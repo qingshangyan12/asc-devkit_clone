@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | --- | --- |
 | Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+| Atlas A3训练系列产品/Atlas A3推理系列产品 | x |
+| Atlas A2训练系列产品/Atlas A2推理系列产品 | x |
+| Atlas 200I/500 A2推理产品 | x |
+| Atlas推理系列产品AI Core | x |
+| Atlas推理系列产品Vector Core | x |
+| Atlas训练系列产品 | x |
 
 ## 功能说明
 
@@ -36,7 +36,7 @@ inline uint64_t asc_atomic_and(uint64_t *address, uint64_t val)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ inline uint64_t asc_atomic_and(uint64_t *address, uint64_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表 2**  不同数据类型支持的内存范围
+**表2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -73,17 +73,16 @@ Unified Buffer或Global Memory上的初始数据。
 ## 调用示例
 
 **场景**
-多个线程根据各自检测结果清除共享状态字中的某些 bit，使用 `asc_atomic_and` 保证不同线程清除不同 bit 时不会覆盖彼此的修改。
+
+多个线程根据各自检测结果清除共享状态字中的某些bit，使用`asc_atomic_and`保证不同线程清除不同bit时不会覆盖彼此的修改。
 
 **输入说明**
 
 | 名称 | 说明 |
-| --- |  --- |
-| `flags` | Global Memory 中的共享状态位。 |
-| `clear_bits` | 每个元素表示需要清除的 bit，kernel 内部会转换为 AND 掩码。 |
+| --- | --- |
+| `flags` | Global Memory中的共享状态位。 |
+| `clear_bits` | 每个元素表示需要清除的bit，kernel内部会转换为AND掩码。 |
 | `n` | 掩码数量。 |
-
-**实现代码**
 
 **代码实现**
 

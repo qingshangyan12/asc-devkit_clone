@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | --- | --- |
 | Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+| Atlas A3训练系列产品/Atlas A3推理系列产品 | x |
+| Atlas A2训练系列产品/Atlas A2推理系列产品 | x |
+| Atlas 200I/500 A2推理产品 | x |
+| Atlas推理系列产品AI Core | x |
+| Atlas推理系列产品Vector Core | x |
+| Atlas训练系列产品 | x |
 
 ## 功能说明
 
@@ -56,7 +56,7 @@ inline bfloat16x2_t asc_atomic_max(bfloat16x2_t *address, bfloat16x2_t val)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -65,7 +65,7 @@ inline bfloat16x2_t asc_atomic_max(bfloat16x2_t *address, bfloat16x2_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表 2**  不同数据类型支持的内存范围
+**表2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -102,14 +102,15 @@ Unified Buffer或Global Memory上的初始数据。
 ## 调用示例
 
 **场景**
-多个线程扫描分数数组，使用 `asc_atomic_max` 将全局最高分写入同一个结果地址。
+
+多个线程扫描分数数组，使用`asc_atomic_max`将全局最高分写入同一个结果地址。
 
 **输入说明**
 
 | 名称 | 说明 |
-| --- |  --- |
+| --- | --- |
 | `scores` | 每个元素表示一个候选分数。 |
-| `max_score` | Global Memory 中的最大值结果，kernel 启动前初始化为足够小的值。 |
+| `max_score` | Global Memory中的最大值结果，kernel启动前初始化为足够小的值。 |
 | `n` | 分数数量。 |
 
 **代码实现**
