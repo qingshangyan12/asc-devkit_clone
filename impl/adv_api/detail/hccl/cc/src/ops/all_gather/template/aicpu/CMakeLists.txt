@@ -10,6 +10,7 @@
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_gather_mesh_1D.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_gather_nhr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_gather_hd.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_gather_nhr_dpu.cc
 )
 

@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #ifndef HCCL_CCU_KERNEL_ALLREDUCE_MESH_1D_MEM2MEM_H
 #define HCCL_CCU_KERNEL_ALLREDUCE_MESH_1D_MEM2MEM_H
 
@@ -104,7 +105,7 @@ private:
     std::vector<hcomm::CcuRep::Variable> input_;
     std::vector<hcomm::CcuRep::Variable> output_;
     std::vector<hcomm::CcuRep::Variable> token_;
-    std::vector<hcomm::CcuRep::Variable> scratch_;
+    CcuRep::Variable                     myScratch_;
     hcomm::CcuRep::Variable              currentRankSliceInputOffset_;
     hcomm::CcuRep::Variable              currentRankSliceOutputOffset_;
     hcomm::CcuRep::Variable              normalSliceSize_;
@@ -113,7 +114,7 @@ private:
     hcomm::CcuRep::Variable              sliceOffset_;
     hcomm::CcuRep::Variable              isInputOutputEqual_;
     hcomm::CcuRep::Variable              sliceSize_;
-    hcomm::CcuRep::CompletedEvent        locEvent_;
+    std::vector<hcomm::CcuRep::CompletedEvent> events_;
 
     hcomm::CcuRep::LocalAddr              srcMem_;
     hcomm::CcuRep::LocalAddr              localDstMem_;
@@ -130,6 +131,9 @@ private:
     void ReduceLoopGroup(hcomm::CcuRep::LocalAddr outDstOrg, hcomm::CcuRep::LocalAddr srcOrg,
         std::vector<hcomm::CcuRep::LocalAddr> &scratchOrg, GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType,
         HcclReduceOp opType);
+    void PairwiseLocalReduce(hcomm::CcuRep::LocalAddr myOutput, std::vector<hcomm::CcuRep::LocalAddr> &inputVec,
+        hcomm::CcuRep::Variable sliceSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
+    void DoLocalReduce();
     const std::string LOOP_BLOCK_TAG{"_local_copy_reduce_loop_"};
 };
 } // namespace mc2_ops_hccl

@@ -17,6 +17,7 @@ namespace mc2_ops_hccl {
 
 class CcuTempAllGatherMesh1DMem2Mem : public CcuAlgTemplateBase {
 public:
+    CcuTempAllGatherMesh1DMem2Mem() = default;
     explicit  CcuTempAllGatherMesh1DMem2Mem(const OpParam& param, 
                                                 const u32 rankId, // 传通信域的rankId，userRank
                                                 const std::vector<std::vector<u32>> &subCommRanks);

@@ -41,8 +41,9 @@ public:
 
     void GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMianToSub) override;
     void GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain) override;
+protected:
+    virtual HcclResult GetStepInfoList(std::vector<AicpuNHRStepInfo> &stepInfoList);
 private:
-    HcclResult GetStepInfoList(std::vector<AicpuNHRStepInfo> &stepInfoList);
     HcclResult LocalDataCopy(const std::vector<ThreadHandle> &threads);
     HcclResult RunNHR(const std::vector<ThreadHandle> &threads);
     HcclResult PostLocalCopy(const std::vector<ThreadHandle> &threads);

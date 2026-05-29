@@ -29,6 +29,8 @@
 namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
+constexpr u32 MAX_NUM_BLOCKS = 56;
+constexpr uint64_t AICPU_ALIGN_SIZE = 4096;
 
 constexpr uint32_t DATATYPE_SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {sizeof(int8_t), sizeof(int16_t), sizeof(int32_t),
     2, sizeof(float), sizeof(int64_t), sizeof(uint64_t), sizeof(uint8_t), sizeof(uint16_t), sizeof(uint32_t),
@@ -149,6 +151,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     Level0Shape level0Topo;
     bool Level0Nhr{false};
     bool Level1Nhr{false};
+    bool Level1Hd{false};
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
@@ -181,6 +184,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0Topo;
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
+        binaryStream << Level1Hd;
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
@@ -227,6 +231,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0Topo;
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
+        binaryStream >> Level1Hd;
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
@@ -271,6 +276,7 @@ struct CcuKernelSubmitInfo {
 // ccu快速下发上下文
 struct CcuFastLaunchCtx {
     char algName[OP_ALG_LENGTH];
+    u32 notifyNumOnMainThread = 0;
     u32 threadNum;
     u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO];  // 每次调用template的KernelRun下发的kernel数量
     // 紧接ThreadHandle数组

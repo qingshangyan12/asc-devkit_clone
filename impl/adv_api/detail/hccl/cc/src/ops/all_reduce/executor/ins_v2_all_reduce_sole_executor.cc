@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_v2_all_reduce_sole_executor.h"
 #include "ins_temp_all_reduce_mesh_1D_one_shot.h"
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
@@ -14,6 +15,7 @@
 #include "ins_temp_all_reduce_mesh_1D_two_shot_mesh_chunk.h"
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 #ifndef AICPU_COMPILE
+#if !defined(HCCL_CANN_COMPAT_850)
 #include "ccu_temp_all_reduce_mesh_1D_one_shot.h"
 #include "ccu_temp_all_reduce_mesh_1D_mem2mem.h"
 #include "ccu_temp_all_reduce_mesh_1D.h"
@@ -21,6 +23,7 @@
 #include "ccu_temp_all_reduce_mesh_1D_2die_oneshot.h"
 #include "ccu_temp_all_reduce_mesh_1D_mem2mem_2die_oneshot.h"
 #include "ccu_temp_all_reduce_nhr_mem2mem_1D_multi_jetty.h"
+#endif /* !HCCL_CANN_COMPAT_850 */
 #endif
 
 namespace mc2_ops_hccl {
@@ -51,7 +54,7 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(
     std::shared_ptr<InsAlgTemplate> algTemplate = 
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
     // 调用计算资源的函数
-    algTemplate->CalcRes(comm, param, topoInfo, resourceRequest);
+    CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
     return HCCL_SUCCESS;
 }
 
@@ -161,9 +164,80 @@ HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         CHK_RET(algTemplate->KernelRun(param, tempAlgParams, templateAlgRes));
         processedDataCount += currDataCount;
     }
+#ifndef AICPU_COMPILE
+    if (loopTimes == 1 && param.engine == CommEngine::COMM_ENGINE_CCU && param.opMode != OpMode::OFFLOAD) {
+        CHK_RET(FastLaunchSaveCtx(param, templateAlgRes, resCtx.notifyNumOnMainThread));
+    }
+#endif
+
     HCCL_INFO("[InsV2AllReduceSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
 }
+
+#ifndef AICPU_COMPILE
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunchSaveCtx(
+    const OpParam &param, const TemplateResource &templateAlgRes, u32 notifyNumOnMainThread)
+{
+    HCCL_INFO("[InsV2AllReduceSoleExecutor] loopTimes==1, save fast launch ctx.");
+    u32 threadNum = 1;
+    u32 ccuKernelNum = templateAlgRes.submitInfos.size();
+    if (ccuKernelNum < 1) {
+        HCCL_INFO("[InsV2AllReduceSoleExecutor] ccu kernel num is 0, no need to save.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][HcclEngineCtxCreate] threadNum[%llu], ccuKernelNum[%llu]", threadNum, ccuKernelNum);
+
+    u64 size = CcuFastLaunchCtx::GetCtxSize(threadNum, ccuKernelNum);
+    // 申请ctx
+    void *ctxPtr = nullptr;
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][HcclEngineCtxCreate] Tag[%s], size[%llu]", param.fastLaunchTag, size);
+    CHK_RET(HcclEngineCtxCreate(param.hcclComm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, size, &ctxPtr));
+
+    CcuFastLaunchCtx *ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(ctxPtr);
+    // 1 算法名
+    CHK_SAFETY_FUNC_RET(strcpy_s(ccuFastLaunchCtx->algName, sizeof(ccuFastLaunchCtx->algName), param.algName));
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunchSaveCtx] algName[%s]", ccuFastLaunchCtx->algName);
+
+    // 2 thread
+    ccuFastLaunchCtx->threadNum = threadNum;
+    ccuFastLaunchCtx->notifyNumOnMainThread = notifyNumOnMainThread;
+    ThreadHandle *threads = ccuFastLaunchCtx->GetThreadHandlePtr();
+    threads[0] = templateAlgRes.threads[0];
+        
+    // 3 ccu kernel handle, taskArg入参
+    ccuFastLaunchCtx->ccuKernelNum[0] = ccuKernelNum;
+    CcuKernelSubmitInfo *kernelSubmitInfos = ccuFastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    kernelSubmitInfos[0] = templateAlgRes.submitInfos[0];
+    return HCCL_SUCCESS;
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllReduceSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaunch(
+        const OpParam &param, const CcuFastLaunchCtx *fastLaunchCtx)
+{
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] Start.");
+    TemplateFastLaunchCtx tempFastLaunchCtx;
+    // 1 取thread
+    ThreadHandle *threads = fastLaunchCtx->GetThreadHandlePtr();
+    tempFastLaunchCtx.threads.assign(threads, threads + fastLaunchCtx->threadNum);
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] threadNum[%llu]", fastLaunchCtx->threadNum);
+    
+    // 2 取arg
+    CcuKernelSubmitInfo *ccuKernelSubmitInfos = fastLaunchCtx->GetCcuKernelSubmitInfoPtr();
+    tempFastLaunchCtx.ccuKernelSubmitInfos.assign(ccuKernelSubmitInfos, ccuKernelSubmitInfos + fastLaunchCtx->ccuKernelNum[0]);
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] ccuKernelNum[%llu]", fastLaunchCtx->ccuKernelNum[0]);
+    tempFastLaunchCtx.buffInfo.inputPtr = param.inputPtr;
+    tempFastLaunchCtx.buffInfo.outputPtr = param.outputPtr;
+    tempFastLaunchCtx.buffInfo.hcclBuff = param.hcclBuff;
+    
+    // 3 调template
+    std::unique_ptr<InsAlgTemplate> algTemplate = std::make_unique<InsAlgTemplate>();
+    CHK_RET(algTemplate->FastLaunch(param, tempFastLaunchCtx));
+    HCCL_INFO("[InsV2AllReduceSoleExecutor][FastLaunch] End.");
+    return HCCL_SUCCESS;
+}
+#endif
 
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceMesh1DOneShot, InsV2AllReduceSoleExecutor,
     TopoMatch1D, InsTempAllReduceMesh1DOneShot);
@@ -177,20 +251,34 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceAicpuReduceNHR, In
     TopoMatch1D, InsTempAllReduceAicpuReduceNHR);
 
 #ifndef AICPU_COMPILE
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceNHR1D, InsV2AllReduceSoleExecutor, TopoMatch1D,
                  CcuTempAllReduceNHRMem2Mem1D);
+#endif /* !HCCL_CANN_COMPAT_850 */
 
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1DMem2Mem, InsV2AllReduceSoleExecutor,
                  TopoMatch1D, CcuTempAllReduceMeshMem2Mem1D);
+#endif /* !HCCL_CANN_COMPAT_850 */
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1D, InsV2AllReduceSoleExecutor, 
                  TopoMatch1D, CcuTempAllReduceMesh1D);
+#endif /* !HCCL_CANN_COMPAT_850 */
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh2Die, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempAllreduceMesh1D2DieOneShot);
+#endif /* !HCCL_CANN_COMPAT_850 */
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1DOneShot, InsV2AllReduceSoleExecutor,
     TopoMatch1D, CcuTempAllReduceMesh1DOneShot);
+#endif /* !HCCL_CANN_COMPAT_850 */
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceMesh1DMem2Mem2DieOneShot, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempAllReduceMesh1DMem2Mem2DieOneShot);
+#endif /* !HCCL_CANN_COMPAT_850 */
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceNHR1DMem2MemMultiJetty, InsV2AllReduceSoleExecutor, TopoMatch1D,
     CcuTempAllReduceNhrMem2Mem1DMultiJetty);
+#endif /* !HCCL_CANN_COMPAT_850 */
 #endif
 }  // namespace mc2_ops_hccl

@@ -35,6 +35,11 @@ HcclResult SendWrite(const DataInfo &sendInfo, const ThreadHandle &thread)
     return HCCL_SUCCESS;
 }
 
+HcclResult SendBatchWrite(const DataInfo &sendInfo, const ThreadHandle &thread)
+{
+    return SendWrite(sendInfo, thread);
+}
+
 HcclResult RecvWrite(const DataInfo &recvInfo, const ThreadHandle &thread)
 {
     const ChannelInfo &recvChannel = recvInfo.channel_;
@@ -82,6 +87,11 @@ HcclResult SendRecvWrite(const SendRecvInfo &sendRecvInfo, const ThreadHandle &t
     return HCCL_SUCCESS;
 }
 
+HcclResult SendRecvBatchWrite(const SendRecvInfo &sendRecvInfo, const ThreadHandle &thread)
+{
+    return SendRecvWrite(sendRecvInfo, thread);
+}
+
 HcclResult SendWriteReduce(const DataReduceInfo &sendInfo, const ThreadHandle &thread)
 {
     const std::vector<DataSlice> srcSlices = sendInfo.slices_.srcSlices_;
@@ -124,6 +134,11 @@ HcclResult SendWriteReduce(const DataReduceInfo &sendInfo, const ThreadHandle &t
     CHK_RET(
         static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL)));
     return HCCL_SUCCESS;
+}
+
+HcclResult SendBatchWriteReduce(const DataReduceInfo &sendInfo, const ThreadHandle &thread)
+{
+    return SendWriteReduce(sendInfo, thread);
 }
 
 HcclResult RecvWriteReduce(const DataReduceInfo &recvInfo, const ThreadHandle &thread)
@@ -187,6 +202,11 @@ HcclResult SendRecvWriteReduce(const SendRecvReduceInfo &sendRecvInfo, const Thr
     return HCCL_SUCCESS;
 }
 
+HcclResult SendRecvBatchWriteReduce(const SendRecvReduceInfo &sendRecvInfo, const ThreadHandle &thread)
+{
+    return SendRecvWriteReduce(sendRecvInfo, thread);
+}
+
 HcclResult SendRead(const DataInfo &sendInfo, const ThreadHandle &thread)
 {
     const ChannelInfo &sendChannel = sendInfo.channel_;
@@ -220,6 +240,11 @@ HcclResult RecvRead(const DataInfo &recvInfo, const ThreadHandle &thread)
     return HCCL_SUCCESS;
 }
 
+HcclResult RecvBatchRead(const DataInfo &recvInfo, const ThreadHandle &thread)
+{
+    return RecvRead(recvInfo, thread);
+}
+
 HcclResult SendRecvRead(const SendRecvInfo &sendRecvInfo, const ThreadHandle &thread)
 {
     const std::vector<DataSlice> srcSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.srcSlices_;
@@ -250,6 +275,11 @@ HcclResult SendRecvRead(const SendRecvInfo &sendRecvInfo, const ThreadHandle &th
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
+}
+
+HcclResult SendRecvBatchRead(const SendRecvInfo &sendRecvInfo, const ThreadHandle &thread)
+{
+    return SendRecvRead(sendRecvInfo, thread);
 }
 
 HcclResult SendReadReduce(const DataReduceInfo &sendInfo, const ThreadHandle &thread)
@@ -305,6 +335,11 @@ HcclResult RecvReadReduce(const DataReduceInfo &recvInfo, const ThreadHandle &th
     return HCCL_SUCCESS;
 }
 
+HcclResult RecvBatchReadReduce(const DataReduceInfo &recvInfo, const ThreadHandle &thread)
+{
+    return RecvReadReduce(recvInfo, thread);
+}
+
 HcclResult SendRecvReadReduce(const SendRecvReduceInfo &sendRecvInfo, const ThreadHandle &thread)
 {
     const std::vector<DataSlice> srcSlices = sendRecvInfo.sendRecvSlices_.rxSlicesList_.srcSlices_;
@@ -355,6 +390,11 @@ HcclResult SendRecvReadReduce(const SendRecvReduceInfo &sendRecvInfo, const Thre
     CHK_RET(static_cast<HcclResult>(
         HcommChannelNotifyWaitOnThread(thread, sendChannel.handle, NOTIFY_IDX_DATA_SIGNAL, CUSTOM_TIMEOUT)));
     return HCCL_SUCCESS;
+}
+
+HcclResult SendRecvBatchReadReduce(const SendRecvReduceInfo &sendRecvInfo, const ThreadHandle &thread)
+{
+    return SendRecvReadReduce(sendRecvInfo, thread);
 }
 
 HcclResult LocalCopy(const ThreadHandle &thread, const DataSlice &srcSlice, const DataSlice &dstSlice)

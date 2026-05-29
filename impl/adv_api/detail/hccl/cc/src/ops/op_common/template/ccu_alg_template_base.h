@@ -44,8 +44,20 @@ public:
     HcclResult GetToken(const BuffInfo &buffinfo, uint64_t &token) const;
 
     HcclResult GetChannelDieId(HcclComm comm, uint32_t rankId, const HcclChannelDesc& channelDesc, uint32_t& dieId) const;
+    HcclResult GetChannelBwCoeff(HcclComm comm, uint32_t rankId, const HcclChannelDesc& channelDesc,
+                                 uint32_t& bwCoeff) const;
+    HcclResult ReverseChannelPerDieIfNeed(const HcclComm comm, const u32 myRankId,
+        std::vector<std::vector<HcclChannelDesc>>& channelsPerDie) const;
+
+    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>> &channels)
+    {
+        CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
+        channelsPerRank_ = CalcChannelsPerRank(channels);
+        return HCCL_SUCCESS;
+    }
 
 protected:
+    u32             channelsPerRank_    = 1;
     OpMode          opMode_             = OpMode::OPBASE;
     u32             myRank_             = INVALID_VALUE_RANKID;
     u32             root_               = 0;

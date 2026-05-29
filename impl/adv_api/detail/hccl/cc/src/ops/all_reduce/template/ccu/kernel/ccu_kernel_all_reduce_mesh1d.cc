@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_reduce_mesh1d.h"
 
@@ -23,9 +24,7 @@ CcuKernelAllReduceMesh1D::CcuKernelAllReduceMesh1D(const CcuKernelArg &arg)
                                                     : CcuKernelAlgBase(arg)
 {
     const CcuKernelArgAllReduceMesh1D *kernelArg = dynamic_cast<const CcuKernelArgAllReduceMesh1D *>(&arg);
-    if (kernelArg == nullptr) {
-        HCCL_ERROR("CcuKernelAllReduceMesh1D::kernelArg ptr is null");
-    }
+
     rankId_         = kernelArg->rankId_;
     rankSize_       = kernelArg->dimSize_[0];
     dataType_       = kernelArg->opParam_.DataDes.dataType;
@@ -165,9 +164,6 @@ HcclResult CcuKernelAllReduceMesh1D::Algorithm()
 std::vector<uint64_t> CcuKernelAllReduceMesh1D::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgAllReduceMesh1D *taskArg = dynamic_cast<const CcuTaskArgAllReduceMesh1D *>(&arg);
-    if (taskArg == nullptr) {
-        HCCL_ERROR("CcuKernelAllReduceMesh1D::taskArg ptr is null");
-    }
     uint64_t inputAddr  = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
     uint64_t tokenInfo  = taskArg->token_;

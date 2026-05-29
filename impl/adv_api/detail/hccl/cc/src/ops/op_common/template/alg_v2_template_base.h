@@ -49,9 +49,17 @@ public:
 
     virtual void GetNotifyIdxSubToMain(std::vector<u32> &notifyIdxSubToMain) = 0;
 
+    virtual HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>> &channels)
+    {
+        CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
+        channelsPerRank_ = CalcChannelsPerRank(channels);
+        return HCCL_SUCCESS;
+    }
+
     bool IsPcieProtocol(const std::map<u32, std::vector<ChannelInfo>> &channels);
 
 protected:
+    u32                              channelsPerRank_ = 1;
 
     OpMode                           opMode_; // 单算子还是图模式
     u32                              root_ = 0;  // 一般是scatter、broadcast需要

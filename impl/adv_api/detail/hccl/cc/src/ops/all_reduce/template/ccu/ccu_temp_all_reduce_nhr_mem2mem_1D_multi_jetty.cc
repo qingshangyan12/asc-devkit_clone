@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ccu_temp_all_reduce_nhr_mem2mem_1D_multi_jetty.h"
 
 #include <algorithm>
@@ -16,7 +16,7 @@
 #include "alg_template_base.h"
 
 namespace mc2_ops_hccl {
-constexpr u32 PORT_NUM = 4;
+constexpr u32 PORT_NUM = 1;
 
 CcuTempAllReduceNhrMem2Mem1DMultiJetty::CcuTempAllReduceNhrMem2Mem1DMultiJetty(const OpParam& param,
         const u32 rankId, const std::vector<std::vector<u32>> &subCommRanks) : 
@@ -88,6 +88,37 @@ HcclResult CcuTempAllReduceNhrMem2Mem1DMultiJetty::CalcRes(HcclComm comm, const 
     return HcclResult::HCCL_SUCCESS;
 }
 
+HcclResult CcuTempAllReduceNhrMem2Mem1DMultiJetty::FastLaunch(const OpParam& param, const TemplateFastLaunchCtx& tempFastLaunchCtx)
+{
+    if (tempFastLaunchCtx.ccuKernelSubmitInfos.size() == 0) {
+        HCCL_INFO("[CcuTempAllReduceNhrMem2Mem1DMultiJetty::FastLaunch] ccu kernel num is 0, just success.");
+        return HCCL_SUCCESS;
+    }
+    HCCL_DEBUG("[%s] begin.", __func__);
+    const uint64_t *args = tempFastLaunchCtx.ccuKernelSubmitInfos[0].cachedArgs;
+    buffInfo_ = tempFastLaunchCtx.buffInfo;
+    
+    // 计算NHR Multi Jetty特有的参数
+    CcuTaskArgAllReduceNhrMem2Mem1DMultiJetty taskArg(
+        PointerToAddr(buffInfo_.inputPtr) + args[0],
+        PointerToAddr(buffInfo_.outputPtr) + args[1],
+        args[2], // outputToken
+        args[3], // isInplace
+        args[4], // dataSizePerRank
+        args[5], // dataSizePerPort
+        args[6], // lastRankSliceSize
+        args[7]  // lastPortSliceSize;
+    );
+
+    void* taskArgPtr = static_cast<void*>(&taskArg);
+
+    CHK_RET(HcclCcuKernelLaunch(param.hcclComm, tempFastLaunchCtx.threads[0], 
+        tempFastLaunchCtx.ccuKernelSubmitInfos[0].kernelHandle, taskArgPtr));
+
+    HCCL_DEBUG("[%s] end.", __func__);
+    return HcclResult::HCCL_SUCCESS;
+}
+
 HcclResult CcuTempAllReduceNhrMem2Mem1DMultiJetty::KernelRun(const OpParam& param,
     const TemplateDataParams& templateDataParams, TemplateResource& templateResource)
 {
@@ -136,6 +167,14 @@ HcclResult CcuTempAllReduceNhrMem2Mem1DMultiJetty::KernelRun(const OpParam& para
 
     CHK_RET(
         HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr));
+
+    
+    // 下发完再保存参数信息
+    CcuKernelSubmitInfo submitInfo;
+    submitInfo.kernelHandle = templateResource.ccuKernels[0];
+    CHK_RET(FillCachedArgs(submitInfo, buffInfo_.inBuffBaseOff, buffInfo_.outBuffBaseOff, outputToken, isInplace,
+        dataSizePerRank, dataSizePerPort, lastRankSliceSize, lastPortSliceSize));
+    templateResource.submitInfos.push_back(submitInfo);
 
     HCCL_DEBUG("[%s] end.", __func__);
 
@@ -277,5 +316,10 @@ HcclResult CcuTempAllReduceNhrMem2Mem1DMultiJetty::GetRes(AlgResourceRequest& re
     resourceRequest.slaveThreadNum = 0;
 
     return HcclResult::HCCL_SUCCESS;
+}
+
+u64 CcuTempAllReduceNhrMem2Mem1DMultiJetty::GetThreadNum() const
+{
+    return 1;
 }
 } // namespace mc2_ops_hccl

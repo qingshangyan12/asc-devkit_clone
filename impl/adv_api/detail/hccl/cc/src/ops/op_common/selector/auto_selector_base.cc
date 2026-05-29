@@ -97,6 +97,14 @@ bool AutoSelectorBase::IsLargeData(const u64 dataSize) const
     return dataSize >= LARGE_COUNT_1024KB;
 }
 
+bool AutoSelectorBase::IsSmallDataCCU(const u64 dataSize, const u64 rankSize) const
+{
+    if (rankSize == 0) {
+        HCCL_WARNING("[AutoSelectorBase][IsSmallDataCCU] rankSize is 0.");
+    }
+    return dataSize <= CCU_PARALLEL_MAX_DATA_SIZE;
+}
+
 SelectorStatus AutoSelectorBase::SelectCcuMsAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
                                                  const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
                                                  std::string &selectAlgName) const
@@ -287,6 +295,26 @@ HcclResult AutoSelectorBase::CheckClosNumMultipleOfMeshNum(const TopoInfoWithNet
     // 检查CLOS数量是否大于1DMESH数量且是1DMESH数量的倍数
     isMultiple = (meshRankNums > 1) && (closRankNums > meshRankNums) && (closRankNums % meshRankNums == 0);
     return HCCL_SUCCESS;
+}
+
+bool AutoSelectorBase::IsTwoLevelNetLayer(const TopoInfoWithNetLayerDetails *topoInfo) const
+{
+    CHK_PRT_RET(topoInfo == nullptr,
+        HCCL_WARNING("[AutoSelectorBase][IsTwoLevelNetLayer] topoInfo is nullptr."), false);
+    if (topoInfo->netLayerDetails.netLayerNum <= 1) {
+        HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] netLayerNum[%u] <= 1.",
+            topoInfo->netLayerDetails.netLayerNum);
+        return false;
+    }
+    u32 level1Idx = topoInfo->netLayerDetails.netLayers[1];
+    bool hasLevel1Clos = topoInfo->topoInstDetailsOfLayer.size() > level1Idx &&
+        topoInfo->topoInstDetailsOfLayer[level1Idx].rankNumForTopoType.find(COMM_TOPO_CLOS) !=
+            topoInfo->topoInstDetailsOfLayer[level1Idx].rankNumForTopoType.end();
+    if (!hasLevel1Clos) {
+        return false;
+    }
+    return topoInfo->netLayerDetails.localNetInsSizeOfLayer.size() >= 1 &&
+        topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] > 1;
 }
 
 bool AutoSelectorBase::IsInputOutputOverlap(const OpParam &opParam) const
