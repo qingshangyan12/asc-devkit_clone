@@ -8,11 +8,7 @@
 
 ## 功能说明
 
-头文件为：
-
-```cpp
-#include "tensor_api/tensor.h"
-```
+需要包含的头文件为：#include "tensor_api/tensor.h"
 
 MakeFrameLayout用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
 

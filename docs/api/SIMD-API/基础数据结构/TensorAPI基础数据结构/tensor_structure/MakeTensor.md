@@ -15,7 +15,7 @@ MakeTensor负责将内存指针适配器（由[MakeMemPtr](./MakeMemPtr.md)生�
 `MakeTensor`内部会根据第一个参数的类型自动判断：
 
 - 第一个参数是否是一个已具备解引用能力的迭代器。若是，则作为Engine（内存引擎）使用。
-- 后续参数会被处理为Layout：
+- 后续参数会被处理为Layout。
 
 生成的LocalTensor对象可直接传入Copy（数据搬运）和Mmad（矩阵计算）接口，编译器会根据其Engine中的物理位置标记和Layout中的布局模式，自动选择底层硬件指令。
 

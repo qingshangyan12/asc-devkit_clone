@@ -5,10 +5,15 @@
 | 产品 | 是否支持 |
 | ----------- | :----: |
 | Ascend 950PR/Ascend 950DT | √ |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
 
 ## 功能说明
 
-头文件为： #include "ceil_align.h"
+需要包含的头文件为： #include "ceil_align.h"
 
 ceil_align用于将一个数按给定对齐值向上对齐。其计算方式为先执行向上整除，再乘以对齐值：
 
