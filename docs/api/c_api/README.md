@@ -4,11 +4,12 @@ C API开放芯片完备编程能力，支持[以数组形式分配内存](genera
 
 ## 需要包含的头文件
 
-> [!NOTE]说明 
+> [!NOTE]
+> 说明
 > 包含asc_simd.h文件来调用C API相应接口。如无特殊说明，包含该头文件即可满足接口调用需求。
 > 若API文档中有特殊说明，则应遵循API的具体说明。
 
-```
+```cpp
 #include "c_api/asc_simd.h"
 ```
 
@@ -25,6 +26,8 @@ C API开放芯片完备编程能力，支持[以数组形式分配内存](genera
 |\_\_gm\_\_|存储空间定义修饰符，表示被修饰的变量位于Global Memory地址空间。|
 |\_\_ubuf\_\_|存储空间定义修饰符，表示被修饰的变量位于Unified Buffer地址空间。|
 |\_\_aicore\_\_|执行空间限定符。表示该函数只能在Ai Core上执行。|
+|\_\_cbuf\_\_|存储空间定义修饰符，表示被修饰的变量位于L1 Buffer地址空间。|
+|\_\_simd\_callee\_\_|执行空间限定符。表示该函数只能在Reg上执行。|
 
 ## 流水类型
 
@@ -34,11 +37,11 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 - PIPE_M：矩阵计算流水线。
 - PIPE_MTE1：搬运操作。包括从L1 Buffer到L0A Buffer或L0B Buffer，从L1 Buffer到UB的搬运操作和L0A Buffer或L0B Buffer的初始化操作。
 - PIPE_MTE2：搬运操作。包括从GM到L1 Buffer、从GM到L0A Buffer或L0B Buffer、从GM到UB的搬运操作和L1 Buffer的初始化操作。
-- PIPE_MTE3：搬运操作。包括从UB到GM，从UB到L1 Buffer的操作。
+- PIPE_MTE3：搬运操作。包括从UB到GM、从UB到L1 Buffer的操作和从UB到UB的搬运操作。
 - PIPE_FIX：Fixpipe流水线。
 - PIPE_ALL：所有流水线。
 
-可通过[同步控制](c_api_list.md#同步控制)类API控制同一流水线内的运行顺序和不同流水线建的执行顺序。
+可通过[同步控制](c_api_list.md#同步控制)类API控制同一流水线内的运行顺序和不同流水线间的执行顺序。
 
 ## API列表
 
@@ -47,7 +50,12 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 | [数据结构](c_api_list.md#数据结构) |
 | [矢量计算](c_api_list.md#矢量计算) |
 | [数据搬运](c_api_list.md#数据搬运) |
+| [标量操作](c_api_list.md#标量操作) |
+| [矩阵计算](c_api_list.md#矩阵计算) |
 | [同步控制](c_api_list.md#同步控制) |
 | [系统变量](c_api_list.md#系统变量) |
+| [缓存控制](c_api_list.md#缓存控制) |
 | [原子操作](c_api_list.md#原子操作) |
 | [其他操作](c_api_list.md#其他操作) |
+| [Reg数据搬运](c_api_list.md#Reg数据搬运) |
+| [Reg矢量计算](c_api_list.md#Reg矢量计算) |

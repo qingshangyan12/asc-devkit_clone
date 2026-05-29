@@ -81,7 +81,7 @@ vector_half src0;
 vector_half src1;
 vector_bool mask;
 
-uint16_t repeatTime = 8;
+uint16_t repeatTimes = 8;
 uint16_t repeatSize = 64;
 for (uint16_t i = 1; i < repeatTimes; i++) {
     asc_mem_bar(VST_VLD);

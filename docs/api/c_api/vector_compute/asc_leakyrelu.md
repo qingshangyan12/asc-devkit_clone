@@ -76,7 +76,7 @@ PIPE_V
 //total_length 指参与计算的数据长度
 constexpr uint64_t total_length = 64;
 half alpha = 0.1;
-___ubuf__ half src[total_length];
-___ubuf__ half dst[total_length];
+__ubuf__ half src[total_length];
+__ubuf__ half dst[total_length];
 asc_leakyrelu_sync(dst, src, alpha, total_length);
 ```

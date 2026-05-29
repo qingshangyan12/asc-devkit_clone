@@ -94,7 +94,7 @@ PIPE_V
 
 ```cpp
 // total_length指参与计算的数据长度
-constexpr uint64_t total_length = 64
+constexpr uint64_t total_length = 64;
 __ubuf__ float src[total_length];
 __ubuf__ int16_t dst[total_length];
 asc_float2int16_rn(dst, src, total_length);

@@ -1,8 +1,8 @@
 # asc_set_l13d_padding
 
-## AI处理器支持情况
+## 产品支持情况
 
-|AI处理器类型   | 是否支持 |
+|产品   | 是否支持 |
 | ------------|:----:|
 | Ascend 950PR/Ascend 950DT |    √     |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
@@ -14,7 +14,7 @@
 
 ## 函数原型
 
-```c++
+```cpp
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
 __aicore__ inline void asc_set_l13d_padding(half config)
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
@@ -41,7 +41,7 @@ PIPE_S
 
 ## 调用示例
 
-```c++
+```cpp
 constexpr uint64_t config = 0;
 asc_set_l13d_padding(config);
 ```

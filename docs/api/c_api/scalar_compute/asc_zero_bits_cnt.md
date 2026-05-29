@@ -41,7 +41,6 @@ PIPE_S
 
 ```c++
 uint64_t value = 33;
-asc_zero_bits_cnt(value);
 // 输出数据count_zero为62
 int64_t count_zero = asc_zero_bits_cnt(value);
 ```

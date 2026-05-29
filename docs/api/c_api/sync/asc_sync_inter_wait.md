@@ -43,7 +43,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-int64_t flagID = 1;
-asc_sync_inter_arrive(PIPE_S, flagID);
-asc_sync_inter_wait(PIPE_S, flagID);  
+int64_t flag_id = 1;
+asc_sync_inter_arrive(PIPE_S, flag_id);
+asc_sync_inter_wait(PIPE_S, flag_id);
 ```

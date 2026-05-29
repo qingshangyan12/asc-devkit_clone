@@ -1,8 +1,8 @@
 # asc_copy_l12gm
 
-## AI处理器支持情况
+## 产品支持情况
 
-| AI处理器类型 | 是否支持  |
+| 产品 | 是否支持  |
 | :----------------------- | :------: |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
@@ -15,12 +15,12 @@
 
 - 常规搬运
 
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
     ```
 - 同步搬运
 
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
     ```
 

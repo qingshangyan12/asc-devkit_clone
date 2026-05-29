@@ -1,12 +1,10 @@
 # asc_copy_l12fb_v2
 
-## AI处理器支持情况
+## 产品支持情况
 
-| AI处理器类型 | 是否支持  |
+| 产品 | 是否支持  |
 | :----------------------- | :------: |
 |<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    x    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    x    |
 
 ## 功能说明
 
@@ -15,7 +13,7 @@
 ## 函数原型
 
 - 前n个数据搬运
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 
@@ -25,7 +23,7 @@
     ```
 
 - 同步计算
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 

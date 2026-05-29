@@ -81,6 +81,6 @@ PIPE_V
 
 ```cpp
 vector_half dst;
-vector_half src;
+__ubuf__ half src[64];
 asc_loadunalign_pre(dst, src);
 ```

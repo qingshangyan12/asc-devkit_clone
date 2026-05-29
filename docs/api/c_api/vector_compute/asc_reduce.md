@@ -71,8 +71,8 @@ PIPE_V
 ```cpp
 //total_length指参与计算的数据总长度
 constexpr uint64_t total_length = 128;
-__ubuf__ uint_16 src0[total_length];
-__ubuf__ uint_16 src1[total_length/16];
-__ubuf__ uint_16 dst[total_length];
+__ubuf__ uint16_t src0[total_length];
+__ubuf__ uint16_t src1[total_length/16];
+__ubuf__ uint16_t dst[total_length];
 asc_reduce(dst, src0, src1, total_length);
 ```

@@ -32,7 +32,7 @@ __simd_callee__ inline void asc_leakyrelu(vector_half& dst, vector_half src, hal
 |:-----| :--- |:------------------------------------------------------------------------|
 | dst | 输出 | 目的操作数（矢量数据寄存器）。                                                           |
 | src | 输入 | 源操作数（矢量数据寄存器）。                                                          |
-| value | 输入 | 源操作数（标量）的起始地址。                                                          |
+| value | 输入 | 源操作数（标量），leaky_relu中alpha的值。                                                          |
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg数据类型定义.md)。
@@ -54,7 +54,7 @@ PIPE_V
  ```cpp
 vector_half dst;
 vector_half src;
-half value;
+half value = 0.1;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_leakyrelu(dst, src, value, mask);

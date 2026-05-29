@@ -115,6 +115,7 @@ PIPE_V
     vector_half dst;
     vector_half src;
     asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+    vector_uint16_t index;
     asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather(dst, src, index);
     ```

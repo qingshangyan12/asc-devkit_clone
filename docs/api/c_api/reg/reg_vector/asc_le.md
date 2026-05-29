@@ -50,7 +50,7 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-vector_bool& dst;
+vector_bool dst;
 vector_int8_t src0;
 vector_int8_t src1;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);

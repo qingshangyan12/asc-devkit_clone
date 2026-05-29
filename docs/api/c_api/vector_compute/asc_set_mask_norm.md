@@ -41,8 +41,8 @@ asc_set_vector_mask(0xffffffffffffffff, 0xffffffffffffffff);    // 设置每个�
 
 // 进行高维切分计算
 constexpr uint32_t total_length = 128; //total_length指参与计算的数据总长度
-_ubuf__ half src0[total_length];
-_ubuf__ half src1[total_length];
-_ubuf__ half dst[total_length];
-asc_add(dst, src0, src1, config);
+__ubuf__ half src0[total_length];
+__ubuf__ half src1[total_length];
+__ubuf__ half dst[total_length];
+asc_add(dst, src0, src1, total_length);
 ```
