@@ -38,24 +38,24 @@ struct tuple_element;
 
 // make_tuple
 template <typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...args);
+__callee__ __host__ inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...args);
 
 // tie
 template <typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept;
+__callee__ __host__ inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept;
 
 // get
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
+__callee__ __host__ inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept;
+__callee__ __host__ inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept;
+__callee__ __host__ inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept;
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept;
+__callee__ __host__ inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept;
 
 }
 }

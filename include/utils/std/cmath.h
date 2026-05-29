@@ -21,8 +21,8 @@
 
 namespace AscendC {
 namespace Std {
-template <typename T> __aicore__ inline T sqrt(const T src);
-template <typename T> __aicore__ inline T abs(const T src);
+template <typename T> __callee__ __host__ inline T sqrt(const T src);
+template <typename T> __callee__ __host__ inline T abs(const T src);
 }
 }
 

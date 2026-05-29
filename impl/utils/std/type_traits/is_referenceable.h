@@ -24,10 +24,10 @@ namespace Std {
 struct IsReferenceableImpl
 {
     template <typename Tp>
-    ASCENDC_HOST_AICORE inline static Tp& Test(int32_t);
+    __callee__ __host__ inline static Tp& Test(int32_t);
 
     template <typename Tp>
-    ASCENDC_HOST_AICORE inline static false_type Test(uint32_t);
+    __callee__ __host__ inline static false_type Test(uint32_t);
 };
 
 template <typename Tp>
