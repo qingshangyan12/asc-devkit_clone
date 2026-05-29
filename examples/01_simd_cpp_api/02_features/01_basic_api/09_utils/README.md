@@ -9,3 +9,4 @@
 | 目录名称 | 功能描述 | 支持的产品 |
 | ------- | -------- | --- |
 | [ctrl_spr](./ctrl_spr) |  本样例基于SetCtrlSpr、GetCtrlSpr、ResetCtrlSpr接口实现对CTRL寄存器（控制寄存器）的特定比特位的设置、读取和重置，并验证非饱和模式是否正确。 | Ascend 950PR/Ascend 950DT |
+| [gm_by_pass_dcache](./gm_by_pass_dcache) |  本样例基于ReadGmByPassDcache和WriteGmByPassDcache接口，实现不经过DCache从GM读取和写入数据。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
