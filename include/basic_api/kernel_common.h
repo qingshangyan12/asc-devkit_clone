@@ -131,7 +131,7 @@ __aicore__ inline void ReleaseEventID(TEventID id)
     return;
 }
 
-__aicore__ inline TEventID FetchEventID(HardEvent evt)
+template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
 {
     const auto eventIndex = EventToIndex(evt);
     auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
