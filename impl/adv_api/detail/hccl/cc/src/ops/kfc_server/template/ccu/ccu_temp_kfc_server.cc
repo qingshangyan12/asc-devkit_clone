@@ -16,7 +16,7 @@
 #include "kernel/ccu_kernel_kfc_server.h"
 #include "ccu_temp_kfc_server.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 CcuTempKfcServer::CcuTempKfcServer(const OpParam& param, const u32 rankId,
                                    const std::vector<std::vector<u32>> &subCommRanks)

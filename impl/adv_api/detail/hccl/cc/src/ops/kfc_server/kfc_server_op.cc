@@ -17,7 +17,7 @@
 #include <string>
 
 using namespace std;
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
 
 HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream)
 {
@@ -51,7 +51,7 @@ HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, 
     return HCCL_SUCCESS;
 }
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream)
 {
