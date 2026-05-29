@@ -45,7 +45,7 @@ ASCENDC_HOST_AICORE inline constexpr auto ceil_align(const T& num1, const U& num
 
 ## 约束说明
 
-- num2不能为0。
+num2不能为0。
 
 ## 调用示例
 
