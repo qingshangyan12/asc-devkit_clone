@@ -82,86 +82,23 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 **表 2**  接口参数说明
 
-<a name="table917mcpsimp"></a>
-<table><thead align="left"><tr id="row923mcpsimp"><th class="cellrowborder" valign="top" width="15.02%" id="mcps1.2.4.1.1"><p id="p925mcpsimp"><a name="p925mcpsimp"></a><a name="p925mcpsimp"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="9.86%" id="mcps1.2.4.1.2"><p id="p927mcpsimp"><a name="p927mcpsimp"></a><a name="p927mcpsimp"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="75.12%" id="mcps1.2.4.1.3"><p id="p929mcpsimp"><a name="p929mcpsimp"></a><a name="p929mcpsimp"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row930mcpsimp"><td class="cellrowborder" valign="top" width="15.02%" headers="mcps1.2.4.1.1 "><p id="p2925016172518"><a name="p2925016172518"></a><a name="p2925016172518"></a>dst</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.86%" headers="mcps1.2.4.1.2 "><p id="p199251416112517"><a name="p199251416112517"></a><a name="p199251416112517"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="75.12%" headers="mcps1.2.4.1.3 "><p id="p37551021906"><a name="p37551021906"></a><a name="p37551021906"></a>目的操作数，类型为GlobalTensor。</p>
-</td>
-</tr>
-<tr id="row937mcpsimp"><td class="cellrowborder" valign="top" width="15.02%" headers="mcps1.2.4.1.1 "><p id="p3926171610253"><a name="p3926171610253"></a><a name="p3926171610253"></a>src</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.86%" headers="mcps1.2.4.1.2 "><p id="p4926121682518"><a name="p4926121682518"></a><a name="p4926121682518"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="75.12%" headers="mcps1.2.4.1.3 "><p id="p2055414382913"><a name="p2055414382913"></a><a name="p2055414382913"></a>源操作数，类型为LocalTensor。</p>
-</td>
-</tr>
-<tr id="row997554013220"><td class="cellrowborder" valign="top" width="15.02%" headers="mcps1.2.4.1.1 "><p id="p13976540132215"><a name="p13976540132215"></a><a name="p13976540132215"></a>intriParams</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.86%" headers="mcps1.2.4.1.2 "><p id="p139761340102213"><a name="p139761340102213"></a><a name="p139761340102213"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="75.12%" headers="mcps1.2.4.1.3 "><p id="p99761407226"><a name="p99761407226"></a><a name="p99761407226"></a>搬运参数，类型为<a href="#table15841351172811">Nz2NdParamsFull</a>。</p>
-<p id="p58852119618"><a name="p58852119618"></a><a name="p58852119618"></a>具体定义请参考<span id="ph10562197165916"><a name="ph10562197165916"></a><a name="ph10562197165916"></a>${INSTALL_DIR}</span>/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，<span id="ph14322531015"><a name="ph14322531015"></a><a name="ph14322531015"></a>${INSTALL_DIR}</span>请替换为CANN软件安装后文件存储路径。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 输入/输出 | 含义 |
+|----------|----------|------|
+| dst | 输出 | 目的操作数，类型为GlobalTensor。 |
+| src | 输入 | 源操作数，类型为LocalTensor。 |
+| intriParams | 输入 | 搬运参数，类型为<a href="#table15841351172811">Nz2NdParamsFull</a>。<br>具体定义请参考${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nz2NdParamsFull结构体内参数定义
 
-<a name="table15841351172811"></a>
-<table><thead align="left"><tr id="row5583451132815"><th class="cellrowborder" valign="top" width="17.349999999999998%" id="mcps1.2.3.1.1"><p id="p1558335112820"><a name="p1558335112820"></a><a name="p1558335112820"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="82.65%" id="mcps1.2.3.1.2"><p id="p9583125115289"><a name="p9583125115289"></a><a name="p9583125115289"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row35848519280"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p7583115112814"><a name="p7583115112814"></a><a name="p7583115112814"></a>ndNum</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p155843517288"><a name="p155843517288"></a><a name="p155843517288"></a>传输NZ矩阵的数目，取值范围：ndNum∈[0, 4095]。</p>
-</td>
-</tr>
-<tr id="row958417514280"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p75841651132814"><a name="p75841651132814"></a><a name="p75841651132814"></a>nValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p258445192811"><a name="p258445192811"></a><a name="p258445192811"></a>NZ矩阵的行数，取值范围：nValue∈[1, 8192]。</p>
-</td>
-</tr>
-<tr id="row4584551142816"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p95841851162811"><a name="p95841851162811"></a><a name="p95841851162811"></a>dValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p165841451162817"><a name="p165841451162817"></a><a name="p165841451162817"></a>NZ矩阵的列数，取值范围：dValue∈[1, 8192]。dValue必须为16的倍数。</p>
-</td>
-</tr>
-<tr id="row1358415517282"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p165841151162813"><a name="p165841151162813"></a><a name="p165841151162813"></a>srcNdMatrixStride</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p19584551122814"><a name="p19584551122814"></a><a name="p19584551122814"></a>源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256 (16 * 16) 个元素。</p>
-</td>
-</tr>
-<tr id="row558419514287"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p95841051202818"><a name="p95841051202818"></a><a name="p95841051202818"></a>srcNStride</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p958415116285"><a name="p958415116285"></a><a name="p958415116285"></a>源同一NZ矩阵的相邻Z排布的偏移（头与头），取值范围：srcNStride∈[0, 4096]，单位16个元素。</p>
-</td>
-</tr>
-<tr id="row135841513281"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p8584105102812"><a name="p8584105102812"></a><a name="p8584105102812"></a>dstDStride</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p14584105162812"><a name="p14584105162812"></a><a name="p14584105162812"></a>目的ND矩阵的相邻行的偏移（头与头），取值范围：dstDStride∈[1, 65535]，单位为元素。</p>
-</td>
-</tr>
-<tr id="row25848518288"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p85841051122816"><a name="p85841051122816"></a><a name="p85841051122816"></a>dstNdMatrixStride</p>
-</td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p12584165112820"><a name="p12584165112820"></a><a name="p12584165112820"></a>目的ND矩阵中，来自源相邻NZ矩阵的偏移（头与头），取值范围：dstNdMatrixStride∈[1, 65535]，单位为元素。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 含义 |
+|----------|------|
+| ndNum | 传输NZ矩阵的数目，取值范围：ndNum∈[0, 4095]。 |
+| nValue | NZ矩阵的行数，取值范围：nValue∈[1, 8192]。 |
+| dValue | NZ矩阵的列数，取值范围：dValue∈[1, 8192]。dValue必须为16的倍数。 |
+| srcNdMatrixStride | 源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256 (16 * 16) 个元素。 |
+| srcNStride | 源同一NZ矩阵的相邻Z排布的偏移（头与头），取值范围：srcNStride∈[0, 4096]，单位16个元素。 |
+| dstDStride | 目的ND矩阵的相邻行的偏移（头与头），取值范围：dstDStride∈[1, 65535]，单位为元素。 |
+| dstNdMatrixStride | 目的ND矩阵中，来自源相邻NZ矩阵的偏移（头与头），取值范围：dstNdMatrixStride∈[1, 65535]，单位为元素。 |
 
 以half数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
 
@@ -203,45 +140,12 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 **表 4**  Local Memory -\> Global Memory具体通路和支持的数据类型
 
-<a name="table393440155510"></a>
-<table><thead align="left"><tr id="row393412018551"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p16934807556"><a name="p16934807556"></a><a name="p16934807556"></a>产品型号</p>
-</th>
-<th class="cellrowborder" valign="top" width="24.05%" id="mcps1.2.4.1.2"><p id="p1893430155514"><a name="p1893430155514"></a><a name="p1893430155514"></a>数据通路</p>
-</th>
-<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p1493440195515"><a name="p1493440195515"></a><a name="p1493440195515"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1915162915193"><td class="cellrowborder" valign="top" width="11.04%" headers="mcps1.2.4.1.1 "><p id="p699912252718"><a name="p699912252718"></a><a name="p699912252718"></a><span id="ph7999528276"><a name="ph7999528276"></a><a name="ph7999528276"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="24.05%" headers="mcps1.2.4.1.2 "><p id="p15915142931918"><a name="p15915142931918"></a><a name="p15915142931918"></a>VECOUT -&gt; GM（UB -&gt; GM）</p>
-</td>
-<td class="cellrowborder" valign="top" width="64.91%" headers="mcps1.2.4.1.3 "><p id="p1876550195017"><a name="p1876550195017"></a><a name="p1876550195017"></a>bool、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64</p>
-</td>
-</tr>
-<tr id="row16934609558"><td class="cellrowborder" valign="top" width="11.04%" headers="mcps1.2.4.1.1 "><p id="p19934170135514"><a name="p19934170135514"></a><a name="p19934170135514"></a><span id="ph193400165512"><a name="ph193400165512"></a><a name="ph193400165512"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="24.05%" headers="mcps1.2.4.1.2 "><p id="p11934120175514"><a name="p11934120175514"></a><a name="p11934120175514"></a>VECOUT、CO2 -&gt; GM（UB -&gt; GM）</p>
-</td>
-<td class="cellrowborder" valign="top" width="64.91%" headers="mcps1.2.4.1.3 "><p id="p66254400544"><a name="p66254400544"></a><a name="p66254400544"></a>int16_t、uint16_t、int32_t、uint32_t、half、float</p>
-</td>
-</tr>
-<tr id="row16934901554"><td class="cellrowborder" valign="top" width="11.04%" headers="mcps1.2.4.1.1 "><p id="p39346013553"><a name="p39346013553"></a><a name="p39346013553"></a><span id="ph593411013556"><a name="ph593411013556"></a><a name="ph593411013556"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" valign="top" width="24.05%" headers="mcps1.2.4.1.2 "><p id="p1393420185519"><a name="p1393420185519"></a><a name="p1393420185519"></a>VECOUT -&gt; GM（UB -&gt; GM）</p>
-</td>
-<td class="cellrowborder" valign="top" width="64.91%" headers="mcps1.2.4.1.3 "><p id="p20330102215819"><a name="p20330102215819"></a><a name="p20330102215819"></a>int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float</p>
-</td>
-</tr>
-<tr id="row1710511279329"><td class="cellrowborder" valign="top" width="11.04%" headers="mcps1.2.4.1.1 "><p id="p12105227183212"><a name="p12105227183212"></a><a name="p12105227183212"></a><span id="ph10512113993216"><a name="ph10512113993216"></a><a name="ph10512113993216"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" valign="top" width="24.05%" headers="mcps1.2.4.1.2 "><p id="p173619300322"><a name="p173619300322"></a><a name="p173619300322"></a>VECOUT -&gt; GM（UB -&gt; GM）</p>
-</td>
-<td class="cellrowborder" valign="top" width="64.91%" headers="mcps1.2.4.1.3 "><p id="p1987503835813"><a name="p1987503835813"></a><a name="p1987503835813"></a>int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 产品型号 | 数据通路 | 源操作数和目的操作数的数据类型 (两者保持一致) |
+|----------|----------|------------------------------------------------|
+| Ascend 950PR/Ascend 950DT | VECOUT -&gt; GM（UB -&gt; GM） | bool、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64 |
+| Atlas 推理系列产品 AI Core | VECOUT、CO2 -&gt; GM（UB -&gt; GM） | int16_t、uint16_t、int32_t、uint32_t、half、float |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | VECOUT -&gt; GM（UB -&gt; GM） | int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | VECOUT -&gt; GM（UB -&gt; GM） | int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float |
 
 ## 调用示例<a name="section2409153316111"></a>
 
