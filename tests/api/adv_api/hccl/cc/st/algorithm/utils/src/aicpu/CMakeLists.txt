@@ -277,8 +277,9 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/all_gather_v/template/aicpu/ins_temp_all_gather_v_mesh_1D.cc
 
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
-    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
-    ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
+    # DISABLED: use libhccl.so implementation instead
+    # ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
+    # ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
     ${HCCL_DEV_BASE}/src/ops/send/executor/ins_v2_send_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/send/executor/ins_send_executor.cc

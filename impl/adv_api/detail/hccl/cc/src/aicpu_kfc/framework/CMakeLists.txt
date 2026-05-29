@@ -626,6 +626,7 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 
 
     target_include_directories(asc_ccl_kernel PRIVATE ${ORION_HEAD_LIST})
+
     if(TARGET json)
         target_link_libraries(asc_ccl_kernel PRIVATE json)
         add_dependencies(asc_ccl_kernel json)
@@ -982,6 +983,7 @@ if(DEVICE_MODE AND KERNEL_MODE)
         OPEN_BUILD_PROJECT
         -D_GLIBCXX_USE_CXX11_ABI=1
     )
+
     set(AICPU_CUSTOM_LINK_LIBRARIES
         -Wl,--no-as-needed
         ascend_hal

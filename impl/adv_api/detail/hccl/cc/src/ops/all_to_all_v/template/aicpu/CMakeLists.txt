@@ -8,8 +8,11 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 set(src_list
+    # The .cc forwards every member to ops_hccl::InsTempAlltoAllVMesh1D in
+    # libhccl.so / libscatter_aicpu_kernel.so via lazy dlopen + dlsym, so the
+    # CANN library can be absent at install time.
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_to_all_v_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_dpu_alltoall_mesh.cc
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_dpu_alltoall_mesh.cc
 )
 
 target_sources(mc2_client PRIVATE
