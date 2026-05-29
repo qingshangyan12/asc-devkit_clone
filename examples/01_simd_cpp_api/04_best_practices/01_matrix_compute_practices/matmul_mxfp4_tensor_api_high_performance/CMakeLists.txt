@@ -31,6 +31,8 @@ set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
 set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
 
 include_directories(
+    /home/hyolee/asc-devkit_5197
+    /home/hyolee/asc-devkit_5197/include
     "${ASC_INCLUDE_DIR}"
 )
 
