@@ -5,7 +5,7 @@
 - SUM（求和）
 - MAX（求最大值及索引）
 - MIN（求最小值及索引）
-对于求和运算，提供了三种不同的实现方式
+对于求和运算，提供了四种不同的实现方式
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
@@ -18,9 +18,10 @@
 │   │   └── gen_data.py                // reduce_accumulate单独的数据生成脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
-│   ├── reduce_accumulate.asc          // 累加器方式归约求和样例
-│   ├── reduce_iterator.asc            // 迭代器方式归约求和样例
-│   ├── reduce_binary.asc              // 二分累加归约求和样例
+│   ├── reduce_sum_acc.asc             // 逐块归约累加求和样例
+│   ├── reduce_sum_2level.asc          // 两阶段归约求和样例
+│   ├── reduce_sum_seq.asc             // 线性累加归约求和样例
+│   ├── reduce_sum_binary.asc          // 二分累加归约求和样例
 │   ├── reduce_max.asc                 // 归约求最大值+索引样例
 │   ├── reduce_min.asc                 // 归约求最小值+索引样例
 │   └── README.md                      // 样例介绍
@@ -28,14 +29,14 @@
 
 ## 样例描述
 
-### 1. reduce_accumulate.asc - 累加方式归约求和
+### 1. reduce_sum_acc.asc - 逐块归约累加求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
-- 核函数名：`reduce_accumulate`
-- 样例实现：每行数据按 repeat 切分加载，每个 repeat 经 Reduce<SUM> 归约后，通过向量加法顺序累加至同一累加器寄存器 (accReg)，最终写出归约结果。
-- 累加方式：repeat 内采用硬件 Reduce<SUM> 二叉树归约；repeat 间采用顺序累加，即逐个 repeat 将归约结果 Add 到累加器上
+- 核函数名：`reduce_sum_acc`
+- 样例实现：每个 repeat 先做 Reduce<SUM> 归约得到标量，再顺序 Add 到累加器寄存器。
+- 累加方式：先 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）；后 repeat 间：顺序累加，逐个 repeat 的标量归约结果 Add 到累加器
 - 实现伪代码：
   ```cpp
-  // 串行累加器归约: repeat内硬件二叉树 + repeat间串行Add
+  // 逐块归约累加: repeat内硬件二叉树 + repeat间顺序Add
   vlSize = 64, mainRepeats = 8, tailR = 16
   for row in 0..dimA-1:
       acc ← Duplicate(0)                              // 累加寄存器初始化为0
@@ -53,14 +54,14 @@
   ```
   ![alt text](image.png)
 
-### 2. reduce_iterator.asc - 迭代方式归约求和
+### 2. reduce_sum_2level.asc - 两阶段归约求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
-- 核函数名：`reduce_iterator`
-- 样例实现：采用两级归约策略——第一轮对每个 repeat 执行 Reduce<SUM> 并将中间结果非对齐写出到 UB 中转缓冲区 (workLocal)，第二轮对该缓冲区中的中间标量集合再执行一次 Reduce<SUM>，得到最终归约结果。
-- 累加方式：repeat 内为 ReduceSum 二叉树归约；repeat 间同样通过 ReduceSum 完成归约，本质上是两级二叉树归约
+- 核函数名：`reduce_sum_2level`
+- 样例实现：每个 repeat 先做 Reduce<SUM> 归约得到标量写出到 UB，再对中间结果做一次 Reduce<SUM>。
+- 累加方式：先 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）；后 repeat 间：将中间标量写出到 UB，再做一次硬件 Reduce<SUM> 二叉树归约（9→1）
 - 实现伪代码：
   ```cpp
-  // 两级迭代器归约: repeat内硬件二叉树 + repeat间再次硬件二叉树
+  // 两阶段归约: repeat内硬件二叉树 + repeat间再次硬件二叉树
   vlSize = 64, nRepeats = CeilDiv(528, 64) = 9
   for row in 0..dimA-1:
       // 第一级: repeat内归约, 中间结果写到UB中转缓冲区
@@ -76,11 +77,40 @@
   ```
   ![alt text](image-1.png)
 
-### 3. reduce_binary.asc - 二分累加归约求和
+### 3. reduce_sum_seq.asc - 线性累加归约求和
 - 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
-- 核函数名：`reduce_binary`
-- 样例实现：使首先将尾部余数元素合并至主块使 repeat 数对齐到 2 的幂次（8），随后将 8 个 repeat 全部加载到寄存器，经 log₂(8)=3 轮两两配对向量加法（8→4→2→1） 折半聚合至单个 repeat，最终通过 Reduce<SUM> 归约并写出
-- 累加方式：repeat 内最终由 Reduce<SUM> 二叉树归约完成；repeat 间采用二分折半配对累加
+- 核函数名：`reduce_sequential`
+- 样例实现：将所有 repeat 加载到寄存器，通过向量加法顺序累加至第一个寄存器，最后做一次 Reduce<SUM> 归约。
+- 累加方式：先 repeat 间：顺序向量加法，r1..r7 逐个 Add 到 r0（共 7 次串行 Add）；后 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）
+- 实现伪代码：
+  ```cpp
+  // 全加载 + 顺序向量Add + 最终Reduce
+  vlSize = 64, nRepeat = 8, tailR = 16
+  for row in 0..dimA-1:
+      // Step 0: 加载所有8个repeat到寄存器, 尾块合并到r0
+      r0..r7 ← LoadAlign(row, 8*64)
+      if tailR > 0:
+          rTail ← LoadAlign(row + 512, 16 with mask)
+          r0 ← Add(r0, rTail, mask)
+      // Step 1: 顺序累加 r1..r7 → r0
+      r0 ← Add(r0, r1, FULL_MASK)
+      r0 ← Add(r0, r2, FULL_MASK)
+      r0 ← Add(r0, r3, FULL_MASK)
+      r0 ← Add(r0, r4, FULL_MASK)
+      r0 ← Add(r0, r5, FULL_MASK)
+      r0 ← Add(r0, r6, FULL_MASK)
+      r0 ← Add(r0, r7, FULL_MASK)
+      // Step 2: 寄存器内最终归约
+      result ← Reduce<SUM>(r0, FULL_MASK)
+      StoreUnalign(dst[row], result)
+  ```
+  ![alt text](image-3.png)
+
+### 4. reduce_sum_binary.asc - 二分累加归约求和
+- 样例功能：对输入向量做归约求和运算，向量shape为[20, 528]，数据类型为float
+- 核函数名：`reduce_sum_binary`
+- 样例实现：将所有 repeat 加载到寄存器，通过二分折半向量加法聚合到一个 repeat，最后做一次 Reduce<SUM> 归约。
+- 累加方式：先 repeat 间：二分折半向量加法（8→4→2→1，共 log₂8=3 轮配对 Add）；后 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）
 - 实现伪代码：
   ```cpp
   // 二分折半归约: 尾块合并 + 配对Add(log₂N轮) + 仅最后1次Reduce
@@ -104,7 +134,7 @@
   ```
   ![alt text](image-2.png)
 
-### 4. reduce_max.asc - 归约求最大值及索引
+### 5. reduce_max.asc - 归约求最大值及索引
 - 样例功能：求输入向量的最大值及其对应的索引，向量shape为[1, 1024]，数据类型为float
 - 核函数名：`reduce_max`
 - 样例实现：同时返回最大值和索引
@@ -132,7 +162,7 @@
   StoreUnalign(dst[0..1], {finalVal, finalIdx})
   ```
 
-### 5. reduce_min.asc - 归约求最小值及索引
+### 6. reduce_min.asc - 归约求最小值及索引
 - 样例功能：求输入向量的最小值及其对应的索引，向量shape为[1, 1024]，数据类型为float
 - 核函数名：`reduce_min`
 - 样例实现：同时返回最小值和索引
@@ -182,11 +212,12 @@
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
   python3 ../scripts/gen_all_reduce_data.py                                 # 生成所有reduce核函数的测试数据
-  ./demo_reduce_accumulate    # 执行reduce_accumulate样例
-  ./demo_reduce_iterator      # 执行reduce_iterator样例
-  ./demo_reduce_binary        # 执行reduce_binary样例
-  ./demo_reduce_max           # 执行reduce_max样例
-  ./demo_reduce_min           # 执行reduce_min样例
+  ./demo_reduce_sum_acc        # 执行reduce_sum_acc样例
+  ./demo_reduce_sum_2level     # 执行reduce_sum_2level样例
+  ./demo_reduce_sum_seq        # 执行reduce_sum_seq样例
+  ./demo_reduce_sum_binary     # 执行reduce_sum_binary样例
+  ./demo_reduce_max            # 执行reduce_max样例
+  ./demo_reduce_min            # 执行reduce_min样例
   ```
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。

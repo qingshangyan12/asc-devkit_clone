@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-生成三种reduce方案的输入数据和golden数据
+生成四种reduce求和方案的输入数据和golden数据
 case: 20 * (512 + 16) -> 20 * 1
 """
 
