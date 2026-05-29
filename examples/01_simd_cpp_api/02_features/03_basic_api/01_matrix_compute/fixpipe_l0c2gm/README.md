@@ -22,6 +22,7 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   └── fixpipe_l0c2gm.asc             // Ascend C样例实现 & 调用样例
 ```
+
 ## FixpipeParamsV220 与 FixpipeParamsArch3510 结构体对比
 
 不同产品支持的参数结构体不同：
@@ -120,7 +121,7 @@
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
 - 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
-- 说明：在数据从CO1搬出到GM的过程中开启通道拆分功能，即将16x16小z分型矩阵拆分成两个独立的16X8小z分型矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
+- 说明：在数据从CO1搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
 
 ## 编译运行
 
