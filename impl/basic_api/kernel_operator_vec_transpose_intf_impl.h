@@ -293,7 +293,7 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
         src.SetValue(i, srcAddrConfig);
     }
 
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     TransDataTo5HDVldVaRegImpl<T>(
