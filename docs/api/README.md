@@ -68,9 +68,10 @@
             -   [is\_tensorTrait](SIMD-API/基础数据结构/TensorTrait/is_tensorTrait.md)
             -   [更多样例](SIMD-API/基础数据结构/TensorTrait/更多样例.md)
 
-        -   [内置数据类型](SIMD-API/基础数据结构/内置数据类型.md)
-
     -   [基础API](SIMD-API/基础API/基础API.md)
+        -   [数据结构](SIMD-API/基础API/数据结构/数据结构.md)
+            -   [内置数据类型](SIMD-API/基础API/数据结构/内置数据类型.md)
+            -   [精度转换](SIMD-API/基础API/数据结构/precision_conversion.md)
         -   [Memory数据搬运](SIMD-API/基础API/Memory数据搬运/Memory数据搬运.md)
             -   [DataCopy](SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy.md)
                 -   [DataCopy简介](SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)
@@ -131,6 +132,16 @@
                 -   [Gemm（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）.md)
 
         -   [Memory矢量计算](SIMD-API/基础API/Memory矢量计算/Memory矢量计算.md)
+            -   [SIMD计算说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/SIMD计算说明.md)
+                -   [概述](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/概述.md)
+                -   [连续计算](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/连续计算.md)
+                -   [高维切分](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/高维切分.md)
+                -   [掩码](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/掩码.md)
+                    -   [概述](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/概述.md)
+                    -   [通用说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/通用说明.md)
+                    -   [接口内设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口内设置Mask.md)
+                    -   [接口外设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口外设置Mask.md)
+
             -   [基础算术](SIMD-API/基础API/Memory矢量计算/基础算术/基础算术.md)
                 -   [Exp](SIMD-API/基础API/Memory矢量计算/基础算术/Exp.md)
                 -   [Ln](SIMD-API/基础API/Memory矢量计算/基础算术/Ln.md)
@@ -533,7 +544,6 @@
             -   [GetBlockIdx](SIMD-API/基础API/系统变量访问/GetBlockIdx.md)
             -   [GetDataBlockSizeInBytes](SIMD-API/基础API/系统变量访问/GetDataBlockSizeInBytes.md)
             -   [GetArchVersion](SIMD-API/基础API/系统变量访问/GetArchVersion.md)
-            -   [InitSocState](SIMD-API/基础API/系统变量访问/InitSocState.md)
             -   [GetProgramCounter\(ISASI\)](SIMD-API/基础API/系统变量访问/GetProgramCounter(ISASI).md)
             -   [GetSubBlockNum\(ISASI\)](SIMD-API/基础API/系统变量访问/GetSubBlockNum(ISASI).md)
             -   [GetSubBlockIdx\(ISASI\)](SIMD-API/基础API/系统变量访问/GetSubBlockIdx(ISASI).md)
@@ -621,13 +631,19 @@
                 -   [SignalingNaN](SIMD-API/基础API/工具函数/NumericLimits/SignalingNaN.md)
                 -   [DeNormMin](SIMD-API/基础API/工具函数/NumericLimits/DeNormMin.md)
 
-            -   [Async](SIMD-API/基础API/工具函数/Async.md)
+            
             -   [GetTaskRatio](SIMD-API/基础API/工具函数/GetTaskRatio.md)
             -   [GetUBSizeInBytes](SIMD-API/基础API/工具函数/GetUBSizeInBytes.md)
             -   [GetRuntimeUBSize](SIMD-API/基础API/工具函数/GetRuntimeUBSize.md)
             -   [GetVecLen](SIMD-API/基础API/工具函数/GetVecLen.md)
             -   [CeilDivision](SIMD-API/基础API/工具函数/CeilDivision.md)
             -   [GetSsbufBaseAddr](SIMD-API/基础API/工具函数/GetSsbufBaseAddr.md)
+        
+        -   [工具接口](SIMD-API/基础API/工具接口/工具接口.md)
+            -   [执行模式](SIMD-API/基础API/工具接口/执行模式/执行模式.md)
+                -   [Async](SIMD-API/基础API/工具接口/执行模式/Async.md)
+            -   [系统初始化](SIMD-API/基础API/工具接口/系统初始化/系统初始化.md)
+                -   [InitSocState](SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)
 
         -   [Kernel Tiling](SIMD-API/基础API/Kernel-Tiling/Kernel-Tiling.md)
             -   [GET\_TILING\_DATA](SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA.md)

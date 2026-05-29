@@ -243,6 +243,7 @@
 -   NBuffer33模板策略使用示例
 
     ```
+    #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
     
     typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType; 
@@ -251,9 +252,9 @@
     typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // Matmul定义时传入NBuffer33MatmulPolicy
     
-    AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::NBuffer33MatmulPolicy> mm; 
+    AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::NBuffer33MatmulPolicy> mm; 
     
-    // 常规Matmul计算，最后输出下三角形式的结果
+    // 使用NBuffer33逻辑进行Matmul计算，最后输结果
     TPipe pipe;
     TCubeTiling tiling;
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
@@ -387,4 +388,3 @@
         DataCopy(gmC[baseOffset], bufferC, {blockCount, blockLen, srcStride, dstStride});
     }
     ```
-

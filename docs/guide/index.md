@@ -11,7 +11,7 @@
 
         -   [基于SIMT编程](入门教程/快速入门/基于SIMT编程/基于SIMT编程.md)
             -   [HelloWorld](入门教程/快速入门/基于SIMT编程/HelloWorld.md)
-            -   [Add算子快速入门](入门教程/快速入门/基于SIMT编程/Add算子快速入门.md)
+            -   [Gather算子快速入门](入门教程/快速入门/基于SIMT编程/Gather算子快速入门.md)
 
 -   [编程指南](编程指南/本文档组织结构.md)
     -   [本文档组织结构](编程指南/本文档组织结构.md)
@@ -31,6 +31,7 @@
                 -   [TPipe-TQue框架编程原理](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
                 -   [TPipe-TQue框架编程范式](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md)
         -   [AI Core SIMT编程](编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md)
+            -   [概述](编程指南/编程模型/AI-Core-SIMT编程/概述.md)
             -   [抽象硬件架构](编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)
             -   [线程架构](编程指南/编程模型/AI-Core-SIMT编程/线程架构.md)
             -   [内存层级](编程指南/编程模型/AI-Core-SIMT编程/内存层级.md)
