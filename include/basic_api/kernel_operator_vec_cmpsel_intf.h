@@ -174,12 +174,14 @@ __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTenso
  */
 // select mode: 0/1/2
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask[],
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 // select mode: 0/1/2
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask,
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);

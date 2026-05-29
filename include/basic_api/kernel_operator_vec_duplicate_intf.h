@@ -44,10 +44,12 @@ namespace AscendC {
  * @param [in] dstRepeatStride dst repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask,
     const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask[],
     const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
 
@@ -59,6 +61,7 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
+__ASC_USE_RESERVED_UBUF__(3510, "Duplicate is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)

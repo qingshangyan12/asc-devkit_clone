@@ -110,6 +110,7 @@ __aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTe
  */
 template <typename T, bool isReuseSource = false, bool isBasicBlock = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+__ASC_USE_RESERVED_UBUF__(2201, "SoftMax is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
 {
@@ -139,6 +140,7 @@ __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTenso
  */
 template <typename T, bool isReuseSource = false, bool isBasicBlock = false,
     const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+__ASC_USE_RESERVED_UBUF__(2201, "SoftMax is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
     const SoftMaxShapeInfo& softmaxShapeInfo = {})
