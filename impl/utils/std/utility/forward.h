@@ -22,13 +22,13 @@ namespace AscendC {
 namespace Std {
 
 template <typename Tp>
-ASCENDC_HOST_AICORE inline constexpr Tp&& forward(remove_reference_t<Tp>& t) noexcept
+__callee__ __host__ inline constexpr Tp&& forward(remove_reference_t<Tp>& t) noexcept
 {
     return static_cast<Tp&&>(t);
 }
 
 template <typename Tp>
-ASCENDC_HOST_AICORE inline constexpr Tp&& forward(remove_reference_t<Tp>&& t) noexcept
+__callee__ __host__ inline constexpr Tp&& forward(remove_reference_t<Tp>&& t) noexcept
 {
     static_assert(!is_lvalue_reference<Tp>::value, "cannot forward an rvalue as an lvalue");
     return static_cast<Tp&&>(t);
