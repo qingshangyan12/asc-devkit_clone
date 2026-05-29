@@ -1,4 +1,3 @@
-
 # Mmad unitFlag特性样例
 
 ## 概述
@@ -22,6 +21,7 @@
 │   ├── data_utils.h                // 数据读入写出函数
 │   └── mmad_unitflag.asc           // Ascend C样例实现 & 调用样例
 ```
+
 ## 算子描述
 
 unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。

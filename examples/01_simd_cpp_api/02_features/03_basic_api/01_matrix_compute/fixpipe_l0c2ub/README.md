@@ -20,6 +20,7 @@
 │   ├── figures                        // 图示
 │   └── fixpipe_l0c2ub.asc             // Ascend C样例实现 & 调用样例
 ```
+
 ## 场景详细说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2ub`。
