@@ -8,15 +8,22 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="x90">Kirin X90 | √ </cann-filter>|
 | <cann-filter npu-type="9030">Kirin 9030 | √ </cann-filter>|
 
 ## 功能说明
 
-在所有的输入数据中找出最大值及最大值对应的索引位置。归约指令的总体介绍请参考[如何使用归约计算API](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/类库API/基础API/常用操作速查指导/如何使用归约计算API.md)。
+头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
+
+ReduceMax接口用于从所有输入数据中找出最大值和最大值索引。
+
+ReduceMax计算过程如下图所示：首先，在每个repeat迭代中计算得到最大值和repeat内部索引，这些中间结果暂存于sharedTmpBuffer工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最大值和最大值索引。需要注意的是，每次repeat迭代获取的最大值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最大值索引。
+
+**图 1**  ReduceMax计算示意图<a id="fig1"></a>  
+![ReduceMax计算示意图](../../../../figures/ReduceMax计算示意图.png "ReduceMax计算示意图")
 
 ## 函数原型
 
@@ -48,46 +55,83 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 操作数数据类型。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：uint16_t/int16_t/uint32_t/int32_t/half/float/uint64_t/int64_t<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float<br><br>Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float<br><br>Atlas 推理系列产品AI Core，支持的数据类型为：half/float<br><br>Atlas 训练系列产品，支持的数据类型为：half<br><br>Kirin X90，支持的数据类型为：half、float。<br><br>Kirin 9030，支持的数据类型为：half、float。 |
+| T | 操作数数据类型。 |
 
 **表 2**  参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要保证4字节对齐（针对half数据类型），8字节对齐（针对float数据类型）。 |
-| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | API执行期间，部分硬件型号需要一块空间用于存储中间结果，空间大小需要满足最小所需空间的要求，具体计算方法可参考下文[ReduceMax计算示意图](#fig911740112914)中的介绍。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>数据类型需要与目的操作数保持一致。<br><br>Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用sharedTmpBuffer，可以直接传入src或者任意大小的sharedTmpBuffer。<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，需要使用sharedTmpBuffer。<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要使用sharedTmpBuffer。<br><br>Atlas 200I/500 A2 推理产品，需要使用sharedTmpBuffer。<br><br>Atlas 推理系列产品AI Core，需要使用sharedTmpBuffer<br><br>Atlas 训练系列产品，需要使用sharedTmpBuffer。<br><br>Kirin X90，需要使用sharedTmpBuffer。<br><br>Kirin 9030，需要使用sharedTmpBuffer。 |
-| count | 输入 | 参与计算的元素个数。<br><br>参数取值范围和操作数的数据类型有关，数据类型不同，能够处理的元素个数最大值不同，最大处理的数据量不能超过UB大小限制。 |
-| calIndex | 输入 | 指定是否获取最大值的索引，bool类型，默认值为false，取值：<br>true：同时获取最大值和最大值索引。false：不获取索引，只获取最大值。 |
-| mask/mask[] | 输入 | [mask](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md)用于控制每次迭代内参与计算的元素。<br>逐bit模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。<br>mask为数组形式，数组长度和数组元素的取值范围和操作数的数据类型有关。当操作数为16位时，数组长度为2，mask[0]、mask[1]∈[0, 264-1]并且不同时为0；当操作数为32位时，数组长度为1，mask[0]∈(0, 264-1]；当操作数为64位时，数组长度为1，mask[0]∈(0, 232-1]。<br><br>例如，mask=[8, 0]，8=0b1000，表示仅第4个元素参与计算。<br><br>连续模式：表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask∈[1, 128]；当操作数为32位时，mask∈[1, 64]；当操作数为64位时，mask∈[1, 32]。 |
-| repeatTime | 输入 | 迭代次数。保证不超过int32_t最大值的范围即可。 |
-| srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的datablock数目。详细说明请参考[repeatStride](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md)。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| sharedTmpBuffer | 输入 | 指令执行期间存储中间结果，用于内部计算所需操作空间，需特别注意空间大小。详情请参考[关键特性说明](#关键特性说明)。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。最大处理的数据量不能超过UB大小限制。 |
+| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
+| repeatTime | 输入 | 迭代次数。关于该参数的具体描述请参考高维切分。**注：与高维切分中不同的是，repeatTime可以支持更大的取值范围，保证不超过int32_t的最大值即可。** |
+| srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
+| calIndex | 输入 | 指定是否获取最大值的索引，bool类型，默认值为false，取值：<br>&bull; true：同时获取最大值和最大值索引。<br>&bull; false：不获取索引，只获取最大值。 |
 
-ReduceMax计算过程如[ReduceMax计算示意图](#fig911740112914)所示：先在每个repeat迭代中获取最大值及索引，作为中间结果存储在sharedTmpBuffer工作区中，然后在中间结果中再按照repeat迭代求最大值，以此类推，逐步求出最终的最大值和索引放在目的操作数中。需要注意的是，每次repeat迭代获取的最值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和内部索引推导全量数据内的索引。
+**注：以上高维切分相关参数mask，repeatTime，srcRepStride请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
 
-**图 1**  ReduceMax计算示意图<a name="fig911740112914"></a>
-![](../../../../figures/ReduceMax计算示意图.png "ReduceMax计算示意图")
+## 数据类型
 
-数据量较大时通过一轮归约无法得出最终结果，需要进行多轮计算，同理，每次repeat迭代获取的最值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和内部索引推导全量数据内的索引。
+支持的数据类型如下：
 
-**图 2**  多轮计算示意图
-![](../../../../figures/多轮计算示意图.png "多轮计算示意图")
+- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持half、float。</cann-filter>
+- <cann-filter npu-type = "910">Atlas 训练系列产品，支持half。</cann-filter>
+- <cann-filter npu-type = "x90">Kirin X90，支持half、float。</cann-filter>
+- <cann-filter npu-type = "9030">Kirin 9030，支持half、float。</cann-filter>
 
-sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取索引，sharedTmpBuffer空间计算方式不同：需要返回索引的情况下，需要把每轮计算所需的空间进行累加，同时每轮计算的空间都要考虑UB空间32字节对齐的要求；无需返回索引的情况下，只需要提供第一轮计算所需的空间并满足32字节对齐要求即可，后续的轮次可以直接使用这块空间，此时不需要推导索引的过程，所以之前轮次的中间数据可以直接覆盖。计算最小所需空间的算法如下：
+## 返回值说明
+
+无
+
+## 约束说明
+
+- 源操作数及sharedTmpBuffer的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+- 需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足所需空间要求，详情请参考关键特性说明。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- 如果存在多个最大值，该指令会将最小索引写入目的操作数。
+- dst结果存储顺序为最大值，最大值索引，若不需要索引，只会存储最大值。
+- 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
+- 当输入类型是half的时候，只支持获取最大不超过65535（uint16_t能表示的最大值）的索引值。
+- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，uint64_t/int64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用sharedTmpBuffer，可以直接传入src或者任意大小的sharedTmpBuffer。</cann-filter>
+
+<cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
+
+- 对于<cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品、</cann-filter><cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品、</cann-filter><cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core、</cann-filter><cann-filter npu-type = "910">Atlas 训练系列产品、</cann-filter><cann-filter npu-type = "x90">Kirin X90、</cann-filter><cann-filter npu-type = "9030">Kirin 9030</cann-filter>，需要使用sharedTmpBuffer。
+
+</cann-filter>
+
+## 关键特性说明
+
+**索引值需要强制类型转换**，详情请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
+
+**sharedTmpBuffer所需空间设置：**
+
+sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取索引，sharedTmpBuffer空间计算方式不同：需要返回索引的情况下，需要把每轮计算所需的空间进行累加，同时每轮计算的空间都要考虑UB空间32字节对齐的要求；无需返回索引的情况下，只需要提供第一轮计算所需的空间并满足32字节对齐要求即可，后续的轮次可以直接使用这块空间，此时不需要推导索引的过程，所以之前轮次的中间数据可以直接覆盖。计算所需空间的算法如下：
 
 - 无需返回最大值索引
 
     ```cpp
-    int firstMaxRepeat = repeatTime;           // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
-    int iter1OutputCount = firstMaxRepeat * 2;                                            // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
-    int iter1AlignEnd = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock;   // 第一轮产生的元素个数按照datablock(32字节)向上对齐
-    int finalWorkLocalNeedSize = iter1AlignEnd;                                           // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
+    int firstMaxRepeat = repeatTime; // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
+    int iter1OutputCount = firstMaxRepeat * 2; // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
+    int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数按照datablock(32字节)向上对齐
+    int finalWorkLocalNeedSize = iter1AlignEnd; // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
     ```
 
 - 需要返回最大值索引
 
     ```cpp
-    int firstMaxRepeat = repeatTime;           // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
+    int firstMaxRepeat = repeatTime; 
+    // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
     int iter1OutputCount = firstMaxRepeat * 2;                                            // 第一轮操作产生的元素个数
     int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第二轮操作起始位置偏移，即第一轮产生的元素个数按照datablock(32字节)向上对齐的结果
     // 第一轮计算完成后，后续可能还需要多轮迭代，此时不可以复用同一块空间，因为第一轮的中间结果索引还需要再进行使用，所以需要继续准备后续轮次的空间
@@ -102,30 +146,10 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     }
     ```
 
-以上计算出来的最终的空间大小单位是元素个数，若转成Bytes数表示为finalWorkLocalNeedSize \* typeSize \(Bytes\)，具体计算示例请参考[调用示例](#section107745237168)中sharedTmpBuffer空间计算示例。
+以上计算出来的最终的空间大小单位是元素个数，若转成Bytes数表示为`finalWorkLocalNeedSize * typeSize`(Bytes)。
 
 > [!NOTE]说明
->开发者为了节省地址空间，可以选择sharedTmpBuffer空间复用源操作数的空间。此时因为sharedTmpBuffer需要的最小空间一定小于源操作数的空间，所以无需关注和计算最小空间。
-
-## 返回值说明
-
-无
-
-## 约束说明
-
-- 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足最小所需空间要求，否则不支持地址重叠。
-
-- dst结果存储顺序为最大值，最大值索引，若不需要索引，只会存储最大值。返回结果中索引index数据是按照dst的数据类型进行存储的，比如dst使用half类型时，index按照half类型进行存储，如果按照half格式进行读取，index的值是不对的，因此index的读取需要使用reinterpret\_cast方法转换到整数类型。若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>，比如[tensor高维切分计算接口完整示例](#li7962161711114)中，输入数据是half类型，计算结果为\[0.9985,  6.8e-06\]，6.8e-06需要使用reinterpret\_cast<uint16\_t\*\>方法转换得到索引值114。转换示例如下：
-
-    ```cpp
-    float maxIndex = dst.GetValue(1);
-    uint32_t realIndex = *reinterpret_cast<uint32_t*>(&maxIndex);
-    ```
-
-- 返回最大值索引时，如果存在多个最大值，返回第一个最大值的索引。
-- 当输入类型是half的时候，只支持获取最大不超过65535（uint16\_t能表示的最大值）的索引值。
-- 针对Ascend 950PR/Ascend 950DT，uint64\_t/int64\_t数据类型仅支持tensor前n个数据计算接口。
+> 开发者为了节省地址空间，可以选择sharedTmpBuffer空间复用源操作数的空间。此时因为sharedTmpBuffer需要的最小空间一定小于源操作数的空间，所以无需关注和计算最小空间。
 
 ## 调用示例<a name="section107745237168"></a>
 
@@ -176,7 +200,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
-    // 最终sharedTmpBuffer所需的最小空间为 iter2AlignStart + iter3AlignStart + iter3AlignEnd = 144 + 16 + 16 = 176 ,也就是352Bytes
+    // 最终sharedTmpBuffer所需的最小空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 144 + 16 + 16 = 176 ,也就是352Bytes
     // ReduceMax接口sharedTmpBuffer计算示例二:
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为32640, 使用tensor高维切分计算接口,repeatTime为255, mask为128,需要索引值
     // tensor高维切分计算接口调用示例为:
@@ -192,7 +216,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
-    // 需要的空间为 iter2AlignStart + iter3AlignStart + iter3AlignEnd = 512 + 16 + 16 = 544 ,也就是1088Bytes
+    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 512 + 16 + 16 = 544 ,也就是1088Bytes
     // ReduceMax接口sharedTmpBuffer计算示例三:
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为65408,使用tensor前n个数据计算接口,count=65408,需要索引值
     // tensor前n个数据计算接口调用示例为:
@@ -208,7 +232,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;   // 对iter2OutputCount输出个数向上取整
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                 // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;   // 第三轮产生的元素个数做向上取整
-    // 需要的空间为 iter2AlignStart + iter3AlignStart + iter3AlignEnd = 1024 + 16 + 16 = 1056,也就是2112Bytes
+    // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 1024 + 16 + 16 = 1056,也就是2112Bytes
     // ReduceMax接口sharedTmpBuffer计算示例四:
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的的计算数据量为512,使用tensor高维切分计算接口,repeatTime为4, mask为128,需要索引值
     // tensor高维切分计算接口调用示例为:
@@ -249,7 +273,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3AlignStart = RoundUp(iter2OutputCount, elementsPerBlock)*elementsPerBlock = 16;  // 对第二轮操作输出个数向上取整
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 8;   // 第三轮产生的元素个数做向上取整
-    // 最终sharedTmpBuffer所需的最小空间就是 iter2AlignStart + iter3AlignStart + iter3AlignEnd = 264 + 16 + 8 = 288,也就是1152Bytes
+    // 最终sharedTmpBuffer所需的最小空间就是iter2AlignStart + iter3AlignStart + iter3AlignEnd = 264 + 16 + 8 = 288,也就是1152Bytes
     ```
 
 - <a name="li7962161711114"></a>tensor高维切分计算接口完整示例:
@@ -266,7 +290,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
     AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
     AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
-    // mask为128 一次计算128个元素,4次repeat计算完512个数,calIndex为true，获取最大值的索引
+    // mask为128一次计算128个元素,4次repeat计算完512个数,calIndex为true，获取最大值的索引
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, repeat, repStride, true);
     // 释放Tensor
     outQueueDst.EnQue<half>(dstLocal);
