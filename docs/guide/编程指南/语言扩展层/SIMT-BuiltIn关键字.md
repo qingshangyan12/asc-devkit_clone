@@ -1006,7 +1006,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 -   grid\_dim：int或dim3类型，用于指定网格（grid）的维度与规模，grid\_dim.x \* grid\_dim.y \* grid\_dim.z等于启动的线程块总数。
 -   block\_dim：int或dim3类型，用于指定每个线程块（block）的维度与规模，block\_dim.x \* block\_dim.y \* block\_dim.z等于每个线程块包含的线程数。
 -   dynamic\_mem\_size：size\_t类型，该参数指定除静态分配的内存外，本次调用为每个线程块动态分配的共享内存字节数。
--   stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。
+-   stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。      
 
 以下示例展示了内核函数的声明与调用方式。
 
