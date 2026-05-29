@@ -626,6 +626,29 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 
 
     target_include_directories(asc_ccl_kernel PRIVATE ${ORION_HEAD_LIST})
+    
+    if(DEFINED ENV{ASCEND_HOME_PATH})
+        set(CANN_LIB_DIR "$ENV{ASCEND_HOME_PATH}/lib64")
+    else()
+        set(CANN_LIB_DIR "/usr/local/Ascend/lib64")
+    endif()
+    
+    message(STATUS "CANN library directory: ${CANN_LIB_DIR}")
+    
+    find_library(CANN_HCCL_LIB hccl PATHS ${CANN_LIB_DIR})
+    if(CANN_HCCL_LIB)
+        message(STATUS "Found CANN libhccl.so: ${CANN_HCCL_LIB}")
+        target_link_libraries(asc_ccl_kernel PRIVATE 
+            -Wl,--no-as-needed
+            ${CANN_HCCL_LIB}
+            -Wl,--as-needed
+            -ldl
+        )
+    else()
+        message(WARNING "CANN libhccl.so not found, CollAlgExecRegistryV2 will use dlopen fallback")
+        target_link_libraries(asc_ccl_kernel PRIVATE -ldl)
+    endif()
+    
     if(TARGET json)
         target_link_libraries(asc_ccl_kernel PRIVATE json)
         add_dependencies(asc_ccl_kernel json)
