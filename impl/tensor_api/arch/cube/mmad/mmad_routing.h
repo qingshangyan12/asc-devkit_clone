@@ -9,7 +9,8 @@
 */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "mmad_routing.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#warning                                                                                                               \
+    "impl/tensor_api/arch/cube/mmad/mmad_routing.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -21,8 +22,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_ROUTING_H
 #define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_ROUTING_H
 
-#include "impl/tensor_api/arch/cube/mmad/npu_arch_3510/mmad.h"
-#include "impl/tensor_api/arch/cube/mmad/npu_arch_3510/mmad_with_bias.h"
+#include "impl/tensor_api/arch/cube/mmad/mmad_impl/mmad.h"
+#include "impl/tensor_api/arch/cube/mmad/mmad_impl/mmad_with_bias.h"
 
 namespace AscendC {
 namespace Te {
@@ -31,32 +32,36 @@ class MmadIgnore
 {
 public:
     template <const MmadTrait& trait, typename ...Args>
-    __aicore__ inline static void Run(const Args&... args) {}
+    __aicore__ inline static void Run(const Args&... args)
+    {
+        static_assert(Std::is_same_v<Args..., void>, "MmadIgnore should not be called");
+    }
 };
 
-template<typename dstPos, typename fmPos, typename filterPos, typename biasPos, uint32_t Version>
-struct MmadTensor2Tensor
+template <uint32_t Version, typename DstLayoutPtn, typename FmLayoutPtn, typename FilterLayoutPtn, typename BiasPos>
+struct MmadRouting
 {
     using type = MmadIgnore;
 };
 
-template<>
-struct MmadTensor2Tensor<Location::L0C, Location::L0A, Location::L0B, Location::INVALID, ArchVersion::V3510>
+template <uint32_t Version>
+struct MmadRouting<Version, NZLayoutPtn, NZLayoutPtn, ZNLayoutPtn, Location::INVALID>
 {
-    using type = Mmad3510;
+    using type = MmadNoBias;
 };
 
-template<>
-struct MmadTensor2Tensor<Location::L0C, Location::L0A, Location::L0B, Location::L0C, ArchVersion::V3510>
+template <uint32_t Version>
+struct MmadRouting<Version, NZLayoutPtn, NZLayoutPtn, ZNLayoutPtn, Location::L0C>
 {
-    using type = MmadWithBias3510;
+    using type = MmadWithBias;
 };
 
-template<>
-struct MmadTensor2Tensor<Location::L0C, Location::L0A, Location::L0B, Location::BIAS, ArchVersion::V3510>
+template <uint32_t Version>
+struct MmadRouting<Version, NZLayoutPtn, NZLayoutPtn, ZNLayoutPtn, Location::BIAS>
 {
-    using type = MmadWithBias3510;
+    using type = MmadWithBias;
 };
+
 } // namespace Te
 } // namespace AscendC
 
