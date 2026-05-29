@@ -678,8 +678,6 @@ AscendC::printf("dataCopyLen = %d, curLen = %d\n", dataCopyLen, curLen);
 AscendC::PRINTF("blockIdx = %d, startM = %d\n", AscendC::GetBlockIdx(), startM);
 ```
 
-> **注意：** `printf`仅在CPU调试模式（`-DCMAKE_ASC_RUN_MODE=cpu`）下输出到终端；NPU模式下数据会写入日志文件。`PRINTF`为宏版本，行为与`printf`一致。
-
 ### DumpTensor
 
 基于算子工程开发的算子，可使用该接口Dump指定[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型），比如打印当前行号等。
@@ -695,11 +693,9 @@ AscendC::DumpTensor(zLocal, 1, 16);
 打印示例如下：
 
 ```
-DumpTensor: desc=1, addr=0x1000, data_type=float16, position=UB, dump_size=16
-[141.015, 124.238, 152.883, 96.876, 39.287, 45.760, 172.857, 158.621, 29.611, 92.915, 169.372, 129.811, 96.125, 118.991, 3.930, 58.092]
+DumpTensor: desc=1, addr=0x20000, data_type=float16, position=UB, dump_size=16
+[76.125000, 77.812500, 98.312500, 49.125000, 93.000000, 109.125000, 183.750000, 100.750000, 155.250000, 89.750000, 179.250000, 121.625000, 88.812500, 116.312500, 161.750000, 134.250000]
 ```
-
-> **注意：** DumpTensor仅在CPU调试模式下生效。
 
 ## 性能调试
 

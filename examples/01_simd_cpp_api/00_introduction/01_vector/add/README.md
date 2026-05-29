@@ -81,8 +81,6 @@ AscendC::printf("fmt string %d\n", 0x123);
 AscendC::PRINTF("fmt string %d\n", 0x123);
 ```
 
-> **注意：** printf接口仅在CPU调试模式（`-DCMAKE_ASC_RUN_MODE=cpu`）和NPU仿真模式（`-DCMAKE_ASC_RUN_MODE=sim`）下生效，NPU运行模式下不支持。
-
 ### DumpTensor
 
 [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口用于Dump指定Tensor的内容，支持打印自定义的附加信息（仅支持uint32\_t数据类型），比如打印当前行号等。
@@ -99,11 +97,9 @@ AscendC::DumpTensor(zLocal, 1, 16);
 打印示例如下：
 
 ```
-DumpTensor: desc=1, addr=0x1000, data_type=float32, position=UB, dump_size=16
-[141.015015, 124.238228, 152.882874, 96.875984, 39.287174, 45.760258, 172.856659, 158.620880, 29.610844, 92.915154, 169.371704, 129.811401, 96.124611, 118.990570, 3.930355, 58.091831]
+DumpTensor: desc=1, addr=0x4000, data_type=float32, position=UB, dump_size=16
+[0.000000, 0.300000, 0.600000, 0.900000, 1.200000, 1.500000, 1.800000, 2.100000, 2.400000, 2.700000, 3.000000, 3.300000, 3.600000, 3.900000, 4.200000, 4.500000]
 ```
-
-> **注意：** DumpTensor接口仅在CPU调试模式和NPU仿真模式下生效，NPU运行模式下不支持。
 
 ## 编译运行
 
