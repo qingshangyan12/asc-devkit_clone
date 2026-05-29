@@ -29,12 +29,12 @@ namespace AscendC {
 
 #pragma pack(push, 1)
 struct UrmaWqeEntry {
-    uint32_t odr : 3;
-    uint32_t fence : 1;
-    uint32_t se : 1;
-    uint32_t cqe : 1;
-    uint32_t inlineEn : 1;
-    uint32_t udfFlag : 1;
+    uint32_t odr : 3;       // ordering, request ordering strength (0=unordered, 5=strongly ordered)
+    uint32_t fence : 1;     // fence, 1=current WQE waits for all prior WQEs to complete
+    uint32_t se : 1;        // solicited event, 1=trigger remote event notification on completion
+    uint32_t cqe : 1;       // completion queue entry, 1=generate CQE on completion
+    uint32_t inlineEn : 1;  // inline enable, 1=data inlined in WQE instead of SGE reference
+    uint32_t udfFlag : 1;   // user-defined flag
 } __attribute__((packed));
 #pragma pack(pop)
 
