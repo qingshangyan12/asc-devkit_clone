@@ -168,8 +168,22 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
     if (threadNum_ > 1) {
         subThreads.assign(threads.begin() + 1, threads.end());
     }
+    HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunALLtoALL] start, threadNum[%u], "
+              "threads.size[%zu], subThreads.size[%zu], commLoops[%u], isDmaRead[%u], myAlgRank[%u], "
+              "templateRankSize[%u].",
+              threadNum_, threads.size(), subThreads.size(), commLoops, static_cast<u32>(isDmaRead_), myAlgRank,
+              templateRankSize_);
     for (u32 roundIdx = 0; roundIdx < commLoops && remainRankSize > 0; roundIdx++) {
         CalcCommRankSetForOneLoop(roundIdx, remainRankSize, commRanks); // 计算本轮通信rank
+        const u32 firstRank = commRanks.size() > 0 ? commRanks[0] : 0xFFFFFFFFU;
+        const u32 secondRank = commRanks.size() > 1 ? commRanks[1] : 0xFFFFFFFFU;
+        const u32 thirdRank = commRanks.size() > 2 ? commRanks[2] : 0xFFFFFFFFU;
+        const u32 fourthRank = commRanks.size() > 3 ? commRanks[3] : 0xFFFFFFFFU;
+        HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunALLtoALL] round begin, roundIdx[%u], "
+                  "remainRankSize[%u], commRanks.size[%zu], commRanks[0..3][%u,%u,%u,%u], "
+                  "threads.size[%zu], subThreads.size[%zu], isDmaRead[%u].",
+                  roundIdx, remainRankSize, commRanks.size(), firstRank, secondRank, thirdRank, fourthRank,
+                  threads.size(), subThreads.size(), static_cast<u32>(isDmaRead_));
         // 如果是read模式，统一做前拷贝
         if (isDmaRead_) {
             if (threadNum_ > 1) {
@@ -195,6 +209,9 @@ HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
             CHK_RET(PostSyncInterThreads(threads[0], subThreads, notifyIdxSubToMain_));
         }
         remainRankSize -= commRanks.size();
+        HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunALLtoALL] round end, roundIdx[%u], "
+                  "commRanks.size[%zu], remainRankSize[%u].",
+                  roundIdx, commRanks.size(), remainRankSize);
         HCCL_DEBUG("[InsTempAlltoAllVMesh1D][RunALLtoALL] round[%u] finish, commRank size is [%zu], "
             "remainRankSize is [%u].", roundIdx, commRanks.size(), remainRankSize);
     }
@@ -271,14 +288,32 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByChannel(const TemplateDataParams
         DataInfo recvInfo{channelRecv, {rxSrcSlices, rxDstSlices}};
         SendRecvInfo sendRecvInfo{{channelSend, channelRecv},
             {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
+        const bool needPostCopy = !isDmaRead_ && recvSizeSplit_[channelId] > 0;
+        HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunSendRecvByChannel] before data, "
+                  "remoteRank[%u], channelId[%u], queIdx[%u], thread[%#llx], channels.size[%zu], "
+                  "sendSize[%llu], recvSize[%llu], sendCount[%llu], recvCount[%llu], needPostCopy[%u].",
+                  remoteRank, channelId, queIdx, static_cast<unsigned long long>(threads[queIdx]),
+                  curChannels.size(), sendSizeSplit_[channelId], recvSizeSplit_[channelId],
+                  sendCountsSplit_[channelId], recvCountsSplit_[channelId], static_cast<u32>(needPostCopy));
         CHK_RET(RunSendRecv(tempAlgParams, sendRecvInfo, sendInfo, recvInfo, threads[queIdx], channelId));
         HCCL_DEBUG("[InsTempAlltoAllVMesh1D][RunSendRecvByLoop] do send recv write on thread[%u], "
             "send size[%llu], recv size[%llu], remote rank[%u].",
             queIdx, sendSizeSplit_[channelId], recvSizeSplit_[channelId], remoteRank);
-        if (!isDmaRead_ && recvSizeSplit_[channelId] > 0) {
+        if (needPostCopy) {
+            HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunSendRecvByChannel] before postcopy, "
+                      "remoteRank[%u], channelId[%u], queIdx[%u], thread[%#llx], recvSize[%llu], "
+                      "recvCount[%llu], recvOffset[%llu].",
+                      remoteRank, channelId, queIdx, static_cast<unsigned long long>(threads[queIdx]),
+                      recvSizeSplit_[channelId], recvCountsSplit_[channelId], recvOffsetSplit_[channelId]);
             CHK_RET(PostCopy(tempAlgParams, threads[queIdx], myRankCclBuffIdx, remoteRank,
                 recvSizeSplit_[channelId], recvCountsSplit_[channelId], recvOffsetSplit_[channelId]));
+            HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunSendRecvByChannel] after postcopy, "
+                      "remoteRank[%u], channelId[%u], queIdx[%u], thread[%#llx].",
+                      remoteRank, channelId, queIdx, static_cast<unsigned long long>(threads[queIdx]));
         }
+        HCCL_INFO("YYYYYY asc order [InsTempAlltoAllVMesh1D][RunSendRecvByChannel] after data, "
+                  "remoteRank[%u], channelId[%u], queIdx[%u], thread[%#llx].",
+                  remoteRank, channelId, queIdx, static_cast<unsigned long long>(threads[queIdx]));
         queIdx++;
     }
     return HcclResult::HCCL_SUCCESS;
