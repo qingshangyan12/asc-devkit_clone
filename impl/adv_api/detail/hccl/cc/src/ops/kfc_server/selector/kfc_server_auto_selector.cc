@@ -11,7 +11,7 @@
 #include "kfc_server_auto_selector.h"
 #include "selector_registry.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 SelectorStatus KfcServerAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo,
                                                     const OpParam &opParam,

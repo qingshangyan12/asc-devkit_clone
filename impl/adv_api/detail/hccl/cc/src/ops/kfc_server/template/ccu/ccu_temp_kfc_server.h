@@ -14,7 +14,7 @@
 #include "utils.h"
 #include "ccu_alg_template_base.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 class CcuTempKfcServer : public CcuAlgTemplateBase {
 public:

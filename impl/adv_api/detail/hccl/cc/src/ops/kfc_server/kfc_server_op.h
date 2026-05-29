@@ -30,7 +30,7 @@ HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, 
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream);
 

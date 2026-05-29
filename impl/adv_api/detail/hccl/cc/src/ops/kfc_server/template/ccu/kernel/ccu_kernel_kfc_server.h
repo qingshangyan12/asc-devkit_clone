@@ -22,7 +22,7 @@
 #include "../ccu_temp_kfc_server.h"
 #include "types/mc2_type.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 class CcuKernelArgKfcServer : public hcomm::CcuKernelArg {
 public:
