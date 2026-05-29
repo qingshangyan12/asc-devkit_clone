@@ -8,8 +8,9 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 set(src_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_to_all_v_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_dpu_alltoall_mesh.cc
+    # DISABLED: use libhccl.so implementation instead
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_all_to_all_v_mesh_1D.cc
+    # ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_dpu_alltoall_mesh.cc
 )
 
 target_sources(mc2_client PRIVATE
