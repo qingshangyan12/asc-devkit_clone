@@ -21,7 +21,7 @@ namespace AscendC {
 namespace Std {
 
 template <typename Tp>
-ASCENDC_HOST_AICORE inline constexpr remove_reference_t<Tp>&& move(Tp&& t) noexcept
+__host_callee__ inline constexpr remove_reference_t<Tp>&& move(Tp&& t) noexcept
 {
     using Up = remove_reference_t<Tp> ;
     return static_cast<Up&&>(t);

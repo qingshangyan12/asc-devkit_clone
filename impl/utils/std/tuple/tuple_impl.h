@@ -35,7 +35,7 @@ namespace Std {
 constexpr uint32_t ASCENDC_STD_TUPLE_STACK_DEPTH = 64;
 
 template <size_t N = 0, typename ...Tps>
-ASCENDC_HOST_AICORE inline void tuple_static_assert()
+__host_callee__ inline void tuple_static_assert()
 {
     static_assert(N < ASCENDC_STD_TUPLE_STACK_DEPTH, "Index overflow. The index must be smaller than 64!");
     static_assert(sizeof...(Tps) <= ASCENDC_STD_TUPLE_STACK_DEPTH, "The number of template elements must be <= 64!");
@@ -58,32 +58,32 @@ template <typename Tp, typename ...Tps>
 class tuple<Tp, Tps...> : public tuple<Tps...>
 {
 public:
-    ASCENDC_HOST_AICORE inline tuple() : tuple<Tps...>(), value() {
+    __host_callee__ inline tuple() : tuple<Tps...>(), value() {
         tuple_static_assert<0, Tp, Tps...>();
     }
 
     template <typename Constraints = tuple_constraints<Tp, Tps...>,
         enable_if_t<Constraints::variadic_copy_constructible, int> = 0>
-    ASCENDC_HOST_AICORE inline tuple(const Tp& val, const Tps& ...params) : tuple<Tps...>(params...), value(val) {
+    __host_callee__ inline tuple(const Tp& val, const Tps& ...params) : tuple<Tps...>(params...), value(val) {
         tuple_static_assert<0, Tp, Tps...>();
     }
 
     template <typename Constraints = tuple_constraints<Tp, Tps...>,
         enable_if_t<!Constraints::variadic_copy_constructible, int> = 0>
-    ASCENDC_HOST_AICORE inline tuple(Tp&& val, Tps&& ...params) : tuple<Tps...>(forward<Tps>(params)...), value(forward<Tp>(val)) {
+    __host_callee__ inline tuple(Tp&& val, Tps&& ...params) : tuple<Tps...>(forward<Tps>(params)...), value(forward<Tp>(val)) {
         tuple_static_assert<0, Tp, Tps...>();
     }
 
-    ASCENDC_HOST_AICORE inline Tp& GetValue() noexcept {
+    __host_callee__ inline Tp& GetValue() noexcept {
         return value;
     }
 
-    ASCENDC_HOST_AICORE inline const Tp& GetValue() const noexcept {
+    __host_callee__ inline const Tp& GetValue() const noexcept {
         return value;
     }
 
     template <typename Head, typename ...Args>
-    ASCENDC_HOST_AICORE inline tuple<Tp, Tps...>& operator=(const tuple<Head, Args...>& t)
+    __host_callee__ inline tuple<Tp, Tps...>& operator=(const tuple<Head, Args...>& t)
     {
         static_assert(sizeof...(Tps) == sizeof...(Args), "Both tuples must have the same number of elements");
         this->value = t.value;
@@ -163,7 +163,7 @@ template <typename T>
 using unwrap_decay_t = typename unwrap_refwrapper<decay_t<T>>::type;
 
 template <typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...args)
+__host_callee__ inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tps&& ...args)
 {
     tuple_static_assert<0, Tps...>();
     return tuple<unwrap_decay_t<Tps>...>(forward<Tps>(args)...);
@@ -171,7 +171,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<unwrap_decay_t<Tps>...> make_tuple(Tp
  
 // tie
 template <typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept
+__host_callee__ inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept
 {
     tuple_static_assert<0, Tps...>();
     return tuple<Tps&...>(args...);
@@ -179,7 +179,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<Tps& ...> tie(Tps& ...args) noexcept
 
 // forward_as_tuple
 template <typename ...Tps>
-ASCENDC_HOST_AICORE inline constexpr tuple<Tps&&...> forward_as_tuple(Tps&& ...args) noexcept
+__host_callee__ inline constexpr tuple<Tps&&...> forward_as_tuple(Tps&& ...args) noexcept
 {
     tuple_static_assert<0, Tps...>();
     return tuple<Tps&&...>(forward<Tps>(args)...);
@@ -187,7 +187,7 @@ ASCENDC_HOST_AICORE inline constexpr tuple<Tps&&...> forward_as_tuple(Tps&& ...a
 
 // get
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept
+__host_callee__ inline typename tuple_element<N, tuple<Tps...> >::type& get(tuple<Tps...>& t) noexcept
 {
     tuple_static_assert<N, Tps...>();
     using type = typename tuple_element<N, tuple<Tps...> >::type;
@@ -196,7 +196,7 @@ ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type& get(
 }
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept
+__host_callee__ inline const typename tuple_element<N, tuple<Tps...> >::type& get(const tuple<Tps...>& t) noexcept
 {
     tuple_static_assert<N, Tps...>();
     using type = const typename tuple_element<N, tuple<Tps...> >::type;
@@ -205,14 +205,14 @@ ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type
 }
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept
+__host_callee__ inline typename tuple_element<N, tuple<Tps...> >::type&& get(tuple<Tps...>&& t) noexcept
 {
     using type = typename tuple_element<N, tuple<Tps...> >::type;
     return static_cast<type&&>(get<N, Tps...>(static_cast<tuple<Tps...>&>(t)));
 }
 
 template <size_t N, typename ...Tps>
-ASCENDC_HOST_AICORE inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept
+__host_callee__ inline const typename tuple_element<N, tuple<Tps...> >::type&& get(const tuple<Tps...>&& t) noexcept
 {
     using type = const typename tuple_element<N, tuple<Tps...> >::type;
     return static_cast<type&&>(get<N, Tps...>(static_cast<const tuple<Tps...>&>(t)));

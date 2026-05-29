@@ -20,13 +20,13 @@ namespace Std {
 
 struct ignore_t
 {
-    ASCENDC_HOST_AICORE inline ignore_t() = default;
+    __host_callee__ inline ignore_t() = default;
 
     template <typename Tp, typename...Ts>
-    ASCENDC_HOST_AICORE inline constexpr ignore_t(const Tp&, const Ts&...) noexcept {}
+    __host_callee__ inline constexpr ignore_t(const Tp&, const Ts&...) noexcept {}
 
     template <typename Tp>
-    ASCENDC_HOST_AICORE inline constexpr const ignore_t& operator=(const Tp&) const noexcept
+    __host_callee__ inline constexpr const ignore_t& operator=(const Tp&) const noexcept
     {
         return *this;
     }

@@ -22,7 +22,7 @@ namespace AscendC {
 namespace Std {
 
 template <typename T>
-ASCENDC_HOST_AICORE typename add_rvalue_reference<T>::type declval() noexcept
+__host_callee__ typename add_rvalue_reference<T>::type declval() noexcept
 {
     static_assert(!std::is_abstract<T>::value || std::is_polymorphic<T>::value,
         "Std::declval() cannot be used with polymorphic and abstract types !");

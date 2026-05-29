@@ -29,7 +29,7 @@ template <class T, T... Ns> struct IntegerSequence {
   using type = IntegerSequence;
   using valueType = T;
   static_assert((0 <= sizeof...(Ns) && sizeof...(Ns) <= Impl::MaxIntegerSequenceSize), "Std::index_sequence size must be within [0,64].");
-  ASCENDC_HOST_AICORE inline static constexpr size_t size() { return sizeof...(Ns); }
+  __host_callee__ inline static constexpr size_t size() { return sizeof...(Ns); }
 };
 
 namespace Impl {

@@ -26,16 +26,16 @@ template <typename Base, typename Derived>
 struct IsBaseOfImpl {
 private:
     template <typename B> 
-    ASCENDC_HOST_AICORE inline static true_type TestPtrConv(const volatile B *);
+    __host_callee__ inline static true_type TestPtrConv(const volatile B *);
 
     template <typename B> 
-    ASCENDC_HOST_AICORE inline static false_type TestPtrConv(const volatile void *);
+    __host_callee__ inline static false_type TestPtrConv(const volatile void *);
 
     template <typename B, typename D>
-    ASCENDC_HOST_AICORE inline static auto IsBaseOf(int32_t) -> decltype(TestPtrConv<B>(static_cast<D *>(nullptr)));
+    __host_callee__ inline static auto IsBaseOf(int32_t) -> decltype(TestPtrConv<B>(static_cast<D *>(nullptr)));
 
     template <typename B, typename D>
-    ASCENDC_HOST_AICORE inline static auto IsBaseOf(uint32_t) -> true_type; // private or ambiguous base
+    __host_callee__ inline static auto IsBaseOf(uint32_t) -> true_type; // private or ambiguous base
 
 public:
     static constexpr bool value = decltype(IsBaseOf<Base, Derived>(0))::value;

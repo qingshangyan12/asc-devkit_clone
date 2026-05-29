@@ -24,10 +24,10 @@ namespace Std {
 namespace IsClassImpl {
 
 template <typename Tp>
-ASCENDC_HOST_AICORE inline bool_constant<!is_union_v<Tp>> Test(int32_t Tp::*);
+__host_callee__ inline bool_constant<!is_union_v<Tp>> Test(int32_t Tp::*);
 
 template <typename Tp>
-ASCENDC_HOST_AICORE inline false_type Test(uint32_t);
+__host_callee__ inline false_type Test(uint32_t);
 
 } // namespace is_class_impl
 

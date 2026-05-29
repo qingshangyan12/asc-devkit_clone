@@ -26,10 +26,10 @@ template <typename T>
 struct IsTupleImpl {
     private:
         template <typename Ts>
-        ASCENDC_HOST_AICORE inline static auto HasTupleSize(int32_t) -> bool_constant<(tuple_size<Ts>::value >= 0)>;
+        __host_callee__ inline static auto HasTupleSize(int32_t) -> bool_constant<(tuple_size<Ts>::value >= 0)>;
 
         template <typename Ts>
-        ASCENDC_HOST_AICORE inline static auto HasTupleSize(uint32_t) -> false_type;
+        __host_callee__ inline static auto HasTupleSize(uint32_t) -> false_type;
     
     public:
         static constexpr bool value = decltype(HasTupleSize<T>(static_cast<int32_t>(0)))::value;
