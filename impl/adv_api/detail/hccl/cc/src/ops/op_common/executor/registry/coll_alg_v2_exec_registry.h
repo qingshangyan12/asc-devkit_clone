@@ -16,7 +16,6 @@
 #include <mutex>
 #include "executor_v2_base.h"
 
-
 namespace mc2_ops_hccl {
 
 using CollExecCreatorV2 = std::function<InsCollAlgBase *()>;
@@ -34,10 +33,6 @@ public:
     static CollAlgExecRegistryV2 &Instance();
     HcclResult Register(const HcclCMDType type, const std::string &tag, const CollExecCreatorV2 &collExecCreator);
     std::unique_ptr<InsCollAlgBase> GetAlgExec(const HcclCMDType type, const std::string &tag);
-
-private:
-    std::map<HcclCMDType, std::map<std::string, const CollExecCreatorV2>> execCreators_;
-    mutable std::mutex mu_;
 };
 
 #define REGISTER_EXECUTOR_IMPL_HELPER(ctr, type, name, insCollAlgBase)                                                      \
