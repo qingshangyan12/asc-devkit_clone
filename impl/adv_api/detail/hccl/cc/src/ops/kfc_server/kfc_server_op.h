@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef OPS_HCCL_SRC_OPS_KFC_SERVER_OP_H
-#define OPS_HCCL_SRC_OPS_KFC_SERVER_OP_H
+#ifndef mc2_ops_hccl_SRC_OPS_KFC_SERVER_OP_H
+#define mc2_ops_hccl_SRC_OPS_KFC_SERVER_OP_H
 
 #include <string>
 #include <memory>
@@ -30,7 +30,7 @@ HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, 
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream);
 
