@@ -273,24 +273,21 @@ if ASCEND_IS_AIV {
 
 ```cpp
 // 在Cube核Mmad计算后，Dump L0C结果验证矩阵乘正确性
-if ASCEND_IS_AIC {
-    AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
-    AscendC::DumpTensor(cLocal, 1, 16);  // desc=1标识为Mmad输出，dump前16个元素
-}
+AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+AscendC::DumpTensor(cLocal, 1, 16);  // desc=1标识为Mmad输出，dump前16个元素
+
 // 在Vector核LeakyRelu计算后，Dump UB结果验证激活计算正确性
-if ASCEND_IS_AIV {
-    AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, tileLen);
-    AscendC::DumpTensor(vecLocal, 2, 16);  // desc=2标识为LeakyRelu输出，dump前16个元素
-}
+AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, tileLen);
+AscendC::DumpTensor(vecLocal, 2, 16);  // desc=2标识为LeakyRelu输出，dump前16个元素
 ```
 
 打印示例如下：
 
 ```
-DumpTensor: desc=1, addr=0x2000, data_type=float32, position=CO1, dump_size=16
-[1.023438, 0.875000, -0.250000, 2.062500, ...]
-DumpTensor: desc=2, addr=0x1000, data_type=float16, position=VECCALC, dump_size=16
-[1.023438, 0.875000, -0.000250, 2.062500, ...]
+DumpTensor: desc=1, addr=0x0, data_type=float32, position=L0C, dump_size=16
+[23.000000, 58.000000, -115.000000, 96.000000, -218.000000, 241.000000, -170.000000, 90.000000, -244.000000, -437.000000, 14.000000, 307.000000, -59.000000, 363.000000, -179.000000, 125.000000]
+DumpTensor: desc=2, addr=0x0, data_type=float16, position=UB, dump_size=16
+[23.000000, 58.000000, -0.115051, 96.000000, -0.218140, 241.000000, -0.170044, 90.000000, -0.244141, -0.437256, 14.000000, 307.000000, -0.059021, 363.000000, -0.179077, 125.000000]
 ```
 
 > **注意**：DumpTensor仅用于调试，会中断正常流水执行，不要在性能测试时使用。

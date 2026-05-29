@@ -366,34 +366,16 @@ if ASCEND_IS_AIV {
 在关键计算节点插入DumpTensor，可检查Matmul输出和GELU中间结果是否符合预期。示例如下：
 
 ```cpp
-// AIC侧Mmad计算后，Dump L0C结果验证矩阵乘正确性
-if ASCEND_IS_AIC {
-    AscendC::Mmad(cLocal, a2Local, b2Local, mmadParams);
-    AscendC::DumpTensor(cLocal, 1, 16);  // desc=1标识为Mmad输出，dump前16个元素
-}
-// AIV侧GELU计算后，Dump UB结果验证激活计算正确性
-if ASCEND_IS_AIV {
-    // GM中转模式：DataCopyPad GM→xUB后
-    AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::DumpTensor(xUB, 2, 16);  // desc=2标识为GELU输入，dump前16个元素
-
-    // GELU计算完成后
-    GeluMemBaseCompute(xUB, geluOutUB, computeLen);
-    AscendC::DumpTensor(geluOutUB, 3, 16);  // desc=3标识为GELU输出，dump前16个元素
-}
+// GELU计算完成后
+GeluMemBaseCompute(xUB, geluOutUB, computeLen);
+AscendC::DumpTensor(geluOutUB, 1, 16);  // desc=2标识为GELU输出，dump前16个元素
 ```
 
 打印示例如下：
 
 ```
-DumpTensor: desc=1, addr=0x2000, data_type=float32, position=CO1, dump_size=16
-[1.023438, 0.875000, -0.250000, 2.062500, ...]
-DumpTensor: desc=2, addr=0x1000, data_type=float32, position=VECCALC, dump_size=16
-[1.023438, 0.875000, -0.250000, 2.062500, ...]
-DumpTensor: desc=3, addr=0x1800, data_type=float32, position=VECCALC, dump_size=16
-[0.841028, 0.731129, -0.062250, 0.979924, ...]
+DumpTensor: desc=1, addr=0x10000, data_type=float32, position=UB, dump_size=16
+[-0.000000, -0.000000, 11.407654, -0.000000, 34.559158, -0.000000, 8.137751, 3.600865, -0.000000, 69.617142, -0.000000, 7.272546, -0.000000, -0.000000, -0.000000, -0.000000]
 ```
 
 > **注意**：DumpTensor仅用于调试，会中断正常流水执行，不要在性能测试时使用。
