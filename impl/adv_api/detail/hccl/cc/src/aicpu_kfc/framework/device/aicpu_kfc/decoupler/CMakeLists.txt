@@ -28,9 +28,7 @@ set(open_exec_impl_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_open_env_adapter.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/channel/channel_request.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_base.cc
-    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor/executor_v2_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_template_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/alg_v2_template_base.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/template_utils.cc
