@@ -396,7 +396,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     HCCL_CHECK_RESTART(hcclMsgArea_, return HCCL_FAILED);
     ASCENDC_HCCL_API_ASSERT(curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION, { return HCCL_FAILED; },
                             "Call Wait failed, ensure Hccl::Init func has been called successfully!");
-    KERNEL_LOG(KERNEL_ERROR, "Wait called: handleId=%d, queueNum_=%u, workingFlag_=%u", handleId, queueNum_, workingFlag_);
+    AscendC::PRINTF("Wait called: handleId=%d, queueNum_=%u, workingFlag_=%u", handleId, queueNum_, workingFlag_);
     if (queueNum_ != 0U) {
         return HCCL_SUCCESS;
     }
