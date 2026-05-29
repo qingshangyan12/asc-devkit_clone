@@ -9,7 +9,8 @@
 */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
-#warning "instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#warning                                                                                                               \
+    "impl/tensor_api/arch/cube/mmad/mmad_impl/instruction.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
@@ -18,8 +19,8 @@
  * \file instruction.h
  * \brief
  */
-#ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_NPU_ARCH_3510_INSTRUCTION_H
-#define IMPL_TENSOR_API_ARCH_CUBE_MMAD_NPU_ARCH_3510_INSTRUCTION_H
+#ifndef IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_INSTRUCTION_H
+#define IMPL_TENSOR_API_ARCH_CUBE_MMAD_MMAD_IMPL_INSTRUCTION_H
 
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
@@ -28,7 +29,8 @@
 namespace AscendC {
 namespace Te {
 
-__aicore__ inline static void SetCtrlForhifloat8() {
+__aicore__ inline static void SetCtrlForhifloat8()
+{
     uint64_t oriConfig = asc_get_ctrl();
     uint64_t config = oriConfig | HIFLOAT8_MMAD_CTRL_MASK;
     asc_set_ctrl(config);
@@ -44,8 +46,9 @@ public:
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k, uint16_t n,
-        uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
+    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k,
+        uint16_t n, uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal)
+    {
         if ASCEND_IS_AIV {
             return;
         }
@@ -68,13 +71,14 @@ public:
     __aicore__ inline static void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& ...params)
     {
         // MTE2
-        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), 
+        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(),
             reinterpret_cast<uint64_t>(bias.Data().Get()), params...);
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-        int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
+    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m,
+        uint16_t k, uint16_t n, int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal)
+    {
         if ASCEND_IS_AIV {
             return;
         }
@@ -103,8 +107,9 @@ public:
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k, uint16_t n,
-        uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
+    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint16_t m, uint16_t k,
+        uint16_t n, uint8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal)
+    {
         if ASCEND_IS_AIV {
             return;
         }
@@ -120,13 +125,14 @@ public:
     __aicore__ inline static void Mmad(const T& dst, const U& fm, const S& filter, const V& bias, const Params& ...params)
     {
         // MTE2
-        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(), 
+        MmadImpl(dst.Data().Get(), fm.Data().Get(), filter.Data().Get(),
             reinterpret_cast<uint64_t>(bias.Data().Get()), params...);
     }
 private:
     template <typename T, typename U, typename S>
-    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m, uint16_t k, uint16_t n,
-        int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal) {
+    __aicore__ inline static void MmadImpl(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, uint16_t m,
+        uint16_t k, uint16_t n, int8_t unitFlag, bool disableGemv, bool cmatrixSource, bool cmatrixInitVal)
+    {
         if ASCEND_IS_AIV {
             return;
         }
