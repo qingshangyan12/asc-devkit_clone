@@ -67,7 +67,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | 参数名 | 描述 |
 | --- | --- |
 | modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间或者所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
-| pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX。<cann-filter npu-type="950"><br>流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter> |
+| pipe | 设置这条指令所在的流水类型，支持的流水类型请参考[约束说明](#section633mcpsimp) 。|
 
 **表 2**  参数说明
 
