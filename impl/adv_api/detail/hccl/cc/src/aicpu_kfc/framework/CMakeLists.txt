@@ -626,6 +626,23 @@ if(NOT BUILD_OPEN_PROJECT OR (BUILD_OPEN_PROJECT AND KERNEL_MODE))
 
 
     target_include_directories(asc_ccl_kernel PRIVATE ${ORION_HEAD_LIST})
+    
+    # Device-side targets resolve ops_hccl::* against the AI CPU package's
+    # libscatter_aicpu_kernel.so (shipped inside CANN's signed
+    # opp/built-in/op_impl/aicpu/kernel/aicpu_hccl.tar.gz) instead of the
+    # host library libhccl.so. The host-side mc2_client target keeps its
+    # libhccl.so path via libhcomm (see src/CMakeLists.txt).
+    include(${HCCL_CC_DIR}/cmake/extract_aicpu_hccl.cmake)
+    add_dependencies(asc_ccl_kernel aicpu_hccl_extracted)
+    message(STATUS "asc_ccl_kernel will link against ${AICPU_HCCL_SCATTER_LIB}")
+    target_link_libraries(asc_ccl_kernel PRIVATE
+        -Wl,--no-as-needed
+        ${AICPU_HCCL_SCATTER_LIB}
+        ${AICPU_HCCL_KCOMPAT_LIB}
+        -Wl,--as-needed
+        -ldl
+    )
+    
     if(TARGET json)
         target_link_libraries(asc_ccl_kernel PRIVATE json)
         add_dependencies(asc_ccl_kernel json)
@@ -982,6 +999,10 @@ if(DEVICE_MODE AND KERNEL_MODE)
         OPEN_BUILD_PROJECT
         -D_GLIBCXX_USE_CXX11_ABI=1
     )
+
+    # Device-side asc_aicpu_custom intentionally does NOT link against the host
+    # libhccl.so. ops_hccl::* symbols are resolved via libscatter_aicpu_kernel.so
+    # extracted by extract_aicpu_hccl.cmake and added below.
     set(AICPU_CUSTOM_LINK_LIBRARIES
         -Wl,--no-as-needed
         ascend_hal
@@ -1026,6 +1047,17 @@ if(DEVICE_MODE AND KERNEL_MODE)
     )
 
     target_link_libraries(asc_aicpu_custom PRIVATE ${AICPU_CUSTOM_LINK_LIBRARIES} ascend_hal c_sec unified_dlog)
+
+    # Same host/device split as asc_ccl_kernel: device-side asc_aicpu_custom
+    # resolves ops_hccl::* against the extracted libscatter_aicpu_kernel.so.
+    add_dependencies(asc_aicpu_custom aicpu_hccl_extracted)
+    target_link_libraries(asc_aicpu_custom PRIVATE
+        -Wl,--no-as-needed
+        ${AICPU_HCCL_SCATTER_LIB}
+        ${AICPU_HCCL_KCOMPAT_LIB}
+        -Wl,--as-needed
+        -ldl
+    )
 
     add_dependencies(asc_aicpu_custom asc_ccl_kernel asc_ccl_kernel_plf_a asc_aicpu_custom_json)
     set_target_properties(asc_aicpu_custom PROPERTIES
