@@ -5,8 +5,8 @@
 | 产品 | 是否支持 |
 | :-----------| :------: |
 | <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √    |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √    |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √    |
 
 ## 功能说明
 
@@ -28,7 +28,7 @@ __aicore__ inline int64_t asc_get_program_counter()
 
 ## 流水类型
 
-PIPE_TYPE_S
+PIPE_S
 
 ## 约束说明
 
