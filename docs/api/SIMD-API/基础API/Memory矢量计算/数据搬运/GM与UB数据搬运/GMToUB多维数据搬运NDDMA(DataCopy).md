@@ -20,13 +20,13 @@
 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
 
 ## 函数原型<a name="section1954364615315"></a>
+
+-   GM-\> UB ，支持多维度搬运
     ```
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
     ```
-
-- NdDma DataCache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存保证DataCache为最新状态。
-
+- NdDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
     ```
     __aicore__ inline void NdDmaDci()
     ```
@@ -92,9 +92,10 @@
 
 ## 数据类型
 
+源操作数和目的操作数支持的数据类型保持一致。
 <cann-filter npu-type = "950">
 
-Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。源操作数和目的操作数支持的数据类型保持一致。
+Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 
 </cann-filter>
 
@@ -117,16 +118,16 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。源�
 ## 调用示例<a name="section122101199486"></a>
 
 ```
-// T：搬运数据的类型
-// xGm：保存DataCopy搬入数据
-// xLocal：保存DataCopy搬出数据
+// T：搬运数据的类型。
+// xGm：保存DataCopy搬入数据。
+// xLocal：保存DataCopy搬出数据。
 
-// 2D Padding场景
-// xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]
+// 2D Padding场景。
+// xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]。
 AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}};
-AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
-AscendC::NdDmaDci();  // 刷新cache
-static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0。
+AscendC::NdDmaDci();  // 刷新cache。
+static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
 AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
 ```
 

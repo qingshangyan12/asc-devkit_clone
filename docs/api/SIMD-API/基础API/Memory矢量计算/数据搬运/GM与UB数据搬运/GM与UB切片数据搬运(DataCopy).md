@@ -2,19 +2,19 @@
 
 ## 产品支持情况<a name="zh-cn_topic_0000002565968945_section796754519912"></a>
 
-<a name="zh-cn_topic_0000002565968945_table38301303189"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002565968945_row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="zh-cn_topic_0000002565968945_p1883113061818"><a name="zh-cn_topic_0000002565968945_p1883113061818"></a><a name="zh-cn_topic_0000002565968945_p1883113061818"></a><span id="zh-cn_topic_0000002565968945_ph20833205312295"><a name="zh-cn_topic_0000002565968945_ph20833205312295"></a><a name="zh-cn_topic_0000002565968945_ph20833205312295"></a>产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="zh-cn_topic_0000002565968945_p783113012187"><a name="zh-cn_topic_0000002565968945_p783113012187"></a><a name="zh-cn_topic_0000002565968945_p783113012187"></a>是否支持</p>
-</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+| 产品 | 是否支持  |
+| :----------------------- | :------: |
+|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
+|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
+|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
+|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
 ## 功能说明<a name="zh-cn_topic_0000002565968945_section106841136114319"></a>
 
-头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
 
@@ -22,134 +22,53 @@
 
 -   GM-\>UB
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
     ```
 
 -   UB-\>GM
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
     ```
+
+> [!NOTE]说明 
+> 各原型支持的数据类型，请参考[数据类型](#section186352046151419)。
 
 ## 参数说明<a name="zh-cn_topic_0000002565968945_section16128134420472"></a>
 
 **表 1**  模板参数说明
 
-<a name="zh-cn_topic_0000002565968945_table49614585413"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002565968945_row996115820412"><th class="cellrowborder" valign="top" width="14.719999999999999%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002565968945_p10961458104110"><a name="zh-cn_topic_0000002565968945_p10961458104110"></a><a name="zh-cn_topic_0000002565968945_p10961458104110"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="85.28%" id="mcps1.2.3.1.2"><p id="zh-cn_topic_0000002565968945_p6961155817415"><a name="zh-cn_topic_0000002565968945_p6961155817415"></a><a name="zh-cn_topic_0000002565968945_p6961155817415"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002565968945_row4961205811416"><td class="cellrowborder" valign="top" width="14.719999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p29619586417"><a name="zh-cn_topic_0000002565968945_p29619586417"></a><a name="zh-cn_topic_0000002565968945_p29619586417"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="85.28%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p996110583417"><a name="zh-cn_topic_0000002565968945_p996110583417"></a><a name="zh-cn_topic_0000002565968945_p996110583417"></a>源操作数或者目的操作数的数据类型。支持的数据类型请参考。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+| :--- | :--- |
+| T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考。 |
 
 **表 2**  参数说明
 
-<a name="zh-cn_topic_0000002565968945_table8955841508"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002565968945_row15956194105014"><th class="cellrowborder" valign="top" width="13.651365136513652%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000002565968945_p7956144195014"><a name="zh-cn_topic_0000002565968945_p7956144195014"></a><a name="zh-cn_topic_0000002565968945_p7956144195014"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="8.42084208420842%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000002565968945_p1295624145013"><a name="zh-cn_topic_0000002565968945_p1295624145013"></a><a name="zh-cn_topic_0000002565968945_p1295624145013"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="77.92779277927792%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000002565968945_p16956144145011"><a name="zh-cn_topic_0000002565968945_p16956144145011"></a><a name="zh-cn_topic_0000002565968945_p16956144145011"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002565968945_row5956546509"><td class="cellrowborder" valign="top" width="13.651365136513652%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002565968945_p19287714181617"><a name="zh-cn_topic_0000002565968945_p19287714181617"></a><a name="zh-cn_topic_0000002565968945_p19287714181617"></a>dst</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.42084208420842%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002565968945_p192871614151615"><a name="zh-cn_topic_0000002565968945_p192871614151615"></a><a name="zh-cn_topic_0000002565968945_p192871614151615"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="77.92779277927792%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002565968945_p16287121461618"><a name="zh-cn_topic_0000002565968945_p16287121461618"></a><a name="zh-cn_topic_0000002565968945_p16287121461618"></a>目的操作数。</p>
-<a name="zh-cn_topic_0000002565968945_ul17617194613257"></a><a name="zh-cn_topic_0000002565968945_ul17617194613257"></a><ul id="zh-cn_topic_0000002565968945_ul17617194613257"><li>类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。</li><li>类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。</li></ul>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row4956154125018"><td class="cellrowborder" valign="top" width="13.651365136513652%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002565968945_p142871414131614"><a name="zh-cn_topic_0000002565968945_p142871414131614"></a><a name="zh-cn_topic_0000002565968945_p142871414131614"></a>src</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.42084208420842%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002565968945_p628711148165"><a name="zh-cn_topic_0000002565968945_p628711148165"></a><a name="zh-cn_topic_0000002565968945_p628711148165"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="77.92779277927792%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002565968945_p0287191420164"><a name="zh-cn_topic_0000002565968945_p0287191420164"></a><a name="zh-cn_topic_0000002565968945_p0287191420164"></a>源操作数。</p>
-<a name="zh-cn_topic_0000002565968945_ul174993262613"></a><a name="zh-cn_topic_0000002565968945_ul174993262613"></a><ul id="zh-cn_topic_0000002565968945_ul174993262613"><li>类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。</li><li>类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。</li></ul>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row187261835102011"><td class="cellrowborder" valign="top" width="13.651365136513652%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002565968945_p1372633532019"><a name="zh-cn_topic_0000002565968945_p1372633532019"></a><a name="zh-cn_topic_0000002565968945_p1372633532019"></a>dstSliceInfo</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.42084208420842%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002565968945_p97261435142012"><a name="zh-cn_topic_0000002565968945_p97261435142012"></a><a name="zh-cn_topic_0000002565968945_p97261435142012"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="77.92779277927792%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002565968945_p072623511206"><a name="zh-cn_topic_0000002565968945_p072623511206"></a><a name="zh-cn_topic_0000002565968945_p072623511206"></a>源操作数切片信息，类型为SliceInfo。通过改参数可以配置切片的起始和终止元素个数、间隔、长度等信息。</p>
-<p id="zh-cn_topic_0000002565968945_p18226206122318"><a name="zh-cn_topic_0000002565968945_p18226206122318"></a><a name="zh-cn_topic_0000002565968945_p18226206122318"></a>SliceInfo参数说明请参考。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row25611637122020"><td class="cellrowborder" valign="top" width="13.651365136513652%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002565968945_p5561537192013"><a name="zh-cn_topic_0000002565968945_p5561537192013"></a><a name="zh-cn_topic_0000002565968945_p5561537192013"></a>srcSliceInfo</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.42084208420842%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002565968945_p1656133782010"><a name="zh-cn_topic_0000002565968945_p1656133782010"></a><a name="zh-cn_topic_0000002565968945_p1656133782010"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="77.92779277927792%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002565968945_p195611437192019"><a name="zh-cn_topic_0000002565968945_p195611437192019"></a><a name="zh-cn_topic_0000002565968945_p195611437192019"></a>目的操作数切片信息，类型为SliceInfo。通过改参数可以配置切片的起始和终止元素个数、间隔、长度等信息。SliceInfo参数说明请参考。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row1075785651510"><td class="cellrowborder" valign="top" width="13.651365136513652%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002565968945_p1728791441620"><a name="zh-cn_topic_0000002565968945_p1728791441620"></a><a name="zh-cn_topic_0000002565968945_p1728791441620"></a>dimValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.42084208420842%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002565968945_p11287151451610"><a name="zh-cn_topic_0000002565968945_p11287151451610"></a><a name="zh-cn_topic_0000002565968945_p11287151451610"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="77.92779277927792%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002565968945_p25431398275"><a name="zh-cn_topic_0000002565968945_p25431398275"></a><a name="zh-cn_topic_0000002565968945_p25431398275"></a>操作数维度信息，默认值为1。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 输入/输出 | 含义 |
+| :--- | :---: | :--- |
+| dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。 |
+| src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。 |
+| dstSliceInfo | 输入 | 目的操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>SliceInfo参数说明请参考。 |
+| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。SliceInfo参数说明请参考。 |
+| dimValue | 输入 | 操作数维度信息，默认值为1。 |
 
 **表 3**  SliceInfo结构体参数定义
 
-<a name="zh-cn_topic_0000002565968945_table144203616291"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002565968945_row742014692919"><th class="cellrowborder" valign="top" width="12.959999999999999%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002565968945_p1242012617291"><a name="zh-cn_topic_0000002565968945_p1242012617291"></a><a name="zh-cn_topic_0000002565968945_p1242012617291"></a>参数名称</p>
-</th>
-<th class="cellrowborder" valign="top" width="87.03999999999999%" id="mcps1.2.3.1.2"><p id="zh-cn_topic_0000002565968945_p1342018622916"><a name="zh-cn_topic_0000002565968945_p1342018622916"></a><a name="zh-cn_topic_0000002565968945_p1342018622916"></a>含义</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002565968945_row1642018613291"><td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p42771239121712"><a name="zh-cn_topic_0000002565968945_p42771239121712"></a><a name="zh-cn_topic_0000002565968945_p42771239121712"></a>startIndex</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.03999999999999%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p113258476173"><a name="zh-cn_topic_0000002565968945_p113258476173"></a><a name="zh-cn_topic_0000002565968945_p113258476173"></a>切片的起始元素位置，uint32_t类型，单位是元素个数。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row174201161298"><td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p12778396171"><a name="zh-cn_topic_0000002565968945_p12778396171"></a><a name="zh-cn_topic_0000002565968945_p12778396171"></a>endIndex</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.03999999999999%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p1632634715178"><a name="zh-cn_topic_0000002565968945_p1632634715178"></a><a name="zh-cn_topic_0000002565968945_p1632634715178"></a>切片的终止元素位置，uint32_t类型，单位是元素个数。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row1542086182913"><td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p6277143991716"><a name="zh-cn_topic_0000002565968945_p6277143991716"></a><a name="zh-cn_topic_0000002565968945_p6277143991716"></a>stride</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.03999999999999%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p432674771713"><a name="zh-cn_topic_0000002565968945_p432674771713"></a><a name="zh-cn_topic_0000002565968945_p432674771713"></a>切片的间隔元素个数，uint32_t类型。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row13420361297"><td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p17277123915179"><a name="zh-cn_topic_0000002565968945_p17277123915179"></a><a name="zh-cn_topic_0000002565968945_p17277123915179"></a>burstLen</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.03999999999999%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p16442099222"><a name="zh-cn_topic_0000002565968945_p16442099222"></a><a name="zh-cn_topic_0000002565968945_p16442099222"></a>横向切片，每一片数据的长度，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。uint32_t类型，单位：datablock（32B）。</p>
-<p id="zh-cn_topic_0000002565968945_p1490419231327"><a name="zh-cn_topic_0000002565968945_p1490419231327"></a><a name="zh-cn_topic_0000002565968945_p1490419231327"></a>比如，srcSliceInfo的List为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}，{16, 70, 7, 3, 87}表示第一维的切片信息，burstLen设置为3，表示一个切片数据段大小为3个datablock； {0, 2, 1, 1, 3}为第二维的切片信息，burstLen仅能设置为1。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002565968945_row72945110259"><td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002565968945_p72601617193111"><a name="zh-cn_topic_0000002565968945_p72601617193111"></a><a name="zh-cn_topic_0000002565968945_p72601617193111"></a>shapeValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="87.03999999999999%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002565968945_p426051714315"><a name="zh-cn_topic_0000002565968945_p426051714315"></a><a name="zh-cn_topic_0000002565968945_p426051714315"></a>当前维度的原始长度。uint32_t类型，单位为元素个数。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名称 | 含义 |
+| :--- | :--- |
+| startIndex | 切片的起始元素位置，uint32_t类型，单位是元素个数。 |
+| endIndex | 切片的终止元素位置，uint32_t类型，单位是元素个数。 |
+| stride | 切片的间隔元素个数，uint32_t类型。 |
+| burstLen | 横向切片，每一片数据的长度，仅在 dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。uint32_t类型，单位：datablock（32B）。<br>比如，srcSliceInfo的List为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}，{16, 70, 7, 3, 87}表示第一维的切片信息，burstLen设置为3，表示一个切片数据段大小为3个datablock； {0, 2, 1, 1, 3}为第二维的切片信息，burstLen仅能设置为1。 |
+| shapeValue | 当前维度的原始长度。uint32_t类型，单位为元素个数。 |
 
-## 二维切片搬运<a name="zh-cn_topic_0000002565968945_section13815175812385"></a>
+通过具体的示例对上述参数的含义进行解析。如图1所示，以float数据类型为例，切片搬运接口能从shape为3\*87的源操作中，选取四个不连续的横向切片搬运到目的操作数中，下面结合图示对SliceInfo结构体参数进行解析：
 
-如下图所示，以float数据类型为例，切片搬运接口能从shape为3\*87的源操作中，选取四个不连续的横向切片搬运到目的操作数中，下面结合图示对SliceInfo结构体参数进行解析：
-
-**图 1**  二维切片搬运示意图<a name="zh-cn_topic_0000002565968945_fig422819202304"></a>  
-
-![](figures/切片数据搬运示意图.png)
+**图 1**  参数解析示意图<a name="fig1196816115710"></a>  
+![](../../../../../figures/parameter_analysis_diagram.png "参数解析示意图")
 
 -   dimValue为2，表示操作数有2维。
 -   srcSliceInfo为 \{\{16, 70, 7, 3, 87\},  \{0, 2, 1, 1, 3\}\}
@@ -192,68 +111,70 @@
 
     -   \{0, 1, 0, 1, 2\} 是针对多行，即从二维的角度来配置，每个元素代表1行：
 
-        **startIndex **= 0，表示有效数据段从第0行开始；
+        **startIndex** = 0，表示有效数据段从第0行开始；
 
-        **endIndex **= 1，表示有效数据段到第1行结束；
+        **endIndex** = 1，表示有效数据段到第1行结束；
 
-        **stride **= 0，表示相邻的2个切片数据段没有间隔；
+        **stride** = 0，表示相邻的2个切片数据段没有间隔；
 
         **burstLen**  = 1，在dimValue \> 1时必须填为1；
 
-        **shapeValue **= 2，表示一共有2行。
+        **shapeValue** = 2，表示一共有2行。
 
 ## 数据类型<a name="zh-cn_topic_0000002565968945_section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致。
+源操作数和目的操作数支持的数据类型保持一致。GM -\> VECIN（GM -\> UB）和 VECOUT -\> GM（UB -\> GM）两个数据通路的数据类型支持情况相同，具体如下：
+<cann-filter npu-type="950">
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：int8\_t、uint8\_t、int16\_t、uint16\_t、int32\_t、uint32\_t、half、bfloat16\_t、float
+- Ascend 950PR/Ascend 950DT：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 
-Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：int8\_t、uint8\_t、int16\_t、uint16\_t、int32\_t、uint32\_t、half、bfloat16\_t、float
+</cann-filter>
 
-## API映射关系<a name="zh-cn_topic_0000002565968945_section5469132317498"></a>
+<cann-filter npu-type="A3">
 
-该接口属于软仿实现，无直接映射关系。涉及以下built-in指令的使用：
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float。
 
-```
-// GM -> UB
-void copy_gm_to_ubuf(__ubuf__ void *dst, __gm__ void *src, uint8_t sid, uint16_t nBurst, uint16_t lenBurst, uint16_t srcStride, uint16_t dstStride);
+</cann-filter>
 
-void copy_gm_to_ubuf_align_b8(__ubuf__ void *dst, __gm__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_t srcGap, uint32_t dstGap);
+<cann-filter npu-type="910b">
 
-void copy_gm_to_ubuf_align_b16(__ubuf__ void *dst, __gm__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_t srcGap, uint32_t dstGap);
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、bfloat16_t、float。
 
-void copy_gm_to_ubuf_align_b32(__ubuf__ void *dst, __gm__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_t srcGap, uint32_t dstGap);
+</cann-filter>
 
-// UB -> GM
-void copy_ubuf_to_gm(__gm__ void *dst, __ubuf__ void *src, uint8_t sid, uint16_t nBurst, uint16_t lenBurst, uint16_t srcStride, uint16_t dstStride);
+<cann-filter npu-type="310p">
 
-void copy_ubuf_to_gm_align_b8(__gm__ void *dst, __ubuf__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_t srcGap, uint32_t dstGap);
+- Atlas 推理系列产品AI Core：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
 
-void copy_ubuf_to_gm_align_b16(__gm__ void *dst, __ubuf__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_tsrcGap, uint32_t dstGap);
+</cann-filter>
 
-void copy_ubuf_to_gm_align_b32(__gm__ void *dst, __ubuf__ void *src, uint8_t sid, uint16_t nBurst, uint32_t lenBurst, uint8_t leftPaddingNum, uint8_t rightPaddingNum, uint32_t srcGap, uint32_t dstGap);
+## 返回值说明
 
-```
+无
 
 ## 约束说明<a name="zh-cn_topic_0000002565968945_section2045914466492"></a>
 
 -   位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
 -   burstLen，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。
-
 -   切片数据搬运中的横向burstLen大小设置，需要用户自己通过计算：横向切片元素个数\* sizeof\(T\)/32byte。横向切片元素个数\* sizeof\(T\)的大小必须是32byte的倍数。
 -   SliceInfo 结构体的成员变量 startIndex、endIndex、stride、burstLen的取值须满足：
-
-    ![](figures/zh-cn_formulaimage_0000002567536318.png)
-
--   SliceInfo 结构体的成员变量 startIndex、endIndex、shapeValue的取值须满足：![](figures/zh-cn_formulaimage_0000002567581556.png)
+$$endIndex - startIndex + 1 = (N - 1) \times stride + N \times burstLen \times \frac{32}{sizeof(T)}, \quad N \in 正整数$$
+-   SliceInfo 结构体的成员变量 startIndex、endIndex、shapeValue的取值须满足：$$startIndex < endIndex \le shapeValue$$
 -   切片数据搬运中的SliceInfo结构体数组大小和dimValue需要保持一致，并且不超过8。
 -   切片数据搬运中的srcSliceInfo结构体数组大小的和dstSliceInfo的结构体数组大小需要保持一致，两者的结构体中的burstLen需要相等（srcSliceInfo\[i\].burstLen = dstSliceInfo\[i\].burstLen）。
 -   切片数据搬运对参数有一定要求，建议使用者参考调用示例，并在CPU上仿真结果无误后，再到NPU侧执行。
 
-## 理论性能说明<a name="zh-cn_topic_0000002565968945_section11310948115013"></a>
-
-软仿接口不涉及理论性能。
-
 ## 调用示例<a name="zh-cn_topic_0000002565968945_section088124295117"></a>
 
-待补充
+```cpp
+// srcLocal为float类型的LocalTensor，srcGlobal、dstGlobal为float类型的GlobalTensor。
+uint32_t dimValue = 2; // 操作数维度为2。
+AscendC::SliceInfo srcSliceInfo[] = {{16, 70, 7, 3, 87}, {0, 2, 1, 1, 3}};
+AscendC::SliceInfo dstSliceInfo[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
+// Global Memory -> Local Memory
+AscendC::DataCopy(srcLocal, srcGlobal,  dstSliceInfo, srcSliceInfo, dimValue);
+// Local Memory -> Global Memory
+AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
+```
+
+完整样例请参考[切片数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2ub_slice)。srcSliceInfo、dstSliceInfo参数解析与结果示例请参考[图1](#fig1196816115710)。
