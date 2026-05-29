@@ -24,6 +24,7 @@ add_executable(demo
     gelu.asc
 )
 
+# ks todo: 当前未链接任何库，空target_link_libraries配置是冗余语句，后续应删除。
 target_link_libraries(demo PRIVATE)
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
