@@ -396,7 +396,6 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     HCCL_CHECK_RESTART(hcclMsgArea_, return HCCL_FAILED);
     ASCENDC_HCCL_API_ASSERT(curVersion_ != HcclTilingVersion::INVALID_TILING_VERSION, { return HCCL_FAILED; },
                             "Call Wait failed, ensure Hccl::Init func has been called successfully!");
-    AscendC::PRINTF("Wait called: handleId=%d, queueNum_=%u, workingFlag_=%u", handleId, queueNum_, workingFlag_);
     if (queueNum_ != 0U) {
         return HCCL_SUCCESS;
     }
@@ -423,6 +422,29 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_AICPU, confi
     const uint16_t stepSize = GetStepSizeByHandle(handleId);
     waitCnt += (stepSize == 0U ? 1U : stepSize);
     (void)WaitFinishCntFromGm(curMsgPos, waitCnt);
+
+    // === 修复：Wait 完成后，对 recvBuf 区域做 DCache Invalidate ===
+    // 确保 AICPU server 写入的数据对当前核可见
+    KERNEL_LOG(KERNEL_ERROR, "Try to make DCache Invalidate.");
+    __gm__ HcclMsg *msg;
+    if (queueNum_ == 0U) {
+        msg = hcclMsgArea_->commMsg.singleMsg.sendMsgs + curMsgPos;
+    }
+    if (msg != nullptr) {
+        FlushDataCache(msg);  // 先刷新 msg 本身，读到最新的 recvBuf 地址
+        GM_ADDR recvBuf = msg->addMsg.v0Msg.recvBuf;
+        uint64_t count = msg->addMsg.v0Msg.count;
+        uint64_t dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(msg->addMsg.v0Msg.dataType)];
+        uint64_t totalBytes = count * dataSize * GetRankDim();
+        // 对 recvBuf 做逐 cache line DCCI
+        GlobalTensor<int64_t> tmpGlobal;
+        for (uint64_t offset = 0; offset < totalBytes; offset += MAX_DCCI_CNT) {
+            FlushDataCache(tmpGlobal, reinterpret_cast<__gm__ void*>(
+                reinterpret_cast<uint64_t>(recvBuf) + offset));
+        }
+    }
+    // === 修复结束 ===
+
     return HCCL_SUCCESS;
 }
 
