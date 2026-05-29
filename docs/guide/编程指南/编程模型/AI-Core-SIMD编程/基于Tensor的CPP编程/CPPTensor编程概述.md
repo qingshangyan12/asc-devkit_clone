@@ -10,29 +10,37 @@ Tensor本质是对内存地址的抽象封装，通过数组方式来管理和�
 
 ### Tensor的定义与分配管理
 
-根据芯片分级存储架构，Tensor分为两类：GlobalTensor对应全局内存（GM），存放算子输入/输出数据，作为算子与外部数据交互的门户；LocalTensor对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程中的输入、输出和中间数据。Tensor体系在演进过程中逐步增强能力：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可根据Layout自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
+根据芯片分级存储架构，Tensor分为两类：GlobalTensor对应Global Memory，存放算子输入/输出数据，作为算子与外部数据交互的门户；LocalTensor对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程中的输入、输出和中间数据。Tensor体系在演进过程中逐步增强能力：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可根据Layout自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
 
 - 基础Tensor(不带Layout)的定义和使用
-```cpp
-// Definition: carries data type + memory location, requires manual parameter passing
-AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
-GlobalTensor<half> gmTensor;
-gmTensor.SetGlobalBuffer((__gm__ half*)gmBuffer, bufferSize);
-// Operation: requires manual size/count parameter passing
-DataCopy(ubTensor, gmTensor, 256);
-Add(dstTensor, src0Tensor, src1Tensor, 256);
-```
+  - **GlobalTensor**对应Global Memory（全局内存），用于存储算子与外部交互的输入输出数据。GlobalTensor封装了全局内存的地址与大小信息，开发者通过`SetGlobalBuffer(__gm__ PrimType* buffer, uint64_t bufferSize)`接口设置其指向的Global Memory地址和空间大小。
+    ```cpp
+    GlobalTensor<half> gmTensor;
+    gmTensor.SetGlobalBuffer((__gm__ half*)gmBuffer, bufferSize);
+    ```
+  - **LocalTensor**对应Local Memory（本地内存），用于存储L1 Buffer、L0A/L0B/L0C Buffer及Unified Buffer（UB）中的计算中间数据。开发者通过`LocalMemAllocator`指定物理存储位置与大小，完成LocalTensor的内存分配。
+    ```cpp
+    // Definition: carries data type + memory location, requires manual parameter passing
+    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+    LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
+    ```
+  - **GlobalTensor**和**LocalTensor**是数据搬运与计算接口的基础操作单元。开发者在执行搬运或计算操作前，需先分配相应类型的Tensor，随后调用搬运或计算接口完成数据处理。
+    ```cpp
+    // Operation: requires manual size/count parameter passing
+    DataCopy(ubTensor, gmTensor, 256);
+    Add(dstTensor, src0Tensor, src1Tensor, 256);
+    ```
 
 - 扩展Tensor(带有Layout)的定义和使用
-```cpp
-// ===== Extended Tensor (Tensor API) =====
-// Definition: created via MakeTensor, carries Shape and Stride
-auto gmTensor = MakeTensor(gmPointer, MakeShape(128, 64));
-auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
-// Operation: no manual size/count setting, Copy interface automatically infers from Tensor info
-Copy(ubTensor, gmTensor);
-```
+  不带Layout的基础Tensor仅封装数据指针与大小信息，无法表达数据的物理排布方式，开发者在执行搬运和计算时必须手动传入size/count参数、自行计算偏移与步长，面对4D/5D高维张量时极易出错且代码冗长；而引入`Layout<Shape, Stride>`后，Tensor封装了Shape和Stride信息，接口自动推导操作参数，实现编译期类型安全，开发者无需关注内存布局细节，一行代码即可完成切片、搬运与计算。
+    ```cpp
+    // ===== Extended Tensor (Tensor API) =====
+    // Definition: created via MakeTensor, carries Shape and Stride
+    auto gmTensor = MakeTensor(gmPointer, MakeShape(128, 64));
+    auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
+    // Operation: no manual size/count setting, Copy interface automatically infers from Tensor info
+    Copy(ubTensor, gmTensor);
+    ```
 
 ## 编程范式: 面向C++ Tensor的SPMD编程范式
 
