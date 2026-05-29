@@ -210,110 +210,57 @@ typedef struct {
     };
 } ChannelProtectionInfo;
 
-typedef union {
-    struct {
-        uint64_t sqVa;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-        uint32_t jfsID;
-        uint32_t wqeSize;
-        uint32_t sqDepth;
-        uint32_t tpID;
-        uint8_t remoteEID[16];
-    } ubJfs;
-    struct {
-        uint64_t sqVa;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-        uint32_t qpn;
-        uint32_t wqeSize;
-        uint32_t depth;
-        int8_t dbMode;
-        uint8_t sl;
-    } roceSq;
-    uint8_t raws[120];
-    struct {
-        uint32_t jfsID;
-        uint64_t sqVa;
-        uint32_t wqeSize;
-        uint32_t sqDepth;
-        uint32_t tpID;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint8_t remoteEID[16];
-        uint64_t dbVa;
-    } jfsContext;
-    struct {
-        uint32_t qpn;
-        uint64_t sqVa;
-        uint32_t wqeSize;
-        uint32_t depth;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint8_t sl;
-        uint64_t dbVa;
-        int8_t dbMode;
-    } rdmaSqContext;
-} ChannelSqContextInfo;
-
 typedef struct {
     SqContextType type;
     union {
-        ChannelSqContextInfo contextInfo;
-        ChannelSqContextInfo ctx;
-    };
+        struct {
+            uint32_t jfsID;
+            uint64_t sqVa;
+            uint32_t wqeSize;
+            uint32_t sqDepth;
+            uint32_t tpID;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint8_t remoteEID[16];
+            uint64_t dbVa;
+        } jfsContext;
+        struct {
+            uint32_t qpn;
+            uint64_t sqVa;
+            uint32_t wqeSize;
+            uint32_t depth;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint8_t sl;
+            uint64_t dbVa;
+            int8_t dbMode;
+        } rdmaSqContext;
+    } ctx;
 } ChannelSqContext;
-
-typedef union {
-    struct {
-        uint64_t scqVa;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-        uint32_t jfcID;
-        uint32_t cqeSize;
-        uint32_t cqDepth;
-    } ubJfc;
-    struct {
-        uint64_t cqVa;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-        uint32_t cqn;
-        uint32_t cqeSize;
-        uint32_t cqDepth;
-        int8_t dbMode;
-    } roceCq;
-    uint8_t raws[120];
-    struct {
-        uint32_t jfcID;
-        uint64_t scqVa;
-        uint32_t cqeSize;
-        uint32_t cqDepth;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-    } jfcContext;
-    struct {
-        uint32_t cqn;
-        uint64_t cqVa;
-        uint32_t cqeSize;
-        uint32_t cqDepth;
-        uint64_t headAddr;
-        uint64_t tailAddr;
-        uint64_t dbVa;
-        int8_t dbMode;
-    } rdmaCqContext;
-} ChannelCqContextInfo;
 
 typedef struct {
     CqContextType type;
     union {
-        ChannelCqContextInfo contextInfo;
-        ChannelCqContextInfo ctx;
-    };
+        struct {
+            uint32_t jfcID;
+            uint64_t scqVa;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+        } jfcContext;
+        struct {
+            uint32_t cqn;
+            uint64_t cqVa;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            int8_t dbMode;
+        } rdmaCqContext;
+    } ctx;
 } ChannelCqContext;
 
 typedef struct {
