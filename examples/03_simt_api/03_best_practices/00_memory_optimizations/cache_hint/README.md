@@ -15,7 +15,7 @@
 ## 目录结构介绍
 
 ```text
-├── 03_simt_data_cache_hint
+├── cache_hint
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── data_cache_hint.asc         // SIMT数据缓存样例实现
 │   ├── figures                     // README中的图片资源

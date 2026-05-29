@@ -20,7 +20,7 @@
 ## 目录结构介绍
 
 ```
-02_short_vector_add
+short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果

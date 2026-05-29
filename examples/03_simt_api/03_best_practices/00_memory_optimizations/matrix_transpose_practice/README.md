@@ -11,7 +11,7 @@
 ## 目录结构介绍
 
 ```text
-├── 01_simt_matrix_transpose
+├── matrix_transpose_practice
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
 │   ├── matrix_transpose.asc   // SIMT矩阵转置样例实现
