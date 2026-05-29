@@ -20,7 +20,7 @@
 ## 目录结构介绍
 
 ```
-02_short_vector_add
+short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
@@ -201,14 +201,14 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 
 | 优化手段 | 核心原理              | 适用场景                                                                                        |
 |:-----|:------------------|:--------------------------------------------------------------------------------------------|
-| 短向量  | 底层指令支持一次完成两个数据的计算 | half/bfloat16_t类型元素进行[基本运算](../../../../docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符) |
+| 短向量  | 底层指令支持一次完成两个数据的计算 | half/bfloat16_t类型元素进行[基本运算](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/%E8%AF%AD%E8%A8%80%E6%89%A9%E5%B1%95%E5%B1%82/SIMT-BuiltIn%E5%85%B3%E9%94%AE%E5%AD%97.md#运算符) |
 
 ---
 
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
     - 默认路径，root用户安装CANN软件包
       ```bash
