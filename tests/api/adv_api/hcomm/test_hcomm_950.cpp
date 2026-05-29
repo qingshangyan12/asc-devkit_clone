@@ -26,7 +26,7 @@ Channel GetChannel()
 
     // 为 SQ 相关字段分配内存并设置
     channel.sqNum = 1;
-    std::unique_ptr<SqContext> sqContext(new SqContext());
+    std::unique_ptr<ChannelSqContext> sqContext(new ChannelSqContext());
     channel.sqContextAddr = sqContext.get();
     channel.sqContextAddr->type = SQ_CONTEXT_TYPE_UB_JFS; // RDMA
     channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
@@ -50,7 +50,7 @@ Channel GetChannel()
     channel.sqContextAddr->ctx.rdmaSqContext.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
     channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
 
-    std::unique_ptr<CqContext> cqContext(new CqContext());
+    std::unique_ptr<ChannelCqContext> cqContext(new ChannelCqContext());
     channel.cqContextAddr = cqContext.get();
     uint32_t* cqhead = new uint32_t(0);
     uint32_t* cqtail = new uint32_t(0);
@@ -59,13 +59,13 @@ Channel GetChannel()
 
     // 为 Buffer 相关字段分配内存并设置
     channel.remoteBufferNum = 1;
-    std::unique_ptr<ProtectionInfo> remoteBuffer(new ProtectionInfo());
+    std::unique_ptr<ChannelProtectionInfo> remoteBuffer(new ChannelProtectionInfo());
     channel.remoteBufferAddr = remoteBuffer.get();
     channel.remoteBufferAddr->type = PROTECTION_TYPE_ROCE; // RDMA
     channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
 
     channel.localBufferNum = 1;
-    std::unique_ptr<ProtectionInfo> localBuffer(new ProtectionInfo());
+    std::unique_ptr<ChannelProtectionInfo> localBuffer(new ChannelProtectionInfo());
     channel.localBufferAddr = localBuffer.get();
     channel.localBufferAddr->type = PROTECTION_TYPE_ROCE; // RDMA
     channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;

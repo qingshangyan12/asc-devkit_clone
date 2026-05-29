@@ -29,7 +29,8 @@ public:
         : sqBuffer_(URMA_SQ_DEPTH * URMA_WQE_SIZE, 0),
           cqBuffer_(URMA_SQ_DEPTH * URMA_CQE_SIZE, 0)
     {
-        channel_.engine = 4;
+        channel_.engine = COMM_ENGINE_AIV;
+        channel_.protocol = COMM_PROTOCOL_UB_MEM;
         channel_.sqNum = 1;
         channel_.cqNum = 1;
         channel_.remoteBufferNum = URMA_BUFFER_NUM;

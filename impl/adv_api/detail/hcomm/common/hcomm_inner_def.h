@@ -27,6 +27,9 @@
 
 namespace AscendC {
 
+constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
+constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
+
 #pragma pack(push, 1)
 struct UrmaWqeEntry {
     uint32_t odr : 3;       // ordering, request ordering strength (0=unordered, 5=strongly ordered)
@@ -47,8 +50,28 @@ static constexpr UrmaWqeEntry URMA_DEFAULT_CFG = {
     .udfFlag    = 0
 };
 
-constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
-constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
+typedef enum {
+    COMM_ENGINE_RESERVED = -1,
+    COMM_ENGINE_CPU = 0,
+    COMM_ENGINE_CPU_TS = 1,
+    COMM_ENGINE_AICPU = 2,
+    COMM_ENGINE_AICPU_TS = 3,
+    COMM_ENGINE_AIV = 4,
+    COMM_ENGINE_CCU = 5,
+} CommEngineType;
+
+typedef enum {
+    COMM_PROTOCOL_RESERVED = -1,
+    COMM_PROTOCOL_HCCS = 0,
+    COMM_PROTOCOL_ROCE = 1,
+    COMM_PROTOCOL_PCIE = 2,
+    COMM_PROTOCOL_SIO = 3,
+    COMM_PROTOCOL_UBC_CTP = 4,
+    COMM_PROTOCOL_UBC_TP = 5,
+    COMM_PROTOCOL_UB_MEM = 6,
+    COMM_PROTOCOL_UBOE = 7,
+    COMM_PROTOCOL_HCCS_ONLY = 8,
+} CommProtocolType;
 
 typedef enum {
     PROTECTION_TYPE_INVALID = -1,
@@ -89,6 +112,76 @@ typedef struct {
     uint32_t reserved;
 } CommAbiHeader;
 
+typedef struct {
+    ProtectionType type;
+    union {
+        struct {
+            uint32_t lkey;
+            uint32_t rkey;
+        } roce;
+        struct {
+            uint32_t tokenId;
+            uint32_t tokenValue;
+        } ub;
+        uint8_t raws[24];
+    } memInfo;
+} ProtectionInfo;
+
+typedef struct {
+    SqContextType type;
+    union {
+        struct {
+            uint64_t sqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t jfsID;
+            uint32_t wqeSize;
+            uint32_t sqDepth;
+            uint32_t tpID;
+            uint8_t remoteEID[16];
+        } ubJfs;
+        struct {
+            uint64_t sqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t qpn;
+            uint32_t wqeSize;
+            uint32_t depth;
+            int8_t dbMode;
+            uint8_t sl;
+        } roceSq;
+        uint8_t raws[120];
+    } contextInfo;
+} SqContext;
+
+typedef struct {
+    CqContextType type;
+    union {
+        struct {
+            uint64_t scqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t jfcID;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+        } ubJfc;
+        struct {
+            uint64_t cqVa;
+            uint64_t headAddr;
+            uint64_t tailAddr;
+            uint64_t dbVa;
+            uint32_t cqn;
+            uint32_t cqeSize;
+            uint32_t cqDepth;
+            int8_t dbMode;
+        } roceCq;
+        uint8_t raws[120];
+    } contextInfo;
+} CqContext;
+
 typedef union {
     struct {
         uint32_t lkey;
@@ -107,15 +200,15 @@ typedef union {
         uint32_t tokenID;
         uint32_t tokenValue;
     } urmaMemProtectionInfo;
-} HcommProtectionInfoData;
+} ChannelProtectionInfoData;
 
 typedef struct {
     ProtectionType type;
     union {
-        HcommProtectionInfoData memInfo;
-        HcommProtectionInfoData pti;
+        ChannelProtectionInfoData memInfo;
+        ChannelProtectionInfoData pti;
     };
-} ProtectionInfo;
+} ChannelProtectionInfo;
 
 typedef union {
     struct {
@@ -163,15 +256,15 @@ typedef union {
         uint64_t dbVa;
         int8_t dbMode;
     } rdmaSqContext;
-} HcommSqContextInfo;
+} ChannelSqContextInfo;
 
 typedef struct {
     SqContextType type;
     union {
-        HcommSqContextInfo contextInfo;
-        HcommSqContextInfo ctx;
+        ChannelSqContextInfo contextInfo;
+        ChannelSqContextInfo ctx;
     };
-} SqContext;
+} ChannelSqContext;
 
 typedef union {
     struct {
@@ -213,15 +306,15 @@ typedef union {
         uint64_t dbVa;
         int8_t dbMode;
     } rdmaCqContext;
-} HcommCqContextInfo;
+} ChannelCqContextInfo;
 
 typedef struct {
     CqContextType type;
     union {
-        HcommCqContextInfo contextInfo;
-        HcommCqContextInfo ctx;
+        ChannelCqContextInfo contextInfo;
+        ChannelCqContextInfo ctx;
     };
-} CqContext;
+} ChannelCqContext;
 
 typedef struct {
     uint32_t type;
@@ -235,11 +328,11 @@ typedef struct {
             uint64_t address; // 创建notify的时候申请的内存的地址（寄存器的虚地址）
             int32_t notifyId; // remote 时不用
             uint32_t size;    // 默认4Byte
-            ProtectionInfo protectionInfo;
+            ChannelProtectionInfo protectionInfo;
         } rmaNotify;
         int8_t reserve[64];
     };
-} Notify;
+} ChannelNotify;
 
 typedef struct {
     RegedBufferType type;
@@ -286,8 +379,8 @@ typedef struct {
 
 typedef struct {
     CommAbiHeader abiHeader;
-    int32_t engine;
-    int32_t protocol;
+    CommEngineType engine;
+    CommProtocolType protocol;
     uint32_t localNotifyNum;
     uint32_t remoteNotifyNum;
     uint32_t localBufferNum;
@@ -303,28 +396,30 @@ typedef struct {
     uint8_t reserve[160];
 } ChannelEntity;
 
+static_assert(sizeof(ChannelEntity) == 256, "ChannelEntity size must keep aligned with hcomm");
+
 // AIV直驱RoCE，无需考虑notify
 // write with notify的语义，地址是GM地址
 typedef struct {   // channel 本身一片内存
     uint32_t type; // RDMA, SDMA, URMA
     // local notify
     uint32_t localNotifyNum; // 几个local notify
-    Notify* localNotifyAddr; // local notify的数组，分别指向不同的内存片
+    ChannelNotify* localNotifyAddr; // local notify的数组，分别指向不同的内存片
     // remote notify
     uint32_t remoteNotifyNum;
-    Notify* remoteNotifyAddr;
+    ChannelNotify* remoteNotifyAddr;
     // Local buffer
     uint32_t localBufferNum;
-    ProtectionInfo* localBufferAddr;
+    ChannelProtectionInfo* localBufferAddr;
     // Remote buffer
     uint32_t remoteBufferNum;
-    ProtectionInfo* remoteBufferAddr;
+    ChannelProtectionInfo* remoteBufferAddr;
     // SQ
     uint32_t sqNum;
-    SqContext* sqContextAddr; // write/read/commit 操作这个字段
+    ChannelSqContext* sqContextAddr; // write/read/commit 操作这个字段
     // CQ
     uint32_t cqNum;
-    CqContext* cqContextAddr; // wait 操作这个字段
+    ChannelCqContext* cqContextAddr; // wait 操作这个字段
     // AIV Status
     uint8_t aivStatus[64];
     // reserve
