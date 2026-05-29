@@ -56,11 +56,11 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 
 | 参数名称 | 输入/输出 | 含义 |
 | -------- | -------- | ---- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。 |
-| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的源操作数。设置详见[API掩码操作涉及参数](通用说明.md#zh-cn_topic_0000002516385690_table208110588155)。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
-| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长。<br>以一个repeatTime归约后的长度为单位，在half数据类型时，单位为16字节；在float数据类型时，单位为32字节。取值范围为[0, $2^{16}-1$]。<br>**注意：Atlas 训练系列产品不支持配置0。** |
+| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长。<br>以一个repeatTime归约后的长度为单位，在half数据类型时，单位为16字节；在float数据类型时，单位为32字节。取值范围为[0, $2^{16}-1$]。<cann-filter npu-type = "910"><br>**注意：Atlas 训练系列产品不支持配置0。**</cann-filter> |
 | srcBlkStride | 输入 | 源操作数单次迭代内DataBlock间的地址步长，单位为32字节。取值范围为[0, $2^{16}-1$]。 |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, 2^{16}-1]。 |
 
@@ -85,26 +85,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 
 无
 
-## 关键特性说明
-
-接口以二叉树的形式计算每个DataBlock内的结果。
-
-以half类型的数据求和为例，在每个DataBlock内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
-
-1. data1和data2相加得到data01，data3和data4相加得到data02，...，data13和data14相加得到data07，data15和data16相加得到data08；
-2. data01和data02相加得到data001，data03和data04相加得到data002，...，data07和data08相加得到data004；
-3. 以此类推，得到目的操作数为1个half类型的数据sum。
-
-**图 2**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
-![](../../../../figures/vcgadd_binrary_add.png "ReduceDataBlock-ReduceType-SUM-求和示意图")
-
 ## 约束说明
 
 - 目的操作数与源操作数的数据类型需要保持一致。
 
-- src起始地址的对齐约束请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，需要32字节对齐；dst起始地址对齐约束与操作数数据类型有关，在half数据类型时需要保证16字节对齐，在float数据类型时需要保证32字节对齐。
+- 源操作数的对齐约束请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数起始地址的对齐约束与操作数数据类型有关，在half数据类型时需要保证16字节对齐，在float数据类型时需要保证32字节对齐。
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+
+- dstRepStride, srcBlkStride, srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
 <cann-filter npu-type = "A3,910b">
 
@@ -134,11 +123,24 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     **图 3**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
     ![](../../../../figures/vcgadd_overflow.png "ReduceDataBlock-ReduceType-SUM-饱和模式数值溢出情况处理说明")
 
+## 关键特性说明
+
+接口以二叉树的形式计算每个DataBlock内的结果。
+
+以half类型的数据求和为例，在每个DataBlock内有16个数，通过二叉树的方式，两两相加，计算过程如下图所示：
+
+1. data1和data2相加得到data01，data3和data4相加得到data02，...，data13和data14相加得到data07，data15和data16相加得到data08；
+2. data01和data02相加得到data001，data03和data04相加得到data002，...，data07和data08相加得到data004；
+3. 以此类推，得到目的操作数为1个half类型的数据sum。
+
+**图 2**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
+![](../../../../figures/vcgadd_binrary_add.png "ReduceDataBlock-ReduceType-SUM-求和示意图")
+
 ## 调用示例
 
-本样例中只展示Compute流程中的部分代码。完整样例可参考[BlockReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
+本样例中只展示Compute流程中的部分代码。完整样例可参考[ReduceDataBlock系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
 
-- BlockReduceMax-tensor高维切分计算样例-mask连续模式
+- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask连续模式
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -149,10 +151,27 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     // srcLocal: 源操作数tensor
     // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
     // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
-    AscendC::BlockReduceMax<half>(dstLocal, srcLocal, repeat, mask, 1, 1, 8);
+    AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
-- BlockReduceMax-tensor高维切分计算样例-mask逐bit模式
+    结果示例如下：
+
+    ```cpp
+    输入数据src_gm:
+    [1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 2, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 3, 1, 1,
+    ...
+    1, 1, 1, 4, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    ]
+
+    输出数据dst_gm:
+    [2, 3, ..., 4]
+    ```
+
+- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -163,22 +182,83 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     // srcLocal: 源操作数tensor
     // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
     // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
-    AscendC::BlockReduceMax<half>(dstLocal, srcLocal, repeat, mask, 1, 1, 8);
+    AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
-结果示例如下：
+    结果示例如下：
 
-```cpp
-输入数据src_gm:
-[1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 2, 1, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 3, 1, 1,
- ...
- 1, 1, 1, 4, 1, 1, 1, 1,
- 1, 1, 1, 1, 1, 1, 1, 1,
-]
+    ```cpp
+    输入数据src_gm:
+    [1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 2, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 3, 1, 1,
+    ...
+    1, 1, 1, 4, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    ]
 
-输出数据dst_gm:
-[2, 3, ..., 4]
-```
+    输出数据dst_gm:
+    [2, 3, ..., 4]
+    ```
+
+- `ReduceDataBlock<ReduceType::MIN>`-tensor高维切分计算样例-mask逐bit模式
+
+    ```cpp
+    // 设定mask为最多的128个全部元素参与计算
+    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    // 每个repeat128个元素，一共128个元素。
+    int repeat = 1;
+    // dstLocal: 目的操作数tensor
+    // srcLocal: 源操作数tensor
+    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
+    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    AscendC::ReduceDataBlock<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+    ```
+
+    结果示例如下：
+
+    ```cpp
+    输入数据src_gm:
+    [10, 10, 10, 10, 10, 10, 10, 10,
+    10, 10, 10, 2, 10, 10, 10, 10,
+    10, 10, 10, 10, 10, 10, 10, 10,
+    10, 10, 10, 10, 10, -3, 10, 10,
+    ...
+    10, 10, 10, 10, 10, 10, 10, 10,
+    10, 4, 10, 10, 10, 10, 10, 10,
+    ]
+
+    输出数据dst_gm:
+    [2, -3, ..., 4]
+    ```
+
+- `ReduceDataBlock<ReduceType::SUM>`-tensor高维切分计算样例-mask逐bit模式
+
+    ```cpp
+    // 设定mask为最多的128个全部元素参与计算
+    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
+    // 每个repeat128个元素，一共128个元素。
+    int repeat = 1;
+    // dstLocal: 目的操作数tensor
+    // srcLocal: 源操作数tensor
+    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
+    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    ReduceDataBlock<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+    ```
+
+    结果示例如下：
+
+    ```cpp
+    输入数据src_gm:
+    [1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2, 2, 2,
+    ...
+    3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3]
+
+    输出数据dst_gm:
+    [16, 32, ..., 48]
+    ```

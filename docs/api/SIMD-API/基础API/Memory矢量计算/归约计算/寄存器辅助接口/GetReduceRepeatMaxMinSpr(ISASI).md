@@ -95,13 +95,13 @@ Atlas 训练系列产品
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口来获取准确的索引值。
 - 针对Ascend 950PR/Ascend 950DT，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口来获取准确的索引值。同时，GetReduceRepeatMaxMinSpr必须紧跟着[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口进行调用。
 - 索引maxMinIndex数据\`是按照ReduceMax/ReduceMin的数据类型进行存储的，比如ReduceMax/ReduceMin使用half类型时，maxMinIndex是按照half类型进行存储的，如果按照half格式进行读取，maxMinIndex的值是不对的，因此maxMinIndex的读取需要使用reinterpret\_cast方法转换到整数类型，若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。
-- 操作数数据类型T，需要与所使用的ReduceMax/ReduceMin指令的操作数数据类型一致，否则会导致精度错误。
-<!-- TODO 待测试 -->
+- 操作数数据类型T，需要与所使用的ReduceMax/ReduceMin指令的操作数数据类型一致，否则会导致精度错误。<!-- TODO 待测试 -->
+
 ## 调用示例
 
 具体可参考[WholeReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
 
-1.  以ReduceMax指令为例，首先执行ReduceMax指令。
+1. 以ReduceMax指令为例，首先执行ReduceMax指令。
 
     ```cpp
     AscendC::LocalTensor<float> src;
@@ -111,7 +111,7 @@ Atlas 训练系列产品
     AscendC::ReduceMax(dst, src, work, mask, 1, 8, true); // 连续场景，srcRepStride = 8，且calIndex = true
     ```
 
-2.  获取上述ReduceMax指令的最值与索引值。
+2. 获取上述ReduceMax指令的最值与索引值。
 
     针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要使用WholeReduceMax指令获取准确的索引值，然后再调用GetReduceRepeatMaxMinSpr指令。
 
