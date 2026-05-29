@@ -47,6 +47,14 @@ $$
   - y：输入，形状为[8192, 8192]，数据类型为half；
   - z：输出，形状为[8192, 8192]，数据类型为half；
 
+### 样例规格与硬件约束
+
+- **UB空间限制**：Atlas A2/A3系列[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Unified Buffer）大小为192KB，Ascend 950系列为256KB；双缓冲场景需同时容纳x/y/z的Ping-Pong共6块缓冲区，单块可用空间约为 `UBSIZE/6`
+- **内存对齐**：[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)搬运的数据量需对齐到32B（half类型16个元素）；推荐搬运粒度对齐到512B以获得更稳定性能
+- **Shape整除**：多核切分时，`totalM`不一定能被`splitM`整除，样例通过余数分配策略处理（前`remainderM`个核各多处理一行）
+- **核数限制**：Atlas A2/A3系列提供48个AIV Core，Ascend 950系列提供64个AIV Core
+- **dataCopyLen上限**：受UB空间约束，双缓冲场景下单块`dataCopyLen`最大约为 `UBSIZE / 6 / sizeof(half)`；Atlas A2/A3为16384个half，Ascend 950为21840个half
+
 ## 样例实现
 
 ### 性能指标说明
@@ -60,10 +68,19 @@ $$
 | aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
 | aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte2_time(μs) | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。 |
-| aiv_mte2_ratio | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte3_time(μs) | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。 |
-| aiv_mte3_ratio | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
+| aiv_mte2_time(μs) | mte2类型指令（GM→UB搬运，由MTE2引擎执行[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)）耗时，单位μs。 |
+| aiv_mte2_ratio | mte2类型指令（GM→UB搬运）的cycle数在total cycle数中的占用比。 |
+| aiv_mte3_time(μs) | mte3类型指令（UB→GM搬运，由MTE3引擎执行[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)）耗时，单位μs。 |
+| aiv_mte3_ratio | mte3类型指令（UB→GM搬运）的cycle数在total cycle数中的占用比。 |
+
+**数据流向**：本样例的数据处理流程为 `GM →[MTE2引擎]→ UB →[Vector引擎]→ UB →[MTE3引擎]→ GM`，其中：
+- [GlobalTensor](../../../../../docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md)（如`xGm`、`yGm`、`zGm`）对应[GM](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Global Memory）上的数据
+- [LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)（如`xLocal`、`yLocal`、`zLocal`）对应[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（Unified Buffer）上的数据
+- [DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（GM→UB搬运）由MTE2引擎执行，对应`aiv_mte2_time`
+- [DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（UB→GM搬运）由MTE3引擎执行，对应`aiv_mte3_time`
+- [Add](../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/基础算术/Add.md)向量计算由Vector引擎执行，对应`aiv_vec_time`
+
+**事件同步机制**：不同引擎间的数据依赖通过事件同步（`SetFlag/WaitFlag`）管理。例如`SetFlag<HardEvent::MTE2_V>`通知MTE2→Vector的搬运完成，`WaitFlag<HardEvent::MTE2_V>`让Vector引擎等待搬运完成后再读取数据。相比[PipeBarrier](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)的全局屏障，事件同步更轻量，可实现细粒度的流水线并行。
 
 本章节性能数据在Atlas A2训练系列产品上运行得到。
 
@@ -71,10 +88,11 @@ $$
 
 **实现方式**：参考 `KernelAdd::ProcessScalar()` 函数实现
 
-基准程序实现了`half`类型的两组输入数据的加法，采用`for`循环`scalar`运算的方式进行计算。
+基准程序实现了`half`类型的两组输入数据的加法，采用`for`循环配合`GetValue/SetValue`的scalar运算方式进行计算。数据流为：[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（MTE2引擎，GM→UB）→ scalar逐元素计算（Scalar引擎）→ [DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（MTE3引擎，UB→GM）。
 
 **关键代码**：
 ```cpp
+// GetValue/SetValue为LocalTensor的标量访问接口，每次读写1个元素，由Scalar引擎执行
 for (uint32_t i = 0; i < curLen; i++) {
       float xVal = (float)xLocal.GetValue(i);
       float yVal = (float)yLocal.GetValue(i);
@@ -114,7 +132,7 @@ for (uint32_t i = 0; i < curLen; i++) {
 
 **实现方式**：参考 `KernelAdd::ProcessSingle()` 函数实现
 
-将标量运算转换为向量运算，使用`AscendC::Add`向量指令替代标量循环，大幅提升计算效率。
+将标量运算转换为向量运算，使用[AscendC::Add](../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/基础算术/Add.md)向量指令（Vector引擎执行）替代标量循环，单条指令可并行处理多个元素，大幅提升计算效率。数据流为：[DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（MTE2引擎，GM→UB）→ Add向量计算（Vector引擎）→ [DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（MTE3引擎，UB→GM）。
 
 **关键代码**：
 ```cpp
@@ -125,7 +143,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 - 单核运算
 - `dataCopyLen = 4096` 为每次搬运的数据量元素个数
 - 单次搬运操作`DataCopy`的数据量为 8192 Byte
-- 单次`Add`处理两个输入`Tensor`，处理的总数据量为 16384 Byte
+- 单次`Add`处理两个输入[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)，处理的总数据量为 16384 Byte
 
 
 **性能数据**：
@@ -168,7 +186,7 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 - 行方向切分48份，将数据均匀切分至48个核运算
 - `dataCopyLen = 4096` 为每次搬运的数据量元素个数
 - 单次搬运操作`DataCopy`的数据量为 4096 * 2B = 8192 Byte
-- 单次`Add`处理两个输入`Tensor`，处理的总数据量为 16384 Byte
+- 单次`Add`处理两个输入[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)，处理的总数据量为 16384 Byte
 
 
 **关键代码**：
@@ -201,7 +219,7 @@ if (blockIdxM < remainderM) {
   - 数据搬运仍是瓶颈（mte2占比72.5%）
 - 均匀切分确保各核负载均衡，避免出现部分核空闲、部分核繁忙的负载不均问题
 
-- 本样例选择 `M` 方向切48份（`splitM=48, splitN=1`），而不是 `M` 切8、`N` 切6，核心目的是保持每个核处理的数据在GM上连续，从而在分块循环中用单条 `DataCopy` 搬运 `dataCopyLen`
+- 本样例选择 `M` 方向切48份（`splitM=48, splitN=1`），而不是 `M` 切8、`N` 切6，核心目的是保持每个核处理的数据在GM上连续，从而在分块循环中用单条 [DataCopy](../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)（MTE2引擎）搬运 `dataCopyLen` 个连续元素；若在N方向也切分，则每次搬运需设置stride参数（非连续地址），MTE2引擎搬运效率降低
 
   <img src="figures/SplitCoreM.png" width="50%">
 
@@ -242,9 +260,8 @@ if (blockIdxM < remainderM) {
 - 通过增大单次搬运的数据量，MTE2耗时从215.485μs降至184.369μs，耗时减少 **14.4%**
 
 **原理说明**：
-- 增大单次搬运数据量可减少搬运次数
-- 更大的连续数据块可更好地利用内存带宽
-- 但数据量受限于UB空间大小（本例UB需容纳x、y、z三份数据）
+- 增大单次搬运数据量可减少搬运次数，摊薄每次搬运的启动开销（命令下发、地址计算等），同时更大的连续数据块能更好地利用内存带宽的突发传输特性
+- 但数据量受限于[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)空间大小（本例UB需容纳x、y、z三份数据）
 
 **性能优化建议**：
 > 💡 **增大单次数据搬运量，减少搬运次数**
@@ -264,7 +281,7 @@ if (blockIdxM < remainderM) {
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBuffer()` 函数实现
 
-采用双缓冲（Double Buffer）技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。
+采用[双缓冲（Double Buffer）](../../../../../docs/guide/技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md)技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。其核心思想是：当Ping缓冲区由Vector引擎执行计算时，Pong缓冲区同时由MTE2/MTE3引擎执行数据搬运（GM↔UB），两组缓冲区交替执行，使搬运和计算在时间上重叠。
 
 **关键代码**：
 ```cpp
@@ -350,7 +367,7 @@ UB内存分配（双缓冲）：
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferL2Bypass()` 函数实现（在该函数内部先设置 `SetL2CacheHint(CACHE_MODE_DISABLE)`，再调用 `ProcessDoubleBuffer()`）
 
-在双缓冲基础上，对于只需要载入一次的数据量可以设置L2 Cache bypass，直接从GM载入UB。
+在双缓冲基础上，对于只需要载入一次的数据量可以设置L2 Cache bypass，直接从GM载入UB，避免缓存污染。通过[SetL2CacheHint](../../../../../docs/api/SIMD-API/基础数据结构/GlobalTensor/SetL2CacheHint.md)接口将[GlobalTensor](../../../../../docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md)的L2 Cache策略设为`CACHE_MODE_DISABLE`，使MTE2引擎搬运时绕过L2 Cache直接访问GM，减少不必要的Cache开销。
 
 **关键代码**：
 ```cpp
@@ -386,6 +403,7 @@ UB内存分配（双缓冲）：
   - 重复访问的数据可从L2 Cache读取，速度更快
 - **流式访问特点**：
   - Add的输入数据只读取一次，不存在数据复用
+  - 流式数据经过L2 Cache会占用缓存空间并引入额外的Cache一致性维护开销，却无法从缓存命中中获益，反而降低性能
 
 **性能优化建议**：
 > 💡 **合理采用L2 Cache bypass**
@@ -403,7 +421,7 @@ UB内存分配（双缓冲）：
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferBankConflict()` 函数实现
 
-在双缓冲+L2 Cache bypass基础上，优化内存地址布局，避免UB（Unified Buffer）的Bank Conflict，实现最优性能。
+在双缓冲+L2 Cache bypass基础上，优化[UB](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)内存地址布局，避免[Bank Conflict](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/概述.md)，实现最优性能。
 
 **关键代码**：
 ```cpp
@@ -648,28 +666,79 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   test pass!
   ```
 
-## 性能分析
+## 功能调试
 
-使用 `msprof` 工具获取详细性能数据：
+### printf
 
-```bash
-msprof ./demo   # 分析性能
+该接口提供CPU域/NPU域调试场景下的格式化输出功能，可在算子kernel侧实现代码中需要输出日志信息的地方调用。
+
+示例如下：
+```cpp
+AscendC::printf("dataCopyLen = %d, curLen = %d\n", dataCopyLen, curLen);
+AscendC::PRINTF("blockIdx = %d, startM = %d\n", AscendC::GetBlockIdx(), startM);
 ```
 
-当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
+### DumpTensor
+
+基于算子工程开发的算子，可使用该接口Dump指定[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口。样例如下：
+
+```cpp
+// 向量计算完成后，Dump zLocal前16个元素用于验证
+AscendC::Add(zLocal, xLocal, yLocal, curLen);
+AscendC::DumpTensor(zLocal, 1, 16);
+```
+
+打印示例如下：
+
+```
+DumpTensor: desc=1, addr=0x20000, data_type=float16, position=UB, dump_size=16
+[76.125000, 77.812500, 98.312500, 49.125000, 93.000000, 109.125000, 183.750000, 100.750000, 155.250000, 89.750000, 179.250000, 121.625000, 88.812500, 116.312500, 161.750000, 134.250000]
+```
+
+## 性能调试
+
+### msProf工具介绍
+
+msProf工具是单算子性能分析工具，包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。
+
+#### 上板性能采集
+
+通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。基于可执行文件demo通过msprof op执行算子调优：
 
 ```bash
-PROF_xxxx_XXXXXX
-├── device_{id}
-└── host
-└── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
-    ├── msprof_*.json
-    ├── xx_*.csv
-    └── README.txt
+msprof op ./demo
 ```
+
+命令完成后，会在当前目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
+
+```bash
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
+
 查看具体的性能分析结果：
+```bash
+cat ./OPPROF_*/OpSummary.csv
 ```
-# 查看Task Duration 以及各项数据
-cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
+
+#### 仿真性能采集
+
+使用msprof op simulator可以在无NPU环境下通过仿真获取算子性能数据：
+
+```bash
+msprof op simulator ./demo
 ```
+
+> **注意：** 仿真模式需使用`-DCMAKE_ASC_RUN_MODE=sim`编译。
+
+更多msProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msProf）中的内容。
