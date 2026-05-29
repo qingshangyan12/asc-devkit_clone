@@ -377,7 +377,7 @@ __aicore__ inline bool TQueBind<src, dst, depth, mask>::EnQue(TBufHandle buf)
                     ASCENDC_ASSERT(BufIdTracker::GetInstance().GetState(),
                         { KERNEL_LOG(KERNEL_ERROR, "EnQue is not matched with the previous state."); });
                 } else {
-                    auto enQueEvtID = GetTPipePtr()->AllocEventID<enQueEvt>();
+                    auto enQueEvtID = AllocEventID<enQueEvt>();
                     SetFlag<enQueEvt>(enQueEvtID);
                     ptr->enQueEvtID = enQueEvtID;
                 }
@@ -487,7 +487,7 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::DeQue()
                 } else {
                     if (ptr->enQueEvtID != INVALID_TEVENTID) {
                         WaitFlag<enQueEvt>(ptr->enQueEvtID);
-                        GetTPipePtr()->ReleaseEventID<enQueEvt>(ptr->enQueEvtID);
+                        ReleaseEventID<enQueEvt>(ptr->enQueEvtID);
                         ptr->enQueEvtID = INVALID_TEVENTID;
                     }
                 }
@@ -683,7 +683,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeBuffer(TBufHandle bu
                     GetBuffImpl<dstPipe, true>(ptr->bufId);
                     ReleaseBuffImpl<dstPipe, true>(ptr->bufId);
                 } else {
-                    ptr->freeBufEvtID = GetTPipePtr()->AllocEventID<freeBufEvt>();
+                    ptr->freeBufEvtID = AllocEventID<freeBufEvt>();
                     SetFlag<freeBufEvt>(ptr->freeBufEvtID);
                 }
             }
@@ -799,7 +799,7 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::AllocBuffer()
                 if constexpr (depth != 0) {
                     if (ret->freeBufEvtID != INVALID_TEVENTID) {
                         WaitFlag<freeBufEvt>(ret->freeBufEvtID);
-                        GetTPipePtr()->ReleaseEventID<freeBufEvt>(ret->freeBufEvtID);
+                        ReleaseEventID<freeBufEvt>(ret->freeBufEvtID);
                         ret->freeBufEvtID = INVALID_TEVENTID;
                     }
                 }
@@ -877,7 +877,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeAllEvent()
                                 { KERNEL_LOG(KERNEL_ERROR, "enque event id can not be -1"); });
                     if (ptr->freeBufEvtID != INVALID_TEVENTID) {
                         WaitFlag<freeBufEvt>(ptr->freeBufEvtID);
-                        GetTPipePtr()->ReleaseEventID<freeBufEvt>(ptr->freeBufEvtID);
+                        ReleaseEventID<freeBufEvt>(ptr->freeBufEvtID);
                         ptr->freeBufEvtID = INVALID_TEVENTID;
                     }
                 }
@@ -1243,7 +1243,7 @@ __aicore__ inline void TBufPoolExtImpl<pos, bufIDSize>::Reset()
         do {
             if (ptr->freeBufEvtID != INVALID_TEVENTID) {
                 WaitFlagImpl(ptr->freeBufEvt, ptr->freeBufEvtID);
-                GetTPipePtr()->ReleaseEventID<freeBufEvt>(ptr->freeBufEvtID);
+                ReleaseEventID<freeBufEvt>(ptr->freeBufEvtID);
                 ptr->freeBufEvtID = INVALID_TEVENTID;
             }
             i++;
