@@ -68,9 +68,10 @@
             -   [is\_tensorTrait](SIMD-API/基础数据结构/TensorTrait/is_tensorTrait.md)
             -   [更多样例](SIMD-API/基础数据结构/TensorTrait/更多样例.md)
 
-        -   [内置数据类型](SIMD-API/基础数据结构/内置数据类型.md)
-
     -   [基础API](SIMD-API/基础API/基础API.md)
+        -   [数据结构](SIMD-API/基础API/数据结构/数据结构.md)
+            -   [内置数据类型](SIMD-API/基础API/数据结构/内置数据类型.md)
+            -   [精度转换](SIMD-API/基础API/数据结构/precision_conversion.md)
         -   [Memory数据搬运](SIMD-API/基础API/Memory数据搬运/Memory数据搬运.md)
             -   [DataCopy](SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy.md)
                 -   [DataCopy简介](SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md)
@@ -495,9 +496,11 @@
                     -   [GetCurAddr](SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/GetCurAddr-72.md)
                     -   [Alloc](SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/Alloc.md)
 
-        -   [同步控制](SIMD-API/基础API/同步控制/同步控制-73.md)
+        -   [同步控制](SIMD-API/基础API/同步控制/同步控制.md)
+            -   [系统同步能力概述](SIMD-API/基础API/同步控制/系统同步能力概述.md)
             -   [核内同步](SIMD-API/基础API/同步控制/核内同步/核内同步.md)
-                -   [同步控制简介](SIMD-API/基础API/同步控制/核内同步/同步控制简介.md)
+                -   [核内同步能力概述](SIMD-API/基础API/同步控制/核内同步/核内同步能力概述.md)
+                -   [关键特性说明](SIMD-API/基础API/同步控制/核内同步/关键特性说明.md)
                 -   [TQueSync](SIMD-API/基础API/同步控制/核内同步/TQueSync/TQueSync.md)
                     -   [模板参数](SIMD-API/基础API/同步控制/核内同步/TQueSync/模板参数.md)
                     -   [SetFlag/WaitFlag](SIMD-API/基础API/同步控制/核内同步/TQueSync/SetFlag-WaitFlag.md)
@@ -505,15 +508,17 @@
                 -   [SetFlag/WaitFlag\(ISASI\)](SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)
                 -   [PipeBarrier\(ISASI\)](SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)
                 -   [DataSyncBarrier\(ISASI\)](SIMD-API/基础API/同步控制/核内同步/DataSyncBarrier(ISASI).md)
-                -   [Mutex（ISASI）](SIMD-API/基础API/同步控制/核内同步/Mutex（ISASI）/Mutex（ISASI）.md)
-                    -   [简介](SIMD-API/基础API/同步控制/核内同步/Mutex（ISASI）/简介.md)
-                    -   [Lock](SIMD-API/基础API/同步控制/核内同步/Mutex（ISASI）/Lock.md)
-                    -   [Unlock](SIMD-API/基础API/同步控制/核内同步/Mutex（ISASI）/Unlock.md)
+                -   [Mutex（ISASI）](SIMD-API/基础API/同步控制/核内同步/Mutex(ISASI)/Mutex(ISASI).md)
+                    -   [简介](SIMD-API/基础API/同步控制/核内同步/Mutex(ISASI)/简介.md)
+                    -   [Lock](SIMD-API/基础API/同步控制/核内同步/Mutex(ISASI)/Lock.md)
+                    -   [Unlock](SIMD-API/基础API/同步控制/核内同步/Mutex(ISASI)/Unlock.md)
 
                 -   [AllocMutexID \(ISASI\)](SIMD-API/基础API/同步控制/核内同步/AllocMutexID-(ISASI).md)
                 -   [ReleaseMutexID \(ISASI\)](SIMD-API/基础API/同步控制/核内同步/ReleaseMutexID-(ISASI).md)
 
             -   [核间同步](SIMD-API/基础API/同步控制/核间同步/核间同步.md)
+                -   [核间同步能力概述](SIMD-API/基础API/同步控制/核间同步/核间同步能力概述.md)
+                -   [关键特性说明](SIMD-API/基础API/同步控制/核间同步/关键特性说明.md)
                 -   [IBSet](SIMD-API/基础API/同步控制/核间同步/IBSet.md)
                 -   [IBWait](SIMD-API/基础API/同步控制/核间同步/IBWait.md)
                 -   [SyncAll](SIMD-API/基础API/同步控制/核间同步/SyncAll.md)
@@ -526,6 +531,7 @@
             -   [任务间同步](SIMD-API/基础API/同步控制/任务间同步/任务间同步.md)
                 -   [SetNextTaskStart](SIMD-API/基础API/同步控制/任务间同步/SetNextTaskStart.md)
                 -   [WaitPreTaskEnd](SIMD-API/基础API/同步控制/任务间同步/WaitPreTaskEnd.md)
+
 
         -   [缓存控制](SIMD-API/基础API/缓存控制/缓存控制.md)
             -   [DataCachePreload](SIMD-API/基础API/缓存控制/DataCachePreload.md)
@@ -547,6 +553,8 @@
             -   [ResetCtrlSpr\(ISASI\)](SIMD-API/基础API/系统变量访问/ResetCtrlSpr(ISASI).md)
 
         -   [原子操作](SIMD-API/基础API/原子操作/原子操作.md)
+            -   [原子操作概述](SIMD-API/基础API/原子操作/原子操作概述.md)
+            -   [关键特性说明](SIMD-API/基础API/原子操作/关键特性说明.md)
             -   [SetAtomicAdd](SIMD-API/基础API/原子操作/SetAtomicAdd.md)
             -   [SetAtomicType](SIMD-API/基础API/原子操作/SetAtomicType.md)
             -   [DisableDmaAtomic](SIMD-API/基础API/原子操作/DisableDmaAtomic.md)

@@ -11,12 +11,12 @@ Reg矢量计算API是面向RegBase架构开发的API，用户可以通过该API�
 在SIMD Vector的内存架构中，最靠近Vector计算单元的是VF Reg，它是SIMD的私有内存，包含多种类型的Reg矢量计算寄存器，用于存放并行处理的多个数据元素。单核内所有的VF Reg寄存器共享一个本地内存资源UB。SIMD架构不支持从全局内存（Global Memory）加载数据到Reg矢量计算寄存器，先将数据从全局内存GM搬运至Unified Buffer，再通过显式的Load/Store指令，由Unified Buffer加载到Reg矢量计算寄存器中。
 
 **图 1**  SIMD Reg矢量计算内存层级<a name="fig597318712265"></a>  
-![](../../../../figures/SIMD-Reg矢量计算内存层级.png "SIMD-Reg矢量计算内存层级")
+![](../../../../figures/SIMD-Reg矢量计算内存层级1.png "SIMD-Reg矢量计算内存层级")
 
 SIMD Reg矢量计算编程架构中，通过发出指令到Reg矢量计算执行单元，执行单元从Registers读取数据，进行计算，计算结果写回Registers。DMA搬运单元负责在Registers和Local Memory之间搬运数据。
 
 **图 2**  SIMD Reg矢量计算编程架构<a name="fig116711840123520"></a>  
-![](../../../../figures/SIMD-Reg矢量计算编程架构.png "SIMD-Reg矢量计算编程架构")
+![](../../../../figures/抽象硬件架构a5.png "SIMD-Reg矢量计算编程架构")
 
 ## Regbase和Membase编程调用层级<a name="section61258392540"></a>
 
@@ -66,7 +66,7 @@ __aicore__ inline void Compute()
 
 ## Reg矢量计算寄存器<a name="section1910719438134"></a>
 
-Reg矢量计算API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Reg矢量计算.md)。
+Reg矢量计算API操作的基础数据类型介绍如下，具体API请参考[Reg矢量计算](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg矢量计算.md)。
 
 -   **RegTensor**
 

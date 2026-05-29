@@ -31,7 +31,7 @@ GELU 是神经网络中常用的激活函数。本样例演示如何使用 Ascen
 Gelu 近似公式计算为：
 
 $$
-GELU(x) \approx 0.5 \cdot x \cdot \left(1 + \tanh\left(\sqrt{\frac{2}{\pi}} \cdot \left(x + 0.044715 \cdot x^3\right)\right)\right) \
+GELU(x) \approx 0.5 \cdot x \cdot \left(1 + \tanh\left(\sqrt{\frac{2}{\pi}} \cdot \left(x + 0.044715 \cdot x^3\right)\right)\right)
 $$
 
 对公式进行简化，采用如下方式展开为具体的向量运算步骤：
@@ -85,19 +85,18 @@ $$
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上 CANN 开发套件包的安装方式，选择对应配置环境变量的命令。
-
-  - 默认路径，root 用户安装 CANN 软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - 默认路径，非 root 用户安装 CANN 软件包
+  - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - 指定路径 `install_path`，安装 CANN 软件包
+  - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
