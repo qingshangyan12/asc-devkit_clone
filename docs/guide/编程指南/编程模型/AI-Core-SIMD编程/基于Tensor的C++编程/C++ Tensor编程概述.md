@@ -14,23 +14,23 @@ Tensor本质是对内存地址的抽象封装，通过数组方式来管理和�
 
 - 基础Tensor(不带Layout)的定义和使用
 ```cpp
-// 定义：携带数据类型 + 内存位置，需手动传参
+// Definition: carries data type + memory location, requires manual parameter passing
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
 GlobalTensor<half> gmTensor;
 gmTensor.SetGlobalBuffer((__gm__ half*)gmBuffer, bufferSize);
-// 操作：需手动传递size/count参数
+// Operation: requires manual size/count parameter passing
 DataCopy(ubTensor, gmTensor, 256);
 Add(dstTensor, src0Tensor, src1Tensor, 256);
 ```
 
 - 扩展Tensor(带有Layout)的定义和使用
 ```cpp
-// ===== 扩展能力的Tensor (Tensor API) =====
-// 定义：通过MakeTensor创建，携带Shape和Stride
+// ===== Extended Tensor (Tensor API) =====
+// Definition: created via MakeTensor, carries Shape and Stride
 auto gmTensor = MakeTensor(gmPointer, MakeShape(128, 64));
 auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
-// 操作：无需手动设置size/count，Copy接口根据Tensor信息自动推导
+// Operation: no manual size/count setting, Copy interface automatically infers from Tensor info
 Copy(ubTensor, gmTensor);
 ```
 
@@ -38,16 +38,7 @@ Copy(ubTensor, gmTensor);
 
 ### Kernel函数及函数修饰符
 
-核函数是Ascend C算子设备侧实现的入口，使用__global__限定符声明。当核函数被调用时，多个核并行执行相同的代码逻辑，具有相同的函数入参。通过__vector__、__cube__、__mix__限定符指定核函数在Vector核、Cube核或两者上执行；指针入参变量需添加__gm__限定符，表明指向Global Memory；使用<<<...>>>内核调用符启动核函数，可指定执行核数。
-```c
-// 实现核函数
-__vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    uint32_t blockLength = TILE_LENGTH * NUM_BLOCKS / asc_get_block_num();
-}
-```
-
-**学习路径**：详见 [核函数](../核函数.md) [SIMD Builtin关键字](../../../语言扩展层/SIMD-BuiltIn关键字.md)
+核函数是Ascend C算子设备侧实现的入口。C++ Tensor编程在核函数定义与调用方面遵循SIMD编程的通用规范，无特殊语法规则，完整规则详见[核函数](../核函数.md)。
 
 ### 内存层级
 
@@ -58,8 +49,6 @@ C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操�
 
 > 📌 寄存器可编程能力从**Ascend 950PR/950DT**引入，构建三级内存架构，可获得接近峰值的计算性能。
 
-**学习路径**：详见[内存层级](./内存层级.md)
-
 ### 同步机制
 
 C++ Tensor编程针对AI Core同步机制分别提供了核内同步和核间同步接口。核内同步包括：Mutex互斥锁保护共享资源并发访问(Ascend 950PR/Ascend 950DT引入)，SetFlag/WaitFlag实现多流水线间同步（生产者发信号、消费者等待），PipeBarrier约束单流水线内执行顺序。核间同步采用计数器机制，通过CrossCoreSetFlag/WaitFlag协调多核执行进度。
@@ -68,7 +57,6 @@ C++ Tensor编程针对AI Core同步机制分别提供了核内同步和核间同
 - **PipeBarrier（单流水同步）**采用**阻塞等待**模式，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。用于在同一流水线内部约束执行顺序。
 - **核间同步（多AI Core协作）**采用**计数器递增/递减**模式，通过flag_id对应的计数器协调多核执行进度。每个flag_id对应一个初始值为0的计数器，arrive指令递增计数器表示"当前核到达同步点"，wait指令检测计数器大于0则递减并继续执行、等于0则阻塞等待。
 
-**学习路径**：详见[同步机制](./同步机制.md)
 
 ### 数据搬运与计算接口
 
@@ -76,7 +64,6 @@ AI Core采用「标量控制单元+Vector矢量计算单元+Cube矩阵计算单�
 
 C++ Tensor编程针对AI Core的架构，提供了面向Tensor编程能力的搬运和计算接口。搬运接口分为**矢量搬运接口**（GM↔UB）和**矩阵搬运接口**（GM→L1→L0A/L0B→L0C→GM），基础搬运手动传参、显式同步。计算接口分为矢量计算和矩阵计算两大类，矢量计算覆盖算术、比较、转换等场景；Ascend 950PR/950DT引入寄存器后，矢量计算接口拆分为**Memory矢量计算接口**和**Reg矢量计算接口**，**矩阵计算接口**以Mmad为核心执行矩阵乘加运算。此外，Ascend 950PR/950DT还引入了Layout扩展Tensor，并基于扩展Tensor提供了一套简化参数传入的矩阵搬运和计算接口。
 
-**学习路径**：详见[数据搬运与计算](./数据搬运与计算.md)
 
 本章阐述了Ascend C编程体系中的C++ Tensor编程范式：将内存地址抽象为Tensor对象，隐藏地址细节。基础能力接口提供Tensor定义、数据搬运、计算、同步等核心功能。扩展能力引入Layout概念，通过Shape和Stride编译期确定实现类型安全，支持平铺布局、层次化布局、分形布局等多种布局模式。开发者可根据场景选择基础能力或扩展能力，复杂场景可混合使用。
 

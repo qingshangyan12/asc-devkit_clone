@@ -18,16 +18,7 @@ C语言指针编程提供C完备编程能力，通过声明静态数组管理本
 
 ### Kernel函数及函数修饰符
 
-核函数是Ascend C算子设备侧实现的入口，使用__global__限定符声明。当核函数被调用时，多个核并行执行相同的代码逻辑，具有相同的函数入参。通过__vector__、__cube__、__mix__限定符指定核函数在Vector核、Cube核或两者上执行；指针入参变量需添加__gm__限定符，表明指向Global Memory；使用<<<...>>>内核调用符启动核函数，可指定执行核数。
-```c
-// 实现核函数
-__vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    uint32_t blockLength = TILE_LENGTH * NUM_BLOCKS / asc_get_block_num();
-}
-```
-
-**学习路径**：详见 [核函数](../核函数.md) [SIMD Builtin关键字](../../../语言扩展层/SIMD-BuiltIn关键字.md)
+核函数是Ascend C算子设备侧实现的入口。C语言指针编程在核函数定义与调用方面遵循SIMD编程的通用规范，无特殊语法规则，完整规则详见[核函数](../核函数.md)。
 
 ### 内存层级
 
@@ -39,8 +30,6 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 C语言指针编程通过地址限定符精准映射物理存储空间：`__gm__`声明Global Memory变量用于数据搬入搬出，`__ubuf__/__cbuf__/__ca__/__cb__`声明UB/L1/L0A/L0B等片上存储空间。寄存器变量`vector_half`作为矢量计算基本存储单元，位宽为VL，配合Load-Compute-Store模式与UB协作：从UB加载至寄存器、执行计算、存回UB，充分释放硬件峰值性能。
 
-**学习路径**：详见[内存层级](./内存层级.md)
-
 
 ### 同步机制
 
@@ -48,15 +37,11 @@ C语言指针编程提供核内同步与核间同步两类接口。
 - 核内同步包括：**Mutex互斥锁**（Ascend 950PR/950DT引入），采用"获取锁→访问资源→释放锁"模式保护共享资源并发访问；**Notify/Wait**（流水线间数据依赖同步），采用"信号通知-阻塞等待"模式，源流水线发出就绪信号、目标流水线等待信号后继续执行；**数据屏障**（内存访问顺序控制），阻塞后续指令直到前序内存访问指令完成。
 - 核间同步采用计数器递增/递减机制，通过flag_id协调多核执行进度，arrive指令递增计数器表示到达同步点，wait指令检测计数器后决定阻塞或继续；Block内同步（Ascend 950PR/950DT专用）采用ID映射机制，实现Vector Core与Cube Core间的信号传递与等待。
 
-**学习路径**：详见[同步机制](./同步机制.md)
-
 
 ### 数据搬运与计算
 AI Core采用「标量控制单元+Vector矢量计算单元+Cube矩阵计算单元+分级本地存储（UB/L1/L0/Reg）」的异构架构，各组件分工明确、协同联动，硬件能力边界直接决定算子的数据搬运路径与计算形态。数据搬运与计算是AI Core算子开发的两大核心操作，共同构成算子执行的数据流转与计算处理闭环——数据搬运解决「数据从哪里来、到哪里去」的问题，计算解决「数据如何处理」的问题，二者协同配合完成算子功能实现。
 
 C语言指针编程开放芯片完备编程能力，支持以数组形式分配内存，提供与业界一致的C语言编程体验。搬运接口分为矢量搬运（GM↔UB）和矩阵搬运（GM→L1→L0A/L0B→L0C→GM），计算接口分为矢量计算和矩阵计算两大类。矢量计算覆盖算术、比较、转换等场景；Ascend 950PR/950DT引入寄存器后，矢量计算接口拆分为Memory矢量计算接口和Reg矢量计算接口；矩阵计算以Mmad为核心执行矩阵乘加运算。
-
-**学习路径**：详见[数据搬运与计算](./数据搬运与计算.md)
 
 
 ### 基于C语言指针的算子Kernel通用开发流程
@@ -66,30 +51,29 @@ C语言指针编程开放芯片完备编程能力，支持以数组形式分配�
 ```c
 constexpr uint32_t C_API_TOTAL_LENGTH = 16384;
 constexpr uint32_t C_API_TILE_NUM = 8;
-uint32_t blockLength = C_API_TOTAL_LENGTH / asc_get_block_num();    // 单核内计算数据量
-uint32_t tileLength = blockLength / C_API_TILE_NUM;                 // 单次循环计算数据量
+uint32_t blockLength = C_API_TOTAL_LENGTH / asc_get_block_num();    // Compute data amount per core
+uint32_t tileLength = blockLength / C_API_TILE_NUM;                 // Compute data amount per loop
 ```
 
 - **数据搬入**: 调用SIMD编程接口，将全局内存中的待计算数据，批量搬运至L1 Buffer、UB等AI Core片内高速本地内存。
 ```c
-asc_copy_gm2ub(x_local, x_gm + i * tileLength, tileLength);  // 搬入输入数据1
-asc_copy_gm2ub(y_local, y_gm + i * tileLength, tileLength);  // 搬入输入数据2
+asc_copy_gm2ub(x_local, x_gm + i * tileLength, tileLength);  // Load input data 1
+asc_copy_gm2ub(y_local, y_gm + i * tileLength, tileLength);  // Load input data 2
 ```
 
 - **数据计算**：根据算子类型调度Cube计算单元或Vector计算单元，依托片内高速缓存数据，完成矩阵、向量或混合逻辑计算；
 ```c
-asc_add(z_local, x_local, y_local, tileLength);   // 向量加法
-asc_sync();                                       // 计算完成后同步
-asc_mul(z_local, z_local, y_local, tileLength);   // 向量乘法（可连续）
+asc_add(z_local, x_local, y_local, tileLength);   // Vector addition
+asc_sync();                                       // Synchronize after computation
+asc_mul(z_local, z_local, y_local, tileLength);   // Vector multiplication (can be continuous)
 ```
 
 - **数据搬出**：计算完成后，将片内存储中的结果数据写回全局内存，完成单次算子计算流程。
 ```c
 asc_lock(PIPE_MTE3, mutex_id);
-asc_copy_ub2gm(z_gm + i * tileLength, z_local, tileLength);  // 搬出结果数据
+asc_copy_ub2gm(z_gm + i * tileLength, z_local, tileLength);  // Store result data
 asc_unlock(PIPE_MTE3, mutex_id);
 ```
-**学习路径**：详见[编程示例](./编程示例.md)
 
 本章系统阐述了C语言指针编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言指针编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。编程范式遵循SPMD模型的四步法，核心要点在于显式同步机制的正确应用。
 
