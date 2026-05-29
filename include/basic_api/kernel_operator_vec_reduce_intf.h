@@ -103,6 +103,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
  * @param [in] srcRepStride src repeat stride
  */
 template <typename T>
+__ASC_USE_RESERVED_UBUF__(2201, "ReduceSum is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LocalTensor<T>& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime, const int32_t srcRepStride);
 
@@ -115,6 +116,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>
     const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride,
     bool calIndex = 0);
 template <typename T>
+__ASC_USE_RESERVED_UBUF__(2201, "ReduceSum is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride);
 
@@ -153,6 +155,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>
  * @param [in] count Number of data involved in calculation
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, "ReduceSum is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LocalTensor<T>& sharedTmpBuffer, const int32_t count);
 #pragma end_pipe
