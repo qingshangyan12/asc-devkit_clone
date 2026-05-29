@@ -54,8 +54,16 @@ private:
         using dstPos = GetMemLocation<T>;
         using fmPos = GetMemLocation<U>;
         using filterPos = GetMemLocation<S>;
-        using Tensor2Tensor = typename MmadTensor2Tensor<dstPos, fmPos, filterPos, Location::INVALID, CURRENT_ARCH_VERSION>::type;
-        Tensor2Tensor::template Run<trait>(dst, fm, filter, params);
+        static_assert(Std::is_same_v<dstPos, Location::L0C>, "Mmad requires destination tensor on L0C.");
+        static_assert(Std::is_same_v<fmPos, Location::L0A>, "Mmad requires fm tensor on L0A.");
+        static_assert(Std::is_same_v<filterPos, Location::L0B>, "Mmad requires filter tensor on L0B.");
+
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using FmLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using FilterLayoutPtn = GetLayoutPattern<typename S::layoutType>;
+        using MmadImpl =
+            typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, Location::INVALID>::type;
+        MmadImpl::template Run<trait>(dst, fm, filter, params);
     }
 
     template <const MmadTrait& trait = DEFAULT_MMAD_TRAIT, typename T, typename U, typename S, typename V, typename Params>
@@ -65,8 +73,18 @@ private:
         using fmPos = GetMemLocation<U>;
         using filterPos = GetMemLocation<S>;
         using biasPos = GetMemLocation<V>;
-        using Tensor2Tensor = typename MmadTensor2Tensor<dstPos, fmPos, filterPos, biasPos, CURRENT_ARCH_VERSION>::type;
-        Tensor2Tensor::template Run<trait>(dst, fm, filter, bias, params);
+        static_assert(Std::is_same_v<dstPos, Location::L0C>, "Mmad with bias requires destination tensor on L0C.");
+        static_assert(Std::is_same_v<fmPos, Location::L0A>, "Mmad with bias requires fm tensor on L0A.");
+        static_assert(Std::is_same_v<filterPos, Location::L0B>, "Mmad with bias requires filter tensor on L0B.");
+        static_assert(Std::is_same_v<biasPos, Location::L0C> || Std::is_same_v<biasPos, Location::BIAS>,
+            "Mmad with bias requires bias tensor on L0C or BIAS.");
+
+        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
+        using FmLayoutPtn = GetLayoutPattern<typename U::layoutType>;
+        using FilterLayoutPtn = GetLayoutPattern<typename S::layoutType>;
+        using MmadImpl =
+            typename MmadRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, FmLayoutPtn, FilterLayoutPtn, biasPos>::type;
+        MmadImpl::template Run<trait>(dst, fm, filter, bias, params);
     }
 };
 
