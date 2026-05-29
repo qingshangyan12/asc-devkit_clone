@@ -8,7 +8,7 @@ set(SCENARIO_NUM "0" CACHE STRING "Case type to run (0-1)")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 add_executable(demo
-    matrix_transpose.asc
+    sobel_simt_v2.asc
 )
 
 target_compile_definitions(demo PRIVATE
