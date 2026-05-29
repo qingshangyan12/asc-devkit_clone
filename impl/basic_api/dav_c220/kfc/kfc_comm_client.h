@@ -80,7 +80,7 @@ public:
 #else
             ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(TOTAL_UB_SIZE - sizeof(KfcMsg));
 #endif
-            eventID_ = GetTPipePtr()->AllocEventID<HardEvent::MTE3_S>();
+            eventID_ = AllocEventID<HardEvent::MTE3_S>();
             SetFlag<HardEvent::MTE3_S>((event_t)eventID_);
 
 #ifdef __ASCENDC_ENABLE_SUPER_KERNEL__
@@ -152,7 +152,7 @@ public:
     template <bool isAck>
     __disable_kernel_type_autoinfer__ __aicore__ inline void PostMessage(__gm__ KfcMsg *msg)
     {
-        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
+        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
         SetFlag<HardEvent::S_MTE3>(eventID);
         WaitFlag<HardEvent::S_MTE3>(eventID);
         PipeBarrier<PIPE_MTE3>();
