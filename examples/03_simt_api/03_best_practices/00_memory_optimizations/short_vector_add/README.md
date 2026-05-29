@@ -20,7 +20,7 @@
 ## 目录结构介绍
 
 ```
-02_short_vector_add
+short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
@@ -208,7 +208,7 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
     - 默认路径，root用户安装CANN软件包
       ```bash
