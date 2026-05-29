@@ -113,7 +113,7 @@ $$
 | 7 | yLocal = 1 + e^(...) | Adds | yLocal |
 | 8 | yLocal = x / (1 + e^(...)) | Div | yLocal, xLocal |
 
-**方式3计算步骤分解**（共8条指令，需2份内存）：
+**方式3计算步骤分解**（共8条指令，需2份内存）：（ks -- 4这一步应该用yLocal, xLocal）
 
 | 步骤 | 计算内容 | 计算指令 | 内存占用 |
 |:---:|:---|:---:|:---|
@@ -199,8 +199,9 @@ __aicore__ inline void GeluCompute(
 ```
 
 **样例配置**：
+（ks -- 分核逻辑和代码不一致，M方向分32份，N方向2份）
 - 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
-- `tileLen = 8192` 为每次搬运和计算的数据元素个数
+- `tileLen = 8192` 为每次搬运和计算的数据元素个数（ks -- 这里tileLen = 8192？）
 
 **性能数据**：
 
@@ -253,6 +254,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ```
 
 **样例配置**：
+（ks -- 分核逻辑和代码不一致，M方向分32份，N方向2份）
 - 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
 - `tileLen = 8192` 为每次搬运和计算的数据元素个数
 
@@ -276,7 +278,6 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ### Case 2: 启用RegBase API、VF融合能力和循环展开优化
 
 **实现方式**：参考 `KernelGelu::GeluVfBasic()` 函数实现，添加 `#pragma unroll 6` 循环展开优化
-
 在Case 1中由于Gelu计算依赖路径较长，使用循环展开优化，提高指令级并行度。
 
 **关键代码**：
