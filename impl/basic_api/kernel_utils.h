@@ -45,6 +45,17 @@ namespace Internal {
 __BLOCK_LOCAL__ __inline__ uint16_t g_occupyEventPool[EVENT_NUM] = {};
 __BLOCK_LOCAL__ __inline__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
 }
+
+__aicore__ inline TEventID FetchEventID(HardEvent evt)
+{
+    const auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT));
+    return lastId;
+}
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
