@@ -1,0 +1,190 @@
+# SIMD与SIMT混合编程实现快速除法算子样例
+
+## 概述
+
+本样例基于SIMD与SIMT混合编程方式实现快速除法算子，针对除数固定的批量整数除法场景，使用乘法和移位操作替代普通除法运算，展示混合编程模式下使用快速除法算法提升除法运算效率的性能优化方式。
+
+## 支持的产品
+
+- Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+- \>= CANN 9.1.0
+
+## 目录结构
+
+```
+├── simt_and_simd_integer_fast_div
+│   ├── CMakeLists.txt              # cmake编译文件
+│   ├── integer_fast_div.asc        # 快速除法算子样例
+│   ├── integer_normal_div.asc      # 普通除法算子样例（对比基准）
+│   └── README.md
+```
+
+## 算子描述
+
+- 算子功能：  
+  实现对一维输入张量input中每个元素除以指定除数divisor的功能。算子输出output第i个元素计算公式为：
+  
+  ```
+  output[i] = input[i] / divisor
+  ```
+
+  其中input每个元素的取值范围为 `[0, INT32_MAX]`。
+
+- 算子规格：  
+  <table>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">integer_div</td></tr>
+  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">input</td><td align="center">32768</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">divisor</td><td align="center">标量</td><td align="center">uint32_t</td><td align="center">-</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">32768</td><td align="center">uint32_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">快速除法核函数名</td><td colspan="4" align="center">integer_fast_div / integer_fast_div_clock</td></tr>
+  <tr><td rowspan="1" align="center">普通除法核函数名</td><td colspan="4" align="center">integer_normal_div / integer_normal_div_clock</td></tr>
+  </table>
+
+- 线程层次结构：
+  * 线程块数：64
+  * 单个线程块中线程数：512
+
+- 算子实现：  
+  integer_normal_div.asc中直接使用除法运算符作为性能对比基准。整数除法在AI处理器上相比乘法和移位操作，指令执行开销显著更高。当除数固定时，可以预先根据除数计算乘法系数和移位量，运行时使用乘法和移位操作完成等价的快速除法计算，避免触发高延迟的硬件除法指令。
+
+  对于uint32_t类型整数除法，可作如下变形，将除法计算转换为乘法和移位操作：
+  $$
+  \left\lfloor \frac{n}{d} \right\rfloor =
+  \left\lfloor \frac{n}{d} \times \frac{2^s}{2^s} \right\rfloor =
+  \left\lfloor \frac{2^s}{d} \times \frac{n}{2^s} \right\rfloor = 
+  \left\lfloor {m} \times \frac{n}{2^s} \right\rfloor
+  $$
+
+  其中$n$为被除数，$d$为除数，$m = \frac{2^s}{d}$。除以$2^s$可通过右移$s$位实现。为了避免$m \times n$乘法溢出，将$m$拆分为：
+  $$
+  m = (m - 2^{32}) + 2^{32}
+  $$
+
+  令$magic = m - 2^{32}$，代入上式可得：
+  $$
+  \left\lfloor \frac{n}{d} \right\rfloor =
+  \left\lfloor \frac{n \times {magic} + n \times 2^{32}}{2^s} \right\rfloor =
+  \left\lfloor \left(\frac{n \times magic}{2^{32}} + n\right) >> (s-32) \right\rfloor =
+  \left\lfloor \left(\frac{n \times magic}{2^{32}} + n\right) >> shift \right\rfloor
+  $$
+
+  其中`magic`和`shift`表示快速除法所需的乘法魔数和移位数。
+  本样例中基于上述除法转换思路，在SIMD部分使用Scalar计算单元中的`clz()`、`bcnt1()`标量计算接口，获取快速除法所需的`magic`和`shift`，供SIMT线程复用，代码示例如下：
+  ```cpp
+  int64_t pos = BIT_64_LEN - CountLeadingZero(divisor);  // CountLeadingZero: 调用clz，计算除数的前导零个数
+  int64_t cnt1 = GetBitCount1(divisor);                  // GetBitCount1: 调用bcnt1，计算除数二进制中1的个数
+  uint32_t shift = (cnt1 == 1) ? (pos - 1) : pos;
+  uint32_t magic = (1l << BIT_32_LEN) * ((1l << shift) - divisor) / divisor + 1;
+  ```
+  SIMT线程读取预先从Global Memory搬运到UB上的input，每个线程通过乘法和移位操作完成一个元素的除法，结果写回Global Memory。代码示例如下：
+  ```cpp
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  ...
+  uint64_t start_clock = clock();
+  // 快速除法计算：乘法和移位替代除法
+  uint32_t q = __umulhi(value, magic);
+  uint32_t result = (value + q) >> shift;
+
+  uint64_t end_clock = clock();
+  output[idx] = result;
+  clock_cycles[idx] = end_clock - start_clock;
+  ```
+
+  通过在计算前后调用[`clock()`](../../../../../docs/api/Utils-API/调测接口/clock.md)记录时间戳，能够统计每个线程的除法操作耗时。
+
+- 性能收益：
+
+  本优化方法的收益主要体现在除法指令层面：将每次除法替代为乘法和移位操作，可有效降低计算部分的执行开销。
+
+  **单次除法操作cycle数对比**
+
+  使用NPU硬件时钟周期（clock cycle）统计每个线程执行除法操作的耗时，每个线程通过[`clock()`](../../../../../docs/api/Utils-API/调测接口/clock.md)记录除法操作前后的时间差，得到一次除法操作的cycle数。平均clock cycles为所有线程统计除法操作cycle数的平均值，数据量32768，结果如下：
+
+  | 数据量（N） | 快速除法（cycles） | 普通除法（cycles） |
+  |:-----------:|:-----------------:|:-----------------:|
+  | 32768       | 14.00             | 38.25             |
+
+  N=32768时，快速除法平均clock cycles为14.00，普通除法为38.25。
+
+  **SIMT VF函数整体耗时对比**
+
+  通过在核函数内使用[`GetSystemCycle()`](<../../../../../docs/api/SIMD-API/基础API/系统变量访问/GetSystemCycle(ISASI).md>)对`asc_vf_call`前后打点，采集SIMT VF函数的执行时间。分别重复运行快速除法和普通除法样例各10次，取第0号核测量结果，得到以下性能数据：
+
+  | 数据量（N） | 除法方式 | 各次结果（cycles） | 均值 |
+  |:-----------:|:--------:|:-----------------|:----:|
+  | 32768       | 快速除法 | 880, 543, 526, 611, 527, 526, 558, 618, 570, 515 | 587.40 |
+  | 32768       | 普通除法 | 867, 949, 1020, 941, 601, 1317, 1148, 756, 945, 858 | 940.20 |
+
+  第0号核SIMT VF函数整体耗时的10次运行均值为：快速除法587.40 cycles，普通除法940.20 cycles。快速除法约为普通除法的62%，平均节省约353 cycles。其中，快速除法核函数中执行`calc_magic_shift`预计算magic和shift，该接口耗时约19 cycles。由于除数固定，预计算结果可被SIMT线程复用，该开销与输入数据量无关，相比快速除法整体收益，计算开销较小。
+
+  整体来看，当除数固定时，使用快速除法可有效降低整数除法的执行开销。
+
+## 编译运行
+
+在本样例根目录下执行如下步骤，编译并执行算子。
+
+- 配置环境变量   
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
+
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+    
+- 样例执行  
+  快速除法执行方式：
+  ```bash
+  mkdir -p build && cd build;                                          # 创建并进入build目录
+  cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
+  ./integer_div                                                               # 执行样例
+  ```
+  普通除法执行方式：
+  ```bash
+  mkdir -p build && cd build;                                          # 创建并进入build目录
+  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # 编译工程
+  ./integer_div                                                               # 执行样例
+  ```
+
+  编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `SCENARIO_NUM` | `0`（默认）、`1` | 除法实现版本：0为快速除法，1为普通除法 |
+
+  执行结果如下，说明精度对比成功。
+
+  SCENARIO_NUM=0（快速除法）：
+  ```
+  [INFO] num_blocks: 64, THREAD_COUNT: 512
+  [Magic Cycles] Block 0 calc_magic_shift elapsed cycles: 19
+  [VF Cycles] Block 0 simt_fast_div elapsed cycles: 611
+  [Total Sum] Total cycle sum of all threads: 458752
+  [Overall Average] Overall average cycles of all threads: 14
+  Output: 285190763 273084670 97058763 40098825 56423234 12197552 62755693 253536868 174168601 163232660 182703215 293380004 295897023 141711313 200383876 283387511 229752108 114712801 200504374 47543249 ...
+  Golden: 285190763 273084670 97058763 40098825 56423234 12197552 62755693 253536868 174168601 163232660 182703215 293380004 295897023 141711313 200383876 283387511 229752108 114712801 200504374 47543249 ...
+  [Success] Case accuracy is verification passed.
+  ```
+
+  SCENARIO_NUM=1（普通除法）：
+  ```
+  [INFO] num_blocks: 64, THREAD_COUNT: 512
+  [VF Cycles] Block 0 simt_normal_div elapsed cycles: 941
+  [Total Sum] Total cycle sum of all threads: 1253376
+  [Overall Average] Overall average cycles of all threads: 38.25
+  Output: 285190763 273084670 97058763 40098825 56423234 12197552 62755693 253536868 174168601 163232660 182703215 293380004 295897023 141711313 200383876 283387511 229752108 114712801 200504374 47543249 ...
+  Golden: 285190763 273084670 97058763 40098825 56423234 12197552 62755693 253536868 174168601 163232660 182703215 293380004 295897023 141711313 200383876 283387511 229752108 114712801 200504374 47543249 ...
+  [Success] Case accuracy is verification passed.
+  ```
