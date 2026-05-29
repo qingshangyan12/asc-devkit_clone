@@ -81,10 +81,10 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 不同产品版本对CrossCoreWaitFlag接口是否支持配置核间同步模式和流水类型的情况不同：
+- 不同产品版本下，CrossCoreWaitFlag接口对核间同步模式和流水类型的配置支持情况如下：
 <cann-filter npu-type="950">
 
-    - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe生效。
+    - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe生效。此时，支持的流水类型为：PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX、PIPE_S、PIPE_ALL。
 </cann-filter>
 <cann-filter npu-type="A3">
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品，硬件不支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe不生效。
