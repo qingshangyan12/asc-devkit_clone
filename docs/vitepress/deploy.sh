@@ -128,18 +128,14 @@ install_deps() {
         exit 1
     fi
 
-    if [ ! -d "node_modules" ]; then
-        log "安装项目依赖..."
-        if command -v pnpm &>/dev/null; then
-            pnpm install 2>&1 | tee -a "$LOG_FILE"
-        else
-            log "pnpm 未安装，使用 npm..."
-            npm install 2>&1 | tee -a "$LOG_FILE"
-        fi
-        log "依赖安装完成"
+    log "安装/更新项目依赖..."
+    if command -v pnpm &>/dev/null; then
+        pnpm install 2>&1 | tee -a "$LOG_FILE"
     else
-        log "依赖已存在，跳过安装"
+        log "pnpm 未安装，使用 npm..."
+        npm install 2>&1 | tee -a "$LOG_FILE"
     fi
+    log "依赖安装完成"
 }
 
 # ============================================================
