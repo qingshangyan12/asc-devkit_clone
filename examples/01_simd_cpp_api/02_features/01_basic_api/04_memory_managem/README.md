@@ -8,6 +8,7 @@
 
 | 目录名称 | 功能描述 | 支持的产品 |
 | ----------------------------------------------------------- | --------------------------------------------------- | --- |
+| [gm_by_pass_dcache](./gm_by_pass_dcache) |  本样例基于ReadGmByPassDcache和WriteGmByPassDcache接口，实现不经过DCache从GM读取和写入数据。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [tpipe_reuse](./tpipe_reuse) |  本样例基于TPipe::Init和TPipe::Destroy，实现TPipe重复申请与使用。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [get_tpipe_ptr](./get_tpipe_ptr) |  样例基于GetTPipePtr获取全局TPipe指针，核函数无需显式传入TPipe指针，即可进行TPipe相关的操作。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [tbufpool_management](./tbufpool_management) |  本样例基于TPipe::InitBufPool和TBufPool::InitBufPool接口实现TBufPool内存资源管理，展示TBufPool资源分配、内存划分、内存复用和自定义TBufPool等使用方式。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
