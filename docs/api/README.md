@@ -230,9 +230,9 @@
                 -   [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatSumSpr(ISASI).md)
                 -   [GetReduceRepeatMaxMinSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatMaxMinSpr(ISASI).md)
 
-            -   [数据转换](SIMD-API/基础API/Memory矢量计算/数据转换/数据转换.md)
-                -   [Transpose](SIMD-API/基础API/Memory矢量计算/数据转换/Transpose.md)
-                -   [TransDataTo5HD](SIMD-API/基础API/Memory矢量计算/数据转换/TransDataTo5HD.md)
+            -   [数据排布转换](SIMD-API/基础API/Memory矢量计算/数据排布转换/数据排布转换.md)
+                -   [Transpose](SIMD-API/基础API/Memory矢量计算/数据排布转换/Transpose.md)
+                -   [TransDataTo5HD](SIMD-API/基础API/Memory矢量计算/数据排布转换/TransDataTo5HD.md)
 
             -   [数据填充](SIMD-API/基础API/Memory矢量计算/数据填充/数据填充.md)
                 -   [Duplicate](SIMD-API/基础API/Memory矢量计算/数据填充/Duplicate.md)
