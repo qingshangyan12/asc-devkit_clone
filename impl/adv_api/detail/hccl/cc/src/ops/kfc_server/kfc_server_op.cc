@@ -43,7 +43,7 @@ HcclResult HcclKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, 
     CHK_RET(KfcServerEntryLog(stream, tag, "HcclKfcServer"));
 
     bool useInnerOp = false;
-    CHK_RET_AND_PRINT_IDE(KfcServerOutPlace(comm, stream, tag,
+    CHK_RET_AND_PRINT_IDE(KfcServerOutPlace(xnAddr, ckeAddr, workSpace, workSpaceSize, comm, stream, tag,
         HcclCMDType::HCCL_CMD_KFC_SERVER, rankSize, useInnerOp), tag.c_str());
     
     CHK_RET(LogHcclExit("HcclKfcServer", tag.c_str(), startut));
@@ -92,11 +92,12 @@ HcclResult KfcServerConstructOpParam(uint64_t xnAddr, uint64_t ckeAddr, uint64_t
     return HCCL_SUCCESS;
 }
 
-HcclResult KfcServerOutPlaceCommon(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType,
+HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, 
+    HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType, 
     u32 rankSize, bool &useInnerOp, OpMode opMode, const ResPackGraphMode &resPack)
 {
     OpParam param;
-    CHK_RET(KfcServerConstructOpParam(comm, stream, tag, opType, rankSize, opMode, param));
+    CHK_RET(KfcServerConstructOpParam(xnAddr, ckeAddr, workSpace, workSpaceSize, comm, stream, tag, opType, rankSize, opMode, param));
     
     CHK_RET(HcclGetOpExpansionMode(comm, param));
 
@@ -114,11 +115,11 @@ HcclResult KfcServerOutPlaceCommon(HcclComm comm, aclrtStream stream, const std:
     return HCCL_SUCCESS;
 }
 
-HcclResult KfcServerOutPlace(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType,
-    u32 rankSize, bool &useInnerOp)
+HcclResult KfcServerOutPlace(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, 
+    aclrtStream stream, const std::string &tag, HcclCMDType opType, u32 rankSize, bool &useInnerOp)
 {
     HCCL_INFO("Start to execute KfcServerOutPlace");
-    CHK_RET(KfcServerOutPlaceCommon(comm, stream, tag, opType, 
+    CHK_RET(KfcServerOutPlaceCommon(xnAddr, ckeAddr, workSpace, workSpaceSize, comm, stream, tag, opType, 
         rankSize, useInnerOp, OpMode::OPBASE, ResPackGraphMode()));
     HCCL_INFO("Execute KfcServerOutPlace success.");
     return HCCL_SUCCESS;

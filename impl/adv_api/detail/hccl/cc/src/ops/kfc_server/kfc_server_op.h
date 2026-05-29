@@ -37,11 +37,11 @@ HcclResult CheckKfcServerInputPara(const HcclComm comm, const aclrtStream stream
 HcclResult KfcServerConstructOpParam(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream,
     const std::string &tag, HcclCMDType opType, u32 rankSize, OpMode opMode, OpParam &param);
 
-HcclResult KfcServerOutPlaceCommon(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType,
-    u32 rankSize, bool &useInnerOp, OpMode opMode, const ResPackGraphMode &resPack);
+HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, aclrtStream stream, 
+    const std::string &tag, HcclCMDType opType, u32 rankSize, bool &useInnerOp, OpMode opMode, const ResPackGraphMode &resPack);
 
-HcclResult KfcServerOutPlace(HcclComm comm, aclrtStream stream, const std::string &tag, HcclCMDType opType,
-    u32 rankSize, bool &useInnerOp);
+HcclResult KfcServerOutPlace(uint64_t xnAddr, uint64_t ckeAddr, uint64_t workSpace, uint64_t workSpaceSize, HcclComm comm, 
+    aclrtStream stream, const std::string &tag, HcclCMDType opType, u32 rankSize, bool &useInnerOp);
 
 HcclResult KfcServerEntryLog(aclrtStream stream, const std::string &tag, const std::string &opName);
 
