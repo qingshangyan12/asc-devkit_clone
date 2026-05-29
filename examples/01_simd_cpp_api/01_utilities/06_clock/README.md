@@ -17,7 +17,7 @@
 ```
 ├── 06_clock
 │   ├── CMakeLists.txt              # cmake编译文件
-│   ├── gather_and_adds.asc         # SIMD&SIMT混编与clock打点实现样例
+│   ├── clock.asc                   # SIMD&SIMT混编与clock打点实现样例
 │   └── README.md
 ```
 
