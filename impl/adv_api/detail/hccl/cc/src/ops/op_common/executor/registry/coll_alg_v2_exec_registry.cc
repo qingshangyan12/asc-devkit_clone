@@ -9,38 +9,62 @@
 */
 #include "coll_alg_v2_exec_registry.h"
 
+namespace ops_hccl {
+    class InsCollAlgBase;
+    
+    class CollAlgExecRegistryV2 {
+    public:
+        static CollAlgExecRegistryV2& Instance();
+        HcclResult Register(HcclCMDType type, const std::string& tag, 
+                           const std::function<InsCollAlgBase*()>& creator);
+        InsCollAlgBase* GetAlgExec(HcclCMDType type, const std::string& tag);
+    };
+}
+
 namespace mc2_ops_hccl {
 
 CollAlgExecRegistryV2 &CollAlgExecRegistryV2::Instance()
 {
-    static CollAlgExecRegistryV2 globalExecRegistry;
-    return globalExecRegistry;
+    HCCL_INFO("[mc2_ops_hccl::CollAlgExecRegistryV2::Instance] delegating to CANN ops_hccl library");
+    
+    ops_hccl::CollAlgExecRegistryV2& cannInstance = ops_hccl::CollAlgExecRegistryV2::Instance();
+    
+    return reinterpret_cast<CollAlgExecRegistryV2&>(cannInstance);
 }
 
 HcclResult CollAlgExecRegistryV2::Register(const HcclCMDType type, const std::string &tag,
     const CollExecCreatorV2 &collExecCreator)
 {
-    const std::lock_guard<std::mutex> lock(mu_);
-    if (execCreators_[type].count(tag) != 0) {
-        HCCL_ERROR("[CollAlgExecRegistryV2]Exec tag[%s] already registered.", tag.c_str());
-        return HcclResult::HCCL_E_INTERNAL;
-    }
-    execCreators_[type].emplace(tag, collExecCreator);
-    return HcclResult::HCCL_SUCCESS;
+    HCCL_INFO("[mc2_ops_hccl::CollAlgExecRegistryV2::Register] delegating to CANN library, type[%d], tag[%s]",
+        static_cast<int>(type), tag.c_str());
+    
+    ops_hccl::CollAlgExecRegistryV2& cannInstance = ops_hccl::CollAlgExecRegistryV2::Instance();
+    
+    const std::function<ops_hccl::InsCollAlgBase*()>& cannCreator = 
+        reinterpret_cast<const std::function<ops_hccl::InsCollAlgBase*()>&>(collExecCreator);
+    
+    return cannInstance.Register(type, tag, cannCreator);
 }
 
 std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(const HcclCMDType type,
     const std::string &tag)
 {
-    if (execCreators_.count(type) == 0 || execCreators_[type].count(tag) == 0) {
-        HCCL_INFO("[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] miss, opType[%d], algName[%s].",
-            type, tag.c_str());
+    HCCL_INFO("[mc2_ops_hccl::CollAlgExecRegistryV2::GetAlgExec] delegating to CANN library, type[%d], tag[%s]",
+        static_cast<int>(type), tag.c_str());
+    
+    ops_hccl::CollAlgExecRegistryV2& cannInstance = ops_hccl::CollAlgExecRegistryV2::Instance();
+    
+    ops_hccl::InsCollAlgBase* cannExecutor = cannInstance.GetAlgExec(type, tag);
+    
+    if (cannExecutor == nullptr) {
+        HCCL_INFO("[mc2_ops_hccl::CollAlgExecRegistryV2::GetAlgExec] CANN returned nullptr");
         return nullptr;
     }
-    auto executor = std::unique_ptr<InsCollAlgBase>(execCreators_[type][tag]());
-    HCCL_INFO("[asc][AlgoExecute][CollAlgExecRegistryV2::GetAlgExec] hit, opType[%d], algName[%s], "
-        "executor[%p].", type, tag.c_str(), executor.get());
-    return executor;
+    
+    HCCL_INFO("[mc2_ops_hccl::CollAlgExecRegistryV2::GetAlgExec] CANN returned executor[%p]", cannExecutor);
+    
+    InsCollAlgBase* localExecutor = reinterpret_cast<InsCollAlgBase*>(cannExecutor);
+    return std::unique_ptr<InsCollAlgBase>(localExecutor);
 }
 
 }
