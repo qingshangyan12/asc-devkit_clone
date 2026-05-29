@@ -16,9 +16,9 @@
 
 ```
 ├── 06_clock
-│   ├── CMakeLists.txt              # cmake编译文件
-│   ├── gather_and_adds.asc         # SIMD&SIMT混编与clock打点实现样例
-│   └── README.md
+│   ├── CMakeLists.txt              // 编译工程文件
+│   ├── clock.asc                   // Ascend C样例实现&调用样例
+│   └── README.md                   // 样例说明
 ```
 
 ## 样例描述
