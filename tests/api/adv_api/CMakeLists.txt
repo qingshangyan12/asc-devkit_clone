@@ -259,17 +259,17 @@ file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
 
-    #normalization/rmsnorm/test_operator_rmsnorm.cpp
-    #math/sinh/test_operator_sinh.cpp
-    #sort/sort/test_operator_radix_sort.cpp
-    #sort/topk/test_operator_radix_topk.cpp
-    #transpose/confusion_transpose/test_operator_confusion_transpose.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
     activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu.cpp
-    #quantization/antiquant/test_ascend_antiquant.cpp
-    #quantization/dequant/test_ascend_dequant.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
     activation/gelu/test_operator_fast_gelu.cpp
-    #activation/softmax/test_operator_softmax_v220.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
 ) 
 
 set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
@@ -302,17 +302,17 @@ file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
     matmul/test_matmul_shape_info_left.cpp
     matmul/test_matmul_l0c_buffer.cpp
 
-    #normalization/rmsnorm/test_operator_rmsnorm.cpp
-    #math/sinh/test_operator_sinh.cpp
-    #sort/sort/test_operator_radix_sort.cpp
-    #sort/topk/test_operator_radix_topk.cpp
-    #transpose/confusion_transpose/test_operator_confusion_transpose.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
     activation/geglu/test_operator_geglu.cpp
     activation/swiglu/test_operator_swiglu.cpp
-    #quantization/antiquant/test_ascend_antiquant.cpp
-    #quantization/dequant/test_ascend_dequant.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
     activation/gelu/test_operator_fast_gelu.cpp
-    #activation/softmax/test_operator_softmax_v220.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
     activation/gelu/test_operator_gelu.cpp
     activation/silu/test_operator_silu.cpp
 ) 
@@ -488,6 +488,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         UT_TEST
         ASCENDC_OOM=1
         ASCENDC_DUMP=0
+        ASCEND_CPU_DEBUG=1
+        ASCEND_DEBUG=1
         $<$<STREQUAL:${product_type},ascend310p>:__NPU_ARCH__=2002;__DAV_M200__>
         $<$<STREQUAL:${product_type},ascend610>:__NPU_ARCH__=2002;__DAV_M200__>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_CUBE__;__DAV_CUBE__>
@@ -503,6 +505,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     target_include_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         ${ASCENDC_TEST_HEADER_FILES}
         ${ASCENDC_DEP_HEADER_DIR}
+        ${ASCEND_CANN_PACKAGE_PATH}/toolkit/tools/tikicpulib/lib/include
     )
 
     target_compile_options(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
