@@ -105,6 +105,7 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 - eventID的取值范围如下：
 <cann-filter npu-type="950">
+
     - Ascend 950PR/Ascend 950DT，数据范围为：0-7
 </cann-filter>
 <cann-filter npu-type="A3">

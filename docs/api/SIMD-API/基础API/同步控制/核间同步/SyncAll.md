@@ -146,28 +146,34 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace缓存申请的空间大小要求大于等于核数*32Bytes，并且缓存的值需要初始化为0。目前常见的有两种初始化方式：
-    - 通过在host侧进行初始化操作，确保传入该接口时，gmWorkspace缓存已经初始化为0。
-    - 在kernel侧初始化的时候对gmWorkspace缓存初始化，需要注意的是，每个核上都需要初始化全部的gmWorkspace缓存空间。
+SyncAll硬件同步和软件同步接口的内部实现不同，约束条件也有所区别。
 
-- ubWorkspace申请的空间大小要求大于等于核数*32Bytes。
-- 针对Ascend 950PR/Ascend 950DT，对于软同步接口，连续使用（Polling）该接口，用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象。若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 * 200。
-- 使用该接口进行多核控制时，算子调用时指定的逻辑numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
-- SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为[11-14]。
-- 在分离模式下，建议使用硬同步接口而非软同步接口。软同步接口仅适用于纯Vector场景，且性能较低。使用硬同步接口时，需根据场景设置Kernel类型：
-    - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
-    - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
+- 软件同步接口约束：
+    - gmWorkspace缓存申请的空间大小要求大于等于GetBlockNum()*32Bytes，并且缓存的值需要初始化为0。目前常见的有两种初始化方式：
+        - 通过在host侧进行初始化操作，确保传入该接口时，gmWorkspace缓存已经初始化为0；
+        - 在kernel侧初始化的时候对gmWorkspace缓存初始化，需要注意的是，每个核上都需要初始化全部的gmWorkspace缓存空间。
+    - ubWorkspace申请的空间大小要求大于等于GetBlockNum()*32Bytes。
+    - 在纯Vector算子场景中，若所有AIV核默认参与同步，推荐采用性能更优的硬件同步接口；若需指定部分AIV核参与同步，则应使用软件同步接口，并通过入参usedCores完成配置。
+    - usedCores传入数值不能超过算子调用时指定的逻辑AI Core中AIV的数量：GetBlockNum()*GetTaskRatio()，不传此参数表示全核软同步。
+    - <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，SyncAll软同步接口内部实现中标量单元连续读取相同GM地址时用于进行多核同步，会造成Bus被长期占用，导致其他核无法访问该GM，导致多核读同一GM出现卡死现象。若需要Polling，建议在该使用接口间，增加Nop指令，指令量建议为800个，一般为需要同步的核数 * 200。</cann-filter>
+    
+- 硬件同步接口约束：
+    - 使用硬同步接口时，需根据场景使用合适的核函数修饰符：
+        - 在纯Vector算子，需使用\_\_mix\_\_\(0, 1\)修饰核函数，而不是使用\_\_vector\_\_，具体原因请参考。
+        - 对于Mix（包含Cube和Vector计算）算子，需使用\_\_mix\_\_\(1, 1\)或\_\_mix\_\_\(1, 2\)修饰核函数。
+    - 对于纯Vector算子，模板参数isAIVOnly必须设置为true，否则会导致程序卡死。
+    - 对于Mix（包含Cube和Vector计算）算子，模板参数isAIVOnly设置为true，会导致接口实际只能完成Vector全核同步与预期同步行为不符。
+    - 使用该接口时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
+        - 多流并发场景（≥2条执行流）。
+        - ≥2个算子并发执行。
+        - 所有并发算子的核数总和超过物理核数。
+        - ≥2个并发算子使用了核间同步功能。
 
-- 使用该接口时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
+        具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
+        Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
+    - SyncAll硬件同步接口内部实现中使用了[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为[11-14]。
 
-    - 多流并发场景（≥2条执行流）。
-    - ≥2个算子并发执行。
-    - 所有并发算子的核数总和超过物理核数。
-    - ≥2个并发算子使用了核间同步功能。
-
-    具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
-
-    Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
+- 硬件同步接口和软件同步接口公共约束：使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

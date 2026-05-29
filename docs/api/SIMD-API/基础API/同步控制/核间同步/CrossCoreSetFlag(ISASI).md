@@ -51,7 +51,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)接口配对工作，使用时需传入核间同步的标记ID(flagId)，每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
+在核间同步场景中，CrossCoreSetFlag接口和[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。
 
 - CrossCoreSetFlag
 
@@ -91,8 +91,8 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 | 参数名 | 描述 |
 | --- | --- |
-| modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间 / 所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
-| pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX。<cann-filter npu-type="950"><br>流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter> |
+| modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间或者所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
+| pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX。<cann-filter npu-type="950"><br>针对Ascend 950PR/Ascend 950DT，新增支持以下流水类型：PIPE_ALL和PIPE_S。</cann-filter> |
 
 **表 2**  参数说明
 
@@ -106,9 +106,9 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 使用该同步接口时，需要按照如下规则[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)：
-    - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
-    - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
+- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或 KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如不：
+    - 在纯Vector/Cube场景下（模式0或模式1），建议设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0，其它支持的Kernel类型请参考表3。
+    - 对于Vector和Cube混合场景（模式2），需根据AI Core中AIC和AIV的比例灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
 
         **表 3**  模式与支持的Kernel类型配置
 
@@ -120,36 +120,25 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 
 - 接口使用模式0、1、2，需要避免flagId使用冲突：
     - Matmul高阶API内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和Matmul高阶API，否则会有flagId冲突的风险。Matmul高阶API内部占用的flagId范围与定义的Matmul对象数目相关，假设定义了N个Matmul对象，Matmul高阶API内部占用的flagId范围为\[0, 2 \* N - 1\]。Matmul最多支持定义4个对象，此时flagId占用范围为\[0,7\]。
-
     - SyncAll硬件同步接口内部实现中使用了CrossCoreSetFlag进行核间同步控制，所以不建议开发者同时使用CrossCoreSetFlag和SyncAll硬件同步接口，否则会有flagID冲突的风险。SyncAll硬件同步接口flagId占用范围为\[11-14\]。
-
 - 用户需要确保配套使用CrossCoreSetFlag和CrossCoreWaitFlag，否则会出现未定义行为。
 - <cann-filter npu-type="950">流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter>
-
 - 一个核连续发出的CrossCoreSetFlag，硬件不保证执行顺序。例如AIV依次发射CrossCoreSetFlag<0，PIPE\_V\>\(0\)，CrossCoreSetFlag<0，PIPE\_V\>\(1\)，实际的执行顺序可能是flagId=1的先执行。
-
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
     - 每个flagId都对应一个计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到所有参与同步的核（具体包含哪些核与设置的核间同步模式有关）完成（调用了CrossCoreSetFlag）同步后，会将与设置的flagId对应的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。每一个计数器计数范围为0-15。如果调用CrossCoreWaitFlag的次数过多，计数器的值超出该范围，则会异常报错，中断流程。
-
 - 模式0、1、2下，同一个flagId用于不同核间同步模式的约束：
-
     - 对于同一个核上的操作，若需将同一flagId用于不同的核间同步模式，必须在模式切换前确保前一个模式下的所有同步操作已完成——即与该flagId关联的CrossCoreSetFlag调用及其配对的CrossCoreWaitFlag调用均执行完毕。否则，未完成的同步操作可能导致系统出现未定义行为。
-
     - 对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
-
         - 多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
         - 单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
-
 - 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
-
     - 多流并发场景（≥2条执行流）。
     - ≥2个算子并发执行。
     - 所有并发算子的核数总和超过物理核数。
     - ≥2个并发算子使用了核间同步功能。
 
     具体而言，在多流场景下，某条流的核间同步算子虽分配到n个物理核，但可能仅有n-m个核先被调度执行，而其余m个核因被其他流的核间同步算子抢占而尚未启动。先启动的n-m个核执行到核间同步时等待剩余m核完成，而剩余m核因被其他流的核间同步算子占用而无法释放，形成死锁。
-
     Kernel直调场景下通过[\_\_schedmode\_\_\(mode\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)限定符来设置batchmode模式；工程化算子开发场景下，通过TilingContext的SetScheduleMode接口来设置batchmode模式，具体请参考[《基础数据结构和接口》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/basicdataapi/atlasopapi_07_00001.html)。
 
 ## 调用示例<a name="section837496171220"></a>

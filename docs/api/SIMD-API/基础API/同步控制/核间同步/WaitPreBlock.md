@@ -78,7 +78,7 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 
 - 要实现确定性计算，需要保证每个核调用NotifyNextBlock/WaitPreBlock接口的次数相同。如果调用了NotifyNextBlock没有与之配对的WaitPreBlock，会导致非确定性计算、输出结果可能不符合预期；如果调用了WaitPreBlock没有与之配对的NotifyNextBlock，会导致程序卡死。
 - 使用接口前，请确保已经调用[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)接口，初始化共享内存。
-- gmWorkspace申请的空间最少要求为：GetBlockNum() * 32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum() * 32 + 32Bytes。
+- gmWorkspace申请的空间最少要求为：GetBlockNum()*32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum()*32+32Bytes。
 - 使用该接口进行多核同步时，仅对AIV核生效，WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致Kernel“卡死”现象。
 

@@ -66,7 +66,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 | 参数名 | 描述 |
 | --- | --- |
-| modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间 / 所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
+| modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间或者所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
 | pipe | 设置这条指令所在的流水类型。支持的流水类型为PIPE_V，PIPE_M，PIPE_MTE1，PIPE_MTE2，PIPE_MTE3，PIPE_FIX。<cann-filter npu-type="950"><br>流水类型为PIPE_ALL/PIPE_S时，仅在Ascend 950PR/Ascend 950DT上支持。</cann-filter> |
 
 **表 2**  参数说明
@@ -81,15 +81,28 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
+- 不同产品版本对CrossCoreWaitFlag接口是否支持配置核间同步模式和流水类型的情况不同：
 <cann-filter npu-type="950">
 
-- 模板参数modeId和pipe，仅在Ascend 950PR/Ascend 950DT上生效。
+    - Ascend 950PR/Ascend 950DT，硬件支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe生效。
+</cann-filter>
+<cann-filter npu-type="A3">
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，硬件不支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe不生效。
+</cann-filter>
+<cann-filter npu-type="910b">
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，硬件不支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe不生效。
+</cann-filter>
+- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或 KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如不：
+    - 在纯Vector/Cube场景下（模式0或模式1），建议设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0，其它支持的Kernel类型请参考表3。
+    - 对于Vector和Cube混合场景（模式2），需根据AI Core中AIC和AIV的比例灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
 
-</cann-filter> 
+        **表 3**  模式与支持的Kernel类型配置
 
-- 使用该同步接口时，需要按照如下规则[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)：
-    - 在纯Vector/Cube场景下，需设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0。
-    - 对于Vector和Cube混合场景，需根据实际情况灵活配置Kernel类型。
+        | 模式 | 支持的函数修饰符 | 支持的Kernel类型配置 |
+        | --- | --- | --- |
+        | 0 | \_\_mix\_\_(0, 1)，\_\_mix\_\_(1, 0)， \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIV\_1\_0， KERNEL\_TYPE\_MIX\_AIC\_1\_0，KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 1 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
+        | 2 | \_\_mix\_\_(1, 1)，\_\_mix\_\_(1, 2) | KERNEL\_TYPE\_MIX\_AIC\_1\_1， KERNEL\_TYPE\_MIX\_AIC\_1\_2 |
 
 - CrossCoreWaitFlag必须与[CrossCoreSetFlag](CrossCoreSetFlag(ISASI).md)接口配合使用，避免计算核一直处于阻塞阶段。
 
