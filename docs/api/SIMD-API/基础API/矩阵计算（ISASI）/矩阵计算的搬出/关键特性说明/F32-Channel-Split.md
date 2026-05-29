@@ -30,4 +30,4 @@
 当开启channel Split功能后，nSize（源NZ矩阵在N方向上的大小）必须为8的倍数。如下图所示，shape为\[64,24\]的源操作数将会被拆分为3列16x8分形矩阵。
 
 **图 2**  F32 channel split示意图2<a name="zh-cn_topic_0000002515660950_fig5809145844116"></a>  
-![](../../../../../figures/Fixpipe_Channel_Split_wtth_dirty.png)
+![](../../../../../figures/Fixpipe_Channel_Split_with_dirty.png)
