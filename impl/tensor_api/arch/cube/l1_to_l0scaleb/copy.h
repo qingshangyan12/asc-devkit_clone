@@ -50,11 +50,13 @@ private:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<dstPos, Location::L0ScaleB>, "When Copy tensor from L1 to L0ScaleB, dst tensor must on L0ScaleB");
+        static_assert(Std::is_same_v<srcPos, Location::L1>, "When Copy tensor from L1 to L0ScaleB, src tensor must on L1");
         using DstLayout = typename T::layoutType;
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
-        using Tensor2Tensor = typename CopyL12L0ScaleBTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern,
+        using Tensor2Tensor = typename CopyL12L0ScaleBTensor2Tensor<CURRENT_ARCH_VERSION, DstPattern,
             SrcPattern, CopyMode::NORMAL>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
@@ -65,11 +67,13 @@ private:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
+        static_assert(Std::is_same_v<dstPos, Location::L0ScaleB>, "When Copy tensor from L1 to L0ScaleB, dst tensor must on L0ScaleB");
+        static_assert(Std::is_same_v<srcPos, Location::L1>, "When Copy tensor from L1 to L0ScaleB, src tensor must on L1");
         using DstLayout = typename T::layoutType;
         using SrcLayout = typename U::layoutType;
         using DstPattern = GetLayoutPattern<DstLayout>;
         using SrcPattern = GetLayoutPattern<SrcLayout>;
-        using Tensor2Tensor = typename CopyL12L0ScaleBTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION, DstPattern,
+        using Tensor2Tensor = typename CopyL12L0ScaleBTensor2Tensor<CURRENT_ARCH_VERSION, DstPattern,
             SrcPattern, CopyMode::NORMAL_COORD>::type;
         Tensor2Tensor::template Run<trait, T, U, Coord>(dst, src, coord);
     }
