@@ -12,7 +12,7 @@
 > [!TIP] 选择建议
 >
 > - 为了保障开发体验环境的质量，推荐用户基于**容器化技术**完成**环境准备**。
-> - 如不希望使用容器，也可在带NPU设备的主机上完成**环境准备**，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+> - 如不希望使用容器，也可在带NPU设备的主机上完成**环境准备**，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/cann/download)。
 > - 针对仅体验"编译安装本开源仓 + 仿真环境运行算子"的用户，不要求主机带NPU设备，可跳过安装NPU驱动和固件，直接安装CANN包，请参考[下载安装CANN包](#📥-下载安装cann包)。
 
 <!-- 待加入AI Agent使能的逻辑 -->
@@ -45,7 +45,7 @@
 
 1. 确认主机环境
 
-   - 是否已安装NPU驱动和固件，使用`npu-smi info`能够输出NPU相关信息，如没有安装，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/document/redirect/CannCommunityInstWizard)。
+   - 是否已安装NPU驱动和固件，使用`npu-smi info`能够输出NPU相关信息，如没有安装，请参考[CANN软件安装指南 - 在物理机上安装](https://www.hiascend.com/cann/download)。
    - 是否已安装Docker，使用`docker --version`能够输出Docker版本信息，如没有安装，请参考[Docker官方安装指南](https://docs.docker.com/engine/install/)。
 
 2. 下载CANN镜像
@@ -202,11 +202,12 @@ git clone https://gitcode.com/cann/asc-devkit.git
 > [!NOTE] 使用前须知
 > 如您使用**容器化技术**，容器中已为您安装好依赖，可跳过此步骤。
 
-以下为本开源仓源码编译和examples算子样例编译运行的基础依赖条件：
+以下为本开源仓源码编译和examples算子样例编译运行的基础依赖条件，您可参考仓库内[DevContainer Python依赖（以 Python 3.12 为例）](../.devcontainer/requirements.txt)：
 
 - python >= 3.9.0
 - gcc >= 7.3.0 / g++ >= 7.3.0 (注意：要求gcc与g++版本一致)
 - cmake >= 3.16.0
+- pkg-config >= 0.29.0
 
 ### ⚡ 编译安装<a name="compile&install"></a>
 

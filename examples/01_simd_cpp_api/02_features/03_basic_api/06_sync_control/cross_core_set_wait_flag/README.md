@@ -38,10 +38,11 @@
 ```
 ├── cross_core_set_wait_flag
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
+│   │   ├── gen_data.py              // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py         // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt               // 编译工程文件
+│   ├── data_utils.h                 // 数据读入写出函数
+│   ├── figures                      // 图示
 │   ├── cross_core_set_wait_flag.h   // Ascend C样例实现
 │   └── cross_core_set_wait_flag.asc // 调用样例以及结果校验
 ```
@@ -134,7 +135,7 @@
 ### 1. Cube与Vector融合计算场景
 #### 1.1 整体逻辑
 <p align="center">
-  <img src="img/融合场景_示意图.png" width="100%">
+  <img src="figures/融合场景_示意图.png" width="100%">
    </p>
 <p align="center">
 图1：Cube与Vector场景融合计算场景，整体计算逻辑示意图
@@ -162,7 +163,7 @@
         AscendC::CrossCoreSetFlag<2, PIPE_MTE3>(SYNC_AIV_AIC_FLAG);
 
 <p align="center">
-  <img src="img/融合场景_精度转换阶段.png" width="100%">
+  <img src="figures/融合场景_精度转换阶段.png" width="100%">
    </p>
 <p align="center">
 图2：精度转换阶段，模式2示意图
@@ -190,7 +191,7 @@ $$
         AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
 
 <p align="center">
-  <img src="img/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
+  <img src="figures/融合场景_分块矩阵乘与原子累加阶段.png" width="100%">
    </p>
 <p align="center">
 图3：分块矩阵乘与原子累加阶段，模式0示意图
@@ -210,7 +211,7 @@ $$
         ...
 
 <p align="center">
-  <img src="img/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
+  <img src="figures/融合场景_LeakyRelu运算与结果回写阶段.png" width="100%">
    </p>
 <p align="center">
 图4：LeakyRelu运算与结果回写阶段，模式2示意图
@@ -221,7 +222,7 @@ $$
 本样例设置NUM\_BLOCKS为8(8个AI Core)，每一个AI Core内AIC:AIV配比为2，即本样例总共起了8个AIC和16个AIV，AIV的BlockIdx范围为0\~15。
 如下图5所示，本样例中模式0和模式1计算逻辑几乎相同，区别仅在于参与同步的AIV数目：模式0时，全部的16个AIV参与同步；模式1时，仅有第二个AI Core中的2个AIV(BlockIdx=2和3)参与同步。因此，下一节将详细介绍模式0的整体逻辑，模式1就不再详细介绍。
 <p align="center">
-  <img src="img/纯aiv_模式1和模式0的区别.png" width="100%">
+  <img src="figures/纯aiv_模式1和模式0的区别.png" width="100%">
 </p>
 <p align="center">
 图5：纯AIV场景，模式0计算逻辑示意图
@@ -256,7 +257,7 @@ $$
             return;
         }
 <p align="center">
-  <img src="img/纯aiv_模式0示意图.png" width="100%">
+  <img src="figures/纯aiv_模式0示意图.png" width="100%">
 </p>
 <p align="center">
 图6：纯AIV场景，模式0计算逻辑示意图
@@ -278,7 +279,7 @@ if ASCEND_IS_AIV {
 ```
 (2) GetBlockIdx(获取当前核的index)在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2，因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
 
-(3) 样例采用静态tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+(3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 #### 3.2 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
@@ -291,7 +292,7 @@ if ASCEND_IS_AIV {
 ```
  (2) 模式 1 要求参与同步的 2个AIV 必须属于同一个AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的 GetBlockIdx=2、3 同属第 2 个 AI Core(下标从 1 开始)；若将GetBlockIdx改为 3 和 4(分别属于两个不同的AI Core)，程序将卡死。
 
- (3) 样例采用静态tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+ (3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 ## 编译运行
 

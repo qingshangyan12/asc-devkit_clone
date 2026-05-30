@@ -61,17 +61,18 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT，Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 
 - 执行结果  
   执行结果如下，说明执行成功。
+  
   ```bash
-  [Block (0/8)]: Hello World!!!
-  [Block (1/8)]: Hello World!!!
-  [Block (2/8)]: Hello World!!!
-  [Block (3/8)]: Hello World!!!
-  [Block (4/8)]: Hello World!!!
-  [Block (5/8)]: Hello World!!!
-  [Block (6/8)]: Hello World!!!
-  [Block (7/8)]: Hello World!!!
+  [AIV Block 0/8] Hello World!!!
+  [AIV Block 1/8] Hello World!!!
+  [AIV Block 2/8] Hello World!!!
+  [AIV Block 3/8] Hello World!!!
+  [AIV Block 4/8] Hello World!!!
+  [AIV Block 5/8] Hello World!!!
+  [AIV Block 6/8] Hello World!!!
+  [AIV Block 7/8] Hello World!!!
   ```

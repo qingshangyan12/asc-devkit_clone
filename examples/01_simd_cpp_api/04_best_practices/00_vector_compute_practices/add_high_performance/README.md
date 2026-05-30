@@ -27,6 +27,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   └── add.asc                 // Ascend C样例实现（包含7个优化case）
 ```
 
@@ -54,7 +55,7 @@ $$
 | 字段名 | 字段含义 |
 |:---:|:---|
 | Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-| aiv_time|Task在AI Vector Core上的理论执行时间，单位为μs。|
+| aiv_time|Task在AI Vector Core上的执行时间，单位为μs。|
 | aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位μs。 |
 | aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
@@ -202,7 +203,7 @@ if (blockIdxM < remainderM) {
 
 - 本样例选择 `M` 方向切48份（`splitM=48, splitN=1`），而不是 `M` 切8、`N` 切6，核心目的是保持每个核处理的数据在GM上连续，从而在分块循环中用单条 `DataCopy` 搬运 `dataCopyLen`
 
-  <img src="figure/SplitCoreM.png" width="50%">
+  <img src="figures/SplitCoreM.png" width="50%">
 
 **性能优化建议**：
 > 💡 **充分利用多核并行，采用均匀切分策略**
@@ -331,7 +332,7 @@ UB内存分配（双缓冲）：
 - **Ping-Pong机制**：
   - Ping缓冲区进行计算时，Pong缓冲区进行数据搬运
   - 交替执行，实现计算与搬运的流水线并行，如下图所示  
-    <img src="figure/DoubleBuffer.png" width="50%">
+    <img src="figures/DoubleBuffer.png" width="50%">
 
 **性能优化建议**：
 > 💡 **使用双缓冲实现搬运与计算并行**
@@ -423,7 +424,7 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 - 行方向切分48份，将数据均匀切分至48个核运算
 - `dataCopyLen = 16256` 为每次切分的数据量元素个数
 - 单次搬运操作`DataCopy`的数据量为 32512 Byte
-- 单次`Add`处理两个输入`Tensor`，处理的总数据量为 65204 Byte
+- 单次`Add`处理两个输入`Tensor`，处理的总数据量为 65024 Byte
 - 将待处理的数据一分为二，由此数据的进出搬运和Vector计算实现并行执行
 
 **内存布局优化**：
@@ -431,12 +432,12 @@ static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LE
 针对Atlas A2/A3 系列产品，UB的大小为192KB，包含16个Bank Group，每个Bank Group包含3个Bank，每个Bank大小为4KB，由128行组成，每行长度为32B。
 
 未优化前的UB Bank内存布局（即case5）
-<img src="figure/UBBankConflict.png" width="100%">
+<img src="figures/UBBankConflict.png" width="100%">
 
 可以看到这样同时存在一个bank内的读写冲突，一个bankgroup内的读读冲突以及写写冲突。
 
 优化后的UB Bank内存布局（case6）
-<img src="figure/UBBankConflictResolution.png" width="100%">
+<img src="figures/UBBankConflictResolution.png" width="100%">
 
 由于vec指令一拍读取256B的数据（即同时读取8个block的数据），如上图xping、yping的起始地址正好错开了256B，有效消解了ub bank冲突。
 
@@ -521,7 +522,7 @@ $$
 - $D_{read} = M \times N \times sizeof(half) \times 2$ 为总读数据量（x和y两个输入矩阵）
 - $D_{write} = M \times N \times sizeof(half)$ 为总写数据量（z输出矩阵）
 - $T_{mte2}$ 为 aiv_mte2_time（GM→UB搬运耗时，μs）
-- 开启双缓冲后，mte2 与 mte3 流水并行；从本样例数据看，Case 4-6 的 mte2 利用率分别为 97.3%、95.3%、95.2%，因此这里采用 $T_{mte2}$ 作为主路径时间进行估算
+- 开启双缓冲后，mte2 与 mte3 流水并行；从本样例数据看，Case 4-6 的 mte2 利用率分别为 97.3%、95.1%、96.1%，因此这里采用 $T_{mte2}$ 作为主路径时间进行估算
 
 以 Case 3 为例（$M=N=8192$，$T_{mte2}=184.369\mu s$）：
 $$
@@ -562,7 +563,7 @@ $$
 
 Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
-- 该理论值仅统计“纯Vector计算”时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_reatio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
+- 该理论值仅统计“纯Vector计算”时间，不包含数据搬运、事件同步、流水线调度等开销；而实测Case 5中 `aiv_vec_time=10.997μs`、Task Duration为 `182.04μs`，`aiv_mte2_ratio`高达98.3%，受限于带宽限制，说明端到端瓶颈不在纯计算本身。
 - Ascend 950系列 RegBase的主要收益来自“减少冗余Load/Store、寄存器复用、提升无依赖并发指令比例”。当前Add样例核心计算基本是单条Add，计算链较短、可融合/可双发空间有限，难以充分释放RegBase的优势。
 
 ### 优化要点总结
@@ -582,10 +583,10 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
 
 - 切换Case
 
-  在 cmake 编译时通过 `-DSCENARIO=N` 指定要编译的 case：
+  在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的 case：
 
   ```bash
-  cmake -DSCENARIO=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可替换为0-6）
+  cmake -DSCENARIO_NUM=6 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..   # 编译 case 6（可替换为0-6）
   ```
 
   各 case 说明：

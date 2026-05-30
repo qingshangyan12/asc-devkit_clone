@@ -4,7 +4,7 @@
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-|<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -13,7 +13,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline int64_t asc_get_vf_len()
+__aicore__ inline constexpr int64_t asc_get_vf_len()
 ```
 
 ## 参数说明

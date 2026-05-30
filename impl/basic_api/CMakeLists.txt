@@ -144,6 +144,7 @@ install(CODE "file(CREATE_LINK ../basic_api/kernel_type.h \${CMAKE_INSTALL_PREFI
 install(CODE "file(CREATE_LINK ../basic_api/kernel_basic_intf.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_basic_intf.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_cube_intf.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_cube_intf.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_vec_intf.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_vec_intf.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../basic_api/kernel_base_types.h \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_base_types.h SYMBOLIC)" COMPONENT asc-devkit)
 
 # 2 ascendc/include/basic_api
 if(NOT BUILD_OPEN_PROJECT)
@@ -255,6 +256,8 @@ if(NOT BUILD_OPEN_PROJECT)
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
         DIRECTORY ${ASCENDC_DIR}/impl/c_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
+        DIRECTORY ${ASCENDC_DIR}/impl/tensor_api
+        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/impl
 
         DIRECTORY ${ASCENDC_DIR}/include/basic_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
@@ -263,6 +266,8 @@ if(NOT BUILD_OPEN_PROJECT)
         FILES ${ASCENDC_DIR}/include/kernel_operator.h
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
         DIRECTORY ${ASCENDC_DIR}/include/c_api
+        DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
+        DIRECTORY ${ASCENDC_DIR}/include/tensor_api
         DESTINATION ${INSTALL_INCLUDE_DIR}/asc/include
 
         FILES ${ASCENDC_DIR}/include/utils/tiling/platform/platform_ascendc.h

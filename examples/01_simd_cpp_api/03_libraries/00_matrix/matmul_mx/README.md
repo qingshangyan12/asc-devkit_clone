@@ -13,11 +13,11 @@
 
 ```
 ├── matmul_mx
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   ├── gen_data.py            // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py       // 真值对比文件
+│   ├── CMakeLists.txt             // 编译工程文件
+│   ├── data_utils.h               // 数据读入写出函数
 │   └── matmul_mx.asc              // Ascend C样例实现 & 调用样例
 ```
 
@@ -41,7 +41,7 @@
   </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_mx_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulMxNormEvenCustom</td></tr>
   </table>
 
 - 样例实现： 

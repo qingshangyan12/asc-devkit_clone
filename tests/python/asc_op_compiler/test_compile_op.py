@@ -45,7 +45,7 @@ from asc_op_compile_base.asc_op_compiler.compile_op import _gen_kernel_func_decl
     _compile_ascendc_cce_v200_with_kernel_type, _dynamic_kernel_list_to_json, \
     _compile_ascendc_cce_v200_with_kernel_type_for_dynamic, _gen_dynamic_json_for_v200, \
     _gen_static_json_for_mix_v200, _gen_static_json_for_no_mix_v200, _gen_non_mix_sub_json, _gen_mix_json_from_seperate_json, \
-    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section
+    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section, _match_regex, _get_dcci_disable_cap_bitmap
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import call_bisheng_v220, get_ktype_section_variable, decode_mode, v220_mode, v310_mode
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v200 import call_bisheng_v200_static
@@ -4426,6 +4426,7 @@ auto __enable_feature_for_compile_deterministic = 1;
 
     def test_get_sync_task_start_end_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
         os.system(f"touch {dst_i_file}")
         with open(dst_i_file, "w") as file:
             context = """
@@ -4445,6 +4446,69 @@ WaitPreTaskEnd();
         self.assertEqual(res1, False)
         self.assertEqual(res2, False)
         os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
+
+    def test_get_sync_task_start_end_instr_from_i_file_with_template_args(self):
+        context = """
+__aicore__ inline void SetNextTaskStart();
+__aicore__ inline void WaitPreTaskEnd();
+AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+AscendC::WaitPreTaskEnd<true>();
+AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+AscendC::WaitPreTaskEnd<true>();
+"""
+        res1, res2 = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(context)
+        self.assertEqual(res1, True)
+        self.assertEqual(res2, True)
+
+    def test_infer_info_from_ifile_uses_shared_scan_for_aclgraph_early_start(self):
+        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'aclgraph_early_start.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
+        os.system(f"touch {dst_i_file}")
+        context = """
+template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
+__aicore__ inline void SetNextTaskStart();
+template<pipe_t AIV_PIPE, pipe_t AIC_PIPE, bool FORCE>
+__aicore__ inline void SetNextTaskStart()
+{
+    SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
+}
+template<bool FORCE = false>
+__aicore__ inline void WaitPreTaskEnd();
+template<bool FORCE>
+__aicore__ inline void WaitPreTaskEnd()
+{
+    WaitPreTaskEndImpl();
+}
+void add_custom();
+void add_custom()
+{
+    AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+    AscendC::WaitPreTaskEnd<true>();
+    AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+    AscendC::WaitPreTaskEnd<true>();
+}
+"""
+        with open(dst_i_file, "w") as file:
+            file.write(context)
+        op_info = OpInfo(kernel_name="AclgraphForceOp", op_type="AclgraphForceOp", inputs=[], outputs=[])
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        global_var_storage.set_variable("ascendc_compile_debug_config", True)
+        try:
+            with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+                ctx.add_addition("super_kernel_sub_combine", True)
+                with mock.patch.object(CommonUtility, "is_v220", return_value=False), \
+                     mock.patch.object(CommonUtility, "is_c310", return_value=False), \
+                     mock.patch.object(CommonUtility, "is_m510", return_value=True), \
+                     mock.patch.object(KernelInfoInfer, "_gen_tiling_key_struct_map", return_value={}):
+                    result = KernelInfoInfer.infer_info_from_ifile(op_info, dst_i_file, None,
+                                                                   "add_custom.cpp", "add_custom")
+            self.assertTrue(result.super_kernel_early_start_set_flag)
+            self.assertTrue(result.super_kernel_early_start_wait_flag)
+        finally:
+            global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+            global_var_storage.set_variable("ascendc_compile_debug_config", False)
+            if os.path.exists(dst_i_file):
+                os.remove(dst_i_file)
 
     def test_get_tiling_struct_size(self):
         compile_info = CompileInfo()
@@ -4957,6 +5021,110 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         tiling = DFXArgInfo("tiling", DFXParamType.TILING)
         DFXSectionGenerator().insert_param(tiling)
         DFXSectionGenerator().generate_dfx_section_without_tiling_register(tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name)
+
+    def test_match_regex_basic(self):
+        self.assertFalse(_match_regex("*abc", "abc"))
+        self.assertFalse(_match_regex("*", "test"))
+
+    def test_match_regex_exact_match(self):
+        self.assertTrue(_match_regex("abc", "abc"))
+        self.assertFalse(_match_regex("abc", "abd"))
+        self.assertFalse(_match_regex("abc", "abcd"))
+
+    def test_match_regex_dot(self):
+        self.assertTrue(_match_regex("a.c", "abc"))
+        self.assertTrue(_match_regex("a.c", "aac"))
+        self.assertTrue(_match_regex(".", "x"))
+        self.assertFalse(_match_regex("a.c", "ac"))
+
+    def test_match_regex_star(self):
+        self.assertTrue(_match_regex("ab*c", "ac"))
+        self.assertTrue(_match_regex("ab*c", "abc"))
+        self.assertTrue(_match_regex("ab*c", "abbbc"))
+        self.assertTrue(_match_regex("a*", ""))
+        self.assertTrue(_match_regex("a*", "aaa"))
+        self.assertFalse(_match_regex("ab*c", "adc"))
+
+    def test_match_regex_wildcard(self):
+        self.assertTrue(_match_regex(".*", "anything"))
+        self.assertTrue(_match_regex(".*", ""))
+        self.assertTrue(_match_regex("a.*b", "acb"))
+        self.assertTrue(_match_regex("a.*b", "a123b"))
+        self.assertFalse(_match_regex("a.*b", "abx"))
+
+    def test_match_regex_prefix_suffix(self):
+        self.assertTrue(_match_regex("abc.*", "abc"))
+        self.assertTrue(_match_regex("abc.*", "abcdef"))
+        self.assertTrue(_match_regex(".*abc", "abc"))
+        self.assertTrue(_match_regex(".*abc", "xyzabc"))
+        self.assertFalse(_match_regex("abc.*", "ab"))
+
+    def test_match_regex_complex(self):
+        self.assertTrue(_match_regex("a.*b.*c", "abc"))
+        self.assertTrue(_match_regex("a.*b.*c", "aXbYc"))
+        self.assertTrue(_match_regex("a*b*c*", "abc"))
+        self.assertTrue(_match_regex("a*b*c*", "aaabbbccc"))
+
+    def test_match_regex_empty(self):
+        self.assertTrue(_match_regex("", ""))
+        self.assertFalse(_match_regex("", "a"))
+        self.assertFalse(_match_regex("a", ""))
+
+    def test_get_dcci_disable_cap_bitmap_empty_patterns(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_patterns_not_list(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": "not_a_list"}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_patterns_empty_list(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": []}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_matched(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_a", "kernel_b"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_not_matched(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x", "kernel_y"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_wildcard_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_.*", ".*_test"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_abc"])
+        self.assertEqual(result, 4)
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["op_test"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_multi_symbols_first_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_b"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_multi_symbols_no_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_no_sp_options(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"other_option": "value"}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
 
 
 if __name__ == "__main__":

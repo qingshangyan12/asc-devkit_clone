@@ -35,8 +35,8 @@ constexpr bool IS_BIAS = false;
 constexpr uint32_t SINGLE_M = 2048;
 constexpr uint32_t SINGLE_M_SPLIT = 4096;
 constexpr uint32_t SINGLE_M_L2CACHE = 1024;
-
 constexpr uint32_t SINGLE_K = 8192;
+
 constexpr uint32_t BASE_N = 256;
 constexpr uint32_t BASE_K = 64;
 constexpr uint32_t TILING_DEPTHB1_PARAM = 8;
@@ -72,7 +72,7 @@ struct MatmulProblemShape {
 };
 
 template <typename TilingType>
-__aicore__ inline void CopyTiling(TilingType* tiling, GM_ADDR tilingGM)
+__aicore__ inline void CopyTiling(TilingType* tiling, __gm__ uint8_t* tilingGM)
 {
     uint32_t* ptr = reinterpret_cast<uint32_t*>(tiling);
     auto tiling32 = reinterpret_cast<__gm__ uint32_t*>(tilingGM);
@@ -86,7 +86,7 @@ class MatmulKernel {
 public:
     static constexpr auto MatmulConfig = isMdl ? CFG_MDL : CFG_NORM;
     __aicore__ inline MatmulKernel(){};
-    __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling);
+    __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias, __gm__ uint8_t* c, const TCubeTiling& tiling);
     __aicore__ inline void Process(AscendC::TPipe* pipe);
 
     AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
@@ -107,8 +107,8 @@ private:
 };
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool isMdl>
-__aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
-                                                                                GM_ADDR c, const TCubeTiling& tiling)
+__aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias,
+                                                                                __gm__ uint8_t* c, const TCubeTiling& tiling)
 {
     this->tiling = tiling;
     aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ AType*>(a), tiling.M * tiling.Ka);
@@ -131,6 +131,7 @@ __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Init(
 template <typename AType, typename BType, typename CType, typename BiasType, bool isMdl>
 __aicore__ inline void MatmulKernel<AType, BType, CType, BiasType, isMdl>::Process(AscendC::TPipe* pipe)
 {
+    // Case 0-5: 单次迭代完成当前核分片计算
     matmulObj.SetTensorA(aGlobal, IS_TRANS_A);
     matmulObj.SetTensorB(bGlobal, IS_TRANS_B);
     if (tiling.isBias) {
@@ -147,6 +148,7 @@ MatmulKernel<AType, BType, CType, BiasType, isMdl>::CalcOffset(int32_t blockIdx,
 {
     const TCubeTiling& tiling = this->tiling;
     auto mSingleBlocks = (tiling.M + tiling.singleCoreM - 1) / tiling.singleCoreM;
+    // blockIdx -> M/N方向分片索引
     auto mCoreIndx = blockIdx % mSingleBlocks;
     auto nCoreIndx = blockIdx / mSingleBlocks;
 
@@ -161,6 +163,7 @@ MatmulKernel<AType, BType, CType, BiasType, isMdl>::CalcOffset(int32_t blockIdx,
     offsetC = mCoreIndx * tiling.N * tiling.singleCoreM + nCoreIndx * tiling.singleCoreN;
     offsetBias = nCoreIndx * tiling.singleCoreN;
 
+    // M/N尾块处理
     int tailM = tiling.M - mCoreIndx * tiling.singleCoreM;
     tailM = tailM < tiling.singleCoreM ? tailM : tiling.singleCoreM;
     int tailN = tiling.N - nCoreIndx * tiling.singleCoreN;
@@ -174,7 +177,7 @@ template <typename AType, typename BType, typename CType, typename BiasType>
 class MatmulKernelL2Cache {
 public:
     __aicore__ inline MatmulKernelL2Cache(){};
-    __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, const TCubeTiling& tiling);
+    __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias, __gm__ uint8_t* c, const TCubeTiling& tiling);
     __aicore__ inline void Process(AscendC::TPipe* pipe);
 
     static constexpr auto MatmulConfig = CFG_MDL;
@@ -198,8 +201,8 @@ private:
 };
 
 template <typename AType, typename BType, typename CType, typename BiasType>
-__aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
-                                                                                 GM_ADDR c, const TCubeTiling& tiling)
+__aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias,
+                                                                                 __gm__ uint8_t* c, const TCubeTiling& tiling)
 {
     this->tiling = tiling;
     aGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ AType*>(a), tiling.M * tiling.Ka);
@@ -228,6 +231,7 @@ __aicore__ inline void MatmulKernelL2Cache<AType, BType, CType, BiasType>::Proce
         matmulObj.SetTail(tailM, tailN);
     }
 
+    // Case 6: L2Cache优化，A矩阵M轴切分为2份，B矩阵复用
     for (int i = 0; i < 2; i++) {
         matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
         matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
@@ -246,6 +250,7 @@ MatmulKernelL2Cache<AType, BType, CType, BiasType>::CalcOffset(int32_t blockIdx,
 {
     const TCubeTiling& tiling = this->tiling;
     constexpr uint32_t mSingleBlocks = 4;
+    // Case 6: M方向固定为4份，N方向由blockIdx展开
     mIdx = blockIdx % mSingleBlocks;
     nIdx = blockIdx / mSingleBlocks;
 
@@ -264,6 +269,7 @@ MatmulKernelL2Cache<AType, BType, CType, BiasType>::CalcOffset(int32_t blockIdx,
 template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitFlag = false>
 __aicore__ inline constexpr MatmulApiStaticTiling GetCustomConstantCFG()
 {
+    // Case 7/8: 编译期生成MatmulApiStaticTiling
     MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
     mmCFG.enUnitFlag = useUnitFlag;
     auto constantCFG = AscendC::GetMatmulApiTiling<AType, BType, CType, BiasType>(mmCFG);
@@ -280,7 +286,7 @@ template <typename AType, typename BType, typename CType, typename BiasType, boo
 class MatmulKernelMdlL2CacheConstant {
 public:
     __aicore__ inline MatmulKernelMdlL2CacheConstant(){};
-    __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR tiling);
+    __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias, __gm__ uint8_t* c, __gm__ uint8_t* tiling);
     __aicore__ inline void Process(AscendC::TPipe* pipe);
 
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
@@ -288,6 +294,7 @@ public:
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
     using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
 
+    // CONSTANT_CFG: 常量Tiling配置，减少运行时Scalar计算
     constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, useUnitFlag>();
     AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
     MatmulProblemShape shapes;
@@ -306,8 +313,8 @@ private:
 
 template <typename AType, typename BType, typename CType, typename BiasType, bool useUnitFlag>
 __aicore__ inline void
-MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Init(GM_ADDR a, GM_ADDR b, GM_ADDR bias,
-                                                                                   GM_ADDR c, GM_ADDR tiling)
+MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias,
+                                                                                   __gm__ uint8_t* c, __gm__ uint8_t* tiling)
 {
     CopyTiling(&shapes, tiling);
     if (AscendC::GetBlockIdx() >= shapes.usedCoreNum) {
@@ -341,6 +348,7 @@ MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasType, useUnitFlag>::Proc
         matmulObj.SetTail(tailM, tailN);
     }
 
+    // Case 7/8: 沿用L2Cache切分策略，循环2次
     for (int i = 0; i < 2; i++) {
         matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
         matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
@@ -358,6 +366,7 @@ __aicore__ inline void MatmulKernelMdlL2CacheConstant<AType, BType, CType, BiasT
 {
     auto blockIdx = AscendC::GetBlockIdx();
     constexpr uint32_t mSingleBlocks = 4;
+    // Case 7/8: M方向固定为4份，N方向由blockIdx展开
     mIdx = blockIdx % mSingleBlocks;
     nIdx = blockIdx / mSingleBlocks;
 

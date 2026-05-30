@@ -17,6 +17,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   └── mmad_mx.asc             // Ascend C 基础 API 样例实现
 ```
 
@@ -36,7 +37,7 @@ $$
 
 在MxMatmul中，K 方向每 32 个元素共享一个 scale。也就是说，scale 的数量远少于矩阵元素数量，但它会沿 K 方向广播到对应的一组 MxFP4 数据上，如图所示：
 
-  <img src="figure/MxMatmul.png"  width="80%">
+  <img src="figures/MxMatmul.png"  width="80%">
 
 ## 样例规格
 
@@ -63,11 +64,11 @@ $$
 
 - 四路输入的数据排布格式如下图所示：
 
-  <img src="figure/formatOfMx.png">
+  <img src="figures/formatOfMx.png">
 
 - 四路输入的搬运与计算如下图所示：
 
-  <img src="figure/InputOfMxMatmul.png">
+  <img src="figures/InputOfMxMatmul.png">
 
 ### 关键参数
 
@@ -247,7 +248,7 @@ AscendC::LocalTensor<fp4x2_e1m2_t> a2LocalPong(AscendC::TPosition::A2, L0_PINGPO
 time     |---------------------------------------------------------------------------->
 
 GM->L1   | A/B/scaleA/scaleB Ping | A/B/scaleA/scaleB Pong | A/B/scaleA/scaleB Ping |
-L1->L0                            | L0 Ping load --|       | L0 Pong load --|    
+L1->L0                            | L0 Ping load --|       | L0 Pong load --|
 Cube                                               | Mmad Ping ---|   | Mmad Pong ---|
 Fixpipe                                                           | fixpipe C ---
 ```
@@ -487,20 +488,23 @@ pip3 install en_dtypes==0.0.4
 
 请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
-- 默认路径，root 用户安装 CANN 软件包
-  ```bash
-  source /usr/local/Ascend/cann/set_env.sh
-  ```
+  - 默认路径，root用户安装CANN软件包
 
-- 默认路径，非 root 用户安装 CANN 软件包
-  ```bash
-  source $HOME/Ascend/cann/set_env.sh
-  ```
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
 
-- 指定路径 install_path，安装 CANN 软件包
-  ```bash
-  source ${install_path}/cann/set_env.sh
-  ```
+  - 默认路径，非root用户安装CANN软件包
+
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
 
 ### 样例执行
 
