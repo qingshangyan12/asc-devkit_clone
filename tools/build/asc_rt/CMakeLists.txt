@@ -39,6 +39,7 @@ target_compile_options(ascend_runtime_base PRIVATE
   -fvisibility-inlines-hidden
   -fvisibility=hidden
   -Werror
+  -g
 )
 
 target_link_libraries(ascend_runtime_base PRIVATE

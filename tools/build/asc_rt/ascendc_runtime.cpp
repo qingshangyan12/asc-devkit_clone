@@ -26,7 +26,32 @@
 #include "rt_external_kernel.h"
 #include "acl_rt.h"
 #include "ascendc_tool_log.h"
+#include <iostream>
+#include <iomanip> // 用于格式化输出
 
+void printHostArgsRaw(void* hostArgs, size_t argsSize) {
+    if (!hostArgs || argsSize == 0) {
+        std::cout << "HostArgs is empty or null." << std::endl;
+        return;
+    }
+
+    // 将 void* 强转为 unsigned char*（单字节指针）
+    unsigned char* bytePtr = static_cast<unsigned char*>(hostArgs);
+
+    std::cout << "--- HostArgs Raw Data (Size: " << argsSize << " bytes) ---" << std::endl;
+    
+    for (size_t i = 0; i < argsSize; ++i) {
+        // 以 2 位十六进制、大写、前导 0 的格式打印每一个字节
+        std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)bytePtr[i] << " ";
+        
+        // 每 16 个字节换一行，方便阅读
+        if ((i + 1) % 16 == 0) {
+            std::cout << std::endl;
+        }
+    }
+    std::cout << std::dec << std::endl; // 恢复成十进制输出，避免影响后续打印
+    std::cout << "------------------------------------------------" << std::endl;
+}
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -225,6 +250,8 @@ int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     uint32_t numBlocks, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
 {
     static SocVersion currentSoc = GetSocVersion();
+    printf("hostArgs %p, argsSize %zu\n", hostArgs, argsSize);
+    printHostArgsRaw(hostArgs, argsSize);
     if (currentSoc == SocVersion::ASCEND310P) {
         unsigned int curKernelType;
         ASCENDC_ASSERT_RTOK_RETVAL(AscendCFunctionGetMetaInfoKtype(funcHandle, &curKernelType));
