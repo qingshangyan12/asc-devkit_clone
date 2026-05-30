@@ -58,10 +58,10 @@
 - 样例实现：
 
   **硬件约束**：
-  - baseM/baseK/baseN必须满足16对齐（Cube单元单次计算的最小粒度为16×16）
-  - baseM/baseK/baseN必须能被singleCoreM/singleCoreK/singleCoreN整除
-  - singleCoreM/singleCoreK/singleCoreN必须能被M/K/N整除，不支持非整切场景
-  - Vector核数必须是Cube核数的2倍（`__mix__(1, 2)`模式要求）
+  - **baseM/baseK/baseN**（单次Cube计算子块大小）必须满足16对齐：因为Cube计算单元单次计算的最小粒度为16×16，所以子块大小必须是16的倍数
+  - **singleCoreM/singleCoreK/singleCoreN**（单核处理的矩阵分块大小）必须能被M/K/N整除：因为整矩阵需均匀切分到各核，若无法整除则会出现部分核多算或越界
+  - `__mix__(1,2)`模式下Vector核数必须是Cube核数的2倍：`__mix__(1,2)`表示1个Cube核配2个Vector核的混合模式，核数比例必须匹配
+  - Scenario 2（CV融合-UB直通）仅Ascend 950PR/Ascend 950DT支持，A2/A3架构仅支持Scenario 1（CV融合-GM中转）：UB直通依赖L0C→UB的直连硬件通路，该通路仅950PR/950DT具备；A2/A3架构L0C只能先搬回GM再由Vector读取
 
   **分核逻辑**：
 
