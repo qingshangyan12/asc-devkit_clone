@@ -22,27 +22,28 @@ ReduceMin接口用于从所有输入数据中找出最小值和最小值索引�
 
 ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算得到最小值和repeat内部索引，这些中间结果暂存于sharedTmpBuffer工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最小值和最小值索引。需要注意的是，每次repeat迭代获取的最小值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最小值索引。
 
-**图 1**  ReduceMin计算示意图<a id="fig1"></a>  
-![](../../../../figures/ReduceMin_scale.png "ReduceMin计算示意图")
+**图 1**  ReduceMin计算示意图<a id="fig1"></a>
+
+![ReduceMin计算示意图](../../../../figures/ReduceMin_scale.png "ReduceMin计算示意图")
 
 ## 函数原型
 
-- tensor前n个数据计算
+- tensor前n个数据计算：
 
     ```cpp
     template <typename T>
     __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex = 0)
     ```
 
-- tensor高维切分计算
-    - mask逐bit模式
+- tensor高维切分计算：
+    - mask逐bit模式：
 
         ```cpp
         template <typename T>
         __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
-    - mask连续模式
+    - mask连续模式：
 
         ```cpp
         template <typename T>
@@ -94,14 +95,14 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
 - 源操作数及sharedTmpBuffer的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足所需空间要求，详情请参考关键特性说明。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 - srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 - 如果存在多个最小值，该指令会将最小索引写入目的操作数。
 - dst结果存储顺序为最小值，最小值索引，若不需要索引，只会存储最小值。
 - 当输入类型是half的时候，只支持获取最大不超过65535（uint16_t能表示的最大值）的索引值。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
-- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，uint64_t/int64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，int64_t/uint64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用sharedTmpBuffer，可以直接传入src或者任意大小的sharedTmpBuffer。</cann-filter>
 
 <cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
@@ -110,17 +111,17 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
 
 </cann-filter>
 
-## 关键特性说明<a name="zh-cn_topic_0000002519944070_section36714374014"></a>
+## 关键特性说明
 
-**索引值需要强制类型转换**，详情请参考[RepeatReduce关键特性说明](./ReduceRepeat.md#关键特性说明)。
+- **索引值需要强制类型转换**，详情请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
 
-**sharedTmpBuffer最小所需空间设置**：与ReduceMax类似，详情请参考[ReduceMax关键特性说明](./ReduceMax.md#关键特性说明)。
+- **sharedTmpBuffer最小所需空间设置**：与ReduceMax类似，详情请参考[ReduceMax关键特性说明](./ReduceMax.md#关键特性说明)。
 
 ## 调用示例
 
 详细示例请参考[ReduceMin样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
 
-- tensor高维切分计算样例-mask连续模式
+- tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
@@ -128,7 +129,7 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
-- tensor高维切分计算样例-mask逐bit模式
+- tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
@@ -136,14 +137,14 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
-- tensor前n个数据计算样例
+- tensor前n个数据计算样例：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor前n个数据计算接口
     AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320, true);
     ```
 
-- <a name="li0437172884019"></a>tensor高维切分计算接口完整调用示例
+- <a name="li0437172884019"></a>tensor高维切分计算接口完整调用示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -170,7 +171,7 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     示例结果如下：
 
     ```cpp
-    输入数据(src_gm):
+    // 输入数据(src_gm)：
     [0.769    0.8584   0.1082   0.2715   0.1759   0.7646   0.6406   0.2944   0.4255   0.927    0.8022   0.04507  0.9688   0.919    0.3008   0.7144   0.3206   0.6753   0.8276
      0.3374   0.4636   0.3591   0.112    0.93     0.822    0.7314   0.01165  0.31     0.5586   0.2808   0.3997   0.04544  0.0931   0.8438   0.612    0.03052  0.3652   0.1153
      0.06213  0.12103  0.4421   0.8003   0.1583   0.845    0.125    0.6934   0.4592   0.871    0.573    0.4133   0.885    0.6875   0.2854   0.7007   0.1294   0.2092   0.3794
@@ -198,8 +199,8 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
      0.3643   0.7163   0.6484   0.4526   0.8096   0.2408   0.608    0.0215   0.7246   0.412    0.609    0.03342  0.653    0.0424   0.672    0.627    0.3025   0.9424   0.3784
      0.1012   0.4192   0.7695   0.7383   0.9395   0.06494  0.3027   0.11523  0.6035   0.1727   0.4048   0.932    0.4053   0.3528   0.8193   0.0355   0.01953  0.574    0.509
      0.1443   0.0848   0.568    0.8716   0.968    0.613    0.535    0.0389   0.84     0.0655   0.127    0.06104  0.526    0.504    0.4175   0.8027   0.482    0.304   ]
-    输出数据(dst_gm):
-    [0.01034,  2.104e-05], 2.104e-05需要使用reinterpret_cast方法转换得到索引值353
+    // 输出数据(dst_gm)：
+    [0.01034,  2.104e-05] // 2.104e-05需要使用reinterpret_cast方法转换得到索引值353
     ```
 
 - tensor前n个数据计算接口完整调用示例：
@@ -224,8 +225,8 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     示例结果如下：
 
     ```cpp
-    示例结果
-    输入数据(src_gm):
+    // 示例结果
+    // 输入数据(src_gm)：
     [0.556    0.5225   0.3623   0.214    0.556    0.0643   0.769    0.594    0.261    0.3652   0.911    0.924    0.386    0.3696   0.2296   0.5957   0.1709   0.79     0.8516
      0.341    0.705    0.728    0.8135   0.7534   0.5874   0.771    0.05835  0.7456   0.1049   0.3105   0.1729   0.9253   0.8003   0.918    0.5005   0.7744   0.688    0.6807
      0.1456   0.4136   0.1055   0.12054  0.275    0.3848   0.08405  0.3843   0.3218   0.6904   0.878    0.3706   0.3586   0.3518   0.429    0.7275   0.6123   0.8096   0.563
@@ -242,6 +243,6 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
      0.04547  1.       0.1208   0.5225   0.00935  0.4128   0.644    0.3826   0.6963   0.2942   0.007626 0.7144   0.609    0.3206   0.694    0.393    0.6265   0.6904   0.2487
      0.9478   0.798    0.891    0.8867   0.9414   0.395    0.11285  0.515    0.919    0.013855 0.749    0.5527   0.465    0.451    0.1458   0.59     0.893    0.0146   0.062
      0.06604  0.934    0.2242  ]
-    输出数据(dst_gm):
-    [0.00393,  4.3e-06], 4.3e-06需要使用reinterpret_cast方法转换得到索引值72
+    // 输出数据(dst_gm)：
+    [0.00393,  4.3e-06] // 4.3e-06需要使用reinterpret_cast方法转换得到索引值72
     ```

@@ -23,18 +23,19 @@
 ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8个DataBlock（每个DataBlock数据块内部地址连续，大小为32字节）进行计算，输出结果会连续写入目的地址。
 
 **图 1**  ReduceDataBlock归约示意图
-![](../../../../figures/ReduceDataBlock.png "ReduceDataBlock归约示意图")
+
+![ReduceDataBlock归约示意图](../../../../figures/ReduceDataBlock.png "ReduceDataBlock归约示意图")
 
 ## 函数原型
 
-- mask逐bit模式
+- mask逐bit模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
     __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
-- mask连续模式
+- mask连续模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
@@ -47,7 +48,7 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 
 | 参数名 | 描述 |
 | ------ | ---- |
-| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和<br>&bull; ReduceType::MAX：求最大值<br>&bull; ReduceType::MIN：求最小值 |
+| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和；<br>&bull; ReduceType::MAX：求最大值；<br>&bull; ReduceType::MIN：求最小值。 |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。 |
@@ -88,24 +89,11 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 ## 约束说明
 
 - 目的操作数与源操作数的数据类型需要保持一致。
-
 - 源操作数的对齐约束请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数起始地址的对齐约束与操作数数据类型有关，在half数据类型时需要保证16字节对齐，在float数据类型时需要保证32字节对齐。
-
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
-
-- dstRepStride, srcBlkStride, srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-
-<cann-filter npu-type = "A3,910b">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-</cann-filter>
-
-<cann-filter npu-type = "A3,910b">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据；当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-</cann-filter>
+- dstRepStride、srcBlkStride、srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据；当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 
 <cann-filter npu-type = "310b">
 
@@ -120,8 +108,9 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 - float数据类型只支持寄存器非饱和模式，half数据类型默认是寄存器非饱和模式。寄存器的非饱和/饱和模式具体配置方式参考[SetCtrlSpr(ISASI).md](../../系统变量访问/SetCtrlSpr(ISASI).md)。
     - 下图说明reduceType取ReduceType::SUM时，在饱和模式下half数据类型的计算过程。源操作数为$[60000,60000,-30000,100]$，首先$60000+60000$溢出，结果为$65504$，然后计算$-30000+100=-29900$，最后计算$65504-29900=35604$。
 
-    **图 3**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
-    ![](../../../../figures/vcgadd_overflow.png "ReduceDataBlock-ReduceType-SUM-饱和模式数值溢出情况处理说明")
+    **图 2**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
+
+    ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
 
 ## 关键特性说明
 
@@ -133,14 +122,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 2. data01和data02相加得到data001，data03和data04相加得到data002，...，data07和data08相加得到data004；
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
-**图 2**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
-![](../../../../figures/vcgadd_binary_add.png "ReduceDataBlock-ReduceType-SUM-求和示意图")
+**图 3**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
+
+![ReduceDataBlock<ReduceType::SUM>求和示意图](../../../../figures/vcgadd_binary_add.png "ReduceDataBlock<ReduceType::SUM>求和示意图")
 
 ## 调用示例
 
 本样例中只展示Compute流程中的部分代码。完整样例可参考[ReduceDataBlock系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
 
-- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask连续模式
+- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -149,15 +139,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
 
     ```cpp
-    输入数据src_gm:
+    // 输入数据src_gm：
     [1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 2, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
@@ -167,11 +157,11 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     1, 1, 1, 1, 1, 1, 1, 1,
     ]
 
-    输出数据dst_gm:
+    // 输出数据dst_gm：
     [2, 3, ..., 4]
     ```
 
-- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -180,15 +170,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
 
     ```cpp
-    输入数据src_gm:
+    // 输入数据src_gm：
     [1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 2, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
@@ -198,11 +188,11 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     1, 1, 1, 1, 1, 1, 1, 1,
     ]
 
-    输出数据dst_gm:
+    // 输出数据dst_gm：
     [2, 3, ..., 4]
     ```
 
-- `ReduceDataBlock<ReduceType::MIN>`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceDataBlock<ReduceType::MIN>`-tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -211,15 +201,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     AscendC::ReduceDataBlock<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
 
     ```cpp
-    输入数据src_gm:
+    // 输入数据src_gm：
     [10, 10, 10, 10, 10, 10, 10, 10,
     10, 10, 10, 2, 10, 10, 10, 10,
     10, 10, 10, 10, 10, 10, 10, 10,
@@ -229,11 +219,11 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     10, 4, 10, 10, 10, 10, 10, 10,
     ]
 
-    输出数据dst_gm:
+    // 输出数据dst_gm：
     [2, -3, ..., 4]
     ```
 
-- `ReduceDataBlock<ReduceType::SUM>`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceDataBlock<ReduceType::SUM>`-tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -242,15 +232,15 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     ReduceDataBlock<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
 
     ```cpp
-    输入数据src_gm:
+    // 输入数据src_gm：
     [1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
     2, 2, 2, 2, 2, 2, 2, 2,
@@ -259,6 +249,6 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
     3, 3, 3, 3, 3, 3, 3, 3,
     3, 3, 3, 3, 3, 3, 3, 3]
 
-    输出数据dst_gm:
+    // 输出数据dst_gm：
     [16, 32, ..., 48]
     ```

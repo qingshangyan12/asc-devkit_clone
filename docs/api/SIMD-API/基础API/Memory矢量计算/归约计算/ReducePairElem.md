@@ -21,18 +21,19 @@ ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）�
 例如，[a1, a2, a3, a4, a5, a6, ...]的求和结果为[a1+a2, a3+a4, a5+a6, ...]。计算过程如下图所示，灰色部分代表无效元素。
 
 **图 1**  `ReducePairElem<ReduceType::SUM>`示意图
-![](../../../../figures/ReducePairElem.png "ReducePairElem-ReduceType-SUM-示意图")
+
+![ReducePairElem<ReduceType::SUM>示意图](../../../../figures/ReducePairElem.png "ReducePairElem<ReduceType::SUM>示意图")
 
 ## 函数原型
 
-- mask逐bit模式
+- mask逐bit模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
     __aicore__ inline void ReducePairElem(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[],const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
     ```
 
-- mask连续模式
+- mask连续模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
@@ -85,9 +86,9 @@ ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）�
 
 - 操作数的起始地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
-- dstRepStride, srcBlkStride, srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- dstRepStride、srcBlkStride、srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 
 <cann-filter npu-type = "A3,910b,310b,310p,910">
 
@@ -101,7 +102,7 @@ ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）�
 
 本样例中只展示Compute流程中的部分代码。完整示例可参考[ReducePairElem样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/pair_reduce_sum)。
 
-- `ReducePairElem`-tensor高维切分计算样例-mask连续模式
+- `ReducePairElem` tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -110,12 +111,12 @@ ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     AscendC::ReducePairElem<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
-- `ReducePairElem`-tensor高维切分计算样例-mask逐bit模式
+- `ReducePairElem` tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // 设定mask为最多的128个全部元素参与计算
@@ -124,20 +125,20 @@ ReducePairElem接口根据模板参数reduceType，对相邻两个（奇偶）�
     int repeat = 1;
     // dstLocal: 目的操作数tensor
     // srcLocal: 源操作数tensor
-    // srcBlkStride = 1, 在一个repeat中，block间没有空隙。
-    // dstRepStride = 1, srcRepStride = 8, repeat间没有空隙。
+    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
+    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
     AscendC::ReducePairElem<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
     ```
 
 - 示例结果
 
     ```cpp
-    输入数据src_gm：
+    // 输入数据src_gm：
     [1, 1, 1, -1, 2, 2, -1, 2, 
      3, 3, 3, -1, 4, 4, -2, 4,
     ....
     ]
-    输出数据dst_gm：
+    // 输出数据dst_gm：
     [2, 0, 4, 1, 6, 2, 8, 2, 
     ....
     ]

@@ -14,7 +14,7 @@
 
 ## 功能说明
 
-头文件为：\#include "basic\_api/kernel\_operator\_vec\_reduce\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
 获取[ReduceMax](../ReduceMax.md)、[ReduceMin](../ReduceMin.md)接口的结果（最值以及对应的索引值），仅支持连续计算场景（repeatStride=8，blockStride=1）。计算结果以全局变量形式存储，可以随时调用获取。
 
@@ -22,7 +22,7 @@
 
 <cann-filter npu-type="950,A3,910b">
 
-以下函数原型仅支持:
+以下函数原型仅支持：
 
 <cann-filter npu-type="950">
 
@@ -51,11 +51,11 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
     
 </cann-filter>
 
-<cann-filter npu-type="910">
+<cann-filter npu-type="310p">
 
-以下函数原型仅支持
+以下函数原型仅支持：
 
-Atlas 训练系列产品
+Atlas 推理系列产品 AI Core
 
 - 获取[ReduceMax](../ReduceMax.md)、[ReduceMin](../ReduceMin.md)连续场景下的最大值与最小值。
 
@@ -91,10 +91,9 @@ Atlas 训练系列产品
 
 ## 约束说明
 
-- 针对Ascend 950PR/Ascend 950DT，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[ReduceRepeat](../ReduceRepeat.md)接口来获取准确的索引值。同时，GetReduceRepeatMaxMinSpr必须紧跟着[ReduceRepeat](../ReduceRepeat.md)接口进行调用。
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[ReduceRepeat](../ReduceRepeat.md)接口来获取准确的索引值。
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[ReduceRepeat](../ReduceRepeat.md)接口来获取准确的索引值。
-- 索引maxMinIndex数据\`是按照ReduceMax/ReduceMin的数据类型进行存储的，比如ReduceMax/ReduceMin使用half类型时，maxMinIndex是按照half类型进行存储的，如果按照half格式进行读取，maxMinIndex的值是不对的，因此maxMinIndex的读取需要使用reinterpret\_cast方法转换到整数类型，若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。
+- <cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，由于ReduceMax/ReduceMin的内部实现原因，直接调用`GetReduceRepeatMaxMinSpr`接口无法获取到准确的索引值，验证时需要使用[ReduceRepeat](../ReduceRepeat.md)接口来获取准确的索引值。同时，`GetReduceRepeatMaxMinSpr`必须紧跟着[ReduceRepeat](../ReduceRepeat.md)接口进行调用。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，由于ReduceMax/ReduceMin的内部实现原因，直接调用`GetReduceRepeatMaxMinSpr`接口无法获取到准确的索引值，验证时需要使用[ReduceRepeat](../ReduceRepeat.md)接口来获取准确的索引值。</cann-filter>
+- 索引maxMinIndex数据是按照ReduceMax/ReduceMin的数据类型进行存储的，比如ReduceMax/ReduceMin使用half类型时，maxMinIndex是按照half类型进行存储的，如果按照half格式进行读取，maxMinIndex的值是不对的，因此maxMinIndex的读取需要使用reinterpret\_cast方法转换到整数类型，若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。
 - 操作数数据类型T，需要与所使用的ReduceMax/ReduceMin指令的操作数数据类型一致，否则会导致精度错误。<!-- TODO 待测试 -->
 
 ## 调用示例
@@ -113,50 +112,50 @@ Atlas 训练系列产品
 
 2. 获取上述ReduceMax指令的最值与索引值。
 
-    针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要使用ReduceRepeat指令获取准确的索引值，然后再调用GetReduceRepeatMaxMinSpr指令。
+    <cann-filter npu-type="950">
 
-    ```cpp
-    AscendC::LocalTensor<float> src;
-    AscendC::LocalTensor<float> dst;
-    int32_t mask = 64;
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-    float val = 0;   // 最大值
-    float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同，保证和ReduceRepeat的调用次序，而且要配对调用
-    AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx);
-    ```
+    - 针对Ascend 950PR/Ascend 950DT，需要先执行ReduceRepeat指令，随后立即调用`GetReduceRepeatMaxMinSpr`指令。
 
-    针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，需要使用ReduceRepeat指令获取准确的索引值，然后再调用GetReduceRepeatMaxMinSpr指令。
+        ```cpp
+        AscendC::LocalTensor<float> src;
+        AscendC::LocalTensor<float> dst;
+        int32_t mask = 64;
+        float val = 0;   // 最大值
+        float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同
+        AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
+        AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceRepeat的调用次序，而且要配对调用
+        ```
 
-    ```cpp
-    AscendC::LocalTensor<float> src;
-    AscendC::LocalTensor<float> dst;
-    int32_t mask = 64;
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-    float val = 0;   // 最大值
-    float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同，保证和ReduceRepeat的调动次序，而且要配对调用
-    AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx);
-    ```
+    </cann-filter>
 
-    针对Atlas推理系列产品AI Core版本，则可在调用ReduceMax后直接调用GetReduceRepeatMaxMinSpr指令获取其最大/最小值。
+    <cann-filter npu-type = "A3,910b">
 
-    ```cpp
-    AscendC::LocalTensor<float> src;
-    AscendC::LocalTensor<float> work;
-    AscendC::LocalTensor<float> dst;
-    int32_t mask = 64;
-    AscendC::ReduceMax(dst, src, work, mask, 1, 8, true);
-    float val = 0;   // 最大值
-    AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceMax的调动次序，而且要配对调用
-    ```
+    - <cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，需要使用ReduceRepeat指令获取准确的索引值，然后再调用`GetReduceRepeatMaxMinSpr`指令。
 
-    针对Ascend 950PR/Ascend 950DT，需要先执行ReduceRepeat指令，随后立即调用GetReduceRepeatMaxMinSpr指令。
+        ```cpp
+        AscendC::LocalTensor<float> src;
+        AscendC::LocalTensor<float> dst;
+        int32_t mask = 64;
+        AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
+        float val = 0;   // 最大值
+        float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同，保证和ReduceRepeat的调用次序，而且要配对调用
+        AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx);
+        ```
 
-    ```cpp
-    AscendC::LocalTensor<float> src;
-    AscendC::LocalTensor<float> dst;
-    int32_t mask = 64;
-    float val = 0;   // 最大值
-    float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同
-    AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-    AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceRepeat的调动次序，而且要配对调用
-    ```
+    </cann-filter>
+
+    <cann-filter npu-type="310p">
+
+    - 针对Atlas 推理系列产品 AI Core版本，则可在调用ReduceMax后直接调用`GetReduceRepeatMaxMinSpr`指令获取其最大/最小值。
+
+        ```cpp
+        AscendC::LocalTensor<float> src;
+        AscendC::LocalTensor<float> work;
+        AscendC::LocalTensor<float> dst;
+        int32_t mask = 64;
+        AscendC::ReduceMax(dst, src, work, mask, 1, 8, true);
+        float val = 0;   // 最大值
+        AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceMax的调用次序，而且要配对调用
+        ```
+
+    </cann-filter>

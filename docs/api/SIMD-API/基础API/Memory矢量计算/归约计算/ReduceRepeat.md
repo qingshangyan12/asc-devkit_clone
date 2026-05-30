@@ -49,7 +49,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 | 参数名 | 描述 |
 | --- | --- |
-| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和<br>&bull; ReduceType::MAX：求最大值<br>&bull; ReduceType::MIN：求最小值 |
+| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和；<br>&bull; ReduceType::MAX：求最大值；<br>&bull; ReduceType::MIN：求最小值。 |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。 |
@@ -112,24 +112,23 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 源操作数的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[表3](#tab3)。
-- dstRepStride, srcBlkStride, srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- dstRepStride、srcBlkStride、srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 
-<cann-filter npu-type = "A3,910b">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-</cann-filter>
-
-<cann-filter npu-type = "A3,910b">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-</cann-filter>
-
-**归约操作类型取MAX/MIN时的约束：**
+**归约操作类型取MAX或MIN时的约束：**
 
 - 如果存在多个最值，该指令会将最小索引写入目的操作数。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型，请参考[关键特性说明](#关键特性说明)。
+- 不同芯片支持的`ReduceOrder`如下：
+  - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
+  - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持ORDER_VALUE_INDEX、ORDER_ONLY_VALUE。</cann-filter>
+  - <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
+  - <cann-filter npu-type = "910">Atlas 训练系列产品，支持ORDER_VALUE_INDEX。</cann-filter>
+  - <cann-filter npu-type = "x90">Kirin X90，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
+  - <cann-filter npu-type = "9030">Kirin 9030，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
 
 **表 3**  地址对齐和步长单位
 
@@ -167,8 +166,8 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     <cann-filter npu-type = "950">
 
     特别地
-    - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，当操作数数据类型为uint16_t，int16_t，half时，读取index都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
-    - 针对<cann-filter npu-type = "A3,910b">Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，读取索引值index时都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
+    - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，当操作数数据类型为int16_t，uint16_t，half时，读取index都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
+    - <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，读取索引值index时都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
 
     </cann-filter>
 
@@ -178,7 +177,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 完整示例可参考[ReduceRepeat样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
 
-- `ReduceRepeat<ReduceType::MAX>`-tensor高维切分计算样例-mask连续模式
+- `ReduceRepeat<ReduceType::MAX>` tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -196,7 +195,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
 
-- `ReduceRepeat<AscendC::ReduceType::MAX`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceRepeat<AscendC::ReduceType::MAX>` tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -220,7 +219,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     示例结果如下：
 
     ```cpp
-    输入数据src_gm：
+    // 输入数据src_gm：
     [1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
      1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
      1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
@@ -247,22 +246,24 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
      3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3
      3   3   3   3   3   3   3   3   3   3   3   3   3   3   3   3]
 
-    若ReduceOrder类型为ORDER_VALUE_INDEX或默认，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_VALUE_INDEX或默认，则输出数据dst_gm：
     [11 3.09944e-06 12 5.96046e-06 ... 13 1.13249e-06]
-    若ReduceOrder类型为ORDER_INDEX_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_INDEX_VALUE，则输出数据dst_gm：
     [3.09944e-06 11 5.96046e-06 12 ... 1.13249e-06 13]
-    若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
     [11 12 ... 13 0 0 0 ...]
-    若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
     [3.09944e-06 0 5.96046e-06 0 ... 1.13249e-06 0]
 
+    /**
     其中，index的值为int数值的二进制，在half中的表达，以上述结果为例：
     前128个数中，11的位置在对应的repeat中为52，十六进制为0x3400，对应half值为3.09944e-06。
     第二个128个数中，12的位置在对应的repeat中为100，十六进制为0x6400，对应half值为5.96046e-06。
     最后128个数中，13的位置在对应的repeat中为19，十六进制为0x1300，对应half值为1.13249e-06。
+    */
     ```
 
-- `ReduceRepeat<AscendC::ReduceType::MIN`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceRepeat<AscendC::ReduceType::MIN>` tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -285,7 +286,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     示例结果如下：
 
     ```cpp
-    输入数据src_gm：
+    // 输入数据src_gm：
     [10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10
     10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10
     10   10   10   10   10   10   10   10   10   10   10   10   10   10   10   10
@@ -312,22 +313,22 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30
     30   30   30   30   30   30   30   30   30   30   30   30   30   30   30   30]
 
-    若ReduceOrder类型为ORDER_VALUE_INDEX或默认，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_VALUE_INDEX或默认，则输出数据dst_gm：
     [1 3.09944e-06 2 5.96046e-06 ... 3 1.13249e-06]
-    若ReduceOrder类型为ORDER_INDEX_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_INDEX_VALUE，则输出数据dst_gm：
     [3.09944e-06 1 5.96046e-06 2 ... 1.13249e-06 3]
-    若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
     [1 2 ... 3 0 0 0 ...]
-    若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
+    // 若ReduceOrder类型为ORDER_ONLY_VALUE，则输出数据dst_gm：
     [3.09944e-06 0 5.96046e-06 0 ... 1.13249e-06 0]
 
-    其中，index的值为int数值的二进制，在half中的表达，以上述结果为例：
-    前128个数中，11的位置在对应的repeat中为52，十六进制为0x3400，对应half值为3.09944e-06。
-    第二个128个数中，12的位置在对应的repeat中为100，十六进制为0x6400，对应half值为5.96046e-06。
-    最后128个数中，13的位置在对应的repeat中为19，十六进制为0x1300，对应half值为1.13249e-06。
+    // 其中，index的值为int数值的二进制，在half中的表达，以上述结果为例：
+    // 前128个数中，11的位置在对应的repeat中为52，十六进制为0x3400，对应half值为3.09944e-06。
+    // 第二个128个数中，12的位置在对应的repeat中为100，十六进制为0x6400，对应half值为5.96046e-06。
+    // 最后128个数中，13的位置在对应的repeat中为19，十六进制为0x1300，对应half值为1.13249e-06。
     ```
 
-- `ReduceRepeat<ReduceType::SUM`-tensor高维切分计算样例-mask逐bit模式
+- `ReduceRepeat<ReduceType::SUM>` tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
