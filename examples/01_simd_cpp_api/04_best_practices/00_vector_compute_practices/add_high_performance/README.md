@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以加法为例，介绍基于静态Tensor方式编程的性能调优方法。整个调优过程分为七个步骤（case 0-6），逐步展示从标量运算到向量运算、从单核到多核、从基础实现到深度优化的完整调优路径。
+本样例以加法为例，介绍基于静态[Tensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)方式编程的性能调优方法。整个调优过程分为七个步骤（case 0-6），逐步展示从标量运算到向量运算、从单核到多核、从基础实现到深度优化的完整调优路径。
 
 **优化路径**：
 - Case 0: 单核标量版本（基准）
@@ -47,6 +47,13 @@ $$
   - y：输入，形状为[8192, 8192]，数据类型为half；
   - z：输出，形状为[8192, 8192]，数据类型为half；
 
+**硬件约束**：
+- DataCopy搬运数据量需满足32B对齐（即元素个数需为32B/sizeof(dataType)的整数倍，half类型需16个元素对齐）
+- 双缓冲场景下UB需同时容纳x/y/z的Ping-Pong共6块缓冲区，Atlas A2/A3系列单块上限为`192KB/6=32KB`（即16384个half），Ascend 950系列单块上限为`256KB/6≈42.67KB`（即约21840个half）
+- 多核切分时需保证每核处理的数据行数可被整除，否则需通过余数分配策略处理
+- 避免Bank Conflict时，dataCopyLen需调整为使vec指令一拍访存数据分布在不同Bank Group（如Atlas A2/A3上从16384调整为16256）
+- 搬运粒度和计算粒度推荐对齐到512B，以获得更稳定的性能表现
+
 ## 样例实现
 
 ### 性能指标说明
@@ -55,15 +62,15 @@ $$
 | 字段名 | 字段含义 |
 |:---:|:---|
 | Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-| aiv_time|Task在AI Vector Core上的执行时间，单位为μs。|
-| aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位μs。 |
+| aiv_time|Task在[AI Vector Core](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)上的执行时间，单位为μs。|
+| aiv_vec_time(μs) | vec类型指令（[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)向量类运算指令）耗时，单位μs。 |
 | aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
-| aiv_scalar_ratio | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte2_time(μs) | mte2类型指令（GM->UB搬运类指令）耗时，单位μs。 |
-| aiv_mte2_ratio | mte2类型指令（GM->UB搬运类指令）的cycle数在total cycle数中的占用比。 |
-| aiv_mte3_time(μs) | mte3类型指令（UB->GM搬运类指令）耗时，单位μs。 |
-| aiv_mte3_ratio | mte3类型指令（UB->GM搬运类指令）的cycle数在total cycle数中的占用比。 |
+| aiv_scalar_ratio | scalar类型指令的cycle数在total cycle数中的占用比。 |
+| aiv_mte2_time(μs) | mte2类型指令（[MTE2](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)引擎执行的[GM→UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)搬运类指令）耗时，单位μs。 |
+| aiv_mte2_ratio | mte2类型指令的cycle数在total cycle数中的占用比。 |
+| aiv_mte3_time(μs) | mte3类型指令（[MTE3](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)引擎执行的UB→GM搬运类指令）耗时，单位μs。 |
+| aiv_mte3_ratio | mte3类型指令的cycle数在total cycle数中的占用比。 |
 
 本章节性能数据在Atlas A2训练系列产品上运行得到。
 
@@ -157,6 +164,8 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 - 需要通过多核并行和增大搬运粒度来提升带宽利用率
 
 ---
+
+### 中级性能优化
 
 ### Case 2: 多核均匀切分 + 小块搬运
 
@@ -264,7 +273,7 @@ if (blockIdxM < remainderM) {
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBuffer()` 函数实现
 
-采用双缓冲（Double Buffer）技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。
+采用双缓冲（[Double Buffer](../../../../../docs/guide/技术附录/概念原理和术语/性能优化技术原理/DoubleBuffer.md)）技术，实现数据搬运与计算的流水线并行，隐藏内存访问延迟。
 
 **关键代码**：
 ```cpp
@@ -346,11 +355,13 @@ UB内存分配（双缓冲）：
 - 可尝试L2 Cache优化来提升搬运效率
 ---
 
+### 高级极限打磨
+
 ### Case 5: 双缓冲 + L2 Cache bypass
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferL2Bypass()` 函数实现（在该函数内部先设置 `SetL2CacheHint(CACHE_MODE_DISABLE)`，再调用 `ProcessDoubleBuffer()`）
 
-在双缓冲基础上，对于只需要载入一次的数据量可以设置L2 Cache bypass，直接从GM载入UB。
+在双缓冲基础上，对于只需要载入一次的数据量可以设置[SetL2CacheHint](../../../../../docs/api/SIMD-API/基础数据结构/GlobalTensor/SetL2CacheHint.md)(CACHE_MODE_DISABLE)，使数据绕过L2 Cache直接从[GM](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)载入[UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)。之所以需要bypass L2 Cache，是因为Add的输入数据只读取一次、不存在数据复用，若仍经过L2 Cache反而会占用Cache空间、污染其他可能复用的数据，增加额外开销。
 
 **关键代码**：
 ```cpp
@@ -403,7 +414,7 @@ UB内存分配（双缓冲）：
 
 **实现方式**：参考 `KernelAdd::ProcessDoubleBufferBankConflict()` 函数实现
 
-在双缓冲+L2 Cache bypass基础上，优化内存地址布局，避免UB（Unified Buffer）的Bank Conflict，实现最优性能。
+在双缓冲+L2 Cache bypass基础上，优化内存地址布局，避免UB（[Unified Buffer](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)）的[Bank Conflict](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免UB的bank冲突.md)，实现最优性能。
 
 **关键代码**：
 ```cpp
@@ -648,7 +659,39 @@ Ascend 950系列未达到理论vector耗时峰值的原因如下：
   test pass!
   ```
 
-## 性能分析
+---
+
+## 功能调试
+
+### printf
+
+该接口提供CPU域/NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("add blockIdx=%d\n", AscendC::GetBlockIdx());
+```
+
+> **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0的方式关闭打印功能。
+
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+// 向量计算: z = x + y
+AscendC::Add(zLocal, xLocal, yLocal, curLen);
+AscendC::DumpTensor(zLocal, 0, 16);
+```
+
+> **注意：** DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+
+## 性能调试
 
 使用 `msprof` 工具获取详细性能数据：
 
