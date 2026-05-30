@@ -52,13 +52,6 @@
     - 样例使用[静态Tensor编程方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)，通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)创建[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)。
     - `CUBE_BLOCK = 16`表示half数据类型分形为`16 x 16`，代码中按`16 x 16`的分形为单位进行[LoadData](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)搬运。
 
-  - 数据流路径
-
-    ```
-    GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──(Cube, Mmad)──> L0C ──(Fixpipe)──> GM
-    ```
-    ![Cube计算单元数据访问](../../../../../docs/guide/figures/Cube计算单元数据访问.png)
-
   - Kernel侧详细流程
     - 创建[`GlobalTensor`]((https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md))`<half>`对象`aGM`、`bGM`、`cGM`，分别表示[GM（Global Memory，全局内存）](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)中的A、B、C矩阵。
     - 通过[AscendC::GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)获取当前核号，并计算`mIterIdx`。本样例只沿M轴切分任务，因此每个核只需要处理A矩阵和C矩阵中属于自己的M轴分片。
@@ -88,7 +81,7 @@
 
   以下结构体均以花括号`{}`方式传参，各字段含义如下（字段顺序与API文档保持一致，实际struct声明中部分字段顺序可能不同）：
 
-  **[`AscendC::Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)** — [`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)接口使用，描述ND→NZ格式转换参数：
+  **[`AscendC::Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)** — [`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)接口使用，描述ND→Nz格式转换参数：
   ```cpp
   struct Nd2NzParams {
       int32_t  ndNum;              // 传输ND矩阵的数目，[0, 4095]
@@ -282,11 +275,8 @@ cat ./OPPROF_*/OpSummary.csv
 
 #### 仿真性能采集
 
-使用msprof op simulator可以在无NPU环境下通过仿真获取算子性能数据：
+使用msopprof simulator开启算子仿真调优功能，并配合使用仿真可选参数和用户待调优程序（blockdim 1）进行调优。参考[msopprof simulator模式用户指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/user_guide/msopprof_simulator_user_guide.md#命令参考 )。仿真可选参数请参考[表 1 msopprof simulator可选参数说明](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/user_guide/msopprof_simulator_user_guide.md#simulator可选参数说明)。参考[《芯片SoC类型获取方法》](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/get_chip_soc_type.md)获取芯片类型，作为如下参数 --soc-version 的值。具体命令示例如下：
 
 ```bash
-msprof op simulator ./demo
+msprof op simulator --soc-version=Ascendxxxyy --output=/home/projects/output /home/projects/MyApp/out/main blockdim 1   # --output为可选参数,/home/projects/MyApp/out/main为使用的app,blockdim 1为用户app的可选参数,xxxyy为用户实际使用的具体芯片类型
 ```
-
-> **注意：** 仿真模式需使用`-DCMAKE_ASC_RUN_MODE=sim`编译。
-更多msProf工具使用方式请参考[MindStudio工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)算子调优（msOpProf）中的内容。
