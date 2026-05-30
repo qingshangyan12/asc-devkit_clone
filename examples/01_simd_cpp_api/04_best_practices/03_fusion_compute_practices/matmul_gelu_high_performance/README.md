@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
+本样例基于静态Tensor编程范式，展示了[Cube](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)-[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将结果输出到[GM](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)或[UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
 ## 支持的产品
 
@@ -40,6 +40,12 @@ $$
 
 - 样例规格：
 
+**硬件约束**：
+- **baseM/baseK/baseN**（单次Cube计算子块大小）必须满足16对齐：因为Cube计算单元单次计算的最小粒度为16×16，所以子块大小必须是16的倍数
+- **singleCoreM/singleCoreK/singleCoreN**（单核处理的矩阵分块大小）必须能被M/K/N整除：因为整矩阵需均匀切分到各核，若无法整除则会出现部分核多算或越界
+- `__mix__(1,2)`模式下Vector核数必须是Cube核数的2倍：`__mix__(1,2)`表示1个Cube核配2个Vector核的混合模式，核数比例必须匹配
+- Scenario 2（CV融合-UB直通）仅Ascend 950PR/Ascend 950DT支持，A2/A3架构仅支持Scenario 1（CV融合-GM中转）：UB直通依赖L0C→UB的直连硬件通路，该通路仅950PR/950DT具备；A2/A3架构L0C只能先搬回GM再由Vector读取
+
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul + GELU</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
@@ -48,6 +54,9 @@ $$
 <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float32</td><td align="center">ND</td><td align="center">-</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">mmad_vector_custom</td></tr>
 </table>
+
+> **format字段说明**：
+> - **ND**：[普通数据排布格式](../../../../../docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)，数据在内存中按原始逻辑维度连续排列，是GM侧输入输出的默认格式。
 
 ## 样例实现
 
@@ -82,17 +91,15 @@ $$
 
 **Scenario 1：CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
 
-```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
-```
+数据流向：`GM ──([MTE2](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md))──> L1 ──([MTE1](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md))──> L0A/L0B ──([Cube](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md))──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──([MTE3](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md))──> GM`
+
+AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
 
 **Scenario 2：CV融合-UB直通**（仅Ascend 950PR支持）
 
-Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算
+Ascend 950PR新增L0C→UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算，省去GM中转的MTE2搬运开销。
 
-```
-GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
-```
+数据流向：`GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM`
 
 ### 核心特性
 
@@ -130,7 +137,7 @@ if ASCEND_IS_AIV {
 
 #### 2. 跨核同步：AIC→AIV 数据就绪通知
 
-AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `CrossCoreSetFlag` 通知AIV侧数据已就绪；AIV侧通过 `CrossCoreWaitFlag` 等待该信号，然后开始GELU计算：
+AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 [CrossCoreSetFlag](../../../../../docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md) 通知AIV侧数据已就绪（该接口用于同一AI Core内AIC与AIV核之间的信号通知，AIC侧设置标志后AIV侧可感知）；AIV侧通过 [CrossCoreWaitFlag](../../../../../docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) 等待该信号（该接口阻塞等待直到AIC侧设置对应标志），然后开始GELU计算：
 
 ```cpp
 // AIC侧 CopyOutAic():
@@ -139,6 +146,8 @@ AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 // AIV侧 GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
 AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 ```
+
+### 中级性能优化
 
 #### 3. Scenario 1：CV融合-GM中转
 
@@ -321,7 +330,6 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 ![Scenario2 CV融合-UB直通流水并行](figures/CVParallell_L0C_UB.png)
 
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
@@ -386,24 +394,65 @@ uint32_t nIterIdx = logicCoreId / mIter;
   ```bash
   test pass!
   ```
+  
+## 功能调试
 
-### 性能分析
+### printf
+
+该接口提供CPU域/NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("AIC core: blockIdx=%d\n", AscendC::GetBlockIdx());
+
+AscendC::printf("AIV core: blockIdx=%d\n", AscendC::GetBlockIdx());
+```
+
+> **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0的方式关闭打印功能。
+
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+// AIC侧：Dump L0C结果
+AscendC::Fixpipe(...);
+AscendC::DumpTensor(cLocal, 1, 16);
+
+// AIV侧：Dump GELU计算结果
+GeluCompute(xUB, geluOutUB, computeLen);
+AscendC::DumpTensor(geluOutUB, 2, 16);
+```
+
+> **注意：** DumpTensor接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+
+### 性能调试
 
 使用 `msprof` 工具获取详细性能数据：
 
 ```bash
-msprof ./demo   # 分析样例性能
+msprof ./demo   # 分析性能
 ```
 
-当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存 Host 和各个 Device 的性能数据汇总，性能数据分析推荐查看该目录下文件：
+当前目录下会生成PROF_前缀的文件夹，`mindstudio_profiler_output`目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件
 
 ```bash
 PROF_xxxx_XXXXXX
 ├── device_{id}
 └── host
 └── mindstudio_profiler_log
-└── mindstudio_profiler_output    # 保存 Host 和各个 Device 的性能数据汇总
+└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt
+```
+查看具体的性能分析结果：
+```
+# 查看Task Duration 以及各项数据
+cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```
