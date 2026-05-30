@@ -13,12 +13,12 @@ set -euo pipefail
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
-SKILL_DIR="${SKILL_DIR:-${REPO_ROOT}/.agent/skills/gitcode-pr}"
-SKILL_FILE="${SKILL_DIR}/SKILL.md"
-SCRIPT_FILE="${SKILL_DIR}/scripts/create_pr.py"
-PR_API_SCRIPT="${SKILL_DIR}/scripts/pr_api.py"
-TEMPLATE_FILE="${SKILL_DIR}/assets/pr_template.md"
-REFERENCE_FILE="${SKILL_DIR}/references/gitcode_api.md"
+SKILLS_DIR="${REPO_ROOT}/.agent/skills"
+SKILL_LINK="${SKILLS_DIR}/gitcode-pr"
+REMOTE_SKILL="${SKILLS_DIR}/_remote/gitcode-pr"
+DEFAULT_SKILL_DIR="${SKILLS_DIR}/default-skills"
+DEFAULT_SKILL_FILE="${DEFAULT_SKILL_DIR}/SKILL.md"
+INSTALL_SCRIPT="${DEFAULT_SKILL_DIR}/scripts/install-default-skills.sh"
 
 fail() {
     echo "[FAIL] $*" >&2
@@ -36,34 +36,36 @@ expect_dir() {
     [[ -d "$path" ]] || fail "missing directory: $path"
 }
 
-expect_dir "$SKILL_DIR"
-expect_dir "${SKILL_DIR}/scripts"
-expect_dir "${SKILL_DIR}/assets"
-expect_dir "${SKILL_DIR}/references"
-expect_file "$SKILL_FILE"
-expect_file "$SCRIPT_FILE"
-expect_file "$PR_API_SCRIPT"
-expect_file "$TEMPLATE_FILE"
-expect_file "$REFERENCE_FILE"
+expect_symlink() {
+    local path="$1"
+    [[ -L "$path" ]] || fail "missing symlink: $path"
+}
 
-[[ "$(basename "$SKILL_DIR")" == "gitcode-pr" ]] || fail "skill directory must be gitcode-pr"
-[[ ! -e "${SKILL_DIR}/README.md" ]] || fail "skill directory must not contain README.md"
-[[ "$(head -n 1 "$SKILL_FILE")" == "---" ]] || fail "SKILL.md must start with YAML frontmatter"
-grep -Eq '^name:[[:space:]]*gitcode-pr[[:space:]]*$' "$SKILL_FILE" || fail "frontmatter name must be gitcode-pr"
-grep -Eq '^description:[[:space:]]*.+' "$SKILL_FILE" || fail "frontmatter description is required"
+expect_dir "$DEFAULT_SKILL_DIR"
+expect_file "$DEFAULT_SKILL_FILE"
+expect_file "$INSTALL_SCRIPT"
+[[ -x "$INSTALL_SCRIPT" ]] || fail "install script must be executable: $INSTALL_SCRIPT"
 
-python3 - "$SCRIPT_FILE" "$PR_API_SCRIPT" <<'PY' || fail "python scripts must parse"
-import ast
-import sys
+if [[ ! -d "$REMOTE_SKILL" || ! -L "$SKILL_LINK" ]]; then
+    bash "$INSTALL_SCRIPT"
+fi
 
-for path in sys.argv[1:]:
-    with open(path, encoding="utf-8") as f:
-        ast.parse(f.read(), filename=path)
-PY
+expect_dir "${SKILLS_DIR}/_remote"
+expect_dir "$REMOTE_SKILL"
+expect_symlink "$SKILL_LINK"
+[[ "$(readlink "$SKILL_LINK")" == "_remote/gitcode-pr" ]] || fail "gitcode-pr must link to _remote/gitcode-pr"
 
-grep -Fq "scripts/create_pr.py" "$SKILL_FILE" || fail "SKILL.md must link create_pr.py"
-grep -Fq "scripts/pr_api.py" "$SKILL_FILE" || fail "SKILL.md must link pr_api.py"
-grep -Fq "assets/pr_template.md" "$SKILL_FILE" || fail "SKILL.md must link pr_template.md"
-grep -Fq "references/gitcode_api.md" "$SKILL_FILE" || fail "SKILL.md must link gitcode_api.md"
+expect_file "${REMOTE_SKILL}/SKILL.md"
+[[ "$(head -n 1 "${REMOTE_SKILL}/SKILL.md")" == "---" ]] || fail "remote SKILL.md must start with YAML frontmatter"
+grep -Eq '^name:[[:space:]]*gitcode-pr[[:space:]]*$' "${REMOTE_SKILL}/SKILL.md" || \
+    fail "remote frontmatter name must be gitcode-pr"
+grep -Eq '^description:[[:space:]]*.+' "${REMOTE_SKILL}/SKILL.md" || fail "remote frontmatter description is required"
+
+[[ ! -e "${SKILL_LINK}/scripts/create_pr.py" ]] || \
+    fail "gitcode-pr must not use the previous asc-devkit-local create_pr.py implementation"
+[[ ! -e "${SKILL_LINK}/scripts/pr_api.py" ]] || \
+    fail "gitcode-pr must not use the previous asc-devkit-local pr_api.py implementation"
+
+bash -n "$INSTALL_SCRIPT" || fail "install script syntax check failed"
 
 echo "[PASS] gitcode-pr skill structure validation passed"

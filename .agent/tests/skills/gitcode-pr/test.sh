@@ -15,6 +15,5 @@ TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 bash "${TEST_DIR}/test-structure.sh"
 bash "${TEST_DIR}/test-content.sh"
-bash "${TEST_DIR}/test-script.sh"
 
 echo "[PASS] gitcode-pr skill test suite passed"
