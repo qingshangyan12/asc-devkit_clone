@@ -61,6 +61,7 @@ foreach(product_type ${MICRO_PRODUCT_TYPE_LIST})
 
     target_compile_options(ascendc_ut_reg_compute_${product_type} PRIVATE
         -fno-access-control
+        -UASCENDC_DEBUG
     )
 
     target_link_libraries(ascendc_ut_reg_compute_${product_type} PRIVATE
