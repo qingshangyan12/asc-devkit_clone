@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu/ins_temp_all_to_all_v_mesh_1D.h"
+#include "timing_stat.h"
 
 #define NET_NUM 2
 
@@ -28,11 +29,11 @@ HcclResult InsTempAlltoAllVMesh1D::CalcRes(HcclComm comm, const OpParam& param, 
 {
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->topoLevelNums > 1 && !topoInfo->level0PcieMix) {
         CHK_PRT_RET(subCommRanks_.size() != NET_NUM,
-            HCCL_ERROR("[InsTempAlltoAllVMesh1D][CalcRes] subCommRankNum[%zu] is not [%u]",
-                subCommRanks_.size(), NET_NUM),
-            HCCL_E_PARA);
+                    HCCL_ERROR("[InsTempAlltoAllVMesh1D][CalcRes] subCommRankNum[%zu] is not [%u]",
+                               subCommRanks_.size(), NET_NUM),
+                    HCCL_E_PARA);
         std::vector<u32> interRanks = subCommRanks_[1];
-        subCommRanks_ = {interRanks};
+        subCommRanks_ = {subCommRanks_[1]};
         templateRankSize_ = interRanks.size();
     }
 
@@ -88,6 +89,7 @@ void InsTempAlltoAllVMesh1D::CalcCommRankSetForOneLoop(const u32 roundIdx, const
             commRanks.push_back(rightRemoteRank);
         }
     }
+    return;
 }
 
 u32 InsTempAlltoAllVMesh1D::CalcCommLoops() const
@@ -117,9 +119,10 @@ void InsTempAlltoAllVMesh1D::CalcCclBuffIdx(u32 remoteRank, u32 &myRankCclBuffId
         myRankCclBuffIdx = 0;
         remoteCclBuffIdx = 0;
     }
-    HCCL_DEBUG("[InsTempAlltoAllVMesh1D][CalcCclBuffIdx] For my rank[%u] and remote rank[%u], "
+    HCCL_DEBUG("[InsTempAlltoAllVMesh1D][CalcCclBuffIdx] For my rank[%u] and remote rank[%u], "\
         "my ccl buff idx is [%u], remote ccl buff idx is [%u].",
         myRank_, remoteRank, myRankCclBuffIdx, remoteCclBuffIdx);
+    return;
 }
 
 HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
@@ -143,7 +146,11 @@ HcclResult InsTempAlltoAllVMesh1D::KernelRun(const OpParam& param,
         HCCL_ERROR("[InsTempAlltoAllVMesh1D][KernelRun] subCommRanks_ or myRank_ is error.");
         return HCCL_E_INTERNAL;
     }
+
+    // u64 StartTime = GetCurCpuTimestamp();
+    uint32_t kernelRunSlot = TimingStatStart("[KernelRun]");
     CHK_RET(RunALLtoALL(templateResource.channels, templateResource.threads, tempAlgParams, myAlgRank));
+    TimingStatEnd(kernelRunSlot);
 
     HCCL_INFO("[InsTempAlltoAllVMesh1D][KernelRun] Run End");
     return HcclResult::HCCL_SUCCESS;
@@ -168,10 +175,8 @@ HcclResult InsTempAlltoAllVMesh1D::LocalCopyForMyRank(const TemplateDataParams &
 }
 
 HcclResult InsTempAlltoAllVMesh1D::RunALLtoALL(
-    const std::map<u32, std::vector<ChannelInfo>> &channels,
-    const std::vector<ThreadHandle> &threads,
-    const TemplateDataParams &tempAlgParams,
-    const u32 myAlgRank)
+    const std::map<u32, std::vector<ChannelInfo>> &channels, const std::vector<ThreadHandle> &threads,
+    const TemplateDataParams &tempAlgParams, const u32 myAlgRank)
 {
     // 计算通信轮数
     u32 commLoops = CalcCommLoops();
@@ -229,7 +234,7 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByLoop(const std::vector<u32> &com
         u32 remoteRank = commRanks[rankIdx];
         // 取出本次通信对端的channel
         if (channels.find(remoteRank) == channels.end()) {
-            HCCL_ERROR("[InsTempAlltoAllVMesh1D][RunSendRecvByLoop] remoteRank[%u] "
+            HCCL_ERROR("[InsTempAlltoAllVMesh1D][RunSendRecvByLoop] remoteRank[%u] "\
                 "does not exist in channels map!", remoteRank);
             return HCCL_E_PARA;
         }
@@ -295,22 +300,17 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByChannel(const TemplateDataParams
 
         void* remoteCclBuffAddr = channelRecv.remoteCclMem.addr;
         // write模式下，本端src数据input buffer slice
-        DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inputPtr,
-            tempAlgParams.sdispls[remoteRank] * dataTypeSize_ + sendOffsetSplit_[channelId],
-            sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
+        DataSlice txSrcSlice = DataSlice(tempAlgParams.buffInfo.inputPtr, tempAlgParams.sdispls[remoteRank]
+            * dataTypeSize_ + sendOffsetSplit_[channelId], sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
         // write模式下，远端dst数据ccl buffer slice
-        DataSlice txDstSlice = DataSlice(remoteCclBuffAddr,
-            remoteCclBuffIdx * tempAlgParams.inputSliceStride + tempAlgParams.buffInfo.hcclBuffBaseOff +
-            sendOffsetSplit_[channelId], sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
+        DataSlice txDstSlice = DataSlice(remoteCclBuffAddr, remoteCclBuffIdx * tempAlgParams.inputSliceStride
+            + tempAlgParams.buffInfo.hcclBuffBaseOff + sendOffsetSplit_[channelId], sendSizeSplit_[channelId], sendCountsSplit_[channelId]);
         // read模式下，远端src数据ccl buffer slice
-        DataSlice rxSrcSlice = DataSlice(remoteCclBuffAddr,
-            remoteCclBuffIdx * tempAlgParams.inputSliceStride + tempAlgParams.buffInfo.hcclBuffBaseOff +
-            recvOffsetSplit_[channelId], recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
+        DataSlice rxSrcSlice = DataSlice(remoteCclBuffAddr, remoteCclBuffIdx * tempAlgParams.inputSliceStride
+            + tempAlgParams.buffInfo.hcclBuffBaseOff + recvOffsetSplit_[channelId], recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
         // read模式下，本端dst数据output buffer slice
-        DataSlice rxDstSlice = DataSlice(tempAlgParams.buffInfo.outputPtr,
-            tempAlgParams.rdispls[remoteRank] * dataTypeSize_ + recvOffsetSplit_[channelId],
-            recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
-
+        DataSlice rxDstSlice = DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.rdispls[remoteRank]
+            * dataTypeSize_ + recvOffsetSplit_[channelId], recvSizeSplit_[channelId], recvCountsSplit_[channelId]);
         txSrcSlices.push_back(txSrcSlice);
         txDstSlices.push_back(txDstSlice);
         rxSrcSlices.push_back(rxSrcSlice);
@@ -320,13 +320,16 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecvByChannel(const TemplateDataParams
         DataInfo recvInfo{channelRecv, {rxSrcSlices, rxDstSlices}};
         SendRecvInfo sendRecvInfo{{channelSend, channelRecv},
             {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
+        uint32_t runSendRecvSlot = TimingStatStart("[RunSendRecvByChannel][RunSendRecv]");
         CHK_RET(RunSendRecv(tempAlgParams, sendRecvInfo, sendInfo, recvInfo, threads[queIdx], channelId));
         HCCL_INFO("[InsTempAlltoAllVMesh1D][RunSendRecvByLoop] do send recv write on thread[%u], channelId[%u], "
             "send size[%llu], recv size[%llu], remote rank[%u].",
             queIdx, channelId, sendSizeSplit_[channelId], recvSizeSplit_[channelId], remoteRank);
         if (!isDmaRead_ && recvSizeSplit_[channelId] > 0) {
+            uint32_t postCopySlot = TimingStatStart("[RunSendRecvByChannel][PostCopy]");
             CHK_RET(PostCopy(tempAlgParams, threads[queIdx], myRankCclBuffIdx, remoteRank,
                 recvSizeSplit_[channelId], recvCountsSplit_[channelId], recvOffsetSplit_[channelId]));
+            TimingStatEnd(postCopySlot);
         }
         queIdx++;
     }
@@ -340,38 +343,49 @@ HcclResult InsTempAlltoAllVMesh1D::RunSendRecv(const TemplateDataParams &tempAlg
     const SendRecvInfo &sendRecvInfo, const DataInfo &sendInfo, const DataInfo &recvInfo,
     const ThreadHandle& thread, const u32 channelId) const
 {
-    (void)tempAlgParams;
     if (isDmaRead_) {
         if (sendSizeSplit_[channelId] > 0 && recvSizeSplit_[channelId] > 0) {
+            uint32_t sendRecvReadSlot = TimingStatStart("[RunSendRecv][SendRecvRead]");
             CHK_PRT_RET(SendRecvRead(sendRecvInfo, thread),
                 HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL SendRecvInfo failed"),
                 HcclResult::HCCL_E_INTERNAL);
+            TimingStatEnd(sendRecvReadSlot);
         } else { // 其中一个或者两个为0
             if (sendSizeSplit_[channelId] > 0) {
+                uint32_t sendReadSlot = TimingStatStart("[RunSendRecv][SendRead]");
                 CHK_PRT_RET(SendRead(sendInfo, thread),
                     HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL sendInfo failed"),
                     HcclResult::HCCL_E_INTERNAL);
+                TimingStatEnd(sendReadSlot);
             } else if (recvSizeSplit_[channelId] > 0) {
+                uint32_t recvReadSlot = TimingStatStart("[RunSendRecv][RecvRead]");
                 CHK_PRT_RET(RecvRead(recvInfo, thread),
                     HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL recvInfo failed"),
                     HcclResult::HCCL_E_INTERNAL);
+                TimingStatEnd(recvReadSlot);
             }
         }
     } else {
         if (sendSizeSplit_[channelId] > 0 && recvSizeSplit_[channelId] > 0) {
+            uint32_t sendRecvWriteSlot = TimingStatStart("[RunSendRecv][SendRecvWrite]");
             CHK_PRT_RET(SendRecvWrite(sendRecvInfo, thread),
                 HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL SendRecvInfo failed"),
                 HcclResult::HCCL_E_INTERNAL);
+            TimingStatEnd(sendRecvWriteSlot);
         } else { // 其中一个或者两个为0
             if (sendSizeSplit_[channelId] > 0) {
+                uint32_t sendWriteSlot = TimingStatStart("[RunSendRecv][SendWrite]");
                 CHK_PRT_RET(SendWrite(sendInfo, thread),
                     HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL sendInfo failed"),
                     HcclResult::HCCL_E_INTERNAL);
+                TimingStatEnd(sendWriteSlot);
             }
             if (recvSizeSplit_[channelId] > 0) {
+                uint32_t recvWriteSlot = TimingStatStart("[RunSendRecv][RecvWrite]");
                 CHK_PRT_RET(RecvWrite(recvInfo, thread),
                     HCCL_ERROR("[InsTempAlltoAllVMesh1D] RunALLtoALL recvInfo failed"),
                     HcclResult::HCCL_E_INTERNAL);
+                TimingStatEnd(recvWriteSlot);
             }
         }
     }

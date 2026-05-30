@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <cstddef>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,6 +16,14 @@
 #include "log.h"
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "timing_stat.h"
+
+namespace mc2_ops_hccl {
+// 旁路入口(定义在 ops/all_to_all_v/executor/cann_kernel_bridge.cc)。
+// 经 dlopen CANN libscatter_aicpu_kernel.so 调其 GetAlgExec + Orchestrate。
+HcclResult LaunchViaCann(const OpParam &ascParam, const AlgResourceCtxSerializable &ascResCtx);
+}  // namespace mc2_ops_hccl
+
 
 namespace {
 mc2_ops_hccl::OpParam *AsOpenOpParam(std::vector<uint8_t> &opParam)
@@ -119,6 +128,7 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam &param, const mc2_ops_hc
 
 HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 {
+    uint32_t firstSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][first]");
     auto *param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
     HCCL_INFO("[MC2_OPEN_DIAG][LaunchOpenOpParamDataImpl] file[%s:%d], opParamSize %zu, "
@@ -130,7 +140,13 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 
     char *ctx = static_cast<char *>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
+    TimingStatEnd(firstSlot);
+
+    uint32_t deserSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][DeSerialize]");
     resCtx.DeSerialize(seq);
+    TimingStatEnd(deserSlot);
+
+    uint32_t restoreSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][else]");
     HCCL_INFO("[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
               "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.", 
               static_cast<u32>(param->opType), param->algName, param->inputPtr, param->outputPtr,
@@ -162,22 +178,30 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
     const u64 outputBegin = reinterpret_cast<u64>(param->outputPtr);
     HCCL_INFO("[MC2_OPEN_DIAG][LaunchRange] userRank %u, userRankSize %u, dataTypeSize %llu, inputBytes %llu, "
               "rankStrideCount %llu, rankStrideBytes %llu, outputSpanCount %llu, outputBytes %llu, "
-              "inputRange [%#llx, %#llx), outputSpan [%#llx, %#llx), outputSpanRankScaled %u.",
+              "inputRange [%#llx, %#llx), outputSpan [%#llx, %#llx), outputSpanRankScaled %u, engine %u.",
               resCtx.topoInfo.userRank, resCtx.topoInfo.userRankSize,
               static_cast<unsigned long long>(dataTypeSize), static_cast<unsigned long long>(inputBytes),
               static_cast<unsigned long long>(rankStrideCount), static_cast<unsigned long long>(rankStrideBytes),
               static_cast<unsigned long long>(outputSpanCount), static_cast<unsigned long long>(outputBytes),
               static_cast<unsigned long long>(inputBegin),
               static_cast<unsigned long long>(inputBegin + inputBytes), static_cast<unsigned long long>(outputBegin),
-              static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather);
+              static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather, static_cast<u32>(param->engine));
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+    TimingStatEnd(restoreSlot);
 
-    auto executor = mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
-    CHK_SMART_PTR_NULL(executor);
-
-    HcclResult ret = executor->Orchestrate(*param, resCtx);
-    CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("orchestrate failed for alg:%s", param->algName), ret);
-
-    return HCCL_SUCCESS;
+    // dlopen 调用 CANN libscatter_aicpu_kernel.so 的 GetAlgExec + Orchestrate，使其内部走到 ops_hccl 对应的 KernelRun。
+    // GetAlgExec 按 (opType, algName) 查表，asc 与 CANN 两 fork 的注册名逐字一致，故可直接复用。
+    HCCL_RUN_INFO("[CannBridge] BYPASS ENTERED (unconditional verify build), opType=%u algName[%s]",
+                    static_cast<u32>(param->opType), param->algName);
+    uint32_t launchSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][LaunchViaCann]");
+    HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+    TimingStatEnd(launchSlot);
+    if (cannRet == HCCL_SUCCESS) {
+        // HCCL_RUN_INFO("[CannBridge] CANN path SUCCESS, return. algName[%s]", param->algName);
+        return HCCL_SUCCESS;
+    }
+    HCCL_WARNING("[CannBridge] CANN path failed (ret=%d), fallback to asc path. algName[%s]",
+                    static_cast<int>(cannRet), param->algName);
+    return HCCL_FAILED;
 }
