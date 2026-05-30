@@ -53,6 +53,7 @@
     -   [语言扩展层](编程指南/语言扩展层/语言扩展层.md)
         -   [SIMD BuiltIn关键字](编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
         -   [SIMT BuiltIn关键字](编程指南/语言扩展层/SIMT-BuiltIn关键字.md)
+        -   [SIMD&SIMT BuiltIn关键字](编程指南/语言扩展层/SIMD&SIMT-BuiltIn关键字.md)
         -   [SIMD语言扩展层C API](编程指南/语言扩展层/SIMD语言扩展层C-API.md)
         -   [SIMT语言扩展层C API](编程指南/语言扩展层/SIMT语言扩展层C-API.md)
 
@@ -98,13 +99,12 @@
                 -   [NPU架构版本2201](./编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2201.md)
             
         -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/高级AI-Core编程模型.md)
-            -   [概述](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)
-            -   [抽象硬件架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/抽象硬件架构.md)
-            -   [混合编程场景的SIMT编程](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/线程架构.md)
-                -   [线程架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/线程架构.md)
-                -   [UB划分](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/UB划分.md)
-            -   [函数层级](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/函数层级.md)
-            -   [扩展语法](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/扩展语法.md)
+            -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/高级AI-Core编程模型.md)
+                -   [概述](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)
+                -   [抽象硬件架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/抽象硬件架构.md)
+                -   [函数层级](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/函数层级.md)
+                -   [内存层级](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)
+                -   [编码示例](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/编码示例.md)
 
         -   [高级特性](./编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述.md)
             -   [Aclnn算子工程化开发](./编程指南/高级编程/高级特性/Aclnn算子工程化开发/概述.md)

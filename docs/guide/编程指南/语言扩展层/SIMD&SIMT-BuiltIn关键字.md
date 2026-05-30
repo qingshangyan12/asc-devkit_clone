@@ -1,13 +1,68 @@
-# 扩展语法<a name="ZH-CN_TOPIC_0000002593949295"></a>
+# SIMD&SIMT BuiltIn关键字<a name="ZH-CN_TOPIC_0000002593949295"></a>
+
+## VF函数执行限定符
+
+### \_\_simt\_vf\_\_
+
+\_\_simt\_vf\_\_用于标记SIMT VF入口函数，函数无返回值。函数定义示例如下：
+
+```
+__simt_vf__ inline void function_name(
+    __gm__ uint32_t* gm_param,
+    __ubuf__ float* ubuf_param,
+    uint64_t scalar_param, ...);
+```
+
+SIMT VF函数定义中的关键修饰符说明如下：
+
+| 修饰符 | 作用 |
+| --- | --- |
+| \_\_simt_vf\_\_ | 函数标识符，标识SIMT VF函数。 |
+| inline | 建议内联，实际是否内联由编译器决定。 |
+| \_\_gm\_\_ | 内存空间修饰符，标识内存空间为GM。 |
+| \_\_ubuf\_\_ | 内存空间修饰符，标识内存空间为UB。 |
+
+通过SIMT的[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD%E4%B8%8ESIMT%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/%E6%89%A9%E5%B1%95%E8%AF%AD%E6%B3%95/%E6%A0%B8%E5%87%BD%E6%95%B0%E9%85%8D%E7%BD%AE-147.md#asc_vf_call%E8%B0%83%E7%94%A8)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
+
+```
+asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
+```
+
+SIMT VF函数有以下约束：
+
+-   入参仅支持Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
+-   函数返回类型必须是void。
+-   SIMT VF内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
+
+### \_\_simt\_callee\_\_
+
+\_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
+
+```
+__simt_callee__ uint32_t simt_helper(__gm__ uint32_t* gm_param, __ubuf__ float* ubuf_param, uint64_t scalar_param, ...);
+```
+
+调用示例如下：
+
+```
+uint32_t result = simt_helper(arg1, arg2, ...);
+```
+
+该函数有以下约束：
+
+-   入参仅支持Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   函数返回值只能是Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
+
 
 ## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
 当前提供了以下仅在Device上可用的dim3结构的内置变量：  
 
--   gridDim
+-   gridDim<a name="zh-cn_topic_0000002571575581_li20760123812911"></a>
 
     内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。gridDim.x <= 65535；gridDim.y、gridDim.z必须为1。
 
--   blockDim
+-   blockDim<a name="zh-cn_topic_0000002571575581_li076017381191"></a>
 
     内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数，各个维度上线程数需满足blockDim.x \* blockDim.y \*blockDim.z  <= 2048。
 
@@ -30,7 +85,7 @@
     运行时变量，表示一个线程束（Warp）中的线程数量，当前为固定值32。
 
 
-## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a>
+## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
 
 Ascend C为SIMD与SIMT混合编程、SIMT编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型。当前支持标量数据类型如下：
 
@@ -1166,4 +1221,3 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 </tr>
 </tbody>
 </table>
-
