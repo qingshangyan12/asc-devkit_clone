@@ -62,9 +62,9 @@ $$
 | 字段名 | 字段含义 |
 |:---:|:---|
 | Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-| aiv_time|Task在[AI Vector Core](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)上的理论执行时间，单位为μs。|
-| aiv_vec_time(μs) | vec类型指令（[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)引擎执行的向量类运算指令）耗时，单位μs。 |
-| aiv_vec_ratio | vec类型指令的cycle数在total cycle数中的占用比。 |
+| aiv_time|Task在[AI Vector Core](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)上的执行时间，单位为μs。|
+| aiv_vec_time(μs) | vec类型指令（[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)向量类运算指令）耗时，单位μs。 |
+| aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
 | aiv_scalar_ratio | scalar类型指令的cycle数在total cycle数中的占用比。 |
 | aiv_mte2_time(μs) | mte2类型指令（[MTE2](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)引擎执行的[GM→UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)搬运类指令）耗时，单位μs。 |
