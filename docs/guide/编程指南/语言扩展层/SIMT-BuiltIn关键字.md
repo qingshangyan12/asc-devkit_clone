@@ -92,6 +92,30 @@
 
 ## 内置结构体<a name="section18310741094123"></a>
 
+## 内置常量<a name="section784531219338"></a>
+
+<a name="table878553753515"></a>
+<table><thead align="left"><tr id="row578553718354"><th class="cellrowborder" valign="top" width="16.14838516148385%" id="mcps1.1.4.1.1"><p id="p1378573713352"><a name="p1378573713352"></a><a name="p1378573713352"></a>常量名</p>
+</th>
+<th class="cellrowborder" valign="top" width="25.847415258474154%" id="mcps1.1.4.1.2"><p id="p1378553763512"><a name="p1378553763512"></a><a name="p1378553763512"></a>取值</p>
+</th>
+<th class="cellrowborder" valign="top" width="58.00419958004199%" id="mcps1.1.4.1.3"><p id="p127858377356"><a name="p127858377356"></a><a name="p127858377356"></a>功能</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_UB_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下Unified Buffer（UB）的容量，可用于编译期获取UB资源大小。</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+## 内置变量<a name="section13165113520576"></a>
+
 -   dim3<a name="li1136665405"></a>
 
     用于指定和获取线程网格（grid）、线程块（block）在x、y、z维度上的内置结构体。
