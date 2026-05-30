@@ -86,8 +86,8 @@ PIPE_V
     vector_int8_t dst;
     __ubuf__ int8_t* src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
     vector_uint32_t index;
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     vector_bool mask = asc_create_mask_b8(PAT_ALL);
+    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather_datablock(dst, src, index, mask);
     ```
 - 无掩码控制，默认收集所有索引对应的数据块

@@ -11,7 +11,7 @@
 完成包含放缩功能的矩阵乘加操作。计算公式如下：
 
 $$
-c_{matrix} = a_{matrix} * b_{matrix} + c_{matrix}
+c_{matrix} = (a_{matrix} * b_{matrix}) + c_{matrix}
 $$
 
 ## 函数原型
