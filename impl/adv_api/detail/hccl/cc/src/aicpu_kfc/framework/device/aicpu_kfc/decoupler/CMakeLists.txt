@@ -60,6 +60,7 @@ set(open_exec_impl_src_list
     ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+    ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/cann_kernel_bridge.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
