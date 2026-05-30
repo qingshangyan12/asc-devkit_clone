@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <string>
 #include <cstring>
+#include <cstdio>
 
 #include "rt_external_base.h"
 #include "rt_external_kernel.h"
@@ -62,6 +63,38 @@ static bool g_profEnable;
 namespace {
 constexpr int16_t SIZE_VAL_TWO = 2;
 constexpr size_t ASCENDC_KERNEL_ID = 69;
+constexpr size_t HOST_ARGS_DUMP_MAX_BYTES = 256;
+
+void AscendDumpHostArgs(const void* hostArgs, size_t argsSize)
+{
+    ASCENDLOGI("AscendLaunchKernelWithHostArgs hostArgs=%p, argsSize=%zu\n", hostArgs, argsSize);
+    if (hostArgs == nullptr || argsSize == 0) {
+        return;
+    }
+
+    constexpr size_t bytesPerLine = 16;
+    constexpr size_t charsPerByte = 3;
+    constexpr size_t lineBufSize = bytesPerLine * charsPerByte + 1;
+    const size_t dumpSize = argsSize > HOST_ARGS_DUMP_MAX_BYTES ? HOST_ARGS_DUMP_MAX_BYTES : argsSize;
+    const auto* args = static_cast<const unsigned char*>(hostArgs);
+    for (size_t offset = 0; offset < dumpSize; offset += bytesPerLine) {
+        char line[lineBufSize] = {};
+        size_t pos = 0;
+        const size_t lineBytes = dumpSize - offset > bytesPerLine ? bytesPerLine : dumpSize - offset;
+        for (size_t i = 0; i < lineBytes; ++i) {
+            int ret = std::snprintf(line + pos, lineBufSize - pos, "%02x ", args[offset + i]);
+            if (ret <= 0) {
+                break;
+            }
+            pos += static_cast<size_t>(ret);
+        }
+        ASCENDLOGI("AscendLaunchKernelWithHostArgs hostArgs[%zu:%zu]=%s\n", offset, offset + lineBytes, line);
+    }
+    if (dumpSize < argsSize) {
+        ASCENDLOGI("AscendLaunchKernelWithHostArgs hostArgs dump truncated, dumped=%zu, argsSize=%zu\n", dumpSize,
+            argsSize);
+    }
+}
 }
 
 #define PROF_TASK_TIME 0x00000002ULL  // dynamic profiling hwts log
@@ -224,6 +257,7 @@ static SocVersion GetSocVersion() {
 int32_t AscendLaunchKernelWithHostArgs(void* funcHandle,
     uint32_t numBlocks, void* stream, void* hostArgs, size_t argsSize, uint32_t ubufDynamicSize)
 {
+    AscendDumpHostArgs(hostArgs, argsSize);
     static SocVersion currentSoc = GetSocVersion();
     if (currentSoc == SocVersion::ASCEND310P) {
         unsigned int curKernelType;
