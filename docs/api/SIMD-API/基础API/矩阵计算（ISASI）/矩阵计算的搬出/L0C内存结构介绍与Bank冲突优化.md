@@ -30,14 +30,14 @@ L0C_ADDR[16:0] = { BANK_DEPTH[6:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺
 
 - **读写冲突**：
 
-    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行读写操作时，会引起冲突，导致未定义的硬件行为。
+    Mmad计算和Fixpipe搬出对同一Bank的相同地址进行读写操作时，会引起冲突，导致未定义的硬件行为。
 
 - **写写冲突**：
 
-    Mmad 计算和 Fixpipe 搬出对同一 Bank 的相同地址进行写操作时，会引起冲突。
+    Mmad计算和Fixpipe搬出对同一Bank的相同地址进行写操作时，会引起冲突。
 
 - **读读冲突**：
 
-    Mmad 计算和 Fixpipe 搬出同时对同一 Bank 进行读操作时，会引起冲突。
+    Mmad计算和Fixpipe搬出同时对同一Bank进行读操作时，会引起冲突。
 
 </cann-filter>
