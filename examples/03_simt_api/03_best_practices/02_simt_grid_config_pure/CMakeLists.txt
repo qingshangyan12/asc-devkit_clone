@@ -15,7 +15,8 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-6)")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-17)")
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 add_executable(grid_config
     grid_config.asc
@@ -26,5 +27,5 @@ target_compile_definitions(grid_config PRIVATE
 )
 
 target_compile_options(grid_config PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510 --enable-simt>
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以Gather+Adds融合计算为例，介绍Ascend C SIMT编程方式下的gridDim配置调优思路。样例包含4个空核函数场景（对比启动不同核数的头开销）以及2个实际计算场景（对比逻辑核数与物理核数匹配前后的性能差异），从核数远超物理核的基础配置，逐步优化至逻辑核数匹配最大物理核的最优配置。
+本样例以Gather采集计算为例，介绍Ascend C SIMT编程方式下的gridDim配置调优思路。
 
 ## 支持的产品
 
@@ -12,7 +12,6 @@
 
 ```text
 ├── 02_simt_grid_config
-│   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
 │   ├── grid_config.asc        // gridDim配置样例实现
 ```
@@ -22,61 +21,108 @@
 - 计算公式：
 
   $$
-  output[i][j] = input[index[i][j]] + 1.0
+  output[i][j] = input[index[i][j]]
   $$
 
-  - input为输入张量，形状为[1100000]，数据类型为float
-  - index为索引张量，形状为[1024,1024]，数据类型为uint32，索引范围为[0,1100000)
-  - output为输出张量，形状为[1024,1024]，数据类型为float
-  - 计算过程：根据index[i][j]索引从input中采集对应位置的数据，加1.0后写入output[i][j]位置
+  - input为输入张量，形状为[2100000]，数据类型为float
+  - index为索引张量，数据类型为uint32，索引范围为[0,2100000)；大shape为[1024,2048]，中shape为[64,2048]，小shape为[8,2048]
+  - output为输出张量，数据类型为float；大shape为[1024,2048]，中shape为[64,2048]，小shape为[8,2048]
+  - 计算过程：根据index[i][j]索引从input中采集对应位置的数据，写入output[i][j]位置
 
 - 样例规格：
 
   <table>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">GatherAdds</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Gather</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[1100000]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">index</td><td align="center">[1024,1024]</td><td align="center">uint32</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1024,1024]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">empty_kernel / gather_adds_kernel</td></tr>
+  <tr><td align="center">input</td><td align="center">[2100000]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">index</td><td align="center">大shape: [1024,2048]<br>中shape: [64,2048]<br>小shape: [8,2048]</td><td align="center">uint32</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">大shape: [1024,2048]<br>中shape: [64,2048]<br>小shape: [8,2048]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">empty_kernel / gather_naive_kernel / gather_strided_kernel</td></tr>
   </table>
 
 ## 样例实现
 
 ### Case实现说明
 
-本样例通过6个独立场景展示不同的gridDim配置策略，每个场景通过`SCENARIO_NUM`选择。
+本样例将17个`SCENARIO_NUM`归为4类Case，先建立调度基线，再分别观察大shape、中shape和小shape下的gridDim选择。
 
-| Case   | 实现特点                                  | 使用的核函数        | 优化特性                          |
-| ------ | ----------------------------------------- | ------------------- | --------------------------------- |
-| Case 1 | 36核，启动空的核函数                          | empty_kernel        | 调度基线，逻辑核数 < 物理核           |
-| Case 2 | 64核，启动空的核函数               | empty_kernel        | 调度基线，逻辑核数 = 物理核           |
-| Case 3 | 128核，启动空的核函数                          | empty_kernel        | 调度基线，逻辑核数 > 物理核（2×）     |
-| Case 4 | 1024核，启动空的核函数                         | empty_kernel        | 调度基线，逻辑核数 ≫ 物理核（16×）    |
-| Case 5 | 1024核，每核1024个元素，进行gather+adds计算       | gather_adds_kernel  | 逻辑核数 ≫ 物理核           |
-| Case 6 | 64核，每核16384个元素，进行gather+adds计算         | gather_adds_kernel  | 逻辑核数 = 物理核（最优）   |
+| Case   | SCENARIO_NUM   | Shape / 规模                      | 核函数                                  | 对比目的                                  |
+| ------ | -------------- | --------------------------------- | --------------------------------------- | ----------------------------------------- |
+| Case 0 | 1 / 2 / 3 / 4 / 5 | 大shape，[1024,2048]           | empty_kernel                            | 测1 / 32 / 64 / 128 / 1024核的空核调度开销 |
+| Case 1 | 6 / 7 / 8      | 大shape，[1024,2048]              | gather_naive_kernel / gather_strided_kernel | 大shape，gridDim.x设置1024、64、32，对比性能差异 |
+| Case 2 | 9 / 10 / 11 / 12 | 中shape，[64,2048]=131072        | gather_strided_kernel                   | 在中shape下，gridDim.x设置16 / 32 / 64 / 128，对比性能差异|
+| Case 3 | 13 / 14 / 15 / 16 / 17 | 小shape，[8,2048]=16384    | gather_strided_kernel                   | 在小shape下，gridDim.x设置4 / 8 / 16 / 32 / 64，对比性能差异|
 
-#### 物理核与逻辑核
+### 性能指标说明
 
-在SIMT编程模型中：
+| 指标                | 说明                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| Task Duration(us)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
 
-- **物理核**：硬件实际拥有的物理核数，本样例环境运行时实测核数为64
-- **逻辑核**：通过gridDim配置启动的逻辑核数量，即`gridDim.x`
-- **核数匹配原则**：当逻辑核数量小于等于物理核数量时，各核可并行执行；当逻辑核数量超过物理核数量时，多余逻辑核需要等待执行
+### Case 0: 空核函数调度基线
 
-下图展示了Case 1~Case 4四种gridDim配置下，逻辑核到物理核的调度映射关系。当`gridDim ≤ 64`时所有逻辑核单wave并行；当`gridDim > 64`时多余逻辑核需要分多个wave执行，调度耗时随wave数量成倍上升。
+**样例目标**：用空核函数建立不同gridDim下的Task调度耗时基线。
 
-> **wave**：一次同时驻留并并行执行的一组逻辑核（block）。当`gridDim ≤ 物理核数`时，全部逻辑核可在 1 个 wave 内并行；当`gridDim > 物理核数`时，多余逻辑核须等前一个 wave 让出物理核才能被调度上来，形成多个 wave 执行。本样例的 wave 数 ≈ ⌈ `gridDim` / 物理核数 ⌉，例如 Case 4 的 1024 核需 16 个 wave。
+**核心实现**：
 
-> **注意**：wave只是分析模型，非硬件实际执行逻辑。
+- 核函数`empty_kernel`函数体为空，仅承担Task调度开销
+- 通过`SCENARIO_NUM=1~5`控制五种gridDim配置：1 / 32 / 64 / 128 / 1024
+- Host侧先通过`aclrtMemcpy(DEVICE_TO_DEVICE)`把input拷贝到output，保证精度校验通过，再启动空kernel仅测调度开销
 
-<img src="./figures/fig1_logical_to_physical.png" width="90%">
+**关键代码**：
 
-本样例通过Case 1-4建立调度开销基线，Case 5与Case 6对比1024核与64核两种配置下的实际计算性能。
+```cpp
+__global__ __launch_bounds__(THREAD_NUM) void empty_kernel(
+    float* input, uint32_t* index, float* output,
+    uint32_t input_total_length, uint32_t index_total_length)
+{
+}
+
+// gridDim 由 SCENARIO_NUM 选择：1 / 32 / 64 / 128 / 1024
+empty_kernel<<<num_blocks, THREAD_NUM, 0, stream>>>(
+    input_device, index_device, output_device,
+    input_total_length, index_total_length);
+```
+
+**性能数据**：
+
+| SCENARIO_NUM | Block Dim | Task Duration(us) |
+| :----------: | :-------: | :---------------: | 
+|      1       |     1     |       1.356       | 
+|      2       |    32     |       1.643       | 
+|      3       |    64     |       2.218       | 
+|      4       |    128    |       2.927       | 
+|      5       |   1024    |      16.104       | 
+
+
+#### 从gridDim到逻辑核/物理核
+
+在SIMT kernel启动时，`gridDim.x`决定本次任务要启动多少个block。对于本样例的一维grid配置，可以直接把`gridDim.x`理解为要启动的**逻辑核数量**：例如`SCENARIO_NUM=2`启动32个block，`SCENARIO_NUM=5`启动1024个block。
+
+但这些逻辑核最终要落到硬件实际存在的Vector Core上执行，因此需要引入两个概念：
+
+- **逻辑核**：由`gridDim.x`配置出来的block数量，是软件侧希望启动的并行任务数
+- **物理核**：硬件实际拥有的Vector Core数量，本样例环境运行时实测为64，查询方法参考[运行期如何查询物理核数](#运行期查询物理核数)
+
+两者的关系会影响调度开销：当`gridDim.x ≤ 64`时，所有逻辑核可以一次占满物理核并行执行；当`gridDim.x > 64`时，超出64的逻辑核必须等待前面的逻辑核执行完、让出物理核后才能被调度，等待开销会随超出的逻辑核数量增加而上升。
+
+#### 调度头开销总结
+
+| 对比         | Block Dim 变化   | Task Duration 变化      | 现象                              |
+| ------------ | ---------------- | ----------------------- | --------------------------------- |
+| 1 → 32       | 32×              | 1.356 → 1.643（1.21×）  | 逻辑核数 ≪ 物理核，均在物理核内，仅启动更多核的微小固定开销 |
+| 32 → 64      | 2×               | 1.643 → 2.218（1.35×）  | 逻辑核数 ≤ 物理核，一次占满，涨幅平缓 |
+| 64 → 128     | 2×               | 2.218 → 2.927（1.32×）  | 逻辑核数超物理核，出现等待，开始上升 |
+| 128 → 1024   | 8×               | 2.927 → 16.104（5.50×） | 逻辑核数 ≫ 物理核，等待开销陡增 |
+
+可以总结出俩条规律：
+
+1. **逻辑核数 ≤ 物理核数时调度时间基本不变**：1核、32核、64核都在物理核数以内、无需等待，Task Duration从1.356us缓慢升到2.218us。
+2. **逻辑核数超过物理核数后调度开销随等待量增长**：128核有64个、1024核有960个逻辑核必须等待物理核空闲后才能被调度，调度耗时随需要等待的逻辑核数量近似线性增加。
 
 #### 运行期查询物理核数
 
-样例中`AIV_CORE_NUM = 64`是按照下面的代码实际获取到的，为了保证程序界面的风格统一，并未体现。在实际工程中，建议通过AscendC Runtime API在运行期向硬件查询，避免硬编码：
+样例中`AIV_CORE_NUM = 64`是按照下面的代码实际获取到的，为了保证编程界面的统一，代码中未直接体现：
 
 ```cpp
 #include "acl/acl.h"
@@ -100,243 +146,204 @@ if (ret == ACL_SUCCESS) {
 | ------------------------------- | --------------------- |
 | `ACL_DEV_ATTR_VECTOR_CORE_NUM`  | Vector Core (AIV) 数量 |
 
-#### 线程块布局
+---
 
-所有场景共用同一套线程块布局：
+### Case 1: 大shape Gather计算配置对比（SCENARIO_NUM=6/7/8）
 
-- block配置固定为`(THREAD_NUM, 1, 1)`，其中`THREAD_NUM = 1024`，单个block总线程数为1024
-- grid配置由`SCENARIO_NUM`决定，取值为36 / 64 / 128 / 1024
-- 计算场景中，每个block处理的数据量`rows_per_block`由`总数据量 / 逻辑核数`得到，即`index_total_length / gridDim.x`
-- 每个线程在`[threadIdx.x, rows_per_block)`区间按`THREAD_NUM`跨步处理元素
+**样例目标**：对比同一大shape下执行Gather操作，配置不同griddim的性能差异。
+
+#### 1024核Gather（SCENARIO_NUM=6）
+
+**核心实现**：
+
+- 核函数`gather_naive_kernel`：每个线程用全局线程号`blockIdx.x * blockDim.x + threadIdx.x`定位唯一一个元素，从GM上的`index[]`取下标，再从GM上的`input[]`乱序读取数据写入`output[]`
+- gridDim配置为1024、每block 2048线程，`gridDim.x * blockDim.x = 1024 * 2048 = 2097152`恰好等于元素总数。`blockIdx.x`对应[1024,2048]张量的一行、`threadIdx.x`对应一列，每个线程刚好覆盖1个元素，**无需for循环**
+
+**关键代码**：
+
+```cpp
+// 最朴素写法：每个线程只处理1个元素，无for循环
+uint32_t global_idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+uint32_t gather_idx = index[global_idx];
+if (gather_idx >= input_total_length) { gather_idx = 0; }
+output[global_idx] = input[gather_idx];
+```
+
+**性能数据**：
+
+| Task Duration(us) |
+| :---------------: |
+|      75.834       |
+
+
+#### 如何优化这种写法
+
+当前写法的瓶颈不在gather计算本身，而在"线程号 = 元素号"这条隐式约束——它强制gridDim等于元素总数/单核线程数，核数被数据规模绑死。优化思路是**解耦逻辑核数与元素总数**：
+
+1. **先确定逻辑核数**：把`gridDim`直接设为物理核数（本样例64），而不是由元素总数倒推。这样逻辑核与物理核一一对应、一次铺满，既不会像1024核那样超出物理核排队等待，也不会少于物理核让硬件闲置。大shape数据量足够大，64核下每核仍分到32768个元素的充足工作量，因此打满物理核不会浪费。
+2. **每核改为处理一段元素**：核数降下来后，每个block要负责的元素数`rows_per_block = 元素总数 / gridDim.x`随之增大（`2097152 / 64 = 32768`）。
+3. **用stride循环遍历这一段**：block内的`blockDim.x`个线程，以`blockDim.x`为步长跨步循环，覆盖本block负责的全部元素。这样既不漏元素，相邻线程访问的也是相邻地址（访存合并友好）。每block仍取2048线程，每个线程stride循环`32768 / 2048 = 16`次。
+
+```cpp
+// 优化写法：每个线程以 blockDim.x 为步长跨步处理多个元素
+uint32_t rows_per_block = index_total_length / gridDim.x;
+uint32_t index_start = blockIdx.x * rows_per_block;
+
+for (uint32_t local_idx = threadIdx.x; local_idx < rows_per_block; local_idx += blockDim.x) {
+    uint32_t gather_idx = index[index_start + local_idx];
+    if (gather_idx >= input_total_length) { gather_idx = 0; }
+    output[index_start + local_idx] = input[gather_idx];
+}
+```
+
+这套改写就是`SCENARIO_NUM=7`采用的写法。
+
+#### 64核Gather（SCENARIO_NUM=7）
+
+**优化目标**：在gather语义不变的前提下，改用"解耦核数 + stride循环"写法，将逻辑核数与物理核数对齐
+
+**核心实现**：
+
+- 核函数`gather_strided_kernel`：采用上一节给出的优化写法，逻辑核数固定为物理核数64
+- 每个block负责的元素数从2048扩展到`2097152 / 64 = 32768`，block内每个线程以`blockDim.x`为步长stride循环
+- 每block线程数与`SCENARIO_NUM=6`一致，同为硬件上限2048，每个线程stride循环`32768 / 2048 = 16`次
+
+**关键代码**：
 
 ```cpp
 uint32_t rows_per_block = index_total_length / gridDim.x;
 uint32_t index_start = blockIdx.x * rows_per_block;
 
-for (uint32_t local_idx = threadIdx.x; local_idx < rows_per_block; local_idx += THREAD_NUM) {
-    // 当前线程处理 index_start + local_idx 这个元素
+for (uint32_t local_idx = threadIdx.x; local_idx < rows_per_block; local_idx += blockDim.x) {
+    uint32_t gather_idx = index[index_start + local_idx];
+    if (gather_idx >= input_total_length) { gather_idx = 0; }
+    output[index_start + local_idx] = input[gather_idx];
 }
-```
-
-### 性能指标说明
-
-| 指标                | 说明                                                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| Task Duration(us)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
-| aiv_time(us)        | Task在AI Vector Core上的理论执行时间，单位为us                                            |
-| aiv_total_cycles    | 该Task被分配到每个AI Vector Core计算单元上后，每个AI Vector Core计算单元上的执行cycle总数 |
-| aiv_vec_time(us)    | vec类型指令（向量类运算指令）耗时，单位为us                                               |
-| aiv_vec_ratio       | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比                           |
-| aiv_scalar_time(us) | scalar类型指令（标量类运算指令）耗时，单位为us                                            |
-| aiv_scalar_ratio    | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比                        |
-
-除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
-
-### Case 1: 36核空核函数
-
-**样例目标**：建立"核数 < 物理核"配置下的Task调度耗时基线
-
-**核心实现**：
-
-- 核函数`empty_kernel`函数体为空，仅承担Task调度开销
-- gridDim配置为36，逻辑核数小于物理核数（64）
-- Host侧先通过`aclrtMemcpy(DEVICE_TO_DEVICE)`把input拷贝到output，保证精度校验通过，再启动空kernel仅测调度开销
-
-**关键代码**：
-
-```cpp
-__global__ __launch_bounds__(THREAD_NUM) void empty_kernel(
-    float* input, uint32_t* index, float* output,
-    uint32_t input_total_length, uint32_t index_total_length)
-{
-}
-```
-
-**性能数据**：
-
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|       2.160       |    0.397     |      655.7       |      0.000       |     0.000     |        0.374        |      0.936       |
-
-**分析**：
-
-- Case 1的Task Duration为2.160us，作为"核数 < 物理核"场景下的调度耗时基线
-- 由于核函数为空，aiv_vec_ratio为0，aiv_scalar_ratio接近0.94，Task整体由标量调度路径主导
-- 后续Case 2~4将在此基线上观察核数变化对调度耗时的影响
-
----
-
-### Case 2: 64核空核函数
-
-**样例目标**：观察"核数 = 物理核"配置下的Task调度耗时
-
-**核心实现**：
-
-- 核函数与Case 1完全相同，仅gridDim从36改为64
-- 逻辑核数等于物理核数，所有逻辑核可在物理核上一次性铺满
-
-**关键代码**：
-
-```cpp
-empty_kernel<<<64, THREAD_NUM, 0, stream>>>(
-    input_device, index_device, output_device,
-    input_total_length, index_total_length);
-```
-
-**性能数据**：
-
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|       2.373       |    0.461     |      760.5       |      0.000       |     0.000     |        0.438        |      0.941       |
-
-**分析**：
-
-- 相比Case 1，Block Dim从36增加到64（约1.78×），Task Duration从2.160us增加到2.373us（约1.10×）
-- 逻辑核数仍在物理核范围内，所有逻辑核并行执行，Task Duration涨幅平缓
-- 随着启动的逻辑核数的增加，调度开销也随之增加，但逻辑核数 < 物理核数，无排队等待时间，调度开销增加不显著
-
----
-
-### Case 3: 128核空核函数
-
-**样例目标**：观察"核数 = 2 × 物理核"配置下的Task调度耗时
-
-**核心实现**：
-
-- 核函数与Case 1相同，gridDim配置为128
-- 逻辑核数为物理核数的2倍，每个物理核需要承担2个逻辑核的调度
-
-**关键代码**：
-
-```cpp
-empty_kernel<<<128, THREAD_NUM, 0, stream>>>(
-    input_device, index_device, output_device,
-    input_total_length, index_total_length);
-```
-
-**性能数据**：
-
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|       3.592       |    0.309     |      509.4       |      0.000       |     0.000     |        0.286        |      0.901       |
-
-**分析**：
-
-- 相比Case 2，Block Dim从64增加到128（2×），Task Duration从2.373us增加到3.592us（约1.51×）
-- 逻辑核数超过物理核数，多余逻辑核需要等待物理核空闲才能执行，调度耗时开始出现明显上升
-
----
-
-### Case 4: 1024核空核函数
-
-**样例目标**：观察"核数 ≫ 物理核"配置下的Task调度耗时上限
-
-**核心实现**：
-
-- 核函数与Case 1相同，gridDim配置为1024
-- 逻辑核数为物理核数的16倍，每个物理核需要承担16个逻辑核的调度
-
-**关键代码**：
-
-```cpp
-empty_kernel<<<1024, THREAD_NUM, 0, stream>>>(
-    input_device, index_device, output_device,
-    input_total_length, index_total_length);
-```
-
-**性能数据**：
-
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      16.400       |    0.169     |      279.3       |      0.000       |     0.000     |        0.146        |      0.848       |
-
-**分析**：
-
-- 相比Case 3，Block Dim从128增加到1024（8×），Task Duration从3.592us增加到16.400us（约4.57×）
-- 逻辑核数显著超过物理核数后，多余逻辑核等待执行的开销占据主导，Task Duration出现陡增
-- 1024核配置下的调度耗时已是Case 2（64核）的6.91×，体现出大量逻辑核排队等待的开销
-
-
----
-
-### Case 5: 1024核Gather+Adds计算
-
-**样例目标**：在"核数 ≫ 物理核"配置下完成实际Gather+Adds计算，作为计算场景的对比基线
-
-**核心实现**：
-
-- 核函数`gather_adds_kernel`：每个线程从GM上的`index[]`取下标，从GM上的`input[]`乱序读取数据，加常数1后顺序写入GM上的`output[]`
-- gridDim配置为1024，每个block处理`1048576 / 1024 = 1024`个元素
-- block内1024个线程处理当前block的数据，每个线程处理1个元素，stride循环只跑1次
-
-**关键代码**：
-
-```cpp
-    uint32_t rows_per_block = index_total_length / gridDim.x;
-    uint32_t index_start = blockIdx.x * rows_per_block;
-
-    for (uint32_t local_idx = threadIdx.x; local_idx < rows_per_block; local_idx += THREAD_NUM) {
-        uint32_t gather_idx = index[index_start + local_idx];
-        if (gather_idx >= input_total_length) { gather_idx = 0; }
-        output[index_start + local_idx] = input[gather_idx] + ADDS_ADDEND;
-    }
-```
-
-**性能数据**：
-
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      53.132       |    2.613     |     4310.9       |      2.449       |     0.939     |        0.152        |      0.056       |
-
-**分析**：
-
-- Case 5的Task Duration为53.132us，作为"核数 ≫ 物理核"配置下实际计算场景的耗时基线
-- 1024个逻辑核要在64个物理核上分16个wave排队下发，与Case 4（1024核空核函数，16.400us）对比可知，仅"调度+排队等待"这一项就贡献了约16us头开销
-- 扣除调度基线后，实际"gather+adds+store"约36.7us。虽然aiv_vec_ratio已经到0.939，但单block工作集仅1024元素、每线程stride循环只跑1次，gather读GM的延迟没有足够的循环可供pipe掩盖，单核aiv_time仅2.613us、aiv_total_cycles仅4310.9
-
----
-
-### Case 6: 64核Gather+Adds计算
-
-**优化目标**：将逻辑核数与物理核数对齐，消除多余逻辑核排队等待
-
-**核心实现**：
-
-- 核函数与Case 5完全一致，仅gridDim从1024改为64
-- 每个block接管的元素数从1024增加到`1048576 / 64 = 16384`，每个线程在`THREAD_NUM = 1024`步长下stride循环16次
-- 逻辑核数等于物理核数，所有block在物理核上一次铺满，无后续排队
-
-**关键代码**：
-
-```cpp
-gather_adds_kernel<<<64, THREAD_NUM, 0, stream>>>(
-    input_device, index_device, output_device,
-    input_total_length, index_total_length);
 ```
 
 **优化手段**：
 
-- 将逻辑核数从1024调整为64，匹配物理核数，消除多余逻辑核的等待
-- 每核工作集从1024扩展到16384元素，把原本被调度开销摊薄掉的有效计算时间填回来
-- block内stride循环从1次增加到16次，使vector pipe在更长时间窗内保持高占用
+- 将逻辑核数从1024调整为64，匹配物理核数，消除多余逻辑核的等待（这是`SCENARIO_NUM=6→7`唯一变化的变量）
 
 **性能数据**：
 
-| Task Duration(us) | aiv_time(us) | aiv_total_cycles | aiv_vec_time(us) | aiv_vec_ratio | aiv_scalar_time(us) | aiv_scalar_ratio |
-| :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      33.319       |    31.364    |     51750.9      |     30.919       |     0.986     |        0.434        |      0.014       |
+| Task Duration(us) |
+| :---------------: |
+|      56.902       |
 
 **分析**：
 
-- 相比Case 5的1024核配置，Task Duration从53.132us降低到33.319us，耗时下降约37.3%，整体性能提升约1.59倍
-- **GM读写总量并没有变**：两个case都对`input[]`做了1M次gather+adds、对`output[]`做了1M次写入，访问的元素总量完全一致。差异来自两点
-  - **调度开销**：Case 5需要16个wave排队，调度基线约16.4us（见Case 4）；Case 6单wave无需排队，调度基线约2.4us（见Case 2），仅这一项就省下约14us
-  - **访存延迟掩盖**：每核工作集从1024扩到16384后，stride循环从1次增加到16次，gather读GM的高延迟可以被更长的循环窗口覆盖，单核aiv_total_cycles从4310.9提升到51750.9（约12×）、aiv_time从2.613us提升到31.364us（约12×），pipe不再被频繁打断
-- 与Case 2（64核空核函数）的2.373us调度基线相比，Case 6的33.319us中约30.9us为有效vector计算时间，调度头开销占比已不到10%
+- 相比`SCENARIO_NUM=6`的朴素写法（1024核），Task Duration从75.834us降低到56.902us，耗时下降约25.0%，整体性能提升约1.33倍
+- **gather读写总量并没有变，每block线程数也没变**：提升完全来自唯一变化的变量——逻辑核数从1024降到64，分两部分体现
+  - **调度开销**：`SCENARIO_NUM=6`的1024核中有960个逻辑核要等待物理核空闲，调度基线约16.1us（见Case 0的1024核档）；`SCENARIO_NUM=7`的64核一次占满物理核无需等待，调度基线约2.2us（见Case 0的64核档），仅这一项就省下约14us
+  - **访存延迟更容易被掩盖**：1024核时每个线程只读1个元素，发起gather读指令后只能等GM的结果返回；64核时每个线程要stride循环处理16个元素，这次读GM的结果还没返回、下一次读GM的请求已经发起，多次读GM的等待时间相互重叠，整体时间减少
 
-下图对比了Case 5与Case 6在block排布、单核工作集与stride循环结构上的差异：左侧Case 5的1024个block被切分为16个wave执行，每核工作集仅1024元素（4KB），stride循环只跑1次；右侧Case 6的64个block单wave占满物理核，每核工作集扩展到16384元素（64KB），stride循环跑16次。
+#### 32核Gather（SCENARIO_NUM=8）
 
-<img src="./figures/fig2_case5_vs_case6.png" width="95%">
+**核心实现**：
+
+- 核函数与`SCENARIO_NUM=7`完全相同（`gather_strided_kernel`，每block 2048线程），唯一变化的变量是把逻辑核数从64进一步降到32，即只用一半物理核
+- 每核处理的元素总量 = `2097152 / 32 = 65536`元素，stride循环`65536 / 2048 = 32`次
+
+**性能数据**：
+
+| Task Duration(us) |
+| :---------------: |
+|      110.419      |
+
+**分析**：
+
+- 32核的Task Duration为110.419us，比64核（56.902us）慢约94%，几乎是其两倍——**核数减半，并行度也减半，每核工作量翻倍**，而调度开销在32/64核档相差无几（见Case 0：32核1.643us、64核2.218us），慢的部分几乎全是计算并行度不足
+- 更关键的是：**32核（110.419us）比1024核（75.834us）还慢**。这说明大shape场景下，"逻辑核数 < 物理核数"的代价（一半物理核闲置、单核工作量翻倍）比"逻辑核数 ≫ 物理核数"的代价（排队等待）更大
+
+
+**Case 1 三种场景性能对比**：
+
+| SCENARIO_NUM | 写法 | Block Dim | Task Duration(us) | 说明 |
+| :----------: | :--: | :-------: | :---------------: | ---- |
+| SCENARIO_NUM=8 | strided | 32 | 110.419 | 逻辑核 < 物理核，并行度不足 |
+| **SCENARIO_NUM=7** | **strided** | **64** | **56.902** | **逻辑核 = 物理核，最优** |
+| SCENARIO_NUM=6 | naive | 1024 | 75.834 | 逻辑核 ≫ 物理核，排队等待 |
+
+![Case 1 大shape(2097152) Task Duration 随核数变化](figures/fig5_case1_large_curve.png)
+
+
+---
+#### 为什么都用2048线程
+
+每block线程数都固定为2048，原因有两点：
+
+1. **gather是memory-bound算子，大线程数掩盖访存延迟**：gather的瓶颈是随机读GM的访存延迟而非计算。每block线程越多，同时发送的访存请求越多，单次访存延迟越容易被并发掩盖。下表是64核固定在不同线程数下的实测Task Duration：
+
+   | 每block线程数 | stride循环次数 | Task Duration(us) | 说明                       |
+   | :-----------: | :------------: | :---------------: | -------------------------- |
+   | 256           | 128            | 94.328            | 线程数偏少，发送访存请求不足 |
+   | 512           | 64             | 69.286            | 并发上升，延迟开始被掩盖     |
+   | 1024          | 32             | 61.537            | 进一步提升                  |
+   | **2048**      | **16**         | **56.617**        | 硬件线程上限，收益最佳       |
+
+
+2. **2048是硬件单block线程数上限**：`__launch_bounds__`允许的线程数范围为`(0, 2048]`。因此2048既是性能最优点，也是硬件能给的最大并发。
+
+---
+### Case 2: 中shape的核数选择（SCENARIO_NUM=9/10/11/12）
+
+**样例目标**：对比同一中shape下执行Gather操作，配置不同griddim的性能差异。
+
+**核心实现**：
+
+- 核函数与`SCENARIO_NUM=7`完全相同，只把shape换成`64*2048=131072`个元素。主样例通过`SCENARIO_NUM=9/10/11/12`设置16 / 32 / 64 / 128核
+- 每核处理的元素数量 = `131072 / 核数`：16核8192、32核4096、64核2048、128核1024。相比小shape的几百元素，单核工作量仍然可观
+
+**性能数据**：
+
+| SCENARIO_NUM    | Block Dim | Elements per block | Task Duration(us) | 说明                       |
+| --------------- | :-------: | :-------: | :---------------: | -------------------------- |
+| SCENARIO_NUM=9  |    16     |   8192    |      16.753       | 核数偏少，单核工作量重     |
+| SCENARIO_NUM=10 |    32     |   4096    |      10.127       | 继续加核仍明显收益         |
+| SCENARIO_NUM=11 |  **64**   | **2048**  |     **7.753**     | **最优，逻辑核数=物理核**  |
+| SCENARIO_NUM=12 |    128    |   1024    |       9.857       | 越过物理核，反而变慢 |
+
+![Case 2 中shape(131072) Task Duration 随核数变化](figures/fig3_case2_131072_curve.png)
+
+
+**分析**：
+- 16 → 32 → 64：核数翻倍时Task Duration持续下降（16.753 → 10.127 → 7.753），说明数据量较大、每核工作量（≥2048元素）足够，加到物理核上限前增加并行的核数的收益始终明显
+- 64 → 128：核数翻倍越过64物理核，Task Duration 从 7.753us 升到 9.857us，**反而变慢约 27.1%**。多出的64个逻辑核必须排队等物理核空闲
+- **结论**：较大shape应打满物理核（64），但**打满≠越多越好**——核数超过物理核数，超出的逻辑核只能排队等待，必须以物理核数为上限
+
+---
+
+### Case 3: 小shape的核数选择（SCENARIO_NUM=13/14/15/16/17）
+
+**样例目标**：小shape下每核工作量很小，启动更多核带来的调度头开销会反超有效计算的收益，必须按shape实测选核数。
+
+**核心实现**：
+
+- 核函数与`SCENARIO_NUM=7`完全相同，只把shape换成小shape `8*2048=16384`个元素。主样例通过`SCENARIO_NUM=13/14/15/16/17`设置4 / 8 / 16 / 32 / 64核
+- 每核工作集 = `16384 / 核数`：4核4096、8核2048、16核1024、32核512、64核256。相比Case 2的131072，工作量小了一个数量级
+
+**性能数据**：
+
+| SCENARIO_NUM    | Block Dim | Elements per block | Task Duration(us) | 说明                     |
+| --------------- | :-------: | :-------: | :---------------: | ------------------------ |
+| SCENARIO_NUM=13 |     4     |   4096    |      10.792       | 核数太少，单核工作量重   |
+| SCENARIO_NUM=14 |     8     |   2048    |       6.676       | 继续加核仍明显收益       |
+| SCENARIO_NUM=15 |    16     |   1024    |       4.693       | 核数偏少，单核工作量偏重 |
+| SCENARIO_NUM=16 |  **32**   |  **512**  |     **3.834**     | **最低点，最优核数**     |
+| SCENARIO_NUM=17 |    64     |    256    |       4.212       | 打满物理核，头开销反超   |
+
+![Case 3 小shape(16384) Task Duration 随核数变化](figures/fig4_case3_16384_curve.png)
+
+
+**分析**：
+
+- 折线呈"先降后升"的谷形，**较优核数 = 32（物理核数的一半）**，并非打满64核
+- 32 → 64：核数翻倍，Task Duration 从 3.834us 升到 4.212us，**反而变慢约 9.9%**。多核场景下，每个核的任务量较小，导致计算时间较小，反而带来的调度开销会显著影响整体性能
+- 4 → 8 → 16 → 32：核数增加时Task Duration持续下降（10.792 → 6.676 → 4.693 → 3.834），说明小核数下，单核的计算量大会影响整体性能
+- 与Case 2的131072对照：同样的kernel与线程数，shape小到一定程度后最优核数从64退回到32，说明"最优核数"随shape缩小而变化，必须实测
+- **结论**：小shape无法照搬"打满物理核"的经验，必须像本case一样设置核数实测。更小的数据量最优核数要小于最大物理核数，本样例环境下16384的最低点在32核
 
 ---
 
@@ -344,35 +351,60 @@ gather_adds_kernel<<<64, THREAD_NUM, 0, stream>>>(
 
 ### Ascend 950PR性能数据
 
-**调度开销随核数变化（Case 1~4，empty_kernel）**：
+**调度开销随核数变化（Case 0）**：
 
-| Case version | Block Dim | Task Duration(us) | 相对Case 1调度耗时 | 说明                                  |
-| ------------ | --------- | ----------------- | ------------------ | ------------------------------------- |
-| Case 1       | 36        | 2.160             | **1×**             | 调度基线，核数 < 物理核               |
-| Case 2       | 64        | 2.373             | **1.10×**          | 核数 = 物理核，调度耗时基本持平       |
-| Case 3       | 128       | 3.592             | **1.66×**          | 核数 > 物理核（2×），调度开始上升     |
-| Case 4       | 1024      | 16.400            | **7.59×**          | 核数 ≫ 物理核（16×），调度开销主导    |
+| SCENARIO_NUM | Block Dim | Task Duration(us) | 说明                                  |
+| ------------ | --------- | ----------------- | ------------------------------------- |
+| 1            | 1         | 1.356             | 调度基线，单核启动开销                |
+| 2            | 32        | 1.643             | 核数 < 物理核                         |
+| 3            | 64        | 2.218             | 核数 = 物理核，调度耗时基本持平       |
+| 4            | 128       | 2.927             | 核数 > 物理核（2×），调度开始上升     |
+| 5            | 1024      | 16.104            | 核数 ≫ 物理核（16×），调度开销主导    |
 
-**实际计算场景核数匹配物理核的收益（Case 5 → Case 6）**：
+**实际计算场景匹配物理核的收益（Case 1）**：
 
-| 配置项               | Case 5             | Case 6             |
-| -------------------- | ------------------ | ------------------ |
-| 逻辑核数             | 1024               | 64                 |
-| 每核处理元素数       | 1024               | 16384              |
-| Task Duration(us)    | 53.132             | **33.319**         |
-| aiv_vec_ratio        | 0.939              | 0.986              |
-| Task Duration相对Case 5 | **1×**          | **0.63×**          |
+| 配置项                  | SCENARIO_NUM=6           | SCENARIO_NUM=7           | SCENARIO_NUM=8           |
+| ----------------------- | ------------------------ | ------------------------ | ------------------------ |
+| 写法                    | 朴素，每线程1元素，无循环 | 优化，每核跨步处理一段   | 优化，每核跨步处理一段   |
+| 逻辑核数                | 1024                     | 64                       | 32                       |
+| 每block线程数           | 2048                     | 2048                     | 2048                     |
+| 每核处理元素数          | 2048                     | 32768                    | 65536                    |
+| Task Duration(us)       | 75.834                   | **56.902**               | 110.419                  |
 
-- Case 6相比Case 5耗时下降约37.3%，整体性能提升约1.59倍
-- 逻辑核数从1024降到64匹配物理核，消除了多余逻辑核的等待开销
-- 每核工作集从1024扩到16384后，调度头开销摊薄到更多有效计算上，aiv_vec_ratio从0.939提升到0.986
+- `SCENARIO_NUM=7`相比`SCENARIO_NUM=6`耗时下降约25.0%，整体性能提升约1.33倍。核数降到64后，每个block分到的元素从2048增加到32768：一方面64核无需排队、调度开销远低于1024核；另一方面每个线程要连续处理16个元素，这次读的GM延迟还没返回、下一次读已经发起，多次读的等待相互重叠，而不像1024核那样每个线程读1个元素后就干等
+- `SCENARIO_NUM=8`把核数继续降到32（仅用一半物理核），Task Duration反而升到110.419us，比64核慢约94%、甚至比1024核还慢：大shape下"逻辑核数 < 物理核数"导致一半物理核闲置、单核工作量翻倍，代价比"逻辑核数 ≫ 物理核数"排队等待更大。可见逻辑核=物理核才是大shape的最优核数
+
+**中shape的最优核数（Case 2）**：
+
+| 核数 | rows/core | Task Duration(us) |
+| :--: | :-------: | :---------------: |
+| 16   | 8192      | 16.753            |
+| 32   | 4096      | 10.127            |
+| **64** | **2048** | **7.753**        |
+| 128  | 1024      | 9.857             |
+
+- 最优在 **64核**；16→32→64 单调下降，griddim在增加到物理核上限过程中持续受益
+- 64→128：核数越过物理核上限，128个逻辑核中有64个排队等待，反而慢约27.1%
+- **较大shape优先考虑打满物理核**：较大shape应把核数提到物理核数为止，超过物理核数排队等待开销会显著影响性能
+
+**小shape的最优核数（Case 3）**：
+
+| 核数 | rows/core | Task Duration(us) |
+| :--: | :-------: | :---------------: |
+| 4    | 4096      | 10.792            |
+| 8    | 2048      | 6.676             |
+| 16   | 1024      | 4.693             |
+| **32** | **512** | **3.834**         |
+| 64   | 256       | 4.212             |
+
+- 最低点在 **32核**（物理核数一半），不是打满的64核；32→64 反而慢约9.9%
+- 与Case 2对照：同样的kernel与线程数，shape小到一定程度后最优核数从64退回到32，说明"最优核数"是随shape变化的，必须实测
+- 多shape规律：数据量越大最优核数越靠近物理核上限
 
 ## 调优建议
 
-1. **优先匹配物理核数**：逻辑核数应尽量等于物理核数，避免多余逻辑核排队带来的调度开销。Case 4的1024核相对Case 2的64核多出约6.91×的调度耗时即为典型代价。
-2. **加大每核工作集摊薄头开销**：核数下调后，每核处理的元素数会成倍增加，让调度头开销在更多有效计算上分摊。
-3. **运行期查询物理核数**：避免硬编码`AIV_CORE_NUM`，建议使用`aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM, ...)`在运行期获取，提升样例在不同硬件上的可移植性。
-4. **先以空核函数建立调度基线**：在分析grid配置类调优问题时，建议先用`empty_kernel`测得相同核数下的调度基线，再用实际算子的Task Duration与其对比，区分调度开销和真实计算耗时。
+1. **大shape / 中shape，优先匹配物理核数，但不要越过**：逻辑核数应尽量等于物理核数，避免逻辑核不足（工作量重）或超过物理核排队等待两种代价。
+2. **小shape需实测核数性能**：当数据量较小、每核工作量很小时，启动更多核带来的调度头开销会反超收益，最优核数落在物理核数以内。应像Case 2/Case 3那样设置核数、用msprof Task Duration找最低点。数据量越大最优核数越靠近物理核数。
 
 ## 编译运行
 
@@ -402,7 +434,7 @@ gather_adds_kernel<<<64, THREAD_NUM, 0, stream>>>(
 - 样例执行
 
   ```bash
-  SCENARIO_NUM=6                       # 选择执行场景，可选1-6
+  SCENARIO_NUM=7                       # 选择执行场景，可选1-17
   mkdir -p build && cd build;          # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./grid_config                        # 执行样例
@@ -413,7 +445,7 @@ gather_adds_kernel<<<64, THREAD_NUM, 0, stream>>>(
   | 选项                       | 可选值      | 说明                                                          |
   | -------------------------- | ----------- | ------------------------------------------------------------- |
   | `CMAKE_ASC_ARCHITECTURES`  | `dav-3510`  | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT）    |
-  | `SCENARIO_NUM`             | `1`-`6`     | 样例类型，默认为1                                             |
+  | `SCENARIO_NUM`             | `1`-`17`    | 样例类型，默认为1                                             |
 
   执行结果如下，说明精度对比成功。
 
