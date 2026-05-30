@@ -13,6 +13,7 @@
 
 #include "common/aicpu_kfc_utils.h"
 #include "comm_kfc_aicpu_server.h"
+#include "timing_stat.h"
 
 using namespace HcclApi;
 
@@ -121,7 +122,11 @@ HcclResult PrepareProcess(AscCommServerInfo &server, u32 &expectSeqNum)
         HCCL_INFO("Expect seq id %u but receive %u.", expectSeqNum, seqNum);
         ++(server.retryCnt);
     } else {
+        uint32_t slot = TimingStatStart("[PrepareProcess][Orchestrate]");
         CHK_RET(server.serverIns.Orchestrate(server.msg, *(server.extMsg), server.msgPos));
+        TimingStatEnd(slot);
+        TIMING_STAT_DUMP();
+
         server.msgPos = (server.msgPos + 1U) % HCCL_MSG_CNT;
         ++expectSeqNum;
         server.retryCnt = 0;
