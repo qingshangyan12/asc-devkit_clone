@@ -112,18 +112,7 @@ AscendC::LocalTensor<half> a2LocalPing(AscendC::TPosition::A2, 0, a2PingpongSize
 AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES, a2PingpongSize);
 ```
 
-#### 2. 大包搬运
-
-通过 `stepKa`/`stepKb` 参数将多个基本块打包为一次 DataCopyIn 操作（称为"大包"），减少 MTE2 搬运次数。例如 `stepKa=8` 表示一次将 8 个 baseM * baseK 块从 GM 搬入 L1。
-
-```cpp
-// DataCopyInA: 一次搬入 stepKa 个 baseK 块
-AscendC::Nd2NzParams nd2nzParams;
-nd2nzParams.nValue = curM;
-nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
-```
-
-#### 3. 细粒度流水同步
+#### 2. 细粒度流水同步
 
 使用四类硬件事件标志实现精确的流水线同步，分为正向同步（数据就绪通知）和反向同步（缓冲区释放通知）：
 
@@ -159,15 +148,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 }
 ```
 
-#### 4. LoadData3D 替代 LoadData2D——减少指令队列占用
-
-在 Atlas A2/A3 架构上，本样例使用 [`LoadData3DParamsV2`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)（即 [LoadData3D](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)）替代 [`LoadData2DParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
-
-**问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
-
-> **注意**：Atlas A5 芯片提供了 `LoadData2DParamsV2` 接口，单条指令即可完成搬运，无需 LoadData3D。因此本样例通过 `__NPU_ARCH__` 条件编译区分两种架构的 LoadData 实现。
-
-#### 5. 多核并行切分
+#### 3. 多核并行切分
 
 按 M/N 方向均匀切分矩阵到多核并行计算，4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突：
 
@@ -177,31 +158,7 @@ uint32_t mIterIdx = AscendC::GetBlockIdx() % mIter;
 uint32_t nIterIdx = AscendC::GetBlockIdx() / mIter;
 ```
 
-#### 6. 常量 Tiling
-
-所有 Tiling 参数（baseM/baseK/baseN、singleCoreM/K/N、stepKa/stepKb）通过模板参数在编译期确定，运行时无需 Scalar 动态计算，减少 Scalar 开销：
-
-```cpp
-template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
-          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
-          uint32_t stepKa, uint32_t stepKb>
-class KernelMmad { ... };
-```
-
-#### 7. UnitFlag 优化
-
-开启 UnitFlag 后，[MMAD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md) 和 [FIXPIPE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
-
-```cpp
-mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
-```
-
-- `unitFlag = 2`：中间 K 块，MMAD 计算结果不立即写回，而是等待下一个 512B 完成后流水搬出
-- `unitFlag = 3`：最后一个 K 块，通知 FIXPIPE 将所有剩余结果写回 GM
-
-### 高级极限打磨
-
-#### 8. DataCopyIn 优先搬运 B 矩阵
+#### 4. DataCopyIn 优先搬运 B 矩阵
 
 当 `stepKa > stepKb` 时，B 矩阵每 `stepKb` 个 baseK 就需要切换到下一个 L1 缓冲区（Pong），而 A 矩阵需要 `stepKa` 个 baseK 才切换。因此 B 的数据需求更紧迫。如果先搬运 A，MTE2 流水被 A 占用，B 的搬运要等 A 搬完才能开始，导致需要 B 数据时 B 尚未就绪。
 
@@ -213,6 +170,49 @@ k=0:  Compute → DataCopyIn(B1 Pong) → DataCopyIn(A1 Pong)
 k=stepKb:       需要 B1 Pong → 已就绪 ✓（B 已有 stepKb 轮时间搬运）
 k=stepKa:       需要 A1 Pong → 已就绪 ✓（A 有 stepKa 轮时间搬运，更充裕）
 ```
+
+### 高级极限打磨
+
+#### 5. 大包搬运
+
+通过 `stepKa`/`stepKb` 参数将多个基本块打包为一次 DataCopyIn 操作（称为"大包"），减少 MTE2 搬运次数。例如 `stepKa=8` 表示一次将 8 个 baseM * baseK 块从 GM 搬入 L1。
+
+```cpp
+// DataCopyInA: 一次搬入 stepKa 个 baseK 块
+AscendC::Nd2NzParams nd2nzParams;
+nd2nzParams.nValue = curM;
+nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
+```
+
+#### 6. LoadData3D 替代 LoadData2D——减少指令队列占用
+
+在 Atlas A2/A3 架构上，本样例使用 [`LoadData3DParamsV2`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)（即 [LoadData3D](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load3D.md)）替代 [`LoadData2DParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
+
+**问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
+
+> **注意**：Atlas A5 芯片提供了 `LoadData2DParamsV2` 接口，单条指令即可完成搬运，无需 LoadData3D。因此本样例通过 `__NPU_ARCH__` 条件编译区分两种架构的 LoadData 实现。
+
+#### 7. 常量 Tiling
+
+所有 Tiling 参数（baseM/baseK/baseN、singleCoreM/K/N、stepKa/stepKb）通过模板参数在编译期确定，运行时无需 Scalar 动态计算，减少 Scalar 开销：
+
+```cpp
+template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
+          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
+          uint32_t stepKa, uint32_t stepKb>
+class KernelMmad { ... };
+```
+
+#### 8. UnitFlag 优化
+
+开启 UnitFlag 后，[MMAD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md) 和 [FIXPIPE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
+
+```cpp
+mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
+```
+
+- `unitFlag = 2`：中间 K 块，MMAD 计算结果不立即写回，而是等待下一个 512B 完成后流水搬出
+- `unitFlag = 3`：最后一个 K 块，通知 FIXPIPE 将所有剩余结果写回 GM
 
 #### 9. L2Cache 优化
 
