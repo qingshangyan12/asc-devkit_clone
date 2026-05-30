@@ -1,6 +1,6 @@
 # 随路量化与随路relu场景组合<a name="ZH-CN_TOPIC_0000002538071282"></a>
 
-矩阵搬出支持多种随路量化与随路relu的组合，芯片支持的全量场景组合参考下表，接下来将对下表中的随路量化relu算法逐一介绍。（其中Leaky relu、Prelu、REQ4/VREQ4、QF322S4\_PRE/VQF322S4\_PRE、\(V\)SHIFTS322S16模式 AscendC 待实现）
+矩阵搬出支持多种随路量化与随路relu的组合，芯片支持的全量场景组合参考下表，接下来将对下表中的随路量化relu算法逐一介绍。（其中Leaky relu、Prelu、REQ4/VREQ4、QF322S4\_PRE/VQF322S4\_PRE、\(V\)SHIFTS322S16模式AscendC待实现）
 
 <cann-filter npu_type = "A3,910b">
 

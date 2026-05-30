@@ -53,8 +53,8 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 |参数名称|含义|
 |----------|----------|
-|blockCount|搬运的数据块个数。uint16_t类型，取值范围为blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）**。|
-|blockLen|搬运的每个数据块长度。uint16_t类型，取值范围为blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为 NOP（空操作）**。|
+|blockCount|搬运的数据块个数。uint16_t类型，取值范围为blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）**。|
+|blockLen|搬运的每个数据块长度。uint16_t类型，取值范围为blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）**。|
 |srcGap|源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围为srcGap∈[0, 65535]，单位为DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。|
 |dstGap|目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围为dstGap∈[0, 65535]，单位为DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。|
 
