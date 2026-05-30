@@ -1001,14 +1001,14 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
 ```
-<<<blocks_per_grid, threads_per_block, dynamic_ubuf_bytes, stream>>>
+<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>
 ```
 
 其中：
 
 -   blocks\_per\_grid：int或dim3类型，用于指定网格（grid）的维度与规模，blocks\_per\_grid.x \* blocks\_per\_grid.y \* blocks\_per\_grid.z等于启动的线程块总数。
 -   threads\_per\_block：int或dim3类型，用于指定每个线程块（block）的维度与规模，threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
--   dynamic\_ubuf\_bytes：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存unified-buffer)中的“动态申请”方式。
+-   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存unified-buffer)中的“动态申请”方式。
 -   stream：aclrtStream类型指针，指定关联的流，用于维护异步操作的执行顺序。
 
 以下示例展示了内核函数的声明与调用方式。
@@ -1017,10 +1017,10 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 // 声明
 __global__ void add_custom(float* x, float* y, float* z, uint64_t total_length);
 // 调用
-add_custom<<<blocks_per_grid, threads_per_block, dynamic_ubuf_bytes, stream>>>(x, y, z, 1024);
+add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, z, 1024);
 ```
 
-在执行函数之前，会先对上述配置参数进行校验。如果grid\_dim或block\_dim超出设备的最大允许规模，或dynamic\_smem\_bytes超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
+在执行函数之前，会先对上述配置参数进行校验。如果blocks\_per\_grid或threads\_per\_block超出设备的最大允许规模，或dyn\_ubuf\_size超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
 在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
 
