@@ -142,8 +142,7 @@ src0_repeat_stride = 8;
 src1_repeat_stride = 8; // 迭代间的数据连续读取和写入。
 
 asc_set_vector_mask(0, mask[0]);
-asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block_stride,
-        src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
 
 结果示例如下：
