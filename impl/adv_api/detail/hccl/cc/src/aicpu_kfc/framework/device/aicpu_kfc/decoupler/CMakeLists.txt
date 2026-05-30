@@ -60,6 +60,7 @@ set(open_exec_impl_src_list
     ${OPEN_HCCL_SRC_ROOT}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/cann_kernel_bridge.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
     ${OPEN_HCCL_SRC_ROOT}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
@@ -91,6 +92,7 @@ target_compile_options(ccl_kernel_decoupler PRIVATE
 target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/tools
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
@@ -149,6 +151,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper
+    ${OPEN_HCCL_SRC_ROOT}/tools
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -186,6 +189,7 @@ target_compile_options(ccl_kernel_decoupler_open_exec_impl PRIVATE
 
 target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${HCCL_LOCAL_HEADER_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl
@@ -252,14 +256,15 @@ if(TARGET mc2_server)
         $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
     )
 
-    target_include_directories(mc2_server_decoupler PRIVATE
-        ${HCCL_HCOMM_HEADER_DIR}/../
-        ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
-        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
-        ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
+target_include_directories(mc2_server_decoupler PRIVATE
+    ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${OPEN_HCCL_SRC_ROOT}/tools
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
+    ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
-        $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
-    )
+    $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+)
 
     target_link_libraries(mc2_server_decoupler PRIVATE
         $<BUILD_INTERFACE:acl_rt_headers>
