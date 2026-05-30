@@ -135,6 +135,10 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler
 )
 
 
@@ -229,6 +233,7 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather_v/template/aicpu/ins_temp_all_gather_v_mesh_1D.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler/cann_kernel_bridge.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
 
@@ -410,6 +415,7 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
 endif()
 
 add_subdirectory(common)
+add_subdirectory(tools)
 
 if(PRODUCT_SIDE STREQUAL "host")
     add_subdirectory(ops)
