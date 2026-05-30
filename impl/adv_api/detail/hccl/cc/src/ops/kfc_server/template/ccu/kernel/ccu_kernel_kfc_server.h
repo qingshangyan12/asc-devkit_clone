@@ -20,10 +20,10 @@
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "../ccu_temp_kfc_server.h"
-#include "types/mc2_type.h"
+#include "mc2_type.h"
 
 namespace mc2_ops_hccl {
-
+constexpr u64 INVALID_U64 = UINT64_MAX;
 class CcuKernelArgKfcServer : public hcomm::CcuKernelArg {
 public:
     explicit CcuKernelArgKfcServer(uint64_t dimSize, uint32_t rankId, bool loadFromMem, const OpParam& opParam,
@@ -52,15 +52,8 @@ public:
 class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
 public:
     explicit CcuTaskArgKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t dieNum,
-                                 uint64_t missionNum, uint64_t missionIndex, uint64_t token):
-                                xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
-                                missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
-    {
-        CHECK_PARAM();  // 对入参的校验，SetCommAddr()、SetDieNum()、SetMissionNumAndId(), 主机 GenCircularQueue()
-        HCCL_DEBUG("[CcuTaskArgKfcServer] syncAddr: %lu, paramAddr: %lu, dieNum: %lu, "
-                   "missionNum: %lu, missionIndex: %lu",
-                   xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_);
-    }
+                                 uint64_t missionNum, uint64_t missionIndex, uint64_t token);
+
     // HBM上的算子执行参数首地址
     uint64_t xnAddr_{0};
     
@@ -71,6 +64,8 @@ public:
     uint64_t missionIndex_{0};
     uint64_t token_;
 
+private:
+    HcclResult CheckTaskArgs();
 };
 
 class CcuKernelKfcServer : public CcuKernelAlgBase {

@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_server.h"
+#include "mc2_type.h"
 
 namespace mc2_ops_hccl {
 
@@ -28,6 +29,58 @@ const uint32_t DIE0_ID = 0;
 const uint32_t DIE1_ID = 1;
 const string DIE1_START_SIG = "Die1StartSig";
 const string DIE1_END_SIG = "Die1EndSig";
+
+CcuTaskArgKfcServer::CcuTaskArgKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t dieNum,
+        uint64_t missionNum, uint64_t missionIndex, uint64_t token):
+        xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
+        missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
+{
+    // 对入参的校验 , 主机 GenCircularQueue()
+    CheckTaskArgs();
+    HCCL_DEBUG("[CcuTaskArgKfcServer] syncAddr: %lu, paramAddr: %lu, dieNum: %lu, "
+                   "missionNum: %lu, missionIndex: %lu",
+                   xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_);
+}
+
+HcclResult CcuTaskArgKfcServer::CheckTaskArgs()
+{
+    HcclResult ret = HcclResult::HCCL_SUCCESS;
+
+    // SetCommAddr()部分校验
+    if (ckeAddr_ > (UINT64_MAX - CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
+        HCCL_ERROR("MC2 High Level API SetDieNum Failed: integer overflow occurs");
+        ret = HcclResult::HCCL_E_PARA;
+    }
+
+    // SetDieNum()部分校验
+    // TODO GetDieId()
+    uint32_t getDieId = DIE1_ID;
+    bool isDieNumValid = (dieNum_ == SINGLE_DIE || dieNum_ == DOUBLE_DIE);
+    bool isDieIdValid  = (getDieId == DIE0_ID || getDieId == DIE1_ID);
+    if (!(isDieNumValid && isDieIdValid)) {
+        HCCL_ERROR("MC2 High Level API SetDieNum Failed: Invalid Die Config");
+        ret = HcclResult::HCCL_E_PARA;
+    }
+
+    //SetMissionNumAndId()部分校验
+    if (missionIndex_ >= missionNum_) {
+        HCCL_ERROR("MC2 High Level API SetDieNum Failed: integer overflow occurs");
+        ret = HcclResult::HCCL_E_PARA;
+    }
+
+    // 主机
+    if (missionIndex_ == 0){
+        uint64_t recordAddr = ckeAddr_ + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
+        if (ckeAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
+            || recordAddr > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_ONE_PARAM_SIZE)
+            || xnAddr_ > (UINT64_MAX - (CCU_TASK_NUM_MAX - 1) * CCU_PARAM_NUM_MAX * CCU_ONE_PARAM_SIZE)) {
+            HCCL_ERROR("MC2 High Level API SetDieNum Failed: integer overflow occurs");
+            ret = HcclResult::HCCL_E_PARA;
+        }
+    }
+
+    return ret;
+}
 
 CcuKernelKfcServer::CcuKernelKfcServer(const CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
@@ -59,7 +112,6 @@ void CcuKernelKfcServer ::LoadArgs()
 void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 {   
     // 原本的应该是在入参处检查，这里仅用于set
-    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
     // Variable当前与u64的运算符仅重载了==,!=,=
     waitAddr_ = syncAddr;
     recordAddr_ = syncAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
@@ -67,9 +119,7 @@ void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
-    // TODO GetDieId()
     // 原本的应该是在入参处检查，这里仅用于set 成员变量
-    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
     if (dieNum == DOUBLE_DIE) { // 双Die场景才需要导入导出
         // 导出信号
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
@@ -83,7 +133,6 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable miIndex)
 {
     // miNum与missionIndex_的校验应该在外面
-    // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
     // 多Mission场景暂且不考虑
     return ;
     if (miIndex == 0) {
