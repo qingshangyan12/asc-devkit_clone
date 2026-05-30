@@ -379,6 +379,7 @@ struct AlgResourceCtxSerializable {
     std::vector<ThreadHandle> threads;
     ThreadHandle unfoldThread = 0; // 展开流thread
     std::vector<std::vector<ChannelInfo>> channels;
+    bool isHcommBatchTransferOnThreadSupported = false; // 布局与 CANN 一致；asc 不使用，恒 false
     void* commInfoPtr = nullptr;
     // hostdpu
     void *npu2DpuShmemPtr = nullptr;
@@ -448,6 +449,13 @@ struct AlgResourceCtxSerializable {
     }
 };
 
+// device aicpu 算子配置。布局须与 CANN ops_hccl 的 DevAicpuOpConfig 一致，
+// 使 OpParam 可不经转换直接传给 CANN executor(见 cann_kernel_bridge)。
+struct DevAicpuOpConfig {
+    u32 execTimeout = 0;
+    double multipleDimensionSplitRatio = 0.8;
+};
+
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
     char tag[TAG_LENGTH]; // 保存topoInfo的key值
@@ -472,7 +480,6 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     AlgType algType;
-    double multipleDimensionSplitRatio = 0.8;
     char algTypeStr[ALG_MAX_LENGTH];
     union {
         struct {
@@ -522,6 +529,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     ThreadHandle opThread = 0;
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
     u32 dataCount = 0; // 算子上报dfx的数据量
+    DevAicpuOpConfig opConfig; // device aicpu 算子配置(布局与 CANN 一致)
     u64 varMemSize{0};
     u8 varData[0];
 };
