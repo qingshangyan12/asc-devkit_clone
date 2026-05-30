@@ -8,9 +8,10 @@ TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下
 ## 目录结构介绍
 ```
 ├── matmul_triangle
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│   ├── figures                 // 图示
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   └── matmul_triangle.asc     // Ascend C样例实现 & 调用样例
@@ -19,8 +20,6 @@ TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下
 - 样例功能：  
   使用上三角模板策略时，index为0、5、10、15的核，使用上三角模板策略进行三角矩阵计算；index为4、8、9、12、13、14的核，进行常规的矩阵乘计算；index为1、2、3、6、7、11的核不执行计算。  
   使用下三角模板策略时，index为0、5、10、15的核，使用下三角模板策略进行三角矩阵计算；index为1、2、3、6、7、11的核，进行常规的矩阵乘计算；index为4、8、9、12、13、14的核不执行计算。
-
-  ![mm_triangle.png](../../../../../docs/api/context/figures/mm_triangle.png)
 
 - 样例规格：  
   本样例中：M = 2558, N = 2045, K = 128。
@@ -112,19 +111,41 @@ TrianUpperMatmulPolicy（上三角模板策略）和TrianLowerMatmulPolicy（下
     source ${install_path}/cann/set_env.sh
     ```
 
-- 样例执行  
+- 样例执行
+
   ```bash
   # -DTRIANGLE_MODE=0：使能上三角模板策略；
   # -DTRIANGLE_MODE=1：使能下三角模板策略；
   # -m=0：生成使能上三角模板策略的测试输入数据
   # -m=1：生成使能下三角模板策略的测试输入数据
   mkdir -p build && cd build;    # 创建并进入build目录
-  cmake .. -DTRIANGLE_MODE=0;make -j;    # 编译工程，以使能上三角模板策略为例
+  cmake -DTRIANGLE_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，以使能上三角模板策略为例，默认npu模式
   python3 ../scripts/gen_data.py -m=0    # 生成测试输入数据，以使能上三角模板策略为例
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin    # 验证输出结果是否正确，确认算法逻辑正确
   ```
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如：
+  ```bash
+  cmake -DTRIANGLE_MODE=0 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # cpu调试模式
+  cmake -DTRIANGLE_MODE=0 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+
+- 执行结果
+
   执行结果如下，说明精度对比成功。
+
   ```bash
   test pass!
   ```

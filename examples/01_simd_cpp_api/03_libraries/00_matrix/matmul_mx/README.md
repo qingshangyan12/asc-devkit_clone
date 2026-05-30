@@ -13,11 +13,11 @@
 
 ```
 ├── matmul_mx
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
+│   ├── scripts
+│   │   ├── gen_data.py            // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py       // 真值对比文件
+│   ├── CMakeLists.txt             // 编译工程文件
+│   ├── data_utils.h               // 数据读入写出函数
 │   └── matmul_mx.asc              // Ascend C样例实现 & 调用样例
 ```
 
@@ -41,7 +41,7 @@
   </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_mx_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulMxNormEvenCustom</td></tr>
   </table>
 
 - 样例实现： 
@@ -96,15 +96,36 @@
     source ${install_path}/cann/set_env.sh
     ```
 
-- 样例执行  
+- 样例执行
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;             # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
   ./demo                        # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
-  执行结果如下，说明精度对比成功。
+
+  使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+
+  示例如：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 参数 | 说明 | 可选值 | 默认值 |
+  |------|------|---------|--------|
+  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-3510 | dav-3510 |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功：
   ```bash
   test pass!
   ```

@@ -9,6 +9,7 @@
 - Case 2: 多核 MDL 常量化 tiling（在**GM→L1搬运中**，scaleA/B 相对 A/B 按照倍数多倍搬运，`mxTypePara`）
 
 ## 支持的产品
+
 - Ascend 950PR / Ascend 950DT
 
 ## 目录结构介绍
@@ -20,6 +21,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   ├── matmul_mx.asc           // Ascend C样例实现（包含2个优化case）
 │   └── matmul_mx.h             // 样例头文件（静态Tiling模板与kernel实现）
 ```
@@ -53,18 +55,18 @@ $$
 | scaleB | 右量化系数矩阵 | [256, 8192] | `fp8_e8m0_t` | `ND` | B 矩阵的缩放因子矩阵，B矩阵 K 方向每 32 个元素共享一个缩放因子 |
 | C | 输出 | [8192, 8192] | `bfloat16_t` | `ND` | 计算结果 |
 
-  <img src="figure/MxMatmul.png">
+  <img src="figures/MxMatmul.png">
 
 #### 四路输入说明
 
 - 样例中 `sK = ceil(K / 64) * 2`，当 `K=8192` 时，`sK=256`
 - 因此 `scaleA` 形状为 `[M, sK] = [8192, 256]`，`scaleB` 形状为 `[sK, N] = [256, 8192]`
 - `scale` 的 ND 需要特别说明：`scaleA` 按常规 row-major `[M, sK]` 写入；`scaleB` 的写盘顺序等价于 `[sK/2, N, 2]`，即先在 K 方向连续 `2 Byte`，再沿 N 方向推进，四路输入的 `ND` 排布如下图所示：
-  <img src="figure/NDformat.png">
+  <img src="figures/NDformat.png">
 
 - 四路输入的搬运如下图所示：
 
-  <img src="figure/InputOfMxMatmul.png">
+  <img src="figures/InputOfMxMatmul.png">
 
 ## 样例实现
 
@@ -87,7 +89,7 @@ REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 
 ### Case1 与 Case2 差异
 
-两种场景均为常量化 tiling，L1 参数一致：`depthA1/depthB1=4`、`stepKa/stepKb=2`、`stepM/stepN=1`、`dbL0A/dbL0B=2`。  
+两种场景均为常量化 tiling，L1 参数一致：`depthA1/depthB1=4`、`stepKa/stepKb=2`、`stepM/stepN=1`、`dbL0A/dbL0B=2`。
 唯一差异是 `mxTypePara`：
 
 | 场景 | `mxTypePara` | 语义 |
@@ -163,11 +165,10 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 - Case2：每次多量搬运，scale 搬运次数约为 `4` 次（`8192/2048`）
 - 在该 shape 下两者 scale 理论总字节量相同，但 Case2 的批次更少、复用窗口更大，更利于降低 MTE2 耗时。
 
-
-
 ## 性能对比总结
 
 ### Ascend 950PR芯片性能数据
+
 | Case version | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Case 1 | 750.219 | 32 | 749.13 | 660.15 | 0.881 | 258.354 | 0.345 | 437.64 | 0.584 | 753.906 | 0.982 | 33.257 | 0.044 |
@@ -187,8 +188,8 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 **调优 Tips**：
 > MX Matmul 的关键差异在于 `scale` 与 A/B 的搬运可解耦；当 `aic_mte2_ratio` 偏高时，优先通过 `mxTypePara` 调整 `scale` 搬运比例以提升 L1 复用、减少重复 GM->L1 搬运。
 
-
 ### 理论性能对比
+
 本样例的性能数据在Ascend 950PR上运行得到，该处理器的主频为1.65GHz，对于MX-FP4的数据类型，每cycle处理16×64×16次乘加运算。Cube理论运算时间为
 $$
 T_{\text{theory}} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{4096 \times 1.65 \times 10^9 \times 32} = 635.5 μs
@@ -253,7 +254,6 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | 目标SoC架构（本样例仅支持3510） |
 
   > **注意：** 切换 `CMAKE_ASC_RUN_MODE` / `CMAKE_ASC_ARCHITECTURES` / `SCENARIO_NUM` 前需清理cmake缓存，可在build目录下执行 `rm CMakeCache.txt` 后重新 cmake。
-  
 
   执行结果如下，说明精度对比成功。
   ```bash
@@ -280,7 +280,9 @@ PROF_xxxx_XXXXXX
     ├── xx_*.csv
     └── README.txt
 ```
+
 查看具体的性能分析结果：
+
 ```
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv

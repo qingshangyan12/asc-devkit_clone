@@ -1,12 +1,17 @@
 # Matmul最佳实践样例
+
 ## 概述
+
 本样例基于Matmul 高阶API实现矩阵乘法运算，通过9个递进式的优化case展示从基础实现到高性能优化的完整调优路径，包括单核基础版本、Tiling优化、多核并行切分、MDL模式、L1Cache/L2Cache优化、常量Tiling、UnitFlag优化等多种优化手段。
 
 ## 支持的产品
+
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
 ## 目录结构介绍
+
 ```
 ├── matmul_high_performance
 │   ├── scripts
@@ -14,6 +19,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   ├── matmul.h                // 所有优化case的头文件定义
 │   └── matmul.asc              // Ascend C样例实现
 ```
@@ -29,12 +35,11 @@
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">-</td></tr>
+<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">true</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">-</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_custom</td></tr>
 </table>
-
 
 ## 样例实现
 
@@ -54,9 +59,9 @@
 - `MatmulKernelMdlL2CacheConstant`使用自定义的`MatmulProblemShape`结构体，仅包含shape信息（M, N, K, singleCoreM等），Tiling参数已在编译期通过`CONSTANT_CFG`计算完成，运行时无需Scalar计算
 
 #### 2. Process方法计算流程特点
+
 - **计算流程**：`MatmulKernel`单次迭代，`MatmulKernelL2Cache`和`MatmulKernelMdlL2CacheConstant`循环2次（L2Cache优化，A矩阵M轴切分）
 
----
 ### 性能指标说明
 
 | 指标 | 说明 |
@@ -74,8 +79,6 @@
 | aic_mte2_ratio | MTE2的时间占比，反映GM到L1的数据加载压力 |
 | aic_fixpipe_time(μs) | FixPipe（L0C到GM搬运）的执行时间 |
 | aic_fixpipe_ratio | FixPipe的时间占比，反映结果写回的访存压力 |
-
----
 
 **说明**：以下各Case的性能变化分析以A2芯片（Ascend 910B1）性能数据为例。Ascend 950PR的性能调优数据请参考[下文](#ascend-950pr芯片性能数据)。
 
@@ -103,7 +106,6 @@ tilingData.set_baseK(64);
 **分析**：
 - 单核运算时间**759363.98μs**
 - 计算单元利用率aic_mac_ratio仅**18.7%**，该场景仅作为Matmul运算性能对比样例，不建议用户使用
----
 
 ### Case 1: 单核Tiling优化 (SINGLE_CORE_TILING)
 
@@ -127,8 +129,6 @@ tilingApi.SetFixSplit(128, 256, 64);
 
 - 💡**推荐base块设置**：A2/A3 芯片L0A大小与L0B大小一致，为64KB，L0C大小为128KB，[baseM, baseN, baseK] = [128, 256, 64]时，能最大限度利用内存空间。`输入数据类型b16时，base块推荐[baseM, baseN, baseK] = [128, 256, 64]，输入数据类型b8时，base块推荐[baseM, baseN, baseK] = [128, 256, 128]。`
 
-
-
 **性能数据**：
 | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 |------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
@@ -139,8 +139,6 @@ tilingApi.SetFixSplit(128, 256, 64);
 - MTE2数据搬运耗时从582515.828μs降低到195613.432μs，降低**66.42%**
 - 后续优化方向：引入多核并行计算，充分利用多核资源提升整体吞吐量
 
----
-
 ### Case 2: 多核切分 2x12 (MULTI_CORE_SPLIT_2_12)
 
 **优化目标**：引入多核并行计算，提升整体吞吐量
@@ -149,7 +147,7 @@ tilingApi.SetFixSplit(128, 256, 64);
 - 多核并行计算，将8192×8192的矩阵乘法切分到24个核上并行执行
 - 切分策略：M方向2块，N方向12块，**singleM=4096，singleN=683，尾块tailN=679**
 - 搬运策略：GM上输入的A、B矩阵按baseM×baseK、baseK×baseN分块依次搬运到L1中，再从L1搬运到L0A/L0B，Cube单元对每次搬运的base块执行一次baseM×baseN×baseK大小的Matmul计算
-<img src="figure/2_12_split_core.png">
+<img src="figures/2_12_split_core.png">
 
 **关键代码**：
 ```cpp
@@ -172,8 +170,6 @@ SetL1(tilingData);
 - aic_mte2_time耗时**10177.798μs**，占比**81.2%**，成为性能提升瓶颈
 - 后续优化方向：当前多核切分策略没有满足地址512B对齐，且对M、N没有均匀分核，后续将优化切分策略，提升地址对齐，提高访存效率
 
----
-
 ### Case 3: 多核切分 4x6 (MULTI_CORE_SPLIT_4_6)
 
 **优化目标**：优化多核切分策略
@@ -183,7 +179,7 @@ SetL1(tilingData);
 - 切分策略：对M、N均匀切分，M方向4块，N方向6块
 - 搬运策略：GM上输入的A、B矩阵按baseM×baseK、baseK×baseN分块依次搬运到L1中，再从L1搬运到L0A/L0B，Cube单元对每次搬运的base块执行一次baseM×baseN×baseK大小的Matmul计算
 
-<img src="figure/4_6_split_core.png">
+<img src="figures/4_6_split_core.png">
 
 **关键代码**：
 ```cpp
@@ -198,7 +194,6 @@ SetL1(tilingData);
 - **避免同地址访问**：同地址访问指多个核同时读取A矩阵的同一行数据时，需要访问相同的内存地址，硬件对同一地址的多次访问需要串行化。同地址访问核数越多，串行导致的性能劣化越严重，相比于case2中2×12的分核策略，case3的4×6分核同地址冲突延迟更小
 - **在多核切分时，应在满足地址512B对齐的情况下，对M、N进行均匀切分。**
 
-
 **性能数据**：
 | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 |------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
@@ -208,8 +203,6 @@ SetL1(tilingData);
 - 相比Case 2，Task Duration从12541.22μs降低到12283.84μs，降低了 2.05%。
 - aic_mte2_time从10177.798μs降低到8616.671μs，降低**15.33%**，降幅**1561.127μs**
 - 后续优化方向：当前aicore耗时仍主要为MTE2，后续将启用L1多块缓存功能，隐藏数据搬运延迟，提升MTE2流水线效率
-
----
 
 ### Case 4: 多核使用MDL模板 (MULTI_CORE_MDL)
 
@@ -253,8 +246,6 @@ AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATyp
 - aic_mac_ratio从**31.2%**提升到**69.4%**
 - 后续优化方向：MDL模板自动调优计算的的Tiling没有完全利用L1空间，可手动调整Tiling参数，进一步提高MTE2的搬运力度
 
----
-
 ### Case 5: 多核MDL + L1Cache优化 (MULTI_CORE_MDL_L1CACHE)
 
 **优化目标**：提高MTE2的搬运力度，充分利用L1缓存空间
@@ -279,12 +270,12 @@ tilingData.set_stepKa(8);
 - **L1 Cache Tiling参数优化**：手动调整depthA1和stepKa参数，充分利用L1缓存
   - 当前配置：depthA1=16, depthB1=8, baseM=128, baseN=256, baseK=64
   - L1 缓存占用计算：
-    
+
     A 矩阵：
-      depthA1 × baseM × baseK × sizeof(float16) = 16 × 128 × 64 × 2B = 262,144B = 256 KB
+      depthA1 × baseM × baseK × sizeof(half) = 16 × 128 × 64 × 2B = 262,144B = 256 KB
 
     B 矩阵：
-      depthB1 × baseN × baseK × sizeof(float16) = 8 × 256 × 64 × 2B = 262,144B = 256 KB
+      depthB1 × baseN × baseK × sizeof(half) = 8 × 256 × 64 × 2B = 262,144B = 256 KB
 
     总计256 KB + 256 KB = 512 KB
 
@@ -298,7 +289,6 @@ tilingData.set_stepKa(8);
 - aic_mte2_time从4051.458μs降低到3778.555μs，MTE2搬运时间降低了**6.47%**
 - aic_mac_ratio从69.4%提85.4%，cube利用率提升了**23.05%**
 - 后续优化方向：aic_mte2_ratio达到**96.3%**，达到MTE2 bound，成为性能提升瓶颈，后续将优化L2Cache以缓解MTE2 bound
----
 
 ### Case 6: 多核MDL + L1Cache + L2Cache (MULTI_CORE_MDL_L1CACHE_L2CACHE)
 
@@ -329,7 +319,7 @@ for (int i = 0; i < 2; i++) {
 
 分块计算适配L2Cache示意图：
 
-<img src="figure/L2Cache.png">
+<img src="figures/L2Cache.png">
 
 ```
 计算过程：
@@ -352,8 +342,6 @@ L2Cache利用：
 - aic_mte2_time从3778.555μs降低到3625.42μs，MTE2搬运时间降低了**4.05%**
 - aic_mac_ratio从**85.4%**提升到**86%**
 - 后续优化方向：当前制约样例性能的仍为MTE2 bound，开发者可通过优化L2Cache的切分策略对MTE2进一步优化。本样例后续将展示对Scalar和Fixpipe流水的优化
-
----
 
 ### Case 7: 多核MDL + L1Cache + L2Cache + Constants Tiling (MULTI_CORE_MDL_L1CACHE_L2CACHE_CONSTANTS)
 
@@ -390,8 +378,6 @@ AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
 - 常量Tiling有效减少了Scalar单元的性能开销。当样例因Scalar阻塞性能较差时，用户可通过该方式降低Scalar时间占比
 - 后续优化方向：启用UnitFlag优化，演示并行化计算与搬运流水
 
----
-
 ### Case 8: 多核MDL + L1Cache + L2Cache + Constants Tiling + UnitFlag (MULTI_CORE_MDL_L1CACHE_L2CACHE_CONSTANTS_UNITFLAG)
 
 **优化目标**：启用UnitFlag优化，并行化计算与搬运流水
@@ -416,10 +402,8 @@ mmCFG.enUnitFlag = true;
 
 UnitFlag功能示意图：
 
-<img src="figure/unitflag_close.png">
-<img src="figure/unitflag_open.png">
-
-
+<img src="figures/unitflag_close.png">
+<img src="figures/unitflag_open.png">
 
 **性能数据**：
 | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
@@ -431,11 +415,10 @@ UnitFlag功能示意图：
 - aic_fixpipe_time从45.76μs提高到272.576μs，原因为开启Unitflag后，aic_fixpipe_time会包含FIXPIPE指令的等待时间，并不是真正流水的耗时，用户可关注端到端性能是否提升
 - 当前性能收益较小的原因为制约性能的仍为MTE2 bound，算子的MMAD、FIXPIPE流水被MTE2 bound掩盖。当样例因FIXPIPE阻塞性能较差时，用户可启用UnitFlag功能
 
----
-
 ## 性能对比总结
 
 ### Atlas A2训练系列芯片性能数据
+
 **综合优化效果**：
 - 本样例cube利用率提升了**67.7%**(18.7% → 86.4%)，已达到芯片峰值算力的**86.4%**
 - 通过Case 0到Case 8的递进优化，样例耗时降幅达**99.47%**(759363.98μs → 4012.44μs)
@@ -484,9 +467,8 @@ $$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 2
 
 当前MTE2耗时与理论值相差较大，因为实际芯片L2Cache大小为192MB，当前L2Cache切分策略较简单；另一方面当MTE2搬运场景为ND2NZ（GM数据Layout为ND，搬运到L1时需做ND→NZ格式转换）时，L2Cache带宽会降低。用户可进一步优化L2Cache切分策略以提高MTE2带宽。
 
-
-
 ### Ascend 950PR芯片性能数据
+
 | Case version | Task Duration(μs) | 端到端耗时相对Case 0 | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 |------|------------------|----------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Case 0 | 1096626.431 | **1x** | 1 | 1096625.66 | 198351.65 | 0.181 | 583195.222 | 0.532 | 115705.132 | 0.106 | 960571.993 | 0.876 | 28615.988 | 0.026 |
@@ -500,6 +482,7 @@ $$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 2
 | Case 8 | 2558.155 | **428.68x** | 32 | 2557.49 | 2549.657 | 0.997 | 412.29 | 0.161 | 835.579 | 0.327 | 1900.322 | 0.743 | 213.789 | 0.084 |
 
 **理论性能对比**：
+
 #### Cube计算性能分析
 
 样例参数：M=N=K=8192，baseM=256，baseN=256，baseK=64。本样例性能数据在Ascend 950PR芯片上测试，该处理器主频为1.65GHz，每cycle处理16×16×16次乘加运算。
@@ -511,6 +494,7 @@ Case 8 Cube计算耗时误差：
 $$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{{2549.657\mu s} - {2542\mu s}}{{2542\mu s}} = 0.30\%$$
 
 已达成该芯片99.7%的峰值算力
+
 #### MTE2带宽分析
 
 读入数据总量：
@@ -537,8 +521,9 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
 7. **UnitFlag优化**：启用UnitFlag可以并行化计算与搬运流水
 
 ## 编译运行
+
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
     ```bash

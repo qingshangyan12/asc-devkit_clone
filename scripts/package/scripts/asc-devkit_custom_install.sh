@@ -102,6 +102,33 @@ install_whl_package() {
     fi
 }
 
+clear_kernel_cache_dir() {
+    local dir_atc_data="$HOME/atc_data"
+    local dir_kernel_caches="$(ls -d $dir_atc_data/kernel_cache* 2> /dev/null)"
+    if [ -z "$dir_kernel_caches" ]; then
+        return
+    fi
+    if [ -w "$dir_atc_data" ]; then
+        for dir_cache in $dir_kernel_caches; do
+            [ ! -d "$dir_cache" ] && continue
+            [ -n "$dir_cache" ] && rm -rf "$dir_cache" > /dev/null 2>&1
+            if [ -d "$dir_cache" ]; then
+                log "WARNING" "failed to delete directory '$dir_cache'"
+            else
+                log "INFO" "directory '$dir_cache' was deleted."
+            fi
+        done
+    else
+        log "WARNING" "current user do not have permission to delete kernel_cache* directories in '$dir_atc_data'."
+    fi
+}
+
+get_arch_name() {
+    local pkg_dir="$1"
+    local scene_file="$pkg_dir/scene.info"
+    grep '^arch=' $scene_file | cut -d"=" -f2
+}
+
 custom_install() {
     if [ -z "$common_parse_dir/share/info/asc-devkit" ]; then
         log "ERROR" "ERR_NO:0x0001;ERR_DES:asc-devkit directory is empty"
@@ -113,7 +140,10 @@ custom_install() {
 
     # create softlinks for stub libs in devlib/linux/${ARCH}
     create_stub_softlink "$common_parse_dir"
-    
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+
     if [ -d "${common_parse_dir}/lib" ]; then
         rm -rf "${common_parse_dir}/lib"
     fi
@@ -124,4 +154,6 @@ custom_install
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+clear_kernel_cache_dir
 exit 0

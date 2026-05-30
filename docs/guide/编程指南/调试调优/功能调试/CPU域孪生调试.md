@@ -2,13 +2,13 @@
 
 本节介绍CPU域调试的方法：CPU侧验证核函数，gdb调试、使用printf命令打印。当前SIMT编程场景不支持。
 
->[!NOTE]说明 
+>[!NOTE] 说明
 >CPU调测过程中，配置日志相关环境变量，可以记录程序的运行过程及异常信息，有助于开发者进行功能调测。
->关于环境变量的使用约束以及详细说明，可参见《环境变量参考》中“辅助功能 \> 日志”章节。
+>关于环境变量的使用约束以及详细说明，可参见[《环境变量参考》](https://www.hiascend.com/document/redirect/CannCommunityEnvRef)中“辅助功能 \> 日志”章节。
 
 ## CPU侧验证核函数<a name="section1227643165914"></a>
 
-在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../../编译与运行/)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试将算子Kernel程序以Host程序的形式进行编译，此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
+在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../../编译与运行/编译与运行.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试将算子Kernel程序以Host程序的形式进行编译，此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
 **图 1**  CPU域和NPU域的核函数运行逻辑对比<a name="fig39851716019"></a>  
 ![](../../../figures/CPU域和NPU域的核函数运行逻辑对比.png "CPU域和NPU域的核函数运行逻辑对比")
@@ -31,24 +31,24 @@
     cmake -B build -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
     ```
 
-    cpu表示开启CPU域编译，dav-后为NPU架构版本号，请根据实际情况进行填写。
+    cpu表示开启CPU域编译，dav-后为NPU架构版本号，请根据实际情况参考[对应关系表](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行填写。
 
     其他CMakeLists.txt项目配置[通过CMake编译](../../编译与运行/AI-Core-SIMD编译/通过CMake编译.md)进行编写。
 
->[!NOTE]说明 
+>[!NOTE] 说明 
 >为了实现CPU域与NPU域代码归一，框架在CPU域中仅对部分acl接口进行适配，开发者在使用CPU域调测功能时，仅支持使用如下acl接口，并且不支持用户自行链接**ascendcl库**：
->-   有实际功能接口，支持CPU域调用
->    -   aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
->    -   aclrtMalloc、aclrtFree、aclrtMallocHost、aclrtFreeHost、aclrtMemset、aclrtMemsetAsync、aclrtMemcpy、aclrtMemcpyAsync、aclrtMemcpy2d、aclrtMemcpy2dAsync、aclrtCreateContext、aclrtDestroyContext。
->-   无实际功能接口，打桩实现。
->    -   Profiling数据采集
+>- 有实际功能接口，支持CPU域调用
+>    - aclDataTypeSize、aclFloat16ToFloat、aclFloatToFloat16。
+>    - aclrtMalloc、aclrtFree、aclrtMallocHost、aclrtFreeHost、aclrtMemset、aclrtMemsetAsync、aclrtMemcpy、aclrtMemcpyAsync、aclrtMemcpy2d、aclrtMemcpy2dAsync、aclrtCreateContext、aclrtDestroyContext。
+>- 无实际功能接口，打桩实现。
+>    - Profiling数据采集
 >        aclprofInit、aclprofSetConfig、aclprofStart、aclprofStop、aclprofFinalize。
->    -   系统配置
+>    - 系统配置
 >        aclInit、aclFinalize、aclrtGetVersion。
->    -   运行时管理
+>    - 运行时管理
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
 
-> [!CAUTION]注意
+> [!CAUTION] 注意
 > 在CPU孪生调试模式下，编译器不识别Ascend C提供的[SIMD-BuiltIn关键字](../../语言扩展层/SIMD-BuiltIn关键字.md)及[SIMT-BuiltIn关键字](../../语言扩展层/SIMT-BuiltIn关键字.md)，包括
 > - **函数执行空间限定符**：如 `__aicore__`、`__global__`、`__host__` 等;
 > - **函数标记宏**：如 `__simd_vf__`、`__simd_callee__`、`__simt_vf__` 等；
@@ -171,4 +171,3 @@ quit
 printf("xLocal size: %d\n", xLocal.GetSize()); 
 printf("tileLength: %d\n", tileLength);
 ```
-

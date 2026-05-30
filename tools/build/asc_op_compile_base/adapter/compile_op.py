@@ -241,17 +241,13 @@ def _json_post_process(compile_info: CompileInfo, op_info: OpInfo, tiling_info: 
             f"The operator {op_info.op_type} has not been adapted to superkernel. Therefore, \
 the superkernel cannot be integrated with the operator.", \
             AscendCLogLevel.LOG_WARNING)
-    if "isSimt" in js and js["isSimt"] == 1:
-        CommonUtility.print_compile_log(compile_info.kernel_name, \
-        f"The current soc version does not support merging simt type operator:{op_info.op_type} \
-into superkernel", AscendCLogLevel.LOG_WARNING)
 
-    if CommonUtility.is_c310() and "isSimt" not in js:
+    if CommonUtility.is_c310():
         if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
             js["supportSuperKernel"] = 0
-            js["isSimt"] = 1
-        else:
-            js["isSimt"] = 0
+            CommonUtility.print_compile_log(compile_info.kernel_name, \
+            f"The current soc version does not support merging simt type operator:{op_info.op_type} \
+    into superkernel", AscendCLogLevel.LOG_INFO)
 
     aicore_num = get_context().get_addition("_op_aicore_num")
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
@@ -429,7 +425,8 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             called_func_params = "param, sargs"
             called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
             source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
-            source += " uint32_t __asc_index = 0;\n"
+            source += "    g_super_kernel_early_start_config = sargs->SkGetTaskSyncCfg();\n"
+            source += "    uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
 
@@ -1002,8 +999,7 @@ def handle_sk_codegen_options(compile_info: CompileInfo, infered_info_from_ifile
         sp_info = get_context().get_addition("super_kernel_sub_info")
         if sp_info is not None:
             compile_info.super_kernel_info["sp_options"] = \
-                parse_super_kernel_options(sp_info.get("super_kernel_options", ""),
-                    convert_underscore_to_hyphen=get_context().get_addition("super_kernel_sub_combine") is True)
+                parse_super_kernel_options(sp_info.get("super_kernel_options", ""))
         else:
             compile_info.super_kernel_info["sp_options"] = {}
 
@@ -1117,18 +1113,63 @@ def link_kernel_obj(compile_info: CompileInfo, op_info: OpInfo, tiling_info: Til
     CommonUtility.print_compile_log(op_info.kernel_name, "link relocatable success", AscendCLogLevel.LOG_INFO)
 
 
+def _match_regex(pattern: str, op_name: str) -> bool:
+    """
+    Match regex pattern with op_name.
+    Supports '.' (matches any single char) and '*' (matches zero or more of preceding element).
+    """
+    if len(pattern) > 0 and pattern[0] == '*':
+        return False
+
+    m, n = len(op_name), len(pattern)
+
+    def matches(i: int, j: int) -> bool:
+        if i == 0 or j == 0:
+            return False
+        if pattern[j - 1] == '.':
+            return True
+        return op_name[i - 1] == pattern[j - 1]
+
+    dp = [[False] * (n + 1) for _ in range(m + 1)]
+    dp[0][0] = True
+    for i in range(m + 1):
+        for j in range(1, n + 1):
+            if pattern[j - 1] == '*':
+                if j >= 2:
+                    dp[i][j] |= dp[i][j - 2]
+                    if matches(i, j - 1):
+                        dp[i][j] |= dp[i - 1][j]
+            elif matches(i, j):
+                dp[i][j] |= dp[i - 1][j - 1]
+    return dp[m][n]
+
+
+def _get_dcci_disable_cap_bitmap(compile_info: CompileInfo, kernel_symbols: list) -> int:
+    """
+    Check if DCCI should be disabled for any kernel in kernel_symbols.
+    Returns 4 if matched, 0 otherwise.
+    """
+    sp_options = compile_info.super_kernel_info.get("sp_options", {})
+    patterns = sp_options.get("dcci-disable-on-kernel", [])
+    if isinstance(patterns, list) and patterns:
+        for kernel_name in kernel_symbols:
+            if any(_match_regex(p, kernel_name) for p in patterns):
+                return 4
+    return 0
+
+
 def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo, compile_option_tuple, kernel_meta_dir):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
     source = "#include \"kernel_operator.h\"\n"
 
-    # Calculate capability bitmap based on compile_info early start flags
-    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci(4), default:4
-    cap_bitmap = 4  # Default value
+    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4), default:0
+    cap_bitmap = 0
     if compile_info.super_kernel_early_start_wait_flag:
-        cap_bitmap |= 1  # Set bit 0 for wait flag
+        cap_bitmap |= 1
     if compile_info.super_kernel_early_start_set_flag:
-        cap_bitmap |= 2  # Set bit 1 for set flag
+        cap_bitmap |= 2
+    cap_bitmap |= _get_dcci_disable_cap_bitmap(compile_info, compile_info_origin.global_kernel_symbols)
 
     for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
         sk_syb = compile_info.global_kernel_symbols[idx]
@@ -1282,8 +1323,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
-    # dump function determins how kernel wrapper will be, must be handle early
-    handle_dump_options(compile_info, compile_option_tuple)
+    # dump ktype handle
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
 
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
@@ -1306,10 +1347,12 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
-        handle_dump_options(compile_info_origin, compile_option_tuple_origin)
+        # dump ktype handle
+        compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
         handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
         workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
                                                 distinct_tag, kernel_meta_dir)
@@ -1441,18 +1484,6 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
 
     compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
                             extend_options)
-
-
-def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
-    # dump ktype handle
-    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-
-    # dump or acc or timestamp or recognize_simtvf will need extra workspace
-    ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
-        (global_var_storage.get_variable("ascendc_time_stamp_compile_options") is True) or \
-        "-DASCENDC_ACC_DUMP" in compile_option_tuple.compile_options or \
-        (global_var_storage.get_variable("ascendc_recognize_simtvf") is True)
-    global_var_storage.set_variable("ascendc_enable_dump_workspace", ascendc_enable_dump_workspace)
 
 
 def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option_tuple):

@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file"
+    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -29,6 +29,9 @@ USE_CXX11_ABI=0
 CMAKE_TOOLCHAIN_FILE_VAL=""
 CHANGED_FILES=""
 CI_MODE=FALSE
+ENABLE_SIGN="false"
+VERSION_INFO="8.5.0"
+CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
 
 dotted_line="----------------------------------------------------------------"
 
@@ -197,7 +200,7 @@ check_help_combinations() {
   local has_cov=false
   local has_pkg=false
 
-  for arg in "${arg[@]}"; do
+  for arg in "${args[@]}"; do
     case "$arg" in
       -t|--test) has_test=true ;;
       --adv_test) test_part="adv_test" ;;
@@ -222,8 +225,8 @@ check_help_combinations() {
     log "[ERROR] --pkg cannot be used with test(-t, --test, --$test_part)."
     return 1
   fi
-  if [[ "$has_cov" == "true" && ("$has_test" == "true" || -n "$test_part") ]]; then
-    log "[ERROR] --cov must be used with test(-t, --test, --$test_part)."
+  if [[ "$has_cov" == "true" && "$has_test" != "true" && -z "$test_part" ]]; then
+    log "[ERROR] --cov must be used with test(-t, --test) or a test part option."
     return 1
   fi
   return 0
@@ -242,6 +245,9 @@ check_param_with_help() {
   seen=()
   for arg in "$@"; do
     arg="${arg%%=*}"
+    if [[ "$arg" =~ ^-j[0-9]+$ ]]; then
+      arg="-j"
+    fi
     if [[ " ${seen[@]} " =~ " $arg " ]]; then
       log "[ERROR] $arg can only be input one."
       exit 1
@@ -459,6 +465,14 @@ set_options() {
       check_param_test_build_type
       shift
       ;;
+    --enable-sign)
+        ENABLE_SIGN="true"
+        shift
+        ;;
+    --sign-script)
+        CUSTOM_SIGN_SCRIPT="$(realpath $2)"
+        shift 2
+        ;;
     --build-type)
       BUILD_TYPE="$2"
       check_param_test_build_type
@@ -497,6 +511,7 @@ set_env() {
     exit 1
   fi
 
+  source $ASCEND_CANN_PACKAGE_PATH/set_env.sh || echo "0"
 }
 
 function clean()
@@ -521,8 +536,8 @@ function cmake_config()
 
 function build()
 {
-  local target="$1"
-  cmake --build . --target ${target} -j ${THREAD_NUM}
+  log "Info: build target:$@ JOB_NUM:${JOB_NUM}"
+  cmake --build . --target "$@" -j ${THREAD_NUM}
 }
 
 function build_package(){
@@ -559,8 +574,13 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    TARGETS="${TARGETS} --target ${tag}"
-    TEST_MOD="${tag},${TEST_MOD}"
+    if [ "${tag}" == "hccl_checker_ops_stest" ]; then
+      local hccl_st_dir="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm"
+      bash ${hccl_st_dir}/build.sh
+    else
+      TARGETS="${TARGETS} --target ${tag}"
+      TEST_MOD="${tag},${TEST_MOD}"
+    fi
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
@@ -599,6 +619,7 @@ set_ci_mode() {
 
     if [[ "${CI_ACTION}" == "PKG" && "${PKG}" == "true" ]]; then
       log "[INFO] CI mode: Trigger package build for examples changes."
+      CUSTOM_OPTION="${CUSTOM_OPTION} -DPACKAGE_OPEN_PROJECT=ON -DKERNEL_MODE=OFF"
       build_package
       exit 0
     fi
@@ -655,6 +676,7 @@ main() {
   elif [ -n "$TEST_PART" ]; then
     build_test_part
   elif [ -n "${PKG}" ]; then
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DCUSTOM_SIGN_SCRIPT=${CUSTOM_SIGN_SCRIPT} -DENABLE_SIGN=${ENABLE_SIGN} -DVERSION_INFO=${VERSION_INFO} -DPACKAGE_OPEN_PROJECT=ON"
     build_package
   else
     cmake_config

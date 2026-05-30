@@ -36,7 +36,9 @@ namespace Te {
 class CopyL12L0AIgnore {
 public:
     template <const CopyL12L0ATrait& trait, typename ...Args>
-    __aicore__ inline void static Run(const Args&... args) {}
+    __aicore__ inline void static Run(const Args&... args) {
+        static_assert(Std::is_same_v<Args..., void>, "CopyL12L0AIgnore should not be called");
+    }
 };
 
 template <typename dstPos, typename srcPos, uint32_t Version, typename DstLayoutPattern, typename SrcLayoutPattern, typename CopyMode>
@@ -79,6 +81,7 @@ struct CopyL12L0ATensor2Tensor<Location::L0A, Location::L1, ArchVersion::V3510, 
 {
     using type = LoadDataL12L0AZN2NZB8B4WithCoord3510;
 };
+
 } // namespace Te
 } // namespace AscendC
 #endif // IMPL_TENSOR_API_ARCH_CUBE_L1_TO_L0A_ROUTING_H

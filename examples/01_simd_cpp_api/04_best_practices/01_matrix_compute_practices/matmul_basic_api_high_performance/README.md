@@ -3,6 +3,7 @@
 ## 概述
 
 本样例基于静态Tensor编程范式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步、UnitFlag、L2Cache等多种优化手段，实现高性能矩阵乘法运算。本样例基于基础API实现，与高阶API版本所使用的优化方法相同，样例目标为基于静态Tensor编程范式展示调优实现细节。
+
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
@@ -32,14 +33,12 @@
 
 - 样例规格：
 
-
-
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
 <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td><td align="center">false</td></tr>
-<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">true</td></tr>
-<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td><td align="center">-</td></tr>
+<tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
+<tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">true</td></tr>
+<tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">-</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">mmad_custom</td></tr>
 </table>
 
@@ -61,8 +60,8 @@
 | aic_fixpipe_time(μs) | FixPipe（L0C 到 GM 搬运）的执行时间 |
 | aic_fixpipe_ratio | FixPipe 的时间占比，反映结果写回的访存压力 |
 
-
 ### 数据流路径：
+
 ```
 GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──(Cube, Mmad)──> L0C ──(Fixpipe)──> GM
        DataCopyInA/B             DataLoadA/B                   Compute             CopyOut
@@ -82,7 +81,6 @@ MTE1:               |─ A2 Ping ──|─ A2 Pong ──|─ A2 Ping ──| .
 Cube:                            |─ Mmad ─────|─ Mmad ─────| ...
 Fixpipe:                           |─ CopyOut ──|(unitflag)
 ```
-
 
 **L1 双缓冲布局**：A1 占 L1 前半（0~256KB），B1 占 L1 后半（256~512KB），各自再分为 Ping/Pong 两块：
 
@@ -116,7 +114,6 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 #### 2. 大包搬运
 
 通过 `stepKa`/`stepKb` 参数将多个基本块打包为一次 DataCopyIn 操作（称为"大包"），减少 MTE2 搬运次数。例如 `stepKa=8` 表示一次将 8 个 baseM * baseK 块从 GM 搬入 L1。
-
 
 ```cpp
 // DataCopyInA: 一次搬入 stepKa 个 baseK 块
@@ -166,6 +163,33 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 在 Atlas A2/A3 架构上，本样例使用 `LoadData3DParamsV2`（即 LoadData3D）替代 `LoadData2DParams`（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
 
 **问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
+
+**代码实现**：使用 LoadData2D 时，需要按 `CUBE_BLOCK` 粒度循环发射多条搬运指令；改为 LoadData3D 后，可用一条指令描述完整的 base 切片。
+
+优化前，`baseK=64` 时循环次数为 4：
+
+```cpp
+AscendC::LoadData2DParams loadDataParams;
+for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
+}
+```
+
+优化后，使用 `LoadData3DParamsV2` 一次性描述 `baseM * baseK` 切片：
+
+```cpp
+AscendC::LoadData3DParamsV2<half> loadDataParams;
+loadDataParams.l1H = 1;
+loadDataParams.l1W = baseM;
+loadDataParams.channelSize = baseK;
+loadDataParams.kExtension = baseK;
+loadDataParams.mExtension = curMAlign;
+loadDataParams.mStartPt = 0;
+loadDataParams.kStartPt = 0;
+AscendC::LoadData(a2Local, a1Local[srcAddr], loadDataParams);
+```
+
+这样每个 base 切片的 MTE1 指令数从多条 `LoadData2D` 降为 1 条 `LoadData3D`，可以降低 MTE1 队列占用。B 矩阵非转置输入时，同样通过 `LoadData3DParamsV2` 配置 `enTranspose = true` 完成转置搬运。
 
 > **注意**：Atlas A5 芯片提供了 `LoadData2DParamsV2` 接口，单条指令即可完成搬运，无需 LoadData3D。因此本样例通过 `__NPU_ARCH__` 条件编译区分两种架构的 LoadData 实现。
 
@@ -296,14 +320,14 @@ k=4:  WaitFlag(B1Pong) → DataLoad(B1Pong) → Compute
 k=5:  DataLoad → Compute
 k=6:  DataLoad → Compute
 k=7:  DataLoad(释放A1Ping B1Pong) → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Ping)
-k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute 
+k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute
 ...
 ```
-
 
 ### 性能数据分析
 
 #### Atlas A2训练系列芯片性能数据
+
 - Scenario 1：不使能 L2Cache 切分，singleCoreM=2048, singleCoreN=1536，24 核一轮全覆盖
 - Scenario 2：使能 L2Cache 切分，singleCoreM=1024, singleCoreN=1536，24 核分 2 轮计算
 
@@ -315,7 +339,6 @@ k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad
 除去启动开销，已达成该芯片 84.7% 的峰值算力。
 
 使能 L2Cache 切分后，aic_mte2_time 从 3552.248μs 降低到 3487.068μs，降低了 1.84%。当前切分策略较简单，用户可进一步优化 L2Cache 切分策略以提高 MTE2 带宽。
-
 
 #### Ascend 950PR芯片性能数据
 
@@ -331,7 +354,6 @@ k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad
 
 使能 L2Cache 切分后在 Ascend 950PR 芯片上没有明显效果，原因如下：L2Cache 优化的目标是缓解 MTE2 bound，但当前瓶颈为 Cube 计算而非数据搬运，因此减少 MTE2 耗时无法提升整体性能；此外 L2Cache 切分将计算分为 2 轮调度，引入了额外的 Scalar 开销和调度开销，导致 Scenario 2 的 Task Duration 略高于 Scenario 1。同时，Scenario 2 的 aic_mte2_time（1892.742μs）反而略高于 Scenario 1（1874.267μs），这是因为当样例处于 Cube bound 时，MTE2 流水线被 Cube 计算阻塞，profiler 采集的 aic_mte2_time 包含了流水线等待时间而非纯粹的数据搬运时间，L2Cache 优化虽然减少了实际数据访问延迟，但被 Cube 计算瓶颈掩盖，无法在 MTE2 指标上体现。
 
-
 ### 理论性能分析
 
 #### Cube 计算性能分析
@@ -344,7 +366,6 @@ Cube 计算耗时误差：
 
 $$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{3082.158 - 3022.92}{3022.92} = 1.95\%$$
 
-
 **Ascend 950PR 芯片**：样例参数 M=N=K=8192，baseM=256，baseN=256，baseK=64，该处理器主频为 1.65GHz，每 cycle 处理 16×16×16 次乘加运算。
 
 $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 32 \times 1650} = 2542.00\mu s$$
@@ -352,7 +373,6 @@ $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_nu
 Cube 计算耗时误差：
 
 $$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{2564.813 - 2542.00}{2542.00} = 0.90\%$$
-
 
 #### MTE2 带宽分析
 
@@ -390,54 +410,63 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
 相比于 Atlas A2 训练系列芯片，Ascend 950PR 芯片数据搬运更为高效，MTE2 带宽利用率更高。
 
-
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量  
-  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root 用户安装 CANN 软件包
+
+- 切换Case
+
+  在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的场景，各场景说明：
+  - `1`: 不使能L2Cache切分
+  - `2`: 使能L2Cache切分
+
+- 配置环境变量
+
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
     ```bash
     source /usr/local/Ascend/cann/set_env.sh
     ```
 
-  - 默认路径，非 root 用户安装 CANN 软件包
+  - 默认路径，非root用户安装CANN软件包
     ```bash
     source $HOME/Ascend/cann/set_env.sh
     ```
 
-  - 指定路径 install_path，安装 CANN 软件包
+  - 指定路径install_path，安装CANN软件包
     ```bash
     source ${install_path}/cann/set_env.sh
     ```
 
 - 样例执行
+
   ```bash
-  SCENARIO=1                                                           # 选择执行场景（1为不使能L2Cache切分，2为使能L2Cache切分）
-  mkdir -p build && cd build;                                          # 创建并进入 build 目录
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py                                       # 生成测试输入数据
-  ./demo                                                               # 执行编译生成的可执行程序
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
+  SCENARIO_NUM=1
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
-  示例：
+  示例如：
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # NPU 仿真模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式或Scenario前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | `SCENARIO_NUM` | `1` / `2` | 1: 不使能L2Cache切分；2: 使能L2Cache切分 | `1` |
-  | `CMAKE_ASC_RUN_MODE` | 运行模式 | `npu`、`sim` | `npu` |
-  | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构 | `dav-2201`、`dav-3510` | `dav-2201` |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU硬件架构：dav-2201对应A2/A3，dav-3510对应Ascend 950PR |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=不使能L2Cache切分，2=使能L2Cache切分 |
+
+- 执行结果
 
   执行结果如下，说明精度对比成功。
   ```bash

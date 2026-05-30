@@ -14,8 +14,8 @@
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif     
 
-#ifndef INCLUDE_C_API_SIMD_ATOMIC_H
-#define INCLUDE_C_API_SIMD_ATOMIC_H
+#ifndef INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
+#define INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -29,7 +29,9 @@
 
 __aicore__ inline void asc_icache_preload(const void* addr, int64_t prefetch_len);
 
+namespace __asc_aicore {
 __aicore__ inline void asc_dcci_single(__gm__ void* dst);
+}
 
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst);
 

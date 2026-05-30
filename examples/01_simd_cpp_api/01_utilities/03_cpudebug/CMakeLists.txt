@@ -11,12 +11,14 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
+
 find_package(ASC REQUIRED)
 
 project(cpudebug LANGUAGES ASC CXX)
 
-add_executable(add ${CMAKE_CURRENT_SOURCE_DIR}/add.asc)
+add_executable(cpu_debug ${CMAKE_CURRENT_SOURCE_DIR}/cpu_debug.asc)
 
-target_compile_options(add PRIVATE
+target_compile_options(cpu_debug PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

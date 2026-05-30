@@ -15,19 +15,22 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_DEBUG_TYPES_H
 #define IMPL_UTILS_DEBUG_ASC_DEBUG_TYPES_H
 
-#define SIMD_VF_PRINTF_UBUF_MAX_SIZE 1024
-#define SIMD_VF_MAGIC_NUMBER 0xF0A00B0F
+#ifndef ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE
+// Reserved UB space is 2K in total. 20 bytes for BlockVFBufInfo header, leaving 2028 bytes for buffer.
+#define ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE 2028
+#endif
+#define ASCENDC_SIMD_VF_MAGIC_NUMBER 0xF0A00B0F
 
 struct BlockVFBufInfo {
-    uint32_t magic = SIMD_VF_MAGIC_NUMBER;
-    uint32_t length = SIMD_VF_PRINTF_UBUF_MAX_SIZE;
+    uint32_t magic = ASCENDC_SIMD_VF_MAGIC_NUMBER;
+    uint32_t length = ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE;
     uint32_t writeLen = 0;
     uint16_t pidx = 0;
     uint8_t flag = 0;
     uint8_t resv1 = 0;
     uint16_t blockIdx = 0;
     uint16_t resv2 = 0;
-    uint8_t buffer[SIMD_VF_PRINTF_UBUF_MAX_SIZE];
+    uint8_t buffer[ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE];
 };
 
 namespace __asc_aicore {
@@ -86,7 +89,8 @@ struct DebugBlockHeadInfo {
     uint16_t flag = 0U;          // 0: simd, 1: simt
     uint32_t rsv = 0U;           // reserve
     uint64_t ringBufAddr = 0U;   // start addr of fifo buff
-    uint32_t resvMem[6];        // reserved
+    uint64_t debugBusAddr = 0U;  // debug-bus base addr for L1/L0A/L0B dump
+    uint32_t resvMem[4];         // reserved
 };
 
 struct DebugBlockWriteInfo {
@@ -123,7 +127,7 @@ struct DumpTensorTlv {
     uint32_t dataType = 0U;          // Data type: int32_t/half/...
     uint32_t desc = 0U;              // Usr id
     uint32_t bufferId = 0U;          // 0
-    uint16_t position = 0U;          // Position GM,UB,L1,L0C
+    uint16_t position = 0U;          // Position GM, UB, L1, L0A, L0B, L0C
     uint16_t blockIdx = 0U;          // blockIdx
     uint32_t dim = 0U;               // shape dim
     uint32_t shape[8];              // dim <= 8

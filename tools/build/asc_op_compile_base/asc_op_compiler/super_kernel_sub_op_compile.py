@@ -59,11 +59,12 @@ def gen_gm_get_set_value_dcci_compile_options(compile_option_tuple, compile_info
     ]
 
     is_sub_combine = get_context().get_addition("super_kernel_sub_combine") is True
-    if match_kernel_name_patern(compile_info.kernel_name, dcci_before_kernel_start_op_list, use_regex=is_sub_combine):
+    match_key = compile_info.kernel_name if is_sub_combine else compile_info.op_type
+    if match_kernel_name_patern(match_key, dcci_before_kernel_start_op_list, use_regex=is_sub_combine):
         global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_before_kernel_start", True)
-    if match_kernel_name_patern(compile_info.kernel_name, dcci_after_kernel_end_op_list, use_regex=is_sub_combine):
+    if match_kernel_name_patern(match_key, dcci_after_kernel_end_op_list, use_regex=is_sub_combine):
         global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_after_kernel_end", True)
-    if match_kernel_name_patern(compile_info.kernel_name, dcci_disable_on_kernel_op_list, use_regex=is_sub_combine):
+    if match_kernel_name_patern(match_key, dcci_disable_on_kernel_op_list, use_regex=is_sub_combine):
         global_var_storage.set_variable("ascendc_sub_super_kernel_call_dcci_disable_on_kernel", True)
 
     if is_sub_combine:
@@ -87,8 +88,17 @@ def gen_gm_get_set_value_dcci_compile_options(compile_option_tuple, compile_info
 
 
 def gen_sub_super_kernel_early_start_compile_options(compile_option_tuple, compile_info):
-    # For aclgraph+sk workflow (super_kernel_sub_combine), disable early start mode
     if get_context().get_addition("super_kernel_sub_combine") is True:
+        sp_options = compile_info.super_kernel_info.get("sp_options", {})
+        if sp_options.get('early-start', '0') == '1' and sp_options.get('debug-sync-all', '0') != '1':
+            if compile_info.super_kernel_early_start_set_flag or compile_info.super_kernel_early_start_wait_flag:
+                compile_option_tuple.compile_options.append("-D__ASCENDC_SUPERKERNEL_EARLY_START_V3")
+            if compile_info.super_kernel_early_start_set_flag:
+                compile_option_tuple.compile_options.append("-D__ASCENDC_ENABLE_SET_NEXT_TASK_START")
+                global_var_storage.set_variable("ascendc_sub_super_kernel_early_start_set_flag", True)
+            if compile_info.super_kernel_early_start_wait_flag:
+                compile_option_tuple.compile_options.append("-D__ASCENDC_ENABLE_WAIT_PRE_TASK_END")
+                global_var_storage.set_variable("ascendc_sub_super_kernel_early_start_wait_flag", True)
         return
     early_start_mode = compile_info.super_kernel_info["sp_options"].get('early-start', \
         SuperKernelEarlyStartMode.EarlyStartEnableV2)

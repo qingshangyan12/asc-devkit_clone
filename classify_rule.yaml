@@ -50,8 +50,10 @@ asc-devkit:
       - impl/adv_api/detail/hcomm/common/hcomm_inner_def.h
       - impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv_def.h
       - impl/adv_api/detail/hcomm/impl/platform_v310/hcomm_aiv_def.h
+      - impl/adv_api/detail/hcomm/impl/platform_v310/hcomm_aiv_urma_def.h
       - impl/basic_api/dav_c100/kernel_operator_dump_tensor_impl.h
       - impl/basic_api/dav_m310/kernel_operator_dump_tensor_impl.h
+      - impl/basic_api/dav_m310/kernel_operator_common_impl.h
       - impl/basic_api/dav_m200/kernel_operator_dump_tensor_impl.h
       - impl/basic_api/dav_c220/kernel_operator_dump_tensor_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/debug_impl/printf_impl.h
@@ -65,6 +67,7 @@ asc-devkit:
       - impl/adv_api/detail/hccl/impl/hccl_impl.h
       - impl/adv_api/detail/hccl/impl/hccl_v220_impl.h
       - impl/adv_api/detail/hccl/impl/hccl_v310_impl.h
+      - impl/adv_api/detail/hccl/cc
       - impl/c_api/instr_impl/npu_arch_2201/sync_impl/asc_sync_data_barrier_impl.h
       - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_sync_data_barrier_impl.h
       - impl/c_api/instr_impl/npu_arch_3510/sync_impl/asc_lock_impl.h
@@ -73,6 +76,7 @@ asc-devkit:
       - impl/c_api/instr_impl/npu_arch_3510/sync_impl.h
       - impl/c_api/instr_impl/npu_arch_2201/vector_compute_impl/asc_transto5hd_impl.h
       - impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_transto5hd_impl.h
+      - impl/c_api/instr_impl/npu_arch_3510/sys_var_impl/asc_get_vf_len_impl.h
       - impl/basic_api/dav_c310/kernel_operator_determine_compute_sync_impl.h
       - impl/tensor_api/arch/utils/*.h
       - impl/tensor_api/utils/*.h

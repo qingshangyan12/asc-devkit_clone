@@ -24,27 +24,23 @@ target_link_libraries(demo PRIVATE)
 
 # 场景参数（通过命令行传入）
 # SCENARIO_NUM: 场景编号
-#   1 - 输出格式Nz，输出到L1的数据类型为half（仅Ascend 950PR/Ascend 950DT支持）
-#   2 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Scalar量化（均支持）
-#   3 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Vector量化（均支持）
-#   4 - 输出格式Nz，输出到L1的数据类型为half，使能relu（仅Ascend 950PR/Ascend 950DT支持）
+#   1 - 输出格式Nz，输出到L1的数据类型为half
+#   2 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Scalar量化
+#   3 - 输出格式Nz，输出到L1的数据类型为int8_t，使能Vector量化
+#   4 - 输出格式Nz，输出到L1的数据类型为half，使能relu
+set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
 
-if(NOT DEFINED SCENARIO_NUM)
-    message(FATAL_ERROR "SCENARIO_NUM is not set. Please specify -DSCENARIO_NUM=1/2/3/4")
+if(NOT SCENARIO_NUM MATCHES "^[1-4]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2, 3 or 4, but got ${SCENARIO_NUM}")
 endif()
-
-set(VALID_SCENARIOS 1 2 3 4)
-if(NOT SCENARIO_NUM IN_LIST VALID_SCENARIOS)
-    message(FATAL_ERROR "SCENARIO_NUM must be 1,2,3,4, got: ${SCENARIO_NUM}")
-endif()
-
-set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-4)")
 
 add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
 
 string(REGEX MATCH "([0-9]+)" ARCH_NUM "${CMAKE_ASC_ARCHITECTURES}")
+
 add_definitions(-DASC_ARCHITECTURES=${ARCH_NUM})
+
 message(STATUS "[INFO] ARCH_NUM is ${ARCH_NUM}")
 
 target_compile_options(demo PRIVATE

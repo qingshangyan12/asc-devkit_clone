@@ -47,25 +47,25 @@ class GlobalTensor;
 
 template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Args &&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510) 
-#if ASCENDC_SIMD_VF_DEBUG == 1
-    constexpr uint64_t RESERVED_UB_SIZE = 8 * 1024;
-    uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
-    uint16_t blockIdx = asc_debug_get_block_idx();
-    get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
-#endif
-    funcPtr(args...);
-#if ASCENDC_SIMD_VF_DEBUG == 1
-    asc_vf_debug_ub2gm();
-#endif
-#endif
+    if ASCEND_IS_AIV {
+        AscendC::AscVFCallImpl<funcPtr>(args...);
+    }
 }
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-#if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
 
+#ifdef ASCENDC_DEBUG
+#ifdef SPLIT_CORE_CUBE
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr = nullptr;
+#elif defined(SPLIT_CORE_VEC)
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr = nullptr;
+#else
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr = nullptr;
+#endif
+__BLOCK_LOCAL__ __inline__ uint64_t g_lastTpipeInitPos = 0;
+#else // end ASCENDC_DEBUG
 #ifdef SPLIT_CORE_CUBE
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr;
 #elif defined(SPLIT_CORE_VEC)
@@ -73,13 +73,11 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr;
 #else
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
-#else
-__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
-#endif
+#endif // end ASCENDC_DEBUG
 
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 #endif
 #endif
@@ -95,14 +93,10 @@ __aicore__ AscendC::TPipe* GetTPipePtr();
 #else
 __aicore__ inline AscendC::TPipe* GetTPipePtr()
 {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #ifdef SPLIT_CORE_CUBE
     return g_cubeTPipePtr;
 #elif defined(SPLIT_CORE_VEC)
     return g_vecTPipePtr;
-#else
-    return g_tPipePtr;
-#endif
 #else
     return g_tPipePtr;
 #endif
