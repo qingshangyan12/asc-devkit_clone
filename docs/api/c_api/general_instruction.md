@@ -50,14 +50,14 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 
     **图 3** 2次迭代Exp计算
 
-![2次迭代Exp计算](figures/exp_2_repeat.png)
+    ![2次迭代Exp计算](figures/exp_2_repeat.png)
 
 - 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。<br/>
 <br/>
 
     **图 4** 通过mask参数进行掩码操作示意图（以float数据类型为例）
 
-![通过mask参数进行掩码操作示意图（以float数据类型为例）](figures/mask_proc.png)
+    ![通过mask参数进行掩码操作示意图（以float数据类型为例）](figures/mask_proc.png)
 
 - 矢量计算单元还支持带间隔的向量计算，通过dataBlockStride（单次迭代内不同DataBlock间地址步长）和repeatStride（相邻迭代间相同DataBlock的地址步长）来进行配置。
   - dataBlockStride <br/>
@@ -103,7 +103,7 @@ repeatStride是指相邻迭代间相同DataBlock的地址步长。
 
 - **部分重复计算：** repeatStride取值大于0且小于8时，相邻迭代间部分数据会被矢量计算单元重复读取和计算，此种情形一般场景不涉及。
 
-[部分重复计算](figures/repeatStride_1.png)
+![部分重复计算](figures/repeatStride_1.png)
 
 ## 掩码操作
 
@@ -132,8 +132,7 @@ asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block
 ```cpp
 输入数据(src0Local): [1 2 3 ... 64 ...127 128]
 输入数据(src1Local): [1 2 3 ... 64 ...127 128]
-输出数据(dstLocal):  [2 0 6 ... 0  ...254 0]
-说明：当mask为0时，根据所调用api本身的特性dstLocal对应位存在未定义或0两种可能，示例中asc_add会将mask为0的位置结果设置为0。
+输出数据(dstLocal):  [2 undefined 6 ... undefined  ...254 undefined]
 ```
 
 mask过程如下：<br/>
