@@ -15,6 +15,7 @@ This directory contains samples for multiple APIs related to vector computation.
 | [data_relayout](./data_relayout) | This sample demonstrates Interleave and Pack interfaces using the Reg programming interface for data relayout (Interleave + Pack low-bit extraction) |
 | [duplicate](./duplicate) | This sample implements Duplicate operation (scalar fill) using the Reg programming interface, filling a scalar value to each position of a vector |
 | [gather](./gather) | This sample demonstrates Gather interface (source operand is register) using the Reg programming interface to collect elements by index, using LoadAlign/StoreAlign postUpdate mode |
+| [histogram](./histogram) | This sample implements Histogram operation using the Reg programming interface, performing histogram statistics on input data |
 | [mergemode](./mergemode) | This sample comprehensively demonstrates MaskMergeMode::MERGING + postUpdate + UpdateMask + ReduceMax using the Reg programming interface |
 | [mul](./mul) | This sample implements Mul operation using the Reg programming interface. Add/Sub/Div/Max/Min/Prelu interfaces can also reference this sample |
 | [muls](./muls) | This sample implements Muls operation using the Reg programming interface. Adds/Maxs/Mins/LeakyRelu interfaces can also reference this sample |
@@ -23,4 +24,6 @@ This directory contains samples for multiple APIs related to vector computation.
 | [reduce_pair](./reduce_pair) | This sample implements PairReduceElem operation (SUM mode) using the Reg programming interface, performing reduction sum on adjacent odd-even element pairs |
 | [select](./select) | This sample implements Select operation using the Reg programming interface, selecting elements between two vectors based on mask |
 | [squeeze](./squeeze) | This sample implements Squeeze operation using the Reg programming interface, compressing a vector to a scalar |
+| [subnormal](./subnormal) | This sample implements Div operation using the Reg programming interface, demonstrating the difference in computation results with and without subnormal support |
+| [trait](./trait) | This sample implements Div operation using the Reg programming interface, using int64_t data type to demonstrate the performance advantage of RegTensor processing 2x width data in single core |
 | [truncate](./truncate) | This sample implements Truncate operation using the Reg programming interface, truncating floating-point numbers to integer bits |
