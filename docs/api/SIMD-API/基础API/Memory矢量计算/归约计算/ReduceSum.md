@@ -20,27 +20,28 @@
 
 ReduceSum接口对所有输入数据进行求和，计算过程如下。
 
-**图 1** ReduceSum计算示意图<a id="fig1"></a>  
+**图 1** ReduceSum计算示意图<a id="fig1"></a>
+
 ![](../../../../figures/ReduceSum.png "ReduceSum计算示意图")
 
 ## 函数原型
 
-- tensor前n个数据计算
+- tensor前n个数据计算：
 
     ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count)
     ```
 
-- tensor高维切分计算
-    - mask逐bit模式
+- tensor高维切分计算：
+    - mask逐bit模式：
 
         ```cpp
         template <typename T>
         __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride)
         ```
 
-    - mask连续模式
+    - mask连续模式：
 
         ```cpp
         template <typename T>
@@ -63,7 +64,7 @@ ReduceSum接口对所有输入数据进行求和，计算过程如下。
 | dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | sharedTmpBuffer | 输入 | 指令执行期间存储中间结果，用于内部计算所需操作空间，需特别注意空间大小。详情请参考[关键特性说明](#关键特性说明)。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
-| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。最大处理的数据量不能超过UB大小限制。  |
+| count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。最大处理的数据量不能超过UB大小限制。 |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。关于该参数的具体描述请参考高维切分。**注：与高维切分中不同的是，repeatTime可以支持更大的取值范围，保证不超过int32_t的最大值即可。** |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
@@ -92,9 +93,9 @@ ReduceSum接口对所有输入数据进行求和，计算过程如下。
 - 源操作数及sharedTmpBuffer的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足所需空间要求，详情请参考关键特性说明。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，uint64_t/int64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，int64_t/uint64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
 ## 关键特性说明
@@ -103,8 +104,6 @@ ReduceSum接口对所有输入数据进行求和，计算过程如下。
 
 - 方式一：同一repeat内采用二叉树累加，不同repeat的结果按顺序累加。
 - 方式二：同一repeat内采用二叉树累加，不同repeat的结果也按二叉树累加。
-
-ReduceSum对应的相加方式：tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。
 
 ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详情请参考[ReduceDataBlock关键特性说明](./ReduceDataBlock.md#关键特性说明)。
 
@@ -124,7 +123,7 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
     int finalWorkLocalNeedSize = iter1AlignEnd; // 最终sharedTmpBuffer所需的elements空间大小就是第一轮操作产生元素做向上取整后的结果
     ```
 
-不同硬件形态对应的ReduceSum相加方式如下：
+**不同硬件形态对应的ReduceSum相加方式如下：**
 
 - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，采用方式一。</cann-filter>
 - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式二，tensor高维切分计算接口采用方式一。</cann-filter>
@@ -139,7 +138,7 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
 
 详细示例请参考[ReduceSum样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
 
-- tensor高维切分计算样例-mask连续模式
+- tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
@@ -147,7 +146,7 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
     AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
     ```
 
-- tensor高维切分计算样例-mask逐bit模式
+- tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
@@ -155,14 +154,14 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
     AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
     ```
 
-- tensor前n个数据计算样例
+- tensor前n个数据计算样例：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor前n个数据计算接口
     AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320);
     ```
 
-- tensor高维切分计算接口完整示例:
+- tensor高维切分计算接口完整示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -187,14 +186,14 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
     示例结果如下：
 
     ```cpp
-    输入数据(src_gm):
+    // 输入数据(src_gm)：
     [1. 1. 1. ... 1. 1. 1.]
-    输出数据(dst_gm):
+    // 输出数据(dst_gm)：
     [8320.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.
         0.    0.    0.    0.]
     ```
 
-- tensor前n个数据计算接口完整示例:
+- tensor前n个数据计算接口完整示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -216,8 +215,8 @@ ReduceSum接口以二叉树累加的方式完成每个repeat内的求和，详�
     示例结果如下：
 
     ```cpp
-    输入数据(src_gm):
+    // 输入数据(src_gm)：
     [1. 1. 1. ... 1. 1. 1.]
-    输出数据(dst_gm):
+    // 输出数据(dst_gm)：
     [288.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
     ```

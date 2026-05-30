@@ -22,27 +22,28 @@ ReduceMax接口用于从所有输入数据中找出最大值和最大值索引�
 
 ReduceMax计算过程如下图所示：首先，在每个repeat迭代中计算得到最大值和repeat内部索引，这些中间结果暂存于sharedTmpBuffer工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最大值和最大值索引。需要注意的是，每次repeat迭代获取的最大值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最大值索引。
 
-**图 1**  ReduceMax计算示意图<a id="fig1"></a>  
+**图 1**  ReduceMax计算示意图<a id="fig1"></a>
+
 ![ReduceMax计算示意图](../../../../figures/ReduceMax_scale.png "ReduceMax计算示意图")
 
 ## 函数原型
 
-- tensor前n个数据计算
+- tensor前n个数据计算：
 
     ```cpp
     template <typename T>
     __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex = 0)
     ```
 
-- tensor高维切分计算
-    - mask逐bit模式
+- tensor高维切分计算：
+    - mask逐bit模式：
 
         ```cpp
         template <typename T>
         __aicore__ inline void ReduceMax(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
-    - mask连续模式
+    - mask连续模式：
 
         ```cpp
         template <typename T>
@@ -94,14 +95,14 @@ ReduceMax计算过程如下图所示：首先，在每个repeat迭代中计算�
 - 源操作数及sharedTmpBuffer的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足所需空间要求，详情请参考关键特性说明。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
 - srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 - 如果存在多个最大值，该指令会将最小索引写入目的操作数。
 - dst结果存储顺序为最大值，最大值索引，若不需要索引，只会存储最大值。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
 - 当输入类型是half的时候，只支持获取最大不超过65535（uint16_t能表示的最大值）的索引值。
-- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，uint64_t/int64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，int64_t/uint64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用sharedTmpBuffer，可以直接传入src或者任意大小的sharedTmpBuffer。</cann-filter>
 
 <cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
@@ -112,22 +113,22 @@ ReduceMax计算过程如下图所示：首先，在每个repeat迭代中计算�
 
 ## 关键特性说明
 
-**索引值需要强制类型转换**，详情请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
+- **索引值需要强制类型转换**，详情请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
 
-**sharedTmpBuffer所需空间设置：**
+- **sharedTmpBuffer所需空间设置：**
 
-sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取索引，sharedTmpBuffer空间计算方式不同：需要返回索引的情况下，需要把每轮计算所需的空间进行累加，同时每轮计算的空间都要考虑UB空间32字节对齐的要求；无需返回索引的情况下，只需要提供第一轮计算所需的空间并满足32字节对齐要求即可，后续的轮次可以直接使用这块空间，此时不需要推导索引的过程，所以之前轮次的中间数据可以直接覆盖。计算所需空间的算法如下：
+    sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取索引，sharedTmpBuffer空间计算方式不同：需要返回索引的情况下，需要把每轮计算所需的空间进行累加，同时每轮计算的空间都要考虑UB空间32字节对齐的要求；无需返回索引的情况下，只需要提供第一轮计算所需的空间并满足32字节对齐要求即可，后续的轮次可以直接使用这块空间，此时不需要推导索引的过程，所以之前轮次的中间数据可以直接覆盖。计算所需空间的算法如下：
 
-- 无需返回最大值索引
+    - 无需返回最大值索引：
 
-    ```cpp
-    int firstMaxRepeat = repeatTime; // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
-    int iter1OutputCount = firstMaxRepeat * 2; // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
-    int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数按照datablock(32字节)向上对齐
-    int finalWorkLocalNeedSize = iter1AlignEnd; // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
-    ```
+        ```cpp
+        int firstMaxRepeat = repeatTime; // 对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat
+        int iter1OutputCount = firstMaxRepeat * 2; // 第一轮操作产生的元素个数，无论开发者是否需要返回索引，底层指令都会返回索引，所以这里要为索引预留空间，产生的元素个数为repeat次数*2
+        int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数按照datablock(32字节)向上对齐
+        int finalWorkLocalNeedSize = iter1AlignEnd; // 第一轮计算完成后，后续可能还需要多轮迭代，但是可以复用同一块空间，所以第一轮计算所需的空间就是最终sharedTmpBuffer所需的空间大小
+        ```
 
-- 需要返回最大值索引
+    - 需要返回最大值索引：
 
     ```cpp
     int firstMaxRepeat = repeatTime; 
@@ -146,16 +147,16 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     }
     ```
 
-以上计算出来的最终的空间大小单位是元素个数，若转成Bytes数表示为`finalWorkLocalNeedSize * typeSize`(Bytes)。
+    以上计算出来的最终的空间大小单位是元素个数，若转成Bytes数表示为`finalWorkLocalNeedSize * typeSize`(Bytes)。
 
-> [!NOTE]说明
-> 开发者为了节省地址空间，可以选择sharedTmpBuffer空间复用源操作数的空间。此时因为sharedTmpBuffer需要的最小空间一定小于源操作数的空间，所以无需关注和计算最小空间。
+    > [!NOTE]说明
+    > 开发者为了节省地址空间，可以选择sharedTmpBuffer空间复用源操作数的空间。此时因为sharedTmpBuffer需要的最小空间一定小于源操作数的空间，所以无需关注和计算最小空间。
 
 ## 调用示例<a name="section107745237168"></a>
 
 详细示例请参考[ReduceMax样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
 
-- tensor高维切分计算样例-mask连续模式
+- tensor高维切分计算样例-mask连续模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
@@ -163,7 +164,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
-- tensor高维切分计算样例-mask逐bit模式
+- tensor高维切分计算样例-mask逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
@@ -171,21 +172,21 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
-- tensor前n个数据计算样例
+- tensor前n个数据计算样例：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor前n个数据计算接口
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320, true);
     ```
 
-- sharedTmpBuffer空间计算示例
+- sharedTmpBuffer空间计算示例：
 
     ```cpp
-    // ReduceMax接口sharedTmpBuffer计算示例一:
+    // ReduceMax接口sharedTmpBuffer计算示例一：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320, 使用tensor高维切分计算接口, repeatTime为65, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为:
+    // tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 65, 8, true);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int RoundUp(int a, int b)
     {
         return (a + b - 1) / b;
@@ -201,11 +202,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
     // 最终sharedTmpBuffer所需的最小空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 144 + 16 + 16 = 176 ,也就是352Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例二:
+    // ReduceMax接口sharedTmpBuffer计算示例二：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为32640, 使用tensor高维切分计算接口,repeatTime为255, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为:
+    // tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 255, 8, true);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
@@ -217,11 +218,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;  // 第三轮产生的元素个数做向上取整
     // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 512 + 16 + 16 = 544 ,也就是1088Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例三:
+    // ReduceMax接口sharedTmpBuffer计算示例三：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为65408,使用tensor前n个数据计算接口,count=65408,需要索引值
-    // tensor前n个数据计算接口调用示例为:
+    // tensor前n个数据计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 65408, true);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
@@ -233,11 +234,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter3OutputCount = RoundUp(iter2OutputCount, elementsPerRepeat)*2 = 2;                 // 第三轮操作产生的元素个数
     int iter3AlignEnd = RoundUp(iter3OutputCount, elementsPerBlock) * elementsPerBlock = 16;   // 第三轮产生的元素个数做向上取整
     // 需要的空间为iter2AlignStart + iter3AlignStart + iter3AlignEnd = 1024 + 16 + 16 = 1056,也就是2112Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例四:
+    // ReduceMax接口sharedTmpBuffer计算示例四：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的的计算数据量为512,使用tensor高维切分计算接口,repeatTime为4, mask为128,需要索引值
-    // tensor高维切分计算接口调用示例为:
+    // tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 128, 4, 8, true);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
@@ -246,11 +247,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter2AlignStart = RoundUp(iter1OutputCount, elementsPerBlock)*elementsPerBlock = 16; // 对iter1OutputCount输出个数向上取整
     int iter2OutputCount = RoundUp(iter1OutputCount, elementsPerRepeat)*2 = 2;               // 第二轮操作产生的元素个数
     // 本用例中，由于第二轮操作产生的元素个数为2，即第二轮结束就可以拿到最大值和其索引值，因此需要的空间为iter2AlignStart + RoundUp(iter2OutputCount, elementsPerBlock) * elementsPerBlock = 16 + 16 = 32，也就是64Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例五:
+    // ReduceMax接口sharedTmpBuffer计算示例五：
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量count为65408,使用tensor前n个数据计算接口,count=65408，不需要索引值
-    // tensor前n个数据计算接口调用示例为:
+    // tensor前n个数据计算接口调用示例为：
     AscendC::ReduceMax<half>(dstLocal, srcLocal, sharedTmpBuffer, 65408, false);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 2;
     int elementsPerBlock = 32 / typeSize = 16;
     int elementsPerRepeat = 256 / typeSize = 128;
@@ -258,11 +259,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     int iter1OutputCount = firstMaxRepeat * 2 = 1022;                                          // 第一轮操作产生的元素个数
     int iter1AlignEnd = RoundUp(iter1OutputCount, elementsPerBlock) * elementsPerBlock = 1024; // 第一轮产生的元素个数做向上取整
     // 由于calIndex为false,因此最终sharedTmpBuffer所需的最小空间大小就是对第一轮产生元素做向上取整后的结果，此处就是1024，也就是2048Bytes
-    // ReduceMax接口sharedTmpBuffer计算示例六:
+    // ReduceMax接口sharedTmpBuffer计算示例六：
     // dstLocal,srcLocal和sharedTmpBuffer均为float类型,srcLocal的计算数据量为8320, 使用tensor高维切分计算接口, repeatTime为130, mask为64,需要索引值
-    // tensor高维切分计算接口调用示例为:
+    // tensor高维切分计算接口调用示例为：
     AscendC::ReduceMax<float>(dstLocal, srcLocal, sharedTmpBuffer, 64, 130, 8, true);
-    // 此时sharedTmpBuffer所需的最小空间计算过程为:
+    // 此时sharedTmpBuffer所需的最小空间计算过程为：
     int typeSize = 4;
     int elementsPerBlock = 32 / typeSize = 8;
     int elementsPerRepeat = 256 / typeSize = 64;
@@ -276,7 +277,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     // 最终sharedTmpBuffer所需的最小空间就是iter2AlignStart + iter3AlignStart + iter3AlignEnd = 264 + 16 + 8 = 288,也就是1152Bytes
     ```
 
-- <a name="li7962161711114"></a>tensor高维切分计算接口完整示例:
+- <a name="li7962161711114"></a>tensor高维切分计算接口完整示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -301,7 +302,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     示例结果如下：
 
     ```cpp
-    示例结果 输入数据(src_gm):
+    // 示例结果 输入数据(src_gm)：
     [0.4795   0.951    0.866    0.008545 0.8037   0.551    0.754    0.73     0.6035   0.251    0.4841   0.05914  0.9414   0.379    0.664    0.6914   0.9307   0.3853   0.4048
      0.7754   0.1265   0.709    0.7695   0.8057   0.9673   0.2566   0.8696   0.243    0.871    0.123    0.76     0.1844   0.7324   0.5757   0.0172   0.7188   0.556    0.3699
      0.7334   0.655    0.919    0.4219   0.82     0.1046   0.5796   0.4773   0.1405   0.3777   0.4421   0.983    0.728    0.642    0.37     0.9473   0.52     0.7783   0.699
@@ -329,11 +330,11 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
      0.068    0.07855  0.6177   0.3408   0.1538   0.2732   0.997    0.1158   0.4028   0.9536   0.7197   0.585    0.0899   0.3994   0.1835   0.737    0.4639   0.3071   0.47
      0.993    0.3862   0.293    0.1813   0.8193   0.745    0.064    0.7407   0.329    0.198    0.596    0.3      0.6562   0.819    0.2803   0.04095  0.703    0.3425   0.9224
      0.776    0.8057   0.734    0.2534   0.1824   0.793    0.3542   0.2595   0.2607   0.838    0.39     0.631    0.3542   0.1968   0.643    0.015366 0.4106   0.604   ]
-    输出数据(dst_gm):
-    [0.9985,  6.8e-06], 6.8e-06使用reinterpret_cast方法转换后为索引值114
+    // 输出数据(dst_gm)：
+    [0.9985,  6.8e-06] // 6.8e-06使用reinterpret_cast方法转换后为索引值114
     ```
 
-- tensor前n个数据计算接口完整调用示例:
+- tensor前n个数据计算接口完整调用示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -355,7 +356,7 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
     示例结果如下：
 
     ```cpp
-    示例结果 输入数据(src_gm):
+    // 示例结果 输入数据(src_gm)：
     [0.4778   0.5903   0.2433   0.698    0.1943   0.407    0.891    0.1766   0.5977   0.9473   0.6523   0.10913  0.0143   0.86     0.2366   0.625    0.3696   0.708    0.946
      0.538    0.3826   0.08215  0.516    0.9116   0.1548   0.507    0.8145   0.89     0.5435   0.563    0.1125   0.543    0.3142   0.8086   0.6885   0.874    0.855    0.4019
      0.1613   0.04462  0.945    0.6064   0.6904   0.00758  0.9463   0.528    0.9966   0.629    0.714    0.03134  0.4407   0.0322   0.5376   0.04443  0.03778  0.522    0.793
@@ -372,6 +373,6 @@ sharedTmpBuffer空间需要开发者申请并传入，根据是否需要获取�
      0.1768   0.52     0.3428   0.9146   0.7324   0.5054   0.7397   0.2737   0.6313   0.1704   0.5093   0.8105   0.1312   0.752    0.3647   0.781    0.4197   0.2329   0.787
      0.762    0.63     0.9263   0.2673   0.1846   0.765    0.921    0.2913   0.3135   0.337    0.2598   0.1782   0.8013   0.641    0.6865   0.736    0.618    0.8755   0.2756
      0.9854   0.8296   0.262   ]
-    输出数据(dst_gm):
-    [0.999,  1.38e-05], 1.38e-05使用reinterpret_cast方法转换后为索引值232
+    // 输出数据(dst_gm)：
+    [0.999,  1.38e-05] // 1.38e-05使用reinterpret_cast方法转换后为索引值232
     ```
