@@ -5,7 +5,7 @@ Coord用于定义张量的坐标，用于访问张量中特定位置的元素。
 ## 需要包含的头文件
 
 ```cpp
-#include "tensor_api/tensor.h
+#include "tensor_api/tensor.h"
 ```
 
 ## 原型定义
