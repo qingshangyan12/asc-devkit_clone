@@ -129,10 +129,23 @@ __aicore__ inline void ReleaseEventID(TEventID id)
     return;
 }
 
-template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
+namespace Internal {
+__aicore__ inline TEventID FetchEventIDImpl(HardEvent evt)
 {
-    return Internal::FetchEventIDImpl(evt);
+    const auto eventIndex = EventToIndex(evt);
+    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
+        KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
+            QUE_MAX_EVENT));
+    return lastId;
 }
+
+template <HardEvent evt> __aicore__ inline TEventID FetchEventIDImpl()
+{
+    return FetchEventIDImpl(evt);
+}
+}
+
 
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
