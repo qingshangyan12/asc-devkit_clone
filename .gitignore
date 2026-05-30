@@ -15,3 +15,5 @@ build_device/
 *.o
 *.log
 
+# OpenCode 配置
+.opencode/
