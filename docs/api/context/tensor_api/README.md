@@ -44,4 +44,4 @@ Tensor API的接口调用一般遵循以下四个步骤：
 
 ### 测试和样例
 
-本仓库提供[测试用例](../../../../tests/api/tensor_api) 以及[示例代码1](../../../../examples/01_simd_cpp_api/00_introduction/02_matrix/matmul_tensor_api)，[示例代码2](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api),[示例代码3](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/copy_in_tensor_api),[示例代码4](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/copy_out_tensor_api/)方便快速了解功能用法并进行验证。
+本仓库提供[测试用例](../../../../tests/api/tensor_api) 以及[示例代码1](../../../../examples/01_simd_cpp_api/00_introduction/02_matrix/matmul_tensor_api)，[示例代码2](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api),[示例代码3](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/copy_in_tensor_api),[示例代码4](../../../../examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/copy_out_tensor_api),[示例代码5](../../../../examples/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_tensor_api_high_performance)方便快速了解功能用法并进行验证。
