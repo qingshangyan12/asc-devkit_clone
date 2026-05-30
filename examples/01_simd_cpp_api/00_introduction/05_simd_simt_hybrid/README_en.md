@@ -1,15 +1,11 @@
-# Introduction Sample Overview
+# SimdSimtHybrid Sample Introduction
 
 ## Overview
 
-Simple examples of matrix and vector computation based on Ascend C programming.
+This directory provides introductory samples for Ascend C vector computation based on SIMT and SIMD hybrid programming.
 
 ## Sample List
 
-| Directory Name | Function Description |
-| -------------- | -------------------- |
-| [00_quickstart](./00_quickstart) | HelloWorld kernel implementation |
-| [01_add](./01_add) | Vector computation implementation based on different programming modes |
-| [02_matrix](./02_matrix) | Matrix multiplication computation |
-| [03_fusion_operation](./03_fusion_operation) | Fusion computation |
-| [04_reg_compute](./04_reg_compute) | Vector computation based on RegBase programming |
+| Directory Name | Function Description | Supported Products |
+| ---------------| -------------------- | --- |
+| [gather_adds_simt_simd_hybrid](./gather_adds_simt_simd_hybrid) | Gather and Adds fusion computation based on SIMT and SIMD | Ascend 950PR/Ascend 950DT |
