@@ -90,7 +90,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Op
     sqPIGlobal.SetGlobalBuffer(sqPIAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t sqHead = sqPI_.GetValue(0);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = %u, sqHead = %u", opType, sqHead);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = %u, sqHead = %u\n", opType, sqHead);
 
     auto sqCIAddr = (__gm__ uint32_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr);
     GlobalTensor<uint32_t> sqCIGlobal;
