@@ -23,7 +23,7 @@ ReduceMax接口用于从所有输入数据中找出最大值和最大值索引�
 ReduceMax计算过程如下图所示：首先，在每个repeat迭代中计算得到最大值和repeat内部索引，这些中间结果暂存于sharedTmpBuffer工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最大值和最大值索引。需要注意的是，每次repeat迭代获取的最大值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最大值索引。
 
 **图 1**  ReduceMax计算示意图<a id="fig1"></a>  
-![ReduceMax计算示意图](../../../../figures/ReduceMax计算示意图.png "ReduceMax计算示意图")
+![ReduceMax计算示意图](../../../../figures/ReduceMax_scale.png "ReduceMax计算示意图")
 
 ## 函数原型
 
