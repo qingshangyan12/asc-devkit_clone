@@ -18,7 +18,7 @@
 
 头文件引用路径为: "basic\_api/kernel\_operator\_fixpipe\_intf.h"。
 
-矩阵计算的结果存放在L0C Buffer, 需要将结果搬运至Unified Buffer（UB）中, 并且在搬运过程中支持随路量化等操作。
+矩阵计算的结果存放在L0C Buffer，需要将结果搬运至Unified Buffer（UB）中，并且在搬运过程中支持随路量化等操作。
 
 ## 函数原型<a name="zh-cn_topic_0000002549846732_section82039854412"></a>
 
@@ -98,7 +98,7 @@ L0C到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内包含�
 | reluEn | 输入 | 是否开启relu的开关：<br>&bull; false：不开启relu功能；<br>&bull; true：开启relu功能。 |
 | unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag；<br>&bull; 1（2'b01）：保留值；<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
 | TransformParams | 输入 | TransformParams 结构体是一个基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。<br>&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[1, 65535]。<br>&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），单位为C0_SIZE。<br>&bull; dstDnMatrixStride：目的相邻DN矩阵起始地址间的偏移，取值范围为dstDnMatrixStride∈[1, 2^32 -1]，单位为element。<br>&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），单位为C0_SIZE。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C到目标位置的正常数据移动。 |
-| dualDstCtrl | 输入 | 双目标模式控制。当启用双目标模式控制时，L0C中的M×N矩阵将被分成两半，并同时写入两个子块（SUB BLOCK）的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。<br>&bull; 2'b00：单目标模式，将整个矩阵写入通过subBlockId参数配置的目标UB。<br>&bull; 2'b01：双目标模式，按M维度拆分，M / 2 \* N写入每个UB, M必须为2的倍数。<br>&bull; 2'b10：双目标模式，按N维度拆分，M \* N / 2写入每个UB, N须为32的倍数。<br>&bull; 2'b11：保留。<br>dualDstCtrl仅支持在普通搬运模式或NZ2ND搬运场景下使用，不支持随路功能场景。 |
+| dualDstCtrl | 输入 | 双目标模式控制。当启用双目标模式控制时，L0C中的M×N矩阵将被分成两半，并同时写入两个子块（SUB BLOCK）的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。<br>&bull; 2'b00：单目标模式，将整个矩阵写入通过subBlockId参数配置的目标UB。<br>&bull; 2'b01：双目标模式，按M维度拆分，M / 2 \* N写入每个UB，M必须为2的倍数。<br>&bull; 2'b10：双目标模式，按N维度拆分，M \* N / 2写入每个UB，N须为32的倍数。<br>&bull; 2'b11：保留。<br>dualDstCtrl仅支持在普通搬运模式或NZ2ND搬运场景下使用，不支持随路功能场景。 |
 | subBlockId | 输入 | 在启用单目标模式时指示目标UB的编号。 |
 | isChannelSplit | 输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND功能。 |
 
@@ -211,7 +211,7 @@ M方向切分：
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 - dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
-- srcNdStride = 16,  表示不同NZ矩阵起始地址之间的间隔为16 \*  16 \* C0\_Size。
+- srcNdStride = 16，表示不同NZ矩阵起始地址之间的间隔为16 \*  16 \* C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 3**  开启NZ2ND参数设置示意图<a name="fig79783143556"></a>  
@@ -225,7 +225,7 @@ M方向切分：
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 - dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
-- srcNdStride = 256,  表示不同NZ矩阵起始地址之间的间隔为256，单位为C0\_Size。
+- srcNdStride = 256，表示不同NZ矩阵起始地址之间的间隔为256，单位为C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 4**  开启NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
@@ -239,8 +239,8 @@ M方向切分：
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图红框区域中左侧浅色Z排布矩阵的起始地址与右侧深色Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 - dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
-- ndNum = 2, 表示源NZ矩阵的数目。
-- srcNdStride = 240 ,  表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
+- ndNum = 2，表示源NZ矩阵的数目。
+- srcNdStride = 240，表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
     **图 5**  开启NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
@@ -256,7 +256,7 @@ M方向切分：
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 80，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中相邻两块蓝色Z排布的起始地址之间的间隔为80 \* C0\_Size。
 - dstStride = 80，表示目的DN矩阵每一行中的元素个数为80。
-- ndNum = 2, 表示源NZ矩阵的数目。
+- ndNum = 2，表示源NZ矩阵的数目。
 - srcNzMatrixStride = 240，表示不同源NZ矩阵的偏移，即下图中第一个蓝色Z排布的起始地址和第二个紫色Z排布的起始地址之间的间隔为240 \* C0\_Size。
 - srcNzC0Stride = 1：表示源矩阵NZ分形相邻行的地址偏移。
 - dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 80 =3840个元素。
@@ -272,7 +272,7 @@ M方向切分：
 - mSize = 24，表示源NZ矩阵在M方向上的大小为24个元素。
 - srcStride = 80，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中相邻两块蓝色Z排布的起始地址之间的间隔为80 \* C0\_Size。
 - dstStride = 60，表示目的DN矩阵每一行中的元素个数为60。
-- ndNum = 2, 表示源NZ矩阵的数目。
+- ndNum = 2，表示源NZ矩阵的数目。
 - srcNzMatrixStride = 240，表示不同源NZ矩阵的偏移，即下图中第一个蓝色Z排布的起始地址和第二个紫色Z排布的起始地址之间的间隔为240 \* C0\_Size。
 - srcNzC0Stride = 2：表示源矩阵NZ分形相邻行的地址偏移。
 - dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 60 = 2880个元素。
