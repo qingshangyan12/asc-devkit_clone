@@ -21,7 +21,7 @@
 ReduceSum接口对所有输入数据进行求和，计算过程如下。
 
 **图 1** ReduceSum计算示意图<a id="fig1"></a>  
-![](../../../figures/ReduceSum计算示意图.png "ReduceSum计算示意图")
+![](../../../../figures/ReduceSum.png "ReduceSum计算示意图")
 
 ## 函数原型
 

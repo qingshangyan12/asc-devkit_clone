@@ -134,7 +134,7 @@ ReduceDataBlock对输入数据进行多次迭代计算，每个迭代会取出8�
 3. 以此类推，得到目的操作数为1个half类型的数据sum。
 
 **图 2**  `ReduceDataBlock<ReduceType::SUM>`求和示意图
-![](../../../../figures/vcgadd_binrary_add.png "ReduceDataBlock-ReduceType-SUM-求和示意图")
+![](../../../../figures/vcgadd_binary_add.png "ReduceDataBlock-ReduceType-SUM-求和示意图")
 
 ## 调用示例
 
