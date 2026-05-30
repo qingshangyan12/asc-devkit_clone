@@ -77,6 +77,10 @@ __aicore__ inline TPipe::~TPipe()
 
 __aicore__ inline void TPipe::Init()
 {
+#ifdef ASCENDC_DEBUG
+    ASCENDC_DEBUG_ASSERT(GetTPipePtr() == nullptr, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "TPipe has already been constructed at %p!\n", (void*)g_lastTpipeInitPos));
+    g_lastTpipeInitPos = get_pc();
+#endif
     ResetPool();
     // for matmul macro, set flag M_MTE1 at the begining of operator, and also wait flag at the end.
     // matmul macro only use M_MTE1 event id 0 1 currently.
@@ -545,6 +549,9 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
 
 __aicore__ inline void TPipe::Destroy()
 {
+#ifdef ASCENDC_DEBUG
+    Internal::ResetTPipePtr(); // Reset global tpipe ptr to nullptr for next Initialazation.
+#endif
     DestroyWithoutPipeAll();
 #ifndef __ASCENDC_ENABLE_SUPER_KERNEL__
     pipe_barrier(PIPE_ALL);
