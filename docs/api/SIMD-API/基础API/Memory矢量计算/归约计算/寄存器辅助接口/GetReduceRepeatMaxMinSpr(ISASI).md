@@ -14,7 +14,7 @@
 
 ## 功能说明
 
-头文件为：\#include "basic\_api/kernel\_operator\_vec\_reduce\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
 获取[ReduceMax](../ReduceMax.md)、[ReduceMin](../ReduceMin.md)接口的结果（最值以及对应的索引值），仅支持连续计算场景（repeatStride=8，blockStride=1）。计算结果以全局变量形式存储，可以随时调用获取。
 
@@ -22,7 +22,7 @@
 
 <cann-filter npu-type="950,A3,910b">
 
-以下函数原型仅支持:
+以下函数原型仅支持：
 
 <cann-filter npu-type="950">
 
@@ -53,7 +53,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 <cann-filter npu-type="910">
 
-以下函数原型仅支持
+以下函数原型仅支持：
 
 Atlas 训练系列产品
 
