@@ -72,9 +72,23 @@ __aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Commit(HcommHandle ha
 
 template <CommProtocol commProtocol, CommEngine commEngine>
 template <pipe_t pipe>
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Commit(ChannelPtr channelPtr)
+{
+    return impl_.template Commit<pipe>(channelPtr);
+}
+
+template <CommProtocol commProtocol, CommEngine commEngine>
+template <pipe_t pipe>
 __aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Wait(HcommHandle handleId)
 {
     return impl_.template Wait<pipe>(handleId);
+}
+
+template <CommProtocol commProtocol, CommEngine commEngine>
+template <pipe_t pipe>
+__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Wait(ChannelPtr channelPtr)
+{
+    return impl_.template Wait<pipe>(channelPtr);
 }
 } // namespace AscendC
 

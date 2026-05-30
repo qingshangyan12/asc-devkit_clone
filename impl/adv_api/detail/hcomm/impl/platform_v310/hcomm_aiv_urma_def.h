@@ -69,7 +69,11 @@ public:
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId);
     template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Commit(ChannelPtr channel);
+    template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
+    template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Wait(ChannelPtr channel);
 
 private:
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,

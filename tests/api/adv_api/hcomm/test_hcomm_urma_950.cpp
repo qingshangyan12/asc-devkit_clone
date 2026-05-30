@@ -323,3 +323,41 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommit)
     EXPECT_EQ(hcomm.Wait(h0), AscendC::HCOMM_FAILED);
     EXPECT_EQ(hcomm.Wait(h1), AscendC::HCOMM_FAILED);
 }
+
+// Channel-based Commit/Wait directly operates on the channel without using handle state.
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_ChannelCommitWait)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+    AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
+        reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
+    EXPECT_EQ(handleId, 0);
+    EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+    channel.CompleteCurrentSq();
+    EXPECT_EQ(hcomm.Wait(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+}
+
+// Channel-based Commit/Wait covers all currently submitted work on the channel.
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_ChannelBatchCommitWait)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
+
+    AscendC::HcommHandle h0 = hcomm.WriteNbi<false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
+    AscendC::HcommHandle h1 = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
+        reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
+    AscendC::HcommHandle h2 = hcomm.WriteNbi<false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1018), reinterpret_cast<GM_ADDR>(0x2018), 8);
+    EXPECT_EQ(h0, 0);
+    EXPECT_EQ(h1, 1);
+    EXPECT_EQ(h2, 2);
+
+    EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+    channel.CompleteCurrentSq();
+    EXPECT_EQ(hcomm.Wait(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+}

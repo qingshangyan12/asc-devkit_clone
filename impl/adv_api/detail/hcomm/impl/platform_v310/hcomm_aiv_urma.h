@@ -467,6 +467,23 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit
 }
 
 template <pipe_t pipe>
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit(ChannelPtr channel)
+{
+    (void)pipe;
+    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
+    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    AscendC::GlobalTensor<uint32_t> sqPIGlobal;
+    sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
+    Gm2Ub(sqPI_, sqPIGlobal, 1);
+    uint32_t curHead = sqPI_.GetValue(0);
+
+    st_dev(curHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
+
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Commit by channel finish channel=%lu curHead=%u", channel, curHead);
+    return HCOMM_SUCCESS;
+}
+
+template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(HcommHandle handleId)
 {
     (void)pipe;
@@ -496,6 +513,26 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(H
         }
     }
     KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait finish handleId=%d curHead=%u", handleId, curHead);
+    return HCOMM_SUCCESS;
+}
+
+template <pipe_t pipe>
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(ChannelPtr channel)
+{
+    (void)pipe;
+    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
+    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    AscendC::GlobalTensor<uint32_t> sqPIGlobal;
+    sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
+    Gm2Ub(sqPI_, sqPIGlobal, 1);
+    uint32_t curHead = sqPI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait by channel enter channel=%lu curHead=%u", channel, curHead);
+    uint32_t ret = PollCq(channel, curHead);
+    if (ret != HCOMM_SUCCESS) {
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Wait by channel failed channel=%lu pollRet=%u", channel, ret);
+        return HCOMM_FAILED;
+    }
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait by channel finish channel=%lu curHead=%u", channel, curHead);
     return HCOMM_SUCCESS;
 }
 

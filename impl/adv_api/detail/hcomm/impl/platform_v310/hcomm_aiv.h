@@ -272,6 +272,15 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit
 }
 
 template <pipe_t pipe>
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(ChannelPtr channel)
+{
+    (void)pipe;
+    (void)channel;
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE Commit by channel is not supported");
+    return HCOMM_FAILED;
+}
+
+template <pipe_t pipe>
 __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(HcommHandle handleId)
 {
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Wait, handleId = %u", handleId);
@@ -345,6 +354,15 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(H
         }
     }
     return HCOMM_SUCCESS;
+}
+
+template <pipe_t pipe>
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(ChannelPtr channel)
+{
+    (void)pipe;
+    (void)channel;
+    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE Wait by channel is not supported");
+    return HCOMM_FAILED;
 }
 } // namespace AscendC
 

@@ -118,6 +118,17 @@ public:
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(HcommHandle handleId);
+
+    /*!
+     * @class Hcomm
+     * @brief Informed that tasks submitted on channel can be executed.
+     * @tparam pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @param [in] channelPtr: The handle of the communication channel.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note URMA supports committing by channel directly.
+     */
+    template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Commit(ChannelPtr channelPtr);
     
     /*!
      * @class Hcomm
@@ -129,6 +140,17 @@ public:
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(HcommHandle handleId);
+
+    /*!
+     * @class Hcomm
+     * @brief Block Aicore and wait for comm tasks submitted on channel to finish processing once.
+     * @tparam pipe: The pipe type to use for wait, PIPE_MTE3 supported as default.
+     * @param [in] channelPtr: The handle of the communication channel.
+     * @return 0 indicates success and -1 indicates failure.
+     * @note URMA supports waiting by channel directly.
+     */
+    template <pipe_t pipe = PIPE_MTE3>
+    __aicore__ inline int32_t Wait(ChannelPtr channelPtr);
 private:
     HcommImpl<commProtocol, commEngine> impl_;
 };
