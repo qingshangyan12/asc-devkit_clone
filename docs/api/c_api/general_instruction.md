@@ -26,15 +26,13 @@ AI Core上的存储单元用于存储矢量计算、矩阵计算的源操作数�
 
 ![地址重叠示例（不支持）](figures/unsupported_address_overlap_example.png)
 
-> [!NOTE]
-> 说明 
+> [!NOTE]说明 
 >本节所述地址重叠通用约束适用于一般情况，API参考中如有额外特殊说明的，则以具体API中的说明为准。
 >API中没有描述地址重叠约束的，视为不支持高维切分计算的地址重叠，地址重叠时计算结果可能不满足预期。
 
 ## 如何使用高维切分计算API
 
-> [!NOTE]
-> 说明 
+> [!NOTE]说明 
 > - 本章节对矢量计算API中的高维切分计算接口做解释说明。
 > - 下文中的repeatTime、dataBlockStride、repeatStride为通用描述，其命名不一定与具体指令中的参数命名完全对应。比如，单次迭代内不同DataBlock间地址步长dataBlockStride参数，在单目API中，对应为dst_block_stride，src_block_stride参数；在双目API中，对应为dst_block_stride，src0_block_stride，src1_block_stride参数。您可以在具体接口的参数说明中，找到参数含义的描述。
 > - dataBlockStride、repeatStride参数的单位默认为DataBlock（32Byte）。API中有特殊说明的，以API中的说明为准。
@@ -109,15 +107,14 @@ mask实际取值范围和操作数的数据类型有关。当操作数为16位�
 uint64_t mask[2] = {6148914691236517205, 6148914691236517205};
 repeatTime = 1 // 共128个元素，单次迭代能处理128个元素，故repeatTime = 1。
 dst_block_stride = 1;
-src0_block_stride =1;
+src0_block_stride = 1;
 src1_block_stride = 1; // 单次迭代内连续读取和写入数据。
 dst_repeat_stride = 8;
 src0_repeat_stride = 8;
 src1_repeat_stride = 8;  // 迭代间的数据连续读取和写入。
 
 asc_set_vector_mask(mask[1], mask[0]);
-asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block_stride,
-        src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(dstLocal, src0Local, src1Local, repeatTime, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
 
 结果示例如下：
