@@ -1,5 +1,7 @@
 # Tensor API手册资料目录导览
 
+- **[Tensor API教程](tensor_api_tutorial.md)**
+- **[Tensor API接口列表](tensor_api_list.md)**
 - **[基础数据结构](data_structure_directory.md)**
     - **[Layout数据结构](data_structure/layout_structure/layout_structure_directory.md)**
         - **[Layout和层次化表述法](<data_structure/layout_structure/Layout和层次化表述法.md>)**
