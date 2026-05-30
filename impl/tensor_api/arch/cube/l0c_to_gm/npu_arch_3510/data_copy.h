@@ -202,8 +202,8 @@ private:
             InsertSync();
 
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * CBURST_NUM_3510));
-            const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
-
+            // const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510));
+            const auto dstCoord = MakeCoord(0, i * MAIN_LOOP_N_SIZE_3510);
             DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), mainLoopParam,
                                       Std::make_index_sequence<Std::tuple_size_v<decltype(mainLoopParam)>>{});
         }
@@ -215,8 +215,8 @@ private:
             InsertSync();
 
             const auto srcCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * CBURST_NUM_3510));
-            const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
-
+            // const auto dstCoord = MakeCoord(MakeCoord(0, 0), MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510));
+            const auto dstCoord = MakeCoord(0, nIterNum * MAIN_LOOP_N_SIZE_3510);
             DataCopyWrapper<quantPre>(dst(dstCoord), src(srcCoord), tailParam,
                                       Std::make_index_sequence<Std::tuple_size_v<decltype(tailParam)>>{});
         }
