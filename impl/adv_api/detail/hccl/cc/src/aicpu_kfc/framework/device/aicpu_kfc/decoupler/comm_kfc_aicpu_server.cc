@@ -27,6 +27,7 @@
 #include "stream_lite.h"
 #include "thread.h"
 #include "aicpu_ts_thread.h"
+#include "timing_stat.h"
 
 using namespace HcclApi;
 namespace {
@@ -560,7 +561,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
             recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeWait] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
+        uint32_t waitSlot = TimingStatStart("[Orchestrate][LaunchOpenCcoreWait]");
         ret = LaunchOpenCcoreWait(*execCtx, waitAddr, turnIdx, turnNumsAddr_, turnIdx == repeatCnt);
+        TimingStatEnd(waitSlot);
         UpdateProgress("AfterWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter("AfterWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
             recordAddr, turnNumsAddr_, execCtx);
@@ -573,7 +576,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
             recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
+        uint32_t launchSlot = TimingStatStart("[Orchestrate][LaunchOpenAicpuKernelServer]");
         ret = LaunchOpenAicpuKernelServer(runParam);
+        TimingStatEnd(launchSlot);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter("AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
             recordAddr, turnNumsAddr_, execCtx);
@@ -586,7 +591,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg &msg, HcclMsgExt &extMs
             recordAddr, turnNumsAddr_, execCtx);
         HCCL_INFO("[MC2_OPEN_DIAG][LoopBeforePost] group %u, msgPos %u, repeatIdx %u, turnIdx %u.",
                   groupIdx_, msgPos, i, turnIdx);
+        uint32_t postSlot = TimingStatStart("[Orchestrate][LaunchOpenCcorePost]");
         ret = LaunchOpenCcorePost(*execCtx, recordAddr, turnIdx, turnNumsAddr_);
+        TimingStatEnd(postSlot);
         UpdateProgress("AfterPost", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter("AfterPost", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr,
             recordAddr, turnNumsAddr_, execCtx);
