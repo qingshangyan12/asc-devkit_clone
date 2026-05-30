@@ -1,4 +1,4 @@
-# 基于静态Tensor编程实现Matmul计算
+# 基于静态Tensor编程实现Matmul基础API计算
 
 ## 概述
 
@@ -29,7 +29,7 @@
   $$
   C = A * B
   $$
-  其中，A矩阵的形状为`[M, K]`，B矩阵的形状为`[K, N]`，输出C矩阵的形状为`[M, N]`。对输出矩阵C中的每一个元素`C[m, n]`，都会累加A矩阵第`m`行和B矩阵第`n`列在K轴上的乘积。在矩阵乘法中，**M方向**指矩阵的行方向，**N方向**指矩阵的列方向，**K方向**指矩阵乘法的内维（累加维度）。
+  其中，A矩阵的形状为`[M, K]`，B矩阵的形状为`[K, N]`，输出C矩阵的形状为`[M, N]`。对输出矩阵C中的每一个元素`C[m, n]`，都会累加A矩阵第`m`行和B矩阵第`n`列在K轴上的乘积。在矩阵乘法中，**M方向**指矩阵C的行方向，**N方向**指矩阵C的列方向，**K方向**指矩阵C乘法的内维（累加维度）。
 
 - 样例规格：  
   本样例参数`M = 256, N = 256, K = 64`，输入输出均为`half`类型、[ND](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式。样例启动2个核完成计算，每个核负责输出矩阵C在M轴方向的128行、N轴方向的全部256列：
@@ -61,16 +61,16 @@
       - `cGM`偏移`mIterIdx * singleCoreM * N`，使当前核把结果写回C矩阵中自己负责的行块。
     - 通过`LocalMemAllocator`创建静态`LocalTensor`：
       - `a1Local`：A矩阵在L1中的临时存储。
-      - `a2Local`：A矩阵在L0A中的临时存储，供`Mmad`读取。
+      - `a2Local`：A矩阵在L0A中的临时存储，供[`Mmad`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)读取。
       - `b1Local`：B矩阵在L1中的临时存储。`a1Local`和`b1Local`使用同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移。
       - `b2Local`：B矩阵在L0B中的临时存储，供`Mmad`读取。
       - `cLocal`：矩阵乘结果在L0C中的临时存储。
     - 调用[`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)将A、B矩阵从GM搬运到L1。这里使用[`Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)参数，在搬运过程中将输入的[ND](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式数据转换为Cube计算需要的[Nz](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式。
     - 调用[`SetFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[`WaitFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)进行同步。`DataCopy`属于MTE2流水，后续`LoadData`属于[MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)流水，[MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)必须等待[MTE2](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)完成，避免读取到尚未搬运完成的L1数据。
     - 调用`LoadData`将A矩阵从L1搬运到L0A，将B矩阵从L1搬运到L0B。L0A和L0B是Cube矩阵计算单元直接读取的输入缓存。
-    - 调用`SetFlag<HardEvent::MTE1_M>`和`WaitFlag<HardEvent::MTE1_M>`进行同步。`LoadData`属于MTE1流水，后续`Mmad`属于M流水，M流水必须等待MTE1完成，避免读取到尚未搬运完成的L0A/L0B数据。
-    - 调用`Mmad(cLocal, a2Local, b2Local, {baseM, baseN, baseK, 0, false, true})`执行矩阵乘。这里`baseM = 128`、`baseN = 256`、`baseK = 64`，对应单个核一次计算的矩阵块大小。
-    - 调用`SetFlag<HardEvent::M_FIX>`和`WaitFlag<HardEvent::M_FIX>`进行同步。[`Mmad`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)属于M流水，后续[`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)属于FIX流水，FIX流水必须等待M流水完成，避免读取到尚未计算完成的L0C结果。
+    - 调用[`SetFlag<HardEvent::MTE1_M>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[`WaitFlag<HardEvent::MTE1_M>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)进行同步。`LoadData`属于MTE1流水，后续`Mmad`属于M流水，M流水必须等待MTE1完成，避免读取到尚未搬运完成的L0A/L0B数据。
+    - 调用[`Mmad`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)`(cLocal, a2Local, b2Local, {baseM, baseN, baseK, 0, false, true})`执行矩阵乘。这里`baseM = 128`、`baseN = 256`、`baseK = 64`，对应单个核一次计算的矩阵块大小。
+    - 调用[`SetFlag<HardEvent::M_FIX>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[`WaitFlag<HardEvent::M_FIX>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)进行同步。[`Mmad`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)属于M流水，后续[`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)属于FIX流水，FIX流水必须等待M流水完成，避免读取到尚未计算完成的L0C结果。
     - 调用[`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将L0C中的`float`累加结果转换为`half`并搬运回GM中的C矩阵输出位置。
     - 最后调用[`PipeBarrier`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)`<PIPE_ALL>()`，确保当前核内相关流水任务完成。
 
