@@ -40,7 +40,9 @@ function applyFilter() {
     allFilterDivs.forEach(el => { el.style.display = '' })
   } else {
     allFilterDivs.forEach(el => {
-      el.style.display = el.getAttribute('data-filter') === selectedFilter.value ? '' : 'none'
+      const filterValue = el.getAttribute('data-filter')
+      const match = filterValue.split(',').map(s => s.trim()).includes(selectedFilter.value)
+      el.style.display = match ? '' : 'none'
     })
   }
 }
