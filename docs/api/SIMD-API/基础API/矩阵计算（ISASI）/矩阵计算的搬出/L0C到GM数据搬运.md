@@ -186,7 +186,7 @@
 
 <cann-filter npu_type = "A3,910b">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品:
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 
 **表 3**  DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002542828493_table35908519282"></a>
 
@@ -200,8 +200,8 @@
 | unitFlag | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag。<br>&bull; 1（2'b01）：无效值。<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位。<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的UnitFlag特性说明章节。 |
 | clipReluPre | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
 | eltWiseOp | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
-| quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下:<br>&bull; float/int32_t输出此需配置为QuantMode_t::NoQuant。<br>&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer 搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16: float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16 :float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16: int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16: int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8: float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8: float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8: int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8: int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
-| reluPre | 用于配置relu操作的模式，类型为uint8_t，取值如下：<br>配置为Leaky relu时，需要调用[SetLreluALPHA](./寄存器配置说明/SetLreluALPHA.md)（注：非正式对外接口，正式待补充）来设置leaky relu系数；配置为Prelu时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置Prelu参数（AscendC 待实现）。<br>&bull; 0：不开启relu<br>&bull; 1：Normal relu<br>&bull; 2：Leaky relu（AscendC 待实现）<br>&bull; 3：Prelu（AscendC 待实现） |
+| quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下：<br>&bull; float/int32_t输出此需配置为QuantMode_t::NoQuant。<br>&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
+| reluPre | 用于配置relu操作的模式，类型为uint8_t，取值如下：<br>配置为Leaky relu时，需要调用[SetLreluALPHA](./寄存器配置说明/SetLreluALPHA.md)（注：非正式对外接口，正式待补充）来设置leaky relu系数；配置为Prelu时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置Prelu参数（AscendC待实现）。<br>&bull; 0：不开启relu<br>&bull; 1：Normal relu<br>&bull; 2：Leaky relu（AscendC待实现）<br>&bull; 3：Prelu（AscendC待实现） |
 | channelSplit | 类型为bool，配置是否开启通道切分功能，仅在L0C(CO1) -> GM通路下NZ格式float类型输出时生效。<br>&bull; false：不开启<br>&bull; true：开启 |
 | nz2ndEn | 类型为bool，配置是否开启NZ2ND的格式转换，仅在L0C(CO1) -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息<br>&bull; false：不开启<br>&bull; true：开启 |
 
@@ -262,7 +262,7 @@
 | deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
 | reluEn | 输入 | 是否开启relu的开关：<br>&bull; false：不开启relu功能；<br>&bull; true：开启relu功能。 |
 | unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag；<br>&bull; 1（2'b01）：保留值；<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
-| TransformParams | 输入 | TransformParams 结构体是一个基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。<br>&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[1, 65535]。<br>&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），单位为C0_SIZE。<br>&bull; dstDnMatrixStride：目的相邻DN矩阵起始地址间的偏移，取值范围为dstDnMatrixStride∈[1, 2^32 -1]，单位为element。<br>&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），单位为C0_SIZE。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C到目标位置的正常数据移动。 |
+| TransformParams | 输入 | TransformParams结构体是一个基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。<br>&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[1, 65535]。<br>&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），单位为C0_SIZE。<br>&bull; dstDnMatrixStride：目的相邻DN矩阵起始地址间的偏移，取值范围为dstDnMatrixStride∈[1, 2^32 -1]，单位为element。<br>&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），单位为C0_SIZE。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C到目标位置的正常数据移动。 |
 | dualDstCtrl | 输入 | 双目标模式控制。当启用双目标模式控制时，L0C中的M×N矩阵将被分成两半，并同时写入两个子块（SUB BLOCK）的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。<br>&bull; 2'b00：单目标模式，将整个矩阵写入通过subBlockId参数配置的目标UB。<br>&bull; 2'b01：双目标模式，按M维度拆分，M / 2 \* N写入每个UB，M必须为2的倍数。<br>&bull; 2'b10：双目标模式，按N维度拆分，M \* N / 2写入每个UB，N须为32的倍数。<br>&bull; 2'b11：保留。<br>dualDstCtrl仅支持在普通搬运模式或NZ2ND搬运场景下使用，不支持随路功能场景。 |
 | subBlockId | 输入 | 在启用单目标模式时指示目标UB的编号。 |
 | isChannelSplit | 输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND功能。 |
@@ -279,13 +279,13 @@
 |mSize|必选输入|源NZ矩阵在M方向上的大小。<br>&bull; 不开启随路NZ2ND功能（[NZ2NZ搬运](./关键特性说明/NZ2NZ.md)），取值范围为mSize∈[0, 65535]。<br>&bull; 开启随路[NZ2ND](./关键特性说明/NZ2ND.md)功能，取值范围为mSize∈[0, 8192]。|
 |srcStride|必选输入|源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)），T为src的数据类型，其值应填成mSize对16向上取整。|
 |dstStride|必选输入|&bull; 不开启NZ2ND功能（[NZ2NZ搬运](./关键特性说明/NZ2NZ.md)）：目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock（32Bytes）。<br>&bull; 开启随路[NZ2ND](./关键特性说明/NZ2ND.md)功能：目的ND矩阵每一行中的元素个数，取值不为0，单位为element。|
-|[quantPre](./关键特性说明/随路量化.md)|可选输入|用于控制量化模式，QuantMode_t类型，默认值为`QuantMode_t::NoQuant`，具体定义如下:<br>&bull; float/int32_t输出此需配置为`QuantMode_t::NoQuant`;<br>&bull; half/bfloat16_t输出，此参数需配置为`QuantMode_t::F322F16`/`QuantMode_t::F322BF16`;<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16: float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16 :float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16: int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16: int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8: float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8: float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8: int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8: int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre>|
+|[quantPre](./关键特性说明/随路量化.md)|可选输入|用于控制量化模式，QuantMode_t类型，默认值为`QuantMode_t::NoQuant`，具体定义如下：<br>&bull; float/int32_t输出此需配置为`QuantMode_t::NoQuant`;<br>&bull; half/bfloat16_t输出，此参数需配置为`QuantMode_t::F322F16`/`QuantMode_t::F322BF16`;<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre>|
 |deqScalar|可选输入|scalar量化参数，表示单个scale值，quantPre量化模式为[随路量化](./关键特性说明/随路量化.md)时需要设置该参数。支持的数据类型为`uint64_t`。|
 |[reluEn](./关键特性说明/随路relu.md)|可选输入|是否开启NormRelu的开关：<br>&bull; `false`：不开启NormRelu功能， 默认为`false`；<br>&bull; `true`：开启NormRelu功能。|
 |unitFlag|可选输入|unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag；<br>&bull; 1（2'b01）：保留值；<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的UnitFlag特性说明章节。|
 |[channelSplit](./关键特性说明/F32-Channel-Split.md)|可选输入|仅在L0C(CO1) -> GM NZ float输出时生效，是否开启通道拆分的功能。默认为`false`，不开启该功能。|
 |ndNum|可选输入|L0C上源NZ矩阵的数目，也就是传输ND矩阵的数目，默认为1，取值范围为ndNum∈[1, 65535]，[NZ2ND](./关键特性说明/NZ2ND.md)多个NZ非连续矩阵的个数。|
-|srcNdStride|可选输入|不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 512]，单位为数据块 16* C0_Size。当ndNum配置为1时，srcNdStride配置为0即可，不生效。|
+|srcNdStride|可选输入|不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 512]，单位为数据块16*C0_Size。当ndNum配置为1时，srcNdStride配置为0即可，不生效。|
 |dstNdStride|可选输入|目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[0, 65535]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。|
 
 </cann-filter>
@@ -401,7 +401,7 @@
 - cbufWorkspace量化Tensor位于L1 Buffer，地址要求32B对齐。
 - 量化和Relu参数不能为INF/NAN和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
-- unitFlag 特性开启需要配合Mmad同时开启。
+- unitFlag特性开启需要配合Mmad同时开启。
 
 <cann-filter npu_type = "A3,910b">
 
@@ -740,7 +740,7 @@
             AscendC::LocalTensor<dstCO1_T> dstCO1 = outQueueCO1.AllocTensor<dstCO1_T>();
             AscendC::LocalTensor<dstCO1_T> biasA1 = inQueueBiasA1.DeQue<dstCO1_T>();
             // C = A * B + bias
-            // m：左矩阵Height，k：左矩阵Width，n: 右矩阵Width
+            // m：左矩阵Height，k：左矩阵Width，n：右矩阵Width
             AscendC::Mmad(dstCO1, featureMapA2, weightB2, biasA1, { m, n, k, true, 0, false, false, false });
             outQueueCO1.EnQue<dstCO1_T>(dstCO1);
             inQueueFmA2.FreeTensor(featureMapA2);
@@ -796,9 +796,9 @@
             // // 设置clip relu的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
-            // //mov l0c to gm，量化操作后，设置 element-wise 操作，Add
+            // //mov l0c to gm，量化操作后，设置element-wise操作，Add
             // intriParams.eltWiseOp = 1;
-            // // 需要额外申请 element-wise tensor的gm空间，将值搬到eleWiseTensor
+            // // 需要额外申请element-wise tensor的gm空间，将值搬到eleWiseTensor
             // AscendC::LocalTensor<half> eleWiseTensor = inQueueC1.AllocTensor<half>();
             // DataCopy(eleWiseTensor, eleWiseGlobal, { 1, static_cast<uint16_t>(sizeof(half) * dst_size / 32), 0, 0 });
             // AscendC::PipeBarrier<PIPE_ALL>();

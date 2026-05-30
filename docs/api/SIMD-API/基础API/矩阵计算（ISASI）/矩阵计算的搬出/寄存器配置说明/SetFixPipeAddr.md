@@ -155,7 +155,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             AscendC::LocalTensor<dstCO1_T> dstCO1 = outQueueCO1.AllocTensor<dstCO1_T>();
             AscendC::LocalTensor<dstCO1_T> biasA1 = inQueueBiasA1.DeQue<dstCO1_T>();
             // C = A * B + bias
-            // m: 左矩阵Height, k: 左矩阵Width, n: 右矩阵Width
+            // m：左矩阵Height，k：左矩阵Width，n：右矩阵Width
             AscendC::Mmad(dstCO1, featureMapA2, weightB2, biasA1, { m, n, k, true, 0, false, false, false });
             outQueueCO1.EnQue<dstCO1_T>(dstCO1);
             inQueueFmA2.FreeTensor(featureMapA2);
@@ -211,9 +211,9 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // // 设置clip relu的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
-            // //mov l0c to gm，量化操作后，设置 element-wise 操作，Add
+            // //mov l0c to gm，量化操作后，设置element-wise操作，Add
             // intriParams.eltWiseOp = 1;
-            // // 需要额外申请 element-wise tensor的gm空间，将值搬到eleWiseTensor
+            // // 需要额外申请element-wise tensor的gm空间，将值搬到eleWiseTensor
             // AscendC::LocalTensor<half> eleWiseTensor = inQueueC1.AllocTensor<half>();
             // DataCopy(eleWiseTensor, eleWiseGlobal, { 1, static_cast<uint16_t>(sizeof(half) * dst_size / 32), 0, 0 });
             // AscendC::PipeBarrier<PIPE_ALL>();
