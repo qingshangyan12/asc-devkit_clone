@@ -53,7 +53,7 @@
     - `CUBE_BLOCK = 16`表示half数据类型分形为`16 x 16`，代码中按`16 x 16`的分形为单位进行[`LoadData`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/Load2D.md)搬运。
 
   - Kernel侧详细流程
-    - 创建[`GlobalTensor`]((https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md))`<half>`对象`aGM`、`bGM`、`cGM`，分别表示[GM（Global Memory，全局内存）](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)中的A、B、C矩阵。
+    - 创建[`GlobalTensor`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/GlobalTensor简介.md)`<half>`对象`aGM`、`bGM`、`cGM`，分别表示[GM（Global Memory，全局内存）](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)中的A、B、C矩阵。
     - 通过[AscendC::GetBlockIdx()](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)获取当前核号，并计算`mIterIdx`。本样例只沿M轴切分任务，因此每个核只需要处理A矩阵和C矩阵中属于自己的M轴分片。
     - 设置GM地址偏移：
       - `aGM`偏移`mIterIdx * singleCoreM * K`，使当前核读取自己负责的A矩阵行块。
@@ -65,8 +65,8 @@
       - `b1Local`：B矩阵在L1中的临时存储。`a1Local`和`b1Local`使用同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移。
       - `b2Local`：B矩阵在L0B中的临时存储，供`Mmad`读取。
       - `cLocal`：矩阵乘结果在L0C中的临时存储。
-    - 调用[`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy.md)将A、B矩阵从GM搬运到L1。这里使用[`Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)参数，在搬运过程中将输入的[ND](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式数据转换为Cube计算需要的[Nz](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式。
-    - 调用[`SetFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[`WaitFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)进行同步。`DataCopy`属于MTE2流水，后续`LoadData`属于[MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)流水，[MTE1]((https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md))必须等待[MTE2]((https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md))完成，避免读取到尚未搬运完成的L1数据。
+    - 调用[`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)将A、B矩阵从GM搬运到L1。这里使用[`Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)参数，在搬运过程中将输入的[ND](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式数据转换为Cube计算需要的[Nz](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/神经网络和算子/数据排布格式.md)格式。
+    - 调用[`SetFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[`WaitFlag<HardEvent::MTE2_MTE1>`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)进行同步。`DataCopy`属于MTE2流水，后续`LoadData`属于[MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)流水，[MTE1](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)必须等待[MTE2](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/技术附录/概念原理和术语/术语表.md)完成，避免读取到尚未搬运完成的L1数据。
     - 调用`LoadData`将A矩阵从L1搬运到L0A，将B矩阵从L1搬运到L0B。L0A和L0B是Cube矩阵计算单元直接读取的输入缓存。
     - 调用`SetFlag<HardEvent::MTE1_M>`和`WaitFlag<HardEvent::MTE1_M>`进行同步。`LoadData`属于MTE1流水，后续`Mmad`属于M流水，M流水必须等待MTE1完成，避免读取到尚未搬运完成的L0A/L0B数据。
     - 调用`Mmad(cLocal, a2Local, b2Local, {baseM, baseN, baseK, 0, false, true})`执行矩阵乘。这里`baseM = 128`、`baseN = 256`、`baseK = 64`，对应单个核一次计算的矩阵块大小。
@@ -243,40 +243,21 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 
 ### msProf工具介绍
 
-[msProf](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/调试调优/性能调优.md)工具是单算子性能分析工具，包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。
-
-#### 上板性能采集
-
-通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。基于可执行文件demo通过msprof op执行算子调优：
+使用 `msprof` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo
+msprof ./demo   # 分析样例性能
 ```
 
-命令完成后，会在当前目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
+当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件：
 
 ```bash
-├──dump                       # 原始的性能数据，用户无需关注
-├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-├──OpBasicInfo.csv            # 算子基础信息
-├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
-└──visualize_data.bin         # MindStudio Insight呈现文件
-```
-
-查看具体的性能分析结果：
-```bash
-cat ./OPPROF_*/OpSummary.csv
-```
-
-#### 仿真性能采集
-
-使用msopprof simulator开启算子仿真调优功能，并配合使用仿真可选参数和用户待调优程序（blockdim 1）进行调优。参考[msopprof simulator模式用户指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/user_guide/msopprof_simulator_user_guide.md#命令参考 )。仿真可选参数请参考[表 1 msopprof simulator可选参数说明](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/user_guide/msopprof_simulator_user_guide.md#simulator可选参数说明)。参考[《芯片SoC类型获取方法》](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/get_chip_soc_type.md)获取芯片类型，作为如下参数 --soc-version 的值。具体命令示例如下：
-
-```bash
-msprof op simulator --soc-version=Ascendxxxyy --output=/home/projects/output /home/projects/MyApp/out/main blockdim 1   # --output为可选参数,/home/projects/MyApp/out/main为使用的app,blockdim 1为用户app的可选参数,xxxyy为用户实际使用的具体芯片类型
+PROF_xxxx_XXXXXX
+├── device_{id}
+└── host
+└── mindstudio_profiler_log
+└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+    ├── msprof_*.json
+    ├── xx_*.csv
+    └── README.txt
 ```
