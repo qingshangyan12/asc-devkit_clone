@@ -483,29 +483,22 @@ AscendC::DumpTensor(cLocal, baseM * baseN);
 
 ### msProf工具介绍
 
-msProf工具是单算子性能分析工具，包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。
-
-#### 上板性能采集
-
-通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。基于可执行文件demo通过msprof op执行算子调优：
+使用 `msprof` 工具获取详细性能数据：
 
 ```bash
-msprof op ./demo
+msprof ./demo   # 分析样例性能
 ```
 
-命令完成后，会在当前目录下生成以"OPPROF_{timestamp}_XXX"命名的文件夹，性能数据文件夹结构示例如下：
-
+当前目录下会生成 PROF_ 前缀的文件夹，`mindstudio_profiler_output` 目录保存Host和各个Device的性能数据汇总，性能数据分析推荐查看该目录下文件：
 ```bash
-├──dump                       # 原始的性能数据，用户无需关注
-├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-├──OpBasicInfo.csv            # 算子基础信息
-├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
-└──visualize_data.bin         # MindStudio Insight呈现文件
+PROF_xxxx_XXXXXX
+├── device_{id}
+└── host
+└── mindstudio_profiler_log
+└── mindstudio_profiler_output    # 保存Host和各个Device的性能数据汇总
+    ├── msprof_*.json
+    ├── xx_*.csv
+    └── README.txt
 ```
 
 查看具体的性能分析结果：
@@ -513,7 +506,7 @@ msprof op ./demo
 cat ./OPPROF_*/OpSummary.csv
 ```
 
-#### 仿真性能采集
+### 仿真性能采集
 
 使用msprof op simulator可以在无NPU环境下通过仿真获取算子性能数据：
 
