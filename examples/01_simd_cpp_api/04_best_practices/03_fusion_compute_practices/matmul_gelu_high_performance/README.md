@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程范式，展示了[Cube](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)-[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将结果输出到[GM](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)或[UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
+本样例基于[Tensor的C++编程](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/基于Tensor的C++编程.md)范式，展示了[Cube](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)-[Vector](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过[Fixpipe](../../../../../docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)将结果输出到[GM](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)或[UB](../../../../../docs/guide/编程指南/高级编程/硬件实现/基本架构.md)，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
 ## 支持的产品
 
