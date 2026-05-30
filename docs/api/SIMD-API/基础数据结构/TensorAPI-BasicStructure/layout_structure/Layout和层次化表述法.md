@@ -34,7 +34,7 @@ Shape用于表达Tensor形状，Stride则用于区分不同的排布方式。
 
 图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时，用黑色线包裹的矩阵。
 
-Shape的第一个元素描述行方向的形状，(2, 3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述列方向的形状，(2, 4)表示内层矩阵和外层矩阵的列数分别为2和4。
+Shape的第一个元素描述行方向的形状，（2，3）表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述列方向的形状，（2，4）表示内层矩阵和外层矩阵的列数分别为2和4。
 
 Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔。图片中用箭头表示了每个维度相邻元素的首地址间隔。
 
@@ -72,7 +72,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
 - ZN Layout
 
-    ZN Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为(32Byte / sizeof(T)) * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按N字形组织，外层分形按字形组织，因此StrideRow1需要满足按整块对齐的要求。
+    ZN Layout格式的ShapeRow0、ShapeColumn0为固定值。内层分形的Shape为（32Byte / sizeof(T)） * 16，StrideRow0、StrideColumn0也为固定值，即内层分形按N字形组织，外层分形按字形组织，因此StrideRow1需要满足按整块对齐的要求。
 
     ```cpp
     Layout = ((Shape) : (Stride))
