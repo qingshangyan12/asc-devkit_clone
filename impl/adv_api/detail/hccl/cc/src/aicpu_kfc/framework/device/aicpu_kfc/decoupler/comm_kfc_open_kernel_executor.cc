@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <cstddef>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
@@ -16,6 +17,13 @@
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "timing_stat.h"
+
+namespace mc2_ops_hccl {
+// 旁路入口(定义在 ops/all_to_all_v/executor/cann_kernel_bridge.cc)。
+// 经 dlopen CANN libscatter_aicpu_kernel.so 调其 GetAlgExec + Orchestrate。
+HcclResult LaunchAlltoAllViaCann(const OpParam &ascParam, const AlgResourceCtxSerializable &ascResCtx);
+}  // namespace mc2_ops_hccl
+
 
 namespace {
 mc2_ops_hccl::OpParam *AsOpenOpParam(std::vector<uint8_t> &opParam)
@@ -181,6 +189,24 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
     TimingStatEnd(restoreSlot);
+
+    // 旁路(opt-in): MC2_ALLTOALL_USE_CANN=1 且为 alltoall 类算子时，经 dlopen 调用
+    // CANN 的 GetAlgExec + Orchestrate，使其内部走到 ops_hccl::InsTempAlltoAllVMesh1D::
+    // KernelRun。成功则直接返回; 失败/未启用则回退下方 asc 原流程(默认行为不变)。
+    const char *useCannEnv = std::getenv("MC2_ALLTOALL_USE_CANN");
+    const bool useCann = (useCannEnv != nullptr && useCannEnv[0] == '1');
+    const bool isAlltoAll = (param->opType == HCCL_CMD_ALLTOALL ||
+                             param->opType == HCCL_CMD_ALLTOALLV ||
+                             param->opType == HCCL_CMD_ALLTOALLVC);
+    if (useCann && isAlltoAll) {
+        HCCL_INFO("[CannBridge] bypass enabled, routing alltoall to CANN kernel. algName[%s]", param->algName);
+        HcclResult cannRet = mc2_ops_hccl::LaunchAlltoAllViaCann(*param, resCtx);
+        if (cannRet == HCCL_SUCCESS) {
+            return HCCL_SUCCESS;
+        }
+        HCCL_WARNING("[CannBridge] CANN path failed (ret=%d), fallback to asc path. algName[%s]",
+                     static_cast<int>(cannRet), param->algName);
+    }
 
     uint32_t getAlgSlot = TimingStatStart("[LaunchOpenOpParamDataImpl][GetAlgExec]");
     auto executor = mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
