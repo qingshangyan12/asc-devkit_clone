@@ -55,3 +55,37 @@ TEST_F(Tensor_Api_Tensor_Slice, TestLocalTensorSliceByLayout)
     EXPECT_EQ(sliced[MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0))], 10);
     EXPECT_EQ(sliced[MakeCoord(MakeCoord(0, 1), MakeCoord(0, 3))], 21);
 }
+
+TEST_F(Tensor_Api_Tensor_Slice, TestLocalTensorSliceThreeDimLayoutByShape)
+{
+    using namespace AscendC::Te;
+
+    __gm__ float data[48] = {};
+    auto layout = MakeLayout(MakeShape(2, MakeShape(6, 4)), MakeStride(24, MakeStride(4, 1)));
+    auto tensor = MakeTensor(MakeMemPtr<Location::GM>(data), layout);
+    auto sliced = Slice(tensor, MakeCoord(1, MakeCoord(2, 1)), MakeShape(2, MakeShape(3, 2)));
+
+    EXPECT_EQ(sliced.Data(), tensor.Data() + layout(MakeCoord(1, MakeCoord(2, 1))));
+    EXPECT_EQ(AscendC::Std::get<0>(sliced.Shape()), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(sliced.Shape())), 3);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(sliced.Shape())), 2);
+}
+
+TEST_F(Tensor_Api_Tensor_Slice, TestLocalTensorSliceFiveDimLayoutByShape)
+{
+    using namespace AscendC::Te;
+
+    __gm__ float data[240] = {};
+    auto layout = MakeLayout(
+        MakeShape(2, MakeShape(MakeShape(2, 3), MakeShape(4, 5))),
+        MakeStride(120, MakeStride(MakeStride(1, 8), MakeStride(2, 24))));
+    auto tensor = MakeTensor(MakeMemPtr<Location::GM>(data), layout);
+    auto sliced = Slice(tensor, MakeCoord(1, MakeCoord(3, 7)), MakeShape(2, MakeShape(4, 12)));
+
+    EXPECT_EQ(sliced.Data(), tensor.Data() + layout(MakeCoord(1, MakeCoord(3, 7))));
+    EXPECT_EQ(AscendC::Std::get<0>(sliced.Shape()), 1);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<0>(AscendC::Std::get<1>(sliced.Shape()))), 2);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<0>(AscendC::Std::get<1>(sliced.Shape()))), 2);
+    EXPECT_EQ(AscendC::Std::get<0>(AscendC::Std::get<1>(AscendC::Std::get<1>(sliced.Shape()))), 4);
+    EXPECT_EQ(AscendC::Std::get<1>(AscendC::Std::get<1>(AscendC::Std::get<1>(sliced.Shape()))), 3);
+}
