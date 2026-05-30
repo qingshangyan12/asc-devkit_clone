@@ -91,19 +91,19 @@ repeatStride是指相邻迭代间相同DataBlock的地址步长。
 
 - **连续计算场景：** 假设定义一个Tensor供目的操作数和源操作数同时使用（即地址重叠），repeatStride取值为8。此时，矢量计算单元第一次迭代读取连续8个DataBlock，第二轮迭代读取下一个连续的8个DataBlock，通过多次迭代即可完成所有输入数据的计算。
 
-![连续计算场景](figures/repeatStride_4.png)
+    ![连续计算场景](figures/repeatStride_4.png)
 
 - **非连续计算场景：** repeatStride取值大于8（如取10）时，则相邻迭代间矢量计算单元读取的数据在地址上不连续，出现2个DataBlock的间隔。
 
-![非连续计算场景](figures/repeatStride_3.png)
+    ![非连续计算场景](figures/repeatStride_3.png)
 
 - **反复计算场景：** repeatStride取值为0时，矢量计算单元会对首个连续的8个DataBlock进行反复读取和计算。
 
-![反复计算场景](figures/repeatStride_2.png)
+    ![反复计算场景](figures/repeatStride_2.png)
 
 - **部分重复计算：** repeatStride取值大于0且小于8时，相邻迭代间部分数据会被矢量计算单元重复读取和计算，此种情形一般场景不涉及。
 
-![部分重复计算](figures/repeatStride_1.png)
+    ![部分重复计算](figures/repeatStride_1.png)
 
 ## 掩码操作
 
