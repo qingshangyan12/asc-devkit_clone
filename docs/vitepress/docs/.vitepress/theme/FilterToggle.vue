@@ -35,6 +35,7 @@ function applyFilter() {
   if (!content) return
 
   const allFilterDivs = content.querySelectorAll('[data-filter]')
+  content.querySelectorAll('tr').forEach(tr => { tr.style.display = '' })
 
   if (selectedFilter.value === 'all') {
     allFilterDivs.forEach(el => { el.style.display = '' })
@@ -43,6 +44,12 @@ function applyFilter() {
       const filterValue = el.getAttribute('data-filter')
       const match = filterValue.split(',').map(s => s.trim()).includes(selectedFilter.value)
       el.style.display = match ? '' : 'none'
+    })
+    content.querySelectorAll('tr').forEach(tr => {
+      const filterDivs = tr.querySelectorAll('[data-filter]')
+      if (filterDivs.length === 0) return
+      const anyVisible = Array.from(filterDivs).some(el => el.style.display !== 'none')
+      tr.style.display = anyVisible ? '' : 'none'
     })
   }
 }
