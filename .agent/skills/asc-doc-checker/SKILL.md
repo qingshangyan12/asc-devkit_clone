@@ -76,6 +76,7 @@ description: |
   ![](../../../figures/atomic_operation_pipelined_data_movement_diagram.png)
   ```
   **错误示例：**
+  ```
   ❌ 路径使用了反斜杠
   ![](..\..\..\figures\atomic_operation_pipelined_data_movement_diagram.png)
   ```
