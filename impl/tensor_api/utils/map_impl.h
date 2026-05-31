@@ -45,6 +45,21 @@ private:
     template <typename Key, typename Value>
     struct IsValidPair<Std::tuple<Key, Value>> : Std::true_type {};
 
+    template <typename Input, typename KeySet>
+    struct ContainsKey : Std::false_type {};
+
+    template <typename Input, typename... Keys>
+    struct ContainsKey<Input, Std::tuple<Keys...>> : Std::bool_constant<(Std::is_same_v<Input, Keys> || ...)> {};
+
+    template <typename Input, typename KeySet, bool IsTupleKey>
+    struct MatchKeyImpl : Std::is_same<KeySet, Input> {};
+
+    template <typename Input, typename KeySet>
+    struct MatchKeyImpl<Input, KeySet, true> : ContainsKey<Input, KeySet> {};
+
+    template <typename Input, typename KeySet>
+    struct MatchKey : MatchKeyImpl<Input, KeySet, Std::is_tuple_v<KeySet>> {};
+
     template <typename Pair, typename Map>
     struct PrependPair;
 
@@ -67,6 +82,23 @@ private:
 
     template <typename Key, size_t MaxSize>
     struct FindImpl<Key, MaxSize, MaxSize> {
+        using type = Std::ignore_t;
+    };
+
+    template <typename Input, size_t Index, size_t MaxSize>
+    struct MatchImpl {
+        using CurrentPair = typename Std::tuple_element<Index, MapType>::type;
+        static_assert(IsValidPair<CurrentPair>::value, "TupleMap expects Std::tuple<Key, Value> entries.");
+        using CurrentKey = PairKey<CurrentPair>;
+        using CurrentVal = PairValue<CurrentPair>;
+
+        using NextResult = typename MatchImpl<Input, Index + 1, MaxSize>::type;
+
+        using type = Std::conditional_t<MatchKey<Input, CurrentKey>::value, CurrentVal, NextResult>;
+    };
+
+    template <typename Input, size_t MaxSize>
+    struct MatchImpl<Input, MaxSize, MaxSize> {
         using type = Std::ignore_t;
     };
 
@@ -114,6 +146,9 @@ private:
 public:
     template <typename Key>
     using Get = typename FindImpl<Key, 0, MapSize>::type;
+
+    template <typename Input>
+    using Find = typename MatchImpl<Input, 0, MapSize>::type;
 
     template <typename Key, typename Val>
     using Insert = typename InsertImpl<Key, Val, Pairs...>::type;
