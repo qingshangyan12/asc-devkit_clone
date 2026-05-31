@@ -4,15 +4,15 @@
 
 | 产品 | 是否支持 | 是否支持（不传入config的原型）| 是否支持（传入config的原型）|
 |---|---|---|---|
-| Ascend 950PR/Ascend 950DT | √ | x | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | x |
-| Atlas 200I/500 A2 推理产品 | √ | √ | x |
-| Atlas 推理系列产品AI Core | √ | √ | x |
-| Atlas 推理系列产品Vector Core | x | √ | x |
-| Atlas 训练系列产品 | √ | √ | x |
-| Kirin X90 | √ | √ | x |
-| Kirin 9030 | √ | √ | x |
+| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | √ | x | √</cann-filter> |
+| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x | √ | x</cann-filter> |
+| <cann-filter npu-type="910">Atlas 训练系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="x90">Kirin X90 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="9030">Kirin 9030 | √ | √ | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -93,8 +93,8 @@ $dst_i = src0_i / src1_i$
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，DivConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class DivAlgo {&#10;    INTRINSIC = 0,&#10;    DIFF_COMPENSATION,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE&#10;};&#10;struct DivConfig {&#10;    DivAlgo algo = DivAlgo::INTRINSIC;&#10;};</pre>通过DivConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; DivAlgo::INTRINSIC、DivAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; DivAlgo::DIFF_COMPENSATION、DivAlgo::PRECISION_0ULP_FTZ_TRUE，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_0ULP_FTZ_FALSE，支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_DIV_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr DivConfig DEFAULT_DIV_CONFIG = { DivAlgo::INTRINSIC };</pre></cann-filter> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，DivConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;DivAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;DIFF_COMPENSATION,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_0ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_0ULP_FTZ_FALSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE<br>};<br>struct&nbsp;DivConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;DivAlgo&nbsp;algo&nbsp;=&nbsp;DivAlgo::INTRINSIC;<br>};<br>通过DivConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; DivAlgo::INTRINSIC、DivAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; DivAlgo::DIFF_COMPENSATION、DivAlgo::PRECISION_0ULP_FTZ_TRUE，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_0ULP_FTZ_FALSE，支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。<br>&bull; DivAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_DIV_CONFIG的取值如下：<br><br>constexpr&nbsp;DivConfig&nbsp;DEFAULT_DIV_CONFIG&nbsp;=&nbsp;{&nbsp;DivAlgo::INTRINSIC&nbsp;};<br></cann-filter> |
 
 **表 2**  参数说明
 
@@ -103,7 +103,7 @@ $dst_i = src0_i / src1_i$
 | dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
 | src0、src1 | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[BinaryRepeatParams](../../../其他数据类型/BinaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
@@ -111,7 +111,7 @@ $dst_i = src0_i / src1_i$
 
 <cann-filter npu-type="950">
 
-- 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。数据类型uint64_t、int64_t、complex32、complex64仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
+- 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。数据类型complex32、int64_t、uint64_t、complex64仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
 
 </cann-filter>
 
@@ -189,9 +189,9 @@ $dst_i = src0_i / src1_i$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    // repeatTime = 4, 128 elements one repeat, 512 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+    // repeatTime = 4, 128 elements one repeat, 512 elements total.
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat.
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats.
     AscendC::Div(dstLocal, src0Local, src1Local, 128, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 
@@ -199,9 +199,9 @@ $dst_i = src0_i / src1_i$
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 128 elements one repeat, 512 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+    // repeatTime = 4, 128 elements one repeat, 512 elements total.
+    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat.
+    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats.
     AscendC::Div(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
     ```
 
@@ -216,10 +216,10 @@ $dst_i = src0_i / src1_i$
     以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
-    // Div 0ulp
+    // Div 0ulp.
     static constexpr DivConfig config = { DivAlgo::DIFF_COMPENSATION };
     Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
-    // Div Subnormal
+    // Div Subnormal.
     static constexpr DivConfig config = { DivAlgo::PRECISION_0ULP_FTZ_FALSE };
     Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
     ```

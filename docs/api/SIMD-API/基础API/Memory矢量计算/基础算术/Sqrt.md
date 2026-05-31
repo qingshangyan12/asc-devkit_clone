@@ -4,15 +4,15 @@
 
 | 产品 | 是否支持 | 是否支持（不传入config的原型）| 是否支持（传入config的原型）|
 |---|---|---|---|
-| Ascend 950PR/Ascend 950DT | √ | x | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | x |
-| Atlas 200I/500 A2 推理产品 | √ | √ | x |
-| Atlas 推理系列产品AI Core | √ | √ | x |
-| Atlas 推理系列产品Vector Core | x | √ | x |
-| Atlas 训练系列产品 | √ | √ | x |
-| Kirin X90 | √ | √ | x |
-| Kirin 9030 | √ | √ | x |
+| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | √ | x | √</cann-filter> |
+| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x | √ | x</cann-filter> |
+| <cann-filter npu-type="910">Atlas 训练系列产品 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="x90">Kirin X90 | √ | √ | x</cann-filter> |
+| <cann-filter npu-type="9030">Kirin 9030 | √ | √ | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -86,9 +86,9 @@ $dst_i = \sqrt{src_i}$
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。|
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码.md)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><pre class="screen" codetype="Cpp">enum class SqrtAlgo {&#10;    INTRINSIC = 0,&#10;    FAST_INVERSE,&#10;    PRECISION_1ULP_FTZ_TRUE,&#10;    PRECISION_0ULP_FTZ_FALSE,&#10;    PRECISION_1ULP_FTZ_FALSE,&#10;};&#10;struct SqrtConfig {&#10;    SqrtAlgo algo = SqrtAlgo::INTRINSIC;&#10;};</pre>通过SqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_SQRT_CONFIG的取值如下：<br><pre class="screen" codetype="Cpp">constexpr SqrtConfig DEFAULT_SQRT_CONFIG = { SqrtAlgo::INTRINSIC };</pre></cann-filter> |
+| T | 操作数数据类型。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
+| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置精度计算模式，SqrtConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;SqrtAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;FAST_INVERSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_0ULP_FTZ_FALSE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;SqrtConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;SqrtAlgo&nbsp;algo&nbsp;=&nbsp;SqrtAlgo::INTRINSIC;<br>};<br>通过SqrtConfig结构体的参数algo来配置精度计算模式。algo取值如下：<br>&bull; SqrtAlgo::INTRINSIC、SqrtAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。<br>&bull; SqrtAlgo::FAST_INVERSE、SqrtAlgo::PRECISION_0ULP_FTZ_FALSE，使用快速求逆算法得出结果。适用于输入值在[0, 85070596800837026223494223584045301760]范围内的计算。在该范围内，算法保证输出的最大精度误差为0 ulp；当输入值大于85070596800837026223494223584045301760时，输出为0。目前，该算法仅支持float数据类型，并在该模式下支持Subnormal数据计算。<br>&bull; SqrtAlgo::PRECISION_1ULP_FTZ_FALSE，仅支持half类型的Subnormal数据计算，此时最大精度误差为1 ulp。<br>该参数的默认值DEFAULT_SQRT_CONFIG的取值如下：<br><br>constexpr&nbsp;SqrtConfig&nbsp;DEFAULT_SQRT_CONFIG&nbsp;=&nbsp;{&nbsp;SqrtAlgo::INTRINSIC&nbsp;};<br></cann-filter> |
 
 **表 2**  参数说明
 
@@ -97,7 +97,7 @@ $dst_i = \sqrt{src_i}$
 | dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
 | src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>地址对齐约束参考[通用地址对齐约束](../../../通用说明和约束.md)。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码.md)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
@@ -139,9 +139,9 @@ T支持的数据类型为：half、float。
 
     ```cpp
     uint64_t mask = 256 / sizeof(half);
-    // repeatTime = 4, 128 elements one repeat, 512 elements total
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
+    // repeatTime = 4, 128 elements one repeat, 512 elements total.
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+    // dstRepStride, srcRepStride = 8, no gap between repeats.
     AscendC::Sqrt(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
     ```
 
@@ -149,9 +149,9 @@ T支持的数据类型为：half、float。
 
     ```cpp
     uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 128 elements one repeat, 512 elements total
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
+    // repeatTime = 4, 128 elements one repeat, 512 elements total.
+    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+    // dstRepStride, srcRepStride = 8, no gap between repeats.
     AscendC::Sqrt(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
     ```
 
