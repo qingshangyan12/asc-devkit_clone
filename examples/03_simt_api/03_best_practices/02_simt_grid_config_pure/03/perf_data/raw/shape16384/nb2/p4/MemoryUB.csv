@@ -1,0 +1,3 @@
+block_id,sub_block_id,aic_time(us),aic_total_cycles,aiv_time(us),aiv_total_cycles,aiv_ub_read_bw_vector(GB/s),aiv_ub_write_bw_vector(GB/s),aiv_ub_write_bw_gm(GB/s),
+0,vector0,NA,NA,17.798182,29367,116.475357,114.090927,0.033489,
+1,vector0,NA,NA,17.944242,29608,115.513992,112.989532,0.199300,

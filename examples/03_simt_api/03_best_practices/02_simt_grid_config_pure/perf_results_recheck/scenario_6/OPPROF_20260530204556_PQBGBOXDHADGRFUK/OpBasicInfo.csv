@@ -1,0 +1,2 @@
+Op Name,Op Type,Task Duration(us),Block Dim,Mix Block Dim,Device Id,Pid,Current Freq,Rated Freq,
+gather_naive_kernel,vector,77.734001,1024,NA,0,2944047,1650,1650,
