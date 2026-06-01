@@ -37,8 +37,8 @@ AI Core负责执行矩阵、矢量计算密集的任务，其包括以下组成�
 
 ### 通用说明和约束
 
-- Unified Buffer地址对齐约束，请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)中的`Unified Buffer`内容。
-- Unified Buffer地址重叠约束，请参考[通用地址重叠约束](../../../通用说明和约束.md)。
+- Unified Buffer地址对齐约束，请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)中的`Unified Buffer`内容。
+- Unified Buffer地址重叠约束，请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 
 ### Unified Buffer的内存结构介绍与bank冲突
 
