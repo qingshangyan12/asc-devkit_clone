@@ -49,11 +49,7 @@ public:
     __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId);
-    template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(ChannelPtr channel);
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(ChannelPtr channel);
 
@@ -61,8 +57,6 @@ private:
     template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3>
     __aicore__ inline HcommHandle Operate(
         ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType);
-    template <bool isWait>
-    __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
 private:
     TPipe pipe_;
@@ -73,9 +67,6 @@ private:
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
     LocalTensor<uint32_t> doorBell_;
-    ChannelPtr channelList_[HCOMM_MAX_HANDLE_ID] = {0};
-    bool handleCommitList_[HCOMM_MAX_HANDLE_ID] = {0};
-    bool handleWaitList_[HCOMM_MAX_HANDLE_ID] = {0};
     HcommHandle curHandleId_ = HCOMM_INVALID_HANDLE_ID;
 };
 } // namespace AscendC

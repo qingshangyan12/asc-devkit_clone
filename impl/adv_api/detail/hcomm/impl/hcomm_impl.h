@@ -65,23 +65,9 @@ __aicore__ inline HcommHandle Hcomm<commProtocol, commEngine>::ReadNbi(
 
 template <CommProtocol commProtocol, CommEngine commEngine>
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Commit(HcommHandle handleId)
-{
-    return impl_.template Commit<pipe>(handleId);
-}
-
-template <CommProtocol commProtocol, CommEngine commEngine>
-template <pipe_t pipe>
 __aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Commit(ChannelPtr channelPtr)
 {
     return impl_.template Commit<pipe>(channelPtr);
-}
-
-template <CommProtocol commProtocol, CommEngine commEngine>
-template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commProtocol, commEngine>::Wait(HcommHandle handleId)
-{
-    return impl_.template Wait<pipe>(handleId);
 }
 
 template <CommProtocol commProtocol, CommEngine commEngine>

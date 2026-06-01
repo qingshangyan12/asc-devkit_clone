@@ -158,7 +158,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), 8);
     EXPECT_EQ(handleId, 0);
     channel.CompleteCurrentSq();
-    int32_t ret = hcomm.Wait(handleId);
+    int32_t ret = hcomm.Wait(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
@@ -172,10 +172,10 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
     AscendC::HcommHandle handleId = hcomm.WriteNbi<false>(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8);
     EXPECT_EQ(handleId, 0);
-    int32_t ret = hcomm.Commit(handleId);
+    int32_t ret = hcomm.Commit(channel.GetHandle());
     EXPECT_EQ(ret, 0);
     channel.CompleteCurrentSq();
-    ret = hcomm.Wait(handleId);
+    ret = hcomm.Wait(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
@@ -189,10 +189,10 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
     AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
         reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
     EXPECT_EQ(handleId, 0);
-    int32_t ret = hcomm.Commit(handleId);
+    int32_t ret = hcomm.Commit(channel.GetHandle());
     EXPECT_EQ(ret, 0);
     channel.CompleteCurrentSq();
-    ret = hcomm.Wait(handleId);
+    ret = hcomm.Wait(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
@@ -243,104 +243,8 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_RemoteBufferNotFound)
     EXPECT_EQ(h, AscendC::HCOMM_INVALID_HANDLE_ID);
 }
 
-// Commit/Wait state machine constraints
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_CommitWaitStateMachine)
-{
-    UrmaChannelResource channel;
-
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
-    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
-
-    AscendC::HcommHandle h0 = hcomm.WriteNbi<false>(
-        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
-    EXPECT_EQ(h0, 0);
-
-    // Wait without Commit should fail
-    EXPECT_EQ(hcomm.Wait(h0), AscendC::HCOMM_FAILED);
-
-    // First Commit should succeed
-    EXPECT_EQ(hcomm.Commit(h0), AscendC::HCOMM_SUCCESS);
-
-    // Duplicate Commit should fail
-    EXPECT_EQ(hcomm.Commit(h0), AscendC::HCOMM_FAILED);
-
-    // Wait after Commit should succeed
-    channel.CompleteCurrentSq();
-    EXPECT_EQ(hcomm.Wait(h0), AscendC::HCOMM_SUCCESS);
-
-    // Duplicate Wait should fail
-    EXPECT_EQ(hcomm.Wait(h0), AscendC::HCOMM_FAILED);
-}
-
-// Auto-commit via commit=true template parameter, then explicit Commit should fail
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_AutoCommitThenExplicitCommitFails)
-{
-    UrmaChannelResource channel;
-
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
-    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
-
-    // commit=true (default) means PostSend internally calls Commit
-    AscendC::HcommHandle h0 = hcomm.WriteNbi(
-        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
-    EXPECT_EQ(h0, 0);
-
-    // Explicit Commit should fail since already committed internally
-    EXPECT_EQ(hcomm.Commit(h0), AscendC::HCOMM_FAILED);
-}
-
-// Batch commit: Commit(latest) marks all prior handles on same channel as committed
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommit)
-{
-    UrmaChannelResource channel;
-
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
-    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
-
-    // Issue 3 writes without commit
-    AscendC::HcommHandle h0 = hcomm.WriteNbi<false>(
-        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1008), reinterpret_cast<GM_ADDR>(0x2008), 8);
-    AscendC::HcommHandle h1 = hcomm.WriteNbi<false>(
-        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1010), reinterpret_cast<GM_ADDR>(0x2010), 8);
-    AscendC::HcommHandle h2 = hcomm.WriteNbi<false>(
-        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x1018), reinterpret_cast<GM_ADDR>(0x2018), 8);
-    EXPECT_EQ(h0, 0);
-    EXPECT_EQ(h1, 1);
-    EXPECT_EQ(h2, 2);
-
-    // Commit only the last handle
-    EXPECT_EQ(hcomm.Commit(h2), AscendC::HCOMM_SUCCESS);
-
-    // All prior handles on same channel should now be committed (re-Commit fails)
-    EXPECT_EQ(hcomm.Commit(h0), AscendC::HCOMM_FAILED);
-    EXPECT_EQ(hcomm.Commit(h1), AscendC::HCOMM_FAILED);
-
-    // Wait on the last handle should succeed (covers all)
-    channel.CompleteCurrentSq();
-    EXPECT_EQ(hcomm.Wait(h2), AscendC::HCOMM_SUCCESS);
-
-    // All prior handles should also be marked as waited
-    EXPECT_EQ(hcomm.Wait(h0), AscendC::HCOMM_FAILED);
-    EXPECT_EQ(hcomm.Wait(h1), AscendC::HCOMM_FAILED);
-}
-
-// Channel-based Commit/Wait directly operates on the channel without using handle state.
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_ChannelCommitWait)
-{
-    UrmaChannelResource channel;
-
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
-    EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
-    AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
-        reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
-    EXPECT_EQ(handleId, 0);
-    EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
-    channel.CompleteCurrentSq();
-    EXPECT_EQ(hcomm.Wait(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
-}
-
-// Channel-based Commit/Wait covers all currently submitted work on the channel.
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_ChannelBatchCommitWait)
+// Batch: mixed Write + WriteWithNotify, single channel Commit/Wait covers all
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitWait)
 {
     UrmaChannelResource channel;
 

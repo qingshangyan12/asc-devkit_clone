@@ -148,13 +148,12 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Op
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: set wqe to qp ok");
 
     HcommHandle handleId = ++curHandleId_;
-    channelList_[handleId] = channel;
     sqHead++;
     sqPI_.SetValue(0, sqHead);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI in stack, sqHead = %u handleId = %d", sqHead, handleId);
 
     if constexpr (commit) {
-        Commit(handleId);
+        Commit(channel);
         KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok, handleId = %d", handleId);
     }
 
@@ -197,51 +196,16 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
     return HCOMM_INVALID_HANDLE_ID;
 }
 
-template <bool isWait>
-__aicore__ inline bool HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::JudgeHandleId(HcommHandle handleId)
-{
-    // 判断handleId是否合法
-    if (handleId < 0 || handleId >= 1024) {
-        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without invalid handleId");
-        return false;
-    }
-    if (channelList_[handleId] == 0) {
-        KERNEL_LOG(KERNEL_ERROR, "Judge HandleId failed without valid channel");
-        return false;
-    }
-    if constexpr (isWait) {
-        // Wait操作，拒绝对未进行Commit或者已进行Wait的handleId进行操作
-        if (!handleCommitList_[handleId]) {
-            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed without Commit");
-            return false;
-        }
-        if (handleWaitList_[handleId]) {
-            KERNEL_LOG(KERNEL_ERROR, "Wait Judge HandleId failed with already Wait");
-            return false;
-        }
-    } else {
-        // Commit操作，拒绝对已进行Commit的handleId进行操作
-        if (handleCommitList_[handleId]) {
-            KERNEL_LOG(KERNEL_ERROR, "Commit Judge HandleId failed with already Commit");
-            return false;
-        }
-    }
-    return true;
-}
-
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(HcommHandle handleId)
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(ChannelPtr channel)
 {
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Commit, handleId = %u", handleId);
-    if (!JudgeHandleId<false>(handleId)) {
-        return HCOMM_FAILED;
-    }
-    ChannelPtr channel = channelList_[handleId];
-    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
+    (void)pipe;
+    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
     AscendC::GlobalTensor<uint32_t> sqPIGlobalTensor;
     sqPIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)channelPtr->sqContextAddr->ctx.rdmaSqContext.headAddr);
     Gm2Ub(sqPI_, sqPIGlobalTensor, 1);
-    uint32_t sqHead = sqPI_.GetValue(0); // 获取当前channel对应的sq pi
+    uint32_t sqHead = sqPI_.GetValue(0);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Commit by channel enter channel=%lu sqHead=%u", channel, sqHead);
 
     AscendC::GlobalTensor<uint32_t> dbGlobalTensor;
     __gm__ uint32_t* doorBellAddr =
@@ -253,53 +217,29 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit
     *(dbUB + 0) = (dbValue & 0xffffffff);
     *(dbUB + 1) = (dbValue >> 32) | ((sqHead >> 8) & 0xff);
 
-    // 此处想保证db写入为原子操作，穿刺中未验证操作正确性，是否需要换成SetAtomicAdd
     set_atomic_add();
     Ub2Gm(dbGlobalTensor, doorBell_, 2);
     SetAtomicNone();
 
-    // 从当前handleId向前遍历更新handleCommitList_
-    for (HcommHandle i = handleId; i >= 0; i--) {
-        if (channelList_[i] == channel) {
-            if (!handleCommitList_[i]) {
-                handleCommitList_[i] = true;
-            } else {
-                break;
-            }
-        }
-    }
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Commit by channel finish channel=%lu sqHead=%u", channel, sqHead);
     return HCOMM_SUCCESS;
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(ChannelPtr channel)
 {
     (void)pipe;
-    (void)channel;
-    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE Commit by channel is not supported");
-    return HCOMM_FAILED;
-}
-
-template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(HcommHandle handleId)
-{
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: opType = Wait, handleId = %u", handleId);
-    if (!JudgeHandleId<true>(handleId)) {
-        return HCOMM_FAILED;
-    }
-    ChannelPtr channel = channelList_[handleId];
-    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel); // 获取channel
+    __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
     auto sqCIAddr = channelPtr->sqContextAddr->ctx.rdmaSqContext.tailAddr;
     AscendC::GlobalTensor<uint32_t> sqCIGlobalTensor;
-    sqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr); // 获取Sq CI对应的global tensor
+    sqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)sqCIAddr);
 
     auto cqCIAddr = channelPtr->cqContextAddr->ctx.rdmaCqContext.tailAddr;
     AscendC::GlobalTensor<uint32_t> cqCIGlobalTensor;
-    cqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqCIAddr); // 获取Cq CI对应的global tensor
+    cqCIGlobalTensor.SetGlobalBuffer((__gm__ uint32_t*)cqCIAddr);
 
     uint8_t owner;
     uint32_t cqTail;
-    uint32_t cqMask;
     uint32_t cqeSize = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqeSize;
     uint32_t cqDepth = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqDepth;
     uint32_t cqn = channelPtr->cqContextAddr->ctx.rdmaCqContext.cqn;
@@ -307,6 +247,8 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(H
 
     AscendC::GlobalTensor<uint32_t> cqeGlobalTensor;
     __ubuf__ RoceCqeEntry* cqeUB = (__ubuf__ RoceCqeEntry*)(cqeItem_.GetPhyAddr());
+
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Wait by channel enter channel=%lu", channel);
 
     do {
         Gm2Ub(cqCI_, cqCIGlobalTensor, 1);
@@ -333,7 +275,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(H
     cqTail += 1;
     cqCI_.SetValue(0, cqTail);
 
-    Ub2Gm(cqCIGlobalTensor, cqCI_, 1); // 更新 Cq CI 到 gm
+    Ub2Gm(cqCIGlobalTensor, cqCI_, 1);
 
     Gm2Ub(sqCI_, sqCIGlobalTensor, 1);
 
@@ -341,28 +283,10 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(H
     sqTail += 1;
     sqCI_.SetValue(0, sqTail);
 
-    Ub2Gm(sqCIGlobalTensor, sqCI_, 1); // 更新 Sq CI 到 gm
+    Ub2Gm(sqCIGlobalTensor, sqCI_, 1);
 
-    // 从当前handleId向前遍历处理handleWaitList_
-    for (HcommHandle i = handleId; i >= 0; i--) {
-        if (channelList_[i] == channel) {
-            if (!handleWaitList_[i]) {
-                handleWaitList_[i] = true;
-            } else {
-                break;
-            }
-        }
-    }
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Wait by channel finish channel=%lu", channel);
     return HCOMM_SUCCESS;
-}
-
-template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(ChannelPtr channel)
-{
-    (void)pipe;
-    (void)channel;
-    KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE Wait by channel is not supported");
-    return HCOMM_FAILED;
 }
 } // namespace AscendC
 

@@ -57,21 +57,9 @@ public:
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId)
-    {
-        return 0;
-    }
-
-    template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(ChannelPtr channelPtr)
     {
         return HCOMM_FAILED;
-    }
-
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId)
-    {
-        return 0;
     }
 
     template <pipe_t pipe = PIPE_MTE3>

@@ -110,36 +110,13 @@ public:
 
     /*!
      * @class Hcomm
-     * @brief Informed that the task corresponding to handleId can be executed.
-     * @tparam pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
-     * @param [in] handleId: The identifier(handleId) of WriteNbi / ReadNbi task.
-     * @return 0 indicates success and -1 indicates failure.
-     * @note Must be called after WriteNbi / ReadNbi task.
-     */
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId);
-
-    /*!
-     * @class Hcomm
      * @brief Informed that tasks submitted on channel can be executed.
      * @tparam pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
      * @param [in] channelPtr: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
-     * @note URMA supports committing by channel directly.
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(ChannelPtr channelPtr);
-    
-    /*!
-     * @class Hcomm
-     * @brief Block Aicore and wait for the comm task of handleId to finish processing once.
-     * @tparam pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
-     * @param [in] handleId: The identifier(handleId) of Write / Read task.
-     * @return 0 indicates success and -1 indicates failure.
-     * @note Must be called after Commit task.
-     */
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId);
 
     /*!
      * @class Hcomm
@@ -147,7 +124,6 @@ public:
      * @tparam pipe: The pipe type to use for wait, PIPE_MTE3 supported as default.
      * @param [in] channelPtr: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
-     * @note URMA supports waiting by channel directly.
      */
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(ChannelPtr channelPtr);

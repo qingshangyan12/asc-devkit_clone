@@ -67,11 +67,7 @@ public:
     __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId);
-    template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(ChannelPtr channel);
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId);
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Wait(ChannelPtr channel);
 
@@ -84,8 +80,6 @@ private:
     __aicore__ inline void PollCqWhenSqOverflow(
         ChannelPtr channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
     __aicore__ inline uint32_t PollCq(ChannelPtr channel, uint32_t expectTail);
-    template <bool isWait>
-    __aicore__ inline bool JudgeHandleId(HcommHandle handleId);
 
 private:
     LocalTensor<uint32_t> wqeItem_;
@@ -93,9 +87,6 @@ private:
     LocalTensor<uint32_t> sqPI_;
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
-    ChannelPtr channelList_[HCOMM_MAX_HANDLE_ID] = {0};
-    bool handleCommitList_[HCOMM_MAX_HANDLE_ID] = {0};
-    bool handleWaitList_[HCOMM_MAX_HANDLE_ID] = {0};
     HcommHandle curHandleId_ = HCOMM_INVALID_HANDLE_ID;
 };
 } // namespace AscendC

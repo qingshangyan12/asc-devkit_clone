@@ -61,19 +61,7 @@ public:
     }
 
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Commit(HcommHandle handleId)
-    {
-        return -1;
-    }
-
-    template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Commit(ChannelPtr channelPtr)
-    {
-        return -1;
-    }
-
-    template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(HcommHandle handleId)
     {
         return -1;
     }
