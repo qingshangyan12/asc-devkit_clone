@@ -10,17 +10,54 @@
 
 ## 351x UB 关键特性
 
-| 对比 220x | 220x | 351x |
-|:----------:|:-----:|:--:|
-| UB 总容量 | 192KB | 256KB |
-| Bank Group 数 | 16 | 8 |
-| 每 BG Bank 数 / 读口数 | 3 / 1 | 2 / **2** |
-| 地址交织 | 高位 | 低位 |
-
 351x UB 结构：
 - 256KB UB，8 个 bank group，每组 2 个 bank（共 16 bank），每 bank 512 行 × 32B = 16KB
 - 每组 2 个读口 + 1 个写口
-- 低位地址交织：`ADDR = {DEPTH[8:0], BANK[0], BG[2:0], WIDTH[4:0]}`
+- 低位地址交织
+
+## A5 UB 地址解码
+
+A5 的 UB 地址按低位交织：`ADDR = {DEPTH[8:0], BANK[0], BG[2:0], WIDTH[4:0]}`
+
+| 字段 | 位域 | 说明 |
+|------|------|------|
+| `WIDTH[4:0]` | addr[4:0] | bank 内 32B 行内偏移 (0-31 bytes) |
+| `BG[2:0]`    | addr[7:5] | bank group 选择 (0-7) |
+| `BANK[0]`    | addr[8]   | bank group 内 bank 选择 (0=bank0, 1=bank1) |
+| `DEPTH[8:0]` | addr[17:9] | bank 内深度/行号 (0-511) |
+
+给定字节地址 `A`：
+```
+物理 bank = addr[8:5] = (A >> 5) & 0xF   (0-15)
+BG        = addr[7:5] = (A >> 5) & 0x7
+BANK      = addr[8]   = (A >> 8) & 0x1
+```
+
+地址的物理 bank 编号：
+
+| addr | bank | addr | bank | addr | bank |
+|:----:|:----:|:----:|:----:|:----:|:----:|
+| 0x0000 | 0 | 0x4000 | 0 | 0x8000 | 0 |
+| 0x4100 | 8 | 0x8900 | 8 | 0x0400 | 0 |
+
+## DataBlock 映射
+
+一条 VF Load/Store 指令处理 256B = 8 个 DataBlock。每 DB = 32B，BG 每 32B 递增，BANK 每 256B 翻转。
+
+从 `base` 地址开始的 8 个 DB 映射：
+
+| DB | 偏移 | 物理 bank | BG | BANK |
+|:--:|:----:|:---------:|:--:|:----:|
+| 0 | +0   | b | b&7 | b>>3 |
+| 1 | +0x20 | b+1 | b+1&7 | (b+1)>>3 |
+| ... | ... | ... | ... | ... |
+| 7 | +0xE0 | b+7 | b+7&7 | (b+7)>>3 |
+
+其中 `b = (base >> 5) & 0xF`。8 DB 覆盖 8 个不同 BG（BG 0-7），若 b<8 则 BANK=0，否则 BANK=1。
+
+关键性质：**一个 256B 的向量指令完整覆盖 BG 0-7 各一次**，单条指令内不可能有 BG 冲突。
+
+冲突只发生在**不同 tensor 的对应 DB 落在相同物理 bank** 时。
 
 ## 样例描述
 
@@ -42,9 +79,23 @@
 | 10 | GatherAndScatterVF | **subbank 冲突** idx [0,128] 交替 | 同 subbank 不同行，不可 coalesce |
 | 11 | GatherAndScatterVF | 无 subbank 冲突 idx 全 0 | 全部 coalesce |
 
-### Case 配置详情
+### Case 地址配置与冲突分析
 
-**Case 1-5: 二读一写 / 双搬入**
+| Case | VF 函数 | xLocal | yLocal | zLocal | 物理 bank 分析 |
+|:----:|:--------|:------:|:------:|:------:|:--------------|
+| 1 | AddVF | 0x0000 | 0x4000 | 0x8000 | 全部 bank0：三路同 bank（基准） |
+| 2 | AddSingleVF | 0x0000 | 0x4000 | 0x8000 | 同 Case 1，无循环展开 |
+| 3 | AddVF | 0x0000 | 0x4100 | 0x8900 | src0=bank0，src1+dst=bank8 |
+| 4 | AddVF | 0x0000 | 0x0000 | 0x4100 | src0==src1=bank0，dst=bank8 |
+| 5 | AddWithInstrLoadVF | 0x0000 | 0x4000 | 0x8000 | 单源 Load bank0 |
+| 6 | AddsVF | 0x0000 | 0x0000 | 0x4000 | src+dst 均在 bank0 |
+| 7 | AddsVF | 0x0000 | 0x0000 | 0x4100 | src=bank0，dst=bank8 |
+| 8 | GatherAndScatterVF | 0x0000 | 0x0400 | 0x0400 | idx=[0..7]×32 |
+| 9 | GatherAndScatterVF | 0x0000 | 0x0400 | 0x0400 | idx=[0..255] |
+| 10 | GatherAndScatterVF | 0x0000 | 0x0400 | 0x0400 | idx=[0,128]×32，subbank 冲突 |
+| 11 | GatherAndScatterVF | 0x0000 | 0x0400 | 0x0400 | idx 全 0，全部 coalesce |
+
+### Case 1-5 详细配置: 二读一写 / 双搬入
 
 | Case | src0 地址 | src1 地址 | dst 地址 | TOTAL_LENGTH | 备注 |
 |:----:|:---------:|:---------:|:--------:|:------------:|:-----|
@@ -54,14 +105,26 @@
 | 4 | 0x0000 | **0x0000** | 0x4100 | 4096 | 地址重叠，读指令减半 |
 | 5 | 0x0000 | 0x4000 | 0x8000 | 4096 | 双搬入 DINTLV_B32 |
 
-**Case 6-7: 一读一写**
+**Case 1-5 UB 内存分布图**：
+
+| Case 1/2 | Case 3 | Case 4 | Case 5 |
+|:--------:|:------:|:------:|:------:|
+| <img src="./figures/case1_2.jpg" width="180"> | <img src="./figures/case3.jpg" width="180"> | <img src="./figures/case4.jpg" width="180"> | <img src="./figures/case5.jpg" width="180"> |
+
+### Case 6-7 详细配置: 一读一写
 
 | Case | src0 地址 | src1 地址 | dst 地址 | TOTAL_LENGTH | 备注 |
 |:----:|:---------:|:---------:|:--------:|:------------:|:-----|
 | 6 | 0x0000 | 0x0000 | 0x4000 | 4096 | 同 bank 读写冲突 |
 | 7 | 0x0000 | 0x0000 | 0x4100 | 4096 | 消除读写冲突 |
 
-**Case 8-11: 离散访存**
+**Case 6-7 UB 内存分布图**：
+
+| Case 6 | Case 7 |
+|:------:|:------:|
+| <img src="./figures/case6.jpg" width="270"> | <img src="./figures/case7.jpg" width="270"> |
+
+### Case 8-11 详细配置: 离散访存
 
 | Case | index 地址 | data 地址 | index 模式 | 特征 |
 |:----:|:----------:|:---------:|:----------|:-----|
@@ -70,9 +133,44 @@
 | 10 | 0x0000 | 0x0400 | 交替 [0,128] | **同 subbank 不同行冲突** |
 | 11 | 0x0000 | 0x0400 | 全 0 | 全部 coalesce |
 
-**Subbank 冲突机制**：A5 每个 bank 含 4 个 8B subbank，每个 subbank 仅 1 个读口。
-- Gather 命中相同地址 → 硬件 coalesce → 无冲突
-- Gather 命中同 subbank 不同地址 → 排队串行化 → 可测性能下降
+**Case 8-11 UB 内存分布图**：
+
+| Case 8 | Case 9 | Case 10 | Case 11 |
+|:------:|:------:|:-------:|:-------:|
+| <img src="./figures/case8.jpg" width="180"> | <img src="./figures/case9.jpg" width="180"> | <img src="./figures/case10.jpg" width="180"> | <img src="./figures/case11.jpg" width="180"> |
+
+## Subbank 与 Gather/Scatter 冲突
+
+A5 每个 bank（32B 宽）分为 **4 个 subbank**，各 8B 宽 × 512 行深度，各自有 **独立读口**。
+
+```
+bank 内部 layout（一行 32B）：
+┌────────┬────────┬────────┬────────┐
+│ sub0   │ sub1   │ sub2   │ sub3   │
+│  8B    │  8B    │  8B    │  8B    │
+│ 2×f32  │ 2×f32  │ 2×f32  │ 2×f32  │
+└────────┴────────┴────────┴────────┘
+```
+
+subbank 选择：`addr[4:3]`，每 subbank 内 2 个 float32 由 `addr[2]` 区分。
+
+### Gather 冲突规则
+
+- 命中**不同 subbank** → 无冲突（各自独立读口）
+- 命中**同 subbank + 同起始地址** → coalesce → 无冲突（硬件合并为一次读）
+- 命中**同 subbank + 不同起始地址** → **冲突**（单读口需排队）
+- Gather/Scatter 与 ld/st/MTE 冲突 → 每拍一条，反压其余指令
+
+### 各 case 实测
+
+| Case | index 模式 | subbank 行为 | Task(us) |
+|:----:|:----------|:------------|:--------:|
+| 8 | [0..7]×32 | 每 subbank 仅 2 个 unique addr → 2 次读 | 41.5 |
+| 9 | [0..63] 连续 | 跨 8 个 bank，每 subbank 2 次读 | 41.7 |
+| 10 | [0,128]×32 | **同 subbank 不同行** → subbank 排队 → 冲突 | **47.4** |
+| 11 | [0]×64 | 全部同地址 → coalesce 为 1 次 | 41.4 |
+
+**Case 10（47.4us）比 Case 11（41.4us）慢 ~14%**——Gather 中 subbank 单读口在一次指令内只能服务一个 depth 行，当 index 交替命中两个不同行时，必须排队。
 
 ## 目录结构
 
@@ -80,10 +178,20 @@
 ├── bank_conflict.asc              // 算子 host + device 代码
 ├── config.h                      // 11 个 Case 的地址/类型配置
 ├── vf_func.h                     // Vector 函数实现
-├── analyse.md                    // 地址解码与冲突分析
 ├── data_utils.h                  // 数据读写工具
 ├── CMakeLists.txt                // 编译工程
 ├── test.sh                       // 测试脚本
+├── figures/                      // 各 Case UB 内存分布图
+│   ├── case1_2.jpg
+│   ├── case3.jpg
+│   ├── case4.jpg
+│   ├── case5.jpg
+│   ├── case6.jpg
+│   ├── case7.jpg
+│   ├── case8.jpg
+│   ├── case9.jpg
+│   ├── case10.jpg
+│   └── case11.jpg
 └── scripts/
     ├── gen_data.py               // 测试数据生成
     └── verify_result.py          // 精度验证
@@ -136,6 +244,8 @@ bash test.sh profile     # 精度验证 + profiling
 | `PipeUtilization.csv` | aiv_vec_time(us) | 向量计算时间 |
 | `PipeUtilization.csv` | aiv_scalar_time | 标量操作时间 |
 | `PipeUtilization.csv` | aiv_mte2_ratio | MTE2 数据搬运占比 |
+| `ResourceConflictRatio.csv` | aic_vec_ldu_cflt_ratio | 向量 Load 单元冲突占比 |
+| `ResourceConflictRatio.csv` | aic_vec_stu_cflt_ratio | 向量 Store 单元冲突占比 |
 
 ### 实测结果
 
@@ -153,16 +263,19 @@ bash test.sh profile     # 精度验证 + profiling
 | 10 | **47.4** | **46.4** | 0.980 | **subbank 冲突（+14%）** |
 | 11 | 41.4 | 40.3 | 0.977 | 全 coalesce |
 
-### 分析结论
+### 结论
 
 1. **aiv_vec 恒定**（~0.98 us）——向量计算管线不受冲突影响
-2. **subbank 冲突拉长 aiv_time**（46.4 vs 40.3 us）——Gather 的 subbank 排队让向量单元多活跃 6 us
-3. **bank 冲突不拉长 aiv_time**——Case 1/3/6/7 的差异不在向量单元
-4. **循环展开对冲突场景有正收益**——Case 1 vs 2（展开 vs 无展开）= 82.6 vs 88.0（+6.5%）
-5. **Task ≈ aiv_time + 1 us**——向量单元占满整个算子执行
+2. **VF 层面 bank 冲突不可测**——低位交织 + 2读口/BG 让传统 bank 冲突不是瓶颈
+3. **Subbank 冲突才是真正可测的瓶颈**——Gather/Scatter 的 index 模式直接影响 subbank 排队深度，Case 10 vs Case 11 慢 ~14%
+4. **循环展开对冲突场景有正收益**——Case 1 vs Case 2 = 82.6 vs 88.0 us（+6.5%）
+5. **地址重叠收益最大**——Case 4 省一条 Load，比基准快 15%
+6. **Task ≈ aiv_time + 1 us**——向量单元占满整个算子执行
+7. **调优优先级**：地址重叠/复用 > 避免 subbank 不同行冲突 > 标量指令优化 > 地址间隔
 
-## 相关文档
+## 与 220x 的差异
 
-- [避免 bank 冲突（NPU 架构版本 3510）](../../../../../docs/guide/算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)
-- [性能调优](../../../../../docs/guide/编程指南/调试调优/性能调优.md)
-- [msProf profiling 样例](../../01_utilities/04_profiling/msProf/README.md)
+351x 的 bank 冲突表现与 220x 有本质差异：
+- 220x 使用**高位交织**，连续 256B 内所有 DataBlock 落在一个 BG，冲突概率高
+- 351x 的**低位交织** + 2 读口/BG + 8 DB 分散到 8 个 BG 使冲突容错性大幅提升
+- 220x 的调优策略（padding/地址间隔）在 351x 上收益有限
