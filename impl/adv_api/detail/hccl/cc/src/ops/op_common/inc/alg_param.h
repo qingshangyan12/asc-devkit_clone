@@ -41,37 +41,19 @@ constexpr uint32_t OP_ALG_LENGTH = 128; // 存放算法 + host/device标记
 constexpr uint32_t ALG_TAG_LENGTH = TAG_LENGTH + OP_ALG_LENGTH;
 constexpr uint32_t MAX_TAG_LENGTH = 255;
 constexpr uint32_t AICPU_CONTROL_NOTIFY_NUM = 2;
-constexpr uint32_t MAX_MEM_TAG_LENGTH = OP_ALG_LENGTH + 32;
-constexpr uint32_t RES_PACK_TAG_LENGTH = 255;
-constexpr uint32_t MAX_TEMP_NUM_IN_ALGO = 8; // 单个算法中最大template数量
-
-// 是否再拆分一个comm头文件
-constexpr u32 LOCAL_NOTIFY_IDX_ZERO = 0;
-constexpr u32 NOTIFY_IDX_ACK = 0;
-constexpr u32 NOTIFY_IDX_DATA_SIGNAL = 1;
-constexpr u32 NOTIFY_IDX_FIN_ACK = 2;
-constexpr u32 CUSTOM_TIMEOUT = 1800;
-constexpr u32 TIME_S_TO_US = 1000000;
-constexpr u32 MAX_LENGTH = 128;
-constexpr u32 ALG_MAX_LENGTH = 128;
-
-// alltoallv需要
-constexpr u64 ALL_TO_ALL_V_VECTOR_NUM = 4;
-constexpr u64 REDUCE_SCATTER_V_VECTOR_NUM = 2;
-constexpr u64 ALL_GATHER_V_VECTOR_NUM = 2;
 constexpr u32 MESH_CHANNELS_NUM = 1;
 
 enum class TopoType {
-    TOPO_TYPE_COMMON = 0,           // 普通拓扑类型 ，default单层拓扑使用
-    TOPO_TYPE_8P_RING = 1,          // 特殊场景, 服务器内8 rank组成一个ring，4个逻辑环
-    TOPO_TYPE_4P_MESH = 2,          // 特殊场景, 服务器内4 rank组成MESH
-    TOPO_TYPE_2P_MESH = 3,          // 特殊场景, 服务器内2 rank组成MESH。仅用于测试和自验证
-    TOPO_TYPE_1P_MESH = 4,          // 特殊场景, 服务器内1 rank组成MESH。仅用于测试和自验证
-    TOPO_TYPE_4P_RING = 5,          // 特殊场景，服务器内4 rank组成ring
-    TOPO_TYPE_NP_SINGLE_RING = 6,   // 特殊场景, 服务器内n rank组成单 ring。目前仅用于标卡
-    TOPO_TYPE_8P_MESH = 7,          // 特殊场景, 服务器内8 rank通过RDMA组成MESH
-    TOPO_TYPE_NP_MESH = 8,          // 特殊场景, 服务器内3~8p rank组成MESH
-    TOPO_TYPE_NP_DOUBLE_RING = 9,   // 特殊场景, 910_93场景
+    TOPO_TYPE_COMMON = 0,         // 普通拓扑类型 ，default单层拓扑使用
+    TOPO_TYPE_8P_RING = 1,        // 特殊场景, 服务器内8 rank组成一个ring，4个逻辑环
+    TOPO_TYPE_4P_MESH = 2,        // 特殊场景, 服务器内4 rank组成MESH
+    TOPO_TYPE_2P_MESH = 3,        // 特殊场景, 服务器内2 rank组成MESH。仅用于测试和自验证
+    TOPO_TYPE_1P_MESH = 4,        // 特殊场景, 服务器内1 rank组成MESH。仅用于测试和自验证
+    TOPO_TYPE_4P_RING = 5,        // 特殊场景，服务器内4 rank组成ring
+    TOPO_TYPE_NP_SINGLE_RING = 6, // 特殊场景, 服务器内n rank组成单 ring。目前仅用于标卡
+    TOPO_TYPE_8P_MESH = 7,        // 特殊场景, 服务器内8 rank通过RDMA组成MESH
+    TOPO_TYPE_NP_MESH = 8,        // 特殊场景, 服务器内3~8p rank组成MESH
+    TOPO_TYPE_NP_DOUBLE_RING = 9, // 特殊场景, 910_93场景
     TOPO_TYPE_HETEROG = 10,
     TOPO_TYPE_ES_MESH = 11,
     TOPO_TYPE_RESERVED
@@ -150,7 +132,6 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     Level0Shape level0Topo;
     bool Level0Nhr{false};
     bool Level1Nhr{false};
-    bool Level1Hd{false};
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
@@ -183,7 +164,6 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0Topo;
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
-        binaryStream << Level1Hd;
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
@@ -205,7 +185,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream.Dump(result);
         return result;
     }
- 
+
     void DeSerialize(std::vector<char> &data)
     {
         BinaryStream binaryStream(data);
@@ -230,7 +210,6 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0Topo;
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
-        binaryStream >> Level1Hd;
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;
@@ -276,7 +255,7 @@ struct CcuKernelSubmitInfo {
 struct CcuFastLaunchCtx {
     char algName[OP_ALG_LENGTH];
     u32 threadNum;
-    u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO];  // 每次调用template的KernelRun下发的kernel数量
+    u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO]; // 每次调用template的KernelRun下发的kernel数量
     // 紧接ThreadHandle数组
     // 紧接CcuKernelSubmitInfo数组
 
@@ -379,6 +358,7 @@ struct AlgResourceCtxSerializable {
     std::vector<ThreadHandle> threads;
     ThreadHandle unfoldThread = 0; // 展开流thread
     std::vector<std::vector<ChannelInfo>> channels;
+    bool isHcommBatchTransferOnThreadSupported = false;
     void* commInfoPtr = nullptr;
     // hostdpu
     void *npu2DpuShmemPtr = nullptr;
@@ -403,6 +383,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << threads;
         binaryStream << unfoldThread;
         binaryStream << channels;
+        binaryStream << isHcommBatchTransferOnThreadSupported;
 
         binaryStream << npu2DpuShmemPtr;
         binaryStream << dpu2NpuShmemPtr;
@@ -433,6 +414,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> threads;
         binaryStream >> unfoldThread;
         binaryStream >> channels;
+        binaryStream >> isHcommBatchTransferOnThreadSupported;
 
         binaryStream >> npu2DpuShmemPtr;
         binaryStream >> dpu2NpuShmemPtr;
@@ -448,32 +430,37 @@ struct AlgResourceCtxSerializable {
     }
 };
 
+struct DevAicpuOpConfig {
+    u32 execTimeout = 0;
+    double multipleDimensionSplitRatio = 0.8;
+    // 如要新增配置类字段，在此处添加
+};
+
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
-    char tag[TAG_LENGTH]; // 保存topoInfo的key值
-    char algTag[ALG_TAG_LENGTH]; // 保存资源的key值，和算法绑定
-    char fastLaunchTag[ALG_TAG_LENGTH]; // 快速下发的key值
+    char tag[TAG_LENGTH] = "";               // 保存topoInfo的key值
+    char algTag[ALG_TAG_LENGTH] = "";        // 保存资源的key值，和算法绑定
+    char fastLaunchTag[ALG_TAG_LENGTH] = ""; // 快速下发的key值
     char fallbackTag[ALG_MAX_LENGTH] = "";
-    char commName[COMM_INDENTIFIER_MAX_LENGTH];
-    char commModeTag[TAG_LENGTH]; // 保存与执行模式相关的资源信息的key值
+    char commName[COMM_INDENTIFIER_MAX_LENGTH] = "";
+    char commModeTag[TAG_LENGTH] = ""; // 保存与执行模式相关的资源信息的key值，当前aiv使用
     aclrtStream stream;
     void* inputPtr = nullptr;
     u64 inputSize = 0;
     void* outputPtr = nullptr;
     u64 outputSize = 0;
-    HcclMem hcclBuff;   // 当前仅快速下发时使用此处的地址
+    HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址
     HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_RESERVED;
     u32 root = INVALID_VALUE_RANKID;
     u32 userRank = INVALID_VALUE_RANKID;
     u32 sendRecvRemoteRank = INVALID_VALUE_RANKID;
     OpMode opMode;
-    bool   enableDetour{false};
-    bool   isMc2{false};
+    bool enableDetour{false};
+    bool isMc2{false};
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     AlgType algType;
-    double multipleDimensionSplitRatio = 0.8;
-    char algTypeStr[ALG_MAX_LENGTH];
+    char algTypeStr[ALG_MAX_LENGTH] = "";
     union {
         struct {
             u64 count;
@@ -512,7 +499,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     };
     HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
     bool isZeroCopy = false;
-    char algName[OP_ALG_LENGTH];
+    char algName[OP_ALG_LENGTH] = "";
     HcclOpExpansionMode commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
     OpExecuteConfig opExecuteConfig;
     u32 numBlocksLimit = 0;
@@ -521,7 +508,8 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* resCtx = nullptr;
     ThreadHandle opThread = 0;
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
-    u32 dataCount = 0; // 算子上报dfx的数据量
+    u32 dataCount = 0;         // 算子上报dfx的数据量
+    DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
 };
@@ -538,7 +526,7 @@ struct AlgDesc {
 
 struct Slice {
     u64 offset{0}; // Slice相对于input/output的偏移字节数，gather类操作取output，scatter类操作取input
-    u64 size{0};    // Slice的数据大小，单位：字节
+    u64 size{0};   // Slice的数据大小，单位：字节
 };
 
 struct HcomProInfo {
@@ -583,5 +571,5 @@ struct ResPackGraphMode {
     u64 scratchMemSize;
 };
 
-} 
+} // namespace mc2_ops_hccl
 #endif
