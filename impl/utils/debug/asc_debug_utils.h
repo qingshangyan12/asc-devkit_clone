@@ -231,6 +231,12 @@ __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo
     return true;
 }
 
+#define IS_RINGBUF_CHECK_STATE_1(w, r) ((w) < (r) && (w) != 0)
+#define IS_RINGBUF_CHECK_STATE_2(w, r) ((w) > (r) && (r) == 0)
+#define IS_RINGBUF_CHECK_STATE_3(w, r) ((w) >= (r) && (r) != 0)
+#define IS_RINGBUF_CHECK_STATE_4(w, r) ((w) < (r) && (w) == 0)
+#define IS_RINGBUF_CHECK_STATE_5(w, r) ((w) == (r) && (w) == 0)
+
 __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen)
 {
     constexpr uint32_t minTlvLen = sizeof(SkipTlv);
@@ -244,11 +250,10 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
     if (minTlvLen >= ringBufLen || tlvLen > ringBufLen) {
         return false;
     }
-    // state 1~5 below covers all situation, and state witten earlier only switch to a state written later
-    // state 1 + state 4 = (w < r), state2 + state3 + state5 = (w >= r)
-    // state1: w < r, w != 0
-    if (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset != 0) {
-        // notice we need assure w != r after write, or rts won't read
+    // state witten earlier only switch to a state written later, state 1 + state 4 = (w < r), state2 + state3 + state5 = (w >= r)
+    // w < r, w != 0
+    if (IS_RINGBUF_CHECK_STATE_1(writeInfo->bufOffset, readInfo->bufOffset)) {
+        // make sure w != r after write, or rts won't read
         if (writeInfo->bufOffset + tlvLen < readInfo->bufOffset) {
             return true;
         } else {
@@ -258,8 +263,8 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
             }
         }
     }
-    // state2: w > r, r == 0
-    if (writeInfo->bufOffset > readInfo->bufOffset && readInfo->bufOffset == 0) {
+    // w > r, r == 0
+    if (IS_RINGBUF_CHECK_STATE_2(writeInfo->bufOffset, readInfo->bufOffset)) {
         if (writeInfo->bufOffset + tlvLen <= ringBufLen) {
             return true;
         } else {
@@ -271,8 +276,8 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
             do_overlow_skip(writeInfo, ringBufAddr, ringBufLen, minTlvLen);
         }
     }
-    // state3: w >= r, r != 0
-    if (writeInfo->bufOffset >= readInfo->bufOffset && readInfo->bufOffset != 0) {
+    // w >= r, r != 0
+    if (IS_RINGBUF_CHECK_STATE_3(writeInfo->bufOffset, readInfo->bufOffset)) {
         if (writeInfo->bufOffset + tlvLen <= ringBufLen) {
             return true;
         } else {
@@ -281,7 +286,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         }
     }
     // state4: w < r, w == 0
-    if (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset == 0) {
+    if (IS_RINGBUF_CHECK_STATE_4(writeInfo->bufOffset, readInfo->bufOffset)) {
         if (writeInfo->bufOffset + tlvLen < readInfo->bufOffset) {
             return true;
         } else {
@@ -292,7 +297,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         }
     }
     // state5: w == r == 0
-    if (readInfo->bufOffset == 0 && writeInfo->bufOffset == 0) {
+    if (IS_RINGBUF_CHECK_STATE_5(writeInfo->bufOffset, readInfo->bufOffset)) {
         return true;
     }
     return false;
