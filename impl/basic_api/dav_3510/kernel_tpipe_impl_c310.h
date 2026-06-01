@@ -66,18 +66,6 @@ class tuple;
 
 namespace AscendC {
 __aicore__ inline void PrintTimeStamp(uint32_t descId);
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-inline uint8_t* GetBaseAddrCpu(int8_t logicPos)
-{
-    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
-    ASCENDC_ASSERT((positionHardMap.find((TPosition)logicPos) != positionHardMap.end()),
-                    { KERNEL_LOG(KERNEL_ERROR, "illegal logicPos %d ", int32_t(logicPos)); });
-    Hardware hardType = positionHardMap.at((TPosition)logicPos);
-    ASCENDC_ASSERT((hardType != Hardware::GM),
-                    { KERNEL_LOG(KERNEL_ERROR, "hardware position can not be gm"); });
-    return ConstDefiner::Instance().GetHardwareBaseAddr(hardType);
-}
-#endif
 
 // begin impl of tpipe
 __aicore__ inline TPipe::TPipe()
@@ -262,7 +250,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
         ASCENDC_ASSERT((num * len <= bufferInitLen.at(pool)), {
             KERNEL_LOG(KERNEL_ERROR, "buffer size is %d, exceeds the limit %d", num * len, bufferInitLen.at(pool)); });
         auto pos_ = GetPosition(T::srcPosition, T::dstPosition);
-        auto absAddr = GetBaseAddr(static_cast<int8_t>(pos_));
+        auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos_));
         AscendCBufInit(static_cast<uint8_t>(pos_), 0, num, reinterpret_cast<uint64_t>(curPoolAddr + absAddr), len);
 #endif
         for (int32_t i = 0; i < num; i++, ptr++) {
@@ -330,7 +318,7 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
     auto bufferInitLen = ConstDefiner::Instance().bufferInitLen;
     ASCENDC_ASSERT((len <= bufferInitLen.at(pool)),
                    { KERNEL_LOG(KERNEL_ERROR, "len is %u, exceeds the limit %d", len, bufferInitLen.at(pool)); });
-    auto absAddr = GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     AscendCBufInit(static_cast<uint8_t>(pos), 1, 1, reinterpret_cast<uint64_t>(curPoolAddr + absAddr), len);
 #endif
     ptr->state = TBufState::FREE;
@@ -379,7 +367,7 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len)
     ASCENDC_ASSERT((len <= bufferInitLen.at(pool)),
         { KERNEL_LOG(KERNEL_ERROR, "buffer size is %d, exceeds the limit %d", len, bufferInitLen.at(pool)); });
     auto pos = T::poolPos;
-    auto absAddr = GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     AscendCTBufPoolInit(static_cast<uint8_t>(pos),
         reinterpret_cast<uint64_t>(curPoolAddr + absAddr),
         len,
@@ -426,7 +414,7 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len, U &shareBuf)
     ASCENDC_ASSERT((len <= bufferInitLen.at(pool)),
         { KERNEL_LOG(KERNEL_ERROR, "buffer size is %d, exceeds the limit %d", len, bufferInitLen.at(pool)); });
     auto pos = T::poolPos;
-    auto absAddr = GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     AscendCTBufPoolInit(static_cast<uint8_t>(pos),
         reinterpret_cast<uint64_t>(bufPool.tBufPoolImpl.startAddr_ + absAddr),
         len,
@@ -470,7 +458,7 @@ template <TPosition pos> __aicore__ inline TBuffAddr TPipe::GetAbsAddr(int32_t o
     ASCENDC_ASSERT(((offset + len) <= bufferInitLen.at(pool)), {
         KERNEL_LOG(KERNEL_ERROR, "offset is %d, len is %d, exceeds the limit %d", offset, len, bufferInitLen.at(pool));
     });
-    auto absAddr = this->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(pool)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     addr.absAddr = absAddr + addr.bufferAddr;
 #endif
     return addr;
@@ -791,8 +779,7 @@ inline uint64_t TPipe::GetAbsAddr(const LocalTensor<T>& tensor)
     ASCENDC_ASSERT(((hardType == Hardware::UB) || (hardType == Hardware::L1)),
                     { KERNEL_LOG(KERNEL_ERROR, "illegal hardType %d ", static_cast<int32_t>(hardType)); });
     uint8_t* phyAddr = reinterpret_cast<uint8_t*>(tensor.GetPhyAddr());
-    uint8_t* baseAddr =
-        static_cast<uint8_t*>(g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint32_t>(hardType)].absAddr);
+    uint8_t* baseAddr = GetBaseAddrCpu(logicPos);
     ASCENDC_ASSERT((phyAddr >= baseAddr), {
         KERNEL_LOG(KERNEL_ERROR, "phyAddr is %p, baseAddr is %p, phyAddr should be larger than baseAddr", phyAddr,
                    baseAddr);
@@ -821,8 +808,7 @@ template <typename T> inline uint64_t GetAbsAddr(TPipe* tpipe, const LocalTensor
     ASCENDC_ASSERT(((hardType == Hardware::UB) || (hardType == Hardware::L1)),
                     { KERNEL_LOG(KERNEL_ERROR, "illegal hardType %d ", static_cast<int32_t>(hardType)); });
     uint8_t* phyAddr = reinterpret_cast<uint8_t*>(tensor.GetPhyAddr());
-    uint8_t* baseAddr =
-        static_cast<uint8_t*>(tpipe->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint32_t>(hardType)].absAddr);
+    uint8_t* baseAddr = GetBaseAddrCpu(logicPos);
     ASCENDC_ASSERT((phyAddr >= baseAddr), {
         KERNEL_LOG(KERNEL_ERROR, "phyAddr is %p, baseAddr is %p, phyAddr should be larger than baseAddr", phyAddr,
             baseAddr);
@@ -840,15 +826,7 @@ template <typename T> inline uint64_t GetAbsAddr(TPipe* tpipe, const LocalTensor
 
 inline uint8_t* TPipe::GetBaseAddr(int8_t logicPos)
 {
-    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
-    ASCENDC_ASSERT((positionHardMap.find((TPosition)logicPos) != positionHardMap.end()),
-                    { KERNEL_LOG(KERNEL_ERROR, "illegal logicPos %d ", int32_t(logicPos)); });
-    Hardware hardType = positionHardMap.at((TPosition)logicPos);
-    ASCENDC_ASSERT((hardType != Hardware::GM),
-                    { KERNEL_LOG(KERNEL_ERROR, "hardware position can not be gm"); });
-    uint8_t* baseAddr =
-        static_cast<uint8_t*>(g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint32_t>(hardType)].absAddr);
-    return baseAddr;
+    return GetBaseAddrCpu(logicPos);
 }
 
 void inline TPipe::SetBufferCtx(Hardware hard, struct BufPoolExtra* bufPool)
