@@ -95,19 +95,19 @@
 #endif
 
 #if defined(__ASC_DISABLE_RESERVED_UBUF__)
-#define __ASC_RESERVED_UBUF_ERROR_ATTR__(msg) __attribute__((error(msg)))
+#define __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg) __attribute__((unavailable(msg)))
 #else
-#define __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#define __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #endif
 
 #if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-#define __ASC_USE_RESERVED_UBUF_2201(msg) __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#define __ASC_USE_RESERVED_UBUF_2201(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #else
 #define __ASC_USE_RESERVED_UBUF_2201(msg)
 #endif
 
 #if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#define __ASC_USE_RESERVED_UBUF_3510(msg) __ASC_RESERVED_UBUF_ERROR_ATTR__(msg)
+#define __ASC_USE_RESERVED_UBUF_3510(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #else
 #define __ASC_USE_RESERVED_UBUF_3510(msg)
 #endif
