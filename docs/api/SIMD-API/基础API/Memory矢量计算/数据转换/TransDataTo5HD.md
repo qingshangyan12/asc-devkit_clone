@@ -265,7 +265,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/02_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
 
 -   入参类型是LocalTensor的调用方式
 
