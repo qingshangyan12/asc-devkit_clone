@@ -73,7 +73,10 @@ public:
     CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
-    HcclResult Algorithm() override;
+    HcclResult Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                        ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                        ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                        ccu::Variable goSize3, ccu::Variable goSize4);
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
@@ -81,27 +84,29 @@ private:
     uint32_t rankId_{0};
     HcclDataType dataType_;
     HcclDataType outputDataType_;
-    hcomm::CcuRep::Variable repeatNum_;
+    ccu::Variable repeatNum_;
     std::vector<ChannelHandle> channels_;
-    std::vector<hcomm::CcuRep::Variable> input_;
-    std::vector<hcomm::CcuRep::Variable> output_;
-    std::vector<hcomm::CcuRep::Variable> token_;
-    hcomm::CcuRep::Variable sliceSize_;
-    hcomm::CcuRep::Variable srcStride_;
-    hcomm::CcuRep::Variable srcOffset_;
-    hcomm::CcuRep::Variable dstOffset_;
+    std::vector<ccu::Variable> input_;
+    std::vector<ccu::Variable> output_;
+    std::vector<ccu::Variable> token_;
+    ccu::Variable sliceSize_;
+    ccu::Variable srcStride_;
+    ccu::Variable srcOffset_;
+    ccu::Variable dstOffset_;
     GroupOpSize groupOpSize_;
     hcomm::CcuRep::LocalAddr                   myDst_;
     std::vector<hcomm::CcuRep::RemoteAddr>     dstAddr_;
     std::vector<hcomm::CcuRep::LocalAddr>      srcAddr_;
-    std::vector<hcomm::CcuRep::Variable>       dstToken_;
-    std::vector<hcomm::CcuRep::Variable>       srcToken_;
+    std::vector<ccu::Variable>       dstToken_;
+    std::vector<ccu::Variable>       srcToken_;
     hcomm::CcuRep::CompletedEvent event_;
-    hcomm::CcuRep::Variable flag_; // 用以判断是否是第一次重复
+    ccu::Variable flag_; // 用以判断是否是第一次重复
     bool loadFromMem_ = false;
 
-    HcclResult InitResource();
-    void LoadArgs();
+    HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                            ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                            ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                            ccu::Variable goSize3, ccu::Variable goSize4);
     void PreSync();
     void PostSync();
     void DoAlltoAll();
