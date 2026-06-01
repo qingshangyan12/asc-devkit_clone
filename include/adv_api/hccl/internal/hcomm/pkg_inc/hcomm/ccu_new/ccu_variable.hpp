@@ -15,6 +15,7 @@
 #include <type_traits>
 
 #include "ccu_types.h"
+#include "ccu_log.h"
 #include "ccu_data_utils.hpp"
 #include "ccu_data_api_impl.h"
 

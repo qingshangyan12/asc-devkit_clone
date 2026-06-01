@@ -40,6 +40,18 @@ struct FunctorTraits<R (C::*)(A...)> {
     using ReturnT = R;
 };
 
+template <typename Lambda, std::size_t... I>
+std::function<void(Variable*)> MakeBodyImpl(Lambda fn, std::index_sequence<I...>)
+{
+    return [fn](Variable* formals) { fn(formals[I]...); };
+}
+
+template <typename Lambda, std::size_t Arity>
+std::function<void(Variable*)> MakeBody(Lambda fn)
+{
+    return MakeBodyImpl(fn, std::make_index_sequence<Arity>{});
+}
+
 } // namespace internal
 
 class Func {
