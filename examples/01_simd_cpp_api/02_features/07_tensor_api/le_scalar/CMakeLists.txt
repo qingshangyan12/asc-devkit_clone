@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(kernel_samples)
 
-set(ASC_SRC_FILE tensor_api_ternary.asc)
+set(ASC_SRC_FILE le_scalar.asc)
 
 # ======================================================================================
 # 运行模式配置
@@ -55,23 +55,4 @@ target_link_libraries(demo PRIVATE
     $<BUILD_INTERFACE:$<$<NOT:$<STREQUAL:${RUN_MODE},cpu>>:register>>
     $<BUILD_INTERFACE:$<$<NOT:$<STREQUAL:${RUN_MODE},cpu>>:platform>>
     $<BUILD_INTERFACE:$<$<NOT:$<STREQUAL:${RUN_MODE},cpu>>:dl>>
-)
-
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-    dl
-)
-
-# ======================================================================================
-# NPU 编译选项配置
-#
-# 说明：
-#   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
-# ======================================================================================
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-3510>
-    # $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
 )
