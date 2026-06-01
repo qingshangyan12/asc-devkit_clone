@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 560" width="1300" height="560" font-family="Arial, sans-serif">
+  <defs>
+    <style>
+      .axis-line { stroke: #333; stroke-width: 1.5; }
+      .grid-line { stroke: #ddd; stroke-width: 0.8; stroke-dasharray: 3,3; }
+      .tick-text { font-size: 10px; fill: #333; }
+      .tick-text-sm { font-size: 8px; fill: #555; }
+      .axis-title { font-size: 13px; fill: #333; font-weight: bold; }
+      .chart-title { font-size: 16px; fill: #333; font-weight: bold; }
+      .legend-text { font-size: 10px; fill: #333; }
+      .data-label { font-size: 8px; fill: #333; }
+      .group-label { font-size: 10px; fill: #4472C4; font-weight: bold; }
+      .group-label-orange { font-size: 10px; fill: #ED7D31; font-weight: bold; }
+      .group-label-green { font-size: 10px; fill: #70AD47; font-weight: bold; }
+      .line-empty { stroke: #4472C4; stroke-width: 2; fill: none; }
+      .line-compute { stroke: #ED7D31; stroke-width: 2; fill: none; }
+      .line-small { stroke: #70AD47; stroke-width: 2; fill: none; }
+      .dot-empty { fill: #4472C4; }
+      .dot-compute { fill: #ED7D31; }
+      .dot-small { fill: #70AD47; }
+      .case-label { font-size: 10px; fill: #333; font-weight: bold; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1300" height="560" fill="#ffffff"/>
+
+  <!-- Chart area: x=80 to x=1240, y=50 to y=410 -->
+  <!-- Y axis: 0 to 100 us, 1us = 3.6px -->
+
+  <text x="650" y="30" text-anchor="middle" class="chart-title">Task Duration vs SCENARIO_NUM</text>
+
+  <!-- Y gridlines (every 10us) -->
+  <line x1="80" y1="410" x2="1240" y2="410" class="grid-line"/>
+  <line x1="80" y1="374" x2="1240" y2="374" class="grid-line"/>
+  <line x1="80" y1="338" x2="1240" y2="338" class="grid-line"/>
+  <line x1="80" y1="302" x2="1240" y2="302" class="grid-line"/>
+  <line x1="80" y1="266" x2="1240" y2="266" class="grid-line"/>
+  <line x1="80" y1="230" x2="1240" y2="230" class="grid-line"/>
+  <line x1="80" y1="194" x2="1240" y2="194" class="grid-line"/>
+  <line x1="80" y1="158" x2="1240" y2="158" class="grid-line"/>
+  <line x1="80" y1="122" x2="1240" y2="122" class="grid-line"/>
+  <line x1="80" y1="86" x2="1240" y2="86" class="grid-line"/>
+  <line x1="80" y1="50" x2="1240" y2="50" class="grid-line"/>
+
+  <!-- Y tick labels -->
+  <text x="70" y="414" text-anchor="end" class="tick-text">0</text>
+  <text x="70" y="378" text-anchor="end" class="tick-text">10</text>
+  <text x="70" y="342" text-anchor="end" class="tick-text">20</text>
+  <text x="70" y="306" text-anchor="end" class="tick-text">30</text>
+  <text x="70" y="270" text-anchor="end" class="tick-text">40</text>
+  <text x="70" y="234" text-anchor="end" class="tick-text">50</text>
+  <text x="70" y="198" text-anchor="end" class="tick-text">60</text>
+  <text x="70" y="162" text-anchor="end" class="tick-text">70</text>
+  <text x="70" y="126" text-anchor="end" class="tick-text">80</text>
+  <text x="70" y="90" text-anchor="end" class="tick-text">90</text>
+  <text x="70" y="54" text-anchor="end" class="tick-text">100</text>
+
+  <text x="22" y="230" text-anchor="middle" class="axis-title" transform="rotate(-90 22 230)">Task Duration (us)</text>
+
+  <!-- Axes -->
+  <line x1="80" y1="410" x2="1240" y2="410" class="axis-line"/>
+  <line x1="80" y1="50" x2="80" y2="410" class="axis-line"/>
+
+  <!-- Section headers -->
+  <text x="275" y="47" text-anchor="middle" class="group-label">Case 0/1: 空壳核函数</text>
+  <text x="710" y="47" text-anchor="middle" class="group-label-orange">Case 2/3: gather+adds (64行)</text>
+  <text x="1100" y="47" text-anchor="middle" class="group-label-green">Case 4: gather+adds (8行)</text>
+
+  <!-- Separators -->
+  <line x1="520" y1="50" x2="520" y2="410" stroke="#999" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="920" y1="50" x2="920" y2="410" stroke="#999" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- X labels: Case 0/1 (6 points) -->
+  <text x="100" y="428" text-anchor="middle" class="tick-text">1</text>
+  <text x="100" y="442" text-anchor="middle" class="tick-text-sm">36核1vf</text>
+  <text x="170" y="428" text-anchor="middle" class="tick-text">5</text>
+  <text x="170" y="442" text-anchor="middle" class="tick-text-sm">36核2vf</text>
+  <text x="240" y="428" text-anchor="middle" class="tick-text">2</text>
+  <text x="240" y="442" text-anchor="middle" class="tick-text-sm">64核1vf</text>
+  <text x="310" y="428" text-anchor="middle" class="tick-text">3</text>
+  <text x="310" y="442" text-anchor="middle" class="tick-text-sm">128核1vf</text>
+  <text x="380" y="428" text-anchor="middle" class="tick-text">4</text>
+  <text x="380" y="442" text-anchor="middle" class="tick-text-sm">1024核1vf</text>
+  <text x="450" y="428" text-anchor="middle" class="tick-text">6</text>
+  <text x="450" y="442" text-anchor="middle" class="tick-text-sm">1024核2vf</text>
+
+  <!-- X labels: Case 2/3 (5 points) -->
+  <text x="570" y="428" text-anchor="middle" class="tick-text">7</text>
+  <text x="570" y="442" text-anchor="middle" class="tick-text-sm">1024核</text>
+  <text x="640" y="428" text-anchor="middle" class="tick-text">8</text>
+  <text x="640" y="442" text-anchor="middle" class="tick-text-sm">64核</text>
+  <text x="710" y="428" text-anchor="middle" class="tick-text">9</text>
+  <text x="710" y="442" text-anchor="middle" class="tick-text-sm">64核1数据</text>
+  <text x="780" y="428" text-anchor="middle" class="tick-text">10</text>
+  <text x="780" y="442" text-anchor="middle" class="tick-text-sm">32核2数据</text>
+  <text x="850" y="428" text-anchor="middle" class="tick-text">11</text>
+  <text x="850" y="442" text-anchor="middle" class="tick-text-sm">16核4数据</text>
+
+  <!-- X labels: Case 4 (5 points) -->
+  <text x="960" y="428" text-anchor="middle" class="tick-text">16</text>
+  <text x="960" y="442" text-anchor="middle" class="tick-text-sm">36核1数据</text>
+  <text x="1030" y="428" text-anchor="middle" class="tick-text">12</text>
+  <text x="1030" y="442" text-anchor="middle" class="tick-text-sm">8核1数据</text>
+  <text x="1100" y="428" text-anchor="middle" class="tick-text">13</text>
+  <text x="1100" y="442" text-anchor="middle" class="tick-text-sm">4核2数据</text>
+  <text x="1170" y="428" text-anchor="middle" class="tick-text">14</text>
+  <text x="1170" y="442" text-anchor="middle" class="tick-text-sm">2核4数据</text>
+  <text x="1240" y="428" text-anchor="middle" class="tick-text">15</text>
+  <text x="1240" y="442" text-anchor="middle" class="tick-text-sm">1核8数据</text>
+
+  <text x="660" y="462" text-anchor="middle" class="axis-title">SCENARIO_NUM</text>
+
+  <!-- Case 0/1: empty_kernel line -->
+  <polyline points="100,394.3 170,393.5 240,393.5 310,391.8 380,358.7 450,351.7" class="line-empty"/>
+
+  <circle cx="100" cy="394.3" r="3.5" class="dot-empty"/>
+  <circle cx="170" cy="393.5" r="3.5" class="dot-empty"/>
+  <circle cx="240" cy="393.5" r="3.5" class="dot-empty"/>
+  <circle cx="310" cy="391.8" r="3.5" class="dot-empty"/>
+  <circle cx="380" cy="358.7" r="3.5" class="dot-empty"/>
+  <circle cx="450" cy="351.7" r="3.5" class="dot-empty"/>
+
+  <text x="100" y="388" text-anchor="middle" class="data-label">4.373</text>
+  <text x="170" y="387" text-anchor="middle" class="data-label">4.603</text>
+  <text x="240" y="387" text-anchor="middle" class="data-label">4.57</text>
+  <text x="310" y="385" text-anchor="middle" class="data-label">5.05</text>
+  <text x="380" y="352" text-anchor="middle" class="data-label">14.244</text>
+  <text x="450" y="345" text-anchor="middle" class="data-label">16.2</text>
+
+  <!-- Case 2/3: gather+adds (64行) line -->
+  <polyline points="570,118.4 640,181.4 710,261.1 780,218.8 850,116.3" class="line-compute"/>
+
+  <circle cx="570" cy="118.4" r="4" class="dot-compute"/>
+  <circle cx="640" cy="181.4" r="4" class="dot-compute"/>
+  <circle cx="710" cy="261.1" r="4" class="dot-compute"/>
+  <circle cx="780" cy="218.8" r="4" class="dot-compute"/>
+  <circle cx="850" cy="116.3" r="4" class="dot-compute"/>
+
+  <text x="570" y="109" text-anchor="middle" class="data-label">81.004</text>
+  <text x="640" y="172" text-anchor="middle" class="data-label">63.731</text>
+  <text x="710" y="252" text-anchor="middle" class="data-label">41.346</text>
+  <text x="780" y="210" text-anchor="middle" class="data-label">53.324</text>
+  <text x="850" y="107" text-anchor="middle" class="data-label">81.596</text>
+
+  <!-- Case 4: gather+adds (8行) line -->
+  <polyline points="960,378.1 1030,376.8 1100,371.5 1170,364.3 1240,348.9" class="line-small"/>
+
+  <circle cx="960" cy="378.1" r="4" class="dot-small"/>
+  <circle cx="1030" cy="376.8" r="4" class="dot-small"/>
+  <circle cx="1100" cy="371.5" r="4" class="dot-small"/>
+  <circle cx="1170" cy="364.3" r="4" class="dot-small"/>
+  <circle cx="1240" cy="348.9" r="4" class="dot-small"/>
+
+  <text x="960" y="370" text-anchor="middle" class="data-label">8.819</text>
+  <text x="1030" y="369" text-anchor="middle" class="data-label">9.221</text>
+  <text x="1100" y="363" text-anchor="middle" class="data-label">10.701</text>
+  <text x="1170" y="356" text-anchor="middle" class="data-label">12.756</text>
+  <text x="1240" y="340" text-anchor="middle" class="data-label">16.974</text>
+
+  <!-- Legend -->
+  <line x1="200" y1="520" x2="230" y2="520" class="line-empty"/>
+  <circle cx="215" cy="520" r="3.5" class="dot-empty"/>
+  <text x="238" y="524" class="legend-text">empty_kernel (空壳核函数)</text>
+
+  <line x1="500" y1="520" x2="530" y2="520" class="line-compute"/>
+  <circle cx="515" cy="520" r="3.5" class="dot-compute"/>
+  <text x="538" y="524" class="legend-text">gather_adds Case 2/3 (64行)</text>
+
+  <line x1="800" y1="520" x2="830" y2="520" class="line-small"/>
+  <circle cx="815" cy="520" r="3.5" class="dot-small"/>
+  <text x="838" y="524" class="legend-text">gather_adds Case 4 (8行)</text>
+</svg>
