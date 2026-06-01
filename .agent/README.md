@@ -15,8 +15,8 @@
 |------|------|------|
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
-| `default-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新默认远程 skill | `skills/default-skills/SKILL.md` |
-| `gitcode-pr` | 通过默认远程 skill 处理 GitCode PR、评论、讨论和变更查询 | `skills/gitcode-pr/SKILL.md` |
+| `public-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新公共远程 skill | `skills/public-skills/SKILL.md` |
+| `gitcode-pr` | 通过公共远程 skill 处理 GitCode PR、评论、讨论和变更查询 | `skills/gitcode-pr/SKILL.md` |
 
 当前 `.agent` 不维护设计文档生成、API 实现生成、示例工程生成等 skill。
 
@@ -44,14 +44,14 @@
 
 ### 默认使用
 
-仓内本地维护 `asc-api-ut-gen`、`asc-npu-arch` 和 `default-skills`。`gitcode-pr` 等默认通用 skill
-使用 `skills/default-skills/scripts/install-default-skills.sh` 从 `cann-agent/skills` 安装到
+仓内本地维护 `asc-api-ut-gen`、`asc-npu-arch` 和 `public-skills`。`gitcode-pr` 等公共通用 skill
+使用 `skills/public-skills/scripts/install-public-skills.sh` 从 `cann-agent/skills` 安装到
 `.agent/skills/_remote/`，并通过 `skills/gitcode-pr -> _remote/gitcode-pr` 这类一级软链暴露给客户端。
 
-更新默认通用 skill：
+更新公共通用 skill：
 
 ```bash
-bash .agent/skills/default-skills/scripts/install-default-skills.sh
+bash .agent/skills/public-skills/scripts/install-public-skills.sh
 ```
 
 客户端直接读取对应兼容入口：
@@ -103,7 +103,7 @@ bash .agent/tests/skills/asc-npu-arch/test.sh
 ### 维护边界
 
 - `.agent/skills` 是本仓 skill 的唯一事实来源。
-- 默认通用 skill 的本仓事实源是 `skills/default-skills` 的安装脚本；不要在本仓重新实现
+- 公共通用 skill 的本仓事实源是 `skills/public-skills` 的安装脚本；不要在本仓重新实现
   `gitcode-pr`、`gitcode-issue`、`api-doc-generator` 或 `gitcode-pipeline`。
 - `skills/_remote/` 是远程缓存目录，`skills/gitcode-pr` 等一级入口应是指向 `_remote/<skill>` 的软链。
 - 不直接编辑 `.opencode/skills`、`.claude/skills` 或 `.codex/skills`；它们都通过软链访问 `.agent/skills`。
