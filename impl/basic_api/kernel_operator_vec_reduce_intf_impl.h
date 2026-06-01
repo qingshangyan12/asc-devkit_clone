@@ -136,7 +136,7 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<T>& dst, const Lo
     static_assert(Std::is_same_v<SrcPrimType, DstPrimType>,
         "ReduceDataBlock only supports identical src type and dst type for current NPU_ARCH.");
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    constexpr const char* apiName = []() -> const char* {
+    constexpr const __gm__ char* apiName = []() -> const __gm__ char* {
         if constexpr (reduceType == ReduceType::SUM) {
             return "ReduceDataBlock<SUM> [new API, recommended] (implements BlockReduceSum)";
         } else if constexpr (reduceType == ReduceType::MAX) {
@@ -183,7 +183,7 @@ __aicore__ inline void ReducePairElemCommon(const LocalTensor<T>& dst, const Loc
     static_assert(Std::is_same_v<SrcPrimType, DstPrimType>,
         "ReducePairElem only supports identical src type and dst type for current NPU_ARCH.");
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    constexpr const char* apiName = "ReducePairElem<SUM> [new API, recommended] (implements PairReduceSum)";
+    constexpr const __gm__ char* apiName = "ReducePairElem<SUM> [new API, recommended] (implements PairReduceSum)";
     ASCENDC_DEBUG_ASSERT((SupportType<SrcPrimType, half, float>()), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
         "Failed to check dtype in %s, current api support dtype combination is "
         "src and dst both: half / float.\n", apiName));
@@ -270,7 +270,7 @@ __aicore__ inline void ReduceRepeatCommon(const LocalTensor<T>& dst, const Local
         "ReduceRepeat only supports identical dst type (T) and src type (U) for current NPU_ARCH.");
 #endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    constexpr const char* apiName = []() -> const char* {
+    constexpr const __gm__ char* apiName = []() -> const __gm__ char* {
         if constexpr (reduceType == ReduceType::SUM) {
             return "ReduceRepeat<SUM> [new API, recommended] (implements WholeReduceSum/RepeatReduceSum)";
         } else if constexpr (reduceType == ReduceType::MAX) {
