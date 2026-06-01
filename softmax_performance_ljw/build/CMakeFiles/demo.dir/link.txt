@@ -1,1 +1,0 @@
-/home/developer/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/demo.dir/softmax.asc.o -o demo 
