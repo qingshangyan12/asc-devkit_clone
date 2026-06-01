@@ -1,0 +1,1 @@
+/usr/local/Ascend/cann-9.0.0/bin/bisheng CMakeFiles/grid_config.dir/grid_config.asc.o -o grid_config 
