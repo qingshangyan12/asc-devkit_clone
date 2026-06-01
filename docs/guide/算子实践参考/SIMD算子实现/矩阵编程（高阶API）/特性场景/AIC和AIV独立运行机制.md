@@ -12,7 +12,7 @@ AIC和AIV独立运行机制，又称双主模式。在[分离模式](../../../..
 
 -   该功能仅支持[Norm模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)和[MDL模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
 -   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:1。
--   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时使能[IBSHARE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul使用说明.md)参数。
+-   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时使能[IBSHARE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)参数。
 
 -   同一算子中所有Matmul对象的该参数取值必须保持一致。
 -   A、B、Bias矩阵只支持从Global Memory输入。
@@ -23,7 +23,7 @@ AIC和AIV独立运行机制，又称双主模式。在[分离模式](../../../..
 完整的算子样例请参考[使能双主模式的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mixdualmaster)。
 
 ```
-// 修改模板参数enableMixDualMaster=true，Norm模板开启双主模式，MDL模板使用[GetMDLConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetMDLConfig.md)接口获取模板参数。
+// 修改模板参数enableMixDualMaster=true，Norm模板开启双主模式，MDL模板使用[GetMDLConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetMDLConfig.md)接口获取模板参数。
 constexpr static MatmulConfig MM_CFG = GetNormalConfig(false, false, false, BatchMode::BATCH_LESS_THAN_L1, true, IterateOrder::ORDER_M, ScheduleType::OUTER_PRODUCT, false, true/*enableMixDualMaster*/);
 Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> mm;
 

@@ -45,7 +45,7 @@ SIMT能够通过大量线程的并发执行实现高效处理大批数据，但�
     **图 3**  多线程哈希冲突<a name="fig162521813558"></a>  
     ![](../../figures/多线程哈希冲突.png "多线程哈希冲突")
 
-    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_atomic_cas.md)修改flag来获取桶的写权限。
+    程序实现时，在Bucket结构体中添加一个标记位”flag”，用于标记当前桶的写入权限，线程通过原子指令[asc\_atomic\_cas](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/原子操作/asc_atomic_cas.md)修改flag来获取桶的写权限。
 
     ```
     inline int32_t asc_atomic_cas(int32_t *address, int32_t compare, int32_t val)
