@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" font-family="Arial, sans-serif">
+  <defs>
+    <style>
+      .axis-line { stroke: #333; stroke-width: 1.5; }
+      .grid-line { stroke: #ddd; stroke-width: 0.8; stroke-dasharray: 3,3; }
+      .tick-text { font-size: 11px; fill: #333; }
+      .axis-title { font-size: 13px; fill: #333; font-weight: bold; }
+      .data-label { font-size: 9px; fill: #333; }
+      .line-data { stroke: #70AD47; stroke-width: 2.5; fill: none; }
+      .dot-data { fill: #70AD47; }
+    </style>
+  </defs>
+  <rect width="600" height="400" fill="#fff"/>
+
+  <!-- Chart: x=80-550, y=50-340, Y=0-12us, 1us=24.17px -->
+  <text x="315" y="25" text-anchor="middle" style="font-size:14px;font-weight:bold;fill:#333;">小shape(16384) Task Duration 随核数变化（2048线程）</text>
+
+  <!-- Y gridlines (every 2us) -->
+  <line x1="80" y1="340" x2="550" y2="340" class="grid-line"/>
+  <line x1="80" y1="291.7" x2="550" y2="291.7" class="grid-line"/>
+  <line x1="80" y1="243.3" x2="550" y2="243.3" class="grid-line"/>
+  <line x1="80" y1="195" x2="550" y2="195" class="grid-line"/>
+  <line x1="80" y1="146.7" x2="550" y2="146.7" class="grid-line"/>
+  <line x1="80" y1="98.3" x2="550" y2="98.3" class="grid-line"/>
+  <line x1="80" y1="50" x2="550" y2="50" class="grid-line"/>
+
+  <text x="70" y="344" text-anchor="end" class="tick-text">0</text>
+  <text x="70" y="296" text-anchor="end" class="tick-text">2</text>
+  <text x="70" y="248" text-anchor="end" class="tick-text">4</text>
+  <text x="70" y="199" text-anchor="end" class="tick-text">6</text>
+  <text x="70" y="151" text-anchor="end" class="tick-text">8</text>
+  <text x="70" y="103" text-anchor="end" class="tick-text">10</text>
+  <text x="70" y="54" text-anchor="end" class="tick-text">12</text>
+  <text x="25" y="195" text-anchor="middle" class="axis-title" transform="rotate(-90 25 195)">Task Duration (us)</text>
+
+  <line x1="80" y1="340" x2="550" y2="340" class="axis-line"/>
+  <line x1="80" y1="50" x2="80" y2="340" class="axis-line"/>
+
+  <!-- X: 4→x=150, 8→x=237, 16→x=315, 32→x=425, 64→x=535 -->
+  <text x="150" y="360" text-anchor="middle" class="tick-text">4</text>
+  <text x="237" y="360" text-anchor="middle" class="tick-text">8</text>
+  <text x="315" y="360" text-anchor="middle" class="tick-text">16</text>
+  <text x="425" y="360" text-anchor="middle" class="tick-text">32</text>
+  <text x="535" y="360" text-anchor="middle" class="tick-text">64</text>
+  <text x="315" y="380" text-anchor="middle" class="axis-title">Block Dim (逻辑核数)</text>
+
+  <!-- Data: S16(4,10.784)→y=340-10.784*24.17=75.2, S17(8,9.568)→y=104.8, S18(16,8.765)→y=128.1, S19(32,9.041)→y=121.5, S20(64,10.46)→y=87.5 -->
+  <polyline points="150,75.2 237,104.8 315,128.1 425,121.5 535,87.5" class="line-data"/>
+  <circle cx="150" cy="75.2" r="5" class="dot-data"/>
+  <circle cx="237" cy="104.8" r="5" class="dot-data"/>
+  <circle cx="315" cy="128.1" r="5" class="dot-data"/>
+  <circle cx="425" cy="121.5" r="5" class="dot-data"/>
+  <circle cx="535" cy="87.5" r="5" class="dot-data"/>
+  <text x="150" y="68" text-anchor="middle" class="data-label">10.784</text>
+  <text x="237" y="98" text-anchor="middle" class="data-label">9.568</text>
+  <text x="315" y="121" text-anchor="middle" class="data-label" style="font-weight:bold;">8.765</text>
+  <text x="425" y="115" text-anchor="middle" class="data-label">9.041</text>
+  <text x="535" y="80" text-anchor="middle" class="data-label">10.46</text>
+</svg>
