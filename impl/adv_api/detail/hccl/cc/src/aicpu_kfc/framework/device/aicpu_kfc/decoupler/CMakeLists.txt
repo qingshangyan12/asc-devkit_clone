@@ -22,6 +22,7 @@ set(open_src_list
 
 set(open_exec_src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/comm_kfc_open_kernel_executor.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/cann_dispatch_bridge.cc
 )
 
 set(open_exec_impl_src_list

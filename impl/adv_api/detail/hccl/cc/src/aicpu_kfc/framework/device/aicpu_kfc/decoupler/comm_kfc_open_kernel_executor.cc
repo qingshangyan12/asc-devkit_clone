@@ -15,6 +15,7 @@
 #include "log.h"
 #include "alg_param.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "cann_dispatch_bridge.h"
 
 namespace {
 mc2_ops_hccl::OpParam *AsOpenOpParam(std::vector<uint8_t> &opParam)
@@ -172,6 +173,18 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
               static_cast<unsigned long long>(outputBegin + outputBytes), isAllGather);
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
+
+    const bool useCannBridge = (param->opType == HCCL_CMD_ALLTOALL ||
+                                param->opType == HCCL_CMD_ALLTOALLV ||
+                                param->opType == HCCL_CMD_ALLREDUCE);
+    if (useCannBridge) {
+        HcclResult cannRet = mc2_ops_hccl::LaunchViaCann(*param, resCtx);
+        CHK_PRT_RET(cannRet != HCCL_SUCCESS,
+            HCCL_ERROR("[CannBridge] dispatch failed (ret=%d), opType=%u algName[%s]",
+                       static_cast<int>(cannRet), static_cast<u32>(param->opType), param->algName),
+            cannRet);
+        return HCCL_SUCCESS;
+    }
 
     auto executor = mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
