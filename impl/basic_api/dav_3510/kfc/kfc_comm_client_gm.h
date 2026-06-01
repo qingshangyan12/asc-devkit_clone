@@ -53,7 +53,6 @@ public:
                 return;
             }
             ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
-            ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
             ASCENDC_ASSERT((GetBaseAddrCpu((int8_t)TPosition::VECIN) != nullptr),
                            { KERNEL_LOG(KERNEL_ERROR, "vecin base addr can not be nullptr"); });
             // Note that the addresses of aic and aiv are exchanged.

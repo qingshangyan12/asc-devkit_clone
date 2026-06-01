@@ -82,7 +82,6 @@ __aicore__ inline KfcCommClient::KfcCommClient(GM_ADDR workspace, int subBlockID
 {
     if ASCEND_IS_AIV {
         ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
-        ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
         ASCENDC_ASSERT((GetBaseAddrCpu((int8_t)TPosition::VECIN) != nullptr),
                        { KERNEL_LOG(KERNEL_ERROR, "vecin base addr can not be nullptr"); });
         this->msgSendHead = (MSG_POS KfcMsg *)GetMsgHead(subBlockID); // 注意aic和aiv的地址是交换的
