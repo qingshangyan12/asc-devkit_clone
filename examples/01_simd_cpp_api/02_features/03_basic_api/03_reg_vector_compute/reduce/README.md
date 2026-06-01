@@ -32,22 +32,6 @@
 - 核函数名：`reduce_sum_2level`
 - 样例实现：每个 repeat 先做 Reduce<SUM> 归约得到标量写出到 UB，再对中间结果做一次 Reduce<SUM>。
 - 累加方式：先 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）；后 repeat 间：将中间标量写出到 UB，再做一次硬件 Reduce<SUM> 二叉树归约（9→1）
-- 实现伪代码：
-  ```cpp
-  // 两阶段归约: repeat内硬件二叉树 + repeat间再次硬件二叉树
-  vlSize = 64, nRepeats = CeilDiv(528, 64) = 9
-  for row in 0..dimA-1:
-      // 第一级: repeat内归约, 中间结果写到UB中转缓冲区
-      for rep in 0..nRepeats-1:
-          src ← LoadAlign(row + rep*vlSize, 64)
-          partial ← Reduce<SUM>(src, mask)            // 硬件二叉树: 64→1
-          StoreUnalign(workBuf[rep], partial)         // 中间标量写出到UB
-      LocalMemBar(STORE→LOAD)                         // 保序: 写完成后才能读
-      // 第二级: 加载9个中间归约结果, 再做一次归约
-      src ← LoadAlign(workBuf[0], 9 with mask)
-      final ← Reduce<SUM>(src, mask)                  // 硬件二叉树: 9→1
-      StoreUnalign(dst[row], final)                   // 写出最终结果
-  ```
   ![alt text](image-1.png)
 
 ### 2. reduce_sum_seq.asc - 线性累加归约求和
@@ -55,28 +39,6 @@
 - 核函数名：`reduce_sequential`
 - 样例实现：将所有 repeat 加载到寄存器，通过向量加法顺序累加至第一个寄存器，最后做一次 Reduce<SUM> 归约。
 - 累加方式：先 repeat 间：顺序向量加法，r1..r7 逐个 Add 到 r0（共 7 次串行 Add）；后 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）
-- 实现伪代码：
-  ```cpp
-  // 全加载 + 顺序向量Add + 最终Reduce
-  vlSize = 64, nRepeat = 8, tailR = 16
-  for row in 0..dimA-1:
-      // Step 0: 加载所有8个repeat到寄存器, 尾块合并到r0
-      r0..r7 ← LoadAlign(row, 8*64)
-      if tailR > 0:
-          rTail ← LoadAlign(row + 512, 16 with mask)
-          r0 ← Add(r0, rTail, mask)
-      // Step 1: 顺序累加 r1..r7 → r0
-      r0 ← Add(r0, r1, FULL_MASK)
-      r0 ← Add(r0, r2, FULL_MASK)
-      r0 ← Add(r0, r3, FULL_MASK)
-      r0 ← Add(r0, r4, FULL_MASK)
-      r0 ← Add(r0, r5, FULL_MASK)
-      r0 ← Add(r0, r6, FULL_MASK)
-      r0 ← Add(r0, r7, FULL_MASK)
-      // Step 2: 寄存器内最终归约
-      result ← Reduce<SUM>(r0, FULL_MASK)
-      StoreUnalign(dst[row], result)
-  ```
   ![alt text](image-3.png)
 
 ### 3. reduce_sum_binary.asc - 二分累加归约求和
@@ -84,27 +46,6 @@
 - 核函数名：`reduce_sum_binary`
 - 样例实现：将所有 repeat 加载到寄存器，通过二分折半向量加法聚合到一个 repeat，最后做一次 Reduce<SUM> 归约。
 - 累加方式：先 repeat 间：二分折半向量加法（8→4→2→1，共 log₂8=3 轮配对 Add）；后 repeat 内：硬件 Reduce<SUM> 二叉树归约（64→1）
-- 实现伪代码：
-  ```cpp
-  // 二分折半归约: 尾块合并 + 配对Add(log₂N轮) + 仅最后1次Reduce
-  vlSize = 64, nRepeat = 8 (对齐到2的幂次), tailR = 16
-  for row in 0..dimA-1:
-      // Step 0: 加载所有8个repeat到寄存器, 尾块合并到r0
-      r0..r7 ← LoadAlign(row, 8*64)                   // 8个向量寄存器各64元素
-      if tailR > 0:
-          rTail ← LoadAlign(row + 512, 16 with mask)
-          r0 ← Add(r0, rTail, mask)                   // 尾部元素并入r0
-      // Step 1: 二分折半配对累加
-      // L1 - 8→4: 间隔4配对
-      r0←Add(r0,r4); r1←Add(r1,r5); r2←Add(r2,r6); r3←Add(r3,r7)
-      // L2 - 4→2: 间隔2配对
-      r0←Add(r0,r2); r1←Add(r1,r3)
-      // L3 - 2→1: 相邻配对, 全行数据已聚合到r0
-      r0←Add(r0,r1)
-      // Step 2: 寄存器内最终归约
-      result ← Reduce<SUM>(r0, FULL_MASK)             // 硬件二叉树: 64→1
-      StoreUnalign(dst[row], result)
-  ```
   ![alt text](image-2.png)
 
 ### 三种求和方案对比
