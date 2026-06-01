@@ -251,7 +251,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         // 进行回绕前需要判断回绕会不会导致覆写
         if (readInfo->bufOffset > writeInfo->bufOffset || readInfo->bufOffset) {
             // 此分支必有 writeInfo->bufOffset != readInfo->bufOffset，不写入直接等待时，rts会正常读取所有未读内容
-            if (ringbuf_overflow_wait(readInfo, writeInfo)) {
+            if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
                 return false;
             }
         }
@@ -263,7 +263,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         // 当前分支写入会导致覆写rts未读区域 or 导致写入后writeInfo->bufOffset == readInfo->bufOffset
         // rts在readInfo->bufOffset ！= writeInfo->bufOffset才会读取数据，否则认为无新数据写入
         // 此分支必有 writeInfo->bufOffset != readInfo->bufOffset，不写入直接等待时，rts会正常读取所有未读内容
-        if (ringbuf_overflow_wait(readInfo, writeInfo)) {
+        if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
             return false;
         }
     }
