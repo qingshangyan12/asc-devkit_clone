@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "cann_host_resctx_bridge.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -317,8 +318,27 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
 
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] before HcclGetAlgRes, opType[%d], algName[%s], algTag[%s], "
         "engine[%d].", param.opType, algName.c_str(), param.algTag, param.engine);
-    HcclResult getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
-        isResourceReused);
+    // 旁路(env gate, 默认关): 三算子(ALLTOALL/ALLTOALLV/ALLREDUCE) + AICPU_TS 时, 经 dlopen
+    // libhccl.so 调 CANN HcclGetAlgRes 产 CANN 布局 resCtx, 与 device 侧 LaunchViaCann 对齐。
+    // 失败回退 asc 原路径(打通阶段保底)。
+    bool useCannResCtx = (std::getenv("MC2_HOST_RESCTX_USE_CANN") != nullptr) &&
+        (param.engine == COMM_ENGINE_AICPU_TS) &&
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+    HcclResult getAlgResRet = HCCL_SUCCESS;
+    if (useCannResCtx) {
+        getAlgResRet = GetAlgResViaCann(comm, param, topoInfo.get(), algName, &resCtxSequence, param.ctxSize);
+        if (getAlgResRet != HCCL_SUCCESS) {
+            HCCL_WARNING("[HostResCtxBridge] CANN path failed (ret=%d), fallback to asc path. algName[%s]",
+                static_cast<int>(getAlgResRet), algName.c_str());
+            getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
+                isResourceReused);
+        }
+    } else {
+        getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
+            isResourceReused);
+    }
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] after HcclGetAlgRes, ret[%d], resCtxSequence[%p], "
         "isResourceReused[%d], ctxSize[%llu].", getAlgResRet, resCtxSequence, isResourceReused, param.ctxSize);
     CHK_RET(getAlgResRet);
