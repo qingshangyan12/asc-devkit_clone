@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
-获取[ReduceSum](../ReduceSum.md)接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。
+获取[ReduceRepeat\<SUM\>](../ReduceRepeat.md)、[ReduceSum](../ReduceSum.md)接口的计算结果，仅支持tensor前n个数据连续计算接口使用。计算结果以全局变量形式存储，可以随时调用获取。
 
 ## 函数原型
 
@@ -35,7 +35,7 @@ __aicore__ inline T GetReduceRepeatSumSpr()
 
 ## 数据类型
 
-操作数支持的数据类型为：half/float。
+操作数支持的数据类型为：`half`/`float`。
 
 ## 返回值说明
 

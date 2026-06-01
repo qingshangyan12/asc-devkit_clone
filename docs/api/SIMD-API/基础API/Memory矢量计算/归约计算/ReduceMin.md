@@ -18,11 +18,11 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
-ReduceMin接口用于从所有输入数据中找出最小值和最小值索引。
+`ReduceMin`接口用于从所有输入数据中找出最小值和最小值索引。
 
-ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算得到最小值和repeat内部索引，这些中间结果暂存于sharedTmpBuffer工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最小值和最小值索引。需要注意的是，每次repeat迭代获取的最小值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最小值索引。
+`ReduceMin`计算过程如下图所示：首先，在每个repeat迭代中计算得到最小值和repeat内部索引，这些中间结果暂存于`sharedTmpBuffer`工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最小值和最小值索引。需要注意的是，每次repeat迭代获取的最小值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最小值索引。
 
-**图 1**  ReduceMin计算示意图<a id="fig1"></a>
+**图 1**  `ReduceMin`计算示意图<a id="fig1"></a>
 
 ![ReduceMin计算示意图](../../../../figures/ReduceMin_scale.png "ReduceMin计算示意图")
 
@@ -36,14 +36,14 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     ```
 
 - tensor高维切分计算：
-    - mask逐bit模式：
+    - `mask`逐bit模式：
 
         ```cpp
         template <typename T>
         __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
         ```
 
-    - mask连续模式：
+    - `mask`连续模式：
 
         ```cpp
         template <typename T>
@@ -66,12 +66,12 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
 | src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | sharedTmpBuffer | 输入 | 指令执行期间存储中间结果，用于内部计算所需操作空间，需特别注意空间大小。详情请参考[关键特性说明](#关键特性说明)。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。最大处理的数据量不能超过UB大小限制。  |
-| mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
-| repeatTime | 输入 | 迭代次数。关于该参数的具体描述请参考高维切分。**注：与高维切分中不同的是，repeatTime可以支持更大的取值范围，保证不超过int32_t的最大值即可。** |
+| mask/mask[] | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
+| repeatTime | 输入 | 迭代次数。关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。**注：与高维切分中不同的是，`repeatTime`可以支持更大的取值范围，保证不超过int32_t的最大值即可。** |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
-| calIndex | 输入 | 指定是否获取最小值的索引，bool类型，默认值为false，取值：<br>&bull; true：同时获取最小值和最小值索引。<br>&bull; false：不获取索引，只获取最小值。 |
+| calIndex | 输入 | 指定是否获取最小值的索引，bool类型，默认值为`false`，取值：<br>&bull; `true`：同时获取最小值和最小值索引。<br>&bull; `false`：不获取索引，只获取最小值。 |
 
-**注：以上高维切分相关参数mask，repeatTime，srcRepStride请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
+**注：以上高维切分相关参数`mask`，`repeatTime`，`srcRepStride`请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
 
 ## 数据类型
 
@@ -92,36 +92,36 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
 
 ## 约束说明
 
-- 源操作数及sharedTmpBuffer的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
+- 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
-- 需要使用sharedTmpBuffer的情况下，支持dst与sharedTmpBuffer地址重叠（通常情况下dst比sharedTmpBuffer所需的空间要小），此时sharedTmpBuffer必须满足所需空间要求，详情请参考关键特性说明。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
+- `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 - 如果存在多个最小值，该指令会将最小索引写入目的操作数。
-- dst结果存储顺序为最小值，最小值索引，若不需要索引，只会存储最小值。
-- 当输入类型是half的时候，只支持获取最大不超过65535（uint16_t能表示的最大值）的索引值。
+- `dst`结果存储顺序为最小值，最小值索引，若不需要索引，只会存储最小值。
+- 当输入类型是`half`的时候，只支持获取最大不超过65535（`uint16_t`能表示的最大值）的索引值。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型。请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
-- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，int64_t/uint64_t数据类型仅支持tensor前n个数据计算接口。</cann-filter>
-- <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用sharedTmpBuffer，可以直接传入src或者任意大小的sharedTmpBuffer。</cann-filter>
+- <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
+- <cann-filter npu-type = "950">对于Ascend 950PR/Ascend 950DT，因接口内部算法实现不同，无需使用`sharedTmpBuffer`，可以直接传入`src`或者任意大小的`sharedTmpBuffer`。</cann-filter>
 
 <cann-filter npu-type = "A3,910b,310b,310p,910,x90,9030">
 
-- 对于<cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品、</cann-filter><cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品、</cann-filter><cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core、</cann-filter><cann-filter npu-type = "910">Atlas 训练系列产品、</cann-filter><cann-filter npu-type = "x90">Kirin X90、</cann-filter><cann-filter npu-type = "9030">Kirin 9030</cann-filter>，需要使用sharedTmpBuffer。
+- 对于<cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品、</cann-filter><cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品、</cann-filter><cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core、</cann-filter><cann-filter npu-type = "910">Atlas 训练系列产品、</cann-filter><cann-filter npu-type = "x90">Kirin X90、</cann-filter><cann-filter npu-type = "9030">Kirin 9030</cann-filter>，需要使用`sharedTmpBuffer`。
 
 </cann-filter>
 
 ## 关键特性说明
 
-- **索引值需要强制类型转换**，详情请参考[ReduceRepeat关键特性说明](./ReduceRepeat.md#关键特性说明)。
+- **索引值需要强制类型转换**，详情请参考[`ReduceRepeat`关键特性说明](./ReduceRepeat.md#关键特性说明)。
 
-- **sharedTmpBuffer最小所需空间设置**：与ReduceMax类似，详情请参考[ReduceMax关键特性说明](./ReduceMax.md#关键特性说明)。
+- **`sharedTmpBuffer`最小所需空间设置**：与`ReduceMax`类似，详情请参考[ReduceMax关键特性说明](./ReduceMax.md#关键特性说明)。
 
 ## 调用示例
 
 详细示例请参考[ReduceMin样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
 
-- tensor高维切分计算样例-mask连续模式：
+- tensor高维切分计算样例-`mask`连续模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
@@ -129,7 +129,7 @@ ReduceMin计算过程如下图所示：首先，在每个repeat迭代中计算�
     AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
     ```
 
-- tensor高维切分计算样例-mask逐bit模式：
+- tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
