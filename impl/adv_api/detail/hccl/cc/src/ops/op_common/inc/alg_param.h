@@ -379,6 +379,7 @@ struct AlgResourceCtxSerializable {
     std::vector<ThreadHandle> threads;
     ThreadHandle unfoldThread = 0; // 展开流thread
     std::vector<std::vector<ChannelInfo>> channels;
+    bool isHcommBatchTransferOnThreadSupported = false;
     void* commInfoPtr = nullptr;
     // hostdpu
     void *npu2DpuShmemPtr = nullptr;
@@ -403,6 +404,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << threads;
         binaryStream << unfoldThread;
         binaryStream << channels;
+        binaryStream << isHcommBatchTransferOnThreadSupported;
 
         binaryStream << npu2DpuShmemPtr;
         binaryStream << dpu2NpuShmemPtr;
@@ -433,6 +435,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> threads;
         binaryStream >> unfoldThread;
         binaryStream >> channels;
+        binaryStream >> isHcommBatchTransferOnThreadSupported;
 
         binaryStream >> npu2DpuShmemPtr;
         binaryStream >> dpu2NpuShmemPtr;
@@ -448,14 +451,20 @@ struct AlgResourceCtxSerializable {
     }
 };
 
+struct DevAicpuOpConfig {
+    u32 execTimeout = 0;
+    double multipleDimensionSplitRatio = 0.8;
+    // 如要新增配置类字段，在此处添加
+};
+
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
-    char tag[TAG_LENGTH]; // 保存topoInfo的key值
-    char algTag[ALG_TAG_LENGTH]; // 保存资源的key值，和算法绑定
-    char fastLaunchTag[ALG_TAG_LENGTH]; // 快速下发的key值
+    char tag[TAG_LENGTH] = ""; // 保存topoInfo的key值
+    char algTag[ALG_TAG_LENGTH] = ""; // 保存资源的key值，和算法绑定
+    char fastLaunchTag[ALG_TAG_LENGTH] = ""; // 快速下发的key值
     char fallbackTag[ALG_MAX_LENGTH] = "";
-    char commName[COMM_INDENTIFIER_MAX_LENGTH];
-    char commModeTag[TAG_LENGTH]; // 保存与执行模式相关的资源信息的key值
+    char commName[COMM_INDENTIFIER_MAX_LENGTH] = "";
+    char commModeTag[TAG_LENGTH] = ""; // 保存与执行模式相关的资源信息的key值，当前aiv使用
     aclrtStream stream;
     void* inputPtr = nullptr;
     u64 inputSize = 0;
@@ -472,8 +481,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     AlgType algType;
-    double multipleDimensionSplitRatio = 0.8;
-    char algTypeStr[ALG_MAX_LENGTH];
+    char algTypeStr[ALG_MAX_LENGTH] = "";
     union {
         struct {
             u64 count;
@@ -512,7 +520,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     };
     HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
     bool isZeroCopy = false;
-    char algName[OP_ALG_LENGTH];
+    char algName[OP_ALG_LENGTH] = "";
     HcclOpExpansionMode commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_INVALID;
     OpExecuteConfig opExecuteConfig;
     u32 numBlocksLimit = 0;
@@ -522,6 +530,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     ThreadHandle opThread = 0;
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
     u32 dataCount = 0; // 算子上报dfx的数据量
+    DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
 };

@@ -441,6 +441,7 @@ HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &t
 {
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
+    opParam.engine = static_cast<CommEngine>(ccTiling->commEngine);
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     return HCCL_SUCCESS;
