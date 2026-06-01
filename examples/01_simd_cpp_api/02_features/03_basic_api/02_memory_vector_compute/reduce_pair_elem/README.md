@@ -1,8 +1,8 @@
-# ReducePairElem<SUM>样例
+# `ReducePairElem<SUM>`样例
 
 ## 概述
 
-本样例在归约场景下，基于接口ReducePairElem<SUM>对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。
+本样例在归约场景下，基于接口`ReducePairElem<SUM>`对数据（a1, a2, a3, a4, a5, a6...）的相邻两个元素求和为（a1+a2, a3+a4, a5+a6, ......），即对每个pair（偶数下标与奇数下标组成的相邻元素对）进行求和归约，输出元素个数为输入的一半。
 
 注：`ReducePairElem`为 CANN 9.1.0 重命名后的 API。CANN 9.0.0 及之前版本请使用`PairReduceSum`。
 
@@ -14,7 +14,7 @@
 
 ## 目录结构介绍
 
-```
+``` text
 ├── reduce_pair_elem
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
@@ -27,10 +27,10 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例中调用ReducePairElem<SUM>接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
+  本样例中调用R`educePairElem<SUM>`接口，对输入元素中所有的相邻元素对执行求和计算。样例规格如下表所示：
 
   <table border="2">
-  <caption>表1：ReducePairElem<SUM>样例规格</caption>
+  <caption>表1：ReducePairElem&lt;SUM&gt;样例规格</caption>
   <tr>
   <td rowspan="1" align="center">样例类型(OpType)</td>
   <td colspan="4" align="center">ReducePairElem<SUM></td></tr>
@@ -43,13 +43,14 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1, 128]，输出y[1, 64]的ReducePairElem<SUM>样例。
+  本样例中实现的是固定shape为输入x[1, 128]，输出y[1, 64]的`ReducePairElem<SUM>`样例。
 
   Compute任务负责对srcLocal中每对相邻元素（偶数下标与奇数下标）求和，并将结果存储在dstLocal中。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并运行样例。
+
 - 配置环境变量  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
