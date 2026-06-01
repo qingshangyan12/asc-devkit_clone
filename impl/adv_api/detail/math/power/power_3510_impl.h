@@ -42,6 +42,8 @@ constexpr Reg::CastTrait castTraitI8I16 = {
 constexpr Reg::CastTrait castTraitI16I8 = {
     Reg::RegLayout::ZERO, Reg::SatMode::NO_SAT, Reg::MaskMergeMode::ZEROING, RoundMode::CAST_ROUND};
 
+static constexpr Reg::ExpSpecificMode expMode = {Reg::MaskMergeMode::ZEROING, ExpAlgo::PRECISION_1ULP_FTZ_FALSE};
+
 namespace PowF {
 constexpr float LOG2_LOWEST_VALUE = 1.175494351e-38f;
 constexpr float LOG2_LOWEST_VALUE_MULS = 8388608.0f;
@@ -332,7 +334,7 @@ __simd_callee__ inline void GetExpCore(
     Reg::MulAddDst(tmPLOReg, tmpLHIReg, expReg, mask);
     Reg::MulAddDst(tmPLOReg, tmpLLOReg, expReg, mask);
     // step 3: r = exp(phi)
-    Reg::Exp(tmpRReg, tmPHIReg, mask);
+    Reg::Exp<float, &expMode>(tmpRReg, tmPHIReg, mask);
     // step 4: r = plo*r + r
     Reg::MulAddDst(tmpRReg, tmPLOReg, tmpRReg, mask);
     /*
