@@ -403,12 +403,10 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
-    void* taskArgs = nullptr;
-    u32 argSize = 0;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     void* kfcServerArgs = nullptr;        // kfc server算子入参
-    u32 kfcServerArgSize;                 // kfc server算子入参个数
+    u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
     {
@@ -430,8 +428,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
-        binaryStream << taskArgs;
-        binaryStream << argSize;
+        binaryStream << kfcServerArgs;
+        binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -462,8 +460,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
-        binaryStream >> taskArgs;
-        binaryStream >> argSize;
+        binaryStream >> kfcServerArgs;
+        binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());

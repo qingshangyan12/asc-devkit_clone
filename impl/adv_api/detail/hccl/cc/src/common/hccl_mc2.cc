@@ -16,12 +16,9 @@
 #include "hccl_alloc_ctx_res.h"
 #include "op_common.h"
 #include "ccu_assist_pub.h"
-#include "ccu/ccu_types.h"
+#include "hccl_ccu_res.h"
 
 using namespace mc2_ops_hccl;
-
-extern "C" CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle,
-    const void *taskArgs, uint32_t argSize);
 
 constexpr uint32_t ALG_CONFIG_SIZE = 128;
 struct HcclOpArgs {
@@ -351,8 +348,8 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[0];
     CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
     CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
-    CHK_PRT_RET(resourceCtx.argSize != 0U && resourceCtx.taskArgs == nullptr,
-        HCCL_ERROR("invalid taskArgs, taskArgsSize[%u].", resourceCtx.argSize), CCU_E_PTR);
+    CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs == nullptr,
+        HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
 
-    return HcommCcuKernelLaunch(threadHandle, kernelHandle, resourceCtx.taskArgs, resourceCtx.argSize);
+    return HcommCcuKernelLaunch(threadHandle, kernelHandle, resourceCtx.kfcServerArgs, resourceCtx.kfcServerArgSize);
 }
