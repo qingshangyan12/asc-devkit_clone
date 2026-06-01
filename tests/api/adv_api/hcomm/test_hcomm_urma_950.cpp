@@ -265,3 +265,32 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitDrain)
     channel.CompleteCurrentSq();
     EXPECT_EQ(hcomm.Drain(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
 }
+
+// Init with LocalTensor overload: uses LocalTensor directly without TBuffAddr/SetAddr
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_InitLocalTensor)
+{
+    UrmaChannelResource channel;
+
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm;
+
+    // Allocate buffer via TPipe and get LocalTensor
+    AscendC::TPipe pipe;
+    AscendC::TBuf<AscendC::TPosition::VECOUT> buf;
+    pipe.InitBuffer(buf, AscendC::HCOMM_URMA_TMP_BUF_SIZE);
+    AscendC::LocalTensor<uint8_t> localBuf = buf.Get<uint8_t>();
+
+    // Init with LocalTensor should succeed
+    EXPECT_EQ(hcomm.Init(localBuf, AscendC::HCOMM_URMA_TMP_BUF_SIZE), AscendC::HCOMM_SUCCESS);
+
+    // Init with insufficient length should fail
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP> hcomm2;
+    EXPECT_EQ(hcomm2.Init(localBuf, AscendC::HCOMM_URMA_TMP_BUF_SIZE - 1), AscendC::HCOMM_FAILED);
+
+    // Verify the initialized hcomm can perform operations
+    int32_t ret = hcomm.WriteNbi<false>(
+        channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8);
+    EXPECT_EQ(ret, AscendC::HCOMM_SUCCESS);
+    EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+    channel.CompleteCurrentSq();
+    EXPECT_EQ(hcomm.Drain(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+}
