@@ -78,55 +78,11 @@
 - 样例功能：求输入向量的最大值及其对应的索引，向量shape为[1, 1024]，数据类型为float
 - 核函数名：`reduce_max`
 - 样例实现：同时返回最大值和索引
-- 实现伪代码：
-  ```cpp
-  // 归约求最大值及索引: 维护(value, index)对, repeat间逐元素竞争
-  vlSize = 64, nRepeats = CeilDiv(1024, 64) = 16
-  dstValue ← Duplicate(FLOAT_MIN)                     // 值寄存器初始化为最小浮点数
-  dstIndex ← Arange(1, 2, ..., 64)                    // 索引寄存器初始化为1..64
-  curIndex ← dstIndex
-  // Step1: repeat间 value-index 竞争
-  for rep in 0..nRepeats-1:
-      src ← LoadAlign(row + rep*vlSize, 64)
-      tmpValue ← Max(dstValue, src, mask)             // 逐元素取max
-      tmpValue ← Select(tmpValue, dstValue, mask)     // mask外保留旧值
-      changed ← Compare(NE, dstValue, tmpValue)       // 检测哪些位置值发生了更新
-      dstIndex ← Select(changed, curIndex, dstIndex)  // 值变则索引同步更新
-      curIndex ← curIndex + 64                        // 当前repeat的全局索引偏移
-      dstValue ← tmpValue
-  // Step2: 寄存器内最终归约
-  finalVal ← ReduceMax(dstValue, FULL_MASK)           // 硬件二叉树: 64→1最大值
-  eqMask ← Compare(EQ, dstValue, finalVal)            // 标记等于最大值的候选位置
-  packedIdx ← GatherMask(dstIndex, eqMask)            // 提取出对应索引
-  finalIdx ← ReduceMin(packedIdx, eqMask) - 1         // 多候选时取最小原始索引
-  StoreUnalign(dst[0..1], {finalVal, finalIdx})
-  ```
 
 ### 5. reduce_min.asc - 归约求最小值及索引
 - 样例功能：求输入向量的最小值及其对应的索引，向量shape为[1, 1024]，数据类型为float
 - 核函数名：`reduce_min`
 - 样例实现：同时返回最小值和索引
-- 实现伪代码：
-  ```cpp
-  // 归约求最小值及索引: 与reduce_max镜像, Max→Min, FLOAT_MIN→FLOAT_MAX
-  vlSize = 64, nRepeats = CeilDiv(1024, 64) = 16
-  dstValue ← Duplicate(FLOAT_MAX)                     // 值寄存器初始化为最大浮点数
-  dstIndex ← Arange(1, 2, ..., 64)
-  curIndex ← dstIndex
-  for rep in 0..nRepeats-1:
-      src ← LoadAlign(row + rep*vlSize, 64)
-      tmpValue ← Min(dstValue, src, mask)             // 逐元素取min
-      tmpValue ← Select(tmpValue, dstValue, mask)     // mask外保留旧值
-      changed ← Compare(NE, dstValue, tmpValue)       // 检测哪些位置值发生了更新
-      dstIndex ← Select(changed, curIndex, dstIndex)  // 值变则索引同步更新
-      curIndex ← curIndex + 64                        // 当前repeat的全局索引偏移
-      dstValue ← tmpValue
-  finalVal ← ReduceMin(dstValue, FULL_MASK)           // 硬件二叉树: 64→1最小值
-  eqMask ← Compare(EQ, dstValue, finalVal)            // 标记等于最小值的候选位置
-  packedIdx ← GatherMask(dstIndex, eqMask)            // 提取出对应索引
-  finalIdx ← ReduceMin(packedIdx, eqMask) - 1         // 多候选时取最小原始索引
-  StoreUnalign(dst[0..1], {finalVal, finalIdx})
-  ```
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
