@@ -65,8 +65,8 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 |----------|----------|
 |mStartPosition|以M*K矩阵为例，源矩阵M轴方向的起始位置，单位为16个元素。|
 |kStartPosition|以M*K矩阵为例，源矩阵K轴方向的起始位置，单位为32B。|
-|mStep|以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16 elements。取值范围：mStep∈[0, 255]。|
-|kStep|以M*K矩阵为例，源矩阵K轴方向搬运长度，单位为32B。取值范围：kStep∈[0, 255]。|
+|mStep|以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16 elements。取值范围：mStep∈[0, 255]。<br>**注：mStep=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|kStep|以M*K矩阵为例，源矩阵K轴方向搬运长度，单位为32B。取值范围：kStep∈[0, 255]。<br>**注：kStep=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |srcStride|以M*K矩阵为例，源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位为512B。|
 |dstStride|以M*K矩阵为例，目的矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位为512B。|
 |ifTranspose|是否启用转置功能，对每个分形矩阵进行转置，默认为false。<br>&bull; true：启用<br>&bull; false：不启用<br>注意：本通路场景下（GM->L1 Buffer）不支持转置，参数无意义，保持默认即可。|
