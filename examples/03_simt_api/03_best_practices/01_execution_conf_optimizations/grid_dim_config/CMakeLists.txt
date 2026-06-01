@@ -15,11 +15,11 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-17)")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number (1-20)")
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 
 add_executable(grid_config
-    grid_config.asc
+        grid_config.asc
 )
 
 target_compile_definitions(grid_config PRIVATE
