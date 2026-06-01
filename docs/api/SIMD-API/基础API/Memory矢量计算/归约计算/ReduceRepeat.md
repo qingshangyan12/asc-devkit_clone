@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_vec_reduce_intf.h"`。
 
-ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。
+`ReduceRepeat`接口用于对每个repeat内所有数据进行归约操作，根据模板参数reduceType进行求和/求最大值/求最小值操作，结果按顺序写入目标地址。
 
 在求最大值或最小值时可以返回对应的索引，返回的索引值为每个repeat内部索引。支持[高维切分](../SIMD计算说明/高维切分.md)计算。
 
@@ -29,14 +29,14 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 ## 函数原型
 
-- mask逐bit模式：
+- `mask`逐bit模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
     __aicore__ inline void ReduceRepeat(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order = ReduceOrder::ORDER_VALUE_INDEX)
     ```
 
-- mask连续模式：
+- `mask`连续模式：
 
     ```cpp
     template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
@@ -49,10 +49,10 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 | 参数名 | 描述 |
 | --- | --- |
-| reduceType | 归约操作类型。<br>类型为ReduceType枚举类型，支持：<br>&bull; ReduceType::SUM：求和；<br>&bull; ReduceType::MAX：求最大值；<br>&bull; ReduceType::MIN：求最小值。 |
+| reduceType | 归约操作类型。<br>类型为`ReduceType`枚举类型，支持：<br>&bull; `ReduceType::SUM`：求和；<br>&bull; `ReduceType::MAX`：求最大值；<br>&bull; `ReduceType::MIN`：求最小值。 |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; `true`，表示在接口内部设置mask。<br>&bull; `false`，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。 |
 
 **表 2**  参数说明
 
@@ -60,14 +60,14 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 | --- | --- | --- |
 | dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
+| mask[]/mask | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
-| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位。取值范围为[0, $2^{16}-1$]。<br>**注意：dstRepStride的单位受reduceType和order参数的影响**，参考[表3](#tab3)。<cann-filter npu-type = "910"><br>**注意：Atlas 训练系列产品不支持配置0。**</cann-filter> |
+| dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位。取值范围为[0, $2^{16}-1$]。<br>**注意：dstRepStride的单位受`reduceType`和`order`参数的影响**，参考[表3](#tab3)。<cann-filter npu-type = "910"><br>**注意：Atlas 训练系列产品不支持配置0。**</cann-filter> |
 | srcBlkStride | 输入 | 单次迭代内DataBlock的地址步长，单位为32字节。取值范围为[0, $2^{16}-1$]。 |
 | srcRepStride | 输入 | 源操作数相邻迭代间的地址步长，即源操作数每次迭代跳过的DataBlock数目。取值范围为[0, $2^{16}-1$]。 |
-| order | 输入 | 在归约操作类型为MAX或MIN时，指定dst中最大值value和索引值index的相对位置以及返回结果行为，参数类型为ReduceOrder枚举类型，默认值为ORDER_VALUE_INDEX。<br>ReduceOrder取值如下：<br>&bull; ORDER_VALUE_INDEX：表示value位于低半部，返回结果存储顺序为[value, index]。<br>&bull; ORDER_INDEX_VALUE：表示index位于低半部，返回结果存储顺序为[index, value]。<br>&bull; ORDER_ONLY_VALUE：表示只返回最值，返回结果存储顺序为[value]。<br>&bull; ORDER_ONLY_INDEX：表示只返回最值索引，返回结果存储顺序为[index]。<br>**注：归约操作类型为SUM时，该参数不生效。** |
+| order | 输入 | 在归约操作类型为MAX或MIN时，指定dst中最大值value和索引值index的相对位置以及返回结果行为，参数类型为`ReduceOrder`枚举类型，默认值为`ORDER_VALUE_INDEX`。<br>`ReduceOrder`取值如下：<br>&bull; `ORDER_VALUE_INDEX`：表示value位于低半部，返回结果存储顺序为[value, index]。<br>&bull; `ORDER_INDEX_VALUE`：表示index位于低半部，返回结果存储顺序为[index, value]。<br>&bull; `ORDER_ONLY_VALUE`：表示只返回最值，返回结果存储顺序为[value]。<br>&bull; `ORDER_ONLY_INDEX`：表示只返回最值索引，返回结果存储顺序为[index]。<br>**注：归约操作类型为SUM时，该参数不生效。** |
 
-**注：以上高维切分相关参数mask，repeatTime，dstRepStride，srcBlkStride，srcRepStride请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
+**注：以上高维切分相关参数`mask`，`repeatTime`，`dstRepStride`，`srcBlkStride`，`srcRepStride`请参考[高维切分](../SIMD计算说明/高维切分.md)中的介绍。**
 
 ## 数据类型
 
@@ -91,10 +91,10 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
     | 目的操作数数据类型T |源操作数数据类型U |
     | --- | --- |
-    | int32_t | int16_t，int32_t | 
-    | uint32_t | uint16_t，uint32_t |
-    | half | half |
-    | float | float |
+    | `int32_t` | `int16_t`，`int32_t` | 
+    | `uint32_t` | `uint16_t`，`uint32_t` |
+    | `half` | `half` |
+    | `float` | `float` |
 
 </cann-filter>
 
@@ -112,23 +112,23 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 源操作数的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[表3](#tab3)。
-- dstRepStride、srcBlkStride、srcRepStride取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。</cann-filter>
+- `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
+- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
 
 **归约操作类型取MAX或MIN时的约束：**
 
 - 如果存在多个最值，该指令会将最小索引写入目的操作数。
 - 索引按操作数的数据类型存储，读取索引需要将类型转换到整型，请参考[关键特性说明](#关键特性说明)。
 - 不同芯片支持的`ReduceOrder`如下：
-  - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
-  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
-  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE、ORDER_ONLY_VALUE、ORDER_ONLY_INDEX。</cann-filter>
-  - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持ORDER_VALUE_INDEX、ORDER_ONLY_VALUE。</cann-filter>
-  - <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
-  - <cann-filter npu-type = "910">Atlas 训练系列产品，支持ORDER_VALUE_INDEX。</cann-filter>
-  - <cann-filter npu-type = "x90">Kirin X90，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
-  - <cann-filter npu-type = "9030">Kirin 9030，支持ORDER_VALUE_INDEX、ORDER_INDEX_VALUE。</cann-filter>
+  - <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。</cann-filter>
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`、`ORDER_ONLY_VALUE`、`ORDER_ONLY_INDEX`。</cann-filter>
+  - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持`ORDER_VALUE_INDEX`、`ORDER_ONLY_VALUE`。</cann-filter>
+  - <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。</cann-filter>
+  - <cann-filter npu-type = "910">Atlas 训练系列产品，支持`ORDER_VALUE_INDEX`。</cann-filter>
+  - <cann-filter npu-type = "x90">Kirin X90，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。</cann-filter>
+  - <cann-filter npu-type = "9030">Kirin 9030，支持`ORDER_VALUE_INDEX`、`ORDER_INDEX_VALUE`。</cann-filter>
 
 **表 3**  地址对齐和步长单位
 
@@ -136,19 +136,19 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 | 归约操作类型 | 数据类型 | dst地址对齐要求 | dstRepStride单位 |
 | --- | --- | --- | --- |
-| SUM | half | 2B | 2B |
-| SUM | float | 4B | 4B |
+| `SUM` | `half` | 2B | 2B |
+| `SUM` | `float` | 4B | 4B |
 
-| 归约操作类型 | 数据类型 | order | dst地址对齐要求 | dstRepStride单位 |
+| 归约操作类型 | 数据类型 | `order` | dst地址对齐要求 | dstRepStride单位 |
 | --- | --- | --- | --- | --- |
-| MAX/MIN | half | ORDER_VALUE_INDEX | 4B | 4B |
-| MAX/MIN | half | ORDER_INDEX_VALUE | 4B | 4B |
-| MAX/MIN | half | ORDER_ONLY_VALUE | 2B | 2B |
-| MAX/MIN | half | ORDER_ONLY_INDEX | 4B | 4B |
-| MAX/MIN | float | ORDER_VALUE_INDEX | 8B | 8B |
-| MAX/MIN | float | ORDER_INDEX_VALUE | 8B | 8B |
-| MAX/MIN | float | ORDER_ONLY_VALUE | 4B | 4B |
-| MAX/MIN | float | ORDER_ONLY_INDEX | 4B | 4B |
+| MAX/MIN | `half` | `ORDER_VALUE_INDEX` | 4B | 4B |
+| MAX/MIN | `half` | `ORDER_INDEX_VALUE` | 4B | 4B |
+| MAX/MIN | `half` | `ORDER_ONLY_VALUE` | 2B | 2B |
+| MAX/MIN | `half` | `ORDER_ONLY_INDEX` | 4B | 4B |
+| MAX/MIN | `float` | `ORDER_VALUE_INDEX` | 8B | 8B |
+| MAX/MIN | `float` | `ORDER_INDEX_VALUE` | 8B | 8B |
+| MAX/MIN | `float` | `ORDER_ONLY_VALUE` | 4B | 4B |
+| MAX/MIN | `float` | `ORDER_ONLY_INDEX` | 4B | 4B |
 
 ## 关键特性说明
 
@@ -166,7 +166,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     <cann-filter npu-type = "950">
 
     特别地
-    - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，当操作数数据类型为int16_t，uint16_t，half时，读取index都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
+    - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，当操作数数据类型为`int16_t`，`uint16_t`，`half`时，读取index都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
     - <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，`ORDER_ONLY_INDEX`（仅返回最值索引）情况下，读取索引值index时都需要使用`reinterpret_cast<uint32_t*>`。</cann-filter>
 
     </cann-filter>
@@ -177,7 +177,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
 
 完整示例可参考[ReduceRepeat样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
 
-- `ReduceRepeat<ReduceType::MAX>` tensor高维切分计算样例-mask连续模式：
+- `ReduceRepeat<ReduceType::MAX>` tensor高维切分计算样例-`mask`连续模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -195,7 +195,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     AscendC::ReduceRepeat<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, 128, 4, 1, 1, 8, AscendC::ReduceOrder::ORDER_ONLY_INDEX);
     ```
 
-- `ReduceRepeat<AscendC::ReduceType::MAX>` tensor高维切分计算样例-mask逐bit模式：
+- `ReduceRepeat<AscendC::ReduceType::MAX>` tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -263,7 +263,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     */
     ```
 
-- `ReduceRepeat<AscendC::ReduceType::MIN>` tensor高维切分计算样例-mask逐bit模式：
+- `ReduceRepeat<AscendC::ReduceType::MIN>` tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
@@ -328,7 +328,7 @@ ReduceRepeat接口用于对每个repeat内所有数据进行归约操作，根�
     // 最后128个数中，13的位置在对应的repeat中为19，十六进制为0x1300，对应half值为1.13249e-06。
     ```
 
-- `ReduceRepeat<ReduceType::SUM>` tensor高维切分计算样例-mask逐bit模式：
+- `ReduceRepeat<ReduceType::SUM>` tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
     // dstLocal,srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
