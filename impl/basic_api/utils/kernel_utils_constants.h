@@ -82,10 +82,11 @@ constexpr uint32_t INT4_BIT_NUM = 4;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 // int3b_t param
 constexpr uint32_t INT3_BIT_NUM = 3;
+#endif
+
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT2_BIT_NUM = 2;
-#endif
 
 namespace ConstantsInternal {
 constexpr uint32_t ASCENDC_B4_TWO = 2;

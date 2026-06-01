@@ -526,6 +526,7 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
     WaitFlag<HardEvent::M_MTE1>(2);
     ReleaseEventID<HardEvent::M_MTE1>(2);
 #endif
+}
 
 __aicore__ inline void TPipe::Destroy()
 {
