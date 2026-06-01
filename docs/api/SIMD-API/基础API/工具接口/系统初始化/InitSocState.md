@@ -14,7 +14,7 @@
 
 ## 功能说明
 
-头文件路径为：`"basic_api/kernel_operator_common_intf_impl.h"`。
+头文件路径为：`"basic_api/kernel_operator_common_intf.h"`。
 
 初始化AI Core上的一些全局状态，包括Cube Core（AIC）和Vector Core（AIV）的共有状态，以及各自特有的状态：
 
