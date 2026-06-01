@@ -18,8 +18,10 @@
 #include "hccl_res_expt.h"
 #include "load_kernel.h"
 #include "coll_alg_v2_exec_registry.h"
+#include "cann_host_bridge.h"
 
 #include <vector>
+#include <memory>
 
 using namespace mc2_ops_hccl;
 
@@ -441,8 +443,14 @@ HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &t
 {
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
+    opParam.engine = static_cast<CommEngine>(ccTiling->commEngine);
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
+    if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        opParam.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
+        constexpr uint64_t ALLTOALL_DEFAULT_SEND_COUNTS = 200ULL * 1024 * 1024;
+        opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void *>(ALLTOALL_DEFAULT_SEND_COUNTS);
+    }
     return HCCL_SUCCESS;
 }
 
@@ -500,7 +508,14 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
 HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
     TopoInfoWithNetLayerDetails *topoInfo, void **resCtxOut)
 {
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    bool useCannResCtx = UseCannBridge(opParam);
+
+    std::unique_ptr<InsCollAlgBase> executor = nullptr;
+    if (useCannResCtx) {
+        executor = GetAlgExecViaCann(opParam.opType, algName);
+    } else {
+        executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    }
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
 
