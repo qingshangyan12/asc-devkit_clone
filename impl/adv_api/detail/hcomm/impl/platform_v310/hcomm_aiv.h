@@ -152,7 +152,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Operate(
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI in stack, sqHead = %u", sqHead);
 
     if constexpr (commit) {
-        Commit(channel);
+        Commit(channelHandle);
         KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok");
     }
 
