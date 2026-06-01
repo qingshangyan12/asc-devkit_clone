@@ -68,7 +68,7 @@ $$
 | 字段名 | 字段含义 |
 |:---|:---|
 |Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-|aiv_time(μs)|Task在AI Vector Core上的理论执行时间。|
+|aiv_time(μs)|Task在AI Vector Core上的执行时间。|
 |aiv_total_cycles|所有vector核的总共计算的cycle数量。|
 |aiv_vec_time(μs)|vec类型指令（向量类运算指令）耗时。|
 |aiv_vec_ratio|vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。|
@@ -581,7 +581,7 @@ $$
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1`、`2`、`3`　　　　　| Case编号：0=单loop+128bytes，1=单loop+256bytes，2=loop拆分，3=loop拆分+unroll |
 
 - 执行结果

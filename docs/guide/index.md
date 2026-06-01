@@ -11,7 +11,7 @@
 
         -   [基于SIMT编程](入门教程/快速入门/基于SIMT编程/基于SIMT编程.md)
             -   [HelloWorld](入门教程/快速入门/基于SIMT编程/HelloWorld.md)
-            -   [Add算子快速入门](入门教程/快速入门/基于SIMT编程/Add算子快速入门.md)
+            -   [Gather算子快速入门](入门教程/快速入门/基于SIMT编程/Gather算子快速入门.md)
 
 -   [编程指南](编程指南/本文档组织结构.md)
     -   [本文档组织结构](编程指南/本文档组织结构.md)
@@ -138,6 +138,7 @@
     -   [附录](编程指南/附录/show_kernel_debug_data工具.md)
         -   [show_kernel_debug_data工具](编程指南/附录/show_kernel_debug_data工具.md)
         -   [msobjdump工具](编程指南/附录/msobjdump工具.md)
+        -   [optype_collector工具](编程指南/附录/optype_collector工具.md)
         -   [基于样例工程完成Kernel直调](编程指南/附录/基于样例工程完成Kernel直调.md)
         -   [简易自定义算子工程](编程指南/附录/简易自定义算子工程.md)
         -   [常用操作](编程指南/附录/常用操作/如何开发动态输入算子.md)
@@ -290,6 +291,8 @@
         -   [内存访问](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [访存合并](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [避免UB的Bank冲突](算子实践参考/SIMT算子性能优化/内存访问/避免UB的Bank冲突.md)
+            -   [DCache访问优化](算子实践参考/SIMT算子性能优化/内存访问/DCache访问优化.md)
+            -   [通过类型对齐提升搬运效率](算子实践参考/SIMT算子性能优化/内存访问/通过类型对齐提升搬运效率.md)
 
     -   [优秀实践](算子实践参考/优秀实践/优秀实践.md)
         -   [FlashAttention算子性能调优案例](算子实践参考/优秀实践/FlashAttention算子性能调优案例.md)

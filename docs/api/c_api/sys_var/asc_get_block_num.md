@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | :-----------| :------: |
 | <cann-filter npu_type="950">Ascend 950PR/Ascend 950DT | √    </cann-filter>|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √    |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √    |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √    |
 
 ## 功能说明
 
-获取AI核数。
+获取当前任务配置的核数，用于代码内部的多核逻辑控制等。
 
 ## 函数原型
 
@@ -24,7 +24,7 @@ __aicore__ inline int64_t asc_get_block_num()
 
 ## 返回值说明
 
-无
+当前任务配置的核数。
 
 ## 流水类型
 

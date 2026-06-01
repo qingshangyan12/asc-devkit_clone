@@ -8,6 +8,10 @@
 
 - Ascend 950PR / Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.1.0
+
 ## 目录结构
 
 ```text
@@ -248,7 +252,7 @@ AscendC::LocalTensor<fp4x2_e1m2_t> a2LocalPong(AscendC::TPosition::A2, L0_PINGPO
 time     |---------------------------------------------------------------------------->
 
 GM->L1   | A/B/scaleA/scaleB Ping | A/B/scaleA/scaleB Pong | A/B/scaleA/scaleB Ping |
-L1->L0                            | L0 Ping load --|       | L0 Pong load --|    
+L1->L0                            | L0 Ping load --|       | L0 Pong load --|
 Cube                                               | Mmad Ping ---|   | Mmad Pong ---|
 Fixpipe                                                           | fixpipe C ---
 ```
@@ -478,30 +482,33 @@ Ascend 950PR中 L2Cache 大小为 128MB，无法缓存所有输入数据，部�
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-> **注意事项**：本样例使用的 `en_dtypes` 库需要版本 `0.0.4`。安装命令为
+> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，`en_dtypes` 库需要版本 `0.0.4`。安装命令为
 
 ```bash
-pip3 install en_dtypes==0.0.4
+python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
 ```
 
 ### 配置环境变量
 
 请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
 
-- 默认路径，root 用户安装 CANN 软件包
-  ```bash
-  source /usr/local/Ascend/cann/set_env.sh
-  ```
+  - 默认路径，root用户安装CANN软件包
 
-- 默认路径，非 root 用户安装 CANN 软件包
-  ```bash
-  source $HOME/Ascend/cann/set_env.sh
-  ```
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
 
-- 指定路径 install_path，安装 CANN 软件包
-  ```bash
-  source ${install_path}/cann/set_env.sh
-  ```
+  - 默认路径，非root用户安装CANN软件包
+
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
 
 ### 样例执行
 
