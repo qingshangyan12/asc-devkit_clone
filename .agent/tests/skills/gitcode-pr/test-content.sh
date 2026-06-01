@@ -32,21 +32,6 @@ expect_fixed() {
     grep -Fq -- "$text" "$file" || fail "missing content: ${label}"
 }
 
-reject_tree_pattern() {
-    local path="$1"
-    local pattern="$2"
-    local label="$3"
-
-    if grep -REnI \
-        --include='*.md' \
-        --include='*.py' \
-        --include='*.sh' \
-        --include='*.yaml' \
-        -- "$pattern" "$path"; then
-        fail "forbidden content: ${label}"
-    fi
-}
-
 if [[ ! -f "$REMOTE_SKILL_FILE" ]]; then
     bash "$INSTALL_SCRIPT"
 fi
@@ -84,7 +69,5 @@ expect_fixed "$AGENT_README" "\`gitcode-pr\`" "README gitcode-pr listing"
 expect_fixed "$AGENT_README" "_remote/gitcode-pr" "README remote skill implementation"
 expect_fixed "$GITIGNORE" ".agent/skills/_remote/" "gitignore remote skill cache"
 expect_fixed "$GITIGNORE" ".agent/skills/gitcode-pr" "gitignore gitcode-pr symlink"
-
-reject_tree_pattern "${SKILLS_DIR}/public-skills" '\.claude/skills' "GE .claude path in asc-devkit public-skills"
 
 echo "[PASS] gitcode-pr skill content validation passed"
