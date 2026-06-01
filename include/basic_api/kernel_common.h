@@ -106,12 +106,12 @@ __aicore__ inline TEventID AllocEventID()
     ASCENDC_DEBUG_ASSERT((evt < HardEvent::MAX),
                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)));
     constexpr auto eventIndex = EventToIndex(evt);
-    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    auto lastId = sff0(Internal::g_occupyEventPool + eventIndex);
     ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT));
-    Internal::g_occupyEventPool[eventIndex] =
-        sbitset1(Internal::g_occupyEventPool[eventIndex], lastId);
+    Internal::g_occupyEventPool + eventIndex =
+        sbitset1(Internal::g_occupyEventPool + eventIndex, lastId);
     return lastId;
 }
 
@@ -123,7 +123,7 @@ __aicore__ inline void ReleaseEventID(TEventID id)
             static_cast<int32_t>(id), QUE_MAX_EVENT));
     ASCENDC_DEBUG_ASSERT((evt != HardEvent::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "evt cannot be HardEvent::MAX"));
     constexpr auto eventIndex = EventToIndex(evt);
-    Internal::g_occupyEventPool[eventIndex] = sbitset0(Internal::g_occupyEventPool[eventIndex], id);
+    Internal::g_occupyEventPool + eventIndex = sbitset0(Internal::g_occupyEventPool + eventIndex, id);
     return;
 }
 
