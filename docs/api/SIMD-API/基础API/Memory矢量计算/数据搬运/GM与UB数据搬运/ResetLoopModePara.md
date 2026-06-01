@@ -2,8 +2,8 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-|------|----------|
+| 产品 | 是否支持  |
+| :----------------------- | :------: |
 | <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
 | <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | x</cann-filter> |
 | <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | x</cann-filter> |
@@ -14,6 +14,8 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
+
 重置loop mode的参数。与[SetLoopModePara](SetLoopModePara.md)搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。支持的通路如下：
 
 - GM-\>VECIN
@@ -21,7 +23,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 ```
 
@@ -45,7 +47,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 
 本示例中操作数数据类型为int8\_t。
 
-```
+```cpp
 AscendC::LocalTensor<int8_t> srcLocal = inQueueSrc.AllocTensor<int8_t>();
 AscendC::DataCopyExtParams copyParams{2, 48 * sizeof(int8_t), 0, 0, 0}; // 结构体DataCopyExtParams最后一个参数是rsv保留位。
 AscendC::DataCopyPadExtParams<half> padParams{false, 0, 0, 0};

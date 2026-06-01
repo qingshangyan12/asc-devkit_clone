@@ -57,6 +57,18 @@
 </tbody>
 </table>
 
+ | 产品 | 是否支持  |
+ | :----------------------- | :------: |
+ |<cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
+ |<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
+ |<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
+ |<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
+ |<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
+ |<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+ |<cann-filter npu-type = "910"> Atlas 训练系列产品 | x </cann-filter>|
+ |<cann-filter npu-type = "x90"> Kirin X90 | x </cann-filter>|
+ |<cann-filter npu-type = "9030"> Kirin 9030 | x </cann-filter>|
+
 ## 功能说明<a name="section618mcpsimp"></a>
 
 VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间隔操作。

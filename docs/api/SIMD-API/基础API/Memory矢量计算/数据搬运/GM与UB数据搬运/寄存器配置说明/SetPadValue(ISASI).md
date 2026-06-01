@@ -2,17 +2,19 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-|------|----------|
-| <cann-filter npu-type="950"><term>Ascend 950PR/Ascend 950DT</term> | √</cann-filter> |
-| <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
-| <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
-| <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | x</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
-| <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | x</cann-filter> |
+| 产品 | 是否支持  |
+| :----------------------- | :------: |
+|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √</cann-filter>|
+|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √</cann-filter>|
+|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √</cann-filter>|
+|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x</cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | x</cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 Vector Core | x</cann-filter>|
+|<cann-filter npu-type="910"> Atlas 训练系列产品 | x</cann-filter>|
 
 ## 功能说明<a name="section618mcpsimp"></a>
+
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 [DataCopyPad](GM2UB非对齐数据搬运(DataCopyPad).md)从Global Memory将数据非对齐搬运至UB时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。支持的通路如下：
 
@@ -20,7 +22,7 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T, TPosition pos = TPosition::MAX>
 __aicore__ inline void SetPadValue(T paddingValue)
 ```
@@ -40,6 +42,26 @@ __aicore__ inline void SetPadValue(T paddingValue)
 | :--- | :---: | :--- |
 | paddingValue | 输入 | DataCopyPad接口填充的数值，数据类型与DataCopyPad接口搬运的数据类型一致。 |
 
+## 数据类型
+
+<cann-filter npu-type="950">
+
+- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+
+</cann-filter>
+
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
@@ -50,7 +72,7 @@ __aicore__ inline void SetPadValue(T paddingValue)
 
 ## 调用示例<a name="section1227835243314"></a>
 
-```
+```cpp
 uint32_t m_n1 = 32;
 uint32_t m_n2 = 31;
 uint32_t m_n2Align = n2 % 32 == 0 ? n2 : (n2 / 32 + 1) * 32;
@@ -59,8 +81,8 @@ AscendC::LocalTensor<float> srcLocal = m_queInSrc.AllocTensor<float>();
 AscendC::DataCopyExtParams dataCopyExtParams;
 AscendC::DataCopyPadExtParams<float> padParams;
 
-dataCopyExtParams.blockCount = m_n1; // Block个数，拷贝的的次数
-dataCopyExtParams.blockLen = m_n2 * sizeof(float); // 一次拷贝多少个32B
+dataCopyExtParams.blockCount = m_n1; // Block个数，拷贝的次数。
+dataCopyExtParams.blockLen = m_n2 * sizeof(float); // 一次拷贝多少个32B。
 dataCopyExtParams.srcStride = 0;
 dataCopyExtParams.dstStride = 0;
 
@@ -68,16 +90,16 @@ padParams.isPad = true;
 padParams.leftPadding = 0;
 padParams.rightPadding = 1;
 
-AscendC::SetPadValue((float)37); // 设置Pad的值为37
+AscendC::SetPadValue((float)37); // 设置Pad的值为37。
 AscendC::DataCopyPad(srcLocal, m_srcGlobal, dataCopyExtParams, padParams);
 ```
 
-```
+```text
 输入数据（srcGm, shape = [32, 31]）：[[1, 1, 1, ..., 1], [1, 1, 1, ..., 1], ... , [1, 1, 1, ..., 1]]
 输出数据（dstGm, shape = [32, 32]）：[[1, 1, 1, ..., 1, 37], [1, 1, 1, ..., 1, 37], ... , [1, 1, 1, ..., 1, 37]]
 ```
 
-```
+```cpp
 // 对于不支持使用立即数进行赋值和初始化的数据类型，如下是一个输入类型bfloat16_t的示例：
 AscendC::SetPadValue(m_srcGlobal.GetValue(0));
 AscendC::DataCopyPad(srcLocal, m_srcGlobal, dataCopyExtParams, padParams);
