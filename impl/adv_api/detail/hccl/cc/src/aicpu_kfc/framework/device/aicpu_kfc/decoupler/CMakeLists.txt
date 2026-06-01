@@ -91,6 +91,7 @@ target_compile_options(ccl_kernel_decoupler PRIVATE
 target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
@@ -114,6 +115,7 @@ target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
 
     $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
@@ -162,6 +164,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
@@ -228,6 +231,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
@@ -255,6 +259,7 @@ if(TARGET mc2_server)
     target_include_directories(mc2_server_decoupler PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}/../
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+        ${HCCL_HCOMM_HEADER_DIR}/ccu
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
 
