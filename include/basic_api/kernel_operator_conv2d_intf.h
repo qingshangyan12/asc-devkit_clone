@@ -20,6 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_CONV2D_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_CONV2D_INTERFACE_H
 
+#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
 #include "kernel_macros.h"
 #include "kernel_struct_conv2d.h"
 
@@ -52,7 +53,6 @@ template <typename T> __aicore__ inline Conv2dTilling GetConv2dTiling(Conv2dPara
  * @param [in] conv2dParams.initY dst initialization parameters
  * @param [in] conv2dParams.partialSum Judge whether the result is moved out
  */
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
 template <typename T, typename U>
 __aicore__ inline __in_pipe__(MTE2)
     __out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst, const LocalTensor<U> &featureMap,
@@ -63,9 +63,9 @@ __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTen
     const LocalTensor<T> &bias, const LocalTensor<U> &featureMap, const LocalTensor<U> &weight,
     Conv2dParams &conv2dParams, Conv2dTilling &tilling);
 } // namespace AscendC
-#endif
 
 #include "../../impl/basic_api/kernel_operator_conv2d_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_CONV2D_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_CONV2D_INTF_H__)
