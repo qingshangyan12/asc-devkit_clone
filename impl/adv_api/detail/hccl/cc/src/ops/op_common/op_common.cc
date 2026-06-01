@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "cann_host_bridge.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,7 +117,9 @@ HcclResult Selector(HcclComm comm, OpParam &param, std::unique_ptr<TopoInfoWithN
     // 检查非对称拓扑支持情况，非对称场景仅 AllGather/AllReduce/ReduceScatter 可用
     CHK_RET(CheckAsymmetricTopoSupport(param.opType, topoInfo.get()));
 
-    // 算法选择，选择完后顺便param.algTag设置了，资源的保存是以算子+算法为单位
+    // 算法选择，选择完后顺便param.algTag设置了，资源的保存是以算子+算法为单位。
+    // alltoall/alltoallv/allreduce + aicpu 引擎的 CANN 委托判断已收口到 ExecuteSelector::Run 内部
+    // (经 SelectViaCann 调 libhccl.so, 失败回退本地注册表), 此处统一调 ExecuteSelector::Run 即可。
     std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
     HCCL_INFO("[asc][AlgoSelect][Selector] before ExecuteSelector::Run, opType[%d], opExecuteConfig[%d], "
         "engine[%d].", param.opType, param.opExecuteConfig, param.engine);
@@ -295,11 +298,22 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         return HCCL_E_INTERNAL;
     }
 
+    // 三算子(ALLTOALL/ALLTOALLV/ALLREDUCE) + AICPU 时, 默认经 dlopen libhccl.so 调 CANN
+    // HcclGetAlgRes 产 CANN 布局 resCtx, 与 device 侧 LaunchViaCann 对齐(失败回退 asc 原路径)。
+    // 与 Selector 默认委托 CANN 保持一致, 不再依赖 env 开关。
+    bool useCannResCtx =
+        (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+
+    // CANN 路径下三算子的本地 executor 已被 A5 删除, 且执行走 HcclAicpuKernelEntranceLaunch
+    // (用 resCtxSequence + algName, executor 不参与), 故此处本地 executor 为空不算失败。
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p].",
-        param.opType, algName.c_str(), executor.get());
+    CHK_PRT_RET(executor.get() == nullptr && !useCannResCtx,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p], "
+        "useCannResCtx[%d].", param.opType, algName.c_str(), executor.get(), useCannResCtx);
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
@@ -318,7 +332,7 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] before HcclGetAlgRes, opType[%d], algName[%s], algTag[%s], "
         "engine[%d].", param.opType, algName.c_str(), param.algTag, param.engine);
     HcclResult getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
-        isResourceReused);
+            isResourceReused);
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] after HcclGetAlgRes, ret[%d], resCtxSequence[%p], "
         "isResourceReused[%d], ctxSize[%llu].", getAlgResRet, resCtxSequence, isResourceReused, param.ctxSize);
     CHK_RET(getAlgResRet);
