@@ -14,3 +14,4 @@
 | [simt_and_simd_floor_mod](./simt_and_simd_floor_mod) |  本样例以FloorMod算子为例，展示SIMT与SIMD混合编程的算子开发方式：使用SIMD DataCopy完成数据搬入搬出，float场景使用SIMD计算，int32_t场景使用SIMT计算。 | Ascend 950PR/Ascend 950DT |
 | [simt_and_simd_high_performance](./simt_and_simd_high_performance) |  本样例以FloorMod计算为例，介绍SIMD与SIMT混合编程场景下的性能调优方法，展示SIMT直接访问GM、SIMD RegBase计算、SIMT访问UB以及Warp内访存合并优化的性能差异。 | Ascend 950PR/Ascend 950DT |
 | [simt_gather_with_ub](./simt_gather_with_ub) |  本样例以Gather算子为例，展示SIMD与SIMT混合编程下使用UB提升离散内存访问效率的方法，对比SIMT直接访问GM与预先搬运到UB后再访问的性能差异。 | Ascend 950PR/Ascend 950DT |
+| [simt_and_simd_grid_dim_config](./simt_and_simd_grid_dim_config) |  本样例以Gather+Adds融合计算为例，介绍Ascend C SIMD与SIMT混合编程方式下的gridDim配置和vf函数调用优化思路。 | Ascend 950PR/Ascend 950DT |
