@@ -132,11 +132,7 @@
                 -   [Gemm（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）.md)
 
         -   [Memory矢量计算](SIMD-API/基础API/Memory矢量计算/Memory矢量计算.md)
-            -   [Vector逻辑架构](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Vector逻辑架构.md)
-                -   [Unified Buffer介绍](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Unified-Buffer介绍.md)
-                -   [Unified Buffer内存结构介绍与Bank冲突优化](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Unified-Buffer内存结构介绍与Bank冲突优化.md)
-                -   [内存结构](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/内存结构.md)
-                -   [Bank冲突优化](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Bank冲突优化.md)
+            -   [Vector逻辑架构与Unified Buffer介绍](<SIMD-API/基础API/Memory矢量计算/Vector逻辑架构与Unified Buffer介绍/Vector逻辑架构与Unified Buffer介绍.md>)
 
             -   [SIMD计算说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/SIMD计算说明.md)
                 -   [概述](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/概述.md)
