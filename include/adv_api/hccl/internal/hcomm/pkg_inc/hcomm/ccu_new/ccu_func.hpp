@@ -13,16 +13,8 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <functional>
 #include <tuple>
 #include <type_traits>
-#include <utility>
-#include <vector>
-
-#include "ccu_types.h"
-#include "ccu_data_api_impl.h"
-#include "ccu_variable.hpp"
-#include "ccu_log.h"
 
 namespace ccu {
 
@@ -35,9 +27,6 @@ template <typename C, typename R, typename... A>
 struct FunctorTraits<R (C::*)(A...) const> {
     static constexpr std::size_t Arity = sizeof...(A);
     using ReturnT = R;
-    template <std::size_t I> struct Arg {
-        using type = typename std::tuple_element<I, std::tuple<A...>>::type;
-    };
 };
 
 template <typename C, typename R, typename... A>
@@ -45,20 +34,6 @@ struct FunctorTraits<R (C::*)(A...)> {
     static constexpr std::size_t Arity = sizeof...(A);
     using ReturnT = R;
 };
-
-template <typename Lambda, std::size_t... Is>
-inline std::function<void(Variable*)> MakeBodyImpl(Lambda body, std::index_sequence<Is...>)
-{
-    return [body](Variable* formals) {
-        body(formals[Is]...);
-    };
-}
-
-template <typename Lambda, std::size_t N>
-inline std::function<void(Variable*)> MakeBody(Lambda body)
-{
-    return MakeBodyImpl(body, std::make_index_sequence<N>{});
-}
 
 } // namespace internal
 
