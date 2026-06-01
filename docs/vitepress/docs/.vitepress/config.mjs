@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, copyFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
@@ -516,6 +516,35 @@ export default defineConfig({
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
     }), {
+      name: 'serve-theme-assets',
+      configureServer(server) {
+        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
+        server.middlewares.use(async (req, res, next) => {
+          const file = req.url === '/ascend-logo.svg' ? 'ascend-logo.svg'
+            : req.url === '/favicon.ico' ? 'favicon.ico' : null
+          if (file) {
+            const fp = resolve(themeAssets, file)
+            if (existsSync(fp)) {
+              const mime = file.endsWith('.svg') ? 'image/svg+xml' : 'image/x-icon'
+              res.setHeader('Content-Type', mime)
+              res.end(readFileSync(fp))
+              return
+            }
+          }
+          next()
+        })
+      },
+      writeBundle(options) {
+        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
+        const dest = options.dir
+        if (dest) {
+          for (const f of ['ascend-logo.svg', 'favicon.ico']) {
+            const src = resolve(themeAssets, f)
+            if (existsSync(src)) copyFileSync(src, resolve(dest, f))
+          }
+        }
+      },
+    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
