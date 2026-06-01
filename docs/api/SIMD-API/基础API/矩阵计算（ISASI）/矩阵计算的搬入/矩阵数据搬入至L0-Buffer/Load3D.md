@@ -130,12 +130,12 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |mExtension|该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于b4、b8、b16类型，应为16的倍数，b32类型无要求；覆盖的情况则任何数据类型都无倍数要求。取值范围：mExtension∈[0, 65535]。默认为0。<br>**注：针对Atlas A2/A3系列产品，mExtension = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kStartPt|该指令在目的操作数width维度的起点，对于b32类型，应为8的倍数，对于b16类型，应为16的倍数，对于b8类型，应为32的倍数，对于b4类型，应为64的倍数；取值范围[0, 65535]。默认为0。|
 |mStartPt|该指令在目的操作数height维度的起点，取值范围[0, 65535]。默认为0。|
-|strideW|卷积核在源操作数width维度滑动的步长，取值范围：strideW∈[1, 63]。默认为1。|
-|strideH|卷积核在源操作数height维度滑动的步长，取值范围：strideH∈[1, 63]。默认为1。|
-|filterW|卷积核width，取值范围：filterW∈[1, 255]。默认为1。|
-|filterH|卷积核height，取值范围：filterH∈[1, 255]。默认为1。|
-|dilationFilterW|卷积核width膨胀系数，取值范围：dilationFilterW∈[1, 255]。默认为1。|
-|dilationFilterH|卷积核height膨胀系数，取值范围：dilationFilterH∈[1, 255]。默认为1。|
+|strideW|卷积核在源操作数width维度滑动的步长，取值范围：strideW∈[0, 63]。默认为1。|
+|strideH|卷积核在源操作数height维度滑动的步长，取值范围：strideH∈[0, 63]。默认为1。|
+|filterW|卷积核width，取值范围：filterW∈[0, 255]。默认为1。<br>**注：filterW=0且filterSizeW=false时表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|filterH|卷积核height，取值范围：filterH∈[0, 255]。默认为1。<br>**注：filterH=0且filterSizeH=false时表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|dilationFilterW|卷积核width膨胀系数，取值范围：dilationFilterW∈[0, 255]。默认为1。|
+|dilationFilterH|卷积核height膨胀系数，取值范围：dilationFilterH∈[0, 255]。默认为1。|
 |enTranspose|是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，默认为false。<br>&bull; true：启用<br>&bull; false：不启用<cann-filter npu_type="A3,910b"><br>针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，在目的操作数的物理存储位置为L0A Buffer(TPosition: A2)，且源操作数为b16/b32类型时有效。</cann-filter><cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT，在目的操作数的物理存储位置为L0A Buffer(TPosition: A2)，且源操作数为b8/b16/b32类型时有效。</cann-filter><br>**注：在目的操作数的物理存储位置为L0B Buffer(TPosition: B2)时本参数无效。**|
 |enSmallK|是否开启small k特性，每个分形矩阵大小为16*4，支持数据类型为bool，默认为false。当前产品形态，该特性已不再支持。|
 |padValue|Pad填充值的数值，数据类型需要与src保持一致。若不想开启padding，可将padList设为全0。默认为0。|
@@ -205,12 +205,18 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 ## 约束说明<a id="zh-cn_topic_0000002512171652_section2045914466492"></a>
 
 - 非转置场景下，L1->L0B通路不支持。L1->L0B通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
-- 当目的地址位于L0A/L0B时，地址必须512Byte对齐。当源地址位于L1时，地址必须32Byte对齐。指令执行占用的流水为PIPE_MTE1。
-<cann-filter npu_type="A3,910b">- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：L1-\>L0B通路不支持b4/b8类型数据；转置场景下，L1-\>L0A通路不支持b8数据类型。</cann-filter>
+<cann-filter npu_type="A3,910b">
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：L1-\>L0B通路不支持b4/b8类型数据；转置场景下，L1-\>L0A通路不支持b8数据类型。
+</cann-filter>
 - 当l1H/l1W/channelSize/kExtension/mExtension中的任意一个值为0时，该指令不会被执行。
 - 当filterW为0且filterSizeW为false或者当filterH为0且filterSizeH为false时，该指令不会被执行。
-<cann-filter npu_type="950">- 针对Ascend 950PR/Ascend 950DT：必须使用辅助配置接口SetLoadDataRepeat配置dstStride参数，若不开启repeat模式，接口内repeat相关参数使用默认构造值。</cann-filter>
-<cann-filter npu_type="910,310p">- LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为 4 channel对齐。</cann-filter>
+<cann-filter npu_type="950">
+- 针对Ascend 950PR/Ascend 950DT：必须使用辅助配置接口SetLoadDataRepeat配置dstStride参数，若不开启repeat模式，接口内repeat相关参数使用默认构造值。
+</cann-filter>
+- 当目的地址位于L0A/L0B时，地址必须512Byte对齐。当源地址位于L1时，地址必须32Byte对齐。指令执行占用的流水为PIPE_MTE1。
+<cann-filter npu_type="910,310p">
+- LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为4 channel对齐。
+</cann-filter>
 
 ## 返回值说明<a id="zh-cn_topic_0000002512171652_section640mcpsimp"></a>
 

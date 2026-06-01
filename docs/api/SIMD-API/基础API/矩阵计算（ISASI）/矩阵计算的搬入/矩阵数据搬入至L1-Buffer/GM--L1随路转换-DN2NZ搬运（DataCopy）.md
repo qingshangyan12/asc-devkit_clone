@@ -58,9 +58,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 |参数名称|含义|
 |----------|----------|
-|dnNum|传输DN矩阵的数目，取值范围：dnNum∈[0, 4095]。|
-|nValue|DN矩阵的列数，取值范围：nValue∈[0, 16384]。|
-|dValue|DN矩阵的行数，取值范围：dValue∈[0, 2^21-1]。|
+|dnNum|传输DN矩阵的数目，取值范围：dnNum∈[0, 4095]。<br>**注：dnNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|nValue|DN矩阵的列数，取值范围：nValue∈[0, 16384]。<br>**注：nValue=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|dValue|DN矩阵的行数，取值范围：dValue∈[0, 2^21-1]。<br>**注：dValue=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |srcDnMatrixStride|源操作数相邻DN矩阵起始地址间的偏移，取值范围：srcDnMatrixStride∈[0, 2^40-1]，单位为元素。|
 |srcDValue|源操作数同一DN矩阵的相邻行起始地址间的偏移，取值范围：srcDValue∈[1, 2^40-1]，单位为元素。|
 |dstNzC0Stride|DN转换到NZ格式后，源操作数中的一列会转换为目的操作数的多行。dstNzC0Stride表示，目的NZ矩阵中，来自源操作数同一列的多行数据相邻行起始地址间的偏移，取值范围：dstNzC0Stride∈[1, 65535]，单位：C0_SIZE（32B）。|
