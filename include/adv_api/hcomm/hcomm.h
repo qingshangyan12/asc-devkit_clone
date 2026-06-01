@@ -36,7 +36,7 @@ namespace AscendC {
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  */
-template <CommProtocol commProtocol = COMM_PROTOCOL_ROCE>
+template <CommProtocol commProtocol = COMM_PROTOCOL_UBC_CTP>
 class Hcomm {
 public:
     /*!
@@ -53,7 +53,7 @@ public:
      * @brief The task launching interface of the Write point-to-point communication operator, returns the identifier
      *        handleId. (task content: Write data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
-     * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
      * @param [in] channelPtr: The handle of the communication channel.
@@ -63,7 +63,7 @@ public:
      * @return The identifier(handleId) of Write task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline HcommHandle WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
@@ -71,7 +71,7 @@ public:
      * @class Hcomm
      * @brief The task launching interface of the Write-with-notify point-to-point communication operator.
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
-     * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
      * @param [in] channelPtr: The handle of the communication channel.
@@ -83,7 +83,7 @@ public:
      * @return The identifier(handleId) of Write-with-notify task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
@@ -93,7 +93,7 @@ public:
      * @brief The task launching interface of the Read point-to-point communication operator, returns the identifier
      *        handleId. (task content: Read data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
-     * @tparam commitPipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
      * @param [in] channelPtr: The handle of the communication channel.
@@ -103,18 +103,18 @@ public:
      * @return The identifier(handleId) of Read task. HandleId >= 0 when successful, otherwise return -1.
      * @note Must be called after channel initialization.
      */
-    template <bool commit = true, pipe_t commitPipe = PIPE_MTE3, pipe_t reqPipe = PIPE_MTE3,
+    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline HcommHandle ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
      * @brief Informed that tasks submitted on channel can be executed.
-     * @tparam pipe: The pipe type to use for commit, PIPE_MTE3 supported as default.
+     * @tparam pipe: The pipe type to use for commit, PIPE_S supported as default.
      * @param [in] channelPtr: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
      */
-    template <pipe_t pipe = PIPE_MTE3>
+    template <pipe_t pipe = PIPE_S>
     __aicore__ inline int32_t Commit(ChannelPtr channelPtr);
 
     /*!
