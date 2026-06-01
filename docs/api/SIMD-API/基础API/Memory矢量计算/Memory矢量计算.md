@@ -1,6 +1,6 @@
 # Memory矢量计算<a name="ZH-CN_TOPIC_0000001376097986"></a>
 
--   **[Vector逻辑架构与Unified Buffer介绍](<Vector逻辑架构与Unified Buffer介绍/Vector逻辑架构与Unified Buffer介绍.md>)**  
+-   **[Vector逻辑架构与Unified Buffer介绍](Vector逻辑架构与Unified%20Buffer介绍/Vector逻辑架构与Unified%20Buffer介绍.md)**  
 
 -   **[SIMD计算说明](SIMD计算说明/SIMD计算说明.md)**  
 

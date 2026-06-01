@@ -4,15 +4,17 @@
 
 ### 概述
 
-如下图所示，基于Ascend C开发的算子运行在AI Core上。Ascend C编程模型基于AI Core硬件架构的抽象进行介绍，了解硬件架构能够帮助开发者更好的理解Memory矢量计算接口。
+如下图所示，基于Ascend C开发的算子运行在AI Core上。Ascend C编程模型基于AI Core硬件架构的抽象进行介绍，了解硬件架构能够帮助开发者更好地理解Memory矢量计算接口。
 
-![](https://gitcode.com/cann/asc-devkit/tree/master/docs/guide/figures/概述.png)
+**图 1**  NPU硬件架构
+
+![](../../../../../guide/figures/概述.png)
 
 AI Core负责执行矩阵、矢量计算密集的任务，其包括以下组成部分：
 
 - 计算单元：包括Cube（矩阵）计算单元、Vector（矢量）计算单元和Scalar（标量）计算单元。
 - 存储单元：包括L1 Buffer、L0A Buffer、L0B Buffer、L0C Buffer、**Unified Buffer**、BiasTable Buffer、Fixpipe Buffer等专为高效计算设计的存储单元。
-- 搬运单元：包括MTE1、MTE2、MTE3和FixPipe，用于数据在不同存储单元之间的高效传输。
+- 搬运单元：包括MTE1、MTE2、MTE3和Fixpipe，用于数据在不同存储单元之间的高效传输。
 
 ### 硬件架构说明（含Vector逻辑架构）
 
