@@ -174,6 +174,17 @@ __aicore__ inline decltype(auto) MakeSliceLayout(const Coord& coord, const SrcLa
     return MakePatternLayout<PatternType, TraitType>(sliceShape, srcLayout.Stride());
 }
 
+template <typename LayoutType, typename = Std::enable_if_t<IsLayoutV<LayoutType>>>
+__aicore__ inline constexpr decltype(auto) RemoveBatchDim(const LayoutType& layout)
+{
+    constexpr auto layoutDepth = LayoutType::depth;
+    static_assert(layoutDepth == THREE_DIM_DATA || layoutDepth == FIVE_DIM_DATA,
+        "RemoveBatchDim only supports Three Dim or Five Dim Layout.");
+    using TraitType = GetLayoutTrait<LayoutType>;
+    using PatternType = GetLayoutPattern<LayoutType>;
+    return MakePatternLayout<PatternType, TraitType>(Get<1>(layout.Shape()), Get<1>(layout.Stride()));
+}
+
 } // namespace Te
 } // namespace AscendC
 
