@@ -12,7 +12,7 @@
 | [01_memory_vector_compute](./01_memory_vector_compute) | 本样例路径以reduce、sort、transpose等算子为示例，展示了内存向量计算接口的使用。|
 | [02_reg_vector_compute](./02_reg_vector_compute) | 本路径下包含了与向量计算相关的多个API的样例，基于Reg编程接口实现。|
 | [03_matrix_compute](./03_matrix_compute) | 本样例路径以batch_matmul、fixpipe_co12c1_quantization等算子为示例，展示了矩阵计算接口的使用。|
-| [04_mempry_management](./04_mempry_management) | 本路径下包含了与资源管理相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
+| [04_memory_management](./04_memory_management) | 本路径下包含了与资源管理相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [05_sync_control](./05_sync_control) | 本路径下包含了与同步控制相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [06_atomic](./06_atomic) | 本路径下包含了与原子操作相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [07_tpipe_tque](./07_tpipe_tque) | 本路径下包含了与tpipe和tque相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
