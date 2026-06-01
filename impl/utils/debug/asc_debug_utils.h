@@ -194,21 +194,6 @@ __aicore__ inline void update_write_info(__gm__ DebugBlockWriteInfo* writeInfo, 
     asc_entire_dcci((__gm__ uint64_t*)writeInfo);
 }
 
-__aicore__ inline bool ringbuf_read_wait(__gm__ DebugBlockReadInfo* readInfo)
-{
-    constexpr uint32_t maxCounter = 15;
-    uint32_t counter = 0;
-    while (readInfo->bufOffset == 0) {
-        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
-            return false;
-        }
-        ringbuf_wait_rts_sync(); // wait 20 * 15 ms
-        ++counter;
-        asc_entire_dcci((__gm__ uint64_t*)readInfo);
-    }
-    return true;
-}
-
 __aicore__ inline void ringbuf_skip_directly(__gm__ DebugBlockWriteInfo* writeInfo)
 {
     writeInfo->bufOffset = 0;
@@ -228,12 +213,21 @@ __aicore__ inline void ringbuf_skip_with_info(
     return;
 }
 
-__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo,
-                                             const uint32_t& tlvLen)
+__aicore__ inline void do_overlow_skip(__gm__ DebugBlockWriteInfo* writeInfo, __gm__ uint8_t* ringBufAddr,
+    const uint32_t& ringBufLen, const uint32_t& minTlvLen)
+{
+    if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
+        ringbuf_skip_directly(writeInfo);
+    }
+    ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
+}
+
+__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
     uint32_t counter = 0;
-    while (writeInfo->bufOffset < readInfo->bufOffset && writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
+    // notice all state which need to wait in function check_ringbuf_space has (w != r) before wait
+    while (writeInfo->bufOffset != readInfo->bufOffset) {
         if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
             return false;
         }
@@ -243,6 +237,12 @@ __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo
     }
     return true;
 }
+
+#define IS_RINGBUF_CHECK_STATE_1(w, r) ((w) < (r) && (w) != 0)
+#define IS_RINGBUF_CHECK_STATE_2(w, r) ((w) > (r) && (r) == 0)
+#define IS_RINGBUF_CHECK_STATE_3(w, r) ((w) >= (r) && (r) != 0)
+#define IS_RINGBUF_CHECK_STATE_4(w, r) ((w) < (r) && (w) == 0)
+#define IS_RINGBUF_CHECK_STATE_5(w, r) ((w) == (r) && (w) == 0)
 
 __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen)
 {
@@ -256,23 +256,58 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
 
     if (minTlvLen >= ringBufLen || tlvLen > ringBufLen) {
         return false;
-    } else if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
-        if (!ringbuf_read_wait(readInfo)) { // check read is begin
-            return false;
-        }
-        ringbuf_skip_directly(writeInfo);
-    } else if (writeInfo->bufOffset + tlvLen > ringBufLen) {
-        if (!ringbuf_read_wait(readInfo)) { // check read is begin
-            return false;
-        }
-        ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
     }
-    if (writeInfo->packIdx > 0 &&
-        writeInfo->bufOffset < readInfo->bufOffset &&
-        writeInfo->bufOffset + tlvLen >= readInfo->bufOffset) {
-        return ringbuf_overflow_wait(readInfo, writeInfo, tlvLen);
+    // state witten earlier only switch to a state written later, state 1 + state 4 = (w < r), state2 + state3 + state5 = (w >= r)
+    // w < r, w != 0
+    if (IS_RINGBUF_CHECK_STATE_1(writeInfo->bufOffset, readInfo->bufOffset)) {
+        // make sure w != r after write, or rts won't read
+        if (writeInfo->bufOffset + tlvLen < readInfo->bufOffset) {
+            return true;
+        } else {
+            // wait read finish, then r == w != 0 (belong to state 3)
+            if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
+                return false;
+            }
+        }
     }
-    return true;
+    // w > r, r == 0
+    if (IS_RINGBUF_CHECK_STATE_2(writeInfo->bufOffset, readInfo->bufOffset)) {
+        if (writeInfo->bufOffset + tlvLen <= ringBufLen) {
+            return true;
+        } else {
+            // r = 0, cannot skip directly (lead to r=w), wait util rts read finish.
+            if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
+                return false;
+            }
+            // skip, then w == 0, w < r (belong to state 4)
+            do_overlow_skip(writeInfo, ringBufAddr, ringBufLen, minTlvLen);
+        }
+    }
+    // w >= r, r != 0
+    if (IS_RINGBUF_CHECK_STATE_3(writeInfo->bufOffset, readInfo->bufOffset)) {
+        if (writeInfo->bufOffset + tlvLen <= ringBufLen) {
+            return true;
+        } else {
+            // skip without wait (r != 0), then w == 0, w < r (belong to state 4)
+            do_overlow_skip(writeInfo, ringBufAddr, ringBufLen, minTlvLen);
+        }
+    }
+    // state4: w < r, w == 0
+    if (IS_RINGBUF_CHECK_STATE_4(writeInfo->bufOffset, readInfo->bufOffset)) {
+        if (writeInfo->bufOffset + tlvLen < readInfo->bufOffset) {
+            return true;
+        } else {
+            // wait read finish, then r == w == 0 (belong to state 5)
+            if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
+                return false;
+            }
+        }
+    }
+    // state5: w == r == 0
+    if (IS_RINGBUF_CHECK_STATE_5(writeInfo->bufOffset, readInfo->bufOffset)) {
+        return true;
+    }
+    return false;
 }
 
 template <typename T>
