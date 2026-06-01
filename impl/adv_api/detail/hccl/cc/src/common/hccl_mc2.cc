@@ -15,8 +15,13 @@
 #include "param_check.h"
 #include "hccl_alloc_ctx_res.h"
 #include "op_common.h"
+#include "ccu_assist_pub.h"
+#include "ccu/ccu_types.h"
 
 using namespace mc2_ops_hccl;
+
+extern "C" CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle,
+    const void *taskArgs, uint32_t argSize);
 
 constexpr uint32_t ALG_CONFIG_SIZE = 128;
 struct HcclOpArgs {
@@ -262,4 +267,42 @@ HcclAllocComResourceByTilingA5Mc2(HcclComm comm, void *stream, void *mc2Tiling, 
     HCCL_RUN_INFO("[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
         "comm[%p], stream[%p], tiling[%p].", comm, stream, mc2Tiling);
     return HcclAllocComResourceByTiling(comm, stream, mc2Tiling, opResCtx);
+}
+
+CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
+{
+    CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
+    CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
+
+    const auto *opRes = reinterpret_cast<const OpResCtx *>(opResCtx);
+    CHK_PRT_RET(opRes->algInfo[0].opParam == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opRes->algInfo[0].opParam),
+        CCU_E_PARA);
+    CHK_PRT_RET(opRes->workSpace == 0U || opRes->workSpaceSize == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, workSpace[%llu], workSpaceSize[%llu].",
+            opRes->workSpace, opRes->workSpaceSize),
+        CCU_E_PARA);
+
+    const auto *ctx = reinterpret_cast<const OpParam *>(opRes->algInfo[0].opParam);
+    CHK_PRT_RET(ctx->resCtx == nullptr || ctx->ctxSize == 0U,
+        HCCL_ERROR("invalid ccu op resource ctx, resCtx[%p], ctxSize[%llu].",
+            ctx->resCtx, ctx->ctxSize),
+        CCU_E_PARA);
+
+    auto *resCtx = static_cast<char *>(ctx->resCtx);
+    std::vector<char> seq(resCtx, resCtx + ctx->ctxSize);
+    AlgResourceCtxSerializable resourceCtx;
+    resourceCtx.DeSerialize(seq);
+
+    CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
+    CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
+
+    ThreadHandle threadHandle = resourceCtx.threads[0];
+    CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[0];
+    CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
+    CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
+    CHK_PRT_RET(resourceCtx.argSize != 0U && resourceCtx.taskArgs == nullptr,
+        HCCL_ERROR("invalid taskArgs, taskArgsSize[%u].", resourceCtx.argSize), CCU_E_PTR);
+
+    return HcommCcuKernelLaunch(threadHandle, kernelHandle, resourceCtx.taskArgs, resourceCtx.argSize);
 }
