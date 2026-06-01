@@ -38,6 +38,14 @@ public:
         return HCOMM_SUCCESS;
     }
 
+    template <typename T>
+    __aicore__ inline int32_t Init(const LocalTensor<T>& buff, uint32_t len)
+    {
+        (void)buff;
+        (void)len;
+        return HCOMM_SUCCESS;
+    }
+
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)

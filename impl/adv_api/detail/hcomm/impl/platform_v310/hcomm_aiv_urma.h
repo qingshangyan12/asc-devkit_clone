@@ -227,6 +227,21 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_
     return HCOMM_SUCCESS;
 }
 
+template <typename T>
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTensor<T>& buff, uint32_t len)
+{
+    if (len < HCOMM_URMA_TMP_BUF_SIZE || len > buff.GetSize()) {
+        return HCOMM_FAILED;
+    }
+
+    wqeItem_ = buff.template ReinterpretCast<uint32_t>();
+    cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
+    sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
+    sqCI_ = sqPI_[8];
+    cqCI_ = sqCI_[8];
+    return HCOMM_SUCCESS;
+}
+
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t curHead)
 {

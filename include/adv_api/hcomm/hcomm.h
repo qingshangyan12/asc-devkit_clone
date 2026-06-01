@@ -49,9 +49,19 @@ public:
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
 
     /*!
+     * @brief Initialize Hcomm workspace using LocalTensor.
+     * @tparam T: The element type of the LocalTensor.
+     * @param [in] buff: The LocalTensor buffer provided by caller. Start address must be 32-byte aligned.
+     * @param [in] len: The buffer length in bytes.
+     * @return 0 indicates success and -1 indicates failure.
+     */
+    template <typename T>
+    __aicore__ inline int32_t Init(const LocalTensor<T>& buff, uint32_t len);
+
+    /*!
      * @class Hcomm
-     * @brief The task launching interface of the Write point-to-point communication operator, returns the identifier
-     *        handleId. (task content: Write data of length len from src to dst through the specified channel.)
+     * @brief The task launching interface of the Write point-to-point communication operator.
+ *        (task content: Write data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
@@ -60,7 +70,7 @@ public:
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
-     * @return The identifier(handleId) of Write task. HandleId >= 0 when successful, otherwise return -1.
+     * @return 0 indicates success and -1 indicates failure.
      * @note Must be called after channel initialization.
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
@@ -69,7 +79,7 @@ public:
 
     /*!
      * @class Hcomm
-     * @brief The task launching interface of the Write-with-notify point-to-point communication operator.
+     * @brief @brief The task launching interface of the Write-with-notify point-to-point communication operator.
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
@@ -80,7 +90,7 @@ public:
      * @param [in] len: The length of the data to write, using byte as the basic unit.
      * @param [in] notifyAddr: The remote notify address.
      * @param [in] notifyVal: The remote notify value.
-     * @return The identifier(handleId) of Write-with-notify task. HandleId >= 0 when successful, otherwise return -1.
+     * @return 0 indicates success and -1 indicates failure.
      * @note Must be called after channel initialization.
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
@@ -90,8 +100,8 @@ public:
 
     /*!
      * @class Hcomm
-     * @brief The task launching interface of the Read point-to-point communication operator, returns the identifier
-     *        handleId. (task content: Read data of length len from src to dst through the specified channel.)
+     * @brief The task launching interface of the Read point-to-point communication operator.
+ *        (task content: Read data of length len from src to dst through the specified channel.)
      * @tparam commit: true/false true: commit the task immediately; false: do not commit immediately.
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
@@ -100,7 +110,7 @@ public:
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to read, using byte as the basic unit.
-     * @return The identifier(handleId) of Read task. HandleId >= 0 when successful, otherwise return -1.
+     * @return 0 indicates success and -1 indicates failure.
      * @note Must be called after channel initialization.
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,

@@ -56,6 +56,8 @@ public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
+    template <typename T>
+    __aicore__ inline int32_t Init(const LocalTensor<T>& buff, uint32_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
