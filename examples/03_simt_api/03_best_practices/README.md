@@ -10,3 +10,4 @@
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [00_simt_insert_hash_table](./00_simt_insert_hash_table/) | 样例基于Ascend C SIMT编程方式实现InsertHashTable算子，展示SIMT算子处理复杂业务逻辑能力。        |
 | [01_simt_matrix_transpose](./01_simt_matrix_transpose/)   | 样例基于Ascend C SIMT编程方式实现MatrixTranspose算子，展示Ascend C SIMT编程方式的性能调优思路。 |
+| [02_simt_grid_config](./02_simt_grid_config)   | 样例以Gather+Adds融合计算为例，介绍Ascend C SIMD与SIMT混合编程方式下的gridDim配置和vf函数调用优化思路。 |
