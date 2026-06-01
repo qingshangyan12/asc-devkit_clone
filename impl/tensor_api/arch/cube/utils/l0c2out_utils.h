@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_UTILS_L0C2OUT_UTILS_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "c_api/sys_var/sys_var.h"
 
 namespace AscendC {
 namespace Te {
