@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "ccu_control_api.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -646,6 +647,13 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
         resRequest.notifyNumOnMainThread, resRequest.channels.size());
     CHK_RET(calcResRet);
 
+    // kfc算法kernel资源准备
+    std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+    CHK_PRT_RET(
+        ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
+    CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+
+
     // host侧资源
     if (param.engine == COMM_ENGINE_RESERVED) {
         // COMM_ENGINE_RESERVED
@@ -1131,11 +1139,27 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
         HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
         HCCL_E_INTERNAL);
 
-    // 按照resgroup进行注册
+    // 从通信域查询CCU实例
+    constexpr u32 CCU_INS_MAX_NUM = 1;
+    u32 insNum = 0;
+    CcuInsHandle insHandles[CCU_INS_MAX_NUM] = {0};
+    CHK_RET(HcclCommQueryCcuIns(comm, insHandles, &insNum));
+    CHK_PRT_RET(insNum == 0,
+        HCCL_ERROR("[HcclGetCcuKernel]no CCU instance available"),
+        HCCL_E_INTERNAL);
+    CcuInsHandle insHandle = insHandles[0];
+
+    // 按照resGroup进行分批注册
     u32 currentResGroup = 0;
     u32 maxResGroup = 0;
     resCtxHost->ccuKernels.resize(totalKernelNum);
     while (currentResGroup <= maxResGroup) {
+        // 开始新批次注册
+        CcuResult ccuRet = HcommCcuKernelRegisterStart(insHandle);
+        CHK_PRT_RET(ccuRet != CCU_SUCCESS,
+            HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegisterStart failed, ccuRet[%d]", ccuRet),
+            HCCL_E_INTERNAL);
+
         for (u32 i = 0; i < totalKernelNum; i++) {
             CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
             if (kernelInfo.resGroup > maxResGroup) {
@@ -1144,15 +1168,26 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
             if (kernelInfo.resGroup != currentResGroup) {
                 continue;
             }
-            void* kernelArgPtr = static_cast<void*>(kernelInfo.kernelArg.get()); // 保证没有释放
-            void* creatorPtr = static_cast<void*>(&kernelInfo.creator);
+            const void* kernelFuncPtr = reinterpret_cast<const void*>(&kernelInfo.creator);
+            const void* kernelArgPtr = static_cast<const void*>(kernelInfo.kernelArg.get());
 
-            HCCL_DEBUG("[AllocAlgResource] kernelArgPtr[%p], creator[%p]", kernelArgPtr, &(kernelInfo.creator));
-            CcuKernelHandle handle;
-            CHK_RET(HcclCcuKernelRegister(comm, &handle, creatorPtr, kernelArgPtr));
-            resCtxHost->ccuKernels[i] = handle;
+            HCCL_DEBUG("[HcclGetCcuKernel] kernelFuncPtr[%p], kernelArgPtr[%p]", kernelFuncPtr, kernelArgPtr);
+
+            std::string kernelFuncName = "ccu_kernel_" + std::to_string(i);
+            CcuKernelHandle kernelHandle = 0;
+            ccuRet = HcommCcuKernelRegister(insHandle, kernelFuncName.c_str(),
+                kernelFuncPtr, kernelArgPtr, &kernelHandle);
+            CHK_PRT_RET(ccuRet != CCU_SUCCESS,
+                HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegister failed, ccuRet[%d], kernel[%u]", ccuRet, i),
+                HCCL_E_INTERNAL);
+            resCtxHost->ccuKernels[i] = kernelHandle;
         }
-        CHK_RET(HcclCcuKernelRegisterFinish(comm));
+
+        // 结束新批次注册
+        ccuRet = HcommCcuKernelRegisterEnd(insHandle);
+        CHK_PRT_RET(ccuRet != CCU_SUCCESS,
+            HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegisterEnd failed, ccuRet[%d]", ccuRet),
+            HCCL_E_INTERNAL);
         currentResGroup++;
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
