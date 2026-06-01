@@ -51,7 +51,7 @@ enum class HcommUrmaOpCode : uint32_t {
 };
 
 template <>
-class HcommImpl<CommProtocol::URMA, CommEngine::AIV> {
+class HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV> {
 public:
     __aicore__ inline HcommImpl();
     __aicore__ inline ~HcommImpl();

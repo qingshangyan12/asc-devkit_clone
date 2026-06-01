@@ -29,7 +29,7 @@
 
 namespace AscendC {
 
-__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
+__aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::HcommImpl()
 {
     TBuf<TPosition::VECOUT> rdmaInBuf;
     pipe_.InitBuffer(rdmaInBuf, HCOMM_MEM_BLOCK_SIZE);
@@ -40,10 +40,10 @@ __aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
     ubLocalHead_ = rdmaInBuf2.Get<uint32_t>();
 }
 
-__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::~HcommImpl() {}
+__aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::~HcommImpl() {}
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::WriteNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -55,7 +55,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::ReadNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::ReadNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -67,7 +67,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Re
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
@@ -84,7 +84,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
     return HCOMM_INVALID_HANDLE_ID;
 }
 
-__aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::doorBell(
+__aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::doorBell(
     __gm__ Channel* channelPtr, uint64_t curHead)
 {
     uint64_t doorBellInfo = 0;
@@ -103,7 +103,7 @@ __aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::doorBell(
     AscendC::DataCopyPad(DBGlobalTensor, ubLocal_, copyParams);
 }
 
-__aicore__ inline void HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::PostSend(
+__aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::PostSend(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
 {
     __gm__ Channel* channel = (__gm__ Channel*)channelPtr;

@@ -24,6 +24,7 @@
 #define IMPL_ADV_API_DETAIL_HCOMM_COMMON_HCOMM_INNER_DEF_H
 
 #include <cstdint>
+#include "hcomm/hcomm_common.h"
 
 namespace AscendC {
 
@@ -59,19 +60,6 @@ typedef enum {
     COMM_ENGINE_AIV = 4,
     COMM_ENGINE_CCU = 5,
 } CommEngineType;
-
-typedef enum {
-    COMM_PROTOCOL_RESERVED = -1,
-    COMM_PROTOCOL_HCCS = 0,
-    COMM_PROTOCOL_ROCE = 1,
-    COMM_PROTOCOL_PCIE = 2,
-    COMM_PROTOCOL_SIO = 3,
-    COMM_PROTOCOL_UBC_CTP = 4,
-    COMM_PROTOCOL_UBC_TP = 5,
-    COMM_PROTOCOL_UB_MEM = 6,
-    COMM_PROTOCOL_UBOE = 7,
-    COMM_PROTOCOL_HCCS_ONLY = 8,
-} CommProtocolType;
 
 typedef enum {
     PROTECTION_TYPE_INVALID = -1,
@@ -327,7 +315,7 @@ typedef struct {
 typedef struct {
     CommAbiHeader abiHeader;
     CommEngineType engine;
-    CommProtocolType protocol;
+    CommProtocol protocol;
     uint32_t localNotifyNum;
     uint32_t remoteNotifyNum;
     uint32_t localBufferNum;

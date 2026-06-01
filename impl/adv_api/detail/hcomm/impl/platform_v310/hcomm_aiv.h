@@ -60,7 +60,7 @@ __aicore__ inline uint32_t HtoNL(uint32_t x)
         ((x & byte0Mask) << wordShift));
 }
 
-__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
+__aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::HcommImpl()
 {
     pipe_.InitBuffer(hcommBuf_, HCOMM_TMP_BUF_SIZE);
     wqeItem_ = hcommBuf_.Get<uint32_t>();
@@ -71,9 +71,9 @@ __aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::HcommImpl()
     doorBell_ = cqCI_[8];
 }
 
-__aicore__ inline HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::~HcommImpl() {}
+__aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::~HcommImpl() {}
 
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Init(__ubuf__ uint8_t* buff, uint32_t len)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::Init(__ubuf__ uint8_t* buff, uint32_t len)
 {
     (void)buff;
     (void)len;
@@ -81,7 +81,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Init(_
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Operate(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::Operate(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
@@ -163,7 +163,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Op
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::WriteNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -171,7 +171,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::ReadNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::ReadNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -179,7 +179,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Re
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::WriteWithNotifyNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
@@ -197,7 +197,7 @@ __aicore__ inline HcommHandle HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wr
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::Commit(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
@@ -226,7 +226,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Drain(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE, CommEngine::AIV>::Drain(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);

@@ -118,7 +118,7 @@ protected:
         block_idx = blockIdxBak_;
     }
 
-    int32_t InitHcomm(AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV>& hcomm)
+    int32_t InitHcomm(AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV>& hcomm)
     {
         pipe_.InitBuffer(hcommBuf_, AscendC::HCOMM_URMA_TMP_BUF_SIZE);
         AscendC::LocalTensor<uint8_t> hcommLocal = hcommBuf_.Get<uint8_t>();
@@ -152,7 +152,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId = hcomm.ReadNbi(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), 8);
@@ -167,7 +167,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId = hcomm.WriteNbi<false>(
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8);
@@ -184,7 +184,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
     AscendC::HcommHandle handleId = hcomm.WriteWithNotifyNbi<false>(channel.GetHandle(),
         reinterpret_cast<GM_ADDR>(0x3008), reinterpret_cast<GM_ADDR>(0x5008), 8, reinterpret_cast<GM_ADDR>(0x33), 1);
@@ -202,7 +202,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify_WqeBbCnt)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
 
     // WriteNbi should advance sqPI by 1
@@ -229,7 +229,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_RemoteBufferNotFound)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
 
     // Address completely outside any remote buffer range (remote buffers are at 0x1000-0x2000 and 0x3000-0x4000)
@@ -248,7 +248,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitDrain)
 {
     UrmaChannelResource channel;
 
-    AscendC::Hcomm<AscendC::CommProtocol::URMA, AscendC::CommEngine::AIV> hcomm;
+    AscendC::Hcomm<AscendC::COMM_PROTOCOL_UBC_CTP, AscendC::CommEngine::AIV> hcomm;
     EXPECT_EQ(InitHcomm(hcomm), AscendC::HCOMM_SUCCESS);
 
     AscendC::HcommHandle h0 = hcomm.WriteNbi<false>(

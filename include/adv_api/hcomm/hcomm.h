@@ -37,7 +37,7 @@ namespace AscendC {
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  * @tparam commEngine: The communication engine to use, AIV supported as default.
  */
-template <CommProtocol commProtocol = CommProtocol::ROCE, CommEngine commEngine = CommEngine::AIV>
+template <CommProtocol commProtocol = COMM_PROTOCOL_ROCE, CommEngine commEngine = CommEngine::AIV>
 class Hcomm {
 public:
     /*!
