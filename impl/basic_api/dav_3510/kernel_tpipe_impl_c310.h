@@ -701,9 +701,7 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& readLocal, con
 
 template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
 {
-    Hardware hardType = GetPhyType(pos);
-    ASCENDC_ASSERT((hardType == Hardware::UB), { KERNEL_LOG(KERNEL_ERROR, "hardType should be UB"); });
-    return Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(hardType)];
+    return ::AscendC::GetQueueEndAddress<pos>();
 }
 
 __aicore__ inline void TPipe::DestroyWithoutPipeAll()
