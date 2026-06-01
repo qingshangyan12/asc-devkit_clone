@@ -86,7 +86,7 @@ public:
         WaitFlag<HardEvent::MTE3_MTE2>(eventID);
         __cbuf__ uint32_t* dst = (__cbuf__ uint32_t*)(TOTAL_L1_SIZE);
 #if ASCENDC_CPU_DEBUG
-        dst = (uint32_t*)(GetTPipePtr()->GetBaseAddr(static_cast<uint8_t>(TPosition::A1)) + TOTAL_L1_SIZE);
+        dst = (uint32_t*)(GetBaseAddrCpu(static_cast<uint8_t>(TPosition::A1)) + TOTAL_L1_SIZE);
         *dst = addr;
 #else
         create_cbuf_matrix((__cbuf__ uint32_t*)dst, 0x10001, static_cast<uint32_t>(addr));
