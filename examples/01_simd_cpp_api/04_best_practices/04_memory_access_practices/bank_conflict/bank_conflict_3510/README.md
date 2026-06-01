@@ -105,9 +105,6 @@
 
 ![case1_2](./figures/case1_2.jpg)
 
-- 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
-- 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
-- 每 8 个蓝色数据块（32B）代表 dst 每次 repeat 写入的数据（256B）；
 - 循环展开每次迭代处理 2 个 repeat，共迭代 `total_iterations = 4096 × 4 ÷ 256 ÷ 2 = 32` 次。
 
 ### 分析结论
@@ -125,9 +122,6 @@
 
 ![case1_2](./figures/case1_2.jpg)
 
-- 每 8 个绿色数据块（32B）代表 src0 每次 repeat 读取的数据（256B）；
-- 每 8 个黄色数据块（32B）代表 src1 每次 repeat 读取的数据（256B）；
-- 每 8 个蓝色数据块（32B）代表 dst 每次 repeat 写入的数据（256B）；
 - 未做循环展开，单次迭代处理 1 个 repeat，共迭代 `total_iterations = 4096 × 4 ÷ 256 = 64` 次。
 
 ### 分析结论
