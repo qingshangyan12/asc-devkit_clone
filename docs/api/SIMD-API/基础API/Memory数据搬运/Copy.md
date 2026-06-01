@@ -104,7 +104,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：uint8_t/int8_t/hifloat8_t/fp8_e4m3fn_t/fp8_e5m2_t/fp4x2_e2m1_t/fp4x2_e1m2_t/fp8_e8m0_t/uint16_t/int16_t/half/bfloat16_t/float/uint32_t/int32_t/uint64_t/int64_t<br>&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float<br>&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float<br>&bull; Atlas 200I/500 A2 推理产品，支持的数据类型为：uint16_t/int16_t/half/bfloat16_t/uint32_t/int32_t/float<br>&bull; Kirin X90，支持的数据类型为：half/float/uint16_t/int16_t/uint32_t/int32_t<br>&bull; Kirin 9030，支持的数据类型为：half/float/uint16_t/int16_t/uint32_t/int32_t |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用SetVectorMask接口设置mask值。这种模式下，接口入参中的mask值设置为占位符MASK_PLACEHOLDER，用于占位，无实际含义。 |
+| isSetMask | 参数不生效，保持默认值true即可。 |
 
 **表 2**  参数说明
 

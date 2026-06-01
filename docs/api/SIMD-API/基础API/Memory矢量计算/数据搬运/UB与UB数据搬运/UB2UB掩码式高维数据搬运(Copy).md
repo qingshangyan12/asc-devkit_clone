@@ -43,7 +43,7 @@ DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数�
 | 参数名 | 描述 |
 | --- | --- |
 | T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](SetVectorMask.md#ZH-CN_TOPIC_0000002574024783)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>isSetMask的具体使用方式可参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>isSetMask的具体使用方式可参考[掩码](../../SIMD计算说明/掩码/概述.md)。 |
 
 **表 2**  参数说明
 
@@ -51,9 +51,9 @@ DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数�
 | --- | --- | --- |
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为Unified Buffer，目的地址需要32B对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为Unified Buffer，源地址需要32B对齐。 |
-| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](掩码.md#ZH-CN_TOPIC_0000002573904669)。 |
-| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](高维切分.md#ZH-CN_TOPIC_0000002556644319)。<br>**注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。** |
-| repeatParams | 输入 | 控制操作数地址步长的参数。CopyRepeatParams类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。CopyRepeatParams参数说明请参考[表3](#zh-cn_topic_0000002567699435_table992513120142)。 |
+| mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../../SIMD计算说明/掩码/概述.md)。 |
+| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../../SIMD计算说明/高维切分.md)。**<cann-filter npu-type = "A3,910b"><br>注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter></cann-filter>**|
+| repeatParams | 输入 | 控制操作数地址步长的参数。CopyRepeatParams类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。CopyRepeatParams参数说明请参考表3。 |
 
 **表 3**  CopyRepeatParams结构体参数定义
 
@@ -68,35 +68,89 @@ DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数�
 
 源操作数和目的操作数支持的数据类型保持一致。
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：uint16\_t/int16\_t/half/bfloat16\_t/uint32\_t/int32\_t/float
+<cann-filter npu-type="A3">
 
-Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：uint16\_t/int16\_t/half/bfloat16\_t/uint32\_t/int32\_t/float
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float。
+</cann-filter>
 
-## API映射关系<a name="zh-cn_topic_0000002567699435_section5469132317498"></a>
+<cann-filter npu-type="910b">
 
-与built-in接口映射关系：
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float。
 
-接口是在built-in接口（vcopy）的基础上进行抽象封装实现的，其对应的底层built-in接口为：
+</cann-filter>
 
-```
-void vcopy(__ubuf__ int16_t *dst, __ubuf__ int16_t *src, uint8_t repeat, uint16_t dstStride, uint16_t srcStride, uint16_t dstRepeatSize, uint16_t srcRepeatSize);
+<cann-filter npu-type="310b">
 
-void vcopy(__ubuf__ int32_t *dst, __ubuf__ int32_t *src, uint8_t repeat, uint16_t dstStride, uint16_t srcStride, uint16_t dstRepeatSize, uint16_t srcRepeatSize);
+- Atlas 200I/500 A2 推理产品，支持的数据类型为：uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float。
 
-void vcopy(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src, uint8_t repeat, uint16_t dstStride, uint16_t srcStride, uint16_t dstRepeatSize, uint16_t srcRepeatSize);
+</cann-filter>
 
-void vcopy(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src, uint8_t repeat, uint16_t dstStride, uint16_t srcStride, uint16_t dstRepeatSize, uint16_t srcRepeatSize);
-```
+<cann-filter npu-type="x90">
+
+- Kirin X90，支持的数据类型为：half、float、uint16_t、int16_t、uint32_t、int32_t。
+
+</cann-filter>
+
+<cann-filter npu-type="9030">
+
+- Kirin 9030，支持的数据类型为：half、float、uint16_t、int16_t、uint32_t、int32_t。
+
+</cann-filter>
 
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
--   地址对齐约束参考[地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
+-   位于Unified Buffer的地址必须32B对齐。
 -   操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
--   repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
--   Copy和矢量计算API一样，支持和掩码操作API配合使用。但counter模式配合高维切分计算API时，和[通用的counter模式](接口内设置mask.md#ZH-CN_TOPIC_0000002543264752)有一定差异。具体差异如下：
-    -   通用的counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效**。
+- <cann-filter npu-type = "A3,910b">repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+</cann-filter>
+-   Copy和矢量计算API一样，支持和掩码操作API配合使用。但counter模式配合高维切分计算API时，和[通用的counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
+    -   通用的counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**
     -   Copy高维切分计算API的counter模式：Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
-完整示例可参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/016b968f0528e78580ba95d34cf28faad80fcc96/examples/02_features/07_data_movement/copy)。
+```
+    if constexpr (scenarioNum == 1) {
+        // 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大
+        // mask=64表示每次迭代处理64个int32元素
+        // repeatTime=8表示迭代8次，共处理512个元素
+        // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙
+        // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）
+        uint64_t mask = 64;
+        AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+    } else if constexpr (scenarioNum == 2) {
+        // 场景2：从[18, 64]的数据里搬运[18, 8]的数据量
+        // 源数据shape: [18, 64]，共1152个元素
+        // 目的数据shape: [18, 8]，共144个元素
+        // 每次迭代处理一行中的8个元素，共18次迭代
+        // mask=8：每次迭代处理8个元素
+        // repeatTime=18：迭代18次（对应18行）
+        // srcStride=1, dstStride=1：同一迭代内无间隙
+        // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）
+        // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）
+        uint64_t mask = 8;
+        AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
+    } else if constexpr (scenarioNum == 3) {
+        // 场景3：从[18, 64]搬运[18, 8]数据，counter模式
+        // 源数据shape: [18, 64]，共1152个元素
+        // 目的数据shape: [18, 8]，共144个元素
+        // Counter模式下，Mask代表每次Repeat中处理的元素个数
+        // mask=144：每次迭代处理144个元素
+        // repeatTime=1：迭代1次（对应18行）
+        // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）
+        // dstStride=1：目的数据连续存放无间隙
+        // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效
+        AscendC::SetMaskCount();
+        AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
+        AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});
+        AscendC::SetMaskNorm();
+        AscendC::ResetMask();
+    } else {
+        uint64_t mask = 64;
+        AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+    }
+```
+
+完整样例请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub)。
