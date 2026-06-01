@@ -90,6 +90,47 @@ void load_cbuf_to_ca_stub(__ca__ T* dst, __cbuf__ T* src,
     EXPECT_EQ(transposed, transpose);
 }
 
+template<typename T, int M_STEP, int K_STEP, int SRC_STRIDE, int DST_STRIDE>
+void load_cbuf_to_ca_batch_stub(__ca__ T* dst, __cbuf__ T* src,
+                                uint16_t mStartPosition, uint16_t kStartPosition,
+                                uint8_t mStep, uint8_t kStep,
+                                int16_t srcStride, uint16_t dstStride,
+                                bool transposed) {
+    EXPECT_EQ(mStartPosition, 0);
+    EXPECT_EQ(kStartPosition, 0);
+    EXPECT_EQ(mStep, M_STEP);
+    EXPECT_EQ(kStep, K_STEP);
+    EXPECT_EQ(srcStride, SRC_STRIDE);
+    EXPECT_EQ(dstStride, DST_STRIDE);
+    EXPECT_FALSE(transposed);
+}
+
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL12L0ABatchNz2Nz)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t m = 32;
+    constexpr uint32_t n = 32;
+    __cbuf__ float src[batch * m * n] = {0};
+    __ca__ float dst[batch * m * n] = {0};
+
+    auto noBatchLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n);
+    auto batchLayout = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<float>>(
+        MakeShape(batch, noBatchLayout.Shape()), MakeStride(m * n, noBatchLayout.Stride()));
+    auto l1Tensor = MakeTensorAt<Location::L1>(src, batchLayout);
+    auto l0aTensor = MakeTensorAt<Location::L0A>(dst, batchLayout);
+
+    MOCKER_CPP(load_cbuf_to_ca,
+        void(__ca__ float*, __cbuf__ float*, uint16_t, uint16_t, uint8_t, uint8_t, int16_t, uint16_t, bool))
+        .times(1)
+        .will(invoke(&load_cbuf_to_ca_batch_stub<float, 4, 4, 2, 2>));
+
+    Copy(CopyAtom<CopyTraits<CopyL12L0A, CopyL12L0ATraitDefault>>{}, l0aTensor, l1Tensor);
+
+    mockcpp::GlobalMockObject::verify();
+}
+
 #define MAKE_LAYOUT_TYPE(fmt) fmt##LayoutPtn
 
 #define TEST_TENSOR_API_LOAD_DATA(TYPE, M, N, SRC_FORMAT, DST_FORMAT, SRC_POS, DST_POS, SRC_TAG, DST_TAG, TRANSPOSE, COORD_I, COORD_J) \
