@@ -132,3 +132,7 @@ OPPROF_{timestamp}_XXX/
 - **MindStudio Insight**：打开`visualize_data.bin`或`trace.json`进行可视化呈现。
 
   更多详细内容可以查看msProf工具使用方式，[MindStudio工具调优（msProf）快速入门](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/quick_start/msopprof_quick_start.md)。
+<<<<<<< HEAD
+=======
+
+>>>>>>> 60127faa8 (update ai fix spelling error)

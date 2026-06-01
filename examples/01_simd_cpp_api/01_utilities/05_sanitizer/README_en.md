@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates the usage of the ms_sanitizer debugging tool based on MindStudio. Users can quickly locate abnormal scenarios in the sample based on exception detection results.
+This sample demonstrates the usage of the msSanitizer debugging tool based on MindStudio. Users can quickly locate abnormal scenarios in the sample based on exception detection results.
 
 ## Sample List
 
