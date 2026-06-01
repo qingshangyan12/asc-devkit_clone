@@ -36,10 +36,10 @@ CcuKernelAlltoAllMesh1D::CcuKernelAlltoAllMesh1D(const CcuKernelArg &arg)
     loadFromMem_ = kernelArg->loadFromMem_;
 }
 
-HcclResult CcuKernelAlltoAllMesh1D::InitResource(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
-                                  hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
-                                  hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
-                                  hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4)
+HcclResult CcuKernelAlltoAllMesh1D::InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                  ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                  ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                  ccu::Variable goSize3, ccu::Variable goSize4)
 {
     uint16_t channelIdx = 0;
     if (channels_.size() == 0) {
@@ -56,12 +56,11 @@ HcclResult CcuKernelAlltoAllMesh1D::InitResource(hcomm::CcuRep::Variable inputAd
         } else {
             HCCL_DEBUG("[CcuKernelAlltoAllMesh1D] MyRank[%u], PeerId[%u], ChannelId[%u]",
                        rankId_, peerId, channelIdx);
-            CcuRep::Variable inputVar, outputVar, tokenVar;
-            CHK_RET(CreateVariable(channels_[channelIdx], INPUT_XN_ID, &inputVar));
-            input_.push_back(inputVar); // 获取channel中id=0的Var来传递output
-            CHK_RET(CreateVariable(channels_[channelIdx], OUTPUT_XN_ID, &outputVar));
+            ccu::Variable inputVar = GetResByChannel(channels_[channelIdx], INPUT_XN_ID);
+            input_.push_back(inputVar);
+            ccu::Variable outputVar = GetResByChannel(channels_[channelIdx], OUTPUT_XN_ID);
             output_.push_back(outputVar);
-            CHK_RET(CreateVariable(channels_[channelIdx], TOKEN_XN_ID, &tokenVar));
+            ccu::Variable tokenVar = GetResByChannel(channels_[channelIdx], TOKEN_XN_ID);
             token_.push_back(tokenVar);
             channelIdx++;
         }
@@ -183,7 +182,7 @@ ccu::Func CcuKernelAlltoAllMesh1D([](ccu::Variable inputAddr, ccu::Variable outp
                                        sliceSize, goSize1, goSize2, goSize3, goSize4);
 });
 
-HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+static HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                               ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                               ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                               ccu::Variable goSize3, ccu::Variable goSize4)
