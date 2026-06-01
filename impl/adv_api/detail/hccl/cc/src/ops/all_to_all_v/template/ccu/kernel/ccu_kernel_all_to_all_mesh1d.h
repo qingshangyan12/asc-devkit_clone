@@ -16,6 +16,7 @@
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "ccu_func.hpp"
 
 namespace mc2_ops_hccl {
 
@@ -73,7 +74,10 @@ public:
     CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
-    HcclResult Algorithm() override;
+    HcclResult Algorithm(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
+                        hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
+                        hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
+                        hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4) override;
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
@@ -100,8 +104,10 @@ private:
     hcomm::CcuRep::Variable flag_; // 用以判断是否是第一次重复
     bool loadFromMem_ = false;
 
-    HcclResult InitResource();
-    void LoadArgs();
+    HcclResult InitResource(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
+                            hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
+                            hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
+                            hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4);
     void PreSync();
     void PostSync();
     void DoAlltoAll();
