@@ -48,6 +48,29 @@ def gen_golden_adds():
     return x, y, y.astype(np.float32)
 
 
+def gen_golden_debug():
+    N = 4096
+    x = np.ones(N, dtype=np.float32)
+    y = np.ones(N, dtype=np.float32)
+    golden = np.ones(N, dtype=np.float32)
+    return x, y, golden
+
+
+def gen_golden_adds_512():
+    N = 512
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    return x, y, y.astype(np.float32)
+
+
+def gen_golden_debug_512():
+    N = 512
+    x = np.ones(N, dtype=np.float32)
+    y = np.ones(N, dtype=np.float32)
+    golden = np.ones(N, dtype=np.float32)
+    return x, y, golden
+
+
 def gen_golden_gather(case, repeat=1):
     N = 256
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
@@ -78,8 +101,12 @@ def gen_golden_data(case=1, repeat=1):
         x, y, golden = gen_golden_overlap()
     elif case == 5:                     # AddWithInstrLoadVF
         x, y, golden = gen_golden_dintlv()
-    elif case in (6, 7):               # AddsVF
+    elif case in (6, 7):                  # AddsVF (4096)
         x, y, golden = gen_golden_adds()
+    elif case == 12:                      # AddsVFWithStride1 (512)
+        x, y, golden = gen_golden_adds_512()
+    elif case == 13:                      # AddsVFWithStride2 (512, debug)
+        x, y, golden = gen_golden_debug_512()
     elif case in (8, 9, 10, 11):       # GatherAndScatterVF
         x, y, golden = gen_golden_gather(case, repeat)
     else:

@@ -89,6 +89,15 @@
 | 10 | Gather + Add + Scatter | idx [0,128] 交替 | **同 subbank 不同行冲突** | 0x0000 | 0x0400 | [0,128]×32 交替 | **45,782** | 对比 Case 11 |
 | 11 | Gather + Add + Scatter | idx 全 0 | 全部 coalesce，无冲突 | 0x0000 | 0x0400 | [0]×64 全 0 | 39,582 | 基准参照 |
 
+### DATA_BLOCK_COPY 跨步对比（Case 12-13）
+
+| case | 计算公式 | 场景描述 | 冲突情况 | src0 首地址 | dst 首地址 | 搬运方式 | 打点性能(cycles) | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 12 | dst = src0 + 0 | 横着搬 512 元素，stride=1 | 无冲突 | 0x0000 | 0x4100 | 连续 8 DataBlock | 26,898 | 基准 |
+| 13 | dst = src0 + 0 | **竖着搬 512 元素，stride=8** | **subbank 冲突** | 0x0000 | 0x4100 | 间隔 256B 8 DataBlock | 91,815 | 对比 Case 12 |
+
+> **说明**：Case 12/13 的 `TOTAL_LENGTH = 512`，各计算 512 个 float32，形成对照组对比横着 vs 竖着搬运的 subbank 冲突开销。
+
 各 case 的详细分析见下文对应章节。
 
 ## Case 1：二读一写，三路同 bank——基准
@@ -311,6 +320,54 @@
 - index 全 0，Gather 所有 64 个元素命中同一地址 → 硬件 coalesce 为 1 次读。
 - 性能 39,582 cycles，最快（用于对比 Case 10 的 subbank 冲突开销）。
 
+## Case 12：横着搬（stride=1）——DATA_BLOCK_COPY 连续搬运 512 元素
+
+### 地址解码
+
+| 操作数 | 首地址 | 18 位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id | 全局 bank 编号 |
+| --- | --- | --- | --- | --- | --- |
+| src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 | 0 |
+| dst | `0x4100` | `010000010 0 000 00000` | 0 | 0 | 0 |
+
+### 搬运方式
+
+```
+i=0: src0[0..63]     → dst[0..63]
+i=1: src0[64..127]   → dst[64..127]
+...
+i=7: src0[448..511]  → dst[448..511]
+```
+
+8 轮 × 每轮 64 元素（8 个连续 DataBlock），横着铺满 512 个 float32。
+
+### 分析结论
+
+- `DATA_BLOCK_COPY` stride=1：8 个 DataBlock 连续排布（间隔 32B），等价于普通 `LoadAlign`。
+- 性能 26,898 cycles，作为竖着搬运的基准参照。
+
+## Case 13：竖着搬（stride=8）——DATA_BLOCK_COPY 跨步搬运 512 元素
+
+### 地址解码
+
+同 Case 12 地址配置。
+
+### 搬运方式
+
+```
+i=0: src0[0..7],  src0[64..71],  ..., src0[448..455]  → dst 同上
+i=1: src0[8..15], src0[72..79],..., src0[456..463]  → dst 同上
+...
+i=7: src0[56..63], ..., src0[504..511]  → dst 同上
+```
+
+8 轮 × 8 个 DataBlock，每个 DataBlock 间隔 **256B（stride=8 × 32B = 64 float）**，竖着覆盖 512 个 float32。
+
+### 分析结论
+
+- `DATA_BLOCK_COPY` stride=8：8 个 DataBlock 均从 bank 0 的不同 depth 行读取，命中**同 subbank 不同行** → **subbank 冲突**。
+- Case 13 vs Case 12 = 91,815 vs 26,898 cycles（**慢 3.4x**），直接验证了 VF Load 指令中 subbank 冲突的显著开销。
+- 竖着搬运的 subbank 冲突开销（3.4x）远大于 Gather/Scatter 场景（Case 10 vs 11 的 +15.7%），因为在 **单条 Reg 级 Load 指令内部**，同 subbank 不同行的 8 个 DataBlock 必须串行排队，完全阻塞向量管线。
+
 ## Subbank 冲突规则
 
 A5 每个 bank（32B 宽）分为 4 个 subbank，各 8B 宽 × 512 行深度，各有独立读口：
@@ -338,14 +395,16 @@ subbank 选择：`addr[4:3]`，每 subbank 内 2 个 float32 由 `addr[2]` 区�
 - **循环展开对冲突场景有正收益**：Case 1 vs Case 2 = 80,948 vs 86,249 cycles（+6.5%）。
 - **双搬入无收益**：Case 5 vs Case 1 = 89,893 vs 80,948 cycles（慢 11.0%），3510 上读读冲突不是瓶颈。
 - **VF 层面 bank 冲突不可测**（Case 1 vs 3，Case 6 vs 7 差异在噪声范围）：3510 低位交织 + 2读口/BG + 8 DB 分散到 8 个 BG 使冲突容错性大幅提升。
-- **Subbank 冲突才是真正可测的瓶颈**：Gather/Scatter 的 index 模式直接影响 subbank 排队深度，Case 10 vs Case 11 = 45,782 vs 39,582 cycles（慢 15.7%）。
+- **Subbank 冲突才是真正可测的瓶颈**：
+  - Gather/Scatter：Case 10 vs Case 11 = 45,782 vs 39,582 cycles（慢 15.7%）。
+  - **VF Load 指令内部**：Case 13 vs Case 12 = 91,815 vs 26,898 cycles（**慢 3.4x**），在单条 Reg 级 Load 中，stride=8 的 8 个 DataBlock 全部命中同 subbank 不同行，串行排队阻塞向量管线。
 - **调优优先级**：地址重叠/复用 > 避免 subbank 不同行冲突 > 标量指令优化 > 地址间隔。
 
 ## 目录结构
 
 ```text
 ├── bank_conflict.asc              // 算子 host + device 代码
-├── config.h                      // 11 个 Case 的地址/类型配置
+├── config.h                      // 13 个 Case 的地址/类型配置
 ├── vf_func.h                     // Vector 函数实现
 ├── data_utils.h                  // 数据读写工具
 ├── CMakeLists.txt                // 编译工程
@@ -377,7 +436,7 @@ source /path/to/cann/set_env.sh
 ### 编译与运行（单个 Case）
 
 ```bash
-export CASE_NUM=1          # 1-11 可选
+export CASE_NUM=1          # 1-13 可选
 mkdir -p build && cd build
 cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCASE_NUM=${CASE_NUM}
 make -j
@@ -398,6 +457,6 @@ bash test.sh profile     # 精度验证 + profiling
 | 选项 | 可选值 | 说明 |
 |:----:|:------:|:----|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构版本 |
-| `CASE_NUM` | 1-11 | 切换测试场景 |
+| `CASE_NUM` | 1-13 | 切换测试场景 |
 | `CMAKE_ASC_RUN_MODE` | `npu` | 上板运行模式 |
 
