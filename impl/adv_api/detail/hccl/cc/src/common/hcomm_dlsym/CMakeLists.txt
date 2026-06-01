@@ -53,6 +53,7 @@ else()
         ${TOP_DIR}/hcomm/inc/hccl
         ${TOP_DIR}/hcomm/pkg_inc
         ${TOP_DIR}/hcomm/pkg_inc/hccl
+        ${TOP_DIR}/hcomm/ccu
         ${TOP_DIR}/hcomm/pkg_inc/hcomm/ccu
         ${TOP_DIR}/hcomm/include
         ${TOP_DIR}/hcomm/include/hccl
@@ -124,6 +125,7 @@ if(PRODUCT_SIDE STREQUAL "host")
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
+        ccu_func_dl.cc
     )
 endif()
 
