@@ -21,12 +21,6 @@ namespace AscendC {
 using HcommHandle = int32_t;
 using ChannelPtr = uint64_t;
 
-enum class CommEngine {
-    AIV = 0,
-    AICPU,
-    CCU,
-};
-
 /**
  * @brief 通信协议类型枚举
  */

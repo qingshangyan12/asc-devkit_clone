@@ -201,11 +201,11 @@ __aicore__ inline void HcommUrmaDumpCqeCtx(__ubuf__ HcommUrmaJfcCqeCtx* cqeCtx)
         cqeCtx->inlineData[0], cqeCtx->inlineData[1], cqeCtx->inlineData[2]);
 }
 
-__aicore__ inline HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::HcommImpl() {}
+__aicore__ inline HcommImpl<COMM_PROTOCOL_UBC_CTP>::HcommImpl() {}
 
-__aicore__ inline HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::~HcommImpl() {}
+__aicore__ inline HcommImpl<COMM_PROTOCOL_UBC_CTP>::~HcommImpl() {}
 
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Init(__ubuf__ uint8_t* buff, uint32_t len)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_t* buff, uint32_t len)
 {
     if (len < HCOMM_URMA_TMP_BUF_SIZE) {
         return HCOMM_FAILED;
@@ -227,7 +227,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Ini
     return HCOMM_SUCCESS;
 }
 
-__aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::PollCqWhenSqOverflow(
+__aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     ChannelPtr channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t curHead)
 {
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
@@ -246,7 +246,7 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::PollCq
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::PostSend(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     ChannelPtr channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commitPipe;
@@ -311,7 +311,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>:
     return handleId;
 }
 
-__aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::PollCq(
+__aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
     ChannelPtr channel, uint32_t expectIdx)
 {
     if (expectIdx == 0) {
@@ -380,21 +380,21 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Po
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::WriteNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(channel, dst, src, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::ReadNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::WriteWithNotifyNbi(
+__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteWithNotifyNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(
@@ -402,7 +402,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>:
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Commit(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
@@ -419,7 +419,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Com
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP, CommEngine::AIV>::Drain(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;

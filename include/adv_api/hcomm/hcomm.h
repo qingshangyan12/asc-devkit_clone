@@ -35,9 +35,8 @@ namespace AscendC {
  * corresponding comm task. 5) Call the Drain interface (blocking) to wait for the server to complete the corresponding
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
- * @tparam commEngine: The communication engine to use, AIV supported as default.
  */
-template <CommProtocol commProtocol = COMM_PROTOCOL_ROCE, CommEngine commEngine = CommEngine::AIV>
+template <CommProtocol commProtocol = COMM_PROTOCOL_ROCE>
 class Hcomm {
 public:
     /*!
@@ -128,7 +127,7 @@ public:
     template <pipe_t pipe = PIPE_MTE3>
     __aicore__ inline int32_t Drain(ChannelPtr channelPtr);
 private:
-    HcommImpl<commProtocol, commEngine> impl_;
+    HcommImpl<commProtocol> impl_;
 };
 } // namespace AscendC
 
