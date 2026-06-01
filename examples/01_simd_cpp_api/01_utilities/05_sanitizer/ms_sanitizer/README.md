@@ -1,10 +1,10 @@
-# msSanitizer样例说明
+# mssanitizer样例说明
 
 ## 概述
 
-msSanitizer用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过`mssanitizer`运行样例并定位异常。
+mssanitizer用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过`mssanitizer`运行样例并定位异常。
 
-本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`mssanitizer.asc`，重新编译后通过`mssanitizer`体验对应异常检测能力。
+本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`ms_sanitizer.asc`，重新编译后通过`mssanitizer`体验对应异常检测能力。
 
 请参考[算子开发工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中的“环境准备”章节，获取详细的安装指南和步骤。
 
@@ -16,9 +16,9 @@ msSanitizer用于检测Ascend C样例运行过程中的内存访问、内存泄�
 ## 目录结构介绍
 
 ```
-├── msSanitizer
+├── ms_sanitizer
 │   ├── CMakeLists.txt       // 编译工程文件
-│   ├── mssanitizer.asc      // Ascend C样例实现和Host侧调用样例
+│   ├── ms_sanitizer.asc      // Ascend C样例实现和Host侧调用样例
 │   └── README.md            // 样例说明
 ```
 
@@ -34,7 +34,7 @@ z = x + y
 
 ## 异常场景检测
 
-复现异常场景时，需要先按对应说明修改`mssanitizer.asc`中的代码，再在`build`目录下重新编译并运行对应检测命令。如果只修改源码但没有重新编译，`mssanitizer`仍会运行旧的`demo`，不会检测到新改入的错误。
+复现异常场景时，需要先按对应说明修改`ms_sanitizer.asc`中的代码，再在`build`目录下重新编译并运行对应检测命令。如果只修改源码但没有重新编译，`mssanitizer`仍会运行旧的`demo`，不会检测到新改入的错误。
 
 - **内存检测**
 
