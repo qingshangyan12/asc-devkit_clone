@@ -13,8 +13,13 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <functional>
 #include <tuple>
 #include <type_traits>
+#include <vector>
+
+#include "ccu_log.h"
+#include "ccu_variable.hpp"
 
 namespace ccu {
 

@@ -16,40 +16,6 @@
 #include "ccu_log.h"
 #include "mc2_type.h"
 
-namespace ccu {
-template <Func& Obj, typename... Args>
-inline CcuResult CallFunc(Args... args)
-{
-    constexpr std::size_t kArgN = sizeof...(Args);
-    if (static_cast<uint32_t>(kArgN) != Obj.NumIn()) {
-        return CcuResult::CCU_E_PARA;
-    }
-
-    uint64_t handle = 0;
-    CCU_CHK_RET(::CcuFuncBlockLookup(Obj.Key(), &handle));
-    if (handle == 0) {
-        CCU_CHK_RET(::CcuFuncBlockBegin(Obj.Key(), &handle));
-
-        std::vector<Variable> formals(Obj.NumIn());
-        for (uint32_t i = 0; i < Obj.NumIn(); i++) {
-            CCU_CHK_RET(::CcuVariableAlloc(&formals[i].handle));
-            CCU_CHK_RET(::CcuFuncDefineInArg(handle, formals[i].handle));
-        }
-
-        CCU_CHK_RET(::CcuFuncBlockEnd(handle));
-    }
-
-    std::vector<::CcuVariableHandle> actuals(kArgN);
-    {
-        std::size_t i = 0;
-        using expand_t = int[];
-        (void)expand_t{0, ((void)(actuals[i++] = args.handle), 0)...};
-        (void)i;
-    }
-    return ::CcuFuncCall(handle, actuals.empty() ? nullptr : actuals.data(), static_cast<uint32_t>(kArgN));
-}
-} // namespace ccu
-
 namespace mc2_ops_hccl {
 
 using namespace hcomm;
