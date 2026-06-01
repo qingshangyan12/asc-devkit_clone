@@ -1,16 +1,24 @@
 ---
-name: default-skills
+name: public-skills
 description: |
-  **必须触发此 default-skills 的场景**（用户提到以下任何内容时使用）：找不到/缺失/安装/更新 gitcode-pr, gitcode-issue, api-doc-generator, gitcode-pipeline skill时，或者安装必备/默认/必要/必须skills时；
+  **必须触发此 public-skills 的场景**（用户提到以下任何内容时使用）：找不到/缺失/安装/更新 gitcode-pr, gitcode-issue, api-doc-generator, gitcode-pipeline skill时，或者安装公共/必备/必要/必须skills时；
 ---
 
-## 安装默认skills步骤
+## 安装公共skills步骤
 
-1. 读取`.agent/skills/default-skills/scripts/install-default-skills.sh` 获取 `DEFAULT_SKILLS`
-2. 首先尝试使用 `.agent/skills/default-skills/scripts/install-default-skills.sh` 安装或更新skills，执行后检查 `.agent/skills/_remote/`目录有没有`DEFAULT_SKILLS`，如果有立即结束；如果没有，继续下一步
-3. 使用git克隆`https://gitcode.com/cann-agent/skills.git` 到临时目录，要使用`--depth 1`参数，该仓下找到`DEFAULT_SKILLS`，拷贝到`.agent/skills/_remote/`目录下
+1. 读取`.agent/skills/public-skills/scripts/install-public-skills.sh` 获取 `PUBLIC_SKILLS`
+2. 首先尝试使用 `.agent/skills/public-skills/scripts/install-public-skills.sh` 安装或更新skills，执行后检查 `.agent/skills/_remote/`目录有没有`PUBLIC_SKILLS`，如果有立即结束；如果没有，继续下一步
+3. 使用git克隆`https://gitcode.com/cann-agent/skills.git` 到临时目录，要使用`--depth 1`参数，该仓下找到`PUBLIC_SKILLS`，拷贝到`.agent/skills/_remote/`目录下
 
-## 默认skills使用场景
+## 更新规则
+
+1. 每次执行安装脚本都会重新克隆远端仓库`https://gitcode.com/cann-agent/skills.git`，以远端仓库当前`HEAD`作为公共skill版本来源。
+2. 对`PUBLIC_SKILLS`中的每个skill，若远端存在同名目录，先删除本地缓存中的同名目录`.agent/skills/_remote/<skill>`，再完整拷贝远端目录，避免旧文件残留。
+3. 每次安装或更新后都重新创建一级入口软链`.agent/skills/<skill> -> _remote/<skill>`，并删除可能存在的同名本地目录或旧软链。
+4. `.gitignore`更新是幂等的，只补充缺失的`.agent/skills/_remote/`和`.agent/skills/<skill>`条目，不重复追加。
+5. 如果`PUBLIC_SKILLS`中的某个skill在远端仓库缺失，只输出告警，不在本地伪造目录或软链；执行后必须检查`.agent/skills/_remote/`确认实际安装结果。
+
+## 公共skills使用场景
 
 1. **必须触发 gitcode-issue 的场景**（用户提到以下任何内容时使用）：
 - 查看/读取 issue：查看issue、看看issue、读取issue、打开issue、issue详情、issue是什么

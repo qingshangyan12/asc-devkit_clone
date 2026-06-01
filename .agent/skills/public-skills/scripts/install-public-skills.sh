@@ -11,8 +11,8 @@
 
 set -e
 
-# 脚本功能：安装项目必备的 skills
-DEFAULT_SKILLS=("gitcode-pr" "gitcode-issue" "api-doc-generator" "gitcode-pipeline")
+# 脚本功能：安装或更新项目公共 skills
+PUBLIC_SKILLS=("gitcode-pr" "gitcode-issue" "api-doc-generator" "gitcode-pipeline")
 
 CONNECT_TIMEOUT=5
 CLONE_TIMEOUT=20
@@ -81,7 +81,7 @@ if [ ! -d "$TEMP_DIR/skills/skills" ]; then
 fi
 
 echo "Installing skills..."
-for skill in "${DEFAULT_SKILLS[@]}"; do
+for skill in "${PUBLIC_SKILLS[@]}"; do
     if [ -d "$TEMP_DIR/skills/skills/$skill" ]; then
         rm -rf "$REMOTE_DIR/$skill"
         cp -r "$TEMP_DIR/skills/skills/$skill" "$REMOTE_DIR/"
@@ -98,7 +98,7 @@ if [ -f "$GITIGNORE" ]; then
         echo ".agent/skills/_remote/" >> "$GITIGNORE"
     fi
 
-    for skill in "${DEFAULT_SKILLS[@]}"; do
+    for skill in "${PUBLIC_SKILLS[@]}"; do
         ENTRY=".agent/skills/$skill"
         if ! grep -qxF "$ENTRY" "$GITIGNORE"; then
             echo "$ENTRY" >> "$GITIGNORE"
