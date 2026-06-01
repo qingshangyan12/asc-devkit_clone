@@ -24,7 +24,7 @@
 #define IMPL_ADV_API_DETAIL_HCOMM_COMMON_HCOMM_INNER_DEF_H
 
 #include <cstdint>
-#include "hcomm/hcomm_common.h"
+#include "../../../../../include/adv_api/hcomm/hcomm_common.h"
 
 namespace AscendC {
 
