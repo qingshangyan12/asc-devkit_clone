@@ -19,6 +19,7 @@
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "ccu_variable.hpp"
 #include "../ccu_temp_kfc_server.h"
 #include "mc2_type.h"
 

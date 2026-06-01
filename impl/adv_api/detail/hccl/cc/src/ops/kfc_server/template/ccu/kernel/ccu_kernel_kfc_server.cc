@@ -10,6 +10,10 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_func.hpp"
+#include "ccu_variable.hpp"
+#include "ccu_func_dl.h"
+#include "ccu_log.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -206,10 +210,10 @@ void Mc2KfcServer::GenCircularQueue()
             CCU_BREAK;
         }
 
-        hcomm::ccu::Variable opType;
+        ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
+            ccu::CallFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
         }
 
         MissionPostSync();
@@ -310,10 +314,10 @@ void Mc2SlaveKfcServer::GenCircularQueue()
 
         // 读取本轮参数
         LoadFuncParamFromMemory(paramAddr, param);
-        hcomm::ccu::Variable opType;
+        ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::callFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
+            ccu::CallFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
         }
 
         MissionPostSync();
