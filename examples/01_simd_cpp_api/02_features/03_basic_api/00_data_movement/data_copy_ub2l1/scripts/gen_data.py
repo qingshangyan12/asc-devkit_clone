@@ -38,6 +38,7 @@ def nd_to_nz_for_matrix_a(data_nd):
     for m_block in range(0, m_aligned, BLOCK_CUBE):
         for k_block in range(0, k_aligned, BLOCK_CUBE):
             block = data_nz[m_block:m_block+BLOCK_CUBE, k_block:k_block+BLOCK_CUBE]
+            # Mmad硬件NZ格式A矩阵块内为行主序排列，使用flatten()（行主序展平）而非block.T.flatten()（列主序）
             block_flat = block.flatten()
             start = block_idx * CUBE_BLOCK_SIZE
             nz_result.flat[start:start + CUBE_BLOCK_SIZE] = block_flat
@@ -63,6 +64,7 @@ def nd_to_nz_for_matrix_b(data_nd):
     
     nz_result = np.zeros_like(data_nz)
     block_idx = 0
+    # NZ格式B矩阵在内存中为连续分形布局：先沿n轴排列分形，再沿k轴排列，因此遍历顺序为n_block→k_block
     for n_block in range(0, n_aligned, BLOCK_CUBE):
         for k_block in range(0, k_aligned, BLOCK_CUBE):
             block = data_nz[k_block:k_block+BLOCK_CUBE, n_block:n_block+BLOCK_CUBE]
@@ -82,7 +84,7 @@ def gen_golden_data_simple():
     n = 32
     k = 32
 
-    # 生成ND格式的数据
+    # 使用arange生成每个元素值不同的数据，全1数据(np.ones)无法检测NZ转换逻辑是否正确（转置错误时矩阵乘结果仍正确）
     x1_nd = np.arange(1, m * k + 1).reshape([m, k]).astype(np.float16)
     x2_nd = np.arange(1, k * n + 1).reshape([k, n]).astype(np.float16)
     
