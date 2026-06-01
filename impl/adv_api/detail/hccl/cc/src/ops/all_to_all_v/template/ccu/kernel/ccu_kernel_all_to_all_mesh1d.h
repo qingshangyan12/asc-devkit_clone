@@ -76,7 +76,7 @@ public:
     HcclResult Algorithm(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
                         hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
                         hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
-                        hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4) override;
+                        hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4);
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:

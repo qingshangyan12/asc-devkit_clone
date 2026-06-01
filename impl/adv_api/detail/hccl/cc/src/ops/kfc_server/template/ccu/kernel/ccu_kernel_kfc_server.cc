@@ -10,6 +10,7 @@
 
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_kfc_server.h"
+#include "ccu_func.hpp"
 #include "ccu_func_dl.h"
 #include "mc2_type.h"
 
