@@ -33,7 +33,7 @@ namespace Internal {
 __aicore__ inline TEventID FetchEventIDImpl(HardEvent evt)
 {
     const auto eventIndex = EventToIndex(evt);
-    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    auto lastId = sff0(Internal::g_occupyEventPool + eventIndex);
     ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT));
@@ -43,7 +43,7 @@ __aicore__ inline TEventID FetchEventIDImpl(HardEvent evt)
 template <HardEvent evt> __aicore__ inline TEventID FetchEventIDImpl()
 {
     constexpr auto eventIndex = EventToIndex(evt);
-    auto lastId = sff0(Internal::g_occupyEventPool[eventIndex]);
+    auto lastId = sff0(Internal::g_occupyEventPool + eventIndex);
     ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT));
