@@ -35,7 +35,7 @@ __aicore__ inline T GetReduceRepeatSumSpr()
 
 ## 数据类型
 
-操作数支持的数据类型为：half/float。
+操作数支持的数据类型为：`half`/`float`。
 
 ## 返回值说明
 
