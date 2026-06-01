@@ -73,7 +73,8 @@ function parseMdSidebar(filePath, urlPrefix) {
   function addCollapsed(items) {
     return items.map(item => {
       if (item.items && item.items.length > 0) {
-        return { ...item, collapsed: true, items: addCollapsed(item.items) }
+        const { link, ...rest } = item
+        return { ...rest, collapsed: true, items: addCollapsed(item.items) }
       }
       return item
     })
@@ -537,7 +538,13 @@ export default defineConfig({
     },
   },
 
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }],
+  ],
+
   themeConfig: {
+    logo: '/ascend-logo.svg',
+
     nav: [
       { text: '首页', link: '/' },
       { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
