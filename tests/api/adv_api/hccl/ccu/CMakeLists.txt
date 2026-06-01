@@ -33,6 +33,7 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_LOCAL_PKG_INC}
     ${HCCL_LOCAL_PKG_INC}/hccl
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
     ${HCCL_LOCAL_PKG_INC}/hcomm/ccu
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
