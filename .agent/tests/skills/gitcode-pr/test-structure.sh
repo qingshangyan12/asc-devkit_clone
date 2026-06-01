@@ -16,9 +16,9 @@ REPO_ROOT="$(cd "${TEST_DIR}/../../../.." && pwd)"
 SKILLS_DIR="${REPO_ROOT}/.agent/skills"
 SKILL_LINK="${SKILLS_DIR}/gitcode-pr"
 REMOTE_SKILL="${SKILLS_DIR}/_remote/gitcode-pr"
-DEFAULT_SKILL_DIR="${SKILLS_DIR}/default-skills"
-DEFAULT_SKILL_FILE="${DEFAULT_SKILL_DIR}/SKILL.md"
-INSTALL_SCRIPT="${DEFAULT_SKILL_DIR}/scripts/install-default-skills.sh"
+PUBLIC_SKILL_DIR="${SKILLS_DIR}/public-skills"
+PUBLIC_SKILL_FILE="${PUBLIC_SKILL_DIR}/SKILL.md"
+INSTALL_SCRIPT="${PUBLIC_SKILL_DIR}/scripts/install-public-skills.sh"
 
 fail() {
     echo "[FAIL] $*" >&2
@@ -41,8 +41,8 @@ expect_symlink() {
     [[ -L "$path" ]] || fail "missing symlink: $path"
 }
 
-expect_dir "$DEFAULT_SKILL_DIR"
-expect_file "$DEFAULT_SKILL_FILE"
+expect_dir "$PUBLIC_SKILL_DIR"
+expect_file "$PUBLIC_SKILL_FILE"
 expect_file "$INSTALL_SCRIPT"
 [[ -x "$INSTALL_SCRIPT" ]] || fail "install script must be executable: $INSTALL_SCRIPT"
 
