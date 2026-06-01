@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "cann_host_bridge.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,13 +117,31 @@ HcclResult Selector(HcclComm comm, OpParam &param, std::unique_ptr<TopoInfoWithN
     // 检查非对称拓扑支持情况，非对称场景仅 AllGather/AllReduce/ReduceScatter 可用
     CHK_RET(CheckAsymmetricTopoSupport(param.opType, topoInfo.get()));
 
-    // 算法选择，选择完后顺便param.algTag设置了，资源的保存是以算子+算法为单位
-    std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
-    HCCL_INFO("[asc][AlgoSelect][Selector] before ExecuteSelector::Run, opType[%d], opExecuteConfig[%d], "
-        "engine[%d].", param.opType, param.opExecuteConfig, param.engine);
-    HcclResult selectRet = collAlgSelector->Run(param, topoInfo.get(), algName);
-    HCCL_INFO("[asc][AlgoSelect][Selector] after ExecuteSelector::Run, ret[%d], algName[%s], "
-        "opExecuteConfig[%d], engine[%d].", selectRet, algName.c_str(), param.opExecuteConfig, param.engine);
+    // 算法选择，选择完后顺便param.algTag设置了，资源的保存是以算子+算法为单位。
+    // 三算子(ALLTOALL/ALLTOALLV/ALLREDUCE)的本地 selector 已被 A5 删除, 默认委托 libhccl.so
+    // 的 ops_hccl::ExecuteSelector::Run(经 SelectViaCann); 委托失败再回退本地 ExecuteSelector。
+    // 其余算子(allgather/reduce_scatter 等)维持本地 selector。
+    bool useCannSelector = (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+                            param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+                            param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+    HcclResult selectRet = HCCL_SUCCESS;
+    if (useCannSelector) {
+        HCCL_INFO("[asc][AlgoSelect][Selector] before SelectViaCann, opType[%d], opExecuteConfig[%d], "
+            "engine[%d].", param.opType, param.opExecuteConfig, param.engine);
+        selectRet = SelectViaCann(param, topoInfo.get(), algName);
+        if (selectRet != HCCL_SUCCESS) {
+            HCCL_WARNING("[asc][AlgoSelect][Selector] SelectViaCann failed (ret=%d), fallback to local "
+                "ExecuteSelector. opType[%d].", selectRet, param.opType);
+        }
+    }
+    if (!useCannSelector || selectRet != HCCL_SUCCESS) {
+        std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
+        HCCL_INFO("[asc][AlgoSelect][Selector] before ExecuteSelector::Run, opType[%d], opExecuteConfig[%d], "
+            "engine[%d].", param.opType, param.opExecuteConfig, param.engine);
+        selectRet = collAlgSelector->Run(param, topoInfo.get(), algName);
+        HCCL_INFO("[asc][AlgoSelect][Selector] after ExecuteSelector::Run, ret[%d], algName[%s], "
+            "opExecuteConfig[%d], engine[%d].", selectRet, algName.c_str(), param.opExecuteConfig, param.engine);
+    }
     CHK_RET(selectRet);
     if (algName == "") {
         HCCL_ERROR("[Selector] select algname fail!");
@@ -295,11 +314,22 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         return HCCL_E_INTERNAL;
     }
 
+    // 三算子(ALLTOALL/ALLTOALLV/ALLREDUCE) + AICPU 时, 默认经 dlopen libhccl.so 调 CANN
+    // HcclGetAlgRes 产 CANN 布局 resCtx, 与 device 侧 LaunchViaCann 对齐(失败回退 asc 原路径)。
+    // 与 Selector 默认委托 CANN 保持一致, 不再依赖 env 开关。
+    bool useCannResCtx =
+        (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+
+    // CANN 路径下三算子的本地 executor 已被 A5 删除, 且执行走 HcclAicpuKernelEntranceLaunch
+    // (用 resCtxSequence + algName, executor 不参与), 故此处本地 executor 为空不算失败。
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p].",
-        param.opType, algName.c_str(), executor.get());
+    CHK_PRT_RET(executor.get() == nullptr && !useCannResCtx,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p], "
+        "useCannResCtx[%d].", param.opType, algName.c_str(), executor.get(), useCannResCtx);
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
@@ -317,8 +347,26 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
 
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] before HcclGetAlgRes, opType[%d], algName[%s], algTag[%s], "
         "engine[%d].", param.opType, algName.c_str(), param.algTag, param.engine);
-    HcclResult getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
-        isResourceReused);
+    HcclResult getAlgResRet = HCCL_SUCCESS;
+    if (useCannResCtx) {
+        getAlgResRet = GetAlgResViaCann(comm, param, topoInfo.get(), algName, &resCtxSequence, param.ctxSize);
+        if (getAlgResRet != HCCL_SUCCESS) {
+            // CANN 失败时回退本地 HcclGetAlgRes; 但本地 executor 为空(三算子已被 A5 删)则无法回退,
+            // 直接返回 CANN 错误, 避免向 HcclGetAlgRes 传入空 executor。
+            if (executor.get() == nullptr) {
+                HCCL_ERROR("[HostResCtxBridge] CANN path failed (ret=%d) and no local executor for algName[%s], "
+                    "cannot fallback.", static_cast<int>(getAlgResRet), algName.c_str());
+            } else {
+                HCCL_WARNING("[HostResCtxBridge] CANN path failed (ret=%d), fallback to asc path. algName[%s]",
+                    static_cast<int>(getAlgResRet), algName.c_str());
+                getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
+                    isResourceReused);
+            }
+        }
+    } else {
+        getAlgResRet = HcclGetAlgRes(comm, param, executor, topoInfo.get(), resCtxHost, &resCtxSequence,
+            isResourceReused);
+    }
     HCCL_INFO("[asc][AlgoResource][HcclExecOp] after HcclGetAlgRes, ret[%d], resCtxSequence[%p], "
         "isResourceReused[%d], ctxSize[%llu].", getAlgResRet, resCtxSequence, isResourceReused, param.ctxSize);
     CHK_RET(getAlgResRet);
