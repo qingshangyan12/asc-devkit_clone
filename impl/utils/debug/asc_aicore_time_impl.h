@@ -135,7 +135,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_2(pipe, idx)
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if 0
 __aicore__ inline void TRACE_START_1(TraceId apid)
 {}
 __aicore__ inline void TRACE_STOP_1(TraceId apid)

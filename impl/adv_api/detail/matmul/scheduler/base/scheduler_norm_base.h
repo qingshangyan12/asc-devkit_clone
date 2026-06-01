@@ -253,7 +253,7 @@ protected:
         if constexpr (IsStaticPaddingEnable(MM_CFG)) {
             bL0Params.axisL1Len = CeilAlign(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN(), BLOCK_CUBE);
             bL0Params.axisL0Len = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
-#if __NPU_ARCH__ == 5102
+#if 0
             bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), c0SizeB_);
 #else
             bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(), c0Size_);
@@ -275,7 +275,7 @@ protected:
             if constexpr (IsBasic(MM_CFG)) {
                 bL0Params.axisL1Offset = 0;
                 if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportLoad2dV2()) {
-#if __NPU_ARCH__ == 5102
+#if 0
                     bL0Params.kAxisL1Len =
                         (IsSupportB4<TransBT>() || IsSupportB8<TransBT>()) ?
                             CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<false>(), c0SizeB_) :
@@ -293,7 +293,7 @@ protected:
                     MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
             }
             if (MATMUL_MODULE(MatmulShapeInfo)->template IsTransposeB<IS_INTRA_BLOCK>()) {
-#if __NPU_ARCH__ == 5102
+#if 0
                 bL0Params.kAxisL1Len =
                     CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->template GetSingleCoreK<IS_INTRA_BLOCK>(), c0SizeB_);
 #else
@@ -339,7 +339,7 @@ protected:
             if constexpr (IS_INTRA_BLOCK) {
                 bL0Params.kAxisL1Len = MATMUL_MODULE(KLoop)->template GetTileBlockShapeB<true>() * c0Size_;
             } else {
-#if __NPU_ARCH__ == 5102
+#if 0
                 bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeB(), c0SizeB_);
 #else
                 bL0Params.kAxisL1Len = MATMUL_MODULE(KLoop)->GetTileBlockShapeB() * c0Size_;
@@ -416,7 +416,7 @@ protected:
 
     bool isFirstIter_ = true;
     constexpr static int32_t c0Size_ = AuxGetC0Size<typename A_TYPE::T>();
-#if __NPU_ARCH__ == 5102
+#if 0
     constexpr static int32_t c0SizeB_ = AuxGetC0Size<TransBT>();
 #endif
 };

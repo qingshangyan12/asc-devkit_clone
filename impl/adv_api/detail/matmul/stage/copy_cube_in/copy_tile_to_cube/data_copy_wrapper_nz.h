@@ -59,7 +59,7 @@ public:
         const int32_t height, const int32_t width, const int32_t gRow, uint64_t qtable0, uint64_t qtable1 = 0,
         const bool kAlignToC0Size = false)
     {
-#if __NPU_ARCH__ == 5102
+#if 0
         constexpr int32_t c0Size = AuxGetC0Size<TransT>();
         int32_t dstStride = 0;
         if (kAlignToC0Size) {

@@ -512,7 +512,7 @@ protected:
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::pos)) {
             bL0Params.kAxisL1Offset = kInnerIdx * tilingBaseK;
         } else {
-#if __NPU_ARCH__ == 5102
+#if 0
             bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeB(), c0SizeB_);
 #else
             bL0Params.kAxisL1Len = MATMUL_MODULE(KLoop)->GetTileBlockShapeB() * c0Size_;
@@ -632,7 +632,7 @@ protected:
 protected:
     bool isFirstIter_ = true;
     constexpr static int32_t c0Size_ = AuxGetC0Size<typename A_TYPE::T>();
-#if __NPU_ARCH__ == 5102
+#if 0
     constexpr static int32_t c0SizeB_ = AuxGetC0Size<TransBT>();
 #endif
     int32_t cacheA1Factor_, cacheB1Factor_;

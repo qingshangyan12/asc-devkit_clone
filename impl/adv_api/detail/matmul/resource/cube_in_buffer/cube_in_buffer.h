@@ -36,7 +36,7 @@
 #include "cube_in_buffer_bmm_db.h"
 #endif
 
-#if (__NPU_ARCH__ == 5102)
+#if 0
 #include "cube_in_buffer_bmm_db.h"
 #endif
 

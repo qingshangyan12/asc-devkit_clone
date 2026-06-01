@@ -161,7 +161,7 @@ public:
             }
         }
     }
-#if __NPU_ARCH__ == 5102
+#if 0
     __aicore__ inline void WaitIterateAll()
     {
         event_t eventIDFixToMte2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::FIX_MTE2));

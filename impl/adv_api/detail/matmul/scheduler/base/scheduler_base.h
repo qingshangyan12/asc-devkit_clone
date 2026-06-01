@@ -113,7 +113,7 @@ public:
 
         uint32_t lenFactor = 1;
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 3510) 
         if constexpr (MdlInitScene<MM_CFG> && ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             lenFactor = DOUBLE_SIZE;
         }
@@ -121,14 +121,14 @@ public:
         MATMUL_MODULE(CubeOutBuffer)->Init(baseMN, lenFactor);
         if constexpr (NormInitScene<MM_CFG>) {
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 3510) 
             MATMUL_MODULE(BiasScheduler)->Init();
 #endif
         } else {
             MATMUL_MODULE(BiasScheduler)->Init();
         }
         MATMUL_MODULE(MatmulQuantProcessor)->Init(tiling.GetBaseN());
-#if __NPU_ARCH__ == 5102
+#if 0
         if constexpr (IsSameTypeV<SrcAT, half> && IsSameTypeV<SrcBT, half> && IsTypeOneOfV<DstT, half, bfloat16_t>) {
             constexpr float FIX_VAL_RECIPROCAL = 1.0f / (1 << 16);
             const uint64_t quantScalar =
@@ -358,7 +358,7 @@ protected:
         }
     }
 
-#if __NPU_ARCH__ == 5102
+#if 0
     __aicore__ inline void InitQtableProcessor()
     {
         auto shapeInfo = MATMUL_MODULE(MatmulShapeInfo);

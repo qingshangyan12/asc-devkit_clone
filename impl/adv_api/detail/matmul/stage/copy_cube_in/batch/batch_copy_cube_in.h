@@ -59,7 +59,7 @@ public:
 
     __aicore__ inline void Init()
     {
-#if __NPU_ARCH__ == 5102
+#if 0
         constexpr bool IS_KROW =
             INPUT_TYPE::isTrans ? INPUT_TYPE::TAG == InputTypeTag::A : INPUT_TYPE::TAG == InputTypeTag::B;
 #else
@@ -129,7 +129,7 @@ private:
         // Calculate src and dst stride of one step
         // if user input matrixStride, use matrixStride as srcStride
         auto srcStride = matrixStride != 0 ? matrixStride : GetSrcStride<IS_TRANS, false>();
-#if __NPU_ARCH__ == 5102
+#if 0
         auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS, IS_KROW>();
 #else
         auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS>();
@@ -147,7 +147,7 @@ private:
         srcGlobal.SetGlobalBuffer(MATMUL_MODULE(MatmulTensorInfo)->GetGlobalTensor().address_);
         srcGlobal.SetAddr(batchOffset);
         for (int32_t idx = 0; idx < iterNum; ++idx) {
-#if __NPU_ARCH__ == 5102
+#if 0
             constexpr bool iskRowDirec = IS_KROW && IsSupportB8<TransT>();
             MATMUL_MODULE(DataCopyWrapper)
                 ->CopyND2NZ(
@@ -200,7 +200,7 @@ private:
         // Calculate src and dst stride of one step
         // if user input matrixStride, use matrixStride as srcStride
         auto srcStride = matrixStride != 0 ? matrixStride : GetSrcStride<IS_TRANS, false>();
-#if __NPU_ARCH__ == 5102
+#if 0
         auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS, IS_KROW>();
 #else
         auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS>();
@@ -222,7 +222,7 @@ private:
         srcGlobal.SetGlobalBuffer(MATMUL_MODULE(MatmulTensorInfo)->GetGlobalTensor().address_);
         srcGlobal.SetAddr(batchOffset);
         for (auto idx = 0; idx < iterNum; ++idx) {
-#if __NPU_ARCH__ == 5102
+#if 0
             constexpr bool iskRowDirec = IS_KROW && IsSupportB8<TransT>();
             MATMUL_MODULE(DataCopyWrapper)
                 ->CopyND2NZ(

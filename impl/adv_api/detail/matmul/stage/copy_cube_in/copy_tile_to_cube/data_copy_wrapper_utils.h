@@ -283,7 +283,7 @@ __aicore__ inline void TransDataNZBMatrix(
     }
 }
 
-#if __NPU_ARCH__ == 5102
+#if 0
 template <typename SrcT, typename TransT>
 __aicore__ inline void CopyNZ2NZImplByLoadData(
     const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
@@ -313,7 +313,7 @@ __aicore__ inline void CopyNZ2NZImpl(
     const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
     const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
 {
-#if __NPU_ARCH__ == 5102
+#if 0
     CopyNZ2NZImplByLoadData(dst, src, row, col, height, width, gRow, kAlignToC0Size);
 #else
     ASCENDC_ASSERT((gRow >= height), {

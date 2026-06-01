@@ -113,7 +113,7 @@ private:
                 dstOffset += dstAddrStride;
             }
         }
-#if __NPU_ARCH__ == 5102
+#if 0
         else if constexpr (IsSupportB4<A_T>()) {
             uint16_t l0ALoop = loadDataParams.mStep / M_STEP_MIN_VAL_B4;
             uint64_t dstOffset = 0;

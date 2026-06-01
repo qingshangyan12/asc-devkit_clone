@@ -30,7 +30,7 @@
 #include "data_copy_wrapper_mx.h"
 #include "data_copy_wrapper_dn.h"
 #endif
-#if  __NPU_ARCH__ == 5102
+#if 0
 #include "data_copy_wrapper_dn.h"
 #endif
 

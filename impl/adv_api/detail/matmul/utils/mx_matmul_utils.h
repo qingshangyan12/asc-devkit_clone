@@ -232,7 +232,7 @@ __aicore__ constexpr int32_t GetBitSize()
         return ONE_BYTE_BIT_SIZE / 2;
     }
 #endif
-#if __NPU_ARCH__ == 5102
+#if 0
     if (IsSameTypeV<T, AscendC::int2b_t>) {
         return ONE_BYTE_BIT_SIZE / 4;
     }
@@ -265,7 +265,7 @@ __aicore__ inline constexpr auto GetTransBDataType()
         B_TYPE mxBType;
         return mxBType;
     }
-#if __NPU_ARCH__ == 5102
+#if 0
     else if constexpr (
         DecompMode(MM_CFG) == DecompressionMode::DECOMP_1bitTo4bit ||
         DecompMode(MM_CFG) == DecompressionMode::DECOMP_2bitTo4bit) {

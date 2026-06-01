@@ -63,7 +63,7 @@ template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Arg
 #endif
 }
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510)
 #if defined(__ASCENDC_SUPERKERNEL_EARLY_START_V1) || defined(__ASCENDC_SUPERKERNEL_EARLY_START_V2)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
@@ -79,9 +79,9 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
 
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 #endif
 #endif
@@ -140,7 +140,7 @@ __aicore__ inline void ResetMask()
     ResetMaskImpl();
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 using MutexID = uint8_t;
 
 class Mutex {
@@ -214,7 +214,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetHcclContext(void)
 
 #if defined(__NPU_ARCH__) &&                                                            \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||      \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3510))
 template <typename T, typename U>
 __aicore__ inline void SetAippFunctions(const GlobalTensor<T>& src0, AippInputFormat format, AippParams<U> config)
 {

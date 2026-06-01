@@ -137,7 +137,7 @@ public:
         int32_t srcOffset = row * gCol + col;
         int32_t calcWidthExr = Ceil(width, c0Size_);
 
-#if __NPU_ARCH__ == 5102
+#if 0
         ASCENDC_ASSERT(gCol % c0Size_ == 0 && width % c0Size_ == 0, {
             KERNEL_LOG(KERNEL_ERROR, "When ND from UB, C0Size must be able to divisible by width and tile width.");
         });

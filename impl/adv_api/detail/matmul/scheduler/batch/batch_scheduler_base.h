@@ -113,7 +113,7 @@ public:
             MATMUL_MODULE(BiasScheduler)->Init(tiling.GetBatchNum());
         }
 
-#if __NPU_ARCH__ == 5102
+#if 0
         if constexpr (
             IsSameTypeV<TransAT, half> && IsSameTypeV<TransBT, half> && IsTypeOneOfV<DstT, half, bfloat16_t>) {
             constexpr float FIX_VAL_RECIPROCAL = 1.0f / (1 << 16);
@@ -435,7 +435,7 @@ public:
         MATMUL_MODULE(BatchCopyCubeInB)->Destroy();
         MATMUL_MODULE(BiasScheduler)->End();
         MATMUL_MODULE(CubeOutBuffer)->Destroy();
-#if __NPU_ARCH__ == 5102
+#if 0
         if constexpr (IsTypeOneOfV<TransAT, half, int8_t> && IsTypeOneOfV<DstT, int8_t, uint8_t, half, bfloat16_t>) {
             MATMUL_MODULE(MatmulQuantProcessor)->Destroy();
         }
@@ -624,7 +624,7 @@ public:
 
 private:
     constexpr static int32_t c0Size_ = AuxGetC0Size<TransAT>();
-#if __NPU_ARCH__ == 5102
+#if 0
     constexpr static int32_t c0SizeB_ = AuxGetC0Size<TransBT>();
 #else
     constexpr static int32_t c0SizeB_ = c0Size_;

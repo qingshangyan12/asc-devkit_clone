@@ -80,7 +80,7 @@ public:
      */
     __aicore__ inline void SetLookupTable(const GlobalTensor<uint64_t> &qtableTensor)
     {
-#if __NPU_ARCH__ == 5102
+#if 0
         qtableTensor_ = qidQtable_.Get<uint64_t>();
         auto dstPadTensor = qtableTensor_.template ReinterpretCast<uint8_t>();
         auto srcPadTensor = qtableTensor.template ReinterpretCast<uint8_t>();

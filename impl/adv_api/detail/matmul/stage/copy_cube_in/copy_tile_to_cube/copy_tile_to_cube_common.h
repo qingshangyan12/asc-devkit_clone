@@ -455,7 +455,7 @@ private:
         }
     }
 
-#if __NPU_ARCH__ == 5102
+#if 0
     __aicore__ inline void GetQtable(
         uint64_t& qtable0, uint64_t& qtable1, int32_t curRow, int32_t curCol, int32_t baseHeight)
     {
@@ -488,7 +488,7 @@ private:
                 MATMUL_MODULE(DataCopyWrapper)
                     ->CopyND2NZ(dst, src, curRow * baseHeight, curCol * baseWidth, tileHeight, tileWidth, orgWidth);
             }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 )
         } else if constexpr (INPUT_TYPE::format == CubeFormat::COLUMN_MAJOR) {
             if constexpr (sizeof(TransT) == sizeof(int8_t)) {
                 CopyDN2NZForInt8(
@@ -500,7 +500,7 @@ private:
             }
 #endif
         } else if constexpr (INPUT_TYPE::format == CubeFormat::NZ) {
-#if __NPU_ARCH__ == 5102
+#if 0
             if constexpr (IsDecompMode<MM_CFG>() && INPUT_TYPE::TAG == InputTypeTag::B) {
                 uint64_t qtable0 = 0;
                 uint64_t qtable1 = 0;
@@ -541,7 +541,7 @@ private:
         const LocalTensor<TransT>& dst, const LocalTensor<SrcT>& src, int32_t curRow, int32_t curCol,
         int32_t tileHeight, int32_t tileWidth, int32_t widthFactor)
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002 )
         auto baseHeight = MATMUL_MODULE(CopyCubeInParams)->template GetBaseHeight<IS_TRANS>();
         auto baseWidth = MATMUL_MODULE(CopyCubeInParams)->template GetBaseWidth<IS_TRANS>();
         auto orgHeight = MATMUL_MODULE(CopyCubeInParams)->template GetOrgHeight<IS_TRANS, IS_INTRA_BLOCK>();
