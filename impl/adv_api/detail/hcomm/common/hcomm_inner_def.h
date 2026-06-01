@@ -24,7 +24,6 @@
 #define IMPL_ADV_API_DETAIL_HCOMM_COMMON_HCOMM_INNER_DEF_H
 
 #include <cstdint>
-#include "../../../../../include/adv_api/hcomm/hcomm_common.h"
 
 namespace AscendC {
 
@@ -310,7 +309,7 @@ typedef struct {
 typedef struct {
     CommAbiHeader abiHeader;
     CommEngineType engine;
-    CommProtocol protocol;
+    int32_t protocol;
     uint32_t localNotifyNum;
     uint32_t remoteNotifyNum;
     uint32_t localBufferNum;
