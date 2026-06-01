@@ -228,7 +228,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
-    ChannelPtr channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t curHead)
+    ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t curHead)
 {
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
     sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
@@ -247,20 +247,20 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
-    ChannelPtr channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelHandle channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commitPipe;
     (void)reqPipe;
 
-    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
+    __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     int32_t remoteIdx =
-        HcommFindBufferIdx(channelPtr->remoteBufferAddr, channelPtr->remoteBufferNum, remoteAddr, len);
+        HcommFindBufferIdx(channelEntity->remoteBufferAddr, channelEntity->remoteBufferNum, remoteAddr, len);
     if (remoteIdx == HCOMM_FAILED) {
         KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid remote buffer");
         return HCOMM_FAILED;
     }
 
-    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
@@ -269,12 +269,12 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
         curHead, sqCtx.contextInfo.ubJfs.sqDepth);
 
     // poll cq if send queue is full
-    auto cqCtx = channelPtr->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     PollCqWhenSqOverflow(channel, sqCtx, cqCtx, curHead);
 
     // write SQE
     __ubuf__ HcommUrmaSqeCtx* sqeCtx = (__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr();
-    auto remoteMemInfo = channelPtr->remoteBufferAddr[remoteIdx];
+    auto remoteMemInfo = channelEntity->remoteBufferAddr[remoteIdx];
     HcommUrmaFillSqeCtx<opCode, config>(
         sqeCtx, (__gm__ uint8_t*)remoteAddr, sqCtx, remoteMemInfo, curHead, notifyAddr, notifyVal);
 
@@ -310,13 +310,13 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
 }
 
 __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
-    ChannelPtr channel, uint32_t expectIdx)
+    ChannelHandle channel, uint32_t expectIdx)
 {
     if (expectIdx == 0) {
         return HCOMM_SUCCESS;
     }
-    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
-    auto cqCtx = channelPtr->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
+    auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> cqCIGlobal;
     cqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.tailAddr);
     Gm2Ub(cqCI_, cqCIGlobal, 1);
@@ -369,7 +369,7 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
 
     // update WQ tail
     AscendC::GlobalTensor<uint32_t> sqCIGlobal;
-    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
     sqCI_.SetValue(0, curTail);
     Ub2Gm<uint32_t>(sqCIGlobal, sqCI_, 1);
@@ -379,32 +379,32 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteNbi(
-    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(channel, dst, src, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
-    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteWithNotifyNbi(
-    ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(
         channel, dst, src, len, notifyAddr, notifyVal);
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelHandle channel)
 {
     (void)pipe;
-    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
-    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
+    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
@@ -417,11 +417,11 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelPtr ch
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelHandle channel)
 {
     (void)pipe;
-    __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
-    auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
+    __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
+    auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
     AscendC::GlobalTensor<uint32_t> sqPIGlobal;
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);

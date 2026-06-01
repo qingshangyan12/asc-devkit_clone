@@ -18,7 +18,7 @@
 #include <cstdint>
 
 namespace AscendC {
-using ChannelPtr = uint64_t;
+using ChannelHandle = uint64_t;
 
 /**
  * @brief 通信协议类型枚举

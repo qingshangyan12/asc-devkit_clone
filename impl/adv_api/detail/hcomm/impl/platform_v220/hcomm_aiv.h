@@ -44,35 +44,35 @@ __aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE>::~HcommImpl() {}
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
-    PostSend(channelPtr, dst, src, len, false);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write channel:%llu, dst:%p, src:%p, len:%llu", channel, dst, src, len);
+    PostSend(channel, dst, src, len, false);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete");
     return HCOMM_SUCCESS;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
-    PostSend(channelPtr, dst, src, len, true);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read channel:%llu, dst:%p, src:%p, len:%llu", channel, dst, src, len);
+    PostSend(channel, dst, src, len, true);
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete");
     return HCOMM_SUCCESS;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
     (void)commitPipe;
     (void)reqPipe;
     (void)config;
-    (void)channelPtr;
+    (void)channel;
     (void)dst;
     (void)src;
     (void)len;
@@ -83,15 +83,15 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::doorBell(
-    __gm__ Channel* channelPtr, uint64_t curHead)
+    __gm__ Channel* channel, uint64_t curHead)
 {
     uint64_t doorBellInfo = 0;
-    doorBellInfo |= channelPtr->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
+    doorBellInfo |= channel->sqContextAddr->ctx.rdmaSqContext.qpn; // [0:23] DB_TAG (qp_num)
     doorBellInfo |= 0UL << 24UL;                                      // [24:27] DB_CMD = HNS_ROCE_V2_SQ_DB (0)
     doorBellInfo |= (curHead % 65536UL) << 32UL;                      // [32:47] DB_PI = sq.head
-    doorBellInfo |= (uint64_t)(channelPtr->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
+    doorBellInfo |= (uint64_t)(channel->sqContextAddr->ctx.rdmaSqContext.sl) << 48UL; // [48:50] DB_SL = qp.sl
 
-    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channelPtr->sqContextAddr->ctx.rdmaSqContext.dbVa);
+    __gm__ uint64_t* doorBellAddr = (__gm__ uint64_t*)(channel->sqContextAddr->ctx.rdmaSqContext.dbVa);
     KERNEL_LOG(KERNEL_INFO, "Hcomm doorBell doorBellAddr:%p, doorBellInfo:%llu", doorBellAddr, doorBellInfo);
 
     ubLocal_.SetValue(0, doorBellInfo);
@@ -102,9 +102,9 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::doorBell(
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::PostSend(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
+    ChannelHandle channelHandle, GM_ADDR dst, GM_ADDR src, uint64_t len, bool isRead)
 {
-    __gm__ Channel* channel = (__gm__ Channel*)channelPtr;
+    __gm__ Channel* channel = (__gm__ Channel*)channelHandle;
     auto qpNum = channel->sqContextAddr->ctx.rdmaSqContext.qpn;
     auto sqBaseAddr = channel->sqContextAddr->ctx.rdmaSqContext.sqVa;
     auto wqeSize = channel->sqContextAddr->ctx.rdmaSqContext.wqeSize;

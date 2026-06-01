@@ -56,7 +56,7 @@ public:
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
-     * @param [in] channelPtr: The handle of the communication channel.
+     * @param [in] channel: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
@@ -65,7 +65,7 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
@@ -74,7 +74,7 @@ public:
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
-     * @param [in] channelPtr: The handle of the communication channel.
+     * @param [in] channel: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to write, using byte as the basic unit.
@@ -85,7 +85,7 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
+    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
     /*!
@@ -96,7 +96,7 @@ public:
      * @tparam commitPipe: The pipe type to use for commit, PIPE_S supported as default.
      * @tparam reqPipe: The pipe type to use for req, PIPE_MTE supported as default.
      * @tparam config: URMA WQE control config, only used by URMA. Default: strongly ordered + fence + CQE enabled.
-     * @param [in] channelPtr: The handle of the communication channel.
+     * @param [in] channel: The handle of the communication channel.
      * @param [out] dst: The destination address of the data.
      * @param [in] src: The source address of the data.
      * @param [in] len: The length of the data to read, using byte as the basic unit.
@@ -105,27 +105,27 @@ public:
      */
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t ReadNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     /*!
      * @class Hcomm
      * @brief Informed that tasks submitted on channel can be executed.
      * @tparam pipe: The pipe type to use for commit, PIPE_S supported as default.
-     * @param [in] channelPtr: The handle of the communication channel.
+     * @param [in] channel: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
      */
     template <pipe_t pipe = PIPE_S>
-    __aicore__ inline int32_t Commit(ChannelPtr channelPtr);
+    __aicore__ inline int32_t Commit(ChannelHandle channel);
 
     /*!
      * @class Hcomm
      * @brief Block Aicore and drain comm tasks submitted on channel until finish processing.
      * @tparam pipe: The pipe type to use for drain, PIPE_MTE3 supported as default.
-     * @param [in] channelPtr: The handle of the communication channel.
+     * @param [in] channel: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
      */
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Drain(ChannelPtr channelPtr);
+    __aicore__ inline int32_t Drain(ChannelHandle channel);
 private:
     HcommImpl<commProtocol> impl_;
 };

@@ -41,40 +41,40 @@ __aicore__ inline int32_t Hcomm<commProtocol>::Init(__ubuf__ uint8_t* buff, uint
 template <CommProtocol commProtocol>
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t Hcomm<commProtocol>::WriteNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return impl_.template WriteNbi<commit, commitPipe, reqPipe, config>(channelPtr, dst, src, len);
+    return impl_.template WriteNbi<commit, commitPipe, reqPipe, config>(channel, dst, src, len);
 }
 
 template <CommProtocol commProtocol>
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t Hcomm<commProtocol>::WriteWithNotifyNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     return impl_.template WriteWithNotifyNbi<commit, commitPipe, reqPipe, config>(
-        channelPtr, dst, src, len, notifyAddr, notifyVal);
+        channel, dst, src, len, notifyAddr, notifyVal);
 }
 
 template <CommProtocol commProtocol>
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
 __aicore__ inline int32_t Hcomm<commProtocol>::ReadNbi(
-    ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
-    return impl_.template ReadNbi<commit, commitPipe, reqPipe, config>(channelPtr, dst, src, len);
+    return impl_.template ReadNbi<commit, commitPipe, reqPipe, config>(channel, dst, src, len);
 }
 
 template <CommProtocol commProtocol>
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commProtocol>::Commit(ChannelPtr channelPtr)
+__aicore__ inline int32_t Hcomm<commProtocol>::Commit(ChannelHandle channel)
 {
-    return impl_.template Commit<pipe>(channelPtr);
+    return impl_.template Commit<pipe>(channel);
 }
 
 template <CommProtocol commProtocol>
 template <pipe_t pipe>
-__aicore__ inline int32_t Hcomm<commProtocol>::Drain(ChannelPtr channelPtr)
+__aicore__ inline int32_t Hcomm<commProtocol>::Drain(ChannelHandle channel)
 {
-    return impl_.template Drain<pipe>(channelPtr);
+    return impl_.template Drain<pipe>(channel);
 }
 } // namespace AscendC
 

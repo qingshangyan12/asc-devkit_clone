@@ -58,28 +58,28 @@ public:
     __aicore__ inline int32_t Init(__ubuf__ uint8_t* buff, uint32_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t WriteNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t WriteNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t ReadNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t ReadNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len);
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
+    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         GM_ADDR notifyAddr, uint64_t notifyVal);
     template <pipe_t pipe = PIPE_S>
-    __aicore__ inline int32_t Commit(ChannelPtr channel);
+    __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Drain(ChannelPtr channel);
+    __aicore__ inline int32_t Drain(ChannelHandle channel);
 
 private:
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         HcommUrmaOpCode opCode = HcommUrmaOpCode::WRITE, auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t PostSend(
-        ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
+        ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr = nullptr,
         uint64_t notifyVal = 0);
     __aicore__ inline void PollCqWhenSqOverflow(
-        ChannelPtr channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
-    __aicore__ inline uint32_t PollCq(ChannelPtr channel, uint32_t expectTail);
+        ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t sqHead);
+    __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
 
 private:
     LocalTensor<uint32_t> wqeItem_;
