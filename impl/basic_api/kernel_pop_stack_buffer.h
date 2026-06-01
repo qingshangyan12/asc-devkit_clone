@@ -53,7 +53,7 @@ template <typename T, TPosition pos> __aicore__ inline bool PopStackBuffer(Local
     addr.dataLen = static_cast<uint32_t>(endAddress - queEndAddress);
     addr.bufferAddr = queEndAddress;
 #ifdef ASCENDC_CPU_DEBUG
-    auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     addr.absAddr = absAddr + addr.bufferAddr;
     AscendCBufInit(static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1), (uint64_t)addr.absAddr,
         static_cast<uint64_t>(addr.dataLen));
@@ -80,7 +80,7 @@ template <TPosition pos> __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuf
     bufStart.dataLen = dataLen;
     popBuffer.SetTpipeBuf(&bufStart, dataLen);
 #ifdef ASCENDC_CPU_DEBUG
-    auto absAddr = GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(pos));
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(pos));
     AscendCBufInit(static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1),
         (uint64_t)(absAddr + queEndAddress), static_cast<uint64_t>(dataLen));
     AscendCBufInit(static_cast<uint8_t>(pos), static_cast<uint8_t>(1), static_cast<uint8_t>(1),
