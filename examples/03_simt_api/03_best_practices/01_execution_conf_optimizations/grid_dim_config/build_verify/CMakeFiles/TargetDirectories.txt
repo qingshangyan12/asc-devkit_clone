@@ -1,0 +1,3 @@
+/home/qxk/asc-devkit/examples/03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config/build_verify/CMakeFiles/grid_config.dir
+/home/qxk/asc-devkit/examples/03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config/build_verify/CMakeFiles/edit_cache.dir
+/home/qxk/asc-devkit/examples/03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config/build_verify/CMakeFiles/rebuild_cache.dir
