@@ -1458,7 +1458,7 @@ __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 template <HardEvent evt>
 __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
+    return ::AscendC::Internal::FetchEventIDImpl<evt>();
 }
 
 template <TPosition pos>
