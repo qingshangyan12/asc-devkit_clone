@@ -125,6 +125,7 @@ if(PRODUCT_SIDE STREQUAL "host")
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
+        ccu_func_dl.cc
     )
 endif()
 
