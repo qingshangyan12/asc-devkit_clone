@@ -1,0 +1,2 @@
+Device_id,OP Type,Core Type,Count,Total Time(us),Min Time(us),Avg Time(us),Max Time(us),Ratio(%)
+0,_Z14softmax_customIfEvPhS0_N6Custom13SoftmaxTilingIT_EE,AI_VECTOR_CORE,1,16.525,16.525,16.525,16.525,100

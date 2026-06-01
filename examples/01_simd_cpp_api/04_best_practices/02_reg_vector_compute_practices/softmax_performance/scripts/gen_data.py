@@ -19,7 +19,7 @@ import numpy as np
 def gen_golden_data_simple():
 
     np.random.seed(0)  # 固定随机种子，保证结果可复现
-    input_float = np.random.randn(16, 1568).astype(np.float16)  # 强制 float32 类型
+    input_float = np.random.randn(128, 128).astype(np.float32)  # 强制 float32 类型
 
     def softmax_2d(z):
         max_z = np.max(z, axis=1, keepdims=True)
