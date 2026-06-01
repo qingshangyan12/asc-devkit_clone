@@ -125,7 +125,7 @@ __aicore__ inline __sync_alias__ void TQueBind<src, dst, depth, mask>::AllocTens
     input.SetAddr(addr);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufAlloc(static_cast<uint8_t>(bufferType), static_cast<uint8_t>(GetPosition(src, dst)),
         reinterpret_cast<uint64_t>(absAddr + ret->address), static_cast<uint64_t>(ret->dataLen));
     if (this->bufPoolHandle != 0U) {
@@ -225,7 +225,7 @@ __aicore__ inline __sync_alias__ bool TQueBind<src, dst, depth, mask>::EnQue(TBu
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufEnque(static_cast<uint8_t>(src), static_cast<uint8_t>(dst), static_cast<uint8_t>(GetPosition(src, dst)),
         reinterpret_cast<uint64_t>(absAddr + ptr->address));
 #endif // ASCENDC_CPU_DEBUG
@@ -299,7 +299,7 @@ __aicore__ inline __sync_alias__ bool TQueBind<src, dst, depth, mask>::EnQue(TBu
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufEnque(static_cast<uint8_t>(src), static_cast<uint8_t>(dst),
         static_cast<uint8_t>(GetPosition(src, dst)), reinterpret_cast<uint64_t>(absAddr + ptr->address));
 #endif // ASCENDC_CPU_DEBUG
@@ -396,7 +396,7 @@ __aicore__ inline __sync_alias__ TBufHandle TQueBind<src, dst, depth, mask>::DeQ
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufDeque(static_cast<uint8_t>(src), static_cast<uint8_t>(dst), static_cast<uint8_t>(GetPosition(src, dst)),
         (uint64_t)(absAddr + ptr->address));
 #endif // ASCENDC_CPU_DEBUG
@@ -469,7 +469,7 @@ __aicore__ inline __sync_alias__ TBufHandle TQueBind<src, dst, depth, mask>::DeQ
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufDeque(static_cast<uint8_t>(src), static_cast<uint8_t>(dst),
         static_cast<uint8_t>(GetPosition(src, dst)), (uint64_t)(absAddr + ptr->address));
 #endif // ASCENDC_CPU_DEBUG
@@ -541,7 +541,7 @@ __aicore__ inline void TQueBind<src, dst, depth, mask>::FreeBuffer(TBufHandle bu
     }
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufFree(static_cast<uint8_t>(bufferType), static_cast<uint8_t>(GetPosition(src, dst)),
         (uint64_t)(absAddr + ptr->address), static_cast<uint64_t>(ptr->dataLen));
 #endif // ASCENDC_CPU_DEBUG
@@ -620,7 +620,7 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::AllocBuffer()
     this->bufUsedCount++;
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     AscendCBufAlloc(static_cast<uint8_t>(bufferType), static_cast<uint8_t>(GetPosition(src, dst)),
         reinterpret_cast<uint64_t>(absAddr + ret->address), static_cast<uint64_t>(ret->dataLen));
     if (this->bufPoolHandle != 0U) {
@@ -691,7 +691,7 @@ __aicore__ inline TBuffAddr TQueBind<src, dst, depth, mask>::GetBufferAddr(TBufH
     addr.dataLen = ptr->dataLen;
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     constexpr Hardware bufferType = GetBufferPos(src, dst);
-    auto absAddr = GetTPipePtr()->g_tpipeImpl.bufPoolBaseAddr_[static_cast<uint8_t>(bufferType)].absAddr;
+    auto absAddr = GetBaseAddrCpu(static_cast<int8_t>(GetDefaultPosition(bufferType)));
     addr.absAddr = absAddr + addr.bufferAddr;
 #endif
     return addr;
