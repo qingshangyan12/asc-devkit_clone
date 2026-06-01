@@ -31,6 +31,7 @@ constexpr int8_t INVALID_HANDLE_ID = static_cast<int8_t>(-1);
 constexpr int8_t HCCL_MAX_HANDLE_ID = 63;
 constexpr uint8_t HCCL_ALG_MAX_NUM = 8;
 constexpr uint8_t HCCL_ALG_SUPPORT_NUM = 2;
+constexpr uint8_t MAX_OP_NUM = 1;
 
 enum class HcclTilingVersion: uint8_t {
     DEPRECATED_TILING_VERSION,          // Deprecated tiling version
@@ -218,6 +219,7 @@ struct OpResCtx {
     uint64_t rankSize;
     AlgInfo algInfo[HCCL_ALG_MAX_NUM];
 
+<<<<<<< HEAD
     uint64_t xnAddr;    // Xn寄存器起始地址
     uint64_t ckeAddr;   // CKE寄存器起始地址
     uint64_t sprAddr;   // spr寄存器地址，预留
@@ -225,6 +227,16 @@ struct OpResCtx {
     uint64_t resCtx;    //资源地址，用于资源下发时的处理
     uint32_t opType[HCCL_API_MAX_OP_NUM];
     uint32_t algorithmType[HCCL_API_MAX_OP_NUM];
+=======
+    // for ccu
+    uint64_t xnAddr;  // CCU需要
+    uint64_t ckeAddr; // CCU需要
+    uint64_t sprAddr; // CCU需要，A6需要;
+    uint64_t res[MAX_OP_NUM]; // CCU不需要
+    uint64_t resCtx;  // CCU需要, 主要是资源信息，用于ccu任务下发
+    uint32_t opType[MAX_OP_NUM]; // CCU需要，算子枚举
+    uint32_t algorithmType[MAX_OP_NUM]; // CCU需要，算法枚举
+>>>>>>> pr_2793
 };
 }
 
