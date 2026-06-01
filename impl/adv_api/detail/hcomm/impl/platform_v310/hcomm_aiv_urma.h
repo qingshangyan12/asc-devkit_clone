@@ -419,7 +419,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Commit
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Drain(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
@@ -428,13 +428,13 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::URMA, CommEngine::AIV>::Wait(C
     sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
     Gm2Ub(sqPI_, sqPIGlobal, 1);
     uint32_t curHead = sqPI_.GetValue(0);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait by channel enter channel=%lu curHead=%u", channel, curHead);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Drain by channel enter channel=%lu curHead=%u", channel, curHead);
     uint32_t ret = PollCq(channel, curHead);
     if (ret != HCOMM_SUCCESS) {
-        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Wait by channel failed channel=%lu pollRet=%u", channel, ret);
+        KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA Drain by channel failed channel=%lu pollRet=%u", channel, ret);
         return HCOMM_FAILED;
     }
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Wait by channel finish channel=%lu curHead=%u", channel, curHead);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA Drain by channel finish channel=%lu curHead=%u", channel, curHead);
     return HCOMM_SUCCESS;
 }
 

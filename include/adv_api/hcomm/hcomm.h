@@ -32,7 +32,7 @@ namespace AscendC {
  *          3) Launch comm tasks asynchronously through the corresponding interface,
  *             and the server starts assembling and launching comm tasks as soon as it listens.
  *          4) If commit is false when launching task, call the Commit interface to notify the execution of the
- * corresponding comm task. 5) Call the Wait interface (blocking) to wait for the server to complete the corresponding
+ * corresponding comm task. 5) Call the Drain interface (blocking) to wait for the server to complete the corresponding
  * comm task.
  * @tparam commProtocol: The communication protocol to use, ROCE supported as default.
  * @tparam commEngine: The communication engine to use, AIV supported as default.
@@ -120,13 +120,13 @@ public:
 
     /*!
      * @class Hcomm
-     * @brief Block Aicore and wait for comm tasks submitted on channel to finish processing once.
-     * @tparam pipe: The pipe type to use for wait, PIPE_MTE3 supported as default.
+     * @brief Block Aicore and drain comm tasks submitted on channel until finish processing.
+     * @tparam pipe: The pipe type to use for drain, PIPE_MTE3 supported as default.
      * @param [in] channelPtr: The handle of the communication channel.
      * @return 0 indicates success and -1 indicates failure.
      */
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(ChannelPtr channelPtr);
+    __aicore__ inline int32_t Drain(ChannelPtr channelPtr);
 private:
     HcommImpl<commProtocol, commEngine> impl_;
 };

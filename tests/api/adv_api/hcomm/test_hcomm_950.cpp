@@ -114,6 +114,6 @@ TEST_F(HcommCommonTestSuite, Aiv_Write)
     EXPECT_EQ(handleId, 0);
     int32_t ret = hcomm.Commit(channelPtr);
     EXPECT_EQ(ret, 0);
-    ret = hcomm.Wait(channelPtr);
+    ret = hcomm.Drain(channelPtr);
     EXPECT_EQ(ret, 0);
 }

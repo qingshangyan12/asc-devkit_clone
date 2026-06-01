@@ -147,7 +147,7 @@ private:
     int64_t blockIdxBak_;
 };
 
-// ReadNbi with default commit=true: auto-commit internally, then Wait succeeds
+// ReadNbi with default commit=true: auto-commit internally, then Drain succeeds
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
 {
     UrmaChannelResource channel;
@@ -158,11 +158,11 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Read)
         channel.GetHandle(), reinterpret_cast<GM_ADDR>(0x5008), reinterpret_cast<GM_ADDR>(0x3008), 8);
     EXPECT_EQ(handleId, 0);
     channel.CompleteCurrentSq();
-    int32_t ret = hcomm.Wait(channel.GetHandle());
+    int32_t ret = hcomm.Drain(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
-// WriteNbi with commit=false: explicit Commit then Wait succeeds
+// WriteNbi with commit=false: explicit Commit then Drain succeeds
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
 {
     UrmaChannelResource channel;
@@ -175,11 +175,11 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_Write)
     int32_t ret = hcomm.Commit(channel.GetHandle());
     EXPECT_EQ(ret, 0);
     channel.CompleteCurrentSq();
-    ret = hcomm.Wait(channel.GetHandle());
+    ret = hcomm.Drain(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
-// WriteWithNotifyNbi with commit=false: explicit Commit then Wait succeeds
+// WriteWithNotifyNbi with commit=false: explicit Commit then Drain succeeds
 TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
 {
     UrmaChannelResource channel;
@@ -192,7 +192,7 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_WriteWithNotify)
     int32_t ret = hcomm.Commit(channel.GetHandle());
     EXPECT_EQ(ret, 0);
     channel.CompleteCurrentSq();
-    ret = hcomm.Wait(channel.GetHandle());
+    ret = hcomm.Drain(channel.GetHandle());
     EXPECT_EQ(ret, 0);
 }
 
@@ -243,8 +243,8 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_RemoteBufferNotFound)
     EXPECT_EQ(h, AscendC::HCOMM_INVALID_HANDLE_ID);
 }
 
-// Batch: mixed Write + WriteWithNotify, single channel Commit/Wait covers all
-TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitWait)
+// Batch: mixed Write + WriteWithNotify, single channel Commit/Drain covers all
+TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitDrain)
 {
     UrmaChannelResource channel;
 
@@ -263,5 +263,5 @@ TEST_F(HcommUrmaTestSuite, Aiv_Urma_BatchCommitWait)
 
     EXPECT_EQ(hcomm.Commit(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
     channel.CompleteCurrentSq();
-    EXPECT_EQ(hcomm.Wait(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
+    EXPECT_EQ(hcomm.Drain(channel.GetHandle()), AscendC::HCOMM_SUCCESS);
 }

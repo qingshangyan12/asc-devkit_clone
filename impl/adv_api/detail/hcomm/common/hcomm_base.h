@@ -67,7 +67,7 @@ public:
     }
 
     template <pipe_t pipe = PIPE_MTE3>
-    __aicore__ inline int32_t Wait(ChannelPtr channelPtr)
+    __aicore__ inline int32_t Drain(ChannelPtr channelPtr)
     {
         return -1;
     }

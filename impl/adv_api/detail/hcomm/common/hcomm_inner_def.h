@@ -366,7 +366,7 @@ typedef struct {   // channel 本身一片内存
     ChannelSqContext* sqContextAddr; // write/read/commit 操作这个字段
     // CQ
     uint32_t cqNum;
-    ChannelCqContext* cqContextAddr; // wait 操作这个字段
+    ChannelCqContext* cqContextAddr; // drain 操作这个字段
     // AIV Status
     uint8_t aivStatus[64];
     // reserve

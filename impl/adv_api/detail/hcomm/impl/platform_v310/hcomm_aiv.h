@@ -226,7 +226,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Commit
 }
 
 template <pipe_t pipe>
-__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(ChannelPtr channel)
+__aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Drain(ChannelPtr channel)
 {
     (void)pipe;
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
@@ -248,7 +248,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(C
     AscendC::GlobalTensor<uint32_t> cqeGlobalTensor;
     __ubuf__ RoceCqeEntry* cqeUB = (__ubuf__ RoceCqeEntry*)(cqeItem_.GetPhyAddr());
 
-    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Wait by channel enter channel=%lu", channel);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Drain by channel enter channel=%lu", channel);
 
     do {
         Gm2Ub(cqCI_, cqCIGlobalTensor, 1);
@@ -285,7 +285,7 @@ __aicore__ inline int32_t HcommImpl<CommProtocol::ROCE, CommEngine::AIV>::Wait(C
 
     Ub2Gm(sqCIGlobalTensor, sqCI_, 1);
 
-    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Wait by channel finish channel=%lu", channel);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm ROCE Drain by channel finish channel=%lu", channel);
     return HCOMM_SUCCESS;
 }
 } // namespace AscendC
