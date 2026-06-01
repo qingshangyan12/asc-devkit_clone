@@ -57,9 +57,9 @@
 
 ## 支持的产品
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Ascend 950PR/Ascend 950DT
 
 ## 目录结构介绍
 
@@ -78,8 +78,8 @@
 - 样例功能  
   将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），支持以下两种随路量化模式：
   - Scalar量化：使用SetFixpipePreQuantFlag接口设置Scalar量化参数。
-  - Tensor量化：使用SetFixPipeConfig接口设置Tensor量化参数。  
-  并支持与随路NZ2ND、relu激活能力组合。接口资料参考随路量化激活搬运。
+  - Vector量化：使用SetFixPipeConfig接口设置Vector量化参数。  
+  并支持与随路NZ2ND、relu激活能力组合。其中NZ2ND格式转换使用SetFixpipeNz2ndFlag接口设置参数。接口资料参考随路量化激活搬运。
 
 - 样例规格
 
@@ -87,8 +87,8 @@
   <caption>场景1：Scalar量化+relu激活</caption>
   <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -96,10 +96,11 @@
 
   <table>
   <caption>场景2：Vector量化</caption>
-  <tr><td rowspan="4" align="center">样例输入</td></tr>
+  <tr><td rowspan="6" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">quantAlpha</td><td align="center">[1, 256]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">NZ</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -109,8 +110,8 @@
   <caption>场景3：Scalar量化</caption>
   <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">NZ</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -118,10 +119,11 @@
 
   <table>
   <caption>场景4：Vector量化+relu激活</caption>
-  <tr><td rowspan="4" align="center">样例输入</td></tr>
+  <tr><td rowspan="6" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">quantAlpha</td><td align="center">[1, 256]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -131,8 +133,8 @@
   <caption>场景5：Scalar量化</caption>
   <tr><td rowspan="4" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -140,10 +142,11 @@
 
   <table>
   <caption>场景6：Vector量化+relu激活</caption>
-  <tr><td rowspan="4" align="center">样例输入</td></tr>
+  <tr><td rowspan="6" align="center">样例输入</td></tr>
   <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x1</td><td align="center">[128, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x2</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">quantAlpha</td><td align="center">[1, 256]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
   <tr><td rowspan="2" align="center">样例输出</td></tr>
   <tr><td align="center">z</td><td align="center">[128, 256]</td><td align="center">int8_t</td><td align="center">NZ</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">KernelDataCopyL0c2Gm</td></tr>
@@ -155,7 +158,7 @@
 
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到A1（L1 Buffer）和B1（L1 Buffer），并做ND到NZ的格式转换。
 
-    - 调用LoadData接口，将数据从A1（L1 Buffer）和B1（L1 Buffer）搬运到A2（L0A Buffer）和B2(L0B Buffer)。
+    - 调用LoadData接口将数据从A1（L1 Buffer）搬运到A2（L0A Buffer），调用LoadDataWithTranspose接口将数据从B1（L1 Buffer）搬运到B2（L0B Buffer）并做转置。
 
     - 调用Mmad接口，将输入shape[128, 128]的矩阵A和输入shape[128, 256]的矩阵B做矩阵乘法，得到输出shape[128, 256]的结果矩阵。
 

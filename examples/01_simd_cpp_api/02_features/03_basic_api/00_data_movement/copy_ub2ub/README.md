@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Copy接口实现UB（Unified Buffer）内部数据搬运功能，适用于需要在VECIN、VECCALC、VECOUT等不同TPosition之间搬运数据的场景。样例支持通过编译参数切换不同场景，便于开发者理解Copy接口的使用方法。
+本样例基于Copy接口实现UB（Unified Buffer）内部数据搬运功能，适用于需要在VECIN、VECOUT等不同TPosition之间搬运数据的场景。样例支持通过编译参数切换不同场景，便于开发者理解Copy接口的使用方法。
 
 ## 支持的产品
 
@@ -29,7 +29,7 @@
 <table border="2">
 <caption>表1：场景配置对照表</caption>
 <tr><th>scenarioNum</th><th>输入Shape</th><th>输出Shape</th><th>计算模式</th><th>说明</th></tr>
-<tr><td>1</td><td>[1, 512]</td><td>[1, 512]</td><td>tensor高维切分计算</td><td>源操作数和目的操作数空间共享</td></tr>
+<tr><td>1</td><td>[1, 512]</td><td>[1, 512]</td><td>tensor高维切分计算</td><td>源操作数和目的操作数空间大小相同</td></tr>
 <tr><td>2</td><td>[18, 64]</td><td>[18, 8]</td><td>tensor高维切分计算</td><td>源操作数和目的操作数空间不同</td></tr>
 <tr><td>3</td><td>[18, 64]</td><td>[18, 8]</td><td>Counter模式</td><td>源操作数和目的操作数空间不同</td></tr>
 </table>
@@ -42,11 +42,11 @@
 
 **stride参数**：{dstStride, srcStride, dstRepeatSize, srcRepeatSize}控制源操作数和目的操作数在同一迭代内和相邻迭代间的地址步长。
 
-- **场景1**：tensor高维切分计算，mask=64，repeatTime=8，stride={1, 1, 8, 8}。源操作数和目的操作数空间共享，每次迭代处理64个元素，迭代8次，共搬运512个元素。
+- **场景1**：tensor高维切分计算，mask=64，repeatTime=8，stride={1, 1, 8, 8}。源操作数和目的操作数空间大小相同，每次迭代处理64个元素，迭代8次，共搬运512个元素。
 
 - **场景2**：tensor高维切分计算，mask=8，repeatTime=18，stride={1, 1, 1, 8}。从[18, 64]搬运[18, 8]，srcRepeatSize=8表示源操作数每次Repeat跳过64个元素（跳到下一行），dstRepeatSize=1表示目的操作数紧凑排列，共搬运144个元素。
 
-- **场景3**：Counter模式，mask=144，repeatTime=1，stride={1, 8, 8, 8}。从[18, 64]搬运[18, 8]，srcStride=8表示源操作数每个DataBlock地址步长为8（取每一行的前8个元素），共搬运144个元素。
+- **场景3**：Counter模式，mask=144，repeatTime=1，stride={1, 8, 8, 8}。从[18, 64]搬运[18, 8]，dstStride=1表示目的数据连续存放无间隙，srcStride=8表示源操作数每个DataBlock地址步长为8（取每一行的前8个元素），共搬运144个元素。
 
 ## 样例描述
 

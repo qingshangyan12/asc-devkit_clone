@@ -70,10 +70,7 @@ def qf322b8_pre(data, quant_pre, relu_pre):
         data = data / (2 ** n_shift)
         data = saturation(data, -32768, 32767, np.int16)
     data = data.astype(np.float32)
-    if data >= 0:
-        data = data * quant_alpha
-    else:
-        data = data * relu_alpha
+    data = np.where(data >= 0, data * quant_alpha, data * relu_alpha)
     quant_data = saturation(data, -256, 255, np.int16) + offset
     if sign:
         return saturation(quant_data, -128, 127, np.int8)
@@ -148,6 +145,6 @@ def gen_golden_data(scenarioNum=1):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 8))
+    parser.add_argument('-scenarioNum', type=int, default=1, choices=range(1, 6))
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)
