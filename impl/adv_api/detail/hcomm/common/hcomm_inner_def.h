@@ -28,9 +28,6 @@
 
 namespace AscendC {
 
-constexpr int8_t HCOMM_INVALID_HANDLE_ID = -1;
-constexpr uint32_t HCOMM_MAX_HANDLE_ID = 1024;
-
 #pragma pack(push, 1)
 struct UrmaWqeEntry {
     uint32_t odr : 3;       // ordering, request ordering strength (0=unordered, 5=strongly ordered)

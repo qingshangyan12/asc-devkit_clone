@@ -45,15 +45,15 @@ public:
 
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t WriteNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
+    __aicore__ inline int32_t ReadNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len);
 
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
         auto const &config = URMA_DEFAULT_CFG>
-    __aicore__ inline HcommHandle WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
+    __aicore__ inline int32_t WriteWithNotifyNbi(ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
     template <pipe_t pipe = PIPE_S>
@@ -74,7 +74,6 @@ private:
     __aicore__ inline void doorBell(__gm__ Channel* channelPtr, uint64_t curHead);
 
 private:
-    HcommHandle curHandleId_ = static_cast<int8_t>(-1);
     TPipe pipe_;
     LocalTensor<uint64_t> ubLocal_;
     LocalTensor<uint32_t> ubLocalHead_;

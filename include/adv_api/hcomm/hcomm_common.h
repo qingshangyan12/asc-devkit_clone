@@ -18,7 +18,6 @@
 #include <cstdint>
 
 namespace AscendC {
-using HcommHandle = int32_t;
 using ChannelPtr = uint64_t;
 
 /**

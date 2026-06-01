@@ -246,7 +246,7 @@ __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, HcommUrmaOpCode opCode, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     ChannelPtr channel, GM_ADDR remoteAddr, GM_ADDR localAddr, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commitPipe;
@@ -255,9 +255,9 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     __gm__ ChannelEntity* channelPtr = (__gm__ ChannelEntity*)channel;
     int32_t remoteIdx =
         HcommFindBufferIdx(channelPtr->remoteBufferAddr, channelPtr->remoteBufferNum, remoteAddr, len);
-    if (remoteIdx == HCOMM_INVALID_HANDLE_ID) {
+    if (remoteIdx == HCOMM_FAILED) {
         KERNEL_LOG(KERNEL_ERROR, "Hcomm URMA PostSend failed with invalid remote buffer");
-        return HCOMM_INVALID_HANDLE_ID;
+        return HCOMM_FAILED;
     }
 
     auto sqCtx = channelPtr->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
@@ -298,17 +298,15 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     PipeBarrier<PIPE_ALL>();
 
-    HcommHandle handleId = ++curHandleId_;
     curHead += wqeBbCnt;
     sqPI_.SetValue(0, curHead);
     Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend finish handleId=%d new curHead=%u wqeBbCnt=%u", handleId, curHead,
-        wqeBbCnt);
     if constexpr (commit) {
         Commit(channel);
     }
     HcommUrmaDumpWqeCtx(sqeCtx);
-    return handleId;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend finish new curHead=%u wqeBbCnt=%u", curHead, wqeBbCnt);
+    return HCOMM_SUCCESS;
 }
 
 __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
@@ -380,21 +378,21 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE, config>(channel, dst, src, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteWithNotifyNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::WriteWithNotifyNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::WRITE_WITH_NOTIFY, config>(

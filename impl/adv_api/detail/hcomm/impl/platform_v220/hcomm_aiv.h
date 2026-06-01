@@ -43,31 +43,29 @@ __aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE>::HcommImpl()
 __aicore__ inline HcommImpl<COMM_PROTOCOL_ROCE>::~HcommImpl() {}
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
     KERNEL_LOG(KERNEL_INFO, "Hcomm Write channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
-    HcommHandle handleId = ++curHandleId_;
     PostSend(channelPtr, dst, src, len, false);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete handleId:%u", handleId);
-    return handleId;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Write complete");
+    return HCOMM_SUCCESS;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
     KERNEL_LOG(KERNEL_INFO, "Hcomm Read channelPtr:%llu, dst:%p, src:%p, len:%llu", channelPtr, dst, src, len);
-    HcommHandle handleId = ++curHandleId_;
     PostSend(channelPtr, dst, src, len, true);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete handleId:%u", handleId);
-    return handleId;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Read complete");
+    return HCOMM_SUCCESS;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
     ChannelPtr channelPtr, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
@@ -81,7 +79,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
     (void)notifyAddr;
     (void)notifyVal;
     KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE WriteWithNotifyNbi is not supported");
-    return HCOMM_INVALID_HANDLE_ID;
+    return HCOMM_FAILED;
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_ROCE>::doorBell(

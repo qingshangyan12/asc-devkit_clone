@@ -81,7 +81,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Init(__ubuf__ uint8_t* 
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::Operate(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Operate(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, uint32_t opType)
 {
     __gm__ Channel* channelPtr = (__gm__ Channel*)(channel);
@@ -147,23 +147,22 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::Operate(
     PipeBarrier<PIPE_ALL>();
     KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: set wqe to qp ok");
 
-    HcommHandle handleId = ++curHandleId_;
     sqHead++;
     sqPI_.SetValue(0, sqHead);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI in stack, sqHead = %u handleId = %d", sqHead, handleId);
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI in stack, sqHead = %u", sqHead);
 
     if constexpr (commit) {
         Commit(channel);
-        KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok, handleId = %d", handleId);
+        KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: Commit ok");
     }
 
     Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
-    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI to GM sqHead = %u handleId = %d", sqHead, handleId);
-    return handleId;
+    KERNEL_LOG(KERNEL_INFO, "Hcomm Operate: update PI to GM sqHead = %u", sqHead);
+    return HCOMM_SUCCESS;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -171,7 +170,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteNbi(
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     (void)config;
@@ -179,7 +178,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::ReadNbi(
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
-__aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
+__aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
     ChannelPtr channel, GM_ADDR dst, GM_ADDR src, uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal)
 {
     (void)commit;
@@ -193,7 +192,7 @@ __aicore__ inline HcommHandle HcommImpl<COMM_PROTOCOL_ROCE>::WriteWithNotifyNbi(
     (void)notifyAddr;
     (void)notifyVal;
     KERNEL_LOG(KERNEL_ERROR, "Hcomm ROCE WriteWithNotifyNbi is not supported");
-    return HCOMM_INVALID_HANDLE_ID;
+    return HCOMM_FAILED;
 }
 
 template <pipe_t pipe>
