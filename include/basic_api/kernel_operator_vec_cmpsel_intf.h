@@ -64,11 +64,13 @@ __aicore__ inline void Compare(const LocalTensor<U>& dst, const LocalTensor<T>& 
     const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compare(const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[],
     const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Compare is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compare(const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask,
     const BinaryRepeatParams& repeatParams);
@@ -110,23 +112,27 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src);
  * @param [in] repeatParams.srcRepStride src0 repeat stride
  */
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Compares is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Compares is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const T src1Scalar, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "CompareScalar is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "CompareScalar is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CompareScalar(const LocalTensor<U>& dst, const LocalTensor<T>& src0,
     const T src1Scalar, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime,
     const UnaryRepeatParams& repeatParams);
@@ -187,10 +193,12 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, SELMODE selMode>
+__ASC_USE_RESERVED_UBUF__(3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
@@ -206,6 +214,7 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
  */
 // select mode: 0/1/2
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint32_t count);
 
@@ -229,12 +238,14 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
  */
 // select mode: 1
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask[], uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
 
 // select mode: 1
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime,
     const BinaryRepeatParams& repeatParams);
@@ -251,6 +262,7 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(2201, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, T src1, SELMODE selMode, uint32_t count);
 
@@ -267,11 +279,13 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
           const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__ASC_USE_RESERVED_UBUF__(3510, "Compares is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode,
     const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
           const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__ASC_USE_RESERVED_UBUF__(3510, "Compares is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode,
     const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
@@ -283,12 +297,14 @@ __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, C
 // CompareScalar has been updated, please use Compares instead.
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
           const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__ASC_USE_RESERVED_UBUF__(3510, "CompareScalar is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode,
     const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 // CompareScalar has been updated, please use Compares instead.
 template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, bool isSetMask = true,
           const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
+__ASC_USE_RESERVED_UBUF__(3510, "CompareScalar is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& src1, CMPMODE cmpMode,
     const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
