@@ -32,6 +32,7 @@ uint8_t GetCacheModeValue(CacheMode mode)
     static std::map<CacheMode, uint8_t> map = {
         { CacheMode::CACHE_MODE_DISABLE, 0b100 },
         { CacheMode::CACHE_MODE_NORMAL, 0b000 },
+        { CacheMode::CACHE_MODE_NORMAL, 0b010 },
     };
 
     return map[mode];
@@ -74,6 +75,7 @@ uint8_t GetCacheModeValue(CacheMode mode)
     }
 
 DATA_COPY_L2_CACHE_L1_TEST(uint16_t, CACHE_MODE_NORMAL)
+DATA_COPY_L2_CACHE_L1_TEST(uint16_t, CACHE_MODE_PERSISTENT)
 DATA_COPY_L2_CACHE_L1_TEST(int8_t, CACHE_MODE_DISABLE)
 
 #define LOAD_DATA_L2_CACHE_TEST(t, cacheMode, pos)                                                \
