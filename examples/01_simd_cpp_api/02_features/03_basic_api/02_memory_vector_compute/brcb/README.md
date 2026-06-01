@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例在数据填充场景下，基于Brcb API实现广播复制功能，将输入张量的数据复制填充到输出张量的多个datablock中。Brcb API支持每次从输入张量中取8个元素，分别填充到输出张量的8个datablock（每个datablock为32字节）中，每个元素对应一个datablock，实现高效的数据广播操作。
+本样例在数据填充场景下，基于Brcb API实现广播复制功能，将输入Tensor的数据复制填充到输出Tensor的多个DataBlock中。Brcb API支持每次从输入Tensor中取8个元素，分别填充到输出Tensor的8个DataBlock（每个DataBlock为32字节）中，每个元素对应一个DataBlock，实现高效的数据广播操作。
 
 ## 支持的产品
 
@@ -19,13 +19,13 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── brcb.asc      // Ascend C样例实现 & 调用样例
+│   └── brcb.asc                // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
 
 - 样例功能：  
-  本样例展示了使用Brcb API实现广播复制功能，每次从输入张量中取8个元素，分别填充到输出张量的8个datablock（每个datablock为32字节）中，每个元素对应一个datablock。Brcb API适用于需要将少量数据广播到大量位置的场景，例如常量填充、掩码生成等。通过repeatTime参数控制迭代次数，通过dstBlkStride和dstRepStride参数控制datablock间的地址步长。所用API详细介绍请参考[Brcb API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0089.html)。
+  本样例展示了使用Brcb API实现广播复制功能，每次从输入Tensor中取8个元素，分别填充到输出Tensor的8个DataBlock（每个DataBlock为32字节）中，每个元素对应一个DataBlock。Brcb API适用于需要将少量数据广播到大量位置的场景，例如常量填充、掩码生成等。通过repeatTime参数控制迭代次数，通过dstBlkStride和dstRepStride参数控制DataBlock间的地址步长。所用API详细介绍请参考[Brcb API文档](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta1/API/ascendcopapi/atlasascendc_api_07_0089.html)。
 
 - 样例规格：  
   <table border="2" align="center">
@@ -43,16 +43,10 @@
 - 样例实现：  
   本样例中实现的是固定shape为输入x[1,16]，输出y[1,256]的Brcb广播复制样例。
 
-  - Kernel实现
-
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，输入数据需要先搬运进片上存储，然后使用Brcb基础API接口完成广播复制，得到最终结果，再搬出到外部存储上。
-    
-    Brcb API参数说明：
-    - dst：目标张量，用于存储广播复制的结果
-    - src：源张量，要进行广播的数据
-    - repeatTime：指令迭代次数，本样例中为2，表示执行2次广播操作
-    - dstBlkStride：单次迭代内，不同datablock间地址步长，本样例中为1
-    - dstRepStride：相邻迭代间，相同datablock地址步长，本样例中为8
+  - Kernel实现  
+    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用Brcb接口，执行广播复制操作，将输入Tensor的数据复制填充到输出Tensor的多个DataBlock中
+    - 调用DataCopy基础API，将数据从UB（Unified Buffer）搬运到GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -79,13 +73,29 @@
     
 - 样例执行
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
+
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
+  示例如下：
+  ```bash
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # NPU仿真模式
+  ```
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |

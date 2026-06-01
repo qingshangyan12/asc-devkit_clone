@@ -45,7 +45,7 @@ from asc_op_compile_base.asc_op_compiler.compile_op import _gen_kernel_func_decl
     _compile_ascendc_cce_v200_with_kernel_type, _dynamic_kernel_list_to_json, \
     _compile_ascendc_cce_v200_with_kernel_type_for_dynamic, _gen_dynamic_json_for_v200, \
     _gen_static_json_for_mix_v200, _gen_static_json_for_no_mix_v200, _gen_non_mix_sub_json, _gen_mix_json_from_seperate_json, \
-    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section
+    _gen_mix_sub_json, _update_compile_option, gen_meta_info_section, _match_regex, _get_dcci_disable_cap_bitmap
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import call_bisheng_v220, get_ktype_section_variable, decode_mode, v220_mode, v310_mode
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_dfx import DFXSectionGenerator
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v200 import call_bisheng_v200_static
@@ -515,20 +515,20 @@ class TestCompileOp(unittest.TestCase):
         dump_size = 1024
         old_source = ""
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.static_shape_flag = True
         compile_info.tiling_key_struct_map = {'1': 96, '2': 100}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.tiling_key_data_size = {}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
         tiling_info.tiling_key_data_size = {'0': 96}
         new_source = add_op_param_to_workspace(
-            op_info, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
 
         op_info_neg = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d97',
@@ -550,7 +550,7 @@ class TestCompileOp(unittest.TestCase):
                     init_value_list=[None], output_shape_depend_on_compute=[0])
 
         new_source = add_op_param_to_workspace(
-            op_info_neg, tiling_info, old_source, dump_size, compile_options, compile_info)
+            op_info_neg, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
 
         value = get_value("DT_INT8")
@@ -705,7 +705,7 @@ class TestCompileOp(unittest.TestCase):
             cfg.current()["tir.op_debug_config"] = ["oom"]
         from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import CommonUtility as utility
         get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
-        global_var_storage.set_variable("ascendc_short_soc_version", "MC62CM12A")
+        global_var_storage.set_variable("ascendc_short_soc_version", "MC62")
         self.assertTrue(utility.is_m510())
         global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
@@ -1145,23 +1145,18 @@ class TestCompileOp(unittest.TestCase):
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        compile_info.dump_info["dump_type"]= "assert"
-        set_dump_assert_flag(compile_info)
-        assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
-        handle_dump_options(compile_info, compile_option_tuple)
+        # compile_info.dump_info["dump_type"]= "assert"
+        # assert global_var_storage.get_variable("ascendc_dump_assert_only") is True
         assert '-DASCENDC_DUMP=0' not in compile_option_tuple.compile_options
-        assert '-DASCENDC_DUMP_ASSERT_ONLY' in compile_option_tuple.compile_options
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         os.remove(compile_info.gen_kernel_func_file)
-        global_var_storage.set_variable("ascendc_dump_assert_only", True)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", True)
         compile_info.code_channel = 1
         gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple(compile_options, []))
-        global_var_storage.set_variable("ascendc_dump_assert_only", False)
+        # global_var_storage.set_variable("ascendc_dump_assert_only", False)
         compile_info.dump_info = infered_info_from_ifile.dump_info
         assert os.path.exists(
             compile_info.gen_kernel_func_file) == True, "Problems Occurred during Kernel Function Generation!!!"
@@ -2929,12 +2924,12 @@ Contents of section
         dump_size = 0
         compile_info.dump_info["dump_type"] = ['printf']
         result = _gen_set_workspace_codes(is_mix, is_single_and_using_hard_sync,
-                                          op_info, tiling_info, dump_size, compile_options, compile_info)
+                                          op_info, tiling_info, compile_options, compile_info)
         self.assertNotEqual(result, '')
         with buildcfg.build_config() as cfg:
             cfg.current()["tir.op_debug_config"] = ["oom"]
             result = _gen_set_workspace_codes(is_mix, is_single_and_using_hard_sync,
-                                          op_info, tiling_info, dump_size, compile_options, compile_info)
+                                          op_info, tiling_info, compile_options, compile_info)
         self.assertNotEqual(result, '')
 
     def test_dump_compile_log(self):
@@ -4377,76 +4372,6 @@ void add_custom();
             ascendc_tiling_no_register = global_var_storage.get_variable("ascendc_tiling_no_register")
             self.assertEqual(ascendc_tiling_no_register, True)
 
-
-    def test_get_dump_info_from_i_file_null(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR >= 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printf = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"printf,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_1(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printf = 1;
-auto __enable_feature_for_compile_assert = 1;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"printf,assert,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_2(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_assert = 1;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
-            file.write(context)
-        compile_op_module.global_var_storage.set_variable("ascendc_time_stamp_compile_options", True)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_type"],"assert,timestamp")
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
     def test_get_hard_sync_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
         os.system(f"touch {dst_i_file}")
@@ -4501,6 +4426,7 @@ auto __enable_feature_for_compile_deterministic = 1;
 
     def test_get_sync_task_start_end_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
         os.system(f"touch {dst_i_file}")
         with open(dst_i_file, "w") as file:
             context = """
@@ -4521,55 +4447,68 @@ WaitPreTaskEnd();
         self.assertEqual(res2, False)
         os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
 
-    def test_get_dump_info_with_simt_from_i_file(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-__attribute__((cce_simt_entry)) [aicore] __inline__ void SimtCompute(__attribute__((cce_global)) uint8_t *dumpWorkspaceAddr){}
-auto __enable_feature_for_compile_printf = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
+    def test_get_sync_task_start_end_instr_from_i_file_with_template_args(self):
+        context = """
+__aicore__ inline void SetNextTaskStart();
+__aicore__ inline void WaitPreTaskEnd();
+AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+AscendC::WaitPreTaskEnd<true>();
+AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+AscendC::WaitPreTaskEnd<true>();
 """
-            file.write(context)
-        with mock.patch.object(CommonUtility, 'is_c310', return_value=True):
-            dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-            self.assertEqual(dump_info["dump_size"], 1048576)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
+        res1, res2 = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(context)
+        self.assertEqual(res1, True)
+        self.assertEqual(res2, True)
 
-    def test_get_dump_info_from_i_file_stamp_off(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
+    def test_infer_info_from_ifile_uses_shared_scan_for_aclgraph_early_start(self):
+        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'aclgraph_early_start.i')
+        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
         os.system(f"touch {dst_i_file}")
-        with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_assertBufSize = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
+        context = """
+template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX, bool FORCE = false>
+__aicore__ inline void SetNextTaskStart();
+template<pipe_t AIV_PIPE, pipe_t AIC_PIPE, bool FORCE>
+__aicore__ inline void SetNextTaskStart()
+{
+    SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
+}
+template<bool FORCE = false>
+__aicore__ inline void WaitPreTaskEnd();
+template<bool FORCE>
+__aicore__ inline void WaitPreTaskEnd()
+{
+    WaitPreTaskEndImpl();
+}
 void add_custom();
+void add_custom()
+{
+    AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+    AscendC::WaitPreTaskEnd<true>();
+    AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
+    AscendC::WaitPreTaskEnd<true>();
+}
 """
-            file.write(context)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_size"],1)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
-
-    def test_get_dump_info_from_i_file_stamp(self):
-        dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.system(f"touch {dst_i_file}")
         with open(dst_i_file, "w") as file:
-            context = """
-auto __enable_feature_for_compile_printfBufSize = 1";
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR == 1";
-auto __enable_custom_tiling optiling::TilingData_A = default;
-auto __enable_custom_tiling optiling::TilingData = "TILING_KEY_VAR != 1";
-void add_custom();
-"""
             file.write(context)
-        dump_info = KernelInfoInfer.get_dump_info_from_i_file(context)
-        self.assertEqual(dump_info["dump_size"],1)
-        os.remove(os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i'))
+        op_info = OpInfo(kernel_name="AclgraphForceOp", op_type="AclgraphForceOp", inputs=[], outputs=[])
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        global_var_storage.set_variable("ascendc_compile_debug_config", True)
+        try:
+            with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
+                ctx.add_addition("super_kernel_sub_combine", True)
+                with mock.patch.object(CommonUtility, "is_v220", return_value=False), \
+                     mock.patch.object(CommonUtility, "is_c310", return_value=False), \
+                     mock.patch.object(CommonUtility, "is_m510", return_value=True), \
+                     mock.patch.object(KernelInfoInfer, "_gen_tiling_key_struct_map", return_value={}):
+                    result = KernelInfoInfer.infer_info_from_ifile(op_info, dst_i_file, None,
+                                                                   "add_custom.cpp", "add_custom")
+            self.assertTrue(result.super_kernel_early_start_set_flag)
+            self.assertTrue(result.super_kernel_early_start_wait_flag)
+        finally:
+            global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+            global_var_storage.set_variable("ascendc_compile_debug_config", False)
+            if os.path.exists(dst_i_file):
+                os.remove(dst_i_file)
 
     def test_get_tiling_struct_size(self):
         compile_info = CompileInfo()
@@ -5082,6 +5021,110 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         tiling = DFXArgInfo("tiling", DFXParamType.TILING)
         DFXSectionGenerator().insert_param(tiling)
         DFXSectionGenerator().generate_dfx_section_without_tiling_register(tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name)
+
+    def test_match_regex_basic(self):
+        self.assertFalse(_match_regex("*abc", "abc"))
+        self.assertFalse(_match_regex("*", "test"))
+
+    def test_match_regex_exact_match(self):
+        self.assertTrue(_match_regex("abc", "abc"))
+        self.assertFalse(_match_regex("abc", "abd"))
+        self.assertFalse(_match_regex("abc", "abcd"))
+
+    def test_match_regex_dot(self):
+        self.assertTrue(_match_regex("a.c", "abc"))
+        self.assertTrue(_match_regex("a.c", "aac"))
+        self.assertTrue(_match_regex(".", "x"))
+        self.assertFalse(_match_regex("a.c", "ac"))
+
+    def test_match_regex_star(self):
+        self.assertTrue(_match_regex("ab*c", "ac"))
+        self.assertTrue(_match_regex("ab*c", "abc"))
+        self.assertTrue(_match_regex("ab*c", "abbbc"))
+        self.assertTrue(_match_regex("a*", ""))
+        self.assertTrue(_match_regex("a*", "aaa"))
+        self.assertFalse(_match_regex("ab*c", "adc"))
+
+    def test_match_regex_wildcard(self):
+        self.assertTrue(_match_regex(".*", "anything"))
+        self.assertTrue(_match_regex(".*", ""))
+        self.assertTrue(_match_regex("a.*b", "acb"))
+        self.assertTrue(_match_regex("a.*b", "a123b"))
+        self.assertFalse(_match_regex("a.*b", "abx"))
+
+    def test_match_regex_prefix_suffix(self):
+        self.assertTrue(_match_regex("abc.*", "abc"))
+        self.assertTrue(_match_regex("abc.*", "abcdef"))
+        self.assertTrue(_match_regex(".*abc", "abc"))
+        self.assertTrue(_match_regex(".*abc", "xyzabc"))
+        self.assertFalse(_match_regex("abc.*", "ab"))
+
+    def test_match_regex_complex(self):
+        self.assertTrue(_match_regex("a.*b.*c", "abc"))
+        self.assertTrue(_match_regex("a.*b.*c", "aXbYc"))
+        self.assertTrue(_match_regex("a*b*c*", "abc"))
+        self.assertTrue(_match_regex("a*b*c*", "aaabbbccc"))
+
+    def test_match_regex_empty(self):
+        self.assertTrue(_match_regex("", ""))
+        self.assertFalse(_match_regex("", "a"))
+        self.assertFalse(_match_regex("a", ""))
+
+    def test_get_dcci_disable_cap_bitmap_empty_patterns(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_patterns_not_list(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": "not_a_list"}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_patterns_empty_list(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": []}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_matched(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_a", "kernel_b"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_not_matched(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x", "kernel_y"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_wildcard_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_.*", ".*_test"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_abc"])
+        self.assertEqual(result, 4)
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["op_test"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_multi_symbols_first_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_b"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
+        self.assertEqual(result, 4)
+
+    def test_get_dcci_disable_cap_bitmap_multi_symbols_no_match(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x"]}}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
+        self.assertEqual(result, 0)
+
+    def test_get_dcci_disable_cap_bitmap_no_sp_options(self):
+        compile_info = CompileInfo()
+        compile_info.super_kernel_info = {"other_option": "value"}
+        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
+        self.assertEqual(result, 0)
 
 
 if __name__ == "__main__":

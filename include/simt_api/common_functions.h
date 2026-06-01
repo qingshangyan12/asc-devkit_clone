@@ -17,10 +17,8 @@
 #endif
 
 #include "simt_api/device_types.h"
-#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "utils/debug/asc_printf.h"
 #include "utils/debug/asc_assert.h"
-#endif
 #include "utils/debug/asc_time.h"
 
 #ifndef SPLIT_CORE_VEC
@@ -29,9 +27,9 @@
 #endif
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 using dim3 = cce::dim3;
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 
 template <auto funcPtr, typename... Args>
 __aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)

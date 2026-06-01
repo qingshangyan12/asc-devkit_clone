@@ -2,62 +2,58 @@
 
 ## 概述
 
-本样例介绍DataSyncBarrier的调用，该接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，适用于核内标量单元流水（PIPE_S）的同步。
+本样例介绍DataSyncBarrier的调用，该接口功能：阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束。
 
 ## 支持的产品
 
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
 ## 目录结构介绍
 
-```
+```txt
 ├── data_sync_barrier
-│   ├── CMakeLists.txt                   // 编译工程文件
-│   └── data_sync_barrier.asc      // Ascend C算子实现 & 调用样例
+│   ├── scripts
+│   │   ├── gen_data.py            // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py       // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt             // 编译工程文件
+│   ├── data_utils.h               // 数据读入写出函数
+│   └── data_sync_barrier.asc      // Ascend C样例实现 & 调用样例
 ```
 
-## 算子描述
+## 样例规格
 
-核内单流水同步指令包含[PipeBarrier](../pipe_barrier/)和DataSyncBarrier，其中调用PipeBarrier<PIPE_S>()会引发硬件错误。因此当需要做标量流水之间的同步需要使用DataSyncBarrier。
+<table border="2">
+<caption>表1：样例规格对照表</caption>
+<tr><th>类型</th><th>名称</th><th>Shape</th><th>数据类型</th><th>格式</th></tr>
+<tr><td>输入</td><td>srcGm</td><td>[1, 8]</td><td>int32_t</td><td>ND</td></tr>
+<tr><td>输出</td><td>dstGm</td><td>[1, 8]</td><td>int32_t</td><td>ND</td></tr>
+<tr><td>核函数名</td><td colspan="4" style="text-align:center;">kernel_data_sync_barrier</td></tr>
+</table>
 
-下面介绍 DataSyncBarrier 的一种使用场景：
-系统中有两个 AIV 核（核 0 与核 1），变量 x、y 初始值均为 1。核 0 通过标量流水接口[WriteGmByPassDCache](../../16_scalar_computation/write_gm_by_pass_dcache/)向GM依次写入 x=7、y=6；核 1 持续轮询变量 y，直到检测到 y=6 后，再从 GM 中读取变量 x 并打印。
+## 样例说明
 
-预期行为：当 y=6 写入 GM 时，x=7 必须已完成写入 GM，因此核 1 最终打印的 x 值应为 7。
+下面按步骤介绍本样例中 `DataSyncBarrier` 的使用场景：
 
-但由于标量流水不能保证指令间的写序一致性，若不加同步，可能出现 y 已更新而 x 尚未写入 GM 的情况，导致核 1 读到错误的 x 值。
-此时需要插入同步指令 DataSyncBarrier，以确保两次写操作顺序执行。
+1. 系统中有两个 AIV 核，分别记为核 0 和核 1。GM 中的两个变量 `x` 和 `y` 初始值都为 1。
+2. 核 0 先通过标量流水接口WriteGmByPassDCache向 `srcGm[1]` 写入 `x=7`。
+3. 核 0 再插入 `DataSyncBarrier<AscendC::MemDsbT::DDR>()`，等待前一次 GM 写操作完成。
+4. 核 0 随后向 `srcGm[0]` 写入 `y=6`。
+5. 核 1 持续轮询 `srcGm[0]`，直到读到 `y=6`，再读取 `srcGm[1]`，并将 `2 * x` 写入输出。
 
-如下所示，核 0 通过同步指令完成对GM中张量srcGlobal第 1 个元素与第 0 个元素的顺序写入。调用DataSyncBarrier后，将阻塞后续WriteGmByPassDCache指令的执行，直至此前所有WriteGmByPassDCache类型的 GM(对应DDR) 访问指令全部完成。
+预期行为是：
 
-        if (blockIdx == 0) {
-            AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm)+1, value+1);
-            AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>(); // 三种取值，ALL(包含DDR+UB)、DDR、UB
-            AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), value); // value = 6
-        }
+- 当核 1 读到 `y=6` 时，`x=7` 必须已经写回 GM。
+- 因此核 1 读到的 `x` 应为 7，最终输出应为 14。
 
-在核 1 中，一直循环读取GM中输入tensor srcGlobal的第0个元素的取值value，当value的取值与核 0 向srcGlobal写入的值相等时，此时可以认为GM中srcGlobal第 1 个元素也已经被核 0 写入。
-
-        if (blockIdx == 1) {
-            while(true){
-                __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
-                T value = AscendC::ReadGmByPassDCache<T>(addr);
-                if(value == 6){
-                    __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
-                    T valueNew = AscendC::ReadGmByPassDCache<T>(addr+1);
-                    AscendC::printf("GM上addr+1位置的值：%u\n",valueNew);
-                    AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * valueNew);
-                    return;
-                }
-            }
-        }
+如果不加同步，标量流水不保证两次 GM 写入的先后顺序，可能出现 `y` 已更新而 `x` 尚未完成写入的情况。这样核 1 即使已经看到 `y=6`，也可能读到错误的 `x` 值。
 
 ## 编译运行
 
-在本样例根目录下执行如下步骤，编译并执行算子。
+在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
@@ -80,10 +76,31 @@
 - 样例执行
 
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证输出结果是否正确
   ```
+
+  使用CPU调试时，添加 `-DCMAKE_ASC_RUN_MODE=cpu`参数即可。
+
+  示例如下：
+
+  ```bash
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式
+  ```
+
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu` | 运行模式：NPU运行、CPU调试|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2/A3，dav-3510对应Ascend 950 |
+
+- 执行结果
 
   执行结果如下，说明精度对比成功。
 

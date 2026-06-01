@@ -30,17 +30,37 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 5102
+#include "impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h"
+#else
+#include "impl/utils/debug/asc_debug_utils_impl_stub.h"
 #endif
 
 namespace __asc_aicore {
+__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
+{
+    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
+}
+
 __aicore__ inline void enable_asc_diagnostics()
 {
-#if defined(__ENABLE_ASCENDC_PRINTF__)
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
     static const struct AscTlv __asc_debug_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 1};
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
-#endif // __ENABLE_ASCENDC_PRINTF__
+}
+
+__aicore__ inline void enable_asc_assert()
+{
+#if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+#if (__NPU_ARCH__ == 5102)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#else
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 5};
+#endif
+#endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
 template <typename T, typename U, typename... Args>
@@ -70,6 +90,20 @@ __aicore__ inline uint32_t asc_debug_get_core_idx()
 __aicore__ inline uint64_t asc_debug_get_block_idx()
 {
     return asc_debug_get_block_idx_impl();
+}
+
+__aicore__ inline uint64_t asc_debug_get_block_num()
+{
+    return get_block_num();
+}
+
+__aicore__ inline uint64_t asc_debug_get_block_total_num()
+{
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+    return asc_debug_get_block_num() * get_task_ration();
+#else
+    return asc_debug_get_block_num();
+#endif
 }
 
 __aicore__ inline int64_t asc_debug_get_program_counter()
@@ -110,16 +144,17 @@ __aicore__ inline void sync_all()
     sync_all_impl();
 }
 
-__aicore__ inline void mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
+__aicore__ inline uint32_t mem_copy_gm_to_gm(__gm__ uint8_t* dst, __gm__ const uint8_t* src, const uint32_t& len)
 {
     if (dst == nullptr || src == nullptr)
     {
-        return;
+        return 1;
     }
     for (uint32_t i = 0; i < len; i++) {
         *(dst + i) = *(src + i);
     }
     asc_entire_dcci((__gm__ uint64_t*)dst);
+    return 0;
 }
 
 __aicore__ __gm__ inline DebugBlockHeadInfo* get_block_info()
@@ -249,8 +284,51 @@ __aicore__ constexpr inline DumpTensorDataType get_dump_datatype()
     return get_dump_datatype_impl<T>();
 }
 
+__aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint64_t& version, uint64_t& timeStamp)
+{
+#ifdef ASC_DEVKIT_VERSION_STR
+    versionStr = const_cast<__gm__ char*>(ASC_DEVKIT_VERSION_STR);
+#else
+    versionStr = const_cast<__gm__ char*>("Unknown ASC_DEVKIT version");
+#endif
+
+#ifdef ASC_DEVKIT_TIMESTAMP
+    timeStamp = static_cast<uint64_t>(ASC_DEVKIT_TIMESTAMP);
+#else
+    timeStamp = 0;
+#endif
+
+#ifdef ASC_DEVKIT_VERSION
+    version = static_cast<uint64_t>(ASC_DEVKIT_VERSION);
+#else
+    version = 0;
+#endif
+}
+
 } // namespace __asc_aicore
 #endif
+
+__aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
+{
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (g_sysPrintFifoSpace != nullptr) {
+        constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+        uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
+        uint16_t blockIdx = asc_debug_get_block_idx();
+        get_printf_ubuf_addr_aicore(ascReservedAddr, blockIdx);
+    }
+#endif
+}
+
+__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
+{
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    if (g_sysPrintFifoSpace != nullptr) {
+        pipe_barrier(PIPE_ALL);
+        asc_vf_debug_ub2gm();
+    }
+#endif
+}
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

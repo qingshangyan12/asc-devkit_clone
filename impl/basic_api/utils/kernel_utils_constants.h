@@ -21,6 +21,7 @@
 #define ASCENDC_MODULE_UTILS_CONSTANTS_H
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_dump_constants.h"
+#include "impl/utils/common_types.h"
 
 namespace AscendC {
 const int32_t DEFAULT_BLK_NUM = 8;
@@ -349,7 +350,7 @@ namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
 }
 
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
 // param check size
 const int32_t MAX_BLOCK_COUNT = 4095;
 const int32_t MIN_BLOCK_COUNT = 1;
@@ -429,6 +430,10 @@ const int32_t MIN_SORT_REPEAT_TIMES = 1;
 namespace Internal {
 constexpr uint8_t REGION_PROPOSAL_ELEMENT_NUM = 8;
 }
+
+#endif // (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 
 template <typename T> std::string ScalarToString(T scalarValue);
 template <> inline std::string ScalarToString(half scalarValue)
@@ -576,7 +581,7 @@ struct IntegerSubType {
     }
 };
 
-using int4b_t = IntegerSubType<INT4_BIT_NUM, true>;
+using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
 
 #if (__NPU_ARCH__ == 5102)
 using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
@@ -718,6 +723,24 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIC = 0b1000;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV = 0b1001;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX = 0b1010;
 #endif
+
+// early-start mask for super kernel early start V3.
+// Low 16 bits layout: | 4bits ctrl(mask) | 4bits reserved | 4bits aivqueue(mask) | 4bits aicqueue(mask) |
+namespace Internal {
+// aic task que func config
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_SET = 1U << 0;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_WAIT = 1U << 1;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_SET = 1U << 2;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_WAIT = 1U << 3;
+// aiv task que func config
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_SET = 1U << 4;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_WAIT = 1U << 5;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_SET = 1U << 6;
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT = 1U << 7;
+// control bits
+// If set, WaitPreTaskEndV3Impl uses loose sync; otherwise it uses tight sync.
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_CTRL_SPLIT_CORE = 1U << 15;
+} // namespace Internal
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
 __BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;

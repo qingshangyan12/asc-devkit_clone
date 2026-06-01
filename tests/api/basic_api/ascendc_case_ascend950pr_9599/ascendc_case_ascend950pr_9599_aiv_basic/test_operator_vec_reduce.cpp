@@ -13,17 +13,17 @@
 using namespace std;
 using namespace AscendC;
 
-template <typename T>
+template <typename T, typename U = T>
 void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __restrict__ srcGm,
     __gm__ int32_t dataSize)
 {
     TPipe tpipe;
-    GlobalTensor<T> input0Global;
     GlobalTensor<T> outputGlobal;
-    input0Global.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(srcGm), dataSize);
+    GlobalTensor<U> input0Global;
     outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
-
-    LocalTensor<T> input0Local;
+    input0Global.SetGlobalBuffer(reinterpret_cast<__gm__ U*>(srcGm), dataSize);
+    
+    LocalTensor<U> input0Local;
     TBuffAddr tbuf0;
     tbuf0.logicPos = static_cast<uint8_t>(TPosition::VECCALC);
     input0Local.SetAddr(tbuf0);
@@ -33,7 +33,7 @@ void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __res
     TBuffAddr tbuf2;
     tbuf2.logicPos = static_cast<uint8_t>(TPosition::VECCALC);
     outputLocal.SetAddr(tbuf2);
-    outputLocal.InitBuffer(dataSize * sizeof(T) * 2, dataSize);
+    outputLocal.InitBuffer(dataSize * sizeof(U) * 2, dataSize);
 
     DataCopy(input0Local, input0Global, dataSize);
 
@@ -42,13 +42,13 @@ void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __res
     uint64_t mask[2] = {0xffffffff, 0xffffffff};
     uint64_t counterMask[2] = {144, 0};
     uint8_t repeatTimes = dataSize / (256 / sizeof(T));
-    WholeReduceSum<T>(outputLocal, input0Local, mask, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T, U>(outputLocal, input0Local, mask, repeatTimes, 1, 1, 8);
 
     AscendC::SetMaskCount();
-    AscendC::SetVectorMask<T, MaskMode::COUNTER>(0, 144);
-    WholeReduceSum<T, false>(outputLocal, input0Local, AscendC::MASK_PLACEHOLDER_LIST, repeatTimes, 1, 1, 8);
+    AscendC::SetVectorMask<U, MaskMode::COUNTER>(0, 144);
+    ReduceRepeat<ReduceType::SUM, T, U, false>(outputLocal, input0Local, AscendC::MASK_PLACEHOLDER_LIST, repeatTimes, 1, 1, 8);
     AscendC::ResetMask();
-    WholeReduceSum<T>(outputLocal, input0Local, counterMask, repeatTimes, 1, 1, 8);
+    ReduceRepeat<ReduceType::SUM, T, U>(outputLocal, input0Local, counterMask, repeatTimes, 1, 1, 8);
     AscendC::SetMaskNorm();
 
     set_flag(PIPE_V, PIPE_MTE3, EVENT_ID0);
@@ -60,7 +60,8 @@ void VecWholeReduceSum(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __res
 
 struct ReduceTestParams {
     int32_t dataSize;
-    int32_t databitSize;
+    int32_t srcDatabitSize;
+    int32_t dstDatabitSize;
     void (*cal_func)(uint8_t*, uint8_t*, int32_t);
 };
 
@@ -71,14 +72,14 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(ReduceSimpleTestCase, ReduceSimpleTestsuite,
-    ::testing::Values(ReduceTestParams{ 256, 2, VecWholeReduceSum<half> }));
+    ::testing::Values(ReduceTestParams{ 256, 2, 2, VecWholeReduceSum<half>}));
 
 TEST_P(ReduceSimpleTestsuite, ReduceSimpleTestCase)
 {
     TPipe tpipe;
     auto param = GetParam();
-    uint8_t srcGm[param.dataSize * param.databitSize] = {0};
-    uint8_t dstGm[param.dataSize * param.databitSize] = {0};
+    uint8_t srcGm[param.dataSize * param.srcDatabitSize] = {0};
+    uint8_t dstGm[param.dataSize * param.dstDatabitSize] = {0};
 
     param.cal_func(dstGm, srcGm, param.dataSize);
     for (int32_t i = 0; i < param.dataSize; i++) {
@@ -258,4 +259,100 @@ TEST_P(ReduceMergeSimpleTestsuite, ReduceMergeSimpleTestCase)
     for (int32_t i = 0; i < param.dstDataSize; i++) {
         EXPECT_EQ(dstGm[i], 0x00);
     }
+}
+
+template <typename T>
+__global__ __aicore__ void MainReduceSumCounterMode(
+    __gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __restrict__ dstGm, __gm__ int32_t srcDataSize,
+    __gm__ int32_t dstDataSize)
+{
+    TPipe tpipe;
+    int32_t mask = 64;
+    if (sizeof(PrimT<T>) == sizeof(half)) {
+        mask = 128;
+    }
+    int32_t repStride = 8;
+    int32_t repeat = srcDataSize / mask;
+
+    GlobalTensor<T> inputGlobal;
+    GlobalTensor<T> outputGlobal;
+    inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ PrimT<T>*>(srcGm), srcDataSize);
+    outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ PrimT<T>*>(dstGm), dstDataSize);
+
+    TBuf<TPosition::VECIN> tbuf1;
+    tpipe.InitBuffer(tbuf1, srcDataSize * sizeof(PrimT<T>));
+    LocalTensor<T> inputLocal = tbuf1.Get<T>();
+
+    TBuf<TPosition::VECOUT> tbuf2;
+    tpipe.InitBuffer(tbuf2, dstDataSize * sizeof(PrimT<T>));
+    LocalTensor<T> outputLocal = tbuf2.Get<T>();
+
+    TBuf<TPosition::VECCALC> tbuf3;
+    tpipe.InitBuffer(tbuf3, repeat * repStride);
+    LocalTensor<T> workLocal = tbuf3.Get<T>();
+
+    DataCopy(inputLocal, inputGlobal, srcDataSize);
+    event_t eventIdMte2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
+    SetFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
+    WaitFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
+
+    AscendC::SetMaskCount();
+    AscendC::SetVectorMask<T, MaskMode::COUNTER>(0, srcDataSize);
+    ReduceSum<T>(outputLocal, inputLocal, workLocal, srcDataSize);
+    AscendC::SetMaskNorm();
+
+    event_t eventIdVToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+    SetFlag<HardEvent::V_MTE3>(eventIdVToMte3);
+    WaitFlag<HardEvent::V_MTE3>(eventIdVToMte3);
+
+    DataCopy(outputGlobal, outputLocal, dstDataSize);
+
+    PipeBarrier<PIPE_ALL>();
+}
+
+struct ReduceSumCounterModeTestParams {
+    void (*calFunc)(uint8_t*, uint8_t*, int32_t, int32_t);
+    int32_t srcDataSize;
+    int32_t dstDataSize;
+    int32_t dtypeSize;
+    int32_t shapeScope;
+};
+
+class ReduceSumCounterModeTestsuite : public testing::Test,
+                                      public testing::WithParamInterface<ReduceSumCounterModeTestParams> {
+protected:
+    void SetUp() {}
+    void TearDown() {}
+};
+
+INSTANTIATE_TEST_CASE_P(
+    TEST_REDUCE_SUM_COUNTER_MODE, ReduceSumCounterModeTestsuite,
+    ::testing::Values(
+        // shapeScope 1: count <= oneRepSize (float: 64, half: 128)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 64, 16, 4, 1},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 128, 16, 2, 1},
+        // shapeScope 2: count <= oneRepSize * 2 (float: 128, half: 256)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 128, 16, 4, 2},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 256, 16, 2, 2},
+        // shapeScope 3: count <= oneRepSize * 3 (float: 192, half: 384)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 192, 16, 4, 3},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 384, 16, 2, 3},
+        // shapeScope 4: count <= oneRepSize * 4 (float: 256, half: 512)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 256, 16, 4, 4},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 512, 16, 2, 4},
+        // shapeScope 5: count <= oneRepSize * oneRepSize (float: 4096, half: 16384)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 4096, 16, 4, 5},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 16384, 16, 2, 5},
+        // shapeScope 6: count > oneRepSize * oneRepSize (float: >4096, half: >16384)
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<float>, 8192, 16, 4, 6},
+        ReduceSumCounterModeTestParams{MainReduceSumCounterMode<half>, 32768, 16, 2, 6}));
+
+TEST_P(ReduceSumCounterModeTestsuite, ReduceSumCounterModeTestCase)
+{
+    auto param = GetParam();
+    std::vector<uint8_t> srcGm(param.srcDataSize * param.dtypeSize);
+    std::vector<uint8_t> dstGm(param.dstDataSize * param.dtypeSize);
+
+    param.calFunc(srcGm.data(), dstGm.data(), param.srcDataSize, param.dstDataSize);
+    EXPECT_EQ(dstGm[0], 0x00);
 }

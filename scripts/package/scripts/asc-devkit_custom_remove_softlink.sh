@@ -89,6 +89,9 @@ do_remove_stub_softlink() {
     if [ -z "$(ls -A "$install_path/$latest_dir/compiler")" ]; then
         rm -r "$install_path/$latest_dir/compiler/"
     fi
+    if [ -d "$install_path/$latest_dir/tools/opbuild" ]; then 
+        rm -f "$install_path/$latest_dir/tools/opbuild" 
+    fi
     
     if [ -d "$arch_linux_path/pkg_inc/asc/hccl" ]; then
         rm -rf "$arch_linux_path/pkg_inc/asc"
@@ -129,6 +132,9 @@ remove_softlink "asc_op_compile_base"
 remove_softlink "asc_op_compile_base-*.dist-info"
 remove_softlink "asc_opc_tool"
 remove_softlink "asc_opc_tool-*.dist-info"
+# hccl python whl 软链接
+remove_softlink "hccl"
+remove_softlink "hccl-*.dist-info"
 
 remove_empty_dir "$WHL_SOFTLINK_INSTALL_DIR_PATH"
 remove_empty_dir "$install_path/$latest_dir/python"

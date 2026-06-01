@@ -9,10 +9,10 @@
 # ----------------------------------------------------------------------------------------------------------
 add_compile_options(-Werror)
 
-add_subdirectory(aicpu_api)
 add_subdirectory(adv_api)
 add_subdirectory(basic_api)
 add_subdirectory(c_api)
+add_subdirectory(tensor_api)
 add_subdirectory(utils)
 
 if(NOT BUILD_OPEN_PROJECT)
@@ -35,5 +35,5 @@ if(NOT BUILD_OPEN_PROJECT)
     DESTINATION
     ${INSTALL_INCLUDE_DIR}/asc/include/adv_api)
 
-  install(SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/tiling_directory.cmake)
+  install(SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/tiling_directory.cmake COMPONENT asc-devkit)
 endif()

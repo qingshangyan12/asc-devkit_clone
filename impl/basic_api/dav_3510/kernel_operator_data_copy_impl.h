@@ -184,12 +184,12 @@ __aicore__ inline void CopyUbufToCbuf(__cbuf__ T* dst, __ubuf__ T* src, const ui
 
 // only support CubeCore   PIPE_MTE1
 // L1 -> UB: copy_cbuf_to_ubuf
-template <typename T>
+template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void CopyCbufToUbuf(__ubuf__ T* dst, __cbuf__ T* src, const uint16_t blockCount,
                                       const uint16_t blockLen, const uint16_t srcStride, const uint16_t dstStride)
 {
     if ASCEND_IS_AIC {
-        copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, 0, blockCount, blockLen, srcStride, dstStride);
+        copy_cbuf_to_ubuf((__ubuf__ void*)dst, (__cbuf__ void*)src, static_cast<bool>(subBlockId), blockCount, blockLen, srcStride, dstStride);
     }
 }
 
@@ -203,6 +203,10 @@ __aicore__ inline void CopyCbufToBt(uint64_t dst, __cbuf__ T* src, const uint16_
     if ASCEND_IS_AIC {
         if constexpr (std::is_same<T, bfloat16_t>::value || std::is_same<T, float>::value
                       || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
+            if constexpr (sizeof(T) == 4) {
+                ASCENDC_DEBUG_ASSERT((blockLen % 2 == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR,
+                    "For float or int32_t types, blockLen must be even when DataCopy from L1 to BIAS."));
+            }
             copy_cbuf_to_bt(dst, src, static_cast<bool>(convControl), blockCount, blockLen, srcStride, dstStride);
         }
     }
@@ -808,10 +812,10 @@ __aicore__ inline void DataCopyUB2L0CImpl(__cc__ T* dst, __ubuf__ U* src, const 
 }
 
 // SRC: L1
-template <typename T>
+template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-    CopyCbufToUbuf(dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
+    CopyCbufToUbuf<T, subBlockId>(dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
                    intriParams.dstStride);
 }
 
@@ -1432,7 +1436,7 @@ template <typename T>
 __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const DataCopyParams& intriParams,
                                             const uint8_t cacheMode = 0)
 {
-    ASSERT(false && "unsupported data copy from gm to ubuf with pad in Ascend910");
+    ASSERT(false && "unsupported data copy from gm to ubuf with pad on current device");
 }
 
 __aicore__ inline void NdDmaDciImpl() {

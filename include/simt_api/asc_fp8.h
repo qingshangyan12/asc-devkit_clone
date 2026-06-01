@@ -16,11 +16,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_FP8_H__
 #endif
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-
-#include "simt_api/asc_bf16.h"
-#include "simt_api/device_types.h"
-
 typedef enum __asc_fp8_interpretation_t {
     __ASC_E4M3,
     __ASC_E5M2,
@@ -32,6 +27,11 @@ typedef enum __asc_saturation_t {
 } __asc_saturation_t;
 
 typedef unsigned short int __asc_fp8x2_storage_t;
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+
+#include "simt_api/asc_bf16.h"
+#include "simt_api/device_types.h"
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline hifloat8x2_t __float22hif82_rna(const float2 x);
 
@@ -61,7 +61,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline __asc_fp8x2_storage_t
 __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate,
                           const __asc_fp8_interpretation_t fp8_interpretation);
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "impl/simt_api/asc_fp8_impl.h"
+#endif
 
 #endif
 

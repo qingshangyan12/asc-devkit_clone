@@ -44,15 +44,14 @@
   本样例中实现的是固定shape为输出y[1,128]的CreateVecIndex样例，生成从0开始的128个连续整数索引（0, 1, 2, ..., 127）。
   
   CreateVecIndex API参数说明：
-  - dst：目标张量，用于存储生成的索引向量
+  - dst：目的操作数，用于存储生成的索引向量
   - startIndex：索引的起始值，本样例中为0
-  - count：参与计算的元素个数，本样例中为128（repeatTime * 256 / sizeof(uint16_t)）
-  - repeatTime：指令迭代次数，控制生成的数据量
-  - dstBlkStride：单次迭代内，不同datablock间地址步长
-  - dstRepStride：相邻迭代间，相同datablock地址步长
+  - count：参与计算的元素个数，本样例中为128
 
-  - Kernel实现
-    计算逻辑是：Ascend C提供的矢量计算接口的操作元素都为LocalTensor，首先分配输出缓冲区，然后使用CreateVecIndex基础API接口生成索引向量，得到最终结果，再搬出到外部存储上。
+  - Kernel实现  
+    - 调用Duplicate接口，初始化UB（Unified Buffer）缓冲区为0
+    - 调用CreateVecIndex接口，生成从0开始的连续索引向量
+    - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运到GM（Global Memory）
 
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
@@ -80,13 +79,29 @@
     
 - 样例执行
   ```bash
-  mkdir -p build && cd build;   # 创建并进入build目录
-  cmake ..;make -j;             # 编译工程
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j;    # 编译工程，默认npu模式
   python3 ../scripts/gen_data.py   # 生成测试输入数据
-  ./demo                        # 执行编译生成的可执行程序，执行样例
+  ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
   执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
+
+  使用CPU调试或NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  
+  示例如下：
+  ```bash
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # CPU调试模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201;make -j; # NPU仿真模式
+  ```
+  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |

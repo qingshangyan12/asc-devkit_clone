@@ -73,6 +73,7 @@ enum class HardEvent : uint8_t {
     FIX_FIX,
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003))
     FIX_V,
+    V_FIX,
 #endif
     MAX,
 };
@@ -506,6 +507,35 @@ __aicore__ constexpr TPosition GetBufferLogicPos(TPosition pos, bool isSrc)
     return TPosition::MAX;
 }
 
+__aicore__ constexpr bool IsVecPos(TPosition pos)
+{
+    return pos == TPosition::VECIN || pos == TPosition::VECOUT || pos == TPosition::VECCALC;
+}
+
+__aicore__ constexpr bool IsTQuePositionForVec(TPosition src, TPosition dst)
+{
+    return (IsVecPos(src) || IsVecPos(dst)) && src != TPosition::TSCM && dst != TPosition::TSCM;
+}
+
+template <typename T>
+__aicore__ constexpr bool UseBufIdSync()
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    return IsTQuePositionForVec(T::srcPosition, T::dstPosition) || T::config.enableStaticEvtId;
+#else
+    return false;
+#endif
+}
+
+__aicore__ constexpr bool UseBufIdSync(TPosition src, TPosition dst, bool enableStaticEvtId)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    return IsTQuePositionForVec(src, dst) || enableStaticEvtId;
+#else
+    return false;
+#endif
+}
+
 __aicore__ constexpr HardEvent GetQueEvt(Hardware src, Hardware dst, bool fwdDirect, bool nd2nz = false,
                                          bool nz2nd = false)
 {
@@ -717,7 +747,7 @@ __aicore__ inline void RlsBufInternal(uint8_t bufId) {
 __aicore__ constexpr pipe_t GetPipeByPos(TPosition pos, TPosition altPos)
 {
     if (pos == TPosition::GM) {
-        return altPos == TPosition::GM ? PIPE_MTE2 : PIPE_MTE3;
+        return altPos == TPosition::VECIN ? PIPE_MTE2 : PIPE_MTE3;
     } else if (pos == TPosition::VECIN) {
         return altPos == TPosition::GM ? PIPE_V : PIPE_MTE2;
     } else if (pos == TPosition::VECCALC) {
@@ -991,6 +1021,9 @@ __aicore__ inline void SetFlagImpl(int32_t eventID)
         case HardEvent::FIX_V:
             SetFlagInternal<PIPE_FIX, PIPE_V>(e);
             break;
+        case HardEvent::V_FIX:
+            SetFlagInternal<PIPE_V, PIPE_FIX>(e);
+            break;
 #endif
         case HardEvent::MAX:
             break;
@@ -1115,6 +1148,9 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102))
         case HardEvent::FIX_V:
             WaitFlagInternal<PIPE_FIX, PIPE_V>(e);
+            break;
+        case HardEvent::V_FIX:
+            WaitFlagInternal<PIPE_V, PIPE_FIX>(e);
             break;
 #endif
         case HardEvent::MTE3_MTE2:

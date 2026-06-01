@@ -2887,7 +2887,7 @@ __simd_callee__ inline void asc_min_scalar(vector_float& dst, vector_float src, 
     asc_min_scalar_impl(dst, src, value, mask);
 }
 
-__simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_f16 src, half value, vector_bool mask)
+__simd_callee__ inline void asc_min_scalar(vector_half& dst, vector_half src, half value, vector_bool mask)
 {
     asc_min_scalar_impl(dst, src, value, mask);
 }
@@ -3026,103 +3026,103 @@ __simd_callee__ inline void asc_gt_scalar(vector_bool& dst, vector_float src, fl
     asc_gt_scalar_impl(dst, src, value, mask);
 }
 
-//=================aschal2uint8===============
-__simd_callee__ inline void asc_half2uint8_rd(vector_u8& dst, vector_f16 src, vector_bool mask)
+//=================asc_half2uint8===============
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rd_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rd_sat(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rd_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rd_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rd_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rd_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rd_sat_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rd_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rd_sat_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rn(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rn_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rn_sat(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rn_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rn_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rn_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rn_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rn_sat_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rn_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rn_sat_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rna(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rna_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rna_sat(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rna_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rna_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rna_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rna_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rna_sat_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rna_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rna_sat_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_ru(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_ru_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_ru_sat(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_ru_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_ru_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_ru_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_ru_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_ru_sat_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_ru_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_ru_sat_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rz(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rz_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rz_sat(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rz_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rz_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rz_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rz_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_half2uint8_rz_sat_v2(vector_u8& dst, vector_f16 src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rz_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
 {
     asc_half2uint8_rz_sat_v2_impl(dst, src, mask);
 }
@@ -4169,42 +4169,42 @@ __simd_callee__ inline void asc_float2bfloat16_rz_sat_v2(vector_bfloat16_t& dst,
 }
 
 // ==========asc_float2e5m2==========
-__simd_callee__ inline void asc_float2e5m2_rn(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_v2(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_v3(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_v3(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_v4(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_v4_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_sat(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_sat(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_sat_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_sat_v2(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v2(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_sat_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_sat_v3(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v3(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_sat_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_float2e5m2_rn_sat_v4(vector_f8e5m2& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t& dst, vector_float src, vector_bool mask)
 {
     asc_float2e5m2_rn_sat_v4_impl(dst, src, mask);
 }
@@ -4886,123 +4886,123 @@ __simd_callee__ inline void asc_float2e4m3_rn_v4(vector_fp8_e4m3fn_t& dst, vecto
 }
 
 // ==========asc_bfloat162e1m2x2_rd/rn/rna/ru/rz==========
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rd_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rd_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rd_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rd_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rd_v4_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rn_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rn_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rn_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rn_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rn_v4_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rna_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rna_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rna_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rna_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rna_v4_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_ru_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_ru_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_ru_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_ru_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_ru_v4_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rz_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v2(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rz_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v3(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rz_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_f4e1m2x2& dst, vector_bfloat16_t src, vector_bool mask)
+__simd_callee__ inline void asc_bfloat162e1m2x2_rz_v4(vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask)
 {
     asc_bfloat162e1m2x2_rz_v4_impl(dst, src, mask);
 }
 
 // ==========asc_e1m2x22bfloat16==========
-__simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst, vector_f4e1m2x2 src, vector_bool mask)
+__simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
 {
     asc_e1m2x22bfloat16_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_e1m2x22bfloat16_v2(vector_bfloat16_t& dst, vector_f4e1m2x2 src, vector_bool mask)
+__simd_callee__ inline void asc_e1m2x22bfloat16_v2(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
 {
     asc_e1m2x22bfloat16_v2_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_e1m2x22bfloat16_v3(vector_bfloat16_t& dst, vector_f4e1m2x2 src, vector_bool mask)
+__simd_callee__ inline void asc_e1m2x22bfloat16_v3(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
 {
     asc_e1m2x22bfloat16_v3_impl(dst, src, mask);
 }
 
-__simd_callee__ inline void asc_e1m2x22bfloat16_v4(vector_bfloat16_t& dst, vector_f4e1m2x2 src, vector_bool mask)
+__simd_callee__ inline void asc_e1m2x22bfloat16_v4(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
 {
     asc_e1m2x22bfloat16_v4_impl(dst, src, mask);
 }

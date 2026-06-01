@@ -10,7 +10,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-sourcedir="$PWD/asc-devkit"
+sourcedir="$PWD"
 curpath=$(dirname $(readlink -f "$0"))
 common_func_path="${curpath}/common_func.inc"
 devkit_func_path="${curpath}/asc-devkit_func.sh"
@@ -65,9 +65,9 @@ done
 
 WHL_INSTALL_DIR_PATH="${common_parse_dir}/python/site-packages"
 PYTHON_ASC_OP_COMPILE_BASE_NAME="asc_op_compile_base"
-PYTHON_ASC_OP_COMPILE_BASE_WHL_PATH="${sourcedir}/../lib/asc_op_compile_base-0.1.0-py3-none-any.whl"
+PYTHON_ASC_OP_COMPILE_BASE_WHL_PATH="${sourcedir}/lib/asc_op_compile_base-0.1.0-py3-none-any.whl"
 PYTHON_ASC_OPC_TOOL_NAME="asc_opc_tool"
-PYTHON_ASC_OPC_TOOL_WHL_PATH="${sourcedir}/../lib/asc_opc_tool-0.1.0-py3-none-any.whl"
+PYTHON_ASC_OPC_TOOL_WHL_PATH="${sourcedir}/lib/asc_opc_tool-0.1.0-py3-none-any.whl"
 
 # 写日志
 log() {
@@ -102,6 +102,33 @@ install_whl_package() {
     fi
 }
 
+clear_kernel_cache_dir() {
+    local dir_atc_data="$HOME/atc_data"
+    local dir_kernel_caches="$(ls -d $dir_atc_data/kernel_cache* 2> /dev/null)"
+    if [ -z "$dir_kernel_caches" ]; then
+        return
+    fi
+    if [ -w "$dir_atc_data" ]; then
+        for dir_cache in $dir_kernel_caches; do
+            [ ! -d "$dir_cache" ] && continue
+            [ -n "$dir_cache" ] && rm -rf "$dir_cache" > /dev/null 2>&1
+            if [ -d "$dir_cache" ]; then
+                log "WARNING" "failed to delete directory '$dir_cache'"
+            else
+                log "INFO" "directory '$dir_cache' was deleted."
+            fi
+        done
+    else
+        log "WARNING" "current user do not have permission to delete kernel_cache* directories in '$dir_atc_data'."
+    fi
+}
+
+get_arch_name() {
+    local pkg_dir="$1"
+    local scene_file="$pkg_dir/scene.info"
+    grep '^arch=' $scene_file | cut -d"=" -f2
+}
+
 custom_install() {
     if [ -z "$common_parse_dir/share/info/asc-devkit" ]; then
         log "ERROR" "ERR_NO:0x0001;ERR_DES:asc-devkit directory is empty"
@@ -113,7 +140,13 @@ custom_install() {
 
     # create softlinks for stub libs in devlib/linux/${ARCH}
     create_stub_softlink "$common_parse_dir"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
 
+    if [ -d "${common_parse_dir}/lib" ]; then
+        rm -rf "${common_parse_dir}/lib"
+    fi
     return 0
 }
 
@@ -121,4 +154,6 @@ custom_install
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+clear_kernel_cache_dir
 exit 0

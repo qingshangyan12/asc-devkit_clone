@@ -2,7 +2,7 @@
 # coding=utf-8
 
 # ----------------------------------------------------------------------------------------------------------
-# Copyright (c) 2025 Huawei Technologies Co., Ltd.
+# Copyright (c) 2025-2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 import sys
 import numpy as np
+import argparse
 
 
 RELATIVE_TOL = 1e-6
@@ -21,10 +22,14 @@ ABSOLUTE_TOL = 1e-9
 ERROR_TOL = 1e-4
 
 
-def verify_result(output, golden):
+def verify_result(output, golden, scenario_num):
     output_type = np.uint8
     output = np.fromfile(output, dtype=output_type).reshape(-1)
     golden = np.fromfile(golden, dtype=output_type).reshape(-1)
+
+    if scenario_num == 2:
+        output = output[0:8]
+        golden = golden[0:8]
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=RELATIVE_TOL,
@@ -46,8 +51,12 @@ def verify_result(output, golden):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-scenario_num', type=int, default=1, choices=range(1, 5))
+    args, unknown_args = parser.parse_known_args()
+    
     try:
-        res = verify_result(sys.argv[1], sys.argv[2])
+        res = verify_result(sys.argv[1], sys.argv[2], args.scenario_num)
         if not res:
             raise ValueError("[ERROR] result error")
         else:

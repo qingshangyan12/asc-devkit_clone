@@ -6,7 +6,7 @@
 
 ## 支持的产品
 
-本样例支持如下产品型号：
+- Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
@@ -14,7 +14,7 @@
 
 ```
 ├── tiling_sink_programming
-│   └── test_add_custom_tiling_sink.py
+│   └── test_add_custom_tiling_sink.py   // PyTorch图模式下Tiling下沉调用测试脚本
 ```
 
 ## 代码实现介绍

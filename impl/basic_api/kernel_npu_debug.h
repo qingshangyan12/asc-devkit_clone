@@ -111,6 +111,19 @@ __aicore__ inline void CheckTensorAlignment(const LocalTensor<T>& inputTensor, u
         tensorName, apiName, alignBytes, static_cast<unsigned long long>(tensorAddr)));
 }
 
+__aicore__ inline void CheckAddrAlignment(uint64_t addr, Hardware phyPos, uint32_t alignBytes,
+    const __gm__ char* addrName, const __gm__ char* apiName)
+{
+    uint64_t checkAddr = addr;
+#ifdef ASCENDC_CPU_DEBUG
+    checkAddr = addr - reinterpret_cast<uint64_t>(
+        ConstDefiner::Instance().hardwareCpuBufferMap.at(phyPos));
+#endif
+    ASCENDC_DEBUG_ASSERT((checkAddr % alignBytes == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check %s "
+        "address alignment in %s, its address must align with %u bytes, current address is %llu.\n",
+        addrName, apiName, alignBytes, static_cast<unsigned long long>(checkAddr)));
+}
+
 template <typename T>
 __aicore__ inline void CheckValueRange(T value, T valueLow, T valueHigh, const __gm__ char* paramName,
     const __gm__ char* apiName)
@@ -169,8 +182,8 @@ __aicore__ inline void CheckMaskArray(const uint64_t mask[], const __gm__ char* 
     }
 }
 
-template <typename T, bool isSetMask = true>
-__aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* apiName)
+template <typename T, bool isSetMask = true, typename MaskType = uint64_t>
+__aicore__ inline void CheckMaskValue(const MaskType mask, const __gm__ char* apiName)
 {
     if ASCEND_IS_AIC {
         return;   // AIC does not need to check mask
@@ -180,8 +193,12 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
     }
 
     if (!IsMaskNorm()) {
-        ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
-            "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
+        if constexpr (SupportType<MaskType, int32_t>()) {
+            CheckValueRange<int32_t>(mask, 0, INT32_MAX, "mask when counter mode", apiName);
+        } else {
+            ASCENDC_DEBUG_ASSERT((mask <= UINT32_MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "Failed to check mask value when "
+                "counter mode in %s, mask should be in range [0, UINT32_MAX], current value is %llu.\n", apiName, mask));
+        }
         return;
     }
 
@@ -191,11 +208,11 @@ __aicore__ inline void CheckMaskValue(const uint64_t mask, const __gm__ char* ap
 #endif
 
     if constexpr (sizeof(T) == 2) {
-        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
+        CheckValueRange<MaskType>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 2" , apiName);
     } else if constexpr (sizeof(T) == 4) {
-        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
+        CheckValueRange<MaskType>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 4" , apiName);
     } else if constexpr (sizeof(T) == 8) {
-        CheckValueRange<uint64_t>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
+        CheckValueRange<MaskType>(mask, 0, ONE_REPEAT_BYTE_SIZE / sizeof(T), "mask when sizeof(T) == 8" , apiName);
     }
 }
 
