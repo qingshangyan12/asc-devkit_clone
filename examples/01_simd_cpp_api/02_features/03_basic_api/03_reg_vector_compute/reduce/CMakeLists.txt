@@ -20,7 +20,6 @@ project(kernel_samples LANGUAGES ASC CXX)
 
 # 定义所有需要编译的 .asc 文件及其对应的可执行目标名
 set(ASC_SOURCES
-    reduce_sum_acc.asc
     reduce_sum_2level.asc
     reduce_sum_seq.asc
     reduce_sum_binary.asc
