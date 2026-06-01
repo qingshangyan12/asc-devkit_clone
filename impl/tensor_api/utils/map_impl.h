@@ -69,19 +69,19 @@ private:
     };
 
     template <typename Key, size_t Index, size_t MaxSize>
-    struct FindImpl {
+    struct GetImpl {
         using CurrentPair = typename Std::tuple_element<Index, MapType>::type;
         static_assert(IsValidPair<CurrentPair>::value, "TupleMap expects Std::tuple<Key, Value> entries.");
         using CurrentKey = PairKey<CurrentPair>;
         using CurrentVal = PairValue<CurrentPair>;
 
-        using NextResult = typename FindImpl<Key, Index + 1, MaxSize>::type;
+        using NextResult = typename GetImpl<Key, Index + 1, MaxSize>::type;
 
         using type = Std::conditional_t<Std::is_same_v<CurrentKey, Key>, CurrentVal, NextResult>;
     };
 
     template <typename Key, size_t MaxSize>
-    struct FindImpl<Key, MaxSize, MaxSize> {
+    struct GetImpl<Key, MaxSize, MaxSize> {
         using type = Std::ignore_t;
     };
 
@@ -145,7 +145,7 @@ private:
 
 public:
     template <typename Key>
-    using Get = typename FindImpl<Key, 0, MapSize>::type;
+    using Get = typename GetImpl<Key, 0, MapSize>::type;
 
     template <typename Input>
     using Find = typename MatchImpl<Input, 0, MapSize>::type;
