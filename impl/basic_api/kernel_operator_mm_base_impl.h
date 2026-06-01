@@ -232,7 +232,9 @@ __aicore__ inline void LoadDataImpl(const LocalTensor<T>& dst, const LocalTensor
 }
 
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T, typename U>
+__aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src,
     const LoadData3DParamsV2<U>& loadDataParams)
 {
     ASCENDC_ASSERT(CheckFuncLoadData3dv2(dst, src, loadDataParams, "LoadDataWithStride with LoadData3DParamsV2"), {
