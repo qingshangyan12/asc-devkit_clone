@@ -25,6 +25,7 @@
 
 #include "impl/tensor_api/utils/utils_impl.h"
 #include "impl/tensor_api/tensor/pointer_mem_impl.h"
+#include "c_api/sys_var/sys_var.h"
 
 namespace AscendC {
 namespace Te {
