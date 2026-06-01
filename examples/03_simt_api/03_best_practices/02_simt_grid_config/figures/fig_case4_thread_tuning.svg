@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400" font-family="Arial, sans-serif">
+  <defs>
+    <style>
+      .axis-line { stroke: #333; stroke-width: 1.5; }
+      .grid-line { stroke: #ddd; stroke-width: 0.8; stroke-dasharray: 3,3; }
+      .tick-text { font-size: 11px; fill: #333; }
+      .axis-title { font-size: 13px; fill: #333; font-weight: bold; }
+      .data-label { font-size: 9px; fill: #333; }
+      .line-baseline { stroke: #4472C4; stroke-width: 2.5; fill: none; }
+      .dot-baseline { fill: #4472C4; }
+      .line-optimized { stroke: #70AD47; stroke-width: 2.5; fill: none; }
+      .dot-optimized { fill: #70AD47; }
+    </style>
+  </defs>
+  <rect width="600" height="400" fill="#fff"/>
+
+  <!-- Chart area: x=80-540, y=50-340, Y=0-12us, 1us=24.17px -->
+  <text x="310" y="25" text-anchor="middle" style="font-size:14px;font-weight:bold;fill:#333;">小shape[8, 2048] 线程数调优对比</text>
+
+  <!-- Y gridlines (every 2us) -->
+  <line x1="80" y1="340" x2="540" y2="340" class="grid-line"/>
+  <line x1="80" y1="291.7" x2="540" y2="291.7" class="grid-line"/>
+  <line x1="80" y1="243.3" x2="540" y2="243.3" class="grid-line"/>
+  <line x1="80" y1="195" x2="540" y2="195" class="grid-line"/>
+  <line x1="80" y1="146.7" x2="540" y2="146.7" class="grid-line"/>
+  <line x1="80" y1="98.3" x2="540" y2="98.3" class="grid-line"/>
+  <line x1="80" y1="50" x2="540" y2="50" class="grid-line"/>
+
+  <text x="70" y="344" text-anchor="end" class="tick-text">0</text>
+  <text x="70" y="296" text-anchor="end" class="tick-text">2</text>
+  <text x="70" y="248" text-anchor="end" class="tick-text">4</text>
+  <text x="70" y="199" text-anchor="end" class="tick-text">6</text>
+  <text x="70" y="151" text-anchor="end" class="tick-text">8</text>
+  <text x="70" y="103" text-anchor="end" class="tick-text">10</text>
+  <text x="70" y="54" text-anchor="end" class="tick-text">12</text>
+  <text x="25" y="195" text-anchor="middle" class="axis-title" transform="rotate(-90 25 195)">Task Duration (us)</text>
+
+  <line x1="80" y1="340" x2="540" y2="340" class="axis-line"/>
+  <line x1="80" y1="50" x2="80" y2="340" class="axis-line"/>
+
+  <!-- X axis: 16核→x=180, 32核→x=310, 64核→x=440 -->
+  <text x="180" y="360" text-anchor="middle" class="tick-text">16核</text>
+  <text x="310" y="360" text-anchor="middle" class="tick-text">32核</text>
+  <text x="440" y="360" text-anchor="middle" class="tick-text">64核</text>
+  <text x="310" y="380" text-anchor="middle" class="axis-title">Block Dim (逻辑核数)</text>
+
+  <!-- 2048T baseline line: 16核=8.765→y=340-8.765*24.17=128.15, 32核=9.041→y=340-9.041*24.17=121.54, 64核=10.46→y=340-10.46*24.17=87.12 -->
+  <polyline points="180,128.15 310,121.54 440,87.12" class="line-baseline"/>
+  <circle cx="180" cy="128.15" r="5" class="dot-baseline"/>
+  <circle cx="310" cy="121.54" r="5" class="dot-baseline"/>
+  <circle cx="440" cy="87.12" r="5" class="dot-baseline"/>
+  <text x="180" y="121" text-anchor="middle" class="data-label">8.765</text>
+  <text x="310" y="115" text-anchor="middle" class="data-label">9.041</text>
+  <text x="440" y="80" text-anchor="middle" class="data-label">10.46</text>
+
+  <!-- 调优线程 line: 16核(1024T)=8.103→y=340-8.103*24.17=144.19, 32核(512T)=7.841→y=340-7.841*24.17=150.73, 64核(256T)=9.104→y=340-9.104*24.17=119.81 -->
+  <polyline points="180,144.19 310,150.73 440,119.81" class="line-optimized"/>
+  <circle cx="180" cy="144.19" r="5" class="dot-optimized"/>
+  <circle cx="310" cy="150.73" r="5" class="dot-optimized"/>
+  <circle cx="440" cy="119.81" r="5" class="dot-optimized"/>
+  <text x="180" y="152" text-anchor="middle" class="data-label" style="fill:#70AD47;">8.103</text>
+  <text x="310" y="158" text-anchor="middle" class="data-label" style="fill:#70AD47;">7.841</text>
+  <text x="440" y="113" text-anchor="middle" class="data-label" style="fill:#70AD47;">9.104</text>
+
+  <!-- Legend -->
+  <line x1="420" y1="38" x2="445" y2="38" class="line-baseline" stroke-width="2.5"/>
+  <circle cx="432" cy="38" r="4" class="dot-baseline"/>
+  <text x="450" y="42" class="tick-text">2048线程(固定)</text>
+  <line x1="420" y1="48" x2="445" y2="48" class="line-optimized" stroke-width="2.5"/>
+  <circle cx="432" cy="48" r="4" class="dot-optimized"/>
+  <text x="450" y="52" class="tick-text">调优线程</text>
+</svg>

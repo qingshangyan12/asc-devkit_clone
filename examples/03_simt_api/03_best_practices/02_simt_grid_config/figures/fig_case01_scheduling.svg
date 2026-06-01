@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 440" width="700" height="440" font-family="Arial, sans-serif">
+  <defs>
+    <style>
+      .axis-line { stroke: #333; stroke-width: 1.5; }
+      .grid-line { stroke: #ddd; stroke-width: 0.8; stroke-dasharray: 3,3; }
+      .tick-text { font-size: 11px; fill: #333; }
+      .axis-title { font-size: 13px; fill: #333; font-weight: bold; }
+      .data-label { font-size: 9px; fill: #333; }
+      .line-1vf { stroke: #4472C4; stroke-width: 2.5; fill: none; }
+      .line-2vf { stroke: #ED7D31; stroke-width: 2.5; fill: none; stroke-dasharray: 8,4; }
+      .dot-1vf { fill: #4472C4; }
+      .dot-2vf { fill: #ED7D31; }
+    </style>
+  </defs>
+
+  <rect width="700" height="440" fill="#fff"/>
+
+  <!-- Chart: x=80-650, y=50-380, Y=0-16us, 1us=20.625px -->
+  <text x="365" y="25" text-anchor="middle" style="font-size:14px;font-weight:bold;fill:#333;">逻辑核数与调度头开销</text>
+
+  <!-- Y gridlines (every 2us) -->
+  <line x1="80" y1="380" x2="650" y2="380" class="grid-line"/>
+  <line x1="80" y1="338.75" x2="650" y2="338.75" class="grid-line"/>
+  <line x1="80" y1="297.5" x2="650" y2="297.5" class="grid-line"/>
+  <line x1="80" y1="256.25" x2="650" y2="256.25" class="grid-line"/>
+  <line x1="80" y1="215" x2="650" y2="215" class="grid-line"/>
+  <line x1="80" y1="173.75" x2="650" y2="173.75" class="grid-line"/>
+  <line x1="80" y1="132.5" x2="650" y2="132.5" class="grid-line"/>
+  <line x1="80" y1="91.25" x2="650" y2="91.25" class="grid-line"/>
+  <line x1="80" y1="50" x2="650" y2="50" class="grid-line"/>
+
+  <!-- Y ticks -->
+  <text x="70" y="384" text-anchor="end" class="tick-text">0</text>
+  <text x="70" y="343" text-anchor="end" class="tick-text">2</text>
+  <text x="70" y="301" text-anchor="end" class="tick-text">4</text>
+  <text x="70" y="260" text-anchor="end" class="tick-text">6</text>
+  <text x="70" y="219" text-anchor="end" class="tick-text">8</text>
+  <text x="70" y="178" text-anchor="end" class="tick-text">10</text>
+  <text x="70" y="137" text-anchor="end" class="tick-text">12</text>
+  <text x="70" y="95" text-anchor="end" class="tick-text">14</text>
+  <text x="70" y="54" text-anchor="end" class="tick-text">16</text>
+  <text x="25" y="215" text-anchor="middle" class="axis-title" transform="rotate(-90 25 215)">Task Duration (us)</text>
+
+  <!-- Axes -->
+  <line x1="80" y1="380" x2="650" y2="380" class="axis-line"/>
+  <line x1="80" y1="50" x2="80" y2="380" class="axis-line"/>
+
+  <!-- X ticks: 1,32,64,128,1024 → x=120,240,360,480,600 -->
+  <text x="120" y="400" text-anchor="middle" class="tick-text">1</text>
+  <text x="240" y="400" text-anchor="middle" class="tick-text">32</text>
+  <text x="360" y="400" text-anchor="middle" class="tick-text">64</text>
+  <text x="480" y="400" text-anchor="middle" class="tick-text">128</text>
+  <text x="600" y="400" text-anchor="middle" class="tick-text">1024</text>
+  <text x="365" y="420" text-anchor="middle" class="axis-title">Block Dim (逻辑核数)</text>
+
+  <!-- 1vf line: S1(1,3.753), S2(32,4.429), S3(64,4.758), S4(128,5.137), S5(1024,14.306) -->
+  <!-- y = 380 - val*20.625 -->
+  <!-- S1:302.3 S2:289.5 S3:283.0 S4:274.2 S5:83.9 -->
+  <polyline points="120,302.3 240,289.5 360,283.0 480,274.2 600,83.9" class="line-1vf"/>
+  <circle cx="120" cy="302.3" r="4" class="dot-1vf"/>
+  <circle cx="240" cy="289.5" r="4" class="dot-1vf"/>
+  <circle cx="360" cy="283.0" r="4" class="dot-1vf"/>
+  <circle cx="480" cy="274.2" r="4" class="dot-1vf"/>
+  <circle cx="600" cy="83.9" r="4" class="dot-1vf"/>
+  <text x="120" y="293" text-anchor="middle" class="data-label">3.753</text>
+  <text x="240" y="281" text-anchor="middle" class="data-label">4.429</text>
+  <text x="360" y="275" text-anchor="middle" class="data-label">4.758</text>
+  <text x="480" y="266" text-anchor="middle" class="data-label">5.137</text>
+  <text x="600" y="75" text-anchor="middle" class="data-label">14.306</text>
+
+  <!-- 2vf line: S6(32,4.716), S7(64,4.911), S8(1024,15.841) -->
+  <!-- S6:281.2 S7:277.0 S8:50.6 -->
+  <polyline points="240,281.2 360,277.0 600,50.6" class="line-2vf"/>
+  <circle cx="240" cy="281.2" r="4" class="dot-2vf"/>
+  <circle cx="360" cy="277.0" r="4" class="dot-2vf"/>
+  <circle cx="600" cy="50.6" r="4" class="dot-2vf"/>
+  <text x="240" y="273" text-anchor="middle" class="data-label" style="fill:#ED7D31;">4.716</text>
+  <text x="360" y="269" text-anchor="middle" class="data-label" style="fill:#ED7D31;">4.911</text>
+  <text x="600" y="65" text-anchor="middle" class="data-label" style="fill:#ED7D31;">15.841</text>
+
+  <!-- Legend -->
+  <line x1="200" y1="430" x2="230" y2="430" class="line-1vf"/>
+  <circle cx="215" cy="430" r="3.5" class="dot-1vf"/>
+  <text x="238" y="434" style="font-size:10px;fill:#333;">1次vf调用 (Case 0)</text>
+  <line x1="400" y1="430" x2="430" y2="430" class="line-2vf"/>
+  <circle cx="415" cy="430" r="3.5" class="dot-2vf"/>
+  <text x="438" y="434" style="font-size:10px;fill:#333;">2次vf调用 (Case 1)</text>
+</svg>
