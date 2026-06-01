@@ -4,7 +4,7 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| <term>Ascend 950PR/Ascend 950DT</term> | √ |
+| Ascend 950PR/Ascend 950DT | √ |
 
 ## 功能说明
 
@@ -57,6 +57,8 @@ PIPE_V
 vector_half src0;
 vector_half src1;
 vector_half dst;
-vector_bool mask;
-asc_or(dst, src0, src1, mask)
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
+asc_loadalign(src0, src0_addr);  // src0_addr是外部输入的UB内存空间地址
+asc_loadalign(src1, src1_addr);  // src0_addr是外部输入的UB内存空间地址
+asc_or(dst, src0, src1, mask);
 ```

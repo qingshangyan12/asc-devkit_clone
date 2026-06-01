@@ -4,9 +4,9 @@
 
 | 产品 | 是否支持  |
 | :-----------| :------: |
-| <cann-filter npu_type="950">Ascend 950PR/Ascend 950DT | √    </cann-filter>|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 |    √     |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 |    √     |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
 
 ## 功能说明
 
@@ -54,5 +54,5 @@ asc_add(dst, src1, src0, total_length);
 // 同步操作：前置操作完成后才能启动后续操作。
 asc_sync();
 
-asc_copy_ub2gm((__gm__ void*)dst_gm, (__ubuf__ void*)dst, blockLength * sizeof(float));
+asc_copy_ub2gm((__gm__ void*)dst_gm, (__ubuf__ void*)dst, total_length * sizeof(float));
 ```
