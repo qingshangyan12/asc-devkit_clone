@@ -249,7 +249,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
     if (writeInfo->bufOffset + tlvLen > ringBufLen) {
         // 需要回绕（跳过writeInfo->bufOffset后剩余的ringbuf，设置writeInfo->bufOffset=0），该分支下有 writeInfo->bufOffset != 0
         // 进行回绕前需要判断回绕会不会导致覆写
-        if (readInfo->bufOffset > writeInfo->bufOffset || readInfo->bufOffset) {
+        if (readInfo->bufOffset > writeInfo->bufOffset || readInfo->bufOffset == 0) {
             // 此分支必有 writeInfo->bufOffset != readInfo->bufOffset，不写入直接等待时，rts会正常读取所有未读内容
             if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
                 return false;
