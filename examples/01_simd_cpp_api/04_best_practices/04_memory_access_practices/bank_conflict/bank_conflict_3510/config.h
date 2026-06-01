@@ -113,6 +113,26 @@ using T1 = uint32_t;
 using T2 = float;
 using T3 = float;
 #define USED_VF GatherAndScatterVF
+#elif CASE_NUM == 12
+// 一读一写，DATA_BLOCK_COPY 跨步读写，对标 Case 7 对比跨步 vs 连续的性能差异
+constexpr uint32_t TOTAL_LENGTH = 512;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0000;
+constexpr uint32_t zLocalAddr = 0x4100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddsVFWithStride1
+#elif CASE_NUM == 13
+// 一读一写，竖着搬运 stride=8，对标 Case 12 对比竖着 vs 横着的性能差异
+constexpr uint32_t TOTAL_LENGTH = 512;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0000;
+constexpr uint32_t zLocalAddr = 0x4100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddsVFWithStride2
 #endif
 
 #endif // BANK_CONFLICT_CONFIG_H

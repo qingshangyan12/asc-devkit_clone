@@ -72,6 +72,32 @@ __simd_vf__ inline void AddsVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* d
     }
 }
 
+template <typename T>
+__simd_vf__ inline void AddsVFWithStride1(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+{
+    // 横着搬运512个数: 8轮×64元素
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::RegTensor<T> reg0, reg1;
+    for (uint16_t i = 0; i < 8; ++i) {
+        AscendC::Reg::LoadAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(reg0, src0 + oneRepSize * i, 1, mask);
+        AscendC::Reg::Adds(reg1, reg0, (T)0, mask);
+        AscendC::Reg::StoreAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + oneRepSize * i, reg1, 1, mask);
+    }
+}
+
+template <typename T>
+__simd_vf__ inline void AddsVFWithStride2(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+{
+    // stride=8, 竖着搬运: 分8块×64列, 每次加载1个DataBlock(8元素), 64轮拼满一行
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::RegTensor<T> reg0, reg1;
+    for (uint16_t i = 0; i < 8; ++i) {
+        AscendC::Reg::LoadAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(reg0, src0 + i * 8, 8, mask);
+        AscendC::Reg::Adds(reg1, reg0, (T)0, mask);
+        AscendC::Reg::StoreAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + i * 8, reg1, 8, mask);
+    }
+}
+
 template <typename T1, typename T2, typename T3>
 __simd_vf__ inline void GatherAndScatterVF(__ubuf__ T1* src0, __ubuf__ T2* src1, __ubuf__ T3* dst)
 {
