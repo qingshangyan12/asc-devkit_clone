@@ -584,7 +584,6 @@ __aicore__ inline __in_pipe__(MTE3)
                    intriParams.dstStride);
 #else
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
     if ASCEND_IS_AIV {
@@ -710,7 +709,6 @@ template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
 #if KFC_C310_SSBUF == 1 || __MIX_CORE_AIC_RATION__ != 1
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
     ASCENDC_ASSERT((intriParams.dValue * sizeof(T) % ONE_BLK_SIZE == 0),
@@ -743,7 +741,6 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
     }
 #else
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
     if ASCEND_IS_AIV {
@@ -1174,7 +1171,6 @@ __aicore__ inline void DataCopyPadUB2L1ImplCommon(__cbuf__ T* dst, __ubuf__ T* s
                                             const Nd2NzParams& nd2nzParams)
 {
     // Add for TSCM AIV: Copy buffer into workspace, and send message to AIC
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
     if ASCEND_IS_AIV {

@@ -603,7 +603,6 @@ __aicore__ inline void TransND2NZ(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr, uint
 template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
-    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
     ASCENDC_ASSERT((dst != nullptr), { KERNEL_LOG(KERNEL_ERROR, "dst ptr can not be nullptr"); });
     ASCENDC_ASSERT((src != nullptr), { KERNEL_LOG(KERNEL_ERROR, "src ptr can not be nullptr"); });
     ASCENDC_ASSERT((intriParams.dValue * sizeof(T) % ONE_BLK_SIZE == 0),
