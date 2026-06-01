@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 620" width="1600" height="620" font-family="Arial, sans-serif">
+  <defs>
+    <style>
+      .axis-line { stroke: #333; stroke-width: 1.5; }
+      .grid-line { stroke: #ddd; stroke-width: 0.8; stroke-dasharray: 3,3; }
+      .tick-text { font-size: 11px; fill: #333; }
+      .tick-text-sm { font-size: 8px; fill: #555; }
+      .axis-title { font-size: 13px; fill: #333; font-weight: bold; }
+      .chart-title { font-size: 16px; fill: #333; font-weight: bold; }
+      .legend-text { font-size: 10px; fill: #333; }
+      .data-label { font-size: 8px; fill: #333; }
+      .tbd-label { font-size: 7px; fill: #999; }
+      .section-label { font-size: 10px; fill: #333; font-weight: bold; }
+      .line-empty { stroke: #4472C4; stroke-width: 2; fill: none; }
+      .line-empty-dash { stroke: #4472C4; stroke-width: 2; fill: none; stroke-dasharray: 6,3; }
+      .line-large { stroke: #ED7D31; stroke-width: 2; fill: none; }
+      .line-medium { stroke: #C0392B; stroke-width: 2; fill: none; }
+      .line-small { stroke: #70AD47; stroke-width: 2; fill: none; }
+      .dot-empty { fill: #4472C4; }
+      .dot-large { fill: #ED7D31; }
+      .dot-medium { fill: #C0392B; }
+      .dot-small { fill: #70AD47; }
+      .dot-tbd { fill: none; stroke: #999; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="620" fill="#ffffff"/>
+
+  <!-- Chart area: x=80 to x=1520, y=60 to y=450 -->
+  <!-- Y axis: 0 to 100 us, 1us = 3.9px -->
+
+  <text x="800" y="35" text-anchor="middle" class="chart-title">Task Duration vs SCENARIO_NUM (23 Scenarios)</text>
+
+  <!-- Section headers -->
+  <text x="310" y="52" text-anchor="middle" style="font-size:11px;fill:#4472C4;font-weight:bold;">Case 0/1: 空壳核函数</text>
+  <text x="640" y="52" text-anchor="middle" style="font-size:11px;fill:#ED7D31;font-weight:bold;">Case 2: 大shape</text>
+  <text x="820" y="52" text-anchor="middle" style="font-size:11px;fill:#C0392B;font-weight:bold;">Case 3: 中shape</text>
+  <text x="1210" y="52" text-anchor="middle" style="font-size:11px;fill:#70AD47;font-weight:bold;">Case 4: 小shape</text>
+
+  <!-- Y gridlines (every 10us) -->
+  <line x1="80" y1="450" x2="1520" y2="450" class="grid-line"/>
+  <line x1="80" y1="411" x2="1520" y2="411" class="grid-line"/>
+  <line x1="80" y1="372" x2="1520" y2="372" class="grid-line"/>
+  <line x1="80" y1="333" x2="1520" y2="333" class="grid-line"/>
+  <line x1="80" y1="294" x2="1520" y2="294" class="grid-line"/>
+  <line x1="80" y1="255" x2="1520" y2="255" class="grid-line"/>
+  <line x1="80" y1="216" x2="1520" y2="216" class="grid-line"/>
+  <line x1="80" y1="177" x2="1520" y2="177" class="grid-line"/>
+  <line x1="80" y1="138" x2="1520" y2="138" class="grid-line"/>
+  <line x1="80" y1="99" x2="1520" y2="99" class="grid-line"/>
+  <line x1="80" y1="60" x2="1520" y2="60" class="grid-line"/>
+
+  <!-- Y tick labels -->
+  <text x="70" y="454" text-anchor="end" class="tick-text">0</text>
+  <text x="70" y="415" text-anchor="end" class="tick-text">10</text>
+  <text x="70" y="376" text-anchor="end" class="tick-text">20</text>
+  <text x="70" y="337" text-anchor="end" class="tick-text">30</text>
+  <text x="70" y="298" text-anchor="end" class="tick-text">40</text>
+  <text x="70" y="259" text-anchor="end" class="tick-text">50</text>
+  <text x="70" y="220" text-anchor="end" class="tick-text">60</text>
+  <text x="70" y="181" text-anchor="end" class="tick-text">70</text>
+  <text x="70" y="142" text-anchor="end" class="tick-text">80</text>
+  <text x="70" y="103" text-anchor="end" class="tick-text">90</text>
+  <text x="70" y="64" text-anchor="end" class="tick-text">100</text>
+
+  <text x="22" y="255" text-anchor="middle" class="axis-title" transform="rotate(-90 22 255)">Task Duration (us)</text>
+
+  <!-- Axes -->
+  <line x1="80" y1="450" x2="1520" y2="450" class="axis-line"/>
+  <line x1="80" y1="60" x2="80" y2="450" class="axis-line"/>
+
+  <!-- Separators -->
+  <line x1="550" y1="60" x2="550" y2="450" stroke="#999" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="730" y1="60" x2="730" y2="450" stroke="#999" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="970" y1="60" x2="970" y2="450" stroke="#999" stroke-width="1" stroke-dasharray="6,4"/>
+
+  <!-- X labels: Case 0/1 (S1-S8) -->
+  <text x="100" y="468" text-anchor="middle" class="tick-text-sm">1</text>
+  <text x="160" y="468" text-anchor="middle" class="tick-text-sm">2</text>
+  <text x="220" y="468" text-anchor="middle" class="tick-text-sm">3</text>
+  <text x="280" y="468" text-anchor="middle" class="tick-text-sm">4</text>
+  <text x="340" y="468" text-anchor="middle" class="tick-text-sm">5</text>
+  <text x="400" y="468" text-anchor="middle" class="tick-text-sm">6</text>
+  <text x="460" y="468" text-anchor="middle" class="tick-text-sm">7</text>
+  <text x="520" y="468" text-anchor="middle" class="tick-text-sm">8</text>
+  <text x="100" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">1核</text>
+  <text x="160" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">32核</text>
+  <text x="220" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">64核</text>
+  <text x="280" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">128核</text>
+  <text x="340" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">1024核</text>
+  <text x="400" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">32核2vf</text>
+  <text x="460" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">64核2vf</text>
+  <text x="520" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#4472C4;">1024核2vf</text>
+
+  <!-- X labels: Case 2 (S9-S11) -->
+  <text x="580" y="468" text-anchor="middle" class="tick-text-sm">9</text>
+  <text x="640" y="468" text-anchor="middle" class="tick-text-sm">10</text>
+  <text x="700" y="468" text-anchor="middle" class="tick-text-sm">11</text>
+  <text x="580" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#ED7D31;">1024核</text>
+  <text x="640" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#ED7D31;">64核</text>
+  <text x="700" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#ED7D31;">32核</text>
+
+  <!-- X labels: Case 3 (S12-S15) -->
+  <text x="760" y="468" text-anchor="middle" class="tick-text-sm">12</text>
+  <text x="820" y="468" text-anchor="middle" class="tick-text-sm">13</text>
+  <text x="880" y="468" text-anchor="middle" class="tick-text-sm">14</text>
+  <text x="940" y="468" text-anchor="middle" class="tick-text-sm">15</text>
+  <text x="760" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#C0392B;">16核</text>
+  <text x="820" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#C0392B;">32核</text>
+  <text x="880" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#C0392B;">64核</text>
+  <text x="940" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#C0392B;">128核</text>
+
+  <!-- X labels: Case 4 (S16-S23) -->
+  <text x="1000" y="468" text-anchor="middle" class="tick-text-sm">16</text>
+  <text x="1060" y="468" text-anchor="middle" class="tick-text-sm">17</text>
+  <text x="1120" y="468" text-anchor="middle" class="tick-text-sm">18</text>
+  <text x="1180" y="468" text-anchor="middle" class="tick-text-sm">19</text>
+  <text x="1240" y="468" text-anchor="middle" class="tick-text-sm">20</text>
+  <text x="1300" y="468" text-anchor="middle" class="tick-text-sm">21</text>
+  <text x="1360" y="468" text-anchor="middle" class="tick-text-sm">22</text>
+  <text x="1420" y="468" text-anchor="middle" class="tick-text-sm">23</text>
+  <text x="1000" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">4核</text>
+  <text x="1060" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">8核</text>
+  <text x="1120" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">16核</text>
+  <text x="1180" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">32核</text>
+  <text x="1240" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">64核</text>
+  <text x="1300" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">16核1kT</text>
+  <text x="1360" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">32核512T</text>
+  <text x="1420" y="480" text-anchor="middle" class="tick-text-sm" style="fill:#70AD47;">64核256T</text>
+
+  <text x="800" y="498" text-anchor="middle" class="axis-title">SCENARIO_NUM</text>
+
+  <!-- Case 0/1: known data line (S3-S5) -->
+  <polyline points="220,432.2 280,430.3 340,394.5" class="line-empty"/>
+
+  <circle cx="220" cy="432.2" r="3.5" class="dot-empty"/>
+  <circle cx="280" cy="430.3" r="3.5" class="dot-empty"/>
+  <circle cx="340" cy="394.5" r="3.5" class="dot-empty"/>
+  <text x="220" y="424" text-anchor="middle" class="data-label">4.57</text>
+  <text x="280" y="422" text-anchor="middle" class="data-label">5.05</text>
+  <text x="340" y="386" text-anchor="middle" class="data-label">14.244</text>
+
+  <!-- Case 0: TBD (S1, S2) -->
+  <circle cx="100" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="160" cy="440" r="3" class="dot-tbd"/>
+  <text x="100" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="160" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+
+  <!-- Case 1: known data (S8) -->
+  <circle cx="520" cy="386.8" r="3.5" class="dot-empty"/>
+  <text x="520" y="378" text-anchor="middle" class="data-label">16.2</text>
+
+  <!-- Case 1: TBD (S6, S7) -->
+  <circle cx="400" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="460" cy="440" r="3" class="dot-tbd"/>
+  <text x="400" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="460" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+
+  <!-- Case 2: known data line (S9-S10) -->
+  <polyline points="580,134.1 640,201.5" class="line-large"/>
+
+  <circle cx="580" cy="134.1" r="4" class="dot-large"/>
+  <circle cx="640" cy="201.5" r="4" class="dot-large"/>
+  <text x="580" y="125" text-anchor="middle" class="data-label">81.004</text>
+  <text x="640" y="193" text-anchor="middle" class="data-label">63.731</text>
+
+  <!-- Case 2: TBD (S11) -->
+  <circle cx="700" cy="440" r="3" class="dot-tbd"/>
+  <text x="700" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+
+  <!-- Case 3: known data line (S12-S14) -->
+  <polyline points="760,133.8 820,242 880,288.8" class="line-medium"/>
+
+  <circle cx="760" cy="133.8" r="4" class="dot-medium"/>
+  <circle cx="820" cy="242" r="4" class="dot-medium"/>
+  <circle cx="880" cy="288.8" r="4" class="dot-medium"/>
+  <text x="760" y="125" text-anchor="middle" class="data-label">81.596</text>
+  <text x="820" y="233" text-anchor="middle" class="data-label">53.324</text>
+  <text x="880" y="280" text-anchor="middle" class="data-label">41.346</text>
+
+  <!-- Case 3: TBD (S15) -->
+  <circle cx="940" cy="440" r="3" class="dot-tbd"/>
+  <text x="940" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+
+  <!-- Case 4: all TBD (S16-S23) -->
+  <circle cx="1000" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1060" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1120" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1180" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1240" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1300" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1360" cy="440" r="3" class="dot-tbd"/>
+  <circle cx="1420" cy="440" r="3" class="dot-tbd"/>
+  <text x="1000" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1060" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1120" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1180" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1240" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1300" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1360" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+  <text x="1420" y="435" text-anchor="middle" class="tbd-label">TBD</text>
+
+  <!-- Legend -->
+  <line x1="180" y1="580" x2="210" y2="580" class="line-empty"/>
+  <circle cx="195" cy="580" r="3.5" class="dot-empty"/>
+  <text x="218" y="584" class="legend-text">Case 0/1: empty_kernel (空壳)</text>
+
+  <line x1="430" y1="580" x2="460" y2="580" class="line-large"/>
+  <circle cx="445" cy="580" r="3.5" class="dot-large"/>
+  <text x="468" y="584" class="legend-text">Case 2: gather+adds (大shape)</text>
+
+  <line x1="700" y1="580" x2="730" y2="580" class="line-medium"/>
+  <circle cx="715" cy="580" r="3.5" class="dot-medium"/>
+  <text x="738" y="584" class="legend-text">Case 3: gather+adds (中shape)</text>
+
+  <line x1="970" y1="580" x2="1000" y2="580" class="line-small"/>
+  <circle cx="985" cy="580" r="3.5" class="dot-small"/>
+  <text x="1008" y="584" class="legend-text">Case 4: gather+adds (小shape)</text>
+
+  <circle cx="1220" cy="580" r="3" class="dot-tbd"/>
+  <text x="1230" y="584" class="legend-text">TBD (数据待补充)</text>
+</svg>
