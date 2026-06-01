@@ -175,25 +175,18 @@ void CcuKernelAlltoAllMesh1D::DoAlltoAll()
     }
 }
 
-ccu::Func CcuKernelAlltoAllMesh1D([](std::vector<hcomm::CcuRep::Variable> &vars, hcomm::CcuRep::Variable tokenInfo) {
-    hcomm::CcuRep::Variable inputAddr = vars[0];
-    hcomm::CcuRep::Variable outputAddr = vars[1];
-    hcomm::CcuRep::Variable srcStride = vars[2];
-    hcomm::CcuRep::Variable srcOffset = vars[3];
-    hcomm::CcuRep::Variable dstOffset = vars[4];
-    hcomm::CcuRep::Variable sliceSize = vars[5];
-    hcomm::CcuRep::Variable goSize1 = vars[6];
-    hcomm::CcuRep::Variable goSize2 = vars[7];
-    hcomm::CcuRep::Variable goSize3 = vars[8];
-    hcomm::CcuRep::Variable goSize4 = vars[9];
+ccu::Func CcuKernelAlltoAllMesh1D([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                    ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                    ccu::Variable goSize3, ccu::Variable goSize4) {
     CcuKernelAlltoAllMesh1D::Algorithm(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
                                        sliceSize, goSize1, goSize2, goSize3, goSize4);
 });
 
-HcclResult CcuKernelAlltoAllMesh1D::Algorithm(hcomm::CcuRep::Variable inputAddr, hcomm::CcuRep::Variable outputAddr, hcomm::CcuRep::Variable tokenInfo,
-                                              hcomm::CcuRep::Variable srcStride, hcomm::CcuRep::Variable srcOffset, hcomm::CcuRep::Variable dstOffset,
-                                              hcomm::CcuRep::Variable sliceSize, hcomm::CcuRep::Variable goSize1, hcomm::CcuRep::Variable goSize2,
-                                              hcomm::CcuRep::Variable goSize3, hcomm::CcuRep::Variable goSize4)
+HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                              ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                              ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                              ccu::Variable goSize3, ccu::Variable goSize4)
 {
     HCCL_INFO("[ccuAllToAllMesh1D_context] AllToAllMesh1D run.");
 
