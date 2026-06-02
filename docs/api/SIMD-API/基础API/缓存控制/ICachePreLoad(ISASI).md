@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_cache_intf.h"`。
 
-开发者手动调用ICachePreLoad接口，能够从指令所在DDR地址预加载指令到ICache中。
+开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
