@@ -27,7 +27,7 @@ run_case() {
     pushd build
     cmake ..
     make -j4
-    python3 ../script/gendata.py
+    python3 ../scripts/gen_data.py
     start=$(date +%s.%N)
     eval "$2"
     end=$(date +%s.%N)
@@ -39,7 +39,7 @@ run_case() {
     res=$?
     end=$(date +%s.%N)
     run_time=$(awk -v start="$start" -v end="$end" 'BEGIN {print end - start}')
-    python3 ../script/verify.py output/output.bin output/golden.bin
+    python3 ../scripts/verify_result.py output/output.bin output/golden.bin
     res=$((res + $?))
     # if [ "$res" -ne 0 ]; then
     #     echo "output: ${output}"
@@ -53,4 +53,4 @@ run_case() {
 }
 
 set -e
-run_case add-tensor-api "./add-tensor-api"
+run_case demo "./demo"
