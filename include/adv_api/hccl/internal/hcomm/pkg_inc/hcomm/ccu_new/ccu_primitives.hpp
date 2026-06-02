@@ -11,7 +11,7 @@
 #ifndef CCU_API_HPP
 #define CCU_API_HPP
 
-#include "ccu_data_api_impl.h"
+#include "ccu_primitives_impl.h"
 
 #include "ccu_variable.hpp"
 #include "ccu_address.hpp"

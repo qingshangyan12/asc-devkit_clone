@@ -9,7 +9,7 @@
 */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_mesh1d.h"
-#include "ccu_api.hpp"
+#include "ccu_primitives.hpp"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;

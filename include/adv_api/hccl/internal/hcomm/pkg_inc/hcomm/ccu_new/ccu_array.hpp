@@ -15,8 +15,8 @@
 #include <new>
 
 #include "ccu_types.h"
-#include "ccu_data_api_impl.h"
-#include "ccu_data_utils.hpp"
+#include "ccu_primitives_impl.h"
+#include "ccu_utils.hpp"
 #include "ccu_variable.hpp"
 #include "ccu_event.hpp"
 #include "ccu_buffer.hpp"

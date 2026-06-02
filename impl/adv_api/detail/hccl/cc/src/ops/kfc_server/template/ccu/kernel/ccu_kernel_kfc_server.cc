@@ -13,7 +13,6 @@
 #include "ccu_func.hpp"
 #include "ccu_variable.hpp"
 #include "ccu_func_dl.h"
-#include "ccu_log.h"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {

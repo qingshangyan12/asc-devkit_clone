@@ -16,8 +16,8 @@
 #include "ccu_types.h"
 #include "ccu_variable.hpp"
 #include "ccu_func.hpp"
-#include "ccu_data_api_impl.h"
-#include "ccu_data_utils.hpp"
+#include "ccu_primitives_impl.h"
+#include "ccu_utils.hpp"
 
 namespace ccu {
 

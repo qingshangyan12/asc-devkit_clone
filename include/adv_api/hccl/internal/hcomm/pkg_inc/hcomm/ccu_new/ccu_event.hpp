@@ -15,8 +15,8 @@
 #include <type_traits>
 
 #include "ccu_types.h"
-#include "ccu_data_api_impl.h"
-#include "ccu_data_utils.hpp"
+#include "ccu_primitives_impl.h"
+#include "ccu_utils.hpp"
 
 namespace ccu {
 

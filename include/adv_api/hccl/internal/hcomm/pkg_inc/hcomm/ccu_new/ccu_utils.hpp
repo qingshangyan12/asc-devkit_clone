@@ -8,8 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#ifndef CCU_DATA_UTILS_HPP
-#define CCU_DATA_UTILS_HPP
+#ifndef CCU_UTILS_HPP
+#define CCU_UTILS_HPP
 
 #include <exception>
 #include <string>
@@ -70,5 +70,15 @@ public:
 
     CcuArithmeticOperatorType type{CcuArithmeticOperatorType::INVALID};
 };
+
+#define CCU_THROW_IF_FAILED(ret, msg)                                            \
+    do {                                                                         \
+        auto _ccu_ret = (ret);                                                   \
+        if (_ccu_ret != CcuResult::CCU_SUCCESS) {                                \
+            throw ::ccu::CcuException(_ccu_ret, (msg));                          \
+        }                                                                        \
+    } while (0)
+
+#define CCU_CHK_RET(expr) do { CcuResult ret = (expr); if (ret != CCU_SUCCESS) return ret; } while(0)
 
 #endif

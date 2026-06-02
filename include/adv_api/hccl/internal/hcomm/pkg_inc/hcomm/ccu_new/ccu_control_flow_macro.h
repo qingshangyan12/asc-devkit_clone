@@ -12,7 +12,7 @@
 #define CCU_CONTROL_FLOW_MACRO_H
 
 #include "ccu_variable.hpp"
-#include "ccu_data_api_impl.h"
+#include "ccu_primitives_impl.h"
 
 /* ---------------------------------------------------------------------------
  * Macro wrappers for structured control flow
