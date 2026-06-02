@@ -16,8 +16,7 @@
 #define IMPL_UTILS_DEBUG_ASC_DEBUG_TYPES_H
 
 #ifndef ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE
-// Reserved UB space is 2K in total. 20 bytes for BlockVFBufInfo header, leaving 2028 bytes for buffer.
-#define ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE 2028
+#define ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE 1024
 #endif
 #define ASCENDC_SIMD_VF_MAGIC_NUMBER 0xF0A00B0F
 
