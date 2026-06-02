@@ -22,6 +22,10 @@
 #include "ccu_variable.hpp"
 #include "../ccu_temp_kfc_server.h"
 #include "mc2_type.h"
+#include "ccu_func.hpp"
+
+using namespace AscendC;
+using namespace Hccl;
 
 namespace mc2_ops_hccl {
 constexpr u64 INVALID_U64 = UINT64_MAX;
@@ -88,6 +92,11 @@ public:
     void MissionPostSync();
 
 protected:
+    uint64_t rankSize_{0};
+    uint32_t rankId_{0};
+    std::vector<ChannelHandle> channels_{};
+    bool loadFromMem_ = false;
+
     ccu::Variable xnAddr_;           // HBM上的算子执行参数首地址
     ccu::Variable ckeAddr_;
     ccu::Variable waitAddr_;            // HBM上的每轮开始信号的首地址
@@ -122,7 +131,7 @@ protected:
 private:
     void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartSig);
     void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig);
-    void LoadFuncParamFromMemory(ccu::Variable &paramAddr, std::array<ccu::Variable, CCU_PARAM_NUM_PER_DIE> &param);
+    void LoadFuncParamFromMemory(ccu::Variable &paramAddr, std::array<ccu::Variable, Hccl::CCU_PARAM_NUM_PER_DIE> &param);
 };
 
 class Mc2SlaveKfcServer : public CcuKernelKfcServer {

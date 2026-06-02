@@ -99,7 +99,7 @@ HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t w
     OpParam param;
     CHK_RET(KfcServerConstructOpParam(xnAddr, ckeAddr, workSpace, workSpaceSize, comm, stream, tag, opType, rankSize, opMode, param));
     
-    CHK_RET(HcclGetOpExpansionMode(comm, param));
+    CHK_RET(HcclGetOpExpansionMode(param));
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();

@@ -13,6 +13,7 @@
 #include "ccu_func.hpp"
 #include "ccu_variable.hpp"
 #include "ccu_func_dl.h"
+#include "ccu_api.hpp"
 #include "mc2_type.h"
 
 namespace mc2_ops_hccl {
@@ -25,6 +26,13 @@ const uint32_t HBM_PARAM_IDX_0 = 0;
 const uint32_t HBM_PARAM_IDX_1 = 1;
 const uint32_t HBM_PARAM_IDX_2 = 2;
 const uint32_t HBM_PARAM_IDX_3 = 3;
+const uint32_t HBM_PARAM_IDX_4 = 4;
+const uint32_t HBM_PARAM_IDX_5 = 5;
+const uint32_t HBM_PARAM_IDX_6 = 6;
+const uint32_t HBM_PARAM_IDX_7 = 7;
+const uint32_t HBM_PARAM_IDX_8 = 8;
+const uint32_t HBM_PARAM_IDX_9 = 9;
+const uint32_t HBM_PARAM_IDX_10 = 10;
 
 const uint32_t SINGLE_DIE = 1;
 const uint32_t DOUBLE_DIE = 2;
@@ -85,7 +93,7 @@ HcclResult CcuTaskArgKfcServer::CheckTaskArgs()
     return ret;
 }
 
-CcuKernelKfcServer::CcuKernelKfcServer(const CcuKernelArg &arg)
+CcuKernelKfcServer::CcuKernelKfcServer(const hcomm::CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
 {
     const CcuKernelArgKfcServer *kernelArg = dynamic_cast<const CcuKernelArgKfcServer *>(&arg);
@@ -96,34 +104,38 @@ CcuKernelKfcServer::CcuKernelKfcServer(const CcuKernelArg &arg)
     HCCL_INFO("[CcuKernelKfcServer] rankId_ = %d, rankSize_ = %d, loadFromMem_ = %d", rankId_, rankSize_, loadFromMem_);
 }
 
-HcclResult CcuKernelKfcServer::InitResource()
+static CcuResult CcuKernelKfcServer::InitResource()
 {
     HCCL_INFO("[CcuKernelKfcServer] InitResource start !");
-    return HcclResult::HCCL_SUCCESS;
+    return CCU_SUCCESS;
 }
 
-void CcuKernelKfcServer ::LoadArgs()
+static CcuResult CcuKernelKfcServer ::LoadArgs()
 {
-    LoadArg(xnAddr_, 0);        // Done：加载参数
-    LoadArg(ckeAddr_, 1);
-    LoadArg(token_, 2);
-    LoadArg(dieNum_, 3);
-    LoadArg(missionNum_, 4);
-    LoadArg(missionIndex_, 5);
+    uint32_t argId = 0;
+    CCU_CHK_RET(LoadArg(xnAddr_, argId++));
+    CCU_CHK_RET(LoadArg(ckeAddr_, argId++));
+    CCU_CHK_RET(LoadArg(token_, argId++));
+    CCU_CHK_RET(LoadArg(dieNum_, argId++));
+    CCU_CHK_RET(LoadArg(missionNum_, argId++));
+    CCU_CHK_RET(LoadArg(missionIndex_, argId++));
+
+    return CCU_SUCCESS;
 }
 
 void CcuKernelKfcServer::SetCommAddr(ccu::Variable syncAddr)
 {   
-    // 原本的应该是在入参处检查，这里仅用于set
     // Variable当前与u64的运算符仅重载了==,!=,=
+    ccu::Variable addrBias;
     waitAddr_ = syncAddr;
-    recordAddr_ = syncAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE; // 偏移8轮的总宽度
+    addrBias = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;       // 偏移8轮的总宽度
+    recordAddr_ = syncAddr + addrBias; 
 }
 
 void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 {
-    // 原本的应该是在入参处检查，这里仅用于set 成员变量
-    if (dieNum == DOUBLE_DIE) { // 双Die场景才需要导入导出
+    // 双Die场景才需要导入导出
+    CCU_IF(dieNum == DOUBLE_DIE) {
         // 导出信号
         // Die0: export完成信号给Die1，Die1: export开始信号给Die0
         exportDieSig_ = DIE1_END_SIG;        
@@ -135,7 +147,6 @@ void CcuKernelKfcServer::SetDieNum(ccu::Variable dieNum)
 
 void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable miIndex)
 {
-    // miNum与missionIndex_的校验应该在外面
     // 多Mission场景暂且不考虑
     return ;
     if (miIndex == 0) {
@@ -150,8 +161,8 @@ void CcuKernelKfcServer::SetMissionNumAndId(ccu::Variable miNum, ccu::Variable m
 
 HcclResult CcuKernelKfcServer::Algorithm()
 {
-    (void)InitResource();
-    LoadArgs();                                
+    CCU_CHK_RET(InitResource());
+    CCU_CHK_RET(LoadArgs());                        
     SetCommAddr(ckeAddr_);                    
     SetDieNum(dieNum_);                         
     SetMissionNumAndId(missionNum_, missionIndex_); 
@@ -190,12 +201,10 @@ void Mc2KfcServer::GenCircularQueue()
     ccu::Variable one = 1;
 
     // 存放<每轮算子参数>的寄存器
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Array<ccu::Variable> param(Hccl::CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
-        // TODO：这里的比较应该提到外面去，即std::make_unique<CcuTaskArgKfcServer>之前
-
         // 等待本轮开始信号
         WaitTurnStartSig(waitAddr, turnStartSig);
 
@@ -212,7 +221,11 @@ void Mc2KfcServer::GenCircularQueue()
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == CcuKernelAlltoAllMesh1D) {
-            ccu::CallFunc<CcuKernelAlltoAllMesh1D>(param, token_);   //给通信算子自己解析
+            //给通信算子自己解析
+            ccu::CallFunc<CcuKernelAlltoAllMesh1D>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], token_,
+                param[HBM_PARAM_IDX_3], param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5],
+                param[HBM_PARAM_IDX_6], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8],
+                param[HBM_PARAM_IDX_9], param[HBM_PARAM_IDX_10]);
         }
 
         MissionPostSync();
@@ -272,17 +285,17 @@ void Mc2KfcServer::SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Var
     }
 }
 
-void Mc2KfcServer::LoadFuncParamFromMemory(ccu::Variable &paramAddr, array<ccu::Variable, CCU_PARAM_NUM_PER_DIE> &param)
+void Mc2KfcServer::LoadFuncParamFromMemory(ccu::Variable &paramAddr, array<ccu::Variable, Hccl::CCU_PARAM_NUM_PER_DIE> &param)
 {
     ccu::Variable doubleDie;
-    doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
+    doubleDie = Hccl::CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     ccu::Variable addr;
     addr = paramAddr;
     const uint32_t getDieId = 1;        // TODO GetDieId()
     if (dieNum_ == DOUBLE_DIE && getDieId == DIE1_ID) {
         addr += doubleDie;
     }
-    Load(addr, param, CCU_PARAM_NUM_PER_DIE);
+    Load(addr, param, Hccl::CCU_PARAM_NUM_PER_DIE);
 }
 
 void Mc2SlaveKfcServer::GenCircularQueue()
@@ -298,7 +311,7 @@ void Mc2SlaveKfcServer::GenCircularQueue()
     paramAddr = xnAddr_;
 
     // 存放<每轮算子参数>的寄存器
-    ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
+    ccu::Array<ccu::Variable> param(Hccl::CCU_PARAM_NUM_PER_DIE);
 
     CCU_WHILE(repeatCond == 0)
     {
