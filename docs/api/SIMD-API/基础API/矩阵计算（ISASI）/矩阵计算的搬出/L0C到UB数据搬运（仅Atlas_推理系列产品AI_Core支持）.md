@@ -7,13 +7,13 @@
 
 |产品|是否支持<br>（源操作数和目的操作数类型一致的原型）|是否支持<br>（源操作数和目的操作数类型不一致的原型）|
 |----------|:----------:|:----------:|
-|Ascend 950PR/Ascend 950DT|√|x|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|x|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|x|
-|Atlas 200I/500 A2 推理产品|√|x|
+|Ascend 950PR/Ascend 950DT|x|x|
+|Atlas A3 训练系列产品/Atlas A3 推理系列产品|x|x|
+|Atlas A2 训练系列产品/Atlas A2 推理系列产品|x|x|
+|Atlas 200I/500 A2 推理产品|x|x|
 |Atlas 推理系列产品AI Core|√|√|
-|Atlas 推理系列产品Vector Core|√|x|
-|Atlas 训练系列产品|√|x|
+|Atlas 推理系列产品Vector Core|x|x|
+|Atlas 训练系列产品|x|x|
 
 ## 功能说明<a name="section474617392321"></a>
 
@@ -21,25 +21,11 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-- Global Memory -\> Local Memory
-
-    ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
-    ```
-
 - Local Memory -\> Local Memory
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
-    ```
-
-- Local Memory -\> Global Memory
-
-    ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
     ```
 
 - Local Memory -\>  Local  Memory，支持源操作数和目的操作数类型不一致
@@ -50,7 +36,7 @@
     ```
 
 > [!NOTE]说明 
-> 各原型支持的具体数据通路和数据类型，请参考[支持的通路和数据类型](#section8664371012)。
+> 各原型支持的具体数据通路和数据类型，请参考[数据类型](#section8664371012)。
 
 ## 参数说明<a name="section1592117358563"></a>
 
@@ -58,14 +44,14 @@
 
 |参数名|描述|
 |----------|----------|
-|T、U|操作数的数据类型。支持的数据类型请参考[支持的通路和数据类型](#section8664371012)。|
+|T、U|操作数的数据类型。支持的数据类型请参考[数据类型](#section8664371012)。|
 
 **表 2**  参数说明
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|dst|输出|目的操作数，类型为LocalTensor或GlobalTensor。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。|
+|dst|输出|目的操作数，类型为LocalTensor。|
+|src|输入|源操作数，类型为LocalTensor。|
 |intriParams|输入|搬运参数。DataCopyParams类型。|
 |enhancedParams|输入|增强信息参数。DataCopyEnhancedParams类型。<br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。|
 
@@ -76,7 +62,7 @@
 |blockMode|数据搬移基本分形，BlockMode枚举类型，支持以下配置：<br>&bull; BLOCK_MODE_NORMAL：表示传输单位为32B。当前暂不支持。<br>&bull; BLOCK_MODE_MATRIX：表示传输单位为一个16 \* 16的cube分形。<br>&bull; BLOCK_MODE_VECTOR：表示传输单位为一个1 \* 16的cube分形。<br>&bull; BLOCK_MODE_SMALL_CHANNEL：表示传输单位为一个16 \* 4的cube分形。当前暂不支持。<br>&bull; BLOCK_MODE_DEPTHWISE：表示传输单位为一个16 \* 16的cube分形，提供随路channel-split功能。当前暂不支持。<br>每种模式下对应的blockLen等参数单位见[表4](#table13396838183618)。|
 |deqScale|随路精度转换辅助参数，即量化模式，支持的量化模式取值和对应的数据类型等信息请参考[表5](#table168091348673)。其中DEQ、DEQ8、DEQ16模式，需要传入deqValue量化系数，设置deqValue的对应比特位；VDEQ、VDEQ8、VDEQ16模式，需要传入包含16个元素（deqValue）的量化参数向量，设置deqTensorAddr的对应比特位，同时保证DEQADDR中存储的反量化参数向量的每个元素（deqValue）都符合预期和使用限制。<br>VDEQ模式下，反量化参数向量长度为32Byte（16个half元素）；其他模式下，反量化参数向量长度为128Byte（16个64bit的反量化元素）。|
 |deqValue|量化系数。 deqValue的配置方式请参考[deqValue配置方式](#table54451538192912)。|
-|deqTensorAddr|UB中存储反量化参数向量的起始地址。deqScale为VDEQ/VDEQ8/VDEQ16模式时，需要传入反量化运算时的参数向量的地址。该地址要满足32B对齐。<br>对于VDEQ模式，该地址指向32B大小的反量化参数向量，其中每个元素大小为16bit(half)。<br>对于VDEQ8、VDEQ16模式，反量化参数向量中的每个元素大小都为64bit。搬运时会搬运blockCount个连续传输数据块，每个数据块的长度为blockLen。每个数据块对应一个128Byte的反量化向量。对于同一个数据块，反量化参数向量中的16个元素会被连续复用。不同的数据块，对应不同的反量化参数向量，地址会相应的偏移128B。例如：假设对应起始地址为A，第一个数据块的128B反量化参数向量起始地址为A，第二个数据块的128B反量化参数向量起始地址为A + 128B。<br>同一个反量化参数向量的每一个元素的MCB标志位必须一致。|
+|deqTensorAddr|UB中存储反量化参数向量的起始地址。deqScale为VDEQ/VDEQ8/VDEQ16模式时，需要传入反量化运算时的参数向量的地址。该地址要满足32B对齐。<br>对于VDEQ模式，该地址指向32B大小的反量化参数向量，其中每个元素大小为16bit（half）。<br>对于VDEQ8、VDEQ16模式，反量化参数向量中的每个元素大小都为64bit。搬运时会搬运blockCount个连续传输数据块，每个数据块的长度为blockLen。每个数据块对应一个128Byte的反量化向量。对于同一个数据块，反量化参数向量中的16个元素会被连续复用。不同的数据块，对应不同的反量化参数向量，地址会相应的偏移128B。例如：假设对应起始地址为A，第一个数据块的128B反量化参数向量起始地址为A，第二个数据块的128B反量化参数向量起始地址为A + 128B。<br>同一个反量化参数向量的每一个元素的MCB标志位必须一致。|
 |sidStoreMode|用于deqScale为DEQ8/VDEQ8时配置存储模式，控制反量化结果如何存储在dst地址中。配置效果参考[sidStoreMode配置示意图](#fig5416115192414)。<br>&bull; 0：dst的数据存储在每个DataBlock的前半段，即每32B的高16B<br>&bull; 1：dst的数据存储在每个DataBlock的后半段，即每32B的低16B<br>&bull; 2：dst的数据存储在完整的DataBlock中，即整个32B|
 |isRelu|配置是否可以随路做线性整流操作。配置deqValue的情况下，如果该参数被置为true，那么会刷新deqValue的Relu标志位为1；如果被置为false，则不会做修改。配置deqTensorAddr的情况下，反量化参数向量元素中的Relu标志位不生效，以isRelu为准。<br>仅配置isRelu，不配置量化参数，即deqValue配置为DEQ_NONE场景，支持src和dst的数据类型组合如下：{half，half}，{float，float}，{int32_t，int32_t}，{float，half}；同时配置isRelu和量化参数的场景，支持的数据类型组合参考[表5](#table168091348673)。|
 |padMode|预留参数，当前暂不支持。|
@@ -85,11 +71,6 @@
 
 |blockMode|src|dst|数据类型|blockLen单位|srcStride单位|dstStride单位|
 |----------|----------|----------|----------|----------|----------|----------|
-|BLOCK_MODE_NORMAL|GM|A1|int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、 uint64_t、 half、bfloat16_t、float、double|32B|32B|32B|
-|BLOCK_MODE_NORMAL|GM|B1|int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、 uint64_t、 half、bfloat16_t、float、double|32B|32B|32B|
-|BLOCK_MODE_NORMAL|GM|VECIN|int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、 uint64_t、 half、bfloat16_t、float、double|32B|32B|32B|
-|BLOCK_MODE_NORMAL|VECOUT|GM|int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、 uint64_t、 half、bfloat16_t、float、double|32B|32B|32B|
-|BLOCK_MODE_NORMAL|VECIN|VECOUT|int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、 uint64_t、 half、bfloat16_t、float、double|32B|32B|32B|
 |BLOCK_MODE_MATRIX|CO1|CO2|half、int16_t、uint16_t|512B|512B|32B|
 |BLOCK_MODE_MATRIX|CO1|CO2|float、int32_t、uint32_t|1024B|1024B|32B|
 |BLOCK_MODE_VECTOR|CO1|CO2|half、int16_t、uint16_t|32B|512B|32B|
@@ -127,7 +108,7 @@
 **图 1**  sidStoreMode配置示意图<a id="fig5416115192414"></a>  
 ![](../../../../figures/sidStoreMode配置示意图.png "sidStoreMode配置示意图")
 
-## 数据类型<a name="section8664371012"></a>
+## 数据类型<a id="section8664371012"></a>
 
 下文的数据通路均通过逻辑位置TPosition来表达，并注明了对应的物理通路。
 
@@ -148,13 +129,7 @@
 
 |支持型号|数据通路|
 |----------|----------|
-|Atlas 训练系列产品|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT<br>VECOUT -> GM|
 |Atlas 推理系列产品AI Core|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT<br>VECIN、VECCALC、VECOUT -> A1、B1<br>VECOUT、CO2 -> GM|
-|Atlas 推理系列产品Vector Core|GM -> VECIN<br>VECOUT -> GM|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT<br>VECIN、VECCALC、VECOUT -> TSCM<br>VECOUT -> GM<br>A1、B1 -> GM|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT<br>VECIN、VECCALC、VECOUT -> TSCM<br>VECOUT -> GM<br>A1、B1 -> GM|
-|Atlas 200I/500 A2 推理产品|GM -> VECIN<br>VECOUT -> GM|
-|Ascend 950PR/Ascend 950DT|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT或VECIN  -> VECOUT<br>VECIN、VECCALC、VECOUT -> TSCM<br>VECOUT -> GM|
 
 ## 返回值说明<a name="section16867144513189"></a>
 
@@ -166,28 +141,6 @@
 - 如果CO1-\>CO2有随路精度转换，通路为UB的操作数的blockLen单位需要减半。
 
 ## 调用示例<a name="section1491211256313"></a>
-
-- Global Memory -\> Local Memory
-
-    ```cpp
-    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
-    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
-    DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
-    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
-    DataCopyEnhancedParams enhancedParams;
-    enhancedParams.blockMode = BlockMode::BLOCK_MODE_MATRIX; // 传输单位为16*16的cube分形
-    enhancedParams.deqScale = DeqScale::DEQ_NONE; // 不做量化
-    enhancedParams.deqValue = 0;
-    enhancedParams.deqTensorAddr = 0;
-    enhancedParams.sidStoreMode = 0; // 仅deqScale为DEQ8/VDEQ8时生效
-    enhancedParams.isRelu = false; // 不支持Relu
-    enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
-    // 功能等同基础数据搬运
-    AscendC::DataCopy(srcLocal, srcGlobal, intriParams, enhancedParams);
-    ```
 
 - Local Memory -\> Local Memory
 
@@ -209,28 +162,6 @@
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 功能等同基础数据搬运
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
-    ```
-
-- Local Memory -\> Global Memory
-
-    ```cpp
-    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
-    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
-    DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
-    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
-    DataCopyEnhancedParams enhancedParams;
-    enhancedParams.blockMode = BlockMode::BLOCK_MODE_MATRIX; // 传输单位为16*16的cube分形
-    enhancedParams.deqScale = DeqScale::DEQ_NONE; // 不做量化
-    enhancedParams.deqValue = 0;
-    enhancedParams.deqTensorAddr = 0;
-    enhancedParams.sidStoreMode = 0; // 仅deqScale为DEQ8/VDEQ8时生效
-    enhancedParams.isRelu = false; // 不支持Relu
-    enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
-    // 功能等同基础数据搬运
-    AscendC::DataCopy(dstGlobal, dstLocal, intriParams, enhancedParams);
     ```
 
 - Local Memory -\> Local Memory，源操作数与目的操作数类型不一致
