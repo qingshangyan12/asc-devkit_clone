@@ -12,7 +12,9 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_LOCAL_HEADER_DIRS}
         ${HCCL_CC_INCLUDE_DIR}/hcomm
         ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_SOURCE_DIR}/ccu
