@@ -32,7 +32,7 @@ uint8_t GetCacheModeValue(CacheMode mode)
     static std::map<CacheMode, uint8_t> map = {
         { CacheMode::CACHE_MODE_DISABLE, 0b100 },
         { CacheMode::CACHE_MODE_NORMAL, 0b000 },
-        { CacheMode::CACHE_MODE_NORMAL, 0b010 },
+        { CacheMode::CACHE_MODE_PERSISTENT, 0b010 },
     };
 
     return map[mode];
