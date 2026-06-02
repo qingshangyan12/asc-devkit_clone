@@ -50,10 +50,8 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
 #ifndef ASCENDC_CPU_DEBUG
 template <class... Args>
-__ASC_USE_RESERVED_UBUF__(3510, "PRINTF is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);
 template <class... Args>
-__ASC_USE_RESERVED_UBUF__(3510, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
 #endif
 
