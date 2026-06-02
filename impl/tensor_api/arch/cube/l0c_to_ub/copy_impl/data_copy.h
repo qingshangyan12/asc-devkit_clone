@@ -55,23 +55,15 @@ public:
         constexpr bool isNdFormat = IsSatisfiedPtnFormatV<T, NDExtLayoutPtn> || IsSatisfiedPtnFormatV<T, NDLayoutPtn>;
         constexpr bool isDnFormat = IsSatisfiedPtnFormatV<T, DNExtLayoutPtn> || IsSatisfiedPtnFormatV<T, DNLayoutPtn>;
 
-        uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
-        uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
+        uint32_t nSize = Std::min(GetL0COutColumnShape(srcLayout), GetL0COutColumnShape(dstLayout));
+        uint32_t mSize = Std::min(GetL0COutRowShape(srcLayout), GetL0COutRowShape(dstLayout));
         uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
 
         if constexpr (isNdFormat) {
-            if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
-            } else {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-            }
+            dstStride = GetL0COutNDStride(dst);
         } else {
-            if constexpr (IsSatisfiedPtnFormatV<T, DNLayoutPtn>) {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(dstLayout);
-            } else {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-            }
+            dstStride = GetL0COutDNStride(dst);
         }
 
         bool reluEn = trait.enableRelu;
@@ -114,8 +106,8 @@ private:
         constexpr bool isNdFormat = IsSatisfiedPtnFormatV<T, NDExtLayoutPtn> || IsSatisfiedPtnFormatV<T, NDLayoutPtn>;
         constexpr bool isDnFormat = IsSatisfiedPtnFormatV<T, DNExtLayoutPtn> || IsSatisfiedPtnFormatV<T, DNLayoutPtn>;
 
-        uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
-        uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
+        uint32_t nSize = Std::min(GetL0COutColumnShape(srcLayout), GetL0COutColumnShape(dstLayout));
+        uint32_t mSize = Std::min(GetL0COutRowShape(srcLayout), GetL0COutRowShape(dstLayout));
         if constexpr (IsTail) {
             nSize %= MAIN_LOOP_N_SIZE;
         } else {
@@ -127,17 +119,9 @@ private:
         const uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
         uint32_t dstStride = 0;
         if constexpr (isNdFormat) {
-            if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
-            } else {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
-            }
+            dstStride = GetL0COutNDStride(dst);
         } else {
-            if constexpr (IsSatisfiedPtnFormatV<T, DNLayoutPtn>) {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column>(dstLayout);
-            } else {
-                dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-            }
+            dstStride = GetL0COutDNStride(dst);
         }
 
         const bool reluEn = trait.enableRelu;
@@ -175,8 +159,12 @@ private:
     __aicore__ inline static constexpr auto MakeDstCoord(uint32_t nOffset)
     {
         using LayoutType = typename T::layoutType;
-        if constexpr (LayoutType::depth == FOUR_DIM_DATA) {
+        if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+            return MakeCoord(_0{}, MakeCoord(MakeCoord(0, 0), MakeCoord(0, nOffset)));
+        } else if constexpr (LayoutType::depth == FOUR_DIM_DATA) {
             return MakeCoord(MakeCoord(0, 0), MakeCoord(0, nOffset));
+        } else if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+            return MakeCoord(_0{}, MakeCoord(0, nOffset));
         } else {
             static_assert(LayoutType::depth == TWO_DIM_DATA, "Only support two-dim or four-dim dst tensor.");
             return MakeCoord(0, nOffset);
