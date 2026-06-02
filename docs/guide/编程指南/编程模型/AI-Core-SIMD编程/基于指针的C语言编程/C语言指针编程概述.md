@@ -347,32 +347,34 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 **1. 流水互斥同步**
 
-该同步能力从Ascend 950PR/950DT开始引入并使用, AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。每个锁有固定的一个MutexID，该ID可通过用户自定义（范围为0-27）并通过`asc_lock/asc_unlock`接口对指定流水进行阻塞或者释放。
+该同步能力从Ascend 950PR/950DT开始引入并使用，AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。每个锁有固定的一个MutexID，该ID可通过用户自定义（范围为0-27）并通过`asc_lock/asc_unlock`接口对指定流水进行阻塞或者释放。
 
-`asc_lock`：根据`mutex_id`获取Mutex, 并阻塞当前流水指令队列，直到对应的`mutex_id`被Unlock。
-`asc_unlock`：等待当前流水的前置指令退出后，根据`mutex_id`释放对应的Mutex。
+- `asc_lock`：根据`mutex_id`获取Mutex，并阻塞当前流水指令队列，直到对应的`mutex_id`被Unlock。
+- `asc_unlock`：等待当前流水的前置指令退出后，根据`mutex_id`释放对应的Mutex。
 
 ```c
 // 锁定 MTE2 流水线互斥锁，确保当前线程独占 MTE2 资源进行数据搬运
 uint8_t mutex_id = 1;
-asc_lock(PIPE_MTE2, mutex_id);               
+asc_lock(PIPE_MTE2, mutex_id);
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
 asc_copy_gm2ub((__ubuf__ void*)src1, (__gm__ void*)src1_gm, total_length * sizeof(float));
 // 解锁 MTE2 流水线，允许其他线程使用 MTE2
-asc_unlock(PIPE_MTE2, mutex_id);       
+asc_unlock(PIPE_MTE2, mutex_id);
 
 // 锁定 Vector 流水线互斥锁，确保当前线程独占向量计算资源
-asc_lock(PIPE_V, mutex_id);               
+asc_lock(PIPE_V, mutex_id);
 asc_add(shared_buffer, x_local, y_local);
 // 解锁 Vector 流水线，释放计算资源供其他线程使用
-asc_unlock(PIPE_V, mutex_id);           
+asc_unlock(PIPE_V, mutex_id);
 ```
 
-2. **核内多流水同步**
-该同步主要用于核内多流水间的同步, 通过`asc_sync_notify/asc_sync_wait`对两条流水进行`notify`和`wait`处理，当Vector计算依赖DMA搬入时，需要插入`PIPE_V`等待`PIPE_MTE2`的同步，保证Global Memory的数据成功搬入到Local Memory后再进行Vector计算。
+**2. 核内多流水同步**
 
-`asc_sync_notify`: 当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
-`asc_sync_wait`: 当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
+该同步主要用于核内多流水间的同步，通过`asc_sync_notify/asc_sync_wait`对两条流水进行`notify`和`wait`处理。当Vector计算依赖DMA搬入时，需要插入`PIPE_V`等待`PIPE_MTE2`的同步，保证Global Memory的数据成功搬入到Local Memory后再进行Vector计算。
+
+- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
+- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
+
 ```c
 // 通过DMA(MTE2)进行GM2UB的搬入处理
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
@@ -386,8 +388,10 @@ asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_add(dst, src1, src0, total_length);
 ```
 
-3. **同一流水内同步**
-同一流水线中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。所以对于同一条流水线执行，如果存在前后数据依赖，也需要进行同步处理，C指针编程通过`asc_sync_pipe`接口来进行单流水线的同步。譬如前后两条矢量计算存在对Local Memory的依赖，则插入一条对于`PIPE_V`单流水的依赖。
+**3. 同一流水内同步**
+
+同一流水线中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。所以对于同一条流水线执行，如果存在前后数据依赖，也需要进行同步处理。C指针编程通过`asc_sync_pipe`接口来进行单流水线的同步。譬如前后两条矢量计算存在对Local Memory的依赖，则插入一条对于`PIPE_V`单流水的依赖。
+
 ```c
 asc_add(dst, src1, src0, total_length);
 // 后续asc_sub指令对dst存在依赖，因为asc_add和asc_sub都属于PIPE_V流水，则插入asc_sync_pipe(PIPE_V)进行单流水的同步
@@ -396,6 +400,7 @@ asc_sub(dst, dst, src0, total_length);
 ```
 
 另外可以直接通过`asc_sync_vector`或者`asc_sync_mte2`这些接口来直接等待某一条流水。
+
 ```c
 // 通过DMA(MTE2)进行GM2UB的搬入处理
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
@@ -406,40 +411,48 @@ asc_sync_mte2();
 asc_add(dst, src1, src0, total_length);
 ```
 
-4. **内存访问顺序控制**
+**4. 内存访问顺序控制**
+
 当后续执行指令对前序的内存访问存在数据依赖时，可以通过`asc_sync_data_barrier`来进行内存访问顺序同步，该接口会阻塞后续的指令执行，直到所有之前的内存访问指令都执行结束。
+
 ```c
-asc_sync_data_barrier(mem_dsb_t::DSB_ALL);  // Wait for all memory accesses to complete    
+asc_sync_data_barrier(mem_dsb_t::DSB_ALL);  // Wait for all memory accesses to complete
 ```
 
-- 核间同步
+#### 核间同步
 
 当一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能执行时，则需要通过核间同步来确保多核间的时序正确性。
+
 以下图为例，AIC需要依赖于AIV的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果，因此需要通过核间同步来保证AIC读取ReduceSum结果时的时序正确性。
 
 ![核间同步业务场景示例](../../../../figures/核间同步业务场景示例.png)
 
-从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算, AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock, block与subblock比列为1:N(N>=1), block表示多少个“主核”，subblock表示一个"主核"带多少个"从核"。
+从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个"主核"，subblock表示一个"主核"带多少个"从核"。
+
 算子按计算特征可分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和Mix算子（同时包含矩阵和矢量计算）。如表1所示，算子类型决定了其所需的核间同步方式和可选的group配置模式。其中Mix算子通过函数修饰符指定AIC与AIV的block/subblock关系；Cube算子和Vector算子为单类核执行，不涉及block/subblock划分。AIV为block且AIC为subblock的配置（即Vector核为主、Cube核为辅的模式）当前不支持。
 
 ![block和subblock之间关系（灰色部分表示一个group，即1个block和N个subblock）](../../../../figures/block和subblock之间关系.png)
 
-针对AI Core 多核之间的关系和以及AI Core的能力， C指针根据不同的应用场景分别提供了对应的核间同步的接口。
-• 同步等待全部AIC或者同步等待全部AIV执行结束。
-该能力为多个AIC或AIV之间的同步控制，通过`asc_sync_inter_wait`和`asc_sync_inter_arrive`的接口能力实现全部AIC或者全部AIV的同步能力。如上述场景，当要进行一个ReduceSum多核累加时, 则需要通过该接口实现一个全AIV核的同步能力。
+针对AI Core多核之间的关系以及AI Core的能力，C指针编程根据不同的应用场景分别提供了对应的核间同步接口。
+
+**1. 同步等待全部AIC或者同步等待全部AIV执行结束**
+
+该能力为多个AIC或AIV之间的同步控制，通过`asc_sync_inter_wait`和`asc_sync_inter_arrive`的接口能力实现全部AIC或者全部AIV的同步能力。如上述场景，当要进行一个ReduceSum多核累加时，则需要通过该接口实现一个全AIV核的同步能力。
+
 ```c
 if ASCEND_IS_AIV {
     int64_t flagID = 1;
     asc_sync_inter_arrive(PIPE_S, flagID);
     asc_sync_inter_wait(PIPE_S, flagID);
-    
 }
 ```
-    
-• 单个AI Core内，AIC与全部AIV之间的同步。
-该能力为单个AI Core内, 一个group内的block跟subblock之间的同步能力, 该能力为Ascend 950PR/Ascend 950DT架构新增的能力, 支持AIV0与AIV1可单独触发AIC等待。
+
+**2. 单个AI Core内，AIC与全部AIV之间的同步**
+
+该能力为单个AI Core内，一个group内的block跟subblock之间的同步能力。该能力为Ascend 950PR/Ascend 950DT架构新增的能力，支持AIV0与AIV1可单独触发AIC等待。
+
 ```c
-// 当PIPE_FIX流水执行完毕后, AIC分别给AIV0和AIV1发起arrive的能力
+// 当PIPE_FIX流水执行完毕后，AIC分别给AIV0和AIV1发起arrive的能力
 if ASCEND_IS_AIC {
     asc_sync_intra_arrive(PIPE_FIX, 0);
     asc_sync_intra_arrive(PIPE_FIX, 16);
@@ -449,5 +462,7 @@ if ASCEND_IS_AIV {
     asc_sync_intra_wait(PIPE_MTE3, 0);
 }
 ```
+
+---
 
 本章系统阐述了C语言指针编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言指针编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。编程范式遵循SPMD模型的四步法，核心要点在于显式同步机制的正确应用。
