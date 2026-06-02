@@ -32,7 +32,14 @@ public:
     template <const CopyL12FBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        DataCopyImpl<trait, T, U>(dst, src);
+        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
+        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+            BatchDataCopyImpl<trait, T, U>(dst, src);
+        } else {
+            DataCopyImpl<trait, T, U>(dst, src);
+        }
     }
 
 private:
@@ -82,6 +89,48 @@ private:
         uint16_t blockLen = Std::ceil_align(srcCol * sizeof(srcType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
         uint16_t srcStride = Std::ceil_division(srcRow * sizeof(srcType), C0_SIZE<>);
         uint16_t dstStride = Std::ceil_align(dstRow * sizeof(dstType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
+
+        CopyL12FBInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+    }
+
+    // Batch case: B matrices each laid out as (row, col). The underlying L1->FB instruction has no
+    // batch dimension, so each matrix is emitted as one contiguous block: blockCount carries B, and
+    // blockLen / src/dst stride are computed from the per-matrix stride taken from Get<0> of src/dst
+    // layouts. Assumes each matrix is internally compact (row pitch equals column count); non-compact
+    // inner layouts cannot be expressed via a single blockLen and are not supported on this path.
+    template <const CopyL12FBTrait& trait, typename T, typename U>
+    __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+
+        constexpr uint32_t deqTensorAddrAlignValue = 128;
+        constexpr uint16_t fbufBurstLenUnit = 64;
+
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        uint16_t batchSize = Get<0>(srcLayout.Shape());
+        uint32_t srcMatrixStride = Get<0>(srcLayout.Stride());
+        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+
+        uint32_t srcShapeRows;
+        uint32_t srcShapeColumns;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
+        } else {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+        }
+
+        uint16_t blockCount = batchSize;
+        uint16_t blockLen =
+            Std::ceil_align(srcShapeRows * srcShapeColumns * sizeof(srcType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
+        uint16_t srcStride = Std::ceil_division(srcMatrixStride * sizeof(srcType), C0_SIZE<>);
+        uint16_t dstStride = Std::ceil_align(dstMatrixStride * sizeof(dstType), deqTensorAddrAlignValue) / fbufBurstLenUnit;
 
         CopyL12FBInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
     }
