@@ -94,7 +94,7 @@ private:
     ccu::Variable srcStride_;
     ccu::Variable srcOffset_;
     ccu::Variable dstOffset_;
-    GroupOpSize groupOpSize_;
+    CcuGroupOpSize groupOpSize_;
     hcomm::CcuRep::LocalAddr                   myDst_;
     std::vector<hcomm::CcuRep::RemoteAddr>     dstAddr_;
     std::vector<hcomm::CcuRep::LocalAddr>      srcAddr_;

@@ -636,6 +636,49 @@ HcclResult CcuKernelAlgBase::GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr 
     return HCCL_SUCCESS;
 }
 
+HcclResult CcuKernelAlgBase::GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, CcuGroupOpSize goSize)
+{
+    CHK_RET(CreateMultiOpCopy());
+    CCU_IF(goSize.addrOffset != 0)
+    {
+        ccu::Variable loopParam;
+        loopParam = GetLoopParam(0, moConfig.memSlice * moConfig.loopCount, 0);
+        loopParam += goSize.loopParam;
+
+        ccu::Variable sliceSize;
+        sliceSize = moConfig.memSlice;
+        auto lc = Loop("localcopy_loop_0")(src, dst, sliceSize);
+
+        ccu::Variable paraCfg;
+        paraCfg = GetParallelParam(moConfig.loopCount - 1, 0, 1);
+        ccu::Variable offsetCfg;
+        offsetCfg = GetOffsetParam(moConfig.memSlice, moConfig.msInterleave, 1);
+        LoopGroup({lc}, {loopParam}, paraCfg, offsetCfg);
+    }
+
+    CCU_IF(goSize.parallelParam != 0)
+    {
+        src.addr += goSize.addrOffset;
+        dst.addr += goSize.addrOffset;
+        auto lc0 = Loop("localcopy_loop_0")(src, dst, goSize.residual);
+
+        src.addr += goSize.residual;
+        dst.addr += goSize.residual;
+        ccu::Variable sliceSize;
+        sliceSize = moConfig.memSlice;
+        auto lc1 = Loop("localcopy_loop_1")(src, dst, sliceSize);
+
+        ccu::Variable loopCfg0;
+        loopCfg0 = GetLoopParam(0, 0, 1);
+        ccu::Variable loopCfg1;
+        loopCfg1 = GetLoopParam(0, 0, 1);
+        ccu::Variable offsetCfg;
+        offsetCfg = GetOffsetParam(moConfig.memSlice, moConfig.msInterleave, 1);
+        LoopGroup({lc0, lc1}, {loopCfg0, loopCfg1}, goSize.parallelParam, offsetCfg);
+    }
+    return HCCL_SUCCESS;
+}
+
 std::string CcuKernelAlgBase::GetLoopBlockTag(std::string loopType, int32_t index)
 {
     return loopType + std::to_string(index);
