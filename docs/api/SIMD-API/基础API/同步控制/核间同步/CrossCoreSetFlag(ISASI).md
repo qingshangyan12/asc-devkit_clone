@@ -158,7 +158,7 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // UB到GM搬运启用原子累加：搬运至atomicResult的数据与原值累加后覆盖原值。
+    // UB到GM搬运启用原子累加。
     AscendC::SetAtomicAdd<float>();
     // DataCopy属于PIPE_MTE3流水操作。
     AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
