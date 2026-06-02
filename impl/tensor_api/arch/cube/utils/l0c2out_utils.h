@@ -32,6 +32,62 @@ constexpr uint32_t CBURST_NUM = MAIN_LOOP_N_SIZE / BLOCK_CUBE;
 
 constexpr FixpipeParams DEFAULT_FIXPIPE_PARAMS = FixpipeParams{};
 
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutColumnShape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+        return Get<1, 1>(layout.Shape());
+    } else if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 1, 0>(layout.Shape()) * Get<1, 1, 1>(layout.Shape());
+    } else {
+        return GetTotalColumnShape(layout);
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutRowShape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+        return Get<1, 0>(layout.Shape());
+    } else if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 0, 0>(layout.Shape()) * Get<1, 0, 1>(layout.Shape());
+    } else {
+        return GetTotalRowShape(layout);
+    }
+}
+
+template <typename T>
+__aicore__ inline static constexpr uint32_t GetL0COutNDStride(const T& dst)
+{
+    using LayoutType = typename T::layoutType;
+    auto layout = dst.Layout();
+    if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+        return Get<1, 0>(layout.Stride()); // ND: inner M stride, usually N
+    } else if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
+        return GetElement<AttrInfo::Stride, AttrInfo::Row>(layout);
+    } else if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 0, 1>(layout.Stride());
+    } else {
+        return GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(layout);
+    }
+}
+
+template <typename T>
+__aicore__ inline static constexpr uint32_t GetL0COutDNStride(const T& dst)
+{
+    using LayoutType = typename T::layoutType;
+    auto layout = dst.Layout();
+    if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+        return Get<1, 1>(layout.Stride()); // DN: inner N stride, usually M
+    } else if constexpr (IsSatisfiedPtnFormatV<T, DNLayoutPtn>) {
+        return GetElement<AttrInfo::Stride, AttrInfo::Column>(layout);
+    } else if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 1, 1>(layout.Stride());
+    } else {
+        return GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
+    }
+}
+
 template <RoundMode roundMode, typename dstType, typename srcType>
 __aicore__ inline constexpr QuantMode_t GetVectorQuantMode()
 {
