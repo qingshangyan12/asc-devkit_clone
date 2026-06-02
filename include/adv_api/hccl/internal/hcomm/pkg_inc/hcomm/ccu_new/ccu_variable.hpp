@@ -15,7 +15,6 @@
 #include <type_traits>
 
 #include "ccu_types.h"
-#include "ccu_log.h"
 #include "ccu_data_utils.hpp"
 #include "ccu_data_api_impl.h"
 
@@ -36,7 +35,8 @@ struct CondExpr {
 class Variable final {
 public:
     Variable() {
-        CCU_THROW_IF_FAILED(CcuVariableAlloc(&this->handle), "CcuVariableAlloc: failed");
+        CCU_THROW_IF_FAILED(CcuVariableAlloc(&this->handle),
+            "CcuVariableAlloc: failed");
     }
 
     Variable(const Variable& other) {
@@ -97,6 +97,8 @@ private:
 
 } // namespace ccu
 
-template <> inline void CcuArithmeticOperator<ccu::Variable, ccu::Variable>::Check() const {}
+template <> inline void CcuArithmeticOperator<ccu::Variable, ccu::Variable>::Check() const
+{
+}
 
-#endif
+#endif // CCU_VARIABLE_HPP

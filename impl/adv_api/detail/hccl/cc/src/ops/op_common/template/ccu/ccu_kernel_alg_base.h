@@ -14,7 +14,7 @@
 #include "ccu_kernel.h"
 #include "ccu_variable.hpp"
 #include "ccu_loop.hpp"
-#include "ccu_condition_v1.h"
+#include "ccu_control_flow_macro.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -97,7 +97,7 @@ protected:
                              HcclDataType outputDataType, HcclReduceOp opType);
 
     HcclResult GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, GroupOpSize goSize);
-    HcclResult GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, CcuGroupOpSize goSize);
+    HcclResult GroupCopy(ccu::LocalAddr dst, ccu::LocalAddr src, CcuGroupOpSize goSize);
     HcclResult GroupLocalReduce(CcuRep::LocalAddr outDstOrg, std::vector<CcuRep::LocalAddr> &scratchOrg,
         GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
 private:

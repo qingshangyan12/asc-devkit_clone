@@ -17,6 +17,7 @@
 namespace hcomm {
 namespace CcuRep {
 
+#ifndef CCU_IF
 #define CCU_IF(x) CCU_IF_HELPER1(__COUNTER__, x)
 
 #define CCU_IF_HELPER1(ctr, x) CCU_IF_HELPER2(ctr, x)
@@ -24,6 +25,7 @@ namespace CcuRep {
 #define CCU_IF_HELPER2(ctr, x)                                                                                         \
     for (auto __ccuConditionHidden##ctr = CcuRep::Condition(this, x); __ccuConditionHidden##ctr.Check();               \
          __ccuConditionHidden##ctr.Run())
+#endif // CCU_IF
 
 class Condition {
 public:
