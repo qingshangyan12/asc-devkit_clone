@@ -193,12 +193,12 @@ __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& s
     uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, SELMODE selMode>
-__ASC_USE_RESERVED_UBUF__(3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<T>& src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U>
-__ASC_USE_RESERVED_UBUF__(3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(2201, 3510, "Select is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask,
     const LocalTensor<T>& src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
