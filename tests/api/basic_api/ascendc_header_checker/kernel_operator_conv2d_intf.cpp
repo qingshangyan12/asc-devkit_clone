@@ -14,7 +14,6 @@
 #include "kernel_operator_conv2d_intf.h"
 #endif
 
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
 // __aicore__ inline __in_pipe__(MTE2)__out_pipe__(MTE3) void Conv2D(const LocalTensor<T> &dst, const LocalTensor<T> &bias, const LocalTensor<U> &featureMap, const LocalTensor<U> &weight, Conv2dParams &conv2dParams, Conv2dTilling &tilling);
 extern "C" __global__ __aicore__ void KernelTestConv2D1() {
     AscendC::LocalTensor<float> dst;
@@ -25,4 +24,3 @@ extern "C" __global__ __aicore__ void KernelTestConv2D1() {
     AscendC::Conv2dTilling tilling;
     AscendC::Conv2D(dst, bias, featureMap, weight, conv2dParams, tilling);
 }
-#endif
