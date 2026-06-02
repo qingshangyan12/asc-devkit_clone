@@ -12,6 +12,7 @@
 
 #include "log.h"
 #include "ccu_kernel.h"
+#include "ccu_primitives_dl.hpp"
 
 namespace ccu = ::AscendC::ccu;
 
