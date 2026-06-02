@@ -81,13 +81,19 @@ private:
         auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
-        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout) * Get<0>(dstLayout.Shape());
+        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
-        // Nz -> Nz
+        // Nz -> Zn
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) / STRIDE_UNIT;
-        auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstNoBatchLayout) / STRIDE_UNIT;
-        LoadCbufToCb::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstNoBatchLayout) / STRIDE_UNIT;
+        auto batchNum = Get<0>(dstLayout.Shape());
+        for (uint32_t i = 0; i < batchNum; ++i) {
+            LoadCbufToCb::LoadData<true>(
+                dst(MakeCoord(i, MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0)))), 
+                src(MakeCoord(i, MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0)))), 
+                mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        }
     }
 
 };
