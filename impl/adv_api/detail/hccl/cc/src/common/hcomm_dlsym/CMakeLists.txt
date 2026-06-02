@@ -55,6 +55,7 @@ else()
         ${TOP_DIR}/hcomm/pkg_inc/hccl
         ${TOP_DIR}/hcomm/ccu
         ${TOP_DIR}/hcomm/pkg_inc/hcomm/ccu
+        ${TOP_DIR}/hcomm/pkg_inc/hcomm/ccu_new
         ${TOP_DIR}/hcomm/include
         ${TOP_DIR}/hcomm/include/hccl
     )
