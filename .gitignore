@@ -1,27 +1,19 @@
-.agent
-.claude
 .vscode
 .idea/
 /build/
 build_out
 output
-__pycache__
+__pycache__/
 /examples/**/build/
 AGENTS.md
 oat_reports/
 log/
-!docs/api/Utils-API/log/
 third_party/
 openssl-device-src/
 openssl-host-src/
 build_device/
 *.o
 *.log
-
-# OpenCode 配置
-.opencode/
-
-# Agent skills
 .agent/skills/_remote/
 .agent/skills/gitcode-pr
 .agent/skills/gitcode-issue
