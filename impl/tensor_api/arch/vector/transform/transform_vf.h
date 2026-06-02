@@ -22,10 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_VF_H
 
-#include "impl/tensor_api/arch/vector/binary/binary_vf.h"
-#include "impl/tensor_api/arch/vector/cast/cast_vf.h"
-#include "impl/tensor_api/arch/vector/unary/unary_vf.h"
-#include "impl/tensor_api/arch/vector/dual/dual_vf.h"
+#include "impl/tensor_api/arch/vector/transform/transform_vf_set.h"
 
 namespace AscendC {
 namespace Te {
@@ -33,17 +30,8 @@ namespace Te {
 template<typename CalcFunc, typename TraitType>
 class Transform2VF {
 private:
-    using binarySet = Std::tuple<Inst::Add, Inst::Sub, Inst::Madd, Inst::And, Inst::Select, Inst::AbsSub, Inst::Min, Inst::Max,
-        Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
-    using castSet = Std::tuple<Inst::Ceil, Inst::U82U16>;
-    using unarySet = Std::tuple<Inst::Not, Inst::Ln, Inst::Abs, Inst::Sqrt, Inst::Exp>;
-    using dualSet = Std::tuple<nst::Mull>;
-
-    using transformSet = TupleMap<
-        Std::tuple<binarySet, Transform2BinaryVF<CalcFunc, TraitType>>,
-        Std::tuple<castSet, Transform2CastVF<CalcFunc, TraitType>>,
-        Std::tuple<unarySet, Transform2UnaryVF<CalcFunc, TraitType>>,
-        Std::tuple<dualSet, Transform2DualVF<CalcFunc, TraitType>>>;
+    using Sets = Transform2VFSet<CalcFunc, TraitType>;
+    using transformSet = typename Sets::transformSet;
 
     template <typename Input>
     using Find = typename transformSet::template Find<Input>;
