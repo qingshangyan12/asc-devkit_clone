@@ -93,5 +93,5 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
 
   执行结果如下，说明精度对比成功。
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
