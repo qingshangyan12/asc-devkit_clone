@@ -36,27 +36,27 @@ public:                                                                         
 
 ASCENDC_CAST_INST(Half2UIntRD, asc_half2uint8_rd);
 ASCENDC_CAST_INST(Half2UIntRDSat, asc_half2uint8_rd_sat);
-ASCENDC_CAST_INST(Half2UIntRDP2, asc_half2uint8_rd_v2);
-ASCENDC_CAST_INST(Half2UIntRDSatP2, asc_half2uint8_rd_sat_v2);
+ASCENDC_CAST_INST(Half2UIntRDOdd, asc_half2uint8_rd_v2);
+ASCENDC_CAST_INST(Half2UIntRDSatOdd, asc_half2uint8_rd_sat_v2);
 ASCENDC_CAST_INST(Half2UIntRN, asc_half2uint8_rn);
 ASCENDC_CAST_INST(Half2UIntRNSat, asc_half2uint8_rn_sat);
-ASCENDC_CAST_INST(Half2UIntRNP2, asc_half2uint8_rn_v2);
-ASCENDC_CAST_INST(Half2UIntRNSatP2, asc_half2uint8_rn_sat_v2);
+ASCENDC_CAST_INST(Half2UIntRNOdd, asc_half2uint8_rn_v2);
+ASCENDC_CAST_INST(Half2UIntRNSatOdd, asc_half2uint8_rn_sat_v2);
 ASCENDC_CAST_INST(Half2UIntRNA, asc_half2uint8_rna);
 ASCENDC_CAST_INST(Half2UIntRNASat, asc_half2uint8_rna_sat);
-ASCENDC_CAST_INST(Half2UIntRNAP2, asc_half2uint8_rna_v2);
-ASCENDC_CAST_INST(Half2UIntRNASatP2, asc_half2uint8_rna_sat_v2);
+ASCENDC_CAST_INST(Half2UIntRNAOdd, asc_half2uint8_rna_v2);
+ASCENDC_CAST_INST(Half2UIntRNASatOdd, asc_half2uint8_rna_sat_v2);
 ASCENDC_CAST_INST(Half2UIntRU, asc_half2uint8_ru);
 ASCENDC_CAST_INST(Half2UIntRUSat, asc_half2uint8_ru_sat);
-ASCENDC_CAST_INST(Half2UIntRUP2, asc_half2uint8_ru_v2);
-ASCENDC_CAST_INST(Half2UIntRUSatP2, asc_half2uint8_ru_sat_v2);
+ASCENDC_CAST_INST(Half2UIntRUOdd, asc_half2uint8_ru_v2);
+ASCENDC_CAST_INST(Half2UIntRUSatOdd, asc_half2uint8_ru_sat_v2);
 ASCENDC_CAST_INST(Half2UIntRZ, asc_half2uint8_rz);
 ASCENDC_CAST_INST(Half2UIntRZSat, asc_half2uint8_rz_sat);
-ASCENDC_CAST_INST(Half2UIntRZP2, asc_half2uint8_rz_v2);
-ASCENDC_CAST_INST(Half2UIntRZSatP2, asc_half2uint8_rz_sat_v2);
+ASCENDC_CAST_INST(Half2UIntRZOdd, asc_half2uint8_rz_v2);
+ASCENDC_CAST_INST(Half2UIntRZSatOdd, asc_half2uint8_rz_sat_v2);
 
 ASCENDC_CAST_INST(U82Half, asc_uint82half);
-ASCENDC_CAST_INST(U82HalfP2, asc_uint82half_v2);
+ASCENDC_CAST_INST(U82HalfOdd, asc_uint82half_v2);
 
 #undef ASCENDC_CAST_INST
 
