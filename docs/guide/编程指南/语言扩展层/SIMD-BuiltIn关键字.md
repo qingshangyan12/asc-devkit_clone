@@ -534,11 +534,27 @@ __ubuf__ int * __gm__ ptr;
 <td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。</p>
 </td>
 </tr>
+<tr id="rowSubBlockNum"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockNum"><a name="pSubBlockNum"></a><a name="pSubBlockNum"></a>sub_block_num</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockNum"><a name="pGetSubBlockNum"></a><a name="pGetSubBlockNum"></a>GetSubBlockNum</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockNumDesc"><a name="pSubBlockNumDesc"></a><a name="pSubBlockNumDesc"></a>当前任务配置的子块（SubBlock）数量，仅在Mix场景（__mix__编程模式）下的Vector核上有效，用于确定AIV核在组合内的并行粒度。</p>
+</td>
+</tr>
+<tr id="rowSubBlockIdx"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockIdx"><a name="pSubBlockIdx"></a><a name="pSubBlockIdx"></a>sub_block_idx</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockIdx"><a name="pGetSubBlockIdx"></a><a name="pGetSubBlockIdx"></a>GetSubBlockIdx</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockIdxDesc"><a name="pSubBlockIdxDesc"></a><a name="pSubBlockIdxDesc"></a>当前子块（SubBlock）的索引，仅在Mix场景（__mix__编程模式）下的Vector核上有效。在Mix场景中，AIV核的逻辑位置由block_idx和sub_block_idx共同确定。</p>
+</td>
+</tr>
 </tbody>
 </table>
 通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
 例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+
+在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
 
 ## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
 
