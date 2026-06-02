@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section12840195813362"></a>
 
-支持在数据搬运时进行NZ到ND格式的转换。
+该接口为软仿接口，基于易用性角度进行设计，支持在从UB到GM的数据搬运过程中进行NZ到ND格式的转换。
 
 ## 函数原型<a name="section1792117555586"></a>
 
@@ -37,7 +37,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。 |
 | src | 输入 | 源操作数，类型为LocalTensor。 |
-| intriParams | 输入 | 搬运参数，类型为[Nz2NdParamsFull](#table15841351172811)。<br>具体定义请参考${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[Nz2NdParamsFull](#table15841351172811)。<br>具体定义请参考${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nz2NdParamsFull结构体内参数定义
 
@@ -109,7 +109,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 约束说明<a name="section830051273220"></a>
 
-无
+该接口为软仿接口，基于易用性角度进行设计。
 
 ## 调用示例<a name="section2409153316111"></a>
 

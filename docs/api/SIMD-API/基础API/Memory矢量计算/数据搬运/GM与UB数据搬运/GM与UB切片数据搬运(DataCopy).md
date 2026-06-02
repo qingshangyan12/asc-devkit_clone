@@ -16,18 +16,18 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
+该接口为软仿接口，基于易用性角度进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
 
 ## 函数原型<a name="zh-cn_topic_0000002565968945_section82039854412"></a>
 
--   GM-\>UB
+- GM-\>UB
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
     ```
 
--   UB-\>GM
+- UB-\>GM
 
     ```cpp
     template <typename T>
@@ -70,9 +70,9 @@
 **图 1**  参数解析示意图<a name="fig1196816115710"></a>  
 ![](../../../../../figures/parameter_analysis_diagram.png "参数解析示意图")
 
--   dimValue为2，表示操作数有2维。
--   srcSliceInfo为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}
-    -   {16, 70, 7, 3, 87}是针对单独一行， 即从一维的角度来配置，每个元素代表一个数：
+- dimValue为2，表示操作数有2维。
+- srcSliceInfo为 {{16, 70, 7, 3, 87},  {0, 2, 1, 1, 3}}
+    - {16, 70, 7, 3, 87}是针对单独一行， 即从一维的角度来配置，每个元素代表一个数：
 
         **startIndex**  = 16，表示有效数据段从第16个数开始；
 
@@ -84,7 +84,7 @@
 
         **shapeValue**  = 87，表示单独一行的长度，单位为元素个数，即 8 \* 10 + 7 = 87个元素。
 
-    -   {0, 2, 1, 1, 3}是针对多行，即从二维的角度来配置，每个元素代表一行：
+    - {0, 2, 1, 1, 3}是针对多行，即从二维的角度来配置，每个元素代表一行：
 
         **startIndex**  = 0，表示有效数据段从第0行开始；
 
@@ -96,8 +96,8 @@
 
         **shapeValue**  = 3，表明一共有3行。
 
--   dstSliceInfo为{{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}}
-    -   {0, 47, 0, 3, 48}是针对单独一行， 即从一维的角度来配置，每个元素代表一个数：
+- dstSliceInfo为{{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}}
+    - {0, 47, 0, 3, 48}是针对单独一行， 即从一维的角度来配置，每个元素代表一个数：
 
         **startIndex**  = 0，表示有效数据段从第0个数开始；
 
@@ -109,7 +109,7 @@
 
         **shapeValue**  = 48，表示单独一行的长度，单位为元素个数，即8 \* 6 = 48个元素。
 
-    -   {0, 1, 0, 1, 2} 是针对多行，即从二维的角度来配置，每个元素代表1行：
+    - {0, 1, 0, 1, 2} 是针对多行，即从二维的角度来配置，每个元素代表1行：
 
         **startIndex** = 0，表示有效数据段从第0行开始；
 
@@ -154,15 +154,16 @@
 
 ## 约束说明<a name="zh-cn_topic_0000002565968945_section2045914466492"></a>
 
--   位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
--   burstLen，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。
--   切片数据搬运中的横向burstLen大小设置，需要用户自己通过计算：横向切片元素个数\* sizeof\(T\)/32byte。横向切片元素个数\* sizeof\(T\)的大小必须是32byte的倍数。
--   SliceInfo 结构体的成员变量 startIndex、endIndex、stride、burstLen的取值须满足：
+- 该接口为软仿接口，基于易用性角度进行设计。
+- 位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
+- burstLen，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。
+- 切片数据搬运中的横向burstLen大小设置，需要用户自己通过计算：横向切片元素个数\* sizeof\(T\)/32byte。横向切片元素个数\* sizeof\(T\)的大小必须是32byte的倍数。
+- SliceInfo 结构体的成员变量 startIndex、endIndex、stride、burstLen的取值须满足：
 $$endIndex - startIndex + 1 = (N - 1) \times stride + N \times burstLen \times \frac{32}{sizeof(T)}, \quad N \in 正整数$$
--   SliceInfo结构体的成员变量startIndex、endIndex、shapeValue的取值须满足：$$startIndex < endIndex \le shapeValue$$
--   切片数据搬运中的SliceInfo结构体数组大小和dimValue需要保持一致，并且不超过8。
--   切片数据搬运中的srcSliceInfo结构体数组大小的和dstSliceInfo的结构体数组大小需要保持一致，两者的结构体中的burstLen需要相等（srcSliceInfo\[i\].burstLen = dstSliceInfo\[i\].burstLen）。
--   切片数据搬运对参数有一定要求，建议使用者参考调用示例，并在CPU上仿真结果无误后，再到NPU侧执行。
+- SliceInfo结构体的成员变量startIndex、endIndex、shapeValue的取值须满足：$$startIndex < endIndex \le shapeValue$$
+- 切片数据搬运中的SliceInfo结构体数组大小和dimValue需要保持一致，并且不超过8。
+- 切片数据搬运中的srcSliceInfo结构体数组大小的和dstSliceInfo的结构体数组大小需要保持一致，两者的结构体中的burstLen需要相等（srcSliceInfo\[i\].burstLen = dstSliceInfo\[i\].burstLen）。
+- 切片数据搬运对参数有一定要求，建议使用者参考调用示例，并在CPU上仿真结果无误后，再到NPU侧执行。
 
 ## 调用示例<a name="zh-cn_topic_0000002565968945_section088124295117"></a>
 
