@@ -15,9 +15,6 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-set(CODEBASE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../")
-message(CODEBASE_SOURCE_DIR: "${CODEBASE_SOURCE_DIR}")
-
 add_executable(demo
     vector_add.asc
 )
@@ -35,10 +32,6 @@ set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
 include_directories(
     "${ASC_INCLUDE_DIR}"
 )
-
-# target_include_directories(demo PRIVATE
-#     ${CODEBASE_SOURCE_DIR}
-# )
 
 # ======================================================================================
 # NPU 编译选项配置
