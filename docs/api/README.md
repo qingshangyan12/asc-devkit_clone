@@ -1727,7 +1727,6 @@
         -   [随机函数](SIMD-API/高阶API/随机函数/随机函数.md)
             -   [PhiloxRandom](SIMD-API/高阶API/随机函数/PhiloxRandom.md)
 
-    -   [C API](SIMD-API/C-API/README.md)
     -   [其他数据类型](SIMD-API/其他数据类型/其他数据类型.md)
         -   [ShapeInfo](SIMD-API/其他数据类型/ShapeInfo.md)
         -   [ListTensorDesc](SIMD-API/其他数据类型/ListTensorDesc.md)
