@@ -32,7 +32,14 @@ public:
     template <const CopyL12BTTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        DataCopyImpl<trait, T, U>(dst, src);
+        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
+        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+            BatchDataCopyImpl<trait, T, U>(dst, src);
+        } else {
+            DataCopyImpl<trait, T, U>(dst, src);
+        }
     }
 
 private:
@@ -43,44 +50,58 @@ private:
         CheckDataType::CheckL12BtDataType<T, U>();
     }
 
-    template <const CopyL12BTTrait& trait, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    // Emits a DataCopy on the (already batch-stripped) src/dst layouts. matrixCount/srcMatrixStride/
+    // dstMatrixStride carry the batch dimension when matrixCount > 1; non-batch path passes 1/0/0.
+    // Pattern is read from the original tensor types T/U so the NDLayoutPtn dim=0 vs NDExt dim=1
+    // split keeps working on the inner sub-layout.
+    template <typename T, typename U, typename SrcLayout, typename DstLayout>
+    __aicore__ inline static void EmitCopy(const T& dst, const U& src, const SrcLayout& srcLayout,
+                                           const DstLayout& dstLayout, uint16_t matrixCount,
+                                           uint32_t srcMatrixStride, uint32_t dstMatrixStride)
     {
-        CheckTemplate<trait, T, U>();
-
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
 
         uint16_t srcCol;
         uint16_t srcRow;
-        uint16_t dstCol;
+        uint16_t srcShapeRow;
         uint16_t dstRow;
-        uint16_t blockCount;
         if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
+            srcShapeRow = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
         } else {
             srcCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
             srcRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
+            srcShapeRow = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcLayout);
         }
         if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
-            dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
         } else {
-            dstCol = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstLayout);
             dstRow = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout);
         }
-
-        using srcType = typename U::elementType;
-        using dstType = typename T::elementType;
 
         bool convControl = false;
         if (IsOneOfAttrV<srcType, half> && IsOneOfAttrV<dstType, float>) {
             convControl = true;
         }
 
+        if (matrixCount > 1) {
+            // Batch path: each matrix becomes one block; assumes per-matrix internal compactness so
+            // a single blockLen can cover the matrix.
+            uint16_t blockCount = matrixCount;
+            uint32_t matrixElems = static_cast<uint32_t>(srcShapeRow) * srcCol;
+            uint16_t blockLen = Std::ceil_division(matrixElems, C0_ELEMENT<srcType>);
+            if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
+                blockLen = Std::ceil_align(blockLen, 2);
+            }
+            uint16_t srcStride = (srcMatrixStride - matrixElems) / C0_ELEMENT<srcType>;
+            uint16_t dstStride = Std::ceil_align((dstMatrixStride - matrixElems) / C0_ELEMENT<dstType>, 2);
+            CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
+            return;
+        }
+
+        uint16_t blockCount = srcShapeRow;
         uint16_t blockLen = Std::ceil_division(srcCol, C0_ELEMENT<srcType>);
         if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
             blockLen = Std::ceil_align(blockLen, 2);
@@ -89,6 +110,31 @@ private:
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
+    }
+
+    template <const CopyL12BTTrait& trait, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+        EmitCopy(dst, src, src.Layout(), dst.Layout(), 1, 0, 0);
+    }
+
+    // Batch case: strip the leading B axis, then reuse the single-matrix path on the sub-layouts.
+    // Per-batch src stride (Get<0> of src stride) is the per-matrix L1 pitch; per-batch dst stride
+    // (Get<0> of dst stride) is the per-matrix BT pitch.
+    template <const CopyL12BTTrait& trait, typename T, typename U>
+    __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        uint16_t matrixCount = Get<0>(srcLayout.Shape());
+        uint32_t srcMatrixStride = Get<0>(srcLayout.Stride());
+        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+
+        EmitCopy(dst, src, Te::Get<1>(srcLayout), Te::Get<1>(dstLayout), matrixCount, srcMatrixStride,
+                 dstMatrixStride);
     }
 };
 

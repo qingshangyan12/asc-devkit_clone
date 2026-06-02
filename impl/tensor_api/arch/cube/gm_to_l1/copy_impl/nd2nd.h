@@ -32,7 +32,14 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        DataCopyImpl<trait, T, U>(dst, src);
+        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
+        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+            BatchDataCopyImpl<trait, T, U>(dst, src);
+        } else {
+            DataCopyImpl<trait, T, U>(dst, src);
+        }
     }
 
 private:
@@ -43,14 +50,16 @@ private:
         CheckDataType::CheckGm2L1AlignV2NDDataType<T, U>();
     }
 
-    template <const CopyGM2L1Trait& trait, typename T, typename U>
-    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    // Emits a DataCopy on the (already batch-stripped) src/dst layouts. matrixCount/srcMatrixStride/
+    // dstMatrixStride carry the batch dimension when set (and 0/1 default for the non-batch path).
+    // The src/dst pattern is read from the original tensor types T/U so the NDLayoutPtn dim=0 vs
+    // NDExt dim=1 split keeps working on the inner sub-layout.
+    template <typename T, typename U, typename SrcLayout, typename DstLayout>
+    __aicore__ inline static void EmitCopy(const T& dst, const U& src, const SrcLayout& srcLayout,
+                                           const DstLayout& dstLayout, uint32_t matrixCount,
+                                           uint64_t srcMatrixStride, uint32_t dstMatrixStride)
     {
-        CheckTemplate<trait, T, U>();
-
         using type = typename U::elementType;
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
 
         uint32_t srcShapeRows;
         uint32_t srcShapeColumns;
@@ -58,7 +67,7 @@ private:
         uint32_t dstShapeColumns;
         uint32_t dstStrideRows;
 
-        if constexpr(IsSatisfiedPtnFormatV<T, NDLayoutPtn>){
+        if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcLayout);
             srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcLayout);
             srcStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout);
@@ -68,7 +77,7 @@ private:
             srcStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout);
         }
 
-        if constexpr(IsSatisfiedPtnFormatV<T, NDLayoutPtn>){
+        if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
             dstShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(dstLayout);
             dstStrideRows = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout);
         } else {
@@ -77,6 +86,22 @@ private:
         }
 
         uint8_t cacheMode = src.Engine().GetCacheMode();
+
+        if (matrixCount > 1) {
+            // Batch path: each matrix becomes one block; assumes per-matrix internal compactness so
+            // a single blockLen can cover the matrix.
+            uint32_t blockCount = matrixCount;
+            uint32_t blockLen = srcShapeRows * srcShapeColumns * sizeof(type);
+            uint64_t srcStride = srcMatrixStride * sizeof(type);
+            uint32_t dstStride = dstMatrixStride * sizeof(type);
+            if constexpr (IsB4Type<type>) {
+                blockLen = blockLen >> 1;
+                srcStride = srcStride >> 1;
+                dstStride = dstStride >> 1;
+            }
+            CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+            return;
+        }
 
         // normal mode, dst_stride % C0_SIZE should be 0
         // compact mode, blockLen equals dstStride
@@ -103,6 +128,31 @@ private:
             dstStride = dstStride >> 1;
         }
         CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+    }
+
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void DataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+        EmitCopy(dst, src, src.Layout(), dst.Layout(), 1, 0, 0);
+    }
+
+    // Batch case: strip the leading B axis, then reuse the single-matrix path on the sub-layouts.
+    // Per-batch GM stride (Get<0> of src stride) covers both contiguous (bmk) and non-contiguous
+    // (mbk) memory; per-batch L1 stride (Get<0> of dst stride) is the per-matrix dst pitch.
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        uint32_t matrixCount = Get<0>(srcLayout.Shape());
+        uint64_t srcMatrixStride = Get<0>(srcLayout.Stride());
+        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+
+        EmitCopy(dst, src, Te::Get<1>(srcLayout), Te::Get<1>(dstLayout), matrixCount, srcMatrixStride,
+                 dstMatrixStride);
     }
 };
 } // namespace Te
