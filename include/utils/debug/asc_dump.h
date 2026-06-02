@@ -20,6 +20,8 @@
 #define __UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_DUMP_H__
 #endif
 
+#include "kernel_macros.h"
+
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #endif
@@ -52,15 +54,23 @@ __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_
 
 namespace __asc_simd_vf {
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "SIMD-VF dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size);
 
 template <typename T>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "SIMD-VF dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "SIMD-VF dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size);
 
 template <typename T>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "SIMD-VF dump is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 }
 
