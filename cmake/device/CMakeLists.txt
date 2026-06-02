@@ -34,11 +34,5 @@ find_cann_package(acl_rt REQUIRED)
 find_cann_package(atrace REQUIRED)
 find_cann_package(error_manager REQUIRED)
 
-include(${ASCENDC_DIR}/impl/adv_api/gen_kernel_tiling.cmake)
-
 set(DEVICE_MODE TRUE)
 set(KERNEL_MODE TRUE)
-
-add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
-add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
-add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)
