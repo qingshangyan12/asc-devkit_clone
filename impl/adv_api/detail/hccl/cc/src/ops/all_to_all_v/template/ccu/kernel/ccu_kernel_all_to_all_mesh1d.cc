@@ -9,6 +9,7 @@
 */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_mesh1d.h"
+#include "ccu_func.hpp"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -55,11 +56,11 @@ HcclResult CcuKernelAlltoAllMesh1D::InitResource(ccu::Variable inputAddr, ccu::V
         } else {
             HCCL_DEBUG("[CcuKernelAlltoAllMesh1D] MyRank[%u], PeerId[%u], ChannelId[%u]",
                        rankId_, peerId, channelIdx);
-            ccu::Variable inputVar = GetResByChannel(channels_[channelIdx], INPUT_XN_ID);
+            ccu::Variable inputVar = ccu::GetResByChannel<ccu::Variable>(channels_[channelIdx], INPUT_XN_ID);
             input_.push_back(inputVar);
-            ccu::Variable outputVar = GetResByChannel(channels_[channelIdx], OUTPUT_XN_ID);
+            ccu::Variable outputVar = ccu::GetResByChannel<ccu::Variable>(channels_[channelIdx], OUTPUT_XN_ID);
             output_.push_back(outputVar);
-            ccu::Variable tokenVar = GetResByChannel(channels_[channelIdx], TOKEN_XN_ID);
+            ccu::Variable tokenVar = ccu::GetResByChannel<ccu::Variable>(channels_[channelIdx], TOKEN_XN_ID);
             token_.push_back(tokenVar);
             channelIdx++;
         }
