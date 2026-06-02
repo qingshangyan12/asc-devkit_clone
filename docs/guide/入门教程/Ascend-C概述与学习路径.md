@@ -34,14 +34,14 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 ---
 # Ascend C学习路径
 
-## 快速入门：快速上手实操，构建全景认知
+## 快速入门：快速上手实践，构建全景认知
 
 初级阶段的目标是让您在最短时间内跑通第一个算子，理解Ascend C的基本工作方式。
 
 学习路线建议如下：
 
 - **环境搭建**：从 [CANN环境安装](./环境准备.md) 开始，准备好开发与运行环境。
-- **编程模型概览**：阅读 [异构系统与SIMD/SIMT编程模型介绍](./快速入门/异构系统与编程模型.md)，建立对昇腾AI处理器异构计算以及SIMD、SIMT两种执行模型的整体认识。
+- **异构系统与编程模型概览**：阅读 [异构系统与SIMD/SIMT编程模型介绍](./快速入门/异构系统与编程模型.md)，建立对昇腾AI处理器异构计算以及SIMD、SIMT两种执行模型的整体认识。
 - **动手实践**：
    - [SIMD算子快速入门](./快速入门/基于SIMD编程/基于SIMD编程.md)
    - [SIMT算子快速入门](./快速入门/基于SIMT编程/基于SIMT编程.md)
@@ -56,7 +56,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
    - [编程模型概述](../编程指南/编程模型/编程模型.md)
    - **SIMD编程**：[Ascend C SIMD编程模型](../编程指南/编程模型/AI-Core-SIMD编程/概述.md)
        - [基于指针的C语言编程](../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
-       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)
+       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
        - [基于TPipe-TQue框架编程](../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
    - **SIMT编程**：[Ascend C SIMT编程模型](../编程指南/编程模型/AI-Core-SIMT编程/概述.md)
    - [语言扩展层概述](../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
@@ -104,4 +104,5 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 - [基本概念与术语](../技术附录/概念原理和术语/术语表.md)
 - [C++语言标准支持](../技术附录/CPP标准支持/概述.md)
-- [Ascend C API参考（含每个API的规格与约束）](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [Ascend C API参考](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [CANN Runtime 接口可参考《应用开发（C&C++）》](https://hiascend.com/document/redirect/CannCommunityadev)

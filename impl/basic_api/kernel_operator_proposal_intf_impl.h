@@ -166,6 +166,9 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
     }
     ASCENDC_ASSERT((params.validBit == 3 || params.validBit == 7 || params.validBit == 15),
         { KERNEL_LOG(KERNEL_ERROR, "Failed to check validBit value in MrgSort, its valid value is 3 / 7 / 15"); });
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    ReportNopWarning<uint8_t>(params.repeatTimes, "params.repeatTimes", "MrgSort");
+#endif
 #if ASCENDC_CPU_DEBUG
     if (!CheckFunProposal(dst, src, params, Internal::REGION_PROPOSAL_ELEMENT_NUM, "MrgSort")) {
         ASCENDC_REPORT_CHECK_ERROR("MrgSort", KernelFuncType::NONE_MODE);
@@ -341,7 +344,7 @@ __aicore__ inline void Extract(const LocalTensor<T>& dstValue, const LocalTensor
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     ExtractImpl((__ubuf__ PrimType *)dstValue.GetPhyAddr(), (__ubuf__ uint32_t *)dstIndex.GetPhyAddr(),
         (__ubuf__ PrimType *)sorted.GetPhyAddr(), repeatTime);
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     uint64_t rsvdCnt;
     if constexpr (Std::is_same<PrimType, half>::value) {
         constexpr uint8_t gatherMaskPattern3 = 3;

@@ -1,8 +1,8 @@
 # asc_copy_l12bt
 
-## AI处理器支持情况
+## 产品支持情况
 
-| AI处理器类型 | 是否支持  |
+| 产品 | 是否支持  |
 | :----------------------- | :------: |
 |<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
 
@@ -13,7 +13,7 @@
 ## 函数原型
 
 - 前n个数据搬运
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
@@ -31,7 +31,7 @@
     ```
 
 - 同步搬运
-    ```c++
+    ```cpp
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)

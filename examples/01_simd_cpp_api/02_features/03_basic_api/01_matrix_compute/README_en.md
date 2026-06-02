@@ -1,26 +1,27 @@
-# Matrix Compute API Example Introduction
+# Matrix Compute API Sample Introduction
 
 ## Overview
 
-This example set introduces typical usage of different features of matrix computation APIs, providing corresponding end-to-end implementations. The naming of examples in the directory follows the pattern "API_name_path", as shown below:
+This sample set introduces typical usage of different features of matrix computation APIs, providing corresponding end-to-end implementations. Samples in the directory are named according to "API_name_pathway", as follows:
+1. **load_data**: Samples starting with "load_data" introduce related APIs for L1 Buffer -> L0 Buffer;
+2. **mmad**: Samples starting with "mmad" introduce matrix multiplication Mmad API;
+3. **fixpipe**: Samples starting with "fixpipe" introduce related APIs for L0C Buffer → Global Memory/L1 Buffer/Unified Buffer;
 
-1. **load_data_**: Examples starting with "load_data_" introduce relevant APIs for L1 Buffer -> L0 Buffer.
-2. **mmad_**: Examples starting with "mmad_" introduce the matrix multiplication Mmad API.
-3. **fixpipe_**: Examples starting with "fixpipe_" introduce relevant APIs for L0C Buffer → GM/L1 Buffer/UB.
+## Sample List
 
-## Example List
-
-| Directory Name | Function Description |
-|--------------------------------------------------------------------------------------------| ---------------------------------------------------- |
-| [fixpipe_l0c2gm](./fixpipe_l0c2gm) | This example introduces how to use Fixpipe to move matrix multiplication results from CO1 (L0C Buffer) to GM (Global Memory) |
-| [fixpipe_l0c2ub](./fixpipe_l0c2ub) | This example introduces how to use Fixpipe to move matrix multiplication results from CO1 (L0C Buffer) to UB (Unified Buffer) |
-| [fixpipe_l0c2l1](./fixpipe_l0c2l1) | This example introduces how to use Fixpipe to move matrix multiplication results from CO1 (L0C Buffer) to L1 (L1 Buffer) |
-| [load_data_l12l0](./load_data_l12l0) | This example introduces the usage of relevant instructions for 14 matrix multiplication scenarios with B4/B8/B16/B32 data types, covering combinations of left/right matrix transposition and non-transposition. It focuses on data movement from A1 to A2 and B1 to B2 using basic API LoadData, including Load2D, Load3D, and LoadDataWithTranspose |
-| [load_data_2dv2_l12l0](./load_data_2dv2_l12l0) | This example introduces data movement from A1 to A2 and B1 to B2 using basic API LoadData, including Load2Dv2 |
-| [load_data_2dmx_l12l0](./load_data_2dmx_l12l0) | This example introduces the usage of relevant instructions for 6 quantized matrix multiplication scenarios with FP4/FP8 data types, covering combinations of left/right matrix transposition and non-transposition. It focuses on data movement from L1 to L0 for matrices A, scaleA, B, and scaleB using basic API LoadData |
-| [mmad_load3dv2](./mmad_load3dv2) | This example introduces the process of moving matrices A and B from L1 to L0A/L0B using the LoadData3DV2 instruction, where A and B respectively represent the left and right input matrices of matrix multiplication. The parameter configuration of the LoadData3DV2 instruction and the data layout changes before and after executing the instruction are explained with diagrams |
-| [batch_mmad](./batch_mmad) | This example introduces batch matrix multiplication with float input data type and both left and right matrices not transposed. DataCopy ND2NZ and Fixpipe batch data movement are used for the GM-->L1, L0C-->GM, and L0C-->L1 paths. The L1-->L0A/L0B and Mmad matrix multiplication steps loop batch times, processing one pair of left and right matrices per loop |
-| [mmad](./mmad) | This example introduces matrix multiplication with ND format input and B4/B8/B16/B32 input data types (specifically using int4_t/int8_t/bfloat16/float as examples), explaining how to implement matrix multiplication computation (C = A x B + Bias) through the Mmad instruction |
-| [mmad_unitflag](./mmad_unitflag) | This example introduces how to use the unitFlag feature when calling the Mmad instruction |
-| [mmad_gemv](./mmad_gemv) | This example introduces matrix multiplication in Gemv (M=1) mode |
-| [mmad_with_sparse](./mmad_with_sparse) | This example introduces the basic API MmadWithSparse calling example |
+| Directory Name | Function Description | Supported Products |
+|--------------------------------------------------------------------------------------------| ---------------------------------------------------- | --- |
+| [fixpipe_l0c2gm](./fixpipe_l0c2gm) |  This sample introduces how to use Fixpipe to move matrix multiplication results from L0C Buffer to GM (Global Memory) | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [fixpipe_l0c2ub](./fixpipe_l0c2ub) |  This sample introduces how to use Fixpipe to move matrix multiplication results from L0C Buffer to UB (Unified Buffer) | Ascend 950PR/Ascend 950DT |
+| [fixpipe_l0c2l1](./fixpipe_l0c2l1) |  This sample introduces how to use Fixpipe to move matrix multiplication results from L0C Buffer to L1 (L1 Buffer) | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [load_data_l12l0](./load_data_l12l0) |  This sample demonstrates the complete flow for B4/B8/B16/B32 input data types, including A/B matrix movement from GM to L1, L1 to L0, matrix multiplication, and result movement | Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [load_data_2dv2_l12l0](./load_data_2dv2_l12l0) |  This sample demonstrates how to call the `LoadData` interface and configure `LoadData2DParamsV2` structure parameters (referred to as the `Load2Dv2` interface in this sample) to move A/B matrices from L1 to L0A/L0B | Ascend 950PR/Ascend 950DT |
+| [load_data_2dmx_l12l0](./load_data_2dmx_l12l0) |  This sample demonstrates how to use the basic API `LoadData` to complete L1-to-L0 data movement in MX quantized matrix multiplication | Ascend 950PR/Ascend 950DT |
+| [mmad_load3dv2](./mmad_load3dv2) |  This sample introduces the usage scenarios and methods of the LoadData3DV2 instruction in matrix multiplication. LoadData3DV2 can move two-dimensional A and B matrices from L1 to L0A/L0B, where A and B represent the left and right input matrices of matrix multiplication | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [batch_matmul](./batch_matmul) |  This sample introduces batch matrix multiplication with float data type input and both left/right matrices non-transposed. The GM -> L1 path uses DataCopy with Nd2NzParams for batch data movement, the L0C -> GM and L0C -> L1 paths use Fixpipe for batch data movement, and L1 -> L0A / L0B movement plus Mmad matrix multiplication are executed batch times | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mmad](./mmad) |  This sample introduces matrix multiplication with ND format input, B4/B8/B16/B32 input data types (specifically using int4_t/int8_t/bfloat16/float as examples), demonstrating how to implement matrix multiplication computation (C = A x B + Bias) using Mmad instruction | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mmad_tensor_api](./mmad_tensor_api) |  This sample implements dynamic-shape matrix multiplication and in-path quantization using the Tensor API programming mode | Ascend 950PR/Ascend 950DT |
+| [mmad_unitflag](./mmad_unitflag) |  This sample introduces how to use unitFlag functionality when calling Mmad instruction | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mmad_gemv](./mmad_gemv) |  This sample introduces matrix multiplication in GEMV (M=1) mode | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mmad_with_sparse](./mmad_with_sparse) |  This sample introduces a basic API MmadWithSparse invocation sample | Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |
+| [mmad_mx](./mmad_mx) | This sample introduces 4 types of matrix multiplication with quantization features (referred to as MX matrix multiplication) with ND format input, where A and B matrices are of FP4 (fp4x2_e1m2_t, fp4x2_e2m1_t) and FP8 (fp8_e4m3fn_t, fp8_e5m2_t) data types, and quantization coefficient matrices scaleA and scaleB are of fp8_e8m0_t data type. It covers scenarios with non-transposed left matrix and left quantization coefficient matrix, and transposed right matrix and right quantization coefficient matrix | Ascend 950PR/Ascend 950DT |

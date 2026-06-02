@@ -8,17 +8,17 @@
 
 ## 目录结构介绍
 ```
-├── set_atomic_determine_compute
-│   ├── figures                      // README中图片资源目录
+├── set_atomic_deterministic_computation
+│   ├── figures                                   // README中图片资源目录
 │   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致的验证脚本
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── set_atomic_add_multi_aic.h    // 多AIC核同步实现
-│   ├── set_atomic_add_multi_aiv.h    // 多AIV核同步实现
-│   ├── set_atomic_add_single_aiv.h   // 单AIV核同步实现
-│   ├── set_atomic_determine_compute.asc  // Ascend C样例实现 & 调用样例
+│   │   ├── gen_data.py                           // 输入数据和真值数据生成脚本
+│   │   └── verify_result.py                      // 验证输出数据和真值数据是否一致的验证脚本
+│   ├── CMakeLists.txt                            // 编译工程文件
+│   ├── data_utils.h                              // 数据读入写出函数
+│   ├── set_atomic_add_multi_aic.h                // 多AIC核同步实现
+│   ├── set_atomic_add_multi_aiv.h                // 多AIV核同步实现
+│   ├── set_atomic_add_single_aiv.h               // 单AIV核同步实现
+│   ├── set_atomic_deterministic_computation.asc  // Ascend C样例实现 & 调用样例
 ```
 
 ## 1. 确定性计算
@@ -184,7 +184,7 @@ if (GetBlockIdx == 0) {
     <td style="padding: 8px;">方案1支持指定部分AIV参与同步，并可控制各AIV的执行顺序。</td>
   </tr>
   <tr>
-    <td style="padding: 8px;">方案2： 通过InitDetermineComputeWorkspace、NotifyNextBlock 和 WaitPreBlock三个接口配合使用，确保所有AIV核按照blockIdx升序顺序执行，可参考样例中SCENARIO_NUM=4的分支(待支持)。</td>
+    <td style="padding: 8px;">方案2： 通过InitDetermineComputeWorkspace、NotifyNextBlock 和 WaitPreBlock三个接口配合使用，确保所有AIV核按照blockIdx升序执行。</td>
     <td style="padding: 8px;">方案2要求所有AIV必须参与同步，且执行顺序固定为blockIdx升序。</td>
   </tr>
   <tr>

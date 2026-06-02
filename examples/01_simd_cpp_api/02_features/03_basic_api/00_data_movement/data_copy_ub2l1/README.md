@@ -22,7 +22,7 @@
 ## 样例描述
 
 - 样例功能：  
-  将数据从UB（Unified Buffer）搬运到L1（L1 Buffer），然后进行Mmad矩阵乘计算，最后通过Fixpipe搬出到GM（Global Memory）。接口资料参考[随路基础数据搬运](../../../../../../docs/api/context/基础数据搬运.md)。
+  将数据从UB（Unified Buffer）搬运到L1（L1 Buffer），然后进行Mmad矩阵乘计算，最后通过Fixpipe搬出到GM（Global Memory）。接口资料参考[随路基础数据搬运](../../../../../../docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/基础数据搬运.md)。
 - 样例规格：
   <table>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
@@ -39,7 +39,7 @@
   - 将数据从UB（Unified Buffer）搬运到L1（L1 Buffer）。
   - 调用基础API LoadData将数据从L1（L1 Buffer）搬运到A2（L0A Buffer）与B2(L0B Buffer)。
   - 调用基础API Mmad进行矩阵乘计算。
-  - 调用基础API Fixpipe将数据从CO1（L0C Buffer）搬运到GM（Global Memory）。
+  - 调用基础API Fixpipe将数据从L0C Buffer搬运到GM（Global Memory）。
 - 调用实现  
   使用内核调用符<<<>>>调用核函数。
     

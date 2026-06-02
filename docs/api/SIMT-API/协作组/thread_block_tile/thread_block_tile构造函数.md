@@ -12,18 +12,20 @@
 | Atlas 推理系列产品Vector Core | x |
 | Atlas 训练系列产品 | x |
 
+## 功能说明
+
 `thread_block_tile`不提供默认构造函数，可通过`tiled_partition`接口从另一个协作组中划分得到。
 
 ## 函数原型
 
-```C++
+```c++
 template <unsigned int Size, typename ParentT>
 thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 ```
 
 ## 参数说明
 
-**表 1**  模板版本参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -49,7 +51,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         ...
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
-        auto tile32 = tiled_partition<32>(block);                               // 建议使用auto管理返回对象
+        auto tile32_auto = tiled_partition<32>(block);                          // 建议使用auto管理返回对象
         thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);   // 按照4个线程为一组划分thread_block，对象类型中保留父组信息
         ...
     }
@@ -64,7 +66,7 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         ...
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
-        auto tile32 = tiled_partition<32>(block);                               // 建议使用auto管理返回对象
+        auto tile32_auto = tiled_partition<32>(block);                          // 建议使用auto管理返回对象
         thread_block_tile<4, thread_block> tile4 = tiled_partition<4>(block);   // 按照4个线程为一组划分thread_block，对象类型中保留父组信息
         ...
     }

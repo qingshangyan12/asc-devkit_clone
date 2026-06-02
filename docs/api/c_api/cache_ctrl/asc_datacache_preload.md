@@ -35,12 +35,12 @@ PIPE_S
 
 ## 约束说明
 
-频繁调用此接口可能会导致保留栈拥塞，此时，该接口将被是为NOP指令，阻塞Scalar流水。因此不建议频繁调用此接口。
+频繁调用此接口可能会导致保留栈拥塞，此时，该接口将被视为NOP指令，阻塞Scalar流水。因此不建议频繁调用此接口。
 
 ## 调用示例
 
 ```cpp
-__gm__ uint64_t* addr;
+__gm__ uint64_t addr[256];
 int64_t offset = 0;
 asc_datacache_preload(addr, offset);
 ```

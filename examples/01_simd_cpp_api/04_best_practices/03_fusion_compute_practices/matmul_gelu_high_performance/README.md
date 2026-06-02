@@ -19,6 +19,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
@@ -299,9 +300,8 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 下图展示了Scenario 1（CV融合-GM中转）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果写入GM，AIV侧从GM读取数据完成GELU计算，两者按(baseM × baseN)块粒度流水并行：
 
-![Scenario1 CV融合-GM中转流水并行](figure/CVParallell_L0C_GM_UB.png)
-
-> **备注：** 流水图基于产品线CANN包msopprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeUtilization`
+![Scenario1 CV融合-GM中转流水并行](figures/CVParallell_L0C_GM_UB.png)
+> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeTimeline ./demo`
 
 **MTE2时间显著减少的原因：**
 
@@ -319,71 +319,73 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 下图展示了Scenario 2（CV融合-UB直通）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果直接写入UB（不经过GM中转），AIV侧直接在UB上进行GELU计算，省去了GM→UB的MTE2搬运开销：
 
-![Scenario2 CV融合-UB直通流水并行](figure/CVParallell_L0C_UB.png)
+![Scenario2 CV融合-UB直通流水并行](figures/CVParallell_L0C_UB.png)
 
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-### 配置环境变量
+- 切换Case
 
-请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  在 cmake 编译时通过 `-DSCENARIO_NUM=N` 指定要编译的场景，各场景说明：
+  - `1`: CV融合-GM中转（A2/A3/Ascend 950PR均支持）
+  - `2`: CV融合-UB直通（仅Ascend 950PR支持）
 
-- 默认路径，root 用户安装 CANN 软件包
+  > **注意：** A2/A3架构仅支持Scenario 1（GM中转），选择Scenario 2会触发编译期 `static_assert` 报错。
+
+- 配置环境变量
+
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  - 默认路径，root用户安装CANN软件包
+    ```bash
+    source /usr/local/Ascend/cann/set_env.sh
+    ```
+
+  - 默认路径，非root用户安装CANN软件包
+    ```bash
+    source $HOME/Ascend/cann/set_env.sh
+    ```
+
+  - 指定路径install_path，安装CANN软件包
+    ```bash
+    source ${install_path}/cann/set_env.sh
+    ```
+
+- 样例执行
 
   ```bash
-  source /usr/local/Ascend/cann/set_env.sh
+  SCENARIO_NUM=1
+  mkdir -p build && cd build;      # 创建并进入build目录
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py   # 生成测试输入数据
+  ./demo                           # 执行编译生成的可执行程序，执行样例
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-- 默认路径，非 root 用户安装 CANN 软件包
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
+  示例如：
   ```bash
-  source $HOME/Ascend/cann/set_env.sh
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
 
-- 指定路径 install_path，安装 CANN 软件包
+  > **注意：** 切换编译模式或Scenario前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
+- 编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`、`dav-3510` | NPU硬件架构：dav-2201对应A2/A3，dav-3510对应Ascend 950PR |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1=CV融合-GM中转，2=CV融合-UB直通（仅Ascend 950PR支持） |
+
+- 执行结果
+
+  执行结果如下，说明精度对比成功。
   ```bash
-  source ${install_path}/cann/set_env.sh
+  test pass!
   ```
-
-### 样例执行
-
-```bash
-SCENARIO=1                                                           # 选择执行场景（1为CV融合-GM中转，2为CV融合-UB直通，仅Ascend 950PR支持）
-mkdir -p build && cd build;                                          # 创建并进入 build 目录
-cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # 编译工程（默认npu模式）
-python3 ../scripts/gen_data.py                                       # 生成测试输入数据
-./demo                                                               # 执行编译生成的可执行程序
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin
-```
-
-使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
-
-示例：
-
-```bash
-cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;   # NPU 仿真模式
-```
-
-> **注意：** 
-> - 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
-> - A2/A3架构仅支持Scenario 1（GM中转），选择Scenario 2会触发编译期 `static_assert` 报错。
-
-### 编译选项说明
-
-| 参数 | 说明 | 可选值 | 默认值 |
-|------|------|---------|--------|
-| `SCENARIO_NUM` | CV融合场景 | 1: CV融合-GM中转；2: CV融合-UB直通（仅Ascend 950PR支持） | `1` |
-| `CMAKE_ASC_RUN_MODE` | 运行模式 | `npu`、`sim` | `npu` |
-| `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构 | `dav-2201`、`dav-3510` | `dav-3510` |
-
-执行结果如下，说明精度对比成功。
-
-```bash
-test pass!
-```
 
 ### 性能分析
 

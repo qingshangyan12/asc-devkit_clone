@@ -13,15 +13,15 @@
 
 ## 目录结构介绍
 
-```
+```text
 ├── msProf
-│   ├── CMakeLists.txt         # cmake编译文件
-│   ├── gather.asc             # SIMT实现gather调用样例
-|   └── README.md
+│   ├── CMakeLists.txt         // cmake编译文件
+│   ├── gather.asc             // SIMT实现gather调用样例
+│   └── README.md
 ```
 
 ## 算子描述
-  gather算子实现了从形状为100000 * 128的二维向量中获取指定索引的12288行数据的功能，具体功能描述可参考[Gather算子详情](../../../02_features/00_resource_management/basic_gather/README.md)章节。
+  gather算子实现了从形状为100000 * 128的二维向量中获取指定索引的12288行数据的功能，具体功能描述可参考[Gather算子详情](../../../00_introduction/01_gather/basic_gather/gather_2d/README.md)章节。
 
 ## msProf工具介绍
 msProf工具是单算子性能分析工具。包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
@@ -78,11 +78,19 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
     ```
 
 - 样例执行
+
   ```bash
   mkdir -p build && cd build;           # 创建并进入build目录
-  cmake ..;make -j;                     # 编译工程
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # 编译工程
   msprof op ./demo                      # 基于可执行文件demo通过msprof op执行算子调优
   ```
+
+  编译选项说明
+
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+
   执行结果如下，说明精度对比成功。
   ```
   [Success] Case accuracy is verification passed.

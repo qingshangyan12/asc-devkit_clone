@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-此接口用于获取执行GatherMask操作后剩余的元素数量。
+此接口用于获取执行[asc_reduce](./asc_reduce.md)操作后剩余的元素数量。
 
 ## 函数原型
 
@@ -39,7 +39,10 @@ PIPE_S
 ```cpp
 // 初始化dst、src0、src1和total_length(参与计算的数据长度)
 int total_length = 256;
-asc_reduce(dst, src0, src1, total_length)
+__ubuf__ float src0[total_length];
+__ubuf__ float src1[total_length];
+__ubuf__ float dst[total_length];
+asc_reduce(dst, src0, src1, total_length);
 asc_sync_notify(PIPE_V, PIPE_S, 0); // 设置等待和同步信号
 asc_sync_wait(PIPE_V, PIPE_S, 0);
 int64_t result = asc_get_rsvd_count();  // 获取结果

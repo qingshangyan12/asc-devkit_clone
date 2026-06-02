@@ -1,11 +1,12 @@
-# RegBase Sample Introduction
+# RegBase Example Introduction
 
 ## Overview
 
-This sample introduces Vector computation functionality of RegBase programming.
+This example introduces the Vector computation functionality of RegBase programming.
 
-## Sample List
+## Example List
 
-| Directory Name | Function Description |
-| -------------- | -------------------- |
-| [vector_add](./vector_add) | Add sample based on Reg programming interface |
+| Directory Name | Function Description | Supported Products |
+| ------------------------------------------------------------ | ---------------------------------------------------- | --- |
+| [add](./add) |  Add example based on Reg programming interface | Ascend 950PR/Ascend 950DT |
+| [gelu](./gelu) | GELU computation example based on LocalMemAllocator and RegBase/VF fusion | Ascend 950PR/Ascend 950DT |

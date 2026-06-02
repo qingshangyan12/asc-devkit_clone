@@ -259,7 +259,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 </td>
 <td class="cellrowborder" valign="top" width="80.82000000000001%" headers="mcps1.2.3.1.2 "><p id="p165511311158"><a name="p165511311158"></a><a name="p165511311158"></a>是否允许修改源操作数，默认值为false。</p>
 <p id="p123683470326"><a name="p123683470326"></a><a name="p123683470326"></a><span id="ph43682471321"><a name="ph43682471321"></a><a name="ph43682471321"></a>Ascend 950PR/Ascend 950DT</span>，该参数仅在输入的数据类型为float时生效，取值如下：</p>
-<a name="ul146342113310"></a><a name="ul146342113310"></a><ul id="ul146342113310"><li>true：开发者允许源操作数被改写，可以使能该参数，使能后本接口内部计算时<strong id="b1161942143313"><a name="b1161942143313"></a><a name="b1161942143313"></a>复用</strong>srcTensor的内存空间，节省部分内存空间；</li><li>false：本接口内部计算时<strong id="b1684233315"><a name="b1684233315"></a><a name="b1684233315"></a>不复用</strong>srcTensor的内存空间。</li></ul>
+<a name="ul146342113310"></a><a name="ul146342113310"></a><ul id="ul146342113310"><li>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时<strong id="b1161942143313"><a name="b1161942143313"></a><a name="b1161942143313"></a>复用</strong>srcTensor的内存空间，节省部分内存空间；</li><li>false：本接口内部计算时<strong id="b1684233315"><a name="b1684233315"></a><a name="b1684233315"></a>不复用</strong>srcTensor的内存空间。</li></ul>
 <p id="p1858160123013"><a name="p1858160123013"></a><a name="p1858160123013"></a><span id="ph1949522133011"><a name="ph1949522133011"></a><a name="ph1949522133011"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_4"><a name="zh-cn_topic_0000001312391781_term1253731311225_4"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_4"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_4"><a name="zh-cn_topic_0000001312391781_term131434243115_4"></a><a name="zh-cn_topic_0000001312391781_term131434243115_4"></a>Atlas A3 推理系列产品</term></span>，该参数预留，传入默认值false即可。</p>
 <p id="p0211214415"><a name="p0211214415"></a><a name="p0211214415"></a><span id="ph12112124116"><a name="ph12112124116"></a><a name="ph12112124116"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_4"><a name="zh-cn_topic_0000001312391781_term11962195213215_4"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_4"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_4"><a name="zh-cn_topic_0000001312391781_term184716139811_4"></a><a name="zh-cn_topic_0000001312391781_term184716139811_4"></a>Atlas A2 推理系列产品</term></span>，该参数预留，传入默认值false即可。</p>
 <p id="p12281194220419"><a name="p12281194220419"></a><a name="p12281194220419"></a><span id="ph8281194214120"><a name="ph8281194214120"></a><a name="ph8281194214120"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span>，该参数预留，传入默认值false即可。</p>
@@ -492,7 +492,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 ```
 
 ```
-/ dstLocalValue：保存已排序出的k个值
+// dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值
 // srcLocalIndex：保存待排序的值对应的索引
@@ -583,7 +583,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 ```
 
 ```
-/ dstLocalValue：保存已排序出的k个值
+// dstLocalValue：保存已排序出的k个值
 // dstLocalIndex：保存已排序出的k个值对应的索引
 // srcLocal：保存待排序的值
 // srcLocalIndex：保存待排序的值对应的索引
@@ -675,4 +675,3 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 </tr>
 </tbody>
 </table>
-

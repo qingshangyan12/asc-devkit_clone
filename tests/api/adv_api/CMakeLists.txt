@@ -365,9 +365,9 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
-    hccl/test_hccl_950.cpp
     hccl/test_hccl_aicpu_950.cpp
     hcomm/test_hcomm_950.cpp
+    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
@@ -538,3 +538,5 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 endforeach()
 
 add_subdirectory(hccl/cc)
+
+add_subdirectory(api_host_check)

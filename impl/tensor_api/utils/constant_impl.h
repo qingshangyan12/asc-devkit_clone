@@ -27,11 +27,35 @@
 
 namespace AscendC {
 namespace Te {
+using Std::Int;
+using _0 = Std::Int<0>;
+using _1 = Std::Int<1>;
+using _2 = Std::Int<2>;
+using _3 = Std::Int<3>;
+using _4 = Std::Int<4>;
+using _5 = Std::Int<5>;
+using _6 = Std::Int<6>;
+using _7 = Std::Int<7>;
+using _8 = Std::Int<8>;
+using _9 = Std::Int<9>;
+using _10 = Std::Int<10>;
+using _16 = Std::Int<16>;
+using _24 = Std::Int<24>;
+using _32 = Std::Int<32>;
+using _64 = Std::Int<64>;
+using _128 = Std::Int<128>;
+using _256 = Std::Int<256>;
+using _512 = Std::Int<512>;
+using _1024 = Std::Int<1024>;
+using _2048 = Std::Int<2048>;
+using _4096 = Std::Int<4096>;
+
 constexpr size_t TWO_DIM_DATA = 2;
 constexpr size_t FOUR_DIM_DATA = 4;
 constexpr size_t FRACTAL_FIXED = 16;
 constexpr size_t MX_SCALE_K0 = 2;
 constexpr uint32_t BLOCK_CUBE = 16;
+constexpr uint64_t HIFLOAT8_MMAD_CTRL_MASK = 0x200000000000ULL;
 
 struct ArchVersion {
     static constexpr uint32_t V3510 = 3510;
@@ -59,8 +83,6 @@ namespace CopyMode {
     struct TRANS_B8B4_COORD {};
 };
 
-enum class LayoutFormat : uint8_t { NZ, ZN, ZZ, DN, ND, NN};
-
 namespace Location {
     struct INVALID {};
     struct GM {};
@@ -68,11 +90,36 @@ namespace Location {
     struct L1 {};
     struct L0A {};
     struct L0B {};
+    struct L0ScaleA {};
+    struct L0ScaleB {};
     struct L0C {};
     struct BIAS {};
     struct FIXBUF {};
+    struct SSBUF {};
 }
 
+template <typename T>
+struct IsHardware {
+private:
+    template <typename Tp, typename... Tps>
+    __aicore__ inline static constexpr bool IsUnqualifiedAnyOf() {
+        return (... || Std::is_same_v<Std::remove_cvref_t<Tp>, Tps>);
+    }
+
+public:
+    static constexpr bool value = IsUnqualifiedAnyOf<T,
+        Location::INVALID, Location::GM, Location::UB, Location::L1,
+        Location::L0A, Location::L0B, Location::L0ScaleA, Location::L0ScaleB,
+        Location::L0C, Location::BIAS, Location::FIXBUF, Location::SSBUF>();
+};
+
+template <typename T>
+constexpr bool IsHardwareV = IsHardware<T>::value;
+
+template <typename... Ts>
+struct HasZeroIntegralConstant : Std::bool_constant<
+    (... || Std::is_same_v<Std::remove_cvref_t<Ts>, Std::Int<0>>)> {};
+    
 template <typename TupleType>
 using tuple_sequence = Std::make_index_sequence<Std::tuple_size_v<Std::remove_cvref_t<TupleType>>>;
 
@@ -87,11 +134,13 @@ struct locationAttr {
     using fbufAttr =        __fbuf__    T*;
     using ssbufAttr =       __ssbuf__   T*;
     using biasbufAttr =     __biasbuf__ T*;
+    using noneAttr =                    T*;
 
     using type = Std::tuple<gmAttr, cbufAttr, caAttr, cbAttr, ccAttr, ubufAttr, fbufAttr, ssbufAttr, biasbufAttr>;
 
     using locationMap = TupleMap<Std::tuple<Location::GM, gmAttr>, Std::tuple<Location::L1, cbufAttr>, Std::tuple<Location::L0A, caAttr>,
-    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
+    Std::tuple<Location::L0B, cbAttr>, Std::tuple<Location::L0ScaleA, noneAttr>,
+    Std::tuple<Location::L0ScaleB, noneAttr>, Std::tuple<Location::L0C, ccAttr>, Std::tuple<Location::UB, ubufAttr>, 
     Std::tuple<Location::BIAS, biasbufAttr>, Std::tuple<Location::FIXBUF, fbufAttr>>;
 };
 
@@ -121,6 +170,11 @@ template <typename A, typename... BList>
 constexpr bool IsOneOfAttrV = CheckAllSame<A, BList...>::value;
 
 template <typename DataType>
+inline constexpr bool IsDataType = IsOneOfAttrV<Std::remove_cvref_t<DataType>, hifloat8_t, bfloat16_t, fp4x2_e1m2_t, fp4x2_e2m1_t, 
+                                                fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t> || Std::is_integral_v<Std::remove_cvref_t<DataType>> 
+                                                || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
+
+template <typename DataType>
 inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
 
 template<typename T = Std::ignore_t>
@@ -138,32 +192,6 @@ constexpr size_t C0_SIZE = GetC0Size<T>();
 
 template<typename T>
 constexpr size_t C0_ELEMENT = C0_SIZE<T> / sizeof(T);
-
-template <size_t N, typename = Std::make_index_sequence<N>>
-struct EmptyGenerator;
-
-template <size_t N, size_t... Idx>
-struct EmptyGenerator<N, Std::index_sequence<Idx...>>
-{   
-    using type = Std::tuple<Std::Int<Idx * 0>...>;
-};
-
-template <size_t N>
-struct TupleEmptyGenerator
-{   
-    static_assert((N > 0 && (N & 1) == 0), "N must be greater than 0, and must be even.");
-    using type = Std::tuple<typename EmptyGenerator<N / 2>::type, 
-        typename EmptyGenerator<N / 2>::type>;
-};
-
-template <size_t N>
-using EmptyShape = typename TupleEmptyGenerator<N>::type;
-
-template <size_t N>
-using EmptyStride = typename TupleEmptyGenerator<N>::type;
-
-template <size_t N>
-using EmptyCoord = typename TupleEmptyGenerator<N>::type;
 
 // IsIntegralConstant
 template <typename T>
