@@ -245,24 +245,21 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
         return false;
     }
 
-    // 1. 判断需不需要回绕
+    // 1. Check if wrap-around is needed
     if (writeInfo->bufOffset + tlvLen > ringBufLen) {
-        // 需要回绕（跳过writeInfo->bufOffset后剩余的ringbuf，设置writeInfo->bufOffset=0），该分支下有 writeInfo->bufOffset != 0
-        // 进行回绕前需要判断回绕会不会导致覆写
+        // Wrap-around risks overwriting unread data. Wait if RTS is behind or at buffer start.
         if (readInfo->bufOffset > writeInfo->bufOffset || readInfo->bufOffset == 0) {
-            // 此分支必有 writeInfo->bufOffset != readInfo->bufOffset，不写入直接等待时，rts会正常读取所有未读内容
+            // Wait ensures RTS consumes pending data since w != r.
             if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
                 return false;
             }
         }
-        // rts读取完成后，会更新readInfo->bufOffset = writeInfo->bufOffset，此时回绕行为不会再导致覆写
+        // Safe to wrap(set writeInfo->bufOffset=0) after RTS sync.
         do_overlow_skip(writeInfo, ringBufAddr, ringBufLen, minTlvLen);
     }
-    // 2. 当前位置已保障写入数据不会导致回绕，只需要判断写入是否会导致覆写
+    // 2. No wrap-around needed, check for overwrite in current position
     if (writeInfo->bufOffset + tlvLen >= readInfo->bufOffset && readInfo->bufOffset > writeInfo->bufOffset) {
-        // 当前分支写入会导致覆写rts未读区域 or 导致写入后writeInfo->bufOffset == readInfo->bufOffset
-        // rts在readInfo->bufOffset ！= writeInfo->bufOffset才会读取数据，否则认为无新数据写入
-        // 此分支必有 writeInfo->bufOffset != readInfo->bufOffset，不写入直接等待时，rts会正常读取所有未读内容
+        // Write would overwrite unread region or stall RTS. Wait for RTS to advance.
         if (!ringbuf_overflow_wait(readInfo, writeInfo)) {
             return false;
         }
