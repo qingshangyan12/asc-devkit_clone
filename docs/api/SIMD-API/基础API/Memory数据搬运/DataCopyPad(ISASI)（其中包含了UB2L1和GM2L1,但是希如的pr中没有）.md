@@ -123,10 +123,10 @@
 
 | 产品型号 | 支持的数据传输通路 | 是否支持设置数据搬运模式mode（搬运模式包括单次搬运对齐和整块数据搬运对齐） |
 | --- | --- | --- |
-| Ascend 950PR/Ascend 950DT | GM->VECIN/VECOUT、GM->A1/B1、GM->TSCM、VECIN/VECOUT->GM、A1/B1->GM、VECIN/VECOUT->TSCM、 GM->VECCALC | 是 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | GM->VECIN/VECOUT、VECIN/VECOUT->GM、VECIN/VECOUT->TSCM | 否 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | GM->VECIN/VECOUT、VECIN/VECOUT->GM、VECIN/VECOUT->TSCM | 否 |
-| Atlas 200I/500 A2 推理产品 | GM->VECIN/VECOUT、VECIN/VECOUT->GM | 否 |
+| Ascend 950PR/Ascend 950DT | GM->VECIN/VECOUT（GM->UB）、GM->A1/B1（GM->L1 Buffer）、GM->TSCM（GM->L1 Buffer）、VECIN/VECOUT->GM（UB->GM）、A1/B1->GM（L1 Buffer->GM）、VECIN/VECOUT->TSCM（UB->L1 Buffer）、GM->VECCALC（GM->UB） | 是 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | GM->VECIN/VECOUT（GM->UB）、VECIN/VECOUT->GM（UB->GM）、VECIN/VECOUT->TSCM（UB->L1 Buffer） | 否 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | GM->VECIN/VECOUT（GM->UB）、VECIN/VECOUT->GM（UB->GM）、VECIN/VECOUT->TSCM（UB->L1 Buffer） | 否 |
+| Atlas 200I/500 A2 推理产品 | GM->VECIN/VECOUT（GM->UB）、VECIN/VECOUT->GM（UB->GM） | 否 |
 
 ## 数据类型<a name="section4219135304818"></a>
 
