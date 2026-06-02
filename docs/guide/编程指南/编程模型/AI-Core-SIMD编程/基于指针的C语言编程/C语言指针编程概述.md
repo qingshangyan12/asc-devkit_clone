@@ -223,19 +223,19 @@ Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector�
 
     针对NPU架构2201，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
-    ![2201 硬件架构图](image-10.png)
+    ![2201 硬件架构图](../../../../figures/2201_硬件架构图.png)
 
     针对NPU架构3510，硬件架构图如下，高亮部分展示了并行执行的计算单元和搬运单元。
 
-    ![3510 硬件架构图](image-11.png)
+    ![3510 硬件架构图](../../../../figures/3510_硬件架构图.png)
 
     当我们描述一个常见的Vector矢量计算时，需要执行下面三个步骤：1. 通过DMA将数据从Global Memory搬入到Local Memory。2. 进行矢量计算。3. 通过DMA将数据从Local Memory搬出到Global Memory。
 
-    ![Vector计算数据流](image-12.png)
+    ![Vector计算数据流](../../../../figures/Vector计算数据流.png)
 
     从上图可以看到, 执行一个Vector矢量计算时，四个执行单元`Scalar`, `Vector`, `DMA(MTE2)`, `DMA(MTE3)`四个执行单元并行执行，如果访问同一片Local Memory, 需要同步机制来控制访问时序，保证先搬入Local Memory后在进行计算，然后计算完成后在搬出， 否则将会出现计算出错。
 
-    ![同步顺序](image-13.png)
+    ![同步顺序](../../../../figures/同步顺序.png)
 
     如上图所示, Vector矢量计算是由4个执行单元并行执行的，这些并行的执行单元在AI Core上映射到不同的执行数据流, 通常DMA数据搬入为`MTE2`数据流， DMA数据搬出为`MTE3`数据流, 同步即是控制这些数据流的访问顺序，保证执行正常。
     <table>
