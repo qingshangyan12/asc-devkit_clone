@@ -32,7 +32,14 @@ public:
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        DataCopyImpl<trait, T, U>(dst, src);
+        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
+        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+            BatchDataCopyImpl<trait, T, U>(dst, src);
+        } else {
+            DataCopyImpl<trait, T, U>(dst, src);
+        }
     }
 
 private:
@@ -96,6 +103,54 @@ private:
             srcStride = 0;
             dstStride = blockLen;
         }
+        if constexpr (IsB4Type<type>) {
+            // move fp4 as b8, need to be divided by 2
+            blockLen = blockLen >> 1;
+            srcStride = srcStride >> 1;
+            dstStride = dstStride >> 1;
+        }
+        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+    }
+
+    // Batch case: B matrices each laid out as (row, col). The underlying GM->L1 align-v2 instruction
+    // does not natively support a batch dimension, so each matrix is emitted as one contiguous block
+    // and blockCount carries B; per-matrix start-to-start strides come from Get<0> of src/dst layouts.
+    // Assumes each matrix is internally compact (row pitch equals column count); non-compact inner
+    // layouts cannot be expressed via a single blockLen and are not supported on this path.
+    template <const CopyGM2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+
+        using type = typename U::elementType;
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        uint32_t batchSize = Get<0>(srcLayout.Shape());
+        uint64_t srcMatrixStride = Get<0>(srcLayout.Stride());
+        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+
+        // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
+        // would read the batch axis as row/column.
+        auto srcInner = Te::Get<1>(srcLayout);
+
+        uint32_t srcShapeRows;
+        uint32_t srcShapeColumns;
+        if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcInner);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcInner);
+        } else {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
+        }
+
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+
+        uint32_t blockCount = batchSize;
+        uint32_t blockLen = srcShapeRows * srcShapeColumns * sizeof(type);
+        uint64_t srcStride = srcMatrixStride * sizeof(type);
+        uint32_t dstStride = dstMatrixStride * sizeof(type);
+
         if constexpr (IsB4Type<type>) {
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
