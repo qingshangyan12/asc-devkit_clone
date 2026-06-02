@@ -52,7 +52,6 @@ namespace AscendC {
  * \param [in] info: shape information of input/mask tensors
  */
 template <typename T, typename U, bool isReuseMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "SelectWithBytesMask is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1, const LocalTensor<U>& mask,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
 {
@@ -83,7 +82,6 @@ __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
  * \param [in] info: shape information of input/mask tensors
  */
 template <typename T, typename U, bool isReuseMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "SelectWithBytesMask is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Select(const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1, const LocalTensor<U>& mask,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
 {
