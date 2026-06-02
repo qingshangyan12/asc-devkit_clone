@@ -373,7 +373,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 
   ```text
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
 
 ## 性能分析

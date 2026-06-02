@@ -93,5 +93,5 @@
   执行结果如下，说明精度对比成功。
 
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
