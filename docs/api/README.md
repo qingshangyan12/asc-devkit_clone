@@ -671,7 +671,7 @@
 
     -   [C API](SIMD-API/C-API/README.md)
         -   [API列表](SIMD-API/C-API/C-API.md)
-        -   [通用说明与约束](SIMD-API/C-API/通用说明与约束.md)
+        -   [通用说明和约束](SIMD-API/C-API/通用说明和约束.md)
         -   [数据结构](SIMD-API/C-API/数据结构/数据结构.md)
             -   [asc_fill_value_config](SIMD-API/C-API/数据结构/asc_fill_value_config.md)
             -   [asc_l13d_fmatrix_config](SIMD-API/C-API/数据结构/asc_l13d_fmatrix_config.md)
