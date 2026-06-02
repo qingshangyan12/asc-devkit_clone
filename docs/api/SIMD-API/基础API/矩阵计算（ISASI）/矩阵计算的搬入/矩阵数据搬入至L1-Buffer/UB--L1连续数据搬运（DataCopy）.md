@@ -1,4 +1,4 @@
-# UB->L1数据搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002570000001"></a>
+# UB->L1连续数据搬运（DataCopy）
 
 ## 产品支持情况
 
@@ -16,9 +16,12 @@
 
 ## 功能说明
 
+> [!NOTE]说明 
+> 本接口为软件仿真实现，是在Matmul高阶API的基础上，利用Matmul高阶API中的workspace GM空间作为数据中转空间，数据先搬入GM，再搬入L1。因此，在使用本接口时，需要先使用REGISSTER_MATMUL注册高阶API。
+
 头文件路径为："basic_api/kernel_operator_data_copy_intf.h"。
 
-该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，数据搬运时格式和内容保持不变。同时支持连续和非连续搬运。
+该接口实现将矩阵从Unified Buffer（UB，TPosition为VECIN/VECCALC/VECOUT）搬运至L1 Buffer，搬运方式为连续搬运，数据搬运时格式和内容保持不变。
 
 ## 函数原型
 
@@ -26,10 +29,6 @@
 // 连续搬运
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
-
-// 同时支持非连续搬运和连续搬运
-template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
 
 ## 参数说明
@@ -46,21 +45,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 |----------|----------|----------|
 |dst|输出|目的操作数，类型为LocalTensor，存储位置为L1 Buffer，起始地址要求32B对齐。|
 |src|输入|源操作数，类型为LocalTensor，存储位置为Unified Buffer（TPosition为VECIN/VECCALC/VECOUT），起始地址要求32B对齐。|
-|repeatParams|输入|搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h。|
 |count|输入|参与搬运的元素个数。count * sizeof(T)需要32B对齐，若不对齐，搬运量将对32B做向下取整。|
-
-**表 3**  DataCopyParams结构体参数定义
-
-|参数名称|含义|
-|----------|----------|
-|blockCount|待搬运的连续传输数据块个数。uint16_t类型，取值范围：blockCount∈[1, 4095]。|
-|blockLen|待搬运的每个连续传输数据块长度，单位为DataBlock（32B）。uint16_t类型，取值范围：blockLen∈[1, 65535]。|
-|srcGap|源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32B）。uint16_t类型。|
-|dstGap|目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32B）。uint16_t类型。|
-
-下图呈现了DataCopyParams结构体参数的使用方法，样例中完成了2个连续传输数据块的搬运，每个数据块含有8个DataBlock，源操作数相邻数据块之间无间隔，目的操作数相邻数据块尾与头之间间隔1个DataBlock。
-
-![](../../../../../figures/repeat-times.png)
 
 ## 数据类型
 
@@ -114,11 +99,4 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 // dstLocal、srcLocal为half类型的LocalTensor，分别位于L1 Buffer和UB
 // 使用传入count参数的搬运接口，完成连续搬运
 AscendC::DataCopy(dstLocal, srcLocal, 512);
-// 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
-DataCopyParams intriParams;
-intriParams.blockCount = 1; // 连续数据块个数为1
-intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock
-intriParams.srcGap = 0; // 源操作数做连续搬运
-intriParams.dstGap = 0; // 目的操作数连续排布
-AscendC::DataCopy(dstLocal, srcLocal, intriParams);
 ```
