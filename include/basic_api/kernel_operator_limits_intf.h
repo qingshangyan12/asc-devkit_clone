@@ -62,7 +62,7 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7BFFu);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7F7FFFFFu);
-#if (__NPU_ARCH__ == 3510)            
+#if (__NPU_ARCH__ == 3510)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7F7Fu);
 #endif

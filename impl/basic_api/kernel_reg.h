@@ -117,7 +117,7 @@ enum class DcciDst : uint64_t {
 
 #if defined(__NPU_ARCH__) &&                                                \
      ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                   \
-      (__NPU_ARCH__ == 3510)  || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 {
@@ -133,7 +133,7 @@ __aicore__ inline void DcciUBImpl(__ubuf__ T* dst)
 
 #if defined(__NPU_ARCH__ ) &&                                                           \
      ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) ||     \
-      (__NPU_ARCH__ == 3510)  || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+      (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 template <typename T, CacheLine entireType>
 __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 {
