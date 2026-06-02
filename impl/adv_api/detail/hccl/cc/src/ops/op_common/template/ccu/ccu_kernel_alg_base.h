@@ -12,6 +12,9 @@
 
 #include "log.h"
 #include "ccu_kernel.h"
+#include "ccu_variable.hpp"
+#include "ccu_loop.hpp"
+#include "ccu_condition_v1.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -41,6 +44,13 @@ protected:
         CcuRep::Variable loopParam;         // loop串行重复执行次数
         CcuRep::Variable parallelParam;     // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
         CcuRep::Variable residual;          // 尾块数据size
+    };
+
+    struct CcuGroupOpSize {
+        ccu::Variable addrOffset;           // 第二个loopGroup搬运的起始偏移
+        ccu::Variable loopParam;            // loop串行重复执行次数
+        ccu::Variable parallelParam;        // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
+        ccu::Variable residual;             // 尾块数据size
     };
 
     // 用于n和p部分数据loopgroup的参数
@@ -87,6 +97,7 @@ protected:
                              HcclDataType outputDataType, HcclReduceOp opType);
 
     HcclResult GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, GroupOpSize goSize);
+    HcclResult GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, CcuGroupOpSize goSize);
     HcclResult GroupLocalReduce(CcuRep::LocalAddr outDstOrg, std::vector<CcuRep::LocalAddr> &scratchOrg,
         GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
 private:
