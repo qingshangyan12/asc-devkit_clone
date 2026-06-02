@@ -21,7 +21,7 @@
 #include "ccu_temp_reduce_scatter_nhr_1D_mem2mem.h"
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1, typename InsAlgTemplate2, typename InsAlgTemplate3>
 InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3>::InsAllReduceParallelExecutor()
 {
@@ -806,9 +806,12 @@ HcclResult InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTem
 // 算法注册
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceParallelRSAG, InsAllReduceParallelExecutor,
     TopoMatchMultilevel, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+REGISTER_EXECUTOR_BY_FOUR_TEMPS(HcclCMDType::HCCL_CMD_ALLREDUCE, InsAllReduceParallelMesh1DNHR,
+    InsAllReduceParallelExecutor, TopoMatchMultilevel, InsTempReduceScatterMesh1D, InsTempReduceScatterNHR,
+    InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 #ifndef AICPU_COMPILE
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(HcclCMDType::HCCL_CMD_ALLREDUCE, CcuAllReduceParallelMesh1DNHR, InsAllReduceParallelExecutor,
     TopoMatchMultilevel, CcuTempReduceScatterMesh1DMem2Mem, CcuTempReduceScatterNHR1DMem2Mem, CcuTempAllGatherMesh1DMem2Mem, 
     CcuTempAllGatherNHR1DMem2Mem);
 #endif
-}  // namespace Hccl
+}  // namespace mc2_ops_hccl

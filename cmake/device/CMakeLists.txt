@@ -13,6 +13,7 @@ include(../fetch_cann_cmake.cmake)
 project(ascendc_tiling_api)
 
 init_cann_project(PRODUCT_SIDE "device" PREPEND_MODULE_PATH)
+add_cann_target_options()
 
 set(HI_PYTHON "python3" CACHE STRING "python executor")
 set(ASCENDC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
@@ -23,11 +24,21 @@ get_filename_component(ASC_DEVKIT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLU
 
 find_cann_package(aicpu_sharder REQUIRED)
 find_cann_package(tilingdata_base REQUIRED OBJECTS)
+find_cann_package(metadef REQUIRED)
+find_cann_package(unified_dlog REQUIRED)
+find_cann_package(ascend_hal REQUIRED)
+find_cann_package(securec REQUIRED)
+find_cann_package(runtime REQUIRED)
+find_cann_package(mmpa REQUIRED)
+find_cann_package(acl_rt REQUIRED)
+find_cann_package(atrace REQUIRED)
+find_cann_package(error_manager REQUIRED)
 
 include(${ASCENDC_DIR}/impl/adv_api/gen_kernel_tiling.cmake)
 
 set(DEVICE_MODE TRUE)
 set(KERNEL_MODE TRUE)
 
+add_subdirectory(../../impl/aicpu_api impl/aicpu_api)
 add_subdirectory(../../impl/adv_api/tiling impl/adv_api/tiling)
 add_subdirectory(../../impl/adv_api/detail/hccl/cc impl/adv_api/detail/hccl/cc)

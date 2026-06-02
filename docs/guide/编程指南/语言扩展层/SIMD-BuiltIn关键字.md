@@ -119,7 +119,7 @@
 
     ASCENDC\_CUBE\_ONLY是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。
 
-    基于分离模式开发非融合算子时，在只有矩阵计算的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，使能纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
+    基于分离模式开发非融合算子时，在只有矩阵计算的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
 
     >[!CAUTION]注意 
     >ASCENDC\_CUBE\_ONLY宏必须在\#include "lib/matmul\_intf.h"之前设置。
@@ -286,7 +286,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call-2.md)调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
@@ -558,7 +558,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
 
-SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
+SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
 
 -   \_\_simt\_vf\_\_ <a name="li611618392141"></a>
 
@@ -568,7 +568,7 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     __simt_vf__ inline void KernelAdd(__gm__ float* x, __gm__ float* y, __gm__ float* z)
     ```
 
-    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md#section776244992018)。
+    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md#section776244992018)。
 
     -   指针类型：\_\_ubuf\_\_ \*、\_\_gm\_\_ \*；
     -   标量类型：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16、int32\_t、uint32\_t、float、int64\_t、uint64\_t。

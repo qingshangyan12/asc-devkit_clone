@@ -31,7 +31,7 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ fp8_e5m2_t* dst, vector_st
 __simd_callee__ inline void asc_storeunalign(__ubuf__ fp8_e8m0_t* dst, vector_store_unalign& src0, vector_fp8_e8m0_t src1, uint32_t count)
 __simd_callee__ inline void asc_storeunalign(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, uint32_t count)
 __simd_callee__ inline void asc_storeunalign(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, uint32_t count)
-__simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count)
+__simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t*& dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count)
 ```
 
 ## 参数说明
@@ -72,7 +72,7 @@ for (uint32_t i = 0; i < repeat; i++) {
 
     // 第一次：src[0:62] 写入 dst[0:62]（即UB[8:256]）；同时src[62:64] 写入 ureg[0:2]
     // 第二次：ureg[0:2] + src[0:62] 写入 dst[62:126]（即UB[256:512]）；同时src[62:64] 写入 ureg[0:2]
-    asc_storeunalign(dst[i * count], ureg, src, count);
+    asc_storeunalign(dst + i*count, ureg, src, count);
 }
 // dst结束地址为520，即dst + repeat * count * sizeof(uint32_t)，所以offset要配置为repeat * count
 int32_t offset = repeat * count;
