@@ -131,7 +131,7 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 ## 调用示例<a name="section11276201527"></a>
 
-完整使用样例请参见[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景四。
+完整使用样例请参见[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/02_memory_vector_compute/gather)场景四。
 
 ```cpp
 uint32_t bufferLen = 128;
