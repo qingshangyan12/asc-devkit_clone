@@ -56,7 +56,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
    - [编程模型概述](../编程指南/编程模型/编程模型.md)
    - **SIMD编程**：[Ascend C SIMD编程模型](../编程指南/编程模型/AI-Core-SIMD编程/概述.md)
        - [基于指针的C语言编程](../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
-       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)
+       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
        - [基于TPipe-TQue框架编程](../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
    - **SIMT编程**：[Ascend C SIMT编程模型](../编程指南/编程模型/AI-Core-SIMT编程/概述.md)
    - [语言扩展层概述](../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
@@ -104,4 +104,5 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 - [基本概念与术语](../技术附录/概念原理和术语/术语表.md)
 - [C++语言标准支持](../技术附录/CPP标准支持/概述.md)
-- [Ascend C API参考（含每个API的规格与约束）](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [Ascend C API参考](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [CANN Runtime 接口可参考《应用开发（C&C++）》](https://hiascend.com/document/redirect/CannCommunityadev)

@@ -22,5 +22,5 @@ add_executable(demo
 )
 
 target_compile_options(demo PRIVATE
-    --npu-arch=${CMAKE_ASC_ARCHITECTURES}
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
 )

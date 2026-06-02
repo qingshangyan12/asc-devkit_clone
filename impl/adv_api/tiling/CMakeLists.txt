@@ -18,11 +18,6 @@ target_include_directories(
     $<BUILD_INTERFACE:${ASCENDC_DIR}>
     $<BUILD_INTERFACE:${ASCENDC_DIR}/include>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/include/base>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/pkg_inc>>
-    $<$<BOOL:${BUILD_OPEN_PROJECT}>:$<BUILD_INTERFACE:${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit>>
     $<$<NOT:$<BOOL:${BUILD_OPEN_PROJECT}>>:$<BUILD_INTERFACE:${ASCENDC_DIR}/../../asc/asc-devkit/include>>
@@ -35,7 +30,10 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/ascendc/include/highlevel_api/tiling>)
 
 target_link_libraries(tiling_api_headers
-                      INTERFACE $<BUILD_INTERFACE:tikcfw_headers>)
+                      INTERFACE 
+                      $<BUILD_INTERFACE:metadef_headers>
+                      $<BUILD_INTERFACE:unified_dlog>
+                      $<BUILD_INTERFACE:tikcfw_headers>)
 
 add_library(
   tiling_api STATIC
@@ -172,8 +170,6 @@ target_compile_options(
           -O2
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fPIC>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-strong>
-          $<$<STREQUAL:${PRODUCT_SIDE},device>:-fstack-protector-all>
-          $<$<STREQUAL:${PRODUCT_SIDE},device>:-std=c++11>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fvisibility-inlines-hidden>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-DASCEND_IS_AICPU>
           $<$<STREQUAL:${PRODUCT_SIDE},device>:-fvisibility=hidden>)
@@ -186,7 +182,7 @@ target_compile_definitions(
 
 target_link_libraries(
   tiling_api
-  PRIVATE $<BUILD_INTERFACE:intf_pub>
+  PRIVATE $<BUILD_INTERFACE:intf_pub_cxx14>
           $<BUILD_INTERFACE:slog_headers>
           -Wl,--no-as-needed
           c_sec
@@ -195,7 +191,8 @@ target_link_libraries(
           $<$<STREQUAL:${PRODUCT_SIDE},host>:exe_graph>
           $<$<STREQUAL:${PRODUCT_SIDE},host>:register>
   PUBLIC $<BUILD_INTERFACE:kernel_tiling_headers>
-         $<$<STREQUAL:${PRODUCT_SIDE},host>:metadef_headers> tiling_api_headers)
+         $<BUILD_INTERFACE:metadef_headers> tiling_api_headers
+         )
 
 if(BUILD_OPEN_PROJECT)
   set(ASCENDC_API_ADV_INSTALL_DIR ${INSTALL_LIBRARY_DIR}/lib64)

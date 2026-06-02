@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#ifndef OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
-#define OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
+#ifndef MC2_OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
+#define MC2_OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
 
 #include <string>
 #include <vector>
@@ -26,7 +26,7 @@
 #include "../../../common/binary_stream.h"
 #include "hccl_ccu_res.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
 
@@ -59,6 +59,7 @@ constexpr u32 ALG_MAX_LENGTH = 128;
 constexpr u64 ALL_TO_ALL_V_VECTOR_NUM = 4;
 constexpr u64 REDUCE_SCATTER_V_VECTOR_NUM = 2;
 constexpr u64 ALL_GATHER_V_VECTOR_NUM = 2;
+constexpr u32 MESH_CHANNELS_NUM = 1;
 
 enum class TopoType {
     TOPO_TYPE_COMMON = 0,           // 普通拓扑类型 ，default单层拓扑使用
@@ -149,6 +150,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     Level0Shape level0Topo;
     bool Level0Nhr{false};
     bool Level1Nhr{false};
+    bool Level1Hd{false};
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};
@@ -181,6 +183,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0Topo;
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
+        binaryStream << Level1Hd;
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
@@ -227,6 +230,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0Topo;
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
+        binaryStream >> Level1Hd;
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;

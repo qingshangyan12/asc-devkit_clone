@@ -232,7 +232,7 @@ constexpr WelfordFinalizeConfig WFFINALIZE_DEFAULT_CFG = { false };
 <td class="cellrowborder" valign="top" width="9.65%" headers="mcps1.2.4.1.2 "><p id="p263018345154"><a name="p263018345154"></a><a name="p263018345154"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="72.58%" headers="mcps1.2.4.1.3 "><p id="p0534135117111"><a name="p0534135117111"></a><a name="p0534135117111"></a>计算所需的参数信息。WelfordFinalizePara类型，定义如下方代码所示，其中参数的含义如下。</p>
-<a name="ul20925141115211"></a><a name="ul20925141115211"></a><ul id="ul20925141115211"><li>rnLength：输入的Reduce轴，按abLength为一次计算的大小，拆分的次数。如果拆分后有尾块，则次数向上取整。</li><li>abLength：Reduce轴拆分的大小。在不带counts参数的接口中，abLength=headCountLength+tailCountLength。</li><li>headCount：在不带counts参数的接口中使能该参数，作为公式中非尾块的counts系数，headCount值。</li><li>headCountLength：在不带counts参数的接口中使能该参数，headCount值对应的长度。</li><li>tailCount：在不带counts参数的接口中使能该参数，作为公式中尾块的counts系数，tailCount值。</li><li>tailCountLength：在不带counts参数的接口中使能该参数，tailCount值对应的长度。</li><li>abRec：abLength的倒数，即为1/abLength的值。</li><li>rRec：输入的Reduce轴拆分后，若没有尾块，表示1/(rnLength*abLength)的值，若有尾块，表示1/R的值。</li><li>rRecWithCorrection：输入的方差修正系数，当模板参数config中的isCorrection为true时生效。该参数仅支持<span id="ph131111419216"><a name="ph131111419216"></a><a name="ph131111419216"></a>Ascend 950PR/Ascend 950DT</span>。</li></ul>
+<a name="ul20925141115211"></a><a name="ul20925141115211"></a><ul id="ul20925141115211"><li>rnLength：输入的Reduce轴，按abLength为一次计算的大小，拆分的次数。如果拆分后有尾块，则次数向上取整。</li><li>abLength：Reduce轴拆分的大小。在不带counts参数的接口中，abLength=headCountLength+tailCountLength。</li><li>headCount：在不带counts参数的接口中开启该参数，作为公式中非尾块的counts系数，headCount值。</li><li>headCountLength：在不带counts参数的接口中开启该参数，headCount值对应的长度。</li><li>tailCount：在不带counts参数的接口中开启该参数，作为公式中尾块的counts系数，tailCount值。</li><li>tailCountLength：在不带counts参数的接口中开启该参数，tailCount值对应的长度。</li><li>abRec：abLength的倒数，即为1/abLength的值。</li><li>rRec：输入的Reduce轴拆分后，若没有尾块，表示1/(rnLength*abLength)的值，若有尾块，表示1/R的值。</li><li>rRecWithCorrection：输入的方差修正系数，当模板参数config中的isCorrection为true时生效。该参数仅支持<span id="ph131111419216"><a name="ph131111419216"></a><a name="ph131111419216"></a>Ascend 950PR/Ascend 950DT</span>。</li></ul>
 </td>
 </tr>
 </tbody>
@@ -261,7 +261,10 @@ struct WelfordFinalizePara {
 -   接口参数para.abLength的取值必须为32/sizeof\(float\)的整数倍。
 -   接口参数para.headCountLength与para.tailCountLength的和必须等于参数para.abLength。
 -   接口处理逻辑以参数para中设置的具体参数值为准，不依赖源操作数的shape信息。
--   接口参数para.tailCount为0时，禁止配置para.tailCountLength为非0值。
+-   对于以下芯片版本，接口参数para.tailCount为0时，禁止配置para.tailCountLength为非0值。
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    - Atlas 推理系列产品AI Core
 -   不支持源操作数与目的操作数地址重叠。
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 
@@ -304,4 +307,3 @@ AscendC::WelfordFinalize<false, CONFIG>(meanLocal, varianceLocal, inmeanLocal, i
 输出数据(varianceLocal): 
 [ 9.831062 0.       0.       0.       0.       0.       0.       0.      ]
 ```
-

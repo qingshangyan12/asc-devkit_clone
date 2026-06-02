@@ -1,11 +1,11 @@
 # RTC<a name="ZH-CN_TOPIC_0000002462620725"></a>
 
-RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/RTC.md)接口，在程序运行时，将中间代码动态编译成目标机器码，提升程序运行性能。
+RTC是Ascend C运行时编译库，通过[aclrtc](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/RTC/RTC.md)接口，在程序运行时，将中间代码动态编译成目标机器码，提升程序运行性能。
 
 运行时编译库提供以下核心接口：
 -   aclrtcCreateProg：根据输入参数（字符串形式表达的Ascend C源代码等）创建aclrtcProg程序实例。
 -   aclrtcAddNameExpr（可选）：注册需要导出的核函数名表达式，支持模板参数（如 "Kernel::add_custom\<float\>"），非模板核函数可跳过。
--   aclrtcCompileProg：编译给定的程序，支持用户自定义编译选项，比如指定NPU架构版本号：--npu-arch=dav-2201。支持的编译选项可以参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
+-   aclrtcCompileProg：编译给定的程序，支持用户自定义编译选项，比如指定[NPU架构版本号](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)：--npu-arch=dav-2201。支持的编译选项可以参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。
 -   aclrtcGetBinDataSize：获取编译后的Device侧二进制数据的大小。
 -   aclrtcGetBinData：获取编译后的Device侧二进制数据。
 -   aclrtcGetLoweredName（可选）：获取核函数编译后的mangled name，用于后续通过aclrtBinaryGetFunction查找核函数句柄，非模板核函数可跳过。

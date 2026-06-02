@@ -12,8 +12,8 @@ Ascend C编程模型的核心架构，深度承袭了传统C/C++并发编程中*
 
 **TPipe**与**TQue**是支撑多Stage流水线并行运行的两大基础组件，二者职责分明、紧密协同：
 
-- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)** 作为资源管理器，统一管理系统内存资源及用于同步的事件等；
-- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)** 作为队列，负责完成Stage任务间的同步与通信。
+- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TPipe/TPipe.md)** 作为资源管理器，统一管理系统内存资源及用于同步的事件等；
+- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/TQue.md)** 作为队列，负责完成Stage任务间的同步与通信。
 
 在TPipe-TQue模型下，完整的算子计算流程被拆分为若干独立、可并行调度的Stage，每个Stage都遵循一套标准化的四步编程范式：
 
@@ -61,7 +61,7 @@ Ascend C编程模型的核心架构，深度承袭了传统C/C++并发编程中*
 
 此机制精确管控每一块片上内存的读写状态与生命周期，确保覆写只发生在所有读操作完成之后，从底层消除读后写冲突，实现片上内存的高效、安全复用。
 
-![](../../../../figures/Iterate_flase-30.png)
+![](../../../../figures/Iterate_flase_2.png)
 
 由此可见，异步并行程序所面临的复杂同步控制，在Ascend C中被转化为`EnQue`/`DeQue`、`AllocTensor`/`FreeTensor`这类开发者熟悉的资源操作。这种封装既保留了硬件级性能，又极大降低了编程与理解难度。
 

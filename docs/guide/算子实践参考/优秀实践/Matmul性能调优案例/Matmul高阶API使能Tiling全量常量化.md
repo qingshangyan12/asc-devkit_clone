@@ -1,8 +1,8 @@
-# Matmul高阶API使能Tiling全量常量化<a name="ZH-CN_TOPIC_0000002374865629"></a>
+# Matmul高阶API开启Tiling全量常量化<a name="ZH-CN_TOPIC_0000002374865629"></a>
 
 ## 案例介绍<a name="section12231144316533"></a>
 
-本案例呈现了在使用Matmul高阶API进行矩阵乘法计算时，使能Matmul Tiling全量常量化对算子性能的提升效果。Matmul API在初始化和迭代过程中有大量Scalar计算，Matmul初始化时的Scalar计算影响指令头开销，Matmul迭代间的Scalar计算可能阻塞MTE2流水。在调用Matmul API实现矩阵乘法时，使用[MatmulApiStaticTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul模板参数.md)参数替代TCubeTiling变量参数，将Scalar计算提前到编译期进行，以减少运行时的Scalar计算开销，实现算子性能的提升。
+本案例呈现了在使用Matmul高阶API进行矩阵乘法计算时，开启Matmul Tiling全量常量化对算子性能的提升效果。Matmul API在初始化和迭代过程中有大量Scalar计算，Matmul初始化时的Scalar计算影响指令头开销，Matmul迭代间的Scalar计算可能阻塞MTE2流水。在调用Matmul API实现矩阵乘法时，使用[MatmulApiStaticTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul模板参数.md)参数替代TCubeTiling变量参数，将Scalar计算提前到编译期进行，以减少运行时的Scalar计算开销，实现算子性能的提升。
 
 -   Matmul Tiling常量化的适用场景：
     -   Matmul初始化时的Scalar计算较多，影响指令头开销。
@@ -70,7 +70,7 @@ Tiling参数如下：
 
 ## 分析主要瓶颈点<a name="section93975169548"></a>
 
--   优化前的流水图如下，默认不使能Tiling常量化，Tiling参数需要从Host侧拷贝到Kernel侧，导致Matmul初始化时的Scalar计算较多，第一个MTE2指令开始于3.536us左右，MTE2前的指令头开销在算子整个流水中占比较大，因此需要优化Scalar计算。
+-   优化前的流水图如下，默认不开启Tiling常量化，Tiling参数需要从Host侧拷贝到Kernel侧，导致Matmul初始化时的Scalar计算较多，第一个MTE2指令开始于3.536us左右，MTE2前的指令头开销在算子整个流水中占比较大，因此需要优化Scalar计算。
 
     ![](../../../figures/zh-cn_image_0000002411422713.png)
 
@@ -80,17 +80,17 @@ Tiling参数如下：
 
 ## 设计优化方案<a name="section10569929145417"></a>
 
-如下图所示，默认不使能Tiling常量化功能时，开发者在host侧创建Tiling对象，通过调用API自动获取Tiling参数。然后将Tiling参数从Host侧传递到Kernel侧，在Kernel侧初始化操作时传入。在算子执行时，使用Tiling变量参数完成矩阵乘操作。
+如下图所示，默认不开启Tiling常量化功能时，开发者在host侧创建Tiling对象，通过调用API自动获取Tiling参数。然后将Tiling参数从Host侧传递到Kernel侧，在Kernel侧初始化操作时传入。在算子执行时，使用Tiling变量参数完成矩阵乘操作。
 
-**图 1**  默认不使能Tiling常量化的Matmul计算流程示意图<a name="fig1911911419426"></a>  
-![](../../../figures/默认不使能Tiling常量化的Matmul计算流程示意图.png "默认不使能Tiling常量化的Matmul计算流程示意图")
+**图 1**  默认不开启Tiling常量化的Matmul计算流程示意图<a name="fig1911911419426"></a>  
+![](../../../figures/默认不使能Tiling常量化的Matmul计算流程示意图.png "默认不开启Tiling常量化的Matmul计算流程示意图")
 
-如下图所示，使能Tiling常量化功能时，开发者只需要在Kernel侧创建Matmul对象时，调用GetMatmulApiTiling接口在编译期获取常量化Tiling信息，即可完成Tiling常量化。在算子执行时，使用常量化的Tiling参数完成矩阵乘操作，减少Scalar计算开销。
+如下图所示，开启Tiling常量化功能时，开发者只需要在Kernel侧创建Matmul对象时，调用GetMatmulApiTiling接口在编译期获取常量化Tiling信息，即可完成Tiling常量化。在算子执行时，使用常量化的Tiling参数完成矩阵乘操作，减少Scalar计算开销。
 
-**图 2**  使能Tiling常量化的Matmul计算流程示意图<a name="fig146371949194314"></a>  
-![](../../../figures/使能Tiling常量化的Matmul计算流程示意图.png "使能Tiling常量化的Matmul计算流程示意图")
+**图 2**  开启Tiling常量化的Matmul计算流程示意图<a name="fig146371949194314"></a>  
+![](../../../figures/使能Tiling常量化的Matmul计算流程示意图.png "开启Tiling常量化的Matmul计算流程示意图")
 
-Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常量化的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_constant_tiling)。使能Tiling全量常量化功能的步骤如下：
+Matmul API开启Tiling全量常量化的完整样例请参考[Matmul Tiling常量化的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_constant_tiling)。开启Tiling全量常量化功能的步骤如下：
 
 1.  调用获取MatmulConfig模板的接口GetMMConfig时，使用常数值设置MatmulShapeParams，得到带有常量化参数的自定义MatmulConfig模板CUSTOM\_CFG。
 
@@ -133,7 +133,7 @@ Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 ## 验证优化方案性能收益<a name="section7519174385413"></a>
 
--   优化后的流水图如下，通过使能Tiling全量常量化，无需将Tiling参数从Host侧拷贝到Kernel侧，在编译期完成Tiling常量化，减少了Matmul初始化时的Scalar计算。从0us起到第一个MTE2指令发起，这之间的时间为Matmul初始化时间，Matmul初始化时间从优化前的3.536us减少到2.185us，性能有所提升。
+-   优化后的流水图如下，通过开启Tiling全量常量化，无需将Tiling参数从Host侧拷贝到Kernel侧，在编译期完成Tiling常量化，减少了Matmul初始化时的Scalar计算。从0us起到第一个MTE2指令发起，这之间的时间为Matmul初始化时间，Matmul初始化时间从优化前的3.536us减少到2.185us，性能有所提升。
 
     ![](../../../figures/zh-cn_image_0000002377921500.png)
 
@@ -143,4 +143,4 @@ Matmul API使能Tiling全量常量化的完整样例请参考[Matmul Tiling常�
 
 ## 总结<a name="section252011820413"></a>
 
-算子在调用Matmul API完成矩阵乘计算时，若Matmul初始化时的Scalar计算较多，影响了指令头开销，或Matmul迭代间的Scalar计算较多，阻塞了MTE2流水。在这两类场景下，满足上文提及的Tiling常量化使能条件（[全量常量化](#li159920538152)或[部分常量化](#li98655581816)），可以考虑使能Tiling常量化，减少Scalar计算开销，提升算子性能。
+算子在调用Matmul API完成矩阵乘计算时，若Matmul初始化时的Scalar计算较多，影响了指令头开销，或Matmul迭代间的Scalar计算较多，阻塞了MTE2流水。在这两类场景下，满足上文提及的Tiling常量化开启条件（[全量常量化](#li159920538152)或[部分常量化](#li98655581816)），可以考虑开启Tiling常量化，减少Scalar计算开销，提升算子性能。

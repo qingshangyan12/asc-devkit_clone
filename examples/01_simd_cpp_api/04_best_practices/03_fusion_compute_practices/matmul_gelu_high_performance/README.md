@@ -10,6 +10,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -19,6 +23,7 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
+│   ├── figures                 // 图示
 │   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
@@ -299,9 +304,8 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 下图展示了Scenario 1（CV融合-GM中转）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果写入GM，AIV侧从GM读取数据完成GELU计算，两者按(baseM × baseN)块粒度流水并行：
 
-![Scenario1 CV融合-GM中转流水并行](figure/CVParallell_L0C_GM_UB.png)
-
-> **备注：** 流水图基于产品线CANN包msopprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeUtilization`
+![Scenario1 CV融合-GM中转流水并行](figures/CVParallell_L0C_GM_UB.png)
+> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeTimeline ./demo`
 
 **MTE2时间显著减少的原因：**
 
@@ -319,7 +323,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 下图展示了Scenario 2（CV融合-UB直通）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果直接写入UB（不经过GM中转），AIV侧直接在UB上进行GELU计算，省去了GM→UB的MTE2搬运开销：
 
-![Scenario2 CV融合-UB直通流水并行](figure/CVParallell_L0C_UB.png)
+![Scenario2 CV融合-UB直通流水并行](figures/CVParallell_L0C_UB.png)
 
 
 ## 编译运行
@@ -336,24 +340,16 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录

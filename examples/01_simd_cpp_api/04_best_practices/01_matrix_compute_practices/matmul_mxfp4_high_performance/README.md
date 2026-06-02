@@ -9,7 +9,12 @@
 - Case 2: 多核 MDL 常量化 tiling（在**GM→L1搬运中**，scaleA/B 相对 A/B 按照倍数多倍搬运，`mxTypePara`）
 
 ## 支持的产品
+
 - Ascend 950PR / Ascend 950DT
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.1.0
 
 ## 目录结构介绍
 
@@ -88,7 +93,7 @@ REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 
 ### Case1 与 Case2 差异
 
-两种场景均为常量化 tiling，L1 参数一致：`depthA1/depthB1=4`、`stepKa/stepKb=2`、`stepM/stepN=1`、`dbL0A/dbL0B=2`。  
+两种场景均为常量化 tiling，L1 参数一致：`depthA1/depthB1=4`、`stepKa/stepKb=2`、`stepM/stepN=1`、`dbL0A/dbL0B=2`。
 唯一差异是 `mxTypePara`：
 
 | 场景 | `mxTypePara` | 语义 |
@@ -164,11 +169,10 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 - Case2：每次多量搬运，scale 搬运次数约为 `4` 次（`8192/2048`）
 - 在该 shape 下两者 scale 理论总字节量相同，但 Case2 的批次更少、复用窗口更大，更利于降低 MTE2 耗时。
 
-
-
 ## 性能对比总结
 
 ### Ascend 950PR芯片性能数据
+
 | Case version | Task Duration(μs) | Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio |
 |------|------------------|-----------|----------------|-----------------|---------------|-------------------|-----------------|------------------|----------------|------------------|----------------|--------------------|-------------------|
 | Case 1 | 750.219 | 32 | 749.13 | 660.15 | 0.881 | 258.354 | 0.345 | 437.64 | 0.584 | 753.906 | 0.982 | 33.257 | 0.044 |
@@ -188,11 +192,11 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 **调优 Tips**：
 > MX Matmul 的关键差异在于 `scale` 与 A/B 的搬运可解耦；当 `aic_mte2_ratio` 偏高时，优先通过 `mxTypePara` 调整 `scale` 搬运比例以提升 L1 复用、减少重复 GM->L1 搬运。
 
-
 ### 理论性能对比
+
 本样例的性能数据在Ascend 950PR上运行得到，该处理器的主频为1.65GHz，对于MX-FP4的数据类型，每cycle处理16×64×16次乘加运算。Cube理论运算时间为
 $$
-T_{\text{theory}} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{4096 \times 1.65 \times 10^9 \times 32} = 635.5 μs
+T_{\text{theory}} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs
 $$
 Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相对理论值 `635.5 μs`：
 - Case 1 误差：`(660.150 - 635.5) / 635.5 = 3.88%`
@@ -204,32 +208,24 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
 
 在本样例根目录下执行如下步骤，编译并执行样例：
 
-> **注意事项**：本样例使用的 `en_dtypes` 库需要版本 `0.0.4`。安装命令为
+> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，`en_dtypes` 库需要版本 `0.0.4`。安装命令为
 
   ```bash
-  pip3 install en_dtypes==0.0.4
+  python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
   ```
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=2
   mkdir -p build && cd build;  # 创建并进入 build 目录
@@ -254,7 +250,6 @@ Case 1/Case 2 的 `aic_mac_time` 分别为 `660.150 μs` / `641.444 μs`，相�
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | 目标SoC架构（本样例仅支持3510） |
 
   > **注意：** 切换 `CMAKE_ASC_RUN_MODE` / `CMAKE_ASC_ARCHITECTURES` / `SCENARIO_NUM` 前需清理cmake缓存，可在build目录下执行 `rm CMakeCache.txt` 后重新 cmake。
-  
 
   执行结果如下，说明精度对比成功。
   ```bash
@@ -281,7 +276,9 @@ PROF_xxxx_XXXXXX
     ├── xx_*.csv
     └── README.txt
 ```
+
 查看具体的性能分析结果：
+
 ```
 # 查看Task Duration 以及各项数据
 cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv

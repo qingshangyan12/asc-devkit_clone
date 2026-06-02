@@ -8,13 +8,17 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 - Ascend 950PR/Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
 ├── matmul_fp8
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   └── matmul_fp8.asc          // Ascend C样例实现 & 调用样例
@@ -70,19 +74,12 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
+
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 

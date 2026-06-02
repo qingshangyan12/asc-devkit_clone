@@ -1,4 +1,4 @@
-# Best Practices Example Introduction
+# BestPractices Example Introduction
 
 ## Overview
 
@@ -6,7 +6,6 @@ Operator development practices based on Ascend C SIMT, demonstrating the applica
 
 ## Example List
 
-| Directory Name                                               | Description                                                                                        |
+| Directory Name                                              | Description                                                                                        |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [00_simt_insert_hash_table](./00_simt_insert_hash_table/) | This example implements the InsertHashTable operator based on Ascend C SIMT programming, demonstrating the capability of SIMT operators to handle complex business logic.        |
-| [01_simt_matrix_transpose](./01_simt_matrix_transpose/)   | This example implements the MatrixTranspose operator based on Ascend C SIMT programming, demonstrating performance tuning strategies for Ascend C SIMT programming. |
+| [00_memory_optimizations](./00_memory_optimizations)   | Introduce memory access optimization methods based on SIMT programming, including global memory access coalescing, on-chip cache reuse, bank conflict avoidance, and short vector tuning. |

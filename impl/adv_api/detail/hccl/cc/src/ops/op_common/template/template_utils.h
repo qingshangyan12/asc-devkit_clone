@@ -19,7 +19,7 @@
 #include "binary_stream.h"
 
 HcclResult __attribute__((weak)) HcommThreadJoin(ThreadHandle thread, uint32_t timeout);
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 # define UINT32_MAX     (4294967295U)
 constexpr u32 INVALID_U32 = UINT32_MAX;
@@ -93,8 +93,13 @@ struct A2ASendRecvInfo {
 struct DataInfo {
     ChannelInfo channel_;
     SlicesList slices_;
+    HcclDataType dataType_{HCCL_DATA_TYPE_RESERVED};
     DataInfo(const ChannelInfo &channel, const SlicesList &slices)
     : channel_(channel), slices_(slices)
+    {
+    }
+    DataInfo(const ChannelInfo &channel, const SlicesList &slices, HcclDataType dataType)
+    : channel_(channel), slices_(slices), dataType_(dataType)
     {
     }
 };
@@ -133,9 +138,14 @@ struct TxRxSlicesList {
 struct SendRecvInfo {
     TxRxChannels      sendRecvChannels_;
     TxRxSlicesList    sendRecvSlices_;
+    HcclDataType      dataType_{HCCL_DATA_TYPE_RESERVED};
 
     SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices)
         : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices)
+    {
+    }
+    SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices, HcclDataType dataType)
+        : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices), dataType_(dataType)
     {
     }
 };
@@ -394,6 +404,15 @@ HcclResult CalcDataSplitByPortGroupCommon(const u64 totalDataCount,
                                           std::vector<u64> &sizeOut,
                                           std::vector<u64> &elemOffset,
                                           const u32 channelsPerRank);
+HcclResult CalcDataSplitByPortGroupZAxisDetour(const u64 totalDataCount,
+                                               const u64 dataTypeSize,
+                                               const std::vector<ChannelInfo> &channels,
+                                               std::vector<u64> &elemCountOut,
+                                               std::vector<u64> &sizeOut,
+                                               std::vector<u64> &elemOffset,
+                                               const u32 level0ChannelNumPerRank,
+                                               const u32 level1ChannelNumPerRank,
+                                               const float level0DataRatio = 0.5f);
 
 }
 #endif
