@@ -93,6 +93,58 @@ public:
     }
 };
 
+namespace CastRoundMode {
+struct Rint {};
+struct Round {};
+struct Floor {};
+struct Ceil {};
+struct Trunc {};
+}
+
+namespace CastSatMode {
+struct Sat {};
+struct NoSat {};
+}
+
+namespace CastIndexPos {
+struct Odd {};
+struct Even {};
+struct PartP1 {};
+struct PartP2 {};
+struct PartP3 {};
+}
+
+template<typename T, typename U>
+struct CastTrait2VF {
+    using srcType = GetAttributeElementType<typename U::elementType*>;
+    using dstType = GetAttributeElementType<typename T::elementType*>;
+    using roundMode = Std::ignore_t;
+    using satMode = Std::ignore_t;
+    using indexPos = Std::ignore_t;
+};
+
+using CastTrait2CastFunc = TupleMap<
+    Std::tuple<Std::tuple<half, half, CastRoundMode::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+    Std::tuple<Std::tuple<bfloat16_t, bfloat16_t, CastRoundMode::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+    Std::tuple<Std::tuple<float, float, CastRoundMode::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+    Std::tuple<Std::tuple<uint8_t, uint16_t, Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U82U16>>;
+
+
+template<typename CalcFunc, typename TraitType>
+class Transform2CastInstMatch {
+public:
+    template<typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    {
+        using trait = Std::conditional_t<Std::is_same_v<TraitType, Std::ignore_t>, CastTrait2VF<T, U>, TraitType>;
+        using condition = Std::tuple<typename trait::srcType, typename trait::dstType, 
+            typename trait::roundMode, typename trait::satMode, typename trait::indexPos>;
+
+        using func = CastTrait2CastFunc::template Get<condition>;
+        Transform2CastVF<func, TraitType>::template Run(dst, src);
+    }
+};
+
 }
 }
 

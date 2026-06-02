@@ -73,8 +73,8 @@ TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_##Function##_##DstDataType##_##SrcDat
     EXPECT_EQ(z[0], zUB[0]); \
 }
 
-VECTOR_CAST_3510(Ceil, half, half)
-VECTOR_CAST_3510(Ceil, float, float)
-VECTOR_CAST_3510(Ceil, bfloat16_t, bfloat16_t)
+VECTOR_CAST_3510(Cast, half, half)
+VECTOR_CAST_3510(Cast, float, float)
+VECTOR_CAST_3510(Cast, bfloat16_t, bfloat16_t)
 
-VECTOR_CAST_3510(U82U16, uint16_t, uint8_t)
+VECTOR_CAST_3510(Cast, uint16_t, uint8_t)
