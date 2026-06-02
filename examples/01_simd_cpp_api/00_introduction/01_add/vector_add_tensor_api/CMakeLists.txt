@@ -29,9 +29,16 @@ target_link_libraries(demo PRIVATE
     m
 )
 
-target_include_directories(demo PRIVATE
-    ${CODEBASE_SOURCE_DIR}
+set(ASCEND_HOME $ENV{ASCEND_HOME_PATH})
+
+set(ASC_INCLUDE_DIR "${ASCEND_HOME}/asc/")
+include_directories(
+    "${ASC_INCLUDE_DIR}"
 )
+
+# target_include_directories(demo PRIVATE
+#     ${CODEBASE_SOURCE_DIR}
+# )
 
 # ======================================================================================
 # NPU 编译选项配置
