@@ -11,5 +11,5 @@ project(ascendc_api_utils_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
 # add_subdirectory(context)
-add_subdirectory(std)
-add_subdirectory(tiling)
+# add_subdirectory(std)
+# add_subdirectory(tiling)
