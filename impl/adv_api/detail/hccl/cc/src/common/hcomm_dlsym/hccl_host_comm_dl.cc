@@ -13,9 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-DEFINE_WEAK_FUNC(HcclResult, HcclCommGetStatus, const char* commId, HcclCommStatus *status);
-
 // 初始化
 void HcclCommDlInit(void* libHcommHandle) {
-    INIT_SUPPORT_FLAG(libHcommHandle, HcclCommGetStatus);
+    // HcclCommGetStatus 已在 op_base.cc 中实现，无需 dl 初始化
 }
