@@ -95,14 +95,6 @@ private:
     template <typename T> friend T GetResByChannel(ChannelHandle channel, uint32_t index);
 };
 
-template <>
-inline Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex) {
-    Variable v{NoAllocTag{}};
-    CCU_THROW_IF_FAILED(CcuVariableCreateByChannel(channel, varIndex, &v.handle),
-        "CcuVariableCreateByChannel: failed");
-    return v;
-}
-
 } // namespace ccu
 
 template <> inline void CcuArithmeticOperator<ccu::Variable, ccu::Variable>::Check() const {}
