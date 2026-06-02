@@ -32,7 +32,14 @@ public:
     template <const CopyL12BTTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        DataCopyImpl<trait, T, U>(dst, src);
+        // Batch layouts carry a leading B axis: (B, (row, col)) -> depth 3,
+        // (B, ((1, row), (1, col))) -> depth 5. Non-batch layouts are depth 2/4.
+        constexpr auto srcDepth = NestingDepthV<decltype(src.Layout().Shape())>;
+        if constexpr (srcDepth == THREE_DIM_DATA || srcDepth == FIVE_DIM_DATA) {
+            BatchDataCopyImpl<trait, T, U>(dst, src);
+        } else {
+            DataCopyImpl<trait, T, U>(dst, src);
+        }
     }
 
 private:
@@ -88,6 +95,57 @@ private:
 
         uint16_t srcStride = (srcRow - srcCol) / C0_ELEMENT<srcType>;
         uint16_t dstStride = Std::ceil_align((dstRow - srcCol) / C0_ELEMENT<dstType>, 2);
+        CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
+    }
+
+    // Batch case: B matrices each laid out as (row, col). The underlying L1->BT instruction has no
+    // batch dimension, so each matrix is emitted as one contiguous block: blockCount carries B, and
+    // blockLen / src/dst stride are computed from the per-matrix stride taken from Get<0> of src/dst
+    // layouts. Assumes each matrix is internally compact (row pitch equals column count); non-compact
+    // inner layouts cannot be expressed via a single blockLen and are not supported on this path.
+    template <const CopyL12BTTrait& trait, typename T, typename U>
+    __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
+    {
+        CheckTemplate<trait, T, U>();
+
+        using srcType = typename U::elementType;
+        using dstType = typename T::elementType;
+
+        auto srcLayout = src.Layout();
+        auto dstLayout = dst.Layout();
+
+        uint16_t batchSize = Get<0>(srcLayout.Shape());
+        uint32_t srcMatrixStride = Get<0>(srcLayout.Stride());
+        uint32_t dstMatrixStride = Get<0>(dstLayout.Stride());
+
+        // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
+        // would read the batch axis as row/column.
+        auto srcInner = Te::Get<1>(srcLayout);
+
+        uint32_t srcShapeRows;
+        uint32_t srcShapeColumns;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcInner);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcInner);
+        } else {
+            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
+            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
+        }
+
+        bool convControl = false;
+        if (IsOneOfAttrV<srcType, half> && IsOneOfAttrV<dstType, float>) {
+            convControl = true;
+        }
+
+        uint16_t blockCount = batchSize;
+        uint32_t matrixElems = srcShapeRows * srcShapeColumns;
+        uint16_t blockLen = Std::ceil_division(matrixElems, C0_ELEMENT<srcType>);
+        if constexpr (IsOneOfAttrV<srcType, float, int32_t>) {
+            blockLen = Std::ceil_align(blockLen, 2);
+        }
+
+        uint16_t srcStride = (srcMatrixStride - matrixElems) / C0_ELEMENT<srcType>;
+        uint16_t dstStride = Std::ceil_align((dstMatrixStride - matrixElems) / C0_ELEMENT<dstType>, 2);
         CopyL12BTInstr::DataCopy(dst, src, convControl, blockCount, blockLen, srcStride, dstStride);
     }
 };
