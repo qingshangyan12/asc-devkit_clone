@@ -5,7 +5,7 @@
 /build/
 build_out
 output
-__pycache__/
+__pycache__
 /examples/**/build/
 AGENTS.md
 oat_reports/
@@ -20,3 +20,10 @@ build_device/
 
 # OpenCode 配置
 .opencode/
+
+# Agent skills
+.agent/skills/_remote/
+.agent/skills/gitcode-pr
+.agent/skills/gitcode-issue
+.agent/skills/api-doc-generator
+.agent/skills/gitcode-pipeline

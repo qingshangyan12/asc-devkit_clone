@@ -27,7 +27,7 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 -   Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantScalar.md)、[SetQuantVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantVector.md)接口。
 -   BSNGD场景，不支持一次计算多行SD，需要算子程序中循环计算。
 -   **异步模式**不支持IterateBatch搬运到Unified Buffer上。
--   模板参数[enableMixDualMaster](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)（默认取值为false）设置为true，即使能MixDualMaster（双主模式）场景时，不支持Batch Matmul。
+-   模板参数[enableMixDualMaster](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)（默认取值为false）设置为true，即开启MixDualMaster（双主模式）场景时，不支持Batch Matmul。
 -   在batch场景，A矩阵、B矩阵支持half/float/bfloat16\_t/int8\_t数据类型，不支持int4b\_t数据类型。
 
 ## 调用示例<a name="zh-cn_topic_0000001726346562_section18018102212"></a>
@@ -103,4 +103,3 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
         ```
         mm.End();
         ```
-
