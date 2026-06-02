@@ -201,6 +201,7 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
+#if defined(__NPU_ARCH__) 
 using VectorTypeTransform = TupleMap<
     Std::tuple<uint8_t,        vector_uint8_t>,
     Std::tuple<uint16_t,       vector_uint16_t>,
@@ -213,14 +214,17 @@ using VectorTypeTransform = TupleMap<
     Std::tuple<bfloat16_t,     vector_bfloat16_t>,
     Std::tuple<half,           vector_half>,
     Std::tuple<float,          vector_float>,
+#if  __NPU_ARCH__ == 3510
     Std::tuple<hifloat8_t,     vector_hifloat8_t>,
     Std::tuple<fp8_e4m3fn_t,   vector_fp8_e4m3fn_t>,
     Std::tuple<fp8_e5m2_t,     vector_fp8_e5m2_t>,
     Std::tuple<fp8_e8m0_t,     vector_fp8_e8m0_t>,
     Std::tuple<int4x2_t,       vector_int4x2_t>,
     Std::tuple<fp4x2_e2m1_t,   vector_fp4x2_e2m1_t>,
-    Std::tuple<fp4x2_e1m2_t,   vector_fp4x2_e1m2_t>>;
-
+    Std::tuple<fp4x2_e1m2_t,   vector_fp4x2_e1m2_t>
+#endif
+    >;
+#endif
 } // namespace Te
 } // namespace AscendC
 
