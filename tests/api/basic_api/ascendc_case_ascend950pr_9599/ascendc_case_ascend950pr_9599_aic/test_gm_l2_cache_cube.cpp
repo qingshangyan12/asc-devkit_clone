@@ -72,6 +72,8 @@ uint8_t GetCacheModeValue(CacheMode mode)
         actualMode = 99;                                                                     \
         DataCopy(globalTensor, inputLocal, param);                                           \
         EXPECT_EQ(expectedMode, actualMode);                                                 \
+        CacheMode exceptCacheMode = ToCacheModeEnum(expectedMode);                           \
+        EXPECT_EQ(exceptCacheMode, mode);                                                    \
     }
 
 DATA_COPY_L2_CACHE_L1_TEST(uint16_t, CACHE_MODE_NORMAL)
