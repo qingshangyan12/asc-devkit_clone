@@ -12,7 +12,7 @@ AIC和AIV独立运行机制，又称双主模式。在[分离模式](../../../..
 
 -   该功能仅支持[Norm模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)和[MDL模板](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
 -   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:1。
--   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时使能[IBSHARE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul使用说明.md)参数。
+-   算子核函数的类型为MIX，同时AIC核数 : AIV核数为1:2，且A矩阵和B矩阵同时开启[IBSHARE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul使用说明.md)参数。
 
 -   同一算子中所有Matmul对象的该参数取值必须保持一致。
 -   A、B、Bias矩阵只支持从Global Memory输入。
