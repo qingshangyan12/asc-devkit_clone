@@ -14,7 +14,7 @@
 #include "ccu_kernel.h"
 #include "ccu_variable.hpp"
 #include "ccu_loop.hpp"
-#include "ccu_control_flow_macro.h"
+#include "ccu_condition_v1.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
