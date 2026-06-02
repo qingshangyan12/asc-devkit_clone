@@ -77,7 +77,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_ROCE>::Init(__ubuf__ uint8_t* 
 {
     (void)buff;
     (void)len;
-    return HCOMM_SUCCESS;
+    return HCOMM_FAILED;
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe>

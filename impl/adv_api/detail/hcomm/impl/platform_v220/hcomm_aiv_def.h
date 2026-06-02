@@ -40,7 +40,7 @@ public:
     {
         (void)buff;
         (void)len;
-        return HCOMM_SUCCESS;
+        return HCOMM_FAILED;
     }
 
     template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
