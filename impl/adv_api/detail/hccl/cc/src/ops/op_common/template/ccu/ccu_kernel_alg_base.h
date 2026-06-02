@@ -12,9 +12,8 @@
 
 #include "log.h"
 #include "ccu_kernel.h"
-#include "ccu_variable.hpp"
-#include "ccu_loop.hpp"
-#include "ccu_control_flow_macro.h"
+
+namespace ccu = ::AscendC::ccu;
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -113,10 +112,6 @@ private:
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
 };
 
-}
-
-namespace ccu = ::AscendC::ccu;
-namespace ops_hccl {
 constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
 constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
 constexpr uint64_t CCU_MS_SIZE               = 4096;
