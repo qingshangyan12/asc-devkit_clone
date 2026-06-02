@@ -45,13 +45,6 @@ protected:
         CcuRep::Variable residual;          // 尾块数据size
     };
 
-    struct CcuGroupOpSize {
-        ccu::Variable addrOffset;           // 第二个loopGroup搬运的起始偏移
-        ccu::Variable loopParam;            // loop串行重复执行次数
-        ccu::Variable parallelParam;        // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
-        ccu::Variable residual;             // 尾块数据size
-    };
-
     // 用于n和p部分数据loopgroup的参数
     GroupOpConfig       moConfig{0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
     GroupOpSizeResource moRes;
@@ -96,7 +89,6 @@ protected:
                              HcclDataType outputDataType, HcclReduceOp opType);
 
     HcclResult GroupCopy(CcuRep::LocalAddr dst, CcuRep::LocalAddr src, GroupOpSize goSize);
-    HcclResult GroupCopy(ccu::LocalAddr dst, ccu::LocalAddr src, CcuGroupOpSize goSize);
     HcclResult GroupLocalReduce(CcuRep::LocalAddr outDstOrg, std::vector<CcuRep::LocalAddr> &scratchOrg,
         GroupOpSize goSize, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
 private:
@@ -111,7 +103,9 @@ private:
         HcclReduceOp opType);
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
 };
+}
 
+namespace ops_hccl {
 constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
 constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
 constexpr uint64_t CCU_MS_SIZE               = 4096;
@@ -180,7 +174,6 @@ CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,
     bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT, uint32_t msPerLoop = 1);
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var);
 CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
-
-}
+} // namespace ops_hccl
 
 #endif // !CCU_KERNEL_ALG_BASE
