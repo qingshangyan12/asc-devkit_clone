@@ -114,6 +114,25 @@ TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2NDLayout)
     EXPECT_EQ(dst[0], 0);
 }
 
+TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBVectorQuantNZ2NDLayout)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 32;
+    constexpr uint32_t n = 640;
+    __cc__ float src[m * n] = {0};
+    __ubuf__ float dst[m * n] = {0};
+    __cbuf__ uint64_t quant[n] = {0};
+
+    auto l0cTensor = MakeTensorAt<Location::L0C>(src, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<NDLayoutPtn, LayoutTraitDefault<float>>(m, n));
+    auto quantTensor = MakeTensorAt<Location::L1>(quant, MakeFrameLayout<NDExtLayoutPtn>(1, n));
+
+    Copy(CopyAtom<CopyTraits<CopyL0C2UB, CopyL0C2UBTraitDefault>>{}, ubTensor, l0cTensor, quantTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
 
 TEST_F(Tensor_Api_Cube_Copy_3510, CopyL0C2UBNZ2DN)
 {
