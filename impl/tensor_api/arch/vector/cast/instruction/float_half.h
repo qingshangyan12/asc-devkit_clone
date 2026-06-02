@@ -1,0 +1,72 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/arch/vector/cast/instruction/float_half.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
+/*!
+* \file float_half.h
+* \brief
+*/
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HALF_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HALF_H
+
+#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
+class CLASS_NAME {                                                                                                   \
+public:                                                                                                              \
+    template <typename T, typename U>                                                                                \
+    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
+    {                                                                                                                \
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
+            FUNC_NAME(dst, src, mask);                                                                               \
+        }                                                                                                            \
+    }                                                                                                                \
+}
+
+ASCENDC_CAST_INST(Float2HalfRD, asc_float2half_rd);
+ASCENDC_CAST_INST(Float2HalfRDSat, asc_float2half_rd_sat);
+ASCENDC_CAST_INST(Float2HalfRDP2, asc_float2half_rd_v2);
+ASCENDC_CAST_INST(Float2HalfRDSatP2, asc_float2half_rd_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRN, asc_float2half_rn);
+ASCENDC_CAST_INST(Float2HalfRNSat, asc_float2half_rn_sat);
+ASCENDC_CAST_INST(Float2HalfRNP2, asc_float2half_rn_v2);
+ASCENDC_CAST_INST(Float2HalfRNSatP2, asc_float2half_rn_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRNA, asc_float2half_rna);
+ASCENDC_CAST_INST(Float2HalfRNASat, asc_float2half_rna_sat);
+ASCENDC_CAST_INST(Float2HalfRNAP2, asc_float2half_rna_v2);
+ASCENDC_CAST_INST(Float2HalfRNASatP2, asc_float2half_rna_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRO, asc_float2half_ro);
+ASCENDC_CAST_INST(Float2HalfROSat, asc_float2half_ro_sat);
+ASCENDC_CAST_INST(Float2HalfROP2, asc_float2half_ro_v2);
+ASCENDC_CAST_INST(Float2HalfROSatP2, asc_float2half_ro_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRU, asc_float2half_ru);
+ASCENDC_CAST_INST(Float2HalfRUSat, asc_float2half_ru_sat);
+ASCENDC_CAST_INST(Float2HalfRUP2, asc_float2half_ru_v2);
+ASCENDC_CAST_INST(Float2HalfRUSatP2, asc_float2half_ru_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRZ, asc_float2half_rz);
+ASCENDC_CAST_INST(Float2HalfRZSat, asc_float2half_rz_sat);
+ASCENDC_CAST_INST(Float2HalfRZP2, asc_float2half_rz_v2);
+ASCENDC_CAST_INST(Float2HalfRZSatP2, asc_float2half_rz_sat_v2);
+
+ASCENDC_CAST_INST(Half2Float, asc_half2float);
+ASCENDC_CAST_INST(Half2FloatP2, asc_half2float_v2);
+
+#undef ASCENDC_CAST_INST
+
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HALF_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif

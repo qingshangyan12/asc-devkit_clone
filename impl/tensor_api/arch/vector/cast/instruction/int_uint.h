@@ -1,0 +1,69 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+#if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning                                                                                                               \
+    "impl/tensor_api/arch/vector/cast/instruction/int_uint.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "tensor_api/tensor.h"" and use public functions or variables defined in interface headers files."
+#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
+
+/*!
+* \file int_uint.h
+* \brief
+*/
+#ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_INT_UINT_H
+#define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_INT_UINT_H
+
+#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
+class CLASS_NAME {                                                                                                   \
+public:                                                                                                              \
+    template <typename T, typename U>                                                                                \
+    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
+    {                                                                                                                \
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
+            FUNC_NAME(dst, src, mask);                                                                               \
+        }                                                                                                            \
+    }                                                                                                                \
+}
+
+ASCENDC_CAST_INST(Int162UInt32, asc_int162uint32);
+ASCENDC_CAST_INST(Int162UInt32P2, asc_int162uint32_v2);
+ASCENDC_CAST_INST(Int162UInt, asc_int162uint8);
+ASCENDC_CAST_INST(Int162UIntSat, asc_int162uint8_sat);
+ASCENDC_CAST_INST(Int162UIntP2, asc_int162uint8_v2);
+ASCENDC_CAST_INST(Int162UIntSatP2, asc_int162uint8_sat_v2);
+
+ASCENDC_CAST_INST(Int322UInt16, asc_int322uint16);
+ASCENDC_CAST_INST(Int322UInt16Sat, asc_int322uint16_sat);
+ASCENDC_CAST_INST(Int322UInt16P2, asc_int322uint16_v2);
+ASCENDC_CAST_INST(Int322UInt16SatP2, asc_int322uint16_sat_v2);
+ASCENDC_CAST_INST(Int322UInt, asc_int322uint8);
+ASCENDC_CAST_INST(Int322UIntSat, asc_int322uint8_sat);
+ASCENDC_CAST_INST(Int322UIntP2, asc_int322uint8_v2);
+ASCENDC_CAST_INST(Int322UIntSatP2, asc_int322uint8_sat_v2);
+ASCENDC_CAST_INST(Int322UIntP3, asc_int322uint8_v3);
+ASCENDC_CAST_INST(Int322UIntSatP3, asc_int322uint8_sat_v3);
+ASCENDC_CAST_INST(Int322UIntP4, asc_int322uint8_v4);
+ASCENDC_CAST_INST(Int322UIntSatP4, asc_int322uint8_sat_v4);
+
+ASCENDC_CAST_INST(U322Int16, asc_uint322int16);
+ASCENDC_CAST_INST(U322Int16Sat, asc_uint322int16_sat);
+ASCENDC_CAST_INST(U322Int16P2, asc_uint322int16_v2);
+ASCENDC_CAST_INST(U322Int16SatP2, asc_uint322int16_sat_v2);
+
+#undef ASCENDC_CAST_INST
+
+#endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_INT_UINT_H
+
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
+#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+#endif
