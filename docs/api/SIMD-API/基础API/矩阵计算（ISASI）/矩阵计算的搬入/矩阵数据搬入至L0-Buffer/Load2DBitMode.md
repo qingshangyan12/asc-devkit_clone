@@ -26,7 +26,7 @@ A1->A2; B1->B2。
 
 ```cpp
 template <TPosition Dst, TPosition Src, typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,const Load2DBitModeParam& loadDataParam)
+__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,const Load2DBitModeParam& loadDataParams)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -44,7 +44,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
 |dst|输出|目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32B / sizeof(T))。<br>&bull; B2：ZN格式；对应的分形大小为 (32B / sizeof(T))  \* 16。<br>&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>数据类型需要与dst保持一致。|
+|src|输入|源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。|
 |loadDataParams|输入|LoadData参数结构体，类型为Load2DBitModeParam，具体参考[表3](#table10539223195311)。<br>上述结构体参数定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_mm.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。|
 
 **表 3**  Load2DBitModeParam类参数说明<a id="table10539223195311"></a>
@@ -80,7 +80,7 @@ loadDataParams.ifTranspose = false;
 Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结构体类型对象初始化
 ```
 
-也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对congfig0和config1直接进行逐bit位修改来修改参数。
+也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
 
 **表 4**  Load2DBitModeConfig0结构体参数说明<a name="table4109172132317"></a>
 

@@ -57,7 +57,7 @@ DataCopy数据搬运支持将矩阵计算用到的bias参数从L1 Buffer移动�
 |----------|----------|----------|
 |dst|输出|目的操作数，类型为LocalTensor。存储位置为BiasTable Buffer（TPosition: C2），目的地址需要64B对齐。|
 |src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition: C1），源地址需要32B对齐。|
-|count|输入|参与搬运的元素个数。`count * sizeof(T)`需要32字节对齐，若未对齐，则搬运量会向下取整到32B对齐。|
+|count|输入|参与搬运的元素个数。`count * sizeof(T)`需要32B对齐，若未对齐，则搬运量会向下取整到32B对齐。|
 |repeatParams|输入|搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。具体定义请参考"basic_api/interface/kernel_struct_data_copy.h"，参数说明见[表3](#zh-cn_topic_0000002566886667_table9182515919)。|
 
 **表 3**  DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566886667_table9182515919"></a>

@@ -31,7 +31,7 @@ DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buff
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 
-// 连续或非连续搬运场景（高维切分）
+// 连续或非连续搬运场景（高维切分）
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
@@ -50,8 +50,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 |----------|----------|----------|
 |dst|输出|目的操作数，类型为LocalTensor。存储位置为Fixpipe Buffer，目的地址需要128B对齐。|
 |src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer，源地址需要32B对齐。|
-|repeatParams|输入|参与搬运的元素个数。count * sizeof(T) 需要32字节对齐，若未对齐，则搬运量会向下取整到32B对齐。|
-|count|输入|搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考"basic_api/interface/kernel_struct_data_copy.h"|
+|repeatParams|输入|搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考"basic_api/interface/kernel_struct_data_copy.h"|
+|count|输入|参与搬运的元素个数。count * sizeof(T) 需要32字节对齐，若未对齐，则搬运量会向下取整到32B对齐。|
 
 **表 3**  DataCopyParams结构体参数定义
 
@@ -60,7 +60,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 |blockCount|待搬运的连续传输数据块个数。uint16_t类型，取值范围：blockCount∈[1, 4095]。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |blockLen|待搬运的每个连续传输数据块长度，dst位于Fixpipe Buffer时，单位为128B。uint16_t类型，取值范围：blockLen∈[1, 65535]。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |srcGap|在L1 Buffer -> Fixpipe Buffer场景中，srcGap特指源操作数相邻连续数据块的间隔（前面一个数据块的头与后面数据块的头的间隔），单位为DataBlock（32B）。uint16_t类型，srcGap ∈[0, 2^16-1]。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当srcGap=0时，表示重复搬出源操作数的第一个数据块。|
-|dstGap|在L1 Buffer -> Fixpipe Buffer场景中，dstGap特指源操作数相邻连续数据块的间隔（前面一个数据块的头与后面数据块的头的间隔），单位为DataBlock（128B）。uint16_t类型，dstGap不要超出该数据类型的取值范围，dstGap  ∈[1, 2^16-1]。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。|
+|dstGap|在L1 Buffer -> Fixpipe Buffer场景中，dstGap特指目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面数据块的头的间隔），单位为DataBlock（128B）。uint16_t类型，dstGap不要超出该数据类型的取值范围，dstGap  ∈[1, 2^16-1]。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。|
 
 ## 数据类型<a id="section_data_type"></a>
 
@@ -74,7 +74,7 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 - dst物理内存为Fixpipe Buffer起始地址要求128B对齐，src物理内存为L1 Buffer，起始地址要求32B对齐。
 - blockCount取值范围：blockCount∈[1, 4095]，设置为0表示不执行，此指令将被视为NOP并报告警告。
-- srcGap ∈[0, 2^16-1]，dstGap  ∈[1, 2^16-1]。
+- srcGap∈[0, 2^16-1]，dstGap∈[1, 2^16-1]。
 - 如果读写地址大于对应的mem_block，地址将被绕行并引发警告。
 - 如果Fixpipe Buffer中的目标dst地址溢出，将引发异常。
 
