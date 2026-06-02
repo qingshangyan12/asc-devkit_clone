@@ -4,7 +4,7 @@
 
 |产品   | 是否支持 |
 | ------------|:----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
 
 ## 功能说明
 
@@ -37,6 +37,6 @@ PIPE_S
 ## 调用示例
 
 ```c++
-asc_ndim_pad_count_config config;
+asc_ndim_pad_count_config config;  // config默认初始值为0。
 asc_set_ndim_pad_count(config); 
 ```

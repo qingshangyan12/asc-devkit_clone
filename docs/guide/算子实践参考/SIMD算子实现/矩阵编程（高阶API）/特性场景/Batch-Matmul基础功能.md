@@ -24,10 +24,10 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 -   对于BSNGD、SBNGD、BNGS1S2 Layout格式，称左矩阵、右矩阵的G轴分别为ALayoutInfoG、BLayoutInfoG，则ALayoutInfoG / batchA = BLayoutInfoG / batchB；对于NORMAL Layout格式，batchA 、batchB必须满足倍数关系。Bias的shape\(batch, n\)中的batch必须与C矩阵的batch相等。
 -   如果接口输出到Unified Buffer上，输出C矩阵大小BaseM\*BaseN应小于分配的Unified Buffer内存大小。
 -   对于BSNGD、SBNGD Layout格式，输入输出只支持ND格式数据。对于BNGS1S2、NORMAL Layout格式， 输入支持ND/NZ格式数据。
--   Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetQuantScalar.md)、[SetQuantVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetQuantVector.md)接口。
+-   Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantScalar.md)、[SetQuantVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantVector.md)接口。
 -   BSNGD场景，不支持一次计算多行SD，需要算子程序中循环计算。
 -   **异步模式**不支持IterateBatch搬运到Unified Buffer上。
--   模板参数[enableMixDualMaster](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)（默认取值为false）设置为true，即使能MixDualMaster（双主模式）场景时，不支持Batch Matmul。
+-   模板参数[enableMixDualMaster](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)（默认取值为false）设置为true，即开启MixDualMaster（双主模式）场景时，不支持Batch Matmul。
 -   在batch场景，A矩阵、B矩阵支持half/float/bfloat16\_t/int8\_t数据类型，不支持int4b\_t数据类型。
 
 ## 调用示例<a name="zh-cn_topic_0000001726346562_section18018102212"></a>
@@ -36,7 +36,7 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
 -   Tiling实现
 
-    使用[SetBatchInfoForNormal](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum。
+    使用[SetBatchInfoForNormal](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/SetBatchInfoForNormal.md)设置A/B/C的M/N/K轴信息和A/B矩阵的BatchNum。
 
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
@@ -103,4 +103,3 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
         ```
         mm.End();
         ```
-
