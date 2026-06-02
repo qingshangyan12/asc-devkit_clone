@@ -49,7 +49,6 @@ if(BUILD_OPEN_PROJECT)
   include(cmake/dependencies.cmake)
 endif()
 
-add_subdirectory(tools)
 add_subdirectory(cmake)
 
 include(cmake/funcs.cmake)

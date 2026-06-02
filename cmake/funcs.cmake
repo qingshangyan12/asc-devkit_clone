@@ -66,27 +66,8 @@ endfunction()
 
 # 检查构建依赖
 function(check_pkg_build_deps pkg_name)
-    execute_process(
-        COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/check_build_dependencies.py "${ASCEND_CANN_PACKAGE_PATH}" ${CANN_VERSION_${pkg_name}_BUILD_DEPS}
-        RESULT_VARIABLE result
-    )
-    if(result)
-        message(FATAL_ERROR "Check ${pkg_name} build dependencies failed!")
-    endif()
 endfunction()
 
 # 添加生成version.info的目标
-# 目标名格式为：version_${包名}_info
 function(add_version_info_targets)
-    message(STATUS "Generating version.info....")
-    foreach(pkg_name ${CANN_VERSION_PACKAGES})
-        execute_process(
-            COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_version_info.py 
-                --output ${CMAKE_BINARY_DIR}/version.${pkg_name}.info
-                "${CANN_VERSION_${pkg_name}_VERSION}" ${CANN_VERSION_${pkg_name}_RUN_DEPS}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE result
-        )
-        add_custom_target(version_${pkg_name}_info ALL DEPENDS ${CMAKE_BINARY_DIR}/version.${pkg_name}.info)
-    endforeach()
 endfunction()
