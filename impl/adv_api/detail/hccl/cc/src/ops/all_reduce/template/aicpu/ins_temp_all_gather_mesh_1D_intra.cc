@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "ins_temp_all_gather_mesh_1D_intra.h"
 #include "alg_data_trans_wrapper.h"
@@ -54,7 +54,7 @@ u64 InsTempAllGatherMesh1dIntra::CalcScratchMultiple(BufferType inBuffType, Buff
 }
 
 HcclResult InsTempAllGatherMesh1dIntra::KernelRun(const OpParam &param, const TemplateDataParams &tempAlgParams,
-    const TemplateResource &templateResource)
+    TemplateResource &templateResource)
 {
     HCCL_INFO("[InsTempAllGatherMesh1dIntra] Run start");
     threadNum_ = templateResource.threads.size();
@@ -130,7 +130,7 @@ HcclResult InsTempAllGatherMesh1dIntra::RunAllGatherMesh(const std::vector<Threa
             }
 
             ThreadHandle currQue = threads[threadIdx];
-            // 预留兼容offload模式
+            // allgather 预留兼容offload模式
             const ChannelInfo &linkRemote = channels.at(connectedRank)[0];
             void *remoteCclBuffAddr = linkRemote.remoteCclMem.addr;
 
@@ -146,13 +146,13 @@ HcclResult InsTempAllGatherMesh1dIntra::RunAllGatherMesh(const std::vector<Threa
             void *txDstPtr = remoteCclBuffAddr;
             void *rxSrcPtr = tempAlgParams_.buffInfo.outputPtr;
             void *rxDstPtr = remoteCclBuffAddr;
-            // write模式使用tx,rx地址不生效，仅使用对端link做Post/Wait
-            // read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
+            // allgather write模式使用tx,rx地址不生效，仅使用对端link做Post/Wait
+            // allgather read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
             std::vector<DataSlice> txSrcSlices{
                 DataSlice(txSrcPtr, txOutOffset, myAlgSize, myAlgCount)};  // 本地(send)
             std::vector<DataSlice> txDstSlices{
                 DataSlice(txDstPtr, txDstOffset, myAlgSize, myAlgCount)};  // 远程(send)
-            // read模式使用rx
+            // allgather read模式使用rx
             std::vector<DataSlice> rxDstSlices{
                 DataSlice(rxDstPtr, rxDstOffset, connectedAlgSize, connectedAlgCount)};  // 本地(recv)
             std::vector<DataSlice> rxSrcSlices{

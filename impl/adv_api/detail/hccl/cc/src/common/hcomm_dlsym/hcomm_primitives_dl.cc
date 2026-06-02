@@ -1,16 +1,17 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "hcomm_primitives_dl.h"
 #include <dlfcn.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 DEFINE_WEAK_FUNC(int32_t, HcommWriteWithNotifyOnThread, ThreadHandle thread, ChannelHandle channel, void* dst, const void* src,
                                                 uint64_t len, uint32_t remoteNotifyIdx);
@@ -38,6 +39,27 @@ DEFINE_WEAK_FUNC(int32_t, HcommFenceOnThread, ThreadHandle thread);
 DEFINE_WEAK_FUNC(int32_t, HcommChannelFenceOnThread, ThreadHandle thread, ChannelHandle channel);
 DEFINE_WEAK_FUNC(HcclResult, HcommThreadJoin, ThreadHandle thread, uint32_t timeout);
 
+using HcclHcommBatchTransferOnThreadFunc =
+    int32_t (*)(ThreadHandle, ChannelHandle, const HcclHcommBatchTransferDesc *, uint32_t);
+
+static bool g_HcommBatchTransferOnThreadSupported = false;
+static HcclHcommBatchTransferOnThreadFunc g_HcommBatchTransferOnThread = nullptr;
+
+extern "C" bool HcommIsSupportHcommBatchTransferOnThread(void)
+{
+    return g_HcommBatchTransferOnThreadSupported;
+}
+
+extern "C" int32_t HcclHcommBatchTransferOnThread(ThreadHandle thread, ChannelHandle channel,
+    const HcclHcommBatchTransferDesc *transferDescs, uint32_t transferDescNum)
+{
+    if (g_HcommBatchTransferOnThread == nullptr) {
+        HCCL_COMPAT_ERROR("[HcclWrapper] HcommBatchTransferOnThread not supported");
+        return -1;
+    }
+    return g_HcommBatchTransferOnThread(thread, channel, transferDescs, transferDescNum);
+}
+
 // ---------- 初始化函数 ----------
 void HcommPrimitivesDlInit(void* libHcommHandle) {
     INIT_SUPPORT_FLAG(libHcommHandle, HcommWriteWithNotifyOnThread);
@@ -60,4 +82,12 @@ void HcommPrimitivesDlInit(void* libHcommHandle) {
     INIT_SUPPORT_FLAG(libHcommHandle, HcommFenceOnThread);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommChannelFenceOnThread);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommThreadJoin);
+    g_HcommBatchTransferOnThread = reinterpret_cast<HcclHcommBatchTransferOnThreadFunc>(
+        dlsym(libHcommHandle, "HcommBatchTransferOnThread"));
+    if (g_HcommBatchTransferOnThread == nullptr) {
+        g_HcommBatchTransferOnThreadSupported = false;
+        HCCL_COMPAT_DEBUG("[HcclWrapper] %s not supported", "HcommBatchTransferOnThread");
+    } else {
+        g_HcommBatchTransferOnThreadSupported = true;
+    }
 }

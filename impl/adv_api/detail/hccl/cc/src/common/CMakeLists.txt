@@ -13,6 +13,7 @@ if(PRODUCT_SIDE STREQUAL "host")
         ${CMAKE_CURRENT_SOURCE_DIR}/adapter_acl.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/alg_env_config.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/param_check.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/inconsistent_check.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/utils.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/alg_type.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/adapter_error_manager_pub.cc

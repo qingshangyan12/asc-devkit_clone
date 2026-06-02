@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "ins_temp_all_reduce_aicpu_reduce_nhr.h"
 #include "alg_data_trans_wrapper.h"
@@ -63,7 +63,7 @@ void InsTempAllReduceAicpuReduceNHR::GetNotifyIdxSubToMain(std::vector<u32> &not
 }
 
 HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
-    const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+    const OpParam &param, const TemplateDataParams &tempAlgParams, TemplateResource &templateResource)
 {
     HCCL_INFO("[InsTempAllReduceAicpuReduceNHR] rank[%d] KernelRun start", myRank_);
     // 处理数据量为0的场景
@@ -96,7 +96,7 @@ HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
         myRank_,
         channels.size(),
         channels.begin()->first);
-
+    
     bool isPcieProtocal = IsPcieProtocol(channels);  // 判断是否存在pcie链路
     isDmaRead_ = isPcieProtocal;  // 是否使用Read模式
     HCCL_DEBUG("[InsTempAllReduceAicpuReduceNHR] Use Dma Read[%d]", isDmaRead_);
@@ -106,7 +106,7 @@ HcclResult InsTempAllReduceAicpuReduceNHR::KernelRun(
 
     // 2. PreCopy (OPBASE 模式下将 userIn -> ccl)
     CHK_RET(PreCopy(tempAlgParams));
-
+    
     // 3. AllGather 阶段
     CHK_RET(RunGather(channels));
 
@@ -241,12 +241,12 @@ HcclResult InsTempAllReduceAicpuReduceNHR::GetStepInfo(u32 step, u32 nSteps, Aic
     stepInfo.step = step;
     stepInfo.myRank = rankIdx;
 
-    // 计算通信对象
+    // AicpuReduceNHR 计算通信对象
     u32 deltaRank = 1 << (nSteps - 1 - step);
     u32 recvFrom = (rankIdx + templateRankSize_ - deltaRank) % templateRankSize_;
     u32 sendTo = (rankIdx + deltaRank) % templateRankSize_;
 
-    // 数据份数和数据编号增量
+    // AicpuReduceNHR 数据份数和数据编号增量
     u32 nSlices = (templateRankSize_ - 1 + (1 << (nSteps - 1 - step))) / (1 << (nSteps - step));
     u32 deltaSliceIndex = 1 << (nSteps - step);
     u32 txSliceIdx = rankIdx;

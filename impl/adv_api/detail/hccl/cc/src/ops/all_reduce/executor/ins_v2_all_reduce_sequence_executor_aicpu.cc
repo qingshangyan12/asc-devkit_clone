@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "ins_v2_all_reduce_sequence_executor_aicpu.h"
 #include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
@@ -39,7 +39,7 @@ HcclResult InsV2AllReduceSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
 
     algHierarchyInfo_ = algHierarchyInfo;
     HCCL_INFO("[InsV2AllReduceSequenceExecutorAicpu][InitCommInfo] myRank [%u], rankSize [%u], redOp [%u], "
-        "dataType [%u] dataTypeSize [%u]", myRank_, rankSize_, reduceOp_, dataType_, dataTypeSize_);
+        "dataType [%u] dataTypeSize [%u]", myRank_, rankSize_, devType_, reduceOp_, dataTypeSize_);
     return HCCL_SUCCESS;
 }
 
@@ -160,7 +160,7 @@ void InsV2AllReduceSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, InsAlgTe
     tempAlgParamsStepOne.buffInfo.outBuffType = BufferType::HCCL_BUFFER;
     tempAlgParamsStepOne.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
     tempAlgParamsStepOne.buffInfo.inputPtr = param.inputPtr;
-    tempAlgParamsStepOne.buffInfo.outputPtr = resCtx.cclMem.addr;
+    tempAlgParamsStepOne.buffInfo.outputPtr = resCtx.cclMem.addr; 
     tempAlgParamsStepOne.buffInfo.hcclBuff = resCtx.cclMem;
 
     tempAlgParamsStepTwo.buffInfo.inBuffType = BufferType::HCCL_BUFFER;
@@ -300,7 +300,7 @@ void InsV2AllReduceSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, InsAlgTe
 
     tempAlgParamsStepFour.inputSliceStride = 0;
     tempAlgParamsStepFour.outputSliceStride = tempAlgParamsStepFour.sliceSize;
-
+    
     HCCL_INFO("[InsV2AllReduceSequenceExecutorAicpu] loop [%u] tempAlgParamsStepFour.inputSliceStride [%u], "
         "tempAlgParamsStepFour.outputSliceStride [%u], tempAlgParamsStepFour.sliceSize [%u], tempAlgParamsStepFour.tailSize [%u], "
         "tempAlgParamsStepFour.buffInfo.inBuffBaseOff [%u], tempAlgParamsStepFour.buffInfo.outBuffBaseOff [%u]",
@@ -352,9 +352,11 @@ HcclResult InsV2AllReduceSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
 
     // 构建框间ReduceScatterNhr的template
     std::shared_ptr<InsAlgTemplate1> algTemplateStepTwo = std::make_shared<InsAlgTemplate1>(param, myRank_, algHierarchyInfo_.infos[1]);
+    algTemplateStepTwo->SetchannelsPerRank(remoteRankToChannelInfo_[1]);
 
     // 构建框间AllGatherNhr的template
     std::shared_ptr<InsAlgTemplate2> algTemplateStepThree = std::make_shared<InsAlgTemplate2>(param, myRank_, algHierarchyInfo_.infos[1]);
+    algTemplateStepThree->SetchannelsPerRank(remoteRankToChannelInfo_[1]);
 
     // 构建框内AllGatherMesh1D的template
     std::shared_ptr<InsAlgTemplate3> algTemplateStepFour = std::make_shared<InsAlgTemplate3>(param, myRank_, algHierarchyInfo_.infos[0]);
@@ -372,7 +374,7 @@ HcclResult InsV2AllReduceSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0, In
     // 构造框内AllGatherMesh1D的template资源
     TemplateResource templateResourceStepFour;
     CHK_RET(GenTempResource(resCtx, 0, algTemplateStepFour, templateResourceStepFour));
-
+    
     // 计算中转内存单次最多能够接受的output count
     // CCL buffer切分为2块，前1块作为ReduceScatter mesh1D归约操作的output，后1块作为ccl buffer接收其他卡的数据
     outCclBuffSize_ = tempAlgParamsStepOne.buffInfo.hcclBuff.size / 2;

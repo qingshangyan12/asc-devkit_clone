@@ -1,14 +1,16 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "scatter_auto_selector.h"
 #include "selector_registry.h"
+#include "hccl_aiv_utils.h"
 
 namespace mc2_ops_hccl {
 
@@ -58,8 +60,11 @@ SelectorStatus ScatterAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNetL
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
                 selectAlgName = "CcuScatterMesh1D";
+            } else if (topoInfo->level0PcieMix) {
+                HCCL_WARNING("[ScatterAutoSelector] pcie mixed topo is not supported yet for ccu schedule mode.");
+                return SelectorStatus::NOT_MATCH;
             } else {
-                selectAlgName = "CcuScatterParallelMesh1DNHR";
+                selectAlgName = "CcuScatterParallelMesh1DNHRUBX";
             }
         } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
             HCCL_WARNING("[Algo][ScatterAutoSelector] level0Topo[%d] is not supported yet for ccu_schedule mode.", topoInfo->level0Topo);
@@ -100,11 +105,17 @@ SelectorStatus ScatterAutoSelector::SelectAicpuAlgo(const TopoInfoWithNetLayerDe
             if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
                 // MESH_1D 即可链接所有卡， 使用 MESH_1D 算法
                 selectAlgName = "InsScatterMesh1D";
+            } else if (topoInfo->level0PcieMix) {
+                selectAlgName = "InsScatterParallelMesh1DNHRPcie";
+            } else {
+                selectAlgName = "InsScatterParallelMesh1DNHRUBX";
+            }
+        } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
+            if (topoInfo->level0PcieMix) {
+                selectAlgName = "InsScatterNHR";
             } else {
                 selectAlgName = "InsScatterMesh1D";
             }
-        } else if (topoInfo->level0Topo == Level0Shape::CLOS) {
-            selectAlgName = "InsScatterMesh1D";
         } 
         else {
             HCCL_WARNING("[ScatterAutoSelector] topo not match for aicpu algo");
@@ -123,6 +134,22 @@ SelectorStatus ScatterAutoSelector::SelectAivAlgo(const TopoInfoWithNetLayerDeta
     (void)opParam;
     (void)configAlgMap;
     HCCL_DEBUG("[ScatterAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
+
+    if (topoInfo->userRankSize > MAX_RANK_SIZE) {
+        HCCL_DEBUG("[ScatterAutoSelector][%s] rankSize[%u] larger than [%u]", __func__, topoInfo->userRankSize, MAX_RANK_SIZE);
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    void *cclBufferAddr;
+    uint64_t cclBufferSize;
+    CHK_PRT_RET(HcclGetHcclBuffer(opParam.hcclComm, &cclBufferAddr, &cclBufferSize) != HCCL_SUCCESS,
+        HCCL_WARNING("[ScatterAutoSelector] HcclGetHcclBuffer failed."), SelectorStatus::NOT_MATCH);
+    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    u64 totalSize = opParam.DataDes.count * perDataSize * topoInfo->userRankSize;
+    if (totalSize > cclBufferSize * AIV_MAX_CCL_LOOP_NUM) {
+        HCCL_DEBUG("[ScatterAutoSelector][%s] totalSize[%llu] too large for cclBufferSize [%llu]", __func__, totalSize, cclBufferSize);
+        return SelectorStatus::NOT_MATCH;
+    }
 
     selectAlgName = "AivScatterMesh1D";
 

@@ -9,7 +9,7 @@
 */
 #include "hccl_alloc_ctx_res.h"
 
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
 
 std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},

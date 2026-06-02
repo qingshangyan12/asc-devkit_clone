@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_v2_recv_sole_executor.h"
 #include "ins_temp_recv_dpu.h"
 
@@ -129,12 +130,12 @@ namespace mc2_ops_hccl
         tempAlgParams.buffInfo.hcclBuff = resCtx.cclMem;    // 本端的ccl
         // template资源
         TemplateResource templateResource;
-        templateResource.channels = remoteRankToChannelInfo_[0];
         templateResource.threads = resCtx.threads;
+        templateResource.channels = remoteRankToChannelInfo_[0];
         templateResource.npu2DpuShmemPtr = resCtx.npu2DpuShmemPtr;
         templateResource.dpu2NpuShmemPtr = resCtx.dpu2NpuShmemPtr;
-        u64 resDataSize = dataSize_;
         maxTmpMemSize_ = std::min<u64>(UB_MAX_DATA_SIZE, resCtx.cclMem.size); // maxTmpMemSize_取ub和ccl的最小值
+        u64 resDataSize = dataSize_;
         u64 maxRoundTransferSize = (maxTmpMemSize_ / dataTypeSize_) * dataTypeSize_;
         while (resDataSize > 0)
         {
@@ -148,5 +149,7 @@ namespace mc2_ops_hccl
         return HCCL_SUCCESS;
     }
 
+#if !defined(HCCL_CANN_COMPAT_850)
     REGISTER_EXECUTOR_IMPL_NO_TOPOMATCH(HcclCMDType::HCCL_CMD_RECEIVE, InsRecvDPU, InsV2RecvSoleExecutor, InsTempRecvDpu);
+#endif /* !HCCL_CANN_COMPAT_850 */
 } // namespace mc2_ops_hccl

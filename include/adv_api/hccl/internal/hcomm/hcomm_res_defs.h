@@ -78,6 +78,8 @@ typedef enum {
     COMM_PROTOCOL_UBC_CTP = 4,    ///< 华为统一总线UBC_CTP
     COMM_PROTOCOL_UBC_TP = 5,     ///< 华为统一总线UBC_TP
     COMM_PROTOCOL_UB_MEM = 6,     ///< UB_MEM
+    COMM_PROTOCOL_UBOE = 7,       ///< UBoE
+    COMM_PROTOCOL_HCCS_ONLY = 8,  ///< 一卡双DIE使用HCCS
 } CommProtocol;
 
 /**
@@ -207,10 +209,14 @@ typedef struct {
             uint32_t retryInterval;  ///< 重传间隔（ms）
             uint8_t tc;              ///< 流量类别（QoS)
             uint8_t sl;              ///< 服务等级（QoS)
+            uint32_t qpThreshold;    ///< 多QP场景下，每个QP最小数据量(B)
         } roceAttr;
         struct {
             uint32_t qos;            ///< HCCS QoS
         } hccsAttr;
+        struct {
+            uint32_t sqDepth;         ///< UB队列深度，0表示使用默认值
+        } ubAttr;
     };
 } HcommChannelDesc;
 
@@ -280,6 +286,14 @@ static inline HcommResult HcommChannelDescInit(HcommChannelDesc *channelDesc, ui
 
     return 0;
 }
+
+/**
+ * @brief 底层特性枚举定义
+ */
+typedef enum {
+    HCOMM_ENDPOINT_FEATURE_INVALID = -1,
+    HCOMM_ENDPOINT_FEATURE_NDA = 0,  // NPU Direct RDMA Async 特性
+} HcommEndpointFeatureType;
 
 #ifdef __cplusplus
 }

@@ -17,11 +17,6 @@
 extern "C" {
 #endif // __cplusplus
 
-#ifndef __cplusplus
-typedef void *CcuKernelArg;
-typedef CcuResult (*CcuKernelFunc)(CcuKernelArg arg);
-#endif
-
 /**
  * @brief CCU return value definition
  */
@@ -87,6 +82,10 @@ typedef uint64_t CcuBufferHandle;
 typedef uint64_t CcuLocalAddrHandle;
 
 typedef uint64_t CcuRemoteAddrHandle;
+
+typedef void *CcuKernelArg;
+
+typedef CcuResult (*CcuKernelFunc)(CcuKernelArg arg);
 
 #ifdef __cplusplus
 }

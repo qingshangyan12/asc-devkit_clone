@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include <algorithm>
 #include "alg_data_trans_wrapper.h"
 #include "ins_v2_batch_send_recv_executor.h"
@@ -142,19 +143,20 @@ HcclResult InsV2BatchSendRecvExecutor::GetPairWiseList(const HcclSendRecvItem *s
 
     for (u32 i = 0; i < itemNum; i++) {
         HCCL_INFO("[InsV2BatchSendRecvExecutor][GetPairWiseList] index is %u, itemNum is %u,"\
-            "localRankID is %d, remoteRank is %u, sendRecvType is %u, rankSize is %u.",
-            i, itemNum, myRank_, sendRecvInfo->remoteRank,
+            "localRankID is %d, remoteRank is %u, dataCount is %llu, sendRecvType is %u, rankSize is %u.",
+            i, itemNum, myRank_, sendRecvInfo->remoteRank, sendRecvInfo->count,
             static_cast<u32>(sendRecvInfo->sendRecvType), rankSize_);
-        CHK_PTR_NULL(sendRecvInfo->buf);
-
-        if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_SEND) {
-            sendDeque_.push_back(sendRecvInfo);
-        } else if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_RECV) {
-            recvDeque_.push_back(sendRecvInfo);
-        } else {
-            HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetPairWiseList] sendRecvType wrong sendrecvType is %d, "\
-                "rankID is %d, remoteRank is %u.", sendRecvInfo->sendRecvType, myRank_, sendRecvInfo->remoteRank);
-            return HcclResult::HCCL_E_PARA;
+        if (sendRecvInfo->count > 0) {
+            CHK_PTR_NULL(sendRecvInfo->buf);
+            if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_SEND) {
+                sendDeque_.push_back(sendRecvInfo);
+            } else if (sendRecvInfo->sendRecvType == HcclSendRecvType::HCCL_RECV) {
+                recvDeque_.push_back(sendRecvInfo);
+            } else {
+                HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetPairWiseList] sendRecvType wrong sendrecvType is %d, "\
+                    "rankID is %d, remoteRank is %u.", sendRecvInfo->sendRecvType, myRank_, sendRecvInfo->remoteRank);
+                return HcclResult::HCCL_E_PARA;
+            }
         }
         sendRecvInfo++;
     }
@@ -295,8 +297,8 @@ HcclResult InsV2BatchSendRecvExecutor::GetRecvChannel(u32 remoteRank, ChannelInf
         return HCCL_E_INTERNAL;
     }
     if (it->second.size() < channelNumPerRankPair_) {
-        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetRecvChannel] Channel number[%u] is less than expected number[2]",
-            it->second.size());
+        HCCL_ERROR("[InsV2BatchSendRecvExecutor][GetRecvChannel] Channel number[%u] is less than expected number[%u]",
+            it->second.size(), channelNumPerRankPair_);
         return HCCL_E_INTERNAL;
     }
     if (remoteRank > myRank_) {
@@ -321,7 +323,7 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessSendDataSlice(SendRecvSlice& sendS
         "send channel handle[0x%llx].", myRank_, sendSlice.remoteRank_, sendChannel.handle);
     SlicesList slices({}, {}); // read模式下发送端不感知数据信息，直接给一个空的
     DataInfo sendDataInfo(sendChannel, slices);
-    SendRead(sendDataInfo, thread);
+    CHK_RET(SendRead(sendDataInfo, thread));
     HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessSendDataSlice] Process a send task by read mode, CCLBuffer[%p], remoteRank[%u].",
         cclMem_.addr, sendSlice.remoteRank_);
     return HCCL_SUCCESS;
@@ -340,7 +342,7 @@ HcclResult InsV2BatchSendRecvExecutor::ProcessRecvDataSlice(SendRecvSlice& recvS
     DataSlice recvDstDataSlice(recvSlice.addr_, 0, recvSlice.size_); // 采用DMA消减，直接接收到本端的outputBuffer上
     SlicesList slices({recvSrcDataSlice}, {recvDstDataSlice});
     DataInfo recvDataInfo(recvChannel, slices);
-    RecvRead(recvDataInfo, thread);
+    CHK_RET(RecvRead(recvDataInfo, thread));
     HCCL_DEBUG("[InsV2BatchSendRecvExecutor][ProcessRecvDataSlice] Process a recv task by read mode, outputBuffer[%p], remoteRank[%u].",
         recvSlice.addr_, recvSlice.remoteRank_);
     return HCCL_SUCCESS;
@@ -378,6 +380,11 @@ HcclResult InsV2BatchSendRecvExecutor::Orchestrate(const OpParam &param,
     HCCL_INFO("[InsV2BatchSendRecvExecutor][Orchestrate] Orchestrate Start.");
     // 给channels_和threads_赋值
     threads_ = resCtx.threads;
+    if (threads_.size() < totalThreadNum_) {
+        HCCL_ERROR("[InsV2BatchSendRecvExecutor][Orchestrate] threads num[%zu] is less than [%u]!",
+            threads_.size(), totalThreadNum_);
+        return HCCL_E_PARA;
+    }
     CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
     cclMem_ = resCtx.cclMem;
     maxTmpMemSize_ = std::min(resCtx.cclMem.size, UB_MAX_DATA_SIZE);

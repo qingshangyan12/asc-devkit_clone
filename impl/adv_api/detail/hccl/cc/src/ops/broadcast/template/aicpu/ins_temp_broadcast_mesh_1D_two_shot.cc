@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "aicpu/ins_temp_broadcast_mesh_1D_two_shot.h"
 
 namespace mc2_ops_hccl {
@@ -160,8 +161,8 @@ HcclResult InsTempBroadcastMesh1DTwoShot::RootSendData(const u64 memOffset,
     std::vector<DataSlice> sendSrcSliceVec0 = {sendSrcSlice0};
     std::vector<DataSlice> sendDstSliceVec0 = {sendDstSlice0};
     SlicesList sendDataSlice0(sendSrcSliceVec0, sendDstSliceVec0);
-    DataInfo sendDataInfo0(linkSend, sendDataSlice0);
-    CHK_RET(SendWrite(sendDataInfo0, threads[id]));
+    DataInfo sendDataInfo0(linkSend, sendDataSlice0, dataType_);
+    CHK_RET(SendBatchWrite(sendDataInfo0, threads[id]));
 
     // root将自己数据分片发送至对端
     u64 sendSrcOffset1 = sliceInfoVec[myRankIdx][0].offset + memOffset;
@@ -174,7 +175,7 @@ HcclResult InsTempBroadcastMesh1DTwoShot::RootSendData(const u64 memOffset,
         DstPtr = linkSend.remoteOutputGraphMode.addr;
     }
     DataSlice sendSrcSlice1 = DataSlice(tempAlgParams.buffInfo.inputPtr, sendSrcOffset1, sliceInfoVec[myRankIdx][0].size);
-    DataSlice sendDstSlice1 = DataSlice(DstPtr, sendDstOffset1, sendDstOffset1);
+    DataSlice sendDstSlice1 = DataSlice(DstPtr, sendDstOffset1, sliceInfoVec[myRankIdx][0].size);
 
     HCCL_DEBUG("[InsTempBroadcastMesh1DTwoShot] RootSendData: sendSrcSlice1.myRank[%d] addr[%p] offset[%d] Size[%d]",
               myRank_, tempAlgParams.buffInfo.inputPtr, sendSrcOffset1, sliceInfoVec[myRankIdx][0].size);
@@ -184,8 +185,8 @@ HcclResult InsTempBroadcastMesh1DTwoShot::RootSendData(const u64 memOffset,
     std::vector<DataSlice> sendSrcSliceVec1 = {sendSrcSlice1};
     std::vector<DataSlice> sendDstSliceVec1 = {sendDstSlice1};
     SlicesList sendDataSlice1(sendSrcSliceVec1, sendDstSliceVec1);
-    DataInfo sendDataInfo1(linkSend, sendDataSlice1);
-    CHK_RET(SendWrite(sendDataInfo1, threads[id]));
+    DataInfo sendDataInfo1(linkSend, sendDataSlice1, dataType_);
+    CHK_RET(SendBatchWrite(sendDataInfo1, threads[id]));
 
     return HcclResult::HCCL_SUCCESS;
 }
@@ -359,8 +360,8 @@ HcclResult InsTempBroadcastMesh1DTwoShot::RunAllGather(const std::vector<u32> &c
         TxRxSlicesList sendRecvSlice(sendDataSlice, recvDataSlice);
         TxRxChannels  sendRecvLinks(linkSendRecv, linkSendRecv);
 
-        SendRecvInfo sendRecvInfo(sendRecvLinks, sendRecvSlice);
-        CHK_RET(SendRecvWrite(sendRecvInfo, threads[i]));
+        SendRecvInfo sendRecvInfo(sendRecvLinks, sendRecvSlice, dataType_);
+        CHK_RET(SendRecvBatchWrite(sendRecvInfo, threads[i]));
     }
 
     if (commRanks.size() > 1) {
@@ -394,7 +395,7 @@ void InsTempBroadcastMesh1DTwoShot::SetRoot(u32 root)
 }
 
 HcclResult InsTempBroadcastMesh1DTwoShot::KernelRun(const OpParam& param, const TemplateDataParams& tempAlgParams,
-                                          const TemplateResource& templateResource)
+                                          TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempBroadcastMesh1DTwoShot] BroadcastMesh1DTwoShot entry.");
     HCCL_DEBUG("[InsTempBroadcastMesh1DTwoShot] BroadcastMesh1DTwoShot rank[%d] slicesize[%d] count[%d].",
@@ -417,7 +418,7 @@ HcclResult InsTempBroadcastMesh1DTwoShot::KernelRun(const OpParam& param, const 
 
     threadNum_ = templateResource.threads.size();
 
-    HCCL_INFO("[InsTempBroadcastMesh1DTwoShot Run]RankID:[%d], root:[%u]", myRank_, root_);
+    HCCL_INFO("[InsTempBroadcastMesh1DTwoShot Run]RankID:[%d], root:[%u], threadNum_:[%u]", myRank_, root_, threadNum_);
 
     std::vector<u32> scatterCommRanks;
     CHK_RET(CalcCommRankSetforScatter(templateRankSize_, scatterCommRanks));  // 计算scatter步骤的通信对象
@@ -460,4 +461,3 @@ void InsTempBroadcastMesh1DTwoShot::GetNotifyIdxSubToMain(std::vector<u32> &noti
 }
 
 } // namespace Hccl
-

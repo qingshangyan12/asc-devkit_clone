@@ -1,15 +1,17 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-#ifndef MC2_OPS_HCCL_SRC_OPS_SCATTER_OP
-#define MC2_OPS_HCCL_SRC_OPS_SCATTER_OP
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
+#ifndef OPS_HCCL_SRC_OPS_SCATTER_OP
+#define OPS_HCCL_SRC_OPS_SCATTER_OP
+
+#include <array>
 #include <string>
 #include "hccl.h"
 
@@ -30,8 +32,13 @@ HcclResult HcclScatter(void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDat
 #endif
 
 namespace mc2_ops_hccl {
-HcclResult ScatterOutPlace(void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType, uint32_t root,
-    HcclComm comm, aclrtStream stream, const std::string &tag);
+using NotifyArray = std::array<aclrtNotify, AICPU_CONTROL_NOTIFY_NUM>;
+
+HcclResult ScatterOutPlace(OpParam &param, void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType, uint32_t root,
+    HcclComm comm, aclrtStream stream, u32 userRankSize);
+
+HcclResult ScatterExecOp(OpParam &param, void *sendBuf, void *recvBuf, uint64_t recvCount, HcclDataType dataType, uint32_t root,
+    HcclComm comm, aclrtStream stream, u32 userRankSize, uint64_t beginTime);
 
 HcclResult ExecOp(HcclComm comm, OpParam &param);
 

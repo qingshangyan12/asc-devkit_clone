@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_recv_executor.h"
 #include "alg_data_trans_wrapper.h"
 
@@ -104,6 +105,12 @@ namespace mc2_ops_hccl {
             HCCL_ERROR("[InsRecvExecutor][Orchestrate] Channel[%d]-[%d] not found.", myRank_, remoteRank_),
             HcclResult::HCCL_E_NOT_FOUND);
         const ChannelInfo &channel = *channelIt;
+
+        // 判断是否为PCIE链路，如果是则使用read
+        if (channel.protocol == CommProtocol::COMM_PROTOCOL_PCIE) {
+            isDmaRead_ = true;
+        }
+
         // 使用的是PUT DMAMode，所以无论图模式还是单算子，数据都是从对端的input buffer来
         // channel.remoteInput不是对端input buffer
         // 但因为使用的是PUT模式srcBufferPtr无用，且无法获取对端input buffer地址，仅示意作用
@@ -145,15 +152,16 @@ namespace mc2_ops_hccl {
         SlicesList recvSlicesList{srcSlices, dstSlices};
         DataInfo recvInfo{channel, recvSlicesList};
         // 给对端发送ready信号，最后等待对端发送fin信号
-        CHK_RET(RecvWrite(recvInfo, thread));
+        if (isDmaRead_) {
+            CHK_RET(RecvRead(recvInfo, thread));
+        } else {
+            CHK_RET(RecvWrite(recvInfo, thread));
+        }
 
         return HcclResult::HCCL_SUCCESS;
     }
 
     HcclResult InsRecvExecutor::OrchestrateOpbase(const OpParam &param, const AlgResourceCtxSerializable &resCtx, const ThreadHandle &thread, const ChannelInfo &channel) {
-        void *srcBufferPtr = static_cast<void *>(channel.remoteInput.addr);
-        // 单算子模式到本端ccl buffer(scratch buffer)
-        void *dstBufferPtr = static_cast<void *>(resCtx.cclMem.addr);
         // UB和ccl Buffer取小为一次传输最大数据量
         maxLoopTransSize_ = std::min<u64>(UB_MAX_DATA_SIZE, maxTmpMemSize_);
         // 一次搬运最大数据个数
@@ -166,18 +174,22 @@ namespace mc2_ops_hccl {
         while (dataCountToRecv > 0) {
             u64 transferCount = dataCountToRecv > maxLoopTransCount_ ? maxLoopTransCount_ : dataCountToRecv;
             u64 transferSize = transferCount * dataTypeSize_;
-            // 因使用的是PUT模式，此处srcSlices其实无实际使用，仅示意
-            DataSlice srcSlice{srcBufferPtr, currentOffset, transferSize, transferCount};
             // 因ccl buffer大小限制，每次往ccl buffer写一片数据，所以offset固定为0
-            DataSlice cclSlice{dstBufferPtr, 0, transferSize, transferCount};
-            SlicesList recvSlicesList{{srcSlice}, {cclSlice}};
-            DataInfo recvInfo{channel, recvSlicesList};
-            // 因本端需要把ccl buffer数据localCopy到output buffer，所以此处每片数据都调用一次RecvWrite
-            // 给对端发送ready信号后，等待对端发送fin信号
-            CHK_RET(RecvWrite(recvInfo, thread));
-            // 把ccl buffer数据localCopy到output buffer
+            DataSlice remoteCclSlice{channel.remoteCclMem.addr, 0, transferSize, transferCount};
             DataSlice outputSlice{param.outputPtr, currentOffset, transferSize, transferCount};
-            CHK_RET(LocalCopy(thread, cclSlice, outputSlice));
+            if (isDmaRead_) {
+                // Read模式下，等待对端通知后，从对端cclBuffer中读取数据
+                SlicesList recvSlicesList{{remoteCclSlice}, {outputSlice}};
+                DataInfo recvInfo{channel, recvSlicesList};
+                CHK_RET(RecvRead(recvInfo, thread));
+            } else {
+                // Write模式下，先等待对端数据写入本端cclBuffer，然后将数据拷贝到output上
+                DataSlice cclSlice{resCtx.cclMem.addr, 0, transferSize, transferCount};
+                SlicesList recvSlicesList{{remoteCclSlice}, {cclSlice}};
+                DataInfo recvInfo{channel, recvSlicesList};
+                CHK_RET(RecvWrite(recvInfo, thread));
+                CHK_RET(LocalCopy(thread, cclSlice, outputSlice));
+            }
             currentOffset = currentOffset + transferSize;
             dataCountToRecv = dataCountToRecv - transferCount;
         }

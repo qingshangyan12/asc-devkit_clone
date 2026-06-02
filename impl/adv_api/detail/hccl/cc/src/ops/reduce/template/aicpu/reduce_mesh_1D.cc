@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include <numeric>
 #include "reduce_mesh_1D.h"
 
@@ -29,6 +30,7 @@ void ReduceMesh1D::SetRoot(u32 root) const
 HcclResult ReduceMesh1D::CalcRes(
     HcclComm comm, const OpParam &param, const TopoInfoWithNetLayerDetails *topoInfo, AlgResourceRequest &resourceRequest)
 {
+    CHK_PTR_NULL(topoInfo);
     threadNum_ = templateRankSize_ > 1 ? templateRankSize_ : 1;
     resourceRequest.slaveThreadNum = threadNum_ - 1;
     for (u32 index = 0; index < threadNum_ - 1; index++) {
@@ -51,7 +53,7 @@ u64 ReduceMesh1D::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffT
 }
 
 HcclResult ReduceMesh1D::KernelRun(
-    const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+    const OpParam &param, const TemplateDataParams &tempAlgParams, TemplateResource &templateResource)
 {
     HCCL_INFO("[ReduceMesh1D] rank[%d] KernelRun start", myRank_);
     // 处理数据量为0的场景
@@ -151,10 +153,10 @@ HcclResult ReduceMesh1D::SendData(const TemplateDataParams &dataParams,
         buffInfo.inBuffBaseOff,
         buffInfo.hcclBuffBaseOff);
     SlicesList sendSlicesList({srcDataSlice}, {dstDataSlice});
-    DataInfo sendInfo(sendChannel, sendSlicesList);
+    DataInfo sendInfo(sendChannel, sendSlicesList, dataType_);
 
     CHK_PRT_RET(
-        SendWrite(sendInfo, threads.at(0)), HCCL_ERROR("[ReduceMesh1D] Send data failed"), HcclResult::HCCL_E_INTERNAL);
+        SendBatchWrite(sendInfo, threads.at(0)), HCCL_ERROR("[ReduceMesh1D] Send data failed"), HcclResult::HCCL_E_INTERNAL);
 
     return HcclResult::HCCL_SUCCESS;
 }

@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "reduce_scatter_v_op.h"
 #include "op_common_ops.h"
 #include "topo_host.h"
@@ -23,9 +24,6 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void *sendDispls, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
-        return HcclReduceScatterVInner(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, comm, stream);
-    }
     HCCL_INFO("Start to run execute HcclReduceScatterV");
     if (GetHcommVersion() < 90000000) { // compat handle
         return HcclReduceScatterVInner(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, comm, stream);
@@ -77,7 +75,6 @@ HcclResult HcclReduceScatterV(void *sendBuf,  const void *sendCounts, const void
 
     return HCCL_SUCCESS;
 }
-
 
 HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, const void *sendDispls, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, const char* group, aclrtStream stream, const char* tag, void** streams, size_t streamCount, void* scratchMemAddr, uint64_t scratchMemSize)
@@ -135,8 +132,6 @@ HcclResult HcclReduceScatterVGraphMode(void *sendBuf,  const void *sendCounts, c
 
     return HCCL_SUCCESS;
 }
-
-
 
 namespace mc2_ops_hccl {
 HcclResult CheckReduceScatterVInputParam(
@@ -203,7 +198,8 @@ HcclResult PrepareReduceScatterVParam(void *sendBuf, const void *sendDispls, con
     HCCL_INFO("PrepareReduceScatterVParam: recvCount:[%u]", recvCount);
 
     // 参数准备
-    std::vector<u64> countsAndDispls(userRankSize*2);
+    u32 rankNum = 2;
+    std::vector<u64> countsAndDispls(userRankSize * rankNum);
     const u64* sendDisplsAddr = reinterpret_cast<const u64*>(sendDispls);
     const u64* sendCountsAddr = reinterpret_cast<const u64*>(sendCounts);
 
@@ -236,7 +232,6 @@ HcclResult ReduceScatterVOutPlace(void *sendBuf, const void *sendDispls, const v
     return HCCL_SUCCESS;
 }
 
-
 HcclResult ReduceScatterVOutPlaceGraphMode(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag, const ResPackGraphMode &resPack)
 {
@@ -245,7 +240,6 @@ HcclResult ReduceScatterVOutPlaceGraphMode(void *sendBuf, const void *sendDispls
     HCCL_INFO("Execute ReduceScatterVOutPlaceGraphMode success.");
     return HCCL_SUCCESS;
 }
-
 
 HcclResult ReduceScatterVOutPlaceCommon(void *sendBuf, const void *sendDispls, const void *sendCounts, void *recvBuf, uint64_t recvCount, HcclDataType dataType,
     HcclReduceOp op, HcclComm comm, aclrtStream stream, const std::string &tag, OpMode opMode, const ResPackGraphMode &resPack)
@@ -277,11 +271,16 @@ HcclResult ReduceScatterVOutPlaceCommon(void *sendBuf, const void *sendDispls, c
     
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    CHK_RET(HcclGetOpExpansionMode(comm, param));
     CHK_RET(Selector(comm, param, topoInfo, algName));
+
+    if (ShouldUseInnerOp(param.opExecuteConfig) && param.opMode == OpMode::OPBASE) {
+        return HcclReduceScatterVInner(sendBuf, sendCounts, sendDispls, recvBuf, recvCount, dataType, op, comm, stream);
+    }
     
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(param));
+        CHK_RET(SingleRankProc(comm, param));
         return HcclResult::HCCL_SUCCESS;
     }
     CHK_RET(HcclExecOp(comm, param, topoInfo, algName, resPack));

@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_temp_allgather_nhr_dpu_inter.h"
 #include "alg_data_trans_wrapper.h"
 #include "dpu_alg_data_trans_wrapper.h"
@@ -44,7 +45,7 @@ u64 InsTempAllGatherNHRDPUInter::CalcScratchMultiple(BufferType inBufferType, Bu
 }
 
 HcclResult InsTempAllGatherNHRDPUInter::KernelRun(const OpParam& param, const TemplateDataParams& tempAlgParams,
-    const TemplateResource& templateResource)
+    TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempAllGatherNHRDPUInter] Run Start");
         HCCL_DEBUG("[InsTempAllGatherNHRDPUInter][KernelRun] check myRank[%u]", myRank_);
@@ -59,12 +60,12 @@ HcclResult InsTempAllGatherNHRDPUInter::KernelRun(const OpParam& param, const Te
 
     // 转换成eager-mode，保障AICPU指令下发执行完成
     if (HcommBatchModeEnd(param.algTag) != HCCL_SUCCESS) {
-        HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }
 
     if (HcommThreadSynchronize(templateResource.threads[0]) != 0) {
-        HCCL_ERROR("HcommThreadSynchronize failed");
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] HcommThreadSynchronize failed");
         return HCCL_E_INTERNAL;
     }
     
@@ -81,28 +82,28 @@ HcclResult InsTempAllGatherNHRDPUInter::KernelRun(const OpParam& param, const Te
     u32 sendMsgId = 0;
     if (HcommSendRequest(reinterpret_cast<uint64_t>(templateResource.npu2DpuShmemPtr), param.algTag,
         static_cast<void*>(dpuRunInfoSeqData.data()), dpuRunInfoSeqData.size(), &sendMsgId) != 0) {
-        HCCL_ERROR("HcommSendRequest failed");
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] HcommSendRequest failed");
         return HCCL_E_INTERNAL;
     }
-    HCCL_DEBUG("HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
+    HCCL_DEBUG("[InsTempAllGatherNHRDPUInter] HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
 
     // 等待DPU数据传输，然后回写结果回来
     void *recvData = nullptr;
     u32 recvMsgId = 0;
     if (HcommWaitResponse(reinterpret_cast<uint64_t>(templateResource.dpu2NpuShmemPtr), recvData, 0, &recvMsgId) != 0) {
-        HCCL_ERROR("HcommWaitResponse failed");
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] HcommWaitResponse failed");
         return HCCL_E_INTERNAL;
     }
-    HCCL_DEBUG("HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
+    HCCL_DEBUG("[InsTempAllGatherNHRDPUInter] HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
 
     if (recvMsgId != sendMsgId) {
-        HCCL_ERROR("recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
         return HCCL_E_INTERNAL;
     }
 
     // 将执行模式转换回到batch
     if (HcommBatchModeStart(param.algTag) != HCCL_SUCCESS) {
-        HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] failed set eager mode, tag is %s.", param.algTag);
         return HCCL_E_INTERNAL;
     }
 
@@ -249,12 +250,38 @@ HcclResult InsTempAllGatherNHRDPUInter::RunNHR(const TemplateDataParams& tempAlg
                 std::vector<DataSlice> rxDstSlices{DataSlice(tempAlgParams.buffInfo.hcclBuff.addr, rxScratchOff, recvSize, recvCount)};
 
                 if (sendSize > 0 && recvSize > 0) {
-                    TxRxChannels sendRecvChannels(txChannel[0], rxChannel[0]);
-                    TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
-                    SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
-                    CHK_PRT_RET(SendRecvWrite(sendRecvInfo),
-                        HCCL_ERROR("[InsTempAllGatherNHRDPUInter] SendRecvWrite failed (step=%u, rpt=%u)", step, rpt),
-                        HcclResult::HCCL_E_INTERNAL);
+                    if (txChannel[0].remoteRank == rxChannel[0].remoteRank) {
+                        TxRxChannels sendRecvChannels(txChannel[0], rxChannel[0]);
+                        TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
+                        SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
+                        CHK_PRT_RET(SendRecvWrite(sendRecvInfo),
+                            HCCL_ERROR("[InsTempAllGatherNHRDPUInter] SendRecvWrite failed (step=%u, rpt=%u)", step, rpt),
+                            HcclResult::HCCL_E_INTERNAL);
+                    } else if (txChannel[0].remoteRank < rxChannel[0].remoteRank) {
+                        SlicesList sendSliceList(txSrcSlices, txDstSlices);
+                        DataInfo sendInfo(txChannel[0], sendSliceList);
+                        CHK_PRT_RET(SendWrite(sendInfo),
+                            HCCL_ERROR("[InsTempAllGatherNHRDPUInter][RunNHR] Send failed (step=%u, rpt=%u)", step, rpt),
+                            HcclResult::HCCL_E_INTERNAL);
+
+                        SlicesList recvSliceList(rxSrcSlices, rxDstSlices);
+                        DataInfo recvInfo(rxChannel[0], recvSliceList);
+                        CHK_PRT_RET(RecvWrite(recvInfo),
+                            HCCL_ERROR("[InsTempAllGatherNHRDPUInter][RunNHR] Recv failed (step=%u, rpt=%u)", step, rpt),
+                            HcclResult::HCCL_E_INTERNAL);
+                    } else {
+                        SlicesList recvSliceList(rxSrcSlices, rxDstSlices);
+                        DataInfo recvInfo(rxChannel[0], recvSliceList);
+                        CHK_PRT_RET(RecvWrite(recvInfo),
+                            HCCL_ERROR("[InsTempAllGatherNHRDPUInter][RunNHR] Recv failed (step=%u, rpt=%u)", step, rpt),
+                            HcclResult::HCCL_E_INTERNAL);
+
+                        SlicesList sendSliceList(txSrcSlices, txDstSlices);
+                        DataInfo sendInfo(txChannel[0], sendSliceList);
+                        CHK_PRT_RET(SendWrite(sendInfo),
+                            HCCL_ERROR("[InsTempAllGatherNHRDPUInter][RunNHR] Send failed (step=%u, rpt=%u)", step, rpt),
+                            HcclResult::HCCL_E_INTERNAL);
+                    }
                 } else if (sendSize > 0) {
                     SlicesList sendSliceList(txSrcSlices, txDstSlices);
                     DataInfo sendInfo(txChannel[0], sendSliceList);

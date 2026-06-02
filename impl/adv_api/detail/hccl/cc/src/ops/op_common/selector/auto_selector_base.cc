@@ -1,77 +1,69 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "auto_selector_base.h"
 #include "selector_registry.h"
+#include "op_common.h"
 
 namespace mc2_ops_hccl {
 
 SelectorStatus AutoSelectorBase::Select(OpParam &opParam, TopoInfoWithNetLayerDetails* topoInfo,
                                         std::string &selectAlgName) const
 {
-    HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] start, opType[%d], opExecuteConfig[%d], engine[%d], "
-        "isMc2[%d], topoInfo[%p].", opParam.opType, opParam.opExecuteConfig, opParam.engine, opParam.isMc2, topoInfo);
+    HCCL_DEBUG("[AutoSelectorBase][%s] start, OpExecuteConfig is %d.", __func__, opParam.opExecuteConfig);
     std::map<HcclCMDType, std::vector<HcclAlgoType>> configAlgMap = GetExternalInputHcclAlgoConfigAllType();
     SelectorStatus ret = SelectorStatus::NOT_MATCH;
     bool hostDPUOnly = false;
-    if ((CheckHostDPUOnly(topoInfo, opParam, hostDPUOnly) == HCCL_SUCCESS) && hostDPUOnly) {
+    if ((CheckHostDPUOnly(opParam.hcclComm, topoInfo, hostDPUOnly) == HCCL_SUCCESS) && hostDPUOnly) {
         opParam.opExecuteConfig = OpExecuteConfig::HOSTCPU;
         opParam.engine = CommEngine::COMM_ENGINE_CPU;
-        HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] switch to host DPU, opType[%d], "
-            "opExecuteConfig[%d], engine[%d].", opParam.opType, opParam.opExecuteConfig, opParam.engine);
         return SelectDPUAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
     }
     if (opParam.opExecuteConfig == OpExecuteConfig::CCU_MS) {
-        HCCL_DEBUG("[asc][AlgoSelect][AutoSelectorBase::Select] try CCU_MS, opType[%d].", opParam.opType);
         ret = SelectCcuMsAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
         if (ret == SelectorStatus::NOT_MATCH) {
             opParam.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
-            HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] CCU_MS not match, fallback to CCU_SCHED, "
-                "opType[%d].", opParam.opType);
         } else {
-            HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] CCU_MS matched, opType[%d], algName[%s].",
-                opParam.opType, selectAlgName.c_str());
             return ret;
         }
     }
     if (opParam.opExecuteConfig == OpExecuteConfig::CCU_SCHED) {
-        HCCL_DEBUG("[asc][AlgoSelect][AutoSelectorBase::Select] try CCU_SCHED, opType[%d].", opParam.opType);
         ret = SelectCcuScheduleAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
         if (ret == SelectorStatus::NOT_MATCH) {
             opParam.opExecuteConfig = OpExecuteConfig::CCU_FAIL;
-            HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED not match, fallback to CCU_FAIL, "
-                "opType[%d].", opParam.opType);
         } else {
-            HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] CCU_SCHED matched, opType[%d], algName[%s].",
-                opParam.opType, selectAlgName.c_str());
             return ret;
         }
     }
     if (ProcessAivConfig(opParam, topoInfo, configAlgMap, selectAlgName, ret)) {
-        HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] AIV config handled, opType[%d], algName[%s], "
-            "opExecuteConfig[%d], status[%d].", opParam.opType, selectAlgName.c_str(), opParam.opExecuteConfig,
-            static_cast<int>(ret));
         return ret;
     }
     if (IsStarsState(opParam.opExecuteConfig)) {
-        HCCL_DEBUG("[asc][AlgoSelect][AutoSelectorBase::Select] try AICPU algo, opType[%d], opExecuteConfig[%d].",
-            opParam.opType, opParam.opExecuteConfig);
+        // level0是PCIE混合的场景，且CLOS规模大于8，alltoall算子选择AIV_ONLY算法
+        if (topoInfo->level0PcieMix && topoInfo->level0BigClosRange &&
+            (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+             opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+             opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLVC)) {
+            opParam.opExecuteConfig = OpExecuteConfig::AIV_ONLY;
+            (void)ProcessAivConfig(opParam, topoInfo, configAlgMap, selectAlgName, ret);
+            HCCL_INFO("[Algo][AutoSelectorBase] The selected algo is %s, OpExecuteConfig is %d.",
+                selectAlgName.c_str(), opParam.opExecuteConfig);
+            return ret;
+        }
         ret = SelectAicpuAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
         if (ret == SelectorStatus::MATCH) {
             opParam.opExecuteConfig = OpExecuteConfig::AICPU_TS;
-            HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] AICPU algo matched, opType[%d], algName[%s], "
-                "opExecuteConfig[%d].", opParam.opType, selectAlgName.c_str(), opParam.opExecuteConfig);
         }
     }
-    HCCL_INFO("[asc][AlgoSelect][AutoSelectorBase::Select] end, opType[%d], status[%d], algName[%s], "
-        "opExecuteConfig[%d], engine[%d].", opParam.opType, static_cast<int>(ret), selectAlgName.c_str(),
-        opParam.opExecuteConfig, opParam.engine);
+    HCCL_INFO("[Algo][AutoSelectorBase] The selected algo is %s, OpExecuteConfig is %d.",
+        selectAlgName.c_str(), opParam.opExecuteConfig);
     return ret;
 }
 
@@ -95,6 +87,14 @@ bool AutoSelectorBase::IsSmallData(const u64 dataSize) const
 bool AutoSelectorBase::IsLargeData(const u64 dataSize) const
 {
     return dataSize >= LARGE_COUNT_1024KB;
+}
+
+bool AutoSelectorBase::IsSmallDataCCU(const u64 dataSize, const u64 rankSize) const
+{
+    if (rankSize == 0) {
+        HCCL_WARNING("the selector is not set RankSize");
+    } 
+    return (dataSize <= CCU_PARALLEL_MAX_DATA_SIZE) ? true : false;
 }
 
 SelectorStatus AutoSelectorBase::SelectCcuMsAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
@@ -145,81 +145,6 @@ SelectorStatus AutoSelectorBase::SelectDPUAlgo(const TopoInfoWithNetLayerDetails
     (void)configAlgMap;
     (void)selectAlgName;
     return SelectorStatus::NOT_MATCH;
-}
-
-// 判断通过最高一个level的网络全部没有device的可达链路，并且有host的可达链路
-HcclResult AutoSelectorBase::CheckHostDPUOnly(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam, bool &hostDPUOnly) const
-{
-    hostDPUOnly = false;
-    HCCL_INFO("Start CheckHostDPUOnly");
-    // 只有一个server，不使用DPU
-    if (topoInfo->serverNum == 1) {
-        HCCL_INFO("Not using hostdpu because serverNum is 1");
-        return HCCL_SUCCESS;
-    }
-
-    uint32_t *netLayers = nullptr;
-    uint32_t netLayerNum = 0;
-    CHK_RET(HcclRankGraphGetLayers(opParam.hcclComm, &netLayers, &netLayerNum));
-    if ((netLayers == nullptr) || (netLayerNum == 0)) {
-        HCCL_WARNING("HcclRankGraphGetLayers fail");
-        return HCCL_E_INTERNAL;
-    }
-
-    bool hostDPU = false;
-    for (uint32_t layerIdx = 0; layerIdx < netLayerNum; layerIdx++) {
-        uint32_t netLayer = netLayers[layerIdx];
-        // 只校验最后一个level
-        if (netLayer < (topoInfo->topoLevelNums - 1)) {
-            HCCL_INFO("Skip checking layer[%u], topoLevelNums is [%u]", netLayer, topoInfo->topoLevelNums);
-            continue;
-        }
-        uint32_t *topoInsts = nullptr;
-        uint32_t topoInsNum = 0;
-        CHK_RET(HcclRankGraphGetTopoInstsByLayer(opParam.hcclComm, netLayer, &topoInsts, &topoInsNum));
-        if ((topoInsts == nullptr) || (topoInsNum == 0)) {
-            HCCL_WARNING("HcclRankGraphGetTopoInstsByLayer fail, netLayer[%u]", netLayer);
-            return HCCL_E_INTERNAL;
-        }
-        for (uint32_t topoInsIdx = 0; topoInsIdx < topoInsNum; topoInsIdx++) {
-            uint32_t topoInstId = topoInsts[topoInsIdx];
-            HCCL_INFO("Start checking topoInstId[%u]", topoInstId);
-            CommTopo topoType;
-            CHK_RET(HcclRankGraphGetTopoType(opParam.hcclComm, netLayer, topoInstId, &topoType));
-            if (topoType != COMM_TOPO_CLOS) {
-                HCCL_INFO("Not using hostdpu because topo type is not COMM_TOPO_CLOS");
-                continue;
-            }
-            uint32_t *ranks = nullptr;
-            uint32_t rankNum = 0;
-            CHK_RET(HcclRankGraphGetRanksByTopoInst(opParam.hcclComm, netLayer, topoInstId, &ranks, &rankNum));
-            // 校验当前rank与其他所有rank连通
-            if (rankNum != topoInfo->userRankSize) {
-                HCCL_INFO("Not using hostdpu because current rank is not fully connected to all other ranks");
-                continue;
-            }
-            uint32_t endPointNums = 0;
-            CHK_RET(HcclRankGraphGetEndpointNum(opParam.hcclComm, netLayer, topoInstId, &endPointNums));
-            EndpointDesc endPointDescs[endPointNums];
-            CHK_RET(HcclRankGraphGetEndpointDesc(opParam.hcclComm, netLayer, topoInstId, &endPointNums, endPointDescs));
-            for (uint32_t endPointIdx = 0; endPointIdx < endPointNums; endPointIdx++) {
-                EndpointDesc endPointDesc = endPointDescs[endPointIdx];
-                if (endPointDesc.loc.locType == ENDPOINT_LOC_TYPE_DEVICE) {
-                    HCCL_INFO("Not using hostdpu because there is links on device in netLayer[%u] in endPointIdx[%u]",
-                        netLayer, endPointIdx);
-                    return HCCL_SUCCESS;
-                } else if (endPointDesc.loc.locType == ENDPOINT_LOC_TYPE_HOST) {
-                    HCCL_INFO("Found a host endPoint in netLayer[%u] endPointIdx[%u]", netLayer, endPointIdx);
-                    hostDPU = true;
-                }
-            }
-        }
-    }
-    if (hostDPU) {
-        HCCL_INFO("Using host dpu trans.");
-        hostDPUOnly = true;
-    }
-    return HCCL_SUCCESS;
 }
 
 bool AutoSelectorBase::IsLayerAllConnetedWithTopo(const TopoInfoWithNetLayerDetails *topoInfo, const u32 netLayer, const CommTopo topoType) const
@@ -298,20 +223,18 @@ bool AutoSelectorBase::IsTwoLevelNetLayer(const TopoInfoWithNetLayerDetails *top
             topoInfo->netLayerDetails.netLayerNum);
         return false;
     }
-
     u32 level1Idx = topoInfo->netLayerDetails.netLayers[1];
     bool hasLevel1Clos = topoInfo->topoInstDetailsOfLayer.size() > level1Idx &&
         topoInfo->topoInstDetailsOfLayer[level1Idx].rankNumForTopoType.find(COMM_TOPO_CLOS) !=
             topoInfo->topoInstDetailsOfLayer[level1Idx].rankNumForTopoType.end();
     if (!hasLevel1Clos) {
-        HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] level1[%u] has no CLOS topo, not two level net layer.",
-            level1Idx);
+        HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] level1[%u] has no CLOS topo, not two level net layer.", level1Idx);
         return false;
     }
-    if (topoInfo->netLayerDetails.localNetInsSizeOfLayer.empty() ||
+    if (topoInfo->netLayerDetails.localNetInsSizeOfLayer.size() < 1 ||
         topoInfo->netLayerDetails.localNetInsSizeOfLayer[0] <= 1) {
-        HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] level0 localNetInsSizeOfLayer[%zu] <= 1, not two level "
-            "net layer.", topoInfo->netLayerDetails.localNetInsSizeOfLayer.size());
+        HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] level0 localNetInsSizeOfLayer[%zu] <= 1, not two level net layer.",
+            topoInfo->netLayerDetails.localNetInsSizeOfLayer.size());
         return false;
     }
     HCCL_INFO("[AutoSelectorBase][IsTwoLevelNetLayer] topoLevelNums[%u], netLayerNum[%u], level0Topo[MESH_1D], "
@@ -362,7 +285,7 @@ bool AutoSelectorBase::ProcessAivConfig(OpParam &opParam, TopoInfoWithNetLayerDe
                                         std::string &selectAlgName, SelectorStatus &ret) const
 {
     if (opParam.opExecuteConfig != OpExecuteConfig::AIV && opParam.opExecuteConfig != OpExecuteConfig::AIV_ONLY) {
-        return false; 
+        return false;
     }
 
     ret = SelectAivAlgo(topoInfo, opParam, configAlgMap, selectAlgName);
@@ -372,10 +295,10 @@ bool AutoSelectorBase::ProcessAivConfig(OpParam &opParam, TopoInfoWithNetLayerDe
             return true;
         }
         opParam.opExecuteConfig = OpExecuteConfig::CCU_FAIL;
-        return false; 
-    } 
-    
-    return true; 
+        return false;
+    }
+
+    return true;
 }
 
 }

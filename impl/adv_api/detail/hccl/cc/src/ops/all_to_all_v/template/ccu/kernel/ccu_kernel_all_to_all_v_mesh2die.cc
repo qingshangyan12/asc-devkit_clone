@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ccu_kernel_all_to_all_v_mesh2die.h"
 
 namespace mc2_ops_hccl {
@@ -22,11 +23,6 @@ CcuKernelAllToAllVMesh2Die::CcuKernelAllToAllVMesh2Die(const hcomm::CcuKernelArg
     : CcuKernelAlgBase(arg)
 {
     const CcuKernelArgAllToAllVMesh2Die *kernelArg = dynamic_cast<const CcuKernelArgAllToAllVMesh2Die *>(&arg);
-    if (kernelArg == nullptr) {
-        HCCL_ERROR("[CcuKernelAllToAllVMesh2Die] kernelArg ptr is null.");
-        return;
-    }
-
     channels_ = kernelArg->channels;
 
     rankId_ = kernelArg->rankId_;
@@ -307,11 +303,6 @@ HcclResult CcuKernelAllToAllVMesh2Die::Algorithm()
 std::vector<uint64_t> CcuKernelAllToAllVMesh2Die::GeneArgs(const CcuTaskArg &arg)
 {
     const CcuTaskArgAllToAllVMesh2Die *taskArg = dynamic_cast<const CcuTaskArgAllToAllVMesh2Die *>(&arg);
-    if (taskArg == nullptr) {
-        HCCL_ERROR("[CcuKernelAllToAllVMesh2Die] taskArg ptr is null. RankId[%u]", rankId_);
-        return {};
-    }
-
     uint64_t inputAddr  = taskArg->inputAddr_;
     uint64_t outputAddr = taskArg->outputAddr_;
     uint64_t tokenInfo  = taskArg->token_;

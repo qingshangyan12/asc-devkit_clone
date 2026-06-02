@@ -1,14 +1,15 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-#ifndef MC2_OPS_HCCL_SRC_OPS_SEND_OP
-#define MC2_OPS_HCCL_SRC_OPS_SEND_OP
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef OPS_HCCL_SRC_OPS_SEND_OP
+#define OPS_HCCL_SRC_OPS_SEND_OP
 
 #include <string>
 
@@ -42,7 +43,7 @@ namespace mc2_ops_hccl {
         const OpMode &opMode, const std::string &tag, const ResPackGraphMode &resPack = ResPackGraphMode());
     HcclResult SendEntryLog(void *sendBuf, uint64_t count, HcclDataType dataType, uint32_t destRank,
         aclrtStream stream, const std::string &tag, const std::string &opName);
-    } // namespace mc2_ops_hccl
+} // namespace mc2_ops_hccl
 
-// ifndef MC2_OPS_HCCL_SRC_OPS_SEND_OP
+// ifndef OPS_HCCL_SRC_OPS_SEND_OP
 #endif

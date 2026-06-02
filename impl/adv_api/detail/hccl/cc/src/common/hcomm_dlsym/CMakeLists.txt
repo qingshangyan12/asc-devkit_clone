@@ -14,7 +14,9 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
         ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu
 
     )
 else()
@@ -125,7 +127,9 @@ if(PRODUCT_SIDE STREQUAL "host")
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
-        ccu_func_dl.cc
+        ccu_res_dl.cc
+        hccl_ccu_res_dl.cc
+        ccu_launch_dl.cc
     )
 endif()
 

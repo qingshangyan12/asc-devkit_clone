@@ -1,18 +1,21 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_v2_all_gather_v_sole_executor.h"
 #include "topo_match_1d.h"
 #include "ins_temp_all_gather_v_mesh_1D.h"
 
 #ifndef AICPU_COMPILE
+#if !defined(HCCL_CANN_COMPAT_850)
 #include "ccu_temp_all_gather_v_mesh_1D_mem2mem.h"
+#endif /* !HCCL_CANN_COMPAT_850 */
 #endif
 namespace mc2_ops_hccl {
 
@@ -38,7 +41,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes(Hc
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
     // 调用计算资源的函数
-    algTemplate->CalcRes(comm, param, topoInfo, resourceRequest);
+    CHK_RET(algTemplate->CalcRes(comm, param, topoInfo, resourceRequest));
     myRank_ = topoInfo->userRank;
     return HCCL_SUCCESS;
 }
@@ -143,6 +146,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
     // 带V算子统计所有Rank的processedDataCount
     std::vector<u64> allRankProcessedDataCount(rankSize_, 0);
     tempAlgParams.sliceSize = 0;
+    tempAlgParams.tailSize = 0;
     for (u64 loop = 0; loop < loopTimes; loop++) {
         tempAlgParams.allRankSliceSize = {};
         for (u64 i = 0; i < rankSize_; i++) {
@@ -157,7 +161,6 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
         tempAlgParams.buffInfo.outBuffBaseOff = processedDataCount * dataTypeSize_;
         tempAlgParams.allRankProcessedDataCount = allRankProcessedDataCount;
         tempAlgParams.buffInfo.hcclBuffBaseOff = 0;
-        tempAlgParams.tailSize = tempAlgParams.sliceSize;
         // 这里的stride当成传统意义上的sreide 间隔
         tempAlgParams.inputSliceStride = dataSize_;  // 如果是输入，偏移是算子的output datasize
         tempAlgParams.outputSliceStride =
@@ -183,6 +186,7 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
         for (u64 i = 0; i < rankSize_; i++) {
             allRankProcessedDataCount[i] += tempAlgParams.allRankSliceSize[i] / dataTypeSize_;
         }
+        tempAlgParams.tailSize += maxCountPerLoop;
     }
     HCCL_INFO("[InsV2AllGatherVSoleExecutor][OrchestrateLoop] End.");
     return HCCL_SUCCESS;
@@ -191,7 +195,9 @@ HcclResult InsV2AllGatherVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrat
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER_V, InsAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
     InsTempAllGatherVMesh1D);
 #ifndef AICPU_COMPILE
+#if !defined(HCCL_CANN_COMPAT_850)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER_V, CcuAllGatherVMesh1D, InsV2AllGatherVSoleExecutor, TopoMatch1D,
     CcuTempAllGatherVMesh1DMem2Mem);
+#endif /* !HCCL_CANN_COMPAT_850 */
 #endif
 }  // namespace mc2_ops_hccl

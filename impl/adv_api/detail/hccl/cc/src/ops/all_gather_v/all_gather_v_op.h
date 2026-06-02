@@ -1,14 +1,15 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
-#ifndef MC2_OPS_HCCL_SRC_OPS_ALL_GATHER_V_OP
-#define MC2_OPS_HCCL_SRC_OPS_ALL_GATHER_V_OP
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#ifndef OPS_HCCL_SRC_OPS_ALL_GATHER_V_OP
+#define OPS_HCCL_SRC_OPS_ALL_GATHER_V_OP
 
 #include <string>
 #include <memory>
@@ -44,7 +45,7 @@ HcclResult AllGatherVEntryLog(void *sendBuf, void *recvBuf, uint64_t sendCount, 
 HcclResult AllGatherVOutPlaceGraphMode(void *sendBuf, void *recvBuf, uint64_t sendCount, const void *recvCounts,
  	const void *recvDispls, HcclDataType dataType, HcclComm comm, aclrtStream stream, const std::string &tag, const ResPackGraphMode &resPack);
 
-HcclResult CheckAllGatherVInputPara(const HcclComm comm, const void* sendBuf, const void* recvBuf);
+HcclResult CheckAllGatherVInputPara(const HcclComm comm, const void* recvBuf, const void *recvCounts, const void *recvDispls, const aclrtStream stream);
 
 HcclResult AllGatherVExecOp(HcclComm comm, OpParam &param);
 

@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_temp_send_dpu.h"
 
 namespace mc2_ops_hccl
@@ -43,7 +44,7 @@ namespace mc2_ops_hccl
 
     // ! 基本编码完成，剩余数据序列化
     HcclResult InsTempSendDpu::KernelRun(
-        const OpParam &param, const TemplateDataParams &tempAlgParams, const TemplateResource &templateResource)
+        const OpParam &param, const TemplateDataParams &tempAlgParams, TemplateResource &templateResource)
     {
         // 得到thread和channel
         recvRank_ = param.sendRecvRemoteRank;
@@ -80,12 +81,12 @@ namespace mc2_ops_hccl
             // 转换成eager-mode，保障AICPU指令下发执行完成
             if (HcommBatchModeEnd(param.algTag) != HCCL_SUCCESS)
             {
-                HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+                HCCL_ERROR("[InsTempSendDpu] failed set eager mode, tag is %s.", param.algTag);
                 return HCCL_E_INTERNAL;
             }
             if (HcommThreadSynchronize(thread_) != 0)
             {
-                HCCL_ERROR("HcommThreadSynchronize failed");
+                HCCL_ERROR("[InsTempSendDpu] HcommThreadSynchronize failed");
                 return HCCL_E_INTERNAL;
             }
             DPURunInfo dpuRunInfo;
@@ -103,31 +104,31 @@ namespace mc2_ops_hccl
                                  dpuRunInfoSeqData.size(),
                                  &sendMsgId) != 0)
             {
-                HCCL_ERROR("HcommSendRequest failed");
+                HCCL_ERROR("[InsTempSendDpu] HcommSendRequest failed");
                 return HCCL_E_INTERNAL;
             }
-            HCCL_INFO("HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
+            HCCL_INFO("[InsTempSendDpu] HcommSendRequest run over, sendMsgId[%u]", sendMsgId);
             // 等待DPU数据传输，然后回写结果回来
             void *recvData = nullptr;
             u32 recvMsgId = 0;
             if (HcommWaitResponse(reinterpret_cast<uint64_t>(templateResource.dpu2NpuShmemPtr), recvData, 0, &recvMsgId) !=
                 0)
             {
-                HCCL_ERROR("HcommWaitResponse failed");
+                HCCL_ERROR("[InsTempSendDpu] HcommWaitResponse failed");
                 return HCCL_E_INTERNAL;
             }
 
             // 将执行模式转换回到batch
             if (HcommBatchModeStart(param.algTag) != HCCL_SUCCESS)
             {
-                HCCL_ERROR("failed set eager mode, tag is %s.", param.algTag);
+                HCCL_ERROR("[InsTempSendDpu] failed set eager mode, tag is %s.", param.algTag);
                 return HCCL_E_INTERNAL;
             }
-            HCCL_INFO("HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
+            HCCL_INFO("[InsTempSendDpu] HcommWaitResponse run over, recvMsgId[%u]", recvMsgId);
 
             if (recvMsgId != sendMsgId)
             {
-                HCCL_ERROR("recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
+                HCCL_ERROR("[InsTempSendDpu] recvMsgId[%u] not equal to sendMsgId[%u]", recvMsgId, sendMsgId);
                 return HCCL_E_INTERNAL;
             }
             HCCL_INFO("[InsTempSendDpu] Run End");

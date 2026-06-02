@@ -1,12 +1,13 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
 #include "ins_v2_broadcast_sequence_executor.h"
 #include "ins_temp_scatter_mesh_1D_intra.h"
 #include "ins_temp_scatter_nhr_dpu_inter.h"
@@ -75,10 +76,10 @@ HcclResult InsV2BroadcastSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     AlgResourceRequest resReqScatterInter;
     AlgResourceRequest resReqAllGatherInter;
 
-    intraScatterTempAlg->CalcRes(comm, param, topoInfo, resReqScatterIntra);
-    intraAllGatherTempAlg->CalcRes(comm, param, topoInfo, resReqAllGatherIntra);
-    interScatterTempAlg->CalcRes(comm, param, topoInfo, resReqScatterInter);
-    interAllGatherTempAlg->CalcRes(comm, param, topoInfo, resReqAllGatherInter);
+    CHK_RET(intraScatterTempAlg->CalcRes(comm, param, topoInfo, resReqScatterIntra));
+    CHK_RET(intraAllGatherTempAlg->CalcRes(comm, param, topoInfo, resReqAllGatherIntra));
+    CHK_RET(interScatterTempAlg->CalcRes(comm, param, topoInfo, resReqScatterInter));
+    CHK_RET(interAllGatherTempAlg->CalcRes(comm, param, topoInfo, resReqAllGatherInter));
 
     // step1在完成后，完成后同步后展开step2，因此slaveThread和对应notify可以复用
     resourceRequest.slaveThreadNum = std::max({resReqScatterIntra.slaveThreadNum,
@@ -136,9 +137,6 @@ HcclResult InsV2BroadcastSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
 
     rankSizeLevel0_ = algHierarchyInfo_.infos[0][0].size();
     rankSizeLevel1_ = algHierarchyInfo_.infos[1][0].size();
-
-    // 计算框内的root同号卡
-    intraLocalRoot_ = root_ % rankSizeLevel0_ + rankIdxLevel1_ * rankIdxLevel0_;
 
     dataCount_ = param.DataDes.count;
     dataTypeSize_ = SIZE_TABLE[param.DataDes.dataType];
@@ -251,9 +249,7 @@ HcclResult InsV2BroadcastSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
         tempAlgParamsScatterIntra.inputRepeatStride = 0;
         tempAlgParamsScatterIntra.outputRepeatStride = 0;
         // 因为只考虑执行0级算法，所以传进template里面的channels就是channels_的第一个vector
-        if(intraLocalRoot_ = root_) {
-            CHK_RET(algTemplateScatterIntra->KernelRun(param, tempAlgParamsScatterIntra, templateResourceIntra));
-        }
+        CHK_RET(algTemplateScatterIntra->KernelRun(param, tempAlgParamsScatterIntra, templateResourceIntra));
 
         // ----------- 框间Scatter数据搬运 -----------
         // 框间的数据偏移和搬运计算
@@ -398,6 +394,8 @@ HcclResult InsV2BroadcastSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     InsAlgTemplate3>::SplitData(const u64 &dataCount, const uint64_t &rankSize, TemplateDataParams &tempAlgParams)
 {
     u32 sliceNum = rankSize;
+    u64 offsetCount = 0;
+    u64 offsetSize = 0;
     tempAlgParams.allRankSliceSize.clear();
     tempAlgParams.allRankDispls.clear();
     tempAlgParams.allRankProcessedDataCount.clear();
@@ -408,20 +406,18 @@ HcclResult InsV2BroadcastSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
     u64 sliceCount = RoundUp(dataCount, sliceNum);
     u64 sliceSize = sliceCount * dataTypeSize_;
 
-    u64 offsetCount = 0;
-    u64 offsetSize = 0;
     for (u32 sliceIdx = 0; sliceIdx < sliceNum; ++sliceIdx) {
         if (dataCount - offsetCount >= sliceCount) {
-            tempAlgParams.allRankSliceSize.emplace_back(sliceSize);
             tempAlgParams.allRankDispls.emplace_back(offsetSize);
+            tempAlgParams.allRankSliceSize.emplace_back(sliceSize);
             tempAlgParams.allRankProcessedDataCount.emplace_back(sliceCount);
             offsetCount += sliceCount;
             offsetSize = offsetCount * dataTypeSize_;
         } else {
             u64 curSliceCount = dataCount - offsetCount;
             u64 curSliceSize = curSliceCount * dataTypeSize_;
-            tempAlgParams.allRankSliceSize.emplace_back(curSliceSize);
             tempAlgParams.allRankDispls.emplace_back(offsetSize);
+            tempAlgParams.allRankSliceSize.emplace_back(curSliceSize);
             tempAlgParams.allRankProcessedDataCount.emplace_back(curSliceCount);
             offsetCount = dataCount;
             offsetSize = offsetCount * dataTypeSize_;
