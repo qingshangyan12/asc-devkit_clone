@@ -24,7 +24,7 @@
 
 仅支持如下数据通路的搬运：L1->L0B。
 
-**图 1**  L1->L0B LoadDataWithSparse示意图，LoadData2dParams参数配置startIndex = 1，repeatTimes = 5，表示需要从源操作数src中第1块数据分形开始搬运5块连续的数据分形，从源操作idx中第1块index分形开始搬运5块连续的index分形。<a name="zh-cn_topic_0000002512171654_fig71111314164414"></a>  
+**图 1**  L1->L0B LoadDataWithSparse示意图，LoadData2dParams参数配置startIndex = 1，repeatTimes = 5，表示需要从源操作数src中第1块数据分形开始搬运5块连续的数据分形，从源操作数idx中第1块index分形开始搬运5块连续的index分形。<a name="zh-cn_topic_0000002512171654_fig71111314164414"></a>  
 ![](../../../../../figures/loaddatawithsparse_l12l0b.png)
 
 ## 函数原型<a name="zh-cn_topic_0000002512171654_section82039854412"></a>
@@ -50,7 +50,7 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 |dst|输出| 目的操作数，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>支持的数据类型为int8_t。<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的物理存储位置为L0B Buffer(TPosition: B2)。<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的物理存储位置为L0B Buffer(TPosition: B2)。 |
 |src|输入| 源操作数，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>支持的数据类型为int8_t。<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。 |
 |idx|输入| 源操作数，类型为LocalTensor。<br>数据分形大小为128Byte，每个数据分形shape为16 \* 32 \* 2bit。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>支持的数据类型为uint8_t。<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的物理存储位置为L1 Buffer(TPosition: B1)。 |
-|loadDataParam|输入| LoadData参数结构体，类型为：<br>&bull; LoadData2DParams，具体参考[LoadData2DParams结构体内参数说明](Load2D.md)。<br>需要注意的是，本接口仅支持连续的数据分形搬运，不支持跳stride，因此仅支持配置loadDataParam中的startIndex和repeatTimes参数，其余参数未使用，无需配置。 |
+|loadDataParam|输入| LoadData参数结构体，类型为：<br>&bull; LoadData2dParams，具体参考[LoadData2dParams结构体内参数说明](Load2D.md)。<br>需要注意的是，本接口仅支持连续的数据分形搬运，不支持跳stride，因此仅支持配置loadDataParam中的startIndex和repeatTimes参数，其余参数未使用，无需配置。 |
 
 ## 数据类型<a name="zh-cn_topic_0000002512171654_section4219135304818"></a>
 
@@ -60,10 +60,10 @@ Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为�
 
 ## 约束说明<a name="zh-cn_topic_0000002512171654_section2045914466492"></a>
 
-- 当配置loadDataParam中参数repeatTimes=0表示不执行。表示不执行搬运，该接口将被视为NOP（空操作）。最大支持repeatTimes=255。
+- 当配置loadDataParam中参数repeatTimes=0时，表示不执行搬运，该接口将被视为NOP（空操作）。最大支持repeatTimes=255。
 - 不支持转置功能，仅支持连续的数据分形搬运，不支持跳stride，仅支持配置loadDataParam中的startIndex和repeatTimes参数，其余参数未使用。
 - 存放索引矩阵的专用buffer空间大小为L0B大小的四分之一，开发者无需配置地址，MmadWithSparse接口会自动从该buffer中读取数据。
-- 仅支持L1->L0B通路，且L1上的分型为Zn。
+- 仅支持L1->L0B通路，且L1上的分形为Zn。
 - 每次迭代中的startIndex不能小于零。
 
 ## 返回值说明<a name="zh-cn_topic_0000002512171654_section640mcpsimp"></a>

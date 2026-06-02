@@ -18,15 +18,15 @@
 
 头文件路径为："basic_api/kernel_operator_mm_intf.h"
 
-负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运，支持如下数据通路的搬运：
+负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行，支持如下数据通路：
 
 L1->L0A、L1->L0B。
 
-对于b4数据类型，每个数据分形在L0A中为一个16×64的矩阵，在L0B中为一个64×16的矩阵，
+对于b4数据类型，每个数据分形在L0A中为一个16×64的矩阵，在L0B中为一个64×16的矩阵。
 
-对于b8数据类型，每个数据分形在L0A中为一个16×32的矩阵，在L0B中为一个32×16的矩阵，
+对于b8数据类型，每个数据分形在L0A中为一个16×32的矩阵，在L0B中为一个32×16的矩阵。
 
-对于b16数据类型，每个数据分形为一个16×16的矩阵，
+对于b16数据类型，每个数据分形为一个16×16的矩阵。
 
 对于b32数据类型，每个数据分形在L0A中为一个16×8的矩阵，在L0B中为一个8×16的矩阵。
 
@@ -50,7 +50,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |参数名称|输入/输出|含义|
 |----------|-----------|------|
 |dst|输出|目的操作数，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>数据类型和src的数据类型保持一致。<br>支持的物理存储位置为L0A Buffer（TPosition: A2）/L0B Buffer（TPosition: B2）。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>数据类型和dst的数据类型保持一致。<br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）/Global Memory（TPosition: GM）。|
+|src|输入|源操作数，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>数据类型和dst的数据类型保持一致。<br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）/Global Memory（TPosition: GM）。|
 |loadDataParam|输入|LoadData参数结构体，类型为LoadData2DParamsV2，具体参考表3。|
 
 **表3** LoadData2DParamsV2结构体内参数说明
@@ -59,7 +59,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |----------|------|
 |mStartPosition|以M×K矩阵为例，源矩阵M轴方向的起始位置，单位为16个元素。|
 |kStartPosition|以M×K矩阵为例，源矩阵K轴方向的起始位置，单位为32B。|
-|mStep|以M×K矩阵为例，源矩阵M轴方向搬运长度，单位为16 element。取值范围：mStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，mStep除需满足取值范围外，还需满足以下额外约束：<br>&bull; 当数据类型为b4时，mStep必须是4的倍数；<br>&bull; 当数据类型为b8时，mStep必须是2的倍数；<br>&bull; 当数据类型为b16时，mStep必须是1的倍数；<br>&bull; 当数据类型为b32时，mStep无额外约束。<br>**注：mStep=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|mStep|以M×K矩阵为例，源矩阵M轴方向搬运长度，单位为16 elements。取值范围：mStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，mStep除需满足取值范围外，还需满足以下额外约束：<br>&bull; 当数据类型为b4时，mStep必须是4的倍数；<br>&bull; 当数据类型为b8时，mStep必须是2的倍数；<br>&bull; 当数据类型为b16时，mStep必须是1的倍数；<br>&bull; 当数据类型为b32时，mStep无额外约束。<br>**注：mStep=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kStep|以M×K矩阵为例，源矩阵K轴方向搬运长度，单位为32B。取值范围：kStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，kStep除需满足取值范围外，还需满足以下额外约束：<br>&bull; 当数据类型为b4、b8或b16时，kStep没有额外约束；<br>&bull; 当数据类型为b32时，kStep必须是2的倍数。<br>**注：kStep=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |srcStride|以M×K矩阵为例，源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512B。|
 |dstStride|以M×K矩阵为例，目标矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512B。|

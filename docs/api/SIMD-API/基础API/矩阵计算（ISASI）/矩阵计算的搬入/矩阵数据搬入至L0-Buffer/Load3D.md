@@ -110,7 +110,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |dilationFilterH|卷积核height膨胀系数，取值范围：dilationFilterH∈[1, 255]。|
 |jumpStride|迭代之间，目的操作数首地址步长，取值范围：jumpStride∈[1, 127]。|
 |repeatMode|迭代模式。<br>&bull; 模式0：每次迭代，增加卷积核窗口中的点，对应在目的矩阵上往w维度方向增长。<br>&bull; 模式1：每次迭代，增加滑动窗口左上坐标，对应在目的矩阵上往h维度方向增长。<br>取值范围：repeatMode∈[0, 1]。默认为0。|
-|repeatTime|迭代次数，每一次源操作数和目的操作数的地址都会改变。取值范围：repeatTime∈[1，255]。|
+|repeatTime|迭代次数，每一次源操作数和目的操作数的地址都会改变。取值范围：repeatTime∈[1, 255]。|
 |cSize|配置是否开启cSize = 4(b16) / cSize = 8(b8)优化，取值范围：cSize∈[0, 1]。默认为0。|
 |padValue|Pad填充值的数值，数据类型需要与src保持一致。默认为0。若不想开启padding，可将padList设为全0。|
 
@@ -125,7 +125,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0,255]。默认为{0, 0, 0, 0}。|
 |l1H|源操作数height，取值范围：l1H∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1H = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |l1W|源操作数weight，取值范围：l1W∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1W = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|channelSize|源操作数的通道数，取值范围：channelSize∈[0, 65535]。默认为0。<cann-filter npu_type="310p"><br>&bull; 针对Atlas 推理系列产品 AI Core：对于half，channelSize可取值为4，8，16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，ChannelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><cann-filter npu_type="950,A3,910b,310b,x90"><br>&bull; 针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90：对于uint32_t/int32_t/float，channelSize可取值为4，N \* 8，N \* 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N \* 16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 \* N，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，ChannelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><br>**注：针对Atlas A2/A3系列产品，channelSize = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|channelSize|源操作数的通道数，取值范围：channelSize∈[0, 65535]。默认为0。<cann-filter npu_type="310p"><br>&bull; 针对Atlas 推理系列产品 AI Core：对于half，channelSize可取值为4，8，16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，channelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><cann-filter npu_type="950,A3,910b,310b,x90"><br>&bull; 针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90：对于uint32_t/int32_t/float，channelSize可取值为4，N \* 8，N \* 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N \* 16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 \* N，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，channelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><br>**注：针对Atlas A2/A3系列产品，channelSize = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kExtension|该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于b32类型，应为8的倍数，对于b16类型，应为16的倍数，对于b8类型，应为32的倍数，对于b4类型，应为64的倍数；覆盖的情况则任何数据类型都无倍数要求。取值范围：kExtension∈[0, 65535]。默认为0。<br>**注：针对Atlas A2/A3系列产品，kExtension = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |mExtension|该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于b4、b8、b16类型，应为16的倍数，b32类型无要求；覆盖的情况则任何数据类型都无倍数要求。取值范围：mExtension∈[0, 65535]。默认为0。<br>**注：针对Atlas A2/A3系列产品，mExtension = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kStartPt|该指令在目的操作数width维度的起点，对于b32类型，应为8的倍数，对于b16类型，应为16的倍数，对于b8类型，应为32的倍数，对于b4类型，应为64的倍数；取值范围[0, 65535]。默认为0。|
@@ -151,7 +151,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|------|
-|channelSize|源操作数的通道数，取值范围：channelSize∈[1, 63]。<br>对于half，channelSize除16的余数应当为0，4或8。<br>对于int8_t和uint8_t，channelSize除32的余数应当为0，4，8或16。<br>对于int4b_t，ChannelSize为8，16，32，N*64，N*64+8，N*64+16，N*64+32，N为正整数。|
+|channelSize|源操作数的通道数，取值范围：channelSize∈[1, 63]。<br>对于half，channelSize除16的余数应当为0，4或8。<br>对于int8_t和uint8_t，channelSize除32的余数应当为0，4，8或16。<br>对于int4b_t，channelSize为8，16，32，N*64，N*64+8，N*64+16，N*64+32，N为正整数。|
 |enTranspose|是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。<br>&bull; true：启用<br>&bull; false：不启用|
 |enSmallK|是否开启small k特性，每个分形矩阵大小为16*4，支持数据类型为bool，默认为false。<br>**注：当前产品形态，该特性已不再支持。**|
 |filterSizeW|是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。|
@@ -226,7 +226,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ### 使用Load3D完成矩阵计算所需2D格式数据的搬运<a id="zh-cn_topic_0000002512171652_section86392366416"></a>
 
-对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to colum展开后的数据排布可以看成矩阵计算过程中L1上的NZ分形排布，因此该场景下可以使用Load3D接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
+对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to column展开后的数据排布可以看成矩阵计算过程中L1上的NZ分形排布，因此该场景下可以使用Load3D接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
 
 ![](../../../../../figures/load3d_3d22d_demo.png)
 
@@ -319,9 +319,9 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 
 要求输入的feature map和filter的格式是NC1HWC0，其中C0是最低维度而且C0是固定值为16（对于u8/s8类型为32），C1=C/C0。
 
-为了简化场景，以下场景假设输入的feature map的channel为4，即Ci=4。输入feature maps在A1中的形状为(Hi,Wi,Ci)，经过load3d处理后在A2的数据形状为(Wo\*Ho, Hk\*Wk\*Ci)。其中Wo和Ho是卷积后输出的shape，Hk和Wk是filter的shape。
+为了简化场景，以下场景假设输入的feature map的channel为4，即Ci=4。输入feature maps在A1中的形状为(Hi,Wi,Ci)，经过Load3D处理后在A2的数据形状为(Wo\*Ho, Hk\*Wk\*Ci)。其中Wo和Ho是卷积后输出的shape，Hk和Wk是filter的shape。
 
-直观的来看，img2col的过程就是filter在feature map上扫过，将对应feature map的数据展开成输出数据的每一行的过程。filter首先在W方向上滑动Wo步，然后在H方向上走一步然后重复以上过程，最终输出Wo\*Ho行数据。下图中红色和黄色的数据分别代表第一行和第二行。数字表示原始输入数据，filter和输出数据三者之间的关联关系。可以看到，load3d首先在输入数据的Ci维度搬运对应于00的4个数，然后搬运对应于01的四个数，最终这一行的大小为Hk\*Wk\*Ci即3\*3\*4=36个数。
+直观地来看，img2col的过程就是filter在feature map上扫过，将对应feature map的数据展开成输出数据的每一行的过程。filter首先在W方向上滑动Wo步，然后在H方向上走一步然后重复以上过程，最终输出Wo\*Ho行数据。下图中红色和黄色的数据分别代表第一行和第二行。数字表示原始输入数据，filter和输出数据三者之间的关联关系。可以看到，Load3D首先在输入数据的Ci维度搬运对应于00的4个数，然后搬运对应于01的四个数，最终这一行的大小为Hk\*Wk\*Ci即3\*3\*4=36个数。
 
 对应的feature map格式如下图：
 
@@ -342,7 +342,7 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 
 对于A2的feature map来说有两种方案，水平分块和垂直分块。分别对应参数中repeatMode的0和1。
 
-注：下图中的分型矩阵大小为4x4，实际应该为16x16 (对于u8/s8类型为16x32)
+注：下图中的分形矩阵大小为4x4，实际应该为16x16 (对于u8/s8类型为16x32)
 
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
@@ -368,14 +368,14 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 
 ```cpp
 // Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci \* kh \* kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用load3d接口，实现NZ2ZZ
+// 使用Load3D接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 // 源操作数height
 loadDataParams.l1H = 1;
 // 源操作数wight
 loadDataParams.l1W = CeilAlign(k, fractalShape[0]);
 // 源操作数的通道数，
-// img2col的结果矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho \* wo = loadDataParams.l1H \* loadDataParams.l1w
+// img2col的结果矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：ho \* wo = loadDataParams.l1H \* loadDataParams.l1W
 // img2col的结果矩阵宽度为ci \* kh \* kw，代入kh=1，kw=1，可知结果矩阵的宽度为ci=loadDataParams.channelSize = m
 loadDataParams.channelSize = CeilAlign(m, fractalShape[1]);
 // 该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。

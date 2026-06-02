@@ -67,7 +67,7 @@ template <typename T>
 __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DParams_);
 ```
 
-也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对congfig0和config1直接进行逐bit位修改来修改参数。
+也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
 
 **表 4**  Load3DBitModeConfig0结构体参数说明<a name="table184321224173"></a>
 
