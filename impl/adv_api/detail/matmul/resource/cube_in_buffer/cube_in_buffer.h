@@ -36,6 +36,10 @@
 #include "cube_in_buffer_bmm_db.h"
 #endif
 
+#if (__NPU_ARCH__ == 5102)
+#include "cube_in_buffer_bmm_db.h"
+#endif
+
 #endif // _CUBE_IN_BUFFER_H_
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_DETAIL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_H__)
