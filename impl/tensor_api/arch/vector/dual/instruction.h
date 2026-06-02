@@ -30,6 +30,23 @@ namespace AscendC {
 namespace Te {
 namespace Inst {
 
+class CreateMask {
+public:
+    template <typename T, typename PatType>
+    __simd_callee__ inline static vector_bool Run()
+    {
+        if constexpr (sizeof(T) == sizeof(uint32_t)) {
+            return asc_create_mask_b32(PatType());
+        } else if constexpr (sizeof(T) == sizeof(uint16_t)) {
+            return asc_create_mask_b16(PatType());
+        } else if constexpr (sizeof(T) == sizeof(uint8_t)) {
+            return asc_create_mask_b8(PatType());
+        } else {
+            return vector_bool{};
+        }
+    }
+};
+
 class Mull{
 public:
     template<typename T>
