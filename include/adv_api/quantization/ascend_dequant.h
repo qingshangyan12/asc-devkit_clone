@@ -52,6 +52,8 @@ namespace AscendC {
  * \param [in] params: DequantParams with m, n, calcount to describe the calculation process like above.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
 {
@@ -79,6 +81,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] params: DequantParams with m, n, calcount to describe the calculation process like above.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale, DequantParams params)
 {
@@ -113,6 +117,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] calCount: The number of elements in srcTensor to be processed.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
@@ -138,6 +144,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] calCount: The number of elements in srcTensor to be processed.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale, const uint32_t calCount)
 {
@@ -171,6 +179,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -196,6 +206,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] deqScale: Input deqScale localTensor
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const LocalTensor<scaleT>& deqScale)
 {
@@ -230,6 +242,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] params: DequantParams with m, n, calcount to describe the calculation process like above.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const scaleT deqScale, const LocalTensor<uint8_t>& sharedTmpBuffer, DequantParams params)
 {
@@ -259,6 +273,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
  * \param [in] params: DequantParams with m, n, calcount to describe the calculation process like above.
  */
 template <typename dstT, typename scaleT, DeQuantMode mode = DeQuantMode::DEQUANT_WITH_SINGLE_ROW>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<int32_t>& srcTensor,
     const scaleT deqScale, DequantParams params)
 {
@@ -272,6 +288,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
                                      const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
                                      const AscendDeQuantParam& para)
@@ -282,6 +300,8 @@ __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const L
 }
 
 template <typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "AscendDequant is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AscendDequant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
                                      const LocalTensor<scaleT> &scaleTensor, const LocalTensor<scaleT> &offsetTensor,
                                      const LocalTensor<uint8_t> &sharedTmpBuffer, const AscendDeQuantParam& para)

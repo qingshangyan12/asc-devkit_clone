@@ -51,6 +51,8 @@ namespace AscendC {
  * \param [in] params: DequantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "Dequantize is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
     const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const DequantizeParams& params)
@@ -78,6 +80,8 @@ __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const Loca
  * \param [in] params: DequantizeParams with m, n, groupSize to describe the calculation process like above.
  */
 template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "Dequantize is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
     const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
