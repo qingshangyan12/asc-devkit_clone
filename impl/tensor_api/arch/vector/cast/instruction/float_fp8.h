@@ -35,31 +35,31 @@ public:                                                                         
 }
 
 ASCENDC_CAST_INST(E4M32Float, asc_e4m32float);
-ASCENDC_CAST_INST(E4M32FloatP2, asc_e4m32float_v2);
-ASCENDC_CAST_INST(E4M32FloatP3, asc_e4m32float_v3);
-ASCENDC_CAST_INST(E4M32FloatP4, asc_e4m32float_v4);
+ASCENDC_CAST_INST(E4M32FloatP1, asc_e4m32float_v2);
+ASCENDC_CAST_INST(E4M32FloatP2, asc_e4m32float_v3);
+ASCENDC_CAST_INST(E4M32FloatP3, asc_e4m32float_v4);
 ASCENDC_CAST_INST(E5M22Float, asc_e5m22float);
-ASCENDC_CAST_INST(E5M22FloatP2, asc_e5m22float_v2);
-ASCENDC_CAST_INST(E5M22FloatP3, asc_e5m22float_v3);
-ASCENDC_CAST_INST(E5M22FloatP4, asc_e5m22float_v4);
+ASCENDC_CAST_INST(E5M22FloatP1, asc_e5m22float_v2);
+ASCENDC_CAST_INST(E5M22FloatP2, asc_e5m22float_v3);
+ASCENDC_CAST_INST(E5M22FloatP3, asc_e5m22float_v4);
 
 ASCENDC_CAST_INST(Float2E4M3RN, asc_float2e4m3_rn);
 ASCENDC_CAST_INST(Float2E4M3RNSat, asc_float2e4m3_rn_sat);
-ASCENDC_CAST_INST(Float2E4M3RNP2, asc_float2e4m3_rn_v2);
-ASCENDC_CAST_INST(Float2E4M3RNSatP2, asc_float2e4m3_rn_sat_v2);
-ASCENDC_CAST_INST(Float2E4M3RNP3, asc_float2e4m3_rn_v3);
-ASCENDC_CAST_INST(Float2E4M3RNSatP3, asc_float2e4m3_rn_sat_v3);
-ASCENDC_CAST_INST(Float2E4M3RNP4, asc_float2e4m3_rn_v4);
-ASCENDC_CAST_INST(Float2E4M3RNSatP4, asc_float2e4m3_rn_sat_v4);
+ASCENDC_CAST_INST(Float2E4M3RNP1, asc_float2e4m3_rn_v2);
+ASCENDC_CAST_INST(Float2E4M3RNSatP1, asc_float2e4m3_rn_sat_v2);
+ASCENDC_CAST_INST(Float2E4M3RNP2, asc_float2e4m3_rn_v3);
+ASCENDC_CAST_INST(Float2E4M3RNSatP2, asc_float2e4m3_rn_sat_v3);
+ASCENDC_CAST_INST(Float2E4M3RNP3, asc_float2e4m3_rn_v4);
+ASCENDC_CAST_INST(Float2E4M3RNSatP3, asc_float2e4m3_rn_sat_v4);
 
 ASCENDC_CAST_INST(Float2E5M2RN, asc_float2e5m2_rn);
 ASCENDC_CAST_INST(Float2E5M2RNSat, asc_float2e5m2_rn_sat);
-ASCENDC_CAST_INST(Float2E5M2RNP2, asc_float2e5m2_rn_v2);
-ASCENDC_CAST_INST(Float2E5M2RNSatP2, asc_float2e5m2_rn_sat_v2);
-ASCENDC_CAST_INST(Float2E5M2RNP3, asc_float2e5m2_rn_v3);
-ASCENDC_CAST_INST(Float2E5M2RNSatP3, asc_float2e5m2_rn_sat_v3);
-ASCENDC_CAST_INST(Float2E5M2RNP4, asc_float2e5m2_rn_v4);
-ASCENDC_CAST_INST(Float2E5M2RNSatP4, asc_float2e5m2_rn_sat_v4);
+ASCENDC_CAST_INST(Float2E5M2RNP1, asc_float2e5m2_rn_v2);
+ASCENDC_CAST_INST(Float2E5M2RNSatP1, asc_float2e5m2_rn_sat_v2);
+ASCENDC_CAST_INST(Float2E5M2RNP2, asc_float2e5m2_rn_v3);
+ASCENDC_CAST_INST(Float2E5M2RNSatP2, asc_float2e5m2_rn_sat_v3);
+ASCENDC_CAST_INST(Float2E5M2RNP3, asc_float2e5m2_rn_v4);
+ASCENDC_CAST_INST(Float2E5M2RNSatP3, asc_float2e5m2_rn_sat_v4);
 
 #undef ASCENDC_CAST_INST
 

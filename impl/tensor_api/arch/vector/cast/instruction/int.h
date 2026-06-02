@@ -25,8 +25,8 @@
 #define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
-    template <typename T>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask)                                         \
+    template <typename T, typename U>                                                                                \
+    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
     {                                                                                                                \
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
             FUNC_NAME(dst, src, mask);                                                                               \
@@ -35,31 +35,31 @@ public:                                                                         
 }
 
 ASCENDC_CAST_INST(Int162Int32, asc_int162int32);
-ASCENDC_CAST_INST(Int162Int32P2, asc_int162int32_v2);
+ASCENDC_CAST_INST(Int162Int32Odd, asc_int162int32_v2);
 
 ASCENDC_CAST_INST(Int322Int16, asc_int322int16);
 ASCENDC_CAST_INST(Int322Int16Sat, asc_int322int16_sat);
-ASCENDC_CAST_INST(Int322Int16P2, asc_int322int16_v2);
-ASCENDC_CAST_INST(Int322Int16SatP2, asc_int322int16_sat_v2);
+ASCENDC_CAST_INST(Int322Int16Odd, asc_int322int16_v2);
+ASCENDC_CAST_INST(Int322Int16SatOdd, asc_int322int16_sat_v2);
 ASCENDC_CAST_INST(Int322Int64, asc_int322int64);
-ASCENDC_CAST_INST(Int322Int64P2, asc_int322int64_v2);
+ASCENDC_CAST_INST(Int322Int64Odd, asc_int322int64_v2);
 
 ASCENDC_CAST_INST(Int4x22Int16, asc_int4x22int16);
-ASCENDC_CAST_INST(Int4x22Int16P2, asc_int4x22int16_v2);
-ASCENDC_CAST_INST(Int4x22Int16P3, asc_int4x22int16_v3);
-ASCENDC_CAST_INST(Int4x22Int16P4, asc_int4x22int16_v4);
+ASCENDC_CAST_INST(Int4x22Int16P1, asc_int4x22int16_v2);
+ASCENDC_CAST_INST(Int4x22Int16P2, asc_int4x22int16_v3);
+ASCENDC_CAST_INST(Int4x22Int16P3, asc_int4x22int16_v4);
 
 ASCENDC_CAST_INST(Int642Int32, asc_int642int32);
 ASCENDC_CAST_INST(Int642Int32Sat, asc_int642int32_sat);
-ASCENDC_CAST_INST(Int642Int32P2, asc_int642int32_v2);
-ASCENDC_CAST_INST(Int642Int32SatP2, asc_int642int32_sat_v2);
+ASCENDC_CAST_INST(Int642Int32Odd, asc_int642int32_v2);
+ASCENDC_CAST_INST(Int642Int32SatOdd, asc_int642int32_sat_v2);
 
 ASCENDC_CAST_INST(Int82Int16, asc_int82int16);
-ASCENDC_CAST_INST(Int82Int16P2, asc_int82int16_v2);
+ASCENDC_CAST_INST(Int82Int16Odd, asc_int82int16_v2);
 ASCENDC_CAST_INST(Int82Int32, asc_int82int32);
-ASCENDC_CAST_INST(Int82Int32P2, asc_int82int32_v2);
-ASCENDC_CAST_INST(Int82Int32P3, asc_int82int32_v3);
-ASCENDC_CAST_INST(Int82Int32P4, asc_int82int32_v4);
+ASCENDC_CAST_INST(Int82Int32P1, asc_int82int32_v2);
+ASCENDC_CAST_INST(Int82Int32P2, asc_int82int32_v3);
+ASCENDC_CAST_INST(Int82Int32P3, asc_int82int32_v4);
 
 #undef ASCENDC_CAST_INST
 

@@ -36,27 +36,27 @@ public:                                                                         
 
 ASCENDC_CAST_INST(BF162Int32RD, asc_bfloat162int32_rd);
 ASCENDC_CAST_INST(BF162Int32RDSat, asc_bfloat162int32_rd_sat);
-ASCENDC_CAST_INST(BF162Int32RDP2, asc_bfloat162int32_rd_v2);
-ASCENDC_CAST_INST(BF162Int32RDSatP2, asc_bfloat162int32_rd_sat_v2);
+ASCENDC_CAST_INST(BF162Int32RDOdd, asc_bfloat162int32_rd_v2);
+ASCENDC_CAST_INST(BF162Int32RDSatOdd, asc_bfloat162int32_rd_sat_v2);
 ASCENDC_CAST_INST(BF162Int32RN, asc_bfloat162int32_rn);
 ASCENDC_CAST_INST(BF162Int32RNSat, asc_bfloat162int32_rn_sat);
-ASCENDC_CAST_INST(BF162Int32RNP2, asc_bfloat162int32_rn_v2);
-ASCENDC_CAST_INST(BF162Int32RNSatP2, asc_bfloat162int32_rn_sat_v2);
+ASCENDC_CAST_INST(BF162Int32RNOdd, asc_bfloat162int32_rn_v2);
+ASCENDC_CAST_INST(BF162Int32RNSatOdd, asc_bfloat162int32_rn_sat_v2);
 ASCENDC_CAST_INST(BF162Int32RNA, asc_bfloat162int32_rna);
 ASCENDC_CAST_INST(BF162Int32RNASat, asc_bfloat162int32_rna_sat);
-ASCENDC_CAST_INST(BF162Int32RNAP2, asc_bfloat162int32_rna_v2);
-ASCENDC_CAST_INST(BF162Int32RNASatP2, asc_bfloat162int32_rna_sat_v2);
+ASCENDC_CAST_INST(BF162Int32RNAOdd, asc_bfloat162int32_rna_v2);
+ASCENDC_CAST_INST(BF162Int32RNASatOdd, asc_bfloat162int32_rna_sat_v2);
 ASCENDC_CAST_INST(BF162Int32RU, asc_bfloat162int32_ru);
 ASCENDC_CAST_INST(BF162Int32RUSat, asc_bfloat162int32_ru_sat);
-ASCENDC_CAST_INST(BF162Int32RUP2, asc_bfloat162int32_ru_v2);
-ASCENDC_CAST_INST(BF162Int32RUSatP2, asc_bfloat162int32_ru_sat_v2);
+ASCENDC_CAST_INST(BF162Int32RUOdd, asc_bfloat162int32_ru_v2);
+ASCENDC_CAST_INST(BF162Int32RUSatOdd, asc_bfloat162int32_ru_sat_v2);
 ASCENDC_CAST_INST(BF162Int32RZ, asc_bfloat162int32_rz);
 ASCENDC_CAST_INST(BF162Int32RZSat, asc_bfloat162int32_rz_sat);
-ASCENDC_CAST_INST(BF162Int32RZP2, asc_bfloat162int32_rz_v2);
-ASCENDC_CAST_INST(BF162Int32RZSatP2, asc_bfloat162int32_rz_sat_v2);
+ASCENDC_CAST_INST(BF162Int32RZOdd, asc_bfloat162int32_rz_v2);
+ASCENDC_CAST_INST(BF162Int32RZSatOdd, asc_bfloat162int32_rz_sat_v2);
 
 ASCENDC_CAST_INST(Int4x22BF16, asc_int4x22bfloat16);
-ASCENDC_CAST_INST(Int4x22BF16P2, asc_int4x22bfloat16_v2);
+ASCENDC_CAST_INST(Int4x22BF16Odd, asc_int4x22bfloat16_v2);
 ASCENDC_CAST_INST(Int4x22BF16P3, asc_int4x22bfloat16_v3);
 ASCENDC_CAST_INST(Int4x22BF16P4, asc_int4x22bfloat16_v4);
 

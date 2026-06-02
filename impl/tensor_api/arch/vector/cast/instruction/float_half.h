@@ -36,31 +36,31 @@ public:                                                                         
 
 ASCENDC_CAST_INST(Float2HalfRD, asc_float2half_rd);
 ASCENDC_CAST_INST(Float2HalfRDSat, asc_float2half_rd_sat);
-ASCENDC_CAST_INST(Float2HalfRDP2, asc_float2half_rd_v2);
-ASCENDC_CAST_INST(Float2HalfRDSatP2, asc_float2half_rd_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRDOdd, asc_float2half_rd_v2);
+ASCENDC_CAST_INST(Float2HalfRDSatOdd, asc_float2half_rd_sat_v2);
 ASCENDC_CAST_INST(Float2HalfRN, asc_float2half_rn);
 ASCENDC_CAST_INST(Float2HalfRNSat, asc_float2half_rn_sat);
-ASCENDC_CAST_INST(Float2HalfRNP2, asc_float2half_rn_v2);
-ASCENDC_CAST_INST(Float2HalfRNSatP2, asc_float2half_rn_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRNOdd, asc_float2half_rn_v2);
+ASCENDC_CAST_INST(Float2HalfRNSatOdd, asc_float2half_rn_sat_v2);
 ASCENDC_CAST_INST(Float2HalfRNA, asc_float2half_rna);
 ASCENDC_CAST_INST(Float2HalfRNASat, asc_float2half_rna_sat);
-ASCENDC_CAST_INST(Float2HalfRNAP2, asc_float2half_rna_v2);
-ASCENDC_CAST_INST(Float2HalfRNASatP2, asc_float2half_rna_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRNAOdd, asc_float2half_rna_v2);
+ASCENDC_CAST_INST(Float2HalfRNASatOdd, asc_float2half_rna_sat_v2);
 ASCENDC_CAST_INST(Float2HalfRO, asc_float2half_ro);
 ASCENDC_CAST_INST(Float2HalfROSat, asc_float2half_ro_sat);
-ASCENDC_CAST_INST(Float2HalfROP2, asc_float2half_ro_v2);
-ASCENDC_CAST_INST(Float2HalfROSatP2, asc_float2half_ro_sat_v2);
+ASCENDC_CAST_INST(Float2HalfROOdd, asc_float2half_ro_v2);
+ASCENDC_CAST_INST(Float2HalfROSatOdd, asc_float2half_ro_sat_v2);
 ASCENDC_CAST_INST(Float2HalfRU, asc_float2half_ru);
 ASCENDC_CAST_INST(Float2HalfRUSat, asc_float2half_ru_sat);
-ASCENDC_CAST_INST(Float2HalfRUP2, asc_float2half_ru_v2);
-ASCENDC_CAST_INST(Float2HalfRUSatP2, asc_float2half_ru_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRUOdd, asc_float2half_ru_v2);
+ASCENDC_CAST_INST(Float2HalfRUSatOdd, asc_float2half_ru_sat_v2);
 ASCENDC_CAST_INST(Float2HalfRZ, asc_float2half_rz);
 ASCENDC_CAST_INST(Float2HalfRZSat, asc_float2half_rz_sat);
-ASCENDC_CAST_INST(Float2HalfRZP2, asc_float2half_rz_v2);
-ASCENDC_CAST_INST(Float2HalfRZSatP2, asc_float2half_rz_sat_v2);
+ASCENDC_CAST_INST(Float2HalfRZOdd, asc_float2half_rz_v2);
+ASCENDC_CAST_INST(Float2HalfRZSatOdd, asc_float2half_rz_sat_v2);
 
 ASCENDC_CAST_INST(Half2Float, asc_half2float);
-ASCENDC_CAST_INST(Half2FloatP2, asc_half2float_v2);
+ASCENDC_CAST_INST(Half2FloatOdd, asc_half2float_v2);
 
 #undef ASCENDC_CAST_INST
 

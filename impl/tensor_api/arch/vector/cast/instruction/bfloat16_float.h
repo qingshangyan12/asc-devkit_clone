@@ -35,28 +35,28 @@ public:                                                                         
 }
 
 ASCENDC_CAST_INST(BF162Float, asc_bfloat162float);
-ASCENDC_CAST_INST(BF162FloatP2, asc_bfloat162float_v2);
+ASCENDC_CAST_INST(BF162FloatOdd, asc_bfloat162float_v2);
 
 ASCENDC_CAST_INST(Float2BF16RD, asc_float2bfloat16_rd);
 ASCENDC_CAST_INST(Float2BF16RDSat, asc_float2bfloat16_rd_sat);
-ASCENDC_CAST_INST(Float2BF16RDP2, asc_float2bfloat16_rd_v2);
-ASCENDC_CAST_INST(Float2BF16RDSatP2, asc_float2bfloat16_rd_sat_v2);
+ASCENDC_CAST_INST(Float2BF16RDOdd, asc_float2bfloat16_rd_v2);
+ASCENDC_CAST_INST(Float2BF16RDSatOdd, asc_float2bfloat16_rd_sat_v2);
 ASCENDC_CAST_INST(Float2BF16RN, asc_float2bfloat16_rn);
 ASCENDC_CAST_INST(Float2BF16RNSat, asc_float2bfloat16_rn_sat);
-ASCENDC_CAST_INST(Float2BF16RNP2, asc_float2bfloat16_rn_v2);
-ASCENDC_CAST_INST(Float2BF16RNSatP2, asc_float2bfloat16_rn_sat_v2);
+ASCENDC_CAST_INST(Float2BF16RNOdd, asc_float2bfloat16_rn_v2);
+ASCENDC_CAST_INST(Float2BF16RNSatOdd, asc_float2bfloat16_rn_sat_v2);
 ASCENDC_CAST_INST(Float2BF16RNA, asc_float2bfloat16_rna);
 ASCENDC_CAST_INST(Float2BF16RNASat, asc_float2bfloat16_rna_sat);
-ASCENDC_CAST_INST(Float2BF16RNAP2, asc_float2bfloat16_rna_v2);
-ASCENDC_CAST_INST(Float2BF16RNASatP2, asc_float2bfloat16_rna_sat_v2);
+ASCENDC_CAST_INST(Float2BF16RNAOdd, asc_float2bfloat16_rna_v2);
+ASCENDC_CAST_INST(Float2BF16RNASatOdd, asc_float2bfloat16_rna_sat_v2);
 ASCENDC_CAST_INST(Float2BF16RU, asc_float2bfloat16_ru);
 ASCENDC_CAST_INST(Float2BF16RUSat, asc_float2bfloat16_ru_sat);
-ASCENDC_CAST_INST(Float2BF16RUP2, asc_float2bfloat16_ru_v2);
-ASCENDC_CAST_INST(Float2BF16RUSatP2, asc_float2bfloat16_ru_sat_v2);
+ASCENDC_CAST_INST(Float2BF16RUOdd, asc_float2bfloat16_ru_v2);
+ASCENDC_CAST_INST(Float2BF16RUSatOdd, asc_float2bfloat16_ru_sat_v2);
 ASCENDC_CAST_INST(Float2BF16RZ, asc_float2bfloat16_rz);
 ASCENDC_CAST_INST(Float2BF16RZSat, asc_float2bfloat16_rz_sat);
-ASCENDC_CAST_INST(Float2BF16RZP2, asc_float2bfloat16_rz_v2);
-ASCENDC_CAST_INST(Float2BF16RZSatP2, asc_float2bfloat16_rz_sat_v2);
+ASCENDC_CAST_INST(Float2BF16RZOdd, asc_float2bfloat16_rz_v2);
+ASCENDC_CAST_INST(Float2BF16RZSatOdd, asc_float2bfloat16_rz_sat_v2);
 
 #undef ASCENDC_CAST_INST
 
