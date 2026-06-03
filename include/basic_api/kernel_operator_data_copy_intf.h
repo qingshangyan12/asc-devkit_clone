@@ -65,7 +65,7 @@ __aicore__ inline void __inout_pipe__(MTE2)
  * @param [in] intriParams.dstNzNStride stride of n between 2 C0 in L1
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src,
                                                      const Nd2NzParams& intriParams);
@@ -93,7 +93,7 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                      const Nd2NzParams& intriParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 /*
  * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
@@ -169,19 +169,17 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>&
  */
 // Copy::Level 0 - mask bit mode
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                               const uint64_t mask[], const uint8_t repeatTime,
                                               const CopyRepeatParams& repeatParams);
 
 // Copy::Level 0 - mask count mode
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "Copy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src,
                                               const uint64_t mask, const uint8_t repeatTime,
                                               const CopyRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 // Copy::Level 2 - count mode
 template <typename T, bool isSetMask = true>
 __aicore__ inline __inout_pipe__(V) void Copy(const LocalTensor<T> &dst, const LocalTensor<T> &src,
@@ -299,6 +297,7 @@ template <typename T, typename U>
 __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
                                 const DataCopyCO12DstParams& intriParams);
 
+
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
 // float to bfloat16_t
 template <typename T, typename U,
@@ -355,7 +354,7 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(const LocalTensor<T>& dst, con
                                                   const DataCopyParams& intriParams,
                                                   const DataCopyEnhancedParams& enhancedParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& dst,
                                                         const GlobalTensor<T>& src,
@@ -384,7 +383,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
                                         const DataCopyParams& dataCopyParams, const Nd2NzParams& nd2nzParams);
 
 // override DataCopyPad, use new param DataCopyExtParams
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& dst,
                                                         const GlobalTensor<T>& src,
@@ -407,7 +406,7 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(const LocalTensor<T>& ds
                                                         const DataCopyExtParams& dataCopyParams,
                                                         const DataCopyPadExtParams<U>& padParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(const GlobalTensor<T>& dst,
                                                         const LocalTensor<T>& src,
@@ -426,28 +425,20 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<
 template <typename T, TPosition pos = TPosition::MAX>
 __aicore__ inline void SetPadValue(T paddingValue);
 
-template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
-
-template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
-
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, uint8_t dim, const NdDmaConfig &config = kDefaultNdDmaConfig>
 __aicore__ inline void DataCopy(const LocalTensor<T> &dst, const GlobalTensor<T> &src,
     const MultiCopyParams<T, dim> &params);
-#endif
 
 __aicore__ inline void NdDmaDci();
 
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type);
 
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type);
+#endif
 }  // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_data_copy_intf_impl.h"
-#endif
 #endif  // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

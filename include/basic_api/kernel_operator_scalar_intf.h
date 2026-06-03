@@ -41,8 +41,10 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn);
 // ScalarCountLeadingZero has been updated, please use CountLeadingZero instead.
 __aicore__ inline int64_t ScalarCountLeadingZero(uint64_t valueIn);
 
+#if (__NPU_ARCH__ == 3510)
 template <typename T>
 __aicore__ inline void GetUintDivMagicAndShift(T& magic, T& shift, T divisor);
+#endif
 
 __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn);
 
@@ -62,7 +64,7 @@ __aicore__ inline U ScalarCast(T valueIn);
 
 #if defined(__NPU_ARCH__) &&                                                    \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) ||                        \
+     (__NPU_ARCH__ == 3510) ||                        \
      (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 // 所有架构共用的：float -> bfloat16_t
 __aicore__ inline bfloat16_t Cast(const float& fVal);
@@ -70,9 +72,9 @@ __aicore__ inline bfloat16_t Cast(const float& fVal);
 
 #if defined(__NPU_ARCH__) &&                                                    \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||                        \
-     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+     (__NPU_ARCH__ == 3510))
 // 各架构特化的：类型 -> float
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename>
 __aicore__ constexpr inline U Cast(T bVal);
 #else
@@ -84,16 +86,16 @@ template <typename T>
 __aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510)
 template <typename T>
 __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
 
 template <typename T>
 __aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
+#endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_scalar_intf_impl.h"
-#endif
 #endif // ASCENDC_MODULE_OPERATOR_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SCALAR_INTF_H__)

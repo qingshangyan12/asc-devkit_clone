@@ -21,23 +21,21 @@
 
 #ifndef LIB_MATH_POWER_H
 #define LIB_MATH_POWER_H
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/math/power/power_common_utils.h"
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/power/power_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
+#include "../../../impl/adv_api/detail/math/power/power_common_utils.h"
 #include "../../../impl/adv_api/detail/math/power/power_3510_impl.h"
-#endif
 #endif
 
 namespace AscendC {
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 /*!
  * \ingroup Power
@@ -294,14 +292,10 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
     const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
-#endif
 }
 
 /*!
@@ -316,14 +310,10 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
     const LocalTensor<T>& src1Tensor, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Tensor, calCount);
-#endif
 }
 
 /*!
@@ -342,8 +332,6 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor,
     const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -361,8 +349,6 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] src1Tensor: exponent LocalTensor
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
 {
@@ -386,14 +372,10 @@ __aicore__ inline void Power(
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
     const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Scalar, sharedTmpBuffer, calCount);
-#endif
 }
 
 /*!
@@ -408,14 +390,10 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Scalar, calCount);
-#endif
 }
 
 /*!
@@ -434,8 +412,6 @@ __aicore__ inline void Power(
  *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -453,8 +429,6 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] src1Scalar: exponent Scalar
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar)
 {
     Power<T, isReuseSource>(dstTensor, src0Tensor, src1Scalar, src0Tensor.GetSize());
@@ -477,14 +451,10 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Scalar, src1Tensor, sharedTmpBuffer, calCount);
-#endif
 }
 
 /*!
@@ -499,14 +469,10 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
  * \param [in] calCount: amount of output data to be calculated
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(
     const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Scalar, src1Tensor, calCount);
-#endif
 }
 
 /*!
@@ -525,14 +491,10 @@ __aicore__ inline void Power(
  *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Scalar, src1Tensor, sharedTmpBuffer, src1Tensor.GetSize());
-#endif
 }
 
 /*!
@@ -546,17 +508,14 @@ __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scala
  * \param [in] src1Tensor: exponent LocalTensor
  */
 template <typename T, bool isReuseSource = false>
-__ASC_USE_RESERVED_UBUF__(2201,
-    "Power is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
     PowerCommonImpl<T, isReuseSource>(dstTensor, src0Scalar, src1Tensor, src1Tensor.GetSize());
-#endif
 }
 #endif
 #pragma end_pipe
 }  // namespace AscendC
+#endif
 #endif  // LIB_MATH_POWER_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_POWER_H__)

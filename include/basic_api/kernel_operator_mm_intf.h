@@ -27,7 +27,9 @@
 #include "utils/kernel_utils_constants.h"
 #include "utils/kernel_utils_macros.h"
 
+#if (__NPU_ARCH__ == 3510)
 #include "kernel_operator_mm_bitmode_intf.h"
+#endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -88,22 +90,14 @@ template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 template <typename T, typename U = T>
 __aicore__ inline void LoadData(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx,
     const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams);
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
-template <typename T, typename U>
-__aicore__ inline __inout_pipe__(MTE2) void LoadData(
-    const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
-    const Nd2NzParamsV2& nd2nzParams)
-{
-    LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
-}
-#endif
+
 
 /* **************************************************************************************************
  * LoadData 3dv1                                             *
@@ -172,13 +166,14 @@ template <
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams);
 
-template <
-    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
-    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__aicore__ inline void LoadDataWithStride(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T, const IsResetLoad3dConfig &defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG,
+    typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(const LocalTensor<T>& dst, const LocalTensor<T>& src,
+    const LoadData3DParamsV2<U>& loadDataParams);
+#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams);
@@ -214,7 +209,7 @@ template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <TPosition DstPos, TPosition SrcPos, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams);
@@ -294,7 +289,6 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     MmadBitModeParams& mmadParams);
-#endif
 
 /* **************************************************************************************************
  * MmadMx                                                                                           *
@@ -333,7 +327,9 @@ template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams);
+#endif
 
+#if __NPU_ARCH__ == 2201
 template <
     typename T = int32_t, typename U = int8_t,
     typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
@@ -348,9 +344,12 @@ template <
 __aicore__ inline void LoadDataWithSparse(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& idx,
     const LoadData2dParams& loadDataParam);
+#endif
 
+#if __NPU_ARCH__ == 2002
 template <typename T = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true>
 __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry);
+#endif
 
 /* **************************************************************************************************
  * BroadCastVecToMM                                             *
@@ -404,8 +403,9 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue);
  */
 __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padList[4], const FmatrixMode& fmatrixMode);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-__aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param,
+    const FmatrixMode &fmatrixMode);
 #endif
 /* **************************************************************************************************
  * SetLoadDataBoundary                                             *
@@ -419,7 +419,9 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue);
 
 __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWithStride& repeatParams);
+#endif
 
 /* **************************************************************************************************
  * LoadImageToLocal                                             *
@@ -510,9 +512,9 @@ __aicore__ inline void SetMMColumnMajor();
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
 
 } // namespace AscendC
-#if defined(__NPU_ARCH__)
+
 #include "../../impl/basic_api/kernel_operator_mm_intf_impl.h"
-#endif
+
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

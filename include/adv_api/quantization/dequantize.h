@@ -21,13 +21,11 @@
 #ifndef LIB_QUANTIZATION_DEQUANTIZE_H
 #define LIB_QUANTIZATION_DEQUANTIZE_H
 #include "kernel_tensor.h"
-#include "../../../impl/adv_api/detail/quantization/dequantize/dequantize_common.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/quantization/dequantize/dequantize_impl.h"
-#endif
 namespace AscendC {
 #pragma begin_pipe(V)
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /*!
  * \ingroup Dequantize
  * \brief For DequantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n num;
@@ -43,7 +41,7 @@ namespace AscendC {
  * \param [in] srcTensor: Input src localTensor.
  * \param [in] scale: Input scale.
  * \param [in] offset: Reserved input offset.
- * \param [in] sharedTmpBufferï¼?extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] sharedTmpBufferï¿½?extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
  *             ascend_dequant_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
@@ -55,9 +53,7 @@ __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const Loca
     const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer,
     const DequantizeParams& params)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     DequantizeImpl<config>(dstTensor, srcTensor, scale, offset, sharedTmpBuffer, params);
-#endif
 }
 
 /*!
@@ -81,10 +77,9 @@ template <const DequantizeConfig& config, typename DstT, typename SrcT, typename
 __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,
     const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     DequantizeImpl<config>(dstTensor, srcTensor, scale, offset, params); 
-#endif
 }
+#endif
 #pragma end_pipe
 } // namespace AscendC
 #endif // LIB_QUANTIZATION_DEQUANTIZE_H

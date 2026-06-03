@@ -22,11 +22,9 @@
 #ifndef LIB_MATH_WHERE_H
 #define LIB_MATH_WHERE_H
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "kernel_tensor.h"
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/where/where_3510_impl.h"
-#endif
 
 namespace AscendC {
 #pragma begin_pipe(V)
@@ -45,12 +43,11 @@ __aicore__ inline void Where(const LocalTensor<T>& dst, const U& src0, const S& 
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     WhereImpl<T, U, S, V>(dst, src0, src1, condition, count);
-#endif
 }
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_MATH_WHERE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_WHERE_H__)

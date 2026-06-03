@@ -23,10 +23,10 @@
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/math/round/round_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "../../../impl/adv_api/detail/math/round/round_3510_impl.h"
 #endif
-
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510)
 namespace AscendC {
 #pragma begin_pipe(V)
 /*!
@@ -49,9 +49,7 @@ __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     RoundImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
-#endif
 }
 
 /*!
@@ -68,12 +66,11 @@ __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     RoundImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
-#endif
 }
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_MATH_ROUND_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ROUND_H__)

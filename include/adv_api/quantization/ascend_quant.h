@@ -29,12 +29,11 @@
 #ifndef LIB_ASCEND_QUANT_ASCEND_QUANT_H
 #define LIB_ASCEND_QUANT_ASCEND_QUANT_H
 #include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
 #include "include/adv_api/quantization/ascend_quant_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#include "kernel_tensor.h"
 #include "../../../impl/adv_api/detail/quantization/quant/ascend_quant_common_impl.h"
-#endif
 namespace AscendC {
 #pragma begin_pipe(V)
 
@@ -59,10 +58,7 @@ template <typename T, bool isReuseSource = false, const AscendQuantConfig& confi
 __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
-#endif
 }
 
 /*!
@@ -81,10 +77,7 @@ template <typename T, bool isReuseSource = false, const AscendQuantConfig& confi
 __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor,
     const float scale, const float offset, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, scale, offset, calCount);
-#endif
 }
 
 /*!
@@ -151,11 +144,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const L
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<T>& scaleTensor,
     const T offset, const uint32_t scaleCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offset,
         scaleCount, calCount);
-#endif
 }
 
 /*!
@@ -175,10 +165,7 @@ template <typename T, bool isReuseSource = false, const AscendQuantConfig& confi
 __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<T>& scaleTensor, const T offset, const uint32_t scaleCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, scaleTensor, offset, scaleCount, calCount);
-#endif
 }
 
 /*!
@@ -249,11 +236,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const L
     const LocalTensor<T>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount,
     const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor,
         scaleCount, offsetCount, calCount);
-#endif
 }
 
 /*!
@@ -275,11 +259,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const L
     const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor, const uint32_t scaleCount,
     const uint32_t offsetCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     AscendQuantImpl<T, isReuseSource, config>(dstTensor, srcTensor, scaleTensor, offsetTensor,
         scaleCount, offsetCount, calCount);
-#endif
 }
 
 /*!
@@ -326,7 +307,7 @@ __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor,
         scaleTensor.GetSize(), offsetTensor.GetSize(), srcTensor.GetSize());
 }
 
-#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /*!
  * \ingroup AscendQuant
  * \brief AscendQuant per tensor interface
@@ -343,9 +324,7 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const float scale, const float offset, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, scale, offset, calCount);
-#endif
 }
 
 /*!
@@ -363,9 +342,7 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(
     const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, scale, offset, srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -388,10 +365,8 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, sharedTmpBuffer, scale, offset, srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -415,9 +390,7 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scale, offset, calCount);
-#endif
 }
 
 /*!
@@ -441,10 +414,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor,
     const LocalTensor<srcT>& offsetTensor)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor,
         scaleTensor.GetSize(), offsetTensor.GetSize(), srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -472,10 +443,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount,
     const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor, scaleCount, offsetCount, calCount);
-#endif
 }
 
 /*!
@@ -493,10 +462,8 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, scaleTensor, offsetTensor, scaleTensor.GetSize(),
         offsetTensor.GetSize(), srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -518,10 +485,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount,
     const uint32_t offsetCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, scaleTensor, offsetTensor, scaleCount, offsetCount, calCount);
-#endif
 }
 
 /*!
@@ -547,10 +512,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const srcT offset,
     const uint32_t scaleCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offset, scaleCount, calCount);
-#endif
 }
 
 /*!
@@ -573,10 +536,8 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const srcT offset)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offset, scaleTensor.GetSize(), srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -596,9 +557,7 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<srcT>& scaleTensor, const srcT offset, const uint32_t scaleCount, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(dstTensor, srcTensor, scaleTensor, offset, scaleCount, calCount);
-#endif
 }
 
 /*!
@@ -616,10 +575,8 @@ template <typename dstT, typename srcT, bool isReuseSource = false>
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<srcT>& scaleTensor, const srcT offset)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, isReuseSource>(
         dstTensor, srcTensor, scaleTensor, offset, scaleTensor.GetSize(), srcTensor.GetSize());
-#endif
 }
 
 /*!
@@ -639,10 +596,8 @@ template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = fa
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, scaleT, isReuseSource, config, policy>(
         dstTensor, srcTensor, scaleTensor, offsetTensor, para);
-#endif
 }
 
 /*!
@@ -668,10 +623,8 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<scaleT>& scaleTensor,
     const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, scaleT, isReuseSource, config, policy>(
         dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offsetTensor, para);
-#endif
 }
 
 /*!
@@ -691,9 +644,7 @@ template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = fa
 __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor,
     const LocalTensor<scaleT>& scaleTensor, const scaleT offset, const AscendQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, scaleT, isReuseSource, config, policy>(dstTensor, srcTensor, scaleTensor, offset, para);
-#endif
 }
 
 /*!
@@ -719,14 +670,13 @@ __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const Loc
     const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<scaleT>& scaleTensor, const scaleT offset,
     const AscendQuantParam& para)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     AscendQuantImpl<dstT, srcT, scaleT, isReuseSource, config, policy>(
         dstTensor, srcTensor, sharedTmpBuffer, scaleTensor, offset, para);
-#endif
 }
 #endif
 #pragma end_pipe
 }  // namespace AscendC
+#endif
 #endif  // LIB_ASCEND_QUANT_ASCEND_QUANT_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASCEND_QUANT_H__)

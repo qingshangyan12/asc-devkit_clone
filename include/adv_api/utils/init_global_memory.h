@@ -20,11 +20,12 @@
 
 #ifndef LIB_UTILS_INIT_GLOBAL_MEMORY_H
 #define LIB_UTILS_INIT_GLOBAL_MEMORY_H
+
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v220_impl.h"
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
+#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v310_impl.h"
 #endif
@@ -46,7 +47,16 @@ __aicore__ inline __in_pipe__(V)
 {
     InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
 }
-#else
+
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+template <typename T>
+__aicore__ inline __in_pipe__(V)
+    __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
+{
+    InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
+}
+#endif
+
 /* !
  * \brief This function realizes the clear global memory function.
  *
@@ -56,14 +66,13 @@ __aicore__ inline __in_pipe__(V)
  * \param [in] size, size of space to be initialized
  * \param [in] value, value to be initialized in global memory
  */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 2201)
     InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
-#endif
 }
 #endif
 } // namespace AscendC

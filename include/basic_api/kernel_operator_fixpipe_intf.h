@@ -55,7 +55,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &reluPre, const Loc
 template <typename T, bool setRelu = false>
 __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData, bool isUnitFlag = false);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride);
 #else
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride);
@@ -70,7 +70,7 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T> &eleWiseData, uint16_
 
 #if defined(__NPU_ARCH__) &&                                                                            \
     (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 ||    \
-     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+     __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -138,7 +138,7 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, t
     typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
 __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM310& intriParams);
-#elif !defined(__NPU_ARCH__) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#elif (__NPU_ARCH__ == 3510)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src,
@@ -161,9 +161,7 @@ __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>&
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_fixpipe_intf_impl.h"
-#endif
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
