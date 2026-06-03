@@ -8,10 +8,10 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 set(src_list
-    #${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh_1D.cc
-    #${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_mesh1d.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh_1D.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_mesh_1D.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_mesh1d.cc
+    #${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh_1D.cc
+    #${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_v_mesh1d.cc
     #${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh2die.cc
     #${CMAKE_CURRENT_SOURCE_DIR}/kernel/ccu_kernel_all_to_all_v_mesh2die.cc
     #${CMAKE_CURRENT_SOURCE_DIR}/ccu_temp_all_to_all_v_mesh_1D_multi_jetty.cc

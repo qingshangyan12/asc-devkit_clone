@@ -13,11 +13,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "exception_util.h"
-#include "ccu_api_exception.h"
-#include "op_type.h"
-#include "data_type.h"
-#include "reduce_op.h"
 
 namespace Hccl { // 仅保留了a5 ccu kfc_server算子需要编译态常量
     

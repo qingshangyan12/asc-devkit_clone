@@ -965,9 +965,7 @@ std::vector<CcuRep::CompletedEvent> CcuKernelAlgBase::CreateBlockCompletedEvent(
     return res;
 }
 
-} // namespace mc2_ops_hccl
-
-namespace ops_hccl {
+// ==================== 新API体系函数实现 ====================
 
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool &allocated, uint32_t parallelDim, uint32_t msPerLoop)
 {
@@ -975,9 +973,9 @@ CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool 
         return CCU_SUCCESS;
     }
 
-    config.msInterleave = CCU_MS_INTERLEAVE;
+    config.msInterleave = CCU_MS_INTERLEAVE_NEW;
     config.loopCount    = parallelDim;
-    config.memSlice     = msPerLoop * CCU_MS_SIZE;
+    config.memSlice     = msPerLoop * CCU_MS_SIZE_NEW;
 
     res.eventCount = config.loopCount;
     res.completedEvent = ccu::Array<ccu::Event>(res.eventCount);
@@ -991,7 +989,7 @@ CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool 
 
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var)
 {
-    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_MS_LOCAL_COPY_LOOP_COUNT, LOCAL_COPY_MS_PER_LOOP);
+    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_MS_DEFAULT_LOOP_COUNT_NEW, 1);
 
     std::string loopType = "localcopy";
     if (ctx.IsLoopEntityRegistered(loopType)) {
@@ -1090,4 +1088,4 @@ CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr sr
     return CCU_SUCCESS;
 }
 
-} // namespace ops_hccl
+} // namespace mc2_ops_hccl

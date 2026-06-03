@@ -16,8 +16,8 @@
 #include <memory>
 
 #include "log.h"
-#include "ccu_kernel.h"
 #include "ccu_primitives_dl.hpp"
+#include "ccu_log.h"
 
 namespace ccu = ::AscendC::ccu;
 
@@ -109,20 +109,17 @@ private:
         HcclReduceOp opType);
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
 };
-}
 
-namespace ops_hccl {
-constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
-constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
-constexpr uint64_t CCU_MS_SIZE               = 4096;
-
-constexpr uint32_t LOCAL_COPY_MS_PER_LOOP = 8;
-constexpr uint32_t CCU_MS_LOCAL_COPY_LOOP_COUNT = 8;
+// ==================== 新API体系（使用 ccu::Variable） ====================
+// 常量定义（新API体系）
+constexpr uint64_t CCU_MS_INTERLEAVE_NEW         = 8;
+constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT_NEW = 64;
+constexpr uint64_t CCU_MS_SIZE_NEW               = 4096;
 
 struct LoopGroupConfig {
-    uint32_t msInterleave;  // loop使用的ms步长，即与前一个loop间的间距
-    uint32_t loopCount;     // loop的并行次数
-    uint64_t memSlice;      // 单个loop内使用的ms总字节大小
+    uint32_t msInterleave;
+    uint32_t loopCount;
+    uint64_t memSlice;
 };
 
 struct LoopGroupResource {
@@ -133,10 +130,10 @@ struct LoopGroupResource {
 };
 
 struct GroupOpSizeVars {
-    ccu::Variable addrOffset;        // 第二个loopGroup搬运的起始偏移
-    ccu::Variable loopParam;         // loop串行重复执行次数
-    ccu::Variable parallelParam;     // loopgroup展开参数，包括展开次数、从第几个loop开始展开、共有几个loop
-    ccu::Variable residual;          // 尾块数据size
+    ccu::Variable addrOffset;
+    ccu::Variable loopParam;
+    ccu::Variable parallelParam;
+    ccu::Variable residual;
 };
 
 struct CcuKernelCtxBase {
@@ -177,9 +174,10 @@ struct GroupCopyVar {
 };
 
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,
-    bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT, uint32_t msPerLoop = 1);
+    bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT_NEW, uint32_t msPerLoop = 1);
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var);
 CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
-} // namespace ops_hccl
+
+} // namespace mc2_ops_hccl
 
 #endif // !CCU_KERNEL_ALG_BASE

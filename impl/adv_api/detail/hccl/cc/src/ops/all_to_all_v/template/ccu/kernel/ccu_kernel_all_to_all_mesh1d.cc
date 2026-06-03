@@ -9,7 +9,6 @@
 */
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_mesh1d.h"
-#include "ccu_primitives.hpp"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -70,9 +69,9 @@ HcclResult CcuKernelAlltoAllMesh1D::InitResource(ccu::Variable inputAddr, ccu::V
     srcOffset_   = srcOffset;
     dstOffset_   = dstOffset;
     groupOpSize_.addrOffset = goSize1;
-    groupOpSize_.addrOffset = goSize2;
-    groupOpSize_.addrOffset = goSize3;
-    groupOpSize_.addrOffset = goSize4;
+    groupOpSize_.loopParam = goSize2;
+    groupOpSize_.parallelParam = goSize3;
+    groupOpSize_.residual = goSize4;
 
     // 创建GSA， src为本地的各片HBM地址GSA列表，dst为所有对端的HBM地址GSA列表
     for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
