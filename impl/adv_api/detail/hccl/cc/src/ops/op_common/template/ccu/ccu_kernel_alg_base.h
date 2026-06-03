@@ -110,11 +110,12 @@ private:
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
 };
 
-// ==================== 新API体系（使用 ccu::Variable） ====================
-// 常量定义（新API体系）
-constexpr uint64_t CCU_MS_INTERLEAVE_NEW         = 8;
-constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT_NEW = 64;
-constexpr uint64_t CCU_MS_SIZE_NEW               = 4096;
+constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
+constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
+constexpr uint64_t CCU_MS_SIZE               = 4096;
+
+constexpr uint32_t LOCAL_COPY_MS_PER_LOOP = 8;
+constexpr uint32_t CCU_MS_LOCAL_COPY_LOOP_COUNT = 8;
 
 struct LoopGroupConfig {
     uint32_t msInterleave;

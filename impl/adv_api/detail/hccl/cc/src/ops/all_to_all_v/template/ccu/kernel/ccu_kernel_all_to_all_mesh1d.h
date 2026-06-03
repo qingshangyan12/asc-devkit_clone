@@ -94,13 +94,13 @@ private:
     ccu::Variable srcStride_;
     ccu::Variable srcOffset_;
     ccu::Variable dstOffset_;
-    ops_hccl::GroupOpSizeVars groupOpSize_;
+    GroupOpSizeVars groupOpSize_;
     ccu::LocalAddr                   myDst_;
     std::vector<ccu::RemoteAddr>     dstAddr_;
     std::vector<ccu::LocalAddr>      srcAddr_;
     std::vector<ccu::Variable>       dstToken_;
     std::vector<ccu::Variable>       srcToken_;
-    hcomm::CcuRep::CompletedEvent event_;
+    ccu::Event event_;
     ccu::Variable flag_; // 用以判断是否是第一次重复
     bool loadFromMem_ = false;
 
