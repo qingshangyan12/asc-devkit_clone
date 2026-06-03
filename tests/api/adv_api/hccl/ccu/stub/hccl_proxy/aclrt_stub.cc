@@ -24,10 +24,10 @@
 #include "sim_task_queue.h"
 
 using namespace hccl;
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
 
-extern "C" unsigned int HcclLaunchAicpuKernel(OpParam *param);
+extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam *param);
 
 #ifdef __cplusplus
 extern "C" {

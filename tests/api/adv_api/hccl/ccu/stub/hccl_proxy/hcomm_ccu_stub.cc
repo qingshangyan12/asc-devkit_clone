@@ -14,6 +14,8 @@
 #include "ccu_repeat_v1.h"
 #include "ccu_datatype_v1.h"
 #include "ccu_rep_context_v1.h"
+#include "ccu_types.h"
+#include "hccl_ccu_res.h"
 #include <vector>
 #include <string>
 

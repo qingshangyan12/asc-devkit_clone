@@ -37,12 +37,12 @@ bool IsErrorToWarn()
     return false;
 }
 
-extern "C" unsigned int HcclLaunchAicpuKernel(ops_hccl::OpParam* param)
+extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param)
 {
     return 0;
 }
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 InsCollAlgBase::InsCollAlgBase() {}
 InsCollAlgBase::~InsCollAlgBase() {}

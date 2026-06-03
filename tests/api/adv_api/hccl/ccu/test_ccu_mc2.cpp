@@ -27,7 +27,7 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIn
     return HCCL_SUCCESS;
 }
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 extern std::shared_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
 }
 
