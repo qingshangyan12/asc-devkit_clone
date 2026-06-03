@@ -154,4 +154,3 @@ atomCopyGM2L1.Call(dstTensor, srcTensor);
 ...
 ```
 
-完整样例请参考[TensorAPI样例代码](../../../../../examples/01_simd_cpp_api/02_features/05_tensor_api/matmul_quant_relu/matmul_quant_relu.asc)。
