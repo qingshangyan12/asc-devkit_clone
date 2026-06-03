@@ -57,6 +57,33 @@ private:
     }
 };
 
+class DataCopyUB2L13510DN2DN {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint16_t blockCount = GetTotalColumnShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+
+        int64_t srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout) - GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Column>(dstLayout) - GetTotalRowShape(srcLayout), C0_ELEMENT<DST_TYPE>);
+
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+    }
+};
+
 class DataCopyUB2L13510NDExt2NDExt {
 public:
     template <const CopyUB2L1Trait& trait, typename T, typename U>

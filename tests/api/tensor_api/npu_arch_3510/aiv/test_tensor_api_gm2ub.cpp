@@ -60,6 +60,24 @@ void RunCopyWithPaths(const DstTensor& dst, const SrcTensor& src)
 
 } // namespace
 
+TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBDNFlat2DNFlat)
+{
+    using namespace AscendC::Te;
+
+    constexpr uint32_t m = 64;
+    constexpr uint32_t n = 64;
+    __gm__ int8_t src[m * n] = {0};
+    __ubuf__ int8_t dst[m * n] = {0};
+
+    auto gmTensor = MakeTensorAt<Location::GM>(src, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+    auto ubTensor = MakeTensorAt<Location::UB>(dst, MakeFrameLayout<DNLayoutPtn, LayoutTraitDefault<int8_t>>(m, n));
+
+    RunCopyCallPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+    RunCopyWithPaths<CopyGM2UB, CopyGM2UBTraitDefault>(ubTensor, gmTensor);
+
+    EXPECT_EQ(dst[0], 0);
+}
+
 TEST_F(Tensor_Api_Vector_Copy_3510, CopyGM2UBNDFlat2NDFlat)
 {
     using namespace AscendC::Te;
