@@ -34,14 +34,24 @@ public:
     }
 };
 
-template <typename dstTPos, typename srcTpos, uint32_t Version>
+template <typename dstTPos, typename srcTpos, typename DstLayoutPtn, typename SrcLayoutPtn, uint32_t Version>
 struct CopyUB2L1Tensor2Tensor {
     using type = CopyUB2L1Ignore;
 };
 
 template <>
-struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, ArchVersion::V3510> {
-    using type = DataCopyUB2L13510;
+struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, NDExtLayoutPtn, NDExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2L13510NDExt2NDExt;
+};
+
+template <>
+struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, DNExtLayoutPtn, DNExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2L13510DNExt2DNExt;
+};
+
+template <>
+struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, NZLayoutPtn, NZLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2L13510NZ2NZ;
 };
 
 } // namespace Te

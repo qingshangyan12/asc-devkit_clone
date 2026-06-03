@@ -30,7 +30,7 @@ namespace Te {
 
 struct CopyGM2UBTrait {};
 
-class DataCopyGM2UB3510 {
+class DataCopyGM2UB3510NDExt2NDExt {
 public:
     template <const CopyGM2UBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
@@ -50,37 +50,92 @@ private:
         constexpr uint8_t leftPaddingCnt = 0;
         constexpr uint8_t rightPaddingCnt = 0;
 
-        uint16_t blockCount = 0;
-        uint32_t blockLen = 0;
-        int64_t srcStride = 0;
-        int64_t dstStride = 0;
+        uint16_t blockCount = GetTotalRowShape(srcLayout);
+        uint32_t blockLen = GetTotalColumnShape(srcLayout) * sizeof(SRC_TYPE);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SRC_TYPE);
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DST_TYPE);
 
-        if constexpr (IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) {
-            blockCount = GetTotalRowShape(srcLayout);
-            blockLen = GetTotalColumnShape(srcLayout) * sizeof(SRC_TYPE);
-
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) * sizeof(DST_TYPE);
-
-        } else if constexpr (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) {
-            blockCount = GetTotalColumnShape(srcLayout);
-            blockLen = GetTotalRowShape(srcLayout) * sizeof(SRC_TYPE);
-
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
-
-        } else if constexpr (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) { // NZ format
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-            blockLen = GetTotalRowShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) * sizeof(SRC_TYPE);
-
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
-        } else {
-            static_assert((IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) || 
-                          (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) || 
-                          (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>),
-                          "Unsupported layout type combination for DataCopyGM2UB3510");
+        if constexpr (IsB4Type<SRC_TYPE>) {
+            // move fp4 as b8, need to be divided by 2
+            blockLen = blockLen >> 1;
+            srcStride = srcStride >> 1;
         }
+
+        if constexpr (IsB4Type<DST_TYPE>) {
+            dstStride = dstStride >> 1;
+        }
+
+        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
+                                           dstStride, cacheMode);
+        // ND和DN场景，需要保证UB上申请的空间和tensor的stride满足32字节对齐，否则CopyGmToUbufAlignV2会有问题，无法正确加载数据，导致数据错误
+    }
+};
+
+class DataCopyGM2UB3510DNExt2DNExt {
+public:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        constexpr uint8_t leftPaddingCnt = 0;
+        constexpr uint8_t rightPaddingCnt = 0;
+
+        uint16_t blockCount = GetTotalColumnShape(srcLayout);
+        uint32_t blockLen = GetTotalRowShape(srcLayout) * sizeof(SRC_TYPE);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
+
+        if constexpr (IsB4Type<SRC_TYPE>) {
+            // move fp4 as b8, need to be divided by 2
+            blockLen = blockLen >> 1;
+            srcStride = srcStride >> 1;
+        }
+
+        if constexpr (IsB4Type<DST_TYPE>) {
+            dstStride = dstStride >> 1;
+        }
+
+        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
+                                           dstStride, cacheMode);
+        // ND和DN场景，需要保证UB上申请的空间和tensor的stride满足32字节对齐，否则CopyGmToUbufAlignV2会有问题，无法正确加载数据，导致数据错误
+    }
+};
+
+class DataCopyGM2UB3510NZ2NZ {
+public:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        constexpr uint8_t leftPaddingCnt = 0;
+        constexpr uint8_t rightPaddingCnt = 0;
+
+        uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+        uint32_t blockLen = GetTotalRowShape(srcLayout) * GetElement<AttrInfo::Shape, AttrInfo::Column, 0>(srcLayout) * sizeof(SRC_TYPE);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) * sizeof(SRC_TYPE);
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) * sizeof(DST_TYPE);
 
         if constexpr (IsB4Type<SRC_TYPE>) {
             // move fp4 as b8, need to be divided by 2

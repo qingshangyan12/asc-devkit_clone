@@ -34,15 +34,26 @@ public:
     }
 };
 
-template <typename dstTPos, typename srcTPos, uint32_t Version>
+template <typename dstTPos, typename srcTPos, typename DstLayoutPtn, typename SrcLayoutPtn, uint32_t Version>
 struct CopyGM2UBTensor2Tensor {
     using type = CopyGM2UBIgnore;
 };
 
 template <>
-struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, ArchVersion::V3510> {
-    using type = DataCopyGM2UB3510;
+struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, NDExtLayoutPtn, NDExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyGM2UB3510NDExt2NDExt;
 };
+
+template <>
+struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, DNExtLayoutPtn, DNExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyGM2UB3510DNExt2DNExt;
+};
+
+template <>
+struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, NZLayoutPtn, NZLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyGM2UB3510NZ2NZ;
+};
+
 
 } // namespace Te
 } // namespace AscendC
