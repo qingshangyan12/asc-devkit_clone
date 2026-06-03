@@ -549,9 +549,8 @@ __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     AbsUsingS32(vAbsSrc0, srcReg0, mask);
     AbsUsingS32(vAbsSrc1, srcReg1, mask);
     VbrUsingU32(vConstDup0, static_cast<uint32_t>(0), static_cast<uint32_t>(0));
-    static constexpr uint32_t u32MaxNum = 0xFFFFFFFFU;
-    static constexpr uint32_t s32MaxNum = 0x7FFFFFFFU;
-    VbrUsingU32(qZero, u32MaxNum, s32MaxNum);
+    constexpr uint32_t u32MaxNum = 0xFFFFFFFFU;
+    VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
     VcmpEqUsingU32( zeroMask, srcReg1, vConstDup0, mask);
     pnot( nonZeroMask,  zeroMask, mask);
