@@ -59,48 +59,25 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section259105813316"></a>
 
+头文件路径为：include "tools/cpudebug/include/kern\_fwk.h
+
 进行核函数的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。
 
 ## 函数原型<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section2067518173415"></a>
 
 ```
-#define ICPU_RUN_KF(func, blkdim, ...)
+#define ICPU_RUN_KF(func, numBlocks, ...)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section158061867342"></a>
 
-<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.1.4.1.1"><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="11.93%" id="mcps1.1.4.1.2"><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.58%" id="mcps1.1.4.1.3"><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_row42461942101815"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p284425844311"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p284425844311"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p284425844311"></a>func</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p158449584436"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p158449584436"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p158449584436"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p297233812230"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p297233812230"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p297233812230"></a>算子的kernel函数指针。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_row8219113874910"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p16219938104918"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p16219938104918"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p16219938104918"></a>blkdim</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p17219113894919"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p17219113894919"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p17219113894919"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p1721973834915"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p1721973834915"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p1721973834915"></a>算子的核心数，corenum。</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_row14935161035014"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.1.4.1.1 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p9935110175011"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p9935110175011"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p9935110175011"></a>...</p>
-</td>
-<td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.1.4.1.2 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p199351310145011"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p199351310145011"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p199351310145011"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.1.4.1.3 "><p id="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p79351710125012"><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p79351710125012"></a><a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_p79351710125012"></a>所有的入参和出参，依次填入，当前参数个数限制为32个，超出32时会出现编译错误。</p>
-</td>
-</tr>
-</tbody>
-</table>
+**表 1**  模板参数说明
+
+| 参数名称 | 输入/输出 | 描述 |
+| ------ | ------ | ------ |
+| func | 输入 | 算子的kernel函数指针|
+| numBlocks | 输入 | 算子的核心数，corenum。|
+| ... | 输入 | 所有的入参和出参，依次填入，当前参数个数限制为32个，超出32时会出现编译错误 |
 
 ## 返回值说明<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section640mcpsimp"></a>
 
@@ -108,7 +85,7 @@
 
 ## 约束说明<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section794123819592"></a>
 
-除了func、blkdim以外，其他的变量都必须是通过GmAlloc分配的共享内存的指针；传入的参数的数量和顺序都必须和kernel保持一致。
+- 除了func、blkdim以外，其他的变量都必须是通过[GmAlloc](GmAlloc)分配的共享内存的指针；传入的参数的数量和顺序都必须和kernel保持一致。
 
 ## 调用示例<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section82241477610"></a>
 
@@ -131,7 +108,7 @@
     **图 1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
     ![](../../../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
-    ```
+    ```cpp
     int32_t main(int32_t argc, char* argv[])
     {
         uint32_t numBlocks = 8;
@@ -158,4 +135,3 @@
         return 0;
     }
     ```
-
