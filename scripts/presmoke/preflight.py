@@ -1,0 +1,1 @@
+"""Optional preflight integration placeholder."""
