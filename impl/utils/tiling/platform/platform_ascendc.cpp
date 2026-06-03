@@ -48,7 +48,6 @@ static const std::map<std::string, SocVersion> convertMap {
     {"Ascend910_93", SocVersion::ASCEND910B},
     {"Ascend310B", SocVersion::ASCEND310B},
     {"Ascend950", SocVersion::ASCEND950},
-    {"Ascend350", SocVersion::ASCEND350},
     {"AS31XM1", SocVersion::AS31XM1},
     {"Ascend031", SocVersion::ASCEND031},
     {"Ascend035", SocVersion::ASCEND035},
@@ -60,7 +59,7 @@ static const std::map<std::string, SocVersion> convertMap {
     {"Hi3796CV300CS", SocVersion::HI3796CV300CS},
     {"Hi3796CV300ES", SocVersion::HI3796CV300ES},
     {"MC61AM21A", SocVersion::MC61AM21A},
-    {"MC62", SocVersion::MC62},
+    {"MC62CM12A", SocVersion::MC62CM12A},
     {"SD3403", SocVersion::SD3403},
     {"KirinX90", SocVersion::KIRINX90},
     {"Kirin9030", SocVersion::KIRIN9030},
@@ -372,24 +371,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9576", "Ascend950"},
     {"Ascend950DT_9577", "Ascend950"},
     {"Ascend950DT_9578", "Ascend950"}, // ascend950_list
-    {"Ascend350_354f", "Ascend350"},
- 	{"Ascend350_355e", "Ascend350"}, // ascend350_list
-    {"MC62CM12AA", "MC62"},
-    {"MC62DM22AA", "MC62"},
-    {"MC62CM13AA", "MC62"},
-    {"MC62DM23AA", "MC62"},
-    {"MC62CM13AB", "MC62"},
-    {"MC62DM23AB", "MC62"},
-    {"MC62CM12AC", "MC62"},
-    {"MC62DM22AC", "MC62"},
-    {"MC62CM12AD", "MC62"},
-    {"MC62DM22AD", "MC62"},
-    {"MC62CM12AE", "MC62"},
-    {"MC62DM22AE", "MC62"},
-    {"MC62CM12AB", "MC62"},
-    {"MC62DM22AB", "MC62"},
-    {"MC62CM12AF", "MC62"},
-    {"MC62DM22AF", "MC62"},
+    {"MC62CM12AA", "MC62CM12A"},
     {"KirinX90", "KirinX90"},
     {"Kirin9030", "Kirin9030"},
     {"MC32DM11AA", "MC32DM11A"},
@@ -403,11 +385,10 @@ const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = 
     {"Ascend310P", "2002"},
     {"Ascend310B", "3002"},
     {"Ascend950", "3510"},
-    {"Ascend350", "3510"},
-    {"MC62", "5102"},
+
     {"KirinX90", "3003"},
     {"Kirin9030", "3113"},
-    {"MC32DM11A", "5102"},
+
 };
 
 bool SwitchIntoShortSocVersion(const char *socVersionStr, std::string &shortSocVersion)

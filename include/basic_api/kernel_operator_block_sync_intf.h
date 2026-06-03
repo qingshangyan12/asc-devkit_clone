@@ -43,8 +43,13 @@ __aicore__ inline void WaitFlag(int32_t eventID);
 template <pipe_t pipe>
 __aicore__ inline void PipeBarrier();
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||       \
+    (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) ||       \
+    (__NPU_ARCH__ == 3003) ||                                 \
+    (__NPU_ARCH__ == 3113))
 template <MemDsbT arg0>
 __aicore__ inline void DataSyncBarrier();
+#endif
 
 /*
  * @ingroup：IBSet, IBWait
@@ -71,7 +76,7 @@ template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace,
                                  const int32_t usedCores = 0);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
 __aicore__ inline void SyncAll();
 #else
@@ -93,9 +98,8 @@ public:
 };
 
 } // namespace AscendC
-#if defined(__NPU_ARCH__)
+
 #include "../../impl/basic_api/kernel_operator_block_sync_intf_impl.h"
-#endif
 #endif // KERNEL_BLOCK_SYNC_INTF_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_BLOCK_SYNC_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

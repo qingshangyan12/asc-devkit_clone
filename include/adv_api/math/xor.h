@@ -30,6 +30,8 @@
 #include <type_traits>
 #endif
 
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || \
+    __NPU_ARCH__ == 3510))
 namespace AscendC {
 #pragma begin_pipe(V)
 /*
@@ -53,10 +55,7 @@ __aicore__ inline void Xor(const LocalTensor<T>& dstTensor, const LocalTensor<T>
     static_assert((std::is_same<T, int16_t>::value || std::is_same<T, uint16_t>::value),
         "Failed to check the data types, current api support data types are int16_t/uint16_t.");
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3002 || \
-    __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
     XorImpl<T, isReuseSource>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
-#endif
 }
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
@@ -122,6 +121,7 @@ __aicore__ inline void Xor(
 }
 #pragma end_pipe
 }  // namespace AscendC
+#endif
 #endif  // LIB_MATH_XOR_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_XOR_H__)

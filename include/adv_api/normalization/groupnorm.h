@@ -21,13 +21,15 @@
 
 #ifndef LIB_NORMALIZATION_GROUPNORM_H
 #define LIB_NORMALIZATION_GROUPNORM_H
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510)
+
 #include "kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/normalization/groupnorm/groupnorm_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "../../../impl/adv_api/detail/normalization/groupnorm/groupnorm_3510_impl.h"
 #endif
+#include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
 #pragma begin_pipe(V)
 /*!
@@ -50,10 +52,8 @@ __aicore__ inline void GroupNorm(const LocalTensor<T>& output, const LocalTensor
     const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma,
     const LocalTensor<T>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, GroupNormTiling& tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     GroupNormImpl<T, isReuseSource>(output, outputMean, outputVariance, inputX, gamma, beta, sharedTmpBuffer, epsilon,
         tiling);
-#endif
 }
 
 /*!
@@ -75,12 +75,11 @@ __aicore__ inline void GroupNorm(const LocalTensor<T>& output, const LocalTensor
     const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma,
     const LocalTensor<T>& beta, const T epsilon, GroupNormTiling& tiling)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     GroupNormImpl<T, isReuseSource>(output, outputMean, outputVariance, inputX, gamma, beta, epsilon, tiling);
-#endif
 }
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_NORMALIZATION_GROUPNORM_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_GROUPNORM_H__)

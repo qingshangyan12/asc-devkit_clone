@@ -22,6 +22,9 @@
 #define LIB_SORT_TOPK_H
 
 #include "include/adv_api/sort/topk_utils.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+
 #include "kernel_tensor.h"
 #include "kernel_utils.h"
 #include "kernel_tiling/kernel_tiling.h"
@@ -31,8 +34,6 @@
 #endif // ASCENDC_CPU_DEBUG
 #include "../../../impl/adv_api/detail/api_check/kernel_api_check.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/sort/topk/topk_common_impl.h"
 #endif
@@ -41,15 +42,14 @@
 #include "../../../impl/adv_api/detail/sort/topk/topk_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "../../../impl/adv_api/detail/sort/topk/topk_v200_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/sort/topk/topk_3510_impl.h"
-#endif
 #endif
 
 namespace AscendC {
 #pragma begin_pipe(V)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || \
     __NPU_ARCH__ == 3113)
 /*
  * @ingroup TopK
@@ -154,8 +154,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
  */
 template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false,
     enum TopKMode topkMode = TopKMode::TOPK_NORMAL, const TopKConfig& config = defaultTopKConfig>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "TopK is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTensor<int32_t>& dstIndexLocal,
     const LocalTensor<T>& srcLocal, const LocalTensor<int32_t>& srcIndexLocal, const LocalTensor<bool>& finishLocal,
     const int32_t k, const TopkTiling& tilling, const TopKInfo& topKInfo, const bool isLargest = true)
@@ -255,7 +253,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
     CHECK_FUNC_HIGHLEVEL_API(TopK, (T, isInitIndex, isHasfinish, isReuseSrc, topkMode), (
         dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, tmpLocal, k, tilling, topKInfo, isLargest));
 
@@ -267,7 +264,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal,
             finishLocal, tmpLocal, k, tilling, topKInfo, isLargest);
     }
-#endif
 }
 
 /*
@@ -307,7 +303,6 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         return;
     }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
     CHECK_FUNC_HIGHLEVEL_API(TopK, (T, isInitIndex, isHasfinish, isReuseSrc, topkMode), (
         dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest));
 
@@ -319,12 +314,13 @@ __aicore__ inline void TopK(const LocalTensor<T>& dstValueLocal, const LocalTens
         TopKNSmall<T, isInitIndex, isHasfinish, isReuseSrc>(
             dstValueLocal, dstIndexLocal, srcLocal, srcIndexLocal, finishLocal, k, tilling, topKInfo, isLargest);
     }
-#endif
 }
 #endif
 
 #pragma end_pipe
 }  // namespace AscendC
+
+#endif
 
 #endif  // LIB_SORT_TOPK_H
 

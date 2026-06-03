@@ -19,13 +19,13 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MM_BITMODE_INTERFACE_H
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 #include "kernel_struct_mm.h"
 #include "../../impl/basic_api/kernel_operator_mm_bitmode_struct.h"
 
 namespace AscendC {
 class Load2DBitModeParam {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline Load2DBitModeParam();
     __aicore__ inline Load2DBitModeParam(const LoadData2DParamsV2& loadData2DParams_);
@@ -59,11 +59,9 @@ private:
         struct Load2DBitModeConfig1 config1BitMode;
     };
     bool ifTranspose = false;
-#endif
 };
 
 class Load3DBitModeParam {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline Load3DBitModeParam();
     template <typename T>
@@ -113,11 +111,9 @@ private:
         uint64_t config1;
         struct Load3DBitModeConfig1 config1BitMode;
     };
-#endif
 };
 
 class SetFMatrixBitModeParams {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 public:
     __aicore__ inline SetFMatrixBitModeParams();
     template <typename T>
@@ -133,11 +129,10 @@ private:
         uint64_t config0;
         struct SetFMatrixBitModeConfig0 config0BitMode;
     };
-#endif
 };
 
-class MmadBitModeParams {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+class MmadBitModeParams {
 public:
     __aicore__ inline MmadBitModeParams();
     __aicore__ inline MmadBitModeParams(const MmadParams& mmadParams_);
@@ -164,14 +159,14 @@ private:
         uint64_t config0;
         struct MmadBitModeConfig0 config0BitMode;
     };
-#endif
 };
-}  // namespace AscendC
-#if defined(__NPU_ARCH__)
-#include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
 #endif
-#endif
+} // namespace AscendC
 
+#include "../../impl/basic_api/kernel_operator_mm_bitmode_intf_impl.h"
+
+#endif // __NPU_ARCH__ == 3510
+#endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_BITMODE_INTF_H__
