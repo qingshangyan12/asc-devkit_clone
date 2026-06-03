@@ -155,7 +155,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 ## 调用示例<a name="section837496171220"></a>
 
-详细示例请参考[TaskSync样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/task_sync)。
+详细示例请参考[TaskSync样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/05_sync_control/task_sync)。
 
 ```
 #include "kernel_operator.h"
