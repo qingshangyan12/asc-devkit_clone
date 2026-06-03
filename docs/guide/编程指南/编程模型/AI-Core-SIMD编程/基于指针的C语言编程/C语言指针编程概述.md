@@ -146,12 +146,8 @@ asc_add(z, x, y, 4096);
 
 <img src="../../../../figures/地址分配优化后示意图.png" alt="地址分配优化后示意图" width="800" />
 
-**解决方法**：
-
 C指针编程采用静态数组声明方式分配内存，内存地址按声明顺序连续分配。开发者可通过调整数组大小控制地址分配，实现地址错开，避免Bank冲突。
-
-**避免读读冲突**：将x和y的首地址错开8个bank group空间（256字节），确保一次repeat内的8个data block分配在不同bank group。
-
+**避免读读冲突**：如上图所示, 将x和y的首地址错开8个bank group空间（256字节），确保一次repeat内的8个data block分配在不同bank group。
 **避免读写冲突**：确保dst（z）的地址不与x、y分配在同一bank。通过增加y的地址空间，将x/y所在的bank区域内存分配满，使z的地址从bank16开始分配。
 ```c
 __ubuf__ float x[4096 + 64];  // 多申请256字节
@@ -179,8 +175,6 @@ Cube计算单元是AI Core中专用于执行矩阵运算的单元，高亮部分
 | Fixpipe Buffer | 存储量化参数 | `__fbuf__` | `__fbuf__ half fixpipe_buffer[128];` |
 | BiasTable Buffer | 存储Bias数据 | `__biasbuf__` | `__biasbuf__ half bias_buffer[64];` |
 
-**示例代码**：
-
 ```c
 constexpr uint32_t m_size = 256;
 constexpr uint32_t n_size = 128;
@@ -193,6 +187,14 @@ __cb__ half l0b_buffer[n_size * k_size];    // L0B Buffer，512字节对齐
 __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer，64字节对齐
 ```
 
+同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率, AI Core对于L1 Buffer、L0 Buffer都采用了分形格式：
+- L1 Buffer  : FRACTAL_NZ
+- L0A Buffer : FRACTAL_NZ (Ascend 950PR/Ascend 950DT架构该内存分形为NZ, Ascend 910B为ZZ分形)
+- L0A Buffer : FRACTAL_ZN
+- L0C Buffer : FRACTAL_NZ
+
+以`FRACTAL_NZ`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
+![alt text](image-2.png)
 ---
 
 ### 2.5 寄存器（Register）
@@ -274,11 +276,13 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 | 同步范围 | 同步类型 | C指针编程API | 适用场景 |
 |---------|---------|-------------|----------|
-| 核内同步 | 流水互斥同步 📌 | `asc_lock(pipe, mutex_id)`<br>`asc_unlock(pipe, mutex_id)` | 通过锁定指定流水再释放流水来完成流水间的同步依赖 |
+| 核内同步 | 流水互斥同步  | `asc_lock`<br>`asc_unlock` | 通过锁定指定流水再释放流水来完成流水间的同步依赖 |
 | 核内同步 | 核内多流水同步 | `asc_sync_notify`<br>`asc_sync_wait`<br>`asc_sync`<br>`asc_sync_pipe` | 多条流水线间数据依赖同步 |
-| 核内同步 | 同一流水内同步 | `asc_sync_data_barrier(arg)` | 同一流水线内部约束执行顺序 |
+| 核内同步 | 同一流水内同步 | `asc_sync_pipe` | 同一流水线内部约束执行顺序 |
+| 核内同步 | 内存顺序访问控制 | `asc_sync_data_barrier` | 后续执行指令对前序的内存访问存在数据依赖时控制同步 |
 
-> 📌 Ascend 950PR/950DT引入
+
+> 📌 流水互斥同步自Ascend 950PR/950DT引入
 
 ---
 
@@ -286,13 +290,8 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 该同步能力从Ascend 950PR/950DT开始引入并使用，AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。
 
-**接口说明**：
-
 - `asc_lock`：根据`mutex_id`获取Mutex，并阻塞当前流水指令队列，直到对应的`mutex_id`被Unlock
 - `asc_unlock`：等待当前流水的前置指令退出后，根据`mutex_id`释放对应的Mutex
-
-**示例代码**：
-
 ```c
 // 锁定 MTE2 流水线互斥锁
 uint8_t mutex_id = 1;
@@ -313,12 +312,8 @@ asc_unlock(PIPE_V, mutex_id);
 
 该同步主要用于核内多流水间的同步，通过`asc_sync_notify/asc_sync_wait`对两条流水进行`notify`和`wait`处理。
 
-**接口说明**：
-
 - `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1
 - `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行
-
-**示例代码**：
 
 ```c
 // 通过DMA(MTE2)进行GM2UB的搬入处理
@@ -339,8 +334,6 @@ asc_add(dst, src1, src0, total_length);
 
 同一流水线中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。所以对于同一条流水线执行，如果存在前后数据依赖，也需要进行同步处理。
 
-**示例代码**：
-
 ```c
 asc_add(dst, src1, src0, total_length);
 // 后续asc_sub指令对dst存在依赖，插入asc_sync_pipe(PIPE_V)进行单流水的同步
@@ -348,7 +341,7 @@ asc_sync_pipe(PIPE_V);
 asc_sub(dst, dst, src0, total_length);
 ```
 
-**简化方法**：可以直接通过`asc_sync_vector`或者`asc_sync_mte2`这些接口来直接等待某一条流水。
+可以直接通过`asc_sync_vector`或者`asc_sync_mte2`这些接口来直接等待某一条流水。
 
 ```c
 // 通过DMA(MTE2)进行GM2UB的搬入处理
@@ -425,6 +418,9 @@ if ASCEND_IS_AIV {
 
 ---
 
-## 四、总结
+## 四、计算单元
+
+
+## 五、总结
 
 本章系统阐述了C语言指针编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言指针编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。
