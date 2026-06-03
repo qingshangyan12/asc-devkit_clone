@@ -201,7 +201,7 @@ struct IsIntegralConstant<Std::Int<Value>> : Std::true_type {};
 template <typename T>
 constexpr bool IsIntegralConstantV = IsIntegralConstant<T>::value;
 
-#if defined(__NPU_ARCH__) 
+#if defined(__NPU_DEVICE__) 
 using VectorTypeTransform = TupleMap<
     Std::tuple<uint8_t,        vector_uint8_t>,
     Std::tuple<uint16_t,       vector_uint16_t>,

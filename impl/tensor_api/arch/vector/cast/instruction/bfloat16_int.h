@@ -34,28 +34,28 @@ public:                                                                         
     }                                                                                                                \
 }
 
-ASCENDC_CAST_INST(BF162Int32RD, asc_bfloat162int32_rd);
-ASCENDC_CAST_INST(BF162Int32RDSat, asc_bfloat162int32_rd_sat);
-ASCENDC_CAST_INST(BF162Int32RDOdd, asc_bfloat162int32_rd_v2);
+ASCENDC_CAST_INST(BF162Int32RDNoSatEven, asc_bfloat162int32_rd);
+ASCENDC_CAST_INST(BF162Int32RDSatEven, asc_bfloat162int32_rd_sat);
+ASCENDC_CAST_INST(BF162Int32RDNoSatOdd, asc_bfloat162int32_rd_v2);
 ASCENDC_CAST_INST(BF162Int32RDSatOdd, asc_bfloat162int32_rd_sat_v2);
-ASCENDC_CAST_INST(BF162Int32RN, asc_bfloat162int32_rn);
-ASCENDC_CAST_INST(BF162Int32RNSat, asc_bfloat162int32_rn_sat);
-ASCENDC_CAST_INST(BF162Int32RNOdd, asc_bfloat162int32_rn_v2);
+ASCENDC_CAST_INST(BF162Int32RNNoSatEven, asc_bfloat162int32_rn);
+ASCENDC_CAST_INST(BF162Int32RNSatEven, asc_bfloat162int32_rn_sat);
+ASCENDC_CAST_INST(BF162Int32RNNoSatOdd, asc_bfloat162int32_rn_v2);
 ASCENDC_CAST_INST(BF162Int32RNSatOdd, asc_bfloat162int32_rn_sat_v2);
-ASCENDC_CAST_INST(BF162Int32RNA, asc_bfloat162int32_rna);
-ASCENDC_CAST_INST(BF162Int32RNASat, asc_bfloat162int32_rna_sat);
-ASCENDC_CAST_INST(BF162Int32RNAOdd, asc_bfloat162int32_rna_v2);
+ASCENDC_CAST_INST(BF162Int32RNANoSatEven, asc_bfloat162int32_rna);
+ASCENDC_CAST_INST(BF162Int32RNASatEven, asc_bfloat162int32_rna_sat);
+ASCENDC_CAST_INST(BF162Int32RNANoSatOdd, asc_bfloat162int32_rna_v2);
 ASCENDC_CAST_INST(BF162Int32RNASatOdd, asc_bfloat162int32_rna_sat_v2);
-ASCENDC_CAST_INST(BF162Int32RU, asc_bfloat162int32_ru);
-ASCENDC_CAST_INST(BF162Int32RUSat, asc_bfloat162int32_ru_sat);
-ASCENDC_CAST_INST(BF162Int32RUOdd, asc_bfloat162int32_ru_v2);
+ASCENDC_CAST_INST(BF162Int32RUNoSatEven, asc_bfloat162int32_ru);
+ASCENDC_CAST_INST(BF162Int32RUSatEven, asc_bfloat162int32_ru_sat);
+ASCENDC_CAST_INST(BF162Int32RUNoSatOdd, asc_bfloat162int32_ru_v2);
 ASCENDC_CAST_INST(BF162Int32RUSatOdd, asc_bfloat162int32_ru_sat_v2);
-ASCENDC_CAST_INST(BF162Int32RZ, asc_bfloat162int32_rz);
-ASCENDC_CAST_INST(BF162Int32RZSat, asc_bfloat162int32_rz_sat);
-ASCENDC_CAST_INST(BF162Int32RZOdd, asc_bfloat162int32_rz_v2);
+ASCENDC_CAST_INST(BF162Int32RZNoSatEven, asc_bfloat162int32_rz);
+ASCENDC_CAST_INST(BF162Int32RZSatEven, asc_bfloat162int32_rz_sat);
+ASCENDC_CAST_INST(BF162Int32RZNoSatOdd, asc_bfloat162int32_rz_v2);
 ASCENDC_CAST_INST(BF162Int32RZSatOdd, asc_bfloat162int32_rz_sat_v2);
 
-ASCENDC_CAST_INST(Int4x22BF16, asc_int4x22bfloat16);
+ASCENDC_CAST_INST(Int4x22BF16P0, asc_int4x22bfloat16);
 ASCENDC_CAST_INST(Int4x22BF16P1, asc_int4x22bfloat16_v2);
 ASCENDC_CAST_INST(Int4x22BF16P2, asc_int4x22bfloat16_v3);
 ASCENDC_CAST_INST(Int4x22BF16P3, asc_int4x22bfloat16_v4);

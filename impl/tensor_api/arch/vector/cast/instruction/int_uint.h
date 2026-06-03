@@ -34,29 +34,29 @@ public:                                                                         
     }                                                                                                                \
 }
 
-ASCENDC_CAST_INST(Int162UInt32, asc_int162uint32);
-ASCENDC_CAST_INST(Int162UInt32Odd, asc_int162uint32_v2);
-ASCENDC_CAST_INST(Int162UInt, asc_int162uint8);
-ASCENDC_CAST_INST(Int162UIntSat, asc_int162uint8_sat);
-ASCENDC_CAST_INST(Int162UIntOdd, asc_int162uint8_v2);
-ASCENDC_CAST_INST(Int162UIntSatOdd, asc_int162uint8_sat_v2);
+ASCENDC_CAST_INST(Int162UInt32NoSatEven, asc_int162uint32);
+ASCENDC_CAST_INST(Int162UInt32NoSatOdd, asc_int162uint32_v2);
+ASCENDC_CAST_INST(Int162UInt8NoSatEven, asc_int162uint8);
+ASCENDC_CAST_INST(Int162UInt8SatEven, asc_int162uint8_sat);
+ASCENDC_CAST_INST(Int162UInt8NoSatOdd, asc_int162uint8_v2);
+ASCENDC_CAST_INST(Int162UInt8SatOdd, asc_int162uint8_sat_v2);
 
-ASCENDC_CAST_INST(Int322UInt16, asc_int322uint16);
-ASCENDC_CAST_INST(Int322UInt16Sat, asc_int322uint16_sat);
-ASCENDC_CAST_INST(Int322UInt16Odd, asc_int322uint16_v2);
+ASCENDC_CAST_INST(Int322UInt16NoSatEven, asc_int322uint16);
+ASCENDC_CAST_INST(Int322UInt16SatEven, asc_int322uint16_sat);
+ASCENDC_CAST_INST(Int322UInt16NoSatOdd, asc_int322uint16_v2);
 ASCENDC_CAST_INST(Int322UInt16SatOdd, asc_int322uint16_sat_v2);
-ASCENDC_CAST_INST(Int322UInt, asc_int322uint8);
-ASCENDC_CAST_INST(Int322UIntSat, asc_int322uint8_sat);
-ASCENDC_CAST_INST(Int322UIntP1, asc_int322uint8_v2);
-ASCENDC_CAST_INST(Int322UIntSatP1, asc_int322uint8_sat_v2);
-ASCENDC_CAST_INST(Int322UIntP2, asc_int322uint8_v3);
-ASCENDC_CAST_INST(Int322UIntSatP2, asc_int322uint8_sat_v3);
-ASCENDC_CAST_INST(Int322UIntP3, asc_int322uint8_v4);
-ASCENDC_CAST_INST(Int322UIntSatP3, asc_int322uint8_sat_v4);
+ASCENDC_CAST_INST(Int322UInt8NoSatP0, asc_int322uint8);
+ASCENDC_CAST_INST(Int322UInt8SatP0, asc_int322uint8_sat);
+ASCENDC_CAST_INST(Int322UInt8NoSatP1, asc_int322uint8_v2);
+ASCENDC_CAST_INST(Int322UInt8SatP1, asc_int322uint8_sat_v2);
+ASCENDC_CAST_INST(Int322UInt8NoSatP2, asc_int322uint8_v3);
+ASCENDC_CAST_INST(Int322UInt8SatP2, asc_int322uint8_sat_v3);
+ASCENDC_CAST_INST(Int322UInt8NoSatP3, asc_int322uint8_v4);
+ASCENDC_CAST_INST(Int322UInt8SatP3, asc_int322uint8_sat_v4);
 
-ASCENDC_CAST_INST(U322Int16, asc_uint322int16);
-ASCENDC_CAST_INST(U322Int16Sat, asc_uint322int16_sat);
-ASCENDC_CAST_INST(U322Int16Odd, asc_uint322int16_v2);
+ASCENDC_CAST_INST(U322Int16NoSatEven, asc_uint322int16);
+ASCENDC_CAST_INST(U322Int16SatEven, asc_uint322int16_sat);
+ASCENDC_CAST_INST(U322Int16NoSatOdd, asc_uint322int16_v2);
 ASCENDC_CAST_INST(U322Int16SatOdd, asc_uint322int16_sat_v2);
 
 #undef ASCENDC_CAST_INST

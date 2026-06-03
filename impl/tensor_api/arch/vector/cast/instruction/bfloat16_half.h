@@ -34,15 +34,15 @@ public:                                                                         
     }                                                                                                                \
 }
 
-ASCENDC_CAST_INST(BF162HalfRD, asc_bfloat162half_rd);
+ASCENDC_CAST_INST(BF162HalfRDNoSat, asc_bfloat162half_rd);
 ASCENDC_CAST_INST(BF162HalfRDSat, asc_bfloat162half_rd_sat);
-ASCENDC_CAST_INST(BF162HalfRN, asc_bfloat162half_rn);
+ASCENDC_CAST_INST(BF162HalfRNNoSat, asc_bfloat162half_rn);
 ASCENDC_CAST_INST(BF162HalfRNSat, asc_bfloat162half_rn_sat);
-ASCENDC_CAST_INST(BF162HalfRNA, asc_bfloat162half_rna);
+ASCENDC_CAST_INST(BF162HalfRNANoSat, asc_bfloat162half_rna);
 ASCENDC_CAST_INST(BF162HalfRNASat, asc_bfloat162half_rna_sat);
-ASCENDC_CAST_INST(BF162HalfRU, asc_bfloat162half_ru);
+ASCENDC_CAST_INST(BF162HalfRUNoSat, asc_bfloat162half_ru);
 ASCENDC_CAST_INST(BF162HalfRUSat, asc_bfloat162half_ru_sat);
-ASCENDC_CAST_INST(BF162HalfRZ, asc_bfloat162half_rz);
+ASCENDC_CAST_INST(BF162HalfRZNoSat, asc_bfloat162half_rz);
 ASCENDC_CAST_INST(BF162HalfRZSat, asc_bfloat162half_rz_sat);
 
 ASCENDC_CAST_INST(Half2BF16RD, asc_half2bfloat16_rd);

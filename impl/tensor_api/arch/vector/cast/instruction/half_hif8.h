@@ -34,16 +34,16 @@ public:                                                                         
     }                                                                                                                \
 }
 
-ASCENDC_CAST_INST(Half2Hif8RH, asc_half2hif8_rh);
-ASCENDC_CAST_INST(Half2Hif8RHSat, asc_half2hif8_rh_sat);
-ASCENDC_CAST_INST(Half2Hif8RHOdd, asc_half2hif8_rh_v2);
+ASCENDC_CAST_INST(Half2Hif8RHNoSatEven, asc_half2hif8_rh);
+ASCENDC_CAST_INST(Half2Hif8RHSatEven, asc_half2hif8_rh_sat);
+ASCENDC_CAST_INST(Half2Hif8RHNoSatOdd, asc_half2hif8_rh_v2);
 ASCENDC_CAST_INST(Half2Hif8RHSatOdd, asc_half2hif8_rh_sat_v2);
-ASCENDC_CAST_INST(Half2Hif8RNA, asc_half2hif8_rna);
-ASCENDC_CAST_INST(Half2Hif8RNASat, asc_half2hif8_rna_sat);
-ASCENDC_CAST_INST(Half2Hif8RNAOdd, asc_half2hif8_rna_v2);
+ASCENDC_CAST_INST(Half2Hif8RNANoSatEven, asc_half2hif8_rna);
+ASCENDC_CAST_INST(Half2Hif8RNASatEven, asc_half2hif8_rna_sat);
+ASCENDC_CAST_INST(Half2Hif8RNANoSatOdd, asc_half2hif8_rna_v2);
 ASCENDC_CAST_INST(Half2Hif8RNASatOdd, asc_half2hif8_rna_sat_v2);
 
-ASCENDC_CAST_INST(Hif82Half, asc_hif82half);
+ASCENDC_CAST_INST(Hif82HalfEven, asc_hif82half);
 ASCENDC_CAST_INST(Hif82HalfOdd, asc_hif82half_v2);
 
 #undef ASCENDC_CAST_INST

@@ -34,26 +34,26 @@ public:                                                                         
     }                                                                                                                \
 }
 
-ASCENDC_CAST_INST(Hif82Float, asc_hif82float);
+ASCENDC_CAST_INST(Hif82FloatP0, asc_hif82float);
 ASCENDC_CAST_INST(Hif82FloatP1, asc_hif82float_v2);
 ASCENDC_CAST_INST(Hif82FloatP2, asc_hif82float_v3);
 ASCENDC_CAST_INST(Hif82FloatP3, asc_hif82float_v4);
 
-ASCENDC_CAST_INST(Float2Hif8RH, asc_float2hif8_rh);
-ASCENDC_CAST_INST(Float2Hif8RHSat, asc_float2hif8_rh_sat);
-ASCENDC_CAST_INST(Float2Hif8RHP1, asc_float2hif8_rh_v2);
+ASCENDC_CAST_INST(Float2Hif8RHNoSatP0, asc_float2hif8_rh);
+ASCENDC_CAST_INST(Float2Hif8RHSatP0, asc_float2hif8_rh_sat);
+ASCENDC_CAST_INST(Float2Hif8RHNoSatP1, asc_float2hif8_rh_v2);
 ASCENDC_CAST_INST(Float2Hif8RHSatP1, asc_float2hif8_rh_sat_v2);
-ASCENDC_CAST_INST(Float2Hif8RHP2, asc_float2hif8_rh_v3);
+ASCENDC_CAST_INST(Float2Hif8RHNoSatP2, asc_float2hif8_rh_v3);
 ASCENDC_CAST_INST(Float2Hif8RHSatP2, asc_float2hif8_rh_sat_v3);
-ASCENDC_CAST_INST(Float2Hif8RHP3, asc_float2hif8_rh_v4);
+ASCENDC_CAST_INST(Float2Hif8RHNoSatP3, asc_float2hif8_rh_v4);
 ASCENDC_CAST_INST(Float2Hif8RHSatP3, asc_float2hif8_rh_sat_v4);
-ASCENDC_CAST_INST(Float2Hif8RNA, asc_float2hif8_rna);
-ASCENDC_CAST_INST(Float2Hif8RNASat, asc_float2hif8_rna_sat);
-ASCENDC_CAST_INST(Float2Hif8RNAP1, asc_float2hif8_rna_v2);
+ASCENDC_CAST_INST(Float2Hif8RNANoSatP0, asc_float2hif8_rna);
+ASCENDC_CAST_INST(Float2Hif8RNASatP0, asc_float2hif8_rna_sat);
+ASCENDC_CAST_INST(Float2Hif8RNANoSatP1, asc_float2hif8_rna_v2);
 ASCENDC_CAST_INST(Float2Hif8RNASatP1, asc_float2hif8_rna_sat_v2);
-ASCENDC_CAST_INST(Float2Hif8RNAP2, asc_float2hif8_rna_v3);
+ASCENDC_CAST_INST(Float2Hif8RNANoSatP2, asc_float2hif8_rna_v3);
 ASCENDC_CAST_INST(Float2Hif8RNASatP2, asc_float2hif8_rna_sat_v3);
-ASCENDC_CAST_INST(Float2Hif8RNAP3, asc_float2hif8_rna_v4);
+ASCENDC_CAST_INST(Float2Hif8RNANoSatP3, asc_float2hif8_rna_v4);
 ASCENDC_CAST_INST(Float2Hif8RNASatP3, asc_float2hif8_rna_sat_v4);
 
 #undef ASCENDC_CAST_INST
