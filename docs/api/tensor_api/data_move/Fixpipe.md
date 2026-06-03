@@ -201,4 +201,3 @@ struct FixpipeTraitCustom {
 Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitCustom>>{}, globalC, l0CTensor);
 ...
 ```
-完整样例请参考[TensorAPI样例代码](../../../../../examples/01_simd_cpp_api/02_features/05_tensor_api/matmul_quant_relu/matmul_quant_relu.asc)。
