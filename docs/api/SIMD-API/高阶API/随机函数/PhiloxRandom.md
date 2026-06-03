@@ -171,7 +171,7 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-完整算子样例请参考[philoxrandom样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/11_random/philoxrandom)。
+完整算子样例请参考[philoxrandom样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/09_random/philoxrandom)。
 
 ```
 // dstLocal：存放计算结果的Tensor
