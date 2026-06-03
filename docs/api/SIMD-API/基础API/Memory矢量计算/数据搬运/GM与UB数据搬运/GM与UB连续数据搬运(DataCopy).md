@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section474617392321"></a>
 
-头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 支持GM与UB之间的连续数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
 
@@ -140,7 +140,7 @@
 
 - GM -> UB
 
-    ```
+    ```cpp
     // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
     // 使用传入count参数的搬运接口，完成连续搬运
     AscendC::DataCopy(srcLocal, srcGlobal, 512);
@@ -155,7 +155,7 @@
 
 - UB -> GM
 
-    ```
+    ```cpp
     // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
     // 使用传入count参数的搬运接口，完成连续搬运
     AscendC::DataCopy(dstGlobal, dstLocal, 512);
