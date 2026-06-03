@@ -1867,8 +1867,8 @@
 
         -   [Warp Reduce类函数](SIMT-API/Warp函数/Warp-Reduce类函数/Warp-Reduce类函数.md)
             -   [asc\_reduce\_add](SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_add.md)
-            -   [asc\_reduce\_max](SIMD-API/C-API/Reg矢量计算/reg_vector/asc_reduce_max.md)
-            -   [asc\_reduce\_min](SIMD-API/C-API/Reg矢量计算/reg_vector/asc_reduce_min.md)
+            -   [asc\_reduce\_max](SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_max.md)
+            -   [asc\_reduce\_min](SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_min.md)
 
     -   [数学函数](SIMT-API/数学函数/数学函数.md)
         -   [fp8类型](SIMT-API/数学函数/fp8类型/fp8类型.md)
