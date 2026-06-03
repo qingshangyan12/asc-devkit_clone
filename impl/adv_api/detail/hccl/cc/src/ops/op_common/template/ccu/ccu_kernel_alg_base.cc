@@ -965,6 +965,10 @@ std::vector<CcuRep::CompletedEvent> CcuKernelAlgBase::CreateBlockCompletedEvent(
     return res;
 }
 
+} // namespace mc2_ops_hccl
+
+namespace ops_hccl {
+
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool &allocated, uint32_t parallelDim, uint32_t msPerLoop)
 {
     if (allocated) {
@@ -1085,4 +1089,5 @@ CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr sr
     }
     return CCU_SUCCESS;
 }
-}
+
+} // namespace ops_hccl

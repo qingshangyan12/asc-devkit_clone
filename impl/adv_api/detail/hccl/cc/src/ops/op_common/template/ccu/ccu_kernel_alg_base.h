@@ -10,6 +10,11 @@
 #ifndef CCU_KERNEL_ALG_BASE
 #define CCU_KERNEL_ALG_BASE
 
+#include <vector>
+#include <map>
+#include <array>
+#include <memory>
+
 #include "log.h"
 #include "ccu_kernel.h"
 #include "ccu_primitives_dl.hpp"
