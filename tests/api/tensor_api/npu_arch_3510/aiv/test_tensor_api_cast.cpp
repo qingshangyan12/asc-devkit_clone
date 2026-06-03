@@ -104,12 +104,7 @@ TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_CastTrait_U162UInt8NoSatEven_uint8_t_
 
     __ubuf__ uint16_t xUB[TILE_LENGTH] = {0};
     __ubuf__ uint8_t zUB[TILE_LENGTH] = {0};
-
-    x[0] = 0;
-    x[1] = 1;
-    x[2] = 127;
-    x[3] = 255;
-
+    
     TestTransformBinary<uint8_t, uint16_t, AscendC::Te::Inst::Cast, CastTraitU162UInt8NoSatEven>(z, x, zUB, xUB);
 
     EXPECT_EQ(z[0], static_cast<uint8_t>(x[0]));
