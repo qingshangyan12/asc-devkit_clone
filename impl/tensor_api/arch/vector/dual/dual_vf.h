@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_DUAL_DUAL_VF_H
 
 #include "impl/tensor_api/arch/vector/dual/instruction.h"
+#include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
 namespace AscendC {
 namespace Te {

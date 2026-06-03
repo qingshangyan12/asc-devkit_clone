@@ -22,10 +22,10 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 
-#include "impl/tensor_api/arch/vector/binary/instruction.h"
+#include "impl/tensor_api/arch/vector/binary/binary_vf.h"
 #include "impl/tensor_api/arch/vector/cast/cast_vf.h"
-#include "impl/tensor_api/arch/vector/unary/instruction.h"
-#include "impl/tensor_api/arch/vector/dual/instruction.h"
+#include "impl/tensor_api/arch/vector/dual/dual_vf.h"
+#include "impl/tensor_api/arch/vector/unary/unary_vf.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
 namespace AscendC {

@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_VF_H
 
 #include "impl/tensor_api/arch/vector/cast/instruction.h"
+#include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
 namespace AscendC {
 namespace Te {
