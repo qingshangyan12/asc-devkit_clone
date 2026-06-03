@@ -11,10 +11,12 @@ add_library(ascend_runtime_base OBJECT ascendc_runtime.cpp aicpu_rt.cpp)
 
 if(BUILD_OPEN_PROJECT)
   target_include_directories(ascend_runtime_base PRIVATE
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+    ${ASCEND_CANN_PACKAGE_PATH}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../common
-  )
-  target_link_libraries(ascend_runtime_base PRIVATE
-    runtime_headers
   )
 else()
   target_include_directories(ascend_runtime_base PRIVATE
@@ -45,9 +47,6 @@ target_link_libraries(ascend_runtime_base PRIVATE
     $<BUILD_INTERFACE:intf_pub>
     mmpa
     unified_dlog
-    $<BUILD_INTERFACE:c_sec_headers>
-    $<BUILD_INTERFACE:acl_rt_headers>
-    $<BUILD_INTERFACE:metadef_headers>
     $<$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>:acl_rt>
     $<$<NOT:$<BOOL:${BUILD_WITH_INSTALLED_DEPENDENCY_CANN_PKG}>>:ascendcl>
 )
