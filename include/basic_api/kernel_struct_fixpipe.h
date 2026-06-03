@@ -29,6 +29,10 @@
 #include "stub_fun.h"
 #endif
 
+#if __NPU_ARCH__ == 5102
+#define ENABLE_FIX_SHIFT
+#endif
+
 namespace AscendC {
 enum class CO2Layout : uint8_t {
     NZ = 0,
@@ -199,6 +203,9 @@ struct FixpipeParamsArch3510 {
     bool subBlockId = false;
     typename TransformParams<format>::PARAMS params;
     bool isChannelSplit = false;
+#ifdef ENABLE_FIX_SHIFT
+    uint8_t fix_shift_val = 0;
+#endif
 };
 
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
