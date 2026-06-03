@@ -73,7 +73,7 @@ Ascend 950PR/Ascend 950DT架构下，SIMD与SIMT混合场景中，获取到的UB
 
 ## 调用示例<a name="section177231425115410"></a>
 
-本调用示例通过GetRuntimeUBSize获取的UB空间大小，来计算tileNum的值。完整的算子样例参考：[get\_ub\_size样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/get_ub_size)。
+本调用示例通过GetRuntimeUBSize获取的UB空间大小，来计算tileNum的值。完整的算子样例参考：[get\_ub\_size样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/09_utils/get_ub_size)。
 
 ```
 // totalLength为待处理的总数据长度 (元素个数)
