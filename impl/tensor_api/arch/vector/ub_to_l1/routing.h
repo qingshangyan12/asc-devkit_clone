@@ -40,6 +40,11 @@ struct CopyUB2L1Tensor2Tensor {
 };
 
 template <>
+struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, NDLayoutPtn, NDLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2L13510ND2ND;
+};
+
+template <>
 struct CopyUB2L1Tensor2Tensor<Location::L1, Location::UB, NDExtLayoutPtn, NDExtLayoutPtn, ArchVersion::V3510> {
     using type = DataCopyUB2L13510NDExt2NDExt;
 };

@@ -30,6 +30,45 @@ namespace Te {
 
 struct CopyGM2UBTrait {};
 
+class DataCopyGM2UB3510ND2ND {
+public:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyGM2UBTrait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+        constexpr uint8_t leftPaddingCnt = 0;
+        constexpr uint8_t rightPaddingCnt = 0;
+
+        uint16_t blockCount = GetTotalRowShape(srcLayout);
+        uint32_t blockLen = GetTotalColumnShape(srcLayout) * sizeof(SRC_TYPE);
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout) * sizeof(SRC_TYPE);
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout) * sizeof(DST_TYPE);
+
+        if constexpr (IsB4Type<SRC_TYPE>) {
+            blockLen = blockLen >> 1;
+            srcStride = srcStride >> 1;
+        }
+
+        if constexpr (IsB4Type<DST_TYPE>) {
+            dstStride = dstStride >> 1;
+        }
+
+        CopyGmToUbufAlignV2Instr::DataCopy(dst, src, blockCount, blockLen, leftPaddingCnt, rightPaddingCnt, srcStride,
+                                           dstStride, cacheMode);
+    }
+};
+
 class DataCopyGM2UB3510NDExt2NDExt {
 public:
     template <const CopyGM2UBTrait& trait, typename T, typename U>

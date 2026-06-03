@@ -30,6 +30,33 @@ namespace Te {
 
 struct CopyUB2L1Trait {};
 
+class DataCopyUB2L13510ND2ND {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint16_t blockCount = GetTotalRowShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+
+        int64_t srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<DST_TYPE>);
+
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+    }
+};
+
 class DataCopyUB2L13510NDExt2NDExt {
 public:
     template <const CopyUB2L1Trait& trait, typename T, typename U>
