@@ -225,10 +225,6 @@ using VectorTypeTransform = TupleMap<
 #endif
     >;
 #endif
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/feature/tensor_api_from_9.0.0
 } // namespace Te
 } // namespace AscendC
 

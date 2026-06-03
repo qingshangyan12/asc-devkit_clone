@@ -48,7 +48,6 @@ public:
     }
 };
 
-<<<<<<< HEAD
 #define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
@@ -60,7 +59,6 @@ public:                                                                         
         }                                                                                                            \
     }                                                                                                                \
 }
-=======
 class Cast {
 public:
     template<typename... Args>
@@ -76,7 +74,6 @@ public:
         }
     }
 };
->>>>>>> upstream/feature/tensor_api_from_9.0.0
 
 #define ASCENDC_ROUNDING_INST(CLASS_NAME, FUNC_NAME)                                                                 \
 class CLASS_NAME {                                                                                                   \
