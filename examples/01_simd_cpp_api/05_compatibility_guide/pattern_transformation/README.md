@@ -194,7 +194,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
   在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j       # 编译（默认 NPU 模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j       # 编译（默认 NPU 模式）
   python3 ../scripts/gen_data.py                                # 生成测试输入数据
   ./demo                                                        # 执行编译生成的可执行程序
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证结果
@@ -203,8 +203,8 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
   使用 CPU 调试或 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可，示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j   # CPU 调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 .. && make -j   # NPU 仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j   # CPU 调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j   # NPU 仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
