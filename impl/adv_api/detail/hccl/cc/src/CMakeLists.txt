@@ -12,12 +12,15 @@ set(OPS_BASE_DIR ${HCCL_CC_DIR})
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_CC_INCLUDE_DIR}/hcomm
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/types
     ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hcomm/ccu
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
+    ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym/ccu
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common
@@ -135,8 +138,53 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/executor
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/batch_send_recv/selector
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/exception
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common/types
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/legacy/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/aicpu_kfc/pub_inc
 )
 
+list(APPEND INCLUDE_LIST
+    ${ASCEND_CANN_PACKAGE_PATH}/include
+    ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+
+    # hcomm头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/include/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm
+    ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm/ccu
+
+    # runtime头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/include/base/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/driver/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/dump/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/external/
+    ${ASCEND_CANN_PACKAGE_PATH}/include/platform/
+
+    # mmpa头文件
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/mmpa/
+
+    # 包间接口
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hccl
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hcomm/ccu
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/aicpu/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/runtime/runtime/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/profiling/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/dump/
+    ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/trace/
+)
 
 if(PRODUCT_SIDE STREQUAL "device")
     add_library(mc2_server SHARED
@@ -293,7 +341,6 @@ if(PRODUCT_SIDE STREQUAL "device")
     target_link_libraries(mc2_server PRIVATE
         -Wl,--no-as-needed
         mc2_kernel_compat
-        -Wl,--no-as-needed
         mmpa
         $<BUILD_INTERFACE:acl_rt_headers>
         $<BUILD_INTERFACE:error_manager_headers>
