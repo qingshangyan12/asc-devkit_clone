@@ -352,7 +352,7 @@ namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
 }
 
-#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1)
 // param check size
 const int32_t MAX_BLOCK_COUNT = 4095;
 const int32_t MIN_BLOCK_COUNT = 1;
