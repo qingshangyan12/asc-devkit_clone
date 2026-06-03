@@ -124,6 +124,8 @@ public:
             roundMode, typename trait::satMode, typename trait::indexPos>;
 
         using func = CastTrait2CastFunc::template Get<condition>;
+        static_assert(!Std::is_same_v<func, Std::ignore_t>,
+            "Unsupported cast trait: no matching entry found in CastTrait2CastFunc.");
         Transform2CastVF<func, TraitType>::template Run(dst, src);
     }
 };
