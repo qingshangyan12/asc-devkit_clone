@@ -130,8 +130,13 @@ __aicore__ inline void ReduceDataBlockCommon(const LocalTensor<U>& dst, const Lo
     using DstPrimType = PrimT<U>;
     static_assert((SupportEnum<reduceType, ReduceType::SUM, ReduceType::MAX, ReduceType::MIN>()),
         "Invalid reduceType for ReduceDataBlock, only ReduceType::SUM, ReduceType::MAX and ReduceType::MIN are supported.");
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    static_assert((reduceType == ReduceType::SUM || Std::is_same_v<SrcPrimType, DstPrimType>),
+        "ReduceRepeat for MAX/MIN only supports identical src type (T) and dst type (U) for current NPU_ARCH.");
+#else
     static_assert(Std::is_same_v<SrcPrimType, DstPrimType>,
-        "ReduceDataBlock only supports identical src type and dst type for current NPU_ARCH.");
+        "ReduceDataBlock only supports identical src type (T) and dst type (U) for current NPU_ARCH.");
+#endif
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckReduceDataBlockParams<T, U>(dst, src, repeatTime, "ReduceDataBlock");
     if constexpr (Std::is_same_v<MaskType, int32_t>) {
