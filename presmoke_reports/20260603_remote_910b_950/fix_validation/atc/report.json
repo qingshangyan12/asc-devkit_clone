@@ -1,0 +1,95 @@
+{
+  "host_arch": "dav-2201",
+  "modes": [
+    "npu"
+  ],
+  "started_at": "2026-06-03T14:13:40+08:00",
+  "finished_at": "2026-06-03T14:14:18+08:00",
+  "results": [
+    {
+      "example": "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/01_invocation/aclop_invocation/run.sh build",
+      "rc": 255,
+      "duration_s": 10.7540398860001,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_atc_after_soc_fix/logs/01_simd_cpp_api__02_features__01_invocation__aclop_invocation__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/01_invocation/aclop_invocation/run.sh build",
+          "kind": "build",
+          "rc": 255,
+          "duration_s": 10.753278511001554,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 38.481195649001165,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_atc_after_soc_fix/logs/01_simd_cpp_api__02_features__02_framework__02_onnx__onnx_plugin__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 33.34592529099609,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 5.119542316999286,
+          "wait_s": 1.8840000848285854e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.014963066001655534,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "example": "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "atc_command, shell_variable_reference, special_02_features_00_01_02"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "atc_command, framework_command, shell_variable_reference, special_02_features_00_01_02"
+    }
+  ],
+  "summary": {
+    "PASS": 1,
+    "FAIL": 1,
+    "SKIP": 0
+  }
+}

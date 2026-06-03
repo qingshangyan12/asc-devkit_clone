@@ -1,0 +1,2069 @@
+{
+  "host_arch": "dav-2201",
+  "modes": [
+    "npu"
+  ],
+  "started_at": "2026-06-03T13:42:54+08:00",
+  "finished_at": "2026-06-03T14:12:37+08:00",
+  "results": [
+    {
+      "example": "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 39.650372266005434,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__00_compilation__parallel_ops_package__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/00_compilation/parallel_ops_package/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 36.60450808099995,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/00_compilation/parallel_ops_package/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.029603662995214,
+          "wait_s": 1.1715550110020558,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/00_compilation/parallel_ops_package/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.015184910997049883,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/01_invocation/aclop_invocation/run.sh build",
+      "rc": 255,
+      "duration_s": 0.7091742109987536,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__01_invocation__aclop_invocation__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/01_invocation/aclop_invocation/run.sh build",
+          "kind": "build",
+          "rc": 255,
+          "duration_s": 0.707300504000159,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 5.139876724002534,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__02_framework__01_tensorflow__tensorflow_builtin__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 0.013779412998701446,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 5.107100645000173,
+          "wait_s": 2.4319997464772314e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.014718301004904788,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin/run.sh build",
+      "rc": 255,
+      "duration_s": 1.2680962640006328,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__02_framework__02_onnx__onnx_plugin__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin/run.sh build",
+          "kind": "build",
+          "rc": 255,
+          "duration_s": 1.2639278610004112,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 11.954183421999915,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__00_data_movement__copy_ub2ub__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.895592704000592,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8820394099966506,
+          "wait_s": 4.6920999011490494e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17585398400115082,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 14.28012294400105,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__00_data_movement__data_copy_gm2l1__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.358027255999332,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.741325106995646,
+          "wait_s": 1.8602476960004424,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.18009375800465932,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 14.145288031999371,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__00_data_movement__data_copy_l0c2gm__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 11.077613204004592,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8778963779986952,
+          "wait_s": 2.7469999622553587e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.18909738599904813,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.155941697994422,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__00_data_movement__data_copy_pad_gm2ub_ub2gm__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.097257627996441,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.86281113899895,
+          "wait_s": 2.374099858570844e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19527267800003756,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.132407450997562,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__fixpipe_l0c2gm__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.992694135995407,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.9648000890010735,
+          "wait_s": 0.08186701199883828,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1741478600015398,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 13.793929018997005,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__fixpipe_l0c2l1__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.556903773998783,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.056885586003773,
+          "wait_s": 2.196000423282385e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17934263299684972,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 18.090512511997076,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__load_data_l12l0__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.897539040000993,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.058661121001933,
+          "wait_s": 2.1790998289361596e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 5.133656127996801,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 15.013291654999193,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__mmad__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.466320818995882,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 5.354736408000463,
+          "wait_s": 2.486203257001762,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1914915240049595,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_gemv",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.493579043999489,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__mmad_gemv__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_gemv/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.266534880000108,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_gemv/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.041178471998137,
+          "wait_s": 0.15696559000207344,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_gemv/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.18521588900330244,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 17.407972367000184,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__mmad_load3dv2__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.506154107002658,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.871046942003886,
+          "wait_s": 2.862099790945649e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 5.030133607004245,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_mx",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "SKIP",
+      "reason": "unsupported arch dav-2201; supported_archs=dav-3510",
+      "failing_step": null,
+      "rc": null,
+      "duration_s": 0,
+      "log_file": "",
+      "source": "case-runner",
+      "steps": []
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "SKIP",
+      "reason": "unsupported arch dav-2201; supported_archs=dav-3510",
+      "failing_step": null,
+      "rc": null,
+      "duration_s": 0,
+      "log_file": "",
+      "source": "case-runner",
+      "steps": []
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag/run.sh verify",
+      "rc": 1,
+      "duration_s": 12.388335827999981,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__mmad_unitflag__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.620177344004333,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.5841026380003314,
+          "wait_s": 0.712064798004576,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag/run.sh verify",
+          "kind": "verify",
+          "rc": 1,
+          "duration_s": 0.18337966399849392,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 16.044706138003676,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__01_matrix_compute__mmad_with_sparse__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.496578677004436,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 6.361063315001957,
+          "wait_s": 2.492825048000668,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.18638199199631345,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 17.25082879299589,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__block_reduce_min_max_sum__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.175264058998437,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 8.886375027002941,
+          "wait_s": 5.019566067996493,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1885292750012013,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.24532993399771,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__cast__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.200609261999489,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.862322317996586,
+          "wait_s": 2.3319997126236558e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.18177625200041803,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 13.154867643002945,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__compare__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.414524569001514,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.546656325997901,
+          "wait_s": 0.6739350520001608,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19285921099799452,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_compound_compute",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 14.14611942099873,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__element_wise_compound_compute__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_compound_compute/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.263807613002427,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_compound_compute/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.689321913996537,
+          "wait_s": 1.8008811779945972,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_compound_compute/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19239378099882742,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_logic",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 14.139055339997867,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__element_wise_logic__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_logic/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.164194707998831,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_logic/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 5.778459521003242,
+          "wait_s": 1.919679882004857,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_logic/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1956372460044804,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 13.485600533997058,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__gather__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 8.936949386996275,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.3695936989970505,
+          "wait_s": 0.5014390950018424,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17843353500211379,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 13.513102968994644,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__mrg_sort__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.114112867006043,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 4.200150081996981,
+          "wait_s": 1.3084666630020365,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19811881499481387,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 13.499016868998297,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__reduce_computation__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.474493326000811,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.8314318869961426,
+          "wait_s": 0.9518001769974944,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19238601099641528,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/select",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.497756172000663,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__select__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/select/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.179546312996536,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/select/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.1435365790021024,
+          "wait_s": 0.26421266400575405,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/select/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1738269740017131,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.222046918999695,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__transpose__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.173992682000971,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8700640200040652,
+          "wait_s": 2.5169996661134064e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17738753499725135,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.412931370003207,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__02_memory_vector_compute__whole_reduce_min_max_sum__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.351837845002592,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8764338870023494,
+          "wait_s": 2.9670001822523773e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.1839874650031561,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.675145095003245,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__04_resource_management__tbufpool_management__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.61081428599573,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8682081639999524,
+          "wait_s": 3.173000004608184e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19543166100629605,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 12.775962942003389,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__06_sync_control__cross_core_set_wait_flag__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.699674216004496,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8751049200000125,
+          "wait_s": 2.5570996513124555e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.2005365229997551,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 34.749898244997894,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__08_atomic_operations__data_movement_with_atomic_operations__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 9.200287562001904,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 25.357790572998056,
+          "wait_s": 22.48024337500101,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.19122669900389155,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 34.50436897000327,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__03_basic_api__08_atomic_operations__set_atomic_deterministic_computation__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 10.577548068002216,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 23.750271034994512,
+          "wait_s": 20.878148654999677,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17585491399950115,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming/run.sh run",
+      "rc": 1,
+      "duration_s": 25.442330769001273,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__02_features__04_aicpu__tiling_sink_programming__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 0.014253291999921203,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming/run.sh run",
+          "kind": "run",
+          "rc": 1,
+          "duration_s": 25.427034336004,
+          "wait_s": 2.746188726996479,
+          "npu_slot": true,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 31.48724900600064,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__00_matrix__matmul_ibshareAB__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 23.589657634001924,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 7.722243416996207,
+          "wait_s": 4.640203868002573,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17457420800201362,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 31.33520163600042,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__00_matrix__matmul_ibshareB__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 27.402691499002685,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.7543949090031674,
+          "wait_s": 0.8709723849970032,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.17543592600122793,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 18.63177079700108,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__08_tensor_transformation__broadcast__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 15.744272483003442,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.87073299199983,
+          "wait_s": 2.7711001166608185e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.016026498000428546,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/08_tensor_transformation/transdata",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 19.488949958999,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__08_tensor_transformation__transdata__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/transdata/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 16.59380345300451,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/transdata/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 2.8710912790047587,
+          "wait_s": 3.331100015202537e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/08_tensor_transformation/transdata/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.02312021799298236,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/12_math/clampmin",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 19.285669660996064,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__12_math__clampmin__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/clampmin/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 16.12616060700384,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/clampmin/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.1422741719943588,
+          "wait_s": 0.2579537900019204,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/clampmin/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.016291163003188558,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/12_math/power",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 29.095996158997878,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__03_libraries__12_math__power__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/power/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 25.996181050002633,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/power/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.073863256002369,
+          "wait_s": 3.226999979233369e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/power/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.025324920999992173,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 35.214380778001214,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__04_best_practices__01_matrix_compute_practices__matmul_basic_api_high_performance__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 22.7019644480024,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 6.72037017600087,
+          "wait_s": 2.6539320470037637,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 5.79117366700666,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 51.93663641600142,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__04_best_practices__01_matrix_compute_practices__matmul_high_performance__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 43.49950072100182,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 5.067723854001088,
+          "wait_s": 2.5041001208592206e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 3.368616904001101,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 35.235024415000225,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__04_best_practices__03_fusion_compute_practices__matmul_gelu_high_performance__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 28.94538432299305,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 3.8603525959988474,
+          "wait_s": 3.1501003832090646e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 2.428465529999812,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "FAIL",
+      "reason": "nonzero rc",
+      "failing_step": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance/run.sh verify",
+      "rc": 1,
+      "duration_s": 1607.0339749030027,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__04_best_practices__03_fusion_compute_practices__quant_group_matmul_high_performance__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 497.89674158600246,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 1102.6005677960056,
+          "wait_s": 2.5699999241624027e-05,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance/run.sh verify",
+          "kind": "verify",
+          "rc": 1,
+          "duration_s": 6.53605041999981,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy",
+      "arch": "dav-2201",
+      "mode": "npu",
+      "status": "PASS",
+      "reason": "",
+      "failing_step": null,
+      "rc": 0,
+      "duration_s": 20.315450091002276,
+      "log_file": "/data/zgx/asc-devkit/presmoke_results/20260603_cmd40_after_runner_fix/logs/01_simd_cpp_api__04_best_practices__04_memory_access_practices__data_copy__npu.log",
+      "source": "case-runner",
+      "steps": [
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy/run.sh build",
+          "kind": "build",
+          "rc": 0,
+          "duration_s": 12.196642363000137,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy/run.sh run",
+          "kind": "run",
+          "rc": 0,
+          "duration_s": 8.103915702995437,
+          "wait_s": 4.033756110999093,
+          "npu_slot": true,
+          "timeout": false
+        },
+        {
+          "command": "bash /data/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy/run.sh verify",
+          "kind": "verify",
+          "rc": 0,
+          "duration_s": 0.014007466998009477,
+          "wait_s": 0.0,
+          "npu_slot": false,
+          "timeout": false
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "example": "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "no_make_step, special_02_features_00_01_02"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "atc_command, shell_variable_reference, special_02_features_00_01_02"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "no_cmake_step, no_make_step, special_02_features_00_01_02"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "atc_command, framework_command, shell_variable_reference, special_02_features_00_01_02"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_mx",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference, unsupported_on_target_arch_or_mode"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_mx",
+      "category": "case-runner",
+      "severity": "info",
+      "message": "Skipped on unsupported arch dav-2201",
+      "hint": "Supported archs: dav-3510"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api",
+      "category": "case-runner",
+      "severity": "info",
+      "message": "Generated runner confidence is medium",
+      "hint": "unsupported_on_target_arch_or_mode"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api",
+      "category": "case-runner",
+      "severity": "info",
+      "message": "Skipped on unsupported arch dav-2201",
+      "hint": "Supported archs: dav-3510"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_compound_compute",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/element_wise_logic",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/mrg_sort",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/select",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+      "category": "case-runner",
+      "severity": "info",
+      "message": "Generated runner confidence is medium",
+      "hint": "no_cmake_step, no_make_step"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/08_tensor_transformation/transdata",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/12_math/clampmin",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/03_libraries/12_math/power",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    },
+    {
+      "example": "01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy",
+      "category": "case-runner",
+      "severity": "warn",
+      "message": "Generated runner confidence is low",
+      "hint": "shell_variable_reference"
+    }
+  ],
+  "summary": {
+    "PASS": 38,
+    "FAIL": 5,
+    "SKIP": 2
+  }
+}
