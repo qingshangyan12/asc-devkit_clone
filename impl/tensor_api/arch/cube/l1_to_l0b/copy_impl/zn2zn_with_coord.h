@@ -57,12 +57,7 @@ private:
         uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / STRIDE_UNIT;
-        if constexpr (IsB4Type<DstType>) {
-            LoadCbufToCb::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-        }
-        else {
-            LoadCbufToCb::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-        }
+        LoadCbufToCb::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
     }
 };
 } // namespace Te

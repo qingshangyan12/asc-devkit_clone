@@ -14,15 +14,15 @@
 import sys
 import numpy as np
 
-# for float32
-relative_tol = 1e-4
-absolute_tol = 1e-6
-error_tol = 1e-4
+# for float16 output
+relative_tol = 1e-3
+absolute_tol = 1e-3
+error_tol = 1e-3
 
 
 def verify_result(output, golden):
-    output = np.fromfile(output, dtype=np.float32).reshape(-1)
-    golden = np.fromfile(golden, dtype=np.float32).reshape(-1)
+    output = np.fromfile(output, dtype=np.half).astype(np.float32).reshape(-1)
+    golden = np.fromfile(golden, dtype=np.half).astype(np.float32).reshape(-1)
     different_element_results = np.isclose(output,
                                            golden,
                                            rtol=relative_tol,

@@ -16,7 +16,7 @@ import numpy as np
 
 
 def gen_golden_data():
-    B, M, K, N = 4, 64, 64, 64
+    B, M, K, N = 128, 32, 32, 32
     #带batch的矩阵乘，输入[B, M, K]和[B, K, N]
     input_type = np.dtype("half")
     golden = np.zeros([B, M, N]).astype(np.float32)

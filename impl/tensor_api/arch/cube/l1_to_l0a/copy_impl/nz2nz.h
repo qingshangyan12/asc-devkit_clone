@@ -65,11 +65,7 @@ private:
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / STRIDE_UNIT;
-        if constexpr (IsB4Type<DstType>) {
-            LoadCbufToCa::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-        } else {
-            LoadCbufToCa::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-        }
+        LoadCbufToCa::LoadData<false>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
     }
 
     template <const CopyL12L0ATrait& trait, typename T, typename U>

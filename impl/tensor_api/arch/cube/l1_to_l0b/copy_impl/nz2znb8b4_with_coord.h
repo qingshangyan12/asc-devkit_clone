@@ -97,18 +97,13 @@ private:
         constexpr uint32_t STRIDE_UNIT = C0_ELEMENT<DstType> * FRACTAL_FIXED;
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / STRIDE_UNIT;
         auto dstStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) / STRIDE_UNIT;
-        if constexpr (IsB4Type<DstType>) {
-            if (n1 < FRACTAL_FIXED) {
-                LoadCbufToCb::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            } else {
-                LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            }
+        
+        if (n1 < FRACTAL_FIXED) {
+            LoadCbufToCb::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
+        } else if constexpr (IsB4Type<DstType>) { 
+            LoadDataImplB4<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         } else {
-            if (n1 < FRACTAL_FIXED) {
-                LoadCbufToCb::LoadData<true>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            } else {
-                LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
-            }
+            LoadDataImplB8<trait, T, U>(dst, src, mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride);
         }
     }
 };
