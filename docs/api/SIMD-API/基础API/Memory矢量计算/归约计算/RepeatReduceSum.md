@@ -217,7 +217,7 @@ __aicore__ inline void RepeatReduceSum(const LocalTensor<U>& dst, const LocalTen
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本样例中只展示Compute流程中的部分代码。完整样例可参考[WholeReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
+本样例中只展示Compute流程中的部分代码。完整样例可参考[WholeReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/whole_reduce_min_max_sum)。
 
 ```
 // dstLocal，srcLocal均为half类型，srcLocal的计算数据量为512，连续排布，计算结果也需要连续排布，使用tensor高维切分计算接口，设定mask为最多的128个全部元素参与计算
