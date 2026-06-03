@@ -109,7 +109,7 @@ private:
     static std::vector<ccu::LocalAddr>      srcAddr_;
     static std::vector<ccu::Variable>       dstToken_;
     static std::vector<ccu::Variable>       srcToken_;
-    static hcomm::CcuRep::CompletedEvent event_;
+    static ccu::Event event_;
     static ccu::Variable flag_;
     static bool loadFromMem_;
 };
