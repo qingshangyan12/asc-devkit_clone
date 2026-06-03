@@ -29,10 +29,3 @@ add_executable(demo
 target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )
-
-target_link_libraries(demo PRIVATE
-    m
-    platform
-    tiling_api
-    dl
-)
