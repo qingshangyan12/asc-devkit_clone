@@ -50,10 +50,10 @@ __aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const
 
 template <typename LayoutPattern, typename TraitType, typename Batch, typename Row, typename Column, typename LayoutType>
 __aicore__ inline constexpr auto MakeBatchPatternLayout(
-    const Batch& batch, const Row& row, const Column& column, const LayoutType& layout)
+    const Batch& batch, const Row& /*row*/, const Column& /*column*/, const LayoutType& layout)
 {
     return MakePatternLayout<LayoutPattern, TraitType>(
-        MakeShape(batch, layout.Shape()), MakeStride(row * column, layout.Stride()));
+        MakeShape(batch, layout.Shape()), MakeStride(layout.Capacity(), layout.Stride()));
 }
 
 struct MakeNzFrameLayout {
