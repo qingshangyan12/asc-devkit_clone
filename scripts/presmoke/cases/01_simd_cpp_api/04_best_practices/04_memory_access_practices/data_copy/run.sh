@@ -39,14 +39,14 @@ run_in_build_dir() {
 
 build() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && ASC_ARCH=dav-2201 COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && ASC_ARCH=dav-2201 COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'make -j')
-    (cd "$BUILD_DIR" && ASC_ARCH=dav-2201 COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH')
+    (cd "$BUILD_DIR" && ASC_ARCH=$ARCH COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+    (cd "$BUILD_DIR" && ASC_ARCH=$ARCH COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'make -j')
+    (cd "$BUILD_DIR" && ASC_ARCH=$ARCH COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH')
 }
 
 run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && ASC_ARCH=dav-2201 COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc ./demo)
+    (cd "$BUILD_DIR" && ASC_ARCH=$ARCH COPY_DST=UB SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc ./demo)
 }
 
 verify() {

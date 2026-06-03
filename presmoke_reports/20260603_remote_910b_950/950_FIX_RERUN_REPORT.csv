@@ -1,0 +1,14 @@
+case,first_status,first_category,first_duration_s,fix_status,fix_duration_s,fix_build_s,fix_run_s,fix_verify_s,fix_npu_wait_s,fix_rc,fix_reason,failing_step
+01_simd_cpp_api/00_introduction/04_vector_reg/add,FAIL,accuracy_or_verify,26.954,FAIL,21.389,14.159,7.046,0.183,0.000,1,nonzero rc,bash /home/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/00_introduction/04_vector_reg/add/run.sh verify
+01_simd_cpp_api/01_utilities/04_profiling/torch_library_report_tensor,FAIL,runner_wrong_cwd_msprof,123.753,PASS,141.850,123.778,18.055,0.013,0.000,0,,
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1,FAIL,accuracy_or_verify,21.848,FAIL,34.081,14.524,19.376,0.180,12.525,1,nonzero rc,bash /home/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1/run.sh verify
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_2dmx_l12l0,FAIL,accuracy_or_verify,21.043,PASS,27.224,14.522,12.527,0.174,6.683,0,,
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2,FAIL,accuracy_or_verify,30.200,FAIL,23.036,8.228,11.334,3.474,4.284,1,nonzero rc,bash /home/zgx/asc-devkit/scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2/run.sh verify
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_mx,FAIL,accuracy_or_verify,27.760,PASS,22.122,15.095,6.845,0.182,0.000,0,,
+01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_basic_api_high_performance,FAIL,missing_en_dtypes,14.765,PASS,35.072,26.720,6.849,1.503,0.000,0,,
+01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_high_performance,FAIL,missing_en_dtypes,25.040,PASS,48.036,36.814,9.748,1.473,2.903,0,,
+01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_tensor_api_high_performance,FAIL,missing_en_dtypes,21.212,PASS,49.966,34.892,13.583,1.491,6.748,0,,
+03_simt_api/02_features/06_compile/00_basic_compile,FAIL,runner_wrong_cwd_demo,6.857,PASS,6.992,1.134,5.844,0.014,0.000,0,,
+03_simt_api/02_features/06_compile/01_separate_compile,FAIL,runner_wrong_cwd_demo,1.600,PASS,8.011,1.167,6.829,0.014,0.000,0,,
+03_simt_api/02_features/06_compile/02_dynamic_library_compile,FAIL,runner_line_continuation,0.670,PASS,20.528,1.830,18.683,0.014,11.836,0,,
+03_simt_api/02_features/06_compile/03_static_library_compile,FAIL,runner_line_continuation,0.363,PASS,19.070,1.545,17.511,0.013,10.664,0,,

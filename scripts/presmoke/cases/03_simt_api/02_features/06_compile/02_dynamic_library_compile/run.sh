@@ -39,10 +39,8 @@ run_in_build_dir() {
 
 build() {
     mkdir -p "$BUILD_DIR"
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'bisheng -shared gather_kernel.asc -o libgather_kernel.so -fPIC --npu-arch=dav-3510 --enable-simt')
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'bisheng main.cpp -o demo -L./ -L${ASCEND_HOME_PATH}/lib64 -I${ASCEND_HOME_PATH}/include \')
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc '-lgather_kernel -lascendcl -lstdc++')
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH')
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
 }
 
 run() {

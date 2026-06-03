@@ -39,6 +39,7 @@ run_in_build_dir() {
 
 build() {
     mkdir -p "$BUILD_DIR"
+    presmoke_ensure_custom_op_package
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../leaky_relu.py')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'atc --model=./leaky_relu.onnx --framework=5 --soc_version=${soc_version} --output=./leaky_relu_custom --input_shape="X:8,16,1024" --input_format=ND')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')

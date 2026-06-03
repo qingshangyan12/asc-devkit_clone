@@ -1,0 +1,7 @@
+case,current_status,phase,baseline_or_latest_duration_s,build_s,run_s,verify_s,evidence,next_action
+01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin,SKIP,build/run/verify,,,,,Current runner explicitly skips because TensorFlow 2.6.5 is required,Keep skipped unless TensorFlow 2.6.5 environment is prepared
+01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom,SKIP,build/run/verify,,,,,Current runner explicitly skips because TensorFlow 2.6.5 is required,Keep skipped unless TensorFlow 2.6.5 environment is prepared
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag,FAIL,verify,20.421,8.3,12.0,0.2,"Card 7 reproduced verify failure; many rdiff around 0.000001 then [ERROR] result error","Treat as confirmed 910B sample/result issue"
+01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sync_all,PASS_ON_CARD7,all,12.243,9.2,2.9,0.2,"Card 7 rerun passed; verify error ratio 0.0000 and test pass","Treat earlier baseline failure as card/runtime-state sensitive unless reproduced"
+01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8,EXCLUDED_ON_910B_UNSUPPORTED,planner,11.840,11.8,,,"README supports Ascend 950PR/950DT only; card 7 build failed with unknown type name hifloat8_t","Presmoke marks supported_archs=dav-3510 so 910B does not plan it or count it as skip"
+01_simd_cpp_api/04_best_practices/04_memory_access_practices/bank_conflict_nd2nz,PASS_ON_CARD7,all,14.052,10.5,2.9,0.7,"Card 7 rerun passed; verify test pass","Treat earlier baseline failure as card/runtime-state sensitive unless reproduced"

@@ -21,6 +21,30 @@ SPECIAL_PREFIXES = (
     "01_simd_cpp_api/02_features/02_",
 )
 
+CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+
+CUSTOM_OP_PACKAGE_DEPENDENTS = {
+    "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+    "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+}
+
+TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
+ARCH_OVERRIDES = {
+    # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
+    # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
+    "01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8": ["dav-3510"],
+}
+
+ARCH_ENV_KEYS = {
+    "ARCH",
+    "ASC_ARCH",
+    "ASCEND_ARCH",
+    "CMAKE_ASC_ARCHITECTURES",
+    "NPU_ARCH",
+}
+
 
 @dataclass
 class CaseReport:
@@ -31,6 +55,8 @@ class CaseReport:
     supported_archs: List[str] = field(default_factory=list)
     supported_modes: List[str] = field(default_factory=list)
     target_runnable: bool = False
+    skip: bool = False
+    skip_reason: str = ""
     reasons: List[str] = field(default_factory=list)
     commands: List[str] = field(default_factory=list)
 
@@ -45,6 +71,7 @@ def main() -> int:
     reports_root.mkdir(parents=True, exist_ok=True)
 
     specs = [parse_readme(path, examples_root) for path in discover_examples(examples_root)]
+    apply_case_overrides(specs)
     cells, planner_suggestions = build_cells(specs, args.arch, [args.mode])
     runnable_by_rel = {cell.example.rel_path: cell for cell in cells}
     all_cells = [cell_for_spec(spec, args.arch, args.mode) for spec in specs]
@@ -53,7 +80,7 @@ def main() -> int:
         report = write_runner(project_root, runners_root, cell, runnable_on_target=cell.example.rel_path in runnable_by_rel)
         reports.append(report)
 
-    coverage = build_coverage_report(examples_root, specs, cells, reports)
+    coverage = build_coverage_report(examples_root, specs, cells, reports, args.arch, args.mode)
     write_reports(reports_root, reports, coverage, planner_suggestions)
     print(f"generated_runners={len(reports)}")
     print(f"low_confidence={sum(1 for item in reports if item.confidence != 'high')}")
@@ -73,6 +100,12 @@ def cell_for_spec(spec, arch: str, mode: str) -> Cell:
     commands = [rewrite_command(command, arch, mode) for command in spec.commands]
     build_dir = spec.path / f"build_{mode}"
     return Cell(spec, arch, mode, commands, build_dir)
+
+
+def apply_case_overrides(specs) -> None:
+    for spec in specs:
+        if spec.rel_path in ARCH_OVERRIDES:
+            spec.archs = ARCH_OVERRIDES[spec.rel_path]
 
 
 def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_target: bool) -> CaseReport:
@@ -100,7 +133,32 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     if not verify_cmds:
         verify_cmds = [Command(":", "verify")]
 
-    text = render_runner(rel, build_cmds, run_cmds, verify_cmds)
+    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
+    custom_op_dependency = requires_custom_op_package(rel)
+    skip_reason = explicit_skip_reason(rel)
+    if skip_reason:
+        reasons.append("explicit_skip")
+        confidence = "high"
+        build_cmds = [Command(":", "build")]
+        run_cmds = [Command(":", "run")]
+        verify_cmds = [Command(":", "verify")]
+    elif custom_op_package_case:
+        reasons.append("custom_op_package_provider")
+        build_cmds = [Command(":", "build")]
+        run_cmds = [Command(":", "run")]
+        verify_cmds = [Command(":", "verify")]
+    elif custom_op_dependency:
+        reasons.append("requires_custom_op_package")
+
+    text = render_runner(
+        rel,
+        build_cmds,
+        run_cmds,
+        verify_cmds,
+        custom_op_dependency=custom_op_dependency,
+        custom_op_package_case=custom_op_package_case,
+        skip_reason=skip_reason,
+    )
     runner.write_text(text, encoding="utf-8")
     runner.chmod(0o755)
     return CaseReport(
@@ -111,6 +169,8 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
         supported_archs=cell.example.archs,
         supported_modes=cell.example.modes,
         target_runnable=runnable_on_target,
+        skip=bool(skip_reason),
+        skip_reason=skip_reason,
         reasons=reasons,
         commands=[command.raw for command in cell.commands if command.raw],
     )
@@ -169,13 +229,47 @@ def downgrade(confidence: str) -> str:
     return confidence
 
 
-def render_runner(rel: str, build_cmds: List[Command], run_cmds: List[Command], verify_cmds: List[Command]) -> str:
+def requires_custom_op_package(rel: str) -> bool:
+    if rel == CUSTOM_OP_PACKAGE_CASE:
+        return True
+    if rel in CUSTOM_OP_PACKAGE_DEPENDENTS:
+        return True
+    if "/02_framework/01_tensorflow/" in rel:
+        return True
+    return False
+
+
+def explicit_skip_reason(rel: str) -> str:
+    if "/02_framework/01_tensorflow/" in rel:
+        return TENSORFLOW_SKIP_REASON
+    return ""
+
+
+def render_runner(
+    rel: str,
+    build_cmds: List[Command],
+    run_cmds: List[Command],
+    verify_cmds: List[Command],
+    custom_op_dependency: bool = False,
+    custom_op_package_case: bool = False,
+    skip_reason: str = "",
+) -> str:
+    pre_build_lines = ['    presmoke_ensure_custom_op_package'] if custom_op_dependency and not skip_reason else []
+    pre_run_lines = ['    presmoke_ensure_custom_op_package'] if custom_op_package_case and not skip_reason else []
+    skip_lines = []
+    if skip_reason:
+        quoted_reason = shlex.quote(skip_reason)
+        skip_lines = [
+            f"SKIP_REASON={quoted_reason}",
+            "",
+        ]
     return "\n".join(
         [
             "#!/usr/bin/env bash",
             "set -euo pipefail",
             "",
             f'CASE_REL={shlex.quote(rel)}',
+            *skip_lines,
             'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
             'if [[ -n "${PRESMOKE_PROJECT_ROOT:-}" ]]; then',
             '    COMMON_SH="$PRESMOKE_PROJECT_ROOT/scripts/presmoke/case_common.sh"',
@@ -212,16 +306,21 @@ def render_runner(rel: str, build_cmds: List[Command], run_cmds: List[Command], 
             "}",
             "",
             "build() {",
+            *skip_function_lines(skip_reason),
             '    mkdir -p "$BUILD_DIR"',
+            *pre_build_lines,
             *indent_commands(build_cmds),
             "}",
             "",
             "run() {",
+            *skip_function_lines(skip_reason),
             '    mkdir -p "$BUILD_DIR"',
+            *pre_run_lines,
             *indent_commands(run_cmds, default_cd_build=True),
             "}",
             "",
             "verify() {",
+            *skip_function_lines(skip_reason),
             '    mkdir -p "$BUILD_DIR"',
             *indent_commands(verify_cmds, default_cd_build=True),
             "}",
@@ -243,6 +342,15 @@ def render_runner(rel: str, build_cmds: List[Command], run_cmds: List[Command], 
     )
 
 
+def skip_function_lines(skip_reason: str) -> List[str]:
+    if not skip_reason:
+        return []
+    return [
+        '    echo "SKIP: $SKIP_REASON"',
+        "    exit 0",
+    ]
+
+
 def indent_commands(commands: Iterable[Command], default_cd_build: bool = False) -> List[str]:
     lines: List[str] = []
     for command in commands:
@@ -252,6 +360,7 @@ def indent_commands(commands: Iterable[Command], default_cd_build: bool = False)
         if not raw or raw == ":":
             lines.append("    :")
             continue
+        raw = rewrite_runtime_arch_options(raw)
         raw = rewrite_runtime_cmake_options(raw)
         quoted = shlex.quote(raw)
         env_prefix = command_env_prefix(command)
@@ -270,11 +379,19 @@ def indent_commands(commands: Iterable[Command], default_cd_build: bool = False)
             lines.append(f'    (cd "$BUILD_DIR" && {runner})')
         elif raw.startswith("atc "):
             lines.append(f'    (cd "$BUILD_DIR" && {runner})')
-        elif raw.startswith("python3 ../") or (default_cd_build and raw.startswith("./") and not raw.startswith("./build/")):
+        elif command_runs_from_build_dir(raw, default_cd_build):
             lines.append(f'    (cd "$BUILD_DIR" && {runner})')
         else:
             lines.append(f'    (cd "$CASE_DIR" && {runner})')
     return lines
+
+
+def command_runs_from_build_dir(command: str, default_cd_build: bool = False) -> bool:
+    if command.startswith("python3 ../"):
+        return True
+    if 'python3 ../' in command and ("--application=" in command or command.startswith("msprof ")):
+        return True
+    return default_cd_build and command.startswith("./") and not command.startswith("./build/")
 
 
 def rewrite_runtime_cmake_options(command: str) -> str:
@@ -295,9 +412,26 @@ def rewrite_runtime_cmake_options(command: str) -> str:
     return f"{command} $RUN_MODE_ARG"
 
 
+def rewrite_runtime_arch_options(command: str) -> str:
+    command = re.sub(
+        r"--npu-arch=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        "--npu-arch=$ARCH",
+        command,
+    )
+    command = re.sub(
+        r"-DNPU_ARCH=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        '-DNPU_ARCH="$ARCH"',
+        command,
+    )
+    return command
+
+
 def command_env_prefix(command: Command) -> str:
     env = dict(command.env)
     env.setdefault("soc_version", "$SOC_VERSION")
+    for key in ARCH_ENV_KEYS:
+        if key in env:
+            env[key] = "$ARCH"
     if not env:
         return ""
     parts = [f"{key}={quote_env_value(str(value))}" for key, value in sorted(env.items())]
@@ -312,7 +446,7 @@ def quote_env_value(value: str) -> str:
     return shlex.quote(value)
 
 
-def build_coverage_report(examples_root: Path, specs, cells, reports: List[CaseReport]) -> dict:
+def build_coverage_report(examples_root: Path, specs, cells, reports: List[CaseReport], target_arch: str, target_mode: str) -> dict:
     readmes = sorted(p.parent.relative_to(examples_root).as_posix() for p in examples_root.rglob("README.md"))
     runnable_readmes = sorted(spec.rel_path for spec in specs)
     target_cell_cases = sorted(cell.example.rel_path for cell in cells)
@@ -323,6 +457,8 @@ def build_coverage_report(examples_root: Path, specs, cells, reports: List[CaseR
         "runnable_readme_count": len(runnable_readmes),
         "generated_runner_count": len(generated_cases),
         "target_runnable_count": len(target_cell_cases),
+        "target_arch": target_arch,
+        "target_mode": target_mode,
         "cmake_dir_count": len(cmake_dirs),
         "supported_arch_counts": count_supported_archs(reports),
         "supported_mode_counts": count_supported_modes(reports),
@@ -364,7 +500,7 @@ def write_reports(reports_root: Path, reports: List[CaseReport], coverage: dict,
         f"- README.md count: `{coverage['readme_count']}`",
         f"- README with 编译运行: `{coverage['runnable_readme_count']}`",
         f"- generated runners: `{coverage['generated_runner_count']}`",
-        f"- target runnable on dav-2201/npu: `{coverage['target_runnable_count']}`",
+        f"- target runnable on {coverage['target_arch']}/{coverage['target_mode']}: `{coverage['target_runnable_count']}`",
         f"- CMakeLists.txt directories: `{coverage['cmake_dir_count']}`",
         f"- low/medium confidence runners: `{len(low)}`",
         f"- supported arch counts: `{coverage['supported_arch_counts']}`",

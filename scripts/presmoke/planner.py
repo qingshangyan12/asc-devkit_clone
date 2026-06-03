@@ -25,36 +25,13 @@ def build_cells_with_skips(
     skipped: List[RunResult] = []
     for spec in specs:
         if arch not in spec.archs:
-            suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Skipped on unsupported arch {arch}", f"Supported archs: {', '.join(spec.archs)}"))
-            for mode in (mode_list or spec.modes):
-                skipped.append(
-                    RunResult(
-                        spec.rel_path,
-                        arch,
-                        mode,
-                        "SKIP",
-                        f"unsupported arch {arch}; supported_archs={','.join(spec.archs)}",
-                        duration_s=0,
-                        source=spec.source,
-                    )
-                )
+            suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Excluded on unsupported arch {arch}", f"Supported archs: {', '.join(spec.archs)}"))
             continue
         for mode in (mode_list or spec.modes):
             if requested_modes and mode not in requested_modes:
                 continue
             if mode not in spec.modes:
-                suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Skipped on unsupported mode {mode}", f"Supported modes: {', '.join(spec.modes)}"))
-                skipped.append(
-                    RunResult(
-                        spec.rel_path,
-                        arch,
-                        mode,
-                        "SKIP",
-                        f"unsupported mode {mode}; supported_modes={','.join(spec.modes)}",
-                        duration_s=0,
-                        source=spec.source,
-                    )
-                )
+                suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Excluded on unsupported mode {mode}", f"Supported modes: {', '.join(spec.modes)}"))
                 continue
             rewritten = [rewrite_command(command, arch, mode) for command in spec.commands]
             build_dir = spec.path / f"build_{mode}"

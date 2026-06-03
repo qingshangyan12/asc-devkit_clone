@@ -39,6 +39,7 @@ run_in_build_dir() {
 
 build() {
     mkdir -p "$BUILD_DIR"
+    presmoke_ensure_custom_op_package
 }
 
 run() {

@@ -41,6 +41,30 @@ def build_case_runner_cells_with_skips(
         supported_modes = list(info.get("supported_modes") or modes_list or ["npu"])
         confidence = info.get("confidence", "")
         reasons = ", ".join(info.get("reasons", []))
+        if info.get("skip"):
+            skip_reason = info.get("skip_reason") or "explicit skip"
+            for mode in modes_list:
+                skipped.append(
+                    RunResult(
+                        rel_path,
+                        arch,
+                        mode,
+                        "SKIP",
+                        skip_reason,
+                        duration_s=0,
+                        source="case-runner",
+                    )
+                )
+            suggestions.append(
+                Suggestion(
+                    rel_path,
+                    "case-runner",
+                    "info",
+                    "Explicitly skipped",
+                    skip_reason,
+                )
+            )
+            continue
         if confidence and confidence != "high":
             suggestions.append(
                 Suggestion(
@@ -58,19 +82,8 @@ def build_case_runner_cells_with_skips(
                         rel_path,
                         "case-runner",
                         "info",
-                        f"Skipped on unsupported arch {arch}",
+                        f"Excluded on unsupported arch {arch}",
                         f"Supported archs: {', '.join(supported_archs)}",
-                    )
-                )
-                skipped.append(
-                    RunResult(
-                        rel_path,
-                        arch,
-                        mode,
-                        "SKIP",
-                        f"unsupported arch {arch}; supported_archs={','.join(supported_archs)}",
-                        duration_s=0,
-                        source="case-runner",
                     )
                 )
                 continue
@@ -80,19 +93,8 @@ def build_case_runner_cells_with_skips(
                         rel_path,
                         "case-runner",
                         "info",
-                        f"Skipped on unsupported mode {mode}",
+                        f"Excluded on unsupported mode {mode}",
                         f"Supported modes: {', '.join(supported_modes)}",
-                    )
-                )
-                skipped.append(
-                    RunResult(
-                        rel_path,
-                        arch,
-                        mode,
-                        "SKIP",
-                        f"unsupported mode {mode}; supported_modes={','.join(supported_modes)}",
-                        duration_s=0,
-                        source="case-runner",
                     )
                 )
                 continue

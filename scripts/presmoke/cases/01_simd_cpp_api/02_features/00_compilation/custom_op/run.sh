@@ -39,13 +39,14 @@ run_in_build_dir() {
 
 build() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j binary package')
+    presmoke_ensure_custom_op_package
+    :
 }
 
 run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc './custom_opp_*.run')
+    presmoke_ensure_custom_op_package
+    :
 }
 
 verify() {

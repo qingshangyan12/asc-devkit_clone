@@ -6,6 +6,7 @@ import time
 import unittest
 from pathlib import Path
 
+from presmoke.case_runners import build_case_runner_cells_with_skips
 from presmoke.model import Cell, Command, ExampleSpec
 from presmoke.pool import NpuSlotPool
 from presmoke.runner import run_cell
@@ -56,6 +57,43 @@ class RunnerPoolTest(unittest.TestCase):
             for thread in threads:
                 thread.join()
         self.assertLessEqual(max_active, 2)
+
+    def test_manifest_skip_does_not_create_cell(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner = root / "scripts/presmoke/cases/x/run.sh"
+            runner.parent.mkdir(parents=True)
+            runner.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            manifest = root / "scripts/presmoke/reports/case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                '[{"case":"x","skip":true,"skip_reason":"needs TensorFlow 2.6.5","supported_archs":["dav-2201"],"supported_modes":["npu"]}]',
+                encoding="utf-8",
+            )
+            cells, suggestions, skipped = build_case_runner_cells_with_skips(root, "dav-2201", ["npu"], [], [])
+        self.assertEqual(cells, [])
+        self.assertEqual(len(skipped), 1)
+        self.assertEqual(skipped[0].status, "SKIP")
+        self.assertIn("TensorFlow 2.6.5", skipped[0].reason)
+        self.assertEqual(len(suggestions), 1)
+
+    def test_unsupported_arch_is_excluded_not_counted_as_skip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner = root / "scripts/presmoke/cases/x/run.sh"
+            runner.parent.mkdir(parents=True)
+            runner.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            manifest = root / "scripts/presmoke/reports/case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                '[{"case":"x","skip":false,"supported_archs":["dav-3510"],"supported_modes":["npu"]}]',
+                encoding="utf-8",
+            )
+            cells, suggestions, skipped = build_case_runner_cells_with_skips(root, "dav-2201", ["npu"], [], [])
+        self.assertEqual(cells, [])
+        self.assertEqual(skipped, [])
+        self.assertEqual(len(suggestions), 1)
+        self.assertIn("Excluded on unsupported arch dav-2201", suggestions[0].message)
 
 
 if __name__ == "__main__":

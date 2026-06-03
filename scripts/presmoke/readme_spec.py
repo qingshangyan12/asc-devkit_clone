@@ -94,13 +94,23 @@ def _pick_command_block(run_section: str) -> Tuple[str, str]:
         return "", "convention"
     sample_pos = run_section.find("样例执行")
     if sample_pos >= 0:
-        for block in _bash_blocks(run_section[sample_pos:]):
-            if _is_runnable_block(block):
-                return block, "readme"
-    for block in _bash_blocks(run_section):
-        if _is_runnable_block(block):
+        block = _pick_preferred_block(_bash_blocks(run_section[sample_pos:]))
+        if block:
             return block, "readme"
+    block = _pick_preferred_block(_bash_blocks(run_section))
+    if block:
+        return block, "readme"
     return "", "convention"
+
+
+def _pick_preferred_block(blocks: List[str]) -> str:
+    runnable_blocks = [block for block in blocks if _is_runnable_block(block)]
+    if not runnable_blocks:
+        return ""
+    for block in runnable_blocks:
+        if "cmake" in block and "make" in block:
+            return block
+    return runnable_blocks[0]
 
 
 def _is_runnable_block(block: str) -> bool:
@@ -115,7 +125,7 @@ def _is_runnable_block(block: str) -> bool:
 def split_commands(block: str) -> List[Command]:
     env: Dict[str, str] = {}
     commands: List[Command] = []
-    for original in block.splitlines():
+    for original in _join_line_continuations(block):
         line = _strip_comment(original).strip()
         if not line:
             continue
@@ -128,6 +138,21 @@ def split_commands(block: str) -> List[Command]:
             if rest:
                 commands.append(Command(raw=rest, kind=classify_command(rest), env=dict(env)))
     return commands
+
+
+def _join_line_continuations(block: str) -> List[str]:
+    lines: List[str] = []
+    current = ""
+    for line in block.splitlines():
+        stripped = line.rstrip()
+        if stripped.endswith("\\"):
+            current += stripped[:-1].rstrip() + " "
+            continue
+        lines.append(current + line)
+        current = ""
+    if current:
+        lines.append(current.rstrip())
+    return lines
 
 
 def _strip_comment(line: str) -> str:
@@ -287,4 +312,3 @@ def _static_suggestions(example_dir: Path, rel_path: str, commands: Sequence[Com
             suggestions.append(_suggest(rel_path, "structure", "warn", "Command references verify_result.py but file is missing", "Fix README command or add scripts/verify_result.py."))
     if not any(c.kind == "verify" for c in commands):
         suggestions.append(_suggest(rel_path, "runtime", "info", "No verify step found; pass/fail depends on command rc only", "Add verify_result.py or an explicit validation command."))
-

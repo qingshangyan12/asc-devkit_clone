@@ -54,7 +54,46 @@ class ReadmeSpecTest(unittest.TestCase):
         self.assertEqual(spec.modes, ["npu", "sim"])
         self.assertTrue(any(c.kind == "verify" for c in spec.commands))
 
+    def test_parse_readme_prefers_cmake_block_over_manual_compile_block(self) -> None:
+        text = """# sample
+
+## 编译运行
+
+- 样例执行
+
+  - 命令行方式
+
+    ```bash
+    bisheng main.cpp -o demo -L./ \\
+      -lfoo
+    ./demo
+    ```
+
+  - CMake方式
+
+    ```bash
+    mkdir -p build && cd build;
+    cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;
+    ./demo
+    ```
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "examples"
+            ex = root / "x"
+            ex.mkdir(parents=True)
+            (ex / "README.md").write_text(text, encoding="utf-8")
+            (ex / "CMakeLists.txt").write_text("add_executable(demo main.cpp)", encoding="utf-8")
+            spec = parse_readme(ex, root)
+        self.assertIn("cmake", " ".join(c.raw for c in spec.commands))
+        self.assertNotIn("-lfoo", " ".join(c.raw for c in spec.commands))
+        self.assertEqual([c.kind for c in spec.commands][-3:], ["cmake", "make", "run"])
+
+    def test_split_commands_joins_shell_line_continuations(self) -> None:
+        commands = split_commands("bisheng main.cpp -o demo -L./ \\\n  -lfoo\n./demo")
+        self.assertEqual(len(commands), 2)
+        self.assertIn("-lfoo", commands[0].raw)
+        self.assertNotIn("\\", commands[0].raw)
+
 
 if __name__ == "__main__":
     unittest.main()
-

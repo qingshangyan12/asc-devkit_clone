@@ -1,8 +1,8 @@
 ﻿example,original_category,original_command_error,original_phase,after_status,after_rc,after_phase,after_category,after_duration_s,after_evidence
 01_simd_cpp_api/02_features/00_compilation/parallel_ops_package,runner_command_error:cmake_build_args,yes,build,PASS,0,,fixed_pass,39.650,修复后通过。
-01_simd_cpp_api/02_features/01_invocation/aclop_invocation,runner_command_error:atc_soc_version,yes,build,FAIL,255,build,prerequisite_custom_op_deploy_issue,10.754,ATC 已使用 Ascend910B4，当前失败为已部署 AddCustom 包缺 add_custom_tiling.h；README 要求先完成 custom_op 编译/打包/部署。
+01_simd_cpp_api/02_features/01_invocation/aclop_invocation,runner_command_error:atc_soc_version,yes,build,PASS,0,,fixed_pass_after_custom_op_prereq,58.900,补充回归通过：runner build 阶段先编译/打包/部署 custom_op，随后 ATC/CMake/make 和 execute_add_op 均通过。
 01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin,runner_command_error:wrong_workdir,yes,run,PASS,0,,fixed_pass,5.140,修复后通过。
-01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom,environment_missing_dependency,no,run,,,,not_rerun,,未在修复回归中运行。
+01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom,environment_missing_dependency,no,run,SKIP,0,planner,explicit_skip_tensorflow_2_6_5,,需要 TensorFlow 2.6.5 环境，presmoke 中显式跳过。
 01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin,runner_command_error:atc_soc_version,yes,build,PASS,0,,fixed_pass,38.481,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,11.954,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2l1,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,14.280,修复后通过。
@@ -13,7 +13,7 @@
 01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,18.091,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,15.013,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,17.408,修复后通过。
-01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag,runtime_or_verify_failure,no,verify,FAIL,1,verify,still_failed_other,12.388,nonzero rc
+01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag,runtime_or_verify_failure,no,verify,FAIL,1,verify,still_failed_other_card7,20.421,卡 7 补充回归复现 verify 失败；多处 rdiff 约 0.000001，最终 [ERROR] result error。
 01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,17.251,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/cast,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,12.245,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/compare,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,13.155,修复后通过。
@@ -27,11 +27,11 @@
 01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,12.413,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,12.675,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/06_sync_control/cross_core_set_wait_flag,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,12.776,修复后通过。
-01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sync_all,runtime_or_verify_failure,no,verify,,,,not_rerun,,未在修复回归中运行。
+01_simd_cpp_api/02_features/03_basic_api/06_sync_control/sync_all,runtime_or_verify_failure,no,verify,PASS,0,,fixed_pass_on_card7,12.243,卡 7 补充回归通过；verify 输出 error ratio 0.0000 和 test pass。
 01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,34.750,修复后通过。
 01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/set_atomic_deterministic_computation,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,34.504,修复后通过。
-01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming,runner_command_error:wrong_workdir,yes,run,FAIL,1,run,runtime_accuracy_failure,25.442,已进入 torch_npu 图模式运行，当前为输出精度断言失败。
-01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8,sample_compile_or_arch_issue,no,build,,,,not_rerun,,未在修复回归中运行。
+01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming,runner_command_error:wrong_workdir,yes,run,PASS,0,,fixed_pass_after_custom_op_prereq,54.400,补充回归通过：runner build 阶段先确认 custom_op 包已安装，随后 test_add_custom_tiling_sink.py 通过。
+01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8,sample_compile_or_arch_issue,no,build,EXCLUDED,0,planner,excluded_unsupported_arch,11.840,README 支持产品为 Ascend 950PR/Ascend 950DT；presmoke 已标为 dav-3510 only，910B 不规划、不计 skip。
 01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,31.487,修复后通过。
 01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareB,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,31.335,修复后通过。
 01_simd_cpp_api/03_libraries/08_tensor_transformation/broadcast,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,18.632,修复后通过。
@@ -41,6 +41,6 @@
 01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,35.214,修复后通过。
 01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_high_performance,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,51.937,修复后通过。
 01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/matmul_gelu_high_performance,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,35.235,修复后通过。
-01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance,runner_command_error:missing_readme_variable,yes,build,FAIL,1,verify,verify_accuracy_failure,1607.034,error ratio 0.0003 > tolerance 0.0001
-01_simd_cpp_api/04_best_practices/04_memory_access_practices/bank_conflict_nd2nz,runtime_or_verify_failure,no,verify,,,,not_rerun,,未在修复回归中运行。
+01_simd_cpp_api/04_best_practices/03_fusion_compute_practices/quant_group_matmul_high_performance,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass_on_card7,504.416,卡 7 补充回归通过；verify 输出 error ratio 0.0000 <= tolerance 0.0001。
+01_simd_cpp_api/04_best_practices/04_memory_access_practices/bank_conflict_nd2nz,runtime_or_verify_failure,no,verify,PASS,0,,fixed_pass_on_card7,14.052,卡 7 补充回归通过；verify 输出 test pass。
 01_simd_cpp_api/04_best_practices/04_memory_access_practices/data_copy,runner_command_error:missing_readme_variable,yes,build,PASS,0,,fixed_pass,20.315,修复后通过。

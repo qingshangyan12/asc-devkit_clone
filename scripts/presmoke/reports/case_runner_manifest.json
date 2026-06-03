@@ -14,9 +14,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -36,9 +38,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -58,9 +62,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -81,9 +87,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -105,9 +113,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -118,7 +128,7 @@
     "case": "01_simd_cpp_api/00_introduction/02_matrix/matmul_tensor_api",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/00_introduction/02_matrix/matmul_tensor_api/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -126,12 +136,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -142,7 +152,7 @@
     "case": "01_simd_cpp_api/00_introduction/03_fusion_operation/gather_adds_simt_simd_hybrid",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/00_introduction/03_fusion_operation/gather_adds_simt_simd_hybrid/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -150,12 +160,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -176,9 +186,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -200,9 +212,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -213,7 +227,7 @@
     "case": "01_simd_cpp_api/00_introduction/04_vector_reg/add",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/00_introduction/04_vector_reg/add/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -222,12 +236,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -238,7 +252,7 @@
     "case": "01_simd_cpp_api/00_introduction/04_vector_reg/gelu",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/00_introduction/04_vector_reg/gelu/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -246,12 +260,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -262,19 +276,19 @@
     "case": "01_simd_cpp_api/01_utilities/00_printf/simd_vf_printf",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/01_utilities/00_printf/simd_vf_printf/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -292,9 +306,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -314,9 +330,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -327,19 +345,19 @@
     "case": "01_simd_cpp_api/01_utilities/02_dump/simd_vf_dump",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/01_utilities/02_dump/simd_vf_dump/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -359,9 +377,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -381,11 +401,13 @@
       "cpu"
     ],
     "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./cpu_debug"
     ]
@@ -403,9 +425,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "msprof op ./demo"
     ]
@@ -423,9 +447,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "msprof --application=\"python3 ../torch_library_report_tensor.py\" --output=\"../result\""
     ]
@@ -441,12 +467,15 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
+      "unsupported_on_target_arch_or_mode",
       "no_run_step"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "mssanitizer ./demo",
       "mssanitizer ./demo --leak-check=yes",
@@ -459,7 +488,7 @@
     "case": "01_simd_cpp_api/01_utilities/06_clock",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/01_utilities/06_clock/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -467,12 +496,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -490,11 +519,13 @@
       "sim"
     ],
     "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "msprof op simulator --soc-version=Ascend910B1 ./demo",
@@ -512,12 +543,16 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "custom_op_package_provider"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j binary package",
       "./custom_opp_*.run"
     ]
@@ -533,12 +568,15 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./execute_add_op"
     ]
@@ -554,13 +592,16 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "no_make_step",
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "cmake --build build -j",
       "./build/add_custom/custom_opp_*.run",
       "./build/leaky_relu_custom/custom_opp_*.run"
@@ -577,12 +618,16 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "requires_custom_op_package"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./execute_add_op"
     ]
@@ -598,15 +643,19 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "atc_command",
       "shell_variable_reference",
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "requires_custom_op_package"
     ],
     "commands": [
       "atc --singleop=../add_custom.json --output=. --soc_version=${soc_version}",
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./execute_add_op"
     ]
@@ -624,11 +673,13 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "special_02_features_00_01_02"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../add_custom_test.py"
     ]
@@ -646,11 +697,13 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "special_02_features_00_01_02"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../add_custom_test.py"
     ]
@@ -659,18 +712,22 @@
     "case": "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": true,
+    "skip_reason": "requires TensorFlow 2.6.5 environment; skipped by presmoke",
     "reasons": [
       "no_cmake_step",
       "no_make_step",
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "explicit_skip"
     ],
     "commands": [
       "python3 run_add_custom.py"
@@ -680,19 +737,23 @@
     "case": "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": true,
+    "skip_reason": "requires TensorFlow 2.6.5 environment; skipped by presmoke",
     "reasons": [
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "explicit_skip"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../run_add_custom_tf.py"
     ]
@@ -708,17 +769,21 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "atc_command",
       "framework_command",
       "shell_variable_reference",
-      "special_02_features_00_01_02"
+      "special_02_features_00_01_02",
+      "unsupported_on_target_arch_or_mode",
+      "requires_custom_op_package"
     ],
     "commands": [
       "python3 ../leaky_relu.py",
       "atc --model=./leaky_relu.onnx --framework=5 --soc_version=${soc_version} --output=./leaky_relu_custom --input_shape=\"X:8,16,1024\" --input_format=ND",
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./execute_leaky_relu_op"
     ]
@@ -727,7 +792,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/auxscalar_reg",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/auxscalar_reg/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -736,12 +801,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -761,11 +826,13 @@
       "sim"
     ],
     "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -784,13 +851,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=${SCENARIO} .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=${SCENARIO} .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py ${SCENARIO}",
       "./demo",
@@ -809,13 +877,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=${SCENARIO} .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=${SCENARIO} .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -837,11 +906,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -863,11 +934,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -887,13 +960,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -915,9 +989,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -938,11 +1014,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -963,11 +1041,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -978,7 +1058,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_ub2l1",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_ub2l1/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -987,12 +1067,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -1011,13 +1091,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
       "./demo"
@@ -1036,13 +1117,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
       "./demo"
@@ -1061,13 +1143,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -1086,13 +1169,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -1111,13 +1195,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -1127,7 +1212,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/00_data_movement/scatter_st_reg",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/scatter_st_reg/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -1136,12 +1221,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -1162,9 +1247,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1186,11 +1273,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1212,11 +1301,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1236,13 +1327,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1262,13 +1354,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -1288,13 +1381,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1313,12 +1407,15 @@
       "npu",
       "sim"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference"
+      "shell_variable_reference",
+      "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -1339,11 +1436,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -1365,9 +1464,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DDISABLE_GEMV=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DDISABLE_GEMV=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1387,11 +1488,13 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO -DM_SIZE=$M -DK_SIZE=$K -DN_SIZE=$N -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO -m=$M -k=$K -n=$N",
       "./demo",
@@ -1411,13 +1514,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -1428,7 +1532,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_tensor_api/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -1436,12 +1540,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1463,9 +1567,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DENABLE_UNITFLAG=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DENABLE_UNITFLAG=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1476,7 +1582,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_with_sparse/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
@@ -1485,10 +1591,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1510,11 +1620,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1536,9 +1648,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1560,11 +1674,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1586,11 +1702,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenario_num=$SCENARIO_NUM",
       "./demo",
@@ -1612,9 +1730,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1636,9 +1756,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1660,9 +1782,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1684,11 +1808,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1710,11 +1836,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1736,11 +1864,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenario_num=$SCENARIO_NUM",
       "./demo",
@@ -1760,13 +1890,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1788,11 +1919,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1814,9 +1947,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1838,11 +1973,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -1863,11 +2000,13 @@
       "sim"
     ],
     "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -1889,11 +2028,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenario_num=$SCENARIO_NUM",
       "./demo",
@@ -1915,11 +2056,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenario_num=$SCENARIO_NUM",
       "./demo",
@@ -1941,11 +2084,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo",
@@ -1956,7 +2101,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/abs",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/abs/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -1965,12 +2110,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -1980,7 +2125,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/arange",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/arange/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -1989,12 +2134,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2013,13 +2158,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -2038,13 +2184,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -2063,13 +2210,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
       "./demo"
@@ -2079,7 +2227,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/duplicate",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/duplicate/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2088,12 +2236,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2103,7 +2251,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/gather",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/gather/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2112,12 +2260,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2127,7 +2275,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/histogram",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/histogram/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2136,12 +2284,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2151,7 +2299,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/mergemode",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/mergemode/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2160,12 +2308,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2175,7 +2323,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/mul",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/mul/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2184,12 +2332,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2199,7 +2347,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/muls",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/muls/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2208,12 +2356,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2223,7 +2371,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2232,12 +2380,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2247,7 +2395,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce_block",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce_block/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2256,12 +2404,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2271,7 +2419,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce_pair",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/reduce_pair/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2280,12 +2428,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2295,7 +2443,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/select",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/select/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2304,12 +2452,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2319,7 +2467,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/squeeze",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/squeeze/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2328,12 +2476,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2352,13 +2500,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2377,13 +2526,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2393,7 +2543,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/truncate",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/03_reg_vector_compute/truncate/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2402,12 +2552,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -2428,9 +2578,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -2448,13 +2600,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -2476,9 +2629,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -2498,11 +2653,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo",
@@ -2524,9 +2681,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2548,9 +2707,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2572,11 +2733,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo",
@@ -2597,9 +2760,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2620,9 +2785,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -2642,9 +2809,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2655,7 +2824,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/06_sync_control/mutex",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/mutex/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2664,12 +2833,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2689,13 +2858,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
       "./demo"
@@ -2716,9 +2886,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2740,9 +2912,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2764,9 +2938,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2777,7 +2953,7 @@
     "case": "01_simd_cpp_api/02_features/03_basic_api/07_system_access/ctrl_spr",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/02_features/03_basic_api/07_system_access/ctrl_spr/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -2786,12 +2962,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2813,11 +2989,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo",
@@ -2837,13 +3015,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo",
@@ -2861,12 +3040,15 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference"
+      "shell_variable_reference",
+      "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2888,9 +3070,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -2910,9 +3094,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -2928,10 +3114,14 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "no_cmake_step",
-      "no_make_step"
+      "no_make_step",
+      "unsupported_on_target_arch_or_mode",
+      "requires_custom_op_package"
     ],
     "commands": [
       "python3 test_add_custom_tiling_sink.py"
@@ -2950,9 +3140,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -2970,9 +3162,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./main"
     ]
@@ -2992,9 +3186,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3016,9 +3212,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3040,9 +3238,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3064,9 +3264,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3088,9 +3290,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3112,9 +3316,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3136,9 +3342,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3160,9 +3368,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3184,9 +3394,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3197,7 +3409,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_co1_output",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_co1_output/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
@@ -3206,10 +3418,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3231,9 +3447,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3244,7 +3462,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_format_column_major",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_format_column_major/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3253,12 +3471,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3280,9 +3498,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3304,9 +3524,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3319,7 +3541,6 @@
     "source": "readme",
     "confidence": "high",
     "supported_archs": [
-      "dav-2201",
       "dav-3510"
     ],
     "supported_modes": [
@@ -3328,9 +3549,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DDT_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DDT_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py  0",
       "./demo",
@@ -3352,9 +3575,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3376,9 +3601,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3400,11 +3627,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3426,11 +3655,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3441,7 +3672,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_int4",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_int4/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
@@ -3450,10 +3681,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3475,9 +3710,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3499,9 +3736,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3523,9 +3762,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3547,9 +3788,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3571,9 +3814,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3595,9 +3840,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3608,7 +3855,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_mx",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3617,12 +3864,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3633,7 +3880,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_scale_cache",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_scale_cache/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3642,12 +3889,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3658,7 +3905,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_ub_tscm_nz",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_ub_tscm_nz/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3667,12 +3914,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3694,9 +3941,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3718,9 +3967,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3742,9 +3993,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3766,9 +4019,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DQUANT_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DQUANT_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -m=0",
       "./demo",
@@ -3779,7 +4034,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_sparse",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_sparse/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
@@ -3788,10 +4043,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3813,9 +4072,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3826,7 +4087,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_splitm",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_splitm/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3835,12 +4096,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3862,9 +4123,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DTRIANGLE_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DTRIANGLE_MODE=0 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -m=0",
       "./demo",
@@ -3886,9 +4149,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3899,7 +4164,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_tscm_src_vecout",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_tscm_src_vecout/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3908,12 +4173,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3935,9 +4200,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3948,7 +4215,7 @@
     "case": "01_simd_cpp_api/03_libraries/00_matrix/matmul_vecout",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/00_matrix/matmul_vecout/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -3957,12 +4224,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -3984,9 +4251,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4007,9 +4276,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4030,9 +4301,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4053,9 +4326,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4076,9 +4351,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4099,9 +4376,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4122,9 +4401,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4145,9 +4426,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4168,9 +4451,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4191,9 +4476,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4214,9 +4501,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4237,9 +4526,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4260,9 +4551,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4283,9 +4576,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4306,9 +4601,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4329,9 +4626,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "./demo"
@@ -4352,9 +4651,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4375,9 +4676,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "./demo"
@@ -4398,9 +4701,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4421,9 +4726,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4444,9 +4751,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4467,9 +4776,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4490,9 +4801,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4513,9 +4826,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4536,9 +4851,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4559,9 +4876,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4582,9 +4901,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -4606,11 +4927,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py --testcase $TESTCASE",
       "./demo $TESTCASE"
@@ -4631,9 +4954,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4654,9 +4979,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4677,11 +5004,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py --mode $SCENARIO",
       "./demo"
@@ -4702,9 +5031,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -4726,9 +5057,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4738,7 +5071,7 @@
     "case": "01_simd_cpp_api/03_libraries/11_random/philoxrandom",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/11_random/philoxrandom/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -4747,12 +5080,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4773,9 +5106,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -4795,9 +5130,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -4808,7 +5145,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/bitwiseand",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/bitwiseand/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -4817,12 +5154,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4843,9 +5180,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4855,7 +5194,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/clamp",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/clamp/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -4864,12 +5203,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4890,11 +5229,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py --scenario $SCENARIO",
       "./demo"
@@ -4915,9 +5256,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4938,9 +5281,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4961,9 +5306,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -4973,7 +5320,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/fma",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/fma/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -4982,12 +5329,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5008,9 +5355,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5031,9 +5380,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5043,7 +5394,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/isfinite",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/isfinite/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5052,12 +5403,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5078,9 +5429,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5090,7 +5443,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/logicaland",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/logicaland/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5099,12 +5452,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5125,11 +5478,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py --scenario $SCENARIO",
       "./demo"
@@ -5139,7 +5494,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/rint",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/rint/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5148,12 +5503,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5163,7 +5518,7 @@
     "case": "01_simd_cpp_api/03_libraries/12_math/where",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/03_libraries/12_math/where/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5172,12 +5527,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5198,9 +5553,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo"
@@ -5221,9 +5578,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5243,9 +5602,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DSCENARIO_NUM=6 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=6 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5266,11 +5627,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5291,11 +5654,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5306,7 +5671,7 @@
     "case": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_basic_api_high_performance",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_basic_api_high_performance/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5314,12 +5679,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5338,13 +5703,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5355,7 +5721,7 @@
     "case": "01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_tensor_api_high_performance",
     "runner": "scripts/presmoke/cases/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_mxfp4_tensor_api_high_performance/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -5363,12 +5729,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5388,13 +5754,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5414,13 +5781,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_VF_MODE=$CMAKE_VF_MODE -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_VF_MODE=$CMAKE_VF_MODE -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5441,11 +5809,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5463,13 +5833,14 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5488,11 +5859,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5511,13 +5884,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5539,9 +5913,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=1 .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5562,11 +5938,13 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH",
       "./demo"
@@ -5587,9 +5965,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5611,9 +5991,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5635,9 +6017,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5659,9 +6043,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5683,9 +6069,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5707,9 +6095,11 @@
       "sim"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
@@ -5729,9 +6119,11 @@
       "npu"
     ],
     "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5740,17 +6132,21 @@
     "case": "02_simd_c_api/00_introduction/01_add/c_api_async_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/01_add/c_api_async_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5759,17 +6155,21 @@
     "case": "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5778,17 +6178,21 @@
     "case": "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/01_add/c_api_sync_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5797,19 +6201,19 @@
     "case": "02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5818,17 +6222,21 @@
     "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5837,17 +6245,21 @@
     "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5856,17 +6268,21 @@
     "case": "02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add",
     "runner": "scripts/presmoke/cases/02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add/run.sh",
     "source": "readme",
-    "confidence": "high",
+    "confidence": "medium",
     "supported_archs": [
       "dav-2201"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": true,
-    "reasons": [],
+    "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [
+      "unsupported_on_target_arch_or_mode"
+    ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./c_api_add_example"
     ]
@@ -5875,19 +6291,19 @@
     "case": "03_simt_api/00_introduction/00_quickstart/hello_world_simt",
     "runner": "scripts/presmoke/cases/03_simt_api/00_introduction/00_quickstart/hello_world_simt/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5896,19 +6312,19 @@
     "case": "03_simt_api/00_introduction/01_gather/basic_gather/gather_1d",
     "runner": "scripts/presmoke/cases/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5917,19 +6333,19 @@
     "case": "03_simt_api/00_introduction/01_gather/basic_gather/gather_2d",
     "runner": "scripts/presmoke/cases/03_simt_api/00_introduction/01_gather/basic_gather/gather_2d/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5938,19 +6354,19 @@
     "case": "03_simt_api/00_introduction/01_gather/general_gather",
     "runner": "scripts/presmoke/cases/03_simt_api/00_introduction/01_gather/general_gather/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./gather",
       "./gather_v2"
@@ -5960,19 +6376,19 @@
     "case": "03_simt_api/01_utilities/00_printf",
     "runner": "scripts/presmoke/cases/03_simt_api/01_utilities/00_printf/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -5981,19 +6397,19 @@
     "case": "03_simt_api/01_utilities/01_assert",
     "runner": "scripts/presmoke/cases/03_simt_api/01_utilities/01_assert/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6002,19 +6418,19 @@
     "case": "03_simt_api/01_utilities/02_clock",
     "runner": "scripts/presmoke/cases/03_simt_api/01_utilities/02_clock/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6023,19 +6439,19 @@
     "case": "03_simt_api/01_utilities/03_profiling/msProf",
     "runner": "scripts/presmoke/cases/03_simt_api/01_utilities/03_profiling/msProf/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "msprof op ./demo"
     ]
@@ -6052,11 +6468,13 @@
       "sim"
     ],
     "target_runnable": false,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "msprof op simulator --soc-version=<soc_version> ./demo",
@@ -6067,7 +6485,7 @@
     "case": "03_simt_api/01_utilities/09_log",
     "runner": "scripts/presmoke/cases/03_simt_api/01_utilities/09_log/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -6075,12 +6493,12 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6089,19 +6507,19 @@
     "case": "03_simt_api/02_features/00_framework/00_pytorch/torch_library_roll",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/00_framework/00_pytorch/torch_library_roll/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../roll_custom_test.py"
     ]
@@ -6110,19 +6528,19 @@
     "case": "03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6138,13 +6556,14 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6153,19 +6572,19 @@
     "case": "03_simt_api/02_features/01_api_features/02_atomic_operation/histogram",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./histogram"
     ]
@@ -6174,7 +6593,7 @@
     "case": "03_simt_api/02_features/06_compile/00_basic_compile",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/06_compile/00_basic_compile/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -6182,17 +6601,13 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "no_cmake_step",
-      "no_make_step",
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "bisheng -c gather_kernel.asc -o gather_kernel.o --npu-arch=dav-3510 --enable-simt",
-      "bisheng -c main.cpp -o main.o -I${ASCEND_HOME_PATH}/include",
-      "bisheng gather_kernel.o main.o -o demo",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
+      "make -j",
       "./demo"
     ]
   },
@@ -6200,7 +6615,7 @@
     "case": "03_simt_api/02_features/06_compile/01_separate_compile",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/06_compile/01_separate_compile/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -6208,18 +6623,13 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "no_cmake_step",
-      "no_make_step",
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "bisheng -dc gather_compute.asc -o gather_compute.o --npu-arch=dav-3510 --enable-simt",
-      "bisheng -dc gather_kernel.asc -o gather_kernel.o --npu-arch=dav-3510 --enable-simt",
-      "bisheng -c main.cpp -o main.o -I${ASCEND_HOME_PATH}/include",
-      "bisheng gather_compute.o gather_kernel.o main.o -o demo",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
+      "make -j",
       "./demo"
     ]
   },
@@ -6227,7 +6637,7 @@
     "case": "03_simt_api/02_features/06_compile/02_dynamic_library_compile",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/06_compile/02_dynamic_library_compile/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -6235,19 +6645,13 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "line_continuation",
-      "no_cmake_step",
-      "no_make_step",
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "bisheng -shared gather_kernel.asc -o libgather_kernel.so -fPIC --npu-arch=dav-3510 --enable-simt",
-      "bisheng main.cpp -o demo -L./ -L${ASCEND_HOME_PATH}/lib64 -I${ASCEND_HOME_PATH}/include \\",
-      "-lgather_kernel -lascendcl -lstdc++",
-      "export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
+      "make -j",
       "./demo"
     ]
   },
@@ -6255,7 +6659,7 @@
     "case": "03_simt_api/02_features/06_compile/03_static_library_compile",
     "runner": "scripts/presmoke/cases/03_simt_api/02_features/06_compile/03_static_library_compile/run.sh",
     "source": "readme",
-    "confidence": "low",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
@@ -6263,18 +6667,13 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "line_continuation",
-      "no_cmake_step",
-      "no_make_step",
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "bisheng -lib gather_kernel.asc -o libgather_kernel.a --npu-arch=dav-3510 --enable-simt",
-      "bisheng main.cpp -o demo -L./ -L${ASCEND_HOME_PATH}/lib64 -I${ASCEND_HOME_PATH}/include \\",
-      "-lgather_kernel -lascendcl -lruntime -lstdc++",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
+      "make -j",
       "./demo"
     ]
   },
@@ -6282,19 +6681,19 @@
     "case": "03_simt_api/03_best_practices/00_memory_optimizations/aligned_types",
     "runner": "scripts/presmoke/cases/03_simt_api/03_best_practices/00_memory_optimizations/aligned_types/run.sh",
     "source": "readme",
-    "confidence": "medium",
+    "confidence": "high",
     "supported_archs": [
       "dav-3510"
     ],
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
-    "reasons": [
-      "unsupported_on_target_arch_or_mode"
-    ],
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
+    "reasons": [],
     "commands": [
-      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./demo"
     ]
@@ -6310,13 +6709,14 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./data_cache_hint"
     ]
@@ -6332,13 +6732,14 @@
     "supported_modes": [
       "npu"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "./matrix_transpose"
     ]
@@ -6355,13 +6756,14 @@
       "npu",
       "sim"
     ],
-    "target_runnable": false,
+    "target_runnable": true,
+    "skip": false,
+    "skip_reason": "",
     "reasons": [
-      "shell_variable_reference",
-      "unsupported_on_target_arch_or_mode"
+      "shell_variable_reference"
     ],
     "commands": [
-      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake .. -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510",
       "make -j",
       "python3 ../scripts/gen_data.py",
       "./demo",
