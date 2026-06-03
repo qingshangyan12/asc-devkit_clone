@@ -74,13 +74,21 @@ public:
     CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
-    HcclResult Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+    static HcclResult Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                         ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                         ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                         ccu::Variable goSize3, ccu::Variable goSize4);
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
+    HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                            ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                            ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                            ccu::Variable goSize3, ccu::Variable goSize4);
+    void PreSync();
+    void PostSync();
+    void DoAlltoAll();
+    
     uint64_t rankSize_{0};
     uint32_t rankId_{0};
     HcclDataType dataType_;
@@ -100,17 +108,9 @@ private:
     std::vector<ccu::LocalAddr>      srcAddr_;
     std::vector<ccu::Variable>       dstToken_;
     std::vector<ccu::Variable>       srcToken_;
-    ccu::Event event_;
-    ccu::Variable flag_; // 用以判断是否是第一次重复
+    hcomm::CcuRep::CompletedEvent event_;
+    ccu::Variable flag_;
     bool loadFromMem_ = false;
-
-    HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                            ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                            ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                            ccu::Variable goSize3, ccu::Variable goSize4);
-    void PreSync();
-    void PostSync();
-    void DoAlltoAll();
 };
 
 }// namespace mc2_ops_hccl

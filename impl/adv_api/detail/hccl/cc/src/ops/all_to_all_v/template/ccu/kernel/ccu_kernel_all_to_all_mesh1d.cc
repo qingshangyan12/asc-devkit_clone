@@ -20,9 +20,6 @@ constexpr int CKE_IDX_0    = 0;
 constexpr int CKE_IDX_1    = 1;
 constexpr int CKE_IDX_2    = 2;
 
-constexpr uint64_t CCU_MS_SIZE   = 4096;
-constexpr uint64_t LOCAL_COPY_MS = 8;
-
 CcuKernelAlltoAllMesh1D::CcuKernelAlltoAllMesh1D(const CcuKernelArg &arg)
     : CcuKernelAlgBase(arg)
 {
@@ -72,22 +69,6 @@ HcclResult CcuKernelAlltoAllMesh1D::InitResource(ccu::Variable inputAddr, ccu::V
     groupOpSize_.loopParam = goSize2;
     groupOpSize_.parallelParam = goSize3;
     groupOpSize_.residual = goSize4;
-
-    // 创建GSA， src为本地的各片HBM地址GSA列表，dst为所有对端的HBM地址GSA列表
-    for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
-        srcAddr_.push_back(CreateLocalAddr());
-    }
-    for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
-        if (rankIdx == rankId_) {
-            myDst_ = CreateLocalAddr();
-            dstAddr_.push_back({});
-        } else {
-            dstAddr_.push_back(CreateRemoteAddr());
-        }
-    }
-
-    event_ = CreateCompletedEvent();
-    srcOffset_ += input_[rankId_];
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -125,7 +106,6 @@ void CcuKernelAlltoAllMesh1D::DoAlltoAll()
 {
     HCCL_INFO("DoAlltoAll Start.");
     CcuKernelCtxBase ctx;
-    ctx.arg = kernelArg;
     ctx.resourceAllocated = false;
     // ctx.IsLoopResRegistered = false;
     ctx.moConfig.msInterleave = 0;
@@ -152,7 +132,7 @@ void CcuKernelAlltoAllMesh1D::DoAlltoAll()
 
         src[r].addr = srcOffset_;
         src[r].token = token_[r];
-        for (uint64_t i = 0; i < rankIdx; i++) {
+        for (uint64_t i = 0; i < r; i++) {
             src[r].addr += srcStride_;
         }
     }
@@ -192,7 +172,7 @@ ccu::Func CcuKernelAlltoAllMesh1D([](ccu::Variable inputAddr, ccu::Variable outp
                                        sliceSize, goSize1, goSize2, goSize3, goSize4);
 });
 
-static HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                               ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                               ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                               ccu::Variable goSize3, ccu::Variable goSize4)

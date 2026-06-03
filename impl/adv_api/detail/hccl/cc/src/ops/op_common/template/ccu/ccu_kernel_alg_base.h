@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "log.h"
+#include "ccu_kernel.h"
 #include "ccu_primitives_dl.hpp"
 #include "ccu_log.h"
 
@@ -175,7 +176,7 @@ struct GroupCopyVar {
 };
 
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,
-    bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT_NEW, uint32_t msPerLoop = 1);
+    bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT, uint32_t msPerLoop = 1);
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var);
 CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
 
