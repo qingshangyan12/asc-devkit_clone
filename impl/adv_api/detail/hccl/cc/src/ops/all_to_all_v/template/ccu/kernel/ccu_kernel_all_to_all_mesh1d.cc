@@ -167,7 +167,7 @@ void CcuKernelAlltoAllMesh1D::DoAlltoAll()
                 channelId++;
             }
         }
-        GroupCopy(ctx, localDst, src[rankId_], groupOpSize_);
+        mc2_ops_hccl::GroupCopy(ctx, localDst, src[rankId_], groupOpSize_);
         ccu::EventWait(event_, allBit);
     }
 }

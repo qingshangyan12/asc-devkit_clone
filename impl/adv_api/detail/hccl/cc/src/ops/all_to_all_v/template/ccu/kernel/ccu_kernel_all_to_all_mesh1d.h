@@ -82,10 +82,10 @@ public:
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
-    HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                            ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                            ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                            ccu::Variable goSize3, ccu::Variable goSize4);
+    static HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                    ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                    ccu::Variable goSize3, ccu::Variable goSize4);
     static void PreSync();
     static void PostSync();
     static void DoAlltoAll();
