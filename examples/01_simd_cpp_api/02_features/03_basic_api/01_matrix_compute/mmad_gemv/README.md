@@ -10,6 +10,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -22,6 +26,7 @@
 │   ├── data_utils.h                // 数据读入写出函数
 │   └── mmad_gemv.asc               // Ascend C样例实现 & 调用样例
 ```
+
 ## 样例描述
 
 GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N)的右矩阵B进行矩阵乘运算的场景。当M=1时，自动开启GEMV模式，仅在Ascend 950PR/Ascend 950DT上支持通过设置`mmadParams.disableGemv = true`关闭。本样例中通过编译参数`DISABLE_GEMV`选择是否关闭GEMV模式，0 代表开启GEMV，1 代表关闭。
@@ -32,7 +37,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
   将A矩阵从A1搬运到A2时，1 * 256的向量被当作16 * 16的矩阵进行处理，调用LoadData接口一次完成16 * 16分形大小的矩阵搬运。B矩阵的搬运以及矩阵乘计算跟基础场景相同，如下图1所示。
   <p align="center">
-  <img src="figures/开启gemv.png" width="1100">
+  <img src="figures/开启gemv.png" width="600">
   </p>
   <p align="center">
   图1：GEMV模式，Mmad计算示意图
@@ -42,7 +47,7 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
   将A矩阵从A1搬运到A2时，1 * 256的向量被当作非对齐矩阵数据进行处理，将M方向对齐到16后进行搬运。调用LoadData接口每次搬运16 * 16分形大小的矩阵，一共搬运CeilDiv(K, 16)=16次，导致搬运数据量增加，性能相较于GEMV模式差，如下图2所示。
   <p align="center">
-  <img src="figures/关闭gemv.png" width="1100">
+  <img src="figures/关闭gemv.png" width="600">
   </p>
   <p align="center">
   图2：非GEMV模式，Mmad计算示意图
@@ -57,25 +62,16 @@ GEMV模式是指Mmad计算中M=1，形状为(1, K)的左矩阵A与形状为(K, N
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
   
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DDISABLE_GEMV=0 ..;make -j;    # 编译工程，默认npu模式

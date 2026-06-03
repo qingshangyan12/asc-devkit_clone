@@ -2,13 +2,17 @@
 
 ## 概述
 
-本样例介绍如何使用Fixpipe将矩阵乘的结果从CO1（L0C Buffer）搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
+本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory），支持多种输出格式（Nz、ND、DN）、数据类型转换、随路量化、ReLU以及ChannelSplit等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到全局内存，并支持各种数据格式转换和预处理能力。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
 
 ## 目录结构介绍
 
@@ -22,6 +26,7 @@
 │   ├── data_utils.h                   // 数据读入写出函数
 │   └── fixpipe_l0c2gm.asc             // Ascend C样例实现 & 调用样例
 ```
+
 ## FixpipeParamsV220 与 FixpipeParamsArch3510 结构体对比
 
 不同产品支持的参数结构体不同：
@@ -74,8 +79,8 @@
 **场景1：输出格式Nz，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，Nz格式
-- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从CO1搬出到GM，输出为Nz格式
-- 说明：CO1数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
+- 实现：使用 `Fixpipe<outputType, l0cType, AscendC::CFG_NZ>` 将数据从L0C搬出到GM，输出为Nz格式
+- 说明：L0C数据为Nz格式直接输出到GM的Nz格式，数据保持原格式不变
 <p align="center">
   <img src="figures/fixpipe_l0c2gm_NZ2NZ.png" width="800">
 </p>
@@ -114,36 +119,27 @@
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，ND格式
 - 实现：设置 `fixpipeParams.reluEn = true` 开启ReLU功能
-- 说明：在数据从CO1搬出到GM的过程中执行ReLU操作，即将负值置为0
+- 说明：在数据从L0C搬出到GM的过程中执行ReLU操作，即将负值置为0
 
 **场景7：输出格式Nz，输出数据类型float，使能ChannelSplit**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
 - 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
-- 说明：在数据从CO1搬出到GM的过程中开启通道拆分功能，即将16x16小z分型矩阵拆分成两个独立的16X8小z分型矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
+- 说明：在数据从L0C搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -167,7 +163,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | 1-7 | 场景编号 |
 
   执行结果如下，说明精度对比成功。

@@ -10,6 +10,10 @@
 
 - Ascend 950PR/Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -26,53 +30,33 @@
 
 本样例通过编译参数 `SCENARIO_NUM` 来切换不同的场景：
 
+**场景1：AtomicAdd原子加操作**  
+  三个核依次调度，每个核对GM的首个元素（dst[0]）原子加1，返回值为原子操作前的旧值。最终dst[0]的值为初始值加3
+
+**场景2：AtomicCas原子比较交换操作**  
+  三个核依次调度，每个核检查GM首个元素是否等于expected值1，若相等则替换为newValue值2，不相等则不修改。返回值为原子操作前的旧值
+
 <table border="2">
 <caption>表1：场景配置对照表</caption>
-<tr><th>scenarioNum</th><th>原子操作接口</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
-<tr><td>1</td><td>AtomicAdd</td><td>[1, 256]</td><td>[1, 256]</td><td>int32</td><td>三个核并行对GM首个元素进行原子加1操作</td></tr>
-<tr><td>2</td><td>AtomicCas</td><td>[1, 256]</td><td>[1, 256]</td><td>uint32</td><td>三个核并行对GM首个元素进行原子比较交换（如果值为1则替换为2）</td></tr>
+<tr><th>scenarioNum</th><th>原子操作接口</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
+<tr><td>1</td><td>AtomicAdd</td><td>[1, 256]</td><td>int32</td><td>三个核并行对GM首个元素进行原子加1操作</td></tr>
+<tr><td>2</td><td>AtomicCas</td><td>[1, 256]</td><td>uint32</td><td>三个核并行对GM首个元素进行原子比较交换（如果值为1则替换为2）</td></tr>
 </table>
-
-**场景1：AtomicAdd原子加操作**
-- 输入shape：src=[1, 256]
-- 输出shape：dst=[1, 256]
-- 数据类型：int32
-- 参数：并行block数=3
-- 说明：三个核依次调度，每个核对GM的首个元素（dst[0]）原子加1，返回值为原子操作前的旧值。最终dst[0]的值为初始值加3
-
-
-**场景2：AtomicCas原子比较交换操作**
-- 输入shape：src=[1, 256]
-- 输出shape：dst=[1, 256]
-- 数据类型：uint32
-- 参数：并行block数=3
-- 说明：三个核依次调度，每个核检查GM首个元素是否等于expected值1，若相等则替换为newValue值2，不相等则不修改。返回值为原子操作前的旧值
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1  # 设置场景编号（取值为1、2）
   mkdir -p build && cd build;      # 创建并进入build目录

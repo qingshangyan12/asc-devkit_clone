@@ -3,13 +3,17 @@
 
 ## 概述
 
-本样例介绍在输入为float数据类型并且左、右矩阵均不转置的场景下，带batch的矩阵乘法，其中从GM-->L1采用了DataCopy ND2NZ，L0C-->GM、L0C-->L1采用了Fixpipe批量搬运数据，从L1-->L0A/L0B搬运数据以及Mmad执行矩阵乘这两个步骤则是循环batch次，每次循环内只处理一对左、右矩阵。
+本样例介绍在输入为float数据类型并且左、右矩阵均不转置的场景下，带batch的矩阵乘法，其中GM -> L1通路采用DataCopy（Nd2NzParams）批量搬运，L0C -> GM、L0C -> L1通路采用Fixpipe批量搬运，L1 -> L0A / L0B搬运和Mmad矩阵乘循环执行batch次。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
 
 ## 目录结构介绍
 
@@ -22,7 +26,15 @@
 │   ├── data_utils.h                // 数据读入写出函数
 │   └── batch_matmul.asc              // Ascend C样例实现 & 调用样例
 ```
-## 算子描述
+
+## 样例描述
+
+本样例的数据流如下：
+
+1. GM -> L1：调用DataCopy（Nd2NzParams），一次性搬入B对A、B矩阵并完成ND -> Nz随路转换。
+2. L1 -> L0A / L0B：循环batch次，每次搬运当前batch的一对A、B矩阵。
+3. Mmad：循环batch次，每次计算一对A、B矩阵乘结果，并写入L0C对应位置。
+4. L0C -> GM / L1：调用Fixpipe一次性搬出B个C矩阵；Atlas A2/A3系列产品额外演示L0C -> L1搬出路径。
 
 ### batch mmad定义
 
@@ -31,7 +43,7 @@
 简单来说，若有两个批量矩阵 A 和 B，它们的形状分别为 [B, M, K] 和 [B, K, N]（其中 B 是批次大小，M/K/N 是矩阵维度），批量矩阵乘法会为每一个批次索引 i（i ∈ [0, B-1]），取 A[i]（形状 [M, K]）和 B[i]（形状 [K, N]）执行普通矩阵乘法，最终得到形状为 [B, M, N] 的批量结果矩阵 C。对任意批次 i（0 ≤ i < B），C 的第 i 个矩阵满足：
 C[i]=A[i]×B[i]。
 
-需要注意的是不同批次的矩阵之间不会互相计算。
+需要注意的是，不同批次的矩阵之间不会互相计算。
 
 ### 样例规格
 
@@ -67,12 +79,12 @@ C[i]=A[i]×B[i]。
   </tr>
 </table>
 
-### 矩阵批量搬入（GM->L1）
+### 矩阵批量搬入（GM -> L1）
 
-根据batch mmad的定义可知，共计B对A、B矩阵进行矩阵乘法。数据从GM-->L1通路时，如下所示调用随路转换ND2NZ搬运接口时，通过配置`nd2nzA1Params.ndNum = B`，实现一次性搬入B对A、B矩阵。
+根据batch Mmad的定义可知，共计B对A、B矩阵进行矩阵乘法。GM -> L1通路调用DataCopy（Nd2NzParams）完成ND -> Nz随路转换，通过配置`nd2nzA1Params.ndNum = B`，实现一次性搬入B对A、B矩阵。
 
 ```cpp
-// GM-->L1，搬运A矩阵
+// GM -> L1，搬运A矩阵
 AscendC::Nd2NzParams nd2nzA1Params;
 // 传输ND矩阵的数目
 nd2nzA1Params.ndNum = B;
@@ -94,9 +106,10 @@ nd2nzA1Params.dstNzNStride = 1;
 // 目的NZ矩阵中，相邻NZ矩阵起始地址间的偏移，单位是元素
 nd2nzA1Params.dstNzMatrixStride = aSizeAlignL0;
 ```
-### L1->L0A/L0B搬运和矩阵乘Mmad循环执行B次
 
-for循环B次，每次从L1->L0A/L0B搬运每个batch的A、B矩阵，mmad指令每次计算一对A、B矩阵矩阵乘的结果
+### L1 -> L0A / L0B搬运和矩阵乘Mmad循环执行B次
+
+for循环B次，每次从L1 -> L0A / L0B搬运每个batch的A、B矩阵，Mmad指令每次计算一对A、B矩阵乘的结果。
 
 ```cpp
 for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
@@ -110,17 +123,19 @@ for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
         AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
 }
 ```
+
 for循环计算得到每个batch的矩阵计算结果，存储到L0C的相应位置上，待循环结束后将L0C上的完整结果搬出到GM。
 
 ```cpp
 AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])],
               a2Local, b2Local, mmadParams);
 ```
+
 ### 矩阵批量搬出
 
-数据从L0C-->GM通路时，如下所示调用fixpipe搬运接口时，通过配置fixpipeParams.ndNum = B，实现一次性搬出B对C矩阵。注意的是L0C中的C矩阵是对齐后的，而搬出到GM的C矩阵是原始非对齐的shape。
+L0C -> GM通路调用Fixpipe搬运接口，通过配置`fixpipeParams.ndNum = B`，实现一次性搬出B对C矩阵。需要注意的是，L0C中的C矩阵是对齐后的，搬出到GM的C矩阵是原始非对齐shape。
 
-对于Atlas A2 训练系列产品/Atlas A2 推理系列产品以及Atlas A3 训练系列产品/Atlas A3 推理系列产品，样例还额外演示了L0C->L1搬出路径：Fixpipe将L0C上的float结果量化为half后写入L1，并通过DumpTensor打印L1上的NZ结果。
+对于Atlas A2 训练系列产品/Atlas A2 推理系列产品以及Atlas A3 训练系列产品/Atlas A3 推理系列产品，样例还额外演示了L0C -> L1搬出路径：Fixpipe将L0C上的float结果量化为half后写入L1，并通过DumpTensor打印L1上的NZ结果。
 
 ```cpp
 // 源NZ矩阵在N方向上的大小。
@@ -138,34 +153,26 @@ fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape
                                 / (cubeShape[0] * cubeShape[0]);
 // 目的相邻ND矩阵起始地址之间的偏移，单位：element
 ```
+
 ### 避免数据占用总内存超过存储空间限制
 
-用户应该保证batch mmad整个过程中的数据所占总的内存不超过存储空间限制。
-用户可以通过PlatformAscendC类成员函数GetCoreMemSize，获取获取硬件平台中L1、L0A、L0B、L0C存储空间的内存大小。
+用户应该保证batch Mmad整个过程中的数据所占总内存不超过存储空间限制。
+用户可以通过PlatformAscendC类成员函数GetCoreMemSize，获取硬件平台中L1、L0A、L0B、L0C存储空间的内存大小。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCMAKE_ASC_RUN_MODE=npu ..;make -j;    # 编译工程

@@ -10,6 +10,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -163,6 +167,33 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 在 Atlas A2/A3 架构上，本样例使用 `LoadData3DParamsV2`（即 LoadData3D）替代 `LoadData2DParams`（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
 
 **问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
+
+**代码实现**：使用 LoadData2D 时，需要按 `CUBE_BLOCK` 粒度循环发射多条搬运指令；改为 LoadData3D 后，可用一条指令描述完整的 base 切片。
+
+优化前，`baseK=64` 时循环次数为 4：
+
+```cpp
+AscendC::LoadData2DParams loadDataParams;
+for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
+}
+```
+
+优化后，使用 `LoadData3DParamsV2` 一次性描述 `baseM * baseK` 切片：
+
+```cpp
+AscendC::LoadData3DParamsV2<half> loadDataParams;
+loadDataParams.l1H = 1;
+loadDataParams.l1W = baseM;
+loadDataParams.channelSize = baseK;
+loadDataParams.kExtension = baseK;
+loadDataParams.mExtension = curMAlign;
+loadDataParams.mStartPt = 0;
+loadDataParams.kStartPt = 0;
+AscendC::LoadData(a2Local, a1Local[srcAddr], loadDataParams);
+```
+
+这样每个 base 切片的 MTE1 指令数从多条 `LoadData2D` 降为 1 条 `LoadData3D`，可以降低 MTE1 队列占用。B 矩阵非转置输入时，同样通过 `LoadData3DParamsV2` 配置 `enTranspose = true` 完成转置搬运。
 
 > **注意**：Atlas A5 芯片提供了 `LoadData2DParamsV2` 接口，单条指令即可完成搬运，无需 LoadData3D。因此本样例通过 `__NPU_ARCH__` 条件编译区分两种架构的 LoadData 实现。
 
@@ -395,24 +426,16 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录

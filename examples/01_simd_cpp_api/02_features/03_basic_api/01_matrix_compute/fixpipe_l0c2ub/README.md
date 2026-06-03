@@ -2,11 +2,15 @@
 
 ## 概述
 
-本样例介绍如何使用Fixpipe将矩阵乘的结果从CO1（L0C Buffer）搬出到UB（Unified Buffer），支持多种输出格式（Nz、ND）以及双目标模式（按M维度或N维度拆分）等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到统一缓存区，并支持各种数据格式转换和拆分能力。
+本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer），支持多种输出格式（Nz、ND）以及双目标模式（按M维度或N维度拆分）等功能。这些接口用于将L0C中的矩阵乘计算结果高效地传输到统一缓存区，并支持各种数据格式转换和拆分能力。
 
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
 
 ## 目录结构介绍
 
@@ -20,6 +24,7 @@
 │   ├── figures                        // 图示
 │   └── fixpipe_l0c2ub.asc             // Ascend C样例实现 & 调用样例
 ```
+
 ## 场景详细说明
 
 本样例通过编译参数 `SCENARIO_NUM` 选择不同的输出场景，SCENARIO_NUM不同取值对应的含义如下表所示。所有场景基于相同的矩阵乘规格：[M, N, K] = [128, 256, 128]，核函数名为 `fixpipe_l0c2ub`。
@@ -38,8 +43,8 @@
 **场景1：输出格式Nz，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
 - 输出：C [128, 256] float类型，Nz格式
-- 实现：使用 `Fixpipe<outputType, l0cType, CFG_NZ_UB>` 将数据从CO1搬出到UB，输出为Nz格式
-- 说明：CO1数据为Nz格式直接输出到UB的Nz格式，数据保持原格式不变
+- 实现：使用 `Fixpipe<outputType, l0cType, CFG_NZ_UB>` 将数据从L0C搬出到UB，输出为Nz格式
+- 说明：L0C数据为Nz格式直接输出到UB的Nz格式，数据保持原格式不变
 
 **场景2：输出格式ND，输出数据类型float**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
@@ -69,24 +74,15 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
