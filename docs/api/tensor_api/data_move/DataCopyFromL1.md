@@ -247,4 +247,3 @@ PIPE_MTE1(L1 Buffer -> BiasTable Buffer)或PIPE_FIX(L1 Buffer -> Fixpipe Buffer)
     atomCopyL0C2GM.Call(globalC, l0CTensor, l1QuantTensor);
 ...
 ```
-完整样例请参考[TensorAPI样例代码](../../../../../examples/01_simd_cpp_api/02_features/05_tensor_api/matmul_quant_relu/matmul_quant_relu.asc)。

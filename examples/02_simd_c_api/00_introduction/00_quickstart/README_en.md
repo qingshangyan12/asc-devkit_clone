@@ -2,7 +2,7 @@
 
 ## Summary
 
-This sample demonstrates the kernel function direct call method for the HelloWorld operator based on Ascend C, verifying the operator kernel function from the NPU side, showing the overall flow from invocation to execution.
+This sample demonstrates the kernel function direct call method for the HelloWorld operator based on Ascend C, running and verifying the operator kernel function from the NPU side, showing the overall flow from invocation to execution.
 
 ## Sample List
 
