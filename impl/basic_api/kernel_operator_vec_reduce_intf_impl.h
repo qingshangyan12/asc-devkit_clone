@@ -64,7 +64,7 @@ __aicore__ inline void CheckReduceBaseParams(const LocalTensor<T>& dst, const Lo
     CheckValueRange<int32_t>(repeatTime, 0, 255, "repeatTime", apiName);
     CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", apiName);
     CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", apiName);
-    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName);
+    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", apiName); 
 }
 
 // ReduceDataBlock common checks: dtype, repeatTime, position, alignment
