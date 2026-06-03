@@ -60,7 +60,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 <cann-filter npu_type="950">
 
-针对Ascend 950PR/Ascend 950DT，支持数据类型为：b4（fp4x2_e2m1_t、fp4x2_e1m2_t）、b8、b16、b32、b64
+针对Ascend 950PR/Ascend 950DT，支持数据类型为：b8、b16、b32、b64
 
 </cann-filter>
 
