@@ -102,8 +102,9 @@ RW = 3
 <a name="screen1440994812502"></a><a name="screen1440994812502"></a><pre class="screen" codetype="Cpp" id="screen1440994812502">enum class CacheMode : uint8_t {
 CACHE_MODE_DISABLE = 0, // 不使能L2 Cache
 CACHE_MODE_NORMAL = 1,  // 使能L2 Cache
+CACHE_MODE_PERSISTENT = 4,  // 使能L2 Cache 驻留模式
 };</pre>
-<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在写算子时，相比不使能L2 Cache，某GlobalTensor使能L2 Cache反而会导致实测性能下降，可以手动禁止该GlobalTensor使能L2 Cache。比如某算子仅会读一次某个GlobalTensor数据，数据进L2 Cache并不会对算子产生收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不使能该GlobalTensor L2 Cache能力。</p>
+<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在写算子时，相比不使能L2 Cache，某GlobalTensor使能L2 Cache反而会导致实测性能下降，可以手动禁止该GlobalTensor使能L2 Cache。比如某算子仅会读一次某个GlobalTensor数据，数据进L2 Cache并不会对算子产生收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不使能该GlobalTensor L2 Cache能力。特殊地，如果用户想要GlobalTensor的数据一直保存在L2 Cache中，则可以使能L2 Cache的驻留模式。</p>
 <p id="p165951277168"><a name="p165951277168"></a><a name="p165951277168"></a>如果不调用该接口，默认为CacheMode::CACHE_MODE_NORMAL，即GlobalTensor会使能L2 Cache。</p>
 </td>
 </tr>
@@ -116,7 +117,8 @@ CACHE_MODE_NORMAL = 1,  // 使能L2 Cache
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-使用mssanitizer工具时，默认使能L2 Cache，无法通过本接口设置L2 Cache模式为CACHE\_MODE\_DISABLE。
+-   使用mssanitizer工具时，默认使能L2 Cache，无法通过本接口设置L2 Cache模式为CACHE\_MODE\_DISABLE和CACHE\_MODE\_PERSISTENT。
+-   CACHE\_MODE\_PERSISTENT模式仅在Ascend 950PR/Ascend 950DT上支持配置，且完整使能L2 Cache的驻留模式能力当前暂不支持。
 
 ## 调用示例<a name="section17531157161314"></a>
 
@@ -130,4 +132,3 @@ inputGlobal.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE); // 设置Glo
 AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
 AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
 ```
-
