@@ -30,7 +30,61 @@ namespace Te {
 
 struct CopyUB2L1Trait {};
 
-class DataCopyUB2L13510 {
+class DataCopyUB2L13510ND2ND {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        uint16_t blockCount = GetTotalRowShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+
+        int64_t srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row>(srcLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row>(dstLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<DST_TYPE>);
+
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+    }
+};
+
+class DataCopyUB2L13510DN2DN {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        uint16_t blockCount = GetTotalColumnShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+
+        int64_t srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Column>(srcLayout) - GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Column>(dstLayout) - GetTotalRowShape(srcLayout), C0_ELEMENT<DST_TYPE>);
+
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+    }
+};
+
+class DataCopyUB2L13510NDExt2NDExt {
 public:
     template <const CopyUB2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
@@ -46,41 +100,70 @@ private:
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
 
-        uint16_t blockCount = 0;
-        uint32_t blockLen = 0;
-        int64_t srcStride = 0;
-        int64_t dstStride = 0;
+        uint16_t blockCount = GetTotalRowShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
 
-        if constexpr (IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) {
-            blockCount = GetTotalRowShape(srcLayout);
-            // Next three parameters are in unit of 32B
-            blockLen = Std::ceil_division(GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<DST_TYPE>);
 
-            srcStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
-            dstStride = Std::ceil_division(GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(dstLayout) - GetTotalColumnShape(srcLayout), C0_ELEMENT<DST_TYPE>);
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+        // ND和DN场景，需要保证UB和L1上申请的空间和tensor的stride满足32字节对齐，否则CopyUbufToCbuf会有问题，无法正确加载数据，导致数据错误
+    }
+};
 
-        } else if constexpr (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>) {
-            blockCount = GetTotalColumnShape(srcLayout);
-            // Next three parameters are in unit of 32B
-            blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
+class DataCopyUB2L13510DNExt2DNExt {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
 
-            srcStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<SRC_TYPE>);
-            dstStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<DST_TYPE>);
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
 
-        } else if constexpr (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>) {
-            blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
-            // Next three parameters are in unit of 32B
-            // note: C0_Byte_Size == 32B
-            blockLen = GetTotalRowShape(srcLayout);
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
 
-            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
+        uint16_t blockCount = GetTotalColumnShape(srcLayout);
+        // Next three parameters are in unit of 32B
+        uint32_t blockLen = Std::ceil_division(GetTotalRowShape(srcLayout), C0_ELEMENT<SRC_TYPE>);
 
-        } else {
-            static_assert((IsSatisfiedPtnFormatV<U, NDExtLayoutPtn> && IsSatisfiedPtnFormatV<T, NDExtLayoutPtn>) || (IsSatisfiedPtnFormatV<U, DNExtLayoutPtn> && IsSatisfiedPtnFormatV<T, DNExtLayoutPtn>)
-                              || (IsSatisfiedPtnFormatV<U, NZLayoutPtn> && IsSatisfiedPtnFormatV<T, NZLayoutPtn>),
-                          "Unsupported layout type combination for DataCopyL12UB3510");
-        }
+        int64_t srcStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<SRC_TYPE>);
+        int64_t dstStride = Std::ceil_division((GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) - GetTotalRowShape(srcLayout)), C0_ELEMENT<DST_TYPE>);
+
+        CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
+        // ND和DN场景，需要保证UB和L1上申请的空间和tensor的stride满足32字节对齐，否则CopyUbufToCbuf会有问题，无法正确加载数据，导致数据错误
+    }
+};
+
+class DataCopyUB2L13510NZ2NZ {
+public:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Run(const T& dst, const U& src)
+    { Execute<trait>(dst, src); }
+
+private:
+    template <const CopyUB2L1Trait& trait, typename T, typename U>
+    __aicore__ inline static void Execute(const T& dst, const U& src)
+    {
+        using SRC_TYPE = typename U::elementType;
+        using DST_TYPE = typename T::elementType;
+
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+
+        uint16_t blockCount = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcLayout);
+        // Next three parameters are in unit of 32B
+        // note: C0_Byte_Size == 32B
+        uint32_t blockLen = GetTotalRowShape(srcLayout);
+
+        int64_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / C0_ELEMENT<SRC_TYPE> - blockLen;
+        int64_t dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout) / C0_ELEMENT<DST_TYPE> - blockLen;
+
         CopyUbufToCbufInstr::DataCopy(dst, src, blockCount, blockLen, srcStride, dstStride);
         // ND和DN场景，需要保证UB和L1上申请的空间和tensor的stride满足32字节对齐，否则CopyUbufToCbuf会有问题，无法正确加载数据，导致数据错误
     }
