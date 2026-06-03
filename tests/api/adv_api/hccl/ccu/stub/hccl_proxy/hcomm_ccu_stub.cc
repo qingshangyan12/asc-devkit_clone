@@ -10,6 +10,10 @@
 
 #include "ccu_kernel.h"
 #include "ccu_rep_loopcall_v1.h"
+#include "ccu_condition_v1.h"
+#include "ccu_repeat_v1.h"
+#include "ccu_datatype_v1.h"
+#include "ccu_rep_context_v1.h"
 #include <vector>
 #include <string>
 
