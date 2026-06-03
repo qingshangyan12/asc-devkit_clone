@@ -85,9 +85,9 @@ private:
                             ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                             ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                             ccu::Variable goSize3, ccu::Variable goSize4);
-    void PreSync();
-    void PostSync();
-    void DoAlltoAll();
+    static void PreSync();
+    static void PostSync();
+    static void DoAlltoAll();
     
     uint64_t rankSize_{0};
     uint32_t rankId_{0};
@@ -108,7 +108,7 @@ private:
     std::vector<ccu::LocalAddr>      srcAddr_;
     std::vector<ccu::Variable>       dstToken_;
     std::vector<ccu::Variable>       srcToken_;
-    hcomm::CcuRep::CompletedEvent event_;
+    ccu::Event event_;
     ccu::Variable flag_;
     bool loadFromMem_ = false;
 };

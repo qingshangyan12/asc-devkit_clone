@@ -157,6 +157,9 @@ HcclResult CcuKernelAlgBase::CreateMultiOpBroadcast(const std::vector<ChannelHan
     return HCCL_SUCCESS;
 }
 
+// ==================== 旧API函数实现（已注释，不参与编译） ====================
+/*
+
 HcclResult CcuKernelAlgBase::GroupBroadcast(const std::vector<ChannelHandle> &channels, std::vector<CcuRep::RemoteAddr> dst,
                                 CcuRep::LocalAddr src, GroupOpSize goSize)
 {
@@ -964,6 +967,8 @@ std::vector<CcuRep::CompletedEvent> CcuKernelAlgBase::CreateBlockCompletedEvent(
     CcuKernel::CreateBlockCompletedEvent(count, res.data());
     return res;
 }
+
+*/ // 旧API函数实现结束
 
 // ==================== 新API体系函数实现 ====================
 
