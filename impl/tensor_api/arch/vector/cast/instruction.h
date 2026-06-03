@@ -22,6 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_H
 
+#include "impl/tensor_api/arch/vector/binary/instruction.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
@@ -29,23 +30,6 @@
 namespace AscendC {
 namespace Te {
 namespace Inst {
-
-class UpdateMask {
-public:
-    template <typename T, typename U>
-    __simd_callee__ inline static vector_bool Run(U& value)
-    {
-        if constexpr (sizeof(T) == sizeof(uint32_t)) {
-            return asc_update_mask_b32(value);
-        } else if constexpr (sizeof(T) == sizeof(uint16_t)) {
-            return asc_update_mask_b16(value);
-        } else if constexpr (sizeof(T) == sizeof(uint8_t)) {
-            return asc_update_mask_b8(value);
-        } else {
-            return vector_bool{};
-        }
-    }
-};
 
 class CreateMask {
 public:
