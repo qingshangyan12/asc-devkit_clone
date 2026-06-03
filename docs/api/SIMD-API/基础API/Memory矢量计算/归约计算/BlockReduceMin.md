@@ -186,7 +186,7 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本样例中只展示Compute流程中的部分代码。完整样例可参考[BlockReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
+本样例中只展示Compute流程中的部分代码。完整样例可参考[BlockReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/block_reduce_min_max_sum)。
 
 -   BlockReduceMin-tensor高维切分计算样例-mask连续模式
 
