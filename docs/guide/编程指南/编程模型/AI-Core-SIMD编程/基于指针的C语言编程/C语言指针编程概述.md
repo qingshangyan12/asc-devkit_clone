@@ -1,4 +1,4 @@
-# C语言指针编程概述
+﻿# C语言指针编程概述
 
 Ascend C为AI Core提供了SIMD编程路径，**C语言指针编程**是该路径的底层核心接口，直接映射NPU硬件指令，提供对向量处理单元、矩阵运算单元、本地存储等硬件资源的精细控制能力。
 
@@ -30,7 +30,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 **Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/950DT引入寄存器后构建「Global Memory → UB → Register」三级层级。**Global Memory**存放输入输出数据，**UB**作为矢量计算数据枢纽，**Register**位于Vector计算单元最内层，具备最低访存延迟与最高带宽。
 
-![AI Core存储层次结构](../../../../figures/AI_Core存储层次结构.png)
+<img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
 ---
 
@@ -86,7 +86,7 @@ extern __ubuf__ char dynamic_buffer[];
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为192K（NPU架构版本2201），划分为16个bank。每个bank由512行组成，每行长度为32B。这16个bank进一步组织为8个bank group，每个bank group包含2个bank。
 
-![UB Bank冲突示意图](../../../../figures/UB_Bank冲突示意图.png)
+<img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 
@@ -103,7 +103,7 @@ extern __ubuf__ char dynamic_buffer[];
 - 不产生冲突：src0地址0x10020，dst地址0x10000，相差0x00020，位于不同Bank
 - 产生冲突：src0地址0x10020，dst地址0x10120，相差0x00100，位于同一Bank
 
-![Unified Buffer地址分配示意图](../../../../figures/Unified_Buffer地址分配示意图.png)
+<img src="../../../../figures/Unified_Buffer地址分配示意图.png" alt="Unified Buffer地址分配示意图" width="800" />
 
 ---
 
@@ -111,7 +111,7 @@ extern __ubuf__ char dynamic_buffer[];
 
 以shape为(8, 16, 16)的输入执行(1, 0, 2)的transpose操作为例，通过将计算逻辑由"跳读、连续写"调整为"连续读、跳写"，可避免冲突。
 
-![读读冲突示意图](../../../../figures/读读冲突.png)
+<img src="../../../../figures/读读冲突.png" alt="读读冲突示意图" width="800" />
 
 **问题代码**（会导致读读冲突）：
 
@@ -122,7 +122,7 @@ for (uint16_t i = 0; i < 16; ++i) {
 }
 ```
 
-![读读冲突优化示意图](../../../../figures/读读冲突优化.png)
+<img src="../../../../figures/读读冲突优化.png" alt="读读冲突优化示意图" width="800" />
 
 **优化代码**（避免读读冲突）：
 
@@ -139,7 +139,7 @@ for (uint16_t i = 0; i < 8; ++i) {
 
 以连续4096个float元素的加法`z = x + y`为例，通过在分配内存时适当扩大申请空间，保证在一个Repeat内，x和y不会同时位于同一个bank group，且x或y不会与z同时位于同一个bank。
 
-![地址分配优化前示意图](../../../../figures/地址分配优化前示意图.png)
+<img src="../../../../figures/地址分配优化前示意图.png" alt="地址分配优化前示意图" width="800" />
 
 **问题代码**（会产生Bank冲突）：
 
@@ -150,7 +150,7 @@ __ubuf__ float z[4096];  // 起始地址0x08000
 asc_add(z, x, y, 4096);
 ```
 
-![地址分配优化后示意图](../../../../figures/地址分配优化后示意图.png)
+<img src="../../../../figures/地址分配优化后示意图.png" alt="地址分配优化后示意图" width="800" />
 
 **优化代码**（避免Bank冲突）：
 
@@ -167,7 +167,7 @@ asc_add(z, x, y, 4096);
 
 Cube计算单元是AI Core中专用于执行矩阵运算的单元，高亮部分展示了Cube计算单元及其直接访问的专用缓存：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
-![矩阵计算单元架构图](../../../../figures/矩阵计算单元架构图.png)
+<img src="../../../../figures/矩阵计算单元架构图.png" alt="矩阵计算单元架构图" width="800" />
 
 **存储单元说明**：
 
@@ -229,11 +229,11 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 **2201硬件架构图**：
 
-![2201硬件架构图](../../../../figures/2201_硬件架构图.png)
+<img src="../../../../figures/2201_硬件架构图.png" alt="2201硬件架构图" width="800" />
 
 **3510硬件架构图**：
 
-![3510硬件架构图](../../../../figures/3510_硬件架构图.png)
+<img src="../../../../figures/3510_硬件架构图.png" alt="3510硬件架构图" width="800" />
 
 ---
 
@@ -245,11 +245,11 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-![Vector计算数据流](../../../../figures/Vector计算数据流.png)
+<img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
 
 从上图可以看到，执行一个Vector矢量计算时，四个执行单元`Scalar`、`Vector`、`DMA(MTE2)`、`DMA(MTE3)`并行执行，如果访问同一片Local Memory，需要同步机制来控制访问时序。
 
-![同步顺序示意图](../../../../figures/同步顺序.png)
+<img src="../../../../figures/同步顺序.png" alt="同步顺序示意图" width="800" />
 
 ---
 
@@ -379,11 +379,11 @@ asc_sync_data_barrier(mem_dsb_t::DSB_ALL);  // 等待所有内存访问完成
 
 以下图为例，AIC需要依赖于AIV的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
 
-![核间同步业务场景示例](../../../../figures/核间同步业务场景示例.png)
+<img src="../../../../figures/核间同步业务场景示例.png" alt="核间同步业务场景示例" width="800" />
 
 从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个"主核"，subblock表示一个"主核"带多少个"从核"。
 
-![block和subblock之间关系](../../../../figures/block和subblock之间关系.png)
+<img src="../../../../figures/block和subblock之间关系.png" alt="block和subblock之间关系" width="800" />
 
 算子按计算特征可分为三类：Cube算子（矩阵计算）、Vector算子（矢量计算）和Mix算子（同时包含矩阵和矢量计算）。算子类型决定了其所需的核间同步方式和可选的group配置模式。
 
