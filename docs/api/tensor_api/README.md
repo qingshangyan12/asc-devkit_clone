@@ -58,4 +58,3 @@ Tensor API当前仅支持Ascend 950PR/Ascend 950DT。
 
 ### 测试和样例
 
-本仓库提供[测试用例](../../../../tests/api/tensor_api) 以及[示例代码](../../../../examples/01_simd_cpp_api/02_features/05_tensor_api)，方便快速了解功能用法并进行验证。
