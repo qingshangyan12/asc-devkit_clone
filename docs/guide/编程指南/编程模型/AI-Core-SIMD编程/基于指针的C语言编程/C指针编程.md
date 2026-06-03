@@ -509,7 +509,7 @@ C指针编程针对矩阵计算编程模型提供了四类接口，分别承载C
 
 ![普通矩阵基础计算流程图](image-4.png)
 
-
+首先通过数组的方式申请L1 Buffer, L0A Buffer, L0B Buffer等资源。
 ```c
 __cbuf__ half a_l1[BLOCK_M * BLOCK_K];   // L1 staging area
 __cbuf__ half b_l1[BLOCK_K * BLOCK_N];   // L1 staging area
@@ -520,13 +520,26 @@ __cc__ float c_l0c[BLOCK_M * BLOCK_N];   // L0C output
 ```
 
 1. 通过`asc_copy_gm2l1_nd2nz`接口将A、B原始矩阵的GM数据搬运到L1 Buffer中（如果存在Bias/随路量化，则同样通过DataCopy搬运到L1 Buffer中, L1 Buffer必须为NZ分形）。
+```c
+asc_copy_gm2l1(a_l1, a_gm, BLOCK_M * BLOCK_K);  // GM to L1
+asc_copy_gm2l1(b_l1, b_gm, BLOCK_K * BLOCK_N);  // GM to L1
+```
 
 2. 通过`asc_copy_l12l0a`接口将A、B矩阵分别搬运到L0A Buffer和L0B Buffer上准备计算(如果存在Bias/随路量化，则通过`asc_copy`接口将L1 Buffer中的bias数据/量化系数数据搬运到BT Buffer/Fixpipe Buffer上)。
+```c
+asc_copy_l12l0a(a_l0a, a_l1, 0, 1, 1, 0);  // L1 to L0A
+asc_copy_l12l0b(b_l0b, b_l1, 0, 1, 1, 0);  // L1 to L0B
+```
 
 3. 通过`asc_mmad`接口对L0A Buffer、L0B Buffer(BT Buffer)上面的数据进行矩阵计算，并输出结果到L0C Buffer上。
+```c
+asc_mmad(c_l0c, a_l0a, b_l0b, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
+```
 
 4. 通过`asc_copy_l0c2gm`接口将L0C Buffer的数据进行处理并搬出到GM中，该接口可以利用Fixpipe Buffer数据进行随路量化、Relu等随路操作。
-
+```c
+asc_copy_l0c2gm(c_gm, c_l0c, BLOCK_M * BLOCK_N);
+```
 
 ## 五、总结
 
