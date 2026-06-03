@@ -233,7 +233,6 @@ HcclResult InsV2ReduceScatterSequenceExecutorAicpu<AlgTopoMatch, InsAlgTemplate0
 
     std::shared_ptr<InsAlgTemplate1> algTemplateInter =
         std::make_shared<InsAlgTemplate1>(param, myRank_, algHierarchyInfo_.infos[1]);
-    algTemplateInter->SetchannelsPerRank(remoteRankToChannelInfo_[1]);
 
     u32 templateScratchMultiplierIntra = algTemplateIntra->CalcScratchMultiple(BufferType::INPUT,
         BufferType::HCCL_BUFFER);
