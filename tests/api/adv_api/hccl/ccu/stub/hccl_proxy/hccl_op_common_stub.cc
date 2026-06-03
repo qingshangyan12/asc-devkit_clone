@@ -282,7 +282,8 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
         return HCCL_E_PTR;
     }
     if (resCtxHost != nullptr && resCtxHost->kfcServerArgs != nullptr) {
-        g_capturedKfcServerArgs = std::move(resCtxHost->kfcServerArgs);
+        g_capturedKfcServerArgs = std::make_shared<CcuKfcKernelStruct>(
+            *static_cast<CcuKfcKernelStruct*>(resCtxHost->kfcServerArgs));
     } else {
         g_capturedKfcServerArgs = nullptr;
     }

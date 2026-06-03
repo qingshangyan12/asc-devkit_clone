@@ -9,7 +9,8 @@
 */
 #include "hccl_alloc_ctx_res.h"
 
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
+using namespace hcomm::CcuRep;
 
 std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},
@@ -462,6 +463,14 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     return HCCL_SUCCESS;
 }
 
+static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
+{
+    uint64_t workSpace = opResCtx.workSpace;
+    uint64_t workSpaceSize = opResCtx.workSpaceSize;
+    token = hcomm::CcuRep::GetTokenInfo(workSpace, workSpaceSize);
+    return HCCL_SUCCESS;
+}
+
 static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, OpResCtx &opResCtx, void **resCtxOut)
@@ -477,20 +486,17 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     if (opParam.engine == COMM_ENGINE_CCU) {
         uint64_t token;
         CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
-        std::shared_ptr<CcuTaskArgKfcServer> kfcServerArgs = std::make_shared<CcuTaskArgKfcServer>(
-             opResCtx.xnAddr, opResCtx.ckeAddr, 1, 1, 0, token); // 1 1 0 for ccuAlltoAllMesh1D
-        resCtxHost->kfcServerArgs = kfcServerArgs.get();
+        auto kfcServerArgs = std::make_shared<CcuKfcKernelStruct>();
+        kfcServerArgs->waitAddr = opResCtx.ckeAddr;
+        kfcServerArgs->recordAddr = opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
+        kfcServerArgs->paramAddr = opResCtx.xnAddr;
+        kfcServerArgs->dieNum = 1;
+        kfcServerArgs->missonNum = 1;
+        kfcServerArgs->missonIndex = 0;
+        resCtxHost->kfcServerArgs = static_cast<void*>(kfcServerArgs.get());
         resCtxHost->kfcServerArgSize = 6;
     }
     opParam.resCtx = *resCtxOut;
-    return HCCL_SUCCESS;
-}
-
-static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
-{
-    uint64_t workSpace = opResCtx.workSpace;
-    uint64_t workSpaceSize = opResCtx.workSpaceSize;
-    token = CcuRep::GetTokenInfo(workSpace, workSpaceSize);
     return HCCL_SUCCESS;
 }
 
