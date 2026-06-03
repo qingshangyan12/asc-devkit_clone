@@ -540,3 +540,4 @@ endforeach()
 add_subdirectory(hccl/cc)
 
 add_subdirectory(api_host_check)
+add_subdirectory(hccl/ccu)
