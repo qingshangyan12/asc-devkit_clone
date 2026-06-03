@@ -87,7 +87,7 @@ ReduceSum接口（Tensor前n个数据计算接口，n为接口的count参数）�
 
 ## 调用示例<a name="section837496171220"></a>
 
-具体可参考[GetReduceRepeatSumSpr样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
+具体可参考[GetReduceRepeatSumSpr样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/reduce_computation)。
 
 ```
 AscendC::LocalTensor<float> src;
