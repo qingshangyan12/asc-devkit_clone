@@ -124,3 +124,48 @@ TEST_P(CreateVecIndexTestsuite, testCreateVecIndex)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+__global__ __aicore__ void testCreateVecIndexInt32Precision(GM_ADDR dstGm)
+{
+    constexpr int32_t count = 128;
+    constexpr int32_t firstValue = 16777216;
+    AscendC::GlobalTensor<int32_t> dstGlobal;
+    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t*>(dstGm), count);
+
+    AscendC::TPipe pipe;
+    AscendC::TBuf<AscendC::TPosition::VECCALC> intBuf;
+    pipe.InitBuffer(intBuf, count * sizeof(int32_t));
+    AscendC::LocalTensor<int32_t> index = intBuf.Get<int32_t>(count);
+
+    AscendC::CreateVecIndex<int32_t>(index, firstValue, count);
+    AscendC::PipeBarrier<PIPE_ALL>();
+    AscendC::DataCopy(dstGlobal, index, count);
+}
+
+class CreateVecIndexPrecisionTestsuite : public testing::Test {
+protected:
+    void SetUp()
+    {
+        AscendC::SetGCoreType(2);
+    }
+
+    void TearDown()
+    {
+        AscendC::CheckSyncState();
+        AscendC::SetGCoreType(0);
+        GlobalMockObject::verify();
+    }
+};
+
+TEST_F(CreateVecIndexPrecisionTestsuite, createVecIndexInt32KeepsPrecisionAboveFloatMantissa)
+{
+    constexpr int32_t count = 128;
+    constexpr int32_t firstValue = 16777216;
+    int32_t dstGm[count] = {0};
+
+    testCreateVecIndexInt32Precision(reinterpret_cast<GM_ADDR>(dstGm));
+
+    for (int32_t i = 0; i < count; i++) {
+        EXPECT_EQ(dstGm[i], firstValue + i);
+    }
+}

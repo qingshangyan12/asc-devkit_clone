@@ -31,10 +31,20 @@ namespace AscendC {
 constexpr int32_t maskBitNum = 64;
 
 template <typename T>
+__aicore__ inline T GetCreateVecIndexValue(const T &firstValue, uint32_t offset)
+{
+    if constexpr (SupportType<T, int32_t>()) {
+        return static_cast<T>(static_cast<int64_t>(firstValue) + static_cast<int64_t>(offset));
+    } else {
+        return static_cast<T>(static_cast<float>(firstValue) + static_cast<float>(offset));
+    }
+}
+
+template <typename T>
 __aicore__ inline void CreateVecIndexOneBlk(const LocalTensor<T> &dst, const T &firstValue, uint32_t count)
 {
     for (int32_t i = 0; i < static_cast<int32_t>(count); i++) {
-        dst.SetValue(i, static_cast<float>(firstValue) + static_cast<float>(i));
+        dst.SetValue(i, GetCreateVecIndexValue(firstValue, static_cast<uint32_t>(i)));
     }
     auto eventIdSToV = GetTPipePtr()->FetchEventID(HardEvent::S_V);
     SetFlag<HardEvent::S_V>(eventIdSToV);
@@ -55,7 +65,7 @@ __aicore__ inline void CreateVecIndexOneRep(const LocalTensor<T> &dst, const T &
                     uint32_t index = i * maskBitNum + j;
                     uint32_t blkIndex = index / eleCntOfOneBlk;
                     uint32_t eleIndex = blkIndex * eleCntOfOneBlk * dstBlkStride + index % eleCntOfOneBlk;
-                    dst.SetValue(eleIndex, static_cast<float>(firstValue) + static_cast<float>(i * maskBitNum + j));
+                    dst.SetValue(eleIndex, GetCreateVecIndexValue(firstValue, i * maskBitNum + j));
                 }
                 maskValue <<= 1;
             }
@@ -66,7 +76,7 @@ __aicore__ inline void CreateVecIndexOneRep(const LocalTensor<T> &dst, const T &
             if (mask[0] & maskValue) {
                 uint32_t blkIndex = j / eleCntOfOneBlk;
                 uint32_t eleIndex = blkIndex * eleCntOfOneBlk * dstBlkStride + j % eleCntOfOneBlk;
-                dst.SetValue(eleIndex, static_cast<float>(firstValue) + static_cast<float>(j));
+                dst.SetValue(eleIndex, GetCreateVecIndexValue(firstValue, static_cast<uint32_t>(j)));
             }
             maskValue <<= 1;
         }

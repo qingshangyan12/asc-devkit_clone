@@ -93,3 +93,38 @@ TEST_P(arithprogressionTestSuite, arithprogressionTestCase)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+__aicore__ inline void mainArangeInt32PrecisionTest(GM_ADDR dstGm)
+{
+    constexpr int32_t count = 16;
+    constexpr int32_t diffValue = 16777217;
+    GlobalTensor<int32_t> dstGlobal;
+    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t*>(dstGm), count);
+
+    TPipe pipe;
+    TQue<TPosition::VECOUT, 1> outDst;
+    pipe.InitBuffer(outDst, 1, count * sizeof(int32_t));
+
+    LocalTensor<int32_t> dstLocal = outDst.AllocTensor<int32_t>();
+    PipeBarrier<PIPE_ALL>();
+    Arange<int32_t>(dstLocal, static_cast<int32_t>(0), diffValue, count);
+
+    PipeBarrier<PIPE_ALL>();
+    DataCopy(dstGlobal, dstLocal, count);
+    outDst.FreeTensor(dstLocal);
+    PipeBarrier<PIPE_ALL>();
+}
+
+TEST_F(TEST_arithprogression, arangeInt32KeepsDiffPrecisionAboveFloatMantissa)
+{
+    constexpr int32_t count = 16;
+    constexpr int32_t diffValue = 16777217;
+    uint8_t dstGm[count * sizeof(int32_t)] { 0x00 };
+
+    mainArangeInt32PrecisionTest(dstGm);
+
+    auto output = reinterpret_cast<int32_t*>(dstGm);
+    for (int32_t i = 0; i < count; i++) {
+        EXPECT_EQ(output[i], i * diffValue);
+    }
+}
