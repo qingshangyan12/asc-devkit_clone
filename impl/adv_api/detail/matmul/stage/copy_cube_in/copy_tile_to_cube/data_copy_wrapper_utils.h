@@ -287,80 +287,12 @@ __aicore__ inline void TransDataNZBMatrix(
     }
 }
 
-#if __NPU_ARCH__ == 5102
-template <typename SrcT, typename TransT>
-__aicore__ inline void CopyNZ2NZImplByLoadData(
-    const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
-    const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
-{
-    constexpr int32_t c0Size_ = AuxGetC0Size<TransT>();
-    int32_t dstStride = 0;
-    if (kAlignToC0Size) {
-        dstStride = Ceil(height, c0Size_) * c0Size_ / BLOCK_CUBE;
-    } else {
-        dstStride = Ceil(height, BLOCK_CUBE);
-    }
-
-    LoadData2DParamsV2 loadDataParams;
-    loadDataParams.srcStride = Ceil(gRow, BLOCK_CUBE);
-    loadDataParams.mStartPosition = Ceil(row, BLOCK_CUBE);
-    loadDataParams.kStartPosition = Ceil(col, c0Size_);
-    loadDataParams.dstStride = static_cast<uint16_t>(dstStride);
-    loadDataParams.mStep = Ceil(height, BLOCK_CUBE);
-    loadDataParams.kStep = Ceil(width, c0Size_);
-    LoadData(dst, src, loadDataParams);
-}
-#endif
 
 template <typename SrcT, typename TransT, bool HasScalePos = false>
 __aicore__ inline void CopyNZ2NZImpl(
     const LocalTensor<TransT>& dst, const GlobalTensor<SrcT>& src, const int32_t row, const int32_t col,
     const int32_t height, const int32_t width, const int32_t gRow, const bool kAlignToC0Size = false)
 {
-#if __NPU_ARCH__ == 5102
-    CopyNZ2NZImplByLoadData(dst, src, row, col, height, width, gRow, kAlignToC0Size);
-#else
-    ASCENDC_ASSERT((gRow >= height), {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "NZ2NZ height larger than origin matrix height, gRow is %d, which should be no less than height %d.", gRow,
-            height);
-    });
-    constexpr int32_t c0Size_ = AuxGetC0Size<TransT>();
-    int32_t alignedGRow = Ceil(gRow, BLOCK_CUBE) * BLOCK_CUBE;
-    int64_t srcOffset = (int64_t)row * (int64_t)c0Size_ + (int64_t)col * (int64_t)alignedGRow;
-    // height direction need to be 16 aligned
-    auto alignHeight = Ceil(height, BLOCK_CUBE) * BLOCK_CUBE;
-    int32_t blockLen = alignHeight * c0Size_ * sizeof(TransT) / ONE_BLK_SIZE;
-    int32_t srcStride = (alignedGRow - alignHeight) * (c0Size_ * sizeof(TransT) / ONE_BLK_SIZE);
-    if constexpr (IsSupportB4<TransT>()) {
-        blockLen /= INT4_TWO;
-        srcStride /= INT4_TWO;
-    }
-    if (srcStride >= UINT16_MAX) {
-        for (int32_t i = 0; i < Ceil(width, c0Size_); ++i) {
-            DataCopy(
-                dst[i * alignHeight * c0Size_], src[srcOffset + i * gRow * c0Size_],
-                {1, static_cast<uint16_t>(blockLen), 0, 0});
-        }
-    } else {
-        uint16_t nburst = Ceil(width, c0Size_);
-        int32_t dstStride = 0;
-        if constexpr (IsNeedC0Align<TransT>()) {
-            if (kAlignToC0Size) {
-                if constexpr (HasScalePos && IsSupportB8<TransT>()) {
-                    dstStride = Ceil(height, MX_BASEK_FACTOR) * MX_BASEK_FACTOR - alignHeight;
-                } else {
-                    dstStride = Ceil(height, c0Size_) * c0Size_ - alignHeight;
-                }
-            }
-        }
-        DataCopy(
-            dst, src[srcOffset],
-            {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
-             static_cast<uint16_t>(dstStride)});
-    }
-#endif
 }
 
 template <typename SrcT, typename TransT>
