@@ -131,7 +131,7 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 
 | Task Duration(us) | DCache Read GM | DCache Read Vector | DCache Write Vector |
 |:-----------------:|:-----------------:|:---------------------:|:----------------------:|
-|       56.82       |       5064        |         2048          |          6144          |
+|       102.47       |       256        |         640          |          768          |
 
 **性能瓶颈**：
 - 寄存器溢出到Global Memory
@@ -184,12 +184,12 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 | Task Duration(us) | DCache Read GM(次) | DCache Read Vector(次) | DCache Write Vector(次) |
 |:-----------------:|:-----------------:|:---------------------:|:----------------------:|
-|      50.895       |       3531        |         2048          |          6144          |
+|      96.22       |       256        |         512          |          256          |
 
 **优化效果分析**：
-- Task Duration从56.82us降低到50.895us，耗时下降约**10.4%**
-- DCache Read GM从5064次降至3531次，减少约**30.2%**（减少1533次Global Memory访问）
-- DCache Read Vector和DCache Write Vector保持不变，说明优化没有增加额外开销
+- Task Duration从102.47us降低到96.22us，耗时下降约**6.1%**
+- DCache Read GM保持不变，说明并没有增加额外开销
+- DCache Read Vector从640减小至512， DCache Write Vector从768减小至256，说明没有寄存器溢出后，对于Data Cache的读写次数减少（stack物理位置位于Global Memory，因此寄存器溢出时对于stack的访问会体现在Data Cache的访问次数上）
 - 寄存器充分利用，避免数据溢出到Global Memory
 
 ---
@@ -199,13 +199,13 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 ### Ascend 950PR性能数据
 
 **综合优化效果**：
-- 从Case 0基线版本到Case 1优化版本，Task Duration从56.82us降低到50.895us，耗时下降约10.4%
-- DCache Read GM从5064次降至3531次，减少约30.2%，减少1533次Global Memory访问
+- 从Case 0基线版本到Case 1优化版本，Task Duration从102.47us降低到96.22us，耗时下降约6.1%
+- DCache Read Vector从640减小至512，DCache Write Vector从768减小至256
 
 | Case version | Task Duration(us) | Task Duration相对Case 0 | 优化点                   |
 |--------------|-------------------|-----------------------|-----------------------|
-| Case 0       | 56.82             | **1x**                | 基线版本，寄存器溢出到Global Memory |
-| Case 1       | 50.895            | **0.90x耗时**           | 配置launch bounds避免寄存器溢出 |
+| Case 0       | 102.47             | **1x**                | 基线版本，寄存器溢出到Global Memory |
+| Case 1       | 96.22            | **0.94x耗时**           | 配置launch bounds避免寄存器溢出 |
 
 ## 调优建议
 
@@ -225,11 +225,10 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 4. **验证优化效果**：
    - 对比优化前后的编译信息（Stack size和Used register number）
-   - 对比优化前后的性能数据（Task Duration、DCache Read GM）
+   - 对比优化前后的性能数据（Task Duration、DCache Read GM、DCache Read Vector、DCache Write Vector）
 
 5. **性能指标关注**：
    - Task Duration：整体性能提升的直接指标
-   - DCache Read GM：减少Global Memory访问的关键指标
    - 寄存器使用情况：判断是否存在寄存器溢出
 
 ## 编译运行
