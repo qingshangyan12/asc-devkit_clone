@@ -237,7 +237,7 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
--   用户自定义Tensor样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景二。
+-   用户自定义Tensor样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)场景二。
 
     ```
     uint32_t mask = 70; // 每次迭代内参与计算的元素
@@ -277,7 +277,7 @@
     **图 2**  Counter模式配置方式二示意图<a name="fig13219248171214"></a>  
     ![](../../../../figures/Counter模式配置方式二示意图.png "Counter模式配置方式二示意图")
 
--   内置固定模式样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景一。
+-   内置固定模式样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)场景一。
 
     ```
     uint32_t mask = 0; // 每次迭代内参与计算的元素，normal模式下mask建议设置为0
