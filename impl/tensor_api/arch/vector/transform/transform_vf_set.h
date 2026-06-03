@@ -22,10 +22,10 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 
-#include "impl/tensor_api/arch/vector/binary/binary_vf.h"
+#include "impl/tensor_api/arch/vector/binary/instruction.h"
 #include "impl/tensor_api/arch/vector/cast/cast_vf.h"
-#include "impl/tensor_api/arch/vector/unary/unary_vf.h"
-#include "impl/tensor_api/arch/vector/dual/dual_vf.h"
+#include "impl/tensor_api/arch/vector/unary/instruction.h"
+#include "impl/tensor_api/arch/vector/dual/instruction.h"
 #include "impl/tensor_api/utils/map_impl.h"
 
 namespace AscendC {
@@ -37,7 +37,7 @@ struct Transform2VFSet {
         Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
     using castSet = Std::tuple<Inst::Ceil, Inst::U82U16>;
     using unarySet = Std::tuple<Inst::Not, Inst::Ln, Inst::Abs, Inst::Sqrt, Inst::Exp>;
-    using dualSet = Std::tuple<nst::Mull>;
+    using dualSet = Std::tuple<Inst::Mull>;
 
     using transformSet = TupleMap<
         Std::tuple<binarySet, Transform2BinaryVF<CalcFunc, TraitType>>,
