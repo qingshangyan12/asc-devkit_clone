@@ -973,9 +973,9 @@ CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool 
         return CCU_SUCCESS;
     }
 
-    config.msInterleave = CCU_MS_INTERLEAVE_NEW;
+    config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount    = parallelDim;
-    config.memSlice     = msPerLoop * CCU_MS_SIZE_NEW;
+    config.memSlice     = msPerLoop * CCU_MS_SIZE;
 
     res.eventCount = config.loopCount;
     res.completedEvent = ccu::Array<ccu::Event>(res.eventCount);
@@ -989,7 +989,7 @@ CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool 
 
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var)
 {
-    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_MS_DEFAULT_LOOP_COUNT_NEW, 1);
+    AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, CCU_MS_DEFAULT_LOOP_COUNT, 1);
 
     std::string loopType = "localcopy";
     if (ctx.IsLoopEntityRegistered(loopType)) {
