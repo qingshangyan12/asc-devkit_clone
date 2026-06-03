@@ -22,18 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_UINT_UINT_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_UINT_UINT_H
 
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_CAST_INST(U162UInt32NoSatEven, asc_uint162uint32);
 ASCENDC_CAST_INST(U162UInt32NoSatOdd, asc_uint162uint32_v2);
 ASCENDC_CAST_INST(U162UInt8NoSatEven, asc_uint162uint8);
@@ -60,8 +48,6 @@ ASCENDC_CAST_INST(U82UInt32NoSatP0, asc_uint82uint32);
 ASCENDC_CAST_INST(U82UInt32NoSatP1, asc_uint82uint32_v2);
 ASCENDC_CAST_INST(U82UInt32NoSatP2, asc_uint82uint32_v3);
 ASCENDC_CAST_INST(U82UInt32NoSatP3, asc_uint82uint32_v4);
-
-#undef ASCENDC_CAST_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_UINT_UINT_H
 

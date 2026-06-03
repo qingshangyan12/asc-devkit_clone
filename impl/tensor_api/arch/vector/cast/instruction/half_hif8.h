@@ -22,18 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_HALF_HIF8_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_HALF_HIF8_H
 
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_CAST_INST(Half2Hif8RHNoSatEven, asc_half2hif8_rh);
 ASCENDC_CAST_INST(Half2Hif8RHSatEven, asc_half2hif8_rh_sat);
 ASCENDC_CAST_INST(Half2Hif8RHNoSatOdd, asc_half2hif8_rh_v2);
@@ -45,8 +33,6 @@ ASCENDC_CAST_INST(Half2Hif8RNASatOdd, asc_half2hif8_rna_sat_v2);
 
 ASCENDC_CAST_INST(Hif82HalfEven, asc_hif82half);
 ASCENDC_CAST_INST(Hif82HalfOdd, asc_hif82half_v2);
-
-#undef ASCENDC_CAST_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_HALF_HIF8_H
 

@@ -22,18 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HIF8_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HIF8_H
 
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_CAST_INST(Hif82FloatP0, asc_hif82float);
 ASCENDC_CAST_INST(Hif82FloatP1, asc_hif82float_v2);
 ASCENDC_CAST_INST(Hif82FloatP2, asc_hif82float_v3);
@@ -55,8 +43,6 @@ ASCENDC_CAST_INST(Float2Hif8RNANoSatP2, asc_float2hif8_rna_v3);
 ASCENDC_CAST_INST(Float2Hif8RNASatP2, asc_float2hif8_rna_sat_v3);
 ASCENDC_CAST_INST(Float2Hif8RNANoSatP3, asc_float2hif8_rna_v4);
 ASCENDC_CAST_INST(Float2Hif8RNASatP3, asc_float2hif8_rna_sat_v4);
-
-#undef ASCENDC_CAST_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HIF8_H
 

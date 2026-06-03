@@ -22,18 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_INT_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_INT_H
 
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_CAST_INST(Float2Int16RDNoSatEven, asc_float2int16_rd);
 ASCENDC_CAST_INST(Float2Int16RDSatEven, asc_float2int16_rd_sat);
 ASCENDC_CAST_INST(Float2Int16RDNoSatOdd, asc_float2int16_rd_v2);
@@ -106,8 +94,6 @@ ASCENDC_CAST_INST(Int642FloatRUEven, asc_int642float_ru);
 ASCENDC_CAST_INST(Int642FloatRUOdd, asc_int642float_ru_v2);
 ASCENDC_CAST_INST(Int642FloatRZEven, asc_int642float_rz);
 ASCENDC_CAST_INST(Int642FloatRZOdd, asc_int642float_rz_v2);
-
-#undef ASCENDC_CAST_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_INT_H
 

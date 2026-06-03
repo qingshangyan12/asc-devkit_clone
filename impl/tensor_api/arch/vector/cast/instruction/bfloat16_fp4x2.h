@@ -22,18 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_BFLOAT16_FP4X2_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_BFLOAT16_FP4X2_H
 
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_CAST_INST(BF162E1M2RDP0, asc_bfloat162e1m2x2_rd);
 ASCENDC_CAST_INST(BF162E1M2RDP1, asc_bfloat162e1m2x2_rd_v2);
 ASCENDC_CAST_INST(BF162E1M2RDP2, asc_bfloat162e1m2x2_rd_v3);
@@ -85,8 +73,6 @@ ASCENDC_CAST_INST(E2M12BF16P0, asc_e2m1x22bfloat16);
 ASCENDC_CAST_INST(E2M12BF16P1, asc_e2m1x22bfloat16_v2);
 ASCENDC_CAST_INST(E2M12BF16P2, asc_e2m1x22bfloat16_v3);
 ASCENDC_CAST_INST(E2M12BF16P3, asc_e2m1x22bfloat16_v4);
-
-#undef ASCENDC_CAST_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_BFLOAT16_FP4X2_H
 

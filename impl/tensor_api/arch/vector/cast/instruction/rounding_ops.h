@@ -22,25 +22,11 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 
-#define ASCENDC_ROUNDING_INST(CLASS_NAME, FUNC_NAME)                                                                 \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T>                                                                                            \
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
 ASCENDC_ROUNDING_INST(Rint, asc_rint);
 ASCENDC_ROUNDING_INST(Round, asc_round);
 ASCENDC_ROUNDING_INST(Floor, asc_floor);
 ASCENDC_ROUNDING_INST(Ceil, asc_ceil);
 ASCENDC_ROUNDING_INST(Trunc, asc_trunc);
-
-#undef ASCENDC_ROUNDING_INST
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 
