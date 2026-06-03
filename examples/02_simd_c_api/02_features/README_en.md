@@ -2,7 +2,7 @@
 
 ## Overview
 
-Based on Ascend C feature samples, this document introduces the implementation methods for writing operator samples using Framework, C_API, and other features.
+Based on Ascend C feature samples, this document introduces the implementation methods for writing operator samples using C_API and other features.
 
 ## Sample List
 

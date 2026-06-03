@@ -143,7 +143,7 @@
 
 ## 调用示例<a name="section837496171220"></a>
 
-具体可参考[WholeReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
+具体可参考[WholeReduce系列归约指令样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/whole_reduce_min_max_sum)。
 
 1.  以ReduceMax指令为例，首先执行ReduceMax指令。
 
