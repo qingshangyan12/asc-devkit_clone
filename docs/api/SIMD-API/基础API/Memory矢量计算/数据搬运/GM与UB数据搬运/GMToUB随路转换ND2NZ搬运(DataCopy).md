@@ -8,7 +8,7 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | √ </cann-filter>|
 |<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 |<cann-filter npu-type="x90"> Kirin X90 | x </cann-filter>|
@@ -16,12 +16,14 @@
 
 ## 功能说明<a name="section12840195813362"></a>
 
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
+
 该接口为软仿接口，基于易用性角度进行设计，支持在从GM到UB的数据搬运过程中进行ND到NZ格式的转换。
 
 ## 函数原型<a name="section1954364615315"></a>
 
 - 不支持enableSmallC0模式
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
     ```
@@ -29,7 +31,7 @@
 <cann-filter npu-type="950">
 
 - 支持enableSmallC0模式
-    ```
+    ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, bool enableSmallC0 = false>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
@@ -79,24 +81,24 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 - dstNzMatrixStride = 96，表达dst中第x个ND矩阵的起点和第x+1个ND矩阵的起点的偏移，即A1和C1之间的距离，即为6个DataBlock，6 \* 16 = 96个元素。
 
 **图 1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>  
-![](../../../../../figures/ND2NZ转换示意图（half数据类型）.png "ND2NZ转换示意图（half数据类型）")
+![](../../../../../figures/nd2nz_conversion_half.png "ND2NZ转换示意图（half数据类型）")
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 **图 2**  enableSmallC0开启模式下的ND2NZ转换示意图 （half数据类型）<a name="fig07641913195410"></a>  
-![](../../../../../figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
+![](../../../../../figures/enable_smallc0_nd2nz_conversion_half.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 
 ## 数据类型<a name="section4219135304818"></a>
 
 <cann-filter npu-type="950">
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。
+- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32。
 
 </cann-filter>
 
 <cann-filter npu-type="310p">
 
-- Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、half、float。
+- Atlas 推理系列产品 AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、float、int32_t、uint32_t。
 
 </cann-filter>
 
@@ -129,8 +131,8 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
-```
-// srcLocal为half类型的L1 Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor
+```cpp
+// srcLocal为half类型的L1 Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // Global Memory -> Local Memory
 AscendC::DataCopy(srcLocal, srcGlobal, intriParams);

@@ -8,17 +8,19 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | √ </cann-filter>|
 |<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
 ## 功能说明<a name="section12840195813362"></a>
 
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
+
 该接口为软仿接口，基于易用性角度进行设计，支持在从UB到GM的数据搬运过程中进行NZ到ND格式的转换。
 
 ## 函数原型<a name="section1792117555586"></a>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
 ```
@@ -62,7 +64,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - dstNdMatrixStride = 48，表达dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，即为3个DataBlock，3 \* 16 = 48个元素。
 
 **图 1**  NZ2ND转换示意图（half数据类型）<a name="fig15851251122815"></a>  
-![](../../../../../figures/NZ2ND转换示意图（half数据类型）.png "NZ2ND转换示意图（half数据类型）")
+![](../../../../../figures/nz2nd_conversion_half.png "NZ2ND转换示意图（half数据类型）")
 
 以float数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
 
@@ -75,13 +77,13 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - dstNdMatrixStride = 40，表示dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，为5个DataBlock，5 \* 8 = 40个元素。
 
 **图 2**  NZ2ND转换示意图（float数据类型）<a name="fig5586175192811"></a>  
-![](../../../../../figures/NZ2ND转换示意图（float数据类型）.png "NZ2ND转换示意图（float数据类型）")
+![](../../../../../figures/nz2nd_conversion_float.png "NZ2ND转换示意图（float数据类型）")
 
 ## 数据类型<a name="section4219135304818"></a>
 
 <cann-filter npu-type="950">
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
+- Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
 
 </cann-filter>
 
@@ -115,8 +117,8 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 intriParams参数解析请参考[图1](#fig15851251122815)。
 
-```
-// dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
+```cpp
+// dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
 AscendC::Nz2NdParamsFull intriParams{1, 32, 32, 1, 32, 32, 1};
 // Local Memory -> Global Memory
 AscendC::DataCopy(dstGlobal, dstLocal, intriParams);
@@ -127,4 +129,5 @@ AscendC::DataCopy(dstGlobal, dstLocal, intriParams);
 ```
 输入数据(srcGlobal): [1 2 3 ... 1024]
 输出数据(dstGlobal):[1 2 ... 15 16 513 514 ... 527 528 17 18 ... 31 32 529 530 ... 543 544 ...497 498 ...  511 512  1009 1010... 1023 1024]
+```
 ```

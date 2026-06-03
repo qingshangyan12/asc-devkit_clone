@@ -8,21 +8,21 @@
 |<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品 AI Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品 Vector Core | x </cann-filter>|
 |<cann-filter npu-type = "910"> Atlas 训练系列产品 | x </cann-filter>|
 |<cann-filter npu-type = "x90"> Kirin X90 | x </cann-filter>|
 |<cann-filter npu-type = "9030"> Kirin 9030 | x </cann-filter>|
 
 ## 功能说明<a name="zh-cn_topic_0000002567699435_section106841136114319"></a>
 
-头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-Copy能够实现Unified Buffer和Unified Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。
+支持Unified Buffer和Unified Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。
 
 ## 函数原型<a name="zh-cn_topic_0000002567699435_section82039854412"></a>
 
-```
+```cpp
 template <typename T, bool isSetMask = true>
 __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
@@ -49,9 +49,13 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 源操作数和目的操作数支持的数据类型保持一致。
 <cann-filter npu-type="950">
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为：uint8_t、int8_t、hifloat8_t、fp8_e4m3fn_t、fp8_e5m2_t、fp4x2_e2m1_t、fp4x2_e1m2_t、fp8_e8m0_t、uint16_t、int16_t、half、bfloat16_t、float、uint32_t、int32_t、uint64_t、int64_t。
+- Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
 
 </cann-filter>
+
+## 返回值说明
+
+无
 
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
@@ -61,6 +65,6 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
-```
+```cpp
 AscendC::Copy(dstLocal, srcLocal, 512);
 ```

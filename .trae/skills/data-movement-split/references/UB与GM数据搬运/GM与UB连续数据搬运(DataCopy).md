@@ -16,7 +16,9 @@
 
 ## 功能说明<a name="section474617392321"></a>
 
-提供连续数据搬运能力，支持GM与UB之间的双向数据搬运（GM->UB和UB->GM），数据在传输过程中保持原始格式和内容不变。
+头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+
+支持GM与UB之间的连续数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
 
 ## 函数原型<a name="section1954364615315"></a>
 

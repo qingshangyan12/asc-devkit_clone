@@ -8,30 +8,30 @@
 |<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品 AI Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品 Vector Core | x </cann-filter>|
 |<cann-filter npu-type = "910"> Atlas 训练系列产品 | x </cann-filter>|
 |<cann-filter npu-type = "x90"> Kirin X90 | √ </cann-filter>|
 |<cann-filter npu-type = "9030"> Kirin 9030 | √ </cann-filter>|
 
 ## 功能说明<a name="zh-cn_topic_0000002567699435_section106841136114319"></a>
 
-头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
+支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
 
 ## 函数原型<a name="zh-cn_topic_0000002567699435_section82039854412"></a>
 
 -   mask逐bit模式
 
-    ```
+    ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
 -   mask连续模式 
 
-    ```
+    ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
@@ -97,6 +97,10 @@ DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数�
 
 </cann-filter>
 
+## 返回值说明
+
+无
+
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
 -   位于Unified Buffer的地址必须32B对齐。
@@ -111,37 +115,37 @@ DataCopy能够实现Unified Buffer和Unified Buffer之间的数据搬运，数�
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
-```
+```cpp
     if constexpr (scenarioNum == 1) {
-        // 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大
-        // mask=64表示每次迭代处理64个int32元素
-        // repeatTime=8表示迭代8次，共处理512个元素
-        // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙
-        // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）
+        // 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大。
+        // mask=64表示每次迭代处理64个int32元素。
+        // repeatTime=8表示迭代8次，共处理512个元素。
+        // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙。
+        // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）。
         uint64_t mask = 64;
         AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
     } else if constexpr (scenarioNum == 2) {
-        // 场景2：从[18, 64]的数据里搬运[18, 8]的数据量
-        // 源数据shape: [18, 64]，共1152个元素
-        // 目的数据shape: [18, 8]，共144个元素
-        // 每次迭代处理一行中的8个元素，共18次迭代
-        // mask=8：每次迭代处理8个元素
-        // repeatTime=18：迭代18次（对应18行）
-        // srcStride=1, dstStride=1：同一迭代内无间隙
-        // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）
-        // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）
+        // 场景2：从[18, 64]的数据里搬运[18, 8]的数据量。
+        // 源数据shape: [18, 64]，共1152个元素。
+        // 目的数据shape: [18, 8]，共144个元素。
+        // 每次迭代处理一行中的8个元素，共18次迭代。
+        // mask=8：每次迭代处理8个元素。
+        // repeatTime=18：迭代18次（对应18行）。
+        // srcStride=1, dstStride=1：同一迭代内无间隙。
+        // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）。
+        // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）。
         uint64_t mask = 8;
         AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
     } else if constexpr (scenarioNum == 3) {
-        // 场景3：从[18, 64]搬运[18, 8]数据，counter模式
-        // 源数据shape: [18, 64]，共1152个元素
-        // 目的数据shape: [18, 8]，共144个元素
-        // Counter模式下，Mask代表每次Repeat中处理的元素个数
-        // mask=144：每次迭代处理144个元素
-        // repeatTime=1：迭代1次（对应18行）
-        // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）
-        // dstStride=1：目的数据连续存放无间隙
-        // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效
+        // 场景3：从[18, 64]搬运[18, 8]数据，counter模式。
+        // 源数据shape: [18, 64]，共1152个元素。
+        // 目的数据shape: [18, 8]，共144个元素。
+        // Counter模式下，Mask代表每次Repeat中处理的元素个数。
+        // mask=144：每次迭代处理144个元素。
+        // repeatTime=1：迭代1次（对应18行）。
+        // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）。
+        // dstStride=1：目的数据连续存放无间隙。
+        // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效。
         AscendC::SetMaskCount();
         AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
         AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});

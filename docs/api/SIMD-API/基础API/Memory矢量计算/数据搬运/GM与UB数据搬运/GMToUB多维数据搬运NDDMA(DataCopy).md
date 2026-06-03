@@ -8,26 +8,26 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品 Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
 
 ## 功能说明<a name="section474617392321"></a>
 
-头文件路径为：""。
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
 
 ## 函数原型<a name="section1954364615315"></a>
 
 -   GM-\> UB ，支持多维度搬运
-    ```
+    ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
     ```
 - NdDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
-    ```
+    ```cpp
     __aicore__ inline void NdDmaDci()
     ```
 
@@ -39,7 +39,7 @@
 | :--- | :--- |
 | T | 源操作数或者目的操作数的数据类型。 |
 | dim | 搬运的数据维度, 数据类型为uint8_t，支持的维度为[1, 5]。 |
-| config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考[表 NdDmaConfig结构体参数定义](#table9182515919)。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special senario.<br>};</pre> |
+| config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考[表 NdDmaConfig结构体参数定义](#table9182515919)。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special scenario.<br>};</pre> |
 
 **表 2**  参数说明
 
@@ -79,16 +79,16 @@
 以下以2维的例子介绍几个典型使用场景。
 
 **图 1**  2D Padding场景<a name="fig10722115123919"></a>  
-![](../../../../../figures/2D-Padding场景.png "2D-Padding场景")
+![](../../../../../figures/2d_padding_scenario.png "2D-Padding场景")
 
 **图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
-![](../../../../../figures/2D-Transpose场景.png "2D-Transpose场景")
+![](../../../../../figures/2d_transpose_scenario.png "2D-Transpose场景")
 
 **图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
-![](../../../../../figures/2D-BroadCast场景.png "2D-BroadCast场景")
+![](../../../../../figures/2d_broadcast_scenario.png "2D-BroadCast场景")
 
 **图 4**  2D Slice场景<a name="fig13061435132915"></a>  
-![](../../../../../figures/2D-Slice场景.png "2D-Slice场景")
+![](../../../../../figures/2d_slice_scenario.png "2D-Slice场景")
 
 ## 数据类型
 
@@ -117,7 +117,7 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 
 ## 调用示例<a name="section122101199486"></a>
 
-```
+```cpp
 // T：搬运数据的类型。
 // xGm：保存DataCopy搬入数据。
 // xLocal：保存DataCopy搬出数据。

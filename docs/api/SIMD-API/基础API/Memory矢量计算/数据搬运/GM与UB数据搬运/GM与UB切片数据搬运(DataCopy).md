@@ -52,7 +52,7 @@
 | dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。 |
 | src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。 |
 | dstSliceInfo | 输入 | 目的操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>SliceInfo参数说明请参考表3。 |
-| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。SliceInfo参数说明请参考表3。 |
+| srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考表3。 |
 | dimValue | 输入 | 操作数维度信息，默认值为1。 |
 
 **表 3**  SliceInfo结构体参数定义
@@ -123,7 +123,7 @@
 
 ## 数据类型<a name="zh-cn_topic_0000002565968945_section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致。GM -\> VECIN（GM -\> UB）和 VECOUT -\> GM（UB -\> GM）两个数据通路的数据类型支持情况相同，具体如下：
+源操作数和目的操作数支持的数据类型保持一致，GM -\> VECIN（GM -\> UB）和 VECOUT -\> GM（UB -\> GM）两个数据通路的数据类型支持情况相同，具体如下：
 <cann-filter npu-type="950">
 
 - Ascend 950PR/Ascend 950DT：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
