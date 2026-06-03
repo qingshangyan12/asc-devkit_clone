@@ -21,11 +21,7 @@
 #ifndef LIB_KERNEL_API_H
 #define LIB_KERNEL_API_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#if (__NPU_ARCH__ != 5102)
-#include "hccl/hccl.h"
-#include "hcomm/hcomm.h"
-#endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 )
 #include "index/arithprogression.h"
 #include "activation/sigmoid.h"
 #include "activation/softmax.h"
