@@ -22,8 +22,9 @@ protected:
     void TearDown() override {}
 };
 
-template<typename DstDataType, typename SrcDataType, typename Func>
-__aicore__ inline void TestTransformBinary(__gm__ DstDataType* z, __gm__ SrcDataType* x, __ubuf__ DstDataType zUB[2048], __ubuf__ SrcDataType xUB[2048])
+template<typename DstDataType, typename SrcDataType, typename Func, typename TraitType = AscendC::Std::ignore_t>
+__aicore__ inline void TestTransformBinary(__gm__ DstDataType* z, __gm__ SrcDataType* x,
+    __ubuf__ DstDataType zUB[2048], __ubuf__ SrcDataType xUB[2048])
 {
     constexpr uint32_t TILE_LENGTH = 2048;
     constexpr uint32_t BLK_NUM = 1;
@@ -50,13 +51,29 @@ __aicore__ inline void TestTransformBinary(__gm__ DstDataType* z, __gm__ SrcData
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    Transform<Func>(zLocal, xLocal);
+    Transform<Func, TraitType>(zLocal, xLocal);
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
 
     asc_copy_ub2gm_align(zGm.Data().Get(), zLocal.Data().Get(), BLK_NUM, TILE_LENGTH * sizeof(DstDataType), cacheMode, srcStride, dstStride);
 }
+
+template <typename SrcType, typename DstType, typename RoundMode, typename SatMode, typename IndexPos>
+struct CastTrait {
+    using srcType = SrcType;
+    using dstType = DstType;
+    using roundMode = RoundMode;
+    using satMode = SatMode;
+    using indexPos = IndexPos;
+};
+
+using CastTraitU162UInt8NoSatEven = CastTrait<
+    uint16_t,
+    uint8_t,
+    AscendC::Std::ignore_t,
+    AscendC::Te::CastSatMode::NoSat,
+    AscendC::Te::CastIndexPos::Even>;
 
 #define VECTOR_CAST_3510(Function, DstDataType, SrcDataType) \
 TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_##Function##_##DstDataType##_##SrcDataType) \
@@ -77,4 +94,27 @@ VECTOR_CAST_3510(Ceil, half, half)
 VECTOR_CAST_3510(Ceil, float, float)
 VECTOR_CAST_3510(Ceil, bfloat16_t, bfloat16_t)
 
-VECTOR_CAST_3510(Cast, uint16_t, uint8_t)
+
+TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_CastTrait_U162UInt8NoSatEven_uint8_t_uint16_t)
+{
+    constexpr uint32_t TILE_LENGTH = 2048;
+
+    __gm__ uint16_t x[TILE_LENGTH] = {0};
+    __gm__ uint8_t z[TILE_LENGTH] = {0};
+
+    __ubuf__ uint16_t xUB[TILE_LENGTH] = {0};
+    __ubuf__ uint8_t zUB[TILE_LENGTH] = {0};
+
+    x[0] = 0;
+    x[1] = 1;
+    x[2] = 127;
+    x[3] = 255;
+
+    TestTransformBinary<uint8_t, uint16_t, AscendC::Te::Inst::Cast, CastTraitU162UInt8NoSatEven>(z, x, zUB, xUB);
+
+    EXPECT_EQ(z[0], static_cast<uint8_t>(x[0]));
+    EXPECT_EQ(z[1], static_cast<uint8_t>(x[1]));
+    EXPECT_EQ(z[2], static_cast<uint8_t>(x[2]));
+    EXPECT_EQ(z[3], static_cast<uint8_t>(x[3]));
+    EXPECT_EQ(z[0], zUB[0]);
+}

@@ -89,6 +89,7 @@ struct NoSat {};
 namespace CastIndexPos {
 struct Odd {};
 struct Even {};
+struct PartP0 {};
 struct PartP1 {};
 struct PartP2 {};
 struct PartP3 {};
@@ -107,7 +108,7 @@ using CastTrait2CastFunc = TupleMap<
     Std::tuple<Std::tuple<half, half, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
     Std::tuple<Std::tuple<bfloat16_t, bfloat16_t, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
     Std::tuple<Std::tuple<float, float, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<uint8_t, uint16_t, Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U82U16>>;
+    Std::tuple<Std::tuple<uint16_t, uint8_t, Std::ignore_t, CastSatMode::NoSat, CastIndexPos::Even>, Inst::U162UInt8NoSatEven>>;
 
 
 template<typename CalcFunc, typename TraitType>
