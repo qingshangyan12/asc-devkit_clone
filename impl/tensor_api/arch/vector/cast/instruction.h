@@ -48,6 +48,7 @@ public:
     }
 };
 
+<<<<<<< HEAD
 #define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
@@ -59,6 +60,23 @@ public:                                                                         
         }                                                                                                            \
     }                                                                                                                \
 }
+=======
+class Cast {
+public:
+    template<typename... Args>
+    __simd_callee__ inline static void Run(const Args&... args) {}
+};
+
+class Ceil {
+public:
+    template <typename T>
+    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+            asc_ceil(dst, src, mask);
+        }
+    }
+};
+>>>>>>> upstream/feature/tensor_api_from_9.0.0
 
 #define ASCENDC_ROUNDING_INST(CLASS_NAME, FUNC_NAME)                                                                 \
 class CLASS_NAME {                                                                                                   \
