@@ -74,7 +74,8 @@ public:
     CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
-    static HcclResult Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+    HcclResult Algorithm() override;  // 框架接口占位符
+    static HcclResult KernelCcuAlltoAllMesh1D(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                         ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                         ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                         ccu::Variable goSize3, ccu::Variable goSize4);
@@ -89,28 +90,28 @@ private:
     static void PostSync();
     static void DoAlltoAll();
     
-    uint64_t rankSize_{0};
-    uint32_t rankId_{0};
-    HcclDataType dataType_;
-    HcclDataType outputDataType_;
-    ccu::Variable repeatNum_;
-    std::vector<ChannelHandle> channels_;
-    std::vector<ccu::Variable> input_;
-    std::vector<ccu::Variable> output_;
-    std::vector<ccu::Variable> token_;
-    ccu::Variable sliceSize_;
-    ccu::Variable srcStride_;
-    ccu::Variable srcOffset_;
-    ccu::Variable dstOffset_;
-    GroupOpSizeVars groupOpSize_;
-    ccu::LocalAddr                   myDst_;
-    std::vector<ccu::RemoteAddr>     dstAddr_;
-    std::vector<ccu::LocalAddr>      srcAddr_;
-    std::vector<ccu::Variable>       dstToken_;
-    std::vector<ccu::Variable>       srcToken_;
-    ccu::Event event_;
-    ccu::Variable flag_;
-    bool loadFromMem_ = false;
+    static uint64_t rankSize_;
+    static uint32_t rankId_;
+    static HcclDataType dataType_;
+    static HcclDataType outputDataType_;
+    static ccu::Variable repeatNum_;
+    static std::vector<ChannelHandle> channels_;
+    static std::vector<ccu::Variable> input_;
+    static std::vector<ccu::Variable> output_;
+    static std::vector<ccu::Variable> token_;
+    static ccu::Variable sliceSize_;
+    static ccu::Variable srcStride_;
+    static ccu::Variable srcOffset_;
+    static ccu::Variable dstOffset_;
+    static GroupOpSizeVars groupOpSize_;
+    static ccu::LocalAddr                   myDst_;
+    static std::vector<ccu::RemoteAddr>     dstAddr_;
+    static std::vector<ccu::LocalAddr>      srcAddr_;
+    static std::vector<ccu::Variable>       dstToken_;
+    static std::vector<ccu::Variable>       srcToken_;
+    static hcomm::CcuRep::CompletedEvent event_;
+    static ccu::Variable flag_;
+    static bool loadFromMem_;
 };
 
 }// namespace mc2_ops_hccl

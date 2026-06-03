@@ -13,6 +13,14 @@
 namespace mc2_ops_hccl {
 using namespace hcomm;
 
+// 静态成员变量初始化（仅初始化简单类型）
+uint64_t CcuKernelAlltoAllMesh1D::rankSize_ = 0;
+uint32_t CcuKernelAlltoAllMesh1D::rankId_ = 0;
+HcclDataType CcuKernelAlltoAllMesh1D::dataType_ = HcclDataType::HCCL_DATA_TYPE_RESERVED;
+HcclDataType CcuKernelAlltoAllMesh1D::outputDataType_ = HcclDataType::HCCL_DATA_TYPE_RESERVED;
+bool CcuKernelAlltoAllMesh1D::loadFromMem_ = false;
+// 其他成员依赖默认构造函数（vector、Variable、LocalAddr等）
+
 constexpr int INPUT_XN_ID  = 0;
 constexpr int OUTPUT_XN_ID = 1;
 constexpr int TOKEN_XN_ID  = 2;
@@ -168,11 +176,11 @@ ccu::Func CcuKernelAlltoAllMesh1D([](ccu::Variable inputAddr, ccu::Variable outp
                                     ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                     ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                     ccu::Variable goSize3, ccu::Variable goSize4) {
-    CcuKernelAlltoAllMesh1D::Algorithm(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
-                                       sliceSize, goSize1, goSize2, goSize3, goSize4);
+    CcuKernelAlltoAllMesh1D::KernelCcuAlltoAllMesh1D(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
+                                                    sliceSize, goSize1, goSize2, goSize3, goSize4);
 });
 
-HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+HcclResult CcuKernelAlltoAllMesh1D::KernelCcuAlltoAllMesh1D(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                               ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                               ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                               ccu::Variable goSize3, ccu::Variable goSize4)
@@ -188,6 +196,13 @@ HcclResult CcuKernelAlltoAllMesh1D::Algorithm(ccu::Variable inputAddr, ccu::Vari
 
     HCCL_INFO("[AllToAllAlgo] AllToAllMesh1D end");
     
+    return HcclResult::HCCL_SUCCESS;
+}
+
+// ==================== Algorithm() 框架接口占位符 ====================
+HcclResult CcuKernelAlltoAllMesh1D::Algorithm()
+{
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] Algorithm entry (framework placeholder)");
     return HcclResult::HCCL_SUCCESS;
 }
 
