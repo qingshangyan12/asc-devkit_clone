@@ -22,6 +22,7 @@ C指针编程提供完备的C语言编程能力，是SIMD编程路径中最贴�
 
 [核函数](../核函数.md)在前序章节已作介绍，C语言指针编程在核函数定义与调用上沿用SIMD编程通用规范，无额外语法约束。
 
+
 ### 2.2 内存管理
 
 AI Core采用分级存储架构，不同计算单元的编程视角有所差异：
@@ -36,9 +37,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 ### 2.3 外部存储（Global Memory）
 
-Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Memory。
-
-Global Memory具有持久性：通过全局内存分配的空间，其中存储的数据将持续保留，直到该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
+Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Memory。Global Memory具有持久性：通过全局内存分配的空间，其中存储的数据将持续保留，直到该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
 Host使用aclrtMalloc分配Device侧的全局内存，并通过aclrtMemcpy将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；通过aclrtMalloc分配的Device全局内存需使用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
@@ -58,8 +57,6 @@ __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
 AI Core包含三类基础计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务于不同计算单元：L1 Buffer和L0 Buffer支撑矩阵计算，Unified Buffer支撑矢量计算。
 
 #### 2.4.1 Unified Buffer
-
-**内存申请**
 
 Unified Buffer是AI Core内主要用于矢量计算单元的内部存储单元，位于每个Vector Core（AIV）内部。与外部存储空间相比，Unified Buffer的容量较小，但具有更高的带宽和更低的访问延迟，可视为内核执行期间由用户管理的高速缓存资源。
 
@@ -82,11 +79,9 @@ extern __ubuf__ char dynamic_buffer[];
 
 ---
 
-**Bank冲突优化**
+为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。以NPU架构版本2201版本为例，Unified Buffer总大小为192K，划分为16个bank。每个bank由512行组成，每行长度为32B。这16个bank进一步组织为8个bank group，每个bank group包含2个bank。
 
-为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为192K（NPU架构版本2201），划分为16个bank。每个bank由512行组成，每行长度为32B。这16个bank进一步组织为8个bank group，每个bank group包含2个bank。
-
-<img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
+<img src="image.png" alt="UB Bank冲突示意图" width="800" />
 
 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 
@@ -98,23 +93,23 @@ extern __ubuf__ char dynamic_buffer[];
 | 写写冲突 | 多个写操作同时尝试访问同一个bank group |
 | 读读冲突 | 两个读操作同时尝试访问同一个bank，或者两个以上读操作同时尝试访问同一个bank group |
 
-**示例分析**：以读写冲突为例，当执行一条矢量加法计算时：
-
-- 不产生冲突：src0地址0x10020，dst地址0x10000，相差0x00020，位于不同Bank
-- 产生冲突：src0地址0x10020，dst地址0x10120，相差0x00100，位于同一Bank
-
-<img src="../../../../figures/Unified_Buffer地址分配示意图.png" alt="Unified Buffer地址分配示意图" width="800" />
+以读写冲突为例，结合下图所示，0x10000地址在bank16上，0x10020在bank17上，0x20020在bank33上。当要进行矢量加法计算时：
+- 如果src0的地址为0x10000, dst的地址为0x10E20， 则src0和dst都会在bank16上，产生读写冲突。如果dst的地址为0x010020, 则dst分配在bank17，不会产生读写冲突。
+- 如果src0的地址为0x10020, src1的地址为0x20020， 则src0分配在bank17, src1分配在bank33, 从图上可以看到， 这两个bank在同一个bank group内，产生读读冲突。
+- 如果dst的地址为0x10020, 每次加法计算8个data block，如果每个data block的间隔stride为16, 则dst的每个data block都在一个bank group内, 执行该条指令时将会产生写写冲突。
+  
+![Unified_Buffer地址分配示意图](image-1.png)
 
 ---
 
 **优化方法1：优化计算逻辑**
 
-以shape为(8, 16, 16)的输入执行(1, 0, 2)的transpose操作为例，通过将计算逻辑由"跳读、连续写"调整为"连续读、跳写"，可避免冲突。
+对于一些特定的算法计算, 可以通过修改对于内存的读写顺序或者方式来避免Bank冲突的产生。以shape为(8, 16, 16)的输入执行(1, 0, 2)的transpose操作为例，通过将计算逻辑由"跳读、连续写"调整为"连续读、跳写"，可避免冲突。
 
 <img src="../../../../figures/读读冲突.png" alt="读读冲突示意图" width="800" />
 
-**问题代码**（会导致读读冲突）：
 
+如上图所示，如果我们对src进行"跳读、连续写"的方式进行操作, 这样对于src的8个data block都会分配在同一个bank group内, 会产生读读冲突。
 ```c
 for (uint16_t i = 0; i < 16; ++i) {
     // 按列进行计算，跳读、连续写
@@ -124,8 +119,7 @@ for (uint16_t i = 0; i < 16; ++i) {
 
 <img src="../../../../figures/读读冲突优化.png" alt="读读冲突优化示意图" width="800" />
 
-**优化代码**（避免读读冲突）：
-
+为了避免类似的读读冲突，通常是避免读操作时访问到同一个bank group, 该场景是一个读单元，因为操作时跳着读，造成8个data block都分配到了同一个bank group内，导致读读冲突，所以这种情况，通过改写算法逻辑, 将跳读调整为连续读，这样8个data block会分配到不同的8个bank group内，从而避免掉读读冲突。(该样例说明了如果通过调整计算逻辑优化了读读冲突的问题，同理写操作也会遇到类似问题)
 ```c
 for (uint16_t i = 0; i < 8; ++i) {
     // 按列进行计算，连续读、跳写
@@ -137,12 +131,12 @@ for (uint16_t i = 0; i < 8; ++i) {
 
 **优化方法2：优化地址分配**
 
+相较于优化本身的计算逻辑来优化Bank冲突, 通过调整地址分配的方式优化Bank冲突的方式更为通用。
 以连续4096个float元素的加法`z = x + y`为例，通过在分配内存时适当扩大申请空间，保证在一个Repeat内，x和y不会同时位于同一个bank group，且x或y不会与z同时位于同一个bank。
 
 <img src="../../../../figures/地址分配优化前示意图.png" alt="地址分配优化前示意图" width="800" />
 
-**问题代码**（会产生Bank冲突）：
-
+如上图所示，如果我们按照要操作的内存空间大小顺序分配内存，将会发现, x, y, z的地址都会分配在同一个bank/bank group内，这种情况将会产生读读冲突(x和y在同一个bank group内)， 读写冲突(x/y跟z在同一个bank内)。
 ```c
 __ubuf__ float x[4096];  // 编译器统一分配，起始地址0x00000
 __ubuf__ float y[4096];  // 起始地址0x04000
@@ -152,8 +146,13 @@ asc_add(z, x, y, 4096);
 
 <img src="../../../../figures/地址分配优化后示意图.png" alt="地址分配优化后示意图" width="800" />
 
-**优化代码**（避免Bank冲突）：
+**解决方法**：
 
+C指针编程采用静态数组声明方式分配内存，内存地址按声明顺序连续分配。开发者可通过调整数组大小控制地址分配，实现地址错开，避免Bank冲突。
+
+**避免读读冲突**：将x和y的首地址错开8个bank group空间（256字节），确保一次repeat内的8个data block分配在不同bank group。
+
+**避免读写冲突**：确保dst（z）的地址不与x、y分配在同一bank。通过增加y的地址空间，将x/y所在的bank区域内存分配满，使z的地址从bank16开始分配。
 ```c
 __ubuf__ float x[4096 + 64];  // 多申请256字节
 __ubuf__ float y[128 * 128 - (4096 + 64)];  // 确保z不在同一Bank
