@@ -15,7 +15,7 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(demo
+add_executable(sincos_compute
     sincos_compute.asc
 )
 
@@ -27,11 +27,11 @@ set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU ARCH, e.g. dav-3510")
 # 说明：
 #   - 需根据实际部署的 NPU 硬件架构选择对应的 `npu-arch` 参数。
 # ======================================================================================
-target_compile_options(demo PRIVATE
+target_compile_options(sincos_compute PRIVATE
     --cce-res-usage
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>
 )
 
-target_link_libraries(demo PRIVATE
+target_link_libraries(sincos_compute PRIVATE
     m
 )
