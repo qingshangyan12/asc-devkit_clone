@@ -91,6 +91,25 @@ __aicore__ inline void ReportNotSupport(bool isSupported, const __gm__ char* api
         apiName));
 }
 
+template <typename T>
+__aicore__ inline bool CheckIsZero(T param)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+    // 910B does not support scalar comparison for half / bf16 / double
+    if constexpr (SupportType<T, half, bfloat16_t>()) {
+        uint16_t paramU16 = *reinterpret_cast<uint16_t*>(&param);
+        return paramU16 == 0;
+    } else if constexpr (SupportType<T, double>()) {
+        uint64_t paramU64 = *reinterpret_cast<uint64_t*>(&param);
+        return paramU64 == 0;
+    } else {
+        return param == 0;
+    }
+#else
+    return param == 0;
+#endif
+}
+
 template <Hardware... expectedPos, typename T>
 __aicore__ inline void CheckTensorPhyPosition(const LocalTensor<T>& inputTensor, const __gm__ char* tensorName,
     const __gm__ char* posName, const __gm__ char* apiName)
