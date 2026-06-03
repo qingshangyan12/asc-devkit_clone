@@ -72,6 +72,27 @@ class RunResult:
 
 
 @dataclass
+class NpuStats:
+    slots: int
+    queue_model: str
+    idle_s: float = 0.0
+    busy_s: float = 0.0
+    max_slot_idle_s: float = 0.0
+    max_slot_busy_s: float = 0.0
+
+    @property
+    def utilization(self) -> float:
+        total = self.idle_s + self.busy_s
+        return self.busy_s / total if total else 0.0
+
+
+@dataclass
+class RunCellsResult:
+    results: List[RunResult]
+    npu_stats: NpuStats
+
+
+@dataclass
 class RunReport:
     host_arch: str
     modes: List[str]
@@ -79,3 +100,4 @@ class RunReport:
     finished_at: str
     results: List[RunResult]
     suggestions: List[Suggestion]
+    npu_stats: Optional[NpuStats] = None

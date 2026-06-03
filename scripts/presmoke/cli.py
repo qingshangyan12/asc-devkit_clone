@@ -13,8 +13,7 @@ from .model import RunReport, RunResult, Suggestion
 from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
-from .runner import run_cell
-from .pool import NpuSlotPool, run_all
+from .runner import run_cells_pipeline
 from .suggest import dedupe_suggestions
 
 
@@ -66,21 +65,18 @@ def main(argv: list[str] | None = None) -> int:
         print("Error: baseline and changed-only are Phase 2/3 features and are not implemented in this Phase 1 build")
         return 2
 
-    npu_pool = NpuSlotPool(args.npu_slots)
-
-    def _run(cell):
-        return run_cell(
-            cell,
-            log_dir=log_dir,
-            timeout=args.timeout,
-            keep_artifacts=args.keep_artifacts,
-            npu_gate=npu_pool.gate,
-        )
-
-    results = run_all(cells, jobs=args.jobs, npu_slots=args.npu_slots, fn=_run)
+    run = run_cells_pipeline(
+        cells,
+        log_dir=log_dir,
+        timeout=args.timeout,
+        keep_artifacts=args.keep_artifacts,
+        jobs=args.jobs,
+        npu_slots=args.npu_slots,
+    )
+    results = run.results
     results.extend(skipped_results)
     results = sorted(results, key=lambda result: (result.example, result.mode))
-    report = RunReport(host_arch, modes, started_at, now_iso(), results, suggestions)
+    report = RunReport(host_arch, modes, started_at, now_iso(), results, suggestions, run.npu_stats)
     emit_reports(report, args, results_dir)
     return 1 if any(result.status == "FAIL" for result in results) else 0
 
@@ -95,7 +91,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--npu-slots", type=int, default=1)
     parser.add_argument("--filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
-    parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
     parser.add_argument("--results", default="presmoke_results")
     parser.add_argument("--log-dir")

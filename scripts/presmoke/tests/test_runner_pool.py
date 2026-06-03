@@ -7,9 +7,12 @@ import unittest
 from pathlib import Path
 
 from presmoke.case_runners import build_case_runner_cells_with_skips
-from presmoke.model import Cell, Command, ExampleSpec
+from presmoke.cli import parse_args
+from presmoke.model import Cell, Command, ExampleSpec, RunReport
 from presmoke.pool import NpuSlotPool
+from presmoke.report import write_json, write_markdown
 from presmoke.runner import run_cell
+from presmoke.runner import run_cells_pipeline
 
 
 def cell(tmp: Path, name: str, mode: str = "npu", commands=None) -> Cell:
@@ -19,6 +22,11 @@ def cell(tmp: Path, name: str, mode: str = "npu", commands=None) -> Cell:
 
 
 class RunnerPoolTest(unittest.TestCase):
+    def test_cli_default_timeout_is_short_for_presmoke(self) -> None:
+        args = parse_args([])
+
+        self.assertEqual(args.timeout, 120)
+
     def test_runner_timeout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             c = cell(Path(tmp), "x", commands=[Command("sleep 2", "run")])
@@ -94,6 +102,169 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertEqual(skipped, [])
         self.assertEqual(len(suggestions), 1)
         self.assertIn("Excluded on unsupported arch dav-2201", suggestions[0].message)
+
+    def test_case_runner_cell_starts_with_clean_step(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runner = root / "scripts/presmoke/cases/x/run.sh"
+            runner.parent.mkdir(parents=True)
+            runner.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            manifest = root / "scripts/presmoke/reports/case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                '[{"case":"x","skip":false,"supported_archs":["dav-2201"],"supported_modes":["npu"]}]',
+                encoding="utf-8",
+            )
+
+            cells, _, _ = build_case_runner_cells_with_skips(root, "dav-2201", ["npu"], [], [])
+
+        self.assertEqual([command.kind for command in cells[0].commands], ["clean", "build", "run", "verify"])
+        self.assertTrue(cells[0].commands[0].raw.endswith("run.sh clean"))
+
+    def test_single_worker_run_removes_stale_build_dir_before_commands(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c = cell(
+                root,
+                "stale",
+                commands=[
+                    Command("test ! -e build_npu/stale", "build"),
+                ],
+            )
+            c.build_dir.mkdir()
+            (c.build_dir / "stale").write_text("old", encoding="utf-8")
+
+            result = run_cell(c, Path(tmp) / "logs", timeout=1, keep_artifacts=True)
+
+        self.assertEqual(result.status, "PASS")
+
+    def test_pipeline_keeps_build_workers_running_while_npu_slot_is_busy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            marker_dir = root / "markers"
+            marker_dir.mkdir()
+            cells = [
+                cell(
+                    root,
+                    "slow-run",
+                    commands=[
+                        Command(":", "build"),
+                        Command(f"while [ ! -f {marker_dir / 'third_build_started'} ]; do sleep 0.02; done", "run"),
+                        Command(":", "verify"),
+                    ],
+                ),
+                cell(
+                    root,
+                    "npu-queued",
+                    commands=[
+                        Command(":", "build"),
+                        Command("sleep 0.05", "run"),
+                        Command(":", "verify"),
+                    ],
+                ),
+                cell(
+                    root,
+                    "third-build",
+                    commands=[
+                        Command(f"touch {marker_dir / 'third_build_started'}", "build"),
+                        Command(":", "run"),
+                        Command(":", "verify"),
+                    ],
+                ),
+            ]
+            run = run_cells_pipeline(cells, Path(tmp) / "logs", timeout=2, keep_artifacts=True, jobs=2, npu_slots=1)
+            results = run.results
+
+        by_name = {result.example: result for result in results}
+        self.assertEqual(by_name["slow-run"].status, "PASS")
+        self.assertEqual(by_name["npu-queued"].status, "PASS")
+        self.assertEqual(by_name["third-build"].status, "PASS")
+
+    def test_pipeline_does_not_block_next_npu_run_on_verify(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            marker = root / "second_run_started"
+            cells = [
+                cell(
+                    root,
+                    "verify-waits-for-next-run",
+                    commands=[
+                        Command(":", "build"),
+                        Command("sleep 0.01", "run"),
+                        Command(f"while [ ! -f {marker} ]; do sleep 0.02; done", "verify"),
+                    ],
+                ),
+                cell(
+                    root,
+                    "touches-verify-marker",
+                    commands=[
+                        Command("sleep 0.05", "build"),
+                        Command(f"touch {marker}", "run"),
+                        Command(":", "verify"),
+                    ],
+                ),
+            ]
+
+            run = run_cells_pipeline(cells, Path(tmp) / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+            results = run.results
+
+        by_name = {result.example: result for result in results}
+        self.assertEqual(by_name["verify-waits-for-next-run"].status, "PASS")
+        self.assertEqual(by_name["touches-verify-marker"].status, "PASS")
+
+    def test_pipeline_reports_npu_idle_and_busy_time(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [
+                cell(
+                    root,
+                    "slow-build",
+                    commands=[
+                        Command("sleep 0.05", "build"),
+                        Command("sleep 0.05", "run"),
+                        Command(":", "verify"),
+                    ],
+                )
+            ]
+
+            run = run_cells_pipeline(cells, Path(tmp) / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+
+        self.assertEqual(run.npu_stats.slots, 1)
+        self.assertEqual(run.npu_stats.queue_model, "pipeline")
+        self.assertGreater(run.npu_stats.idle_s, 0)
+        self.assertGreater(run.npu_stats.busy_s, 0)
+        self.assertGreater(run.npu_stats.utilization, 0)
+
+    def test_report_writes_npu_stats(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [
+                cell(
+                    root,
+                    "slow-build",
+                    commands=[
+                        Command("sleep 0.01", "build"),
+                        Command("sleep 0.01", "run"),
+                        Command(":", "verify"),
+                    ],
+                )
+            ]
+            run = run_cells_pipeline(cells, root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+            report = RunReport("dav-2201", ["npu"], "start", "finish", run.results, [], run.npu_stats)
+            json_path = root / "report.json"
+            md_path = root / "report.md"
+
+            write_json(report, json_path)
+            write_markdown(report, md_path)
+
+            json_text = json_path.read_text(encoding="utf-8")
+            md_text = md_path.read_text(encoding="utf-8")
+
+        self.assertIn('"npu_stats"', json_text)
+        self.assertIn('"idle_s"', json_text)
+        self.assertIn('"utilization"', json_text)
+        self.assertIn("npu_idle_s", md_text)
+        self.assertIn("npu_utilization", md_text)
 
 
 if __name__ == "__main__":
