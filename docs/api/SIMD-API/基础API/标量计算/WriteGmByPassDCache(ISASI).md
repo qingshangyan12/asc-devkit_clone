@@ -120,7 +120,7 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 
 ## 调用示例<a name="section6191129670"></a>
 
-更多示例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。
+更多示例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/09_utils/gm_by_pass_dcache)。
 
 ```
 __gm__ int32_t *addr = const_cast<__gm__ int32_t *>(srcGlobal.GetPhyAddr());
