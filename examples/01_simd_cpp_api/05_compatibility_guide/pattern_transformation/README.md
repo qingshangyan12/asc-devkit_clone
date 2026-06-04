@@ -117,7 +117,7 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 ```
 
 
-#### L0A复用场景（Ascend 950PR/Ascend 950DT，\__NPU_ARCH__ = 3510）
+#### L0A复用场景
 
 在分析前，先介绍数学背景。对于矩阵乘法 C = A × B，当 A 可拆分为上下两块时：
 
