@@ -94,7 +94,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|------|
-|padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0,255]。默认为{0, 0, 0, 0}。|
+|padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0, 255]。默认为{0, 0, 0, 0}。|
 |l1H|源操作数height，取值范围：l1H∈[1, 32767]。|
 |l1W|源操作数width，取值范围：l1W∈[1, 32767]。|
 |c1Index|该指令在源tensor C1维度的起点，取值范围：c1Index∈[0, 4095]。默认为0。|
@@ -122,7 +122,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|------|
-|padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0,255]。默认为{0, 0, 0, 0}。|
+|padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0, 255]。默认为{0, 0, 0, 0}。|
 |l1H|源操作数height，取值范围：l1H∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1H = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |l1W|源操作数weight，取值范围：l1W∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1W = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |channelSize|源操作数的通道数，取值范围：channelSize∈[0, 65535]。默认为0。<cann-filter npu_type="310p"><br>&bull; 针对Atlas 推理系列产品 AI Core：对于half，channelSize可取值为4，8，16，N\*16+4，N\*16+8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，channelSize可取值为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32。N为正整数。</cann-filter><cann-filter npu_type="950,A3,910b,310b,x90"><br>&bull; 针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90：对于uint32_t/int32_t/float，channelSize可取值为4，N\*8，N\*8+4；对于half/bfloat16，channelSize可取值为4，8，N\*16，N\*16 + 4，N\*16+8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32\*N，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，channelSize可取值为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32。N为正整数。</cann-filter><br>**注：针对Atlas A2/A3系列产品，channelSize = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|

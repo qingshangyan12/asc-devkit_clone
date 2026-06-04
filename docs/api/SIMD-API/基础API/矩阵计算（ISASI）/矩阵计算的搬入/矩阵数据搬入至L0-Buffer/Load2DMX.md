@@ -52,7 +52,7 @@ A1->A2; B1->B2。
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
 |dst|输出|目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32B / sizeof(T))。<br>&bull; B2：ZN格式；对应的分形大小为 (32B / sizeof(T))  \* 16。<br>&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>数据类型需要与dst保持一致。|
+|src|输入|源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。|
 |srcMx|输入|源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。|
 |loadDataParams|输入|LoadData参数结构体，类型为LoadData2DParamsV2，具体参考表[Load2DV2](Load2DV2.md)中的LoadData2DParamsV2结构体内参数说明。|
 |loadMxDataParams|输入|LoadData参数结构体，类型为LoadData2DMxParams，具体参考[表3](#table15901153712305)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。|
