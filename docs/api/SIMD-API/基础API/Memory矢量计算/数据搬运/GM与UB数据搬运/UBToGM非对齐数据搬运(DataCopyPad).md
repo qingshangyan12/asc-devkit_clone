@@ -60,8 +60,8 @@ __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor
 
 | 参数名称 | 含义 |
 | :--- | :--- |
-| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[1, 4095]。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter> |
-| blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限**。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
+| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[1, 4095]。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter> |
+| blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限**。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
 | srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock(32字节)。<br>数据类型为uint32_t，srcStride不要超出该数据类型的取值范围。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。 |
 | dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，dstStride不要超出该数据类型的取值范围。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 2^40-1]。 |
 | rsv | 保留字段。 |
@@ -136,13 +136,13 @@ __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor
 
 ```cpp
 AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0};
-// 从VECIN->GM搬运40字节
+// 从VECIN->GM搬运40字节。
 AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
 ```
 
 结果示例：
 
-```
+```text
 输入数据srcLocal: [1 2 3 ... 32]
 输出数据dstGlobal:[1 2 3 ... 20]
 ```

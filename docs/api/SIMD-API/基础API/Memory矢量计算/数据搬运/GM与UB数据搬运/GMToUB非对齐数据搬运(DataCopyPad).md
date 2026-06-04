@@ -26,8 +26,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type="950">
-```cpp
 针对Ascend 950PR/Ascend 950DT，支持设置数据搬运模式mode（搬运模式包括单次搬运对齐和整块数据搬运对齐）：
+
+```cpp
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
 ```
@@ -62,8 +63,8 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| blockCount | 搬运的数据块个数，uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）**。 |
-| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为 NOP（空操作）**。**blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限。** |
+| blockCount | 搬运的数据块个数，uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）**。 |
+| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为NOP（空操作）**。**blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限。** |
 | srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。 |
 | dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意UB不要超限**。 |
 | rsv | 保留字段。uint32_t类型，默认值为0。 |
@@ -166,13 +167,13 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 ```cpp
 AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0};
 AscendC::DataCopyPadExtParams<half> padParams{true, 0, 2, 0};
-// 从GM->VECIN搬运40字节
+// 从GM->VECIN搬运40字节。
 AscendC::DataCopyPad(dstGlobal, src0Global, copyParams, padParams);
 ```
 
 结果示例：
 
-```
+```text
 输入数据src0Global: [1 2 3 ... 32]
 输出数据dstGlobal:[1 2 3 ... 20]
 ```

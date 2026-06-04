@@ -55,7 +55,7 @@
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002534928976_fig54801848104717)将源操作数中128个元素连续搬运至目的操作数。
 
 **图 1**  连续搬运示意图<a name="zh-cn_topic_0000002534928976_fig54801848104717"></a>  
-![](../../../../../figures/连续搬运示意图.png "连续搬运示意图")
+![](../../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
 
 ## 数据类型<a name="section4219135304818"></a>
 
@@ -125,7 +125,7 @@
 -   调用连续搬运接口时，count \* sizeof\(T\)需要32B对齐， 若未对齐，则搬运量会向下取整到32B对齐。
 - 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
-    ![](../../../../../figures/绘图4.png)
+    ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
 <cann-filter npu-type="910b,A3">
 
@@ -141,14 +141,14 @@
 - GM -> UB
 
     ```cpp
-    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
-    // 使用传入count参数的搬运接口，完成连续搬运
+    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
+    // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(srcLocal, srcGlobal, 512);
     ```
 
     结果示例：
 
-    ```
+    ```text
     输入数据srcGlobal：[1 2 3 ... 512]
     输出数据srcLocal：[1 2 3 ... 512]
     ```
@@ -156,14 +156,14 @@
 - UB -> GM
 
     ```cpp
-    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
-    // 使用传入count参数的搬运接口，完成连续搬运
+    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
+    // 使用传入count参数的搬运接口，完成连续搬运。
     AscendC::DataCopy(dstGlobal, dstLocal, 512);
     ```
 
     结果示例：
 
-    ```
+    ```text
     输入数据dstLocal：[1 2 3 ... 512]
     输出数据dstGlobal：[1 2 3 ... 512]
     ```
