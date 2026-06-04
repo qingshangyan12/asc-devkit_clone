@@ -132,6 +132,11 @@ if(PRODUCT_SIDE STREQUAL "host")
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
+        ccu_primitives_impl_dl.cc
+        ccu_res_dl.cc
+        hccl_ccu_res_dl.cc
+        hccl_res_expt_dl.cc
+        hccl_host_comm_dl.cc
     )
 endif()
 
