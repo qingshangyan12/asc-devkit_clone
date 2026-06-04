@@ -12,47 +12,6 @@
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
-/*
-HcclResult CcuKernelAlgBase::LocalReduceNb(const std::vector<CcuRep::CcuBuf> &bufs, uint32_t count, HcclDataType dataType,
-                     HcclDataType outputDataType, HcclReduceOp opType,
-                     const CcuRep::Variable &len, CcuRep::CompletedEvent event)
-{
-    (void)count;
-    return CcuKernel::LocalReduceNb(bufs.data(), bufs.size(), dataType, outputDataType, opType, len, event);
-}
-
-void CcuKernelAlgBase::AllocGoResource(uint32_t parallelDim, uint32_t msPerLoop)
-{
-    if (moConfig.loopCount != 0xFFFFFFFF && moConfig.msInterleave != 0xFFFFFFFF &&
-        moConfig.memSlice != 0xFFFFFFFFFFFFFFFF) {
-        // 已经配置过，略过
-        return;
-    } else {
-        // 采用默认配置
-        moConfig = {CcuRep::CCU_MS_INTERLEAVE, CcuRep::CCU_MS_DEFAULT_LOOP_COUNT, CcuRep::CCU_MS_SIZE};
-    }
-    // 算法配置的loop数覆盖默认配置，parallelDim默认为CCU_MS_DEFAULT_LOOP_COUNT
-    moConfig.loopCount = parallelDim;
-    // 算法配置的msPerLoop * CcuRep::CCU_MS_SIZE覆盖默认配置，msPerLoop默认为1
-    moConfig.memSlice = msPerLoop * CcuRep::CCU_MS_SIZE;
-
-    HCCL_INFO("[AllocGoResource]moConfig: loopCount = %u, msInterleave = %u", moConfig.loopCount, moConfig.msInterleave);
-
-    // 简单实现,只需要申请一次资源
-    if (moRes.executor.size() == 0) {
-        moRes.executor = CreateBlockExecutor(moConfig.loopCount);
-        moRes.completedEvent = CreateBlockCompletedEvent(moConfig.loopCount);
-        moRes.ccuBuf = CreateBlockCcuBuf(moConfig.loopCount * moConfig.msInterleave);
-    }
-}
-
-void CcuKernelAlgBase::Load(GroupOpSize moSize)
-{
-    Load(moSize.addrOffset);
-    Load(moSize.loopParam);
-    Load(moSize.parallelParam);
-    Load(moSize.residual);
-}
 
 std::vector<uint64_t> CcuKernelAlgBase::CalGoSize(uint64_t size)
 {
@@ -107,6 +66,48 @@ std::vector<uint64_t> CcuKernelAlgBase::CalGoSize(uint64_t size)
                loopExtendNum, tailSize);
 
     return {offset, loopIterNum, loopExtendNum, tailSize};
+}
+
+/*
+HcclResult CcuKernelAlgBase::LocalReduceNb(const std::vector<CcuRep::CcuBuf> &bufs, uint32_t count, HcclDataType dataType,
+                     HcclDataType outputDataType, HcclReduceOp opType,
+                     const CcuRep::Variable &len, CcuRep::CompletedEvent event)
+{
+    (void)count;
+    return CcuKernel::LocalReduceNb(bufs.data(), bufs.size(), dataType, outputDataType, opType, len, event);
+}
+
+void CcuKernelAlgBase::AllocGoResource(uint32_t parallelDim, uint32_t msPerLoop)
+{
+    if (moConfig.loopCount != 0xFFFFFFFF && moConfig.msInterleave != 0xFFFFFFFF &&
+        moConfig.memSlice != 0xFFFFFFFFFFFFFFFF) {
+        // 已经配置过，略过
+        return;
+    } else {
+        // 采用默认配置
+        moConfig = {CcuRep::CCU_MS_INTERLEAVE, CcuRep::CCU_MS_DEFAULT_LOOP_COUNT, CcuRep::CCU_MS_SIZE};
+    }
+    // 算法配置的loop数覆盖默认配置，parallelDim默认为CCU_MS_DEFAULT_LOOP_COUNT
+    moConfig.loopCount = parallelDim;
+    // 算法配置的msPerLoop * CcuRep::CCU_MS_SIZE覆盖默认配置，msPerLoop默认为1
+    moConfig.memSlice = msPerLoop * CcuRep::CCU_MS_SIZE;
+
+    HCCL_INFO("[AllocGoResource]moConfig: loopCount = %u, msInterleave = %u", moConfig.loopCount, moConfig.msInterleave);
+
+    // 简单实现,只需要申请一次资源
+    if (moRes.executor.size() == 0) {
+        moRes.executor = CreateBlockExecutor(moConfig.loopCount);
+        moRes.completedEvent = CreateBlockCompletedEvent(moConfig.loopCount);
+        moRes.ccuBuf = CreateBlockCcuBuf(moConfig.loopCount * moConfig.msInterleave);
+    }
+}
+
+void CcuKernelAlgBase::Load(GroupOpSize moSize)
+{
+    Load(moSize.addrOffset);
+    Load(moSize.loopParam);
+    Load(moSize.parallelParam);
+    Load(moSize.residual);
 }
 
 HcclResult CcuKernelAlgBase::CreateMultiOpBroadcast(const std::vector<ChannelHandle> &channels)
