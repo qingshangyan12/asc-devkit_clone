@@ -37,6 +37,14 @@ __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t du
 template<typename T>
 __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t dump_size);
 
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template<typename T>
+__aicore__ inline void asc_dump_biasbuf(__biasbuf__ T* input, uint32_t desc, uint32_t dump_size);
+
+template<typename T>
+__aicore__ inline void asc_dump_fbuf(__fbuf__ T* input, uint32_t desc, uint32_t dump_size);
+#endif
+
 template<typename T>
 __aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size);
 
@@ -48,6 +56,14 @@ __aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_si
 
 template<typename T>
 __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size);
+
+#if !defined(ASCENDC_CPU_DEBUG) || ASCENDC_CPU_DEBUG != 1
+template<typename T>
+__aicore__ inline void asc_dump(__biasbuf__ T* input, uint32_t desc, uint32_t dump_size);
+
+template<typename T>
+__aicore__ inline void asc_dump(__fbuf__ T* input, uint32_t desc, uint32_t dump_size);
+#endif
 }
 
 namespace __asc_simd_vf {

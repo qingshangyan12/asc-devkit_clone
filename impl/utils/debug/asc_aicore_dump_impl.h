@@ -80,6 +80,10 @@ __aicore__ inline uint32_t set_dump_tlv_data(U src, __gm__ DumpTensorTlv* dumpTl
         ret = mem_copy_bbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
     } else if constexpr (hardware == AscendC::Hardware::L0C) {
         ret = mem_copy_cbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
+    } else if constexpr (hardware == AscendC::Hardware::BIAS) {
+        ret = mem_copy_biasbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
+    } else if constexpr (hardware == AscendC::Hardware::FIXBUF) {
+        ret = mem_copy_fbuf_to_gm_impl(dumpDstAddr, src, alignDumpLen);
     }
     sync_all();
     return ret;
@@ -158,6 +162,18 @@ __aicore__ inline void asc_dump_l1buf(__cbuf__ T* input, uint32_t desc, uint32_t
 }
 
 template<typename T>
+__aicore__ inline void asc_dump_biasbuf(__biasbuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_local_impl<AscendC::Hardware::BIAS, T>(input, desc, dump_size);
+}
+
+template<typename T>
+__aicore__ inline void asc_dump_fbuf(__fbuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_local_impl<AscendC::Hardware::FIXBUF, T>(input, desc, dump_size);
+}
+
+template<typename T>
 __aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size)
 {
     asc_dump_gm(input, desc, dump_size);
@@ -179,6 +195,18 @@ template<typename T>
 __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
 {
     asc_dump_l1buf(input, desc, dump_size);
+}
+
+template<typename T>
+__aicore__ inline void asc_dump(__biasbuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_biasbuf(input, desc, dump_size);
+}
+
+template<typename T>
+__aicore__ inline void asc_dump(__fbuf__ T* input, uint32_t desc, uint32_t dump_size)
+{
+    asc_dump_fbuf(input, desc, dump_size);
 }
 } // namespace __asc_aicore
 #else

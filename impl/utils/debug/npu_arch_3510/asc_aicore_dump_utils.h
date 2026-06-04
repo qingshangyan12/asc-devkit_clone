@@ -41,6 +41,10 @@ __aicore__ constexpr inline uint32_t get_debug_bus_model_base()
         return 0x420000U;
     } else if constexpr (hardware == AscendC::Hardware::L0C) {
         return 0x430000U;
+    } else if constexpr (hardware == AscendC::Hardware::BIAS) {
+        return 0x480000U;
+    } else if constexpr (hardware == AscendC::Hardware::FIXBUF) {
+        return 0x630000U;
     } else {
         return 0U;
     }
@@ -190,6 +194,30 @@ __aicore__ inline uint32_t mem_copy_cbuf_to_gm_impl(__gm__ T* dst, __cc__ T* src
         static_cast<uint64_t>(QuantMode_t::NoQuant), static_cast<uint8_t>(false), false, false, static_cast<uint64_t>(QuantMode_post::NoConv),
         0, false, false, 0, false, false, true, false, false, false);
     return 0;
+}
+
+template<typename T>
+__aicore__ inline uint32_t mem_copy_biasbuf_to_gm_impl(
+    __gm__ T* dst, __biasbuf__ T* src, const uint32_t alignDumpBytes)
+{
+#if defined(__DAV_CUBE__)
+    return debug_bus_copy_local_to_gm_impl<AscendC::Hardware::BIAS>(
+                dst, src, alignDumpBytes, get_debug_bus_addr_impl());
+#else
+    return 1;
+#endif
+}
+
+template<typename T>
+__aicore__ inline uint32_t mem_copy_fbuf_to_gm_impl(
+    __gm__ T* dst, __fbuf__ T* src, const uint32_t alignDumpBytes)
+{
+#if defined(__DAV_CUBE__)
+    return debug_bus_copy_local_to_gm_impl<AscendC::Hardware::FIXBUF>(
+                dst, src, alignDumpBytes, get_debug_bus_addr_impl());
+#else
+    return 1;
+#endif
 }
 
 template<typename T>

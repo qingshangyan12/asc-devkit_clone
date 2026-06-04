@@ -61,6 +61,22 @@ __aicore__ inline void mem_copy_ub_to_gm_impl(__gm__ T* dst, __ubuf__ T* src, co
 #endif
 }
 
+template<typename T>
+__aicore__ inline uint32_t mem_copy_abuf_to_gm_impl(
+    __gm__ T* dst, __ca__ T* src, const uint32_t alignDumpBytes) { return 1; }
+
+template<typename T>
+__aicore__ inline uint32_t mem_copy_bbuf_to_gm_impl(
+    __gm__ T* dst, __cb__ T* src, const uint32_t alignDumpBytes) { return 1; }
+
+template<typename T>
+__aicore__ inline uint32_t mem_copy_biasbuf_to_gm_impl(
+    __gm__ T* dst, __biasbuf__ T* src, const uint32_t alignDumpBytes) { return 1; }
+
+template<typename T>
+__aicore__ inline uint32_t mem_copy_fbuf_to_gm_impl(
+    __gm__ T* dst, __fbuf__ T* src, const uint32_t alignDumpBytes) { return 1; }
+
 } // namespace __asc_aicore
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_AICORE_DUMP_UTILS__)
