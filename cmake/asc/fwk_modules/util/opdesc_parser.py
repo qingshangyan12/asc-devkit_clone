@@ -80,7 +80,7 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend950dt_9578": "ascend950",
     "ascend950": "ascend950",
     "ascend350_354f": "ascend350",
- 	"ascend350_355e": "ascend350",
+    "ascend350_355e": "ascend350",
 }
 CONFLICT_KEYWORDS = {
     "and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else",
