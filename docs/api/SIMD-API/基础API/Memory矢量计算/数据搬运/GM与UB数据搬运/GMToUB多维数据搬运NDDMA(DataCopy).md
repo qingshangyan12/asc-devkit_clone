@@ -21,12 +21,15 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
--   GM->UB，支持多维度搬运
+- GM->UB，支持多维度搬运
+
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
     ```
+
 - NdDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
+
     ```cpp
     __aicore__ inline void NdDmaDci()
     ```
@@ -133,7 +136,7 @@ AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
 
 结果示例如下：
 
-```
+```text
 输入数据（xGm）:
 [[ 1.  2.  3.  4.  5.  6.  7.  8.]
  [ 9. 10. 11. 12. 13. 14. 15. 16.]]

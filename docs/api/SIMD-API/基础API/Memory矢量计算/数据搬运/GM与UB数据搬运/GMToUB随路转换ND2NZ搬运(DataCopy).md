@@ -23,6 +23,7 @@
 ## 函数原型<a name="section1954364615315"></a>
 
 - 不支持enableSmallC0模式
+
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
@@ -31,6 +32,7 @@
 <cann-filter npu-type="950">
 
 - 支持enableSmallC0模式
+
     ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
     template <typename T, bool enableSmallC0 = false>
@@ -54,7 +56,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。 |
-| intriParams | 输入 | 搬运参数，类型为[Nd2NzParams](#table844881954715)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考表3。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nd2NzParams结构体参数定义
 
@@ -140,7 +142,7 @@ AscendC::DataCopy(srcLocal, srcGlobal, intriParams);
 
 结果示例：
 
-```
+```text
 输入数据(srcGlobal): [1 2 3 ... 1024]
 输出数据(dstGlobal):[1 2 ... 15 16 33 34 ... 47 48 65 66 ... 79 80 97 98 ... 111 112 ... 1009 1010... 1023 1024]
 ```
