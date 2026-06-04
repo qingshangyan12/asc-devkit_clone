@@ -83,5 +83,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-#endif // DLSYM_COMMON_H
