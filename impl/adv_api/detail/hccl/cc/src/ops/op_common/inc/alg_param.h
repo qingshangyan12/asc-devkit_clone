@@ -16,6 +16,8 @@
 #include <set>
 #include <unordered_set>
 #include <functional>
+#include <memory>
+#include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
 #include "hccl_types.h"
@@ -388,6 +390,8 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
+    std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
+    u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
     {
@@ -409,6 +413,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
+        binaryStream << kfcServerArgs;
+        binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -439,6 +445,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
+        binaryStream >> kfcServerArgs;
+        binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
@@ -524,6 +532,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u32 dataCount = 0; // 算子上报dfx的数据量
     u64 varMemSize{0};
     u8 varData[0];
+    u64 ccuKfcArgs[4];          // 测试，ccu-kfc作为通信算子
 };
 
 struct AlgDesc {

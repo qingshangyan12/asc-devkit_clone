@@ -16,6 +16,7 @@
 #include "ccu_kernel.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
+#include "ccu_func_dl.hpp"
 
 namespace mc2_ops_hccl {
 
@@ -73,38 +74,44 @@ public:
     CcuKernelAlltoAllMesh1D(const hcomm::CcuKernelArg &arg);
     ~CcuKernelAlltoAllMesh1D() override {}
 
-    HcclResult Algorithm() override;
+    HcclResult Algorithm() override;  // 框架接口占位符
+    static HcclResult KernelCcuAlltoAllMesh1D(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                        ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                        ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                        ccu::Variable goSize3, ccu::Variable goSize4);
     std::vector<uint64_t> GeneArgs(const hcomm::CcuTaskArg &arg) override;
 
 private:
-    uint64_t rankSize_{0};
-    uint32_t rankId_{0};
-    HcclDataType dataType_;
-    HcclDataType outputDataType_;
-    hcomm::CcuRep::Variable repeatNum_;
-    std::vector<ChannelHandle> channels_;
-    std::vector<hcomm::CcuRep::Variable> input_;
-    std::vector<hcomm::CcuRep::Variable> output_;
-    std::vector<hcomm::CcuRep::Variable> token_;
-    hcomm::CcuRep::Variable sliceSize_;
-    hcomm::CcuRep::Variable srcStride_;
-    hcomm::CcuRep::Variable srcOffset_;
-    hcomm::CcuRep::Variable dstOffset_;
-    GroupOpSize groupOpSize_;
-    hcomm::CcuRep::LocalAddr                   myDst_;
-    std::vector<hcomm::CcuRep::RemoteAddr>     dstAddr_;
-    std::vector<hcomm::CcuRep::LocalAddr>      srcAddr_;
-    std::vector<hcomm::CcuRep::Variable>       dstToken_;
-    std::vector<hcomm::CcuRep::Variable>       srcToken_;
-    hcomm::CcuRep::CompletedEvent event_;
-    hcomm::CcuRep::Variable flag_; // 用以判断是否是第一次重复
-    bool loadFromMem_ = false;
-
-    HcclResult InitResource();
-    void LoadArgs();
-    void PreSync();
-    void PostSync();
-    void DoAlltoAll();
+    static HcclResult InitResource(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                    ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                    ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                    ccu::Variable goSize3, ccu::Variable goSize4);
+    static void PreSync();
+    static void PostSync();
+    static void DoAlltoAll();
+    
+    static uint64_t rankSize_;
+    static uint32_t rankId_;
+    static HcclDataType dataType_;
+    static HcclDataType outputDataType_;
+    static ccu::Variable repeatNum_;
+    static std::vector<ChannelHandle> channels_;
+    static std::vector<ccu::Variable> input_;
+    static std::vector<ccu::Variable> output_;
+    static std::vector<ccu::Variable> token_;
+    static ccu::Variable sliceSize_;
+    static ccu::Variable srcStride_;
+    static ccu::Variable srcOffset_;
+    static ccu::Variable dstOffset_;
+    static GroupOpSizeVars groupOpSize_;
+    static ccu::LocalAddr                   myDst_;
+    static std::vector<ccu::RemoteAddr>     dstAddr_;
+    static std::vector<ccu::LocalAddr>      srcAddr_;
+    static std::vector<ccu::Variable>       dstToken_;
+    static std::vector<ccu::Variable>       srcToken_;
+    static ccu::Event event_;
+    static ccu::Variable flag_;
+    static bool loadFromMem_;
 };
 
 }// namespace mc2_ops_hccl
