@@ -95,10 +95,7 @@ struct PartP2 {};
 struct PartP3 {};
 }
 
-template<typename T, typename U>
-struct CastTrait2VF {
-    using srcType = GetAttributeElementType<typename U::elementType*>;
-    using dstType = GetAttributeElementType<typename T::elementType*>;
+struct CastTraitDefault {
     using roundMode = Std::ignore_t;
     using satMode = Std::ignore_t;
     using indexPos = Std::ignore_t;
@@ -108,20 +105,24 @@ using CastTrait2CastFunc = TupleMap<
     Std::tuple<Std::tuple<half, half, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
     Std::tuple<Std::tuple<bfloat16_t, bfloat16_t, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
     Std::tuple<Std::tuple<float, float, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<uint16_t, uint8_t, Std::ignore_t, CastSatMode::NoSat, CastIndexPos::Even>, Inst::U162UInt8NoSatEven>>;
+    Std::tuple<Std::tuple<uint16_t, uint8_t, Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U162UInt8NoSatEven>>;
 
 
-template<typename CalcFunc, typename TraitType>
+template<typename CalcFunc, typename TraitType = CastTraitDefault<>>
 class Transform2CastInstMatch {
 public:
     template<typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src)
     {
-        using trait = Std::conditional_t<Std::is_same_v<TraitType, Std::ignore_t>, CastTrait2VF<T, U>, TraitType>;
-        using roundMode = Std::conditional_t<Std::is_same_v<typename trait::srcType, typename trait::dstType>, CalcFunc, typename trait::roundMode>;
+        using srcType = GetAttributeElementType<typename U::elementType*>;
+        using dstType = GetAttributeElementType<typename T::elementType*>;
 
-        using condition = Std::tuple<typename trait::srcType, typename trait::dstType, 
-            roundMode, typename trait::satMode, typename trait::indexPos>;
+        using roundMode = Std::conditional_t<Std::is_same_v<srcType, dstType>, CalcFunc, typename TraitType::roundMode>;
+        using satMode = Std::conditional_t<Std::is_same_v<typename TraitType::satMode, CastSatMode::NoSat>, Std::ignore_t, typename TraitType::satMode>;
+        using indexPos = Std::conditional_t<(Std::is_same_v<typename TraitType::indexPos, CastIndexPos::PartP0> || Std::is_same_v<typename TraitType::indexPos, CastIndexPos::Even>), Std::ignore_t, typename trait::indexPos>;
+
+        using condition = Std::tuple<typename srcType, typename dstType, 
+            roundMode, satMode, indexPos>;
 
         using func = CastTrait2CastFunc::template Get<condition>;
         static_assert(!Std::is_same_v<func, Std::ignore_t>,
