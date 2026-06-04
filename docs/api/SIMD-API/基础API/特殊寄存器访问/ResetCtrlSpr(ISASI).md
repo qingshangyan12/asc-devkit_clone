@@ -40,7 +40,7 @@ __aicore__ static inline void ResetCtrlSpr()
 
 ## 约束说明
 
-仅支持CTRL[8:6]、CTRL[10:9]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位。
+仅支持CTRL[8:6]、CTRL[10:9]、CTRL[48]、CTRL[50]、CTRL[53]、CTRL[59]、CTRL[60]比特位，各比特位的说明请参考[SetCtrlSpr(ISASI)参数说明](./SetCtrlSpr(ISASI).md#参数说明)。
 
 ## 调用示例
 

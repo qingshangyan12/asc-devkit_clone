@@ -37,12 +37,11 @@ __aicore__ inline __ssbuf__ void*  GetSsbufBaseAddr()
 - SSBuffer中存在脏数据，读取时数据不保证全为0。
 - AIC和AIV启动不同的任务时，不能访问SSBuffer。
 - 访问超过最末端的地址存在异常。每个核在非MIX模式下运行时，可以独立占用1KB的空间（AIC，AIV0，AIV1各占据1KB）；或者在MIX模式下运行时共享整个3KB的空间(AIC:AIV = 1:2)。目前SSBuffer的大小为3KB。
-- SSBuffer支持32字节或64字节的地址对齐访问。
+- SSBuffer只支持通过读写指令32字节的对齐访问。
 
 ## 调用示例
 
 ```cpp
  __ssbuf__ void* ssbuf = GetSsbufBaseAddr(); // NPU域中返回(void*) 0 ,CPU域中返回CPU模拟分配的地址
-AscendC::printf("Ssbuf基地址指针： %p\n", ssbuf ); // %p为打印指针格式符，NPU环境中，将特殊的0指针值显示为nil
-AscendC::printf("Ssbuf基地址指针： %p\n", ssbuf ); //输出为nil
+AscendC::printf("Ssbuf基地址指针： %p\n", ssbuf); // %p为打印指针格式符，NPU环境中，将特殊的0指针值显示为nil
 ```

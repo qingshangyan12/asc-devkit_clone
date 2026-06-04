@@ -40,7 +40,7 @@ __aicore__ inline int64_t GetSystemCycle()
 
 ## 约束说明
 
-该接口属于PIPE\_S流水，若需要测试其他流水的指令时间，需要在调用该接口前通过[PipeBarrier](../../同步控制/核内同步/PipeBarrier(ISASI).md)插入对应流水的同步，具体请参考[调用示例](#li126441923175612)。
+该接口属于PIPE\_S流水，若需要测试其他流水的指令时间，需要在调用该接口前通过[PipeBarrier](../../同步控制/核内同步/PipeBarrier(ISASI).md)插入对应流水的同步，具体请参考[调用示例](#example2)。
 
 ## 调用示例
 
@@ -55,12 +55,15 @@ __aicore__ inline int64_t GetSystemCycle()
         loopSize = totalSize / AscendC::GetBlockNum();
         int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用GetBlockNum指令后的cycle数
         int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行GetBlockNum指令所用的cycle数
-        int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，Atlas A2/A3为50，Ascend 950为1000
-        int64_t GetBlockNumTime = GetBlockNumCycle/CycleToTimeBase; // 执行GetBlockNum指令所用时间，单位为us
+        int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位
+        /* 在Ascend 950PR/Ascend 950DT上为1000
+        在Atlas A3 训练系列产品/Atlas A3 推理系列产品上为50
+        在Atlas A2 训练系列产品/Atlas A2 推理系列产品上为50 */
+        int64_t GetBlockNumTime = GetBlockNumCycle / CycleToTimeBase; // 执行GetBlockNum指令所用时间，单位为us
     };
     ```
 
-- <a name="li126441923175612"></a>如下示例为获取矢量计算Add指令时间的关键代码片段，在调用`GetSystemCycle`之前，插入了`PIPE_ALL`同步，可以保证相关指令执行完后再获取cycle数。
+- <a id="example2"></a>如下示例为获取矢量计算Add指令时间的关键代码片段，在调用`GetSystemCycle`之前，插入了`PIPE_ALL`同步，可以保证相关指令执行完后再获取cycle数。
 
     ```cpp
     PipeBarrier<PIPE_ALL>();
@@ -69,6 +72,9 @@ __aicore__ inline int64_t GetSystemCycle()
     PipeBarrier<PIPE_ALL>();
     int64_t systemCycleAfter = AscendC::GetSystemCycle(); // 调用Add指令后的cycle数
     int64_t GetBlockNumCycle = systemCycleAfter - systemCycleBefore; // 执行Add指令所用的cycle数
-    int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位，Atlas A2/A3为50，Ascend 950为1000
-    int64_t GetBlockNumTime = GetBlockNumCycle/CycleToTimeBase; // 执行Add指令所用时间，单位为us
+    int64_t CycleToTimeBase = 50; // cycle数转换成时间的基准单位
+    /* 在Ascend 950PR/Ascend 950DT上为1000
+    在Atlas A3 训练系列产品/Atlas A3 推理系列产品上为50
+    在Atlas A2 训练系列产品/Atlas A2 推理系列产品上为50 */
+    int64_t GetBlockNumTime = GetBlockNumCycle / CycleToTimeBase; // 执行Add指令所用时间，单位为us
     ```

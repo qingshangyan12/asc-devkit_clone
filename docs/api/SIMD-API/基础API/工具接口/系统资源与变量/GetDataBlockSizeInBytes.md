@@ -20,7 +20,7 @@
 
 获取当前芯片版本一个DataBlock的大小，单位为Byte。
 
-开发者根据DataBlock的大小来计算API指令中待传入的[repeatTime、DataBlock Stride、Repeat Stride等参数值](../../Memory矢量计算/SIMD计算说明/高维切分.md)。
+开发者根据DataBlock的大小来计算API指令中待传入的[repeatTime、dstBlkStride、srcblkStride、dstRepStride、srcRepStride等参数值](../../Memory矢量计算/SIMD计算说明/高维切分.md)。
 
 ## 函数原型
 
