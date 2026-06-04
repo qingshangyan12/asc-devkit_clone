@@ -485,14 +485,14 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     if (opParam.engine == COMM_ENGINE_CCU) {
         uint64_t token;
         CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
-        auto kfcServerArgs = std::make_shared<CcuKfcKernelStruct>();
-        kfcServerArgs->waitAddr = opResCtx.ckeAddr;
-        kfcServerArgs->recordAddr = opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
-        kfcServerArgs->paramAddr = opResCtx.xnAddr;
-        kfcServerArgs->dieNum = 1;
-        kfcServerArgs->missonNum = 1;
-        kfcServerArgs->missonIndex = 0;
-        resCtxHost->kfcServerArgs = static_cast<void*>(kfcServerArgs.get());
+        resCtxHost->kfcServerArgs = {
+            opResCtx.ckeAddr,
+            opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE,
+            opResCtx.xnAddr,
+            static_cast<uint64_t>(1),  // dieNum
+            static_cast<uint64_t>(1),  // missonNum
+            static_cast<uint64_t>(0),  // missonIndex
+        };
         resCtxHost->kfcServerArgSize = 6;
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));

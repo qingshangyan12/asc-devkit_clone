@@ -271,9 +271,6 @@ std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType op
     return std::make_unique<MockInsCollAlgBase>();
 }
 
-// 全局变量：捕获GetCcuOpParamResCtx中构造的kfcServerArgs，供UT验证
-std::shared_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs = nullptr;
-
 HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
     TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
     void** resCtxDevice, bool& isSuspend)
@@ -281,17 +278,16 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     if (resCtxDevice == nullptr) {
         return HCCL_E_PTR;
     }
-    if (resCtxHost != nullptr && resCtxHost->kfcServerArgs != nullptr) {
-        g_capturedKfcServerArgs = std::make_shared<CcuKfcKernelStruct>(
-            *static_cast<CcuKfcKernelStruct*>(resCtxHost->kfcServerArgs));
-    } else {
-        g_capturedKfcServerArgs = nullptr;
-    }
-    void* ctx = std::malloc(sizeof(AlgResourceCtxSerializable));
+    // 执行真正的序列化，使测试端可以通过反序列化验证数据
+    std::vector<char> seq = resCtxHost->Serialize();
+    uint64_t size = seq.size();
+    void* ctx = std::malloc(size);
     if (ctx == nullptr) {
         return HCCL_E_PTR;
     }
+    memcpy(ctx, seq.data(), size);
     *resCtxDevice = ctx;
+    param.ctxSize = size;
     isSuspend = false;
     return HcclResult::HCCL_SUCCESS;
 }

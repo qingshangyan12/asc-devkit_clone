@@ -27,9 +27,6 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIn
     return HCCL_SUCCESS;
 }
 
-namespace mc2_ops_hccl {
-extern std::shared_ptr<CcuKfcKernelStruct> g_capturedKfcServerArgs;
-}
 
 namespace {
 
@@ -399,34 +396,34 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     ASSERT_FALSE(skipGetRes);
 
     // 3. 调用GetCcuOpParamResCtx
-    mc2_ops_hccl::g_capturedKfcServerArgs = nullptr;
     void *resCtxOut = nullptr;
     EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam, topoInfo.get(), opResCtx, &resCtxOut), HCCL_SUCCESS);
     EXPECT_NE(resCtxOut, nullptr);
     EXPECT_EQ(opParam.resCtx, resCtxOut);
 
-    // 4. 验证kfcServerArgs各字段与CcuAlltoAllMesh1D预期一致
-    ASSERT_NE(mc2_ops_hccl::g_capturedKfcServerArgs, nullptr);
+    // 4. 通过反序列化resCtxOut还原resourceCtx，验证kfcServerArgs各字段
+    ASSERT_NE(opParam.ctxSize, 0U);
+    auto *resCtxRaw = static_cast<char *>(resCtxOut);
+    std::vector<char> seq(resCtxRaw, resCtxRaw + opParam.ctxSize);
+    mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx;
+    resourceCtx.DeSerialize(seq);
 
+    // kfcServerArgs应包含6个uint64_t元素
+    ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
     // waitAddr = ckeAddr
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->waitAddr, opResCtx.ckeAddr);
+    EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.ckeAddr);
     // recordAddr = ckeAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->recordAddr,
+    EXPECT_EQ(resourceCtx.kfcServerArgs[1],
               opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE);
     // paramAddr = xnAddr
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->paramAddr, opResCtx.xnAddr);
-    // CcuAlltoAllMesh1D: 单die
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->dieNum, 1U);
-    // CcuAlltoAllMesh1D: 单mission
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->missonNum, 1U);
-    EXPECT_EQ(mc2_ops_hccl::g_capturedKfcServerArgs->missonIndex, 0U);
-    // CcuAlltoAllMesh1D: 单mission无需mission间同步信号
-    EXPECT_TRUE(mc2_ops_hccl::g_capturedKfcServerArgs->exportMissionSig.empty());
-    EXPECT_TRUE(mc2_ops_hccl::g_capturedKfcServerArgs->importMissionSig.empty());
-    EXPECT_TRUE(mc2_ops_hccl::g_capturedKfcServerArgs->exportMissionVar.empty());
-    EXPECT_TRUE(mc2_ops_hccl::g_capturedKfcServerArgs->importMissionVar.empty());
+    EXPECT_EQ(resourceCtx.kfcServerArgs[2], opResCtx.xnAddr);
+    // dieNum = 1
+    EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
+    // missonNum = 1
+    EXPECT_EQ(resourceCtx.kfcServerArgs[4], 1U);
+    // missonIndex = 0
+    EXPECT_EQ(resourceCtx.kfcServerArgs[5], 0U);
 
     free(resCtxOut);
-    mc2_ops_hccl::g_capturedKfcServerArgs = nullptr;
 }
 }

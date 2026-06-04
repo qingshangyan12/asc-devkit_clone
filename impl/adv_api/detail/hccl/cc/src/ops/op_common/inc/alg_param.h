@@ -30,21 +30,6 @@
 
 namespace mc2_ops_hccl {
 
-struct CcuKfcKernelStruct {
-    uint64_t waitAddr;
-    uint64_t recordAddr;
-    uint64_t paramAddr;
-    uint32_t dieNum;
-    hcomm::CcuRep::MaskSignal exportDieSig;
-    hcomm::CcuRep::MaskSignal importDieSig;
-    uint32_t missonNum;
-    uint32_t missonIndex;
-    std::vector<hcomm::CcuRep::MaskSignal> exportMissionSig;
-    std::vector<hcomm::CcuRep::MaskSignal> importMissionSig;
-    std::vector<hcomm::CcuRep::Variable> exportMissionVar;
-    std::vector<hcomm::CcuRep::Variable> importMissionVar;
-};
-
 constexpr uint64_t UB_MAX_DATA_SIZE = 256*1024*1024; // Byte, UB协议一次传输的最大size
 
 constexpr uint32_t DATATYPE_SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {sizeof(int8_t), sizeof(int16_t), sizeof(int32_t),
@@ -405,7 +390,7 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
-    void* kfcServerArgs = nullptr;        // kfc server算子入参
+    std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
