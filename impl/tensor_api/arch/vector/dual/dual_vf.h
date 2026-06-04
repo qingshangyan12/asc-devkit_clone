@@ -72,8 +72,8 @@ public:
                                                          repeat, oneRepSize, dataSize);
     }
 };
-}  // namespace Te
-}  // namespace AscendC
+
+}}
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_DUAL_DUAL_VF_H
 
