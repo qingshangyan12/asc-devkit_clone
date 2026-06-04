@@ -255,8 +255,8 @@ __aicore__ inline void GeluCompute(
 
 **原理解析**：
 
-RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
-- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) 和一次 [StoreAlign](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)，消除中间结果的 Load/Store 开销
+RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
+- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) 和一次 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)，消除中间结果的 Load/Store 开销
 - 支持 VF 双发特性，常规计算指令并行度可达 512 bytes/cycle，指令发射效率（IPC）大幅提升
 
 ```
@@ -612,7 +612,7 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/doc/docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
