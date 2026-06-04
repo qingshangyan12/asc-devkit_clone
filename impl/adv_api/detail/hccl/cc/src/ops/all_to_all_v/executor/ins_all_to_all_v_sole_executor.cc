@@ -10,11 +10,9 @@
 #include "template_utils.h"
 #include "ins_all_to_all_v_sole_executor.h"
 #ifndef AICPU_COMPILE
-/*
 #include "ccu_temp_all_to_all_v_mesh_1D.h"
 #include "ccu_temp_all_to_all_v_mesh2die.h"
 #include "ccu_temp_all_to_all_v_mesh_1D_multi_jetty.h"
-*/
 #endif
 
 #define CONST_ZERO 0
@@ -203,7 +201,6 @@ HcclResult InsAlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLo
 
 // 第二个参数是All to AllV的template文件
 #ifndef AICPU_COMPILE
-/*
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, CcuAlltoAllVMesh1D, InsAlltoAllVSoleExecutor, TopoMatch1D,
     CcuTempAlltoAllVMesh1D);
 
@@ -218,6 +215,5 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV,
                 InsAlltoAllVSoleExecutor,
                 TopoMatchUBX,
                 CcuTempAllToAllVMesh1DMultiJetty);
-*/
 #endif
 }
