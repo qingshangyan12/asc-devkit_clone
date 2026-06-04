@@ -26,6 +26,9 @@
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
 
+namespace AscendC {
+namespace Te {
+namespace Inst {
 class Cast {
 public:
     template<typename... Args>

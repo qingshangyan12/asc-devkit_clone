@@ -22,7 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_TRANSFORM_TRANSFORM_SET_VF_H
 
-#include "mpl/tensor_api/arch/vector/axpy/axpy_vf.h"
+#include "impl/tensor_api/arch/vector/axpy/axpy_vf.h"
 #include "impl/tensor_api/arch/vector/binary/binary_vf.h"
 #include "impl/tensor_api/arch/vector/binary_scalar/binary_scalar_vf.h"
 #include "impl/tensor_api/arch/vector/cast/cast_vf.h"
@@ -35,15 +35,14 @@ namespace Te {
 
 template<typename CalcFunc, typename TraitType>
 struct Transform2VFSet {
-
     using binarySet = Std::tuple<Inst::Add, Inst::Sub, Inst::Madd, Inst::And, Inst::Select, Inst::AbsSub, Inst::Min, Inst::Max,
         Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
-    using castSet = Std::tuple<Inst::Ceil, Inst::U82U16>;
+    using castSet = Std::tuple<Inst::Cast, Inst::Ceil>;
     using binaryScalarSet = Std::tuple<Inst::MulScalar, Inst::AddScalar, Inst::MaxScalar, Inst::MinScalar,
         Inst::ShiftLeftScalar, Inst::ShiftRightScalar, Inst::MulsEven, Inst::MulsOdd>;
     using unarySet = Std::tuple<Inst::Not, Inst::Ln, Inst::Abs, Inst::Sqrt, Inst::Exp>;
     using axpySet = Std::tuple<Inst::Axpy>;
-    using dualSet = Std::tuple<nst::Mull>;
+    using dualSet = Std::tuple<Inst::Mull>;
 
     using transformSet = TupleMap<
         Std::tuple<binarySet, Transform2BinaryVF<CalcFunc, TraitType>>,
