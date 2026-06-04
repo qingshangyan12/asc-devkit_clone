@@ -45,4 +45,18 @@ union asc_gm2ub_loop_stride_config {
     };
 };
 
+struct asc_position_even{};
+struct asc_position_odd{};
+constexpr asc_position_even ASC_POSITION_EVEN;
+constexpr asc_position_odd ASC_POSITION_ODD;
+
+struct asc_disperse_first_quarter{};
+struct asc_disperse_second_quarter{};
+struct asc_disperse_third_quarter{};
+struct asc_disperse_fourth_quarter{};
+constexpr asc_disperse_first_quarter ASC_DISPERSE_FIRST_QUARTER;
+constexpr asc_disperse_second_quarter ASC_DISPERSE_SECOND_QUARTER;
+constexpr asc_disperse_third_quarter ASC_DISPERSE_THIRD_QUARTER;
+constexpr asc_disperse_fourth_quarter ASC_DISPERSE_FOURTH_QUARTER;
+
 #endif
