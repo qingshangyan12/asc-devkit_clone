@@ -8,8 +8,8 @@
 |<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品 AI Core | x </cann-filter>|
-|<cann-filter npu-type = "310p"> Atlas 推理系列产品 Vector Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
+|<cann-filter npu-type = "310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type = "910"> Atlas 训练系列产品 | x </cann-filter>|
 |<cann-filter npu-type = "x90"> Kirin X90 | √ </cann-filter>|
 |<cann-filter npu-type = "9030"> Kirin 9030 | √ </cann-filter>|
@@ -52,7 +52,7 @@
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为Unified Buffer，目的地址需要32B对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为Unified Buffer，源地址需要32B对齐。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../../SIMD计算说明/掩码/概述.md)。 |
-| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../../SIMD计算说明/高维切分.md)。**<cann-filter npu-type = "A3,910b"><br>注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter></cann-filter>**|
+| repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../../SIMD计算说明/高维切分.md)。**<cann-filter npu-type = "A3,910b"><br>注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter></cann-filter>**|
 | repeatParams | 输入 | 控制操作数地址步长的参数。CopyRepeatParams类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。CopyRepeatParams参数说明请参考表3。 |
 
 **表 3**  CopyRepeatParams结构体参数定义
@@ -105,7 +105,7 @@
 
 -   位于Unified Buffer的地址必须32B对齐。
 -   操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
-- <cann-filter npu-type = "A3,910b">repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：
+- <cann-filter npu-type = "A3,910b">repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 </cann-filter>
