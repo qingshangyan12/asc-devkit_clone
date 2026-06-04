@@ -140,5 +140,5 @@
   bool signMode = true; // dstLocal为int8_t类型，为有符号数
   AscendC::SetDeqScale(scale, offset, signMode);
   // dst = src
-  AscendC::CastDeq<int8_t, int16_t, false, false>(dstLocal, srcLocal, srcSize);
+  AscendC::CastDequant<int8_t, int16_t, false, false>(dstLocal, srcLocal, srcSize);
   ```
