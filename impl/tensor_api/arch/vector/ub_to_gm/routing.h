@@ -34,14 +34,34 @@ public:
     }
 };
 
-template <typename dstTPos, typename srcTpos, uint32_t Version>
+template <typename dstTPos, typename srcTpos, typename DstLayoutPtn, typename SrcLayoutPtn, uint32_t Version>
 struct CopyUB2GMTensor2Tensor {
     using type = CopyUB2GMIgnore;
 };
 
 template <>
-struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, ArchVersion::V3510> {
-    using type = DataCopyUB2GM3510;
+struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, NDLayoutPtn, NDLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2GM3510ND2ND;
+};
+
+template <>
+struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, DNLayoutPtn, DNLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2GM3510DN2DN;
+};
+
+template <>
+struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, NDExtLayoutPtn, NDExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2GM3510NDExt2NDExt;
+};
+
+template <>
+struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, DNExtLayoutPtn, DNExtLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2GM3510DNExt2DNExt;
+};
+
+template <>
+struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, NZLayoutPtn, NZLayoutPtn, ArchVersion::V3510> {
+    using type = DataCopyUB2GM3510NZ2NZ;
 };
 
 } // namespace Te
