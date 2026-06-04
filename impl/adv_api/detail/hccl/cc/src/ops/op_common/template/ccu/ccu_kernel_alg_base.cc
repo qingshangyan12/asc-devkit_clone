@@ -12,7 +12,7 @@
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
-
+/*
 HcclResult CcuKernelAlgBase::LocalReduceNb(const std::vector<CcuRep::CcuBuf> &bufs, uint32_t count, HcclDataType dataType,
                      HcclDataType outputDataType, HcclReduceOp opType,
                      const CcuRep::Variable &len, CcuRep::CompletedEvent event)
@@ -21,7 +21,6 @@ HcclResult CcuKernelAlgBase::LocalReduceNb(const std::vector<CcuRep::CcuBuf> &bu
     return CcuKernel::LocalReduceNb(bufs.data(), bufs.size(), dataType, outputDataType, opType, len, event);
 }
 
-/*
 void CcuKernelAlgBase::AllocGoResource(uint32_t parallelDim, uint32_t msPerLoop)
 {
     if (moConfig.loopCount != 0xFFFFFFFF && moConfig.msInterleave != 0xFFFFFFFF &&
@@ -46,7 +45,6 @@ void CcuKernelAlgBase::AllocGoResource(uint32_t parallelDim, uint32_t msPerLoop)
         moRes.ccuBuf = CreateBlockCcuBuf(moConfig.loopCount * moConfig.msInterleave);
     }
 }
-*/
 
 void CcuKernelAlgBase::Load(GroupOpSize moSize)
 {
@@ -158,6 +156,7 @@ HcclResult CcuKernelAlgBase::CreateMultiOpBroadcast(const std::vector<ChannelHan
     registeredLoop.insert(loopType);
     return HCCL_SUCCESS;
 }
+*/
 
 // ==================== 旧API函数实现（已注释，不参与编译） ====================
 /*

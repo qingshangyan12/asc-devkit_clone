@@ -598,3 +598,8 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
 
     return HCCL_SUCCESS;
 }
+
+HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIndex) {
+    HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
+    return HCCL_SUCCESS;
+}
