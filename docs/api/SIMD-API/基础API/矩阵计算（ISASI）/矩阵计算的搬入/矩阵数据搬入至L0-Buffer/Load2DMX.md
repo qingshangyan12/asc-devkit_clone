@@ -55,7 +55,7 @@ A1->A2; B1->B2。
 |src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>数据类型需要与dst保持一致。|
 |srcMx|输入|源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。|
 |loadDataParams|输入|LoadData参数结构体，类型为LoadData2DParamsV2，具体参考表[Load2DV2](Load2DV2.md)中的LoadData2DParamsV2结构体内参数说明。|
-|loadMxDataParams|输入|LoadData参数结构体，类型为LoadData2DMxParams，具体参考[表3](#table15901153712305)。<br>上述结构体参数定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_mm.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。|
+|loadMxDataParams|输入|LoadData参数结构体，类型为LoadData2DMxParams，具体参考[表3](#table15901153712305)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。|
 
 **表 3**  LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
 

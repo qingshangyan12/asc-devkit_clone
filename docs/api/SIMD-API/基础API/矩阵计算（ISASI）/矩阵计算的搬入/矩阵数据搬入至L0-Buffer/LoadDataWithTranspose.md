@@ -56,7 +56,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 |----------|-----------|------|
 |dst|输出| 目的操作数，结果矩阵，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>LocalTensor的起始地址需要保证512字节对齐。<br>数据类型和src的数据类型保持一致。 |
 |src|输入| 源操作数，类型为LocalTensor。<br>分形约束参考矩阵计算输入搬运约束。<br>起始地址对齐约束参考矩阵计算输入搬运约束中的对齐约束。<br>LocalTensor的起始地址需要保证32字节对齐。<br>数据类型和dst的数据类型保持一致。 |
-|loadDataParams|输入| LoadDataWithTranspose相关参数，类型为LoadData2dTransposeParams。具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_mm.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表3](#zh-cn_topic_0000002543851571_table13526111319538)。 |
+|loadDataParams|输入| LoadDataWithTranspose相关参数，类型为LoadData2dTransposeParams。具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。<br>参数说明请参考[表3](#zh-cn_topic_0000002543851571_table13526111319538)。 |
 |loadDataParams（Ascend 950PR/Ascend 950DT）|输入| LoadDataWithTranspose相关参数，类型为LoadData2dTransposeParamsV2。<br>参数说明请参考[表4](#zh-cn_topic_0000002543851571_table64891930194618)。 |
 
 **表 3**  LoadData2dTransposeParams结构体内参数说明<a id="zh-cn_topic_0000002543851571_table13526111319538"></a>
