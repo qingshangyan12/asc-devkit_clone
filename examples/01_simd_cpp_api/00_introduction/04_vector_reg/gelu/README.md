@@ -2,6 +2,8 @@
 
 ## 算子概述
 
+> **适用产品**：本样例仅支持 Ascend 950PR / Ascend 950DT（NPU架构版本 dav-3510），使用 RegBase API 特性，需 CANN >= 9.0.0。
+
 **计算公式**：
 
 GELU 近似计算公式为：
@@ -30,7 +32,11 @@ $$
 - `totalM = 256`，`singleCoreM = 128`，每个核处理 `128 × 32 = 4096` 个元素
 - 前 128 行由第 1 个核处理，后 128 行由第 2 个核处理
 
-**说明**：GELU 是神经网络中常用的激活函数，本样例采用 RegBase API 和 VF 调用方式，在寄存器中完成 GELU 近似计算，展示了 GM → UB → 寄存器 → UB → GM 的完整数据通路。
+**说明**：GELU 是神经网络中常用的激活函数，用于替代 ReLU 以获得更平滑的梯度特性。
+
+本样例采用 RegBase 编程方式实现 GELU 计算——与 [01_vector/add 样例](../01_vector/add/README.md) 使用的 MemBase（基于 [LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）方式相比，RegBase 允许中间计算结果暂存在寄存器而非 UB 中，减少了 UB 读写次数，适合多步骤融合计算场景。
+
+完整的数据通路为：GM → UB → 寄存器（逐步计算）→ UB → GM。
 
 ## 算子实现
 
@@ -45,6 +51,7 @@ $$
   - `MTE2_V`：表示 MTE2（内存搬运引擎）完成 GM→UB 搬运后，V（向量计算单元）再开始读取 UB 数据
   - `V_MTE3`：表示 V 完成计算后，MTE3（回写引擎）再将 UB 结果写回 GM
 - [PipeBarrier](../../../../../docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md) 用于等待本核所有流水阶段全部完成后再退出 kernel，确保数据写回完成。
+- **RegBase 编程范式**：与传统 MemBase（基于 [LocalTensor](../../../../../docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）不同，RegBase 通过 [asc_vf_call](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，在函数内使用 [RegTensor](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md)（寄存器张量）完成计算。VF 函数以 `__simd_vf__` 声明，参数和局部变量通过 `__ubuf__` 标记 UB 地址空间。VF 函数内数据通过 [LoadAlign](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md)（UB→寄存器）和 [StoreAlign](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)（寄存器→UB）搬运，使用 [MaskReg](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)（掩码寄存器）控制每次计算的元素数量，通过 [UpdateMask](../../../../../docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) 根据剩余元素数更新掩码。优势是中间结果可暂存在寄存器，减少 UB 读写次数。
 
 **核心代码示例**：
 
@@ -57,6 +64,7 @@ constexpr float COEFF_CUBIC = -0.071405f;
 __simd_vf__ inline static void GeluVfMethod2(
     __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t count, uint32_t loopNum)
 {
+    // 一次向量计算repeat可处理的float元素数（如dav-3510为256字节/4字节=64个元素）
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::RegTensor<float> xReg;
@@ -76,7 +84,11 @@ __simd_vf__ inline static void GeluVfMethod2(
         AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask); // 寄存器 → UB
     }
 }
+```
 
+上述 VF 函数封装了 GELU 在寄存器中的逐步计算逻辑。下面是完整的核函数，负责分核、数据搬运、调用 VF 函数和同步管理。
+
+```cpp
 // 核函数：分核逻辑 + 搬入/计算/搬出
 template <uint32_t singleCoreLength>
 __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
@@ -96,6 +108,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
     // Stage 1: GM → UB 搬入
     AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
     // 同步：等待 GM→UB 搬运完成
+    // EVENT_ID0 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用 0
     AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
