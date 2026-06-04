@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以 Add 计算为载体，重点演示 Ascend C CPU Debug 功能的使用流程，包括 CPU 域编译、可执行程序运行、通过 GDB 进入调试模式，以及在核函数中设置断点、单步执行和查看变量。样例用于帮助开发者在不依赖 NPU 运行的情况下，对 Ascend C 核函数逻辑进行本地调试和问题定位。
+本样例以矩阵乘法（Matmul）计算为载体，重点演示 Ascend C CPU Debug 功能的使用流程，包括 CPU 域编译、可执行程序运行、通过 GDB 进入调试模式，以及在核函数中设置断点、单步执行和查看变量。样例用于帮助开发者在不依赖 NPU 运行的情况下，对 Ascend C 核函数逻辑进行本地调试和问题定位。
 
 ## 支持的产品
 
@@ -15,7 +15,11 @@
 ```
 ├── 03_cpudebug
 │   ├── CMakeLists.txt          // 编译工程文件
-│   └── cpu_debug.asc           // Ascend C样例实现 & 调用样例
+│   ├── cpu_debug.asc           // Ascend C样例实现 & 调用样例
+│   ├── data_utils.h            // 数据读入写出函数
+│   └── scripts
+│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│       └── verify_result.py    // 真值对比文件
 ```
 
 ## 支持的CANN软件版本
@@ -28,7 +32,7 @@
   CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要通过GDB工具实现。GDB调试支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。
 
 - 样例介绍：  
-  本样例的Add实现与[Add基础样例](../../00_introduction/01_vector/add/README.md)保持一致，默认使用`float`类型。每个block处理`2048`个数据，流程为`DataCopy`输入到UB、执行`Add`、再将结果`DataCopy`回GM。
+  本样例的矩阵乘法实现与[矩阵乘法基础样例](../../00_introduction/02_matrix/matmul_basic_api/README.md)保持一致，使用`half`类型，矩阵规格为`M=256, K=64, N=256`。样例启动2个核完成计算，每个核负责输出矩阵C在M轴方向的128行、N轴方向的全部256列。流程包括：通过`DataCopy`将A、B矩阵从GM搬运到L1并转换为Nz格式；通过`LoadData`从L1搬运到L0A/L0B；执行`Mmad`矩阵乘计算；最后通过`Fixpipe`将结果从L0C搬运回GM并转换为half类型。
 
   为了使能CPU Debug，本样例在定义`ASCENDC_CPU_DEBUG`宏时包含`cpu_debug_launch.h`头文件。
 
@@ -57,7 +61,9 @@
   ```bash
   mkdir -p build && cd build;
   cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+  python3 ../scripts/gen_data.py
   ./cpu_debug
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin
   ```
   请根据实际测试的 NPU 硬件架构选择对应的 `CMAKE_ASC_ARCHITECTURES` 参数
   - 编译选项说明
@@ -69,7 +75,7 @@
 - 执行结果  
   执行结果如下，说明执行成功。
   ```bash
-  [Success] Case accuracy is verification passed.
+  test pass!
   ```
 - 进入gdb模式调试  
   编译生成的CPU域可执行程序支持通过gdb进行调试。gdb支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。在上述指令中"./cpu_debug"前加入"gdb --args"，再次执行指令即可进入gdb模式。
@@ -86,7 +92,7 @@
 
   ```text
   # 在核函数入口处设置断点
-  (gdb) break add_custom
+  (gdb) break mmad_custom
 
   # 运行程序
   (gdb) run
@@ -95,7 +101,7 @@
   (gdb) next
 
   # 打印变量值
-  (gdb) print xLocal.GetValue(0)
+  (gdb) print aGM.GetValue(0)
 
   # 继续执行到下一个断点
   (gdb) continue
