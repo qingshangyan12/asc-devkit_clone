@@ -151,6 +151,14 @@ if(BUILD_OPEN_PROJECT)
     add_cann_third_party(json)
     add_cann_third_party(rdma-core)
 
+    if(NOT TARGET rdma_core_headers)
+        add_library(rdma_core_headers INTERFACE)
+
+        target_include_directories(rdma_core_headers INTERFACE
+            ${RDMA_CORE_INCLUDE_DIR}
+        )
+    endif()
+
     target_compile_definitions(asc_ccl_kernel_plf PRIVATE
         OPEN_BUILD_PROJECT)
 
@@ -168,13 +176,13 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/pub_inc/new
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
-        ${RDMA_CORE_INCLUDE_DIR}
-
-
         # 临时依赖头文件，待删除
         ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
-        ${RDMA_CORE_INCLUDE_DIR}
         ${THIRD_PARTY_NLOHMANN_PATH}
+    )
+
+    target_link_libraries(asc_ccl_kernel_plf PRIVATE
+        rdma_core_headers
     )
 
     target_include_directories(asc_ccl_kernel_plf_a PRIVATE
@@ -190,21 +198,24 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_BASE_DIR}/pub_inc/new
         ${HCCL_BASE_DIR}/platform/hccp/inc
         ${HCCL_BASE_DIR}/platform/hccp/inc/network
-        ${RDMA_CORE_INCLUDE_DIR}
-
-
         # 临时依赖头文件，待删除
         ${HCCL_HCOMM_HEADER_DIR}/externel_depends/tsch/
-        ${RDMA_CORE_INCLUDE_DIR}
-
         ${THIRD_PARTY_NLOHMANN_PATH}
     )
 
+    target_link_libraries(asc_ccl_kernel_plf_a PRIVATE
+        rdma_core_headers
+    )
 endif()
 
 if(TARGET json)
-    target_link_libraries(asc_ccl_kernel_plf json)
-    target_link_libraries(asc_ccl_kernel_plf_a json)
+    target_link_libraries(asc_ccl_kernel_plf PRIVATE
+        json
+    )
+
+    target_link_libraries(asc_ccl_kernel_plf_a PRIVATE 
+        json
+    )
     add_dependencies(asc_ccl_kernel_plf json)
     add_dependencies(asc_ccl_kernel_plf_a json)
 endif()
