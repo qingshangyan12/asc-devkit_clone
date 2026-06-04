@@ -4,6 +4,8 @@
 
 本样例以Gelu计算为例，介绍RegBase的向量性能调优方法，样例展示使能VF融合和循环展开之后的性能收益情况。
 
+> **前置阅读**：[Gelu算子入门样例](https://gitcode.com/cann/asc-devkit/blob/doc/examples/01_simd_cpp_api/00_introduction/04_vector_reg/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
+
 **优化路径**：
 - Case 0: Gelu未使能VF融合能力（基准）
 - Case 1: 启用RegBase API和VF融合能力
@@ -202,6 +204,20 @@ __aicore__ inline void GeluCompute(
 }
 ```
 
+**VF 函数调用上下文**：
+
+上述 VF 函数定义了 GELU 在寄存器中的计算逻辑，在核函数中通过 `asc_vf_call` 调用，调用示例如下：
+
+```cpp
+// 核函数中调用 VF 函数的代码片段
+constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
+__ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
+__ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
+// 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数和循环次数
+asc_vf_call<GeluVfBasic>(xAddr, yAddr, singleCoreLength, loopNum);
+```
+
 **样例配置**：
 - 多核切分：M方向分32份，N方向2份，共计64份数据，分布到64core上计算
 - `tileLen = 8192` 为每次搬运和计算的数据元素个数
@@ -252,6 +268,32 @@ __aicore__ inline void GeluCompute(
 - **痛点2：指令级并行度低**：基础 API 每条向量指令间需插入 `PipeBarrier<PIPE_V>()` 同步，无法利用 VF 融合的双发特性，标量开销占比 2.7%。
 
 ### 优化手段解析与实施：RegBase API + VF融合
+
+**MemBase vs RegBase 概念对比**：
+
+| 维度 | MemBase（基础API） | RegBase（VF融合API） |
+|:---|:---|:---|
+| 编程接口 | Compute API（如 `Mul(yLocal, xLocal, xLocal, n)`） | Reg API（如 `Reg::Mul(yReg, xReg, xReg, mask)`） |
+| 数据驻留 | 每条指令隐式 Load/Store，中间结果写回 UB | 数据显式加载到寄存器后常驻，中间结果暂存寄存器 |
+| 同步方式 | 每条指令间需 `PipeBarrier<PIPE_V>()` 同步 | VF 函数内无需显式同步，硬件自动管理依赖 |
+| 调用方式 | 直接调用 Compute API | 通过 `asc_vf_call` 调用 VF 函数 |
+| 适用场景 | 简单计算、单步或少步运算 | 多步骤融合计算，减少 UB 读写次数 |
+| 性能特征 | 每步 Load/Store 开销大，IPC 低 | 仅 1 次 Load + 1 次 Store，支持双发，IPC 高 |
+
+> **选择建议**：当计算步骤较多（≥3步）且中间结果无需写回 UB 时，优先选择 RegBase + VF 融合，可显著减少 UB 读写次数并利用双发特性提升 IPC。
+
+**RegBase API 关键概念**：
+
+| 关键字/概念 | 含义 | 详细文档 |
+|:---|:---|:---|
+| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) |
+| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) |
+| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
+| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) |
+| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md) |
+| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) |
+| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [MoveMask](https://gitcode.com/cann/asc-devkit/blob/doc/docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) |
 
 **原理解析**：
 
@@ -308,6 +350,20 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
         AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // 仅一次Store
     }
 }
+```
+
+**VF 函数调用上下文**：
+
+上述 VF 函数定义了 GELU 在寄存器中的计算逻辑，在核函数中通过 `asc_vf_call` 调用，调用示例如下：
+
+```cpp
+// 核函数中调用 VF 函数的代码片段
+constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
+__ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
+__ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
+// 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数和循环次数
+asc_vf_call<GeluVfBasic>(xAddr, yAddr, singleCoreLength, loopNum);
 ```
 
 **样例配置**：
