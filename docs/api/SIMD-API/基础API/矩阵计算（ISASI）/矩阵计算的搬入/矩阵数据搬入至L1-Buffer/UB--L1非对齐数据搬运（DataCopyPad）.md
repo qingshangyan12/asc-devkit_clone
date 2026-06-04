@@ -45,7 +45,7 @@
 |参数名|输入/输出|描述|
 |---|---|---|
 |dst|输出|目的操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。<br>GlobalTensor的起始地址无地址对齐约束。|
+|src|输入|源操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。<br>GlobalTensor的起始地址无地址对齐约束。|
 |dataCopyParams|输入|搬运参数。<br>&bull; DataCopyExtParams类型，具体参数说明请参考[表4](#table10572141063919)。<br>&bull;|
 |nd2nzParams|输入|从VECIN/VECOUT->TSCM进行数据搬运时，可以进行ND到NZ的数据格式转换。nd2nzParams是用于控制数据格式转换的参数，Nd2NzParams类型，具体参数请参考[UB->L1随路转换-ND2NZ搬运（DataCopy）](UB--L1随路转换-ND2NZ搬运（DataCopy）.md)中的介绍。<br>**注意：本接口Nd2NzParams的ndNum仅支持设置为1**。|
 

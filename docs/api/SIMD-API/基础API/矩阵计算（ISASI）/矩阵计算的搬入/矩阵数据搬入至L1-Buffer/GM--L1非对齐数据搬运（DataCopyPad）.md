@@ -43,7 +43,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 |参数名|输入/输出|描述|
 |---|---|---|
 |dst|输出|目的操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。|
-|src|输入|源操作数，类型为LocalTensor或GlobalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。<br>GlobalTensor的起始地址无地址对齐约束。|
+|src|输入|源操作数，类型为GlobalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。<br>GlobalTensor的起始地址无地址对齐约束。|
 |dataCopyParams|输入|搬运参数。<br>&bull; DataCopyExtParams类型，具体参数说明请参考[表4](#table10572141063919)。|
 |padParams|输入|从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。<br>&bull; DataCopyPadExtParams类型，具体参数请参考[表6](#table844881954715)。|
 

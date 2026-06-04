@@ -65,9 +65,9 @@ DataCopy数据搬运支持将矩阵计算用到的bias参数从L1 Buffer移动�
 |参数名称|含义|
 |----------|----------|
 |blockCount|待搬运的连续传输数据块个数。uint16_t类型，取值范围：blockCount∈[0, 4095]。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）**。|
-|blockLen|待搬运的每个连续传输数据块长度，dst位于BiasTable Buffer时，单位为64B。uint16_t类型，取值范围：blockLen∈[0, 65535]。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）**。|
+|blockLen|待搬运的每个连续传输数据块长度，uint16_t类型，取值范围：blockLen∈[0, 65535]。<cann-filter npu_type="A3,910b"><br>针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，单位为64B。</cann-filter><cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT，单位为32B，blockLen必须为偶数。</cann-filter><br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）**。|
 |srcGap|源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32B）。uint16_t类型，srcGap∈[0, 2^16-1]。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当srcGap=0时，表示重复搬出源操作数的第一个数据块。|
-|dstGap|目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为DataBlock（32B）。uint16_t类型，dstGap∈[0, 2^16-1]。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。|
+|dstGap|目的操作数相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），uint16_t类型，dstGap∈[0, 2^16-1]。<cann-filter npu_type="A3,910b"><br>针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，单位为64B。</cann-filter><cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT，单位为32B。</cann-filter><br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。|
 
 ## 数据类型<a id="zh-cn_topic_0000002566886667_section4219135304818"></a>
 
