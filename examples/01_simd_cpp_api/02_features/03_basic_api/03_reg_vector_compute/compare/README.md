@@ -91,10 +91,10 @@ Compare接口一般与Select接口配合使用，该样例仅演示Compare和Sel
 
   在本样例目录下执行如下命令。
   ```bash
-  SCENARIO=1                                                                    # 执行场景1
+  SCENARIO_NUM=1                                                                    # 执行场景1
   mkdir -p build && cd build;                                                   # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                         # 生成测试输入数据
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM                         # 生成测试输入数据
   ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
