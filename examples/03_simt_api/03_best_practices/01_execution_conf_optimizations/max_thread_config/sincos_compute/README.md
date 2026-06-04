@@ -136,7 +136,7 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 **性能瓶颈**：
 - 寄存器溢出到Global Memory
 - 额外的栈空间访问增加延迟
-- DCache Read Vector / DCache Write Vector次数较高（5064次）
+- DCache Read Vector / DCache Write Vector次数较高（640次 / 768次）
 
 优化方向：通过`__launch_bounds__`提示编译器真实的`blockDim`，充分利用寄存器资源，避免寄存器溢出。
 
