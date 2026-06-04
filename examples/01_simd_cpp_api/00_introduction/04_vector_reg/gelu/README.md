@@ -2,8 +2,6 @@
 
 ## 算子概述
 
-> **适用产品**：本样例仅支持 Ascend 950PR / Ascend 950DT（NPU架构版本 dav-3510），使用 RegBase API 特性，需 CANN >= 9.0.0。
-
 **计算公式**：
 
 GELU 近似计算公式为：
