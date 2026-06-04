@@ -22,7 +22,7 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_VF_H
 
-#include "impl/tensor_api/arch/vector/cast/instruction.h"
+#include "impl/tensor_api/arch/vector/cast/cast_trait_map.h"
 
 namespace AscendC {
 namespace Te {
@@ -73,42 +73,7 @@ public:
     }
 };
 
-namespace CastRoundMode {
-struct Rint {};
-struct Round {};
-struct Floor {};
-struct Ceil {};
-struct Trunc {};
-}
-
-namespace CastSatMode {
-struct Sat {};
-struct NoSat {};
-}
-
-namespace CastIndexPos {
-struct Odd {};
-struct Even {};
-struct PartP0 {};
-struct PartP1 {};
-struct PartP2 {};
-struct PartP3 {};
-}
-
-struct CastTraitDefault {
-    using roundMode = Std::ignore_t;
-    using satMode = Std::ignore_t;
-    using indexPos = Std::ignore_t;
-};
-
-using CastTrait2CastFunc = TupleMap<
-    Std::tuple<Std::tuple<half, half, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<bfloat16_t, bfloat16_t, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<float, float, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<uint16_t, uint8_t, Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U162UInt8NoSatEven>>;
-
-
-template<typename CalcFunc, typename TraitType = CastTraitDefault<>>
+template<typename CalcFunc, typename TraitType>
 class Transform2CastInstMatch {
 public:
     template<typename T, typename U>
@@ -116,18 +81,22 @@ public:
     {
         using srcType = GetAttributeElementType<typename U::elementType*>;
         using dstType = GetAttributeElementType<typename T::elementType*>;
+        using trait = Std::conditional_t<Std::is_same_v<TraitType, Std::ignore_t>, CastTraitDefault, TraitType>;
 
-        using roundMode = Std::conditional_t<Std::is_same_v<srcType, dstType>, CalcFunc, typename TraitType::roundMode>;
-        using satMode = Std::conditional_t<Std::is_same_v<typename TraitType::satMode, CastSatMode::NoSat>, Std::ignore_t, typename TraitType::satMode>;
-        using indexPos = Std::conditional_t<(Std::is_same_v<typename TraitType::indexPos, CastIndexPos::PartP0> || Std::is_same_v<typename TraitType::indexPos, CastIndexPos::Even>), Std::ignore_t, typename trait::indexPos>;
+        using roundMode = Std::conditional_t<Std::is_same_v<srcType, dstType>, CalcFunc, typename trait::roundMode>;
+        using satMode = Std::conditional_t<Std::is_same_v<typename trait::satMode, CastSatMode::NoSat>,
+            Std::ignore_t, typename trait::satMode>;
+        using indexPos = Std::conditional_t<
+            (Std::is_same_v<typename trait::indexPos, CastIndexPos::Even> ||
+            Std::is_same_v<typename trait::indexPos, CastIndexPos::PartP0>),
+            Std::ignore_t, typename trait::indexPos>;
 
-        using condition = Std::tuple<typename srcType, typename dstType, 
-            roundMode, satMode, indexPos>;
+        using condition = Std::tuple<srcType, dstType, roundMode, satMode, indexPos>;
 
         using func = CastTrait2CastFunc::template Get<condition>;
         static_assert(!Std::is_same_v<func, Std::ignore_t>,
             "Unsupported cast trait: no matching entry found in CastTrait2CastFunc.");
-        Transform2CastVF<func, TraitType>::template Run(dst, src);
+        Transform2CastVF<func, condition>::template Run(dst, src);
     }
 };
 

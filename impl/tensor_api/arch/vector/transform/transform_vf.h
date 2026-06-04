@@ -33,7 +33,7 @@ class Transform2VF {
 private:
     using binarySet = Std::tuple<Inst::Add, Inst::Sub, Inst::Madd, Inst::And, Inst::Select, Inst::AbsSub, Inst::Min, Inst::Max,
         Inst::Or, Inst::Mul, Inst::ExpSubEven, Inst::ExpSubOdd, Inst::ShiftLeft, Inst::ShiftRight, Inst::Div, Inst::Xor, Inst::Prelu>;
-    using castSet = Std::tuple<Inst::Cast, Inst::Ceil>;
+    using castSet = Std::tuple<Inst::Cast, Inst::Rint, Inst::Round, Inst::Floor, Inst::Ceil, Inst::Trunc>;
 
     using transformSet = TupleMap<
         Std::tuple<castSet, Transform2CastInstMatch<CalcFunc, TraitType>>,
