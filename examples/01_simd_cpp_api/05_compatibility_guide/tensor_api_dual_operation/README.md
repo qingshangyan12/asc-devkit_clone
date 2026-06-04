@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍基于 Tensor API 的 Exp 算子核函数直调方法，算子支持单核运行。与传统的 Ascend C Vector API 不同，本样例使用 `tensor_api` 提供的 `MakeTensor`、`MakeCopy`、`Transform` 等接口完成数据的搬运与计算，展示了更高层次的张量编程模型。
+本样例介绍基于 Tensor API 的 Mull 算子核函数直调方法，算子支持单核运行。与传统的 Ascend C Vector API 不同，本样例使用 `tensor_api` 提供的 `MakeTensor`、`MakeCopy`、`Transform` 等接口完成数据的搬运与计算，展示了更高层次的张量编程模型。
 
 ## 支持的产品
 
@@ -14,24 +14,26 @@
 ├── vector_add_tensor_api
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── run.sh                   // 一键编译运行脚本
-│   └── vector_add.asc           // Ascend C算子实现 & 调用样例（含数据生成与结果验证）
+│   └── vector_mull.asc           // Ascend C算子实现 & 调用样例（含数据生成与结果验证）
 ```
 
 ## 算子描述
 
 - 算子功能：
-  Exp算子实现对输入数据进行指数计算的功能。对应的数学表达式为：
+  Mull算子实现对输入数据进行带溢出的乘法。对应的数学表达式为：
   ```
-  z = e^x
+  z = x * y
   ```
 - 算子规格：
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Exp</td></tr>
+  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Mull</td></tr>
   </tr>
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td rowspan="2" align="center">算子输入</td><td align="center">x</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="2" align="center">算子输出</td><td align="center">z0</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">z1</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">exp_custom</td></tr>
   </table>
@@ -40,7 +42,7 @@
 
   1. 通过 `MakeTensor` + `MakeFrameLayout<NDExtLayoutPtn>` 创建 GM 和 UB 侧的张量对象。
   2. 通过 `MakeCopy(CopyGM2UB{})` / `MakeCopy(CopyUB2GM{})` 创建拷贝原子操作，使用 `Copy` 接口完成 GM 与 UB 之间的数据搬运。
-  3. 使用 `Transform<Exp>` 对输入张量执行逐元素指数运算。
+  3. 使用 `Transform<Mull>` 对输入张量执行支持溢出的逐元素乘法运算。
   4. 通过 `asc_sync_notify` / `asc_sync_wait` 进行流水线同步，确保搬运与计算之间的依赖关系。
 
   主机侧程序在 `main` 函数中生成随机输入数据并计算 golden 结果，核函数执行后将 Device 侧结果拷贝回 Host，逐元素对比验证正确性。

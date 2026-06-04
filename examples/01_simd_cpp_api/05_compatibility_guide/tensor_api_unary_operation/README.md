@@ -14,7 +14,7 @@
 ├── vector_add_tensor_api
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── run.sh                   // 一键编译运行脚本
-│   └── vector_add.asc           // Ascend C算子实现 & 调用样例（含数据生成与结果验证）
+│   └── vector_exp.asc           // Ascend C算子实现 & 调用样例（含数据生成与结果验证）
 ```
 
 ## 算子描述
@@ -26,14 +26,11 @@
   ```
 - 算子规格：
   <table>
-  <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">Exp</td></tr>
-  </tr>
-  <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">z</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">exp_custom</td></tr>
+    <tr><td align="center">算子类型(OpType)</td><td colspan="4" align="center">Exp</td></tr>
+    <tr><td align="center"></td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+    <tr><td align="center">算子输入</td><td align="center">x</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+    <tr><td align="center">算子输出</td><td align="center">z</td><td align="center">1 * 256</td><td align="center">float</td><td align="center">ND</td></tr>
+    <tr><td align="center">核函数名</td><td colspan="4" align="center">exp_custom</td></tr>
   </table>
 - 算子实现：
   本样例使用 Tensor API 编程模型，核心流程如下：
