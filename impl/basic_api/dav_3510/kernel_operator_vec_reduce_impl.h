@@ -385,6 +385,14 @@ __aicore__ inline void RepeatReduceSumImpl(__ubuf__ U *dstLocal, __ubuf__ T *src
         U>(dstLocal, srcLocal, repeat, dstRepStride, 1, srcBlkStride, srcRepStride, maskReg);
 }
 
+namespace Internal {
+__BLOCK_LOCAL__ static __inline__ uint64_t g_packedValue;
+__BLOCK_LOCAL__ static __inline__ uint64_t g_wholeReduceSrcLocal;
+__BLOCK_LOCAL__ static __inline__ uint64_t g_packedStride;
+__BLOCK_LOCAL__ static __inline__ uint64_t g_wholeReduceMask0;
+__BLOCK_LOCAL__ static __inline__ uint64_t g_wholeReduceMask1;
+}
+
 /* **************************************** Whole Reduce Interface ****************************************** */
 template <typename T, bool isSetMask = true>
 __aicore__ inline void WholeReduceMaxImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal, const uint64_t mask[],
@@ -401,25 +409,23 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
         oneRepOffset = 2;
     }
 
-    // save the src address and count for GetReduceMaxMinCountImpl
-    LocalTensor<uint64_t> popBuffer;
-    const bool ret = PopStackBuffer<uint64_t, TPosition::LCM>(popBuffer);
     // 124 indicating this is a max call, this value also works as a parity for GetReduceMaxMinCountImpl
-    uint16_t maxMinParity = 124;
+    constexpr uint16_t maxMinParity = 124;
     // similarly, 110 indicating this is a bitwise mask
-    uint16_t bitNonBitParity = 110;
+    constexpr uint16_t bitNonBitParity = 110;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
     packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
-    popBuffer.SetValue(0, packed_value);
-    popBuffer.SetValue(1, reinterpret_cast<uint64_t>(srcLocal));
-    popBuffer.SetValue(2, (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride);
-    popBuffer.SetValue(3, mask[0]);
+    Internal::g_packedValue = packed_value;
+    Internal::g_wholeReduceSrcLocal = reinterpret_cast<uint64_t>(srcLocal);
+    Internal::g_packedStride = (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride;
+    Internal::g_wholeReduceMask0 = mask[0];
     if constexpr (sizeof(T) == 2) {
-        popBuffer.SetValue(4, mask[1]);
+        Internal::g_wholeReduceMask1 = mask[1];
     }
+
     ReduceTemplate<isSetMask, true, Reg::ReduceMax<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>>(
         dstLocal, srcLocal, repeat, dstRepStride, oneRepOffset, srcBlkStride, srcRepStride, mask[0], order);
 }
@@ -439,21 +445,20 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     }
 
     // save the src address and count for GetReduceMaxMinCountImpl
-    LocalTensor<uint64_t> popBuffer;
-    const bool ret = PopStackBuffer<uint64_t, TPosition::LCM>(popBuffer);
     // 124 indicating this is a max call, this value also works as a parity for GetReduceMaxMinCountImpl
-    uint32_t maxMinParity = 124;
+    constexpr uint32_t maxMinParity = 124;
     // similarly, 111 indicating this is a continuous mask
-    uint32_t bitNonBitParity = 111;
+    constexpr uint32_t bitNonBitParity = 111;
+
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
     packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
-    popBuffer.SetValue(0, packed_value);
-    popBuffer.SetValue(1, reinterpret_cast<uint64_t>(srcLocal));
-    popBuffer.SetValue(2, (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride);
-    popBuffer.SetValue(3, static_cast<uint64_t>(mask));
+    Internal::g_packedValue = packed_value;
+    Internal::g_wholeReduceSrcLocal = reinterpret_cast<uint64_t>(srcLocal);
+    Internal::g_packedStride = (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride;
+    Internal::g_wholeReduceMask0 = static_cast<uint64_t>(mask);
 
     ReduceTemplate<isSetMask, false, Reg::ReduceMax<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>>(
         dstLocal, srcLocal, repeat, dstRepStride, oneRepOffset, srcBlkStride, srcRepStride, maskReg, order);
@@ -475,23 +480,21 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     }
 
     // save the src address and count for GetReduceMaxMinCountImpl
-    LocalTensor<uint64_t> popBuffer;
-    const bool ret = PopStackBuffer<uint64_t, TPosition::LCM>(popBuffer);
     // 123 indicating this is a min call, this value also works as a parity for GetReduceMaxMinCountImpl
-    uint32_t maxMinParity = 123;
+    constexpr uint32_t maxMinParity = 123;
     // similarly, 110 indicating this is a bitwise mask
-    uint32_t bitNonBitParity = 110;
+    constexpr uint32_t bitNonBitParity = 110;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
     packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
-    popBuffer.SetValue(0, packed_value);
-    popBuffer.SetValue(1, reinterpret_cast<uint64_t>(srcLocal));
-    popBuffer.SetValue(2, (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride);
-    popBuffer.SetValue(3, mask[0]);
+    Internal::g_packedValue = packed_value;
+    Internal::g_wholeReduceSrcLocal = reinterpret_cast<uint64_t>(srcLocal);
+    Internal::g_packedStride = (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride;
+    Internal::g_wholeReduceMask0 = mask[0];
     if constexpr (sizeof(T) == 2) {
-        popBuffer.SetValue(4, mask[1]);
+        Internal::g_wholeReduceMask1 = mask[1];
     }
 
     ReduceTemplate<isSetMask, true, Reg::ReduceMin<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>>(
@@ -512,21 +515,19 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ T *dstLocal, __ubuf__ T *srcL
     }
 
     // save the src address and count for GetReduceMaxMinCountImpl
-    LocalTensor<uint64_t> popBuffer;
-    const bool ret = PopStackBuffer<uint64_t, TPosition::LCM>(popBuffer);
     // 123 indicating this is a min call, this value also works as a parity for GetReduceMaxMinCountImpl
-    uint32_t maxMinParity = 123;
+    constexpr uint32_t maxMinParity = 123;
     // similarly, 111 indicating this is a continuous mask
-    uint32_t bitNonBitParity = 111;
+    constexpr uint32_t bitNonBitParity = 111;
     uint64_t packed_value = 0;
     packed_value |= (static_cast<uint64_t>(maxMinParity) << 48);
     packed_value |= (static_cast<uint64_t>(bitNonBitParity) << 32);
     packed_value |= (static_cast<uint64_t>(isSetMask) << 16);
     packed_value |= static_cast<uint64_t>(repeat);
-    popBuffer.SetValue(0, packed_value);
-    popBuffer.SetValue(1, reinterpret_cast<uint64_t>(srcLocal));
-    popBuffer.SetValue(2, (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride);
-    popBuffer.SetValue(3, static_cast<uint64_t>(mask));
+    Internal::g_packedValue = packed_value;
+    Internal::g_wholeReduceSrcLocal = reinterpret_cast<uint64_t>(srcLocal);
+    Internal::g_packedStride = (static_cast<uint64_t>(srcRepStride) << 32) | srcBlkStride;
+    Internal::g_wholeReduceMask0 = static_cast<uint64_t>(mask);
 
     ReduceTemplate<isSetMask, false, Reg::ReduceMin<T, Reg::MaskMergeMode::ZEROING, Reg::RegTensor<T>>>(
         dstLocal, srcLocal, repeat, dstRepStride, oneRepOffset, srcBlkStride, srcRepStride, maskReg, order);
@@ -1458,32 +1459,27 @@ __aicore__ inline void GetReduceMaxMinCountImpl(T &maxMinValue, T &maxMinIndex)
     // retrieve saved src address and count
     LocalTensor<uint64_t> popBuffer;
     __ubuf__ uint64_t* popBufferAddress = (__ubuf__ uint64_t*)popBuffer.GetPhyAddr() + 8;
-    bool ret = PopStackBuffer<uint64_t, TPosition::LCM>(popBuffer);
-    uint64_t reduceMaxMinProperty = popBuffer.GetValue(0);
-    bool isMax = static_cast<uint16_t>(reduceMaxMinProperty >> 48) == 124;
-    bool bitwiseMask = static_cast<uint16_t>(reduceMaxMinProperty >> 32) == 110;
-    bool isSetMask = static_cast<uint16_t>(reduceMaxMinProperty >> 16);
-    uint32_t repeat = static_cast<uint32_t>(static_cast<uint16_t>(reduceMaxMinProperty));
-    __ubuf__ T* src =reinterpret_cast<__ubuf__ T*>(popBuffer.GetValue(1));
-    uint64_t strideConfig = popBuffer.GetValue(2);
-    uint32_t srcRepStride = static_cast<uint32_t>(strideConfig >> 32);
-    uint32_t srcBlkStride = static_cast<uint32_t>(strideConfig & 0xFFFFFFFFULL);
-    uint64_t mask0 = popBuffer.GetValue(3);
+
+    bool isMax = static_cast<uint16_t>(Internal::g_packedValue >> 48) == 124;
+    bool bitwiseMask = static_cast<uint16_t>(Internal::g_packedValue >> 32) == 110;
+    bool isSetMask = static_cast<uint16_t>(Internal::g_packedValue >> 16);
+    uint32_t repeat = static_cast<uint32_t>(static_cast<uint16_t>(Internal::g_packedValue));
+    __ubuf__ T* src =reinterpret_cast<__ubuf__ T*>(Internal::g_wholeReduceSrcLocal);
+    uint32_t srcRepStride = static_cast<uint32_t>(Internal::g_packedStride >> 32);
+    uint32_t srcBlkStride = static_cast<uint32_t>(Internal::g_packedStride & 0xFFFFFFFFULL);
+    uint64_t mask0 = Internal::g_wholeReduceMask0;
     uint64_t mask1 = 0;
     if constexpr (sizeof(T) == 2) {
-        mask1 = popBuffer.GetValue(4);
+        mask1 = Internal::g_wholeReduceMask1;
     }
     bool isCounterMode = Internal::IsCounterMode();
 
-    TEventID eventID = GetTPipePtr()->AllocEventID<HardEvent::V_S>();
     if (!isSetMask && bitwiseMask) {
         GetReduceMaxMinCountImplVF<T>(popBufferAddress);
-        SetFlag<HardEvent::V_S>(eventID);
-        WaitFlag<HardEvent::V_S>(eventID);
+        PipeBarrier<PIPE_ALL>();
         mask0 = popBufferAddress[0];
         mask1 = popBufferAddress[1];
     }
-    GetTPipePtr()->ReleaseEventID<AscendC::HardEvent::V_S>(eventID);
 
     uint32_t maxMinInd = -1;
     IterateSrc<T>(
