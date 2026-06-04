@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口为软仿接口，基于易用性角度进行设计，支持在从UB到GM的数据搬运过程中进行NZ到ND格式的转换。
+该接口为软仿接口，从易用性角度出发进行设计，支持在从UB到GM的数据搬运过程中进行NZ到ND格式的转换。
 
 ## 函数原型<a name="section1792117555586"></a>
 
@@ -39,7 +39,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。 |
 | src | 输入 | 源操作数，类型为LocalTensor。 |
-| intriParams | 输入 | 搬运参数，类型为[Nz2NdParamsFull](#table15841351172811)。<br>具体定义请参考${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[Nz2NdParamsFull](#table15841351172811)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nz2NdParamsFull结构体内参数定义
 
@@ -48,18 +48,18 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | ndNum | 传输NZ矩阵的数目，取值范围：ndNum∈[0, 4095]。 |
 | nValue | NZ矩阵的行数，取值范围：nValue∈[1, 8192]。 |
 | dValue | NZ矩阵的列数，取值范围：dValue∈[1, 8192]。dValue必须为16的倍数。 |
-| srcNdMatrixStride | 源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256 (16 * 16) 个元素。 |
+| srcNdMatrixStride | 源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256（16 \* 16）个元素。 |
 | srcNStride | 源同一NZ矩阵的相邻Z排布的偏移（头与头），取值范围：srcNStride∈[0, 4096]，单位16个元素。 |
 | dstDStride | 目的ND矩阵的相邻行的偏移（头与头），取值范围：dstDStride∈[1, 65535]，单位为元素。 |
 | dstNdMatrixStride | 目的ND矩阵中，来自源相邻NZ矩阵的偏移（头与头），取值范围：dstNdMatrixStride∈[1, 65535]，单位为元素。 |
 
 以half数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
 
-- ndNum = 2，表示源NZ矩阵的数目为2 \(NZ矩阵1为A1\~A4 + B1\~B4，NZ矩阵2为C1\~C4 + D1\~D4\)。
+- ndNum = 2，表示源NZ矩阵的数目为2（NZ矩阵1为A1\~A4 + B1\~B4，NZ矩阵2为C1\~C4 + D1\~D4）。
 - nValue = 4，NZ矩阵的行数，也就是矩阵的高度为4。
 - dValue = 32，NZ矩阵的列数，也就是矩阵的宽度为32个元素。
-- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即为A1\~C1的距离，即为256个元素\(16个DataBlock \* 16个元素\)。
-- srcNStride = 4,  表示同一个源NZ矩阵的相邻Z排布的偏移，即为A1到B1的距离，即为64个元素\(4个DataBlock\* 16个元素\)。
+- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即为A1\~C1的距离，即为256个元素（16个DataBlock \* 16个元素）。
+- srcNStride = 4，表示同一个源NZ矩阵的相邻Z排布的偏移，即为A1到B1的距离，即为64个元素（4个DataBlock \* 16个元素）。
 - dstDStride = 160，表达一个目的ND矩阵的相邻行之间的偏移，即A1和A2之间的距离，即为10个DataBlock，即10 \* 16 = 160个元素。
 - dstNdMatrixStride = 48，表达dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，即为3个DataBlock，3 \* 16 = 48个元素。
 
@@ -68,11 +68,11 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 以float数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
 
-- ndNum = 2，表示源NZ矩阵的数目为2 \(NZ矩阵1为A1\~A8 + B1\~B8，NZ矩阵2为C1\~C8 + D1\~D8\)。
+- ndNum = 2，表示源NZ矩阵的数目为2（NZ矩阵1为A1\~A8 + B1\~B8，NZ矩阵2为C1\~C8 + D1\~D8）。
 - nValue = 4，NZ矩阵的行数，也就是矩阵的高度为4。
 - dValue = 32，NZ矩阵的列数，也就是矩阵的宽度为32个元素。
-- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即A1到C1的距离，为256个元素\(32个DataBlock \* 8个元素\)
-- srcNStride = 4,  表示同一个源NZ矩阵的相邻Z排布的偏移，即A1到B1的距离，为64个元素 \(8个DataBlock \* 8个元素\)。
+- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即A1到C1的距离，为256个元素（32个DataBlock \* 8个元素）
+- srcNStride = 4，表示同一个源NZ矩阵的相邻Z排布的偏移，即A1到B1的距离，为64个元素（8个DataBlock \* 8个元素）。
 - dstDStride = 144，表示一个目的ND矩阵的相邻行之间的偏移，即A1和A3之间的距离，为18个DataBlock，即18 \* 8 = 144个元素。
 - dstNdMatrixStride = 40，表示dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，为5个DataBlock，5 \* 8 = 40个元素。
 
@@ -111,7 +111,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 约束说明<a name="section830051273220"></a>
 
-该接口为软仿接口，基于易用性角度进行设计。
+该接口为软仿接口，从易用性角度出发进行设计。
 
 ## 调用示例<a name="section2409153316111"></a>
 

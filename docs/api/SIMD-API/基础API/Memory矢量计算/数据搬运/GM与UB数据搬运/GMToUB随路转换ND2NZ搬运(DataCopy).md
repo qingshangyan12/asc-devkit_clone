@@ -8,7 +8,7 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | √ </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>|
 |<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 |<cann-filter npu-type="x90"> Kirin X90 | x </cann-filter>|
@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口为软仿接口，基于易用性角度进行设计，支持在从GM到UB的数据搬运过程中进行ND到NZ格式的转换。
+该接口为软仿接口，从易用性角度出发进行设计，支持在从GM到UB的数据搬运过程中进行ND到NZ格式的转换。
 
 ## 函数原型<a name="section1954364615315"></a>
 
@@ -54,7 +54,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。 |
-| intriParams | 输入 | 搬运参数，类型为[Nd2NzParams](#table844881954715)。<br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[Nd2NzParams](#table844881954715)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nd2NzParams结构体参数定义
 
@@ -75,7 +75,7 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 - nValue = 2，ND矩阵的行数，也就是矩阵的高度为2。
 - dValue = 24，ND矩阵的列数，也就是矩阵的宽度为24个元素。当dValue不满足32B对齐时，在目的操作数中不足的部分会被补齐为0，例如图示中A2所在DataBlock的空白部分会被补齐为0。
 - srcNdMatrixStride = 144，表达相邻ND矩阵起始地址间的偏移，即为A1\~C1的距离，即为9个DataBlock，9 \* 16 = 144个元素。
-- srcDValue = 48，表示一行的所含元素个数，即为A1到B1的距离，即为3个DataBlock，3 \* 16 = 48个元素
+- srcDValue = 48，表示一行的所含元素个数，即为A1到B1的距离，即为3个DataBlock，3 \* 16 = 48个元素。
 - dstNzC0Stride = 11。ND转换到NZ格式后，源操作数中的一行会转换为目的操作数的多行，例如src中A1和A2为1行，dst中A1和A2被分为2行。多行数据起始地址之间的偏移就是A1和A2在dst中的偏移，偏移为11个DataBlock。
 - dstNzNStride = 2，表示src中一个ND矩阵的第x行和第x+1行转换为NZ格式后在dst中的偏移，即A1和B1在dst之间的偏移为2个DataBlock。
 - dstNzMatrixStride = 96，表达dst中第x个ND矩阵的起点和第x+1个ND矩阵的起点的偏移，即A1和C1之间的距离，即为6个DataBlock，6 \* 16 = 96个元素。
@@ -120,7 +120,7 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 ## 约束说明<a name="section1140315215118"></a>
 
-- 该接口为软仿接口，基于易用性角度进行设计。
+- 该接口为软仿接口，从易用性角度出发进行设计。
 <cann-filter npu-type="310p">
 
 - 针对Atlas 推理系列产品AI Core，需要预留8K的UB空间，作为接口的临时数据存放区。

@@ -8,8 +8,8 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品 Vector Core | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
 
@@ -21,7 +21,7 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
--   GM-\> UB ，支持多维度搬运
+-   GM->UB，支持多维度搬运
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
@@ -38,7 +38,7 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 源操作数或者目的操作数的数据类型。 |
-| dim | 搬运的数据维度, 数据类型为uint8_t，支持的维度为[1, 5]。 |
+| dim | 搬运的数据维度，数据类型为uint8_t，支持的维度为[1, 5]。 |
 | config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考[表 NdDmaConfig结构体参数定义](#table9182515919)。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special scenario.<br>};</pre> |
 
 **表 2**  参数说明
@@ -47,7 +47,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。 |
-| params | 输入 | 搬运参数 NdDmaParams类型，定义如下，具体参数说明请参考[表 NdDmaParams结构体参数定义](#table1247813351789)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表 NdDmaLoopInfo结构体参数定义](#table725271775813)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意: dim的有效范围为[1,5]</pre> |
+| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表3](#table1247813351789)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表3](#table725271775813)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]</pre> |
 
 **表 3**  NdDmaConfig结构体参数定义
 
@@ -63,7 +63,7 @@
 
 | 参数名称 | 含义 |
 | :--- | :--- |
-| loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考[表 NdDmaLoopInfo结构体参数定义](#table725271775813)。 |
+| loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考[表4](#table725271775813)。 |
 | constantValue | 数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>当数据类型为b64时，参数constantValue的值应为0。 |
 
 **表 5**  NdDmaLoopInfo结构体参数定义
@@ -72,9 +72,9 @@
 | :--- | :--- |
 | loopSrcStride | 表示每个维度内，该源操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint64_t，srcStride需在[0, 2<sup>40</sup>)。 |
 | loopDstStride | 表示每个维度内，该目的操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint32_t，dstStride需在[0, 2<sup>20</sup>)。 |
-| loopSize | 表示每个维度内，处理的元素个数（不包含Padding元素）。<br>单位为元素个数。数据类型为uint32_t，dstStride需在[0, 2<sup>20</sup>)。 |
-| loopLpSize | 表示每个维度内，左侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，srcStride不要超出该数据类型的取值范围。 |
-| loopRpSize | 表示每个维度内，右侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，srcStride不要超出该数据类型的取值范围。 |
+| loopSize | 表示每个维度内，处理的元素个数（不包含Padding元素）。<br>单位为元素个数。数据类型为uint32_t，loopSize需在[0, 2<sup>20</sup>)。 |
+| loopLpSize | 表示每个维度内，左侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopLpSize不要超出该数据类型的取值范围。 |
+| loopRpSize | 表示每个维度内，右侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopRpSize不要超出该数据类型的取值范围。 |
 
 以下以2维的例子介绍几个典型使用场景。
 

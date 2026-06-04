@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section474617392321"></a>
 
-头文件为: \#include "basic\_api/kernel\_operator\_data\_copy\_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 支持GM与UB之间的高维切分数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
 
@@ -54,20 +54,20 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。 |
 | src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。 |
-| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  DataCopyParams结构体参数定义
 
 | 参数名称 | 含义 |
 | --- | --- |
-| blockCount | 搬运的数据块个数。uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter>|
-| blockLen | 搬运的每个数据块长度。uint16_t类型，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
+| blockCount | 搬运的数据块个数。uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter>|
+| blockLen | 搬运的每个数据块长度。uint16_t类型，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
 | srcGap | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。 |
 | dstGap | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。 |
 
 下面的样例通过两个示例展示连续搬运和非连续搬运的使用方式。
 
-针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy)-7.md#ZH-CN_TOPIC_0000002544407902)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md#ZH-CN_TOPIC_0000002544407902)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 以half数据类型为例，源操作数的shape为1 \* 128。
 
@@ -79,7 +79,7 @@
 -   dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
 **图 1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>  
-![](../../../../../figures/连续搬运示意图.png "连续搬运示意图")
+![](../../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
 
 以half数据类型为例，源操作数的shape为1 \* 112。
 
@@ -91,7 +91,7 @@
 -   dstGap= 2，目的操作数相邻数据块之间的间隔为2。
 
 **图 2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>  
-![](../../../../../figures/非连续搬运示意图.png "非连续搬运示意图")
+![](../../../../../figures/discontinuous_data_copy_diagram.png "非连续搬运示意图")
 
 ## 数据类型<a name="section4219135304818"></a>
 
@@ -158,7 +158,7 @@
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
-- <cann-filter npu-type = "A3,910b">当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：
+- <cann-filter npu-type = "A3,910b">当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 </cann-filter>
@@ -175,7 +175,7 @@
 
 - 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
-    ![](../../../../../figures/绘图4.png)
+    ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
 <cann-filter npu-type="910b,A3">
 
@@ -187,9 +187,9 @@
 
 - GM -> UB
 
-    ```
-    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
-    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
+    ```cpp
+    // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
+    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
@@ -200,16 +200,16 @@
 
     结果示例：
 
-    ```
+    ```text
     输入数据srcGlobal：[1 2 3 ... 512]
     输出数据srcLocal：[1 2 3 ... 512]
     ```
 
 - UB -> GM
 
-    ```
-    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
-    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
+    ```cpp
+    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
+    // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     DataCopyParams intriParams;
     intriParams.blockCount = 1; // 连续数据块个数为1
     intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
@@ -220,7 +220,7 @@
 
     结果示例：
 
-    ```
+    ```text
     输入数据dstLocal：[1 2 3 ... 512]
     输出数据dstGlobal：[1 2 3 ... 512]
     ```

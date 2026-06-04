@@ -14,7 +14,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件为: #include "basic_api/kernel_operator_data_copy_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。
 
@@ -26,49 +26,50 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type="950">
-```
 针对Ascend 950PR/Ascend 950DT，支持设置数据搬运模式mode（搬运模式包括单次搬运对齐和整块数据搬运对齐）：
+
+```cpp
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
 ```
 </cann-filter>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 2**  模板参数说明
+**表 1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数以及paddingValue（待填充数据值）的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
 | <cann-filter npu-type="950">mode | 该参数仅Ascend 950PR/Ascend 950DT支持，配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre></cann-filter> |
 
-**表 3**  接口参数说明
+**表 2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为Unified Buffer，目的地址需要32B对齐。 |
 | src | 输入 | 源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1B对齐。 |
-| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考表4。 |
-| padParams | 输入 | 从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考表5。 |
+| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考表3。 |
+| padParams | 输入 | 从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考表4。 |
 
-下文表格中列出的结构体参数定义请参考`INSTALL_DIR`/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，`INSTALL_DIR`请替换为CANN软件安装后文件存储路径。
+下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 4**  DataCopyExtParams结构体参数定义
+**表 3**  DataCopyExtParams结构体参数定义
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| blockCount | 搬运的数据块个数，uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）**。 |
-| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为 NOP（空操作）**。**blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限。** |
+| blockCount | 搬运的数据块个数，uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）**。 |
+| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为NOP（空操作）**。**blockLen必须是sizeof(T)的整数倍，需要注意UB不要超限。** |
 | srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。 |
 | dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意UB不要超限**。 |
 | rsv | 保留字段。uint32_t类型，默认值为0。 |
 
-**表 5**  DataCopyPadExtParams&lt;T&gt;结构体参数定义
+**表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义
 
 | 参数名称 | 含义 |
 | :--- | :--- |
@@ -155,7 +156,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 -   位于Global Memory的源地址必须1B对齐，位于Unified Buffer的目的地址必须32B对齐。
 -   leftPadding、rightPadding所占字节数均不能超过32B。
--   blockLen必须是 sizeof\(T\) 的整数倍。
+-   blockLen必须是sizeof\(T\)的整数倍。
 -   结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
 -   结构体DataCopyPadExtParams的参数取值范围需要考虑UB超限问题。
 
@@ -163,16 +164,16 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 本示例实现了GM->VECIN的非对齐搬运过程，完整使用样例请参见[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
 
-```
+```cpp
 AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0};
 AscendC::DataCopyPadExtParams<half> padParams{true, 0, 2, 0};
-// 从GM->VECIN搬运40字节
+// 从GM->VECIN搬运40字节。
 AscendC::DataCopyPad(dstGlobal, src0Global, copyParams, padParams);
 ```
 
 结果示例：
 
-```
+```text
 输入数据src0Global: [1 2 3 ... 32]
 输出数据dstGlobal:[1 2 3 ... 20]
 ```

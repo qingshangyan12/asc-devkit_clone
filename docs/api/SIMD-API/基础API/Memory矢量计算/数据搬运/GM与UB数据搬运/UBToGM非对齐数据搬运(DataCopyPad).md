@@ -14,11 +14,11 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件为: #include "basic_api/kernel_operator_data_copy_intf.h"
+头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。
 
--   如[图1](#fig_datacopypad3)所示，对于32B对齐搬运搬运场景，从UB读取的所有数据都会搬运至GM。
+-   如[图1](#fig_datacopypad3)所示，对于32B对齐搬运场景，从UB读取的所有数据都会搬运至GM。
 -   如[图2](#fig_datacopypad4)所示，对于非32B对齐的场景，在读取UB数据时会填入dummy假数据，对齐到32B，搬入GM时会将dummy空数据丢弃，从而实现UB到GM的非对齐搬运。
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -26,43 +26,43 @@
 <cann-filter npu-type="950">
 针对Ascend 950PR/Ascend 950DT，支持设置数据搬运模式mode（搬运模式包括单次搬运对齐和整块数据搬运对齐）：
 
-```
+```cpp
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
 ```
 </cann-filter>
 
-```
+```cpp
 template <typename T>
 __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 2**  模板参数说明
+**表 1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
 | <cann-filter npu-type="950">mode | 该参数仅Ascend 950PR/Ascend 950DT支持，配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre></cann-filter> |
 
-**表 3**  接口参数说明
+**表 2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。<br>起始地址无地址对齐约束。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>起始地址需要保证32字节对齐。 |
-| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考表4。 |
+| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考表3。 |
 
-下文表格中列出的结构体参数定义请参考`INSTALL_DIR`/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，`INSTALL_DIR`请替换为CANN软件安装后文件存储路径。
+下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 4**  DataCopyExtParams结构体参数定义
+**表 3**  DataCopyExtParams结构体参数定义
 
 | 参数名称 | 含义 |
 | :--- | :--- |
-| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[1, 4095]。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter> |
-| blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限**。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为 NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
-| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock(32字节)。<br>数据类型为uint32_t，srcStride不要超出该数据类型的取值范围。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。 |
+| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[1, 4095]。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter> |
+| blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是sizeof(T)的整数倍，需要注意UB不要超限**。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
+| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为uint32_t，srcStride不要超出该数据类型的取值范围。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。 |
 | dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，dstStride不要超出该数据类型的取值范围。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 2^40-1]。 |
 | rsv | 保留字段。 |
 
@@ -70,7 +70,7 @@ __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor
 
 - 32B对齐场景<a name="32B对齐场景"></a>
 
-    如[图1](#fig_datacopypad3)所示，blockLen为64，每个连续传输数据块包含64字节；srcStride为1，源操作数的逻辑位置为VECIN/VECOUT，srcStride的单位为dataBlock(32字节)，即源操作数相邻数据块之间间隔1个dataBlock；dstStride为1，目的操作数的逻辑位置为GM，dstStride的单位为字节，即目的操作数相邻数据块之间间隔1字节。
+    如[图1](#fig_datacopypad3)所示，blockLen为64，每个连续传输数据块包含64字节；srcStride为1，源操作数的逻辑位置为VECIN/VECOUT，srcStride的单位为dataBlock（32字节），即源操作数相邻数据块之间间隔1个dataBlock；dstStride为1，目的操作数的逻辑位置为GM，dstStride的单位为字节，即目的操作数相邻数据块之间间隔1字节。
 
     对于32B对齐搬运场景，从UB读取的所有数据都会搬运至GM。
 
@@ -134,15 +134,15 @@ __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor
 
 本示例实现了UB->GM的非对齐搬运过程，完整使用样例请参见[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
 
-```
+```cpp
 AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0};
-// 从VECIN->GM搬运40字节
+// 从VECIN->GM搬运40字节。
 AscendC::DataCopyPad(dstGlobal, srcLocal, copyParams);
 ```
 
 结果示例：
 
-```
+```text
 输入数据srcLocal: [1 2 3 ... 32]
 输出数据dstGlobal:[1 2 3 ... 20]
 ```
