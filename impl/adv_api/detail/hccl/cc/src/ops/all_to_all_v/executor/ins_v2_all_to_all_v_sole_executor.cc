@@ -12,8 +12,8 @@
 #include "ins_temp_dpu_alltoall_mesh.h"
 #include <cstddef>
 #ifndef AICPU_COMPILE
-#include "ccu_temp_all_to_all_mesh_1D.h"
 /*
+#include "ccu_temp_all_to_all_mesh_1D.h"
 #include "ccu_temp_all_to_all_mesh2die.h"
 #include "ccu_temp_all_to_all_mesh1d_multi_jetty.h"
 */
@@ -334,9 +334,9 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLVC, InsAlltoAllVCMesh1DDPU, InsV2
     InsTempDpuAlltoAllMesh);
 
 #ifndef AICPU_COMPILE
+/*
     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1D, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
         CcuTempAlltoAllMesh1D);
-/*
     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAllToAllMesh2Die, InsV2AlltoAllVSoleExecutor, TopoMatch1D,
     CcuTempAllToAllMesh2Die);
     REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALL, CcuAlltoAllMesh1DMultiJetty, InsV2AlltoAllVSoleExecutor,
