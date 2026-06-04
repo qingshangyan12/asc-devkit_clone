@@ -196,32 +196,21 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 | 优化手段 | 核心原理              | 适用场景                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 短向量  | 底层指令支持一次完成两个数据的计算 | 1、half/bfloat16_t类型元素进行[基本运算](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/%E7%BC%96%E7%A8%8B%E6%8C%87%E5%8D%97/%E8%AF%AD%E8%A8%80%E6%89%A9%E5%B1%95%E5%B1%82/SIMT-BuiltIn%E5%85%B3%E9%94%AE%E5%AD%97.md#运算符)，更多短向量类型参见[完整类型列表](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+| 短向量  | 底层指令支持一次完成两个数据的计算 | 1、half/bfloat16_t类型元素进行[基本运算](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，更多短向量类型参见[完整类型列表](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
 
 ---
 
 ## 编译运行
 
-- 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+在本样例根目录下执行如下步骤，编译并执行样例。
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
-    - 默认路径，root用户安装CANN软件包
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-      ```bash
-      source /usr/local/Ascend/cann/set_env.sh
-      ```
-
-    - 默认路径，非root用户安装CANN软件包
-
-      ```bash
-      source $HOME/Ascend/cann/set_env.sh
-      ```
-
-    - 指定路径install_path，安装CANN软件包
-
-      ```bash
-      source ${install_path}/cann/set_env.sh
-      ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
