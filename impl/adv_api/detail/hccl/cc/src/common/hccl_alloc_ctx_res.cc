@@ -482,7 +482,6 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     if (opParam.engine == COMM_ENGINE_CCU) {
         uint64_t token;
         CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
@@ -496,6 +495,7 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         resCtxHost->kfcServerArgs = static_cast<void*>(kfcServerArgs.get());
         resCtxHost->kfcServerArgSize = 6;
     }
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
 }
