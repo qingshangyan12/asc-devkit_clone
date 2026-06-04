@@ -50,7 +50,12 @@ private:
     {
         using dstTPos = GetMemLocation<T>;
         using srcTPos = GetMemLocation<U>;
-        using Tensor2Tensor = typename CopyUB2GMTensor2Tensor<dstTPos, srcTPos, CURRENT_ARCH_VERSION>::type;
+        using DstLayout = typename T::layoutType;
+        using SrcLayout = typename U::layoutType;
+        using DstLayoutPtn = GetLayoutPattern<DstLayout>;
+        using SrcLayoutPtn = GetLayoutPattern<SrcLayout>;
+        using Tensor2Tensor =
+            typename CopyUB2GMTensor2Tensor<dstTPos, srcTPos, DstLayoutPtn, SrcLayoutPtn, CURRENT_ARCH_VERSION>::type;
         Tensor2Tensor::template Run<trait, T, U>(dst, src);
     }
 };
