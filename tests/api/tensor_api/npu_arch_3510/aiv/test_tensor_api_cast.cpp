@@ -59,18 +59,14 @@ __aicore__ inline void TestTransformBinary(__gm__ DstDataType* z, __gm__ SrcData
     asc_copy_ub2gm_align(zGm.Data().Get(), zLocal.Data().Get(), BLK_NUM, TILE_LENGTH * sizeof(DstDataType), cacheMode, srcStride, dstStride);
 }
 
-template <typename SrcType, typename DstType, typename RoundMode, typename SatMode, typename IndexPos>
+template <typename RoundMode, typename SatMode, typename IndexPos>
 struct CastTrait {
-    using srcType = SrcType;
-    using dstType = DstType;
     using roundMode = RoundMode;
     using satMode = SatMode;
     using indexPos = IndexPos;
 };
 
 using CastTraitU162UInt8NoSatEven = CastTrait<
-    uint16_t,
-    uint8_t,
     AscendC::Std::ignore_t,
     AscendC::Te::CastSatMode::NoSat,
     AscendC::Te::CastIndexPos::Even>;
