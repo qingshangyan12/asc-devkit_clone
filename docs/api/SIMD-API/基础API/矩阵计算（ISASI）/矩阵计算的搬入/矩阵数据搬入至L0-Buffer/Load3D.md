@@ -86,7 +86,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |----------|-----------|------|
 |dst|输出| 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定，具体约束如下：<br>&bull; L0A Buffer(TPosition: A2)：ZZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。<cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT：<br>&bull; L0A Buffer(TPosition: A2)：NZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。</cann-filter><br>L1上的排列顺序无格式要求，一般情况下为NZ格式。|
 |src|输入| 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。|
-|loadDataParams|输入| LoadData参数结构体，类型为：<cann-filter npu_type="910,310p"><br>&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。</cann-filter><cann-filter npu_type="950,A3,910b,310b,310p,x90"><br>&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。</cann-filter><cann-filter npu_type="950"><br>&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。</cann-filter><br>上述结构体参数定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_mm.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+|loadDataParams|输入| LoadData参数结构体，类型为：<cann-filter npu_type="910,310p"><br>&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。</cann-filter><cann-filter npu_type="950,A3,910b,310b,310p,x90"><br>&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。</cann-filter><cann-filter npu_type="950"><br>&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。</cann-filter><br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 <cann-filter npu_type="910,310p">
 
@@ -125,7 +125,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |padList|padding列表 [padding_left, padding_right, padding_top, padding_bottom]，每个元素取值范围：[0,255]。默认为{0, 0, 0, 0}。|
 |l1H|源操作数height，取值范围：l1H∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1H = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |l1W|源操作数weight，取值范围：l1W∈[0, 32767]。默认为0。<br>**注：针对Atlas A2/A3系列产品，l1W = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|channelSize|源操作数的通道数，取值范围：channelSize∈[0, 65535]。默认为0。<cann-filter npu_type="310p"><br>&bull; 针对Atlas 推理系列产品 AI Core：对于half，channelSize可取值为4，8，16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，channelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><cann-filter npu_type="950,A3,910b,310b,x90"><br>&bull; 针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90：对于uint32_t/int32_t/float，channelSize可取值为4，N \* 8，N \* 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N \* 16，N \* 16 + 4，N \* 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 \* N，N \* 32 + 4，N \* 32 + 8，N \* 32 + 16；对于int4b_t，channelSize可取值为8，16，32，N \* 64，N \* 64 + 8，N \* 64 + 16，N \* 64 + 32。N为正整数。</cann-filter><br>**注：针对Atlas A2/A3系列产品，channelSize = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|channelSize|源操作数的通道数，取值范围：channelSize∈[0, 65535]。默认为0。<cann-filter npu_type="310p"><br>&bull; 针对Atlas 推理系列产品 AI Core：对于half，channelSize可取值为4，8，16，N\*16+4，N\*16+8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，channelSize可取值为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32。N为正整数。</cann-filter><cann-filter npu_type="950,A3,910b,310b,x90"><br>&bull; 针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90：对于uint32_t/int32_t/float，channelSize可取值为4，N\*8，N\*8+4；对于half/bfloat16，channelSize可取值为4，8，N\*16，N\*16 + 4，N\*16+8；对于int8_t/uint8_t，channelSize可取值为4，8，16，32\*N，N\*32+4，N\*32+8，N\*32+16；对于int4b_t，channelSize可取值为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32。N为正整数。</cann-filter><br>**注：针对Atlas A2/A3系列产品，channelSize = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kExtension|该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于b32类型，应为8的倍数，对于b16类型，应为16的倍数，对于b8类型，应为32的倍数，对于b4类型，应为64的倍数；覆盖的情况则任何数据类型都无倍数要求。取值范围：kExtension∈[0, 65535]。默认为0。<br>**注：针对Atlas A2/A3系列产品，kExtension = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |mExtension|该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于b4、b8、b16类型，应为16的倍数，b32类型无要求；覆盖的情况则任何数据类型都无倍数要求。取值范围：mExtension∈[0, 65535]。默认为0。<br>**注：针对Atlas A2/A3系列产品，mExtension = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
 |kStartPt|该指令在目的操作数width维度的起点，对于b32类型，应为8的倍数，对于b16类型，应为16的倍数，对于b8类型，应为32的倍数，对于b4类型，应为64的倍数；取值范围[0, 65535]。默认为0。|
@@ -151,9 +151,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|------|
-|channelSize|源操作数的通道数，取值范围：channelSize∈[1, 63]。<br>对于half，channelSize除16的余数应当为0，4或8。<br>对于int8_t和uint8_t，channelSize除32的余数应当为0，4，8或16。<br>对于int4b_t，channelSize为8，16，32，N*64，N*64+8，N*64+16，N*64+32，N为正整数。|
+|channelSize|源操作数的通道数，取值范围：channelSize∈[1, 63]。<br>对于half，channelSize除16的余数应当为0，4或8。<br>对于int8_t和uint8_t，channelSize除32的余数应当为0，4，8或16。<br>对于int4b_t，channelSize为8，16，32，N\*64，N\*64+8，N\*64+16，N\*64+32，N为正整数。|
 |enTranspose|是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。<br>&bull; true：启用<br>&bull; false：不启用|
-|enSmallK|是否开启small k特性，每个分形矩阵大小为16*4，支持数据类型为bool，默认为false。<br>**注：当前产品形态，该特性已不再支持。**|
+|enSmallK|是否开启small k特性，每个分形矩阵大小为16\*4，支持数据类型为bool，默认为false。<br>**注：当前产品形态，该特性已不再支持。**|
 |filterSizeW|是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。|
 |filterSizeH|是否在filterH的基础上将卷积核height增加256个元素。true，增加；false，不增加。|
 |fMatrixCtrl|表示LoadData3DV2指令从左矩阵还是右矩阵获取FeatureMap的属性描述，与SetFmatrix配合使用，当前只支持设置为false，默认值为false。<br>&bull; true：从右矩阵中获取FeatureMap的属性描述；<br>&bull; false：从左矩阵中获取FeatureMap的属性描述。|
