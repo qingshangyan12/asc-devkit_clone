@@ -59,8 +59,8 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
--   位于Unified Buffer的地址必须32B对齐。
--   操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- 位于Unified Buffer的地址必须32B对齐。
+- 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
 - isSetMask参数不生效，保持默认值true即可。
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>

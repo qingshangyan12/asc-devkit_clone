@@ -20,8 +20,8 @@
 
 填充的数据有两种配置方式：
 
--   配置结构体[DataCopyPadExtParams](#zh-cn_topic_0000002565888823_table2036831862917)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
--   使用寄存器配置接口[SetPadValue](寄存器配置说明/SetPadValue(ISASI).md)在接口外部设置需要填充的数据，此时DataCopyPadExtParams的参数isPad需要设置为false。
+- 配置结构体[DataCopyPadExtParams](#zh-cn_topic_0000002565888823_table2036831862917)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
+- 使用寄存器配置接口[SetPadValue](寄存器配置说明/SetPadValue(ISASI).md)在接口外部设置需要填充的数据，此时DataCopyPadExtParams的参数isPad需要设置为false。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -32,6 +32,7 @@
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
 ```
+
 </cann-filter>
 
 ```cpp
@@ -154,11 +155,11 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   位于Global Memory的源地址必须1B对齐，位于Unified Buffer的目的地址必须32B对齐。
--   leftPadding、rightPadding所占字节数均不能超过32B。
--   blockLen必须是sizeof\(T\)的整数倍。
--   结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
--   结构体DataCopyPadExtParams的参数取值范围需要考虑UB超限问题。
+- 位于Global Memory的源地址必须1B对齐，位于Unified Buffer的目的地址必须32B对齐。
+- leftPadding、rightPadding所占字节数均不能超过32B。
+- blockLen必须是sizeof\(T\)的整数倍。
+- 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
+- 结构体DataCopyPadExtParams的参数取值范围需要考虑UB超限问题。
 
 ## 调用示例<a name="section177231425115410"></a>
 

@@ -22,14 +22,14 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002567699435_section82039854412"></a>
 
--   mask逐bit模式
+- mask逐bit模式
 
     ```cpp
     template <typename T, bool isSetMask = true>
     __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
     ```
 
--   mask连续模式 
+- mask连续模式 
 
     ```cpp
     template <typename T, bool isSetMask = true>
@@ -103,15 +103,15 @@
 
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
--   位于Unified Buffer的地址必须32B对齐。
--   操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- 位于Unified Buffer的地址必须32B对齐。
+- 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
 - <cann-filter npu-type = "A3,910b">repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 </cann-filter>
--   Copy和矢量计算API一样，支持和掩码操作API配合使用。但counter模式配合高维切分计算API时，和[通用的counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
-    -   通用的counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**
-    -   Copy高维切分计算API的counter模式：Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**
+- Copy和矢量计算API一样，支持和掩码操作API配合使用。但counter模式配合高维切分计算API时，和[通用的counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
+    - 通用的counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**
+    - Copy高维切分计算API的counter模式：Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
