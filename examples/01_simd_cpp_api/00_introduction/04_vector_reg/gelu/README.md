@@ -8,13 +8,11 @@ GELU 是神经网络中常用的激活函数。本样例演示如何使用 Ascen
 
 样例实现采用 RegBase API 和 VF 调用方式，在寄存器中完成 GELU 计算。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
