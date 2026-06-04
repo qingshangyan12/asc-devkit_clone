@@ -104,18 +104,6 @@ C[b] = A[b] * B[b] + Bias[b], b = 0, 1, ..., B - 1
     source ${install_path}/cann/set_env.sh
     ```
 
-- 软连接配置
-  由于当前Tensor API样例只用于功能展示，相关源码未随标准CANN软件包发布。
-
-  如需编译运行该样例，需要先将Tensor API相关源码通过软连接挂载到CANN安装路径下。
-
-  ```bash
-  cd ${install_path}/cann/asc/impl
-  ln -s ${code_path}/impl/tensor_api  # ${code_path}表示本地代码下载路径
-  cd ../include
-  ln -s ${code_path}/include/tensor_api
-  ```
-
 - 样例执行
 
   ```bash
