@@ -25,14 +25,8 @@ protected:
     {
         std::cout << "TEST_arithprogression TearDownTestCase" << std::endl;
     }
-    void SetUp() override
-    {
-        AscendC::SetGCoreType(2);
-    }
-    void TearDown() override
-    {
-        AscendC::SetGCoreType(0);
-    }
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 };
 
 template <typename dataType>
@@ -65,6 +59,7 @@ struct arithprogressionTestParams {
     uint32_t diffValue;
     uint32_t count;
     uint32_t typeSize;
+    bool checkValue;
     void (*cal_func)(uint8_t *, uint32_t, uint32_t, uint32_t);
 };
 
@@ -84,51 +79,30 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(TEST_PACKAGE_arithprogression, arithprogressionTestSuite,
     ::testing::Values(
-        arithprogressionTestParams { 1, 2, 15, sizeof(half), mainArithprogressionTest<half> },
-        arithprogressionTestParams { 1, 2, 64, sizeof(half), mainArithprogressionTest<half> },
-        arithprogressionTestParams { 1, 2, 260, sizeof(half), mainArithprogressionTest<half> }
+        arithprogressionTestParams { 1, 2, 15, sizeof(half), false, mainArithprogressionTest<half> },
+        arithprogressionTestParams { 1, 2, 64, sizeof(half), false, mainArithprogressionTest<half> },
+        arithprogressionTestParams { 1, 2, 260, sizeof(half), false, mainArithprogressionTest<half> },
+        arithprogressionTestParams { 0, 16777217, 16, sizeof(int32_t), true, mainArithprogressionTest<int32_t> }
         ));
 
 TEST_P(arithprogressionTestSuite, arithprogressionTestCase)
 {
     auto param = GetParam();
+    if (param.checkValue) {
+        AscendC::SetGCoreType(2);
+        int32_t dstGm[param.count] { 0 };
+        param.cal_func(reinterpret_cast<uint8_t *>(dstGm), param.firstValue, param.diffValue, param.count);
+        AscendC::SetGCoreType(0);
+
+        for (int32_t i = 0; i < param.count; i++) {
+            EXPECT_EQ(dstGm[i], static_cast<int32_t>(param.firstValue) + i * static_cast<int32_t>(param.diffValue));
+        }
+        return;
+    }
     uint8_t dstGm[param.count * param.typeSize] { 0x00 };
     param.cal_func(dstGm, param.firstValue, param.diffValue, param.count);
 
     for (int32_t i = 0; i < param.count * param.typeSize; i++) {
         EXPECT_EQ(dstGm[i], 0x00);
-    }
-}
-
-__aicore__ inline void mainArangeInt32PrecisionTest(GM_ADDR dstGm)
-{
-    constexpr int32_t count = 16;
-    constexpr int32_t diffValue = 16777217;
-    GlobalTensor<int32_t> dstGlobal;
-    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t*>(dstGm), count);
-
-    TPipe pipe;
-    TQue<TPosition::VECOUT, 1> outDst;
-    pipe.InitBuffer(outDst, 1, count * sizeof(int32_t));
-
-    LocalTensor<int32_t> dstLocal = outDst.AllocTensor<int32_t>();
-    PipeBarrier<PIPE_ALL>();
-    Arange<int32_t>(dstLocal, static_cast<int32_t>(0), diffValue, count);
-
-    PipeBarrier<PIPE_ALL>();
-    DataCopy(dstGlobal, dstLocal, count);
-    outDst.FreeTensor(dstLocal);
-    PipeBarrier<PIPE_ALL>();
-}
-
-TEST_F(TEST_arithprogression, arangeInt32KeepsDiffPrecisionAboveFloatMantissa)
-{
-    constexpr int32_t count = 16;
-    constexpr int32_t diffValue = 16777217;
-    int32_t dstGm[count] = {0};
-
-    mainArangeInt32PrecisionTest(reinterpret_cast<GM_ADDR>(dstGm));
-    for (int32_t i = 0; i < count; i++) {
-        EXPECT_EQ(dstGm[i], i * diffValue);
     }
 }
