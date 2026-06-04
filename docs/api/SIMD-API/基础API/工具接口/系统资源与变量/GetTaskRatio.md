@@ -18,12 +18,12 @@
 
 头文件路径为：`"basic_api/kernel_operator_sys_var_intf.h"`。
 
-分离模式下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。
+[分离模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)下，获取任务启动的Cube Core（AIC）或者Vector Core（AIV）的数量与逻辑AI Core数量的比例。
 
 - 在AIC上调用时返回AIC数量与逻辑AI Core数量的比例。
 - 在AIV上调用时返回AIV数量与逻辑AI Core数量的比例。
 
-耦合模式下，固定返回1。
+[耦合模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)下，固定返回1。
 
 ## 函数原型
 
@@ -37,7 +37,7 @@ __aicore__ inline int64_t GetTaskRatio()
 
 ## 返回值说明
 
-- 针对分离模式，不同Kernel类型下（通过[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)接口设置），在AIC和AIV上调用该接口的返回值如下：
+- 针对[分离模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)，不同Kernel类型下（通过[设置Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)接口设置），在AIC和AIV上调用该接口的返回值如下：
 
     **表 1** 返回值列表
 
@@ -46,7 +46,7 @@ __aicore__ inline int64_t GetTaskRatio()
     | AIV | 1 | - | 2 | 1 | - | 1 |
     | AIC | - | 1 | 1 | 1 | 1 | - |
 
-- 针对耦合模式，固定返回1。
+- 针对[耦合模式](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)，固定返回1。
 
 ## 约束说明
 
@@ -56,5 +56,5 @@ __aicore__ inline int64_t GetTaskRatio()
 
 ```cpp
 int64_t ratio = AscendC::GetTaskRatio(); // 返回AIC或AIV与逻辑AI Core数量的比例
-AscendC::printf("task ratio is %u", ratio);
+AscendC::printf("task ratio is %ld", ratio);
 ```

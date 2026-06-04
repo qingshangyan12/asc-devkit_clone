@@ -18,7 +18,7 @@
 
 头文件路径为： `"basic_api/kernel_operator_sys_var_intf.h"`。
 
-获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
+在[分离模式架构](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/高级编程/硬件实现/基本架构.md)下，获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。
 
 ## 函数原型
 
