@@ -29,6 +29,7 @@
 namespace AscendC {
 namespace Te {
 namespace Inst {
+
 class Cast {
 public:
     template<typename... Args>
