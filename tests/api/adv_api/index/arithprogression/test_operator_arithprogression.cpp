@@ -25,8 +25,14 @@ protected:
     {
         std::cout << "TEST_arithprogression TearDownTestCase" << std::endl;
     }
-    virtual void SetUp() {}
-    virtual void TearDown() {}
+    void SetUp() override
+    {
+        AscendC::SetGCoreType(2);
+    }
+    void TearDown() override
+    {
+        AscendC::SetGCoreType(0);
+    }
 };
 
 template <typename dataType>
@@ -119,12 +125,10 @@ TEST_F(TEST_arithprogression, arangeInt32KeepsDiffPrecisionAboveFloatMantissa)
 {
     constexpr int32_t count = 16;
     constexpr int32_t diffValue = 16777217;
-    uint8_t dstGm[count * sizeof(int32_t)] { 0x00 };
+    int32_t dstGm[count] = {0};
 
-    mainArangeInt32PrecisionTest(dstGm);
-
-    auto output = reinterpret_cast<int32_t*>(dstGm);
+    mainArangeInt32PrecisionTest(reinterpret_cast<GM_ADDR>(dstGm));
     for (int32_t i = 0; i < count; i++) {
-        EXPECT_EQ(output[i], i * diffValue);
+        EXPECT_EQ(dstGm[i], i * diffValue);
     }
 }
