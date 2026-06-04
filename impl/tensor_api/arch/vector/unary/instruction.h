@@ -79,10 +79,7 @@ public:
         }
     }
 };
-
-} // namespace Inst
-} // namespace Te
-} // namespace AscendC
+}}}
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_UNARY_INSTRUCTION_H
 
