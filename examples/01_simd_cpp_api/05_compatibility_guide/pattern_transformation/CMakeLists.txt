@@ -27,5 +27,5 @@ target_compile_options(demo PRIVATE
 )
 
 target_compile_definitions(demo PRIVATE
-    CASE_NUM=${CASE_NUM}
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
