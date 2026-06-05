@@ -106,7 +106,7 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
-    parser.add_argument("--results", default="presmoke_results")
+    parser.add_argument("--results", default="presmoke_report")
     parser.add_argument("--log-dir")
     parser.add_argument("--keep-artifacts", action="store_true")
     parser.add_argument("--schedule", choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min", "fixed"], default="default")

@@ -1,17 +1,17 @@
 # Presmoke Watch Entry
 
-`scripts/presmoke_orchestrate.sh` is the Jenkins and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
+`scripts/presmoke_orchestrate.sh` is the CI and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
 
 `scripts/run_presmoke2.sh` is the lower-level debug entry. Use it for dry-run, single-case checks, direct Python CLI experiments, or regenerating schedules.
 
 Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--dry-run`, or `--suggestions-only` do not clean `opp/vendors`.
 
-## Jenkins Commands
+## CI Commands
 
 910B:
 
 ```bash
-PROJECT_ROOT=/data/zgx/asc-devkit \
+PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-2201 \
 PRIMARY_CARD=7 \
 RETRY_CARDS="0 1 2 3 4 5 6" \
@@ -21,7 +21,7 @@ bash scripts/presmoke_orchestrate.sh
 950:
 
 ```bash
-PROJECT_ROOT=/home/zgx/asc-devkit \
+PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-3510 \
 PRIMARY_CARD=0 \
 bash scripts/presmoke_orchestrate.sh
@@ -48,7 +48,7 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `TIMEOUT` | `120` | Timeout in seconds for NPU run commands only. Build and verify commands do not use this timeout. |
 | `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
 | `SCHEDULE_FILE` | built-in | Optional fixed order override. |
-| `OUT_ROOT` | `presmoke_results/orchestrate_<arch>_<timestamp>` | Output directory for Jenkins archive. |
+| `OUT_ROOT` | `presmoke_report/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
 | `RUNNER_MODE` | `case-runner` | Default runner implementation. |
 | `MODES` | `npu` | Presmoke modes. |
 
@@ -61,6 +61,8 @@ The orchestrator writes:
 - `full_card<N>/stdout.log` and `stderr.log`: raw wrapper logs.
 - `full_card<N>/results/report.json`: machine-readable presmoke report.
 - `full_card<N>/results/report.md`: detailed Markdown report.
+- `full_card<N>/results/logs/<case>__<mode>.log`: full per-case command log.
+- `full_card<N>/results/logs/stages/<case>__<mode>__<stage>.log`: per-stage command logs for build, run, and verify.
 - `FINAL_REPORT.md`: concise summary with failures and retry results.
 - `ALL_CASE_TIMINGS.tsv`: per-case timing, NPU wait, step details, and executed commands.
 - `FAILURES.tsv`: failed or skipped primary results plus retry outcome.
@@ -89,7 +91,7 @@ PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
   --modes npu \
   --jobs auto \
   --schedule npu-idle-min \
-  --schedule-report presmoke_results/latest/full_card7/results/report.json \
+  --schedule-report presmoke_report/latest/full_card7/results/report.json \
   --export-schedule scripts/presmoke/schedules/dav-2201_npu.txt \
   --dry-run \
   --report-format json \
@@ -99,7 +101,7 @@ PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
 ## Notes
 
 - Do not run multiple orchestrators in the same checkout at the same time. A lock under `.presmoke_locks` protects against accidental overlap.
-- The full watch entry cleans the active CANN `opp/vendors` directory. Make sure the Jenkins user has permission to remove and reinstall custom-op vendor packages.
+- The full watch entry cleans the active CANN `opp/vendors` directory. Make sure the CI user has permission to remove and reinstall custom-op vendor packages.
 - `run_presmoke.sh` is the old presmoke script and is not the watch entry for this flow.
 - TensorFlow cases that require TensorFlow 2.6.5 are intentionally skipped by the case manifest.
 - Timeout retry is for timeout cases only. Non-timeout failures are reported and left for diagnosis.
