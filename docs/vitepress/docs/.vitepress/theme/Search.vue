@@ -15,7 +15,6 @@ if (typeof window !== 'undefined' && !window.__pagefind__) {
   import('/pagefind/pagefind.js').then(m => {
     if (!window.__pagefind__) {
       window.__pagefind__ = m
-      m.init()
     }
   }).catch(() => {})
 }
@@ -48,6 +47,7 @@ onMounted(() => {
   metaKey.value = /(Mac|iPhone|iPod|iPad)/i.test(navigator?.platform)
     ? '⌘'
     : 'Ctrl'
+  console.log('[search] onMounted: pagefind loaded=', !!window?.__pagefind__, 'search=', !!window?.__pagefind__?.search)
 })
 
 const searchModal = ref(false)
@@ -126,6 +126,7 @@ watch(
       return
     }
     if (!window?.__pagefind__?.search) {
+      console.log('[search] pagefind not available, using inline', !!window?.__pagefind__, !!window?.__pagefind__?.search)
       inlineSearch()
       searching.value = false
       return
@@ -136,15 +137,20 @@ watch(
     const searchText
       = typeof finalSearchConfig.value.customSearchQuery === 'function'
         ? finalSearchConfig.value.customSearchQuery(searchWords.value)
-        : searchWords.value
+        : (chineseRegex.test(searchWords.value) ? chineseSearchOptimize(searchWords.value) : searchWords.value)
+
+    console.log('[search] query:', JSON.stringify(searchWords.value), '=> searchText:', JSON.stringify(searchText))
 
     try {
       const pagefindSearchResult: any = await window?.__pagefind__
         ?.debouncedSearch?.(searchText, {}, searchDelayTime.value)
 
+      console.log('[search] result:', pagefindSearchResult === null ? 'NULL (stale)' : `results=${pagefindSearchResult?.results?.length}`)
+
       if (pagefindSearchResult === null) {
         return
       }
+      console.log('[search] raw results:', pagefindSearchResult.results.length)
       const pagefindResults = await Promise.all(
         pagefindSearchResult.results.slice(0, 30).map((v: any) => v.data())
       )
@@ -169,6 +175,7 @@ watch(
       searchResult.value = formattedResults.filter(
         finalSearchConfig.value.filter ?? (() => true)
       )
+      console.log('[search] formatted results:', searchResult.value.length)
     }
     finally {
       searching.value = false
