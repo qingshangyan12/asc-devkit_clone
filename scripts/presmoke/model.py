@@ -67,6 +67,7 @@ class RunResult:
     rc: Optional[int] = None
     duration_s: float = 0.0
     log_file: str = ""
+    stage_log_files: List[str] = field(default_factory=list)
     source: str = ""
     steps: List[StepResult] = field(default_factory=list)
 
