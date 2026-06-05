@@ -8,6 +8,12 @@
 
 - Ascend 950PR / Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \> CANN 9.1.0
+
+> **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
+
 ## 目录结构
 
 ```text
@@ -362,7 +368,7 @@ Ascend 950PR 芯片性能数据如下：
 
 Cube 理论运算时间 $T_{cube}$ 为：
 
-$$T_{cube} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{4096 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
+$$T_{cube} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
 
 从表中可以看出 `aic_mac_time` 为 `640.16 μs`，相对理论值 `635.5 μs`，误差 $E_{cube}$ 为：
 
@@ -455,6 +461,8 @@ python3 -m pip install ml_dtypes==0.2.0 en_dtypes==0.0.4
   ```
 
 ### 样例执行
+
+在本样例目录下执行如下命令。
 
 ```bash
 mkdir -p build && cd build;  # 创建并进入 build 目录

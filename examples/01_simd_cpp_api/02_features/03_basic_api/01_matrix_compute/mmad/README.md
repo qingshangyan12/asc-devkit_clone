@@ -10,6 +10,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -61,7 +65,7 @@
   </tr>
 </table>
 
-通常的矩阵乘法计算公式：C = A × B + Bias，其中A、B、Bias、C矩阵的需要满足的shape分别为[M,K]、[K,N]、[N]和[M,N]。Bias的数据类型与C矩阵数据类型的对应关系，如表2所示：
+通常的矩阵乘法计算公式：C = A × B + Bias，其中A、B、Bias、C矩阵的需要满足的shape分别为[M,K]、[K,N]、[N]和[M,N]。Bias的数据类型与C矩阵数据类型的对应关系，如表2所示，其中 bfloat16 仅支持Ascend 950PR/Ascend 950DT。
 <a name="表2"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">
@@ -218,26 +222,16 @@ Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬
 在本样例根目录下执行如下步骤，编译并执行算子。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
   
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO=1
   mkdir -p build && cd build;      # 创建并进入build目录
