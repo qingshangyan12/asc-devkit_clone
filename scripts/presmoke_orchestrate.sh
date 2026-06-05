@@ -15,7 +15,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 ASCEND_HOME_DIR="${ASCEND_HOME_DIR:-/usr/local/Ascend/ascend-toolkit/latest}"
 ARCH="${ARCH:-dav-2201}"
-MODES="${MODES:-npu}"
+MODES="${MODES:-${MODE:-npu}}"
 RUNNER_MODE="${RUNNER_MODE:-case-runner}"
 SCHEDULE="${SCHEDULE:-fixed}"
 SCHEDULE_FILE="${SCHEDULE_FILE:-}"
@@ -27,6 +27,10 @@ RETRY_CARDS="${RETRY_CARDS:-}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
 OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_reports/orchestrate_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
 LOCK_DIR="${LOCK_DIR:-${PROJECT_ROOT}/.presmoke_locks/presmoke_orchestrate.lock}"
+
+if [[ "$MODES" != "npu" && "${SCHEDULE:-}" == "fixed" && -z "$SCHEDULE_FILE" ]]; then
+    SCHEDULE="default"
+fi
 
 mkdir -p "$OUT_ROOT"
 STATUS_FILE="$OUT_ROOT/status.txt"
@@ -116,7 +120,7 @@ run_presmoke() {
     shift 2
     local run_dir="$OUT_ROOT/$name"
     mkdir -p "$run_dir"
-    log "run_start name=$name card=$card arch=$ARCH jobs=$JOBS npu_slots=$NPU_SLOTS timeout=$TIMEOUT schedule=$SCHEDULE args=$*"
+    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS npu_slots=$NPU_SLOTS timeout=$TIMEOUT schedule=$SCHEDULE args=$*"
     {
         echo "name=$name"
         echo "started_at=$(date_iso)"
