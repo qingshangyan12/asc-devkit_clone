@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
+import subprocess
+import time
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List
+from typing import Iterator, List
 
 from .arch import detect_arch
 from .case_runners import build_case_runner_cells_with_skips
@@ -14,11 +18,13 @@ from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
 from .runner import run_cells_pipeline
+from .scheduler import schedule_cells
 from .suggest import dedupe_suggestions
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    jobs = resolve_jobs(args.jobs)
     project_root = Path(os.environ.get("PRESMOKE_PROJECT_ROOT", Path.cwd())).resolve()
     examples_root = Path(args.examples_root).resolve() if args.examples_root else project_root / "examples"
     host_arch = detect_arch(args.arch)
@@ -46,6 +52,13 @@ def main(argv: list[str] | None = None) -> int:
         cells, planner_suggestions, skipped_results = build_cells_with_skips(specs, host_arch, modes)
         suggestions.extend(planner_suggestions)
     suggestions = dedupe_suggestions(suggestions)
+    cells = schedule_cells(
+        cells,
+        schedule=args.schedule,
+        schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
+        frontload_count=args.schedule_frontload_count,
+        jobs=jobs,
+    )
 
     if args.suggestions_only:
         report = RunReport(host_arch, modes, started_at, now_iso(), [], suggestions)
@@ -65,14 +78,16 @@ def main(argv: list[str] | None = None) -> int:
         print("Error: baseline and changed-only are Phase 2/3 features and are not implemented in this Phase 1 build")
         return 2
 
-    run = run_cells_pipeline(
-        cells,
-        log_dir=log_dir,
-        timeout=args.timeout,
-        keep_artifacts=args.keep_artifacts,
-        jobs=args.jobs,
-        npu_slots=args.npu_slots,
-    )
+    with presmoke_run_lock(project_root):
+        run = run_cells_pipeline(
+            cells,
+            log_dir=log_dir,
+            timeout=args.timeout,
+            host_timeout=args.host_timeout,
+            keep_artifacts=args.keep_artifacts,
+            jobs=jobs,
+            npu_slots=args.npu_slots,
+        )
     results = run.results
     results.extend(skipped_results)
     results = sorted(results, key=lambda result: (result.example, result.mode))
@@ -87,15 +102,19 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--runner-mode", choices=["readme", "case-runner"], default="readme")
     parser.add_argument("--arch")
     parser.add_argument("--modes", default="npu")
-    parser.add_argument("--jobs", type=int, default=1)
+    parser.add_argument("--jobs", default="1")
     parser.add_argument("--npu-slots", type=int, default=1)
     parser.add_argument("--filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
+    parser.add_argument("--host-timeout", type=int, default=900)
     parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
     parser.add_argument("--results", default="presmoke_results")
     parser.add_argument("--log-dir")
     parser.add_argument("--keep-artifacts", action="store_true")
+    parser.add_argument("--schedule", choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min"], default="default")
+    parser.add_argument("--schedule-report")
+    parser.add_argument("--schedule-frontload-count", type=int, default=1)
     parser.add_argument("--suggestions-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--preflight", action="store_true")
@@ -106,6 +125,82 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--changed-only", action="store_true")
     parser.add_argument("--since")
     return parser.parse_args(argv)
+
+
+def resolve_jobs(value: str | int, cpu_count: int | None = None) -> int:
+    if isinstance(value, int):
+        return max(value, 1)
+    if value != "auto":
+        return max(int(value), 1)
+
+    cpus = cpu_count if cpu_count is not None else detect_cpu_count()
+    if cpus >= 160:
+        return 12
+    if cpus >= 80:
+        return 8
+    if cpus >= 32:
+        return 6
+    return 4
+
+
+def detect_cpu_count() -> int:
+    try:
+        result = subprocess.run(
+            ["lscpu"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+    except (OSError, ValueError):
+        return os.cpu_count() or 1
+
+    for line in result.stdout.splitlines():
+        if line.startswith("CPU(s):"):
+            try:
+                return max(int(line.split(":", 1)[1].strip()), 1)
+            except ValueError:
+                break
+    return os.cpu_count() or 1
+
+
+@contextmanager
+def presmoke_run_lock(project_root: Path) -> Iterator[None]:
+    lock_parent = Path(os.environ.get("PRESMOKE_LOCK_DIR", project_root / ".presmoke_locks"))
+    lock_dir = lock_parent / "presmoke_run.lock"
+    lock_parent.mkdir(parents=True, exist_ok=True)
+
+    while True:
+        try:
+            lock_dir.mkdir()
+            break
+        except FileExistsError:
+            pid_file = lock_dir / "pid"
+            try:
+                pid = int(pid_file.read_text(encoding="utf-8").strip())
+            except (OSError, ValueError):
+                pid = 0
+            if pid and process_exists(pid):
+                print(f"Waiting for existing presmoke run pid={pid}", flush=True)
+                time.sleep(5)
+                continue
+            shutil.rmtree(lock_dir, ignore_errors=True)
+
+    (lock_dir / "pid").write_text(str(os.getpid()), encoding="utf-8")
+    try:
+        yield
+    finally:
+        shutil.rmtree(lock_dir, ignore_errors=True)
+
+
+def process_exists(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
 
 
 def parse_modes(value: str) -> List[str]:

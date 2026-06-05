@@ -2,14 +2,14 @@
   "readme_count": 346,
   "runnable_readme_count": 269,
   "generated_runner_count": 269,
-  "target_runnable_count": 242,
-  "target_arch": "dav-3510",
+  "target_runnable_count": 171,
+  "target_arch": "dav-2201",
   "target_mode": "npu",
   "cmake_dir_count": 280,
   "supported_arch_counts": {
     "dav-2002": 2,
     "dav-2201": 173,
-    "dav-3510": 245
+    "dav-3510": 253
   },
   "supported_mode_counts": {
     "cpu": 190,

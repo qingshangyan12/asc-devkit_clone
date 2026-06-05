@@ -5,70 +5,26 @@ CASE_REL=01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custo
 SKIP_REASON='requires TensorFlow 2.6.5 environment; skipped by presmoke'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -n "${PRESMOKE_PROJECT_ROOT:-}" ]]; then
-    COMMON_SH="$PRESMOKE_PROJECT_ROOT/scripts/presmoke/case_common.sh"
-else
-    SEARCH_DIR="$SCRIPT_DIR"
-    COMMON_SH=""
-    while [[ "$SEARCH_DIR" != "/" ]]; do
-        if [[ -f "$SEARCH_DIR/scripts/presmoke/case_common.sh" ]]; then
-            COMMON_SH="$SEARCH_DIR/scripts/presmoke/case_common.sh"
-            break
-        fi
-        SEARCH_DIR="$(dirname "$SEARCH_DIR")"
-    done
-fi
-if [[ -z "$COMMON_SH" || ! -f "$COMMON_SH" ]]; then
-    echo "Cannot locate scripts/presmoke/case_common.sh; set PRESMOKE_PROJECT_ROOT" >&2
-    exit 2
-fi
-source "$COMMON_SH"
-CASE_DIR="$(presmoke_case_root "$CASE_REL")"
-MODE="$(presmoke_mode)"
-ARCH="$(presmoke_arch)"
-SOC_VERSION="$(presmoke_soc_version "$ARCH")"
-RUN_MODE_ARG=""
-if [[ "$MODE" != "npu" ]]; then
-    RUN_MODE_ARG="-DCMAKE_ASC_RUN_MODE=$MODE"
-fi
-export ARCH MODE SOC_VERSION RUN_MODE_ARG
-BUILD_DIR="$(presmoke_build_dir "$CASE_DIR")"
-ACTION="${1:-all}"
+source "$SCRIPT_DIR/../../../../../_case_entry.sh"
+presmoke_case_init "$CASE_REL"
 
-run_in_build_dir() {
-    (cd "$BUILD_DIR" && "$@")
-}
-
-build() {
-    echo "SKIP: $SKIP_REASON"
-    exit 0
+case_build() {
     mkdir -p "$BUILD_DIR"
     :
 }
 
-run() {
-    echo "SKIP: $SKIP_REASON"
-    exit 0
+case_run() {
     mkdir -p "$BUILD_DIR"
     :
 }
 
-verify() {
-    echo "SKIP: $SKIP_REASON"
-    exit 0
+case_verify() {
     mkdir -p "$BUILD_DIR"
     :
 }
 
-clean() {
-    rm -rf "$BUILD_DIR"
+case_clean() {
+    presmoke_default_clean
 }
 
-case "$ACTION" in
-    build) build ;;
-    run) run ;;
-    verify) verify ;;
-    clean) clean ;;
-    all) build; run; verify ;;
-    *) echo "Usage: $0 {build|run|verify|clean|all}" >&2; exit 2 ;;
-esac
+presmoke_case_main "$@"
