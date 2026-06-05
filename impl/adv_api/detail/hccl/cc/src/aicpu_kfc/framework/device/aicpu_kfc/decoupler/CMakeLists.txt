@@ -260,7 +260,8 @@ if(TARGET mc2_server)
         $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_OPTIONS>
     )
 
-    target_include_directories(mc2_server_decoupler PRIVATE
+    target_include_directories(mc2_server_decoupler BEFORE PRIVATE
+        ${HCCL_BASE_DIR}/pub_inc
         ${HCCL_HCOMM_HEADER_DIR}/../
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
         ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
