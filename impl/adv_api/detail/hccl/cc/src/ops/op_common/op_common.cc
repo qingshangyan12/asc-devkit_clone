@@ -41,6 +41,7 @@
 #include "rt.h"
 #include "dlhcomm_function.h"
 #include "ccu_launch_dl.h"
+#include "ccu_log.h"
 
 #ifdef __cplusplus
 extern "C" {
