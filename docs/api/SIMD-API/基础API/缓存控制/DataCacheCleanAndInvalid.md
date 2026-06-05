@@ -28,12 +28,14 @@
 ![](../../../figures/datacache.png)
 
 DataCacheCleanAndInvalid接口用于解决上述一致性问题，其功能可以拆解为两部分：
+
 - Clean：将缓存中被修改过的数据（脏数据，Dirty Data）写回到GM中，避免数据丢失。
 - Invalid：
-    - 将指定地址范围的Cache Line标记为"无效"，使其从缓存中移除。
+    - 将指定地址范围的Cache Line标记为“无效”，使其从缓存中移除。
     - 保证下一次访问这些内存地址时，会从GM重新加载数据，而不是使用可能过期的缓存数据。
 
 该接口的典型使用场景如下：
+
 - 读取GM的数据，但该数据可能在外部被其余核修改，此时需要使用DataCacheCleanAndInvalid接口，直接访问GM，获取最新数据。
 - 用户通过Scalar单元写GM的数据，希望立刻写出，也需要使用DataCacheCleanAndInvalid接口。
 
