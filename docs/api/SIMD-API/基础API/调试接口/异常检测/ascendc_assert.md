@@ -49,15 +49,15 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为:"utils/debug/asc\_assert.h"
+头文件路径为："utils/debug/asc_assert.h"。
 
-ascendc\_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。
+ascendc_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。
 
-在算子Kernel侧实现代码中需要增加断言的地方使用ascendc\_assert检查代码，并格式化输出一些调测信息。
+在算子Kernel侧实现代码中需要增加断言的地方使用ascendc_assert检查代码，并格式化输出一些调测信息。
 
 > [!CAUTION]注意
 > 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>
-> 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明)，按需关闭该接口功能。
+> 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明.md)，按需关闭该接口功能。
 
 ## 函数原型<a name="section2067518173415"></a>
 
@@ -67,7 +67,7 @@ ascendc\_assert提供了一种在CPU/NPU域实现断言功能的接口。当断�
 
 ## 参数说明<a name="section158061867342"></a>
 
-**表**  参数说明
+**表 1**  参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
@@ -83,7 +83,7 @@ ascendc\_assert提供了一种在CPU/NPU域实现断言功能的接口。当断�
 
 <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="310p">Atlas 推理系列产品 AI Core，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -96,7 +96,7 @@ ascendc\_assert提供了一种在CPU/NPU域实现断言功能的接口。当断�
 
 ## 调用示例<a name="section82241477610"></a>
 
-- 接口调用示例
+接口调用示例
 
     ```cpp
     int assertFlag = 10;
