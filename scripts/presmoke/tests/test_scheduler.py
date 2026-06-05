@@ -399,6 +399,50 @@ class SchedulerTest(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual([item["example"] for item in payload["results"]], ["b", "a", "c"])
 
+    def test_cli_fixed_schedule_falls_back_when_builtin_cpu_schedule_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "a", "supported_archs": ["dav-2201"], "supported_modes": ["cpu"]},
+                        {"case": "b", "supported_archs": ["dav-2201"], "supported_modes": ["cpu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            results_dir = root / "out"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "cpu",
+                        "--dry-run",
+                        "--schedule",
+                        "fixed",
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(results_dir),
+                    ]
+                )
+
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual([item["example"] for item in payload["results"]], ["a", "b"])
+
     def test_cli_schedule_file_overrides_builtin_schedule_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -34,7 +34,7 @@ def schedule_cells(
         return enforce_required_order(cells_list)
     if schedule == "fixed":
         if schedule_file is None:
-            raise FileNotFoundError("fixed schedule requires --schedule-file or built-in schedule")
+            return enforce_required_order(cells_list)
         return enforce_required_order(apply_fixed_schedule(cells_list, schedule_file))
     if schedule not in {"build-desc", "frontload-build-desc", "npu-idle-min"}:
         raise ValueError(f"unknown schedule: {schedule}")

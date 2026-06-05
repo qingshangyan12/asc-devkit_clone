@@ -132,7 +132,8 @@ def resolve_schedule_file(
     if schedule != "fixed":
         return None
     mode = modes[0] if modes else "npu"
-    return project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
+    schedule_file = project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
+    return schedule_file if schedule_file.exists() else None
 
 
 def resolve_jobs(value: str | int, cpu_count: int | None = None) -> int:
