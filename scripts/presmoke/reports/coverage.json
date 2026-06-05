@@ -89,7 +89,7 @@
     "03_simt_api/02_features/00_framework",
     "03_simt_api/02_features/00_framework/00_pytorch",
     "03_simt_api/02_features/01_api_features",
-    "03_simt_api/02_features/01_api_features/00_memory_asscess",
+    "03_simt_api/02_features/01_api_features/00_memory_access",
     "03_simt_api/02_features/01_api_features/01_sync_instruction",
     "03_simt_api/02_features/06_compile",
     "03_simt_api/03_best_practices",

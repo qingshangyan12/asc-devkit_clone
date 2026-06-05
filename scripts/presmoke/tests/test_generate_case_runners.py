@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 import unittest
 import subprocess
 import tempfile
@@ -19,6 +21,42 @@ from presmoke.model import Command, ExampleSpec
 
 
 class GenerateCaseRunnersTest(unittest.TestCase):
+    def expected_archs_from_supported_products(self, readme: Path) -> list[str]:
+        text = readme.read_text(encoding="utf-8", errors="ignore")
+        lines = text.splitlines()
+        start = None
+        for idx, line in enumerate(lines):
+            if re.match(r"^#+\s*(支持的产品|支持产品)\s*$", line.strip()):
+                start = idx + 1
+                break
+        if start is None:
+            return []
+        end = len(lines)
+        for idx in range(start, len(lines)):
+            if re.match(r"^##+\s+", lines[idx].strip()):
+                end = idx
+                break
+        support = "\n".join(lines[start:end])
+        archs = []
+        if re.search(r"Ascend\s*950|950PR|950DT|dav-3510", support, re.IGNORECASE):
+            archs.append("dav-3510")
+        if re.search(r"Atlas\s*A[23]|Atlas\s*200I/500\s*A2|Atlas\s*200I|Atlas\s*500\s*A2|dav-2201", support, re.IGNORECASE):
+            archs.append("dav-2201")
+        return archs
+
+    def test_manifest_archs_match_readme_supported_products(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        manifest = json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8"))
+        mismatches = []
+        for item in manifest:
+            readme = project_root / "examples" / item["case"] / "README.md"
+            if not readme.exists():
+                continue
+            expected = self.expected_archs_from_supported_products(readme)
+            if expected and sorted(item.get("supported_archs")) != sorted(expected):
+                mismatches.append((item["case"], expected, item.get("supported_archs")))
+        self.assertEqual(mismatches, [])
+
     def test_atc_prerequisite_python_stays_in_build_before_atc(self) -> None:
         commands = [
             Command("python3 ../leaky_relu.py", "run"),
@@ -221,6 +259,10 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             vendor_dynamic.mkdir(parents=True)
             (vendor_dynamic / "add_custom.py").write_text("", encoding="utf-8")
             (vendor_dynamic / "add_custom_tiling_sink.py").write_text("", encoding="utf-8")
+            add_custom_dynamic = opp / "vendors/add_custom/op_impl/ai_core/tbe/add_custom_impl/dynamic"
+            add_custom_dynamic.mkdir(parents=True)
+            (add_custom_dynamic / "add_custom.py").write_text("", encoding="utf-8")
+            (add_custom_dynamic / "add_custom_kernel.cpp").write_text("", encoding="utf-8")
             vendor_api = opp / "vendors/customize/op_api"
             (vendor_api / "include").mkdir(parents=True)
             (vendor_api / "lib").mkdir(parents=True)
@@ -276,6 +318,7 @@ presmoke_ensure_custom_op_package
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("custom_op package already installed", result.stderr)
             self.assertTrue((opp / "vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py").exists())
+            self.assertTrue((add_custom_dynamic / "add_custom_tiling.h").exists())
 
 
 if __name__ == "__main__":

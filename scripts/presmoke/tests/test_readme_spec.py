@@ -54,6 +54,60 @@ class ReadmeSpecTest(unittest.TestCase):
         self.assertEqual(spec.modes, ["npu", "sim"])
         self.assertTrue(any(c.kind == "verify" for c in spec.commands))
 
+    def test_support_product_section_overrides_command_arch_defaults(self) -> None:
+        text = """# sample
+
+## 支持的产品
+
+- Ascend 950PR/Ascend 950DT
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+## 编译运行
+
+```bash
+cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-2201
+cmake --build build -j
+./demo
+```
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "examples"
+            ex = root / "x"
+            ex.mkdir(parents=True)
+            (ex / "README.md").write_text(text, encoding="utf-8")
+            spec = parse_readme(ex, root)
+
+        self.assertEqual(spec.archs, ["dav-2201", "dav-3510"])
+
+    def test_support_product_section_restricts_arch_even_if_option_table_mentions_more(self) -> None:
+        text = """# sample
+
+## 支持的产品
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+## 编译运行
+
+```bash
+cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+./demo
+```
+
+| 参数 | 说明 |
+| :--- | :--- |
+| CMAKE_ASC_ARCHITECTURES | dav-2201 对应 Atlas A2/A3，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "examples"
+            ex = root / "x"
+            ex.mkdir(parents=True)
+            (ex / "README.md").write_text(text, encoding="utf-8")
+            spec = parse_readme(ex, root)
+
+        self.assertEqual(spec.archs, ["dav-2201"])
+
     def test_parse_readme_prefers_cmake_block_over_manual_compile_block(self) -> None:
         text = """# sample
 
