@@ -21,6 +21,7 @@ protected:
     {
         blockIdxBak_ = block_idx;
         channel_.sqNum = 1;
+        channel_.cqNum = 1;
         sqCtx_.contextInfo.roceSq.sqVa = (uint64_t)sqVa_;
         sqCtx_.contextInfo.roceSq.dbVa = (uint64_t)dbVa_;
         sqCtx_.contextInfo.roceSq.wqeSize = 48;
