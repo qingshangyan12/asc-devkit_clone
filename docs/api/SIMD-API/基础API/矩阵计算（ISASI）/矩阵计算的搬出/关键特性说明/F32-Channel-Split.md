@@ -8,7 +8,7 @@
 
 <cann-filter npu_type = "A3,910b">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，可以通过配置[Fixpipe搬运参数（FixpipeParamsV220）结构体说明](../L0C到GM数据搬运.md)中[channelSplit](F32-Channel-Split.md)为true开启。
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，可以通过配置[Fixpipe搬运参数（FixpipeParamsV220）结构体说明](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)中[channelSplit](F32-Channel-Split.md)为true开启。
 
 </cann-filter>
 

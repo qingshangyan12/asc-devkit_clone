@@ -1,4 +1,4 @@
-# L1-\>GM连续数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002563687928"></a>
+# L1ToGM连续数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002563687928"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002540198372_section796754519912"></a>
 

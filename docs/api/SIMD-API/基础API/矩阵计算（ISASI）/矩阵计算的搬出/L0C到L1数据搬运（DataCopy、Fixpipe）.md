@@ -1,4 +1,4 @@
-# L0C到L1数据搬运<a id="ZH-CN_TOPIC_0000002538231198"></a>
+# L0C到L1数据搬运（DataCopy、Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002511188540_section796754519912"></a>
 
@@ -44,27 +44,11 @@
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
     ```
 
-- 寄存器设置接口，通过调用该接口设置随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，使用tensor量化、pRelu模式（AscendC待实现）时需要设置
+- [SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)：寄存器设置接口，通过调用该接口设置随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，使用tensor量化、pRelu模式（AscendC待实现）时需要设置。
 
-    ```cpp
-    template <typename T>
-    __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool isUnitFlag = false)
-    
-    template <typename T, bool setRelu = false>
-    __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false)
-    ```
+- [SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)：寄存器设置接口，通过调用该接口设置随路量化参数，此元素代表整个输出矩阵使用的量化参数，使用Scalar量化时需要设置。
 
-- 寄存器设置接口，通过调用该接口设置随路量化参数，此元素代表整个输出矩阵使用的量化参数，使用Scalar量化时需要设置
-
-    ```cpp
-    __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
-    ```
-
-- 寄存器设置接口，通过调用该接口设置随路NZ2ND格式转换配置，使用随路NZ2ND需要设置
-
-    ```cpp
-    __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
-    ```
+- [SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)：寄存器设置接口，通过调用该接口设置随路NZ2ND格式转换配置，使用随路NZ2ND需要设置。
 
 </cann-filter>
 
@@ -72,12 +56,7 @@
 
 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 
-- 寄存器设置接口，通过调用该接口设置随路Leaky Relu系数，使用随路Leaky Relu需要设置（注：非正式对外接口，正式待补充，头文件路径为："basic\_api/dav\_c220/kernel\_operator\_cube\_others\_impl.h"）
-
-    ```cpp
-    template<typename T>
-    __aicore__ inline void SetLreluALPHA(T config)
-    ```
+- [SetLreluALPHA](./寄存器配置说明/SetLreluALPHA.md)：寄存器设置接口，通过调用该接口设置随路Leaky Relu系数，使用随路Leaky Relu需要设置（注：非正式对外接口，正式待补充，头文件路径为："basic\_api/dav\_c220/kernel\_operator\_cube\_others\_impl.h"）。
 
 </cann-filter>
 
@@ -85,19 +64,9 @@
 
 针对Atlas 200I/500 A2 推理产品：
 
-- 寄存器设置接口，通过调用该接口设置ClipRelu操作的最大值
+- [SetFixPipeClipRelu](./寄存器配置说明/SetFixPipeClipRelu.md)：寄存器设置接口，通过调用该接口设置ClipRelu操作的最大值。
 
-    ```cpp
-    uint64_t clipReluMaxVal = 0x3c00;
-    SetFixPipeClipRelu(clipReluMaxVal); // 开启Relu的情况下，先进行Relu操作，再进行clip，clipReluMaxVal为通过该接口设置的最大值
-    ```
-
-- 寄存器设置接口，通过调用该接口设置Elementwise操作时LocalTensor的地址
-
-    ```cpp
-    template <typename T>
-    __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_t c0ChStride)
-    ```
+- [SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)：寄存器设置接口，通过调用该接口设置Elementwise操作时LocalTensor的地址。
 
 </cann-filter>
 
