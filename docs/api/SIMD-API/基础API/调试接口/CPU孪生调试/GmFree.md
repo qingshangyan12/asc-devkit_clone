@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section259105813316"></a>
 
-头文件路径为：include "tools/cpudebug/include/stub\_def.h
+头文件路径为：`"tools/cpudebug/include/stub_def.h"`。
 
 进行核函数的CPU侧运行验证时，用于释放通过[GmAlloc](GmAlloc.md)申请的共享内存。
 
@@ -71,7 +71,7 @@ void GmFree(void *ptr)
 
 ## 参数说明<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section158061867342"></a>
 
-**表 1**  模板参数说明
+**表 1**  参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |

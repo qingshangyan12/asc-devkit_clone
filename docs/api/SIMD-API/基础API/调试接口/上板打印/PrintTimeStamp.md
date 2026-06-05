@@ -49,13 +49,13 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_dump\_tensor\_intf_impl.h
+头文件路径为：`"basic_api/kernel_operator_dump_tensor_intf_impl.h"`。
 
 提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。调用后会打印如下信息：
 
-- descId:用户自定义标识符，用于区分不同打点位置；
-- rsv ：保留值，默认为0，无需关注；
-- timeStamp :当前系统cycle数，用于计算时间差，时间换算规则可参考[GetSystemCycle\(ISASI\)](../../系统变量访问/GetSystemCycle(ISASI).md)；
+- descId：用户自定义标识符，用于区分不同打点位置；
+- rsv：保留值，默认为0，无需关注；
+- timeStamp:当前系统cycle数，用于计算时间差，时间换算规则可参考[GetSystemCycle\(ISASI\)](../../系统变量访问/GetSystemCycle(ISASI).md)。
 - pcPtr：pc指针数值，若无特殊需求，用户无需关注。
 - entry：算子开始执行的cycle数，若无特殊需求，用户无需关注。
 
@@ -85,7 +85,7 @@ __aicore__ inline void PrintTimeStamp(uint32_t descId)
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
-| descId | 输入 | 用户自定义标识符（自定义数字），用于区分不同打点位置。<br>•**注意**：[0, 0xffff]是预留给Ascend C内部各个模块使用的id值，用户自定义的descId建议使用大于0xffff的数值。 |
+| descId | 输入 | 用户自定义标识符（自定义数字），用于区分不同打点位置。<br>•**注意**：[0，0xffff]是预留给Ascend C内部各个模块使用的id值，用户自定义的descId建议使用大于0xffff的数值。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
