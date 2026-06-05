@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "ccu_kernel_signature.h"
-#include "ccu_kernel_arg.h"
 #include "ccu_types.h"
 #include "ccu_task_arg_v1.h"
 #include "ccu_task_param_v1.h"
