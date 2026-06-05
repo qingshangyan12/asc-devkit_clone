@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CASE_REL=03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table
+CASE_REL=03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
