@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以sincos计算为例，介绍Ascend C SIMT编程方式下的线程配置优化思路。样例包含1个基线版本以及1个优化版本，基线版本中未设置`__launch_bounds__`，编译器按照默认值`blockDim`最大为1024线程进行资源分配导致寄存器溢出，优化版本通过配置`__launch_bounds__(512)`，提示编译器真实`blockDim`最大为512，编译器根据提示在编译过程中充分利用硬件资源，从而避免寄存器溢出，展示SIMT编程方式下合理配置线程数优化性能的调优路径。
+本样例以sincos计算为例，介绍Ascend C SIMT编程方式下的线程配置优化思路。样例包含1个基线版本以及1个优化版本，基线版本中未设置`__launch_bounds__`，编译器按照默认值1024（即每个Block内1024个线程）进行资源分配导致寄存器溢出，优化版本通过配置`__launch_bounds__(512)`，提示编译器每个Block内线程数量为512，编译器根据提示在编译过程中充分利用硬件资源，从而避免寄存器溢出，展示SIMT编程方式下合理配置线程数优化性能的调优路径。
 
 ## 支持的产品
 
@@ -52,9 +52,9 @@ sincos_compute/
 
 ### 线程数与寄存器关系
 
-在SIMT编程模型中，blockDim大小直接影响每个Thread可用的寄存器数量：
+在SIMT编程模型中，Blcok内的线程数量直接影响每个Thread可用的寄存器数量：
 
-| blockDim大小 | 每个Thread可用寄存器个数 |
+| Block内线程数量 | 每个Thread可用寄存器个数 |
 |--------------|--------------------------|
 | 1025~2048 | 16 |
 | 513~1024 | 32 |
@@ -62,7 +62,7 @@ sincos_compute/
 | 1~256 | 127 |
 
 **关键原则**：
-- blockDim越大，每个Thread可用寄存器数越少
+- 每个Block内线程数量越大，每个Thread可用寄存器数越少
 - 计算密集型算子，单个线程通常占用较多寄存器，一般建议配置512~1024线程
 - 数据搬运类算子，单个线程通常寄存器占用较少，一般建议配置2048线程
 - 当寄存器不足时，数据会溢出到栈空间（Global Memory），导致性能下降
@@ -95,8 +95,6 @@ sincos_compute/
 **核心实现**：
 - 默认线程数为1024，每个Thread仅可用32个寄存器
 - sincosf计算需要更多寄存器，超出32个寄存器限制
-- 超出的寄存器数据溢出到栈空间（Global Memory）
-- 导致额外的Global Memory访问，降低性能
 
 **关键代码**：
 
@@ -149,8 +147,6 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 **核心优化**：
 - 指定`__launch_bounds__(512)`，每个Thread可用64个寄存器
 - sincosf计算所需的寄存器在限制范围内
-- 无寄存器溢出，所有中间数据保存在寄存器中
-- 减少Global Memory访问，提升性能
 
 **关键代码**：
 
@@ -214,7 +210,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
    - Stack size = 0：无寄存器溢出
 
 2. **合理配置线程数**：
-   - 计算密集型算子（如sincos、矩阵运算）：建议512~1024线程
+   - 计算密集型算子：建议512~1024线程
    - 数据搬运类算子：建议2048线程
    - 根据寄存器需求表选择合适的线程数配置
 
@@ -227,16 +223,12 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
    - 对比优化前后的编译信息（Stack size和Used register number）
    - 对比优化前后的性能数据（Task Duration、DCache Read GM、DCache Read Vector、DCache Write Vector）
 
-5. **性能指标关注**：
-   - Task Duration：整体性能提升的直接指标
-   - 寄存器使用情况：判断是否存在寄存器溢出
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
   - 默认路径，root用户安装CANN软件包
 
     ```bash
