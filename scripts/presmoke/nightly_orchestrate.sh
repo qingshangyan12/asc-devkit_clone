@@ -7,7 +7,7 @@ ARCH="${ARCH:-dav-2201}"
 MODES="${MODES:-npu}"
 JOBS="${JOBS:-4}"
 NPU_SLOTS="${NPU_SLOTS:-1}"
-TIMEOUT="${TIMEOUT:-1200}"
+TIMEOUT="${TIMEOUT:-120}"
 PRIMARY_CARD="${PRIMARY_CARD:-1}"
 RETRY_CARDS="${RETRY_CARDS:-2 3 4 5 6 7 0}"
 WAIT_PID_FILE="${WAIT_PID_FILE:-/tmp/run_presmoke2_full_exclude_000102.pid}"
@@ -265,6 +265,7 @@ if primary:
     name, run_dir, meta, data = primary
     summary = data.get("summary", {})
     results = data.get("results", [])
+    npu_stats = data.get("npu_stats") or {}
     lines.extend([
         "## Primary Full Run",
         "",
@@ -275,8 +276,15 @@ if primary:
         f"- elapsed_sec: `{meta.get('elapsed_sec', '')}`",
         f"- planned_results: `{len(results)}`",
         f"- pass/fail/skip: `{summary.get('PASS', 0)}/{summary.get('FAIL', 0)}/{summary.get('SKIP', 0)}`",
-        "",
     ])
+    if npu_stats:
+        lines.extend([
+            f"- npu_busy_s: `{float(npu_stats.get('busy_s') or 0):.3f}`",
+            f"- npu_idle_s: `{float(npu_stats.get('idle_s') or 0):.3f}`",
+            f"- npu_utilization: `{float(npu_stats.get('utilization') or 0):.3f}`",
+            f"- npu_max_slot_idle_s: `{float(npu_stats.get('max_slot_idle_s') or 0):.3f}`",
+        ])
+    lines.append("")
     failures = [r for r in results if r.get("status") != "PASS"]
     lines.append("## Failures")
     lines.append("")
