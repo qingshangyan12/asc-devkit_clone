@@ -61,6 +61,7 @@
 - 输出：[1, 16]个half元素（仅前2个元素有效：全局最小值 + 全局最小值索引）
 - 实现：先调用 `WholeReduceMin<half>(dstLocal, srcLocal, mask=uint64_t[2]{-1,-1}, repeat=8, 1, 1, 8)`，再调用 `GetReduceRepeatMaxMinSpr<half>(val, idx)` 获取全局最小值及其索引，通过 `SetFlag<HardEvent::V_S>` / `WaitFlag<HardEvent::V_S>` 同步向量计算到标量计算
 - 说明：WholeReduceMin对8个repeat分别求局部最小值，GetReduceRepeatMaxMinSpr从硬件寄存器中读取所有repeat中的全局最小值及其在源数据中的索引位置，结果写入dstLocal的前两个元素
+- 约束：仅支持Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，不支持Ascend 950PR/Ascend 950DT
 
 **场景6：WholeReduceSum非对齐场景**
 - 输入：[13, 57]个float元素（13行×57列，列数57×4字节=228字节，非32字节对齐）
