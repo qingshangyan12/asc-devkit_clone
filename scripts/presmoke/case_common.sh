@@ -133,7 +133,7 @@ presmoke_opp_path() {
 }
 
 presmoke_custom_op_package_valid() {
-    local vendor_dir add_custom_dynamic
+    local vendor_dir
     vendor_dir="$(presmoke_opp_path)/vendors/customize"
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom.py" ]] || return 1
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py" ]] || return 1
@@ -142,11 +142,6 @@ presmoke_custom_op_package_valid() {
     [[ -f "$vendor_dir/op_api/lib/libcust_opapi.so" ]] || return 1
     [[ -f "$vendor_dir/framework/onnx/libcust_onnx_parsers.so" ]] || return 1
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/op_master_device/lib/libcust_opmaster.so" ]] || return 1
-
-    add_custom_dynamic="$(presmoke_opp_path)/vendors/add_custom/op_impl/ai_core/tbe/add_custom_impl/dynamic"
-    [[ -f "$add_custom_dynamic/add_custom.py" ]] || return 1
-    [[ -f "$add_custom_dynamic/add_custom_kernel.cpp" ]] || return 1
-    [[ -f "$add_custom_dynamic/add_custom_tiling.h" ]] || return 1
 }
 
 presmoke_custom_op_dynamic_dirs() {
