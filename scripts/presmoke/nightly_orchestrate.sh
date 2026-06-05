@@ -8,6 +8,7 @@ MODES="${MODES:-npu}"
 JOBS="${JOBS:-4}"
 NPU_SLOTS="${NPU_SLOTS:-1}"
 TIMEOUT="${TIMEOUT:-120}"
+HOST_TIMEOUT="${HOST_TIMEOUT:-900}"
 PRIMARY_CARD="${PRIMARY_CARD:-1}"
 RETRY_CARDS="${RETRY_CARDS:-2 3 4 5 6 7 0}"
 WAIT_PID_FILE="${WAIT_PID_FILE:-/tmp/run_presmoke2_full_exclude_000102.pid}"
@@ -49,7 +50,7 @@ run_presmoke() {
     shift 2
     local run_dir="$OUT_ROOT/$name"
     mkdir -p "$run_dir"
-    log "run_start name=$name card=$card jobs=$JOBS npu_slots=$NPU_SLOTS timeout=$TIMEOUT args=$*"
+    log "run_start name=$name card=$card jobs=$JOBS npu_slots=$NPU_SLOTS timeout=$TIMEOUT host_timeout=$HOST_TIMEOUT args=$*"
     {
         echo "name=$name"
         echo "started_at=$(date -Is)"
@@ -60,6 +61,7 @@ run_presmoke() {
         echo "jobs=$JOBS"
         echo "npu_slots=$NPU_SLOTS"
         echo "timeout=$TIMEOUT"
+        echo "host_timeout=$HOST_TIMEOUT"
         echo "card=$card"
         echo "extra_args=$*"
         source_cann
@@ -79,7 +81,7 @@ run_presmoke() {
         export ASCEND_DEVICE_ID=0
         export NPU_DEVICE_ID=0
         bash scripts/run_presmoke2.sh \
-            --arch "$ARCH" --modes "$MODES" --jobs "$JOBS" --npu-slots "$NPU_SLOTS" --timeout "$TIMEOUT" \
+            --arch "$ARCH" --modes "$MODES" --jobs "$JOBS" --npu-slots "$NPU_SLOTS" --timeout "$TIMEOUT" --host-timeout "$HOST_TIMEOUT" \
             --report-format all --results "$run_dir/results" "$@"
     ) > "$run_dir/stdout.log" 2> "$run_dir/stderr.log"
     rc=$?
