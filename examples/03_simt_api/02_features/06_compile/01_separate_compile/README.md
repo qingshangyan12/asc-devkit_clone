@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于Gather算子，演示了将Host + Device混合.asc文件中的Device代码拆分到**多个.asc文件**的单独编译流程。单独编译的代码结构与调用关系如下图1所示，其中 `func.asc` 为**纯Device侧计算函数**（定义 `func_a` 函数并通过 extern 暴露供跨文件调用），`kernel.asc` 为**Host + Device混合文件**（含Kernel定义、<<<>>>内核调用，通过extern调用gather_compute中的计算函数），`.cpp` 为纯Host侧代码（通过extern调用kernel.asc暴露的 <<<>>> 内核启动函数）。
+本样例基于Gather算子，演示了将Host + Device混合.asc文件中的Device代码拆分到**多个.asc文件**的单独编译流程。单独编译的代码结构与调用关系如下图1所示，其中 `func.asc` 为**Device侧执行函数**（定义 `func_a` 函数并通过 extern 暴露供跨文件调用），`kernel.asc` 为**Host + Device混合文件**（含Kernel定义、<<<>>>内核调用，通过extern调用func.asc中的Device侧执行函数），`.cpp` 为纯Host侧代码（通过extern调用kernel.asc暴露的 <<<>>> 内核启动函数）。
 
 <p align="center">
   <img src="./figures/separate_compile.png" width="50%">
@@ -97,24 +97,18 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
-- 配置环境变量
-  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
 
   - 命令行方式
 

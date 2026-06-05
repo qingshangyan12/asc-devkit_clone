@@ -12,6 +12,10 @@
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -120,7 +124,7 @@ $$
 | 1 | yLocal = x² | Mul | yLocal, xLocal |
 | 2 | yLocal = x³ | Mul | yLocal, xLocal |
 | 3 | yLocal = 0.044715 * x³ | Muls | yLocal |
-| 4 | yLocal = x + 0.044715 * x³ | Add | yLocal |
+| 4 | yLocal = x + 0.044715 * x³ | Add | xLocal, yLocal |
 | 5 | yLocal = -1.595769 * (x + 0.044715 * x³) | Muls | yLocal |
 | 6 | yLocal = e^(-1.595769 * (x + 0.044715 * x³)) | Exp | yLocal |
 | 7 | yLocal = 1 + e^(...) | Adds | yLocal |
@@ -151,7 +155,7 @@ $$
 | 字段名 | 字段含义 |
 |:---|:---|
 |Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-|aiv_time(μs)|Task在AI Vector Core上的理论执行时间。|
+|aiv_time(μs)|Task在AI Vector Core上的执行时间。|
 |aiv_vec_time(μs)|vec类型指令（向量类运算指令）耗时。|
 |aiv_vec_ratio|vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。|
 |aiv_scalar_time(μs)|scalar类型指令（标量类运算指令）耗时。|
@@ -199,7 +203,7 @@ __aicore__ inline void GeluCompute(
 ```
 
 **样例配置**：
-- 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
+- 多核切分：M方向分32份，N方向2份，共计64份数据，分布到64core上计算
 - `tileLen = 8192` 为每次搬运和计算的数据元素个数
 
 **性能数据**：
@@ -253,7 +257,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ```
 
 **样例配置**：
-- 多核切分：M方向分2份，N方向32份，共计64份数据，分布到64core上计算
+- 多核切分：M方向分32份，N方向2份，共计64份数据，分布到64core上计算
 - `tileLen = 8192` 为每次搬运和计算的数据元素个数
 
 **优化手段**：
@@ -276,7 +280,6 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ### Case 2: 启用RegBase API、VF融合能力和循环展开优化
 
 **实现方式**：参考 `KernelGelu::GeluVfBasic()` 函数实现，添加 `#pragma unroll 6` 循环展开优化
-
 在Case 1中由于Gelu计算依赖路径较长，使用循环展开优化，提高指令级并行度。
 
 **关键代码**：
@@ -502,24 +505,16 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=0
   CMAKE_VF_MODE=false
@@ -544,9 +539,9 @@ $$
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1`、`2`　　　　　| Case编号：0=Gelu未使能VF融合，1=启用RegBase API和VF融合，2=启用RegBase API、VF融合和循环展开 |
-  | `CMAKE_VF_MODE` | `true`、`false`　　　　　| VF融合模式：case 0时需设置为false关闭VF自动融合 |
+  | `CMAKE_VF_MODE` | `true`、`false`　　　　　| VF融合模式：case 0时需设置为false关闭VF自动融合，case 1/2时需设置为true使能VF融合 |
 
 - 执行结果
 

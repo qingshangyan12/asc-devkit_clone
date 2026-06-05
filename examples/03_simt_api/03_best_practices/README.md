@@ -8,5 +8,4 @@
 
 | 目录名称                                               | 功能描述                                                                                        |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [01_simt_matrix_transpose](./01_simt_matrix_transpose)   | 样例基于Ascend C SIMT编程方式实现MatrixTranspose算子，展示Ascend C SIMT编程方式的性能调优思路。 |
-| [02_short_vector_add](./02_short_vector_add)            | 样例基于Ascend C SIMT编程方式实现Add算子，主要演示基于短向量half2性能调优方法。 |
+| [00_memory_optimizations](./00_memory_optimizations)   | 介绍SIMT编程方式下全局访存合并、片上缓存中转复用、bank冲突规避及短向量调优等访存优化方法。 |

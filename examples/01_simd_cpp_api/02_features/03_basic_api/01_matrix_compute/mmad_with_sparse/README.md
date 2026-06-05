@@ -9,6 +9,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -29,7 +33,7 @@
   ```
   C = A * B
   ```
-  其中矩阵B为稠密化后的矩阵，原始B矩阵每4个元素中至少包含2个零元素，通过4选2稠密化策略进行压缩存储，并且B矩阵必须转置，即为[N,K]输入。A、B矩阵数据类型只支持int8_t，index矩阵矩阵数据类型为uint8_t
+  其中矩阵B为稠密化后的矩阵，原始B矩阵每4个元素中至少包含2个零元素，通过4选2稠密化策略进行压缩存储，并且B矩阵必须转置，即为[N,K]输入。A、B矩阵数据类型只支持int8_t，index矩阵数据类型为uint8_t
 - 样例规格：
 
 <a name="表1"></a>
@@ -40,16 +44,13 @@
   <tr><td align="center">a</td><td align="center">[128, 128]</td><td align="center">int8</td><td align="center">NZ</td></tr>
   <tr><td align="center">b</td><td align="center">[64, 128]</td><td align="center">int8</td><td align="center">NZ</td></tr>
   <tr><td align="center">idx</td><td align="center">[128, 8]</td><td align="center">uint8</td><td align="center">ZN</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[128, 128]</td><td align="center">int32</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_with_sparse_custom</td></tr>
 </table>
 
 - 样例实现：
   样例实现流程分为以下步骤：
-  - **CopyIn**：将Global Memory上的输入数据搬运到Local Memory L1中，并把加载索引矩阵到L1中，其中Index分型与B矩阵分型必须为Zn分型，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
+  - **CopyIn**：将Global Memory上的输入数据搬运到Local Memory L1中，并将索引矩阵加载到L1中，其中Index分形与B矩阵分形必须为Zn分形，即GM上的B矩阵必须为转置，Index离线生成必须为Zn排布
   - **SplitB**：使用LoadDataWithSparse将B矩阵和索引矩阵从L1搬运到L0B与内置索引buffer中
   - **SplitA**：将A矩阵从L1搬运到L0A中
   - **Compute**：使用MmadWithSparse完成稀疏矩阵乘运算，计算结果存储在Local Memory L0C中
@@ -59,25 +60,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
   
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake ..;make -j;    # 编译工程，默认npu模式
@@ -108,6 +100,7 @@
   ```bash
   test pass!
   ```
+
 ## 数据生成与验证说明
 
 ### gen_data.py 脚本功能
