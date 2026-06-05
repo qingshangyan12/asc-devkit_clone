@@ -119,9 +119,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
     - 对于不同的核，可以直接将同一flagId用于不同的核间同步模式，具体包括以下2种场景：
         - 多个AI Core之间，使用flagId=0同步所有的AIC（模式0）；单个AI Core内，使用flagId=0同步所有AIV（模式1）。
         - 单个AI Core内，使用flagId=0同步所有AIV（模式1）；另一个AI Core内，使用flagId=0同步AIC与所有AIV（模式2）。
-
 - 使用该接口模式0时，建议开启batchmode模式，使算子独占全部所需核资源，否则可能因满足以下条件导致死锁：
-
     - 多流并发场景（≥2条执行流）。
     - ≥2个算子并发执行。
     - 所有并发算子的核数总和超过物理核数。
