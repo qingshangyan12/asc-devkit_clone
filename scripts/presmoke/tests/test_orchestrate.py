@@ -79,6 +79,39 @@ MD
             self.assertIn(f"out_root={root / 'presmoke_reports' / 'orchestrate_dav-2201_'}", result.stdout)
             self.assertFalse((root / "presmoke_results").exists())
 
+    def test_cpu_mode_uses_default_schedule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = {
+                **os.environ,
+                "PROJECT_ROOT": str(root),
+                "MODES": "cpu",
+                "ASCEND_OPP_PATH": str(root / "opp"),
+            }
+
+            result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("schedule=default", result.stdout)
+
+    def test_mode_alias_enables_cpu_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = {
+                **os.environ,
+                "PROJECT_ROOT": str(root),
+                "MODE": "cpu",
+                "ASCEND_OPP_PATH": str(root / "opp"),
+            }
+
+            result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("modes=cpu", result.stdout)
+            self.assertIn("schedule=default", result.stdout)
+
     def test_filtered_run_does_not_clean_cann_vendors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

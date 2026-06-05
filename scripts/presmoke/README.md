@@ -51,6 +51,9 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `OUT_ROOT` | `presmoke_reports/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
 | `RUNNER_MODE` | `case-runner` | Default runner implementation. |
 | `MODES` | `npu` | Presmoke modes. |
+| `MODE` | unset | Alias used only when `MODES` is unset. For example, `MODE=cpu`. |
+
+CPU debug mode is opt-in. Use `MODES=cpu` or `MODE=cpu`; the default watch path remains `npu`. CPU mode does not use the NPU fixed schedule unless `SCHEDULE_FILE` is explicitly provided.
 
 ## Reports
 
