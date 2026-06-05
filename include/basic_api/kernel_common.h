@@ -100,6 +100,7 @@ __aicore__ inline AscendC::TPipe* GetTPipePtr()
 #endif
 
 namespace AscendC {
+#if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)))
 template <HardEvent evt>
 __aicore__ inline TEventID AllocEventID()
 {
@@ -131,6 +132,7 @@ template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
 {
     return Internal::FetchEventIDImpl(evt);
 }
+#endif
 
 template <typename T, MaskMode mode = MaskMode::NORMAL>
 __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
