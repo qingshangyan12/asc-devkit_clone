@@ -25,7 +25,7 @@ TIMEOUT="${TIMEOUT:-120}"
 PRIMARY_CARD="${PRIMARY_CARD:-0}"
 RETRY_CARDS="${RETRY_CARDS:-}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
-OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_report/orchestrate_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
+OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_reports/orchestrate_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
 LOCK_DIR="${LOCK_DIR:-${PROJECT_ROOT}/.presmoke_locks/presmoke_orchestrate.lock}"
 
 mkdir -p "$OUT_ROOT"
