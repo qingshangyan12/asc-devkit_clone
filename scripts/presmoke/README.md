@@ -1,0 +1,101 @@
+# Presmoke Watch Entry
+
+`scripts/presmoke_orchestrate.sh` is the Jenkins and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
+
+`scripts/run_presmoke2.sh` is the lower-level debug entry. Use it for dry-run, single-case checks, direct Python CLI experiments, or regenerating schedules.
+
+## Jenkins Commands
+
+910B:
+
+```bash
+PROJECT_ROOT=/data/zgx/asc-devkit \
+ARCH=dav-2201 \
+PRIMARY_CARD=7 \
+RETRY_CARDS="0 1 2 3 4 5 6" \
+bash scripts/presmoke_orchestrate.sh
+```
+
+950:
+
+```bash
+PROJECT_ROOT=/home/zgx/asc-devkit \
+ARCH=dav-3510 \
+PRIMARY_CARD=0 \
+bash scripts/presmoke_orchestrate.sh
+```
+
+Dry-run:
+
+```bash
+ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/presmoke_orchestrate.sh --dry-run
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
+```
+
+## Parameters
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `PROJECT_ROOT` | script parent repo | asc-devkit checkout to run. |
+| `ASCEND_HOME_DIR` | `/usr/local/Ascend/ascend-toolkit/latest` | CANN toolkit root containing `set_env.sh`. |
+| `ARCH` | `dav-2201` | Target arch. Use `dav-2201` for 910B and `dav-3510` for 950. |
+| `PRIMARY_CARD` | `0` | Main NPU card id used for the full run. |
+| `RETRY_CARDS` | empty | Space-separated card ids for retrying timeout cases. |
+| `JOBS` | `auto` | Parallel build workers. `auto` uses CPU count. |
+| `NPU_SLOTS` | `1` | NPU queue concurrency. Keep `1` for watch runs. |
+| `TIMEOUT` | `120` | Timeout in seconds for NPU run commands only. Build and verify commands do not use this timeout. |
+| `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
+| `SCHEDULE_FILE` | built-in | Optional fixed order override. |
+| `OUT_ROOT` | `presmoke_results/orchestrate_<arch>_<timestamp>` | Output directory for Jenkins archive. |
+| `RUNNER_MODE` | `case-runner` | Default runner implementation. |
+| `MODES` | `npu` | Presmoke modes. |
+
+## Reports
+
+The orchestrator writes:
+
+- `status.txt`: high-level progress and final location.
+- `full_card<N>/meta.txt`: env, card, elapsed time, and `npu-smi` snapshots.
+- `full_card<N>/stdout.log` and `stderr.log`: raw wrapper logs.
+- `full_card<N>/results/report.json`: machine-readable presmoke report.
+- `full_card<N>/results/report.md`: detailed Markdown report.
+- `FINAL_REPORT.md`: concise summary with failures and retry results.
+- `ALL_CASE_TIMINGS.tsv`: per-case timing, NPU wait, step details, and executed commands.
+- `FAILURES.tsv`: failed or skipped primary results plus retry outcome.
+
+## Fixed Schedule
+
+The default fixed schedules are:
+
+- `scripts/presmoke/schedules/dav-2201_npu.txt`
+- `scripts/presmoke/schedules/dav-3510_npu.txt`
+
+They preserve the required custom-op ordering:
+
+- `custom_op_static_lib` runs before `custom_op`.
+- `aclnn`, `aclop`, `onnx`, `tensorflow`, and `tiling_sink` run after `custom_op`.
+
+New cases not listed in a schedule file are appended to the end, then the custom-op dependency order is enforced again.
+
+To regenerate a fixed schedule from a previous run:
+
+```bash
+PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
+  --runner-mode case-runner \
+  --arch dav-2201 \
+  --modes npu \
+  --jobs auto \
+  --schedule npu-idle-min \
+  --schedule-report presmoke_results/latest/full_card7/results/report.json \
+  --export-schedule scripts/presmoke/schedules/dav-2201_npu.txt \
+  --dry-run \
+  --report-format json \
+  --results /tmp/presmoke_schedule_export
+```
+
+## Notes
+
+- Do not run multiple orchestrators in the same checkout at the same time. A lock under `.presmoke_locks` protects against accidental overlap.
+- `run_presmoke.sh` is the old presmoke script and is not the watch entry for this flow.
+- TensorFlow cases that require TensorFlow 2.6.5 are intentionally skipped by the case manifest.
+- Timeout retry is for timeout cases only. Non-timeout failures are reported and left for diagnosis.

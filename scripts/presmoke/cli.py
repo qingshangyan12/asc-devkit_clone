@@ -18,7 +18,7 @@ from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
 from .runner import run_cells_pipeline
-from .scheduler import schedule_cells
+from .scheduler import export_schedule_file, schedule_cells
 from .suggest import dedupe_suggestions
 
 
@@ -56,9 +56,12 @@ def main(argv: list[str] | None = None) -> int:
         cells,
         schedule=args.schedule,
         schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
+        schedule_file=resolve_schedule_file(project_root, host_arch, modes, args.schedule, args.schedule_file),
         frontload_count=args.schedule_frontload_count,
         jobs=jobs,
     )
+    if args.export_schedule:
+        export_schedule_file(cells, Path(args.export_schedule).resolve())
 
     if args.suggestions_only:
         report = RunReport(host_arch, modes, started_at, now_iso(), [], suggestions)
@@ -74,16 +77,11 @@ def main(argv: list[str] | None = None) -> int:
         emit_reports(report, args, results_dir)
         return 0
 
-    if args.baseline or args.changed_only:
-        print("Error: baseline and changed-only are Phase 2/3 features and are not implemented in this Phase 1 build")
-        return 2
-
     with presmoke_run_lock(project_root):
         run = run_cells_pipeline(
             cells,
             log_dir=log_dir,
             timeout=args.timeout,
-            host_timeout=args.host_timeout,
             keep_artifacts=args.keep_artifacts,
             jobs=jobs,
             npu_slots=args.npu_slots,
@@ -107,24 +105,34 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
-    parser.add_argument("--host-timeout", type=int, default=900)
     parser.add_argument("--report-format", choices=["console", "json", "markdown", "all"], default="console")
     parser.add_argument("--results", default="presmoke_results")
     parser.add_argument("--log-dir")
     parser.add_argument("--keep-artifacts", action="store_true")
-    parser.add_argument("--schedule", choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min"], default="default")
+    parser.add_argument("--schedule", choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min", "fixed"], default="default")
     parser.add_argument("--schedule-report")
+    parser.add_argument("--schedule-file")
+    parser.add_argument("--export-schedule")
     parser.add_argument("--schedule-frontload-count", type=int, default=1)
     parser.add_argument("--suggestions-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--preflight", action="store_true")
     parser.add_argument("-v", "--verbose", action="store_true")
-    parser.add_argument("--baseline")
-    parser.add_argument("--update-baseline", action="store_true")
-    parser.add_argument("--allowlist")
-    parser.add_argument("--changed-only", action="store_true")
-    parser.add_argument("--since")
     return parser.parse_args(argv)
+
+
+def resolve_schedule_file(
+    project_root: Path,
+    host_arch: str,
+    modes: List[str],
+    schedule: str,
+    explicit_schedule_file: str | None,
+) -> Path | None:
+    if explicit_schedule_file:
+        return Path(explicit_schedule_file).resolve()
+    if schedule != "fixed":
+        return None
+    mode = modes[0] if modes else "npu"
+    return project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
 
 
 def resolve_jobs(value: str | int, cpu_count: int | None = None) -> int:
