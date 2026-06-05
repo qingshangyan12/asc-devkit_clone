@@ -100,6 +100,7 @@ def build_case_runner_cells_with_skips(
                 continue
             runner = runner_dir / "run.sh"
             commands = [
+                Command(f"bash {runner} clean", "clean", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
                 Command(f"bash {runner} build", "build", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
                 Command(f"bash {runner} run", "run", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
                 Command(f"bash {runner} verify", "verify", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
