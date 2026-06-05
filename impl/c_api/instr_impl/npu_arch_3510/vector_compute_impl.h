@@ -213,20 +213,18 @@
 #include "instr_impl/npu_arch_3510/vector_compute_impl/asc_set_va_reg_impl.h"
 
 // ==========asc_create_iter_reg(b8/b16/b32)=========
-__simd_callee__ inline iter_reg asc_create_iter_reg_b32(uint32_t offset)
-{
-    return asc_create_iter_reg_b32_impl(offset);
-}
+#define ASC_ITER_REG_API_FN(bxx, ...)                                                                \
+    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx(__VA_ARGS__)                           \
+    {                                                                                                \
+        return asc_create_iter_reg_##bxx##_impl(__VA_ARGS__);                                        \
+    }
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b16(uint32_t offset)
-{
-    return asc_create_iter_reg_b16_impl(offset);
-}
+ASC_ITER_REG_ARITIES(ASC_ITER_REG_API_FN, b32)
+ASC_ITER_REG_ARITIES(ASC_ITER_REG_API_FN, b16)
+ASC_ITER_REG_ARITIES(ASC_ITER_REG_API_FN, b8)
 
-__simd_callee__ inline iter_reg asc_create_iter_reg_b8(uint32_t offset)
-{
-    return asc_create_iter_reg_b8_impl(offset);
-}
+#undef ASC_ITER_REG_API_FN
+#undef ASC_ITER_REG_ARITIES
 
 // ==========asc_add(u8/s8/u16/s18/u32/s32)=========
 __simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
