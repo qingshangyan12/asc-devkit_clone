@@ -107,18 +107,14 @@ public:
         nd2nzParams.dstNzNStride = 1;
         nd2nzParams.dstNzMatrixStride = dstNzMatrixStride;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-        if constexpr (!ToMatmulConfig(MM_CFG).intrinsicsCheck) {
-            DataCopy(dst, src[srcOffset], nd2nzParams);
-        } else {
-            if (gCol >= UINT16_MAX) {
-                nd2nzParams.nValue = 1;
-                nd2nzParams.srcDValue = width;
-                for (int32_t i = 0; i < height; ++i) {
-                    DataCopy(dst[i * c0Size_], src[srcOffset + gCol * i], nd2nzParams);
-                }
-            } else {
-                DataCopy(dst, src[srcOffset], nd2nzParams);
+        if (gCol >= UINT16_MAX) {
+            nd2nzParams.nValue = 1;
+            nd2nzParams.srcDValue = width;
+            for (int32_t i = 0; i < height; ++i) {
+                DataCopy(dst[i * c0Size_], src[srcOffset + static_cast<int64_t>(gCol) * i], nd2nzParams);
             }
+        } else {
+            DataCopy(dst, src[srcOffset], nd2nzParams);
         }
 #else
         DataCopy(dst, src[srcOffset], nd2nzParams); // stride scope has increased
