@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+import io
 import tempfile
 import threading
 import time
@@ -26,7 +28,23 @@ class RunnerPoolTest(unittest.TestCase):
         args = parse_args([])
 
         self.assertEqual(args.timeout, 120)
-        self.assertEqual(args.host_timeout, 900)
+
+    def test_removed_cli_options_are_rejected(self) -> None:
+        removed_options = [
+            ["--preflight"],
+            ["--baseline"],
+            ["--update-baseline"],
+            ["--allowlist", "x"],
+            ["--changed-only"],
+            ["--since", "HEAD~1"],
+            ["--host-timeout", "1"],
+        ]
+
+        for option in removed_options:
+            with self.subTest(option=option):
+                with contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit):
+                        parse_args(option)
 
     def test_presmoke_run_lock_removes_stale_lock(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,7 +76,7 @@ class RunnerPoolTest(unittest.TestCase):
                     Command("sleep 1.2", "verify"),
                 ],
             )
-            result = run_cell(c, Path(tmp) / "logs", timeout=1, host_timeout=1, keep_artifacts=True)
+            result = run_cell(c, Path(tmp) / "logs", timeout=1, keep_artifacts=True)
 
         self.assertEqual(result.status, "PASS")
         self.assertEqual([step.rc for step in result.steps], [0, 0, 0])
