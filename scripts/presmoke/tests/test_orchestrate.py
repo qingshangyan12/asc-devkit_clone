@@ -166,6 +166,48 @@ MD
             self.assertTrue(stale.exists())
             self.assertIn("vendors_clean_skip reason=non_full_run", result.stdout)
 
+    def test_make_wrapper_limits_explicit_parallel_jobs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            fake_bin = root / "bin"
+            fake_bin.mkdir()
+            capture = root / "args.txt"
+            fake_make = fake_bin / "make"
+            fake_make.write_text(
+                f"#!/usr/bin/env bash\nprintf '%s\\n' \"$@\" > {capture}\n",
+                encoding="utf-8",
+            )
+            fake_make.chmod(0o755)
+            project_root = Path(__file__).resolve().parents[3]
+            wrapper = project_root / "scripts/presmoke/wrappers/make"
+            env = {
+                **os.environ,
+                "PATH": f"{wrapper.parent}{os.pathsep}{fake_bin}{os.pathsep}{os.environ.get('PATH', '')}",
+                "PRESMOKE_MAKE_JOBS": "16",
+            }
+
+            result = subprocess.run(
+                [str(wrapper), "-j", "binary", "package"],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(capture.read_text(encoding="utf-8").splitlines(), ["-j16", "binary", "package"])
+
+            result = subprocess.run(
+                [str(wrapper), "-j", "8", "binary"],
+                text=True,
+                capture_output=True,
+                env=env,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(capture.read_text(encoding="utf-8").splitlines(), ["-j16", "binary"])
+
 
 if __name__ == "__main__":
     unittest.main()

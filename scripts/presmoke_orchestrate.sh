@@ -21,7 +21,10 @@ SCHEDULE="${SCHEDULE:-fixed}"
 SCHEDULE_FILE="${SCHEDULE_FILE:-}"
 JOBS="${JOBS:-auto}"
 NPU_SLOTS="${NPU_SLOTS:-1}"
+CPU_RUN_SLOTS="${CPU_RUN_SLOTS:-auto}"
+MAKE_JOBS="${MAKE_JOBS:-auto}"
 TIMEOUT="${TIMEOUT:-120}"
+CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT:-300}"
 PRIMARY_CARD="${PRIMARY_CARD:-0}"
 RETRY_CARDS="${RETRY_CARDS:-}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
@@ -120,7 +123,7 @@ run_presmoke() {
     shift 2
     local run_dir="$OUT_ROOT/$name"
     mkdir -p "$run_dir"
-    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS npu_slots=$NPU_SLOTS timeout=$TIMEOUT schedule=$SCHEDULE args=$*"
+    log "run_start name=$name card=$card arch=$ARCH modes=$MODES jobs=$JOBS npu_slots=$NPU_SLOTS cpu_run_slots=$CPU_RUN_SLOTS make_jobs=$MAKE_JOBS timeout=$TIMEOUT cpu_run_timeout=$CPU_RUN_TIMEOUT schedule=$SCHEDULE args=$*"
     {
         echo "name=$name"
         echo "started_at=$(date_iso)"
@@ -133,7 +136,10 @@ run_presmoke() {
         echo "schedule_file=$SCHEDULE_FILE"
         echo "jobs=$JOBS"
         echo "npu_slots=$NPU_SLOTS"
+        echo "cpu_run_slots=$CPU_RUN_SLOTS"
+        echo "make_jobs=$MAKE_JOBS"
         echo "timeout=$TIMEOUT"
+        echo "cpu_run_timeout=$CPU_RUN_TIMEOUT"
         echo "card=$card"
         echo "extra_args=$*"
         source_cann
@@ -158,7 +164,10 @@ run_presmoke() {
             --modes "$MODES"
             --jobs "$JOBS"
             --npu-slots "$NPU_SLOTS"
+            --cpu-run-slots "$CPU_RUN_SLOTS"
+            --make-jobs "$MAKE_JOBS"
             --timeout "$TIMEOUT"
+            --cpu-run-timeout "$CPU_RUN_TIMEOUT"
             --schedule "$SCHEDULE"
             --report-format "$REPORT_FORMAT"
             --results "$run_dir/results"
@@ -363,6 +372,7 @@ if primary:
     name, run_dir, meta, data = primary
     summary = data.get("summary", {})
     npu_stats = data.get("npu_stats") or {}
+    parallel_config = data.get("parallel_config") or {}
     results = data.get("results", [])
     lines.extend([
         "",
@@ -373,16 +383,22 @@ if primary:
         f"- arch: `{meta.get('arch', '')}`",
         f"- schedule: `{meta.get('schedule', '')}`",
         f"- jobs/npu_slots: `{meta.get('jobs', '')}/{meta.get('npu_slots', '')}`",
+        f"- cpu_run_slots/make_jobs: `{meta.get('cpu_run_slots', '')}/{meta.get('make_jobs', '')}`",
+        f"- resolved jobs/npu_slots: `{parallel_config.get('jobs', '')}/{parallel_config.get('npu_slots', '')}`",
+        f"- resolved cpu_run_slots/make_jobs: `{parallel_config.get('cpu_run_slots', '')}/{parallel_config.get('make_jobs', '')}`",
+        f"- resolved cpu_run_timeout: `{parallel_config.get('cpu_run_timeout', '')}`",
         f"- timeout: `{meta.get('timeout', '')}`",
+        f"- cpu_run_timeout: `{meta.get('cpu_run_timeout', '')}`",
         f"- elapsed_sec: `{meta.get('elapsed_sec', '')}`",
         f"- planned_results: `{len(results)}`",
         f"- pass/fail/skip: `{summary.get('PASS', 0)}/{summary.get('FAIL', 0)}/{summary.get('SKIP', 0)}`",
     ])
     if npu_stats:
+        metric_prefix = "run_queue" if npu_stats.get("queue_model") == "pipeline-cpu" else "npu"
         lines.extend([
-            f"- npu_busy_s: `{float(npu_stats.get('busy_s') or 0):.3f}`",
-            f"- npu_idle_s: `{float(npu_stats.get('idle_s') or 0):.3f}`",
-            f"- npu_utilization: `{float(npu_stats.get('utilization') or 0):.3f}`",
+            f"- {metric_prefix}_busy_s: `{float(npu_stats.get('busy_s') or 0):.3f}`",
+            f"- {metric_prefix}_idle_s: `{float(npu_stats.get('idle_s') or 0):.3f}`",
+            f"- {metric_prefix}_utilization: `{float(npu_stats.get('utilization') or 0):.3f}`",
         ])
     failures = [r for r in results if r.get("status") == "FAIL"]
     skips = [r for r in results if r.get("status") == "SKIP"]

@@ -28,6 +28,7 @@ class RunnerPoolTest(unittest.TestCase):
         args = parse_args([])
 
         self.assertEqual(args.timeout, 120)
+        self.assertEqual(args.cpu_run_timeout, "300")
 
     def test_removed_cli_options_are_rejected(self) -> None:
         removed_options = [
@@ -80,6 +81,22 @@ class RunnerPoolTest(unittest.TestCase):
 
         self.assertEqual(result.status, "PASS")
         self.assertEqual([step.rc for step in result.steps], [0, 0, 0])
+
+    def test_cpu_run_stage_uses_timeout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            c = cell(Path(tmp), "x", mode="cpu", commands=[Command("sleep 2", "run")])
+            result = run_cell(c, Path(tmp) / "logs", timeout=1, keep_artifacts=True)
+
+        self.assertEqual(result.status, "PASS")
+        self.assertEqual(result.rc, 0)
+
+    def test_cpu_run_timeout_can_be_overridden(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            c = cell(Path(tmp), "x", mode="cpu", commands=[Command("sleep 2", "run")])
+            result = run_cell(c, Path(tmp) / "logs", timeout=1, cpu_run_timeout=1, keep_artifacts=True)
+
+        self.assertEqual(result.status, "FAIL")
+        self.assertEqual(result.rc, 124)
 
     def test_npu_gate_limits_concurrency(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -277,6 +294,43 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertEqual(by_name["verify-waits-for-next-run"].status, "PASS")
         self.assertEqual(by_name["touches-verify-marker"].status, "PASS")
 
+    def test_cpu_pipeline_runs_run_stages_with_job_parallelism(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            marker = root / "second_cpu_run_started"
+            cells = [
+                cell(
+                    root,
+                    "waits-for-other-cpu-run",
+                    mode="cpu",
+                    commands=[
+                        Command(":", "build"),
+                        Command(
+                            f"for i in $(seq 1 50); do [ -f {marker} ] && exit 0; sleep 0.02; done; exit 7",
+                            "run",
+                        ),
+                        Command(":", "verify"),
+                    ],
+                ),
+                cell(
+                    root,
+                    "starts-other-cpu-run",
+                    mode="cpu",
+                    commands=[
+                        Command(":", "build"),
+                        Command(f"touch {marker}", "run"),
+                        Command(":", "verify"),
+                    ],
+                ),
+            ]
+
+            run = run_cells_pipeline(cells, Path(tmp) / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+            results = run.results
+
+        by_name = {result.example: result for result in results}
+        self.assertEqual(by_name["waits-for-other-cpu-run"].status, "PASS")
+        self.assertEqual(by_name["starts-other-cpu-run"].status, "PASS")
+
     def test_pipeline_reports_npu_idle_and_busy_time(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -330,6 +384,32 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertIn('"utilization"', json_text)
         self.assertIn("npu_idle_s", md_text)
         self.assertIn("npu_utilization", md_text)
+
+    def test_cpu_report_labels_run_queue_stats(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [
+                cell(
+                    root,
+                    "cpu-stats",
+                    mode="cpu",
+                    commands=[
+                        Command(":", "build"),
+                        Command("sleep 0.01", "run"),
+                        Command(":", "verify"),
+                    ],
+                )
+            ]
+            run = run_cells_pipeline(cells, root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+            report = RunReport("dav-2201", ["cpu"], "start", "finish", run.results, [], run.npu_stats)
+            md_path = root / "report.md"
+
+            write_markdown(report, md_path)
+            md_text = md_path.read_text(encoding="utf-8")
+
+        self.assertIn("cpu_run_queue_idle_s", md_text)
+        self.assertIn("cpu_run_queue_utilization", md_text)
+        self.assertNotIn("npu_idle_s", md_text)
 
     def test_pipeline_writes_per_stage_logs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -20,12 +20,14 @@ NpuGate = Callable[[Cell, Command, Callable[[], int]], tuple[int, float]]
 PRESERVE_BUILD_ARTIFACT_CASES = {
     "01_simd_cpp_api/02_features/00_compilation/custom_op",
 }
+CPU_RUN_TIMEOUT = 300
 
 
 def run_cell(
     cell: Cell,
     log_dir: Path,
     timeout: int,
+    cpu_run_timeout: int = CPU_RUN_TIMEOUT,
     keep_artifacts: bool = False,
     npu_gate: Optional[NpuGate] = None,
 ) -> RunResult:
@@ -65,7 +67,7 @@ def run_cell(
             command_started = time.monotonic()
             uses_npu = command_uses_npu(cell, command)
             wait_s = 0.0
-            step_timeout = select_timeout(uses_npu, timeout)
+            step_timeout = select_timeout(cell, command, uses_npu, timeout, cpu_run_timeout)
             if uses_npu and npu_gate:
                 step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout))
             else:
@@ -117,9 +119,11 @@ def run_cells_pipeline(
     cells: Iterable[Cell],
     log_dir: Path,
     timeout: int,
+    cpu_run_timeout: int = CPU_RUN_TIMEOUT,
     keep_artifacts: bool = False,
     jobs: int = 1,
     npu_slots: int = 1,
+    cpu_run_slots: Optional[int] = None,
 ) -> RunCellsResult:
     cells_list = list(cells)
     if jobs <= 1:
@@ -129,6 +133,7 @@ def run_cells_pipeline(
                 cell,
                 log_dir=log_dir,
                 timeout=timeout,
+                cpu_run_timeout=cpu_run_timeout,
                 keep_artifacts=keep_artifacts,
                 npu_gate=npu_pool.gate,
             )
@@ -136,12 +141,15 @@ def run_cells_pipeline(
         ]
         return RunCellsResult(results, NpuStats(slots=npu_slots, queue_model="serial"))
 
+    uses_npu_queue = cells_use_npu_queue(cells_list)
+    run_slots = npu_slots if uses_npu_queue else max(cpu_run_slots or jobs, 1)
+    queue_model = "pipeline" if uses_npu_queue else "pipeline-cpu"
     npu_pool = NpuSlotPool(npu_slots)
     ready: "queue.Queue[Union[_PipelineItem, None]]" = queue.Queue()
     verify_ready: "queue.Queue[Union[_PipelineItem, None]]" = queue.Queue()
     results: List[RunResult] = []
     results_lock = threading.Lock()
-    npu_stats = _NpuPipelineStats(npu_slots)
+    npu_stats = _NpuPipelineStats(run_slots, queue_model)
 
     def append_result(result: RunResult) -> None:
         with results_lock:
@@ -152,6 +160,7 @@ def run_cells_pipeline(
             cell,
             log_dir=log_dir,
             timeout=timeout,
+            cpu_run_timeout=cpu_run_timeout,
             commands=build_stage_commands(cell.commands),
             keep_artifacts=True,
             stage_name="build",
@@ -173,6 +182,7 @@ def run_cells_pipeline(
                 result = finish_cell_after_build(
                     item,
                     timeout=timeout,
+                    cpu_run_timeout=cpu_run_timeout,
                     npu_gate=npu_pool.gate,
                 )
                 npu_stats.add_busy(slot_idx, time.monotonic() - busy_started)
@@ -189,14 +199,14 @@ def run_cells_pipeline(
             try:
                 if item is None:
                     return
-                result = finish_cell_verify(item, timeout=timeout, keep_artifacts=keep_artifacts)
+                result = finish_cell_verify(item, timeout=timeout, cpu_run_timeout=cpu_run_timeout, keep_artifacts=keep_artifacts)
                 append_result(result)
             finally:
                 verify_ready.task_done()
 
     npu_threads = [
         threading.Thread(target=npu_worker, args=(idx,), name=f"presmoke-npu-{idx}")
-        for idx in range(npu_slots)
+        for idx in range(run_slots)
     ]
     verify_threads = [threading.Thread(target=verify_worker, name=f"presmoke-verify-{idx}") for idx in range(jobs)]
     for thread in npu_threads:
@@ -225,8 +235,9 @@ def run_cells_pipeline(
 
 
 class _NpuPipelineStats:
-    def __init__(self, slots: int) -> None:
+    def __init__(self, slots: int, queue_model: str) -> None:
         self._slots = slots
+        self._queue_model = queue_model
         self._idle_by_slot = [0.0 for _ in range(slots)]
         self._busy_by_slot = [0.0 for _ in range(slots)]
         self._lock = threading.Lock()
@@ -245,7 +256,7 @@ class _NpuPipelineStats:
             busy_by_slot = list(self._busy_by_slot)
         return NpuStats(
             slots=self._slots,
-            queue_model="pipeline",
+            queue_model=self._queue_model,
             idle_s=sum(idle_by_slot),
             busy_s=sum(busy_by_slot),
             max_slot_idle_s=max(idle_by_slot, default=0.0),
@@ -267,6 +278,7 @@ def run_cell_stage(
     cell: Cell,
     log_dir: Path,
     timeout: int,
+    cpu_run_timeout: int,
     commands: Iterable[Command],
     keep_artifacts: bool,
     stage_name: str,
@@ -300,7 +312,7 @@ def run_cell_stage(
     )
     with log_file.open("w", encoding="utf-8", errors="replace") as log:
         log.write(f"example={cell.example.rel_path}\narch={cell.arch}\nmode={cell.mode}\nrun_dir={run_dir}\n\n")
-        run_commands(result, cell, commands, run_dir, log, timeout)
+        run_commands(result, cell, commands, run_dir, log, timeout, cpu_run_timeout)
     result.duration_s = time.monotonic() - started
     if should_remove_build_dir(cell, use_build_dir, keep_artifacts, result.status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
@@ -310,6 +322,7 @@ def run_cell_stage(
 def finish_cell_after_build(
     item: _PipelineItem,
     timeout: int,
+    cpu_run_timeout: int,
     npu_gate: Optional[NpuGate],
 ) -> RunResult:
     cell = item.cell
@@ -322,6 +335,7 @@ def finish_cell_after_build(
                 item.run_dir,
                 log,
                 timeout,
+                cpu_run_timeout,
                 npu_gate,
                 initial_npu_wait_s=time.monotonic() - item.ready_at,
             )
@@ -329,11 +343,11 @@ def finish_cell_after_build(
     return item.result
 
 
-def finish_cell_verify(item: _PipelineItem, timeout: int, keep_artifacts: bool) -> RunResult:
+def finish_cell_verify(item: _PipelineItem, timeout: int, cpu_run_timeout: int, keep_artifacts: bool) -> RunResult:
     cell = item.cell
     with item.log_file.open("a", encoding="utf-8", errors="replace") as log:
         if item.result.status == "PASS":
-            run_commands(item.result, cell, verify_stage_commands(cell.commands), item.run_dir, log, timeout)
+            run_commands(item.result, cell, verify_stage_commands(cell.commands), item.run_dir, log, timeout, cpu_run_timeout)
     item.result.duration_s = time.monotonic() - item.started
     if should_remove_build_dir(cell, cell.build_dir.exists(), keep_artifacts, item.result.status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
@@ -347,6 +361,7 @@ def run_commands(
     run_dir: Path,
     log,
     timeout: int,
+    cpu_run_timeout: int,
     npu_gate: Optional[NpuGate] = None,
     initial_npu_wait_s: float = 0.0,
 ) -> None:
@@ -365,7 +380,7 @@ def run_commands(
         stage_log.flush()
         command_started = time.monotonic()
         uses_npu = command_uses_npu(cell, command)
-        step_timeout = select_timeout(uses_npu, timeout)
+        step_timeout = select_timeout(cell, command, uses_npu, timeout, cpu_run_timeout)
         wait_s = 0.0
         if uses_npu and npu_gate:
             step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout))
@@ -407,6 +422,14 @@ def build_stage_commands(commands: Iterable[Command]) -> List[Command]:
 
 def run_stage_commands(commands: Iterable[Command]) -> List[Command]:
     return [command for command in commands if command.kind in {"run", "package_run"}]
+
+
+def cells_use_npu_queue(cells: Iterable[Cell]) -> bool:
+    return any(
+        command_uses_npu(cell, command)
+        for cell in cells
+        for command in run_stage_commands(cell.commands)
+    )
 
 
 def verify_stage_commands(commands: Iterable[Command]) -> List[Command]:
@@ -487,8 +510,12 @@ def command_uses_npu(cell: Cell, command: Command) -> bool:
     return False
 
 
-def select_timeout(uses_npu: bool, npu_timeout: int) -> Optional[int]:
-    return npu_timeout if uses_npu else None
+def select_timeout(cell: Cell, command: Command, uses_npu: bool, npu_run_timeout: int, cpu_run_timeout: int = CPU_RUN_TIMEOUT) -> Optional[int]:
+    if uses_npu:
+        return npu_run_timeout
+    if cell.mode == "cpu" and command.kind in {"run", "package_run"}:
+        return cpu_run_timeout
+    return None
 
 
 def _run_command(command: Command, cwd: Path, log, timeout: Optional[int]) -> int:
