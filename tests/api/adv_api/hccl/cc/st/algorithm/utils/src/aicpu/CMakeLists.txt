@@ -80,12 +80,15 @@ target_compile_definitions(${HCCL_CHECKER_SELECTOR_TARGET} PRIVATE
 )
 
 add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_pcie_mix.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_reduce_scatter_parallel_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor.cc
+    ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor_aicpu.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_meshchunk.cc
+    ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1d_dpu.cc
 
