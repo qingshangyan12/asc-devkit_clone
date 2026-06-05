@@ -10,3 +10,4 @@
 | [02_reg_vector_compute_practices](./02_reg_vector_compute_practices) | 基于VF函数的性能优化样例，通过<<<>>>直调的实现方式，介绍了VF循环优化、VF指令双发优化、VF连续非对齐场景优化、VF融合优化的方法。 |
 | [03_fusion_compute_practices](./03_fusion_compute_practices) | 融合计算相关的性能优化样例，介绍QuantGroupMatmul、Matmul+GELU等Cube-Vector融合算子的高性能实现，以及SIMD与SIMT混合编程高性能优化样例。 |
 | [04_memory_access_practices](./04_memory_access_practices) | 基于搬运类API使用的优化样例，通过<<<>>>直调的实现方式，介绍了减少无效数据搬运、减少搬运指令数量等方法。 |
+| [05_kernel_aot_practices](./05_kernel_aot_practices) | 基于 AOT（Ahead-of-Time）编译优化的性能实践样例，通过编译阶段将 Tiling 参数常量化实现更激进的编译器优化，运行时自动匹配预编译特化版本以获得性能提升。 |
