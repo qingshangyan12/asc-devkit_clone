@@ -127,6 +127,7 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/common/alg_env_config.cc
 
     channel_stub.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/cann_host_bridge.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/executor/channel/channel_request.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/executor/registry/coll_alg_exec_registry.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
