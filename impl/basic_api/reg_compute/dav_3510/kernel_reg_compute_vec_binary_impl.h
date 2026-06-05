@@ -390,10 +390,10 @@ __simd_callee__ inline void AbsUsingS32(T& dstReg, T& srcReg0, MaskReg& mask)
 }
 
 template <typename T>
-__simd_callee__ inline void VbrUsingU32(T& dstReg, uint32_t highScalar, uint32_t lowScalar)
+__simd_callee__ inline void VbrUsingU32(T& dstReg, uint32_t lowScalar, uint32_t highScalar)
 {
-    vbr((RegTensor<uint32_t>&)dstReg.reg[0], highScalar);
-    vbr((RegTensor<uint32_t>&)dstReg.reg[1], lowScalar);
+    vbr((RegTensor<uint32_t>&)dstReg.reg[0], lowScalar);
+    vbr((RegTensor<uint32_t>&)dstReg.reg[1], highScalar);
 }
 
 template <typename T, typename U>
@@ -549,8 +549,9 @@ __simd_callee__ inline void DivS64Impl(T& dstReg, T& srcReg0, T& srcReg1, MaskRe
     AbsUsingS32(vAbsSrc0, srcReg0, mask);
     AbsUsingS32(vAbsSrc1, srcReg1, mask);
     VbrUsingU32(vConstDup0, static_cast<uint32_t>(0), static_cast<uint32_t>(0));
+    constexpr uint64_t vdivU64Const = 0x7FFFFFFFFFFFFFFFULL;
     constexpr uint32_t u32MaxNum = 0xFFFFFFFFU;
-    VbrUsingU32(qZero, u32MaxNum, u32MaxNum);
+    VbrUsingU32(qZero, u32MaxNum, static_cast<uint32_t>(vdivU64Const >> 8));
     VbrUsingU32(vConstDup1, static_cast<uint32_t>(1), static_cast<uint32_t>(0));
     VcmpEqUsingU32( zeroMask, srcReg1, vConstDup0, mask);
     pnot( nonZeroMask,  zeroMask, mask);
@@ -1925,4 +1926,3 @@ __simd_callee__ inline void SubCarryOutImpl(MaskReg& carry, U& dstReg, U& srcReg
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_BINARY_IMPL__
 #endif
-
