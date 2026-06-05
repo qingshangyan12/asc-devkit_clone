@@ -49,9 +49,9 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001963799138_zh-cn_topic_0000001997078721_section259105813316"></a>
 
-头文件路径为："basic\_api/kernel\_prof\_trace\_intf.h
+头文件路径为："basic_api/kernel_prof_trace_intf.h"。
 
-用于设置性能数据采集信号启动，和[MetricsProfStop](MetricsProfStop)配合使用。使用msProf工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。
+用于设置性能数据采集信号启动，和[MetricsProfStop](MetricsProfStop.md)配合使用。使用msProf工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。
 
 ## 函数原型<a name="zh-cn_topic_0000001963799138_zh-cn_topic_0000001997078721_section2067518173415"></a>
 
@@ -75,6 +75,6 @@ __aicore__ inline void MetricsProfStart()
 
 ```cpp
 MetricsProfStart();
-... // 需要调优的kernel侧代码段
+... // 需要调优的kernel侧代码段。
 MetricsProfStop();
 ```

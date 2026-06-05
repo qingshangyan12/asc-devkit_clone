@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001963639310_zh-cn_topic_0000001656094169_section259105813316"></a>
 
-头文件路径为：include "tools/cpudebug/include/stub\_def.h
+头文件路径为：include "tools/cpudebug/include/stub_def.h"
 
 针对分离模式，CPU调测时，设置内核模式为单AIV模式，单AIC模式或者MIX模式，以分别支持单AIV矢量算子，单AIC矩阵算子，MIX混合算子的CPU调试。不调用该接口的情况下，默认为MIX模式。为保证算子代码在多个硬件平台兼容，耦合模式下也可以调用，该场景下接口不会生效，不影响正常调试。
 

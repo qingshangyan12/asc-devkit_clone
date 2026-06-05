@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_dump\_tensor\_intf.h
+头文件路径为："basic_api/kernel_operator_dump_tensor_intf.h"。
 
-该接口可以打印Tensor的内容，同时支持打印自定义的标签（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+该接口可以打印Tensor的内容，同时支持打印自定义的标签（仅支持uint32_t数据类型的信息），比如打印当前行号等。
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
 
 ```cpp
@@ -117,14 +117,14 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
-| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0 Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入|
+| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0 Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入。|
 | desc | 输入 | 用户自定义附加信息（行号或其他自定义数字）。<br>在使用DumpTensor功能时，用户可通过desc参数附加自定义信息，以便在不同场景下区分Dump内容的来源。此功能有助于精准定位具体DumpTensor的输出，提升调试与分析效率。|
-| dumpSize | 输入 | 需要dump的元素个数 |
+| dumpSize | 输入 | 需要dump的元素个数。|
 | shapeInfo | 输入 | 传入Tensor的shape信息，可按照shape信息进行打印。<br>•当Shape尺寸大于dumpSize元素个数时，按照ShapeInfo打印元素，不足的Dump数据用"-"展示。<br>•当Shape尺寸小于等于dumpSize元素个数时，按照ShapeInfo打印元素，多出的Dump数据不展示。|
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、 hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、 fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
@@ -132,7 +132,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="310p">Atlas 推理系列产品 AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 <cann-filter npu-type="910">Atlas 训练系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
@@ -159,50 +159,60 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 
 - 带Tensor shape的打印
 
-    ```cpp
-    uint32_t array[] = {static_cast<uint32_t>(8), static_cast<uint32_t>(8)};
-    AscendC::ShapeInfo shapeInfo(2, array);       // dim为2， shape为(8,8)
-    AscendC::DumpTensor(x, 2, 64, shapeInfo);     // dump x的64个元素，且解析按照shapeInfo的(8,8)排列
+    - Shape等于dumpSize元素个数
+        ```cpp
+            uint32_t array[] = {static_cast<uint32_t>(8), static_cast<uint32_t>(8)};
+            AscendC::ShapeInfo shapeInfo(2, array);       // dim为2， shape为(8,8)
+            AscendC::DumpTensor(x, 2, 64, shapeInfo);     // dump x的64个元素，且解析按照shapeInfo的(8,8)排列
+        ```
+        打印结果如下：
+        ```plain
+            DumpTensor: desc=2, addr=0x0, data_type=float16, position=UB, dump_size=64
+            [[2.048828,0.113037,4.042969,3.505859,4.554688,4.019531,0.598633,2.160156],
+            [2.707031,0.117981,1.134766,4.835938,1.190430,3.085938,1.334961,0.406250],
+            [2.658203,1.674805,3.791016,0.747070,3.541016,4.546875,0.394043,2.455078],
+            [1.161133,2.775391,0.453857,2.857422,2.837891,1.052734,2.654297,1.828125],
+            [0.358643,4.765625,3.681641,0.850098,2.250000,2.001953,0.446777,0.830078],
+            [2.154297,4.781250,1.773438,0.201294,0.028412,3.285156,0.772949,3.261719],
+            [0.532227,2.789062,0.588867,4.316406,0.146606,2.201172,3.775391,2.023438],
+            [2.820312,2.835938,2.957031,2.398438,4.449219,0.516113,4.796875,0.786133]]
+        ```
 
-    uint32_t array1[] = {static_cast<uint32_t>(7), static_cast<uint32_t>(8)};
-    AscendC::ShapeInfo shapeInfo1(2, array1); // dim为2， shape为(7,8)
-    AscendC::DumpTensor(x1, 3, 64, shapeInfo1); // 当Shape尺寸小于等于dumpSize元素个数时， 按照ShapeInfo打印元素，多出的Dump数据不展示
-
-    uint32_t array2[] = {static_cast<uint32_t>(9), static_cast<uint32_t>(8)};
-    AscendC::ShapeInfo shapeInfo2(2, array2); // dim为2， shape为(9,8)
-    AscendC::DumpTensor(x2, 4, 64, shapeInfo2); // 当Shape尺寸大于dumpSize元素个数时， 按照ShapeInfo打印元素，不足的Dump数据用"-"展示
-    ```
-
-    打印结果如下：
-
-    ```plain
-    DumpTensor: desc=2, addr=xxxx, data_type=float16, position=UB, dump_size=64
-    [[150.000000,83.000000,109.000000,166.000000,129.000000,50.000000,150.000000,74.000000],
-    [135.000000,79.000000,98.000000,134.000000,146.000000,166.000000,112.000000,70.000000],
-    [122.000000,51.000000,116.000000,68.000000,172.000000,72.000000,102.000000,69.000000],
-    [136.000000,83.000000,88.000000,88.000000,112.000000,148.000000,79.000000,136.000000],
-    [133.000000,104.000000,83.000000,71.000000,83.000000,99.000000,103.000000,151.000000],
-    [98.000000,118.000000,128.000000,83.000000,25.000000,105.000000,179.000000,34.000000],
-    [104.000000,169.000000,115.000000,113.000000,134.000000,121.000000,88.000000,96.000000],
-    [29.000000,139.000000,70.000000,40.000000,158.000000,138.000000,72.000000,171.000000]]
-    DumpTensor: desc=3, addr=xxxx, data_type=float16, position=UB, dump_size=64
-    shape is [7, 8], dumpSize is 64, dumpSize is greater than shapeSize.
-    [[82.250000,37.312500,22.843750,91.937500,93.312500,77.125000,50.718750,27.171875],
-    [21.859375,32.906250,20.109375,70.875000,13.398438,14.562500,30.156250,52.562500],
-    [40.156250,45.781250,78.937500,65.687500,71.562500,61.375000,32.062500,80.750000],
-    [55.593750,44.031250,43.781250,3.132812,38.750000,50.968750,79.562500,80.562500],
-    [51.562500,22.468750,88.250000,20.578125,95.437500,83.562500,76.812500,34.281250],
-    [75.500000,47.875000,52.562500,74.937500,39.687500,90.062500,28.890625,10.593750],
-    [42.343750,67.062500,35.468750,60.875000,71.812500,81.562500,57.531250,62.500000]]
-    DumpTensor: desc=4, addr=xxxx, data_type=float16, position=UB, dump_size=64
-    shape is [9, 8], dumpSize is 64, data is not enough.
-    [[95.437500,59.250000,57.281250,27.093750,41.375000,48.375000,33.093750,91.312500],
-    [27.703125,60.718750,68.187500,70.875000,67.437500,84.562500,13.507812,4.550781],
-    [24.500000,73.437500,36.062500,68.437500,55.500000,95.375000,60.250000,64.750000],
-    [40.093750,85.000000,42.250000,39.531250,60.968750,8.953125,48.531250,53.906250],
-    [53.656250,64.187500,84.750000,22.250000,95.500000,39.937500,12.945312,54.031250],
-    [3.804688,98.187500,43.968750,26.000000,41.750000,34.500000,75.750000,89.625000],
-    [25.046875,5.265625,65.500000,45.468750,32.937500,8.593750,1.705078,12.742188],
-    [37.281250,95.125000,71.562500,27.515625,47.250000,36.312500,66.750000,31.250000],
-    [-,-,-,-,-,-,-,-]]
-    ```
+    - Shape小于dumpSize元素个数
+        ```cpp
+            uint32_t array1[] = {static_cast<uint32_t>(7), static_cast<uint32_t>(8)};
+            AscendC::ShapeInfo shapeInfo1(2, array1); // dim为2， shape为(7,8)
+            AscendC::DumpTensor(x1, 3, 64, shapeInfo1); // 当Shape尺寸小于等于dumpSize元素个数时， 按照ShapeInfo打印元素，多出的Dump数据不展示
+        ```
+        打印结果如下：
+        ```plain
+            DumpTensor: desc=3, addr=0x0, data_type=float16, position=UB, dump_size=64
+            shape is [7, 8], dumpSize is 64, dumpSize is greater than shapeSize.
+            [[2.048828,0.113037,4.042969,3.505859,4.554688,4.019531,0.598633,2.160156],
+            [2.707031,0.117981,1.134766,4.835938,1.190430,3.085938,1.334961,0.406250],
+            [2.658203,1.674805,3.791016,0.747070,3.541016,4.546875,0.394043,2.455078],
+            [1.161133,2.775391,0.453857,2.857422,2.837891,1.052734,2.654297,1.828125],
+            [0.358643,4.765625,3.681641,0.850098,2.250000,2.001953,0.446777,0.830078],
+            [2.154297,4.781250,1.773438,0.201294,0.028412,3.285156,0.772949,3.261719],
+            [0.532227,2.789062,0.588867,4.316406,0.146606,2.201172,3.775391,2.023438]]
+        ```
+    - Shape大于dumpSize元素个数
+        ```cpp
+            uint32_t array2[] = {static_cast<uint32_t>(9), static_cast<uint32_t>(8)};
+            AscendC::ShapeInfo shapeInfo2(2, array2); // dim为2， shape为(9,8)
+            AscendC::DumpTensor(x2, 4, 64, shapeInfo2); // 当Shape尺寸大于dumpSize元素个数时， 按照ShapeInfo打印元素，不足的Dump数据用"-"展示
+        ```
+        打印结果如下：
+        ```plain
+            DumpTensor: desc=4, addr=0x0, data_type=float16, position=UB, dump_size=64
+            shape is [9, 8], dumpSize is 64, data is not enough.
+            [[2.048828,0.113037,4.042969,3.505859,4.554688,4.019531,0.598633,2.160156],
+            [2.707031,0.117981,1.134766,4.835938,1.190430,3.085938,1.334961,0.406250],
+            [2.658203,1.674805,3.791016,0.747070,3.541016,4.546875,0.394043,2.455078],
+            [1.161133,2.775391,0.453857,2.857422,2.837891,1.052734,2.654297,1.828125],
+            [0.358643,4.765625,3.681641,0.850098,2.250000,2.001953,0.446777,0.830078],
+            [2.154297,4.781250,1.773438,0.201294,0.028412,3.285156,0.772949,3.261719],
+            [0.532227,2.789062,0.588867,4.316406,0.146606,2.201172,3.775391,2.023438],
+            [2.820312,2.835938,2.957031,2.398438,4.449219,0.516113,4.796875,0.786133],
+            [-,-,-,-,-,-,-,-]]
+        ```

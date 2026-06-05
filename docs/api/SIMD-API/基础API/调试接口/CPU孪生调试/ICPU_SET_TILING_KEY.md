@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002000279997_zh-cn_topic_0000001610028277_section259105813316"></a>
 
-头文件路径为：include "tools/cpudebug/include/kern\_fwk.h
+头文件路径为：include "tools/cpudebug/include/kern_fwk.h"
 
 用于指定本次CPU调测使用的tilingKey。调测执行时，将只执行算子核函数中该tilingKey对应的分支。
 
