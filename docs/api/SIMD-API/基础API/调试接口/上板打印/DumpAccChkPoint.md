@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为 "basic\_api/kernel\_operator\_dump\_tensor\_intf.h
+头文件路径为："basic_api/kernel_operator_dump_tensor_intf.h。"。
 
 该接口Dump指定Tensor的内容。同时支持打印自定义的标签（仅支持uint32\_t数据类型的信息），比如打印当前行号等。区别于[DumpTensor](DumpTensor.md)，使用该接口可以支持指定偏移位置的Tensor打印。
 
@@ -70,7 +70,7 @@ AscendC::DumpAccChkPoint(srcLocal, 5, 32, dataLen);
 ```
 > [!CAUTION]注意
 > 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>
-> 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明)，按需关闭该接口功能。
+> 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明.md)，按需关闭该接口功能。
 
 ## 函数原型<a name="section2067518173415"></a>
 
@@ -93,14 +93,14 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
-| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0 Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入|
+| tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0C Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入。|
 | index | 输入 | 用户自定义附加信息（行号或其他自定义数字）。|
 | countOff | 输入 | 偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束。具体参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)|
 | dumpSize | 输入 | 需要dump的元素个数。|
 
 ## 数据类型
 
-<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、 hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、 fp8_e8m0_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，T支持的数据类型为：bool、int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
@@ -108,7 +108,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="310p">Atlas 推理系列产品 AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 <cann-filter npu-type="910">Atlas 训练系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
@@ -116,13 +116,17 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 
 <cann-filter npu-type="9030">Kirin 9030，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
+## 返回值说明<a name="section640mcpsimp"></a>
+
+无。
+
 ## 约束说明<a name="section794123819592"></a>
 
 - 该功能用于NPU上板调试和NPU仿真。
 - 暂不支持算子入图场景的打印。
 - 当前仅支持打印存储位置为Unified Buffer/L1 Buffer/L0C Buffer/Global Memory的Tensor信息。
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
-- 单次调用DumpTensor打印的数据总量不可超过31.77kb（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。
+- 单次调用DumpAccChkPoint打印的数据总量不可超过30kb（还包括少量框架需要的头尾信息，通常可忽略）。使用时应注意，如果超出这个限制，则数据不会被打印。
 - 在计算数据量时，若Dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐Dump时，如果实际Dump的元素长度不满足32字节对齐，系统会在其末尾自动补充一定数量的padding数据，以满足对齐要求。例如，Tensor1中用户需要Dump的元素长度为30字节，系统会在其后添加2字节的padding，使总长度对齐到32字节。但在实际解析时，仍只解析原始的30字节数据，padding部分不会被使用。
 
 ## 调用示例<a name="section82241477610"></a>
@@ -132,8 +136,14 @@ constexpr uint32_t totalLength = 256;    // 参与搬运的元素个数
 AscendC::LocalTensor<half> srcLocal;
 AscendC::GlobalTensor<half> srcGlobal;
 AscendC::DataCopy(srcLocal, srcGlobal, totalLength * sizeof(half));
-uint32_t index = 8;    // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
+uint32_t index = 56;    // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
 uint32_t countOff = 32;    // 偏移元素个数，从srcLocal[32]开始打印
-uint32_t dupmSize = 128;    // dump的元素个数，从srcLocal[32]开始打印128个元素个数
-AscendC::DumpAccChkPoint(srcLocal, index, countOff, dupmSize);
+uint32_t dumpSize = 128;    // dump的元素个数，从srcLocal[32]开始打印128个元素个数
+AscendC::DumpAccChkPoint(srcLocal, index, countOff, dumpSize);
+```
+
+打印结果如下：
+```plain
+DumpTensor: desc=56, addr=0x40, data_type=float16, position=UB, dump_size=15
+[4.710938, 4.707031, 4.773438, 2.271484, 4.347656, 2.359375, 1.284180, 1.073242, 1.242188, 2.298828, 0.521973, 1.099609, 1.880859, 1.226562, 3.916016]
 ```

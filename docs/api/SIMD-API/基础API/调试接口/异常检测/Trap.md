@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_sys\_var\_intf.h
+头文件路径为："basic_api/kernel_operator_sys_var_intf.h。
 
 在Kernel侧调用，NPU模式下会中断AI Core的运行，CPU模式下等同于assert。可用于Kernel侧异常场景的调试。
 

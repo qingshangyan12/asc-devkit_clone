@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为:"utils/debug/asc\_assert.h"
+头文件路径为:"utils/debug/asc_assert.h"。
 
 该接口实现CPU/NPU域assert断言功能。算子执行中，如果assert内部条件判断不为真，则输出assert条件并将输入的信息格式化打印在屏幕上。
 

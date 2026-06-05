@@ -49,9 +49,9 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为:"utils/debug/asc\_assert.h"
+头文件路径为:"utils/debug/asc_assert.h"。
 
-ascendc\_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。
+ascendc_assert提供了一种在CPU/NPU域实现断言功能的接口。当断言条件不满足时，系统会输出断言信息并格式化打印在屏幕上。
 
 在算子Kernel侧实现代码中需要增加断言的地方使用ascendc\_assert检查代码，并格式化输出一些调测信息。
 
