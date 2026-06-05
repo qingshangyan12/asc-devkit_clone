@@ -139,7 +139,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 | 阶段 | 数据流动/行为 | 实现目的/原因 |
 |------|-------------|-------------|
 | 初始化 | 调用 `InitSocState()` 初始化硬件状态 | 确保核运行前硬件状态正确复位 |
-| 分核 | 通过 [GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md) 获取当前核索引，计算 `xGm`/`yGm` 的偏移地址 | 每个核只处理自己对应的连续数据段，避免数据重叠 |
+| 分核 | 通过 [GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md) 获取当前核索引，计算 `xGm`/`yGm` 的偏移地址 | 每个核只处理自己对应的连续数据段，避免数据重叠 |
 | UB 分配 | 使用 [LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md) 为当前核申请 UB 缓存 `xLocal`/`yLocal` | UB 是片上高速缓存，为后续寄存器计算提供数据暂存区 |
 | GM → UB 搬入 | 调用 [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md) 将输入数据从 GM 搬运到 UB | 寄存器无法直接访问 GM，必须先将数据搬运到 UB |
 | MTE2_V 同步 | `SetFlag<HardEvent::MTE2_V>` + `WaitFlag<HardEvent::MTE2_V>` | GM→UB 搬运由 MTE2 引擎异步执行，必须等待搬运完成后 V 单元才能读取 UB 中的数据，否则会读到未完成搬运的脏数据 |
@@ -155,7 +155,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 | VF融合双发优化 | 当前 VF 函数内 GELU 计算依赖路径较长，虽然已使用 `asc_vf_call` 调用 RegBase API，但 VF 融合的双发特性未充分利用，IPC（每 cycle 指令发射数量）较低 | 利用 VF 融合双发特性，常规计算指令（Mul/Muls/Add/Adds）并行度可达 512 bytes/cycle，向量化指令耗时可减少 **55%** 以上。详见[Gelu性能调优样例 Case 1](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/gelu_high_performance/README.md) |
 | 循环展开优化 | VF 函数内循环为简单 for 循环，编译器无法充分调度指令级并行，执行队列中可双发的指令数受限 | 使用 `#pragma unroll N` 展开循环，提高指令发射并行度和 IPC，在 VF 融合基础上向量指令耗时可进一步减少约 **4.6%**。展开因子 N 需根据实际场景调优，过大会增加寄存器压力。详见[Gelu性能调优样例 Case 2](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/gelu_high_performance/README.md) |
 | 流水线串行执行 | 当前搬入、计算、搬出三个阶段严格串行执行，各硬件单元（MTE2/V/MTE3）无法同时工作，数据搬运占比超过 90%，性能瓶颈为 MTE2 bound | 采用多缓冲（Double Buffer/Triple Buffer）机制，使搬入、计算、搬出可并行执行，提升硬件利用率和吞吐 |
-| 核数固定 | 固定使用 2 个核，未根据实际可用核数动态分配 | 动态获取可用核数（[GetBlockNum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockNum.md)），充分利用多核并行能力 |
+| 核数固定 | 固定使用 2 个核，未根据实际可用核数动态分配 | 动态获取可用核数（[GetBlockNum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockNum.md)），充分利用多核并行能力 |
 
 ## 功能调试
 
