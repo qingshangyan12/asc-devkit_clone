@@ -133,29 +133,4 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 
 ## 调用示例<a id="section6461234123118"></a>
 
-```cpp
-#include "kernel_operator.h"
-uint16_t C1 = 2;
-uint16_t H = 4, W = 4;
-uint8_t Kh = 2, Kw = 2;
-uint16_t Cout = 16;
-uint16_t C0 = 16;
-uint8_t dilationH = 2, dilationW = 2;
-uint8_t padTop = 1, padBottom = 1, padLeft = 1, padRight = 1;
-uint8_t strideH = 1, strideW = 1;
-uint16_t coutBlocks, ho, wo, howo, howoRound;
-uint32_t featureMapA1Size, weightA1Size, featureMapA2Size, weightB2Size, dstSize, dstCO1Size;
-uint8_t padList[4] = {padLeft, padRight, padTop, padBottom};
-featureMapA2Size = howoRound * (C1 * Kh * Kw * C0);
-
-fmRepeat = featureMapA2Size / (16 * C0);
-
-LoadData2DParamsV2 param = { padList, H, W, 0, 0, 0, -1, -1, strideW, strideH, Kw, Kh, dilationW, dilationH, 1, 0, fmRepeat, 0, (half)(0)};
-Load2DBitModeParam paramBitMode(param);
-
-AscendC::LocalTensor<half> featureMapA1 = inQueueFmA1.DeQue<half>();
-AscendC::LocalTensor<half> featureMapA2 = inQueueFmA2.AllocTensor<half>();
-AscendC::LoadData<A2, A1, half>(featureMapA2, featureMapA1, paramBitMode);
-inQueueFmA2.EnQue<half>(featureMapA2);
-inQueueFmA1.FreeTensor(featureMapA1);
-```
+无
