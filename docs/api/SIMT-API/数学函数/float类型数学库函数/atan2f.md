@@ -64,43 +64,41 @@ y/x的反正切值。
 
 - SIMT编程场景：
 
-```
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "simt_api/math_functions.h"
 
-__global__ __launch_bounds__(256) void compute_atan2f(float *result, const float *x, const float *y, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __global__ __launch_bounds__(256) void compute_atan2f(float *result, const float *x, const float *y, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = atan2f(y[idx], x[idx]);
     }
-    result[idx] = atan2f(y[idx], x[idx]);
-}
-```
+    ```
 
 - SIMD与SIMT混合编程场景：
 
-```
-#include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "kernel_operator.h"
+    #include "simt_api/math_functions.h"
 
-__simt_vf__ __launch_bounds__(256) inline void compute_atan2f_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __simt_vf__ __launch_bounds__(256) inline void compute_atan2f_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = atan2f(y[idx], x[idx]);
     }
-    result[idx] = atan2f(y[idx], x[idx]);
-}
 
-__global__ __vector__ void run_atan2f(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
-{
-    asc_vf_call<compute_atan2f_vf>(dim3(256), result, x, y, count);
-}
-```
+    __global__ __vector__ void run_atan2f(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
+    {
+        asc_vf_call<compute_atan2f_vf>(dim3(256), result, x, y, count);
+    }
+    ```
 
-- 输入输出
+输入输出示例如下：
 
 ```
 y：1.5, 2.5, 3.5, 4.5

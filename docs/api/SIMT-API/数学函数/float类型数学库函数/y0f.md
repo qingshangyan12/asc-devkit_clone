@@ -57,43 +57,41 @@ inline float y0f(float x)
 
 - SIMT编程场景：
 
-```
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "simt_api/math_functions.h"
 
-__global__ __launch_bounds__(256) void compute_y0f(float *result, const float *x, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __global__ __launch_bounds__(256) void compute_y0f(float *result, const float *x, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = y0f(x[idx]);
     }
-    result[idx] = y0f(x[idx]);
-}
-```
+    ```
 
 - SIMD与SIMT混合编程场景：
 
-```
-#include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "kernel_operator.h"
+    #include "simt_api/math_functions.h"
 
-__simt_vf__ __launch_bounds__(256) inline void compute_y0f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __simt_vf__ __launch_bounds__(256) inline void compute_y0f_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = y0f(x[idx]);
     }
-    result[idx] = y0f(x[idx]);
-}
 
-__global__ __vector__ void run_y0f(__gm__ float *result, __gm__ const float *x, uint32_t count)
-{
-    asc_vf_call<compute_y0f_vf>(dim3(256), result, x, count);
-}
-```
+    __global__ __vector__ void run_y0f(__gm__ float *result, __gm__ const float *x, uint32_t count)
+    {
+        asc_vf_call<compute_y0f_vf>(dim3(256), result, x, count);
+    }
+    ```
 
-- 输入输出
+输入输出示例如下：
 
 ```
 x：1, 2, 3, 4

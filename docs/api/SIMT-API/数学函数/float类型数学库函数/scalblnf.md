@@ -57,43 +57,41 @@ inline float scalblnf(float x, int64_t n)
 
 - SIMT编程场景：
 
-```
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "simt_api/math_functions.h"
 
-__global__ __launch_bounds__(256) void compute_scalblnf(float *result, const int *n, const float *x, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __global__ __launch_bounds__(256) void compute_scalblnf(float *result, const int *n, const float *x, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
     }
-    result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
-}
-```
+    ```
 
 - SIMD与SIMT混合编程场景：
 
-```
-#include "kernel_operator.h"
-#include "simt_api/asc_simt.h"
-#include "simt_api/math_functions.h"
+    ```
+    #include "kernel_operator.h"
+    #include "simt_api/math_functions.h"
 
-__simt_vf__ __launch_bounds__(256) inline void compute_scalblnf_vf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
-{
-    const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= count) {
-        return;
+    __simt_vf__ __launch_bounds__(256) inline void compute_scalblnf_vf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
+    {
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
     }
-    result[idx] = scalblnf(x[idx], static_cast<int64_t>(n[idx]));
-}
 
-__global__ __vector__ void run_scalblnf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
-{
-    asc_vf_call<compute_scalblnf_vf>(dim3(256), result, n, x, count);
-}
-```
+    __global__ __vector__ void run_scalblnf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
+    {
+        asc_vf_call<compute_scalblnf_vf>(dim3(256), result, n, x, count);
+    }
+    ```
 
-- 输入输出
+输入输出示例如下：
 
 ```
 n：1, 2, 3, 1
