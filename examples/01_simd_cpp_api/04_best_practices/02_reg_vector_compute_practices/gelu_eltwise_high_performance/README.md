@@ -15,6 +15,10 @@
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -68,7 +72,7 @@ $$
 | 字段名 | 字段含义 |
 |:---|:---|
 |Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-|aiv_time(μs)|Task在AI Vector Core上的理论执行时间。|
+|aiv_time(μs)|Task在AI Vector Core上的执行时间。|
 |aiv_total_cycles|所有vector核的总共计算的cycle数量。|
 |aiv_vec_time(μs)|vec类型指令（向量类运算指令）耗时。|
 |aiv_vec_ratio|vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。|
@@ -418,13 +422,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 244.299 \text{ μs} \times 1650 \text{ MHz} = 401094
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 244.299 \text{ μs} \times 1650 \text{ MHz} = 403093
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{425984}{401094} \approx 1.06
+IPC = \frac{425984}{403093} \approx 1.06
 $$
 
 ---
@@ -445,13 +449,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 125.203 \text{ μs} \times 1650 \text{ MHz} = 205835
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 125.203 \text{ μs} \times 1650 \text{ MHz} = 206585
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{205835} \approx 1.03
+IPC = \frac{212992}{206585} \approx 1.03
 $$
 
 **IPC分析**：Case 1相比Case 0，IPC略有降低（1.03 vs 1.06），但vector耗时显著减少（减少48.7%）。这里要注意，虽然一般采用IPC衡量VF的性能，但是前提是要尽量用满指令并行度。
@@ -471,13 +475,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 97.184 \text{ μs} \times 1650 \text{ MHz} = 159861
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 97.184 \text{ μs} \times 1650 \text{ MHz} = 160354
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{159861} \approx 1.33
+IPC = \frac{212992}{160354} \approx 1.33
 $$
 
 **IPC分析**：Case 2相比Case 1，IPC从1.03提升到1.33，提升了 **29.1%**。Loop拆分后，指令依赖链缩短，指令双发效率显著提高。
@@ -497,16 +501,16 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 94.339 \text{ μs} \times 1650 \text{ MHz} = 155069
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 94.339 \text{ μs} \times 1650 \text{ MHz} = 155659
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{155069} \approx 1.38
+IPC = \frac{212992}{155659} \approx 1.37
 $$
 
-**IPC分析**：Case 3相比Case 2，IPC从1.33提升到1.38，提升了 **3.8%**。循环展开后，更多指令能够并行执行，进一步提高指令发射效率。
+**IPC分析**：Case 3相比Case 2，IPC从1.33提升到1.37，提升了 **3.0%**。循环展开后，更多指令能够并行执行，进一步提高指令发射效率。
 
 ---
 
@@ -517,11 +521,11 @@ $$
 | 0 | 单loop计算，并行度128 bytes（基准） | 244.299 | 1.06 | 1x |
 | 1 | 单loop计算，并行度256 bytes | 125.203 | 1.03 | 0.97x |
 | 2 | Loop拆分（Gelu + Element-wise） | 97.184 | 1.33 | 1.25x |
-| 3 | Loop拆分 + unroll循环展开 | 94.339 | 1.38 | 1.31x |
+| 3 | Loop拆分 + unroll循环展开 | 94.339 | 1.37 | 1.29x |
 
 **IPC优化建议**：
 - IPC越高越好，理论极限接近2.0，大多数情况下达成1.4~1.5则表示取得较优性能
-- Case 3的IPC为1.38，已接近理想性能水平
+- Case 3的IPC为1.37，已接近理想性能水平
 - Loop拆分是提升IPC的一种优化手段，需要结合实际VF的计算深度进行分析和尝试
 
 ---
@@ -540,24 +544,16 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=0
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -581,7 +577,7 @@ $$
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1`、`2`、`3`　　　　　| Case编号：0=单loop+128bytes，1=单loop+256bytes，2=loop拆分，3=loop拆分+unroll |
 
 - 执行结果

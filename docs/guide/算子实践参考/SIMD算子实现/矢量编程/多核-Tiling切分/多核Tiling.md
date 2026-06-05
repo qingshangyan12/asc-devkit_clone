@@ -72,7 +72,7 @@
 
 前述场景中算子的输入和输出均为固定shape，然而在实际的算子开发场景中，这些信息是支持动态变化的，场景会更加灵活和复杂。动态shape场景下，输入的shape是未知的。一些与输入shape相关的变量（比如每次搬运的块大小等），需要通过Tiling计算出来，然后传递到kernel侧，kernel侧使用该参数进行后续的计算。
 
-具体实现方式为：分析设计Tiling参数、定义Tiling结构体，在Host侧通过上下文获取输入输出的shape信息，根据shape信息，计算Tiling参数并设置到对应的Tiling结构体中；通过核函数入口参数将Tiling信息传入核函数，在核函数内通过解析Tiling结构体，获取并使用相关参数来实现核函数内部逻辑，详细介绍请参考[Host侧tiling实现](../../../../编程指南/附录/工程化算子开发/Host侧Tiling实现/基本流程.md)。本节将以上述分析中的切分策略为例，说明如何实现Tiling。
+具体实现方式为：分析设计Tiling参数、定义Tiling结构体，在Host侧通过上下文获取输入输出的shape信息，根据shape信息，计算Tiling参数并设置到对应的Tiling结构体中；通过核函数入口参数将Tiling信息传入核函数，在核函数内通过解析Tiling结构体，获取并使用相关参数来实现核函数内部逻辑，详细介绍请参考[Host侧tiling实现](../../../../编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/基本流程.md)。本节将以上述分析中的切分策略为例，说明如何实现Tiling。
 
 基于本节的切分策略，Tiling需要定义如下参数：
 
@@ -134,7 +134,7 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
 
     由于本样例中将数据分配到了多个核上进行处理，每个核处理不同的数据，因此不同核要处理的数据在Global Memory上的地址不同，在初始化函数Init中，需要获取单核所需处理的输入输出在Global Memory上的内存偏移地址，并将该偏移地址设置到GlobalTensor中。
 
-    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
+    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/GlobalTensor/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
 
     ```
     xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
