@@ -25,4 +25,6 @@
         }                                             \
     } while (0)
 
+HcclResult ConvertCcuToHccl(CcuResult ccuResult);
+
 #endif //CCU_LOG_H

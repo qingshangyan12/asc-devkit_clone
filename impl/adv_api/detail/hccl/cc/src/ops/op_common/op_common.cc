@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "ccu_launch_dl.h"
 
 #ifdef __cplusplus
 extern "C" {
