@@ -58,8 +58,7 @@ struct AlltoAllMesh1DContext: CcuKernelCtxBase {
 CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                   ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                   ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg,
-                                  AlltoAllMesh1DContext &ctx);
+                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg);
 
 }// namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_ALL_TO_ALL_MESH_1D_H

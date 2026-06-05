@@ -456,6 +456,12 @@ struct AlgResourceCtxSerializable {
     }
 };
 
+struct CcuKernelArgBase {
+    // std::vector<ChannelHandle> channels;
+    ChannelHandle channels[CCU_MAX_RANK_SIZE];
+    uint32_t      channelCount;
+};
+
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
     char tag[TAG_LENGTH]; // 保存topoInfo的key值

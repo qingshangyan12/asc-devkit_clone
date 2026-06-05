@@ -179,11 +179,11 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
 CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                   ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                   ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg,
-                                  AlltoAllMesh1DContext &ctx)
+                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg)
 {
     auto *kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D *>(arg);
 
+    AlltoAllMesh1DContext ctx;
     ctx.arg = kernelArg;
     ctx.resourceAllocated = false;
     // ctx.IsLoopResRegistered = false;
