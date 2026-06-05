@@ -57,6 +57,25 @@ class GenerateCaseRunnersTest(unittest.TestCase):
                 mismatches.append((item["case"], expected, item.get("supported_archs")))
         self.assertEqual(mismatches, [])
 
+    def test_manifest_modes_include_readme_cpu_support(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        examples_root = project_root / "examples"
+        manifest = {
+            item["case"]: item
+            for item in json.loads((project_root / "scripts/presmoke/reports/case_runner_manifest.json").read_text(encoding="utf-8"))
+        }
+        missing = []
+        for readme in examples_root.rglob("README.md"):
+            text = readme.read_text(encoding="utf-8", errors="ignore")
+            if "CMAKE_ASC_RUN_MODE=cpu" not in text:
+                continue
+            rel_path = readme.parent.relative_to(examples_root).as_posix()
+            item = manifest.get(rel_path)
+            if not item or "cpu" not in item.get("supported_modes", []):
+                missing.append(rel_path)
+
+        self.assertEqual(missing, [])
+
     def test_atc_prerequisite_python_stays_in_build_before_atc(self) -> None:
         commands = [
             Command("python3 ../leaky_relu.py", "run"),
