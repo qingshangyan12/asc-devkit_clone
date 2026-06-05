@@ -521,35 +521,6 @@ export default defineConfig({
         return trimmed
       },
     }), {
-      name: 'serve-theme-assets',
-      configureServer(server) {
-        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
-        server.middlewares.use(async (req, res, next) => {
-          const file = req.url === '/ascend-logo.svg' ? 'ascend-logo.svg'
-            : req.url === '/favicon.ico' ? 'favicon.ico' : null
-          if (file) {
-            const fp = resolve(themeAssets, file)
-            if (existsSync(fp)) {
-              const mime = file.endsWith('.svg') ? 'image/svg+xml' : 'image/x-icon'
-              res.setHeader('Content-Type', mime)
-              res.end(readFileSync(fp))
-              return
-            }
-          }
-          next()
-        })
-      },
-      writeBundle(options) {
-        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
-        const dest = options.dir
-        if (dest) {
-          for (const f of ['ascend-logo.svg', 'favicon.ico']) {
-            const src = resolve(themeAssets, f)
-            if (existsSync(src)) copyFileSync(src, resolve(dest, f))
-          }
-        }
-      },
-    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
@@ -572,13 +543,9 @@ export default defineConfig({
     },
   },
 
-  head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-  ],
+  head: [],
 
   themeConfig: {
-    logo: '/ascend-logo.svg',
-
     nav: [
       { text: '首页', link: '/' },
       { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
