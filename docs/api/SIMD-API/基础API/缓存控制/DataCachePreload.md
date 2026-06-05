@@ -40,7 +40,7 @@ __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-频繁调用此接口可能导致保留站发生拥塞。在此情况下，该指令将被视为NOP指令，进而阻塞Scalar流水线。因此，建议连续调用此接口的次数不要超过4次。
+频繁调用此接口可能导致保留站（Reservation Station，用于暂存待执行指令的硬件队列）发生拥塞。在此情况下，该指令将被视为NOP指令，进而阻塞Scalar流水线。因此，建议连续调用此接口的次数不要超过4次。
 
 ## 调用示例<a name="section837496171220"></a>
 
@@ -48,4 +48,3 @@ __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const
 AscendC::GlobalTensor<uint64_t> srcGlobal;
 int64_t cacheOffset = 0;
 AscendC::DataCachePreload(srcGlobal, cacheOffset);
-```
