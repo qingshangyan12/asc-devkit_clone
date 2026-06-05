@@ -15,7 +15,7 @@
 </td>
 <td class="cellrowborder" align="center" valign="top" width="25.770000000000003%" headers="mcps1.1.4.1.2 "><p id="p37256491200"><a name="p37256491200"></a><a name="p37256491200"></a>x</p>
 </td>
-<td class="cellrowborder" align="center" valign="top" width="23.520000000000003%" headers="mcps1.1.4.1.3 "><p id="p19714340116"><a name="p19714340116"></a><a name="p19714340116"></a>√</p>
+<td class="cellrowborder" align="center" valign="top" width="23.520000000000003%" headers="mcps1.1.4.1.3 "><p id="p19714340116"><a name="p19714340116"></a><a name="p19714340116"></a>x</p>
 </td>
 </tr>
 <tr id="row220181016240"><td class="cellrowborder" valign="top" width="50.71000000000001%" headers="mcps1.1.4.1.1 "><p id="p48327011813"><a name="p48327011813"></a><a name="p48327011813"></a><span id="ph583230201815"><a name="ph583230201815"></a><a name="ph583230201815"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
@@ -138,7 +138,6 @@
 
 -   针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口来获取准确的索引值。
 -   针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口来获取准确的索引值。
--   针对Ascend 950PR/Ascend 950DT，由于ReduceMax/ReduceMin的内部实现原因，直接调用GetReduceRepeatMaxMinSpr接口无法获取到准确的索引值，验证时需要使用[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口来获取准确的索引值。同时，GetReduceRepeatMaxMinSpr必须紧跟着[WholeReduceMax](WholeReduceMax.md)/[WholeReduceMin](WholeReduceMin.md)接口进行调用。
 -   索引maxMinIndex数据\`是按照ReduceMax/ReduceMin的数据类型进行存储的，比如ReduceMax/ReduceMin使用half类型时，maxMinIndex是按照half类型进行存储的，如果按照half格式进行读取，maxMinIndex的值是不对的，因此maxMinIndex的读取需要使用reinterpret\_cast方法转换到整数类型，若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。
 
 ## 调用示例<a name="section837496171220"></a>
@@ -192,16 +191,3 @@
     float val = 0;   // 最大值
     AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和WholeReduceMax的调动次序，而且要配对调用
     ```
-
-    针对Ascend 950PR/Ascend 950DT，需要先执行WholeReduceMax指令，随后立即调用GetReduceRepeatMaxMinSpr指令。
-
-    ```
-    AscendC::LocalTensor<float> src;
-    AscendC::LocalTensor<float> dst;
-    int32_t mask = 64;
-    float val = 0;   // 最大值
-    float idx = 0;   // 最大值的索引值，与ReduceMax的结果相同
-    AscendC::WholeReduceMax(dst, src, mask, 1, 1, 1, 8);
-    AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和WholeReduceMax的调动次序，而且要配对调用
-    ```
-
