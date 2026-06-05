@@ -7,7 +7,9 @@ __pycache__/
 /examples/**/build/
 AGENTS.md
 oat_reports/
+presmoke_reports/
 log/
+.DS_Store
 third_party/
 openssl-device-src/
 openssl-host-src/
