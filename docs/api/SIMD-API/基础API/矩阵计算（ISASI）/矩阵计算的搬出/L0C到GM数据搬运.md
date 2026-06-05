@@ -24,7 +24,7 @@
 
 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。
 
-例如，下图中L0C中F32类型的数据可以通过QF322B8\_PRE随路量化得到B8数据，可以按需选择是否进一步开启随路Relu，接下来B8数据经过NZ2NZ或NZ2ND操作可以输出到GM。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/vector量化模式。
+例如，下图中L0C中F32类型的数据可以通过QF322B8\_PRE随路量化得到B8数据，可以按需选择是否进一步开启随路Relu，接下来B8数据经过NZ2NZ Channel merge或NZ2ND操作可以输出到GM。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 **图 1**  L0C2GM流程图<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
 ![](../../../../figures/L0C2GM_Function_Combination.png)
@@ -46,7 +46,7 @@
     __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
     ```
 
-- 寄存器设置接口，通过调用该接口设置随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，使用Vector量化、pRelu模式（AscendC待实现）时需要设置
+- 寄存器设置接口，通过调用该接口设置Vector随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，启用tensor量化、pRelu模式（AscendC待实现）时需要设置
 
     ```cpp
     template <typename T>
@@ -56,7 +56,7 @@
     __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false)
     ```
 
-- 寄存器设置接口，通过调用该接口设置随路量化参数，此元素代表整个输出矩阵使用的量化参数，使用Scalar量化时需要设置
+- 寄存器设置接口，通过调用该接口设置Scalar随路量化参数，此元素代表整个输出矩阵使用的量化参数，启用Scalar量化时需要设置
 
     ```cpp
     __aicore__ inline void SetFixpipePreQuantFlag(uint64_t config)
@@ -182,7 +182,7 @@
 |----------|----------|----------|
 | dst | 输出 | 目的操作数，类型为GlobalTensor，数据格式为NZ、ND格式，ND地址要求满足1B对齐，NZ地址需要满足32B对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64B对齐。 |
-| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。|
+| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。|
 
 <cann-filter npu_type = "A3,910b">
 

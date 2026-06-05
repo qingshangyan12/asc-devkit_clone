@@ -44,7 +44,7 @@
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
     ```
 
-- 寄存器设置接口，通过调用该接口设置随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，使用Vector量化、pRelu模式（AscendC待实现）时需要设置
+- 寄存器设置接口，通过调用该接口设置随路量化，随路pRelu参数（AscendC待实现），其中tensor的每个元素都代表一个量化参数，使用tensor量化、pRelu模式（AscendC待实现）时需要设置
 
     ```cpp
     template <typename T>
@@ -160,7 +160,7 @@
 |----------|----------|----------|
 | dst | 输出 | 目的操作数，类型为LocalTensor，数据格式为NZ格式，地址需要满足32B对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64B对齐。 |
-| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002511188540_table35908519282)。<br>具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_data_copy.h，\${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002511188540_table35908519282)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 <cann-filter npu_type = "A3,910b">
 
