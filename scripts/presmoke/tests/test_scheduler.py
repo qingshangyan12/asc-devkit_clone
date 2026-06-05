@@ -11,6 +11,7 @@ from presmoke.cli import detect_cpu_count, main, resolve_jobs
 from presmoke.model import Cell, Command, ExampleSpec
 from presmoke.scheduler import (
     custom_op_dependency_violation_s,
+    export_schedule_file,
     schedule_cells,
     simulate_npu_idle,
     simulate_npu_makespan,
@@ -230,6 +231,53 @@ class SchedulerTest(unittest.TestCase):
 
         self.assertEqual([item.example.rel_path for item in scheduled], ["slow", "fast-a", "fast-b", "medium"])
 
+    def test_fixed_schedule_uses_schedule_file_and_appends_missing_cases(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            schedule_file = root / "schedule.txt"
+            schedule_file.write_text("b\n# comment\nunknown\n\na\n", encoding="utf-8")
+            cells = [cell(root, name) for name in ["a", "b", "c"]]
+
+            scheduled = schedule_cells(cells, schedule="fixed", schedule_file=schedule_file)
+
+        self.assertEqual([item.example.rel_path for item in scheduled], ["b", "a", "c"])
+
+    def test_fixed_schedule_preserves_custom_op_required_order(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        dependent = "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            schedule_file = root / "schedule.txt"
+            schedule_file.write_text(f"{dependent}\n{custom_op}\n{static_lib}\n", encoding="utf-8")
+            cells = [cell(root, dependent), cell(root, custom_op), cell(root, static_lib)]
+
+            scheduled = schedule_cells(cells, schedule="fixed", schedule_file=schedule_file)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLess(names.index(static_lib), names.index(custom_op))
+        self.assertLess(names.index(custom_op), names.index(dependent))
+
+    def test_fixed_schedule_requires_existing_schedule_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [cell(root, "a")]
+
+            with self.assertRaises(FileNotFoundError):
+                schedule_cells(cells, schedule="fixed", schedule_file=root / "missing.txt")
+
+    def test_export_schedule_file_writes_selected_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(report, {"slow-a": (100, 1), "fast-a": (1, 30), "fast-b": (1, 20)})
+            out = root / "fixed.txt"
+            cells = [cell(root, name) for name in ["slow-a", "fast-a", "fast-b"]]
+
+            export_schedule_file(cells, out)
+
+            self.assertEqual(out.read_text(encoding="utf-8").splitlines(), ["slow-a", "fast-a", "fast-b"])
+
     def test_cli_applies_schedule_before_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -288,6 +336,156 @@ class SchedulerTest(unittest.TestCase):
 
         self.assertEqual(rc, 0)
         self.assertEqual([item["example"] for item in payload["results"]], ["a", "b", "c"])
+
+    def test_cli_fixed_schedule_uses_builtin_schedule_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b", "c"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "b", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "c", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            schedule_file = root / "scripts" / "presmoke" / "schedules" / "dav-2201_npu.txt"
+            schedule_file.parent.mkdir(parents=True, exist_ok=True)
+            schedule_file.write_text("b\na\n", encoding="utf-8")
+            results_dir = root / "out"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "fixed",
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(results_dir),
+                    ]
+                )
+
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual([item["example"] for item in payload["results"]], ["b", "a", "c"])
+
+    def test_cli_schedule_file_overrides_builtin_schedule_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b", "c"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "b", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "c", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            builtin = root / "scripts" / "presmoke" / "schedules" / "dav-2201_npu.txt"
+            builtin.parent.mkdir(parents=True, exist_ok=True)
+            builtin.write_text("a\nb\n", encoding="utf-8")
+            explicit = root / "explicit.txt"
+            explicit.write_text("c\nb\n", encoding="utf-8")
+            results_dir = root / "out"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "fixed",
+                        "--schedule-file",
+                        str(explicit),
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(results_dir),
+                    ]
+                )
+
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual([item["example"] for item in payload["results"]], ["c", "b", "a"])
+
+    def test_cli_export_schedule_writes_current_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b", "c"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "b", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "c", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            schedule_file = root / "schedule.txt"
+            schedule_file.write_text("c\na\n", encoding="utf-8")
+            export_path = root / "exported.txt"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "fixed",
+                        "--schedule-file",
+                        str(schedule_file),
+                        "--export-schedule",
+                        str(export_path),
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(root / "out"),
+                    ]
+                )
+            exported_lines = export_path.read_text(encoding="utf-8").splitlines()
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(exported_lines, ["c", "a", "b"])
 
     def test_npu_idle_min_schedule_is_not_worse_than_build_desc_after_frontload(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -24,12 +24,17 @@ def schedule_cells(
     cells: Iterable[Cell],
     schedule: str = "default",
     schedule_report: Optional[Path] = None,
+    schedule_file: Optional[Path] = None,
     frontload_count: int = 1,
     jobs: int = 1,
 ) -> List[Cell]:
     cells_list = list(cells)
     if schedule == "default":
         return enforce_required_order(cells_list)
+    if schedule == "fixed":
+        if schedule_file is None:
+            raise FileNotFoundError("fixed schedule requires --schedule-file or built-in schedule")
+        return enforce_required_order(apply_fixed_schedule(cells_list, schedule_file))
     if schedule not in {"build-desc", "frontload-build-desc", "npu-idle-min"}:
         raise ValueError(f"unknown schedule: {schedule}")
     if schedule_report is None:
@@ -64,6 +69,40 @@ def schedule_npu_idle_min(cells: List[Cell], report_path: Path, jobs: int) -> Li
             simulate_npu_makespan(candidate, report_path, jobs=max(jobs, 1)),
             [cell.example.rel_path for cell in candidate],
         ),
+    )
+
+
+def apply_fixed_schedule(cells: List[Cell], schedule_file: Path) -> List[Cell]:
+    if not schedule_file.exists():
+        raise FileNotFoundError(f"schedule file not found: {schedule_file}")
+    order = read_schedule_file(schedule_file)
+    by_name = {cell.example.rel_path: cell for cell in cells}
+    used: set[str] = set()
+    scheduled: List[Cell] = []
+    for name in order:
+        cell = by_name.get(name)
+        if cell is None or cell.key in used:
+            continue
+        scheduled.append(cell)
+        used.add(cell.key)
+    scheduled.extend(cell for cell in cells if cell.key not in used)
+    return scheduled
+
+
+def read_schedule_file(schedule_file: Path) -> List[str]:
+    names: List[str] = []
+    for line in schedule_file.read_text(encoding="utf-8").splitlines():
+        item = line.split("#", 1)[0].strip()
+        if item:
+            names.append(item)
+    return names
+
+
+def export_schedule_file(cells: List[Cell], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        "\n".join(cell.example.rel_path for cell in cells) + "\n",
+        encoding="utf-8",
     )
 
 
@@ -152,21 +191,6 @@ def simulate_npu_makespan(cells: List[Cell], report_path: Path, jobs: int = 1) -
     for ready_at, _, cell in sorted(build_finishes, key=lambda item: (item[0], item[1])):
         npu_available = max(npu_available, ready_at) + run_seconds[cell.example.rel_path]
     return npu_available
-
-
-def late_long_build_penalty_s(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
-    timings = load_stage_seconds(report_path)
-    if not timings:
-        return 0.0
-    build_seconds = with_default_seconds({case: build_s for case, (build_s, _) in timings.items()}, cells)
-    first_screen_count = min(max(jobs, 1), len(cells))
-    first_screen = {cell.key for cell in cells[:first_screen_count]}
-    longest = sorted(cells, key=lambda cell: (-build_seconds[cell.example.rel_path], cells.index(cell)))[:first_screen_count]
-    return sum(
-        build_seconds[cell.example.rel_path]
-        for cell in longest
-        if cell.key not in first_screen
-    )
 
 
 def custom_op_dependency_violation_s(cells: List[Cell], report_path: Path, jobs: int = 1) -> float:
