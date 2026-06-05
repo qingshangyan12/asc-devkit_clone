@@ -17,15 +17,27 @@ from .model import RunReport, RunResult, Suggestion
 from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
-from .runner import run_cells_pipeline
+from .runner import CPU_RUN_TIMEOUT, run_cells_pipeline
 from .scheduler import export_schedule_file, schedule_cells
 from .suggest import dedupe_suggestions
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    jobs = resolve_jobs(args.jobs)
+    modes = parse_modes(args.modes)
+    jobs = resolve_jobs(args.jobs, modes=modes)
+    make_jobs = resolve_make_jobs(args.make_jobs, jobs)
+    cpu_run_slots = resolve_cpu_run_slots(args.cpu_run_slots)
+    cpu_run_timeout = resolve_positive_int(args.cpu_run_timeout)
     project_root = Path(os.environ.get("PRESMOKE_PROJECT_ROOT", Path.cwd())).resolve()
+    configure_parallel_env(project_root, make_jobs)
+    parallel_config = {
+        "jobs": jobs,
+        "npu_slots": args.npu_slots,
+        "cpu_run_slots": cpu_run_slots,
+        "make_jobs": make_jobs,
+        "cpu_run_timeout": cpu_run_timeout,
+    }
     examples_root = Path(args.examples_root).resolve() if args.examples_root else project_root / "examples"
     host_arch = detect_arch(args.arch)
     if not host_arch:
@@ -37,7 +49,6 @@ def main(argv: list[str] | None = None) -> int:
     started_at = now_iso()
 
     suggestions: List[Suggestion] = []
-    modes = parse_modes(args.modes)
     skipped_results: List[RunResult] = []
 
     if args.runner_mode == "case-runner":
@@ -64,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
         export_schedule_file(cells, Path(args.export_schedule).resolve())
 
     if args.suggestions_only:
-        report = RunReport(host_arch, modes, started_at, now_iso(), [], suggestions)
+        report = RunReport(host_arch, modes, started_at, now_iso(), [], suggestions, parallel_config=parallel_config)
         emit_reports(report, args, results_dir)
         return 0
 
@@ -73,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
             RunResult(cell.example.rel_path, cell.arch, cell.mode, "SKIP", "dry-run", duration_s=0, source=cell.example.source)
             for cell in cells
         ]
-        report = RunReport(host_arch, modes, started_at, now_iso(), dry_results + skipped_results, suggestions)
+        report = RunReport(host_arch, modes, started_at, now_iso(), dry_results + skipped_results, suggestions, parallel_config=parallel_config)
         emit_reports(report, args, results_dir)
         return 0
 
@@ -82,14 +93,16 @@ def main(argv: list[str] | None = None) -> int:
             cells,
             log_dir=log_dir,
             timeout=args.timeout,
+            cpu_run_timeout=cpu_run_timeout,
             keep_artifacts=args.keep_artifacts,
             jobs=jobs,
             npu_slots=args.npu_slots,
+            cpu_run_slots=cpu_run_slots,
         )
     results = run.results
     results.extend(skipped_results)
     results = sorted(results, key=lambda result: (result.example, result.mode))
-    report = RunReport(host_arch, modes, started_at, now_iso(), results, suggestions, run.npu_stats)
+    report = RunReport(host_arch, modes, started_at, now_iso(), results, suggestions, run.npu_stats, parallel_config)
     emit_reports(report, args, results_dir)
     return 1 if any(result.status == "FAIL" for result in results) else 0
 
@@ -102,6 +115,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--modes", default="npu")
     parser.add_argument("--jobs", default="1")
     parser.add_argument("--npu-slots", type=int, default=1)
+    parser.add_argument("--cpu-run-slots", default="auto")
+    parser.add_argument("--make-jobs", default="auto")
+    parser.add_argument("--cpu-run-timeout", default=str(CPU_RUN_TIMEOUT))
     parser.add_argument("--filter", action="append", default=[])
     parser.add_argument("--exclude", action="append", default=[])
     parser.add_argument("--timeout", type=int, default=120)
@@ -136,13 +152,15 @@ def resolve_schedule_file(
     return schedule_file if schedule_file.exists() else None
 
 
-def resolve_jobs(value: str | int, cpu_count: int | None = None) -> int:
+def resolve_jobs(value: str | int, cpu_count: int | None = None, modes: List[str] | None = None) -> int:
     if isinstance(value, int):
         return max(value, 1)
     if value != "auto":
         return max(int(value), 1)
 
     cpus = cpu_count if cpu_count is not None else detect_cpu_count()
+    if modes and all(mode == "cpu" for mode in modes):
+        return resolve_cpu_build_jobs(cpus)
     if cpus >= 160:
         return 12
     if cpus >= 80:
@@ -150,6 +168,46 @@ def resolve_jobs(value: str | int, cpu_count: int | None = None) -> int:
     if cpus >= 32:
         return 6
     return 4
+
+
+def resolve_cpu_build_jobs(cpu_count: int) -> int:
+    cpus = max(cpu_count, 1)
+    return max(min((cpus + 3) // 4, 64), 1)
+
+
+def resolve_cpu_run_slots(value: str | int, cpu_count: int | None = None) -> int:
+    if isinstance(value, int):
+        return max(value, 1)
+    if value != "auto":
+        return max(int(value), 1)
+    cpus = cpu_count if cpu_count is not None else detect_cpu_count()
+    return max(cpus, 1)
+
+
+def resolve_make_jobs(value: str | int, build_jobs: int, cpu_count: int | None = None) -> int:
+    if isinstance(value, int):
+        return max(value, 1)
+    if value != "auto":
+        return max(int(value), 1)
+    cpus = cpu_count if cpu_count is not None else detect_cpu_count()
+    return max(cpus // max(build_jobs, 1), 1)
+
+
+def resolve_positive_int(value: str | int) -> int:
+    if isinstance(value, int):
+        return max(value, 1)
+    return max(int(value), 1)
+
+
+def configure_parallel_env(project_root: Path, make_jobs: int) -> None:
+    wrappers_dir = project_root / "scripts" / "presmoke" / "wrappers"
+    if wrappers_dir.is_dir():
+        path_entries = os.environ.get("PATH", "").split(os.pathsep)
+        wrappers = str(wrappers_dir)
+        if wrappers not in path_entries:
+            os.environ["PATH"] = os.pathsep.join([wrappers, *path_entries])
+    os.environ["PRESMOKE_MAKE_JOBS"] = str(make_jobs)
+    os.environ.setdefault("CMAKE_BUILD_PARALLEL_LEVEL", str(make_jobs))
 
 
 def detect_cpu_count() -> int:

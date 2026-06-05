@@ -43,9 +43,12 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `ARCH` | `dav-2201` | Target arch. Use `dav-2201` for 910B and `dav-3510` for 950. |
 | `PRIMARY_CARD` | `0` | Main NPU card id used for the full run. |
 | `RETRY_CARDS` | empty | Space-separated card ids for retrying timeout cases. |
-| `JOBS` | `auto` | Parallel build workers. `auto` uses CPU count. |
+| `JOBS` | `auto` | Parallel build workers. NPU mode uses a conservative CPU-count ladder; CPU-only mode uses `ceil(CPU(s) / 4)`, capped at 64. |
 | `NPU_SLOTS` | `1` | NPU queue concurrency. Keep `1` for watch runs. |
-| `TIMEOUT` | `120` | Timeout in seconds for NPU run commands only. Build and verify commands do not use this timeout. |
+| `CPU_RUN_SLOTS` | `auto` | CPU-only run workers. `auto` uses host `CPU(s)` from `lscpu`. Ignored by NPU mode. |
+| `MAKE_JOBS` | `auto` | Per-case `make -j` limit. `auto` uses `CPU(s) / resolved JOBS`; explicit `make -j` commands are capped by the presmoke wrapper. |
+| `TIMEOUT` | `120` | Timeout in seconds for NPU run commands. Build and verify commands do not use this timeout. |
+| `CPU_RUN_TIMEOUT` | `300` | Timeout in seconds for CPU run commands. Increase this when CPU-only validation is slower than expected. |
 | `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
 | `SCHEDULE_FILE` | built-in | Optional fixed order override. |
 | `OUT_ROOT` | `presmoke_reports/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
@@ -54,6 +57,8 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `MODE` | unset | Alias used only when `MODES` is unset. For example, `MODE=cpu`. |
 
 CPU debug mode is opt-in. Use `MODES=cpu` or `MODE=cpu`; the default watch path remains `npu`. CPU mode does not use the NPU fixed schedule unless `SCHEDULE_FILE` is explicitly provided.
+
+For CPU mode, the default parallelism is computed from the host CPU count instead of hard-coded for specific machines. For example, a 192-CPU host resolves to `JOBS=48`, `MAKE_JOBS=4`, and `CPU_RUN_SLOTS=192`; an 88-CPU host resolves to `JOBS=22`, `MAKE_JOBS=4`, and `CPU_RUN_SLOTS=88`.
 
 ## Reports
 
