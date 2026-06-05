@@ -331,6 +331,32 @@ class RunnerPoolTest(unittest.TestCase):
         self.assertIn("npu_idle_s", md_text)
         self.assertIn("npu_utilization", md_text)
 
+    def test_pipeline_writes_per_stage_logs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c = cell(
+                root,
+                "stage-log-case",
+                commands=[
+                    Command("echo build-stage", "build"),
+                    Command("echo run-stage", "run"),
+                    Command("echo verify-stage", "verify"),
+                ],
+            )
+
+            run = run_cells_pipeline([c], root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1)
+            result = run.results[0]
+
+            build_log = root / "logs/stages/stage-log-case__npu__build.log"
+            run_log = root / "logs/stages/stage-log-case__npu__run.log"
+            verify_log = root / "logs/stages/stage-log-case__npu__verify.log"
+
+            self.assertEqual(result.status, "PASS")
+            self.assertEqual(set(result.stage_log_files), {str(build_log), str(run_log), str(verify_log)})
+            self.assertIn("build-stage", build_log.read_text(encoding="utf-8"))
+            self.assertIn("run-stage", run_log.read_text(encoding="utf-8"))
+            self.assertIn("verify-stage", verify_log.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

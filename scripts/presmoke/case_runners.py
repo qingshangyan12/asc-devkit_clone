@@ -8,17 +8,6 @@ from .discover import filter_examples
 from .model import Cell, Command, ExampleSpec, RunResult, Suggestion
 
 
-def build_case_runner_cells(
-    project_root: Path,
-    arch: str,
-    modes: Iterable[str],
-    includes: Iterable[str],
-    excludes: Iterable[str],
-) -> tuple[List[Cell], List[Suggestion]]:
-    cells, suggestions, _ = build_case_runner_cells_with_skips(project_root, arch, modes, includes, excludes)
-    return cells, suggestions
-
-
 def build_case_runner_cells_with_skips(
     project_root: Path,
     arch: str,
