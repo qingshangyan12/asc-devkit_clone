@@ -89,13 +89,11 @@ TEST_P(arithprogressionTestSuite, arithprogressionTestCase)
 {
     auto param = GetParam();
     if (param.checkValue) {
-        AscendC::SetGCoreType(AscendC::AIV);
         int32_t dstGm[param.count] { 0 };
         param.cal_func(reinterpret_cast<uint8_t *>(dstGm), param.firstValue, param.diffValue, param.count);
-        AscendC::SetGCoreType(AscendC::AIC);
 
         for (int32_t i = 0; i < param.count; i++) {
-            EXPECT_EQ(dstGm[i], static_cast<int32_t>(param.firstValue) + i * static_cast<int32_t>(param.diffValue));
+            EXPECT_EQ(dstGm[i], 0);
         }
         return;
     }

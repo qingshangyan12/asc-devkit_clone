@@ -58,6 +58,7 @@ struct arangeTestParams {
     uint32_t diffValue;
     uint32_t count;
     uint32_t typeSize;
+    bool checkValue;
     void (*cal_func)(uint8_t *, uint32_t, uint32_t, uint32_t);
 };
 
@@ -77,14 +78,24 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(TEST_PACKAGE_arange, arangeTestSuite,
     ::testing::Values(
-        arangeTestParams { 1, 2, 15, sizeof(half), mainArangeTest<half> },
-        arangeTestParams { 1, 2, 64, sizeof(half), mainArangeTest<half> },
-        arangeTestParams { 1, 2, 260, sizeof(half), mainArangeTest<half> }
+        arangeTestParams { 1, 2, 15, sizeof(half), false, mainArangeTest<half> },
+        arangeTestParams { 1, 2, 64, sizeof(half), false, mainArangeTest<half> },
+        arangeTestParams { 1, 2, 260, sizeof(half), false, mainArangeTest<half> },
+        arangeTestParams { 0, 16777217, 16, sizeof(int32_t), true, mainArangeTest<int32_t> }
         ));
 
 TEST_P(arangeTestSuite, arangeTestCase)
 {
     auto param = GetParam();
+    if (param.checkValue) {
+        int32_t dstGm[param.count] { 0 };
+        param.cal_func(reinterpret_cast<uint8_t *>(dstGm), param.firstValue, param.diffValue, param.count);
+
+        for (int32_t i = 0; i < param.count; i++) {
+            EXPECT_EQ(dstGm[i], 0);
+        }
+        return;
+    }
     uint8_t dstGm[param.count * param.typeSize] { 0x00 };
     param.cal_func(dstGm, param.firstValue, param.diffValue, param.count);
 

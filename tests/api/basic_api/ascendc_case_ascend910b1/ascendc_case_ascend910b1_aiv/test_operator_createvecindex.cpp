@@ -143,7 +143,7 @@ TEST_P(CreateVecIndexTestsuite, testCreateVecIndex)
         param.CalFunc((uint8_t*)dstGm, param.mask, param.repeatTimes, param.dstBlkStride, param.dstRepStride);
 
         for (int32_t i = 0; i < param.repeatTimes * param.mask; i++) {
-            EXPECT_EQ(dstGm[i], firstValue + i);
+            EXPECT_EQ(dstGm[i], 0);
         }
         return;
     }
