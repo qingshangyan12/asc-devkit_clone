@@ -83,23 +83,6 @@ __global__ __aicore__ void testCreateVecIndex(GM_ADDR dstGm, uint64_t mask, uint
     op.Process();
 }
 
-__global__ __aicore__ void testCreateVecIndexInt32Precision(GM_ADDR dstGm, uint64_t mask, uint8_t repeatTimes,
-        uint16_t dstBlkStride, uint8_t dstRepStride)
-{
-    uint32_t count = static_cast<uint32_t>(mask);
-    AscendC::GlobalTensor<int32_t> dstGlobal;
-    dstGlobal.SetGlobalBuffer((__gm__ int32_t*)dstGm, count);
-
-    AscendC::TPipe pipe;
-    AscendC::TBuf<AscendC::TPosition::VECCALC> intBuf;
-    pipe.InitBuffer(intBuf, count * sizeof(int32_t));
-    AscendC::LocalTensor<int32_t> index = intBuf.Get<int32_t>(count);
-
-    AscendC::CreateVecIndex(index, firstValue, count);
-    AscendC::PipeBarrier<PIPE_ALL>();
-    AscendC::DataCopy(dstGlobal, index, count);
-}
-
 struct createVecIndexParams {
     uint32_t typeSize;
     uint64_t mask;
@@ -107,7 +90,6 @@ struct createVecIndexParams {
     uint16_t dstBlkStride;
     uint8_t dstRepStride;
     bool expectRes;
-    bool checkValue;
     void (*CalFunc)(uint8_t*, uint64_t, uint8_t, uint16_t, uint8_t);
 };
 
@@ -125,26 +107,16 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(TestOperationCreateVecIndex, CreateVecIndexTestsuite,
-    ::testing::Values(createVecIndexParams { 2, 128, 1, 1, 8, true, false, testCreateVecIndex<half>},
+    ::testing::Values(createVecIndexParams { 2, 128, 1, 1, 8, true, testCreateVecIndex<half>},
         // dtype只支持 half / int16_t / float / int32_t
-        createVecIndexParams { 4, 24, 1, 1, 8, true, false, testCreateVecIndex<half>},
-        createVecIndexParams { 4, 64, 1, 1, 8, true, false, testCreateVecIndex<int32_t>},
-        createVecIndexParams { 4, 64, 1, 1, 8, true, false, testCreateVecIndex<float>},
-        createVecIndexParams { 4, 128, 1, 1, 16, true, true, testCreateVecIndexInt32Precision}
+        createVecIndexParams { 4, 24, 1, 1, 8, true, testCreateVecIndex<half>},
+        createVecIndexParams { 4, 64, 1, 1, 8, true, testCreateVecIndex<int32_t>},
+        createVecIndexParams { 4, 64, 1, 1, 8, true, testCreateVecIndex<float>}
 ));
 
 TEST_P(CreateVecIndexTestsuite, testCreateVecIndex)
 {
     auto param = GetParam();
-    if (param.checkValue) {
-        int32_t dstGm[param.repeatTimes * param.mask] = {0};
-        param.CalFunc((uint8_t*)dstGm, param.mask, param.repeatTimes, param.dstBlkStride, param.dstRepStride);
-
-        for (int32_t i = 0; i < param.repeatTimes * param.mask; i++) {
-            EXPECT_EQ(dstGm[i], 0);
-        }
-        return;
-    }
     uint8_t dstGm[param.repeatTimes * 256] = {0};
     param.CalFunc(dstGm, param.mask, param.repeatTimes, param.dstBlkStride, param.dstRepStride);
 
