@@ -4,6 +4,8 @@
 
 `scripts/run_presmoke2.sh` is the lower-level debug entry. Use it for dry-run, single-case checks, direct Python CLI experiments, or regenerating schedules.
 
+Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--dry-run`, or `--suggestions-only` do not clean `opp/vendors`.
+
 ## Jenkins Commands
 
 910B:
@@ -73,6 +75,7 @@ The default fixed schedules are:
 They preserve the required custom-op ordering:
 
 - `custom_op_static_lib` runs before `custom_op`.
+- `parallel_ops_package` runs after `custom_op_static_lib`.
 - `aclnn`, `aclop`, `onnx`, `tensorflow`, and `tiling_sink` run after `custom_op`.
 
 New cases not listed in a schedule file are appended to the end, then the custom-op dependency order is enforced again.
@@ -96,6 +99,7 @@ PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
 ## Notes
 
 - Do not run multiple orchestrators in the same checkout at the same time. A lock under `.presmoke_locks` protects against accidental overlap.
+- The full watch entry cleans the active CANN `opp/vendors` directory. Make sure the Jenkins user has permission to remove and reinstall custom-op vendor packages.
 - `run_presmoke.sh` is the old presmoke script and is not the watch entry for this flow.
 - TensorFlow cases that require TensorFlow 2.6.5 are intentionally skipped by the case manifest.
 - Timeout retry is for timeout cases only. Non-timeout failures are reported and left for diagnosis.

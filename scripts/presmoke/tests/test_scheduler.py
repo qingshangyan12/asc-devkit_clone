@@ -66,6 +66,18 @@ class SchedulerTest(unittest.TestCase):
         names = [item.example.rel_path for item in scheduled]
         self.assertLess(names.index(static_lib), names.index(custom_op))
 
+    def test_parallel_ops_package_is_always_after_custom_op_static_lib(self) -> None:
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        parallel_ops = "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [cell(root, parallel_ops), cell(root, "a"), cell(root, static_lib)]
+
+            scheduled = schedule_cells(cells)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLess(names.index(static_lib), names.index(parallel_ops))
+
     def test_required_order_survives_build_desc_schedule(self) -> None:
         custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
         static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
@@ -246,16 +258,18 @@ class SchedulerTest(unittest.TestCase):
         custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
         static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
         dependent = "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin"
+        parallel_ops = "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package"
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             schedule_file = root / "schedule.txt"
-            schedule_file.write_text(f"{dependent}\n{custom_op}\n{static_lib}\n", encoding="utf-8")
-            cells = [cell(root, dependent), cell(root, custom_op), cell(root, static_lib)]
+            schedule_file.write_text(f"{dependent}\n{custom_op}\n{parallel_ops}\n{static_lib}\n", encoding="utf-8")
+            cells = [cell(root, dependent), cell(root, custom_op), cell(root, parallel_ops), cell(root, static_lib)]
 
             scheduled = schedule_cells(cells, schedule="fixed", schedule_file=schedule_file)
 
         names = [item.example.rel_path for item in scheduled]
         self.assertLess(names.index(static_lib), names.index(custom_op))
+        self.assertLess(names.index(static_lib), names.index(parallel_ops))
         self.assertLess(names.index(custom_op), names.index(dependent))
 
     def test_fixed_schedule_requires_existing_schedule_file(self) -> None:

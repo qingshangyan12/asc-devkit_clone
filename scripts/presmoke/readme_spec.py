@@ -245,6 +245,9 @@ def classify_command(command: str) -> str:
 
 
 def parse_archs(text: str, command_block: str, example_dir: Path) -> List[str]:
+    product_archs = _archs_from_supported_products(text)
+    if product_archs:
+        return product_archs
     table_archs = _values_from_option_rows(text, "CMAKE_ASC_ARCHITECTURES", ARCH_RE)
     if table_archs:
         return table_archs
@@ -258,6 +261,19 @@ def parse_archs(text: str, command_block: str, example_dir: Path) -> List[str]:
         if found:
             return found
     return []
+
+
+def _archs_from_supported_products(text: str) -> List[str]:
+    support_section = _section(text, "支持的产品") or _section(text, "支持产品")
+    if not support_section:
+        return []
+
+    archs: List[str] = []
+    if re.search(r"Ascend\s*950|950PR|950DT|dav-3510", support_section, re.IGNORECASE):
+        archs.append("dav-3510")
+    if re.search(r"Atlas\s*A[23]|Atlas\s*200I/500\s*A2|Atlas\s*200I|Atlas\s*500\s*A2|dav-2201", support_section, re.IGNORECASE):
+        archs.append("dav-2201")
+    return archs
 
 
 def parse_modes(text: str, command_block: str) -> List[str]:
