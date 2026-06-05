@@ -10,6 +10,7 @@ from .model import Cell
 
 CUSTOM_OP_CASE = "01_simd_cpp_api/02_features/00_compilation/custom_op"
 CUSTOM_OP_STATIC_LIB_CASE = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package"
 CUSTOM_OP_DEPENDENT_CASES = {
     "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
     "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
@@ -282,6 +283,7 @@ def enforce_required_order(cells: List[Cell]) -> List[Cell]:
         cells,
         {
             CUSTOM_OP_CASE: {CUSTOM_OP_STATIC_LIB_CASE},
+            PARALLEL_OPS_PACKAGE_CASE: {CUSTOM_OP_STATIC_LIB_CASE},
             **{dependent: {CUSTOM_OP_CASE} for dependent in CUSTOM_OP_DEPENDENT_CASES},
         },
     )

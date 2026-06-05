@@ -133,7 +133,7 @@ presmoke_opp_path() {
 }
 
 presmoke_custom_op_package_valid() {
-    local vendor_dir
+    local vendor_dir add_custom_dynamic
     vendor_dir="$(presmoke_opp_path)/vendors/customize"
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom.py" ]] || return 1
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py" ]] || return 1
@@ -142,18 +142,32 @@ presmoke_custom_op_package_valid() {
     [[ -f "$vendor_dir/op_api/lib/libcust_opapi.so" ]] || return 1
     [[ -f "$vendor_dir/framework/onnx/libcust_onnx_parsers.so" ]] || return 1
     [[ -f "$vendor_dir/op_impl/ai_core/tbe/op_master_device/lib/libcust_opmaster.so" ]] || return 1
+
+    add_custom_dynamic="$(presmoke_opp_path)/vendors/add_custom/op_impl/ai_core/tbe/add_custom_impl/dynamic"
+    [[ -f "$add_custom_dynamic/add_custom.py" ]] || return 1
+    [[ -f "$add_custom_dynamic/add_custom_kernel.cpp" ]] || return 1
+    [[ -f "$add_custom_dynamic/add_custom_tiling.h" ]] || return 1
+}
+
+presmoke_custom_op_dynamic_dirs() {
+    local opp_path
+    opp_path="$(presmoke_opp_path)"
+    printf '%s\n' "$opp_path/vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic"
+    printf '%s\n' "$opp_path/vendors/add_custom/op_impl/ai_core/tbe/add_custom_impl/dynamic"
 }
 
 presmoke_repair_custom_op_package_headers() {
     local build_dir="$1"
     local vendor_dynamic source_dynamic header
-    vendor_dynamic="$(presmoke_opp_path)/vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic"
     source_dynamic="$build_dir/op_kernel/ascendc_kernels/binary/dynamic"
-    [[ -d "$vendor_dynamic" && -d "$source_dynamic" ]] || return 0
+    [[ -d "$source_dynamic" ]] || return 0
 
-    while IFS= read -r header; do
-        cp "$header" "$vendor_dynamic/"
-    done < <(find "$source_dynamic" -mindepth 2 -maxdepth 2 -type f \( -name '*.h' -o -name '*.hpp' \) 2>/dev/null)
+    while IFS= read -r vendor_dynamic; do
+        [[ -d "$vendor_dynamic" ]] || continue
+        while IFS= read -r header; do
+            cp "$header" "$vendor_dynamic/"
+        done < <(find "$source_dynamic" -mindepth 2 -maxdepth 2 -type f \( -name '*.h' -o -name '*.hpp' \) 2>/dev/null)
+    done < <(presmoke_custom_op_dynamic_dirs)
 }
 
 presmoke_ensure_custom_op_package() {
