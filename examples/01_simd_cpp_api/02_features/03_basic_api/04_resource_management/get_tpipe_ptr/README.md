@@ -33,42 +33,42 @@
   **调用GetTPipePtr接口**
 
   ```cpp
-    __aicore__ inline void InitTPipe()
-    {
-        AscendC::TPipe pipe;
-    }
+  template <uint32_t totalLength, uint32_t tileNum>
+  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+  {
+      // 没有TPipe变量
+      // ...
+      // 调用GetTPipePtr获取TPipe指针并使用
+      GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+  }
 
-    template <uint32_t totalLength, uint32_t tileNum>
-    __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-    {
-        // 不用显式传入TPipe指针，且没有TPipe变量
-        InitTPipe();
-        // ...
-        // 调用GetTPipePtr获取TPipe指针并使用
-        GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
-    }
+  template <uint32_t totalLength, uint32_t tileNum>
+  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+  {
+      AscendC::TPipe pipe;
+      // 不用显式传入TPipe指针
+      Process<totalLength, tileNum>(x, y, z);
+  }
   ```
 
   **不调用GetTPipePtr接口（核函数显式传入TPipe指针）**
 
   ```cpp
-  class KernelAdd {
-      AscendC::TPipe* pipe;  // 需要TPipe指针成员变量
-
-      __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum, AscendC::TPipe* pipeIn)
-      {
-          pipe = pipeIn;
-          pipe->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
-      }
-  };
-
-  __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
+  template <uint32_t totalLength, uint32_t tileNum>
+  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AscendC::TPipe* pipe)
   {
-      // 需要显式传入TPipe指针
+      // 需要TPipe指针入参
+      // ...
+      // 使用传入的TPipe指针
+      pipe->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+  }
+
+  template <uint32_t totalLength, uint32_t tileNum>
+  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+  {
       AscendC::TPipe pipe;
-      KernelAdd op;
-      op.Init(x, y, z, tiling.totalLength, tiling.tileNum, &pipe);
-      op.Process();
+      // 需要显式传入TPipe指针
+      Process<totalLength, tileNum>(x, y, z, &pipe);
   }
   ```
 
@@ -160,9 +160,9 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
