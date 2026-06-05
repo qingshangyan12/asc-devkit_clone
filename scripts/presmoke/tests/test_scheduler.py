@@ -1,0 +1,463 @@
+from __future__ import annotations
+
+import json
+import os
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+from presmoke.cli import detect_cpu_count, main, resolve_jobs
+from presmoke.model import Cell, Command, ExampleSpec
+from presmoke.scheduler import (
+    custom_op_dependency_violation_s,
+    schedule_cells,
+    simulate_npu_idle,
+    simulate_npu_makespan,
+)
+
+
+def cell(tmp: Path, name: str) -> Cell:
+    spec = ExampleSpec(tmp / name, name, [Command(":", "build")], ["dav-2201"], ["npu"], "test")
+    spec.path.mkdir(parents=True, exist_ok=True)
+    return Cell(spec, "dav-2201", "npu", spec.commands, spec.path / "build_npu")
+
+
+def write_timing_report(path: Path, timings: dict[str, tuple[float, float]]) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "results": [
+                    {
+                        "example": example,
+                        "steps": [
+                            {"kind": "build", "duration_s": build_s},
+                            {"kind": "run", "duration_s": run_s},
+                        ],
+                    }
+                    for example, (build_s, run_s) in timings.items()
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+class SchedulerTest(unittest.TestCase):
+    def test_default_schedule_keeps_original_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [cell(root, "a"), cell(root, "b"), cell(root, "c")]
+
+            scheduled = schedule_cells(cells)
+
+        self.assertEqual([item.example.rel_path for item in scheduled], ["a", "b", "c"])
+
+    def test_custom_op_static_lib_is_always_before_custom_op(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [cell(root, "a"), cell(root, custom_op), cell(root, "b"), cell(root, static_lib)]
+
+            scheduled = schedule_cells(cells)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLess(names.index(static_lib), names.index(custom_op))
+
+    def test_required_order_survives_build_desc_schedule(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            report.write_text(
+                json.dumps(
+                    {
+                        "results": [
+                            {"example": custom_op, "steps": [{"kind": "build", "duration_s": 100}]},
+                            {"example": static_lib, "steps": [{"kind": "build", "duration_s": 1}]},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            cells = [cell(root, custom_op), cell(root, "a"), cell(root, static_lib)]
+
+            scheduled = schedule_cells(cells, schedule="build-desc", schedule_report=report)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLess(names.index(static_lib), names.index(custom_op))
+
+    def test_custom_op_dependents_are_always_after_custom_op(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        dependents = [
+            "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
+            "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
+            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom",
+            "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+            "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cells = [
+                cell(root, dependents[0]),
+                cell(root, "a"),
+                cell(root, dependents[1]),
+                cell(root, custom_op),
+                cell(root, dependents[2]),
+                cell(root, dependents[3]),
+                cell(root, dependents[4]),
+                cell(root, dependents[5]),
+            ]
+
+            scheduled = schedule_cells(cells)
+
+        names = [item.example.rel_path for item in scheduled]
+        for dependent in dependents:
+            self.assertLess(names.index(custom_op), names.index(dependent))
+
+    def test_npu_idle_min_preserves_custom_op_required_order(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        dependent = "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(
+                report,
+                {
+                    dependent: (1, 30),
+                    custom_op: (2, 1),
+                    static_lib: (100, 1),
+                },
+            )
+            cells = [cell(root, dependent), cell(root, custom_op), cell(root, static_lib)]
+
+            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLess(names.index(static_lib), names.index(custom_op))
+        self.assertLess(names.index(custom_op), names.index(dependent))
+
+    def test_npu_idle_min_delays_custom_op_dependents_until_custom_op_build_ready(self) -> None:
+        custom_op = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+        static_lib = "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"
+        dependent = "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(
+                report,
+                {
+                    static_lib: (1, 1),
+                    custom_op: (30, 1),
+                    dependent: (1, 10),
+                    "short-a": (1, 10),
+                    "short-b": (1, 10),
+                    "short-c": (1, 10),
+                    "short-d": (1, 10),
+                    "short-e": (1, 10),
+                },
+            )
+            cells = [
+                cell(root, static_lib),
+                cell(root, custom_op),
+                cell(root, dependent),
+                cell(root, "short-a"),
+                cell(root, "short-b"),
+                cell(root, "short-c"),
+                cell(root, "short-d"),
+                cell(root, "short-e"),
+            ]
+
+            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=4)
+
+        self.assertEqual(custom_op_dependency_violation_s(scheduled, report, jobs=4), 0.0)
+
+    def test_build_desc_schedule_uses_historical_build_duration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            report.write_text(
+                json.dumps(
+                    {
+                        "results": [
+                            {
+                                "example": "a",
+                                "steps": [
+                                    {"kind": "clean", "duration_s": 1},
+                                    {"kind": "build", "duration_s": 10},
+                                ],
+                            },
+                            {"example": "b", "steps": [{"kind": "build", "duration_s": 2}]},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            cells = [cell(root, "c"), cell(root, "b"), cell(root, "a")]
+
+            scheduled = schedule_cells(cells, schedule="build-desc", schedule_report=report)
+
+        self.assertEqual([item.example.rel_path for item in scheduled], ["a", "b", "c"])
+        self.assertIsInstance(scheduled[0], Cell)
+
+    def test_frontload_build_desc_keeps_rest_in_original_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            report.write_text(
+                json.dumps(
+                    {
+                        "results": [
+                            {"example": "slow", "steps": [{"kind": "build", "duration_s": 30}]},
+                            {"example": "medium", "steps": [{"kind": "build", "duration_s": 20}]},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            cells = [cell(root, "fast-a"), cell(root, "slow"), cell(root, "fast-b"), cell(root, "medium")]
+
+            scheduled = schedule_cells(
+                cells,
+                schedule="frontload-build-desc",
+                schedule_report=report,
+                frontload_count=1,
+            )
+
+        self.assertEqual([item.example.rel_path for item in scheduled], ["slow", "fast-a", "fast-b", "medium"])
+
+    def test_cli_applies_schedule_before_dry_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["a", "b", "c"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "c", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "b", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            schedule_report = root / "schedule_report.json"
+            schedule_report.write_text(
+                json.dumps(
+                    {
+                        "results": [
+                            {"example": "a", "steps": [{"kind": "build", "duration_s": 30}]},
+                            {"example": "b", "steps": [{"kind": "build", "duration_s": 10}]},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            results_dir = root / "out"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "build-desc",
+                        "--schedule-report",
+                        str(schedule_report),
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(results_dir),
+                    ]
+                )
+
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual([item["example"] for item in payload["results"]], ["a", "b", "c"])
+
+    def test_npu_idle_min_schedule_is_not_worse_than_build_desc_after_frontload(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(
+                report,
+                {
+                    "slow-a": (100, 1),
+                    "slow-b": (90, 1),
+                    "fast-a": (1, 30),
+                    "fast-b": (1, 30),
+                    "fast-c": (1, 30),
+                },
+            )
+            cells = [cell(root, name) for name in ["slow-a", "slow-b", "fast-a", "fast-b", "fast-c"]]
+
+            build_desc = schedule_cells(cells, schedule="build-desc", schedule_report=report, jobs=2)
+            idle_min = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+
+            idle_min_s = simulate_npu_idle(idle_min, report, jobs=2)
+            build_desc_idle_s = simulate_npu_idle(build_desc, report, jobs=2)
+            idle_min_makespan_s = simulate_npu_makespan(idle_min, report, jobs=2)
+            build_desc_makespan_s = simulate_npu_makespan(build_desc, report, jobs=2)
+
+        self.assertLessEqual(idle_min_s, build_desc_idle_s)
+        self.assertLessEqual(idle_min_makespan_s, build_desc_makespan_s)
+
+    def test_npu_idle_min_schedule_depends_on_jobs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(
+                report,
+                {
+                    "c0": (100, 10),
+                    "c1": (100, 10),
+                    "c2": (1, 5),
+                    "c3": (20, 10),
+                    "c4": (10, 100),
+                    "c5": (100, 5),
+                },
+            )
+            cells = [cell(root, name) for name in ["c0", "c1", "c2", "c3", "c4", "c5"]]
+
+            one_job = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=1)
+            two_jobs = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+
+        self.assertNotEqual([item.example.rel_path for item in one_job], [item.example.rel_path for item in two_jobs])
+
+    def test_cli_accepts_npu_idle_min_schedule_before_dry_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ["slow-a", "fast-a", "fast-b"]:
+                runner = root / "scripts" / "presmoke" / "cases" / name / "run.sh"
+                runner.parent.mkdir(parents=True, exist_ok=True)
+                runner.write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+            manifest = root / "scripts" / "presmoke" / "reports" / "case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True, exist_ok=True)
+            manifest.write_text(
+                json.dumps(
+                    [
+                        {"case": "slow-a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "fast-a", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                        {"case": "fast-b", "supported_archs": ["dav-2201"], "supported_modes": ["npu"]},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            schedule_report = root / "schedule_report.json"
+            write_timing_report(schedule_report, {"slow-a": (100, 1), "fast-a": (1, 30), "fast-b": (1, 20)})
+            results_dir = root / "out"
+
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(root)}):
+                rc = main(
+                    [
+                        "--runner-mode",
+                        "case-runner",
+                        "--arch",
+                        "dav-2201",
+                        "--modes",
+                        "npu",
+                        "--dry-run",
+                        "--schedule",
+                        "npu-idle-min",
+                        "--schedule-report",
+                        str(schedule_report),
+                        "--jobs",
+                        "2",
+                        "--report-format",
+                        "json",
+                        "--results",
+                        str(results_dir),
+                    ]
+                )
+
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual([item["example"] for item in payload["results"]], ["slow-a", "fast-a", "fast-b"])
+
+    def test_auto_jobs_scales_with_available_cpu_count(self) -> None:
+        self.assertEqual(resolve_jobs("auto", cpu_count=192), 12)
+        self.assertEqual(resolve_jobs("auto", cpu_count=88), 8)
+        self.assertEqual(resolve_jobs("auto", cpu_count=40), 6)
+        self.assertEqual(resolve_jobs("auto", cpu_count=16), 4)
+        self.assertEqual(resolve_jobs("7", cpu_count=192), 7)
+
+    def test_detect_cpu_count_prefers_lscpu(self) -> None:
+        with mock.patch("presmoke.cli.subprocess.run") as run:
+            run.return_value.stdout = "CPU(s):                             192\n"
+            run.return_value.returncode = 0
+
+            self.assertEqual(detect_cpu_count(), 192)
+
+        run.assert_called_once()
+
+    def test_npu_idle_min_does_not_frontload_long_builds_when_it_increases_idle(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            timings = {
+                "slow-a": (500, 1),
+                "slow-b": (130, 1),
+                "slow-c": (120, 1),
+                "slow-d": (110, 1),
+                "fast-a": (1, 200),
+                "fast-b": (1, 100),
+                "fast-c": (1, 80),
+                "fast-d": (1, 60),
+            }
+            write_timing_report(report, timings)
+            cells = [
+                cell(root, name)
+                for name in ["fast-a", "fast-b", "fast-c", "fast-d", "slow-a", "slow-b", "slow-c", "slow-d"]
+            ]
+
+            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=4)
+            scheduled_idle = simulate_npu_idle(scheduled, report, jobs=4)
+
+        names = [item.example.rel_path for item in scheduled]
+        self.assertLessEqual(scheduled_idle, 58.0)
+        self.assertLess(names.index("fast-a"), names.index("slow-b"))
+
+    def test_npu_idle_min_prefers_lower_makespan_after_idle(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            report = root / "report.json"
+            write_timing_report(
+                report,
+                {
+                    "long-build": (100, 1),
+                    "long-run-a": (1, 80),
+                    "long-run-b": (1, 70),
+                    "short-run": (1, 1),
+                },
+            )
+            cells = [cell(root, name) for name in ["short-run", "long-run-a", "long-build", "long-run-b"]]
+
+            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=3)
+            build_desc = schedule_cells(cells, schedule="build-desc", schedule_report=report, jobs=3)
+
+            scheduled_idle = simulate_npu_idle(scheduled, report, jobs=3)
+            build_desc_idle = simulate_npu_idle(build_desc, report, jobs=3)
+            scheduled_makespan = simulate_npu_makespan(scheduled, report, jobs=3)
+            build_desc_makespan = simulate_npu_makespan(build_desc, report, jobs=3)
+
+        self.assertLessEqual(scheduled_idle, build_desc_idle)
+        self.assertLessEqual(scheduled_makespan, build_desc_makespan)
+
+
+if __name__ == "__main__":
+    unittest.main()

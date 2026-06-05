@@ -30,7 +30,7 @@ presmoke_soc_version() {
     fi
     case "${1:-$(presmoke_arch)}" in
         dav-2201) printf '%s\n' "Ascend910B4" ;;
-        dav-3510) printf '%s\n' "Ascend950" ;;
+        dav-3510) printf '%s\n' "Ascend950PR_9599" ;;
         *) printf '%s\n' "${1:-$(presmoke_arch)}" ;;
     esac
 }
@@ -38,6 +38,54 @@ presmoke_soc_version() {
 presmoke_build_dir() {
     local case_dir="$1"
     printf '%s/build_%s\n' "$case_dir" "$(presmoke_mode)"
+}
+
+presmoke_case_init() {
+    if [[ $# -ne 1 || -z "${1:-}" ]]; then
+        echo "Usage: presmoke_case_init <case_rel>" >&2
+        return 2
+    fi
+
+    CASE_DIR="$(presmoke_case_root "$1")"
+    MODE="$(presmoke_mode)"
+    ARCH="$(presmoke_arch)"
+    SOC_VERSION="$(presmoke_soc_version "$ARCH")"
+    RUN_MODE_ARG=""
+    if [[ "$MODE" != "npu" ]]; then
+        RUN_MODE_ARG="-DCMAKE_ASC_RUN_MODE=$MODE"
+    fi
+    BUILD_DIR="$(presmoke_build_dir "$CASE_DIR")"
+    export CASE_DIR MODE ARCH SOC_VERSION RUN_MODE_ARG BUILD_DIR
+}
+
+run_in_build_dir() {
+    (cd "$BUILD_DIR" && "$@")
+}
+
+presmoke_default_clean() {
+    rm -rf "$BUILD_DIR"
+}
+
+presmoke_case_main() {
+    local action="${1:-all}"
+
+    if [[ "$action" == "clean" ]]; then
+        case_clean
+        return
+    fi
+
+    if [[ -n "${SKIP_REASON:-}" ]]; then
+        echo "SKIP: $SKIP_REASON"
+        return 0
+    fi
+
+    case "$action" in
+        build) case_build ;;
+        run) case_run ;;
+        verify) case_verify ;;
+        all) case_build; case_run; case_verify ;;
+        *) echo "Usage: $0 {build|run|verify|clean|all}" >&2; return 2 ;;
+    esac
 }
 
 presmoke_run_command() {
@@ -72,6 +120,42 @@ presmoke_with_lock() {
     return "$rc"
 }
 
+presmoke_opp_path() {
+    if [[ -n "${ASCEND_OPP_PATH:-}" ]]; then
+        printf '%s\n' "$ASCEND_OPP_PATH"
+        return
+    fi
+    if [[ -n "${ASCEND_HOME_PATH:-}" && -d "$ASCEND_HOME_PATH/opp" ]]; then
+        printf '%s\n' "$ASCEND_HOME_PATH/opp"
+        return
+    fi
+    printf '%s\n' "/usr/local/Ascend/cann-9.1.0/opp"
+}
+
+presmoke_custom_op_package_valid() {
+    local vendor_dir
+    vendor_dir="$(presmoke_opp_path)/vendors/customize"
+    [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom.py" ]] || return 1
+    [[ -f "$vendor_dir/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py" ]] || return 1
+    [[ -f "$vendor_dir/op_api/include/aclnn_add_custom.h" ]] || return 1
+    [[ -f "$vendor_dir/op_api/include/aclnn_add_custom_tiling_sink.h" ]] || return 1
+    [[ -f "$vendor_dir/op_api/lib/libcust_opapi.so" ]] || return 1
+    [[ -f "$vendor_dir/framework/onnx/libcust_onnx_parsers.so" ]] || return 1
+    [[ -f "$vendor_dir/op_impl/ai_core/tbe/op_master_device/lib/libcust_opmaster.so" ]] || return 1
+}
+
+presmoke_repair_custom_op_package_headers() {
+    local build_dir="$1"
+    local vendor_dynamic source_dynamic header
+    vendor_dynamic="$(presmoke_opp_path)/vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic"
+    source_dynamic="$build_dir/op_kernel/ascendc_kernels/binary/dynamic"
+    [[ -d "$vendor_dynamic" && -d "$source_dynamic" ]] || return 0
+
+    while IFS= read -r header; do
+        cp "$header" "$vendor_dynamic/"
+    done < <(find "$source_dynamic" -mindepth 2 -maxdepth 2 -type f \( -name '*.h' -o -name '*.hpp' \) 2>/dev/null)
+}
+
 presmoke_ensure_custom_op_package() {
     if [[ "${PRESMOKE_CUSTOM_OP_AUTO_INSTALL:-1}" == "0" ]]; then
         echo "PRESMOKE_CUSTOM_OP_AUTO_INSTALL=0; custom_op package auto-install skipped" >&2
@@ -96,10 +180,14 @@ _presmoke_ensure_custom_op_package_locked() {
     stamp="$state_dir/custom_op_${arch}_${mode}.installed"
     mkdir -p "$build_dir" "$state_dir"
 
-    local packages=("$build_dir"/custom_opp_*.run)
-    if [[ -f "$stamp" && -f "${packages[0]}" ]]; then
-        echo "custom_op package already installed for arch=$arch mode=$mode" >&2
-        return 0
+    if [[ -f "$stamp" ]]; then
+        presmoke_repair_custom_op_package_headers "$build_dir"
+        if presmoke_custom_op_package_valid; then
+            echo "custom_op package already installed for arch=$arch mode=$mode" >&2
+            return 0
+        fi
+        echo "custom_op package stamp exists but installed files are incomplete; reinstalling" >&2
+        rm -f "$stamp"
     fi
 
     local cmake_args=(cmake .. "-DCMAKE_ASC_ARCHITECTURES=$arch")
@@ -110,13 +198,18 @@ _presmoke_ensure_custom_op_package_locked() {
     (cd "$build_dir" && presmoke_run_command "${cmake_args[@]}")
     (cd "$build_dir" && presmoke_run_command make -j binary package)
 
-    packages=("$build_dir"/custom_opp_*.run)
+    local packages=("$build_dir"/custom_opp_*.run)
     if [[ ! -f "${packages[0]}" ]]; then
         echo "custom_op package was not generated under $build_dir" >&2
         return 1
     fi
     package="$(basename "${packages[0]}")"
     (cd "$build_dir" && presmoke_run_command "./$package")
+    presmoke_repair_custom_op_package_headers "$build_dir"
+    if ! presmoke_custom_op_package_valid; then
+        echo "custom_op package install finished but required files are still incomplete" >&2
+        return 1
+    fi
     touch "$stamp"
 }
 

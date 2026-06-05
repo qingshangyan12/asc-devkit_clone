@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import unittest
+import subprocess
+import tempfile
 from pathlib import Path
 
 from presmoke.generate_case_runners import (
@@ -115,6 +117,29 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             ["dav-3510"],
         )
 
+    def test_custom_op_provider_cases_support_910b_and_950(self) -> None:
+        expected = ["dav-2201", "dav-3510"]
+        self.assertEqual(
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"],
+            expected,
+        )
+        self.assertEqual(
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/00_compilation/custom_op"],
+            expected,
+        )
+
+    def test_custom_op_dependent_cases_support_910b_and_950(self) -> None:
+        expected = ["dav-2201", "dav-3510"]
+        for rel_path in [
+            "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
+            "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
+            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
+            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom",
+            "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
+            "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+        ]:
+            self.assertEqual(ARCH_OVERRIDES[rel_path], expected)
+
     def test_arch_overrides_are_applied_before_planning(self) -> None:
         spec = ExampleSpec(
             Path("examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8"),
@@ -126,6 +151,131 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         )
         apply_case_overrides([spec])
         self.assertEqual(spec.archs, ["dav-3510"])
+
+    def test_rendered_runner_delegates_common_boilerplate_to_case_common(self) -> None:
+        script = render_runner(
+            "01_simd_cpp_api/00_introduction/00_quickstart/hello_world",
+            [Command("cmake ..", "cmake"), Command("make -j", "make")],
+            [Command("./demo", "run")],
+            [],
+        )
+
+        self.assertIn("presmoke_case_init", script)
+        self.assertIn("_case_entry.sh", script)
+        self.assertIn("case_build()", script)
+        self.assertIn("case_run()", script)
+        self.assertIn("case_verify()", script)
+        self.assertIn('presmoke_case_main "$@"', script)
+        self.assertNotIn("COMMON_SH", script)
+        self.assertNotIn("SEARCH_DIR", script)
+        self.assertNotIn('CASE_DIR="$(presmoke_case_root "$CASE_REL")"', script)
+        self.assertNotIn('ACTION="${1:-all}"', script)
+        self.assertNotIn('case "$ACTION" in', script)
+
+    def test_skip_runner_clean_still_removes_build_directory(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        runner = project_root / "scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh"
+        build_dir = project_root / "examples/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/build_npu"
+
+        with tempfile.TemporaryDirectory(dir=project_root) as tmp:
+            marker = build_dir / "presmoke_clean_marker"
+            build_dir.mkdir(parents=True, exist_ok=True)
+            marker.write_text("stale", encoding="utf-8")
+            env = {"PRESMOKE_PROJECT_ROOT": str(project_root), **dict(__import__("os").environ)}
+
+            result = subprocess.run(["bash", str(runner), "clean"], cwd=tmp, env=env, text=True, capture_output=True)
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(build_dir.exists())
+
+    def test_case_common_maps_950_arch_to_supported_soc_version(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        case_common = project_root / "scripts/presmoke/case_common.sh"
+
+        result = subprocess.run(
+            ["bash", "-c", f"source {case_common}; presmoke_soc_version dav-3510"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "Ascend950PR_9599")
+
+    def test_custom_op_stamp_requires_installed_files_to_be_complete(self) -> None:
+        project_root = Path(__file__).resolve().parents[3]
+        case_common = project_root / "scripts/presmoke/case_common.sh"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            custom_op = root / "examples/01_simd_cpp_api/02_features/00_compilation/custom_op"
+            state = root / ".presmoke_state"
+            custom_op.mkdir(parents=True)
+            state.mkdir()
+            (state / "custom_op_dav-2201_npu.installed").write_text("stale", encoding="utf-8")
+            opp = root / "opp"
+            build_dynamic = custom_op / "build_npu/op_kernel/ascendc_kernels/binary/dynamic/add_custom"
+            build_dynamic.mkdir(parents=True)
+            (build_dynamic / "add_custom_tiling.h").write_text("header", encoding="utf-8")
+            vendor_dynamic = opp / "vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic"
+            vendor_dynamic.mkdir(parents=True)
+            (vendor_dynamic / "add_custom.py").write_text("", encoding="utf-8")
+            (vendor_dynamic / "add_custom_tiling_sink.py").write_text("", encoding="utf-8")
+            vendor_api = opp / "vendors/customize/op_api"
+            (vendor_api / "include").mkdir(parents=True)
+            (vendor_api / "lib").mkdir(parents=True)
+            (vendor_api / "include/aclnn_add_custom.h").write_text("", encoding="utf-8")
+            (vendor_api / "include/aclnn_add_custom_tiling_sink.h").write_text("", encoding="utf-8")
+            (vendor_api / "lib/libcust_opapi.so").write_text("", encoding="utf-8")
+            vendor_framework = opp / "vendors/customize/framework/onnx"
+            vendor_framework.mkdir(parents=True)
+            (vendor_framework / "libcust_onnx_parsers.so").write_text("", encoding="utf-8")
+            vendor_master = opp / "vendors/customize/op_impl/ai_core/tbe/op_master_device/lib"
+            vendor_master.mkdir(parents=True)
+            (vendor_master / "libcust_opmaster.so").write_text("", encoding="utf-8")
+
+            script = f"""
+set -euo pipefail
+source {case_common}
+export PRESMOKE_PROJECT_ROOT={root}
+export PRESMOKE_STATE_DIR={state}
+export ASCEND_OPP_PATH={opp}
+export PRESMOKE_ARCH=dav-2201
+export PRESMOKE_MODE=npu
+presmoke_run_command() {{
+    if [[ "$1" == "make" ]]; then
+        cat > custom_opp_test.run <<'RUN'
+#!/usr/bin/env bash
+set -euo pipefail
+vendor="$ASCEND_OPP_PATH/vendors/customize"
+mkdir -p "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic"
+mkdir -p "$vendor/op_api/include" "$vendor/op_api/lib"
+mkdir -p "$vendor/framework/onnx" "$vendor/op_impl/ai_core/tbe/op_master_device/lib"
+touch "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom.py"
+touch "$vendor/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py"
+touch "$vendor/op_api/include/aclnn_add_custom.h"
+touch "$vendor/op_api/include/aclnn_add_custom_tiling_sink.h"
+touch "$vendor/op_api/lib/libcust_opapi.so"
+touch "$vendor/framework/onnx/libcust_onnx_parsers.so"
+touch "$vendor/op_impl/ai_core/tbe/op_master_device/lib/libcust_opmaster.so"
+RUN
+        chmod +x custom_opp_test.run
+        return 0
+    fi
+    if [[ "$1" == "./custom_opp_test.run" ]]; then
+        "$@"
+        return
+    fi
+    return 0
+}}
+presmoke_ensure_custom_op_package
+"""
+
+            result = subprocess.run(["bash", "-c", script], text=True, capture_output=True, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("custom_op package already installed", result.stderr)
+            self.assertTrue((opp / "vendors/customize/op_impl/ai_core/tbe/customize_impl/dynamic/add_custom_tiling_sink.py").exists())
 
 
 if __name__ == "__main__":
