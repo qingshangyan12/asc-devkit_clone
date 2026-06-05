@@ -80,7 +80,7 @@ def main() -> int:
 
     specs = [parse_readme(path, examples_root) for path in discover_examples(examples_root)]
     apply_case_overrides(specs)
-    cells, planner_suggestions = build_cells(specs, args.arch, [args.mode])
+    cells, _ = build_cells(specs, args.arch, [args.mode])
     runnable_by_rel = {cell.example.rel_path: cell for cell in cells}
     all_cells = [cell_for_spec(spec, args.arch, args.mode) for spec in specs]
     reports: List[CaseReport] = []
@@ -88,8 +88,7 @@ def main() -> int:
         report = write_runner(project_root, runners_root, cell, runnable_on_target=cell.example.rel_path in runnable_by_rel)
         reports.append(report)
 
-    coverage = build_coverage_report(examples_root, specs, cells, reports, args.arch, args.mode)
-    write_reports(reports_root, reports, coverage, planner_suggestions)
+    write_manifest(reports_root, reports)
     print(f"generated_runners={len(reports)}")
     print(f"low_confidence={sum(1 for item in reports if item.confidence != 'high')}")
     print(f"reports_dir={reports_root}")
@@ -314,15 +313,6 @@ def case_entry_relative_path(rel: str) -> str:
     return "../" * depth + "_case_entry.sh"
 
 
-def skip_function_lines(skip_reason: str) -> List[str]:
-    if not skip_reason:
-        return []
-    return [
-        '    echo "SKIP: $SKIP_REASON"',
-        "    exit 0",
-    ]
-
-
 def indent_commands(commands: Iterable[Command], default_cd_build: bool = False) -> List[str]:
     lines: List[str] = []
     for command in commands:
@@ -418,98 +408,11 @@ def quote_env_value(value: str) -> str:
     return shlex.quote(value)
 
 
-def build_coverage_report(examples_root: Path, specs, cells, reports: List[CaseReport], target_arch: str, target_mode: str) -> dict:
-    readmes = sorted(p.parent.relative_to(examples_root).as_posix() for p in examples_root.rglob("README.md"))
-    runnable_readmes = sorted(spec.rel_path for spec in specs)
-    target_cell_cases = sorted(cell.example.rel_path for cell in cells)
-    generated_cases = sorted(report.case for report in reports)
-    cmake_dirs = sorted(p.parent.relative_to(examples_root).as_posix() for p in examples_root.rglob("CMakeLists.txt"))
-    return {
-        "readme_count": len(readmes),
-        "runnable_readme_count": len(runnable_readmes),
-        "generated_runner_count": len(generated_cases),
-        "target_runnable_count": len(target_cell_cases),
-        "target_arch": target_arch,
-        "target_mode": target_mode,
-        "cmake_dir_count": len(cmake_dirs),
-        "supported_arch_counts": count_supported_archs(reports),
-        "supported_mode_counts": count_supported_modes(reports),
-        "readmes_without_compile_run": sorted(set(readmes) - set(runnable_readmes)),
-        "cmake_dirs_without_readme": sorted(set(cmake_dirs) - set(readmes)),
-        "runnable_readmes_without_runner": sorted(set(runnable_readmes) - set(generated_cases)),
-        "target_runnable_without_runner": sorted(set(target_cell_cases) - set(generated_cases)),
-    }
-
-
-def count_supported_archs(reports: List[CaseReport]) -> dict[str, int]:
-    counts: dict[str, int] = {}
-    for report in reports:
-        for arch in report.supported_archs:
-            counts[arch] = counts.get(arch, 0) + 1
-    return dict(sorted(counts.items()))
-
-
-def count_supported_modes(reports: List[CaseReport]) -> dict[str, int]:
-    counts: dict[str, int] = {}
-    for report in reports:
-        for mode in report.supported_modes:
-            counts[mode] = counts.get(mode, 0) + 1
-    return dict(sorted(counts.items()))
-
-
-def write_reports(reports_root: Path, reports: List[CaseReport], coverage: dict, planner_suggestions) -> None:
+def write_manifest(reports_root: Path, reports: List[CaseReport]) -> None:
     (reports_root / "case_runner_manifest.json").write_text(
         json.dumps([asdict(report) for report in reports], ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    (reports_root / "coverage.json").write_text(json.dumps(coverage, ensure_ascii=False, indent=2), encoding="utf-8")
-    low = [report for report in reports if report.confidence != "high"]
-    lines = [
-        "# Presmoke Case Runner Generation Report",
-        "",
-        "## Summary",
-        "",
-        f"- README.md count: `{coverage['readme_count']}`",
-        f"- README with 编译运行: `{coverage['runnable_readme_count']}`",
-        f"- generated runners: `{coverage['generated_runner_count']}`",
-        f"- target runnable on {coverage['target_arch']}/{coverage['target_mode']}: `{coverage['target_runnable_count']}`",
-        f"- CMakeLists.txt directories: `{coverage['cmake_dir_count']}`",
-        f"- low/medium confidence runners: `{len(low)}`",
-        f"- supported arch counts: `{coverage['supported_arch_counts']}`",
-        f"- supported mode counts: `{coverage['supported_mode_counts']}`",
-        "",
-        "## Low Confidence Runners",
-        "",
-        "| case | confidence | reasons | runner |",
-        "|---|---|---|---|",
-    ]
-    for report in low:
-        lines.append(f"| {report.case} | {report.confidence} | {', '.join(report.reasons)} | {report.runner} |")
-    lines.extend([
-        "",
-        "## CMake Directories Without README",
-        "",
-    ])
-    if coverage["cmake_dirs_without_readme"]:
-        for item in coverage["cmake_dirs_without_readme"]:
-            lines.append(f"- `{item}`")
-    else:
-        lines.append("None.")
-    lines.extend([
-        "",
-        "## README Without 编译运行",
-        "",
-    ])
-    if coverage["readmes_without_compile_run"]:
-        for item in coverage["readmes_without_compile_run"]:
-            lines.append(f"- `{item}`")
-    else:
-        lines.append("None.")
-    if planner_suggestions:
-        lines.extend(["", "## Planner Suggestions", ""])
-        for item in planner_suggestions:
-            lines.append(f"- `{item.example}` {item.severity}: {item.message} {item.hint}")
-    (reports_root / "case_runner_report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

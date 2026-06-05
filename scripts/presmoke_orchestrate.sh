@@ -25,7 +25,7 @@ TIMEOUT="${TIMEOUT:-120}"
 PRIMARY_CARD="${PRIMARY_CARD:-0}"
 RETRY_CARDS="${RETRY_CARDS:-}"
 REPORT_FORMAT="${REPORT_FORMAT:-all}"
-OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_results/orchestrate_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
+OUT_ROOT="${OUT_ROOT:-${PROJECT_ROOT}/presmoke_report/orchestrate_${ARCH}_$(date +%Y%m%d_%H%M%S)}"
 LOCK_DIR="${LOCK_DIR:-${PROJECT_ROOT}/.presmoke_locks/presmoke_orchestrate.lock}"
 
 mkdir -p "$OUT_ROOT"
@@ -282,7 +282,7 @@ failures_path = root / "FAILURES.tsv"
 effective_rc_path = root / "effective_rc.txt"
 with timings_path.open("w", encoding="utf-8", newline="") as f:
     writer = csv.writer(f, delimiter="\t")
-    writer.writerow(["run", "example", "arch", "mode", "status", "rc", "duration_s", "npu_wait_s", "reason", "failing_step", "steps", "commands", "log_file"])
+    writer.writerow(["run", "example", "arch", "mode", "status", "rc", "duration_s", "npu_wait_s", "reason", "failing_step", "steps", "commands", "log_file", "stage_log_files"])
     if primary:
         name, _, _, data = primary
         for result in data.get("results", []):
@@ -310,6 +310,7 @@ with timings_path.open("w", encoding="utf-8", newline="") as f:
                 step_text,
                 commands,
                 result.get("log_file", ""),
+                ";".join(result.get("stage_log_files", [])),
             ])
 
 with failures_path.open("w", encoding="utf-8", newline="") as f:
@@ -425,6 +426,8 @@ if primary:
         f"- failures tsv: `{failures_path}`",
         f"- primary JSON: `{run_dir / 'results' / 'report.json'}`",
         f"- primary Markdown: `{run_dir / 'results' / 'report.md'}`",
+        f"- per-case logs: `{run_dir / 'results' / 'logs'}`",
+        f"- per-stage logs: `{run_dir / 'results' / 'logs' / 'stages'}`",
     ])
 else:
     lines.extend(["", "Primary full run report was not found.", "", "## Effective Status", "", "`FAIL`: primary report missing."])
