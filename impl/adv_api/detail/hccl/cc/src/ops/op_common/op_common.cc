@@ -1118,10 +1118,25 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResource
         kernelChannels.resize(channelNum);
 
         if (channelNum > 0) {
-            CHK_RET(HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(),
-                channelNum, kernelChannels.data()));
+            // 需要资源回退。返回资源不够
+            auto ret = HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(),
+                channelNum, kernelChannels.data());
+            if (ret == HCCL_E_UNAVAIL) {
+                HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
+                return HCCL_E_UNAVAIL;
+            } else {
+                CHK_RET(ret);
+            }
         }
-        kernelInfo.kernelArg->channels = kernelChannels;
+        auto* kernelArgBase = static_cast<CcuKernelArgBase*>(kernelInfo.kernelArg);
+        if (!kernelArgBase) {
+            HCCL_ERROR("[HcclGetChannelForCcu] kernelArg ptr is err.");
+            return HCCL_E_INTERNAL;
+        }
+        for (u32 i = 0; i < channelNum; ++i) {
+            kernelArgBase->channels[i] = kernelChannels[i];
+        }
+        kernelArgBase->channelCount = channelNum;
         HCCL_INFO("[HcclGetChannelForCcu] Get [%lu] channels", channelNum);
     }
     return HCCL_SUCCESS;
@@ -1130,6 +1145,13 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResource
 HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
                           std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
+    CcuInsHandle insHandle{0};
+    uint32_t insNum = 0;
+    CHK_RET(HcclCommQueryCcuIns(comm, &insHandle, &insNum));
+    CHK_PRT_RET(insNum != 1,
+        HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
+        HCCL_E_INTERNAL);
+
     u32 totalKernelNum = 0;
     for (auto t: resRequest.ccuKernelNum) {
         totalKernelNum += t;
@@ -1138,27 +1160,17 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
         HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
         HCCL_E_INTERNAL);
 
-    // 从通信域查询CCU实例
-    constexpr u32 CCU_INS_MAX_NUM = 1;
-    u32 insNum = 0;
-    CcuInsHandle insHandles[CCU_INS_MAX_NUM] = {0};
-    CHK_RET(HcclCommQueryCcuIns(comm, insHandles, &insNum));
-    CHK_PRT_RET(insNum == 0,
-        HCCL_ERROR("[HcclGetCcuKernel]no CCU instance available"),
-        HCCL_E_INTERNAL);
-    CcuInsHandle insHandle = insHandles[0];
-
-    // 按照resGroup进行分批注册
+    // 按照resgroup进行注册
     u32 currentResGroup = 0;
     u32 maxResGroup = 0;
     resCtxHost->ccuKernels.resize(totalKernelNum);
-    while (currentResGroup <= maxResGroup) {
-        // 开始新批次注册
-        CcuResult ccuRet = HcommCcuKernelRegisterStart(insHandle);
-        CHK_PRT_RET(ccuRet != CCU_SUCCESS,
-            HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegisterStart failed, ccuRet[%d]", ccuRet),
-            HCCL_E_INTERNAL);
 
+    while (currentResGroup <= maxResGroup) {
+        CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
+        if (regStartRet != CCU_SUCCESS) {
+            HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
+            return ConvertCcuToHccl(regStartRet);
+        }
         for (u32 i = 0; i < totalKernelNum; i++) {
             CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
             if (kernelInfo.resGroup > maxResGroup) {
@@ -1167,26 +1179,23 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
             if (kernelInfo.resGroup != currentResGroup) {
                 continue;
             }
-            const void* kernelFuncPtr = reinterpret_cast<const void*>(&kernelInfo.creator);
-            const void* kernelArgPtr = static_cast<const void*>(kernelInfo.kernelArg.get());
 
-            HCCL_DEBUG("[HcclGetCcuKernel] kernelFuncPtr[%p], kernelArgPtr[%p]", kernelFuncPtr, kernelArgPtr);
-
-            std::string kernelFuncName = "ccu_kernel_" + std::to_string(i);
-            CcuKernelHandle kernelHandle = 0;
-            ccuRet = HcommCcuKernelRegister(insHandle, kernelFuncName.c_str(),
-                kernelFuncPtr, kernelArgPtr, &kernelHandle);
-            CHK_PRT_RET(ccuRet != CCU_SUCCESS,
-                HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegister failed, ccuRet[%d], kernel[%u]", ccuRet, i),
-                HCCL_E_INTERNAL);
+            HCCL_DEBUG("[HcclGetCcuKernel] kernelFuncName[%s]", kernelInfo.kernelFuncName);
+            CcuKernelHandle kernelHandle;
+            CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
+                                                      reinterpret_cast<void*>(kernelInfo.kernelFunc),
+                                                      kernelInfo.kernelArg, &kernelHandle);
+            if (regRet != CCU_SUCCESS) {
+                HCCL_ERROR("ccu kernel register failed: ccuRet -> %d", regRet);
+                return ConvertCcuToHccl(regRet);
+            }
             resCtxHost->ccuKernels[i] = kernelHandle;
         }
-
-        // 结束新批次注册
-        ccuRet = HcommCcuKernelRegisterEnd(insHandle);
-        CHK_PRT_RET(ccuRet != CCU_SUCCESS,
-            HCCL_ERROR("[HcclGetCcuKernel]HcommCcuKernelRegisterEnd failed, ccuRet[%d]", ccuRet),
-            HCCL_E_INTERNAL);
+        CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
+        if (regEndRet != CCU_SUCCESS) {
+            HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet);
+            return ConvertCcuToHccl(regEndRet);
+        }
         currentResGroup++;
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
