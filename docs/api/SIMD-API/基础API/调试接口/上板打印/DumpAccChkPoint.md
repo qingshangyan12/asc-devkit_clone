@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为 "basic\_api/kernel\_operator\_dump\_tensor\_intf.h
+头文件路径为 "basic\_api/kernel\_operator\_dump\_tensor\_intf.h。"
 
 该接口Dump指定Tensor的内容。同时支持打印自定义的标签（仅支持uint32\_t数据类型的信息），比如打印当前行号等。区别于[DumpTensor](DumpTensor.md)，使用该接口可以支持指定偏移位置的Tensor打印。
 
@@ -132,8 +132,14 @@ constexpr uint32_t totalLength = 256;    // 参与搬运的元素个数
 AscendC::LocalTensor<half> srcLocal;
 AscendC::GlobalTensor<half> srcGlobal;
 AscendC::DataCopy(srcLocal, srcGlobal, totalLength * sizeof(half));
-uint32_t index = 8;    // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
+uint32_t index = 56;    // 用户自定义附加信息，此处传入DumpAccChkPoint指令的行号
 uint32_t countOff = 32;    // 偏移元素个数，从srcLocal[32]开始打印
 uint32_t dupmSize = 128;    // dump的元素个数，从srcLocal[32]开始打印128个元素个数
 AscendC::DumpAccChkPoint(srcLocal, index, countOff, dupmSize);
+```
+
+打印结果如下：
+```plain
+DumpTensor: desc=56, addr=0x40, data_type=float16, position=UB, dump_size=15
+[4.710938, 4.707031, 4.773438, 2.271484, 4.347656, 2.359375, 1.284180, 1.073242, 1.242188, 2.298828, 0.521973, 1.099609, 1.880859, 1.226562, 3.916016]
 ```
