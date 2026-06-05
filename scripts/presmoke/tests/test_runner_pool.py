@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from presmoke.case_runners import build_case_runner_cells_with_skips
-from presmoke.cli import parse_args
+from presmoke.cli import parse_args, presmoke_run_lock
 from presmoke.model import Cell, Command, ExampleSpec, RunReport
 from presmoke.pool import NpuSlotPool
 from presmoke.report import write_json, write_markdown
@@ -26,6 +26,19 @@ class RunnerPoolTest(unittest.TestCase):
         args = parse_args([])
 
         self.assertEqual(args.timeout, 120)
+        self.assertEqual(args.host_timeout, 900)
+
+    def test_presmoke_run_lock_removes_stale_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            lock_dir = root / ".presmoke_locks" / "presmoke_run.lock"
+            lock_dir.mkdir(parents=True)
+            (lock_dir / "pid").write_text("999999999", encoding="utf-8")
+
+            with presmoke_run_lock(root):
+                self.assertEqual((lock_dir / "pid").read_text(encoding="utf-8"), str(__import__("os").getpid()))
+
+            self.assertFalse(lock_dir.exists())
 
     def test_runner_timeout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -33,6 +46,22 @@ class RunnerPoolTest(unittest.TestCase):
             result = run_cell(c, Path(tmp) / "logs", timeout=1, keep_artifacts=True)
         self.assertEqual(result.status, "FAIL")
         self.assertEqual(result.rc, 124)
+
+    def test_host_stages_do_not_timeout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            c = cell(
+                Path(tmp),
+                "x",
+                commands=[
+                    Command("sleep 1.2", "build"),
+                    Command(":", "run"),
+                    Command("sleep 1.2", "verify"),
+                ],
+            )
+            result = run_cell(c, Path(tmp) / "logs", timeout=1, host_timeout=1, keep_artifacts=True)
+
+        self.assertEqual(result.status, "PASS")
+        self.assertEqual([step.rc for step in result.steps], [0, 0, 0])
 
     def test_npu_gate_limits_concurrency(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -137,6 +166,24 @@ class RunnerPoolTest(unittest.TestCase):
             result = run_cell(c, Path(tmp) / "logs", timeout=1, keep_artifacts=True)
 
         self.assertEqual(result.status, "PASS")
+
+    def test_custom_op_provider_build_dir_is_preserved_for_dependent_cases(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            c = cell(
+                root,
+                "01_simd_cpp_api/02_features/00_compilation/custom_op",
+                commands=[
+                    Command("mkdir -p build_npu && touch build_npu/custom_opp_test.run", "build"),
+                    Command(":", "run"),
+                    Command(":", "verify"),
+                ],
+            )
+
+            result = run_cell(c, root / "logs", timeout=1, keep_artifacts=False)
+
+            self.assertEqual(result.status, "PASS")
+            self.assertTrue((c.build_dir / "custom_opp_test.run").exists())
 
     def test_pipeline_keeps_build_workers_running_while_npu_slot_is_busy(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

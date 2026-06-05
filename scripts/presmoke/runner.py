@@ -17,11 +17,16 @@ from .pool import NpuSlotPool
 
 NpuGate = Callable[[Cell, Command, Callable[[], int]], tuple[int, float]]
 
+PRESERVE_BUILD_ARTIFACT_CASES = {
+    "01_simd_cpp_api/02_features/00_compilation/custom_op",
+}
+
 
 def run_cell(
     cell: Cell,
     log_dir: Path,
     timeout: int,
+    host_timeout: int = 900,
     keep_artifacts: bool = False,
     npu_gate: Optional[NpuGate] = None,
 ) -> RunResult:
@@ -54,10 +59,11 @@ def run_cell(
             command_started = time.monotonic()
             uses_npu = command_uses_npu(cell, command)
             wait_s = 0.0
+            step_timeout = select_timeout(uses_npu, timeout, host_timeout)
             if uses_npu and npu_gate:
-                step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, timeout))
+                step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, step_timeout))
             else:
-                step_rc = _run_command(command, run_dir, log, timeout)
+                step_rc = _run_command(command, run_dir, log, step_timeout)
             step_duration = time.monotonic() - command_started
             steps.append(
                 StepResult(
@@ -80,7 +86,7 @@ def run_cell(
                 break
 
     duration = time.monotonic() - started
-    if use_build_dir and not keep_artifacts and status == "PASS":
+    if should_remove_build_dir(cell, use_build_dir, keep_artifacts, status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
     return RunResult(
         example=cell.example.rel_path,
@@ -101,6 +107,7 @@ def run_cells_pipeline(
     cells: Iterable[Cell],
     log_dir: Path,
     timeout: int,
+    host_timeout: int = 900,
     keep_artifacts: bool = False,
     jobs: int = 1,
     npu_slots: int = 1,
@@ -113,6 +120,7 @@ def run_cells_pipeline(
                 cell,
                 log_dir=log_dir,
                 timeout=timeout,
+                host_timeout=host_timeout,
                 keep_artifacts=keep_artifacts,
                 npu_gate=npu_pool.gate,
             )
@@ -136,6 +144,7 @@ def run_cells_pipeline(
             cell,
             log_dir=log_dir,
             timeout=timeout,
+            host_timeout=host_timeout,
             commands=build_stage_commands(cell.commands),
             keep_artifacts=True,
             stage_name="build",
@@ -157,6 +166,7 @@ def run_cells_pipeline(
                 result = finish_cell_after_build(
                     item,
                     timeout=timeout,
+                    host_timeout=host_timeout,
                     npu_gate=npu_pool.gate,
                 )
                 npu_stats.add_busy(slot_idx, time.monotonic() - busy_started)
@@ -173,7 +183,7 @@ def run_cells_pipeline(
             try:
                 if item is None:
                     return
-                result = finish_cell_verify(item, timeout=timeout, keep_artifacts=keep_artifacts)
+                result = finish_cell_verify(item, timeout=timeout, host_timeout=host_timeout, keep_artifacts=keep_artifacts)
                 append_result(result)
             finally:
                 verify_ready.task_done()
@@ -251,6 +261,7 @@ def run_cell_stage(
     cell: Cell,
     log_dir: Path,
     timeout: int,
+    host_timeout: int,
     commands: Iterable[Command],
     keep_artifacts: bool,
     stage_name: str,
@@ -281,9 +292,9 @@ def run_cell_stage(
     )
     with log_file.open("w", encoding="utf-8", errors="replace") as log:
         log.write(f"example={cell.example.rel_path}\narch={cell.arch}\nmode={cell.mode}\nrun_dir={run_dir}\n\n")
-        run_commands(result, cell, commands, run_dir, log, timeout)
+        run_commands(result, cell, commands, run_dir, log, timeout, host_timeout)
     result.duration_s = time.monotonic() - started
-    if use_build_dir and not keep_artifacts and result.status == "PASS":
+    if should_remove_build_dir(cell, use_build_dir, keep_artifacts, result.status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
     return _PipelineItem(cell, result, run_dir, log_file, started)
 
@@ -291,6 +302,7 @@ def run_cell_stage(
 def finish_cell_after_build(
     item: _PipelineItem,
     timeout: int,
+    host_timeout: int,
     npu_gate: Optional[NpuGate],
 ) -> RunResult:
     cell = item.cell
@@ -303,6 +315,7 @@ def finish_cell_after_build(
                 item.run_dir,
                 log,
                 timeout,
+                host_timeout,
                 npu_gate,
                 initial_npu_wait_s=time.monotonic() - item.ready_at,
             )
@@ -310,13 +323,13 @@ def finish_cell_after_build(
     return item.result
 
 
-def finish_cell_verify(item: _PipelineItem, timeout: int, keep_artifacts: bool) -> RunResult:
+def finish_cell_verify(item: _PipelineItem, timeout: int, host_timeout: int, keep_artifacts: bool) -> RunResult:
     cell = item.cell
     with item.log_file.open("a", encoding="utf-8", errors="replace") as log:
         if item.result.status == "PASS":
-            run_commands(item.result, cell, verify_stage_commands(cell.commands), item.run_dir, log, timeout)
+            run_commands(item.result, cell, verify_stage_commands(cell.commands), item.run_dir, log, timeout, host_timeout)
     item.result.duration_s = time.monotonic() - item.started
-    if cell.build_dir.exists() and not keep_artifacts and item.result.status == "PASS":
+    if should_remove_build_dir(cell, cell.build_dir.exists(), keep_artifacts, item.result.status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
     return item.result
 
@@ -328,6 +341,7 @@ def run_commands(
     run_dir: Path,
     log,
     timeout: int,
+    host_timeout: int,
     npu_gate: Optional[NpuGate] = None,
     initial_npu_wait_s: float = 0.0,
 ) -> None:
@@ -339,11 +353,12 @@ def run_commands(
         log.flush()
         command_started = time.monotonic()
         uses_npu = command_uses_npu(cell, command)
+        step_timeout = select_timeout(uses_npu, timeout, host_timeout)
         wait_s = 0.0
         if uses_npu and npu_gate:
-            step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, timeout))
+            step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, step_timeout))
         else:
-            step_rc = _run_command(command, run_dir, log, timeout)
+            step_rc = _run_command(command, run_dir, log, step_timeout)
         queued_wait_s = 0.0
         if uses_npu and pending_npu_wait_s:
             queued_wait_s = pending_npu_wait_s
@@ -388,6 +403,12 @@ def clean_build_dir(build_dir: Path) -> None:
         shutil.rmtree(build_dir, ignore_errors=True)
 
 
+def should_remove_build_dir(cell: Cell, use_build_dir: bool, keep_artifacts: bool, status: str) -> bool:
+    if not use_build_dir or keep_artifacts or status != "PASS":
+        return False
+    return cell.example.rel_path not in PRESERVE_BUILD_ARTIFACT_CASES
+
+
 def command_uses_npu(cell: Cell, command: Command) -> bool:
     if cell.mode != "npu":
         return False
@@ -401,7 +422,11 @@ def command_uses_npu(cell: Cell, command: Command) -> bool:
     return False
 
 
-def _run_command(command: Command, cwd: Path, log, timeout: int) -> int:
+def select_timeout(uses_npu: bool, npu_timeout: int, host_timeout: int) -> Optional[int]:
+    return npu_timeout if uses_npu else None
+
+
+def _run_command(command: Command, cwd: Path, log, timeout: Optional[int]) -> int:
     env = os.environ.copy()
     env.update(command.env)
     try:
