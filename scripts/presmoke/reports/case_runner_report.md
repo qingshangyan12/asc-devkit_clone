@@ -147,7 +147,7 @@
 | 03_simt_api/01_utilities/07_simulator | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/01_utilities/07_simulator/run.sh |
 | 03_simt_api/01_utilities/09_log | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/01_utilities/09_log/run.sh |
 | 03_simt_api/02_features/00_framework/00_pytorch/torch_library_roll | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/00_framework/00_pytorch/torch_library_roll/run.sh |
-| 03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table/run.sh |
+| 03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/run.sh |
 | 03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence | low | shell_variable_reference, unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence/run.sh |
 | 03_simt_api/02_features/01_api_features/02_atomic_operation/histogram | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram/run.sh |
 | 03_simt_api/02_features/06_compile/00_basic_compile | medium | unsupported_on_target_arch_or_mode | scripts/presmoke/cases/03_simt_api/02_features/06_compile/00_basic_compile/run.sh |
@@ -249,7 +249,7 @@
 - `03_simt_api/02_features/00_framework`
 - `03_simt_api/02_features/00_framework/00_pytorch`
 - `03_simt_api/02_features/01_api_features`
-- `03_simt_api/02_features/01_api_features/00_memory_asscess`
+- `03_simt_api/02_features/01_api_features/00_memory_access`
 - `03_simt_api/02_features/01_api_features/01_sync_instruction`
 - `03_simt_api/02_features/06_compile`
 - `03_simt_api/03_best_practices`
@@ -344,7 +344,7 @@
 - `03_simt_api/01_utilities/07_simulator` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
 - `03_simt_api/01_utilities/09_log` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
 - `03_simt_api/02_features/00_framework/00_pytorch/torch_library_roll` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
-- `03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
+- `03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
 - `03_simt_api/02_features/01_api_features/01_sync_instruction/memory_fence` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
 - `03_simt_api/02_features/01_api_features/02_atomic_operation/histogram` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
 - `03_simt_api/02_features/06_compile/00_basic_compile` info: Excluded on unsupported arch dav-2201 Supported archs: dav-3510
