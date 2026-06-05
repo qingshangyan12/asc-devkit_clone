@@ -104,7 +104,7 @@ CACHE_MODE_DISABLE = 0, // 不使能L2 Cache
 CACHE_MODE_NORMAL = 1,  // 使能L2 Cache
 CACHE_MODE_PERSISTENT = 4,  // 使能L2 Cache 驻留模式
 };</pre>
-<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在编写算子时发现，为某个GlobalTensor开启L2 Cache后，实测性能反而低于不开启的情况，可以手动禁止该GlobalTensor使用L2 Cache。例如，某算子仅读取一次某个GlobalTensor数据，将数据存入L2 Cache并不会带来收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不让该GlobalTensor使用L2 Cache。通常情况下，使用L2 Cache采用的是CACHE_MODE_NORMAL模式，当L2 Cache已经占满时，则会进行数据置换，原本暂存在L2 Cache中的数据可能会被替换，如果用户希望GlobalTensor的数据一直保留在L2 Cache中，则可以采用L2 Cache的驻留模式。当前L2 Cache驻留模式能力暂不支持，未来将在Ascend 950PR/Ascend 950DT上支持。</p>
+<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在编写算子时发现，为某个GlobalTensor开启L2 Cache后，实测性能反而低于不开启的情况，可以手动禁止该GlobalTensor使用L2 Cache。例如，某算子仅读取一次某个GlobalTensor数据，将数据存入L2 Cache并不会带来收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不让该GlobalTensor使用L2 Cache。通常情况下，L2 Cache可采用CACHE_MODE_NORMAL模式运行。在此模式下，当L2 Cache容量耗尽时会触发数据置换机制，已存入L2 Cache中的数据可能被替换。若需确保特定GlobalTensor的数据始终保留在L2 Cache中，可采用驻留模式。目前该驻留模式功能尚在开发中，计划于Ascend 950PR/Ascend 950DT产品上提供支持。。</p>
 <p id="p165951277168"><a name="p165951277168"></a><a name="p165951277168"></a>如果不调用该接口，默认为CacheMode::CACHE_MODE_NORMAL，即GlobalTensor会使能L2 Cache。</p>
 </td>
 </tr>
