@@ -87,7 +87,6 @@ __global__ __aicore__ void testCreateVecIndexInt32Precision(GM_ADDR dstGm, uint6
         uint16_t dstBlkStride, uint8_t dstRepStride)
 {
     uint32_t count = static_cast<uint32_t>(mask);
-    constexpr int32_t firstValue = 16777216;
     AscendC::GlobalTensor<int32_t> dstGlobal;
     dstGlobal.SetGlobalBuffer((__gm__ int32_t*)dstGm, count);
 
@@ -138,7 +137,6 @@ TEST_P(CreateVecIndexTestsuite, testCreateVecIndex)
 {
     auto param = GetParam();
     if (param.checkValue) {
-        constexpr int32_t firstValue = 16777216;
         int32_t dstGm[param.repeatTimes * param.mask] = {0};
         param.CalFunc((uint8_t*)dstGm, param.mask, param.repeatTimes, param.dstBlkStride, param.dstRepStride);
 
