@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002516209232_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
 ## 函数原型<a name="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
 

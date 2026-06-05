@@ -1,4 +1,4 @@
-# L0C到UB数据搬运（仅Atlas推理系列产品AI Core支持）<a name="ZH-CN_TOPIC_0000002382867725"></a>
+# L0C到UB数据搬运（DataCopy、仅Atlas推理系列产品AI Core支持）<a name="ZH-CN_TOPIC_0000002382867725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 

@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运.md)）过程中进行随路量化后，通过调用该接口设置ClipRelu操作的最大值。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)）过程中进行随路量化后，通过调用该接口设置ClipRelu操作的最大值。
 
 ClipRelu计算公式为`min(clipReluMaxVal, srcData)`，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
 

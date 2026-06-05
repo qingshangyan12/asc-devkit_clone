@@ -1,4 +1,4 @@
-# L1-\>GM高维切分数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002594407261"></a>
+# L1ToGM高维切分数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002594407261"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002540558032_section796754519912"></a>
 
@@ -26,7 +26,7 @@
 
 接口同时支持非连续搬运和连续搬运：
 
-- 对于连续搬运场景，推荐使用[L1-\>GM连续数据搬运（DataCopy）](L1--GM连续数据搬运（DataCopy）.md)。
+- 对于连续搬运场景，推荐使用[L1ToGM连续数据搬运（DataCopy）](L1ToGM连续数据搬运（DataCopy）.md)。
 
 ```cpp
 template <typename T>
@@ -110,7 +110,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 **连续搬运**
 
-针对连续搬运场景，推荐使用[L1-\>GM连续数据搬运（DataCopy）](L1--GM连续数据搬运（DataCopy）.md#ZH-CN_TOPIC_0000002563687928)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
+针对连续搬运场景，推荐使用[L1ToGM连续数据搬运（DataCopy）](L1ToGM连续数据搬运（DataCopy）.md#ZH-CN_TOPIC_0000002563687928)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
 以half数据类型为例，源操作数的shape为1 \* 128。
 

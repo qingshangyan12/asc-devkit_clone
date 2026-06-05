@@ -12,7 +12,7 @@ NZ2NZ转化过程可以参考以下伪代码以及图示，伪代码使用的参
 - 目的操作数中NZ矩阵每一行的起始地址为dst\_temp\_n\_addr ；
 - 在每一行中，以16个数据为粒度进行数据块切分，源操作数每一块数据块的起始地址为src\_block\_addr ，目的操作数中每一数据块起始地址为dst\_block\_addr ；
 
-以下参数为NZ2NZ用户可配置参数，含义及取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运.md)：
+以下参数为NZ2NZ用户可配置参数，含义及取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)：
 
 - mSize与nSize分别表示矩阵M方向和N方向上的维度；
 - srcStride表示源NZ矩阵中不同Z分形列的间隔，单位为C0\_Size\(C0\_Size = 16\*sizeof\(T\)，T为操作数的数据类型\)；
