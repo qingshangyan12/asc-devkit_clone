@@ -48,7 +48,7 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `TIMEOUT` | `120` | Timeout in seconds for NPU run commands only. Build and verify commands do not use this timeout. |
 | `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
 | `SCHEDULE_FILE` | built-in | Optional fixed order override. |
-| `OUT_ROOT` | `presmoke_report/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
+| `OUT_ROOT` | `presmoke_reports/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
 | `RUNNER_MODE` | `case-runner` | Default runner implementation. |
 | `MODES` | `npu` | Presmoke modes. |
 
@@ -91,7 +91,7 @@ PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
   --modes npu \
   --jobs auto \
   --schedule npu-idle-min \
-  --schedule-report presmoke_report/latest/full_card7/results/report.json \
+  --schedule-report presmoke_reports/latest/full_card7/results/report.json \
   --export-schedule scripts/presmoke/schedules/dav-2201_npu.txt \
   --dry-run \
   --report-format json \
