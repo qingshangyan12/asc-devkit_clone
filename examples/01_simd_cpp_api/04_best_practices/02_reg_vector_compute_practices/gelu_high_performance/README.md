@@ -204,20 +204,6 @@ __aicore__ inline void GeluCompute(
 }
 ```
 
-**VF 函数调用上下文**：
-
-上述 VF 函数定义了 GELU 在寄存器中的计算逻辑，在核函数中通过 `asc_vf_call` 调用，调用示例如下：
-
-```cpp
-// 核函数中调用 VF 函数的代码片段
-constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
-__ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
-__ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
-// 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数和循环次数
-asc_vf_call<GeluVfBasic>(xAddr, yAddr, singleCoreLength, loopNum);
-```
-
 **样例配置**：
 - 多核切分：M方向分32份，N方向2份，共计64份数据，分布到64core上计算
 - `tileLen = 8192` 为每次搬运和计算的数据元素个数
