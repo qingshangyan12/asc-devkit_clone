@@ -10,8 +10,17 @@
 #ifndef CCU_KERNEL_ALG_BASE
 #define CCU_KERNEL_ALG_BASE
 
+#include <vector>
+#include <map>
+#include <array>
+#include <memory>
+
 #include "log.h"
 #include "ccu_kernel.h"
+#include "ccu_primitives_dl.hpp"
+#include "ccu_log.h"
+
+namespace ccu = ::AscendC::ccu;
 
 namespace mc2_ops_hccl {
 using namespace hcomm;
@@ -102,6 +111,75 @@ private:
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
 };
 
-}
+constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
+constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
+constexpr uint64_t CCU_MS_SIZE               = 4096;
+
+constexpr uint32_t LOCAL_COPY_MS_PER_LOOP = 8;
+constexpr uint32_t CCU_MS_LOCAL_COPY_LOOP_COUNT = 8;
+
+struct LoopGroupConfig {
+    uint32_t msInterleave;
+    uint32_t loopCount;
+    uint64_t memSlice;
+};
+
+struct LoopGroupResource {
+    ccu::Array<ccu::Event>     completedEvent{0};
+    ccu::Array<ccu::CcuBuffer> ccuBuf{0};
+    uint32_t  eventCount;
+    uint32_t  bufCount;
+};
+
+struct GroupOpSizeVars {
+    ccu::Variable addrOffset;
+    ccu::Variable loopParam;
+    ccu::Variable parallelParam;
+    ccu::Variable residual;
+};
+
+struct CcuKernelCtxBase {
+    struct CcuLoopEntity {
+        std::unique_ptr<ccu::Func> body[2];
+        std::unique_ptr<ccu::Loop> loops[2];
+        ccu::Variable              loopParam[2];
+    };
+
+    LoopGroupConfig  moConfig;
+    LoopGroupResource moRes;
+    bool resourceAllocated;
+
+    std::map<std::string, CcuLoopEntity> loopMap;
+    CcuLoopExecutors enginePool;
+
+    void CreateLoopEntity(std::string loopStr) {
+        loopMap.emplace(loopStr, CcuLoopEntity());
+    }
+
+    bool IsLoopEntityRegistered(std::string loopStr) {
+        return loopMap.count(loopStr) != 0;
+    }
+};
+
+struct GroupReduceVar {
+    ccu::LocalAddr loopDst[2];
+    std::array<std::vector<ccu::RemoteAddr>, 2> loopRemoteSrc;
+    ccu::LocalAddr loopLocalSrc[2];
+    ccu::Variable  loopLen[2];
+    ccu::Variable  loopLenExp[2];
+};
+
+struct GroupCopyVar {
+    ccu::LocalAddr loopSrc[2];
+    ccu::LocalAddr loopDst[2];
+    ccu::Variable  loopLen[2];
+};
+
+CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,
+    bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT, uint32_t msPerLoop = 1);
+CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var);
+CcuResult GroupCopy(CcuKernelCtxBase &ctx, ccu::LocalAddr dst, ccu::LocalAddr src, GroupOpSizeVars goSize);
+
+} // namespace mc2_ops_hccl
 
 #endif // !CCU_KERNEL_ALG_BASE

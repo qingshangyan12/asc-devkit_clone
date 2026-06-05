@@ -20,7 +20,9 @@ if(PRODUCT_SIDE STREQUAL "host")
         ${CMAKE_CURRENT_SOURCE_DIR}/log.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/sal.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/hccl_mc2.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/hccl_alloc_ctx_res.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/compat.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/hcomm_dlsym/ccu_launch_dl.cc
     )
 
     target_sources(mc2_client PRIVATE

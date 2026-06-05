@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "ccu_kernel_signature.h"
-#include "ccu_kernel_arg.h"
+#include "ccu_types.h"
 #include "ccu_task_arg_v1.h"
 #include "ccu_task_param_v1.h"
 
@@ -38,7 +38,7 @@
 
 // 暂时引用方便算法开发
 #include "ccu_repeat_v1.h"
-#include "ccu_condition_v1.h"
+// #include "ccu_condition_v1.h"  // 已注释，不使用旧API控制流
 #include "ccu_loopblock_v1.h"
 #include "ccu_loopcall_v1.h"
 #include "ccu_loopgroupcall_v1.h"

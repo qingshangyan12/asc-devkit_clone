@@ -11,6 +11,7 @@
 #define HCCL_CCU_RES_H
 
 #include "hccl_types.h"
+#include "ccu_types.h"
 #include "ccu_kernel.h"
 
 #ifdef __cplusplus
@@ -25,6 +26,21 @@ extern HcclResult HcclCcuKernelRegisterFinish(HcclComm comm);
 extern HcclResult HcclCcuKernelLaunch(HcclComm comm,
     const ThreadHandle threadHandle, const CcuKernelHandle kernelHandle,
     void *taskArgs);
+
+extern HcclResult HcclCommQueryCcuIns(HcclComm comm,
+    CcuInsHandle *insHandles, uint32_t *insNum);
+
+extern CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle);
+
+extern CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle,
+    const char *kernelFuncName, const void *kernelFunc,
+    const void *kernelArg, CcuKernelHandle *kernelHandle);
+
+extern CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle);
+
+extern CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle,
+    CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
