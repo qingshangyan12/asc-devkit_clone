@@ -104,7 +104,7 @@ CACHE_MODE_DISABLE = 0, // 不使能L2 Cache
 CACHE_MODE_NORMAL = 1,  // 使能L2 Cache
 CACHE_MODE_PERSISTENT = 4,  // 使能L2 Cache 驻留模式
 };</pre>
-<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在写算子时，相比不使能L2 Cache，某GlobalTensor使能L2 Cache反而会导致实测性能下降，可以手动禁止该GlobalTensor使能L2 Cache。比如某算子仅会读一次某个GlobalTensor数据，数据进L2 Cache并不会对算子产生收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不使能该GlobalTensor L2 Cache能力。使能L2 Cache能力通常情况下是使能CACHE_MODE_NORMAL模式，如果L2 Cache已经占满，则会进行数据置换，原本暂存在L2 Cache中的数据可能会被替换，如果用户想要GlobalTensor的数据一直保存在L2 Cache中，则可以使能L2 Cache的驻留模式。</p>
+<p id="p595815581177"><a name="p595815581177"></a><a name="p595815581177"></a>如果用户在编写算子时发现，为某个GlobalTensor开启L2 Cache后，实测性能反而低于不开启的情况，可以手动禁止该GlobalTensor使用L2 Cache。例如，某算子仅读取一次某个GlobalTensor数据，将数据存入L2 Cache并不会带来收益，反而会因为数据频繁的搬入L2 Cache造成性能损耗，可以考虑不让该GlobalTensor 使用L2 Cache。通常情况下，使用L2 Cache采用的是CACHE_MODE_NORMAL模式，当L2 Cache已经占满时，则会进行数据置换，原本暂存在L2 Cache中的数据可能会被替换，如果用户希望GlobalTensor的数据一直保留在L2 Cache中，则可以采用L2 Cache的驻留模式。</p>
 <p id="p165951277168"><a name="p165951277168"></a><a name="p165951277168"></a>如果不调用该接口，默认为CacheMode::CACHE_MODE_NORMAL，即GlobalTensor会使能L2 Cache。</p>
 </td>
 </tr>
@@ -118,7 +118,7 @@ CACHE_MODE_PERSISTENT = 4,  // 使能L2 Cache 驻留模式
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   使用mssanitizer工具时，默认使能L2 Cache，无法通过本接口设置L2 Cache模式为CACHE\_MODE\_DISABLE和CACHE\_MODE\_PERSISTENT。
--   当前使能L2 Cache 驻留模式能力暂不支持，未来将在Ascend 950PR/Ascend 950DT上支持。
+-   当前L2 Cache 驻留模式能力暂不支持，未来将在Ascend 950PR/Ascend 950DT上支持。
 
 ## 调用示例<a name="section17531157161314"></a>
 
