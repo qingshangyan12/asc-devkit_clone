@@ -16,7 +16,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 
   | 存储单元 | 说明 | 
   | --- | --- |
-  | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入或输出数据。 |
+  | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
 
 </cann-filter>
 
@@ -32,7 +32,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 
   | 存储单元 | 说明 | 
   | --- | --- |
-  | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入或输出数据。 |
+  | Unified Buffer | AI Core内部物理存储单元，通常用于存储向量计算的输入/输出数据。 |
   | SIMD Register File | AI Core内部物理存储单元，在SIMD程序中，数据从Unified Buffer搬运到Register进行计算，产生的中间结果可以不用传回Unified Buffer，直接在寄存器计算。 |
 
 </cann-filter>
@@ -44,7 +44,7 @@ Vector计算单元专用于执行向量计算。如下图所示，高亮部分�
 - Unified Buffer地址对齐约束，请参考[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
 - Unified Buffer地址重叠约束，请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 
-### Unified Buffer的内存结构介绍与bank冲突
+### Unified Buffer的内存结构与bank冲突
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了大小相等的内存模块（bank）结构设计。当多条读写指令同时访问Unified Buffer时，由于硬件资源的限制，这些指令不能同时执行，从而引发bank冲突。在这种情况下，指令需要排队等待资源，无法在一个指令周期内完成。
 
