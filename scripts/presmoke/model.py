@@ -102,3 +102,4 @@ class RunReport:
     results: List[RunResult]
     suggestions: List[Suggestion]
     npu_stats: Optional[NpuStats] = None
+    parallel_config: Dict[str, int] = field(default_factory=dict)
