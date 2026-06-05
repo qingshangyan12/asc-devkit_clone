@@ -1,5 +1,9 @@
 # SIMD&SIMT BuiltIn关键字<a name="ZH-CN_TOPIC_0000002593949295"></a>
 
+## 函数执行空间限定符<a name="section1074418132518"></a>
+
+SIMD与SIMT混合编程使用的函数执行空间限定符与SIMD编程一致，详细说明请参见[SIMD BuiltIn关键字的函数执行空间限定符](SIMD-BuiltIn关键字.md#section1074418132518)。
+
 ## VF函数执行限定符
 
 ### \_\_simt\_vf\_\_
@@ -30,7 +34,7 @@ asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
 
 SIMT VF函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
+-   入参仅支持Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
 
@@ -50,10 +54,114 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 
 该函数有以下约束：
 
--   入参仅支持Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
--   函数返回值只能是Ascend C的[内置数据类型](#cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   入参仅支持Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
+-   函数返回值只能是Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
 
+## 地址空间限定符<a name="section1624210295308"></a>
+
+SIMD与SIMT混合编程使用的地址空间限定符与SIMD编程一致，详细说明请参见[SIMD BuiltIn关键字的地址空间限定符](SIMD-BuiltIn关键字.md#section1624210295308)。
+
+## 核函数配置
+
+### 核函数定义
+
+核函数是SIMD与SIMT混合编程的Device侧入口函数，负责协调整个算子的执行流程，包括VF的调度和调用。vector计算单元的混合编程场景下，函数定义语法为：
+
+```
+__global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2, ...);
+```
+
+关键修饰符说明如下：
+
+-   \_\_global\_\_：必需修饰符，作用为标识核函数，表明可在Host侧通过<<<...\>\>\>调用。
+-   \_\_vector\_\_：必需修饰符，作用为标识函数是在Device侧AIV核上执行。
+
+核函数定义有以下几个约束：
+
+-   返回值类型必须是void；
+-   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend C内置数据类型；
+-   指针参数必须是指向Global Memory上的内存地址，使用\_\_gm\_\_修饰。
+
+### \_\_launch\_bounds\_\_\(N\)
+
+在多线程并发执行时，每个线程使用较少的寄存器可以让更多的线程和线程块驻留在AI处理器上，从而提升性能。因此，编译器会采用启发式算法，将寄存器溢出（register spilling）和指令数量控制在最低水平，同时尽量减少寄存器的使用量。应用程序可以通过在\_\_global\_\_函数定义中使用\_\_launch\_bounds\_\_\(\)限定符来限制启动边界（launch bounds），提供附加信息辅助编译器优化这一过程，这属于可选配置。
+
+\_\_launch\_bounds\_\_\(N\)：函数标记宏，在SIMT VF入口函数上可选配置，用于在编译期指定SIMT VF启动的最大线程数。若未配置\_\_launch\_bounds\_\_，最大线程数默认为1024。参数N需要满足：
+
+-   N \>= dimx \* dimy \* dimz；dimx，dimy，dimz为表示线程的dim3结构体。
+-   N的取值范围为1到2048。
+
+    最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动VF任务的dim3线程数保持一致。
+
+    **表 1**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+
+    | Thread的个数(个) | 每个Thread可用寄存器个数(个) |
+    | --- | --- |
+    | 1025~2048 | 16 |
+    | 513~1024 | 32 |
+    | 257~512 | 64 |
+    | 1~256 | 127 |
+
+### <<<\>\>\>调用
+
+核函数的调用是通过<<<...\>\>\>内核调用符在Host侧调用，语法如下：
+
+```
+kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
+```
+
+内核调用符内的配置参数说明如下：
+
+| 参数 | 类型 | 说明 | 约束 |
+| --- | --- | --- | --- |
+| block_num | uint32_t | 设置核函数启用的核数 | 取值范围[1, 65535] |
+| dyn_ub_size | uint32_t | 指定动态内存大小，单位为字节 | 不超过最大可配置值：256KB - 8KB - 32KB - 静态内存 |
+| stream | aclrtStream | 用于维护异步操作执行顺序 | 无 |
+
+## asc\_vf\_call调用
+
+在SIMD与SIMT混合编程场景，需使用asc\_vf\_call启动SIMT VF（Vector Function）子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
+
+```
+template <auto funcPtr, typename... Args>
+__aicore__ inline void asc_vf_call(dim3 threadNums, Args &&...args)
+```
+
+其中模板参数为指定的SIMT VF函数名以及SIMT VF函数参数，具体描述如下：
+
+**表 2**  模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| funcPtr | 用于指定SIMT入口核函数。 |
+| Args | 定义可变参数，用于传递实参到SIMT入口核函数。 |
+
+**表 3**  参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| threadNums | 输入 | dim3结构，定义为{dimx，dimy，dimz}，用于指定SIMT线程块内线程数量。线程总数为dimx * dimy * dimz，该值的大小必须小于等于2048，建议为32的倍数。 |
+| args | 输入 | 可变参数，用于传递实参到SIMT入口核函数。 |
+
+以下示例展示了SIMD与SIMT混合编程场景下如何使用asc\_vf\_call调用\_\_simt\_vf\_\_函数。
+
+```
+#include "simt_api/common_functions.h"
+__simt_vf__ inline void add_simt(
+    __gm__ float* dst, __gm__ float* src0, __gm__ float* src1)
+{
+    // simt 代码
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    dst[idx] = src0[idx] + src1[idx];
+}
+
+__global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+{
+    // asc_vf_call启动SIMT VF子任务，函数名为：add_simt，配置blockDim为dim3{1024, 1, 1}
+    asc_vf_call<add_simt>(dim3{1024, 1, 1}, z, x, y);
+}
+```
 
 ## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
 当前提供了以下仅在Device上可用的dim3结构的内置变量：  
@@ -87,1137 +195,8 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 
 ## 内置数据类型<a name="zh-cn_topic_0000002571575581_section1880403364916"></a><a name="cn_topic_0000002571575581_section1880403364916"></a>
 
-Ascend C为SIMD与SIMT混合编程、SIMT编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型。当前支持标量数据类型如下：
-
-**表 1** 标量数据类型
-
-<a name="zh-cn_topic_0000002571575581_table966616291045"></a>
-<table><tbody><tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row11523124473213"><td class="cellrowborder" valign="top" width="10.209999999999999%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p356595195817"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p356595195817"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p356595195817"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1440858442"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1440858442"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1440858442"></a>类型</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="25.56%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252334493212"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252334493212"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252334493212"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1140918144"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1140918144"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1140918144"></a><strong id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b252317441327"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b252317441327"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b252317441327"></a>数据类型</strong></span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.19%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p115231244103214"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p115231244103214"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p115231244103214"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph104101381344"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph104101381344"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph104101381344"></a><strong id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b9523144193211"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b9523144193211"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_b9523144193211"></a>描述</strong></span></p>
-</td>
-<td class="cellrowborder" valign="top" width="29.04%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15230443324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15230443324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15230443324"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph134111987414"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph134111987414"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph134111987414"></a>Size（bit）</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row16523144173216"><td class="cellrowborder" valign="top" width="10.209999999999999%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125651859582"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125651859582"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125651859582"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph8412681246"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph8412681246"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph8412681246"></a>布尔型</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="25.56%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1752384403213"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1752384403213"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1752384403213"></a>bool</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.19%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15523104414328"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15523104414328"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15523104414328"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph741315811412"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph741315811412"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph741315811412"></a>全0代表false，否则代表true。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="29.04%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252464414329"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252464414329"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252464414329"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph114144813420"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph114144813420"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph114144813420"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row752484423212"><td class="cellrowborder" rowspan="8" valign="top" width="10.209999999999999%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p155656525811"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p155656525811"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p155656525811"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph74159813416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph74159813416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph74159813416"></a>整形</span></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p75655513587"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p75655513587"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p75655513587"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p7565857582"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p7565857582"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p7565857582"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256515518584"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256515518584"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256515518584"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p856513575815"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p856513575815"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p856513575815"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256555105817"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256555105817"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p256555105817"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15651952584"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15651952584"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15651952584"></a></p>
-<p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1956519517584"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1956519517584"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1956519517584"></a></p>
-</td>
-<td class="cellrowborder" valign="top" width="25.56%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185244442322"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185244442322"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185244442322"></a>uint8_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.19%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524164410326"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524164410326"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524164410326"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84194812412"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84194812412"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84194812412"></a>unsigned char</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="29.04%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6524184417325"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6524184417325"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6524184417325"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph194201882043"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph194201882043"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph194201882043"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row9524104414329"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p55245445324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p55245445324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p55245445324"></a>int8_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175249445326"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175249445326"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175249445326"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph6422286420"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph6422286420"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph6422286420"></a>signed char</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15244442322"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15244442322"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15244442322"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph15423181648"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph15423181648"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph15423181648"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row13524124415322"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652444413320"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652444413320"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652444413320"></a>uint16_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1952420443327"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1952420443327"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1952420443327"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14252812411"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14252812411"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14252812411"></a>unsigned short</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524174410328"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524174410328"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524174410328"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph842688741"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph842688741"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph842688741"></a>16</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row205248445323"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252474415325"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252474415325"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252474415325"></a>int16_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652414445323"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652414445323"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p652414445323"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph34281985410"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph34281985410"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph34281985410"></a>signed short</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185241044203211"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185241044203211"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p185241044203211"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph17428168446"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph17428168446"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph17428168446"></a>16</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row1252464413322"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524134417324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524134417324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p11524134417324"></a>uint32_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524114453219"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524114453219"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524114453219"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1543048145"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1543048145"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1543048145"></a>unsigned int</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852415445326"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852415445326"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852415445326"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph5431283412"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph5431283412"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph5431283412"></a>32</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row15524244123211"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p19524244153211"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p19524244153211"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p19524244153211"></a>int32_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p2052414446324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p2052414446324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p2052414446324"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph64337814415"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph64337814415"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph64337814415"></a>signed int</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524644153216"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524644153216"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p3524644153216"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph154346811417"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph154346811417"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph154346811417"></a>32</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row35241144113212"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p145241244153216"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p145241244153216"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p145241244153216"></a>uint64_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p752418446324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p752418446324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p752418446324"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph4436158649"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph4436158649"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph4436158649"></a>unsigned long</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524174493219"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524174493219"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524174493219"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94371984420"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94371984420"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94371984420"></a>64</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row552424418327"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p4524174418327"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p4524174418327"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p4524174418327"></a>int64_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524134420322"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524134420322"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5524134420322"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph24391681541"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph24391681541"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph24391681541"></a>signed long</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125241344143217"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125241344143217"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p125241344143217"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1044019813412"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1044019813412"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1044019813412"></a>64</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row12524194413212"><td class="cellrowborder" rowspan="6" valign="top" width="10.209999999999999%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p451813217594"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p451813217594"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p451813217594"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94413818415"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94413818415"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94413818415"></a>浮点型</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="25.56%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1652414420324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1652414420324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1652414420324"></a>float8_e4m3_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.19%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524194412324"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524194412324"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p15524194412324"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14421486416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14421486416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph14421486416"></a>符号位宽1，指数位宽4，尾数位宽3</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="29.04%"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p9524154418326"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p9524154418326"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p9524154418326"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph44436812414"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph44436812414"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph44436812414"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row9524144163216"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p135241844113216"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p135241844113216"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p135241844113216"></a>float8_e5m2_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p85241344173217"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p85241344173217"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p85241344173217"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1644715811416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1644715811416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1644715811416"></a>符号位宽1，指数位宽5，尾数位宽2</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p14524244123213"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p14524244123213"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p14524244123213"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph744728448"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph744728448"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph744728448"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row9524644153216"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p552454412325"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p552454412325"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p552454412325"></a>hifloat8_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6959161523517"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6959161523517"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p6959161523517"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84511382419"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84511382419"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph84511382419"></a>符号位宽1，点域位宽2，指数与尾数位宽由点域编码决定</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1352464419323"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1352464419323"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1352464419323"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1345215818416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1345215818416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1345215818416"></a>8</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row19524544113220"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p352544453213"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p352544453213"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p352544453213"></a>half</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5525174493216"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5525174493216"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p5525174493216"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph945514820416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph945514820416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph945514820416"></a>符号位宽1，指数位宽5，尾数位宽10</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p952544473213"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p952544473213"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p952544473213"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10455128149"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10455128149"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10455128149"></a>16</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row5525154443219"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p13525164463215"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p13525164463215"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p13525164463215"></a>bfloat16_t</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p45253449322"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p45253449322"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p45253449322"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1445913812414"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1445913812414"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph1445913812414"></a>符号位宽1，指数位宽8，尾数位宽7</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175251844103212"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175251844103212"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p175251844103212"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94601817416"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94601817416"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph94601817416"></a>16</span></p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_row1052544410322"><td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p252554410321"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p252554410321"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p252554410321"></a>float</p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252534413212"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252534413212"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p1252534413212"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph13463281414"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph13463281414"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph13463281414"></a>符号位宽1，指数位宽8，尾数位宽23</span></p>
-</td>
-<td class="cellrowborder" valign="top"><p id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852516444327"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852516444327"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_p852516444327"></a><span id="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10464781542"><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10464781542"></a><a name="zh-cn_topic_0000002571575581_zh-cn_topic_0000002477663934_ph10464781542"></a>32</span></p>
-</td>
-</tr>
-</tbody>
-</table>
-
-短向量是由多个元素组成的简单向量，其数据类型分为Vector X2、Vector X4，表示一个短向量变量有2、3、4个元素，当前支持的类型分布如下：
-
-**表 2**  短向量数据类型
-
-<a name="zh-cn_topic_0000002571575581_table49986503175"></a>
-<table><tbody><tr id="zh-cn_topic_0000002571575581_row12995135017175"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p108797465237"><a name="zh-cn_topic_0000002571575581_p108797465237"></a><a name="zh-cn_topic_0000002571575581_p108797465237"></a>元素数据类型</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p6995650191711"><a name="zh-cn_topic_0000002571575581_p6995650191711"></a><a name="zh-cn_topic_0000002571575581_p6995650191711"></a>Vector X2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p216573951814"><a name="zh-cn_topic_0000002571575581_p216573951814"></a><a name="zh-cn_topic_0000002571575581_p216573951814"></a>Vector X4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row179955509177"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p138795466233"><a name="zh-cn_topic_0000002571575581_p138795466233"></a><a name="zh-cn_topic_0000002571575581_p138795466233"></a><span>unsigned char</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p19951050111714"><a name="zh-cn_topic_0000002571575581_p19951050111714"></a><a name="zh-cn_topic_0000002571575581_p19951050111714"></a>uchar2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p1599515506173"><a name="zh-cn_topic_0000002571575581_p1599515506173"></a><a name="zh-cn_topic_0000002571575581_p1599515506173"></a>uchar4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row6995150121717"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p520813615266"><a name="zh-cn_topic_0000002571575581_p520813615266"></a><a name="zh-cn_topic_0000002571575581_p520813615266"></a><span>signed char</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p1399595019178"><a name="zh-cn_topic_0000002571575581_p1399595019178"></a><a name="zh-cn_topic_0000002571575581_p1399595019178"></a>char2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p129951450181712"><a name="zh-cn_topic_0000002571575581_p129951450181712"></a><a name="zh-cn_topic_0000002571575581_p129951450181712"></a>char4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row6996105019176"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p138791246152313"><a name="zh-cn_topic_0000002571575581_p138791246152313"></a><a name="zh-cn_topic_0000002571575581_p138791246152313"></a>unsigned short (16bit)</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p17995650141719"><a name="zh-cn_topic_0000002571575581_p17995650141719"></a><a name="zh-cn_topic_0000002571575581_p17995650141719"></a>ushort2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p99965500173"><a name="zh-cn_topic_0000002571575581_p99965500173"></a><a name="zh-cn_topic_0000002571575581_p99965500173"></a>ushort4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row8996185012174"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p187913467238"><a name="zh-cn_topic_0000002571575581_p187913467238"></a><a name="zh-cn_topic_0000002571575581_p187913467238"></a><span>signed short (16bit)</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p209968502179"><a name="zh-cn_topic_0000002571575581_p209968502179"></a><a name="zh-cn_topic_0000002571575581_p209968502179"></a>short2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p399611500176"><a name="zh-cn_topic_0000002571575581_p399611500176"></a><a name="zh-cn_topic_0000002571575581_p399611500176"></a>short4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row0996250181714"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1387914611236"><a name="zh-cn_topic_0000002571575581_p1387914611236"></a><a name="zh-cn_topic_0000002571575581_p1387914611236"></a><span>unsigned int</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p1899655081717"><a name="zh-cn_topic_0000002571575581_p1899655081717"></a><a name="zh-cn_topic_0000002571575581_p1899655081717"></a>uint2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p19996105017176"><a name="zh-cn_topic_0000002571575581_p19996105017176"></a><a name="zh-cn_topic_0000002571575581_p19996105017176"></a>uint4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row189961750201712"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p18879184616231"><a name="zh-cn_topic_0000002571575581_p18879184616231"></a><a name="zh-cn_topic_0000002571575581_p18879184616231"></a><span>signed int</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p799613501179"><a name="zh-cn_topic_0000002571575581_p799613501179"></a><a name="zh-cn_topic_0000002571575581_p799613501179"></a>int2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p109961750131712"><a name="zh-cn_topic_0000002571575581_p109961750131712"></a><a name="zh-cn_topic_0000002571575581_p109961750131712"></a>int4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row10996850111715"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p4879124614237"><a name="zh-cn_topic_0000002571575581_p4879124614237"></a><a name="zh-cn_topic_0000002571575581_p4879124614237"></a>无符号的长整型 (64bit)</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p13996115016176"><a name="zh-cn_topic_0000002571575581_p13996115016176"></a><a name="zh-cn_topic_0000002571575581_p13996115016176"></a>ulonglong2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p179961450121719"><a name="zh-cn_topic_0000002571575581_p179961450121719"></a><a name="zh-cn_topic_0000002571575581_p179961450121719"></a>ulonglong4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row399685017170"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p4879164612319"><a name="zh-cn_topic_0000002571575581_p4879164612319"></a><a name="zh-cn_topic_0000002571575581_p4879164612319"></a>有符号的长整型 (64bit)</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p499645021715"><a name="zh-cn_topic_0000002571575581_p499645021715"></a><a name="zh-cn_topic_0000002571575581_p499645021715"></a>longlong2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p1996165041719"><a name="zh-cn_topic_0000002571575581_p1996165041719"></a><a name="zh-cn_topic_0000002571575581_p1996165041719"></a>longlong4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row10996750131719"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1387994611236"><a name="zh-cn_topic_0000002571575581_p1387994611236"></a><a name="zh-cn_topic_0000002571575581_p1387994611236"></a>无符号的长整型 (32bit)</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p799675061716"><a name="zh-cn_topic_0000002571575581_p799675061716"></a><a name="zh-cn_topic_0000002571575581_p799675061716"></a>ulong2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p159961350201718"><a name="zh-cn_topic_0000002571575581_p159961350201718"></a><a name="zh-cn_topic_0000002571575581_p159961350201718"></a>ulong4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row179961650101720"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p18879946162314"><a name="zh-cn_topic_0000002571575581_p18879946162314"></a><a name="zh-cn_topic_0000002571575581_p18879946162314"></a>有符号的长整型 (32bit)</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p11996145013170"><a name="zh-cn_topic_0000002571575581_p11996145013170"></a><a name="zh-cn_topic_0000002571575581_p11996145013170"></a>long2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p2996125016171"><a name="zh-cn_topic_0000002571575581_p2996125016171"></a><a name="zh-cn_topic_0000002571575581_p2996125016171"></a>long4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row189971750141710"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p4879124615236"><a name="zh-cn_topic_0000002571575581_p4879124615236"></a><a name="zh-cn_topic_0000002571575581_p4879124615236"></a>浮点型，1符号位，2指数位，1尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p1899619506175"><a name="zh-cn_topic_0000002571575581_p1899619506175"></a><a name="zh-cn_topic_0000002571575581_p1899619506175"></a>float4_e2m1x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p299715011716"><a name="zh-cn_topic_0000002571575581_p299715011716"></a><a name="zh-cn_topic_0000002571575581_p299715011716"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row4997135021712"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p8879446142315"><a name="zh-cn_topic_0000002571575581_p8879446142315"></a><a name="zh-cn_topic_0000002571575581_p8879446142315"></a>浮点型，1符号位，1指数位，2尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p1499795013177"><a name="zh-cn_topic_0000002571575581_p1499795013177"></a><a name="zh-cn_topic_0000002571575581_p1499795013177"></a>float4_e1m2x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p1699715508179"><a name="zh-cn_topic_0000002571575581_p1699715508179"></a><a name="zh-cn_topic_0000002571575581_p1699715508179"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row12997115001717"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p9879194642317"><a name="zh-cn_topic_0000002571575581_p9879194642317"></a><a name="zh-cn_topic_0000002571575581_p9879194642317"></a>浮点型，1符号位，4指数位，3尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p19997185071717"><a name="zh-cn_topic_0000002571575581_p19997185071717"></a><a name="zh-cn_topic_0000002571575581_p19997185071717"></a>float8_e4m3x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p89971350171718"><a name="zh-cn_topic_0000002571575581_p89971350171718"></a><a name="zh-cn_topic_0000002571575581_p89971350171718"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1899710509175"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1087914618237"><a name="zh-cn_topic_0000002571575581_p1087914618237"></a><a name="zh-cn_topic_0000002571575581_p1087914618237"></a>浮点型，1符号位，5指数位，2尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p199710500179"><a name="zh-cn_topic_0000002571575581_p199710500179"></a><a name="zh-cn_topic_0000002571575581_p199710500179"></a>float8_e5m2x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p499755013177"><a name="zh-cn_topic_0000002571575581_p499755013177"></a><a name="zh-cn_topic_0000002571575581_p499755013177"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row18997650181714"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1787974652320"><a name="zh-cn_topic_0000002571575581_p1787974652320"></a><a name="zh-cn_topic_0000002571575581_p1787974652320"></a>浮点型 hif8</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p599755041713"><a name="zh-cn_topic_0000002571575581_p599755041713"></a><a name="zh-cn_topic_0000002571575581_p599755041713"></a>hifloat8x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p12997205015174"><a name="zh-cn_topic_0000002571575581_p12997205015174"></a><a name="zh-cn_topic_0000002571575581_p12997205015174"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row99975505178"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1187994610232"><a name="zh-cn_topic_0000002571575581_p1187994610232"></a><a name="zh-cn_topic_0000002571575581_p1187994610232"></a>浮点型，1符号位，5指数位，10尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p2997115021715"><a name="zh-cn_topic_0000002571575581_p2997115021715"></a><a name="zh-cn_topic_0000002571575581_p2997115021715"></a>half2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p16997135051713"><a name="zh-cn_topic_0000002571575581_p16997135051713"></a><a name="zh-cn_topic_0000002571575581_p16997135051713"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row699865011170"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p1687944642312"><a name="zh-cn_topic_0000002571575581_p1687944642312"></a><a name="zh-cn_topic_0000002571575581_p1687944642312"></a>浮点型，1符号位，8指数位，7尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p179971350151716"><a name="zh-cn_topic_0000002571575581_p179971350151716"></a><a name="zh-cn_topic_0000002571575581_p179971350151716"></a>bfloat16x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p3997185061710"><a name="zh-cn_topic_0000002571575581_p3997185061710"></a><a name="zh-cn_topic_0000002571575581_p3997185061710"></a>-</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row999818508170"><td class="cellrowborder" valign="top" width="41.32%"><p id="zh-cn_topic_0000002571575581_p128791246192315"><a name="zh-cn_topic_0000002571575581_p128791246192315"></a><a name="zh-cn_topic_0000002571575581_p128791246192315"></a>浮点型，1符号位，8指数位，23尾数位</p>
-</td>
-<td class="cellrowborder" valign="top" width="35.22%"><p id="zh-cn_topic_0000002571575581_p1499815509170"><a name="zh-cn_topic_0000002571575581_p1499815509170"></a><a name="zh-cn_topic_0000002571575581_p1499815509170"></a>float2</p>
-</td>
-<td class="cellrowborder" valign="top" width="23.46%"><p id="zh-cn_topic_0000002571575581_p69984505172"><a name="zh-cn_topic_0000002571575581_p69984505172"></a><a name="zh-cn_topic_0000002571575581_p69984505172"></a>float4</p>
-</td>
-</tr>
-</tbody>
-</table>
-
-每种短向量的内存大小与地址对齐大小如下：
-
-**表 3**  短向量数据类型内存大小
-
-<a name="zh-cn_topic_0000002571575581_table13856144241"></a>
-<table><tbody><tr id="zh-cn_topic_0000002571575581_row585151414242"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p98514141249"><a name="zh-cn_topic_0000002571575581_p98514141249"></a><a name="zh-cn_topic_0000002571575581_p98514141249"></a>数据类型</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p78551418240"><a name="zh-cn_topic_0000002571575581_p78551418240"></a><a name="zh-cn_topic_0000002571575581_p78551418240"></a>内存大小（字节）</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p1085201418248"><a name="zh-cn_topic_0000002571575581_p1085201418248"></a><a name="zh-cn_topic_0000002571575581_p1085201418248"></a>地址对齐（字节）</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1285161422412"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p198651472418"><a name="zh-cn_topic_0000002571575581_p198651472418"></a><a name="zh-cn_topic_0000002571575581_p198651472418"></a>char2, uchar2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p178641420249"><a name="zh-cn_topic_0000002571575581_p178641420249"></a><a name="zh-cn_topic_0000002571575581_p178641420249"></a>2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p11861714172410"><a name="zh-cn_topic_0000002571575581_p11861714172410"></a><a name="zh-cn_topic_0000002571575581_p11861714172410"></a>2</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row486414142412"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p1861214172413"><a name="zh-cn_topic_0000002571575581_p1861214172413"></a><a name="zh-cn_topic_0000002571575581_p1861214172413"></a>char4, uchar4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p186141413240"><a name="zh-cn_topic_0000002571575581_p186141413240"></a><a name="zh-cn_topic_0000002571575581_p186141413240"></a>4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p886914182410"><a name="zh-cn_topic_0000002571575581_p886914182410"></a><a name="zh-cn_topic_0000002571575581_p886914182410"></a>4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row586171442413"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p208612148244"><a name="zh-cn_topic_0000002571575581_p208612148244"></a><a name="zh-cn_topic_0000002571575581_p208612148244"></a>short2, ushort2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p586161416241"><a name="zh-cn_topic_0000002571575581_p586161416241"></a><a name="zh-cn_topic_0000002571575581_p586161416241"></a>4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p486131492417"><a name="zh-cn_topic_0000002571575581_p486131492417"></a><a name="zh-cn_topic_0000002571575581_p486131492417"></a>4</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1486314192410"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p2861914152411"><a name="zh-cn_topic_0000002571575581_p2861914152411"></a><a name="zh-cn_topic_0000002571575581_p2861914152411"></a>short4, ushort4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p208681472412"><a name="zh-cn_topic_0000002571575581_p208681472412"></a><a name="zh-cn_topic_0000002571575581_p208681472412"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p16861514172417"><a name="zh-cn_topic_0000002571575581_p16861514172417"></a><a name="zh-cn_topic_0000002571575581_p16861514172417"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1086114182419"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p148671419247"><a name="zh-cn_topic_0000002571575581_p148671419247"></a><a name="zh-cn_topic_0000002571575581_p148671419247"></a>int2, uint2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p27064244135"><a name="zh-cn_topic_0000002571575581_p27064244135"></a><a name="zh-cn_topic_0000002571575581_p27064244135"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p686171402415"><a name="zh-cn_topic_0000002571575581_p686171402415"></a><a name="zh-cn_topic_0000002571575581_p686171402415"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row68613143247"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p88719147244"><a name="zh-cn_topic_0000002571575581_p88719147244"></a><a name="zh-cn_topic_0000002571575581_p88719147244"></a>int4, uint4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p148714143245"><a name="zh-cn_topic_0000002571575581_p148714143245"></a><a name="zh-cn_topic_0000002571575581_p148714143245"></a>16</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p08712148242"><a name="zh-cn_topic_0000002571575581_p08712148242"></a><a name="zh-cn_topic_0000002571575581_p08712148242"></a>16</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row58781462412"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p108718147247"><a name="zh-cn_topic_0000002571575581_p108718147247"></a><a name="zh-cn_topic_0000002571575581_p108718147247"></a>long2, ulong2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p98714144244"><a name="zh-cn_topic_0000002571575581_p98714144244"></a><a name="zh-cn_topic_0000002571575581_p98714144244"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p1987151482412"><a name="zh-cn_topic_0000002571575581_p1987151482412"></a><a name="zh-cn_topic_0000002571575581_p1987151482412"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row205761327101413"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p16576627191411"><a name="zh-cn_topic_0000002571575581_p16576627191411"></a><a name="zh-cn_topic_0000002571575581_p16576627191411"></a>long4, ulong4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p65761527131413"><a name="zh-cn_topic_0000002571575581_p65761527131413"></a><a name="zh-cn_topic_0000002571575581_p65761527131413"></a>16</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p115762275146"><a name="zh-cn_topic_0000002571575581_p115762275146"></a><a name="zh-cn_topic_0000002571575581_p115762275146"></a>16</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row310145571416"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p41075571416"><a name="zh-cn_topic_0000002571575581_p41075571416"></a><a name="zh-cn_topic_0000002571575581_p41075571416"></a>longlong2, ulonglong2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p1410455181416"><a name="zh-cn_topic_0000002571575581_p1410455181416"></a><a name="zh-cn_topic_0000002571575581_p1410455181416"></a>16</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p310125591414"><a name="zh-cn_topic_0000002571575581_p310125591414"></a><a name="zh-cn_topic_0000002571575581_p310125591414"></a>16</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row161011553147"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p98731422420"><a name="zh-cn_topic_0000002571575581_p98731422420"></a><a name="zh-cn_topic_0000002571575581_p98731422420"></a>longlong4, ulonglong4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p410105581413"><a name="zh-cn_topic_0000002571575581_p410105581413"></a><a name="zh-cn_topic_0000002571575581_p410105581413"></a>32</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p0101255191412"><a name="zh-cn_topic_0000002571575581_p0101255191412"></a><a name="zh-cn_topic_0000002571575581_p0101255191412"></a>32</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row787191412417"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p489914122418"><a name="zh-cn_topic_0000002571575581_p489914122418"></a><a name="zh-cn_topic_0000002571575581_p489914122418"></a>float2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p146121260161"><a name="zh-cn_topic_0000002571575581_p146121260161"></a><a name="zh-cn_topic_0000002571575581_p146121260161"></a>8</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p787714102416"><a name="zh-cn_topic_0000002571575581_p787714102416"></a><a name="zh-cn_topic_0000002571575581_p787714102416"></a>8</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row138710146247"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p1687714172410"><a name="zh-cn_topic_0000002571575581_p1687714172410"></a><a name="zh-cn_topic_0000002571575581_p1687714172410"></a>float4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p5879143243"><a name="zh-cn_topic_0000002571575581_p5879143243"></a><a name="zh-cn_topic_0000002571575581_p5879143243"></a>16</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p1887141442410"><a name="zh-cn_topic_0000002571575581_p1887141442410"></a><a name="zh-cn_topic_0000002571575581_p1887141442410"></a>16</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row148761462413"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p118713146248"><a name="zh-cn_topic_0000002571575581_p118713146248"></a><a name="zh-cn_topic_0000002571575581_p118713146248"></a>float4_e2m1x2_t, float4_e1m2x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p208715145248"><a name="zh-cn_topic_0000002571575581_p208715145248"></a><a name="zh-cn_topic_0000002571575581_p208715145248"></a>1</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p108711142246"><a name="zh-cn_topic_0000002571575581_p108711142246"></a><a name="zh-cn_topic_0000002571575581_p108711142246"></a>1</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row488141452411"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p15882142245"><a name="zh-cn_topic_0000002571575581_p15882142245"></a><a name="zh-cn_topic_0000002571575581_p15882142245"></a>float8_e4m3x2_t, float8_e5m2x2_t, hifloat8x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p19881214142414"><a name="zh-cn_topic_0000002571575581_p19881214142414"></a><a name="zh-cn_topic_0000002571575581_p19881214142414"></a>2</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p888514142418"><a name="zh-cn_topic_0000002571575581_p888514142418"></a><a name="zh-cn_topic_0000002571575581_p888514142418"></a>2</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row288314162415"><td class="cellrowborder" valign="top" width="60.39%"><p id="zh-cn_topic_0000002571575581_p58801442416"><a name="zh-cn_topic_0000002571575581_p58801442416"></a><a name="zh-cn_topic_0000002571575581_p58801442416"></a>half2, bfloat16x2_t</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.950000000000003%"><p id="zh-cn_topic_0000002571575581_p78851482412"><a name="zh-cn_topic_0000002571575581_p78851482412"></a><a name="zh-cn_topic_0000002571575581_p78851482412"></a>4</p>
-</td>
-<td class="cellrowborder" valign="top" width="19.66%"><p id="zh-cn_topic_0000002571575581_p888114102411"><a name="zh-cn_topic_0000002571575581_p888114102411"></a><a name="zh-cn_topic_0000002571575581_p888114102411"></a>4</p>
-</td>
-</tr>
-</tbody>
-</table>
+SIMD与SIMT混合编程使用的内置数据类型与SIMT编程一致，详细说明请参见[SIMT BuiltIn关键字的内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)。
 
 ## 运算符<a name="zh-cn_topic_0000002571575581_section186787252339"></a>
 
-Ascend C为SIMD与SIMT混合编程、SIMT编程提供了一系列运算符，用于执行数学运算。以下是支持的运算符列表。
-
-**表 4**  SIMT编程支持的运算符列表
-
-<a name="zh-cn_topic_0000002571575581_table11745172843710"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002571575581_row874617286370"><th class="cellrowborder" valign="top" width="11.75%" id="mcps1.2.8.1.1"><p id="zh-cn_topic_0000002571575581_p774672811375"><a name="zh-cn_topic_0000002571575581_p774672811375"></a><a name="zh-cn_topic_0000002571575581_p774672811375"></a>类别</p>
-</th>
-<th class="cellrowborder" valign="top" width="8.89%" id="mcps1.2.8.1.2"><p id="zh-cn_topic_0000002571575581_p47469283375"><a name="zh-cn_topic_0000002571575581_p47469283375"></a><a name="zh-cn_topic_0000002571575581_p47469283375"></a>运算符</p>
-</th>
-<th class="cellrowborder" valign="top" width="8.48%" id="mcps1.2.8.1.3"><p id="zh-cn_topic_0000002571575581_p16746828203711"><a name="zh-cn_topic_0000002571575581_p16746828203711"></a><a name="zh-cn_topic_0000002571575581_p16746828203711"></a>bool</p>
-</th>
-<th class="cellrowborder" valign="top" width="31.03%" id="mcps1.2.8.1.4"><p id="zh-cn_topic_0000002571575581_p1774652813378"><a name="zh-cn_topic_0000002571575581_p1774652813378"></a><a name="zh-cn_topic_0000002571575581_p1774652813378"></a>int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t</p>
-</th>
-<th class="cellrowborder" valign="top" width="14.149999999999999%" id="mcps1.2.8.1.5"><p id="zh-cn_topic_0000002571575581_p17746152823720"><a name="zh-cn_topic_0000002571575581_p17746152823720"></a><a name="zh-cn_topic_0000002571575581_p17746152823720"></a>half/bfloat16_t/float</p>
-</th>
-<th class="cellrowborder" valign="top" width="16.13%" id="mcps1.2.8.1.6"><p id="zh-cn_topic_0000002571575581_p77469281379"><a name="zh-cn_topic_0000002571575581_p77469281379"></a><a name="zh-cn_topic_0000002571575581_p77469281379"></a>half2/bfloat16x2_t</p>
-</th>
-<th class="cellrowborder" valign="top" width="9.569999999999999%" id="mcps1.2.8.1.7"><p id="zh-cn_topic_0000002571575581_p7746102843711"><a name="zh-cn_topic_0000002571575581_p7746102843711"></a><a name="zh-cn_topic_0000002571575581_p7746102843711"></a>hifloat8_t</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002571575581_row2746162863719"><td class="cellrowborder" rowspan="8" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p9746728143715"><a name="zh-cn_topic_0000002571575581_p9746728143715"></a><a name="zh-cn_topic_0000002571575581_p9746728143715"></a>算术运算符</p>
-<p id="zh-cn_topic_0000002571575581_p2074662843716"><a name="zh-cn_topic_0000002571575581_p2074662843716"></a><a name="zh-cn_topic_0000002571575581_p2074662843716"></a></p>
-<p id="zh-cn_topic_0000002571575581_p19746142873718"><a name="zh-cn_topic_0000002571575581_p19746142873718"></a><a name="zh-cn_topic_0000002571575581_p19746142873718"></a></p>
-</td>
-<td class="cellrowborder" valign="top" width="8.89%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p187461428163718"><a name="zh-cn_topic_0000002571575581_p187461428163718"></a><a name="zh-cn_topic_0000002571575581_p187461428163718"></a>+</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.48%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p15746328113715"><a name="zh-cn_topic_0000002571575581_p15746328113715"></a><a name="zh-cn_topic_0000002571575581_p15746328113715"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.03%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p174632815371"><a name="zh-cn_topic_0000002571575581_p174632815371"></a><a name="zh-cn_topic_0000002571575581_p174632815371"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="14.149999999999999%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1474622813375"><a name="zh-cn_topic_0000002571575581_p1474622813375"></a><a name="zh-cn_topic_0000002571575581_p1474622813375"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.13%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p10746728153713"><a name="zh-cn_topic_0000002571575581_p10746728153713"></a><a name="zh-cn_topic_0000002571575581_p10746728153713"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.569999999999999%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002571575581_p87469283372"><a name="zh-cn_topic_0000002571575581_p87469283372"></a><a name="zh-cn_topic_0000002571575581_p87469283372"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row2746182816377"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p2746142820377"><a name="zh-cn_topic_0000002571575581_p2746142820377"></a><a name="zh-cn_topic_0000002571575581_p2746142820377"></a>-</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p11746628103715"><a name="zh-cn_topic_0000002571575581_p11746628103715"></a><a name="zh-cn_topic_0000002571575581_p11746628103715"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p7746192843716"><a name="zh-cn_topic_0000002571575581_p7746192843716"></a><a name="zh-cn_topic_0000002571575581_p7746192843716"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1746152812377"><a name="zh-cn_topic_0000002571575581_p1746152812377"></a><a name="zh-cn_topic_0000002571575581_p1746152812377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p12746028153714"><a name="zh-cn_topic_0000002571575581_p12746028153714"></a><a name="zh-cn_topic_0000002571575581_p12746028153714"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p107463280371"><a name="zh-cn_topic_0000002571575581_p107463280371"></a><a name="zh-cn_topic_0000002571575581_p107463280371"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1574672853712"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p67464286375"><a name="zh-cn_topic_0000002571575581_p67464286375"></a><a name="zh-cn_topic_0000002571575581_p67464286375"></a>*</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p1774672853711"><a name="zh-cn_topic_0000002571575581_p1774672853711"></a><a name="zh-cn_topic_0000002571575581_p1774672853711"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p174622812371"><a name="zh-cn_topic_0000002571575581_p174622812371"></a><a name="zh-cn_topic_0000002571575581_p174622812371"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p157461228123711"><a name="zh-cn_topic_0000002571575581_p157461228123711"></a><a name="zh-cn_topic_0000002571575581_p157461228123711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p16746122863713"><a name="zh-cn_topic_0000002571575581_p16746122863713"></a><a name="zh-cn_topic_0000002571575581_p16746122863713"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p167465287377"><a name="zh-cn_topic_0000002571575581_p167465287377"></a><a name="zh-cn_topic_0000002571575581_p167465287377"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row47461828143714"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p7746182816378"><a name="zh-cn_topic_0000002571575581_p7746182816378"></a><a name="zh-cn_topic_0000002571575581_p7746182816378"></a>/</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p1474672817374"><a name="zh-cn_topic_0000002571575581_p1474672817374"></a><a name="zh-cn_topic_0000002571575581_p1474672817374"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p8746152853718"><a name="zh-cn_topic_0000002571575581_p8746152853718"></a><a name="zh-cn_topic_0000002571575581_p8746152853718"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p474617285375"><a name="zh-cn_topic_0000002571575581_p474617285375"></a><a name="zh-cn_topic_0000002571575581_p474617285375"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p17746102833712"><a name="zh-cn_topic_0000002571575581_p17746102833712"></a><a name="zh-cn_topic_0000002571575581_p17746102833712"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p6746142811379"><a name="zh-cn_topic_0000002571575581_p6746142811379"></a><a name="zh-cn_topic_0000002571575581_p6746142811379"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1074662813372"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p17746132863714"><a name="zh-cn_topic_0000002571575581_p17746132863714"></a><a name="zh-cn_topic_0000002571575581_p17746132863714"></a>%</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p17746628113713"><a name="zh-cn_topic_0000002571575581_p17746628113713"></a><a name="zh-cn_topic_0000002571575581_p17746628113713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p974617282376"><a name="zh-cn_topic_0000002571575581_p974617282376"></a><a name="zh-cn_topic_0000002571575581_p974617282376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p274792815371"><a name="zh-cn_topic_0000002571575581_p274792815371"></a><a name="zh-cn_topic_0000002571575581_p274792815371"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p674712863718"><a name="zh-cn_topic_0000002571575581_p674712863718"></a><a name="zh-cn_topic_0000002571575581_p674712863718"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p18747128183716"><a name="zh-cn_topic_0000002571575581_p18747128183716"></a><a name="zh-cn_topic_0000002571575581_p18747128183716"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row57476286372"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p474713283376"><a name="zh-cn_topic_0000002571575581_p474713283376"></a><a name="zh-cn_topic_0000002571575581_p474713283376"></a>++</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p12747728183715"><a name="zh-cn_topic_0000002571575581_p12747728183715"></a><a name="zh-cn_topic_0000002571575581_p12747728183715"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p15747028153711"><a name="zh-cn_topic_0000002571575581_p15747028153711"></a><a name="zh-cn_topic_0000002571575581_p15747028153711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p17471628193714"><a name="zh-cn_topic_0000002571575581_p17471628193714"></a><a name="zh-cn_topic_0000002571575581_p17471628193714"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p07471528133711"><a name="zh-cn_topic_0000002571575581_p07471528133711"></a><a name="zh-cn_topic_0000002571575581_p07471528133711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p15747192817372"><a name="zh-cn_topic_0000002571575581_p15747192817372"></a><a name="zh-cn_topic_0000002571575581_p15747192817372"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row18747162873719"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p13747142873710"><a name="zh-cn_topic_0000002571575581_p13747142873710"></a><a name="zh-cn_topic_0000002571575581_p13747142873710"></a>--</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p16747112816375"><a name="zh-cn_topic_0000002571575581_p16747112816375"></a><a name="zh-cn_topic_0000002571575581_p16747112816375"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p1474772812374"><a name="zh-cn_topic_0000002571575581_p1474772812374"></a><a name="zh-cn_topic_0000002571575581_p1474772812374"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p11747162811374"><a name="zh-cn_topic_0000002571575581_p11747162811374"></a><a name="zh-cn_topic_0000002571575581_p11747162811374"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p774722819376"><a name="zh-cn_topic_0000002571575581_p774722819376"></a><a name="zh-cn_topic_0000002571575581_p774722819376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p4747728123717"><a name="zh-cn_topic_0000002571575581_p4747728123717"></a><a name="zh-cn_topic_0000002571575581_p4747728123717"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row874712286377"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p974719284373"><a name="zh-cn_topic_0000002571575581_p974719284373"></a><a name="zh-cn_topic_0000002571575581_p974719284373"></a>- (取反)</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p177476281370"><a name="zh-cn_topic_0000002571575581_p177476281370"></a><a name="zh-cn_topic_0000002571575581_p177476281370"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p10747102803717"><a name="zh-cn_topic_0000002571575581_p10747102803717"></a><a name="zh-cn_topic_0000002571575581_p10747102803717"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p15747162823711"><a name="zh-cn_topic_0000002571575581_p15747162823711"></a><a name="zh-cn_topic_0000002571575581_p15747162823711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p17473289372"><a name="zh-cn_topic_0000002571575581_p17473289372"></a><a name="zh-cn_topic_0000002571575581_p17473289372"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p10747132817378"><a name="zh-cn_topic_0000002571575581_p10747132817378"></a><a name="zh-cn_topic_0000002571575581_p10747132817378"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row374712843713"><td class="cellrowborder" rowspan="6" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p074732823714"><a name="zh-cn_topic_0000002571575581_p074732823714"></a><a name="zh-cn_topic_0000002571575581_p074732823714"></a>比较运算符</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.89%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p874742883718"><a name="zh-cn_topic_0000002571575581_p874742883718"></a><a name="zh-cn_topic_0000002571575581_p874742883718"></a>&lt;</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.48%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p19747152893712"><a name="zh-cn_topic_0000002571575581_p19747152893712"></a><a name="zh-cn_topic_0000002571575581_p19747152893712"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.03%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1674719280375"><a name="zh-cn_topic_0000002571575581_p1674719280375"></a><a name="zh-cn_topic_0000002571575581_p1674719280375"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="14.149999999999999%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p774772843715"><a name="zh-cn_topic_0000002571575581_p774772843715"></a><a name="zh-cn_topic_0000002571575581_p774772843715"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.13%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p16747162811376"><a name="zh-cn_topic_0000002571575581_p16747162811376"></a><a name="zh-cn_topic_0000002571575581_p16747162811376"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.569999999999999%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002571575581_p1874752843717"><a name="zh-cn_topic_0000002571575581_p1874752843717"></a><a name="zh-cn_topic_0000002571575581_p1874752843717"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row17748828103711"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p774852853714"><a name="zh-cn_topic_0000002571575581_p774852853714"></a><a name="zh-cn_topic_0000002571575581_p774852853714"></a>&lt;=</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p5748228183719"><a name="zh-cn_topic_0000002571575581_p5748228183719"></a><a name="zh-cn_topic_0000002571575581_p5748228183719"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p117486284376"><a name="zh-cn_topic_0000002571575581_p117486284376"></a><a name="zh-cn_topic_0000002571575581_p117486284376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p574842818373"><a name="zh-cn_topic_0000002571575581_p574842818373"></a><a name="zh-cn_topic_0000002571575581_p574842818373"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1374852853713"><a name="zh-cn_topic_0000002571575581_p1374852853713"></a><a name="zh-cn_topic_0000002571575581_p1374852853713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p167485285371"><a name="zh-cn_topic_0000002571575581_p167485285371"></a><a name="zh-cn_topic_0000002571575581_p167485285371"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row574892833718"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p1974815284379"><a name="zh-cn_topic_0000002571575581_p1974815284379"></a><a name="zh-cn_topic_0000002571575581_p1974815284379"></a>&gt;</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p1748112819377"><a name="zh-cn_topic_0000002571575581_p1748112819377"></a><a name="zh-cn_topic_0000002571575581_p1748112819377"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p15748192893718"><a name="zh-cn_topic_0000002571575581_p15748192893718"></a><a name="zh-cn_topic_0000002571575581_p15748192893718"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1774815287377"><a name="zh-cn_topic_0000002571575581_p1774815287377"></a><a name="zh-cn_topic_0000002571575581_p1774815287377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p274852813713"><a name="zh-cn_topic_0000002571575581_p274852813713"></a><a name="zh-cn_topic_0000002571575581_p274852813713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p1074832833715"><a name="zh-cn_topic_0000002571575581_p1074832833715"></a><a name="zh-cn_topic_0000002571575581_p1074832833715"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row2748928193713"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p37482283373"><a name="zh-cn_topic_0000002571575581_p37482283373"></a><a name="zh-cn_topic_0000002571575581_p37482283373"></a>&gt;=</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p774811288377"><a name="zh-cn_topic_0000002571575581_p774811288377"></a><a name="zh-cn_topic_0000002571575581_p774811288377"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p974822818377"><a name="zh-cn_topic_0000002571575581_p974822818377"></a><a name="zh-cn_topic_0000002571575581_p974822818377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p4748172803711"><a name="zh-cn_topic_0000002571575581_p4748172803711"></a><a name="zh-cn_topic_0000002571575581_p4748172803711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1374822833712"><a name="zh-cn_topic_0000002571575581_p1374822833712"></a><a name="zh-cn_topic_0000002571575581_p1374822833712"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p0748112816378"><a name="zh-cn_topic_0000002571575581_p0748112816378"></a><a name="zh-cn_topic_0000002571575581_p0748112816378"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1374822815373"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p8748132818373"><a name="zh-cn_topic_0000002571575581_p8748132818373"></a><a name="zh-cn_topic_0000002571575581_p8748132818373"></a>==</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p18748028153712"><a name="zh-cn_topic_0000002571575581_p18748028153712"></a><a name="zh-cn_topic_0000002571575581_p18748028153712"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p37484282373"><a name="zh-cn_topic_0000002571575581_p37484282373"></a><a name="zh-cn_topic_0000002571575581_p37484282373"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p15748142816377"><a name="zh-cn_topic_0000002571575581_p15748142816377"></a><a name="zh-cn_topic_0000002571575581_p15748142816377"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p12748142823713"><a name="zh-cn_topic_0000002571575581_p12748142823713"></a><a name="zh-cn_topic_0000002571575581_p12748142823713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p18748102883718"><a name="zh-cn_topic_0000002571575581_p18748102883718"></a><a name="zh-cn_topic_0000002571575581_p18748102883718"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row147481428143716"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p57489283370"><a name="zh-cn_topic_0000002571575581_p57489283370"></a><a name="zh-cn_topic_0000002571575581_p57489283370"></a>!=</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p1574892820379"><a name="zh-cn_topic_0000002571575581_p1574892820379"></a><a name="zh-cn_topic_0000002571575581_p1574892820379"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p12748162893719"><a name="zh-cn_topic_0000002571575581_p12748162893719"></a><a name="zh-cn_topic_0000002571575581_p12748162893719"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p974852815371"><a name="zh-cn_topic_0000002571575581_p974852815371"></a><a name="zh-cn_topic_0000002571575581_p974852815371"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p2748172816376"><a name="zh-cn_topic_0000002571575581_p2748172816376"></a><a name="zh-cn_topic_0000002571575581_p2748172816376"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p074872843711"><a name="zh-cn_topic_0000002571575581_p074872843711"></a><a name="zh-cn_topic_0000002571575581_p074872843711"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row97481228183718"><td class="cellrowborder" rowspan="6" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p174818285372"><a name="zh-cn_topic_0000002571575581_p174818285372"></a><a name="zh-cn_topic_0000002571575581_p174818285372"></a>位运算符</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.89%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p974813287375"><a name="zh-cn_topic_0000002571575581_p974813287375"></a><a name="zh-cn_topic_0000002571575581_p974813287375"></a>&</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.48%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p67481428193713"><a name="zh-cn_topic_0000002571575581_p67481428193713"></a><a name="zh-cn_topic_0000002571575581_p67481428193713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.03%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p274815280376"><a name="zh-cn_topic_0000002571575581_p274815280376"></a><a name="zh-cn_topic_0000002571575581_p274815280376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="14.149999999999999%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p2748428193716"><a name="zh-cn_topic_0000002571575581_p2748428193716"></a><a name="zh-cn_topic_0000002571575581_p2748428193716"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.13%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p20748628113713"><a name="zh-cn_topic_0000002571575581_p20748628113713"></a><a name="zh-cn_topic_0000002571575581_p20748628113713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.569999999999999%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002571575581_p374815286375"><a name="zh-cn_topic_0000002571575581_p374815286375"></a><a name="zh-cn_topic_0000002571575581_p374815286375"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row57481328203718"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p137482281371"><a name="zh-cn_topic_0000002571575581_p137482281371"></a><a name="zh-cn_topic_0000002571575581_p137482281371"></a>|</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p374832873713"><a name="zh-cn_topic_0000002571575581_p374832873713"></a><a name="zh-cn_topic_0000002571575581_p374832873713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p6748328183713"><a name="zh-cn_topic_0000002571575581_p6748328183713"></a><a name="zh-cn_topic_0000002571575581_p6748328183713"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1474818289377"><a name="zh-cn_topic_0000002571575581_p1474818289377"></a><a name="zh-cn_topic_0000002571575581_p1474818289377"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1074914288375"><a name="zh-cn_topic_0000002571575581_p1074914288375"></a><a name="zh-cn_topic_0000002571575581_p1074914288375"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p17749192803719"><a name="zh-cn_topic_0000002571575581_p17749192803719"></a><a name="zh-cn_topic_0000002571575581_p17749192803719"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row10749102818374"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p674942853711"><a name="zh-cn_topic_0000002571575581_p674942853711"></a><a name="zh-cn_topic_0000002571575581_p674942853711"></a>^</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p207492028183713"><a name="zh-cn_topic_0000002571575581_p207492028183713"></a><a name="zh-cn_topic_0000002571575581_p207492028183713"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p1374992803714"><a name="zh-cn_topic_0000002571575581_p1374992803714"></a><a name="zh-cn_topic_0000002571575581_p1374992803714"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1174932815377"><a name="zh-cn_topic_0000002571575581_p1174932815377"></a><a name="zh-cn_topic_0000002571575581_p1174932815377"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1749152833719"><a name="zh-cn_topic_0000002571575581_p1749152833719"></a><a name="zh-cn_topic_0000002571575581_p1749152833719"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p97491628113716"><a name="zh-cn_topic_0000002571575581_p97491628113716"></a><a name="zh-cn_topic_0000002571575581_p97491628113716"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row127490289377"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p13749152815370"><a name="zh-cn_topic_0000002571575581_p13749152815370"></a><a name="zh-cn_topic_0000002571575581_p13749152815370"></a>~</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p674952853719"><a name="zh-cn_topic_0000002571575581_p674952853719"></a><a name="zh-cn_topic_0000002571575581_p674952853719"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p27493282376"><a name="zh-cn_topic_0000002571575581_p27493282376"></a><a name="zh-cn_topic_0000002571575581_p27493282376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p177498283371"><a name="zh-cn_topic_0000002571575581_p177498283371"></a><a name="zh-cn_topic_0000002571575581_p177498283371"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p87491528113716"><a name="zh-cn_topic_0000002571575581_p87491528113716"></a><a name="zh-cn_topic_0000002571575581_p87491528113716"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p18749182833710"><a name="zh-cn_topic_0000002571575581_p18749182833710"></a><a name="zh-cn_topic_0000002571575581_p18749182833710"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row174932863718"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p8749128163720"><a name="zh-cn_topic_0000002571575581_p8749128163720"></a><a name="zh-cn_topic_0000002571575581_p8749128163720"></a>&lt;&lt;</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p77495289371"><a name="zh-cn_topic_0000002571575581_p77495289371"></a><a name="zh-cn_topic_0000002571575581_p77495289371"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p07491628113711"><a name="zh-cn_topic_0000002571575581_p07491628113711"></a><a name="zh-cn_topic_0000002571575581_p07491628113711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p97491128173716"><a name="zh-cn_topic_0000002571575581_p97491128173716"></a><a name="zh-cn_topic_0000002571575581_p97491128173716"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p137497284372"><a name="zh-cn_topic_0000002571575581_p137497284372"></a><a name="zh-cn_topic_0000002571575581_p137497284372"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p117498288373"><a name="zh-cn_topic_0000002571575581_p117498288373"></a><a name="zh-cn_topic_0000002571575581_p117498288373"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row174919282376"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p11749182813377"><a name="zh-cn_topic_0000002571575581_p11749182813377"></a><a name="zh-cn_topic_0000002571575581_p11749182813377"></a>&gt;&gt;</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p107491428143715"><a name="zh-cn_topic_0000002571575581_p107491428143715"></a><a name="zh-cn_topic_0000002571575581_p107491428143715"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p10749228133717"><a name="zh-cn_topic_0000002571575581_p10749228133717"></a><a name="zh-cn_topic_0000002571575581_p10749228133717"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p474922817378"><a name="zh-cn_topic_0000002571575581_p474922817378"></a><a name="zh-cn_topic_0000002571575581_p474922817378"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p174915288375"><a name="zh-cn_topic_0000002571575581_p174915288375"></a><a name="zh-cn_topic_0000002571575581_p174915288375"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p127491728123720"><a name="zh-cn_topic_0000002571575581_p127491728123720"></a><a name="zh-cn_topic_0000002571575581_p127491728123720"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row13749102818372"><td class="cellrowborder" rowspan="3" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p14749112820370"><a name="zh-cn_topic_0000002571575581_p14749112820370"></a><a name="zh-cn_topic_0000002571575581_p14749112820370"></a>逻辑运算符</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.89%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p1874910286374"><a name="zh-cn_topic_0000002571575581_p1874910286374"></a><a name="zh-cn_topic_0000002571575581_p1874910286374"></a>&&</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.48%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p1574911288371"><a name="zh-cn_topic_0000002571575581_p1574911288371"></a><a name="zh-cn_topic_0000002571575581_p1574911288371"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.03%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p16749928163715"><a name="zh-cn_topic_0000002571575581_p16749928163715"></a><a name="zh-cn_topic_0000002571575581_p16749928163715"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="14.149999999999999%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p1374932893715"><a name="zh-cn_topic_0000002571575581_p1374932893715"></a><a name="zh-cn_topic_0000002571575581_p1374932893715"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.13%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p197496287379"><a name="zh-cn_topic_0000002571575581_p197496287379"></a><a name="zh-cn_topic_0000002571575581_p197496287379"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.569999999999999%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002571575581_p167491828193716"><a name="zh-cn_topic_0000002571575581_p167491828193716"></a><a name="zh-cn_topic_0000002571575581_p167491828193716"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row107491528103715"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p1474992873713"><a name="zh-cn_topic_0000002571575581_p1474992873713"></a><a name="zh-cn_topic_0000002571575581_p1474992873713"></a>||</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p9749182819375"><a name="zh-cn_topic_0000002571575581_p9749182819375"></a><a name="zh-cn_topic_0000002571575581_p9749182819375"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p1474915289376"><a name="zh-cn_topic_0000002571575581_p1474915289376"></a><a name="zh-cn_topic_0000002571575581_p1474915289376"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p1974902814372"><a name="zh-cn_topic_0000002571575581_p1974902814372"></a><a name="zh-cn_topic_0000002571575581_p1974902814372"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p574962863717"><a name="zh-cn_topic_0000002571575581_p574962863717"></a><a name="zh-cn_topic_0000002571575581_p574962863717"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p18749142814370"><a name="zh-cn_topic_0000002571575581_p18749142814370"></a><a name="zh-cn_topic_0000002571575581_p18749142814370"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1474917283372"><td class="cellrowborder" valign="top" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p187499282375"><a name="zh-cn_topic_0000002571575581_p187499282375"></a><a name="zh-cn_topic_0000002571575581_p187499282375"></a>!</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p974962843716"><a name="zh-cn_topic_0000002571575581_p974962843716"></a><a name="zh-cn_topic_0000002571575581_p974962843716"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p1474920282378"><a name="zh-cn_topic_0000002571575581_p1474920282378"></a><a name="zh-cn_topic_0000002571575581_p1474920282378"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p6749728203713"><a name="zh-cn_topic_0000002571575581_p6749728203713"></a><a name="zh-cn_topic_0000002571575581_p6749728203713"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p11749112813371"><a name="zh-cn_topic_0000002571575581_p11749112813371"></a><a name="zh-cn_topic_0000002571575581_p11749112813371"></a>x</p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p187501628133717"><a name="zh-cn_topic_0000002571575581_p187501628133717"></a><a name="zh-cn_topic_0000002571575581_p187501628133717"></a>x</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1975042813373"><td class="cellrowborder" valign="top" width="11.75%" headers="mcps1.2.8.1.1 "><p id="zh-cn_topic_0000002571575581_p15750128193711"><a name="zh-cn_topic_0000002571575581_p15750128193711"></a><a name="zh-cn_topic_0000002571575581_p15750128193711"></a>条件运算符</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.89%" headers="mcps1.2.8.1.2 "><p id="zh-cn_topic_0000002571575581_p117501528163717"><a name="zh-cn_topic_0000002571575581_p117501528163717"></a><a name="zh-cn_topic_0000002571575581_p117501528163717"></a>a ? b : c</p>
-</td>
-<td class="cellrowborder" valign="top" width="8.48%" headers="mcps1.2.8.1.3 "><p id="zh-cn_topic_0000002571575581_p175022883711"><a name="zh-cn_topic_0000002571575581_p175022883711"></a><a name="zh-cn_topic_0000002571575581_p175022883711"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="31.03%" headers="mcps1.2.8.1.4 "><p id="zh-cn_topic_0000002571575581_p37502280371"><a name="zh-cn_topic_0000002571575581_p37502280371"></a><a name="zh-cn_topic_0000002571575581_p37502280371"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="14.149999999999999%" headers="mcps1.2.8.1.5 "><p id="zh-cn_topic_0000002571575581_p375032883716"><a name="zh-cn_topic_0000002571575581_p375032883716"></a><a name="zh-cn_topic_0000002571575581_p375032883716"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="16.13%" headers="mcps1.2.8.1.6 "><p id="zh-cn_topic_0000002571575581_p117501282372"><a name="zh-cn_topic_0000002571575581_p117501282372"></a><a name="zh-cn_topic_0000002571575581_p117501282372"></a>√</p>
-</td>
-<td class="cellrowborder" valign="top" width="9.569999999999999%" headers="mcps1.2.8.1.7 "><p id="zh-cn_topic_0000002571575581_p1575022814377"><a name="zh-cn_topic_0000002571575581_p1575022814377"></a><a name="zh-cn_topic_0000002571575581_p1575022814377"></a>x</p>
-</td>
-</tr>
-</tbody>
-</table>
-
-运算符使用示例如下所示：
-
-```
-// 加法运算
-res[idx] = x[idx] + y[idx]; 
-
-// 取反运算
-x[idx] = (-x[idx]);
-
-// 比较运算
-if (x[idx] > y[idx]) {
-    res[idx] = x[idx];
-} else {
-    res[idx] = y[idx];
-}
-
-// 按位与运算
-res[idx] = x[idx] & y[idx];
-
-// 逻辑或运算
-if (x[idx] || y[idx]) {
-    res[idx] = 1;
-}
-
-// 条件运算
-res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
-```
-
-## 内置宏<a name="zh-cn_topic_0000002571575581_section1792114386103"></a>
-
-下表列出了一些常用的内置宏，涵盖了bfloat16、half和float三种浮点类型的特殊值，以及常用的数学常数、对数和边界值。当开发者需要处理浮点边界或数学常量时，可以直接参考并使用这些内置宏，无需手动定义或查阅具体的数值，从而可以将更多精力集中在算法逻辑上。
-
-**表 5**  常用内置宏列表
-
-<a name="zh-cn_topic_0000002571575581_table9546750192911"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0000002571575581_row55461550192911"><th class="cellrowborder" valign="top" width="34.22342234223422%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000002571575581_p754725017294"><a name="zh-cn_topic_0000002571575581_p754725017294"></a><a name="zh-cn_topic_0000002571575581_p754725017294"></a>宏名</p>
-</th>
-<th class="cellrowborder" valign="top" width="32.44324432443245%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000002571575581_p15472050152916"><a name="zh-cn_topic_0000002571575581_p15472050152916"></a><a name="zh-cn_topic_0000002571575581_p15472050152916"></a>描述</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000002571575581_p14547105012292"><a name="zh-cn_topic_0000002571575581_p14547105012292"></a><a name="zh-cn_topic_0000002571575581_p14547105012292"></a>需要包含的头文件</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="zh-cn_topic_0000002571575581_row754725072910"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p151334519326"><a name="zh-cn_topic_0000002571575581_p151334519326"></a><a name="zh-cn_topic_0000002571575581_p151334519326"></a>ASCRT_INF_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1354765017296"><a name="zh-cn_topic_0000002571575581_p1354765017296"></a><a name="zh-cn_topic_0000002571575581_p1354765017296"></a><span>定义bfloat16类型的正无穷大值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p254785042914"><a name="zh-cn_topic_0000002571575581_p254785042914"></a><a name="zh-cn_topic_0000002571575581_p254785042914"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row45471550152913"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p19791592339"><a name="zh-cn_topic_0000002571575581_p19791592339"></a><a name="zh-cn_topic_0000002571575581_p19791592339"></a>ASCRT_MAX_NORMAL_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1754716505295"><a name="zh-cn_topic_0000002571575581_p1754716505295"></a><a name="zh-cn_topic_0000002571575581_p1754716505295"></a><span>定义bfloat16类型的最大表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p754785010297"><a name="zh-cn_topic_0000002571575581_p754785010297"></a><a name="zh-cn_topic_0000002571575581_p754785010297"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1254717508299"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p161841815163319"><a name="zh-cn_topic_0000002571575581_p161841815163319"></a><a name="zh-cn_topic_0000002571575581_p161841815163319"></a>ASCRT_MIN_DENORM_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p11547165014293"><a name="zh-cn_topic_0000002571575581_p11547165014293"></a><a name="zh-cn_topic_0000002571575581_p11547165014293"></a><span>定义bfloat16类型的最小表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p454775019293"><a name="zh-cn_topic_0000002571575581_p454775019293"></a><a name="zh-cn_topic_0000002571575581_p454775019293"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row18547195042919"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p152223198333"><a name="zh-cn_topic_0000002571575581_p152223198333"></a><a name="zh-cn_topic_0000002571575581_p152223198333"></a>ASCRT_NAN_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1454715042910"><a name="zh-cn_topic_0000002571575581_p1454715042910"></a><a name="zh-cn_topic_0000002571575581_p1454715042910"></a><span>定义bfloat16类型的nan值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1454712501298"><a name="zh-cn_topic_0000002571575581_p1454712501298"></a><a name="zh-cn_topic_0000002571575581_p1454712501298"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row175471950152912"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1942410220331"><a name="zh-cn_topic_0000002571575581_p1942410220331"></a><a name="zh-cn_topic_0000002571575581_p1942410220331"></a>ASCRT_NEG_ZERO_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p5547550132915"><a name="zh-cn_topic_0000002571575581_p5547550132915"></a><a name="zh-cn_topic_0000002571575581_p5547550132915"></a><span>定义bfloat16类型的负零值</span>。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p17547135020297"><a name="zh-cn_topic_0000002571575581_p17547135020297"></a><a name="zh-cn_topic_0000002571575581_p17547135020297"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row854785016291"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p7439162513330"><a name="zh-cn_topic_0000002571575581_p7439162513330"></a><a name="zh-cn_topic_0000002571575581_p7439162513330"></a>ASCRT_ONE_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p95471504296"><a name="zh-cn_topic_0000002571575581_p95471504296"></a><a name="zh-cn_topic_0000002571575581_p95471504296"></a><span>定义bfloat16类型的1.0值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p75471550152914"><a name="zh-cn_topic_0000002571575581_p75471550152914"></a><a name="zh-cn_topic_0000002571575581_p75471550152914"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row2547175072915"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1320414295338"><a name="zh-cn_topic_0000002571575581_p1320414295338"></a><a name="zh-cn_topic_0000002571575581_p1320414295338"></a>ASCRT_ZERO_BF16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1454725014299"><a name="zh-cn_topic_0000002571575581_p1454725014299"></a><a name="zh-cn_topic_0000002571575581_p1454725014299"></a><span>定义bfloat16类型的正零值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1547195032920"><a name="zh-cn_topic_0000002571575581_p1547195032920"></a><a name="zh-cn_topic_0000002571575581_p1547195032920"></a>asc_bf16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row754717509291"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p492622124014"><a name="zh-cn_topic_0000002571575581_p492622124014"></a><a name="zh-cn_topic_0000002571575581_p492622124014"></a>ASCRT_INF_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p785384354110"><a name="zh-cn_topic_0000002571575581_p785384354110"></a><a name="zh-cn_topic_0000002571575581_p785384354110"></a><span>定义half类型的正无穷大值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p354785019293"><a name="zh-cn_topic_0000002571575581_p354785019293"></a><a name="zh-cn_topic_0000002571575581_p354785019293"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row13547175012298"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p153036712409"><a name="zh-cn_topic_0000002571575581_p153036712409"></a><a name="zh-cn_topic_0000002571575581_p153036712409"></a>ASCRT_MAX_NORMAL_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p3853204313414"><a name="zh-cn_topic_0000002571575581_p3853204313414"></a><a name="zh-cn_topic_0000002571575581_p3853204313414"></a><span>定义half类型的最大表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1754775022915"><a name="zh-cn_topic_0000002571575581_p1754775022915"></a><a name="zh-cn_topic_0000002571575581_p1754775022915"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row054715082917"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1734191011404"><a name="zh-cn_topic_0000002571575581_p1734191011404"></a><a name="zh-cn_topic_0000002571575581_p1734191011404"></a>ASCRT_MIN_DENORM_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p385374317419"><a name="zh-cn_topic_0000002571575581_p385374317419"></a><a name="zh-cn_topic_0000002571575581_p385374317419"></a><span>定义half类型的最小表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1654785011297"><a name="zh-cn_topic_0000002571575581_p1654785011297"></a><a name="zh-cn_topic_0000002571575581_p1654785011297"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row354715072910"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1328731454010"><a name="zh-cn_topic_0000002571575581_p1328731454010"></a><a name="zh-cn_topic_0000002571575581_p1328731454010"></a>ASCRT_NAN_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1585324311413"><a name="zh-cn_topic_0000002571575581_p1585324311413"></a><a name="zh-cn_topic_0000002571575581_p1585324311413"></a><span>定义half类型的nan值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p115471550182910"><a name="zh-cn_topic_0000002571575581_p115471550182910"></a><a name="zh-cn_topic_0000002571575581_p115471550182910"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1354755042916"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p207101017154011"><a name="zh-cn_topic_0000002571575581_p207101017154011"></a><a name="zh-cn_topic_0000002571575581_p207101017154011"></a>ASCRT_NEG_ZERO_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1853143194116"><a name="zh-cn_topic_0000002571575581_p1853143194116"></a><a name="zh-cn_topic_0000002571575581_p1853143194116"></a><span>定义half类型的负零值</span>。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p3547850152916"><a name="zh-cn_topic_0000002571575581_p3547850152916"></a><a name="zh-cn_topic_0000002571575581_p3547850152916"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row11547185018292"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p4915322104014"><a name="zh-cn_topic_0000002571575581_p4915322104014"></a><a name="zh-cn_topic_0000002571575581_p4915322104014"></a>ASCRT_ONE_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p88537436412"><a name="zh-cn_topic_0000002571575581_p88537436412"></a><a name="zh-cn_topic_0000002571575581_p88537436412"></a><span>定义half类型的1.0值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p195471050162911"><a name="zh-cn_topic_0000002571575581_p195471050162911"></a><a name="zh-cn_topic_0000002571575581_p195471050162911"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row152167284404"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1419973134013"><a name="zh-cn_topic_0000002571575581_p1419973134013"></a><a name="zh-cn_topic_0000002571575581_p1419973134013"></a>ASCRT_ZERO_FP16</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p68532439419"><a name="zh-cn_topic_0000002571575581_p68532439419"></a><a name="zh-cn_topic_0000002571575581_p68532439419"></a><span>定义half类型的正零值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1021615289402"><a name="zh-cn_topic_0000002571575581_p1021615289402"></a><a name="zh-cn_topic_0000002571575581_p1021615289402"></a>asc_fp16.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1845113144714"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1345213318472"><a name="zh-cn_topic_0000002571575581_p1345213318472"></a><a name="zh-cn_topic_0000002571575581_p1345213318472"></a>ASCRT_INF_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p9422143710513"><a name="zh-cn_topic_0000002571575581_p9422143710513"></a><a name="zh-cn_topic_0000002571575581_p9422143710513"></a><span>定义float类型的正无穷大值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p845211314715"><a name="zh-cn_topic_0000002571575581_p845211314715"></a><a name="zh-cn_topic_0000002571575581_p845211314715"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row125421092475"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p654219914476"><a name="zh-cn_topic_0000002571575581_p654219914476"></a><a name="zh-cn_topic_0000002571575581_p654219914476"></a>ASCRT_NAN_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p16422153714519"><a name="zh-cn_topic_0000002571575581_p16422153714519"></a><a name="zh-cn_topic_0000002571575581_p16422153714519"></a><span>定义float类型的nan值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p20543149194716"><a name="zh-cn_topic_0000002571575581_p20543149194716"></a><a name="zh-cn_topic_0000002571575581_p20543149194716"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row59304110477"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1793181184718"><a name="zh-cn_topic_0000002571575581_p1793181184718"></a><a name="zh-cn_topic_0000002571575581_p1793181184718"></a>ASCRT_MIN_DENORM_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p13422137135119"><a name="zh-cn_topic_0000002571575581_p13422137135119"></a><a name="zh-cn_topic_0000002571575581_p13422137135119"></a><span>定义float类型的最小表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1793111110471"><a name="zh-cn_topic_0000002571575581_p1793111110471"></a><a name="zh-cn_topic_0000002571575581_p1793111110471"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row14364101424719"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p93651514114720"><a name="zh-cn_topic_0000002571575581_p93651514114720"></a><a name="zh-cn_topic_0000002571575581_p93651514114720"></a>ASCRT_MAX_NORMAL_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1642243713518"><a name="zh-cn_topic_0000002571575581_p1642243713518"></a><a name="zh-cn_topic_0000002571575581_p1642243713518"></a><span>定义float类型的最大表示值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p16365111417478"><a name="zh-cn_topic_0000002571575581_p16365111417478"></a><a name="zh-cn_topic_0000002571575581_p16365111417478"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1848022311479"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p7480132344712"><a name="zh-cn_topic_0000002571575581_p7480132344712"></a><a name="zh-cn_topic_0000002571575581_p7480132344712"></a>ASCRT_NEG_ZERO_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1142220378512"><a name="zh-cn_topic_0000002571575581_p1142220378512"></a><a name="zh-cn_topic_0000002571575581_p1142220378512"></a><span>定义float类型的负零值</span>。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p11480122316471"><a name="zh-cn_topic_0000002571575581_p11480122316471"></a><a name="zh-cn_topic_0000002571575581_p11480122316471"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row17520182512472"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p8520425154718"><a name="zh-cn_topic_0000002571575581_p8520425154718"></a><a name="zh-cn_topic_0000002571575581_p8520425154718"></a>ASCRT_ZERO_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1422237175113"><a name="zh-cn_topic_0000002571575581_p1422237175113"></a><a name="zh-cn_topic_0000002571575581_p1422237175113"></a><span>定义float类型的正零值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p8520192524718"><a name="zh-cn_topic_0000002571575581_p8520192524718"></a><a name="zh-cn_topic_0000002571575581_p8520192524718"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1888914294472"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1788962913479"><a name="zh-cn_topic_0000002571575581_p1788962913479"></a><a name="zh-cn_topic_0000002571575581_p1788962913479"></a>ASCRT_ONE_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p124225377517"><a name="zh-cn_topic_0000002571575581_p124225377517"></a><a name="zh-cn_topic_0000002571575581_p124225377517"></a><span>定义float类型的1.0值。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p2889192918474"><a name="zh-cn_topic_0000002571575581_p2889192918474"></a><a name="zh-cn_topic_0000002571575581_p2889192918474"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row12404111216588"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p13798122714012"><a name="zh-cn_topic_0000002571575581_p13798122714012"></a><a name="zh-cn_topic_0000002571575581_p13798122714012"></a>ASCRT_SQRT_HALF_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p13404181255814"><a name="zh-cn_topic_0000002571575581_p13404181255814"></a><a name="zh-cn_topic_0000002571575581_p13404181255814"></a>定义$\sqrt{1/2}$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p19815223188"><a name="zh-cn_topic_0000002571575581_p19815223188"></a><a name="zh-cn_topic_0000002571575581_p19815223188"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row13237371800"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p8904175315012"><a name="zh-cn_topic_0000002571575581_p8904175315012"></a><a name="zh-cn_topic_0000002571575581_p8904175315012"></a>ASCRT_SQRT_HALF_HI_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p6323837906"><a name="zh-cn_topic_0000002571575581_p6323837906"></a><a name="zh-cn_topic_0000002571575581_p6323837906"></a>定义$\sqrt{1/2}$的高位部分浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p8815923784"><a name="zh-cn_topic_0000002571575581_p8815923784"></a><a name="zh-cn_topic_0000002571575581_p8815923784"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row167219398016"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p29991357401"><a name="zh-cn_topic_0000002571575581_p29991357401"></a><a name="zh-cn_topic_0000002571575581_p29991357401"></a>ASCRT_SQRT_HALF_LO_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p116731039209"><a name="zh-cn_topic_0000002571575581_p116731039209"></a><a name="zh-cn_topic_0000002571575581_p116731039209"></a>定义$\sqrt{1/2}$的低位部分浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p68151231785"><a name="zh-cn_topic_0000002571575581_p68151231785"></a><a name="zh-cn_topic_0000002571575581_p68151231785"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row15344104911011"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p17801451312"><a name="zh-cn_topic_0000002571575581_p17801451312"></a><a name="zh-cn_topic_0000002571575581_p17801451312"></a>ASCRT_SQRT_TWO_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p434524913018"><a name="zh-cn_topic_0000002571575581_p434524913018"></a><a name="zh-cn_topic_0000002571575581_p434524913018"></a>定义$\sqrt{2}$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p481511231186"><a name="zh-cn_topic_0000002571575581_p481511231186"></a><a name="zh-cn_topic_0000002571575581_p481511231186"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row6134482110"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p684071415110"><a name="zh-cn_topic_0000002571575581_p684071415110"></a><a name="zh-cn_topic_0000002571575581_p684071415110"></a>ASCRT_THIRD_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p11341687116"><a name="zh-cn_topic_0000002571575581_p11341687116"></a><a name="zh-cn_topic_0000002571575581_p11341687116"></a>定义$1/3$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1081516236817"><a name="zh-cn_topic_0000002571575581_p1081516236817"></a><a name="zh-cn_topic_0000002571575581_p1081516236817"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row128119131014"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p8241112016111"><a name="zh-cn_topic_0000002571575581_p8241112016111"></a><a name="zh-cn_topic_0000002571575581_p8241112016111"></a>ASCRT_PIO4_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p188111313816"><a name="zh-cn_topic_0000002571575581_p188111313816"></a><a name="zh-cn_topic_0000002571575581_p188111313816"></a>定义$\pi/4$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p3815223784"><a name="zh-cn_topic_0000002571575581_p3815223784"></a><a name="zh-cn_topic_0000002571575581_p3815223784"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1889992419114"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p13549537318"><a name="zh-cn_topic_0000002571575581_p13549537318"></a><a name="zh-cn_topic_0000002571575581_p13549537318"></a>ASCRT_PIO2_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p18899172412113"><a name="zh-cn_topic_0000002571575581_p18899172412113"></a><a name="zh-cn_topic_0000002571575581_p18899172412113"></a>定义$\pi/2$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p181510231888"><a name="zh-cn_topic_0000002571575581_p181510231888"></a><a name="zh-cn_topic_0000002571575581_p181510231888"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row13309327218"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p36319412015"><a name="zh-cn_topic_0000002571575581_p36319412015"></a><a name="zh-cn_topic_0000002571575581_p36319412015"></a>ASCRT_3PIO4_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p197702461209"><a name="zh-cn_topic_0000002571575581_p197702461209"></a><a name="zh-cn_topic_0000002571575581_p197702461209"></a>定义$3\pi/4$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1759716251088"><a name="zh-cn_topic_0000002571575581_p1759716251088"></a><a name="zh-cn_topic_0000002571575581_p1759716251088"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row72931429517"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p191636451112"><a name="zh-cn_topic_0000002571575581_p191636451112"></a><a name="zh-cn_topic_0000002571575581_p191636451112"></a>ASCRT_2_OVER_PI_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1629382919119"><a name="zh-cn_topic_0000002571575581_p1629382919119"></a><a name="zh-cn_topic_0000002571575581_p1629382919119"></a>定义$2/\pi$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p759732513817"><a name="zh-cn_topic_0000002571575581_p759732513817"></a><a name="zh-cn_topic_0000002571575581_p759732513817"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1443431019"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1752310491011"><a name="zh-cn_topic_0000002571575581_p1752310491011"></a><a name="zh-cn_topic_0000002571575581_p1752310491011"></a>ASCRT_SQRT_2_OVER_PI_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p20579173514210"><a name="zh-cn_topic_0000002571575581_p20579173514210"></a><a name="zh-cn_topic_0000002571575581_p20579173514210"></a>定义$\sqrt{2/\pi}$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p12597425287"><a name="zh-cn_topic_0000002571575581_p12597425287"></a><a name="zh-cn_topic_0000002571575581_p12597425287"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row469043220119"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p455013531416"><a name="zh-cn_topic_0000002571575581_p455013531416"></a><a name="zh-cn_topic_0000002571575581_p455013531416"></a>ASCRT_PI_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p769013216112"><a name="zh-cn_topic_0000002571575581_p769013216112"></a><a name="zh-cn_topic_0000002571575581_p769013216112"></a>$\pi$的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p95971425187"><a name="zh-cn_topic_0000002571575581_p95971425187"></a><a name="zh-cn_topic_0000002571575581_p95971425187"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row9410105618116"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p173546517211"><a name="zh-cn_topic_0000002571575581_p173546517211"></a><a name="zh-cn_topic_0000002571575581_p173546517211"></a>ASCRT_L2E_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p20410125610111"><a name="zh-cn_topic_0000002571575581_p20410125610111"></a><a name="zh-cn_topic_0000002571575581_p20410125610111"></a>定义log<sub id="zh-cn_topic_0000002571575581_sub1921512399260"><a name="zh-cn_topic_0000002571575581_sub1921512399260"></a><a name="zh-cn_topic_0000002571575581_sub1921512399260"></a>2</sub>(e)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1159752515811"><a name="zh-cn_topic_0000002571575581_p1159752515811"></a><a name="zh-cn_topic_0000002571575581_p1159752515811"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1842145820119"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p6188291724"><a name="zh-cn_topic_0000002571575581_p6188291724"></a><a name="zh-cn_topic_0000002571575581_p6188291724"></a>ASCRT_L2T_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p74217581114"><a name="zh-cn_topic_0000002571575581_p74217581114"></a><a name="zh-cn_topic_0000002571575581_p74217581114"></a>定义log<sub id="zh-cn_topic_0000002571575581_sub15154252112610"><a name="zh-cn_topic_0000002571575581_sub15154252112610"></a><a name="zh-cn_topic_0000002571575581_sub15154252112610"></a>2</sub>(10)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1597132512816"><a name="zh-cn_topic_0000002571575581_p1597132512816"></a><a name="zh-cn_topic_0000002571575581_p1597132512816"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row2297609213"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p222513122215"><a name="zh-cn_topic_0000002571575581_p222513122215"></a><a name="zh-cn_topic_0000002571575581_p222513122215"></a>ASCRT_LG2_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p9298801423"><a name="zh-cn_topic_0000002571575581_p9298801423"></a><a name="zh-cn_topic_0000002571575581_p9298801423"></a>定义log<sub id="zh-cn_topic_0000002571575581_sub13594621112712"><a name="zh-cn_topic_0000002571575581_sub13594621112712"></a><a name="zh-cn_topic_0000002571575581_sub13594621112712"></a>10</sub>(2)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p10597122511812"><a name="zh-cn_topic_0000002571575581_p10597122511812"></a><a name="zh-cn_topic_0000002571575581_p10597122511812"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1306315823"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1528116271023"><a name="zh-cn_topic_0000002571575581_p1528116271023"></a><a name="zh-cn_topic_0000002571575581_p1528116271023"></a>ASCRT_LGE_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p930713151025"><a name="zh-cn_topic_0000002571575581_p930713151025"></a><a name="zh-cn_topic_0000002571575581_p930713151025"></a>定义log<sub id="zh-cn_topic_0000002571575581_sub267653072715"><a name="zh-cn_topic_0000002571575581_sub267653072715"></a><a name="zh-cn_topic_0000002571575581_sub267653072715"></a>10</sub>(e)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1510827588"><a name="zh-cn_topic_0000002571575581_p1510827588"></a><a name="zh-cn_topic_0000002571575581_p1510827588"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row298417192211"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p10497173119215"><a name="zh-cn_topic_0000002571575581_p10497173119215"></a><a name="zh-cn_topic_0000002571575581_p10497173119215"></a>ASCRT_LN2_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1398414191222"><a name="zh-cn_topic_0000002571575581_p1398414191222"></a><a name="zh-cn_topic_0000002571575581_p1398414191222"></a>定义ln(2)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p51022713811"><a name="zh-cn_topic_0000002571575581_p51022713811"></a><a name="zh-cn_topic_0000002571575581_p51022713811"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row174948211821"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p77801437426"><a name="zh-cn_topic_0000002571575581_p77801437426"></a><a name="zh-cn_topic_0000002571575581_p77801437426"></a>ASCRT_LNT_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1494521121"><a name="zh-cn_topic_0000002571575581_p1494521121"></a><a name="zh-cn_topic_0000002571575581_p1494521121"></a>定义ln(10)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p9104271685"><a name="zh-cn_topic_0000002571575581_p9104271685"></a><a name="zh-cn_topic_0000002571575581_p9104271685"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1924917231226"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p16119441126"><a name="zh-cn_topic_0000002571575581_p16119441126"></a><a name="zh-cn_topic_0000002571575581_p16119441126"></a>ASCRT_LNPI_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p162491923220"><a name="zh-cn_topic_0000002571575581_p162491923220"></a><a name="zh-cn_topic_0000002571575581_p162491923220"></a>定义ln(π)的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p11101527088"><a name="zh-cn_topic_0000002571575581_p11101527088"></a><a name="zh-cn_topic_0000002571575581_p11101527088"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row19386446729"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p16855452822"><a name="zh-cn_topic_0000002571575581_p16855452822"></a><a name="zh-cn_topic_0000002571575581_p16855452822"></a>ASCRT_TWO_TO_M126_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1438610461216"><a name="zh-cn_topic_0000002571575581_p1438610461216"></a><a name="zh-cn_topic_0000002571575581_p1438610461216"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup361015142912"><a name="zh-cn_topic_0000002571575581_sup361015142912"></a><a name="zh-cn_topic_0000002571575581_sup361015142912"></a>-126</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1105275818"><a name="zh-cn_topic_0000002571575581_p1105275818"></a><a name="zh-cn_topic_0000002571575581_p1105275818"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1911056523"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p15182336312"><a name="zh-cn_topic_0000002571575581_p15182336312"></a><a name="zh-cn_topic_0000002571575581_p15182336312"></a>ASCRT_TWO_TO_126_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1416561323"><a name="zh-cn_topic_0000002571575581_p1416561323"></a><a name="zh-cn_topic_0000002571575581_p1416561323"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup06751437172918"><a name="zh-cn_topic_0000002571575581_sup06751437172918"></a><a name="zh-cn_topic_0000002571575581_sup06751437172918"></a>126</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p151022720810"><a name="zh-cn_topic_0000002571575581_p151022720810"></a><a name="zh-cn_topic_0000002571575581_p151022720810"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row825195817216"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p141218718311"><a name="zh-cn_topic_0000002571575581_p141218718311"></a><a name="zh-cn_topic_0000002571575581_p141218718311"></a>ASCRT_NORM_HUGE_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p22510581426"><a name="zh-cn_topic_0000002571575581_p22510581426"></a><a name="zh-cn_topic_0000002571575581_p22510581426"></a>定义float类型的最大有限值，超过该值即溢出到inf。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1510132716817"><a name="zh-cn_topic_0000002571575581_p1510132716817"></a><a name="zh-cn_topic_0000002571575581_p1510132716817"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row188013012311"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p13334712733"><a name="zh-cn_topic_0000002571575581_p13334712733"></a><a name="zh-cn_topic_0000002571575581_p13334712733"></a>ASCRT_TWO_TO_23_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p080170135"><a name="zh-cn_topic_0000002571575581_p080170135"></a><a name="zh-cn_topic_0000002571575581_p080170135"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup1878119193019"><a name="zh-cn_topic_0000002571575581_sup1878119193019"></a><a name="zh-cn_topic_0000002571575581_sup1878119193019"></a>23</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p385232719818"><a name="zh-cn_topic_0000002571575581_p385232719818"></a><a name="zh-cn_topic_0000002571575581_p385232719818"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row14592161613316"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p83121217639"><a name="zh-cn_topic_0000002571575581_p83121217639"></a><a name="zh-cn_topic_0000002571575581_p83121217639"></a>ASCRT_TWO_TO_24_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p105929163314"><a name="zh-cn_topic_0000002571575581_p105929163314"></a><a name="zh-cn_topic_0000002571575581_p105929163314"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup68383179307"><a name="zh-cn_topic_0000002571575581_sup68383179307"></a><a name="zh-cn_topic_0000002571575581_sup68383179307"></a>24</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p385292713819"><a name="zh-cn_topic_0000002571575581_p385292713819"></a><a name="zh-cn_topic_0000002571575581_p385292713819"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row14144122019313"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p1839512241837"><a name="zh-cn_topic_0000002571575581_p1839512241837"></a><a name="zh-cn_topic_0000002571575581_p1839512241837"></a>ASCRT_TWO_TO_31_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p1714515201433"><a name="zh-cn_topic_0000002571575581_p1714515201433"></a><a name="zh-cn_topic_0000002571575581_p1714515201433"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup68751219153015"><a name="zh-cn_topic_0000002571575581_sup68751219153015"></a><a name="zh-cn_topic_0000002571575581_sup68751219153015"></a>31</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1485242719812"><a name="zh-cn_topic_0000002571575581_p1485242719812"></a><a name="zh-cn_topic_0000002571575581_p1485242719812"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row137841334731"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p68312451438"><a name="zh-cn_topic_0000002571575581_p68312451438"></a><a name="zh-cn_topic_0000002571575581_p68312451438"></a>ASCRT_TWO_TO_32_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p117842344312"><a name="zh-cn_topic_0000002571575581_p117842344312"></a><a name="zh-cn_topic_0000002571575581_p117842344312"></a>定义2<sup id="zh-cn_topic_0000002571575581_sup135081624163015"><a name="zh-cn_topic_0000002571575581_sup135081624163015"></a><a name="zh-cn_topic_0000002571575581_sup135081624163015"></a>32</sup>的浮点数值。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p17852142717816"><a name="zh-cn_topic_0000002571575581_p17852142717816"></a><a name="zh-cn_topic_0000002571575581_p17852142717816"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row4291193916314"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p139791251935"><a name="zh-cn_topic_0000002571575581_p139791251935"></a><a name="zh-cn_topic_0000002571575581_p139791251935"></a>ASCRT_REMQUO_BITS_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p729111391337"><a name="zh-cn_topic_0000002571575581_p729111391337"></a><a name="zh-cn_topic_0000002571575581_p729111391337"></a><span>在</span><span>remquof函数</span><span>中提取</span><span>商的最低3位有效位</span><span>，即数值为3。</span></p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p2085242716812"><a name="zh-cn_topic_0000002571575581_p2085242716812"></a><a name="zh-cn_topic_0000002571575581_p2085242716812"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row183659551732"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p31861831945"><a name="zh-cn_topic_0000002571575581_p31861831945"></a><a name="zh-cn_topic_0000002571575581_p31861831945"></a>ASCRT_REMQUO_MASK_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p136645514319"><a name="zh-cn_topic_0000002571575581_p136645514319"></a><a name="zh-cn_topic_0000002571575581_p136645514319"></a><span>用于提取remquof结果中</span><span>低3位比特的位掩码</span>。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p485220274815"><a name="zh-cn_topic_0000002571575581_p485220274815"></a><a name="zh-cn_topic_0000002571575581_p485220274815"></a>math_constants.h</p>
-</td>
-</tr>
-<tr id="zh-cn_topic_0000002571575581_row1120616591319"><td class="cellrowborder" valign="top" width="34.22342234223422%" headers="mcps1.2.4.1.1 "><p id="zh-cn_topic_0000002571575581_p160656243"><a name="zh-cn_topic_0000002571575581_p160656243"></a><a name="zh-cn_topic_0000002571575581_p160656243"></a>ASCRT_TRIG_PLOSS_F</p>
-</td>
-<td class="cellrowborder" valign="top" width="32.44324432443245%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000002571575581_p31481920145616"><a name="zh-cn_topic_0000002571575581_p31481920145616"></a><a name="zh-cn_topic_0000002571575581_p31481920145616"></a>105615.0F，表示<span>三角函数计算中</span><span>精度损失的临界阈值</span>。</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000002571575581_p1385218271288"><a name="zh-cn_topic_0000002571575581_p1385218271288"></a><a name="zh-cn_topic_0000002571575581_p1385218271288"></a>math_constants.h</p>
-</td>
-</tr>
-</tbody>
-</table>
+SIMD与SIMT混合编程支持的运算符与SIMT编程一致，详细说明请参见[SIMT BuiltIn关键字的运算符](SIMT-BuiltIn关键字.md#section186787252339)。

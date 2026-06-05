@@ -598,34 +598,6 @@ __ubuf__ int * __gm__ ptr;
 
 在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
 
-## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
-
-SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
-
--   \_\_simt\_vf\_\_ <a name="li611618392141"></a>
-
-    函数标记宏，用于标记SIMT VF入口函数，函数无返回值。使用asc\_vf\_call接口调用SIMT VF入口函数，启动VF子任务。
-
-    ```
-    __simt_vf__ inline void KernelAdd(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-    ```
-
-    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md#section776244992018)。
-
-    -   指针类型：\_\_ubuf\_\_ \*、\_\_gm\_\_ \*；
-    -   标量类型：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
-
--   \_\_simt\_callee\_\_
-
-    函数标记宏，用于标记SIMT VF非入口函数，函数可以有返回值，允许被SIMT VF入口函数或其他非入口函数调用。
-
-    ```
-    __simt_callee__ inline float add(float x, float y)
-    ```
-
-Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#section13165113520576)。
-
-
 ## 核函数配置<a name="section97005415463"></a>
 
 在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
