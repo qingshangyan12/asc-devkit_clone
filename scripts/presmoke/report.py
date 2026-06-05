@@ -43,8 +43,8 @@ def write_markdown(report: RunReport, path: Path) -> None:
     lines.extend(
         [
             "",
-            "| example | arch | mode | status | rc | duration_s | npu_wait_s | reason | steps | log |",
-            "|---|---|---|---:|---:|---:|---:|---|---|---|",
+            "| example | arch | mode | status | rc | duration_s | npu_wait_s | reason | steps | log | stage_logs |",
+            "|---|---|---|---:|---:|---:|---:|---|---|---|---|",
         ]
     )
     for result in sorted(report.results, key=lambda r: (r.example, r.mode)):
@@ -59,7 +59,7 @@ def write_markdown(report: RunReport, path: Path) -> None:
         lines.append(
             f"| {result.example} | {result.arch} | {result.mode} | {result.status} | "
             f"{'' if result.rc is None else result.rc} | {result.duration_s:.1f} | {npu_wait:.1f} | "
-            f"{result.reason} | {steps} | {result.log_file} |"
+            f"{result.reason} | {steps} | {result.log_file} | {'<br>'.join(result.stage_log_files)} |"
         )
     if report.suggestions:
         lines.extend(["", "## Suggestions", "", "| example | severity | category | message | hint |", "|---|---|---|---|---|"])

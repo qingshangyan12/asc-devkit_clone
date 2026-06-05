@@ -32,6 +32,8 @@ def run_cell(
     started = time.monotonic()
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
+    stage_log_dir = log_dir / "stages"
+    clear_stage_logs(log_dir, cell)
     use_build_dir = any(command.kind in {"cmake", "make", "package_run"} for command in cell.commands)
     if cell.example.source == "case-runner":
         use_build_dir = False
@@ -53,16 +55,21 @@ def run_cell(
         for command in cell.commands:
             if not command.raw or command.kind == "skip":
                 continue
+            stage_name = stage_name_for_command(command)
+            stage_log_file = stage_log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}__{stage_name}.log"
+            stage_log = _open_stage_log(stage_log_file, cell, run_dir, stage_name, append=stage_log_file.exists())
             log.write(f"\n$ {command.raw}\n")
             log.flush()
+            stage_log.write(f"\n$ {command.raw}\n")
+            stage_log.flush()
             command_started = time.monotonic()
             uses_npu = command_uses_npu(cell, command)
             wait_s = 0.0
             step_timeout = select_timeout(uses_npu, timeout)
             if uses_npu and npu_gate:
-                step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, step_timeout))
+                step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout))
             else:
-                step_rc = _run_command(command, run_dir, log, step_timeout)
+                step_rc = _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout)
             step_duration = time.monotonic() - command_started
             steps.append(
                 StepResult(
@@ -77,6 +84,9 @@ def run_cell(
             )
             log.write(f"\n[STEP] rc={step_rc} duration_s={step_duration:.3f} wait_s={wait_s:.3f} npu_slot={int(uses_npu)}\n")
             log.flush()
+            stage_log.write(f"\n[STEP] rc={step_rc} duration_s={step_duration:.3f} wait_s={wait_s:.3f} npu_slot={int(uses_npu)}\n")
+            stage_log.flush()
+            stage_log.close()
             if step_rc != 0:
                 status = "FAIL"
                 reason = "timeout" if step_rc == 124 else "nonzero rc"
@@ -97,6 +107,7 @@ def run_cell(
         rc=rc,
         duration_s=duration,
         log_file=str(log_file),
+        stage_log_files=stage_log_files_for_cell(log_dir, cell),
         source=cell.example.source,
         steps=steps,
     )
@@ -272,6 +283,8 @@ def run_cell_stage(
         cell.build_dir.mkdir(parents=True, exist_ok=True)
     elif stage_name == "build":
         clean_build_dir(cell.build_dir)
+    if stage_name == "build":
+        clear_stage_logs(log_dir, cell)
 
     result = RunResult(
         example=cell.example.rel_path,
@@ -281,6 +294,7 @@ def run_cell_stage(
         reason="",
         rc=0,
         log_file=str(log_file),
+        stage_log_files=[],
         source=cell.example.source,
         steps=[],
     )
@@ -340,16 +354,23 @@ def run_commands(
     for command in commands:
         if not command.raw or command.kind == "skip":
             continue
+        stage_name = stage_name_for_command(command)
+        stage_log_file = stage_log_path(log.name, cell, stage_name)
+        if str(stage_log_file) not in result.stage_log_files:
+            result.stage_log_files.append(str(stage_log_file))
+        stage_log = _open_stage_log(stage_log_file, cell, run_dir, stage_name, append=stage_log_file.exists())
         log.write(f"\n$ {command.raw}\n")
         log.flush()
+        stage_log.write(f"\n$ {command.raw}\n")
+        stage_log.flush()
         command_started = time.monotonic()
         uses_npu = command_uses_npu(cell, command)
         step_timeout = select_timeout(uses_npu, timeout)
         wait_s = 0.0
         if uses_npu and npu_gate:
-            step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, log, step_timeout))
+            step_rc, wait_s = npu_gate(cell, command, lambda: _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout))
         else:
-            step_rc = _run_command(command, run_dir, log, step_timeout)
+            step_rc = _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout)
         queued_wait_s = 0.0
         if uses_npu and pending_npu_wait_s:
             queued_wait_s = pending_npu_wait_s
@@ -369,6 +390,9 @@ def run_commands(
         )
         log.write(f"\n[STEP] rc={step_rc} duration_s={step_duration:.3f} wait_s={wait_s:.3f} npu_slot={int(uses_npu)}\n")
         log.flush()
+        stage_log.write(f"\n[STEP] rc={step_rc} duration_s={step_duration:.3f} wait_s={wait_s:.3f} npu_slot={int(uses_npu)}\n")
+        stage_log.flush()
+        stage_log.close()
         if step_rc != 0:
             result.status = "FAIL"
             result.reason = "timeout" if step_rc == 124 else "nonzero rc"
@@ -387,6 +411,56 @@ def run_stage_commands(commands: Iterable[Command]) -> List[Command]:
 
 def verify_stage_commands(commands: Iterable[Command]) -> List[Command]:
     return [command for command in commands if command.kind == "verify"]
+
+
+def stage_name_for_command(command: Command) -> str:
+    if command.kind in {"run", "package_run"}:
+        return "run"
+    if command.kind == "verify":
+        return "verify"
+    return "build"
+
+
+def stage_log_path(case_log_name: str, cell: Cell, stage_name: str) -> Path:
+    return Path(case_log_name).parent / "stages" / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}__{stage_name}.log"
+
+
+def stage_log_files_for_cell(log_dir: Path, cell: Cell) -> List[str]:
+    root = log_dir / "stages"
+    prefix = f"{safe_log_name(cell.example.rel_path)}__{cell.mode}__"
+    return [str(path) for path in sorted(root.glob(f"{prefix}*.log"))]
+
+
+def clear_stage_logs(log_dir: Path, cell: Cell) -> None:
+    for path in stage_log_files_for_cell(log_dir, cell):
+        Path(path).unlink(missing_ok=True)
+
+
+def _open_stage_log(path: Path, cell: Cell, run_dir: Path, stage_name: str, append: bool):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    log = path.open("a" if append else "w", encoding="utf-8", errors="replace")
+    if not append:
+        log.write(
+            f"example={cell.example.rel_path}\n"
+            f"arch={cell.arch}\n"
+            f"mode={cell.mode}\n"
+            f"stage={stage_name}\n"
+            f"run_dir={run_dir}\n\n"
+        )
+    return log
+
+
+class _TeeLog:
+    def __init__(self, *logs) -> None:
+        self._logs = logs
+
+    def write(self, value: str) -> None:
+        for log in self._logs:
+            log.write(value)
+
+    def flush(self) -> None:
+        for log in self._logs:
+            log.flush()
 
 
 def clean_build_dir(build_dir: Path) -> None:

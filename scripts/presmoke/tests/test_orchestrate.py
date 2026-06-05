@@ -62,6 +62,23 @@ MD
             self.assertFalse(stale.exists())
             self.assertIn("vendors_clean_done", result.stdout)
 
+    def test_default_output_root_is_presmoke_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = {
+                **os.environ,
+                "PROJECT_ROOT": str(root),
+                "ARCH": "dav-2201",
+                "ASCEND_OPP_PATH": str(root / "opp"),
+            }
+
+            result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn(f"out_root={root / 'presmoke_report' / 'orchestrate_dav-2201_'}", result.stdout)
+            self.assertFalse((root / "presmoke_results").exists())
+
     def test_filtered_run_does_not_clean_cann_vendors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
