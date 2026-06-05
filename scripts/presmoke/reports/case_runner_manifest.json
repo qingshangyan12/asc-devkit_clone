@@ -600,7 +600,8 @@
     "source": "readme",
     "confidence": "low",
     "supported_archs": [
-      "dav-2201"
+      "dav-2201",
+      "dav-3510"
     ],
     "supported_modes": [
       "npu"
@@ -1118,9 +1119,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -1145,9 +1146,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -1172,9 +1173,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -1199,9 +1200,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -1226,9 +1227,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -2200,9 +2201,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -2227,9 +2228,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -2254,9 +2255,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -2932,9 +2933,9 @@
       "unsupported_on_target_arch_or_mode"
     ],
     "commands": [
-      "cmake -DSCENARIO_NUM=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
+      "cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
       "make -j",
-      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO",
+      "python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM",
       "./demo"
     ]
   },
@@ -3298,8 +3299,7 @@
     "source": "readme",
     "confidence": "high",
     "supported_archs": [
-      "dav-2201",
-      "dav-3510"
+      "dav-2201"
     ],
     "supported_modes": [
       "cpu",
@@ -6639,8 +6639,8 @@
     ]
   },
   {
-    "case": "03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table",
-    "runner": "scripts/presmoke/cases/03_simt_api/02_features/01_api_features/00_memory_asscess/insert_hash_table/run.sh",
+    "case": "03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table",
+    "runner": "scripts/presmoke/cases/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/run.sh",
     "source": "readme",
     "confidence": "medium",
     "supported_archs": [

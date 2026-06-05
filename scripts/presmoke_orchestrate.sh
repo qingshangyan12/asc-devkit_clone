@@ -75,6 +75,41 @@ source_cann() {
     set -u
 }
 
+presmoke_opp_path() {
+    if [[ -n "${ASCEND_OPP_PATH:-}" ]]; then
+        printf '%s\n' "$ASCEND_OPP_PATH"
+        return
+    fi
+    if [[ -n "${ASCEND_HOME_PATH:-}" && -d "$ASCEND_HOME_PATH/opp" ]]; then
+        printf '%s\n' "$ASCEND_HOME_PATH/opp"
+        return
+    fi
+    printf '%s\n' "/usr/local/Ascend/cann-9.1.0/opp"
+}
+
+clean_cann_vendors() {
+    source_cann
+    local vendors_dir
+    vendors_dir="$(presmoke_opp_path)/vendors"
+    if [[ ! -d "$vendors_dir" ]]; then
+        log "vendors_clean_skip missing_dir=$vendors_dir"
+        return
+    fi
+    log "vendors_clean_begin dir=$vendors_dir"
+    find "$vendors_dir" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+    log "vendors_clean_done dir=$vendors_dir"
+}
+
+should_clean_cann_vendors() {
+    local arg
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run|--filter|--filter=*|--suggestions-only) return 1 ;;
+        esac
+    done
+    return 0
+}
+
 run_presmoke() {
     local name="$1"
     local card="$2"
@@ -402,6 +437,11 @@ PY
 main() {
     acquire_lock
     log "orchestrate_start out_root=$OUT_ROOT"
+    if should_clean_cann_vendors "$@"; then
+        clean_cann_vendors
+    else
+        log "vendors_clean_skip reason=non_full_run args=$*"
+    fi
     run_presmoke "full_card${PRIMARY_CARD}" "$PRIMARY_CARD" "$@"
     retry_timeouts
     write_final_report
