@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from presmoke.cli import detect_cpu_count, main, resolve_jobs
+from presmoke.cli import detect_cpu_count, main, resolve_cpu_build_jobs, resolve_cpu_run_slots, resolve_jobs, resolve_make_jobs
 from presmoke.model import Cell, Command, ExampleSpec
 from presmoke.scheduler import (
     custom_op_dependency_violation_s,
@@ -651,6 +651,67 @@ class SchedulerTest(unittest.TestCase):
         self.assertEqual(resolve_jobs("auto", cpu_count=40), 6)
         self.assertEqual(resolve_jobs("auto", cpu_count=16), 4)
         self.assertEqual(resolve_jobs("7", cpu_count=192), 7)
+
+    def test_cpu_auto_jobs_use_generic_cpu_count_formula(self) -> None:
+        self.assertEqual(resolve_cpu_build_jobs(192), 48)
+        self.assertEqual(resolve_cpu_build_jobs(88), 22)
+        self.assertEqual(resolve_cpu_build_jobs(40), 10)
+        self.assertEqual(resolve_cpu_build_jobs(16), 4)
+        self.assertEqual(resolve_cpu_build_jobs(320), 64)
+        self.assertEqual(resolve_jobs("auto", cpu_count=192, modes=["cpu"]), 48)
+        self.assertEqual(resolve_jobs("auto", cpu_count=88, modes=["cpu"]), 22)
+
+    def test_cpu_parallel_defaults_use_host_cpu_count(self) -> None:
+        self.assertEqual(resolve_cpu_run_slots("auto", cpu_count=192), 192)
+        self.assertEqual(resolve_cpu_run_slots("5", cpu_count=192), 5)
+        self.assertEqual(resolve_make_jobs("auto", build_jobs=48, cpu_count=192), 4)
+        self.assertEqual(resolve_make_jobs("auto", build_jobs=22, cpu_count=88), 4)
+        self.assertEqual(resolve_make_jobs("3", build_jobs=12, cpu_count=192), 3)
+
+    def test_cli_report_includes_resolved_parallel_config(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            project = root / "project"
+            runner = project / "scripts/presmoke/cases/cpu-case/run.sh"
+            runner.parent.mkdir(parents=True)
+            runner.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            manifest = project / "scripts/presmoke/reports/case_runner_manifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                '[{"case":"cpu-case","supported_archs":["dav-2201"],"supported_modes":["cpu"]}]',
+                encoding="utf-8",
+            )
+            results_dir = root / "results"
+            with mock.patch.dict(os.environ, {"PRESMOKE_PROJECT_ROOT": str(project)}):
+                with mock.patch("presmoke.cli.detect_cpu_count", return_value=88):
+                    rc = main(
+                        [
+                            "--runner-mode",
+                            "case-runner",
+                            "--arch",
+                            "dav-2201",
+                            "--modes",
+                            "cpu",
+                            "--dry-run",
+                            "--report-format",
+                            "json",
+                            "--results",
+                            str(results_dir),
+                            "--jobs",
+                            "auto",
+                            "--cpu-run-slots",
+                            "auto",
+                            "--make-jobs",
+                            "auto",
+                        ]
+                    )
+            payload = json.loads((results_dir / "report.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            payload["parallel_config"],
+            {"jobs": 22, "npu_slots": 1, "cpu_run_slots": 88, "make_jobs": 4, "cpu_run_timeout": 300},
+        )
 
     def test_detect_cpu_count_prefers_lscpu(self) -> None:
         with mock.patch("presmoke.cli.subprocess.run") as run:

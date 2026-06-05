@@ -29,15 +29,25 @@ def write_markdown(report: RunReport, path: Path) -> None:
         f"- finished_at: `{report.finished_at}`",
         f"- pass/fail/skip: `{summary['PASS']}/{summary['FAIL']}/{summary['SKIP']}`",
     ]
-    if report.npu_stats:
+    if report.parallel_config:
         lines.extend(
             [
-                f"- npu_slots: `{report.npu_stats.slots}`",
-                f"- npu_queue_model: `{report.npu_stats.queue_model}`",
-                f"- npu_busy_s: `{report.npu_stats.busy_s:.3f}`",
-                f"- npu_idle_s: `{report.npu_stats.idle_s:.3f}`",
-                f"- npu_utilization: `{report.npu_stats.utilization:.3f}`",
-                f"- npu_max_slot_idle_s: `{report.npu_stats.max_slot_idle_s:.3f}`",
+                f"- resolved_jobs: `{report.parallel_config.get('jobs', '')}`",
+                f"- resolved_npu_slots: `{report.parallel_config.get('npu_slots', '')}`",
+                f"- resolved_cpu_run_slots: `{report.parallel_config.get('cpu_run_slots', '')}`",
+                f"- resolved_make_jobs: `{report.parallel_config.get('make_jobs', '')}`",
+            ]
+        )
+    if report.npu_stats:
+        metric_prefix = "cpu_run_queue" if report.npu_stats.queue_model == "pipeline-cpu" else "npu"
+        lines.extend(
+            [
+                f"- {metric_prefix}_slots: `{report.npu_stats.slots}`",
+                f"- {metric_prefix}_model: `{report.npu_stats.queue_model}`",
+                f"- {metric_prefix}_busy_s: `{report.npu_stats.busy_s:.3f}`",
+                f"- {metric_prefix}_idle_s: `{report.npu_stats.idle_s:.3f}`",
+                f"- {metric_prefix}_utilization: `{report.npu_stats.utilization:.3f}`",
+                f"- {metric_prefix}_max_slot_idle_s: `{report.npu_stats.max_slot_idle_s:.3f}`",
             ]
         )
     lines.extend(
@@ -80,9 +90,18 @@ def print_console(report: RunReport) -> None:
     summary = summarize(report.results)
     print(f"Presmoke v2: arch={report.host_arch} modes={','.join(report.modes)}")
     print(f"PASS={summary['PASS']} FAIL={summary['FAIL']} SKIP={summary['SKIP']}")
-    if report.npu_stats:
+    if report.parallel_config:
         print(
-            "NPU "
+            "PARALLEL "
+            f"jobs={report.parallel_config.get('jobs', '')} "
+            f"npu_slots={report.parallel_config.get('npu_slots', '')} "
+            f"cpu_run_slots={report.parallel_config.get('cpu_run_slots', '')} "
+            f"make_jobs={report.parallel_config.get('make_jobs', '')}"
+        )
+    if report.npu_stats:
+        metric_label = "CPU_RUN_QUEUE" if report.npu_stats.queue_model == "pipeline-cpu" else "NPU"
+        print(
+            f"{metric_label} "
             f"slots={report.npu_stats.slots} "
             f"model={report.npu_stats.queue_model} "
             f"busy_s={report.npu_stats.busy_s:.3f} "
