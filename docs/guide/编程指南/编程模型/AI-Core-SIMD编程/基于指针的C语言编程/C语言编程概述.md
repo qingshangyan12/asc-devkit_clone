@@ -43,8 +43,6 @@ Global Memory具有持久性：通过全局内存分配的空间，其中存储�
 
 Host使用aclrtMalloc分配Device侧的全局内存，并通过aclrtMemcpy将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；通过aclrtMalloc分配的Device全局内存需使用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
-**示例代码**：
-
 ```c
 __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
@@ -291,7 +289,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 ---
 
-#### 同步方法1：流水互斥同步
+#### 流水互斥同步
 
 该同步能力从Ascend 950PR/950DT开始引入并使用，AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。
 
@@ -313,7 +311,7 @@ asc_unlock(PIPE_V, mutex_id);
 
 ---
 
-#### 同步方法2：核内多流水同步
+#### 核内多流水同步
 
 该同步主要用于核内多流水间的同步，通过`asc_sync_notify/asc_sync_wait`对两条流水进行`notify`和`wait`处理。
 
@@ -335,7 +333,7 @@ asc_add(dst, src1, src0, total_length);
 
 ---
 
-#### 同步方法3：同一流水内同步
+#### 同一流水内同步
 
 同一流水线中虽然指令是顺序执行，但并不意味着后一条指令开始执行时前一条指令执行结束。所以对于同一条流水线执行，如果存在前后数据依赖，也需要进行同步处理。
 
@@ -360,7 +358,7 @@ asc_add(dst, src1, src0, total_length);
 
 ---
 
-#### 同步方法4：内存访问顺序控制
+#### 内存访问顺序控制
 
 当后续执行指令对前序的内存访问存在数据依赖时，可以通过`asc_sync_data_barrier`来进行内存访问顺序同步，该接口会阻塞后续的指令执行，直到所有之前的内存访问指令都执行结束。
 
