@@ -671,6 +671,8 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 }
 #endif
 
+using TBufId = uint8_t;
+
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 #ifdef ASCENDC_CPU_DEBUG
 class BufIdTracker {
@@ -703,7 +705,6 @@ private:
 };
 #endif
 
-using TBufId = uint8_t;
 constexpr TBufId INVALID_TBUFID = (static_cast<TBufId>(-1));
 constexpr TBufId MAX_TBUFID = (static_cast<TBufId>(31));
 constexpr TBufId MAX_MUTEXID = (static_cast<TBufId>(27));
@@ -747,7 +748,7 @@ __aicore__ inline void RlsBufInternal(uint8_t bufId) {
 __aicore__ constexpr pipe_t GetPipeByPos(TPosition pos, TPosition altPos)
 {
     if (pos == TPosition::GM) {
-        return altPos == TPosition::GM ? PIPE_MTE2 : PIPE_MTE3;
+        return altPos == TPosition::VECIN ? PIPE_MTE2 : PIPE_MTE3;
     } else if (pos == TPosition::VECIN) {
         return altPos == TPosition::GM ? PIPE_V : PIPE_MTE2;
     } else if (pos == TPosition::VECCALC) {

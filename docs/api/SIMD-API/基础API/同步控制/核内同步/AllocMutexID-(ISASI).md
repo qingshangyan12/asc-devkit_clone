@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID-(ISASI).md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock/Unlock](Mutex（ISASI）/Mutex（ISASI）.md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
+从框架获取并占用一个MutexID，与[ReleaseMutexID](ReleaseMutexID-(ISASI).md)配合使用，管理MutexID的获取和释放。获取的MutexID可以传入[Mutex::Lock/Unlock](Mutex(ISASI)/Mutex(ISASI).md)接口使用，此时Mutex::Lock/Unlock可以与TQue等其他接口配合使用。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -79,10 +79,9 @@ MutexID有数量限制，使用结束应该立刻调用ReleaseMutexID释放，�
 MutexID id = AllocMutexID();
 Mutex::Lock<PIPE_MTE2>(id);
 DataCopy(local, gm, 1024);
-Mutex::Unlock<<PIPE_MTE2>(id);
+Mutex::Unlock<PIPE_MTE2>(id);
 Mutex::Lock<PIPE_V>(id);
 Adds(local, local, 1, 1024);
 Mutex::Unlock<PIPE_V>(id);
 ReleaseMutexID(id);
 ```
-

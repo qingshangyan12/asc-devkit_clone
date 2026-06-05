@@ -19,7 +19,7 @@
 ## 函数原型
 
 ```
-__asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate, const __asc_fp8_interpretation_t fp8_interpretation)
+inline __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_saturation_t saturate, const __asc_fp8_interpretation_t fp8_interpretation)
 ```
 
 ## 参数说明
@@ -38,7 +38,7 @@ __asc_fp8x2_storage_t __asc_cvt_float2_to_fp8x2(const float2 x, const __asc_satu
 
 -   float8\_e4m3\_t数据类型没有inf值，非饱和模式下输入超出该类型所能表示的范围时，其溢出结果为nan，饱和模式下溢出结果为该类型表示的最大值或最小值。
 -   float8\_e5m2\_t类型则有inf值，非饱和模式下输入超出该类型所能表示的范围，转换结果为对应符号的inf值，饱和模式下溢出结果为该类型表示的最大值或最小值。
--   饱和模式下，对于float8\_e5m2\_t和float8\_e4m3\_t数据类型，当寄存器CTRL\[50\]=0时，nan值会被转换为0，当寄存器CTRL\[50\]=1时，nan值被转化为fp8类型下的nan值。CTRL寄存器值可通过[GetCtrlSpr\(ISASI\)](../../../../SIMD-API/基础API/系统变量访问/GetCtrlSpr(ISASI).md)接口获取。
+-   饱和模式下，对于float8\_e5m2\_t和float8\_e4m3\_t数据类型，当寄存器CTRL\[50\]=0时，nan值会被转换为0，当寄存器CTRL\[50\]=1时，nan值被转化为fp8类型下的nan值。CTRL寄存器值可通过[GetCtrlSpr\(ISASI\)](../../../../SIMD-API/基础API/特殊寄存器访问/GetCtrlSpr(ISASI).md)接口获取。
 
 ## 约束说明
 
@@ -74,4 +74,3 @@ SIMT编程场景当前不支持使用该接口。
         asc_vf_call<simt_asc_cvt_float2_to_fp8x2>(dim3(1024), (__gm__ float2*)input, output, input_total_length);
     }
     ```
-
