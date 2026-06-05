@@ -48,10 +48,17 @@
 
 ![L0A不复用场景](./figures/普通兼容场景.jpg)
 
+图1 展示了 L0A 不复用场景下两种芯片的 L1→L0A 数据搬运差异：
+- Atlas A2/A3 系列：L0A 为 Zz 分形，需通过 Load2D 完成 Nz→Zz 分形转换。
+- Ascend 950PR/Ascend 950DT：L0A 为 Nz 分形，与 L1 一致，无需分形转换，Load2D 参数更简洁。
 
 ***图2 L0A复用场景概览***
 
 ![L0A切分兼容场景](./figures/L0A切分兼容场景.jpg)
+
+图2 展示了 L0A 复用（M 轴切分）场景下两种芯片的适配逻辑：
+- Atlas A2/A3 系列：Zz 分形下，M 轴切分后 A1 和 A2 在 L0A 中依然连续，仅需调整第二次 Mmad 的偏移量即可。
+- Ascend 950PR/Ascend 950DT：Nz 分形下，M 轴切分后 A1 和 A2 不连续，需通过两次 Load2D 分别搬运上半和下半 Nz 子矩阵，不改变 Mmad 计算逻辑及流水排布。
 
 ### GM->L1
 
@@ -71,7 +78,7 @@ DataCopy 将 GM 中 ND 格式的矩阵 x[M, K] 和 y[K, N] 分别搬运到 L1 Bu
 
 ### L1->L0A
 
-Ascend 950PR/Ascend 950DT中，L0A 中的数据格式变为为 Nz 分形，以下分场景介绍兼容性差异。
+Atlas A2/A3 系列产品中 L0A 数据排布为 Zz 分形，Ascend 950PR/Ascend 950DT 中变更为 Nz 分形，以下分场景介绍兼容性差异。通过编译宏 `SCENARIO_NUM` 区分场景：`SCENARIO_NUM=1` 为 L0A 不复用场景，`SCENARIO_NUM=2` 为 L0A 复用场景（M 轴切分）。
 
 #### L0A不复用场景
 
@@ -161,20 +168,44 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 
 ### Compute
 
-Compute 阶段使用 Mmad 接口完成矩阵乘法，采用 A 矩阵上下两半拆分的策略，分别计算 C1=A1×B 和 C2=A2×B，**无需兼容性适配**，相关代码如下：
+Compute 阶段使用 Mmad 接口完成矩阵乘法，Mmad 接口在两种架构上通用，**无需兼容性适配**。
+
+- `SCENARIO_NUM=1`（L0A 不复用）：直接调用一次 Mmad 完成完整矩阵乘法 C=A×B。
 
 ```cpp
-...
+AscendC::MmadParams mmadParams;
+mmadParams.m = M;
+mmadParams.n = N;
+mmadParams.k = K;
+AscendC::Mmad(co1Local, a2, b2, mmadParams);
+```
+
+- `SCENARIO_NUM=2`（L0A 复用）：将 A 矩阵按 M 轴拆分为上下两半，分别计算 C1=A1×B 和 C2=A2×B。
+
+```cpp
 AscendC::Mmad(co1Local, a2, b2, mmadParams);
 AscendC::Mmad(co1Local[M * N / 2], a2[M * K / 2], b2, mmadParams);  // 下半部分 A2[32, 64]
 ```
 
 ### L0C->GM
 
-L0C 到 GM 的搬运，使用 Fixpipe 接口将 L0C 中的 float 结果写回 GM，同样采用上下两半拆分的策略，**无需兼容性适配**，搬运两块Nz矩阵：
+L0C 到 GM 的搬运，使用 AscendC::FixpipeParamsV220 接口将 L0C 中的 float 结果写回 GM，该接口在两种架构上通用，**无需兼容性适配**。
+
+- `SCENARIO_NUM=1`（L0A 不复用）：直接一次 Fixpipe 搬出完整结果矩阵。
 
 ```cpp
-...
+AscendC::FixpipeParamsV220 fixpipeParams;
+fixpipeParams.mSize = M;
+fixpipeParams.srcStride = M;
+AscendC::Fixpipe(cGM, co1Local, fixpipeParams);
+```
+
+- `SCENARIO_NUM=2`（L0A 复用）：将结果矩阵按 M 轴拆分为上下两半分别搬出。
+
+```cpp
+AscendC::FixpipeParamsV220 fixpipeParams;
+fixpipeParams.mSize = M / 2;
+fixpipeParams.srcStride = M / 2;
 AscendC::Fixpipe(cGM, co1Local, fixpipeParams);
 AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
 ```
@@ -197,7 +228,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
   在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j       # 编译（默认 NPU 模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=1 .. && make -j       # 编译（默认 NPU 模式）
   python3 ../scripts/gen_data.py                                # 生成测试输入数据
   ./demo                                                        # 执行编译生成的可执行程序
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # 验证结果
@@ -206,8 +237,8 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
   使用 CPU 调试或 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可，示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j   # CPU 调试模式
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DCASE_NUM=1 .. && make -j   # NPU 仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=1 .. && make -j   # CPU 调试模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=1 .. && make -j   # NPU 仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -218,6 +249,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU 调试、NPU 仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1 表示 L0A 不复用场景，2 表示 L0A 复用场景（M 轴切分） |
 
 - 执行结果
 
