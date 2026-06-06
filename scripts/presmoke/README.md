@@ -1,8 +1,8 @@
 # Presmoke Watch Entry
 
-`scripts/presmoke_orchestrate.sh` is the CI and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
+`scripts/run_presmoke.sh` is the CI and manual watch entry. It runs one full 910B or 950 presmoke round, writes archiveable reports, and can retry timeout cases on other cards.
 
-`scripts/run_presmoke2.sh` is the lower-level debug entry. Use it for dry-run, single-case checks, direct Python CLI experiments, or regenerating schedules.
+For direct Python CLI experiments, use `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke ...`.
 
 Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--dry-run`, or `--suggestions-only` do not clean `opp/vendors`.
 
@@ -15,7 +15,7 @@ PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-2201 \
 PRIMARY_CARD=7 \
 RETRY_CARDS="0 1 2 3 4 5 6" \
-bash scripts/presmoke_orchestrate.sh
+bash scripts/run_presmoke.sh
 ```
 
 950:
@@ -24,14 +24,14 @@ bash scripts/presmoke_orchestrate.sh
 PROJECT_ROOT=/path/to/asc-devkit \
 ARCH=dav-3510 \
 PRIMARY_CARD=0 \
-bash scripts/presmoke_orchestrate.sh
+bash scripts/run_presmoke.sh
 ```
 
 Dry-run:
 
 ```bash
-ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/presmoke_orchestrate.sh --dry-run
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
+ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh --dry-run
 ```
 
 ## Parameters
@@ -51,7 +51,7 @@ ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/presmoke_orchestrate.sh --dry-run
 | `CPU_RUN_TIMEOUT` | `300` | Timeout in seconds for CPU run commands. Increase this when CPU-only validation is slower than expected. |
 | `SCHEDULE` | `fixed` | Case submit order. Watch runs should use `fixed`. |
 | `SCHEDULE_FILE` | built-in | Optional fixed order override. |
-| `OUT_ROOT` | `presmoke_reports/orchestrate_<arch>_<timestamp>` | Output directory for CI archive. |
+| `OUT_ROOT` | `presmoke_reports/presmoke_<arch>_<timestamp>` | Output directory for CI archive. |
 | `RUNNER_MODE` | `case-runner` | Default runner implementation. |
 | `MODES` | `npu` | Presmoke modes. |
 | `MODE` | unset | Alias used only when `MODES` is unset. For example, `MODE=cpu`. |
@@ -110,6 +110,5 @@ PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT=$PWD python3 -m presmoke \
 
 - Do not run multiple orchestrators in the same checkout at the same time. A lock under `.presmoke_locks` protects against accidental overlap.
 - The full watch entry cleans the active CANN `opp/vendors` directory. Make sure the CI user has permission to remove and reinstall custom-op vendor packages.
-- `run_presmoke.sh` is the old presmoke script and is not the watch entry for this flow.
 - TensorFlow cases that require TensorFlow 2.6.5 are intentionally skipped by the case manifest.
 - Timeout retry is for timeout cases only. Non-timeout failures are reported and left for diagnosis.
