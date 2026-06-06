@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_VECTOR_BINARY_BINARY_VF_H
 
 #include "impl/tensor_api/arch/vector/binary/instruction.h"
+#include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
 namespace AscendC {
 namespace Te {
@@ -58,7 +59,7 @@ public:
         using type = GetAttributeElementType<typename T::elementType*>;
         uint32_t dataSize = dst.Size();
 
-        constexpr uint16_t VECTOR_REG_WIDTH = 256;
+        constexpr uint16_t VECTOR_REG_WIDTH = asc_get_vf_len();
         constexpr uint16_t oneRepSize = VECTOR_REG_WIDTH / sizeof(type);
         uint16_t repeat = Std::ceil_division(dataSize, oneRepSize);
         

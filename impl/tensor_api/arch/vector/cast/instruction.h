@@ -30,38 +30,7 @@
 namespace AscendC {
 namespace Te {
 namespace Inst {
-
-class Cast{};
-
-class CreateMask {
-public:
-    template <typename T, typename PatType>
-    __simd_callee__ inline static vector_bool Run()
-    {
-        if constexpr (sizeof(T) == sizeof(uint32_t)) {
-            return asc_create_mask_b32(PatType());
-        } else if constexpr (sizeof(T) == sizeof(uint16_t)) {
-            return asc_create_mask_b16(PatType());
-        } else if constexpr (sizeof(T) == sizeof(uint8_t)) {
-            return asc_create_mask_b8(PatType());
-        } else {
-            return vector_bool{};
-        }
-    }
-};
-
-#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                     \
-class CLASS_NAME {                                                                                                   \
-public:                                                                                                              \
-    template <typename T, typename U>                                                                                \
-    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
-    {                                                                                                                \
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
-            FUNC_NAME(dst, src, mask);                                                                               \
-        }                                                                                                            \
-    }                                                                                                                \
-}
-
+    
 #define ASCENDC_ROUNDING_INST(CLASS_NAME, FUNC_NAME)                                                                 \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
