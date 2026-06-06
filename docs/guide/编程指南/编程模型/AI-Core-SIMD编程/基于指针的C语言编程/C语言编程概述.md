@@ -81,7 +81,7 @@ extern __ubuf__ char dynamic_buffer[];
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。以NPU架构版本2201为例，Unified Buffer总大小为192K，划分为16个bank。每个bank由512行组成，每行长度为32B。这16个bank进一步组织为8个bank group，每个bank group包含2个bank。
 
-<img src="UB Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
+<img src="../../../../figures/UB Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 

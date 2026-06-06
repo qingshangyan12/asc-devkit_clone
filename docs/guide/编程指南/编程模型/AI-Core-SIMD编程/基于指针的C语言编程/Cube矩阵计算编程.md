@@ -26,10 +26,10 @@ Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → 
 矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
 针对Atlas A2/A3训练和推理系列产品，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
-![矩阵乘法场景设计的数据格式](../../../../figures/矩阵乘法场景设计的数据格式.png)
+<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
 
 针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
-![矩阵乘法场景涉及的数据格式](../../../../figures/矩阵乘法场景涉及的数据格式.png)
+<img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
 **ND 格式(N-Dimension)**
 
@@ -195,9 +195,11 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 随路量化、ReLU、格式转换、通道拆分合并的有效组合、中间数据类型和数据路径如下图所示。例如，L0C中F32数据通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU，然后经过NZ2NZ/NZ2ND输出到GM。图中F32→F16和F32→BF16为数据类型转换，其他为随路scalar/vector量化模式。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN格式转换。
 针对Atlas A2/A3训练和推理系列产品：
+
 ![L0C2GM搬运](../../../../figures/L0C2GM搬运-AtlasA2A3.png)
 
 针对Ascend 950PR/Ascend 950DT：
+
 ![L0C2GM搬运](../../../../figures/L0C2GM搬运-Ascend950PR.png)
 
 矩阵搬出接口支持多种随路能力组合，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
