@@ -168,13 +168,13 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 <td class="cellrowborder" rowspan="7" valign="top" width="85.32%" headers="mcps1.2.3.1.2 "><p id="p1601381273"><a name="p1601381273"></a><a name="p1601381273"></a>预留的扩展参数，当前因后续架构升级，该参数已废弃，不对其进行业务处理。</p>
 </td>
 </tr>
-<tr id="row15587123719438"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p17440724164219"><a name="p17440724164219"></a><a name="p17440724164219"></a>srcBlkStride</p>
+<tr id="row15587123719438"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p17440724164219"><a name="p17440724164219"></a><a name="p17440724164219"></a>src0BlkStride</p>
 </td>
 </tr>
 <tr id="row117541839174314"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p189333274213"><a name="p189333274213"></a><a name="p189333274213"></a>src1BlkStride</p>
 </td>
 </tr>
-<tr id="row84242104318"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p9159164174210"><a name="p9159164174210"></a><a name="p9159164174210"></a>srcRepStride</p>
+<tr id="row84242104318"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p9159164174210"><a name="p9159164174210"></a><a name="p9159164174210"></a>src0RepStride</p>
 </td>
 </tr>
 <tr id="row6164344144320"><td class="cellrowborder" valign="top" headers="mcps1.2.3.1.1 "><p id="p164911750124215"><a name="p164911750124215"></a><a name="p164911750124215"></a>src1RepStride</p>
