@@ -1,159 +1,96 @@
-# Log10<a name="ZH-CN_TOPIC_0000002044509269"></a>
+# Log10
 
-## 产品支持情况<a name="section1550532418810"></a>
+## 产品支持情况
 
-<a name="table38301303189"></a>
-<table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><a name="p1883113061818"></a><a name="p1883113061818"></a><span id="ph20833205312295"><a name="ph20833205312295"></a><a name="ph20833205312295"></a>产品</span></p>
-</th>
-<th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1272474920205"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1622020982912"><a name="p1622020982912"></a><a name="p1622020982912"></a><span id="ph1522010992915"><a name="ph1522010992915"></a><a name="ph1522010992915"></a>Ascend 950PR/Ascend 950DT</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p37256491200"><a name="p37256491200"></a><a name="p37256491200"></a>√</p>
-</td>
-</tr>
-<tr id="row220181016240"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p48327011813"><a name="p48327011813"></a><a name="p48327011813"></a><span id="ph583230201815"><a name="ph583230201815"></a><a name="ph583230201815"></a><term id="zh-cn_topic_0000001312391781_term1253731311225"><a name="zh-cn_topic_0000001312391781_term1253731311225"></a><a name="zh-cn_topic_0000001312391781_term1253731311225"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115"><a name="zh-cn_topic_0000001312391781_term131434243115"></a><a name="zh-cn_topic_0000001312391781_term131434243115"></a>Atlas A3 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p7948163910184"><a name="p7948163910184"></a><a name="p7948163910184"></a>x</p>
-</td>
-</tr>
-<tr id="row173226882415"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p14832120181815"><a name="p14832120181815"></a><a name="p14832120181815"></a><span id="ph1483216010188"><a name="ph1483216010188"></a><a name="ph1483216010188"></a><term id="zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>x</p>
-</td>
-</tr>
-<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695483941817"><a name="p1695483941817"></a><a name="p1695483941817"></a>x</p>
-</td>
-</tr>
-<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695443971810"><a name="p1695443971810"></a><a name="p1695443971810"></a>x</p>
-</td>
-</tr>
-<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
-</td>
-</tr>
-<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
-</td>
-<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 产品 | 是否支持  |
+| :----------------------- | :------: |
+| <cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter> |
+| <cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
+| <cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
+| <cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x </cann-filter> |
+| <cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x </cann-filter> |
+| <cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter> |
+| <cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter> |
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明
 
-根据mask对输入数据srcReg进行求以10为底的对数操作，将结果写入dstReg。计算公式如下：
+头文件路径：`"basic_api/reg_compute/kernel_reg_compute_vec_unary_intf.h"`。该接口根据mask逐元素对源操作数求以10为底的对数，将结果写入目的操作数。
 
-![](../../../../figures/zh-cn_formulaimage_0000002008231304.png)
+计算公式如下：
 
-## 函数原型<a name="section620mcpsimp"></a>
+$$dstReg_i = \log_{10}(srcReg_i)$$
 
-```
+## 函数原型
+
+```cpp
 template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void Log10(U& dstReg, U& srcReg, MaskReg& mask)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明
 
 **表 1**  模板参数说明
 
-<a name="table4835205712588"></a>
-<table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.43%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="81.57%" id="mcps1.2.3.1.2"><p id="p583535795817"><a name="p583535795817"></a><a name="p583535795817"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1835857145817"><td class="cellrowborder" valign="top" width="18.43%" headers="mcps1.2.3.1.1 "><p id="p5835457165816"><a name="p5835457165816"></a><a name="p5835457165816"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.57%" headers="mcps1.2.3.1.2 "><p id="p168351657155818"><a name="p168351657155818"></a><a name="p168351657155818"></a>操作数数据类型。</p>
-<p id="p1218065664919"><a name="p1218065664919"></a><a name="p1218065664919"></a><span id="ph8180656154911"><a name="ph8180656154911"></a><a name="ph8180656154911"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half、float。</p>
-</td>
-</tr>
-<tr id="row18835145716587"><td class="cellrowborder" valign="top" width="18.43%" headers="mcps1.2.3.1.1 "><p id="p1756419170189"><a name="p1756419170189"></a><a name="p1756419170189"></a>mode</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.57%" headers="mcps1.2.3.1.2 "><div class="p" id="p4367181482310"><a name="p4367181482310"></a><a name="p4367181482310"></a>可配置为MaskMergeMode的枚举或Log10SpecificMode的结构体。<a name="ul1131085281310"></a><a name="ul1131085281310"></a><ul id="ul1131085281310"><li>MaskMergeMode，选择MERGING模式或ZEROING模式。<a name="ul13721340113818"></a><a name="ul13721340113818"></a><ul id="ul13721340113818"><li>ZEROING，mask未筛选的元素在dstReg中置零。</li><li>MERGING，暂不支持。</li></ul>
-</li><li>Log10SpecificMode，定义如下：<pre class="screen" id="screen18481935171419"><a name="screen18481935171419"></a><a name="screen18481935171419"></a>enum class Log10Algo {
-    INTRINSIC = 0,
-    PRECISION_1ULP_FTZ_TRUE,
-    PRECISION_1ULP_FTZ_FALSE,
-};
-struct Log10SpecificMode{
-    MaskMergeMode mrgMode = MaskMergeMode::ZEROING,
-    Log10Algo algo = Log10Algo::INTRINSIC;
-};</pre>
-<a name="ul196783155815"></a><a name="ul196783155815"></a><ul id="ul196783155815"><li>mrgMode：选择MERGING模式或ZEROING模式。</li><li>algo：用于配置Subnormal模式。<a name="ul111801915217"></a><a name="ul111801915217"></a><ul id="ul111801915217"><li>Log10Algo::INTRINSIC、Log10Algo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。</li><li>Log10Algo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。</li></ul>
-</li></ul>
-</li></ul>
-</div>
-</td>
-</tr>
-<tr id="row1043313302213"><td class="cellrowborder" valign="top" width="18.43%" headers="mcps1.2.3.1.1 "><p id="p916243141912"><a name="p916243141912"></a><a name="p916243141912"></a>U</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.57%" headers="mcps1.2.3.1.2 "><p id="p15901115914145"><a name="p15901115914145"></a><a name="p15901115914145"></a><span id="ph19851723182011"><a name="ph19851723182011"></a><a name="ph19851723182011"></a>目的操作数的RegTensor类型，例如RegTensor&lt;half&gt;，由编译器自动推导，用户不需要填写。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。 |
+| mode | 可配置为MaskMergeMode的枚举或Log10SpecificMode的结构体。<br>&bull; MaskMergeMode，选择MERGING模式或ZEROING模式。<br>&nbsp;&nbsp;&bull; ZEROING，mask未筛选的元素在dstReg中置零。<br>&nbsp;&nbsp;&bull; MERGING，暂不支持。<br>&bull; Log10SpecificMode，定义如下：<pre><code>enum class Log10Algo {<br>    INTRINSIC = 0,<br>    PRECISION_1ULP_FTZ_TRUE,<br>    PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct Log10SpecificMode{<br>    MaskMergeMode mrgMode = MaskMergeMode::ZEROING,<br>    Log10Algo algo = Log10Algo::INTRINSIC;<br>};</code></pre>&bull; mrgMode：选择MERGING模式或ZEROING模式。<br>&bull; algo：用于配置Subnormal模式。<br>&nbsp;&nbsp;&bull; Log10Algo::INTRINSIC、Log10Algo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&nbsp;&nbsp;&bull; Log10Algo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。 |
+| U | 目的操作数的RegTensor类型，例如RegTensor&lt;half&gt;，由编译器自动推导，用户不需要填写。 |
 
 **表 2**  参数说明
 
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.05%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p108051250181214"><a name="p108051250181214"></a><a name="p108051250181214"></a>dstReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-</td>
-</tr>
-<tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p19574165615129"><a name="p19574165615129"></a><a name="p19574165615129"></a>srcReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-<p id="p1484485824312"><a name="p1484485824312"></a><a name="p1484485824312"></a>源操作数的数据类型需要与目的操作数保持一致。</p>
-</td>
-</tr>
-<tr id="row19615183817191"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p1484519586432"><a name="p1484519586432"></a><a name="p1484519586432"></a>mask</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+| --- | --- | --- |
+| dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
+| srcReg | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。|
+| mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
+## 数据类型
 
-src输入为-0时，输出-inf。
+**表 3**  数据类型组合
 
-## 调用示例<a name="section642mcpsimp"></a>
+| srcReg | dstReg |
+| --- | --- |
+| half | half |
+| float | float |
 
-```
+## 约束说明
+
+- 支持操作数重叠。
+- 本接口不涉及地址对齐。
+- src输入为-0时，输出-inf。
+
+## 理论性能说明
+
+该接口为软仿实现，不提供理论性能。
+
+## 关键特性说明
+
+**精度提升**
+
+当源操作数数据类型为half时，将half提升精度到float后进行计算，在将结果转为half后输出。
+
+**最大精度误差**
+
+- Log10Algo::INTRINSIC、Log10Algo::PRECISION_1ULP_FTZ_TRUE，最大精度误差为1ULP。
+- Log10Algo::PRECISION_1ULP_FTZ_FALSE，最大精度误差为1ULP。
+
+**配置Subnormal模式**
+
+- Log10Algo::INTRINSIC、Log10Algo::PRECISION_1ULP_FTZ_TRUE，不支持Subnormal计算，所有Subnormal被近似为0。
+- Log10Algo::PRECISION_1ULP_FTZ_FALSE，最大精度误差为1ULP，支持Subnormal计算。
+
+## 调用示例
+
+完整调用示例待补充。
+
+```cpp
 template<typename T>
-__simd_vf__ inline void Log10VF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
+__simd_vf__ inline void Log10VF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count,
  uint32_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::RegTensor<T> srcReg;
@@ -161,7 +98,7 @@ __simd_vf__ inline void Log10VF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32
     AscendC::Reg::MaskReg mask;
     // Subnormal模式
     // static constexpr AscendC::Reg::Log10SpecificMode mode = {MaskMergeMode::ZEROING, Log10Algo::PRECISION_1ULP_FTZ_FALSE};
-    for (uint16_t i = 0; i < repeatTimes; i++) {     
+    for (uint16_t i = 0; i < repeatTimes; i++) {
         mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
         AscendC::Reg::Log10(dstReg, srcReg, mask);
