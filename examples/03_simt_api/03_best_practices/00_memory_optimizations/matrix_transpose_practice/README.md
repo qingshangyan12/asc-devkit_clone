@@ -239,7 +239,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 **核心实现**：
 
 - GM到UB阶段与Case 2完全一致
-- 差异只在UB布局，从32×32改成32×33
+- 差异只在UB布局，从32×32改成32×34
 - 同步后，从UB写回到GM与Case 2完全一致
 - 该版本没有改变算法路径，也没有改变block和线程切分，只是调整了UB中的物理布局
 
@@ -249,31 +249,31 @@ UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两�
 
 <img src="./figures/bank结构示意图.png">
 
-对SIMT来说，最关键的是同一条UB访问指令下，同一Warp的并发线程是否会集中访问少数几个bank。
+在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B，判断是否冲突的关键是同一条UB访问指令下，同一Warp的并发线程是否会集中访问少数几个sub bank。
 
-- **读写冲突**：读操作和写操作同时尝试访问同一个bank。
-- **写写冲突**：多个写操作同时尝试访问同一个bank group。
-- **读读冲突**：两个读操作同时尝试访问同一个bank，或者两个以上读操作同时尝试访问同一个bank group。
+- **读写冲突**：读操作和写操作同时尝试访问同一个bank下的同一个sub bank。
+- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的sub bank。
+- **读读冲突**：两个读操作同时尝试访问同一个bank下的同一个sub bank，或者两个以上读操作同时尝试访问同一个bank group的相同编号的sub bank。
 
 由于本样例中的tile很小：
 
 - `32×32×4B = 4096B`
-- `32×33×4B = 4224B`
+- `32×34×4B = 4352B`
 
 远小于128KB，所以一个tile通常只会落在前128KB区域内。在本文分析里，可以把它近似看成只使用 `bank0~bank7`。
 
-case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示了前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank，也就是一个bank会有16个线程同时访问，产生大量的读冲突。
+case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示了前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank中的两个sub bank，也就是一个sub bank会有16个线程同时访问，产生大量的读冲突。
 
 <img src="./figures/case2bank.png">
 
-case 3中对UB中的tile数组增加一列padding，由每行32个元素改为33个元素，其在UB上的排列如下图所示。由于每行有33个元素跨越5个bank存储，此时同一列的元素会被错开排布在不同的bank。case 3中在访问UB时，32个线程的访问会被分布到8个bank中，也就是一个bank会有4个线程同时访问，大大降低了冲突的规模。
+case 3中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素跨越17个sub bank存储，此时同一列的元素会被错开排布在不同的sub bank。case 3中在访问UB时，32个线程的访问会被分布到32个sub bank中，也就是同一条访问指令下一个sub bank仅会有一个线程访问，大大降低了冲突的规模。
 
 <img src="./figures/case3bank.png">
 
 **关键代码**：
 
 ```cpp
-__ubuf__ float tile[TILE_DIM][TILE_DIM + 1];
+__ubuf__ float tile[TILE_DIM][TILE_DIM + 2];
 
 tile[threadIdx.y][threadIdx.x] = input[index_in];
 asc_syncthreads();
@@ -287,7 +287,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 **优化手段**：
 
-- 对UB tile增加+1 padding，使每行stride从32个float变为33个float
+- 对UB tile增加+2 padding，使每行stride从32个float变为34个float
 - 通过改变UB中同一列元素的bank分布，降低同一Warp转置读阶段集中访问少数bank的概率
 
 **性能数据**：
@@ -301,7 +301,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 - 相比Case 2的transpose_coalesced_kernel，Task Duration从35.945us降低到26.725us，耗时下降约25.7%，整体性能提升约1.35倍
 - Case 3在Case 2的基础上通过padding降低UB转置读阶段的bank冲突，因此端到端Task Duration继续下降
 - 相比Case 1的naive transpose，Case 3的Task Duration下降约55.8%，整体性能提升约2.26倍，说明“GM访存合并 + UB bank冲突降低”两步优化在端到端耗时上叠加生效
-- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步以及UB读写时仍然存在的少量bank冲突
+- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步
 
 ---
 
@@ -332,8 +332,10 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-- 配置环境变量  
+- 配置环境变量
+  
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -350,13 +352,12 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;  # 编译工程
   ./matrix_transpose                   # 执行样例
   ```
-
 - 编译选项说明
 
-  | 选项             | 可选值      | 说明              |
-  | ---------------- | ----------- | ----------------- |
+  | 选项                        | 可选值       | 说明                                                         |
+  | --------------------------- | ------------ | ------------------------------------------------------------ |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM` | `0`-`3` | 样例类型，默认为3 |
+  | `SCENARIO_NUM`            | `0`-`3`  | 样例类型，默认为3                                            |
 
   执行结果如下，说明精度对比成功。
 
