@@ -99,7 +99,7 @@ extern __ubuf__ char dynamic_buffer[];
 - 如果src0的地址为0x10020，src1的地址为0x20020，则src0分配在bank17，src1分配在bank33，从图上可以看到，这两个bank在同一个bank group内，产生读读冲突。
 - 如果dst的地址为0x10020，每次加法计算8个data block，如果每个data block的间隔stride为16，则dst的每个data block都在一个bank group内，执行该条指令时将会产生写写冲突。
   
-![Unified_Buffer地址分配示意图](Unified_Buffer地址分配示意图.png)
+![Unified_Buffer地址分配示意图](../../../../figures/Unified_Buffer地址分配示意图.png)
 
 ---
 
@@ -197,7 +197,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer，64字节对齐
 
 以`FRACTAL_NZ`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
 
-![FRACTAL_NZ内存排布示意图](FRACTAL_NZ内存排布示意图.png)
+![FRACTAL_NZ内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
 ---
 
 ### 2.5 寄存器（Register）
@@ -424,7 +424,7 @@ if ASCEND_IS_AIV {
 
 AI Core分为AIC和AIV两个独立的核，分别用于矩阵计算和向量计算。以下图为例(NPU架构版本3510), AIC核与AIV核的配比为1:2。
 
-![硬件架构图3510](硬件架构图3510.png)
+![硬件架构图3510](../../../../figures/硬件架构图3510.png)
 
 Cube计算单元和Vector计算单元分别部署在AIC核和AIV核上，每个核都有自己的Scalar单元，能独立加载自己的代码段。
 
@@ -508,7 +508,7 @@ Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下�
 
 C语言编程针对矩阵计算编程模型提供了四类接口，分别承载CUBE核中各个通路的搬运和计算能力，如下图所示：
 
-![普通矩阵基础计算流程图](普通矩阵基础计算流程图.png)
+![普通矩阵基础计算流程图](../../../../figures/普通矩阵基础计算流程图.png)
 
 首先通过数组的方式申请L1 Buffer、L0A Buffer、L0B Buffer等资源。
 ```c

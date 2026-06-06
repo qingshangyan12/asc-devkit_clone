@@ -4,7 +4,7 @@
 
 AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。矢量计算通过Vector计算单元完成，源操作数和目的操作数均通过Unified Buffer（UB）存储。
 
-![硬件架构图3510](硬件架构图3510.png)
+![硬件架构图3510](../../../../figures/硬件架构图3510.png)
 
 ## Memory矢量计算数据流
 
@@ -61,7 +61,7 @@ asc_copy_gm2ub(dst_ub, src_gm, size);
 
 **高维切分数据搬运**提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如将上述示例中的src_gm数据修改为(shape(16, 200)，数据类型为half)，则无法通过`asc_copy_gm2ub`完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`asc_copy_gm2ub_align`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
 
-![非对齐搬入能力](非对齐搬入能力.png)
+![非对齐搬入能力](../../../../figures/非对齐搬入能力.png)
 以上图为例, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
 在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
 ```c
@@ -88,7 +88,7 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-![Memory矢量计算模式示意图](Memory矢量计算模式示意图.png)
+![Memory矢量计算模式示意图](../../../../figures/Memory矢量计算模式示意图.png)
 
 ### 高维切分
 高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等, 能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
@@ -96,17 +96,17 @@ Memory矢量计算提供连续计算和高维切分两种计算模式，并可�
 - 迭代控制
 Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
 
-![DataBlock迭代示意图](DataBlock迭代示意图.png)
+![DataBlock迭代示意图](../../../../figures/DataBlock迭代示意图.png)
 
 矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。由于硬件限制，repeat_time不能超过255。
 
-![2次迭代Exp计算示意图](2次迭代Exp计算示意图.png)
+![2次迭代Exp计算示意图](../../../../figures/2次迭代Exp计算示意图.png)
 
 - 掩码设置
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。关于掩码的详细介绍请参考掩码。
 
-![掩码操作示意图](掩码操作示意图.png)
+![掩码操作示意图](../../../../figures/掩码操作示意图.png)
 
 - 地址间隔配置
 
@@ -116,30 +116,30 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 1. 连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
 2. 非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同`data_block`之间在读取数据时出现一个`data_block`的间隔，如下图所示。
 
-![data_block_stride示例](data_block_stride示例.png)
+![data_block_stride示例](../../../../figures/data_block_stride示例.png)
 
 > 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个data_block。
 
 下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
 
-![单次迭代内源和目的操作数读写示例](单次迭代内源和目的操作数读写示例.png)
+![单次迭代内源和目的操作数读写示例](../../../../figures/单次迭代内源和目的操作数读写示例.png)
 
 **repeat_stride**是指相邻迭代间相同`data_block`的地址步长。
 1. 连续计算场景：假设定义一个Unified Buffer供目的操作数和源操作数同时使用（即地址重叠），`repeat_stride`取值为8。此时，矢量计算单元第一次迭代读取连续8个`data_block`，第二轮迭代读取下一个连续的8个`data_block`，通过多次迭代即可完成所有输入数据的计算。
-![repeat_stride连续计算场景](repeat_stride连续计算场景.png)
+![repeat_stride连续计算场景](../../../../figures/repeat_stride连续计算场景.png)
 
 2. 非连续计算场景：`repeat_stride`取值大于8（如取10）时，则相邻迭代间矢量计算单元读取的数据在地址上不连续，出现2个`data_block`的间隔。
-![repeat_stride非连续计算场景](repeat_stride非连续计算场景.png)
+![repeat_stride非连续计算场景](../../../../figures/repeat_stride非连续计算场景.png)
 
 3. 反复计算场景：`repeat_stride`取值为0时，矢量计算单元会对首个连续的8个`data_block`进行反复读取和计算。
-![repeat_stride反复计算场景](repeat_stride反复计算场景.png)
+![repeat_stride反复计算场景](../../../../figures/repeat_stride反复计算场景.png)
 
 4. 部分重复计算：`repeat_stride`取值大于0且小于8时，相邻迭代间部分数据会被矢量计算单元重复读取和计算，此种情形一般场景不涉及。
-![repeat_stride部分重复计算](repeat_stride部分重复计算.png)
+![repeat_stride部分重复计算](../../../../figures/repeat_stride部分重复计算.png)
 
 当repeatTime大于1，需要多次迭代完成矢量计算时，开发者可以根据不同的使用场景合理设置repeatStride的值。下图给出了多次迭代间非连续场景的示意图，示例中源操作数和目的操作数的repeatStride均配置为9，表示相邻迭代间相同DataBlock起始地址之间的间隔为9个DataBlock。相同DataBlock是指DataBlock在迭代内的位置相同，比如下图中的src1和src9处于相邻迭代，在迭代内都是第一个DataBlock的位置，其间隔即为repeatStride的数值。
 
-![多次迭代非连续场景示意图](多次迭代非连续场景示意图.png)
+![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图.png)
 
 C语言编程提供C风格的编程接口, `repeat_stride`和`data_block_stride`都通过入参的形式传递给计算接口；
 ```c
