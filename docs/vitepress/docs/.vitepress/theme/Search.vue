@@ -103,7 +103,7 @@ function inlineSearch() {
 
 const chineseRegex = /[\u4E00-\u9FA5]/g
 function chineseSearchOptimize(input: string) {
-  return input.replace(chineseRegex, ' $& ').replace(/\s+/g, ' ').trim()
+  return input.replace(chineseRegex, '\u200A$&\u200A').replace(/\s+/g, '\u200A').trim()
 }
 
 const searchDelayTime = computed(() => finalSearchConfig.value?.delay ?? 300)
@@ -277,7 +277,7 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
       <span class="search-tip">{{
         finalSearchConfig?.btnPlaceholder || 'Search'
       }}</span>
-      <span class="metaKey"> {{ metaKey }} K </span>
+      <span v-if="metaKey" class="metaKey"> {{ metaKey }} K </span>
     </div>
     <ClientOnly>
       <Command.Dialog :visible="searchModal" theme="algolia">
