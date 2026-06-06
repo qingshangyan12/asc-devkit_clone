@@ -91,12 +91,10 @@ public:
             Std::is_same_v<typename trait::indexPos, CastIndexPos::PartP0>),
             Std::ignore_t, typename trait::indexPos>;
 
-        using condition = Std::tuple<srcType, dstType, roundMode, satMode, indexPos>;
-
-        using func = CastTrait2CastFunc::template Get<condition>;
+        using func = CastTrait2CastFunc::template Lookup<srcType, dstType, roundMode, satMode, indexPos>;
         static_assert(!Std::is_same_v<func, Std::ignore_t>,
             "Unsupported cast trait: no matching entry found in CastTrait2CastFunc.");
-        Transform2CastVF<func, condition>::template Run(dst, src);
+        Transform2CastVF<func, Std::ignore_t>::template Run(dst, src);
     }
 };
 
