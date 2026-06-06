@@ -33,10 +33,10 @@ Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → 
 
 **ND 格式(N-Dimension)**
 
-ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为NZ格式以适配Cube计算单元。
+ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube计算单元。
 
 **Nz 格式**
-NZ格式主要用于L1 Buffer和L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
+Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
 ![Nz数据排布格式](../../../../figures/Nz数据排布格式.png)
 
@@ -45,10 +45,10 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 > 📌 Nz格式在不同Buffer中的应用场景：
 > - **L0C Buffer**: 存储矩阵乘法结果。分形形状为16×16（256元素），适合Cube计算单元高效运算。
 > - **L1 Buffer**: 存储中间数据。分形形状为16×(32B/sizeof(DataType))，大小512字节，便于转换为Zz和Zn格式。
-> - **L0A Buffer（仅Ascend 950PR/950DT）**: 存储左矩阵。
+> - **L0A Buffer（仅Ascend 950PR/Ascend 950DT）**: 存储左矩阵。
 
 **Zz 格式**
-针对Atlas A2/A3训练和推理系列产品，L0A Buffer使用此格式（Ascend 950PR/950DT使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
+针对Atlas A2/A3训练和推理系列产品，L0A Buffer使用此格式（Ascend 950PR/Ascend 950DT使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
 ![Zz 格式(以half类型为例)](../../../../figures/Zz格式-以half类型为例.png)
 
@@ -76,12 +76,12 @@ Zn格式主要用于L0B Buffer中存放数据, 如果离线处理好的右矩阵
   M 轴填充： 原始 M=40 不能被 16 整除，需向上补齐至 48（16 x 3）。
   K 轴填充： 原始 K=56 不能被 16 整除，需向上补齐至 64（16 x 4）。
   图中灰色区域即为补齐产生的无效数据（Padding），白色区域为原始有效数据。
-- 重排布 (NZ 格式)：
+- 重排布 (Nz 格式)：
   右侧 L1 Buffer 中，数据被重组为 3 x 4 个分形块。
   Z 字流动： 每个 16 x 16 的小方块内部，以及方块之间，均按照特定的 Z 字形顺序存储（如图中折线箭头所示），完成了从“线性”到“分形”的物理映射，做好了进入 Cube 计算的准备。
 
 Ascend C编程中直接提供了`Global Memory`到`L1 Buffer`中的C语言编程接口，通过该接口可以直接将`Global Memory`数据搬入`L1 Buffer`并完成ND2NZ格式转换。
-C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950DT/Ascend 950RP上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN到NZ的格式转换搬运。
+C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950PR/Ascend 950DT上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN到Nz的格式转换搬运。
 
 ## 矩阵搬运能力说明
 
@@ -95,17 +95,18 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 | 数据通路 | 功能    | C语言编程接口  | 分行支持情况 |
 |---------|---------|---------------|-------------|
 | gm2l1   | 随路转换ND2NZ搬运  | `asc_copy_gm2l1_nd2nz` | ![ND->Nz](../../../../figures/ND-Nz.png) |
-| l12l0a  | 高维切分数据搬运  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png) Ascend 950DT/Ascend 950RP上L0A分形为Nz, 搬运时为Nz-Nz |
+| l12l0a  | 高维切分数据搬运  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png) Ascend 950PR/Ascend 950DT上L0A分形为Nz, 搬运时为Nz-Nz |
 | l12l0b  | 非对齐数据搬运  | `asc_copy_l12l0b` | ![Nz->Zn](../../../../figures/Nz-Zn.png)|
 
 **GM2L1 随路转换ND2NZ搬运**
 
-该能力主要实现将矩阵从`Global Memory`搬运至`L1 Buffer`，并支持在数据搬运时进行ND到NZ格式的转换。
+该能力主要实现将矩阵从`Global Memory`搬运至`L1 Buffer`，并支持在数据搬运时进行ND到Nz格式的转换。
 
 该能力通过`asc_copy_gm2l1_nd2nz`接口实现，配置`src_nd_matrix_stride`、`src_d_value`等参数完成GM2L1搬运和ND2NZ格式转换。
 
 ![GM到L1的ND2NZ搬运示例](../../../../figures/GM到L1的ND2NZ搬运示例.png)
-以上图为例, 实现A矩阵(Shape(16, 23), 数据类型为half)从GM搬运到L1的能力, 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品 和 Atlas A3 训练系列产品/Atlas A3 推理系列产品, 调用接口如下：
+
+以上图为例, 实现A矩阵(Shape(16, 23), 数据类型为half)从GM搬运到L1的能力, 针对Atlas A2/A3训练和推理系列产品, 调用接口如下：
 
 ```c
 // 分配L1 Buffer空间, m方向为16， n方向 23向上对齐为32
@@ -115,9 +116,9 @@ __cbuf__ half dst[m * k];
 
 // 通过asc_set_gm2l1_nz_para接口对dst矩阵(L1 Buffer)进行参数设置
 constexpr uint64_t dst_nz_matrix_stride = 0, dst_nz_c0_stride = 16, dst_nz_n_stride = 1, dst_nd_num = 1;
-// 目的矩阵中，相邻NZ矩阵起始地址的偏移
+// 目的矩阵中，相邻Nz矩阵起始地址的偏移
 constexpr uint64_t nz_config = static_cast<uint64_t>(dst_nz_matrix_stride) << 48;
-// ND转换为NZ格式后，目的NZ矩阵中相邻Z矩阵起始地址的偏移
+// ND转换为Nz格式后，目的Nz矩阵中相邻Z矩阵起始地址的偏移
 nz_config |= static_cast<uint64_t>(dst_nz_c0_stride) << 32;
 nz_config |= static_cast<uint64_t>(dst_nz_n_stride) << 16;
 nz_config |= static_cast<uint64_t>(dst_nd_num);
@@ -168,7 +169,7 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_ste
 
 搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](../../../../../api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
 
-当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（Ascend 950RP/950DT），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
+当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（Ascend 950PR/Ascend 950DT），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
 ![需要转置的处理场景](../../../../figures/需要转置的处理场景.png)
 ```c
@@ -178,11 +179,11 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 ### 矩阵搬出能力
 
-矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、格式转换等操作，通常在Mmad接口后使用。针对Ascend 950PR/950DT，还支持L0C到UB Buffer的传输。
+矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、格式转换等操作，通常在Mmad接口后使用。针对Ascend 950PR/Ascend 950DT，还支持L0C到UB Buffer的传输。
 
-搬出接口支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等。开发者通过配置参数控制搬运路径、位置、长度等，充分利用硬件能力。针对Ascend 950PR/950DT，还支持NZ2DN格式转换和UB双目标模式。
+搬出接口支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等。开发者通过配置参数控制搬运路径、位置、长度等，充分利用硬件能力。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN格式转换和UB双目标模式。
 
-针对AtlasA3训练系列产品/AtlasA3推理系列产品和AtlasA2训练系列产品/AtlasA2推理系列产品：
+针对Atlas A2/A3训练和推理系列产品：
 
 ![矩阵搬出流程](../../../../figures/矩阵搬出流程-AtlasA2A3.png)
 
@@ -192,7 +193,7 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 矩阵搬出接口支持多种随路能力组合。以L0C到Global Memory为例：矩阵计算结果存放在L0C Buffer，需搬运至GM，支持随路格式转换等操作。
 
-随路量化、ReLU、格式转换、通道拆分合并的有效组合、中间数据类型和数据路径如下图所示。例如，L0C中F32数据通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU，然后经过NZ2NZ/NZ2ND输出到GM。图中F32→F16和F32→BF16为数据类型转换，其他为随路scalar/vector量化模式。针对Ascend 950PR/950DT，还支持NZ2DN格式转换。
+随路量化、ReLU、格式转换、通道拆分合并的有效组合、中间数据类型和数据路径如下图所示。例如，L0C中F32数据通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU，然后经过NZ2NZ/NZ2ND输出到GM。图中F32→F16和F32→BF16为数据类型转换，其他为随路scalar/vector量化模式。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN格式转换。
 针对Atlas A2/A3训练和推理系列产品：
 ![L0C2GM搬运](../../../../figures/L0C2GM搬运-AtlasA2A3.png)
 
@@ -201,7 +202,7 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 矩阵搬出接口支持多种随路能力组合，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
 
-1. L0C2GM数据搬出接口，支持配置随路量化、ReLU激活、NZ到ND格式转换：
+1. L0C2GM数据搬出接口，支持配置随路量化、ReLU激活、Nz到ND格式转换：
 ```c
 __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float *src_addr,
                         uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl,
@@ -232,7 +233,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 `asc_mmad`是Ascend C的矩阵乘加核心接口，封装NPU硬件计算能力，用于全连接层、卷积层等算子开发。
 
-`asc_mmad`实现矩阵乘加计算：C = A × B + C。输入为L0A Buffer和L0B Buffer，输出为L0C Buffer。针对Atlas A2/A3训练和推理系列产品，L0A Buffer分形为Zz，L0B Buffer分形为Zn，L0C Buffer分形为Nz。Ascend 950PR/950DT产品L0A Buffer分形为Nz。
+`asc_mmad`实现矩阵乘加计算：C = A × B + C。输入为L0A Buffer和L0B Buffer，输出为L0C Buffer。针对Atlas A2/A3训练和推理系列产品，L0A Buffer分形为Zz，L0B Buffer分形为Zn，L0C Buffer分形为Nz。Ascend 950PR/Ascend 950DT产品L0A Buffer分形为Nz。
 
 ![Ascend 950PR/Ascend 950DT `asc_mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
@@ -291,7 +292,7 @@ extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ ha
     
 // 1. 将A矩阵从GM中搬运到L1中
 // 1.1 设置L1 Buffer中的参数, 其中dst_nd_num为1, 只有一块ND块，所以dst_nz_matrix_stride为0, dst_nz_c0_stride为相邻Z矩阵的起始地址，偏移为16个C0_SIZE,
-// dst_nz_n_stride 表示NZ矩阵中相邻行起始地址的偏移，为1个C0_SIZE。
+// dst_nz_n_stride 表示Nz矩阵中相邻行起始地址的偏移，为1个C0_SIZE。
     constexpr uint64_t dst_nz_matrix_stride = 0, dst_nz_c0_stride = 16, dst_nz_n_stride = 1, dst_nd_num = 1;
     constexpr uint64_t nz_config = static_cast<uint64_t>(dst_nz_matrix_stride) << 48;
     nz_config |= static_cast<uint64_t>(dst_nz_c0_stride) << 32;

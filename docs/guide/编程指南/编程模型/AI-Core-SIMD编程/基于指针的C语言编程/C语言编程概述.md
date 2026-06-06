@@ -29,7 +29,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 **Cube矩阵计算**：采用「Global Memory → L1/L0系列Buffer」两级层级，其中L1 Buffer、L0A/L0B Buffer、L0C Buffer均服务于矩阵计算。
 
-**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/950DT引入寄存器后构建「Global Memory → UB → Register」三级层级。**Global Memory**存放输入输出数据，**UB**作为矢量计算数据枢纽，**Register**位于Vector计算单元最内层，具备最低访存延迟与最高带宽。
+**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → UB → Register」三级层级。**Global Memory**存放输入输出数据，**UB**作为矢量计算数据枢纽，**Register**位于Vector计算单元最内层，具备最低访存延迟与最高带宽。
 
 <img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
@@ -190,14 +190,14 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer，64字节对齐
 ```
 
 同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式：
-- L1 Buffer  : FRACTAL_NZ
-- L0A Buffer : FRACTAL_NZ (Ascend 950PR/Ascend 950DT架构该内存分形为NZ, Ascend 910B为ZZ分形)
-- L0B Buffer : FRACTAL_ZN
-- L0C Buffer : FRACTAL_NZ
+- L1 Buffer  : FRACTAL_Nz
+- L0A Buffer : FRACTAL_Nz (Ascend 950PR/Ascend 950DT架构该内存分形为Nz, Atlas A2/A3训练和推理系列产品为Zz分形)
+- L0B Buffer : FRACTAL_Zn
+- L0C Buffer : FRACTAL_Nz
 
-以`FRACTAL_NZ`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
+以`FRACTAL_Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
 
-![FRACTAL_NZ内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
+![FRACTAL_Nz内存排布示意图](../../../../figures/FRACTAL_Nz内存排布示意图.png)
 ---
 
 ### 2.5 寄存器（Register）
@@ -285,13 +285,13 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 | 核内同步 | 内存顺序访问控制 | `asc_sync_data_barrier` | 后续执行指令对前序的内存访问存在数据依赖时控制同步 |
 
 
-> 📌 流水互斥同步自Ascend 950PR/950DT引入
+> 📌 流水互斥同步自Ascend 950PR/Ascend 950DT引入
 
 ---
 
 #### 流水互斥同步
 
-该同步能力从Ascend 950PR/950DT开始引入并使用，AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。
+该同步能力从Ascend 950PR/Ascend 950DT开始引入并使用，AI Core提供了类似传统CPU中锁机制的同步能力。通过锁定指定流水再释放流水来完成流水间的同步依赖。
 
 - `asc_lock`：根据`mutex_id`获取Mutex，并阻塞当前流水指令队列，直到对应的`mutex_id`被Unlock
 - `asc_unlock`：等待当前流水的前置指令退出后，根据`mutex_id`释放对应的Mutex
@@ -520,7 +520,7 @@ __cc__ float c_l0c[BLOCK_M * BLOCK_N];   // L0C output
 
 ```
 
-1. 通过`asc_copy_gm2l1_nd2nz`接口将A、B原始矩阵的GM数据搬运到L1 Buffer中（如果存在Bias/随路量化，则同样通过DataCopy搬运到L1 Buffer中, L1 Buffer必须为NZ分形）。
+1. 通过`asc_copy_gm2l1_nd2nz`接口将A、B原始矩阵的GM数据搬运到L1 Buffer中（如果存在Bias/随路量化，则同样通过DataCopy搬运到L1 Buffer中, L1 Buffer必须为Nz分形）。
 ```c
 asc_copy_gm2l1(a_l1, a_gm, BLOCK_M * BLOCK_K);  // GM to L1
 asc_copy_gm2l1(b_l1, b_gm, BLOCK_K * BLOCK_N);  // GM to L1

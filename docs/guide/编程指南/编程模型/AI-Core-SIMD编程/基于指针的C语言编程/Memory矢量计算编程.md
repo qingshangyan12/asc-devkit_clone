@@ -1,6 +1,6 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用语言扩展C API编写基于Unified Buffer（以下简称UB）的**矢量计算代码**，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程，该能力主要在Ascend 910B上提供。
+本文介绍如何在Ascend C中使用语言扩展C API编写基于Unified Buffer（以下简称UB）的**矢量计算代码**，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程，该能力主要在Atlas A2/A3训练和推理系列产品上提供。
 
 AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。矢量计算通过Vector计算单元完成，源操作数和目的操作数均通过Unified Buffer（UB）存储。
 
@@ -50,7 +50,7 @@ uint16_t dst_stride = 256 * sizeof(half) / 32;
 
 asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 ```
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Ascend 910B使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 **连续数据搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据大小（字节）即可。例如src_gm数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`asc_copy_gm2ub`直接调用：
 ```c
