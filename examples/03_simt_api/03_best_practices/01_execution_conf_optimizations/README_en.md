@@ -8,4 +8,4 @@ Operator execution configuration optimization introduces gridDim/blockDim relate
 
 | Directory Name                                        | Description                                                                                                                                      |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [sincos_compute](./max_thread_config/sincos_compute) | This example uses sincos computation as an example to compare performance differences between using default values and 512 for \_\_launch_bounds__, demonstrating the impact of register spilling on performance in SIMT programming and methods for configuring maximum thread blocks. |
+| [sincos_compute](./max_thread_config/sincos_compute) | This example uses sincos computation as an example to compare performance differences between using default values and 512 for \_\_launch_bounds__, demonstrating the impact of register spilling on performance in SIMT programming and methods for configuring maximum thread count per block. |
