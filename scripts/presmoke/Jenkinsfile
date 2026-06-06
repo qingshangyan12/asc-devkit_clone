@@ -3,7 +3,7 @@
 //
 // Assumptions:
 //   - Jenkins starts from an empty or reusable workspace and clones asc-devkit
-//     into REPO_DIR during this pipeline.
+//     into workspace/asc-devkit during this pipeline.
 //   - The selected node already has CANN and device access prepared.
 //   - One build runs one presmoke mode: npu or cpu.
 // ============================================================================
@@ -12,10 +12,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: 'https://gitcode.com/cann/asc-devkit.git', trim: true, description: 'asc-devkit git repository URL.')
         string(name: 'GIT_BRANCH', defaultValue: 'master', trim: true, description: 'Branch or tag to test.')
-        string(name: 'GIT_CREDENTIALS_ID', defaultValue: 'gitcode_http_key', trim: true, description: 'Jenkins username/password credential id for git clone.')
-        string(name: 'REPO_DIR', defaultValue: 'asc-devkit', trim: true, description: 'Repository directory under workspace.')
         choice(name: 'ARCH', choices: ['dav-2201', 'dav-3510'], description: 'Target architecture: dav-2201 for 910B, dav-3510 for 950.')
         choice(name: 'MODES', choices: ['npu', 'cpu'], description: 'Presmoke execution mode.')
         string(name: 'PRIMARY_CARD', defaultValue: '0', trim: true, description: 'Primary NPU card id for npu mode.')
@@ -39,27 +36,20 @@ pipeline {
     stages {
         stage('clone asc-devkit') {
             steps {
-                withCredentials([usernamePassword(credentialsId: params.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD')]) {
-                    sh '''#!/usr/bin/env bash
-                        set -euo pipefail
-                        rm -rf "${REPO_DIR}"
-                        repo_url="${GIT_URL#https://}"
-                        repo_url="${repo_url#http://}"
-                        git clone --depth 1 --branch "${GIT_BRANCH}" "https://${GIT_USER}:${GIT_PASSWORD}@${repo_url}" "${REPO_DIR}"
-                    '''
-                }
+                sh '''#!/usr/bin/env bash
+                    set -euo pipefail
+                    rm -rf asc-devkit
+                    git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/cann/asc-devkit.git asc-devkit
+                '''
             }
         }
 
         stage('prepare') {
             steps {
                 script {
-                    env.ASC_DEVKIT_DIR = params.REPO_DIR ?: "asc-devkit"
                     env.PRESMOKE_OUT_ROOT = "presmoke_reports/jenkins_${env.BUILD_NUMBER}_${params.ARCH}_${params.MODES}"
-                    env.PRESMOKE_JUNIT_PATTERN = "${env.ASC_DEVKIT_DIR}/presmoke_reports/**/junit.xml"
-                    env.PRESMOKE_ARCHIVE_PATTERN = "${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.md, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.tsv, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.xml, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.json, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.log"
                 }
-                dir("${env.ASC_DEVKIT_DIR}") {
+                dir('asc-devkit') {
                     sh '''#!/usr/bin/env bash
                         set -euo pipefail
                         rm -rf "${PRESMOKE_OUT_ROOT}"
@@ -74,7 +64,7 @@ pipeline {
             steps {
                 script {
                     int rc = 0
-                    dir("${env.ASC_DEVKIT_DIR}") {
+                    dir('asc-devkit') {
                         rc = sh(
                             returnStatus: true,
                             script: '''#!/usr/bin/env bash
@@ -97,7 +87,7 @@ pipeline {
                     echo "presmoke rc=${rc}; report=${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md"
                     if (rc != 0) {
                         catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                            error("presmoke failed with rc=${rc}; see ${env.ASC_DEVKIT_DIR}/${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md")
+                            error("presmoke failed with rc=${rc}; see asc-devkit/${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md")
                         }
                     }
                 }
@@ -107,9 +97,9 @@ pipeline {
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: "${env.PRESMOKE_JUNIT_PATTERN ?: 'asc-devkit/presmoke_reports/**/junit.xml'}"
+            junit allowEmptyResults: true, testResults: 'asc-devkit/presmoke_reports/**/junit.xml'
             archiveArtifacts allowEmptyArchive: true, fingerprint: true,
-                artifacts: "${env.PRESMOKE_ARCHIVE_PATTERN ?: 'asc-devkit/presmoke_reports/**/*.md, asc-devkit/presmoke_reports/**/*.tsv, asc-devkit/presmoke_reports/**/*.xml, asc-devkit/presmoke_reports/**/*.json, asc-devkit/presmoke_reports/**/*.log'}"
+                artifacts: 'asc-devkit/presmoke_reports/**/*.md, asc-devkit/presmoke_reports/**/*.tsv, asc-devkit/presmoke_reports/**/*.xml, asc-devkit/presmoke_reports/**/*.json, asc-devkit/presmoke_reports/**/*.log'
             echo "===== Final: ${currentBuild.currentResult} (duration: ${currentBuild.durationString}) ====="
         }
         success {
