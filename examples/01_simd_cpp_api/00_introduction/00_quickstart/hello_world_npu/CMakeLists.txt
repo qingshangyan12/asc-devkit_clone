@@ -22,6 +22,19 @@ add_executable(demo
     hello_world.asc
 )
 
+target_include_directories(demo PRIVATE
+    /home/yyc/pkgs/cann/include
+    /home/yyc/pkgs/cann/include/mmpa
+    /home/yyc/pkgs/cann/x86_64-linux/pkg_inc
+)
+
 target_compile_options(demo PRIVATE
+    -D__linux
     $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+)
+
+target_link_libraries(demo PRIVATE
+    /home/yyc/pkgs/cann/x86_64-linux/devlib/libascend_hal.so
+    /home/yyc/pkgs/cann/x86_64-linux/devlib/libascendcl.so
+    /home/yyc/pkgs/cann/x86_64-linux/lib64/libruntime.so
 )
