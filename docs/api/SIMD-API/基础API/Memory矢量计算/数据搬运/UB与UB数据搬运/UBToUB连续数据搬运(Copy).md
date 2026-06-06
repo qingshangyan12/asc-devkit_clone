@@ -49,7 +49,7 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 源操作数和目的操作数支持的数据类型保持一致。
 <cann-filter npu-type="950">
 
-- Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
+Ascend 950PR/Ascend 950DT，支持的数据类型为：int8_t、uint8_t、fp4x2_e2m1_t、fp4x2_e1m2_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。
 
 </cann-filter>
 

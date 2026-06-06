@@ -25,20 +25,24 @@
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-<cann-filter npu-type="950">
-针对Ascend 950PR/Ascend 950DT，支持设置数据搬运模式mode（搬运模式包括单次搬运对齐和整块数据搬运对齐）：
+- 不支持配置设置数据搬运模式mode
 
-```cpp
-template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
-```
+    ```cpp
+    template <typename T>
+    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+    ```
+
+<cann-filter npu-type="950">
+
+- 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
+
+    ```cpp
+    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
+    template <typename T, PaddingMode mode = PaddingMode::Normal>
+    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+    ```
 
 </cann-filter>
-
-```cpp
-template <typename T>
-__aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
-```
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -65,9 +69,9 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 | 参数名 | 描述 |
 | :--- | :--- |
 | blockCount | 搬运的数据块个数，uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）**。 |
-| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为NOP（空操作）**。**blockLen必须是sizeof(T)的整数倍，需要注意UB不要超限。** |
+| blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<br>**注：blockLen= 0表示不执行搬运，该接口将被视为NOP（空操作）**。**blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小。** |
 | srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。 |
-| dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意UB不要超限**。 |
+| dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意不要超过UB空间大小**。 |
 | rsv | 保留字段。uint32_t类型，默认值为0。 |
 
 **表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义
@@ -86,28 +90,29 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
     - 当blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
 - 配置示例1：
-    - blockLen为64，每个连续传输数据块包含64字节；srcStride为1，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间间隔1字节；dstStride为1，因为目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock数量（每DataBlock为32字节），即目的操作数相邻数据块之间间隔1个dataBlock。
+    - blockLen为64，每个连续传输数据块包含64字节；srcStride为1，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，因为目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock数量（每DataBlock为32字节），即目的操作数相邻数据块之间间隔1个dataBlock。
     - blockLen+leftPadding+rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。此处示例中，leftPadding、rightPadding均为0，则不填充。
     - blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad1.png)
 
 - 配置示例2：
-    - blockLen为47，每个连续传输数据块包含47字节；srcStride为1，表示源操作数相邻数据块之间间隔1字节；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
+    - blockLen为47，每个连续传输数据块包含47字节；srcStride为1，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
     - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
     - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad2.png)
 <cann-filter npu-type="950">
-- 配置示例3：
-    - blockLen为48，每个连续传输数据块包含48字节；srcStride为-48，表示源操作数相邻数据块之间间隔-48字节，相当于每次传输的连续数据块都是同一块；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
+
+- 配置示例3（仅Ascend 950PR/Ascend 950DT支持）：
+    - blockLen为48，每个连续传输数据块包含48字节；srcStride为-48，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为-48字节（一个连续数据块长度为48字节），相当于每次传输的连续数据块都是同一块；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
     - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
     - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad.png)
 </cann-filter>
 
-### 搬运模式的配置示例
+### 搬运模式的配置示例（仅Ascend 950PR/Ascend 950DT支持）
 
 <cann-filter npu-type="950">
 
@@ -159,22 +164,127 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
 - 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
-- 结构体DataCopyPadExtParams的参数取值范围需要考虑UB超限问题。
+- 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
 
 ## 调用示例<a name="section177231425115410"></a>
 
-本示例实现了GM->VECIN的非对齐搬运过程，完整使用样例请参见[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+- 场景1：使用SetPadValue进行自定义填充
 
-```cpp
-AscendC::DataCopyExtParams copyParams{1, 20 * sizeof(half), 0, 0, 0};
-AscendC::DataCopyPadExtParams<half> padParams{true, 0, 2, 0};
-// 从GM->VECIN搬运40字节。
-AscendC::DataCopyPad(dstGlobal, src0Global, copyParams, padParams);
-```
+    ```cpp
+    // DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
+    // DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12
+    // SetPadValue设置填充值为1，配合isPad=false使用
+    AscendC::DataCopyExtParams copyParams{1, srcCols * sizeof(T), 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams;
+    padParams.isPad = false;
+    padParams.leftPadding = 0;
+    padParams.rightPadding = dstCols - srcCols;
 
-结果示例：
+    AscendC::SetPadValue((T)1);
+    AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
+    ```
 
-```text
-输入数据src0Global: [1 2 3 ... 32]
-输出数据dstGlobal:[1 2 3 ... 20]
-```
+- 场景2：使用rightPadding进行默认填充
+
+    ```cpp
+    // DataCopyExtParams参数：blockCount=32, blockLen=59*sizeof(float), srcBlkStride=0, srcRepStride=0, reserved=0
+    // DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=5
+    // isPad=true时填充值为0，不使用SetPadValue
+    AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(float), 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams;
+    padParams.isPad = true;
+    padParams.leftPadding = 0;
+    padParams.rightPadding = dstCols - srcCols;
+
+    AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
+    ```
+
+- 场景3：使用Compact模式进行紧凑填充（仅支持 Ascend 950PR/Ascend 950DT）
+
+    ```cpp
+    // DataCopyExtParams参数：blockCount=3, blockLen=24*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
+    // DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=16
+    // PaddingMode::Compact：将多行数据紧凑排列到一行，填充区域紧凑放置在数据之后
+    // 输入[3, 24]紧凑排列为[1, 80]，前72个元素为3行数据，后8个元素为填充区域
+    AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(T), 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams;
+    padParams.isPad = true;
+    padParams.leftPadding = 0;
+    padParams.rightPadding = dstCols - srcCols * srcRows;
+
+    AscendC::DataCopyPad<T, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
+    ```
+
+- 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+
+    ```cpp
+    // Compact模式：每次内层循环搬运80B后填充16B使其96B对齐
+    // padding值设为-1
+    AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
+
+    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+    AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
+    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+    ```
+
+- 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+
+    ```cpp
+    // Normal模式：每个block搬运40B后填充24B使其64B对齐
+    // padding值设为-1
+    AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
+    AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
+
+    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+    AscendC::DataCopyPad<int8_t>(srcLocal, srcGlobal, copyParams, padParams);
+    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+    ```
+
+- 场景6：五维数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+
+    ```cpp
+    // GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8
+    // Normal模式，使用loop mode
+    // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节
+    // 最终UB连续存放为[512, 128]
+
+    // Stride参数说明：
+    // - loop1SrcStride=128*126：第2维stride，每次loop1源地址跳过128*126字节
+    // - loop1DstStride=64*128：每次loop1目的地址跳过64*128字节（64行×128字节/行）
+    // - loop2SrcStride=3*128*126：第1维stride，每次loop2源地址跳过3*128*126字节
+    // - loop2DstStride=2*64*128：每次loop2目的地址跳过2*64*128字节
+
+    AscendC::LoopModeParams loopParam2Ub {
+        2,  // loop1Size=2（第2维搬运2次）
+        2,  // loop2Size=2（第1维搬运2次）
+        128 * 126,  // loop1SrcStride（第2维stride）
+        64 * 128,   // loop1DstStride
+        3 * 128 * 126,  // loop2SrcStride（第1维stride）
+        2 * 64 * 128    // loop2DstStride
+    };
+    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+
+    AscendC::DataCopyExtParams copyParams{
+        64,  // blockCount=64（第3维搬运64次）
+        126,  // blockLen=126（第4维搬运126字节，padding到128）
+        0, 0, 0  // srcStride/dstStride=0
+    };
+    AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
+
+    // 第0维for循环搬运2次
+    for (uint32_t dim0 = 0; dim0 < 2; dim0++) {
+        constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126;  // 第0维源stride
+        constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;   // 第0维目的stride
+        uint32_t srcOffset = dim0 * dim0SrcStride;
+        uint32_t dstOffset = dim0 * dim0DstStride;
+
+        AscendC::DataCopyPad<int8_t>(srcLocal[dstOffset], srcGlobal[srcOffset], copyParams, padParams);
+    }
+
+    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+    ```
+
+完整样例请参考[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。

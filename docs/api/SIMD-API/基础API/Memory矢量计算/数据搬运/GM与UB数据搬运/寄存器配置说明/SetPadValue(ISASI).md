@@ -8,8 +8,8 @@
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √</cann-filter>|
 |<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √</cann-filter>|
 |<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | x</cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品 AI Core | x</cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品 Vector Core | x</cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x</cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x</cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x</cann-filter>|
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -73,39 +73,18 @@ __aicore__ inline void SetPadValue(T paddingValue)
 ## 调用示例<a name="section1227835243314"></a>
 
 ```cpp
-uint32_t m_n1 = 32;
-uint32_t m_n2 = 31;
-uint32_t m_n2Align = n2 % 32 == 0 ? n2 : (n2 / 32 + 1) * 32;
-
-AscendC::LocalTensor<float> srcLocal = m_queInSrc.AllocTensor<float>();
-AscendC::DataCopyExtParams dataCopyExtParams;
-AscendC::DataCopyPadExtParams<float> padParams;
-
-dataCopyExtParams.blockCount = m_n1; // Block个数，拷贝的次数。
-dataCopyExtParams.blockLen = m_n2 * sizeof(float); // 一次拷贝多少个32B。
-dataCopyExtParams.srcStride = 0;
-dataCopyExtParams.dstStride = 0;
-
-padParams.isPad = true;
+// 场景1：使用SetPadValue进行自定义填充
+// DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
+// DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12
+// SetPadValue设置填充值为1，配合isPad=false使用
+AscendC::DataCopyExtParams copyParams{1, srcCols * sizeof(T), 0, 0, 0};
+AscendC::DataCopyPadExtParams<T> padParams;
+padParams.isPad = false;
 padParams.leftPadding = 0;
-padParams.rightPadding = 1;
+padParams.rightPadding = dstCols - srcCols;
 
-AscendC::SetPadValue((float)37); // 设置Pad的值为37。
-AscendC::DataCopyPad(srcLocal, m_srcGlobal, dataCopyExtParams, padParams);
+AscendC::SetPadValue((T)1);
+AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
 ```
 
-```text
-输入数据（srcGm, shape = [32, 31]）：[[1, 1, 1, ..., 1], [1, 1, 1, ..., 1], ... , [1, 1, 1, ..., 1]]
-输出数据（dstGm, shape = [32, 32]）：[[1, 1, 1, ..., 1, 37], [1, 1, 1, ..., 1, 37], ... , [1, 1, 1, ..., 1, 37]]
-```
-
-```cpp
-// 对于不支持使用立即数进行赋值和初始化的数据类型，如下是一个输入类型bfloat16_t的示例：
-AscendC::SetPadValue(m_srcGlobal.GetValue(0));
-AscendC::DataCopyPad(srcLocal, m_srcGlobal, dataCopyExtParams, padParams);
-
-输入数据（srcGm, shape = [32, 31]）：[[1, 2, 3, ..., 31], [1, 2, 3, ..., 31], ... , [1, 2, 3, ..., 31]]
-输出数据（dstGm, shape = [32, 32]）：[[1, 2, 3, ..., 31, 1], [1, 2, 3, ..., 31, 1], ... , [1, 2, 3, ..., 31, 1]]
-```
-
-完整样例请参考[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+完整样例请参考[DataCopyPad样例场景1](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。

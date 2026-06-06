@@ -71,6 +71,7 @@
 <cann-filter npu-type="A3">
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float。
+
 </cann-filter>
 
 <cann-filter npu-type="910b">
@@ -109,9 +110,10 @@
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 </cann-filter>
-- Copy和矢量计算API一样，支持和掩码操作API配合使用。但counter模式配合高维切分计算API时，和[通用的counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
-    - 通用的counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**
-    - Copy高维切分计算API的counter模式：Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**
+
+- Copy和矢量计算API一样，支持和掩码操作API配合使用。但Counter模式配合高维切分计算API时，和[通用的Counter模式](../../SIMD计算说明/掩码/接口内设置Mask.md)有一定差异。具体差异如下：
+    - 通用的Counter模式：Mask代表**整个矢量计算参与计算的元素个数，迭代次数不生效。**
+    - Copy高维切分计算API的Counter模式：Mask代表**每次Repeat中处理的元素个数，迭代次数生效。**
 
 ## 调用示例<a name="zh-cn_topic_0000002567699435_section088124295117"></a>
 
@@ -137,7 +139,7 @@
         uint64_t mask = 8;
         AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
     } else if constexpr (scenarioNum == 3) {
-        // 场景3：从[18, 64]搬运[18, 8]数据，counter模式。
+        // 场景3：从[18, 64]搬运[18, 8]数据，Counter模式。
         // 源数据shape: [18, 64]，共1152个元素。
         // 目的数据shape: [18, 8]，共144个元素。
         // Counter模式下，Mask代表每次Repeat中处理的元素个数。

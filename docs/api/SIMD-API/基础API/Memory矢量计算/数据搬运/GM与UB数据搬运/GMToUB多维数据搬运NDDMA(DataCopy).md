@@ -42,7 +42,7 @@
 | :--- | :--- |
 | T | 源操作数或者目的操作数的数据类型。 |
 | dim | 搬运的数据维度，数据类型为uint8_t，支持的维度为[1, 5]。 |
-| config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考[表 NdDmaConfig结构体参数定义](#table9182515919)。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special scenario.<br>};</pre> |
+| config | 搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考表3。<br><pre>struct NdDmaConfig {<br>    static constexpr uint16_t unsetPad = 0xffff;<br>    bool isNearestValueMode = false;<br>    uint16_t loopLpSize = unsetPad; // Left padding size of all dimensions, must be less than 256.<br>    uint16_t loopRpSize = unsetPad; // Right padding size of all dimensions, must be less than 256.<br>    bool ascOptimize = false;       // used for Ascend C optimization on special scenario.<br>};</pre> |
 
 **表 2**  参数说明
 
@@ -50,7 +50,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。 |
-| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表3](#table1247813351789)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表3](#table725271775813)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]</pre> |
+| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考表4。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考表3。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]</pre> |
 
 **表 3**  NdDmaConfig结构体参数定义
 
@@ -66,7 +66,7 @@
 
 | 参数名称 | 含义 |
 | :--- | :--- |
-| loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考[表4](#table725271775813)。 |
+| loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考表5。 |
 | constantValue | 数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>当数据类型为b64时，参数constantValue的值应为0。 |
 
 **表 5**  NdDmaLoopInfo结构体参数定义
@@ -96,6 +96,7 @@
 ## 数据类型
 
 源操作数和目的操作数支持的数据类型保持一致。
+
 <cann-filter npu-type = "950">
 
 Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
@@ -120,31 +121,60 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 
 ## 调用示例<a name="section122101199486"></a>
 
-```cpp
-// T：搬运数据的类型。
-// xGm：保存DataCopy搬入数据。
-// xLocal：保存DataCopy搬出数据。
+- 场景1：2D Padding场景，常数填充方式
 
-// 2D Padding场景。
-// xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]。
-AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}};
-AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0。
-AscendC::NdDmaDci();  // 刷新cache。
-static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
-AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
-```
+    ```cpp
+    // xGmShape：[16, 32]，搬运8列2行数据，左Padding 15，上Padding 13，右Padding 17，下Padding 3，xLocalShape：[32, 64]
+    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 32}, {1, 64}, {32, 16}, {15, 13}, {17, 3}};
+    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
+    AscendC::NdDmaDci();  // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+    ```
 
-结果示例如下：
+- 场景2：2D Padding场景，最近值填充方式
 
-```text
-输入数据（xGm）:
-[[ 1.  2.  3.  4.  5.  6.  7.  8.]
- [ 9. 10. 11. 12. 13. 14. 15. 16.]]
-搬运至Local的数据（xLocal）:
-[[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  1.  2.  3.  4.  5.  6.  7.  8.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  9. 10. 11. 12. 13. 14. 15. 16.  0.  0.  0.  0.  0.]
- [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]]
-```
+    ```cpp
+    // xGmShape：[28, 15]，搬运3列4行数据，左Padding 11，上Padding 3，右Padding 6，下Padding 1，xLocalShape：[32, 32]
+    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 15}, {1, 32}, {15, 28}, {11, 3}, {6, 1}};
+    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
+    AscendC::NdDmaDci();  // 刷新cache
+    // isNearestValueMode = true 左右Padding值会选取当前维度最左或最右的值进行填充
+    static constexpr AscendC::NdDmaConfig dmaConfig = {true};
+    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+    ```
+
+- 场景3：2D Transpose场景
+
+    ```cpp
+    // xGmShape：[16, 64]，搬运8列4行数据，xLocalShape：[64, 16]
+    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {16, 1}, {64, 16}, {0, 0}, {0, 0}};
+    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
+    AscendC::NdDmaDci();  // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+    ```
+
+- 场景4：2D BroadCast场景
+
+    ```cpp
+    // xGmShape：[1, 16]，搬运16列1行数据并进行广播，xLocalShape：[3, 16]
+    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 0}, {1, 16}, {16, 3}, {0, 0}, {0, 0}};
+    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
+    AscendC::NdDmaDci();  // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+    ```
+
+- 场景5：2D Slice场景
+
+    ```cpp
+    // xGmShape：[32, 64]，将16*10的矩阵截取为一个5*7的矩阵，xLocalShape：[16, 16]
+    AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {1, 16}, {16, 16}, {0, 0}, {0, 0}};
+    AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
+    AscendC::NdDmaDci();  // 刷新cache
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+    ```
 
 完整样例请参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2ub_nddma)。

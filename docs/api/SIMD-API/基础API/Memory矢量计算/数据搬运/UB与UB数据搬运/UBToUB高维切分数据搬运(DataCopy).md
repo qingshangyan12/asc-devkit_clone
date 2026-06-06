@@ -136,32 +136,56 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
     | srcGap | [0, 65535] |
     | dstGap | [0, 65535] |
 
-- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
-
-    ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
-
 <cann-filter npu-type="910b,A3">
 
-- 针对如下产品型号：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过npu-smi info -t topo命令查询HCCS物理链路。
+- 针对如下产品型号：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过`npu-smi info -t topo`命令查询HCCS物理链路。
 
 </cann-filter>
 
 ## 调用示例<a name="section122101199486"></a>
 
-```cpp
-// srcLocal、dstLocal为half类型的LocalTensor。
-// 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
-DataCopyParams intriParams;
-intriParams.blockCount = 1; // 连续数据块个数为1
-intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-intriParams.srcGap = 0; // 源操作数做连续搬运
-intriParams.dstGap = 0; // 目的操作数连续排布
-AscendC::DataCopy(dstLocal, srcLocal, intriParams);
-```
+- 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大
 
-结果示例：
+    ```cpp
+    // mask=64表示每次迭代处理64个int32元素
+    // repeatTime=8表示迭代8次，共处理512个元素
+    // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙
+    // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）
+    uint64_t mask = 64;
+    AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+    ```
 
-```text
-输入数据srcGlobal：[1 2 3 ... 512]
-输出数据dstGlobal：[1 2 3 ... 512]
-```
+- 场景2：从[18, 64]的数据里搬运[18, 8]的数据量
+
+    ```cpp
+    // 源数据shape: [18, 64]，共1152个元素
+    // 目的数据shape: [18, 8]，共144个元素
+    // 每次迭代处理一行中的8个元素，共18次迭代
+    // mask=8：每次迭代处理8个元素
+    // repeatTime=18：迭代18次（对应18行）
+    // srcStride=1, dstStride=1：同一迭代内无间隙
+    // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）
+    // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）
+    uint64_t mask = 8;
+    AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
+    ```
+
+- 场景3：从[18, 64]搬运[18, 8]数据，Counter模式
+
+    ```cpp
+    // 源数据shape: [18, 64]，共1152个元素
+    // 目的数据shape: [18, 8]，共144个元素
+    // Counter模式下，Mask代表每次Repeat中处理的元素个数
+    // mask=144：每次迭代处理144个元素
+    // repeatTime=1：迭代1次（对应18行）
+    // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）
+    // dstStride=1：目的数据连续存放无间隙
+    // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效
+    AscendC::SetMaskCount();
+    AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
+    AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});
+    AscendC::SetMaskNorm();
+    AscendC::ResetMask();
+    ```
+
+完整样例请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub)。
