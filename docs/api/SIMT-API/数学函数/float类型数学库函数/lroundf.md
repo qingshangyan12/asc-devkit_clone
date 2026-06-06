@@ -45,7 +45,7 @@ inline long int lroundf(float x)
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
 ```
-#include "simt_api/math_functions.h"
+#include "simt_api/asc_simt.h"
 ```
 
 ## 调用示例
@@ -53,7 +53,7 @@ inline long int lroundf(float x)
 - SIMT编程场景：
 
     ```
-    #include "simt_api/math_functions.h"
+    #include "simt_api/asc_simt.h"
 
     __global__ __launch_bounds__(256) void compute_lroundf(float *result, const float *x, uint32_t count)
     {
@@ -69,7 +69,7 @@ inline long int lroundf(float x)
 
     ```
     #include "kernel_operator.h"
-    #include "simt_api/math_functions.h"
+    #include "simt_api/asc_simt.h"
 
     __simt_vf__ __launch_bounds__(256) inline void compute_lroundf_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
