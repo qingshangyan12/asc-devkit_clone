@@ -22,41 +22,11 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_TRAIT_MAP_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_TRAIT_MAP_H
 
+#include "impl/tensor_api/utils/map_impl.h"
 #include "impl/tensor_api/arch/vector/cast/instruction.h"
 
 namespace AscendC {
 namespace Te {
-
-namespace CastRoundMode {
-struct RD {};
-struct RN {};
-struct RNA {};
-struct RH {};
-struct RO {};
-struct RU {};
-struct RZ {};
-}
-
-namespace CastSatMode {
-struct Sat {};
-struct NoSat {};
-}
-
-namespace CastIndexPos {
-struct Even {};
-struct Odd {};
-struct PartP0 {};
-struct PartP1 {};
-struct PartP2 {};
-struct PartP3 {};
-}
-
-struct CastTraitDefault {
-    using roundMode = Std::ignore_t;
-    using satMode = Std::ignore_t;
-    using indexPos = Std::ignore_t;
-};
-
 
 using CastBucketMap = TupleMap<
     Std::tuple<Std::tuple<bfloat16_t, bfloat16_t>, CastSub_bfloat16_t_to_bfloat16_t>,
