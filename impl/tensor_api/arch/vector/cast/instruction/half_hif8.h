@@ -34,6 +34,24 @@ ASCENDC_CAST_INST(Half2Hif8RNASatOdd, asc_half2hif8_rna_sat_v2);
 ASCENDC_CAST_INST(Hif82HalfEven, asc_hif82half);
 ASCENDC_CAST_INST(Hif82HalfOdd, asc_hif82half_v2);
 
+
+// --- Cast trait sub-maps ---
+using CastSub_half_to_hifloat8_t = TupleMap<
+    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, Std::ignore_t>, Inst::Half2Hif8RHNoSatEven>,
+    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, Std::ignore_t>, Inst::Half2Hif8RHSatEven>,
+    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2Hif8RHNoSatOdd>,
+    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2Hif8RHSatOdd>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Half2Hif8RNANoSatEven>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::Half2Hif8RNASatEven>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2Hif8RNANoSatOdd>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2Hif8RNASatOdd>
+>;
+
+using CastSub_hifloat8_t_to_half = TupleMap<
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Hif82HalfEven>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Hif82HalfOdd>
+>;
+
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_HALF_HIF8_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

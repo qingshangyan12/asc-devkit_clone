@@ -39,6 +39,29 @@ ASCENDC_CAST_INST(Half2BF16RNA, asc_half2bfloat16_rna);
 ASCENDC_CAST_INST(Half2BF16RU, asc_half2bfloat16_ru);
 ASCENDC_CAST_INST(Half2BF16RZ, asc_half2bfloat16_rz);
 
+
+// --- Cast trait sub-maps ---
+using CastSub_bfloat16_t_to_half = TupleMap<
+    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, Std::ignore_t>, Inst::BF162HalfRDNoSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, Std::ignore_t>, Inst::BF162HalfRDSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::BF162HalfRNNoSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::BF162HalfRNSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::BF162HalfRNANoSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::BF162HalfRNASat>,
+    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, Std::ignore_t>, Inst::BF162HalfRUNoSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, Std::ignore_t>, Inst::BF162HalfRUSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, Std::ignore_t>, Inst::BF162HalfRZNoSat>,
+    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, Std::ignore_t>, Inst::BF162HalfRZSat>
+>;
+
+using CastSub_half_to_bfloat16_t = TupleMap<
+    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, Std::ignore_t>, Inst::Half2BF16RD>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Half2BF16RN>,
+    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Half2BF16RNA>,
+    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, Std::ignore_t>, Inst::Half2BF16RU>,
+    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, Std::ignore_t>, Inst::Half2BF16RZ>
+>;
+
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_BFLOAT16_HALF_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

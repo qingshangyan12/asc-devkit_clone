@@ -49,6 +49,44 @@ ASCENDC_CAST_INST(Float2E5M2RNSatP2, asc_float2e5m2_rn_sat_v3);
 ASCENDC_CAST_INST(Float2E5M2RNNoSatP3, asc_float2e5m2_rn_v4);
 ASCENDC_CAST_INST(Float2E5M2RNSatP3, asc_float2e5m2_rn_sat_v4);
 
+
+// --- Cast trait sub-maps ---
+using CastSub_float_to_fp8_e4m3fn_t = TupleMap<
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Float2E4M3RNNoSatP0>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::Float2E4M3RNSatP0>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP1>, Inst::Float2E4M3RNNoSatP1>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP1>, Inst::Float2E4M3RNSatP1>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP2>, Inst::Float2E4M3RNNoSatP2>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP2>, Inst::Float2E4M3RNSatP2>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP3>, Inst::Float2E4M3RNNoSatP3>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP3>, Inst::Float2E4M3RNSatP3>
+>;
+
+using CastSub_float_to_fp8_e5m2_t = TupleMap<
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Float2E5M2RNNoSatP0>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::Float2E5M2RNSatP0>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP1>, Inst::Float2E5M2RNNoSatP1>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP1>, Inst::Float2E5M2RNSatP1>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP2>, Inst::Float2E5M2RNNoSatP2>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP2>, Inst::Float2E5M2RNSatP2>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::PartP3>, Inst::Float2E5M2RNNoSatP3>,
+    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::PartP3>, Inst::Float2E5M2RNSatP3>
+>;
+
+using CastSub_fp8_e4m3fn_t_to_float = TupleMap<
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::E4M32FloatP0>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::E4M32FloatP1>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::E4M32FloatP2>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::E4M32FloatP3>
+>;
+
+using CastSub_fp8_e5m2_t_to_float = TupleMap<
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::E5M22FloatP0>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::E5M22FloatP1>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::E5M22FloatP2>,
+    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::E5M22FloatP3>
+>;
+
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_FP8_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
