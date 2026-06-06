@@ -9,16 +9,37 @@ from pathlib import Path
 
 
 class OrchestrateShellTest(unittest.TestCase):
+    def base_env(self, root: Path, **overrides: str) -> dict[str, str]:
+        env = {
+            **os.environ,
+            "PATH": f"{root / 'bin'}{os.pathsep}{os.environ.get('PATH', '')}",
+            "REAL_PYTHON": shutil.which("python3") or "python3",
+        }
+        env.update(overrides)
+        return env
+
     def copy_orchestrate_fixture(self, root: Path) -> Path:
         project_root = Path(__file__).resolve().parents[3]
-        script = root / "scripts/presmoke_orchestrate.sh"
+        script = root / "scripts/run_presmoke.sh"
         script.parent.mkdir(parents=True)
-        shutil.copy(project_root / "scripts/presmoke_orchestrate.sh", script)
+        shutil.copy(project_root / "scripts/run_presmoke.sh", script)
         script.chmod(0o755)
-        run_presmoke = root / "scripts/run_presmoke2.sh"
-        run_presmoke.write_text(
+
+        presmoke_pkg = root / "scripts/presmoke"
+        presmoke_pkg.mkdir(parents=True)
+        shutil.copy(project_root / "scripts/presmoke/orchestrate_report.py", presmoke_pkg / "orchestrate_report.py")
+        (presmoke_pkg / "__init__.py").write_text("", encoding="utf-8")
+
+        fake_bin = root / "bin"
+        fake_bin.mkdir()
+        fake_python = fake_bin / "python3"
+        fake_python.write_text(
             """#!/usr/bin/env bash
 set -euo pipefail
+if [[ "${1:-}" != "-m" || "${2:-}" != "presmoke" ]]; then
+    exec "${REAL_PYTHON}" "$@"
+fi
+shift 2
 results=""
 while [[ $# -gt 0 ]]; do
     if [[ "$1" == "--results" ]]; then
@@ -29,16 +50,23 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 mkdir -p "$results"
+if [[ "${PRESMOKE_STUB_RC:-0}" == "0" ]]; then
 cat > "$results/report.json" <<'JSON'
 {"summary":{"PASS":0,"FAIL":0,"SKIP":0},"results":[],"npu_stats":{"busy_s":0,"idle_s":0,"utilization":0}}
 JSON
+else
+cat > "$results/report.json" <<'JSON'
+{"summary":{"PASS":0,"FAIL":1,"SKIP":0},"results":[{"example":"stub/fail","arch":"dav-2201","mode":"npu","status":"FAIL","reason":"nonzero rc","rc":1,"duration_s":1,"steps":[]}],"npu_stats":{"busy_s":0,"idle_s":0,"utilization":0}}
+JSON
+fi
 cat > "$results/report.md" <<'MD'
 # stub
 MD
+exit "${PRESMOKE_STUB_RC:-0}"
 """,
             encoding="utf-8",
         )
-        run_presmoke.chmod(0o755)
+        fake_python.chmod(0o755)
         return script
 
     def test_full_run_cleans_cann_vendors_before_presmoke(self) -> None:
@@ -49,46 +77,50 @@ MD
             stale = vendors / "stale_vendor"
             stale.mkdir(parents=True)
             (stale / "old.txt").write_text("old", encoding="utf-8")
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "OUT_ROOT": str(root / "out"),
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
 
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(stale.exists())
             self.assertIn("vendors_clean_done", result.stdout)
+            self.assertIn("Presmoke Summary:", result.stdout)
+            self.assertIn("Elapsed:", result.stdout)
+            self.assertIn("Cases: total=0 pass=0 fail=0 skip=0", result.stdout)
+            self.assertIn("execute samples success", result.stdout)
 
     def test_default_output_root_is_presmoke_reports(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "ARCH": "dav-2201",
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                ARCH="dav-2201",
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
 
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn(f"out_root={root / 'presmoke_reports' / 'orchestrate_dav-2201_'}", result.stdout)
+            self.assertIn(f"out_root={root / 'presmoke_reports' / 'presmoke_dav-2201_'}", result.stdout)
             self.assertFalse((root / "presmoke_results").exists())
 
     def test_cpu_mode_uses_default_schedule(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "MODES": "cpu",
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                MODES="cpu",
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
 
@@ -99,12 +131,12 @@ MD
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             script = self.copy_orchestrate_fixture(root)
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "MODE": "cpu",
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                MODE="cpu",
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(["bash", str(script), "--dry-run"], text=True, capture_output=True, env=env, check=False)
 
@@ -120,12 +152,12 @@ MD
             stale = vendors / "stale_vendor"
             stale.mkdir(parents=True)
             (stale / "old.txt").write_text("old", encoding="utf-8")
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "OUT_ROOT": str(root / "out"),
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(
                 ["bash", str(script), "--filter", "x"],
@@ -147,12 +179,12 @@ MD
             stale = vendors / "stale_vendor"
             stale.mkdir(parents=True)
             (stale / "old.txt").write_text("old", encoding="utf-8")
-            env = {
-                **os.environ,
-                "PROJECT_ROOT": str(root),
-                "OUT_ROOT": str(root / "out"),
-                "ASCEND_OPP_PATH": str(root / "opp"),
-            }
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+            )
 
             result = subprocess.run(
                 ["bash", str(script), "--dry-run"],
@@ -165,6 +197,25 @@ MD
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertTrue(stale.exists())
             self.assertIn("vendors_clean_skip reason=non_full_run", result.stdout)
+
+    def test_failed_presmoke_keeps_legacy_failure_marker(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            script = self.copy_orchestrate_fixture(root)
+            env = self.base_env(
+                root,
+                PROJECT_ROOT=str(root),
+                OUT_ROOT=str(root / "out"),
+                ASCEND_OPP_PATH=str(root / "opp"),
+                PRESMOKE_STUB_RC="1",
+            )
+
+            result = subprocess.run(["bash", str(script)], text=True, capture_output=True, env=env, check=False)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("Presmoke Summary:", result.stdout)
+            self.assertIn("Cases: total=1 pass=0 fail=1 skip=0", result.stdout)
+            self.assertIn("execute samples failed", result.stderr)
 
     def test_make_wrapper_limits_explicit_parallel_jobs(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
