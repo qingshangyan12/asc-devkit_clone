@@ -1,6 +1,6 @@
 # 核函数与VF函数<a name="ZH-CN_TOPIC_0000002593909249"></a>
 
-SIMD与SIMT混合编程涉及多种类型的函数，它们之间遵循严格的调用关系和层级约束。本章节将会介绍整体函数类型和调用关系，再详细展开每种函数的定义、调用语法及约束。
+SIMD与SIMT混合编程涉及多种类型的函数，它们之间遵循严格的调用关系和层级约束。本章节将介绍整体函数类型和调用关系，再详细展开每种函数的定义、调用语法及约束。
 
 SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 
@@ -12,9 +12,18 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 | `__simt_vf__` | 线程级并行计算任务 | 通过SIMT提供的`asc_vf_call`接口调用 |
 | `__simd_vf__` | 向量级并行计算任务 | 通过SIMD提供的`asc_vf_call`接口调用 |
 | `__simt_callee__` | SIMT VF的子函数 | SIMT VF内部调用 |
-| `__simd_callee__` | SIMD VF的辅助子函数 | SIMD VF内部调用 |
+| `__simd_callee__` | SIMD VF的子函数 | SIMD VF内部调用 |
+| `__callee__` | SIMD VF和SIMT VF的公共子函数 | VF内部调用 |
 
-函数调用关系如下图所示：
+各层函数间的调用关系如下：
+- 核函数：是Device侧的入口函数，可以调用`__aicore__`函数和VF函数。
+- simd vf函数：能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simd vf函数内只能调用`__simd_callee__`函数和`__callee__`函数。
+- simt vf函数：使用__simt_vf__标记，能被核函数或者`__aicore__`函数通过`asc_vf_call`接口调用。simt vf函数内只能调用`__simt_callee__`函数和`__callee__`函数。
+- `__simd_callee__`子函数：simd vf函数内部的子函数，子函数可能有返回值或者通过引用传参。__simd_callee__函数内只能调用`__simd_callee__`函数和`__callee__`函数。
+- `__simt_callee__`子函数：simt vf函内部的子函数，子函数可能有返回值或者通过引用传参。`__simt_callee__`函数内只能调用`__simt_callee__`函数和`__callee__`函数。
+- `__callee__`公共函数：可供VF内部调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
+
+**图 1** SIMD与SIMT混合编程函数调用层级
 
 <img src="../../../../figures/SIMT_混合_函数调用层级.png" title="SIMD与SIMT混合编程函数调用层级" width="70%" />
 
@@ -89,13 +98,12 @@ SIMT VF函数有以下约束：
 -   函数返回类型必须是void。
 -   SIMT VF内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
 
-
 ## \_\_simt\_callee\_\_子函数<a name="zh-cn_topic_0000002571578013_section4680126514"></a>
 
 \_\_simt\_callee\_\_子函数是SIMT VF函数内部调用的辅助函数，函数内部可以使用SIMT内置变量。定义示例如下：
 
 ```
-__simt_callee__ return_type function_name(__gm__ type* gm_param, __ubuf__ type* ubuf_param, type scalar_param, ...);
+__simt_callee__ return_type function_name(__gm__ type* gm_param, __ubuf__ type* ubuf_param, type scalar_param, ...);
 ```
 
 调用示例如下：
