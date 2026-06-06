@@ -1,0 +1,98 @@
+// ============================================================================
+// asc-devkit presmoke Jenkinsfile
+//
+// Assumptions:
+//   - Jenkins has already checked out asc-devkit.
+//   - The selected node already has CANN and device access prepared.
+//   - One build runs one presmoke mode: npu or cpu.
+// ============================================================================
+
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ARCH', choices: ['dav-2201', 'dav-3510'], description: 'Target architecture: dav-2201 for 910B, dav-3510 for 950.')
+        choice(name: 'MODES', choices: ['npu', 'cpu'], description: 'Presmoke execution mode.')
+        string(name: 'PRIMARY_CARD', defaultValue: '0', trim: true, description: 'Primary NPU card id for npu mode.')
+        string(name: 'RETRY_CARDS', defaultValue: '', trim: true, description: 'Space-separated retry card ids for timeout cases in npu mode.')
+        string(name: 'JOBS', defaultValue: 'auto', trim: true, description: 'Build worker count, or auto.')
+        string(name: 'NPU_SLOTS', defaultValue: '1', trim: true, description: 'NPU run queue concurrency. Keep 1 for watchdog runs.')
+        string(name: 'MAKE_JOBS', defaultValue: 'auto', trim: true, description: 'Per-case make -j value, or auto.')
+        string(name: 'CPU_RUN_SLOTS', defaultValue: 'auto', trim: true, description: 'CPU mode run queue slots, or auto.')
+        string(name: 'TIMEOUT', defaultValue: '120', trim: true, description: 'NPU run-stage timeout in seconds.')
+        string(name: 'CPU_RUN_TIMEOUT', defaultValue: '300', trim: true, description: 'CPU run-stage timeout in seconds.')
+        string(name: 'EXTRA_ARGS', defaultValue: '', trim: true, description: 'Extra arguments passed to scripts/run_presmoke.sh, for example --filter <case>.')
+    }
+
+    options {
+        timeout(time: 180, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('prepare') {
+            steps {
+                script {
+                    env.PRESMOKE_OUT_ROOT = "presmoke_reports/jenkins_${env.BUILD_NUMBER}_${params.ARCH}_${params.MODES}"
+                }
+                sh '''#!/usr/bin/env bash
+                    set -euo pipefail
+                    rm -rf "${PRESMOKE_OUT_ROOT}"
+                    mkdir -p "${PRESMOKE_OUT_ROOT}"
+                    bash -n scripts/run_presmoke.sh
+                '''
+            }
+        }
+
+        stage('presmoke') {
+            steps {
+                script {
+                    int rc = sh(
+                        returnStatus: true,
+                        script: '''#!/usr/bin/env bash
+                            set -o pipefail
+                            ARCH="${ARCH}" \
+                            MODES="${MODES}" \
+                            PRIMARY_CARD="${PRIMARY_CARD}" \
+                            RETRY_CARDS="${RETRY_CARDS}" \
+                            JOBS="${JOBS}" \
+                            NPU_SLOTS="${NPU_SLOTS}" \
+                            MAKE_JOBS="${MAKE_JOBS}" \
+                            CPU_RUN_SLOTS="${CPU_RUN_SLOTS}" \
+                            TIMEOUT="${TIMEOUT}" \
+                            CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT}" \
+                            OUT_ROOT="${PRESMOKE_OUT_ROOT}" \
+                            bash scripts/run_presmoke.sh ${EXTRA_ARGS} 2>&1 | tee "${PRESMOKE_OUT_ROOT}/jenkins_console.log"
+                        '''
+                    )
+                    echo "presmoke rc=${rc}; report=${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md"
+                    if (rc != 0) {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                            error("presmoke failed with rc=${rc}; see ${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            junit allowEmptyResults: true, testResults: 'presmoke_reports/**/junit.xml'
+            archiveArtifacts allowEmptyArchive: true, fingerprint: true,
+                artifacts: 'presmoke_reports/**/*.md, presmoke_reports/**/*.tsv, presmoke_reports/**/*.xml, presmoke_reports/**/*.json, presmoke_reports/**/*.log'
+            echo "===== Final: ${currentBuild.currentResult} (duration: ${currentBuild.durationString}) ====="
+        }
+        success {
+            echo 'All selected presmoke cases PASS'
+        }
+        unstable {
+            echo 'Some presmoke cases FAIL or SKIP/FAIL details are available in Jenkins test view and presmoke_reports artifacts'
+        }
+        failure {
+            echo 'Pipeline fatal error before presmoke report completion'
+        }
+    }
+}
