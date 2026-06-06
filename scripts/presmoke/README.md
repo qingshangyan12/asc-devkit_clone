@@ -6,6 +6,72 @@ For direct Python CLI experiments, use `PYTHONPATH=scripts PRESMOKE_PROJECT_ROOT
 
 Before a full watch run, the orchestrator removes all entries under the active CANN `opp/vendors` directory. This keeps custom-op package installation deterministic across rounds. Runs with `--filter`, `--dry-run`, or `--suggestions-only` do not clean `opp/vendors`.
 
+## Quick Start
+
+Run with defaults. This is the shortest command and is intended to be compatible with the old `run_presmoke.sh` caller contract:
+
+```bash
+bash scripts/run_presmoke.sh
+```
+
+Default behavior:
+
+- `ARCH=dav-2201`, for 910B.
+- `MODES=npu`.
+- `PRIMARY_CARD=0`.
+- `SCHEDULE=fixed`.
+- `JOBS=auto`.
+- `NPU_SLOTS=1`.
+- `TIMEOUT=120`, applied only to NPU run commands.
+- Success prints `execute samples success`; failure prints `execute samples failed` and exits non-zero.
+
+## Common Commands
+
+Check which cases would run without executing them:
+
+```bash
+bash scripts/run_presmoke.sh --dry-run
+```
+
+Run 910B on a specific card:
+
+```bash
+PRIMARY_CARD=7 bash scripts/run_presmoke.sh
+```
+
+Run 950:
+
+```bash
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh
+```
+
+Run one case:
+
+```bash
+bash scripts/run_presmoke.sh \
+  --filter 01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag
+```
+
+Write reports to a specific directory:
+
+```bash
+OUT_ROOT=/tmp/presmoke_910b_card7 \
+PRIMARY_CARD=7 \
+bash scripts/run_presmoke.sh
+```
+
+Run CPU mode explicitly. CPU mode is not the default:
+
+```bash
+MODES=cpu bash scripts/run_presmoke.sh
+```
+
+Increase CPU run timeout for slow CPU-mode cases:
+
+```bash
+MODES=cpu CPU_RUN_TIMEOUT=1800 bash scripts/run_presmoke.sh
+```
+
 ## CI Commands
 
 910B:
@@ -27,11 +93,16 @@ PRIMARY_CARD=0 \
 bash scripts/run_presmoke.sh
 ```
 
-Dry-run:
+950 dry-run:
+
+```bash
+ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh --dry-run
+```
+
+910B dry-run:
 
 ```bash
 ARCH=dav-2201 PRIMARY_CARD=7 bash scripts/run_presmoke.sh --dry-run
-ARCH=dav-3510 PRIMARY_CARD=0 bash scripts/run_presmoke.sh --dry-run
 ```
 
 ## Parameters
