@@ -50,7 +50,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为GM (Global Memory)，目的地址需要1B对齐。 |
 | src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为GM，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为UB，源地址需要32B对齐。 |
-| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32字节对齐，若不对齐，搬运量将对32字节做向下取整。 |
+| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32B对齐，若不对齐，搬运量将对32字节做向下取整。 |
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002534928976_fig54801848104717)将源操作数中128个元素连续搬运至目的操作数。
 
