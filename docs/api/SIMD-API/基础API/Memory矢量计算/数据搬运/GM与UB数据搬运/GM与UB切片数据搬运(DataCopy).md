@@ -49,8 +49,8 @@
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。 |
-| src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。 |
+| dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为GM (Global Memory)，目的地址需要1B对齐。 |
+| src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为GM，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为UB，源地址需要32B对齐。 |
 | dstSliceInfo | 输入 | 目的操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>SliceInfo参数说明请参考表3。 |
 | srcSliceInfo | 输入 | 源操作数切片信息，类型为SliceInfo。通过该参数可以配置切片的起始和终止元素个数、间隔、长度等信息。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。<br>SliceInfo参数说明请参考表3。 |
 | dimValue | 输入 | 操作数维度信息，默认值为1。 |
@@ -156,7 +156,7 @@
 ## 约束说明<a name="zh-cn_topic_0000002565968945_section2045914466492"></a>
 
 - 该接口为软仿接口，从易用性角度出发进行设计。
-- 位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
+- 位于GM的地址必须1B对齐，位于UB的地址必须32B对齐。
 - burstLen，仅在dimValue = 1时生效，超出1维的情况下，必须配置为1，不支持配置成其他值。
 - 切片数据搬运中的横向burstLen大小设置，需要用户自己通过计算：横向切片元素个数\* sizeof\(T\)/32byte。横向切片元素个数\* sizeof\(T\)的大小必须是32byte的倍数。
 - SliceInfo 结构体的成员变量 startIndex、endIndex、stride、burstLen的取值须满足：

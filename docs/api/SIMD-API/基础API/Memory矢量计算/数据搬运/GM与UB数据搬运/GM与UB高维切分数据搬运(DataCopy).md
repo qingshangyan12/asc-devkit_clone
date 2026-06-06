@@ -52,8 +52,8 @@
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，目的地址需要1B对齐。 |
-| src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为Global Memory，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为Unified Buffer，源地址需要32B对齐。 |
+| dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为GM (Global Memory)，目的地址需要1B对齐。 |
+| src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为GM，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为UB，源地址需要32B对齐。 |
 | repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  DataCopyParams结构体参数定义
@@ -157,7 +157,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 位于Global Memory的地址必须1B对齐，位于Unified Buffer的地址必须32B对齐。
+- 位于GM的地址必须1B对齐，位于UB的地址必须32B对齐。
 - <cann-filter npu-type = "A3,910b">当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
@@ -173,7 +173,7 @@
     | srcGap | [0, 65535] |
     | dstGap | [0, 65535] |
 
-- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
+- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址UB存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
     ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
