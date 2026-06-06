@@ -211,16 +211,18 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_postion, k_start_positi
 
 ![矩阵搬出流程](image-31.png)
 
-如上所述, 矩阵计算的搬出支持多种随路量化、Relu、格式转换的能力, 以`L0C Buffer`搬出到`Global Memory`为例,  矩阵计算的结果存放在L0C Buffer, 需要将结果搬运至`Global Memory(GM)`中, 并且在搬运过程中支持随路格式转换等操作。图中的F32->F16与F32->BF16为非量化模式，仅为cast，其余为随路saclar/vector量化模式。
-随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。例如，L0C中F32类型的数据可以通过QF322B8_PRE随路量化得到B8数据，可以按需选择是否进一步使能随路Relu, 接下来B8数据经过NZ2NZ/NZ2ND操作可以输出到GM(OUT)。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN随路格式转换。图中的F32->F16与F32->BF16为数据类型转换，其余为随路scalar/vector量化模式。
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+矩阵搬出接口支持多种随路能力组合。以L0C到Global Memory为例：矩阵计算结果存放在L0C Buffer，需搬运至GM，支持随路格式转换等操作。
+
+随路量化、ReLU、格式转换、通道拆分合并的有效组合、中间数据类型和数据路径如下图所示。例如，L0C中F32数据通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU，然后经过NZ2NZ/NZ2ND输出到GM。图中F32→F16和F32→BF16为数据类型转换，其他为随路scalar/vector量化模式。针对Ascend 950PR/950DT，还支持NZ2DN格式转换。
+针对Atlas A2/A3训练和推理系列产品：
 ![L0C2GM搬运](image-32.png)
 
 针对Ascend 950PR/Ascend 950DT：
 ![L0C2GM搬运](image-33.png)
 
-矩阵搬出接口支持多种随路能力的组合，需要设置不同的寄存器，配合数据搬运接口使能不同的数据搬运能力， 对应的接口和处理能力如下：
-1. l0c2gm数据搬出接口，支持配置随路实现量化和Relu激活，NZ到ND格式的转换
+矩阵搬出接口支持多种随路能力组合，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
+
+1. L0C2GM数据搬出接口，支持配置随路量化、ReLU激活、NZ到ND格式转换：
 ```c
 __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float *src_addr,
                         uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl,
@@ -228,19 +230,19 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float
                         bool enable_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, 
                         bool enable_clip_relu_post, uint8_t eltwise_op, bool enable_eltwise_antq, bool enable_c0_pad,
                         bool enable_broadcast, bool enable_nz2dn);
-```  
+```
 
-2. 通过调用该接口设置随路量化，随路pRelu参数(AscendC待实现)，其中tensor的每个元素都代表一个量化参数，使用Vector量化/pRelu模式(AscendC待实现)时需要设置
+2. 设置随路量化参数和pReLU参数（待实现）。Tensor的每个元素代表一个量化参数：
 ```c
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 ```
 
-3. 通过调用该接口设置随路NZ2ND格式转换配置，使用随路NZ2ND需要设置
+3. 设置随路NZ2ND格式转换配置：
 ```c
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 ```
 
-4. 寄存器设置接口，通过调用该接口设置随路Leaky Relu系数，使用随路Leaky Relu需要设置
+4. 设置随路Leaky ReLU系数：
 ```c
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
@@ -249,19 +251,19 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 ## 矩阵计算能力说明
 
-`asc_mmad`接口是AscendC C语言编程面向昇腾 AI 芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，封装了昇腾 NPU 硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发。
-如下图所示，`asc_mmad`接口实现昇腾NPU矩阵乘计算能力，其数学表达式为：C = A X B + C, 该接口调用入参为`L0A Buffer`和`L0B Buffer`, 输出为`L0C Buffer`。在Atlas A2 训练系列产品/Atlas A2 推理系列产品 和 Atlas A3 训练系列产品/Atlas A3 推理系列产品中 `L0A Buffer`分形为Zz，`L0B Buffer`分形为Nz, `L0C Buffer`分形为Nz。
-Ascend 950PR/Ascend 950DT产品`L0A Buffer`的分形为Nz。
+`asc_mmad`是Ascend C的矩阵乘加核心接口，封装NPU硬件计算能力，用于全连接层、卷积层等算子开发。
+
+`asc_mmad`实现矩阵乘加计算：C = A × B + C。输入为L0A Buffer和L0B Buffer，输出为L0C Buffer。针对Atlas A2/A3训练和推理系列产品，L0A Buffer分形为Zz，L0B Buffer分形为Zn，L0C Buffer分形为Nz。Ascend 950PR/950DT产品L0A Buffer分形为Nz。
 
 ![Ascend 950PR/Ascend 950DT `asc_mmad`计算](image-38.png)
 
-C语言编程针对AI Core Cube计算的能力, 通过重载实现提供了一系列名为`asc_mmad`, 支持不同数据类型计算的接口能力, 可通过下面的代码实现上图中的矩阵乘计算。
+C语言编程提供了一系列`asc_mmad`重载接口，支持不同数据类型的矩阵计算。以下代码实现上图中的矩阵乘计算。
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val);
 
 ```c
-// 1. 定义L0A/L0B上面矩阵的大小
+// 1. 定义L0A/L0B矩阵大小
 constexpr uint32_t l0_m_size = 64;
 constexpr uint32_t l0_k_size = 64;
 constexpr uint32_t l0_n_size = 64;
@@ -269,23 +271,23 @@ __ca__ c_matrix[l0_m_size * l0_k_size];
 __cb__ b_matrix[l0_k_size * l0_n_size];
 __cc__ c_matrix[l0_m_size * l0_n_size];
 
-// 2. 配置asc_mmad的参数
-// 2.1. 配置实际参与计算的矩阵大小(m, n, k)
-// 如上图，m 方向为三个分形，实际计算值为3 * 16 = 48
+// 2. 配置asc_mmad参数
+// 2.1. 实际参与计算的矩阵大小(m, n, k)
+// m方向：3个分形，实际值 = 3 × 16 = 48
 constexpr uint16_t m = 48;
-// n 方向为三个分形，实际计算值为3 * 16 = 48
+// n方向：3个分形，实际值 = 3 × 16 = 48
 constexpr uint16_t n = 48;
-// k 方向为4个分形大小，实际值为4 * 16 = 64
+// k方向：4个分形，实际值 = 4 × 16 = 64
 constexpr uint16_t k = 64;
 
-// 2.2 配置相关特性参数
-// unit_flag可以控制Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出。
+// 2.2 特性参数
+// unit_flag：控制Mmad和Fixpipe指令细粒度并行。使能后，每计算完一个分形立即搬出结果。
 uint8_t unit_flag = 0;
-// M=1时，该参数用来配置Mmad计算是否开启GEMV模式。
+// disable_gemv：M=1时配置是否开启GEMV模式
 bool disable_gemv = false;
-// 配置C矩阵初始值存在初始值。false时不对L0C进行初始化操作；true时使用BT Buffer中的数据对L0C进行初始化操作。
+// enable_cube_init：使能C矩阵初始值加载。false：不初始化L0C；true：从BT Buffer加载初始值。
 bool enable_cube_init = false;
-// 是否使能C矩阵默认初始化清零操作。true时C矩阵默认初始化为0；false时C矩阵不进行默认操作，通过设置cmatrixSource参数进行初始化。
+// enable_cube_zero_init：使能C矩阵默认清零。true：初始化为0；false：通过enable_cube_init参数控制初始化。
 bool enable_cube_zero_init = true;
 
 asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
@@ -293,7 +295,7 @@ asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_
 
 ## Cube矩阵计算示例(Ascend 950PR/Ascend 950DT)
 
-实现一个`C(M, N) = A(M, K) * B(K, N)`的矩阵乘计算, 其中 M = 64, K = 128, N = 64, 数据类型为half, 基于C语言编程的视实现如下。
+实现矩阵乘计算C(M, N) = A(M, K) × B(K, N)，其中M=64, K=128, N=64，数据类型为half。C语言编程实现如下：
 ```c
 extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ half* b_gm, __gm__ float* c_gm)
 {
@@ -332,30 +334,33 @@ asc_set_gm2l1_nz_para(nz_config);
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     
-    // 4. 将A, B矩阵搬入到L0A/B中
-    // 4.1 A矩阵从L1 Buffer搬入到L0A Buffer
+// 4. 将A、B矩阵搬入到L0A/L0B
+    // 4.1 A矩阵从L1搬入到L0A
     /*
      * 参数说明：
-     * m_step = 4，源矩阵M轴方向搬运长度，单位为16 element。所以值为 64 / 16
-     * k_step = 8, 源矩阵K轴方向搬运长度，单位为32B。所以值为 128 * sizeof(half) / 32
-     * m_start_postion = 0, 源矩阵M轴方向的起始位置，单位为16个元素。从起点开始，值为0
-     * k_start_position = 0, 源矩阵K轴方向的起始位置，单位为32B。从起点开始，值为0
-     * src_stride = 1, 源矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512B。源数据内连续排布，所以只为1个分形间隔
-     * dst_stride = 1, 目标矩阵K方向前一个分形起始地址与后一个分形起始地址的间隔，单位：512B。目标数据内连续排布，所以只为1个分形间隔
-     */ 
-asc_copy_l12l0a(l0a_buf, a_l1_buf, 0, 0, 4, 8, 1, 1);
-// 4.2 B矩阵从L1 Buffer搬入到L0B Buffer, 参数同A矩阵, GM中矩阵排布是(K, N), 搬入到L1中是(K, N)排布的Nz分形， N方向连续，但是L0B中是Zn排布，内部是沿着K方向连续的K，所以这边需要调用asc_copy_l12l0b_transpose实现
+     * m_step=4：M轴搬运长度（单位：16元素），值为64/16
+     * k_step=8：K轴搬运长度（单位：32B），值为128*sizeof(half)/32
+     * m_start_position=0：M轴起始位置（单位：16元素）
+     * k_start_position=0：K轴起始位置（单位：32B）
+     * src_stride=1：源矩阵K方向分形间隔（单位：512B），连续排布为1
+     * dst_stride=1：目标矩阵K方向分形间隔（单位：512B），连续排布为1
+     */
+    asc_copy_l12l0a(l0a_buf, a_l1_buf, 0, 0, 4, 8, 1, 1);
+    
+    // 4.2 B矩阵从L1搬入到L0B
+    // GM中矩阵排布为(K, N)，L1中为(K, N)的Nz分形，N方向连续。
+    // L0B要求Zn排布，内部沿K方向连续，需调用transpose接口转换。
     asc_copy_l12l0b_transpose(l0b_buf, b_l1_buf, 0, 0, 4, 8, 1, 1);
-    // 5. 插入同步，进行MM计算时需要等待搬入到L0 Buffer内
+    // 5. 插入同步：进行MM计算前需等待数据搬入L0 Buffer
     asc_sync_notify(PIPE_MTE1, PIPE_CUBE, EVENT_ID0);
     asc_sync_wait(PIPE_MTE1, PIPE_CUBE, EVENT_ID0);
     
-    // 6. 执行Mmad, 计算大小为(BLOCK_M, BLOCK_K, BLOCK_N)
+    // 6. 执行Mmad，计算大小为(BLOCK_M, BLOCK_K, BLOCK_N)
     asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
     asc_sync_notify(PIPE_CUBE, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_CUBE, PIPE_MTE3, EVENT_ID0);
     
-    // 7. 将数据搬出到GM中, 需要配置随路的搬运信息
+    // 7. 将结果搬出到GM，配置随路搬运信息
     asc_copy_l0c2gm(c_gm, l0c_buf, BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0,
         0, QuantMode_t::NoQuant, 0, false, true, 0, 0, false, false, 0, false, false, false, false, false, false);
 }
