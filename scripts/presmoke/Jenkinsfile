@@ -2,7 +2,8 @@
 // asc-devkit presmoke Jenkinsfile
 //
 // Assumptions:
-//   - Jenkins has already checked out asc-devkit.
+//   - Jenkins has cloned asc-devkit into workspace/asc-devkit, or is already
+//     running from the asc-devkit repository root.
 //   - The selected node already has CANN and device access prepared.
 //   - One build runs one presmoke mode: npu or cpu.
 // ============================================================================
@@ -22,6 +23,7 @@ pipeline {
         string(name: 'TIMEOUT', defaultValue: '120', trim: true, description: 'NPU run-stage timeout in seconds.')
         string(name: 'CPU_RUN_TIMEOUT', defaultValue: '300', trim: true, description: 'CPU run-stage timeout in seconds.')
         string(name: 'EXTRA_ARGS', defaultValue: '', trim: true, description: 'Extra arguments passed to scripts/run_presmoke.sh, for example --filter <case>.')
+        string(name: 'REPO_DIR', defaultValue: 'asc-devkit', trim: true, description: 'Repository directory under workspace. Use . if Jenkins already runs at repo root.')
     }
 
     options {
@@ -35,42 +37,50 @@ pipeline {
         stage('prepare') {
             steps {
                 script {
+                    env.ASC_DEVKIT_DIR = resolveRepoDir(params.REPO_DIR)
                     env.PRESMOKE_OUT_ROOT = "presmoke_reports/jenkins_${env.BUILD_NUMBER}_${params.ARCH}_${params.MODES}"
+                    env.PRESMOKE_JUNIT_PATTERN = "${env.ASC_DEVKIT_DIR}/presmoke_reports/**/junit.xml"
+                    env.PRESMOKE_ARCHIVE_PATTERN = "${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.md, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.tsv, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.xml, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.json, ${env.ASC_DEVKIT_DIR}/presmoke_reports/**/*.log"
                 }
-                sh '''#!/usr/bin/env bash
-                    set -euo pipefail
-                    rm -rf "${PRESMOKE_OUT_ROOT}"
-                    mkdir -p "${PRESMOKE_OUT_ROOT}"
-                    bash -n scripts/run_presmoke.sh
-                '''
+                dir("${env.ASC_DEVKIT_DIR}") {
+                    sh '''#!/usr/bin/env bash
+                        set -euo pipefail
+                        rm -rf "${PRESMOKE_OUT_ROOT}"
+                        mkdir -p "${PRESMOKE_OUT_ROOT}"
+                        bash -n scripts/run_presmoke.sh
+                    '''
+                }
             }
         }
 
         stage('presmoke') {
             steps {
                 script {
-                    int rc = sh(
-                        returnStatus: true,
-                        script: '''#!/usr/bin/env bash
-                            set -o pipefail
-                            ARCH="${ARCH}" \
-                            MODES="${MODES}" \
-                            PRIMARY_CARD="${PRIMARY_CARD}" \
-                            RETRY_CARDS="${RETRY_CARDS}" \
-                            JOBS="${JOBS}" \
-                            NPU_SLOTS="${NPU_SLOTS}" \
-                            MAKE_JOBS="${MAKE_JOBS}" \
-                            CPU_RUN_SLOTS="${CPU_RUN_SLOTS}" \
-                            TIMEOUT="${TIMEOUT}" \
-                            CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT}" \
-                            OUT_ROOT="${PRESMOKE_OUT_ROOT}" \
-                            bash scripts/run_presmoke.sh ${EXTRA_ARGS} 2>&1 | tee "${PRESMOKE_OUT_ROOT}/jenkins_console.log"
-                        '''
-                    )
+                    int rc = 0
+                    dir("${env.ASC_DEVKIT_DIR}") {
+                        rc = sh(
+                            returnStatus: true,
+                            script: '''#!/usr/bin/env bash
+                                set -o pipefail
+                                ARCH="${ARCH}" \
+                                MODES="${MODES}" \
+                                PRIMARY_CARD="${PRIMARY_CARD}" \
+                                RETRY_CARDS="${RETRY_CARDS}" \
+                                JOBS="${JOBS}" \
+                                NPU_SLOTS="${NPU_SLOTS}" \
+                                MAKE_JOBS="${MAKE_JOBS}" \
+                                CPU_RUN_SLOTS="${CPU_RUN_SLOTS}" \
+                                TIMEOUT="${TIMEOUT}" \
+                                CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT}" \
+                                OUT_ROOT="${PRESMOKE_OUT_ROOT}" \
+                                bash scripts/run_presmoke.sh ${EXTRA_ARGS} 2>&1 | tee "${PRESMOKE_OUT_ROOT}/jenkins_console.log"
+                            '''
+                        )
+                    }
                     echo "presmoke rc=${rc}; report=${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md"
                     if (rc != 0) {
                         catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                            error("presmoke failed with rc=${rc}; see ${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md")
+                            error("presmoke failed with rc=${rc}; see ${env.ASC_DEVKIT_DIR}/${env.PRESMOKE_OUT_ROOT}/FINAL_REPORT.md")
                         }
                     }
                 }
@@ -80,9 +90,9 @@ pipeline {
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: 'presmoke_reports/**/junit.xml'
+            junit allowEmptyResults: true, testResults: "${env.PRESMOKE_JUNIT_PATTERN ?: 'asc-devkit/presmoke_reports/**/junit.xml'}"
             archiveArtifacts allowEmptyArchive: true, fingerprint: true,
-                artifacts: 'presmoke_reports/**/*.md, presmoke_reports/**/*.tsv, presmoke_reports/**/*.xml, presmoke_reports/**/*.json, presmoke_reports/**/*.log'
+                artifacts: "${env.PRESMOKE_ARCHIVE_PATTERN ?: 'asc-devkit/presmoke_reports/**/*.md, asc-devkit/presmoke_reports/**/*.tsv, asc-devkit/presmoke_reports/**/*.xml, asc-devkit/presmoke_reports/**/*.json, asc-devkit/presmoke_reports/**/*.log'}"
             echo "===== Final: ${currentBuild.currentResult} (duration: ${currentBuild.durationString}) ====="
         }
         success {
@@ -95,4 +105,14 @@ pipeline {
             echo 'Pipeline fatal error before presmoke report completion'
         }
     }
+}
+
+def resolveRepoDir(String preferred) {
+    if (fileExists("${preferred}/scripts/run_presmoke.sh")) {
+        return preferred
+    }
+    if (fileExists('scripts/run_presmoke.sh')) {
+        return '.'
+    }
+    error("Cannot find asc-devkit repository. Checked '${preferred}/scripts/run_presmoke.sh' and './scripts/run_presmoke.sh'.")
 }
