@@ -516,10 +516,6 @@ export default defineConfig({
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'en',
-      customSearchQuery(input) {
-        const trimmed = input.trim()
-        return trimmed
-      },
     }), {
       name: 'vitepress-override-search-vue',
       enforce: 'post',

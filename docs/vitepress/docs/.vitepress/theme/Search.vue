@@ -135,7 +135,7 @@ watch(
     const searchText
       = typeof finalSearchConfig.value.customSearchQuery === 'function'
         ? finalSearchConfig.value.customSearchQuery(searchWords.value)
-        : (chineseRegex.test(searchWords.value) ? chineseSearchOptimize(searchWords.value) : searchWords.value)
+        : (/[\u4E00-\u9FA5]/.test(searchWords.value) ? chineseSearchOptimize(searchWords.value) : searchWords.value)
 
     try {
       const pagefindSearchResult: any = await window?.__pagefind__
