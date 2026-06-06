@@ -9,10 +9,34 @@
 // ============================================================================
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            label '141.131.72.151'
+            image "harbor.turing-ci.hisilicon.com/tbe-kits/ubuntu_ascendc:24.04"
+            args """
+                  --ipc=host
+                  --device=/dev/davinci0
+                  --device=/dev/davinci_manager
+                  --device=/dev/devmm_svm
+                  --device=/dev/hisi_hdc
+                  -v /usr/local/Ascend/driver:/usr/local/Ascend/driver:ro
+                  -v /etc/ascend_install.info:/etc/ascend_install.info:ro
+                  -e http_proxy=\"http://141.131.72.64:1080\"
+                  -e https_proxy=\"http://141.131.72.64:1080\"
+                  -e socks_proxy=\"socks5://141.131.72.64:1079\"
+                  --privileged --entrypoint=''
+                """
+        }
+    }
+
+    environment {
+        SOC_VERSION = "ascend910b"
+        SHORT_SOC_VERSION = "910b"
+        TORCH_DEVICE_BACKEND_AUTOLOAD = 0
+    }
 
     parameters {
-        string(name: 'GIT_BRANCH', defaultValue: 'presmoke_opt', trim: true, description: 'Branch or tag to test.')
+        string(defaultValue: 'newest', name: 'URLS', trim: true, description: 'download pkg path\n示例： /compilepackage/CI_Version/cann/br_hisi_trunk_ai_PRE_COMPILE/202204/20220415_085143747_I56c0061\n填写 newest 会下载当天最新包')
         choice(name: 'ARCH', choices: ['dav-2201', 'dav-3510'], description: 'Target architecture: dav-2201 for 910B, dav-3510 for 950.')
         choice(name: 'MODES', choices: ['npu', 'cpu'], description: 'Presmoke execution mode.')
         string(name: 'PRIMARY_CARD', defaultValue: '0', trim: true, description: 'Primary NPU card id for npu mode.')
@@ -27,35 +51,87 @@ pipeline {
     }
 
     options {
-        timeout(time: 180, unit: 'MINUTES')
+        timeout(time: 120, unit: 'MINUTES')
         timestamps()
         buildDiscarder(logRotator(numToKeepStr: '20'))
         disableConcurrentBuilds()
     }
 
     stages {
-        stage('clone asc-devkit') {
+        stage('clear workspace') {
             steps {
-                sh '''#!/usr/bin/env bash
-                    set -euo pipefail
-                    rm -rf asc-devkit
-                    git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit
-                '''
+                sh """#!/bin/bash
+                    du -h --max-depth=1
+                    rm -rf ..?* .[!.]* *
+                    du -h --max-depth=1
+                    rm -rf /usr/local/Ascend/cann-* /usr/local/Ascend/cann /usr/local/Ascend/ascend-toolkit
+
+                    git config --global user.email "ci_user@me.com"
+                    git config --global user.name "ci_user"
+                """
             }
         }
 
-        stage('prepare') {
-            steps {
-                script {
-                    env.PRESMOKE_OUT_ROOT = "presmoke_reports/jenkins_${env.BUILD_NUMBER}_${params.ARCH}_${params.MODES}"
+        stage('download and clone') {
+            parallel {
+                stage('download package') {
+                    steps {
+                        script {
+                            if (env.URLS == "newest") {
+                                env.URLS = sh(script: 'zsh -c "source /opt/conda/etc/profile.d/conda.sh && conda activate py312 && $(curl -L -k -s -o- http://tbe-kits.hisilicon.com/files/tbe_kits/get_latest_ci_url.sh)" cann_eco', returnStdout: true).trim()
+                            }
+                            def URLS_TAIL = "${env.URLS}".split('/')[-1]
+                            currentBuild.description = "${env.NODE_NAME}: ${URLS_TAIL}"
+                            sh """#!/bin/bash
+                                set -e
+                                set -x
+                                echo "URLS: \$URLS"
+                                URLS=\$(sed 's/\\/cann\\//\\/cann_eco\\//g' <<<"\$URLS")
+                                bash -i -c "\$(curl -L -k -s -o- http://tbe-kits.hisilicon.com/files/tbe_kits/download_cann.sh)" -s -t toolkit ops -v ${env.SHORT_SOC_VERSION} -u \$URLS --install --pylocal --check
+                            """
+                        }
+                    }
                 }
-                dir('asc-devkit') {
-                    sh '''#!/usr/bin/env bash
-                        set -euo pipefail
-                        rm -rf "${PRESMOKE_OUT_ROOT}"
-                        mkdir -p "${PRESMOKE_OUT_ROOT}"
-                        bash -n scripts/run_presmoke.sh
-                    '''
+                stage('git repo clone') {
+                    steps {
+                        script {
+                            env.PRESMOKE_OUT_ROOT = "presmoke_reports/jenkins_${env.BUILD_NUMBER}_${params.ARCH}_${params.MODES}"
+                        }
+                        withCredentials([
+                            usernamePassword(
+                                credentialsId: 'gitcode_http_key',
+                                usernameVariable: 'GIT_USER',
+                                passwordVariable: 'GIT_PASSWORD'
+                            )
+                        ]) {
+                            sh '''#!/bin/bash
+                                set -e
+
+                                if [[ "${NODE_LABELS}" =~ "141.131.72" ]]; then
+                                    PROXY_URL="141.131.72.90:3128"
+                                else
+                                    PROXY_URL="100.102.39.42:3128"
+                                fi
+                
+                                (
+                                    export http_proxy="http://${PROXY_URL}"
+                                    export https_proxy="http://${PROXY_URL}"
+                                    export HTTP_PROXY="http://${PROXY_URL}"
+                                    export HTTPS_PROXY="http://${PROXY_URL}"
+
+                                    source /opt/conda/etc/profile.d/conda.sh; conda activate py312; pip3 install en_dtypes==0.0.4
+
+                                    rm -rf asc-devkit
+                                    git clone --depth 1 --branch "presmoke_opt" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit
+
+                                    cd asc-devkit
+                                    rm -rf "${PRESMOKE_OUT_ROOT}"
+                                    mkdir -p "${PRESMOKE_OUT_ROOT}"
+                                    bash -n scripts/run_presmoke.sh
+                                )
+                            '''
+                        }
+                    }
                 }
             }
         }
@@ -67,7 +143,7 @@ pipeline {
                     dir('asc-devkit') {
                         rc = sh(
                             returnStatus: true,
-                            script: '''#!/usr/bin/env bash
+                            script: '''#!/bin/zsh
                                 set -o pipefail
                                 ARCH="${ARCH}" \
                                 MODES="${MODES}" \
@@ -80,7 +156,7 @@ pipeline {
                                 TIMEOUT="${TIMEOUT}" \
                                 CPU_RUN_TIMEOUT="${CPU_RUN_TIMEOUT}" \
                                 OUT_ROOT="${PRESMOKE_OUT_ROOT}" \
-                                bash scripts/run_presmoke.sh ${EXTRA_ARGS} 2>&1 | tee "${PRESMOKE_OUT_ROOT}/jenkins_console.log"
+                                zsh -i scripts/run_presmoke.sh ${EXTRA_ARGS} 2>&1 | tee "${PRESMOKE_OUT_ROOT}/jenkins_console.log"
                             '''
                         )
                     }
