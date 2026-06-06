@@ -484,13 +484,6 @@ export default defineConfig({
     },
   },
 
-  transformHtml(code) {
-    return code.replace(
-      /(<div[^>]*class="[^"]*vp-doc[^"]*")([^>]*>)/,
-      '$1 data-pagefind-body$2'
-    )
-  },
-
   transformPageData(pageData) {
     const cache = loadHeaderCache(pageData.filePath)
     if (cache && cache.length > 0) {
@@ -499,6 +492,14 @@ export default defineConfig({
   },
 
   buildConcurrency: 1,
+
+  transformHtml(code) {
+    code = code.replace(/<body\b/, '<body data-pagefind-body')
+    return code.replace(
+      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
+      m => m.startsWith('<') ? m : m.replace(/(.)(?=.)/g, '$1\u200A')
+    )
+  },
 
   vite: {
     sourcemap: false,
