@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | --- | --- |
 | Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3训练系列产品/Atlas A3推理系列产品 | x |
-| Atlas A2训练系列产品/Atlas A2推理系列产品 | x |
-| Atlas 200I/500 A2推理产品 | x |
-| Atlas推理系列产品AI Core | x |
-| Atlas推理系列产品Vector Core | x |
-| Atlas训练系列产品 | x |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
 
 ## 功能说明
 
@@ -36,7 +36,7 @@ inline uint64_t asc_atomic_xor(uint64_t *address, uint64_t val)
 
 ## 参数说明
 
-**表1**  参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ inline uint64_t asc_atomic_xor(uint64_t *address, uint64_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表2**  不同数据类型支持的内存范围
+**表 2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -80,11 +80,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-**场景**
-
-多个线程检查事件是否命中，命中时使用`asc_atomic_xor`翻转共享奇偶标志。最终值为1表示命中次数为奇数，0表示命中次数为偶数。
-
-**输入说明**
+示例场景为：多个线程检查事件是否命中，命中时使用`asc_atomic_xor`接口翻转共享奇偶标志。最终值为1表示命中次数为奇数，0表示命中次数为偶数。输入参数说明如下：
 
 | 名称 | 说明 |
 | --- | --- |
@@ -92,7 +88,7 @@ Unified Buffer或Global Memory上的初始数据。
 | `parity` | Global Memory中的奇偶标志，kernel启动前清零。 |
 | `n` | 输入元素个数。 |
 
-**代码实现**
+核心代码实现如下：
 
 -   SIMT编程场景：
 
@@ -132,7 +128,7 @@ Unified Buffer或Global Memory上的初始数据。
     }
     ```
 
-**结果说明**
+输出结果示例如下：
 
 ```
 hit: 1, 0, 1, 1

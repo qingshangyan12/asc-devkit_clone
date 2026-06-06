@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | --- | --- |
 | Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3训练系列产品/Atlas A3推理系列产品 | x |
-| Atlas A2训练系列产品/Atlas A2推理系列产品 | x |
-| Atlas 200I/500 A2推理产品 | x |
-| Atlas推理系列产品AI Core | x |
-| Atlas推理系列产品Vector Core | x |
-| Atlas训练系列产品 | x |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
 
 ## 功能说明
 
@@ -56,7 +56,7 @@ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
 
 ## 参数说明
 
-**表1**  参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -65,7 +65,7 @@ inline bfloat16x2_t asc_atomic_add(bfloat16x2_t *address, bfloat16x2_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表2**  不同数据类型支持的内存范围
+**表 2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -100,11 +100,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-**场景**
-
-多个线程扫描状态数组，状态非0表示一条异常记录，使用`asc_atomic_add`统计异常状态的数量。
-
-**输入说明**
+示例场景：多个线程扫描状态数组，状态非0表示一条异常记录，使用`asc_atomic_add`接口统计异常状态的数量。输入参数说明如下：
 
 | 名称 | 说明 |
 | --- | --- |
@@ -112,7 +108,7 @@ Unified Buffer或Global Memory上的初始数据。
 | `error_count` | Global Memory中的异常计数器，kernel启动前清零。 |
 | `n` | 输入元素个数。 |
 
-**代码实现**
+核心代码实现如下：
 
 -   SIMT编程场景：
 
@@ -152,9 +148,11 @@ Unified Buffer或Global Memory上的初始数据。
     }
     ```
 
-**结果说明**
+输出结果示例如下：
 
 ```cpp
 status: 0, 2, 0, 1, 3
 error_count: 3 // 表明status中有3个数据是非0的
 ```
+
+也可参阅[字节序频率直方图样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/02_atomic_operation/histogram)，该样例详细展示了如何利用`asc_atomic_add`接口，高效统计输入字节序列中每个字节值的出现频率。

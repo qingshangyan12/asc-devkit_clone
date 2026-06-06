@@ -5,12 +5,12 @@
 | 产品 | 是否支持 |
 | --- | --- |
 | Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3训练系列产品/Atlas A3推理系列产品 | x |
-| Atlas A2训练系列产品/Atlas A2推理系列产品 | x |
-| Atlas 200I/500 A2推理产品 | x |
-| Atlas推理系列产品AI Core | x |
-| Atlas推理系列产品Vector Core | x |
-| Atlas训练系列产品 | x |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
+| Atlas 200I/500 A2 推理产品 | x |
+| Atlas 推理系列产品AI Core | x |
+| Atlas 推理系列产品Vector Core | x |
+| Atlas 训练系列产品 | x |
 
 ## 功能说明
 
@@ -48,7 +48,7 @@ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, 
 
 ## 参数说明
 
-**表1**  参数说明
+**表 1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ inline bfloat16x2_t asc_atomic_cas(bfloat16x2_t *address, bfloat16x2_t compare, 
 
 不同数据类型支持的内存范围说明如下：
 
-**表2**  不同数据类型支持的内存范围
+**表 2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -72,7 +72,6 @@ Unified Buffer或Global Memory上的初始数据。
 ## 约束说明
 
 无
-
 
 ## 需要包含的头文件
 
@@ -90,14 +89,9 @@ Unified Buffer或Global Memory上的初始数据。
 #include "simt_api/asc_bf16.h"
 ```
 
-
 ## 调用示例
 
-**场景**
-
-多个线程尝试抢占同一个任务，任务初始拥有者ID为0。使用`asc_atomic_cas`接口实现只有一个线程抢占成功，其它线程读到非0后抢占失败。
-
-**输入说明**
+示例场景为：多个线程尝试抢占同一个任务，任务初始拥有者ID为0。使用`asc_atomic_cas`接口实现只有一个线程抢占成功，其它线程读到非0后抢占失败。输入输出参数说明如下：
 
 | 名称 | 说明 |
 | --- | --- |
@@ -106,7 +100,7 @@ Unified Buffer或Global Memory上的初始数据。
 | `claim_result` | 保存每个线程是否抢占成功。 |
 | `n` | 参与抢占的线程数。 |
 
-**代码实现**
+核心代码实现如下：
 
 -   SIMT编程场景：
 
@@ -146,7 +140,7 @@ Unified Buffer或Global Memory上的初始数据。
     }
     ```
 
-**结果说明**
+输出结果示例如下：
 
 ```cpp
 worker_ids: 101, 102, 103
