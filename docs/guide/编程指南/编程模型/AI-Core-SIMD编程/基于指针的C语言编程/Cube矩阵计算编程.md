@@ -81,28 +81,7 @@ Zn格式主要用于L0B Buffer中存放数据, 如果离线处理好的右矩阵
   Z 字流动： 每个 16 x 16 的小方块内部，以及方块之间，均按照特定的 Z 字形顺序存储（如图中折线箭头所示），完成了从“线性”到“分形”的物理映射，做好了进入 Cube 计算的准备。
 
 Ascend C编程中直接提供了`Global Memory`到`L1 Buffer`中的C语言编程接口，通过该接口可以直接将`Global Memory`数据搬入`L1 Buffer`并完成ND2NZ格式转换。
-
-![GM2L1-ND2NZ搬运](../../../../figures/GM2L1-ND2NZ搬运.png)
-
-C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950DT/Ascend 950RP上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN2NZ的格式转换的搬运。
-
-```c
-// 搬运关于最内层循环的步长为4个字节
-constexpr uint64_t loop1_src_stride = 4;
-//L2 Cache采用NORMAL模式
-constexpr uint8_t l2_cache_ctl = 1;
-// N值为3
-constexpr uint16_t n_value = 3;
-// D值为3
-constexpr uint32_t d_value = 3;
-// 搬运关于最外层循环的步长为2个字节
-constexpr uint64_t loop4_src_stride = 2;
-// 每一个C0数据块都会被pad至32个字节
-constexpr bool smallc0_en = true;
-__gm__ half src[256];
-__cbuf__ half dst[256];
-asc_copy_gm2l1_nd2nz(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
-```
+C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950DT/Ascend 950RP上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN到NZ的格式转换搬运。
 
 ## 矩阵搬运能力说明
 
@@ -184,7 +163,7 @@ uint16_t k_start_position = 2;
 int16_t src_stride = 5;
 // dstStride为3：表示目的操作数中，K方向前一个分形起始地址与后一个分形起始地址的间隔为3
 int16_t dst_stride = 3;
-asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_postion, k_start_position, m_step, k_step, src_stride, dst_stride);
+asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
 搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](../../../../../api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
@@ -194,7 +173,7 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_postion, k_start_position, m_step
 ![需要转置的处理场景](../../../../figures/需要转置的处理场景.png)
 ```c
 // 使用transpose接口完成处理
-asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_postion, k_start_position, m_step, k_step, src_stride, dst_stride);
+asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
 ### 矩阵搬出能力
@@ -328,9 +307,9 @@ extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ ha
 asc_set_gm2l1_nz_para(nz_config);
 // 2.2 调用asc_copy_gm2l1_nd2nz拷贝接口实现GM2L1的搬运操作, 其中n_value为128, d_value为64
 // src_d_value表示源矩阵一行中的元素个数，值为64。只有一块ND矩阵，src_nd_matrix_stride为0。
-    asc_copy_gm2l1_nd2nz(b_l1_buf, a_gm, 64, 1, BLOCK_K, BLOCK_N, 0, false);
+    asc_copy_gm2l1_nd2nz(b_l1_buf, b_gm, 64, 1, BLOCK_K, BLOCK_N, 0, false);
 
-    // 3. 插入同步，搬入L0A/B Buffer前需要等待GM搬入到L1Buffer中
+    // 3. 插入同步，搬入L0A/B Buffer前需要等待GM搬入到L1 Buffer中
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     

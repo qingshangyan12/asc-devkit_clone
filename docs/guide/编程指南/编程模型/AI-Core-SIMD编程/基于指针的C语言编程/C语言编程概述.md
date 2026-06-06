@@ -192,7 +192,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer，64字节对齐
 同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式：
 - L1 Buffer  : FRACTAL_NZ
 - L0A Buffer : FRACTAL_NZ (Ascend 950PR/Ascend 950DT架构该内存分形为NZ, Ascend 910B为ZZ分形)
-- L0A Buffer : FRACTAL_ZN
+- L0B Buffer : FRACTAL_ZN
 - L0C Buffer : FRACTAL_NZ
 
 以`FRACTAL_NZ`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
