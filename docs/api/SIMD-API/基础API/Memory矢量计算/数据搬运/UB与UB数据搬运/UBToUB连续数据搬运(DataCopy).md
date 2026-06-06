@@ -41,7 +41,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数。类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。 |
 | src | 输入 | 源操作数。类型为LocalTensor，存储位置为UB，源地址需要32B对齐。 |
-| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32字节对齐，若不对齐，搬运量将对32字节做向下取整。 |
+| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32B对齐，若不对齐，搬运量将对32字节做向下取整。 |
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002567699425_fig13481537531)将源操作数中128个元素连续搬运至目的操作数。
 
