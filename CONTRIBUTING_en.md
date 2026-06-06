@@ -32,6 +32,14 @@ C API provides pure C style interfaces, conforming to C language operator develo
 - **Applicable Scenarios**: C language programming style scenarios
 - **Contribution Guide**: [docs/en/asc_c_api_contributing.md](./docs/en/asc_c_api_contributing.md)
 
+
+## Documentation Contribution Guide
+
+This project includes four core Ascend C documentation sets (Programming Guide, API Reference, Operator Practice Reference, Cross-generation Migration Guide). Developers can contribute by fixing errors, supplementing content, or sharing optimization experiences.
+
+- **Documentation Writing Guide**: [docs/en/asc_doc_contributing.md](./docs/en/asc_doc_contributing.md) — Contribution scenarios, writing conventions, PR checklist
+- **Documentation Design Principles**: [docs/en/asc_doc_dfx_design.md](./docs/en/asc_doc_dfx_design.md) — Discoverability, readability, completeness design specification
+
 ## Developer Contribution Scenarios
 
 - Bug Fix

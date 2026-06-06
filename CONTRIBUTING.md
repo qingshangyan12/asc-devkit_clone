@@ -32,6 +32,14 @@ C API提供纯C风格的接口，符合C语言算子开发习惯，开放芯片�
 - **适用场景**：使用C语言编程风格的场景
 - **贡献指南**：[docs/asc_c_api_contributing.md](./docs/asc_c_api_contributing.md)
 
+
+## 资料贡献指南
+
+本项目包含Ascend C的四份核心资料文档（编程指南、API参考手册、算子实践参考、跨代迁移兼容性指南），开发者可以对资料内容进行纠错、补充和贡献。
+
+- **资料编写规范**：[docs/asc_doc_contributing.md](./docs/asc_doc_contributing.md) — 资料贡献场景、各文档编写规范、PR自检清单
+- **资料设计原则**：[docs/asc_doc_dfx_design.md](./docs/asc_doc_dfx_design.md) — 可获取性、可读性、完备性三维度设计规范
+
 ## 开发者贡献场景主要包括
 
 - Bug修复
