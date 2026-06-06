@@ -88,7 +88,11 @@ Warp内指定线程的var值。
 
 ## 调用示例
 
+以下示例包含两类用法：示例1使用asc\_shfl\_up获取Warp分组内向前偏移线程的输入值；示例2使用asc\_shfl\_up在每个Warp内进行规约求和。
+
 -   SIMT编程场景：
+
+    示例1：
 
     ```
     __global__ __launch_bounds__(1024) void KernelShflUp(int32_t* dst)
@@ -101,26 +105,30 @@ Warp内指定线程的var值。
          int32_t result = asc_shfl_up(laneId, 2, 16);
          dst[idx] = result;
     }
+    ```
 
-    // asc_shfl_up实现reducesum
+    示例2：
+
+    ```
     __global__ __launch_bounds__(1024) void KernelShflUpReduceSum(int32_t* dst)
     {
-         // asc_vf_call参数：dim3{1024, 1, 1}
          int idx = threadIdx.x + blockIdx.x * blockDim.x;
          int32_t laneId = idx % 32;
          int32_t value = laneId;
 
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
 
-         dst[idx] = value;
+         dst[idx] = value; // 规约求和结果位于每个Warp内laneId为31的线程
     }
     ```
 
 -   SIMD与SIMT混合编程场景：
+
+    示例1：
 
     ```
     __simt_vf__ __launch_bounds__(1024) inline void KernelShflUp(__gm__ int32_t* dst)
@@ -134,8 +142,11 @@ Warp内指定线程的var值。
          int32_t result = asc_shfl_up(laneId, 2, 16);
          dst[idx] = result;
     }
+    ```
 
-    // asc_shfl_up实现reducesum
+    示例2：
+
+    ```
     __simt_vf__ __launch_bounds__(1024) inline void KernelShflUpReduceSum(__gm__ int32_t* dst)
     {
          // asc_vf_call参数：dim3{1024, 1, 1}
@@ -143,12 +154,12 @@ Warp内指定线程的var值。
          int32_t laneId = idx % 32;
          int32_t value = laneId;
 
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
 
-         dst[idx] = value;
+         dst[idx] = value; // 规约求和结果位于每个Warp内laneId为31的线程
     }
     ```
