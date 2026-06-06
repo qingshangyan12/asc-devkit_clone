@@ -4,8 +4,15 @@ import argparse
 import csv
 import datetime
 import json
+import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
+from xml.dom import minidom
+
+
+_XML_INVALID_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+_JUNIT_LOG_TAIL_BYTES = 100_000
 
 
 def read_json(path: Path) -> dict[str, Any] | None:
@@ -130,6 +137,7 @@ def write_final_report(root: Path) -> None:
 
     timings_path = root / "ALL_CASE_TIMINGS.tsv"
     failures_path = root / "FAILURES.tsv"
+    junit_path = root / "junit.xml"
     effective_rc_path = root / "effective_rc.txt"
 
     with timings_path.open("w", encoding="utf-8", newline="") as handle:
@@ -222,6 +230,141 @@ def write_final_report(root: Path) -> None:
         "\n".join(render_markdown(root, primary, retry_by_example, effective_failures, timings_path, failures_path)) + "\n",
         encoding="utf-8",
     )
+    write_junit_xml(junit_path, primary)
+
+
+def write_junit_xml(path: Path, primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    suites = ET.Element("testsuites")
+    if primary:
+        _, _, meta, data = primary
+        results = data.get("results", [])
+        grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for result in results:
+            arch = str(result.get("arch", "") or meta.get("arch", ""))
+            mode = str(result.get("mode", ""))
+            grouped.setdefault((arch, mode), []).append(result)
+        for (arch, mode), group in sorted(grouped.items()):
+            append_junit_suite(suites, arch, mode, group)
+
+    rough = ET.tostring(suites, encoding="utf-8")
+    pretty = minidom.parseString(rough).toprettyxml(indent="  ", encoding="utf-8")
+    path.write_bytes(pretty)
+
+
+def append_junit_suite(parent: ET.Element, arch: str, mode: str, results: list[dict[str, Any]]) -> None:
+    failures = sum(1 for result in results if result.get("status") == "FAIL")
+    skipped = sum(1 for result in results if result.get("status") == "SKIP")
+    suite = ET.SubElement(
+        parent,
+        "testsuite",
+        {
+            "name": f"presmoke.{arch}.{mode}",
+            "tests": str(len(results)),
+            "failures": str(failures),
+            "errors": "0",
+            "skipped": str(skipped),
+            "time": f"{sum(float(result.get('duration_s') or 0) for result in results):.3f}",
+        },
+    )
+    for result in sorted(results, key=lambda item: item.get("example", "")):
+        append_junit_case(suite, result)
+
+
+def append_junit_case(suite: ET.Element, result: dict[str, Any]) -> None:
+    example = str(result.get("example", ""))
+    case = ET.SubElement(
+        suite,
+        "testcase",
+        {
+            "classname": junit_classname(example),
+            "name": f"{junit_case_name(example)} [{result.get('mode', '')}]",
+            "time": f"{float(result.get('duration_s') or 0):.3f}",
+        },
+    )
+    status = result.get("status", "")
+    reason = str(result.get("reason", "") or "")
+    rc = result.get("rc", "")
+    failing_step = str(result.get("failing_step", "") or "")
+    if status == "FAIL":
+        failure = ET.SubElement(
+            case,
+            "failure",
+            {
+                "message": sanitize_xml_text(f"{reason} rc={rc}").strip(),
+                "type": "PresmokeFailure",
+            },
+        )
+        failure.text = sanitize_xml_text(f"reason={reason}\nrc={rc}\nfailing_step={failing_step}\n")
+    elif status == "SKIP":
+        skipped = ET.SubElement(case, "skipped", {"message": sanitize_xml_text(reason)})
+        skipped.text = sanitize_xml_text(reason)
+    ET.SubElement(case, "system-out").text = build_junit_system_out(result)
+
+
+def junit_classname(example: str) -> str:
+    parts = [part for part in example.split("/") if part]
+    if len(parts) <= 1:
+        return "presmoke"
+    return ".".join(parts[:-1])
+
+
+def junit_case_name(example: str) -> str:
+    parts = [part for part in example.split("/") if part]
+    return parts[-1] if parts else "unknown"
+
+
+def build_junit_system_out(result: dict[str, Any]) -> str:
+    lines = [
+        f"example={result.get('example', '')}",
+        f"arch={result.get('arch', '')}",
+        f"mode={result.get('mode', '')}",
+        f"status={result.get('status', '')}",
+        f"reason={result.get('reason', '')}",
+        f"rc={result.get('rc', '')}",
+        f"duration_s={float(result.get('duration_s') or 0):.3f}",
+        "",
+        "steps:",
+    ]
+    for step in result.get("steps", []):
+        command = str(step.get("command", "")).replace("\n", " ")
+        lines.append(
+            "  "
+            f"{step.get('kind', '')}: "
+            f"duration_s={float(step.get('duration_s') or 0):.3f} "
+            f"wait_s={float(step.get('wait_s') or 0):.3f} "
+            f"npu_slot={int(bool(step.get('npu_slot')))} "
+            f"rc={step.get('rc', '')} "
+            f"command={command}"
+        )
+    lines.extend(["", "logs:"])
+    append_log_tail(lines, "case_log", str(result.get("log_file", "") or ""))
+    for stage_log in result.get("stage_log_files", []):
+        append_log_tail(lines, "stage_log", str(stage_log))
+    return sanitize_xml_text("\n".join(lines))
+
+
+def append_log_tail(lines: list[str], label: str, raw_path: str) -> None:
+    if not raw_path:
+        lines.append(f"  {label}: (missing)")
+        return
+    path = Path(raw_path)
+    lines.append(f"  {label}: {path}")
+    if not path.exists():
+        lines.append(f"  {path} (missing)")
+        return
+    try:
+        data = path.read_bytes()
+        tail = data[-_JUNIT_LOG_TAIL_BYTES:]
+        if len(data) > len(tail):
+            lines.append(f"  ... log truncated to last {_JUNIT_LOG_TAIL_BYTES} bytes ...")
+        lines.append(tail.decode("utf-8", errors="replace"))
+    except OSError as exc:
+        lines.append(f"  unable to read log: {exc}")
+
+
+def sanitize_xml_text(value: str) -> str:
+    return _XML_INVALID_CHARS.sub("", value or "")
 
 
 def format_step(step: dict[str, Any]) -> str:
@@ -299,6 +442,7 @@ def render_markdown(
             "",
             f"- all case timings: `{timings_path}`",
             f"- failures tsv: `{failures_path}`",
+            f"- junit xml: `{root / 'junit.xml'}`",
             f"- primary JSON: `{run_dir / 'results' / 'report.json'}`",
             f"- primary Markdown: `{run_dir / 'results' / 'report.md'}`",
             f"- per-case logs: `{run_dir / 'results' / 'logs'}`",

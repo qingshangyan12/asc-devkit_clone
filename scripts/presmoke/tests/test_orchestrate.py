@@ -93,6 +93,7 @@ exit "${PRESMOKE_STUB_RC:-0}"
             self.assertIn("Elapsed:", result.stdout)
             self.assertIn("Cases: total=0 pass=0 fail=0 skip=0", result.stdout)
             self.assertIn("execute samples success", result.stdout)
+            self.assertTrue((root / "out/junit.xml").exists())
 
     def test_default_output_root_is_presmoke_reports(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
