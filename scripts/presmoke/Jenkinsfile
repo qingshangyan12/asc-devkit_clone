@@ -119,7 +119,18 @@ pipeline {
                                     export HTTP_PROXY="http://${PROXY_URL}"
                                     export HTTPS_PROXY="http://${PROXY_URL}"
 
-                                    source /opt/conda/etc/profile.d/conda.sh; conda activate py312; pip3 install en_dtypes==0.0.4
+                                    # prepare tensorflow modules for presmoke
+                                    source /opt/conda/etc/profile.d/conda.sh; conda activate py312
+                                    pip3 install en_dtypes==0.0.4
+                                    ARCH="$(uname -m)"
+                                    if [ "$ARCH" = "x86_64" ]; then
+                                        pip3 install tensorflow-cpu==2.19.1
+                                    elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+                                        pip3 install tensorflow==2.19.1
+                                    else
+                                        echo "Unsupported architecture: $ARCH"
+                                        exit 1
+                                    fi
 
                                     rm -rf asc-devkit
                                     git clone --depth 1 --branch "presmoke_opt" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit
