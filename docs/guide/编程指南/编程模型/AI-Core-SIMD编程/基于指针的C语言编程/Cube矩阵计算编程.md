@@ -2,16 +2,16 @@
 
 本文介绍如何在Ascend C中使用语言扩展C API编写基于`L1 Buffer`、`L0A Buffer`等片上存储的**矩阵计算代码**，该能力是Ascend C最基础、最通用的矩阵编程方式。
 
-前面概述已经描述了AI Core中分别用Vector计算单元和Cube计算单元来进行矢量和矩阵类计算，Vector计算单元部署于AIV核，Cube计算单元部署于AIC核。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
+AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
 
 ## 矩阵计算数据流
 
-Cube矩阵计算的主要数据流遵循`CopyGM2L1`->`CopyL12L0A/B`->`Mmad`->`CopyL0C2GM`的编程计算模型。
-当我们描述一个常见的Cube矩阵计算时，需要执行以下三个步骤：
-1. 通过`asc_copy_gm2l1_nd2nz`接口将A、B原始矩阵的GM数据搬运到L1 Buffer中。
-2. 通过`asc_copy_l12l0a`接口将A、B矩阵分别搬运到L0A Buffer和L0B Buffer上准备计算。
-3. 通过`asc_mmad`接口对L0A Buffer、L0B Buffer（又称BT Buffer）上面的数据进行矩阵计算，并输出结果到L0C Buffer上。
-4. 通过`asc_copy_l0c2gm`接口将L0C Buffer的数据进行处理并搬出到GM中，该接口可以利用Fixpipe Buffer数据进行随路量化、Relu等随路操作。
+Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → `CopyL0C2GM`。
+当我们描述一个常见的Cube矩阵计算时，需要执行以下四个步骤：
+1. 通过`asc_copy_gm2l1_nd2nz`接口将A、B原始矩阵从GM搬运到L1 Buffer中。
+2. 通过`asc_copy_l12l0a`和`asc_copy_l12l0b`接口分别将A、B矩阵搬运到L0A Buffer和L0B Buffer中。
+3. 通过`asc_mmad`接口对L0A Buffer和L0B Buffer中的数据进行矩阵计算，结果输出到L0C Buffer。
+4. 通过`asc_copy_l0c2gm`接口将L0C Buffer的结果搬运到GM中，支持随路量化、ReLU等操作。
 
 ## 矩阵计算分形介绍
 
@@ -25,18 +25,18 @@ Cube矩阵计算的主要数据流遵循`CopyGM2L1`->`CopyL12L0A/B`->`Mmad`->`Co
 ### 关键分形格式详解
 矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品 和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，矩阵乘法 C = A x B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
+针对Atlas A2/A3训练和推理系列产品，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
 ![矩阵乘法场景设计的数据格式](image-17.png)
 
-针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A x B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
+针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
 ![矩阵乘法场景涉及的数据格式](image-18.png)
 
 **ND 格式(N-Dimension)**
 
-ND格式是通用的N维张量格式，即"线性格式"，数据在内存中是连续线性的，通常存在于`Global Memory(GM)`中。 在进行矩阵运算前，通常需要将其转换为NZ格式以适配Cube计算单元。
+ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为NZ格式以适配Cube计算单元。
 
 **Nz 格式**
-NZ格式主要用于L1 Buffer & L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT, L0A Buffer的存储数据分形也为Nz分形格式。该格式采用大N(外部列主序) + 小z(内部行主序)的方式排布。
+NZ格式主要用于L1 Buffer和L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
 ![Nz数据排布格式](image-19.png)
 
