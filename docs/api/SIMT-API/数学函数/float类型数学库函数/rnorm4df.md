@@ -54,7 +54,7 @@ a^2 + b^2 + c^2 + d^2的平方根的倒数。
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
 ```
-#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
 ```
 
 ## 调用示例
@@ -62,8 +62,6 @@ a^2 + b^2 + c^2 + d^2的平方根的倒数。
 - SIMT编程场景：
 
     ```
-    #include "simt_api/asc_simt.h"
-
     __global__ __launch_bounds__(256) void compute_rnorm4df(float *result, const float *x, const float *y, const float *z, const float *w, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -77,9 +75,6 @@ a^2 + b^2 + c^2 + d^2的平方根的倒数。
 - SIMD与SIMT混合编程场景：
 
     ```
-    #include "kernel_operator.h"
-    #include "simt_api/asc_simt.h"
-
     __simt_vf__ __launch_bounds__(256) inline void compute_rnorm4df_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, __gm__ const float *z, __gm__ const float *w, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

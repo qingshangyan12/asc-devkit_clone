@@ -51,7 +51,7 @@ inline float fdimf(float x, float y)
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
 
 ```
-#include "simt_api/asc_simt.h"
+#include "simt_api/math_functions.h"
 ```
 
 ## 调用示例
@@ -59,8 +59,6 @@ inline float fdimf(float x, float y)
 - SIMT编程场景：
 
     ```
-    #include "simt_api/asc_simt.h"
-
     __global__ __launch_bounds__(256) void compute_fdimf(float *result, const float *x, const float *y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -74,9 +72,6 @@ inline float fdimf(float x, float y)
 - SIMD与SIMT混合编程场景：
 
     ```
-    #include "kernel_operator.h"
-    #include "simt_api/asc_simt.h"
-
     __simt_vf__ __launch_bounds__(256) inline void compute_fdimf_vf(__gm__ float *result, __gm__ const float *x, __gm__ const float *y, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;

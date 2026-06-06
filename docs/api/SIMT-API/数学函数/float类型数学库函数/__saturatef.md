@@ -48,7 +48,7 @@ float __saturatef(float x)
 使用该接口需要包含"simt\_api/device\_functions.h"头文件。
 
 ```
-#include "simt_api/asc_simt.h"
+#include "simt_api/device_functions.h"
 ```
 
 ## 调用示例
@@ -56,8 +56,6 @@ float __saturatef(float x)
 - SIMT编程场景：
 
     ```
-    #include "simt_api/asc_simt.h"
-
     __global__ __launch_bounds__(256) void compute_saturate_intrinsic(float *result, const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -71,9 +69,6 @@ float __saturatef(float x)
 - SIMD与SIMT混合编程场景：
 
     ```
-    #include "kernel_operator.h"
-    #include "simt_api/asc_simt.h"
-
     __simt_vf__ __launch_bounds__(256) inline void compute_saturate_intrinsic_vf(__gm__ float *result, __gm__ const float *x, uint32_t count)
     {
         const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
