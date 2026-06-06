@@ -64,6 +64,7 @@ from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
 from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
+from .ascendc_compile_manifest import OpCompileManifestRecorder
 
 DEFAULT_TILING_KEY = '0'
 COMPILE_INFO_KEY = 'compileInfo'
@@ -1195,6 +1196,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
     kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
+    manifest_recorder = OpCompileManifestRecorder()
+    manifest_recorder.start(op_info, origin_func_name, cce_file, kernel_meta_dir)
     distinct_tag = CommonUtility.get_distinct_filename_tag()
     compile_log_path = None
     if global_var_storage.get_variable("ascendc_compile_debug_config"):
@@ -1301,9 +1304,9 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
-    # dump ktype handle
-    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-    
+-   # dump ktype handle
+-   compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
+
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
@@ -1329,8 +1332,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
-        # dump ktype handle
-        compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
+-       # dump ktype handle
+-       compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
         handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
         workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
                                                 distinct_tag, kernel_meta_dir)
@@ -1359,6 +1362,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         "compile Ascend C operator {} success".format(op_info.op_type), AscendCLogLevel.LOG_INFO)
     msg_info = "<{}> <{}> compile op end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    manifest_recorder.write(compile_info, tiling_info, compile_option_tuple)
 
 
 def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_options: list = None,
