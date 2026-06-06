@@ -6,6 +6,7 @@ output
 __pycache__/
 /examples/**/build/
 AGENTS.md
+CLAUDE.md
 oat_reports/
 presmoke_reports/
 log/
