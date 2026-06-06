@@ -12,7 +12,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'GIT_BRANCH', defaultValue: 'master', trim: true, description: 'Branch or tag to test.')
+        string(name: 'GIT_BRANCH', defaultValue: 'presmoke_opt', trim: true, description: 'Branch or tag to test.')
         choice(name: 'ARCH', choices: ['dav-2201', 'dav-3510'], description: 'Target architecture: dav-2201 for 910B, dav-3510 for 950.')
         choice(name: 'MODES', choices: ['npu', 'cpu'], description: 'Presmoke execution mode.')
         string(name: 'PRIMARY_CARD', defaultValue: '0', trim: true, description: 'Primary NPU card id for npu mode.')
@@ -39,7 +39,7 @@ pipeline {
                 sh '''#!/usr/bin/env bash
                     set -euo pipefail
                     rm -rf asc-devkit
-                    git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/cann/asc-devkit.git asc-devkit
+                    git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit
                 '''
             }
         }
