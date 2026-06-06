@@ -31,7 +31,7 @@
 
 <cann-filter npu-type="950">
 
-- 支持enableSmallC0模式
+- 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
     // 该函数原型仅支持Ascend 950PR/Ascend 950DT
@@ -100,7 +100,7 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 <cann-filter npu-type="310p">
 
-- Atlas 推理系列产品 AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、float、int32_t、uint32_t。
+- Atlas 推理系列产品AI Core，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、float、int32_t、uint32_t。
 
 </cann-filter>
 

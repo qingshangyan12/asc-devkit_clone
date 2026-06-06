@@ -124,6 +124,7 @@
 ## 数据类型<a name="zh-cn_topic_0000002565968945_section4219135304818"></a>
 
 源操作数和目的操作数支持的数据类型保持一致，GM -\> VECIN（GM -\> UB）和 VECOUT -\> GM（UB -\> GM）两个数据通路的数据类型支持情况相同，具体如下：
+
 <cann-filter npu-type="950">
 
 - Ascend 950PR/Ascend 950DT：bool、int8_t、uint8_t、hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。
@@ -160,7 +161,8 @@
 - 切片数据搬运中的横向burstLen大小设置，需要用户自己通过计算：横向切片元素个数\* sizeof\(T\)/32byte。横向切片元素个数\* sizeof\(T\)的大小必须是32byte的倍数。
 - SliceInfo 结构体的成员变量 startIndex、endIndex、stride、burstLen的取值须满足：
 $$endIndex - startIndex + 1 = (N - 1) \times stride + N \times burstLen \times \frac{32}{sizeof(T)}, \quad N \in 正整数$$
-- SliceInfo结构体的成员变量startIndex、endIndex、shapeValue的取值须满足：$$startIndex < endIndex \le shapeValue$$
+- SliceInfo结构体的成员变量startIndex、endIndex、shapeValue的取值须满足：
+$$startIndex < endIndex \le shapeValue$$
 - 切片数据搬运中的SliceInfo结构体数组大小和dimValue需要保持一致，并且不超过8。
 - 切片数据搬运中的srcSliceInfo结构体数组大小的和dstSliceInfo的结构体数组大小需要保持一致，两者的结构体中的burstLen需要相等（srcSliceInfo\[i\].burstLen = dstSliceInfo\[i\].burstLen）。
 - 切片数据搬运对参数有一定要求，建议使用者参考调用示例，并在CPU上仿真结果无误后，再到NPU侧执行。
@@ -168,13 +170,31 @@ $$endIndex - startIndex + 1 = (N - 1) \times stride + N \times burstLen \times \
 ## 调用示例<a name="zh-cn_topic_0000002565968945_section088124295117"></a>
 
 ```cpp
-// srcLocal为float类型的LocalTensor，srcGlobal、dstGlobal为float类型的GlobalTensor。
-uint32_t dimValue = 2; // 操作数维度为2。
-AscendC::SliceInfo srcSliceInfo[] = {{16, 70, 7, 3, 87}, {0, 2, 1, 1, 3}};
-AscendC::SliceInfo dstSliceInfo[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
-// Global Memory -> Local Memory
-AscendC::DataCopy(srcLocal, srcGlobal,  dstSliceInfo, srcSliceInfo, dimValue);
-// Local Memory -> Global Memory
+// 配置切片搬运参数
+AscendC::SliceInfo srcSliceInfoIn[] = {{16, 70, 7, 3, 87}, {0, 2, 1, 1, 3}};
+AscendC::SliceInfo dstSliceInfoIn[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
+uint32_t dimValueIn = 2;
+dimValue = dimValueIn;
+for (uint32_t i = 0; i < dimValueIn; i++) {
+    srcSliceInfo[i].startIndex = srcSliceInfoIn[i].startIndex;
+    srcSliceInfo[i].endIndex = srcSliceInfoIn[i].endIndex;
+    srcSliceInfo[i].stride = srcSliceInfoIn[i].stride;
+    srcSliceInfo[i].burstLen = srcSliceInfoIn[i].burstLen;
+    srcSliceInfo[i].shapeValue = srcSliceInfoIn[i].shapeValue;
+    dstSliceInfo[i].startIndex = dstSliceInfoIn[i].startIndex;
+    dstSliceInfo[i].endIndex = dstSliceInfoIn[i].endIndex;
+    dstSliceInfo[i].stride = dstSliceInfoIn[i].stride;
+    dstSliceInfo[i].burstLen = dstSliceInfoIn[i].burstLen;
+    dstSliceInfo[i].shapeValue = dstSliceInfoIn[i].shapeValue;
+}
+
+// 先后进行两个数据通路的切片搬运
+// GM -> UB: MTE2流水搬运
+AscendC::DataCopy(srcLocal, srcGlobal, dstSliceInfo, srcSliceInfo, dimValue);
+// 等待MTE2搬运完成，MTE3可以开始
+AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+// UB -> GM: MTE3流水搬运
 AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
 ```
 
