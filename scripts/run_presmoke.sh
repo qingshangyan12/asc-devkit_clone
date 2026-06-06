@@ -96,6 +96,29 @@ run_python_module() {
     python3 -m "$@"
 }
 
+npu_smi_info() {
+    if ! command -v npu-smi >/dev/null 2>&1; then
+        return 0
+    fi
+    if command -v timeout >/dev/null 2>&1; then
+        timeout 10s npu-smi info 2>/dev/null || true
+        return 0
+    fi
+
+    npu-smi info 2>/dev/null &
+    local pid=$!
+    local waited=0
+    while kill -0 "$pid" 2>/dev/null; do
+        if (( waited >= 10 )); then
+            kill "$pid" 2>/dev/null || true
+            return 0
+        fi
+        sleep 1
+        waited=$((waited + 1))
+    done
+    wait "$pid" 2>/dev/null || true
+}
+
 presmoke_opp_path() {
     if [[ -n "${ASCEND_OPP_PATH:-}" ]]; then
         printf '%s\n' "$ASCEND_OPP_PATH"
@@ -158,7 +181,7 @@ run_presmoke() {
         echo "extra_args=$*"
         source_cann
         echo "npu_smi_before_begin"
-        npu-smi info 2>/dev/null || true
+        npu_smi_info
         echo "npu_smi_before_end"
     } > "$run_dir/meta.txt"
 
@@ -201,7 +224,7 @@ run_presmoke() {
         echo "elapsed_sec=$((end - start))"
         source_cann
         echo "npu_smi_after_begin"
-        npu-smi info 2>/dev/null || true
+        npu_smi_info
         echo "npu_smi_after_end"
     } >> "$run_dir/meta.txt"
     log "run_done name=$name card=$card rc=$rc elapsed_sec=$((end - start))"
