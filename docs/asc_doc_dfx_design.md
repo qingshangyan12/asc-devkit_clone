@@ -1,11 +1,5 @@
 # Ascend C资料DFX设计文档
 
-> **文档类型**: 资料体系设计规范
-> **受众**: Ascend C资料开发人员和社区贡献者
-> **适用范围**: Ascend C编程指南（含入门教程）、API参考手册、算子实践参考、跨代迁移兼容性指南
-
----
-
 ## 1 设计目标
 
 Ascend C资料是开发者使用昇腾NPU进行算子开发的唯一官方入口。资料质量直接影响开发者从"了解→上手→精通"全链路效率。
@@ -26,7 +20,10 @@ Ascend C资料是开发者使用昇腾NPU进行算子开发的唯一官方入口
 
 Ascend C资料体系由**四份**核心文档组成（入门教程归入编程指南），通过交叉链接形成可导航的资料网络。
 
-> 架构图见：[ascendc-doc-arch-v4.svg](https://gitcode.com/cann/asc-devkit/tree/master/docs/figures/asc_docs_architecture.png)
+资料体系架构图如下所示：
+
+<img src="figures/asc_docs_architecture.png" alt="资料体系架构图"  width="850px" height="580px">
+
 
 **核心导航逻辑**：每个文档既是链接的**发起方**（首次提到其他文档负责的内容时，链接过去），也是链接的**接收方**（别的文档提到本文档负责的内容时，链接回来）。
 
