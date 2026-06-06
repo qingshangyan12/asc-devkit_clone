@@ -11,7 +11,7 @@ class JenkinsfileTest(unittest.TestCase):
 
         self.assertIn("choice(name: 'ARCH', choices: ['dav-2201', 'dav-3510']", text)
         self.assertIn("choice(name: 'MODES', choices: ['npu', 'cpu']", text)
-        self.assertIn("string(name: 'GIT_BRANCH', defaultValue: 'master'", text)
+        self.assertIn("string(name: 'GIT_BRANCH', defaultValue: 'presmoke_opt'", text)
         self.assertNotIn("REPO_DIR", text)
         self.assertIn("stage('clone asc-devkit')", text)
         self.assertNotIn("withCredentials", text)
@@ -19,7 +19,7 @@ class JenkinsfileTest(unittest.TestCase):
         self.assertNotIn("GIT_CREDENTIALS_ID", text)
         self.assertNotIn("GIT_URL", text)
         self.assertIn('rm -rf asc-devkit', text)
-        self.assertIn('git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/cann/asc-devkit.git asc-devkit', text)
+        self.assertIn('git clone --depth 1 --branch "${GIT_BRANCH}" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit', text)
         self.assertNotIn("ASC_DEVKIT_DIR", text)
         self.assertIn("dir('asc-devkit')", text)
         self.assertIn('bash scripts/run_presmoke.sh ${EXTRA_ARGS}', text)
