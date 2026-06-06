@@ -512,7 +512,7 @@ export default defineConfig({
     },
     plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
-      placeholder: '搜索文档',
+      placeholder: '简易搜索，暂不支持多语言和特殊符号',
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'en',
