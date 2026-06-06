@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口提供将数据从Global Memory非对齐搬运至Unified Buffer的功能，可以根据开发者的需要自行填充数据。
+该接口提供将数据从GM (Global Memory)非对齐搬运至UB (Unified Buffer)的功能，可以根据开发者的需要自行填充数据。
 
 填充的数据有两种配置方式：
 
@@ -57,10 +57,10 @@
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为Unified Buffer，目的地址需要32B对齐。 |
-| src | 输入 | 源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1B对齐。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。 |
+| src | 输入 | 源操作数，类型为GlobalTensor，存储位置为GM (Global Memory)，源地址需要1B对齐。 |
 | dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考表3。 |
-| padParams | 输入 | 从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考表4。 |
+| padParams | 输入 | 从GM搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考表4。 |
 
 下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
@@ -160,7 +160,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 位于Global Memory的源地址必须1B对齐，位于Unified Buffer的目的地址必须32B对齐。
+- 位于GM的源地址必须1B对齐，位于UB的目的地址必须32B对齐。
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
 - 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
