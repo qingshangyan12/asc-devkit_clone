@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import re
@@ -17,14 +30,30 @@ def parse_readme(example_dir: Path, examples_root: Path) -> ExampleSpec:
     readme = example_dir / "README.md"
     suggestions: List[Suggestion] = []
     if not readme.exists():
-        suggestions.append(_suggest(rel_path, "structure", "warn", "README.md is missing", "Add README.md or exclude this directory."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "structure",
+                "warn",
+                "README.md is missing",
+                "Add README.md or exclude this directory.",
+            )
+        )
         text = ""
     else:
         text = readme.read_text(encoding="utf-8", errors="ignore")
 
     run_section = _section(text, "编译运行")
     if not run_section:
-        suggestions.append(_suggest(rel_path, "structure", "warn", "README has no 编译运行 section", "Add a runnable 编译运行 section."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "structure",
+                "warn",
+                "README has no 编译运行 section",
+                "Add a runnable 编译运行 section.",
+            )
+        )
 
     command_block, source = _pick_command_block(run_section)
     if command_block:
@@ -32,13 +61,29 @@ def parse_readme(example_dir: Path, examples_root: Path) -> ExampleSpec:
     else:
         commands = convention_commands(example_dir)
         source = "convention"
-        suggestions.append(_suggest(rel_path, "structure", "warn", "No runnable bash block found; using convention commands", "Add a 样例执行 bash block."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "structure",
+                "warn",
+                "No runnable bash block found; using convention commands",
+                "Add a 样例执行 bash block.",
+            )
+        )
 
     archs = parse_archs(text, command_block, example_dir)
     modes = parse_modes(text, command_block)
     if not archs:
         archs = ["dav-2201"]
-        suggestions.append(_suggest(rel_path, "structure", "warn", "Could not infer supported archs; defaulting to dav-2201", "Document CMAKE_ASC_ARCHITECTURES."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "structure",
+                "warn",
+                "Could not infer supported archs; defaulting to dav-2201",
+                "Document CMAKE_ASC_ARCHITECTURES.",
+            )
+        )
     if not modes:
         modes = ["npu"]
 
@@ -271,7 +316,11 @@ def _archs_from_supported_products(text: str) -> List[str]:
     archs: List[str] = []
     if re.search(r"Ascend\s*950|950PR|950DT|dav-3510", support_section, re.IGNORECASE):
         archs.append("dav-3510")
-    if re.search(r"Atlas\s*A[23]|Atlas\s*200I/500\s*A2|Atlas\s*200I|Atlas\s*500\s*A2|dav-2201", support_section, re.IGNORECASE):
+    if re.search(
+        r"Atlas\s*A[23]|Atlas\s*200I/500\s*A2|Atlas\s*200I|Atlas\s*500\s*A2|dav-2201",
+        support_section,
+        re.IGNORECASE,
+    ):
         archs.append("dav-2201")
     return archs
 
@@ -318,13 +367,50 @@ def convention_commands(example_dir: Path) -> List[Command]:
     return commands
 
 
-def _static_suggestions(example_dir: Path, rel_path: str, commands: Sequence[Command], suggestions: List[Suggestion]) -> None:
+def _static_suggestions(
+    example_dir: Path,
+    rel_path: str,
+    commands: Sequence[Command],
+    suggestions: List[Suggestion],
+) -> None:
     if not (example_dir / "README_en.md").exists():
-        suggestions.append(_suggest(rel_path, "structure", "info", "README_en.md is missing", "Add README_en.md if this example should be bilingual."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "structure",
+                "info",
+                "README_en.md is missing",
+                "Add README_en.md if this example should be bilingual.",
+            )
+        )
     for command in commands:
         if "gen_data.py" in command.raw and not (example_dir / "scripts" / "gen_data.py").exists():
-            suggestions.append(_suggest(rel_path, "structure", "warn", "Command references gen_data.py but file is missing", "Fix README command or add scripts/gen_data.py."))
+            suggestions.append(
+                _suggest(
+                    rel_path,
+                    "structure",
+                    "warn",
+                    "Command references gen_data.py but file is missing",
+                    "Fix README command or add scripts/gen_data.py.",
+                )
+            )
         if "verify_result.py" in command.raw and not (example_dir / "scripts" / "verify_result.py").exists():
-            suggestions.append(_suggest(rel_path, "structure", "warn", "Command references verify_result.py but file is missing", "Fix README command or add scripts/verify_result.py."))
+            suggestions.append(
+                _suggest(
+                    rel_path,
+                    "structure",
+                    "warn",
+                    "Command references verify_result.py but file is missing",
+                    "Fix README command or add scripts/verify_result.py.",
+                )
+            )
     if not any(c.kind == "verify" for c in commands):
-        suggestions.append(_suggest(rel_path, "runtime", "info", "No verify step found; pass/fail depends on command rc only", "Add verify_result.py or an explicit validation command."))
+        suggestions.append(
+            _suggest(
+                rel_path,
+                "runtime",
+                "info",
+                "No verify step found; pass/fail depends on command rc only",
+                "Add verify_result.py or an explicit validation command.",
+            )
+        )
