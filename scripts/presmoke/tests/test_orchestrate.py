@@ -52,7 +52,7 @@ done
 mkdir -p "$results"
 if [[ "${PRESMOKE_STUB_RC:-0}" == "0" ]]; then
 cat > "$results/report.json" <<'JSON'
-{"summary":{"PASS":0,"FAIL":0,"SKIP":0},"results":[],"npu_stats":{"busy_s":0,"idle_s":0,"utilization":0}}
+{"summary":{"PASS":0,"FAIL":0,"SKIP":0},"results":[],"npu_stats":{"busy_s":9,"idle_s":1,"utilization":0.9}}
 JSON
 else
 cat > "$results/report.json" <<'JSON'
@@ -92,6 +92,7 @@ exit "${PRESMOKE_STUB_RC:-0}"
             self.assertIn("Presmoke Summary:", result.stdout)
             self.assertIn("Elapsed:", result.stdout)
             self.assertIn("Cases: total=0 pass=0 fail=0 skip=0", result.stdout)
+            self.assertIn("npu: busy=9.000s idle=1.000s util=90.000%", result.stdout)
             self.assertIn("execute samples success", result.stdout)
             self.assertTrue((root / "out/junit.xml").exists())
 
