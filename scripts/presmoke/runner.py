@@ -234,6 +234,13 @@ class _PipelineExecutor:
         self.results_lock = threading.Lock()
         self.npu_stats = _NpuPipelineStats(self.run_slots, queue_model)
 
+    @staticmethod
+    def _start_threads(npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
+        for thread in npu_threads:
+            thread.start()
+        for thread in verify_threads:
+            thread.start()
+
     def run(self) -> RunCellsResult:
         npu_threads = [
             threading.Thread(target=self.npu_worker, args=(idx,), name=f"presmoke-npu-{idx}")
@@ -323,13 +330,6 @@ class _PipelineExecutor:
 
     def start_threads(self, npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
         self._start_threads(npu_threads, verify_threads)
-
-    @staticmethod
-    def _start_threads(npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
-        for thread in npu_threads:
-            thread.start()
-        for thread in verify_threads:
-            thread.start()
 
     def stop_threads(self, npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
         for _ in npu_threads:
@@ -495,7 +495,12 @@ def run_commands(
             step = execute_command_step(
                 command,
                 CommandContext(context.cell, context.run_dir, context.log, stage_log),
-                RunOptions(Path(context.log.name).parent, options.timeout, options.cpu_run_timeout, npu_gate=options.npu_gate),
+                RunOptions(
+                    Path(context.log.name).parent,
+                    options.timeout,
+                    options.cpu_run_timeout,
+                    npu_gate=options.npu_gate,
+                ),
             )
             if step.uses_npu and pending_npu_wait_s:
                 step = StepRecord(
