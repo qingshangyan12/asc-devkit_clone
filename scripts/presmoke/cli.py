@@ -163,7 +163,13 @@ def schedule_selected_cases(cells: list, args: argparse.Namespace, config: Runti
 
 def emit_suggestions_only(args: argparse.Namespace, config: RuntimeConfig, suggestions: List[Suggestion]) -> int:
     report = RunReport(
-        config.host_arch, config.modes, config.started_at, now_iso(), [], suggestions, parallel_config=config.parallel_config
+        config.host_arch,
+        config.modes,
+        config.started_at,
+        now_iso(),
+        [],
+        suggestions,
+        parallel_config=config.parallel_config,
     )
     emit_reports(report, args, config.results_dir)
     return 0

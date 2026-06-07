@@ -281,12 +281,15 @@ def write_failures_tsv(
                 "retry_results",
             ]
         )
-        if primary:
-            _, _, _, data = primary
-            for result in data.get("results", []):
-                if result.get("status") != "FAIL":
-                    continue
-                writer.writerow(failure_row(result, retry_by_example))
+        for result in primary_failures(primary):
+            writer.writerow(failure_row(result, retry_by_example))
+
+
+def primary_failures(primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None) -> list[dict[str, Any]]:
+    if not primary:
+        return []
+    _, _, _, data = primary
+    return [result for result in data.get("results", []) if result.get("status") == "FAIL"]
 
 
 def failure_row(
