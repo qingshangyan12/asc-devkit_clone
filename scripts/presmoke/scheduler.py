@@ -38,9 +38,9 @@ CUSTOM_OP_DEPENDENT_CASES = {
 @dataclass(frozen=True)
 class ScheduleOptions:
     schedule: str = "default"
-    schedule_report: Optional[Path] = None,
-    schedule_file: Optional[Path] = None,
-    frontload_count: int = 1,
+    schedule_report: Optional[Path] = None
+    schedule_file: Optional[Path] = None
+    frontload_count: int = 1
     jobs: int = 1
 
 
