@@ -73,11 +73,11 @@
 
 | 参数名称 | 含义 |
 | :--- | :--- |
-| loopSrcStride | 表示每个维度内，该源操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint64_t，srcStride需在[0, 2<sup>40</sup>)。 |
-| loopDstStride | 表示每个维度内，该目的操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint32_t，dstStride需在[0, 2<sup>20</sup>)。 |
-| loopSize | 表示每个维度内，处理的元素个数（不包含Padding元素）。<br>单位为元素个数。数据类型为uint32_t，loopSize需在[0, 2<sup>20</sup>)。 |
-| loopLpSize | 表示每个维度内，左侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopLpSize不要超出该数据类型的取值范围。 |
-| loopRpSize | 表示每个维度内，右侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopRpSize不要超出该数据类型的取值范围。 |
+| loopSrcStride | 表示每个维度内，该源操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint64_t，loopSrcStride需在[0, 2<sup>40</sup>)。 |
+| loopDstStride | 表示每个维度内，该目的操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint32_t，loopDstStride需在[0, 2<sup>20</sup>)。 |
+| loopSize | 表示每个维度内，处理的元素个数（不包含Padding元素）。<br>单位为元素个数。数据类型为uint32_t，loopDstStride需在[0, 2<sup>20</sup>)。 |
+| loopLpSize | 表示每个维度内，左侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopLpSize不要超出该数据类型的取值范围：[0, 255]。 |
+| loopRpSize | 表示每个维度内，右侧需要补齐的元素个数。<br>单位为元素个数。数据类型为uint8_t，loopRpSize不要超出该数据类型的取值范围：[0, 255]。 |
 
 以下以2维的例子介绍几个典型使用场景。
 

@@ -49,10 +49,10 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 | 参数名称 | 含义 |
 | --- | --- |
-| blockCount | 搬运的数据块个数。uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter>|
-| blockLen | 搬运的每个数据块长度。uint16_t类型，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
-| srcGap | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。 |
-| dstGap | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。 |
+| blockCount | 搬运的数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter>|
+| blockLen | 搬运的每个数据块长度，数据类型为uint16_t，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> |
+| srcGap | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。 |
+| dstGap | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。 |
 
 下面的样例通过两个示例展示连续搬运和非连续搬运的使用方式。
 
