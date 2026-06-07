@@ -21,6 +21,7 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterator, List
@@ -33,120 +34,195 @@ from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
 from .runner import CPU_RUN_TIMEOUT, PipelineOptions, run_cells_pipeline_with_options
-from .scheduler import export_schedule_file, schedule_cells
+from .scheduler import export_schedule_file, schedule_cells, ScheduleOptions
 from .suggest import dedupe_suggestions
 
 
 LOG = logging.getLogger(__name__)
 
 
+@dataclass
+class RuntimeConfig:
+    modes: List[str]
+    jobs: int
+    make_jobs: int
+    cpu_run_slots: int
+    cpu_run_timeout: int
+    project_root: Path
+    examples_root: Path
+    host_arch: str
+    results_dir: Path
+    log_dir: Path
+    started_at: str
+    parallel_config: dict[str, int]
+
+
+@dataclass
+class CaseSelection:
+    cells: list
+    suggestions: List[Suggestion]
+    skipped_results: List[RunResult]
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     args = parse_args(argv)
+    config = build_runtime_config(args)
+    if not config.host_arch:
+        LOG.error("cannot detect host arch; pass --arch or PRESMOKE_ARCH")
+        return 2
+    configure_parallel_env(config.project_root, config.make_jobs)
+    selected = collect_cases(args, config)
+    cells = schedule_selected_cases(selected.cells, args, config)
+    if args.export_schedule:
+        export_schedule_file(cells, Path(args.export_schedule).resolve())
+    if args.suggestions_only:
+        return emit_suggestions_only(args, config, selected.suggestions)
+    if args.dry_run:
+        return emit_dry_run(args, config, cells, selected)
+    return run_and_emit(args, config, cells, selected)
+
+
+def build_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
     modes = parse_modes(args.modes)
     jobs = resolve_jobs(args.jobs, modes=modes)
     make_jobs = resolve_make_jobs(args.make_jobs, jobs)
     cpu_run_slots = resolve_cpu_run_slots(args.cpu_run_slots)
     cpu_run_timeout = resolve_positive_int(args.cpu_run_timeout)
     project_root = Path(os.environ.get("PRESMOKE_PROJECT_ROOT", Path.cwd())).resolve()
-    configure_parallel_env(project_root, make_jobs)
-    parallel_config = {
+    results_dir = Path(args.results).resolve()
+    return RuntimeConfig(
+        modes=modes,
+        jobs=jobs,
+        make_jobs=make_jobs,
+        cpu_run_slots=cpu_run_slots,
+        cpu_run_timeout=cpu_run_timeout,
+        project_root=project_root,
+        examples_root=Path(args.examples_root).resolve() if args.examples_root else project_root / "examples",
+        host_arch=detect_arch(args.arch),
+        results_dir=results_dir,
+        log_dir=Path(args.log_dir).resolve() if args.log_dir else results_dir / "logs",
+        started_at=now_iso(),
+        parallel_config=parallel_config(args, jobs, make_jobs, cpu_run_slots, cpu_run_timeout),
+    )
+
+
+def parallel_config(
+    args: argparse.Namespace,
+    jobs: int,
+    make_jobs: int,
+    cpu_run_slots: int,
+    cpu_run_timeout: int,
+) -> dict[str, int]:
+    return {
         "jobs": jobs,
         "npu_slots": args.npu_slots,
         "cpu_run_slots": cpu_run_slots,
         "make_jobs": make_jobs,
         "cpu_run_timeout": cpu_run_timeout,
     }
-    examples_root = Path(args.examples_root).resolve() if args.examples_root else project_root / "examples"
-    host_arch = detect_arch(args.arch)
-    if not host_arch:
-        LOG.error("cannot detect host arch; pass --arch or PRESMOKE_ARCH")
-        return 2
 
-    results_dir = Path(args.results).resolve()
-    log_dir = Path(args.log_dir).resolve() if args.log_dir else results_dir / "logs"
-    started_at = now_iso()
 
+def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelection:
     suggestions: List[Suggestion] = []
     skipped_results: List[RunResult] = []
-
     if args.runner_mode == "case-runner":
         cells, runner_suggestions, skipped_results = build_case_runner_cells_with_skips(
-            project_root,
-            host_arch,
-            modes,
+            config.project_root,
+            config.host_arch,
+            config.modes,
             args.filter,
             args.exclude,
         )
         suggestions.extend(runner_suggestions)
     else:
-        examples = discover_examples(examples_root)
+        examples = discover_examples(config.examples_root)
         examples = filter_examples(examples, args.filter, args.exclude)
-        specs = [parse_readme(path, examples_root) for path in examples]
+        specs = [parse_readme(path, config.examples_root) for path in examples]
         for spec in specs:
             suggestions.extend(spec.suggestions)
-        cells, planner_suggestions, skipped_results = build_cells_with_skips(specs, host_arch, modes)
+        cells, planner_suggestions, skipped_results = build_cells_with_skips(specs, config.host_arch, config.modes)
         suggestions.extend(planner_suggestions)
-    suggestions = dedupe_suggestions(suggestions)
-    cells = schedule_cells(
+    return CaseSelection(cells, dedupe_suggestions(suggestions), skipped_results)
+
+
+def schedule_selected_cases(cells: list, args: argparse.Namespace, config: RuntimeConfig) -> list:
+    return schedule_cells(
         cells,
-        schedule=args.schedule,
-        schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
-        schedule_file=resolve_schedule_file(project_root, host_arch, modes, args.schedule, args.schedule_file),
-        frontload_count=args.schedule_frontload_count,
-        jobs=jobs,
+        ScheduleOptions(
+            schedule=args.schedule,
+            schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
+            schedule_file=resolve_schedule_file(
+                config.project_root, config.host_arch, config.modes, args.schedule, args.schedule_file
+            ),
+            frontload_count=args.schedule_frontload_count,
+            jobs=config.jobs,
+        ),
     )
-    if args.export_schedule:
-        export_schedule_file(cells, Path(args.export_schedule).resolve())
 
-    if args.suggestions_only:
-        report = RunReport(host_arch, modes, started_at, now_iso(), [], suggestions, parallel_config=parallel_config)
-        emit_reports(report, args, results_dir)
-        return 0
 
-    if args.dry_run:
-        dry_results = [
-            RunResult(
-                cell.example.rel_path,
-                cell.arch,
-                cell.mode,
-                "SKIP",
-                "dry-run",
-                duration_s=0,
-                source=cell.example.source,
-            )
-            for cell in cells
-        ]
-        report = RunReport(
-            host_arch,
-            modes,
-            started_at,
-            now_iso(),
-            dry_results + skipped_results,
-            suggestions,
-            parallel_config=parallel_config,
+def emit_suggestions_only(args: argparse.Namespace, config: RuntimeConfig, suggestions: List[Suggestion]) -> int:
+    report = RunReport(
+        config.host_arch, config.modes, config.started_at, now_iso(), [], suggestions, parallel_config=config.parallel_config
+    )
+    emit_reports(report, args, config.results_dir)
+    return 0
+
+
+def emit_dry_run(args: argparse.Namespace, config: RuntimeConfig, cells: list, selected: CaseSelection) -> int:
+    dry_results = [
+        RunResult(
+            cell.example.rel_path,
+            cell.arch,
+            cell.mode,
+            "SKIP",
+            "dry-run",
+            duration_s=0,
+            source=cell.example.source,
         )
-        emit_reports(report, args, results_dir)
-        return 0
+        for cell in cells
+    ]
+    report = RunReport(
+        config.host_arch,
+        config.modes,
+        config.started_at,
+        now_iso(),
+        dry_results + selected.skipped_results,
+        selected.suggestions,
+        parallel_config=config.parallel_config,
+    )
+    emit_reports(report, args, config.results_dir)
+    return 0
 
-    with presmoke_run_lock(project_root):
+
+def run_and_emit(args: argparse.Namespace, config: RuntimeConfig, cells: list, selected: CaseSelection) -> int:
+    with presmoke_run_lock(config.project_root):
         run = run_cells_pipeline_with_options(
             cells,
             PipelineOptions(
-                log_dir=log_dir,
+                log_dir=config.log_dir,
                 timeout=args.timeout,
-                cpu_run_timeout=cpu_run_timeout,
+                cpu_run_timeout=config.cpu_run_timeout,
                 keep_artifacts=args.keep_artifacts,
-                jobs=jobs,
+                jobs=config.jobs,
                 npu_slots=args.npu_slots,
-                cpu_run_slots=cpu_run_slots,
+                cpu_run_slots=config.cpu_run_slots,
             ),
         )
     results = run.results
-    results.extend(skipped_results)
+    results.extend(selected.skipped_results)
     results = sorted(results, key=lambda result: (result.example, result.mode))
-    report = RunReport(host_arch, modes, started_at, now_iso(), results, suggestions, run.npu_stats, parallel_config)
-    emit_reports(report, args, results_dir)
+    report = RunReport(
+        config.host_arch,
+        config.modes,
+        config.started_at,
+        now_iso(),
+        results,
+        selected.suggestions,
+        run.npu_stats,
+        config.parallel_config,
+    )
+    emit_reports(report, args, config.results_dir)
     return 1 if any(result.status == "FAIL" for result in results) else 0
 
 
@@ -292,13 +368,9 @@ def presmoke_run_lock(project_root: Path) -> Iterator[None]:
             lock_dir.mkdir()
             break
         except FileExistsError:
-            pid_file = lock_dir / "pid"
-            try:
-                pid = int(pid_file.read_text(encoding="utf-8").strip())
-            except (OSError, ValueError):
-                pid = 0
-            if pid and process_exists(pid):
-                LOG.info("Waiting for existing presmoke run pid=%s", pid)
+            active_pid = active_lock_pid(lock_dir)
+            if active_pid:
+                LOG.info("Waiting for existing presmoke run pid=%s", active_pid)
                 time.sleep(5)
                 continue
             shutil.rmtree(lock_dir, ignore_errors=True)
@@ -308,6 +380,18 @@ def presmoke_run_lock(project_root: Path) -> Iterator[None]:
         yield
     finally:
         shutil.rmtree(lock_dir, ignore_errors=True)
+
+
+def active_lock_pid(lock_dir: Path) -> int:
+    pid = read_lock_pid(lock_dir / "pid")
+    return pid if pid and process_exists(pid) else 0
+
+
+def read_lock_pid(pid_file: Path) -> int:
+    try:
+        return int(pid_file.read_text(encoding="utf-8").strip())
+    except (OSError, ValueError):
+        return 0
 
 
 def process_exists(pid: int) -> bool:

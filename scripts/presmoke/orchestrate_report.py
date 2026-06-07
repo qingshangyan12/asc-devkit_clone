@@ -21,6 +21,7 @@ import logging
 import re
 import sys
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 from xml.dom import minidom
@@ -29,6 +30,16 @@ from xml.dom import minidom
 _XML_INVALID_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 _JUNIT_LOG_TAIL_BYTES = 100_000
 LOG = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class MarkdownRenderContext:
+    root: Path
+    primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None
+    retry_by_example: dict[str, list[tuple[str, dict[str, str], dict[str, Any]]]]
+    effective_failures: list[dict[str, Any]]
+    timings_path: Path
+    failures_path: Path
 
 
 def read_json(path: Path) -> dict[str, Any] | None:
@@ -69,6 +80,16 @@ def retry_status(report_path: Path) -> str:
 
 def print_summary(root: Path) -> None:
     primary = load_primary_run(root)
+    log_summary_header(root)
+    if not primary:
+        LOG.info("  Primary run: missing")
+        LOG.info("========================================")
+        return
+    log_primary_summary(primary)
+    LOG.info("========================================")
+
+
+def log_summary_header(root: Path) -> None:
     effective_rc_path = root / "effective_rc.txt"
     effective_rc = effective_rc_path.read_text(encoding="utf-8").strip() if effective_rc_path.exists() else "1"
     LOG.info("========================================")
@@ -78,11 +99,9 @@ def print_summary(root: Path) -> None:
     LOG.info("  Timings: %s", root / "ALL_CASE_TIMINGS.tsv")
     LOG.info("  Failures: %s", root / "FAILURES.tsv")
     LOG.info("  Effective RC: %s", effective_rc)
-    if not primary:
-        LOG.info("  Primary run: missing")
-        LOG.info("========================================")
-        return
 
+
+def log_primary_summary(primary: tuple[str, Path, dict[str, str], dict[str, Any]]) -> None:
     name, _, meta, data = primary
     summary = data.get("summary", {})
     results = data.get("results", [])
@@ -104,15 +123,24 @@ def print_summary(root: Path) -> None:
         summary.get("FAIL", 0),
         summary.get("SKIP", 0),
     )
-    if npu_stats:
-        metric = "run_queue" if npu_stats.get("queue_model") == "pipeline-cpu" else "npu"
-        LOG.info(
-            "  %s: busy=%.3fs idle=%.3fs util=%.3f%%",
-            metric,
-            float(npu_stats.get("busy_s") or 0),
-            float(npu_stats.get("idle_s") or 0),
-            float(npu_stats.get("utilization") or 0),
-        )
+    log_npu_stats(npu_stats)
+    log_failed_cases(results)
+
+
+def log_npu_stats(npu_stats: dict[str, Any]) -> None:
+    if not npu_stats:
+        return
+    metric = "run_queue" if npu_stats.get("queue_model") == "pipeline-cpu" else "npu"
+    LOG.info(
+        "  %s: busy=%.3fs idle=%.3fs util=%.3f%%",
+        metric,
+        float(npu_stats.get("busy_s") or 0),
+        float(npu_stats.get("idle_s") or 0),
+        float(npu_stats.get("utilization") or 0),
+    )
+
+
+def log_failed_cases(results: list[dict[str, Any]]) -> None:
     failures = [result for result in results if result.get("status") == "FAIL"]
     if failures:
         LOG.info("  Failed cases:")
@@ -126,7 +154,6 @@ def print_summary(root: Path) -> None:
             )
         if len(failures) > 20:
             LOG.info("    ... %s more", len(failures) - 20)
-    LOG.info("========================================")
 
 
 def load_primary_run(root: Path) -> tuple[str, Path, dict[str, str], dict[str, Any]] | None:
@@ -155,7 +182,9 @@ def write_final_report(root: Path) -> None:
         "1\n" if missing_primary or effective_failures else "0\n",
         encoding="utf-8",
     )
-    markdown = render_markdown(root, primary, retry_by_example, effective_failures, timings_path, failures_path)
+    markdown = render_markdown(
+        MarkdownRenderContext(root, primary, retry_by_example, effective_failures, timings_path, failures_path)
+    )
     (root / "FINAL_REPORT.md").write_text("\n".join(markdown) + "\n", encoding="utf-8")
     write_junit_xml(root / "junit.xml", primary)
 
@@ -257,23 +286,32 @@ def write_failures_tsv(
             for result in data.get("results", []):
                 if result.get("status") != "FAIL":
                     continue
-                retries = [
-                    f"{retry_name}:card={meta.get('card','')}:status={retry_result.get('status','')}:"
-                    f"reason={retry_result.get('reason','')}:rc={retry_result.get('rc','')}:"
-                    f"duration={float(retry_result.get('duration_s') or 0):.1f}"
-                    for retry_name, meta, retry_result in retry_by_example.get(result.get("example", ""), [])
-                ]
-                writer.writerow(
-                    [
-                        result.get("example", ""),
-                        result.get("status", ""),
-                        result.get("reason", ""),
-                        result.get("rc", ""),
-                        f"{float(result.get('duration_s') or 0):.3f}",
-                        result.get("failing_step", ""),
-                        " | ".join(retries),
-                    ]
-                )
+                writer.writerow(failure_row(result, retry_by_example))
+
+
+def failure_row(
+    result: dict[str, Any],
+    retry_by_example: dict[str, list[tuple[str, dict[str, str], dict[str, Any]]]],
+) -> list[str]:
+    retries = retry_texts(retry_by_example.get(result.get("example", ""), []))
+    return [
+        result.get("example", ""),
+        result.get("status", ""),
+        result.get("reason", ""),
+        result.get("rc", ""),
+        f"{float(result.get('duration_s') or 0):.3f}",
+        result.get("failing_step", ""),
+        " | ".join(retries),
+    ]
+
+
+def retry_texts(retries: list[tuple[str, dict[str, str], dict[str, Any]]]) -> list[str]:
+    return [
+        f"{retry_name}:card={meta.get('card','')}:status={retry_result.get('status','')}:"
+        f"reason={retry_result.get('reason','')}:rc={retry_result.get('rc','')}:"
+        f"duration={float(retry_result.get('duration_s') or 0):.1f}"
+        for retry_name, meta, retry_result in retries
+    ]
 
 
 def compute_effective_failures(
@@ -440,16 +478,9 @@ def format_step(step: dict[str, Any]) -> str:
     return text
 
 
-def render_markdown(
-    root: Path,
-    primary: tuple[str, Path, dict[str, str], dict[str, Any]] | None,
-    retry_by_example: dict[str, list[tuple[str, dict[str, str], dict[str, Any]]]],
-    effective_failures: list[dict[str, Any]],
-    timings_path: Path,
-    failures_path: Path,
-) -> list[str]:
-    lines = render_markdown_header(root)
-    if not primary:
+def render_markdown(context: MarkdownRenderContext) -> list[str]:
+    lines = render_markdown_header(context.root)
+    if not context.primary:
         lines.extend(
             [
                 "",
@@ -462,12 +493,12 @@ def render_markdown(
         )
         return lines
 
-    name, run_dir, meta, data = primary
+    name, run_dir, meta, data = context.primary
     lines.extend(render_primary_run(name, meta, data))
-    append_failures(lines, data.get("results", []), retry_by_example)
+    append_failures(lines, data.get("results", []), context.retry_by_example)
     append_skips(lines, data.get("results", []))
-    lines.extend(render_effective_status(effective_failures))
-    lines.extend(render_artifacts(root, run_dir, timings_path, failures_path))
+    lines.extend(render_effective_status(context.effective_failures))
+    lines.extend(render_artifacts(context.root, run_dir, context.timings_path, context.failures_path))
     return lines
 
 
@@ -598,9 +629,9 @@ def main() -> int:
 
     if args.command == "timeout-examples":
         for example in timeout_examples(args.report):
-            sys.stdout.write(f"{example}\n")
+            LOG.info("%s", example)
     elif args.command == "retry-status":
-        sys.stdout.write(f"{retry_status(args.report)}\n")
+        LOG.info("%s", retry_status(args.report))
     elif args.command == "write-final-report":
         write_final_report(args.root)
     elif args.command == "print-summary":
