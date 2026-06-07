@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import statistics
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional
 
@@ -34,27 +35,30 @@ CUSTOM_OP_DEPENDENT_CASES = {
 }
 
 
-def schedule_cells(
-    cells: Iterable[Cell],
-    schedule: str = "default",
+@dataclass(frozen=True)
+class ScheduleOptions:
+    schedule: str = "default"
     schedule_report: Optional[Path] = None,
     schedule_file: Optional[Path] = None,
     frontload_count: int = 1,
-    jobs: int = 1,
-) -> List[Cell]:
+    jobs: int = 1
+
+
+def schedule_cells(cells: Iterable[Cell], options: ScheduleOptions = ScheduleOptions()) -> List[Cell]:
     cells_list = list(cells)
+    schedule = options.schedule
     if schedule == "default":
         return enforce_required_order(cells_list)
     if schedule == "fixed":
-        if schedule_file is None:
+        if options.schedule_file is None:
             return enforce_required_order(cells_list)
-        return enforce_required_order(apply_fixed_schedule(cells_list, schedule_file))
+        return enforce_required_order(apply_fixed_schedule(cells_list, options.schedule_file))
     if schedule not in {"build-desc", "frontload-build-desc", "npu-idle-min"}:
         raise ValueError(f"unknown schedule: {schedule}")
-    if schedule_report is None:
+    if options.schedule_report is None:
         return enforce_required_order(cells_list)
 
-    build_seconds = load_build_seconds(schedule_report)
+    build_seconds = load_build_seconds(options.schedule_report)
     ranked_pairs = sorted(
         enumerate(cells_list),
         key=lambda item: (-build_seconds.get(item[1].example.rel_path, 0.0), item[0]),
@@ -62,9 +66,9 @@ def schedule_cells(
     if schedule == "build-desc":
         return enforce_required_order([cell for _, cell in ranked_pairs])
     if schedule == "npu-idle-min":
-        return schedule_npu_idle_min(cells_list, schedule_report, jobs)
+        return schedule_npu_idle_min(cells_list, options.schedule_report, options.jobs)
 
-    frontload = [cell for _, cell in ranked_pairs[: max(frontload_count, 0)]]
+    frontload = [cell for _, cell in ranked_pairs[: max(options.frontload_count, 0)]]
     frontloaded = {cell.key for cell in frontload}
     return enforce_required_order(frontload + [cell for cell in cells_list if cell.key not in frontloaded])
 

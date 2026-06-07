@@ -16,8 +16,29 @@ from presmoke.generate_case_runners import (
     quote_env_value,
     render_runner,
     requires_custom_op_package,
+    RunnerRenderSpec,
 )
 from presmoke.model import Command, ExampleSpec
+
+
+def render_runner_from_parts(
+    rel: str,
+    build_cmds: list[Command],
+    run_cmds: list[Command],
+    verify_cmds: list[Command],
+    custom_op_dependency: bool = False,
+    custom_op_package_case: bool = False,
+) -> str:
+    return render_runner(
+        RunnerRenderSpec(
+            rel=rel,
+            build_cmds=build_cmds,
+            run_cmds=run_cmds,
+            verify_cmds=verify_cmds,
+            custom_op_dependency=custom_op_dependency,
+            custom_op_package_case=custom_op_package_case,
+        )
+    )
 
 
 class GenerateCaseRunnersTest(unittest.TestCase):
@@ -90,14 +111,14 @@ class GenerateCaseRunnersTest(unittest.TestCase):
             if command.kind in {"cmake", "make", "gen_data", "shell"} or is_atc_prerequisite_command(command, commands)
         ]
         run_cmds = [command for command in commands if command.kind in {"run", "package_run"} and command not in build_cmds]
-        script = render_runner("x", build_cmds, run_cmds, [])
+        script = render_runner_from_parts("x", build_cmds, run_cmds, [])
         self.assertLess(script.index("python3 ../leaky_relu.py"), script.index("atc --model=./leaky_relu.onnx"))
         self.assertLess(script.index("atc --model=./leaky_relu.onnx"), script.index("cmake .."))
         self.assertLess(script.index("cmake .."), script.index("make -j"))
         self.assertIn("./execute_leaky_relu_op", script)
 
     def test_cmake_build_command_is_not_treated_as_configure(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "x",
             [Command("cmake -S . -B build", "cmake"), Command("cmake --build build -j", "cmake")],
             [],
@@ -108,7 +129,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertNotIn("cmake --build build -j -DCMAKE_ASC_ARCHITECTURES", script)
 
     def test_msprof_application_with_parent_python_runs_from_build_dir(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "x",
             [],
             [Command('msprof --application="python3 ../torch_library_report_tensor.py" --output="../result"', "run")],
@@ -131,7 +152,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertNotIn("ASC_ARCH=dav-2201", prefix)
 
     def test_manual_npu_arch_option_uses_runtime_arch(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "x",
             [Command("bisheng kernel.asc -o kernel.o --npu-arch=dav-2201", "shell")],
             [Command("./demo", "run")],
@@ -141,7 +162,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertNotIn("--npu-arch=dav-2201", script)
 
     def test_custom_op_dependent_runner_installs_package_before_build(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "x",
             [Command("cmake ..", "cmake")],
             [Command("./demo", "run")],
@@ -151,7 +172,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertLess(script.index("presmoke_ensure_custom_op_package"), script.index("cmake .."))
 
     def test_custom_op_provider_runner_uses_locked_installer_in_run_step(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "01_simd_cpp_api/02_features/00_compilation/custom_op",
             [Command(":", "build")],
             [Command(":", "run")],
@@ -210,7 +231,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertEqual(spec.archs, ["dav-3510"])
 
     def test_rendered_runner_delegates_common_boilerplate_to_case_common(self) -> None:
-        script = render_runner(
+        script = render_runner_from_parts(
             "01_simd_cpp_api/00_introduction/00_quickstart/hello_world",
             [Command("cmake ..", "cmake"), Command("make -j", "make")],
             [Command("./demo", "run")],

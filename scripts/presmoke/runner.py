@@ -67,64 +67,45 @@ class StepRecord:
     uses_npu: bool
 
 
-def run_cell(
-    cell: Cell,
-    log_dir: Path,
-    timeout: int,
-    cpu_run_timeout: int = CPU_RUN_TIMEOUT,
-    keep_artifacts: bool = False,
-    npu_gate: Optional[NpuGate] = None,
-) -> RunResult:
-    options = RunOptions(log_dir, timeout, cpu_run_timeout, keep_artifacts, npu_gate)
-    return run_cell_with_options(cell, options)
+@dataclass(frozen=True)
+class StageRunOptions:
+    log_dir: Path
+    timeout: int
+    cpu_run_timeout: int
+    keep_artifacts: bool
+    stage_name: str
+
+
+@dataclass(frozen=True)
+class CommandRunOptions:
+    timeout: int
+    cpu_run_timeout: int
+    npu_gate: Optional[NpuGate] = None
+    initial_npu_wait_s: float = 0.0
+
+
+@dataclass(frozen=True)
+class CommandContext:
+    cell: Cell
+    run_dir: Path
+    log: object
+    stage_log: object
+
+
+@dataclass(frozen=True)
+class SingleCellRunState:
+    log_file: Path
+    stage_log_dir: Path
+    run_dir: Path
+    use_build_dir: bool
 
 
 def run_cell_with_options(cell: Cell, options: RunOptions) -> RunResult:
     started = time.monotonic()
-    options.log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = options.log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
-    stage_log_dir = options.log_dir / "stages"
-    clear_stage_logs(options.log_dir, cell)
-    use_build_dir = any(command.kind in {"cmake", "make", "package_run"} for command in cell.commands)
-    if cell.example.source == "case-runner":
-        use_build_dir = False
-    run_dir = cell.build_dir if use_build_dir else cell.example.path
-    if use_build_dir:
-        clean_build_dir(cell.build_dir)
-        cell.build_dir.mkdir(parents=True, exist_ok=True)
-    else:
-        clean_build_dir(cell.build_dir)
-
-    status = "PASS"
-    reason = ""
-    failing_step: Optional[str] = None
-    rc: Optional[int] = 0
-    steps: List[StepResult] = []
-
-    with log_file.open("w", encoding="utf-8", errors="replace") as log:
-        log.write(f"example={cell.example.rel_path}\narch={cell.arch}\nmode={cell.mode}\nrun_dir={run_dir}\n\n")
-        for command in cell.commands:
-            if not command.raw or command.kind == "skip":
-                continue
-            stage_name = stage_name_for_command(command)
-            stage_log_file = stage_log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}__{stage_name}.log"
-            with open_stage_log(stage_log_file, cell, run_dir, stage_name) as stage_log:
-                log.write(f"\n$ {command.raw}\n")
-                log.flush()
-                stage_log.write(f"\n$ {command.raw}\n")
-                stage_log.flush()
-                step = execute_command_step(command, cell, run_dir, log, stage_log, options)
-                step_rc = step.rc
-                append_step_result(steps, step, log, stage_log)
-            if step_rc != 0:
-                status = "FAIL"
-                reason = "timeout" if step_rc == 124 else "nonzero rc"
-                failing_step = command.raw
-                rc = step_rc
-                break
-
+    state = prepare_single_cell_run(cell, options.log_dir)
+    status, reason, failing_step, rc, steps = execute_single_cell_commands(cell, options, state)
     duration = time.monotonic() - started
-    if should_remove_build_dir(cell, use_build_dir, options.keep_artifacts, status):
+    if should_remove_build_dir(cell, state.use_build_dir, options.keep_artifacts, status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
     return RunResult(
         example=cell.example.rel_path,
@@ -135,25 +116,86 @@ def run_cell_with_options(cell: Cell, options: RunOptions) -> RunResult:
         failing_step=failing_step,
         rc=rc,
         duration_s=duration,
-        log_file=str(log_file),
+        log_file=str(state.log_file),
         stage_log_files=stage_log_files_for_cell(options.log_dir, cell),
         source=cell.example.source,
         steps=steps,
     )
 
 
-def run_cells_pipeline(
-    cells: Iterable[Cell],
-    log_dir: Path,
-    timeout: int,
-    cpu_run_timeout: int = CPU_RUN_TIMEOUT,
-    keep_artifacts: bool = False,
-    jobs: int = 1,
-    npu_slots: int = 1,
-    cpu_run_slots: Optional[int] = None,
-) -> RunCellsResult:
-    options = PipelineOptions(log_dir, timeout, cpu_run_timeout, keep_artifacts, jobs, npu_slots, cpu_run_slots)
-    return run_cells_pipeline_with_options(cells, options)
+def prepare_single_cell_run(cell: Cell, log_dir: Path) -> SingleCellRunState:
+    log_dir.mkdir(parents=True, exist_ok=True)
+    clear_stage_logs(log_dir, cell)
+    use_build_dir = uses_build_directory(cell)
+    run_dir = cell.build_dir if use_build_dir else cell.example.path
+    if use_build_dir:
+        clean_build_dir(cell.build_dir)
+        cell.build_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        clean_build_dir(cell.build_dir)
+    return SingleCellRunState(
+        log_file=log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log",
+        stage_log_dir=log_dir / "stages",
+        run_dir=run_dir,
+        use_build_dir=use_build_dir,
+    )
+
+
+def uses_build_directory(cell: Cell) -> bool:
+    if cell.example.source == "case-runner":
+        return False
+    return any(command.kind in {"cmake", "make", "package_run"} for command in cell.commands)
+
+
+def execute_single_cell_commands(
+    cell: Cell,
+    options: RunOptions,
+    state: SingleCellRunState,
+) -> tuple[str, str, Optional[str], Optional[int], List[StepResult]]:
+    steps: List[StepResult] = []
+    with state.log_file.open("w", encoding="utf-8", errors="replace") as log:
+        log.write(f"example={cell.example.rel_path}\narch={cell.arch}\nmode={cell.mode}\nrun_dir={state.run_dir}\n\n")
+        for command in cell.commands:
+            if not command.raw or command.kind == "skip":
+                continue
+            step = run_single_command_stage(command, cell, options, state, log)
+            steps.append(step)
+            if step.rc != 0:
+                reason = "timeout" if step.rc == 124 else "nonzero rc"
+                return "FAIL", reason, command.raw, step.rc, steps
+    return "PASS", "", None, 0, steps
+
+
+def run_single_command_stage(
+    command: Command,
+    cell: Cell,
+    options: RunOptions,
+    state: SingleCellRunState,
+    log,
+) -> StepResult:
+    stage_name = stage_name_for_command(command)
+    stage_log_file = state.stage_log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}__{stage_name}.log"
+    with open_stage_log(stage_log_file, cell, state.run_dir, stage_name) as stage_log:
+        log.write(f"\n$ {command.raw}\n")
+        log.flush()
+        stage_log.write(f"\n$ {command.raw}\n")
+        stage_log.flush()
+        record = execute_command_step(command, CommandContext(cell, state.run_dir, log, stage_log), options)
+        step = step_result_from_record(record)
+        write_step_result(record, log, stage_log)
+    return step
+
+
+def step_result_from_record(step: StepRecord) -> StepResult:
+    return StepResult(
+        command=step.command.raw,
+        kind=step.command.kind,
+        rc=step.rc,
+        duration_s=step.duration_s,
+        wait_s=step.wait_s,
+        npu_slot=step.uses_npu,
+        timeout=step.rc == 124,
+    )
 
 
 def run_cells_pipeline_with_options(cells: Iterable[Cell], options: PipelineOptions) -> RunCellsResult:
@@ -217,12 +259,14 @@ class _PipelineExecutor:
     def build_worker(self, cell: Cell) -> None:
         item = run_cell_stage(
             cell,
-            log_dir=self.options.log_dir,
-            timeout=self.options.timeout,
-            cpu_run_timeout=self.options.cpu_run_timeout,
+            StageRunOptions(
+                self.options.log_dir,
+                self.options.timeout,
+                self.options.cpu_run_timeout,
+                keep_artifacts=True,
+                stage_name="build",
+            ),
             commands=build_stage_commands(cell.commands),
-            keep_artifacts=True,
-            stage_name="build",
         )
         if item.result.status == "PASS":
             self.ready.put(item)
@@ -278,6 +322,10 @@ class _PipelineExecutor:
                 future.result()
 
     def start_threads(self, npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
+        self._start_threads(npu_threads, verify_threads)
+
+    @staticmethod
+    def _start_threads(npu_threads: List[threading.Thread], verify_threads: List[threading.Thread]) -> None:
         for thread in npu_threads:
             thread.start()
         for thread in verify_threads:
@@ -325,28 +373,28 @@ class _NpuPipelineStats:
         )
 
 
+@dataclass
 class _PipelineItem:
-    def __init__(self, cell: Cell, result: RunResult, run_dir: Path, log_file: Path, started: float) -> None:
-        self.cell = cell
-        self.result = result
-        self.run_dir = run_dir
-        self.log_file = log_file
-        self.started = started
-        self.ready_at = time.monotonic()
+    cell: Cell
+    result: RunResult
+    run_dir: Path
+    log_file: Path
+    started: float
+    ready_at: float = 0.0
+
+    def __post_init__(self) -> None:
+        if not self.ready_at:
+            self.ready_at = time.monotonic()
 
 
 def run_cell_stage(
     cell: Cell,
-    log_dir: Path,
-    timeout: int,
-    cpu_run_timeout: int,
+    options: StageRunOptions,
     commands: Iterable[Command],
-    keep_artifacts: bool,
-    stage_name: str,
 ) -> _PipelineItem:
     started = time.monotonic()
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
+    options.log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = options.log_dir / f"{safe_log_name(cell.example.rel_path)}__{cell.mode}.log"
     use_build_dir = any(command.kind in {"cmake", "make", "package_run"} for command in cell.commands)
     if cell.example.source == "case-runner":
         use_build_dir = False
@@ -354,10 +402,10 @@ def run_cell_stage(
     if use_build_dir:
         clean_build_dir(cell.build_dir)
         cell.build_dir.mkdir(parents=True, exist_ok=True)
-    elif stage_name == "build":
+    elif options.stage_name == "build":
         clean_build_dir(cell.build_dir)
-    if stage_name == "build":
-        clear_stage_logs(log_dir, cell)
+    if options.stage_name == "build":
+        clear_stage_logs(options.log_dir, cell)
 
     result = RunResult(
         example=cell.example.rel_path,
@@ -373,9 +421,14 @@ def run_cell_stage(
     )
     with log_file.open("w", encoding="utf-8", errors="replace") as log:
         log.write(f"example={cell.example.rel_path}\narch={cell.arch}\nmode={cell.mode}\nrun_dir={run_dir}\n\n")
-        run_commands(result, cell, commands, run_dir, log, timeout, cpu_run_timeout)
+        run_commands(
+            result,
+            commands,
+            CommandContext(cell, run_dir, log, None),
+            CommandRunOptions(options.timeout, options.cpu_run_timeout),
+        )
     result.duration_s = time.monotonic() - started
-    if should_remove_build_dir(cell, use_build_dir, keep_artifacts, result.status):
+    if should_remove_build_dir(cell, use_build_dir, options.keep_artifacts, result.status):
         shutil.rmtree(cell.build_dir, ignore_errors=True)
     return _PipelineItem(cell, result, run_dir, log_file, started)
 
@@ -391,14 +444,9 @@ def finish_cell_after_build(
         if item.result.status == "PASS":
             run_commands(
                 item.result,
-                cell,
                 run_stage_commands(cell.commands),
-                item.run_dir,
-                log,
-                timeout,
-                cpu_run_timeout,
-                npu_gate,
-                initial_npu_wait_s=time.monotonic() - item.ready_at,
+                CommandContext(cell, item.run_dir, log, None),
+                CommandRunOptions(timeout, cpu_run_timeout, npu_gate, time.monotonic() - item.ready_at),
             )
     item.result.duration_s = time.monotonic() - item.started
     return item.result
@@ -415,12 +463,9 @@ def finish_cell_verify(
         if item.result.status == "PASS":
             run_commands(
                 item.result,
-                cell,
                 verify_stage_commands(cell.commands),
-                item.run_dir,
-                log,
-                timeout,
-                cpu_run_timeout,
+                CommandContext(cell, item.run_dir, log, None),
+                CommandRunOptions(timeout, cpu_run_timeout),
             )
     item.result.duration_s = time.monotonic() - item.started
     if should_remove_build_dir(cell, cell.build_dir.exists(), keep_artifacts, item.result.status):
@@ -430,40 +475,27 @@ def finish_cell_verify(
 
 def run_commands(
     result: RunResult,
-    cell: Cell,
     commands: Iterable[Command],
-    run_dir: Path,
-    log,
-    timeout: int,
-    cpu_run_timeout: int,
-    npu_gate: Optional[NpuGate] = None,
-    initial_npu_wait_s: float = 0.0,
+    context: CommandContext,
+    options: CommandRunOptions,
 ) -> None:
-    pending_npu_wait_s = initial_npu_wait_s
+    pending_npu_wait_s = options.initial_npu_wait_s
     for command in commands:
         if not command.raw or command.kind == "skip":
             continue
         stage_name = stage_name_for_command(command)
-        stage_log_file = stage_log_path(log.name, cell, stage_name)
+        stage_log_file = stage_log_path(context.log.name, context.cell, stage_name)
         if str(stage_log_file) not in result.stage_log_files:
             result.stage_log_files.append(str(stage_log_file))
-        with open_stage_log(stage_log_file, cell, run_dir, stage_name) as stage_log:
-            log.write(f"\n$ {command.raw}\n")
-            log.flush()
+        with open_stage_log(stage_log_file, context.cell, context.run_dir, stage_name) as stage_log:
+            context.log.write(f"\n$ {command.raw}\n")
+            context.log.flush()
             stage_log.write(f"\n$ {command.raw}\n")
             stage_log.flush()
             step = execute_command_step(
                 command,
-                cell,
-                run_dir,
-                log,
-                stage_log,
-                RunOptions(
-                    Path(log.name).parent,
-                    timeout,
-                    cpu_run_timeout,
-                    npu_gate=npu_gate,
-                ),
+                CommandContext(context.cell, context.run_dir, context.log, stage_log),
+                RunOptions(Path(context.log.name).parent, options.timeout, options.cpu_run_timeout, npu_gate=options.npu_gate),
             )
             if step.uses_npu and pending_npu_wait_s:
                 step = StepRecord(
@@ -475,7 +507,7 @@ def run_commands(
                 )
                 pending_npu_wait_s = 0.0
             step_rc = step.rc
-            append_step_result(result.steps, step, log, stage_log)
+            append_step_result(result.steps, step, context.log, stage_log)
         if step_rc != 0:
             result.status = "FAIL"
             result.reason = "timeout" if step_rc == 124 else "nonzero rc"
@@ -530,25 +562,18 @@ def clear_stage_logs(log_dir: Path, cell: Cell) -> None:
 
 @contextmanager
 def open_stage_log(path: Path, cell: Cell, run_dir: Path, stage_name: str) -> Iterator:
-    log = _open_stage_log(path, cell, run_dir, stage_name, append=path.exists())
-    try:
-        yield log
-    finally:
-        log.close()
-
-
-def _open_stage_log(path: Path, cell: Cell, run_dir: Path, stage_name: str, append: bool):
+    append = path.exists()
     path.parent.mkdir(parents=True, exist_ok=True)
-    log = path.open("a" if append else "w", encoding="utf-8", errors="replace")
-    if not append:
-        log.write(
-            f"example={cell.example.rel_path}\n"
-            f"arch={cell.arch}\n"
-            f"mode={cell.mode}\n"
-            f"stage={stage_name}\n"
-            f"run_dir={run_dir}\n\n"
-        )
-    return log
+    with path.open("a" if append else "w", encoding="utf-8", errors="replace") as log:
+        if not append:
+            log.write(
+                f"example={cell.example.rel_path}\n"
+                f"arch={cell.arch}\n"
+                f"mode={cell.mode}\n"
+                f"stage={stage_name}\n"
+                f"run_dir={run_dir}\n\n"
+            )
+        yield log
 
 
 class _TeeLog:
@@ -604,23 +629,20 @@ def select_timeout(
 
 def execute_command_step(
     command: Command,
-    cell: Cell,
-    run_dir: Path,
-    log,
-    stage_log,
+    context: CommandContext,
     options: RunOptions,
 ) -> StepRecord:
     command_started = time.monotonic()
-    uses_npu = command_uses_npu(cell, command)
-    step_timeout = select_timeout(cell, command, uses_npu, options.timeout, options.cpu_run_timeout)
+    uses_npu = command_uses_npu(context.cell, command)
+    step_timeout = select_timeout(context.cell, command, uses_npu, options.timeout, options.cpu_run_timeout)
     if uses_npu and options.npu_gate:
         step_rc, wait_s = options.npu_gate(
-            cell,
+            context.cell,
             command,
-            lambda: _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout),
+            lambda: _run_command(command, context.run_dir, _TeeLog(context.log, context.stage_log), step_timeout),
         )
     else:
-        step_rc = _run_command(command, run_dir, _TeeLog(log, stage_log), step_timeout)
+        step_rc = _run_command(command, context.run_dir, _TeeLog(context.log, context.stage_log), step_timeout)
         wait_s = 0.0
     return StepRecord(
         command=command,
@@ -668,17 +690,11 @@ def append_step_result(
     log,
     stage_log,
 ) -> None:
-    steps.append(
-        StepResult(
-            command=step.command.raw,
-            kind=step.command.kind,
-            rc=step.rc,
-            duration_s=step.duration_s,
-            wait_s=step.wait_s,
-            npu_slot=step.uses_npu,
-            timeout=step.rc == 124,
-        )
-    )
+    steps.append(step_result_from_record(step))
+    write_step_result(step, log, stage_log)
+
+
+def write_step_result(step: StepRecord, log, stage_log) -> None:
     step_line = (
         f"\n[STEP] rc={step.rc} duration_s={step.duration_s:.3f} "
         f"wait_s={step.wait_s:.3f} npu_slot={int(step.uses_npu)}\n"

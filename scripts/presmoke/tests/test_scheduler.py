@@ -13,6 +13,7 @@ from presmoke.scheduler import (
     custom_op_dependency_violation_s,
     export_schedule_file,
     schedule_cells,
+    ScheduleOptions,
     simulate_npu_idle,
     simulate_npu_makespan,
 )
@@ -97,7 +98,7 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, custom_op), cell(root, "a"), cell(root, static_lib)]
 
-            scheduled = schedule_cells(cells, schedule="build-desc", schedule_report=report)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report))
 
         names = [item.example.rel_path for item in scheduled]
         self.assertLess(names.index(static_lib), names.index(custom_op))
@@ -148,7 +149,7 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, dependent), cell(root, custom_op), cell(root, static_lib)]
 
-            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=2))
 
         names = [item.example.rel_path for item in scheduled]
         self.assertLess(names.index(static_lib), names.index(custom_op))
@@ -185,7 +186,7 @@ class SchedulerTest(unittest.TestCase):
                 cell(root, "short-e"),
             ]
 
-            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=4)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=4))
 
         self.assertEqual(custom_op_dependency_violation_s(scheduled, report, jobs=4), 0.0)
 
@@ -212,7 +213,7 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, "c"), cell(root, "b"), cell(root, "a")]
 
-            scheduled = schedule_cells(cells, schedule="build-desc", schedule_report=report)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report))
 
         self.assertEqual([item.example.rel_path for item in scheduled], ["a", "b", "c"])
         self.assertIsInstance(scheduled[0], Cell)
@@ -236,9 +237,11 @@ class SchedulerTest(unittest.TestCase):
 
             scheduled = schedule_cells(
                 cells,
-                schedule="frontload-build-desc",
-                schedule_report=report,
-                frontload_count=1,
+                ScheduleOptions(
+                    schedule="frontload-build-desc",
+                    schedule_report=report,
+                    frontload_count=1,
+                ),
             )
 
         self.assertEqual([item.example.rel_path for item in scheduled], ["slow", "fast-a", "fast-b", "medium"])
@@ -250,7 +253,7 @@ class SchedulerTest(unittest.TestCase):
             schedule_file.write_text("b\n# comment\nunknown\n\na\n", encoding="utf-8")
             cells = [cell(root, name) for name in ["a", "b", "c"]]
 
-            scheduled = schedule_cells(cells, schedule="fixed", schedule_file=schedule_file)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="fixed", schedule_file=schedule_file))
 
         self.assertEqual([item.example.rel_path for item in scheduled], ["b", "a", "c"])
 
@@ -265,7 +268,7 @@ class SchedulerTest(unittest.TestCase):
             schedule_file.write_text(f"{dependent}\n{custom_op}\n{parallel_ops}\n{static_lib}\n", encoding="utf-8")
             cells = [cell(root, dependent), cell(root, custom_op), cell(root, parallel_ops), cell(root, static_lib)]
 
-            scheduled = schedule_cells(cells, schedule="fixed", schedule_file=schedule_file)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="fixed", schedule_file=schedule_file))
 
         names = [item.example.rel_path for item in scheduled]
         self.assertLess(names.index(static_lib), names.index(custom_op))
@@ -278,7 +281,7 @@ class SchedulerTest(unittest.TestCase):
             cells = [cell(root, "a")]
 
             with self.assertRaises(FileNotFoundError):
-                schedule_cells(cells, schedule="fixed", schedule_file=root / "missing.txt")
+                schedule_cells(cells, ScheduleOptions(schedule="fixed", schedule_file=root / "missing.txt"))
 
     def test_export_schedule_file_writes_selected_order(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -561,8 +564,8 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, name) for name in ["slow-a", "slow-b", "fast-a", "fast-b", "fast-c"]]
 
-            build_desc = schedule_cells(cells, schedule="build-desc", schedule_report=report, jobs=2)
-            idle_min = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+            build_desc = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report, jobs=2))
+            idle_min = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=2))
 
             idle_min_s = simulate_npu_idle(idle_min, report, jobs=2)
             build_desc_idle_s = simulate_npu_idle(build_desc, report, jobs=2)
@@ -589,8 +592,8 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, name) for name in ["c0", "c1", "c2", "c3", "c4", "c5"]]
 
-            one_job = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=1)
-            two_jobs = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=2)
+            one_job = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=1))
+            two_jobs = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=2))
 
         self.assertNotEqual([item.example.rel_path for item in one_job], [item.example.rel_path for item in two_jobs])
 
@@ -743,7 +746,7 @@ class SchedulerTest(unittest.TestCase):
                 for name in ["fast-a", "fast-b", "fast-c", "fast-d", "slow-a", "slow-b", "slow-c", "slow-d"]
             ]
 
-            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=4)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=4))
             scheduled_idle = simulate_npu_idle(scheduled, report, jobs=4)
 
         names = [item.example.rel_path for item in scheduled]
@@ -765,8 +768,8 @@ class SchedulerTest(unittest.TestCase):
             )
             cells = [cell(root, name) for name in ["short-run", "long-run-a", "long-build", "long-run-b"]]
 
-            scheduled = schedule_cells(cells, schedule="npu-idle-min", schedule_report=report, jobs=3)
-            build_desc = schedule_cells(cells, schedule="build-desc", schedule_report=report, jobs=3)
+            scheduled = schedule_cells(cells, ScheduleOptions(schedule="npu-idle-min", schedule_report=report, jobs=3))
+            build_desc = schedule_cells(cells, ScheduleOptions(schedule="build-desc", schedule_report=report, jobs=3))
 
             scheduled_idle = simulate_npu_idle(scheduled, report, jobs=3)
             build_desc_idle = simulate_npu_idle(build_desc, report, jobs=3)
