@@ -27,68 +27,77 @@ MODE_RE = re.compile(r"\b(npu|cpu|sim)\b", re.IGNORECASE)
 
 def parse_readme(example_dir: Path, examples_root: Path) -> ExampleSpec:
     rel_path = example_dir.relative_to(examples_root).as_posix()
-    readme = example_dir / "README.md"
     suggestions: List[Suggestion] = []
-    if not readme.exists():
-        suggestions.append(
-            _suggest(
-                rel_path,
-                "structure",
-                "warn",
-                "README.md is missing",
-                "Add README.md or exclude this directory.",
-            )
-        )
-        text = ""
-    else:
-        text = readme.read_text(encoding="utf-8", errors="ignore")
+    text = read_readme_text(example_dir, rel_path, suggestions)
+    commands, command_block, source = readme_commands(example_dir, rel_path, text, suggestions)
+    archs = infer_archs(text, command_block, example_dir, rel_path, suggestions)
+    modes = parse_modes(text, command_block) or ["npu"]
+    _static_suggestions(example_dir, rel_path, commands, suggestions)
+    return ExampleSpec(example_dir, rel_path, commands, sorted(set(archs)), sorted(set(modes)), source, suggestions)
 
+
+def read_readme_text(example_dir: Path, rel_path: str, suggestions: List[Suggestion]) -> str:
+    readme = example_dir / "README.md"
+    if readme.exists():
+        return readme.read_text(encoding="utf-8", errors="ignore")
+    suggestions.append(
+        _suggest(
+            rel_path,
+            "structure",
+            "warn",
+            "README.md is missing",
+            "Add README.md or exclude this directory.",
+        )
+    )
+    return ""
+
+
+def readme_commands(
+    example_dir: Path,
+    rel_path: str,
+    text: str,
+    suggestions: List[Suggestion],
+) -> tuple[List[Command], str, str]:
     run_section = _section(text, "编译运行")
     if not run_section:
         suggestions.append(
-            _suggest(
-                rel_path,
-                "structure",
-                "warn",
-                "README has no 编译运行 section",
-                "Add a runnable 编译运行 section.",
-            )
+            _suggest(rel_path, "structure", "warn", "README has no 编译运行 section", "Add a runnable 编译运行 section.")
         )
-
     command_block, source = _pick_command_block(run_section)
     if command_block:
-        commands = split_commands(command_block)
-    else:
-        commands = convention_commands(example_dir)
-        source = "convention"
-        suggestions.append(
-            _suggest(
-                rel_path,
-                "structure",
-                "warn",
-                "No runnable bash block found; using convention commands",
-                "Add a 样例执行 bash block.",
-            )
+        return split_commands(command_block), command_block, source
+    suggestions.append(
+        _suggest(
+            rel_path,
+            "structure",
+            "warn",
+            "No runnable bash block found; using convention commands",
+            "Add a 样例执行 bash block.",
         )
+    )
+    return convention_commands(example_dir), "", "convention"
 
+
+def infer_archs(
+    text: str,
+    command_block: str,
+    example_dir: Path,
+    rel_path: str,
+    suggestions: List[Suggestion],
+) -> List[str]:
     archs = parse_archs(text, command_block, example_dir)
-    modes = parse_modes(text, command_block)
-    if not archs:
-        archs = ["dav-2201"]
-        suggestions.append(
-            _suggest(
-                rel_path,
-                "structure",
-                "warn",
-                "Could not infer supported archs; defaulting to dav-2201",
-                "Document CMAKE_ASC_ARCHITECTURES.",
-            )
+    if archs:
+        return archs
+    suggestions.append(
+        _suggest(
+            rel_path,
+            "structure",
+            "warn",
+            "Could not infer supported archs; defaulting to dav-2201",
+            "Document CMAKE_ASC_ARCHITECTURES.",
         )
-    if not modes:
-        modes = ["npu"]
-
-    _static_suggestions(example_dir, rel_path, commands, suggestions)
-    return ExampleSpec(example_dir, rel_path, commands, sorted(set(archs)), sorted(set(modes)), source, suggestions)
+    )
+    return ["dav-2201"]
 
 
 def _suggest(example: str, category: str, severity: str, message: str, hint: str = "") -> Suggestion:

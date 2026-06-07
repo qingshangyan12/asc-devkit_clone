@@ -167,65 +167,12 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     runner_dir = runners_root / rel
     runner_dir.mkdir(parents=True, exist_ok=True)
     runner = runner_dir / "run.sh"
-    confidence, reasons = classify_confidence(cell)
-    if not runnable_on_target:
-        reasons.append("unsupported_on_target_arch_or_mode")
-        confidence = downgrade(confidence)
-    build_cmds = [
-        command
-        for command in cell.commands
-        if command.raw and (
-            command.kind in {"cmake", "make", "gen_data", "shell"}
-            or is_atc_prerequisite_command(command, cell.commands)
-        )
-    ]
-    run_cmds = [
-        command
-        for command in cell.commands
-        if command.raw
-        and command.kind in {"run", "package_run"}
-        and command not in build_cmds
-    ]
-    verify_cmds = [command for command in cell.commands if command.raw and command.kind == "verify"]
-
-    if not run_cmds:
-        run_cmds = [Command(":", "run")]
-        if "no_run_step" not in reasons:
-            reasons.append("no_run_step")
-            confidence = downgrade(confidence)
-    if not verify_cmds:
-        verify_cmds = [Command(":", "verify")]
-
-    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
-    custom_op_dependency = requires_custom_op_package(rel)
-    skip_reason = explicit_skip_reason(rel)
-    if skip_reason:
-        reasons.append("explicit_skip")
-        confidence = "high"
-        build_cmds = [Command(":", "build")]
-        run_cmds = [Command(":", "run")]
-        verify_cmds = [Command(":", "verify")]
-    elif custom_op_package_case:
-        reasons.append("custom_op_package_provider")
-        build_cmds = [Command(":", "build")]
-        run_cmds = [Command(":", "run")]
-        verify_cmds = [Command(":", "verify")]
-    elif custom_op_dependency:
-        reasons.append("requires_custom_op_package")
-
-    text = _render_runner_from_spec(
-        RunnerRenderSpec(
-            rel=rel,
-            build_cmds=build_cmds,
-            run_cmds=run_cmds,
-            verify_cmds=verify_cmds,
-            custom_op_dependency=custom_op_dependency,
-            custom_op_package_case=custom_op_package_case,
-            skip_reason=skip_reason,
-        )
-    )
+    confidence, reasons = runner_confidence(cell, runnable_on_target)
+    render_spec, confidence = build_runner_render_spec(cell, confidence, reasons)
+    text = render_runner(render_spec)
     runner.write_text(text, encoding="utf-8")
     runner.chmod(0o755)
+    skip_reason = render_spec.skip_reason
     return CaseReport(
         case=rel,
         runner=runner.relative_to(project_root).as_posix(),
@@ -239,6 +186,80 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
         reasons=reasons,
         commands=[command.raw for command in cell.commands if command.raw],
     )
+
+
+def runner_confidence(cell, runnable_on_target: bool) -> tuple[str, List[str]]:
+    confidence, reasons = classify_confidence(cell)
+    if not runnable_on_target:
+        reasons.append("unsupported_on_target_arch_or_mode")
+        confidence = downgrade(confidence)
+    return confidence, reasons
+
+
+def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple[RunnerRenderSpec, str]:
+    rel = cell.example.rel_path
+    build_cmds = build_commands_for_runner(cell.commands)
+    run_cmds = run_commands_for_runner(cell.commands, build_cmds)
+    verify_cmds = [command for command in cell.commands if command.raw and command.kind == "verify"]
+    if not run_cmds:
+        run_cmds = [Command(":", "run")]
+        if "no_run_step" not in reasons:
+            reasons.append("no_run_step")
+            confidence = downgrade(confidence)
+    if not verify_cmds:
+        verify_cmds = [Command(":", "verify")]
+    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
+    custom_op_dependency = requires_custom_op_package(rel)
+    skip_reason = explicit_skip_reason(rel)
+    if skip_reason:
+        reasons.append("explicit_skip")
+        confidence = "high"
+        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
+    elif custom_op_package_case:
+        reasons.append("custom_op_package_provider")
+        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
+    elif custom_op_dependency:
+        reasons.append("requires_custom_op_package")
+    return (
+        RunnerRenderSpec(
+            rel=rel,
+            build_cmds=build_cmds,
+            run_cmds=run_cmds,
+            verify_cmds=verify_cmds,
+            custom_op_dependency=custom_op_dependency,
+            custom_op_package_case=custom_op_package_case,
+            skip_reason=skip_reason,
+        ),
+        confidence,
+    )
+
+
+def noop_stage_commands() -> tuple[List[Command], List[Command], List[Command]]:
+    return [Command(":", "build")], [Command(":", "run")], [Command(":", "verify")]
+
+
+def build_commands_for_runner(commands: Iterable[Command]) -> List[Command]:
+    command_list = list(commands)
+    result: List[Command] = []
+    for command in command_list:
+        if not command.raw:
+            continue
+        if command.kind in {"cmake", "make", "gen_data", "shell"}:
+            result.append(command)
+            continue
+        if is_atc_prerequisite_command(command, command_list):
+            result.append(command)
+    return result
+
+
+def run_commands_for_runner(commands: Iterable[Command], build_cmds: List[Command]) -> List[Command]:
+    result: List[Command] = []
+    for command in commands:
+        if not command.raw or command.kind not in {"run", "package_run"}:
+            continue
+        if command not in build_cmds:
+            result.append(command)
+    return result
 
 
 def classify_confidence(cell) -> tuple[str, List[str]]:
@@ -311,78 +332,58 @@ def explicit_skip_reason(rel: str) -> str:
 
 
 def render_runner(
-    rel: str,
-    build_cmds: List[Command],
-    run_cmds: List[Command],
-    verify_cmds: List[Command],
-    custom_op_dependency: bool = False,
-    custom_op_package_case: bool = False,
-    skip_reason: str = "",
+    spec: RunnerRenderSpec,
 ) -> str:
-    return _render_runner_from_spec(
-        RunnerRenderSpec(
-            rel=rel,
-            build_cmds=build_cmds,
-            run_cmds=run_cmds,
-            verify_cmds=verify_cmds,
-            custom_op_dependency=custom_op_dependency,
-            custom_op_package_case=custom_op_package_case,
-            skip_reason=skip_reason,
-        )
-    )
+    build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
+    run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
+    lines = [
+        *runner_header(spec),
+        *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds)]),
+        *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
+        *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
+        "case_clean() {",
+        "    presmoke_default_clean",
+        "}",
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
 
 
-def _render_runner_from_spec(spec: RunnerRenderSpec) -> str:
-    pre_build_lines = (
-        ['    presmoke_ensure_custom_op_package'] if spec.custom_op_dependency and not spec.skip_reason else []
-    )
-    pre_run_lines = (
-        ['    presmoke_ensure_custom_op_package'] if spec.custom_op_package_case and not spec.skip_reason else []
-    )
-    skip_lines = []
-    if spec.skip_reason:
-        quoted_reason = shlex.quote(spec.skip_reason)
-        skip_lines = [
-            f"SKIP_REASON={quoted_reason}",
-            "",
-        ]
-    return "\n".join(
-        [
-            *BASH_LICENSE_HEADER,
-            "",
-            "set -euo pipefail",
-            "",
-            f'CASE_REL={shlex.quote(spec.rel)}',
-            *skip_lines,
-            'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
-            f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
-            'presmoke_case_init "$CASE_REL"',
-            "",
-            "case_build() {",
-            '    mkdir -p "$BUILD_DIR"',
-            *pre_build_lines,
-            *indent_commands(spec.build_cmds),
-            "}",
-            "",
-            "case_run() {",
-            '    mkdir -p "$BUILD_DIR"',
-            *pre_run_lines,
-            *indent_commands(spec.run_cmds, default_cd_build=True),
-            "}",
-            "",
-            "case_verify() {",
-            '    mkdir -p "$BUILD_DIR"',
-            *indent_commands(spec.verify_cmds, default_cd_build=True),
-            "}",
-            "",
-            "case_clean() {",
-            "    presmoke_default_clean",
-            "}",
-            "",
-            'presmoke_case_main "$@"',
-            "",
-        ]
-    )
+def custom_op_guard(enabled: bool, skip_reason: str) -> List[str]:
+    return ['    presmoke_ensure_custom_op_package'] if enabled and not skip_reason else []
+
+
+def runner_header(spec: RunnerRenderSpec) -> List[str]:
+    return [
+        *BASH_LICENSE_HEADER,
+        "",
+        "set -euo pipefail",
+        "",
+        f'CASE_REL={shlex.quote(spec.rel)}',
+        *skip_reason_lines(spec.skip_reason),
+        'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
+        f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
+        'presmoke_case_init "$CASE_REL"',
+        "",
+    ]
+
+
+def skip_reason_lines(skip_reason: str) -> List[str]:
+    if not skip_reason:
+        return []
+    return [f"SKIP_REASON={shlex.quote(skip_reason)}", ""]
+
+
+def runner_function(name: str, body: List[str]) -> List[str]:
+    return [
+        f"{name}() {{",
+        '    mkdir -p "$BUILD_DIR"',
+        *body,
+        "}",
+        "",
+    ]
 
 
 def case_entry_relative_path(rel: str) -> str:
@@ -395,34 +396,32 @@ def indent_commands(commands: Iterable[Command], default_cd_build: bool = False)
     for command in commands:
         if isinstance(command, str):
             command = Command(command, "shell")
-        raw = command.raw
-        if not raw or raw == ":":
-            lines.append("    :")
-            continue
-        raw = rewrite_runtime_arch_options(raw)
-        raw = rewrite_runtime_cmake_options(raw)
-        quoted = shlex.quote(raw)
-        env_prefix = command_env_prefix(command)
-        runner = f"{env_prefix}bash -lc {quoted}"
-        if raw.startswith("cmake "):
-            normalized = raw
-            quoted = shlex.quote(normalized)
-            runner = f"{env_prefix}bash -lc {quoted}"
-            if is_cmake_configure(normalized) and (" .." in normalized or normalized.endswith("..")):
-                lines.append(f'    (cd "$BUILD_DIR" && {runner})')
-            elif is_cmake_configure(normalized):
-                lines.append(f'    (cd "$CASE_DIR" && {runner})')
-            else:
-                lines.append(f'    (cd "$CASE_DIR" && {runner})')
-        elif raw.startswith("make"):
-            lines.append(f'    (cd "$BUILD_DIR" && {runner})')
-        elif raw.startswith("atc "):
-            lines.append(f'    (cd "$BUILD_DIR" && {runner})')
-        elif command_runs_from_build_dir(raw, default_cd_build):
-            lines.append(f'    (cd "$BUILD_DIR" && {runner})')
-        else:
-            lines.append(f'    (cd "$CASE_DIR" && {runner})')
+        lines.append(indent_command(command, default_cd_build))
     return lines
+
+
+def indent_command(command: Command, default_cd_build: bool = False) -> str:
+    raw = command.raw
+    if not raw or raw == ":":
+        return "    :"
+    raw = rewrite_runtime_arch_options(raw)
+    raw = rewrite_runtime_cmake_options(raw)
+    quoted = shlex.quote(raw)
+    env_prefix = command_env_prefix(command)
+    runner = f"{env_prefix}bash -lc {quoted}"
+    return f'    (cd "{command_workdir(raw, default_cd_build)}" && {runner})'
+
+
+def command_workdir(command: str, default_cd_build: bool = False) -> str:
+    if command.startswith("cmake "):
+        if is_cmake_configure(command) and (" .." in command or command.endswith("..")):
+            return "$BUILD_DIR"
+        return "$CASE_DIR"
+    if command.startswith("make") or command.startswith("atc "):
+        return "$BUILD_DIR"
+    if command_runs_from_build_dir(command, default_cd_build):
+        return "$BUILD_DIR"
+    return "$CASE_DIR"
 
 
 def command_runs_from_build_dir(command: str, default_cd_build: bool = False) -> bool:
