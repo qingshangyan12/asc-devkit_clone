@@ -59,12 +59,12 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。 |
 | src | 输入 | 源操作数，类型为GlobalTensor，存储位置为GM (Global Memory)，源地址需要1B对齐。 |
-| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考表3。 |
-| padParams | 输入 | 从GM搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考表4。 |
+| dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考[表3](#table_gm2ub_pad_3)。 |
+| padParams | 输入 | 从GM搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考[表4](#table_gm2ub_pad_4)。 |
 
 下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 3**  DataCopyExtParams结构体参数定义
+**表 3**  DataCopyExtParams结构体参数定义<a name="table_gm2ub_pad_3"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
@@ -74,7 +74,7 @@
 | dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint32_t类型，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意不要超过UB空间大小**。 |
 | rsv | 保留字段。uint32_t类型，默认值为0。 |
 
-**表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义
+**表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义<a name="table_gm2ub_pad_4"></a>
 
 | 参数名称 | 含义 |
 | :--- | :--- |
@@ -122,7 +122,7 @@
 
 - Compact模式
     - blockLen为48，每个连续传输数据块包含48字节；srcStride为0，源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间紧密排列，不会填充数据。
-    - blockLen * blockCount + leftPadding + rightPadding 满足32B对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
+    - blockLen * blockCount + leftPadding + rightPadding满足32B对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
 
     ![](../../../../../figures/paddingMode.png)
 
@@ -199,7 +199,7 @@
     AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
-- 场景3：使用Compact模式进行紧凑填充（仅支持 Ascend 950PR/Ascend 950DT）
+- 场景3：使用Compact模式进行紧凑填充（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
     // DataCopyExtParams参数：blockCount=3, blockLen=24*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
@@ -215,7 +215,7 @@
     AscendC::DataCopyPad<T, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
-- 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+- 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
     // Compact模式：每次内层循环搬运80B后填充16B使其96B对齐
@@ -229,7 +229,7 @@
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
-- 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+- 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
     // Normal模式：每个block搬运40B后填充24B使其64B对齐
@@ -243,7 +243,7 @@
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
-- 场景6：五维数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+- 场景6：五维数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
     // GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8

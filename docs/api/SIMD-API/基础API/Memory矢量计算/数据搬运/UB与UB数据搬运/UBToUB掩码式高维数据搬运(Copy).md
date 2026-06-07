@@ -4,7 +4,7 @@
 
 | 产品 | 是否支持 |
 | :--- | :---: |
-|<cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT | x </cann-filter>|
+|<cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
 |<cann-filter npu-type = "A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 |<cann-filter npu-type = "310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
@@ -67,6 +67,12 @@
 ## 数据类型<a name="zh-cn_topic_0000002567699435_section4219135304818"></a>
 
 源操作数和目的操作数支持的数据类型保持一致。
+
+<cann-filter npu-type="950">
+
+- Ascend 950PR/Ascend 950DT，支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
 
 <cann-filter npu-type="A3">
 

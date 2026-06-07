@@ -57,11 +57,11 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。<br>起始地址无地址对齐约束。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>起始地址需要保证32B对齐。 |
-| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考表3。 |
+| dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考[表3](#table_ub2gm_pad_3)。 |
 
 下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 3**  DataCopyExtParams结构体参数定义
+**表 3**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_3"></a>
 
 | 参数名称 | 含义 |
 | :--- | :--- |

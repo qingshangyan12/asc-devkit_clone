@@ -41,7 +41,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 与SetLoopModePara搭配使用。在使能loop mode并完成数据搬运后，必须调用该接口重置loop mode参数，否则会影响下一次对应通路的数据搬运，引发异常。
+与SetLoopModePara搭配使用。在使能loop mode并完成数据搬运后，必须调用该接口重置loop mode参数，否则会影响下一次对应通路的数据搬运，引发异常。
 
 ## 调用示例<a name="section1227835243314"></a>
 
