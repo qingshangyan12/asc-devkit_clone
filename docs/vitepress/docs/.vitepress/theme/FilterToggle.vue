@@ -56,6 +56,7 @@ function applyFilter() {
 
 function onFilterChange() {
   localStorage.setItem('cann-filter-selection', selectedFilter.value)
+  window.dispatchEvent(new CustomEvent('version-changed', { detail: selectedFilter.value }))
   applyFilter()
 }
 
