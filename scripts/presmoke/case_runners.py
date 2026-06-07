@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import json
@@ -88,11 +101,16 @@ def build_case_runner_cells_with_skips(
                 )
                 continue
             runner = runner_dir / "run.sh"
+            command_env = {
+                "PRESMOKE_PROJECT_ROOT": str(project_root),
+                "PRESMOKE_ARCH": arch,
+                "PRESMOKE_MODE": mode,
+            }
             commands = [
-                Command(f"bash {runner} clean", "clean", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
-                Command(f"bash {runner} build", "build", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
-                Command(f"bash {runner} run", "run", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
-                Command(f"bash {runner} verify", "verify", {"PRESMOKE_PROJECT_ROOT": str(project_root), "PRESMOKE_ARCH": arch, "PRESMOKE_MODE": mode}),
+                Command(f"bash {runner} clean", "clean", command_env),
+                Command(f"bash {runner} build", "build", command_env),
+                Command(f"bash {runner} run", "run", command_env),
+                Command(f"bash {runner} verify", "verify", command_env),
             ]
             spec = ExampleSpec(
                 path=project_root / "examples" / rel_path,

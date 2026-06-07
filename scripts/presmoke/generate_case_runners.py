@@ -1,7 +1,21 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import argparse
 import json
+import logging
 import re
 import shlex
 from dataclasses import asdict, dataclass, field
@@ -13,6 +27,9 @@ from presmoke.model import Cell, Command
 from presmoke.planner import is_cmake_configure
 from presmoke.planner import build_cells, rewrite_command
 from presmoke.readme_spec import parse_readme
+
+
+LOG = logging.getLogger(__name__)
 
 
 SPECIAL_PREFIXES = (
@@ -53,6 +70,19 @@ ARCH_ENV_KEYS = {
     "NPU_ARCH",
 }
 
+BASH_LICENSE_HEADER = [
+    "#!/bin/bash",
+    "# ----------------------------------------------------------------------------------------------------------",
+    "# Copyright (c) 2026 Huawei Technologies Co., Ltd.",
+    "# This program is free software, you can redistribute it and/or modify it under the terms and conditions of",
+    '# CANN Open Software License Agreement Version 2.0 (the "License").',
+    "# Please refer to the License for details. You may not use this file except in compliance with the License.",
+    '# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,',
+    "# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.",
+    "# See LICENSE in the root of the software repository for the full text of the License.",
+    "# ----------------------------------------------------------------------------------------------------------",
+]
+
 
 @dataclass
 class CaseReport:
@@ -69,7 +99,19 @@ class CaseReport:
     commands: List[str] = field(default_factory=list)
 
 
+@dataclass
+class RunnerRenderSpec:
+    rel: str
+    build_cmds: List[Command]
+    run_cmds: List[Command]
+    verify_cmds: List[Command]
+    custom_op_dependency: bool = False
+    custom_op_package_case: bool = False
+    skip_reason: str = ""
+
+
 def main() -> int:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     args = parse_args()
     project_root = Path(args.project_root).resolve()
     examples_root = project_root / "examples"
@@ -85,13 +127,18 @@ def main() -> int:
     all_cells = [cell_for_spec(spec, args.arch, args.mode) for spec in specs]
     reports: List[CaseReport] = []
     for cell in all_cells:
-        report = write_runner(project_root, runners_root, cell, runnable_on_target=cell.example.rel_path in runnable_by_rel)
+        report = write_runner(
+            project_root,
+            runners_root,
+            cell,
+            runnable_on_target=cell.example.rel_path in runnable_by_rel,
+        )
         reports.append(report)
 
     write_manifest(reports_root, reports)
-    print(f"generated_runners={len(reports)}")
-    print(f"low_confidence={sum(1 for item in reports if item.confidence != 'high')}")
-    print(f"reports_dir={reports_root}")
+    LOG.info("generated_runners=%s", len(reports))
+    LOG.info("low_confidence=%s", sum(1 for item in reports if item.confidence != "high"))
+    LOG.info("reports_dir=%s", reports_root)
     return 0
 
 
@@ -127,9 +174,18 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     build_cmds = [
         command
         for command in cell.commands
-        if command.raw and (command.kind in {"cmake", "make", "gen_data", "shell"} or is_atc_prerequisite_command(command, cell.commands))
+        if command.raw and (
+            command.kind in {"cmake", "make", "gen_data", "shell"}
+            or is_atc_prerequisite_command(command, cell.commands)
+        )
     ]
-    run_cmds = [command for command in cell.commands if command.raw and command.kind in {"run", "package_run"} and command not in build_cmds]
+    run_cmds = [
+        command
+        for command in cell.commands
+        if command.raw
+        and command.kind in {"run", "package_run"}
+        and command not in build_cmds
+    ]
     verify_cmds = [command for command in cell.commands if command.raw and command.kind == "verify"]
 
     if not run_cmds:
@@ -157,14 +213,16 @@ def write_runner(project_root: Path, runners_root: Path, cell, runnable_on_targe
     elif custom_op_dependency:
         reasons.append("requires_custom_op_package")
 
-    text = render_runner(
-        rel,
-        build_cmds,
-        run_cmds,
-        verify_cmds,
-        custom_op_dependency=custom_op_dependency,
-        custom_op_package_case=custom_op_package_case,
-        skip_reason=skip_reason,
+    text = _render_runner_from_spec(
+        RunnerRenderSpec(
+            rel=rel,
+            build_cmds=build_cmds,
+            run_cmds=run_cmds,
+            verify_cmds=verify_cmds,
+            custom_op_dependency=custom_op_dependency,
+            custom_op_package_case=custom_op_package_case,
+            skip_reason=skip_reason,
+        )
     )
     runner.write_text(text, encoding="utf-8")
     runner.chmod(0o755)
@@ -227,7 +285,7 @@ def is_atc_prerequisite_command(command: Command, commands: Iterable[Command]) -
         index = command_list.index(command)
     except ValueError:
         return False
-    return any(item.raw.startswith("atc ") for item in command_list[index + 1 :])
+    return any(item.raw.startswith("atc ") for item in command_list[index + 1:])
 
 
 def downgrade(confidence: str) -> str:
@@ -261,41 +319,60 @@ def render_runner(
     custom_op_package_case: bool = False,
     skip_reason: str = "",
 ) -> str:
-    pre_build_lines = ['    presmoke_ensure_custom_op_package'] if custom_op_dependency and not skip_reason else []
-    pre_run_lines = ['    presmoke_ensure_custom_op_package'] if custom_op_package_case and not skip_reason else []
+    return _render_runner_from_spec(
+        RunnerRenderSpec(
+            rel=rel,
+            build_cmds=build_cmds,
+            run_cmds=run_cmds,
+            verify_cmds=verify_cmds,
+            custom_op_dependency=custom_op_dependency,
+            custom_op_package_case=custom_op_package_case,
+            skip_reason=skip_reason,
+        )
+    )
+
+
+def _render_runner_from_spec(spec: RunnerRenderSpec) -> str:
+    pre_build_lines = (
+        ['    presmoke_ensure_custom_op_package'] if spec.custom_op_dependency and not spec.skip_reason else []
+    )
+    pre_run_lines = (
+        ['    presmoke_ensure_custom_op_package'] if spec.custom_op_package_case and not spec.skip_reason else []
+    )
     skip_lines = []
-    if skip_reason:
-        quoted_reason = shlex.quote(skip_reason)
+    if spec.skip_reason:
+        quoted_reason = shlex.quote(spec.skip_reason)
         skip_lines = [
             f"SKIP_REASON={quoted_reason}",
             "",
         ]
     return "\n".join(
         [
-            "#!/usr/bin/env bash",
+            *BASH_LICENSE_HEADER,
+            "",
             "set -euo pipefail",
             "",
-            f'CASE_REL={shlex.quote(rel)}',
+            f'CASE_REL={shlex.quote(spec.rel)}',
             *skip_lines,
             'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"',
-            f'source "$SCRIPT_DIR/{case_entry_relative_path(rel)}"',
+            f'source "$SCRIPT_DIR/{case_entry_relative_path(spec.rel)}"',
             'presmoke_case_init "$CASE_REL"',
             "",
             "case_build() {",
             '    mkdir -p "$BUILD_DIR"',
             *pre_build_lines,
-            *indent_commands(build_cmds),
+            *indent_commands(spec.build_cmds),
             "}",
             "",
             "case_run() {",
             '    mkdir -p "$BUILD_DIR"',
             *pre_run_lines,
-            *indent_commands(run_cmds, default_cd_build=True),
+            *indent_commands(spec.run_cmds, default_cd_build=True),
             "}",
             "",
             "case_verify() {",
             '    mkdir -p "$BUILD_DIR"',
-            *indent_commands(verify_cmds, default_cd_build=True),
+            *indent_commands(spec.verify_cmds, default_cd_build=True),
             "}",
             "",
             "case_clean() {",

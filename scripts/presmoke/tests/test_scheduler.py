@@ -714,11 +714,12 @@ class SchedulerTest(unittest.TestCase):
         )
 
     def test_detect_cpu_count_prefers_lscpu(self) -> None:
-        with mock.patch("presmoke.cli.subprocess.run") as run:
-            run.return_value.stdout = "CPU(s):                             192\n"
-            run.return_value.returncode = 0
+        with mock.patch("presmoke.cli.shutil.which", return_value="/usr/bin/lscpu"):
+            with mock.patch("presmoke.cli.subprocess.run") as run:
+                run.return_value.stdout = "CPU(s):                             192\n"
+                run.return_value.returncode = 0
 
-            self.assertEqual(detect_cpu_count(), 192)
+                self.assertEqual(detect_cpu_count(), 192)
 
         run.assert_called_once()
 

@@ -1,9 +1,24 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import argparse
+import logging
 import os
 import shutil
 import subprocess
+import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -17,12 +32,16 @@ from .model import RunReport, RunResult, Suggestion
 from .planner import build_cells_with_skips
 from .readme_spec import parse_readme
 from .report import print_console, write_json, write_markdown, write_suggestions
-from .runner import CPU_RUN_TIMEOUT, run_cells_pipeline
+from .runner import CPU_RUN_TIMEOUT, PipelineOptions, run_cells_pipeline_with_options
 from .scheduler import export_schedule_file, schedule_cells
 from .suggest import dedupe_suggestions
 
 
+LOG = logging.getLogger(__name__)
+
+
 def main(argv: list[str] | None = None) -> int:
+    logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     args = parse_args(argv)
     modes = parse_modes(args.modes)
     jobs = resolve_jobs(args.jobs, modes=modes)
@@ -41,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     examples_root = Path(args.examples_root).resolve() if args.examples_root else project_root / "examples"
     host_arch = detect_arch(args.arch)
     if not host_arch:
-        print("Error: cannot detect host arch; pass --arch or PRESMOKE_ARCH", flush=True)
+        LOG.error("cannot detect host arch; pass --arch or PRESMOKE_ARCH")
         return 2
 
     results_dir = Path(args.results).resolve()
@@ -52,7 +71,13 @@ def main(argv: list[str] | None = None) -> int:
     skipped_results: List[RunResult] = []
 
     if args.runner_mode == "case-runner":
-        cells, runner_suggestions, skipped_results = build_case_runner_cells_with_skips(project_root, host_arch, modes, args.filter, args.exclude)
+        cells, runner_suggestions, skipped_results = build_case_runner_cells_with_skips(
+            project_root,
+            host_arch,
+            modes,
+            args.filter,
+            args.exclude,
+        )
         suggestions.extend(runner_suggestions)
     else:
         examples = discover_examples(examples_root)
@@ -81,23 +106,41 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.dry_run:
         dry_results = [
-            RunResult(cell.example.rel_path, cell.arch, cell.mode, "SKIP", "dry-run", duration_s=0, source=cell.example.source)
+            RunResult(
+                cell.example.rel_path,
+                cell.arch,
+                cell.mode,
+                "SKIP",
+                "dry-run",
+                duration_s=0,
+                source=cell.example.source,
+            )
             for cell in cells
         ]
-        report = RunReport(host_arch, modes, started_at, now_iso(), dry_results + skipped_results, suggestions, parallel_config=parallel_config)
+        report = RunReport(
+            host_arch,
+            modes,
+            started_at,
+            now_iso(),
+            dry_results + skipped_results,
+            suggestions,
+            parallel_config=parallel_config,
+        )
         emit_reports(report, args, results_dir)
         return 0
 
     with presmoke_run_lock(project_root):
-        run = run_cells_pipeline(
+        run = run_cells_pipeline_with_options(
             cells,
-            log_dir=log_dir,
-            timeout=args.timeout,
-            cpu_run_timeout=cpu_run_timeout,
-            keep_artifacts=args.keep_artifacts,
-            jobs=jobs,
-            npu_slots=args.npu_slots,
-            cpu_run_slots=cpu_run_slots,
+            PipelineOptions(
+                log_dir=log_dir,
+                timeout=args.timeout,
+                cpu_run_timeout=cpu_run_timeout,
+                keep_artifacts=args.keep_artifacts,
+                jobs=jobs,
+                npu_slots=args.npu_slots,
+                cpu_run_slots=cpu_run_slots,
+            ),
         )
     results = run.results
     results.extend(skipped_results)
@@ -125,7 +168,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--results", default="presmoke_reports")
     parser.add_argument("--log-dir")
     parser.add_argument("--keep-artifacts", action="store_true")
-    parser.add_argument("--schedule", choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min", "fixed"], default="default")
+    parser.add_argument(
+        "--schedule",
+        choices=["default", "build-desc", "frontload-build-desc", "npu-idle-min", "fixed"],
+        default="default",
+    )
     parser.add_argument("--schedule-report")
     parser.add_argument("--schedule-file")
     parser.add_argument("--export-schedule")
@@ -211,9 +258,12 @@ def configure_parallel_env(project_root: Path, make_jobs: int) -> None:
 
 
 def detect_cpu_count() -> int:
+    lscpu = shutil.which("lscpu")
+    if not lscpu:
+        return os.cpu_count() or 1
     try:
         result = subprocess.run(
-            ["lscpu"],
+            [lscpu],
             check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
@@ -248,7 +298,7 @@ def presmoke_run_lock(project_root: Path) -> Iterator[None]:
             except (OSError, ValueError):
                 pid = 0
             if pid and process_exists(pid):
-                print(f"Waiting for existing presmoke run pid={pid}", flush=True)
+                LOG.info("Waiting for existing presmoke run pid=%s", pid)
                 time.sleep(5)
                 continue
             shutil.rmtree(lock_dir, ignore_errors=True)

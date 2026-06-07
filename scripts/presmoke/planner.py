@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 from __future__ import annotations
 
 import re
@@ -25,13 +38,29 @@ def build_cells_with_skips(
     skipped: List[RunResult] = []
     for spec in specs:
         if arch not in spec.archs:
-            suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Excluded on unsupported arch {arch}", f"Supported archs: {', '.join(spec.archs)}"))
+            suggestions.append(
+                Suggestion(
+                    spec.rel_path,
+                    "planner",
+                    "info",
+                    f"Excluded on unsupported arch {arch}",
+                    f"Supported archs: {', '.join(spec.archs)}",
+                )
+            )
             continue
         for mode in (mode_list or spec.modes):
             if requested_modes and mode not in requested_modes:
                 continue
             if mode not in spec.modes:
-                suggestions.append(Suggestion(spec.rel_path, "planner", "info", f"Excluded on unsupported mode {mode}", f"Supported modes: {', '.join(spec.modes)}"))
+                suggestions.append(
+                    Suggestion(
+                        spec.rel_path,
+                        "planner",
+                        "info",
+                        f"Excluded on unsupported mode {mode}",
+                        f"Supported modes: {', '.join(spec.modes)}",
+                    )
+                )
                 continue
             rewritten = [rewrite_command(command, arch, mode) for command in spec.commands]
             build_dir = spec.path / f"build_{mode}"
