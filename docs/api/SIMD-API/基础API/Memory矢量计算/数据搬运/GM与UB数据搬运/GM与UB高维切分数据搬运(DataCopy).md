@@ -54,9 +54,9 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数。<br>&bull; 类型为LocalTensor时，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。<br>&bull; 类型为GlobalTensor时，存储位置为GM (Global Memory)，目的地址需要1B对齐。 |
 | src | 输入 | 源操作数。<br>&bull; 类型为GlobalTensor时，存储位置为GM，源地址需要1B对齐。<br>&bull; 类型为LocalTensor时，存储位置为UB，源地址需要32B对齐。 |
-| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考表3。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| repeatParams | 输入 | 搬运参数，DataCopyParams类型，参数说明请参考[表3](#table_highdim_3)。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
-**表 3**  DataCopyParams结构体参数定义
+**表 3**  DataCopyParams结构体参数定义<a name="table_highdim_3"></a>
 
 | 参数名称 | 含义 |
 | --- | --- |
@@ -71,7 +71,7 @@
 
 以half数据类型为例，源操作数的shape为1 \* 128。
 
-以图1为例，将源操作数中128个元素**连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
+以[图1](#zh-cn_topic_0000002535088926_fig4621152141711)为例，将源操作数中128个元素**连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
 
 - blockCount = 1，搬运1个数据块，表示连续搬运。
 - blockLen = 8，一个数据块长度为8个DataBlock。
@@ -83,7 +83,7 @@
 
 以half数据类型为例，源操作数的shape为1 \* 112。
 
-以图2为例，将源操作数中数据**非连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
+以[图2](#zh-cn_topic_0000002535088926_fig422819202304)为例，将源操作数中数据**非连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
 
 - blockCount= 2，搬运2个数据块。
 - blockLen= 3，一个数据块的长度为3个DataBlock。

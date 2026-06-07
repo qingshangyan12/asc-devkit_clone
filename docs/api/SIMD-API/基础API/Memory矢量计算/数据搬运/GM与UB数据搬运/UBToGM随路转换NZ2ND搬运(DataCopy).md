@@ -39,9 +39,9 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。 |
 | src | 输入 | 源操作数，类型为LocalTensor。 |
-| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFul，具体参数请参考表3。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
+| intriParams | 输入 | 搬运参数，类型为Nz2NdParamsFul，具体参数请参考[表3](#table_nz2nd_3)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
-**表 3**  Nz2NdParamsFull结构体内参数定义
+**表 3**  Nz2NdParamsFull结构体内参数定义<a name="table_nz2nd_3"></a>
 
 | 参数名称 | 含义 |
 | :--- | :--- |

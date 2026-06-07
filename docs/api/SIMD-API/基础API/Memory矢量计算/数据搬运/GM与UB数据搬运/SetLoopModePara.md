@@ -33,10 +33,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| loopParams | 输入 | 循环模式参数LoopModeParams类型，定义如下，具体参数说明请参考表2。<br><pre>struct LoopModeParams {<br>        loop1Size = 0;<br>        loop2Size = 0;<br>        loop1SrcStride = 0;<br>        loop1DstStride = 0;<br>        loop2SrcStride = 0;<br>        loop2DstStride = 0 ;<br>};</pre> |
-| type | 输入 | 数据搬运模式。DataCopyMVType为枚举类型，定义如下，具体参数说明请参考表3。<br><pre>enum class DataCopyMVType : uint8_t {<br>    UB_TO_OUT = 0,<br>    OUT_TO_UB = 1,<br>};</pre> |
+| loopParams | 输入 | 循环模式参数LoopModeParams类型，定义如下，具体参数说明请参考[表2](#table_setloop_2)。<br><pre>struct LoopModeParams {<br>        loop1Size = 0;<br>        loop2Size = 0;<br>        loop1SrcStride = 0;<br>        loop1DstStride = 0;<br>        loop2SrcStride = 0;<br>        loop2DstStride = 0 ;<br>};</pre> |
+| type | 输入 | 数据搬运模式。DataCopyMVType为枚举类型，定义如下，具体参数说明请参考[表3](#table1166074612214)。<br><pre>enum class DataCopyMVType : uint8_t {<br>    UB_TO_OUT = 0,<br>    OUT_TO_UB = 1,<br>};</pre> |
 
-**表 2**  LoopModeParams结构体参数说明
+**表 2**  LoopModeParams结构体参数说明<a name="table_setloop_2"></a>
 
 | 参数名称 | 含义 |
 | --- | --- |
@@ -81,7 +81,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
-    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
     // Compact模式：每次内层循环搬运80B后填充16B使其96B对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
@@ -96,7 +96,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
-    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持 Ascend 950PR/Ascend 950DT）
+    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
     // Normal模式：每个block搬运40B后填充24B使其64B对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
@@ -111,7 +111,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - 五维数据搬运
 
     ```cpp
-    // 场景6：五维数据搬运 GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8
+    // 场景6：五维数据搬运GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8
     // Normal模式，使用loop mode
     // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节
     // 最终UB连续存放为[512, 128]

@@ -144,48 +144,39 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 调用示例<a name="section122101199486"></a>
 
-- 场景1：[1, 512]数据搬运，mask连续模式，源和目的空间一样大
+- 场景1：连续搬运——将源数据中128个half元素连续搬运至目的操作数（对应[图1](#zh-cn_topic_0000002535088926_fig4621152141711)）
 
     ```cpp
-    // mask=64表示每次迭代处理64个int32元素
-    // repeatTime=8表示迭代8次，共处理512个元素
-    // srcStride=1, dstStride=1：同一迭代内DataBlock无间隙
-    // srcRepeatSize=8, dstRepeatSize=8：相邻迭代间步长为8个block（每个block 8个int32元素）
-    uint64_t mask = 64;
-    AscendC::Copy(dstLocal, srcLocal, mask, 8, {1, 1, 8, 8});
+    // srcLocal、dstLocal为half类型的LocalTensor
+    // 使用传入count参数的搬运接口，完成连续搬运
+    AscendC::DataCopy(dstLocal, srcLocal, 128);
+    
+    // 使用传入DataCopyParams参数的搬运接口，实现相同的连续搬运效果
+    // blockCount = 1：连续数据块个数为1
+    // blockLen = 8：一个数据块长度为8个DataBlock（128个half元素 ÷ (32B/2B) = 8）
+    // srcGap = 0, dstGap = 0：无间隔，连续搬运
+    DataCopyParams params;
+    params.blockCount = 1;
+    params.blockLen = 8;
+    params.srcGap = 0;
+    params.dstGap = 0;
+    AscendC::DataCopy(dstLocal, srcLocal, params);
     ```
 
-- 场景2：从[18, 64]的数据里搬运[18, 8]的数据量
+- 场景2：非连续搬运——从源数据中搬运2个数据块，每个数据块3个DataBlock，源间隔1个DataBlock、目的间隔2个DataBlock（对应[图2](#zh-cn_topic_0000002535088926_fig422819202304)）
 
     ```cpp
-    // 源数据shape: [18, 64]，共1152个元素
-    // 目的数据shape: [18, 8]，共144个元素
-    // 每次迭代处理一行中的8个元素，共18次迭代
-    // mask=8：每次迭代处理8个元素
-    // repeatTime=18：迭代18次（对应18行）
-    // srcStride=1, dstStride=1：同一迭代内无间隙
-    // srcRepeatSize=8：源每次迭代后跳过64个元素（跳到下一行起始位置）
-    // dstRepeatSize=1：目的每次迭代后跳过8个元素（紧凑排列下一行）
-    uint64_t mask = 8;
-    AscendC::Copy(dstLocal, srcLocal, mask, 18, {1, 1, 1, 8});
+    // srcLocal、dstLocal为half类型的LocalTensor
+    // 源数据shape为[1, 112]，共112个half元素（7个DataBlock）
+    // 目的数据接收非连续排列的2个数据块，共6个DataBlock（96个half元素）
+    // blockCount = 2：搬运2个数据块
+    // blockLen = 3：每个数据块长度为3个DataBlock
+    // srcGap = 1：源相邻数据块间隔1个DataBlock
+    // dstGap = 2：目的相邻数据块间隔2个DataBlock
+    DataCopyParams params;
+    params.blockCount = 2;
+    params.blockLen = 3;
+    params.srcGap = 1;
+    params.dstGap = 2;
+    AscendC::DataCopy(dstLocal, srcLocal, params);
     ```
-
-- 场景3：从[18, 64]搬运[18, 8]数据，Counter模式
-
-    ```cpp
-    // 源数据shape: [18, 64]，共1152个元素
-    // 目的数据shape: [18, 8]，共144个元素
-    // Counter模式下，Mask代表每次Repeat中处理的元素个数
-    // mask=144：每次迭代处理144个元素
-    // repeatTime=1：迭代1次（对应18行）
-    // srcStride=8：源数据两个DataBlock地址步长为8（每次选择每一行的起始DataBlock）
-    // dstStride=1：目的数据连续存放无间隙
-    // srcRepeatSize=8, dstRepeatSize=8：repeatTime=1场景下该参数无效
-    AscendC::SetMaskCount();
-    AscendC::SetVectorMask<int32_t, AscendC::MaskMode::COUNTER>(144);
-    AscendC::Copy<int32_t, false>(dstLocal, srcLocal, AscendC::MASK_PLACEHOLDER, 1, {1, 8, 8, 8});
-    AscendC::SetMaskNorm();
-    AscendC::ResetMask();
-    ```
-
-完整样例请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub)。
