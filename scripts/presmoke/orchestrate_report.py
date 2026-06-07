@@ -136,7 +136,7 @@ def log_npu_stats(npu_stats: dict[str, Any]) -> None:
         metric,
         float(npu_stats.get("busy_s") or 0),
         float(npu_stats.get("idle_s") or 0),
-        float(npu_stats.get("utilization") or 0),
+        float(npu_stats.get("utilization") or 0) * 100,
     )
 
 
