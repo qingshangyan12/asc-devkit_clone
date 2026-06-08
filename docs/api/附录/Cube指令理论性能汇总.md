@@ -29,7 +29,7 @@
 **表 2**  Mmad理论性能计算公式中并行度和k0的取值
 
 <a name="table1877123815211"></a>
-| 接口 | 左矩阵A | 右矩阵B |  |  |  |  |
+| 接口 | 左矩阵A | 右矩阵B | cube<sub>m</sub> | cube<sub>n</sub> | cube<sub>k</sub> | k<sub>0</sub> |
 | --- | --- | --- | --- | --- | --- | --- |
 | Mmad | int8_t | int8_t | 16 | 16 | 32 | 32 |
 | Mmad | half | half | 16 | 16 | 16 | 16 |
@@ -37,4 +37,3 @@
 | Mmad | bfloat16_t | bfloat16_t | 16 | 16 | 16 | 16 |
 | Mmad | int4b_t | int4b_t | 16 | 16 | 64 | 64 |
 | MmadWithSparse | int8_t | int8_t | 16 | 16 | 32 | 32 |
-

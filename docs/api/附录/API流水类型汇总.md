@@ -3,7 +3,7 @@
 **表 1**  Memory矢量计算API流水类型汇总
 
 <a name="table132070121817"></a>
-| API类型 | API接口名词 | 执行核（AIC/AIV） | 流水 |
+| API类型 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- | --- |
 | 基础算术 | Exp | AIV | PIPE_V |
 | 基础算术 | Ln | AIV | PIPE_V |
@@ -74,7 +74,7 @@
 **表 2**  CUBE API流水类型汇总
 
 <a name="table12311219174812"></a>
-| API接口名词 | 执行核（AIC/AIV） | 流水 |
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
 | DataCopy(GM->L1) | AIC | PIPE_MTE2 |
 | Load2D(GM->L1) | AIC | PIPE_MTE2 |
@@ -108,7 +108,7 @@
 **表 3**  同步指令流水类型汇总
 
 <a name="table1054353913238"></a>
-| API接口名词 | 执行核（AIC/AIV） | 流水 |
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
 | SetFlag/WaitFlag |  | PIPE_S |
 | PipeBarrier |  | PIPE_S |
@@ -119,7 +119,7 @@
 **表 4**  原子操作流水类型汇总
 
 <a name="table25871912193814"></a>
-| API接口名词 | 执行核（AIC/AIV） | 流水 |
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
 | SetAtomicAdd |  | PIPE_S |
 | SetAtomicMax |  | PIPE_S |
@@ -130,7 +130,7 @@
 **表 5**  工具接口流水类型汇总
 
 <a name="table1147331317457"></a>
-| API接口名词 | 执行核（AIC/AIV） | 流水 |
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
 | GetBlockNum |  | PIPE_S |
 | GetBlockIdx |  | PIPE_S |

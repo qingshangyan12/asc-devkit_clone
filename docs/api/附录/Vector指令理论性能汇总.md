@@ -2,6 +2,8 @@
 
 **表 1**  基础算术类指令理论性能汇总
 
+注：缓存控制、同步控制和原子操作类指令，不涉及理论性能。
+
 <a name="table291476204714"></a>
 | 接口 | 输入/输出数据类型 | 硬件并行度（单位：element/cycle） |
 | --- | --- | --- |
@@ -10,58 +12,58 @@
 | Add | int32_t | 64 |
 | Add | float | 64 |
 | Exp | half（fp16） | 32 |
-| Exp | float（fp32） | 32 |
+| Exp | float | 32 |
 | Ln | half（fp16） | 32 |
-| Ln | float（fp32） | 32 |
+| Ln | float | 32 |
 | Abs | half（fp16） | 128 |
-| Abs | float（fp32） | 64 |
+| Abs | float | 64 |
 | Reciprocal | half（fp16） | 128 |
-| Reciprocal | float（fp32） | 64 |
+| Reciprocal | float | 64 |
 | Sqrt | half（fp16） | 32 |
-| Sqrt | float（fp32） | 32 |
+| Sqrt | float | 32 |
 | Rsqrt | half（fp16） | 128 |
-| Rsqrt | float（fp32） | 64 |
+| Rsqrt | float | 64 |
 | Relu | half（fp16） | 128 |
-| Relu | float（fp32） | 64 |
+| Relu | float | 64 |
 | Relu | int32_t | 64 |
 | Sub | half（fp16） | 128 |
 | Sub | int16_t | 128 |
 | Sub | int32_t | 64 |
-| Sub | float（fp32） | 64 |
+| Sub | float | 64 |
 | Mul | half（fp16） | 128 |
 | Mul | int16_t | 128 |
 | Mul | int32_t | 64 |
-| Mul | float（fp32） | 64 |
+| Mul | float | 64 |
 | Div | half（fp16） | 32 |
-| Div | float（fp32） | 32 |
+| Div | float | 32 |
 | Max | half（fp16） | 128 |
 | Max | int16_t | 128 |
 | Max | int32_t | 64 |
-| Max | float（fp32） | 64 |
+| Max | float | 64 |
 | Min | half（fp16） | 128 |
 | Min | int16_t | 128 |
 | Min | int32_t | 64 |
-| Min | float（fp32） | 64 |
+| Min | float | 64 |
 | Adds | half（fp16） | 128 |
 | Adds | int16_t | 128 |
 | Adds | int32_t | 64 |
-| Adds | float（fp32） | 64 |
+| Adds | float | 64 |
 | Muls | half（fp16） | 128 |
 | Muls | int16_t | 128 |
 | Muls | int32_t | 64 |
-| Muls | float（fp32） | 64 |
+| Muls | float | 64 |
 | Maxs | half（fp16） | 128 |
 | Maxs | int16_t | 128 |
 | Maxs | int32_t | 64 |
-| Maxs | float（fp32） | 64 |
+| Maxs | float | 64 |
 | Mins | half（fp16） | 128 |
 | Mins | int16_t | 128 |
 | Mins | int32_t | 64 |
-| Mins | float（fp32） | 64 |
+| Mins | float | 64 |
 | LeakyRelu | half（fp16） | 128 |
 | LeakyRelu | int16_t | 128 |
 | LeakyRelu | int32_t | 64 |
-| LeakyRelu | float（fp32） | 64 |
+| LeakyRelu | float | 64 |
 
 **表 2**  逻辑计算类指令理论性能汇总
 
@@ -107,7 +109,7 @@
 | MulAddRelu | float | float | float | 64 |
 | CastDequant | int16_t | NA | int8_t/uint8_t | 128 |
 | CastDequant | int32_t |  | half | 64 |
-| AddDeqRelu |  |  |  |  |
+| AddDeqRelu | - | - | - | 软仿指令，不涉及理论并行度 |
 
 **表 4**  比较与选择类指令理论性能汇总
 
@@ -122,7 +124,7 @@
 | Compares | half | half | uint8_t | 128 |
 | Compares | float | float | uint8_t | 64 |
 | Compares | int32_t | int32_t | uint8_t | 64 |
-| GetCmpMask(ISASI) | / | / | / | 1 |
+| GetCmpMask(ISASI) |  |  |  |  |
 
 **表 5**  类型转换类指令理论性能汇总
 
@@ -150,12 +152,12 @@
 | 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
 | ReduceDataBlock | half（fp16） | half（fp16） | 128/7 |
-| ReduceDataBlock | float（fp32） | float（fp32） | 64 |
+| ReduceDataBlock | float | float | 64 |
 | ReduceRepeat | half（fp16） | half（fp16） | 128/7 |
-| ReduceRepeat | float（fp32） | float（fp32） | 64/7 |
+| ReduceRepeat | float | float | 64/7 |
 | ReducePairElem | half（fp16） | half（fp16） | 128 |
-| ReducePairElem | float（fp32） | float（fp32） | 64 |
-| ReduceMax/ReduceMin/ReduceSum | 软仿指令，不提供理论并行度 |  |  |
+| ReducePairElem | float | float | 64 |
+| ReduceMax/ReduceMin/ReduceSum | - | - | 软仿指令，不涉及理论并行度 |
 
 **表 7**  数据排布转换类指令理论性能汇总
 
@@ -187,7 +189,7 @@
 | 接口 | src0数据类型 | src1数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- | --- |
 | Sort32 | half（fp16） | uint32_t | half（fp16） | 64 |
-| Sort32 | float（fp32） | uint32_t | float（fp32） | 32 |
+| Sort32 | float | uint32_t | float | 32 |
 | MrgSort（待补充） | - | - | - | - |
 
 **表 10**  离散与聚合类指令理论性能汇总
@@ -204,11 +206,11 @@
 <a name="table12905102516375"></a>
 | 接口 | 输入数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- |
-| SetMaskCount | / | 1 |
-| SetMaskNorm | / | 1 |
+| SetMaskCount | - | 1 |
+| SetMaskNorm | - | 1 |
 | SetVectorMask | uint64_t | 1 |
 | SetVectorMask | int32_t | 1 |
-| ResetMask | / | 1 |
+| ResetMask | - | 1 |
 
 **表 12**  标量计算类指令理论性能汇总
 
@@ -220,8 +222,8 @@
 | GetSFFValue | uint64_t | int64_t | 1 |
 | CountBitsCntSameAsSignBit | int64_t | int64_t | 1 |
 | Cast（float转half、int32_t） | float | half/int32_t | 1 |
-| Cast（float转bfloat16_t） | 软仿指令，不提供理论并行度 |  |  |
-| Cast（bfloat16_t转float） | 软仿指令，不提供理论并行度 |  |  |
+| Cast（float转bfloat16_t） | - | - | 软仿指令，不涉及理论并行度 |
+| Cast（bfloat16_t转float） | - | - | 软仿指令，不涉及理论并行度 |
 
 **表 13**  系统变量访问类指令理论性能汇总
 
@@ -230,22 +232,19 @@
 | --- | --- |
 | GetBlockNum | 1 |
 | GetBlockIdx（AIC） | 1 |
-| GetBlockIdx（AIV） | 软仿指令，不提供理论并行度 |
+| GetBlockIdx（AIV） | 软仿指令，不涉及理论并行度 |
 | GetTaskRatio | 1 |
 | GetSubBlockNum | 1 |
 | GetSubBlockIdx | 1 |
 | GetDataBlockSizeInBytes | 静态编译，无消耗，与直接使用立即数行为一致。 |
 | GetSystemCycle | 1 |
-| GetProgramCounter | 软仿指令，不提供理论并行度 |
-| GetArchVersion | 软仿指令，不提供理论并行度 |
+| GetProgramCounter | 软仿指令，不涉及理论并行度 |
+| GetArchVersion | 软仿指令，不涉及理论并行度 |
 
 **表 14**  工具接口类指令理论性能汇总
 
 <a name="table14541161453912"></a>
 | 接口 | 理论并行度（cycle/instruction） |
 | --- | --- |
-| InitSocState | 软仿指令，不提供理论并行度 |
+| InitSocState | 软仿指令，不涉及理论并行度 |
 | Async | 静态编译，无消耗 |
-
-缓存控制、同步控制和原子操作指令，不涉及理论性能。
-

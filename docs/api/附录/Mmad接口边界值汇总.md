@@ -1,4 +1,4 @@
-# Mmad计算边界值<a name="ZH-CN_TOPIC_0000002607849175"></a>
+# Mmad接口边界值汇总<a name="ZH-CN_TOPIC_0000002607849175"></a>
 
 <cann-filter npu-type="A3,910b">
 

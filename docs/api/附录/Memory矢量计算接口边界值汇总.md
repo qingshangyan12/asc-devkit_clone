@@ -1,4 +1,4 @@
-# Memory矢量计算接口边界值<a name="ZH-CN_TOPIC_0000002533514388"></a>
+# Memory矢量计算接口边界值汇总<a name="ZH-CN_TOPIC_0000002533514388"></a>
 
 ## 概述<a name="section3674181114910"></a>
 
@@ -16,7 +16,7 @@
 
 注：
 
-- float 数据类型输入仅支持INF/NAN模式（饱和模式与INF/NAN模式输出结果一致）；half、int16_t 及 int32_t 类型默认输出INF/NAN模式。
+- float 数据类型输入仅支持INF/NAN模式（即使配置饱和模式，输出结果也与INF/NAN模式输出结果一致）；half、int16_t 及 int32_t 类型输入，默认输出INF/NAN模式的结果。
 - **绝大部分场景下，INF/NAN模式的输出结果与IEEE754标准结果一致。如存在不一致的情况，会在对应接口处备注说明。**
 
 矢量计算接口输出inf/nan的场景总结如下表：
@@ -26,12 +26,14 @@
 <a name="table1645210351498"></a>
 | 场景描述 | 浮点数计算输出结果 | 说明 |
 | --- | --- | --- |
-| **输入包含inf**<br>例外场景：<br>- exp(-inf)=0<br>- inf * 0 = nan<br>- inf + (-inf) = nan | inf | inf区分+inf和-inf |
-| **计算结果发生溢出**<br>例外情况：<br>- 非nan值（不包含0）除以0，比如Div/Sqrt/Reciprocal等指令<br>- ln(0.0) = -inf；ln(-0.0) = -inf<br>- rsqrt(0.0) = inf; rsqrt(-0.0) = -inf | inf | inf区分+inf和-inf |
+| **输入包含inf**<br>例外场景：<br>&bull; exp(-inf)=0<br>&bull; inf * 0 = nan<br>&bull; inf + (-inf) = nan | inf | inf区分+inf和-inf |
+| **计算结果发生溢出**<br>例外情况：<br>&bull; 非nan值（不包含0）除以0，比如Div/Sqrt/Reciprocal等指令<br>&bull; ln(0.0) = -inf；ln(-0.0) = -inf<br>&bull; rsqrt(0.0) = inf; rsqrt(-0.0) = -inf | inf | inf区分+inf和-inf |
 | **输入包含nan** | nan | nan不区分正负 |
-| **计算结果产生nan**<br>举例：<br>- (-inf) - (-inf) = nan，比如Add/Sub/Reduce等指令<br>- (-inf) + inf = nan，比如Add/Sub/Reduce等指令<br>- 0 * (+/-inf) = nan，比如Mul等指令<br>- (+/-inf)/(+/-inf) = nan<br>- 0/0 = nan<br>- ln/Sqrt/Rsqrt指令输入为负值 | nan | nan不区分正负 |
+| **计算结果产生nan**<br>举例：<br>&bull; (-inf) - (-inf) = nan，比如Add/Sub/Reduce等指令<br>&bull; (-inf) + inf = nan，比如Add/Sub/Reduce等指令<br>&bull; 0 * (+/-inf) = nan，比如Mul等指令<br>&bull; (+/-inf)/(+/-inf) = nan<br>&bull; 0/0 = nan<br>&bull; ln/Sqrt/Rsqrt指令输入为负值 | nan | nan不区分正负 |
 
 ## 基础算术<a name="section12606472427"></a>
+
+注：下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
 
 **表 2**  Exp特殊值/边界值输入的计算结果
 
@@ -789,7 +791,9 @@
 
 ## 复合计算<a name="section1978519408454"></a>
 
-**表 20**  Axpy特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+注：下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
+
+**表 20**  Axpy特殊值/边界值输入的计算结果
 
 <a name="table1819218568247"></a>
 | src取值/scalarValue取值 | 中间阶段(src * scalarValue) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -846,7 +850,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 21**  MulAddDst特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 21**  MulAddDst特殊值/边界值输入的计算结果
 
 <a name="table1042313583406"></a>
 | src0取值/src1取值 | 中间阶段(src0 * src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -903,7 +907,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 22**  FusedMulAdd特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 22**  FusedMulAdd特殊值/边界值输入的计算结果
 
 <a name="table1158211814515"></a>
 | src0取值/dst取值 | 中间阶段(src0 * dst) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | src1取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -960,7 +964,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 23**  MulAddRelu特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 23**  MulAddRelu特殊值/边界值输入的计算结果
 
 <a name="table126194714473"></a>
 | src0取值/dst取值 | 中间阶段1(src0 * dst) | 中间阶段1（饱和模式，仅输出为half数据类型时支持） | src1取值 | 中间阶段2（INF/NAN模式） | 中间阶段2（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -1017,7 +1021,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 24**  AddRelu特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 24**  AddRelu特殊值/边界值输入的计算结果
 
 <a name="table143801137164310"></a>
 | src0取值/src1取值 | 中间阶段(src0 + src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -1032,7 +1036,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 25**  SubRelu特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 25**  SubRelu特殊值/边界值输入的计算结果
 
 <a name="table7783335111811"></a>
 | src0取值/src1取值 | 中间阶段(src0 - src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -1047,7 +1051,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 26**  AddReluCast特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 26**  AddReluCast特殊值/边界值输入的计算结果
 
 <a name="table494414452367"></a>
 | src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1(src0 + src1)（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
@@ -1072,7 +1076,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 27**  SubReluCast特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 27**  SubReluCast特殊值/边界值输入的计算结果
 
 <a name="table1418126172917"></a>
 | src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1(src0 - src1)（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
@@ -1097,7 +1101,7 @@
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
 
-**表 28**  MulCast特殊值/边界值输入的计算结果（MAX/MIN对应操作数对应数据类型下的最大值和最小值）
+**表 28**  MulCast特殊值/边界值输入的计算结果
 
 <a name="table1698216295159"></a>
 | src0取值/src1取值 | 中间阶段(src0 * src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
@@ -1130,7 +1134,9 @@
 
 ## 比较与选择<a name="section829519484517"></a>
 
-GetCmpMask为设置比较掩码寄存器的数据搬运操作，不涉及特殊值/边界值。
+注：  
+- 下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
+- GetCmpMask为设置比较掩码寄存器的数据搬运操作，不涉及特殊值/边界值。
 
 **表 30**  Compare特殊值/边界值输入的计算结果
 
@@ -1334,6 +1340,8 @@ GetCmpMask为设置比较掩码寄存器的数据搬运操作，不涉及特殊�
 
 ## 类型转换<a name="section3558104315715"></a>
 
+注：下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
+
 **表 32**  Cast特殊值/边界值输入的计算结果
 
 <a name="table1225292414418"></a>
@@ -1454,9 +1462,11 @@ GetCmpMask为设置比较掩码寄存器的数据搬运操作，不涉及特殊�
 | int16_t/uint8_t | MAX | 255 | 255 |
 | int16_t/uint8_t | MIN | 0 | 0 |
 
-float-\>float转换，-0会被转为+0，与IEEE不一致
+注：float->float转换，-0会被转为+0，与IEEE754不一致。
 
 ## 归约计算<a name="section156745111398"></a>
+
+注：下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
 
 **表 33**  ReduceDataBlock<MAX\>特殊值/边界值输入的计算结果
 
