@@ -5,9 +5,15 @@
 本样例基于基础的mmad样例，演示了 L1 Buffer -> L0A Buffer 通路的分形转换逻辑，通过编译时宏 `__NPU_ARCH__` 隔离不同硬件实现。
 
 - 在 Atlas A2/A3 系列产品中，L0A Buffer 的数据排布为 Zz 分形
-  - 从 L1 Buffer 搬运到 L0A Buffer 时需要做 Nz -> Zz 的分形转换。
-  - L0A复用场景，M轴切分时需要将A矩阵切分为多个Nz矩阵。
-- 在 Ascend 950PR/Ascend 950DT 中，L0A Buffer 的数据排布变更为 Nz 分形，与 L1 Buffer 一致，不再需要做分形转换。
+- 在 Ascend 950PR/Ascend 950DT 系列产品中，L0A Buffer 的数据排布为 Nz 分形
+
+分形的转换涉及到以下两种典型场景的兼容性适配：
+
+1. L0A不复用。对一整块A矩阵进行一次mmad计算。
+2. L0A复用。切分M轴，A矩阵分为两块子矩阵，进行两次mmad计算。
+
+对于场景1，需要修改L1>L0A搬运过程的逻辑，由Nz->Zz分形转换变为Nz->Nz。具体可参考[样例实现](./README.md#样例实现)。
+对于场景2，在Atlas A2/A3 系列产品上，由于Zz分形本身在M轴上连续，所以L1->L0A搬运逻辑和场景1相同，而对于Ascend 950PR/Ascend 950DT 系列产品，切分M轴会导致矩阵不连续，需要拆分为两个Nz矩阵。具体可参考[样例实现](./README.md#样例实现)。
 
 ## 支持的产品
 
