@@ -138,6 +138,12 @@ TEST_F(Tensor_Api_Layout_Struct, TestGetLayoutPatternFromMakeLayoutFractal)
     auto batchedDnLayout = MakeLayout(
         MakeShape(AscendC::Std::_2{}, MakeShape(AscendC::Std::_4{}, AscendC::Std::_5{})),
         MakeStride(AscendC::Std::Int<20>{}, MakeStride(AscendC::Std::_1{}, AscendC::Std::_4{})));
+    auto batchNdUnContinuousLayout = MakeLayout(
+        MakeShape(AscendC::Std::_3{}, MakeShape(AscendC::Std::_4{}, AscendC::Std::_5{})),
+        MakeStride(AscendC::Std::_5{}, MakeStride(AscendC::Std::_15{}, AscendC::Std::_1{})));
+    auto batchDnUnContinuousLayout = MakeLayout(
+        MakeShape(AscendC::Std::_3{}, MakeShape(AscendC::Std::_4{}, AscendC::Std::_5{})),
+        MakeStride(AscendC::Std::_4{}, MakeStride(AscendC::Std::_1{}, AscendC::Std::_12{})));
 
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(nzLayout)>, NZLayoutPtn>);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(znLayout)>, ZNLayoutPtn>);
@@ -155,7 +161,8 @@ TEST_F(Tensor_Api_Layout_Struct, TestGetLayoutPatternFromMakeLayoutFractal)
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(batchedDnExtLayout)>, DNExtLayoutPtn>);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(batchedNdLayout)>, NDLayoutPtn>);
     static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(batchedDnLayout)>, DNLayoutPtn>);
-    static_assert(GetLayoutTrait<decltype(batchedNzLayout)>::C0_ELEMENT == 16);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(batchNdUnContinuousLayout)>, NDLayoutPtn>);
+    static_assert(AscendC::Std::is_same_v<GetLayoutPattern<decltype(batchDnUnContinuousLayout)>, DNLayoutPtn>);
 }
 
 TEST_F(Tensor_Api_Layout_Struct, TestRemoveBatchDimFromThreeDimLayout)
