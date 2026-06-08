@@ -82,8 +82,6 @@ HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint
             return HCCL_E_NOT_SUPPORT;
         }
     }
-
-    commEngine = static_cast<uint8_t>(COMM_ENGINE_CCU);
     
     if (commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) &&
         commEngine != static_cast<uint8_t>(COMM_ENGINE_CCU)) {
