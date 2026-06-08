@@ -18,7 +18,6 @@ basic_test_one_targets=(
 )
 
 basic_test_two_targets=(
-
 )
 
 basic_test_three_targets=(
