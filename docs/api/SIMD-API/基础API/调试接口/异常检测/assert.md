@@ -59,37 +59,39 @@
 
 ## 功能说明<a name="section259105813316"></a>
 
-头文件路径为:"utils/debug/asc\_assert.h"
+头文件路径为：`"utils/debug/asc_assert.h"`。
 
 该接口实现CPU/NPU域assert断言功能。算子执行中，如果assert内部条件判断不为真，则输出assert条件并将输入的信息格式化打印在屏幕上。
 
 在算子Kernel侧实现代码中需要增加断言的地方使用assert检查代码，并格式化输出一些调测信息。示例如下：
 
-```
+```cpp
 int assertFlag = 10;
 
 assert(assertFlag == 10);
 ```
 
 > [!CAUTION]注意 
->assert接口打印功能会对算子实际运行的性能带来一定影响（每一条assert，系统会额外增加一条逻辑判断，具体性能影响取决于代码中assert的使用数量），通常在调测阶段使用。开发者可以按需通过设置ASCENDC\_DUMP=0来关闭打印功能。
-
-> **注意：** 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>
+> 该接口主要用于调试分析，开启后会对算子性能产生一定影响，通常在调试阶段使用，生产环境建议关闭。<br>
 > 默认情况下，调用该接口就会打印相关内容，开发者可以参考[关闭ASCENDC_DUMP说明](../关闭ASCENDC_DUMP说明)，按需关闭该接口功能。
 
 ## 函数原型<a name="section2067518173415"></a>
 
-```
+```cpp
 define assert(...)
 ```
 
 ## 参数说明<a name="section158061867342"></a>
 
-**表**  参数说明
+**表 1**  参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
-| ... | 输入 | assert断言是否终止程序的条件。为true则程序继续执行，为false则终止程序|
+| ... | 输入 | assert断言是否终止程序的条件。为true则程序继续执行，为false则终止程序。|
+
+## 返回值说明<a name="section640mcpsimp"></a>	 
+
+无
 
 ## 数据类型
 
@@ -101,7 +103,7 @@ define assert(...)
 
 <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
-<cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
+<cann-filter npu-type="310p">Atlas 推理系列产品 AI Core，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t。</cann-filter>
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -109,6 +111,7 @@ define assert(...)
 
 ## 约束说明<a name="section43265506459"></a>
 
+- 单次调用本接口打印的数据总量不可超过30kb。使用时应注意，如果超出这个限制，则数据不会被打印。
 - 该接口不需要使用AscendC命名空间。
 
 ## 调用示例<a name="section82241477610"></a>
