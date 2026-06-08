@@ -1,4 +1,4 @@
-# GM->UB非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
+# GM -> UB非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -18,9 +18,11 @@
 
 该接口提供将数据从GM (Global Memory)非对齐搬运至UB (Unified Buffer)的功能，可以根据开发者的需要自行填充数据。
 
-具体支持的数据通路为：
-- GM -> VECIN/VECOUT
-- <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+    - GM -> VECOUT
+    - <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
 
 填充的数据有两种配置方式：
 
@@ -87,7 +89,7 @@
 | rightPadding | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数。<br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
 | paddingValue | 左右两侧需要填充的数据值，需要保证在数据占用字节范围内。<br>数据类型和源操作数保持一致，数据类型为模板参数T。<br>**当数据类型长度为64位时，该参数只能设置为0。** |
 
-### GM->VECIN/VECOUT配置示例<a name="li73127579197"></a>
+### GM -> VECIN/VECOUT配置示例<a name="li73127579197"></a>
 
 - 参数解释
     - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。

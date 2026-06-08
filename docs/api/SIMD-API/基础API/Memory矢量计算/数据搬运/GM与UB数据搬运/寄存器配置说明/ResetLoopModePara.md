@@ -16,10 +16,13 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-重置loop mode的参数。与[SetLoopModePara](SetLoopModePara.md)搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。支持的通路如下：
+重置loop mode的参数。与[SetLoopModePara](SetLoopModePara.md)搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。
 
-- GM-\>VECIN
-- VECOUT-\>GM
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+- Unified Buffer -> Global Memory
+    - VECOUT -> GM
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

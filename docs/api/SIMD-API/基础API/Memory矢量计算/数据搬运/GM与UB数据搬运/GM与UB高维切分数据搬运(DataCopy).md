@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-支持GM与UB之间的高维切分数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
+支持GM与UB之间的高维切分数据搬运（GM -> UB或UB -> GM），数据在传输过程中保持原始格式和内容不变。
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
@@ -33,14 +33,14 @@
 
 接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md)。
 
-- GM->UB
+- GM -> UB
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
-- UB->GM
+- UB -> GM
 
     ```cpp
     template <typename T>
@@ -102,7 +102,7 @@
 
 ## 数据类型<a name="section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致，GM->UB和UB->GM两个数据通路对同一产品支持的数据类型相同，具体如下：
+源操作数和目的操作数支持的数据类型保持一致，GM -> UB和UB -> GM两个数据通路对同一产品支持的数据类型相同，具体如下：
 
 <cann-filter npu-type="950">
 

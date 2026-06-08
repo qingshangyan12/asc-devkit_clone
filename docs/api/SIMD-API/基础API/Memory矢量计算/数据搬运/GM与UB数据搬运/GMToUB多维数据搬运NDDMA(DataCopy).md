@@ -1,4 +1,4 @@
-# GM->UB多维数据搬运NDDMA(DataCopy)<a name="ZH-CN_TOPIC_0000002544407954"></a>
+# GM -> UB多维数据搬运NDDMA(DataCopy)<a name="ZH-CN_TOPIC_0000002544407954"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -23,7 +23,7 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-- GM->UB，支持多维度搬运
+- GM -> UB，支持多维度搬运
 
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
