@@ -28,6 +28,7 @@ from .global_storage import global_var_storage
 
 MANIFEST_VERSION = '1.0'
 CANN_PATH_PLACEHOLDER = '{CANN_PATH_PLACEHOLDER}'
+SRC_FILE_PLACEHOLDER = '{SRC_FILE_PLACEHOLDER}'
 DYNAMIC_COMPILE_PATH_PATTERN = r"(?P<prefix>(?:-I)?)[^\s]*?/dynamic/"
 DYNAMIC_COMPILE_PATH_REPLACEMENT = r"\g<prefix>"
 
@@ -50,6 +51,12 @@ class OpCompileManifestRecorder:
         self.manifest = {
             "version": MANIFEST_VERSION,
             "basic_info": {},
+            "artifacts": {},
+            "tiling_struct_info": {
+                "default": "",
+                "by_tiling_key": {},
+                "sources": []
+            },
             "compile_options": {
                 "source": "compile_option_tuple",
                 "include_paths": [],
@@ -118,6 +125,111 @@ class OpCompileManifestRecorder:
             "raw_options": compile_option_info["raw_options"]
         }
 
+    def record_wrapper_body(self, compile_info: CompileInfo):
+        if self.kernel_meta_dir is None or compile_info is None:
+            return
+        wrapper_body_file = self._get_wrapper_body_filename()
+        if wrapper_body_file is None:
+            return
+        wrapper_body_path = os.path.join(self.kernel_meta_dir, wrapper_body_file)
+        try:
+            with open(compile_info.gen_kernel_func_file, 'r') as fd:
+                source_lines = fd.readlines()
+            wrapper_body_lines, replaced = self._replace_src_include_with_placeholder(
+                source_lines, compile_info.src_file)
+            if not replaced:
+                CommonUtility.print_compile_log(compile_info.kernel_name, \
+                    "record wrapper body did not find source include line", \
+                    AscendCLogLevel.LOG_WARNING)
+            with open(wrapper_body_path, 'w') as fd:
+                fd.writelines(wrapper_body_lines)
+            os.chmod(wrapper_body_path, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
+            self.manifest.setdefault("artifacts", {})["wrapper_body"] = wrapper_body_file
+        except Exception as err:
+            CommonUtility.print_compile_log(compile_info.kernel_name, \
+                "record wrapper body failed, reason is: {}".format(err), \
+                AscendCLogLevel.LOG_WARNING)
+
+    def record_tiling_struct(self, tiling_data_file_path):
+        if self.kernel_meta_dir is None:
+            return
+        tiling_struct_file = self._get_tiling_struct_filename()
+        if tiling_struct_file is None:
+            return
+        tiling_struct_path = os.path.join(self.kernel_meta_dir, tiling_struct_file)
+        kernel_name = self.manifest.get("basic_info", {}).get("kernel_name", "")
+        try:
+            with open(tiling_data_file_path, 'r') as fd:
+                source_lines = fd.readlines()
+            tiling_struct_lines = self._extract_tiling_struct_definitions(source_lines)
+            if not tiling_struct_lines:
+                CommonUtility.print_compile_log(kernel_name, \
+                    "record tiling struct did not find struct definition", \
+                    AscendCLogLevel.LOG_WARNING)
+                return
+            with open(tiling_struct_path, 'w') as fd:
+                fd.writelines(tiling_struct_lines)
+            os.chmod(tiling_struct_path, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
+            self.manifest.setdefault("artifacts", {})["tiling_struct"] = tiling_struct_file
+        except Exception as err:
+            CommonUtility.print_compile_log(kernel_name, \
+                "record tiling struct failed, reason is: {}".format(err), \
+                AscendCLogLevel.LOG_WARNING)
+
+    def record_tiling_struct_info(self, tiling_key_struct_map=None, default_tiling_struct=None, source=None,
+                                  tiling_key_list=None):
+        tiling_struct_info = self.manifest.setdefault("tiling_struct_info", {
+            "default": "",
+            "by_tiling_key": {},
+            "sources": []
+        })
+        if default_tiling_struct is not None:
+            tiling_struct_info["default"] = str(default_tiling_struct)
+        by_tiling_key = tiling_struct_info.setdefault("by_tiling_key", {})
+        normalized_tiling_key_struct_map = self._normalize_tiling_key_struct_map(tiling_key_struct_map)
+        normalized_tiling_key_list = self._normalize_tiling_key_list(tiling_key_list)
+        if normalized_tiling_key_list:
+            normalized_tiling_keys = set(normalized_tiling_key_list)
+            normalized_tiling_key_struct_map = {
+                tiling_key: tiling_struct
+                for tiling_key, tiling_struct in normalized_tiling_key_struct_map.items()
+                if tiling_key in normalized_tiling_keys
+            }
+        by_tiling_key.update(normalized_tiling_key_struct_map)
+        if tiling_key_list and tiling_struct_info.get("default", ""):
+            default_tiling_struct = tiling_struct_info["default"]
+            for tiling_key in normalized_tiling_key_list:
+                by_tiling_key.setdefault(tiling_key, default_tiling_struct)
+        if source:
+            sources = tiling_struct_info.setdefault("sources", [])
+            if source not in sources:
+                sources.append(source)
+
+    def record_kernel_type_info(self, tiling_key_kernel_type=None, default_kernel_type=None,
+                                tiling_key_list=None):
+        kernel_type_info = self.manifest.setdefault("kernel_type_info", {
+            "default": "",
+            "by_tiling_key": {}
+        })
+        if default_kernel_type is not None:
+            kernel_type_info["default"] = self._normalize_kernel_type(default_kernel_type)
+
+        by_tiling_key = kernel_type_info.setdefault("by_tiling_key", {})
+        normalized_kernel_type_map = self._normalize_tiling_key_kernel_type_map(tiling_key_kernel_type)
+        normalized_tiling_key_list = self._normalize_tiling_key_list(tiling_key_list)
+        if normalized_tiling_key_list:
+            normalized_tiling_keys = set(normalized_tiling_key_list)
+            normalized_kernel_type_map = {
+                tiling_key: kernel_type
+                for tiling_key, kernel_type in normalized_kernel_type_map.items()
+                if tiling_key in normalized_tiling_keys
+            }
+        by_tiling_key.update(normalized_kernel_type_map)
+        if normalized_tiling_key_list and kernel_type_info.get("default", ""):
+            default_kernel_type = kernel_type_info["default"]
+            for tiling_key in normalized_tiling_key_list:
+                by_tiling_key.setdefault(tiling_key, default_kernel_type)
+
     def write(self, compile_info: CompileInfo = None, tiling_info: TilingInfo = None,
               compile_option_tuple: CompileOptionTuple = None):
         if self.manifest_path is None:
@@ -136,6 +248,50 @@ class OpCompileManifestRecorder:
                 AscendCLogLevel.LOG_WARNING)
 
     @staticmethod
+    def _normalize_tiling_key_struct_map(tiling_key_struct_map):
+        if not tiling_key_struct_map:
+            return {}
+        normalized_map = {}
+        for tiling_key, tiling_struct in tiling_key_struct_map.items():
+            if isinstance(tiling_struct, (list, tuple)):
+                tiling_struct = tiling_struct[0] if tiling_struct else ""
+            elif isinstance(tiling_struct, dict):
+                tiling_struct = tiling_struct.get("tiling_struct", tiling_struct.get("struct", ""))
+            if tiling_struct is None or str(tiling_struct) == "":
+                continue
+            normalized_map[OpCompileManifestRecorder._normalize_tiling_key(tiling_key)] = str(tiling_struct)
+        return normalized_map
+
+    @staticmethod
+    def _normalize_tiling_key(tiling_key):
+        return str(tiling_key).rstrip("ULul")
+
+    @staticmethod
+    def _normalize_tiling_key_list(tiling_key_list):
+        if not tiling_key_list:
+            return []
+        return [OpCompileManifestRecorder._normalize_tiling_key(tiling_key) for tiling_key in tiling_key_list]
+
+    @staticmethod
+    def _normalize_tiling_key_kernel_type_map(tiling_key_kernel_type):
+        if not tiling_key_kernel_type:
+            return {}
+        normalized_map = {}
+        for tiling_key, kernel_type in tiling_key_kernel_type.items():
+            if kernel_type is None:
+                continue
+            normalized_map[OpCompileManifestRecorder._normalize_tiling_key(tiling_key)] = \
+                OpCompileManifestRecorder._normalize_kernel_type(kernel_type)
+        return normalized_map
+
+    @staticmethod
+    def _normalize_kernel_type(kernel_type):
+        kernel_type_name = getattr(kernel_type, "name", None)
+        if kernel_type_name:
+            return str(kernel_type_name)
+        return str(kernel_type)
+
+    @staticmethod
     def _short_hash(value):
         return hashlib.sha256(str(value).encode("utf-8")).hexdigest()[:16]
 
@@ -150,6 +306,98 @@ class OpCompileManifestRecorder:
     @staticmethod
     def _safe_filename_part(value):
         return re.sub(r"[^0-9A-Za-z_.-]", "_", str(value))
+
+    def _get_wrapper_body_filename(self):
+        op_name = self.manifest.get("basic_info", {}).get("op_name")
+        if not op_name:
+            return None
+        return "{}_wrapper_body.cpp".format(op_name)
+
+    def _get_tiling_struct_filename(self):
+        op_name = self.manifest.get("basic_info", {}).get("op_name")
+        if not op_name:
+            return None
+        return "{}_tiling_strcut.h".format(op_name)
+
+    @staticmethod
+    def _replace_src_include_with_placeholder(source_lines, src_file):
+        src_include_pattern = re.compile(
+            r"^(?P<indent>\s*)#\s*include\s+\"{}\"\s*$".format(re.escape(str(src_file))))
+        wrapper_body_lines = []
+        replaced = False
+        for line in source_lines:
+            stripped_line = line.rstrip("\r\n")
+            line_ending = line[len(stripped_line):]
+            match = src_include_pattern.match(stripped_line)
+            if not replaced and match:
+                wrapper_body_lines.append(
+                    "{}#include \"{}\"{}".format(match.group("indent"), SRC_FILE_PLACEHOLDER, line_ending))
+                replaced = True
+            else:
+                wrapper_body_lines.append(line)
+        return wrapper_body_lines, replaced
+
+    @staticmethod
+    def _extract_tiling_struct_definitions(source_lines):
+        first_definition_idx = None
+        top_level_type_pattern = re.compile(r"^(?:class|struct)\s+[A-Za-z_]\w*(?:\s|:|\{|$)")
+        for idx, line in enumerate(source_lines):
+            if top_level_type_pattern.match(line):
+                first_definition_idx = idx
+                break
+        if first_definition_idx is None:
+            return []
+
+        tiling_struct_lines = list(source_lines[:first_definition_idx])
+        current_definition = []
+        in_definition = False
+        brace_depth = 0
+        saw_open_brace = False
+        for line in source_lines[first_definition_idx:]:
+            if not in_definition:
+                if not top_level_type_pattern.match(line):
+                    continue
+                current_definition = [line]
+                in_definition = True
+                saw_open_brace = "{" in line
+                brace_depth = line.count("{") - line.count("}")
+            else:
+                current_definition.append(line)
+                saw_open_brace = saw_open_brace or "{" in line
+                brace_depth += line.count("{") - line.count("}")
+
+            if in_definition and saw_open_brace and brace_depth <= 0 and ";" in line:
+                tiling_struct_lines.extend(current_definition)
+                if not tiling_struct_lines[-1].endswith("\n"):
+                    tiling_struct_lines[-1] += "\n"
+                tiling_struct_lines.append("\n")
+                current_definition = []
+                in_definition = False
+                brace_depth = 0
+                saw_open_brace = False
+
+        while tiling_struct_lines and tiling_struct_lines[-1].strip() == "":
+            tiling_struct_lines.pop()
+        if tiling_struct_lines:
+            final_endif = OpCompileManifestRecorder._get_final_header_guard_endif(source_lines)
+            if final_endif is not None:
+                tiling_struct_lines.append("\n")
+                tiling_struct_lines.append(final_endif)
+            tiling_struct_lines.append("\n")
+        return tiling_struct_lines
+
+    @staticmethod
+    def _get_final_header_guard_endif(source_lines):
+        if not source_lines:
+            return None
+        has_header_guard = any(line.lstrip().startswith("#ifndef") for line in source_lines[:5]) and \
+            any(line.lstrip().startswith("#define") for line in source_lines[:5])
+        if not has_header_guard:
+            return None
+        for line in reversed(source_lines):
+            if re.match(r"^\s*#endif(?:\s*//.*)?\s*$", line):
+                return line
+        return None
 
     @staticmethod
     def _get_soc_version():

@@ -892,6 +892,8 @@ class TilingInfo:
         self.tiling_key_list = []
         self.tiling_key_data_size = {}
         self.default_tiling_size: int = 0
+        self.default_tiling_struct: str = ""
+        self.tiling_key_struct_map: dict = {}
         self.clear_atomic: bool = True
         self.schedule_mode: int = 0
         self.raw_run_info: dict = None
@@ -914,6 +916,8 @@ class TilingInfo:
         self.tiling_key_list = info_dict["tiling_key_list"]
         self.tiling_key_data_size = info_dict["tiling_key_data_size"]
         self.default_tiling_size = info_dict["default_tiling_size"]
+        self.default_tiling_struct = info_dict.get("default_tiling_struct", "")
+        self.tiling_key_struct_map = info_dict.get("tiling_key_struct_map", {})
         self.clear_atomic = info_dict["clear_atomic"]
         self.schedule_mode = info_dict["schedule_mode"]
         self.raw_run_info = info_dict["raw_run_info"]
@@ -934,6 +938,8 @@ class TilingInfo:
         info_dict["tiling_key_list"] = self.tiling_key_list
         info_dict["tiling_key_data_size"] = self.tiling_key_data_size
         info_dict["default_tiling_size"] = self.default_tiling_size
+        info_dict["default_tiling_struct"] = self.default_tiling_struct
+        info_dict["tiling_key_struct_map"] = self.tiling_key_struct_map
         info_dict["clear_atomic"] = self.clear_atomic
         info_dict["schedule_mode"] = self.schedule_mode
         info_dict["raw_run_info"] = self.raw_run_info
@@ -1304,7 +1310,7 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-    if short_soc_version in ["Ascend950", "MC62", "MC32DM11A"]:
+    if short_soc_version in ["Ascend950", "MC62CM12A", "MC32DM11A"]:
         # use __AUX__ to create a new struct to reduce running time. __AUX__ name does not matter
         # original: initialize, then write value    use __AUX__: write value, then interpret_cast to needed struct
         class_body += _get_tiling_data_without_time_stamp(class_name)
@@ -1675,11 +1681,14 @@ def generate_dynamic_tiling_struct_file(optype, tiling_info, tiling_key_list, ti
     struct_tiling_def_base = {}
     tiling_def_list_of_key = []
     tiling_max_data_size = 0
+    if tiling_key_group_map is None:
+        tiling_key_group_map = {}
 
     optype_tiling_def = get_tiling_def(optype)
     if optype_tiling_def is None:
         LogUtil.print_compile_log(optype, f"do not registe tiling struct!!!", AscendCLogLevel.LOG_ERROR)
         return
+    tiling_info.default_tiling_struct = optype_tiling_def.class_name
 
     struct_tiling_def_base = get_struct_tiling_info(optype_tiling_def, struct_tiling_def_base)
 
@@ -1695,6 +1704,9 @@ def generate_dynamic_tiling_struct_file(optype, tiling_info, tiling_key_list, ti
             tiling_def_list_of_key.append(tiling_def)
             tiling_max_data_size = max(tiling_max_data_size, tiling_def.data_size)
             tiling_info.tiling_key_data_size[tiling_key] = tiling_def.data_size
+            tiling_info.tiling_key_struct_map[tiling_key] = tiling_def.class_name
+            for tiling_key_slave in tiling_key_group_map.get(tiling_key, []):
+                tiling_info.tiling_key_struct_map[tiling_key_slave] = tiling_def.class_name
 
     # do not have tiling key return tiling header file of optype
     if len(tiling_def_list_of_key) == 0:
