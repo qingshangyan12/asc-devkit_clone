@@ -39,9 +39,9 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|dst|输出|目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为A1/B1），目的地址需要32B对齐。|
-|src|输入|源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1B对齐。|
-|count|输入|参与搬运的元素个数。count * sizeof(T)需要32B对齐，若未对齐，则搬运量会向下取整到32B对齐。|
+|dst|输出|目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为A1/B1），目的地址需要32字节对齐。|
+|src|输入|源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1字节对齐。|
+|count|输入|参与搬运的元素个数。count * sizeof(T)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。|
 
 以half数据类型为例，源操作数的shape为1 * 128。当count = 128时，[图1](#zh-cn_topic_0000002535739034_fig79455329161)将源操作数中128个元素连续搬运至目的操作数。
 
@@ -52,27 +52,45 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 源矩阵和目的矩阵支持的数据类型保持一致。
 
-<cann-filter npu_type="A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：b8、b16、b32、b64
-
-</cann-filter>
-
 <cann-filter npu_type="950">
 
-针对Ascend 950PR/Ascend 950DT，支持数据类型为：b8、b16、b32、b64
+针对Ascend 950PR/Ascend 950DT，支持数据类型为：b8、b16、b32、b64。
 
 </cann-filter>
 
-<cann-filter npu_type="910,310p">
+<cann-filter npu_type="A3">
 
-针对Atlas 训练系列产品、Atlas 推理系列产品AI Core，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：b8、b16、b32、b64。
 
 </cann-filter>
 
-<cann-filter npu_type="x90,9030">
+<cann-filter npu_type="910b">
 
-针对Kirin X90、Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：b8、b16、b32、b64。
+
+</cann-filter>
+
+<cann-filter npu_type="310p">
+
+针对Atlas 推理系列产品AI Core，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="910">
+
+针对Atlas 训练系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="x90">
+
+针对Kirin X90，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="9030">
+
+针对Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
 
 </cann-filter>
 
@@ -82,8 +100,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 约束说明<a id="zh-cn_topic_0000002535739034_section2045914466492"></a>
 
-- 位于Global Memory的源地址必须1B对齐，位于L1 Buffer的目的地址必须32B对齐。
-- 调用连续搬运接口时，count * sizeof(T)需要32B对齐，若未对齐，则搬运量会向下取整到32B对齐。
+- 位于Global Memory的源地址必须1字节对齐，位于L1 Buffer的目的地址必须32字节对齐。
+- 调用连续搬运接口时，count * sizeof(T)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。
 - 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier\(ISASI\)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE\_MTE3\>\(\)添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE\_MTE2\>\(\)添加MTE2搬入流水的同步。
 
     ![](../../../../../figures/绘图4.png)

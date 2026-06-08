@@ -33,7 +33,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 
 |参数名|描述|
 |---|---|
-|T|操作数以及paddingValue（待填充数据值）的数据类型。<br>Ascend 950PR/Ascend 950DT，支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64|
+|T|操作数以及paddingValue（待填充数据值）的数据类型。<br>支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、complex32、int64_t、uint64_t、double、complex64。|
 |mode|配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre>|
 
 **表 2**  接口参数说明
@@ -43,7 +43,7 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 |参数名|输入/输出|描述|
 |---|---|---|
 |dst|输出|目的操作数，类型为LocalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。|
-|src|输入|源操作数，类型为GlobalTensor。<br>LocalTensor的起始地址需要保证32字节对齐。<br>GlobalTensor的起始地址无地址对齐约束。|
+|src|输入|源操作数，类型为GlobalTensor。<br>GlobalTensor的起始地址需要保证1字节对齐。|
 |dataCopyParams|输入|搬运参数。<br>&bull; DataCopyExtParams类型，具体参数说明请参考[表4](#table10572141063919)。|
 |padParams|输入|从Global Memory搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。<br>&bull; DataCopyPadExtParams类型，具体参数请参考[表6](#table844881954715)。|
 
@@ -54,9 +54,9 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 |参数名称|含义|
 |---|---|
 |blockCount|指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[1, 4095]。|
-|blockLen|指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限**。|
-|srcStride|源操作数，相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔）。<br>**如果源操作数的逻辑位置为VECIN/VECOUT，则单位为dataBlock(32字节)。如果源操作数的逻辑位置为GM，则单位为字节**。<br>数据类型为uint32_t，srcStride不要超出该数据类型的取值范围。<br>特别地，针对如下型号：<br>Ascend 950PR/Ascend 950DT<br>数据类型为int64_t，如果源操作数的逻辑位置为VECIN/VECOUT，取值范围为[0, 65535]；如果源操作数的逻辑位置为GM，取值范围为[-blockLen, 2^40-1]。|
-|dstStride|目的操作数，相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔）。<br>**如果目的操作数的逻辑位置为VECIN/VECOUT，则单位为dataBlock(32字节)，如果目的操作数的逻辑位置为GM，则单位为字节**。<br>数据类型为uint32_t，dstStride不要超出该数据类型的取值范围。<br>特别地，针对如下型号：<br>Ascend 950PR/Ascend 950DT<br>数据类型为int64_t，如果目的操作数的逻辑位置为VECIN/VECOUT，取值范围为[0, 65535]；如果目的操作数的逻辑位置为GM，取值范围为[0, 2^40-1]。|
+|blockLen|指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]**，blockLen必须是 sizeof(T) 的整数倍**。|
+|srcStride|源操作数，相邻连续数据块的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为字节，取值范围为[-blockLen, 2^40-1]。|
+|dstStride|目的操作数，相邻连续数据块间的间隔（前面一个数据块的尾与后面数据块的头的间隔），单位为dataBlock(32字节)，取值范围为[0, 65535]。|
 |rsv|保留字段。|
 
 **表 4**  DataCopyPadExtParams<T\>结构体参数定义
@@ -94,7 +94,6 @@ __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - leftPadding、rightPadding的字节数均不能超过32字节。
-- 针对Ascend 950PR/Ascend 950DT，VECIN/VECOUT-\>TSCM通路，仅支持如下数据类型：half、bfloat16\_t、int16\_t、uint16\_t、float、int32\_t、uint32\_t、int8\_t、uint8\_t、int64\_t、uint64\_t、double。
 
 ## 调用示例<a name="section177231425115410"></a>
 

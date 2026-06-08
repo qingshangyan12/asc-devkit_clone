@@ -45,8 +45,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|dst|输出|目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为A1/B1），目的地址需要32B对齐。|
-|src|输入|源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1B对齐。|
+|dst|输出|目的操作数，类型为LocalTensor，存储位置为L1 Buffer（TPosition为A1/B1），目的地址需要32字节对齐。|
+|src|输入|源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1字节对齐。|
 |repeatParams|输入|搬运参数，类型为DataCopyParams。通过该参数可以配置搬运的数据块个数、长度、地址间隔等信息，同时支持非连续和连续搬运。<br>DataCopyParams参数说明请参考[表3](#zh-cn_topic_0000002566658905_table144203616291)。|
 
 **表 3**  DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566658905_table144203616291"></a>
@@ -54,35 +54,53 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 |参数名称|含义|
 |----------|----------|
 |blockCount|搬运的数据块个数。uint16_t类型，取值范围：blockCount∈[0, 4095]，默认值为1。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|blockLen|搬运的每个数据块长度。uint16_t类型，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|srcGap|源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。|
-|dstGap|目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。|
+|blockLen|搬运的每个数据块长度。uint16_t类型，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32字节）。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。**|
+|srcGap|源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32字节）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。|
+|dstGap|目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），uint16_t类型，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32字节）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。|
 
 ## 数据类型<a id="zh-cn_topic_0000002566658905_section4219135304818"></a>
 
 源矩阵和目的矩阵支持的数据类型保持一致。
 
-<cann-filter npu_type="A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：b8、b16、b32、b64
-
-</cann-filter>
-
 <cann-filter npu_type="950">
 
-针对Ascend 950PR/Ascend 950DT，支持数据类型为：b8、b16、b32、b64
+针对Ascend 950PR/Ascend 950DT，支持数据类型为：b8、b16、b32、b64。
 
 </cann-filter>
 
-<cann-filter npu_type="910,310p">
+<cann-filter npu_type="A3">
 
-针对Atlas 训练系列产品、Atlas 推理系列产品AI Core，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：b8、b16、b32、b64。
 
 </cann-filter>
 
-<cann-filter npu_type="x90,9030">
+<cann-filter npu_type="910b">
 
-针对Kirin X90、Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：b8、b16、b32、b64。
+
+</cann-filter>
+
+<cann-filter npu_type="310p">
+
+针对Atlas 推理系列产品AI Core，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="910">
+
+针对Atlas 训练系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="x90">
+
+针对Kirin X90，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
+
+</cann-filter>
+
+<cann-filter npu_type="9030">
+
+针对Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t、half、float、double。
 
 </cann-filter>
 
@@ -92,7 +110,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 约束说明<a id="zh-cn_topic_0000002566658905_section2045914466492"></a>
 
-- 位于Global Memory的源地址必须1B对齐，位于L1 Buffer的目的地址必须32B对齐。
+- 位于Global Memory的源地址必须1字节对齐，位于L1 Buffer的目的地址必须32字节对齐。
 - 当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，表示指令不会执行，该接口将被视为NOP（空操作）。
 - DataCopyParams结构体参数的值需在取值范围内：
 
