@@ -84,11 +84,13 @@ private:
     __aicore__ inline uint32_t PollCq(ChannelHandle channel, uint32_t expectTail);
 
 private:
+#ifndef HCOMM_USE_DIRECT_GM
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
     LocalTensor<uint32_t> sqPI_;
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
+#endif
 };
 } // namespace AscendC
 
