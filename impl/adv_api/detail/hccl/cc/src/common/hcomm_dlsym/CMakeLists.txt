@@ -1,12 +1,13 @@
-# ----------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
-# ----------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------
+
 if(BUILD_OPEN_PROJECT)
     set(INCLUDE_LIST
         ${HCCL_LOCAL_HEADER_DIRS}
@@ -15,7 +16,22 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
         ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/ccu
 
+        ${ASCEND_CANN_PACKAGE_PATH}/include
+        ${ASCEND_CANN_PACKAGE_PATH}/include/acl
+
+        # hcomm头文件
+        ${ASCEND_CANN_PACKAGE_PATH}/include/ccu
+        ${ASCEND_CANN_PACKAGE_PATH}/include/hccl
+        ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm
+        ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm/ccu
+
+        # 包间接口
+        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/
+        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/hccl
+        ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
     )
 else()
     set(INCLUDE_LIST
@@ -43,7 +59,6 @@ else()
         ${TOP_DIR}/runtime/include/external
         ${TOP_DIR}/runtime/include/external/acl
         ${TOP_DIR}/runtime/pkg_inc/base
-        ${TOP_DIR}/runtime/pkg_inc/mmpa
 
         ${TOP_DIR}/open_source/json/include
 
@@ -62,56 +77,56 @@ endif()
 if(PRODUCT_SIDE STREQUAL "host")
     add_library(mc2_compat SHARED)
 
-    if(BUILD_OPEN_PROJECT)
+if(BUILD_OPEN_PROJECT)
         target_compile_definitions(mc2_compat PRIVATE
-            OPEN_BUILD_PROJECT
-            $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
-        )
-    else()
-        target_compile_definitions(mc2_compat PRIVATE
-            $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
-        )
-    endif()
-
-    target_include_directories(mc2_compat PRIVATE
-        ${INCLUDE_LIST}
+        OPEN_BUILD_PROJECT
+        $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
     )
+else()
+        target_compile_definitions(mc2_compat PRIVATE
+        $<$<STREQUAL:${PRODUCT_SIDE},host>:_GLIBCXX_USE_CXX11_ABI=0>
+    )
+endif()
+
+hccl_apply_cann_compat(mc2_compat)
+    target_include_directories(mc2_compat PRIVATE
+    ${INCLUDE_LIST}
+)
 
     target_compile_options(mc2_compat PRIVATE
-        -Werror
-        -fno-common
-        -fno-strict-aliasing
-        -pipe
-        $<$<CONFIG:Release>:-O3>
-        $<$<CONFIG:Debug>:-g>
-        -std=c++14
-        -fstack-protector-all
-    )
+    -Werror
+    -fno-common
+    -fno-strict-aliasing
+    -pipe
+    $<$<CONFIG:Release>:-O3>
+    $<$<CONFIG:Debug>:-g>
+    -std=c++14
+    -fstack-protector-all
+)
 
     target_link_options(mc2_compat PRIVATE
-        -Wl,-z,relro
-        -Wl,-z,now
-        -Wl,-z,noexecstack
-        $<$<CONFIG:Release>:-s>
-    )
+    -Wl,-z,relro
+    -Wl,-z,now
+    -Wl,-z,noexecstack
+    $<$<CONFIG:Release>:-s>
+)
 
-    if(BUILD_OPEN_PROJECT)
+if(BUILD_OPEN_PROJECT)
+    target_link_libraries(mc2_compat PRIVATE
+        -Wl,--no-as-needed
+        unified_dlog
+        acl_rt
+        -Wl,--no-as-needed
+    )
+else()
         target_link_libraries(mc2_compat PRIVATE
-            $<BUILD_INTERFACE:c_sec_headers>
-            $<BUILD_INTERFACE:acl_rt_headers>
-            -Wl,--no-as-needed
-            acl_rt
-            unified_dlog
-            -Wl,--no-as-needed
-        )
-    else()
-        target_link_libraries(mc2_compat PRIVATE
-            $<BUILD_INTERFACE:slog_headers>
-            -Wl,--no-as-needed
-            unified_dlog
-            -Wl,--no-as-needed
-        )
-    endif()
+        $<BUILD_INTERFACE:slog_headers>
+        -Wl,--no-as-needed
+        unified_dlog
+        acl_rt
+        -Wl,--no-as-needed
+    )
+endif()
 
     install(TARGETS mc2_compat
         DESTINATION "${CMAKE_SYSTEM_PROCESSOR}-linux/lib64" COMPONENT asc-devkit
@@ -124,6 +139,12 @@ if(PRODUCT_SIDE STREQUAL "host")
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc
+        hccl_host_comm_dl.cc
+        hccl_res_expt_dl.cc
+        ccu_res_dl.cc
+        hccl_ccu_res_dl.cc
+        ccu_launch_dl.cc
+        ccu_primitives_impl_dl.cc
     )
 endif()
 
@@ -133,7 +154,10 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
         hcomm_primitives_dl.cc
         hcomm_diag_dl.cc
         hcomm_device_profiling_dl.cc
+        hccl_device_comm_dl.cc
     )
+
+    hccl_apply_cann_compat(mc2_kernel_compat)
 
     target_include_directories(mc2_kernel_compat PRIVATE
         ${INCLUDE_LIST}
@@ -156,5 +180,5 @@ if((DEVICE_MODE AND BUILD_OPEN_PROJECT) OR (NOT BUILD_OPEN_PROJECT))
  	    $<BUILD_INTERFACE:slog_headers>
  	    $<BUILD_INTERFACE:c_sec_headers>
  	    $<BUILD_INTERFACE:acl_rt_headers>
- 	)
+    )
 endif()

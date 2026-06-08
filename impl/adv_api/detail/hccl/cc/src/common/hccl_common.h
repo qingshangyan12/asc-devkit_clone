@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef MC2_OPS_HCCL_COMMON_H
 #define MC2_OPS_HCCL_COMMON_H
 
@@ -63,7 +63,6 @@ const std::map<HcclDataType, std::string> HCOM_DATA_TYPE_STR_MAP{
     {HcclDataType::HCCL_DATA_TYPE_FP8E4M3, "fp8e4m3"},
     {HcclDataType::HCCL_DATA_TYPE_FP8E5M2, "fp8e5m2"},
     {HcclDataType::HCCL_DATA_TYPE_FP8E8M0, "fp8e8m0"},
-    {HcclDataType::HCCL_DATA_TYPE_MXFP8, "mxfp8"},
     {HcclDataType::HCCL_DATA_TYPE_RESERVED, "reserved"}
 };
 
@@ -89,7 +88,6 @@ inline const char* GetHcclDataTypeStr(HcclDataType type) noexcept
         case HcclDataType::HCCL_DATA_TYPE_FP8E4M3: return "fp8e4m3";
         case HcclDataType::HCCL_DATA_TYPE_FP8E5M2: return "fp8e5m2";
         case HcclDataType::HCCL_DATA_TYPE_FP8E8M0: return "fp8e8m0";
-        case HcclDataType::HCCL_DATA_TYPE_MXFP8: return "mxfp8";
         case HcclDataType::HCCL_DATA_TYPE_RESERVED: return "reserved";
         default:
             return nullptr;
@@ -149,6 +147,18 @@ inline std::string GetDataTypeEnumStr(u32 dataType)
 {
     auto hcclDataType = static_cast<HcclDataType>(dataType);
     return GetDataTypeEnumStr(hcclDataType);
+}
+
+inline std::string GetDataStr(const void *data, u32 totalRanks)
+{
+    std::string dataCounts;
+    for (u32 i = 0; i < totalRanks; i++) {
+        if (i > 0) {
+            dataCounts += ", ";
+        }
+        dataCounts += std::to_string(static_cast<const u64 *>(data)[i]);
+    }
+    return dataCounts;
 }
 
 // server内link类型
