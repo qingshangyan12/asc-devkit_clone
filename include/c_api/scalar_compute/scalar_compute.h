@@ -74,6 +74,207 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx);
 
 __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx);
 
+namespace __asc_aicore {
+// ==========asc_atomic_add==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_add(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_add(__ubuf__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_add(__ubuf__ float *address, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_add(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_add(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_add(__gm__ float *address, float val);
+
+__aicore__ inline int64_t asc_atomic_add(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_add(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_sub==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_sub(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_sub(__ubuf__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_sub(__ubuf__ float *address, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_sub(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_sub(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_sub(__gm__ float *address, float val);
+
+__aicore__ inline int64_t asc_atomic_sub(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_sub(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_exch==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_exch(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_exch(__ubuf__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_exch(__ubuf__ float *address, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_exch(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_exch(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_exch(__gm__ float *address, float val);
+
+__aicore__ inline int64_t asc_atomic_exch(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_exch(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_max==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_max(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_max(__ubuf__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_max(__ubuf__ float *address, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_max(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_max(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_max(__gm__ float *address, float val);
+
+__aicore__ inline int64_t asc_atomic_max(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_max(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_min==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_min(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_min(__ubuf__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_min(__ubuf__ float *address, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_min(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_min(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline float asc_atomic_min(__gm__ float *address, float val);
+
+__aicore__ inline int64_t asc_atomic_min(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_min(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_cas==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_cas(__ubuf__ int32_t *address, int32_t compare, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_cas(__ubuf__ uint32_t *address, uint32_t compare, uint32_t val);
+
+__aicore__ inline float asc_atomic_cas(__ubuf__ float *address, float compare, float val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t *address, int32_t compare, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_cas(__gm__ uint32_t *address, uint32_t compare, uint32_t val);
+
+__aicore__ inline float asc_atomic_cas(__gm__ float *address, float compare, float val);
+
+__aicore__ inline int64_t asc_atomic_cas(__gm__ int64_t *address, int64_t compare, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_cas(__gm__ uint64_t *address, uint64_t compare, uint64_t val);
+
+// ==========asc_atomic_and==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_and(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_and(__ubuf__ uint32_t *address, uint32_t val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_and(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_and(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline int64_t asc_atomic_and(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_and(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_or==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_or(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_or(__ubuf__ uint32_t *address, uint32_t val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_or(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_or(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline int64_t asc_atomic_or(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_or(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_xor==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline int32_t asc_atomic_xor(__ubuf__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_xor(__ubuf__ uint32_t *address, uint32_t val);
+#endif
+#endif
+
+__aicore__ inline int32_t asc_atomic_xor(__gm__ int32_t *address, int32_t val);
+
+__aicore__ inline uint32_t asc_atomic_xor(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline int64_t asc_atomic_xor(__gm__ int64_t *address, int64_t val);
+
+__aicore__ inline uint64_t asc_atomic_xor(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_inc==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline uint32_t asc_atomic_inc(__ubuf__ uint32_t *address, uint32_t val);
+#endif
+#endif
+
+__aicore__ inline uint32_t asc_atomic_inc(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t *address, uint64_t val);
+
+// ==========asc_atomic_dec==========
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__aicore__ inline uint32_t asc_atomic_dec(__ubuf__ uint32_t *address, uint32_t val);
+#endif
+#endif
+
+__aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t *address, uint32_t val);
+
+__aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t *address, uint64_t val);
+}
+
 #endif
 
 #endif
