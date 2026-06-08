@@ -29,7 +29,6 @@
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── data_utils.h                       // 数据读入写出函数
 │   ├── pattern_transformation.asc         // AscendC算子实现 & 调用样例
-│   └── test.sh                            // 一键编译运行脚本
 ```
 
 ## 样例规格
