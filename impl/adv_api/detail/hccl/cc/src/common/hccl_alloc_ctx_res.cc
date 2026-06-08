@@ -471,8 +471,10 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
 
 static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
 {
+    HCCL_INFO("[GetTokenFormBuffInfo]start GetTokenFormBuffInfo!");
     uint64_t workSpace = opResCtx.workSpace;
     uint64_t workSpaceSize = opResCtx.workSpaceSize;
+    HCCL_INFO("[GetTokenInfo]start GetTokenInfo!");
     token = hcomm::CcuRep::GetTokenInfo(workSpace, workSpaceSize);
     return HCCL_SUCCESS;
 }
@@ -481,6 +483,7 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, OpResCtx &opResCtx, void **resCtxOut)
 {
+    HCCL_INFO("[AcquireAlgResources]start AcquireAlgResources!");
     bool isResourceReused = false;
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
@@ -491,6 +494,7 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     if (opParam.engine == COMM_ENGINE_CCU) {
         uint64_t token;
         CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
+        HCCL_INFO("[AcquireAlgResources] GetTokenFormBuffInfo successfully!");
         resCtxHost->kfcServerArgs = {
             opResCtx.ckeAddr,
             opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE,

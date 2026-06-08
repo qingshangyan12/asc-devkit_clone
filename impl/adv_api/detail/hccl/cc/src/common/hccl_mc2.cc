@@ -217,15 +217,19 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     const void *ccTilingList[], uint32_t tilingNum, const char *commName,
     u32 rankSize, u32 userRank, void **opResCtx, std::string &ctxTag)
 {
+    HCCL_INFO("[AllocComResourceByTilingCcu]start AllocComResourceByTilingCcu!");
     std::string topoTag[MAX_OP_NUM];
     CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+    HCCL_INFO("[AllocComResourceByTilingCcu]BuildTagsAndValidate successfully!");
 
     // 构建 OpResCtx 基础字段（workspace、XN、CKE等）
     OpResCtx resCtx{};
     CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
+    HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));
+    HCCL_INFO("[CcuSelectAlg]AllocCcuOpResCtx successfully!");
 
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
