@@ -367,14 +367,14 @@
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1481215214350"><a name="p1481215214350"></a><a name="p1481215214350"></a>每个repeat内所有数据求和。和<a href="基础API/Memory矢量计算/归约计算/WholeReduceSum.md">WholeReduceSum</a>接口相比，不支持mask逐bit模式。建议使用功能更全面的<a href="基础API/Memory矢量计算/归约计算/WholeReduceSum.md">WholeReduceSum</a>接口。</p>
 </td>
 </tr>
-<tr id="row109261892541"><td class="cellrowborder" rowspan="2" valign="top" width="15.590000000000002%" headers="mcps1.2.4.1.1 "><p id="p629093119547"><a name="p629093119547"></a><a name="p629093119547"></a>数据转换</p>
+<tr id="row109261892541"><td class="cellrowborder" rowspan="2" valign="top" width="15.590000000000002%" headers="mcps1.2.4.1.1 "><p id="p629093119547"><a name="p629093119547"></a><a name="p629093119547"></a>数据排布转换</p>
 </td>
-<td class="cellrowborder" valign="top" width="24.64%" headers="mcps1.2.4.1.2 "><p id="p42901731145414"><a name="p42901731145414"></a><a name="p42901731145414"></a><a href="基础API/Memory矢量计算/数据转换/Transpose.md">Transpose</a></p>
+<td class="cellrowborder" valign="top" width="24.64%" headers="mcps1.2.4.1.2 "><p id="p42901731145414"><a name="p42901731145414"></a><a name="p42901731145414"></a><a href="基础API/Memory矢量计算/数据排布转换/Transpose.md">Transpose</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.77%" headers="mcps1.2.4.1.3 "><p id="p1429010318547"><a name="p1429010318547"></a><a name="p1429010318547"></a>可实现16*16的二维矩阵数据块的转置和[N,C,H,W]与[N,H,W,C]互相转换。</p>
 </td>
 </tr>
-<tr id="row476616718548"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p629033110540"><a name="p629033110540"></a><a name="p629033110540"></a><a href="基础API/Memory矢量计算/数据转换/TransDataTo5HD.md">TransDataTo5HD</a></p>
+<tr id="row476616718548"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p629033110540"><a name="p629033110540"></a><a name="p629033110540"></a><a href="基础API/Memory矢量计算/数据排布转换/TransDataTo5HD.md">TransDataTo5HD</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p162901631125410"><a name="p162901631125410"></a><a name="p162901631125410"></a>数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。</p>
 </td>
@@ -423,13 +423,6 @@
 <tr id="row15756339433"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p3324039144317"><a name="p3324039144317"></a><a name="p3324039144317"></a><a href="基础API/Memory矢量计算/掩码操作/ResetMask.md">ResetMask</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p57533324312"><a name="p57533324312"></a><a name="p57533324312"></a>恢复mask的值为默认值（全1），表示矢量计算中每次迭代内的所有元素都将参与运算。</p>
-</td>
-</tr>
-<tr id="row743516194407"><td class="cellrowborder" valign="top" width="15.590000000000002%" headers="mcps1.2.4.1.1 "><p id="p23240390438"><a name="p23240390438"></a><a name="p23240390438"></a>量化设置</p>
-</td>
-<td class="cellrowborder" valign="top" width="24.64%" headers="mcps1.2.4.1.2 "><p id="p10324173918436"><a name="p10324173918436"></a><a name="p10324173918436"></a><a href="基础API/Memory矢量计算/量化设置/SetDeqScale.md">SetDeqScale</a></p>
-</td>
-<td class="cellrowborder" valign="top" width="59.77%" headers="mcps1.2.4.1.3 "><p id="p1238122924318"><a name="p1238122924318"></a><a name="p1238122924318"></a>设置DEQSCALE寄存器的值。</p>
 </td>
 </tr>
 </tbody>
@@ -570,12 +563,12 @@
 </tr>
 <tr id="row1821272513168"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p1190314213216"><a name="p1190314213216"></a><a name="p1190314213216"></a><a href="基础API/同步控制/核间同步/IBSet.md">IBSet</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p15692228145311"><a name="p15692228145311"></a><a name="p15692228145311"></a>当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。调用IBSet设置某一个核的标志位，与IBWait成对出现配合使用，表示核之间的同步等待指令，等待某一个核操作完成。</p>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p15692228145311"><a name="p15692228145311"></a><a name="p15692228145311"></a>当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令，等待某一个核操作完成。</p>
 </td>
 </tr>
 <tr id="row121219258161"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p13903164214324"><a name="p13903164214324"></a><a name="p13903164214324"></a><a href="基础API/同步控制/核间同步/IBWait.md">IBWait</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p27141049175319"><a name="p27141049175319"></a><a name="p27141049175319"></a>当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。IBWait与IBSet成对出现配合使用，表示核之间的同步等待指令，等待某一个核操作完成。</p>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p27141049175319"><a name="p27141049175319"></a><a name="p27141049175319"></a>当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。IBWait与IBSet成对使用，表示核之间的同步等待指令，等待某一个核操作完成。</p>
 </td>
 </tr>
 <tr id="row1121220254168"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p8904942143216"><a name="p8904942143216"></a><a name="p8904942143216"></a><a href="基础API/同步控制/核间同步/SyncAll.md">SyncAll</a></p>
@@ -642,22 +635,22 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="row967212454304"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p1194732015475"><a name="p1194732015475"></a><a name="p1194732015475"></a><a href="基础API/系统变量访问/GetBlockNum.md">GetBlockNum</a></p>
+<tbody><tr id="row967212454304"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p1194732015475"><a name="p1194732015475"></a><a name="p1194732015475"></a><a href="基础API/工具接口/系统资源与变量/GetBlockNum.md">GetBlockNum</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p585381495015"><a name="p585381495015"></a><a name="p585381495015"></a>获取当前任务配置的Block数，用于代码内部的多核逻辑控制等。</p>
 </td>
 </tr>
-<tr id="row1967224513011"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p11947620104710"><a name="p11947620104710"></a><a name="p11947620104710"></a><a href="基础API/系统变量访问/GetBlockIdx.md">GetBlockIdx</a></p>
+<tr id="row1967224513011"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p11947620104710"><a name="p11947620104710"></a><a name="p11947620104710"></a><a href="基础API/工具接口/系统资源与变量/GetBlockIdx.md">GetBlockIdx</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p54921825165017"><a name="p54921825165017"></a><a name="p54921825165017"></a>获取当前core的index，用于代码内部的多核逻辑控制及多核偏移量计算等。</p>
 </td>
 </tr>
-<tr id="row11672104593014"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p17947182012472"><a name="p17947182012472"></a><a name="p17947182012472"></a><a href="基础API/系统变量访问/GetDataBlockSizeInBytes.md">GetDataBlockSizeInBytes</a></p>
+<tr id="row11672104593014"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p17947182012472"><a name="p17947182012472"></a><a name="p17947182012472"></a><a href="基础API/工具接口/系统资源与变量/GetDataBlockSizeInBytes.md">GetDataBlockSizeInBytes</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p14250113816503"><a name="p14250113816503"></a><a name="p14250113816503"></a>获取当前芯片版本一个datablock的大小，单位为byte。开发者根据datablock的大小来计算API指令中待传入的<span>repeatTime</span> 、<span id="ph06845043917"><a name="ph06845043917"></a><a name="ph06845043917"></a>DataBlock Stride</span>、<span id="ph13946527113916"><a name="ph13946527113916"></a><a name="ph13946527113916"></a>Repeat Stride</span><span>等</span>参数值。</p>
 </td>
 </tr>
-<tr id="row3672445153011"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p1594715207476"><a name="p1594715207476"></a><a name="p1594715207476"></a><a href="基础API/系统变量访问/GetArchVersion.md">GetArchVersion</a></p>
+<tr id="row3672445153011"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p1594715207476"><a name="p1594715207476"></a><a name="p1594715207476"></a><a href="基础API/工具接口/系统资源与变量/GetArchVersion.md">GetArchVersion</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p764334516501"><a name="p764334516501"></a><a name="p764334516501"></a>获取当前AI处理器架构版本号。</p>
 </td>
@@ -830,22 +823,22 @@
 <td class="cellrowborder" valign="top" width="59.91%" headers="mcps1.2.3.1.2 "><p id="p816712203211"><a name="p816712203211"></a><a name="p816712203211"></a><span id="ph585624314195"><a name="ph585624314195"></a><a name="ph585624314195"></a>Async提供了一个统一的接口，用于在不同模式下（AIC或AIV）执行特定函数，从而避免代码中直接的硬件条件判断（如使用ASCEND_IS_AIV或ASCEND_IS_AIC）。</span></p>
 </td>
 </tr>
-<tr id="row2010610593211"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p317115102325"><a name="p317115102325"></a><a name="p317115102325"></a><a href="基础API/工具函数/NumericLimits/NumericLimits.md">NumericLimits</a></p>
+<tr id="row2010610593211"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p317115102325"><a name="p317115102325"></a><a name="p317115102325"></a><a href="基础API/工具接口/数学计算/NumericLimits/NumericLimits.md">NumericLimits</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.91%" headers="mcps1.2.3.1.2 "><p id="p17106857321"><a name="p17106857321"></a><a name="p17106857321"></a><span id="ph1575202123315"><a name="ph1575202123315"></a><a name="ph1575202123315"></a>NumericLimits工具类，用于查询指定数据类型的最大值/最小值等属性。</span></p>
 </td>
 </tr>
-<tr id="row154197811816"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p2094712054713"><a name="p2094712054713"></a><a name="p2094712054713"></a><a href="基础API/工具函数/GetTaskRatio.md">GetTaskRatio</a></p>
+<tr id="row154197811816"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p2094712054713"><a name="p2094712054713"></a><a name="p2094712054713"></a><a href="基础API/工具接口/系统资源与变量/GetTaskRatio.md">GetTaskRatio</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.91%" headers="mcps1.2.3.1.2 "><p id="p29729544501"><a name="p29729544501"></a><a name="p29729544501"></a>适用于Cube/Vector分离模式，用来获取Cube/Vector的配比。</p>
 </td>
 </tr>
-<tr id="row12385124516283"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p17516125692817"><a name="p17516125692817"></a><a name="p17516125692817"></a><a href="基础API/工具函数/GetUBSizeInBytes.md">GetUBSizeInBytes</a></p>
+<tr id="row12385124516283"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p17516125692817"><a name="p17516125692817"></a><a name="p17516125692817"></a><a href="基础API/工具接口/系统资源与变量/GetUBSizeInBytes.md">GetUBSizeInBytes</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.91%" headers="mcps1.2.3.1.2 "><p id="p17516165612819"><a name="p17516165612819"></a><a name="p17516165612819"></a><span id="ph251617564281"><a name="ph251617564281"></a><a name="ph251617564281"></a>获取UB空间的大小，单位为byte。</span></p>
 </td>
 </tr>
-<tr id="row34503263319"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p543714258341"><a name="p543714258341"></a><a name="p543714258341"></a><a href="基础API/工具函数/GetRuntimeUBSize.md">GetRuntimeUBSize</a></p>
+<tr id="row34503263319"><td class="cellrowborder" valign="top" width="40.089999999999996%" headers="mcps1.2.3.1.1 "><p id="p543714258341"><a name="p543714258341"></a><a name="p543714258341"></a><a href="基础API/工具接口/系统资源与变量/GetRuntimeUBSize.md">GetRuntimeUBSize</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.91%" headers="mcps1.2.3.1.2 "><p id="p9464325332"><a name="p9464325332"></a><a name="p9464325332"></a><span id="ph11371104916159"><a name="ph11371104916159"></a><a name="ph11371104916159"></a>获取运行时UB空间的大小，单位为byte。</span>开发者根据UB的大小来计算循环次数等参数值。</p>
 </td>
@@ -1228,7 +1221,7 @@
 </tr>
 <tr id="row13905175871"><td class="cellrowborder" rowspan="3" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p123688281178"><a name="p123688281178"></a><a name="p123688281178"></a>同步控制</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p99126441977"><a name="p99126441977"></a><a name="p99126441977"></a><a href="基础API/同步控制/核内同步/Mutex（ISASI）/Mutex（ISASI）.md">Mutex</a></p>
+<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p99126441977"><a name="p99126441977"></a><a name="p99126441977"></a><a href="基础API/同步控制/核内同步/Mutex(ISASI)/Mutex(ISASI).md">Mutex</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.99%" headers="mcps1.2.4.1.3 "><p id="p1190519517715"><a name="p1190519517715"></a><a name="p1190519517715"></a><span id="ph1520973121010"><a name="ph1520973121010"></a><a name="ph1520973121010"></a>Mutex用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。通过锁定指定流水再释放流水来完成流水间的同步依赖。每个锁有固定的一个MutexID，该ID可通过用户自定义（范围为0-27）或者通过<a href="基础API/同步控制/核内同步/AllocMutexID-(ISASI).md">AllocMutexID/ReleaseMutexID</a>进行申请释放。</span></p>
 </td>
@@ -1257,39 +1250,39 @@
 </tr>
 <tr id="row2493696509"><td class="cellrowborder" rowspan="4" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p649661485013"><a name="p649661485013"></a><a name="p649661485013"></a>系统变量访问</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p1649651485012"><a name="p1649651485012"></a><a name="p1649651485012"></a><a href="基础API/系统变量访问/GetProgramCounter(ISASI).md">GetProgramCounter</a></p>
+<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p1649651485012"><a name="p1649651485012"></a><a name="p1649651485012"></a><a href="基础API/工具接口/系统资源与变量/GetProgramCounter(ISASI).md">GetProgramCounter</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.99%" headers="mcps1.2.4.1.3 "><p id="p1349315905014"><a name="p1349315905014"></a><a name="p1349315905014"></a>获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。</p>
 </td>
 </tr>
-<tr id="row19631896502"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p74961814175010"><a name="p74961814175010"></a><a name="p74961814175010"></a><a href="基础API/系统变量访问/GetSubBlockNum(ISASI).md">GetSubBlockNum</a></p>
+<tr id="row19631896502"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p74961814175010"><a name="p74961814175010"></a><a name="p74961814175010"></a><a href="基础API/工具接口/系统资源与变量/GetSubBlockNum(ISASI).md">GetSubBlockNum</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p966612452211"><a name="p966612452211"></a><a name="p966612452211"></a>获取AI Core上Vector核的数量。</p>
 </td>
 </tr>
-<tr id="row278314916501"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2496314115019"><a name="p2496314115019"></a><a name="p2496314115019"></a><a href="基础API/系统变量访问/GetSubBlockIdx(ISASI).md">GetSubBlockIdx</a></p>
+<tr id="row278314916501"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p2496314115019"><a name="p2496314115019"></a><a name="p2496314115019"></a><a href="基础API/工具接口/系统资源与变量/GetSubBlockIdx(ISASI).md">GetSubBlockIdx</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p7322151817114"><a name="p7322151817114"></a><a name="p7322151817114"></a>获取AI Core上Vector核的ID。</p>
 </td>
 </tr>
-<tr id="row591914913509"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p449621416508"><a name="p449621416508"></a><a name="p449621416508"></a><a href="基础API/系统变量访问/GetSystemCycle(ISASI).md">GetSystemCycle</a></p>
+<tr id="row591914913509"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p449621416508"><a name="p449621416508"></a><a name="p449621416508"></a><a href="基础API/工具接口/系统资源与变量/GetSystemCycle(ISASI).md">GetSystemCycle</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p318519518103"><a name="p318519518103"></a><a name="p318519518103"></a>获取当前系统cycle数，若换算成时间需要按照50MHz的频率，时间单位为us，换算公式为：time = (cycle数/50) us 。</p>
 </td>
 </tr>
 <tr id="row23644391720"><td class="cellrowborder" rowspan="3" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p13856134291819"><a name="p13856134291819"></a><a name="p13856134291819"></a>系统变量访问</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p236104361711"><a name="p236104361711"></a><a name="p236104361711"></a><a href="基础API/系统变量访问/SetCtrlSpr(ISASI).md">SetCtrlSpr</a></p>
+<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p236104361711"><a name="p236104361711"></a><a name="p236104361711"></a><a href="基础API/特殊寄存器访问/SetCtrlSpr(ISASI).md">SetCtrlSpr</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.99%" headers="mcps1.2.4.1.3 "><p id="p123610436177"><a name="p123610436177"></a><a name="p123610436177"></a><span id="ph1641093112018"><a name="ph1641093112018"></a><a name="ph1641093112018"></a>对CTRL寄存器（控制寄存器）的特定比特位进行设置。</span></p>
 </td>
 </tr>
-<tr id="row191522045131718"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p186893131181"><a name="p186893131181"></a><a name="p186893131181"></a><a href="基础API/系统变量访问/GetCtrlSpr(ISASI).md">GetCtrlSpr</a></p>
+<tr id="row191522045131718"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p186893131181"><a name="p186893131181"></a><a name="p186893131181"></a><a href="基础API/特殊寄存器访问/GetCtrlSpr(ISASI).md">GetCtrlSpr</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17152114561719"><a name="p17152114561719"></a><a name="p17152114561719"></a><span id="ph1892618377202"><a name="ph1892618377202"></a><a name="ph1892618377202"></a>读取CTRL寄存器（控制寄存器）特定比特位上的值。</span></p>
 </td>
 </tr>
-<tr id="row28763469172"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p876017348182"><a name="p876017348182"></a><a name="p876017348182"></a><a href="基础API/系统变量访问/ResetCtrlSpr(ISASI).md">ResetCtrlSpr</a></p>
+<tr id="row28763469172"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p876017348182"><a name="p876017348182"></a><a name="p876017348182"></a><a href="基础API/特殊寄存器访问/ResetCtrlSpr(ISASI).md">ResetCtrlSpr</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p5876194619170"><a name="p5876194619170"></a><a name="p5876194619170"></a><span id="ph818454202"><a name="ph818454202"></a><a name="ph818454202"></a>对CTRL寄存器（控制寄存器）的特定比特位做重置。</span></p>
 </td>

@@ -30,7 +30,7 @@
 | [asc_atomic_dec](../原子操作/asc_atomic_dec.md) | 对Unified Buffer或Global Memory上address的数值进行原子减1操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。 |
 | [asc_atomic_cas](../原子操作/asc_atomic_cas.md) | 对Unified Buffer或Global Memory上address的数值进行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。 |
 | [asc_atomic_and](../原子操作/asc_atomic_and.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子与（&）操作，即将address数值与（&）val的结果赋值到Unified Buffer或Global Memory上。 |
-| [asc_atomic_or](../原子操作/asc_atomic_or.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子或（|）操作，即将address数值或（|）val的结果赋值到Unified Buffer或Global Memory上。 |
+| [asc_atomic_or](../原子操作/asc_atomic_or.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子或（\|）操作，即将address数值或（\|）val的结果赋值到Unified Buffer或Global Memory上。 |
 | [asc_atomic_xor](../原子操作/asc_atomic_xor.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子异或（^）操作，即将address数值异或（^）val的结果赋值到Unified Buffer或Global Memory上。 |
 
 ## Warp函数
@@ -229,8 +229,11 @@
 | [__float22half2_rn](../数学函数/half类型/half类型精度转换函数/__float22half2_rn.md) | 将float2类型数据遵循CAST_RINT模式转换为half2类型，返回转换后的half2类型数据。 |
 | [__low2half](../数学函数/half类型/half类型精度转换函数/__low2half.md) | 返回输入数据的低16位。 |
 | [__low2half2](../数学函数/half类型/half类型精度转换函数/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
+| [__low2float](../数学函数/half类型/half类型精度转换函数/__low2float.md) | 将输入数据的低16位转换为浮点数并返回结果。 |
+| [__lowhigh2highlow](../数学函数/half类型/half类型精度转换函数/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
 | [__high2half](../数学函数/half类型/half类型精度转换函数/__high2half.md) | 提取输入half2的高16位，并返回 |
 | [__high2half2](../数学函数/half类型/half类型精度转换函数/__high2half2.md) | 将输入数据的的高16位填充到half2并返回结果。 |
+| [__high2float](../数学函数/half类型/half类型精度转换函数/__high2float.md) | 将输入数据的高16位转换为float类型并返回结果。 |
 | [__highs2half2](../数学函数/half类型/half类型精度转换函数/__highs2half2.md) | 分别提取两个half2输入的高16位，并填充到half2中。返回填充后的数据。 |
 | [__lows2half2](../数学函数/half类型/half类型精度转换函数/__lows2half2.md) | 分别提取两个half2输入的低16位，并填充到half2中。返回填充后的数据。 |
 | [__halves2half2](../数学函数/half类型/half类型精度转换函数/__halves2half2.md) | 将输入的数据分别填充为half2前后两个分量，返回填充后数据。 |
@@ -621,7 +624,7 @@
 | [fmodf](../数学函数/float类型数学库函数/fmodf.md) | 获取输入数据x除以y的余数。求余数时，商取x除以y浮点数结果的整数部分。 |
 | [remainderf](../数学函数/float类型数学库函数/remainderf.md) | 获取输入数据x除以y的余数。求余数时，商取最接近x除以y浮点数结果的整数，当x除以y的浮点数结果与左右最接近的整数距离相等时，商取偶数。 |
 | [copysignf](../数学函数/float类型数学库函数/copysignf.md) | 获取由第一个输入x的数值部分和第二个输入y的符号部分拼接得到的浮点数。 |
-| [nearbyIntf](../数学函数/float类型数学库函数/nearbyintf.md) | 获取与输入浮点数最接近的整数，输入浮点数与左右整数的距离相等时，返回偶数。 |
+| [nearbyintf](../数学函数/float类型数学库函数/nearbyintf.md) | 获取与输入浮点数最接近的整数，输入浮点数与左右整数的距离相等时，返回偶数。 |
 | [nextafterf](../数学函数/float类型数学库函数/nextafterf.md) | 如果y大于x，返回比x大的下一个可表示的浮点值，即浮点数二进制最低位加1。<br><br>如果y小于x，返回比x小的下一个可表示的浮点值，即浮点数二进制最低位减1。<br><br>如果y等于x，返回x。 |
 | [scalbnf](../数学函数/float类型数学库函数/scalbnf.md) | 获取输入数据x与2的n次方的乘积。 |
 | [scalblnf](../数学函数/float类型数学库函数/scalblnf.md) | 获取输入数据x与2的n次方的乘积。 |
@@ -767,14 +770,7 @@
 
 ## 协作组
 
-**表 28**  协作组划分接口
-
-| 接口名 | 功能描述 |
-| --- | --- |
-| [tiled_partition](../协作组/tiled_partition.md) | 将一个线程组划分为多个更小、固定大小的子组。 |
-| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个子组。 |
-
-**表 29**  thread_block接口
+**表 28**  thread_block接口
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -788,7 +784,7 @@
 | [group_dim](../协作组/thread_block/group_dim.md) | 获取线程块的维度。 |
 | [dim_threads](../协作组/thread_block/dim_threads.md) | 获取线程块内线程的三维维度。 |
 
-**表 30**  coalesced_group接口
+**表 29**  coalesced_group接口
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -806,7 +802,7 @@
 | [any](../协作组/coalesced_group/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../协作组/coalesced_group/all.md) | 判断是否所有组内线程的输入均不为0。 |
 
-**表 31**  thread_block_tile接口
+**表 30**  thread_block_tile接口
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -824,3 +820,10 @@
 | [ballot](../协作组/thread_block_tile/ballot.md) | 判断组内每个活跃线程的输入是否非零。 |
 | [any](../协作组/thread_block_tile/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../协作组/thread_block_tile/all.md) | 判断是否所有组内线程的输入均不为0。 |
+
+**表 31**  协作组划分接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [tiled_partition](../协作组/tiled_partition.md) | 将一个线程组按指定大小划分为多个子组。 |
+| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个子组。 |

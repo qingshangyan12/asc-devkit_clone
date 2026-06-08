@@ -38,12 +38,13 @@ fi
 
 # 示例列表
 EXAMPLE_LIST=(
+    devkit_dir_check
     01_simd_cpp_api/00_introduction/01_vector/add
     01_simd_cpp_api/00_introduction/01_vector/add_tpipe_tque
-    01_simd_cpp_api/00_introduction/02_matrix/matmul_high_level_api
-    01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_high_level_api
+    01_simd_cpp_api/00_introduction/02_matrix/matmul_advanced_api
+    01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_advanced_api
     01_simd_cpp_api/01_utilities/03_cpudebug
-    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_mmad
+    01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/batch_matmul
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0
     01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_load3dv2
     01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/brcb
@@ -86,6 +87,14 @@ format_duration() {
         }
         print s
     }'
+}
+
+# devkit_dir_check执行函数
+run_check() {
+    local base_path=$1
+    
+    cd "${base_path}/" || return 1
+    bash devkit_dir_check.sh 
 }
 
 # 标准执行函数（cmake + make + gen_data + demo + verify）
@@ -236,6 +245,9 @@ run_test_case() {
     echo ${case_name} >> ${log_path}/../devkit_cases.txt
     # 根据用例名称选择执行函数
     case "${case_name}" in
+        devkit_dir_check)
+            run_check "${SCRIPT_DIR}" 2>&1 | tee "${log_path}/${case_name}.log"
+            ;;
         matmul_a2b2_share)
             run_two_outputs "${code_path}" "${example_name}" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
@@ -263,7 +275,7 @@ run_test_case() {
         basic_api_memory_allocator_add)
             run_with_params "${code_path}" "${example_name}" "" "" "add" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
-        batch_mmad)
+        batch_matmul)
             run_with_params "${code_path}" "${example_name}" "-DB_SIZE=4 -DM_SIZE=30 -DK_SIZE=40 -DN_SIZE=70" "-b=4 -m=30 -k=40 -n=70" 2>&1 | tee "${log_path}/${case_name}.log"
             ;;
         mmad_load3dv2)
@@ -348,7 +360,7 @@ main() {
             continue
         fi
         
-        prf=$(grep -E "test pass|passed|\[Block \(5\/6\)\]: OUTPUT = 24" "${log_file}" || true)
+        prf=$(grep -E "check pass|test pass|passed|\[Block \(5\/6\)\]: OUTPUT = 24" "${log_file}" || true)
         if [ -n "$prf" ]; then
             echo "${line} pass" >> result_devkit.txt
             ((total_passed++)) || true

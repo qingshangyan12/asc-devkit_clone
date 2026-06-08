@@ -19,10 +19,6 @@
 ## 函数原型
 
 ```
-inline float __high2float(const half2 x)
-```
-
-```
 inline float __high2float(const bfloat16x2_t x)
 ```
 
@@ -44,14 +40,10 @@ inline float __high2float(const bfloat16x2_t x)
 
 ## 需要包含的头文件
 
-使用bfloat16x2\_t接口需要包含"simt\_api/asc\_bf16.h"头文件，使用half2接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用该接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```
 #include "simt_api/asc_bf16.h"
-```
-
-```
-#include "simt_api/asc_fp16.h"
 ```
 
 ## 调用示例
@@ -93,4 +85,3 @@ inline float __high2float(const bfloat16x2_t x)
         asc_vf_call<simt_high2float>(dim3(1024), (__gm__ bfloat16x2_t*)input, output, input_total_length);
     }
     ```
-

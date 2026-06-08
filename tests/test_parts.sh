@@ -85,6 +85,7 @@ basic_test_three_targets=(
     ascendc_run_all_header_checks
     ascendc_run_all_header_checks_cpu
     ascendc_run_all_header_checks_cpu_single
+    ascendc_run_all_reg_header_checks
 )
 
 basic_test_four_targets=(
@@ -122,4 +123,6 @@ arm_test_targets=(
     ascendc_run_all_host_header_checks
     ascendc_run_all_host_header_checks_npu
     ascendc_run_all_host_header_checks_npu_single
+    adv_api_run_all_host_header_checks_npu
+    adv_api_run_all_host_header_checks_npu_single
 )
