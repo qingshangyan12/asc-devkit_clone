@@ -42,6 +42,17 @@
 #include "stub_fun.h"
 #endif
 
+template <TPosition pos>
+__aicore__ inline uint64_t TransUBAddr(uint64_t addr)
+{
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+auto positionHardMap = ConstDefiner::Instance().positionHardMap;
+    addr = addr - reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(pos)));
+#endif
+return addr;
+}
+
+#if defined(__NPU_ARCH__)
 namespace AscendC {
 __aicore__ inline void PrintTimeStamp(uint32_t descId);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -1030,16 +1041,8 @@ template <class T> __aicore__ inline bool TPipe::TscmInitBuffer(T& que, uint8_t 
     return true;
 }
 
-template <TPosition pos>
-__aicore__ inline uint64_t TransUBAddr(uint64_t addr)
-{
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
-    addr = addr - reinterpret_cast<uint64_t>(ConstDefiner::Instance().hardwareCpuBufferMap.at(positionHardMap.at(pos)));
+}
 #endif
-    return addr;
-}
-}
 #endif
 #endif // ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 
