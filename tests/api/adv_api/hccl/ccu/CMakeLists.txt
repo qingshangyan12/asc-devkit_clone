@@ -124,6 +124,8 @@ add_executable(${CCU_UT_TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/sim_task_queue.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/stub/sim_world/comm_domain.cc
+    # Cann host bridge stub
+    ${CMAKE_CURRENT_SOURCE_DIR}/stub/cann_host_bridge_stub.cc
     # Source under test (minimal impl dependencies)
     ${HCCL_CC_SRC_DIR}/common/hccl_mc2.cc
     ${HCCL_CC_SRC_DIR}/common/hccl_alloc_ctx_res.cc
