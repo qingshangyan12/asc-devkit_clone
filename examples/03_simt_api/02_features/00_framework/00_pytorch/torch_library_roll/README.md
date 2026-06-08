@@ -109,7 +109,7 @@
 - 安装前置依赖
 
   ```bash
-  pip3 install expecttest
+  pip3 install expecttest     # torch_npu.testing.testcase 的依赖
   ```
 
 - 配置环境变量  
