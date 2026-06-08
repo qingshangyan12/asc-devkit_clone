@@ -92,5 +92,5 @@ __aicore__ inline bool EnQue(const LocalTensor<T>& tensor)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-参考[调用示例](AllocTensor-60.md#调用示例)。
+参考[调用示例](AllocTensor-60.md#section642mcpsimp)。
 

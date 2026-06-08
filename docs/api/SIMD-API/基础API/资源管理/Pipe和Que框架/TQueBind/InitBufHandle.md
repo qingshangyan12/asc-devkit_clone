@@ -137,7 +137,7 @@ __aicore__ inline void InitBufHandle(T* bufPool, uint32_t index, TBufHandle bufh
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-完整示例请参考[调用示例](../自定义TBufPool/EXTERN_IMPL_BUFPOOL宏.md#调用示例)。
+完整示例请参考[调用示例](../自定义TBufPool/EXTERN_IMPL_BUFPOOL宏.md#section1234017553610)。
 
 ```
 // 假设自定义tbufpool类为MyBufPool

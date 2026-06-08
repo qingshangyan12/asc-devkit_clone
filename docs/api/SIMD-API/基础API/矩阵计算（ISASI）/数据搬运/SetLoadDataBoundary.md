@@ -89,9 +89,9 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)
 -   用于Load3Dv1时，boundaryValue的最小值是16（单位：32字节）；用于Load3Dv2时，boundaryValue的最小值是1024（单位：字节）。
 -   如果使用SetLoadDataBoundary接口设置了边界值，配合Load3D指令使用时，Load3D指令的A1/B1初始地址要在设置的边界内。
 -   如果boundaryValue设置为0，则表示无边界，可使用整个A1/B1。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-参考[调用示例](SetFmatrix.md#调用示例)。
+参考[调用示例](SetFmatrix.md#section642mcpsimp)。
 

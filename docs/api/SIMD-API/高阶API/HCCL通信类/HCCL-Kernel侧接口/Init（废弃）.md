@@ -84,7 +84,7 @@ __aicore__ inline void Init(GM_ADDR context, __gm__ void *initTiling = nullptr)
 </td>
 <td class="cellrowborder" valign="top" width="11.799999999999999%" headers="mcps1.2.4.1.2 "><p id="p121011916143010"><a name="p121011916143010"></a><a name="p121011916143010"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p7101111612301"><a name="p7101111612301"></a><a name="p7101111612301"></a>可选参数，通信域初始化<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>的地址。<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>在Host侧计算得出，具体请参考<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">表1 Mc2InitTiling参数说明</a>，由框架传递到Kernel函数中使用，完整示例请参考<a href="HCCL模板参数.md#8.13.1.2-调用示例">8.13.1.2-调用示例</a>。</p>
+<td class="cellrowborder" valign="top" width="70.43%" headers="mcps1.2.4.1.3 "><p id="p7101111612301"><a name="p7101111612301"></a><a name="p7101111612301"></a>可选参数，通信域初始化<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>的地址。<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">Mc2InitTiling</a>在Host侧计算得出，具体请参考<a href="../HCCL-Tiling侧接口/TilingData结构体.md#table4835205712588">表1 Mc2InitTiling参数说明</a>，由框架传递到Kernel函数中使用，完整示例请参考<a href="HCCL模板参数.md#section11493459173619">8.13.1.2-调用示例</a>。</p>
 </td>
 </tr>
 </tbody>

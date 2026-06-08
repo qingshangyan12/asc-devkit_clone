@@ -126,7 +126,7 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
 
 ## 调用示例<a name="section11276201527"></a>

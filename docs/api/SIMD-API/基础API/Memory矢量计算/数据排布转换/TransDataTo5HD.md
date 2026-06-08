@@ -61,7 +61,7 @@
 
 头文件路径为："basic\_api/kernel\_operator\_vec\_transpose\_intf.h"。
 
-TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算（ISASI）/矩阵计算简介/关键数据矩阵格式简介.md#NC1HWC0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
+TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算/矩阵计算分形介绍/关键分形格式详解.md#NC1HWC0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
 
 为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose/scripts/gen_data.py)。
 
@@ -136,8 +136,8 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 约束说明<a name="zh-cn_topic_0000001521260417_section633mcpsimp"></a>
 
-- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
-- 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址对齐要求请参见[Unified Buffer地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+- 操作数地址重叠约束请参考[Unified Buffer地址重叠约束](../../../通用说明和约束.md#section668772811100)。
 - dst与src中的地址需要连续存放。
 - 单次和多次repeat操作实现转置功能，都只需要配置一次srcList和dstList，后续LocalTensor地址通过nchwconvParams参数自动偏移。
 

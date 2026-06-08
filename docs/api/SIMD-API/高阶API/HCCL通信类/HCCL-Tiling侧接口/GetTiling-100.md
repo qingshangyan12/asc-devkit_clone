@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取[Mc2InitTiling](TilingData结构体.md#参数说明)参数和[Mc2CcTiling](TilingData结构体.md#参数说明)参数。
+获取[Mc2InitTiling](TilingData结构体.md#table4835205712588)参数和[Mc2CcTiling](TilingData结构体.md#table678914014562)参数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

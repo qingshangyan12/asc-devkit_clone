@@ -247,7 +247,7 @@ Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结
 </tbody>
 </table>
 
-Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#参数说明)。
+Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#table49630346128)。
 
 **表 5**  Load2DBitModeConfig1结构体参数说明
 
@@ -273,7 +273,7 @@ Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的
 </tbody>
 </table>
 
-Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#参数说明)。
+Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#table49630346128)。
 
 **表 6**  Load2DBitModeParam类成员函数说明
 
@@ -349,7 +349,7 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

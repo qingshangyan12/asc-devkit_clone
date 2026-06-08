@@ -208,7 +208,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 -   针对Ascend 950PR/Ascend 950DT，bool、int8\_t、uint8\_t、fp4x2\_e2m1\_t、fp4x2\_e1m2\_t、hifloat8\_t、fp8\_e5m2\_t、fp8\_e4m3fn\_t、 fp8\_e8m0\_t、complex32、int64\_t、uint64\_t、complex64数据类型仅支持tensor前n个数据计算接口。
 
 ## 返回值说明<a name="section640mcpsimp"></a>

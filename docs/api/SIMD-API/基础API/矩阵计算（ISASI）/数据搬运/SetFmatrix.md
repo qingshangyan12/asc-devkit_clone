@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-用于调用[Load3Dv1/Load3Dv2](LoadData/LoadData.md)时设置FeatureMap的属性描述。Load3Dv1/Load3Dv2的模板参数isSetFMatrix设置为false时，表示Load3Dv1/Load3Dv2传入的FeatureMap的属性（包括l1H、l1W、padList，参数介绍参考[表4 LoadData3DParamsV1结构体内参数说明](LoadData/Load3D.md#参数说明)、[表5 LoadData3DParamsV2结构体内参数说明](LoadData/Load3D.md#参数说明)）描述不生效，开发者需要通过该接口进行设置。
+用于调用[Load3Dv1/Load3Dv2](LoadData/LoadData.md)时设置FeatureMap的属性描述。Load3Dv1/Load3Dv2的模板参数isSetFMatrix设置为false时，表示Load3Dv1/Load3Dv2传入的FeatureMap的属性（包括l1H、l1W、padList，参数介绍参考[表4 LoadData3DParamsV1结构体内参数说明](LoadData/Load3D.md#table679014222918)、[表5 LoadData3DParamsV2结构体内参数说明](LoadData/Load3D.md#table193501032193419)）描述不生效，开发者需要通过该接口进行设置。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -118,7 +118,7 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   该接口需要配合load3Dv1/load3Dv2接口一起使用，需要在load3Dv1/load3Dv2接口之前调用。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

@@ -84,4 +84,4 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 
 ## 调用示例<a name="section177231425115410"></a>
 
-完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#调用示例)。
+完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#section177231425115410)。

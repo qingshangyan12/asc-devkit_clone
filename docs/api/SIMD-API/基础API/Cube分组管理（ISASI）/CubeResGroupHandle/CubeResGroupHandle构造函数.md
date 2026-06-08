@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001526206862_section212607105720"></a>
 
-构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。构造CubeResGroupHandle对象时需要传入模板参数CubeMsgType，CubeMsgType是由用户定义的消息结构体，请参考[表1](CubeResGroupHandle使用说明.md#CubeResGroupHandle使用说明)。使用此接口需要用户自主管理地址、同步事件等，因此更推荐使用[CreateCubeResGroup](CubeResGroupHandle构造函数.md)接口快速创建CubeResGroupHandle对象。
+构造CubeResGroupHandle对象，完成组内的AIC和消息队列分配。构造CubeResGroupHandle对象时需要传入模板参数CubeMsgType，CubeMsgType是由用户定义的消息结构体，请参考[表1](CubeResGroupHandle使用说明.md#table189051237164018)。使用此接口需要用户自主管理地址、同步事件等，因此更推荐使用[CreateCubeResGroup](CubeResGroupHandle构造函数.md)接口快速创建CubeResGroupHandle对象。
 
 ## 函数原型<a name="section765814724715"></a>
 

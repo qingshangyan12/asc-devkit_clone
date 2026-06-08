@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-用于配置BasicBlock模板的参数，获取自定义BasicBlock模板。BasicBlock模板的介绍请参考[表 模板特性](MatmulConfig.md#MatmulConfig)。
+用于配置BasicBlock模板的参数，获取自定义BasicBlock模板。BasicBlock模板的介绍请参考[表 模板特性](MatmulConfig.md#table6981133810309)。
 
-使用该接口时可以优先考虑使用模板常量化。相比BasicBlock模板仅实现baseM、baseN、baseK常量化，模板常量化可以在此基础上实现singleCoreM、singleCoreN、singleCoreK、baseM、baseN、baseK的常量化，模板常量化的具体使用方式请参考[Matmul Tiling常量化](GetMatmulApiTiling.md)。
+使用该接口时可以优先考虑使用模板常量化。相比BasicBlock模板仅实现baseM、baseN、baseK常量化，模板常量化可以在此基础上实现singleCoreM、singleCoreN、singleCoreK、baseM、baseN、baseK的常量化，模板常量化的具体使用方式请参考[Matmul Tiling常量化](GetMatmulApiTiling.md#section618mcpsimp)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -71,7 +71,7 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#MatmulConfig)中的参数，其中互相对应的参数的功能作用相同。
+本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#table1761013213153)中的参数，其中互相对应的参数的功能作用相同。
 
 **表 1**  接口参数说明
 
@@ -141,12 +141,12 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(const uint32_t basicM, const ui
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-[MatmulConfig结构体](MatmulConfig.md#MatmulConfig)。
+[MatmulConfig结构体](MatmulConfig.md#table1761013213153)。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   使用本接口时，基本块大小baseM、baseN需满足：singleCoreM能被baseM整除，singleCoreN能被baseN整除。
--   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#TCubeTiling结构体)的baseM、baseN、baseK设置保持一致。
+-   本接口的参数basicM、basicN、basicK应与[TCubeTiling结构体](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)的baseM、baseN、baseK设置保持一致。
 
 ## 调用示例<a name="section1665082013318"></a>
 

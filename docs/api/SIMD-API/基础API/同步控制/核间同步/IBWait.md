@@ -94,4 +94,4 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 
 ## 调用示例<a name="section177231425115410"></a>
 
-完整样例请参考[调用示例](IBSet.md#调用示例)。
+完整样例请参考[调用示例](IBSet.md#section177231425115410)。

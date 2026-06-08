@@ -413,7 +413,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 </tbody>
 </table>
 
-MmadBitModeConfig0结构体参数的含义与MmadBitModeParams结构体中的同名参数含义相同，具体参考[表3](Mmad.md#参数说明)。
+MmadBitModeConfig0结构体参数的含义与MmadBitModeParams结构体中的同名参数含义相同，具体参考[表3](Mmad.md#table15780447181917)。
 
 **表 5**  dst、fm、filter支持的精度类型组合（Ascend 950PR/Ascend 950DT）
 
@@ -734,7 +734,7 @@ MmadBitModeConfig0结构体参数的含义与MmadBitModeParams结构体中的同
 -   dst只支持位于CO1，fm只支持位于A2，filter只支持位于B2。
 -   当M、K、N中的任意一个值为0时，该指令不会被执行。
 -   当M = 1时，会默认开启GEMV（General Matrix-Vector Multiplication）功能。在这种情况下，Mmad API从L0A Buffer读取数据时，会以ND格式进行读取，而不会将其视为ZZ格式。所以此时左矩阵需要直接按照ND格式进行排布。针对Ascend 950PR/Ascend 950DT，可以通过设置MmadBitModeParams的disableGemv参数为true，将该功能关闭。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 -   通过一个具体的示例来介绍无效数据与有效数据的排布方式。
 
     数据为half类型，当M=30，K=70，N=40的时候，A2中有2x5个16x16矩阵，B2中有5x3个16x16矩阵，CO1中有2x3个16x16矩阵。在这种场景下M、K和N都不是16的倍数，A2中右下角的矩阵实际有效的数据只有14x6个，但是也需要占一个16x16矩阵的空间，其他无效数据在计算中会被忽略。一个16x16分形的数据块中，无效数据与有效数据排布的方式示意如下：

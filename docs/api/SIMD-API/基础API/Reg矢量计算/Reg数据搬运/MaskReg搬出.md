@@ -262,7 +262,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p157351457204415"><a name="p157351457204415"></a><a name="p157351457204415"></a>输出</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p167353572447"><a name="p167353572447"></a><a name="p167353572447"></a>UnalignRegForStore，非对齐寄存器，用于保存非对齐数据，长度32B。调用完<a href="#StoreUnAlign（MaskReg非对齐搬出接口）">StoreUnAlign（MaskReg非对齐搬出接口）</a>后，需要调用<a href="连续非对齐搬出.md#StoreUnAlignPost接口">StoreUnAlignPost接口</a>，传入该非对齐寄存器，将未写出的数据写出到目的地址中。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p167353572447"><a name="p167353572447"></a><a name="p167353572447"></a>UnalignRegForStore，非对齐寄存器，用于保存非对齐数据，长度32B。调用完<a href="#section618mcpsimp">StoreUnAlign（MaskReg非对齐搬出接口）</a>后，需要调用<a href="连续非对齐搬出.md#section618mcpsimp">StoreUnAlignPost接口</a>，传入该非对齐寄存器，将未写出的数据写出到目的地址中。</p>
 </td>
 </tr>
 </tbody>

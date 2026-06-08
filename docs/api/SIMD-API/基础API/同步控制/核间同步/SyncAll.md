@@ -87,8 +87,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
     用于多个核之间的同步控制，支持以下同步场景：
 
-    1. 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明.md#关键特性说明)。
-    2. 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明.md#关键特性说明)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
+    1. 纯Vector算子的全核同步，可参考[CrossCoreSetFlag的模式0](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。
+    2. 融合算子的全核同步，一次性实现三个核间同步能力（参考[CrossCoreSetFlag的关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)）：首先完成单个AI Core内，AIC与所有AIV同步（AIC等AIV）；接着完成多个AI Core间，所有AIC的同步；最后完成单个AI Core内，所有AIV与AIC同步（AIV等AIC）。
 
 - 软件同步接口：
 
@@ -136,8 +136,8 @@ SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能�
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#约束说明)。<br>硬同步接口不支持该参数。 |
-| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#约束说明)。<br>硬同步接口不支持该参数。 |
+| gmWorkspace | 输入 | gmWorkspace为用户定义的全局空间，作为所有核共用的缓存，用于保存每个核的状态标记，类型为GlobalTensor，支持的数据类型为int32_t。GlobalTensor数据结构的定义请参考[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。<br>所需空间大小和使用注意项参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
+| ubWorkspace | 输入 | ubWorkspace为用户定义的局部空间，每个核单独自用，用于标记当前核的状态。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT，支持的数据类型为int32_t。<br>所需空间大小参见[约束说明](#section633mcpsimp)。<br>硬同步接口不支持该参数。 |
 | usedCores | 输入 | 指定多少个核之间的同步，传入数值不能超过算子调用时指定的逻辑numBlocks。此参数为默认参数，不传此参数表示全核软同步。<br>仅在软同步接口中支持，硬同步接口不支持该参数。 |
 
 ## 返回值说明<a name="section91032023123812"></a>

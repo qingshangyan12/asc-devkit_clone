@@ -195,7 +195,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
 -   不支持src0与dst为同一块内存地址。
 -   针对Atlas 推理系列产品AI Core，使用时需要预留8K的Unified Buffer空间，作为接口的临时数据存放区。

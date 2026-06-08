@@ -67,7 +67,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 | 参数名 | 描述 |
 | --- | --- |
 | modeId | 核间同步的模式，支持的取值如下：<br>&bull; 模式0：AI Core核间的同步控制（所有AIC之间或者所有AIV之间）。<br>&bull; 模式1：AI Core内部，Vector核（AIV）之间的同步控制。<br>&bull; 模式2：AI Core内部，Cube核（AIC）与所有Vector核（AIV）之间的同步控制。<br>&bull; 模式4：AI Core内部，AIC与单个AIV之间的同步控制。AIV0与AIV1可单独触发AIC等待。<br>各个模式支持的对应Kernel类型请参照表3。 |
-| pipe | 设置这条指令所在的流水类型，支持的流水类型请参考[约束说明](#约束说明) 。|
+| pipe | 设置这条指令所在的流水类型，支持的流水类型请参考[约束说明](#section633mcpsimp) 。|
 
 **表 2**  参数说明
 
@@ -92,7 +92,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 <cann-filter npu-type="910b">
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品，硬件不支持配置核间同步模式和流水类型，传入该接口的模板参数modeId和pipe不生效。
 </cann-filter>
-- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或 KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#函数执行空间限定符)的情况如不：
+- 由于当Kernel类型为KERNEL_TYPE_AIC_ONLY或 KERNEL_TYPE_AIV_ONLY时，硬件不会开启调度模块，也就无法正常进行核间同步，因此不同的同步模式配置[Kernel类型](../../Kernel-Tiling/设置Kernel类型.md)或[函数修饰符](../../../../../guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#section1074418132518)的情况如不：
     - 在纯Vector/Cube场景下（模式0或模式1），建议设置Kernel类型为KERNEL\_TYPE\_MIX\_AIV\_1\_0或KERNEL\_TYPE\_MIX\_AIC\_1\_0，其它支持的Kernel类型请参考表3。
     - 对于Vector和Cube混合场景（模式2），需根据AI Core中AIC和AIV的比例灵活配置Kernel类型，不同模式支持的函数修饰符和Kernel类型请参照表3。
 
@@ -113,7 +113,7 @@ __aicore__ inline void CrossCoreWaitFlag(uint16_t flagId)
 
 - flagId相关的约束：
     - 对于模式0、1、2，每个AIC和每个AIV都各自有16个flagId，支持的取值范围为0-15。如果flagId的值超出该范围，则会取截取最低位4bit为准。
-    - 每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步（CrossCoreSetFlag）全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#关键特性说明)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
+    - 每个flagId有个对应计数器，当调用[CrossCoreWaitFlag](CrossCoreWaitFlag(ISASI).md)时，若计数器值为0则会阻塞后续指令下发，已下发指令可正常执行；当调度模块感知到核间同步（CrossCoreSetFlag）全部完成后，会将对应CrossCoreWaitFlag的计数器的值增加1。此时，计数器值为非0，阻塞解除，并且将对应计数器的值减去1进行还原。具体执行逻辑与细节可以参考[关键特性说明](关键特性说明.md#ZH-CN_TOPIC_0000002586300741)。flagId对应的计数器计数范围为0-15。如果计数器的值超出该范围，则会异常报错，中断流程。
     - 模式0、1、2下，如果多个模式同时共用同一个flagId，CrossCoreWaitFlag无法区分具体是哪一个模式，会导致行为与预期不符。
 
         如图1所示，AIC 1的flagId 0同时用于模式2（AIV执行CrossCoreSetFlag）和模式0（所有AIC）的核间同步。AIC 1调用CrossCoreWaitFlag时，读取flagId=0的计数器，此时计数器的值变化可能来自模式0或模式2的同步完成。AIC 1无法分辨具体是哪个模式，只能感知到计数器值变化后解除阻塞。

@@ -163,5 +163,5 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-调用样例请参考[调用示例](WriteSpmBuffer.md#调用示例)。
+调用样例请参考[调用示例](WriteSpmBuffer.md#section642mcpsimp)。
 

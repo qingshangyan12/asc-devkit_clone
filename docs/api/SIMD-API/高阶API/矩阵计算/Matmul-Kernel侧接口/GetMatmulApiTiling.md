@@ -137,7 +137,7 @@ __aicore__ constexpr MatmulApiStaticTiling GetMatmulApiTiling(const MatmulConfig
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-[MatmulApiStaticTiling](Matmul模板参数.md#参数说明)
+[MatmulApiStaticTiling](Matmul模板参数.md#table7939847143412)
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
