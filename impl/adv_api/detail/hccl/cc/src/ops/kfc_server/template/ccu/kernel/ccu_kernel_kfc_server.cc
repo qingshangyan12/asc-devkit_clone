@@ -40,10 +40,10 @@ const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
-static ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                      ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                                      ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                      ccu::Variable goSize3, ccu::Variable goSize4, ccu::Variable argHandle) {
+ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                                ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                                ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                                ccu::Variable goSize3, ccu::Variable goSize4, ccu::Variable argHandle) {
     CcuKernelArg arg = reinterpret_cast<CcuKernelArg>(argHandle.handle);
     CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
                            sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
