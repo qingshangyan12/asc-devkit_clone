@@ -244,6 +244,19 @@ private:
     }
 };
 
+// Vector-quant dispatcher: binds trait/quantPre/params at template-instantiation time and forwards
+// the per-batch (or single-batch) Invoke from DispatchVectorQuantCopy to DataCopyL0C2UBVectorQuant.
+template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre>
+struct VectorQuantL0C2UBDispatcher {
+    const FixpipeParams& params;
+
+    template <typename D, typename S, typename Q>
+    __aicore__ inline void Invoke(const D& d, const S& s, const Q& q) const
+    {
+        DataCopyL0C2UBVectorQuant::DataCopyImpl<trait, quantPre, D, S, Q>(d, s, q, params);
+    }
+};
+
 class DataCopyL0C2UB {
 public:
     template <const CopyL0C2UBTrait& trait, typename T, typename U>
@@ -267,8 +280,8 @@ public:
     __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
         constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, V>();
-        SetRegisterImpl<T, U>(dst, src);
-        DataCopyL0C2UBVectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        VectorQuantL0C2UBDispatcher<trait, quantPre> dispatcher{params};
+        DispatchVectorQuantCopy(dispatcher, dst, src, quant);
     }
 };
 
