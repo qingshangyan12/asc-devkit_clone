@@ -253,6 +253,7 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     // 获取设备类型
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
+    HCCL_INFO("[HcclAllocComResourceByTiling]hrtGetDeviceType successfully!");
     
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
     if (deviceType != DevType::DEV_TYPE_950) {
@@ -263,29 +264,36 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     // 初始化环境变量配置，解析HCCL相关的环境变量
     // 包括算子展开模式、确定性计算、通信方式、日志开关等配置
     CHK_RET(InitEnvConfig());
+    HCCL_INFO("[HcclAllocComResourceByTiling]InitEnvConfig successfully!");
     
     // 检查输入参数的合法性（comm、sendBuf、recvBuf、stream不能为空）
     CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
+    HCCL_INFO("[HcclAllocComResourceByTiling]CheckInputParam successfully!");
     
     // 获取通信域中的rank数量
     u32 rankSize = INVALID_VALUE_RANKSIZE;
     CHK_RET(HcclGetRankSize(comm, &rankSize));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetRankSize successfully!");
     
     // 获取当前rank的ID
     u32 userRank = INVALID_VALUE_RANKID;
     CHK_RET(HcclGetRankId(comm, &userRank));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetRankId successfully!");
     
     // 获取通信域名称
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
     CHK_RET(HcclGetCommName(comm, commName));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetCommName successfully!");
 
     const void *ccTilingList[MAX_OP_NUM];
     uint32_t tilingNum;
     CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
+    HCCL_INFO("[HcclAllocComResourceByTiling]HcclGetTilingList successfully!");
 
     // 校验commengine
     uint8_t commEngine;
     CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
+    HCCL_INFO("[HcclAllocComResourceByTiling]ObtainCommEngine successfully!");
 
     // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
@@ -299,6 +307,7 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
         HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
+    HCCL_INFO("[HcclAllocComResourceByTiling]AllocComResourceByTilingCcu successfully!");
 
     // 记录退出日志和性能统计信息
     CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
