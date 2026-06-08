@@ -93,6 +93,9 @@ install(DIRECTORY ${MAKESELF_PATH}
         FILE_PERMISSIONS
             OWNER_READ OWNER_EXECUTE
             GROUP_READ GROUP_EXECUTE
+        FILES_PERMISSIONS
+            OWNER_READ OWNER_EXECUTE
+            GROUP_READ GROUP_EXECUTE
         COMPONENT asc-devkit
         PATTERN ".github" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
