@@ -226,6 +226,8 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     OpResCtx resCtx{};
     CHK_RET(AllocCcuOpResCtx(comm, ctxTag, rankSize, userRank, resCtx));
     HCCL_INFO("[AllocComResourceByTilingCcu]AllocCcuOpResCtx successfully!");
+    HCCL_INFO("[AllocComResourceByTilingCcu]allocated: workspace[%p], size[%llu]", 
+    (void*)resCtx.workSpace, resCtx.workSpaceSize);
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));

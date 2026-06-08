@@ -541,6 +541,8 @@ HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpPara
     TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut)
 {
     HCCL_INFO("[GetCcuOpParamResCtx]start GetCcuOpParamResCtx!");
+    HCCL_INFO("[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", 
+    (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     HCCL_INFO("[GetCcuOpParamResCtx]Generate executor successfully!");
     CHK_PRT_RET(executor.get() == nullptr,
@@ -595,6 +597,8 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
     const void *ccTilingList[], uint32_t tilingNum, OpResCtx &opResCtx)
 {
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
+    HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", 
+    (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
 
