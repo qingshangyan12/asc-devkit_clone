@@ -23,6 +23,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 接口支持非转置搬运和转置搬运。源张量和目的张量的Layout需要匹配当前通路支持的格式组合。
 
+接口支持batch模式。batch模式用于一次描述多个形状相同的矩阵块，Layout在原分形Layout最外层增加Batch维度，可通过`MakeFrameLayout<NZLayoutPtn, T>(batch, m, k)`或`MakeFrameLayout<ZNLayoutPtn, T>(batch, m, k)`构造。
+
 ## 函数原型
 
 - 执行L1 Buffer到L0A Buffer的数据搬运。
@@ -80,6 +82,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 - 目的地址位于L0A Buffer时，起始地址需要满足512 Byte对齐要求。
 - 源地址位于L1 Buffer时，起始地址需要满足32 Byte对齐要求。
+- batch模式要求源张量和目的张量的Batch数量一致，且去掉Batch维度后的单个矩阵Layout需要满足当前通路支持的格式组合。
 - 特殊数据类型约束：L1 Buffer到L0A Buffer通路使能转置时，即`ZN2NZ`，支持的数据类型约束如下：
   - b32数据类型要求源矩阵Shape在K轴方向16对齐。
   - b8数据类型要求源矩阵Shape在M轴方向32对齐。
@@ -98,6 +101,10 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 当源张量数据格式为`ZN`、目的张量数据格式为`NZ`时，接口按转置方式搬运。转置搬运会对源张量中每个分形矩阵进行转置。
 
 不同数据位宽的转置搬运示意如下。
+
+### batch搬运
+
+batch模式在矩阵最外层增加Batch维度，适用于连续搬运多个形状相同的左矩阵块。非转置batch搬运要求源张量和目的张量均为`NZ`格式；转置batch搬运要求源张量为`ZN`格式、目的张量为`NZ`格式。用户只需要在构造Layout时传入Batch参数，`Copy`调用形式与非batch模式保持一致。
 
 #### b4转置搬运
 
@@ -134,6 +141,32 @@ __aicore__ inline void CopyL1ToL0AExample()
     auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
 
     auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
+
+    auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    Copy(copyAtom, l0aTensor, l1Tensor);
+}
+```
+
+batch模式调用示例：
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyBatchL1ToL0AExample()
+{
+    using AType = half;
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t m = 16;
+    constexpr uint32_t k = 16;
+
+    __cbuf__ AType l1Buf[batch * m * k];
+    __ca__ AType l0aBuf[batch * m * k];
+
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, AType>(batch, m, k));
+
+    auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, AType>(batch, m, k));
 
     auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
     Copy(copyAtom, l0aTensor, l1Tensor);
