@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section259105813316"></a>
 
-头文件路径为：include "tools/cpudebug/include/stub\_def.h
+头文件路径为：`"tools/cpudebug/include/stub_def.h"`。
 
 进行核函数的CPU侧运行验证时，用于创建共享内存：在/tmp目录下创建一个共享文件，并返回该文件的映射指针。
 
@@ -71,7 +71,7 @@ void *GmAlloc(size_t size)
 
 ## 参数说明<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section158061867342"></a>
 
-**表 1**  模板参数说明
+**表 1**  参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |
@@ -84,13 +84,13 @@ void *GmAlloc(size_t size)
 ## 约束说明<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section794123819592"></a>
 
 - 该接口在系统的/tmp目录下生成临时文件，故需要磁盘空间足够才可以正常生成共享内存。
-- 必须配合[GmFree](GmFree)进行释放。
+- 必须配合[GmFree](GmFree.md)进行释放。
 
 ## 调用示例<a name="zh-cn_topic_0000001963639306_zh-cn_topic_0000001541764188_section82241477610"></a>
 
 ```cpp
-uint32_t numBlocks = 8;    // 总核数
-uint32_t blockLength = 2048;    // 每个核分配的内存大小
-size_t len = numBlocks * blockLength * sizeof(uint16_t);    // 共享内存大小
+uint32_t numBlocks = 8;    // 总核数。
+uint32_t blockLength = 2048;    // 每个核分配的内存大小。
+size_t len = numBlocks * blockLength * sizeof(uint16_t);    // 共享内存大小。
 uint8_t* x = (uint8_t*)AscendC::GmAlloc(len);
 ```
