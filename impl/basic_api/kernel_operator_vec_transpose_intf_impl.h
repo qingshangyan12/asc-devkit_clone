@@ -70,6 +70,58 @@ __aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nch
     CheckValueRange<int32_t>(nchwconvParams.repeatTimes, 0, 255, "repeatTimes", "TransDataTo5HD with TransDataTo5HDParams");
 }
 
+template <typename T>
+__aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const LocalTensor<uint64_t> &dst,
+                                                                     const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
+{
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckTransDataTo5HDParams<T>(nchwconvParams);
+CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");
+CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "TransDataTo5HD");
+#endif
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFunTransDataTo5HD<T, uint64_t>(dst, src, nchwconvParams, "TransDataTo5HD")) {
+    ASCENDC_REPORT_CHECK_ERROR("TransDataTo5HD", KernelFuncType::NONE_MODE);
+}
+TransDataTo5HDVldVaRegImpl<PrimT<T>>(
+    (__ubuf__ uint64_t*)dst.GetPhyAddr(), (__ubuf__ uint64_t*)src.GetPhyAddr(), nchwconvParams);
+#else
+    constexpr uint32_t vaRegSize = VA_REG_ARRAY_LEN / HALF_FACTOR;
+    constexpr uint32_t vaOne = 1;
+    constexpr uint32_t vaTwo = 2;
+    constexpr uint32_t vaThree = 3;
+    constexpr uint64_t vaAddr = 5;
+    constexpr uint64_t vaMask = 0x1fff;
+    constexpr uint64_t vaBit1 = 16;
+    constexpr uint64_t vaBit2 = 32;
+    constexpr uint64_t vaBit3 = 48;
+
+    for (uint32_t i = 0; i < vaRegSize; i++)
+    {
+        uint64_t dstAddrConfig = (((dst.GetValue(vaRegSize * i) >> vaAddr) & vaMask) |
+                                  (((dst.GetValue(vaRegSize * i + vaOne) >> vaAddr) & vaMask) << vaBit1) |
+                                  (((dst.GetValue(vaRegSize * i + vaTwo) >> vaAddr) & vaMask) << vaBit2) |
+                                  (((dst.GetValue(vaRegSize * i + vaThree) >> vaAddr) & vaMask) << vaBit3));
+        dst.SetValue(i, dstAddrConfig);
+
+        uint64_t srcAddrConfig = (((src.GetValue(vaRegSize * i) >> vaAddr) & vaMask) |
+                                  (((src.GetValue(vaRegSize * i + vaOne) >> vaAddr) & vaMask) << vaBit1) |
+                                  (((src.GetValue(vaRegSize * i + vaTwo) >> vaAddr) & vaMask) << vaBit2) |
+                                  (((src.GetValue(vaRegSize * i + vaThree) >> vaAddr) & vaMask) << vaBit3));
+        src.SetValue(i, srcAddrConfig);
+    }
+
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+    SetFlag<HardEvent::S_V>(eventIdSToV);
+    WaitFlag<HardEvent::S_V>(eventIdSToV);
+    TransDataTo5HDVldVaRegImpl<T>(
+            (__ubuf__ uint64_t*)dst.GetPhyAddr(), (__ubuf__ uint64_t*)src.GetPhyAddr(), nchwconvParams);
+#endif
+}
+
+#if defined(__NPU_ARCH__)
 /* **************************************************************************************************
  * Transpose                                            *
  * ************************************************************************************************* */
@@ -210,57 +262,8 @@ __aicore__ inline void Transpose(const LocalTensor<T> &dst, const LocalTensor<T>
         }
     }
 }
+#endif
 #pragma end_pipe
-template <typename T>
-__aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(const LocalTensor<uint64_t> &dst,
-    const LocalTensor<uint64_t> &src, const TransDataTo5HDParams &nchwconvParams)
-{
-#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckTransDataTo5HDParams<T>(nchwconvParams);
-    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-    CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");
-    CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "TransDataTo5HD");
-#endif
-#if ASCENDC_CPU_DEBUG
-    if (!CheckFunTransDataTo5HD<T, uint64_t>(dst, src, nchwconvParams, "TransDataTo5HD")) {
-        ASCENDC_REPORT_CHECK_ERROR("TransDataTo5HD", KernelFuncType::NONE_MODE);
-    }
-    TransDataTo5HDVldVaRegImpl<PrimT<T>>(
-        (__ubuf__ uint64_t*)dst.GetPhyAddr(), (__ubuf__ uint64_t*)src.GetPhyAddr(), nchwconvParams);
-#else
-    constexpr uint32_t vaRegSize = VA_REG_ARRAY_LEN / HALF_FACTOR;
-    constexpr uint32_t vaOne = 1;
-    constexpr uint32_t vaTwo = 2;
-    constexpr uint32_t vaThree = 3;
-    constexpr uint64_t vaAddr = 5;
-    constexpr uint64_t vaMask = 0x1fff;
-    constexpr uint64_t vaBit1 = 16;
-    constexpr uint64_t vaBit2 = 32;
-    constexpr uint64_t vaBit3 = 48;
-
-    for (uint32_t i = 0; i < vaRegSize; i++)
-    {
-        uint64_t dstAddrConfig = (((dst.GetValue(vaRegSize * i) >> vaAddr) & vaMask) |
-                                  (((dst.GetValue(vaRegSize * i + vaOne) >> vaAddr) & vaMask) << vaBit1) |
-                                  (((dst.GetValue(vaRegSize * i + vaTwo) >> vaAddr) & vaMask) << vaBit2) |
-                                  (((dst.GetValue(vaRegSize * i + vaThree) >> vaAddr) & vaMask) << vaBit3));
-        dst.SetValue(i, dstAddrConfig);
-
-        uint64_t srcAddrConfig = (((src.GetValue(vaRegSize * i) >> vaAddr) & vaMask) |
-                                  (((src.GetValue(vaRegSize * i + vaOne) >> vaAddr) & vaMask) << vaBit1) |
-                                  (((src.GetValue(vaRegSize * i + vaTwo) >> vaAddr) & vaMask) << vaBit2) |
-                                  (((src.GetValue(vaRegSize * i + vaThree) >> vaAddr) & vaMask) << vaBit3));
-        src.SetValue(i, srcAddrConfig);
-    }
-
-    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
-    SetFlag<HardEvent::S_V>(eventIdSToV);
-    WaitFlag<HardEvent::S_V>(eventIdSToV);
-    TransDataTo5HDVldVaRegImpl<T>(
-        (__ubuf__ uint64_t*)dst.GetPhyAddr(), (__ubuf__ uint64_t*)src.GetPhyAddr(), nchwconvParams);
-#endif
-}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TRANSPOSE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TRANSPOSE_INTF_IMPL_H__)
