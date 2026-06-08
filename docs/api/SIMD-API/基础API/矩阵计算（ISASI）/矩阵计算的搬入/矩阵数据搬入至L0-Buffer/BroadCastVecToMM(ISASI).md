@@ -17,6 +17,7 @@
 将矢量数据广播到矩阵中，每个数据块中的每16个元素会被连续复制16次；当前支持的数据传输通路：Unified Buffer-\>L0C Buffer（VECIN/VECCALC/VECOUT-\>CO1）。
 
 **图 1**  功能示例<a name="fig1730933122314"></a>  
+
 ![](../../../../../figures/功能示例.png "功能示例")
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -55,6 +56,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 本示例中，输入bias形状为\[1, 32\]，输出c的形状为\[32, 32\]，格式为Nz。
 
 **图 2**  调用示例图<a name="fig496292825418"></a>  
+
 ![](../../../../../figures/调用示例图.png "调用示例图")
 
 本示例仅展示样例中的部分代码。如需运行，请参考[BroadCastVecToMM样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/broadcast_ub2l0c)实现完整的代码。
