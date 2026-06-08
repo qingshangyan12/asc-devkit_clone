@@ -8,28 +8,26 @@ Ascend C为AI Core提供了SIMD编程路径，**C语言编程**是该路径的�
 
 ## 一、背景动因
 
-早期算子开发以C语言裸指针编程为核心，其背景动因源于GPU硬件架构的复杂性——缓存、寄存器、共享内存等片上资源需精确调度。该模式依托C语言底层内存操控能力，通过裸指针直接寻址操作设备内存，绕过抽象层实现零开销访问；手动分配片上内存、插入显式同步语句，精确编排硬件执行时序；原生函数与硬件指令精准映射、调用即执行，无中间转换损耗。
-
-支持向量计算、矩阵乘、数据搬运等核心原语调用，是底层极致性能优化的核心方案，广泛应用于离散、归约、矩阵类等算子的底层实现。
+C语言编程的动因在于让开发者掌握NPU硬件执行细节。满足开发者手动规划本地内存布局，控制数据在内存间流转，插入硬件流水同步，调整搬运和计算流水并行等直接面向计算单元、存储层次和流水同步组织代码的要求。适用于对性能和可控性要求较高的算子开发场景。
 
 ---
 
 ## 二、编程范式
 
-C语言编程提供完备的编程能力，是SIMD编程路径中最贴近硬件的底层接口。开发者通过声明静态数组管理本地内存，感知并手动控制同步细节，直接调用C风格的Vector矢量计算和Cube矩阵计算接口，实现指令级精细控制。
+C语言编程提供完备的编程能力，是SIMD编程路径中最贴近硬件的底层接口。保留了裸指针、数组、地址空间限定符和显式函数调用等底层表达能力。开发者通过声明静态数组管理本地内存，感知并手动控制同步细节，直接调用C API的Vector矢量计算或Cube矩阵计算接口，实现指令级精细控制。
 
 ### 2.1 Kernel函数
 
 [核函数](../核函数.md)在前序章节已作介绍，C语言编程在核函数定义与调用上沿用SIMD编程通用规范，无额外语法约束。
 
 
-### 2.2 内存管理
+### 2.2 内存层级
 
 AI Core采用分级存储架构，不同计算单元的编程视角有所差异：
 
 **Cube矩阵计算**：采用「Global Memory → L1/L0系列Buffer」两级层级，其中L1 Buffer、L0A/L0B Buffer、L0C Buffer均服务于矩阵计算。
 
-**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → UB → Register」三级层级。**Global Memory**存放输入输出数据，**UB**作为矢量计算数据枢纽，**Register**位于Vector计算单元最内层，具备最低访存延迟与最高带宽。
+**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → UB → Register」三级层级。**Global Memory**存放输入输出数据，**UB**作为矢量计算数据中间缓存，**Register**位于Vector计算单元最内层，直接与矢量计算执行单元交互。
 
 <img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
@@ -99,6 +97,7 @@ extern __ubuf__ char dynamic_buffer[];
 - 如果src0的地址为0x10020，src1的地址为0x20020，则src0分配在bank17，src1分配在bank33，从图上可以看到，这两个bank在同一个bank group内，产生读读冲突。
 - 如果dst的地址为0x10020，每次加法计算8个data block，如果每个data block的间隔stride为16，则dst的每个data block都在一个bank group内，执行该条指令时将会产生写写冲突。
   
+
 ![Unified_Buffer地址分配示意图](../../../../figures/Unified_Buffer地址分配示意图.png)
 
 ---
@@ -202,18 +201,9 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer，64字节对齐
 
 ### 2.5 寄存器（Register）
 
-Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。
+Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
-
-**寄存器类型说明**：
-
-| 寄存器名称 | 寄存器类型 | 寄存器描述 | 使用场景 |
-|-----------|-----------|-----------|----------|
-| 矢量数据寄存器 | vector_half、vector_float、vector_int8_t、vector_bfloat16_t | 用于矢量计算，位宽为VL，可存储VL/sizeof(T)个数据元素 | 矢量计算的基本存储单元 |
-| 掩码寄存器 | vector_bool | 指示计算过程中哪些元素参与计算，宽度为VL/8 | 控制矢量计算中的元素参与情况 |
-| 地址寄存器 | iter_reg | 存储地址偏移量，循环中根据stride自动自增 | 循环迭代中自动管理地址偏移 |
-| 非对齐寄存器 | vector_load_unalign、vector_store_unalign | 处理起始地址未满足32字节对齐要求的数据搬运 | UB和寄存器之间不对齐地址访问 |
 
 ---
 
@@ -241,9 +231,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 ---
 
-**Vector矢量计算流程**：
-
-当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
+例如：在2201硬件上**Vector矢量计算流程**，需要执行以下三个主要步骤：
 
 1. 通过DMA将数据从Global Memory搬入到Local Memory
 2. 进行矢量计算
@@ -251,9 +239,11 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 <img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
 
-从上图可以看到，执行一个Vector矢量计算时，四个执行单元`Scalar`、`Vector`、`DMA(MTE2)`、`DMA(MTE3)`并行执行，如果访问同一片Local Memory，需要同步机制来控制访问时序。
+从上图可以看到，执行一个Vector矢量计算时，主要由三个执行单元`Vector`、`DMA(MTE2)`、`DMA(MTE3)`并行执行，如果访问同一片Local Memory，需要同步机制来控制访问时序。
 
 <img src="../../../../figures/同步顺序.png" alt="同步顺序示意图" width="800" />
+
+> 📌 提示：上例描述为主要路径，当`Scalar`执行单元读写GM或者UB时，也需要考虑`Scalar`流水与其他流水的同步。
 
 ---
 
@@ -360,7 +350,7 @@ asc_add(dst, src1, src0, total_length);
 
 #### 内存访问顺序控制
 
-当后续执行指令对前序的内存访问存在数据依赖时，可以通过`asc_sync_data_barrier`来进行内存访问顺序同步，该接口会阻塞后续的指令执行，直到所有之前的内存访问指令都执行结束。
+当后续执行指令对前序的内存访问存在数据依赖或者内存依赖时，可以通过`asc_sync_data_barrier`来进行内存访问顺序同步，该接口会阻塞后续的指令执行，直到所有之前的内存访问指令都执行结束。
 
 ```c
 asc_sync_data_barrier(mem_dsb_t::DSB_ALL);  // 等待所有内存访问完成
@@ -432,7 +422,7 @@ Cube计算单元和Vector计算单元分别部署在AIC核和AIV核上，每个�
 
 Vector计算单元主要用作向量计算，譬如Add、Sub等基础算术计算等。
 
-在NPU架构版本2201上，Vector计算单元的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。
+在NPU架构版本2201上，Vector计算单元的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为[Memory矢量计算编程](./Memory矢量计算编程.md)。
 
 以Add计算为例，当开发者需要计算4096长度的向量加法, 可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。
 ```c
@@ -456,7 +446,7 @@ __ubuf__ float z[4096];
 asc_add(z, x, y, 32, 1, 1, 1, 16, 16, 16);
 ```
 
-新一代架构在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。
+新一代NPU架构版本3501，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。此类直接操作UB的编程方式称为[Reg矢量计算编程](./Reg矢量计算编程.md)。
 
 如下图所示，核函数（__global__ __aicore__）是Device侧入口函数，可调用__aicore__函数；__simd_vf__函数可被核函数调用，内部只能调用__simd_callee__子函数和constexpr aicore函数。
 
@@ -504,7 +494,7 @@ asc_copy_ub2gm_align(z, (__ubuf__ float*)z_local, BLK_NUM, burst_length, cache_m
 
 ### Cube计算单元
 
-Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
+Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L1 Buffer用于矩阵计算缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。此类直接操作L1/L0A/L0B/L0C Buffer的编程方式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
 
 C语言编程针对矩阵计算编程模型提供了四类接口，分别承载CUBE核中各个通路的搬运和计算能力，如下图所示：
 
@@ -544,4 +534,4 @@ asc_copy_l0c2gm(c_gm, c_l0c, BLOCK_M * BLOCK_N);
 
 ## 五、总结
 
-本章系统阐述了C语言编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。
+本章系统阐述了C语言编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。进一步学习可以参考[Cube矩阵计算编程](./Cube矩阵计算编程.md)、[Memory矢量计算编程](./Memory矢量计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
