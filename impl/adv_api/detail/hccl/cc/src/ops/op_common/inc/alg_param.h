@@ -27,7 +27,7 @@
 #include "hcomm_primitives_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "hccl_host_comm_dl.h"
-#include "binary_stream.h"
+#include "common/binary_stream.h"
 #include "hccl_ccu_res_dl.h"
 #include "ccu_types_dl.h"
 
@@ -422,6 +422,8 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
+    void* kfcServerArgs = nullptr;        // kfc server算子入参
+    u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
     {
@@ -444,6 +446,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
+        binaryStream << kfcServerArgs;
+        binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -475,6 +479,8 @@ struct AlgResourceCtxSerializable {
 
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
+        binaryStream >> kfcServerArgs;
+        binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
         size_t startPos = data.size() - topoInfoSeqSize;
         std::vector<char> tailData(data.begin() + startPos, data.end());
@@ -566,6 +572,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
+    u64 ccuKfcArgs[4];
 };
 
 struct AlgDesc {

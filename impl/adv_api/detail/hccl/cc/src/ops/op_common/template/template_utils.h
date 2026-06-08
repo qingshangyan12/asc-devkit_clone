@@ -244,6 +244,7 @@ struct TemplateDataParams {
     std::vector<u64> sdispls;
     std::vector<u64> rdispls;
     StepSliceInfo stepSliceInfo;
+    std::vector<u64> ccuKfcArgs;
 
     std::vector<char> Serialize() const
     {
@@ -268,6 +269,7 @@ struct TemplateDataParams {
         binaryStream << root;
         binaryStream << dataType;
         binaryStream << stepSliceInfo.Serialize();
+        binaryStream << ccuKfcArgs;
         std::vector<char> result;
         binaryStream.Dump(result);
         return result;
@@ -297,6 +299,7 @@ struct TemplateDataParams {
         binaryStream >> dataType;
         std::vector<char> stepSliceInfoData;
         binaryStream >> stepSliceInfoData;
+        binaryStream >> ccuKfcArgs;
         stepSliceInfo.DeSerialize(stepSliceInfoData);
     }
 };

@@ -78,6 +78,8 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/ccu
     ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
     ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
+    ${HCCL_CC_INCLUDE_DIR}/hcomm/types
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym
     ${CMAKE_CURRENT_SOURCE_DIR}/common/hcomm_dlsym/ccu
@@ -123,6 +125,20 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel
 )
 
 
@@ -197,7 +213,6 @@ if(PRODUCT_SIDE STREQUAL "device")
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor/ins_v2_all_gather_concurrent_executor.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_omnipipe_executor.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor/ins_v2_all_gather_omnipipe_executor.cc
-            ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/executor/ins_v2_all_reduce_omnipipe_executor.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sequence_executor.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1d_dpu.cc
             ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor/ins_v2_all_gather_sequence_executor.cc

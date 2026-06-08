@@ -66,6 +66,7 @@ set_target_properties(ccl_kernel_decoupler PROPERTIES POSITION_INDEPENDENT_CODE 
 
 target_compile_definitions(ccl_kernel_decoupler PRIVATE
     $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+    CANN_VERSION_NUM=${HCCL_CANN_VERSION_NUM}
 )
 
 target_compile_options(ccl_kernel_decoupler PRIVATE
@@ -74,11 +75,16 @@ target_compile_options(ccl_kernel_decoupler PRIVATE
 
 target_include_directories(ccl_kernel_decoupler PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+    $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+    ${OPEN_HCCL_SRC_ROOT}/common
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
-
-    $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
 )
 
 add_library(ccl_kernel_decoupler_open OBJECT ${open_src_list})
@@ -86,6 +92,7 @@ set_target_properties(ccl_kernel_decoupler_open PROPERTIES POSITION_INDEPENDENT_
 
 target_compile_definitions(ccl_kernel_decoupler_open PRIVATE
     $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+    CANN_VERSION_NUM=${HCCL_CANN_VERSION_NUM}
 )
 
 target_compile_options(ccl_kernel_decoupler_open PRIVATE
@@ -94,10 +101,14 @@ target_compile_options(ccl_kernel_decoupler_open PRIVATE
 
 target_include_directories(ccl_kernel_decoupler_open BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
+    ${OPEN_HCCL_SRC_ROOT}
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
 
     $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
@@ -112,6 +123,7 @@ set_target_properties(ccl_kernel_decoupler_open_exec PROPERTIES POSITION_INDEPEN
 
 target_compile_definitions(ccl_kernel_decoupler_open_exec PRIVATE
     $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+    CANN_VERSION_NUM=${HCCL_CANN_VERSION_NUM}
     AICPU_COMPILE
 )
 
@@ -125,6 +137,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${OPEN_HCCL_SRC_ROOT}
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -142,10 +155,13 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/registry
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym/ccu
 
     ${HCCL_BASE_DIR}/pub_inc
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
@@ -157,6 +173,7 @@ set_target_properties(ccl_kernel_decoupler_open_exec_impl PROPERTIES POSITION_IN
 
 target_compile_definitions(ccl_kernel_decoupler_open_exec_impl PRIVATE
     $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+    CANN_VERSION_NUM=${HCCL_CANN_VERSION_NUM}
     AICPU_COMPILE
 )
 
@@ -173,6 +190,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${HCCL_HCOMM_HEADER_DIR}/../
     ${HCCL_HCOMM_HEADER_DIR}
     ${HCCL_HCOMM_HEADER_DIR}/hccl
+    ${OPEN_HCCL_SRC_ROOT}
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/topo
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/executor
@@ -191,6 +209,7 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/op_common/template/wrapper
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+    ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym/ccu
     ${OPEN_HCCL_SRC_ROOT}/hccl_public
     ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/executor
     ${OPEN_HCCL_SRC_ROOT}/ops/reduce_scatter/template
@@ -210,8 +229,10 @@ target_include_directories(ccl_kernel_decoupler_open_exec_impl BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/ops/all_reduce/template/aiv
 
     ${HCCL_BASE_DIR}/pub_inc
+    ${HCCL_HCOMM_HEADER_DIR}/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl
+    ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/ccu
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
     ${HCCL_BASE_DIR}/platform/hccp/external_depends/inc/log
 )
@@ -229,6 +250,7 @@ if(TARGET mc2_server)
 
     target_compile_definitions(mc2_server_decoupler PRIVATE
         $<TARGET_PROPERTY:asc_ccl_kernel,COMPILE_DEFINITIONS>
+        CANN_VERSION_NUM=${HCCL_CANN_VERSION_NUM}
         MC2_SERVER_ONLY
     )
 
@@ -238,11 +260,16 @@ if(TARGET mc2_server)
 
     target_include_directories(mc2_server_decoupler PRIVATE
         ${HCCL_HCOMM_HEADER_DIR}/../
+        ${OPEN_HCCL_SRC_ROOT}
         ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc
+        $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
+        ${OPEN_HCCL_SRC_ROOT}/common
+        ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
+        ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym/ccu
+        ${HCCL_HCOMM_HEADER_DIR}/ccu
+        ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/ccu
         ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hcomm/ccu
         ${HCCL_BASE_DIR}/legacy/unified_platform/resource/stream/aicpu
-
-        $<TARGET_PROPERTY:asc_ccl_kernel,INCLUDE_DIRECTORIES>
     )
 
     target_link_libraries(mc2_server_decoupler PRIVATE
