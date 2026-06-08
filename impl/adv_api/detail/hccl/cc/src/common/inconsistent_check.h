@@ -16,7 +16,7 @@
 #include "alg_param.h"
 #include "alg_type.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 bool NeedInconsistentCheck(const OpParam& param);
 
 HcclResult CompareOpExchangeInfos(HcclComm comm, const OpParam& param, const AlgResourceRequest &resRequest,

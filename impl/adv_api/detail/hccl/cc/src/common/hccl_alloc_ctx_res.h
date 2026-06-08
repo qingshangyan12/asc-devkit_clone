@@ -489,7 +489,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(opParam));
+        CHK_RET(SingleRankProc(comm, opParam));
         skipGetRes = true;
         return HCCL_SUCCESS;
     }
@@ -528,7 +528,8 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
         CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused,
+        ResPackGraphMode()));
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
 }

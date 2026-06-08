@@ -1,12 +1,12 @@
 /**
- * Copyright (c) 2025 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ins_temp_all_gather_mesh_1D_Z_axis_detour.h"
 #include "alg_data_trans_wrapper.h"
 #include "template_utils.h"
@@ -91,7 +91,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::SetchannelsPerRank(
 }
 
 std::vector<ChannelInfo> InsTempAllGatherMesh1D1DZAxisDetour::PrepareMergedChannels(
-    const std::map<u32, std::vector<ChannelInfo>> &channels)
+    const std::map<u32, std::vector<ChannelInfo>> &channels) const
 {
     std::vector<ChannelInfo> mergedChannels;
     auto& ranks = subCommRanks_[COMM_LEVEL0];
@@ -162,7 +162,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::ExecuteSendRecvForChannel(
     u32 threadIdx, bool dmaRead, const std::vector<ThreadHandle> &threads,
     const ChannelInfo &linkRemote,
     const std::vector<DataSlice> &txSrcSlicesAll, const std::vector<DataSlice> &txDstSlicesAll,
-    const std::vector<DataSlice> &rxSrcSlicesAll, const std::vector<DataSlice> &rxDstSlicesAll)
+    const std::vector<DataSlice> &rxSrcSlicesAll, const std::vector<DataSlice> &rxDstSlicesAll) const
 {
     TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
     TxRxChannels sendRecvChannels(linkRemote, linkRemote);
@@ -248,7 +248,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::LocalDataCopy(const std::vector<
 }
 
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::KernelRun(const OpParam &param, const TemplateDataParams &tempAlgParams,
-                                                          const TemplateResource &templateResource)
+                                             TemplateResource &templateResource)
 {
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
     HCCL_INFO("[InsTempAllGatherMesh1D1DZAxisDetour] Run start");
@@ -291,7 +291,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::RunAllGatherMesh(const std::vect
     u32 myAlgRank = 0;
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
-    bool dmaRead = (tempAlgParams_.buffInfo.inBuffType == BufferType::HCCL_BUFFER &&
+    bool dmaRead = (tempAlgParams_.buffInfo.inBuffType == BufferType::HCCL_BUFFER && 
                     tempAlgParams_.buffInfo.outBuffType != BufferType::HCCL_BUFFER);
     std::vector<ChannelInfo> mergedChannels = PrepareMergedChannels(channels);
     u32 threadNum = mergedChannels.size();

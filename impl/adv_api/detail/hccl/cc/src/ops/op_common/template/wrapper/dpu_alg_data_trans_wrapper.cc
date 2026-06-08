@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "dpu_alg_data_trans_wrapper.h"
 #include "hcomm_primitives.h"
 
@@ -39,7 +39,7 @@ HcclResult SendRecvWrite(const SendRecvInfo &sendRecvInfo)
     // 写完之后做后同步告诉对面写完了
     CHK_RET(static_cast<HcclResult>(HcommChannelNotifyRecordOnThread(0, sendChannel.handle, NOTIFY_IDX_FIN_ACK)));
     CHK_RET(static_cast<HcclResult>(HcommChannelNotifyWaitOnThread(0, recvChannel.handle, NOTIFY_IDX_FIN_ACK, DPU_TIMEOUT)));
-    CHK_RET(static_cast<HcclResult>(HcommChannelFenceOnThread(0, recvChannel.handle)));
+    CHK_RET(static_cast<HcclResult>(HcommChannelFenceOnThread(0, sendChannel.handle)));
     CHK_RET(static_cast<HcclResult>(HcommFenceOnThread(0)));
 #endif
     return HCCL_SUCCESS;

@@ -11,10 +11,17 @@ set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_mesh_1D.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_nhr.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_mesh_1D_meshchunk.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_mesh_1d_dpu.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_aicpu_reduce_nhr.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.cc
 )
+if(NOT HCCL_CANN_COMPAT_850)
+    list(APPEND src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_mesh_1d_dpu.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_omnipipe_nhr.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_omnipipe_mesh_1D.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ins_temp_reduce_scatter_omnipipe_mesh_1d_dpu.cc
+    )
+endif()
 
 target_sources(mc2_client PRIVATE
     ${src_list}

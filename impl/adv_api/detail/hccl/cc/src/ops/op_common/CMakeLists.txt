@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2025 Huawei Technologies Co., Ltd.
-# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 # CANN Open Software License Agreement Version 2.0 (the "License").
 # Please refer to the License for details. You may not use this file except in compliance with the License.
 # THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -15,8 +15,14 @@ add_subdirectory(topo)
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/op_common.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/dlhcomm_function.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/cann_host_bridge.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/exec_timeout_manager.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_log.cc
 )
+if(NOT HCCL_CANN_COMPAT_850)
+    list(APPEND src_list
+        ${CMAKE_CURRENT_SOURCE_DIR}/omnipipe_data_slice_calc.cc
+    )
+endif()
 
 target_sources(mc2_client PRIVATE
     ${src_list}

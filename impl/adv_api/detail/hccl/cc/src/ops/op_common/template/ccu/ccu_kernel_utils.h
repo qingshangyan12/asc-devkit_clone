@@ -1,19 +1,18 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef HCCL_CCU_KERNEL_UTILS_H_
 #define HCCL_CCU_KERNEL_UTILS_H_
 
 #include <vector>
 #include <queue>
 #include "alg_param.h"
-#include "ccu_kernel.h"
 
 
 namespace mc2_ops_hccl {
@@ -37,7 +36,5 @@ std::string GetReduceTypeStr(HcclDataType dataType, HcclReduceOp opType);
 
 uint64_t DataTypeSizeGet(HcclDataType type);
 
-HcclResult GenerateCcuKernelSignature(hcomm::CcuKernelSignature& sig, const std::string &name, const OpParam& opParam,
-                                      const std::vector<std::vector<uint32_t>>& subCommRanks);
 }
 #endif // HCCL_CCU_KERNEL_UTILS_H_

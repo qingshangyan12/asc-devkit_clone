@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include "aicpu/ins_temp_reduce_scatter_mesh_1D.h"
 
@@ -38,12 +38,12 @@ HcclResult InsTempReduceScatterMesh1D::CalcRes(HcclComm comm, const OpParam& par
         HCCL_ERROR("[InsTempReduceScatterMesh1D][CalcRes] topoInfo is nullptr"), HCCL_E_PARA);
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
         std::vector<HcclChannelDesc> myChannelDescs;
-        CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, subCommRanks_, myChannelDescs, CommTopo::COMM_TOPO_CLOS));
+        CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, subCommRanks_, myChannelDescs, CommTopo::COMM_TOPO_CLOS)); 
         for(auto channel : myChannelDescs) {
             if(channel.channelProtocol == COMM_PROTOCOL_UBC_CTP) {
                 level0Channels.push_back(channel);
             }
-        }
+        } 
     } else {
         CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, level0Channels));
     }
@@ -62,20 +62,18 @@ u64 InsTempReduceScatterMesh1D::CalcScratchMultiple(BufferType inBuffType, Buffe
 
 HcclResult InsTempReduceScatterMesh1D::KernelRun(const OpParam& param,
     const TemplateDataParams& tempAlgParams,
-    const TemplateResource& templateResource)
+    TemplateResource& templateResource)
 {
     if (tempAlgParams.sliceSize == 0 && tempAlgParams.tailSize == 0) {
         HCCL_DEBUG("[InsTempReduceScatterMesh1D] myRank[%u] sliceSize and tailSize are 0, skip reduce scatter.", myRank_);
         return HCCL_SUCCESS;
     }
-    CHK_RET(SetchannelsPerRank(templateResource.channels));
     threadNum_ = GetThreadNum();
     dataType_ = param.DataDes.dataType;
     processSize_ = tempAlgParams.sliceSize;
     count_ = tempAlgParams.sliceSize / DATATYPE_SIZE_TABLE[dataType_];
     HCCL_INFO("[InsTempReduceScatterMesh1D] Run Start");
-    HCCL_INFO("[InsTempReduceScatterMesh1D] KernelRun threadNum_[%u], templateResource.threads.size()[%u]",
-              threadNum_, templateResource.threads.size());
+    HCCL_INFO("[InsTempReduceScatterMesh1D] KernelRun threadNum_[%u], templateResource.threads.size()[%u]", threadNum_, templateResource.threads.size());
     if (threadNum_ > 1) {
         std::vector<ThreadHandle> subThreads(templateResource.threads.begin() + 1, templateResource.threads.end());
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
@@ -100,8 +98,7 @@ HcclResult InsTempReduceScatterMesh1D::KernelRun(const OpParam& param,
     return HcclResult::HCCL_SUCCESS;
 }
 
-HcclResult InsTempReduceScatterMesh1D::PostCopy(const OpParam& param, const TemplateDataParams &tempAlgParams,
-                                                const std::vector<ThreadHandle> &threads)
+HcclResult InsTempReduceScatterMesh1D::PostCopy(const OpParam& param,const TemplateDataParams &tempAlgParams, const std::vector<ThreadHandle> &threads)
 {
     // 通信结束之后，数据都在 cclBuffer 上，需要搬运到对应的输出位置。
     u32 rankIdx = 0;
@@ -197,7 +194,7 @@ HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(
                 // 在reduce_scatter_op.cc的创建channels的环节中获取到了remote的HcclBuff的地址
                 void* remoteCclBuffAddr = linkSend.remoteCclMem.addr;
                 // 在接收的时候接收源应该是远端地址，但是由于rs的mesh算法用的是write，所以rx不用care
-                DataSlice rxSrcSlice = DataSlice(remoteCclBuffAddr, tempAlgParam.buffInfo.inBuffBaseOff +
+                DataSlice rxSrcSlice = DataSlice(remoteCclBuffAddr, tempAlgParam.buffInfo.inBuffBaseOff + 
                     repeatIdx * tempAlgParam.inputRepeatStride + myAlgRank * tempAlgParam.inputSliceStride + elemOffset_[channelIdx],
                     sliceSize, sliceCount); // 接收源
                 DataSlice rxDstSlice = DataSlice(tempAlgParam.buffInfo.hcclBuff.addr,
@@ -215,33 +212,16 @@ HcclResult InsTempReduceScatterMesh1D::RunReduceScatter(
                 txSrcSlices.push_back(txSrcSlice);
                 txDstSlices.push_back(txDstSlice);
             }
-            SendRecvInfo sendRecvInfo{{linkSend, linkRecv}, {{txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices}}};
-            CHK_PRT_RET(SendRecvWrite(sendRecvInfo, threads[queIdx]),
+            SendRecvInfo sendRecvInfo{{linkSend, linkRecv},
+                                {{txSrcSlices, txDstSlices},{rxSrcSlices, rxDstSlices}}
+                                , dataType_};
+            CHK_PRT_RET(SendRecvBatchWrite(sendRecvInfo, threads[queIdx]),
                         HCCL_ERROR("[InsTempReduceScatterMesh1D] RunReduceScatter Send failed"),
                         HcclResult::HCCL_E_INTERNAL);
             queIdx ++;
         }
     }
     return HcclResult::HCCL_SUCCESS;
-}
-
-HcclResult InsTempReduceScatterMesh1D::CalcDataSplitByPortGroup(
-    const u64 totalDataCount, const u64 dataTypeSize,
-    const std::vector<ChannelInfo> &channels,
-    std::vector<u64> &elemCountOut, std::vector<u64> &sizeOut,
-    std::vector<u64> &elemOffset)
-{
-    return CalcDataSplitByPortGroupCommon(totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset,
-                                          channelsPerRank_);
-}
-
-HcclResult InsTempReduceScatterMesh1D::SetchannelsPerRank(
-    const std::map<u32, std::vector<ChannelInfo>> &channels)
-{
-    CHK_PRT_RET(channels.empty(), HCCL_ERROR("[InsTempReduceScatterMesh1D][SetchannelsPerRank] channels is empty."),
-                HCCL_E_INTERNAL);
-    channelsPerRank_ = CalcChannelsPerRank(channels);
-    return HCCL_SUCCESS;
 }
 
 void InsTempReduceScatterMesh1D::GetNotifyIdxMainToSub(std::vector<u32> &notifyIdxMainToSub)

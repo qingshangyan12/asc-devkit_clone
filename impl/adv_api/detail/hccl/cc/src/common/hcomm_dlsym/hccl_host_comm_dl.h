@@ -40,7 +40,6 @@ typedef HcclOpExpansionMode HcclConfigTypeOpExpansionMode;
 extern "C" {
 #endif
 
-DECL_WEAK_FUNC(HcclResult, HcclCommGetStatus, const char* commId, HcclCommStatus *status);
 DECL_SUPPORT_FLAG(HcclCommGetStatus);
 
 DECL_WEAK_FUNC(HcclResult, HcclConfigGetInfo, HcclComm comm, HcclConfigType cfgType,

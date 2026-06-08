@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef EXECUTOR_BASE_V2_H
 #define EXECUTOR_BASE_V2_H
 
@@ -46,9 +46,14 @@ public:
     HcclResult SetTempFastLaunchAddr(TemplateFastLaunchCtx &tempFastLaunchCtx, 
                             void* inputPtr, void* outputPtr, const HcclMem &hcclBuff) const;
 
-    HcclResult RestoreChannelMap(const AlgResourceCtxSerializable &resCtx,
-                                 std::vector<std::map<u32, std::vector<ChannelInfo>>> &rankIdToChannelInfo) const;
+    virtual HcclResult RestoreChannelMap(const AlgResourceCtxSerializable &resCtx,
+        std::vector<std::map<u32, std::vector<ChannelInfo>>> &rankIdToChannelInfo) const;
 
+#ifndef AICPU_COMPILE
+    HcclResult FastLaunchSaveCtxTwoTemplate(const OpParam &param, const u32 threadNum, const u32 ccuKernelNum,
+                                            const std::vector<ThreadHandle> &threads, const std::vector<u32> &ccuKernelNumList,
+                                            const std::vector<std::vector<CcuKernelSubmitInfo>> &submitInfosList, u32 notifyNumOnMainThread) const;
+#endif
 protected:
     // CollAlg base params
     u32           myRank_   = INVALID_VALUE_RANKID;

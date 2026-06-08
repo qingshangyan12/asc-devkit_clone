@@ -14,7 +14,9 @@ if(BUILD_OPEN_PROJECT)
         ${HCCL_CC_INCLUDE_DIR}/hcomm
         ${HCCL_CC_INCLUDE_DIR}/hcomm/hccl
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/hccl
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc/ccu
         ${HCCL_CC_INCLUDE_DIR}/hcomm/pkg_inc
+        ${HCCL_CC_INCLUDE_DIR}/hcomm/ccu
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/ccu
@@ -69,6 +71,7 @@ else()
         ${TOP_DIR}/hcomm/pkg_inc
         ${TOP_DIR}/hcomm/pkg_inc/hccl
         ${TOP_DIR}/hcomm/pkg_inc/hcomm/ccu
+        ${TOP_DIR}/hcomm/pkg_inc/ccu
         ${TOP_DIR}/hcomm/include
         ${TOP_DIR}/hcomm/include/hccl
     )

@@ -13,7 +13,7 @@
 #include "adapter_error_manager_pub.h"
 #include "hccl_res_expt_dl.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 thread_local std::set<std::string> g_inconsistentCheckedList;
 bool NeedInconsistentCheck(const OpParam& param)
 {
