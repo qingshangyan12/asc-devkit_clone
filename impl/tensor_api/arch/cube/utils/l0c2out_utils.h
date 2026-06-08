@@ -294,6 +294,24 @@ __aicore__ inline static void SetRegisterImpl(const T& dst, const U& src, uint64
     }
 }
 
+// Construct a single-batch sub-tensor from a batched tensor by offsetting the engine pointer to
+// batchIdx-th batch and stripping the leading batch axis from the layout. Layout depth 5 -> 4 (NZ
+// fractal) or 3 -> 2 (ND row/col). All used APIs are public: Engine() / Layout() / Get<0> / engine
+// operator+ / RemoveBatchDim / MakeTensorResult.
+template <typename Tensor>
+__aicore__ inline static auto MakeSingleBatchSubTensor(const Tensor& t, uint32_t batchIdx)
+{
+    auto layout = t.Layout();
+    auto batchStride = Get<0>(layout.Stride());
+    auto subEngine = t.Engine() + batchStride * batchIdx;
+    auto subLayout = RemoveBatchDim(layout);
+    using NewEngine = Std::remove_cvref_t<decltype(subEngine)>;
+    using NewLayout = Std::remove_cvref_t<decltype(subLayout)>;
+    using Location = GetMemLocation<NewEngine>;
+    using NewTensor = typename MakeTensorResult<Location, NewEngine, NewLayout>::type;
+    return NewTensor{subEngine, subLayout};
+}
+
 } // namespace Te
 } // namespace AscendC
 
