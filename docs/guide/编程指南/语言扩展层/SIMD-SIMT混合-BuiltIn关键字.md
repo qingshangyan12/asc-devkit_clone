@@ -58,9 +58,9 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 -   函数返回值只能是Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
 
-### \_\_simd\_vf\_\_与\_\_simt\_callee\_\_
+### \_\_simd\_vf\_\_与\_\_simd\_callee\_\_
 
-\_\_simd\_vf\_\_用于标记SIMD VF入口函数，\_\_simt\_callee\_\_是供SIMD VF内部调用子函数，详细说明请参见[SIMD BuiltIn关键字的\_\_simd\_vf\_\_](SIMD-BuiltIn关键字.md#section192521344610)。
+\_\_simd\_vf\_\_用于标记SIMD VF入口函数，\_\_simd\_callee\_\_是供SIMD VF内部调用子函数，详细说明请参见[SIMD BuiltIn关键字的SIMD VF函数标识符](SIMD-BuiltIn关键字.md#section192521344610)。
 
 ## 地址空间限定符<a name="section1624210295308"></a>
 
