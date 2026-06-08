@@ -19,8 +19,6 @@
 #include "ccu_kernel_alg_base.h"
 #include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"
 
-using namespace AscendC;
-
 namespace mc2_ops_hccl {
 constexpr uint64_t INVALID_U64 = UINT64_MAX;
 constexpr uint32_t CCU_PARAM_NUM_PER_DIE = 32;

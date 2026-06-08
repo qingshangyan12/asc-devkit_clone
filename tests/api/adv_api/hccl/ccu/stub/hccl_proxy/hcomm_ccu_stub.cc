@@ -251,16 +251,6 @@ CompletedEvent::CompletedEvent(CcuRepContext *context) : CcuVirRes(context) {}
 
 void CompletedEvent::SetMask(uint32_t compeletedMask) {}
 
-Repeat::Repeat(CcuRepContext *context, CcuRelationalOperator<Variable, uint64_t> rel) {}
-
-Repeat::~Repeat() {}
-
-void Repeat::Break() { }
-
-bool Repeat::Check() const { return true; }
-
-void Repeat::Run() {}
-
 Condition::Condition(CcuRepContext *context, CcuRelationalOperator<Variable, uint64_t> rel) {}
 
 Condition::~Condition() {}

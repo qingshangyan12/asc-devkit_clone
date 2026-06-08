@@ -21,13 +21,6 @@
 #include "topo_model.h"
 #include "sim_common.h"
 
-// CcuSelectAlgCheck的stub实现，测试中默认返回成功
-HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner *ccTiling, uint32_t tilingIndex)
-{
-    return HCCL_SUCCESS;
-}
-
-
 namespace {
 
 static u32 g_stubRankSize = 8;
