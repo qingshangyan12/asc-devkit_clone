@@ -47,35 +47,6 @@ ASCENDC_CAST_INST(U82HalfNoSatEven, asc_uint82half);
 ASCENDC_CAST_INST(U82HalfNoSatOdd, asc_uint82half_v2);
 
 
-// --- Cast trait sub-maps ---
-using CastSub_half_to_uint8_t = TupleMap<
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, Std::ignore_t>, Inst::Half2UInt8RDNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, Std::ignore_t>, Inst::Half2UInt8RDSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2UInt8RDNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2UInt8RDSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Half2UInt8RNNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::Half2UInt8RNSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2UInt8RNNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2UInt8RNSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Half2UInt8RNANoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::Half2UInt8RNASatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2UInt8RNANoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2UInt8RNASatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, Std::ignore_t>, Inst::Half2UInt8RUNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, Std::ignore_t>, Inst::Half2UInt8RUSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2UInt8RUNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2UInt8RUSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, Std::ignore_t>, Inst::Half2UInt8RZNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, Std::ignore_t>, Inst::Half2UInt8RZSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2UInt8RZNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Half2UInt8RZSatOdd>
->;
-
-using CastSub_uint8_t_to_half = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U82HalfNoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::U82HalfNoSatOdd>
->;
-
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_HALF_UINT_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

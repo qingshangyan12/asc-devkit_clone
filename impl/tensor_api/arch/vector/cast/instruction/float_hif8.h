@@ -45,33 +45,6 @@ ASCENDC_CAST_INST(Float2Hif8RNANoSatP3, asc_float2hif8_rna_v4);
 ASCENDC_CAST_INST(Float2Hif8RNASatP3, asc_float2hif8_rna_sat_v4);
 
 
-// --- Cast trait sub-maps ---
-using CastSub_float_to_hifloat8_t = TupleMap<
-    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, Std::ignore_t>, Inst::Float2Hif8RHNoSatP0>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, Std::ignore_t>, Inst::Float2Hif8RHSatP0>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, CastIndexPos::PartP1>, Inst::Float2Hif8RHNoSatP1>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, CastIndexPos::PartP1>, Inst::Float2Hif8RHSatP1>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, CastIndexPos::PartP2>, Inst::Float2Hif8RHNoSatP2>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, CastIndexPos::PartP2>, Inst::Float2Hif8RHSatP2>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, Std::ignore_t, CastIndexPos::PartP3>, Inst::Float2Hif8RHNoSatP3>,
-    Std::tuple<Std::tuple<CastRoundMode::RH, CastSatMode::Sat, CastIndexPos::PartP3>, Inst::Float2Hif8RHSatP3>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Float2Hif8RNANoSatP0>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::Float2Hif8RNASatP0>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::PartP1>, Inst::Float2Hif8RNANoSatP1>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::PartP1>, Inst::Float2Hif8RNASatP1>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::PartP2>, Inst::Float2Hif8RNANoSatP2>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::PartP2>, Inst::Float2Hif8RNASatP2>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::PartP3>, Inst::Float2Hif8RNANoSatP3>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::PartP3>, Inst::Float2Hif8RNASatP3>
->;
-
-using CastSub_hifloat8_t_to_float = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Hif82FloatP0>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::Hif82FloatP1>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::Hif82FloatP2>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Hif82FloatP3>
->;
-
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HIF8_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

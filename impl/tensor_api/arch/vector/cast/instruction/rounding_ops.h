@@ -22,37 +22,12 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 
-ASCENDC_ROUNDING_INST(Rint, asc_rint);
-ASCENDC_ROUNDING_INST(Round, asc_round);
-ASCENDC_ROUNDING_INST(Floor, asc_floor);
-ASCENDC_ROUNDING_INST(Ceil, asc_ceil);
-ASCENDC_ROUNDING_INST(Trunc, asc_trunc);
+ASCENDC_CAST_INST(Rint, asc_rint);
+ASCENDC_CAST_INST(Round, asc_round);
+ASCENDC_CAST_INST(Floor, asc_floor);
+ASCENDC_CAST_INST(Ceil, asc_ceil);
+ASCENDC_CAST_INST(Trunc, asc_trunc);
 
-
-// --- Cast trait sub-maps ---
-using CastSub_bfloat16_t_to_bfloat16_t = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
-
-using CastSub_float_to_float = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
-
-using CastSub_half_to_half = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_ROUNDING_OPS_H
 

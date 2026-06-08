@@ -22,8 +22,8 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_TRAIT_MAP_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_TRAIT_MAP_H
 
-#include "impl/tensor_api/utils/map_impl.h"
 #include "impl/tensor_api/arch/vector/cast/instruction.h"
+#include "impl/tensor_api/arch/vector/cast/cast_sub_map.h"
 
 namespace AscendC {
 namespace Te {
@@ -86,6 +86,7 @@ using CastBucketMap = TupleMap<
     Std::tuple<Std::tuple<uint8_t, uint16_t>, CastSub_uint8_t_to_uint16_t>,
     Std::tuple<Std::tuple<uint8_t, uint32_t>, CastSub_uint8_t_to_uint32_t>
 >;
+
 
 // Two-level lookup to avoid template recursion depth overflow.
 // First level: (SrcType, DstType) -> sub-map.  Second level: (RoundMode, SatMode, IndexPos) -> Inst.

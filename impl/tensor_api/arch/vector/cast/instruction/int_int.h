@@ -50,50 +50,6 @@ ASCENDC_CAST_INST(Int82Int32NoSatP2, asc_int82int32_v3);
 ASCENDC_CAST_INST(Int82Int32NoSatP3, asc_int82int32_v4);
 
 
-// --- Cast trait sub-maps ---
-using CastSub_int16_t_to_int32_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int162Int32NoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Int162Int32NoSatOdd>
->;
-
-using CastSub_int32_t_to_int16_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int322Int16NoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, CastSatMode::Sat, Std::ignore_t>, Inst::Int322Int16SatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Int322Int16NoSatOdd>,
-    Std::tuple<Std::tuple<Std::ignore_t, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Int322Int16SatOdd>
->;
-
-using CastSub_int32_t_to_int64_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int322Int64NoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Int322Int64NoSatOdd>
->;
-
-using CastSub_int4x2_t_to_int16_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int4x22Int16NoSatP0>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::Int4x22Int16NoSatP1>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::Int4x22Int16NoSatP2>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Int4x22Int16NoSatP3>
->;
-
-using CastSub_int64_t_to_int32_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int642Int32NoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, CastSatMode::Sat, Std::ignore_t>, Inst::Int642Int32SatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Int642Int32NoSatOdd>,
-    Std::tuple<Std::tuple<Std::ignore_t, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Int642Int32SatOdd>
->;
-
-using CastSub_int8_t_to_int16_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int82Int16NoSatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Int82Int16NoSatOdd>
->;
-
-using CastSub_int8_t_to_int32_t = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Int82Int32NoSatP0>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::Int82Int32NoSatP1>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::Int82Int32NoSatP2>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Int82Int32NoSatP3>
->;
-
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_INT_INT_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

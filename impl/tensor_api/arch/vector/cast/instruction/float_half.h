@@ -51,39 +51,6 @@ ASCENDC_CAST_INST(Half2FloatEven, asc_half2float);
 ASCENDC_CAST_INST(Half2FloatOdd, asc_half2float_v2);
 
 
-// --- Cast trait sub-maps ---
-using CastSub_float_to_half = TupleMap<
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRDNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfRDSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRDNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfRDSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRNNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfRNSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRNNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfRNSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRNANoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfRNASatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRNANoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfRNASatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RO, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRONoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RO, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfROSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RO, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRONoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RO, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfROSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRUNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfRUSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRUNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfRUSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, Std::ignore_t>, Inst::Float2HalfRZNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, Std::ignore_t>, Inst::Float2HalfRZSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2HalfRZNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2HalfRZSatOdd>
->;
-
-using CastSub_half_to_float = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::Half2FloatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::Half2FloatOdd>
->;
-
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_FLOAT_HALF_H
 
 #if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

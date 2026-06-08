@@ -21,10 +21,10 @@
 */
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_VF_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_CAST_VF_H
-
-#include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 #include "impl/tensor_api/arch/vector/cast/cast_enums.h"
 #include "impl/tensor_api/arch/vector/cast/cast_trait_map.h"
+#include "impl/tensor_api/arch/vector/cast/instruction.h"
+#include "impl/tensor_api/arch/vector/utils/mask_utils.h"
 
 namespace AscendC {
 namespace Te {
@@ -53,6 +53,81 @@ public:
         }
     }
 };
+
+// template<typename CalcFunc, typename TraitType>
+// class Transform2CastVF {
+// public:
+//     template<typename T, typename U>
+//     __aicore__ inline static void Run(const T& dst, const U& src)
+//     {
+//         using dstType = GetAttributeElementType<typename T::elementType*>;
+//         using srcType = GetAttributeElementType<typename U::elementType*>;
+
+//         uint32_t dstSize = dst.Size();
+
+//         constexpr uint16_t VECTOR_REG_WIDTH = asc_get_vf_len();
+//         using greaterType = Std::conditional_t<(sizeof(dstType) > sizeof(srcType)), dstType, srcType>;
+//         constexpr uint16_t oneRepSize = VECTOR_REG_WIDTH / sizeof(greaterType);
+
+//         uint16_t repeat = Std::ceil_division(dstSize, oneRepSize);
+        
+//         CastVF<CalcFunc, TraitType>::template Run(dst.Data().Get(), src.Data().Get(), repeat, oneRepSize, dstSize);
+//     }
+// };
+
+// namespace CastRoundMode {
+// struct Rint {};
+// struct Round {};
+// struct Floor {};
+// struct Ceil {};
+// struct Trunc {};
+// }
+
+// namespace CastSatMode {
+// struct Sat {};
+// struct NoSat {};
+// }
+
+// namespace CastIndexPos {
+// struct Odd {};
+// struct Even {};
+// struct PartP1 {};
+// struct PartP2 {};
+// struct PartP3 {};
+// }
+
+// template<typename T, typename U>
+// struct CastTrait2VF {
+//     using srcType = GetAttributeElementType<typename U::elementType*>;
+//     using dstType = GetAttributeElementType<typename T::elementType*>;
+//     using roundMode = Std::ignore_t;
+//     using satMode = Std::ignore_t;
+//     using indexPos = Std::ignore_t;
+// };
+
+// using CastTrait2CastFunc = TupleMap<
+//     Std::tuple<Std::tuple<half, half, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+//     Std::tuple<Std::tuple<bfloat16_t, bfloat16_t, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+//     Std::tuple<Std::tuple<float, float, Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+//     Std::tuple<Std::tuple<uint8_t, uint16_t, Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U82U16>>;
+
+
+// template<typename CalcFunc, typename TraitType>
+// class Transform2CastInstMatch {
+// public:
+//     template<typename T, typename U>
+//     __aicore__ inline static void Run(const T& dst, const U& src)
+//     {
+//         using trait = Std::conditional_t<Std::is_same_v<TraitType, Std::ignore_t>, CastTrait2VF<T, U>, TraitType>;
+//         using roundMode = Std::conditional_t<Std::is_same_v<typename trait::srcType, typename trait::dstType>, CalcFunc, typename trait::roundMode>;
+
+//         using condition = Std::tuple<typename trait::srcType, typename trait::dstType, 
+//             roundMode, typename trait::satMode, typename trait::indexPos>;
+
+//         using func = CastTrait2CastFunc::template Get<condition>;
+//         Transform2CastVF<func, TraitType>::template Run(dst, src);
+//     }
+// };
 
 template<typename CalcFunc, typename TraitType>
 class Transform2CastVF {
@@ -99,7 +174,6 @@ public:
         Transform2CastVF<func, Std::ignore_t>::template Run(dst, src);
     }
 };
-
 }
 }
 

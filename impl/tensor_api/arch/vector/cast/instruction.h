@@ -22,7 +22,6 @@
 #ifndef IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_H
 #define IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_H
 
-#include "impl/tensor_api/arch/vector/binary/instruction.h"
 #include "impl/tensor_api/tensor/pointer_pattern.h"
 #include "impl/tensor_api/tensor/tensor_impl.h"
 #include "impl/tensor_api/arch/utils/arch_utils.h"
@@ -30,8 +29,43 @@
 namespace AscendC {
 namespace Te {
 namespace Inst {
+
+struct Cast {};
+
+// struct Rint {};
+// struct Round {};
+// struct Floor {};
+// struct Ceil {};
+// struct Trunc {};
+
+// class Cast {
+// public:
+//     template<typename... Args>
+//     __simd_callee__ inline static void Run(const Args&... args) {}
+// };
+
+// class Ceil {
+// public:
+//     template <typename T>
+//     __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask) {
+//         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+//             asc_ceil(dst, src, mask);
+//         }
+//     }
+// };
+
+// class U82U16 {
+// public:
+//     template <typename T, typename U>
+//     __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask) {
+//         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+//             asc_uint82uint16(dst, src, mask);
+//         }
+//     }
+// };
+
     
-#define ASCENDC_ROUNDING_INST(CLASS_NAME, FUNC_NAME)                                                                 \
+#define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                 \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
     template <typename T>                                                                                            \
@@ -59,8 +93,30 @@ public:                                                                         
 #include "impl/tensor_api/arch/vector/cast/instruction/rounding_ops.h"
 #include "impl/tensor_api/arch/vector/cast/instruction/uint_uint.h"
 
+
 #undef ASCENDC_CAST_INST
-#undef ASCENDC_ROUNDING_INST
+
+
+// class BF162FloatEven {
+// public:
+//     template <typename T, typename U>
+//     __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask) {
+//         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+//             asc_bfloat162float(dst, src, mask);
+//         }
+//     }
+// };
+
+// class BF162FloatOdd {
+// public:
+//     template <typename T, typename U>
+//     __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask) {
+//         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
+//             asc_bfloat162float_v2(dst, src, mask);
+//         }
+//     }
+// };
+
 
 }}}
 
