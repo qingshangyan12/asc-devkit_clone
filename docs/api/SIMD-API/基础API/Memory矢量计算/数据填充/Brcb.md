@@ -134,16 +134,16 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 返回值说明<a name="section459672612511"></a>
 
-无。
+无
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
 - repeatTime的取值范围：repeatTime∈[0,255]。repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。
-- BrcbRepeatParams结构体内参数dstBlkStride，当dstBlkStride值为0时，默认按照1来处理。
+- BrcbRepeatParams结构体内参数dstBlkStride不支持设置为0，若设置成0可能产生未定义行为。
 <cann-filter npu-type="310p"> 
-- 针对Atlas 推理系列产品AI Core，使用时需要预留8kb的Unified Buffer空间，作为接口的临时数据存放区。
+- 针对Atlas 推理系列产品AI Core，使用时需要预留8Byte的Unified Buffer空间，作为接口的临时数据存放区。
 </cann-filter>
 
 ## 关键特性说明
