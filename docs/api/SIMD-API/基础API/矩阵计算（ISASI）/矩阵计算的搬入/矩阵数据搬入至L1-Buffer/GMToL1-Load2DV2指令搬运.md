@@ -1,4 +1,4 @@
-# GM->L1 Load2DV2指令搬运<a id="ZH-CN_TOPIC_0000002594327301"></a>
+# GMToL1 Load2DV2指令搬运<a id="ZH-CN_TOPIC_0000002594327301"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 

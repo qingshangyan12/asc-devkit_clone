@@ -1,4 +1,4 @@
-﻿# L1到Bias Table Buffer数据搬运<a id="ZH-CN_TOPIC_0000002538071240"></a>
+﻿# L1ToBias Table Buffer数据搬运<a id="ZH-CN_TOPIC_0000002538071240"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566886667_section796754519912"></a>
 

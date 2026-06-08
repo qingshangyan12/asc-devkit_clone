@@ -1,4 +1,4 @@
-# GM->L1随路转换-ND2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070913"></a>
+# GMToL1随路转换-ND2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002569070913"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566538879_section796754519912"></a>
 
