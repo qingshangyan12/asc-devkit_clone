@@ -168,7 +168,6 @@ private:
         auto shape = MakeShape(_1{}, calNSize);
         auto tileSrc = src.Slice(coord, shape);
         CopyL12FBND::Run<DEFAULT_COPY_L1_FB_TRAIT>(dst, tileSrc);
-        SetFpc(dstAddr);
     }
 
     template <QuantMode_t quantPre, typename T, typename U, typename ParamTuple, size_t... Is>
@@ -237,6 +236,19 @@ private:
     }
 };
 
+// Vector-quant dispatcher: binds trait/quantPre/params at template-instantiation time and forwards
+// the per-batch (or single-batch) Invoke from DispatchVectorQuantCopy to DataCopyL0C2GMVectorQuant.
+template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre>
+struct VectorQuantL0C2GMDispatcher {
+    const FixpipeParams& params;
+
+    template <typename D, typename S, typename Q>
+    __aicore__ inline void Invoke(const D& d, const S& s, const Q& q) const
+    {
+        DataCopyL0C2GMVectorQuant::DataCopyImpl<trait, quantPre, D, S, Q>(d, s, q, params);
+    }
+};
+
 class DataCopyL0C2GM {
 public:
     template <const CopyL0C2GMTrait& trait, typename T, typename U>
@@ -260,8 +272,27 @@ public:
     __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
         constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, V>();
-        SetRegisterImpl<T, U>(dst, src);
-        DataCopyL0C2GMVectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        constexpr bool quantBatched = CheckVectorQuantBatchConsistency<T, U, V>();
+
+        if constexpr (quantBatched) {
+            // Fixpipe hardware reads a single quant slice from FB per instruction and reuses it
+            // across the ndNum batch repetition; the FB quant address does not auto-step per
+            // batch. To honor per-batch quant we must split on the host: each batch issues its
+            // own fixpipe instruction with its own L1->FB quant copy.
+            uint32_t batchSize = Get<0>(src.Layout().Shape());
+            for (uint32_t b = 0; b < batchSize; ++b) {
+                auto subDst = MakeSingleBatchSubTensor(dst, b);
+                auto subSrc = MakeSingleBatchSubTensor(src, b);
+                auto subQuant = MakeSingleBatchSubTensor(quant, b);
+                SetRegisterImpl<decltype(subDst), decltype(subSrc)>(subDst, subSrc);
+                DataCopyL0C2GMVectorQuant::DataCopyImpl<trait, quantPre,
+                    decltype(subDst), decltype(subSrc), decltype(subQuant)>(
+                    subDst, subSrc, subQuant, params);
+            }
+        } else {
+            SetRegisterImpl<T, U>(dst, src);
+            DataCopyL0C2GMVectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        }
     }
 };
 

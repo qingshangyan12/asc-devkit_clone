@@ -47,7 +47,7 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckLayoutPattern<U, T>();
-        CheckDataType::CheckGm2L1AlignV2NDDataType<T, U>();
+        CheckDataType::CheckGm2L1AlignV2NDDataType<T, U>(); // todo
     }
 
     template <const CopyGM2L1Trait& trait, typename T, typename U>
@@ -112,14 +112,16 @@ private:
         CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
     }
 
-    // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
-    // compactness is assumed (sM == N), so a single matrix can be moved as one blockLen-sized block.
-    // Four DataCopy params are derived directly from the batched layout:
-    //   - GetElement<Shape, Row/Column> on the batched layout returns sub-matrix M/N (the
-    //     SelectRowColTuples helper in is_format.h handles batch-axis stripping).
-    //   - Get<0>(Shape/Stride) returns the batch size and per-matrix start-to-start stride.
-    //   - When batches are also contiguous (srcBatchStride == M*N && dstBatchStride == M*N),
-    //     fold the B blocks into a single B*M*N block; otherwise emit B blocks, one per matrix.
+    // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)) on both sides. The dst layout
+    // is still declared as ND/NDExt, but the data lands on L1 in NZ form, so the nz strides
+    // required by the nd2nz instruction must be derived from the row/column extents rather than
+    // read from the dst layout directly.
+    //   - ndNum is the batch dimension;
+    //   - loop1SrcStride / loop4SrcStride are the per-row and per-batch GM strides (bytes);
+    //   - dstNzC0Stride = ceil_align(row, FRACTAL_FIXED) (in C0_ELEMENT units), per the NZ frame
+    //     layout definition stride[1][1] = c0 * ceil_align(row, 16);
+    //   - dstNzMatrixStride = ceil_align(row, FRACTAL_FIXED) * ceil_align(col, C0_ELEMENT)
+    //     (in C0_ELEMENT units), i.e. the aligned NZ matrix size per batch.
     template <const CopyGM2L1Trait& trait, typename T, typename U>
     __aicore__ inline static void BatchDataCopyImpl(const T& dst, const U& src)
     {
@@ -127,55 +129,49 @@ private:
 
         using type = typename U::elementType;
         auto srcLayout = src.Layout();
-        auto dstLayout = dst.Layout();
 
-        uint32_t batchSize = Get<0>(srcLayout.Shape());
+        uint16_t ndNum = Get<0>(srcLayout.Shape());
         uint64_t srcBatchStride = Get<0>(srcLayout.Stride());
-        uint32_t dstBatchStride = Get<0>(dstLayout.Stride());
 
         // Strip the leading B axis before calling GetElement, otherwise the dim=0/1 split below
         // would read the batch axis as row/column.
         auto srcInner = Te::Get<1>(srcLayout);
 
-        uint32_t srcShapeRows;
-        uint32_t srcShapeColumns;
-        if constexpr (IsSatisfiedPtnFormatV<T, NDLayoutPtn>) {
-            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcInner);
-            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcInner);
+        uint16_t nValue;
+        uint32_t dValue;
+        uint32_t srcRowStride;
+        if constexpr (IsSatisfiedPtnFormatV<U, NDLayoutPtn>) {
+            nValue = GetElement<AttrInfo::Shape, AttrInfo::Row>(srcInner);
+            dValue = GetElement<AttrInfo::Shape, AttrInfo::Column>(srcInner);
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row>(srcInner);
         } else {
-            srcShapeRows = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
-            srcShapeColumns = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
-        }
-
-        uint32_t matrixElems = srcShapeRows * srcShapeColumns;
-        uint8_t cacheMode = src.Engine().GetCacheMode();
-
-        uint32_t blockCount;
-        uint32_t blockLen;
-        uint64_t srcStride;
-        uint32_t dstStride;
-
-        if (srcBatchStride == matrixElems && dstBatchStride == matrixElems) {
-            // batches are contiguous on both sides: fold to one B*M*N block.
-            blockCount = 1;
-            blockLen = batchSize * matrixElems * sizeof(type);
-            srcStride = 0;
-            dstStride = blockLen;
-        } else {
-            // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
-            blockCount = batchSize;
-            blockLen = matrixElems * sizeof(type);
-            srcStride = srcBatchStride * sizeof(type);
-            dstStride = dstBatchStride * sizeof(type);
+            nValue = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(srcInner);
+            dValue = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(srcInner);
+            srcRowStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcInner);
         }
 
         if constexpr (IsB4Type<type>) {
             // move fp4 as b8, need to be divided by 2
-            blockLen = blockLen >> 1;
-            srcStride = srcStride >> 1;
-            dstStride = dstStride >> 1;
+            dValue = dValue >> 1;
+            srcRowStride = srcRowStride >> 1;
+            srcBatchStride = srcBatchStride >> 1;
         }
-        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+
+        uint64_t loop1SrcStride = static_cast<uint64_t>(srcRowStride) * sizeof(type);
+        uint64_t loop4SrcStride = srcBatchStride * sizeof(type);
+
+        // ND-declared dst lands on L1 in NZ form: derive nz strides from row/col extents.
+        uint32_t alignedRow = Std::ceil_align(static_cast<uint32_t>(nValue), FRACTAL_FIXED);
+        uint32_t alignedCol = Std::ceil_align(dValue, C0_ELEMENT<type>);
+        uint16_t loop2DstStride = 1;
+        uint16_t loop3DstStride = static_cast<uint16_t>(alignedRow);
+        uint16_t loop4DstStride = static_cast<uint16_t>(
+            (alignedRow * alignedCol) / C0_ELEMENT<type>);
+        uint8_t cacheMode = src.Engine().GetCacheMode();
+
+        CopyGmToCbufMultiNd2nzInstr::DataCopy(dst, src, ndNum, loop2DstStride, loop3DstStride,
+                                              loop4DstStride, loop1SrcStride, cacheMode, nValue, dValue,
+                                              loop4SrcStride, false);
     }
 };
 } // namespace Te
