@@ -20,6 +20,13 @@
 
 支持GM与UB之间的连续数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
 
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+- Unified Buffer -> Global Memory
+    - VECOUT -> GM
+    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+
 ## 函数原型<a name="section1954364615315"></a>
 
 - GM->UB

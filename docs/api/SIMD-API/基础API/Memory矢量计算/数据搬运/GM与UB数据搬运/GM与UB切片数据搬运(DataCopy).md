@@ -18,6 +18,13 @@
 
 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
 
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+- Unified Buffer -> Global Memory
+    - VECOUT -> GM
+    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+
 ## 函数原型<a name="zh-cn_topic_0000002565968945_section82039854412"></a>
 
 - GM-\>UB

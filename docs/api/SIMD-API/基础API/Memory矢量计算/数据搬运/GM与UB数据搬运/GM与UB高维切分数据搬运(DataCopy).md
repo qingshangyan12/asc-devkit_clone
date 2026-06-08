@@ -22,6 +22,13 @@
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+- Unified Buffer -> Global Memory
+    - VECOUT -> GM
+    - <cann-filter npu-type="310p">CO2 -> GM（仅Atlas 推理系列产品AI Core支持）</cann-filter>
+
 ## 函数原型<a name="section1954364615315"></a>
 
 接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md)。

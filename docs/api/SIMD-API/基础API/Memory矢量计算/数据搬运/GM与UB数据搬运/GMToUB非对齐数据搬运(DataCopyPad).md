@@ -18,6 +18,10 @@
 
 该接口提供将数据从GM (Global Memory)非对齐搬运至UB (Unified Buffer)的功能，可以根据开发者的需要自行填充数据。
 
+具体支持的数据通路为：
+- GM -> VECIN/VECOUT
+- <cann-filter npu-type="950">GM -> VECCALC（仅Ascend 950PR/Ascend 950DT支持）</cann-filter>
+
 填充的数据有两种配置方式：
 
 - 配置结构体[DataCopyPadExtParams](#zh-cn_topic_0000002565888823_table2036831862917)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
