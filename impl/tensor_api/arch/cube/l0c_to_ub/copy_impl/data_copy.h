@@ -267,8 +267,36 @@ public:
     __aicore__ inline static void Run(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
         constexpr QuantMode_t quantPre = GetQuantMode<trait.roundMode, T, U, V>();
-        SetRegisterImpl<T, U>(dst, src);
-        DataCopyL0C2UBVectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        constexpr auto srcDepth = U::layoutType::depth;
+        constexpr auto quantDepth = V::layoutType::depth;
+        constexpr bool srcBatched = (srcDepth == FIVE_DIM_DATA);
+        constexpr bool quantBatched =
+            (quantDepth == THREE_DIM_DATA || quantDepth == FIVE_DIM_DATA);
+
+        // Quant batched but src is single-batch is semantically inconsistent: the caller wanted
+        // per-batch dequant scales but only one matrix is being moved out. Reject at compile time.
+        static_assert(!(quantBatched && !srcBatched),
+            "Vector quant with batched quant tensor requires batched src tensor as well.");
+
+        if constexpr (quantBatched && srcBatched) {
+            // Fixpipe hardware reads a single quant slice from FB per instruction and reuses it
+            // across the ndNum batch repetition; the FB quant address does not auto-step per
+            // batch. To honor per-batch quant we must split on the host: each batch issues its
+            // own fixpipe instruction with its own L1->FB quant copy.
+            uint32_t batchSize = Get<0>(src.Layout().Shape());
+            for (uint32_t b = 0; b < batchSize; ++b) {
+                auto subDst = MakeSingleBatchSubTensor(dst, b);
+                auto subSrc = MakeSingleBatchSubTensor(src, b);
+                auto subQuant = MakeSingleBatchSubTensor(quant, b);
+                SetRegisterImpl<decltype(subDst), decltype(subSrc)>(subDst, subSrc);
+                DataCopyL0C2UBVectorQuant::DataCopyImpl<trait, quantPre,
+                    decltype(subDst), decltype(subSrc), decltype(subQuant)>(
+                    subDst, subSrc, subQuant, params);
+            }
+        } else {
+            SetRegisterImpl<T, U>(dst, src);
+            DataCopyL0C2UBVectorQuant::DataCopyImpl<trait, quantPre, T, U, V>(dst, src, quant, params);
+        }
     }
 };
 
