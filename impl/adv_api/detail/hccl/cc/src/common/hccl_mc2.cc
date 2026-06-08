@@ -302,9 +302,11 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
     // 根据commEngine类型分发到对应的资源分配流程
     std::string ctxTag;
     if (commEngine == static_cast<uint8_t>(COMM_ENGINE_AICPU)) {
+        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == COMM_ENGINE_AICPU!");
         CHK_RET(AllocComResourceByTilingAicpu(comm, stream, mc2Tiling,
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(COMM_ENGINE_CCU)) {
+        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == COMM_ENGINE_CCU!");
         CHK_RET(AllocComResourceByTilingCcu(comm, stream, mc2Tiling,
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else {
