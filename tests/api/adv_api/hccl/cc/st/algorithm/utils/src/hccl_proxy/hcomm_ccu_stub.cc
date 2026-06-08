@@ -350,21 +350,6 @@ uint16_t CcuBuf::Id() const { return 0; }
 extern "C" {
 #endif  // __cplusplus
 
-HcclResult HcclCcuKernelRegister(HcclComm comm, CcuKernelHandle *kernelHandle, void *kernelCreator, void *kernelArg)
-{
-    return HCCL_SUCCESS;
-}
-
-HcclResult HcclCcuKernelRegisterFinish(HcclComm comm)
-{
-    return HCCL_SUCCESS;
-}
-
-HcclResult HcclCcuKernelLaunch(HcclComm comm, const ThreadHandle threadHandle, const CcuKernelHandle KernelHandle, void *taskArgs)
-{
-    return HCCL_SUCCESS;
-}
-
 HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t *insNum) {
     return HCCL_SUCCESS;
 }

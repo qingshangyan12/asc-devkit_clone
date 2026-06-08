@@ -78,7 +78,6 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgKfcServer>(
         xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token);
     void* taskArgPtr = static_cast<void*>(taskArg.get());
-    HcclCcuKernelLaunch(param.hcclComm, templateResource.threads[0], templateResource.ccuKernels[0], taskArgPtr);
 
     HCCL_INFO("[CcuTempKfcServer] KernelRun End.");
     return HcclResult::HCCL_SUCCESS;
