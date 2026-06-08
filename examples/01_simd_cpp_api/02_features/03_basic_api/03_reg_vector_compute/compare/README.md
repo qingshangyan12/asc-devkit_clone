@@ -2,7 +2,7 @@
 
 ## 概述
 本样例基于Reg编程接口实现Compare、Compares接口完成多场景下的数据比较功能。  
-本样例支持两种比较场景，通过环境变量SCENARIO_NUM选择场景。
+本样例支持两种比较场景，通过 CMake 编译参数 `SCENARIO_NUM` 选择场景。
   <table>
     <tr>
       <td>SCENARIO_NUM</td>
@@ -20,6 +20,10 @@
 
 ## 支持的产品
 - Ascend 950PR/Ascend 950DT
+
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
 
 ## 目录结构介绍
 ```
@@ -76,28 +80,21 @@ Compare接口一般与Select接口配合使用，该样例仅演示Compare和Sel
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
-  SCENARIO=1                                                                    # 执行场景1
+  SCENARIO_NUM=1                                                                # 执行场景1
   mkdir -p build && cd build;                                                   # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO                         # 生成测试输入数据
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程（默认npu模式）
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM                     # 生成测试输入数据
   ./demo                                                                        # 执行编译生成的可执行程序，执行样例
   ```
 
@@ -105,8 +102,8 @@ Compare接口一般与Select接口配合使用，该样例仅演示Compare和Sel
 
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

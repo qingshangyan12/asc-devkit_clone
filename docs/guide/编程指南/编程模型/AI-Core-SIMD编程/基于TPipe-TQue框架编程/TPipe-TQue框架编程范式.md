@@ -19,9 +19,9 @@
 
 基于这套机制，Ascend C固化了矢量、矩阵、融合三类算子的标准化流水线编程范式。下文将结合硬件特性与工程实例逐一展开。
 
--   **[矢量编程范式](./TPipe-TQue编程范式.md#section116515238815)**
--   **[矩阵编程范式](./TPipe-TQue编程范式.md#section8213173433312)**
--   **[融合算子编程范式](./TPipe-TQue编程范式.md#section57815481855)**
+-   **[矢量编程范式](./TPipe-TQue框架编程范式.md#section116515238815)**
+-   **[矩阵编程范式](./TPipe-TQue框架编程范式.md#section8213173433312)**
+-   **[融合算子编程范式](./TPipe-TQue框架编程范式.md#section57815481855)**
 
 ## 矢量编程范式<a name="section116515238815"></a>
 
@@ -113,7 +113,7 @@ Cube计算流程本质上也可归纳为CopyIn、Compute、CopyOut三个阶段�
 
 ![](../../../../figures/矩阵编程逻辑位置示意图-3.png)
 
-如图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetTensorC.md)接口。示例如下：
+如图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/GetTensorC.md)接口。示例如下：
 
 ```
 // 创建Matmul对象，需传入A、B、C、Bias的参数类型信息

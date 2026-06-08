@@ -24,9 +24,9 @@
             -   [核函数](编程指南/编程模型/AI-Core-SIMD编程/核函数.md)
             -   [基于指针的C语言编程](编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
                 -   [基于语言扩展层C API编程](编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
-            -   [基于Tensor的C++编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)
-                -   [静态Tensor编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)
-                -   [Reg矢量计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md)
+            -   [基于Tensor的C++编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
+                -   [静态Tensor编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
+                -   [Reg矢量计算编程](编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/Reg矢量计算编程.md)
             -   [基于TPipe和TQue编程](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
                 -   [TPipe-TQue框架编程原理](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
                 -   [TPipe-TQue框架编程范式](编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程范式.md)
@@ -134,6 +134,9 @@
                     -   [调用样例](./编程指南/高级编程/高级特性/AI框架算子适配/ONNX框架/调用样例.md)
 
                 -   [TensorFlow框架](./编程指南/高级编程/高级特性/AI框架算子适配/TensorFlow框架.md)
+
+            -   [SIMT协作组](./编程指南/高级编程/高级特性/SIMT协作组/SIMT协作组简介.md)
+                -   [简介](./编程指南/高级编程/高级特性/SIMT协作组/SIMT协作组简介.md)
 
     -   [附录](编程指南/附录/show_kernel_debug_data工具.md)
         -   [show_kernel_debug_data工具](编程指南/附录/show_kernel_debug_data工具.md)
@@ -281,18 +284,25 @@
             -   [较小矩阵长驻L1 Buffer，仅分次搬运较大矩阵](算子实践参考/SIMD算子性能优化/矩阵计算/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵.md)
             -   [Matmul开启AtomicAdd选项](算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项.md)
 
-    -   [SIMD与SIMT混合算子性能优化](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
+    -   [SIMD与SIMT混合算子性能优化](算子实践参考/SIMD与SIMT混合算子性能优化/SIMD与SIMT混合算子性能优化.md)
+        -   [概述](算子实践参考/SIMD与SIMT混合算子性能优化/概述.md)
         -   [内存访问](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
             -   [使用Unified Buffer提升内存访问效率](算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)
 
         -   [计算优化](算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断.md)
             -   [通过SIMT实现分支判断](算子实践参考/SIMD与SIMT混合算子性能优化/计算优化/通过SIMT实现分支判断.md)
+
+        -   [执行控制](算子实践参考/SIMD与SIMT混合算子性能优化/执行控制/线程块数量配置优化.md)
+            -   [线程块数量配置优化](算子实践参考/SIMD与SIMT混合算子性能优化/执行控制/线程块数量配置优化.md)
     -   [SIMT算子性能优化](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
         -   [内存访问](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [访存合并](算子实践参考/SIMT算子性能优化/内存访问/访存合并.md)
             -   [避免UB的Bank冲突](算子实践参考/SIMT算子性能优化/内存访问/避免UB的Bank冲突.md)
             -   [DCache访问优化](算子实践参考/SIMT算子性能优化/内存访问/DCache访问优化.md)
             -   [通过类型对齐提升搬运效率](算子实践参考/SIMT算子性能优化/内存访问/通过类型对齐提升搬运效率.md)
+            -   [使用短向量类型提升效率](算子实践参考/SIMT算子性能优化/内存访问/使用短向量类型提升效率.md)
+        -   [执行配置](算子实践参考/SIMT算子性能优化/执行配置/线程块数量配置优化.md)    
+            -   [线程块数量配置优化](算子实践参考/SIMT算子性能优化/执行配置/线程块数量配置优化.md)
 
     -   [优秀实践](算子实践参考/优秀实践/优秀实践.md)
         -   [FlashAttention算子性能调优案例](算子实践参考/优秀实践/FlashAttention算子性能调优案例.md)

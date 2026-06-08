@@ -47,6 +47,10 @@
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品
 
+## 支持的CANN软件版本
+
+- \>= CANN 9.0.0
+
 ## 目录结构介绍
 
 ```
@@ -62,7 +66,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和tensor高维切分计算接口。接口资料参考[ReduceMax](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)/[ReduceMin](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)/[ReduceSum](../../../../../../docs/api/SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)。
+  本样例基于ReduceMax/ReduceMin/ReduceSum接口实现归约计算，包含前n个数据计算接口和tensor高维切分计算接口。接口资料参考[ReduceMax](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/%E5%9F%BA%E7%A1%80API/Memory%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97/%E5%BD%92%E7%BA%A6%E8%AE%A1%E7%AE%97/ReduceMax.md)/[ReduceMin](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/%E5%9F%BA%E7%A1%80API/Memory%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97/%E5%BD%92%E7%BA%A6%E8%AE%A1%E7%AE%97/ReduceMin.md)/[ReduceSum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/%E5%9F%BA%E7%A1%80API/Memory%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97/%E5%BD%92%E7%BA%A6%E8%AE%A1%E7%AE%97/ReduceSum.md)。
 
 - 样例规格：  
   不同场景的输入输出规格如下表所示：
@@ -145,7 +149,7 @@
   - Kernel实现
     - 调用DataCopy基础API将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将归约计算后的数据搬出到GM（Global Memory）。
     - 调用ReduceMax/ReduceMin/ReduceSum接口完成归约计算。
-    - 在ReduceSum前n个数据计算场景，调用[GetReduceRepeatSumSpr](../../../../../../docs/api/context/GetReduceRepeatSumSpr(ISASI).md)获取计算结果。
+    - 在ReduceSum前n个数据计算场景，调用[GetReduceRepeatSumSpr](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/%E5%9F%BA%E7%A1%80API/Memory%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97/%E5%BD%92%E7%BA%A6%E8%AE%A1%E7%AE%97/GetReduceRepeatSumSpr(ISASI).md)获取计算结果。
 
 - 调用实现  
   使用内核调用符`<<<>>>`调用核函数。
@@ -154,23 +158,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO=1
   mkdir -p build && cd build;                                               # 创建并进入build目录
