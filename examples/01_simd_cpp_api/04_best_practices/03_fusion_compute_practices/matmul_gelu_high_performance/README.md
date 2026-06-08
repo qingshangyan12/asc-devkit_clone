@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
+本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
 ## 支持的产品
 
@@ -84,13 +84,13 @@ $$
 
 本样例提供两种CV融合场景：
 
-**Scenario 1：CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
+**Scenario 1：CV融合-GM中转（中级性能优化）**（A2/A3/Ascend 950PR均支持）
 
 ```
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
-**Scenario 2：CV融合-UB直通**（仅Ascend 950PR支持）
+**Scenario 2：CV融合-UB直通（高阶极限打磨）**（仅Ascend 950PR支持）
 
 Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算
 
@@ -100,7 +100,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### 核心特性
 
-本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。以下重点说明CV融合的实现机制。
+本样例的Matmul部分采用与[Matmul基础API最佳实践样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/01_matrix_compute_practices/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。以下重点说明CV融合的实现机制。
 
 以下重点说明AIC↔AIV的CV融合机制。
 
@@ -144,7 +144,9 @@ AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 ```
 
-#### 3. Scenario 1：CV融合-GM中转
+### 3. 中级性能优化
+
+### Scenario 1 — CV融合-GM中转
 
 AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
 
@@ -187,7 +189,9 @@ AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
 AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 ```
 
-#### 4. Scenario 2：CV融合-UB直通（仅Ascend 950PR支持）
+### 4. 高阶极限打磨
+
+### Scenario 2 — CV融合-UB直通（仅Ascend 950PR支持）
 
 AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
 
@@ -251,7 +255,7 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
 }
 ```
 
-GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_vector_compute_practices/gelu_high_performance/README.md)。
+GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
 #### 6. `__mix__(1,2)` 模式下的多核切分
 
@@ -294,7 +298,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 #### 性能数据解读
 
-**Scenario 1：CV融合-GM中转**
+**Scenario 1：CV融合-GM中转（中级性能优化）**
 
 以Ascend 950PR芯片数据为例：
 - 单独Gelu任务耗时348.868μs，单独Matmul任务耗时2601.311μs
@@ -315,7 +319,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 原因分析：虽然Scenario 1中AIV也需要从GM将数据读取到UB，但AIC的Fixpipe将Matmul计算结果写入GM后，数据会被缓存在L2 Cache中。当AIV发起MTE2操作从GM读取数据时，由于数据已在L2 Cache中命中，实际是从L2 Cache读取而非从GM读取，因此MTE2时间显著减少。这也是CV融合场景下的一个隐式性能优化点。
 
-**Scenario 2：CV融合-UB直通**
+**Scenario 2：CV融合-UB直通（高阶极限打磨）**
 
 以Ascend 950PR芯片数据为例：
 - Scenario 2融合后总耗时2573.584μs，相比Scenario 1的2606.91μs进一步减少约33μs
@@ -340,7 +344,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
