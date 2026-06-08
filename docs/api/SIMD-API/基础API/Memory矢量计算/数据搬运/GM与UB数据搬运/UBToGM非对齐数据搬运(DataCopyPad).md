@@ -18,6 +18,8 @@
 
 该接口提供将数据从UB (Unified Buffer)非对齐搬运至GM (Global Memory)的功能。
 
+具体支持的数据通路为：VECIN/VECOUT -> GM。
+
 -   如[图1](#fig_datacopypad3)所示，对于32字节对齐搬运场景，从UB读取的所有数据都会搬运至GM。
 -   如[图2](#fig_datacopypad4)所示，对于非32字节对齐的场景，在读取UB数据时会填入dummy假数据，对齐到32B，搬入GM时会将dummy空数据丢弃，从而实现UB到GM的非对齐搬运。
 

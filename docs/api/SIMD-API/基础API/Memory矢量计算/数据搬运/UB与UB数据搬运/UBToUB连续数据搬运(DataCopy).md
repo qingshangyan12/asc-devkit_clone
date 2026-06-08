@@ -20,6 +20,10 @@
 
 支持UB与UB之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
 
+具体支持的数据通路为：
+- VECIN -> VECCALC
+- VECCALC -> VECOUT
+
 ## 函数原型<a name="section1954364615315"></a>
 
 ```cpp
