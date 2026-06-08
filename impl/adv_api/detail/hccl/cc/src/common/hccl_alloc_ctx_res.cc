@@ -421,19 +421,25 @@ HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &t
 HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::string &algName,
     std::unique_ptr<TopoInfoWithNetLayerDetails> &topoInfo)
 {
+    HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclGetOpExpansionMode successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
     CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]CheckAsymmetricTopoSupport successfully!");
 
     std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
     CHK_RET(collAlgSelector->Run(opParam, topoInfo.get(), algName));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]Run collAlgSelector successfully!");
     if (algName.empty()) {
         HCCL_ERROR("[Selector] select algname fail!");
         return HCCL_E_PTR;
     }
 
     CHK_RET(SetCommEngine(opParam));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]SetCommEngine successfully!");
     if (GetExternalInputHcclAivOnlyMode() && opParam.engine != COMM_ENGINE_AIV) {
         HCCL_ERROR("[HcclExecOp] opType[%d] currently do not select aiv mode, aiv only not support.",
             static_cast<int>(opParam.opType));
@@ -444,6 +450,7 @@ HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::strin
         CHK_RET(LoadAICPUKernel());
     }
     CHK_RET(SetOpParamAlgTag(opParam, algName));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]SetOpParamAlgTag successfully!");
     return HCCL_SUCCESS;
 }
 
