@@ -973,6 +973,57 @@ std::vector<CcuRep::CompletedEvent> CcuKernelAlgBase::CreateBlockCompletedEvent(
 */ // 旧API函数实现结束
 
 // ==================== 新API体系函数实现 ====================
+std::vector<uint64_t> CalGoSize(uint64_t size)
+{
+    LoopGroupConfig config{};
+    config.msInterleave = CCU_MS_INTERLEAVE;
+    config.loopCount    = CCU_MS_DEFAULT_LOOP_COUNT;
+    config.memSlice     = CCU_MS_SIZE;
+    return CalGoSize(size, config);
+}
+
+std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig &config)
+{
+    uint64_t loopSize = config.loopCount * config.memSlice;
+    uint64_t maxSize  = loopSize * (GetMaxLoopIterNum() + 1);
+
+    uint64_t m = size / loopSize;
+    uint64_t n = (size - m * loopSize) / config.memSlice;
+    uint64_t p = size - m * loopSize - n * config.memSlice;
+
+    if (size == maxSize) {
+        m = GetMaxLoopIterNum();
+        n = config.loopCount - 1;
+        p = config.memSlice;
+    }
+
+    HCCL_INFO("Ccu Slice Split: m = %lu, n = %lu, p = %lu", m, n, p);
+
+    uint64_t offset      = config.memSlice * config.loopCount * m;
+    uint64_t loopIterNum = m;
+
+    uint64_t loopExtendNum = 0;
+    uint64_t tailSize      = 0;
+
+    if (n == 0 && p == 0) {
+        loopExtendNum = 0;
+        tailSize      = 0;
+    } else if (n != 0 && p == 0) {
+        loopExtendNum = GetParallelParam(n - 1, 0, 1);
+        tailSize      = config.memSlice;
+    } else if (n == 0 && p != 0) {
+        loopExtendNum = GetParallelParam(0, 0, 1);
+        tailSize      = p;
+    } else {
+        loopExtendNum = GetParallelParam(n - 1, 1, 2);
+        tailSize      = p;
+    }
+
+    HCCL_INFO("[CalGoSize] offset = %lu, loopIterNum = %lu, loopExtendNum = %lu, tailSize = %lu", offset, loopIterNum,
+               loopExtendNum, tailSize);
+
+    return {offset, loopIterNum, loopExtendNum, tailSize};
+}
 
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res, bool &allocated, uint32_t parallelDim, uint32_t msPerLoop)
 {

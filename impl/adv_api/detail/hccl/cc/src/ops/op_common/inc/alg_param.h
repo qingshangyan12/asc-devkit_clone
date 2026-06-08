@@ -165,6 +165,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
     Level0Shape level0Topo;
     bool Level0Nhr{false};
     bool Level1Nhr{false};
+    bool Level1Hd{false};
     bool is2DieFullMesh{false};
     bool level0PcieMix{false};
     bool level0BigClosRange{false};

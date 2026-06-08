@@ -68,7 +68,7 @@ HcclResult CcuTempKfcServer::KernelRun(const OpParam& param,
     uint64_t ckeAddr = templateDataParams.ccuKfcArgs[1]; 
     uint64_t workSpace = templateDataParams.ccuKfcArgs[2]; 
     uint64_t workSpaceSize = templateDataParams.ccuKfcArgs[3];
-    uint64_t token = ccu:GetTokenInfo(workSpace, workSpaceSize);
+    uint64_t token = hcomm::CcuRep::GetTokenInfo(workSpace, workSpaceSize);
 
     // 临时用于参数测试
     uint64_t dieNum = 1;                

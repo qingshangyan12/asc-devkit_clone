@@ -99,7 +99,7 @@ HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t w
     OpParam param;
     CHK_RET(KfcServerConstructOpParam(xnAddr, ckeAddr, workSpace, workSpaceSize, comm, stream, tag, opType, rankSize, opMode, param));
     
-    CHK_RET(HcclGetOpExpansionMode(param));
+    CHK_RET(HcclGetOpExpansionMode(comm, param));
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
@@ -107,7 +107,7 @@ HcclResult KfcServerOutPlaceCommon(uint64_t xnAddr, uint64_t ckeAddr, uint64_t w
     HCCL_INFO("Selector output algName is: %s", algName.c_str());
     if (rankSize == 1) {
         HCCL_WARNING("[%s] rankSize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(comm, param));
+        CHK_RET(SingleRankProc(param));
         return HcclResult::HCCL_SUCCESS;
     }
 

@@ -65,10 +65,29 @@ struct KfcServerContext: CcuKernelCtxBase {
     // 用于Mission间同步变量
     std::vector<ccu::Variable> exportMissionVar;
     std::vector<ccu::Variable> importMissionVar;
-}    
+};
 
+class CcuTaskArgKfcServer : public hcomm::CcuTaskArg {
+public:
+    explicit CcuTaskArgKfcServer(uint64_t xnAddr, uint64_t ckeAddr, uint64_t dieNum,
+                                  uint64_t missionNum, uint64_t missionIndex, uint64_t token)
+        : xnAddr_(xnAddr), ckeAddr_(ckeAddr), dieNum_(dieNum),
+          missionNum_(missionNum), missionIndex_(missionIndex), token_(token)
+    {
+        HCCL_DEBUG("[CcuTaskArgKfcServer] xnAddr: %lu, ckeAddr: %lu, dieNum: %lu, "
+                   "missionNum: %lu, missionIndex: %lu, token: %lu",
+                   xnAddr_, ckeAddr_, dieNum_, missionNum_, missionIndex_, token_);
+    }
 
-//new---20260603
+    uint64_t xnAddr_;       // HBM上的算子执行参数首地址
+    uint64_t ckeAddr_;      // CKE地址
+    uint64_t dieNum_;       // Die数量
+    uint64_t missionNum_;   // Mission数量
+    uint64_t missionIndex_; // Mission索引
+    uint64_t token_;        // Token信息
+};
+
+CcuResult CcuKfcServerKernel(CcuKernelArg arg);
 }//mc2_ops_hccl
 
 #endif

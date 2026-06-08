@@ -37,7 +37,6 @@
 #include "ccu_res_repo.h"
 
 // 暂时引用方便算法开发
-#include "ccu_repeat_v1.h"
 // #include "ccu_condition_v1.h"  // 已注释，不使用旧API控制流
 #include "ccu_loopblock_v1.h"
 #include "ccu_loopcall_v1.h"

@@ -175,6 +175,9 @@ struct GroupCopyVar {
     ccu::Variable  loopLen[2];
 };
 
+std::vector<uint64_t> CalGoSize(uint64_t size);
+std::vector<uint64_t> CalGoSize(uint64_t size, const LoopGroupConfig &config);
+
 CcuResult AllocGoResource(LoopGroupConfig &config, LoopGroupResource &res,
     bool &allocated, uint32_t parallelDim = CCU_MS_DEFAULT_LOOP_COUNT, uint32_t msPerLoop = 1);
 CcuResult CreateMultiOpCopy(CcuKernelCtxBase &ctx, GroupCopyVar &var);

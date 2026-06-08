@@ -44,23 +44,37 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/topo
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/interface_graph_mode
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/selector
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/executor
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/selector
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aiv
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/selector
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/selector
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
+    #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/ccu/kernel
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/executor
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/selector
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/kfc_server/template/ccu/kernel
 )
 
 list(APPEND INCLUDE_LIST
@@ -151,10 +165,6 @@ if(PRODUCT_SIDE STREQUAL "device")
         #${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/registry/alg_v2_template_register.cc
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_all_to_all_v_mesh_1D.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_to_all_v/template/aicpu/ins_temp_dpu_alltoall_mesh.cc
     )
 
     target_include_directories(mc2_server PRIVATE
