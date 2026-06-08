@@ -202,10 +202,10 @@
 </td>
 <td class="cellrowborder" valign="top" width="12.2%"><p id="p1252464414329"><a name="p1252464414329"></a><a name="p1252464414329"></a>8</p>
 </td>
-<td class="cellrowborder" valign="top" width="26.369999999999997%"><p id="p569365818504"><a name="p569365818504"></a><a name="p569365818504"></a>true, flase</p>
+<td class="cellrowborder" valign="top" width="26.369999999999997%"><p id="p569365818504"><a name="p569365818504"></a><a name="p569365818504"></a>true, false</p>
 </td>
 </tr>
-<tr id="row752484423212"><td class="cellrowborder" rowspan="8" valign="top" width="7.5200000000000005%"><p id="p155656525811"><a name="p155656525811"></a><a name="p155656525811"></a>整形</p>
+<tr id="row752484423212"><td class="cellrowborder" rowspan="8" valign="top" width="7.5200000000000005%"><p id="p155656525811"><a name="p155656525811"></a><a name="p155656525811"></a>整型</p>
 <p id="p75655513587"><a name="p75655513587"></a><a name="p75655513587"></a></p>
 <p id="p7565857582"><a name="p7565857582"></a><a name="p7565857582"></a></p>
 <p id="p256515518584"><a name="p256515518584"></a><a name="p256515518584"></a></p>
@@ -1077,7 +1077,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
 为了支持底层性能调优，应用程序可以通过在\_\_global\_\_函数定义中使用 \_\_maxnreg\_\_\(\)限定符，用于向编译器传递性能调优意图。该限定符直接限制单个线程在一个线程块内最多可分配的寄存器数量。
 
--   \_\_maxnreg\_\_\(N\) <a name="li23861114618"></a>
+-   \_\_maxnreg\_\_\(N\)
 
     函数标记宏，在核函数上可选配置，用于在编译期指定单个线程在一个线程块内最多可分配的寄存器数量。
 
