@@ -20,13 +20,14 @@
 
 支持UB (Unified Buffer)和UB之间的连续数据搬运，数据搬运时格式和内容保持不变。
 
-具体支持的数据通路为VECIN、VECCALC、VECOUT之间的搬运：
-- VECIN -> VECCALC
-- VECIN -> VECOUT
-- VECCALC -> VECIN
-- VECCALC -> VECOUT
-- VECOUT -> VECIN
-- VECOUT -> VECCALC
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+- Unified Buffer -> Unified Buffer
+    - VECIN -> VECCALC
+    - VECIN -> VECOUT
+    - VECCALC -> VECIN
+    - VECCALC -> VECOUT
+    - VECOUT -> VECIN
+    - VECOUT -> VECCALC
 
 ## 函数原型<a name="zh-cn_topic_0000002567699435_section82039854412"></a>
 

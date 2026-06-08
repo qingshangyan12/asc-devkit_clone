@@ -18,7 +18,7 @@
 
 DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，需要和[ResetLoopModePara](ResetLoopModePara.md)搭配使用，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。
 
-具体支持的数据通路为:
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
 - Global Memory -> Unified Buffer
     - GM -> VECIN
 - Unified Buffer -> Global Memory

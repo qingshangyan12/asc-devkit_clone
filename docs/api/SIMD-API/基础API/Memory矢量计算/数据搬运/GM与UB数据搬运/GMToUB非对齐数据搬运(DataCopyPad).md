@@ -18,7 +18,7 @@
 
 该接口提供将数据从GM (Global Memory)非对齐搬运至UB (Unified Buffer)的功能，可以根据开发者的需要自行填充数据。
 
-具体支持的数据通路为:
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
 - Global Memory -> Unified Buffer
     - GM -> VECIN
     - GM -> VECOUT
