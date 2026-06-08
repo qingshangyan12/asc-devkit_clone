@@ -2,17 +2,17 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 | 是否支持（不传入config的原型）| 是否支持（传入config的原型）|
-|---|---|---|---|
-| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | √ | x | √</cann-filter> |
-| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x | √ | x</cann-filter> |
-| <cann-filter npu-type="910">Atlas 训练系列产品 | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="x90">Kirin X90 | √ | √ | x</cann-filter> |
-| <cann-filter npu-type="9030">Kirin 9030 | √ | √ | x</cann-filter> |
+| 产品 | 是否支持（不传入config的原型）| 是否支持（传入config的原型）|
+|---|---|---|
+| <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT | x | √</cann-filter> |
+| <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x</cann-filter> |
+| <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x</cann-filter> |
+| <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ | x</cann-filter> |
+| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x | x</cann-filter> |
+| <cann-filter npu-type="910">Atlas 训练系列产品 | √ | x</cann-filter> |
+| <cann-filter npu-type="x90">Kirin X90 | √ | x</cann-filter> |
+| <cann-filter npu-type="9030">Kirin 9030 | √ | x</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -29,8 +29,6 @@ $dst_i = src0_i / src1_i$
     ```cpp
     dst = src0 / src1;
     ```
-
-<cann-filter npu-type="950">
 
 - 传入config的原型
 
@@ -56,10 +54,6 @@ $dst_i = src0_i / src1_i$
             __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
 
-</cann-filter>
-
-<cann-filter npu-type="A3,910b,310b,310p,910,x90,9030">
-
 - 不传入config的原型
 
     - tensor前n个数据连续计算
@@ -83,8 +77,6 @@ $dst_i = src0_i / src1_i$
             template <typename T, bool isSetMask = true>
             __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
             ```
-
-</cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
@@ -135,7 +127,7 @@ $dst_i = src0_i / src1_i$
 
 <cann-filter npu-type="310p">
 
-- 针对Atlas 推理系列产品 AI Core，T支持的数据类型为：half、float。
+- 针对Atlas 推理系列产品AI Core，T支持的数据类型为：half、float。
 
 </cann-filter>
 
