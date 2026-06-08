@@ -610,7 +610,7 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     __simt_vf__ inline void KernelAdd(__gm__ float* x, __gm__ float* y, __gm__ float* z)
     ```
 
-    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md#编程示例)。
+    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md#section776244992018)。
 
     -   指针类型：\_\_ubuf\_\_ \*、\_\_gm\_\_ \*；
     -   标量类型：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
@@ -623,7 +623,7 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     __simt_callee__ inline float add(float x, float y)
     ```
 
-Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#内置数据类型)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#内置变量)。
+Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#section13165113520576)。
 
 
 ## 核函数配置<a name="section97005415463"></a>
