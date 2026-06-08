@@ -25,7 +25,7 @@
 
 #include "kernel_basic_intf.h"
 #include "../sort_common_utils.h"
-#include "include/adv_api/sort/sort_utils.h"
+#include "../../../../../include/adv_api/sort/sort_utils.h"
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)

@@ -44,7 +44,7 @@
 #include "kernel_tpipe_base.h"
 #include "kernel_utils.h"
 #include "kernel_utils_base.h"
-#include "include/utils/std/tuple.h"
+#include "../../../include/utils/std/tuple.h"
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_constants.h"
 #include "utils/kernel_utils_mode_cpu.h"

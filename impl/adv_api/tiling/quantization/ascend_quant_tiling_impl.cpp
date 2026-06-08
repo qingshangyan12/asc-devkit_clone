@@ -12,7 +12,7 @@
  * \file ascend_quant_tiling_impl.cpp
  * \brief
  */
-#include "include/adv_api/quantization/ascend_quant_tiling.h"
+#include "../../../../include/adv_api/quantization/ascend_quant_tiling.h"
 
 #include <cstdint>
 

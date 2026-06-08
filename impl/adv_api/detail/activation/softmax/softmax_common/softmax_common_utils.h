@@ -22,7 +22,7 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_UTILS_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_UTILS_H
 #include "kernel_pop_stack_buffer.h"
-#include "include/adv_api/activation/softmax_utils.h"
+#include "../../../../../../include/adv_api/activation/softmax_utils.h"
 
 namespace AscendC {
 

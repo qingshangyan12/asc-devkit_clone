@@ -12,7 +12,7 @@
  * \file power_tiling_impl.cpp
  * \brief
  */
-#include "include/adv_api/math/power_tiling.h"
+#include "../../../../include/adv_api/math/power_tiling.h"
 #include "tiling/platform/platform_ascendc.h"
 
 #include <cstdint>

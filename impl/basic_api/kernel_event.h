@@ -24,7 +24,7 @@
 #include "kernel_macros.h"
 #include "kernel_log.h"
 #include "common_types.h"
-#include "impl/utils/common_types.h"
+#include "../utils/common_types.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
 #include "stub_def.h"

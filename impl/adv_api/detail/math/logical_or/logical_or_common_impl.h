@@ -25,7 +25,7 @@
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "../logical_template/logical_template.h"
-#include "include/adv_api/math/logical_or_utils.h"
+#include "../../../../../include/adv_api/math/logical_or_utils.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/math/logical_or/logical_or_check.h"
 #endif // ASCENDC_CPU_DEBUG

@@ -16,7 +16,7 @@
 #define IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 
 #include "kernel_basic_intf.h"
-#include "include/adv_api/matmul/tiling.h"
+#include "../../../../include/adv_api/matmul/tiling.h"
 #include "../../detail/matmul/utils/matmul_utils.h"
 
 namespace AscendC {

@@ -16,7 +16,7 @@
 
 #include "graph/tensor.h"
 #include "../../detail/host_log.h"
-#include "include/adv_api/math/cos_tiling.h"
+#include "../../../../include/adv_api/math/cos_tiling.h"
 #include "tiling/platform/platform_ascendc.h"
 
 namespace AscendC {

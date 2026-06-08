@@ -22,7 +22,7 @@
 
 #include "kernel_basic_intf.h"
 #ifdef LIB_MATMUL_MATMUL_INTF_H
-#include "include/adv_api/matmul/matmul_client.h"
+#include "../../../../include/adv_api/matmul/matmul_client.h"
 #include "../matmul/kfc/matmul_server_aux.h"
 #endif
 namespace AscendC {

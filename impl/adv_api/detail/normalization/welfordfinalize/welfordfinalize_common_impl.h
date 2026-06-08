@@ -25,7 +25,7 @@
 #include "kernel_tensor.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/normalization/welfordfinalize_utils.h"
+#include "../../../../../include/adv_api/normalization/welfordfinalize_utils.h"
 #include "../layernorm/layernorm_common_basic_impl.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/normalization/welfordfinalize/welfordfinalize_check.h"

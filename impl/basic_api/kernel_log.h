@@ -23,7 +23,7 @@
 #define ASCENDC_MODULE_KERNEL_LOG_INTF_H
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)) && \
     !(defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
-#include "impl/utils/debug/asc_aicore_printf_impl.h"
+#include "../utils/debug/asc_aicore_printf_impl.h"
 #endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <string>

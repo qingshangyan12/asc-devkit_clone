@@ -29,7 +29,7 @@
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102)
-#include "include/adv_api/math/cumsum_utils.h"
+#include "../../../../../include/adv_api/math/cumsum_utils.h"
 
 namespace AscendC {
 

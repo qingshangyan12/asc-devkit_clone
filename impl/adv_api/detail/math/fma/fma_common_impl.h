@@ -23,7 +23,7 @@
 #define IMPL_MATH_FMA_FMA_COMMON_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "include/adv_api/math/fma_utils.h"
+#include "../../../../../include/adv_api/math/fma_utils.h"
 #include "../../common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/math/fma/fma_check.h"

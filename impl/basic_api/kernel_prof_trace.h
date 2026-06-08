@@ -21,7 +21,7 @@
 #ifndef ASCENDC_KERNEL_PROF_TRACE_IMPL_H
 #define ASCENDC_KERNEL_PROF_TRACE_IMPL_H
 #include "kernel_utils.h"
-#include "impl/utils/debug/asc_aicore_time_impl.h"
+#include "../utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
 __aicore__ inline void ProfStartImpl()

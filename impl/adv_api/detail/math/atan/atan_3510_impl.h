@@ -24,7 +24,7 @@
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
-#include "include/adv_api/math/atan_utils.h"
+#include "../../../../../include/adv_api/math/atan_utils.h"
 #include "../../common/common.h"
 
 namespace AscendC {

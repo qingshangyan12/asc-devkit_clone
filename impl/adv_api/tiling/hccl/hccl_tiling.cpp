@@ -14,12 +14,12 @@
  */
 
 #include "tiling/platform/platform_ascendc.h"
-#include "include/adv_api/hccl/hccl_tiling.h"
-#include "include/adv_api/hccl/hccl_common.h"
+#include "../../../../include/adv_api/hccl/hccl_tiling.h"
+#include "../../../../include/adv_api/hccl/hccl_common.h"
 #include "securec.h"
 #include "../../detail/host_log.h"
-#include "include/adv_api/hccl/internal/hccl_msg.h"
-#include "include/adv_api/hccl/internal/hccl_tiling_msg.h"
+#include "../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "../../../../include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "tiling/platform/platform_ascendc.h"
 #include "hccl_symbol_loader.h"
 

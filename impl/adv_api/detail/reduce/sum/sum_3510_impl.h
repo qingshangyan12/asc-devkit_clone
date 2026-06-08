@@ -25,7 +25,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "include/adv_api/reduce/sum_utils.h"
+#include "../../../../../include/adv_api/reduce/sum_utils.h"
 
 namespace AscendC {
 namespace SumInternal {

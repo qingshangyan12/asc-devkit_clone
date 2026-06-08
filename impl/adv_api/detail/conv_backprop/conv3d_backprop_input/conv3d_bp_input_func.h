@@ -17,7 +17,7 @@
 #ifndef CONV3D_BP_INPUT_FUNC_H
 #define CONV3D_BP_INPUT_FUNC_H
 
-#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
+#include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "../common/conv3d_bp_util.h"
 #include "conv3d_bp_input_init_func.h"
 #include "kernel_basic_intf.h"
