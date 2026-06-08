@@ -2493,22 +2493,48 @@ CAPTURE_GM_TO_L1_IMPL(uint32_t);
 // =========================================================================
 // Batch ND2ND (gm_to_l1)
 //
-// Layout (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
-// compactness is assumed (sM == N). MakeBatchPatternLayout always emits
-// sB == M*N, so the compact-fold branch fires:
-//   blockCount = 1, blockLen = B*M*N*sizeof(T), srcStride = 0, dstStride = blockLen
+// Layout (B, (M, N)) with strides (sB, (sM, sN)). The dst is declared ND/NDExt
+// but lands on L1 in NZ form, so this path now emits nd2nz instructions:
+//   ndNum            = B
+//   loop1SrcStride   = N * sizeof(T)                              (per-row GM stride)
+//   loop4SrcStride   = M * N * sizeof(T)                          (per-batch GM stride)
+//   loop2DstStride   = 1
+//   loop3DstStride   = ceil_align(M, FRACTAL_FIXED)               (NZ c0 stride / C0_ELEMENT)
+//   loop4DstStride   = ceil_align(M,16) * ceil_align(N, C0_ELEMENT) / C0_ELEMENT
+//   nValue=M, dValue=N, enableSmallC0=false
 // (MakeBatchNDExt is provided by the file-scope MAKE_BATCH_LAYOUT_FUNC macro above.)
 // =========================================================================
 
-#define EXPECT_GM2L1_BATCH_LAST_CALL(expectBlockCount, expectBlockLen, expectSrcStride, expectDstStride) \
-    do {                                                                                                  \
-        ASSERT_FALSE(gGm2L1AlignV2Captures.empty());                                                      \
-        const auto& last = gGm2L1AlignV2Captures.back();                                                  \
-        EXPECT_EQ(last.blockCount, static_cast<uint32_t>(expectBlockCount));                              \
-        EXPECT_EQ(last.blockLen, static_cast<uint32_t>(expectBlockLen));                                  \
-        EXPECT_EQ(last.srcStride, static_cast<uint64_t>(expectSrcStride));                                \
-        EXPECT_EQ(last.dstStride, static_cast<uint32_t>(expectDstStride));                                \
-    } while (0)
+template <typename T>
+constexpr uint32_t TestC0Element()
+{
+    return TEST_C0_SIZE / sizeof(T);
+}
+
+template <typename T>
+inline void ExpectGm2L1BatchNd2NzLastCall(uint32_t B, uint32_t M, uint32_t N)
+{
+    ASSERT_FALSE(gGm2L1ND2NzCaptures.empty());
+    ASSERT_FALSE(gGm2L1NzParaCaptures.empty());
+    const auto& capture = gGm2L1ND2NzCaptures.back();
+    const auto& para = gGm2L1NzParaCaptures.back();
+
+    constexpr uint32_t kFractalFixed = 16;
+    const uint32_t c0Element = TestC0Element<T>();
+    const uint32_t alignedRow = (M + kFractalFixed - 1) / kFractalFixed * kFractalFixed;
+    const uint32_t alignedCol = (N + c0Element - 1) / c0Element * c0Element;
+
+    EXPECT_EQ(capture.nValue, static_cast<uint16_t>(M));
+    EXPECT_EQ(capture.dValue, static_cast<uint32_t>(N));
+    EXPECT_EQ(capture.loop1SrcStride, static_cast<uint64_t>(N) * sizeof(T));
+    EXPECT_EQ(capture.loop4SrcStride, static_cast<uint64_t>(M) * N * sizeof(T));
+    EXPECT_EQ(capture.enableSmallC0, false);
+
+    EXPECT_EQ(para.ndNum, static_cast<uint16_t>(B));
+    EXPECT_EQ(para.loop2DstStride, static_cast<uint16_t>(1));
+    EXPECT_EQ(para.loop3DstStride, static_cast<uint16_t>(alignedRow));
+    EXPECT_EQ(para.loop4DstStride, static_cast<uint16_t>(alignedRow * alignedCol / c0Element));
+}
 
 TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_FoldsToSingleBlock)
 {
@@ -2521,8 +2547,7 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_FoldsToSingleBlock)
 
     MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
-    constexpr uint32_t expectBlockLen = B * M * N * sizeof(T);
-    EXPECT_GM2L1_BATCH_LAST_CALL(1, expectBlockLen, 0, expectBlockLen);
+    ExpectGm2L1BatchNd2NzLastCall<T>(B, M, N);
 }
 
 TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_HalfType)
@@ -2536,6 +2561,5 @@ TEST_F(TensorApiGm2L1, CopyGm2L1Batch_ND2ND_Compact_HalfType)
 
     MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{}).Call(l1A, gmA);
 
-    constexpr uint32_t expectBlockLen = B * M * N * sizeof(T);
-    EXPECT_GM2L1_BATCH_LAST_CALL(1, expectBlockLen, 0, expectBlockLen);
+    ExpectGm2L1BatchNd2NzLastCall<T>(B, M, N);
 }
