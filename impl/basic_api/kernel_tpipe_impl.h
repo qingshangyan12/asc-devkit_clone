@@ -556,6 +556,28 @@ template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 #endif
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+namespace Internal {
+template <HardEvent evt>
+__aicore__ inline TEventID AllocEventIDFromTPipe()
+{
+    return GetTPipePtr()->template AllocEventID<evt>();
+}
+
+template <HardEvent evt>
+__aicore__ inline void ReleaseEventIDFromTPipe(TEventID id)
+{
+    return GetTPipePtr()->template ReleaseEventID<evt>(id);
+}
+
+template <HardEvent evt>
+__aicore__ inline TEventID FetchEventIDFromTPipe()
+{
+    return GetTPipePtr()->template FetchEventID<evt>();
+}
+}
+#endif
+
 template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
@@ -955,7 +977,6 @@ inline uint64_t TPipe::GetAbsAddr(const LocalTensor<T>& input)
 // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
 template <typename T> inline uint64_t GetAbsAddr(TPipe* tpipe, const LocalTensor<T>& input)
 {
-    (void)tpipe;
     // Translates the CPU address to the actual physical address.
     // Currently, only L1 or UB address translation is supported.
     int8_t logicPos = input.GetPosition();
