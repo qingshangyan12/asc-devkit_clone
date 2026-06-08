@@ -159,7 +159,7 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 -   对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前接口仅支持不同AI Server间的通信，同时通信任务信息中指定的目的卡号不能是本卡号。
 -   通信任务信息写入batchWriteInfo前，必须通过调用[DataCacheCleanAndInvalid](../../../基础API/缓存控制/DataCacheCleanAndInvalid.md)接口，保证预期的数据成功刷新到Global Memory上。
 
-## 调用示例<a name="section1665082013318"></a>
+## 调用示例<a name="section1665082013318"></a><a name="li03441128285"></a>
 
 -   不同AI Server之间的点对点通信
 

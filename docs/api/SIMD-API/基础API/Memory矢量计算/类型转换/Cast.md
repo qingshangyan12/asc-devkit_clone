@@ -101,7 +101,7 @@
 | ------ | --------- | ---- |
 | dst    |  输出     | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。|
-| roundMode | 输入 | 精度转换处理模式，类型是RoundMode。<br>RoundMode为枚举类型，用以控制精度转换处理模式，可参考[精度转换规则](../../数据结构/precision_conversion.md)，枚举类型具体定义为：<pre>enum class RoundMode {<br>    CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入<br>    CAST_RINT,      // rint，四舍六入五成双舍入<br>    CAST_FLOOR,     // floor，向负无穷舍入<br>    CAST_CEIL,      // ceil，向正无穷舍入<br>    CAST_ROUND,     // round，四舍五入舍入<br>    CAST_TRUNC,     // trunc，向零舍入<br>    CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入<br>};</pre> |
+| roundMode | 输入 | <a name="li5470114514368"></a><a name="li5682111493710"></a>精度转换处理模式，类型是RoundMode。<br>RoundMode为枚举类型，用以控制精度转换处理模式，可参考[精度转换规则](../../数据结构/precision_conversion.md)，枚举类型具体定义为：<pre>enum class RoundMode {<br>    CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入<br>    CAST_RINT,      // rint，四舍六入五成双舍入<br>    CAST_FLOOR,     // floor，向负无穷舍入<br>    CAST_CEIL,      // ceil，向正无穷舍入<br>    CAST_ROUND,     // round，四舍五入舍入<br>    CAST_TRUNC,     // trunc，向零舍入<br>    CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入<br>};</pre> |
 | count | 输入 | 参与计算的元素个数。<br>**注：参数取值范围和操作数的数据类型有关，数据类型不同，能够处理的元素个数最大值不同，最大处理的数据量不能超过UB大小限制。** |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>注意：数据类型转换的mask会按照输入和输出类型中sizeof(dtype)较大的来筛选。<br>设置详见[掩码操作](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入| 重复迭代次数。<br>矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。 |

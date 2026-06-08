@@ -47,7 +47,7 @@
 </tbody>
 </table>
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明<a name="功能说明"></a><a name="section618mcpsimp"></a>
 
 头文件路径为：`"basic_api/kernel_operator_proposal_intf.h"`
 
@@ -62,7 +62,7 @@ src1固定为uint32\_t类型，无论src0是float还是half类型，dst中的（
 
 **图 1**  Sort32排序示意图
 
-![](../../../../figures/sort32.png)<a id="图1-Sort32排序示意图"></a>
+![](../../../../figures/sort32.png)<a id="图1-Sort32排序示意图"></a><a name="图1-Sort32排序示意图"></a>
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

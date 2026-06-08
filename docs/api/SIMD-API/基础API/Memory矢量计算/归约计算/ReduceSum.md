@@ -95,7 +95,7 @@ Kirin 9030采用方式一
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
--   tensor前n个数据计算
+-   <a name="li6452183633914"></a>tensor前n个数据计算
 
     ```
     template <typename T, bool isSetMask = true>

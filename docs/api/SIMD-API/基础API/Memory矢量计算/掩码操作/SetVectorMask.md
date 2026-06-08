@@ -162,7 +162,7 @@
 
 可结合[SetMaskCount](SetMaskCount.md)与[SetMaskNorm](SetMaskNorm.md)使用，先设置mask的模式再设置mask：
 
--   Normal模式调用示例
+-   <a name="li7648351102813"></a>Normal模式调用示例
 
     ```
     AscendC::LocalTensor<half> dstLocal;
@@ -183,7 +183,7 @@
     AscendC::ResetMask();
     ```
 
--   Counter模式调用示例
+-   <a name="li4954135522812"></a>Counter模式调用示例
 
     ```
     // Counter模式和tensor高维切分计算接口配合使用

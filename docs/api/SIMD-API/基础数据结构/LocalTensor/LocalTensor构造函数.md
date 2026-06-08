@@ -1,4 +1,4 @@
-# LocalTensor构造函数<a name="ZH-CN_TOPIC_0000002330767510"></a>
+# LocalTensor构造函数<a name="ZH-CN_TOPIC_0000002330767510"></a><a name="li1192912551322"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
