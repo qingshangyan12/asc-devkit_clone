@@ -265,9 +265,6 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterAicpuRedu
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterMesh1DZAxisDetour);
 #ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AivReduceScatterMesh1D, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
-    AivTempReduceScatterMesh1D);
-
 #if CANN_VERSION_NUM >= CANN_VERSION(9, 0, 0)
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterMesh1DMem2Mem, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempReduceScatterMesh1DMem2Mem);

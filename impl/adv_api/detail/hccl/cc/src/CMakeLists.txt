@@ -121,6 +121,8 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_reduce/template/aicpu
 )
 
 
@@ -358,7 +360,7 @@ endif()
 add_subdirectory(common)
 
 if(PRODUCT_SIDE STREQUAL "host")
-    # add_subdirectory(ops)
+    add_subdirectory(ops)
 endif()
 
 if(DEVICE_MODE AND KERNEL_MODE)

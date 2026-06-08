@@ -51,6 +51,7 @@
 #include "hccl_res_expt_dl.h"
 #include "ccu_launch_dl.h"
 #include "hccl_ccu_res_dl.h"
+#include "cann_host_bridge.h"
 
 namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
@@ -340,11 +341,10 @@ HcclResult ConstructHcclDfxOpInfo(const OpParam &param, const char* tag, u32 tag
 HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastLaunchCtx *ccuFastLaunchCtx)
 {
 #if CANN_VERSION_NUM >= CANN_VERSION(9, 1, 0)
+    std::string algName = ccuFastLaunchCtx->algName;
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] start, opType[%d], algName[%s], "
         "fastLaunchTag[%s], engine[%d], opExecuteConfig[%d].", param.opType, algName.c_str(), param.fastLaunchTag,
         param.engine, param.opExecuteConfig);
-    std::string algName = ccuFastLaunchCtx->algName;
-    HCCL_DEBUG("[HcclExecOpCcuFastLaunch] algName: [%s]", algName.c_str());
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
     CHK_PRT_RET(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
@@ -1089,7 +1089,7 @@ HcclResult GetAlgResWithEngine(HcclComm comm, OpParam &param, AlgResourceRequest
         // 添加资源回退。SetCommEngine
         auto ret = GetAlgResCcu(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size, resPack);
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
-                "resCtxSequence[%p].", ccuRet, size, *resCtxSequence);
+                "resCtxSequence[%p].", ret, size, *resCtxSequence);
         if (ret == HCCL_E_UNAVAIL) {
             return HCCL_E_UNAVAIL;
         }
