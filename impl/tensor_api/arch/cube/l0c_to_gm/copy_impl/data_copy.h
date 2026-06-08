@@ -162,12 +162,44 @@ private:
     template <typename T>
     __aicore__ inline static void CopyL12Fb(const T& src, uint16_t calNSize, uint16_t nIterIndex)
     {
+        using LayoutType = typename T::layoutType;
+        if constexpr (LayoutType::depth == THREE_DIM_DATA || LayoutType::depth == FIVE_DIM_DATA) {
+            CopyL12FbBatch(src, calNSize, nIterIndex);
+        } else {
+            auto dstAddr = reinterpret_cast<__fbuf__ uint64_t*>(AllocFbTempBuf(calNSize));
+            auto dst = MakeTensor(MakeMemPtr<Location::FIXBUF>(dstAddr), src.Layout());
+            auto coord = MakeCoord(_0{}, nIterIndex * MAIN_LOOP_N_SIZE);
+            auto shape = MakeShape(_1{}, calNSize);
+            auto tileSrc = src.Slice(coord, shape);
+            CopyL12FBND::Run<DEFAULT_COPY_L1_FB_TRAIT>(dst, tileSrc);
+            SetFpc(dstAddr);
+        }
+    }
+
+    // Batched quant tensor: layout is (B, (1, N)) (depth 3) or (B, ((1, 1), (1, N))) (depth 5).
+    // Slice on the inner (1, calNSize) span at column offset nIterIndex * MAIN_LOOP_N_SIZE while
+    // keeping the leading B axis intact, then forward to CopyL12FBND::Run, whose Run-time
+    // NestingDepth dispatch routes to BatchDataCopyImpl. The dst FB tensor reuses src layout
+    // so per-batch stride matches the L1 source.
+    template <typename T>
+    __aicore__ inline static void CopyL12FbBatch(const T& src, uint16_t calNSize, uint16_t nIterIndex)
+    {
+        using LayoutType = typename T::layoutType;
         auto dstAddr = reinterpret_cast<__fbuf__ uint64_t*>(AllocFbTempBuf(calNSize));
         auto dst = MakeTensor(MakeMemPtr<Location::FIXBUF>(dstAddr), src.Layout());
-        auto coord = MakeCoord(_0{}, nIterIndex * MAIN_LOOP_N_SIZE);
-        auto shape = MakeShape(_1{}, calNSize);
-        auto tileSrc = src.Slice(coord, shape);
-        CopyL12FBND::Run<DEFAULT_COPY_L1_FB_TRAIT>(dst, tileSrc);
+        if constexpr (LayoutType::depth == THREE_DIM_DATA) {
+            auto coord = MakeCoord(_0{}, MakeCoord(_0{}, nIterIndex * MAIN_LOOP_N_SIZE));
+            auto shape = MakeShape(Get<0>(src.Layout().Shape()), MakeShape(_1{}, calNSize));
+            auto tileSrc = src.Slice(coord, shape);
+            CopyL12FBND::Run<DEFAULT_COPY_L1_FB_TRAIT>(dst, tileSrc);
+        } else {
+            auto coord =
+                MakeCoord(_0{}, MakeCoord(MakeCoord(_0{}, _0{}), MakeCoord(_0{}, nIterIndex * MAIN_LOOP_N_SIZE)));
+            auto shape =
+                MakeShape(Get<0>(src.Layout().Shape()), MakeShape(MakeShape(_1{}, _1{}), MakeShape(_1{}, calNSize)));
+            auto tileSrc = src.Slice(coord, shape);
+            CopyL12FBND::Run<DEFAULT_COPY_L1_FB_TRAIT>(dst, tileSrc);
+        }
         SetFpc(dstAddr);
     }
 
