@@ -35,7 +35,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 **表 2**  接口参数说明
 
-| 参数名称 | 输入/输出 | 含义 |
+| 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。 |
 | src | 输入 | 源操作数，类型为LocalTensor。 |
@@ -43,7 +43,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 **表 3**  Nz2NdParamsFull结构体内参数定义<a name="table_nz2nd_3"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | :--- | :--- |
 | ndNum | 传输NZ矩阵的数目，取值范围：ndNum∈[0, 4095]。 |
 | nValue | NZ矩阵的行数，取值范围：nValue∈[1, 8192]。 |

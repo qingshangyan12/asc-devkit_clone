@@ -51,14 +51,14 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数以及paddingValue（待填充数据值）的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
-| <cann-filter npu-type="950">mode | 该参数仅Ascend 950PR/Ascend 950DT支持，配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32B对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32B对齐<br>};</pre></cann-filter> |
+| <cann-filter npu-type="950">mode | 该参数仅Ascend 950PR/Ascend 950DT支持，配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre></cann-filter> |
 
 **表 2**  接口参数说明
 
-| 参数名称 | 输入/输出 | 含义 |
+| 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。 |
-| src | 输入 | 源操作数，类型为GlobalTensor，存储位置为GM (Global Memory)，源地址需要1B对齐。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
+| src | 输入 | 源操作数，类型为GlobalTensor，存储位置为GM (Global Memory)，源地址需要1字节对齐。 |
 | dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考[表3](#table_gm2ub_pad_3)。 |
 | padParams | 输入 | 从GM搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考[表4](#table_gm2ub_pad_4)。 |
 
@@ -76,7 +76,7 @@
 
 **表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义<a name="table_gm2ub_pad_4"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | :--- | :--- |
 | isPad | 是否需要填充用户自定义的数据，取值范围：true，false。<br>true：填充padding value。<br>false：表示用户不需要指定填充值，会默认填充随机值。 |
 | leftPadding | 连续搬运数据块左侧需要补充的数据范围，单位为元素个数。<br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
@@ -86,28 +86,28 @@
 ### GM->VECIN/VECOUT配置示例<a name="li73127579197"></a>
 
 - 参数解释
-    - 当blockLen+leftPadding+rightPadding满足32B对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
-    - 当blockLen+leftPadding+rightPadding不满足32B对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32B对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+    - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
+    - 当blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
 - 配置示例1：
     - blockLen为64，每个连续传输数据块包含64字节；srcStride为1，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，因为目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock数量（每DataBlock为32字节），即目的操作数相邻数据块之间间隔1个dataBlock。
-    - blockLen+leftPadding+rightPadding满足32B对齐，isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。此处示例中，leftPadding、rightPadding均为0，则不填充。
-    - blockLen+leftPadding+rightPadding不满足32B对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32B对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+    - blockLen+leftPadding+rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。此处示例中，leftPadding、rightPadding均为0，则不填充。
+    - blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad1.png)
 
 - 配置示例2：
     - blockLen为47，每个连续传输数据块包含47字节；srcStride为1，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
-    - blockLen+leftPadding+rightPadding不满足32B对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
-    - blockLen+leftPadding+rightPadding不满足32B对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+    - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
+    - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad2.png)
 <cann-filter npu-type="950">
 
 - 配置示例3（仅Ascend 950PR/Ascend 950DT支持）：
     - blockLen为48，每个连续传输数据块包含48字节；srcStride为-48，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为-48字节（一个连续数据块长度为48字节），相当于每次传输的连续数据块都是同一块；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
-    - blockLen+leftPadding+rightPadding不满足32B对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
-    - blockLen+leftPadding+rightPadding不满足32B对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
+    - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding、rightPadding均为0：dummy会默认填充待搬运数据块的第一个元素值。
+    - blockLen+leftPadding+rightPadding不满足32字节对齐，leftPadding/rightPadding不为0：若isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
     ![](../../../../../figures/datacopypad.png)
 </cann-filter>
@@ -118,11 +118,11 @@
 
 - Normal模式
     - blockLen为48，每个连续传输数据块包含48字节；srcStride为0，源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间无间隔，注意数据块包含leftPadding/rightPadding数据。
-    - blockLen + leftPadding + rightPadding满足32B对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，每个连续传输数据块都会在右侧填充16字节。目的操作数的总长度为192字节。
+    - blockLen + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，每个连续传输数据块都会在右侧填充16字节。目的操作数的总长度为192字节。
 
 - Compact模式
     - blockLen为48，每个连续传输数据块包含48字节；srcStride为0，源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间紧密排列，不会填充数据。
-    - blockLen * blockCount + leftPadding + rightPadding满足32B对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
+    - blockLen * blockCount + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
 
     ![](../../../../../figures/paddingMode.png)
 
@@ -160,7 +160,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 位于GM的源地址必须1B对齐，位于UB的目的地址必须32B对齐。
+- 位于GM的源地址必须1字节对齐，位于UB的目的地址必须32字节对齐。
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
 - 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
@@ -218,7 +218,7 @@
 - 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // Compact模式：每次内层循环搬运80B后填充16B使其96B对齐
+    // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
@@ -232,7 +232,7 @@
 - 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // Normal模式：每个block搬运40B后填充24B使其64B对齐
+    // Normal模式：每个block搬运40B后填充24B使其64字节对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
