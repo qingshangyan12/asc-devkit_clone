@@ -41,7 +41,7 @@
 - 样例执行
   ```bash
   mkdir -p build && cd build;
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程（默认npu模式）
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）
   ./demo
   ```
 
