@@ -142,6 +142,8 @@
                 -   [Conv2D（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Conv2D（废弃）.md)
                 -   [Gemm（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）.md)
         -   [Memory矢量计算](SIMD-API/基础API/Memory矢量计算/Memory矢量计算.md)
+            -   [Vector逻辑架构](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Vector逻辑架构.md)
+
             -   [SIMD计算说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/SIMD计算说明.md)
                 -   [概述](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/概述.md)
                 -   [连续计算](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/连续计算.md)
@@ -543,6 +545,7 @@
 
 
         -   [缓存控制](SIMD-API/基础API/缓存控制/缓存控制.md)
+            -   [系统缓存概述](SIMD-API/基础API/缓存控制/系统缓存概述.md)
             -   [DataCachePreload](SIMD-API/基础API/缓存控制/DataCachePreload.md)
             -   [DataCacheCleanAndInvalid](SIMD-API/基础API/缓存控制/DataCacheCleanAndInvalid.md)
             -   [ICachePreLoad\(ISASI\)](SIMD-API/基础API/缓存控制/ICachePreLoad(ISASI).md)
