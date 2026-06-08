@@ -422,7 +422,7 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
-    void* kfcServerArgs = nullptr;        // kfc server算子入参
+    std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()

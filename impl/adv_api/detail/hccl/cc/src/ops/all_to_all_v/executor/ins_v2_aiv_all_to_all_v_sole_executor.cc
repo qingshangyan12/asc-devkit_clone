@@ -9,9 +9,6 @@
  */
 
 #include "ins_v2_aiv_all_to_all_v_sole_executor.h"
-#ifndef AICPU_COMPILE
-#include "aiv_temp_all_to_all_v_mesh_1D.h"
-#endif
 
 #define CONST_ZERO 0
 #define CONST_ONE 1
@@ -288,8 +285,4 @@ HcclResult InsV2AivAlltoAllVSoleExecutor<AlgTopoMatch, InsAlgTemplate>::FastLaun
 }
 #endif
 
-#ifndef AICPU_COMPILE
-    REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLTOALLV, AivAlltoAllVMesh1D, InsV2AivAlltoAllVSoleExecutor, TopoMatch1D,
-                     AivTempAlltoAllVMesh1D);
-#endif
 }  // namespace Hccl

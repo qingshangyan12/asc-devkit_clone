@@ -347,8 +347,10 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[0];
     CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
     CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
-    CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs ==nullptr,
+    CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
 
-    return HcommCcuKernelLaunch(threadHandle, kernelHandle, resourceCtx.kfcServerArgs, resourceCtx.kfcServerArgSize);
+    const void *kfcArgs = resourceCtx.kfcServerArgs.empty() ? nullptr :
+        static_cast<const void *>(resourceCtx.kfcServerArgs.data());
+    return HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
 }

@@ -501,7 +501,8 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         };
         resCtxHost->kfcServerArgSize = 6;
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused,
+        ResPackGraphMode()));
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
 }

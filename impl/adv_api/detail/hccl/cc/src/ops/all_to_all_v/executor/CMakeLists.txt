@@ -20,6 +20,6 @@ if(NOT HCCL_CANN_COMPAT_850)
     )
 endif()
 
-target_sources(hccl PRIVATE
+target_sources(mc2_client PRIVATE
     ${src_list}
 )
