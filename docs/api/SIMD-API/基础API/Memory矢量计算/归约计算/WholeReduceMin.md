@@ -197,10 +197,10 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
--   操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#section668772811100)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
+-   操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 
--   dst结果存储顺序由order决定，默认为最值，最值索引。返回结果中索引index数据按照dst的数据类型进行存储，比如dst使用half类型时，index按照half类型进行存储，读取时需要使用reinterpret\_cast方法转换到整数类型。若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。比如[调用示例](#section642mcpsimp)中，前两个计算结果为\[9.980e-01 5.364e-06\]，5.364e-06需要使用reinterpret\_cast方法转换得到索引值90。特别地，针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，ORDER\_ONLY\_INDEX（仅返回最值索引）情况下，读取index时都需要使用reinterpret\_cast<uint32\_t\*\>。针对Ascend 950PR/Ascend 950DT，ORDER\_ONLY\_INDEX（仅返回最值索引）情况下，当操作数数据类型为uint16\_t/int16\_t/half时，读取index都需要使用reinterpret\_cast<uint32\_t\*\>。
+-   dst结果存储顺序由order决定，默认为最值，最值索引。返回结果中索引index数据按照dst的数据类型进行存储，比如dst使用half类型时，index按照half类型进行存储，读取时需要使用reinterpret\_cast方法转换到整数类型。若输入数据类型是half，需要使用reinterpret\_cast<uint16\_t\*\>，若输入是float，需要使用reinterpret\_cast<uint32\_t\*\>。比如[调用示例](#调用示例)中，前两个计算结果为\[9.980e-01 5.364e-06\]，5.364e-06需要使用reinterpret\_cast方法转换得到索引值90。特别地，针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，ORDER\_ONLY\_INDEX（仅返回最值索引）情况下，读取index时都需要使用reinterpret\_cast<uint32\_t\*\>。针对Ascend 950PR/Ascend 950DT，ORDER\_ONLY\_INDEX（仅返回最值索引）情况下，当操作数数据类型为uint16\_t/int16\_t/half时，读取index都需要使用reinterpret\_cast<uint32\_t\*\>。
 -   针对不同场景合理使用归约指令可以带来性能提升，相关介绍请参考[选择低延迟指令，优化归约操作性能](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/算子实践参考/SIMD算子性能优化/矢量计算/选择低延迟指令-优化归约操作性能.md)，具体样例请参考[ReduceCustom](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_libraries/04_reduce/reduce)。
 
 ## 调用示例<a name="section642mcpsimp"></a>

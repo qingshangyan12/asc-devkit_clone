@@ -71,7 +71,7 @@ __aicore__ inline uint32_t GetSize() const
 
 ## 调用示例<a name="section17531157161314"></a>
 
-参考[调用示例](LocalTensor构造函数.md#section17531157161314)。
+参考[调用示例](LocalTensor构造函数.md#调用示例)。
 
 ```
 // 示例

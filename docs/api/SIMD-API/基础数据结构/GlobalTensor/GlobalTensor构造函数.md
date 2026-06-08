@@ -86,5 +86,5 @@ __aicore__ inline GlobalTensor<T>() {}
 
 ## 调用示例<a name="section17531157161314"></a>
 
-参考[调用示例](SetGlobalBuffer.md#section17531157161314)。
+参考[调用示例](SetGlobalBuffer.md#调用示例)。
 

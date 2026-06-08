@@ -98,5 +98,5 @@ offset值不可超出EXTERN\_IMPL\_BUFPOOL中定义的BUFID\_SIZE大小，用户
 
 ## 调用示例<a name="section1234017553610"></a>
 
-请参考[调用示例](EXTERN_IMPL_BUFPOOL宏.md#section1234017553610)。
+请参考[调用示例](EXTERN_IMPL_BUFPOOL宏.md#调用示例)。
 

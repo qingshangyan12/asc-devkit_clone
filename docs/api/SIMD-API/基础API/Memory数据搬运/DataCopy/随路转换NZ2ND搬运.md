@@ -59,7 +59,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 ```
 
 > [!NOTE]说明 
->各原型支持的具体数据通路和数据类型，请参考[支持的通路和数据类型](#section189171223121916)。
+>各原型支持的具体数据通路和数据类型，请参考[支持的通路和数据类型](#支持的通路和数据类型)。
 
 ## 参数说明<a name="section14983445508"></a>
 
@@ -74,7 +74,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 </thead>
 <tbody><tr id="row4961205811416"><td class="cellrowborder" valign="top" width="14.729999999999999%" headers="mcps1.2.3.1.1 "><p id="p29619586417"><a name="p29619586417"></a><a name="p29619586417"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p996110583417"><a name="p996110583417"></a><a name="p996110583417"></a>源操作数或者目的操作数的数据类型。支持的数据类型请参考<a href="#section189171223121916">支持的通路和数据类型</a>。</p>
+<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p996110583417"><a name="p996110583417"></a><a name="p996110583417"></a>源操作数或者目的操作数的数据类型。支持的数据类型请参考<a href="#支持的通路和数据类型">支持的通路和数据类型</a>。</p>
 </td>
 </tr>
 </tbody>
@@ -199,7 +199,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 支持的通路和数据类型<a name="section189171223121916"></a>
 
-下文的数据通路均通过逻辑位置[TPosition](../../../其他数据类型/TPosition.md#table5376122715308)来表达，并注明了对应的物理通路。TPosition与物理内存的映射关系见[表1](../../../通用说明和约束.md#table07372185712)。
+下文的数据通路均通过逻辑位置[TPosition](../../../其他数据类型/TPosition.md#TPosition)来表达，并注明了对应的物理通路。TPosition与物理内存的映射关系见[表1](../../../通用说明和约束.md#逻辑位置和物理存储的映射关系)。
 
 **表 4**  Local Memory -\> Global Memory具体通路和支持的数据类型
 

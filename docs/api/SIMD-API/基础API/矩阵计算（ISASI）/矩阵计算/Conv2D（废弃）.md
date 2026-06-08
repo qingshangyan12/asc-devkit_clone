@@ -610,5 +610,5 @@ __aicore__ inline Conv2dTilling GetConv2dTiling(Conv2dParams& conv2dParams)
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   该接口当前不支持W=Kw并且H\>Kh的场景，其将产生不可预期的结果。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
 

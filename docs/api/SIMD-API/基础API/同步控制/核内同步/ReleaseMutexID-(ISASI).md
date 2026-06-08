@@ -90,5 +90,5 @@ __aicore__ inline void ReleaseMutexID(MutexID id)
 
 ## 调用示例<a name="section837496171220"></a>
 
-请参考[调用示例](AllocMutexID-(ISASI).md#section837496171220)。
+请参考[调用示例](AllocMutexID-(ISASI).md#调用示例)。
 

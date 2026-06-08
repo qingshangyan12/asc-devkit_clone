@@ -97,7 +97,7 @@ template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, co
 using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 ```
 
--   A\_TYPE、B\_TYPE、C\_TYPE类型信息通过[MatmulType](Matmul使用说明.md#table1188045714378)来定义。
+-   A\_TYPE、B\_TYPE、C\_TYPE类型信息通过[MatmulType](Matmul使用说明.md#Matmul使用说明)来定义。
 -   auto类型的参数MM\_CFG（可选）：
     -   支持MatmulConfig类型：
 

@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-用于配置IBShare模板的参数，获取自定义IBShare模板。IBShare模板的介绍请参考[表 模板特性](MatmulConfig.md#table6981133810309)。
+用于配置IBShare模板的参数，获取自定义IBShare模板。IBShare模板的介绍请参考[表 模板特性](MatmulConfig.md#MatmulConfig)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -69,7 +69,7 @@ __aicore__ constexpr MatmulConfig GetIBShareNormConfig(const bool intrinsicsLimi
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#table1761013213153)中的参数，其中互相对应的参数的功能作用相同。
+本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#MatmulConfig)中的参数，其中互相对应的参数的功能作用相同。
 
 **表 1**  接口参数说明
 
@@ -147,7 +147,7 @@ __aicore__ constexpr MatmulConfig GetIBShareNormConfig(const bool intrinsicsLimi
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-[MatmulConfig结构体](MatmulConfig.md#table1761013213153)。
+[MatmulConfig结构体](MatmulConfig.md#MatmulConfig)。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

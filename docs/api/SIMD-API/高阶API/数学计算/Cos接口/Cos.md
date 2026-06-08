@@ -72,7 +72,7 @@ Cos\(x\)的泰勒展开式为：
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
-| isReuseSource | 是否允许修改源操作数，默认值为false。该参数仅在输入的数据类型为float时生效。<br>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时复用srcTensor的内存空间，节省部分内存空间；false：本接口内部计算时不复用srcTensor的内存空间。<br><br>isReuseSource的使用样例请参考[更多样例](../更多样例-83.md#section639165323915)。 |
+| isReuseSource | 是否允许修改源操作数，默认值为false。该参数仅在输入的数据类型为float时生效。<br>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时复用srcTensor的内存空间，节省部分内存空间；false：本接口内部计算时不复用srcTensor的内存空间。<br><br>isReuseSource的使用样例请参考[更多样例](../更多样例-83.md#样例四)。 |
 | config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br><br>Cos算法的相关配置。此参数可选配，CosConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Cos内部实现使用的算法。CosAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Cos接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Cos接口，支持输入全值域，支持的数据类型为half、float。 |
 
 ```
@@ -108,7 +108,7 @@ enum class CosAlgo {
 
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
 
 ## 调用示例
 

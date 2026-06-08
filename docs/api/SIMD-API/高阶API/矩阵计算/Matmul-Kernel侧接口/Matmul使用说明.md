@@ -477,7 +477,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 
     用户可以选择以下三种调用方式之一。
 
-    -   调用[Iterate](Iterate.md#li135771283591)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
+    -   调用[Iterate](Iterate.md#函数原型)完成单次迭代计算，叠加while循环完成单核全量数据的计算。Iterate方式，可以自行控制迭代次数，完成所需数据量的计算，方式比较灵活。
 
         ```
         // API接口内部会进行循环结束条件判断处理
@@ -492,7 +492,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
         mm.IterateAll(gm_c);
         ```
 
-    -   用户申请用于存放矩阵乘结果的逻辑位置CO1内存，调用一次或多次[Iterate](Iterate.md#li4843165185812)完成单次或多次迭代计算，在需要搬出计算结果时，调用[Fixpipe](../../../基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)接口完成CO1上计算结果的搬运，然后释放申请的CO1内存。该方式下，用户可以灵活控制计算和搬运的节奏，根据实际需要，一次计算对应一次结果的搬出，或者将多次计算结果缓存在CO1内存中，再一次性搬出计算结果。
+    -   用户申请用于存放矩阵乘结果的逻辑位置CO1内存，调用一次或多次[Iterate](Iterate.md#函数原型)完成单次或多次迭代计算，在需要搬出计算结果时，调用[Fixpipe](../../../基础API/矩阵计算（ISASI）/数据搬运/Fixpipe.md)接口完成CO1上计算结果的搬运，然后释放申请的CO1内存。该方式下，用户可以灵活控制计算和搬运的节奏，根据实际需要，一次计算对应一次结果的搬出，或者将多次计算结果缓存在CO1内存中，再一次性搬出计算结果。
 
         在此种调用方式下，创建Matmul对象时，必须定义C矩阵的内存逻辑位置为TPosition::CO1、数据排布格式为CubeFormat::NZ、数据类型为float或int32\_t。
 
@@ -584,7 +584,7 @@ Kernel侧实现Matmul矩阵乘运算的步骤概括为：
 对于上表中相关参数和概念的补充说明如下：
 
 -   float/int32\_t数据类型的C0\_size为8，half/bfloat16\_t数据类型的C0\_size为16，int8\_t/fp8\_e4m3fn\_t/fp8\_e5m2\_t/hifloat8\_t数据类型的C0\_size为32，int4b\_t/fp4x2\_e2m1\_t/fp4x2\_e1m2\_t数据类型的C0\_size为64。
--   channel\_split功能通过[MatmulConfig](MatmulConfig.md#table1761013213153)中的isEnableChannelSplit参数配置，具体内容请参考[MatmulConfig](MatmulConfig.md#table1761013213153)。
+-   channel\_split功能通过[MatmulConfig](MatmulConfig.md#MatmulConfig)中的isEnableChannelSplit参数配置，具体内容请参考[MatmulConfig](MatmulConfig.md#MatmulConfig)。
 
 ## 需要包含的头文件<a name="section1682364117469"></a>
 

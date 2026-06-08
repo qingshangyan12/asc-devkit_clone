@@ -170,7 +170,7 @@ Init主要用于对Matmul对象中的Tiling数据进行初始化，根据Tiling�
     无。
 
 -   Tiling参数传入GM地址的接口：
-    -   仅支持Matmul Tiling参数的[部分常量化](GetMatmulApiTiling.md#section618mcpsimp)场景。
+    -   仅支持Matmul Tiling参数的[部分常量化](GetMatmulApiTiling.md)场景。
     -   不支持CPU域调试。
 
 ## 调用示例<a name="section1665082013318"></a>

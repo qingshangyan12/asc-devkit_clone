@@ -44,9 +44,9 @@ __aicore__ inline void Concat(LocalTensor<T> &concat, const LocalTensor<T> &src,
 
 ## 约束说明
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#通用地址对齐约束)。
 
 ## 调用示例
 
-请参见[MrgSort](MrgSort-93.md)的[调用示例](MrgSort-93.md#section642mcpsimp)。
+请参见[MrgSort](MrgSort-93.md)的[调用示例](MrgSort-93.md#调用示例)。
 

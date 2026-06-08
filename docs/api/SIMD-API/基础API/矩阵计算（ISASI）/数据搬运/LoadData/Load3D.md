@@ -122,7 +122,7 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
    bool isSetPadding = true;
 }; </pre>
 <p id="p165915548368"><a name="p165915548368"></a><a name="p165915548368"></a>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考<a href="#table679014222918">表3</a>、<a href="#table193501032193419">表4</a>）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过<a href="../SetFmatrix.md">SetFmatrix</a>进行设置。</p>
-<p id="p3104316173910"><a name="p3104316173910"></a><a name="p3104316173910"></a>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考<a href="#table679014222918">表3</a>、<a href="#table193501032193419">表4</a>）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过<a href="../SetLoadDataPaddingValue.md">SetLoadDataPaddingValue</a>进行设置。可参考样例<a href="../SetFmatrix.md#section642mcpsimp">调用示例</a>。</p>
+<p id="p3104316173910"><a name="p3104316173910"></a><a name="p3104316173910"></a>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考<a href="#table679014222918">表3</a>、<a href="#table193501032193419">表4</a>）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过<a href="../SetLoadDataPaddingValue.md">SetLoadDataPaddingValue</a>进行设置。可参考样例<a href="../SetFmatrix.md#调用示例">调用示例</a>。</p>
 <p id="p661153174917"><a name="p661153174917"></a><a name="p661153174917"></a>该参数的默认值如下：</p>
 <a name="screen1862315313517"></a><a name="screen1862315313517"></a><pre class="screen" codetype="Cpp" id="screen1862315313517">constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>
 </td>
@@ -471,7 +471,7 @@ Load3D用于完成image to column操作，将多维feature map转为二维矩阵
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#通用地址对齐约束)。
 
 -   LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为 4 channel对齐。
 -   调用Load3Dv2/Load3Dv2Pro指令需要通过[SetLoadDataRepeat](../SetLoadDataRepeat.md)接口配置dstStride，若不使能repeat模式，接口内repeat相关参数使用默认构造值。

@@ -69,7 +69,7 @@ __aicore__ inline void WaitIterateBatch()
 
 -   配套[IterateBatch](IterateBatch.md)或[IterateNBatch](IterateNBatch.md)异步接口使用。
 -   仅支持连续输出至Global Memory。
--   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#p9218181073719)设置为true，不支持使用该接口。
+-   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#MatmulConfig)设置为true，不支持使用该接口。
 
 ## 调用示例<a name="section8978338124420"></a>
 

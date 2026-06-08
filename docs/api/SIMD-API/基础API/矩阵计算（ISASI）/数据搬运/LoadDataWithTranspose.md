@@ -371,7 +371,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 -   repeat=0表示不执行搬运操作。
 -   开发者需要保证目的操作数转置后的分形没有重叠。
--   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)。
 -   针对以下型号，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
     -   Ascend 950PR/Ascend 950DT
 

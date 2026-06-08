@@ -2,7 +2,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-获取Tiling计算得到的baseN值。baseN参数的说明请参考[表1](TCubeTiling结构体.md#table1563162142915)。
+获取Tiling计算得到的baseN值。baseN参数的说明请参考[表1](TCubeTiling结构体.md#TCubeTiling结构体)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

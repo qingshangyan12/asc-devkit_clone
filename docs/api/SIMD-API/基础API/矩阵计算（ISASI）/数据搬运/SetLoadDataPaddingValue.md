@@ -104,5 +104,5 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-参考[调用示例](SetFmatrix.md#section642mcpsimp)
+参考[调用示例](SetFmatrix.md#调用示例)
 

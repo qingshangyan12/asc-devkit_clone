@@ -59,9 +59,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-灵活的自定义Matmul模板参数配置。通过设置[MatmulConfigMode](#table17837129144319)、[MatmulShapeParams](#table16317184295116)、[MatmulQuantParams](#table8313111211573)、[MatmulBatchParams](#table15129204644)、[MatmulFuncParams](#table66217141862)，获取自定义的[MatmulConfig](MatmulConfig.md#table1761013213153)。
+灵活的自定义Matmul模板参数配置。通过设置[MatmulConfigMode](#table17837129144319)、[MatmulShapeParams](#table16317184295116)、[MatmulQuantParams](#table8313111211573)、[MatmulBatchParams](#table15129204644)、[MatmulFuncParams](#table66217141862)，获取自定义的[MatmulConfig](MatmulConfig.md#MatmulConfig)。
 
-MatmulConfigMode指定了获取并要修改的MatmulConfig模板，各模板介绍请参考[模板特性](MatmulConfig.md#table6981133810309)；用户根据使用需求通过设置可变参数，即一个或多个任意顺序的MatmulShapeParams、MatmulQuantParams、MatmulBatchParams、MatmulFuncParams，修改该MatmulConfig模板的相应参数配置。相比[GetNormalConfig](GetNormalConfig.md)、[GetMDLConfig](GetMDLConfig.md)等获取模板的接口，该接口提供了更灵活的自定义Matmul模板参数的配置方式。
+MatmulConfigMode指定了获取并要修改的MatmulConfig模板，各模板介绍请参考[模板特性](MatmulConfig.md#MatmulConfig)；用户根据使用需求通过设置可变参数，即一个或多个任意顺序的MatmulShapeParams、MatmulQuantParams、MatmulBatchParams、MatmulFuncParams，修改该MatmulConfig模板的相应参数配置。相比[GetNormalConfig](GetNormalConfig.md)、[GetMDLConfig](GetMDLConfig.md)等获取模板的接口，该接口提供了更灵活的自定义Matmul模板参数的配置方式。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -485,7 +485,7 @@ __aicore__ inline constexpr MatmulConfig GetMMConfig(ArgTypes&&... args)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-[MatmulConfig结构体](MatmulConfig.md#table1761013213153)。
+[MatmulConfig结构体](MatmulConfig.md#MatmulConfig)。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

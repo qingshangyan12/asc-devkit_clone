@@ -582,7 +582,7 @@ struct AscendDeQuantParam {
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   **不支持源操作数与目的操作数地址重叠。**
--   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#通用地址对齐约束)。
 -   PER\_TOKEN/PER\_GROUP场景，连续计算方向（即n方向）的数据量要求32B对齐。
 -   <a name="li17926145114504"></a>非PER\_TOKEN/PER\_GROUP场景dstTensor支持的数据类型
 

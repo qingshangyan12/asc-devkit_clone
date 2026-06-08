@@ -84,4 +84,4 @@ __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, Local
 
 ## 调用示例<a name="section177231425115410"></a>
 
-完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#section177231425115410)。
+完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#调用示例)。
