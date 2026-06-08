@@ -245,7 +245,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 - src0=bank0，dst=bank1 ,Case 6 vs Case 7 性能几乎无差异，进一步印证 351x 上 VF 层面 bank 冲突不是瓶颈。
 
-## Case 8：离散访存，Gather指令的数据索引在[0..7]重复
+## Case 8：离散读写，Gather指令的数据索引在[0..7]重复
 
 ### 地址解码
 
@@ -268,7 +268,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 - Gather 从 data 中按 index 取 64 个元素：index 仅有 [0..7] 共 8 个 unique 值，很多元素命中相同地址 → 触发硬件优化。
 - 每 subbank 仅 2 个 unique addr，读取 2 次即完成，**无 subbank 冲突**。性能为 39,605 cycles。
 
-## Case 9：离散访存，Gather指令的数据索引在[0..255]连续
+## Case 9：离散读写，Gather指令的数据索引在[0..255]连续
 
 ### 地址解码
 
@@ -290,7 +290,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 - Gather 跨 8 个 bank 分散读取，每 subbank 仅 2 次读操作。连续 index 自然分散到不同 subbank，**无 subbank 冲突**。
 - 性能 39,613 cycles，与 Case 8 相当。
 
-## Case 10：离散访存，Gather指令的数据索引0,128交替
+## Case 10：离散读写，Gather指令的数据索引0,128交替
 
 ### 地址解码
 
@@ -308,7 +308,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 - Gather 命中**同 subbank + 不同起始地址**（相同 subbank，不同 depth 行），单读口需排队，取出时间翻倍。
 - Case 10 vs Case 11 = 45,782 vs 39,582 cycles（**+15.7%**）。
 
-## Case 11：离散访存，Gather指令的数据索引全为0，起始地址全部重叠
+## Case 11：离散读写，Gather指令的数据索引全为0，起始地址全部重叠
 
 ### 地址解码
 
@@ -379,11 +379,11 @@ i=7: src0[56..63], ..., src0[504..511]  → dst 同上
 
 ## 小结
 
-- **地址重叠收益最大**：Case 4 省一条 Load，比基准快 15.9%。
+- **起始地址不同时，二读一写必然会引发冲突**：对比Atlas A2/A3系列，Ascend 950PR/Ascend 950DT减少了一半的bank group，一条访存指令读/写256字节数据（刚好覆盖所有bank group），同一bank group必然存在二读一写。由于一个bank group最多支持二读或者一读一写，所以bank冲突必然发生。
+- **地址重叠有性能收益**：Case 4 省一条 Load，比基准快 15.9%。
 - **循环展开对冲突场景有正收益**：Case 1 vs Case 2 = 80,948 vs 86,249 cycles（+6.5%）。
 - **双搬入无收益**：Case 5 vs Case 1 = 89,893 vs 80,948 cycles（慢 11.0%），Ascend 950PR/Ascend 950DT 上读读冲突不是瓶颈。
-- **VF 层面 bank 冲突不可测**（Case 1 vs 3，Case 6 vs 7 差异在噪声范围）：Ascend 950PR/Ascend 950DT 低位交织 + 2读口/BG + 8 DB 分散到 8 个 BG 使冲突容错性大幅提升。
-- **调优优先级**：地址重叠/复用 > 避免 subbank 不同行冲突 > 标量指令优化 > 地址间隔。
+- **VF 层面 bank 冲突难以测量**（Case 1 vs 3，Case 6 vs 7 差异在噪声范围）：Ascend 950PR/Ascend 950DT 低位交织 + 2读口/BG + 8 DB 分散到 8 个 BG 使冲突容错性大幅提升。
 
 ## 目录结构
 
