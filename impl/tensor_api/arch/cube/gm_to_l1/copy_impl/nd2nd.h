@@ -47,7 +47,7 @@ private:
     __aicore__ inline static constexpr void CheckTemplate()
     {
         CheckLayoutPattern<U, T>();
-        CheckDataType::CheckGm2L1AlignV2NDDataType<T, U>();
+        CheckDataType::CheckGm2L1AlignV2NDDataType<T, U>(); // todo
     }
 
     template <const CopyGM2L1Trait& trait, typename T, typename U>
@@ -150,32 +150,19 @@ private:
         uint32_t matrixElems = srcShapeRows * srcShapeColumns;
         uint8_t cacheMode = src.Engine().GetCacheMode();
 
-        uint32_t blockCount;
-        uint32_t blockLen;
-        uint64_t srcStride;
-        uint32_t dstStride;
+        // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
+        uint32_t blockCount = batchSize;
+        uint32_t blockLen = matrixElems * sizeof(type);
+        uint64_t srcStride = srcBatchStride * sizeof(type);
+        uint32_t dstStride = dstBatchStride * sizeof(type);
 
-        if (srcBatchStride == matrixElems && dstBatchStride == matrixElems) {
-            // batches are contiguous on both sides: fold to one B*M*N block.
-            blockCount = 1;
-            blockLen = batchSize * matrixElems * sizeof(type);
-            srcStride = 0;
-            dstStride = blockLen;
-        } else {
-            // batch-strided: B blocks, stride = per-matrix start-to-start in bytes.
-            blockCount = batchSize;
-            blockLen = matrixElems * sizeof(type);
-            srcStride = srcBatchStride * sizeof(type);
-            dstStride = dstBatchStride * sizeof(type);
-        }
-
-        if constexpr (IsB4Type<type>) {
+        if constexpr (IsB4Type<type>) {  // todo
             // move fp4 as b8, need to be divided by 2
             blockLen = blockLen >> 1;
             srcStride = srcStride >> 1;
             dstStride = dstStride >> 1;
         }
-        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride);
+        CopyGmToCbufAlignV2Base::DataCopy(dst, src, blockCount, blockLen, 0, 0, cacheMode, srcStride, dstStride); //换成nd2nz
     }
 };
 } // namespace Te
