@@ -229,7 +229,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
     CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));
-    HCCL_INFO("[CcuSelectAlg]AllocCcuOpResCtx successfully!");
+    HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
 
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
