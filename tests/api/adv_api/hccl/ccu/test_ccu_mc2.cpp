@@ -401,20 +401,23 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx;
     resourceCtx.DeSerialize(seq);
 
-    // kfcServerArgs应包含6个uint64_t元素
+    // kfcServerArgs应包含6个uint64_t元素（xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token）
+    // 前填5字段在AcquireAlgResources中完成，kfcServerArgSize=6预留token位置
+    // 第6字段token在GetAlgResCcu内的HcclAllocAlgResourceCcu中填充
     ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
-    // waitAddr = ckeAddr
-    EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.ckeAddr);
-    // recordAddr = ckeAddr + CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE
-    EXPECT_EQ(resourceCtx.kfcServerArgs[1],
-              opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE);
-    // paramAddr = xnAddr
-    EXPECT_EQ(resourceCtx.kfcServerArgs[2], opResCtx.xnAddr);
+    EXPECT_EQ(resourceCtx.kfcServerArgSize, 6U);
+    
+    // xnAddr
+    EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.xnAddr);
+    // ckeAddr
+    EXPECT_EQ(resourceCtx.kfcServerArgs[1], opResCtx.ckeAddr);
     // dieNum = 1
+    EXPECT_EQ(resourceCtx.kfcServerArgs[2], 1U);
+    // missionNum = 1
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
-    // missonNum = 1
-    EXPECT_EQ(resourceCtx.kfcServerArgs[4], 1U);
-    // missonIndex = 0
+    // missionIndex = 0
+    EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
+    // token (由GetTokenFromBuffInfo获取，模拟环境无实际buffer故为0)
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], 0U);
 
     free(resCtxOut);

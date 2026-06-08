@@ -15,7 +15,7 @@
 #include <cstdlib>  // 包含getenv函数
 #include <cstring>  // 包含strcmp函数
 #include <stdexcept>
-#include <hccl/hccl_types.h>
+#include "hccl/hccl_types.h"
 #include "hccl/base.h"
 #include "sal.h"
 #include "error_codes/rt_error_codes.h"
@@ -43,6 +43,7 @@
 #include "cann_host_bridge.h"
 #include "ccu_launch_dl.h"
 #include "ccu_log.h"
+#include "hcomm/ccu/ccu_assist_pub.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1072,6 +1073,21 @@ HcclResult GetGraphModeBuffers(HcclComm comm, ChannelHandle channelHandle, const
     return HCCL_SUCCESS;
 }
 
+static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
+{
+    if (bufferAddr != nullptr) {
+        uint64_t token = hcomm::CcuRep::GetTokenInfo(
+            reinterpret_cast<uint64_t>(bufferAddr),
+            bufferSize);
+        HCCL_INFO("[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]",
+            bufferAddr, bufferSize, token);
+        return token;
+    }
+    
+    HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
+    return 0;
+}
+
 HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
                         std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
                         AlgHierarchyInfoForAllLevel& algHierarchyInfo, void **resCtxSequence, uint64_t& ctxSize)
@@ -1108,6 +1124,11 @@ HcclResult HcclAllocAlgResourceCcu(HcclComm comm, const OpParam& param, AlgResou
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
+    
+    // 在确保 cclMem 可用的前提下，获取 token 并写入 kfcServerArgs 的第6个字段
+    uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
+    resCtxHost->kfcServerArgs.push_back(token);
+    
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;

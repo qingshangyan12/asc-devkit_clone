@@ -477,16 +477,6 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     return HCCL_SUCCESS;
 }
 
-static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
-{
-    HCCL_INFO("[GetTokenFormBuffInfo]start GetTokenFormBuffInfo!");
-    uint64_t workSpace = opResCtx.workSpace;
-    uint64_t workSpaceSize = opResCtx.workSpaceSize;
-    HCCL_INFO("[GetTokenInfo]start GetTokenInfo, workspace:[%u], workSpaceSize[%u]!", workSpace, workSpaceSize);
-    token = hcomm::CcuRep::GetTokenInfo(workSpace, workSpaceSize);
-    return HCCL_SUCCESS;
-}
-
 static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, OpResCtx &opResCtx, void **resCtxOut)
@@ -500,18 +490,24 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
+        // 先填充 kfcServerArgs 的前5个字段（不含 token），预留第6个位置给 token
         resCtxHost->kfcServerArgs = {
-            opResCtx.ckeAddr,
-            opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE,
             opResCtx.xnAddr,
+            opResCtx.ckeAddr,
             static_cast<uint64_t>(1),  // dieNum
             static_cast<uint64_t>(1),  // missonNum
             static_cast<uint64_t>(0),  // missonIndex
         };
-        resCtxHost->kfcServerArgSize = 6;
+        resCtxHost->kfcServerArgSize = 6;  // 总共6个参数（包括后续填充的 token）
+        
+        // 调用 HcclGetAlgRes 分配资源（包括 cclMem 和 token）
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        opParam.resCtx = *resCtxOut;
+    } else {
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        opParam.resCtx = *resCtxOut;
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
-    opParam.resCtx = *resCtxOut;
+    
     return HCCL_SUCCESS;
 }
 
