@@ -35,8 +35,8 @@ struct Cast {};
 #define ASCENDC_CAST_INST(CLASS_NAME, FUNC_NAME)                                                                 \
 class CLASS_NAME {                                                                                                   \
 public:                                                                                                              \
-    template <typename T>                                                                                            \
-    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask)                                         \
+    template <typename T, typename U>                                                                                            \
+    __simd_callee__ inline static void Run(T& dst, U src, vector_bool mask)                                         \
     {                                                                                                                \
         if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
             FUNC_NAME(dst, src, mask);                                                                               \
@@ -57,7 +57,6 @@ public:                                                                         
 #include "impl/tensor_api/arch/vector/cast/instruction/half_uint.h"
 #include "impl/tensor_api/arch/vector/cast/instruction/int_int.h"
 #include "impl/tensor_api/arch/vector/cast/instruction/int_uint.h"
-#include "impl/tensor_api/arch/vector/cast/instruction/rounding_ops.h"
 #include "impl/tensor_api/arch/vector/cast/instruction/uint_uint.h"
 
 
