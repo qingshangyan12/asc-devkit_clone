@@ -13,7 +13,7 @@
  * \brief
  */
 
-#include "include/adv_api/pad/broadcast_tiling.h"
+#include "../../../../include/adv_api/pad/broadcast_tiling.h"
 #include "../../detail/host_log.h"
 #include "graph/tensor.h"
 #include "tiling/platform/platform_ascendc.h"

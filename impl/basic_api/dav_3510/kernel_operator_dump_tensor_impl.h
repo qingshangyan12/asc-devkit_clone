@@ -25,8 +25,8 @@
 #include "kernel_operator_data_copy_impl.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_operator_print_impl.h"
-#include "impl/utils/debug/asc_aicore_dump_impl.h"
-#include "impl/utils/debug/asc_aicore_time_impl.h"
+#include "../../utils/debug/asc_aicore_dump_impl.h"
+#include "../../utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
 template <typename T>

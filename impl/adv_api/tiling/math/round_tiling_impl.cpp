@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "include/adv_api/math/round_tiling.h"
+#include "../../../../include/adv_api/math/round_tiling.h"
 
 #include "graph/tensor.h"
 #include "tiling/platform/platform_ascendc.h"

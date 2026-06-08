@@ -421,7 +421,7 @@ struct int4x2_t {
 #endif
 
 #if !defined(ASCENDC_CPU_DEBUG)
-#include "impl/utils/common_types.h"
+#include "../../utils/common_types.h"
 #endif
 
 namespace AscendC {

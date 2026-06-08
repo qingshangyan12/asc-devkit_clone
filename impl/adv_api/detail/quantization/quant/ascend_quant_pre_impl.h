@@ -24,7 +24,7 @@
 #define IMPL_QUANTIZATION_QUANT_ASCEND_QUANT_PRE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/quantization/ascend_quant_utils.h"
+#include "../../../../../include/adv_api/quantization/ascend_quant_utils.h"
 
 namespace AscendC {
 

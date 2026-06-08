@@ -25,7 +25,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "include/adv_api/reduce/sum_utils.h"
+#include "../../../../../include/adv_api/reduce/sum_utils.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/reduce/sum/sum_check.h"
 #endif // ASCENDC_CPU_DEBUG
