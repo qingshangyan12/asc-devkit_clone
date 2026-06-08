@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-支持GM与UB之间的连续数据搬运（GM->UB或UB->GM），数据在传输过程中保持原始格式和内容不变。
+支持GM与UB之间的连续数据搬运（GM -> UB或UB -> GM），数据在传输过程中保持原始格式和内容不变。
 
 具体支持的数据通路为:
 - Global Memory -> Unified Buffer
@@ -29,14 +29,14 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-- GM->UB
+- GM -> UB
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count)
     ```
 
-- UB->GM
+- UB -> GM
 
     ```cpp
     template <typename T>
@@ -66,7 +66,7 @@
 
 ## 数据类型<a name="section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致，GM->UB和UB->GM两个数据通路对同一产品支持的数据类型相同，具体如下：
+源操作数和目的操作数支持的数据类型保持一致，GM -> UB和UB -> GM两个数据通路对同一产品支持的数据类型相同，具体如下：
 
 <cann-filter npu-type="950">
 

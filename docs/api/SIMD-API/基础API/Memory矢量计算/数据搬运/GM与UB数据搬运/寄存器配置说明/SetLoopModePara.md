@@ -16,10 +16,13 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，需要和[ResetLoopModePara](ResetLoopModePara.md)搭配使用，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。支持的通路如下：
+DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，需要和[ResetLoopModePara](ResetLoopModePara.md)搭配使用，在数据搬运结束后通过ResetLoopModePara重置loop mode的参数。
 
-- GM-\>VECIN
-- VECOUT-\>GM
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+- Unified Buffer -> Global Memory
+    - VECOUT -> GM
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

@@ -16,9 +16,12 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-[DataCopyPad](../GMToUB非对齐数据搬运(DataCopyPad).md)从GM (Global Memory)将数据非对齐搬运至UB时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。支持的通路如下：
+[DataCopyPad](../GMToUB非对齐数据搬运(DataCopyPad).md)从GM (Global Memory)将数据非对齐搬运至UB时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。
 
-- GM-\>VECIN/GM-\>VECOUT
+具体支持的数据通路为:
+- Global Memory -> Unified Buffer
+    - GM -> VECIN
+    - GM -> VECOUT
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
