@@ -20,9 +20,10 @@
 
 支持UB与UB之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
 
-具体支持的数据通路为：
-- VECIN -> VECCALC
-- VECCALC -> VECOUT
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+- Unified Buffer -> Unified Buffer
+    - VECIN -> VECCALC
+    - VECCALC -> VECOUT
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
