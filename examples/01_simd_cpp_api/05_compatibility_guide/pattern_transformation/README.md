@@ -18,14 +18,14 @@
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
-|------|-------------|
+| ------ | ------------- |
 | Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
-```
+```text
 ├── pattern_transformation
 │   ├── scripts
 │   │   ├── gen_data.py                    // 输入数据和真值数据生成脚本
