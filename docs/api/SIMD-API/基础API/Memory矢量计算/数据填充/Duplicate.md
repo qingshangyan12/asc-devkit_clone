@@ -82,7 +82,7 @@ def Duplicate(scalarValue, dst, count):
         __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
         ```
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="950"> 
 - tensor前n个数据计算-源操作数为Tensor
 
     ```cpp
