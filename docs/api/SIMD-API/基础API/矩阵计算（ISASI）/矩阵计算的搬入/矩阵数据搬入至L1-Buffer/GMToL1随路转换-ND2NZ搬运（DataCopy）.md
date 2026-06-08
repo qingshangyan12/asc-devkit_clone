@@ -23,6 +23,7 @@
 ND到NZ的格式转换等价于DN到ZN的格式转换，如[图1](#zh-cn_topic_0000002566538879_fig444462417355)。
 
 **图 1**  ND2NZ与DN2ZN示意图<a id="zh-cn_topic_0000002566538879_fig444462417355"></a>
+
 ![](../../../../../figures/datacopy_gm2l1_nd2nz_copy.png)
 
 ## 函数原型<a id="zh-cn_topic_0000002566538879_section82039854412"></a>
@@ -208,7 +209,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
-**图 4**  enableSmallC0开启模式下的ND2NZ转换示意图 （half数据类型）<a name="fig07641913195410"></a>  
+**图 4**  enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>  
 
 ![](../../../../../figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 

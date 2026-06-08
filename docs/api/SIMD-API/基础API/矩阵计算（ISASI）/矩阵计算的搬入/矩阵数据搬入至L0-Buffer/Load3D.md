@@ -27,6 +27,7 @@ Load3D仅支持如下数据通路：L1 Buffer->L0A Buffer; L1 Buffer->L0B Buffer
 实现原理可参考伪代码：[Load3D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0/scripts/load3d.py)。
 
 **图 1**  Load3D to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
+
 ![](../../../../../figures/load3d_l1tol0a_demo.png "Load3D-to-L0A Buffer功能示意图")
 
 ## 函数原型<a id="zh-cn_topic_0000002512171652_section82039854412"></a>
@@ -377,6 +378,7 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 对应的feature map格式如下图：
 
 **图 2**  feature map格式<a id="zh-cn_topic_0000002512171652_fig8137131714319"></a>  
+
 ![](../../../../../figures/feature-map格式.png "feature-map格式")
 
 对应的filter的格式如下图：
@@ -384,11 +386,13 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 其中n为filter的个数，可以看出维度排布为(Hk,Wk,Ci,n)，但是需要注意的是下图的格式还需要根据Mmad中B矩阵的格式转换。
 
 **图 3**  filter的格式<a id="zh-cn_topic_0000002512171652_fig1395194710496"></a>  
+
 ![](../../../../../figures/filter的格式.png "filter的格式")
 
 实际操作中，由于存储空间或者计算能力限制，我们通常会将整个卷积计算分块，一次只搬运并计算一小块数据。
 
 **图 4**  卷积计算分块<a id="zh-cn_topic_0000002512171652_fig5278110624"></a>  
+
 ![](../../../../../figures/卷积计算分块.png "卷积计算分块")
 
 对于A2的feature map来说有两种方案，水平分块和垂直分块。分别对应参数中repeatMode的0和1。
@@ -398,11 +402,13 @@ isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padV
 repeatMode =0时，每次repeat会改变在filter窗口中读取数据点的位置，然后跳到下一个C0的位置。
 
 **图 5**  repeatMode = 0 时的filter窗口<a id="zh-cn_topic_0000002512171652_fig11710143294513"></a>  
+
 ![](../../../../../figures/repeatMode-0-时的filter窗口.png "repeatMode-0-时的filter窗口")
 
 repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个repeat在feature map中前进C0个元素。
 
 **图 6**  repeatMode = 1 时的filter窗口<a id="zh-cn_topic_0000002512171652_fig1648315981717"></a>  
+
 ![](../../../../../figures/repeatMode-1-时的filter窗口.png "repeatMode-1-时的filter窗口")
 
 ## 调用示例<a id="zh-cn_topic_0000002512171652_section088124295117"></a>
