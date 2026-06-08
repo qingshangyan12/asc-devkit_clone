@@ -49,13 +49,17 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-根据mask对输入数据dstReg、srcReg、scalarValue按元素做乘加操作，将结果写入dstReg。计算公式如下：
+头文件引用路径为 "basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_ternary\_scalar\_intf.h"。
 
-![](../../../../figures/zh-cn_formulaimage_0000002523920653.png)
+该接口根据mask对dstReg、srcReg和标量scalarValue按元素执行乘加操作，将结果写入dstReg。计算公式如下：
+
+$$
+dstReg_i = scalarValue \times srcReg_i + dstReg_i
+$$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
 __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, MaskReg& mask)
 ```
@@ -64,97 +68,49 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 
 **表1**  模板参数说明
 
-<a name="table4835205712588"></a>
-<table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.27%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="81.73%" id="mcps1.2.3.1.2"><p id="p583535795817"><a name="p583535795817"></a><a name="p583535795817"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1835857145817"><td class="cellrowborder" valign="top" width="18.27%" headers="mcps1.2.3.1.1 "><p id="p5835457165816"><a name="p5835457165816"></a><a name="p5835457165816"></a>T</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.73%" headers="mcps1.2.3.1.2 "><p id="p168351657155818"><a name="p168351657155818"></a><a name="p168351657155818"></a>操作数数据类型。</p>
-<p id="p1940551913268"><a name="p1940551913268"></a><a name="p1940551913268"></a><span id="ph240501915267"><a name="ph240501915267"></a><a name="ph240501915267"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half/float/uint64_t/int64_t</p>
-</td>
-</tr>
-<tr id="row553324655815"><td class="cellrowborder" valign="top" width="18.27%" headers="mcps1.2.3.1.1 "><p id="p127754478583"><a name="p127754478583"></a><a name="p127754478583"></a>U</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.73%" headers="mcps1.2.3.1.2 "><p id="p1775118537244"><a name="p1775118537244"></a><a name="p1775118537244"></a>标量源操作数的数据类型。</p>
-<p id="p47157331012"><a name="p47157331012"></a><a name="p47157331012"></a><span id="ph18715233918"><a name="ph18715233918"></a><a name="ph18715233918"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half/float/uint64_t/int64_t</p>
-</td>
-</tr>
-<tr id="row18835145716587"><td class="cellrowborder" valign="top" width="18.27%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>mode</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.73%" headers="mcps1.2.3.1.2 "><p id="p77520541653"><a name="p77520541653"></a><a name="p77520541653"></a>选择MERGING模式或ZEROING模式。当前仅支持ZEROING模式。</p>
-<a name="ul1163765616511"></a><a name="ul1163765616511"></a><ul id="ul1163765616511"><li>ZEROING，mask未选中的元素在dst中置零。仅支持该模式。</li></ul>
-</td>
-</tr>
-<tr id="row12899183713202"><td class="cellrowborder" valign="top" width="18.27%" headers="mcps1.2.3.1.1 "><p id="p916243141912"><a name="p916243141912"></a><a name="p916243141912"></a>S</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.73%" headers="mcps1.2.3.1.2 "><p id="p15901115914145"><a name="p15901115914145"></a><a name="p15901115914145"></a><span id="ph19851723182011"><a name="ph19851723182011"></a><a name="ph19851723182011"></a>目的操作数的RegTensor类型，例如RegTensor&lt;half&gt;，由编译器自动推导，用户不需要填写。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+| :----- | :--- |
+| T | 操作数数据类型。 |
+| U | 标量源操作数的数据类型。 |
+| mode | 选择MERGING模式或ZEROING模式。当前仅支持ZEROING模式：mask未筛选的元素在dstReg中置零。 |
+| S | 目的操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.05%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p108051250181214"><a name="p108051250181214"></a><a name="p108051250181214"></a>dstReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p6389114616514"><a name="p6389114616514"></a><a name="p6389114616514"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-</td>
-</tr>
-<tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p19574165615129"><a name="p19574165615129"></a><a name="p19574165615129"></a>srcReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p7123111612517"><a name="p7123111612517"></a><a name="p7123111612517"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-<p id="p1484485824312"><a name="p1484485824312"></a><a name="p1484485824312"></a>两个源操作数的数据类型需要与目的操作数保持一致。</p>
-</td>
-</tr>
-<tr id="row11773440341"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p10132448173420"><a name="p10132448173420"></a><a name="p10132448173420"></a>scalarValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p151325484342"><a name="p151325484342"></a><a name="p151325484342"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p181326485341"><a name="p181326485341"></a><a name="p181326485341"></a>源操作数。</p>
-<p id="p157131671911"><a name="p157131671911"></a><a name="p157131671911"></a>类型为标量。</p>
-<p id="p813204817342"><a name="p813204817342"></a><a name="p813204817342"></a>两个源操作数的数据类型需要与目的操作数保持一致。</p>
-</td>
-</tr>
-<tr id="row19615183817191"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p1484519586432"><a name="p1484519586432"></a><a name="p1484519586432"></a>mask</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a><span id="ph15776181222"><a name="ph15776181222"></a><a name="ph15776181222"></a>源操作数元素操作的有效指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</span></p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dstReg | 输出 | 目的操作数和源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。数据类型需要与源操作数保持一致。 |
+| srcReg | 输入 | 源操作数。<br>类型为RegTensor。<br>数据类型需要与目的操作数保持一致。 |
+| scalarValue | 输入 | 源操作数。<br>类型为标量。<br>数据类型需要与目的操作数保持一致。 |
+| mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
+## 数据类型
+
+**表 3**  数据类型组合
+
+| srcReg | scalarValue | dstReg |
+| :----- | :---------- | :----- |
+| half | half | half |
+| float | float | float |
+| uint64_t | uint64_t | uint64_t |
+| int64_t | int64_t | int64_t |
+
+**int64_t、uint64_t为软仿数据类型。**
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
-dstReg和srcReg可以为同一个RegTensor。
+- 本接口支持寄存器重叠。
+- 本接口操作数为寄存器，不涉及地址对齐。
+- 本接口不修改全局寄存器的值。
+- 本接口支持的int64\_t、uint64\_t为软仿数据类型。
 
 ## 调用示例<a name="section98571172212"></a>
 
-```
+```cpp
 template<typename T, typename U>
 static __simd_vf__ inline void AxpyVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, U scalarValue, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
 {

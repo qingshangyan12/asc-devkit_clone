@@ -537,7 +537,8 @@
                 -   [ShiftLefts](SIMD-API/基础API/Reg矢量计算/逻辑计算/ShiftLefts.md)
                 -   [ShiftRights](SIMD-API/基础API/Reg矢量计算/逻辑计算/ShiftRights.md)
 
-            -   [复合计算](SIMD-API/基础API/Reg矢量计算/复合计算/复合计算-37.md)
+            -   [复合计算](SIMD-API/基础API/Reg矢量计算/复合计算/复合计算.md)
+                -   [概述](SIMD-API/基础API/Reg矢量计算/复合计算/概述.md)
                 -   [Axpy](SIMD-API/基础API/Reg矢量计算/复合计算/Axpy-38.md)
                 -   [AbsSub](SIMD-API/基础API/Reg矢量计算/复合计算/AbsSub.md)
                 -   [ExpSub](SIMD-API/基础API/Reg矢量计算/复合计算/ExpSub.md)

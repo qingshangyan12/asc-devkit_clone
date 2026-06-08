@@ -49,13 +49,17 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-src与scalar相乘的结果再按照CAST\_ROUND模式转换成half类型，根据mask将计算结果写入dst。计算公式如下：
+头文件引用路径为："basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_fused\_intf.h"。
 
-![](../../../../figures/zh-cn_formulaimage_0000002521033481.png)
+该接口用于将源操作数src与标量scalar相乘，再按照CAST\_ROUND模式将结果转换为half类型，根据mask将计算结果写入目的操作数dst。计算公式如下：
+
+$$
+dst_i = cast\_round\_to\_f16(src_i \times scalarValue)
+$$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-```
+```cpp
 template <typename T0 = DefaultType, typename T1 = DefaultType, typename T2, RegLayout layout = RegLayout::ZERO, typename T3, typename T4>
 __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, MaskReg& mask)
 ```
@@ -64,107 +68,46 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 
 **表1**  模板参数说明
 
-<a name="table4835205712588"></a>
-<table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.22%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="81.78%" id="mcps1.2.3.1.2"><p id="p583535795817"><a name="p583535795817"></a><a name="p583535795817"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row1835857145817"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p5835457165816"><a name="p5835457165816"></a><a name="p5835457165816"></a>T0</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p168351657155818"><a name="p168351657155818"></a><a name="p168351657155818"></a>目的操作数数据类型。</p>
-<p id="p15959203674218"><a name="p15959203674218"></a><a name="p15959203674218"></a><span id="ph1795914368427"><a name="ph1795914368427"></a><a name="ph1795914368427"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half</p>
-</td>
-</tr>
-<tr id="row4251861118"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p22521061415"><a name="p22521061415"></a><a name="p22521061415"></a>T1</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p11953112614"><a name="p11953112614"></a><a name="p11953112614"></a>源操作数的数据类型。</p>
-<p id="p7973921201115"><a name="p7973921201115"></a><a name="p7973921201115"></a><span id="ph597312121114"><a name="ph597312121114"></a><a name="ph597312121114"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：float</p>
-</td>
-</tr>
-<tr id="row18835145716587"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>T2</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p1775118537244"><a name="p1775118537244"></a><a name="p1775118537244"></a>标量源操作数的数据类型。</p>
-<p id="p69731028111110"><a name="p69731028111110"></a><a name="p69731028111110"></a><span id="ph17973162841112"><a name="ph17973162841112"></a><a name="ph17973162841112"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：float</p>
-</td>
-</tr>
-<tr id="row416056114119"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p95016121914"><a name="p95016121914"></a><a name="p95016121914"></a>layout</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p1433681723313"><a name="p1433681723313"></a><a name="p1433681723313"></a><a href="../数据类型/RegLayout.md">RegLayout</a>枚举类型。</p>
-<p id="p24515419439"><a name="p24515419439"></a><a name="p24515419439"></a>本接口只支持RegLayout::ZERO，RegLayout::ONE。</p>
-<p id="p150112121614"><a name="p150112121614"></a><a name="p150112121614"></a>src为half类型时使用，float时不生效，half类型时，RegLayout::ZERO表示从b16 RegTensor偶数位读取half元素转换成float，RegLayout::ONE表示从b16 RegTensor奇数位读取half元素转换成float。</p>
-</td>
-</tr>
-<tr id="row17775181422"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p916243141912"><a name="p916243141912"></a><a name="p916243141912"></a>T3</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p131047476612"><a name="p131047476612"></a><a name="p131047476612"></a>dstReg的RegTensor类型，例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。</p>
-</td>
-</tr>
-<tr id="row5528594214"><td class="cellrowborder" valign="top" width="18.22%" headers="mcps1.2.3.1.1 "><p id="p145090101527"><a name="p145090101527"></a><a name="p145090101527"></a>T4</p>
-</td>
-<td class="cellrowborder" valign="top" width="81.78%" headers="mcps1.2.3.1.2 "><p id="p12509510225"><a name="p12509510225"></a><a name="p12509510225"></a>srcReg的RegTensor类型，例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 描述 |
+|---|---|
+| T0 | 目的操作数数据类型。 |
+| T1 | 源操作数的数据类型。 |
+| T2 | 标量源操作数的数据类型。 |
+| layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>本接口只支持RegLayout::ZERO，RegLayout::ONE。<br>src为half类型时使用，float时不生效，half类型时，RegLayout::ZERO表示从b16 RegTensor偶数位读取half元素转换成float，RegLayout::ONE表示从b16 RegTensor奇数位读取half元素转换成float。 |
+| T3 | dstReg的RegTensor类型， 例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
+| T4 | srcReg的RegTensor类型， 例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
-<a name="zh-cn_topic_0235751031_table33761356"></a>
-<table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
-</th>
-<th class="cellrowborder" valign="top" width="10.05%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0235751031_p16609919"><a name="zh-cn_topic_0235751031_p16609919"></a><a name="zh-cn_topic_0235751031_p16609919"></a>输入/输出</p>
-</th>
-<th class="cellrowborder" valign="top" width="71.41%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0235751031_p59995477"><a name="zh-cn_topic_0235751031_p59995477"></a><a name="zh-cn_topic_0235751031_p59995477"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row42461942101815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p284425844311"><a name="p284425844311"></a><a name="p284425844311"></a>dstReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输出</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p86271310162918"><a name="p86271310162918"></a><a name="p86271310162918"></a>目的操作数。</p>
-<p id="p66093533169"><a name="p66093533169"></a><a name="p66093533169"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-</td>
-</tr>
-<tr id="row2137145181815"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p6844125874315"><a name="p6844125874315"></a><a name="p6844125874315"></a>srcReg</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p128442058144312"><a name="p128442058144312"></a><a name="p128442058144312"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p172083541517"><a name="p172083541517"></a><a name="p172083541517"></a>源操作数。</p>
-<p id="p17716122843014"><a name="p17716122843014"></a><a name="p17716122843014"></a>类型为<a href="../寄存器数据类型/RegTensor.md">RegTensor</a>。</p>
-</td>
-</tr>
-<tr id="row891912431168"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p195756503168"><a name="p195756503168"></a><a name="p195756503168"></a>scalarValue</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p457515071618"><a name="p457515071618"></a><a name="p457515071618"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p732824954017"><a name="p732824954017"></a><a name="p732824954017"></a>源操作数。</p>
-<p id="p73715114429"><a name="p73715114429"></a><a name="p73715114429"></a>类型为标量。</p>
-</td>
-</tr>
-<tr id="row19615183817191"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.4.1.1 "><p id="p1484519586432"><a name="p1484519586432"></a><a name="p1484519586432"></a>mask</p>
-</td>
-<td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p484514581433"><a name="p484514581433"></a><a name="p484514581433"></a>输入</p>
-</td>
-<td class="cellrowborder" valign="top" width="71.41%" headers="mcps1.2.4.1.3 "><p id="p11541143920"><a name="p11541143920"></a><a name="p11541143920"></a>源操作数元素级操作的有效性指示，详细说明请参考<a href="../寄存器数据类型/MaskReg.md">MaskReg</a>。</p>
-</td>
-</tr>
-</tbody>
-</table>
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
+| srcReg | 输入 | 源操作数。<br>类型为RegTensor。 |
+| scalarValue | 输入 | 源操作数。<br>类型为标量。 |
+| mask | 输入 | 源操作数元素级操作的有效性指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
 
+## 数据类型<a name="zh-cn_topic_0000002580343947_section1785515470716"></a>
+
+**表 3**  数据类型组合
+
+| srcReg | scalarValue | dstReg |
+| :----- | :---------- | :----- |
+| float  | float       | half   |
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
-无
+- 本接口不支持源操作数寄存器和目的操作数寄存器重叠，支持源操作数寄存器之间重叠。
+- 本接口操作数为寄存器，不涉及地址对齐。
+- 本接口不修改全局寄存器的值。
+- Cast计算按照CAST\_ROUND模式舍入。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-```
+```cpp
 template<typename T>
 __simd_vf__ inline void MulsCastVF(__ubuf__ half* dstAddr, __ubuf__ float* srcAddr, float scalarValue, uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
 {
