@@ -79,7 +79,7 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 | --- | --- |
 | T | 矢量目的操作数和源操作数的数据类型。 |
 | U | 标量源操作数的数据类型。 |
-| mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)，选择MERGING模式或ZEROING模式。当前仅支持ZEROING模式。<br>• ZEROING，mask未筛选的元素在dst中置零。<br>• MERGING，当前不支持。 |
+| mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
 | S | dstReg RegTensor类型， 例如RegTensor<uint16_t\>，由编译器自动推导，用户不需要填写。 |
 
 **表 2**  参数说明
