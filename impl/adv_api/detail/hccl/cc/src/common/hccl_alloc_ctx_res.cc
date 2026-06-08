@@ -502,9 +502,6 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        uint64_t token;
-        CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
-        HCCL_INFO("[AcquireAlgResources] GetTokenFormBuffInfo successfully!");
         resCtxHost->kfcServerArgs = {
             opResCtx.ckeAddr,
             opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE,
