@@ -172,7 +172,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 - src0=bank0，src1=bank1，dst=bank1，读读冲突消除，仍存在读写冲突。
 - Case 3 vs Case 1 = 87,601 vs 80,948 cycles，差异很小，说明3510上传统 bank 冲突对性能影响极低。
 
-## Case 4：二读一写，src0与src1位于相同bank的同一起始地址，由于硬件无读读冲突；src0与dst不同bank，无读写冲突
+## Case 4：二读一写，src0与src1位于相同bank的同一起始地址，由于硬件优化，无读读冲突；src0与dst不同bank，无读写冲突
 
 ### 地址解码
 
