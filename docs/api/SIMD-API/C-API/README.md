@@ -58,3 +58,8 @@ NPU内部有不同的计算单元，在计算时往往需要把计算数据搬�
 | [其他操作](C-API.md#其他操作) |
 | [Reg数据搬运](C-API.md#Reg数据搬运) |
 | [Reg矢量计算](C-API.md#Reg矢量计算) |
+
+## 参考样例
+
+Ascend 910B/C的C API样例请参考[C API Add样例](../../../../examples/02_simd_c_api/00_introduction/01_add)。
+Ascend 950PR/DT的C API样例请参考[C API Add样例](../../../../examples/02_simd_c_api/00_introduction/04_reg_base_add_compute)。
