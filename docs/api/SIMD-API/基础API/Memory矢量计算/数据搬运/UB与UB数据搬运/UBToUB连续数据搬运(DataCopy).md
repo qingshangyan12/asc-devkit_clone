@@ -39,7 +39,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数。类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
+| dst | 输出 | 目的操作数。类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
 | src | 输入 | 源操作数。类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。 |
 | count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32字节对齐，若不对齐，搬运量将对32字节做向下取整。 |
 

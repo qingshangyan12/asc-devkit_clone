@@ -57,8 +57,8 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
-| src | 输入 | 源操作数，类型为GlobalTensor，存储位置为GM (Global Memory)，源地址需要1字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
+| src | 输入 | 源操作数，类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor简介.md)，存储位置为GM (Global Memory)，源地址需要1字节对齐。 |
 | dataCopyParams | 输入 | 搬运参数。DataCopyExtParams类型，具体参数说明请参考[表3](#table_gm2ub_pad_3)。 |
 | padParams | 输入 | 从GM搬运数据至Local Memory时，可以根据开发者需要，在搬运数据左边或右边填充数据。padParams是用于控制数据填充过程的参数。DataCopyPadExtParams类型，具体参数请参考[表4](#table_gm2ub_pad_4)。 |
 
