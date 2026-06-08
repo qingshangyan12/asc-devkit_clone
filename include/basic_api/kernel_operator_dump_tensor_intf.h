@@ -31,6 +31,10 @@
 #include "stub_def.h"
 #endif
 
+#ifndef PRINTF
+#define PRINTF printf
+#endif
+
 namespace AscendC {
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T> &tensor, uint32_t desc, uint32_t dumpSize);
@@ -50,7 +54,6 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
 
 using __asc_aicore::printf;
-using __asc_aicore::PRINTF;
 }  // namespace AscendC
 
 #if defined(__NPU_ARCH__)
