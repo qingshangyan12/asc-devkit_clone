@@ -8,6 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "cann_host_bridge.h"
+#include "executor_v2_base.h"
 
 namespace mc2_ops_hccl {
 
