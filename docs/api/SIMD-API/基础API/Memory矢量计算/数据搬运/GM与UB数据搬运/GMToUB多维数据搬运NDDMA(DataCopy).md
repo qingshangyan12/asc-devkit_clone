@@ -48,8 +48,8 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。 |
-| src | 输入 | 源操作数，类型为GlobalTensor。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)。 |
+| src | 输入 | 源操作数，类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor简介.md)。 |
 | params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表4](#table_nddma_4)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表5](#table_nddma_5)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]</pre> |
 
 **表 3**  NdDmaConfig结构体参数定义<a name="table_nddma_3"></a>

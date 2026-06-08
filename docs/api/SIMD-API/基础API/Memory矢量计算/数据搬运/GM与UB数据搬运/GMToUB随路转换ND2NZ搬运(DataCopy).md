@@ -54,8 +54,8 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。 |
-| src | 输入 | 源操作数，类型为GlobalTensor。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)。 |
+| src | 输入 | 源操作数，类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor简介.md)。 |
 | intriParams | 输入 | 搬运参数，类型为Nd2NzParam，具体参数请参考[表3](#table_nd2nz_3)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表 3**  Nd2NzParams结构体参数定义<a name="table_nd2nz_3"></a>

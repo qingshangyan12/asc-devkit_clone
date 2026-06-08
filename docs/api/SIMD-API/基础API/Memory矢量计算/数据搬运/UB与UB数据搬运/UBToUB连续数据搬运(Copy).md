@@ -40,7 +40,7 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。 |
 | src | 输入 | 源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。<br>源操作数的数据类型需要与目的操作数保持一致。 |
 | count | 输入 | 参与搬运的元素个数。 |
 
