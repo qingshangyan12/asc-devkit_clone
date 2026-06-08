@@ -26,7 +26,7 @@ SIMT VF函数定义中的关键修饰符说明如下：
 | \_\_gm\_\_ | 内存空间修饰符，标识内存空间为GM。 |
 | \_\_ubuf\_\_ | 内存空间修饰符，标识内存空间为UB。 |
 
-通过SIMT的[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD%E4%B8%8ESIMT%E6%B7%B7%E5%90%88%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/%E6%89%A9%E5%B1%95%E8%AF%AD%E6%B3%95/%E6%A0%B8%E5%87%BD%E6%95%B0%E9%85%8D%E7%BD%AE-147.md#asc_vf_call%E8%B0%83%E7%94%A8)接口在核函数或\_\_aicore\_\_函数中调用，调用示例如下：
+只支持在核函数或\_\_aicore\_\_函数中调用SIMT VF函数，调用接口为[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md#asc_vf_call调用)，示例如下：
 
 ```
 asc_vf_call<function_name>(dim3(blockDim), arg1, arg2, ...);
@@ -57,6 +57,10 @@ uint32_t result = simt_helper(arg1, arg2, ...);
 -   入参仅支持Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数返回值只能是Ascend C的[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
 -   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
+
+### \_\_simd\_vf\_\_与\_\_simt\_callee\_\_
+
+\_\_simd\_vf\_\_用于标记SIMD VF入口函数，\_\_simt\_callee\_\_是供SIMD VF内部调用子函数，详细说明请参见[SIMD BuiltIn关键字的\_\_simd\_vf\_\_](SIMD-BuiltIn关键字.md#section192521344610)。
 
 ## 地址空间限定符<a name="section1624210295308"></a>
 
@@ -119,7 +123,7 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 | dyn_ub_size | uint32_t | 指定动态内存大小，单位为字节 | 不超过最大可配置值：256KB - 8KB - 32KB - 静态内存 |
 | stream | aclrtStream | 用于维护异步操作执行顺序 | 无 |
 
-## asc\_vf\_call调用
+## SIMT VF的asc\_vf\_call调用
 
 在SIMD与SIMT混合编程场景，需使用asc\_vf\_call启动SIMT VF（Vector Function）子任务，通过参数配置，启动指定数目的线程，执行指定的SIMT VF函数。其函数原型如下：
 
@@ -162,21 +166,25 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
     asc_vf_call<add_simt>(dim3{1024, 1, 1}, z, x, y);
 }
 ```
+## SIMD VF的asc\_vf\_call调用
+
+使用asc\_vf\_call接口调用SIMD VF入口函数启动VF子任务，详细接口说明参见
+[asc\_vf\_call API接口说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md)
 
 ## 内置变量<a name="zh-cn_topic_0000002571575581_section13165113520576"></a>
 当前提供了以下仅在Device上可用的dim3结构的内置变量：  
 
 -   gridDim<a name="zh-cn_topic_0000002571575581_li20760123812911"></a>
 
-    内置全局变量，只能在核函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。gridDim.x <= 65535；gridDim.y、gridDim.z必须为1。
+    内置全局变量，只能在SIMT VF函数中使用，表示整个计算任务在各个维度上分别由多少个线程块构成。gridDim.x <= 65535；gridDim.y、gridDim.z必须为1。
 
 -   blockDim<a name="zh-cn_topic_0000002571575581_li076017381191"></a>
 
-    内置全局变量，在核函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数，各个维度上线程数需满足blockDim.x \* blockDim.y \*blockDim.z  <= 2048。
+    内置全局变量，在SIMT VF函数中可以直接使用，用于获取线程块中配置的线程的三维层次结构。blockDim.x，blockDim.y，blockDim.z分别表示线程块中三个维度的线程数，各个维度上线程数需满足blockDim.x \* blockDim.y \*blockDim.z  <= 2048。
 
 -   blockIdx
 
-    内置全局变量，只能在核函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。blockIdx.x的范围是0到gridDim.x - 1，blockIdx.y和blockIdx.z目前只能返回0。
+    内置全局变量，只能在SIMT VF函数中使用，用于获取块索引。表示当前线程所在的线程块在整个网格中的位置坐标。blockIdx.x的范围是0到gridDim.x - 1，blockIdx.y和blockIdx.z目前只能返回0。
 
 -   threadIdx
 

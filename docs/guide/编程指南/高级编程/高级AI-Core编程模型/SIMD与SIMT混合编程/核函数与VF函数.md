@@ -24,7 +24,6 @@ SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 - `__callee__`公共函数：可供VF内部调用的公共子函数。`__callee__`函数内只能调用`__callee__`函数。
 
 **图 1** SIMD与SIMT混合编程函数调用层级
-
 <img src="../../../../figures/SIMT_混合_函数调用层级.png" title="SIMD与SIMT混合编程函数调用层级" width="70%" />
 
 ## 核函数的定义与执行配置<a name="zh-cn_topic_0000002571578013_section156822920311"></a>
@@ -70,8 +69,8 @@ SIMT VF函数用于实现线程级并行计算任务，处理不规则访问和�
 
 ```
 __simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void function_name(
-    __gm__ type* gm_param, 
-    __ubuf__ type* ubuf_param, 
+    __gm__ type* gm_param,
+    __ubuf__ type* ubuf_param,
     type scalar_param, ...);
 ```
 

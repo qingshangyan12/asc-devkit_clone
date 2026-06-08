@@ -282,7 +282,7 @@
     __global__ __vector__ void OP3() {...} // 不设置__schedmode__，默认为normal mode。
     ```
 
-## VF函数执行限定符<a name="section192521344610"></a>
+## 函数标记宏<a name="section192521344610"></a>
 
 -   \_\_simd\_vf\_\_
 

@@ -53,7 +53,7 @@
     -   [语言扩展层](编程指南/语言扩展层/语言扩展层.md)
         -   [SIMD BuiltIn关键字](编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
         -   [SIMT BuiltIn关键字](编程指南/语言扩展层/SIMT-BuiltIn关键字.md)
-        -   [SIMD&SIMT BuiltIn关键字](编程指南/语言扩展层/SIMD&SIMT-BuiltIn关键字.md)
+        -   [SIMD与SIMT混合编程 BuiltIn关键字](编程指南/语言扩展层/SIMD-SIMT混合-BuiltIn关键字.md)
         -   [SIMD语言扩展层C API](编程指南/语言扩展层/SIMD语言扩展层C-API.md)
         -   [SIMT语言扩展层C API](编程指南/语言扩展层/SIMT语言扩展层C-API.md)
 
@@ -99,7 +99,7 @@
                 -   [NPU架构版本2201](./编程指南/高级编程/硬件实现/硬件约束/NPU架构版本2201.md)
             
         -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/高级AI-Core编程模型.md)
-            -   [高级AI-Core编程模型](./编程指南/高级编程/高级AI-Core编程模型/高级AI-Core编程模型.md)
+            -   [SIMD与SIMT混合编程](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)
                 -   [概述](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/概述.md)
                 -   [抽象硬件架构](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/抽象硬件架构.md)
                 -   [核函数与VF函数](./编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/核函数与VF函数.md)
