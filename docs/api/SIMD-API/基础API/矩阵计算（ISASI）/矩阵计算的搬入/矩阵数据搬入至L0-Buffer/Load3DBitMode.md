@@ -16,7 +16,7 @@
 
 ## 功能说明<a id="section618mcpsimp"></a>
 
-Load3D用于完成image to column操作，将多维feature map转为二维矩阵。支持如下数据通路：A1->A2; B1->B2。
+Load3D用于完成image to column操作，将多维feature map转为二维矩阵。支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
@@ -31,7 +31,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|----------|
-|T|源操作数和目的操作数的数据类型。<br>&bull; **Load3DBitMode接口：**<br>Ascend 950PR/Ascend 950DT，支持数据类型为：uint8_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t/half/bfloat16_t/uint32_t/int32_t/float|
+|T|源操作数和目的操作数的数据类型。<br>&bull; **Load3DBitMode接口：**<br>Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。|
 |Src|源操作数存储的逻辑位置（TPosition），仅Load3DBitMode接口使用。|
 |Dst|目的操作数存储的逻辑位置（TPosition），仅Load3DBitMode接口使用。|
 

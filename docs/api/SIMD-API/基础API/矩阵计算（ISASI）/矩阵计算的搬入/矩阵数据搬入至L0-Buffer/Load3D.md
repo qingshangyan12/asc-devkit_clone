@@ -20,14 +20,14 @@
 
 Load3D本质上是用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。见图1。
 
-由于Load3D搬运过程中，是以512Byte的数据分形为单位进行搬运的，因此，Load3D也可以用于普通矩阵计算所需的2D格式数据的搬运。如何使用Load3D进行2D格式数据的搬运可以参考[关键特性说明](#zh-cn_topic_0000002512171652_section102629572045)。
+由于Load3D搬运过程中，是以512字节的数据分形为单位进行搬运的，因此，Load3D也可以用于普通矩阵计算所需的2D格式数据的搬运。如何使用Load3D进行2D格式数据的搬运可以参考[关键特性说明](#zh-cn_topic_0000002512171652_section102629572045)。
 
-Load3D仅支持如下数据通路：L1->L0A; L1->L0B。
+Load3D仅支持如下数据通路：L1 Buffer->L0A Buffer; L1 Buffer->L0B Buffer。
 
 实现原理可参考伪代码：[Load3D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0/scripts/load3d.py)。
 
-**图 1**  Load3D to L0A功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
-![](../../../../../figures/load3d_l1tol0a_demo.png "Load3D-to-L0A功能示意图")
+**图 1**  Load3D to L0A Buffer功能示意图<a id="zh-cn_topic_0000002512171652_fig54450833715"></a>  
+![](../../../../../figures/load3d_l1tol0a_demo.png "Load3D-to-L0A Buffer功能示意图")
 
 ## 函数原型<a id="zh-cn_topic_0000002512171652_section82039854412"></a>
 
@@ -76,7 +76,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|含义|
 |----------|------|
-|T|源操作数和目的操作数的数据类型。<cann-filter npu_type="910,310p"><br>**Load3Dv1接口：**<br>Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、half<br>Atlas 推理系列产品 AI Core，支持的数据类型为：int8_t、uint8_t、half<br></cann-filter><cann-filter npu_type="950,A3,910b,310b,310p,x90"><br>**Load3Dv2接口：**<br>Atlas 推理系列产品 AI Core，支持的数据类型为：int4b_t、int8_t、uint8_t、half<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>&bull; TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float<br>&bull; TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>&bull; TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float<br>&bull; TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float<br>Atlas 200I/500 A2 推理产品：<br>&bull; TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float<br>&bull; TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float<br>Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float<br>Kirin X90产品：<br>&bull; TPosition为A1/A2时，支持数据类型为：int8_t、half<br>&bull; TPosition为B1/B2时，支持数据类型为：int8_t、half<br></cann-filter><cann-filter npu_type="950"><br>**Load3Dv2Pro接口：**<br>Ascend 950PR/Ascend 950DT，int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float</cann-filter>|
+|T|源操作数和目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002512171652_section4219135304818)|
 |defaultConfig|控制是否在Load3Dv1/Load3Dv2接口内部设置相关属性。 IsResetLoad3dConfig类型。IsResetLoad3dConfig结构定义如下：<pre>struct IsResetLoad3dConfig {<br>   bool isSetFMatrix = true;<br>   bool isSetPadding = true;<br>};</pre>isSetFMatrix配置为true，表示在接口内部设置FeatureMap的属性描述（包括l1H、l1W、padList，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的FeatureMap的属性描述不生效，开发者需要通过SetFmatrix进行设置。<br>isSetPadding配置为true，表示在接口内部设置Pad属性描述（即padValue参数，参数介绍参考[表3](#zh-cn_topic_0000002512171652_table679014222918)、[表4](#zh-cn_topic_0000002512171652_table193501032193419)）；设置为false，表示该接口传入的Pad属性不生效，开发者需要通过SetLoadDataPaddingValue进行设置。可参考样例SetFmatrix调用示例。<br>该参数的默认值如下：<pre>constexpr IsResetLoad3dConfig IS_RESER_LOAD3D_DEFAULT_CONFIG = {true, true};</pre>特性细节可参考：[Feature Map、Pad属性描述寄存器设置](#zh-cn_topic_0000002512171652_section1881795134015)。|
 |U|LoadData3DParamsV1/LoadData3DParamsV2中padValue的数据类型。<br>&bull; 当dst、src使用基础数据类型时， U和dst、src的数据类型T需保持一致，否则编译失败。<br>&bull; 当dst 、src使用TensorTrait类型时，U和dst、src的数据类型T的LiteType需保持一致，否则编译失败。<br>最后一个模板参数仅用于上述数据类型检查，用户无需关注。|
 
@@ -84,7 +84,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 |参数名称|输入/输出|含义|
 |----------|-----------|------|
-|dst|输出| 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定，具体约束如下：<br>&bull; L0A Buffer(TPosition: A2)：ZZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。<cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT：<br>&bull; L0A Buffer(TPosition: A2)：NZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。</cann-filter><br>L1上的排列顺序无格式要求，一般情况下为NZ格式。|
+|dst|输出| 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在物理存储位置决定，具体约束如下：<br>&bull; L0A Buffer(TPosition: A2)：ZZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。<cann-filter npu_type="950"><br>针对Ascend 950PR/Ascend 950DT：<br>&bull; L0A Buffer(TPosition: A2)：NZ格式；<br>&bull; L0B Buffer(TPosition: B2)：ZN格式。</cann-filter><br>L1 Buffer上的排列顺序无格式要求，一般情况下为NZ格式。|
 |src|输入| 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。|
 |loadDataParams|输入| LoadData参数结构体，类型为：<cann-filter npu_type="910,310p"><br>&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。</cann-filter><cann-filter npu_type="950,A3,910b,310b,310p,x90"><br>&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。</cann-filter><cann-filter npu_type="950"><br>&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。</cann-filter><br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
@@ -164,12 +164,27 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 数据类型<a id="zh-cn_topic_0000002512171652_section4219135304818"></a>
 
-<cann-filter npu_type="910,310p">
+<cann-filter npu_type="950">
+
+- Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type="310p,910">
 
 **Load3Dv1接口：**
 
-- Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、half。
+<cann-filter npu_type="310p">
+
 - Atlas 推理系列产品 AI Core，支持的数据类型为：int8_t、uint8_t、half。
+
+</cann-filter>
+
+<cann-filter npu_type="910">
+
+- Atlas 训练系列产品，支持的数据类型为：int8_t、uint8_t、half。
+
+</cann-filter>
 
 </cann-filter>
 
@@ -177,20 +192,49 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 **Load3Dv2接口：**
 
-- Atlas 推理系列产品 AI Core，支持的数据类型为：int4b_t、int8_t、uint8_t、half。
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
-    - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+<cann-filter npu_type="950">
+
+- Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type="A3">
+
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：
     - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
     - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+    - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+    - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type="310b">
+
 - Atlas 200I/500 A2 推理产品：
     - TPosition为A1/A2时，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
     - TPosition为B1/B2时，支持数据类型为：half、bfloat16_t、int32_t、uint32_t、float。
-- Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type="310p">
+
+- Atlas 推理系列产品 AI Core，支持的数据类型为：int4b_t、int8_t、uint8_t、half。
+
+</cann-filter>
+
+<cann-filter npu_type="x90">
+
 - Kirin X90产品：
     - TPosition为A1/A2时，支持数据类型为：int8_t、half。
     - TPosition为B1/B2时，支持数据类型为：int8_t、half。
+
+</cann-filter>
 
 </cann-filter>
 
@@ -198,22 +242,29 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 **Load3Dv2Pro接口：**
 
-- Ascend 950PR/Ascend 950DT，int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float
+- Ascend 950PR/Ascend 950DT，int8_t、uint8_t、hifloat8_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、uint32_t、float。
 
 </cann-filter>
 
 ## 约束说明<a id="zh-cn_topic_0000002512171652_section2045914466492"></a>
 
-- 非转置场景下，L1->L0B通路不支持。L1->L0B通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
-<cann-filter npu_type="A3,910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：L1-\>L0B通路不支持b4/b8类型数据；转置场景下，L1-\>L0A通路不支持b8数据类型。
+- 非转置场景下，L1 Buffer->L0B Buffer通路不支持。L1 Buffer->L0B Buffer通路下会自动进行转置，不需要配置enTranspose，此时enTranspose参数无效。
+
+<cann-filter npu_type="950">
+
+- 针对Ascend 950PR/Ascend 950DT：必须使用辅助配置接口SetLoadDataRepeat配置dstStride参数，若不开启repeat模式，接口内repeat相关参数使用默认构造值。
+
 </cann-filter>
+
+<cann-filter npu_type="A3,910b">
+
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：L1 Buffer-\>L0B Buffer通路不支持b4/b8类型数据；转置场景下，L1 Buffer-\>L0A Buffer通路不支持b8数据类型。
+
+</cann-filter>
+
 - 当l1H/l1W/channelSize/kExtension/mExtension中的任意一个值为0时，该指令不会被执行。
 - 当filterW为0且filterSizeW为false或者当filterH为0且filterSizeH为false时，该指令不会被执行。
-<cann-filter npu_type="950">
-- 针对Ascend 950PR/Ascend 950DT：必须使用辅助配置接口SetLoadDataRepeat配置dstStride参数，若不开启repeat模式，接口内repeat相关参数使用默认构造值。
-</cann-filter>
-- 当目的地址位于L0A/L0B时，地址必须512Byte对齐。当源地址位于L1时，地址必须32Byte对齐。指令执行占用的流水为PIPE_MTE1。
+- 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐。当源地址位于L1 Buffer时，地址必须32字节对齐。指令执行占用的流水为PIPE_MTE1。
 <cann-filter npu_type="910,310p">
 - LoadData3DParamsV1 cSize特性的开启，需要保证A1/B1中的feature map为4 channel对齐。
 </cann-filter>
@@ -226,19 +277,19 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ### 使用Load3D完成矩阵计算所需2D格式数据的搬运<a id="zh-cn_topic_0000002512171652_section86392366416"></a>
 
-对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to column展开后的数据排布可以看成矩阵计算过程中L1上的NZ分形排布，因此该场景下可以使用Load3D接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
+对于NC1HWC0格式的数据，当N为1，卷积核width和height为1，padding为0，卷积核在源操作数width维度和height维度滑动的步长为1，卷积核width和height膨胀系数为1，此时经过image to column展开后的数据排布可以看成矩阵计算过程中L1 Buffer上的NZ分形排布，因此该场景下可以使用Load3D接口进行矩阵计算所需2D格式数据的搬运，示意图如下所示：
 
 ![](../../../../../figures/load3d_3d22d_demo.png)
 
 **非转置场景：**
 
-首先L1->L0B通路不支持非转置场景；而对于L1->L0A通路，根据不同的产品形态有不同的分形排布转换：
+首先L1 Buffer->L0B Buffer通路不支持非转置场景；而对于L1 Buffer->L0A Buffer通路，根据不同的产品形态有不同的分形排布转换：
 
 <cann-filter npu_type="A3,910b">
 
 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品：
 
-Load3D会自动完成分形的变换，从L1上的NZ分形排布转换成L0A中所需的ZZ分形排布，如下b16类型场景的示意图所示：
+Load3D会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成L0A Buffer中所需的ZZ分形排布，如下b16类型场景的示意图所示：
 
 ![](../../../../../figures/load3d_l1tol0a_b16_nontrans.png)
 
@@ -254,21 +305,21 @@ Load3D仅在b16/b32数据类型下支持转置（enTranspose=True），按照类
 
 对于b16场景：每个分形大小是16×16
 
-L1->L0A通路下，转置场景下，除了每个分形矩阵自身会被转置，每个分形矩阵在整个二维特征图中的位置也会被转置，转置示意图如下：
+L1 Buffer->L0A Buffer通路下，转置场景下，除了每个分形矩阵自身会被转置，每个分形矩阵在整个二维特征图中的位置也会被转置，转置示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0a_b16_trans.png)
 
-L1->L0B通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0b_b16_trans.png)
 
 对于b32场景：每个分形大小是16×8
 
-L1->L0A通路下，需要配置enTranspose参数来开启转置功能，转置示意图如下：
+L1 Buffer->L0A Buffer通路下，需要配置enTranspose参数来开启转置功能，转置示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0a_b32_trans.png)
 
-L1->L0B通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
+L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效，转置示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0b_b32_trans.png)
 
@@ -300,7 +351,7 @@ K方向repeat示意图：
 
 ### Feature Map、Pad属性描述寄存器设置<a id="zh-cn_topic_0000002512171652_section1881795134015"></a>
 
-Load3D具备两个特殊寄存器：Feature Map属性描述和Pad属性描述寄存器，作为Image to Column展开时的参数。当我们进行矩阵计算时，出于高性能搬运考虑，往往会从GM搬运大块数据到L1，即在L1中缓存一块较大的数据，然后通过for循环进行L1->L0的搬入并进行Mmad计算。当通过Load3D进行L1->L0的搬入时，对于Load3D中的Feature Map属性和Pad属性我们通常只需要设置一次，不需要反复进行设置，因此我们提供了IsResetLoad3dConfig这个模板参数用于手动管理这两个属性，减少反复设置带来的指令性能开销。
+Load3D具备两个特殊寄存器：Feature Map属性描述和Pad属性描述寄存器，作为Image to Column展开时的参数。当我们进行矩阵计算时，出于高性能搬运考虑，往往会从GM搬运大块数据到L1 Buffer，即在L1 Buffer中缓存一块较大的数据，然后通过for循环进行L1 Buffer->L0 Buffer的搬入并进行Mmad计算。当通过Load3D进行L1 Buffer->L0 Buffer的搬入时，对于Load3D中的Feature Map属性和Pad属性我们通常只需要设置一次，不需要反复进行设置，因此我们提供了IsResetLoad3dConfig这个模板参数用于手动管理这两个属性，减少反复设置带来的指令性能开销。
 
 IsResetLoad3dConfig结构定义如下：
 
@@ -356,11 +407,11 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 
 ## 调用示例<a id="zh-cn_topic_0000002512171652_section088124295117"></a>
 
-一、A矩阵转置，shape为[k,m]，b32数据类型下，GM->L1->L0A数据排布分别是ND、NZ和ZZ。但是L1->L0A的时候，无法调用LoadDataWithTranspose指令对进行转置，因为在K轴方向两个连续的分形并不能合并为一个16\*16的方块，示意图如下：
+一、A矩阵转置，shape为[k,m]，b32数据类型下，GM->L1 Buffer->L0A Buffer数据排布分别是ND、NZ和ZZ。但是L1 Buffer->L0A Buffer的时候，无法调用LoadDataWithTranspose指令对进行转置，因为在K轴方向两个连续的分形并不能合并为一个16\*16的方块，示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0a_b32demo.png)
 
-此时可以调用Load3D接口实现A矩阵转置。调用LoadData3DV2指令时，在写入L0A之前会先分别将A矩阵高度和宽度轴向16、8对齐，接着该指令会将整个A矩阵进行转置并且每一个分形也转置，最终写入到L0A的A矩阵是ZZ排布
+此时可以调用Load3D接口实现A矩阵转置。调用LoadData3DV2指令时，在写入L0A Buffer之前会先分别将A矩阵高度和宽度轴向16、8对齐，接着该指令会将整个A矩阵进行转置并且每一个分形也转置，最终写入到L0A Buffer的A矩阵是ZZ排布
 
 **使用示例片段：**
 
