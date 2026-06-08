@@ -63,6 +63,23 @@ public:                                                                         
 
 #undef ASCENDC_CAST_INST
 
+#define ASCENDC_ROUND_INST(CLASS_NAME, FUNC_NAME)                                                                 \
+class CLASS_NAME {                                                                                                   \
+public:                                                                                                              \
+    template <typename T>                                                                                            \
+    __simd_callee__ inline static void Run(T& dst, T src, vector_bool mask)                                         \
+    {                                                                                                                \
+        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {                                                  \
+            FUNC_NAME(dst, src, mask);                                                                               \
+        }                                                                                                            \
+    }                                                                                                                \
+}
+
+#include "impl/tensor_api/arch/vector/cast/instruction/rounding_ops.h"
+
+
+#undef ASCENDC_ROUND_INST
+
 }}}
 
 #endif // IMPL_TENSOR_API_ARCH_VECTOR_CAST_INSTRUCTION_H
