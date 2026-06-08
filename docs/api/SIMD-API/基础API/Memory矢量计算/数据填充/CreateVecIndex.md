@@ -101,7 +101,7 @@ def CreateVecIndex(dst, firstValue, count):
 | firstValue | 输入 | 索引的第一个数值，数据类型需与dst中元素的数据类型保持一致。|
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。|
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。 |
-| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。<br>**注：repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。** |
+| repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
 | dstBlockStride | 输入 | 单次迭代内，矢量目的操作数不同DataBlock间地址步长，单位为DataBlock |
 | dstRepStride | 输入 | 相邻迭代间，矢量目的操作数相同DataBlock地址步长，单位为DataBlock。 |
 
@@ -117,14 +117,28 @@ def CreateVecIndex(dst, firstValue, count):
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-无。
+无
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - firstValue需保证不超出dst中元素数据类型对应的大小范围。
-- repeatTime的取值范围：repeatTime∈[0,255]。repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+<cann-filter npu-type="A3,910b">
+- repeatTime的取值范围：repeatTime∈[0,255]。repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该约束适用于以下型号。
+<cann-filter npu-type="A3">
+
+  - Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
+  </cann-filter>
+  <cann-filter npu-type="910b">
+
+  - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+  </cann-filter>
+</cann-filter>
+
 <cann-filter npu-type="950">
+
 - 针对Ascend 950PR/Ascend 950DT，int8_t/int64_t数据类型仅支持tensor前n个数据计算接口。
 </cann-filter>
 
