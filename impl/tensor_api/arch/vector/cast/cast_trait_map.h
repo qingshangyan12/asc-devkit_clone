@@ -661,34 +661,6 @@ using CastSub_hifloat8_t_to_float = TupleMap<
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Hif82FloatP3>
 >;
 
-using CastSub_bfloat16_t_to_float = TupleMap<
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::BF162FloatEven>,
-    Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::Odd>, Inst::BF162FloatOdd>
->;
-
-using CastSub_float_to_bfloat16_t = TupleMap<
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, Std::ignore_t>, Inst::Float2BF16RDNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, Std::ignore_t>, Inst::Float2BF16RDSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2BF16RDNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RD, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2BF16RDSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, Std::ignore_t>, Inst::Float2BF16RNNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, Std::ignore_t>, Inst::Float2BF16RNSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2BF16RNNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RN, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2BF16RNSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, Std::ignore_t>, Inst::Float2BF16RNANoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, Std::ignore_t>, Inst::Float2BF16RNASatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2BF16RNANoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RNA, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2BF16RNASatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, Std::ignore_t>, Inst::Float2BF16RUNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, Std::ignore_t>, Inst::Float2BF16RUSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2BF16RUNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RU, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2BF16RUSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, Std::ignore_t>, Inst::Float2BF16RZNoSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, Std::ignore_t>, Inst::Float2BF16RZSatEven>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, Std::ignore_t, CastIndexPos::Odd>, Inst::Float2BF16RZNoSatOdd>,
-    Std::tuple<Std::tuple<CastRoundMode::RZ, CastSatMode::Sat, CastIndexPos::Odd>, Inst::Float2BF16RZSatOdd>
->;
-
 using CastBucketMap = TupleMap<
     Std::tuple<Std::tuple<bfloat16_t, bfloat16_t>, CastSub_bfloat16_t_to_bfloat16_t>,
     Std::tuple<Std::tuple<bfloat16_t, float>, CastSub_bfloat16_t_to_float>,
