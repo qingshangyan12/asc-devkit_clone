@@ -18,6 +18,6 @@
 
 - **[BroadCastVecToMM(ISASI)](BroadCastVecToMM(ISASI).md)
 
-- **[L1到Bias Table Buffer数据搬运](L1到Bias-Table-Buffer数据搬运.md)**
+- **[L1ToBias-Table-Buffer数据搬运（DataCopy）](L1ToBias-Table-Buffer数据搬运（DataCopy）.md)**
 
-- **[L1到Fixpipe Buffer数据搬运](L1到Fixpipe-Buffer数据搬运.md)**
+- **[L1ToFixpipe-Buffer数据搬运（DataCopy）](L1ToFixpipe-Buffer数据搬运（DataCopy）.md)**

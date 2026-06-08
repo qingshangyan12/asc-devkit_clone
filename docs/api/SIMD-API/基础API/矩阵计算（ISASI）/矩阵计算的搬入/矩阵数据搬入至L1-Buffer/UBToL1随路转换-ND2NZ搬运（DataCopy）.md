@@ -1,4 +1,4 @@
-# UB->L1随路转换-ND2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002349187356"></a>
+# UBToL1随路转换-ND2NZ搬运（DataCopy）<a id="ZH-CN_TOPIC_0000002349187356"></a>
 
 ## 产品支持情况<a id="section1550532418810"></a>
 

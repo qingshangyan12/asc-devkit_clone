@@ -1,4 +1,4 @@
-﻿# L1到Fixpipe-Buffer数据搬运<a id="ZH-CN_TOPIC_0000002569070951"></a>
+﻿# L1ToFixpipe-Buffer数据搬运<a id="ZH-CN_TOPIC_0000002569070951"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002538001510_section18204144912492"></a>
 
