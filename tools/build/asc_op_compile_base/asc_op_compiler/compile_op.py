@@ -1060,7 +1060,8 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
         OpCompileManifestRecorder().record_tiling_struct_info(
             tiling_key_struct_size_map, source="_get_tiling_struct_without_register_size",
-            tiling_key_list=compile_info.tiling_key_list)
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
         gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
         chip_version = CommonUtility.get_chip_version()
         if CommonUtility.is_c310() or CommonUtility.is_v220():
@@ -1235,7 +1236,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
             tiling_key_struct_map_from_tiling,
             default_tiling_struct_from_tiling,
             "generate_dynamic_tiling_struct_file",
-            tiling_key_list=getattr(tiling_info, "tiling_key_list", None))
+            tiling_key_list=getattr(tiling_info, "tiling_key_list", None),
+            tiling_key_group_map=infered_info_from_ifile.tiling_key_group_map)
     global_var_storage.set_variable("ascendc_is_static_op", tiling_info.static_shape_flag)
     # replace tiling key when tiling_key is set in compile params
     tiling_key_list = infered_info_from_ifile.tiling_key_list
@@ -1298,7 +1300,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         manifest_recorder.record_kernel_type_info(
             compile_info.tiling_key_kernel_type,
             compile_info.default_kernel_type,
-            tiling_key_list=compile_info.tiling_key_list)
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
     compile_info.dump_info = {'dump_type': '', 'dump_size': 1024}
 
     # generate tiling struct size, dfx section
@@ -1319,7 +1322,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
             compile_info.tiling_key_struct_map,
             default_tiling_struct_from_compile_info,
             "compile_info.tiling_key_struct_map",
-            tiling_key_list=compile_info.tiling_key_list)
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
 
     compile_info_origin = CompileInfo()
     compile_option_tuple_origin = None

@@ -29,6 +29,7 @@ from .global_storage import global_var_storage
 MANIFEST_VERSION = '1.0'
 CANN_PATH_PLACEHOLDER = '{CANN_PATH_PLACEHOLDER}'
 SRC_FILE_PLACEHOLDER = '{SRC_FILE_PLACEHOLDER}'
+KERNEL_TYPE_PLACEHOLDER = '{kernel_type_placeholder}'
 DYNAMIC_COMPILE_PATH_PATTERN = r"(?P<prefix>(?:-I)?)[^\s]*?/dynamic/"
 DYNAMIC_COMPILE_PATH_REPLACEMENT = r"\g<prefix>"
 
@@ -91,14 +92,22 @@ class OpCompileManifestRecorder:
 
     def update_basic_info(self, compile_info: CompileInfo = None, tiling_info: TilingInfo = None):
         if compile_info is not None:
-            self.manifest["basic_info"].update({
+            tiling_key_group_map = self._normalize_tiling_key_group_map_for_list(
+                compile_info.tiling_key_group_map, compile_info.tiling_key_list)
+            basic_info = {
                 "kernel_name": compile_info.kernel_name,
                 "origin_func_name": compile_info.origin_func_name,
                 "op_type": compile_info.op_type,
                 "code_channel": compile_info.code_channel,
-                "tiling_key_list": compile_info.tiling_key_list,
+                "tiling_key_list": self._normalize_tiling_key_list(
+                    compile_info.tiling_key_list, tiling_key_group_map),
                 "soc_version": self._get_soc_version()
-            })
+            }
+            if tiling_key_group_map:
+                basic_info["tiling_key_group_map"] = tiling_key_group_map
+            else:
+                self.manifest["basic_info"].pop("tiling_key_group_map", None)
+            self.manifest["basic_info"].update(basic_info)
             self.set_compile_log_path(compile_info.compile_log_path)
         if tiling_info is not None:
             self.manifest["basic_info"].update({
@@ -141,6 +150,11 @@ class OpCompileManifestRecorder:
                 CommonUtility.print_compile_log(compile_info.kernel_name, \
                     "record wrapper body did not find source include line", \
                     AscendCLogLevel.LOG_WARNING)
+            wrapper_body_lines, inserted = self._insert_kernel_type_placeholder(wrapper_body_lines)
+            if not inserted:
+                CommonUtility.print_compile_log(compile_info.kernel_name, \
+                    "record wrapper body did not find kernel function declaration", \
+                    AscendCLogLevel.LOG_WARNING)
             with open(wrapper_body_path, 'w') as fd:
                 fd.writelines(wrapper_body_lines)
             os.chmod(wrapper_body_path, stat.S_IRUSR + stat.S_IWUSR + stat.S_IRGRP + stat.S_IROTH)
@@ -177,7 +191,7 @@ class OpCompileManifestRecorder:
                 AscendCLogLevel.LOG_WARNING)
 
     def record_tiling_struct_info(self, tiling_key_struct_map=None, default_tiling_struct=None, source=None,
-                                  tiling_key_list=None):
+                                  tiling_key_list=None, tiling_key_group_map=None):
         tiling_struct_info = self.manifest.setdefault("tiling_struct_info", {
             "default": "",
             "by_tiling_key": {},
@@ -186,10 +200,18 @@ class OpCompileManifestRecorder:
         if default_tiling_struct is not None:
             tiling_struct_info["default"] = str(default_tiling_struct)
         by_tiling_key = tiling_struct_info.setdefault("by_tiling_key", {})
+        normalized_tiling_key_group_map = self._normalize_tiling_key_group_map_for_list(
+            tiling_key_group_map, tiling_key_list)
         normalized_tiling_key_struct_map = self._normalize_tiling_key_struct_map(tiling_key_struct_map)
-        normalized_tiling_key_list = self._normalize_tiling_key_list(tiling_key_list)
+        normalized_tiling_key_struct_map = self._expand_tiling_key_struct_map_with_group(
+            normalized_tiling_key_struct_map, normalized_tiling_key_group_map)
+        normalized_tiling_key_list = self._normalize_tiling_key_list(
+            tiling_key_list, normalized_tiling_key_group_map)
         if normalized_tiling_key_list:
             normalized_tiling_keys = set(normalized_tiling_key_list)
+            for tiling_key in list(by_tiling_key.keys()):
+                if tiling_key not in normalized_tiling_keys:
+                    by_tiling_key.pop(tiling_key)
             normalized_tiling_key_struct_map = {
                 tiling_key: tiling_struct
                 for tiling_key, tiling_struct in normalized_tiling_key_struct_map.items()
@@ -206,7 +228,7 @@ class OpCompileManifestRecorder:
                 sources.append(source)
 
     def record_kernel_type_info(self, tiling_key_kernel_type=None, default_kernel_type=None,
-                                tiling_key_list=None):
+                                tiling_key_list=None, tiling_key_group_map=None):
         kernel_type_info = self.manifest.setdefault("kernel_type_info", {
             "default": "",
             "by_tiling_key": {}
@@ -216,9 +238,14 @@ class OpCompileManifestRecorder:
 
         by_tiling_key = kernel_type_info.setdefault("by_tiling_key", {})
         normalized_kernel_type_map = self._normalize_tiling_key_kernel_type_map(tiling_key_kernel_type)
-        normalized_tiling_key_list = self._normalize_tiling_key_list(tiling_key_list)
+        normalized_tiling_key_list = self._normalize_tiling_key_list(
+            tiling_key_list,
+            self._normalize_tiling_key_group_map_for_list(tiling_key_group_map, tiling_key_list))
         if normalized_tiling_key_list:
             normalized_tiling_keys = set(normalized_tiling_key_list)
+            for tiling_key in list(by_tiling_key.keys()):
+                if tiling_key not in normalized_tiling_keys:
+                    by_tiling_key.pop(tiling_key)
             normalized_kernel_type_map = {
                 tiling_key: kernel_type
                 for tiling_key, kernel_type in normalized_kernel_type_map.items()
@@ -267,10 +294,67 @@ class OpCompileManifestRecorder:
         return str(tiling_key).rstrip("ULul")
 
     @staticmethod
-    def _normalize_tiling_key_list(tiling_key_list):
+    def _append_unique(items, item):
+        if item not in items:
+            items.append(item)
+
+    @staticmethod
+    def _normalize_tiling_key_list(tiling_key_list, tiling_key_group_map=None):
         if not tiling_key_list:
             return []
-        return [OpCompileManifestRecorder._normalize_tiling_key(tiling_key) for tiling_key in tiling_key_list]
+        normalized_list = []
+        for tiling_key in tiling_key_list:
+            normalized_tiling_key = OpCompileManifestRecorder._normalize_tiling_key(tiling_key)
+            OpCompileManifestRecorder._append_unique(normalized_list, normalized_tiling_key)
+            if tiling_key_group_map and normalized_tiling_key in tiling_key_group_map:
+                for tiling_key_slave in tiling_key_group_map[normalized_tiling_key]:
+                    OpCompileManifestRecorder._append_unique(normalized_list, tiling_key_slave)
+        return normalized_list
+
+    @staticmethod
+    def _normalize_tiling_key_group_map(tiling_key_group_map):
+        if not tiling_key_group_map:
+            return {}
+        normalized_map = {}
+        for tiling_key_master, tiling_key_slaves in tiling_key_group_map.items():
+            normalized_master = OpCompileManifestRecorder._normalize_tiling_key(tiling_key_master)
+            if isinstance(tiling_key_slaves, (list, tuple, set)):
+                slave_iter = tiling_key_slaves
+            else:
+                slave_iter = [tiling_key_slaves]
+            normalized_slaves = []
+            for tiling_key_slave in slave_iter:
+                normalized_slave = OpCompileManifestRecorder._normalize_tiling_key(tiling_key_slave)
+                OpCompileManifestRecorder._append_unique(normalized_slaves, normalized_slave)
+            normalized_map[normalized_master] = normalized_slaves
+        return normalized_map
+
+    @staticmethod
+    def _normalize_tiling_key_group_map_for_list(tiling_key_group_map, tiling_key_list):
+        normalized_group_map = OpCompileManifestRecorder._normalize_tiling_key_group_map(tiling_key_group_map)
+        if not normalized_group_map:
+            return {}
+        if not tiling_key_list:
+            return normalized_group_map
+        normalized_tiling_keys = set(
+            OpCompileManifestRecorder._normalize_tiling_key(tiling_key) for tiling_key in tiling_key_list)
+        return {
+            tiling_key_master: tiling_key_slaves
+            for tiling_key_master, tiling_key_slaves in normalized_group_map.items()
+            if tiling_key_master in normalized_tiling_keys
+        }
+
+    @staticmethod
+    def _expand_tiling_key_struct_map_with_group(tiling_key_struct_map, tiling_key_group_map):
+        if not tiling_key_struct_map or not tiling_key_group_map:
+            return tiling_key_struct_map
+        expanded_map = dict(tiling_key_struct_map)
+        for tiling_key_master, tiling_key_slaves in tiling_key_group_map.items():
+            if tiling_key_master not in expanded_map:
+                continue
+            for tiling_key_slave in tiling_key_slaves:
+                expanded_map.setdefault(tiling_key_slave, expanded_map[tiling_key_master])
+        return expanded_map
 
     @staticmethod
     def _normalize_tiling_key_kernel_type_map(tiling_key_kernel_type):
@@ -336,6 +420,28 @@ class OpCompileManifestRecorder:
             else:
                 wrapper_body_lines.append(line)
         return wrapper_body_lines, replaced
+
+    @staticmethod
+    def _insert_kernel_type_placeholder(source_lines):
+        kernel_func_pattern = re.compile(
+            r"(?P<prefix>\b__global__(?:(?!\bvoid\b).)*?\[aicore\]\s+)"
+            r"(?P<suffix>void\s+[A-Za-z_]\w*\s*\()")
+        wrapper_body_lines = []
+        inserted = False
+        for line in source_lines:
+            if KERNEL_TYPE_PLACEHOLDER in line:
+                wrapper_body_lines.append(line)
+                inserted = True
+                continue
+
+            def _replace(match):
+                nonlocal inserted
+                inserted = True
+                return "{}{} {}".format(
+                    match.group("prefix"), KERNEL_TYPE_PLACEHOLDER, match.group("suffix"))
+
+            wrapper_body_lines.append(kernel_func_pattern.sub(_replace, line))
+        return wrapper_body_lines, inserted
 
     @staticmethod
     def _extract_tiling_struct_definitions(source_lines):
