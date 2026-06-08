@@ -37,11 +37,11 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 **表 2**  参数说明
 
-| 参数名 | 输入/输出 | 含义 |
+| 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数。类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32B对齐。 |
-| src | 输入 | 源操作数。类型为LocalTensor，存储位置为UB，源地址需要32B对齐。 |
-| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32B对齐，若不对齐，搬运量将对32字节做向下取整。 |
+| dst | 输出 | 目的操作数。类型为LocalTensor，存储位置为UB (Unified Buffer)，目的地址需要32字节对齐。 |
+| src | 输入 | 源操作数。类型为LocalTensor，存储位置为UB，源地址需要32字节对齐。 |
+| count | 输入 | 参与搬运的元素个数。<br>说明：count * sizeof(T)需要32字节对齐，若不对齐，搬运量将对32字节做向下取整。 |
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002567699425_fig13481537531)将源操作数中128个元素连续搬运至目的操作数。
 
@@ -88,8 +88,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 位于UB的地址必须32B对齐。
-- 调用连续搬运接口时，count \* sizeof\(T\)需要32B对齐，若未对齐，则搬运量会向下取整到32B对齐。
+- 位于UB的地址必须32字节对齐。
+- 调用连续搬运接口时，count \* sizeof\(T\)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。
 <cann-filter npu-type="910b,A3">
 
 - 针对如下产品型号：

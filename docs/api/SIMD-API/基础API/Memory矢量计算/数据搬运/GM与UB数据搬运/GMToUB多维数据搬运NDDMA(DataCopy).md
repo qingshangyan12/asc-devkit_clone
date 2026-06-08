@@ -46,7 +46,7 @@
 
 **表 2**  参数说明
 
-| 参数名称 | 输入/输出 | 含义 |
+| 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。 |
 | src | 输入 | 源操作数，类型为GlobalTensor。 |
@@ -54,7 +54,7 @@
 
 **表 3**  NdDmaConfig结构体参数定义<a name="table_nddma_3"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | :--- | :--- |
 | unsetPad | 表示不设置PaddingSize，固定为0xFFFF。 |
 | isNearestValueMode | 表示Padding值填取方式，类型为bool。<br>True：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充，可参考[图1](#fig10722115123919)。<br>False：使能常数填充方式，即所有Padding值填充为固定值NdDmaParams::constantValue。<br>当数据类型为b64时，参数isNearestValueMode的值应为False。 |
@@ -64,14 +64,14 @@
 
 **表 4**  NdDmaParams结构体参数定义<a name="table_nddma_4"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | :--- | :--- |
 | loopInfo | 每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。<br>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考[表5](#table_nddma_5)。 |
 | constantValue | 数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>当数据类型为b64时，参数constantValue的值应为0。 |
 
 **表 5**  NdDmaLoopInfo结构体参数定义<a name="table_nddma_5"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | :--- | :--- |
 | loopSrcStride | 表示每个维度内，该源操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint64_t，loopSrcStride需在[0, 2<sup>40</sup>)。 |
 | loopDstStride | 表示每个维度内，该目的操作数元素与下一个元素间的间隔。<br>单位为元素个数。数据类型为uint32_t，loopDstStride需在[0, 2<sup>20</sup>)。 |

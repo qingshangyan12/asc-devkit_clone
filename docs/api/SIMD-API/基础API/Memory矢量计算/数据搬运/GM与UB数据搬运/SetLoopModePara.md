@@ -38,18 +38,18 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 **表 2**  LoopModeParams结构体参数说明<a name="table_setloop_2"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | --- | --- |
 | loop1Size | 用于设置内层循环的循环次数，数据类型为uint32_t，取值范围为[0, 2^21)。 |
 | loop2Size | 用于设置外层循环的循环次数，数据类型为uint32_t，取值范围为[0, 2^21)。 |
-| loop1SrcStride | 用于设置内层循环中相邻迭代源操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop1SrcStride必须32B对齐。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |
-| loop1DstStride | 用于设置内层循环中相邻迭代目的操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^40)。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^21)，并且loop1DstStride必须32B对齐。 |
-| loop2SrcStride | 用于设置外层循环中相邻迭代源操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop2SrcStride必须32B对齐。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |
-| loop2DstStride | 用于设置外层循环中相邻迭代目的操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^40)。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^21)，并且loop2DstStride必须32B对齐。 |
+| loop1SrcStride | 用于设置内层循环中相邻迭代源操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop1SrcStride必须32字节对齐。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |
+| loop1DstStride | 用于设置内层循环中相邻迭代目的操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^40)。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^21)，并且loop1DstStride必须32字节对齐。 |
+| loop2SrcStride | 用于设置外层循环中相邻迭代源操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop2SrcStride必须32字节对齐。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |
+| loop2DstStride | 用于设置外层循环中相邻迭代目的操作数的数据块间的间隔，单位为Byte，数据类型为uint64_t。<br>&bull; 当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^40)。<br>&bull; 当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^21)，并且loop2DstStride必须32字节对齐。 |
 
 **表 3**  DataCopyMVType结构体参数说明 <a name="table1166074612214"></a>
 
-| 参数名称 | 含义 |
+| 参数名 | 描述 |
 | --- | --- |
 | UB_TO_OUT | 从UB搬运到GM的通路。 |
 | OUT_TO_UB | 从GM搬运到UB的通路。 |
@@ -72,7 +72,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 源操作数和目的操作数的起始地址需要保证32B对齐。
+- 源操作数和目的操作数的起始地址需要保证32字节对齐。
 - 目的操作数的数据不能重叠，如果有重叠，硬件层面不会报错或者告警，同时也不能保证重叠数据的正确性；但是不同迭代可以交织，例如内层循环中相邻迭代目的操作数的数据块间的间隔可以小于相邻连续目的操作数的数据块的间隔。
 - 需要在每次使能loop mode并且设置loop mode的参数后通过ResetLoopModePara进行寄存器的复位，否则会影响到下一次对应通路的搬运的使用，引发异常。
 
@@ -82,7 +82,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
     ```cpp
     // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
-    // Compact模式：每次内层循环搬运80B后填充16B使其96B对齐
+    // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
@@ -97,7 +97,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
     ```cpp
     // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
-    // Normal模式：每个block搬运40B后填充24B使其64B对齐
+    // Normal模式：每个block搬运40B后填充24B使其64字节对齐
     // padding值设为-1
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
