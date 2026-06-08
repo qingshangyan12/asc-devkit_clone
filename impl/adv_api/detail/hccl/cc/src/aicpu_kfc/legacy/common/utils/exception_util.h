@@ -15,6 +15,7 @@
 #include "string_util.h"
 #include <string>
 #include <exception>
+#include <algorithm>
 
 #define MACRO_THROW(EXCEPTION, MSG)                                                                                    \
     do {                                                                                                               \
@@ -53,11 +54,11 @@
         } catch (HcclException & e) {                                                                                  \
             HCCL_ERROR("Exception occurred: %s", e.what());                                                            \
             auto backTraces = e.GetBackTraceStrings();                                                                 \
-            std::for_each(backTraces.begin(), backTraces.end(), [](string item) {                                      \
+            std::for_each(backTraces.begin(), backTraces.end(), [](std::string item) {                                 \
                 HCCL_INFO("backTraces item: %s", item.c_str());                                                        \
             });                                                                                                        \
             return e.GetErrorCode();                                                                                   \
-        } catch (exception & e) {                                                                                      \
+        } catch (std::exception & e) {                                                                                  \
             HCCL_ERROR("Exception occurred: %s", e.what());                                                            \
             return HcclResult::HCCL_E_INTERNAL;                                                                        \
         } catch (...) {                                                                                                \
@@ -90,10 +91,10 @@
         } catch (HcclException & e) {                                                                                  \
             HCCL_ERROR("Exception occurred: %s", e.what());                                                            \
             auto backTraces = e.GetBackTraceStrings();                                                                 \
-            std::for_each(backTraces.begin(), backTraces.end(), [](string item) {                                      \
+            std::for_each(backTraces.begin(), backTraces.end(), [](std::string item) {                                  \
                 HCCL_INFO("backTraces item: %s", item.c_str());                                                        \
             });                                                                                                        \
-        } catch (exception & e) {                                                                                      \
+        } catch (std::exception & e) {                                                                                 \
             HCCL_ERROR("Exception occurred: %s", e.what());                                                            \
         } catch (...) {                                                                                                \
             HCCL_ERROR("Unkown error occurs!");                                                                        \
