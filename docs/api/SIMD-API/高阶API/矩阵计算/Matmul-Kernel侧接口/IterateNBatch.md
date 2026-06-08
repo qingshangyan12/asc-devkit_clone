@@ -168,6 +168,7 @@ __aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, 
 -   单BMM内计算遵循之前的约束条件。
 -   对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵多Batch数据总和应小于L1 Buffer的大小。
 -   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#p9218181073719)设置为true，不支持使用该接口。
+-   当使用ND格式输入时，若单个BMM内A/B矩阵的源矩阵内轴大于65535，需要在MatmulConfig中设置intrinsicsCheck=true。设置为true后，API内部会将一次Global Memory到L1 Buffer的ND2NZ搬运拆分为多次循环搬运，以规避单次搬运指令参数超限。
 
 ## 调用示例<a name="section94691236101419"></a>
 
