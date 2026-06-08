@@ -1,22 +1,24 @@
 # Mmad计算边界值<a name="ZH-CN_TOPIC_0000002607849175"></a>
 
-本节汇总介绍了Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品  Mmad计算接口在边界值输入下的输出结果：
+<cann-filter npu-type="A3,910b">
+
+本节汇总介绍了Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品的Mmad计算接口在边界值输入下的输出结果：
 
 **表 1**  Mmad特殊值/边界值输入的计算结果说明
 
 <a name="table7822641411"></a>
 | C矩阵的数据类型 | Mmad子阶段 | A矩阵的元素取值 | B矩阵的元素取值 | dst的元素取值<br>（INF/NAN模式） |
 | --- | --- | --- | --- | --- |
-| float | 乘法阶段 | +inf | norm(> 0.0) / +inf | +inf |
-| float | 乘法阶段 | +inf | norm(< 0.0) / -inf | -inf |
-| float | 乘法阶段 | -inf | norm(> 0.0) / +inf | -inf |
-| float | 乘法阶段 | -inf | norm(< 0.0) / -inf | +inf |
+| float | 乘法阶段 | +inf | norm(> 0.0)/+inf | +inf |
+| float | 乘法阶段 | +inf | norm(< 0.0)/-inf | -inf |
+| float | 乘法阶段 | -inf | norm(> 0.0)/+inf | -inf |
+| float | 乘法阶段 | -inf | norm(< 0.0)/-inf | +inf |
 | float | 乘法阶段 | +inf/-inf | 0.0 | nan |
 | float | 乘法阶段 | norm(> 0.0) | +inf | +inf |
 | float | 乘法阶段 | norm(> 0.0) | -inf | -inf |
 | float | 乘法阶段 | norm(< 0.0) | +inf | -inf |
 | float | 乘法阶段 | norm(< 0.0) | -inf | +inf |
-| float | 乘法阶段 | 0.0 | +inf/ -inf | nan |
+| float | 乘法阶段 | 0.0 | +inf/-inf | nan |
 | float | 乘法阶段 | nan | 任意输入 | nan |
 | float | 乘法阶段 | 任意输入 | nan | nan |
 | float | 乘法阶段 | 任意输入 | 任意输入 | 结果溢出情况下，正向溢出为INF，负向溢出为-INF |
@@ -33,3 +35,4 @@
 
 （2）饱和模式下，+inf按照数据类型取对应max，-inf按照数据类型取对应min值参与计算，nan值按照0参与计算。
 
+</cann-filter>

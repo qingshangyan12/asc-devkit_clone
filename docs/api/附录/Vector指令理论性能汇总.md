@@ -3,11 +3,11 @@
 **表 1**  基础算术类指令理论性能汇总
 
 <a name="table291476204714"></a>
-| 接口 | 输入/输出数据类型 | 硬件并行度（单位：element / cycle） |
+| 接口 | 输入/输出数据类型 | 硬件并行度（单位：element/cycle） |
 | --- | --- | --- |
 | Add | half | 128 |
-| Add | int16 | 128 |
-| Add | int32 | 64 |
+| Add | int16_t | 128 |
+| Add | int32_t | 64 |
 | Add | float | 64 |
 | Exp | half（fp16） | 32 |
 | Exp | float（fp32） | 32 |
@@ -25,48 +25,48 @@
 | Relu | float（fp32） | 64 |
 | Relu | int32_t | 64 |
 | Sub | half（fp16） | 128 |
-| Sub | int16 | 128 |
-| Sub | int32 | 64 |
+| Sub | int16_t | 128 |
+| Sub | int32_t | 64 |
 | Sub | float（fp32） | 64 |
 | Mul | half（fp16） | 128 |
-| Mul | int16 | 128 |
-| Mul | int32 | 64 |
+| Mul | int16_t | 128 |
+| Mul | int32_t | 64 |
 | Mul | float（fp32） | 64 |
 | Div | half（fp16） | 32 |
 | Div | float（fp32） | 32 |
 | Max | half（fp16） | 128 |
-| Max | int16 | 128 |
-| Max | int32 | 64 |
+| Max | int16_t | 128 |
+| Max | int32_t | 64 |
 | Max | float（fp32） | 64 |
 | Min | half（fp16） | 128 |
-| Min | int16 | 128 |
-| Min | int32 | 64 |
+| Min | int16_t | 128 |
+| Min | int32_t | 64 |
 | Min | float（fp32） | 64 |
 | Adds | half（fp16） | 128 |
-| Adds | int16 | 128 |
-| Adds | int32 | 64 |
+| Adds | int16_t | 128 |
+| Adds | int32_t | 64 |
 | Adds | float（fp32） | 64 |
 | Muls | half（fp16） | 128 |
-| Muls | int16 | 128 |
-| Muls | int32 | 64 |
+| Muls | int16_t | 128 |
+| Muls | int32_t | 64 |
 | Muls | float（fp32） | 64 |
 | Maxs | half（fp16） | 128 |
-| Maxs | int16 | 128 |
-| Maxs | int32 | 64 |
+| Maxs | int16_t | 128 |
+| Maxs | int32_t | 64 |
 | Maxs | float（fp32） | 64 |
 | Mins | half（fp16） | 128 |
-| Mins | int16 | 128 |
-| Mins | int32 | 64 |
+| Mins | int16_t | 128 |
+| Mins | int32_t | 64 |
 | Mins | float（fp32） | 64 |
 | LeakyRelu | half（fp16） | 128 |
-| LeakyRelu | int16 | 128 |
-| LeakyRelu | int32 | 64 |
+| LeakyRelu | int16_t | 128 |
+| LeakyRelu | int32_t | 64 |
 | LeakyRelu | float（fp32） | 64 |
 
 **表 2**  逻辑计算类指令理论性能汇总
 
 <a name="table116881509216"></a>
-| 接口 | src数据类型 | 硬件并行度（单位：element / cycle） |
+| 接口 | src数据类型 | 硬件并行度（单位：element/cycle） |
 | --- | --- | --- |
 | Not | int16_t/uint16_t | 128 |
 | And | int16_t/uint16_t | 128 |
@@ -79,7 +79,7 @@
 **表 3**  复合计算类指令理论性能汇总
 
 <a name="table1089823515222"></a>
-| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element / cycle） |
+| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element/cycle） |
 | --- | --- | --- | --- | --- |
 | Axpy | half | half | half | 128 |
 | Axpy | float | float | float | 64 |
@@ -112,7 +112,7 @@
 **表 4**  比较与选择类指令理论性能汇总
 
 <a name="table205131952256"></a>
-| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element / cycle） |
+| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element/cycle） |
 | --- | --- | --- | --- | --- |
 | Compare | half | half | uint8_t、int8_t | 128 |
 | Compare | float | float | uint8_t、int8_t | 64 |
@@ -127,7 +127,7 @@
 **表 5**  类型转换类指令理论性能汇总
 
 <a name="table1712055602918"></a>
-| 接口 | src数据类型 | dst数据类型 | 理论并行度（element / cycle） |
+| 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
 | Cast | int4b_t | half | 128 |
 | Cast | uint8_t | half | 128 |
@@ -147,7 +147,7 @@
 **表 6**  归约计算类指令理论性能汇总
 
 <a name="table76761043412"></a>
-| 接口 | src数据类型 | dst数据类型 | 理论并行度（element / cycle） |
+| 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
 | ReduceDataBlock | half（fp16） | half（fp16） | 128/7 |
 | ReduceDataBlock | float（fp32） | float（fp32） | 64 |
@@ -160,7 +160,7 @@
 **表 7**  数据排布转换类指令理论性能汇总
 
 <a name="table2514311153610"></a>
-| 接口 | src数据类型 | dst数据类型 | 理论并行度（element / cycle） |
+| 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
 | Transpose | int8_t/uint8_t | int8_t/uint8_t | 256 |
 | Transpose | int16_t/uint16_t/half | int16_t/uint16_t/half | 128 |
@@ -172,7 +172,7 @@
 **表 8**  数据填充类指令理论性能汇总
 
 <a name="table18675133833617"></a>
-| 接口 | src数据类型 | dst数据类型 | 理论输入并行度（element / cycle） | 理论输出并行度（element / cycle） |
+| 接口 | src数据类型 | dst数据类型 | 理论输入并行度（element/cycle） | 理论输出并行度（element/cycle） |
 | --- | --- | --- | --- | --- |
 | Brcb | int16_t/uint16_t/half/bfloat16_t | int16_t/uint16_t/half/bfloat16_t | 8 | 128 |
 | Brcb | int32_t/uint32_t/float | int32_t/uint32_t/float | 8 | 64 |
@@ -184,7 +184,7 @@
 **表 9**  排序组合类指令理论性能汇总
 
 <a name="table1361419514367"></a>
-| 接口 | src0数据类型 | src1数据类型 | dst数据类型 | 理论并行度（element / cycle） |
+| 接口 | src0数据类型 | src1数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- | --- |
 | Sort32 | half（fp16） | uint32_t | half（fp16） | 64 |
 | Sort32 | float（fp32） | uint32_t | float（fp32） | 32 |
@@ -193,7 +193,7 @@
 **表 10**  离散与聚合类指令理论性能汇总
 
 <a name="table111588914379"></a>
-| 接口 | src数据类型 | dst数据类型 | 理论并行度（element / cycle） |
+| 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
 | Gather | int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float | int16_t/uint16_t/half/bfloat16_t/int32_t/uint32_t/float | 5 |
 | Gatherb | uint16_t | uint16_t | 42 |
@@ -202,7 +202,7 @@
 **表 11**  掩码操作类指令理论性能汇总
 
 <a name="table12905102516375"></a>
-| 接口 | 输入数据类型 | 理论并行度（element / cycle） |
+| 接口 | 输入数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- |
 | SetMaskCount | / | 1 |
 | SetMaskNorm | / | 1 |
@@ -213,20 +213,20 @@
 **表 12**  标量计算类指令理论性能汇总
 
 <a name="table12906133883716"></a>
-| 接口 | 输入数据类型 | 输出数据类型 | 理论并行度（cycle / instruction） |
+| 接口 | 输入数据类型 | 输出数据类型 | 理论并行度（cycle/instruction） |
 | --- | --- | --- | --- |
 | GetBitCount | uint64_t | int64_t | 1 |
 | CountLeadingZero | uint64_t | int64_t | 1 |
 | GetSFFValue | uint64_t | int64_t | 1 |
 | CountBitsCntSameAsSignBit | int64_t | int64_t | 1 |
-| Cast（float转half、int32_t） | float | half / int32_t | 1 |
+| Cast（float转half、int32_t） | float | half/int32_t | 1 |
 | Cast（float转bfloat16_t） | 软仿指令，不提供理论并行度 |  |  |
 | Cast（bfloat16_t转float） | 软仿指令，不提供理论并行度 |  |  |
 
 **表 13**  系统变量访问类指令理论性能汇总
 
 <a name="table1843362415383"></a>
-| 接口 | 理论并行度（cycle / instruction） |
+| 接口 | 理论并行度（cycle/instruction） |
 | --- | --- |
 | GetBlockNum | 1 |
 | GetBlockIdx（AIC） | 1 |
@@ -242,7 +242,7 @@
 **表 14**  工具接口类指令理论性能汇总
 
 <a name="table14541161453912"></a>
-| 接口 | 理论并行度（cycle / instruction） |
+| 接口 | 理论并行度（cycle/instruction） |
 | --- | --- |
 | InitSocState | 软仿指令，不提供理论并行度 |
 | Async | 静态编译，无消耗 |

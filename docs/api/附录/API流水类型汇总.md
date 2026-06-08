@@ -141,4 +141,3 @@
 | GetSystemCycle |  | PIPE_S |
 | GetProgramCounter |  | PIPE_S |
 | GetArchVersion |  | PIPE_S |
-
