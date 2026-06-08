@@ -297,9 +297,7 @@ private:
 };
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_tensor_impl.h"
-#endif
 #endif // KERNEL_TENSOR_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H__)
