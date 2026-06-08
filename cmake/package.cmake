@@ -90,9 +90,10 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CM
 # 安装到目标位置
 install(DIRECTORY ${MAKESELF_PATH} 
         DESTINATION ${INSTALL_LIBRARY_DIR}/tikcpp/ascendc_kernel_cmake/fwk_modules/util 
-        FILE_PERMISSIONS
-            OWNER_READ OWNER_EXECUTE
-            GROUP_READ GROUP_EXECUTE
+        PATTERN "*"
+            PERMISSIONS
+                OWNER_READ OWNER_EXECUTE
+                GROUP_READ GROUP_EXECUTE
         COMPONENT asc-devkit
         PATTERN ".github" EXCLUDE
         PATTERN ".gitignore" EXCLUDE
