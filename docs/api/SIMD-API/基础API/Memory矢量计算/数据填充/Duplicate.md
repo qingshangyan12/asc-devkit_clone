@@ -77,12 +77,13 @@ def Duplicate(scalarValue, dst, count):
 
 - tensor前n个数据计算-源操作数为标量
 
-        ```cpp
-        template <typename T>
-        __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
-        ```
+    ```cpp
+    template <typename T>
+    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
+    ```
 
-<cann-filter npu-type="950">
+<cann-filter npu-type="950"> 
+
 - tensor前n个数据计算-源操作数为Tensor
 
     ```cpp
@@ -186,11 +187,12 @@ def Duplicate(scalarValue, dst, count):
     int32_t srcDataSize = 256; // 参与计算的元素个数
     AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
-<cann-filter npu-type="950">
-- tensor前n个数据计算样例，源操作数为Tensor
 
+<cann-filter npu-type="950"> 
+
+- tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
-    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
+    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
     ```
 </cann-filter>
 结果示例如下：
