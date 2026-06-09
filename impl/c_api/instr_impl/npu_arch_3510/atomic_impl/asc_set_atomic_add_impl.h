@@ -9,26 +9,56 @@
  */
 
 /* !
- * \file asc_set_atomic_min_bfloat_impl.h
- * \brief
+ * \file asc_set_atomic_add_impl.h
+ * \brief Atomic add operations for various data types (bfloat, float, float16, int, int8, int16)
  */
 
 #if !defined(ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #warning                                                                                                               \
-    "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_min_bfloat_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
+    "impl/c_api/instr_impl/npu_arch_3510/atomic_impl/asc_set_atomic_add_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
 #endif
 
-#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_MIN_BFLOAT_IMPL_H
-#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_MIN_BFLOAT_IMPL_H
+#ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_ADD_IMPL_H
+#define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_ATOMIC_IMPL_ASC_SET_ATOMIC_ADD_IMPL_H
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_set_atomic_min_bfloat_impl()
+__aicore__ inline void asc_set_atomic_add_bfloat_impl()
 {
-    set_atomic_min();
     set_atomic_bf16();
+    set_atomic_add();
+}
+
+__aicore__ inline void asc_set_atomic_add_float_impl()
+{
+    set_atomic_f32();
+    set_atomic_add();
+}
+
+__aicore__ inline void asc_set_atomic_add_float16_impl()
+{
+    set_atomic_f16();
+    set_atomic_add();
+}
+
+__aicore__ inline void asc_set_atomic_add_int_impl()
+{
+    set_atomic_s32();
+    set_atomic_add();
+}
+
+__aicore__ inline void asc_set_atomic_add_int8_impl()
+{
+    set_atomic_s8();
+    set_atomic_add();
+}
+
+__aicore__ inline void asc_set_atomic_add_int16_impl()
+{
+    set_atomic_s16();
+    set_atomic_add();
 }
 
 #endif
