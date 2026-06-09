@@ -17,8 +17,6 @@
 #include "alg_env_config.h"
 #include "param_check.h"
 #include "sal.h"
-#include "hcomm/hccl/hccl_res.h"
-#include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include <memory>
 #include <string>
 #include <chrono>
