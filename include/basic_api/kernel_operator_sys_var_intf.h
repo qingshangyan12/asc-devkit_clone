@@ -94,7 +94,11 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #else
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #if defined(SPLIT_CORE_VEC)
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    constexpr uint32_t RESERVED_UB_SIZE = 6 * 1024;
+#else
     constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+#endif
     return get_shmem_sz() - RESERVED_UB_SIZE;
 #else
     return TOTAL_UB_SIZE;  // cube core not support get_shmem_sz
