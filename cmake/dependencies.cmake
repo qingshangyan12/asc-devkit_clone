@@ -15,14 +15,15 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
 )
 
-find_cann_package(unified_dlog REQUIRED)
-find_cann_package(securec REQUIRED)
-find_cann_package(mmpa REQUIRED)
-find_cann_package(metadef REQUIRED)
-find_cann_package(platform REQUIRED)
-find_cann_package(error_manager REQUIRED)
-find_cann_package(acl_rt REQUIRED)
-find_cann_package(runtime REQUIRED)
+foreach(_pkg securec mmpa metadef platform runtime acl_rt error_manager)
+    if(NOT TARGET ${_pkg})
+        find_cann_package(${_pkg} REQUIRED)
+    endif()
+endforeach()
+
+if(NOT TARGET unified_dlog)
+    find_cann_package(unified_dlog REQUIRED)
+endif()
 
 if(ENABLE_TEST)
   find_cann_package(graph REQUIRED)
