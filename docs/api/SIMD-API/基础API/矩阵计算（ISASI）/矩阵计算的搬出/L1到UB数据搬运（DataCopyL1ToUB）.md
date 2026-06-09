@@ -37,7 +37,7 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数的数据类型。支持的数据类型为b8、b16、b32、b64。 |
-| subBlockId | AI Core上的Vector核ID。根据输入的Vector核ID，将数据搬运至对应核上的UB地址。可通过[GetSubBlockIdx](../../系统变量访问/GetSubBlockIdx(ISASI).md)接口获取Vector核ID。 |
+| subBlockId | AI Core上的Vector核ID。根据输入的Vector核ID，将数据搬运至对应核上的UB地址。 |
 
 **表 2**  参数说明
 
@@ -63,7 +63,9 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 
 ## 约束说明
 
-如果需要执行多个DataCopyL1ToUB指令，且DataCopyL1ToUB的目的地址存在重叠，需要通过调用[PipeBarrier\(ISASI\)](../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopyL1ToUB指令的串行化，防止出现异常数据。
+- 该接口仅适用于Mix算子场景，且仅支持Cube核数与Vector核数比例为**1:2**的配置。在该场景下，subBlockId仅支持取值**0**或**1**。
+
+- 如果需要执行多个DataCopyL1ToUB指令，且DataCopyL1ToUB的目的地址存在重叠，需要通过调用[PipeBarrier\(ISASI\)](../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopyL1ToUB指令的串行化，防止出现异常数据。
 
 ## 调用示例
 
