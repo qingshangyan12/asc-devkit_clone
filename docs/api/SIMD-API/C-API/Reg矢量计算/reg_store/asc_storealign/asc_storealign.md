@@ -1,11 +1,11 @@
 # asc_storealign
 
-- **[asc_storealign_v1](asc_storealign_v1.md)**
+- **[asc_storealign_norm](asc_storealign_norm.md)** - NORM搬出模式
 
-- **[asc_storealign_v2](asc_storealign_v2.md)**
+- **[asc_storealign_first](asc_storealign_first.md)** - FIRST搬出模式
 
-- **[asc_storealign_v3](asc_storealign_v3.md)**
+- **[asc_storealign_pack](asc_storealign_pack.md)** - PACK搬出模式
 
-- **[asc_storealign_v4](asc_storealign_v4.md)**
+- **[asc_storealign_pack_v2](asc_storealign_pack_v2.md)** - PACKV2搬出模式
 
-- **[asc_storealign_v5](asc_storealign_v5.md)**
+- **[asc_storealign_intlv](asc_storealign_intlv.md)** - INTLV搬出模式
