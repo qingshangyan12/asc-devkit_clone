@@ -2,26 +2,25 @@
 
 ## 具体步骤<a name="section17812263817"></a>
 
-在定义Tiling结构体时，可以使用标准C++语法定义一个**POD类型（Plain Old Data）**，即与C语言兼容的数据类型。具体步骤如下。完整样例请参考[标准C++语法定义Tiling结构体样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/0_introduction/10_matmul_frameworklaunch/MatmulCustomMultiCore)。
+在定义Tiling结构体时，可以使用标准C++语法定义一个**POD类型（Plain Old Data）**，即与C语言兼容的数据类型。具体步骤如下。完整样例请参考[标准C++语法定义Tiling结构体样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/00_compilation/custom_op)。
 
 1.  使用C++语法定义Tiling结构体。
 
     >[!NOTE]说明 
     >该结构体定义所在的头文件应放置在算子工程的op\_kernel目录下。由于只有该目录下的文件会被打包进算子包，供在线编译场景中使用，若将文件放置在其他目录中，可能导致在线编译因找不到相关文件而失败。
 
-    用户在使用高阶API的Tiling结构体时，通过AscendC::tiling命名空间引用"kernel\_tiling/kernel\_tiling.h"中预定义的Tiling结构体，如下代码所示。
+    用户在使用高阶API的Tiling结构体时，可通过AscendC::tiling命名空间引用"kernel\_tiling/kernel\_tiling.h"中预定义的Tiling结构体。如下代码为一个简单的Tiling结构体定义示例。
 
     ```
-    #ifndef MATMUL_CUSTOM_TILING_H
-    #define MATMUL_CUSTOM_TILING_H
+    #ifndef ADD_CUSTOM_TILING_H
+    #define ADD_CUSTOM_TILING_H
     #include <cstdint>
-    #include "kernel_tiling/kernel_tiling.h"    // for TCubeTiling
-    
-    struct MatmulCustomTilingData {
-        uint64_t localMemSize;
-        AscendC::tiling::TCubeTiling cubeTilingData;
+
+    struct AddCustomTilingData {
+        uint32_t totalLength;
+        uint32_t tileNum;
     };
-    #endif  // MATMUL_CUSTOM_TILING_H
+    #endif // ADD_CUSTOM_TILING_H
     ```
 
 2.  Host侧Tiling函数中对Tiling结构体赋值。
@@ -30,25 +29,23 @@
     -   通过GetTilingData获取Tiling结构体指针，并对其成员变量进行赋值。
 
     ```
-    #include "../op_kernel/matmul_custom_tiling.h"  // 包含Tiling结构体定义头文件
-    ...
-    
+    #include "../../op_kernel/add_custom/add_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    #include "register/op_def_registry.h"
+
     namespace optiling {
+    const uint32_t NUM_BLOCKS = 8;
+    const uint32_t TILE_NUM = 8;
     static ge::graphStatus TilingFunc(gert::TilingContext *context)
     {
-        ...
-        MultiCoreMatmulTiling cubeTiling(ascendcPlatform);
-        ...
         // 获取Tiling结构体指针
-        MatmulCustomTilingData *tiling = context->GetTilingData<MatmulCustomTilingData>();
+        AddCustomTilingData *tiling = context->GetTilingData<AddCustomTilingData>();
+        uint32_t totalLength = context->GetInputShape(0)->GetOriginShape().GetShapeSize();
+        context->SetBlockDim(NUM_BLOCKS);
         // 对tiling的成员变量赋值
-        if (cubeTiling.GetTiling(tiling->cubeTilingData) == -1) {
-            return ge::GRAPH_FAILED;
-        }
-        uint64_t localMemSize;
-        ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, localMemSize);
-        tiling->localMemSize = localMemSize;
-        ...
+        tiling->totalLength = totalLength;
+        tiling->tileNum = TILE_NUM;
+        size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+        currentWorkspace[0] = 0;
         return ge::GRAPH_SUCCESS;
     }
     } // namespace optiling
@@ -61,17 +58,18 @@
 
     ```
     #include "kernel_operator.h"
-    #include "matmul_custom_tiling.h"  // 包含Tiling结构体定义头文件
-    
-    extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR workspace, GM_ADDR tiling)
+    #include "add_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    ...
+    // KernelAdd类实现
+    ...
+
+    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
-        REGISTER_TILING_DEFAULT(MatmulCustomTilingData);
+        REGISTER_TILING_DEFAULT(AddCustomTilingData);
         GET_TILING_DATA(tilingData, tiling);
-        MatmulKernel<half, half, float, float> matmulKernel;
-        AscendC::TPipe pipe;
-        REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), matmulKernel.matmulObj, &tilingData.cubeTilingData); // Initialize the matmul object.
-        matmulKernel.Init(a, b, bias, c, workspace, tilingData.localMemSize, tilingData.cubeTilingData);
-        ...
+        KernelAdd op;
+        op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum);
+        op.Process();
     }
     ```
 
@@ -382,4 +380,3 @@
         ...
     }
     ```
-
