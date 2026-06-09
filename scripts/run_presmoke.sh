@@ -154,25 +154,6 @@ should_clean_cann_vendors() {
     return 0
 }
 
-install_python_requirements() {
-    if [[ "${PRESMOKE_INSTALL_REQUIREMENTS:-1}" == "0" ]]; then
-        log "python_requirements_skip reason=disabled"
-        return
-    fi
-
-    local requirements_file
-    requirements_file="$PROJECT_ROOT/.devcontainer/requirements.txt"
-    if [[ ! -f "$requirements_file" ]]; then
-        log "python_requirements_skip missing_file=$requirements_file"
-        return
-    fi
-
-    source_cann
-    log "python_requirements_install_begin file=$requirements_file"
-    python3 -m pip install --disable-pip-version-check -r "$requirements_file"
-    log "python_requirements_install_done file=$requirements_file"
-}
-
 run_presmoke() {
     local name="$1"
     local card="$2"
@@ -296,7 +277,6 @@ write_final_report() {
 main() {
     acquire_lock
     log "presmoke_start out_root=$OUT_ROOT"
-    install_python_requirements
     if should_clean_cann_vendors "$@"; then
         clean_cann_vendors
     else
