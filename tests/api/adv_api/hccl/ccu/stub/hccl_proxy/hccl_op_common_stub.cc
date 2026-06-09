@@ -17,8 +17,6 @@
 #include "alg_env_config.h"
 #include "param_check.h"
 #include "sal.h"
-#include "hccl_res.h"
-#include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include <memory>
 #include <string>
 #include <chrono>
@@ -271,42 +269,6 @@ CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
 std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType opType, const std::string& algTag)
 {
     return std::make_unique<MockInsCollAlgBase>();
-}
-
-HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
-    TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
-    void** resCtxDevice, bool& isSuspend)
-{
-    if (resCtxDevice == nullptr) {
-        return HCCL_E_PTR;
-    }
-    
-    if (param.engine == COMM_ENGINE_CCU) {
-        void *cclBufferPtr = nullptr;
-        uint64_t cclBufferSize = 0;
-        HcclResult ret = HcclGetHcclBuffer(comm, &cclBufferPtr, &cclBufferSize);
-        
-        if (ret == HCCL_SUCCESS && cclBufferPtr != nullptr && cclBufferSize > 0) {
-            uint64_t cclBufferAddr = reinterpret_cast<uint64_t>(cclBufferPtr);
-            uint64_t token = hcomm::CcuRep::GetTokenInfo(cclBufferAddr, cclBufferSize);
-            
-            if (resCtxHost->kfcServerArgs.size() >= 6U) {
-                resCtxHost->kfcServerArgs[5] = token;
-            }
-        }
-    }
-    
-    std::vector<char> seq = resCtxHost->Serialize();
-    uint64_t size = seq.size();
-    void* ctx = std::malloc(size);
-    if (ctx == nullptr) {
-        return HCCL_E_PTR;
-    }
-    memcpy(ctx, seq.data(), size);
-    *resCtxDevice = ctx;
-    param.ctxSize = size;
-    isSuspend = false;
-    return HcclResult::HCCL_SUCCESS;
 }
 
 }
