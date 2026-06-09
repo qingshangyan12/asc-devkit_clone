@@ -25,23 +25,19 @@ if(BUILD_OPEN_PROJECT)
             math(EXPR HCCL_CANN_VERSION_NUM "${CANN_EXPR}" OUTPUT_FORMAT DECIMAL)
         endif()
     endif()
-else()
-    message(STATUS "close TOP_DIR = ${TOP_DIR}")
-    set(OPS_BASE_DIR ${TOP_DIR}/hccl/)
-    set(INSTALL_AICPU_KERNEL_JSON_DIR ${INSTALL_LIBRARY_DIR})
 
-    # 大工程编译：CANN 包路径不确定，改为从 hccl 自身的 version.cmake
-    # (set_cann_package(hccl VERSION "X.Y.Z")) 解析 CANN_VERSION_NUM
-    set(_hccl_version_cmake "${OPS_BASE_DIR}/version.cmake")
-    message(STATUS "Checking HCCL version.cmake: ${_hccl_version_cmake}")
-    if(EXISTS "${_hccl_version_cmake}")
-        file(STRINGS "${_hccl_version_cmake}" _hccl_ver_pkg_line
-            REGEX "set_cann_package[ \t]*\\([ \t]*hccl[ \t]+VERSION[ \t]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"")
-        if(_hccl_ver_pkg_line)
-            string(REGEX MATCH "\"([0-9]+)\\.([0-9]+)\\.([0-9]+)\"" _ "${_hccl_ver_pkg_line}")
-            if(NOT CMAKE_MATCH_1 STREQUAL "" AND NOT CMAKE_MATCH_2 STREQUAL "" AND NOT CMAKE_MATCH_3 STREQUAL "")
-                math(EXPR HCCL_CANN_VERSION_NUM
-                    "${CMAKE_MATCH_1} * 10000000 + ${CMAKE_MATCH_2} * 100000 + ${CMAKE_MATCH_3} * 1000")
+    if(HCCL_CANN_VERSION_NUM EQUAL 0)
+        set(_asc_devkit_version_cmake "${ASCENDC_DIR}/version.cmake")
+        message(STATUS "Checking asc-devkit version.cmake: ${_asc_devkit_version_cmake}")
+        if(EXISTS "${_asc_devkit_version_cmake}")
+            file(STRINGS "${_asc_devkit_version_cmake}" _asc_devkit_ver_pkg_line
+                REGEX "set_cann_package[ \t]*\\([ \t]*asc-devkit[ \t]+VERSION[ \t]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"")
+            if(_asc_devkit_ver_pkg_line)
+                string(REGEX MATCH "\"([0-9]+)\\.([0-9]+)\\.([0-9]+)\"" _ "${_asc_devkit_ver_pkg_line}")
+                if(NOT CMAKE_MATCH_1 STREQUAL "" AND NOT CMAKE_MATCH_2 STREQUAL "" AND NOT CMAKE_MATCH_3 STREQUAL "")
+                    math(EXPR HCCL_CANN_VERSION_NUM
+                        "${CMAKE_MATCH_1} * 10000000 + ${CMAKE_MATCH_2} * 100000 + ${CMAKE_MATCH_3} * 1000")
+                endif()
             endif()
         endif()
     endif()
