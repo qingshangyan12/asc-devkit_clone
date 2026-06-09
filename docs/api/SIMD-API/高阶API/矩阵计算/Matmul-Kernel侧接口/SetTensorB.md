@@ -46,10 +46,10 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gm | 输入 | B矩阵。类型为[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。SrcBT参数表示B矩阵的数据类型。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：half/float/bfloat16_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t<br><br>Atlas 推理系列产品AI Core，支持的数据类型为：half/float/int8_t<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t<br><br>Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float/bfloat16_t/int8_t<br><br>Kirin X90，支持的数据类型为：half/int8_t<br><br>Kirin 9030，支持的数据类型为：half |
-| rightMatrix | 输入 | B矩阵。类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。SrcBT参数表示B矩阵的数据类型。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：half/float/bfloat16_t/int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t<br><br>Atlas 推理系列产品AI Core，支持的数据类型为：half/float/int8_t<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float/bfloat16_t/int8_t/int4b_t<br><br>Atlas 200I/500 A2 推理产品，支持的数据类型为：half/float/bfloat16_t/int8_t<br><br>Kirin X90，支持的数据类型为：half/int8_t<br><br>Kirin 9030，支持的数据类型为：half<br><br>若设置TSCM首地址，默认矩阵可全载，已经位于TSCM，Iterate接口无需再进行GM->A1/B1搬运。 |
-| bScalar | 输入 | B矩阵中设置的值。支持传入标量数据，标量数据会被扩展为一个形状为[1, K]的tensor参与矩阵乘计算，tensor的数值均为该标量值。例如，开发者可以通过将bScalar设置为1来实现矩阵A在K方向的reduce sum操作。SrcBT参数表示B矩阵的数据类型。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：half/float<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/float<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/float<br><br>Atlas 推理系列产品AI Core不支持该参数。<br><br>Atlas 200I/500 A2 推理产品不支持该参数。<br><br>Kirin X90，支持的数据类型为：half<br><br>Kirin 9030，支持的数据类型为：half |
-| isTransposeB | 输入 | B矩阵是否需要转置。<br><br>注意：<br>若B矩阵MatmulType的ISTRANS参数设置为true，该参数可以为true也可以为false，即运行时可以转置和非转置交替使用；若B矩阵MatmulType的ISTRANS参数设置为false，该参数只能设置为false，若强行设置为true，精度会有异常；对于非half、非bfloat16_t输入类型的场景，为了确保Tiling侧与Kernel侧L1 Buffer空间计算大小保持一致及结果精度正确，该参数取值必须与Kernel侧定义B矩阵MatmulType的[ISTRANS](Matmul使用说明.md#p84551411817)参数以及Tiling侧SetBType()接口的[isTrans](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBType.md#p47369411111)参数保持一致，即上述三个参数必须同时设置为true或同时设置为false。 |
+| gm | 输入 | B矩阵。类型为[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。 |
+| rightMatrix | 输入 | B矩阵。类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。<br><br>若设置TSCM首地址，默认矩阵可全载，已经位于TSCM，Iterate接口无需再进行GM->A1/B1搬运。 |
+| bScalar | 输入 | B矩阵中设置的值。支持传入标量数据，标量数据会被扩展为一个形状为[1, K]的tensor参与矩阵乘计算，tensor的数值均为该标量值。例如，开发者可以通过将bScalar设置为1来实现矩阵A在K方向的reduce sum操作。SrcBT参数表示B矩阵的数据类型。<br>不同型号支持的数据类型请参考[bScalar支持的数据类型](#li12616155731723)。 |
+| isTransposeB | 输入 | B矩阵是否需要转置。<br><br>注意：<br>若B矩阵MatmulType的ISTRANS参数设置为true，该参数可以为true也可以为false，即运行时可以转置和非转置交替使用；<br>若B矩阵MatmulType的ISTRANS参数设置为false，该参数只能设置为false，若强行设置为true，精度会有异常；<br>对于非half、非bfloat16_t输入类型的场景，为了确保Tiling侧与Kernel侧L1 Buffer空间计算大小保持一致及结果精度正确，该参数取值必须与Kernel侧定义B矩阵MatmulType的[ISTRANS](Matmul使用说明.md#p84551411817)参数以及Tiling侧SetBType()接口的[isTrans](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBType.md#p47369411111)参数保持一致，即上述三个参数必须同时设置为true或同时设置为false。 |
 
 ## 返回值说明
 
@@ -57,7 +57,38 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
 ## 约束说明
 
-传入的TensorB地址空间大小需要保证不小于singleK \* singleN。
+-   传入的TensorB地址空间大小需要保证不小于singleK \* singleN。
+-   gm和rightMatrix支持的数据类型<a id="li12616155731720"></a>
+
+    Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16_t、int8_t、float、fp8_e4m3fn_t、fp8_e5m2_t、hifloat8_t。
+
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：int4b_t、half、bfloat16_t、int8_t、float。
+
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：int4b_t、half、bfloat16_t、int8_t、float。
+
+    Atlas 推理系列产品AI Core，支持的数据类型为：half、int8_t、float。
+
+    Atlas 200I/500 A2 推理产品，支持的数据类型为：half、bfloat16_t、int8_t、float。
+
+    Kirin X90，支持的数据类型为：half、int8_t。
+
+    Kirin 9030，支持的数据类型为：half。
+
+-   bScalar支持的数据类型<a id="li12616155731723"></a>
+
+    Ascend 950PR/Ascend 950DT，支持的数据类型为：half、float。
+
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、float。
+
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、float。
+
+    Atlas 推理系列产品AI Core，不支持该参数。
+
+    Atlas 200I/500 A2 推理产品，不支持该参数。
+
+    Kirin X90，支持的数据类型为：half。
+
+    Kirin 9030，支持的数据类型为：half。
 
 ## 调用示例
 
@@ -76,4 +107,3 @@ mm.SetTensorB(local_a, isTransposeB);
 // 示例三：设置标量数据
 mm.SetTensorB(scalar_a, isTransposeB);
 ```
-
