@@ -48,18 +48,18 @@ Matmul量化场景：在Matmul计算时，左、右矩阵的输入为half或bflo
 1.  quantTensor为64位格式，初始为0。
 2.  scale按bit位取高19位截断，存储于quantTensor的bit位32位处，并将46位修改为1。
 
-    _quantTensor = quantTensor ∣ \(scale & 0xFFFFE000\) ∣ \(1 ≪ 46\)_
+    quantTensor = quantTensor ∣ \(scale & 0xFFFFE000\) ∣ \(1 ≪ 46\)
 
 3.  根据offset取值进行后续计算：
     -   若offset不存在，不再进行后续计算。
     -   若offset存在：
         1.  将offset值处理为int，范围为\[-256, 255\]。
 
-            _o__f__f__s__e__t __= __M__a__x__\(__M__i__n__\(__I__N__T__\(__R__o__u__n__d__\(__o__f__f__s__e__t__\)\), 255\), −256\)_
+            offset = Max\(Min\(INT\(Round\(offset\)\), 255\), −256\)
 
         2.  再将offset按bit位保留9位并存储于quantTensor的37到45位。
 
-            _quantTensor __= \(quantTensor & 0__x__4000__F__F__F__F__F__F__F__F__\) ∣ \(\(__o__f__f__s__e__t__ & 0__x__1__F__F__\) ≪ 37\)_
+            quantTensor = \(quantTensor & 0x4000FFFFFFFF\) ∣ \(\(offset & 0x1FF\) ≪ 37\)
 
 ## 返回值说明
 
@@ -87,4 +87,3 @@ if (tiling.isBias) {
 mm.IterateAll(gm_c);
 mm.End();
 ```
-
