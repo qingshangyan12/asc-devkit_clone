@@ -17,7 +17,7 @@
 #include <cstdint>
 
 #include "graph/tensor.h"
-#include "cos_utils.h"
+#include "include/adv_api/math/cos_utils.h"
 
 namespace AscendC {
 /*!
