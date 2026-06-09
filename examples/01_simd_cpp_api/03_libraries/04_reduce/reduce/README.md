@@ -4,15 +4,13 @@
 
 本样例介绍了调用WholeReduceSum和BlockReduceSum高阶API实现reduce算子，实现了连续内存上数据元素的累加，返回累加结果的功能。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -48,7 +46,8 @@
   </table>
 
 - 算子实现：  
-  本样例中实现的是固定shape为输入x[4096]，输出y[32]的ReduceCustom算子。x长度的取值范围为(0,4096]float；(0,16384]half。
+
+  当输入数据类型为 `float` 时，输入数据长度的取值范围为 `(0, 4096]`；当输入数据类型为 `half` 时，输入数据长度的取值范围为 `(0, 16384]`。本样例以 `float`类型输入为例，固定输入 `x` 的 shape 为 `[4096]`，输出 `y` 的 shape 为 `[32]`。
 
     样例将一段连续的输入做累加，得到这段连续buffer内元素的和。
 

@@ -12,12 +12,11 @@
 - Case 2: 将VF的loop循环拆分为两个loop，分别执行Gelu和Element-wise计算
 - Case 3: 在Case 2基础上，启用unroll循环展开优化
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -422,13 +421,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 244.299 \text{ μs} \times 1650 \text{ MHz} = 401094
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 244.299 \text{ μs} \times 1650 \text{ MHz} = 403093
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{425984}{401094} \approx 1.06
+IPC = \frac{425984}{403093} \approx 1.06
 $$
 
 ---
@@ -449,13 +448,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 125.203 \text{ μs} \times 1650 \text{ MHz} = 205835
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 125.203 \text{ μs} \times 1650 \text{ MHz} = 206585
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{205835} \approx 1.03
+IPC = \frac{212992}{206585} \approx 1.03
 $$
 
 **IPC分析**：Case 1相比Case 0，IPC略有降低（1.03 vs 1.06），但vector耗时显著减少（减少48.7%）。这里要注意，虽然一般采用IPC衡量VF的性能，但是前提是要尽量用满指令并行度。
@@ -475,13 +474,13 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 97.184 \text{ μs} \times 1650 \text{ MHz} = 159861
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 97.184 \text{ μs} \times 1650 \text{ MHz} = 160354
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{159861} \approx 1.33
+IPC = \frac{212992}{160354} \approx 1.33
 $$
 
 **IPC分析**：Case 2相比Case 1，IPC从1.03提升到1.33，提升了 **29.1%**。Loop拆分后，指令依赖链缩短，指令双发效率显著提高。
@@ -501,16 +500,16 @@ $$
 vector计算的cycle数：
 
 $$
-Cycles_{\text{vec}} = T_{\text{vec}} \times f = 94.339 \text{ μs} \times 1650 \text{ MHz} = 155069
+Cycles_{\text{vec}} = T_{\text{vec}} \times f = 94.339 \text{ μs} \times 1650 \text{ MHz} = 155659
 $$
 
 IPC计算：
 
 $$
-IPC = \frac{212992}{155069} \approx 1.38
+IPC = \frac{212992}{155659} \approx 1.37
 $$
 
-**IPC分析**：Case 3相比Case 2，IPC从1.33提升到1.38，提升了 **3.8%**。循环展开后，更多指令能够并行执行，进一步提高指令发射效率。
+**IPC分析**：Case 3相比Case 2，IPC从1.33提升到1.37，提升了 **3.0%**。循环展开后，更多指令能够并行执行，进一步提高指令发射效率。
 
 ---
 
@@ -521,11 +520,11 @@ $$
 | 0 | 单loop计算，并行度128 bytes（基准） | 244.299 | 1.06 | 1x |
 | 1 | 单loop计算，并行度256 bytes | 125.203 | 1.03 | 0.97x |
 | 2 | Loop拆分（Gelu + Element-wise） | 97.184 | 1.33 | 1.25x |
-| 3 | Loop拆分 + unroll循环展开 | 94.339 | 1.38 | 1.31x |
+| 3 | Loop拆分 + unroll循环展开 | 94.339 | 1.37 | 1.29x |
 
 **IPC优化建议**：
 - IPC越高越好，理论极限接近2.0，大多数情况下达成1.4~1.5则表示取得较优性能
-- Case 3的IPC为1.38，已接近理想性能水平
+- Case 3的IPC为1.37，已接近理想性能水平
 - Loop拆分是提升IPC的一种优化手段，需要结合实际VF的计算深度进行分析和尝试
 
 ---

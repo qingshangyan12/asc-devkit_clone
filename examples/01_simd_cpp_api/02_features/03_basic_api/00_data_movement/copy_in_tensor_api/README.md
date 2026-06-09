@@ -4,13 +4,11 @@
 
 本样例基于Tensor API编程方式实现带Bias的动态Shape矩阵乘法运算，展示了Copy（GM到L1，L1到L0）的转置和非转置场景和Mmad（矩阵乘加）等Tensor API的使用方法。支持通过编译时参数SCENARIO_NUM选择转置模式和数据类型，Shape参数通过MatmulTiling结构体在运行时动态传入。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \> CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
@@ -166,10 +164,10 @@
   以场景0（AB不转置，half）为例：
 
   ```bash
-  SCENARIO=0
+  SCENARIO_NUM=0
   mkdir -p build && cd build;                                                    # 创建并进入build目录
-  cmake -DSCENARIO_NUM=${SCENARIO} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程，默认NPU模式
-  python3 ../scripts/gen_data.py ${SCENARIO};                                    # 生成场景0的测试输入数据
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程，默认NPU模式
+  python3 ../scripts/gen_data.py ${SCENARIO_NUM};                                    # 生成场景0的测试输入数据
   ./demo;                                                                       # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin        # 验证输出结果是否正确，确认算法逻辑正确
   ```
@@ -177,18 +175,18 @@
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
   ```bash
-  cmake -DSCENARIO_NUM=${SCENARIO} -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
-  编译其他场景时，修改`SCENARIO`变量即可，例如编译场景2（AB转置，half）时设置`SCENARIO=2`，并同步传给`gen_data.py`。
+  编译其他场景时，修改`SCENARIO_NUM`变量即可，例如编译场景2（AB转置，half）时设置`SCENARIO_NUM=2`，并同步传给`gen_data.py`。
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  | :--- | :--- | :--- | :--- |
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, sim | npu |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果

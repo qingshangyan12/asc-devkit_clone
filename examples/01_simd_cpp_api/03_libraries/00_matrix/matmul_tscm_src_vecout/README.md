@@ -3,12 +3,11 @@
 ## 概述
 使用数据来源为VECOUT的用户自定义TSCM的输入的Matmul样例，开发者可以自主管理L1 Buffer以高效利用硬件资源。TSCM即Temp Swap Cache Memory，用于临时把数据交换到额外空间。该场景由开发者管理L1 Buffer，再将输入矩阵数据对应的L1 Buffer地址作为Matmul的输入。
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 ```
@@ -103,9 +102,9 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+  | ----------------| -----------------------------| ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果

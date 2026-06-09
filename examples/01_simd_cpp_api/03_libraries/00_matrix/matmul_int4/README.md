@@ -4,14 +4,12 @@
 
 A、B矩阵为int4b_t数据类型输入的Matmul样例。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -96,10 +94,10 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201 | dav-2201 |
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+  | ----------------| -----------------------------| ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认） | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
 
 - 执行结果
 
