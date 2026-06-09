@@ -65,39 +65,37 @@ bool HcommIsExportThreadSupported()
 
 // 初始化
 void HcommDlInit(void) {
-    fprintf(stderr, "[HcclWrapper-FPRINTF] ===== HcommDlInit ENTRY =====\n");
-    fprintf(stderr, "[HcclWrapper-FPRINTF] HcommDlInit called, gLibHandle=%p\n", gLibHandle);
-    fflush(stderr);
+    ForceWriteLog("===== HcommDlInit ENTRY =====");
+    ForceWriteLog("HcommDlInit called, gLibHandle=... (check /tmp/hccl_constructor_debug.log for details)");
     
     if (gLibHandle != nullptr) {
-        fprintf(stderr, "[HcclWrapper-FPRINTF] HcommDlInit already initialized, gLibHandle=%p, skipping\n", gLibHandle);
-        fprintf(stderr, "[HcclWrapper-FPRINTF] ===== HcommDlInit EARLY RETURN =====\n");
-        fflush(stderr);
+        ForceWriteLog("HcommDlInit already initialized, skipping");
+        ForceWriteLog("===== HcommDlInit EARLY RETURN =====");
         return;
     }
 
-    fprintf(stderr, "[HcclWrapper-FPRINTF] gLibHandle is nullptr, proceeding with initialization\n");
-    fprintf(stderr, "[HcclWrapper-FPRINTF] Calling dlopen(\"libhcomm.so\", RTLD_NOW)\n");
-    fflush(stderr);
+    ForceWriteLog("gLibHandle is nullptr, proceeding with initialization");
+    ForceWriteLog("Calling dlopen(\"libhcomm.so\", RTLD_NOW)");
     
     gLibHandle = dlopen("libhcomm.so", RTLD_NOW);
     
     if (!gLibHandle) {
         const char* dlErr = dlerror();
-        fprintf(stderr, "[HcclWrapper-FPRINTF] dlopen FAILED, error: %s\n", dlErr ? dlErr : "(null)");
-        fprintf(stderr, "[HcclWrapper-FPRINTF] ===== HcommDlInit FAILED RETURN =====\n");
-        fflush(stderr);
+        char errMsg[256];
+        snprintf(errMsg, sizeof(errMsg), "dlopen FAILED, error: %s", dlErr ? dlErr : "(null)");
+        ForceWriteLog(errMsg);
+        ForceWriteLog("===== HcommDlInit FAILED RETURN =====");
         HCCL_ERROR("[HcclWrapper] Failed to open libhcomm: %s", dlErr ? dlErr : "(null)");
         return;
     }
     
-    fprintf(stderr, "[HcclWrapper-FPRINTF] dlopen SUCCESS, handle=%p\n", gLibHandle);
-    fflush(stderr);
+    char handleMsg[256];
+    snprintf(handleMsg, sizeof(handleMsg), "dlopen SUCCESS, handle=%p", gLibHandle);
+    ForceWriteLog(handleMsg);
 
     dlerror();
 
-    fprintf(stderr, "[HcclWrapper-FPRINTF] Initializing DL modules...\n");
-    fflush(stderr);
+    ForceWriteLog("Initializing DL modules...");
     
     HcclResDlInit(gLibHandle);
     HcclRankGraphDlInit(gLibHandle);
@@ -109,15 +107,14 @@ void HcommDlInit(void) {
     CcuResDlInit(gLibHandle);
     HcclCcuResDlInit(gLibHandle);
     
-    fprintf(stderr, "[HcclWrapper-FPRINTF] Calling CcuLaunchDlInit...\n");
-    fflush(stderr);
+    ForceWriteLog("Calling CcuLaunchDlInit...");
     
     CcuLaunchDlInit(gLibHandle);
     CcuPrimitivesImplDlInit(gLibHandle);
     
-    fprintf(stderr, "[HcclWrapper-FPRINTF] HcommDlInit completed successfully, final gLibHandle=%p\n", gLibHandle);
-    fprintf(stderr, "[HcclWrapper-FPRINTF] ===== HcommDlInit NORMAL RETURN =====\n");
-    fflush(stderr);
+    snprintf(handleMsg, sizeof(handleMsg), "HcommDlInit completed successfully, final gLibHandle=%p", gLibHandle);
+    ForceWriteLog(handleMsg);
+    ForceWriteLog("===== HcommDlInit NORMAL RETURN =====");
 }
 
 #ifdef __cplusplus

@@ -63,28 +63,20 @@ extern "C" {
 
 void HcommDlInit(void)
 {
-    fprintf(stderr, "[HcclWrapper-STUB-FPRINTF] HcommDlInit stub called (EMPTY IMPLEMENTATION)\n");
-    fflush(stderr);
 }
 
 int GetHcommVersion(void)
 {
-    fprintf(stderr, "[HcclWrapper-STUB-FPRINTF] GetHcommVersion stub called\n");
-    fflush(stderr);
     return 90000009;
 }
 
 bool HcommIsProfilingSupported()
 {
-    fprintf(stderr, "[HcclWrapper-STUB-FPRINTF] HcommIsProfilingSupported stub called\n");
-    fflush(stderr);
     return true;
 }
 
 bool HcommIsExportThreadSupported()
 {
-    fprintf(stderr, "[HcclWrapper-STUB-FPRINTF] HcommIsExportThreadSupported stub called\n");
-    fflush(stderr);
     return true;
 }
 

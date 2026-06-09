@@ -253,7 +253,6 @@ if(NOT KERNEL_MODE AND PRODUCT_SIDE STREQUAL "host")
         -Wl,-z,relro
         -Wl,-z,now
         -Wl,-z,noexecstack
-        -Wl,-Bsymbolic-functions
         $<$<CONFIG:Release>:-s>
     )
 

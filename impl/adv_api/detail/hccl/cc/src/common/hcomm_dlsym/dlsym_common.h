@@ -38,19 +38,13 @@ extern "C" {
 #define INIT_SUPPORT_FLAG(handle, func_name) \
     do { \
         dlerror(); \
-        fprintf(stderr, "[HcclWrapper-FPRINTF] dlsym lookup: %s\n", #func_name); \
-        fflush(stderr); \
         void *ptr = (void *)dlsym(handle, #func_name); \
         const char *err = dlerror(); \
         if (ptr == nullptr) { \
             g_##func_name##Supported = false; \
-            fprintf(stderr, "[HcclWrapper-FPRINTF] dlsym FAILED for %s, ptr=null, error=%s\n", #func_name, err ? err : "(no error)"); \
-            fflush(stderr); \
             HCCL_DEBUG("[HcclWrapper] %s not supported, %s", #func_name, err ? err : "(no error)"); \
         } else { \
             g_##func_name##Supported = true; \
-            fprintf(stderr, "[HcclWrapper-FPRINTF] dlsym SUCCESS for %s, ptr=%p, flag=%d\n", #func_name, ptr, g_##func_name##Supported); \
-            fflush(stderr); \
         } \
     } while(0)
 

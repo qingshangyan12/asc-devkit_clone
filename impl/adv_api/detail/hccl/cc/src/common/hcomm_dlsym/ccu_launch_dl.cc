@@ -21,15 +21,12 @@ DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, Ccu
 
 // 初始化
 void CcuLaunchDlInit(void* libHcommHandle) {
-    fprintf(stderr, "[HcclWrapper-FPRINTF] CcuLaunchDlInit called, handle=%p\n", libHcommHandle);
-    fflush(stderr);
+    HCCL_INFO("[HcclWrapper-FPRINTF] CcuLaunchDlInit called, handle=%p\n", libHcommHandle);
     
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterStart);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegister);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterEnd);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelLaunch);
     
-    fprintf(stderr, "[HcclWrapper-FPRINTF] CcuLaunchDlInit completed, checking flags:\n");
-    fprintf(stderr, "[HcclWrapper-FPRINTF]   HcommCcuKernelRegisterStart supported=%d\n", g_HcommCcuKernelRegisterStartSupported);
-    fflush(stderr);
+    HCCL_INFO("[HcclWrapper-FPRINTF] CcuLaunchDlInit completed.\n");
 }
