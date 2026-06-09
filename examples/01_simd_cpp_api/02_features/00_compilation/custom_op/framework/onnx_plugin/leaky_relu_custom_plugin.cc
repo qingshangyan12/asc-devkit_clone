@@ -10,14 +10,51 @@
 
 #include "graph/operator.h"
 #include "register/register.h"
-#include <nlohmann/json.hpp>
+
+#include <cstdlib>
+#include <string>
 
 using namespace ge;
-using json = nlohmann::json;
 
 namespace domi {
 namespace {
-const int kTypeFloat = 1;
+bool GetAlphaAttrValue(const std::string& attrs_json, std::string& alpha_value)
+{
+  const size_t alpha_pos = attrs_json.find("\"alpha\"");
+  if (alpha_pos == std::string::npos) {
+    return false;
+  }
+
+  const size_t attr_begin = attrs_json.rfind('{', alpha_pos);
+  const size_t attr_end = attrs_json.find('}', alpha_pos);
+  if (attr_begin == std::string::npos || attr_end == std::string::npos) {
+    return false;
+  }
+
+  const std::string attr = attrs_json.substr(attr_begin, attr_end - attr_begin + 1);
+  if (attr.find("\"type\":1") == std::string::npos && attr.find("\"type\": 1") == std::string::npos) {
+    return false;
+  }
+
+  std::string f_key = "\"f\":\"";
+  size_t value_begin = attr.find("\"f\":\"");
+  if (value_begin == std::string::npos) {
+    f_key = "\"f\": \"";
+    value_begin = attr.find("\"f\": \"");
+  }
+  if (value_begin == std::string::npos) {
+    return false;
+  }
+
+  value_begin += f_key.size();
+  const size_t value_end = attr.find('"', value_begin);
+  if (value_end == std::string::npos) {
+    return false;
+  }
+
+  alpha_value = attr.substr(value_begin, value_end - value_begin);
+  return true;
+}
 }
 Status ParseOnnxParamsLeakyReluCustom(const ge::Operator& op_src, ge::Operator& op_dest) {
   // trans op_src to op_dest
@@ -27,12 +64,8 @@ Status ParseOnnxParamsLeakyReluCustom(const ge::Operator& op_src, ge::Operator& 
   string negative_slope_str;
   AscendString attrs_string;
   if (ge::GRAPH_SUCCESS == op_src.GetAttr("attribute", attrs_string)) {
-    json attrs = json::parse(attrs_string.GetString());
-    for (json attr : attrs["attribute"]) {
-      if (attr["name"] == "alpha" && attr["type"] == kTypeFloat) {
-        negative_slope_str = attr["f"];  // float type in json has accuracy loss, so we use string type to store it
-        negative_slope = atof(negative_slope_str.c_str());
-      }
+    if (GetAlphaAttrValue(attrs_string.GetString(), negative_slope_str)) {
+      negative_slope = std::atof(negative_slope_str.c_str());
     }
   }
 
