@@ -16,8 +16,4 @@
 
 -   **[GM -> UB多维数据搬运NDDMA(DataCopy)](GMToUB多维数据搬运NDDMA(DataCopy).md)**
 
--   **[ResetLoopModePara](ResetLoopModePara.md)**
-
--   **[SetLoopModePara](SetLoopModePara.md)**
-
 -   **[寄存器配置说明](寄存器配置说明/寄存器配置说明.md)**
