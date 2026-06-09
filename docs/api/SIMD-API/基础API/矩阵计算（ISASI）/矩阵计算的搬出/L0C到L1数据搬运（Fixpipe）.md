@@ -178,19 +178,11 @@
     - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
 - 源矩阵NZ格式地址要求6对齐，目的矩阵NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize、nSize或者ndNum中的任意一个值为0时，该指令不会被执行。ndNum=0时会报warning。
-- 当前不支持随路pReLU操作。
 - 量化和ReLU参数不能为INF/NAN和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
 - unitFlag特性开启需要配合Mmad同时开启。
 
 <cann-filter npu_type = "A3,910b">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-    - nSize∈\[0, 4095\]，目的矩阵NZ输出，nSize必须为16的倍数，输出类型为int4类型时，nSize必须为64的倍数。
-    - srcStride∈\[0, 65535\]， 单位：C0\_SIZE（16\*sizeof\(T\)），T为src的数据类型。
-    - dstStride需要大于0。
-    - 不支持开启随路NZ2ND功能、F32 Channel Split功能。
-    - 此通路不支持NoQuant量化模式。
 
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品特殊值/边界值约束说明：
 
