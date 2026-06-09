@@ -76,7 +76,7 @@
 | dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。<cann-filter npu-type="950"><br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 2^40-1]。</cann-filter> |
 | rsv | 保留字段。 |
 
-下面通过两个场景介绍UB到GM的非对齐搬运，分别对应32字节对齐和非32字节对齐：
+下面通过两个场景介绍Unified Buffer到Global Memory的非对齐搬运，分别对应32字节对齐和非32字节对齐：
 
 - 32字节对齐场景<a name="32字节对齐场景"></a>
 
@@ -84,7 +84,7 @@
 
     对于32字节对齐搬运场景，从Unified Buffer读取的所有数据都会搬运至Global Memory。
 
-    **图 1**  blockLen为32字节对齐时UB到GM的非对齐搬运示意图<a name="fig_datacopypad3"></a>  
+    **图 1**  blockLen为32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad3"></a>  
     ![](../../../../../figures/datacopypad3.png)
 
 - 非32字节对齐场景<a name="非32字节对齐场景"></a>
@@ -93,7 +93,7 @@
 
     对于非32字节对齐的场景，由于Unified Buffer要求32字节对齐，框架在搬出时会自动补充17字节的假数据来保证对齐，搬到Global Memory时再自动将填充的假数据丢弃掉，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
-    **图 2**  blockLen不满足32字节对齐时UB到GM的非对齐搬运示意图<a name="fig_datacopypad4"></a>  
+    **图 2**  blockLen不满足32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad4"></a>  
     ![](../../../../../figures/datacopypad4.png)
 
 ## 数据类型<a name="section4219135304818"></a>

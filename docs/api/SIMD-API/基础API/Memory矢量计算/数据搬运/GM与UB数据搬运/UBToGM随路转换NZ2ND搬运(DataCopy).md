@@ -1,4 +1,4 @@
-# UB-\>GM随路转换NZ2ND搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002391805265"></a>
+# UB->GM随路转换NZ2ND搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002391805265"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -16,7 +16,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口为软仿接口，从易用性角度出发进行设计，支持在从UB到GM的数据搬运过程中进行NZ到ND格式的转换。
+该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
 - Unified Buffer -> Global Memory

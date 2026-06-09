@@ -27,14 +27,14 @@
 
 ## 函数原型<a name="zh-cn_topic_0000002565968945_section82039854412"></a>
 
-- GM-\>UB
+- Global Memory -> Unified Buffer
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
     ```
 
-- UB-\>GM
+- Unified Buffer -> Global Memory
 
     ```cpp
     template <typename T>
@@ -130,7 +130,7 @@
 
 ## 数据类型<a name="zh-cn_topic_0000002565968945_section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致，GM -\> VECIN（GM -\> UB）和VECOUT -\> GM（UB -\> GM）两个数据通路的数据类型支持情况相同，具体如下：
+源操作数和目的操作数支持的数据类型保持一致，Global Memory -> Unified Buffer和VUB -> Global Memory两个数据通路的数据类型支持情况相同，具体如下：
 
 <cann-filter npu-type="950">
 
@@ -196,12 +196,12 @@ for (uint32_t i = 0; i < dimValueIn; i++) {
 }
 
 // 先后进行两个数据通路的切片搬运
-// GM -> UB: MTE2流水搬运
+// Global Memory -> Unified Buffer: MTE2流水搬运
 AscendC::DataCopy(srcLocal, srcGlobal, dstSliceInfo, srcSliceInfo, dimValue);
 // 等待MTE2搬运完成，MTE3可以开始
 AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
-// UB -> GM: MTE3流水搬运
+// Unified Buffer -> Global Memory: MTE3流水搬运
 AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
 ```
 

@@ -25,7 +25,7 @@
 
 ## 函数原型<a name="section1954364615315"></a>
 
-- GM -> UB，支持多维度搬运
+- Global Memory -> Unified Buffer，支持多维度搬运
 
     ```cpp
     template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
@@ -121,7 +121,7 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 
     ![](../../../../../figures/nddma_padding_2d.png)
 
-- 该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块GM地址可能会导致部分核读取数据错误。
+- 该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块Global Memory地址可能会导致部分核读取数据错误。
 
 ## 调用示例<a name="section122101199486"></a>
 

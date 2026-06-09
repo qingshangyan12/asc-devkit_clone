@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-支持GM与UB之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
+支持Global Memory与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
@@ -33,14 +33,14 @@
 
 接口同时支持非连续搬运和连续搬运，对于连续搬运场景，推荐使用[GM与UB连续数据搬运\(DataCopy\)](GM与UB连续数据搬运(DataCopy).md)。
 
-- GM -> UB
+- Global Memory -> Unified Buffer
 
     ```cpp
     template <typename T>
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
     ```
 
-- UB -> GM
+- Unified Buffer -> Global Memory
 
     ```cpp
     template <typename T>
@@ -106,7 +106,7 @@
 
 ## 数据类型<a name="section4219135304818"></a>
 
-源操作数和目的操作数支持的数据类型保持一致，GM -> UB和UB -> GM两个数据通路对同一产品支持的数据类型相同，具体如下：
+源操作数和目的操作数支持的数据类型保持一致，Global Memory -> Unified Buffer和Unified Buffer -> Global Memory两个数据通路对同一产品支持的数据类型相同，具体如下：
 
 <cann-filter npu-type="950">
 
@@ -184,7 +184,7 @@
     | srcGap | [0, 65535] |
     | dstGap | [0, 65535] |
 
-- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的GM地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址UB存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
+- 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../../同步控制/核内同步/PipeBarrier(ISASI).md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用PipeBarrier<PIPE_MTE3>()添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用PipeBarrier<PIPE_MTE2>()添加MTE2搬入流水的同步。
 
     ![](../../../../../figures/datacopy_address_overlap_sync_diagram.png)
 
@@ -200,7 +200,7 @@
 
 ## 调用示例<a name="section122101199486"></a>
 
-- GM -> UB
+- Global Memory -> Unified Buffer
 
     ```cpp
     // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
@@ -220,7 +220,7 @@
     输出数据srcLocal：[1 2 3 ... 512]
     ```
 
-- UB -> GM
+- Unified Buffer -> Global Memory
 
     ```cpp
     // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。

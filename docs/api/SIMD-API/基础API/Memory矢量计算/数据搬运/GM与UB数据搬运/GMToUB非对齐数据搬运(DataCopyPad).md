@@ -95,13 +95,13 @@
 
 - GM -> VECIN/VECOUT配置示例<a name="li73127579197"></a>
 
-    下面通过三个示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32B对齐场景下的数据搬运，示例2演示非32B对齐时的dummy填充机制，示例3（仅Ascend 950PR/Ascend 950DT支持）演示负stride实现重复搬运同一数据块的场景。
+    下面通过三个示例展示DataCopyPad在GM -> VECIN/VECOUT通路上的不同配置场景。示例1演示32字节对齐场景下的数据搬运，示例2演示非32字节对齐时的dummy填充机制，示例3（仅Ascend 950PR/Ascend 950DT支持）演示负stride实现重复搬运同一数据块的场景。
 
     - 参数解释
         - 当blockLen+leftPadding+rightPadding满足32字节对齐时，若isPad为false，左右两侧填充的数据值会默认为随机值；否则为paddingValue。
         - 当blockLen+leftPadding+rightPadding不满足32字节对齐时，框架会填充一些假数据dummy，保证左右填充的数据和blockLen、假数据为32字节对齐。若leftPadding、rightPadding都为0：dummy会默认填充待搬运数据块的第一个元素值；若leftPadding/rightPadding不为0：isPad为false，左右两侧填充的数据值和dummy值均为随机值；否则为paddingValue。
 
-    - 示例1：32B对齐场景
+    - 示例1：32字节对齐场景
 
         blockLen为64，每个连续传输数据块包含64字节；srcStride为1，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，因为目的操作数的逻辑位置为VECIN/VECOUT，dstStride的单位为DataBlock数量（每DataBlock为32字节），即目的操作数相邻数据块之间间隔1个dataBlock。
 
@@ -111,7 +111,7 @@
 
         ![](../../../../../figures/datacopypad1.png)
 
-    - 示例2：非32B对齐场景
+    - 示例2：非32字节对齐场景
 
         blockLen为47，每个连续传输数据块包含47字节；srcStride为1，表示源操作数中前一个数据块**结束地址**与后一个数据块**起始地址**的差值为1字节；dstStride为1，表示目的操作数相邻数据块之间间隔1个dataBlock。
 
@@ -298,7 +298,7 @@
 - 场景6：五维数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8
+    // Global Memory[2, 4, 3, 128, 126]int8 -> Unified Buffer[512, 128]int8
     // Normal模式，使用loop mode
     // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节
     // 最终UB连续存放为[512, 128]
