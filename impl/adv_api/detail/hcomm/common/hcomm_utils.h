@@ -126,6 +126,87 @@ __aicore__ inline int32_t HcommFindBufferIdx(
     return HCOMM_FAILED;
 }
 
+#ifdef HCOMM_USE_DIRECT_GM
+// Direct GM helper functions: wrap ld_dev/st_dev/dcci_cachelines for direct GM access mode.
+// For UT_TEST builds, provide mock implementations that directly dereference memory.
+
+// Operation tracing infrastructure for property-based ordering tests.
+// When HCOMM_TRACE_OPS is defined (UT_TEST only), each helper records its call into a global log.
+#if defined(UT_TEST) && defined(HCOMM_TRACE_OPS)
+#include <vector>
+#include <cstdint>
+
+enum class HcommOpType : uint8_t {
+    DCCI = 0,
+    WRITE32 = 2,
+    READ32 = 3,
+};
+
+struct HcommOpRecord {
+    HcommOpType type;
+    uint64_t addr;    // address argument
+    uint32_t len;     // length for flush/invalidate, value for write32
+};
+
+// Global operation log — tests clear before use and inspect after calls.
+inline std::vector<HcommOpRecord>& HcommGetOpsLog()
+{
+    static std::vector<HcommOpRecord> opsLog;
+    return opsLog;
+}
+
+inline void HcommClearOpsLog()
+{
+    HcommGetOpsLog().clear();
+}
+#endif // UT_TEST && HCOMM_TRACE_OPS
+
+__aicore__ inline uint32_t HcommGmRead32(__gm__ uint32_t* addr)
+{
+#if defined(UT_TEST)
+#if defined(HCOMM_TRACE_OPS)
+    HcommGetOpsLog().push_back({HcommOpType::READ32, reinterpret_cast<uint64_t>(addr), 0});
+#endif
+    return *reinterpret_cast<volatile uint32_t*>(addr);
+#else
+    return static_cast<uint32_t>(ld_dev(addr, 0));
+#endif
+}
+
+__aicore__ inline void HcommGmWrite32(uint32_t value, __gm__ uint32_t* addr)
+{
+#if defined(UT_TEST)
+#if defined(HCOMM_TRACE_OPS)
+    HcommGetOpsLog().push_back({HcommOpType::WRITE32, reinterpret_cast<uint64_t>(addr), value});
+#endif
+    *reinterpret_cast<volatile uint32_t*>(addr) = value;
+#else
+    st_dev(value, addr, 0);
+#endif
+}
+
+// Clean + invalidate cache lines covering [addr, addr+len).
+// Used for both flush (make writes visible to HW) and invalidate (force re-read from GM).
+__aicore__ inline void HcommGmDcci(__gm__ uint8_t* addr, uint32_t len)
+{
+#if defined(UT_TEST)
+#if defined(HCOMM_TRACE_OPS)
+    HcommGetOpsLog().push_back({HcommOpType::DCCI, reinterpret_cast<uint64_t>(addr), len});
+#endif
+    (void)addr;
+    (void)len;
+#else
+    __gm__ uint8_t* start = (__gm__ uint8_t*)((uint64_t)addr / CACHE_LINE_SIZE * CACHE_LINE_SIZE);
+    __gm__ uint8_t* end = (__gm__ uint8_t*)(((uint64_t)addr + len) / CACHE_LINE_SIZE * CACHE_LINE_SIZE);
+    GlobalTensor<uint8_t> global;
+    global.SetGlobalBuffer(start);
+    for (uint32_t i = 0; i <= end - start; i += CACHE_LINE_SIZE) {
+        DataCacheCleanAndInvalid<uint8_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(global[i]);
+    }
+#endif
+}
+#endif // HCOMM_USE_DIRECT_GM
+
 template <typename T>
 __aicore__ inline void CacheWriteThrough(__gm__ T* sourceAddr, uint64_t length)
 {

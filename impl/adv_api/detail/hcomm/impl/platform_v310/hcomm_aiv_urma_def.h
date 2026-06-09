@@ -33,6 +33,9 @@ constexpr uint32_t HCOMM_URMA_TMP_BUF_SIZE = 512;
 constexpr uint32_t HCOMM_URMA_WQE_U32_NUM = 32;
 constexpr uint32_t HCOMM_URMA_CQE_U32_NUM = 16;
 
+constexpr uint32_t HCOMM_URMA_CQ_DEPTH = 16384;
+constexpr uint32_t HCOMM_URMA_SQ_DEPTH = 32768;
+
 enum class HcommUrmaOpCode : uint32_t {
     SEND = 0U,
     SEND_WITH_IMM,
