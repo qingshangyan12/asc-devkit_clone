@@ -21,9 +21,30 @@
 #ifndef LIB_SORT_TOPK_UTILS_H
 #define LIB_SORT_TOPK_UTILS_H
 #include <cstdint>
-#include "topk_utils_constants.h"
 
 namespace AscendC {
+enum class TopKMode {
+    TOPK_NORMAL,
+    TOPK_NSMALL,
+};
+
+enum class TopKAlgo {
+    RADIX_SELECT,
+    MERGE_SORT
+};
+
+enum class TopKOrder {
+    UNSET,
+    LARGEST,
+    SMALLEST
+};
+
+struct TopKConfig {
+    TopKAlgo algo = TopKAlgo::MERGE_SORT;
+    TopKOrder order = TopKOrder::UNSET;
+    bool sorted = true;
+};
+
 struct TopKInfo {
     int32_t outter = 1;
     int32_t inner;  // inner = 32-byte alignment of n
