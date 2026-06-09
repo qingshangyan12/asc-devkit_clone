@@ -490,17 +490,17 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        // 先填充 kfcServerArgs 的前5个字段（不含 token），预留第6个位置给 token
+        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
         resCtxHost->kfcServerArgs = {
             opResCtx.xnAddr,
             opResCtx.ckeAddr,
             static_cast<uint64_t>(1),  // dieNum
-            static_cast<uint64_t>(1),  // missonNum
-            static_cast<uint64_t>(0),  // missonIndex
+            static_cast<uint64_t>(1),  // missionNum
+            static_cast<uint64_t>(0),  // missionIndex
+            static_cast<uint64_t>(0),  // token 占位符，后续在 GetAlgResCcu 中更新
         };
-        resCtxHost->kfcServerArgSize = 6;  // 总共6个参数（包括后续填充的 token）
+        resCtxHost->kfcServerArgSize = 6;
         
-        // 调用 HcclGetAlgRes 分配资源（包括 cclMem 和 token）
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
     } else {

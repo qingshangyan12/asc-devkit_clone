@@ -331,7 +331,10 @@ LoopCall::LoopCall(CcuRepContext *context, const std::string &label) : context(c
 
 Executor::Executor(CcuRepContext *context) : CcuVirRes(context) {}
 
-uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size) { return 0; }
+uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size) {
+    // 返回基于地址的非零token用于测试验证
+    return (va != 0) ? (va + 0x1234) : 0;
+}
 
 void LoopGroupCall::Run(const std::vector<LoopCall> &loopVec, const std::vector<Variable> &loopCfg,
                         const std::vector<Executor> &executors, Variable paraCfgIn, Variable offsetCfgIn) const {}

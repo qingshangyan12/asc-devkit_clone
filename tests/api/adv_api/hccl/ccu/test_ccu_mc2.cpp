@@ -402,8 +402,8 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     resourceCtx.DeSerialize(seq);
 
     // kfcServerArgs应包含6个uint64_t元素（xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token）
-    // 前填5字段在AcquireAlgResources中完成，kfcServerArgSize=6预留token位置
-    // 第6字段token在GetAlgResCcu内的HcclAllocAlgResourceCcu中填充
+    // AcquireAlgResources 预填充所有6字段（token 占位符为0）
+    // GetAlgResCcu 内的 HcclAllocAlgResourceCcu 更新占位符为真实 token
     ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
     EXPECT_EQ(resourceCtx.kfcServerArgSize, 6U);
     
@@ -417,7 +417,83 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
     // missionIndex = 0
     EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
+    // token (由GetTokenFromBuffInfo获取，stub返回基于地址的非零值)
+    uint64_t expectedToken = opResCtx.xnAddr + 0x1234;  // stub: GetTokenInfo(va, size) = va + 0x1234
+    EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
 
     free(resCtxOut);
 }
+
+TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
+    SetCommEngineEnv(COMM_ENGINE_CCU);
+
+    // 1. 第一次调用：创建资源并写入token
+    OpResCtx opResCtx1{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "ctx_tag1", g_stubRankSize, g_stubRankId, opResCtx1), HCCL_SUCCESS);
+
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLTOALL);
+    ccTiling.commEngine = COMM_ENGINE_CCU;
+    ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling.reduceType = HCCL_REDUCE_SUM;
+
+    OpParam opParam1{};
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam1), HCCL_SUCCESS);
+
+    std::string algName;
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam1, algName, topoInfo), HCCL_SUCCESS);
+    ASSERT_EQ(algName, "CcuAlltoAllMesh1D");
+
+    int result = sprintf_s(opParam1.algName, sizeof(opParam1.algName), "%s", algName.c_str());
+    ASSERT_GT(result, 0);
+
+    bool skipGetRes = false;
+    ASSERT_EQ(HandleSingleRankAndCommMode(comm_, opParam1, skipGetRes), HCCL_SUCCESS);
+    ASSERT_FALSE(skipGetRes);
+
+    void *resCtxOut1 = nullptr;
+    EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam1, topoInfo.get(), opResCtx1, &resCtxOut1), HCCL_SUCCESS);
+    EXPECT_NE(resCtxOut1, nullptr);
+
+    // 验证第一次的token
+    auto *ctxRaw1 = static_cast<char *>(resCtxOut1);
+    std::vector<char> seq1(ctxRaw1, ctxRaw1 + opParam1.ctxSize);
+    mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx1;
+    resourceCtx1.DeSerialize(seq1);
+    uint64_t expectedToken1 = opResCtx1.xnAddr + 0x1234;
+    EXPECT_EQ(resourceCtx1.kfcServerArgs[5], expectedToken1);
+
+    // 2. 第二次调用相同algTag：触发资源复用，UpdateCcuCtxTokenOnReuse应更新token
+    OpResCtx opResCtx2{};
+    ASSERT_EQ(AllocCcuOpResCtx(comm_, "ctx_tag2", g_stubRankSize, g_stubRankId, opResCtx2), HCCL_SUCCESS);
+
+    OpParam opParam2{};
+    ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "reuse_tag", &ccTiling, opParam2), HCCL_SUCCESS);
+    ASSERT_EQ(SelectAlgAndPrepareEngine(comm_, opParam2, algName, topoInfo), HCCL_SUCCESS);
+    result = sprintf_s(opParam2.algName, sizeof(opParam2.algName), "%s", algName.c_str());
+    ASSERT_GT(result, 0);
+    ASSERT_EQ(HandleSingleRankAndCommMode(comm_, opParam2, skipGetRes), HCCL_SUCCESS);
+    ASSERT_FALSE(skipGetRes);
+
+    void *resCtxOut2 = nullptr;
+    EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam2, topoInfo.get(), opResCtx2, &resCtxOut2), HCCL_SUCCESS);
+    EXPECT_NE(resCtxOut2, nullptr);
+
+    // 验证第二次的token被更新为新值
+    auto *ctxRaw2 = static_cast<char *>(resCtxOut2);
+    std::vector<char> seq2(ctxRaw2, ctxRaw2 + opParam2.ctxSize);
+    mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx2;
+    resourceCtx2.DeSerialize(seq2);
+    uint64_t expectedToken2 = opResCtx2.xnAddr + 0x1234;  // 新的xnAddr对应新的token
+    EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 6U);
+    EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken2);
+
+    // 验证资源复用（相同的ctx地址）
+    EXPECT_EQ(resCtxOut1, resCtxOut2);
+
+    free(resCtxOut1);
+}
+
 }
