@@ -79,10 +79,6 @@ void HcommDlInit(void) {
     
     if (!gLibHandle) {
         const char* dlErr = dlerror();
-        char errMsg[256];
-        snprintf(errMsg, sizeof(errMsg), "dlopen FAILED, error: %s", dlErr ? dlErr : "(null)");
-        HCCL_INFO(errMsg);
-        HCCL_INFO("===== HcommDlInit FAILED RETURN =====");
         HCCL_ERROR("[HcclWrapper] Failed to open libhcomm: %s", dlErr ? dlErr : "(null)");
         return;
     }
