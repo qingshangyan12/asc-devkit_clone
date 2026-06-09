@@ -61,13 +61,16 @@ bool HcommIsExportThreadSupported()
 
 // 初始化
 void HcommDlInit(void) {
+    HCCL_INFO("[HcclWrapper-DEBUG] ===== HcommDlInit ENTRY =====");
     HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit called, gLibHandle=%p", gLibHandle);
     
     if (gLibHandle != nullptr) {
-        HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit already initialized, skipping");
+        HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit already initialized, gLibHandle=%p, skipping", gLibHandle);
+        HCCL_INFO("[HcclWrapper-DEBUG] ===== HcommDlInit EARLY RETURN =====");
         return;
     }
 
+    HCCL_INFO("[HcclWrapper-DEBUG] gLibHandle is nullptr, proceeding with initialization");
     HCCL_INFO("[HcclWrapper-DEBUG] Calling dlopen(\"libhcomm.so\", RTLD_NOW)");
     gLibHandle = dlopen("libhcomm.so", RTLD_NOW);
     
@@ -75,6 +78,7 @@ void HcommDlInit(void) {
         const char* dlErr = dlerror();
         HCCL_ERROR("[HcclWrapper-DEBUG] dlopen FAILED, error: %s", dlErr ? dlErr : "(null)");
         HCCL_ERROR("[HcclWrapper] Failed to open libhcomm: %s", dlErr ? dlErr : "(null)");
+        HCCL_INFO("[HcclWrapper-DEBUG] ===== HcommDlInit FAILED RETURN =====");
         return;
     }
     
@@ -96,5 +100,6 @@ void HcommDlInit(void) {
     CcuLaunchDlInit(gLibHandle);
     CcuPrimitivesImplDlInit(gLibHandle);
     
-    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit completed successfully");
+    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit completed successfully, final gLibHandle=%p", gLibHandle);
+    HCCL_INFO("[HcclWrapper-DEBUG] ===== HcommDlInit NORMAL RETURN =====");
 }
