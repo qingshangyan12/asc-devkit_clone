@@ -283,22 +283,19 @@
     </tr>
     </thead>
     <tbody><tr id="row18266511523"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><pre class="screen" id="screen98261951195215"><a name="screen98261951195215"></a><a name="screen98261951195215"></a>#include "register/tilingdata_base.h"
-    #include "tiling/tiling_api.h" // TCubeTiling结构体通过宏定义
-    
     namespace optiling {
-    BEGIN_TILING_DATA_DEF(MatmulCustomTilingData)
-    TILING_DATA_FIELD_DEF(uint64_t, localMemSize);
-    TILING_DATA_FIELD_DEF_STRUCT(TCubeTiling, cubeTilingData);
+    BEGIN_TILING_DATA_DEF(AddCustomTilingData)
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength);
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);
     END_TILING_DATA_DEF;
-    REGISTER_TILING_DATA_CLASS(MatmulCustom, MatmulCustomTilingData)
+    REGISTER_TILING_DATA_CLASS(AddCustom, AddCustomTilingData)
     } // namespace optiling</pre>
-    </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><pre class="screen" id="screen168271451135220"><a name="screen168271451135220"></a><a name="screen168271451135220"></a>#include &lt;cstdint&gt;
-    #include "kernel_tiling/kernel_tiling.h" // TCubeTiling结构体通过C++语法定义
-    
-    struct MatmulCustomTilingData {
-        uint64_t localMemSize;
-        AscendC::tiling::TCubeTiling cubeTilingData;
+        </td>
+        <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><pre class="screen" id="screen168271451135220"><a name="screen168271451135220"></a><a name="screen168271451135220"></a>#include &lt;cstdint&gt;
+
+    struct AddCustomTilingData {
+        uint32_t totalLength;
+        uint32_t tileNum;
     };</pre>
     </td>
     </tr>
@@ -320,46 +317,31 @@
     static ge::graphStatus TilingFunc(gert::TilingContext *context)
     {
         ...
-        MultiCoreMatmulTiling cubeTiling(ascendcPlatform);
-        ...
-        MatmulCustomTilingData tiling;
-        if (cubeTiling.GetTiling(tiling.cubeTilingData) == -1) { // Get matmul tiling.
-            return ge::GRAPH_FAILED;
-        }
-    
-        uint64_t localMemSize;
-        ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, localMemSize);
-        tiling.set_localMemSize(localMemSize);  // 需要使用宏定义方式生成的set方法
-    
+        AddCustomTilingData tiling;
+        tiling.set_totalLength(totalLength);  // 需要使用宏定义方式生成的set方法
+        tiling.set_tileNum(TILE_NUM);        // 需要使用宏定义方式生成的set方法
         ...
         // 需要将局部变量保存至context上下文
-        tiling.SaveToBuffer(context-&gt;GetRawTilingData()-&gt;GetData(), context-&gt;GetRawTilingData()-&gt;GetCapacity());  
+        tiling.SaveToBuffer(context-&gt;GetRawTilingData()-&gt;GetData(), context-&gt;GetRawTilingData()-&gt;GetCapacity());
         ...
-    
+
         return ge::GRAPH_SUCCESS;
     }
     } // namespace optiling</pre>
     </td>
-    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><pre class="screen" id="screen34968325556"><a name="screen34968325556"></a><a name="screen34968325556"></a>#include "../op_kernel/matmul_custom_tiling.h"  // 包含Tiling结构体定义头文件
+    <td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><pre class="screen" id="screen34968325556"><a name="screen34968325556"></a><a name="screen34968325556"></a>#include "../op_kernel/add_custom/add_custom_tiling.h"  // 包含Tiling结构体定义头文件
     ...
-    
+
     namespace optiling {
     static ge::graphStatus TilingFunc(gert::TilingContext *context)
     {
         ...
-        MultiCoreMatmulTiling cubeTiling(ascendcPlatform);
+        AddCustomTilingData *tiling = context-&gt;GetTilingData&lt;AddCustomTilingData&gt;();
         ...
-        MatmulCustomTilingData *tiling = context-&gt;GetTilingData&lt;MatmulCustomTilingData&gt;();
-        if (cubeTiling.GetTiling(tiling-&gt;cubeTilingData) == -1) {
-            return ge::GRAPH_FAILED;
-        }
-    
-        uint64_t localMemSize;
-        ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, localMemSize);
-        tiling-&gt;localMemSize = localMemSize;  // 使用用户友好的C++指针方式赋值成员变量
-    
+        tiling-&gt;totalLength = totalLength;  // 使用用户友好的C++指针方式赋值成员变量
+        tiling-&gt;tileNum = TILE_NUM;         // 使用用户友好的C++指针方式赋值成员变量
         ...
-    
+
         return ge::GRAPH_SUCCESS;
     }
     } // namespace optiling</pre>
@@ -371,12 +353,12 @@
 3.  **最后**，在Kernel 函数入口处新增[REGISTER\_TILING\_DEFAULT](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/REGISTER_TILING_DEFAULT.md)调用，用于注册Tiling结构体。该注册操作的作用是：告知框架用户已使用标准 C++ 语法定义Tiling结构体，并明确其类型，以便框架在进行Tiling数据解析时能够正确识别和使用该结构体。
 
     ```
-    #include "matmul_custom_tiling.h"
+    #include "add_custom_tiling.h"
     ...
-    
-    extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR bias, GM_ADDR c, GM_ADDR workspace, GM_ADDR tiling)
+
+    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
     {
-        REGISTER_TILING_DEFAULT(MatmulCustomTilingData);  // 新增REGISTER_TILING_DEFAULT调用注册Tiling结构体
+        REGISTER_TILING_DEFAULT(AddCustomTilingData);  // 新增REGISTER_TILING_DEFAULT调用注册Tiling结构体
         ...
     }
     ```
