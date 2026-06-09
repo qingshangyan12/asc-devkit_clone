@@ -189,7 +189,7 @@ void RunL0C2GMBatchNZ2NZNoQuant()
     auto dstTensor = MakeTensorAt<Location::GM>(
         dst, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float, _16>>(kDstBatch, kM, kN));
 
-    n_size_global = kN;
+    n_size_global = kSrcBatch * kN;
     m_size_global = kM;
     src_stride_global = kSrcMatrixStride;
     dst_stride_global = kDstMatrixStride;

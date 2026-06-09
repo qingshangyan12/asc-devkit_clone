@@ -85,6 +85,10 @@ __aicore__ inline static constexpr uint32_t GetTotalColumnShape(const LayoutType
 {
     if constexpr (LayoutType::depth == 2) {
         return Get<1>(layout.Shape());
+    } else if constexpr (LayoutType::depth == 3) {
+        return Get<1, 1>(layout.Shape());
+    } else if constexpr (LayoutType::depth == 5) {
+        return Get<1, 1, 0>(layout.Shape()) * Get<1, 1, 1>(layout.Shape());
     } else {
         return Get<1, 0>(layout.Shape()) * Get<1, 1>(layout.Shape());
     }
@@ -95,6 +99,10 @@ __aicore__ inline static constexpr uint32_t GetTotalRowShape(const LayoutType& l
 {
     if constexpr (LayoutType::depth == 2) {
         return Get<0>(layout.Shape());
+    } else if constexpr (LayoutType::depth == 3) {
+        return Get<1, 0>(layout.Shape());
+    } else if constexpr (LayoutType::depth == 5) {
+        return Get<1, 0, 0>(layout.Shape()) * Get<1, 0, 1>(layout.Shape());
     } else {
         return Get<0, 0>(layout.Shape()) * Get<0, 1>(layout.Shape());
     }
