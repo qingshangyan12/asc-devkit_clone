@@ -63,29 +63,33 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 针对连续搬运场景，推荐使用[UB与UB连续数据搬运\(DataCopy\)](UBToUB连续数据搬运(DataCopy).md#ZH-CN_TOPIC_0000002382908021)，以下示例仅展示高维切分数据搬运接口具有连续搬运能力。
 
-以half数据类型为例，源操作数的shape为1 \* 128。
+- 示例1：连续搬运
 
-以图1为例，将源操作数中128个元素**连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
+    以half数据类型为例，源操作数的shape为1 \* 128。
 
-- blockCount = 1，搬运1个数据块，表示连续搬运。
-- blockLen = 8，一个数据块长度为8个DataBlock。
-- srcGap = 0，源操作数相邻数据块之间的间隔为0。
-- dstGap = 0，目的操作数相邻数据块之间的间隔为0。
+    以图1为例，将源操作数中128个元素**连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
 
-**图 1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>  
-![](../../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
+    - blockCount = 1，搬运1个数据块，表示连续搬运。
+    - blockLen = 8，一个数据块长度为8个DataBlock。
+    - srcGap = 0，源操作数相邻数据块之间的间隔为0。
+    - dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
-以half数据类型为例，源操作数的shape为1 \* 112。
+    **图 1**  连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig4621152141711"></a>  
+    ![](../../../../../figures/continuous_data_copy_diagram.png "连续搬运示意图")
 
-以图2为例，将源操作数中数据**非连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
+- 示例2：非连续搬运
 
-- blockCount = 2，搬运2个数据块。
-- blockLen = 3，一个数据块的长度为3个DataBlock。
-- srcGap = 1，源操作数相邻数据块之间的间隔为1。
-- dstGap = 2，目的操作数相邻数据块之间的间隔为2。
+    以half数据类型为例，源操作数的shape为1 \* 112。
 
-**图 2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>  
-![](../../../../../figures/discontinuous_data_copy_diagram.png "非连续搬运示意图")
+    以图2为例，将源操作数中数据**非连续**搬运至目的操作数。DataCopyParams结构体参数配置如下：
+
+    - blockCount = 2，搬运2个数据块。
+    - blockLen = 3，一个数据块的长度为3个DataBlock。
+    - srcGap = 1，源操作数相邻数据块之间的间隔为1。
+    - dstGap = 2，目的操作数相邻数据块之间的间隔为2。
+
+    **图 2**  非连续搬运示意图<a name="zh-cn_topic_0000002535088926_fig422819202304"></a>  
+    ![](../../../../../figures/discontinuous_data_copy_diagram.png "非连续搬运示意图")
 
 ## 数据类型<a name="section4219135304818"></a>
 
