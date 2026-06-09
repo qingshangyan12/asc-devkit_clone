@@ -26,7 +26,7 @@ def mergedExtraArgs() {
 pipeline {
     agent {
         docker {
-            label '141.131.72.151'
+            label "${env.NODE}"
             image "harbor.turing-ci.hisilicon.com/tbe-kits/ubuntu_ascendc:24.04"
             args """
                   --ipc=host
@@ -48,6 +48,7 @@ pipeline {
         SOC_VERSION = "ascend910b"
         SHORT_SOC_VERSION = "910b"
         TORCH_DEVICE_BACKEND_AUTOLOAD = 0
+        NLOHMANN_JSON_URL = 'file:///tmp/include.zip'
     }
 
     parameters {
@@ -64,6 +65,7 @@ pipeline {
         string(name: 'CPU_RUN_TIMEOUT', defaultValue: '300', trim: true, description: 'CPU run-stage timeout in seconds.')
         string(name: 'EXTRA_ARGS', defaultValue: '', trim: true, description: 'Extra arguments passed to scripts/run_presmoke.sh, for example --filter <case>.')
         text(name: 'FILTER_LIST', defaultValue: '', description: 'Optional case filter list. One case path per line. Lines starting with # are ignored.')
+        string(name: 'NODE', defaultValue: '', trim: true, description: 'Jenkins node label to select build node.')
     }
 
     options {
@@ -135,23 +137,14 @@ pipeline {
                                     export HTTP_PROXY="http://${PROXY_URL}"
                                     export HTTPS_PROXY="http://${PROXY_URL}"
 
-                                    # prepare tensorflow modules for presmoke
                                     source /opt/conda/etc/profile.d/conda.sh; conda activate py312
-                                    pip3 install en_dtypes==0.0.4
-                                    ARCH="$(uname -m)"
-                                    if [ "$ARCH" = "x86_64" ]; then
-                                        pip3 install tensorflow-cpu==2.19.1
-                                    elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-                                        pip3 install tensorflow==2.19.1
-                                    else
-                                        echo "Unsupported architecture: $ARCH"
-                                        exit 1
-                                    fi
-
                                     rm -rf asc-devkit
+                                    (cd /tmp; wget https://gitcode.com/cann-src-third-party/json/releases/download/v3.11.3/include.zip --no-check-certificate)
+
                                     git clone --depth 1 --branch "presmoke_opt" https://gitcode.com/xun_zhuge/asc-devkit.git asc-devkit
 
                                     cd asc-devkit
+                                    python3 -m pip install -r .devcontainer/requirements.txt
                                     rm -rf "${PRESMOKE_OUT_ROOT}"
                                     mkdir -p "${PRESMOKE_OUT_ROOT}"
                                     bash -n scripts/run_presmoke.sh
