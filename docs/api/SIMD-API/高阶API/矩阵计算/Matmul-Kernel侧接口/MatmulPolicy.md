@@ -2,16 +2,49 @@
 
 ## 产品支持情况
 
-| 产品 | MatmulPolicy | TrianUpperMatmulPolicy/TrianLowerMatmulPolicy | NBuffer33MatmulPolicy | MatmulWithScalePolicy/SplitMMatmulPolicy/SplitNMatmulPolicy |
-| --- | --- | --- | --- | --- |
-| Ascend 950PR/Ascend 950DT | √ | √ | √ | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ | √ | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ | √ | x |
-| Atlas 200I/500 A2 推理产品 | √ | x | x | x |
-| Atlas 推理系列产品AI Core | √ | x | x | x |
-| Atlas 推理系列产品Vector Core | x | x | x | x |
-| Atlas 训练系列产品 | x | x | x | x |
-| Kirin X90 | √ | √ | √ | x |
+### MatmulPolicy
+
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas 200I/500 A2 推理产品：支持
+- Atlas 推理系列产品AI Core：支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
+- Kirin X90：支持
+
+### TrianUpperMatmulPolicy/TrianLowerMatmulPolicy
+
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
+- Kirin X90：支持
+
+### NBuffer33MatmulPolicy
+
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
+- Kirin X90：支持
+
+### MatmulWithScalePolicy/SplitMMatmulPolicy/SplitNMatmulPolicy
+
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
+- Kirin X90：不支持
 
 ## 功能说明
 
@@ -25,28 +58,28 @@
 
     一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于下三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个上三角矩阵。上三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
 
-    **图 1**  上三角模板策略示意图
+    **图 1**  上三角模板策略示意图  
     ![](../../../../figures/上三角模板策略示意图.png "上三角模板策略示意图")
 
 -   TrianLowerMatmulPolicy（下三角模板策略）
 
     一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。若Matmul结果矩阵C中的基本块位于上三角位置，则Matmul内部做数据计算和数据搬出时，将不对该基本块进行处理，最后得到的矩阵C为一个下三角矩阵。下三角模板策略如下图所示，图示中矩阵形状的相关大小为M=N=512，K=256，baseM=baseN=baseK=32。
 
-    **图 2**  下三角模板策略示意图
+    **图 2**  下三角模板策略示意图  
     ![](../../../../figures/下三角模板策略示意图.png "下三角模板策略示意图")
 
 -   NBuffer33MatmulPolicy（NBuffer33模板策略）
 
     一次矩阵乘指令计算的结果为[baseM \* baseN](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p17899165811566)大小的矩阵块，称该矩阵块为基本块。单核计算的A矩阵切分为3x3个基本块，该3x3个A矩阵的基本块全载和保持在L1 Buffer中，每次与3x1个B矩阵的基本块计算矩阵乘，同时DoubleBuffer并行搬入下次计算所需的3x1个B矩阵基本块，直到singleCoreN方向的矩阵乘计算完成。NBuffer33模板策略如下图所示，图中[singleCoreM、singleCoreN、singleCoreK](../Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md#p11899125875617)表示单核内A、B矩阵的shape大小，单核计算的A矩阵切分为3x3个基本块，3x3个基本块全载在L1 Buffer上，这些基本块每次与B矩阵的3x1个基本块计算矩阵乘。
 
-    **图 3**  NBuffer33模板策略示意图
+    **图 3**  NBuffer33模板策略示意图  
     ![](../../../../figures/NBuffer33模板策略示意图.png "NBuffer33模板策略示意图")
 
 -   MatmulWithScalePolicy（MxMatmul模板策略）
 
     实现带有量化系数的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。MxMatmul场景中，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
-    图4 MxMatmul模板策略示意图
+    **图4** MxMatmul模板策略示意图
 
     ![](../../../../figures/MatmulMx公式图示.png)
 
@@ -54,14 +87,14 @@
 
     Matmul一次[Iterate](Iterate.md)的计算结果从L0C Buffer搬到Unified Buffer时，采用双输出模式，即在分离模式下，AIC核与AIV核的核数比为1：2时，在调用[GetTensorC](GetTensorC.md)接口后，Matmul一次Iterate的计算结果在矩阵的M方向一分为二，将被切分后的两块结果数据分别搬运到两个AIV核的Unified Buffer。模板策略示意图如下所示。
 
-    **图 4**  SplitM模板策略示意图
+    **图 5**  SplitM模板策略示意图  
     ![](../../../../figures/SplitM模板策略示意图.png "SplitM模板策略示意图")
 
 -   SplitNMatmulPolicy（SplitN模板策略）
 
     Matmul一次[Iterate](Iterate.md)的计算结果从L0C Buffer搬到Unified Buffer时，采用双输出模式，即在分离模式下，AIC核与AIV核的核数比为1：2时，在调用[GetTensorC](GetTensorC.md)接口后，Matmul一次Iterate的计算结果在矩阵的N方向一分为二，将被切分后的两块结果数据分别搬运到两个AIV核的Unified Buffer。模板策略示意图如下所示。
 
-    **图 5**  SplitN模板策略示意图
+    **图 6**  SplitN模板策略示意图  
     ![](../../../../figures/SplitN模板策略示意图.png "SplitN模板策略示意图")
 
 ## 约束说明
