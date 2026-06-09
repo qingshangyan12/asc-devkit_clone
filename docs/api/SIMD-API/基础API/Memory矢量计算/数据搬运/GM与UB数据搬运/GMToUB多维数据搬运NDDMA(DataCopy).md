@@ -32,7 +32,7 @@
     __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
     ```
 
-- NdDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
+- NDDMA Cache刷新，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新NdDMA Cache缓存保证为最新状态。
 
     ```cpp
     __aicore__ inline void NdDmaDci()

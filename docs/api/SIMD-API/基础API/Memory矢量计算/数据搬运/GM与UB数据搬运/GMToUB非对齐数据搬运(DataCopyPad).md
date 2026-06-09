@@ -2,15 +2,15 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| :--- | :---: |
-|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>|
-|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
-|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x </cann-filter>|
-|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
-|<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
+| 产品 | 不支持数据搬运模式PaddingMode的原型 | 支持数据搬运模式PaddingMode的原型 |
+| :--- | :---: | :---: |
+|<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
+|<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x </cann-filter>|
+|<cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | x </cann-filter>|
+|<cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | x | x </cann-filter>|
+|<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x | x </cann-filter>|
+|<cann-filter npu-type="910"> Atlas 训练系列产品 | x | x </cann-filter>|
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -61,7 +61,7 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数以及paddingValue（待填充数据值）的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
-| <cann-filter npu-type="950">mode | 该参数仅Ascend 950PR/Ascend 950DT支持，配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre></cann-filter> |
+| mode | 配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre> |
 
 **表 2**  接口参数说明
 
