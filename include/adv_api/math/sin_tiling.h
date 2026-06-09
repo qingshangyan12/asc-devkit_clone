@@ -16,7 +16,7 @@
 #define LIB_MATH_SIN_TILING_H
 #include <cstdint>
 #include "graph/tensor.h"
-#include "sin_utils.h"
+#include "include/adv_api/math/sin_utils.h"
 
 namespace AscendC {
 /*!

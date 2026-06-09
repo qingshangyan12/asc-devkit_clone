@@ -21,11 +21,14 @@
 #ifndef LIB_SORT_SORT_UTILS_H
 #define LIB_SORT_SORT_UTILS_H
 
-#include "include/adv_api/sort/sort_utils_constants.h"
-
 namespace AscendC {
 #ifndef ASCC_STRUCT_SORTCONFIG
 #define ASCC_STRUCT_SORTCONFIG
+enum class SortType {
+    RADIX_SORT,
+    MERGE_SORT
+};
+
 struct SortConfig {
     SortType type = SortType::RADIX_SORT;
     bool isDescend = false;
