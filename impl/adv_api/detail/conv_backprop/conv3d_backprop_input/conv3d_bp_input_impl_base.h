@@ -16,10 +16,10 @@
 #ifndef CONV3D_BP_INPUT_IMPL_BASE_H
 #define CONV3D_BP_INPUT_IMPL_BASE_H
 
-#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
+#include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "conv3d_bp_input_func.h"
 #include "../common/conv3d_bp_util.h"
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "kernel_utils.h"
 
 namespace ConvBackpropApi {

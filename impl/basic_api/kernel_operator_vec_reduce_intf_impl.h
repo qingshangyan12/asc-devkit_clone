@@ -19,7 +19,7 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #include "mstx_local_tensor_info.h"
 #include "utils/std/type_traits/enable_if.h"
 
