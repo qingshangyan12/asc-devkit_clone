@@ -31,7 +31,7 @@ __aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, 
 
 | 参数名 | 描述 |
 | --- | --- |
-| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateNBatch执行结束，后续由开发者自行获取输出到Global Memory上的计算结果。异步：不需要同步等待IterateNBatch执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。 |
+| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateNBatch执行结束，后续由开发者自行获取输出到Global Memory上的计算结果。<br>异步：不需要同步等待IterateNBatch执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。 |
 | waitIterateBatch | 是否需要通过[WaitIterateBatch](WaitIterateBatch.md)接口等待IterateNBatch执行结束，仅在异步场景下使用。默认为false。<br><br>true：需要通过WaitIterateBatch接口等待IterateNBatch执行结束，然后由开发者自行获取输出到Global Memory上的计算结果。<br><br>false：不需要通过WaitIterateBatch接口等待IterateNBatch执行结束。调用本接口后，需要调用[GetBatchTensorC](GetBatchTensorC.md)接口获取C矩阵，或者由开发者自行处理等待IterateNBatch执行结束的过程。 |
 
 | 参数名 | 输入/输出 | 描述 |

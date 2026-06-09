@@ -21,21 +21,21 @@
 
     ![](../../../../figures/250925154552953.png)
 
--   **BSH/SBH：**B：Batch，批处理的大小； S：sequence length，序列长度；H = N \* D，其中，N为head的数量，D为head的大小。Layout格式如下图所示：
+-   **BSH/SBH**：B：Batch，批处理的大小； S：sequence length，序列长度；H = N \* D，其中，N为head的数量，D为head的大小。Layout格式如下图所示：
 
     ![](../../../../figures/跳写模式示意图.png)
 
     ![](../../../../figures/跳写模式示意图-46.png)
 
--   **BSNGD：**为原始BSH shape做reshape后的shape，S和D为单Batch的矩阵乘的M轴（或N轴）和K轴，一个SD为一个batch的计算数据，Layout格式如下图所示：
+-   **BSNGD**：为原始BSH shape做reshape后的shape，S和D为单Batch的矩阵乘的M轴（或N轴）和K轴，一个SD为一个batch的计算数据，Layout格式如下图所示：
 
     ![](../../../../figures/250925161748040.png)
 
--   **SBNGD：**为原始SBH shape做reshape后shape，S和D为矩阵乘的M轴（或N轴）和K轴，一个SD为一个Batch的计算数据，Layout格式如下图所示：
+-   **SBNGD**：为原始SBH shape做reshape后shape，S和D为矩阵乘的M轴（或N轴）和K轴，一个SD为一个Batch的计算数据，Layout格式如下图所示：
 
     ![](../../../../figures/SBNGD.png)
 
--   **BNGS1S2：**一般为前两种Layout进行矩阵乘的输出，S1S2数据连续存放，一个S1S2为一个Batch的计算数据，Layout格式如下图所示：
+-   **BNGS1S2**：一般为前两种Layout进行矩阵乘的输出，S1S2数据连续存放，一个S1S2为一个Batch的计算数据，Layout格式如下图所示：
 
     ![](../../../../figures/BNGS1S2.png)
 
@@ -84,16 +84,16 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateBatch执行结束。异步：不需要同步等待IterateBatch执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。异步场景需要配合[WaitIterateBatch](WaitIterateBatch.md)接口使用。 |
+| sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateBatch执行结束。<br>异步：不需要同步等待IterateBatch执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false。默认为同步模式。异步场景需要配合[WaitIterateBatch](WaitIterateBatch.md)接口使用。 |
 | waitIterateBatch | 是否需要通过[WaitIterateBatch](WaitIterateBatch.md)接口等待IterateBatch执行结束，仅在异步场景下使用。默认为false。<br><br>true：需要通过WaitIterateBatch接口等待IterateBatch执行结束。<br><br>false：不需要通过WaitIterateBatch接口等待IterateBatch执行结束，开发者自行处理等待IterateBatch执行结束的过程。 |
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gm | 输出 | C矩阵。类型为[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas 推理系列产品AI Core，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Kirin X90，支持的数据类型为：half/int32_t |
-| ubCmatrix | 输出 | C矩阵。类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)。<br><br>Ascend 950PR/Ascend 950DT，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Atlas 推理系列产品AI Core，支持的数据类型为：half/bfloat16_t/int32_t/float<br><br>Kirin X90，支持的数据类型为：half/int32_t |
+| gm | 输出 | C矩阵。类型为[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。 |
+| ubCmatrix | 输出 | C矩阵。类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。 |
 | batchA | 输入 | 左矩阵的batch数。 |
 | batchB | 输入 | 右矩阵的batch数。在batchA/batchB不相同的情况下，默认做broadcast操作。<br><br>多batch计算支持在G轴上做输入broadcast和输出reduce，左矩阵、右矩阵G轴维度必须是整数倍的关系。 |
-| enSequentialWrite | 输入 | 输出是否[连续存放](GetTensorC.md#fig580415103338)数据，即是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置）。<br>左右矩阵和输出矩阵的存储位置为Unified Buffer，则enSequentialWrite参数应配置为true；输出矩阵的存储位置为GM，则enSequentialWrite参数应配置为false。 |
+| enSequentialWrite | 输入 | 输出是否[连续存放](GetTensorC.md#fig580415103338)数据，即是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置）。<br>左右矩阵和输出矩阵的存储位置为Unified Buffer，则enSequentialWrite参数应配置为true；<br>输出矩阵的存储位置为GM，则enSequentialWrite参数应配置为false。 |
 | matrixStrideA | 输入 | A矩阵源操作数相邻nd矩阵起始地址间的偏移，单位是元素，默认值是0。 |
 | matrixStrideB | 输入 | B矩阵源操作数相邻nd矩阵起始地址间的偏移，单位是元素，默认值是0。 |
 | matrixStrideC | 输入 | 该参数预留，保持默认值0即可。 |
@@ -124,6 +124,17 @@
 -   Ascend 950PR/Ascend 950DT上，A、B矩阵内存逻辑位置为TPosition::TSCM时，只支持NORMAL  Layout格式。
 -   Atlas 推理系列产品AI Core上，Bias不支持复用，Bias的shape大小必须为Batch \* N。
 -   使用该接口时，A矩阵、B矩阵不支持int4b\_t类型的输入，即BatchMatmul不支持int4b\_t类型的矩阵输入。
+-   支持的数据类型<a id="li12616155731722"></a>
+
+    Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16_t、int32_t、float。
+
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、bfloat16_t、int32_t、float。
+
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、bfloat16_t、int32_t、float。
+
+    Atlas 推理系列产品AI Core，支持的数据类型为：half、bfloat16_t、int32_t、float。
+
+    Kirin X90，支持的数据类型为：half、int32_t。
 
 ## 调用示例
 
