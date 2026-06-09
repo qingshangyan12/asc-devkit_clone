@@ -26,6 +26,7 @@
 #include "kernel_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#define ASCENDC_SIMD_VF_DEBUG
 
 namespace __asc_simt_vf {
 template <class... Args>
