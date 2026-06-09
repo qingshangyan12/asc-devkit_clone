@@ -91,7 +91,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
-完整样例请参考[InsertHashTable算子样例](../../../../examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
+完整样例请参考[InsertHashTable算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/00_memory_access/insert_hash_table/README.md)。
 
 -   SIMT编程场景：
 
