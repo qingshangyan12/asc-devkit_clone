@@ -119,6 +119,7 @@ if(BUILD_OPEN_PROJECT)
         -Wl,--no-as-needed
         unified_dlog
         acl_rt
+        c_sec
         -Wl,--no-as-needed
     )
 else()
