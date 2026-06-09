@@ -50,7 +50,9 @@ public:
     template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const FixpipeParams& params)
     {
-        if constexpr (IsL0COutSrcBatchLayoutV<U>) {
+        if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+            EmitBatchNZ2NZDataCopy<trait, quantPre>(dst, src, params);
+        } else if constexpr (IsL0COutSrcBatchLayoutV<U>) {
             EmitDataCopy<trait, quantPre>(dst, src, Te::Get<1>(dst.Layout()), Te::Get<1>(src.Layout()), params);
         } else {
             EmitDataCopy<trait, quantPre>(dst, src, dst.Layout(), src.Layout(), params);
@@ -58,6 +60,19 @@ public:
     }
 
 private:
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U>
+    __aicore__ inline static void EmitBatchNZ2NZDataCopy(const T& dst, const U& src, const FixpipeParams& params)
+    {
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+        for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
+            EmitDataCopy<trait, quantPre>(
+                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
+                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)),
+                Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
+        }
+    }
+
     template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename DstLayout,
               typename SrcLayout>
     __aicore__ inline static void EmitDataCopy(
@@ -66,6 +81,7 @@ private:
     {
         constexpr bool isNdFormat = IsL0COutNDFormatV<T>;
         constexpr bool isDnFormat = IsL0COutDNFormatV<T>;
+        constexpr bool isNzFormat = IsL0COutNZFormatV<T>;
 
         uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
         uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
@@ -74,8 +90,10 @@ private:
 
         if constexpr (isNdFormat) {
             dstStride = GetL0COutNDStride<T>(dstLayout);
-        } else {
+        } else if constexpr (isDnFormat) {
             dstStride = GetL0COutDNStride<T>(dstLayout);
+        } else if constexpr (isNzFormat) {
+            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
         }
 
         bool reluEn = trait.enableRelu;
@@ -97,7 +115,9 @@ public:
     template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const V& quant, const FixpipeParams& params)
     {
-        if constexpr (IsL0COutSrcBatchLayoutV<U>) {
+        if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+            EmitBatchNZ2NZDataCopy<trait, quantPre>(dst, src, quant, params);
+        } else if constexpr (IsL0COutSrcBatchLayoutV<U>) {
             EmitDataCopy<trait, quantPre>(
                 dst, src, quant, Te::Get<1>(dst.Layout()), Te::Get<1>(src.Layout()), params);
         } else {
@@ -106,6 +126,20 @@ public:
     }
 
 private:
+    template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V>
+    __aicore__ inline static void EmitBatchNZ2NZDataCopy(
+        const T& dst, const U& src, const V& quant, const FixpipeParams& params)
+    {
+        auto dstLayout = dst.Layout();
+        auto srcLayout = src.Layout();
+        for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
+            EmitDataCopy<trait, quantPre>(
+                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
+                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)), quant,
+                Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
+        }
+    }
+
     template <const CopyL0C2UBTrait& trait, QuantMode_t quantPre, typename T, typename U, typename V,
               typename DstLayout, typename SrcLayout>
     __aicore__ inline static void EmitDataCopy(const T& dst, const U& src, const V& quant,
@@ -131,6 +165,7 @@ private:
     {
         constexpr bool isNdFormat = IsL0COutNDFormatV<T>;
         constexpr bool isDnFormat = IsL0COutDNFormatV<T>;
+        constexpr bool isNzFormat = IsL0COutNZFormatV<T>;
 
         uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
         uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
@@ -146,8 +181,10 @@ private:
         uint32_t dstStride = 0;
         if constexpr (isNdFormat) {
             dstStride = GetL0COutNDStride<T>(dstLayout);
-        } else {
+        } else if constexpr (isDnFormat) {
             dstStride = GetL0COutDNStride<T>(dstLayout);
+        } else if constexpr (isNzFormat) {
+            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
         }
 
         const bool reluEn = trait.enableRelu;
