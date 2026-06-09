@@ -17,6 +17,23 @@
 #include "alg_env_config.h"
 #include <memory>
 #include <string>
+#include <chrono>
+#include <cstdlib>
+#include <map>
+#include <unordered_map>
+
+extern bool HcclCheckLogLevel(int logType, int moduleId);
+extern bool IsErrorToWarn();
+
+bool HcclCheckLogLevel(int logType, int moduleId)
+{
+    return false;
+}
+
+bool IsErrorToWarn()
+{
+    return false;
+}
 
 namespace mc2_ops_hccl {
 
