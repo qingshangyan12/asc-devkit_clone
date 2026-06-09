@@ -24,6 +24,8 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── figures                 // 图示
+│   ├── matmul_gelu_中级性能优化.md  // 中级性能优化：CV融合-GM中转详细说明
+│   ├── matmul_gelu_高阶极限打磨.md  // 高阶极限打磨：CV融合-UB直通详细说明
 │   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
@@ -146,80 +148,19 @@ AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 
 ### 3. 中级性能优化
 
-### Scenario 1 — CV融合-GM中转
+详见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md)
+
+**Scenario 1 — CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
 
 AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
 
-**AIC侧**：Fixpipe L0C → GM
-
-```cpp
-// A2/A3架构
-AscendC::FixpipeParamsV220 fixpipeParams;
-fixpipeParams.nSize = curN;
-fixpipeParams.mSize = curM;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
-
-// Ascend 950PR架构
-AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = curM;
-fixpipeParams.nSize = curN;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
-```
-
-**AIV侧**：GM → xUB → GELU → geluOutUB → GM
-
-`__mix__(1,2)` 模式下每个逻辑核有2个AIV，Fixpipe输出到GM的M行数据按M/2行拆分给两个AIV处理。每个AIV通过 `GetSubBlockIdx() % 2` 获取自己的子块索引，独立完成各自M/2行的GELU计算：
-
-```cpp
-uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
-
-// Step 1: DataCopy GM → xUB
-AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
-
-// Step 2: GELU计算
-// A2/A3: GeluMemBaseCompute(xUB, geluOutUB, computeLen);
-// Ascend 950PR:    GeluRegBaseCompute(xUB, geluOutUB, computeLen);
-
-// Step 3: DataCopy geluOutUB → GM
-AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
-```
-
 ### 4. 高阶极限打磨
 
-### Scenario 2 — CV融合-UB直通（仅Ascend 950PR支持）
+详见 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md)
+
+**Scenario 2 — CV融合-UB直通**（仅Ascend 950PR支持）
 
 AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
-
-**AIC侧**：Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度拆分给2个AIV）
-
-```cpp
-AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
-fixpipeParams.nSize = curN;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
-```
-
-**AIV侧**：UB → GELU → geluOutUB → GM
-
-AIV侧无需DataCopy GM→UB，直接对xUB进行GELU计算：
-
-```cpp
-// GELU计算：xUB作为输入，geluOutUB作为输出
-GeluRegBaseCompute(xUB, geluOutUB, computeLen);
-
-// DataCopy: geluOutUB → GM
-uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
-```
 
 #### 5. GELU计算实现
 
@@ -274,27 +215,20 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 ### 性能数据分析
 
+> 以下数据基于msprof工具测量，取5次中位数。矩阵规格M=4096, K=1024, N=1536(A2)/N=1024(950PR)，输入数据类型float16，输出数据类型float32。
+
 #### Atlas A2训练系列芯片性能数据
 
 - Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1536，24核
 
-| Scenario | Task Type | Task Duration(μs) | Block Num | Mix Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|------|-----------|-------------------|-----------|---------------|-----------------|------------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|---------------------|-------------------|--------------|-----------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|
-|Gelu计算 | AI_VECTOR_CORE | 369.827 | 48 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 358.91 | 236.506 | 0.659 | 8.293 | 0.023 | 316.672 | 0.882 | 150.033 | 0.418 |
-| Matmul计算 | AI_CORE | 4227.605 | 24 | 0 | 3760.55 | 3083.197 | 0.82 | 338.636 | 0.09 | 2516.081 | 0.669 | 3685.713 | 0.98 | 193.704 | 0.052 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Scenario 1 | MIX_AIC | 4236.944 | 24 | 48 | 3770.16 | 3083.235 | 0.818 | 531.971 | 0.141 | 2520.852 | 0.669 | 3687.839 | 0.978 | 193.933 | 0.051 | 3773.6 | 174.327 | 0.046 | 2.016 | 0.001 | 90.315 | 0.024 | 66.373 | 0.018 |
+详细数据见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md#性能数据)
 
 #### Ascend 950PR芯片性能数据
 
 - Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1024，32核
 - Scenario 2：CV融合-UB直通，singleCoreM=2048, singleCoreN=1024，32核
 
-| Scenario | Task Type | Task Duration(μs) | Block Num | Mix Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
-|------|-----------|-------------------|-----------|---------------|-----------------|------------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|------------------|----------------|---------------------|-------------------|--------------|-----------------|---------------|---------------------|------------------|------------------|----------------|
-| Gelu计算(RegBase) | AI_VECTOR_CORE | 348.868 | 64 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 347.99 | 66.277 | 0.19 | 3.03 | 0.009 | 320.543 | 0.921 | 314.547 | 0.904 |
-| Matmul计算 | AI_CORE | 2601.311 | 32 | 0 | 2600.55 | 2593.264 | 0.997 | 104.582 | 0.04 | 816.91 | 0.314 | 1875.057 | 0.721 | 252.163 | 0.097 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Scenario 1 | MIX_AIC | 2606.91 | 32 | 64 | 2605.9 | 2597.856 | 0.997 | 105.131 | 0.04 | 818.781 | 0.314 | 1917.737 | 0.736 | 252.231 | 0.097 | 2605.93 | 59.897 | 0.023 | 1.783 | 0.001 | 57.145 | 0.022 | 50.516 | 0.019 |
-| Scenario 2 | MIX_AIC | 2573.584 | 32 | 64 | 2572.67 | 2565.251 | 0.997 | 104.669 | 0.041 | 819.934 | 0.319 | 2096.38 | 0.815 | 212.403 | 0.083 | 2572.69 | 60.438 | 0.023 | 1.138 | 0 | 0.005 | 0 | 68.76 | 0.027 |
+详细数据见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md#性能数据) 和 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md#性能数据)
 
 #### 性能数据解读
 

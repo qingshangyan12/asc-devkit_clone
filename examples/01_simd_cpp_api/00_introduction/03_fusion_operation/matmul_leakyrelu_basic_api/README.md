@@ -1,6 +1,6 @@
 # Matmul和LeakyRelu融合计算样例
 
-## 概述
+## 算子概述
 
 本样例基于静态Tensor编程模式（编译期确定张量形状和内存布局的编程方式）实现Matmul和LeakyRelu融合计算，展示Cube单元（矩阵计算单元，执行Matmul等矩阵运算）和Vector单元（向量计算单元，执行逐元素运算）协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
 
@@ -26,21 +26,21 @@
 │   └── matmul_leakyrelu_basic_api.asc  // Ascend C样例实现 & 调用样例
 ```
 
-## 样例描述
+## 算子描述
 
 - 样例功能：
   实现Matmul和LeakyRelu融合计算，计算公式如下：
 
   Matmul计算：
   $$
-  C = A \times B
+  C_{ij} = \sum_{k} A_{ik} \times B_{kj}
   $$
 
   LeakyRelu计算：
   $$
-  C = \begin{cases}
-  C & \text{if } C \geq 0 \\
-  C \times 0.001 & \text{if } C < 0
+  C_{ij} = \begin{cases}
+  C_{ij} & \text{if } C_{ij} \geq 0 \\
+  C_{ij} \times 0.001 & \text{if } C_{ij} < 0
   \end{cases}
   $$
 
@@ -61,12 +61,26 @@
   **分核逻辑**：
 
   输出矩阵C按M方向（shape第一维，行方向）分为2个分块，N方向（shape第二维，列方向）不分块，使用2个Cube核完成Matmul计算；每个Cube核对应2个Vector核，因此使用4个Vector核完成LeakyRelu计算。每个Cube核产生一个baseM×baseN结果块，对应2个Vector核各处理baseM/2×baseN的数据。
+
+  **M/N/K参数图解**：
+
+  在矩阵乘 C = A × B 中，M/N/K分别对应矩阵的不同维度，分核偏移也围绕这些维度展开：
+
+  ```
+           K                N
+       ┌─────────┐      ┌──────────┐
+       │         │      │          │
+     M │    A    │  × K │    B     │  =  C (M × N)
+       │         │      │          │
+       └─────────┘      └──────────┘
+  ```
+
   - M方向分块数：M / singleCoreM = 512 / 256 = 2
   - N方向分块数：N / singleCoreN = 128 / 128 = 1
   - 总Cube核数：2 × 1 = 2
   - 总Vector核数：2 × 2 = 4
 
-- 样例实现：
+- 算子实现：
   - **整体计算流程**：
 
     样例整体流程如下（展示Cube核和Vector核协同计算）：
@@ -77,10 +91,10 @@
       >
       > Ascend AI Core内部有多级片上缓存，数据从外部DDR（Global Memory, GM）逐级搬运至计算单元：
       > - **GM（Global Memory）**：芯片外部DDR，存放输入/输出数据，容量最大但访问延迟最高
-      > - **L1**：Cube侧片上缓存，存放A/B矩阵数据，由MTE2引擎从GM搬入
+      > - **L1**：片上缓存（Cube侧主要存放A/B矩阵数据），由MTE2引擎从GM搬入
       > - **L0A/L0B**：Cube矩阵计算单元的输入缓存，由MTE1引擎从L1搬入
       > - **L0C（CO1）**：Cube矩阵计算单元的输出缓存，存放Mmad计算结果
-      > - **UB（VECCALC）**：Vector侧片上缓存，存放Vector计算所需的输入/输出数据
+      > - **UB（Unified Buffer，AscendC中对应TPosition::VECCALC）**：Vector侧片上缓存，存放Vector计算所需的输入/输出数据
       >
       > 数据需在搬运过程中进行格式转换（ND→Nz/Zn），因为Cube计算单元要求特定的分形（Fractal）排布格式，而非ND排布。
       >
@@ -134,12 +148,12 @@
           ```cpp
           class KernelMatmul {
           public:
-              __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
+              __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
               {
                   // 设置GlobalTensor的起始地址，指向GM中对应的输入/输出矩阵
-                  aGM.SetGlobalBuffer((__gm__ half*)a);
-                  bGM.SetGlobalBuffer((__gm__ half*)b);
-                  cGM.SetGlobalBuffer((__gm__ half*)c);
+                  aGM.SetGlobalBuffer((__gm__ half*)xMatrix);
+                  bGM.SetGlobalBuffer((__gm__ half*)yMatrix);
+                  cGM.SetGlobalBuffer((__gm__ half*)zMatrix);
 
                   // Cube核按M方向分核，每个Cube核负责singleCoreM * N大小输出块
                   if ASCEND_IS_AIC {
@@ -162,7 +176,13 @@
 
           **内存搬运与计算流程**：
 
-          - **LocalTensor创建**：使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)（片上内存分配器，按申请顺序自动分配，避免手动维护地址偏移）创建A1、B1、A2、B2和CO1位置的[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)（片上内存张量，数据驻留在L1/L0/UB等片上缓存）。其中A、B矩阵在L1中的临时空间由同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移
+          - **LocalTensor创建**：使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)（片上内存分配器，按申请顺序自动分配，避免手动维护地址偏移）创建各位置的[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)（片上内存张量，数据驻留在L1/L0/UB等片上缓存）。各位置含义如下：
+            - **A1（TPosition::A1）**：L1缓存中存放左矩阵A的Nz格式数据，DataCopy GM→L1的目的端
+            - **B1（TPosition::B1）**：L1缓存中存放右矩阵B的Nz格式数据，DataCopy GM→L1的目的端
+            - **A2（TPosition::A2）**：L0A缓存中存放左矩阵A的分形数据，LoadData L1→L0A的目的端，Mmad的左输入
+            - **B2（TPosition::B2）**：L0B缓存中存放右矩阵B的分形数据，LoadData L1→L0B的目的端，Mmad的右输入
+            - **CO1（TPosition::CO1）**：L0C缓存中存放Mmad计算结果，Mmad的输出端，Fixpipe的源端
+            其中A、B矩阵在L1中的临时空间由同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移
           - **GM → L1**：使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)将A、B矩阵从GM搬运到L1，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
           - **L1 → L0A/L0B**：使用[LoadData](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)将数据搬运到L0A和L0B，B矩阵需要转置（Nz→Zn）
           - **L0A/L0B → L0C**：使用[Mmad](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)（矩阵乘累加指令）执行矩阵乘加，累加K轴方向的所有数据块
@@ -181,11 +201,12 @@
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
                   // L1: A/B矩阵的临时存储; L0A/L0B: Cube计算单元输入; L0C(CO1): Cube计算单元输出
-                  AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<AscendC::TPosition::A1, half>(baseM * baseK);
-                  AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<AscendC::TPosition::B1, half>(baseK * baseN);
-                  AscendC::LocalTensor<half> a2Local = l0aAllocator.Alloc<AscendC::TPosition::A2, half>(baseM * baseK);
-                  AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<AscendC::TPosition::B2, half>(baseK * baseN);
-                  AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<AscendC::TPosition::CO1, float>(baseM * baseN);
+                  // Alloc的TPosition模板参数可缺省，Alloc函数会根据allocator对应的物理位置给出默认值
+                  AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<half>(baseM * baseK);
+                  AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<half>(baseK * baseN);
+                  AscendC::LocalTensor<half> a2Local = l0aAllocator.Alloc<half>(baseM * baseK);
+                  AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<half>(baseK * baseN);
+                  AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<float>(baseM * baseN);
 
                   // ==================== GM → L1: DataCopy + ND→Nz格式转换 ====================
                   // DataCopy搬运时同时完成ND到Nz的格式转换（Cube计算单元要求Nz分形排布）
@@ -196,6 +217,8 @@
                   AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 
                   // ==================== L1 → L0A/L0B: LoadData ====================
+                  // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
+                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
                   // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                   for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
@@ -257,8 +280,7 @@
                   // ==================== UB Local Tensor 分配 ====================
                   AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
                   // 每个Vector核处理baseM/2 × baseN个元素（1个Cube核的结果由2个Vector核平分）
-                  AscendC::LocalTensor<half> vecLocal =
-                      ubAllocator.Alloc<AscendC::TPosition::VECCALC, half>(baseM / 2 * baseN);
+                  AscendC::LocalTensor<half> vecLocal = ubAllocator.Alloc<half>(baseM / 2 * baseN);
 
                   // ==================== 核间同步：等待Cube核Fixpipe完成 ====================
                   AscendC::CrossCoreWaitFlag(0);
@@ -303,12 +325,12 @@
     ```cpp
     // __global__: 核函数声明修饰符
     // __mix__(1,2): 混合核函数，1个AIC(Cube) + 2个AIV(Vector)组成一个逻辑核
-    __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
+    __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
     {
         AscendC::InitSocState();  // 初始化硬件状态
         KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN,
                      baseM, baseK, baseN> op;
-        op.Init(a, b, c);   // GlobalTensor初始化与分核偏移
+        op.Init(xMatrix, yMatrix, zMatrix);   // GlobalTensor初始化与分核偏移
         op.Process();        // AIC侧执行Matmul，AIV侧执行LeakyRelu
         AscendC::PipeBarrier<PIPE_ALL>();  // 等待所有流水阶段完成
     }
