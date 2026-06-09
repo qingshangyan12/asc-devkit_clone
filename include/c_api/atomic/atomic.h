@@ -26,60 +26,97 @@
 
 #endif
 
-__aicore__ inline void asc_set_atomic_add_float();
+#if defined(__NPU_ARCH__) 
 
-__aicore__ inline void asc_set_atomic_max_float16();
-
-__aicore__ inline void asc_set_atomic_add_int();
-
+/*
+ * @ingroup AtomicOperations
+ * @brief Set atomic add operation mode
+ * @details Configure subsequent store operations to use (int8/int16/int32/half/bfloat16/float) atomic add semantics
+ */
 __aicore__ inline void asc_set_atomic_add_int8();
 
 __aicore__ inline void asc_set_atomic_add_int16();
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+__aicore__ inline void asc_set_atomic_add_int();
 
-__aicore__ inline void asc_set_atomic_none();
+__aicore__ inline void asc_set_atomic_add_half();
 
-__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
+__aicore__ inline void asc_set_atomic_add_bfloat16();
 
-__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
+__aicore__ inline void asc_set_atomic_add_float();
 
-__aicore__ inline void asc_set_atomic_add_bfloat();
-
-__aicore__ inline void asc_set_atomic_add_float16();
-
-__aicore__ inline void asc_set_atomic_max_bfloat();
-
-__aicore__ inline void asc_set_atomic_max_float();
-
-__aicore__ inline void asc_set_atomic_max_int();
-
+/*
+ * @ingroup AtomicOperations
+ * @brief Set atomic max operation mode
+ * @details Configure subsequent store operations to use (int8/int16/int32/half/bfloat16/float) atomic add semantics
+ */
 __aicore__ inline void asc_set_atomic_max_int8();
 
 __aicore__ inline void asc_set_atomic_max_int16();
 
-__aicore__ inline void asc_set_atomic_min_bfloat();
+__aicore__ inline void asc_set_atomic_max_int();
 
-__aicore__ inline void asc_set_atomic_min_float();
+__aicore__ inline void asc_set_atomic_max_half();
 
-__aicore__ inline void asc_set_atomic_min_float16();
+__aicore__ inline void asc_set_atomic_max_bfloat16();
 
-__aicore__ inline void asc_set_atomic_min_int();
+__aicore__ inline void asc_set_atomic_max_float();
 
+/*
+ * @ingroup AtomicOperations
+ * @brief Set atomic min operation mode
+ * @details Configure subsequent store operations to use (int8/int16/int32/half/bfloat16/float) atomic add semantics
+ */
 __aicore__ inline void asc_set_atomic_min_int8();
 
 __aicore__ inline void asc_set_atomic_min_int16();
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+__aicore__ inline void asc_set_atomic_min_int();
 
-__aicore__ inline void asc_set_atomic_add_float16();
+__aicore__ inline void asc_set_atomic_min_half();
 
-__aicore__ inline void asc_set_atomic_max_float();
+__aicore__ inline void asc_set_atomic_min_bfloat16();
 
+__aicore__ inline void asc_set_atomic_min_float();
+
+/*
+ * @ingroup AtomicOperations
+ * @brief Set no atomic operation mode
+ * @details Configure subsequent store operations to use direct store semantics without atomic operations
+ */
+__aicore__ inline void asc_set_atomic_none();
+
+/*
+ * @ingroup AtomicOperations
+ * @brief Set store atomic configuration
+ * @param [in] atomic operation enable bit (1 means float, 2 means half etc.)
+ * @param [in] op atomic operation opcode (0 means add etc.)
+ * @details Configure subsequent store operations with custom atomic operation parameters
+ */
+__aicore__ inline void asc_set_store_atomic_config(uint16_t type, uint16_t op);
+
+/*
+ * @ingroup AtomicOperations
+ * @brief Get current store atomic configuration
+ * @param [out] config store atomic configuration structure to receive current configuration
+ * @details Retrieve the current atomic operation configuration settings
+ */
+__aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
+
+/*
+ * @ingroup AtomicOperations
+ * @brief Architecture-specific atomic configuration functions (deprecated)
+ * @details These functions are deprecated and will be moved to lower-level implementation files.
+ *          Users should use the unified asc_set_store_atomic_config() function instead.
+ * @deprecated Use asc_set_store_atomic_config() for all architectures
+ */
+#if __NPU_ARCH__ == 2201
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
+#elif __NPU_ARCH__ == 3510
 __aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
-
 #endif
 
+#endif // __NPU_ARCH__
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)
