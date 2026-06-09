@@ -65,7 +65,7 @@ pipeline {
         string(name: 'CPU_RUN_TIMEOUT', defaultValue: '300', trim: true, description: 'CPU run-stage timeout in seconds.')
         string(name: 'EXTRA_ARGS', defaultValue: '', trim: true, description: 'Extra arguments passed to scripts/run_presmoke.sh, for example --filter <case>.')
         text(name: 'FILTER_LIST', defaultValue: '', description: 'Optional case filter list. One case path per line. Lines starting with # are ignored.')
-        string(name: 'NODE', defaultValue: '', trim: true, description: 'Jenkins node label to select build node.')
+        choice(name: 'NODE', choices: ['141.131.72.151'], description: 'Jenkins node label to select build node.')
     }
 
     options {
