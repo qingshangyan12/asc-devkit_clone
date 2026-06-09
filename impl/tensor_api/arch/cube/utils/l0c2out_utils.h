@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_UTILS_L0C2OUT_UTILS_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/tensor/layout_method.h"
 
 namespace AscendC {
 namespace Te {
@@ -43,6 +44,14 @@ template <typename TensorType>
 inline constexpr bool IsL0COutDNFormatV =
     IsSatisfiedPtnFormatV<TensorType, DNExtLayoutPtn> || IsSatisfiedPtnFormatV<TensorType, DNLayoutPtn>;
 
+template <typename TensorType>
+inline constexpr bool IsL0COutNZFormatV = IsSatisfiedPtnFormatV<TensorType, NZLayoutPtn>;
+
+template <typename DstTensorType, typename SrcTensorType>
+inline constexpr bool IsL0COutBatchNZ2NZV =
+    IsL0COutNZFormatV<DstTensorType> && IsL0COutNZFormatV<SrcTensorType> &&
+    DstTensorType::layoutType::depth == FIVE_DIM_DATA && SrcTensorType::layoutType::depth == FIVE_DIM_DATA;
+
 template <typename T, typename LayoutType>
 __aicore__ inline static constexpr uint32_t GetL0COutNDStride(const LayoutType& layout)
 {
@@ -61,6 +70,33 @@ __aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& 
     } else {
         return GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
     }
+}
+
+template <typename ShapeType>
+__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape);
+
+template <typename ShapeType, size_t... Is>
+__aicore__ inline static constexpr auto MakeL0COutZeroCoordImpl(
+    const ShapeType& shape, Std::index_sequence<Is...>)
+{
+    return MakeCoord(MakeL0COutZeroCoord(Std::get<Is>(shape))...);
+}
+
+template <typename ShapeType>
+__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape)
+{
+    using Shape = Std::remove_cvref_t<ShapeType>;
+    if constexpr (Std::is_tuple_v<Shape>) {
+        return MakeL0COutZeroCoordImpl(shape, Std::make_index_sequence<Std::tuple_size_v<Shape>>{});
+    } else {
+        return _0{};
+    }
+}
+
+template <typename ShapeType>
+__aicore__ inline static constexpr auto MakeL0COutBatchCoord(const ShapeType& shape, uint32_t batchIndex)
+{
+    return MakeCoord(batchIndex, MakeL0COutZeroCoord(Get<1>(shape)));
 }
 
 template <RoundMode roundMode, typename dstType, typename srcType>
@@ -253,6 +289,8 @@ __aicore__ inline static void EmitSetRegister(const U& srcLayout, uint32_t batch
     } else if constexpr (IsL0COutDNFormatV<T>) {
         SetRegisterInstr::SetRegister(batchNum, dstBatchStride, srcBatchStride,
                                       GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+    } else if constexpr (IsL0COutNZFormatV<T>) {
+        SetRegisterInstr::SetRegister(1, 0, 0);
     }
 }
 
@@ -265,6 +303,8 @@ __aicore__ inline static void EmitSetRegister(
     } else if constexpr (IsL0COutDNFormatV<T>) {
         SetRegisterInstr::SetRegister(quant, batchNum, dstBatchStride, srcBatchStride,
                                       GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+    } else if constexpr (IsL0COutNZFormatV<T>) {
+        SetRegisterInstr::SetRegister(quant, 1, 0, 0);
     }
 }
 
