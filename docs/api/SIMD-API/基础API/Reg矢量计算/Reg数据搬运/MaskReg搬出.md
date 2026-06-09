@@ -24,6 +24,26 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>x</p>
 </td>
 </tr>
+<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695483941817"><a name="p1695483941817"></a><a name="p1695483941817"></a>x</p>
+</td>
+</tr>
+<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695443971810"><a name="p1695443971810"></a><a name="p1695443971810"></a>x</p>
+</td>
+</tr>
+<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
+</td>
+</tr>
+<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -97,7 +117,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p567151494415"><a name="p567151494415"></a><a name="p567151494415"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p928118257494"><a name="p928118257494"></a><a name="p928118257494"></a>实际搬运UB起始地址为 srcAddr + offset。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p928118257494"><a name="p928118257494"></a><a name="p928118257494"></a>实际搬运UB起始地址为 dstAddr + offset。</p>
 </td>
 </tr>
 </tbody>
@@ -118,7 +138,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p1450152683811"><a name="p1450152683811"></a><a name="p1450152683811"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p18502267385"><a name="p18502267385"></a><a name="p18502267385"></a>支持的数据类型为b8/b16/b32/b64。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p18502267385"><a name="p18502267385"></a><a name="p18502267385"></a><span id="ph231020186135"><a name="ph231020186135"></a><a name="ph231020186135"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为b8/b16/b32/b64。</p>
 </td>
 </tr>
 <tr id="row19503269381"><td class="cellrowborder" valign="top" width="13.268673132686734%" headers="mcps1.2.4.1.1 "><p id="p13501226203813"><a name="p13501226203813"></a><a name="p13501226203813"></a>dist</p>
@@ -161,7 +181,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p383722813383"><a name="p383722813383"></a><a name="p383722813383"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p11837202853819"><a name="p11837202853819"></a><a name="p11837202853819"></a>支持的数据类型为b8/b16/b32/b64。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p136251441171520"><a name="p136251441171520"></a><a name="p136251441171520"></a><span id="ph17626141111518"><a name="ph17626141111518"></a><a name="ph17626141111518"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为b8/b16/b32/b64。</p>
 </td>
 </tr>
 <tr id="row19837152863813"><td class="cellrowborder" valign="top" width="13.268673132686734%" headers="mcps1.2.4.1.1 "><p id="p1383742817382"><a name="p1383742817382"></a><a name="p1383742817382"></a>dist</p>
@@ -176,7 +196,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p883792893817"><a name="p883792893817"></a><a name="p883792893817"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p1246583315216"><a name="p1246583315216"></a><a name="p1246583315216"></a>用于控制是否启用post update。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p1246583315216"><a name="p1246583315216"></a><a name="p1246583315216"></a>用于控制是否开启post update。</p>
 <a name="ul121721550125114"></a><a name="ul121721550125114"></a><ul id="ul121721550125114"><li>POST_MODE_NORMAL，正常场景，UB操作数地址不更新。</li></ul>
 <a name="ul51081954165116"></a><a name="ul51081954165116"></a><ul id="ul51081954165116"><li>POST_MODE_UPDATE，POST_MODE_UPDATE场景使用，UB地址同时作为输入和输出，每次调用会更新。</li></ul>
 </td>
@@ -199,7 +219,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p1983882814386"><a name="p1983882814386"></a><a name="p1983882814386"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><div class="p" id="p342815215547"><a name="p342815215547"></a><a name="p342815215547"></a>当offset为int32_t类型时：POST_MODE_NORMAL与POST_MODE_UPDATE含义不一致。<a name="ul883822833811"></a><a name="ul883822833811"></a><ul id="ul883822833811"><li>POST_MODE_NORMAL场景：实际搬运UB起始地址为srcAddr + offset。</li><li>POST_MODE_UPDATE场景：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr +=  offset。</li></ul>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><div class="p" id="p342815215547"><a name="p342815215547"></a><a name="p342815215547"></a>当offset为int32_t类型时：POST_MODE_NORMAL与POST_MODE_UPDATE含义不一致。<a name="ul883822833811"></a><a name="ul883822833811"></a><ul id="ul883822833811"><li>POST_MODE_NORMAL场景：实际搬运UB起始地址为dstAddr + offset。</li><li>POST_MODE_UPDATE场景：实际搬运UB起始地址为dstAddr，搬运后执行地址更新dstAddr +=  offset。</li></ul>
 </div>
 </td>
 </tr>

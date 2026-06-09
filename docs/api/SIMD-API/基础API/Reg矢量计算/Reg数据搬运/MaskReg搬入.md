@@ -24,6 +24,26 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p19948143911820"><a name="p19948143911820"></a><a name="p19948143911820"></a>x</p>
 </td>
 </tr>
+<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695483941817"><a name="p1695483941817"></a><a name="p1695483941817"></a>x</p>
+</td>
+</tr>
+<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1695443971810"><a name="p1695443971810"></a><a name="p1695443971810"></a>x</p>
+</td>
+</tr>
+<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
+</td>
+</tr>
+<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -115,7 +135,8 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p1095412403115"><a name="p1095412403115"></a><a name="p1095412403115"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p9954194017111"><a name="p9954194017111"></a><a name="p9954194017111"></a>操作数数据类型。支持的数据类型为b8/b16/b32/b64。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p9954194017111"><a name="p9954194017111"></a><a name="p9954194017111"></a>操作数数据类型。</p>
+<p id="p15293173113465"><a name="p15293173113465"></a><a name="p15293173113465"></a><span id="ph0293163118464"><a name="ph0293163118464"></a><a name="ph0293163118464"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为b8/b16/b32/b64。</p>
 </td>
 </tr>
 <tr id="row14285547195114"><td class="cellrowborder" valign="top" width="13.268673132686734%" headers="mcps1.2.4.1.1 "><p id="p152851447135115"><a name="p152851447135115"></a><a name="p152851447135115"></a>dist</p>
@@ -158,7 +179,8 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p67476522313"><a name="p67476522313"></a><a name="p67476522313"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p074785218311"><a name="p074785218311"></a><a name="p074785218311"></a>操作数数据类型。支持的数据类型为b8/b16/b32/b64。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p074785218311"><a name="p074785218311"></a><a name="p074785218311"></a>操作数数据类型。</p>
+<p id="p031031861317"><a name="p031031861317"></a><a name="p031031861317"></a><span id="ph231020186135"><a name="ph231020186135"></a><a name="ph231020186135"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为b8/b16/b32/b64。</p>
 </td>
 </tr>
 <tr id="row2771194935120"><td class="cellrowborder" valign="top" width="13.268673132686734%" headers="mcps1.2.4.1.1 "><p id="p674710521332"><a name="p674710521332"></a><a name="p674710521332"></a>dist</p>
@@ -173,7 +195,7 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p883792893817"><a name="p883792893817"></a><a name="p883792893817"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p1246583315216"><a name="p1246583315216"></a><a name="p1246583315216"></a>用于控制是否启用post update。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p1246583315216"><a name="p1246583315216"></a><a name="p1246583315216"></a>用于控制是否开启post update。</p>
 <a name="ul121721550125114"></a><a name="ul121721550125114"></a><ul id="ul121721550125114"><li>POST_MODE_NORMAL，正常场景，UB操作数地址不更新。</li></ul>
 <a name="ul51081954165116"></a><a name="ul51081954165116"></a><ul id="ul51081954165116"><li>POST_MODE_UPDATE，POST_MODE_UPDATE场景使用，UB地址同时作为输入和输出，每次调用会更新。</li></ul>
 </td>
@@ -202,6 +224,15 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </tr>
 </tbody>
 </table>
+
+**图 1**  DIST\_NORM模式搬入<a name="fig16757125316916"></a>  
+![](../../../../figures/DIST_NORM模式搬入.png "DIST_NORM模式搬入")
+
+**图 2**  DIST\_US模式搬入<a name="fig1982131214910"></a>  
+![](../../../../figures/DIST_US模式搬入.png "DIST_US模式搬入")
+
+**图 3**  DIST\_DS模式搬入<a name="fig9402845095"></a>  
+![](../../../../figures/DIST_DS模式搬入.png "DIST_DS模式搬入")
 
 **表 4**  MaskReg从RegTensor搬入参数说明
 
@@ -246,7 +277,7 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </td>
 <td class="cellrowborder" valign="top" width="12.47875212478752%" headers="mcps1.2.4.1.2 "><p id="p1918529514"><a name="p1918529514"></a><a name="p1918529514"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p19165214516"><a name="p19165214516"></a><a name="p19165214516"></a>offset决定了srcReg中数据搬运的起始地址，当数据类型为T为b16时，计算公式为offset* 16，由于VL为256Byte，因此此时offset取值范围为0-15，同理，T为b32数据类型时，计算公式为offset* 8，offset的取值范围为0-31。</p>
+<td class="cellrowborder" valign="top" width="74.25257474252575%" headers="mcps1.2.4.1.3 "><p id="p19165214516"><a name="p19165214516"></a><a name="p19165214516"></a>offset决定了srcReg中数据搬运的起始地址，当数据类型T为b16时，计算公式为offset* 16，由于VL为256Byte，因此此时offset取值范围为0-15，同理，T为b32数据类型时，计算公式为offset* 8，offset的取值范围为0-31。</p>
 <p id="p18342527145117"><a name="p18342527145117"></a><a name="p18342527145117"></a>当数据类型为B16时，dst[i] = srcReg[offset*VL/16 + i/2]，按bit位进行计算。</p>
 <p id="p234211275519"><a name="p234211275519"></a><a name="p234211275519"></a>当数据类型为B32时，dst[i] = srcReg[offset*VL/32 + i/4],，按bit位进行计算。</p>
 </td>
@@ -254,8 +285,8 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg);
 </tbody>
 </table>
 
-**图 1**  Offset功能示意图<a name="fig115968013431"></a>  
-![](figures/Offset功能示意图.png "Offset功能示意图")
+**图 4**  Offset功能示意图<a name="fig115968013431"></a>  
+![](../../../../figures/Offset功能示意图.png "Offset功能示意图")
 
 ## 返回值说明<a name="section1575141714439"></a>
 
