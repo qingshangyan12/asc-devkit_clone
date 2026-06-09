@@ -332,6 +332,13 @@ TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelForVectorCoreLaunchesAicAndAivWit
     EXPECT_EQ(g_aclrtRecordEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
     EXPECT_EQ(g_aclrtStreamWaitEventLastStream, stream);
     EXPECT_EQ(g_aclrtStreamWaitEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
+
+    g_aclrtRegStreamStateCallbackLastCallback(stream, ACL_RT_STREAM_STATE_DESTROY_PRE, nullptr);
+    EXPECT_EQ(g_ascStreamMap.find(stream), g_ascStreamMap.cend());
+    EXPECT_EQ(g_aclrtDestroyStreamCallCount, 1U);
+    EXPECT_EQ(g_aclrtDestroyEventCallCount, 2U);
+    EXPECT_EQ(g_aclrtDestroyStreamLastStream, g_aclrtCreateStreamWithConfigLastStream);
+    EXPECT_EQ(g_aclrtDestroyEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelForVectorCoreWithProfilingReportsBothTasks)
