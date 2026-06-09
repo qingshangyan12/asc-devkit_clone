@@ -9,35 +9,15 @@
  */
 #include "inconsistent_check.h"
 #include "hcom.h"
-#include "alg_env_config.h"
 #include "adapter_error_manager_pub.h"
 #include "hccl_res_expt_dl.h"
 
 namespace mc2_ops_hccl {
-thread_local std::set<std::string> g_inconsistentCheckedList;
-bool NeedInconsistentCheck(const OpParam& param)
-{
-    if (HcommIsSupportHcclCommAddExchangeInfo()) {
-        // inconsistentCheckSwitch 为 off 以及 inconsistentCheckSwitch 为 first 或空但非首算子时不校验，其他场景均校验
-        std::string tagStr = param.algTag;
-        bool isChecked = (GetInconsistentCheckSwitch() == 0) &&
-            (g_inconsistentCheckedList.find(tagStr) != g_inconsistentCheckedList.end());
-        bool increCreateChannelFlag = (param.opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV) &&
-            (param.opMode == OpMode::OPBASE);
-        if (GetInconsistentCheckSwitch() == -1 || (isChecked && !increCreateChannelFlag)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    return false;
-}
-
-HcclResult CompareOpExchangeInfos(HcclComm comm, const OpParam& param, const AlgResourceRequest &resRequest,
+HcclResult CompareOpExchangeInfos(HcclComm comm, CommEngine engine, const AlgResourceRequest &resRequest,
     const OpExchangeInfo &exchangeInfo)
 {
     if (HcommIsSupportHcclCommGetExchangeInfo()) {
-        if (param.engine != COMM_ENGINE_CCU) {
+        if (engine != COMM_ENGINE_CCU) {
             for (u32 level = 0; level < resRequest.channels.size(); level++) {
                 CHK_RET(InconsistentCheckParams(comm, exchangeInfo, resRequest.channels[level]));
             }
@@ -46,8 +26,6 @@ HcclResult CompareOpExchangeInfos(HcclComm comm, const OpParam& param, const Alg
                 CHK_RET(InconsistentCheckParams(comm, exchangeInfo, kernelInfo.channels));
             }
         }
-        std::string tagStr = param.algTag;
-        g_inconsistentCheckedList.insert(tagStr);
     }
     return HCCL_SUCCESS;
 }
@@ -83,6 +61,10 @@ HcclResult InconsistentCheckParams(HcclComm comm, const OpExchangeInfo &exchange
                 rmtExchangeInfo.root));
         }
         CHK_RET(InconsistentCheckOpType(exchangeInfo, rmtExchangeInfo.opType));
+        if (exchangeInfo.engine != rmtExchangeInfo.engine) {
+            CHK_RET(ReportOpExchangeInfoCheckFailed(exchangeInfo, "CommEngine",
+                static_cast<uint32_t>(exchangeInfo.engine), static_cast<uint32_t>(rmtExchangeInfo.engine)));
+        }
         if (exchangeInfo.opExecuteConfig != rmtExchangeInfo.opExecuteConfig) {
             CHK_RET(ReportOpExchangeInfoCheckFailed(exchangeInfo, "OpExecuteConfig",
                 static_cast<uint32_t>(exchangeInfo.opExecuteConfig),

@@ -51,13 +51,66 @@
 #include "hccl_res_expt_dl.h"
 #include "ccu_launch_dl.h"
 #include "hccl_ccu_res_dl.h"
+#include "ccu_assist_pub.h"
 #include "cann_host_bridge.h"
 
 namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
+thread_local std::set<std::string> g_inconsistentCheckedList;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
 constexpr u32 HOST_NOTIFY_TIMEOUT_OFFSET = 27;  // host等待Device通知的超时时间偏移量
 constexpr u32 KERNEL_TIMEOUT_OFFSET = 25;       // kernel启动超时时间偏移量
+
+static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
+{
+    if (bufferAddr != nullptr) {
+        uint64_t token = hcomm::CcuRep::GetTokenInfo(
+            reinterpret_cast<uint64_t>(bufferAddr),
+            bufferSize);
+        HCCL_INFO("[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]",
+            bufferAddr, bufferSize, token);
+        return token;
+    }
+    
+    HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
+    return 0;
+}
+
+static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+{
+    if (ctxSize == 0) {
+        return HCCL_SUCCESS;
+    }
+    
+    // 从旧 ctx 反序列化获取完整数据
+    auto *ctxRaw = static_cast<char *>(ctx);
+    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
+    AlgResourceCtxSerializable tempCtx;
+    tempCtx.DeSerialize(seq);
+    
+    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
+    tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
+    tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
+    
+    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
+    void *cclBufferAddr = nullptr;
+    uint64_t cclBufferSize = 0;
+    if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
+        uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
+        if (tempCtx.kfcServerArgs.size() >= 6U) {
+            tempCtx.kfcServerArgs[5] = token;  // 更新占位符为真实 token
+            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
+        }
+        
+        // 序列化大小不变（都是6个元素），可以安全更新
+        std::vector<char> updatedSeq = tempCtx.Serialize();
+        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
+    } else {
+        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
+    }
+    return HCCL_SUCCESS;
+}
 
 // 检查非对称拓扑支持情况
 // 仅 AllGather, AllReduce, ReduceScatter 支持跨框非对称拓扑，其他算子拦截
@@ -341,6 +394,7 @@ HcclResult ConstructHcclDfxOpInfo(const OpParam &param, const char* tag, u32 tag
 HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastLaunchCtx *ccuFastLaunchCtx)
 {
 #if CANN_VERSION_NUM >= CANN_VERSION(9, 1, 0)
+    HCCL_INFO("[HcclExecOpCcuFastLaunch] HcclExecOpCcuFastLaunch start");
     std::string algName = ccuFastLaunchCtx->algName;
     HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] start, opType[%d], algName[%s], "
         "fastLaunchTag[%s], engine[%d], opExecuteConfig[%d].", param.opType, algName.c_str(), param.fastLaunchTag,
@@ -900,7 +954,8 @@ void CompReqChannelWithExistChannel(const std::vector<std::vector<ChannelInfo>>&
 }
 
 static HcclResult TryReuseResource(HcclComm comm, OpParam& param, bool& increCreateChannelFlag,
-    void** resCtxSequence, uint64_t& size, bool &isResourceReused)
+    void** resCtxSequence, uint64_t& size, bool &isResourceReused,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
     // 增量建链模式下不能复用资源
     if (param.opType == HcclCMDType::HCCL_CMD_BATCH_SEND_RECV && param.opMode == OpMode::OPBASE) {
@@ -926,6 +981,10 @@ static HcclResult TryReuseResource(HcclComm comm, OpParam& param, bool& increCre
         isResourceReused = true;
         *resCtxSequence = ctx;
         param.ctxSize = size;
+
+        if (param.engine == COMM_ENGINE_CCU && resCtxHost != nullptr) {
+            CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size, resCtxHost));
+        }
         return HCCL_SUCCESS;
     }
     return HCCL_E_NOT_FOUND;
@@ -938,7 +997,8 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
 
     bool increCreateChannelFlag = false;
     uint64_t size = 0;
-    if (TryReuseResource(comm, param, increCreateChannelFlag, resCtxSequence, size, isResourceReused) == HCCL_SUCCESS) {
+    if (TryReuseResource(comm, param, increCreateChannelFlag, resCtxSequence, size, isResourceReused,
+        resCtxHost) == HCCL_SUCCESS) {
         return HCCL_SUCCESS;
     }
 
@@ -955,6 +1015,25 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] before CalcRes, opType[%d], algTag[%s], engine[%d].",
         param.opType, param.algTag, param.engine);
     HcclResult calcResRet = executor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest);
+    CHK_RET(calcResRet);
+
+    // 参数一致性校验准备工作：HCCL_DFS_CONFIG 为 off 以及 HCCL_DFS_CONFIG 为 first 或空但非首算子时不校验，其他场景均校验
+    OpExchangeInfo exchangeInfo{};
+    std::string tagStr = param.algTag;
+    bool isChecked = GetInconsistentCheckSwitch() == 0 &&
+        (g_inconsistentCheckedList.find(tagStr) != g_inconsistentCheckedList.end());
+    if (HcommIsSupportHcclCommAddExchangeInfo()) {
+        if (GetInconsistentCheckSwitch() == -1 || (isChecked && !increCreateChannelFlag)) {
+            isChecked = true; // isChecked 为 false 时做参数比较
+        } else {
+            CHK_RET(FillOpExchangeInfo(comm, param, exchangeInfo));
+            CHK_RET(HcclCommAddExchangeInfo(comm, &exchangeInfo, sizeof(exchangeInfo)));
+            g_inconsistentCheckedList.insert(tagStr);
+            isChecked = false;
+        }
+    } else {
+        isChecked = true; // 符号不存在，不校验
+    }
 
     auto ret = GetAlgResWithEngine(comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence,
         size, increCreateChannelFlag, resPack);
@@ -976,10 +1055,8 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     }
 
     // 参数一致性校验
-    if (NeedInconsistentCheck(param)) {
-        OpExchangeInfo exchangeInfo{};
-        CHK_RET(FillOpExchangeInfo(comm, param, exchangeInfo));
-        CHK_RET(CompareOpExchangeInfos(comm, param, resRequest, exchangeInfo));
+    if (!isChecked) {
+        CHK_RET(CompareOpExchangeInfos(comm, param.engine, resRequest, exchangeInfo));
     }
 
     return HCCL_SUCCESS;
@@ -992,6 +1069,7 @@ HcclResult FillOpExchangeInfo(HcclComm comm, const OpParam &param, OpExchangeInf
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &exchangeInfo.cclBufferSize));
     exchangeInfo.root = param.root;
     exchangeInfo.opType = param.opType;
+    exchangeInfo.engine = param.engine;
     exchangeInfo.opExecuteConfig = param.opExecuteConfig;
     exchangeInfo.reduceType = param.reduceType;
     CHK_RET(FillOpExchangeInfoWithDataDes(param, exchangeInfo));
@@ -1008,10 +1086,12 @@ HcclResult FillOpExchangeInfo(HcclComm comm, const OpParam &param, OpExchangeInf
     CHK_PRT_RET(sRet != EOK, HCCL_ERROR("[%s] call strncpy_s failed, param.tag[%s],  return[%d].",
         __func__, param.tag, sRet), HCCL_E_MEMORY);
 
-    HCCL_INFO("[%s] success. exchangeInfo dump: cclBufferSize[%llu], root[%u], opType[%u], opExecuteConfig[%u], "
-        "reduceType[%u], dataType[%u], count[%llu], aivCoreLimit[%u], group[%s], tag[%s]",
-        __func__, exchangeInfo.cclBufferSize, exchangeInfo.root, exchangeInfo.opType, exchangeInfo.opExecuteConfig,
-        exchangeInfo.reduceType, exchangeInfo.dataType, exchangeInfo.count, exchangeInfo.aivCoreLimit,
+    HCCL_INFO("[%s] success. exchangeInfo dump: cclBufferSize[%llu], root[%u], opType[%u], engine[%u], "
+        "opExecuteConfig[%u], reduceType[%u], dataType[%u], count[%llu], aivCoreLimit[%u], "
+        "group[%s], tag[%s]",
+        __func__, exchangeInfo.cclBufferSize, exchangeInfo.root, exchangeInfo.opType,
+        exchangeInfo.engine, exchangeInfo.opExecuteConfig, exchangeInfo.reduceType,
+        exchangeInfo.dataType, exchangeInfo.count, exchangeInfo.aivCoreLimit,
         exchangeInfo.group, exchangeInfo.tag);
     return HCCL_SUCCESS;
 }
@@ -1038,18 +1118,6 @@ HcclResult FillOpExchangeInfoWithDataDes(const OpParam &param, OpExchangeInfo &e
             exchangeInfo.dataType = param.DataDes.dataType;
             exchangeInfo.count = param.DataDes.count;
             break;
-    }
-    return HCCL_SUCCESS;
-}
-
-HcclResult AddExchangeInfo(HcclComm comm, const OpParam &param)
-{
-    CHK_PTR_NULL(comm);
-    if (NeedInconsistentCheck(param)) {
-        OpExchangeInfo exchangeInfo{};
-        CHK_RET(FillOpExchangeInfo(comm, param, exchangeInfo));
-        CHK_RET(HcclCommAddExchangeInfo(comm, &exchangeInfo, sizeof(exchangeInfo)));
-        HCCL_INFO("[%s] success.", __func__);
     }
     return HCCL_SUCCESS;
 }
@@ -1134,6 +1202,9 @@ HcclResult ReuseCachedDeviceCtx(HcclComm comm, const OpParam &param, void **resC
     if (ret == HCCL_SUCCESS) {
         *resCtxSequence = ctx;
         ctxSize = size;
+        if (HcommIsSupportHcclCommResetExchangeInfo()) {
+            CHK_RET(HcclCommResetExchangeInfo(comm));
+        }
         return HCCL_SUCCESS;
     }
     HCCL_ERROR("failed to get device ctx.");
@@ -1457,8 +1528,6 @@ HcclResult HcclGetChannelImpl(const u32 level, HcclComm comm, const OpParam &par
         }
     }
     if (channelNum > 0) {
-        // 参数一致性校验信息注册到通信域，HcclChannelAcquire内部存在读清动作，每次调用前均需注册
-        CHK_RET(AddExchangeInfo(comm, param));
         CHK_RET(HcclChannelAcquire(comm, commEngine, channelRequest.data(),
             channelNum, levelNChannels.data()));
     }
@@ -1582,6 +1651,17 @@ HcclResult HcclAllocAlgResourceCcu(HcclComm comm, const OpParam& param, AlgResou
     CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
+
+    // 在确保 cclMem 可用的前提下，获取 token 并更新 kfcServerArgs 的第6个字段（占位符）
+    uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
+    if (resCtxHost->kfcServerArgs.size() >= 6U) {
+        resCtxHost->kfcServerArgs[5] = token;  // 更新占位符为真实 token
+        HCCL_INFO("[HcclAllocAlgResourceCcu] token[%llu] updated at kfcServerArgs[5]", token);
+    } else {
+        HCCL_WARNING("[HcclAllocAlgResourceCcu] kfcServerArgs size[%zu] < 6, cannot update token",
+            resCtxHost->kfcServerArgs.size());
+    }
+
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
@@ -1614,11 +1694,9 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResource
         kernelChannels.resize(channelNum);
 
         if (channelNum > 0) {
-            // 参数一致性校验信息注册到通信域，HcclChannelAcquire内部存在读清动作，每次调用前均需注册
-            CHK_RET(AddExchangeInfo(comm, param));
+            // 需要资源回退。返回资源不够
             auto ret = HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(),
                 channelNum, kernelChannels.data());
-            // 需要资源回退。返回资源不够
             if (ret == HCCL_E_UNAVAIL) {
                 HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
                 return HCCL_E_UNAVAIL;
@@ -1771,8 +1849,6 @@ HcclResult HcclAllocAlgResourceAiv(
         HCCL_INFO("[%s]level[%u] validChannelNum[%u]", __func__, level, validChannelNum);
 
         if (validChannelNum > 0) {
-            // 参数一致性校验信息注册到通信域，HcclChannelAcquire内部存在读清动作，每次调用前均需注册
-            CHK_RET(AddExchangeInfo(comm, param));
             CHK_RET(HcclChannelAcquire(comm, param.engine, levelNChannelRequest.data(),
                 validChannelNum, levelNChannels.data()));
         }

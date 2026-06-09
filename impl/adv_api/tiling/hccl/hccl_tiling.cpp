@@ -137,6 +137,9 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
+    if (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL) && impl_.commEngine_ == 5) {
+        tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
+    }
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
 
     TILING_LOG_DEBUG("Mc2InitTiling addr %#lx", impl_.initTilingAddr_);

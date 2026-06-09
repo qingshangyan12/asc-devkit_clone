@@ -82,6 +82,7 @@ HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint
             return HCCL_E_NOT_SUPPORT;
         }
     }
+    
     if (commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) &&
         commEngine != static_cast<uint8_t>(COMM_ENGINE_CCU)) {
         HCCL_ERROR("Invalid commEngine %u.", commEngine);
@@ -421,19 +422,25 @@ HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &t
 HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::string &algName,
     std::unique_ptr<TopoInfoWithNetLayerDetails> &topoInfo)
 {
+    HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclGetOpExpansionMode successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
     CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]CheckAsymmetricTopoSupport successfully!");
 
     std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
     CHK_RET(collAlgSelector->Run(opParam, topoInfo.get(), algName));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]Run collAlgSelector successfully!");
     if (algName.empty()) {
         HCCL_ERROR("[Selector] select algname fail!");
         return HCCL_E_PTR;
     }
 
     CHK_RET(SetCommEngine(opParam));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]SetCommEngine successfully!");
     if (GetExternalInputHcclAivOnlyMode() && opParam.engine != COMM_ENGINE_AIV) {
         HCCL_ERROR("[HcclExecOp] opType[%d] currently do not select aiv mode, aiv only not support.",
             static_cast<int>(opParam.opType));
@@ -444,6 +451,7 @@ HcclResult SelectAlgAndPrepareEngine(HcclComm comm, OpParam &opParam, std::strin
         CHK_RET(LoadAICPUKernel());
     }
     CHK_RET(SetOpParamAlgTag(opParam, algName));
+    HCCL_INFO("[SelectAlgAndPrepareEngine]SetOpParamAlgTag successfully!");
     return HCCL_SUCCESS;
 }
 
@@ -469,18 +477,11 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     return HCCL_SUCCESS;
 }
 
-static HcclResult GetTokenFormBuffInfo(OpParam &opParam, OpResCtx &opResCtx, uint64_t &token)
-{
-    uint64_t workSpace = opResCtx.workSpace;
-    uint64_t workSpaceSize = opResCtx.workSpaceSize;
-    token = hcomm::CcuRep::GetTokenInfo(workSpace, workSpaceSize);
-    return HCCL_SUCCESS;
-}
-
 static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
     std::unique_ptr<InsCollAlgBase> &executor, TopoInfoWithNetLayerDetails *topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable> &resCtxHost, OpResCtx &opResCtx, void **resCtxOut)
 {
+    HCCL_INFO("[AcquireAlgResources]start AcquireAlgResources!");
     bool isResourceReused = false;
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
@@ -489,21 +490,24 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
     if (opParam.engine == COMM_ENGINE_CCU) {
-        uint64_t token;
-        CHK_RET(GetTokenFormBuffInfo(opParam, opResCtx, token));
+        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
         resCtxHost->kfcServerArgs = {
-            opResCtx.ckeAddr,
-            opResCtx.ckeAddr + Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE,
             opResCtx.xnAddr,
+            opResCtx.ckeAddr,
             static_cast<uint64_t>(1),  // dieNum
-            static_cast<uint64_t>(1),  // missonNum
-            static_cast<uint64_t>(0),  // missonIndex
+            static_cast<uint64_t>(1),  // missionNum
+            static_cast<uint64_t>(0),  // missionIndex
+            static_cast<uint64_t>(0),  // token 占位符，后续在 GetAlgResCcu 中更新
         };
         resCtxHost->kfcServerArgSize = 6;
+        
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, ResPackGraphMode()));
+        opParam.resCtx = *resCtxOut;
+    } else {
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, ResPackGraphMode()));
+        opParam.resCtx = *resCtxOut;
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused,
-        ResPackGraphMode()));
-    opParam.resCtx = *resCtxOut;
+    
     return HCCL_SUCCESS;
 }
 
@@ -527,7 +531,11 @@ HcclResult GetOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &
 HcclResult GetCcuOpParamResCtx(HcclComm comm, const std::string &algName, OpParam &opParam,
     TopoInfoWithNetLayerDetails *topoInfo, OpResCtx &opResCtx, void **resCtxOut)
 {
+    HCCL_INFO("[GetCcuOpParamResCtx]start GetCcuOpParamResCtx!");
+    HCCL_INFO("[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", 
+    (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    HCCL_INFO("[GetCcuOpParamResCtx]Generate executor successfully!");
     CHK_PRT_RET(executor.get() == nullptr,
         HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
@@ -579,6 +587,9 @@ HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const
 HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[],
     const void *ccTilingList[], uint32_t tilingNum, OpResCtx &opResCtx)
 {
+    HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
+    HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", 
+    (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
 
@@ -587,14 +598,17 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
             HCCL_WARNING("[CcuSelectAlg] CcuSelectAlgCheck failed for ccTiling[%u], opType[%u]. "
                 "CCU execution condition not satisfied.", i, ccTiling->opType);
         }
+        HCCL_INFO("[CcuSelectAlg]CcuSelectAlgCheck[%u] successfully!", i);
 
         // 构造OpParam并选择算法
         OpParam opParam{};
         CHK_RET(InitOpParamByTiling(comm, stream, topoTag[i], ccTiling, opParam));
+        HCCL_INFO("[CcuSelectAlg]InitOpParamByTiling[%u] successfully!", i);
 
         std::string algName;
         std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        HCCL_INFO("[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully!", i);
 
         // 若选择到AICPU算法（algName不在CCU algorithmMap中）则直接报错并退出
         auto it = algorithmMap.find(algName);
@@ -621,9 +635,11 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         if (skipGetRes) {
             continue;
         }
+        HCCL_INFO("[CcuSelectAlg]HandleSingleRankAndCommMode[%u] successfully!", i);
 
         void *resCtxSequence = nullptr;
         CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), opResCtx, &resCtxSequence));
+        HCCL_INFO("[CcuSelectAlg]GetCcuOpParamResCtx[%u] successfully!", i);
     }
 
     return HCCL_SUCCESS;

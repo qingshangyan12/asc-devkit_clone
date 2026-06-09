@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
- * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You may not use this file except in compliance with the License.
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the License.
- */
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
 #ifndef MC2_OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
 #define MC2_OPS_HCCL_SRC_OPS_INC_COLL_ALG_PARAM
 
@@ -219,7 +219,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream.Dump(result);
         return result;
     }
- 
+
     void DeSerialize(std::vector<char> &data)
     {
         BinaryStream binaryStream(data);
@@ -309,7 +309,7 @@ struct CcuFastLaunchCtx {
     char algName[OP_ALG_LENGTH];
     u32 notifyNumOnMainThread = 0;
     u32 threadNum;
-    u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO];  // 每次调用template的KernelRun下发的kernel数量
+    u32 ccuKernelNum[MAX_TEMP_NUM_IN_ALGO]; // 每次调用template的KernelRun下发的kernel数量
     // 紧接ThreadHandle数组
     // 紧接CcuKernelSubmitInfo数组
 
@@ -422,7 +422,7 @@ struct AlgResourceCtxSerializable {
     std::vector<CcuKernelHandle> ccuKernels;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
-    std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
+    std::vector<uint64_t> kfcServerArgs;   // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
 
     std::vector<char> Serialize()
@@ -498,8 +498,8 @@ struct DevAicpuOpConfig {
 
 struct OpParam { // 不申请ctx，每个算子单独下发
     void* hcclComm;
-    char tag[TAG_LENGTH] = ""; // 保存topoInfo的key值
-    char algTag[ALG_TAG_LENGTH] = ""; // 保存资源的key值，和算法绑定
+    char tag[TAG_LENGTH] = "";               // 保存topoInfo的key值
+    char algTag[ALG_TAG_LENGTH] = "";        // 保存资源的key值，和算法绑定
     char fastLaunchTag[ALG_TAG_LENGTH] = ""; // 快速下发的key值
     char fallbackTag[ALG_MAX_LENGTH] = "";
     char commName[COMM_INDENTIFIER_MAX_LENGTH] = "";
@@ -509,14 +509,14 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u64 inputSize = 0;
     void* outputPtr = nullptr;
     u64 outputSize = 0;
-    HcclMem hcclBuff;   // 当前仅快速下发时使用此处的地址
+    HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址
     HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_RESERVED;
     u32 root = INVALID_VALUE_RANKID;
     u32 userRank = INVALID_VALUE_RANKID;
     u32 sendRecvRemoteRank = INVALID_VALUE_RANKID;
     OpMode opMode;
-    bool   enableDetour{false};
-    bool   isMc2{false};
+    bool enableDetour{false};
+    bool isMc2{false};
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     AlgType algType;
@@ -568,11 +568,11 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* resCtx = nullptr;
     ThreadHandle opThread = 0;
     u32 aicpuRecordCpuIdx = 0; // aicpu record host的notifyIdx
-    u32 dataCount = 0; // 算子上报dfx的数据量
+    u32 dataCount = 0;         // 算子上报dfx的数据量
     DevAicpuOpConfig opConfig; // 收编算子配置类变量
     u64 varMemSize{0};
     u8 varData[0];
-    u64 ccuKfcArgs[4];
+    u64 ccuKfcArgs[4];          // 测试，ccu-kfc作为通信算子
 };
 
 struct AlgDesc {
@@ -587,7 +587,7 @@ struct AlgDesc {
 
 struct Slice {
     u64 offset{0}; // Slice相对于input/output的偏移字节数，gather类操作取output，scatter类操作取input
-    u64 size{0};    // Slice的数据大小，单位：字节
+    u64 size{0};   // Slice的数据大小，单位：字节
 };
 
 struct HcomProInfo {
@@ -663,6 +663,7 @@ struct OpExchangeInfo {
     uint64_t cclBufferSize{0};
     u32 root = INVALID_VALUE_RANKID;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_INVALID;
+    CommEngine engine = CommEngine::COMM_ENGINE_RESERVED;
     OpExecuteConfig opExecuteConfig = OpExecuteConfig::DEFAULT;
     HcclReduceOp reduceType = HcclReduceOp::HCCL_REDUCE_RESERVED;
     HcclDataType dataType = HcclDataType::HCCL_DATA_TYPE_RESERVED;
