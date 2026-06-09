@@ -48,7 +48,7 @@ public:
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const FixpipeParams& params)
     {
         if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
-            EmitBatchNZ2NZDataCopy<trait, quantPre>(dst, src, params);
+            EmitDataCopy<trait, quantPre>(dst, src, dst.Layout(), src.Layout(), params);
         } else if constexpr (IsL0COutSrcBatchLayoutV<U>) {
             EmitDataCopy<trait, quantPre>(dst, src, Te::Get<1>(dst.Layout()), Te::Get<1>(src.Layout()), params);
         } else {
@@ -57,19 +57,6 @@ public:
     }
 
 private:
-    template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static void EmitBatchNZ2NZDataCopy(const T& dst, const U& src, const FixpipeParams& params)
-    {
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
-        for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
-            EmitDataCopy<trait, quantPre>(
-                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
-                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)),
-                Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
-        }
-    }
-
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U, typename DstLayout,
               typename SrcLayout>
     __aicore__ inline static void EmitDataCopy(
@@ -79,17 +66,36 @@ private:
         constexpr bool isNdFormat = IsL0COutNDFormatV<T>;
         constexpr bool isDnFormat = IsL0COutDNFormatV<T>;
         constexpr bool isNzFormat = IsL0COutNZFormatV<T>;
+        constexpr bool isBatchNz2Nz = IsL0COutBatchNZ2NZV<T, U>;
 
-        uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
-        uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
-        uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
+        uint32_t nSize = 0;
+        uint32_t mSize = 0;
+        uint32_t srcStride = 0;
         uint32_t dstStride = 0;
 
-        if constexpr (isNdFormat) {
+        if constexpr (isBatchNz2Nz) {
+            nSize = Std::min(Get<0>(srcLayout.Shape()) * Get<1, 1, 0>(srcLayout.Shape()) *
+                                 Get<1, 1, 1>(srcLayout.Shape()),
+                             Get<0>(dstLayout.Shape()) * Get<1, 1, 0>(dstLayout.Shape()) *
+                                 Get<1, 1, 1>(dstLayout.Shape()));
+            mSize = Std::min(Get<1, 0, 0>(srcLayout.Shape()) * Get<1, 0, 1>(srcLayout.Shape()),
+                             Get<1, 0, 0>(dstLayout.Shape()) * Get<1, 0, 1>(dstLayout.Shape()));
+            srcStride = Get<1, 1, 1>(srcLayout.Stride()) / FRACTAL_FIXED;
+            dstStride = Get<1, 1, 1>(dstLayout.Stride());
+        } else if constexpr (isNdFormat) {
+            nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
+            mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
+            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
             dstStride = GetL0COutNDStride<T>(dstLayout);
         } else if constexpr (isDnFormat) {
+            nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
+            mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
+            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
             dstStride = GetL0COutDNStride<T>(dstLayout);
         } else if constexpr (isNzFormat) {
+            nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
+            mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
+            srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
             dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
         }
 
@@ -131,8 +137,8 @@ private:
         auto srcLayout = src.Layout();
         for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
             EmitDataCopy<trait, quantPre>(
-                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
-                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)), quant,
+                dst(MakeL0COutNZBatchCoord(batchIndex)),
+                src(MakeL0COutNZBatchCoord(batchIndex)), quant,
                 Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
         }
     }

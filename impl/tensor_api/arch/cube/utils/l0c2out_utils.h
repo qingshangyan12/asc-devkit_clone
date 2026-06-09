@@ -72,31 +72,9 @@ __aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& 
     }
 }
 
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape);
-
-template <typename ShapeType, size_t... Is>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoordImpl(
-    const ShapeType& shape, Std::index_sequence<Is...>)
+__aicore__ inline static auto MakeL0COutNZBatchCoord(uint32_t batchIndex)
 {
-    return MakeCoord(MakeL0COutZeroCoord(Std::get<Is>(shape))...);
-}
-
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape)
-{
-    using Shape = Std::remove_cvref_t<ShapeType>;
-    if constexpr (Std::is_tuple_v<Shape>) {
-        return MakeL0COutZeroCoordImpl(shape, Std::make_index_sequence<Std::tuple_size_v<Shape>>{});
-    } else {
-        return _0{};
-    }
-}
-
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutBatchCoord(const ShapeType& shape, uint32_t batchIndex)
-{
-    return MakeCoord(batchIndex, MakeL0COutZeroCoord(Get<1>(shape)));
+    return MakeCoord(batchIndex, MakeCoord(MakeCoord(_0{}, _0{}), MakeCoord(_0{}, _0{})));
 }
 
 template <RoundMode roundMode, typename dstType, typename srcType>
