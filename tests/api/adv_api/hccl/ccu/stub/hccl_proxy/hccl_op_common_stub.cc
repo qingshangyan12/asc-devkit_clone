@@ -9,6 +9,7 @@
  */
 
 #include <iostream>  // for debug output
+#include <cstring>   // for memcpy_s
 #include "alg_param.h"
 #include "hccl_types.h"
 #include "execute_selector.h"
@@ -372,13 +373,4 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     
     std::cout << "Stub: HcclGetAlgRes - Resource created successfully, size=" << newSize << std::endl;
     return HCCL_SUCCESS;
-}
-    
-    memcpy(ctx, seq.data(), size);
-    *resCtxDevice = ctx;
-    param.ctxSize = size;
-    isSuspend = false;
-    return HcclResult::HCCL_SUCCESS;
-}
-
 }
