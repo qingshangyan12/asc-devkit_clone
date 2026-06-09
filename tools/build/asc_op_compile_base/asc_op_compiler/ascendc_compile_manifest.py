@@ -265,6 +265,7 @@ class OpCompileManifestRecorder:
             self.update_basic_info(compile_info=compile_info, tiling_info=tiling_info)
             if not self.update_compile_options_from_log() and compile_option_tuple is not None:
                 self.update_compile_options(compile_option_tuple)
+            self.update_kernel_type_info_from_compile_options(compile_info)
             with open(self.manifest_path, 'w') as fd:
                 json.dump(self.manifest, fd, indent=2, sort_keys=True)
                 fd.write('\n')
@@ -558,6 +559,80 @@ class OpCompileManifestRecorder:
             "by_tiling_key": by_tiling_key
         }
         return True
+
+    def update_kernel_type_info_from_compile_options(self, compile_info):
+        if compile_info is None or getattr(compile_info, "no_set_kernel_type", False) is not True:
+            return
+        compile_options = self.manifest.get("compile_options", {})
+        by_tiling_key = compile_options.get("by_tiling_key", {})
+        if not by_tiling_key:
+            return
+        tiling_key_kernel_type = self._infer_kernel_type_info_from_compile_options(by_tiling_key)
+        if not tiling_key_kernel_type:
+            return
+        default_kernel_type = self._infer_default_kernel_type(tiling_key_kernel_type)
+        self.record_kernel_type_info(
+            tiling_key_kernel_type,
+            default_kernel_type,
+            tiling_key_list=getattr(compile_info, "tiling_key_list", None),
+            tiling_key_group_map=getattr(compile_info, "tiling_key_group_map", None))
+
+    @staticmethod
+    def _infer_kernel_type_info_from_compile_options(by_tiling_key):
+        tiling_key_kernel_type = {}
+        for tiling_key, tiling_info in by_tiling_key.items():
+            if not isinstance(tiling_info, dict):
+                continue
+            cores = tiling_info.get("cores", {})
+            if not isinstance(cores, dict):
+                continue
+            kernel_type = OpCompileManifestRecorder._infer_kernel_type_from_cores(cores)
+            if kernel_type:
+                tiling_key_kernel_type[
+                    OpCompileManifestRecorder._normalize_tiling_key(tiling_key)] = kernel_type
+        return tiling_key_kernel_type
+
+    @staticmethod
+    def _infer_kernel_type_from_cores(cores):
+        has_aic = "aic" in cores
+        has_aiv = "aiv" in cores
+        if has_aic and has_aiv:
+            return "KERNEL_TYPE_MIX_AIC_1_2"
+        if has_aiv:
+            if OpCompileManifestRecorder._core_options_has_auto_gen_suffix(cores.get("aiv", {}), "_mix_aiv"):
+                return "KERNEL_TYPE_MIX_AIV_1_0"
+            return "KERNEL_TYPE_AIV_ONLY"
+        if has_aic:
+            if OpCompileManifestRecorder._core_options_has_auto_gen_suffix(cores.get("aic", {}), "_mix_aic"):
+                return "KERNEL_TYPE_MIX_AIC_1_0"
+            return "KERNEL_TYPE_AIC_ONLY"
+        return ""
+
+    @staticmethod
+    def _core_options_has_auto_gen_suffix(core_options, suffix):
+        if not isinstance(core_options, dict):
+            return False
+        for option_group in ("macros", "raw_options"):
+            for option in core_options.get(option_group, []):
+                macro_name, macro_value = OpCompileManifestRecorder._split_macro_option(option)
+                if macro_name.startswith("auto_gen_") and macro_value.endswith(suffix):
+                    return True
+        return False
+
+    @staticmethod
+    def _split_macro_option(option):
+        if not isinstance(option, str):
+            return "", ""
+        macro = option[2:] if option.startswith("-D") else option
+        if "=" not in macro:
+            return macro, ""
+        macro_name, macro_value = macro.split("=", 1)
+        return macro_name, macro_value.strip("\"'")
+
+    @staticmethod
+    def _infer_default_kernel_type(tiling_key_kernel_type):
+        kernel_types = OpCompileManifestRecorder._unique_keep_order(list(tiling_key_kernel_type.values()))
+        return kernel_types[0] if len(kernel_types) == 1 else ""
 
     def _get_compile_stage_cmds(self):
         log_path = self.compile_log_path
