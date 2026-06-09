@@ -557,12 +557,14 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-__ASC_USE_RESERVED_UBUF__(2201, "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(2201,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0,
                                   const LocalTensor<int32_t>& src1, const int32_t& count);
 
 template <typename T, typename U>
-__ASC_USE_RESERVED_UBUF__(2201, "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(2201,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                   const LocalTensor<U>& src1, const int32_t& count);
 
@@ -585,13 +587,15 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                    const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                    const BinaryRepeatParams& repeatParams);
@@ -627,27 +631,31 @@ __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);

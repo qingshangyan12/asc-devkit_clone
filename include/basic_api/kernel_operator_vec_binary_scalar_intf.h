@@ -413,24 +413,28 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false);
 
 template <typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__ASC_USE_RESERVED_UBUF__(3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn);
 
 template <typename T, bool isSetMask = true>
-__ASC_USE_RESERVED_UBUF__(3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const T& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn = false);
 
 template <typename T, typename U, bool isSetMask = true,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
-__ASC_USE_RESERVED_UBUF__(3510, "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "ShiftRight is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams, bool roundEn);
 

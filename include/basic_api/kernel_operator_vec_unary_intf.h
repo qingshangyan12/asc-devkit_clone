@@ -222,11 +222,13 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
-__ASC_USE_RESERVED_UBUF__(3510, "Reciprocal is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "Reciprocal is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[],
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
-__ASC_USE_RESERVED_UBUF__(3510, "Reciprocal is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510,
+    "Reciprocal is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 #else
