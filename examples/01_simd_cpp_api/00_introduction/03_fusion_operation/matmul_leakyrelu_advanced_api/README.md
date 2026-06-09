@@ -4,11 +4,13 @@
 
 本样例采用高阶API实现Matmul与LeakyRelu激活函数融合计算，实现矩阵运算单元和向量运算单元的融合计算。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -94,7 +96,7 @@
 
 - `__mix__(1, 2)`场景下SetDim和kernel启动核数配置说明：
 
-  MIX场景（包含矩阵计算和适量计算），分离模式下（本样例支持的产品的基本架构为分离模式），Matmul API是从AIV侧发起的，AIV调用`Iterate`时通知AIC做矩阵计算，AIC完成后再通知AIV。因此tiling侧按AIV视角切分任务。
+  MIX场景（包含矩阵计算和矢量计算），分离模式下（本样例支持的产品的基本架构为分离模式），Matmul API是从AIV侧发起的，AIV调用`Iterate`时通知AIC做矩阵计算，AIC完成后再通知AIV。因此tiling侧按AIV视角切分任务。
 
   本样例中`SetDim(2)`表示tiling侧按照2个AIV逻辑核生成Matmul分核参数；`__mix__(1, 2)`表示每个AI Core组合包含1个AIC和2个AIV；
   
@@ -119,23 +121,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # 编译工程（默认npu模式）
@@ -158,7 +153,7 @@
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT，Atlas A3 训练系列产品/Atlas A3 推理系列产品，Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

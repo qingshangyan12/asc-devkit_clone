@@ -5,9 +5,12 @@
 该场景下输入的原始左矩阵A、右矩阵为稀疏矩阵，稀疏矩阵B中每4个元素中至少有2个零元素；在进行Matmul计算前，用户需要自行对B矩阵进行4：2稠密化，即基于原始稀疏矩阵B在每4个元素中过滤掉2个零元素，使B矩阵稠密化为稠密矩阵。Sparse Matmul场景调用Matmul API完成A矩阵与4：2稠密化后的B矩阵的矩阵乘计算。  
 > **注：** 4:2稀疏矩阵乘（Sparse Matmul）当前只支持B矩阵转置。
 
-## 支持的产品
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+## 本样例支持的产品及CANN软件版本
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 ```
@@ -70,24 +73,16 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-    
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;    # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
@@ -108,10 +103,10 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201 | dav-2201 |
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+  | ----------------| -----------------------------| ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认） | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
 
 - 执行结果
 
