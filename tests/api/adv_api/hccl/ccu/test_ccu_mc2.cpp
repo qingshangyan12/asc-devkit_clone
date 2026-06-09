@@ -102,8 +102,13 @@ protected:
     void SetUp() override {
         StubCleanup();
         TopoMeta topoMeta = BuildTopoMeta(g_stubRankSize);
-        HcclSim::SimWorld::Global()->Init(topoMeta, g_stubDeviceType);
-        HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
+        HcclResult ret = HcclSim::SimWorld::Global()->Init(topoMeta, g_stubDeviceType);
+        ASSERT_EQ(ret, HCCL_SUCCESS) << "SimWorld init failed";
+        
+        ret = HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
+        ASSERT_EQ(ret, HCCL_SUCCESS) << "Comm init failed";
+        ASSERT_NE(comm_, nullptr) << "Comm is nullptr after init";
+        
         int dummyStream = 1;
         stream_ = &dummyStream;
     }
@@ -429,8 +434,6 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     // token (由GetTokenFromBuffInfo获取，stub返回基于CCL buffer地址的非零值)
     uint64_t expectedToken = cclBufferAddr + 0x1234;
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
-
-    free(resCtxOut);
 }
 
 TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
@@ -508,8 +511,6 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
     resourceCtx2.DeSerialize(seq2);
     EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 6U);
     EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken);
-
-    free(resCtxOut1);
 }
 
 }
