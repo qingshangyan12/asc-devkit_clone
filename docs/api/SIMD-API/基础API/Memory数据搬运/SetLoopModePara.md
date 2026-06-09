@@ -177,10 +177,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 -   使用以上配置，调用SetLoopModePara再调用DataCopyPad就可以开启DataCopyPad的loop模式完成数据类型为int8\_t的数据块大小为384的数据搬运。详细图解如下：
 
 **图 1**  源操作数搬运场景示例<a name="fig6671114911311"></a>  
-![](../../../figures/源操作数搬运场景示例.png "源操作数搬运场景示例")
+![源操作数搬运场景示例](../../../figures/源操作数搬运场景示例.png)
 
 **图 2**  目的操作数搬运场景示例<a name="fig226181311513"></a>  
-![](../../../figures/目的操作数搬运场景示例.png "目的操作数搬运场景示例")
+![目的操作数搬运场景示例](../../../figures/目的操作数搬运场景示例.png)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

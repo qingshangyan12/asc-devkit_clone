@@ -153,7 +153,7 @@ __aicore__ inline HcclHandle ReduceScatter(GM_ADDR sendBuf, GM_ADDR recvBuf, uin
 </table>
 
 **图 1**  ReduceScatter通信示例<a name="fig11679133914387"></a>  
-![](../../../../figures/ReduceScatter通信示例-58.png "ReduceScatter通信示例-58")
+![ReduceScatter通信示例-58](../../../../figures/ReduceScatter通信示例-58.png)
 
 以上图为例，假设4张卡的场景，每份数据被切分为3块（TileCnt为3），每张卡上的0-0、0-1、0-2数据最终reduce+scatter到卡rank0的recvBuf上，其余的每块1-y、2-y、3-y数据类似，最终分别reduce+scatter到卡rank1、rank2和rank3的recvBuf上。因此，对一张卡上的数据需要调用3次ReduceScatter接口，完成每份数据的3块切分数据的通信。对于每一份数据，本接口中参数recvCount为TileLen，strideCount为TileLen\*TileCnt（即数据块0-0和1-0间隔的数据个数）。由于本例为内存连续场景，因此也可以只调用1次ReduceScatter接口，并将repeat参数设置为3。
 
