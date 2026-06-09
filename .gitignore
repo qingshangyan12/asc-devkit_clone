@@ -14,15 +14,6 @@ openssl-host-src/
 build_device/
 *.o
 *.log
-.claude/skills/gitcode-pr
-.claude/skills/gitcode-issue
-.claude/skills/api-doc-generator
-.claude/skills/gitcode-pipeline
-.agent/skills/_remote/
-.agent/skills/gitcode-pr
-.agent/skills/gitcode-issue
-.agent/skills/api-doc-generator
-.agent/skills/gitcode-pipeline
 .agent/skills/_remote/
 .agent/skills/gitcode-pr
 .agent/skills/gitcode-issue
