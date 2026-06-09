@@ -33,6 +33,8 @@ npu_op_kernel_sources(ascendc_kernels
     KERNEL_FILE add_custom_template.cpp
 )
 
+npu_op_kernel_options(ascendc_kernels ALL OPTIONS -D__ASC_DISABLE_RESERVED_UBUF__)
+
 npu_op_kernel_library(ascendc_kernels
     SRC_BASE ${CMAKE_CURRENT_SOURCE_DIR}
     TILING_LIBRARY cust_optiling

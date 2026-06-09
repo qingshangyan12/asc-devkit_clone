@@ -137,7 +137,7 @@ __aicore__ inline void DigammaNegativeHalf(
 }
 
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaComputeImpl(
     const LocalTensor<half>& dst, const LocalTensor<half>& src, DigammaParams& params)
 {
@@ -324,7 +324,7 @@ __aicore__ inline void DigammaPositive(
 }
 
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaNegPicotPix(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, DigammaParams& params)
 {
@@ -408,7 +408,7 @@ __aicore__ inline void DigammaNegPicotPix(
 
 // compute x is less than 0 and put the result on result
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaNegative(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, DigammaParams& params)
 {
@@ -428,7 +428,7 @@ __aicore__ inline void DigammaNegative(
 }
 
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaComputeImpl(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, DigammaParams& params)
 {
@@ -464,7 +464,7 @@ __aicore__ inline void DigammaComputeImpl(
 
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaCompute(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& tmp, const uint32_t calCount)
 {

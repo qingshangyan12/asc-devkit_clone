@@ -151,7 +151,7 @@ __aicore__ inline void DigammaGenNanMask(
 
 // Select the value of src at mask, and accumulate the result onto dst, used tmpScalar
 __ASC_USE_RESERVED_UBUF__(2201,
-    "LGammaSelect is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+    "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void DigammaSelect(
     const LocalTensor<float>& dst, const LocalTensor<float>& src, const LocalTensor<uint8_t>& mask,
     const LocalTensor<float>& tmp, DigammaParams& params)
