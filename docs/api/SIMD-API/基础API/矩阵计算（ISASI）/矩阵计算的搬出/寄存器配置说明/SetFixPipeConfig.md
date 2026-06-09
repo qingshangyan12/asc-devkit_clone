@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002547729135_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy、Fixpipe）.md)）过程中进行随路量化、随路pRelu（AscendC待实现）时，通过调用该接口设置量化、pRelu（AscendC待实现）的参数。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy、Fixpipe）.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
 
 ## 函数原型<a name="zh-cn_topic_0000002547729135_section620mcpsimp"></a>
 
@@ -41,9 +41,9 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|reluPre|输入|源操作数，relu操作时参与计算的tensor，类型为LocalTensor，支持的物理内存为Fixpipe buffer（TPosition为C2PIPE2GM），为后续的功能扩展做保留，传入一个空LocalTensor即可。|
+|reluPre|输入|源操作数，ReLU操作时参与计算的tensor，类型为LocalTensor，支持的物理内存为Fixpipe buffer（TPosition为C2PIPE2GM），为后续的功能扩展做保留，传入一个空LocalTensor即可。|
 |quantPre|输入|源操作数，quant tensor，量化操作时参与计算的tensor，类型为LocalTensor，支持的物理内存为Fixpipe buffer（TPosition为C2PIPE2GM）。|
-|isUnitFlag|输入|unitFlag清空标志位，类型为bool。如果设为true，L0C中所有内存块的单元标志位都会设为0。旨在消除之前操作中unitFlag产生的多余影响。|
+|isUnitFlag|输入|unitFlag清空标志位，类型为bool。如果设为true，L0C Buffer中所有内存块的单元标志位都会设为0。旨在消除之前操作中unitFlag产生的多余影响。|
 |preData|输入|支持设置一个Tensor，通过开关控制是relu Tensor还是quant Tensor，支持的物理内存为Fixpipe buffer（TPosition为C2PIPE2GM）。当前仅支持传入quant Tensor。对于单独设置unitFlag清空标志位isUnitFlag的场景，支持的物理地址为L0C buffer（TPosition设置为CO1）。|
 
 ## 数据类型
@@ -56,7 +56,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 
 ## 约束说明<a name="zh-cn_topic_0000002547729135_section633mcpsimp"></a>
 
-quantPre和reluPre（pRelu AscendC待实现）必须是Fixpipe Buffer上的Tensor。
+quantPre和reluPre必须是Fixpipe Buffer上的Tensor。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

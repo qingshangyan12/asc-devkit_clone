@@ -30,7 +30,7 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
 |eleWiseData|输入|L1 Buffer上的源操作数。类型为LocalTensor。<br>支持的物理位置为L1 Buffer（TPosition为A1/B1/C1）。起始地址需要保证32字节对齐，仅支持half数据类型。|
-|c0ChStride|输入|在L1 Buffer上的C0 channel stride，单位是C0_SIZE（32B）。<br>eleWiseData沿N方向以C0为单位切分得到的数据块称为C0 channel，两块C0 channel的间隔称为C0 channel stride。|
+|c0ChStride|输入|在L1 Buffer上的C0 channel stride，单位是C0_SIZE（32字节）。<br>eleWiseData沿N方向以C0为单位切分得到的数据块称为C0 channel，两块C0 channel的间隔称为C0 channel stride。|
 
 ## 数据类型
 
@@ -174,7 +174,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             uint16_t mSize = m;
             // srcStride必须为16的倍数
             uint16_t srcStride = (m + 16 - 1) / 16 * 16;
-            // nz2nd不开启时，dstStride为burst头到头的距离，且为32B对齐
+            // nz2nd不开启时，dstStride为burst头到头的距离，且为32字节对齐
             uint32_t dstStride = m * sizeof(dst_T) * 16 / 32;
             if (nz2ndEn) {
                 // nd矩阵的数量为1，src_nd_stride与dst_nd_stride填1
@@ -184,7 +184,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
                 // nz2nd开启时，dstStride表示同一nd矩阵的相邻连续行的间隔，与n保持一致
                 dstStride = nSize;
             };
-            // 不开启relu与channelSplit
+            // 不开启ReLU与channelSplit
             AscendC::DataCopyCO12DstParams intriParams(nSize, mSize, dstStride, srcStride, deqMode, 0, false, nz2ndEn);
            
             // mov l0c to gm, deq scalar quant
@@ -206,9 +206,9 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
             // // 设置量化tensor
             // AscendC::SetFixPipeConfig(deqFB);
             // AscendC::PipeBarrier<PIPE_FIX>();
-            // // mov l0c to gm，量化操作后开启ClipRelu操作
+            // // mov l0c to gm，量化操作后开启ClipReLU操作
             // intriParams.clipReluPre = 1; 
-            // // 设置clip relu的值到寄存器
+            // // 设置clip ReLU的值到寄存器
             // uint64_t clipReluVal = 0x3c00; // value 1, half
             // SetFixPipeClipRelu(clipReluVal);
             // //mov l0c to gm，量化操作后，设置element-wise操作，Add
