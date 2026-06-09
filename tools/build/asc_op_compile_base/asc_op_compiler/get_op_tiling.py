@@ -1265,7 +1265,7 @@ p_tilingdata")
     class_body += "#else\n"
     class_body += "#if __NPU_ARCH__ == 3510 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
     class_body += "#if defined(__ASC_DISABLE_RESERVED_UBUF__)\n"
-    class_body += "#error \"Tiling copy through reserved UB is forbidden when compile option " \
+    class_body += "#error \"GET_TILING_DATA macros using reserved UB are forbidden when compile option " \
         "--cce-disable-asc-reserved-ubuf is enabled\"\n"
     class_body += "#endif\n"
     class_body += _gen_tiling_copy_through_reserved_ub()
