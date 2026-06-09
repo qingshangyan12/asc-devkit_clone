@@ -807,7 +807,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int4b_t* dst, __cbuf__ 
  * @param [out] dst Destination buffer pointer in Global Memory
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
  * @param [in] n_burst Number of burst operations
- * @param [in] len_burst Length of each burst
+ * @param [in] burst_len Length of each burst
  * @param [in] src_stride Source stride value
  * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to Global Memory (__gm__).
@@ -822,7 +822,7 @@ __aicore__ inline void asc_copy_l12gm_sync(__gm__ void *dst, __cbuf__ void *src,
  * @param [out] dst Destination buffer pointer in L0C
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
  * @param [in] n_burst Number of burst operations
- * @param [in] len_burst Length of each burst
+ * @param [in] burst_len Length of each burst
  * @param [in] src_stride Source stride value
  * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to L0C buffer (__cc__).
@@ -946,7 +946,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint16_t *dst, __cbuf__ uint1
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
  * @param [in] n_burst Number of burst operations
- * @param [in] len_burst Length of each burst
+ * @param [in] burst_len Length of each burst
  * @param [in] left_padding_count Left padding count
  * @param [in] right_padding_count Right padding count
  * @param [in] data_select_bit Data selection bit
@@ -957,25 +957,25 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint16_t *dst, __cbuf__ uint1
  *          Supports bfloat16_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ half *dst, __gm__ half *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ half *dst, __gm__ half *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ float *dst, __gm__ float *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ float *dst, __gm__ float *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ hifloat8_t *dst, __gm__ hifloat8_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ hifloat8_t *dst, __gm__ hifloat8_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int16_t *dst, __gm__ int16_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int16_t *dst, __gm__ int16_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int32_t *dst, __gm__ int32_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int32_t *dst, __gm__ int32_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int8_t *dst, __gm__ int8_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ int8_t *dst, __gm__ int8_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint16_t *dst, __gm__ uint16_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint16_t *dst, __gm__ uint16_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
-__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint32_t burst_count, uint32_t len_burst, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
+__aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
 /*
  * @ingroup CubeCompute
@@ -1061,7 +1061,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint8_t *dst, __gm__ u
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
  * @param [in] n_burst Number of burst operations
- * @param [in] len_burst Length of each burst (uint32_t)
+ * @param [in] burst_len Length of each burst (uint32_t)
  * @param [in] pad_func_mode Padding function mode
  * @param [in] src_stride Source stride value (uint64_t)
  * @param [in] dst_stride Destination stride value (uint32_t)
@@ -1069,7 +1069,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint8_t *dst, __gm__ u
  *          Supports void pointer interface for various data types.
  *          This is a software emulation interface with automatic synchronization.
  */
-__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t burst_count, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride);
+__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t burst_count, uint32_t burst_len, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride);
 
 /*
  * @ingroup CubeCompute
@@ -1107,7 +1107,7 @@ __aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void *dst, __cbuf__ void 
  * @param [in] src_addr Source buffer pointer in Cube Buffer (L1)
  * @param [in] sub_blockid Sub-block ID flag
  * @param [in] n_burst Number of burst operations
- * @param [in] len_burst Length of each burst
+ * @param [in] burst_len Length of each burst
  * @param [in] src_gap Source gap value
  * @param [in] dst_gap Destination gap value
  * @details Copies data from Cube Buffer (__cbuf__) to Unified Buffer (__ubuf__).
