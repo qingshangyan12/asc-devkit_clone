@@ -13,13 +13,7 @@
 | &bull; REQ8<br>&bull; DEQF16<br>&bull; QF322B8_PRE | M1=QUANT_PRE\[31:0\]<br>M2=QUANT_PRE\[31:0\]<br>M1、M2均为量化参数 | M1=QUANT_PRE\[31:0\]<br>M2=0<br>M1为量化参数、M2为Normal ReLU系数 |
 | &bull; VREQ8<br>&bull; VDEQF16<br>&bull; VQF322B8_PRE | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=Quant_PRE_ADDR\[i\]\[31:0\]<br>M1、M2均为量化参数，i为原始矩阵的列索引 | M1=Quant_PRE_ADDR\[i\]\[31:0\]<br>M2=0<br>M1为量化参数，M2为Normal ReLU系数，i为原始矩阵的列索引 |
 
-</cann-filter>
-
 注：M1为原始数据取值为正数时使用的随路系数，M2为原始数据取值为负数时使用的随路系数，N为右移位数，即量化系数；
-
-<cann-filter npu_type = "A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
 
 - \(V\)REQ8量化（\(Vector\)ReQuant \(u\)int8量化）与随路ReLU组合
 
