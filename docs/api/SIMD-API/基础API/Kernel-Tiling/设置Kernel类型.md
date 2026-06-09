@@ -193,8 +193,8 @@
 
 ## 调用示例<a name="zh-cn_topic_0000001610027821_section97001499599"></a>
 
--   示例一：开启VectorCore样例
-    1.  完成算子kernel侧开发时，需要通过本接口开启Vector Core，算子执行时会同时启动AI Core和Vector Core， 此时AI Core会当成Vector Core使用。示例如下：
+-   示例一：启用VectorCore样例
+    1.  完成算子kernel侧开发时，需要通过本接口启用Vector Core，算子执行时会同时启动AI Core和Vector Core， 此时AI Core会当成Vector Core使用。示例如下：
 
         ```
         extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z, __gm__ uint8_t *workspace, __gm__ uint8_t *tiling)
@@ -205,7 +205,7 @@
             }
             KernelAdd op;
             op.Init(x, y, z, tilingData.numBlocks, tilingData.totalLength, tilingData.tileNum);
-            KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_VECTOR_CORE); // 开启VectorCore
+            KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_VECTOR_CORE); // 启用VectorCore
             if (TILING_KEY_IS(1)) {
                 op.Process1();
             } else if (TILING_KEY_IS(2)) {
@@ -221,7 +221,7 @@
         // 配套的host侧tiling函数示例：
         ge::graphStatus TilingFunc(gert::TilingContext* context)
         {	
-            // 开启VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
+            // 启用VectorCore，将numBlocks置为AI Core中vector核数 + Vector Core中的vector核数
             auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
             auto totalCoreNum = ascendcPlatform.GetCoreNumAiv();
             // ASCENDXXX请替换为实际的版本型号
