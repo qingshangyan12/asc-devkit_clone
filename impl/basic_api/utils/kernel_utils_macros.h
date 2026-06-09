@@ -32,9 +32,9 @@
 #define unlikely(x) __builtin_expect(!!(x), 0)
 #endif
 
-#include "kernel_macros.h"
-#include "kernel_log.h"
-#include "kernel_event.h"
+#include "../kernel_macros.h"
+#include "../kernel_log.h"
+#include "../kernel_event.h"
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <set>
 #include <map>

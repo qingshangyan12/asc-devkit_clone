@@ -18,7 +18,7 @@
 
 #include "graph/tensor.h"
 #include "pad_tilingdata.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
 /*!
