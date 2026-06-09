@@ -209,6 +209,9 @@ _presmoke_ensure_custom_op_package_locked() {
     fi
 
     local cmake_args=(cmake .. "-DCMAKE_ASC_ARCHITECTURES=$arch")
+    if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then
+        cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")
+    fi
     if [[ "$mode" != "npu" ]]; then
         cmake_args+=("-DCMAKE_ASC_RUN_MODE=$mode")
     fi
