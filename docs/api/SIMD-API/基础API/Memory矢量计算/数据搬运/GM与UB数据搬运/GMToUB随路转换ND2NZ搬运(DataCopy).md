@@ -127,6 +127,21 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 ## 约束说明<a name="section1140315215118"></a>
 
 - 该接口为软仿接口，从易用性角度出发进行设计。
+- Nd2NzParams结构体参数的值需在取值范围内：
+
+    **表 4**  Nd2NzParams结构体参数取值范围
+
+    | 参数名 | 取值范围 |
+    | --- | --- |
+    | ndNum | [0, 4095] |
+    | nValue | [0, 16384] |
+    | dValue | [0, 65535] |
+    | srcNdMatrixStride | [0, 65535] |
+    | srcDValue | [1, 65535] |
+    | dstNzC0Stride | [1, 16384] |
+    | dstNzNStride | [1, 16384] |
+    | dstNzMatrixStride | [1, 65535] |
+
 <cann-filter npu-type="310p">
 
 - 针对Atlas 推理系列产品AI Core，需要预留8K的UB空间，作为接口的临时数据存放区。

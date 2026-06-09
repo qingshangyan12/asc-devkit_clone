@@ -116,7 +116,20 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 约束说明<a name="section830051273220"></a>
 
-该接口为软仿接口，从易用性角度出发进行设计。
+- 该接口为软仿接口，从易用性角度出发进行设计。
+- Nz2NdParamsFull结构体参数的值需在取值范围内：
+
+    **表 4**  Nz2NdParamsFull结构体参数取值范围
+
+    | 参数名 | 取值范围 |
+    | --- | --- |
+    | ndNum | [0, 4095] |
+    | nValue | [1, 8192] |
+    | dValue | [1, 8192] |
+    | srcNdMatrixStride | [1, 512] |
+    | srcNStride | [0, 4096] |
+    | dstDStride | [1, 65535] |
+    | dstNdMatrixStride | [1, 65535] |
 
 ## 调用示例<a name="section2409153316111"></a>
 

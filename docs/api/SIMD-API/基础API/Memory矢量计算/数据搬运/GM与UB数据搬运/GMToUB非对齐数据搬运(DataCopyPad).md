@@ -76,17 +76,17 @@
 | :--- | :--- |
 | blockCount | 搬运的数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter>|
 | blockLen | 搬运的每个数据块长度，数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]，单位：1B。<cann-filter npu-type="910b,A3"><br>**注：blockLen= 0表示不执行搬运，该接口将被视为NOP（空操作）。该说明针对如下型号生效：<br><cann-filter npu-type = "A3">&bull; Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter><br><cann-filter npu-type = "910b">&bull; Atlas A2 训练系列产品/Atlas A2 推理系列产品**</cann-filter> </cann-filter><br>**blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小。** |
-| srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。 |
-| dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。<br>**注：需要注意不要超过UB空间大小**。 |
+| srcStride | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint32_t，取值范围：srcStride∈[0, 2^32 - 1]，单位：1B。<cann-filter npu-type="950"><br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。当srcStride = -blockLen时，表示每次传输的连续数据块均为同一块，即重复搬运第一个数据块。</cann-filter> |
+| dstStride | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint32_t，取值范围：dstStride∈[0, 2^32 - 1]，单位：dataBlock（32B）。<cann-filter npu-type="950"><br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。若PaddingMode为Compact模式，该参数无效，默认值为0，取默认值即可。</cann-filter><br>**注：需要注意不要超过UB空间大小**。 |
 | rsv | 保留字段。数据类型为uint16_t，默认值为0。 |
 
 **表 4**  DataCopyPadExtParams&lt;T&gt;结构体参数定义<a name="table_gm2ub_pad_4"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| isPad | 是否需要填充用户自定义的数据，取值范围：true，false。<br>true：填充padding value。<br>false：表示用户不需要指定填充值，会默认填充随机值。 |
-| leftPadding | 连续搬运数据块左侧需要补充的数据范围，单位为元素个数。<br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
-| rightPadding | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数。<br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
+| isPad | 是否通过DataCopyPadExtParams结构体中的paddingValue字段设置填充值。<br>true：使用paddingValue字段作为填充值。<br>false：不使用paddingValue字段，根据是否调用寄存器配置接口[SetPadValue](寄存器配置说明/SetPadValue(ISASI).md)分为两种情况。<br>&bull; 调用SetPadValue时，在接口外部配置需要填充的数据。<br>&bull; 不调用SetPadValue时，硬件自动在**每个数据块右侧**填充dummy数据至32字节对齐。<cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则只会在**最后一个数据块右侧**填充dummy数据至32字节对齐。</cann-filter> |
+| leftPadding | 连续搬运数据块左侧需要补充的数据范围，单位为元素个数。<br><cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，该参数无效，只会在**最后一个数据块右侧**填充数据。</cann-filter><br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
+| rightPadding | 连续搬运数据块右侧需要补充的数据范围，单位为元素个数。<br><cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，该参数无效，只会在**最后一个数据块右侧**填充数据。</cann-filter><br>**leftPadding、rightPadding所占的字节数均不能超过32字节。** |
 | paddingValue | 左右两侧需要填充的数据值，需要保证在数据占用字节范围内。<br>数据类型和源操作数保持一致，数据类型为模板参数T。<br>**当数据类型长度为64位时，该参数只能设置为0。** |
 
 - GM -> VECIN/VECOUT配置示例<a name="li73127579197"></a>
@@ -189,7 +189,30 @@
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
 - 结构体DataCopyPadExtParams的参数paddingValue数据类型和源操作数保持一致。当数据类型为b64时，paddingValue只能设置为0。
+- DataCopyExtParams结构体参数的值需在取值范围内：
+
+    **表 5**  DataCopyExtParams结构体参数取值范围
+
+    | 参数名 | 取值范围 |
+    | --- | --- |
+    | blockCount | [0, 4095] |
+    | blockLen | [0, 2097151] |
+    | srcStride | [0, 2^32 - 1] |
+    | dstStride | [0, 2^32 - 1] |
+
+    <cann-filter npu-type="950">
+
+    **说明**：针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的取值范围的说明如下：
+    - srcStride：取值范围为[-blockLen, 2^40-1]
+    - dstStride：取值范围为[0, 65535]
+    </cann-filter>
+
 - 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则dstStride/leftPadding/rightPadding无效。
+
+</cann-filter>
 
 ## 调用示例<a name="section177231425115410"></a>
 
