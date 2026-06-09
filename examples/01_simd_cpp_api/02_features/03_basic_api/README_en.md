@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample introduces the usage of Ascend C Basic API, including data movement, matrix computation, memory vector computation, resource management, synchronization control, system access, atomic operations, and scalar computation.
+This sample introduces the usage of Ascend C Basic API, including data movement, matrix computation, memory vector computation, resource management, synchronization control, system access, atomic operations, scalar computation, and communication.
 
 ## Sample List
 
@@ -17,3 +17,4 @@ This sample introduces the usage of Ascend C Basic API, including data movement,
 | [07_system_access](./07_system_access) | This directory contains samples for multiple APIs related to system variable access. Each sample is based on the Ascend C `<<<>>>` direct invocation method, supporting the implementation of both the main function and kernel function in the same cpp file.         |
 | [08_atomic_operations](./08_atomic_operations) | This directory contains samples for multiple APIs related to atomic operations. Each sample is based on the Ascend C `<<<>>>` direct invocation method, supporting the implementation of both the main function and kernel function in the same cpp file.         |
 | [09_scalar_computation](./09_scalar_computation) | This directory contains samples for multiple APIs related to scalar computation. Each sample is based on the Ascend C `<<<>>>` direct invocation method, supporting the implementation of both the main function and kernel function in the same cpp file.         |
+| [10_communication](./10_communication) | This directory contains samples for point-to-point communication between NPUs, demonstrating the usage of Hcomm's WriteNbi and ReadNbi interfaces.         |
