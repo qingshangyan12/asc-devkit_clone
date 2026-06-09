@@ -1,0 +1,3 @@
+inline [aicore] void test() {
+    pipe_barrier(PIPE_ALL);
+}
