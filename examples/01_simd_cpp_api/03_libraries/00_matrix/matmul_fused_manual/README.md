@@ -1,4 +1,4 @@
-# 融合编程matmul_fused_mannul样例
+# 融合编程matmul_fused_manual样例
 
 ## 概述
 
@@ -15,19 +15,19 @@
 ## 目录结构介绍
 
 ```
-├── matmul_fused_mannul
+├── matmul_fused_manual
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_fused_mannul.asc // Ascend C样例实现 & 调用样例
+│   └── matmul_fused_manual.asc // Ascend C样例实现 & 调用样例
 ```
 
 ## 样例描述
 
 - 样例功能：  
-  本样例在AIC核创建纯Cube模式的Matmul对象，实现Matmul计算，中间结果输出至GM。AIC核计算完成后，通过调用CrossCoreSetFlag和CrossCoreSetFlag接口手动控制核间同步，继续在AIV核对GM上的中间结果进行LeakyRelu的计算。
+  本样例在AIC核创建纯Cube模式的Matmul对象，实现Matmul计算，中间结果输出至GM。AIC核计算完成后，通过调用CrossCoreSetFlag和CrossCoreWaitFlag接口手动控制核间同步，继续在AIV核对GM上的中间结果进行LeakyRelu的计算。
 
 - 样例规格：  
   本样例中：M = 128, N = 128, K = 256
@@ -42,7 +42,7 @@
   </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
   </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fused_mannul_custom</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fused_manual_custom</td></tr>
   </table>
 
 - 样例实现： 
@@ -50,7 +50,7 @@
   - Kernel关键步骤
     - AIC侧具体步骤：
       - 创建Matmul对象并初始化。  
-        在#include "lib/matmul_intf.h"前配置ASCENDC_CUBE_ONLY宏，创建纯Cube模式的Mamtul对象
+        在#include "lib/matmul_intf.h"前配置ASCENDC_CUBE_ONLY宏，创建纯Cube模式的Matmul对象
           ```cpp
           #define ASCENDC_CUBE_ONLY
           #include "lib/matmul_intf.h"
@@ -125,10 +125,6 @@
 - 执行结果
 
   执行结果如下，说明精度对比成功：
-  ```bash
-  test pass!
-  ```
-  执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```
