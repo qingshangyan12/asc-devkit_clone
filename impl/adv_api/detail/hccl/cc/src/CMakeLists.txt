@@ -27,16 +27,16 @@ if(BUILD_OPEN_PROJECT)
     endif()
 else()
     message(STATUS "close TOP_DIR = ${TOP_DIR}")
-    set(OPS_BASE_DIR ${TOP_DIR}/hccl/)
+    set(OPS_BASE_DIR ${TOP_DIR}/asc/asc-devkit/)
     set(INSTALL_AICPU_KERNEL_JSON_DIR ${INSTALL_LIBRARY_DIR})
 
-    # 大工程编译：CANN 包路径不确定，改为从 hccl 自身的 version.cmake
+    # 大工程编译：CANN 包路径不确定，改为从自身的 version.cmake
     # (set_cann_package(hccl VERSION "X.Y.Z")) 解析 CANN_VERSION_NUM
     set(_hccl_version_cmake "${OPS_BASE_DIR}/version.cmake")
     message(STATUS "Checking HCCL version.cmake: ${_hccl_version_cmake}")
     if(EXISTS "${_hccl_version_cmake}")
         file(STRINGS "${_hccl_version_cmake}" _hccl_ver_pkg_line
-            REGEX "set_cann_package[ \t]*\\([ \t]*hccl[ \t]+VERSION[ \t]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"")
+            REGEX "set_cann_package[ \t]*\\([ \t]*asc-devkit[ \t]+VERSION[ \t]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"")
         if(_hccl_ver_pkg_line)
             string(REGEX MATCH "\"([0-9]+)\\.([0-9]+)\\.([0-9]+)\"" _ "${_hccl_ver_pkg_line}")
             if(NOT CMAKE_MATCH_1 STREQUAL "" AND NOT CMAKE_MATCH_2 STREQUAL "" AND NOT CMAKE_MATCH_3 STREQUAL "")
