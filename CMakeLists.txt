@@ -11,7 +11,7 @@
 cmake_minimum_required(VERSION 3.16.0)
 project(asc-devkit)
 
-option(BUILD_OPEN_PROJECT "Build open asc-devkit lib project" ON)
+option(ENABLE_TEST "Build tensor API unit tests" ON)
 
 set(CMAKE_C_FLAGS_RELEASE "")
 set(CMAKE_CXX_FLAGS_RELEASE "")
@@ -28,13 +28,7 @@ set(ASCENDC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(ASCENDC_INCLUDE_DIR ${ASCENDC_DIR}/include)
 set(ASCENDC_IMPL_DIR ${ASCENDC_DIR}/impl)
 
-
-if(BUILD_OPEN_PROJECT)
-  include(cmake/config.cmake)
-  set(INSTALL_LIBRARY_DIR ${CMAKE_SYSTEM_PROCESSOR}-linux)
-else()
-  set(INSTALL_LIBRARY_DIR lib)
-endif()
+include(cmake/config.cmake)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -42,32 +36,8 @@ if(CCACHE_PROGRAM)
   set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif()
 
-add_subdirectory(impl)
-
-if(BUILD_OPEN_PROJECT)
-  include(cmake/intf_pub_linux.cmake)
-  include(cmake/dependencies.cmake)
-endif()
-
-add_subdirectory(tools)
-add_subdirectory(cmake)
-
-include(cmake/funcs.cmake)
-include(version.cmake)
-if(BUILD_OPEN_PROJECT)
-    check_pkg_build_deps("asc-devkit")
-endif()
-add_version_info_targets()
+include(cmake/dependencies.cmake)
 
 if(ENABLE_TEST)
   add_subdirectory(tests)
-endif()
-
-if(PACKAGE_OPEN_PROJECT)
-  cmake_minimum_required(VERSION 3.16)
-  project(asc-devkit VERSION 1.0.0)
-  include(CMakePrintHelpers)
-  set(CMAKE_CXX_STANDARD 17)
-  include(cmake/package.cmake)
-  include(cmake/version_info.cmake)
 endif()
