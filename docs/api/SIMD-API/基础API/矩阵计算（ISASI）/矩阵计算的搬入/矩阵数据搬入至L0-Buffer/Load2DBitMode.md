@@ -16,7 +16,9 @@
 
 ## 功能说明<a id="section618mcpsimp"></a>
 
-Load2D支持的数据搬运通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+
+本接口与Load2DV2接口的差异在于参数的传入方式不同，本接口传入的是一个联合体结构Load2DBitModeParam。
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
@@ -59,7 +61,9 @@ Load2DBitModeParam类参数设计思想说明：
 
 位域（bit-field）是一种特殊的类成员，允许精确控制结构体中成员变量所占用的内存位数。结构体中成员变量从上到下对应内存中从低位到高位。
 
-Load2DBitModeParam类使用union与bit-field方法，采用bit位表达参数类型，使用bit-field结构体自动处理入参的bit位数，并利用union的特性实现多参数融合传递，仅需传递一个入参即可包含全部所需信息，对应底层接口仅需要接收一个参数。同时，当需要修改参数中某一bit位的值时，仅需要通过循环和位运算即可实现，不需要重新传入参数，减少了scalar计算，实现性能提升。
+Load2DBitModeParam类使用union与bit-field方法，采用bit位表达参数类型，使用bit-field结构体自动处理入参的bit位数，并利用union的特性实现多参数融合传递，仅需传递一个入参即可包含全部所需信息，对应底层接口仅需要接收一个参数。同时，当需要修改参数中某一bit位的值时，仅需要通过循环和位运算即可实现，不需要重新传入参数。
+
+与使用LoadData2DParamsV2结构体的Load2D接口相比，减少了scalar计算，实现性能提升。
 
 Load2DBitModeParam类可以直接使用LoadData2DParamsV2结构体类型对象初始化：
 
