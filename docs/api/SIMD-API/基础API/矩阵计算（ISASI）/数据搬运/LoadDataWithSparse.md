@@ -53,7 +53,7 @@
 
 索引矩阵在一个int8的地址中的排布是逆序排布的，例如：索引矩阵1 2 0 1 0 2 1 0，在地址中的排布为1 0 2 1 0 1 2 0，其中1 0 2 1（对应索引矩阵前四位1 2 0 1）为一个int8，0 1 2 0（对应索引矩阵后四位0 2 1 0）为一个int8。
 
-索引矩阵的功能说明参考[MmadWithSparse](../矩阵计算（ISASI）/MmadWithSparse.md)。
+索引矩阵的功能说明参考[MmadWithSparse](../矩阵计算/MmadWithSparse.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -148,5 +148,5 @@ __aicore__ inline void LoadDataWithSparse(const LocalTensor<T>& dst, const Local
 
 ## 调用示例<a name="section6461234123118"></a>
 
-详细用例请参考[MmadWithSparse](../矩阵计算（ISASI）/MmadWithSparse.md)。
+详细用例请参考[MmadWithSparse](../矩阵计算/MmadWithSparse.md)。
 
