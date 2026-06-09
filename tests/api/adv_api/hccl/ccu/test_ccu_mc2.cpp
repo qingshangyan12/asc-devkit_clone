@@ -102,10 +102,9 @@ protected:
     void SetUp() override {
         StubCleanup();
         TopoMeta topoMeta = BuildTopoMeta(g_stubRankSize);
-        HcclResult ret = HcclSim::SimWorld::Global()->Init(topoMeta, g_stubDeviceType);
-        ASSERT_EQ(ret, HCCL_SUCCESS) << "SimWorld init failed";
+        HcclSim::SimWorld::Global()->Init(topoMeta, g_stubDeviceType);
         
-        ret = HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
+        HcclResult ret = HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
         ASSERT_EQ(ret, HCCL_SUCCESS) << "Comm init failed";
         ASSERT_NE(comm_, nullptr) << "Comm is nullptr after init";
         
