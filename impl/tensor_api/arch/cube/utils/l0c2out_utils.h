@@ -72,31 +72,67 @@ __aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& 
     }
 }
 
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape);
-
-template <typename ShapeType, size_t... Is>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoordImpl(
-    const ShapeType& shape, Std::index_sequence<Is...>)
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutNZColShape(const LayoutType& layout)
 {
-    return MakeCoord(MakeL0COutZeroCoord(Std::get<Is>(shape))...);
-}
-
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape)
-{
-    using Shape = Std::remove_cvref_t<ShapeType>;
-    if constexpr (Std::is_tuple_v<Shape>) {
-        return MakeL0COutZeroCoordImpl(shape, Std::make_index_sequence<Std::tuple_size_v<Shape>>{});
+    if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 1, 0>(layout.Shape()) * Get<1, 1, 1>(layout.Shape());
     } else {
-        return _0{};
+        return GetTotalColumnShape(layout);
     }
 }
 
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutBatchCoord(const ShapeType& shape, uint32_t batchIndex)
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutNZRowShape(const LayoutType& layout)
 {
-    return MakeCoord(batchIndex, MakeL0COutZeroCoord(Get<1>(shape)));
+    if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 0, 0>(layout.Shape()) * Get<1, 0, 1>(layout.Shape());
+    } else {
+        return GetTotalRowShape(layout);
+    }
+}
+
+struct L0COutCopyParams {
+    uint32_t nSize;
+    uint32_t mSize;
+    uint32_t srcStride;
+    uint32_t dstStride;
+};
+
+template <typename T, typename U, typename DstLayout, typename SrcLayout>
+__aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParams(
+    const DstLayout& dstLayout, const SrcLayout& srcLayout)
+{
+    if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+        return {
+            static_cast<uint32_t>(Std::min(Get<0>(srcLayout.Shape()) * GetL0COutNZColShape(srcLayout),
+                                           Get<0>(dstLayout.Shape()) * GetL0COutNZColShape(dstLayout))),
+            static_cast<uint32_t>(Std::min(GetL0COutNZRowShape(srcLayout), GetL0COutNZRowShape(dstLayout))),
+            static_cast<uint32_t>(Get<1, 1, 1>(srcLayout.Stride()) / FRACTAL_FIXED),
+            static_cast<uint32_t>(Get<1, 1, 1>(dstLayout.Stride()))
+        };
+    } else {
+        const uint32_t nSize =
+            static_cast<uint32_t>(Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout)));
+        const uint32_t mSize =
+            static_cast<uint32_t>(Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout)));
+        const uint32_t srcStride =
+            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED);
+
+        if constexpr (IsL0COutNDFormatV<T>) {
+            return {nSize, mSize, srcStride, GetL0COutNDStride<T>(dstLayout)};
+        } else if constexpr (IsL0COutDNFormatV<T>) {
+            return {nSize, mSize, srcStride, GetL0COutDNStride<T>(dstLayout)};
+        } else {
+            return {nSize, mSize, srcStride,
+                    static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout))};
+        }
+    }
+}
+
+__aicore__ inline static auto MakeL0COutNZBatchCoord(uint32_t batchIndex)
+{
+    return MakeCoord(batchIndex, MakeCoord(MakeCoord(_0{}, _0{}), MakeCoord(_0{}, _0{})));
 }
 
 template <RoundMode roundMode, typename dstType, typename srcType>
