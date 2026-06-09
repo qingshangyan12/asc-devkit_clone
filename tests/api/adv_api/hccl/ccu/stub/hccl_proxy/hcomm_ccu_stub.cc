@@ -332,7 +332,7 @@ LoopCall::LoopCall(CcuRepContext *context, const std::string &label) : context(c
 Executor::Executor(CcuRepContext *context) : CcuVirRes(context) {}
 
 uint64_t CcuRep::GetTokenInfo(uint64_t va, uint64_t size) {
-    // 返回基于地址的非零token用于测试验证
+    // 返回基于buffer地址的动态token，匹配测试预期
     return (va != 0) ? (va + 0x1234) : 0;
 }
 

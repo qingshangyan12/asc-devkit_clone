@@ -26,7 +26,6 @@ std::map<BufferType, uint32_t> g_BufferType2Index = {
 
 void SimNpu::InitSimNpuRes(const NpuPos& pos)
 {
-    // 初始化内存，流，Notify资源
     npuPos_ = pos;
     InitMemLayOut();
     InitStreamRes();
@@ -36,7 +35,7 @@ void SimNpu::InitSimNpuRes(const NpuPos& pos)
 void SimNpu::InitMemLayOut()
 {
     memLayout_.clear();
-    static uint64_t addr = SIM_MEM_BLOCK_SIZE;
+    uint64_t addr = SIM_MEM_BLOCK_SIZE;
     uint64_t startAddr = (uint64_t)addr & SIM_MEM_MASKER;
     MemBlock inMemBlock{BufferType::INPUT, addr, 0};
     memLayout_.push_back(inMemBlock);
@@ -50,7 +49,6 @@ void SimNpu::InitMemLayOut()
     startAddr = (uint64_t)addr & SIM_MEM_MASKER;
     MemBlock cclMemBlock{BufferType::CCL, addr, (uint64_t)SIZE_200MB};
     memLayout_.push_back(cclMemBlock);
-    addr += SIM_MEM_BLOCK_SIZE;
 }
 
 void SimNpu::InitStreamRes()
