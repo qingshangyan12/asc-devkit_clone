@@ -72,31 +72,49 @@ __aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& 
     }
 }
 
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape);
+struct L0COutCopyParams {
+    uint32_t nSize;
+    uint32_t mSize;
+    uint32_t srcStride;
+    uint32_t dstStride;
+};
 
-template <typename ShapeType, size_t... Is>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoordImpl(
-    const ShapeType& shape, Std::index_sequence<Is...>)
+template <typename T, typename U, typename DstLayout, typename SrcLayout>
+__aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParams(
+    const DstLayout& dstLayout, const SrcLayout& srcLayout)
 {
-    return MakeCoord(MakeL0COutZeroCoord(Std::get<Is>(shape))...);
-}
-
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutZeroCoord(const ShapeType& shape)
-{
-    using Shape = Std::remove_cvref_t<ShapeType>;
-    if constexpr (Std::is_tuple_v<Shape>) {
-        return MakeL0COutZeroCoordImpl(shape, Std::make_index_sequence<Std::tuple_size_v<Shape>>{});
+    if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+        return {
+            Std::min(Get<0>(srcLayout.Shape()) * Get<1, 1, 0>(srcLayout.Shape()) *
+                         Get<1, 1, 1>(srcLayout.Shape()),
+                     Get<0>(dstLayout.Shape()) * Get<1, 1, 0>(dstLayout.Shape()) *
+                         Get<1, 1, 1>(dstLayout.Shape())),
+            Std::min(Get<1, 0, 0>(srcLayout.Shape()) * Get<1, 0, 1>(srcLayout.Shape()),
+                     Get<1, 0, 0>(dstLayout.Shape()) * Get<1, 0, 1>(dstLayout.Shape())),
+            Get<1, 1, 1>(srcLayout.Stride()) / FRACTAL_FIXED,
+            Get<1, 1, 1>(dstLayout.Stride())
+        };
     } else {
-        return _0{};
+        uint32_t dstStride;
+        if constexpr (IsL0COutNDFormatV<T>) {
+            dstStride = GetL0COutNDStride<T>(dstLayout);
+        } else if constexpr (IsL0COutDNFormatV<T>) {
+            dstStride = GetL0COutDNStride<T>(dstLayout);
+        } else {
+            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
+        }
+        return {
+            Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout)),
+            Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout)),
+            GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED,
+            dstStride
+        };
     }
 }
 
-template <typename ShapeType>
-__aicore__ inline static constexpr auto MakeL0COutBatchCoord(const ShapeType& shape, uint32_t batchIndex)
+__aicore__ inline static auto MakeL0COutNZBatchCoord(uint32_t batchIndex)
 {
-    return MakeCoord(batchIndex, MakeL0COutZeroCoord(Get<1>(shape)));
+    return MakeCoord(batchIndex, MakeCoord(MakeCoord(_0{}, _0{}), MakeCoord(_0{}, _0{})));
 }
 
 template <RoundMode roundMode, typename dstType, typename srcType>
