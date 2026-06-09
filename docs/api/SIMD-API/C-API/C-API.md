@@ -384,7 +384,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_ge_scalar](Reg矢量计算/reg_vector/asc_ge_scalar.md) | ge（greater than or equal to），对源操作数与标量执行逐元素比较。 |
 | [asc_gt](Reg矢量计算/reg_vector/asc_gt.md) | gt（greater than），对源操作数执行逐元素比较。 |
 | [asc_gt_scalar](Reg矢量计算/reg_vector/asc_gt_scalar.md) | gt（greater than），对源操作数与标量执行逐元素比较。 |
-| [asc_half2bf16](Reg矢量计算/reg_vector/asc_half2bf16.md) | 将half类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |
+| [asc_half2bfloat16](Reg矢量计算/reg_vector/asc_half2bfloat16.md) | 将half类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |
 | [asc_half2float](Reg矢量计算/reg_vector/asc_half2float.md) | 将half类型数据转换为float类型。 |
 | [asc_half2hif8](Reg矢量计算/reg_vector/asc_half2hif8.md) | 将half类型转换为hifloat8_t类型，并支持多种舍入模式。 |
 | [asc_half2int16](Reg矢量计算/reg_vector/asc_half2int16.md) | 将half类型数据转换为int16_t类型，并支持多种舍入模式。 |

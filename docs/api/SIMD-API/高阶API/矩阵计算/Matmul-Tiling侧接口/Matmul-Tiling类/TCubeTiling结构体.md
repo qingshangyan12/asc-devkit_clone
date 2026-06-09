@@ -178,7 +178,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 
 -   TCubeTiling参数约束
 
-    一组合法的TCubeTiling参数需要同时满足[表2](#table1275812182115)中的所有约束条件。若Matmul对象的MatmulConfig模板为[MDL模板](MatmulConfig.md#table6981133810309)，除[表2](#table1275812182115)外，还同时需要满足[表3 MDL模板补充约束条件](#table1094616401179)。
+    一组合法的TCubeTiling参数需要同时满足[表2](#table1275812182115)中的所有约束条件。若Matmul对象的MatmulConfig模板为[MDL模板](../../Matmul-Kernel侧接口/MatmulConfig.md#table6981133810309)，除[表2](#table1275812182115)外，还同时需要满足[表3 MDL模板补充约束条件](#table1094616401179)。
 
     **表 2**  TCubeTiling约束条件
 
