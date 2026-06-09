@@ -215,20 +215,32 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AlltoAll) {
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_MultipleTilings) {
     SetCommEngineEnv(COMM_ENGINE_CCU);
     
-    // 预先分配 CCU 资源（workspace、xnAddr、ckeAddr）
     OpResCtx resCtx{};
     ASSERT_EQ(AllocCcuOpResCtx(comm_, "test_ctx_tag", g_stubRankSize, g_stubRankId, resCtx), HCCL_SUCCESS);
     
     Mc2CcTilingInner ccTiling0{};
     ccTiling0.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER);
     ccTiling0.commEngine = COMM_ENGINE_CCU;
+    ccTiling0.srcDataType = HCCL_DATA_TYPE_FP16;
+    
     Mc2CcTilingInner ccTiling1{};
     ccTiling1.opType = static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE);
     ccTiling1.commEngine = COMM_ENGINE_CCU;
-    const void* ccTilingList[] = {&ccTiling0, &ccTiling1};
-    std::string topoTag[] = {"tag0", "tag1"};
+    ccTiling1.srcDataType = HCCL_DATA_TYPE_FP16;
+    ccTiling1.reduceType = HCCL_REDUCE_SUM;
     
-    EXPECT_EQ(CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 2, resCtx), HCCL_SUCCESS);
+    const void* ccTilingList[] = {&ccTiling0, &ccTiling1};
+    std::string topoTag[] = {"tag0_allgather", "tag1_allreduce"};
+    
+    std::cout << "Debug: Starting CcuSelectAlg with 2 tilings\n";
+    std::cout << "Debug: resCtx.workSpace = " << (void*)resCtx.workSpace << "\n";
+    std::cout << "Debug: resCtx.xnAddr = " << (void*)resCtx.xnAddr << "\n";
+    std::cout << "Debug: resCtx.ckeAddr = " << (void*)resCtx.ckeAddr << "\n";
+    
+    HcclResult ret = CcuSelectAlg(comm_, stream_, topoTag, ccTilingList, 2, resCtx);
+    std::cout << "Debug: CcuSelectAlg returned " << ret << "\n";
+    
+    EXPECT_EQ(ret, HCCL_SUCCESS);
     EXPECT_EQ(resCtx.opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(CcuAllGatherMesh1D));
     EXPECT_EQ(resCtx.opType[1], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLREDUCE));
