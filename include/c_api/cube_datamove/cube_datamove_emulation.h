@@ -51,7 +51,7 @@
 #endif
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to Feature Buffer (L1) for various data types
  * @param [out] dst Destination buffer pointer in Feature Buffer (L1)
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -63,7 +63,7 @@
 __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void *dst, __cbuf__ void *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to BT buffer for various data types
  * @param [out] dst Destination buffer address (uint64_t)
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -74,7 +74,7 @@ __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void *dst, __cbuf__ void *sr
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L0A buffer with scalar value for various data types
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] value Scalar value to fill (half or uint32_t)
@@ -110,7 +110,7 @@ __aicore__ inline void asc_fill_l0a_sync(__ca__ uint32_t *dst, uint32_t value, c
 __aicore__ inline void asc_fill_l0a_sync(__ca__ bfloat16_t *dst, bfloat16_t value, const asc_fill_value_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L0B buffer with scalar value for various data types
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] value Scalar value to fill (half or uint32_t)
@@ -146,7 +146,7 @@ __aicore__ inline void asc_fill_l0b_sync(__cb__ uint32_t *dst, uint32_t value, c
 __aicore__ inline void asc_fill_l0b_sync(__cb__ bfloat16_t *dst, bfloat16_t value, const asc_fill_value_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L1 Cube Buffer with scalar value for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] value Scalar value to fill (half, bfloat16_t or uint32_t)
@@ -188,7 +188,7 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t *dst, uint32_t value
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
@@ -200,7 +200,7 @@ __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t *dst, uint32_t value
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with padding support
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
@@ -226,7 +226,7 @@ __aicore__ inline void asc_copy_gm2l1_pad7_sync(__cbuf__ void *dst, __gm__ void 
 __aicore__ inline void asc_copy_gm2l1_pad8_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with stride parameters for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
@@ -253,7 +253,7 @@ __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint32_t *dst, __gm__ uint32
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with ND to NZ format conversion for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1) with NZ format
  * @param [in] src Source buffer pointer in Global Memory with ND format
@@ -286,7 +286,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ int32_t *dst, __gm__ i
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint16_t nd_num, uint16_t n_value, uint16_t d_value, uint16_t src_nd_matrix_stride, uint16_t src_d_value, uint16_t dst_nz_c0_stride, uint16_t dst_nz_n_stride, uint16_t dst_nz_matrix_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer for various data types
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -326,7 +326,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ int32_t *dst, __cbuf__ int32_
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ float *dst, __cbuf__ float *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0A buffer for various data types
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -372,7 +372,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int32_t *dst, __cbuf__ int32_
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ float *dst, __cbuf__ float *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy sparse data from Cube Buffer (L1) to L0B buffer
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -386,7 +386,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ float *dst, __cbuf__ float *s
 __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t *dst, __cbuf__ int8_t *src, __cbuf__ int8_t *index, uint16_t start_index, uint8_t repeat);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0A buffer with transpose operation for various data types
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -415,7 +415,7 @@ __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ uint32_t *dst, __cbuf__
 __aicore__ inline void asc_copy_l12l0a_trans_sync(__ca__ uint8_t *dst, __cbuf__ uint8_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer with transpose operation for various data types
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -444,7 +444,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t *dst, __cbuf__
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t *dst, __cbuf__ uint8_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint64_t dst_frac_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Load image data to Cube Buffer (L1) with padding support for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] hor_size Horizontal size of the image region
@@ -465,7 +465,7 @@ __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ half *dst, uint16_t 
 __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ int8_t *dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L0B buffer for various data types
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Global Memory
@@ -494,7 +494,7 @@ __aicore__ inline void asc_copy_gm2l0b_sync(__cb__ uint8_t *dst, __gm__ uint8_t 
 __aicore__ inline void asc_copy_gm2l0b_sync(__cb__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L0A buffer for various data types
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Global Memory
@@ -525,7 +525,7 @@ __aicore__ inline void asc_copy_gm2l0a_sync(__ca__ int4b_t* dst, __gm__ int4b_t*
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Cube Buffer (L1) for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in L0C
@@ -547,7 +547,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ float *sr
 __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy MX format data from Cube Buffer (L1) to L0A buffer
  * @param [out] dst Destination buffer address (uint64_t)
  * @param [in] src Source buffer pointer in Cube Buffer (L1) with fp8_e8m0_t format
@@ -564,7 +564,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ int32_t *
 __aicore__ inline void asc_copy_l12l0a_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t *src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy MX format data from Cube Buffer (L1) to L0B buffer
  * @param [out] dst Destination buffer address (uint64_t)
  * @param [in] src Source buffer pointer in Cube Buffer (L1) with fp8_e8m0_t format
@@ -581,7 +581,7 @@ __aicore__ inline void asc_copy_l12l0a_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t
 __aicore__ inline void asc_copy_l12l0b_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t *src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0A buffer for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -626,7 +626,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp4x2_e2m1_t *dst, __cbuf__ f
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp4x2_e1m2_t *dst, __cbuf__ fp4x2_e1m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0A buffer with transpose operation for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -671,7 +671,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp4x2_e2m1_t *dst, 
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp4x2_e1m2_t *dst, __cbuf__ fp4x2_e1m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -716,7 +716,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp4x2_e2m1_t *dst, __cbuf__ f
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp4x2_e1m2_t *dst, __cbuf__ fp4x2_e1m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer with transpose operation for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -761,7 +761,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ fp4x2_e2m1_t *dst, 
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ fp4x2_e1m2_t *dst, __cbuf__ fp4x2_e1m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer with transpose operation for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -802,7 +802,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float4_e2m1x2_t *dst, _
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to Global Memory for various data types
  * @param [out] dst Destination buffer pointer in Global Memory
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -817,7 +817,7 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int4b_t* dst, __cbuf__ 
 __aicore__ inline void asc_copy_l12gm_sync(__gm__ void *dst, __cbuf__ void *src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0C buffer for various data types
  * @param [out] dst Destination buffer pointer in L0C
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -845,7 +845,7 @@ __aicore__ inline void asc_copy_l12l0c_sync(__cc__ int32_t *dst, __cbuf__ int32_
 __aicore__ inline void asc_copy_l12l0c_sync(__cc__ uint32_t *dst, __cbuf__ uint32_t *src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0A buffer for convolution operations (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0A
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -893,7 +893,7 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ int16_t *dst, __cbuf__ int16_
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint16_t *dst, __cbuf__ uint16_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to L0B buffer for convolution operations (3510 architecture)
  * @param [out] dst Destination buffer pointer in L0B
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -941,7 +941,7 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ int16_t *dst, __cbuf__ int16_
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint16_t *dst, __cbuf__ uint16_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with alignment and padding support for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
@@ -978,7 +978,7 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint32_t *dst, __gm__ 
 __aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint32_t burst_count, uint32_t burst_len, uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with DN to NZ format conversion for various data types
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1) with NZ format
  * @param [in] src Source buffer pointer in Global Memory with DN format
@@ -1017,7 +1017,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ uint32_t *dst, __gm__ 
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with ND to NZ format conversion for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1) with NZ format
  * @param [in] src Source buffer pointer in Global Memory with ND format
@@ -1056,7 +1056,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint32_t *dst, __gm__ 
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with padding function for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory
@@ -1072,7 +1072,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ uint8_t *dst, __gm__ u
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t burst_count, uint32_t burst_len, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to BT buffer for various data types (3510 architecture)
  * @param [out] dst Destination buffer address (uint64_t)
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -1090,7 +1090,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float *src, ui
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to Feature Buffer (L1) version 2 for various data types
  * @param [out] dst Destination buffer pointer in Feature Buffer (L1)
  * @param [in] src Source buffer pointer in Cube Buffer (L1)
@@ -1101,7 +1101,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t *src, 
 __aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void *dst, __cbuf__ void *src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Cube Buffer (L1) to Unified Buffer for various data types
  * @param [out] dst_addr Destination buffer pointer in Unified Buffer
  * @param [in] src_addr Source buffer pointer in Cube Buffer (L1)
@@ -1117,7 +1117,7 @@ __aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void *dst, __cbuf__ void 
 __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Cube Buffer (L1) with full quantization support for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in L0C
@@ -1149,7 +1149,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ float *sr
 __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_channel_split, bool NZ2ND_en, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool C0_pad_en, bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Global Memory with full quantization support for various data types
  * @param [out] dst_addr Destination buffer pointer in Global Memory
  * @param [in] src_addr Source buffer pointer in L0C
@@ -1213,7 +1213,7 @@ __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ void *dst_addr, __cc__ float 
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ void *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre_mode, uint8_t unit_flag_ctl, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool NZ2ND_en, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool C0_pad_en, bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Unified Buffer with full quantization support for various data types
  * @param [out] dst_addr Destination buffer pointer in Unified Buffer
  * @param [in] src_addr Source buffer pointer in L0C
@@ -1278,7 +1278,7 @@ __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ void *dst_addr, __cc__ floa
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ void *dst_addr, __cc__ int32_t *src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag_ctl, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool split_en, bool NZ2ND_en, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post, uint8_t eltwise_op, bool eltwise_antq_en, bool C0_pad_en, bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to Cube Buffer (L1) with decomposition mode for various data types (3510 architecture)
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
  * @param [in] src Source buffer pointer in Global Memory

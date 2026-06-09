@@ -28,7 +28,7 @@
 #endif
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set Load3D repeat configuration
  * @param [in] config Load3D configuration structure reference
  * @details Configures repeat parameters for Load3D operations.
@@ -37,7 +37,7 @@
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set Load3D feature matrix configuration
  * @param [in] config Feature matrix configuration structure reference
  * @details Configures feature matrix parameters for Load3D operations.
@@ -46,7 +46,7 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
 __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to Feature buffer
  * @param [out] dst Destination buffer in Feature Buffer
  * @param [in] src Source buffer in Cube Buffer (L1)
@@ -64,7 +64,7 @@ __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, ui
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to BT buffer
  * @param [out] dst Destination address in BT buffer
  * @param [in] src Source buffer in Cube Buffer (L1)
@@ -83,7 +83,7 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L0A buffer with specified value
  * @brief Supports data types: half, float, int16_t, int32_t, uint16_t, uint32_t, bfloat16_t
  * @param [out] dst Destination buffer in Cube L0A Buffer
@@ -132,7 +132,7 @@ __aicore__ inline void asc_fill_l0a(__ca__ bfloat16_t* dst, bfloat16_t value, co
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L0B buffer with specified value
  * @brief Supports data types: half, float, int16_t, int32_t, uint16_t, uint32_t, bfloat16_t
  * @param [out] dst Destination buffer in Cube L0B Buffer
@@ -181,7 +181,7 @@ __aicore__ inline void asc_fill_l0b(__cb__ bfloat16_t* dst, bfloat16_t value, co
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Fill L1 buffer with specified value
  * @brief Supports data types: half, float, int16_t, int32_t, uint16_t, uint32_t, bfloat16_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -207,7 +207,7 @@ __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const a
 __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set Load3D feature matrix configuration for B matrix
  * @param [in] config Feature matrix configuration structure reference
  * @details Configures feature matrix parameters for Load3D B matrix operations.
@@ -215,7 +215,7 @@ __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, con
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set Leaky ReLU alpha parameter for L0C to GM copy
  * @brief Supports data types: half, float
  * @param [in] config Leaky ReLU alpha value
@@ -227,7 +227,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer (2201 architecture)
  * @param [out] dst Destination buffer in Cube Buffer (L1)
  * @param [in] src Source buffer in Global Memory
@@ -243,7 +243,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE1 (2201 architecture)
  * @param [out] dst Destination buffer in Cube Buffer (L1)
  * @param [in] src Source buffer in Global Memory
@@ -259,7 +259,7 @@ __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE2 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -267,7 +267,7 @@ __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE3 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -275,7 +275,7 @@ __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE4 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -283,7 +283,7 @@ __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE5 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -291,7 +291,7 @@ __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE6 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -299,7 +299,7 @@ __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE7 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -307,7 +307,7 @@ __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src,
 __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with PAD_MODE8 (2201 architecture)
  */
 __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
@@ -316,7 +316,7 @@ __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src,
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with stride (2201 architecture)
  * @brief Supports data types: bfloat16_t, half, float, int32_t, int8_t, uint32_t, uint8_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -338,7 +338,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst, __gm__ uint8_t* src
 
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with ND to NZ format conversion (2201 architecture)
  * @brief Supports data types: int8_t, uint8_t, bfloat16_t, half, int16_t, float, int32_t, uint32_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -617,7 +617,7 @@ __aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst, __gm__ int4b_t* src,
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to L1 buffer with quantization and activation (3510 architecture)
  * @brief Supports dst types: half, int8_t, uint8_t, float, int32_t; src types: float, int32_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -697,7 +697,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void* dst, __cc__ int32_t* src, 
                                     uint8_t relu_pre_mode, bool enable_channel_split, bool enable_nz2nd);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy MX scale data from L1 buffer to L0A buffer (3510 architecture)
  * @param [in] dst Destination address in L0A buffer (uint64_t)
  * @param [in] src Source buffer pointer in L1 buffer (fp8_e8m0_t*)
@@ -713,7 +713,7 @@ __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src
     uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set loop size parameters for GM to L1 copy operations (3510 architecture)
  * @param [in] loop1_size Loop 1 size value
  * @param [in] loop2_size Loop 2 size value
@@ -722,7 +722,7 @@ __aicore__ inline void asc_copy_l12l0a_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src
 __aicore__ inline void asc_set_gm2l1_loop_size(uint64_t loop1_size, uint64_t loop2_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set loop 1 stride parameters for GM to L1 copy (3510 architecture)
  * @param [in] loop1_src_stride Loop 1 source stride value
  * @param [in] loop1_dst_stride Loop 1 destination stride value
@@ -730,7 +730,7 @@ __aicore__ inline void asc_set_gm2l1_loop_size(uint64_t loop1_size, uint64_t loo
 __aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uint64_t loop1_dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set loop 2 stride parameters for GM to L1 copy (3510 architecture)
  * @param [in] loop2_src_stride Loop 2 source stride value
  * @param [in] loop2_dst_stride Loop 2 destination stride value
@@ -738,21 +738,21 @@ __aicore__ inline void asc_set_gm2l1_loop1_stride(uint64_t loop1_src_stride, uin
 __aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Set padding value for GM to L1 copy (3510 architecture)
  * @param [in] pad_val Padding value to use
  */
 __aicore__ inline void asc_set_gm2l1_pad(uint32_t pad_val);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy MX scale data from L1 buffer to L0B buffer (3510 architecture)
  */
 __aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos,
     uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0A buffer with M/K position (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t
  * @param [out] dst Destination buffer in Cube L0A Buffer
@@ -799,7 +799,7 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0A buffer with transpose (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t
  * @details Transposes data while copying from Cube Buffer (L1) to Cube L0A Buffer.
@@ -876,7 +876,7 @@ __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ fp4x2_e1m2_t* dst, __cbu
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0B buffer with M/K position (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t
  * @param [out] dst Destination buffer in Cube L0B Buffer
@@ -961,7 +961,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ fp4x2_e1m2_t* dst, __cbuf__ fp4x2_
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0B buffer with transpose (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t
  * @details Transposes data while copying from Cube Buffer (L1) to Cube L0B Buffer.
@@ -1038,7 +1038,7 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
     uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0B buffer with transposed addressing (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, int4b_t
  * @param [out] dst Destination buffer in Cube L0B Buffer
@@ -1113,7 +1113,7 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int4b_t* dst, __cbuf__ int4b
     uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to Global Memory (3510 architecture)
  * @param [out] dst Destination buffer in Global Memory
  * @param [in] src Source buffer in Cube Buffer (L1)
@@ -1128,7 +1128,7 @@ __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint
                                      uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0C buffer (3510 architecture)
  * @brief Supports dst/src types: bfloat16_t, half, float, int32_t, uint32_t; supports src: float
  * @param [out] dst Destination buffer in Cube L0C Buffer
@@ -1155,7 +1155,7 @@ __aicore__ inline void asc_copy_l12l0c(__cc__ uint32_t* dst, __cbuf__ uint32_t* 
   	                                    uint16_t src_stride, uint16_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to L0A buffer with convolution parameters (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, int16_t, uint16_t
  * @param [out] dst Destination buffer in Cube L0A Buffer
@@ -1343,7 +1343,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ uint16_t* dst, __cbuf__ uint16_t* 
                                        uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h, bool transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with alignment padding (3510 architecture)
  * @brief Supports data types: bfloat16_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -1405,7 +1405,7 @@ __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ uint8_t* dst, __gm__ uint8_
                                              uint8_t right_padding_count, bool data_select_bit, uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with DN to NZ format conversion (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
@@ -1475,7 +1475,7 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ uint8_t* dst, __gm__ uint8_
                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with ND to NZ format conversion (3510 architecture)
  * @brief Supports data types: bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t
  * @details Converts data from ND format in Global Memory to NZ format in Cube Buffer.
@@ -1538,7 +1538,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint8_t* dst, __gm__ uint8_
                                              uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with padding function mode (3510 architecture)
  * @param [out] dst Destination buffer in Cube Buffer (L1)
  * @param [in] src Source buffer in Global Memory
@@ -1552,7 +1552,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint
                                      uint64_t src_stride, uint32_t dst_stride);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to BT buffer (3510 architecture)
  * @brief Supports data types: bfloat16_t, half, float, int32_t
  * @param [out] dst Destination address in BT buffer (uint64_t)
@@ -1577,7 +1577,7 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint1
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to Feature buffer version 2 (3510 architecture)
  */
 __aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void * dst, __cbuf__ void * src, uint16_t burst_count,
@@ -1585,14 +1585,14 @@ __aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void * dst, __cbuf__ void * sr
 __aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to Unified buffer (3510 architecture)
  */
 __aicore__ inline void asc_copy_l12ub(__ubuf__ void * dst_addr, __cbuf__ void * src_addr, bool sub_blockid,
                          uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to L1 buffer with extended parameters (3510 architecture)
  * @param [out] dst Destination buffer in Cube Buffer (L1)
  * @param [in] src Source buffer in Cube L0C Buffer
@@ -1628,7 +1628,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void *dst, __cc__ int32_t *src, 
             bool C0_pad_en, bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Global Memory with quantization and activation (3510 architecture)
  * @brief Supports dst types: bfloat16_t, half, float8_e4m3_t, float8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void; src types: float, int32_t
  * @param [out] dst_addr Destination buffer in Global Memory
@@ -1891,7 +1891,7 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ void *dst_addr, __cc__ int32_t *sr
                         bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from L0C buffer to Unified buffer with quantization and activation (3510 architecture)
  * @brief Supports dst types: bfloat16_t, half, float8_e4m3_t, float8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void; src types: float, int32_t
  * @param [out] dst_addr Destination buffer in Unified Buffer
@@ -2122,7 +2122,7 @@ __aicore__ inline void asc_copy_l0c2ub(__ubuf__ void *dst_addr, __cc__ int32_t *
                             bool C0_pad_en, bool broadcast_en, bool NZ2DN_en);
 
 /*
- * @ingroup CubeCompute
+ * @ingroup CubeDataMove
  * @brief Copy data from Global Memory to L1 buffer with decomposition mode for various data types (3510 architecture)
  * @brief Supports data types: bfloat16_t, float, float8_e4m3_t, float8_e5m2_t, half, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, void
  * @param [out] dst Destination buffer pointer in Cube Buffer (L1)
