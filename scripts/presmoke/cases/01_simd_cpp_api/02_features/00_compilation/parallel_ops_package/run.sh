@@ -17,9 +17,17 @@ source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
 case_build() {
+    local cmake_args=(cmake -S . -B build "-DCMAKE_ASC_ARCHITECTURES=$ARCH")
+    if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then
+        cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")
+    fi
+    if [[ -n "${RUN_MODE_ARG:-}" ]]; then
+        cmake_args+=("$RUN_MODE_ARG")
+    fi
+
     mkdir -p "$BUILD_DIR"
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake --build build -j')
+    (cd "$CASE_DIR" && soc_version=$SOC_VERSION presmoke_run_command "${cmake_args[@]}")
+    (cd "$CASE_DIR" && soc_version=$SOC_VERSION presmoke_run_command cmake --build build -j)
 }
 
 case_run() {
