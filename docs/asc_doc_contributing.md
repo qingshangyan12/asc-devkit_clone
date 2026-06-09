@@ -78,13 +78,39 @@ Ascend C资料遵循《Ascend C资料DFX设计文档》的三个维度要求：�
 
 API参考手册是**接口详情权威源**，每个API页面必须包含以下要素（按顺序）：
 
-**1. 适用版本标注**
+#### 页面结构总览（按出现顺序）
 
-页面顶部标注API适用的NPU架构版本。格式：
+| 序号 | 节标题 | 是否必须 | 说明 |
+|------|--------|----------|------|
+| 1 | 产品支持情况 | ✅ 必须 | 页面最顶部，表格列出每个芯片对每个函数原型的支持情况 |
+| 2 | 功能说明 | ✅ 必须 | 一段总述 + 头文件 + 数学公式 + 图示/示意图 |
+| 3 | 函数原型 | ✅ 必须 | 所有重载原型，按功能分支分组（如支持bias/不支持bias） |
+| 4 | 参数说明 | ✅ 必须 | 主参数表 + 嵌套结构体参数表 |
+| 5 | 返回值说明 | ✅ 可选 | 返回值数据类型说明 |
+| 6 | 数据类型 | ✅ 必须 | 分产品系列列出支持的类型组合表 |
+| 8 | 约束说明 | ✅ 必须 | 全部使用约束，含代码示例和阈值公式 |
+| 9 | 理论性能说明 | 推荐 | 计算公式 + 分产品系列的并行度/参数表 |
+| 10 | 调用示例 | ✅ 必须 | 链接到样例库 + 场景分类表 |
+| 11 | 关联API | ✅ 推荐 | 互斥API + 功能相近API |
+
+---
+
+**1. 产品支持情况**
+
+**格式要求**：表格列出所有产品系列对每个函数原型的支持状态。
+
+**样板写法**（以Mmad为例）：
 
 ```
-[适用版本：全版本] 或 [适用版本：2201+] 或 [适用版本：3510+]
+## 产品支持情况
+
+| 产品 | 是否支持（不传入bias的原型） | 是否支持（传入bias的原型） |
+|------|---------------------------|---------------------------|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | √ |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | √ |
+| Ascend 950PR/Ascend 950DT | √ | √ |
 ```
+
 
 废弃API用醒目标注：
 
@@ -92,15 +118,75 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 > **已废弃**（vX.X起），替代方案见迁移指南
 ```
 
-**2. 前置知识**
+---
 
-页面开头用一段话说明使用此API前需要了解的概念，链接到编程指南对应章节。
+**2. 功能说明**
+
+**格式要求**：3要素必须齐全——总述段落 + 头文件 + 数学表达式。
+
+**样板写法**：
+
+```
+## 功能说明
+
+头文件为: `#include "basic_api/kernel_operator_mm_intf.h"`
+
+Mmad接口是AscendC面向昇腾 AI 芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，
+封装了昇腾 NPU 硬件的矩阵乘加计算能力...
+
+如下图所示，Mmad接口实现昇腾NPU矩阵乘计算能力，其数学表达式为：
+C = A × B + Bias
+[示意图/公式图片]
+
+完整示例请参考：[Mmad示例](链接)
+```
+
+**编写要求**：
+- **头文件**必须写明具体include路径
+- 总述段说明API的定位（面向什么场景、封装了什么硬件能力）
+- 数学公式必须给出（不能只用文字描述）
+- 如有示意图/数据流图，嵌入图片并标注图序号
+- 完整示例链接到样例仓库
+
+---
 
 **3. 函数原型**
 
-给出完整的函数签名，包括模板参数和所有参数。
+**格式要求**：按功能分支分组列出所有重载。每组先给概述，再列模板签名。
 
-**4. 约束与限制**
+**样板写法**：
+
+```cpp
+// 不支持bias
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
+    const LocalTensor<S>& b, const MmadParams& mmadParams)
+
+// 支持bias
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
+    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+
+// 不传入bias（BitMode版本）
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
+    const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+
+// 传入bias（BitMode版本）
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
+    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+```
+
+**编写要求**：
+- 每个模板参数（T, U, S, V...）必须在参数说明中标注其对应关系
+- `__aicore__` 修饰符必须保留
+- 参数按输入顺序列出：先输出（c），再输入（a, b, bias），最后参数结构体
+- 如有BitMode版本（位域联合体参数），与常规版本并列列出
+
+---
+
+**5. 约束说明**
 
 在函数原型之后、参数说明之前，用独立段落列出全部约束：
 
@@ -111,11 +197,11 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 - 使用模式限制
 - API组合限制（互斥、必需搭配）
 
-**5. 参数说明**
+**6. 参数说明**
 
 每个参数说明其含义和取值范围。复杂参数（stride、layout、mask类）必须配图解。判断标准：纯文字需要3句以上才能解释清楚的参数，必须配图。
 
-**6. 代码示例**
+**7. 代码示例**
 
 每个API提供1个最小可运行示例（Minimal），在示例中覆盖常用参数组合：
 
@@ -125,7 +211,7 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 
 示例必须可复制编译运行。片段末尾链接到样例库完整示例。
 
-**7. 关联API**
+**8. 关联API**
 
 说明同一版本内API之间的组合关系：
 
