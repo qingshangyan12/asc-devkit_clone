@@ -33,6 +33,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 ## 函数原型<a name="section620mcpsimp"></a>
 
 <cann-filter npu-type="950,A3,910b,310b,x90,9030">
+
 - 该原型在如下产品型号支持：
 
     <cann-filter npu-type = "950"> Ascend 950PR/Ascend 950DT </cann-filter>
@@ -54,6 +55,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 </cann-filter>
 
 <cann-filter npu-type="310p,910">
+
 - 该原型在如下产品型号支持：
 
     <cann-filter npu-type = "310p"> Atlas 推理系列产品AI Core </cann-filter>
