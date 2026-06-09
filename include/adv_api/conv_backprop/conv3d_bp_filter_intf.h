@@ -23,7 +23,7 @@
 
 #include "../../../impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/conv3d_bp_filter_func.h"
 #include "../../../impl/adv_api/detail/conv_backprop/common/conv3d_bp_util.h"
-#include "common/conv3d_bp_config_base.h"
+#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 
 namespace ConvBackpropApi {
 template <class Config_, template <typename, class> class Impl>

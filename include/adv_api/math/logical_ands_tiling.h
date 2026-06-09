@@ -16,7 +16,7 @@
 #define LIB_MATH_LOGICAL_ANDS_TILING_H
 
 #include "graph/tensor.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*!
  * \brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.

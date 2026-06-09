@@ -19,14 +19,14 @@
 #endif
 #ifndef ASCENDC_TYPE_CONVERSION_UTILS_H
 #define ASCENDC_TYPE_CONVERSION_UTILS_H
-#include "utils/kernel_utils_macros.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_constants.h"
-#include "utils/kernel_utils_mode.h"
-#include "utils/kernel_utils_struct_confusion_pad.h"
-#include "utils/kernel_utils_struct_dma_params.h"
-#include "utils/kernel_utils_struct_norm_sort.h"
-#include "utils/kernel_utils_struct_param.h"
+#include "impl/basic_api/utils/kernel_utils_macros.h"
+#include "impl/basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "impl/basic_api/utils/kernel_utils_constants.h"
+#include "impl/basic_api/utils/kernel_utils_mode.h"
+#include "impl/basic_api/utils/kernel_utils_struct_confusion_pad.h"
+#include "impl/basic_api/utils/kernel_utils_struct_dma_params.h"
+#include "impl/basic_api/utils/kernel_utils_struct_norm_sort.h"
+#include "impl/basic_api/utils/kernel_utils_struct_param.h"
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                        \

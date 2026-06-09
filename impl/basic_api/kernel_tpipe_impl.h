@@ -21,8 +21,8 @@
 #ifndef ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "dav_3510/kernel_tpipe_impl_c310.h"
-#include "dav_3510/kernel_tpipe_impl_c310_vec.h"
+#include "impl/basic_api/dav_3510/kernel_tpipe_impl_c310.h"
+#include "impl/basic_api/dav_3510/kernel_tpipe_impl_c310_vec.h"
 #include "kernel_tquesync_impl.h"
 #else
 #include <type_traits>
@@ -30,9 +30,9 @@
 #include "kernel_tquesync_impl.h"
 #include "kernel_tbufpool_impl.h"
 #include "kernel_tbuf_impl.h"
-#include "kernel_struct_data_copy.h"
+#include "../../include/basic_api/kernel_struct_data_copy.h"
 #include "kernel_utils.h"
-#include "kernel_operator_sys_var_intf.h"
+#include "../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 #if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

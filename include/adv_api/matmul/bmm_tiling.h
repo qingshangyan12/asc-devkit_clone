@@ -18,7 +18,7 @@
 #include "matmul_tiling_base.h"
 #include "matmul_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 
 namespace matmul_tiling {
 /**

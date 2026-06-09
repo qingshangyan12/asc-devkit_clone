@@ -16,10 +16,10 @@
 #ifndef CONV3D_BP_FILTER_FUNC_H
 #define CONV3D_BP_FILTER_FUNC_H
 
-#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
+#include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "../common/conv3d_bp_util.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 
 struct Out2L1ScalarParams {
     // to L1A
@@ -37,7 +37,7 @@ struct Out2L1ScalarParams {
 };
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#include "dav_v220/conv3d_bp_filter_sub_func.h"
+#include "impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/dav_v220/conv3d_bp_filter_sub_func.h"
 #endif
 
 DECLARE_CHECK_IMPL(ConvBackpropFilterFunc, Init);

@@ -21,8 +21,8 @@
 #define ASCENDC_MODULE_OPERATOR_CACHE_IMPL_H
 
 #include <cstdint>
-#include "kernel_log.h"
-#include "kernel_macros.h"
+#include "impl/basic_api/kernel_log.h"
+#include "impl/basic_api/kernel_macros.h"
 
 namespace AscendC {
 

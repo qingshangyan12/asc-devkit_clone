@@ -24,13 +24,13 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "kernel_utils.h"
-#include "utils/kernel_check_vec_util.h"
-#include "utils/kernel_check_vec_select_util.h"
-#include "utils/kernel_check_vec_reduce_util.h"
-#include "utils/kernel_check_vec_data_filling_util.h"
-#include "utils/kernel_check_vec_binary_util.h"
-#include "utils/kernel_check_data_copy_util.h"
-#include "utils/kernel_check_cube_util.h"
+#include "impl/basic_api/utils/kernel_check_vec_util.h"
+#include "impl/basic_api/utils/kernel_check_vec_select_util.h"
+#include "impl/basic_api/utils/kernel_check_vec_reduce_util.h"
+#include "impl/basic_api/utils/kernel_check_vec_data_filling_util.h"
+#include "impl/basic_api/utils/kernel_check_vec_binary_util.h"
+#include "impl/basic_api/utils/kernel_check_data_copy_util.h"
+#include "impl/basic_api/utils/kernel_check_cube_util.h"
 
 #endif
 #endif

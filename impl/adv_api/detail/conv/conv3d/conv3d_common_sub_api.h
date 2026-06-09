@@ -17,8 +17,8 @@
 #define API_CONV3D_COMMON_SUB_API_H
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-    #include "dav_m220/conv3d_sub_api.h"
-    #include "dav_m220/conv3d_pointwise_sub_api.h"
-    #include "dav_m220/conv3d_groupopt_sub_api.h"
+    #include "impl/adv_api/detail/conv/conv3d/dav_m220/conv3d_sub_api.h"
+    #include "impl/adv_api/detail/conv/conv3d/dav_m220/conv3d_pointwise_sub_api.h"
+    #include "impl/adv_api/detail/conv/conv3d/dav_m220/conv3d_groupopt_sub_api.h"
 #endif
 #endif // __API_CONV3D_COMMON_SUB_API_H__
