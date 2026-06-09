@@ -24,6 +24,26 @@
 <td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p889812514202"><a name="p889812514202"></a><a name="p889812514202"></a>x</p>
 </td>
 </tr>
+<tr id="row103361763242"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p1983180181813"><a name="p1983180181813"></a><a name="p1983180181813"></a><span id="ph783112021813"><a name="ph783112021813"></a><a name="ph783112021813"></a><term id="zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p6502164772015"><a name="p6502164772015"></a><a name="p6502164772015"></a>x</p>
+</td>
+</tr>
+<tr id="row18403312418"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p78319051815"><a name="p78319051815"></a><a name="p78319051815"></a><span id="ph163561737112019"><a name="ph163561737112019"></a><a name="ph163561737112019"></a><term id="zh-cn_topic_0000001312391781_term1964153212227"><a name="zh-cn_topic_0000001312391781_term1964153212227"></a><a name="zh-cn_topic_0000001312391781_term1964153212227"></a>Atlas 推理系列产品</term>AI Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p126854610209"><a name="p126854610209"></a><a name="p126854610209"></a>x</p>
+</td>
+</tr>
+<tr id="row242332080"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p10519331187"><a name="p10519331187"></a><a name="p10519331187"></a><span id="ph1335623792013"><a name="ph1335623792013"></a><a name="ph1335623792013"></a><term id="zh-cn_topic_0000001312391781_term1463893615224"><a name="zh-cn_topic_0000001312391781_term1463893615224"></a><a name="zh-cn_topic_0000001312391781_term1463893615224"></a>Atlas 推理系列产品</term>Vector Core</span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p1851933589"><a name="p1851933589"></a><a name="p1851933589"></a>x</p>
+</td>
+</tr>
+<tr id="row17253142120252"><td class="cellrowborder" valign="top" width="57.99999999999999%" headers="mcps1.1.3.1.1 "><p id="p38313021813"><a name="p38313021813"></a><a name="p38313021813"></a><span id="ph58317041819"><a name="ph58317041819"></a><a name="ph58317041819"></a><term id="zh-cn_topic_0000001312391781_term71949488213"><a name="zh-cn_topic_0000001312391781_term71949488213"></a><a name="zh-cn_topic_0000001312391781_term71949488213"></a>Atlas 训练系列产品</term></span></p>
+</td>
+<td class="cellrowborder" align="center" valign="top" width="42%" headers="mcps1.1.3.1.2 "><p id="p395243920186"><a name="p395243920186"></a><a name="p395243920186"></a>x</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -149,8 +169,8 @@ struct NdDmaLoopInfo  {
 <tr id="row2968131992515"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p0180154115816"><a name="p0180154115816"></a><a name="p0180154115816"></a>isNearestValueMode</p>
 </td>
 <td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p4353141191111"><a name="p4353141191111"></a><a name="p4353141191111"></a>表示Padding值填取方式，类型为bool。</p>
-<p id="p17325184218514"><a name="p17325184218514"></a><a name="p17325184218514"></a>True：启用最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充，可参考<a href="#fig10722115123919">图1</a>。</p>
-<p id="p1582110246532"><a name="p1582110246532"></a><a name="p1582110246532"></a>False：启用常数填充方式，即所有Padding值填充为固定值NdDmaParams::constantValue。</p>
+<p id="p17325184218514"><a name="p17325184218514"></a><a name="p17325184218514"></a>True：开启最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充，可参考<a href="#fig10722115123919">图1</a>。</p>
+<p id="p1582110246532"><a name="p1582110246532"></a><a name="p1582110246532"></a>False：开启常数填充方式，即所有Padding值填充为固定值NdDmaParams::constantValue。</p>
 <p id="p10561101719473"><a name="p10561101719473"></a><a name="p10561101719473"></a>当数据类型为b64时，参数isNearestValueMode的值应为False。</p>
 </td>
 </tr>
@@ -241,16 +261,16 @@ struct NdDmaLoopInfo  {
 以下以2维的例子介绍几个典型使用场景。
 
 **图 1**  2D Padding场景<a name="fig10722115123919"></a>  
-![](figures/2D-Padding场景.png "2D-Padding场景")
+![](../../../../figures/2D-Padding场景.png "2D-Padding场景")
 
 **图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
-![](figures/2D-Transpose场景.png "2D-Transpose场景")
+![](../../../../figures/2D-Transpose场景.png "2D-Transpose场景")
 
 **图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
-![](figures/2D-BroadCast场景.png "2D-BroadCast场景")
+![](../../../../figures/2D-BroadCast场景.png "2D-BroadCast场景")
 
 **图 4**  2D Slice场景<a name="fig13061435132915"></a>  
-![](figures/2D-Slice场景.png "2D-Slice场景")
+![](../../../../figures/2D-Slice场景.png "2D-Slice场景")
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
@@ -259,7 +279,7 @@ struct NdDmaLoopInfo  {
 <a name="table14255161718545"></a>
 <table><thead align="left"><tr id="row3255181710543"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p52550177546"><a name="p52550177546"></a><a name="p52550177546"></a>支持型号</p>
 </th>
-<th class="cellrowborder" valign="top" width="23.93%" id="mcps1.2.4.1.2"><p id="p13255191735420"><a name="p13255191735420"></a><a name="p13255191735420"></a>数据通路（通过<a href="TPosition.md#table5376122715308">TPosition</a>表达）</p>
+<th class="cellrowborder" valign="top" width="23.93%" id="mcps1.2.4.1.2"><p id="p13255191735420"><a name="p13255191735420"></a><a name="p13255191735420"></a>数据通路（通过<a href="../../../其他数据类型/TPosition.md#table5376122715308">TPosition</a>表达）</p>
 </th>
 <th class="cellrowborder" valign="top" width="65.03%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
 </th>
@@ -287,88 +307,38 @@ struct NdDmaLoopInfo  {
 
 -   当每层循环的dstStride为升序序列，则不同循环间的地址空间不能交织或者重叠。以一个2D Padding场景为例，loopSrcStride、loopDstStride第二个维度的stride值最小是3，数据3不能落在维度1的循环中。
 
-    ![](figures/nddma_padding_2d.png)
+    ![](../../../../figures/nddma_padding_2d.png)
 
 -   该接口通过NDDMA进行数据搬运，对应的NDDMA Cache大小为32KB，在使用DataCopy接口进行数据搬运前，需要使用NdDmaDci接口刷新缓存，否则多核场景下读写同一块GM地址可能会导致部分核读取数据错误。
 
 ## 调用示例<a name="section122101199486"></a>
 
-```
-
-#include "kernel_operator.h"
-template <typename T>
-class Kernel {
-public:
-    __aicore__ inline Kernel() = default;
-    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, uint32_t count, AscendC::TPipe* pipeIn)
-    {
-        this->pipe = pipeIn;
-        this->count = count;
-        this->xGm.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(x));
-        this->yGm.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(y));
-        this->pipe->InitBuffer(inQueueX, 1, sizeof(T) * count);
-        this->pipe->InitBuffer(outQueueY, 1, sizeof(T) * count);
-    }
-    // 使用nddma搬运二维数据
-    __aicore__ inline void CopyIn()
-    {
-        AscendC::LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
-        AscendC::Duplicate<T>(xLocal, 0, count);
-        AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}};
-        AscendC::NdDmaParams<T, 2> params = {loopInfo, 0};
-        // 刷新cache
-        AscendC::NdDmaDci();
-        // 使用默认参数即可
-        static constexpr AscendC::NdDmaConfig config;
-        AscendC::DataCopy<T, 2, config>(xLocal, xGm, params);
-        inQueueX.EnQue<T>(xLocal);
-    }
-    __aicore__ inline void Compute()
-    {
-        AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
-        AscendC::LocalTensor<T> yLocal = outQueueY.AllocTensor<T>();
-        AscendC::DataCopy(yLocal, xLocal, count);
-        outQueueY.EnQue<T>(yLocal);
-    }
-    __aicore__ inline void CopyOut()
-    {
-        AscendC::LocalTensor<T> yLocal = outQueueY.DeQue<T>();
-        AscendC::DataCopy(yGm, yLocal, count);
-    }
-    __aicore__ inline void Process()
-    {
-        CopyIn();
-        Compute();
-        CopyOut();
-    }
-private:
-    AscendC::TPipe* pipe = nullptr;
-    uint32_t count;
-    AscendC::GlobalTensor<T> xGm;
-    AscendC::GlobalTensor<T> yGm;
-    AscendC::TQue<AscendC::TPosition::VECIN, 1> inQueueX;
-    AscendC::TQue<AscendC::TPosition::VECOUT, 1> outQueueY;
-};
-extern "C" __global__ __aicore__ void kernel_nddma(GM_ADDR x, GM_ADDR y)
-{
-    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
-    AscendC::TPipe pipe;
-    Kernel<float> kernel;
-    kernel.Init(x, y, 1024, &pipe);
-    kernel.Process();
-}
-```
-
-结果示例：
+完整算子样例参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
 
 ```
-输入数据(srcGlobal): [
-[1 2  3  4  5  6  7  8]
-[9 10 11 12 13 14 15 16 0 0 ...]]
-输出数据(dstGlobal):[
-[0 0 0 0 0  0  0  0  0  0  0  0 0 0 0 0]
-[0 0 0 1 2  3  4  5  6  7  8  0 0 0 0 0]
-[0 0 0 9 10 11 12 13 14 15 16 0 0 0 0 0]
-[0 0 0 0 0  0  0  0  0  0  0  0 0 0 0 0 0 0 ...]]
+// T：搬运数据的类型
+// xGm：保存DataCopy搬入数据
+// xLocal：保存DataCopy搬出数据
+
+// 2D Padding场景
+// xGmShape：[2, 8]，搬运8列2行数据，左Padding 3，上Padding 1，右Padding 5，下Padding 1，xLocalShape：[4, 16]
+AscendC::NdDmaLoopInfo<2> loopInfo{{1, 8}, {1, 16}, {8, 2}, {3, 1}, {5, 1}};
+AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
+AscendC::NdDmaDci();  // 刷新cache
+static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
+```
+
+结果示例如下：
+
+```
+输入数据（xGm）:
+[[ 1.  2.  3.  4.  5.  6.  7.  8.]
+ [ 9. 10. 11. 12. 13. 14. 15. 16.]]
+搬运至Local的数据（xLocal）:
+[[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  1.  2.  3.  4.  5.  6.  7.  8.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  9. 10. 11. 12. 13. 14. 15. 16.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]]
 ```
 
