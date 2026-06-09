@@ -39,13 +39,14 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
-|dst|输出|目的操作数，类型为GlobalTensor，存储位置为Global Memory，地址需要1B对齐。|
-|src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer，地址需要32B对齐。|
-|count|输入|参与搬运的元素个数。count \* sizeof(T)需要32B对齐， 若未对齐，则搬运量会向下取整到32B对齐。|
+|dst|输出|目的操作数，类型为GlobalTensor，存储位置为Global Memory，地址需要1字节对齐。|
+|src|输入|源操作数，类型为LocalTensor，存储位置为L1 Buffer，地址需要32字节对齐。|
+|count|输入|参与搬运的元素个数。count \* sizeof(T)需要32字节对齐， 若未对齐，则搬运量会向下取整到32字节对齐。|
 
 以half数据类型为例，源操作数的shape为1 \* 128。当count = 128时，[图1](#zh-cn_topic_0000002540198372_fig826614454819)将源操作数中128个元素连续搬运至目的操作数。
 
 **图 1**  连续搬运示意图<a id="zh-cn_topic_0000002540198372_fig826614454819"></a>  
+
 ![](../../../../../figures/L12GM_Continuous_Transporting.png)
 
 ## 数据类型<a id="zh-cn_topic_0000002540198372_section4219135304818"></a>
@@ -54,13 +55,17 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 <cann-filter npu_type = "A3,910b">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：
+
+int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 </cann-filter>
 
 <cann-filter npu_type = "x90,9030">
 
-针对Kirin X90、Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double
+针对Kirin X90、Kirin 9030，支持数据类型为：
+
+int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 </cann-filter>
 
@@ -70,23 +75,21 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 约束说明<a name="zh-cn_topic_0000002540198372_section2045914466492"></a>
 
-- 位于L1 Buffer的源地址必须32B对齐，位于Global Memory的目的地址必须1B对齐。
-- 调用连续搬运接口时，count \* sizeof\(T\)需要32B对齐， 若未对齐，则搬运量会向下取整到32B对齐。
+- 位于L1 Buffer的源地址必须32字节对齐，位于Global Memory的目的地址必须1字节对齐。
+- 调用连续搬运接口时，count \* sizeof\(T\)需要32字节对齐， 若未对齐，则搬运量会向下取整到32字节对齐。
 
 <cann-filter npu_type = "A3,910b">
 
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品：
 
-    - 在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过npu-smi info -t topo命令查询HCCS物理链路。
+    在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过npu-smi info -t topo命令查询HCCS物理链路。
 
 </cann-filter>
 
 ## 调用示例<a name="zh-cn_topic_0000002540198372_section088124295117"></a>
 
-- Local Memory -\> Global Memory连续数据搬运
-
-    ```cpp
-    // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
-    // 使用传入count参数的搬运接口，完成连续搬运
-    AscendC::DataCopy(dstGlobal, dstLocal, 512);
-    ```
+```cpp
+// dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor
+// 使用传入count参数的搬运接口，完成连续搬运
+AscendC::DataCopy(dstGlobal, dstLocal, 512);
+```

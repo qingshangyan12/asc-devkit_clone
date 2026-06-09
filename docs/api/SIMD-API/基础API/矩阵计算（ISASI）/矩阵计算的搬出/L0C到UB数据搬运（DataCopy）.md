@@ -1,4 +1,4 @@
-# L0C到UB数据搬运（DataCopy、仅Atlas推理系列产品AI Core支持）<a name="ZH-CN_TOPIC_0000002382867725"></a>
+# L0C Buffer到UB数据搬运（DataCopy、仅Atlas推理系列产品AI Core支持）<a name="ZH-CN_TOPIC_0000002382867725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -59,22 +59,22 @@
 
 |参数名称|含义|
 |----------|----------|
-|blockMode|数据搬移基本分形，BlockMode枚举类型，支持以下配置：<br>&bull; BLOCK_MODE_NORMAL：表示传输单位为32B。当前暂不支持。<br>&bull; BLOCK_MODE_MATRIX：表示传输单位为一个16 \* 16的cube分形。<br>&bull; BLOCK_MODE_VECTOR：表示传输单位为一个1 \* 16的cube分形。<br>&bull; BLOCK_MODE_SMALL_CHANNEL：表示传输单位为一个16 \* 4的cube分形。当前暂不支持。<br>&bull; BLOCK_MODE_DEPTHWISE：表示传输单位为一个16 \* 16的cube分形，提供随路channel-split功能。当前暂不支持。<br>每种模式下对应的blockLen等参数单位见[表4](#table13396838183618)。|
-|deqScale|随路精度转换辅助参数，即量化模式，支持的量化模式取值和对应的数据类型等信息请参考[表5](#table168091348673)。其中DEQ、DEQ8、DEQ16模式，需要传入deqValue量化系数，设置deqValue的对应比特位；VDEQ、VDEQ8、VDEQ16模式，需要传入包含16个元素（deqValue）的量化参数向量，设置deqTensorAddr的对应比特位，同时保证DEQADDR中存储的反量化参数向量的每个元素（deqValue）都符合预期和使用限制。<br>VDEQ模式下，反量化参数向量长度为32Byte（16个half元素）；其他模式下，反量化参数向量长度为128Byte（16个64bit的反量化元素）。|
+|blockMode|数据搬移基本分形，BlockMode枚举类型，支持以下配置：<br>&bull; BLOCK_MODE_NORMAL：表示传输单位为32字节。当前暂不支持。<br>&bull; BLOCK_MODE_MATRIX：表示传输单位为一个16 \* 16的cube分形。<br>&bull; BLOCK_MODE_VECTOR：表示传输单位为一个1 \* 16的cube分形。<br>&bull; BLOCK_MODE_SMALL_CHANNEL：表示传输单位为一个16 \* 4的cube分形。当前暂不支持。<br>&bull; BLOCK_MODE_DEPTHWISE：表示传输单位为一个16 \* 16的cube分形，提供随路channel-split功能。当前暂不支持。<br>每种模式下对应的blockLen等参数单位见[表4](#table13396838183618)。|
+|deqScale|随路精度转换辅助参数，即量化模式，支持的量化模式取值和对应的数据类型等信息请参考[表5](#table168091348673)。其中DEQ、DEQ8、DEQ16模式，需要传入deqValue量化系数，设置deqValue的对应比特位；VDEQ、VDEQ8、VDEQ16模式，需要传入包含16个元素（deqValue）的量化参数向量，设置deqTensorAddr的对应比特位，同时保证DEQADDR中存储的反量化参数向量的每个元素（deqValue）都符合预期和使用限制。<br>VDEQ模式下，反量化参数向量长度为32字节（16个half元素）；其他模式下，反量化参数向量长度为128字节（16个64bit的反量化元素）。|
 |deqValue|量化系数。 deqValue的配置方式请参考[deqValue配置方式](#table54451538192912)。|
-|deqTensorAddr|UB中存储反量化参数向量的起始地址。deqScale为VDEQ/VDEQ8/VDEQ16模式时，需要传入反量化运算时的参数向量的地址。该地址要满足32B对齐。<br>对于VDEQ模式，该地址指向32B大小的反量化参数向量，其中每个元素大小为16bit（half）。<br>对于VDEQ8、VDEQ16模式，反量化参数向量中的每个元素大小都为64bit。搬运时会搬运blockCount个连续传输数据块，每个数据块的长度为blockLen。每个数据块对应一个128Byte的反量化向量。对于同一个数据块，反量化参数向量中的16个元素会被连续复用。不同的数据块，对应不同的反量化参数向量，地址会相应的偏移128B。例如：假设对应起始地址为A，第一个数据块的128B反量化参数向量起始地址为A，第二个数据块的128B反量化参数向量起始地址为A + 128B。<br>同一个反量化参数向量的每一个元素的MCB标志位必须一致。|
-|sidStoreMode|用于deqScale为DEQ8/VDEQ8时配置存储模式，控制反量化结果如何存储在dst地址中。配置效果参考[sidStoreMode配置示意图](#fig5416115192414)。<br>&bull; 0：dst的数据存储在每个DataBlock的前半段，即每32B的高16B<br>&bull; 1：dst的数据存储在每个DataBlock的后半段，即每32B的低16B<br>&bull; 2：dst的数据存储在完整的DataBlock中，即整个32B|
-|isRelu|配置是否可以随路做线性整流操作。配置deqValue的情况下，如果该参数被置为true，那么会刷新deqValue的Relu标志位为1；如果被置为false，则不会做修改。配置deqTensorAddr的情况下，反量化参数向量元素中的Relu标志位不生效，以isRelu为准。<br>仅配置isRelu，不配置量化参数，即deqValue配置为DEQ_NONE场景，支持src和dst的数据类型组合如下：{half，half}，{float，float}，{int32_t，int32_t}，{float，half}；同时配置isRelu和量化参数的场景，支持的数据类型组合参考[表5](#table168091348673)。|
+|deqTensorAddr|UB中存储反量化参数向量的起始地址。deqScale为VDEQ/VDEQ8/VDEQ16模式时，需要传入反量化运算时的参数向量的地址。该地址要满足32字节对齐。<br>对于VDEQ模式，该地址指向32字节大小的反量化参数向量，其中每个元素大小为16bit（half）。<br>对于VDEQ8、VDEQ16模式，反量化参数向量中的每个元素大小都为64bit。搬运时会搬运blockCount个连续传输数据块，每个数据块的长度为blockLen。每个数据块对应一个128字节的反量化向量。对于同一个数据块，反量化参数向量中的16个元素会被连续复用。不同的数据块，对应不同的反量化参数向量，地址会相应的偏移12。例如：假设对应起始地址为A，第一个数据块的12反量化参数向量起始地址为A，第二个数据块的12反量化参数向量起始地址为A + 12。<br>同一个反量化参数向量的每一个元素的MCB标志位必须一致。|
+|sidStoreMode|用于deqScale为DEQ8/VDEQ8时配置存储模式，控制反量化结果如何存储在dst地址中。配置效果参考[sidStoreMode配置示意图](#fig5416115192414)。<br>&bull; 0：dst的数据存储在每个DataBlock的前半段，即每32字节的高16字节<br>&bull; 1：dst的数据存储在每个DataBlock的后半段，即每32字节的低16字节<br>&bull; 2：dst的数据存储在完整的DataBlock中，即整个32字节|
+|isRelu|配置是否可以随路做线性整流操作。配置deqValue的情况下，如果该参数被置为true，那么会刷新deqValue的ReLU标志位为1；如果被置为false，则不会做修改。配置deqTensorAddr的情况下，反量化参数向量元素中的ReLU标志位不生效，以isRelu为准。<br>仅配置isRelu，不配置量化参数，即deqValue配置为DEQ_NONE场景，支持src和dst的数据类型组合如下：{half，half}，{float，float}，{int32_t，int32_t}，{float，half}；同时配置isRelu和量化参数的场景，支持的数据类型组合参考[表5](#table168091348673)。|
 |padMode|预留参数，当前暂不支持。|
 
 **表 4**  不同blockMode对应的参数单位<a id="table13396838183618"></a>
 
 |blockMode|src|dst|数据类型|blockLen单位|srcStride单位|dstStride单位|
 |----------|----------|----------|----------|----------|----------|----------|
-|BLOCK_MODE_MATRIX|CO1|CO2|half、int16_t、uint16_t|512B|512B|32B|
-|BLOCK_MODE_MATRIX|CO1|CO2|float、int32_t、uint32_t|1024B|1024B|32B|
-|BLOCK_MODE_VECTOR|CO1|CO2|half、int16_t、uint16_t|32B|512B|32B|
-|BLOCK_MODE_VECTOR|CO1|CO2|float、int32_t、uint32_t|64B|1024B|32B|
+|BLOCK_MODE_MATRIX|CO1|CO2|half、int16_t、uint16_t|512B|512B|32字节|
+|BLOCK_MODE_MATRIX|CO1|CO2|float、int32_t、uint32_t|102|102|32字节|
+|BLOCK_MODE_VECTOR|CO1|CO2|half、int16_t、uint16_t|32字节|512B|32字节|
+|BLOCK_MODE_VECTOR|CO1|CO2|float、int32_t、uint32_t|6|102|32字节|
 
 **表 5**  deqScale参数列表<a id="table168091348673"></a>
 
@@ -82,15 +82,15 @@
 |----------|----------|----------|----------|
 |DEQ|int32_t|half|deqValue中的变量M|
 |DEQ|half|half|deqValue中的变量M|
-|DEQ8|int32_t|int8_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Offset<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Sign标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|DEQ8|int32_t|uint8_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Offset<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Sign标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|DEQ16|int32_t|half|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|DEQ16|int32_t|int16_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|VDEQ|int32_t|half|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|VDEQ8|int32_t|int8_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|VDEQ8|int32_t|uint8_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|VDEQ16|int32_t|half|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
-|VDEQ16|int32_t|int16_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Relu标志位<br>&bull; isRelu|
+|DEQ8|int32_t|int8_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Offset<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Sign标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|DEQ8|int32_t|uint8_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Offset<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; Sign标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|DEQ16|int32_t|half|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量M<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; MCB标志位<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|DEQ16|int32_t|int16_t|&bull; deqValue<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; 变量N<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|VDEQ|int32_t|half|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|VDEQ8|int32_t|int8_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|VDEQ8|int32_t|uint8_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|VDEQ16|int32_t|half|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
+|VDEQ16|int32_t|int16_t|deqTensorAddr地址存储的反量化参数向量中的元素deqValue支持配置的参数分别对应DEQ/DEQ8/DEQ16的说明。<br>&bull; deqTensorAddr<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; DEQADDR<br>&nbsp;&nbsp;&nbsp;&nbsp;&bull; ReLU标志位<br>&bull; isRelu|
 
 **表 6**  deqValue配置方式<a id="table54451538192912"></a>
 
@@ -101,11 +101,12 @@
 |DEQ8、VDEQ8、DEQ16、VDEQ16|36|MCB标志位|Mode Control Bit。如果置为0，输入的int32_t会被直接转换为float。如果置为1，输入的int32_t会先右移N比特位，转变成int16_t，然后转换为float。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|37~45|Offset|9bit的整型数据，在进行反量化src * M的计算结果后与Offset进行相加。仅在DEQ8、VDEQ8模式中会用到。如果不使用offset，请置为0。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|46|Sign标志位|如果置为1，表明反量化结果是signed(int8)；如果置为0，表明反量化结果是unsigned(uint8)。仅在DEQ8、VDEQ8模式中会用到。|
-|DEQ8、VDEQ8、DEQ16、VDEQ16|47|Relu标志位|如果置为1，对最终结果进行RELU计算；如果置为0，不进行额外计算。<br>&bull; 对于int32_t->int8_t，配置RELU时，offset必须配置成-128；<br>&bull; 对于int32_t->uint8_t，配置RELU时，offset必须配置成0。|
+|DEQ8、VDEQ8、DEQ16、VDEQ16|47|ReLU标志位|如果置为1，对最终结果进行ReLU计算；如果置为0，不进行额外计算。<br>&bull; 对于int32_t->int8_t，配置ReLU时，offset必须配置成-128；<br>&bull; 对于int32_t->uint8_t，配置ReLU时，offset必须配置成0。|
 |DEQ8、VDEQ8、DEQ16、VDEQ16|48~63|-|预留|
 |DEQ、VDEQ|0 ~ 15|M|这16位数被视为half，作为反量化计算需要乘的值。|
 
 **图 1**  sidStoreMode配置示意图<a id="fig5416115192414"></a>  
+
 ![](../../../../figures/sidStoreMode配置示意图.png "sidStoreMode配置示意图")
 
 ## 数据类型<a id="section8664371012"></a>
@@ -137,8 +138,8 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 开发者需要保证DataCopyEnhancedParams中的isRelu参数配置和量化系数deqValue/量化参数向量deqTensorAddr的RELU标志位配置一致：都开启或都不开启。
-- 如果CO1-\>CO2有随路精度转换，通路为UB的操作数的blockLen单位需要减半。
+- 开发者需要保证DataCopyEnhancedParams中的isRelu参数配置和量化系数deqValue/量化参数向量deqTensorAddr的ReLU标志位配置一致：都开启或都不开启。
+- 如果有随路精度转换，操作数的blockLen单位需要减半。
 
 ## 调用示例<a name="section1491211256313"></a>
 
@@ -158,7 +159,7 @@
     enhancedParams.deqValue = 0;
     enhancedParams.deqTensorAddr = 0;
     enhancedParams.sidStoreMode = 0; // 仅deqScale为DEQ8/VDEQ8时生效
-    enhancedParams.isRelu = false; // 不支持Relu
+    enhancedParams.isRelu = false; // 不支持ReLU
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 功能等同基础数据搬运
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
@@ -180,15 +181,8 @@
     enhancedParams.deqValue = 70369809530880; // float 1 = uint64_t 1065353216, when s322s8 use 1065353216 | (1 << 46)
     enhancedParams.deqTensorAddr = 0; // 仅VDEQ模式下使用
     enhancedParams.sidStoreMode = 2; // dstLocal的数据存储在完整的DataBlock中
-    enhancedParams.isRelu = false; // 不支持Relu
+    enhancedParams.isRelu = false; // 不支持ReLU
     enhancedParams.padMode = pad_t::PAD_NONE; // 预留参数
     // 此时dstLocal = srcLocal
     AscendC::DataCopy(dstLocal, srcLocal, intriParams, enhancedParams);
-    ```
-
-- 结果示例：
-
-    ```text
-    输入数据srcLocal ：[1 2 3 ... 512]
-    输出数据dstLocal ：[1 2 3 ... 512]
     ```

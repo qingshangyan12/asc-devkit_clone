@@ -45,7 +45,7 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 |参数名称|输入/输出|含义|
 |----------|----------|----------|
 |ndNum|输入|nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)）|
-|srcNdStride|输入|以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围 ∈[1, 512]， 单位1024B。|
+|srcNdStride|输入|以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围 ∈[1, 512]， 单位102。|
 |dstNdStride|输入|目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 65535]，单位为element元素。|
 
 </cann-filter>
