@@ -30,7 +30,7 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
-2. **_C0**：直接指定C0维度的元素个数，数据类型为[Int](../../../../Utils-API/C++标准库/类型特性/Int.md)。_C0是Std::Int<C0>的简写形式。
+2. **_C0**：直接指定C0维度的元素个数，数据类型为[Int](../../../../Utils-API/CPP标准库/类型特性/Int.md)。_C0是Std::Int<C0>的简写形式。
    ```cpp
    MakeFrameLayout<NZLayoutPtn, _16>(m, n)
    ```
@@ -47,7 +47,7 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
        static constexpr auto C0_SIZE = Std::Int<16>{};
    };
 
-   MakeFrameLayout<NzLayoutPtn, MyLayoutTrait>(m, n)
+   MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
    ```
 
 ## 参数说明
