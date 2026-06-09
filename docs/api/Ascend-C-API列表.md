@@ -15,7 +15,7 @@ Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到
 </th>
 </tr>
 </thead>
-<tbody><tr id="row1214610131613"><td class="cellrowborder" rowspan="3" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p121462071615"><a name="p121462071615"></a><a name="p121462071615"></a><a href="SIMD-API/SIMD-API列表.md">SIMD API</a></p>
+<tbody><tr id="row1214610131613"><td class="cellrowborder" rowspan="3" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p121462071615"><a name="p121462071615"></a><a name="p121462071615"></a><a href="SIMD-API/SIMD-C-API.md">SIMD API</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.2 "><p id="p111469010160"><a name="p111469010160"></a><a name="p111469010160"></a><a href="SIMD-API/基础API/基础API.md">基础API</a></p>
 </td>
@@ -36,17 +36,17 @@ Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到
 </td>
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.2 "><p id="p10146200151616"><a name="p10146200151616"></a><a name="p10146200151616"></a>-</p>
 </td>
-<td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.3 "><p id="p61468071616"><a name="p61468071616"></a><a name="p61468071616"></a>对标业界，提供单指令多线程API。以单条指令多个线程的形式来实现并行计算。SIMT编程主要用于向量计算，特别适合处理离散访问、复杂控制逻辑等场景。SIMT API支持两种编程模型：SIMT编程、SIMD与SIMT混合编程，具体支持的API请分别参见<a href="SIMT-API/SIMT编程简介/API列表.md">SIMT编程API列表</a>、<a href="SIMT-API/SIMD与SIMT混合编程简介/API列表-148.md">SIMD与SIMT混合编程API列表</a>。</p>
+<td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.3 "><p id="p61468071616"><a name="p61468071616"></a><a name="p61468071616"></a>对标业界，提供单指令多线程API。以单条指令多个线程的形式来实现并行计算。SIMT编程主要用于向量计算，特别适合处理离散访问、复杂控制逻辑等场景。SIMT API支持两种编程模型：SIMT编程、SIMD与SIMT混合编程，具体支持的API请分别参见<a href="SIMT-API/SIMT编程简介/C-API.md">SIMT编程API列表</a>、<a href="SIMT-API/SIMD与SIMT混合编程简介/API列表-148.md">SIMD与SIMT混合编程API列表</a>。</p>
 </td>
 </tr>
-<tr id="row191468061612"><td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p11465091612"><a name="p11465091612"></a><a name="p11465091612"></a><a href="AI-CPU-API/AI-CPU-API列表.md">AI CPU API</a></p>
+<tr id="row191468061612"><td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p11465091612"><a name="p11465091612"></a><a name="p11465091612"></a><a href="AI-CPU-API/AI-CPU-C-API.md">AI CPU API</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.2 "><p id="p61466011169"><a name="p61466011169"></a><a name="p61466011169"></a>-</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.3 "><p id="p1514617018163"><a name="p1514617018163"></a><a name="p1514617018163"></a>通常作为上述API的补充，主要承担非矩阵类、逻辑比较复杂的分支密集型计算。</p>
 </td>
 </tr>
-<tr id="row7146007164"><td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p1314617019165"><a name="p1314617019165"></a><a name="p1314617019165"></a><a href="Utils-API/Utils-API列表.md">Utils API</a></p>
+<tr id="row7146007164"><td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.1 "><p id="p1314617019165"><a name="p1314617019165"></a><a name="p1314617019165"></a><a href="Utils-API/Utils-C-API.md">Utils API</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.2 "><p id="p114710121617"><a name="p114710121617"></a><a name="p114710121617"></a>-</p>
 </td>

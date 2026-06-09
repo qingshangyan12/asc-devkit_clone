@@ -1062,42 +1062,42 @@
 </tr>
 <tr id="row154051221164915"><td class="cellrowborder" rowspan="26" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p118921556154813"><a name="p118921556154813"></a><a name="p118921556154813"></a>矩阵计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p1255212302496"><a name="p1255212302496"></a><a name="p1255212302496"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md">Mmad</a></p>
+<td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p1255212302496"><a name="p1255212302496"></a><a name="p1255212302496"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/Mmad.md">Mmad</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.99%" headers="mcps1.2.4.1.3 "><p id="p24861371569"><a name="p24861371569"></a><a name="p24861371569"></a>完成矩阵乘加操作。</p>
 </td>
 </tr>
-<tr id="row12765526165715"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1176511267573"><a name="p1176511267573"></a><a name="p1176511267573"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/MmadWithSparse.md">MmadWithSparse</a></p>
+<tr id="row12765526165715"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1176511267573"><a name="p1176511267573"></a><a name="p1176511267573"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/MmadWithSparse.md">MmadWithSparse</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p47651826105712"><a name="p47651826105712"></a><a name="p47651826105712"></a>完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵， 右矩阵B为稠密矩阵 。</p>
 </td>
 </tr>
-<tr id="row0435522154918"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p8552203094910"><a name="p8552203094910"></a><a name="p8552203094910"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32Mode.md">SetHF32Mode</a></p>
+<tr id="row0435522154918"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p8552203094910"><a name="p8552203094910"></a><a name="p8552203094910"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32Mode.md">SetHF32Mode</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p64161631122120"><a name="p64161631122120"></a><a name="p64161631122120"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32TransMode.md">SetHF32TransMode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMRowMajor.md">SetMMRowMajor</a>以及<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMColumnMajor.md">SetMMColumnMajor</a>一样，都用于设置寄存器的值。SetHF32Mode接口用于设置MMAD的HF32模式。</p>
-</td>
-</tr>
-<tr id="row1858982214918"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p165526308490"><a name="p165526308490"></a><a name="p165526308490"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32TransMode.md">SetHF32TransMode</a></p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1478477185019"><a name="p1478477185019"></a><a name="p1478477185019"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMRowMajor.md">SetMMRowMajor</a>以及<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMColumnMajor.md">SetMMColumnMajor</a>一样，都用于设置寄存器的值。SetHF32TransMode用于设置MMAD的HF32取整模式，仅在MMAD的HF32模式生效时有效。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p64161631122120"><a name="p64161631122120"></a><a name="p64161631122120"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32TransMode.md">SetHF32TransMode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMRowMajor.md">SetMMRowMajor</a>以及<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMColumnMajor.md">SetMMColumnMajor</a>一样，都用于设置寄存器的值。SetHF32Mode接口用于设置MMAD的HF32模式。</p>
 </td>
 </tr>
-<tr id="row1374212216499"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p19945205916295"><a name="p19945205916295"></a><a name="p19945205916295"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMRowMajor.md">SetMMRowMajor</a></p>
+<tr id="row1858982214918"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p165526308490"><a name="p165526308490"></a><a name="p165526308490"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32TransMode.md">SetHF32TransMode</a></p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p87421422144917"><a name="p87421422144917"></a><a name="p87421422144917"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32TransMode.md">SetHF32TransMode</a>一样，都用于设置寄存器的值，本接口用于设置MMAD计算时优先通过N方向。</p>
-</td>
-</tr>
-<tr id="row9217141164613"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p14218134119466"><a name="p14218134119466"></a><a name="p14218134119466"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/SetMMColumnMajor.md">SetMMColumnMajor</a></p>
-</td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p18317459134619"><a name="p18317459134619"></a><a name="p18317459134619"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算/SetHF32TransMode.md">SetHF32TransMode</a>一样，都用于设置寄存器的值，本接口用于设置MMAD计算时优先通过M方向。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1478477185019"><a name="p1478477185019"></a><a name="p1478477185019"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMRowMajor.md">SetMMRowMajor</a>以及<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMColumnMajor.md">SetMMColumnMajor</a>一样，都用于设置寄存器的值。SetHF32TransMode用于设置MMAD的HF32取整模式，仅在MMAD的HF32模式生效时有效。</p>
 </td>
 </tr>
-<tr id="row19411232491"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p20552113020499"><a name="p20552113020499"></a><a name="p20552113020499"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/Conv2D（废弃）.md">Conv2D</a></p>
+<tr id="row1374212216499"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p19945205916295"><a name="p19945205916295"></a><a name="p19945205916295"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMRowMajor.md">SetMMRowMajor</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p87421422144917"><a name="p87421422144917"></a><a name="p87421422144917"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32TransMode.md">SetHF32TransMode</a>一样，都用于设置寄存器的值，本接口用于设置MMAD计算时优先通过N方向。</p>
+</td>
+</tr>
+<tr id="row9217141164613"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p14218134119466"><a name="p14218134119466"></a><a name="p14218134119466"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetMMColumnMajor.md">SetMMColumnMajor</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p18317459134619"><a name="p18317459134619"></a><a name="p18317459134619"></a>此接口同<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32Mode.md">SetHF32Mode</a>、<a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/SetHF32TransMode.md">SetHF32TransMode</a>一样，都用于设置寄存器的值，本接口用于设置MMAD计算时优先通过M方向。</p>
+</td>
+</tr>
+<tr id="row19411232491"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p20552113020499"><a name="p20552113020499"></a><a name="p20552113020499"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/Conv2D（废弃）.md">Conv2D</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p10261152153414"><a name="p10261152153414"></a><a name="p10261152153414"></a>计算给定输入张量和权重张量的2-D卷积，输出结果张量。Conv2d卷积层多用于图像识别，使用过滤器提取图像中的特征。</p>
 </td>
 </tr>
-<tr id="row144112573483"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p9552930204920"><a name="p9552930204920"></a><a name="p9552930204920"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）.md">Gemm</a></p>
+<tr id="row144112573483"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p9552930204920"><a name="p9552930204920"></a><a name="p9552930204920"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算（ISASI）/Gemm（废弃）.md">Gemm</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p14116577483"><a name="p14116577483"></a><a name="p14116577483"></a>根据输入的切分规则，将给定的两个输入张量做矩阵乘，输出至结果张量。将A和B两个输入矩阵乘法在一起，得到一个输出矩阵C。</p>
 </td>
@@ -1990,7 +1990,7 @@
 </th>
 </tr>
 </thead>
-<tbody><tr id="row2635748192012"><td class="cellrowborder" valign="top" width="37.669999999999995%" headers="mcps1.2.3.1.1 "><p id="p10635248122013"><a name="p10635248122013"></a><a name="p10635248122013"></a><a href="高阶API/矩阵计算/Matmul-Kernel侧接口/Matmul-Kernel侧接口.md">Matmul</a></p>
+<tbody><tr id="row2635748192012"><td class="cellrowborder" valign="top" width="37.669999999999995%" headers="mcps1.2.3.1.1 "><p id="p10635248122013"><a name="p10635248122013"></a><a name="p10635248122013"></a><a href="高阶API/矩阵计算（ISASI）/Matmul-Kernel侧接口/Matmul-Kernel侧接口.md">Matmul</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="62.33%" headers="mcps1.2.3.1.2 "><p id="p1563517485201"><a name="p1563517485201"></a><a name="p1563517485201"></a>Matmul矩阵乘法的运算。</p>
 </td>

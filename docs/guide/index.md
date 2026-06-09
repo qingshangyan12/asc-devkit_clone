@@ -283,12 +283,12 @@
                 -   [连续非对齐场景优化](算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/连续非对齐场景优化.md)
                 -   [VF融合优化](算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)
 
-        -   [矩阵计算](算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算.md)
-            -   [通过BT Buffer实现高效的bias计算](算子实践参考/SIMD算子性能优化/矩阵计算/通过BT-Buffer实现高效的bias计算.md)
-            -   [通过FP Buffer存放量化参数实现高效随路量化](算子实践参考/SIMD算子性能优化/矩阵计算/通过FP-Buffer存放量化参数实现高效随路量化.md)
-            -   [通过L0C Buffer数据暂存实现高效的矩阵乘结果累加](算子实践参考/SIMD算子性能优化/矩阵计算/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加.md)
-            -   [较小矩阵长驻L1 Buffer，仅分次搬运较大矩阵](算子实践参考/SIMD算子性能优化/矩阵计算/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵.md)
-            -   [Matmul开启AtomicAdd选项](算子实践参考/SIMD算子性能优化/矩阵计算/Matmul使能AtomicAdd选项.md)
+        -   [矩阵计算](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/通过BT-Buffer实现高效的bias计算.md)
+            -   [通过BT Buffer实现高效的bias计算](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/通过BT-Buffer实现高效的bias计算.md)
+            -   [通过FP Buffer存放量化参数实现高效随路量化](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/通过FP-Buffer存放量化参数实现高效随路量化.md)
+            -   [通过L0C Buffer数据暂存实现高效的矩阵乘结果累加](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/通过L0C-Buffer数据暂存实现高效的矩阵乘结果累加.md)
+            -   [较小矩阵长驻L1 Buffer，仅分次搬运较大矩阵](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/较小矩阵长驻L1-Buffer-仅分次搬运较大矩阵.md)
+            -   [Matmul开启AtomicAdd选项](算子实践参考/SIMD算子性能优化/矩阵计算（ISASI）/Matmul使能AtomicAdd选项.md)
 
     -   [SIMD与SIMT混合算子性能优化](算子实践参考/SIMD与SIMT混合算子性能优化/SIMD与SIMT混合算子性能优化.md)
         -   [概述](算子实践参考/SIMD与SIMT混合算子性能优化/概述.md)
