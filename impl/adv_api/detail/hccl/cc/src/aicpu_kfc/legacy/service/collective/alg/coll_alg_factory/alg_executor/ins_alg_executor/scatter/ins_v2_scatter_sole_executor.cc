@@ -8,18 +8,18 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "ins_v2_scatter_sole_executor.h"
-#include "ins_temp_scatter_mesh_2d.h"
-#include "topo_match_concurr_mesh.h"
-#include "topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_scatter_mesh_2d.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
 #include "log.h"
-#include "ins_coll_alg_registry.h"
-#include "topo_match_mesh.h"
-#include "ins_temp_scatter_mesh_1d.h"
-#include "ins_temp_scatter_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_scatter_mesh_1d.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_scatter_nhr.h"
 #ifndef CCL_KERNEL_AICPU
 #include "aiv_temp_scatter_mesh_1D.h"
-#include "ccu_temp_scatter_nhr_1D_mem2mem.h"
-#include "ccu_temp_scatter_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_scatter_nhr_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_scatter_mesh_1D.h"
 #endif
 
 namespace Hccl {

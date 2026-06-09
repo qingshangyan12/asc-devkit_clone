@@ -12,11 +12,11 @@
  * \file power_tiling_impl.cpp
  * \brief
  */
-#include "include/adv_api/math/power_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/adv_api/math/power_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
 #include <cstdint>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 
 #include "graph/tensor.h"
 namespace AscendC {

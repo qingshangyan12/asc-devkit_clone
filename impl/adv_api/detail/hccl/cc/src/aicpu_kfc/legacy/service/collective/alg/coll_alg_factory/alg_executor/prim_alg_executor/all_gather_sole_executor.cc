@@ -11,11 +11,11 @@
 
 #include "log.h"
 
-#include "coll_alg_registry.h"
-#include "temp_all_gather_mesh.h"
-#include "topo_match_mesh.h"
-#include "topo_match_concurr_mesh.h"
-#include "temp_all_gather_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_all_gather_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_all_gather_concurr_mesh.h"
 #include "all_gather_sole_executor.h"
 
 namespace Hccl {

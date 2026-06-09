@@ -18,16 +18,16 @@
 #ifndef IMPL_REDUCE_REDUCE_PROD_REDUCE_PROD_C310_IMPL_H_
 #define IMPL_REDUCE_REDUCE_PROD_REDUCE_PROD_C310_IMPL_H_
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "../reduce_common_util_impl.h"
-#include "../reduce_common_util_3510_impl.h"
-#include "../reduce_common_ar_reuse_align_3510_impl.h"
-#include "../reduce_common_ra_reuse_align_3510_impl.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/adv_api/detail/reduce/reduce_common_util_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_util_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ar_reuse_align_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ra_reuse_align_3510_impl.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/reduce/reduce_prod/reduce_prod_check.h"
-#include "../../api_check/kernel_api_check.h"
-#include "../../common/check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/reduce/reduce_prod/reduce_prod_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/common/check.h"
 #endif // ASCENDC_CPU_DEBUG
 
 namespace AscendC {

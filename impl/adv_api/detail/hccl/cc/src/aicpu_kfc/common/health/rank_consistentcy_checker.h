@@ -16,11 +16,11 @@
 #include <vector>
 #include <memory>
 #include <mutex>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 #include "hccl_common.h"
 #include "common.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 
 namespace hccl {
 constexpr u32 DEFAULT_CRC = 0xFFFFFFFF;   // CRC默认值

@@ -13,9 +13,9 @@
 #endif
 #include "dispatcher_virtural_pub.h"
 #include "dispatcher_aicpu_pub.h"
-#include "dispatcher.h"
-#include "externalinput_pub.h"
-#include "adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
 
 using namespace hccl;
 typedef HcclResult (*FftsCounterCallBack)(const HcclDispatcher&, Stream &);

@@ -11,7 +11,7 @@
 
 #include "log.h"
 
-#include "coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/coll_alg_registry.h"
 #include "all_gather_seq_executor.h"
 
 namespace Hccl {

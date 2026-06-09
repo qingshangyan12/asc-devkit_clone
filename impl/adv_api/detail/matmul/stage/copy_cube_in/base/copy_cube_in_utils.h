@@ -21,7 +21,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_CUBE_IN_UTILS_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_CUBE_IN_UTILS_H
 
-#include "../../../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 
 namespace AscendC {
 namespace Impl {

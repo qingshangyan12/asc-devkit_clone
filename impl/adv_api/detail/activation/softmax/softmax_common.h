@@ -22,13 +22,13 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_IMPL_H
 
-#include "kernel_pop_stack_buffer.h"
-#include "softmax_common/softmax_common_utils.h"
-#include "softmax_common/softmax_common_shape_process.h"
-#include "softmax_common/softmax_tiling_func.h"
-#include "softmax_common/softmax_common_broadcast.h"
-#include "softmax_common/softmax_common_reduce.h"
-#include "softmax_common/softmax_common_arithmetic.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_common_utils.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_common_shape_process.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_tiling_func.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_common_broadcast.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_common_reduce.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_common/softmax_common_arithmetic.h"
 
 namespace AscendC {
 

@@ -14,11 +14,11 @@
 #include <memory>
 #include <unordered_map>
 #include "base_transport_lite_impl.h"
-#include "notify_lite.h"
-#include "task_param.h"
-#include "rmt_rma_buf_slice_lite.h"
-#include "rma_conn_lite.h"
-#include "kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/notify/aicpu/notify_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rmt_rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/rma_conn_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
 
 namespace Hccl {
 

@@ -15,11 +15,11 @@
 #include <functional>
 #include <sstream>
 #include <set>
-#include "exception_util.h"
-#include "dma_mode.h"
-#include "ip_address.h"
-#include "op_type.h"
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/dma_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 
 
 namespace Hccl {

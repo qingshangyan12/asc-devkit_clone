@@ -10,8 +10,8 @@
 #ifndef PRIVATE_TYPES_H
 #define PRIVATE_TYPES_H
 #include "hccl_common.h"
-#include "transport_heterog_def.h"
-#include "adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_heterog_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
 using HcclRtPointAttr = void *; // 获取指针属性，主要是页表大小
 using BinHandle = void *;
 constexpr u32 NOTIFY_INFO_LENGTH = 256;

@@ -10,7 +10,7 @@
 #ifndef ALL_REDUCE_RECURSIVE_HD_H
 #define ALL_REDUCE_RECURSIVE_HD_H
 
-#include "all_reduce_recursive_hd_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_reduce_recursive_hd_pub.h"
 
 namespace hccl {
     constexpr u32 NSLBDP_ALL_REDUCE_MOLD2 = 2;

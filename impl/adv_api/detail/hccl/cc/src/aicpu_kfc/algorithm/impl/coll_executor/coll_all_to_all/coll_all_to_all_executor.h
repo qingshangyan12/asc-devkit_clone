@@ -9,7 +9,7 @@
 */
 #ifndef COLL_ALLTOALL_COMM_EXECUTOR_H
 #define COLL_ALLTOALL_COMM_EXECUTOR_H
-#include "coll_comm_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_comm_executor.h"
 namespace hccl {
 constexpr u32 MINORS_NUM_TWO = 2;
 constexpr u64 SMALL_SIZE_FULLMESH = 262144;

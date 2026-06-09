@@ -13,10 +13,10 @@
 #include <mutex>
 #include <map>
 #include <vector>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "stream_pub.h"
-#include "mem_device_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 #include "workspace_mem.h"
 #include "ccl_buffer_manager.h"
 #include "offload_stream_manager_pub.h"

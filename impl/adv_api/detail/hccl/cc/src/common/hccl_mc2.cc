@@ -7,14 +7,14 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl_mc2.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hccl_mc2.h"
 #include "log.h"
 #include "sal.h"
 #include "alg_env_config.h"
-#include "hccl_inner.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 #include "param_check.h"
 #include "hccl_alloc_ctx_res.h"
-#include "op_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/op_common.h"
 
 using namespace mc2_ops_hccl;
 

@@ -11,14 +11,14 @@
 #define OP_BASE_H
 
 #include <vector>
-#include <hccl/hccl_comm.h>
-#include <hccl/hccl_inner.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "op_base_pub.h"
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/op_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 // ltm指定config路径
-#include "common/src/config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config.h"
 #include "../common/src/topo/topoinfo_detect.h"
 #include "op_base_v2.h"
 

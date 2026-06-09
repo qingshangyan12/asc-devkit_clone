@@ -11,7 +11,7 @@
 #define HCCLV2_PRIM_TRANSLATOR_H
 
 #include <functional>
-#include "ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
 #include "prim_queue.h"
 
 namespace Hccl {

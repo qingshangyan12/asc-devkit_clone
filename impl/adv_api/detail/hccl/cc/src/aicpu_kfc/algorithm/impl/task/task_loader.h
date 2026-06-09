@@ -12,11 +12,11 @@
 
 #include <thread>
 #include <condition_variable>
-#include <hccl/base.h>
-#include "stream_pub.h"
-#include "dispatcher.h"
-#include "workflow_pub.h"
-#include "coll_alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 
 namespace hccl {
 class TaskLoader {

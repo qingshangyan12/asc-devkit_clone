@@ -9,11 +9,11 @@
 */
 #include <algorithm>
 #include "ins_to_sqe_rule.h"
-#include "null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
 #include "ins_executor.h"
-#include "hccl_sqe_v82.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/hccl_sqe_v82.h"
 #include "sal.h"
-#include "communicator_impl_lite_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite_manager.h"
 
 namespace Hccl {
 

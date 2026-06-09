@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "ins_coll_alg_registry.h"
-#include "topo_match_nhr.h"
-#include "topo_match_mesh.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
-#include "ins_temp_reduce_scatter_mesh_2D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_reduce_scatter_mesh_2D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #ifndef CCL_KERNEL_AICPU
 #include "aiv_temp_reduce_scatter_mesh_1D.h"
@@ -22,8 +22,8 @@
 #include "ccu_temp_reduce_scatter_mesh_1D_2die.h"
 #endif
 #include "ins_v2_reduce_scatter_sole_executor.h"
-#include "ins_temp_reduce_scatter_aicpu_reduce.h"
-#include "ins_temp_reduce_scatter_aicpu_reduce_mesh_2D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_reduce_scatter_aicpu_reduce.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_reduce_scatter_aicpu_reduce_mesh_2D.h"
 #include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
 
 namespace Hccl {

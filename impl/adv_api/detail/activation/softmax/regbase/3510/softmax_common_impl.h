@@ -23,7 +23,7 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_C310_SOFTMAX_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_C310_SOFTMAX_COMMON_IMPL_H
 
-#include "../../../../common/common.h"
+#include "impl/adv_api/detail/common/common.h"
 
 namespace AscendC {
 template <typename T>

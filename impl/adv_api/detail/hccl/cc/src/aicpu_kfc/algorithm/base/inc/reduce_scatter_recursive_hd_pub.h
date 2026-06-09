@@ -11,8 +11,8 @@
 #define REDUCE_SCATTER_RECURSIVE_HD_PUB_H
 
 #include "recursive_halvingdoubling_base_pub.h"
-#include "reducer_pub.h"
-#include "sender_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/component/reducer_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/component/sender_pub.h"
 
 namespace hccl {
 class ReduceScatterRecursiveHalvingDoubling : public RecursiveHalvingDoublingBase {

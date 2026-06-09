@@ -9,10 +9,10 @@
 */
 #include "op_unfold_cache.h"
 
-#include "aicpu_hccl_sqcq.h"
-#include "aicpu_hccl_sqcqv1.h"
-#include "aicpu_hccl_sqcqv2.h"
-#include "config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv1.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
 #include "log.h"
 
 namespace hccl {

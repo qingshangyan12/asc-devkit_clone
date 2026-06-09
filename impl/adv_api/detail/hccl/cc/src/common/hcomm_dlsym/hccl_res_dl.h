@@ -11,8 +11,8 @@
 #define HCCL_RES_DL_H
 
 #include "dlsym_common.h"
-#include "hccl_res.h"
-#include "hccl_res_expt.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_res_expt.h"
 
 #ifdef __cplusplus
 extern "C" {

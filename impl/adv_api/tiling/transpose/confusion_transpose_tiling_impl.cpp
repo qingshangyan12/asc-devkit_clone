@@ -13,8 +13,8 @@
  * \brief
  */
 
-#include "include/adv_api/transpose/confusion_transpose_tiling.h"
-#include "../../detail/host_log.h"
+#include "../../../../include/adv_api/transpose/confusion_transpose_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(ConfusionTransposeTilingOpApi, ConfusionTransposeTiling);

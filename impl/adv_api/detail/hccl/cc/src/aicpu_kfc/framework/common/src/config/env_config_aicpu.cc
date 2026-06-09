@@ -13,7 +13,7 @@
 #include <string>
 #include "adapter_error_manager_pub.h"
 #include "log.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "mmpa_api.h"
 #include "config_log.h"
 #include "env_config.h"

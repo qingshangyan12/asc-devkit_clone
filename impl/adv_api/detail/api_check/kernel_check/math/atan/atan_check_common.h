@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_ATAN_ATAN_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_ATAN_ATAN_CHECK_COMMON_H_
 
-#include "../math_common_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/math/math_common_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

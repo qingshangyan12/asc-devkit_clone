@@ -11,7 +11,7 @@
 #define HCOMM_DIAG_DL_H
 
 #include "dlsym_common.h"
-#include "hcomm_diag.h"   // 原始头文件，包含所有声明和类型定义
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcomm_diag.h"   // 原始头文件，包含所有声明和类型定义
 
 #ifdef __cplusplus
 extern "C" {

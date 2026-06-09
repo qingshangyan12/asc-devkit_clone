@@ -10,7 +10,7 @@
 #ifndef REDUCE_RING_H
 #define REDUCE_RING_H
 
-#include "reduce_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_ring_pub.h"
 
 namespace hccl {
 }  // namespace hccl

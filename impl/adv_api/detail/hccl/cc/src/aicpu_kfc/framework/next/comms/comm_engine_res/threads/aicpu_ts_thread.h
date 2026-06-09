@@ -12,7 +12,7 @@
 
 #include <vector>
 #include "thread.h"
-#include "aicpu_ts_thread_interface.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/interface/aicpu_ts_thread_interface.h"
 
 namespace hccl {
 class AicpuTsThread : public Thread {

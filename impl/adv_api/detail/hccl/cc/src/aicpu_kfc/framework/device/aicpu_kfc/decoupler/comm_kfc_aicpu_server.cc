@@ -10,23 +10,23 @@
 #include "comm_kfc_aicpu_server.h"
 #include <algorithm>
 #include <numeric>
-#include "adapter_rts_common.h"
-#include "alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "log.h"
-#include "common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
 #ifndef MC2_SERVER_ONLY
-#include "hccl_mc2_ex.h"
-#include "framework/aicpu_communicator.h"
-#include "framework/aicpu_hccl_process.h"
-#include "sqe_build_a5.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/inc/hccl_mc2_ex.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/sqe_build_a5.h"
 #endif
 #include "hccl_common.h"
-#include "aicpu_indop_process.h"
-#include "coll_comm_aicpu.h"
-#include "coll_comm_aicpu_mgr.h"
-#include "stream_lite.h"
-#include "thread.h"
-#include "aicpu_ts_thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/coll_comm_aicpu.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/coll_comm_aicpu_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.h"
 
 using namespace HcclApi;
 namespace {

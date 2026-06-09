@@ -22,8 +22,8 @@
 #ifndef IMPL_MATMUL_SCHEDULER_BATCH_BATCH_SCHEDULER_BASE_H
 #define IMPL_MATMUL_SCHEDULER_BATCH_BATCH_SCHEDULER_BASE_H
 
-#include "../../utils/matmul_module.h"
-#include "../../utils/matmul_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
 
 namespace AscendC {
 namespace Impl {

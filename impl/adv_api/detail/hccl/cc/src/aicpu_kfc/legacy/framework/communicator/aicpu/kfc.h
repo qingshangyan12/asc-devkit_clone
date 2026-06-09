@@ -10,8 +10,8 @@
 #ifndef HCCLV2_KFC_H
 #define HCCLV2_KFC_H
 
-#include "enum_factory.h"
-#include "error_message_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/error_message_v2.h"
 
 namespace Hccl {
 MAKE_ENUM(KfcCommand, NONE, NS_STOP_LAUNCH, NS_CLEAN, DESTROY_AICPU_COMM)

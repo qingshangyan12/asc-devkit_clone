@@ -11,7 +11,7 @@
 #define __AICPU_PROFILING_MANAGER_H__
 
 #include "prof_common.h"
-#include "common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 
 namespace dfx {
 class AicpuProfilingManager {

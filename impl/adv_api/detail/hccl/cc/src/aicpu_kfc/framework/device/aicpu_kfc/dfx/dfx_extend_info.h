@@ -10,7 +10,7 @@
 #ifndef ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_DFX_EXTEND_INFO_H_
 #define ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_DFX_EXTEND_INFO_H_
 
-#include "aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 
 namespace dfx {
 class DfxExtendInfoHelper {

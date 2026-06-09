@@ -10,7 +10,7 @@
 #ifndef HCCLV2_ALLGATHER_AUTO_SELECTOR
 #define HCCLV2_ALLGATHER_AUTO_SELECTOR
 
-#include "auto_selector_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/selector/auto_selector_base.h"
 
 namespace mc2_ops_hccl {
 

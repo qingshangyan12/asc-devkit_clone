@@ -22,9 +22,9 @@
 #ifndef IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_INTF_H
 #define IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_INTF_H
 
-#include "../load_to_l0_utils.h"
+#include "impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h"
 
-#include "../load_to_l0_utils.h"
+#include "impl/adv_api/detail/matmul/stage/split/load_to_l0_utils.h"
 
 namespace AscendC {
 namespace Impl {

@@ -18,13 +18,13 @@
 #include <string>
 #include <vector>
 #include "alltoall_utils_pub.h"
-#include "device_capacity.h"
-#include "ffts_common_pub.h"
-#include "hccl_socket.h"
-#include "local_notify.h"
-#include "stream_pub.h"
-#include "transport_pub.h"
-#include "comm_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/ffts_common_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/comm_utils.h"
 
 struct SendRecvInfo {
     // 存放数据长度和偏移长度

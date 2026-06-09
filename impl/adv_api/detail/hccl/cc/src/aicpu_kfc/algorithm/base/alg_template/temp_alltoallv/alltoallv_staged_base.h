@@ -10,6 +10,6 @@
 #ifndef ALLTOALL_V_STAGED_BASE_H
 #define ALLTOALL_V_STAGED_BASE_H
 
-#include "alltoallv_staged_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/alltoallv_staged_base_pub.h"
 
 #endif /* * ALLTOALL_V_STAGED_BASE_H */

@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "reduce_scatter_op.h"
-#include "op_common_ops.h"
-#include "topo_host.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/op_common_ops.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_host.h"
 #include <algorithm>
 #include <future>
 #include <map>

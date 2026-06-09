@@ -7,11 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "transport_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_mem.h"
 #include "log.h"
-#include "network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
 #ifdef CCL_KERNEL
-#include "transport_device_roce_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/onesided/device/transport_device_roce_mem.h"
 #endif
 
 namespace hccl {

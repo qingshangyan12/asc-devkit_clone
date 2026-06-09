@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "sqe_build_a5.h"
-#include "communicator_impl_lite_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite_manager.h"
 
 namespace Hccl {
 

@@ -12,10 +12,10 @@
 
 #include <cstdint>
 #include <chrono>
-#include "common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 #include "hccl_common.h"
-#include "hccl_msg.h"
-#include "aicpu_operator_pub.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
 
 constexpr int32_t AICPU_CNT = 8;
 constexpr int32_t CLUSTER_CNT = 2;

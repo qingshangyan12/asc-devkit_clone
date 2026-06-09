@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_UTILS_H
 #define IMPL_MATMUL_STAGE_SPLIT_LOAD_TO_L0A_UTILS_H
 
-#include "../../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 
 namespace AscendC {
 namespace Impl {

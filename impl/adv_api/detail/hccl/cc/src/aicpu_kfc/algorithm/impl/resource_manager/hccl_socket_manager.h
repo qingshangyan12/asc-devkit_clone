@@ -18,10 +18,10 @@
 #include <mutex>
 #include <atomic>
 #include <functional>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
-#include "hccl_ip_address.h"
-#include "hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
 #include "common.h"
 
 namespace hccl {

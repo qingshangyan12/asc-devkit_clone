@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "calc_nhr_v1_transport_req.h"
-#include "nonuniform_hierarchical_ring_v1_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/nonuniform_hierarchical_ring_v1_base_pub.h"
 
 namespace hccl {
 CalcNHRV1TransportReq::CalcNHRV1TransportReq(std::vector<std::vector<u32>> &subCommPlaneVector,

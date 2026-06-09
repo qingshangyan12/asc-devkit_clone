@@ -15,7 +15,7 @@
 #ifndef INCLUDE_ADV_API_HCOMM_HCOMM_H
 #define INCLUDE_ADV_API_HCOMM_HCOMM_H
 
-#include "kernel_basic_intf.h"
+#include "include/basic_api/kernel_basic_intf.h"
 #include "hcomm_common.h"
 #include "../../../impl/adv_api/detail/hcomm/impl/hcomm_impl_def.h"
 

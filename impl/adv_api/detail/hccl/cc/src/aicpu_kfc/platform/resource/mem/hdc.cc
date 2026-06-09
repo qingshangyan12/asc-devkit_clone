@@ -7,11 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
 #include "log.h"
 #include "ascend_hal.h"
-#include "adapter_hal.h"
-#include "adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 #include <atomic>
 #include <chrono>
 

@@ -11,10 +11,10 @@
 #include <sstream>
 #include <iomanip>
 #include "log.h"
-#include "hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
 #include <regex>
 #include <log.h>
-#include "hccn_rping.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccn_rping.h"
 namespace hccl {
 
 HcclResult HcclIpAddress::SetBianryAddress(s32 family, const union HcclInAddr &address)

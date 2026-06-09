@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "remote_access.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/remote_access.h"
 #include <algorithm>
 #include "remote_access_impl.h"
 

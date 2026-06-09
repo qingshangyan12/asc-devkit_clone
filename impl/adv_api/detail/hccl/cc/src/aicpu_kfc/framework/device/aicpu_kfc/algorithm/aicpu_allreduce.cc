@@ -10,7 +10,7 @@
 #include "aicpu_allreduce.h"
 #include <cmath>
 #include <algorithm>
-#include "common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
 
 HcclResult AicpuAllreduce::RunAlgorithm(HcclReduceOp opType, void *sendBuffer, void *recvBuffer, u64 dataCount,
     HcclDataType dataType, u64 strideLen, AivAicpuOpParam * /* nextTask */)

@@ -14,9 +14,9 @@
 #include <array>
 #include <mutex>
 
-#include "p2p_mgmt_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/p2p_mgmt_pub.h"
 #include "hccl_common.h"
-#include "adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 
 namespace hccl {
 class P2PMgmt {

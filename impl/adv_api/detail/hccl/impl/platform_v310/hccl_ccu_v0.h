@@ -15,8 +15,8 @@
 #ifndef IMPL_V310_HCCL_CCU_D100_H
 #define IMPL_V310_HCCL_CCU_D100_H
 
-#include "../../common/hccl_utils.h"
-#include "../../ccu/hccl_ccu_v0_prepare.h"
+#include "impl/adv_api/detail/hccl/common/hccl_utils.h"
+#include "impl/adv_api/detail/hccl/ccu/hccl_ccu_v0_prepare.h"
 
 namespace AscendC {
 template <const auto& config>

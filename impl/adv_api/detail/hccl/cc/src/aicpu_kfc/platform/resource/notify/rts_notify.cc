@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "rts_notify.h"
-#include "externalinput_pub.h"
-#include "sal_pub.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 
 namespace hccl {
 

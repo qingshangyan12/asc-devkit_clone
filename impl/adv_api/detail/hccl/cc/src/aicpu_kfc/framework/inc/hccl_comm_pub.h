@@ -14,19 +14,19 @@
 #include <memory>
 #include <map>
 #include <mutex>
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
 #include "common.h"
-#include "mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 #include "topoinfo_struct.h"
 #include "comm.h"
 #include "topoinfo_struct.h"
-#include "transport_heterog_def.h"
-#include "hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_heterog_def.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "comm_config_pub.h"
-#include "transport_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/resource_manager/transport_manager.h"
 #include "independent_op.h"
-#include "share_ccl_buffer_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/share_ccl_buffer_manager.h"
 #ifndef HCCD
     #include "coll_comm.h"
 #endif

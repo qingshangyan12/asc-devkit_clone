@@ -13,12 +13,12 @@
 #include <unordered_set>
 #include <algorithm>
 
-#include "ins_coll_alg_base.h"
-#include "ins_temp_all_gather_mesh.h"
-#include "topo_match_partial_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/ins_alg_executor/ins_coll_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_all_gather_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_partial_mesh.h"
 #include "instruction.h"
-#include "data_buffer.h"
-#include "rmt_data_buffer_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/data_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/buffer/aicpu/rmt_data_buffer_mgr.h"
 
 namespace Hccl {
 constexpr u32 MULTIPLY_TWO = 2;

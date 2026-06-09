@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "mem_device.h"
-#include "adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 
 namespace hccl {
 DeviceMem::DeviceMem(void *ptr, u64 size, bool owner) : ptr_(ptr), size_(size), owner_(owner)

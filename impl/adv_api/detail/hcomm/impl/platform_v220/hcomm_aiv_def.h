@@ -23,7 +23,7 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V220_HCOMM_AIV_DEF_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V220_HCOMM_AIV_DEF_H
 
-#include "../../common/hcomm_inner_def.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h"
 
 namespace AscendC {
 

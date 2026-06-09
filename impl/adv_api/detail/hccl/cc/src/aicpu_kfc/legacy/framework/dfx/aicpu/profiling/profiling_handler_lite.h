@@ -11,11 +11,11 @@
 #define HCCL_PROFILING_HANDLER_LITE_H
 
 #include <vector>
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "prof_common.h"
 #include "aprof_pub.h"
-#include "task_info.h"
-#include "profiling_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/profiling_common.h"
 
 extern "C" {
 __attribute__((weak)) int32_t MsprofReportBatchAdditionalInfo(uint32_t nonPersistantFlag, const VOID_PTR data, uint32_t length);

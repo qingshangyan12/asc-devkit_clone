@@ -24,8 +24,8 @@
 #define IMPL_ACTIVATION_SOFTMAX_V200_SOFTMAX_GRAD_IMPL_H
 
 #include "softmax_common_impl.h"
-#include "../common/softmax_grad_nd_impl.h"
-#include "../common/softmax_grad_nz_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_grad_nd_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_grad_nz_impl.h"
 
 #endif // IMPL_ACTIVATION_SOFTMAX_V200_SOFTMAX_GRAD_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SOFTMAX_GRAD_IMPL_H__)

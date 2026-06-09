@@ -10,9 +10,9 @@
 #ifndef HCCLV2_EXECUTOR_UTILS
 #define HCCLV2_EXECUTOR_UTILS
 
-#include "data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
 #include "log.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 #include "template_utils.h"
 
 namespace Hccl {

@@ -11,8 +11,8 @@
 #define TASK_INFO_H
 #include <string>
 #include <memory>
-#include "task_param.h"
-#include "coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
 
 namespace Hccl {
 

@@ -11,9 +11,9 @@
 #define HCCLV2_AICPU_WQEMGR_WQE_H
  
 #include <string>
-#include "string_util.h"
-#include "hccl/base.h"
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 
 namespace Hccl {
 

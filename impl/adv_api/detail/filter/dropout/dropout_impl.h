@@ -33,9 +33,9 @@
 #include "dropout_3510_impl.h"
 #endif
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/filter/dropout/dropout_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/filter/dropout/dropout_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 #pragma begin_pipe(V)

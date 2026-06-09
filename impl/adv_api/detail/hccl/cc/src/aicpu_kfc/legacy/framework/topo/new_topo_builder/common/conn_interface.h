@@ -12,7 +12,7 @@
 
 #include <string>
 #include "topo_common_types.h"
-#include "ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
 
 namespace Hccl {
 

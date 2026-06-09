@@ -12,14 +12,14 @@
  * \file geglu_tiling.cpp
  * \brief
  */
-#include "include/adv_api/activation/geglu_tiling.h"
+#include "../../../../include/adv_api/activation/geglu_tiling.h"
 
 #include <cstdint>
 #include <set>
 
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "impl/adv_api/detail/host_log.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 namespace AscendC {
 namespace {
 constexpr uint32_t GEGLU_ONE_REPEAT_BYTE_SIZE = 256;

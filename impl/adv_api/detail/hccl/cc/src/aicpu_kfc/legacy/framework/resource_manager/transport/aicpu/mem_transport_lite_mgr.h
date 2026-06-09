@@ -11,10 +11,10 @@
 #define MEM_TRANSPORT_LITE_MANAGER_H
 
 #include <vector>
-#include "types.h"
-#include "virtual_topo.h"
-#include "mem_transport_lite.h"
-#include "mirror_task_manager_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/transport/aicpu/mem_transport_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.h"
 #include "mem_transport_callback_lite.h"
 
 namespace Hccl {

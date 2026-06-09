@@ -10,7 +10,7 @@
 #ifndef AICPU_KFC_PROF_H
 #define AICPU_KFC_PROF_H
 
-#include "common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 
 enum class KfcTimeLine : int64_t {
     HCC_EXEC_START_TIME,

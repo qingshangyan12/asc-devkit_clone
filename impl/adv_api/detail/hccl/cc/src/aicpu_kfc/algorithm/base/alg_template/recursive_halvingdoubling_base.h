@@ -10,7 +10,7 @@
 #ifndef RECURSIVE_HALVINGDOUBLING_BASE_H
 #define RECURSIVE_HALVINGDOUBLING_BASE_H
 
-#include "recursive_halvingdoubling_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/recursive_halvingdoubling_base_pub.h"
 
 namespace hccl {
 }  // hccl

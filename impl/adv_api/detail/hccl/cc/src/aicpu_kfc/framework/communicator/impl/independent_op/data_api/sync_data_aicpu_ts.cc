@@ -14,8 +14,8 @@
 
 #include "log.h"
 #include "ascend_hal.h"
-#include "thread.h"
-#include "aicpu_ts_thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.h"
 
 constexpr uint32_t SYNC_WAIT_TIMEOUT_SECONDS = 205;
 constexpr size_t MSG_TAG_SIZE_BYTE = 256;

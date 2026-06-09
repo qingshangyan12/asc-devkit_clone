@@ -22,7 +22,7 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_DATATYPE_IMPL_H
 #define ASCENDC_MODULE_REG_COMPUTE_DATATYPE_IMPL_H
 
-#include "../../../basic_api/utils/kernel_utils_macros.h"
+#include "impl/basic_api/utils/kernel_utils_macros.h"
 
 namespace AscendC {
 namespace Reg {

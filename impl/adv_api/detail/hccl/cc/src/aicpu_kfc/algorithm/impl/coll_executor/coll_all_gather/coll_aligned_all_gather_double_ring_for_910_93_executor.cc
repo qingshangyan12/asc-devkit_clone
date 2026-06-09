@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "coll_aligned_all_gather_double_ring_for_910_93_executor.h"
-#include "hccl_types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace hccl {
 CollAlignedAllGatherDoubleRingFor91093Executor::CollAlignedAllGatherDoubleRingFor91093Executor(

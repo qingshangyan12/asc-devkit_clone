@@ -10,7 +10,7 @@
 #ifndef HCCLV2_BUFFER_TYPE_H
 #define HCCLV2_BUFFER_TYPE_H
 
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 namespace Hccl {
 
 MAKE_ENUM(BufferType, INPUT, OUTPUT, SCRATCH)

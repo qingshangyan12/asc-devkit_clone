@@ -12,11 +12,11 @@
 
 #include <condition_variable>
 #include "threadManage.h"
-#include "dispatcher.h"
-#include "workflow_pub.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "common.h"
-#include "template_v1_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/template_v1_utils.h"
 
 namespace hccl {
 enum class ExecutorType {

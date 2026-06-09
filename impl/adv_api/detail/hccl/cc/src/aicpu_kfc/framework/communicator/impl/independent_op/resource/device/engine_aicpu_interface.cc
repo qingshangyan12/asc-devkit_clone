@@ -7,12 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "channel_aicpu_interface.h"
-#include "adapter_rts.h"
-#include "aicpu_indop_process.h"
-#include "aicpu_thread_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/device/channel_aicpu_interface.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/slaves/aicpu_thread_process.h"
 #ifndef MC2_SERVER_ONLY
-#include "framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
 #endif
 
 extern "C" {

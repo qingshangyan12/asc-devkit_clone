@@ -10,8 +10,8 @@
 #ifndef MC2_OPS_HCCL_SRC_OPS_CHANNEL
 #define MC2_OPS_HCCL_SRC_OPS_CHANNEL
 
-#include "hccl/base.h"
-#include "alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 
 namespace mc2_ops_hccl {
 

@@ -10,7 +10,7 @@
 #ifndef COLL_SCATTER_EXECUTOR_H
 #define COLL_SCATTER_EXECUTOR_H
 
-#include "coll_comm_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_comm_executor.h"
 #include "coll_alg_exec_registry.h"
 
 namespace hccl {

@@ -10,11 +10,11 @@
 #ifndef PLUGIN_RUNNER_PUB_H
 #define PLUGIN_RUNNER_PUB_H
 
-#include "hccl/hccl_types.h"
-#include "hccl/base.h"
-#include "profiler_base_pub.h"
-#include "task_exception_handler_pub.h"
-#include "task_profiling_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_exception_handler_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_profiling_pub.h"
 namespace hccl {
 class PluginRunner {
 public:

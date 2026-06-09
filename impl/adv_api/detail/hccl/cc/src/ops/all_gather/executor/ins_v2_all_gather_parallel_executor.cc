@@ -10,17 +10,17 @@
 #include "ins_v2_all_gather_parallel_executor.h"
 #include <cmath>
 #include "alg_data_trans_wrapper.h"
-#include "ins_temp_all_gather_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
 #ifndef AICPU_COMPILE
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_nhr_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
 #endif
 #include "alg_data_trans_wrapper.h"
 
-#include "topo_match_multilevel.h"
-#include "topo_match_ubx.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_multilevel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_ubx.h"
 
 namespace mc2_ops_hccl {
 

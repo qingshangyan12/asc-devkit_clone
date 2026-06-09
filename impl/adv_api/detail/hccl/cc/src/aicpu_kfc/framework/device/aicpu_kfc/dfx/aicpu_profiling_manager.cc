@@ -10,9 +10,9 @@
 #include "aicpu_profiling_manager.h"
 
 #include "aicpu_schedule/aicpu_context.h"
-#include "common/aicpu_sqe_context.h"
-#include "common/aicpu_hccl_common.h"
-#include "profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
 
 namespace dfx {
 constexpr std::uint32_t HCCLINFO_REPORT_BATCH_NUM = 2;

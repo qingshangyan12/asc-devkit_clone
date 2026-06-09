@@ -9,8 +9,8 @@
 */
 #include "log.h"
 
-#include "ins_coll_alg_registry.h"
-#include "dev_capability.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dev_capability.h"
 #include "ins_batchSendRecv_executor.h"
 #include "alg_data_trans_wrapper.h"
 

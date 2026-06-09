@@ -10,7 +10,7 @@
 #include "execute_selector.h"
 #include "auto_selector_base.h"
 #include "selector_registry.h"
-#include "cann_host_bridge.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/cann_host_bridge.h"
 
 namespace mc2_ops_hccl {
 

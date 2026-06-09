@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "opexecounter.h"
-#include "adapter_rts_common.h"
-#include "env_config.h"
-#include "dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 namespace hccl {
 OpExeCounter& OpExeCounter::GetInstance(s32 deviceLogicID)
 {

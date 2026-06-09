@@ -14,9 +14,9 @@
 #include <memory>
 #include "hccl.h"
 
-#include "alg_param.h"
-#include "executor_v2_base.h"
-#include "alg_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_v2_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/alg_type.h"
 #include "execute_selector.h"
 #include "acl/acl_rt.h"
 

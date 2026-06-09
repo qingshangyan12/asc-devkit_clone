@@ -11,26 +11,26 @@
 #define HCCL_AICPU_COMMUNICATOR_IMPL_LITE_H_
 
 #include <memory>
-#include "ins_executor.h"
-#include "data_type.h"
-#include "prim_translator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/service/aicpu/ins_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/prim_translator.h"
 
 #include "lite_res_mgr_fetcher.h"
-#include "coll_alg_component_lite.h"
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/interface/device/coll_alg_component_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 #include "coll_alg_info.h"
 #include "kernel_param_lite.h"
-#include "rma_buffer_lite.h"
-#include "queue_notify_lite_mgr.h"
-#include "cnt_1ton_notify_lite_mgr.h"
-#include "host_device_sync_notify_lite_mgr.h"
-#include "profiling_reporter_lite.h"
-#include "profiling_handler_lite.h"
-#include "data_buffer.h"
-#include "rmt_data_buffer_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buffer_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/queue_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/cnt_1ton_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/host_device_sync_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_reporter_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/data_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/buffer/aicpu/rmt_data_buffer_mgr.h"
 #include "aicpu_hdc_handler.h"
-#include "one_sided_component_lite.h"
-#include "error_message_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/one_sided_component/one_sided_component_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/error_message_v2.h"
 
 namespace Hccl {
 

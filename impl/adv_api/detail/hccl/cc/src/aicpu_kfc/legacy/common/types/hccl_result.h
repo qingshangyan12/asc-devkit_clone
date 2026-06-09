@@ -10,7 +10,7 @@
 #ifndef HCCLV2_HCCL_RESULT_H
 #define HCCLV2_HCCL_RESULT_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace Hccl {
 } // namespace Hccl

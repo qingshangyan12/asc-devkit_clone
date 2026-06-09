@@ -10,6 +10,6 @@
 #ifndef ALLTOALL_V_STAGED_PAIRWISE_H
 #define ALLTOALL_V_STAGED_PAIRWISE_H
 
-#include "alltoallv_staged_pairwise_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/alltoallv_staged_pairwise_pub.h"
 
 #endif /* * __ALLTOALL_V_STAGED_PAIRWISE_PUB_H__ */

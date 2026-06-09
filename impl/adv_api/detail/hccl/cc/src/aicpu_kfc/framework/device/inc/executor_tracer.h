@@ -9,9 +9,9 @@
 */
 #ifndef ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_TRACE_EXECUTOR_TRACER_H_
 #define ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_TRACE_EXECUTOR_TRACER_H_
-#include "common/aicpu_hccl_def.h"
-#include "utils/aicpu_hdc_utils.h"
-#include "framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
 #include "cann_error_reporter.h"
 
 namespace dfx_tracer {

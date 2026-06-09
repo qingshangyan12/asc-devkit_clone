@@ -11,13 +11,13 @@
 #define TOPOINFO_EXCHANGE_AGENT_H
 
 #include <vector>
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
-#include "topoinfo_struct.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
 #include "topoinfo_exchange_base.h"
-#include "comm.h"
-#include "hccl_socket.h"
-#include "hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
 
 namespace hccl {
 using HcclBasicRankInfo = struct HcclBasicRankInfoDef {

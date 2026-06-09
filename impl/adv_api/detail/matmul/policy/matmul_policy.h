@@ -20,14 +20,14 @@
 #ifndef IMPL_MATMUL_POLICY_MATMUL_POLICY_H
 #define IMPL_MATMUL_POLICY_MATMUL_POLICY_H
 
-#include "../context/context.h"
-#include "..//utils/matmul_utils.h"
-#include "../resource/cube_in_buffer/cube_in_buffer.h"
-#include "../resource/cube_out_buffer/cube_out_buffer.h"
-#include "../scheduler/bias/bias_scheduler.h"
-#include "../scheduler/scheduler.h"
-#include "../stage/copy_cube_in/copy_cube_in.h"
-#include "../stage/copy_cube_out/copy_cube_out.h"
+#include "impl/adv_api/detail/matmul/context/context.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
+#include "impl/adv_api/detail/matmul/resource/cube_in_buffer/cube_in_buffer.h"
+#include "impl/adv_api/detail/matmul/resource/cube_out_buffer/cube_out_buffer.h"
+#include "impl/adv_api/detail/matmul/scheduler/bias/bias_scheduler.h"
+#include "impl/adv_api/detail/matmul/scheduler/scheduler.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_cube_in.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_out/copy_cube_out.h"
 
 namespace AscendC {
 namespace Impl {

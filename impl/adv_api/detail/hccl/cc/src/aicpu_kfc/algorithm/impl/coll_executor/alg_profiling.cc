@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "alg_profiling.h"
-#include "adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/alg_profiling.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 
 namespace hccl {
 

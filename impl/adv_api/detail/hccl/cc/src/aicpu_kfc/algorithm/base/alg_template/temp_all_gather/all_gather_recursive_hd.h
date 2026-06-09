@@ -10,7 +10,7 @@
 #ifndef ALL_GATHER_RECURSIVE_HD_H
 #define ALL_GATHER_RECURSIVE_HD_H
 
-#include "all_gather_recursive_hd_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_recursive_hd_pub.h"
 
 namespace hccl {
     constexpr u32 NSLBDP_ALL_GATHER_MOLD2 = 2;

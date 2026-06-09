@@ -22,7 +22,7 @@
 #define IMPL_MATMUL_UTILS_MX_MATMUL_UTILS_H
 
 #include "matmul_type_def.h"
-#include "../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 namespace AscendC {
 
 template <typename T, typename U>

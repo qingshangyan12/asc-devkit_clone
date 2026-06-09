@@ -10,11 +10,11 @@
 #ifndef HCCL_COMM_TASKEXCEPTION_H
 #define HCCL_COMM_TASKEXCEPTION_H
 
-#include "daemon_func.h"
-#include "mirror_task_manager.h"
-#include "coll_comm_aicpu.h"
-#include "aicpu_hccl_sqcq.h"
-#include "error_message_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/daemon_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/mirror_task_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/coll_comm_aicpu.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/error_message_v2.h"
 
 namespace hcomm {
 

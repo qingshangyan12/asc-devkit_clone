@@ -13,10 +13,10 @@
  * \brief
  */
 #include <set>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "graph/tensor.h"
-#include "include/adv_api/math/bitwise_or_tiling.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "../../../../include/adv_api/math/bitwise_or_tiling.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 namespace AscendC {
 namespace {
 static const std::set<uint32_t> SUPPORT_TYPESIZE = {1, 2, 4, 8};

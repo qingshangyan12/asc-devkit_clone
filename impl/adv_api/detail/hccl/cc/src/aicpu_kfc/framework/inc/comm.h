@@ -12,7 +12,7 @@
 
 #include "hccl_common.h"
 #include "common.h"
-#include "hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
 
 static constexpr uint32_t HCCL_ALG_MESH = 0b1U;
 static constexpr uint32_t HCCL_ALG_SWITCH = (HCCL_ALG_MESH << 1U);

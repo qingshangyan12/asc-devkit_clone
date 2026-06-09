@@ -9,7 +9,7 @@
 */
 #ifndef PROFFILING_COMMAND_HANDLE_LITE_H
 #define PROFFILING_COMMAND_HANDLE_LITE_H
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace Hccl {
 #ifdef CCL_KERNEL_AICPU

@@ -10,7 +10,7 @@
 #ifndef __TASK_ORCHESTRATE_H__
 #define __TASK_ORCHESTRATE_H__
 
-#include "common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 #include "aicpu_dispatcher.h"
 
 class TaskOrchestrator {

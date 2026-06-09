@@ -22,8 +22,8 @@
 #ifndef IMPL_MATMUL_FEATURE_TRAIT_MATMUL_FEATURE_TRAIT_H
 #define IMPL_MATMUL_FEATURE_TRAIT_MATMUL_FEATURE_TRAIT_H
 
-#include "../utils/matmul_config_utils.h"
-#include "../utils/matmul_type_def.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_config_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_type_def.h"
 #include "matmul_chip_cap.h"
 
 namespace AscendC {

@@ -11,7 +11,7 @@
 #define AICPU_OPERATOR_PUB_H
 #include <stdlib.h>
 #include <chrono>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "common.h"
 #include "hdc_pub.h"
@@ -19,7 +19,7 @@
 #include "dispatcher_task_types.h"
 #include "externalinput_pub.h"
 #include "hccl_mem_defs.h"
-#include "hccl/hccl_res.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 using RankId = u32;
 

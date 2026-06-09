@@ -9,7 +9,7 @@
 */
 #include "cnt_1ton_notify_lite.h"
 #include "binary_stream.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "log.h"
 
 namespace Hccl {

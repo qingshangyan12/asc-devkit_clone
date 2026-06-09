@@ -13,12 +13,12 @@
 #include <vector>
 #include <map>
 
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "types/types.h"
-#include "dev_type.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
 #include "topo_match_base.h"
-#include "rank_gph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
 
 namespace Hccl {
 

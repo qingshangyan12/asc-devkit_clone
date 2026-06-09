@@ -11,8 +11,8 @@
 #define HCCL_AICPU_HDC_UTILS_H
 
 #include <memory>
-#include "aicpu_operator_pub.h"
-#include "hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
 
 class AicpuHdcUtils {
 public:

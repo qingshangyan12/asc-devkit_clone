@@ -14,15 +14,15 @@
 #include <vector>
 #include <map>
 
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "log.h"
 #include "hccl_common.h"
 #include "common.h"
-#include "hccl_impl_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_impl_pub.h"
 #include "comm_ahc_base_pub.h"
-#include "alg_template_base_pub.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 namespace hccl {
 
 class TopoInfoExtractor {

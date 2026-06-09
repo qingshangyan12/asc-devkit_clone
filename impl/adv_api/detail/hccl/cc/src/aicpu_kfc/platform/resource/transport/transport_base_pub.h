@@ -10,20 +10,20 @@
 #ifndef HCOMM_TRANSPORT_BASE_PUB_H
 #define HCOMM_TRANSPORT_BASE_PUB_H
 
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
-#include "stream_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "sal.h"
-#include "dispatcher_pub.h"
-#include "mem_name_repository_pub.h"
-#include "task_logic_info_pub.h"
-#include "transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/task_logic_info_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
 
-#include "hccl_socket.h"
-#include "notify_pool.h"
-#include "local_ipc_notify.h"
-#include "remote_notify.h"
-#include "hccl_mem_defs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/notify_pool.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/notify/local_ipc_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/remote_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
 
 namespace hccl {
 

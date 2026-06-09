@@ -19,10 +19,10 @@
 #define IMPL_API_CHECK_KERNEL_CHECK_SORT_MRGSORT_MRGSORT_CHECK_COMMON_H_
 
 #include <cstdint>
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/multiple_tensor_check.h"
-#include "../../basic_check/reuse_source_check.h"
-#include "../../basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/multiple_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/reuse_source_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

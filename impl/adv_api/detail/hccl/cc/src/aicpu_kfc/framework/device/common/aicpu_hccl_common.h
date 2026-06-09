@@ -10,10 +10,10 @@
 #ifndef __AICPU_HCCL_COMMON_H__
 #define __AICPU_HCCL_COMMON_H__
 
-#include "profiling_manager_device.h"
-#include "dtype_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "log.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 
 inline uint32_t DataUnitSize(HcclDataType dataType)
 {

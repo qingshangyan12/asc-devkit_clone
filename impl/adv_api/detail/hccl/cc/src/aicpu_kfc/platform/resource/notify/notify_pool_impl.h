@@ -13,11 +13,11 @@
 #include <mutex>
 #include <map>
 #include <array>
-#include "hccl/base.h"
-#include "mem_name_repository_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
 #include "local_ipc_notify.h"
-#include "remote_notify.h"
-#include "dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/remote_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 
 namespace hccl {
 

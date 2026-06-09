@@ -10,12 +10,12 @@
 #ifndef HCCLV2_REDUCE_SCATTER_SOLE_EXECUTOR
 #define HCCLV2_REDUCE_SCATTER_SOLE_EXECUTOR
 
-#include "temp_reduce_scatter_ring.h"
-#include "temp_reduce_scatter_concurr_mesh.h"
-#include "temp_reduce_scatter_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_reduce_scatter_ring.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_reduce_scatter_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_reduce_scatter_mesh.h"
 #include "coll_alg_base.h"
-#include "topo_match_concurr_mesh.h"
-#include "topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
 
 namespace Hccl {
 

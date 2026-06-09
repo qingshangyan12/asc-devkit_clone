@@ -22,9 +22,9 @@
 #ifndef IMPL_MATMUL_STAGE_COMPUTE_MMAD_COMPUTE_H
 #define IMPL_MATMUL_STAGE_COMPUTE_MMAD_COMPUTE_H
 
-#include "../../utils/matmul_module.h"
-#include "../../utils/matmul_param.h"
-#include "../../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 
 namespace AscendC {
 namespace Impl {

@@ -9,7 +9,7 @@
 */
 #include "template_utils.h"
 #include "log.h"
-#include "buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
 
 namespace Hccl {
 HcclResult GetUnitAllignSize(const AllignInfo &allignInfo, u64 &unitAllignSize)

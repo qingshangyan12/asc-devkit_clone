@@ -7,10 +7,10 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "transport.h"
-#include "dispatcher_pub.h"
-#include "hccl_primitive_remote.h"
-#include "hccl_primitive_local.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/transport.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_remote.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_local.h"
 
 using namespace hccl;
 extern HcclResult GetPubDispatcher(hccl::DispatcherPub** dispatcherPtr);

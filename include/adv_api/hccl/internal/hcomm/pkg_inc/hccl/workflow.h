@@ -10,7 +10,7 @@
 #ifndef WORKFLOW_H
 #define WORKFLOW_H
 
-#include <hccl/hccl_types.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 enum class HcclWorkflowMode {
     HCCL_WORKFLOW_MODE_OPS_KERNEL_INFO_LIB = 0,

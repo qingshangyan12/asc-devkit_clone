@@ -12,9 +12,9 @@
  * \brief
  */
 #include <set>
-#include "include/adv_api/math/where_tiling.h"
-#include "../../detail/host_log.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "../../../../include/adv_api/math/where_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 #include "graph/tensor.h"
 
 namespace AscendC {

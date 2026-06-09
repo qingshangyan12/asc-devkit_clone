@@ -16,7 +16,7 @@
 #include <map>
 #include <unordered_set>
 #include <regex>
-#include "topo_common_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/topo_common_types.h"
 #include "address_info.h"
 
 namespace Hccl {

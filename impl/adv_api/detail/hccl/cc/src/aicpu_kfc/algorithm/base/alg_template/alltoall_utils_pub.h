@@ -11,8 +11,8 @@
 #define ALLTOALL_V_INFO_PUB_H
 
 #include <list>
-#include "hccl_types.h"
-#include "mem_device_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 
 namespace hccl{
 

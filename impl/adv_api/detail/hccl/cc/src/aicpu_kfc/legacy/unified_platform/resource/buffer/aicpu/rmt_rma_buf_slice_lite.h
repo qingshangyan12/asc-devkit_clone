@@ -9,7 +9,7 @@
 */
 #ifndef HCCLV2_RMT_RMA_BUF_SLICE_LITE_H
 #define HCCLV2_RMT_RMA_BUF_SLICE_LITE_H
-#include "hccl/base.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace Hccl {
 class RmtRmaBufSliceLite {

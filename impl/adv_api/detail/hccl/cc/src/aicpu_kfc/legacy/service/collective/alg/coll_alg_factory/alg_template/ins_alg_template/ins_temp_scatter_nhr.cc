@@ -10,7 +10,7 @@
 #include "ins_temp_scatter_nhr.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "alg_data_trans_wrapper.h"
-#include "dev_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_mode.h"
 #include "log.h"
 
 

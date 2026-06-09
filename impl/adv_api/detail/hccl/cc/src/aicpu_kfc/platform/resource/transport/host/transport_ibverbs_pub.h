@@ -13,12 +13,12 @@
 #include <functional>
 #include <mutex>
 
-#include "../host/transport_net_pub.h"
-#include "network/hccp_common.h"
-#include "workflow_pub.h"
-#include "private_types.h"
-#include "adapter_hccp.h"
-#include "hashtable/universal_concurrent_map.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_net_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/private_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/hashtable/universal_concurrent_map.h"
 
 inline void CopyAiWQInfo(struct HcclAiRMAWQ& dest, const struct AiDataPlaneWq& source, DBMode dbMode, u32 sl)
 {

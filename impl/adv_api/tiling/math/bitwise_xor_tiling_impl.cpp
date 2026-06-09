@@ -13,10 +13,10 @@
  * \brief
  */
 #include <set>
-#include "include/adv_api/math/bitwise_xor_tiling.h"
-#include "../../detail/host_log.h"
+#include "../../../../include/adv_api/math/bitwise_xor_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "graph/tensor.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 
 namespace AscendC {
 namespace {

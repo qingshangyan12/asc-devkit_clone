@@ -10,13 +10,13 @@
 #ifndef COLL_ALG_UTILS_H
 #define COLL_ALG_UTILS_H
 
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "hccl_common.h"
 #include "common.h"
-#include "device_capacity.h"
-#include "coll_alg_param.h"
-#include "op_context.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/op_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 
 namespace hccl {
 constexpr u64 MAX_ALLTOALL_MESH_ALGO_RANK_INTRA_MESH = 32;

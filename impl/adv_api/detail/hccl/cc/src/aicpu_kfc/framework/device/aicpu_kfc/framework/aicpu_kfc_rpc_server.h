@@ -10,9 +10,9 @@
 #ifndef AICPU_KFC_RPC_SERVER_H
 #define AICPU_KFC_RPC_SERVER_H
 
-#include "hccl_msg.h"
-#include "common/aicpu_hccl_def.h"
-#include "common/aicpu_kfc_def.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 
 constexpr uint32_t AC_MAX_AIV = 64U;  // 最多有64个AIV
 

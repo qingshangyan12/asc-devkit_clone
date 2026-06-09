@@ -22,14 +22,14 @@
 #ifndef LIB_MATH_BITWISE_AND_IMPL_H
 #define LIB_MATH_BITWISE_AND_IMPL_H
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "include/adv_api/math/bitwise_and_utils.h"
-#include "../bitwise_template/bitwise_template.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/adv_api/math/bitwise_and_utils.h"
+#include "impl/adv_api/detail/math/bitwise_template/bitwise_template.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/math/bitwise_and/bitwise_and_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/math/bitwise_and/bitwise_and_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 namespace AscendC {
 template <const BitwiseAndConfig& config = DEFAULT_BITWISE_AND_CONFIG, typename T>
 __aicore__ inline void BitwiseAndImpl(

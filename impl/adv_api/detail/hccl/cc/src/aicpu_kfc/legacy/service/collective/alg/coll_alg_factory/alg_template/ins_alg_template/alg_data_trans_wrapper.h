@@ -11,17 +11,17 @@
 #define HCCLV2_ALG_DATA_TRANS_WRAPPER
 
 #include <vector>
-#include "data_type.h"
-#include "reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
 
-#include "coll_alg_params.h"
-#include "virtual_topo.h"
-#include "connected_link_mgr.h"
-#include "dev_capability.h"
-#include "primitive.h"
-#include "prim_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dev_capability.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/primitive.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/prim_queue.h"
 #include "instruction.h"
-#include "ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
 
 namespace Hccl {
 using InsQuePtr = std::shared_ptr<InsQueue>;

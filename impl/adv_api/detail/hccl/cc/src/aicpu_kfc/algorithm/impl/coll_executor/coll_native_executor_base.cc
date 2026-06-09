@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "coll_native_executor_base.h"
-#include "profiling_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager_pub.h"
 namespace hccl {
 
 CollNativeExecutorBase::CollNativeExecutorBase(const HcclDispatcher dispatcher,

@@ -7,12 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "topoinfo_parse.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_parse.h"
 #include <string>
 #include <unordered_set>
 #include <algorithm>
 // ltm指定config路径
-#include "common/src/config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config.h"
 
 using namespace std;
 

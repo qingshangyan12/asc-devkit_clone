@@ -10,9 +10,9 @@
 #ifndef AICPU_KFC_UTILS_H
 #define AICPU_KFC_UTILS_H
 
-#include "hccl_tiling_msg.h"
-#include "hccl_msg.h"
-#include "common/aicpu_hccl_def.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_tiling_msg.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 #include "common/aicpu_kfc_def.h"
 
 class AicpuKfcUtils {

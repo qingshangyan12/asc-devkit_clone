@@ -10,8 +10,8 @@
 #ifndef HCCLV2_REDUCE_IN_H
 #define HCCLV2_REDUCE_IN_H
 #include <string>
-#include "data_type.h"
-#include "reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
 namespace Hccl {
 
 struct ReduceIn {

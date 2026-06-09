@@ -8,15 +8,15 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "ins_coll_alg_registry.h"
-#include "topo_match_mesh_nhr.h"
-#include "topo_match_mesh_nhr_pcie.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh_nhr_pcie.h"
 #include "alg_data_trans_wrapper.h"
 
-#include "ins_temp_broadcast_mesh_1D_two_shot.h"
-#include "ins_temp_broadcast_nhr.h"
-#include "ccu_temp_broadcast_mesh_1D_mem2mem.h"
-#include "ccu_temp_broadcast_nhr_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_mesh_1D_two_shot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_broadcast_mesh_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_broadcast_nhr_1D_mem2mem.h"
 #include "ins_broadcast_parallel_executor.h"
 
 

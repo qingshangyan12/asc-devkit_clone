@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "hcclCommProfilingLite.h"
-#include "profiling_reporter_lite.h"
-#include "mirror_task_manager_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_reporter_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.h"
 
 namespace hccl {
 // 构造函数

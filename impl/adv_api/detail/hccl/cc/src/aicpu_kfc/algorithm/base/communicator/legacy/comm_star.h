@@ -10,7 +10,7 @@
 #ifndef COMM_STAR_H
 #define COMM_STAR_H
 
-#include "comm_star_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_star_pub.h"
 
 namespace hccl {
 }  // namespace hccl

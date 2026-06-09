@@ -10,7 +10,7 @@
 #ifndef ALL_REDUCE_CHUNK_MESH_H
 #define ALL_REDUCE_CHUNK_MESH_H
 
-#include "inc_all_reduce_deter/all_reduce_chunk_mesh_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/inc_all_reduce_deter/all_reduce_chunk_mesh_pub.h"
 
 namespace hccl {}  // namespace hccl
 

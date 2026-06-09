@@ -24,19 +24,19 @@
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #include "digamma_3510_impl.h"
 #else
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/math/tan.h"
-#include "include/adv_api/math/sin.h"
-#include "include/adv_api/math/cos.h"
+#include "../../../../../include/adv_api/math/tan.h"
+#include "../../../../../include/adv_api/math/sin.h"
+#include "../../../../../include/adv_api/math/cos.h"
 #include "digamma_common_basic_impl.h"
-#include "../../common/check.h"
+#include "impl/adv_api/detail/common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/math/digamma/digamma_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/math/digamma/digamma_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 

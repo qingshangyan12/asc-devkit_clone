@@ -9,10 +9,10 @@
 */
 #include "ub_transport_lite_impl.h"
 #include "binary_stream.h"
-#include "ub_conn_lite.h"
-#include "ub_conn_lite_mgr.h"
-#include "exception_util.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_conn_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_conn_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 #include "sal.h"
 
 namespace Hccl {

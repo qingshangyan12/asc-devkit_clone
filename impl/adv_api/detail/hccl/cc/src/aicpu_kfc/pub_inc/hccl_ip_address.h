@@ -12,7 +12,7 @@
 
 #include <securec.h>
 #include <arpa/inet.h>
-#include <hccl/base.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include <string>
 #include <vector>
 

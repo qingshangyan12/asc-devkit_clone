@@ -10,7 +10,7 @@
 #ifndef HCCL_DFX_COMMON_H
 #define HCCL_DFX_COMMON_H
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "circular_queue.h"
 #include "vector_queue.h"
 #include "queue.h"

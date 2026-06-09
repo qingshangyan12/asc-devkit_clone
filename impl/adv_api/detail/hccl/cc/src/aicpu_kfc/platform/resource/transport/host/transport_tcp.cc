@@ -11,10 +11,10 @@
 #include <arpa/inet.h>
 #include <securec.h>
 
-#include "externalinput_pub.h"
-#include "network/hccp.h"
-#include "network/hccp_common.h"
-#include "network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
 
 namespace hccl {
 TransportTcp::TransportTcp(DispatcherPub *dispatcher,

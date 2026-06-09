@@ -9,16 +9,16 @@
 */
 #include "task_exception_handler_lite.h"
 #include "task_exception_func.h"
-#include "communicator_impl_lite.h"
-#include "error_message_v2.h"
-#include "dlhal_function_v2.h"
-#include "task_param.h"
-#include "kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/error_message_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dlhal_function_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
 
-#include "task_struct_v2.h"
-#include "task_scheduler_error.h"
-#include "orion_adapter_hal.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_struct_v2.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/externel_depends/tsch/task_scheduler_error.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/orion_adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 
 namespace Hccl {
 

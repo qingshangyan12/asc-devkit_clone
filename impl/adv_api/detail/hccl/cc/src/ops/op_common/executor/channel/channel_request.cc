@@ -10,9 +10,9 @@
 #include <set>
 #include <vector>
 #include <algorithm>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "channel_request.h"
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "log.h"
 
 namespace mc2_ops_hccl {

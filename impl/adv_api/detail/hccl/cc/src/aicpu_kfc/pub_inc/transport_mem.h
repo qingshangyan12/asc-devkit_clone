@@ -10,14 +10,14 @@
 #ifndef TRANSPORT_MEM_H
 #define TRANSPORT_MEM_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <atomic>
 #include "dispatcher.h"
 #include "notify_pool.h"
 #include "hccl_socket.h"
 #include "hccl_network_pub.h"
 #include "hccl_common.h"
-#include "hccl_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_mem.h"
 #include "transport_pub.h"
 
 namespace hccl {

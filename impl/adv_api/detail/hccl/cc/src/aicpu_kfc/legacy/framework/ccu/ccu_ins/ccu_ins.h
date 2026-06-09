@@ -12,12 +12,12 @@
 
 #include <memory>
 #include "instruction.h"
-#include "ccu_ctx_arg.h"
-#include "ccu_task_arg.h"
-#include "ccu_rank_group.h"
-#include "ccu_ctx_signature.h"
-#include "ccu_task_param.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_ctx_arg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_task_arg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/ccu/ccu_rank_group.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_ctx_signature.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 
 namespace Hccl {
 MAKE_ENUM(CcuInstType, CCU_INS_GROUP, CCU_ALLTOALL_MESH_2D_DIRECT, CCU_ALLGATHER_MESH_1D_DIRECT,

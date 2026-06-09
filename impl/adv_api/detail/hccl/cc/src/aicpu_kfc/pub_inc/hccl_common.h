@@ -19,10 +19,10 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "dtype_common.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "hccl_ip_address.h"
 #include "log.h"
-#include "pkg_inc/hccl/hcom.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h"
 
 #ifndef T_DESC
 #define T_DESC(_msg, _y) ((_y) ? true : false)

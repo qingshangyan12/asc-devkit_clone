@@ -11,11 +11,11 @@
 #define TOPOINFO_RANKTABLEPARSER_H
 
 #include "nlohmann/json.hpp"
-#include "topoinfo_struct.h"
-#include "hccl/base.h"
-#include "hccl_types.h"
-#include "sal_pub.h"
-#include "comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
 
 constexpr char CLUSTER_PROP_VERSION[] = "version";
 constexpr char HCCL_CLUSTER_VERSION[] = "1.0";      // HCCL集群版本

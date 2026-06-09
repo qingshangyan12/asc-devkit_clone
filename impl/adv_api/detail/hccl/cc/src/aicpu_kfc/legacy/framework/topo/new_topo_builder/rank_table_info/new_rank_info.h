@@ -13,11 +13,11 @@
 #include <vector>
 #include <string>
 
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 #include "nlohmann/json.hpp"
 #include "rank_level_info.h"
 #include "control_plane.h"
-#include "orion_adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/external_system/orion_adapter_hccp.h"
 namespace Hccl {
 constexpr unsigned int MAX_VALUE_DEVICEID = 64;
 constexpr unsigned int DEFAULT_VALUE_DEVICEPORT = 16666;

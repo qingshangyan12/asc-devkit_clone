@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include "hccl_msg.h"
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 HcclResult LoadOpenOpParamData(uint64_t opParamKey, std::string &commName, std::vector<uint8_t> &opParam);
 HcclResult FormatOpenOpParamDataFromMsg(const std::vector<uint8_t> &baseOpParam, const HcclApi::HcclMsg &msg,

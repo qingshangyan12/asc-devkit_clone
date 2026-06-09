@@ -12,11 +12,11 @@
  * \file ceil_tiling_impl.cpp
  * \brief
  */
-#include "include/adv_api/math/ceil_tiling.h"
+#include "../../../../include/adv_api/math/ceil_tiling.h"
 #include <cstdint>
 
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 namespace AscendC {
 namespace {
 constexpr uint32_t CEIL_HALF_CALC_FAC = 2;

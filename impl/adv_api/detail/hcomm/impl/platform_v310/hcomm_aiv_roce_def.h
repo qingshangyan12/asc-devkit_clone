@@ -23,7 +23,7 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_ROCE_DEF_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_ROCE_DEF_H
 
-#include "../../common/hcomm_inner_def.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h"
 
 namespace AscendC {
 constexpr uint32_t ROCE_SQ_DOORBELL_TYPE = 2;

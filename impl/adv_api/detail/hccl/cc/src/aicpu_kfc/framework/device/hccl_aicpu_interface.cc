@@ -10,14 +10,14 @@
 #include "hccl_aicpu_interface.h"
 
 #include <sstream>
-#include "common/aicpu_hccl_common.h"
-#include "common/aicpu_hccl_def.h"
-#include "common/aicpu_sqe_context.h"
-#include "profiling_manager_device.h"
-#include "framework/aicpu_hccl_process.h"
-#include "utils/hccl_aicpu_utils.h"
-#include "framework/aicpu_communicator.h"
-#include "utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuKfcResInitV2(void *args)

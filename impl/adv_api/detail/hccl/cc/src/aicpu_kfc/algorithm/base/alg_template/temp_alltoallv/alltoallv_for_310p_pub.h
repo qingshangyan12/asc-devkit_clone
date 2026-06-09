@@ -10,7 +10,7 @@
 #ifndef ALLTOALL_V_FOR_310P_PUB_H
 #define ALLTOALL_V_FOR_310P_PUB_H
 
-#include "allltoall_pipeline_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_alltoall/allltoall_pipeline_base_pub.h"
 
 namespace hccl {
 struct SendMemBlock {

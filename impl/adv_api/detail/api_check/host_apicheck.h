@@ -18,9 +18,9 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "graph/tensor.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

@@ -10,7 +10,7 @@
 #ifndef ALIGNED_REDUCE_SCATTER_DOUBLE_RING_WITH_SERIAL_LOCAL_COPY_H
 #define ALIGNED_REDUCE_SCATTER_DOUBLE_RING_WITH_SERIAL_LOCAL_COPY_H
 
-#include "aligned_reduce_scatter_double_ring_with_serial_local_copy_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/aligned_reduce_scatter_double_ring_with_serial_local_copy_pub.h"
 
 namespace hccl {
 } // namespace hccl

@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "net_instance.h"
-#include "iterator.h"
-#include "exception_util.h"
-#include "not_support_exception.h"
-#include "invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/iterator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
 
 namespace Hccl {
 

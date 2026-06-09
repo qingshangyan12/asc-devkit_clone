@@ -9,7 +9,7 @@
 */
 #ifndef COLL_ALLREDUCE_FOR_310P_DOUBLING_EXECUTOR_H
 #define COLL_ALLREDUCE_FOR_310P_DOUBLING_EXECUTOR_H
-#include "coll_all_reduce_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_all_reduce/coll_all_reduce_executor.h"
 namespace hccl {
 class CollAllReduceFor310PDoublingExecutor : public CollAllReduceExecutor {
 

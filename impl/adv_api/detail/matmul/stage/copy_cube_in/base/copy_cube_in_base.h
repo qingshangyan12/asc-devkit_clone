@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_BASE_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_BASE_H
 
-#include "../../../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 namespace AscendC {
 namespace Impl {

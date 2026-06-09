@@ -7,9 +7,9 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "aicpu/aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
 #include "hccl_common.h"
-#include "dispatcher_task_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher_task_types.h"
 namespace {
 enum class SdmaReduceOpcode {
     SDMA_OPCODE_NOT_ATOMIC = 0,

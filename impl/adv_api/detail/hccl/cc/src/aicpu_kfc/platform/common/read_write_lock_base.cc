@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <climits>
-#include "read_write_lock_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock_base.h"
 #include "log.h"
 
 // CPU 暂停指令定义

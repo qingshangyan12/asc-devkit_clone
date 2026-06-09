@@ -24,7 +24,7 @@
 #define IMPL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_N_BUFFER_H
 
 #include "cube_in_buffer_intf.h"
-#include "../../param/matmul_shape_tiling.h"
+#include "impl/adv_api/detail/matmul/param/matmul_shape_tiling.h"
 
 namespace AscendC {
 namespace Impl {

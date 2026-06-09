@@ -23,8 +23,8 @@
 #ifndef IMPL_MATMUL_MODULES_PARAM_MATMUL_CROSS_CORE_SYNC_H
 #define IMPL_MATMUL_MODULES_PARAM_MATMUL_CROSS_CORE_SYNC_H
 
-#include "../utils/mx_matmul_utils.h"
-#include "../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/mx_matmul_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 namespace AscendC {
 namespace Impl {

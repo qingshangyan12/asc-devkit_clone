@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "coll_all_to_all_v_direct_fullmesh_executor.h"
-#include "stream_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/stream/stream_utils.h"
 
 namespace hccl {
 

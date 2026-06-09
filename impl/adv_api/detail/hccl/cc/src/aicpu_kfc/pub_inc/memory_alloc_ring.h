@@ -13,7 +13,7 @@
 #include <mutex>
 #include <semaphore.h>
 #include "log.h"
-#include "hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace hccl {
 constexpr u32 EXPANSION_MULTIPLES = 2;

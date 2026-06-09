@@ -11,10 +11,10 @@
 #define WORKSPACE_RESOURCE_H
 
 #include <vector>
-#include "hccl/base.h"
-#include "stream_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "ccl_buffer_manager.h"
-#include "mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 #include "common.h"
 
 namespace hccl {

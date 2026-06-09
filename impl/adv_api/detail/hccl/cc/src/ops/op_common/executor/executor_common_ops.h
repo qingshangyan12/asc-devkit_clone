@@ -10,16 +10,16 @@
 #ifndef EXECUTOR_COMMON_OPS_H
 #define EXECUTOR_COMMON_OPS_H
 
-#include "alg_param.h"
-#include "alg_v2_template_base.h"
-#include "channel.h"
-#include "coll_alg_v2_exec_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/alg_v2_template_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/registry/coll_alg_v2_exec_registry.h"
 #include "config_log.h"
 #include "executor_v2_base.h"
 #include "log.h"
 #include "sal.h"
-#include "topo_host.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_host.h"
 #include "utils.h"
-#include "workflow.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
 
 #endif

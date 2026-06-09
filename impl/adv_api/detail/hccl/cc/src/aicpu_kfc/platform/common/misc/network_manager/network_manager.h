@@ -10,8 +10,8 @@
 #ifndef NETWORK_MANAGER_H
 #define NETWORK_MANAGER_H
 
-#include "network/hccp_common.h"
-#include "network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
 
 namespace hccl {
 }

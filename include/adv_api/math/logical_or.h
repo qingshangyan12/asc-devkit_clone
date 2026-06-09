@@ -22,7 +22,7 @@
 #ifndef LIB_MATH_LOGICAL_OR_H
 #define LIB_MATH_LOGICAL_OR_H
 
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #include "logical_or_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)

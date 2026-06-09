@@ -11,7 +11,7 @@
 #define CONFIG_PLF_LOG_H
 
 #include "log.h"
-#include  "externalinput.h"
+#include  "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
 
 namespace hccl {
 constexpr u64 PLF_ALG = 0x1ULL << 0;

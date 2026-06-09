@@ -10,7 +10,7 @@
 #ifndef ALL_REDUCE_AHC_PUB_H
 #define ALL_REDUCE_AHC_PUB_H
 
-#include "asymmetric_hierarchical_concatenate_alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/asymmetric_hierarchical_concatenate_alg_template_base_pub.h"
 
 namespace hccl {
 class AllReduceAHC : public AllReduceAHCBase {

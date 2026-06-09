@@ -18,7 +18,7 @@
 #include "rt_external.h"
 #include "acl/acl_rt.h"
 #include "profiler_base_pub.h"
-#include "aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
 namespace hccl {
 inline void PrintBaseErrorLog(const std::string &stageErrInfo, const std::string &baseInfo)
 {

@@ -25,7 +25,7 @@
 
 #include "softmax_common_impl.h"
 #include "softmax_impl.h"
-#include "../../../../common/common.h"
+#include "impl/adv_api/detail/common/common.h"
 
 namespace AscendC {
 

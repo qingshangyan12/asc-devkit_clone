@@ -8,15 +8,15 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <unordered_map>
-#include "virtual_topo.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "binary_stream.h"
-#include "exception_util.h"
-#include "topo_common_types.h"
-#include "null_ptr_exception.h"
-#include "internal_exception.h"
-#include "not_support_exception.h"
-#include "invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/topo_common_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
 #include "rank_gph.h"
 
 namespace Hccl {

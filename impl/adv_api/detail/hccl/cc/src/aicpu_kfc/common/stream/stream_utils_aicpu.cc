@@ -11,7 +11,7 @@
  #include <functional>
  #include "log.h"
  #include "rt_external.h"
- #include "workflow_pub.h"
+ #include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
  #include "stream_utils.h"
  
  HcclResult GetStreamCaptureInfo(rtStream_t stream, rtModel_t &rtModel, bool &isCapture)

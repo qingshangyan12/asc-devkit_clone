@@ -9,7 +9,7 @@
 */
 #ifndef HCCLV2_INS_ALL_REDUCE_SOLE_EXECUTOR_H
 #define HCCLV2_INS_ALL_REDUCE_SOLE_EXECUTOR_H
-#include "ins_coll_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/ins_alg_executor/ins_coll_alg_base.h"
 
 namespace Hccl {
 

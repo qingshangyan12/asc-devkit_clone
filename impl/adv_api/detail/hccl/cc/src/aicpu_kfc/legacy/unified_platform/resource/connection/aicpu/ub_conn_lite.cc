@@ -10,13 +10,13 @@
 #include <chrono>
 #include "ub_conn_lite.h"
 #include "log.h"
-#include "exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
 #include "udma_data_struct.h"
-#include "internal_exception.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "binary_stream.h"
-#include "data_type.h"
-#include "communicator_impl_lite_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite_manager.h"
 
 constexpr u32 MAX_LOG_TIMEOUT_MS        = 500;
 namespace Hccl {

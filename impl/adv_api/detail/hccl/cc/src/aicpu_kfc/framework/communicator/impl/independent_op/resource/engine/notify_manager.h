@@ -10,11 +10,11 @@
 #ifndef NOTIFY_MANAGER_H
 #define NOTIFY_MANAGER_H
 
-#include "local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
 #include "hccl_common.h"
-#include "hccl/hccl_res.h"
-#include "hccl_independent_common.h"
-#include "manager_common.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/hccl_independent_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/manager_common.h"
 
 namespace hccl {
 

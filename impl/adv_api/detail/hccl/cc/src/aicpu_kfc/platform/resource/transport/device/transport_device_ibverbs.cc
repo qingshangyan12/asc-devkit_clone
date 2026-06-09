@@ -10,14 +10,14 @@
 #include <arpa/inet.h>
 #include <securec.h>
 #include <chrono>
-#include "network/hccp.h"
-#include "network/hccp_common.h"
-#include "device_capacity.h"
-#include "network_manager_pub.h"
-#include "adapter_rts.h"
-#include "dlhns_function.h"
-#include "adapter_verbs.h"
-#include "adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhns_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_verbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
 #include "transport_device_ibverbs.h"
 
 constexpr u32 RDMA_QP_EXPECT_STATUS_PAUSE = 5;

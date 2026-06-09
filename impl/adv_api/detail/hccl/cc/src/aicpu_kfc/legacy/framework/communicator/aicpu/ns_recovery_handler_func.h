@@ -10,10 +10,10 @@
 #ifndef HCCLV2_NS_RECOVERY_FUNC_H
 #define HCCLV2_NS_RECOVERY_FUNC_H
 
-#include "daemon_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/daemon_func.h"
 #include "communicator_impl_lite.h"
 #include "communicator_impl_lite_manager.h"
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 
 namespace Hccl {
 

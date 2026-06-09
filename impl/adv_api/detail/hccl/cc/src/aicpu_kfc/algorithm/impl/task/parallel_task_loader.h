@@ -11,9 +11,9 @@
 #define PARALLEL_TASK_LOADER_H
 
 #include <vector>
-#include <hccl/base.h>
-#include "stream_pub.h"
-#include "dispatcher.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 #include "task_loader.h"
 
 namespace hccl {

@@ -12,7 +12,7 @@
 
 #include "ccu_alg_template_base.h"
 #include "utils.h"
-#include "ccu_kernel_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/kernel/ccu_kernel_all_gather_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
 

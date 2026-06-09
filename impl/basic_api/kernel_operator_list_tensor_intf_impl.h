@@ -22,19 +22,19 @@
 #define ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_IMPL_H
 
 #if __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_c220/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 2002
-#include "dav_m200/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_m200/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 1001
-#include "dav_c100/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_c100/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_3510/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "dav_l300/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_l300/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "dav_l311/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_l311/kernel_operator_list_tensor_impl.h"
 #elif __NPU_ARCH__ == 5102
-#include "dav_m510/kernel_operator_list_tensor_impl.h"
+#include "impl/basic_api/dav_m510/kernel_operator_list_tensor_impl.h"
 #endif
 
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_INTERFACE_IMPL_H

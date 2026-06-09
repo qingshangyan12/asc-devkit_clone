@@ -10,16 +10,16 @@
 #ifndef HCCLV2_RMA_CONN_LITE_H
 #define HCCLV2_RMA_CONN_LITE_H
 #include <memory>
-#include "rma_buf_slice_lite.h"
-#include "rmt_rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rmt_rma_buf_slice_lite.h"
 #include "log.h"
-#include "reduce_in.h"
-#include "data_type.h"
-#include "reduce_op.h"
-#include "ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/reduce_in.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
 #include "ub_jetty_lite.h"
-#include "kernel_param_lite.h"
-#include "stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 namespace Hccl {
 MAKE_ENUM(RmaConnLiteType, P2P, RDMA, UB, CCU) // 需要和RmaConnType一一对应
 

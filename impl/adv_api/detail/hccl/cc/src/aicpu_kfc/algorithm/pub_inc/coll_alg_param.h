@@ -17,14 +17,14 @@
 #include <unordered_set>
 
 #include "hccl_common.h"
-#include "hccl_types.h"
-#include "transport_pub.h"
-#include "stream_pub.h"
-#include "local_notify.h"
-#include "hccl_trace_info.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_trace_info.h"
 #include "common.h"
 #include "threadManage.h"
-#include "template_v1_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/template_v1_utils.h"
 
 namespace hccl {
 using RankId = u32;

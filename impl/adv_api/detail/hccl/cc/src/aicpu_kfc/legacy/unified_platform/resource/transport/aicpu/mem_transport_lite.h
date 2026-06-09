@@ -13,12 +13,12 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
-#include "task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
 #include "base_transport_lite_impl.h"
-#include "stream_lite.h"
-#include "rma_buffer_lite.h"
-#include "buffer.h"
-#include "kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buffer_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
 
 namespace Hccl {
 

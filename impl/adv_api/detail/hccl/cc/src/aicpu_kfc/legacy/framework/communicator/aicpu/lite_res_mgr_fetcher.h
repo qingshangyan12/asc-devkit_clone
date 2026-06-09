@@ -10,16 +10,16 @@
 #ifndef HCCL_RESMGRFETCHER_H
 #define HCCL_RESMGRFETCHER_H
 
-#include "stream_lite_mgr.h"
-#include "connected_link_mgr.h"
-#include "coll_operator.h"
-#include "mem_transport_lite_mgr.h"
-#include "host_device_sync_notify_lite_mgr.h"
-#include "queue_notify_lite_mgr.h"
-#include "cnt_1ton_notify_lite_mgr.h"
-#include "cnt_nto1_notify_lite_mgr.h"
-#include "mirror_task_manager.h"
-#include "data_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/stream/aicpu/stream_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/mem_transport_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/host_device_sync_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/queue_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/cnt_1ton_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/notify/aicpu/cnt_nto1_notify_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/mirror_task_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/data_buffer.h"
 #include "kernel_param_lite.h"
 
 namespace Hccl {

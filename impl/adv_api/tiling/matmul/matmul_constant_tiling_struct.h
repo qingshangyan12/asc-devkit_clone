@@ -15,9 +15,9 @@
 #ifndef IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 #define IMPL_MATMUL_TILING_MATMUL_CONSTANT_TILING_STRUCT_H
 
-#include "kernel_basic_intf.h"
-#include "include/adv_api/matmul/tiling.h"
-#include "../../detail/matmul/utils/matmul_utils.h"
+#include "../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../include/adv_api/matmul/tiling.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
 
 namespace AscendC {
 template <const auto& TILING>

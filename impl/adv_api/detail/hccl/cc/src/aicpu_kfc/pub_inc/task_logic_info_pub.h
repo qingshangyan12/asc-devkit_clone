@@ -12,7 +12,7 @@
 
 #include <vector>
 #include <memory>
-#include <hccl/base.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "mem_device_pub.h"
 #include "adapter_rts_common.h"
 

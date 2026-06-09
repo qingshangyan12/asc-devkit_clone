@@ -12,9 +12,9 @@
 #include <unordered_map>
 #include <algorithm>
 #include <functional>
-#include "op_type.h"
-#include "string_util.h"
-#include "not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
 #include "binary_stream.h"
 namespace Hccl {
 constexpr u32 MAX_OP_TAG_LEN           = 191; // 最大的tag 长度

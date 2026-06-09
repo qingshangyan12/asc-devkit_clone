@@ -12,8 +12,8 @@
 
 #include <map>
 #include <memory>
-#include "types.h"
-#include "notify_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/notify/aicpu/notify_lite.h"
 namespace Hccl {
 
 class HostDeviceSyncNotifyLiteMgr {

@@ -10,7 +10,7 @@
  #ifndef HCOMM_STREAM_UTILS_H
  #define HCOMM_STREAM_UTILS_H
 
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "acl/acl_rt.h"
 
 HcclResult GetStreamCaptureInfo(aclrtStream stream, aclmdlRI &rtModel, bool &isCapture);

@@ -9,7 +9,7 @@
 */
 #ifndef HCCL_BASE_H
 #define HCCL_BASE_H
-#include <hccl/hccl_types.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <string>
 #ifdef __cplusplus
 extern "C" {

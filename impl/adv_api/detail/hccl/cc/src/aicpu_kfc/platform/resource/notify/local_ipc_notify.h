@@ -10,9 +10,9 @@
 #ifndef LOCAL_IPC_NOTIFY_H
 #define LOCAL_IPC_NOTIFY_H
 
-#include "stream_pub.h"
-#include "dispatcher.h"
-#include "local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
 
 namespace hccl {
 class LocalIpcNotify : public LocalNotify {

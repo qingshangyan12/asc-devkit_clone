@@ -10,14 +10,14 @@
 #ifndef REDUCER_PUB_H
 #define REDUCER_PUB_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 #include <functional>
 #include "hccl_common.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
-#include "dispatcher.h"
-#include "transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
 
 namespace hccl {
 

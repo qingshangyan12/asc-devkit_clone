@@ -16,7 +16,7 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
-#include "hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
 
 namespace hccl {
 constexpr u32 MULTI_QP_CONFIG_SUB_STRING_NUM = 2;  // 配置信息格式为"sip,dip=sport0,sport1,...", 因此会被=分为两个子串

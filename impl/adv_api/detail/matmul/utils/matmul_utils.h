@@ -39,7 +39,7 @@
 
 #include "matmul_config_utils.h"
 #include "matmul_type_def.h"
-#include "../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 #include "mx_matmul_utils.h"
 #include "batch_matmul_utils.h"
 

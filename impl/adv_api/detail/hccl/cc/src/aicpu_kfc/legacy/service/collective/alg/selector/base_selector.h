@@ -11,11 +11,11 @@
 #define HCCLV2_COLL_ALG_BASE_SELECTOR
 
 #include <string>
-#include "coll_alg_params.h"
-#include "coll_operator.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 #include "log.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 
 namespace Hccl {
 constexpr u32 CCU_MS_MODE = 2;

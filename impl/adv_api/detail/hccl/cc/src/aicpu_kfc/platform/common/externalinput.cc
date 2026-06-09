@@ -10,18 +10,18 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <adapter_rts.h>
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 #include <thread>
 #include <mutex>
 #include <unistd.h>
 #include <regex>
 #include <cmath>
 #include "sal.h"
-#include "adapter_error_manager.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/hccd/adapter_error_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "mmpa_api.h"
-#include "config_plf_log.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 #include "externalinput.h"
 
 using namespace std;

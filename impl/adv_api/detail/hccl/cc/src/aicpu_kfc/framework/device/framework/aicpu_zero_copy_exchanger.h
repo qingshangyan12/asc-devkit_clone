@@ -14,11 +14,11 @@
 #include <set>
 #include <unordered_set>
 #include <functional>
-#include <hccl/hccl_types.h>
-#include "aicpu_operator_pub.h"
-#include "coll_alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 #include "zero_copy_address_mgr.h"
-#include "op_unfold_cache_entry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/unfold_cache/op_unfold_cache_entry.h"
 
 namespace hccl {
 class AicpuZeroCopyExchanger {

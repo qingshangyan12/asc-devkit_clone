@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 #include <arpa/inet.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_net_dev_defs.h"
 
 #ifdef __cplusplus

@@ -10,7 +10,7 @@
 #ifndef COLL_REDUCESCATTER_AIV_BIG_COUNT_EXECUTOR_H
 #define COLL_REDUCESCATTER_AIV_BIG_COUNT_EXECUTOR_H
 #include "coll_reduce_scatter_v_executor.h"
-#include "hccl_aiv.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_aiv.h"
 
 namespace hccl {
 class CollReduceScatterVAIVBigCountExecutor : public CollReduceScatterVExecutor {

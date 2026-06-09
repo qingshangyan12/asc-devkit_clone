@@ -9,5 +9,5 @@
 */
 #ifndef HETEROG_MR_MANAGER_H
 #define HETEROG_MR_MANAGER_H
-#include "heterog_mem_blocks_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/heterog_mem_blocks_manager_pub.h"
 #endif

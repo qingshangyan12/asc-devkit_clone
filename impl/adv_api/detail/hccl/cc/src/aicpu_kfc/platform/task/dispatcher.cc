@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "dispatcher_pub.h"
-#include "externalinput_pub.h"
-#include "externalinput.h"
-#include "adapter_rts.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "prof_common.h"
-#include "config_plf_log.h"
-#include "hccl_tbe_task.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl_tbe_task.h"
 #ifndef HCCD
 #include "graph_ctx_mgr_common.h"
 #endif

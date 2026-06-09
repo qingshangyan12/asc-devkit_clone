@@ -10,7 +10,7 @@
 #ifndef ALL_REDUCE_NHR_V1_PUB_H
 #define ALL_REDUCE_NHR_V1_PUB_H
 
-#include "nonuniform_hierarchical_ring_v1_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/nonuniform_hierarchical_ring_v1_base_pub.h"
 
 
 namespace hccl {

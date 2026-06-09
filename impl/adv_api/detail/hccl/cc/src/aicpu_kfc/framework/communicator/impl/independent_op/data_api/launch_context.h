@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 #include <mutex>
-#include "hccl_api_data.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_api_data.h"
 
 class LaunchContext {
 public:

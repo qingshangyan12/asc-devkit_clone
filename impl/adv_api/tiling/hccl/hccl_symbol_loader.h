@@ -20,7 +20,7 @@
 #include <climits>
 #include <cstdlib>
 #include <dlfcn.h>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 
 namespace HcclApi {
 class HcclSymbolLoader {

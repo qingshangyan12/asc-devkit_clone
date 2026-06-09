@@ -13,8 +13,8 @@
 #include <functional>
 #include <mutex>
 #include <dlfcn.h>
-#include <hccl/hccl_types.h>
-#include "orion_adapter_rts.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/external_system/orion_adapter_rts.h"
 
 namespace Hccl {
 class DlProfFunction {

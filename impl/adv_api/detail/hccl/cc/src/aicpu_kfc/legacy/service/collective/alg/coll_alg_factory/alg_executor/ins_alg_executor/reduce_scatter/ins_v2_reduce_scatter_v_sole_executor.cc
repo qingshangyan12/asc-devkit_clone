@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "ins_coll_alg_registry.h"
-#include "topo_match_mesh.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 #include "ins_v2_reduce_scatter_v_sole_executor.h"
 
 #ifndef CCL_KERNEL_AICPU

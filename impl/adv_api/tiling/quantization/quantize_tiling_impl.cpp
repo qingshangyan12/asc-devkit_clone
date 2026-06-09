@@ -16,8 +16,8 @@
 #include <cstdint>
 
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
-#include "include/adv_api/quantization/quantize_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
+#include "../../../../include/adv_api/quantization/quantize_tiling.h"
 namespace AscendC {
 namespace {
 constexpr uint32_t QUANTIZE_TWO_TIMES = 2u;

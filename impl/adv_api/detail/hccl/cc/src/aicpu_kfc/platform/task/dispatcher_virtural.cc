@@ -9,8 +9,8 @@
 */
  
 #include "dispatcher_virtural.h"
-#include "externalinput_pub.h"
-#include "hccl_tbe_task.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl_tbe_task.h"
  
 namespace hccl {
 DispatcherVirtural::DispatcherVirtural(const s32 deviceLogicId)

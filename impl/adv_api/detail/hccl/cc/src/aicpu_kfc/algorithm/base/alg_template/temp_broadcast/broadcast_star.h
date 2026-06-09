@@ -10,7 +10,7 @@
 #ifndef BROADCAST_STAR_H
 #define BROADCAST_STAR_H
 
-#include "broadcast_star_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/broadcast_star_pub.h"
 
 namespace hccl {
 }  // namespace hccl

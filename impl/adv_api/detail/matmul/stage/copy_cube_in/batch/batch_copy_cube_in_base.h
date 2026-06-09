@@ -27,7 +27,7 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-#include "../../../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 template <typename IMPL, const auto& MM_CFG, class INPUT_TYPE>
 class BatchCopyCubeInBase {

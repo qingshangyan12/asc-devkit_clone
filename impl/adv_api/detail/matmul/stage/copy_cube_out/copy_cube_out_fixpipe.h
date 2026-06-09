@@ -23,10 +23,10 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_FIXPIPE_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_FIXPIPE_H
 
-#include "../../utils/matmul_module.h"
-#include "../../utils/matmul_param.h"
-#include "../../feature_trait/matmul_feature_trait.h"
-#include "quant/quant_processor_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_out/quant/quant_processor_utils.h"
 #include "copy_cube_out_intf.h"
 #include "copy_cube_out_utils.h"
 

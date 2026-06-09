@@ -13,12 +13,12 @@
 #include <functional>
 #include <atomic>
 #include <mutex>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <infiniband/verbs.h>
-#include "hccl/base.h"
-#include "network/hccp.h"
-#include "network/hccp_ping.h"
-#include "private_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_ping.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/private_types.h"
 #include "hccl_common.h"
 
 namespace hccl {

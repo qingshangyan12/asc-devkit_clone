@@ -23,8 +23,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "tiling/platform/platform_ascendc.h"
-#include "../../detail/conv/common/conv_common.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+#include "impl/adv_api/detail/conv/common/conv_common.h"
 
 namespace Conv3dTilingApi {
 enum class IterateMNOrder : uint32_t { ITER_M_FST = 0, ITER_N_FST, INVALID };

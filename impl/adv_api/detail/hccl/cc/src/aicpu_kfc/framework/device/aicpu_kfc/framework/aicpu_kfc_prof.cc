@@ -9,9 +9,9 @@
 */
 #include "aicpu_kfc_prof.h"
 
-#include "common/aicpu_hccl_common.h"
-#include "common/aicpu_kfc_def.h"
-#include "profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
 
 thread_local static uint32_t g_curLoopCnt = 0;
 thread_local static AicpuComProf g_acprof[AC_MAX_PROF_LOOP];

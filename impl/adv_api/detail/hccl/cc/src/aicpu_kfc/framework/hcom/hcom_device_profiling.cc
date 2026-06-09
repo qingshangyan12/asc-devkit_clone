@@ -7,15 +7,15 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "profiling_manager_pub.h"
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 #include "common.h"
-#include "hccl/hcom.h"
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hcom_device_profiling.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #ifdef CCL_KERNEL_AICPU
-#include "device/inc/profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
 #endif
 using namespace hccl;
 

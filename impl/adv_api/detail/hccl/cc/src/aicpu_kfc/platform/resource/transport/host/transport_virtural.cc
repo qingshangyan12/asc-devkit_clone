@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "transport_virtural.h"
-#include "task_logic_info_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/task_logic_info_pub.h"
 
 namespace hccl {
 

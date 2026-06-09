@@ -22,10 +22,10 @@
 
 #ifndef LIB_ASCEND_QUANT_ASCEND_QUANT_PER_GROUP_L300_IMPL_H
 #define LIB_ASCEND_QUANT_ASCEND_QUANT_PER_GROUP_L300_IMPL_H
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/quantization/ascend_quant_utils.h"
-#include "../../common/check.h"
+#include "../../../../../include/adv_api/quantization/ascend_quant_utils.h"
+#include "impl/adv_api/detail/common/check.h"
 
 namespace AscendC {
 constexpr uint32_t ASCENDC_QUANT_PER_GROUP_B32_VF_LEN = GetVecLen() / sizeof(uint32_t);

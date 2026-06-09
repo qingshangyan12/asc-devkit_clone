@@ -14,7 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include "alg_v2_template_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/alg_v2_template_base.h"
 
 namespace mc2_ops_hccl {
 

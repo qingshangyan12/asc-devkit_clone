@@ -10,7 +10,7 @@
 #ifndef HCOMM_TRANSPORT_H
 #define HCOMM_TRANSPORT_H
 
-#include "transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
 
 namespace hccl {
 }  // namespace hccl

@@ -14,8 +14,8 @@
 #include <vector>
 #include <functional>
 #include <climits>
-#include "ip_address.h"
-#include "dma_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/dma_mode.h"
 #include "env_func.h"
 #include "cfg_field.h"
 

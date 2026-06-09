@@ -8,12 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "dispatcher_ctx.h"
-#include "adapter_hal.h"
-#include "dispatcher_graph_pub.h"
-#include "dispatcher_pub.h"
-#include "dispatcher_aicpu_pub.h"
-#include "dispatcher_virtural_pub.h"
-#include "dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_graph_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_aicpu_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_virtural_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
 
 namespace hccl {
     FftsCounterCallBack DispatcherCtx::GetInitTaskCallback() const

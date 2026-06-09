@@ -10,15 +10,15 @@
 #include <arpa/inet.h>
 #include <securec.h>
 #include <string>
-#include "network/hccp.h"
-#include "network/hccp_common.h"
-#include "device_capacity.h"
-#include "network_manager_pub.h"
-#include "adapter_rts.h"
-#include "externalinput_pub.h"
-#include "hccl_network.h"
-#include "externalinput.h"
-#include "../host/transport_ibverbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/socket/hccl_network.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_ibverbs.h"
 
 using namespace std;
 constexpr u32 RDMA_QP_EXPECT_STATUS_PAUSE = 5;

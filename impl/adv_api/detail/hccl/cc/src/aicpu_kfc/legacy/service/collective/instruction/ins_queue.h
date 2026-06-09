@@ -11,7 +11,7 @@
 #define HCCLV2_INS_QUEUE_H
 
 #include "instruction.h"
-#include "hierarchical_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/hierarchical_queue.h"
 
 #include <unordered_set>
 #include <vector>

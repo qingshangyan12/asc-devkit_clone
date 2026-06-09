@@ -14,21 +14,21 @@
 #include <memory>
 #include <map>
 #include <mutex>
-#include <hccl/hccl_types.h>
-#include <hccl/hccl_comm.h>
-#include <hccl/hccl_inner.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
-#include "hccl_comm_pub.h"
-#include "mem_device_pub.h"
-#include "topoinfo_struct.h"
-#include "sal_pub.h"
-#include "comm.h"
-#include "topoinfo_exchange_agent.h"
-#include "transport_heterog_def.h"
-#include "../common/src/topo/topoinfo_detect.h"
-#include "coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_exchange_agent.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_heterog_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_detect.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 
 namespace hccl {
 

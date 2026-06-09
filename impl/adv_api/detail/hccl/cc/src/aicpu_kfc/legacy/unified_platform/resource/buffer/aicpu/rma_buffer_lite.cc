@@ -9,7 +9,7 @@
 */
 #include "rma_buffer_lite.h"
 #include "log.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 namespace Hccl {
 RmaBufferLite::RmaBufferLite(u64 addr, u64 size) : type_(RmaType::IPC), addr_(addr), size_(size)
 {

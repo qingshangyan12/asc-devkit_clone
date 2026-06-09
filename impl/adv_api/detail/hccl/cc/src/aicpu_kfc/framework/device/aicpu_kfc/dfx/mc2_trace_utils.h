@@ -10,9 +10,9 @@
 #ifndef __MC2_TRACE_UTILS_H__
 #define __MC2_TRACE_UTILS_H__
 
-#include "common/aicpu_hccl_def.h"
-#include "common/aicpu_kfc_def.h"
-#include "common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
 
 constexpr uint32_t MAX_SQE_BATCH_SIZE = 16U;
 

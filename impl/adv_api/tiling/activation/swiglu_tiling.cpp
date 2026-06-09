@@ -12,13 +12,13 @@
  * \file swiglu_tiling.cpp
  * \brief
  */
-#include "include/adv_api/activation/swiglu_tiling.h"
+#include "../../../../include/adv_api/activation/swiglu_tiling.h"
 
 #include <cstdint>
 
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "impl/adv_api/detail/host_log.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 
 namespace AscendC {
 namespace {

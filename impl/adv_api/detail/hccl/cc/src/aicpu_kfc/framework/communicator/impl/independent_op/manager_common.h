@@ -10,8 +10,8 @@
 #ifndef MANAGER_COMMON_H
 #define MANAGER_COMMON_H
 
-#include "hccl_types.h"
-#include "transport_manager.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/resource_manager/transport_manager.h"
 #include "common.h"
 #include <functional>
 #include <string>

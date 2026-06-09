@@ -9,15 +9,15 @@
 */
 #include "aicpu_cache_manager.h"
 
-#include "alltoall_utils_pub.h"
-#include "comm_utils.h"
-#include "transport_pub.h"
-#include "dispatcher.h"
-#include "dispatcher_aicpu_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alltoall_utils_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/comm_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_aicpu_pub.h"
 #include "log.h"
-#include "task_logic_info_pub.h"
-#include "profiling_manager_device.h"
-#include "alltoall_utils_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/task_logic_info_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alltoall_utils_pub.h"
 
 namespace hccl {
     AicpuCacheManager::AicpuCacheManager() {

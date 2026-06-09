@@ -11,7 +11,7 @@
 #define HCCL_CCU_TEMP_REDUCE_SCATTER_NHR_1D_MUTIL_JETTY_MEM2MEM_H
 
 #include "ccu_alg_template_base.h"
-#include "ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
 

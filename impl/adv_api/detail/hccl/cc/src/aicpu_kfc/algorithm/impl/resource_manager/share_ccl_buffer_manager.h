@@ -14,7 +14,7 @@
 #include <memory>
 #include <unordered_map>
 #include "hccl_common.h"
-#include "mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 
 namespace hccl {
 struct ShareCCLMem {

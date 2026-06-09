@@ -27,15 +27,15 @@
 #if __NPU_ARCH__ == 2103
 #include "../../basic_api/reg_compute/dav_l210/kernel_reg_compute_membar_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_membar_impl.h"
+#include "impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_membar_impl.h"
 #elif __NPU_ARCH__ == 3103
 #include "../../basic_api/reg_compute/dav_l310/kernel_reg_compute_membar_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_membar_impl.h"
+#include "impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_membar_impl.h"
 #elif __NPU_ARCH__ == 5102
-#include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_membar_impl.h"
+#include "impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_membar_impl.h"
 #else
-#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_membar_impl.h"
+#include "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_membar_impl.h"
 #endif
 #endif
 

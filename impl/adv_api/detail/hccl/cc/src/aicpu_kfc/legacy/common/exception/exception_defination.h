@@ -12,8 +12,8 @@
 
 #include <map>
 #include <string>
-#include "../types/hccl_result.h"
-#include "../utils/enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/hccl_result.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 
 namespace Hccl {
 MAKE_ENUM(ExceptionType, NULL_PTR_EXCEPTION, INVALID_PARAMS_EXCEPTION, TIMEOUT_EXCEPTION, DRV_API_EXCEPTION,

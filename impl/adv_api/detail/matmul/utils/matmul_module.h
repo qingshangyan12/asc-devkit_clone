@@ -21,8 +21,8 @@
 #ifndef IMPL_MATMUL_UTILS_MATMUL_MODULE_H
 #define IMPL_MATMUL_UTILS_MATMUL_MODULE_H
 
-#include "../dfx/dfx_registry.h"
-#include "../dfx/dfx_config.h"
+#include "impl/adv_api/detail/matmul/dfx/dfx_registry.h"
+#include "impl/adv_api/detail/matmul/dfx/dfx_config.h"
 
 /*                                        MatmulModuleBase                   */
 namespace AscendC {

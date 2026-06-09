@@ -22,10 +22,10 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_ACTIVATION_SOFTMAX_ADJUST_SOFTMAX_RES_ADJUST_SOFTMAX_RES_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_ACTIVATION_SOFTMAX_ADJUST_SOFTMAX_RES_ADJUST_SOFTMAX_RES_CHECK_COMMON_H_
 
-#include "../../../basic_check/datatype_check.h"
-#include "../../../basic_check/single_tensor_check.h"
-#include "../../../basic_check/multiple_tensor_check.h"
-#include "include/adv_api/activation/softmax_utils.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/multiple_tensor_check.h"
+#include "../../../../../../../../include/adv_api/activation/softmax_utils.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

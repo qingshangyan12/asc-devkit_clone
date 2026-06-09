@@ -16,7 +16,7 @@
 #ifndef CONV3D_BP_INPUT_CONFIG_H
 #define CONV3D_BP_INPUT_CONFIG_H
 
-#include "common/conv3d_bp_config_base.h"
+#include "include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 
 namespace ConvBackpropApi {
 

@@ -10,8 +10,8 @@
 #ifndef HCCL_PROFILING_REPORTER_LITE_H
 #define HCCL_PROFILING_REPORTER_LITE_H
 #include "profiling_handler_lite.h"
-#include "mirror_task_manager_lite.h"
-#include "circular_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/circular_queue.h"
  
 namespace Hccl {
 class ProfilingReporterLite {

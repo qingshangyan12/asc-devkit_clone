@@ -10,6 +10,6 @@
 #ifndef COMM_BASE_H
 #define COMM_BASE_H
 
-#include "comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
 
 #endif /* * COMM_BASE_H */

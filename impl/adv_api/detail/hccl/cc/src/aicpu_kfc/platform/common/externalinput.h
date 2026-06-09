@@ -13,7 +13,7 @@
 #include <map>
 #include <nlohmann/json.hpp>
 
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 
 constexpr s32 MAX_LENGTH_OF_U32 = 10;
 constexpr u32 MAX_LEN_OF_DIGIT_ENV = 10; // 数字环境变量最大长度

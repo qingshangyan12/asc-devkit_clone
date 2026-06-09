@@ -11,11 +11,11 @@
 #define HCCL_COLL_EXECUTOR_BASE_H
 
 #include "hccl_impl.h"
-#include "topo_matcher.h"
-#include "coll_alg_param.h"
-#include "executor_impl.h"
-#include "coll_alg_utils.h"
-#include "hccl_aiv.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/topo_matcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/legacy/executor_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_aiv.h"
 
 namespace hccl {
 

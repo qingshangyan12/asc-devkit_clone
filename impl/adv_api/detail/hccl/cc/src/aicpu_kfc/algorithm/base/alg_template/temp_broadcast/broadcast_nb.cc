@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "broadcast_nb.h"
-#include "scatter_nb.h"
-#include "all_gather_nb.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_scatter/scatter_nb.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_all_gather/all_gather_nb.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 #include "alg_template_register.h"
 
 namespace hccl {

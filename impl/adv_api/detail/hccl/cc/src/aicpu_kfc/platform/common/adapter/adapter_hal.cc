@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <thread>
-#include <adapter_hal.h>
-#include "dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
 #include "log.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "rt_external.h"
 #include "aicpu_schedule/aicpu_mc2_maintenance_thread.h"
 

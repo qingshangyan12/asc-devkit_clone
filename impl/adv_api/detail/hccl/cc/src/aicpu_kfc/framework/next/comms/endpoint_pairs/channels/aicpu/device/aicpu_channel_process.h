@@ -11,8 +11,8 @@
 #define __AICPU_CHANNEL_PROCESS_H__
 
 #include "common.h"
-#include "channel_param.h"
-#include "ub_transport_lite_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/channel_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/transport/aicpu/ub_transport_lite_impl.h"
 class AicpuChannelProcess {
 public:
     ~AicpuChannelProcess() = default;

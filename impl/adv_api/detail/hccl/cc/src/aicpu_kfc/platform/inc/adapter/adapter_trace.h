@@ -10,8 +10,8 @@
 #ifndef HCCL_INC_ADAPTER_TRACE_H
 #define HCCL_INC_ADAPTER_TRACE_H
 
-#include <hccl/hccl_types.h>
-#include <hccl/base.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "atrace_types.h"
 
 HcclResult hrtOpenTrace();

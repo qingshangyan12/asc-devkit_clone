@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "task_exception_func.h"
-#include "communicator_impl_lite_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite_manager.h"
 #include "log.h"
 #include <map>
 #include <vector>

@@ -23,15 +23,15 @@
 #ifndef IMPL_SORT_TOPK_TOPK_C310_IMPL_H
 #define IMPL_SORT_TOPK_TOPK_C310_IMPL_H
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-#include "kernel_log.h"
+#include "impl/basic_api/kernel_log.h"
 #endif
 
-#include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "topk_common_utils.h"
 
-#include "../sort/sort_impl.h"
-#include "../sort_common_utils.h"
+#include "impl/adv_api/detail/sort/sort/sort_impl.h"
+#include "impl/adv_api/detail/sort/sort_common_utils.h"
 
 namespace AscendC {
 #if ASCENDC_CPU_DEBUG

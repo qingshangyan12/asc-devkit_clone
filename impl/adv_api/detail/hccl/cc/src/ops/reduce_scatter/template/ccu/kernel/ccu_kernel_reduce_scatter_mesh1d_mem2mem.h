@@ -13,9 +13,9 @@
 #include <vector>
 #include <ios>
 #include "utils.h"
-#include "ccu_kernel.h"
-#include "ccu_kernel_utils.h"
-#include "ccu_kernel_alg_base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_kernel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_alg_base.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;

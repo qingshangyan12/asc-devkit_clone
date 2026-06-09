@@ -10,8 +10,8 @@
 #ifndef __AICPU_EXECUTOR_TRACER_H__
 #define __AICPU_EXECUTOR_TRACER_H__
 
-#include "common/aicpu_hccl_def.h"
-#include "framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
 
 namespace dfx_tracer {
 class AicpuExecutorTracer {

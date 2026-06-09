@@ -24,11 +24,11 @@
 #define IMPL_ACTIVATION_SOFTMAX_V200_SOFTMAX_FLASHV2_IMPL_H
 
 #include "softmax_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_basic_block_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_update_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_no_update_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_nz_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_common_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_basic_block_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_update_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_no_update_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_nz_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_common_impl.h"
 namespace AscendC {
 
 template <typename T1, typename T2, bool isUpdate = false, bool isBasicBlock = false, bool isOutputReduceMax = false>

@@ -11,17 +11,17 @@
 #include <iterator>
 #include <functional>
 #include <map>
-#include "framework/aicpu_hccl_process.h"
-#include "common/aicpu_hccl_common.h"
-#include "stream_pub.h"
-#include "utils/hccl_aicpu_utils.h"
-#include "framework/aicpu_communicator.h"
-#include "sal_pub.h"
-#include "log_control.h"
-#include "cann_error_reporter.h"
-#include "executor_tracer.h"
-#include "dfx/aicpu_executor_tracer.h"
-#include "framework/aicpu_one_side_service.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/log_control.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/cann_error_reporter.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/executor_tracer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/dfx/aicpu_executor_tracer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_one_side_service.h"
 
 namespace dfx_tracer {
 void ExecutorTracer::BackGroundDfx(void *info)

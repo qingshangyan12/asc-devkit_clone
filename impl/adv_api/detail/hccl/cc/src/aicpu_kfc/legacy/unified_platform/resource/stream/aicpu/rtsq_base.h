@@ -12,14 +12,14 @@
 #include <vector>
 #include <functional>
 #include <queue>
-#include "types.h"
-#include "buffer.h"
-#include "notify_lite.h"
-#include "reduce_op.h"
-#include "data_type.h"
-#include "reduce_in.h"
-#include "not_support_exception.h"
-#include "ub_jetty_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/notify/aicpu/notify_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/reduce_in.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_jetty_lite.h"
 
 #include "ascend_hal.h"
 namespace aicpu {

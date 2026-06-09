@@ -20,12 +20,12 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_UNARY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_UNARY_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
 #include "kernel_struct_unary.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "reg_compute/kernel_reg_compute_utils.h"
+#include "include/basic_api/reg_compute/kernel_reg_compute_utils.h"
 #endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

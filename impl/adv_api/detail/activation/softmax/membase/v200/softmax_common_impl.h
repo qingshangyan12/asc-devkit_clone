@@ -23,7 +23,7 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_V200_SOFTMAX_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_V200_SOFTMAX_COMMON_IMPL_H
 
-#include "../common/softmax_common_nz_reduce.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_common_nz_reduce.h"
 
 namespace AscendC {
 constexpr RoundMode FLOAT2HALF_ROUND_MODE = RoundMode::CAST_NONE;

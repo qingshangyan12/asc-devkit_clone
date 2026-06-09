@@ -11,7 +11,7 @@
 #define HCCL_RANK_GRAPH_DL_H
 
 #include "dlsym_common.h"
-#include "hccl_rank_graph.h"   // 原头文件，包含所有类型和 inline 函数
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"   // 原头文件，包含所有类型和 inline 函数
 
 #ifdef __cplusplus
 extern "C" {

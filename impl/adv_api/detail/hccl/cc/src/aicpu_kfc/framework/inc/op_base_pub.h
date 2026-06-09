@@ -11,11 +11,11 @@
 #define OP_BASE_PUB_H
 
 #include <vector>
-#include <hccl/hccl_types.h>
-#include <hccl/hccl_comm.h>
-#include <hccl/hccl_inner.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 struct OpBaseMemPara {
     u64 beginIndex;

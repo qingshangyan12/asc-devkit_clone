@@ -12,9 +12,9 @@
  * \file conv3d_bp_input_tiling_base.cpp
  * \brief
  */
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "conv3d_bp_tiling_util.h"
-#include "include/adv_api/conv_backprop/conv3d_bp_input_tiling_base.h"
+#include "../../../../include/adv_api/conv_backprop/conv3d_bp_input_tiling_base.h"
 
 namespace ConvBackpropApi {
 

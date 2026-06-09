@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "launch_context.h"
-#include "new/hccl_primitive_local.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_local.h"
 
 extern HcclResult CommTaskLaunch(ThreadHandle *threads, uint32_t threadNum); // host ffts+或aicpu stars使用"
 extern HcclResult CommTaskPrepare(char *key, uint32_t keyLen); // host ffts+使用

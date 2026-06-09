@@ -10,7 +10,7 @@
 #ifndef HCCLV2_INS_TEMP_ALL_TO_ALL_MESH
 #define HCCLV2_INS_TEMP_ALL_TO_ALL_MESH
 
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 
 #include "ins_alg_template_base.h"
 #include "alg_data_trans_wrapper.h"

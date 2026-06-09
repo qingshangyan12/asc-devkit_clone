@@ -13,8 +13,8 @@
 #include <vector>
 #include <memory>
 #include <list>
-#include "hccl/base.h"
-#include "alg_param.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "utils.h"
 
 namespace mc2_ops_hccl {

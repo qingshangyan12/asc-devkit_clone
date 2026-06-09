@@ -12,9 +12,9 @@
 
 #include "dev_capability.h"
 #include <map>
-#include "dev_type.h"
-#include "reduce_op.h"
-#include "data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
 
 namespace Hccl {
 

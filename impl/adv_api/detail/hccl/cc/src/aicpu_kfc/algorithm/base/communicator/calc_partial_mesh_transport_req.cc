@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "calc_partial_mesh_transport_req.h"
-#include "dtype_common.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 
 namespace hccl {
 CalcPartialMeshTransportReq::CalcPartialMeshTransportReq(std::vector<std::vector<u32>> &subCommPlaneVector,

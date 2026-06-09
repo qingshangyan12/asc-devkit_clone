@@ -9,8 +9,8 @@
 */
 #include "all_reduce_nhr.h"
 #include "alg_template_register.h"
-#include "reduce_scatter_nhr.h"
-#include "all_gather_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_reduce_scatter/reduce_scatter_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_all_gather/all_gather_nhr.h"
 
 namespace hccl {
 AllReduceNHR::AllReduceNHR(const HcclDispatcher dispatcher) : NHRBase(dispatcher)

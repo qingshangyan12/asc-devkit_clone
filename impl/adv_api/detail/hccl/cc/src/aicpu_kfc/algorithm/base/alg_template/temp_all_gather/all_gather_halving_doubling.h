@@ -10,7 +10,7 @@
 #ifndef ALL_GATHER_HALVING_DOUBLING_H
 #define ALL_GATHER_HALVING_DOUBLING_H
 
-#include "all_gather_halving_doubling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_halving_doubling_pub.h"
 
 namespace hccl {
 }  // namespace hccl

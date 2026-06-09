@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "prim_rules.h"
-#include "not_support_exception.h"
-#include "dev_capability.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dev_capability.h"
 namespace Hccl {
 constexpr u32 INSTRUCTION_PRI_LOCAL_POST_TO         = 90;
 constexpr u32 INSTRUCTION_PRI_LOCAL_WAIT_FROM       = 85;

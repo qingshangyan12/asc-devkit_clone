@@ -9,8 +9,8 @@
 */
 #include "queue_notify_manager.h"
 #include <algorithm>
-#include "device_capacity.h"
-#include "adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 
 namespace hccl {
 constexpr u32 NOTIFY_MAX_NUM = 2048;

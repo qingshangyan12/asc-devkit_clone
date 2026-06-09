@@ -10,7 +10,7 @@
 #ifndef BROADCAST_RING_H
 #define BROADCAST_RING_H
 
-#include "broadcast_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/broadcast_ring_pub.h"
 
 namespace hccl {
 }  // namespace hccl

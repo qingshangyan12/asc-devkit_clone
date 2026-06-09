@@ -23,7 +23,7 @@
 #ifndef IMPL_QUANTIZATION_QUANT_ASCEND_QUANT_V200_IMPL_H
 #define IMPL_QUANTIZATION_QUANT_ASCEND_QUANT_V200_IMPL_H
 #include "ascend_quant_pre_impl.h"
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 

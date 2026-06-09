@@ -15,7 +15,7 @@
 #ifndef IMPL_HCCL_HCCL_V310_IMPL_H
 #define IMPL_HCCL_HCCL_V310_IMPL_H
 
-#include "../common/hccl_aicpu_def.h"
-#include "platform_v310/hccl_ccu_v0_def.h"
+#include "impl/adv_api/detail/hccl/common/hccl_aicpu_def.h"
+#include "impl/adv_api/detail/hccl/impl/platform_v310/hccl_ccu_v0_def.h"
 
 #endif

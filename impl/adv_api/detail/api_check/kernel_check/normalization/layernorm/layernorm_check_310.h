@@ -23,12 +23,12 @@
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_310_H_
 
 #include "kernel_tiling/kernel_tiling.h"
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/reuse_source_check.h"
-#include "../../basic_check/single_tensor_check.h"
-#include "../../basic_check/multiple_tensor_check.h"
-#include "include/adv_api/normalization/layernorm_utils.h"
-#include "../../../../normalization/layernorm/layernorm_normal_config.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/reuse_source_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/multiple_tensor_check.h"
+#include "../../../../../../../include/adv_api/normalization/layernorm_utils.h"
+#include "impl/adv_api/detail/normalization/layernorm/layernorm_normal_config.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

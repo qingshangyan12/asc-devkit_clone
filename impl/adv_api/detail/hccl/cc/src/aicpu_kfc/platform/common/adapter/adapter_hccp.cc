@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include <adapter_hccp.h>
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
 #include <securec.h>
 #include <unordered_map>
 #include <sys/socket.h>
@@ -15,20 +15,20 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-#include <adapter_rts.h>
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 #include <mutex>
 #include <memory>
 #include <unordered_set>
 
-#include "adapter_error_manager.h"
-#include "network/hccp_common.h"
-#include "externalinput.h"
-#include "dlra_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/hccd/adapter_error_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlra_function.h"
 #include "log.h"
-#include "adapter_hal.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 #include "../host/transport_ibverbs_pub.h"
-#include "config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
 
 using namespace hccl;
 using namespace std;

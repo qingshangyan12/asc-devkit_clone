@@ -12,8 +12,8 @@
 
 #include <vector>
 #include <unordered_map>
-#include "virtual_topo.h"
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 
 
 namespace Hccl {

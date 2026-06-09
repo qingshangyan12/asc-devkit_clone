@@ -22,9 +22,9 @@
 
 #ifndef IMPL_MATH_SILU_SILU_C310_IMPL_H
 #define IMPL_MATH_SILU_SILU_C310_IMPL_H
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "../../common/check.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "impl/adv_api/detail/common/check.h"
 
 namespace AscendC {
 namespace Internal {

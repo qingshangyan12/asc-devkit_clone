@@ -21,15 +21,15 @@
 #endif
 #ifndef IMPL_MATH_LOG_LOG_COMMON_IMPL_H
 #define IMPL_MATH_LOG_LOG_COMMON_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "../../common/check.h"
+#include "impl/adv_api/detail/common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/math/log/log_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/math/log/log_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "log_3510_impl.h"

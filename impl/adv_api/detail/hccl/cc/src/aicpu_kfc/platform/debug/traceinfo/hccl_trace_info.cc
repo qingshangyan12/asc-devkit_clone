@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <string>
-#include "sal_pub.h"
-#include "externalinput.h"
-#include "adapter_trace.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_trace.h"
 #include "atrace_types.h"
-#include "hccl_trace_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_trace_info.h"
 using namespace std;
 namespace hccl {
 constexpr u32 TRACE_MAX_MSG_SIZE = 111;

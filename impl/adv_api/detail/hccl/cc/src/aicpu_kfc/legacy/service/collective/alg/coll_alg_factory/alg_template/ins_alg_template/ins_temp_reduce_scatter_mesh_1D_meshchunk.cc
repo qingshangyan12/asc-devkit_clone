@@ -10,7 +10,7 @@
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
 #include "log.h"
 #include "alg_data_trans_wrapper.h"
-#include "ins_coll_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/ins_alg_executor/ins_coll_alg_base.h"
 
 namespace Hccl {
 InsTempReduceScatterMesh1DMeshChunk::InsTempReduceScatterMesh1DMeshChunk(const RankId virtualRank, const u32 tempRankSize,

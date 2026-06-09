@@ -8,16 +8,16 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "communicator_impl_lite.h"
-#include "aicpu_daemon_service.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/aicpu_daemon_service.h"
 #include "aicpu_res_package_helper.h"
-#include "alg_topo_package_helper.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/service/aicpu/alg_topo_package_helper.h"
 #include "sal.h"
-#include "suspending_exception.h"
-#include "exception_util.h"
-#include "task_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/suspending_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
 #ifdef CCL_KERNEL_AICPU
 #include "dlprof_function.h"
-#include "profiling_command_handle_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_command_handle_lite.h"
 #endif
 namespace Hccl {
 

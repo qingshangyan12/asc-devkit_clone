@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "topoinfo_ranktableHeterog.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableHeterog.h"
 
 #include <map>
 #include <vector>
@@ -19,11 +19,11 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#include "externalinput_pub.h"
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 // ltm指定config路径
-#include "common/src/config.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 
 using namespace std;
 using namespace hccl;

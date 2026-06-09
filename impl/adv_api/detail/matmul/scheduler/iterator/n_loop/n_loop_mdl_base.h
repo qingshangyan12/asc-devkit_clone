@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_SCHEDULER_ITERATOR_N_LOOP_N_LOOP_MDL_BASE_H
 #define IMPL_MATMUL_SCHEDULER_ITERATOR_N_LOOP_N_LOOP_MDL_BASE_H
 
-#include "../../../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 namespace AscendC {
 namespace Impl {

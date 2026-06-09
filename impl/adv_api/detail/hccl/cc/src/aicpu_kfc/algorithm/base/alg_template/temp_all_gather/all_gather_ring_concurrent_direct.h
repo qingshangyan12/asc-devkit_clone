@@ -11,7 +11,7 @@
 #ifndef ALL_GATHER_RING_CONCURRENT_DIRECT_H
 #define ALL_GATHER_RING_CONCURRENT_DIRECT_H
  
-#include "all_gather_ring_concurrent_direct_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_ring_concurrent_direct_pub.h"
  
 namespace hccl {
 }  // namespace hccl

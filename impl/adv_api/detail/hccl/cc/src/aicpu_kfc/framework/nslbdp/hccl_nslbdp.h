@@ -15,13 +15,13 @@
 #include <map>
 #include <mutex>
 
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
-#include "hccl_comm_pub.h"
-#include "topoinfo_struct.h"
-#include "sal_pub.h"
-#include "comm.h"
-#include "coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 #include "hccl_nslbdp_pub.h"
 
 namespace hccl {

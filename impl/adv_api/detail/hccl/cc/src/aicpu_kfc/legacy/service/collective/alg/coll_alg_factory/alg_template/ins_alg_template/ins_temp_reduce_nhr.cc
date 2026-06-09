@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "buffer.h"
-#include "aicpu_ins.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/device_mode/aicpu_ins.h"
 #include "log.h"
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_reduce_nhr.h"

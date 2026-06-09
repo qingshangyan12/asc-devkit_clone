@@ -14,7 +14,7 @@
  */
 
 #include <cstdint>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "conv3d_tiling_algorithm.h"
 
 namespace Conv3dTilingApi {

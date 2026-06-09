@@ -16,10 +16,10 @@
 #include <queue>
 #include <string>
 #include <algorithm>
-#include "const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
 #include "template_utils.h"
 #include "instruction.h"
-#include "ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
 
 namespace Hccl {
 using InsQuePtr = std::shared_ptr<InsQueue>;

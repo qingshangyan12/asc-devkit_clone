@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "parallel_task_loader.h"
-#include "profiling_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager_pub.h"
 
 namespace hccl {
 ParallelTaskLoader::ParallelTaskLoader(const s32 deviceLogicId, const HcclDispatcher dispatcher)
