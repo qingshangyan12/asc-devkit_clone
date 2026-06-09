@@ -20,6 +20,7 @@
 #include "hcomm_host_profiling_dl.h"
 #include "hccl_host_comm_dl.h"
 #include "hccl_res_expt_dl.h"
+#include "log.h"
 #include <pthread.h>
 #include <dlfcn.h>
 #include <cstdio>
@@ -60,16 +61,28 @@ bool HcommIsExportThreadSupported()
 
 // 初始化
 void HcommDlInit(void) {
-    if (gLibHandle != nullptr) return;
-
-    gLibHandle = dlopen("libhcomm.so", RTLD_NOW);
-    if (!gLibHandle) {
-        fprintf(stderr, "[HcclWrapper] Failed to open libhcomm: %s\n", dlerror());
+    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit called, gLibHandle=%p", gLibHandle);
+    
+    if (gLibHandle != nullptr) {
+        HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit already initialized, skipping");
         return;
     }
 
+    HCCL_INFO("[HcclWrapper-DEBUG] Calling dlopen(\"libhcomm.so\", RTLD_NOW)");
+    gLibHandle = dlopen("libhcomm.so", RTLD_NOW);
+    
+    if (!gLibHandle) {
+        const char* dlErr = dlerror();
+        HCCL_ERROR("[HcclWrapper-DEBUG] dlopen FAILED, error: %s", dlErr ? dlErr : "(null)");
+        HCCL_ERROR("[HcclWrapper] Failed to open libhcomm: %s", dlErr ? dlErr : "(null)");
+        return;
+    }
+    
+    HCCL_INFO("[HcclWrapper-DEBUG] dlopen SUCCESS, handle=%p", gLibHandle);
+
     dlerror();
 
+    HCCL_INFO("[HcclWrapper-DEBUG] Initializing DL modules...");
     HcclResDlInit(gLibHandle);
     HcclRankGraphDlInit(gLibHandle);
     HcommPrimitivesDlInit(gLibHandle);
@@ -79,6 +92,9 @@ void HcommDlInit(void) {
     HcclResExptDlInit(gLibHandle);
     CcuResDlInit(gLibHandle);
     HcclCcuResDlInit(gLibHandle);
+    HCCL_INFO("[HcclWrapper-DEBUG] Calling CcuLaunchDlInit...");
     CcuLaunchDlInit(gLibHandle);
     CcuPrimitivesImplDlInit(gLibHandle);
+    
+    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit completed successfully");
 }
