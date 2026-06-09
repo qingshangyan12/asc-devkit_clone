@@ -52,13 +52,13 @@ __aicore__ inline void asc_set_l13d_fmatrix(asc_l13d_fmatrix_config& config);
  * @param [in] src Source buffer in Cube Buffer (L1)
  * @param [in] burst_count Number of burst transfers
  * @param [in] burst_len Length of each burst
- * @param [in] src_gap_size Gap between source bursts
- * @param [in] dst_gap_size Gap between destination bursts
+ * @param [in] source_gap Gap between source bursts
+ * @param [in] dst_gap Gap between destination bursts
  * @details Performs data copy from Cube Buffer (L1) to Feature Buffer.
  *          This is a hardware-level instruction that requires manual synchronization.
  */
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len,
-                                      uint16_t src_gap_size, uint16_t dst_gap_size);
+                                      uint16_t source_gap, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
 
@@ -321,7 +321,7 @@ __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src,
  * @brief Supports data types: bfloat16_t, half, float, int32_t, int8_t, uint32_t, uint8_t
  * @param [out] dst Destination buffer in Cube Buffer (L1)
  * @param [in] src Source buffer in Global Memory
- * @param [in] base_idx Base index for the operation
+ * @param [in] base_idx the index id of the fractal matrix in the source matrix
  * @param [in] repeat Number of repeat operations
  * @param [in] src_stride Source stride value
  * @param [in] dst_stride Destination stride value
@@ -382,48 +382,28 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ uint32_t* dst, __gm__ uint3
 __aicore__ inline void asc_copy_l12l0b(__cb__ int4b_t* dst, __cbuf__ int4b_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ uint8_t* dst, __cbuf__ uint8_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0b(__cb__ int8_t* dst, __cbuf__ int8_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -433,15 +413,7 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -451,64 +423,36 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* sr
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src,
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int4b_t* dst, __cbuf__ int4b_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0a(__ca__ uint8_t* dst, __cbuf__ uint8_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int8_t* dst, __cbuf__ int8_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst, __cbuf__ half* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0a(__ca__ uint32_t* dst, __cbuf__ uint32_t* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int32_t* dst, __cbuf__ int32_t* src,
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_l12l0a(__ca__ float* dst, __cbuf__ float* src,
     uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
 
-    uint16_t start_index, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int4b_t* dst, __cbuf__ int4b_t* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -518,15 +462,7 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ uint8_t* dst, __cbuf__ uint8_t* sr
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int8_t* dst, __cbuf__ int8_t* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -536,15 +472,7 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ half* dst, __cbuf__ half* src,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -554,24 +482,12 @@ __aicore__ inline void asc_copy_l12l0a(__ca__ uint32_t* dst, __cbuf__ uint32_t* 
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ int32_t* dst, __cbuf__ int32_t* src,
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
 
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
 __aicore__ inline void asc_copy_l12l0a(__ca__ float* dst, __cbuf__ float* src,
-    uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
-    bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
-
     uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,
     uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool filter_size_w, bool filter_size_h,
     bool transpose, bool f_matrix_ctrl, uint16_t channel_size);
@@ -582,36 +498,22 @@ __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ half* dst, __cbuf__ half* src, uint16_t index_id,
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ float* dst, __cbuf__ float* src, uint16_t index_id,
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id,
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id,
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
-
     uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat,
@@ -621,9 +523,6 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* sr
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id,
                                              uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode,
                                              uint64_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat,
                                              uint16_t src_stride, uint16_t dst_stride, bool addrmode,
@@ -645,24 +544,6 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8
                                              uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool addrmode,
                                              uint64_t dst_frac_stride);
 
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint16_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
-
-                                                  uint8_t repeat, uint16_t src_stride, uint16_t dst_stride,
-                                                  bool addrmode, uint64_t dst_frac_stride);
-
 __aicore__ inline void asc_set_l13d_size(uint64_t value);
 
 __aicore__ inline void asc_set_l13d_padding(uint64_t config);
@@ -677,13 +558,7 @@ __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_s
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size);
 
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
-    uint16_t left_pad_size, uint16_t right_pad_size);
-
 __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size,
-    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
-    uint16_t left_pad_size, uint16_t right_pad_size);
-
     uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size,
     uint16_t left_pad_size, uint16_t right_pad_size);
 
@@ -716,44 +591,28 @@ __aicore__ inline void asc_copy_gm2l0b(__cb__ int4b_t* dst, __gm__ int4b_t* src,
 
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
     uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat,
-    uint16_t src_Stride, uint16_t dst_stride);
-
-    uint16_t src_Stride, uint16_t dst_stride);
+    uint16_t src_stride, uint16_t dst_stride);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 
