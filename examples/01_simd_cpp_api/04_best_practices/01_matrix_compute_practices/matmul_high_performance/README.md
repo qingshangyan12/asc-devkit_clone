@@ -4,11 +4,13 @@
 
 本样例基于Matmul 高阶API实现矩阵乘法运算，通过9个递进式的优化case展示从基础实现到高性能优化的完整调优路径，包括单核基础版本、Tiling优化、多核并行切分、MDL模式、L1Cache/L2Cache优化、常量Tiling、UnitFlag优化等多种优化手段。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -463,7 +465,7 @@ MTE2理论耗时：
 $$MTE2理论耗时 =\frac{HBM读入数据总量}{1.8TB/s} +\frac{L2Cache读入数据总量}{5TB/s} = 2672.44\mu s$$
 
 Case 8 MTE2耗时误差：
-$$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 28.55\%$$
+$$MTE2耗时误差 = \frac{{3435.584\mu s} - {2672.44\mu s}}{{2672.44\mu s}} = 28.56\%$$
 
 当前MTE2耗时与理论值相差较大，因为实际芯片L2Cache大小为192MB，当前L2Cache切分策略较简单；另一方面当MTE2搬运场景为ND2NZ（GM数据Layout为ND，搬运到L1时需做ND→NZ格式转换）时，L2Cache带宽会降低。用户可进一步优化L2Cache切分策略以提高MTE2带宽。
 
@@ -524,23 +526,16 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=0                       # 选择执行场景
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -565,7 +560,7 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
   |------|--------|------|
   | `SCENARIO_NUM` | `0`-`8` | 样例类型（0-8），默认为0 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   执行结果如下，说明精度对比成功。
   ```bash

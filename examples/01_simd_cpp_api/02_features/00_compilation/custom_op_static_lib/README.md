@@ -4,12 +4,13 @@
 
 本样例以`AddCustom`为例，展示如何编译、打包并链接自定义算子静态库，通过aclnn的方式执行算子。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-本样例支持如下产品型号：
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -30,24 +31,12 @@ AddCustom算子介绍等内容可参考[算子描述](../custom_op/README.md)。
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。需确保`ASCEND_HOME_PATH`指向CANN安装根路径，以便头文件与库路径生效。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。需确保`ASCEND_HOME_PATH`指向CANN安装根路径，以便头文件与库路径生效。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 

@@ -13,13 +13,11 @@
 | Case 2 | 2 | SIMT非连续访问UB | 基于SIMD DataCopy接口将GM连续搬运到UB，SIMT每个线程处理一段连续元素，但Warp内相邻线程访问不连续。 |
 | Case 3 | 3 | SIMT连续访问UB | 基于SIMD DataCopy接口将GM连续搬运到UB，调整SIMT线程映射，使Warp内相邻线程访问连续地址。 |
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \> CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -386,28 +384,20 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
-  SCENARIO=1                                                           # 选择执行场景
+  SCENARIO_NUM=1                                                       # 选择执行场景
   mkdir -p build && cd build;                                          # 创建并进入 build 目录
-  cmake -DCMAKE_ASC_RUN_MODE=npu -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # 编译工程
+  cmake -DCMAKE_ASC_RUN_MODE=npu -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;  # 编译工程
   python3 ../scripts/gen_data.py
   ./demo
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
@@ -419,7 +409,7 @@ __aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalT
 
   | 选项 | 可选值 | 说明 |
   |:---|:---|:---|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU仿真、NPU运行 |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1`、`2`、`3` | Case编号：0=SIMT直接访问GM，1=SIMD RegBase，2=SIMT非连续访问，3=SIMT连续访问 |
 

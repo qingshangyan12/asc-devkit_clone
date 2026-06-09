@@ -4,13 +4,11 @@
 
 本样例基于 Gather 和 Adds 融合计算，演示在 SIMD&SIMT 混合编程场景中使用 `clock()` 接口实现时间戳打点的方法。样例以 SIMT 方式实现离散访存的 Gather，以 SIMD 方式实现连续访存的 Adds，并在 SIMT Gather 阶段前后打点，用于记录执行周期。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0-beta.2
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0-beta.2 |
 
 ## 目录结构
 
@@ -83,24 +81,16 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j

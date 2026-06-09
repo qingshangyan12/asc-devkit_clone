@@ -15,64 +15,30 @@
 
 using namespace std;
 using namespace AscendC;
-
-namespace {
-
-Channel GetChannel()
-{
-    Channel channel;
-    // 初始化类型
-    channel.type = 0; // RDMA
-
-    // 为 SQ 相关字段分配内存并设置
-    channel.sqNum = 1;
-    std::unique_ptr<SqContext> sqContext(new SqContext());
-    channel.sqContextAddr = sqContext.get();
-    channel.sqContextAddr->type = SQ_CONTEXT_TYPE_ROCE; // RDMA
-    channel.sqContextAddr->ctx.rdmaSqContext.qpn = 1;
-
-    // 分配实际内存
-    uint8_t* sqBuffer = new uint8_t[10 * 10]; // 10个wqe，每个wqe大小为10
-    channel.sqContextAddr->ctx.rdmaSqContext.sqVa = reinterpret_cast<uint64_t>(sqBuffer);
-    channel.sqContextAddr->ctx.rdmaSqContext.wqeSize = 10;
-    channel.sqContextAddr->ctx.rdmaSqContext.depth = 10;
-
-    // 分配head和tail内存
-    uint32_t* head = new uint32_t(0);
-    uint32_t* tail = new uint32_t(0);
-    channel.sqContextAddr->ctx.rdmaSqContext.headAddr = reinterpret_cast<uint64_t>(head);
-    channel.sqContextAddr->ctx.rdmaSqContext.tailAddr = reinterpret_cast<uint64_t>(tail);
-
-    channel.sqContextAddr->ctx.rdmaSqContext.sl = 1;
-
-    // 分配doorbell内存
-    uint64_t* dbBuffer = new uint64_t(0);
-    channel.sqContextAddr->ctx.rdmaSqContext.dbVa = reinterpret_cast<uint64_t>(dbBuffer);
-    channel.sqContextAddr->ctx.rdmaSqContext.dbMode = 0;
-
-    // 为 Buffer 相关字段分配内存并设置
-    channel.remoteBufferNum = 1;
-    std::unique_ptr<ProtectionInfo> remoteBuffer(new ProtectionInfo());
-    channel.remoteBufferAddr = remoteBuffer.get();
-    channel.remoteBufferAddr->type = PROTECTION_TYPE_ROCE;
-    channel.remoteBufferAddr->pti.rdmaMemProtectionInfo.rkey = 123456;
-
-    channel.localBufferNum = 1;
-    std::unique_ptr<ProtectionInfo> localBuffer(new ProtectionInfo());
-    channel.localBufferAddr = localBuffer.get();
-    channel.localBufferAddr->type = PROTECTION_TYPE_ROCE;
-    channel.localBufferAddr->pti.rdmaMemProtectionInfo.lkey = 654321;
-
-    return channel;
-}
-
-} // namespace
-
 class HcommCommonTestSuite : public testing::Test {
 protected:
     virtual void SetUp()
     {
         blockIdxBak_ = block_idx;
+        channel_.sqNum = 1;
+        sqCtx_.contextInfo.roceSq.sqVa = (uint64_t)sqVa_;
+        sqCtx_.contextInfo.roceSq.dbVa = (uint64_t)dbVa_;
+        sqCtx_.contextInfo.roceSq.wqeSize = 48;
+        sqCtx_.contextInfo.roceSq.depth = 10;
+        sqCtx_.contextInfo.roceSq.qpn = 1;
+        sqCtx_.contextInfo.roceSq.headAddr = (uint64_t)(&head_);
+        sqCtx_.contextInfo.roceSq.tailAddr = (uint64_t)(&tail_);
+        sqCtx_.contextInfo.roceSq.dbMode = 0;
+        sqCtx_.contextInfo.roceSq.sl = 1;
+        channel_.sqContextAddr = &sqCtx_;
+        channel_.localBufferNum = 1;
+        localBuff_.type = RegedBufferType::REGED_BUFFER_RMA;
+        localBuff_.bufferInfo.rma.protectionInfo.memInfo.roce.lkey = 123456;
+        channel_.localBufferAddr = &localBuff_;
+        channel_.remoteBufferNum = 1;
+        remoteBuff_.type = RegedBufferType::REGED_BUFFER_RMA;
+        remoteBuff_.bufferInfo.rma.protectionInfo.memInfo.roce.rkey = 123456;
+        channel_.remoteBufferAddr = &remoteBuff_;
     }
     virtual void TearDown()
     {
@@ -81,26 +47,37 @@ protected:
 
 private:
     int64_t blockIdxBak_;
+    ChannelEntity channel_;
+    SqContext sqCtx_;
+    uint8_t sqVa_[100] = {0};
+    uint8_t dbVa_[8] = {0};
+    uint32_t head_ = 0;
+    uint32_t tail_ = 0;
+    RegedBufferEntity localBuff_;
+    RegedBufferEntity remoteBuff_;
 };
 
 TEST_F(HcommCommonTestSuite, Aiv_Read)
 {
-    Channel channel = GetChannel();
-
-    Hcomm hcomm;
-    ChannelPtr channelPtr = reinterpret_cast<ChannelPtr>(&channel);
-    HcommHandle handleId =
-        hcomm.ReadNbi(channelPtr, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
-    EXPECT_EQ(handleId, 0);
+    Hcomm<AscendC::COMM_PROTOCOL_ROCE> hcomm;
+    ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
+    int32_t ret = hcomm.ReadNbi(channelHandle,
+        reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+    EXPECT_EQ(ret, 0);
 }
 
 TEST_F(HcommCommonTestSuite, Aiv_Write)
 {
-    Channel channel = GetChannel();
+    Hcomm<AscendC::COMM_PROTOCOL_ROCE> hcomm;
+    ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
+    int32_t ret = hcomm.WriteNbi(channelHandle, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
+    EXPECT_EQ(ret, 0);
+}
 
-    Hcomm hcomm;
-    ChannelPtr channelPtr = reinterpret_cast<ChannelPtr>(&channel);
-    HcommHandle handleId =
-        hcomm.WriteNbi(channelPtr, reinterpret_cast<GM_ADDR>(0x11), reinterpret_cast<GM_ADDR>(0x22), 1);
-    EXPECT_EQ(handleId, 0);
+TEST_F(HcommCommonTestSuite, Aiv_WriteWithNotifyNbi)
+{
+    Hcomm<AscendC::COMM_PROTOCOL_ROCE> hcomm;
+    ChannelHandle channelHandle = reinterpret_cast<ChannelHandle>(&channel_);
+    int32_t ret = hcomm.WriteWithNotifyNbi(channelHandle, reinterpret_cast<GM_ADDR>(0x11),reinterpret_cast<GM_ADDR>(0x22), 1, reinterpret_cast<GM_ADDR>(0x33), 2);
+    EXPECT_EQ(ret, -1);
 }

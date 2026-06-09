@@ -484,13 +484,6 @@ export default defineConfig({
     },
   },
 
-  transformHtml(code) {
-    return code.replace(
-      /(<div[^>]*class="[^"]*vp-doc[^"]*")([^>]*>)/,
-      '$1 data-pagefind-body$2'
-    )
-  },
-
   transformPageData(pageData) {
     const cache = loadHeaderCache(pageData.filePath)
     if (cache && cache.length > 0) {
@@ -499,6 +492,14 @@ export default defineConfig({
   },
 
   buildConcurrency: 1,
+
+  transformHtml(code) {
+    code = code.replace(/<body\b/, '<body data-pagefind-body')
+    return code.replace(
+      /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
+      m => m.startsWith('<') ? m : m.replace(/(.)(?=.)/g, '$1\u200A')
+    )
+  },
 
   vite: {
     sourcemap: false,
@@ -512,39 +513,11 @@ export default defineConfig({
     },
     plugins: [htmlAsMdPlugin(), placeholderPlugin(), pagefindPlugin({
       btnPlaceholder: '搜索',
-      placeholder: '搜索文档',
+      placeholder: '简易搜索，暂不支持多语言和特殊符号',
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
+      forceLanguage: 'en',
     }), {
-      name: 'serve-theme-assets',
-      configureServer(server) {
-        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
-        server.middlewares.use(async (req, res, next) => {
-          const file = req.url === '/ascend-logo.svg' ? 'ascend-logo.svg'
-            : req.url === '/favicon.ico' ? 'favicon.ico' : null
-          if (file) {
-            const fp = resolve(themeAssets, file)
-            if (existsSync(fp)) {
-              const mime = file.endsWith('.svg') ? 'image/svg+xml' : 'image/x-icon'
-              res.setHeader('Content-Type', mime)
-              res.end(readFileSync(fp))
-              return
-            }
-          }
-          next()
-        })
-      },
-      writeBundle(options) {
-        const themeAssets = resolve(import.meta.dirname, 'theme/assets')
-        const dest = options.dir
-        if (dest) {
-          for (const f of ['ascend-logo.svg', 'favicon.ico']) {
-            const src = resolve(themeAssets, f)
-            if (existsSync(src)) copyFileSync(src, resolve(dest, f))
-          }
-        }
-      },
-    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
@@ -567,13 +540,9 @@ export default defineConfig({
     },
   },
 
-  head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
-  ],
+  head: [],
 
   themeConfig: {
-    logo: '/ascend-logo.svg',
-
     nav: [
       { text: '首页', link: '/' },
       { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
