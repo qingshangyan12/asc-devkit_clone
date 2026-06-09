@@ -635,6 +635,10 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
             isResourceReused = true;
             *resCtxSequence = ctx;
             param.ctxSize = size;
+            
+            if (param.engine == COMM_ENGINE_CCU) {
+                CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size));
+            }
             return HCCL_SUCCESS;
         }
     }
@@ -1086,6 +1090,34 @@ static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
     
     HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
     return 0;
+}
+
+static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize)
+{
+    if (ctxSize == 0) {
+        return HCCL_SUCCESS;
+    }
+    
+    auto *ctxRaw = static_cast<char *>(ctx);
+    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
+    AlgResourceCtxSerializable tempCtx;
+    tempCtx.DeSerialize(seq);
+    
+    if (tempCtx.kfcServerArgs.size() == 5U && tempCtx.kfcServerArgSize == 6U) {
+        void *cclBufferAddr = nullptr;
+        uint64_t cclBufferSize = 0;
+        if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
+            uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
+            tempCtx.kfcServerArgs.push_back(token);
+            
+            std::vector<char> updatedSeq = tempCtx.Serialize();
+            if (updatedSeq.size() <= ctxSize) {
+                memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
+                HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] appended to reused CCU context", token);
+            }
+        }
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,

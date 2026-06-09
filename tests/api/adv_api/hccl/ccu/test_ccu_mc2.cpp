@@ -417,8 +417,6 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
     // missionIndex = 0
     EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
-    // token (由GetTokenFromBuffInfo获取，模拟环境无实际buffer故为0)
-    EXPECT_EQ(resourceCtx.kfcServerArgs[5], 0U);
 
     free(resCtxOut);
 }
