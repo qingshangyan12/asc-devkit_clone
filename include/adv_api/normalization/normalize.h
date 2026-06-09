@@ -21,7 +21,7 @@
 #ifndef LIB_NORMALIZATION_NORMALIZE_H
 #define LIB_NORMALIZATION_NORMALIZE_H
 #include "include/adv_api/normalization/normalize_utils.h"
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_config.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_common_impl.h"

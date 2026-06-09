@@ -21,12 +21,12 @@
 #ifndef LIB_MATH_XOR_H
 #define LIB_MATH_XOR_H
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../basic_api/kernel_tensor.h"
+#include "../../basic_api/kernel_basic_intf.h"
+#include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #include "../../../impl/adv_api/detail/math/xor/xor_common_impl.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_log.h"
+#include "../../../impl/basic_api/kernel_log.h"
 #include <type_traits>
 #endif
 

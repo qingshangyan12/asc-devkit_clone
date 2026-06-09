@@ -22,7 +22,7 @@
 #ifndef LIB_MATH_FLOOR_H
 #define LIB_MATH_FLOOR_H
 
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/floor/floor_common_impl.h"
 
 namespace AscendC {
