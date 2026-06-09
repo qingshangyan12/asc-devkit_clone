@@ -86,6 +86,57 @@ namespace mc2_ops_hccl {
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
 
+static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
+{
+    if (bufferAddr != nullptr) {
+        uint64_t token = hcomm::CcuRep::GetTokenInfo(
+            reinterpret_cast<uint64_t>(bufferAddr),
+            bufferSize);
+        HCCL_INFO("[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]",
+            bufferAddr, bufferSize, token);
+        return token;
+    }
+    
+    HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
+    return 0;
+}
+
+static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize,
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+{
+    if (ctxSize == 0) {
+        return HCCL_SUCCESS;
+    }
+    
+    // 从旧 ctx 反序列化获取完整数据
+    auto *ctxRaw = static_cast<char *>(ctx);
+    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
+    AlgResourceCtxSerializable tempCtx;
+    tempCtx.DeSerialize(seq);
+    
+    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
+    tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
+    tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
+    
+    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
+    void *cclBufferAddr = nullptr;
+    uint64_t cclBufferSize = 0;
+    if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
+        uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
+        if (tempCtx.kfcServerArgs.size() >= 6U) {
+            tempCtx.kfcServerArgs[5] = token;  // 更新占位符为真实 token
+            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
+        }
+        
+        // 序列化大小不变（都是6个元素），可以安全更新
+        std::vector<char> updatedSeq = tempCtx.Serialize();
+        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
+    } else {
+        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
+    }
+    return HCCL_SUCCESS;
+}
+
 // 检查非对称拓扑支持情况
 // 仅 AllGather, AllReduce, ReduceScatter 支持跨框非对称拓扑，其他算子拦截
 HcclResult CheckAsymmetricTopoSupport(HcclCMDType opType, const TopoInfoWithNetLayerDetails* topoInfo)
@@ -1073,57 +1124,6 @@ HcclResult GetGraphModeBuffers(HcclComm comm, ChannelHandle channelHandle, const
     CHK_RET(HcclGetRemoteBuff(comm, channelHandle, outputBuffTag, &remoteOutputBufferAddr, &remoteOutputBufferSize));
     if (remoteOutputBufferAddr != nullptr && remoteOutputBufferSize > 0) {
         channel.remoteOutputGraphMode = HcclMem{HCCL_MEM_TYPE_DEVICE, remoteOutputBufferAddr, remoteOutputBufferSize};
-    }
-    return HCCL_SUCCESS;
-}
-
-static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
-{
-    if (bufferAddr != nullptr) {
-        uint64_t token = hcomm::CcuRep::GetTokenInfo(
-            reinterpret_cast<uint64_t>(bufferAddr),
-            bufferSize);
-        HCCL_INFO("[GetTokenFromBuffInfo] Get token from buffer[%p], size[%llu], token[%llu]",
-            bufferAddr, bufferSize, token);
-        return token;
-    }
-    
-    HCCL_WARNING("[GetTokenFromBuffInfo] buffer not available, using default token=0");
-    return 0;
-}
-
-static HcclResult UpdateCcuCtxTokenOnReuse(HcclComm comm, void *ctx, uint64_t ctxSize,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
-{
-    if (ctxSize == 0) {
-        return HCCL_SUCCESS;
-    }
-    
-    // 从旧 ctx 反序列化获取完整数据
-    auto *ctxRaw = static_cast<char *>(ctx);
-    std::vector<char> seq(ctxRaw, ctxRaw + ctxSize);
-    AlgResourceCtxSerializable tempCtx;
-    tempCtx.DeSerialize(seq);
-    
-    // 用 resCtxHost 中已设置的 kfcServerArgs（含占位符）覆盖旧数据
-    tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
-    tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
-    
-    // 从 cclBuffer 获取 token 并更新第6个字段（而非 push_back，保证序列化大小一致）
-    void *cclBufferAddr = nullptr;
-    uint64_t cclBufferSize = 0;
-    if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS) {
-        uint64_t token = GetTokenFromBuffInfo(cclBufferAddr, cclBufferSize);
-        if (tempCtx.kfcServerArgs.size() >= 6U) {
-            tempCtx.kfcServerArgs[5] = token;  // 更新占位符为真实 token
-            HCCL_INFO("[UpdateCcuCtxTokenOnReuse] token[%llu] updated at kfcServerArgs[5]", token);
-        }
-        
-        // 序列化大小不变（都是6个元素），可以安全更新
-        std::vector<char> updatedSeq = tempCtx.Serialize();
-        memcpy_s(ctx, ctxSize, updatedSeq.data(), updatedSeq.size());
-    } else {
-        HCCL_WARNING("[UpdateCcuCtxTokenOnReuse] HcclGetHcclBuffer failed, token remains 0");
     }
     return HCCL_SUCCESS;
 }
