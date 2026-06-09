@@ -18,7 +18,7 @@
 
 #include "matmul_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 
 namespace matmul_tiling {
 #if !defined(__NPU_DEVICE__) && !defined(__NPU_HOST__) && !defined(__ASCC_HOST__) && !defined(__ASCC_DEVICE__)

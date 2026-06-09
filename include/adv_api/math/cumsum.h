@@ -21,8 +21,8 @@
 #ifndef LIB_MATH_CUMSUM_H
 #define LIB_MATH_CUMSUM_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_basic_intf.h"
+#include "include/basic_api/kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "../../../impl/adv_api/detail/math/cumsum/regbase/3510/cumsum_3510_impl.h"
 #else
@@ -30,7 +30,7 @@
 #endif
 #include "include/adv_api/math/cumsum_utils.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_log.h"
+#include "../../../impl/basic_api/kernel_log.h"
 #endif
 
 namespace AscendC {
