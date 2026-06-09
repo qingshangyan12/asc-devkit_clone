@@ -2,15 +2,17 @@
 
 ## 概述
 
-本样例展示了如何使用AscendC的**Aclrtc（运行时编译）**模式，在Host侧动态编译核函数源码并执行。核函数内部采用**静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtcAPI在运行时编译并执行。
+本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtcAPI在运行时编译并执行。
 
 与传统自定义算子工程不同，Aclrtc无需提前编译算子包（.run），适合快速验证和原型开发。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3训练系列产品/Atlas A3推理系列产品
-- Atlas A2训练系列产品/Atlas A2推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -48,78 +50,44 @@
 
 ### 调用实现
 
-调用aclrtc接口系列在运行时编译并执行核函数，完整链路如下：
+本样例的核心流程分为两个阶段：**编译阶段**（aclrtc 运行时编译模板核函数源码为 deviceELF）和 **执行阶段**（aclrt 加载 deviceELF 到设备并启动核函数，Host侧完成数据准备与精度校验）。
 
-#### 编译阶段
-1. `aclrtcCreateProg` — 创建编译程序对象，传入核函数源码字符串
-2. `aclrtcAddNameExpr` — 注册需要导出的核函数名（含模板参数，如`Kernel::add_custom<float>`）
-3. `aclrtcCompileProg` — 执行运行时编译，通过options传入`--npu-arch`指定NPU架构
-4. `aclrtcGetBinDataSize`/`aclrtcGetBinData` — 获取编译产物的二进制大小及数据（deviceELF）
-5. `aclrtcGetLoweredName` — 获取核函数编译后的mangledname，用于后续查找
+**1. 编译阶段：aclrtc 接口**
 
-#### 加载阶段
-1. `aclrtBinaryLoadFromData` — 将编译产物的二进制加载到设备（通过`ACL_RT_BINARY_MAGIC_ELF_AICORE`标记为AICore可执行）
-2. `aclrtBinaryGetFunction` — 从加载的二进制中获取核函数句柄（`funcHandle`）
+- `aclrtcCreateProg` — 创建编译程序对象，传入核函数源码字符串
+- `aclrtcAddNameExpr` — 注册需要导出的模板核函数名（如`Kernel::add_custom<float>`）
+- `aclrtcCompileProg` — 执行运行时编译，通过options传入`--npu-arch`指定NPU架构
+- `aclrtcGetBinDataSize` / `aclrtcGetBinData` — 获取编译产物的二进制大小及数据（deviceELF）
+- `aclrtcGetLoweredName` — 获取模板核函数编译后的mangled name，供后续`aclrtBinaryGetFunction`查找
+- `aclrtcDestroyProg` — 销毁编译程序对象
 
-#### 参数配置阶段
-1. `aclrtKernelArgsInit` — 初始化核函数参数句柄
-2. `aclrtKernelArgsAppend` — 逐个追加参数（核函数为`GM_ADDR x, GM_ADDR y, GM_ADDR z`，对应传入三个Device内存指针）
-3. `aclrtKernelArgsFinalize` — 完成参数配置
+**2. 执行阶段：关键 aclrt 接口**
 
-#### 执行阶段
-1. `aclrtLaunchKernelWithConfig` — 启动核函数，指定block数量、stream等执行配置
+- `aclrtMallocHost` / `aclrtMalloc` — 分配Host/Device内存，用于输入输出数据
+- `aclrtMemcpy` — Host与Device间数据拷贝
+- `aclrtBinaryLoadFromData` — 将编译产物加载到设备
+- `aclrtBinaryGetFunction` — 通过编译阶段获取的mangled name查找核函数句柄
+- `aclrtKernelArgsInit` / `aclrtKernelArgsAppend` / `aclrtKernelArgsFinalize` — 配置核函数参数（依次追加三个Device内存指针：`x`、`y`、`z`）
+- `aclrtLaunchKernelWithConfig` — 在指定stream上启动核函数，指定1个block执行
+- `aclrtSynchronizeStream` — 等待stream上核函数执行完成
 
-#### 资源清理
-1. `aclrtcDestroyProg` — 销毁编译程序对象
-
-对于模板核函数（如本样例），还需：
-
-4. `aclrtcAddNameExpr` — 注册需要导出的核函数名表达式（如`Kernel::add_custom<float>`）
-5. `aclrtcGetLoweredName` — 获取编译后的mangled name，用于后续查找
-
-##### 加载与执行
-
-通过aclrt运行时接口加载deviceELF并启动核函数计算，执行完毕后销毁编译程序对象。
-
-- **二进制加载**
-  1. `aclrtBinaryLoadFromData` — 将编译产物的二进制加载到设备（通过`ACL_RT_BINARY_MAGIC_ELF_AICORE`标记为AICore可执行）
-  2. `aclrtBinaryGetFunction` — 从加载的二进制中获取核函数句柄（`funcHandle`）
-
-- **参数配置**
-  1. `aclrtKernelArgsInit` — 初始化核函数参数句柄
-  2. `aclrtKernelArgsAppend` — 逐个追加参数（核函数为`GM_ADDR x, GM_ADDR y, GM_ADDR z`，对应传入三个Device内存指针）
-  3. `aclrtKernelArgsFinalize` — 完成参数配置
-
-- **核函数启动**
-  1. `aclrtLaunchKernelWithConfig` — 启动核函数，指定block数量、stream等执行配置
-
-- **资源清理**
-  1. `aclrtcDestroyProg` — 销毁编译程序对象
-
-数据生成与精度校验均在Host侧C++内完成，不依赖外部脚本。
+Host侧C++内完成数据生成与精度校验，不依赖外部脚本。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程，支持dav-3510, dav-2201
@@ -130,7 +98,7 @@
 
 | 选项 | 可选值 | 说明 |
 |------|--------|------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2训练系列产品/Atlas A2推理系列产品和Atlas A3训练系列产品/Atlas A3推理系列产品，dav-3510对应Ascend 950PR/Ascend 950DT |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   > [!WARNING] 注意
   Aclrtc仅支持NPU运行模式，不支持cpu调试或sim仿真模式。

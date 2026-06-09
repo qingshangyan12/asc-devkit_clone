@@ -2,97 +2,26 @@
 ## 概述
 用户自主管理CO1（L0C Buffer）的Matmul样例。将计算结果C矩阵保存在CO1位置，再调用基础API Fixpipe完成对结果从CO1到Global Memory的搬运。
 
-## 支持的产品
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-## 目录结构介绍
-```
-├── matmul_co1_output
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│   │   └── verify_result.py    // 真值对比文件
-│   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_co1_output.asc   // Ascend C样例实现 & 调用样例
-```
-## 样例描述
-- 样例功能：  
-  Matmul样例调用Matmul API对输入的A，B矩阵做矩阵乘和加bias偏置，将计算结果C矩阵保存在CO1位置，再调用基础API Fixpipe完成对结果从CO1到Global Memory的搬运。
+## 本样例支持的产品及CANN软件版本
 
-- 样例规格：  
-  本样例中：M = 32, N = 256, K = 128。
-  <table>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-  </tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
-  <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
-  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_co1_output_custom</td></tr>
-  </table>
-- 样例实现： 
-  - Iterate接口支持如下两种使用方式：
-    - 接口内部管理CO1：用户无需自行管理存放矩阵乘结果的CO1内存的申请和释放，由Matmul API内部实现管理。
-    - 用户自主管理CO1：用户可以灵活自主地控制矩阵乘结果的搬运。  
-      本样例实现Iterate接口的第二种使用：将多次Iterate计算的矩阵乘结果缓存在用户自己申请的CO1内存中，在需要搬出该结果时，一次性搬出多块baseM * baseN的C矩阵。
-
-  - Kernel关键步骤
-    - 创建Matmul对象时，必须定义C矩阵的内存逻辑位置为TPosition::CO1、数据排布格式为CubeFormat::NZ。
-        ```cpp
-        
-        AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                        AscendC::MatmulType<AscendC::TPosition::CO1, CubeFormat::NZ, L0cT>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_NORM>
-            matmulObj;
-        ```
-    - 完成矩阵乘操作。
-      - 调用用户自主管理CO1的接口获取一次Iterate的计算结果。
-        ```cpp
-        matmulObj.Iterate(false, l0cTensor[l0cOffset]);
-        ```
-      - 调用Fixpipe接口将计算结果C矩阵从CO1搬出。
-        ```cpp
-        FixpipeParamsV220 params;
-        params.mSize = tiling.baseM;
-        params.nSize = tiling.singleCoreN;
-        params.srcStride = (params.mSize + BLOCK_CUBE - 1) / BLOCK_CUBE * BLOCK_CUBE;
-        params.dstStride = tiling.N;
-        CO1_.EnQue(l0cTensor);
-        CO1_.template DeQue<L0cT>();
-        Fixpipe<CType, L0cT, CFG_ROW_MAJOR>(cGlobal, l0cTensor, params);
-        CO1_.FreeTensor(l0cTensor);
-        CO1_.FreeAllEvent();
-        ```
-
-  - 调用实现  
-    使用内核调用符<<<>>>调用核函数。
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-    
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;    # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
@@ -113,11 +42,10 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201 | dav-2201 |
-
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+  | ----------------| -----------------------------| ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认） | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
 - 执行结果
 
   执行结果如下，说明精度对比成功：

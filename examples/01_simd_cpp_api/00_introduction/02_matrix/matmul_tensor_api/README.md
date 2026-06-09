@@ -4,9 +4,13 @@
 
 本样例基于静态Tensor API编程范式实现多核矩阵乘计算，使用Tensor API的高层次抽象接口完成矩阵搬运、切片和乘加流程。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
+
+> **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
 ## 目录结构介绍
 
@@ -36,7 +40,7 @@
   <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_tensor_api</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
 - 样例实现：
@@ -45,7 +49,7 @@
     <tr><th align="left">步骤</th><th align="left">Tensor API操作</th><th align="left">功能</th><th align="left">布局转换</th></tr>
     <tr><td align="left">1</td><td align="left">常量化Tiling参数</td><td align="left">通过模板参数传入kernel</td><td align="left">不涉及</td></tr>
     <tr><td align="left">2</td><td align="left">MakeTensor + Slice</td><td align="left">创建GM张量并切片获取当前核处理的数据块</td><td align="left">ND格式</td></tr>
-    <tr><td align="left">3</td><td align="left">Copy(CopyGM2L1)</td><td align="left">将A矩阵和B矩阵数据从GM搬运到L1</td><td align="left">GM->L1A: ND->NZ<br>GM->L1B: ND->NZ</td></tr>
+    <tr><td align="left">3</td><td align="left">Copy(CopyGM2L1)</td><td align="left">将A矩阵和B矩阵数据从GM搬运到L1</td><td align="left">ND->NZ格式转换</td></tr>
     <tr><td align="left">4</td><td align="left">Copy(CopyL12L0A/B)</td><td align="left">将数据从L1搬运到L0A和L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
     <tr><td align="left">5</td><td align="left">Mmad</td><td align="left">完成矩阵乘加计算</td><td align="left">矩阵乘结果为NZ格式</td></tr>
     <tr><td align="left">6</td><td align="left">Copy(CopyL0C2GM)</td><td align="left">将L0C中的计算结果搬运到GM</td><td align="left">NZ->ND格式转换</td></tr>
@@ -89,27 +93,16 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令，**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。，**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）

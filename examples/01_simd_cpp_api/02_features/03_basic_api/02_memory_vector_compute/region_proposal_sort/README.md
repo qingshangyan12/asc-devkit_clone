@@ -4,9 +4,11 @@
 
 本样例基于ProposalConcat、RpSort16、MrgSort4和ProposalExtract四个接口实现完整排序流水线。首先通过ProposalConcat将连续score值合入Region Proposal格式，再经RpSort16对每组16个Region Proposal按score域降序排列，然后通过MrgSort4将4组已排序的Region Proposal合并为1组，最后通过ProposalExtract从合并后的Region Proposal中提取score域，得到全局降序排列的连续score值。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Atlas 推理系列产品AI Core
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas 推理系列产品AI Core | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -47,27 +49,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
     
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j;    # 编译工程，默认npu模式

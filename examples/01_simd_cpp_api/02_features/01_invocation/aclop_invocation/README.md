@@ -4,14 +4,15 @@
 
 本样例基于示例自定义算子工程，介绍了`aclopExecuteV2`单算子模型的方式执行固定shape算子。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-本样例支持如下产品型号：
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-- Atlas 200I/500 A2 推理产品
-- Atlas 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Atlas 200I/500 A2 推理产品 | >= CANN 9.0.0 |
+| Atlas 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -37,28 +38,16 @@
 
 - 编译、打包和部署自定义算子工程
 
-  运行此样例前，需先进入[自定义算子工程样例](../../00_compilation/custom_op/)目录完成编译、打包和部署。
+  运行此样例前，需先进入[自定义算子工程样例](../../00_compilation/custom_op)目录完成编译、打包和部署。
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 

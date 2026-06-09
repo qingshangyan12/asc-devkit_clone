@@ -4,11 +4,13 @@
 
 本样例基于And、Ors、ShiftLeft、ShiftRight接口实现按位逻辑运算功能。And接口对两个源操作数进行按位与运算。Ors接口对矢量内每个元素和标量间做或操作。ShiftLeft接口对源操作数进行左移操作（tensor形式）。ShiftRight接口对源操作数进行右移操作（scalar形式）。样例支持通过编译参数切换不同场景，便于开发者理解这些接口的使用方法和实现差异。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -107,27 +109,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
     
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1  # 设置场景编号
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -153,7 +144,7 @@
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列、dav-3510 对应 Ascend 950PR/Ascend 950DT。注意：场景2和场景3仅支持 dav-3510，编译时会自动切换 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT。注意：场景2和场景3仅支持 dav-3510，编译时会自动切换 |
   | `SCENARIO_NUM` | `1`（默认）、`2`、`3`、`4` | 场景编号：1（And按位与）、2（Ors矢量标量或）、3（ShiftLeft左移tensor形式）、4（ShiftRight右移scalar形式） |
 
 - 执行结果

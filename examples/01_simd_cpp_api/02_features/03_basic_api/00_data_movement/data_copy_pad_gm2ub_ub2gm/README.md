@@ -6,11 +6,13 @@
 
 数据搬运过程包括：Global Memory（GM）→Unified Buffer（UB）（使用DataCopyPad进行非对齐搬运并填充）→Global Memory（GM）。本样例使用静态Tensor方式分配UB内存，支持通过编译参数切换不同场景，演示DataCopyPad的不同使用方式。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -101,7 +103,7 @@
 - 数据类型：int8
 - 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节
 - 参数配置：
-  - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=128*126, loop1DstStride=64*128, loop2SrcStride=3*128*126, loop2DstStride=2*64*128}，DataCopyMVType::OUT_TO_UB
+  - GM→UB：LoopModeParams{loop1Size=2, loop2Size=2, loop1SrcStride=128\*126, loop1DstStride=64\*128, loop2SrcStride=3\*128\*126, loop2DstStride=2\*64\*128}，DataCopyMVType::OUT_TO_UB
   - DataCopyExtParams：blockCount=64, blockLen=126, srcStride=0, dstStride=0
   - DataCopyPadExtParams：isPad=true, leftPadding=0, rightPadding=0, padValue=0
   - 第0维使用for循环搬运2次
@@ -111,27 +113,16 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1  # 设置场景编号
   mkdir -p build && cd build;      # 创建并进入build目录

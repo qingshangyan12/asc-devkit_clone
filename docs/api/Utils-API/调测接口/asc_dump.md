@@ -54,8 +54,8 @@
 使用该接口需要包含"utils/debug/asc\_dump.h"头文件。
 
 > [!CAUTION]注意 
->该功能主要用于**调试和性能分析**，开启后会对算子性能产生一定影响，通常在调测阶段使用，**生产环境建议关闭**。
->默认情况下，该功能关闭，开发者需要在kernel核函数外定义如下宏定义:"\#define ASCENDC\_DUMP 1"，以开启dump功能。
+>该功能主要用于**调试和性能分析**，通常在调测阶段使用，会对算子性能产生一定影响，**生产环境建议关闭**。
+>默认情况下，该功能开启。
 
 ## 函数原型<a name="zh-cn_topic_0000002000280437_zh-cn_topic_0000001997078721_section2067518173415"></a>
 
@@ -78,19 +78,19 @@ __aicore__ inline void asc_dump_cbuf(__cc__ T* input, uint32_t desc, uint32_t du
 
 // GM内存上的数据打印
 template<typename T>
-__aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size);
+__aicore__ inline void asc_dump(__gm__ T* input, uint32_t desc, uint32_t dump_size)
 
 // UB内存上的数据打印
 template<typename T>
-__aicore__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
+__aicore__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 
 // L1内存上的数据打印
 template<typename T>
-__aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size);
+__aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_size)
 
 // L0C内存上的数据打印
 template<typename T>
-__aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size);
+__aicore__ inline void asc_dump(__cc__ T* input, uint32_t desc, uint32_t dump_size)
 ```
 
 以下接口为simd\_vf中所使用的asc\_dump接口，仅支持Ascend 950PR/Ascend 950DT。
@@ -168,7 +168,7 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 
 ## 约束说明<a name="zh-cn_topic_0000002000280437_zh-cn_topic_0000001997078721_section43265506459"></a>
 
--   Ascend 950PR/Ascend 950DT暂时不支持L1上的内存打印。
+-   针对Ascend 950PR/Ascend 950DT，在使用该接口打印L1 Tensor数据时，HDK版本需要至少升级到25.7.0以上。
 
 -   使用该接口时，在每个核上dump的数据总量不能超过1M，请开发者自行控制打印的内容数据量，超出则不会打印。
 -   在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，系统会自动在其末尾补充一定数量的padding数据，以满足对齐要求。
