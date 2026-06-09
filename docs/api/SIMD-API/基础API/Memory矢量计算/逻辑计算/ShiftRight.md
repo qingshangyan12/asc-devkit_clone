@@ -75,6 +75,8 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 ## 参数说明<a name="section1436019411811"></a>
 
+### 模板参数及接口参数说明
+
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
@@ -96,35 +98,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | roundEn | 输入 | 舍入功能使能开关，支持数据类型：bool，true为使能，false为不使能。仅当src为int16\_t/int32\_t类型时使能有效。<br>例：使能舍入功能，src数据类型为int16\_t，将src算术右移5位，如果src\_ele二进制数中的第5位为1，则dst\_ele值为对src\_ele算术右移5后加1。<br>src\_ele = 17 = 0b00000000000**1**0001 第五位为1<br>dst\_ele = arithmetic\_right\_shift(src\_ele, 5) + 1 = 0b00000000000**00000** + 1 = 0b00000000000**00001**<br><cann-filter npu-type="310b">针对Atlas 200I/500 A2 推理产品，不支持使能舍入功能，仅支持传入false。</cann-filter><br><cann-filter npu-type="950">针对Ascend 950PR/Ascend 950DT，不支持使能舍入功能，仅支持传入false。</cann-filter> |
 
-## 数据类型
-
-### 模板参数及接口参数说明
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
-
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-### ScalarValue取值说明
+### scalarValue取值说明
 
 <cann-filter npu-type="950">
 
@@ -147,6 +121,32 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 <cann-filter npu-type="310b">
 
 - 针对Atlas 200I/500 A2 推理产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+
+</cann-filter>
+
+## 数据类型
+
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
 
 </cann-filter>
 

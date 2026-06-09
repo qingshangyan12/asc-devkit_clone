@@ -75,6 +75,8 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
+### 模板参数及接口参数说明
+
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
@@ -94,35 +96,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体说明请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
 | repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 
-## 数据类型
-
-### 模板参数及接口参数说明
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
-
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
-- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
-- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
-
-### ScalarValue取值说明
+### scalarValue取值说明
 
 <cann-filter npu-type="950">
 
@@ -148,6 +122,31 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 
 </cann-filter>
 
+## 数据类型
+
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+
+</cann-filter>
+
+<cann-filter npu-type="310b">
+
+- 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+
+</cann-filter>
 
 ## 返回值说明<a name="section194321251175110"></a>
 
