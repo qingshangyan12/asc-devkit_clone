@@ -1,13 +1,13 @@
-# L0C Buffer到L1 Buffer数据搬运（DataCopy、Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
+# L0C到L1数据搬运（Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
 
 ## 产品支持情况<a id="zh-cn_topic_0000002511188540_section796754519912"></a>
 
 |产品|是否支持|
 |----------|:----------:|
-|Ascend 950PR/Ascend 950DT|支持包含FixpipeParamsV220/FixpipeParamsArch3510参数的接口，支持DataCopy接口。|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|仅支持包含FixpipeParamsV220参数的接口，支持DataCopy接口。|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|仅支持包含FixpipeParamsV220参数的接口，支持DataCopy接口。|
-|Atlas 200I/500 A2 推理产品|支持DataCopy接口。|
+|Ascend 950PR/Ascend 950DT|支持包含FixpipeParamsV220/FixpipeParamsArch3510参数的接口。|
+|Atlas A3 训练系列产品/Atlas A3 推理系列产品|仅支持包含FixpipeParamsV220参数的接口。|
+|Atlas A2 训练系列产品/Atlas A2 推理系列产品|仅支持包含FixpipeParamsV220参数的接口。|
+|Atlas 200I/500 A2 推理产品|x|
 |Atlas 推理系列产品AI Core|x|
 |Atlas 推理系列产品Vector Core|x|
 |Atlas 训练系列产品|x|
@@ -18,7 +18,7 @@
 
 头文件路径为: "basic_api/kernel_operator_fixpipe_intf.h"、"basic_api/kernel_operator_data_copy_intf.h"。
 
-矩阵计算的结果存放在L0C Buffer，DataCopy和Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。
+矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。
 
 <cann-filter npu_type = "A3,910b">
 
@@ -32,46 +32,9 @@
 
 ## 函数原型<a id="zh-cn_topic_0000002511188540_section82039854412"></a>
 
-### DataCopy
-
-<cann-filter npu_type = "950,A3,910b,310b">
-
-DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同的寄存器，配合数据搬运指令开启不同的数据搬运能力，对应的接口如下：
-
-针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品：
-
-- 数据搬运接口，通路L0C Buffer(CO1)->L1 Buffer(C1)，配合设置寄存器实现量化和ReLU激活
-
-    ```cpp
-    template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
-    ```
-
-- [SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)：寄存器设置接口，通过调用该接口设置随路量化，其中tensor的每个元素都代表一个量化参数，使用tensor量化时需要设置。
-
-- [SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)：寄存器设置接口，通过调用该接口设置随路量化参数，此元素代表整个输出矩阵使用的量化参数，使用Scalar量化时需要设置。
-
-- [SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)：寄存器设置接口，通过调用该接口设置随路NZ2ND格式转换配置，使用随路NZ2ND需要设置。
-
-</cann-filter>
-
-<cann-filter npu_type = "310b">
-
-针对Atlas 200I/500 A2 推理产品：
-
-- [SetFixPipeClipRelu](./寄存器配置说明/SetFixPipeClipRelu.md)：寄存器设置接口，通过调用该接口设置ClipReLU操作的最大值。
-
-- [SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)：寄存器设置接口，通过调用该接口设置Elementwise操作时LocalTensor的地址。
-
-</cann-filter>
-
-### Fixpipe
-
 为了方便用户使用，减少学习理解成本，针对用户经常使用的场景组合，提供了矩阵搬出的组合接口Fixpipe，接口内包含了设置寄存器与数据搬运能力，对应的接口如下：
 
-<cann-filter npu_type = "950">
-
-针对Ascend 950PR/Ascend 950DT：
+**传入FixpipeParamsArch3510参数的接口：**
 
 - 通路L0C Buffer(CO1)->L1 Buffer(C1)，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
@@ -87,11 +50,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-</cann-filter>
-
-<cann-filter npu_type = "950,A3,910b">
-
-针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+**传入FixpipeParamsV220参数的接口：**
 
 - 通路L0C Buffer(CO1)->L1 Buffer(C1)，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
@@ -107,75 +66,9 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams)
     ```
 
-</cann-filter>
-
 ## 参数说明<a id="zh-cn_topic_0000002511188540_section16128134420472"></a>
 
-**DataCopy相关参数说明如下：**
-
-**表 1**  数据搬运DataCopy模板参数说明
-
-| 参数名 | 描述 |
-|----------|----------|
-| T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002511188540_section4219135304818)。 |
-| U | 源操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002511188540_section4219135304818)。 |
-
-**表 2**  数据搬运DataCopy接口参数说明
-
-| 参数名称 | 输入/输出 | 含义 |
-|----------|----------|----------|
-| dst | 输出 | 目的操作数，类型为LocalTensor，数据格式为NZ格式，地址需要满足32字节对齐。 |
-| src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足6对齐。 |
-| intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002511188540_table35908519282)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
-
-<cann-filter npu_type = "A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-
-**表 3**  DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002511188540_table35908519282"></a>
-
-| 参数名称 | 含义 |
-|----------|----------|
-| sid | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
-| nSize | 源NZ矩阵在N方向上的大小。取值范围nSize∈[0, 4095]，nSize必须为16的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| mSize | 源NZ矩阵在M方向上的大小。取值范围为mSize∈[0, 65535]。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| dstStride | 目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0， 单位为datablock（32字节）。 |
-| srcStride | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)），T为src的数据类型，其值应填成mSize对16向上取整。 |
-| unitFlag | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag。<br>&bull; 1（2'b01）：无效值。<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位。<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../矩阵计算/关键特性说明/UnitFlag.md)章节。 |
-| clipReluPre | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
-| eltWiseOp | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
-| quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下：<br>&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。此通路不支持NoQuant模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能，此通路不支持<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
-| reluPre | 用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&bull; 0：不开启ReLU<br>&bull; 1：Normal ReLU |
-| channelSplit | 仅在L0C Buffer(CO1) -> GM通路时生效，此通路设置为false即可。 |
-| nz2ndEn | 仅在L0C Buffer(CO1) -> GM通路时生效，此通路设置为false即可。 |
-
-</cann-filter>
-
-<cann-filter npu_type = "950,310b">
-
-针对Ascend 950PR/Ascend 950DT、Atlas 200I/500 A2 推理产品：
-
-**表 4**  DataCopyCO12DstParams结构体参数定义（C0取值：一般情况下，C0 = 16；开启channelSplit（channel切分）时，C0 = 8）
-
-|参数名称|含义|
-|----------|----------|
-|nSize|src横向方向的size大小。<br>&bull; 不开启NZ2ND功能，必须为C0的倍数，此时连续传输数据块的个数为nSize / C0。<br>&bull; 开启NZ2ND功能，不受限制。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|mSize|src纵向方向的size大小。<br>&bull; 不开启NZ2ND功能，连续传输数据块的大小为mSize \* C0个元素的长度。<br>&bull; 开启NZ2ND功能，NZ/ND矩阵的大小为mSize \* nSize。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|dstStride|&bull; 不开启NZ2ND功能<br>dst相邻连续数据片段间隔（前面一个数据块的头与后面数据块的头的间隔），取值不为0。单位为dataBlock（32字节）。<br>&bull; 开启NZ2ND功能<br>dst同一ND矩阵的相邻行的偏移（头与头），取值不为0， 单位为元素。|
-|srcStride|&bull; 不开启NZ2ND功能<br>src相邻连续数据片段间隔（前面一个数据块的头与后面数据块的头的间隔），必须为16的倍数。取值范围：srcStride∈[0, 65535]， 单位：C0_Size(C0 * sizeof(U)，U为src的数据类型)。<br>&bull; 开启NZ2ND功能<br>src同一NZ矩阵的相邻Z排布的偏移（头与头），必须为16的倍数，取值范围：srcStride∈[0, 65535]，单位C0_size。|
-|quantPre|用于控制量化模式，QuantMode_t类型，具体定义如下。默认值为QuantMode_t::NoQuant，即不开启量化功能。<br>配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数；配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数。<pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // int32_t量化成half，scalar量化<br>    VDEQF16,      // int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre>|
-|reluPre|用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&bull; 0：不开启ReLU<br>&bull; 1：Normal ReLU|
-|channelSplit|类型为bool，配置是否开启channel切分，对于float类型的dst生效。<br>&bull; false：不开启<br>&bull; true：开启|
-|nz2ndEn|类型为bool，配置是否开启NZ2ND的格式转换，仅在CO1 -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息。<br>&bull; false：不开启<br>&bull; true：开启|
-|<cann-filter npu_type = "310b"> clipReluPre <br>该参数仅在Atlas 200I/500 A2 推理产品支持。|用于配置是否开启ClipReLU操作，参数类型为uint8_t，取值如下：0，不开启ClipReLU；1，开启ClipReLU，此时需要调用[SetFixPipeClipRelu](./寄存器配置说明/SetFixPipeClipRelu.md)来设置clipReLU的最大值。<br>&bull; 该操作在随路量化后进行，quantPre配置后才能使用，当前支持的量化模式有F322F16/DEQF16/VDEQF16/QF322B8_PRE/VQF322B8_PRE/REQ8/VREQ8。 |
-|eltWiseOp <br>该参数仅在Atlas 200I/500 A2 推理产品支持。|用于配置是否开启Elementwise操作及操作模式。Elementwise操作是指进行随路量化后，可以逐个元素加/减一个LocalTensor，大小为mSize * nSize，具体LocalTensor地址相关参数需要调用[SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)来设置。<br>eltWiseOp参数类型为uint8_t，取值如下：<br>&bull; 0：不开启Elementwise<br>&bull; 1：Elementwise Addition<br>&bull; 2：Elementwise Subtraction<br> </cann-filter> |
-|sid|预留参数，为后续的功能做保留，开发者暂时无需关注。|
-
-</cann-filter>
-
-**Fixpipe相关参数说明如下：**
-
-**表 5**  Fixpipe模板参数说明
+**表 1**  Fixpipe模板参数说明
 
 | 参数名 | 描述 |
 |----------|----------|
@@ -183,7 +76,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | config | Fixpipe相关配置参数，类型为FixpipeConfig。取值如下：<br>&bull; **CFG_ROW_MAJOR（默认取值）**：开启NZ2ND，输出数据格式为ND格式。<cann-filter npu_type = "A3,910b">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，在L0C Buffer -> L1 Buffer通路下不生效。</cann-filter><br>&bull; CFG_NZ：NZ2NZ，输出数据格式为NZ格式。<br><cann-filter npu_type = "950">&bull; CFG_COLUMN_MAJOR：针对Ascend 950PR/Ascend 950DT，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 用于用户指定目的地址的位置是否是UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 输出数据格式仍为NZ格式。<br>    ROW_MAJOR, // 开启NZ2ND，输出数据格式为ND格式。<br><cann-filter npu_type = "950">    COLUMN_MAJOR, // 仅Ascend 950PR/Ascend 950DT支持，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu_type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 仅Ascend 950PR/Ascend 950DT支持</cann-filter></pre> |
 | S | 参数cbufWorkspace的数据类型，即随路量化参数的数据类型。<br>&bull; 当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。<br>&bull; 当目的操作数、源操作数、cbufWorkspace使用TensorTrait类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。<br>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 
-**表 6**  Fixpipe参数说明
+**表 2**  Fixpipe参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 |----------|----------|----------|
@@ -192,9 +85,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | intriParams | 输入 | Fixpipe搬运参数，具体定义请参考 "basic_api/interface/kernel_struct_fixpipe.h"。<br>参数说明请参考Fixpipe搬运参数（FixpipeParamsArch3510、FixpipeParamsV220）结构体说明。 |
 | cbufWorkspace | 输入 | 量化参数，类型为`LocalTensor<uint64_t>`，支持的物理地址为L1 Buffer（TPosition为C1），地址需满足32字节对齐。<br>&bull; 当quantPre为VDEQF16、VQF322B8_PRE、VREQ8时支持。<br><cann-filter npu_type = "950">&bull; 针对Ascend 950PR/Ascend 950DT，除上述外还有VQF322FP8_PRE、VQF322HIF8_PRE、VQF322HIF8_PRE_HYBRID、VQS322BF16_PRE、VQF322F16_PRE、VQF322BF16_PRE、VQF322F32_PRE支持。<br></cann-filter>quantPre介绍请参考Fixpipe搬运参数结构体中quantPre部分。 |
 
-<cann-filter npu_type = "950">
-
-**表 7**  Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
+**表 3**  Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
 
 | 参数名称 | 数据类型 | 含义 |
 |----------|----------|----------|
@@ -211,11 +102,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | subBlockId | 输入 | 在启用单目标模式时指示目标UB的编号。 |
 | isChannelSplit | 输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND功能。 |
 
-</cann-filter>
-
-<cann-filter npu_type = "950,A3,910b">
-
-**表 8**  Fixpipe搬运参数（FixpipeParamsV220）结构体说明
+**表 4**  Fixpipe搬运参数（FixpipeParamsV220）结构体说明
 
 |参数名称|数据类型|含义|
 |---|---|---|
@@ -232,37 +119,9 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 |srcNdStride|可选输入|仅在L0C Buffer(CO1) -> GM通路时生效，此通路无需额外设置。|
 |dstNdStride|可选输入|仅在L0C Buffer(CO1) -> GM通路时生效，此通路无需额外设置。|
 
-</cann-filter>
-
 ## 数据类型<a id="zh-cn_topic_0000002511188540_section4219135304818"></a>
 
 **源矩阵与目的矩阵支持的数据类型组合**
-
-**DataCopy接口支持的数据类型组合如下：**
-
-<cann-filter npu_type = "A3,910b,310b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品，DataCopy接口支持的数据类型组合如下：
-
-| 源矩阵（L0C Buffer） | 目的矩阵（GM） |
-| ---------- | ---------- |
-| float | int8_t、uint8_t、half、bfloat16_t |
-| int32_t | int8_t、uint8_t、half |
-
-</cann-filter>
-
-<cann-filter npu_type = "950">
-
-针对Ascend 950PR/Ascend 950DT，DataCopy接口支持的数据类型组合如下：
-
-| 源矩阵（L0C Buffer） | 目的矩阵（GM） |
-| ---------- | ---------- |
-| float | int8_t、uint8_t、half、bfloat16_t、float |
-| int32_t | int8_t、uint8_t、half、int32_t |
-
-</cann-filter>
-
-**Fixpipe接口支持的数据类型组合如下：**
 
 <cann-filter npu_type = "950">
 

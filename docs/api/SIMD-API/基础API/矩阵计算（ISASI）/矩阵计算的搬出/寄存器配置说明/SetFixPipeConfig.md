@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002547729135_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy、Fixpipe）.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy）.md)）过程中进行随路量化时，通过调用该接口设置量化的参数。
 
 ## 函数原型<a name="zh-cn_topic_0000002547729135_section620mcpsimp"></a>
 
