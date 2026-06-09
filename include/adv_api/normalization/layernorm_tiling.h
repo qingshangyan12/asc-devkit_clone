@@ -15,7 +15,7 @@
 #ifndef LIB_NORMALIZATION_LAYERNORM_TILING_H
 #define LIB_NORMALIZATION_LAYERNORM_TILING_H
 #include "graph/tensor.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "layernorm_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {

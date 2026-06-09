@@ -23,7 +23,7 @@
 #define IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_ATOP_H
 
 #include "../../utils/matmul_module.h"
-#include "quant/quant_processor_utils.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_out/quant/quant_processor_utils.h"
 #include "copy_cube_out_intf.h"
 
 namespace AscendC {

@@ -16,7 +16,7 @@
 #define LIB_PAD_BROADCAST_TILING_H
 
 #include "graph/tensor.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*
  * @ingroup GetBroadCastMaxMinTmpSize

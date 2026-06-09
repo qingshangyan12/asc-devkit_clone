@@ -23,8 +23,8 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_V220_SOFTMAX_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_V220_SOFTMAX_COMMON_IMPL_H
 
-#include "softmax_common_impl/softmax_common_broadcast.h"
-#include "softmax_common_impl/softmax_common_nd_reduce.h"
+#include "impl/adv_api/detail/activation/softmax/membase/v220/softmax_common_impl/softmax_common_broadcast.h"
+#include "impl/adv_api/detail/activation/softmax/membase/v220/softmax_common_impl/softmax_common_nd_reduce.h"
 #include "../common/softmax_common_nz_reduce.h"
 
 namespace AscendC {

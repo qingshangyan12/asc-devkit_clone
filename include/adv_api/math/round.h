@@ -20,7 +20,7 @@
 
 #ifndef LIB_MATH_ROUND_H
 #define LIB_MATH_ROUND_H
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/math/round/round_common_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)

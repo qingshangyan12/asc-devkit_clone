@@ -23,7 +23,7 @@
     ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 // MICRO API
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #endif
 #include "kernel_prof_trace_intf.h"
 #include "kernel_operator_data_copy_intf.h"
@@ -63,8 +63,8 @@
 #include "include/adv_api/kernel_api.h"
 
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
-#include "core_mng/roc/kernel_operator_cube_group_intf.h"
-#include "core_mng/roc/kernel_operator_group_barrier_intf.h"
+#include "include/basic_api/core_mng/roc/kernel_operator_cube_group_intf.h"
+#include "include/basic_api/core_mng/roc/kernel_operator_group_barrier_intf.h"
 #endif
 
 #if ((__NPU_ARCH__ != 3102) && (__NPU_ARCH__ != 3510)) && (__NPU_ARCH__ != 5102)
@@ -134,7 +134,7 @@
 #endif
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // SIMT API
-#include "simt_api/cpp/kernel_simt_intf.h"
+#include "include/simt_api/cpp/kernel_simt_intf.h"
 #endif
 #endif // ASCENDC_MODULE_OPERATOR_INTERFACE_H
 

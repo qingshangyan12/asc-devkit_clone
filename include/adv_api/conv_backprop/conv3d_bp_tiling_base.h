@@ -16,7 +16,7 @@
 #define CONV3D_BP_TILING_BASE_H
 
 #include <map>
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 
 #include "../../../impl/adv_api/detail/conv/common/conv_common.h"
 
