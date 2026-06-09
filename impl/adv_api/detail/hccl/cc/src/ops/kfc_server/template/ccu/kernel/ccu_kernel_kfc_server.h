@@ -15,6 +15,7 @@
 #include <ios>
 #include "utils.h"
 // #include "ccu_kernel.h"
+#include "ccu_task_arg_v1.h"
 #include "ccu_kernel_utils.h"
 #include "ccu_kernel_alg_base.h"
 #include "../../../all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d.h"

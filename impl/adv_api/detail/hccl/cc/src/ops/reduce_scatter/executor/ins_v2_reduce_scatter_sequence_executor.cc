@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ins_v2_reduce_scatter_sequence_executor.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_mesh_1d_dpu.h"
@@ -103,17 +103,17 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::Orchestrate(const OpParam &param, const AlgResourceCtxSerializable& resCtx)
 {
     // 参数填充
-    myRank_ = resCtx.topoInfo.userRank;
+    myRank_   = resCtx.topoInfo.userRank;
     rankSize_ = resCtx.topoInfo.userRankSize;
 
-    dataCount_ = param.DataDes.count;
+    dataCount_        = param.DataDes.count;
     strideCount_ = param.DataDes.strideCount;
-    dataTypeSize_ =  SIZE_TABLE[param.DataDes.dataType];
-    dataSize_ = dataCount_ * dataTypeSize_;
-    dataType_ = param.DataDes.dataType;
-    reduceOp_ = param.reduceType;
+    dataTypeSize_     =  SIZE_TABLE[param.DataDes.dataType];
+    dataSize_         = dataCount_ * dataTypeSize_;
+    dataType_         = param.DataDes.dataType;
+    reduceOp_         = param.reduceType;
     algHierarchyInfo_ = resCtx.algHierarchyInfo;
-    threads_ = resCtx.threads;
+    threads_          = resCtx.threads;
 
     rankIdxLevel0_ = myRank_ % algHierarchyInfo_.infos[0][0].size();
     rankIdxLevel1_ = myRank_ / algHierarchyInfo_.infos[0][0].size();
@@ -147,6 +147,9 @@ HcclResult InsV2ReduceScatterSequenceExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
     HcclMem cclOutMem = {resCtx.cclMem.type , cclOutAddr, resCtx.cclMem.size / 2};
     // 声明框内templateargs，user in搬运到ccl in，最终规约到ccl in
     TemplateDataParams tempAlgParamsInter;
+    tempAlgParamsInter.buffInfo.inBuffType = BufferType::INPUT;
+    tempAlgParamsInter.buffInfo.outBuffType = BufferType::HCCL_BUFFER;
+    tempAlgParamsInter.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
     tempAlgParamsInter.buffInfo.inputPtr = param.inputPtr;
     tempAlgParamsInter.buffInfo.outputPtr = cclOutMem.addr;
     tempAlgParamsInter.buffInfo.hcclBuff = cclInMem; // ! 待验证这样使用是否能正常输出到CCL-IN，或者这里改用CCL-OUT

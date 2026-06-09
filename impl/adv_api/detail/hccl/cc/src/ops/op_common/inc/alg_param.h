@@ -19,8 +19,7 @@
 #include <functional>
 #include <functional>
 #include <memory>
-#include "ccu_datatype_v1.h"
-#include "hccl_comm.h"
+#include <hccl/hccl_comm.h>
 #include "hccl_common.h"
 #include "hccl_types.h"
 #include "alg_type.h"
@@ -28,9 +27,9 @@
 #include "hcomm_primitives_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "hccl_host_comm_dl.h"
-#include "binary_stream.h"
+#include "common/binary_stream.h"
 #include "hccl_ccu_res_dl.h"
-#include "ccu_types.h"
+#include "ccu_types_dl.h"
 
 namespace mc2_ops_hccl {
 
@@ -40,7 +39,7 @@ constexpr u32 MAX_NUM_BLOCKS = 56; // 56-72
 
 constexpr uint32_t DATATYPE_SIZE_TABLE[HCCL_DATA_TYPE_RESERVED] = {sizeof(int8_t), sizeof(int16_t), sizeof(int32_t),
     2, sizeof(float), sizeof(int64_t), sizeof(uint64_t), sizeof(uint8_t), sizeof(uint16_t), sizeof(uint32_t),
-    8, 2, 16, 2, 1, 1, 1, 1, 1};
+    8, 2, 16, 2, 1, 1, 1, 1};
 
 constexpr u32 COMM_INDENTIFIER_MAX_LENGTH = 128;
 constexpr uint32_t OP_NAME_LENGTH = 32;
@@ -198,6 +197,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream << level0Topo;
         binaryStream << Level0Nhr;
         binaryStream << Level1Nhr;
+        binaryStream << Level1Hd;
         binaryStream << is2DieFullMesh;
         binaryStream << level0PcieMix;
         binaryStream << level0BigClosRange;
@@ -244,6 +244,7 @@ struct TopoInfoWithNetLayerDetails : public TopoInfo { // 通信域拓扑ctx
         binaryStream >> level0Topo;
         binaryStream >> Level0Nhr;
         binaryStream >> Level1Nhr;
+        binaryStream >> Level1Hd;
         binaryStream >> is2DieFullMesh;
         binaryStream >> level0PcieMix;
         binaryStream >> level0BigClosRange;

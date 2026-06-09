@@ -7,7 +7,6 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-
 #include "hcomm_dlsym.h"
 #include "hccl_res_dl.h"
 #include "ccu_res_dl.h"
@@ -20,7 +19,6 @@
 #include "hcomm_host_profiling_dl.h"
 #include "hccl_host_comm_dl.h"
 #include "hccl_res_expt_dl.h"
-#include "log.h"
 #include <pthread.h>
 #include <dlfcn.h>
 #include <cstdio>
@@ -43,7 +41,7 @@ int GetHcommVersion(void) {
 
 bool HcommIsProfilingSupported()
 {
-    if (GetHcommVersion() >= 90000000) {
+    if (GetHcommVersion() >= CANN_VERSION(9, 0, 0)) {
         return true;
     } else {
         return false;
@@ -52,7 +50,7 @@ bool HcommIsProfilingSupported()
 
 bool HcommIsExportThreadSupported()
 {
-    if (GetHcommVersion() >= 90000000 && HcommIsSupportHcclThreadExportToCommEngine()) {
+    if (GetHcommVersion() >= CANN_VERSION(9, 0, 0) && HcommIsSupportHcclThreadExportToCommEngine()) {
         return true;
     } else {
         return false;
@@ -61,28 +59,16 @@ bool HcommIsExportThreadSupported()
 
 // 初始化
 void HcommDlInit(void) {
-    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit called, gLibHandle=%p", gLibHandle);
-    
-    if (gLibHandle != nullptr) {
-        HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit already initialized, skipping");
-        return;
-    }
+    if (gLibHandle != nullptr) return;
 
-    HCCL_INFO("[HcclWrapper-DEBUG] Calling dlopen(\"libhcomm.so\", RTLD_NOW)");
     gLibHandle = dlopen("libhcomm.so", RTLD_NOW);
-    
     if (!gLibHandle) {
-        const char* dlErr = dlerror();
-        HCCL_ERROR("[HcclWrapper-DEBUG] dlopen FAILED, error: %s", dlErr ? dlErr : "(null)");
-        HCCL_ERROR("[HcclWrapper] Failed to open libhcomm: %s", dlErr ? dlErr : "(null)");
+        fprintf(stderr, "[HcclWrapper] Failed to open libhcomm: %s\n", dlerror());
         return;
     }
-    
-    HCCL_INFO("[HcclWrapper-DEBUG] dlopen SUCCESS, handle=%p", gLibHandle);
 
     dlerror();
 
-    HCCL_INFO("[HcclWrapper-DEBUG] Initializing DL modules...");
     HcclResDlInit(gLibHandle);
     HcclRankGraphDlInit(gLibHandle);
     HcommPrimitivesDlInit(gLibHandle);
@@ -92,9 +78,6 @@ void HcommDlInit(void) {
     HcclResExptDlInit(gLibHandle);
     CcuResDlInit(gLibHandle);
     HcclCcuResDlInit(gLibHandle);
-    HCCL_INFO("[HcclWrapper-DEBUG] Calling CcuLaunchDlInit...");
     CcuLaunchDlInit(gLibHandle);
     CcuPrimitivesImplDlInit(gLibHandle);
-    
-    HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit completed successfully");
 }

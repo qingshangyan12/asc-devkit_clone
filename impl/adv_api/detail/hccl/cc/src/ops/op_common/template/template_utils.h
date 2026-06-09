@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef ALG_V2_TEMPLATE_UTILS
 #define ALG_V2_TEMPLATE_UTILS
 
@@ -93,7 +93,7 @@ struct A2ASendRecvInfo {
 struct DataInfo {
     ChannelInfo channel_;
     SlicesList slices_;
-    HcclDataType dataType_{HCCL_DATA_TYPE_RESERVED};
+    HcclDataType dataType_;
     DataInfo(const ChannelInfo &channel, const SlicesList &slices)
     : channel_(channel), slices_(slices)
     {
@@ -138,14 +138,15 @@ struct TxRxSlicesList {
 struct SendRecvInfo {
     TxRxChannels      sendRecvChannels_;
     TxRxSlicesList    sendRecvSlices_;
-    HcclDataType      dataType_{HCCL_DATA_TYPE_RESERVED};
+    HcclDataType      dataType_;
 
     SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices)
         : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices)
     {
     }
+
     SendRecvInfo(const TxRxChannels &sendRecvLinks, const TxRxSlicesList &sendRecvSlices, HcclDataType dataType)
-        : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices), dataType_(dataType)
+    : sendRecvChannels_(sendRecvLinks), sendRecvSlices_(sendRecvSlices), dataType_(dataType)
     {
     }
 };
@@ -178,6 +179,42 @@ struct BuffInfo {
     u64        hcclBuffBaseOff    = 0;
 };
 
+struct StepSliceInfo
+{
+    BuffInfo buffInfo;
+    std::vector<std::vector<u64>> stepCount; //每step上所有的rank参与的数据量
+    std::vector<std::vector<u64>> stepSliceSize; //每step上所有的rank参与的数据量
+    std::vector<u64> stepInputSliceStride; //数据连着放 buffertype.addr + inputSliceStride[rankid] + inputOmniPipeSliceStride[j]
+    std::vector<u64> stepOutputSliceStride; //数据连着放
+    std::vector<std::vector<u64>> inputOmniPipeSliceStride;
+    std::vector<std::vector<u64>> outputOmniPipeSliceStride;
+
+    std::vector<char> Serialize() const
+    {
+        BinaryStream binaryStream;
+        binaryStream << stepCount;
+        binaryStream << stepSliceSize;
+        binaryStream << stepInputSliceStride;
+        binaryStream << stepOutputSliceStride;
+        binaryStream << inputOmniPipeSliceStride;
+        binaryStream << outputOmniPipeSliceStride;
+        std::vector<char> result;
+        binaryStream.Dump(result);
+        return result;
+    }
+
+    void DeSerialize(std::vector<char> &data)
+    {
+        BinaryStream binaryStream(data);
+        binaryStream >> stepCount;
+        binaryStream >> stepSliceSize;
+        binaryStream >> stepInputSliceStride;
+        binaryStream >> stepOutputSliceStride;
+        binaryStream >> inputOmniPipeSliceStride;
+        binaryStream >> outputOmniPipeSliceStride;
+    }
+};
+
 struct TemplateFastLaunchCtx {
     BuffInfo buffInfo;
     std::vector<ThreadHandle> threads;
@@ -206,6 +243,7 @@ struct TemplateDataParams {
     std::vector<u64> recvCounts;
     std::vector<u64> sdispls;
     std::vector<u64> rdispls;
+    StepSliceInfo stepSliceInfo;
     std::vector<u64> ccuKfcArgs;
 
     std::vector<char> Serialize() const
@@ -230,6 +268,8 @@ struct TemplateDataParams {
         binaryStream << allRankProcessedDataCount;
         binaryStream << root;
         binaryStream << dataType;
+        binaryStream << stepSliceInfo.Serialize();
+        binaryStream << ccuKfcArgs;
         std::vector<char> result;
         binaryStream.Dump(result);
         return result;
@@ -257,6 +297,10 @@ struct TemplateDataParams {
         binaryStream >> allRankProcessedDataCount;
         binaryStream >> root;
         binaryStream >> dataType;
+        std::vector<char> stepSliceInfoData;
+        binaryStream >> stepSliceInfoData;
+        binaryStream >> ccuKfcArgs;
+        stepSliceInfo.DeSerialize(stepSliceInfoData);
     }
 };
 
@@ -336,15 +380,18 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc> &channels)
     u32 channelsPerRank = 1;
     u32 currentRank = INVALID_VALUE_RANKID;
     u32 currentCount = 0;
+    u32 changeNum = 0;
     // channels的排列遵循相同远端的channel放在相邻位置
     for (const auto &channel : channels) {
         if (channel.remoteRank == currentRank) {
+            // 如果remoteRank不变，则计数一直累加
             currentCount++;
         } else {
-            if (currentCount != channelsPerRank && channel.remoteRank != channels[0].remoteRank) {
-                HCCL_WARNING("[CalcChannelsPerRank] channel num[%u] of remote rank[%u] is not equal to "
+            // 如果remoteRank变化了，则更新channelsPerRank并重新开始给下一个remoteRank计数
+            if (currentCount != channelsPerRank && currentRank != channels[0].remoteRank && currentRank != INVALID_VALUE_RANKID) {
+                HCCL_WARNING("[CalcChannelsPerRank] channel num[%u] of remote rank[%u] is not equal to "\
                     "channel num[%u] of previous ranks.",
-                    currentCount, channel.remoteRank, channelsPerRank);
+                    currentCount, currentRank, channelsPerRank);
             }
             if (currentCount > channelsPerRank) {
                 channelsPerRank = currentCount;
@@ -353,6 +400,7 @@ inline u32 CalcChannelsPerRank(const std::vector<HcclChannelDesc> &channels)
             currentCount = 1;
         }
     }
+    // 处理最后一个rank
     if (currentCount > channelsPerRank) {
         channelsPerRank = currentCount;
     }
@@ -397,7 +445,6 @@ HcclResult FillCachedArgs(CcuKernelSubmitInfo &info, Args... args)
 
     return HcclResult::HCCL_SUCCESS;
 }
-
 HcclResult CalcDataSplitByPortGroupCommon(const u64 totalDataCount,
                                           const u64 dataTypeSize,
                                           const std::vector<ChannelInfo> &channels,
@@ -405,15 +452,15 @@ HcclResult CalcDataSplitByPortGroupCommon(const u64 totalDataCount,
                                           std::vector<u64> &sizeOut,
                                           std::vector<u64> &elemOffset,
                                           const u32 channelsPerRank);
-HcclResult CalcDataSplitByPortGroupZAxisDetour(const u64 totalDataCount,
-                                               const u64 dataTypeSize,
-                                               const std::vector<ChannelInfo> &channels,
-                                               std::vector<u64> &elemCountOut,
-                                               std::vector<u64> &sizeOut,
-                                               std::vector<u64> &elemOffset,
-                                               const u32 level0ChannelNumPerRank,
-                                               const u32 level1ChannelNumPerRank,
-                                               const float level0DataRatio = 0.5f);
 
+HcclResult CalcDataSplitByPortGroupZAxisDetour(const u64 totalDataCount,
+                                                const u64 dataTypeSize,
+                                                const std::vector<ChannelInfo> &channels,
+                                                std::vector<u64> &elemCountOut,
+                                                std::vector<u64> &sizeOut,
+                                                std::vector<u64> &elemOffset,
+                                                const u32 level0ChannelNumPerRank,
+                                                const u32 level1ChannelNumPerRank,
+                                                const float level0DataRatio = 0.5f);
 }
 #endif

@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef COLL_ALG_V2_EXEC_REGISTRY_H
 #define COLL_ALG_V2_EXEC_REGISTRY_H
 
@@ -101,5 +101,21 @@ private:
 #define REGISTER_EXECUTOR_BY_FOUR_TEMPS(type, name, insCollAlgBase, AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3)              \
     REGISTER_EXECUTOR_BY_FOUR_TEMPS_HELPER_1(__COUNTER__, type, name, insCollAlgBase, AlgTopoMatch, InsAlgTemplate0,             \
         InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3)
+
+// 通过 __VA_ARGS__ 展开
+#define REGISTER_EXECUTOR_IMPL_MULTI(ctr, type, name, insCollAlgBase, AlgTopoMatch, ...) \
+    static HcclResult g_func_##name##_##ctr = \
+        CollAlgExecRegistryV2::Instance().Register( \
+            type, \
+            std::string(#name), \
+            DefaultExecCreatorV2<insCollAlgBase<AlgTopoMatch, __VA_ARGS__>> \
+        )
+
+#define REGISTER_EXECUTOR_HELPER_MULTI(ctr, type, name, insCollAlgBase, AlgTopoMatch, ...) \
+    REGISTER_EXECUTOR_IMPL_MULTI(ctr, type, name, insCollAlgBase, AlgTopoMatch, __VA_ARGS__)
+
+// 支持任意数量的后续参数
+#define REGISTER_EXEC_V2_MULTI(type, name, insCollAlgBase, AlgTopoMatch, ...) \
+    REGISTER_EXECUTOR_HELPER_MULTI(__COUNTER__, type, name, insCollAlgBase, AlgTopoMatch, __VA_ARGS__)
 }
 #endif

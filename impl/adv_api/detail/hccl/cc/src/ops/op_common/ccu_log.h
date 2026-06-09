@@ -12,7 +12,7 @@
 #define CCU_LOG_H
 
 #include "log.h"
-#include "ccu_types.h"
+#include "ccu_types_dl.h"
 
 #define HCCL_TO_CCU_RET(hcclRet) static_cast<CcuResult>(hcclRet)
 /* 检查函数返回值, 并返回指定错误码 */

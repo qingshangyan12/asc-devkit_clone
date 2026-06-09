@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef MC2_OPS_HCCL_SRC_OPS_ALL_TO_ALL_V_OP_H
 #define MC2_OPS_HCCL_SRC_OPS_ALL_TO_ALL_V_OP_H
 
@@ -64,6 +64,8 @@ HcclResult CheckAlltoAllVInputPara(const HcclComm comm, const void *sendBuf, con
     const HcclDataType recvType, const aclrtStream stream);
 HcclResult CheckAlltoAllVCInputPara(const HcclComm comm, const void *sendBuf, const void *sendCountMatrix,
     const HcclDataType sendType, const void *recvBuf, const HcclDataType recvType, const aclrtStream stream);
+HcclResult CheckBufNullptr(const u64* countsData, u32 rankSize, const void* buf, const std::string funcName,
+    const std::string bufName);
 HcclResult AlltoAllVConstructOpParam(const void *sendBuf, const void *sendCounts, const void *sdispls, const void *recvBuf,
     const void *recvCounts, const void *rdispls, HcclDataType dataType, HcclComm comm, aclrtStream stream,
     const std::string &tag, HcclCMDType opType, u32 rankSize, OpMode opMode, u64 varMemSize, OpParam &param);
@@ -80,7 +82,7 @@ HcclResult AlltoAllEntryLog(const void *sendBuf, const void *recvBuf, uint64_t s
     HcclDataType sendType, HcclDataType recvType, aclrtStream stream, const std::string &tag, const std::string &opName);
 HcclResult AlltoAllVEntryLog(const void *sendBuf, const void *recvBuf, const void *sendCounts, const void *recvCounts,
     const void *sdispls, const void *rdispls, HcclDataType sendType, HcclDataType recvType, aclrtStream stream,
-    const std::string &tag, const std::string &opName);
+    const std::string &tag, const u32 totalRanks, const std::string &opName);
 HcclResult AlltoAllVCEntryLog(const void *sendBuf, const void *recvBuf, const void *sendCountMatrix,
     HcclDataType sendType, HcclDataType recvType, aclrtStream stream, const std::string &tag, const std::string &opName);
 

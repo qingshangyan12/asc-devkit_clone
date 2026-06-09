@@ -10,6 +10,7 @@
 
 #include "alltoall_auto_selector.h"
 #include "selector_registry.h"
+#include "hccl_aiv_utils.h"
 
 namespace mc2_ops_hccl {
 constexpr uint32_t INDEX_0 = 0;
@@ -155,7 +156,25 @@ SelectorStatus AlltoAllAutoSelector::SelectAivAlgo(const TopoInfoWithNetLayerDet
     HCCL_DEBUG("[AlltoAllAutoSelector][%s] start, topoInfo levelNum[%u]", __func__, topoInfo->topoLevelNums);
     (void)opParam;
     (void)configAlgMap;
+
+    if (topoInfo->userRankSize > MAX_RANK_SIZE) {
+        HCCL_DEBUG("[AlltoAllAutoSelector][%s] rankSize[%u] larger than [%u]", __func__, topoInfo->userRankSize, MAX_RANK_SIZE);
+        return SelectorStatus::NOT_MATCH;
+    }
+
+    void *cclBufferAddr;
+    uint64_t cclBufferSize;
+    CHK_PRT_RET(HcclGetHcclBuffer(opParam.hcclComm, &cclBufferAddr, &cclBufferSize) != HCCL_SUCCESS,
+        HCCL_WARNING("[AlltoAllAutoSelector] HcclGetHcclBuffer failed."), SelectorStatus::NOT_MATCH);
+    u32 dataTypeSize = DATATYPE_SIZE_TABLE[opParam.all2AllVDataDes.sendType];
+    u64* sendCounts = reinterpret_cast<u64*>(opParam.all2AllVDataDes.sendCounts);
+    u64 totalSize = sendCounts[0] * dataTypeSize * topoInfo->userRankSize;
+    if (totalSize > cclBufferSize * AIV_MAX_CCL_LOOP_NUM) {
+        HCCL_DEBUG("[AlltoAllAutoSelector][%s] totalSize[%llu] too large for cclBufferSize [%llu]", __func__, totalSize, cclBufferSize);
+        return SelectorStatus::NOT_MATCH;
+    }
     selectAlgName = "AivAlltoAllMesh1D";
+
     HCCL_INFO("[AlltoAllAutoSelector][%s] Algo match[%s]", __func__, selectAlgName.c_str());
     return SelectorStatus::MATCH;
 }
@@ -186,4 +205,4 @@ SelectorStatus AlltoAllAutoSelector::SelectDPUAlgo(const TopoInfoWithNetLayerDet
 }
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLTOALL, 18, AlltoAllAutoSelector);
-} // namespace mc2_ops_hccl
+} // namespace Hccl

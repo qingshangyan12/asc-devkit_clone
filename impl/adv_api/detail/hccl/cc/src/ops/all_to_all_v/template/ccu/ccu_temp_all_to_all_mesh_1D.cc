@@ -45,7 +45,7 @@ HcclResult CcuTempAlltoAllMesh1D::CalcRes(HcclComm comm, const OpParam& param, c
     typeSize_ = DataTypeSizeGet(param.all2AllDataDes.sendType);
     CcuKernelInfo kernelInfo;
 
-    strcpy(kernelInfo.kernelFuncName, "CcuKernelAlltoAllMesh1D");
+    strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelAlltoAllMesh1D");
     kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuAlltoAllMesh1DKernel);
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
@@ -181,8 +181,8 @@ HcclResult CcuTempAlltoAllMesh1D::KernelRun(const OpParam& param,
         loadFromMem, myRank_, dimSize[0], inputAddr, outputAddr, sliceSize, srcOffset, dstOffset);
     LoopGroupConfig  config{};
     config.msInterleave = CCU_MS_INTERLEAVE;
-    config.loopCount    = 8;
-    config.memSlice     = 8 * CCU_MS_SIZE;
+    config.loopCount    = CCU_MS_INTERLEAVE;
+    config.memSlice     = CCU_MS_INTERLEAVE * CCU_MS_SIZE;
     auto     goSize     = CalGoSize(sliceSize, config);
     std::vector<uint64_t> taskArgs = {inputAddr, outputAddr, token, sliceSize, srcStride, srcOffset, dstOffset, goSize[0], goSize[1], goSize[2], goSize[3]};
     uint64_t argSize = 11;

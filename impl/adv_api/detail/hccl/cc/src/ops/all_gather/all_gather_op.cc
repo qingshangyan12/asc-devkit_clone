@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "all_gather_op.h"
 #include "op_common_ops.h"
 #include <algorithm>
@@ -23,12 +23,9 @@ extern "C" unsigned int LaunchAicpuKernel(OpParam *param);
 HcclResult HcclAllGather(void *sendBuf, void *recvBuf, uint64_t sendCount, HcclDataType dataType, HcclComm comm,
                          aclrtStream stream)
 {
-    if (!HcclCheckAicpuEnableOpen() && !HcclCheckCcuEnableOpen()) {
-        return HcclAllGatherInner(sendBuf, recvBuf, sendCount, dataType, comm, stream);
-    }
     HCCL_INFO("Start to run execute HcclAllGather");
 
-    if (GetHcommVersion() < 90000000) { // compat handle
+    if (GetHcommVersion() < CANN_VERSION(9, 0, 0)) { // compat handle
         return HcclAllGatherInner(sendBuf, recvBuf, sendCount, dataType, comm, stream);
     }
 
@@ -46,6 +43,13 @@ HcclResult HcclAllGather(void *sendBuf, void *recvBuf, uint64_t sendCount, HcclD
     HcclUs startut = TIME_NOW();// 走老流程的判断时间不统计在内
     std::string opTag;
     CHK_RET(AllGatherInitAndCheck(comm, sendBuf, recvBuf, sendCount, dataType, stream, opTag));
+
+    // 9.0.0 ccu模式走老流程
+    if ((GetHcommVersion() == CANN_VERSION(9, 0, 0)) &&
+        (GetExternalInputHcclCcuMSMode() ||
+        GetExternalInputHcclCcuSchedMode())) {
+        return HcclAllGatherInner(sendBuf, recvBuf, sendCount, dataType, comm, stream);
+    }
 
     CHK_RET(AllGatherEntryLog(sendBuf, recvBuf, sendCount, dataType, stream, opTag, "HcclAllGather"));
 
@@ -182,16 +186,23 @@ HcclResult AllGatherOutPlaceCommon(void *sendBuf, void *recvBuf, uint64_t sendCo
     param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
     param.enableDetour = false;
     param.deviceType = deviceType;
+    
+    CHK_RET(HcclGetOpExpansionMode(comm, param));
+
+    CcuFastLaunchCtx *ccuFastLaunchCtx = nullptr;
+    if (ShouldGoCcuFastLaunch(comm, param, &ccuFastLaunchCtx)) {
+        return HcclExecOpCcuFastLaunch(comm, param, ccuFastLaunchCtx);
+    }
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     CHK_RET(Selector(comm, param, topoInfo, algName));
-    if (ShouldUseInnerOp(param.opExecuteConfig)) {
+    if (ShouldUseInnerOp(param.opExecuteConfig) && param.opMode == OpMode::OPBASE) {
         return HcclAllGatherInner(sendBuf, recvBuf, sendCount, dataType, comm, stream);
     }
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] rankSize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(param));
+        CHK_RET(SingleRankProc(comm, param));
         return HcclResult::HCCL_SUCCESS;
     }
     CHK_RET(HcclExecOp(comm, param, topoInfo, algName, resPack));

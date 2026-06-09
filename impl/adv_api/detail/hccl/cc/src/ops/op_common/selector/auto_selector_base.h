@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #ifndef AUTO_SELECTOR_BASE
 #define AUTO_SELECTOR_BASE
 
@@ -25,6 +25,7 @@ constexpr u32 CCU_MS_MODE = 2;
 constexpr double DEFAULT_RANK_SIZE = 8.0;
 constexpr u64 RS_2D_SMALL_DATA_SIZE = 1024 * 1024;
 constexpr u64 RS_M2M_1D_MAX_DATA_SIZE = 8 * 1024 * 1024;
+constexpr u64 CCU_PARALLEL_MAX_DATA_SIZE = 64 * 1024 * 1024;
 
 enum class SelectorStatus { MATCH, NOT_MATCH };
 
@@ -95,13 +96,13 @@ public:
                                    const OpParam &opParam,
                                    const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
                                    std::string &selectAlgName) const;
-    HcclResult CheckHostDPUOnly(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam, bool &hostDPUOnly) const;
     bool IsStarsState(const OpExecuteConfig &opExecuteConfig) const;
     bool IsLayerAllConnetedWithTopo(const TopoInfoWithNetLayerDetails *topoInfo, const u32 netLayer, const CommTopo topoType) const;
     HcclResult CheckMeshNumEqualToClosNum(const TopoInfoWithNetLayerDetails *topoInfo, bool &isEqual) const;
     HcclResult CheckClosNumMultipleOfMeshNum(const TopoInfoWithNetLayerDetails *topoInfo, bool &isMultiple) const;
     bool IsTwoLevelNetLayer(const TopoInfoWithNetLayerDetails *topoInfo) const;
     bool IsInputOutputOverlap(const OpParam &opParam) const;
+    bool IsSmallDataCCU(const u64 dataSize, const u64 rankSize) const;
 
 private:
     bool ProcessAivConfig(OpParam &opParam, TopoInfoWithNetLayerDetails* topoInfo,

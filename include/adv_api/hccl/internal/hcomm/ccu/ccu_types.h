@@ -17,11 +17,6 @@
 extern "C" {
 #endif // __cplusplus
 
-#ifndef __cplusplus
-typedef void *CcuKernelArg;
-typedef CcuResult (*CcuKernelFunc)(CcuKernelArg arg);
-#endif
-
 /**
  * @brief CCU return value definition
  */

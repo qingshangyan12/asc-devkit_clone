@@ -106,4 +106,4 @@ HcclResult TopoMatchUBX1d::TopoForLayer1(const HcclComm comm, uint32_t layer0Siz
     return HcclResult::HCCL_SUCCESS;
 }
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl

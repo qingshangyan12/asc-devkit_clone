@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <vector>
 #include <string>
 #include <sstream>
@@ -128,42 +128,4 @@ std::string GetReduceTypeStr(HcclDataType dataType, HcclReduceOp opType)
     return ccuRepDataTypeStr[dataType] + "_" + ccuRepOpTypeStr[opType];
 }
 
-HcclResult GenerateCcuKernelSignature(hcomm::CcuKernelSignature &sig, const std::string &name, const OpParam &opParam,
-    const std::vector<std::vector<uint32_t>> &subCommRanks)
-{
-    sig.Append<std::string>(name);
-    if (opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER ||
-        opParam.opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
-        opParam.opType == HcclCMDType::HCCL_CMD_REDUCE) {
-        sig.Append<uint8_t>(uint8_t(opParam.reduceType));
-        sig.Append<uint8_t>(uint8_t(opParam.DataDes.dataType));
-        sig.Append<uint8_t>(uint8_t(opParam.DataDes.outputType));
-    }
-    if (opParam.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER_V) {
-        sig.Append<std::string>(GetReduceTypeStr(opParam.vDataDes.dataType, opParam.reduceType));
-        sig.Append<char>('_');
-    }
-    if (opParam.opType == HcclCMDType::HCCL_CMD_REDUCE ||
-        opParam.opType == HcclCMDType::HCCL_CMD_BROADCAST ||
-        opParam.opType == HcclCMDType::HCCL_CMD_GATHER) {
-        // 带有root属性的算子需要考虑自己与root的关系，暂定直接用root号做区分
-        sig.Append<char>('R');
-        sig.Append<int>(int(opParam.root));
-        // sig.Append<std::string>("_");
-    }
-    if (subCommRanks.size() == COMM_LEVEL_SIZE_1) {
-        sig.Append<uint32_t>(subCommRanks[0].size());
-        sig.Append<char>('P');
-    } else if (subCommRanks.size() == COMM_LEVEL_SIZE_2) {
-        sig.Append<uint32_t>(subCommRanks[0].size());
-        sig.Append<char>('X');
-        sig.Append<uint32_t>(subCommRanks[1].size());
-        sig.Append<char>('P');
-    } else {
-        HCCL_ERROR("[GenerateCcuKernelSignature] failed: unexpected tempVTopoSize[%u]", subCommRanks.size());
-        return HcclResult::HCCL_E_INTERNAL;
-    }
-    HCCL_INFO("[GenerateCcuKernelSignature] success: %s", sig.Describe().c_str());
-    return HcclResult::HCCL_SUCCESS;
-}
 }

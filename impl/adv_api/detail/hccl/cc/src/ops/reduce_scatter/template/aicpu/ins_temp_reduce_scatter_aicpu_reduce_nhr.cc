@@ -1,12 +1,12 @@
 /**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include "ins_temp_reduce_scatter_aicpu_reduce_nhr.h"
 
 namespace mc2_ops_hccl {
@@ -51,13 +51,15 @@ u64 InsTempReduceScatterAicpuReduceNHR::GetThreadNum() const
 
 HcclResult InsTempReduceScatterAicpuReduceNHR::KernelRun(const OpParam& param,
                                               const TemplateDataParams& tempAlgParams,
-                                              const TemplateResource& templateResource)
+                                              TemplateResource& templateResource)
 {
     HCCL_INFO("[InsTempReduceScatterAicpuReduceNHR] KernelRun start");
 
     tempAlgParams_       = tempAlgParams;
     channels_            = templateResource.channels;
     dataType_            = param.DataDes.dataType;
+    bool isPcieProtocal = IsPcieProtocol(channels_);  // 判断是否存在pcie链路
+    isDmaRead_ = isPcieProtocal;  // 是否使用Read模式
     
     for (u32 sliceIdx = 0; sliceIdx < templateRankSize_; ++sliceIdx) {
         // Step 1: 本地拷贝，将本rank的数据拷贝到自己hcclBuffer上相应的位置
@@ -189,27 +191,27 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::RunAllGather(const std::vector<Th
 {
     const u32 nSteps = GetNHRStepNum(templateRankSize_);  // NHR 通信步数， celi(log2(rankSize))
 
-    for (u32 rpt = 0; rpt < tempAlgParams_.repeatNum; ++rpt) {
-        const u64 scratchRepeatStride = tempAlgParams_.sliceSize * templateRankSize_;
-        const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff + rpt * scratchRepeatStride;
+    for (u32 step = 0; step < nSteps; ++step) {
+        AicpuNHRStepInfo stepInfo;
+        CHK_RET(GetStepInfo(step, nSteps, stepInfo));  // 计算当前step要通信的卡，数据
 
-        for (u32 step = 0; step < nSteps; ++step) {
-            AicpuNHRStepInfo stepInfo;
-            CHK_RET(GetStepInfo(step, nSteps, stepInfo));  // 计算当前step要通信的卡，数据
+        const ChannelInfo &channelRecv = channels_.at(GetRankFromMap(stepInfo.fromRank))[0];
+        const ChannelInfo &channelSend = channels_.at(GetRankFromMap(stepInfo.toRank))[0];
+        // 构造SendRecv， 都是Scratch到Scratch的传输，没有DMA消减
+        std::vector<DataSlice> txSrcSlicesAll;
+        std::vector<DataSlice> txDstSlicesAll;
+        std::vector<DataSlice> rxSrcSlicesAll;
+        std::vector<DataSlice> rxDstSlicesAll;
+        void *sendCclBuffAddr = channelSend.remoteCclMem.addr;
+        void *recvCclBuffAddr = channelRecv.remoteCclMem.addr;
 
-            const ChannelInfo &channelRecv = channels_.at(GetRankFromMap(stepInfo.fromRank))[0];
-            const ChannelInfo &channelSend = channels_.at(GetRankFromMap(stepInfo.toRank))[0];
-            // 构造SendRecv， 都是Scratch到Scratch的传输，没有DMA消减
-            std::vector<DataSlice> txSrcSlices;
-            std::vector<DataSlice> txDstSlices;
-            std::vector<DataSlice> rxSrcSlices;
-            std::vector<DataSlice> rxDstSlices;
-            void *sendCclBuffAddr = channelSend.remoteCclMem.addr;
-            void *recvCclBuffAddr = channelRecv.remoteCclMem.addr;
+        HCCL_DEBUG(
+            "[InsTempReduceScatterAicpuReduceNHR] rank[%d] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]",
+            myRank_, templateRankSize_, stepInfo.fromRank, stepInfo.toRank, step, nSteps, stepInfo.nSlices);
 
-            HCCL_DEBUG(
-                "[InsTempReduceScatterAicpuReduceNHR] rank[%d] rankSize[%u] recvFrom[%u] sendTo[%u] step[%u] nSteps[%u] nSlices[%u]",
-                myRank_, templateRankSize_, stepInfo.fromRank, stepInfo.toRank, step, nSteps, stepInfo.nSlices);
+        for (u32 rpt = 0; rpt < tempAlgParams_.repeatNum; ++rpt) {
+            const u64 scratchRepeatStride = tempAlgParams_.sliceSize * templateRankSize_;
+            const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff + rpt * scratchRepeatStride;
 
             for (u32 i = 0; i < stepInfo.nSlices; ++i) {
                 const u32 txIdx = stepInfo.txSliceIdxs[i];
@@ -219,22 +221,28 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::RunAllGather(const std::vector<Th
 
                 const u64 rxScratchOff = scratchBase + tempAlgParams_.sliceSize * rxIdx;
 
-                txSrcSlices.emplace_back(tempAlgParams_.buffInfo.hcclBuff.addr, txScratchOff, tempAlgParams_.sliceSize,
+                txSrcSlicesAll.emplace_back(tempAlgParams_.buffInfo.hcclBuff.addr, txScratchOff, tempAlgParams_.sliceSize,
                                          tempAlgParams_.count);
-                txDstSlices.emplace_back(sendCclBuffAddr, txScratchOff, tempAlgParams_.sliceSize, tempAlgParams_.count);
-                rxSrcSlices.emplace_back(recvCclBuffAddr, rxScratchOff, tempAlgParams_.sliceSize, tempAlgParams_.count);
-                rxDstSlices.emplace_back(tempAlgParams_.buffInfo.hcclBuff.addr, rxScratchOff, tempAlgParams_.sliceSize,
+                txDstSlicesAll.emplace_back(sendCclBuffAddr, txScratchOff, tempAlgParams_.sliceSize, tempAlgParams_.count);
+                rxSrcSlicesAll.emplace_back(recvCclBuffAddr, rxScratchOff, tempAlgParams_.sliceSize, tempAlgParams_.count);
+                rxDstSlicesAll.emplace_back(tempAlgParams_.buffInfo.hcclBuff.addr, rxScratchOff, tempAlgParams_.sliceSize,
                                          tempAlgParams_.count);
             }
-            // write模式使用tx,rx地址不生效，仅使用对端link做Post/Wait
-            // read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
-            TxRxSlicesList sendRecvSlicesList({txSrcSlices, txDstSlices}, {rxSrcSlices, rxDstSlices});
-            TxRxChannels sendRecvChannels(channelSend, channelRecv);
-            SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
+        }
+        // write模式使用tx,rx地址不生效，仅使用对端link做Post/Wait
+        // read 模式使用rx, tx地址不生效，仅使用对端link做Post/Wait
+        TxRxSlicesList sendRecvSlicesList({txSrcSlicesAll, txDstSlicesAll}, {rxSrcSlicesAll, rxDstSlicesAll});
+        TxRxChannels sendRecvChannels(channelSend, channelRecv);
+        SendRecvInfo sendRecvInfo(sendRecvChannels, sendRecvSlicesList);
 
+        if (isDmaRead_) {
+            CHK_PRT_RET(SendRecvRead(sendRecvInfo, threads[0]),
+                HCCL_ERROR("[InsTempReduceScatterAicpuReduceNHR] sendrecv failed (step=%u)", step),
+                HcclResult::HCCL_E_INTERNAL);
+        } else {
             CHK_PRT_RET(SendRecvWrite(sendRecvInfo, threads[0]),
-                        HCCL_ERROR("[InsTempReduceScatterAicpuReduceNHR] sendrecv failed (step=%u, rpt=%u)", step, rpt),
-                        HcclResult::HCCL_E_INTERNAL);
+                HCCL_ERROR("[InsTempReduceScatterAicpuReduceNHR] sendrecv failed (step=%u)", step),
+                HcclResult::HCCL_E_INTERNAL);
         }
     }
     return HcclResult::HCCL_SUCCESS;
@@ -268,21 +276,21 @@ HcclResult InsTempReduceScatterAicpuReduceNHR::GetStepInfo(u32 step, u32 nSteps,
     u32 recvFrom = (myAlgRank + templateRankSize_ - deltaRank) % templateRankSize_;
     u32 sendTo = (myAlgRank + deltaRank) % templateRankSize_;
 
-    // 数据份数和数据编号增量， NHR是一个传输数据变化的
+    // ReduceNHR 数据份数和数据编号增量， NHR是一个传输数据变化的
     u32 nSlices = (templateRankSize_ - 1 + (1 << (nSteps - 1 - step))) / (1 << (nSteps - step));
     u32 deltaSliceIndex = 1 << (nSteps - step);
     u32 txSliceIdx = myAlgRank;
     u32 rxSliceIdx = (myAlgRank - (1 << (nSteps - 1 - step)) + templateRankSize_) % templateRankSize_;
 
+    stepInfo.fromRank = recvFrom;
     stepInfo.nSlices = nSlices;
     stepInfo.toRank = sendTo;
-    stepInfo.fromRank = recvFrom;
 
     for (u32 i = 0; i < nSlices; i++) {
         stepInfo.txSliceIdxs.push_back(txSliceIdx);
         stepInfo.rxSliceIdxs.push_back(rxSliceIdx);
 
-        HCCL_DEBUG("[AllGatherNHR][GetStepInfo] i[%u] txSliceIdx[%u] rxSliceIdx[%u]", i, txSliceIdx, rxSliceIdx);
+        HCCL_DEBUG("[ReduceScatterAicpu][GetStepInfo] i[%u] txSliceIdx[%u] rxSliceIdx[%u]", i, txSliceIdx, rxSliceIdx);
 
         txSliceIdx = (txSliceIdx + templateRankSize_ - deltaSliceIndex) % templateRankSize_;
         rxSliceIdx = (rxSliceIdx + templateRankSize_ - deltaSliceIndex) % templateRankSize_;

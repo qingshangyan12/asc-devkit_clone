@@ -2,7 +2,7 @@
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
- * Please refer to the License for details. You can not use this file except in compliance with the License.
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
@@ -16,6 +16,7 @@
 #else
 #include "ccu_variable_dl.hpp"
 #include "ccu_primitives_impl_dl.h"
+
 
 #define CCU_CONCAT_INNER(a, b) a##b
 #define CCU_CONCAT(a, b)       CCU_CONCAT_INNER(a, b)
@@ -91,19 +92,18 @@
              uid##_rc = (int)CcuIfEnd(uid##_lbl))
 
 
-
 #define CCU_DO                                                              \
     CCU_DO_EXPAND(CCU_CONCAT(__ccu_dw_, __COUNTER__))
 
 #define CCU_DO_EXPAND(uid)                                                  \
-CCU_DO_IMPL(uid)
+    CCU_DO_IMPL(uid)
 
-#define CCU_DO_IMPL(uid)                                                  \
+#define CCU_DO_IMPL(uid)                                                    \
     for (int uid##_rc = (int)CcuDoWhileBegin(CCU_LABEL(uid)),               \
-              uid##_done = 0;                                                \
-          uid##_rc == (int)CCU_SUCCESS && !uid##_done;                       \
-          uid##_done = 1,                                                    \
-              _CcuDoWhileStackPush(CCU_LABEL(uid)))
+             uid##_done = 0;                                                \
+         uid##_rc == (int)CCU_SUCCESS && !uid##_done;                       \
+         uid##_done = 1,                                                    \
+             _CcuDoWhileStackPush(CCU_LABEL(uid)))
 
 #endif // CANN_VERSION_NUM >= 90100000
 

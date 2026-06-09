@@ -461,7 +461,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam &opParam, bool &sk
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(opParam));
+        CHK_RET(SingleRankProc(comm, opParam));
         skipGetRes = true;
         return HCCL_SUCCESS;
     }
@@ -501,10 +501,10 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         };
         resCtxHost->kfcServerArgSize = 6;
         
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, ResPackGraphMode()));
         opParam.resCtx = *resCtxOut;
     } else {
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused, ResPackGraphMode()));
         opParam.resCtx = *resCtxOut;
     }
     
