@@ -22,9 +22,9 @@
 
 #include "kernel_log.h"
 #include "kernel_macros.h"
-#include "kernel_tensor.h"
-#include "kernel_operator_block_sync_intf.h"
-#include "kernel_struct_proposal.h"
+#include "../../../include/basic_api/kernel_tensor.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
+#include "../../../include/basic_api/kernel_struct_proposal.h"
 #include "utils/kernel_utils_ceil_oom_que.h"
 #include "utils/kernel_utils_constants.h"
 #include "utils/kernel_utils_struct_param.h"

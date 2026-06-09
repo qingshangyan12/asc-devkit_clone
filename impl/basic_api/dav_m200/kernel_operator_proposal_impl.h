@@ -20,7 +20,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_PROPOSAL_IMPL_H
 #include "kernel_operator_proposal_base_impl.h"
-#include "kernel_struct_proposal.h"
+#include "../../../include/basic_api/kernel_struct_proposal.h"
 
 namespace AscendC {
 constexpr uint32_t singleSortElementCountV220 = 32;

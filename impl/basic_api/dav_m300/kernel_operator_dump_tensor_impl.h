@@ -23,9 +23,9 @@
 #include "kernel_tpipe_impl.h"
 #include "kernel_operator_common_impl.h"
 #include "kernel_operator_data_copy_impl.h"
-#include "kernel_operator_sys_var_intf.h"
+#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 #include "kernel_pop_stack_buffer.h"
-#include "kernel_struct_fixpipe.h"
+#include "../../../include/basic_api/kernel_struct_fixpipe.h"
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 2002

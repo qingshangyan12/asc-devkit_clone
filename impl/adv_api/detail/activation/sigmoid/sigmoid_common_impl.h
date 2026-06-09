@@ -23,8 +23,8 @@
 #ifndef IMPL_ACTIVATION_SIGMOID_SIGMOID_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SIGMOID_SIGMOID_COMMON_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #ifdef ASCENDC_CPU_DEBUG

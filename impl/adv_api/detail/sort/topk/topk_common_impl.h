@@ -26,12 +26,12 @@
 #include "kernel_log.h"
 #endif
 
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_utils.h"
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "topk_common_utils.h"
-#include "include/adv_api/index/arithprogression.h"
+#include "../../../../../include/adv_api/index/arithprogression.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "topk_v220_impl.h"

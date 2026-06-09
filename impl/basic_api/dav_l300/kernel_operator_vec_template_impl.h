@@ -22,7 +22,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_TEMPLATE_IMPL_H
 
 #include "kernel_utils.h"
-#include "kernel_struct_binary.h"
+#include "../../../include/basic_api/kernel_struct_binary.h"
 #include "kernel_operator_common_impl.h"
 
 namespace AscendC {

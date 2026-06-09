@@ -23,8 +23,8 @@
 #define IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 
 #include "kernel_macros.h"
-#include "kernel_basic_intf.h"
-#include "include/adv_api/matmul/tiling.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/adv_api/matmul/tiling.h"
 #include "../dfx/dfx_proxy.h"
 #include "../resource/cube_in_buffer/global_cache.h"
 #include "../../../tiling/matmul/matmul_constant_tiling_impl.h"

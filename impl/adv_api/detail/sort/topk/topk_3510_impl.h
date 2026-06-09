@@ -26,7 +26,7 @@
 #include "kernel_log.h"
 #endif
 
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_pop_stack_buffer.h"
 #include "topk_common_utils.h"
 

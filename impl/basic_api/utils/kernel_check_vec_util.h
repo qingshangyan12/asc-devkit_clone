@@ -22,7 +22,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "kernel_utils.h"
-#include "kernel_struct_transpose.h"
+#include "../../../include/basic_api/kernel_struct_transpose.h"
 #include "kernel_check_vec_padding_util.h"
 namespace AscendC {
 namespace check {

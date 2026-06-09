@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_IMPL_H
 
 #include "kernel_utils.h"
-#include "kernel_tensor.h"
+#include "../../../include/basic_api/kernel_tensor.h"
 #include "kernel_operator_common_impl.h"
 
 

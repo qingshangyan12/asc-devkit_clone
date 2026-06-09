@@ -20,8 +20,8 @@
 #ifndef __KERNEL_KFC_COMM_H__
 #define __KERNEL_KFC_COMM_H__
 
-#include "kernel_common.h"
-#include "kernel_operator_block_sync_intf.h"
+#include "../../../../include/basic_api/kernel_common.h"
+#include "../../../../include/basic_api/kernel_operator_block_sync_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__

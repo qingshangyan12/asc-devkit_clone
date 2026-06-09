@@ -15,7 +15,7 @@
 #endif
 #ifndef IMPL_SELECT_SELECT_WITH_BYTES_MASK_V200_IMPL_H
 #define IMPL_SELECT_SELECT_WITH_BYTES_MASK_V200_IMPL_H
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_utils.h"
 #include "selectwithbytesmask_common_impl.h"
 
