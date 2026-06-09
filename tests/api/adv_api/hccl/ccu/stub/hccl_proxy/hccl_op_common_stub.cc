@@ -262,8 +262,41 @@ const bool& GetExternalInputHcclAicpuUnfold()
     return value;
 }
 
-HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algTag)
+HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 {
+    // 生成 algTag: tag_algName_host_dataType_reduceType
+    std::string launchMode = (param.engine == COMM_ENGINE_AICPU || param.engine == COMM_ENGINE_AICPU_TS) 
+                              ? "device" : "host";
+    
+    std::string algTag = std::string(param.tag) + "_" + algName + "_" + launchMode;
+    
+    // CCU 算子需要添加 dataType
+    if (param.engine == COMM_ENGINE_CCU) {
+        HcclDataType dataType = HCCL_DATA_TYPE_FP16;  // 默认使用 FP16
+        if (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+            param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+            dataType = param.all2AllVDataDes.sendType;
+        } else {
+            dataType = param.DataDes.dataType;
+        }
+        
+        // 简化处理：只添加 dataType 数字值
+        algTag += "_" + std::to_string(static_cast<int>(dataType));
+        
+        // ALLREDUCE 等算子需要添加 reduceType
+        if (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
+            param.opType == HcclCMDType::HCCL_CMD_REDUCE ||
+            param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+            algTag += "_" + std::to_string(static_cast<int>(param.reduceType));
+        }
+    }
+    
+    int ret = sprintf_s(param.algTag, sizeof(param.algTag), "%s", algTag.c_str());
+    if (ret <= 0) {
+        return HcclResult::HCCL_E_INTERNAL;
+    }
+    
+    std::cout << "Stub: SetOpParamAlgTag set algTag=" << param.algTag << std::endl;
     return HcclResult::HCCL_SUCCESS;
 }
 
