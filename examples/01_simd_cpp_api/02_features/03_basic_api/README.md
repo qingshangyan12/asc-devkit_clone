@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了Ascend C Basic API的使用方法，包括数据搬运、矩阵计算、内存向量计算、资源管理、同步控制、系统访问、原子操作和标量计算等。
+本样例介绍了Ascend C Basic API的使用方法，包括数据搬运、矩阵计算、内存向量计算、资源管理、同步控制、系统访问、原子操作、标量计算和通信等。
 
 ## 样例列表
 
@@ -17,3 +17,4 @@
 | [07_system_access](./07_system_access) | 本路径下包含了与系统变量访问相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [08_atomic_operations](./08_atomic_operations) | 本路径下包含了与原子操作相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [09_scalar_computation](./09_scalar_computation) | 本路径下包含了与标量计算相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
+| [10_communication](./10_communication) | 本路径下包含了与NPU间点对点通信相关的样例，展示了Hcomm的WriteNbi和ReadNbi接口的使用方法。         |
