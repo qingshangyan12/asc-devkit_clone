@@ -16,6 +16,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ![左矩阵和右矩阵缩放数据缩放示意图](../figures/zh-cn_image_0000002549011155.png)
 
+接口支持batch模式。batch模式用于一次描述多个形状相同的右矩阵缩放数据块，Layout在原`NN`分形Layout最外层增加Batch维度，可通过`MakeBatchPatternLayout<NNLayoutPtn, TraitType>(batch, baseLayout)`构造。batch模式下，`Copy`调用形式与非batch模式保持一致。
+
 ## 函数原型
 
 - 执行L1 Buffer到L0ScaleB Buffer的数据搬运。
@@ -70,6 +72,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 ## 约束说明
 
 - 源张量和目的张量数据格式为`NN`，使用`MakeFrameLayout<NNLayoutPtn, _2>(...)`构造。
+- batch模式下，源张量和目的张量数据格式仍为`NN`，源张量和目的张量的Batch数量一致，且去掉Batch维度后的单个缩放数据Layout需要满足非batch模式约束。
 - 源地址和目的地址需要满足32 Byte对齐要求。
 
 ## 调用示例
@@ -93,6 +96,38 @@ __aicore__ inline void CopyL1ToL0ScaleBExample()
     // ScaleB地址由右矩阵的L0B Buffer地址按1/16地址编码换算得到。
     auto l0ScaleBPtr = MakeMemPtr<Location::L0ScaleB, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0BBuf) / 16);
     auto l0ScaleBTensor = MakeTensor(l0ScaleBPtr, MakeFrameLayout<NNLayoutPtn, _2>(scaleK, n));
+
+    auto copyAtom = MakeCopy(CopyL12L0ScaleB{}, CopyL12L0ScaleBTraitDefault{});
+    Copy(copyAtom, l0ScaleBTensor, l1Tensor);
+}
+```
+
+batch模式调用示例：
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyBatchL1ToL0ScaleBExample()
+{
+    constexpr uint32_t batch = 3;
+    constexpr uint32_t k = 32;
+    constexpr uint32_t n = 16;
+    constexpr uint32_t scaleK = k / 16;
+
+    __cbuf__ fp8_e8m0_t l1Buf[batch * scaleK * n];
+    __cb__ fp8_e5m2_t l0BBuf[batch * k * n];
+
+    auto baseLayout = MakeFrameLayout<NNLayoutPtn, _2>(scaleK, n);
+    using LayoutTraitType = GetLayoutTrait<decltype(baseLayout)>;
+    auto batchLayout = MakeBatchPatternLayout<NNLayoutPtn, LayoutTraitType>(batch, baseLayout);
+
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), batchLayout);
+
+    // ScaleB地址由右矩阵的L0B Buffer地址按1/16地址编码换算得到。
+    auto l0ScaleBPtr = MakeMemPtr<Location::L0ScaleB, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0BBuf) / 16);
+    auto l0ScaleBTensor = MakeTensor(l0ScaleBPtr, batchLayout);
 
     auto copyAtom = MakeCopy(CopyL12L0ScaleB{}, CopyL12L0ScaleBTraitDefault{});
     Copy(copyAtom, l0ScaleBTensor, l1Tensor);
