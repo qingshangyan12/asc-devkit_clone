@@ -23,6 +23,7 @@
 #define IMPL_TENSOR_API_ARCH_CUBE_UTILS_L0C2OUT_UTILS_H
 
 #include "impl/tensor_api/utils/utils_impl.h"
+#include "impl/tensor_api/tensor/layout_method.h"
 
 namespace AscendC {
 namespace Te {
@@ -43,6 +44,14 @@ template <typename TensorType>
 inline constexpr bool IsL0COutDNFormatV =
     IsSatisfiedPtnFormatV<TensorType, DNExtLayoutPtn> || IsSatisfiedPtnFormatV<TensorType, DNLayoutPtn>;
 
+template <typename TensorType>
+inline constexpr bool IsL0COutNZFormatV = IsSatisfiedPtnFormatV<TensorType, NZLayoutPtn>;
+
+template <typename DstTensorType, typename SrcTensorType>
+inline constexpr bool IsL0COutBatchNZ2NZV =
+    IsL0COutNZFormatV<DstTensorType> && IsL0COutNZFormatV<SrcTensorType> &&
+    DstTensorType::layoutType::depth == FIVE_DIM_DATA && SrcTensorType::layoutType::depth == FIVE_DIM_DATA;
+
 template <typename T, typename LayoutType>
 __aicore__ inline static constexpr uint32_t GetL0COutNDStride(const LayoutType& layout)
 {
@@ -60,6 +69,64 @@ __aicore__ inline static constexpr uint32_t GetL0COutDNStride(const LayoutType& 
         return GetElement<AttrInfo::Stride, AttrInfo::Column>(layout);
     } else {
         return GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(layout);
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutNZColShape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 1, 0>(layout.Shape()) * Get<1, 1, 1>(layout.Shape());
+    } else {
+        return GetTotalColumnShape(layout);
+    }
+}
+
+template <typename LayoutType>
+__aicore__ inline static constexpr uint32_t GetL0COutNZRowShape(const LayoutType& layout)
+{
+    if constexpr (LayoutType::depth == FIVE_DIM_DATA) {
+        return Get<1, 0, 0>(layout.Shape()) * Get<1, 0, 1>(layout.Shape());
+    } else {
+        return GetTotalRowShape(layout);
+    }
+}
+
+struct L0COutCopyParams {
+    uint32_t nSize;
+    uint32_t mSize;
+    uint32_t srcStride;
+    uint32_t dstStride;
+};
+
+template <typename T, typename U, typename DstLayout, typename SrcLayout>
+__aicore__ inline static constexpr L0COutCopyParams MakeL0COutCopyParams(
+    const DstLayout& dstLayout, const SrcLayout& srcLayout)
+{
+    if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
+        return {
+            static_cast<uint32_t>(Std::min(Get<0>(srcLayout.Shape()) * GetL0COutNZColShape(srcLayout),
+                                           Get<0>(dstLayout.Shape()) * GetL0COutNZColShape(dstLayout))),
+            static_cast<uint32_t>(Std::min(GetL0COutNZRowShape(srcLayout), GetL0COutNZRowShape(dstLayout))),
+            static_cast<uint32_t>(Get<1, 1, 1>(srcLayout.Stride()) / FRACTAL_FIXED),
+            static_cast<uint32_t>(Get<1, 1, 1>(dstLayout.Stride()))
+        };
+    } else {
+        const uint32_t nSize =
+            static_cast<uint32_t>(Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout)));
+        const uint32_t mSize =
+            static_cast<uint32_t>(Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout)));
+        const uint32_t srcStride =
+            static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED);
+
+        if constexpr (IsL0COutNDFormatV<T>) {
+            return {nSize, mSize, srcStride, GetL0COutNDStride<T>(dstLayout)};
+        } else if constexpr (IsL0COutDNFormatV<T>) {
+            return {nSize, mSize, srcStride, GetL0COutDNStride<T>(dstLayout)};
+        } else {
+            return {nSize, mSize, srcStride,
+                    static_cast<uint32_t>(GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout))};
+        }
     }
 }
 
@@ -253,6 +320,8 @@ __aicore__ inline static void EmitSetRegister(const U& srcLayout, uint32_t batch
     } else if constexpr (IsL0COutDNFormatV<T>) {
         SetRegisterInstr::SetRegister(batchNum, dstBatchStride, srcBatchStride,
                                       GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+    } else if constexpr (IsL0COutNZFormatV<T>) {
+        SetRegisterInstr::SetRegister(1, 0, 0);
     }
 }
 
@@ -265,6 +334,8 @@ __aicore__ inline static void EmitSetRegister(
     } else if constexpr (IsL0COutDNFormatV<T>) {
         SetRegisterInstr::SetRegister(quant, batchNum, dstBatchStride, srcBatchStride,
                                       GetElement<AttrInfo::Stride, AttrInfo::Column, 0>(srcLayout));
+    } else if constexpr (IsL0COutNZFormatV<T>) {
+        SetRegisterInstr::SetRegister(quant, 1, 0, 0);
     }
 }
 
@@ -274,7 +345,7 @@ __aicore__ inline static void SetRegisterImpl(const T& dst, const U& src)
     if constexpr (IsL0COutSrcBatchLayoutV<U>) {
         auto srcLayout = src.Layout();
         auto dstLayout = dst.Layout();
-        EmitSetRegister<T>(Te::Get<1>(srcLayout), Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
+        EmitSetRegister<T>(Get<1>(srcLayout), Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
                            Get<0>(srcLayout.Stride()) / FRACTAL_FIXED);
     } else {
         EmitSetRegister<T>(src.Layout(), 1, 0, 0);
@@ -287,7 +358,7 @@ __aicore__ inline static void SetRegisterImpl(const T& dst, const U& src, uint64
     if constexpr (IsL0COutSrcBatchLayoutV<U>) {
         auto srcLayout = src.Layout();
         auto dstLayout = dst.Layout();
-        EmitSetRegister<T>(Te::Get<1>(srcLayout), quant, Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
+        EmitSetRegister<T>(Get<1>(srcLayout), quant, Get<0>(srcLayout.Shape()), Get<0>(dstLayout.Stride()),
                            Get<0>(srcLayout.Stride()) / FRACTAL_FIXED);
     } else {
         EmitSetRegister<T>(src.Layout(), quant, 1, 0, 0);
