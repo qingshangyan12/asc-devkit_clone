@@ -96,7 +96,8 @@ __aicore__ inline TPipe::~TPipe()
 
 __aicore__ inline void TPipe::Init()
 {
-#ifdef ASCENDC_DEBUG
+// disabled on CPU mode for compatiablilty
+#if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
     ASCENDC_DEBUG_ASSERT(GetTPipePtr() == nullptr, KERNEL_LOG_INTERNAL(KERNEL_ERROR, "TPipe has already been constructed at %p!\n", (void*)g_lastTpipeInitPos));
     g_lastTpipeInitPos = get_pc();
 #endif
@@ -752,6 +753,10 @@ template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
 
 __aicore__ inline void TPipe::DestroyWithoutPipeAll()
 {
+// disabled on CPU mode for compatiablilty
+#if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
+    Internal::ResetTPipePtr(); // Reset global tpipe ptr to nullptr for next Initialazation.
+#endif
     if ASCEND_IS_AIC {
         g_tpipeImpl.isDestroy = true;
         auto ptr = this->g_tpipeImpl.buf_;
@@ -774,9 +779,6 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
 
 __aicore__ inline void TPipe::Destroy()
 {
-#ifdef ASCENDC_DEBUG
-    Internal::ResetTPipePtr(); // Reset global tpipe ptr to nullptr for next Initialazation.
-#endif
     DestroyWithoutPipeAll();
 #ifndef __ASCENDC_ENABLE_SUPER_KERNEL__
     pipe_barrier(PIPE_ALL);

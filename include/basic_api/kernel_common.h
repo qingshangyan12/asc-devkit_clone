@@ -56,7 +56,8 @@ template <auto funcPtr, typename... Args> __aicore__ inline void asc_vf_call(Arg
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
 
-#ifdef ASCENDC_DEBUG
+// disabled on CPU mode for compatiablilty
+#if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
 #ifdef SPLIT_CORE_CUBE
 __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr = nullptr;
 #elif defined(SPLIT_CORE_VEC)
