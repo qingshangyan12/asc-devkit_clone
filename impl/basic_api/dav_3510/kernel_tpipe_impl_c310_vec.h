@@ -20,25 +20,25 @@
 #ifndef ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
 #define ASCENDC_MODULE_TPIPE_IMPL_C310_VEC_H
 
-#include "kernel_macros.h"
-#include "common_types.h"
-#include "kernel_common.h"
-#include "kernel_event.h"
-#include "kernel_log.h"
-#include "kernel_operator_block_sync_intf.h"
-#include "kernel_tpipe.h"
+#include "impl/basic_api/kernel_macros.h"
+#include "impl/basic_api/common_types.h"
+#include "../../../include/basic_api/kernel_common.h"
+#include "impl/basic_api/kernel_event.h"
+#include "impl/basic_api/kernel_log.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_tensor.h"
-#include "kernel_tensor_base.h"
-#include "kernel_tpipe_base.h"
-#include "kernel_utils.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_constants.h"
-#include "utils/kernel_utils_macros.h"
-#include "utils/kernel_utils_mode_cpu.h"
+#include "../../../include/basic_api/kernel_tensor.h"
+#include "impl/basic_api/kernel_tensor_base.h"
+#include "impl/basic_api/kernel_tpipe_base.h"
+#include "impl/basic_api/kernel_utils.h"
+#include "impl/basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "impl/basic_api/utils/kernel_utils_constants.h"
+#include "impl/basic_api/utils/kernel_utils_macros.h"
+#include "impl/basic_api/utils/kernel_utils_mode_cpu.h"
 
 #if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>

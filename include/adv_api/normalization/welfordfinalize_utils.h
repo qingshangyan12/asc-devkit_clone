@@ -22,7 +22,7 @@
 #define LIB_NORMALIZATION_WELFORDFINALIZE_UTILS_H
 
 #include <cstdint>
-#include "kernel_basic_intf.h"
+#include "include/basic_api/kernel_basic_intf.h"
 
 namespace AscendC {
 struct WelfordFinalizeConfig {

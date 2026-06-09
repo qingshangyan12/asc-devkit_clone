@@ -27,7 +27,7 @@
 #ifndef LIB_MATH_ATAN_H
 #define LIB_MATH_ATAN_H
 
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #include "include/adv_api/math/atan_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
