@@ -3,13 +3,14 @@
 本文档索引Ascend 950PR/Ascend 950DT（NPU架构版本3510）相比上一代（2201）新增的硬件特性，以及每个特性对应的编程模型、API接口和算子实践资料链接。
 
 > 适用芯片：Ascend 950PR、Ascend 950DT（`__NPU_ARCH__` = 3510）
+
 > 架构变更详情见：[2201到3510架构变更](guide/跨代迁移兼容性指南/3510架构迁移指导/2201到3510架构变更.md)
 
 ---
 
-## A5新增特性总览
+## 新增特性总览
 
-| 序号 | A5新增特性 | 对应编程模型和编程特性 | 对应API | 对应算子实践资料 |
+| 序号 | 新增特性 | 对应编程模型和编程特性 | 对应API | 对应算子实践资料 |
 |------|--------------|-------------------|---------|---------------|
 | 1 | **RegBase架构**：AIV核Vector计算从MemBase切换到RegBase，数据从UB搬运到Register进行计算，中间结果直接在寄存器操作，无需回写UB | [Reg矢量计算编程](guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/Reg矢量计算编程.md) | [Reg矢量计算API列表](api/SIMD-API/基础API/Reg矢量计算/Reg矢量计算.md) | [VF融合优化](guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF融合优化.md)、[VF循环优化](guide/算子实践参考/SIMD算子性能优化/矢量计算/VF性能优化/VF循环优化.md) |
 | 2 | **SIMT编程模型**：新增SIMT硬件单元（DCache、Warp Scheduler、128KB Register File），支持线程级并行编程 | [AI Core SIMT编程](guide/编程指南/编程模型/AI-Core-SIMT编程/AI-Core-SIMT编程.md) | [SIMT API列表](api/SIMT-API/概述.md) | [SIMT算子实现](guide/算子实践参考/SIMT算子实现/基础知识.md)、[SIMT算子性能优化](guide/算子实践参考/SIMT算子性能优化/内存访问/访存合并.md) |
