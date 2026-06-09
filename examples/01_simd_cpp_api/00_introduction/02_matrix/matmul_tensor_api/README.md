@@ -4,13 +4,11 @@
 
 本样例基于静态Tensor API编程范式实现多核矩阵乘计算，使用Tensor API的高层次抽象接口完成矩阵搬运、切片和乘加流程。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \> CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
@@ -51,7 +49,7 @@
     <tr><th align="left">步骤</th><th align="left">Tensor API操作</th><th align="left">功能</th><th align="left">布局转换</th></tr>
     <tr><td align="left">1</td><td align="left">常量化Tiling参数</td><td align="left">通过模板参数传入kernel</td><td align="left">不涉及</td></tr>
     <tr><td align="left">2</td><td align="left">MakeTensor + Slice</td><td align="left">创建GM张量并切片获取当前核处理的数据块</td><td align="left">ND格式</td></tr>
-    <tr><td align="left">3</td><td align="left">Copy(CopyGM2L1)</td><td align="left">将A矩阵和B矩阵数据从GM搬运到L1</td><td align="left">GM->L1A: ND->NZ<br>GM->L1B: ND->NZ</td></tr>
+    <tr><td align="left">3</td><td align="left">Copy(CopyGM2L1)</td><td align="left">将A矩阵和B矩阵数据从GM搬运到L1</td><td align="left">ND->NZ格式转换</td></tr>
     <tr><td align="left">4</td><td align="left">Copy(CopyL12L0A/B)</td><td align="left">将数据从L1搬运到L0A和L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
     <tr><td align="left">5</td><td align="left">Mmad</td><td align="left">完成矩阵乘加计算</td><td align="left">矩阵乘结果为NZ格式</td></tr>
     <tr><td align="left">6</td><td align="left">Copy(CopyL0C2GM)</td><td align="left">将L0C中的计算结果搬运到GM</td><td align="left">NZ->ND格式转换</td></tr>
