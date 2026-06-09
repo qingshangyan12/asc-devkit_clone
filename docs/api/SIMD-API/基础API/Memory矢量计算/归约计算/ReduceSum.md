@@ -93,8 +93,15 @@
 - 源操作数及`sharedTmpBuffer`的地址对齐约束请参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)，起始地址需要32字节对齐；目的操作数的起始地址对齐约束请参考[ReduceRepeat-表3](./ReduceRepeat.md#tab3)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - 需要使用`sharedTmpBuffer`的情况下，支持`dst`与`sharedTmpBuffer`地址重叠（通常情况下`dst`比`sharedTmpBuffer`所需的空间要小），此时`sharedTmpBuffer`必须满足所需空间要求，详情请参考[关键特性说明](#关键特性说明)。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
+
+<cann-filter npu-type = "A3,910b">
+
+- 针对如下型号，当`mask=0`或`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+</cann-filter>
+
 - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
 
@@ -136,7 +143,7 @@
 
 ## 调用示例
 
-详细示例请参考[ReduceSum样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
+更多样例请参考[ReduceSum样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/reduce_computation)。
 
 - tensor高维切分计算样例-`mask`连续模式：
 
@@ -161,7 +168,7 @@
     AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320);
     ```
 
-- tensor高维切分计算接口完整示例：
+- tensor高维切分计算接口示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -185,15 +192,14 @@
 
     示例结果如下：
 
-    ```cpp
-    // 输入数据(src_gm)：
-    [1. 1. 1. ... 1. 1. 1.]
-    // 输出数据(dst_gm)：
-    [8320.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.
-        0.    0.    0.    0.]
-    ```
+    > 输入数据src_gm：
+    > > [1. 1. 1. ... 1. 1. 1.]
+    >
+    > 输出数据dst_gm：
+    > > [8320.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.    0.
+    > >     0.    0.    0.    0.]
 
-- tensor前n个数据计算接口完整示例：
+- tensor前n个数据计算接口示例：
 
     ```cpp
     #include "kernel_operator.h"
@@ -214,9 +220,8 @@
 
     示例结果如下：
 
-    ```cpp
-    // 输入数据(src_gm)：
-    [1. 1. 1. ... 1. 1. 1.]
-    // 输出数据(dst_gm)：
-    [288.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
-    ```
+    > 输入数据src_gm：
+    > > [1. 1. 1. ... 1. 1. 1.]
+    >
+    > 输出数据dst_gm：
+    > > [288.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.   0.]
