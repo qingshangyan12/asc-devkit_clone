@@ -17,6 +17,8 @@
 #include "alg_env_config.h"
 #include "param_check.h"
 #include "sal.h"
+#include "hcomm/hccl/hccl_res.h"
+#include "hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include <memory>
 #include <string>
 #include <chrono>
@@ -279,7 +281,6 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
         return HCCL_E_PTR;
     }
     
-    // Token更新逻辑（模拟真实HcclAllocAlgResourceCcu）
     if (param.engine == COMM_ENGINE_CCU) {
         void *cclBufferPtr = nullptr;
         uint64_t cclBufferSize = 0;
@@ -298,7 +299,6 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
     std::vector<char> seq = resCtxHost->Serialize();
     uint64_t size = seq.size();
     
-    // 资源注册（模拟真实GetAlgResCcu）
     void* ctx = nullptr;
     HcclResult ret = HcclEngineCtxCreate(comm, param.algTag, param.engine, size, &ctx);
     if (ret != HCCL_SUCCESS || ctx == nullptr) {
