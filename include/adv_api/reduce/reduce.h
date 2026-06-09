@@ -16,9 +16,9 @@
 #ifndef LIB_REDUCE_REDUCE_H
 #define LIB_REDUCE_REDUCE_H
 #include "reduce_common.h"
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "include/basic_api/kernel_tensor.h"
+#include "include/basic_api/kernel_basic_intf.h"
+#include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_v220_impl.h"
@@ -37,7 +37,7 @@
 #include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_3510_impl.h"
 #endif
 #if ASCENDC_CPU_DEBUG
-#include "kernel_log.h"
+#include "../../../impl/basic_api/kernel_log.h"
 #include <type_traits>
 #endif
 

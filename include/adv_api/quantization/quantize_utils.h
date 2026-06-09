@@ -22,7 +22,7 @@
 #define LIB_QUANTIZATION_QUANTIZE_UTILS_H
 
 #include <cstdint>
-#include "kernel_basic_intf.h"
+#include "include/basic_api/kernel_basic_intf.h"
 
 namespace AscendC {
 enum class QuantizePolicy : int32_t {
