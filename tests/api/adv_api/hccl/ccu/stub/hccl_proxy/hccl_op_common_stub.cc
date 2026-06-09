@@ -318,12 +318,29 @@ std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType op
 
 HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor,
     TopoInfoWithNetLayerDetails* topoInfo, std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost,
-    void** resCtxDevice, bool& isSuspend)
+    void** resCtxDevice, bool& isResourceReused)
 {
     if (resCtxDevice == nullptr) {
         return HCCL_E_PTR;
     }
     
+    std::cout << "Stub: HcclGetAlgRes algTag=" << param.algTag << std::endl;
+    
+    // 资源复用逻辑：先尝试获取已存在的资源
+    void *ctx = nullptr;
+    uint64_t size = 0;
+    if (HcclEngineCtxGet(comm, param.algTag, param.engine, &ctx, &size) == HCCL_SUCCESS) {
+        std::cout << "Stub: HcclGetAlgRes - REUSED existing resource, size=" << size << std::endl;
+        isResourceReused = true;
+        *resCtxDevice = ctx;
+        param.ctxSize = size;
+        return HCCL_SUCCESS;
+    }
+    
+    std::cout << "Stub: HcclGetAlgRes - Creating NEW resource" << std::endl;
+    isResourceReused = false;
+    
+    // CCU 资源创建逻辑
     if (param.engine == COMM_ENGINE_CCU) {
         void *cclBufferPtr = nullptr;
         uint64_t cclBufferSize = 0;
@@ -339,14 +356,23 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
         }
     }
     
+    // 序列化并创建新资源
     std::vector<char> seq = resCtxHost->Serialize();
-    uint64_t size = seq.size();
+    uint64_t newSize = seq.size();
     
-    void* ctx = nullptr;
-    HcclResult ret = HcclEngineCtxCreate(comm, param.algTag, param.engine, size, &ctx);
-    if (ret != HCCL_SUCCESS || ctx == nullptr) {
+    HcclResult ret = HcclEngineCtxCreate(comm, param.algTag, param.engine, newSize, resCtxDevice);
+    if (ret != HCCL_SUCCESS || *resCtxDevice == nullptr) {
+        std::cout << "Stub: HcclGetAlgRes - HcclEngineCtxCreate FAILED" << std::endl;
         return HCCL_E_PTR;
     }
+    
+    // 拷贝序列化数据到 device ctx
+    memcpy_s(*resCtxDevice, newSize, seq.data(), newSize);
+    param.ctxSize = newSize;
+    
+    std::cout << "Stub: HcclGetAlgRes - Resource created successfully, size=" << newSize << std::endl;
+    return HCCL_SUCCESS;
+}
     
     memcpy(ctx, seq.data(), size);
     *resCtxDevice = ctx;
