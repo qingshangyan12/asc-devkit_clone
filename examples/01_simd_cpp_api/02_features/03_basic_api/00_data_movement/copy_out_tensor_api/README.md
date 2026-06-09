@@ -4,9 +4,13 @@
 
 本样例基于Tensor API编程方式实现带Bias的动态Shape矩阵乘法运算，展示了Copy Out接口（L0C到GM、L0C到UB）和Mmad（矩阵乘加）等Tensor API的使用方法。通过编译时参数`SCENARIO_NUM`选择不同的回写模式，Shape参数通过`MatmulTiling`结构体在运行时动态传入。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
+
+> **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
 ## 目录结构介绍
 
@@ -149,32 +153,20 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](./../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令，**当前仅支持使用[CANN master](../../../../../../docs/quick_start.md#下载-cann-master)**。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](./../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。，**当前仅支持使用[CANN master](../../../../../../docs/quick_start.md#下载-cann-master)**。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
   以场景0（普通模式，L0C -> GM）为例：
 
   ```bash
-  SCENARIO=0
+  SCENARIO_NUM=0
   mkdir -p build && cd build;                                                    # 创建并进入build目录
-  cmake -DSCENARIO_NUM=${SCENARIO} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程，默认NPU模式
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # 编译工程，默认NPU模式
   python3 ../scripts/gen_data.py;                                                # 生成测试输入数据
   ./demo;                                                                       # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin        # 验证输出结果是否正确，确认算法逻辑正确
@@ -183,19 +175,19 @@
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
   ```bash
-  cmake -DSCENARIO_NUM=${SCENARIO} -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=${SCENARIO_NUM} -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
-  编译其他场景时，修改`SCENARIO`变量即可，例如编译场景2（UB搬运模式M拆分）时设置`SCENARIO=2`。
+  编译其他场景时，修改`SCENARIO_NUM`变量即可，例如编译场景2（UB搬运模式M拆分）时设置`SCENARIO_NUM=2`。
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  | :--- | :--- | :--- | :--- |
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-3510 | dav-3510 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

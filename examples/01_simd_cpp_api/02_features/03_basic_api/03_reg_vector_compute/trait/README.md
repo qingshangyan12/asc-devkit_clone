@@ -4,9 +4,11 @@
 
 本样例演示了在Ascend C Reg矢量计算中，寄存器数据类型RegTensor、MaskReg模板参数regTrait的使用方法，通过两种不同的regTrait配置（RegTraitNumOne和RegTraitNumTwo），在寄存器层级执行除法运算。通过比较两种配置下的实现，展示对计算性能和资源使用的影响。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -95,24 +97,16 @@
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    - 默认路径，root用户安装CANN软件包
-      ```bash
-      source /usr/local/Ascend/cann/set_env.sh
-      ```
-
-    - 默认路径，非root用户安装CANN软件包
-      ```bash
-      source $HOME/Ascend/cann/set_env.sh
-      ```
-
-    - 指定路径install_path，安装CANN软件包
-      ```bash
-      source ${install_path}/cann/set_env.sh
-      ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   # 场景2：使用RegTraitNumTwo
   SCENARIO_NUM=2

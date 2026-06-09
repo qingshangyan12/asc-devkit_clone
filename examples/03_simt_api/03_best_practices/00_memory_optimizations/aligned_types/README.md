@@ -145,9 +145,9 @@
   | 4B (2×u16)                 | 27833.56 (alignof=4)  | 46656.61 (alignof=2)    | **1.68x**   |
   | 4B (2×u8 + u16)            | 27854.56 (alignof=4)  | 46666.11 (alignof=2)    | **1.68x**   |
   | 4B (u8 + 1B padding + u16) | 27809.72 (alignof=4)  | 46664.42 (alignof=2)    | **1.68x**   |
-  | 8B                         | 17417.23 (alignof=4)  | 17415.04 (alignof=4)    | **1.00x**   |
-  | 16B                        | 32983.77 (alignof=4)  | 38353.60 (alignof=4)    | **1.16x**   |
-  | 32B                        | 60901.24 (alignof=4)  | 77790.93 (alignof=4)    | **1.28x**   |
+  | 8B                         | 17417.23 (alignof=8)  | 17415.04 (alignof=4)    | **1.00x**   |
+  | 16B                        | 32983.77 (alignof=16) | 38353.60 (alignof=4)    | **1.16x**   |
+  | 32B                        | 60901.24 (alignof=32) | 77790.93 (alignof=4)    | **1.28x**   |
 
   从上表可以看出：
 
@@ -167,28 +167,17 @@
 
 ## 编译运行
 
-- 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+- 配置环境变量  
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    - 默认路径，root用户安装CANN软件包
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
-      ```bash
-      source /usr/local/Ascend/cann/set_env.sh
-      ```
-
-    - 默认路径，非root用户安装CANN软件包
-
-      ```bash
-      source $HOME/Ascend/cann/set_env.sh
-      ```
-
-    - 指定路径install_path，安装CANN软件包
-
-      ```bash
-      source ${install_path}/cann/set_env.sh
-      ```
-      
 - 样例执行
+
+  在本样例目录下执行如下命令。
 
   ```bash
   mkdir -p build && cd build           # 创建并进入 build 目录
