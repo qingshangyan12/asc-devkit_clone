@@ -47,7 +47,7 @@
 #include "normalization/layernorm_grad_beta_tiling.h"
 #include "normalization/welfordfinalize_tiling.h"
 #include "transpose/confusion_transpose_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "sort/topk_tiling.h"
 #include "math/tanh_tiling.h"
 #include "activation/sigmoid_tiling.h"
