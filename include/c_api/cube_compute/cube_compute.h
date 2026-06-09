@@ -87,7 +87,7 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
  * @param [in] smask_offset Smask offset for operation
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] enable_k_direction_align Whether to enable K direction alignment
- * @param [in] is_weight_offset Whether weight offset is enabled
+ * @param [in] enable_weight_offset Whether weight offset is enabled
  * @param [in] enable_cube_init Whether to initialize cube
  * @param [in] enable_cube_zero_init Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with bfloat16 inputs and float output,
@@ -95,22 +95,22 @@ __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8
  */
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b,
     uint16_t m,  uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-    bool enable_k_direction_align, bool is_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
 
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ half* a, __cb__ half* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool is_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
 
 
 __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float* a, __cb__ float* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool is_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
 
 
 __aicore__ inline void asc_mmad(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
      uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-    bool is_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
+    bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init);
 
 /*
  * @ingroup CubeCompute
@@ -132,7 +132,7 @@ __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ 
      uint16_t n, uint16_t k, uint8_t unit_flag, bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init);
 
 __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ int4b_t* b, uint16_t m,
-     uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align, bool is_weight_offset,
+     uint16_t n, uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align, bool enable_weight_offset,
     bool enable_cube_init, bool enable_cube_zero_init);
 
 /*
