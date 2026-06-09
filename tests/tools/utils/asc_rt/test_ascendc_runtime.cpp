@@ -173,7 +173,7 @@ extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *ha
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
-extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args);
+extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, const void *args);
 extern "C" uint32_t g_aclrtLaunchKernelWithHostArgsCallCount;
 extern "C" uint32_t g_aclrtLaunchKernelWithHostArgsLastNumBlocks;
 extern "C" aclrtStream g_aclrtLaunchKernelWithHostArgsLastStream;
