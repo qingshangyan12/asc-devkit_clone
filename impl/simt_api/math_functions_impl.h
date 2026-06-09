@@ -1451,7 +1451,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
         return ASCRT_MIN_VAL_S;
     }
     if (isinf(x)) {
-        return ASCRT_INT32_MAX;
+        return ASCRT_MAX_VAL_S;
     }
     if (x < 0) {
         x = -x;

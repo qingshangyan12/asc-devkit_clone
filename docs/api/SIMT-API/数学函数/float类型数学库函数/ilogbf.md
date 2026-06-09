@@ -40,11 +40,11 @@ inline int ilogbf(float x)
 
 | 输入值x | 返回值 |
 | --- | --- |
-| +0 | -2147483648 |
-| -0 | -2147483648 |
-| inf | 2147483647 |
-| -inf | 2147483647 |
-| nan | -2147483648 |
+| +0 | ASCRT_MIN_VAL_S |
+| -0 | ASCRT_MIN_VAL_S |
+| inf | ASCRT_MAX_VAL_S |
+| -inf | ASCRT_MAX_VAL_S |
+| nan | ASCRT_MIN_VAL_S |
 
 ## 约束说明
 
