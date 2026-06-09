@@ -15,7 +15,7 @@
 #ifndef LIB_SORT_TOPK_TILING_H
 #define LIB_SORT_TOPK_TILING_H
 #include "topk_tilingdata.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "graph/types.h"
 #include "topk_utils_constants.h"
 #include "kernel_tiling/kernel_tiling.h"

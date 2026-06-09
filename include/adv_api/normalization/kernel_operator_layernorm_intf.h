@@ -21,7 +21,7 @@
 #ifndef LIB_NORMALIZATION_KERNEL_OPERATOR_LAYERNORM_INTF_H
 #define LIB_NORMALIZATION_KERNEL_OPERATOR_LAYERNORM_INTF_H
 
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use layernorm.h instead!")]] typedef void LayerNormDeprecatedHeader;
 using LibLayernormInterface = LayerNormDeprecatedHeader;

@@ -14,7 +14,7 @@
 
 #include "graph/tensor.h"
 #include "graph/types.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "sort_utils_constants.h"
 
 namespace AscendC {
