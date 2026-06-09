@@ -17,3 +17,4 @@
 | [06_atomic](./06_atomic) | 本路径下包含了与原子操作相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [07_tpipe_tque](./07_tpipe_tque) | 本路径下包含了与tpipe和tque相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
 | [09_utils](./09_utils) | 本路径下包含了与工具相关API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。         |
+| [10_communication](./10_communication) | 本路径下包含了与NPU间点对点通信相关的样例，展示了Hcomm的WriteNbi和ReadNbi接口的使用方法。         |
