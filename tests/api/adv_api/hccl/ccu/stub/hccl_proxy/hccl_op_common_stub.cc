@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <iostream>  // for debug output
 #include "alg_param.h"
 #include "hccl_types.h"
 #include "execute_selector.h"
@@ -115,15 +116,19 @@ HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
     if (GetExternalInputHcclCcuMSMode()) {
         param.opExecuteConfig = OpExecuteConfig::CCU_MS;
         param.engine = CommEngine::COMM_ENGINE_CCU;
+        std::cout << "Stub: HcclGetOpExpansionMode set engine=CCU (CCU_MS mode)" << std::endl;
     } else if (GetExternalInputHcclCcuSchedMode()) {
         param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
         param.engine = CommEngine::COMM_ENGINE_CCU;
+        std::cout << "Stub: HcclGetOpExpansionMode set engine=CCU (CCU_SCHED mode)" << std::endl;
     } else if (GetExternalInputHcclAicpuUnfold()) {
         param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
         param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+        std::cout << "Stub: HcclGetOpExpansionMode set engine=AICPU_TS" << std::endl;
     } else {
         param.opExecuteConfig = OpExecuteConfig::AICPU_TS;
         param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
+        std::cout << "Stub: HcclGetOpExpansionMode set engine=AICPU_TS (default)" << std::endl;
     }
     return HcclResult::HCCL_SUCCESS;
 }
@@ -168,12 +173,17 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
     };
 
+    std::cout << "Stub: ExecuteSelector::Run opType=" << static_cast<int>(param.opType) 
+              << " engine=" << static_cast<int>(param.engine) << std::endl;
+    
     auto& algMap = (param.engine == COMM_ENGINE_CCU) ? ccuAlgMap : aicpuAlgMap;
     auto it = algMap.find(param.opType);
     if (it != algMap.end()) {
         algName = it->second;
+        std::cout << "Stub: Selected algName=" << algName << std::endl;
         return HcclResult::HCCL_SUCCESS;
     }
+    std::cout << "Stub: ExecuteSelector::Run FAILED - algorithm not found in map" << std::endl;
     return HcclResult::HCCL_E_NOT_SUPPORT;
 }
 
