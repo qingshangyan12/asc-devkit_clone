@@ -10,7 +10,7 @@
 #ifndef MULTI_ROOT_SCATTER_RING_H
 #define MULTI_ROOT_SCATTER_RING_H
 
-#include "multi_root_scatter_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/multi_root_scatter_ring_pub.h"
 
 namespace hccl {
 struct SliceSendRange {

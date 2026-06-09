@@ -9,7 +9,7 @@
 */
 #include "ins_v2_reduce_scatter_sequence_executor.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
-#include "ins_temp_reduce_scatter_mesh_1d_dpu.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1d_dpu.h"
 
 namespace mc2_ops_hccl {
 

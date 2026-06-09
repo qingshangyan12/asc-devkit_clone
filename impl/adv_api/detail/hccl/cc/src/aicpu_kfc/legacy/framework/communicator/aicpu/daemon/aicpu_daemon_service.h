@@ -14,7 +14,7 @@
 #include <vector>
 #include <mutex>
 #include "daemon_func.h"
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 
 namespace Hccl {
 

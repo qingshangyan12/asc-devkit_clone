@@ -11,7 +11,7 @@
 #define HCCL_AICPU_COLL_ALG_INFO_H_
 
 #include <string>
-#include "op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
 namespace Hccl {
 
 class CollAlgInfo {

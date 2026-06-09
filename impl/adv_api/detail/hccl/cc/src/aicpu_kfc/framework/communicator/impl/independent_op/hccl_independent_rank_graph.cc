@@ -7,17 +7,17 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl/hccl_res.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "log.h"
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 #include "independent_op.h"
 #include <string>
-#include "param_check_pub.h"
-#include "hccl_comm.h"
-#include "hccl_inner.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/param_check_pub.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 #include "rank_graph.h"
 #include "rank_graph_v2.h"
-#include "op_base_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/op_base/src/op_base_v2.h"
 #include "hccl_independent_common.h"
 
 using namespace hccl;

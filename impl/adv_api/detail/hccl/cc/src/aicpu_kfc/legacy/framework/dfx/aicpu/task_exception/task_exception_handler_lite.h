@@ -10,11 +10,11 @@
 #ifndef HCCL_TASK_EXCEPTION_HANDLER_LITE_H
 #define HCCL_TASK_EXCEPTION_HANDLER_LITE_H
 
-#include "hccl/base.h"
-#include "global_mirror_tasks.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/global_mirror_tasks.h"
 #include "task_exception_func.h"
-#include "dlhal_function_v2.h"
-#include "communicator_impl_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dlhal_function_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite.h"
 
 namespace Hccl {
 class TaskExceptionHandlerLite {

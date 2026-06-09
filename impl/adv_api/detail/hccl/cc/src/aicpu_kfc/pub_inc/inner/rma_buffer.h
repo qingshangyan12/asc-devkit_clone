@@ -14,7 +14,7 @@
 
 #include "hccl_common.h"
 #include "hccl_inner_common.h"
-#include "transport_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_mem.h"
 
 namespace hccl {
 class RmaBuffer {

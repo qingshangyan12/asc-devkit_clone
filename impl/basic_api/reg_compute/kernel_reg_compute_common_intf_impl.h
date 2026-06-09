@@ -26,13 +26,13 @@
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || defined(__ASC_NPU_HOST__)
 #include "../../../include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"
 #if __NPU_ARCH__ == 3003
-#include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_common_impl.h"
+#include "impl/basic_api/reg_compute/dav_l300/kernel_reg_compute_common_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_common_impl.h"
+#include "impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_common_impl.h"
 #elif __NPU_ARCH__ == 5102
-#include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_common_impl.h"
+#include "impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_common_impl.h"
 #else
-#include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_common_impl.h"
+#include "impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_common_impl.h"
 #endif
 #endif
 

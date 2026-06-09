@@ -20,10 +20,10 @@
 #include <unistd.h>
 #endif
 
-#include "kernel_basic_intf.h"
+#include "../../../../include/basic_api/kernel_basic_intf.h"
 #ifdef LIB_MATMUL_MATMUL_INTF_H
-#include "include/adv_api/matmul/matmul_client.h"
-#include "../matmul/kfc/matmul_server_aux.h"
+#include "../../../../include/adv_api/matmul/matmul_client.h"
+#include "impl/adv_api/detail/matmul/kfc/matmul_server_aux.h"
 #endif
 namespace AscendC {
 constexpr uint16_t WORKSPACE_SYNC_ID = 15;

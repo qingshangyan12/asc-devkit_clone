@@ -10,7 +10,7 @@
 #ifndef __MC2_TILING_UTILS_INTERFACE_H__
 #define __MC2_TILING_UTILS_INTERFACE_H__
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "kernel_tiling/kernel_tiling.h"
 
 #ifdef __cplusplus

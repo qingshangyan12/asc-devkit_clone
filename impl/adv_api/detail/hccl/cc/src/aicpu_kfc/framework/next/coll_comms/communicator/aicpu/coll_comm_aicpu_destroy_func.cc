@@ -9,7 +9,7 @@
 */
 #include "coll_comm_aicpu_destroy_func.h"
 #include "aicpu_indop_process.h"
-#include "read_write_lock.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock.h"
 
 namespace hccl {
 CollCommAicpuDestroyFunc &CollCommAicpuDestroyFunc::GetInstance()

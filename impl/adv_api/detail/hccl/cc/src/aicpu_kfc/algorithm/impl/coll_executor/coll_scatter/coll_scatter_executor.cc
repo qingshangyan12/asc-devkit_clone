@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "coll_scatter_executor.h"
-#include "executor_impl.h"
-#include "stream_active_manager.h"
-#include "device_capacity.h"
-#include "coll_alg_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/legacy/executor_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/stream_active_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_operator.h"
 
 namespace hccl {
 CollScatterExecutor::CollScatterExecutor(const HcclDispatcher dispatcher,

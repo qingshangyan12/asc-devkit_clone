@@ -11,7 +11,7 @@
 #ifndef ALIGNED_ALL_GATHER_DOUBLE_RING_H
 #define ALIGNED_ALL_GATHER_DOUBLE_RING_H
  
-#include "aligned_all_gather_double_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/aligned_all_gather_double_ring_pub.h"
  
 namespace hccl {
 }  // namespace hccl

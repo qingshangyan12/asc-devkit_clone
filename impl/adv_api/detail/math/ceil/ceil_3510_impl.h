@@ -21,9 +21,9 @@
 #endif
 #ifndef IMPL_MATH_CEIL_CEIL_C310_IMPL_H
 #define IMPL_MATH_CEIL_CEIL_C310_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "../../common/check.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/adv_api/detail/common/check.h"
 namespace AscendC {
 template <typename T, bool isReuseSource = false>
 __simd_vf__ inline void CeilCompute(__ubuf__ T* dstUb, __ubuf__ T* srcUb, uint32_t calCount, const uint16_t repeatTimes)

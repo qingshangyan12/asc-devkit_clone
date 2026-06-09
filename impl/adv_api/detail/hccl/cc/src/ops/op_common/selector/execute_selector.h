@@ -11,7 +11,7 @@
 #define HCCLV2_COLL_ALG_SELECTOR_EXECUTION
 
 #include <string>
-#include "alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "auto_selector_base.h"
 
 namespace mc2_ops_hccl {

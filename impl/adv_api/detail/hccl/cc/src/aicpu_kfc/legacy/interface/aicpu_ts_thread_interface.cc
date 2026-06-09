@@ -12,9 +12,9 @@
 #include <memory>
 #include <limits>
 
-#include "stream_lite.h"
-#include "rtsq_a5.h"
-#include "sqe_build_a5.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/rtsq_a5.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/sqe_build_a5.h"
 
 namespace Hccl {
 

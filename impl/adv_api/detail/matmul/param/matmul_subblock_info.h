@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_PARAM_MATMUL_SUBBLOCK_INFO_H
 #define IMPL_MATMUL_PARAM_MATMUL_SUBBLOCK_INFO_H
 
-#include "../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 namespace AscendC {
 namespace Impl {

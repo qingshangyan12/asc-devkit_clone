@@ -10,8 +10,8 @@
 #ifndef HCCL_MC2_H
 #define HCCL_MC2_H
 
-#include <hccl/hccl_types.h>
-#include <hccl/hccl_res.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 #ifdef __cplusplus
 extern "C" {

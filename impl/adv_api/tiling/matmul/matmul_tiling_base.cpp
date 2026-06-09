@@ -12,12 +12,12 @@
  * \file matmul_tiling_base.cpp
  * \brief
  */
-#include "include/adv_api/matmul/matmul_tiling_base.h"
+#include "../../../../include/adv_api/matmul/matmul_tiling_base.h"
 
 #include <iostream>
 #include <algorithm>
 
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "math_util.h"
 
 using namespace std;

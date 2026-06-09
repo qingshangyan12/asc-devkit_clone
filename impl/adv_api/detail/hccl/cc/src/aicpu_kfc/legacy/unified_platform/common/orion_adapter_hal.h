@@ -10,7 +10,7 @@
 #ifndef ORION_ADAPTER_HAL_H
 #define ORION_ADAPTER_HAL_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace Hccl
 {

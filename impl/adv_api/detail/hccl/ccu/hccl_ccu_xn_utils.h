@@ -15,8 +15,8 @@
 #ifndef IMPL_HCCL_CCU_XN_UTILS_H
 #define IMPL_HCCL_CCU_XN_UTILS_H
 
-#include "../common/hccl_inner_def.h"
-#include "../common/hccl_utils.h"
+#include "impl/adv_api/detail/hccl/common/hccl_inner_def.h"
+#include "impl/adv_api/detail/hccl/common/hccl_utils.h"
 
 namespace AscendC {
 

@@ -9,11 +9,11 @@
 */
 #include "cnt_1ton_notify_lite_mgr.h"
 #include "binary_stream.h"
-#include "connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
 #include "log.h"
-#include "exception_util.h"
-#include "internal_exception.h"
-#include "stl_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/stl_util.h"
 
 namespace Hccl {
 

@@ -11,7 +11,7 @@
 #ifndef BROADCAST_NB_BINARY_PUB_H
 #define BROADCAST_NB_BINARY_PUB_H
  
-#include "nonuniform_bruck_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/nonuniform_bruck_base_pub.h"
  
 namespace hccl {
 class BroadcastNBBinary : public NBBase {

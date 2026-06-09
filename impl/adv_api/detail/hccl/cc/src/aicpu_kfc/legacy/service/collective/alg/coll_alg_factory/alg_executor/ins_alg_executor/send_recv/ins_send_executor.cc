@@ -9,11 +9,11 @@
 */
 #include "log.h"
 
-#include "ins_coll_alg_registry.h"
-#include "dev_capability.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dev_capability.h"
 #include "ins_send_executor.h"
 #include "alg_data_trans_wrapper.h"
-#include "topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
 
 using namespace std;
 

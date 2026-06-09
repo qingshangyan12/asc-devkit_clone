@@ -23,7 +23,7 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_FLASHV2_NZ_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_FLASHV2_NZ_IMPL_H
 
-#include "../softmax_impl/softmax_generic_nz_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_impl/softmax_generic_nz_impl.h"
 
 namespace AscendC {
 

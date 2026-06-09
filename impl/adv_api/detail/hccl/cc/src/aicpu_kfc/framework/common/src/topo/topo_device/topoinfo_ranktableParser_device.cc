@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "topoinfo_ranktableParser_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableParser_pub.h"
 
 #include <map>
 #include <vector>
@@ -19,13 +19,13 @@
 #include <iostream>
 #include <arpa/inet.h>
 
-#include "hccl_comm_pub.h"
-#include "topoinfo_ranktableStandard.h"
-#include "topoinfo_ranktableConcise.h"
-#include "topoinfo_ranktableHeterog.h"
-#include "config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableStandard.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableConcise.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableHeterog.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config.h"
 #include "adapter_error_manager_pub.h"
-#include "json_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/json_utils.h"
 
 using namespace std;
 using namespace hccl;

@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_REDUCE_MEAN_MEAN_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_REDUCE_MEAN_MEAN_CHECK_COMMON_H_
 
-#include "../reduce_check_utils.h"
+#include "impl/adv_api/detail/api_check/kernel_check/reduce/reduce_check_utils.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

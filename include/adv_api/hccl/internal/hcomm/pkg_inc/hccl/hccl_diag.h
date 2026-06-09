@@ -12,8 +12,8 @@
 
 #include <cstddef>
 #include <hccl/base.h>
-#include <hccl/hccl_types.h>
-#include <hcomm_res_defs.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "include/adv_api/hccl/internal/hcomm/hcomm_res_defs.h"
 
 #ifdef __cplusplus
 extern "C" {

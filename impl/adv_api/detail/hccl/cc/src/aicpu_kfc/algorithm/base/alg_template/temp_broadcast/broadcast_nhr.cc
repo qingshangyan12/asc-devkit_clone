@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "broadcast_nhr.h"
-#include "scatter_nhr.h"
-#include "all_gather_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_scatter/scatter_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_all_gather/all_gather_nhr.h"
 #include "broadcast_nhr_oneshot.h"
 #include "alg_template_register.h"
 

@@ -12,14 +12,14 @@
 
 #include <thread>
 #include <vector>
-#include "comm.h"
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 #include "topoinfo_exchange_server.h"
 #include "topoinfo_exchange_agent.h"
-#include "env_config.h"
-#include "hccl_socket.h"
-#include "hccl_network_pub.h"
-#include "hashtable/universal_concurrent_map.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/hashtable/universal_concurrent_map.h"
 
 namespace hccl {
 class TopoInfoDetect {

@@ -9,7 +9,7 @@
 */
 #include <cstdint>
 #include "ccu_kernel_all_gather_2dies_mesh_1D.h"
-#include "ccu_kernel_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_alg_base.h"
 namespace mc2_ops_hccl {
 using namespace hcomm;
 

@@ -10,8 +10,8 @@
 #ifndef HCCL_DEVICE_CAPACITY_H
 #define HCCL_DEVICE_CAPACITY_H
 
-#include "hccl/base.h"
-#include "dtype_common.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "hccl_common.h"
 
 

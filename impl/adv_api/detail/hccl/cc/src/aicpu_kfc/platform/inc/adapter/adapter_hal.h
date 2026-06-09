@@ -10,11 +10,11 @@
 #ifndef HCCL_INC_ADAPTER_HAL_H
 #define HCCL_INC_ADAPTER_HAL_H
 
-#include <hccl/hccl_types.h>
-#include "adapter_hal_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
 #include "driver/ascend_hal_define.h"
-#include "hccl/base.h"
-#include "dtype_common.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 
 constexpr u32 HCCL_EVENT_RECV_REQUEST_MSG = static_cast<u32>(EVENT_ID::EVENT_USR_START);
 constexpr u32 HCCL_EVENT_SEND_COMPLETION_MSG = static_cast<u32>(EVENT_ID::EVENT_USR_START) + 1U;

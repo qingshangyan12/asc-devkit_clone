@@ -23,11 +23,11 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_USING_UB_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_USING_UB_H
 
-#include "../../../utils/matmul_module.h"
-#include "../../../utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
 #include "copy_cube_in_intf.h"
 #include "copy_cube_in_base.h"
-#include "../copy_tile_to_cube/copy_tile_to_cube.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/copy_tile_to_cube.h"
 
 namespace AscendC {
 namespace Impl {

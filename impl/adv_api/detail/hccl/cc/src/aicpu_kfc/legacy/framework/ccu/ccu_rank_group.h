@@ -13,8 +13,8 @@
 #include <vector>
 #include <utility>
 #include <functional>
-#include "types.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 
 namespace Hccl {
 

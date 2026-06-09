@@ -10,10 +10,10 @@
 #include "aicpu_kfc_rpc_serverv2.h"
 
 #include <numeric>
-#include "log_control.h"
-#include "common/aicpu_hccl_common.h"
-#include "utils/hccl_aicpu_utils.h"
-#include "common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/log_control.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
 #include "framework/aicpu_kfc_prof.h"
 
 using namespace HcclApi;

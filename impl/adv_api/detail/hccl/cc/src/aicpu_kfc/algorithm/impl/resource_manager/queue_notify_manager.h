@@ -12,9 +12,9 @@
 
 #include <mutex>
 #include <map>
-#include "hccl/base.h"
-#include "local_notify.h"
-#include "dispatcher.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 
 namespace hccl {
 

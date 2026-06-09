@@ -15,7 +15,7 @@
 #ifndef IMPL_V220_HCCL_AICPU_H
 #define IMPL_V220_HCCL_AICPU_H
 
-#include "../../common/hccl_aicpu_impl.h"
+#include "impl/adv_api/detail/hccl/common/hccl_aicpu_impl.h"
 
 namespace AscendC {
 template <const auto& config>

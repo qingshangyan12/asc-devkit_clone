@@ -9,10 +9,10 @@
 */
 #include <sys/time.h> /* 获取时间 */
 
-#include "profiler_base_pub.h"
-#include "adapter_rts_common.h"
-#include "externalinput_pub.h"
-#include "coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
 
 using namespace hccl;
 std::array<std::map<s32, StreamRecordInfo>, MAX_MODULE_DEVICE_NUM> ProfilerBase::streamRecordInfoMap_;

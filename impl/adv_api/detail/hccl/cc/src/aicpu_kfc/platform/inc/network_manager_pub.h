@@ -13,12 +13,12 @@
 #include <map>
 #include <mutex>
 #include <atomic>
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
-#include "hccl_inner_common.h"
-#include "hccl_ip_address.h"
-#include "adapter_hccp.h"
-#include "hccl_net_dev.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/inner/hccl_inner_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_net_dev.h"
 
 namespace hccl {
 enum class SocketRole {

@@ -10,12 +10,12 @@
 #ifndef MC2_OPS_HCCL_SRC_OPS_TOPO
 #define MC2_OPS_HCCL_SRC_OPS_TOPO
 
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "log.h"
-#include "alg_param.h"
-#include "hccl_rank_graph.h"
-#include "hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 namespace mc2_ops_hccl {
 

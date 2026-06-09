@@ -10,8 +10,8 @@
 #ifndef HCCL_CALLBACK_TASK_H
 #define HCCL_CALLBACK_TASK_H
 
-#include "hccl/base.h"
-#include "dispatcher.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 
 namespace hccl {
 class HcclCallbackTask {

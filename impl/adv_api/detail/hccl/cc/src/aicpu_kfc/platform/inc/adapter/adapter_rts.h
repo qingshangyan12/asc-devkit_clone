@@ -10,13 +10,13 @@
 #ifndef HCCL_INC_ADAPTER_RTS_H
 #define HCCL_INC_ADAPTER_RTS_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 #include "acl/acl_rt.h"
 #include "rt_external.h"
-#include "hccl/base.h"
-#include "private_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/private_types.h"
 
 #if T_DESC("test", true)
 #if T_DESC("Device管理", true)

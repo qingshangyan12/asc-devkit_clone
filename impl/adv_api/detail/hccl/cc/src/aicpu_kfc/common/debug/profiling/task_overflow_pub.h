@@ -11,7 +11,7 @@
 #define TASK_OVERFLOW_PUB_H
 #include <mutex>
 #include <vector>
-#include "profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
 
 namespace hccl {
 

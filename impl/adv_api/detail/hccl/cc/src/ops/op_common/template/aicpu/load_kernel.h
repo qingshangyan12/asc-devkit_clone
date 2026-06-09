@@ -11,7 +11,7 @@
 #define MC2_OPS_HCCL_SRC_OPS_LOAD_KERNEL
 
 #include "hccl.h"
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace mc2_ops_hccl {
 

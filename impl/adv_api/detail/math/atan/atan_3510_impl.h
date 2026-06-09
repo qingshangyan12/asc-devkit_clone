@@ -21,11 +21,11 @@
 #endif
 #ifndef IMPL_MATH_ATAN_ATAN_C310_IMPL_H
 #define IMPL_MATH_ATAN_ATAN_C310_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
-#include "include/adv_api/math/atan_utils.h"
-#include "../../common/common.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
+#include "../../../../../include/adv_api/math/atan_utils.h"
+#include "impl/adv_api/detail/common/common.h"
 
 namespace AscendC {
 namespace Internal {

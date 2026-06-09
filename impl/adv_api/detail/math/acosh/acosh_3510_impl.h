@@ -21,10 +21,10 @@
 #endif
 #ifndef DETAIL_MATH_ACOSH_ACOSH_C310_IMPL_H
 #define DETAIL_MATH_ACOSH_ACOSH_C310_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "../../common/check.h"
-#include "../../common/common.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/adv_api/detail/common/check.h"
+#include "impl/adv_api/detail/common/common.h"
 
 namespace AscendC {
 namespace Internal {

@@ -14,17 +14,17 @@
 #include <vector>
 #include <memory>
 #include <list>
-#include "hccl/base.h"
-#include "externalinput_pub.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
-#include "transport_pub.h"
-#include "adapter_pub.h"
-#include "dispatcher.h"
-#include "local_notify.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
 #include "template_v1_utils.h"
-#include "op_context.h"
-#include "comm_ahc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/op_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/comm_ahc_pub.h"
 
 namespace hccl {
 constexpr s32 HCCL_EXEC_STAGE_NOT_SET = -1;

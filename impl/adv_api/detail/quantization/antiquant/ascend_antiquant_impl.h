@@ -23,14 +23,14 @@
 #ifndef IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_IMPL_H
 #define IMPL_QUANTIZATION_ANTIQUANT_ASCEND_ANTIQUANT_IMPL_H
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "ascend_antiquant_common.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/quantization/antiquant/antiquant_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/quantization/antiquant/antiquant_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "ascend_antiquant_3510_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)

@@ -13,9 +13,9 @@
  * \brief
  */
 
-#include "include/adv_api/math/cumsum_tiling.h"
+#include "../../../../include/adv_api/math/cumsum_tiling.h"
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 namespace AscendC {
 void GetCumSumMaxMinTmpSize(
     const ge::Shape& srcShape, const uint32_t typeSize, const bool isLastAxis, const bool isReuseSource,

@@ -9,7 +9,7 @@
 */
 #ifndef HCCLV2_DEV_TYPE_H
 #define HCCLV2_DEV_TYPE_H
-#include "../utils/enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 namespace Hccl {
 
 // 对内芯片类型

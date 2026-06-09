@@ -23,14 +23,14 @@
 #ifndef IMPL_QUANTIZATION_QUANT_ASCEND_QUANT_COMMON_IMPL_H
 #define IMPL_QUANTIZATION_QUANT_ASCEND_QUANT_COMMON_IMPL_H
 
-#include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/quantization/quant/quant_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/quantization/quant/quant_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "ascend_quant_v220_impl.h"

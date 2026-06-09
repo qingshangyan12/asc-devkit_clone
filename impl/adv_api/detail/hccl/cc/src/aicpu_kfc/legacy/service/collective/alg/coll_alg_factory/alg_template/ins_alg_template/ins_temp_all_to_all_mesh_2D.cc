@@ -9,7 +9,7 @@
 */
 #include "log.h"
 #include "alg_data_trans_wrapper.h"
-#include "executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
 #include "ins_temp_all_to_all_mesh_2D.h"
 
 namespace Hccl {

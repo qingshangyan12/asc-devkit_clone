@@ -24,10 +24,10 @@
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_HCOMM_IMPL_H
 
 #if __NPU_ARCH__ == 2201
-#include "platform_v220/hcomm_aiv.h"
+#include "impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv.h"
 #elif __NPU_ARCH__ == 3510
-#include "platform_v310/hcomm_aiv_roce.h"
-#include "platform_v310/hcomm_aiv_urma.h"
+#include "impl/adv_api/detail/hcomm/impl/platform_v310/hcomm_aiv_roce.h"
+#include "impl/adv_api/detail/hcomm/impl/platform_v310/hcomm_aiv_urma.h"
 #endif
 
 namespace AscendC {

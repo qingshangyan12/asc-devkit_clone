@@ -10,7 +10,7 @@
 #ifndef HCCL_IMPL_PUB_H
 #define HCCL_IMPL_PUB_H
 
-#include "comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
 #include "threadManage.h"
 
 namespace hccl {

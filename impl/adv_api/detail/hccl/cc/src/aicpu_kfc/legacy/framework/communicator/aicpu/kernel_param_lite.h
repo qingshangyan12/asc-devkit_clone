@@ -10,9 +10,9 @@
 #ifndef HCCLV2_KERNEL_PARAM_LITE_H
 #define HCCLV2_KERNEL_PARAM_LITE_H
 
-#include "coll_operator.h"
-#include "dev_type.h"
-#include "hdc_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/hdc_param.h"
 
 constexpr u32 MAX_OP_TAG_LEN = 191; // 最大的tag 长度, 和对外接口保持一致
 constexpr u32 MAX_NAME_LEN   = 64;

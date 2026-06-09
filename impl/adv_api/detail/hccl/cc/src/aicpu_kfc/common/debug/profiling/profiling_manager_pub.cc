@@ -9,12 +9,12 @@
 */
 #include <string>
 
-#include "profiling_manager.h"
-#include "adapter_prof.h"
-#include "adapter_rts_common.h"
-#include "profiler_base_pub.h"
-#include "workflow_pub.h"
-#include "profiling_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager_pub.h"
 
 namespace hccl {
 HcclResult ProfilingManagerPub::CallMsprofReportMultiThreadInfo(const std::vector<uint32_t> &tidInfo)

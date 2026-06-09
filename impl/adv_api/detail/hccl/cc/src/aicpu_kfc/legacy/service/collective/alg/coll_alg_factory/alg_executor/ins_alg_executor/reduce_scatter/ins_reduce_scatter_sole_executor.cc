@@ -7,21 +7,21 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
 #include "log.h"
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_reduce_scatter_sole_executor.h"
 #ifndef CCL_KERNEL_AICPU
-#include "ccu_temp_reduce_scatter_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/reduce_scatter/template/ccu/ccu_temp_reduce_scatter_mesh_1D.h"
 #include "ccu_temp_reduce_scatter_mesh_2D.h"
 #include "ccu_temp_reduce_scatter_mesh_2D_mem2mem.h"
 #include "ccu_temp_reduce_scatter_mesh_detour_1D.h"
 #endif
 
-#include "topo_match_mesh.h"
-#include "topo_match_nhr.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 
 namespace Hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>

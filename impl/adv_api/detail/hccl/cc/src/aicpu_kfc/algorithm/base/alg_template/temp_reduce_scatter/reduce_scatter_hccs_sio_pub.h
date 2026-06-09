@@ -10,9 +10,9 @@
 #ifndef REDUCE_SCATTER_HCCS_SIO_PUB_H
 #define REDUCE_SCATTER_HCCS_SIO_PUB_H
 
-#include "alg_template_base_pub.h"
-#include "reducer_pub.h"
-#include "sender_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/component/reducer_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/component/sender_pub.h"
 
 namespace hccl {
 class ReduceScatterHccsSio : public AlgTemplateBase {

@@ -23,8 +23,8 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_DATACOPY_WRAPPER_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_DATACOPY_WRAPPER_H
 
-#include "../../utils/matmul_module.h"
-#include "../../utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
 #include "copy_cube_out_utils.h"
 
 namespace AscendC {

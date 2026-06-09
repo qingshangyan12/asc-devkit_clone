@@ -12,14 +12,14 @@
 
 #include <vector>
 #include <functional>
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "dispatcher_pub.h"
 
-#include "aicpu/aicpu_hccl_sqcq.h"
-#include "aicpu/aicpu_hccl_sqcqv1.h"
-#include "aicpu/aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv1.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
 
-#include "op_unfold_cache.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/unfold_cache/op_unfold_cache.h"
 
 namespace hccl {
 using AddOneNotifyWaitSqe = void(*)(uint16_t, uint16_t, u64, const uint8_t *, uint8_t *, const dfx::DfxTimeOutConfig &);

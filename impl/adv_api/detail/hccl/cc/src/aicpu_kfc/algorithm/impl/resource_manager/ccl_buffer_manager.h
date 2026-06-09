@@ -10,8 +10,8 @@
 #ifndef HCCL_CCL_BUFFER_MANAGER_H
 #define HCCL_CCL_BUFFER_MANAGER_H
 
-#include "mem_device_pub.h"
-#include "mem_host_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_host_pub.h"
 
 namespace hccl {
 

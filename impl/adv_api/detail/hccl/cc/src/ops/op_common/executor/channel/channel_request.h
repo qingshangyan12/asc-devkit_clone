@@ -12,7 +12,7 @@
 
 #include <set>
 #include <vector>
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace mc2_ops_hccl {
 

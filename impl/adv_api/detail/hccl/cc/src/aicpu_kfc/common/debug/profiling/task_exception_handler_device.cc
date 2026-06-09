@@ -12,11 +12,11 @@
 #include <cstdint>
 #include <iomanip>
 #include <array>
-#include "adapter_rts_common.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "config_log.h"
-#include "sal_pub.h"
-#include "../../../algorithm/pub_inc/common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/common.h"
 #include "task_exception_handler.h"
 
 using namespace hccl;

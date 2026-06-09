@@ -12,7 +12,7 @@
 
 #include <memory>
 #include "primitive.h"
-#include "hierarchical_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/hierarchical_queue.h"
 
 namespace Hccl {
 

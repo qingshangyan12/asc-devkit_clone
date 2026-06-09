@@ -11,11 +11,11 @@
 #define PARAM_CHECK_PUB_H
 
 #include <string>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "hccl/base.h"
-#include "comm.h"
-#include "topoinfo_struct.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
 
 // ranktable文件路径合法性检测
 HcclResult HcomGetRanktableRealPath(const char *rankTable, std::string &realFilePath);
@@ -83,7 +83,7 @@ HcclResult HcomCheckOpParam(const char *tag, const u64 count, const HcclDataType
 HcclResult HcclParseRanktable(const std::string &rankTableM,
     const std::string &identify, hccl::HcclCommParams &params, hccl::RankTable_t &rankTable);
 
-#include "param_check_basic_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/aicpu/param_check_basic_v2.h"
 bool IsSupportHCCLV2(const char *socNamePtr);
 
 #endif  // PARAM_CHECK_PUB_H

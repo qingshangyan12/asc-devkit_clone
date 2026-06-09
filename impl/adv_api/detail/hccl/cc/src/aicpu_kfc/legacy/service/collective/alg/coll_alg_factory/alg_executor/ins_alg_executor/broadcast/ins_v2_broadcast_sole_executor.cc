@@ -9,22 +9,22 @@
 */
 #include "ins_v2_broadcast_sole_executor.h"
 #include "log.h"
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 
-#include "topo_match_mesh.h"
-#include "topo_match_nhr.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 #include "alg_data_trans_wrapper.h"
-#include "ccu_temp_broadcast_mesh_1D_mem2mem.h"
-#include "ins_temp_broadcast_mesh1D_oneshot.h"
-#include "ins_temp_broadcast_mesh_2D_two_shot.h"
-#include "ins_temp_broadcast_mesh_1D_two_shot.h"
-#include "ins_temp_broadcast_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_broadcast_mesh_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_mesh1D_oneshot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_mesh_2D_two_shot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_mesh_1D_two_shot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_broadcast_nhr.h"
 
 #ifndef CCL_KERNEL_AICPU
 #include "ccu_temp_broadcast_mesh_2D_mem2mem.h"
 #include "aiv_temp_broadcast_mesh_1D.h"
-#include "ccu_temp_broadcast_nhr_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_broadcast_nhr_1D_mem2mem.h"
 #endif
 
 namespace Hccl {

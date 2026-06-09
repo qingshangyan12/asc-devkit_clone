@@ -13,10 +13,10 @@
 #include <vector>
 #include <memory>
 #include "base_transport_lite_impl.h"
-#include "notify_lite.h"
-#include "rma_buffer_lite.h"
-#include "rmt_rma_buffer_lite.h"
-#include "rdma_conn_lite_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/notify/aicpu/notify_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buffer_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rmt_rma_buffer_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/rdma_conn_lite_v2.h"
 
 namespace Hccl {
 

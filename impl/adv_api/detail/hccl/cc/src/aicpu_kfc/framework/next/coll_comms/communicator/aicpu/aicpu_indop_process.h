@@ -11,11 +11,11 @@
 #define __AICPU_INDOP_PROCESS_H__
 
 #include "common.h"
-#include "channel_param.h"
-#include "aicpu_launch_manager.h"
-#include "aicpu_init_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/channel_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/resource/engine/aicpu_launch_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/aicpu_init_param.h"
 #include "coll_comm_aicpu_mgr.h"
-#include "hccl_diag.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_diag.h"
 class AicpuIndopProcess {
 public:
     ~AicpuIndopProcess() = default;

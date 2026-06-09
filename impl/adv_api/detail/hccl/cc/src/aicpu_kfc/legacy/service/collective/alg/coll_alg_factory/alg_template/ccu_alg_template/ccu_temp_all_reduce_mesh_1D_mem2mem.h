@@ -12,17 +12,17 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <hccl/hccl_types.h>
-#include "reduce_op.h"
-#include "hccl/base.h"
-#include "types/types.h"
-#include "string_util.h"
-#include "env_config.h"
-#include "data_type.h"
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
 #include "template_utils.h"
-#include "buffer_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/buffer_type.h"
 #include "ccu_alg_template_base.h"
-#include "executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
 
 namespace Hccl {
 class CcuTempAllReduceMeshMem2Mem1D : public CcuAlgTemplateBase {

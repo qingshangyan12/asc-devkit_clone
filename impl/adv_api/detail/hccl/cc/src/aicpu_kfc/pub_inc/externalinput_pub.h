@@ -11,8 +11,8 @@
 #define EXTERNALINPUT_PUB_H
 
 #include <string>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
 
 constexpr u32 HCCL_WHITELIST_ON = 1;

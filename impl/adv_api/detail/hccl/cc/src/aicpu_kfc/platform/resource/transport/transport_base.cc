@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "transport_base.h"
-#include "adapter_rts.h"
-#include "externalinput_pub.h"
-#include "device_capacity.h"
-#include "new/hccl_dispatcher_ctx.h"
-#include "dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/dispatcher_ctx/dispatcher_ctx.h"
 
 namespace hccl {
 struct SuperPodInfo {

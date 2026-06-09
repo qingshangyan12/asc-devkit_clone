@@ -10,8 +10,8 @@
 #ifndef HCCL_H_
 #define HCCL_H_
 
-#include <hccl/hccl_types.h>
-#include <hccl/hccl_comm.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
 #include <acl/acl.h>
 
 #ifdef __cplusplus

@@ -10,7 +10,7 @@
 #ifndef BROADCAST_NHR_PUB_H
 #define BROADCAST_NHR_PUB_H
 
-#include "nonuniform_hierarchical_ring_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/nonuniform_hierarchical_ring_base_pub.h"
 
 namespace hccl {
 class BroadcastNHR : public NHRBase {

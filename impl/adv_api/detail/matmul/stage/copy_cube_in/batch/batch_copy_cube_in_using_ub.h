@@ -25,8 +25,8 @@
 #include "batch_copy_cube_in_intf.h"
 #include "batch_copy_cube_in_params.h"
 #include "batch_copy_cube_in_base.h"
-#include "../base/copy_cube_in_params.h"
-#include "../copy_tile_to_cube/copy_tile_to_cube.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/base/copy_cube_in_params.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/copy_tile_to_cube.h"
 
 namespace AscendC {
 namespace Impl {

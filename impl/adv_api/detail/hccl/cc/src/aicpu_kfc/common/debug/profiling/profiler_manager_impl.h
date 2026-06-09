@@ -10,20 +10,20 @@
 #ifndef PROFILER_MANAGER_IMPL_H
 #define PROFILER_MANAGER_IMPL_H
 #include <mutex>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "dlprof_function.h"
-#include "dlrt_function.h"
-#include "task_profiling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/dlrt_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_profiling_pub.h"
 #include "task_overflow_pub.h"
-#include "task_exception_handler_pub.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_exception_handler_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "plugin_runner_pub.h"
 #include "command_handle.h"
-#include "profiler_base_pub.h"
-#include "profiling_manager.h"
-#include "alg_profiling.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/alg_profiling.h"
 
 namespace hccl {
 class ProfilerManagerImpl {

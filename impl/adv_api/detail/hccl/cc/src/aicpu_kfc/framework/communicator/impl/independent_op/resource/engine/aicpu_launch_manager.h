@@ -11,13 +11,13 @@
 #define AICPU_LAUNCH_MANAGER_H
 
 #include "hccl_common.h"
-#include "stream_pub.h"
-#include "aicpu_operator_pub.h"
-#include "thread.h"
-#include "hccl/hccl_res.h"
-#include "hccl_independent_common.h"
-#include "local_notify.h"
-#include "aicpu_init_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/thread.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/hccl_independent_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/aicpu_init_param.h"
 
 constexpr uint32_t THREAD_UNIQUE_ID_MAX_SIZE = 1024;
 constexpr uint32_t NOTIFY_UNIQUE_ID_MAX_SIZE = THREAD_UNIQUE_ID_MAX_SIZE * hccl::HCCL_THREAD_NOTIFY_MAX_NUM;

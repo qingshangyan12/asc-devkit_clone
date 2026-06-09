@@ -10,11 +10,11 @@
 #ifndef HCCLV2_INS_ALL_TO_ALL_SOLE_EXECUTOR
 #define HCCLV2_INS_ALL_TO_ALL_SOLE_EXECUTOR
 
-#include "ins_temp_all_to_all_mesh.h"
-#include "ccu_temp_half_alltoallv_mesh_1D.h"
-#include "ins_coll_alg_base.h"
-#include "topo_match_mesh.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_all_to_all_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_half_alltoallv_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/ins_alg_executor/ins_coll_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 #include "instruction.h"
 
 namespace Hccl {

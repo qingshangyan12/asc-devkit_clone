@@ -12,8 +12,8 @@
  * \file sum_tiling.cpp
  * \brief
  */
-#include "include/adv_api/reduce/sum_tiling.h"
-#include "../../detail/host_log.h"
+#include "../../../../include/adv_api/reduce/sum_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
 
 namespace AscendC {
 void GetSumMaxMinTmpSize(

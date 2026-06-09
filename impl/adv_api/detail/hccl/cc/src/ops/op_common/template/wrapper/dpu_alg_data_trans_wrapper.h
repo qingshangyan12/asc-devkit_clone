@@ -10,9 +10,9 @@
 #ifndef DPU_ALG_DATA_TRANS_WRAPPER
 #define DPU_ALG_DATA_TRANS_WRAPPER
 
-#include "hcomm_primitives.h"
-#include "hccl_types.h"
-#include "alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "template_utils.h"
 
 namespace mc2_ops_hccl {

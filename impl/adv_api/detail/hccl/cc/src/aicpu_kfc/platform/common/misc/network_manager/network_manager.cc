@@ -8,15 +8,15 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "network_manager.h"
-#include "externalinput_pub.h"
-#include "device_capacity.h"
-#include "adapter_tdt.h"
-#include "adapter_rts.h"
-#include "adapter_hccp.h"
-#include "adapter_hal.h"
-#include "adapter_error_manager.h"
-#include "dlhal_function.h"
-#include "adapter_hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_tdt.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/hccd/adapter_error_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
 namespace hccl {
 
 using namespace std;

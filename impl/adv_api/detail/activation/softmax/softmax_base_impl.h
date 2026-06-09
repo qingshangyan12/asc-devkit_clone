@@ -24,19 +24,19 @@
 
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5102)
-#include "regbase/3510/softmax_impl.h"
+#include "impl/adv_api/detail/activation/softmax/regbase/3510/softmax_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
-#include "regbase/v300/softmax_impl.h"
+#include "impl/adv_api/detail/activation/softmax/regbase/v300/softmax_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#include "membase/v220/softmax_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/v220/softmax_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
-#include "membase/v200/softmax_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/v200/softmax_impl.h"
 #endif
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/activation/softmax/adjust_softmax_res/adjust_softmax_res_check.h"
-#include "../../api_check/kernel_check/activation/softmax/softmax/softmax_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/activation/softmax/adjust_softmax_res/adjust_softmax_res_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/activation/softmax/softmax/softmax_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 template <

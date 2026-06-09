@@ -9,9 +9,9 @@
 */
 #include <vector>
 #include "aicpu_ts_urma_channel_kernel.h"
-#include "framework/aicpu_hccl_process.h"
-#include "channel_param.h"
-#include "aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/channel_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
 #include "aicpu_channel_process.h"
 
 extern "C" {

@@ -10,14 +10,14 @@
 #include <unordered_set>
 #include <mutex>
 #include "log.h"
-#include "adapter_rts.h"
-#include "adapter_hccp.h"
-#include "dtype_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "externalinput.h"
-#include "network_manager_pub.h"
-#include "adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
 #include "dlhal_function.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 
 
 constexpr u32 INLINEREDUCE_ALIGN_BYTES_910A = 128;

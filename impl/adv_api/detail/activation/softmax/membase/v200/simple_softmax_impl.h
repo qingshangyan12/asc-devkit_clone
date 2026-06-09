@@ -24,7 +24,7 @@
 #define IMPL_ACTIVATION_SOFTMAX_V200_SIMPLE_SOFTMAX_IMPL_H
 
 #include "softmax_common_impl.h"
-#include "../common/simple_softmax_common_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/simple_softmax_common_impl.h"
 
 #endif // IMPL_ACTIVATION_SOFTMAX_V200_SIMPLE_SOFTMAX_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_SIMPLE_SOFTMAX_IMPL_H__)

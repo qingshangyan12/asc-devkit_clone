@@ -18,9 +18,9 @@
 #ifndef IMPL_REDUCE_REDUCE_COMMON_UTIL_IMPL_H
 #define IMPL_REDUCE_REDUCE_COMMON_UTIL_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "../common/check.h"
+#include "../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../include/basic_api/kernel_tensor.h"
+#include "impl/adv_api/detail/common/check.h"
 
 namespace AscendC {
 namespace Pattern {

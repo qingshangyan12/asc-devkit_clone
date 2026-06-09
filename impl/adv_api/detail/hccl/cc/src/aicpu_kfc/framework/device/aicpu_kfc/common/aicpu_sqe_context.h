@@ -12,7 +12,7 @@
 
 #include "hccl_common.h"
 #include "common/aicpu_kfc_def.h"
-#include "common/sqe_context_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/sqe_context_utils.h"
 
 constexpr uint32_t AC_SQE_MAX_CNT = 2048U; // 一次mc2算子一个流上最大下发sqe数量
 

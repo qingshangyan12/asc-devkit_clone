@@ -24,11 +24,11 @@
 #define IMPL_ACTIVATION_SOFTMAX_V220_SOFTMAX_FLASHV2_IMPL_H
 
 #include "softmax_common_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_basic_block_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_update_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_no_update_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_nz_impl.h"
-#include "../common/softmax_flashv2_impl/softmax_flashv2_common_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_basic_block_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_update_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_no_update_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_nz_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_flashv2_impl/softmax_flashv2_common_impl.h"
 
 namespace AscendC {
 __aicore__ inline void SoftMaxFlashV2M1CastIntrinsicsImpl(

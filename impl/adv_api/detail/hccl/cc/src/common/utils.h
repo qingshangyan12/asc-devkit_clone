@@ -14,7 +14,7 @@
 #include <vector>
 #include <sstream>
 #include "securec.h"
-#include "hccl/base.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
 #include "log.h"
 

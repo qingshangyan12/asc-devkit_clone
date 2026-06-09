@@ -10,7 +10,7 @@
 #ifndef TRANSPORT_DEVICE_P2P_PUB_H
 #define TRANSPORT_DEVICE_P2P_PUB_H
 
-#include "transport_p2p_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_p2p_pub.h"
 
 namespace hccl {
 class TransportDeviceP2p : public TransportP2p {

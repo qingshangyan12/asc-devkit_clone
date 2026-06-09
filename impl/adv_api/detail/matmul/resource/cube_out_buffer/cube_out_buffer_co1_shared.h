@@ -23,9 +23,9 @@
 #define IMPL_MATMUL_MODULES_RESOURCE_CUBE_OUT_BUFFER_CUBE_OUT_BUFFER_CO1_SHARED_H
 
 #include "cube_out_buffer_base.h"
-#include "../../utils/matmul_utils.h"
-#include "include/adv_api/matmul/tiling.h"
-#include "../../feature_trait/matmul_feature_trait.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
+#include "../../../../../../include/adv_api/matmul/tiling.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_feature_trait.h"
 
 namespace AscendC {
 namespace Impl {

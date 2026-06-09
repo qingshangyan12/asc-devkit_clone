@@ -18,16 +18,16 @@
 #ifndef IMPL_REDUCE_REDUCE_MIN_REDUCE_MIN_C310_IMPL_H_
 #define IMPL_REDUCE_REDUCE_MIN_REDUCE_MIN_C310_IMPL_H_
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "../reduce_common_util_impl.h"
-#include "../reduce_common_util_3510_impl.h"
-#include "../reduce_common_ar_reuse_align_3510_impl.h"
-#include "../reduce_common_ra_reuse_align_3510_impl.h"
-#include "../reduce_common_ar_ra_reuse_unalign_3510_impl.h"
-#include "../../common/check.h"
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/reduce/reduce_common_util_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_util_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ar_reuse_align_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ra_reuse_align_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ar_ra_reuse_unalign_3510_impl.h"
+#include "impl/adv_api/detail/common/check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 namespace Internal {

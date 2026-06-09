@@ -10,8 +10,8 @@
 #ifndef HCCL_MEM_H
 #define HCCL_MEM_H
 
-#include "hccl_types.h"
-#include "hccl_mem_defs.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
 #include <stdint.h>
 
 #ifdef __cplusplus

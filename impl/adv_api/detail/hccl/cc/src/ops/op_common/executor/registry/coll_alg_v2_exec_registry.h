@@ -14,7 +14,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
-#include "executor_v2_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_v2_base.h"
 
 
 namespace mc2_ops_hccl {

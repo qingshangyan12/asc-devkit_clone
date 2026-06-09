@@ -10,7 +10,7 @@
 #ifndef ALL_REDUCE_OPERATOR_H
 #define ALL_REDUCE_OPERATOR_H
 
-#include "coll_alg_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_operator.h"
 
 namespace hccl {
 // 数据规模分类

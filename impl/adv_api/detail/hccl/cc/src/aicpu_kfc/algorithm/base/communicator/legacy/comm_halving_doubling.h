@@ -10,7 +10,7 @@
 #ifndef COMM_HALVING_DOUBLING_H
 #define COMM_HALVING_DOUBLING_H
 
-#include "comm_halving_doubling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_halving_doubling_pub.h"
 
 namespace hccl {
 }  // namespace hccl

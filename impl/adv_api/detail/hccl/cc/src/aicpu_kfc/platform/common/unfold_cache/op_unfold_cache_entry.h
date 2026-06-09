@@ -13,8 +13,8 @@
 #include <cstdint>
 #include <vector>
 
-#include "dispatcher_task_types.h" // LinkType
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher_task_types.h" // LinkType
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 
 // 确认ptr应该为空
 #define CHK_PTR_NOTNULL(ptr) \

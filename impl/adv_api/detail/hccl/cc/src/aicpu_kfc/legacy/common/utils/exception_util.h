@@ -10,7 +10,7 @@
 #ifndef HCCLV2_EXCEPTION_UTIL_H
 #define HCCLV2_EXCEPTION_UTIL_H
 
-#include "../exception/null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
 #include "log.h"
 #include "string_util.h"
 #include <string>

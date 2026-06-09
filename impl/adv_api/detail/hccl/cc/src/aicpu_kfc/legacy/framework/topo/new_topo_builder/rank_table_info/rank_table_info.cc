@@ -14,12 +14,12 @@
 #include <sstream>
 #include <string>
 #include "sal.h"
-#include "json_parser.h"
-#include "invalid_params_exception.h"
-#include "types.h"
-#include "const_val.h"
-#include "dev_type.h"
-#include "exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/misc/json_parser/json_parser.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
 #include "adapter_error_manager_pub.h"
 
 namespace Hccl {

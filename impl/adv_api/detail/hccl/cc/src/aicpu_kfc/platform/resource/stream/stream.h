@@ -10,7 +10,7 @@
 #ifndef STREAM_H
 #define STREAM_H
 
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 
 namespace hccl {
 }  // namespace hccl

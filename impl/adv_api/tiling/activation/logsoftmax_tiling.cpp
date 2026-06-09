@@ -13,13 +13,13 @@
  * \brief
  */
 
-#include "include/adv_api/activation/logsoftmax_tiling.h"
+#include "../../../../include/adv_api/activation/logsoftmax_tiling.h"
 
 #include <set>
 
-#include "include/adv_api/activation/logsoftmax_tilingdata.h"
-#include "tiling/platform/platform_ascendc.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "../../../../include/adv_api/activation/logsoftmax_tilingdata.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(LogSoftMaxTilingOpApi, LogSoftMaxTiling)

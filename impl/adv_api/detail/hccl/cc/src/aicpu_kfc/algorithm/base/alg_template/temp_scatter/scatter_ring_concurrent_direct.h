@@ -11,7 +11,7 @@
 #ifndef SCATTER_RING_CONCURRENT_DIRECT_H
 #define SCATTER_RING_CONCURRENT_DIRECT_H
  
-#include "scatter_ring_concurrent_direct_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/scatter_ring_concurrent_direct_pub.h"
  
 namespace hccl {
 } // namespace hccl

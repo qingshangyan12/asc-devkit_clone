@@ -11,8 +11,8 @@
 #define HCCL_ADAPTER_VERBS_H
 
 #include <infiniband/verbs.h>
-#include "hccl/base.h"
-#include "dlhns_function.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhns_function.h"
 
 namespace hccl {
 HcclResult hrtIbvPostSrqRecv(struct ibv_srq *srq, struct ibv_recv_wr *wr, struct ibv_recv_wr **badWr);

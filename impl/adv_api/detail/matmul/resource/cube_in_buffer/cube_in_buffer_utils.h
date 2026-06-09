@@ -21,7 +21,7 @@
 #ifndef IMPL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_UTILS_H
 #define IMPL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_UTILS_H
 
-#include "../../utils/matmul_type_def.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_type_def.h"
 
 namespace AscendC {
 namespace Impl {

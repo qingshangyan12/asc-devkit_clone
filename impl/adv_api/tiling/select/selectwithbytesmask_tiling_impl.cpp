@@ -12,8 +12,8 @@
  * \file selectwithbytesmask_tiling_impl.cpp
  * \brief
  */
-#include "include/adv_api/select/selectwithbytesmask_tiling.h"
-#include "../../detail/host_log.h"
+#include "../../../../include/adv_api/select/selectwithbytesmask_tiling.h"
+#include "impl/adv_api/detail/host_log.h"
 
 #include <cstdint>
 #include <algorithm>

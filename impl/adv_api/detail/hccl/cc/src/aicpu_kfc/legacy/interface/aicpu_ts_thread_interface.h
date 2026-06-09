@@ -10,8 +10,8 @@
 #ifndef AICPU_TS_THREAD_INTERFACE_H
 #define AICPU_TS_THREAD_INTERFACE_H
 
-#include "hccl_types.h"
-#include "stream_lite.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 
 namespace Hccl {
 

@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_hdc.h"
-#include "utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
 
 using namespace hccl;
 

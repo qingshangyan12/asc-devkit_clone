@@ -10,9 +10,9 @@
 #ifndef RANK_GRAPH_INTERFACE_H
 #define RANK_GRAPH_INTERFACE_H
 
-#include "hccl_rank_graph.h"
-#include "hccl_types.h"
-#include "rank_gph.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
 
 namespace Hccl {
 

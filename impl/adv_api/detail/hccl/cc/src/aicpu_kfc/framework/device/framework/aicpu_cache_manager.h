@@ -18,15 +18,15 @@
 #include <stdint.h>
 
 #include "aicpu_zero_copy_exchanger.h"
-#include "coll_alg_param.h"
-#include "coll_executor_base.h"
-#include "hccl_types.h"
-#include "stream_pub.h"
-#include "topo_matcher.h"
-#include "op_context.h"
-#include "workflow.h"
-#include "op_unfold_cache.h"
-#include "mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_executor_base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/topo_matcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/op_context.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/unfold_cache/op_unfold_cache.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 
 namespace hccl {
 

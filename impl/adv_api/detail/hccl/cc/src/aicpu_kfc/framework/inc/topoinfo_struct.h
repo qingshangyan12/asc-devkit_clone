@@ -14,11 +14,11 @@
 #include <vector>
 #include <memory>
 #include <mutex>
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
-#include "adapter_pub.h"
-#include "externalinput_pub.h"
-#include "hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
 
 namespace hccl {
 using NetworkInfo_t = struct tagNetworkInfo {

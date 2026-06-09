@@ -10,7 +10,7 @@
 #ifndef REDUCE_SCATTER_HALVING_DOUBLING_H
 #define REDUCE_SCATTER_HALVING_DOUBLING_H
 
-#include "reduce_scatter_halving_doubling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_halving_doubling_pub.h"
 
 namespace hccl {
 }  // namespace hccl

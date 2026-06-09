@@ -10,7 +10,7 @@
 #ifndef ALL_GATHER_RING_H
 #define ALL_GATHER_RING_H
 
-#include "all_gather_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_ring_pub.h"
 
 namespace hccl {
 }  // namespace hccl

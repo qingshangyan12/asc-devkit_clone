@@ -13,13 +13,13 @@
  * \brief
  */
 
-#include "include/adv_api/activation/gelu_tiling.h"
+#include "../../../../include/adv_api/activation/gelu_tiling.h"
 
 #include <set>
 
 #include "graph/tensor.h"
 #include "register/tilingdata_base.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 
 namespace AscendC {
 constexpr uint32_t GELU_THREE_TIMES = 3;

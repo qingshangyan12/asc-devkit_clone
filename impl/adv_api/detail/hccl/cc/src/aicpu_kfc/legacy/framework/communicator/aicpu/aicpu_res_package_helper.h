@@ -11,8 +11,8 @@
 #define HCCL_AICPU_RES_PACKAGE_HELPER_H
 
 #include <vector>
-#include "hccl/base.h"
-#include "enum_factory.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 #include "binary_stream.h"
 namespace Hccl {
 

@@ -9,7 +9,7 @@
 */
 #ifndef PROFILER_MANAGER_H
 #define PROFILER_MANAGER_H
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "profiler_base_pub.h"
 

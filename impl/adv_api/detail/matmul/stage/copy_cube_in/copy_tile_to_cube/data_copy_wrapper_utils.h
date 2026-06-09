@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_UTILS_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_DATA_COPY_WRAPPER_UTILS_H
 
-#include "../../../utils/matmul_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
 
 namespace AscendC {
 namespace Impl {

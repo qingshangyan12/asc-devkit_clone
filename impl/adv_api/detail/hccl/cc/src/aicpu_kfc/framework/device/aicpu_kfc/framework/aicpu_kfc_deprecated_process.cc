@@ -9,13 +9,13 @@
 */
 #include "aicpu_kfc_deprecated_process.h"
 
-#include "framework/aicpu_communicator.h"
-#include "dfx/dfx_extend_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/dfx/dfx_extend_info.h"
 #include "aicpu_kfc_process.h"
-#include "algorithm/task_orchestrator.h"
-#include "common/aicpu_kfc_utils.h"
-#include "utils/aicpu_hdc_utils.h"
-#include "framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/algorithm/task_orchestrator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
 
 using namespace hccl;
 

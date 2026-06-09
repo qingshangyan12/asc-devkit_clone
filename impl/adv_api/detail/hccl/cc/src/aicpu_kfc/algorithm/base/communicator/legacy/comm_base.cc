@@ -11,12 +11,12 @@
 #include <arpa/inet.h>
 #include <securec.h>
 
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "hccl_common.h"
-#include "device_capacity.h"
-#include "p2p_mgmt_pub.h"
-#include "rank_consistentcy_checker.h"
-#include "coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/p2p_mgmt_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/health/rank_consistentcy_checker.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 
 namespace hccl {
 constexpr s32 HCCL_DEFAULT_INITIAL_VALUE = -1;

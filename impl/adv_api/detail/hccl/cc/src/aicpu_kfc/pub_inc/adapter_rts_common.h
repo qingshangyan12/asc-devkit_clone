@@ -11,7 +11,7 @@
 #define HCCL_INC_ADAPTER_RTS_COMMON_H
 
 #include "hccl_common.h"
-#include "dtype_common.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "acl/acl_rt.h"
 
 #if T_DESC("stream管理", true)

@@ -22,7 +22,7 @@
 
 #include "securec.h"
 
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "math_util.h"
 
 using namespace std;

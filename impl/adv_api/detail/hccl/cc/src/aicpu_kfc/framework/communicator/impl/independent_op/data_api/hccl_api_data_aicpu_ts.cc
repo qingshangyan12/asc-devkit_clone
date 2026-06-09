@@ -7,25 +7,25 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl_api_data.h"
-#include "dispatcher.h"
-#include "new/hccl_primitive_local.h"
-#include "new/hccl_primitive_remote.h"
-#include "thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_api_data.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_local.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_remote.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/thread.h"
 #include "launch_context.h"
 
-#include "base_transport_lite_impl.h"
-#include "ub_transport_lite_impl.h"
-#include "device/framework/aicpu_hccl_process.h"
-#include "coll_comm_aicpu_mgr.h"
-#include "aicpu_indop_process.h"
-#include "hcclCommDfxLite.h"
-#include "hcclCommProfilingLite.h"
-#include "profiling_handler_lite.h"
-#include "hcclCommOp.h"
-#include "hcomm_diag.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/transport/aicpu/base_transport_lite_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/transport/aicpu/ub_transport_lite_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/coll_comm_aicpu_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/hcclCommDfxLite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/profiling/aicpu/hcclCommProfilingLite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/hcclCommOp.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcomm_diag.h"
 #include "hccl_api_data_aicpu_ts.h"
-#include "hccl_diag.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_diag.h"
 
 using namespace hccl;
 thread_local LaunchContext g_threadLaunchCtx;

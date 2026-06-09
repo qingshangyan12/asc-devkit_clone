@@ -12,8 +12,8 @@
 
 #include <vector>
 
-#include "remote_access.h"
-#include "hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/remote_access.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "transport_remote_access.h"
 #include "comm_remote_access.h"
 

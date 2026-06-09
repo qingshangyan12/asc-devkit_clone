@@ -13,7 +13,7 @@
 #include <acl/acl.h>
 #include "hccl_primitive.h"
 #include "hccl_mem.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include <string>
 #include <vector>
 #ifdef __cplusplus

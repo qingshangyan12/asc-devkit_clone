@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_MDL_FULLLOAD_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_MDL_FULLLOAD_H
 
-#include "../copy_tile_to_cube/copy_tile_to_cube.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/copy_tile_to_cube.h"
 #include "copy_cube_in_intf.h"
 #include "copy_cube_in_mdl_base.h"
 

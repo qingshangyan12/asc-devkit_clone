@@ -12,11 +12,11 @@
 
 #include <set>
 #include <vector>
-#include "buffer.h"
-#include "op_mode.h"
-#include "coll_alg_info.h"
-#include "data_buffer.h"
-#include "mem_transport_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/coll_alg_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/data_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/mem_transport_lite_mgr.h"
 
 namespace Hccl {
 

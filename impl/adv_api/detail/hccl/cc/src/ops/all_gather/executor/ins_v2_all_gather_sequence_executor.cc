@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "ins_v2_all_gather_sequence_executor.h"
-#include "topo_match_multilevel.h"
-#include "ins_temp_all_gather_mesh_1D.h"
-#include "ins_temp_all_gather_nhr_dpu.h"
-#include "coll_alg_v2_exec_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_multilevel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_nhr_dpu.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/registry/coll_alg_v2_exec_registry.h"
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>

@@ -22,12 +22,12 @@
 #ifndef IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 #define IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 
-#include "kernel_macros.h"
-#include "kernel_basic_intf.h"
-#include "include/adv_api/matmul/tiling.h"
-#include "../dfx/dfx_proxy.h"
-#include "../resource/cube_in_buffer/global_cache.h"
-#include "../../../tiling/matmul/matmul_constant_tiling_impl.h"
+#include "impl/basic_api/kernel_macros.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/adv_api/matmul/tiling.h"
+#include "impl/adv_api/detail/matmul/dfx/dfx_proxy.h"
+#include "impl/adv_api/detail/matmul/resource/cube_in_buffer/global_cache.h"
+#include "impl/adv_api/tiling/matmul/matmul_constant_tiling_impl.h"
 #include "matmul_type_def.h"
 #include "matmul_utils.h"
 #include "matmul_config_utils.h"

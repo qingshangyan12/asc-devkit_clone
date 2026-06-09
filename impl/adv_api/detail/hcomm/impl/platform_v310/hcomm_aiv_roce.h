@@ -24,8 +24,8 @@
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_PLATFORM_V310_HCOMM_AIV_ROCE_H
 
 #include "hcomm_aiv_roce_def.h"
-#include "../../common/hcomm_utils.h"
-#include "../../common/hcomm_inner_def.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_utils.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h"
 
 namespace AscendC {
 

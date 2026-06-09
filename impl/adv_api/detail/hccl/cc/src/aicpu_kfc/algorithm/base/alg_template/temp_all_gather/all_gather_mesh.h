@@ -10,7 +10,7 @@
 #ifndef ALL_GATHER_MESH_H
 #define ALL_GATHER_MESH_H
 
-#include "all_gather_mesh_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_mesh_pub.h"
 
 namespace hccl {
 }  // namespace hccl

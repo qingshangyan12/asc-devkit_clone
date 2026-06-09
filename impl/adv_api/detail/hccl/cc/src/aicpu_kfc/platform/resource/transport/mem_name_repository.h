@@ -10,7 +10,7 @@
 #ifndef MEM_NAME_REPOSITORY_H
 #define MEM_NAME_REPOSITORY_H
 
-#include "mem_name_repository_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
 
 namespace hccl {
 constexpr u32 HCCL_IPC_PID_ARRAY_SIZE = 1; // 固定每次只传一个PID数据

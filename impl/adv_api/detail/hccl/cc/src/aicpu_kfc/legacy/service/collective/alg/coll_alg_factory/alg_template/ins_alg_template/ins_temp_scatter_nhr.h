@@ -10,7 +10,7 @@
 #ifndef HCCLV2_INS_TEMP_SCATTER_NHR
 #define HCCLV2_INS_TEMP_SCATTER_NHR
 
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 
 #include "ins_alg_template_base.h"
 #include "ins_temp_all_gather_nhr.h"

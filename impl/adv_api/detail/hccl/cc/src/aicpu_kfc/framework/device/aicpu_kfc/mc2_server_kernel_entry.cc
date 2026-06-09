@@ -9,10 +9,10 @@
 */
 #include <cstdint>
 
-#include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
-#include "common/aicpu_kfc_def.h"
-#include "common/aicpu_kfc_utils.h"
-#include "hccl_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
 #include "log.h"
 
 using namespace HcclApi;

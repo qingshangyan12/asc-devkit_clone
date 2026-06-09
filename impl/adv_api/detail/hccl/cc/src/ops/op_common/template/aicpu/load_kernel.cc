@@ -10,7 +10,7 @@
 #include "load_kernel.h"
 #include "mmpa_api.h"
 #include "log.h"
-#include "adapter_acl.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/adapter_acl.h"
 namespace mc2_ops_hccl {
 
 aclrtBinHandle g_binKernelHandle = nullptr;

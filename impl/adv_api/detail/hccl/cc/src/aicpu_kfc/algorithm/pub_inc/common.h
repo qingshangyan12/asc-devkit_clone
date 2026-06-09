@@ -10,14 +10,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "adapter_hccp_common.h"
-#include "hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
 #include "hccl_common.h"
 #include "alg_cmd_type.h"
-#include "transport_pub.h"
-#include "externalinput_pub.h"
-#include "template_v1_utils.h"
-#include "comm_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/template_v1_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/comm_utils.h"
 
 // sub stream 相关
 constexpr s64 HCCL_SUB_STREAM_NUM_ZERO = 0;  // subStream 数量为0

@@ -14,14 +14,14 @@
 #include <map>
 #include <memory>
 #include <list>
-#include "coll_operator.h"
-#include "types.h"
-#include "data_slice.h"
-#include "virtual_topo.h"
-#include "notify_type.h"
-#include "data_buffer.h"
-#include "rmt_rma_buf_slice_lite.h"
-#include "rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/data_slice.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/notify_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/data_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rmt_rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buf_slice_lite.h"
 
 namespace Hccl {
 

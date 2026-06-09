@@ -21,11 +21,11 @@
 #endif
 #ifndef IMPL_MATH_ERF_ERF_C310_IMPL_H
 #define IMPL_MATH_ERF_ERF_C310_IMPL_H
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
-#include "include/adv_api/math/erf_utils.h"
-#include "../../common/check.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
+#include "../../../../../include/adv_api/math/erf_utils.h"
+#include "impl/adv_api/detail/common/check.h"
 
 namespace AscendC {
 namespace ErfAPI {

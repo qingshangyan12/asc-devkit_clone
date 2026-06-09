@@ -9,8 +9,8 @@
 */
 #ifndef HCCLV2_SQE_BUILD_A5_H
 #define HCCLV2_SQE_BUILD_A5_H
-#include "types.h"
-#include "ub_jetty_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_jetty_lite.h"
 #include "sqe_v82.h"
 #include "log.h"
 

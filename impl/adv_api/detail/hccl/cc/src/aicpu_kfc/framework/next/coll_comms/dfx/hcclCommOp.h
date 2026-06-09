@@ -13,11 +13,11 @@
 #include <memory>
 #include "hccl_common.h"
 #include <unordered_map>
-#include "buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
 #include "common.h"
-#include "op_mode.h"
-#include "task_info.h"
-#include "hccl_diag.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_diag.h"
 
 namespace hccl {
     

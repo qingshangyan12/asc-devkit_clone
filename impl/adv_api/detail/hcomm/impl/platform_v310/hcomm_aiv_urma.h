@@ -25,8 +25,8 @@
 
 #include "hcomm_aiv_urma_def.h"
 
-#include "../../common/hcomm_inner_def.h"
-#include "../../common/hcomm_utils.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_inner_def.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_utils.h"
 
 typedef AscendC::HcommUrmaSqeCtx HcommUrmaSqeCtx;
 typedef AscendC::HcommUrmaSgeCtx HcommUrmaSgeCtx;

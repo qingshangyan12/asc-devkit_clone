@@ -13,9 +13,9 @@
  * \brief
  */
 #include <cstdint>
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 #include "graph/tensor.h"
-#include "include/adv_api/math/tanh_tiling.h"
+#include "../../../../include/adv_api/math/tanh_tiling.h"
 
 namespace AscendC {
 namespace {

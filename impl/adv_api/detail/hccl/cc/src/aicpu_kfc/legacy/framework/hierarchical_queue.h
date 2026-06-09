@@ -10,12 +10,12 @@
 #ifndef HCCLV2_HIERARCHICAL_QUEUE_H
 #define HCCLV2_HIERARCHICAL_QUEUE_H
 
-#include "exception_util.h"
-#include "null_ptr_exception.h"
-#include <string_util.h>
-#include "iterator.h"
-#include "iterator_unconst.h"
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/iterator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/iterator_unconst.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 
 #include <memory>
 #include <vector>

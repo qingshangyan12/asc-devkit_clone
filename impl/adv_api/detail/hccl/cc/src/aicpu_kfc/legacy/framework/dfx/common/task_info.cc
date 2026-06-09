@@ -10,9 +10,9 @@
 #include <sstream>
 #include "task_info.h"
 #include "log.h"
-#include "string_util.h"
-#include "const_val.h"
-#include "reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
 
 namespace Hccl {
 using namespace std;

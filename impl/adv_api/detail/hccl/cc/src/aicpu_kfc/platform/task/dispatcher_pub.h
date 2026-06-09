@@ -10,13 +10,13 @@
 #ifndef HCCL_INC_DISPATCHER_PUB_H
 #define HCCL_INC_DISPATCHER_PUB_H
 
-#include "dispatcher.h"
-#include "adapter_hccp.h"
-#include "mem_host_pub.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_host_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "../platform/common/dlprof_func.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "hccl_common.h"
 
 #ifdef CCL_LLT

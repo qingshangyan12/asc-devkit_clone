@@ -15,8 +15,8 @@
 #include <string>
 
 #include "log.h"
-#include "executor_v2_base.h"
-#include "selector/execute_selector.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_v2_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/selector/execute_selector.h"
 
 namespace mc2_ops_hccl {
 namespace cann_abi {

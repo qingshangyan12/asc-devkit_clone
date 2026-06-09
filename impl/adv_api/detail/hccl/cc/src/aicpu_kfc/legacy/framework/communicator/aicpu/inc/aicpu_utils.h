@@ -11,10 +11,10 @@
 #define HCCLV2_AICPU_UTILS_H
 #include <string>
 #include <shared_mutex>
-#include "communicator_impl_lite.h"
-#include "stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 #include "mc2_data_type.h"
-#include "data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
 
 /* 检查指针, 若指针为NULL, 则记录日志, 并返回错误 */
 #define CHK_PTR_NULL_WITH_MSG(ptr, format, ...)                                                                        \

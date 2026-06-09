@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "hccl/hccl_res.h"
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 #ifdef __cplusplus
 extern "C" {

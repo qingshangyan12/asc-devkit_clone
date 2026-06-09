@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_SCHEDULER_BIAS_BIAS_SCHEDULER_BASE_H
 #define IMPL_MATMUL_SCHEDULER_BIAS_BIAS_SCHEDULER_BASE_H
 
-#include "../../utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
 
 namespace AscendC {
 namespace Impl {

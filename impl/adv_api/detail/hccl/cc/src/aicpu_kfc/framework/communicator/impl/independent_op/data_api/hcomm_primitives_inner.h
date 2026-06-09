@@ -10,7 +10,7 @@
 #ifndef HCOMM_PRIMITIVES_INNER_H
 #define HCOMM_PRIMITIVES_INNER_H
 
-#include "hcomm_primitives.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 
 #ifdef __cplusplus
 extern "C" {

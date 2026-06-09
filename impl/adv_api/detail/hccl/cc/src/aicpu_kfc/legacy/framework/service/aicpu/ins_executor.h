@@ -10,12 +10,12 @@
 #ifndef HCCL_AICPU_INSTRUCTION_INS_EXECUTOR_H_
 #define HCCL_AICPU_INSTRUCTION_INS_EXECUTOR_H_
 
-#include "ins_queue.h"
-#include "sqe_mgr.h"
-#include "connected_link_mgr.h"
-#include "lite_res_mgr_fetcher.h"
-#include "kernel_param_lite.h"
-#include "profiling_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/sqe_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/lite_res_mgr_fetcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/profiling/profiling_handler_lite.h"
 
 namespace Hccl {
 

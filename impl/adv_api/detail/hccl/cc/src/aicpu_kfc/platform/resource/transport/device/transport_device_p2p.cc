@@ -13,11 +13,11 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "adapter_hal_pub.h"
-#include "mem_name_repository_pub.h"
-#include "adapter_rts.h"
-#include "device_capacity.h"
-#include "dispatcher_aicpu_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_aicpu_pub.h"
 
 namespace hccl {
 TransportDeviceP2p::TransportDeviceP2p(DispatcherPub *dispatcher,

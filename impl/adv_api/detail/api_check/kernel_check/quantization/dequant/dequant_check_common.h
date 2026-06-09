@@ -22,10 +22,10 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_QUANTIZATION_DEQUANT_DEQUANT_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_QUANTIZATION_DEQUANT_DEQUANT_CHECK_COMMON_H_
 
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/single_tensor_check.h"
-#include "../../basic_check/multiple_tensor_check.h"
-#include "include/adv_api/quantization/ascend_dequant_utils.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/multiple_tensor_check.h"
+#include "../../../../../../../include/adv_api/quantization/ascend_dequant_utils.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

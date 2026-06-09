@@ -23,15 +23,15 @@
 #ifndef IMPL_QUANTIZATION_DEQUANTIZE_IMPL_H
 #define IMPL_QUANTIZATION_DEQUANTIZE_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
-#include "../dequant/ascend_dequant_common_impl.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "impl/adv_api/detail/quantization/dequant/ascend_dequant_common_impl.h"
+#include "impl/basic_api/kernel_pop_stack_buffer.h"
 #include "dequantize_common.h"
-#include "../../common/check.h"
+#include "impl/adv_api/detail/common/check.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../dequant/ascend_dequant_3510_impl.h"
+#include "impl/adv_api/detail/quantization/dequant/ascend_dequant_3510_impl.h"
 #endif
 
 namespace AscendC {

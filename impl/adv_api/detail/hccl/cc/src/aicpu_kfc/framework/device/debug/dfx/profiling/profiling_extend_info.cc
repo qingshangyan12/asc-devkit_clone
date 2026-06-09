@@ -9,11 +9,11 @@
 */
 #include <sstream>
 #include <unordered_map>
-#include "common/aicpu_sqe_context.h"
-#include "task_profiling_pub.h"
-#include "common/aicpu_hccl_common.h"
-#include "profiling_manager_device.h"
-#include "profiling_extend_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_profiling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_extend_info.h"
 
 namespace dfx {
 uint64_t g_taskHashIds[static_cast<uint64_t>(hccl::ProfTaskType::TASK_INVALID)];

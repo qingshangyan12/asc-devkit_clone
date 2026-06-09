@@ -13,17 +13,17 @@
 #include <fstream>
 #include <fcntl.h>
 #include <unistd.h>
-#include <hccl/hccl_types.h>
-#include "device_capacity.h"
-#include "hccl_communicator.h"
-#include "hccl_comm_pub.h"
-#include "task_abort_handler_pub.h"
-#include "coll_alg_utils.h"
-#include "env_config.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/hccl_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/task_abort_handler_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 #include "independent_op.h"
-#include "comm_configer.h"
-#include "hccl_group_utils.h"
-#include "hccl_dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm_configer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/group/hccl_group_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_dispatcher_ctx.h"
 
 namespace hccl {
 RankTable_t g_hcclDefaultRankTable;

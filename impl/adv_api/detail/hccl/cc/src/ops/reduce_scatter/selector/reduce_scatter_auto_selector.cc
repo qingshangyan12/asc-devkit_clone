@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "reduce_scatter_auto_selector.h"
-#include "selector_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/selector/selector_registry.h"
 
 namespace mc2_ops_hccl {
 constexpr u32 MAX_RANK_NUM_FOR_CONCURRENT_ALGO = 4;

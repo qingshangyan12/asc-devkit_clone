@@ -9,10 +9,10 @@
 */
 #include "aicpu_dispatcher.h"
 
-#include "common/aicpu_sqe_context.h"
-#include "common/aicpu_hccl_common.h"
-#include "utils/hccl_aicpu_utils.h"
-#include "adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
 
 using namespace hccl;
 

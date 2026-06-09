@@ -21,11 +21,11 @@
 
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_XOR_LOGICAL_XOR_CHECK_C310_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_LOGICAL_XOR_LOGICAL_XOR_CHECK_C310_H_
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/calcount_check.h"
-#include "../../basic_check/reuse_source_check.h"
-#include "../../basic_check/single_tensor_check.h"
-#include "../../basic_check/multiple_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/calcount_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/reuse_source_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/multiple_tensor_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

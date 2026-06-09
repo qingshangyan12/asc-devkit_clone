@@ -9,7 +9,7 @@
 */
 #include "reduce_scatter_hccs_sio.h"
 #include "alg_template_register.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 
 namespace hccl {
 using namespace std;

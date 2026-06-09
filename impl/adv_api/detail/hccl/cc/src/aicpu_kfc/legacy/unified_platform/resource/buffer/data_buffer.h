@@ -13,8 +13,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
-#include "string_util.h"
-#include "hash_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/hash_utils.h"
 namespace Hccl {
 
 class DataBuffer {

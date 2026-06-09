@@ -16,12 +16,12 @@
 #ifndef API_CONV3D_GROUPOPT_SUB_API_H
 #define API_CONV3D_GROUPOPT_SUB_API_H
 
-#include "../conv3d_util.h"
-#include "kernel_tpipe.h"
-#include "kernel_operator_data_copy_intf.h"
-#include "kernel_operator_mm_intf.h"
-#include "kernel_operator_fixpipe_intf.h"
-#include "kernel_utils.h"
+#include "impl/adv_api/detail/conv/conv3d/conv3d_util.h"
+#include "../../../../../../include/basic_api/kernel_tpipe.h"
+#include "../../../../../../include/basic_api/kernel_operator_data_copy_intf.h"
+#include "../../../../../../include/basic_api/kernel_operator_mm_intf.h"
+#include "../../../../../../include/basic_api/kernel_operator_fixpipe_intf.h"
+#include "impl/basic_api/kernel_utils.h"
 
 namespace Conv3dApiFunc {
 

@@ -9,7 +9,7 @@
 */
 #ifndef COLL_RUN_ALLTOALLV_FOR_310P_EXECUTOR_H
 #define COLL_RUN_ALLTOALLV_FOR_310P_EXECUTOR_H
-#include "coll_all_to_all_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_all_to_all/coll_all_to_all_executor.h"
 namespace hccl {
 class CollRunAlltoAllVFor310PExecutor : public CollAlltoAllExecutor {
 public:

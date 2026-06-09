@@ -12,9 +12,9 @@
 
 #include <string>
 #include <vector>
-#include "op_mode.h"
-#include "types.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 
 namespace Hccl {
 using CollAlgParams = struct CollAlgParamsDef {

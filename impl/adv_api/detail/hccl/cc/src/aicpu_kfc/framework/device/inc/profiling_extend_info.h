@@ -9,7 +9,7 @@
 */
 #ifndef ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_PROFILING_PROFILING_EXTEND_INFO_H_
 #define ASCEND_ACE_COMOP_HCCL_HCCL_AI_CPU_KERNEL_DFX_PROFILING_PROFILING_EXTEND_INFO_H_
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "prof_common.h"
 class SqeInfo;
 class AicpuComContext;

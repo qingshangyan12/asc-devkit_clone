@@ -10,13 +10,13 @@
 #ifndef HCCL_NETWORK_H
 #define HCCL_NETWORK_H
 
-#include "hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
 #include "hccl_common.h"
-#include "hccl_ip_address.h"
-#include "hccl_net_dev.h"
-#include "rma_buffer_mgr.h"
-#include "local_ipc_rma_buffer.h"
-#include "local_rdma_rma_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_net_dev.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/buffer_manager/rma_buffer_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/inner/local_ipc_rma_buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/inner/local_rdma_rma_buffer.h"
 
 namespace hccl {
 class NetDevContext {

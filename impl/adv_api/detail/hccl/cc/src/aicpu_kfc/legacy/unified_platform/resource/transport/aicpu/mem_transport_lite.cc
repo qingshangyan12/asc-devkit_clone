@@ -11,9 +11,9 @@
 #include "ub_transport_lite_impl.h"
 #include "p2p_transport_lite_impl.h"
 #include "binary_stream.h"
-#include "not_support_exception.h"
-#include "internal_exception.h"
-#include "exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
 namespace Hccl {
 
 MemTransportLite::MemTransportLite(std::vector<char>                                                 &uniqueId,

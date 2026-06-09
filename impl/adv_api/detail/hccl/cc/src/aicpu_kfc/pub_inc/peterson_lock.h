@@ -13,7 +13,7 @@
 #include <string>
 #include <thread>
 #include <atomic>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "mem_device_pub.h"
 

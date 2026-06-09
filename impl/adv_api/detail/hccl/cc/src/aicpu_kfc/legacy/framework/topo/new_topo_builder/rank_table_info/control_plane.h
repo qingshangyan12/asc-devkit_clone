@@ -12,9 +12,9 @@
 
 #include <string>
 #include "nlohmann/json.hpp"
-#include "ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
 #include "nlohmann/json.hpp"
-#include "topo_common_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/topo_common_types.h"
 
 
 namespace Hccl {

@@ -23,7 +23,7 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_HCOMM_IMPL_DEF_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_HCOMM_IMPL_DEF_H
 
-#include "../common/hcomm_base.h"
+#include "impl/adv_api/detail/hcomm/common/hcomm_base.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "hcomm_v220_impl.h"

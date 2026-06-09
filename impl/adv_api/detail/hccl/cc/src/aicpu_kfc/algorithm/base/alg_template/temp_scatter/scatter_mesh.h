@@ -10,7 +10,7 @@
 #ifndef SCATTER_MESH_H
 #define SCATTER_MESH_H
 
-#include "scatter_mesh_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/scatter_mesh_pub.h"
 
 namespace hccl {
 constexpr s32 HCCL_S32_NUM_128 = 128;

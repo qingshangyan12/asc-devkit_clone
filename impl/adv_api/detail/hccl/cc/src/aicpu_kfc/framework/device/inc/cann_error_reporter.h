@@ -11,7 +11,7 @@
 #define RAS_REPORTER_H
 
 #include <map>
-#include "adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
 
 namespace dfx {
 enum class HcclReportEvent{

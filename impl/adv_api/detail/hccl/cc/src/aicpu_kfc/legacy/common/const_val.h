@@ -9,7 +9,7 @@
 */
 #ifndef HCCLV2_CONST_VAL_H
 #define HCCLV2_CONST_VAL_H
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 namespace Hccl {
 constexpr u32 CANN_VERSION_MAX_LEN = 50; // Cann版本信息的最大长度为50
 constexpr u32 SOC_VERSION_MAX_LEN  = 32; // soc version的最大长度为32

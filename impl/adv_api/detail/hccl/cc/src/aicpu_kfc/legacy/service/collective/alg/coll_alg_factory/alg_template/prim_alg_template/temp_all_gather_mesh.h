@@ -10,10 +10,10 @@
 #ifndef HCCLV2_TEMP_ALL_GATHER_MESH
 #define HCCLV2_TEMP_ALL_GATHER_MESH
 
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 
 #include "alg_template_base_v2.h"
-#include "connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
 
 namespace Hccl {
 

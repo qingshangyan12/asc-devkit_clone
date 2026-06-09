@@ -10,6 +10,6 @@
 #ifndef CALC_MESH_TRANSPORT_REQ_H
 #define CALC_MESH_TRANSPORT_REQ_H
 
-#include "calc_mesh_transport_req_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/calc_mesh_transport_req_pub.h"
 
 #endif /* CALC_MESH_TRANSPORT_REQ_H */

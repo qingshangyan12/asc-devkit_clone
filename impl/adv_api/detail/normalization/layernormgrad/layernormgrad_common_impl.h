@@ -22,14 +22,14 @@
 #ifndef IMPL_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H
 #define IMPL_NORMALIZATION_LAYERNORMGRAD_LAYERNORMGRAD_COMMON_IMPL_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/adv_api/normalization/layernormgrad_utils.h"
+#include "../../../../../include/adv_api/normalization/layernormgrad_utils.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/normalization/layernormgrad/layernormgrad_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/normalization/layernormgrad/layernormgrad_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 const uint32_t LAYERNORM_GRAD_B32_BYTE_SIZE = 4;
 const uint32_t LAYERNORM_GRAD_B16_BYTE_SIZE = 2;
 

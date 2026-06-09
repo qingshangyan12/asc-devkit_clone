@@ -23,7 +23,7 @@
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_FLASH_H
 
 #include <type_traits>
-#include "../softmax_flash_base_impl/softmax_flash_nd_process_impl.h"
+#include "impl/adv_api/detail/activation/softmax/softmax_flash_base_impl/softmax_flash_nd_process_impl.h"
 
 namespace AscendC {
 

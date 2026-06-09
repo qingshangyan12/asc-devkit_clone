@@ -13,11 +13,11 @@
 #include <unordered_set>
 #include <algorithm>
 
-#include "virtual_topo.h"
-#include "rank_gph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
 #include "log.h"
-#include "dev_type.h"
-#include "const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
 
 namespace Hccl {
 constexpr int RANK_SIZE_TWO   = 2;

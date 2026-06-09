@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-#include "transport_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/transport_base_pub.h"
 
 namespace hccl {
 

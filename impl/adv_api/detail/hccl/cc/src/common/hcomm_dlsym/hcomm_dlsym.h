@@ -10,8 +10,8 @@
 #ifndef HCOMM_DLSYM_H
 #define HCOMM_DLSYM_H
 
-#include "hccl_types.h"
-#include "dtype_common.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "acl/acl_rt.h"
 
 #ifdef __cplusplus

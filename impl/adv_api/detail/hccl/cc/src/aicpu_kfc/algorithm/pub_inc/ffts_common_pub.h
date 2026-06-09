@@ -15,11 +15,11 @@
 #include <vector>
 #include <memory>
 
-#include "hccl/base.h"
-#include "adapter_rts_common.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 #include "hccl_common.h"
 #include "common.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 
 namespace hccl {
 enum class ReduceType {

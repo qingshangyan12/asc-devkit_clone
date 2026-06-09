@@ -10,15 +10,15 @@
 #ifndef HCCL_ALLOC_CTX_RES_H
 #define HCCL_ALLOC_CTX_RES_H
 
-#include "topo_host.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_host.h"
 #include "adapter_error_manager_pub.h"
-#include "alg_param.h"
-#include "op_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/op_common.h"
 #include "alg_env_config.h"
-#include "hccl_res_expt.h"
-#include "load_kernel.h"
-#include "coll_alg_v2_exec_registry.h"
-#include "cann_host_bridge.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_res_expt.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/aicpu/load_kernel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/registry/coll_alg_v2_exec_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/cann_host_bridge.h"
 
 #include <vector>
 #include <memory>

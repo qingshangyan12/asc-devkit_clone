@@ -9,7 +9,7 @@
 */
 #include "aicpu_zero_copy_exchanger.h"
 #include "ascend_hal.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 
 namespace hccl {
 ZeroCopyAddressMgr AicpuZeroCopyExchanger::globalAddrMgr_;

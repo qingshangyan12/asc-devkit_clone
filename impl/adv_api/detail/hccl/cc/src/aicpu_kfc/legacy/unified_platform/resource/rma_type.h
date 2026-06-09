@@ -11,7 +11,7 @@
 #define HCCLV2_RMA_TYPE_H
 #include <map>
 #include <string>
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 namespace Hccl {
 MAKE_ENUM(RmaType, IPC, RDMA, UB)
 } // namespace Hccl

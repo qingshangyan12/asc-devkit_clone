@@ -10,10 +10,10 @@
 #ifndef HCCLV2_ALL_GATHER_SEQ_EXECUTOR
 #define HCCLV2_ALL_GATHER_SEQ_EXECUTOR
 
-#include "temp_all_gather_ring.h"
-#include "temp_all_gather_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_all_gather_ring.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/temp_all_gather_mesh.h"
 #include "coll_alg_base.h"
-#include "topo_match_mesh_ring.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh_ring.h"
 
 namespace Hccl {
 template <typename AlgTopoMatch, typename AlgTemp0, typename AlgTemp1> class AllGatherSeqExecutor : public CollAlgBase {

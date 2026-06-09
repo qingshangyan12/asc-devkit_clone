@@ -12,8 +12,8 @@
 
 #include <set>
 #include <mutex>
-#include <hccl/hccl_types.h>
-#include "aicpu_operator_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
 
 namespace hccl {
 /*

@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "transport_manager.h"
-#include "p2p_mgmt_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/p2p_mgmt_pub.h"
 #include <algorithm>
-#include "rank_consistentcy_checker.h"
-#include "env_config.h"
-#include "detect_connect_anomalies.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/health/rank_consistentcy_checker.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/cluster_maintenance/detect/detect_connect_anomalies/detect_connect_anomalies.h"
 #include "../../nslbdp/hccl_nslbdp.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 #include "rt_external.h"
 
 namespace hccl {

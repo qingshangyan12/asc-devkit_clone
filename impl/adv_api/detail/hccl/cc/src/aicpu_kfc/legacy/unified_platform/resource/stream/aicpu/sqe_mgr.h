@@ -14,7 +14,7 @@
 
 #include "ascend_hal.h"
 #include "hccl_sqe.h"
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 
 namespace Hccl {
 

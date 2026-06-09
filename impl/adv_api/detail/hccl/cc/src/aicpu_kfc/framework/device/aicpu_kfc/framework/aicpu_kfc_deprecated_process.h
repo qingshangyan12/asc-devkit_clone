@@ -10,7 +10,7 @@
 #ifndef AICPU_KFC_DEPRECATED_PROCESS_H
 #define AICPU_KFC_DEPRECATED_PROCESS_H
 
-#include "common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
 #include "aicpu_kfc_rpc_server.h"
 
 class AicpuKfcDeprecatedProcess {

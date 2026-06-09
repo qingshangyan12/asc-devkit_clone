@@ -11,7 +11,7 @@
 #define COLL_REDUCESCATTERV_MESH_AIV_SMALLCOUNT_EXECUTOR_H
 
 #include "coll_reduce_scatter_v_executor.h"
-#include "hccl_aiv.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_aiv.h"
 
 namespace hccl {
 class CollReduceScatterVMeshAivSmallCountExecutor : public CollReduceScatterVExecutor {

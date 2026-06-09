@@ -10,8 +10,8 @@
 #ifndef HCCL_AICPU_HDC_HANDLER_H
 #define HCCL_AICPU_HDC_HANDLER_H
 
-#include "hdc_pub.h"
-#include "kfc.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kfc.h"
 
 namespace hccl {
 

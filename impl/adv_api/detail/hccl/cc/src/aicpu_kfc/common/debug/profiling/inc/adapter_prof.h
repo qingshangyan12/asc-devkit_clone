@@ -10,11 +10,11 @@
 #ifndef HCCL_INC_ADAPTER_PROF_H
 #define HCCL_INC_ADAPTER_PROF_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 #include "rt_external.h"
 #include "dlprof_function.h"
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 uint64_t hrtMsprofGetHashId(const char *hashInfo, uint32_t length);
 uint64_t hrtMsprofSysCycleTime(void);

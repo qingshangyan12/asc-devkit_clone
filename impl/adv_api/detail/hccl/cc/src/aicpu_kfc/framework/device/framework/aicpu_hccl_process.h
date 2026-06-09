@@ -15,10 +15,10 @@
 #include <string>
 #include "common.h"
 #include "aicpu_communicator.h"
-#include "common/aicpu_hccl_def.h"
-#include "hdc_pub.h"
-#include "stream_pub.h"
-#include "aicpu_launch_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/resource/engine/aicpu_launch_manager.h"
 
 class AicpuHcclProcess {
 public:

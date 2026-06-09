@@ -11,7 +11,7 @@
 #include <set>
 #include <functional>
 #include <unordered_map>
-#include "topo_common_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/topo_common_types.h"
 
 namespace Hccl {
 

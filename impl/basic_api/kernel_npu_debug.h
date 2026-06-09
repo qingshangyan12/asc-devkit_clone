@@ -21,9 +21,9 @@
 #define ASCENDC_MODULE_OPERATOR_KERNEL_NPU_DEBUG_H
 
 #include "kernel_log.h"
-#include "utils/kernel_utils_ceil_oom_que.h"
-#include "utils/kernel_utils_constants.h"
-#include "kernel_tensor.h"
+#include "impl/basic_api/utils/kernel_utils_ceil_oom_que.h"
+#include "impl/basic_api/utils/kernel_utils_constants.h"
+#include "../../include/basic_api/kernel_tensor.h"
 
 namespace AscendC {
 

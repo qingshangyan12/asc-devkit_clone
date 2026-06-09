@@ -13,8 +13,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
-#include "hccl_mem_defs.h"
-#include "enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
 namespace Hccl {
 
 class Buffer {

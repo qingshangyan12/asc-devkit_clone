@@ -15,11 +15,11 @@
 
 #include <set>
 
-#include "include/adv_api/activation/softmax_tilingdata.h"
-#include "include/adv_api/activation/softmax_tiling.h"
-#include "tiling/platform/platform_ascendc.h"
-#include "../../detail/host_log.h"
-#include "../../detail/api_check/host_apicheck.h"
+#include "../../../../include/adv_api/activation/softmax_tilingdata.h"
+#include "../../../../include/adv_api/activation/softmax_tiling.h"
+#include "../../../../include/utils/tiling/platform/platform_ascendc.h"
+#include "impl/adv_api/detail/host_log.h"
+#include "impl/adv_api/detail/api_check/host_apicheck.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(SoftMaxTilingOpApi, SoftMaxTiling)

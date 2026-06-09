@@ -10,10 +10,10 @@
 #ifndef TASK_EXCEPTION_H
 #define TASK_EXCEPTION_H
 
-#include "hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
-#include "aicpu_operator_pub.h"
-#include "hcomm_diag.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcomm_diag.h"
 
 namespace hccl {
 constexpr u32 OP_INFO_MAX_SIZE = 2048;

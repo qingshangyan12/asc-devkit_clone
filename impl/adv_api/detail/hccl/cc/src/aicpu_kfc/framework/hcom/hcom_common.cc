@@ -12,27 +12,27 @@
 #include <vector>
 #include <string>
 #include <securec.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 // ltm指定config路径
-#include "common/src/config.h"
-#include "hccl/base.h"
-#include "param_check_pub.h"
-#include "remote_access.h"
-#include "../op_base/src/op_base.h"
-#include "hccl/hcom.h"
-#include "rank_consistentcy_checker.h"
-#include "profiling_manager_pub.h"
-#include "topoinfo_ranktableParser_pub.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/param_check_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/remote_access.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/op_base/src/op_base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/health/rank_consistentcy_checker.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableParser_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "mmpa/mmpa_api.h"
 #include "hcom_common.h"
-#include "comm_configer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm_configer.h"
 #include "hcom_private_v2.h"
 #include "hcom_common_v2.h"
 
-#include "comm_base_pub.h"
-#include "coll_alg_utils.h"
-#include "json_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/json_utils.h"
 
 using namespace std;
 using namespace hccl;

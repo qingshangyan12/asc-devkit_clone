@@ -24,10 +24,10 @@
 #define IMPL_ACTIVATION_SOFTMAX_V220_SOFTMAX_IMPL_H
 
 #include "softmax_common_impl.h"
-#include "../common/softmax_impl/softmax_basic_block_impl.h"
-#include "../common/softmax_impl/softmax_generic_nz_impl.h"
-#include "../common/softmax_impl/softmax_generic_nd_impl.h"
-#include "../common/softmax_common_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_impl/softmax_basic_block_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_impl/softmax_generic_nz_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_impl/softmax_generic_nd_impl.h"
+#include "impl/adv_api/detail/activation/softmax/membase/common/softmax_common_impl.h"
 
 namespace AscendC {
 

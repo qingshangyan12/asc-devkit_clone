@@ -22,9 +22,9 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_COPY_TILE_TO_CUBE_INTF_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_COPY_TILE_TO_CUBE_COPY_TILE_TO_CUBE_INTF_H
 
-#include "../../../utils/matmul_module.h"
-#include "../../../utils/matmul_param.h"
-#include "../base/copy_cube_in_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/base/copy_cube_in_utils.h"
 
 namespace AscendC {
 namespace Impl {

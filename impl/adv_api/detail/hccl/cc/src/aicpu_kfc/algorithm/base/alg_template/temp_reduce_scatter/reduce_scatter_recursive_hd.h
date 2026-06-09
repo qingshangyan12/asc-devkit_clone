@@ -10,7 +10,7 @@
 #ifndef REDUCE_SCATTER_RECURSIVE_HD_H
 #define REDUCE_SCATTER_RECURSIVE_HD_H
 
-#include "reduce_scatter_recursive_hd_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_recursive_hd_pub.h"
 
 namespace hccl {
     constexpr u32 NSLBDP_REDUCE_SCATTER_MOLD2 = 2;

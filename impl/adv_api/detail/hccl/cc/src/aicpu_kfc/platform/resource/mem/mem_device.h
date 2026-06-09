@@ -10,7 +10,7 @@
 #ifndef MEM_DEVICE_H
 #define MEM_DEVICE_H
 
-#include "mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
 
 namespace hccl {
 }  // namespace hccl

@@ -9,7 +9,7 @@
 */
 #ifndef ALG_CMD_TYPE_H
 #define ALG_CMD_TYPE_H
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <map>
 
 const std::map<HcclCMDType, std::string> HCOM_CMD_TYPE_STR_MAP{

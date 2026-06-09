@@ -22,8 +22,8 @@
 #ifndef IMPL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_INTF_H
 #define IMPL_MATMUL_RESOURCE_CUBE_IN_BUFFER_CUBE_IN_BUFFER_INTF_H
 
-#include "../../utils/matmul_module.h"
-#include "../../utils/matmul_utils.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
 
 #include "cube_in_buffer_utils.h"
 

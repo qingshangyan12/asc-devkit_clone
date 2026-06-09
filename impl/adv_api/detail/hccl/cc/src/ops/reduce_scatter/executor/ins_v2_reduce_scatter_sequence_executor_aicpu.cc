@@ -9,7 +9,7 @@
 */
 
 #include "ins_v2_reduce_scatter_sequence_executor_aicpu.h"
-#include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/reduce_scatter/template/aicpu/ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "alg_data_trans_wrapper.h"
 

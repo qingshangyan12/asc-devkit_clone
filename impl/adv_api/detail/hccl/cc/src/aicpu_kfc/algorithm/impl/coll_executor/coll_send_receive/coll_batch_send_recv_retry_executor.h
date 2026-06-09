@@ -10,7 +10,7 @@
 #ifndef COLL_BATCH_SEND_RECV_RETRY_EXECUTOR_H
 #define COLL_BATCH_SEND_RECV_RETRY_EXECUTOR_H
 
-#include "coll_comm_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_comm_executor.h"
 #include "coll_batch_send_recv_executor.h"
 
 namespace hccl {

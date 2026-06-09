@@ -9,7 +9,7 @@
 */
 #ifndef COLL_ALLGATHER_V_RING_FOR_910_93_EXECUTOR_H
 #define COLL_ALLGATHER_V_RING_FOR_910_93_EXECUTOR_H
-#include "coll_all_gather_ring_for_910_93_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_all_gather/coll_all_gather_ring_for_910_93_executor.h"
 namespace hccl {
 class CollAllGatherVRingFor91093Executor : public CollAllGatherRingFor91093Executor {
 public:

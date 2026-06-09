@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_INTF_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_OUT_COPY_CUBE_OUT_INTF_H
 
-#include "../../feature_trait/matmul_chip_cap.h"
+#include "impl/adv_api/detail/matmul/feature_trait/matmul_chip_cap.h"
 
 namespace AscendC {
 namespace Impl {

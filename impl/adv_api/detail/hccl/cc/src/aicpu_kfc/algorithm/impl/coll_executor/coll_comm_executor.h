@@ -12,10 +12,10 @@
 
 #include "coll_native_executor_base.h"
 #include "coll_alg_exec_registry.h"
-#include "profiler_base_pub.h"
-#include "send_receive_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/send_receive_pub.h"
 #include "alg_template_register.h"
-#include "alltoallv_staged_calculator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/alltoallv_staged_calculator_pub.h"
 
 namespace hccl {
 constexpr u32 NSLBDP_MIN_COUNT = 128; 

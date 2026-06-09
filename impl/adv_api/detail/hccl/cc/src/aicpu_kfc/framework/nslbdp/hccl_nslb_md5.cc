@@ -9,8 +9,8 @@
 */
 #include <fcntl.h>
 #include <unistd.h>
-#include <hccl/hccl_types.h>
-#include "sal_pub.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "hccl_nslb_md5.h"
 
 namespace hccl {

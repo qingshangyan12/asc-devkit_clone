@@ -10,7 +10,7 @@
 #include <cmath>
 #include "p2p_transport_lite_impl.h"
 #include "binary_stream.h"
-#include "exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
 #include "sal.h"
 
 namespace Hccl {

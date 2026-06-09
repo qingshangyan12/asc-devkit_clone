@@ -10,12 +10,12 @@
 #ifndef NOTIFY_BASE_H
 #define NOTIFY_BASE_H
 
-#include "adapter_rts.h"
-#include "adapter_hal.h"
-#include "hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
-#include "mem_name_repository_pub.h"
-#include "dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
 
 namespace hccl {
 

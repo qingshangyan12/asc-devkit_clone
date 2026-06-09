@@ -11,14 +11,14 @@
 #include <algorithm>
 #include <string>
 #include <unordered_map>
-#include "types.h"
-#include "const_val.h"
-#include "dev_type.h"
-#include "const_val.h"
-#include "invalid_params_exception.h"
-#include "not_support_exception.h"
-#include "internal_exception.h"
-#include "orion_adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/external_system/orion_adapter_hccp.h"
 
 namespace Hccl {
 

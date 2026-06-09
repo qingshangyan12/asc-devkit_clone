@@ -11,20 +11,20 @@
 
 #include "log.h"
 
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 
-#include "topo_match_mesh.h"
-#include "topo_match_nhr.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 
-#include "ins_temp_all_gather_mesh.h"
-#include "ins_temp_all_gather_mesh_2D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_all_gather_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_temp_all_gather_mesh_2D.h"
 #include "ins_temp_all_gather_nhr.h"
 #ifndef CCL_KERNEL_AICPU
 #include "ccu_temp_all_gather_mesh_1D_mem2mem_with_stride.h"
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_nhr_1D_mem2mem.h"
 #include "ccu_temp_all_gather_mesh_2D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D_mem2mem.h"
 #include "aiv_temp_all_gather_mesh_1D.h"
 #include "ccu_temp_all_gather_mesh_1D_2die.h"
 #endif

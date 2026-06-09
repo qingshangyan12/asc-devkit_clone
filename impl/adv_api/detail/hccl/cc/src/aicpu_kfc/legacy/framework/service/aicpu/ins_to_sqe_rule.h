@@ -11,9 +11,9 @@
 #define HCCL_INS_RULE_H
 
 #include <vector>
-#include "hccl_sqe.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/hccl_sqe.h"
 #include "instruction.h"
-#include "lite_res_mgr_fetcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/lite_res_mgr_fetcher.h"
 namespace Hccl {
 constexpr u32 RTSQ_TASK_ID             = 0;
 constexpr u32 RTSQ_PART_ID             = 0;

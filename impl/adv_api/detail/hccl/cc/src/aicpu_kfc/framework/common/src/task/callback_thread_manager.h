@@ -12,7 +12,7 @@
 
 #include <map>
 #include <mutex>
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace hccl {
 

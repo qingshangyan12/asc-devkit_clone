@@ -18,15 +18,15 @@
 #ifndef IMPL_REDUCE_REDUCE_ALL_REDUCE_ALL_C310_IMPL_H_
 #define IMPL_REDUCE_REDUCE_ALL_REDUCE_ALL_C310_IMPL_H_
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
-#include "../../common/check.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "impl/adv_api/detail/common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/reduce/reduce_all/reduce_all_check.h"
-#include "../../api_check/kernel_api_check.h"
-#include "../reduce_common_util_3510_impl.h"
-#include "../reduce_common_ar_reuse_align_3510_impl.h"
-#include "../reduce_common_ra_reuse_align_3510_impl.h"
+#include "impl/adv_api/detail/api_check/kernel_check/reduce/reduce_all/reduce_all_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/reduce/reduce_common_util_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ar_reuse_align_3510_impl.h"
+#include "impl/adv_api/detail/reduce/reduce_common_ra_reuse_align_3510_impl.h"
 #endif // ASCENDC_CPU_DEBUG
 
 namespace AscendC {

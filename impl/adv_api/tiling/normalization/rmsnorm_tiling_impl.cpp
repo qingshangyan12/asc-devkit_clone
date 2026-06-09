@@ -8,9 +8,9 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "include/adv_api/normalization/rmsnorm_tiling.h"
+#include "../../../../include/adv_api/normalization/rmsnorm_tiling.h"
 
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 
 namespace optiling {
 REGISTER_TILING_DATA_CLASS(RmsNormTilingOpApi, RmsNormTiling);

@@ -16,12 +16,12 @@
 #include <map>
 #include <thread>
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "common.h"
-#include "workflow_pub.h"
-#include "dispatcher_task_types.h"
-#include "alg_profiling.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher_task_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/alg_profiling.h"
 
 #define HCCL_PROFILER_ADD_STREAM_BY_STREAMID(streamId, tag, planeID, algType)
 #define HCCL_PROFILER_DEL_STREAM_BY_STREAMID(streamId)

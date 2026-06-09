@@ -11,13 +11,13 @@
 #define TOPO_MATCHER_H
 
 #include <condition_variable>
-#include "dispatcher.h"
-#include "comm_base_pub.h"
-#include "externalinput_pub.h"
-#include "coll_alg_param.h"
-#include "comm_factory_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/legacy/comm_factory_pub.h"
 #include "hccl_common.h"
-#include "calc_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/calc_impl.h"
 #include "alg_env_config.h"
 
 namespace hccl {

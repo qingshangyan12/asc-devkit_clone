@@ -12,8 +12,8 @@
 
 #include <string>
 #include "aicpu_schedule/aicpu_context.h"
-#include "common/aicpu_hccl_def.h"
-#include "hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
 
 class HcclAicpuUtils {
 public:

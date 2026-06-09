@@ -12,7 +12,7 @@
 
 #include <functional>
 #include <atomic>
-#include "transport_ibverbs_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_ibverbs_pub.h"
 
 namespace hccl {
 constexpr u32 IBV_SGLIST_LEN_MAX = 2147483648;

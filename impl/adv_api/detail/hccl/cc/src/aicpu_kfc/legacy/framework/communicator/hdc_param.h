@@ -10,7 +10,7 @@
 #ifndef HCCLV2_HDC_PARAM_H
 #define HCCLV2_HDC_PARAM_H
 
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 
 namespace Hccl {
 constexpr u32 HCCLV2_HDC_TYPE_D2H = 0;

@@ -22,12 +22,12 @@
 #ifndef IMPL_ACTIVATION_SWIGLU_SWIGLU_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SWIGLU_SWIGLU_COMMON_IMPL_H
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_tensor.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #ifdef ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_check/activation/swiglu/swiglu_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/activation/swiglu/swiglu_check.h"
 #endif // ASCENDC_CPU_DEBUG
-#include "../../api_check/kernel_api_check.h"
+#include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
 namespace AscendC {
 constexpr float NUMBER_ONE = 1.0;

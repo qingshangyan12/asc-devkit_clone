@@ -7,14 +7,14 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl_primitive_local.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_primitive_local.h"
 #include "log.h"
-#include "mem_device_pub.h"
-#include "hccl_dispatcher_ctx.h"
-#include "dispatcher_task_types.h"
-#include "dispatcher_aicpu_pub.h"
-#include "local_notify.h"
-#include "dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher_task_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_aicpu_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/dispatcher_ctx/dispatcher_ctx.h"
 
 HcclResult GetPubDispatcher(hccl::DispatcherPub** dispatcherPtr)
 {

@@ -12,9 +12,9 @@
 
 #include <unordered_set>
 
-#include "executor_utils.h"
-#include "alg_template_base_v2.h"
-#include "hccl_params_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/alg_template_base_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/include/hccl_params_pub.h"
 
 namespace Hccl {
 class CollAlgBase {

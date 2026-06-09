@@ -9,8 +9,8 @@
 */
 #include "all_reduce_nhr_oneshot.h"
 #include "alg_template_register.h"
-#include "reduce_nhr_oneshot.h"
-#include "broadcast_nhr_oneshot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_reduce/reduce_nhr_oneshot.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/temp_broadcast/broadcast_nhr_oneshot.h"
 
 namespace hccl {
 AllReduceNHROneshot::AllReduceNHROneshot(const HcclDispatcher dispatcher) : NHRBase(dispatcher)

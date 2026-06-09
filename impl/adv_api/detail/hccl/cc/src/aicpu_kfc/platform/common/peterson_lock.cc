@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <securec.h>
-#include "adapter_rts_common.h"
-#include "peterson_lock.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/peterson_lock.h"
 
 namespace hccl {
 PetersonLock::PetersonLock(u64 timeoutSec)

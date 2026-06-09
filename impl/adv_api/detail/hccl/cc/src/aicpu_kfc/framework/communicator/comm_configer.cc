@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
  
-#include "comm_configer.h"
-#include "adapter_rts_common.h"
-#include "externalinput.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm_configer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/externalinput.h"
 #include "alg_env_config.h"
  
 namespace hccl {

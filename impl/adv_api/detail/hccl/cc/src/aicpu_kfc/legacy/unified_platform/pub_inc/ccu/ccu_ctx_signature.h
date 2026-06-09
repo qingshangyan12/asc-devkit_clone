@@ -14,8 +14,8 @@
 #include <iostream>
 #include <string>
 #include <ios>
-#include "hash_utils.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/hash_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 
 namespace Hccl {
 

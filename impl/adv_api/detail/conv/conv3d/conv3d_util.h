@@ -16,10 +16,10 @@
 #ifndef API_CONV3D_UTIL_H
 #define API_CONV3D_UTIL_H
 
-#include "kernel_basic_intf.h"
+#include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "kernel_utils.h"
-#include "../common/conv_forward_util.h"
+#include "impl/basic_api/kernel_utils.h"
+#include "impl/adv_api/detail/conv/common/conv_forward_util.h"
 
 namespace Conv3dApi {
 const static uint64_t LOAD2D_MAX_REPEAT_TIMES = 255;

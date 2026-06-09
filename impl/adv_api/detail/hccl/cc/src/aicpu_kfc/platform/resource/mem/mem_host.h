@@ -10,7 +10,7 @@
 #ifndef MEM_HOST_H
 #define MEM_HOST_H
 
-#include "mem_host_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_host_pub.h"
 
 namespace hccl {
 }  // namespace hccl

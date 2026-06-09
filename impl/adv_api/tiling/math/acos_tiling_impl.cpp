@@ -12,12 +12,12 @@
  * \file acos_tiling.cpp
  * \brief
  */
-#include "include/adv_api/math/acos_tiling.h"
+#include "../../../../include/adv_api/math/acos_tiling.h"
 
 #include <cstdint>
 
 #include "graph/tensor.h"
-#include "../../detail/host_log.h"
+#include "impl/adv_api/detail/host_log.h"
 namespace AscendC {
 namespace {
 constexpr uint32_t ACOS_HALF_CALC_PROC = 6;

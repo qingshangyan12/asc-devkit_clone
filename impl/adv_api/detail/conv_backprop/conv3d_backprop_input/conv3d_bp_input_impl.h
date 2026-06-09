@@ -19,8 +19,8 @@
 
 #include "conv3d_bp_input_func.h"
 #include "conv3d_bp_input_impl_base.h"
-#include "../common/conv3d_bp_util.h"
-#include "kernel_utils.h"
+#include "impl/adv_api/detail/conv_backprop/common/conv3d_bp_util.h"
+#include "impl/basic_api/kernel_utils.h"
 
 namespace ConvBackpropApi {
 template <typename Intf_, class Config_>

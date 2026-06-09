@@ -22,8 +22,8 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_UTILS_INIT_GLOBAL_MEMORY_INIT_GLOBAL_MEMORY_CHECK_COMMON_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_UTILS_INIT_GLOBAL_MEMORY_INIT_GLOBAL_MEMORY_CHECK_COMMON_H_
 
-#include "../../basic_check/datatype_check.h"
-#include "../../basic_check/single_tensor_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/datatype_check.h"
+#include "impl/adv_api/detail/api_check/kernel_check/basic_check/single_tensor_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

@@ -7,11 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "adapter_verbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_verbs.h"
 #include <functional>
 
 #include "log.h"
-#include "dlibv_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlibv_function.h"
 
 namespace hccl {
 HcclResult hrtIbvPostSrqRecv(struct ibv_srq *srq, struct ibv_recv_wr *wr, struct ibv_recv_wr **badWr)

@@ -10,8 +10,8 @@
 #ifndef INS_TEMP_ALL_GATHER_NHR_H
 #define INS_TEMP_ALL_GATHER_NHR_H
 
-#include "alg_v2_template_base.h"
-#include "executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/alg_v2_template_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_base.h"
 
 namespace mc2_ops_hccl {
 

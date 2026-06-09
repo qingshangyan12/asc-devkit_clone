@@ -15,7 +15,7 @@
 #ifndef IMPL_HCCL_HCCL_IMPL_DEF_H
 #define IMPL_HCCL_HCCL_IMPL_DEF_H
 
-#include "../common/hccl_base.h"
+#include "impl/adv_api/detail/hccl/common/hccl_base.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "hccl_v220_impl.h"

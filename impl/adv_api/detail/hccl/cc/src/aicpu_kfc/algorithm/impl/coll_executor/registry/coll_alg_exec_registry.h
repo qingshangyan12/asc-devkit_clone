@@ -14,7 +14,7 @@
 #include <functional>
 #include <memory>
 
-#include "coll_executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_executor_base.h"
 
 namespace hccl {
 

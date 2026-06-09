@@ -13,12 +13,12 @@
 #include <unordered_map>
 #include <memory>
 #include <mutex>
-#include "hccl/hccl_res.h"
-#include "hccl_independent_common.h"
-#include "aicpu_ts_thread.h"
-#include "cpu_ts_thread.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/hccl_independent_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/cpu_ts_thread.h"
 #include "log.h"
-#include "manager_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/manager_common.h"
 
 namespace hccl {
 

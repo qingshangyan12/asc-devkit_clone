@@ -9,9 +9,9 @@
 */
 #include "ins_temp_all_gather_nhr_dpu.h"
 #include "alg_data_trans_wrapper.h"
-#include "dpu_alg_data_trans_wrapper.h"
-#include "channel.h"
-#include "alg_v2_template_register.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/wrapper/dpu_alg_data_trans_wrapper.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/registry/alg_v2_template_register.h"
 
 namespace mc2_ops_hccl {
 InsTempAllGatherNHRDPU::InsTempAllGatherNHRDPU(const OpParam& param, const uint32_t rankId,

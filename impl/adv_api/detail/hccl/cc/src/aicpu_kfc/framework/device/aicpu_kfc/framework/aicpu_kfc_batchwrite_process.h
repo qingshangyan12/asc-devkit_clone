@@ -10,9 +10,9 @@
 #ifndef AICPU_KFC_BATCHWRITE_PROCESS_H
 #define AICPU_KFC_BATCHWRITE_PROCESS_H
 
-#include "framework/aicpu_communicator.h"
-#include "common/aicpu_hccl_def.h"
-#include "common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 
 class AicpuKfcBatchwriteProcess {
 public:

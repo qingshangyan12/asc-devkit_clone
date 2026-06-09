@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "rmt_rma_buffer_lite.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "log.h"
 namespace Hccl {
 RmtRmaBufferLite::RmtRmaBufferLite(u64 addr, u64 size) : type_(RmaType::IPC), addr_(addr), size_(size)

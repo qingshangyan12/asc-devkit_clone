@@ -10,7 +10,7 @@
 #ifndef ALLTOALL_V_DIRECT_FULLMESH_PUB_H
 #define ALLTOALL_V_DIRECT_FULLMESH_PUB_H
 
-#include "mc2_handler_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/mc2_handler_pub.h"
 #include "alg_template_register.h"
 
 namespace hccl {

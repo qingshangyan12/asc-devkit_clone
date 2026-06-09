@@ -9,11 +9,11 @@
 */
 #include <chrono>
 #include <thread>
-#include "hccl_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/hccl_communicator.h"
 #include "hccl_common.h"
-#include "hccl_socket.h"
-#include "env_config.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "detect_connect_anomalies.h"
 
 namespace hccl {

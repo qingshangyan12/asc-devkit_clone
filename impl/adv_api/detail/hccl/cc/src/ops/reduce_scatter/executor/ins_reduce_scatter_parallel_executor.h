@@ -10,11 +10,11 @@
 #ifndef HCCLV2_INS_V2_REDUCE_SCATTER_PARALLEL_EXECUTOR_H
 #define HCCLV2_INS_V2_REDUCE_SCATTER_PARALLEL_EXECUTOR_H
 
-#include "executor_common_ops.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_common_ops.h"
 #include "topo_match_base.h"
-#include "topo_match_multilevel.h"
-#include "topo_match_ubx.h"
-#include "topo_match_pcie_mix.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_multilevel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_ubx.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_pcie_mix.h"
 
 namespace mc2_ops_hccl {
 

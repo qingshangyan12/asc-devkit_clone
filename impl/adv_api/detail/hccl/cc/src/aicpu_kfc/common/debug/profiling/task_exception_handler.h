@@ -9,5 +9,5 @@
 */
 #ifndef HCCL_TASK_EXCEPTION_HANDLER_H
 #define HCCL_TASK_EXCEPTION_HANDLER_H
-#include "task_exception_handler_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_exception_handler_pub.h"
 #endif // HCCL_SRC_ADAPTER_H

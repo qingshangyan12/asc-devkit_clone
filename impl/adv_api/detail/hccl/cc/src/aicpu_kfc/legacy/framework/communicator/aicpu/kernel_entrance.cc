@@ -10,15 +10,15 @@
 #include "kernel_entrance.h"
 #include "aicpu_comm_destroy_func.h"
 #include "communicator_impl_lite_manager.h"
-#include "ub_conn_lite_mgr.h"
-#include "aicpu_daemon_service.h"
-#include "task_exception_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_conn_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/aicpu_daemon_service.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_func.h"
 #include "ns_recovery_handler_func.h"
-#include "task_exception_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_handler_lite.h"
 #include "log.h"
-#include "inc/aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/inc/aicpu_utils.h"
 #ifdef CCL_KERNEL_AICPU
-#include "aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
 #endif
 extern "C" {
 using namespace Hccl;

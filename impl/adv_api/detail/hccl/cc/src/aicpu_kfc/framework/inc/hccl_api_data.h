@@ -10,13 +10,13 @@
 #ifndef HCCL_API_DATA_H
 #define HCCL_API_DATA_H
 
-#include "hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <stdint.h>
 #include <securec.h>
 #include <arpa/inet.h>
-#include <hccl/base.h>
-#include "hccl_mem_defs.h"
-#include "hcomm_primitives.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 
 #ifdef __cplusplus
 extern "C" {

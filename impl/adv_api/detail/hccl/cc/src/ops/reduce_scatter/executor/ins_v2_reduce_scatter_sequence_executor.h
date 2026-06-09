@@ -10,9 +10,9 @@
 #ifndef HCCLV2_INS_V2_REDUCE_SCATTER_SOLE_EXECUTOR_H
 #define HCCLV2_INS_V2_REDUCE_SCATTER_SOLE_EXECUTOR_H
 
-#include "executor_common_ops.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_common_ops.h"
 #include "topo_match_base.h"
-#include "topo_match_multilevel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_match_multilevel.h"
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>

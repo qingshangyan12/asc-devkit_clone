@@ -21,10 +21,10 @@
 #include "hccl_mem_alloc.h"
 
 // HCCL
-#include "hccl/base.h"
-#include "hccl_comm.h"
-#include "adapter_rts_common.h"
-#include "hccl_inner.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 
 // NPU VMM API
 #include "acl/acl_rt.h"

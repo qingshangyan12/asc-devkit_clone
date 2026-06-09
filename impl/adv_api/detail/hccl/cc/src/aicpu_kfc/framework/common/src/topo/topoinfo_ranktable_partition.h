@@ -10,11 +10,11 @@
 #ifndef TOPOINFO_RANKTABLE_PARTITION_H
 #define TOPOINFO_RANKTABLE_PARTITION_H
 
-#include <hccl/base.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include <nlohmann/json.hpp>
-#include "topoinfo_struct.h"
-#include "hccl_types.h"
-#include "comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
 
 namespace hccl {
 class TopoinfoRanktablePartition {

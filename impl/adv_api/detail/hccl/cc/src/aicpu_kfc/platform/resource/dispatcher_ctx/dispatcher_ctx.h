@@ -11,8 +11,8 @@
 #define CTX_H
 
 #include "hccl_common.h"
-#include "hccl/base.h"
-#include "notify_pool.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/notify_pool.h"
 
 namespace hccl {
 using FftsCounterCallBack = HcclResult (*)(const HcclDispatcher&, Stream &);

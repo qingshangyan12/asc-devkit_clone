@@ -11,14 +11,14 @@
 #define I_HCCL_ONE_SIDED_SERVICE_H
 
 #include <memory>
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <unordered_set>
-#include "hccl_network_pub.h"
-#include "hccl_socket.h"
-#include "topoinfo_struct.h"
-#include "hccl_socket_manager.h"
-#include "notify_pool.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/hccl_socket_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/notify_pool.h"
 
 namespace hccl {
 class IHcclOneSidedService {

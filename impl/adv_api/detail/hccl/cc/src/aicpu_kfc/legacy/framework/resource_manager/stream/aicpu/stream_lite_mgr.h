@@ -11,8 +11,8 @@
 #define HCCLV2_STREAM_LITE_MGR_H
 
 #include <vector>
-#include "hccl/base.h"
-#include "stream_lite.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 namespace Hccl {
 class StreamLiteMgr {
 public:

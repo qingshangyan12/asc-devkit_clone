@@ -22,8 +22,8 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_DATACOPY_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_OUT_QUANT_QUANT_PROCESSOR_DATACOPY_H
 
-#include "../../../utils/matmul_module.h"
-#include "../../../utils/matmul_param.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_param.h"
 #include "quant_processor_intf.h"
 #include "quant_processor_utils.h"
 

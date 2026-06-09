@@ -12,7 +12,7 @@
 
 #include <cstdint>
 #include <memory>
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 #include "log.h"
 #include "sqe_v82.h"
 #include "hccl_sqe.h"

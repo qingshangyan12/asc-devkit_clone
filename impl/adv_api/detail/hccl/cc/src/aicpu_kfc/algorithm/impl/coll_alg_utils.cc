@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <cmath>
-#include "workflow_pub.h"
-#include "stream_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/stream/stream_utils.h"
 #include "coll_alg_utils.h"
 
 namespace hccl {

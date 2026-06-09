@@ -23,9 +23,9 @@
 #ifndef IMPL_MATMUL_PARAM_MATMUL_SHAPE_TILING_H
 #define IMPL_MATMUL_PARAM_MATMUL_SHAPE_TILING_H
 
-#include "../utils/matmul_module.h"
-#include "../utils/matmul_utils.h"
-#include "../../../tiling/matmul/matmul_constant_tiling_struct.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_module.h"
+#include "impl/adv_api/detail/matmul/utils/matmul_utils.h"
+#include "impl/adv_api/tiling/matmul/matmul_constant_tiling_struct.h"
 
 namespace AscendC {
 namespace Impl {

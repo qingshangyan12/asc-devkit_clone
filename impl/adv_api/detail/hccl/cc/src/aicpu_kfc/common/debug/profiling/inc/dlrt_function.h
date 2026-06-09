@@ -14,9 +14,9 @@
 #include <securec.h>
 #include <mutex>
 #include <dlfcn.h>
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "rt_external.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "log.h"
 
 namespace hccl {

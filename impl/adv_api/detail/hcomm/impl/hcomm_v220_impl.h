@@ -23,7 +23,7 @@
 #ifndef IMPL_ADV_API_DETAIL_HCOMM_IMPL_HCOMM_V220_IMPL_H
 #define IMPL_ADV_API_DETAIL_HCOMM_IMPL_HCOMM_V220_IMPL_H
 
-#include "platform_v220/hcomm_aiv_def.h"
+#include "impl/adv_api/detail/hcomm/impl/platform_v220/hcomm_aiv_def.h"
 
 #endif
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HCOMM_V220_IMPL_H__)

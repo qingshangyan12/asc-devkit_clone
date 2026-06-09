@@ -9,10 +9,10 @@
 */
 #include "aicpu_kfc_utils.h"
 
-#include "common/aicpu_hccl_common.h"
-#include "utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
 #ifndef MC2_SERVER_ONLY
-#include "dfx/aicpu_profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/dfx/aicpu_profiling_manager.h"
 #endif
 
 using namespace HcclApi;

@@ -10,18 +10,18 @@
 #include "ins_v2_all_gather_concurrent_executor.h"
 #include "math.h"
 #include "alg_data_trans_wrapper.h"
-#include "hccl_res.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "ccu_alg_template_base.h"
 
 // AICPU template 头文件
-#include "ins_temp_all_gather_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/aicpu/ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
 
 #ifndef AICPU_COMPILE
 // CCU template 头文件
-#include "ccu_temp_all_gather_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/all_gather/template/ccu/ccu_temp_all_gather_mesh_1D_mem2mem.h"
 
 #endif
 

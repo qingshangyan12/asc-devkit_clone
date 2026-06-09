@@ -13,8 +13,8 @@
 #include <atomic>
 #include <mutex>
 #include "hccl_common.h"
-#include "hccl_inner_common.h"
-#include "dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/inner/hccl_inner_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
 
 namespace hccl {
 class MemMappingManager

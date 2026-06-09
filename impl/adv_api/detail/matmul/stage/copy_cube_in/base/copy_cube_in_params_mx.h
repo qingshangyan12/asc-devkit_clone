@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_PARAMS_MX_H
 #define IMPL_MATMUL_STAGE_COPY_CUBE_IN_BASE_COPY_CUBE_IN_PARAMS_MX_H
 
-#include "../../../param/matmul_shape_tiling.h"
+#include "impl/adv_api/detail/matmul/param/matmul_shape_tiling.h"
 
 namespace AscendC {
 namespace Impl {

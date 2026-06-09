@@ -23,7 +23,7 @@
 #ifndef IMPL_MATMUL_MODULES_STAGE_COPY_CUBE_IN_MX_COPY_CUBE_IN_NORM_MX_H
 #define IMPL_MATMUL_MODULES_STAGE_COPY_CUBE_IN_MX_COPY_CUBE_IN_NORM_MX_H
 
-#include "../copy_tile_to_cube/copy_tile_to_cube.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/copy_tile_to_cube.h"
 #include "copy_cube_in_intf.h"
 #include "copy_cube_in_base.h"
 

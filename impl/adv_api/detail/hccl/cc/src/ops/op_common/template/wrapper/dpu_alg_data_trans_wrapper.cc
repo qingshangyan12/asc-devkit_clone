@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "dpu_alg_data_trans_wrapper.h"
-#include "hcomm_primitives.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 
 namespace mc2_ops_hccl {
 constexpr u32 DPU_TIMEOUT = 180000;

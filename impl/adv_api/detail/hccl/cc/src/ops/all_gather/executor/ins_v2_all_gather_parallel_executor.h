@@ -10,7 +10,7 @@
 #ifndef HCCLV2_INS_V2_ALL_GATHER_PARALLEL_EXECUTOR_H
 #define HCCLV2_INS_V2_ALL_GATHER_PARALLEL_EXECUTOR_H
 
-#include "executor_common_ops.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_common_ops.h"
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>

@@ -21,7 +21,7 @@
 #ifndef IMPL_MATMUL_MODULES_STAGE_COPY_CUBE_IN_UBTOL1_SINGLESHAPE_H
 #define IMPL_MATMUL_MODULES_STAGE_COPY_CUBE_IN_UBTOL1_SINGLESHAPE_H
 
-#include "../copy_tile_to_cube/copy_tile_to_cube.h"
+#include "impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/copy_tile_to_cube.h"
 #include "copy_cube_in_intf.h"
 
 namespace AscendC {
