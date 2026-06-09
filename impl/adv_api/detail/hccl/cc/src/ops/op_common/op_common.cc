@@ -1132,11 +1132,13 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
                         std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
                         AlgHierarchyInfoForAllLevel& algHierarchyInfo, void **resCtxSequence, uint64_t& ctxSize)
 {
+    HCCL_INFO("[GetAlgResCcu]start GetAlgResCcu!");
     resCtxHost->topoInfo = *topoInfo;
     resCtxHost->algHierarchyInfo = algHierarchyInfo;
 
     // 创建资源，并填充到Host内存上
     HcclResult ret = HcclAllocAlgResourceCcu(comm, param, resRequest, resCtxHost);
+    HCCL_INFO("[GetAlgResCcu]HcclAllocAlgResourceCcu successfully!");
     if (ret != HCCL_SUCCESS) {
         HCCL_ERROR("failed to alloc alg resource.");
         return ret;
@@ -1147,10 +1149,11 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
 
     void *ctx = nullptr;
     CHK_RET(HcclEngineCtxCreate(comm, param.algTag, param.engine, size, &ctx));
+    HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
     memcpy_s(ctx, size, seq.data(), size);
     *resCtxSequence = ctx;
     ctxSize = size;
-    HCCL_INFO("Execute GetAlgResCCU success.");
+    HCCL_INFO("[GetAlgResCCU]Execute GetAlgResCCU success.");
     return HCCL_SUCCESS;
 }
 
