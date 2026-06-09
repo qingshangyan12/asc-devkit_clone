@@ -14,14 +14,21 @@
 #include <stdlib.h>
 
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterStart, CcuInsHandle insHandle);
+
+extern bool g_HcommCcuKernelRegisterStartSupported;
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegister, CcuInsHandle insHandle, const char *kernelFuncName, const void *kernelFunc, const void *kernelArg, CcuKernelHandle *kernelHandle);
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelRegisterEnd, CcuInsHandle insHandle);
 DEFINE_WEAK_FUNC(CcuResult, HcommCcuKernelLaunch, ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize);
 
 // 初始化
 void CcuLaunchDlInit(void* libHcommHandle) {
+    HCCL_INFO("[HcclWrapper-DEBUG] CcuLaunchDlInit called, handle=%p", libHcommHandle);
+    
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterStart);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegister);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelRegisterEnd);
     INIT_SUPPORT_FLAG(libHcommHandle, HcommCcuKernelLaunch);
+    
+    HCCL_INFO("[HcclWrapper-DEBUG] CcuLaunchDlInit completed, checking flags:");
+    HCCL_INFO("[HcclWrapper-DEBUG]   HcommCcuKernelRegisterStart supported=%d", g_HcommCcuKernelRegisterStartSupported);
 }
