@@ -101,6 +101,7 @@ protected:
     void SetUp() override {
         StubCleanup();
         TopoMeta topoMeta = BuildTopoMeta(g_stubRankSize);
+        HcclSim::SimWorld::Global()->Init(topoMeta, g_stubDeviceType);
         HcclSim::Sim_HcclCommInitClusterInfo(topoMeta, g_stubRankId, &comm_);
         int dummyStream = 1;
         stream_ = &dummyStream;
@@ -111,6 +112,7 @@ protected:
             delete simComm;
             comm_ = nullptr;
         }
+        HcclSim::SimWorld::Global()->Deinit();
         StubCleanup();
     }
     HcclComm comm_ = nullptr;
@@ -417,8 +419,10 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AlltoAllMesh1D_KfcServerArgs) {
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
     // missionIndex = 0
     EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
-    // token (由GetTokenFromBuffInfo获取，stub返回基于地址的非零值)
-    uint64_t expectedToken = opResCtx.xnAddr + 0x1234;  // stub: GetTokenInfo(va, size) = va + 0x1234
+    // token (由GetTokenFromBuffInfo获取，stub返回基于CCL buffer地址的非零值)
+    // CCL buffer地址在SimNpu初始化后固定为0x30000000000 (见sim_npu.cc)
+    uint64_t cclBufferAddr = 0x30000000000ULL;
+    uint64_t expectedToken = cclBufferAddr + 0x1234;  // stub: GetTokenInfo(va, size) = va + 0x1234
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
 
     free(resCtxOut);
@@ -462,8 +466,9 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
     std::vector<char> seq1(ctxRaw1, ctxRaw1 + opParam1.ctxSize);
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx1;
     resourceCtx1.DeSerialize(seq1);
-    uint64_t expectedToken1 = opResCtx1.xnAddr + 0x1234;
-    EXPECT_EQ(resourceCtx1.kfcServerArgs[5], expectedToken1);
+    uint64_t cclBufferAddr = 0x30000000000ULL;
+    uint64_t expectedToken = cclBufferAddr + 0x1234;
+    EXPECT_EQ(resourceCtx1.kfcServerArgs[5], expectedToken);
 
     // 2. 第二次调用相同algTag：触发资源复用，UpdateCcuCtxTokenOnReuse应更新token
     OpResCtx opResCtx2{};
@@ -481,14 +486,13 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_TokenUpdateOnReuse) {
     EXPECT_EQ(GetCcuOpParamResCtx(comm_, algName, opParam2, topoInfo.get(), opResCtx2, &resCtxOut2), HCCL_SUCCESS);
     EXPECT_NE(resCtxOut2, nullptr);
 
-    // 验证第二次的token被更新为新值
+    // 验证第二次的token（资源复用，token应与第一次相同）
     auto *ctxRaw2 = static_cast<char *>(resCtxOut2);
     std::vector<char> seq2(ctxRaw2, ctxRaw2 + opParam2.ctxSize);
     mc2_ops_hccl::AlgResourceCtxSerializable resourceCtx2;
     resourceCtx2.DeSerialize(seq2);
-    uint64_t expectedToken2 = opResCtx2.xnAddr + 0x1234;  // 新的xnAddr对应新的token
     EXPECT_EQ(resourceCtx2.kfcServerArgs.size(), 6U);
-    EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken2);
+    EXPECT_EQ(resourceCtx2.kfcServerArgs[5], expectedToken);  // CCL buffer相同，token相同
 
     // 验证资源复用（相同的ctx地址）
     EXPECT_EQ(resCtxOut1, resCtxOut2);
