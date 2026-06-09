@@ -2,7 +2,7 @@
 
 **特性说明：**
 
-矩阵搬出时，NZ2ND功能即为实现NZ格式到ND格式的矩阵转换。<cann-filter npu_type = "A3,910b">可以通过调用[DataCopy](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)数据搬运接口与配置相应寄存器[SetFixpipeNz2ndFlag](../寄存器配置说明/SetFixpipeNz2ndFlag.md)接口开启该能力。针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，可以通过[Fixpipe接口](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)配置对应[Fixpipe搬运参数（FixpipeParamsV220）](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)开启。</cann-filter>
+矩阵搬出时，NZ2ND功能即为实现NZ格式到ND格式的矩阵转换。<cann-filter npu_type = "A3,910b">可以通过调用[DataCopy](../L0C到GM数据搬运（DataCopy）.md)数据搬运接口与配置相应寄存器[SetFixpipeNz2ndFlag](../寄存器配置说明/SetFixpipeNz2ndFlag.md)接口开启该能力。针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，可以通过[Fixpipe接口](../L0C到GM数据搬运（Fixpipe）.md)配置对应[Fixpipe搬运参数（FixpipeParamsV220）](../L0C到GM数据搬运（Fixpipe）.md)开启。</cann-filter>
 
 NZ2ND转化过程可以参考以下伪代码：
 
@@ -32,7 +32,7 @@ for (i = 0; i < ndNum; i++) {
 - 目的操作数每个ND矩阵中每一行的起始地址为dst\_temp\_n\_addr。
 - 在每一行中，以16个数据为一个数据块，源操作数每块数据块的起始地址为src\_block\_addr，目的操作数中每一块数据块的起始地址为dst\_block\_addr。
 
-以下参数为NZ2ND用户可配置参数，含义取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)与[参数说明](../寄存器配置说明/SetFixpipeNz2ndFlag.md)：
+以下参数为NZ2ND用户可配置参数，含义取值范围参见[Fixpipe搬运参数](../L0C到GM数据搬运（Fixpipe）.md)与[参数说明](../寄存器配置说明/SetFixpipeNz2ndFlag.md)：
 
 - mSize与nSize分别表示矩阵m方向和n方向上的维度。
 - srcStride表示NZ矩阵中不同Z分形列的间隔，单位为C0\_Size。

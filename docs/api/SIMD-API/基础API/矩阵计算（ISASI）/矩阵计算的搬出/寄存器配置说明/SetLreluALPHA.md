@@ -16,7 +16,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002547689123_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy、Fixpipe）.md)）过程中设置随路Leaky ReLU alpha值。
+DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy）.md)）过程中设置随路Leaky ReLU alpha值。
 
 ## 函数原型<a name="zh-cn_topic_0000002547689123_section620mcpsimp"></a>
 

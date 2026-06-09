@@ -6,7 +6,7 @@
 
 对于DataCopy接口，可以通过配置**DataCopyCO12DstParams结构体参数**定义中[channelSplit](F32-Channel-Split.md)为true开启。
 
-对于Fixpipe接口，可以通过配置[Fixpipe搬运参数结构体说明](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)中[channelSplit](F32-Channel-Split.md)为true开启。
+对于Fixpipe接口，可以通过配置[Fixpipe搬运参数结构体说明](../L0C到GM数据搬运（Fixpipe）.md)中[channelSplit](F32-Channel-Split.md)为true开启。
 
 **特性约束：**
 
