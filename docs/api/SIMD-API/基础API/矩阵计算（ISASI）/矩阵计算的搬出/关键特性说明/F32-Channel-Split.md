@@ -4,13 +4,9 @@
 
 矩阵计算的搬出过程中对于目标类型为f32，如果开启了Channel Split，硬件就能够将16×16的分形矩阵转换为16×8的小z分形矩阵，此时每个16×16的分形矩阵将被拆分为2个独立的16×8的小z分形矩阵。
 
-可以通过配置**DataCopyCO12DstParams结构体参数**定义中[channelSplit](F32-Channel-Split.md)为true开启。
+对于DataCopy接口，可以通过配置**DataCopyCO12DstParams结构体参数**定义中[channelSplit](F32-Channel-Split.md)为true开启。
 
-<cann-filter npu_type = "A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，可以通过配置[Fixpipe搬运参数（FixpipeParamsV220）结构体说明](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)中[channelSplit](F32-Channel-Split.md)为true开启。
-
-</cann-filter>
+对于Fixpipe接口，可以通过配置[Fixpipe搬运参数结构体说明](../L0C到GM数据搬运（DataCopy、Fixpipe）.md)中[channelSplit](F32-Channel-Split.md)为true开启。
 
 **特性约束：**
 
