@@ -16,15 +16,15 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-该接口提供将数据从UB (Unified Buffer)非对齐搬运至GM (Global Memory)的功能。
+该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：：
 - Unified Buffer -> Global Memory
     - VECIN -> GM
     - VECOUT -> GM
 
--   如[图1](#fig_datacopypad3)所示，对于32字节对齐搬运场景，从UB读取的所有数据都会搬运至GM。
--   如[图2](#fig_datacopypad4)所示，对于非32字节对齐的场景，在读取UB数据时会填入dummy假数据，对齐到32B，搬入GM时会将dummy空数据丢弃，从而实现UB到GM的非对齐搬运。
+-   如[图1](#fig_datacopypad3)所示，对于32字节对齐搬运场景，从Unified Buffer读取的所有数据都会搬运至Global Memory。
+-   如[图2](#fig_datacopypad4)所示，对于非32字节对齐的场景，在读取Unified Buffer数据时会填入dummy假数据，对齐到32B，搬入Global Memory时会将dummy空数据丢弃，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -82,7 +82,7 @@
 
     如[图1](#fig_datacopypad3)所示，blockLen为64，每个连续传输数据块包含64字节；srcStride为1，源操作数的逻辑位置为VECIN/VECOUT，srcStride的单位为dataBlock（32字节），即源操作数相邻数据块之间间隔1个dataBlock；dstStride为1，目的操作数的逻辑位置为GM，dstStride的单位为字节，即目的操作数相邻数据块之间间隔1字节。
 
-    对于32字节对齐搬运场景，从UB读取的所有数据都会搬运至GM。
+    对于32字节对齐搬运场景，从Unified Buffer读取的所有数据都会搬运至Global Memory。
 
     **图 1**  blockLen为32字节对齐时UB到GM的非对齐搬运示意图<a name="fig_datacopypad3"></a>  
     ![](../../../../../figures/datacopypad3.png)
@@ -91,7 +91,7 @@
 
     如[图2](#fig_datacopypad4)所示，blockLen为47，每个连续传输数据块包含47字节，不满足32字节对齐；srcStride为1，表示源操作数相邻数据块之间间隔1个dataBlock；dstStride为1，表示目的操作数相邻数据块之间间隔1字节。
 
-    对于非32字节对齐的场景，由于UB要求32字节对齐，框架在搬出时会自动补充17字节的假数据来保证对齐，搬到GM时再自动将填充的假数据丢弃掉，从而实现UB到GM的非对齐搬运。
+    对于非32字节对齐的场景，由于Unified Buffer要求32字节对齐，框架在搬出时会自动补充17字节的假数据来保证对齐，搬到Global Memory时再自动将填充的假数据丢弃掉，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
     **图 2**  blockLen不满足32字节对齐时UB到GM的非对齐搬运示意图<a name="fig_datacopypad4"></a>  
     ![](../../../../../figures/datacopypad4.png)
@@ -128,7 +128,7 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   位于UB的源地址必须32字节对齐，位于GM的目的地址必须1字节对齐。
+-   位于Unified Buffer的源地址必须32字节对齐，位于Global Memory的目的地址必须1字节对齐。
 -   DataCopyExtParams结构体参数的值需在取值范围内：
 
     **表 4**  DataCopyExtParams结构体参数取值范围
