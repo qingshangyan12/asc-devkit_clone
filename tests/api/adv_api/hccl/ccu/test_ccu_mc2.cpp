@@ -18,6 +18,7 @@
 #include "hccl_mc2.h"
 #include "hccl_alloc_ctx_res.h"
 #include "sim_communicator.h"
+#include "sim_world.h"
 #include "topo_model.h"
 #include "sim_common.h"
 
