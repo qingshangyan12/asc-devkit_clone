@@ -148,6 +148,11 @@
 
     </cann-filter>
 
+- <cann-filter npu-type = "A3,910b">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+</cann-filter>
+
 ## 调用示例<a name="section177231425115410"></a>
 
 ```cpp
