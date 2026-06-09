@@ -13,7 +13,7 @@
 
 ## 功能说明
 
-启用模板参数<u>[MatmulCallBackFunc](MatmulCallBackFunc.md)</u>（自定义回调函数）时，设置算子tiling地址，用于回调函数使用，该接口仅需调用一次。
+启用模板参数[MatmulCallBackFunc](MatmulCallBackFunc.md)（自定义回调函数）时，设置算子tiling地址，用于回调函数使用，该接口仅需调用一次。
 
 ## 函数原型
 
