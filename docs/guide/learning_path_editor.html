@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascend C 学习路径编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .panels-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .editor-panel, .preview-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            min-height: 70vh;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .editor-panel:hover, .preview-panel:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .panel-title {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        /* 编辑器样式 */
+        .editor-section {
+            margin-bottom: 30px;
+        }
+        
+        .editor-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 15px;
+        }
+        
+        .editor-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .editor-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .editor-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        .editor-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* 阶段列表样式 */
+        .stage-list {
+            margin-top: 20px;
+        }
+        
+        .stage-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .stage-item:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stage-title {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .stage-desc {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        
+        .stage-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stage-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .module-list {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        
+        .module-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .module-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .module-name {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .module-icon {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .module-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+            transition: all 0.3s;
+        }
+        
+        .item-list {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+        
+        .item-list li {
+            padding: 6px 0;
+            color: #555;
+            position: relative;
+            list-style: none;
+            font-size: 14px;
+        }
+        
+        .item-list li::before {
+            content: '•';
+            color: #764ba2;
+            position: absolute;
+            left: -15px;
+            font-weight: bold;
+        }
+        
+        /* 预览样式 */
+        .preview-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            min-height: 60vh;
+            overflow-y: auto;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .preview-content pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', 'Consolas', monospace;
+            line-height: 1.8;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        /* 添加按钮样式 */
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .edit-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+        }
+        
+        .edit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+        }
+        
+        .delete-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 2px solid #667eea;
+        }
+        
+        .modal-header {
+            font-size: 22px;
+            color: #667eea;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .cancel-btn {
+            background: #f0f0f0;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .cancel-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+        
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .panels-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+        
+        /* 颜色主题 */
+        .color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Ascend C 学习路径编辑器</h1>
+        <div class="header-buttons">
+            <button class="btn btn-primary" onclick="addNewStage()">➕ 添加阶段</button>
+            <button class="btn btn-primary" onclick="importMarkdown()">📂 导入MD</button>
+            <button class="btn btn-primary" onclick="exportMarkdown()">💾 导出MD</button>
+            <button class="btn btn-danger" onclick="resetAll()">🗑️ 重置</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="panels-wrapper">
+            <!-- 编辑器面板 -->
+            <div class="editor-panel">
+                <h2 class="panel-title">✏️ 编辑内容</h2>
+                
+                <!-- 基本信息 -->
+                <div class="editor-section">
+                    <label class="editor-label">文档标题：</label>
+                    <input type="text" class="editor-input" id="docTitle" value="Ascend C 算子开发学习路径" onchange="updatePreview()">
+                </div>
+                
+                <!-- 阶段列表 -->
+                <div class="stage-list" id="stageList">
+                    <!-- 阶段将通过JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 预览面板 -->
+            <div class="preview-panel">
+                <h2 class="panel-title">👁️ 实时预览</h2>
+                <div class="preview-content">
+                    <pre id="previewContent"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加阶段模态框 -->
+    <div class="modal" id="stageModal">
+        <div class="modal-content">
+            <h3 class="modal-header">添加新阶段</h3>
+            <div class="modal-body">
+                <label class="editor-label">阶段名称：</label>
+                <input type="text" class="editor-input" id="newStageName" placeholder="例如：快速入门">
+                
+                <label class="editor-label">阶段描述：</label>
+                <textarea class="editor-textarea" id="newStageDesc" placeholder="例如：快速上手实践，构建全景认知"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="confirmAddStage()">✅ 确认添加</button>
+                <button class="btn cancel-btn" onclick="closeStageModal()">❌ 取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加模块模态框 -->
+    <div class="modal" id="moduleModal">
+        <div class="modal-content">
+            <h3 class="modal-header">添加新模块</h3>
+            <div class="modal-body">
+                <label class="editor-label">模块名称：</label>
+                <input type="text" class="editor-input" id="newModuleName" placeholder="例如：环境搭建">
+                
+                <label class="editor-label">模块图标：</label>
+                <input type="text" class="editor-input" id="newModuleIcon" placeholder="例如：🏠" value="📌">
+                
+                <label class="editor-label">知识点列表（每行一个）：</label>
+                <textarea class="editor-textarea" id="newModuleItems" placeholder="CANN环境安装&#10;开发环境配置&#10;运行环境准备"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="confirmAddModule()">✅ 确认添加</button>
+                <button class="btn cancel-btn" onclick="closeModuleModal()">❌ 取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑模块模态框 -->
+    <div class="modal" id="editModuleModal">
+        <div class="modal-content">
+            <h3 class="modal-header">编辑模块</h3>
+            <div class="modal-body">
+                <label class="editor-label">模块名称：</label>
+                <input type="text" class="editor-input" id="editModuleName">
+                
+                <label class="editor-label">模块图标：</label>
+                <input type="text" class="editor-input" id="editModuleIcon">
+                
+                <label class="editor-label">知识点列表（每行一个）：</label>
+                <textarea class="editor-textarea" id="editModuleItems"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="confirmEditModule()">✅ 确认修改</button>
+                <button class="btn cancel-btn" onclick="closeEditModuleModal()">❌ 取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据结构 ====================
+        
+        let learningPathData = [
+            {
+                stage: "快速入门",
+                description: "快速上手实践，构建全景认知",
+                modules: [
+                    {
+                        name: "环境搭建",
+                        icon: "🏠",
+                        items: ["CANN环境安装", "开发环境配置", "运行环境准备"]
+                    },
+                    {
+                        name: "编程模型概览",
+                        icon: "📚",
+                        items: ["异构系统介绍", "SIMD/SIMT编程模型", "执行模型对比"]
+                    },
+                    {
+                        name: "SIMD快速入门",
+                        icon: "⚡",
+                        items: ["SIMD算子快速入门", "基础概念理解", "第一个算子实践"]
+                    },
+                    {
+                        name: "SIMT快速入门",
+                        icon: "🔥",
+                        items: ["SIMT算子快速入门", "核函数理解", "基础算子开发"]
+                    }
+                ]
+            },
+            {
+                stage: "进阶编程",
+                description: "掌握编程模型，实现定制开发",
+                modules: [
+                    {
+                        name: "编程模型深入",
+                        icon: "📖",
+                        items: ["编程模型概述", "SIMD编程详解", "SIMT编程详解", "语言扩展层"]
+                    },
+                    {
+                        name: "构建与运行",
+                        icon: "🛠️",
+                        items: ["编译与运行", "异步执行", "毕昇编译器", "算子编译"]
+                    },
+                    {
+                        name: "调试与调优",
+                        icon: "🔍",
+                        items: ["调试调优概述", "CPU域孪生调试", "NPU域上板调试", "性能调试"]
+                    },
+                    {
+                        name: "算子部署",
+                        icon: "📦",
+                        items: ["PyTorch框架适配", "算子集成流程", "模型部署"]
+                    },
+                    {
+                        name: "实践巩固",
+                        icon: "💪",
+                        items: ["SIMD矢量算子", "SIMD矩阵算子", "SIMT算子实践"]
+                    }
+                ]
+            },
+            {
+                stage: "高级编程",
+                description: "挖掘极限性能，驾驭复杂场景",
+                modules: [
+                    {
+                        name: "硬件实现",
+                        icon: "🔧",
+                        items: ["基本架构", "硬件规格", "内存体系", "指令流水"]
+                    },
+                    {
+                        name: "高级编程模型",
+                        icon: "⚡",
+                        items: ["SIMD与SIMT混合编程", "高级AI Core编程", "多核协同"]
+                    },
+                    {
+                        name: "高级特性",
+                        icon: "🌟",
+                        items: ["Aclnn算子工程化开发", "算子入图开发", "AI框架算子适配"]
+                    },
+                    {
+                        name: "性能优化",
+                        icon: "🚀",
+                        items: ["高性能实践样例", "极致性能调优", "内存优化", "流水优化"]
+                    },
+                    {
+                        name: "跨代迁移",
+                        icon: "🔄",
+                        items: ["迁移兼容性指南", "架构版本适配", "API演进"]
+                    }
+                ]
+            },
+            {
+                stage: "技术附录",
+                description: "深入理解原理，扩展知识边界",
+                modules: [
+                    {
+                        name: "基础概念",
+                        icon: "💡",
+                        items: ["基本概念与术语", "术语表", "核心原理"]
+                    },
+                    {
+                        name: "语言支持",
+                        icon: "📝",
+                        items: ["C++语言标准支持", "语法特性", "编译器特性"]
+                    },
+                    {
+                        name: "API参考",
+                        icon: "📖",
+                        items: ["Ascend C API参考", "Runtime接口", "工具链文档"]
+                    }
+                ]
+            }
+        ];
+        
+        let currentStageIndex = null;
+        let currentModuleIndex = null;
+        
+        // ==================== 渲染函数 ====================
+        
+        function renderEditor() {
+            const stageList = document.getElementById('stageList');
+            stageList.innerHTML = '';
+            
+            learningPathData.forEach((stage, stageIndex) => {
+                const stageDiv = document.createElement('div');
+                stageDiv.className = 'stage-item';
+                
+                // 阶段头部
+                const headerHTML = `
+                    <div class="stage-header">
+                        <div class="stage-title">
+                            ${stageIndex + 1}. ${stage.stage}
+                        </div>
+                        <div class="stage-actions">
+                            <button class="edit-btn" onclick="editStage(${stageIndex})">✏️ 编辑</button>
+                            <button class="delete-btn" onclick="deleteStage(${stageIndex})">🗑️ 删除</button>
+                        </div>
+                    </div>
+                    <div class="stage-desc">
+                        ${stage.description}
+                    </div>
+                `;
+                
+                // 模块列表
+                const modulesHTML = stage.modules.map((module, moduleIndex) => `
+                    <div class="module-item">
+                        <div class="module-header">
+                            <div class="module-name">
+                                <span class="module-icon">${module.icon}</span>
+                                ${module.name}
+                            </div>
+                            <div class="module-actions">
+                                <button class="edit-btn" onclick="editModule(${stageIndex}, ${moduleIndex})">✏️</button>
+                                <button class="delete-btn" onclick="deleteModule(${stageIndex}, ${moduleIndex})">🗑️</button>
+                            </div>
+                        </div>
+                        <ul class="item-list">
+                            ${module.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `).join('');
+                
+                stageDiv.innerHTML = headerHTML + `
+                    <div class="module-list">
+                        ${modulesHTML}
+                    </div>
+                    <button class="add-btn" onclick="openModuleModal(${stageIndex})">➕ 添加模块</button>
+                `;
+                
+                stageList.appendChild(stageDiv);
+            });
+            
+            updatePreview();
+        }
+        
+        function updatePreview() {
+            const title = document.getElementById('docTitle').value;
+            const markdown = generateMarkdown(title);
+            document.getElementById('previewContent').textContent = markdown;
+        }
+        
+        // ==================== 生成Markdown ====================
+        
+        function generateMarkdown(title) {
+            let md = `# ${title}\n\n`;
+            
+            // 添加文档说明
+            md += `> 📘 **学习路径说明**\n`;
+            md += `> 本文档提供Ascend C算子开发的完整学习路径，帮助开发者循序渐进掌握算子开发技能。\n\n`;
+            
+            md += `---\n\n`;
+            
+            // 添加目录
+            md += `## 📋 目录\n\n`;
+            learningPathData.forEach((stage, stageIndex) => {
+                md += `- [${stageIndex + 1}. ${stage.stage}](#${stageIndex + 1}-${stage.stage.toLowerCase().replace(/\s+/g, '-')})\n`;
+            });
+            md += `\n---\n\n`;
+            
+            // 生成各阶段内容
+            learningPathData.forEach((stage, stageIndex) => {
+                // 阶段标题
+                md += `## ${stageIndex + 1}. ${stage.stage}\n\n`;
+                
+                // 阶段描述（引用块）
+                md += `> **🎯 ${stage.description}**\n\n`;
+                
+                // 学习目标
+                md += `### 📌 学习目标\n\n`;
+                const objectives = generateObjectives(stageIndex);
+                objectives.forEach(obj => {
+                    md += `- ${obj}\n`;
+                });
+                md += `\n`;
+                
+                // 模块列表
+                md += `### 📚 学习内容\n\n`;
+                
+                stage.modules.forEach((module, moduleIndex) => {
+                    // 模块标题
+                    md += `#### ${module.icon} ${module.name}\n\n`;
+                    
+                    // 知识点列表
+                    md += `| 序号 | 知识点 | 重要程度 |\n`;
+                    md += `|:----:|:-------|:--------:|\n`;
+                    module.items.forEach((item, itemIndex) => {
+                        const priority = getPriority(itemIndex, module.items.length);
+                        md += `| ${itemIndex + 1} | ${item} | ${priority} |\n`;
+                    });
+                    md += `\n`;
+                    
+                    // 学习建议
+                    md += `> 💡 **学习建议**：`;
+                    const suggestion = getSuggestion(module.name);
+                    md += `${suggestion}\n\n`;
+                    
+                    // 分隔线
+                    if (moduleIndex < stage.modules.length - 1) {
+                        md += `---\n\n`;
+                    }
+                });
+                
+                // 预计学习时间
+                md += `\n### ⏱️ 预计学习时间\n\n`;
+                const time = calculateTime(stage.modules.length);
+                md += `- **总时长**：${time} 小时\n`;
+                md += `- **建议进度**：每天学习 2-3 小时，${Math.ceil(time / 2.5)} 天完成\n\n`;
+                
+                md += `---\n\n`;
+            });
+            
+            // 添加学习建议
+            md += `## 🎓 学习建议\n\n`;
+            md += `### ✅ 推荐学习方式\n\n`;
+            md += `1. **循序渐进**：按照学习路径顺序依次学习，不要跳跃\n`;
+            md += `2. **理论结合实践**：每学完一个知识点，立即动手实践\n`;
+            md += `3. **定期总结**：每周总结学习内容，形成知识体系\n`;
+            md += `4. **寻求帮助**：遇到问题及时查阅文档或寻求社区帮助\n\n`;
+            
+            md += `### ⚠️ 注意事项\n\n`;
+            md += `- 确保 CANN 环境正确安装配置\n`;
+            md += `- 建议使用官方推荐的硬件平台\n`;
+            md += `- 注意不同架构版本的 API 差异\n`;
+            md += `- 定期备份代码和实验数据\n\n`;
+            
+            md += `---\n\n`;
+            
+            // 添加资源链接
+            md += `## 🔗 相关资源\n\n`;
+            md += `| 资源名称 | 链接 | 说明 |\n`;
+            md += `|:--------|:-----|:-----|\n`;
+            md += `| Ascend C API 参考 | [官方文档](https://gitcode.com/cann/asc-devkit/blob/master/docs/api) | 完整API接口文档 |\n`;
+            md += `| 算子开发样例 | [样例仓库](https://gitcode.com/cann/cann-samples) | 实践代码样例 |\n`;
+            md += `| CANN 环境安装 | [安装指南](./环境准备.md) | 环境搭建教程 |\n\n`;
+            
+            md += `---\n\n`;
+            
+            // 文档信息
+            md += `<div align="center">\n\n`;
+            md += `**📝 文档生成信息**\n\n`;
+            md += `生成时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+            md += `使用 [学习路径编辑器](./learning_path_editor.html) 生成\n\n`;
+            md += `</div>\n`;
+            
+            return md;
+        }
+        
+        // 生成学习目标
+        function generateObjectives(stageIndex) {
+            const objectivesMap = {
+                0: ['了解Ascend C基本概念', '掌握开发环境搭建', '完成第一个算子开发'],
+                1: ['深入理解编程模型', '掌握算子开发流程', '具备独立开发能力'],
+                2: ['理解硬件架构原理', '掌握性能优化技巧', '能够处理复杂场景'],
+                3: ['掌握核心技术概念', '熟悉工具链使用', '具备问题排查能力']
+            };
+            return objectivesMap[stageIndex] || ['掌握核心知识点', '具备实践能力'];
+        }
+        
+        // 获取重要程度
+        function getPriority(index, total) {
+            if (index < total / 3) return '⭐⭐⭐';
+            if (index < total * 2 / 3) return '⭐⭐';
+            return '⭐';
+        }
+        
+        // 生成学习建议
+        function getSuggestion(moduleName) {
+            const suggestions = {
+                '环境搭建': '建议先完成环境安装，再进行配置调试',
+                '编程模型概览': '理解概念后再深入学习具体编程方式',
+                'SIMD快速入门': '边学边练，通过示例代码加深理解',
+                'SIMT快速入门': '对比SIMD编程，理解两种模式的差异',
+                '编程模型深入': '结合硬件架构理解，掌握底层原理',
+                '构建与运行': '掌握编译流程，理解各环节作用',
+                '调试与调优': '先掌握调试方法，再学习性能优化',
+                '算子部署': '理解框架适配原理，掌握集成流程',
+                '实践巩固': '多做练习，积累开发经验',
+                '硬件实现': '结合硬件规格，理解架构设计',
+                '高级编程模型': '掌握混合编程技巧，提升性能',
+                '高级特性': '理解高级功能原理，合理使用',
+                '性能优化': '循序渐进，先优化关键路径',
+                '跨代迁移': '注意API差异，做好兼容性处理',
+                '基础概念': '建立知识体系，理解核心概念',
+                '语言支持': '掌握语言特性，合理使用',
+                'API参考': '熟悉API文档，提高查阅效率'
+            };
+            return suggestions[moduleName] || '结合实际场景学习，注重实践';
+        }
+        
+        // 计算学习时间
+        function calculateTime(moduleCount) {
+            return moduleCount * 2 + 4; // 每个模块2小时，额外4小时实践
+        }
+        
+        // ==================== 阶段管理 ====================
+        
+        function addNewStage() {
+            document.getElementById('stageModal').classList.add('active');
+        }
+        
+        function closeStageModal() {
+            document.getElementById('stageModal').classList.remove('active');
+            document.getElementById('newStageName').value = '';
+            document.getElementById('newStageDesc').value = '';
+        }
+        
+        function confirmAddStage() {
+            const name = document.getElementById('newStageName').value.trim();
+            const desc = document.getElementById('newStageDesc').value.trim();
+            
+            if (!name) {
+                alert('请输入阶段名称！');
+                return;
+            }
+            
+            learningPathData.push({
+                stage: name,
+                description: desc || '自定义阶段',
+                modules: []
+            });
+            
+            closeStageModal();
+            renderEditor();
+        }
+        
+        function editStage(stageIndex) {
+            const stage = learningPathData[stageIndex];
+            const newName = prompt('阶段名称：', stage.stage);
+            
+            if (newName === null) return;
+            
+            const newDesc = prompt('阶段描述：', stage.description);
+            
+            if (newName.trim()) {
+                stage.stage = newName.trim();
+                stage.description = newDesc.trim() || stage.description;
+                renderEditor();
+            }
+        }
+        
+        function deleteStage(stageIndex) {
+            if (confirm(`确定要删除阶段 "${learningPathData[stageIndex].stage}" 及其所有模块吗？`)) {
+                learningPathData.splice(stageIndex, 1);
+                renderEditor();
+            }
+        }
+        
+        // ==================== 模块管理 ====================
+        
+        function openModuleModal(stageIndex) {
+            currentStageIndex = stageIndex;
+            document.getElementById('moduleModal').classList.add('active');
+        }
+        
+        function closeModuleModal() {
+            document.getElementById('moduleModal').classList.remove('active');
+            currentStageIndex = null;
+            document.getElementById('newModuleName').value = '';
+            document.getElementById('newModuleIcon').value = '📌';
+            document.getElementById('newModuleItems').value = '';
+        }
+        
+        function confirmAddModule() {
+            const name = document.getElementById('newModuleName').value.trim();
+            const icon = document.getElementById('newModuleIcon').value.trim() || '📌';
+            const itemsText = document.getElementById('newModuleItems').value;
+            const items = itemsText.split('\n').filter(item => item.trim());
+            
+            if (!name || items.length === 0) {
+                alert('请填写完整信息！');
+                return;
+            }
+            
+            learningPathData[currentStageIndex].modules.push({
+                name: name,
+                icon: icon,
+                items: items
+            });
+            
+            closeModuleModal();
+            renderEditor();
+        }
+        
+        function editModule(stageIndex, moduleIndex) {
+            currentStageIndex = stageIndex;
+            currentModuleIndex = moduleIndex;
+            
+            const module = learningPathData[stageIndex].modules[moduleIndex];
+            
+            document.getElementById('editModuleName').value = module.name;
+            document.getElementById('editModuleIcon').value = module.icon;
+            document.getElementById('editModuleItems').value = module.items.join('\n');
+            
+            document.getElementById('editModuleModal').classList.add('active');
+        }
+        
+        function closeEditModuleModal() {
+            document.getElementById('editModuleModal').classList.remove('active');
+            currentStageIndex = null;
+            currentModuleIndex = null;
+        }
+        
+        function confirmEditModule() {
+            const name = document.getElementById('editModuleName').value.trim();
+            const icon = document.getElementById('editModuleIcon').value.trim() || '📌';
+            const itemsText = document.getElementById('editModuleItems').value;
+            const items = itemsText.split('\n').filter(item => item.trim());
+            
+            if (!name || items.length === 0) {
+                alert('请填写完整信息！');
+                return;
+            }
+            
+            learningPathData[currentStageIndex].modules[currentModuleIndex] = {
+                name: name,
+                icon: icon,
+                items: items
+            };
+            
+            closeEditModuleModal();
+            renderEditor();
+        }
+        
+        function deleteModule(stageIndex, moduleIndex) {
+            const moduleName = learningPathData[stageIndex].modules[moduleIndex].name;
+            
+            if (confirm(`确定要删除模块 "${moduleName}" 吗？`)) {
+                learningPathData[stageIndex].modules.splice(moduleIndex, 1);
+                
+                // 如果阶段没有模块了，删除阶段
+                if (learningPathData[stageIndex].modules.length === 0) {
+                    learningPathData.splice(stageIndex, 1);
+                }
+                
+                renderEditor();
+            }
+        }
+        
+        // ==================== 导入导出 ====================
+        
+        function exportMarkdown() {
+            const title = document.getElementById('docTitle').value;
+            const markdown = generateMarkdown(title);
+            
+            const blob = new Blob([markdown], {type: 'text/markdown;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ascend_c_learning_path.md';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Markdown文件已导出！');
+        }
+        
+        function importMarkdown() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.md';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const content = event.target.result;
+                    parseMarkdown(content);
+                    renderEditor();
+                    alert('Markdown文件已导入！');
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        function parseMarkdown(content) {
+            const lines = content.split('\n');
+            learningPathData = [];
+            
+            let currentStage = null;
+            let currentModule = null;
+            let title = '';
+            
+            lines.forEach(line => {
+                line = line.trim();
+                
+                if (line.startsWith('# ')) {
+                    title = line.substring(2);
+                    document.getElementById('docTitle').value = title;
+                } else if (line.startsWith('## ')) {
+                    // 新阶段
+                    const stageMatch = line.match(/^##\s+(\d+)\.\s+(.+)$/);
+                    if (stageMatch) {
+                        currentStage = {
+                            stage: stageMatch[2],
+                            description: '',
+                            modules: []
+                        };
+                        learningPathData.push(currentStage);
+                    }
+                } else if (line.startsWith('**') && line.endsWith('**') && currentStage) {
+                    // 阶段描述
+                    currentStage.description = line.substring(2, line.length - 2);
+                } else if (line.startsWith('### ')) {
+                    // 新模块
+                    const moduleMatch = line.match(/^###\s+(.+?)\s+(.+)$/);
+                    if (moduleMatch) {
+                        currentModule = {
+                            icon: moduleMatch[1],
+                            name: moduleMatch[2],
+                            items: []
+                        };
+                        currentStage.modules.push(currentModule);
+                    }
+                } else if (line.startsWith('- ') && currentModule) {
+                    // 知识点
+                    currentModule.items.push(line.substring(2));
+                }
+            });
+        }
+        
+        function resetAll() {
+            if (confirm('确定要重置所有内容吗？这将恢复到初始状态。')) {
+                learningPathData = [
+                    {
+                        stage: "快速入门",
+                        description: "快速上手实践，构建全景认知",
+                        modules: []
+                    }
+                ];
+                renderEditor();
+            }
+        }
+        
+        // ==================== 初始化 ====================
+        
+        window.onload = function() {
+            renderEditor();
+        };
+    </script>
+</body>
+</html>
