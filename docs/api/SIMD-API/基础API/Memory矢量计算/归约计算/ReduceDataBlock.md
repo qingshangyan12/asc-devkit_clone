@@ -88,16 +88,24 @@
 
 ## 约束说明
 
-- 目的操作数与源操作数的数据类型需要保持一致。
 - 源操作数的对齐约束请参见[通用地址对齐约束](../../../通用说明和约束.md#通用地址对齐约束)，起始地址需要32字节对齐；目的操作数起始地址的对齐约束与操作数数据类型有关，在`half`数据类型时需要保证16字节对齐，在`float`数据类型时需要保证32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md#通用地址重叠约束)。
 - `dstRepStride`、`srcBlkStride`、`srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，当`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
-- <cann-filter npu-type = "A3,910b"><cann-filter npu-type = "A3">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据；当`mask=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。</cann-filter>
+
+<cann-filter npu-type = "A3,910b">
+
+- 针对如下型号，当`mask=0`或`repeatTime=0`时，不会执行归约操作，不会对目的操作数进行写入，该接口将被视为`NOP`（空操作）。
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+- 针对如下型号，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，不会有值写入对应目的操作数，保留目的操作数原有数据。
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+
+</cann-filter>
 
 <cann-filter npu-type = "310b">
 
-- 对于Atlas 200I/500 A2 推理产品，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，则会以默认值填充对应目的操作数，默认值与`reduceType`和数据类型有关：
+- 针对Atlas 200I/500 A2 推理产品，若配置`mask[]/mask`参数后，存在某个DataBlock里的任何一个元素都不参与计算，则会以默认值填充对应目的操作数，默认值与`reduceType`和数据类型有关：
   - `reduceType == ReduceType::SUM`时填充0；
   - `reduceType == ReduceType::MAX`，操作数数据类型为`float`时填充-inf，操作数数据类型为`half`时填充-65504；
   - `reduceType == ReduceType::MIN`，操作数数据类型为`float`时填充inf，操作数数据类型为`half`时填充65504。
@@ -108,9 +116,9 @@
 - `float`数据类型只支持寄存器非饱和模式，`half`数据类型默认是寄存器非饱和模式。寄存器的非饱和/饱和模式具体配置方式参考[SetCtrlSpr(ISASI).md](../../系统变量访问/SetCtrlSpr(ISASI).md)。
     - 下图说明`reduceType`取`ReduceType::SUM`时，在饱和模式下`half`数据类型的计算过程。源操作数为$[60000,60000,-30000,100]$，首先$60000+60000$溢出，结果为$65504$，然后计算$-30000+100=-29900$，最后计算$65504-29900=35604$。
 
-    **图 2**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
+        **图 2**  `ReduceDataBlock<ReduceType::SUM>`饱和模式数值溢出情况处理说明
 
-    ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
+        ![ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明](../../../../figures/vcgadd_overflow.png "ReduceDataBlock<ReduceType::SUM>饱和模式数值溢出情况处理说明")
 
 ## 关键特性说明
 
@@ -128,7 +136,7 @@
 
 ## 调用示例
 
-本样例中只展示`Compute`流程中的部分代码。完整样例可参考[ReduceDataBlock系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
+本样例中只展示`Compute`流程中的部分代码。更多样例可参考[ReduceDataBlock系列归约指令样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/block_reduce_min_max_sum)。
 
 - `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-`mask`连续模式：
 
@@ -145,21 +153,20 @@
     ```
 
     结果示例如下：
-
-    ```cpp
-    // 输入数据src_gm：
-    [1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 2, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 3, 1, 1,
-    ...
-    1, 1, 1, 4, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    ]
-
-    // 输出数据dst_gm：
-    [2, 3, ..., 4]
-    ```
+    
+    > 输入数据src_gm：
+    > 
+    > > [1, 1, 1, 1, 1, 1, 1, 1,
+    > > 1, 1, 2, 1, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 3, 1, 1,
+    > > ...
+    > > 1, 1, 1, 4, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 1, 1, 1,
+    > > ]
+    >
+    > 输出数据dst_gm：
+    > > [2, 3, ..., 4]
 
 - `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-`mask`逐bit模式：
 
@@ -177,20 +184,18 @@
 
     结果示例如下：
 
-    ```cpp
-    // 输入数据src_gm：
-    [1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 2, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 3, 1, 1,
-    ...
-    1, 1, 1, 4, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    ]
-
-    // 输出数据dst_gm：
-    [2, 3, ..., 4]
-    ```
+    > 输入数据src_gm：
+    > > [1, 1, 1, 1, 1, 1, 1, 1,
+    > > 1, 1, 2, 1, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 3, 1, 1,
+    > > ...
+    > > 1, 1, 1, 4, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 1, 1, 1,
+    > > ]
+    > 
+    > 输出数据dst_gm：
+    > > [2, 3, ..., 4]
 
 - `ReduceDataBlock<ReduceType::MIN>`-tensor高维切分计算样例-`mask`逐bit模式：
 
@@ -208,20 +213,19 @@
 
     结果示例如下：
 
-    ```cpp
-    // 输入数据src_gm：
-    [10, 10, 10, 10, 10, 10, 10, 10,
-    10, 10, 10, 2, 10, 10, 10, 10,
-    10, 10, 10, 10, 10, 10, 10, 10,
-    10, 10, 10, 10, 10, -3, 10, 10,
-    ...
-    10, 10, 10, 10, 10, 10, 10, 10,
-    10, 4, 10, 10, 10, 10, 10, 10,
-    ]
-
-    // 输出数据dst_gm：
-    [2, -3, ..., 4]
-    ```
+    > 输入数据src_gm：
+    > 
+    > > [10, 10, 10, 10, 10, 10, 10, 10,
+    > > 10, 10, 10, 2, 10, 10, 10, 10,
+    > > 10, 10, 10, 10, 10, 10, 10, 10,
+    > > 10, 10, 10, 10, 10, -3, 10, 10,
+    > > ...
+    > > 10, 10, 10, 10, 10, 10, 10, 10,
+    > > 10, 4, 10, 10, 10, 10, 10, 10,
+    > > ]
+    >
+    > 输出数据dst_gm：
+    > > [2, -3, ..., 4]
 
 - `ReduceDataBlock<ReduceType::SUM>`-tensor高维切分计算样例-`mask`逐bit模式：
 
@@ -239,16 +243,15 @@
 
     结果示例如下：
 
-    ```cpp
-    // 输入数据src_gm：
-    [1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
-    2, 2, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 2, 2, 2, 2, 2,
-    ...
-    3, 3, 3, 3, 3, 3, 3, 3,
-    3, 3, 3, 3, 3, 3, 3, 3]
-
-    // 输出数据dst_gm：
-    [16, 32, ..., 48]
-    ```
+    > 输入数据src_gm：
+    > 
+    > > [1, 1, 1, 1, 1, 1, 1, 1,
+    > > 1, 1, 1, 1, 1, 1, 1, 1,
+    > > 2, 2, 2, 2, 2, 2, 2, 2,
+    > > 2, 2, 2, 2, 2, 2, 2, 2,
+    > > ...
+    > > 3, 3, 3, 3, 3, 3, 3, 3,
+    > > 3, 3, 3, 3, 3, 3, 3, 3]
+    >
+    > 输出数据dst_gm：
+    > > [16, 32, ..., 48]
