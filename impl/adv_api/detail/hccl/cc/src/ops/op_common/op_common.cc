@@ -1243,10 +1243,8 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     resCtxHost->ccuKernels.resize(totalKernelNum);
 
     while (currentResGroup <= maxResGroup) {
-        HCCL_INFO("[HcclWrapper-DEBUG] Calling HcommCcuKernelRegisterStart, checking support...");
-        extern bool g_HcommCcuKernelRegisterStartSupported;
-        HCCL_INFO("[HcclWrapper-DEBUG] HcommCcuKernelRegisterStart support flag = %d", g_HcommCcuKernelRegisterStartSupported);
-        
+        HCCL_INFO("[HcclWrapper-DEBUG] Calling HcommCcuKernelRegisterStart...");
+
         CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
         HCCL_INFO("[HcclWrapper-DEBUG] HcommCcuKernelRegisterStart returned: %d", regStartRet);
         
