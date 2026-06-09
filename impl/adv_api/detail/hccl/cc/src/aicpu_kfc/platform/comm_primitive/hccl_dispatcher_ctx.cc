@@ -7,11 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl_dispatcher_ctx.h"
-#include "dispatcher_ctx.h"
-#include "dispatcher_aicpu_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/new/hccl_dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/dispatcher_ctx/dispatcher_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_aicpu_pub.h"
 #include <unordered_map>
-#include "adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 
 // 多个通信域能并发跑通信算子，一个通信域只绑定一个dispatch_ctx线程变量
 // 若不用通信域绑定线程变量，需要创建默认dispatch_ctx

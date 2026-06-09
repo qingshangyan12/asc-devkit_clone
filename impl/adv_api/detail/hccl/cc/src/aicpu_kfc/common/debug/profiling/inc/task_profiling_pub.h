@@ -16,9 +16,9 @@
 #include <string>
 #include <map>
 #include <queue>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "profiler_base_pub.h"
 #include "adapter_prof.h"
 #include "prof_common.h"

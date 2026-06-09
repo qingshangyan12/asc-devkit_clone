@@ -12,13 +12,13 @@
 
 #include <functional>
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 // ltm路径指定
 #include "../../hccp/inc/network/hccp.h"
 #include "hccl_common.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 #include "../../hccp/inc/network/hccp_tlv.h"
-#include "adapter_hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
 
 constexpr u64 SOCKET_SEND_MAX_SIZE = 0x7FFFFFFFFFFFFFFF;
 constexpr u32 MAX_VALUE_U32 = 0xFFFFFFFF; // u32 数据类型最大值

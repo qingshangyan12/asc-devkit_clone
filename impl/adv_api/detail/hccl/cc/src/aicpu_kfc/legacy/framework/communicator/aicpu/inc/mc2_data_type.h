@@ -9,7 +9,7 @@
 */
 #ifndef MC2_DATA_TYPE_H
 #define MC2_DATA_TYPE_H
-#include "hccl_types.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 enum HcclTaskStatus {
     HCCL_NORMAL_STATUS, 

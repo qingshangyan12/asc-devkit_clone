@@ -11,11 +11,11 @@
 #define HCCLV2_CCU_INSTRUCTION_BROADCAST_MESH_1D_MEM2MEM_H_
 #include "template_utils.h"
 #include "instruction.h"
-#include "ins_queue.h"
-#include "ccu_context_utils.h"
-#include "ccu_ctx_signature.h"
-#include "ccu_ins.h"
-#include "ccu_rank_group.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_ccu_context/ccu_context_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_ctx_signature.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/ccu/ccu_ins/ccu_ins.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/ccu/ccu_rank_group.h"
 namespace Hccl {
 // 为BroadcastMesh1D实现的CCUIns、CCUCtxArg与CCUTaskArg
 class CcuCtxArgBroadcastMesh1DMem2Mem : public CcuCtxArg {

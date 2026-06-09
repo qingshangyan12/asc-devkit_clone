@@ -11,7 +11,7 @@
 #define AICPU_INIT_PARAM_H
 
 #include "hccl_common.h"
-#include "hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
 
 constexpr uint32_t HCOMID_MAX_SIZE = 128;
 

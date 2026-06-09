@@ -10,7 +10,7 @@
 #ifndef MC2_HANDLER_PUB_H
 #define MC2_HANDLER_PUB_H
 
-#include "alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
 #include "log.h"
 
 namespace hccl {

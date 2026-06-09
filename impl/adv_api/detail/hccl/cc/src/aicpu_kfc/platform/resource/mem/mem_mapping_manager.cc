@@ -7,11 +7,11 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "mem_mapping_manager.h"
-#include "private_types.h"
-#include "adapter_hal.h"
-#include "adapter_rts.h"
-#include "dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_mapping_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/private_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
 
 namespace hccl {
 MemMappingManager &MemMappingManager::GetInstance(s32 deviceLogicID)

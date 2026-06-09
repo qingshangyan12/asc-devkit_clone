@@ -7,15 +7,15 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
 #include <string>
 
-#include "adapter_prof.h"
-#include "adapter_prof.h"
-#include "adapter_rts_common.h"
-#include "profiler_base_pub.h"
-#include "workflow_pub.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 
 namespace hccl {
 std::queue<MsprofApi> ProfilingManager::storageTaskApi_;

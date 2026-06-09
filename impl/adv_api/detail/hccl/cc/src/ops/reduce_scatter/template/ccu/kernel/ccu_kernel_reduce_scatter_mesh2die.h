@@ -13,8 +13,8 @@
 #include <vector>
 #include <ios>
 #include "utils.h"
-#include "ccu_kernel_utils.h"
-#include "ccu_kernel_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_alg_base.h"
 
 namespace mc2_ops_hccl {
 

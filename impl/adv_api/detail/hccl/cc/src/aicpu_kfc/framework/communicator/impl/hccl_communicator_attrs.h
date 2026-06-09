@@ -10,12 +10,12 @@
 #ifndef HCCL_COMMUNICATOR_ATTRS_H
 #define HCCL_COMMUNICATOR_ATTRS_H
 
-#include <hccl/hccl_types.h>
-#include "hccl_impl_pub.h"
-#include "topoinfo_parse.h"
-#include "device_capacity.h"
-#include "comm.h"
-#include "coll_alg_utils.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_impl_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_parse.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
 
 namespace hccl {
 constexpr s32 COMM_MAX_DEVICE_ID = 31;

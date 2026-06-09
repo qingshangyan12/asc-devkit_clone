@@ -9,7 +9,7 @@
 */
  
 #include "broadcast_nb_binary.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 #include "alg_template_register.h"
 
 namespace hccl {

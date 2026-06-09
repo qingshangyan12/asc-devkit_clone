@@ -9,11 +9,11 @@
 */
 #ifndef HCCL_COMM_DFX_LITE_H
 #define HCCL_COMM_DFX_LITE_H
-#include "mirror_task_manager_lite.h"
-#include "hcclCommProfilingLite.h"
-#include "read_write_lock.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/profiling/aicpu/hcclCommProfilingLite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock.h"
 #include "hccl_common.h"
-#include "buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
 #include "common.h"
 #include "hcclCommOp.h"
 

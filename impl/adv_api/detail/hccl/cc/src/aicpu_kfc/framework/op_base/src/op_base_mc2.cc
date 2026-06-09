@@ -12,13 +12,13 @@
 #include <future>
 #include <map>
 #include <string>
-#include <hccl/hccl_types.h>
-#include "aicpu_operator_pub.h"
-#include "coll_alg_param.h"
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "param_check_pub.h"
-#include "hccl_tiling_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/param_check_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "op_base_v2.h"
 
 using namespace std;

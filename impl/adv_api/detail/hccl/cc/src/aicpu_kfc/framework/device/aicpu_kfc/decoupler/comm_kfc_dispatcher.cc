@@ -9,9 +9,9 @@
 */
 #include "comm_kfc_dispatcher.h"
 
-#include "hccl_msg.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
 
-#include "common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
 #include "comm_kfc_aicpu_server.h"
 
 using namespace HcclApi;

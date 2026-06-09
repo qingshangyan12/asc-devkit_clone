@@ -11,8 +11,8 @@
 #ifndef LAUNCH_DEVIDE_H
 #define LAUNCH_DEVIDE_H
 
-#include "hccl/base.h"
-#include "hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "acl/acl_rt.h"
 
 namespace hccl {

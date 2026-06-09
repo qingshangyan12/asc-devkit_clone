@@ -14,9 +14,9 @@
 #include <unordered_map>
 #include <memory>
 #include <functional>
-#include "dfx_common.h"
-#include "circular_queue.h"
-#include "task_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/dfx_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/circular_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
 
 namespace Hccl {
 class MirrorTaskManagerLite {

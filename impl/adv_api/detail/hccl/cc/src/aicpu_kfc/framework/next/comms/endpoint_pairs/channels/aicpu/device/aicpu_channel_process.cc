@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_channel_process.h"
-#include "aicpu_res_package_helper.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/aicpu_res_package_helper.h"
 
 using namespace hccl;
 

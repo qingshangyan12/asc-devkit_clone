@@ -16,7 +16,7 @@
 #ifndef LIB_SOFTMAX_SOFTMAX_TILING_H
 #define LIB_SOFTMAX_SOFTMAX_TILING_H
 #include "graph/tensor.h"
-#include "tiling/platform/platform_ascendc.h"
+#include "include/utils/tiling/platform/platform_ascendc.h"
 #include "softmax_tilingdata.h"
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {

@@ -10,8 +10,8 @@
 #ifndef TRANSPORT_REMOTE_ACCESS_H
 #define TRANSPORT_REMOTE_ACCESS_H
 
-#include "transport_ibverbs.h"
-#include "dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_ibverbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
 
 namespace hccl {
 constexpr u32 MAX_HDC_CHANEL_NUM = 1024;

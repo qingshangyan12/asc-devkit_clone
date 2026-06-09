@@ -10,7 +10,7 @@
 #ifndef HCCLV2_UB_JETTY_ID_LITE_H
 #define HCCLV2_UB_JETTY_ID_LITE_H
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace Hccl {
 

@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "calc_hccs_plus_sio_transport_req.h"
-#include "dtype_common.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 
 namespace hccl {
 CalcHccsPlusSioTransportReq::CalcHccsPlusSioTransportReq(std::vector<std::vector<u32>> &subCommPlaneVector,

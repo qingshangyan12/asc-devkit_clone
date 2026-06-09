@@ -17,8 +17,8 @@
 #include "env_func.h"
 
 #include "sal.h"
-#include "exception_util.h"
-#include "invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
 #include "adapter_error_manager_pub.h"
 
 namespace Hccl {

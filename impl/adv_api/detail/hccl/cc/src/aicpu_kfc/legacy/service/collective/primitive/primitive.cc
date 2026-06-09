@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "primitive.h"
-#include "null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
 #include "prim_queue.h"
 
 #include <set>

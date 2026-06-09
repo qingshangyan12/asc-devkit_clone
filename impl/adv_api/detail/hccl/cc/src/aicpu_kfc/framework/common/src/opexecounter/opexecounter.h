@@ -10,6 +10,6 @@
 #ifndef HCCLOPEXECOUNTER_H
 #define HCCLOPEXECOUNTER_H
 
-#include "opexecounter_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/opexecounter_pub.h"
 
 #endif // HCCLOPEXECOUNTER_H

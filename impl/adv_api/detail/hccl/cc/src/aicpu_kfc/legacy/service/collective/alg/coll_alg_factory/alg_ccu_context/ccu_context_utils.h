@@ -15,11 +15,11 @@
 #include <vector>
 #include <queue>
 #include "instruction.h"
-#include "ins_queue.h"
-#include "virtual_topo.h"
-#include "ccu_ctx_arg.h"
-#include "ccu_ins.h"
-#include "ccu_ctx_signature.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/instruction/ins_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_ctx_arg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/ccu/ccu_ins/ccu_ins.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/ccu/ccu_ctx_signature.h"
 
 
 namespace Hccl {

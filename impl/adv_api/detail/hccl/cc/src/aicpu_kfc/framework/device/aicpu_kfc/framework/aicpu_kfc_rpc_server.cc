@@ -9,12 +9,12 @@
 */
 #include "aicpu_kfc_rpc_server.h"
 
-#include "log_control.h"
-#include "hccl_tiling_msg.h"
-#include "algorithm/task_orchestrator.h"
-#include "common/aicpu_hccl_common.h"
-#include "common/aicpu_kfc_utils.h"
-#include "utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/log_control.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_tiling_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/algorithm/task_orchestrator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
 
 using namespace HcclApi;
 void AicpuKfcRpcServer::Init(u64 workSpaceAddr, uint32_t notifyOff, uint16_t notifyBeginCnt, KFCTask *taskParam)

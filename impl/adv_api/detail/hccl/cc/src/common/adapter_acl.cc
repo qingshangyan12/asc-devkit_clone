@@ -9,9 +9,9 @@
 */
 #include "adapter_acl.h"
 #include "acl_rt.h"
-#include "workflow.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
 #include "mmpa_api.h"
-#include "dtype_common.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 
 namespace mc2_ops_hccl {
 HcclResult haclrtGetDeviceIndexByPhyId(u32 devicePhyId, u32 &deviceLogicId)

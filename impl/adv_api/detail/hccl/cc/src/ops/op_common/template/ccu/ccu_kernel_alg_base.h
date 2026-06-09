@@ -11,7 +11,7 @@
 #define CCU_KERNEL_ALG_BASE
 
 #include "log.h"
-#include "ccu_kernel.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_kernel.h"
 
 namespace mc2_ops_hccl {
 using namespace hcomm;

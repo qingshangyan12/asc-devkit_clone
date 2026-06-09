@@ -10,9 +10,9 @@
 #ifndef HCCL_INC_ADAPTER_TDT_H
 #define HCCL_INC_ADAPTER_TDT_H
 
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "dltdt_function.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dltdt_function.h"
 #include "acl/acl_base.h"
 #include "rt_external.h"
 

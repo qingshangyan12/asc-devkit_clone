@@ -10,7 +10,7 @@
 #ifndef SCATTER_DOUBLE_RING_DIRECT_H
 #define SCATTER_DOUBLE_RING_DIRECT_H
 
-#include "scatter_double_ring_direct_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/scatter_double_ring_direct_pub.h"
 
 namespace hccl {
 } // namespace hccl

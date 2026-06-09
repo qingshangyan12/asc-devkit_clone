@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "hcclCommTaskExceptionLite.h"
-#include "aicpu_indop_process.h"
-#include "stream_lite.h"
-#include "global_mirror_tasks.h"
-#include "task_scheduler_error.h"
-#include "task_struct_v2.h"
-#include "dlhal_function_v2.h"
-#include "read_write_lock.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/global_mirror_tasks.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/externel_depends/tsch/task_scheduler_error.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_struct_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/common/dlhal_function_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock.h"
 
 namespace hcomm {
 constexpr u32 RT_SDMA_COMPERR = 0x9; // A3 sdma error类型为0x9时，表示写拷贝发生超时代答，或者数据搬移时地址译码错误

@@ -17,14 +17,14 @@
 #include <unistd.h>
 #include<map>
 #include<set>
-#include "topoinfo_ranktableParser_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableParser_pub.h"
 #include "./topo/topoinfo_ranktableStandard.h"
 #include "./topo/topoinfo_ranktableConcise.h"
 #include "./topo/topoinfo_ranktableHeterog.h"
 #include "./topo/topoinfo_roletableParser.h"
-#include "comm.h"
-#include "externalinput_pub.h"
-#include "comm_configer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm_configer.h"
 
 using namespace std;
 using namespace hccl;

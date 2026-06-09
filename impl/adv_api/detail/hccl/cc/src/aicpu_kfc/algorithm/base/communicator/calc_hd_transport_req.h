@@ -10,6 +10,6 @@
 #ifndef CALC_HD_TRANSPORT_REQ_H
 #define CALC_HD_TRANSPORT_REQ_H
 
-#include "calc_hd_transport_req_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/calc_hd_transport_req_pub.h"
 
 #endif /* CALC_HD_TRANSPORT_REQ_H */

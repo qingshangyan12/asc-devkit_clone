@@ -12,17 +12,17 @@
 
 #include <vector>
 #include "hccl_impl.h"
-#include "parallel_task_loader.h"
-#include "dispatcher.h"
-#include "ccl_buffer_manager.h"
-#include "hccl_trace_info.h"
-#include "device_capacity.h"
-#include "topo_matcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/task/parallel_task_loader.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/ccl_buffer_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_trace_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/topo_matcher.h"
 
 #include "coll_alg_param.h"
-#include "coll_executor_base.h"
-#include "coll_alg_utils.h"
-#include "alg_configurator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/alg_configurator.h"
 #include "hccl_aiv.h"
 #include "config_log.h"
 

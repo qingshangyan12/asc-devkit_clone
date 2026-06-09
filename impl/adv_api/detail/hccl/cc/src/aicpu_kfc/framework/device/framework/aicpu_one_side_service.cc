@@ -9,12 +9,12 @@
 */
 #include "aicpu_one_side_service.h"
 #include "log.h"
-#include "common/aicpu_sqe_context.h"
-#include "aicpu_hccl_common.h"
-#include "transport_pub.h"
-#include "adapter_hal_pub.h"
-#include "dispatcher.h"
-#include "executor_tracer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/executor_tracer.h"
 #include "aicpu_hccl_process.h"
 
 namespace hccl {

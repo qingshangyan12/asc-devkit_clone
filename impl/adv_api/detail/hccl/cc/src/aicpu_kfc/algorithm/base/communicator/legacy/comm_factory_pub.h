@@ -14,14 +14,14 @@
 #include <map>
 #include <memory>
 
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
-#include "comm_base_pub.h"
-#include "hccl_socket_manager.h"
-#include "dispatcher.h"
-#include "coll_alg_param.h"
-#include "topo_info_extractor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/hccl_socket_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/topo_info_extractor.h"
 
 namespace hccl {
 constexpr u32 COMM_P2P_QUERRY_WAIT_TIME = 100;

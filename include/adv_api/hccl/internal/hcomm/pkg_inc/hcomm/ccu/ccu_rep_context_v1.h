@@ -14,7 +14,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "hcomm_primitives.h"
+#include "include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 #include "ccu_rep_base_v1.h"
 #include "ccu_rep_block_v1.h"
 #include "ccu_kernel_arg.h"

@@ -11,8 +11,8 @@
 #define HCCLV2_QUEUE_NOTIFY_LITE_MGR_H
 #include <memory>
 #include <map>
-#include "types.h"
-#include "notify_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/notify/aicpu/notify_lite.h"
 namespace Hccl {
 
 class QueueNotifyLiteMgr {

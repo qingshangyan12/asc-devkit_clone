@@ -9,14 +9,14 @@
 */
 #include "log.h"
 
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 #include "ins_all_to_all_sole_executor.h"
 
-#include "ccu_temp_all_to_all_mesh_1D.h"
-#include "ccu_temp_all_to_all_v_mesh_1D.h"
-#include "ccu_temp_all_to_all_mesh2d.h"
-#include "ccu_temp_all_to_all_v_mesh_2D.h"
-#include "ccu_temp_all_to_all_v_mesh_2Die.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_all_to_all_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_all_to_all_v_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_all_to_all_mesh2d.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_all_to_all_v_mesh_2D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_all_to_all_v_mesh_2Die.h"
 
 namespace Hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>

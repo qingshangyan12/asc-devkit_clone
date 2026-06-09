@@ -20,26 +20,26 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SET_ATOMIC_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 
 #if __NPU_ARCH__ == 1001
-#include "dav_c100/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_c100/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 2002
-#include "dav_m200/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_m200/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_c220/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3002
-#include "dav_m300/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_m300/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3102
-#include "dav_m310/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_m310/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_3510/kernel_operator_set_atomic_impl.h"
 #elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_m510/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "dav_l300/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_l300/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "dav_l311/kernel_operator_set_atomic_impl.h"
+#include "impl/basic_api/dav_l311/kernel_operator_set_atomic_impl.h"
 #endif
 
 namespace AscendC {

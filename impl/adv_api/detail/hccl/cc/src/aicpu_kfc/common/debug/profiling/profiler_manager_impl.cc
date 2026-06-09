@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <dlog_pub.h>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "adapter_rts_common.h"
-#include "adapter_prof.h"
-#include "profiling_manager.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
 #include "profiler_manager_impl.h"
-#include "stream_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/stream/stream_utils.h"
 
 namespace hccl {
 ProfilerManagerImpl::ProfilerManagerImpl(s32 devicePhyId, s32 deviceLogicId, u32 realUserRank)

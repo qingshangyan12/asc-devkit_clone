@@ -15,7 +15,7 @@
 #include <string>
 #include <sstream>
 #include <list>
-#include "alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "binary_stream.h"
 
 HcclResult __attribute__((weak)) HcommThreadJoin(ThreadHandle thread, uint32_t timeout);

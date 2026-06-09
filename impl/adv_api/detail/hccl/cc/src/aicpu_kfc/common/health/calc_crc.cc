@@ -15,7 +15,7 @@
 #include <fstream>
 #include <mutex>
 #include "hccl_common.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 
 namespace hccl {
 constexpr int CRC_TABLE_LENGTH = 256;

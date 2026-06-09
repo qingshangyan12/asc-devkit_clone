@@ -10,8 +10,8 @@
 #include "hdc_lite.h"
 #include <chrono>
 #include "log.h"
-#include "internal_exception.h"
-#include "exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
 
 namespace Hccl {
 constexpr u32 HCCL_HDC_CONTROL_WORDS = 2;

@@ -13,13 +13,13 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "hccl_msg.h"
-#include <hccl/hccl_types.h>
-#include "aicpu_hccl_common.h"
-#include "common/aicpu_kfc_def.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 #include "comm_kfc_open_kernel_adapter.h"
-#include "dispatcher.h"
-#include "hcomm_primitives.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 
 namespace hccl {
 class HcclCommAicpu;

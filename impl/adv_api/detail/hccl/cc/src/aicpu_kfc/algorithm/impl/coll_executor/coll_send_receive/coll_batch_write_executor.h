@@ -10,8 +10,8 @@
  
 #ifndef COLL_BATCH_WRITE_EXECUTOR_H
 #define COLL_BATCH_WRITE_EXECUTOR_H
-#include "coll_comm_executor.h"
-#include "alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_comm_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
  
 namespace hccl {
 constexpr char BATCH_WRITE_ALG_NAME[] = "BatchWriteBySdma";

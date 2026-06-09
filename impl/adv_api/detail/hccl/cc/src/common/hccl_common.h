@@ -17,10 +17,10 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
-#include "dtype_common.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 #include "log.h"
-#include "hccl_types.h"
-#include "hccl_res.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 #ifndef T_DESC
 #define T_DESC(_msg, _y) ((_y) ? true : false)

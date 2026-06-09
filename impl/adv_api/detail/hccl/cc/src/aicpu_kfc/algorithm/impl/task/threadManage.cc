@@ -8,16 +8,16 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "alg_template_base_pub.h"
-#include "hccl_impl_pub.h"
-#include "reduce_scatter_ring_pub.h"
-#include "reduce_scatter_ring_concurrent_direct_pub.h"
-#include "all_gather_ring_pub.h"
-#include "all_gather_ring_concurrent_direct_pub.h"
-#include "coll_executor_base.h"
-#include "sal_pub.h"
-#include "profiler_base_pub.h"
-#include "threadManage.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_impl_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_ring_concurrent_direct_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_ring_concurrent_direct_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiler_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/threadManage.h"
 
 namespace hccl {
 ThreadManage::ThreadManage(s32 deviceLogicId, u32 userRank, const HcclDispatcher dispatcher)

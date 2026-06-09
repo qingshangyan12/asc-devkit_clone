@@ -11,7 +11,7 @@
 #define HCCL_TRACE_INFO_H
 
 #include "hccl_common.h"
-#include "hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include <string>
 namespace hccl {
 enum class AtraceOption {

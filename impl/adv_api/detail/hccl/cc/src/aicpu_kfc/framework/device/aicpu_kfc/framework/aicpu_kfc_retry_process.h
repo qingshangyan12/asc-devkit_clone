@@ -10,8 +10,8 @@
 #ifndef AICPU_KFC_RETRY_PROCESS_H
 #define AICPU_KFC_RETRY_PROCESS_H
 
-#include "framework/aicpu_communicator.h"
-#include "common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 
 class AicpuKfcRetryProcess {
 public:

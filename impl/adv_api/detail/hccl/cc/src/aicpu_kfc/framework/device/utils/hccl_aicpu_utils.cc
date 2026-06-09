@@ -11,14 +11,14 @@
 #include <sstream>
 #include <dlog_pub.h>
 
-#include "algorithm/task_orchestrator.h"
-#include "common/aicpu_sqe_context.h"
-#include "common/aicpu_hccl_common.h"
-#include "profiling_manager_device.h"
-#include "framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/algorithm/task_orchestrator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_sqe_context.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_manager_device.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
 #include "log.h"
-#include "hccl_types.h"
-#include "transport_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
 
 int32_t HcclAicpuUtils::GetCpuId()
 {

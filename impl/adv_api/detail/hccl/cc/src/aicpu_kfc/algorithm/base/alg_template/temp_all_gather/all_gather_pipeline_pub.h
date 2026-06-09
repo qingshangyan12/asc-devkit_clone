@@ -13,12 +13,12 @@
 #include <vector>
 #include <memory>
 #include <list>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "externalinput_pub.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
-#include "alg_template_base_pub.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
 
 namespace hccl {
 

@@ -8,11 +8,11 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "coll_comm_executor.h"
-#include "executor_impl.h"
-#include "stream_active_manager.h"
-#include "device_capacity.h"
-#include "comm_factory_pub.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/legacy/executor_impl.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/stream_active_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/legacy/comm_factory_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 
 namespace hccl {
 CollCommExecutor::CollCommExecutor(const HcclDispatcher dispatcher, std::unique_ptr<TopoMatcher> &topoMatcher)

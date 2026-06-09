@@ -12,11 +12,11 @@
 
 #include <string>
 
-#include "types.h"
-#include "dev_type.h"
-#include "rank_gph.h"
-#include "coll_alg_params.h"
-#include "coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
 #include "mc2_selector.h"
 
 namespace Hccl {

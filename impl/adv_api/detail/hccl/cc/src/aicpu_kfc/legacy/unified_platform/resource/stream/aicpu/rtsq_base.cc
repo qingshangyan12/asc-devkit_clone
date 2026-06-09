@@ -10,9 +10,9 @@
 #include "rtsq_base.h"
 #include "ascend_hal.h"
 #include "log.h"
-#include "drv_api_exception.h"
-#include "exception_util.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/drv_api_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 #include <unordered_map>
 namespace Hccl {
 

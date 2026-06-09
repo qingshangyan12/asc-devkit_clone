@@ -11,7 +11,7 @@
 #define HCCL_SRC_HCCLDL_H
 #include <dlfcn.h>
 #include <functional>
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 #ifdef __cplusplus
 extern "C" {

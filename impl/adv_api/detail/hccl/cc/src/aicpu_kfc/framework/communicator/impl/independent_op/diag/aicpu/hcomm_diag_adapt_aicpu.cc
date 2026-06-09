@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hcomm_diag.h"
-#include "device/framework/aicpu_hccl_process.h"
+#include "../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcomm_diag.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
 
 
 HcclResult HcommRegOpInfo(const char* commId, void* opInfo, size_t size)

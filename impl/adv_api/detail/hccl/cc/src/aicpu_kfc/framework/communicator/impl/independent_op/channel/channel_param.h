@@ -10,11 +10,11 @@
 #ifndef CHANNEL_PARAM_H
 #define CHANNEL_PARAM_H
 
-#include "hccl_mem_defs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
 #include "hccl_common.h"
-#include "transport_pub.h"
-#include "hccl/hccl_res.h"
-#include "aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
 
 // 独立算子同步资源
 struct HcclChannelP2p {

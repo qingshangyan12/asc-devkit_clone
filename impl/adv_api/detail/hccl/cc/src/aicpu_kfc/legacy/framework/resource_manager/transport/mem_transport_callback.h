@@ -10,8 +10,8 @@
 #ifndef MEM_TRANSPORT_CALLBACK_H
 #define MEM_TRANSPORT_CALLBACK_H
 
-#include "mirror_task_manager.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/mirror_task_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 
 namespace Hccl{
 class MemTransportCallback {

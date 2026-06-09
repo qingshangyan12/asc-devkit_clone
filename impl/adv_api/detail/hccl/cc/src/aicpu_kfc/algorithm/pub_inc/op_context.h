@@ -10,7 +10,7 @@
 #ifndef OP_CONTEXT_H
 #define OP_CONTEXT_H
 
-#include "hccl/base.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace hccl {
 // nonuniform_hierarchical_ring_base_pub.h

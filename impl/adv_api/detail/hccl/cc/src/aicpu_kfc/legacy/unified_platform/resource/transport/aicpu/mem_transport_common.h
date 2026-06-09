@@ -10,8 +10,8 @@
 #ifndef MEM_TRANSPORT_COMMON_H
 #define MEM_TRANSPORT_COMMON_H
 
-#include "string_util.h"
-#include "reduce_in.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/reduce_in.h"
 
 namespace Hccl {
 MAKE_ENUM(TransportType, P2P, UB, ROCE)

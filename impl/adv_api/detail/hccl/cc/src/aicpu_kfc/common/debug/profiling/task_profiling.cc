@@ -9,9 +9,9 @@
 */
 #include <securec.h>
 #include "command_handle.h"
-#include "profiling_manager.h"
-#include "adapter_prof.h"
-#include "adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
 #include "task_profiling.h"
 
 namespace hccl {

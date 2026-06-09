@@ -12,11 +12,11 @@
 
 #include <cstdint>
 #include "hccl_common.h"
-#include "aicpu_operator_pub.h"
-#include "aicpu_hccl_sqcq.h"
-#include "aicpu_hccl_sqcqv1.h"
-#include "aicpu_hccl_sqcqv2.h"
-#include "profiling_extend_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv1.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/inc/profiling_extend_info.h"
 #include "common.h"
 
 constexpr u32 AC_MAX_RANK_NUM = 32U;

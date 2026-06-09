@@ -12,10 +12,10 @@
 
 #include <string>
 #include <vector>
-#include "hccl/base.h"
-#include "hccl_types.h"
-#include "topoinfo_struct.h"
-#include "hccl_comm_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 
 HcclResult CfgGetClusterInfo(const std::string &rankTableM, const std::string &identify, hccl::HcclCommParams &params,
     hccl::RankTable_t &rankTable, bool isInterSuperPodRetryEnable = GetExternalInputInterSuperPodRetryEnable(),

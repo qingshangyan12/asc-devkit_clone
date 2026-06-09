@@ -12,14 +12,14 @@
 #include <fstream>
 #include <fcntl.h>
 #include <unistd.h>
-#include <hccl/hccl_types.h>
-#include "device_capacity.h"
-#include "hccl_communicator.h"
-#include "hccl_comm_pub.h"
-#include "sal_pub.h"
-#include "hcom_common.h"
-#include "adapter_rts_common.h"
-#include "adapter_hccp_common.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/hccl_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/hcom/hcom_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
 #include "../nslbdp/hccl_nslbdp_pub.h"
 #include "hccl_h2dtlv.h"
 

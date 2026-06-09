@@ -13,10 +13,10 @@
 #include <unordered_map>
 #include <functional>
 #include <memory>
-#include "stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 #include "ascend_hal_define.h"
-#include "daemon_func.h"
-#include "communicator_impl_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/daemon_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite.h"
 
 namespace Hccl {
 extern "C" {

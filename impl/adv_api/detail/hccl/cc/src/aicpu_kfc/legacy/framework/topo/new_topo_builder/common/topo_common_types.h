@@ -14,10 +14,10 @@
 #include <cstring>
 #include <netinet/in.h>
 
-#include "hccl_res.h"
-#include "enum_factory.h"
-#include "hccl/base.h"
-#include "hccl_rank_graph.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
 namespace Hccl {
 using NetPlaneId = u32;
 using LocalId = u32;

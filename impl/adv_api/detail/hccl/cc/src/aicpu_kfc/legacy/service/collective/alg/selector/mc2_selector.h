@@ -11,9 +11,9 @@
 #define HCCLV2_COLL_ALG_CCU_SELECTOR
 
 #include "base_selector.h"
-#include "coll_alg_params.h"
-#include "coll_operator.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 
 namespace Hccl {
 

@@ -10,7 +10,7 @@
 #ifndef ALLTOALL_V_STAGED_BASE_PUB_H
 #define ALLTOALL_V_STAGED_BASE_PUB_H
 
-#include "alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
 #include "alltoallv_staged_calculator_pub.h"
 
 namespace hccl {

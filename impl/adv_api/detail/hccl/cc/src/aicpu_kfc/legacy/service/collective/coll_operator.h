@@ -12,13 +12,13 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "types.h"
-#include "op_type.h"
-#include "op_mode.h"
-#include "data_type.h"
-#include "reduce_op.h"
-#include "buffer_type.h"
-#include "buffer.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/buffer_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/buffer.h"
 namespace Hccl {
 using BaseCollOperator = struct BaseCollOperatorDef {
     OpMode   opMode{OpMode::INVALID};

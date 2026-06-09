@@ -11,7 +11,7 @@
 #define LINK_HOST_TCP_PUB_H
 
 #include "transport_net_pub.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 
 namespace hccl {
 class TransportTcp : public TransportNet {

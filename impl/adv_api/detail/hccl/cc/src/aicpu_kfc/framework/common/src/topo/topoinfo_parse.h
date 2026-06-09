@@ -14,7 +14,7 @@
 #include <set>
 #include "log.h"
 #include "common.h"
-#include "topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
 
 namespace hccl {
 

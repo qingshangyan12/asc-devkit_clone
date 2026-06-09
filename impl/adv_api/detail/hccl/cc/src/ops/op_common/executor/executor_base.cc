@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "executor_base.h"
-#include "workflow.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
 namespace mc2_ops_hccl {
 
 ExecutorBase::ExecutorBase()

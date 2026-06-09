@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "alg_template_register.h"
-#include "reduce_scatter_ring_pub.h"
-#include "all_gather_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/all_gather_ring_pub.h"
 #include "all_reduce_ring.h"
 
 namespace hccl {

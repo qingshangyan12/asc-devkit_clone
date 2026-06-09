@@ -11,14 +11,14 @@
 #define HCCLV2_UB_CONN_LITE_H_
 
 #include <queue>
-#include "data_type.h"
-#include "reduce_op.h"
-#include "rma_buf_slice_lite.h"
-#include "rmt_rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rma_buf_slice_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/buffer/aicpu/rmt_rma_buf_slice_lite.h"
 #include "rma_conn_lite.h"
 #include "udma_data_struct.h"
-#include "kernel_param_lite.h"
-#include "stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 
 namespace Hccl {
 

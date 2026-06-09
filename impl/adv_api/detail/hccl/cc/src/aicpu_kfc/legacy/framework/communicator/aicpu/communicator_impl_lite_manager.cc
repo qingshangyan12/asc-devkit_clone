@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "communicator_impl_lite_manager.h"
-#include "aicpu_daemon_service.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/aicpu_daemon_service.h"
 #include "aicpu_res_package_helper.h"
-#include "alg_topo_package_helper.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/service/aicpu/alg_topo_package_helper.h"
 #include "aicpu_comm_destroy_func.h"
 #include "ns_recovery_handler_func.h"
-#include "task_exception_func.h"
-#include "task_exception_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_handler_lite.h"
 namespace Hccl {
 
 CommunicatorImplLiteMgr::CommunicatorImplLiteMgr()

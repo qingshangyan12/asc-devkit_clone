@@ -11,8 +11,8 @@
 
 #include <sstream>
 #include <unordered_map>
-#include "common/aicpu_hccl_common.h"
-#include "utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
 #include "common/aicpu_kfc_utils.h"
 
 struct SqeContextVariable {

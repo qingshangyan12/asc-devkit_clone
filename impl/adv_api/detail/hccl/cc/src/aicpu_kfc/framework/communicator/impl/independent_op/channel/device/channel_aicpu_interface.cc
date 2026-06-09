@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "channel_aicpu_interface.h"
-#include "framework/aicpu_hccl_process.h"
-#include "channel_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/channel_param.h"
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuIndOpChannelInit(void *args)

@@ -8,13 +8,13 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <condition_variable>
-#include "dispatcher.h"
-#include "comm_base_pub.h"
-#include "externalinput_pub.h"
-#include "coll_alg_param.h"
-#include "search_path.h"
-#include "calc_p2p_transport_req.h"
-#include "calc_hccs_plus_sio_transport_req_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/search_path.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/calc_p2p_transport_req.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/calc_hccs_plus_sio_transport_req_pub.h"
 #include "topo_matcher.h"
 namespace hccl {
 

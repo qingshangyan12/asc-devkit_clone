@@ -11,12 +11,12 @@
 #define COLL_NATIVE_EXECUTOR_BASE_H
 
 #include "coll_executor_base.h"
-#include "device_capacity.h"
-#include "dispatcher.h"
-#include "stream_active_manager.h"
-#include "comm_factory_pub.h"
-#include "rank_consistentcy_checker.h"
-#include "hccl_aiv.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/stream_active_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/legacy/comm_factory_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/health/rank_consistentcy_checker.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_aiv.h"
 #include "config_log.h"
 
 namespace hccl {

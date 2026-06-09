@@ -10,9 +10,9 @@
 #ifndef NS_RECOVERY_LITE_H
 #define NS_RECOVERY_LITE_H
 
-#include "hdc_pub.h"
-#include "kfc.h"
-#include "hccl_aicpu_hdc_handler.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hdc_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kfc.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/hccl_aicpu_hdc_handler.h"
 #include <memory>
 
 namespace hccl {

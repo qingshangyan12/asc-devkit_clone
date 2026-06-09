@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "log.h"
-#include "alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 
 extern HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam);
 

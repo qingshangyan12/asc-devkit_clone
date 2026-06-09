@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <vector>
-#include "aicpu_ts_urma_channel_kernel.h"
-#include "framework/aicpu_hccl_process.h"
-#include "channel_param.h"
-#include "aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/endpoint_pairs/channels/aicpu/device/aicpu_ts_urma_channel_kernel.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/channel/channel_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
 
 extern "C" {
 __attribute__((visibility("default"))) uint32_t RunAicpuDfxOpInfoInitV2(void *args)

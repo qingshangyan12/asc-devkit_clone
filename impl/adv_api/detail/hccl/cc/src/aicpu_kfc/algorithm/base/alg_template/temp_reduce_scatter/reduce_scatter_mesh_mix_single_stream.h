@@ -10,7 +10,7 @@
 #ifndef REDUCE_SCATTER_MESH_MIX_SINGLE_STREAM_H
 #define REDUCE_SCATTER_MESH_MIX_SINGLE_STREAM_H
 
-#include "reduce_scatter_mesh_mix_single_stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_mesh_mix_single_stream_pub.h"
 
 namespace hccl {
 }  // namespace hccl

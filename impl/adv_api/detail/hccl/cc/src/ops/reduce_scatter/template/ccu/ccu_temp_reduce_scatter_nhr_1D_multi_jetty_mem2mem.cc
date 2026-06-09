@@ -7,12 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "channel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.h"
 #include <algorithm>
-#include "hccl_ccu_res.h"
-#include "ccu_assist_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/hccl_ccu_res.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_assist_pub.h"
 #include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
-#include "ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_reduce_scatter_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
 

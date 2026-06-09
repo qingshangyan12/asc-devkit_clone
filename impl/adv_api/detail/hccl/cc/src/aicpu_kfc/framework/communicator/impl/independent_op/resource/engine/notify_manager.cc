@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "notify_manager.h"
-#include "adapter_hal_pub.h"
-#include "device_capacity.h"
-#include "aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
 #include "aicpu_launch_manager.h"
 
 namespace hccl {

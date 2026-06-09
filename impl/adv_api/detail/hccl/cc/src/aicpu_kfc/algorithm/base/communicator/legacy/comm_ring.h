@@ -10,7 +10,7 @@
 #ifndef COMM_RING_H
 #define COMM_RING_H
 
-#include "comm_ring_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_ring_pub.h"
 
 namespace hccl {
 }  // namespace hccl

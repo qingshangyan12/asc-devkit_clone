@@ -14,9 +14,9 @@
 #include <unordered_set>
 #include <mutex>
 #include <thread>
-#include "hccl_socket.h"
-#include "hccl_socket_manager.h"
-#include "hccl_ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/hccl_socket_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_ip_address.h"
 #include "common.h"
 
 namespace hccl {

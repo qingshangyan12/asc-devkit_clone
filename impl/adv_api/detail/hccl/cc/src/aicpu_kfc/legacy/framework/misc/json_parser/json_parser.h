@@ -16,9 +16,9 @@
 #include <iostream>
 #include <fstream>
 #include "nlohmann/json.hpp"
-#include "exception_util.h"
-#include "internal_exception.h"
-#include "invalid_params_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/invalid_params_exception.h"
 
 namespace Hccl {
 

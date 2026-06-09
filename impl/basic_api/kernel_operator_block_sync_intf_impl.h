@@ -21,38 +21,38 @@
 #define ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTERFACE_IMPL_H
 
 #include "kernel_event.h"
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
+#include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_struct_mm.h"
-#include "kernel_operator_data_copy_intf.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_operator_data_copy_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
 #endif
-#include "kernel_operator_sys_var_intf.h"
+#include "../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 #if __NPU_ARCH__ == 1001
-#include "dav_c100/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_c100/kernel_operator_sync_impl.h"
 #elif __NPU_ARCH__ == 2002
-#include "dav_m200/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_m200/kernel_operator_sync_impl.h"
 #elif __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_c220/kernel_operator_sync_impl.h"
 #elif __NPU_ARCH__ == 3002
-#include "dav_m300/kernel_operator_common_impl.h"
+#include "impl/basic_api/dav_m300/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "dav_l300/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_l300/kernel_operator_sync_impl.h"
 #elif __NPU_ARCH__ == 3102
-#include "dav_m310/kernel_operator_common_impl.h"
+#include "impl/basic_api/dav_m310/kernel_operator_common_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "dav_3510/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_3510/kernel_operator_sync_impl.h"
 #elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_m510/kernel_operator_sync_impl.h"
 #elif (__NPU_ARCH__ == 3113)
-#include "dav_l311/kernel_operator_sync_impl.h"
+#include "impl/basic_api/dav_l311/kernel_operator_sync_impl.h"
 #endif
 
 namespace AscendC {

@@ -15,10 +15,10 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include "const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
 #include "template_utils.h"
-#include "primitive.h"
-#include "prim_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/primitive.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/prim_queue.h"
 
 namespace Hccl {
 

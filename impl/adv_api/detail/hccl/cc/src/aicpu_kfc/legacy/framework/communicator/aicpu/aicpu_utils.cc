@@ -8,18 +8,18 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <shared_mutex>
-#include "inc/aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/inc/aicpu_utils.h"
 #include "log.h"
-#include "hccl_mem_defs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
 #include "aicpu_comm_destroy_func.h"
 #include "communicator_impl_lite_manager.h"
-#include "ub_conn_lite_mgr.h"
-#include "aicpu_daemon_service.h"
-#include "task_exception_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/connection/aicpu/ub_conn_lite_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/aicpu_daemon_service.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_func.h"
 #include "ns_recovery_handler_func.h"
-#include "task_exception_handler_lite.h"
-#include "coll_operator.h"
-#include "rtsq_a5.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_handler_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/rtsq_a5.h"
 using namespace Hccl;
 
 AicpuUtils::AicpuUtils()

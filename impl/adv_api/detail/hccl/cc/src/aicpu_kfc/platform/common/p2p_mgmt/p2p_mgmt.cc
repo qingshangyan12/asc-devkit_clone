@@ -11,13 +11,13 @@
 
 #include <chrono>
 #include <thread>
-#include "adapter_error_manager.h"
-#include "externalinput_pub.h"
-#include "device_capacity.h"
-#include "mem_name_repository_pub.h"
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/hccd/adapter_error_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/mem_name_repository_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "driver/ascend_hal.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 
 namespace hccl {
 const u32 DEVICE_PER_MODULE = 8; // A+X 一个mesh卡数

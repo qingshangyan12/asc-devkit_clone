@@ -12,15 +12,15 @@
 #include "rtsq_a5.h"
 #include "ascend_hal.h"
 #include "log.h"
-#include "drv_api_exception.h"
-#include "exception_util.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/drv_api_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 #include "sqe_v82.h"
 #include "sqe_build_a5.h"
 #include "sqe.h"
-#include "communicator_impl_lite_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite_manager.h"
 #ifdef CCL_KERNEL_AICPU
-#include "hccl_api_data_aicpu_ts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/data_api/hccl_api_data_aicpu_ts.h"
 #endif
 
 namespace Hccl {

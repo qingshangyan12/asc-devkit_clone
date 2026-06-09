@@ -10,7 +10,7 @@
 #ifndef COMM_MESH_H
 #define COMM_MESH_H
 
-#include "comm_mesh_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_mesh_pub.h"
 
 namespace hccl {
 }  // namespace hccl

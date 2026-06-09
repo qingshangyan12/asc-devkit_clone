@@ -12,15 +12,15 @@
 #include <securec.h>
 
 #include "driver/ascend_hal.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "log.h"
-#include "sal_pub.h"
-#include "dlrts_function.h"
-#include "adapter_error_manager.h"
-#include "adapter_hal.h"
-#include "device_capacity.h"
-#include "config_plf_log.h"
-#include "adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlrts_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/hccd/adapter_error_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
 
 using namespace hccl;
 using namespace std;

@@ -16,15 +16,15 @@
 #include <set>
 #include <unordered_set>
 #include <functional>
-#include "hccl_comm.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_comm.h"
 #include "hccl_common.h"
-#include "hccl_types.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "../../../common/alg_type.h"
-#include "hccl_res.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "../../../common/hcomm_dlsym/hcomm_primitives_dl.h"
-#include "hccl_rank_graph.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
 #include "../../../common/binary_stream.h"
-#include "hccl_ccu_res.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/hccl_ccu_res.h"
 
 namespace mc2_ops_hccl {
 

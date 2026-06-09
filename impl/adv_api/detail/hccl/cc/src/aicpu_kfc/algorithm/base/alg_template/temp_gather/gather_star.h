@@ -10,7 +10,7 @@
 #ifndef GATHER_STAR_H
 #define GATHER_STAR_H
 
-#include "gather_star_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/gather_star_pub.h"
 
 namespace hccl {
 }  // namespace hccl

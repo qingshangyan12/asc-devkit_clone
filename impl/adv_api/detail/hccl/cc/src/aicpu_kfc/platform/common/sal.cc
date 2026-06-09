@@ -21,12 +21,12 @@
 
 #include "adapter_error_manager_pub.h"
 #include "driver/ascend_hal.h"
-#include "adapter_rts.h"
-#include "adapter_hccp_common.h"
-#include "adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
 #include "externalinput.h"
 #include "dlhal_function.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
 
 using namespace std;
 constexpr uint32_t HOST = 1;

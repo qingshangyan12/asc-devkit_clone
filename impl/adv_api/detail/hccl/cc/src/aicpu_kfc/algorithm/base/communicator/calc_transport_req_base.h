@@ -10,10 +10,10 @@
 #ifndef CALC_TRANSPORT_REQ_BASE_H
 #define CALC_TRANSPORT_REQ_BASE_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <vector>
-#include "hccl/base.h"
-#include "coll_alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 
 namespace hccl {
 class CalcTransportReqBase {

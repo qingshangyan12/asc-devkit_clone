@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <atomic>
 #include "hccl_common.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 
 namespace hccl {
 class StreamActiveManager {

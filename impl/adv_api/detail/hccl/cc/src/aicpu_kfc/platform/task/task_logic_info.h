@@ -9,5 +9,5 @@
 */
 #ifndef HCCL_TASK_LOGIC_INFO_H
 #define HCCL_TASK_LOGIC_INFO_H
-#include "task_logic_info_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/task_logic_info_pub.h"
 #endif /* HCCL_TASK_LOGIC_INFO_H */

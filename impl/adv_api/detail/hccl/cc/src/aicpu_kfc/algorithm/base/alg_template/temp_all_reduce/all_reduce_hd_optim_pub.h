@@ -10,10 +10,10 @@
 #ifndef ALL_REDUCE_HD_OPTIM_PUB_H
 #define ALL_REDUCE_HD_OPTIM_PUB_H
 
-#include "alg_template_base_pub.h"
-#include "mem_host_pub.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_host_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 namespace hccl {
 class AllReduceHDOptim : public AlgTemplateBase {
 public:

@@ -10,7 +10,7 @@
 #ifndef COLL_REDUCESCATTERV_FAST_DOUBLE_RING_FOR_910_93_EXECUTOR_H
 #define COLL_REDUCESCATTERV_FAST_DOUBLE_RING_FOR_910_93_EXECUTOR_H
 
-#include "coll_reduce_scatter_fast_double_ring_for_910_93_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_reduce_scatter/coll_reduce_scatter_fast_double_ring_for_910_93_executor.h"
 
 namespace hccl {
 class CollReduceScatterVFastDoubleRingFor91093Executor : public CollReduceScatterFastDoubleRingFor91093Executor {

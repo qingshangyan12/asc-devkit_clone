@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <regex>
-#include "drv_api_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/drv_api_exception.h"
 #include "ins_to_sqe_rule.h"
 
 namespace Hccl {

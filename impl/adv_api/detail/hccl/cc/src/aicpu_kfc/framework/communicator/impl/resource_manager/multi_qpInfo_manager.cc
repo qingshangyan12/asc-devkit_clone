@@ -8,12 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "multi_qpInfo_manager.h"
-#include "adapter_hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hccp_common.h"
 #include <queue>
 #include <cstdlib>
 #include <fstream>
-#include "workflow_pub.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 #include "adapter_error_manager_pub.h"
 #include "../../../nslbdp/hccl_nslbdp.h"
 #include "mmpa_api.h"

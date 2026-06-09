@@ -15,7 +15,7 @@
 
 #include "ascend_hal.h"
 #include "ascend_hal_define.h"
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace Hccl {
 class DlHalFunctionV2 {

@@ -12,7 +12,7 @@
 
 #include <mutex>
 #include <memory>
-#include "hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "mem_device_pub.h"
 #include "mem_host_pub.h"
 #include "read_write_lock.h"

@@ -11,7 +11,7 @@
 #define HCCLV2_RMA_BUFFER_SLICE_LITE_H
 
 #include <string>
-#include "hccl/base.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace Hccl {
 class RmaBufSliceLite {

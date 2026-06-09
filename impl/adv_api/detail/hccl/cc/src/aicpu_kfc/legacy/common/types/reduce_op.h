@@ -12,10 +12,10 @@
 
 #include <map>
 #include <string>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "enum_factory.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/enum_factory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "../utils/exception_util.h"
 #include "../exception/invalid_params_exception.h"
 namespace Hccl {

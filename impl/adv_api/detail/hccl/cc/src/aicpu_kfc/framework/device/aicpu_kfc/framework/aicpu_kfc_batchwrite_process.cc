@@ -9,10 +9,10 @@
 */
 #include "aicpu_kfc_batchwrite_process.h"
 
-#include "common/aicpu_hccl_common.h"
-#include "utils/hccl_aicpu_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/hccl_aicpu_utils.h"
 #include "framework/aicpu_kfc_prof.h"
-#include "coll_batch_write_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_send_receive/coll_batch_write_executor.h"
 
 using namespace hccl;
 

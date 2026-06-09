@@ -18,11 +18,11 @@
 #include <map>
 #include <utility>
 
-#include "graph.h"
-#include "ip_address.h"
-#include "iterator.h"
-#include "types.h"
-#include "topo_common_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/graph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/iterator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/common/topo_common_types.h"
 
 namespace Hccl {
 constexpr u32 DEFAULT_LISTENING_PORT = 60001;

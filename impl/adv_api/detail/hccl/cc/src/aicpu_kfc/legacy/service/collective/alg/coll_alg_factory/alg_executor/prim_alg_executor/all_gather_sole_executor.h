@@ -14,17 +14,17 @@
 #include <vector>
 #include <map>
 
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "types/types.h"
-#include "coll_alg_params.h"
-#include "connected_link_mgr.h"
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
 #include "template_utils.h"
-#include "alg_template_base_v2.h"
-#include "hccl_params_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/prim_alg_template/alg_template_base_v2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/include/hccl_params_pub.h"
 #include "coll_alg_base.h"
-#include "rank_gph.h"
-#include "coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
 
 namespace Hccl {
 

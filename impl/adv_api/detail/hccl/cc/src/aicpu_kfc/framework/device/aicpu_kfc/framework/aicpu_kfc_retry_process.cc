@@ -9,8 +9,8 @@
 */
 #include "aicpu_kfc_retry_process.h"
 
-#include "aicpu_hccl_def.h"
-#include "framework/aicpu_communicator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_communicator.h"
 
 using namespace hccl;
 

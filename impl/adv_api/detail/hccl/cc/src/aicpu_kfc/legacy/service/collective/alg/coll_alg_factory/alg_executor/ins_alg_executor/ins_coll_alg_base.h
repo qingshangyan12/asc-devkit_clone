@@ -14,32 +14,32 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
-#include "hccl/base.h"
-#include "types/types.h"
-#include "op_type.h"
-#include "op_mode.h"
-#include "dev_mode.h"
-#include "data_type.h"
-#include "reduce_op.h"
-#include "topo/port.h"
-#include "dev_type.h"
-#include "rank_gph.h"
-#include "virtual_topo.h"
-#include "coll_operator.h"
-#include "coll_alg_params.h"
-#include "connected_link_mgr.h"
+#include "../../../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/op_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/port.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/rank_gph.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
 #include "template_utils.h"
-#include "executor_utils.h"
-#include "ins_alg_template_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ins_alg_template/ins_alg_template_base.h"
 #ifndef CCL_KERNEL_AICPU
 #include "ccu_alg_template_base.h"
 #endif
-#include "dma_mode.h"
-#include "hccl_params_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/dma_mode.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/include/hccl_params_pub.h"
 #include "alg_data_trans_wrapper.h"
-#include "rmt_data_buffer_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/buffer/aicpu/rmt_data_buffer_mgr.h"
 
 namespace Hccl {
 

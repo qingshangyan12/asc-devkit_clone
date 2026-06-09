@@ -12,8 +12,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <hccl/hccl_types.h>
-#include "alg_param.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
 #include "topo_match_base.h"
 
 namespace mc2_ops_hccl {

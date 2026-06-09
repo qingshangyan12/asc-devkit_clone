@@ -10,7 +10,7 @@
 #ifndef TRANSPORT_VIRTURAL_PUB_H
 #define TRANSPORT_VIRTURAL_PUB_H
 
-#include "transport_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/transport_base_pub.h"
 namespace hccl {
 class TransportVirtural : public TransportBase {
 public:

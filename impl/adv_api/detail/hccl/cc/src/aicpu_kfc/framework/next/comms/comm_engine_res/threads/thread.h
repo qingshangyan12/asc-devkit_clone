@@ -13,19 +13,19 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "hccl_types.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
-#include "hcomm_primitives.h"
-#include "local_notify.h"
-#include "stream_pub.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/local_notify.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "acl/acl_rt.h"
-#include "adapter_hal_pub.h"
-#include "device_capacity.h"
-#include "task_param.h"
-#include "sal_pub.h"
-#include "stream_lite.h"
-#include "task_info.h"
-#include "adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
 #include "../../../../../legacy/framework/dfx/profiling/dlprof_function.h"
 
 namespace hccl {

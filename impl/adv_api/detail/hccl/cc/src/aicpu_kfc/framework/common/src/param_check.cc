@@ -10,9 +10,9 @@
 #include <unordered_set>
 #include <cstring>
 #include "log.h"
-#include "hccl/base.h"
-#include "rank_consistentcy_checker.h"
-#include "topoinfo_ranktableParser_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/health/rank_consistentcy_checker.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/topo/topoinfo_ranktableParser_pub.h"
 #include "config.h"
 #include "param_check.h"
 

@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 #include "ins_all_reduce_sole_executor.h"
 #ifndef CCL_KERNEL_AICPU
 #include "ccu_temp_all_reduce_mesh_1D.h"
@@ -18,8 +18,8 @@
 #include "ccu_temp_all_reduce_mesh_detour_1D.h"
 #include "ccu_temp_all_reduce_mesh_2D_two_shot_mem2mem.h"
 #endif
-#include "topo_match_mesh.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 
 namespace Hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>

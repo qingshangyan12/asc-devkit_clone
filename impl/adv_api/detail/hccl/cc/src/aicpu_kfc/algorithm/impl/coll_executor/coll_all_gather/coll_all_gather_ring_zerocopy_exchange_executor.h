@@ -10,7 +10,7 @@
 #ifndef COLL_ALLGATHER_RING_ZEROCOPY_EXCHANGE_EXECUTOR_H
 #define COLL_ALLGATHER_RING_ZEROCOPY_EXCHANGE_EXECUTOR_H
 #include "coll_all_gather_ring_zerocopy_executor.h"
-#include "coll_reduce_scatter_ring_zerocopy_exchange_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_reduce_scatter/coll_reduce_scatter_ring_zerocopy_exchange_executor.h"
 
 namespace hccl {
 class CollAllGatherRingZerocopyExchangeExecutor : public CollAllGatherRingZerocopyExecutor {

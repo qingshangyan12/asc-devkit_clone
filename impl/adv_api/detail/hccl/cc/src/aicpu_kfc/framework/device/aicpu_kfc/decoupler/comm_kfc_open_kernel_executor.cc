@@ -13,8 +13,8 @@
 #include <vector>
 
 #include "log.h"
-#include "alg_param.h"
-#include "coll_alg_v2_exec_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/registry/coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 
 namespace {

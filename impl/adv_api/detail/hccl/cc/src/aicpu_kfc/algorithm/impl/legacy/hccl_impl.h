@@ -12,23 +12,23 @@
 
 #include <functional>
 #include <vector>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 #include "hccl_common.h"
 #include "common.h"
-#include "comm_factory_pub.h"
-#include "parallel_task_loader.h"
-#include "dispatcher.h"
-#include "ccl_buffer_manager.h"
-#include "workspace_resource.h"
-#include "hccl_impl_pub.h"
-#include "op_base_stream_manager_pub.h"
-#include "resource_manager/queue_notify_manager.h"
-#include "device_capacity.h"
-#include "coll_alg_utils.h"
-#include "alg_configurator.h"
-#include "workflow_pub.h"
-#include "topo_info_extractor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/legacy/comm_factory_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/task/parallel_task_loader.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/ccl_buffer_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/workspace_resource.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_impl_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/op_base_stream_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/queue_notify_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_alg_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/alg_configurator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/topo_info_extractor.h"
 
 namespace hccl
 {

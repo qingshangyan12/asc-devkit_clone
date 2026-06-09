@@ -10,8 +10,8 @@
 #ifndef HCCL_TBE_TASK_H
 #define HCCL_TBE_TASK_H
 
-#include <hccl/hccl_types.h>
-#include <hccl/base.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "acl/acl_base.h"
 
 constexpr u32 TBE_MAX_MODULE_DEVICE_NUM = 32; // 单server双模组时支持最大的设备数量

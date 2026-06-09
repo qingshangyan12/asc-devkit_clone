@@ -12,8 +12,8 @@
 
 #include <vector>
 #include <queue>
-#include "alg_param.h"
-#include "ccu_kernel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hcomm/ccu/ccu_kernel.h"
 
 
 namespace mc2_ops_hccl {

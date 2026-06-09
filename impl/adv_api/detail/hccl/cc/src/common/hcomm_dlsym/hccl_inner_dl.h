@@ -11,7 +11,7 @@
 #define HCCL_INNER_DL_H
 
 #include "dlsym_common.h"
-#include "hccl_inner.h"   // 原始头文件，包含所有类型和声明
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"   // 原始头文件，包含所有类型和声明
 
 #ifdef __cplusplus
 extern "C" {

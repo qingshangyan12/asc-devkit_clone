@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_dmy_cal_allreduce.h"
-#include "common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 
 namespace {
 constexpr u64 ALL_REDUCE_THRESHOLD = 1024 * 1024; // allreduce确定性计算，小于该值选择AL算法，否则选择RLA算法

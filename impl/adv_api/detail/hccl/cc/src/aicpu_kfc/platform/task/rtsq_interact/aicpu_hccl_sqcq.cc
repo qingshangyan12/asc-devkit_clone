@@ -7,10 +7,10 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "aicpu/aicpu_hccl_sqcq.h"
-#include "adapter_hal_pub.h"
-#include "sal_pub.h"
-#include "task_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/externel_depends/tsch/task_struct.h"
 #include "type_def.h"
 
 using char_t = char;

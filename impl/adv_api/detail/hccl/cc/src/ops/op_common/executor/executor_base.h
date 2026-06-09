@@ -10,15 +10,15 @@
 #ifndef EXECUTOR_BASE_H
 #define EXECUTOR_BASE_H
 
-#include "alg_param.h"
-#include "topo.h"
-#include "topo_host.h"
-#include "channel.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_host.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.h"
 #include "alg_template_base.h"
 #include "alg_template_register.h"
 #include "utils.h"
 #include "log.h"
-#include "workflow.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
 #include "sal.h"
 
 namespace mc2_ops_hccl {

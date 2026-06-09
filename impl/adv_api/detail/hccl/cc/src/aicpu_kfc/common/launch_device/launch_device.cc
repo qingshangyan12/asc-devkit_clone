@@ -13,7 +13,7 @@
 #include "launch_device.h"
 #include "log.h"
 #include "mmpa_api.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 
 using namespace std;
 

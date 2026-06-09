@@ -10,7 +10,7 @@
 #ifndef CALC_RING_TRANSPORT_REQ_PUB_H
 #define CALC_RING_TRANSPORT_REQ_PUB_H
 
-#include "calc_transport_req_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/calc_transport_req_base.h"
 
 namespace hccl {
 class CalcRingTransportReq : public CalcTransportReqBase {

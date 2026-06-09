@@ -11,9 +11,9 @@
 #define HCCLV2_RMT_RMA_BUFFER_LITE_H
 #include <string>
 
-#include "hccl/base.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "rmt_rma_buf_slice_lite.h"
-#include "rma_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/rma_type.h"
 namespace Hccl {
 
 class RmtRmaBufferLite {

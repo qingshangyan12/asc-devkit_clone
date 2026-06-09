@@ -9,7 +9,7 @@
 */
 #include "rma_buf_slice_lite.h"
 #include "log.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 namespace Hccl {
 RmaBufSliceLite::RmaBufSliceLite(u64 addr, u64 size, u32 lkey, u32 tokenId)
     : addr_(addr), size_(size), lkey_(lkey), tokenId_(tokenId)

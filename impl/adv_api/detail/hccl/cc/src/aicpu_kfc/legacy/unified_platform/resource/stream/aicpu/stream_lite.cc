@@ -9,7 +9,7 @@
 */
 #include "stream_lite.h"
 #include "binary_stream.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "rtsq_a5.h"
 namespace Hccl {
 

@@ -13,8 +13,8 @@
 
 #include "rma_conn_lite.h"
 #include "binary_stream.h"
-#include "exception_util.h"
-#include "not_support_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/not_support_exception.h"
 #include "log.h"
 
 struct RdmaSqContextLite {

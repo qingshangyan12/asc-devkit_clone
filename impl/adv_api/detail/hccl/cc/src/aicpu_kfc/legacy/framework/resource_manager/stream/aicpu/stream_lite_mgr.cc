@@ -9,7 +9,7 @@
 */
 #include "stream_lite_mgr.h"
 #include "binary_stream.h"
-#include "task_exception_func.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/task_exception/task_exception_func.h"
 
 namespace Hccl {
 StreamLite *StreamLiteMgr::GetMaster()

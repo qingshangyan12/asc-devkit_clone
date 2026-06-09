@@ -8,10 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "buffer.h"
-#include "range_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/range_utils.h"
 #include "log.h"
-#include "internal_exception.h"
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 namespace Hccl {
 
 Buffer::Buffer(uintptr_t addr, std::size_t size) : addr_(addr), size_(size)

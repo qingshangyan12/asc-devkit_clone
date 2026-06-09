@@ -10,7 +10,7 @@
 #include "kernel_launch.h"
 #include "log.h"
 #include "template_utils.h"
-#include "alg_v2_template_register.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/registry/alg_v2_template_register.h"
 
 namespace mc2_ops_hccl {
 int32_t HcclLaunchDPUKernel(uint64_t ptr, int32_t size)

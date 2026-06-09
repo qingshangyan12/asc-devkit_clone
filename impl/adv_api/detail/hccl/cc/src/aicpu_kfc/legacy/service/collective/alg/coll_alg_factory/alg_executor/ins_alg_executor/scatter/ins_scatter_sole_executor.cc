@@ -8,14 +8,14 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "log.h"
-#include "ins_coll_alg_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/alg_registry/ins_coll_alg_registry.h"
 #ifndef CCL_KERNEL_AICPU
-#include "ccu_temp_scatter_mesh_1D.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_template/ccu_alg_template/ccu_temp_scatter_mesh_1D.h"
 #include "ccu_temp_scatter_mesh_2D.h"
 #endif
-#include "topo_match_mesh.h"
-#include "topo_match_nhr.h"
-#include "topo_match_concurr_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_mesh.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_nhr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_topo_match/topo_match_concurr_mesh.h"
 #include "ins_scatter_sole_executor.h"
 
 namespace Hccl {

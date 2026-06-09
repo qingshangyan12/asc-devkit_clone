@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <mutex>
 #include <map>
-#include "hccl/base.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace hccl {
 using WorkSpaceMem_t = struct tagWorkSpaceMem {

@@ -7,8 +7,8 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "adapter_trace.h"
-#include "dltrace_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_trace.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dltrace_function.h"
 #include "log.h"
 #include "atrace_pub.h"
 using namespace hccl;

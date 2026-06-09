@@ -10,6 +10,6 @@
 #ifndef CALC_HCCS_PLUS_SIO_TRANSPORT_REQ_H
 #define CALC_HCCS_PLUS_SIO_TRANSPORT_REQ_H
 
-#include "calc_hccs_plus_sio_transport_req_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/calc_hccs_plus_sio_transport_req_pub.h"
 
 #endif /* CALC_HCCS_PLUS_SIO_TRANSPORT_REQ_H */

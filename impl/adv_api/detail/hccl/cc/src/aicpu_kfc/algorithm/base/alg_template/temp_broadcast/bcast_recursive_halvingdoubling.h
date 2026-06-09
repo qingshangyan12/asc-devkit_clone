@@ -10,7 +10,7 @@
 #ifndef BCAST_RECURSIVE_HALVINGDOUBLING_H
 #define BCAST_RECURSIVE_HALVINGDOUBLING_H
 
-#include "bcast_recursive_halvingdoubling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/bcast_recursive_halvingdoubling_pub.h"
 
 namespace hccl {
     constexpr u32 NSLBDP_BCAST_MOLD2 = 2;

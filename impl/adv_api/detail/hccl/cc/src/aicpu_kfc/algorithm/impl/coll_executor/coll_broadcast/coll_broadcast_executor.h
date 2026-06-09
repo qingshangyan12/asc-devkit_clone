@@ -9,8 +9,8 @@
 */
 #ifndef COLL_BROADCAST_COMM_EXECUTOR_H
 #define COLL_BROADCAST_COMM_EXECUTOR_H
-#include "coll_comm_executor.h"
-#include "coll_alg_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/coll_executor/coll_comm_executor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_operator.h"
 
 namespace hccl {
 class CollBroadcastExecutor : public CollCommExecutor {

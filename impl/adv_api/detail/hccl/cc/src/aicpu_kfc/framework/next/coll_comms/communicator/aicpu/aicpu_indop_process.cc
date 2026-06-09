@@ -9,8 +9,8 @@
 */
 #include "aicpu_indop_process.h"
 #include "coll_comm_aicpu_mgr.h"
-#include "hcclCommOp.h"
-#include "hcclCommDfxLite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/hcclCommOp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/dfx/hcclCommDfxLite.h"
 
 using namespace hccl;
 

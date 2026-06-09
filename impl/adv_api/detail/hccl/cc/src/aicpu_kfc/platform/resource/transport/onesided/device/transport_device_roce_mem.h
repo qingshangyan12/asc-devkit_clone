@@ -10,7 +10,7 @@
 #ifndef TRANSPORT_DEVICE_ROCE_MEM_H
 #define TRANSPORT_DEVICE_ROCE_MEM_H
 
-#include "transport_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_mem.h"
 #include <atomic>
 #include <chrono>
 

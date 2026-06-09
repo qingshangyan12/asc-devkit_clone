@@ -9,7 +9,7 @@
 */
 #include "ins_temp_all_reduce_mesh_1D_two_shot.h"
 
-#include "aicpu_ins.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/device_mode/aicpu_ins.h"
 #include "log.h"
 #include "alg_data_trans_wrapper.h"
 

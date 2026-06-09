@@ -11,7 +11,7 @@
 #ifndef REDUCE_SCATTER_AHC_BROKE_PUB_H
 #define REDUCE_SCATTER_AHC_BROKE_PUB_H
  
-#include "asymmetric_hierarchical_concatenate_alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/asymmetric_hierarchical_concatenate_alg_template_base_pub.h"
  
 namespace hccl {
 class ReduceScatterAHCBroke : public ReduceScatterAHCBase {

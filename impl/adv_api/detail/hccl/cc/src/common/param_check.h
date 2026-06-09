@@ -10,9 +10,9 @@
 #ifndef MC2_OPS_HCCL_SRC_COMMON_PARAM_CHECK
 #define MC2_OPS_HCCL_SRC_COMMON_PARAM_CHECK
 
-#include <hccl/hccl_types.h>
-#include <hccl/hccl_res.h>
-#include "hccl/base.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 
 namespace mc2_ops_hccl {
 HcclResult HcomCheckGroupName(const char *group);

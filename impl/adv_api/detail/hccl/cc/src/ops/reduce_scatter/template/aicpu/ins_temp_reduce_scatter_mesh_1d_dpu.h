@@ -10,11 +10,11 @@
 #ifndef INS_TEMP_REDUCE_SCATTER_1D_DPU
 #define INS_TEMP_REDUCE_SCATTER_1D_DPU
 
-#include "alg_v2_template_base.h"
-#include "alg_v2_template_register.h"
-#include "alg_param.h"
-#include "executor_base.h"
-#include "dpu_alg_data_trans_wrapper.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/alg_v2_template_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/registry/alg_v2_template_register.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/inc/alg_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/wrapper/dpu_alg_data_trans_wrapper.h"
 #include "alg_data_trans_wrapper.h"
 
 namespace mc2_ops_hccl {

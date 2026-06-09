@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "topo_match_nhr.h"
-#include "net_instance.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_graph/net_instance.h"
 
 namespace Hccl {
 TopoMatchNHR::TopoMatchNHR(const RankId vRank, const u32 rankSize, const RankGraph *rankGraph,

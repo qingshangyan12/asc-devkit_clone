@@ -10,7 +10,7 @@
 #ifndef COMM_P2P_H
 #define COMM_P2P_H
 
-#include "comm_p2p_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_p2p_pub.h"
 
 namespace hccl {
 }  // namespace hccl

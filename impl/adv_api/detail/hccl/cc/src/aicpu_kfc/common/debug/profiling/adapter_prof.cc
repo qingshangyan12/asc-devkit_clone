@@ -7,9 +7,9 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "adapter_prof.h"
-#include "externalinput_pub.h"
-#include "dlrt_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/adapter_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/dlrt_function.h"
 using namespace hccl;
 
 HcclResult hrtMsprofRegisterCallback(uint32_t moduleId, ProfCommandHandle handle)

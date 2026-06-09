@@ -10,7 +10,7 @@
 #ifndef SEND_RECEIVE_H
 #define SEND_RECEIVE_H
 
-#include "send_receive_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/send_receive_pub.h"
 
 namespace hccl {
 } // namespace hccl

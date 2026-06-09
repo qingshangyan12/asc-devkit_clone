@@ -18,9 +18,9 @@
 #define CONV3D_BP_INPUT_INIT_FUNC_H
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
-#include "dav_v220/conv3d_bp_input_mte2_sub_func.h"
-#include "dav_v220/conv3d_bp_input_sub_func.h"
-#include "dav_v220/conv3d_bp_kernel_split.h"
+#include "impl/adv_api/detail/conv_backprop/conv3d_backprop_input/dav_v220/conv3d_bp_input_mte2_sub_func.h"
+#include "impl/adv_api/detail/conv_backprop/conv3d_backprop_input/dav_v220/conv3d_bp_input_sub_func.h"
+#include "impl/adv_api/detail/conv_backprop/conv3d_backprop_input/dav_v220/conv3d_bp_kernel_split.h"
 #endif
 
 namespace ConvBackpropInputFunc {

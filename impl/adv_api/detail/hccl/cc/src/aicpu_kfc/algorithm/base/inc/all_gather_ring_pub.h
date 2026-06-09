@@ -10,7 +10,7 @@
 #ifndef ALL_GATHER_RING_PUB_H
 #define ALL_GATHER_RING_PUB_H
 
-#include "alg_template_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/alg_template/alg_template_base_pub.h"
 
 namespace hccl {
 class AllGatherRing : public AlgTemplateBase {

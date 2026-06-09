@@ -9,8 +9,8 @@
 */
 #ifndef ERROR_MESSAGE_H
 #define ERROR_MESSAGE_H
-#include "task_param.h"
-#include "kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/pub_inc/task_param.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
 namespace Hccl {
 
 constexpr u32 TAG_MAX_LENGTH = 256;

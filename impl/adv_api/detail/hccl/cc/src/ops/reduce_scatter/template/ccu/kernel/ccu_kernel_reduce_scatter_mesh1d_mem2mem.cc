@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "ccu_kernel_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_alg_base.h"
 #include "ccu_kernel_reduce_scatter_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {

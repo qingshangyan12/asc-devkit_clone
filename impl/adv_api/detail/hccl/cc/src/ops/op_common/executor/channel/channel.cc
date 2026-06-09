@@ -10,12 +10,12 @@
 #include "channel.h"
 #include <vector>
 #include <set>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
-#include "alg_type.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/alg_type.h"
 #include "channel_request.h"
-#include "topo.h"
-#include "topo_host.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/topo/topo_host.h"
 #include "alg_env_config.h"
 
 namespace mc2_ops_hccl {

@@ -9,14 +9,14 @@
 */
 #ifndef H_COM_PRIVATE_V2_H
 #define H_COM_PRIVATE_V2_H
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <map>
 #include <unordered_map>
-#include "hccl/base.h"
-#include "hccl/hcom.h"
-#include "types/dev_type.h"
-#include "hccl_types.h"
-#include "types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 #include "log.h"
 
 #ifdef __cplusplus

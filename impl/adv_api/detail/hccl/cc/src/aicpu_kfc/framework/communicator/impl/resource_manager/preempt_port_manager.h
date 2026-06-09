@@ -14,11 +14,11 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
-#include <hccl/hccl_types.h>
-#include "hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
 #include "hccl_common.h"
-#include "hccl_socket.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 
 namespace hccl {
 

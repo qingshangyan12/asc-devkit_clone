@@ -8,9 +8,9 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "independent_op_aicpu_interface.h"
-#include "aicpu_indop_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/coll_comms/communicator/aicpu/aicpu_indop_process.h"
 #ifndef MC2_SERVER_ONLY
-#include "framework/aicpu_hccl_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/framework/aicpu_hccl_process.h"
 #endif
 
 extern "C" {

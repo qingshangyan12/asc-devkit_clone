@@ -10,10 +10,10 @@
 #ifndef INS_TEMP_REDUCE_SCATTER_MESH_2D_H
 #define INS_TEMP_REDUCE_SCATTER_MESH_2D_H
 
-#include "string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "ins_alg_template_base.h"
-#include "executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
 
 #define DATASLICE_ONE 1
 

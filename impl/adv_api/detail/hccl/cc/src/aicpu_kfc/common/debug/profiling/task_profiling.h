@@ -10,7 +10,7 @@
 #ifndef TASK_PROFILING_H
 #define TASK_PROFILING_H
 
-#include "task_profiling_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/task_profiling_pub.h"
 
 #include <iostream>
 #include <iomanip>

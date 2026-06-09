@@ -12,12 +12,12 @@
 
 #include <memory>
 #include <shared_mutex>
-#include "kernel_param_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/kernel_param_lite.h"
 #include "mc2_data_type.h"
-#include "stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
 #include "ascend_hal_define.h"
-#include "data_type.h"
-#include "communicator_impl_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/communicator_impl_lite.h"
 #include "aicpu_utils.h"
 
 namespace Hccl {

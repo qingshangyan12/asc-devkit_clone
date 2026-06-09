@@ -7,12 +7,12 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "hccl_alg.h"
-#include "alltoall_operator.h"
-#include "all_reduce_operator.h"
-#include "coll_alg_op_registry.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/hccl_alg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/alltoall_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/operator/all_reduce_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/operator/registry/coll_alg_op_registry.h"
 #include "topo_matcher.h"
-#include "topo_info_extractor.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/topo_info_extractor.h"
 #include "alg_configurator.h"
 
 namespace hccl

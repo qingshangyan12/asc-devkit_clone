@@ -8,16 +8,16 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <memory>
-#include "config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
 #include "hccl_common.h"
-#include "stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
 #include "rt_external.h"
-#include "aicpu/aicpu_hccl_sqcqv1.h"
-#include "aicpu/aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv1.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
 #include "sal.h"
-#include "config_plf_log.h"
-#include "dlhal_function.h"
-#include "adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/config_plf_log.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/common/dlhal_function.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
 #include "dispatcher_aicpu.h"
 
 namespace hccl {

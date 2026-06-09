@@ -10,10 +10,10 @@
 #include "thread.h"
 #include "cpu_ts_thread.h"
 #include "aicpu_ts_thread.h"
-#include "sal_pub.h"
-#include "stream_lite.h"
-#include "task_info.h"
-#include "aicpu_launch_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/unified_platform/resource/stream/aicpu/stream_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/common/task_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/resource/engine/aicpu_launch_manager.h"
 using namespace std;
 
 namespace hccl {

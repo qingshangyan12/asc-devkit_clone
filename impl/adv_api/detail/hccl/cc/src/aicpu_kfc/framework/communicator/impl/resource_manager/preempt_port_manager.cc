@@ -10,7 +10,7 @@
 #include "preempt_port_manager.h"
 #include <sstream>
 #include "adapter_error_manager_pub.h"
-#include "adapter_rts_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_rts_common.h"
 #include "hccl_common.h"
 
 namespace hccl {

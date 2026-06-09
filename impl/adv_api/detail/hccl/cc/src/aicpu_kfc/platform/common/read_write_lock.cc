@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "read_write_lock.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock.h"
 
 
 ReadWriteLock::~ReadWriteLock()

@@ -10,7 +10,7 @@
 #ifndef ALLTOALL_V_PAIRWISE_H
 #define ALLTOALL_V_PAIRWISE_H
 
-#include "alltoallv_pairwise_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/alltoallv_pairwise_pub.h"
 
 namespace hccl {
 constexpr u32 NSLBDP_PAIRWISE_MAXPHASE = 256;

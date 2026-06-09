@@ -11,8 +11,8 @@
 #define AICPU_INSTRUCTION_H
 
 #include "instruction.h"
-#include "virtual_topo.h"
-#include "coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
 
 #include "template_utils.h"
 

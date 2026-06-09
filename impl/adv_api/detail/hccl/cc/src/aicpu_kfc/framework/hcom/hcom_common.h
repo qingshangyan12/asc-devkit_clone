@@ -10,11 +10,11 @@
 #ifndef HCOM_COMMOM_H
 #define HCOM_COMMOM_H
 
-#include "hccl_comm_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/hccl_comm_pub.h"
 #include "hcom_common_v2.h"
 #include "../common/src/topo/topoinfo_detect.h"
 
-#include "topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
 
 // Ge适配的类
 constexpr u32 SEND_RECEIVE_TASK_NUM = 20;

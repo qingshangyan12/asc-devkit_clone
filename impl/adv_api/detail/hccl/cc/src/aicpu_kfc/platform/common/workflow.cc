@@ -9,8 +9,8 @@
 */
 #include <mutex>
 #include <array>
-#include "adapter_rts.h"
-#include "workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_rts.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
 
 static std::mutex g_workFlowModeMutex;
 

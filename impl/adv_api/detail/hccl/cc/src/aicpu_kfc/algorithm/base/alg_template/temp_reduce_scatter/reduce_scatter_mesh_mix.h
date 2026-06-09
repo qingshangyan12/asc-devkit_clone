@@ -10,7 +10,7 @@
 #ifndef REDUCE_SCATTER_MESH_MIX_H
 #define REDUCE_SCATTER_MESH_MIX_H
 
-#include "reduce_scatter_mesh_mix_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/reduce_scatter_mesh_mix_pub.h"
 
 namespace hccl {
 }  // namespace hccl

@@ -12,7 +12,7 @@
 
 #include <mutex>
 #include <functional>
-#include "coll_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/prim_alg_executor/coll_alg_base.h"
 #include "log.h"
 
 namespace Hccl {

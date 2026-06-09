@@ -10,8 +10,8 @@
 #ifndef __AICPU_DISPATCH_H__
 #define __AICPU_DISPATCH_H__
 
-#include "common/aicpu_hccl_def.h"
-#include "common/aicpu_kfc_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_def.h"
 
 class AicpuDispatcher {
 public:

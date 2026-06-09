@@ -10,10 +10,10 @@
 #ifndef HCCL_INDEPENDENT_COMMON_H
 #define HCCL_INDEPENDENT_COMMON_H
 
-#include "hccl/hccl_res.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "hccl_common.h"
-#include "hcomm_res_defs.h"
-#include "hccl_mem_defs.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_res_defs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_mem_defs.h"
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus

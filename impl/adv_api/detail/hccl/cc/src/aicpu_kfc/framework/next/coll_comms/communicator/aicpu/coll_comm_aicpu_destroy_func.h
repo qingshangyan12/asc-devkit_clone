@@ -10,8 +10,8 @@
 #ifndef __COLL_COMM_AICPU_DESTROY_FUNC_H__
 #define __COLL_COMM_AICPU_DESTROY_FUNC_H__
 
-#include "daemon_func.h"
-#include "hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/communicator/aicpu/daemon/daemon_func.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace hccl {
 

@@ -15,8 +15,8 @@
 #include <algorithm>
 #include "alg_template_base_pub.h"
 #include "asymmetric_hierarchical_concatenate_base_pub.h"
-#include "comm_ahc_base_pub.h"
-#include "device_capacity.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/communicator/comm_ahc_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/device_capacity.h"
  
 namespace hccl {
  

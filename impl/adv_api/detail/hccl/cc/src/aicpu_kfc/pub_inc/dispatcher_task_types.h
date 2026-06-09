@@ -16,7 +16,7 @@
 #include <map>
 #include <thread>
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "workflow_pub.h"
 

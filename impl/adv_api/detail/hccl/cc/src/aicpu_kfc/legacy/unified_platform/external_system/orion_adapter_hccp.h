@@ -11,13 +11,13 @@
 #define HCCLV2_ADAPTER_HCCP_H
 #include <vector>
 #include <unordered_set>
-#include "hccp_common.h"
-#include "ip_address.h"
-#include "data_type.h"
-#include "reduce_op.h"
-#include "hccp_tlv.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/ip_address.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/data_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/reduce_op.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_tlv.h"
 #include <mutex>
-#include "hccp_async_ctx.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp_async_ctx.h"
 
 namespace Hccl {
 using namespace std;

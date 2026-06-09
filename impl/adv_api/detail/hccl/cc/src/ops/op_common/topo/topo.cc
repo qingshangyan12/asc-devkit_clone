@@ -8,12 +8,12 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "topo.h"
-#include "hccl_rank_graph.h"
-#include "hcomm_primitives.h"
-#include "hccl_res.h" 
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
+#include "../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 #include "hccl.h"
-#include "adapter_acl.h"
-#include "channel.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/adapter_acl.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/channel/channel.h"
 #include "hccl_common.h"
 #include "config_log.h"
 

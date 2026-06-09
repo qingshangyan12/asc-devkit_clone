@@ -14,11 +14,11 @@
 #include "adapter_prof.h"
 #include "task_profiling_pub.h"
 #include "profiler_base_pub.h"
-#include "externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
 
 #include "profiling_manager_pub.h"
 #include "aprof_pub.h"
-#include "dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
 
 #include <string>
 #include <cstdio>

@@ -10,8 +10,8 @@
 #ifndef AICPU_KFC_PROCESS_H
 #define AICPU_KFC_PROCESS_H
 
-#include "common/aicpu_hccl_def.h"
-#include "hccl_tiling_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_tiling_msg.h"
 #include "aicpu_kfc_rpc_server.h"
 
 class AicpuKfcProcess {

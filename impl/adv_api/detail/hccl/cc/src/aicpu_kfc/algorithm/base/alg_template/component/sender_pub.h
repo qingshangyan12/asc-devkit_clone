@@ -10,13 +10,13 @@
 #ifndef SENDER_PUB_H
 #define SENDER_PUB_H
 
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 #include "hccl_common.h"
-#include "mem_device_pub.h"
-#include "stream_pub.h"
-#include "transport_pub.h"
-#include "adapter_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_pub.h"
 
 namespace hccl {
 struct SenderMemoryInfo {

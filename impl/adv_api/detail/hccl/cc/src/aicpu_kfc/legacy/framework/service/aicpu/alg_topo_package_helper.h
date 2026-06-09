@@ -11,7 +11,7 @@
 #define HCCLV2_ALG_TOPO_PACKAGE_HELPER_H
 
 #include <vector>
-#include "coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
 
 namespace Hccl {
 

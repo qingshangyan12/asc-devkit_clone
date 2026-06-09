@@ -14,19 +14,19 @@
 #include <unordered_map>
 #include <atomic>
 #include <fstream>
-#include "hccl/base.h"
-#include "hccl_socket_manager.h"
-#include "dispatcher.h"
-#include "mem_device_pub.h"
-#include "transport_pub.h"
-#include "ccl_buffer_manager.h"
-#include "externalinput_pub.h"
-#include "sal_pub.h"
-#include "thread/threads_guard.h"
-#include "hccl_hash_utils.h"
-#include "workflow_pub.h"
-#include "comm_base_pub.h"
-#include "coll_alg_param.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/hccl_socket_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mem_device_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/ccl_buffer_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/externalinput_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/thread/threads_guard.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/hccl_hash_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/workflow_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/base/inc/comm_base_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 #include "multi_qpInfo_manager.h"
 namespace hccl {
 

@@ -15,13 +15,13 @@
 #include <string>
 #include <unordered_map>
 #include <mutex>
-#include <hccl/hccl_types.h>
-#include "common/aicpu_hccl_def.h"
-#include "stream_pub.h"
-#include "transport_mem.h"
-#include "dispatcher.h"
-#include "aicpu_operator_pub.h"
-#include "read_write_lock.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_def.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/stream_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_mem.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/dispatcher.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/read_write_lock.h"
 
 namespace hccl {
 class HcclOneSideServiceAicpu {

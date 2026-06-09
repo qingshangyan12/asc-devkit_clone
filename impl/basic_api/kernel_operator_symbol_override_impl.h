@@ -24,32 +24,32 @@
 #endif
 
 #if __NPU_ARCH__ == 1001
-#include "dav_c100/kernel_operator_vec_cmpsel_impl.h"
-#include "dav_c100/kernel_operator_vec_binary_impl.h"
+#include "impl/basic_api/dav_c100/kernel_operator_vec_cmpsel_impl.h"
+#include "impl/basic_api/dav_c100/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 2002
-#include "dav_m200/kernel_operator_vec_cmpsel_impl.h"
-#include "dav_m200/kernel_operator_vec_binary_impl.h"
+#include "impl/basic_api/dav_m200/kernel_operator_vec_cmpsel_impl.h"
+#include "impl/basic_api/dav_m200/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_vec_cmp_impl.h"
-#include "dav_c220/kernel_operator_vec_binary_impl.h"
+#include "impl/basic_api/dav_c220/kernel_operator_vec_cmp_impl.h"
+#include "impl/basic_api/dav_c220/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3002
-#include "dav_m300/kernel_operator_vec_binary_continuous_impl.h"
+#include "impl/basic_api/dav_m300/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3102
-#include "dav_m310/kernel_operator_vec_binary_continuous_impl.h"
+#include "impl/basic_api/dav_m310/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_3510/kernel_operator_vec_binary_continuous_impl.h"
-#include "dav_3510/kernel_operator_vec_compare_continuous_impl.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
+#include "impl/basic_api/dav_3510/kernel_operator_vec_binary_continuous_impl.h"
+#include "impl/basic_api/dav_3510/kernel_operator_vec_compare_continuous_impl.h"
 #elif (__NPU_ARCH__ == 5102)
-#include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_m510/kernel_operator_vec_binary_continuous_impl.h"
-#include "dav_m510/kernel_operator_vec_compare_continuous_impl.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
+#include "impl/basic_api/dav_m510/kernel_operator_vec_binary_continuous_impl.h"
+#include "impl/basic_api/dav_m510/kernel_operator_vec_compare_continuous_impl.h"
 #elif __NPU_ARCH__ == 3003
-#include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_l300/kernel_operator_vec_binary_continuous_impl.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
+#include "impl/basic_api/dav_l300/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3113
-#include "reg_compute/kernel_reg_compute_intf.h"
-#include "dav_l311/kernel_operator_vec_binary_continuous_impl.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
+#include "impl/basic_api/dav_l311/kernel_operator_vec_binary_continuous_impl.h"
 #endif
 #pragma begin_pipe(V)
 namespace AscendC {

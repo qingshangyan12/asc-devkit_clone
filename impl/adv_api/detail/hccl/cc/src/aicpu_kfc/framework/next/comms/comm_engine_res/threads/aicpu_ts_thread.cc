@@ -9,8 +9,8 @@
 */
 #include "aicpu_ts_thread.h"
 #include "hccl_common.h"
-#include "aicpu/aicpu_hccl_sqcq.h"
-#include "types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcq.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
 
 namespace hccl {
 AicpuTsThread::AicpuTsThread(StreamType streamType, uint32_t notifyNum, const NotifyLoadType notifyLoadType)

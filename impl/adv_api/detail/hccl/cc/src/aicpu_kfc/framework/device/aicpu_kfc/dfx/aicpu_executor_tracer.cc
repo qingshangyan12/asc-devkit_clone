@@ -9,11 +9,11 @@
 */
 #include "aicpu_executor_tracer.h"
 
-#include "hccl_msg.h"
-#include "common/aicpu_hccl_common.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hccl_msg.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
 #include "mc2_trace_utils.h"
-#include "utils/aicpu_hdc_utils.h"
-#include "framework/aicpu_kfc_process.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/utils/aicpu_hdc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/framework/aicpu_kfc_process.h"
 
 using HcclApi::HcclMsgArea;
 using HcclApi::HCCL_MSG_CNT;

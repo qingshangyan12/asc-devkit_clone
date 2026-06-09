@@ -11,8 +11,8 @@
 #define __AICPU_THREAD_PROCESS_H__
 
 #include "common.h"
-#include "aicpu_launch_manager.h"
-#include "aicpu_ts_thread.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/independent_op/resource/engine/aicpu_launch_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/next/comms/comm_engine_res/threads/aicpu_ts_thread.h"
 
 class AicpuThreadProcess {
 public:

@@ -9,7 +9,7 @@
 */
  
 #include "ccu_kernel_reduce_scatter_mesh1d_2die_mem2mem.h"
-#include "ccu_kernel_alg_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/template/ccu/ccu_kernel_alg_base.h"
  
 namespace mc2_ops_hccl {
 using namespace hcomm;

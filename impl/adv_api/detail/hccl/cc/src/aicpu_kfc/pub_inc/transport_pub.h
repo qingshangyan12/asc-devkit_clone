@@ -11,7 +11,7 @@
 #define TRANSPORT_PUB_H
 
 #include <initializer_list>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "hccl_common.h"
 #include "sal_pub.h"
 #include "adapter_pub.h"

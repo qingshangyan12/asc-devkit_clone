@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "command_handle.h"
-#include "profiling_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/common/debug/profiling/inc/profiling_manager.h"
 #include "prof_common.h"
 
 namespace hccl {

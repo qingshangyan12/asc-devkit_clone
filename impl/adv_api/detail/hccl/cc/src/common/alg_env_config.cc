@@ -18,7 +18,7 @@
 #include "mmpa_api.h"
 #include "config_log.h"
 #include "sal.h"
-#include "dtype_common.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/dtype_common.h"
 
 namespace mc2_ops_hccl {
 

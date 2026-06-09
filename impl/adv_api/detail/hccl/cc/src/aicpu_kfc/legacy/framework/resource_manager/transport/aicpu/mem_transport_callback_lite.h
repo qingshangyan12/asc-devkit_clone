@@ -10,8 +10,8 @@
 #ifndef MEM_TRANSPORT_CALLBACK_LITE_H
 #define MEM_TRANSPORT_CALLBACK_LITE_H
 
-#include "mirror_task_manager_lite.h"
-#include "virtual_topo.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/dfx/aicpu/common/mirror_task_manager_lite.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/virtual_topo.h"
 
 namespace Hccl{
 class MemTransportCallbackLite {

@@ -24,15 +24,15 @@
 #define ASCENDC_MODULE_CHECK_H
 
 #if ASCENDC_CPU_DEBUG
-#include "utils/kernel_check_copy.h"
-#include "utils/kernel_check_vec_binary.h"
-#include "utils/kernel_check_vec_binary_scalar.h"
-#include "utils/kernel_check_vec.h"
-#include "utils/kernel_check_func.h"
-#include "utils/kernel_check_conv2d.h"
-#include "utils/kernel_check_data_copy_overflow.h"
-#include "kernel_struct_mm.h"
-#include "kernel_struct_gather.h"
+#include "impl/basic_api/utils/kernel_check_copy.h"
+#include "impl/basic_api/utils/kernel_check_vec_binary.h"
+#include "impl/basic_api/utils/kernel_check_vec_binary_scalar.h"
+#include "impl/basic_api/utils/kernel_check_vec.h"
+#include "impl/basic_api/utils/kernel_check_func.h"
+#include "impl/basic_api/utils/kernel_check_conv2d.h"
+#include "impl/basic_api/utils/kernel_check_data_copy_overflow.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_struct_gather.h"
 
 namespace AscendC {
 

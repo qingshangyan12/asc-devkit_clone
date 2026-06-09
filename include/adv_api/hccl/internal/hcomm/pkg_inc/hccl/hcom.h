@@ -11,14 +11,14 @@
 #define HCOM_H
 
 #include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <functional>
 #include <vector>
 #include <unordered_map>
 #include <map>
 #include "workflow.h"
 #include "dtype_common.h"
-#include "hccl/hccl_rank_graph.h"
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_rank_graph.h"
 
 #ifdef __cplusplus
 extern "C" {

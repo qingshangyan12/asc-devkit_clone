@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_symmetric_memory.h"
-#include "symmetric_memory/symmetric_memory.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/communicator/impl/symmetric_memory/symmetric_memory.h"
 
 #ifdef CCL_KERNEL_AICPU
 namespace hccl {

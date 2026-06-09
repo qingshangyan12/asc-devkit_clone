@@ -14,7 +14,7 @@
 #include <mutex>
 #include <vector>
 #include <atomic>
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 
 namespace hccl {
 enum class P2PStatus {

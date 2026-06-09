@@ -13,10 +13,10 @@
 #include "log.h"
 #include "mmpa_api.h"
 #include "atrace_pub.h"
-#include "common/aicpu_hccl_common.h"
-#include "framework/aicpu_kfc_prof.h"
-#include "common/aicpu_kfc_utils.h"
-#include "adapter_hal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/common/aicpu_hccl_common.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/framework/aicpu_kfc_prof.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/device/aicpu_kfc/common/aicpu_kfc_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/adapter_hal_pub.h"
 
 namespace {
 constexpr uint32_t TRACE_RING_BUFF_SIZE = 128 * 1024;

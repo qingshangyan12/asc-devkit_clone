@@ -11,7 +11,7 @@
 #define HCOMM_HCCL_SRC_SAL_H
 
 #include <nlohmann/json.hpp>
-#include "sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
 #include "log.h"
 
 #if HCOMM_T_DESC("日志处理适配", true)

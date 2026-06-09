@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 
-#include "aicpu_hccl_sqcqv2.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu/aicpu_hccl_sqcqv2.h"
 #include "op_unfold_key.h"
 #include "op_unfold_cache_entry.h"
 #include "rt_external_stars_define.h"

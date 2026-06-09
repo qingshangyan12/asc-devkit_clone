@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "all_gather_op.h"
-#include "op_common_ops.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/op_common_ops.h"
 #include <algorithm>
 #include <future>
 #include <map>

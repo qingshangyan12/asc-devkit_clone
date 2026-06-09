@@ -12,7 +12,7 @@
 
 #include <unordered_map>
 
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "log.h"
 
 namespace hccl {

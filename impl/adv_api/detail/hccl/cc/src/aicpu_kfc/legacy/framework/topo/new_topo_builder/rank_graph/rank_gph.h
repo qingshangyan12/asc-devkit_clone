@@ -18,9 +18,9 @@
 #include "log.h"
 #include "net_instance.h"
 #include "rank_gph.h"
-#include "rank_table_info.h"
-#include "types.h"
-#include "hccl_res.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/topo/new_topo_builder/rank_table_info/rank_table_info.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "../../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_res.h"
 
 namespace Hccl {
 

@@ -15,16 +15,16 @@
 #include <deque>
 #include <mutex>
 
-#include "hccl/hccl_types.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include "log.h"
 #include "reference_map.h"
 #include "ring_buffer.h"
 #include "common.h"
-#include "sal_pub.h"
-#include "hccl_socket_manager.h"
-#include "transport_pub.h"
-#include "topoinfo_struct.h"
-#include "comm_config_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/sal_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/impl/resource_manager/hccl_socket_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/transport_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm_config_pub.h"
 namespace hccl {
 using RankId = u32;
 constexpr u32 BROADCAST_INTERVAL = 50; // 背景线程执行周期为50 ms

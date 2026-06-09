@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include "types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
 #include "rtsq_base.h"
 namespace Hccl {
 

@@ -11,14 +11,14 @@
 #define HCCLV2_COLL_ALG_COMPONENT_LITE
 
 #include <string>
-#include "dev_type.h"
-#include "connected_link_mgr.h"
-#include "base_config.h"
-#include "coll_alg_params.h"
-#include "coll_operator.h"
-#include "prim_queue.h"
-#include "coll_alg_component.h"
-#include "rmt_data_buffer_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/transport/aicpu/connected_link_mgr.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/env_config/base_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_alg_params.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/coll_operator.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/primitive/prim_queue.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/interface/host/coll_alg_component.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/resource_manager/buffer/aicpu/rmt_data_buffer_mgr.h"
 
 namespace Hccl {
 

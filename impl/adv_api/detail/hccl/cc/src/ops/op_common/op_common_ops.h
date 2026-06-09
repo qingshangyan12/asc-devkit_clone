@@ -10,20 +10,20 @@
 #ifndef OP_COMMON_OPS_H
 #define OP_COMMON_OPS_H
 
-#include "adapter_acl.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/adapter_acl.h"
 #include "adapter_error_manager_pub.h"
 #include "alg_env_config.h"
-#include "executor_base.h"
+#include "impl/adv_api/detail/hccl/cc/src/ops/op_common/executor/executor_base.h"
 #include "hccl.h"
-#include "hccl/base.h"
-#include "hccl_inner.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hccl_inner.h"
 #include "mmpa_api.h"
 #include "op_common.h"
 #include "param_check.h"
 #include "sal.h"
-#include "workflow.h"
-#include <hccl/hccl_types.h>
-#include "hcomm_dlsym.h"
-#include "hcom.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/workflow.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "impl/adv_api/detail/hccl/cc/src/common/hcomm_dlsym/hcomm_dlsym.h"
+#include "../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/hcom.h"
 
 #endif

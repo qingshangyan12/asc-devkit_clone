@@ -10,9 +10,9 @@
 #ifndef AICPU_SHARE_DATA_MANAGER
 #define AICPU_SHARE_DATA_MANAGER
 
-#include "hccl/base.h"
-#include "aicpu_operator_pub.h"
-#include "coll_alg_param.h"
+#include "../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/aicpu_operator_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/algorithm/pub_inc/coll_alg_param.h"
 
 namespace hccl {
 

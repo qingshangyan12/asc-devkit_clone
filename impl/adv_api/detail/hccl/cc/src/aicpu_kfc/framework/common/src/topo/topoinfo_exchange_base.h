@@ -10,13 +10,13 @@
 #ifndef TOPOINFO_EXCHANGE_BASE_H
 #define TOPOINFO_EXCHANGE_BASE_H
 
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <nlohmann/json.hpp>
-#include "topoinfo_struct.h"
-#include "comm.h"
-#include "hccl_socket.h"
-#include "hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/topoinfo_struct.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/inc/comm.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_socket.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
 
 namespace hccl {
 constexpr u32 MAX_AGENT_BUF_SIZE = 256; // masterInfo方式: superPodId(128) + hostIp + deviceId

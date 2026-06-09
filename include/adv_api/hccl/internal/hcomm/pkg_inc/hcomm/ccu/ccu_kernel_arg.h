@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "ccu_kernel_signature.h"
-#include "hcomm_primitives.h"
+#include "include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 
 namespace hcomm {
 

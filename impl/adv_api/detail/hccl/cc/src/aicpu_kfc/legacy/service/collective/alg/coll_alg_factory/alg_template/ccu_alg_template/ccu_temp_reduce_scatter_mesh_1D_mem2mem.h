@@ -10,10 +10,10 @@
 #ifndef HCCLV2_CCU_TEMP_REDUCE_SCATTER_MESH_1D_MEM2MEM_H_
 #define HCCLV2_CCU_TEMP_REDUCE_SCATTER_MESH_1D_MEM2MEM_H_
 
-#include "string_util.h"
-#include "env_config.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/framework/common/src/config/env_config.h"
 #include "ccu_alg_template_base.h"
-#include "executor_utils.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/service/collective/alg/coll_alg_factory/alg_executor/executor_utils.h"
 
 namespace Hccl {
 

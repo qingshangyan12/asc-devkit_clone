@@ -9,8 +9,8 @@
 */
 #include "transport_device_roce_mem.h"
 #include "log.h"
-#include "dispatcher_pub.h"
-#include "adapter_verbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/task/dispatcher_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_verbs.h"
 
 namespace hccl {
 std::atomic<u64> TransportDeviceRoceMem::wrIdOffset_;

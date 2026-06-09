@@ -9,12 +9,12 @@
 */
 #include "sqe_mgr.h"
 #include <chrono>
-#include "stl_util.h"
-#include "exception_util.h"
-#include "null_ptr_exception.h"
-#include "internal_exception.h"
-#include "string_util.h"
-#include "drv_api_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/stl_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/null_ptr_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/string_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/drv_api_exception.h"
 
 namespace Hccl {
 

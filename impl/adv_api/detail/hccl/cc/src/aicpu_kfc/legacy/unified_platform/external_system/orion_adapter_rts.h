@@ -13,9 +13,9 @@
 #include <string>
 #include <unordered_map>
 #include "acl/acl_rt.h"
-#include "types.h"
-#include "const_val.h"
-#include "dev_type.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/types.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/const_val.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/types/dev_type.h"
 #include "rt_external.h"
 #include "rt_external_kernel.h"
 

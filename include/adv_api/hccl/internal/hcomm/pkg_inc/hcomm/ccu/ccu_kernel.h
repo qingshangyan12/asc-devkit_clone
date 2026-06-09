@@ -29,8 +29,8 @@
 #include "ccu_funccall_v1.h"
 #include "ccu_loopcall_v1.h"
 
-#include "hccl_types.h"
-#include "hcomm_primitives.h"
+#include "include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
+#include "include/adv_api/hccl/internal/hcomm/hcomm_primitives.h"
 #include "ccu_datatype_v1.h"
 #include "ccu_interface_assist_v1.h"
 

@@ -11,8 +11,8 @@
 #define LOG_H
 
 #include <dlog_pub.h>
-#include <hccl/base.h>
-#include <hccl/hccl_types.h>
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/pkg_inc/hccl/base.h"
+#include "../../../../../../../include/adv_api/hccl/internal/hcomm/hccl/hccl_types.h"
 #include <securec.h>
 #include <iostream>
 #include <sstream>

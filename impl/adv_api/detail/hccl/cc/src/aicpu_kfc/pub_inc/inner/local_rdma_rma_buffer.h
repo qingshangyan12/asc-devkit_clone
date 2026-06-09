@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 #include "hccl_common.h"
-#include "hccl_network_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/hccl_network_pub.h"
 #include "rma_buffer.h"
 
 namespace hccl {

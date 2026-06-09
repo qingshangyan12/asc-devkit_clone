@@ -22,7 +22,7 @@
 #ifndef MATMUL_DFX_CONFIG_H
 #define MATMUL_DFX_CONFIG_H
 
-#include "handlers/dfx_chain_handler.h"
+#include "impl/adv_api/detail/matmul/dfx/handlers/dfx_chain_handler.h"
 #include "dfx_func_info.h"
 
 namespace AscendC {

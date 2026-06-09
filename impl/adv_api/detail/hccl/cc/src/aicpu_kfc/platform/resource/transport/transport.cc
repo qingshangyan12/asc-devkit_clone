@@ -9,15 +9,15 @@
 */
 #include "transport.h"
 #include "transport_base.h"
-#include "transport_ibverbs.h"
-#include "transport_tcp.h"
-#include "transport_direct_npu.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_ibverbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_tcp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_direct_npu.h"
 #ifdef CCL_KERNEL
-#include "transport_device_p2p.h"
-#include "transport_device_ibverbs.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/device/transport_device_p2p.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/device/transport_device_ibverbs.h"
 #endif
-#include "transport_p2p.h"
-#include "transport_virtural.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_p2p.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/resource/transport/host/transport_virtural.h"
 namespace hccl {
 std::mutex Transport::mapMutex_;
 std::unordered_map<TransportBase*, Transport*> Transport::transportMap_;

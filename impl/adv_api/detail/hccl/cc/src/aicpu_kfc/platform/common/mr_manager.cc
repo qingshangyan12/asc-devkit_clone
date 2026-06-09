@@ -7,13 +7,13 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
-#include "mr_manager.h"
-#include "adapter_hal.h"
-#include "adapter_hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/pub_inc/mr_manager.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hal.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/adapter/adapter_hccp.h"
 #include "dlra_function.h"
-#include "network_manager_pub.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/inc/network_manager_pub.h"
 #include "../resource/socket/hccl_network.h"
-#include "network/hccp.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/platform/hccp/inc/network/hccp.h"
 
 namespace hccl {
 using namespace std;

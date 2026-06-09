@@ -9,7 +9,7 @@
 */
 #include "ins_temp_reduce_scatter_mesh_2D.h"
 
-#include "aicpu_ins.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/framework/device_mode/aicpu_ins.h"
 #include "log.h"
 #include "alg_data_trans_wrapper.h"
 

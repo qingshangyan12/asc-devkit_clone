@@ -14,8 +14,8 @@
 #include <memory>
 #include <array>
 #include "dfx_common.h"
-#include "exception_util.h"
-#include "internal_exception.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/utils/exception_util.h"
+#include "impl/adv_api/detail/hccl/cc/src/aicpu_kfc/legacy/common/exception/internal_exception.h"
 #include <array>
 
 namespace Hccl {
