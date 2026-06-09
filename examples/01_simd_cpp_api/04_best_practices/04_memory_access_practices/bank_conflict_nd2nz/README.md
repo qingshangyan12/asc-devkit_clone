@@ -4,11 +4,13 @@
 
 本样例以 `8192 × 8192` half ND 矩阵到全局紧凑 NZ 布局的转换为例，介绍UB 上向量写阶段的 bank 冲突如何产生、如何规避。整个调优过程分为两个步骤（case 1-2），通过调整 `dstNzC0Stride` 这一个参数对比性能。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -98,7 +100,7 @@ ND和NZ的数据排布如图所示
 | 字段名 | 字段含义 |
 |:---:|:---|
 | Task Duration(μs)|Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。|
-| aiv_time|Task在AI Vector Core上的理论执行时间，单位为μs。|
+| aiv_time|Task在AI Vector Core上的执行时间，单位为μs。|
 | aiv_vec_time(μs) | vec类型指令（向量类运算指令）耗时，单位μs。 |
 | aiv_vec_ratio | vec类型指令（向量类运算指令）的cycle数在total cycle数中的占用比。 |
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位μs。 |
@@ -112,7 +114,7 @@ ND和NZ的数据排布如图所示
 
 ### Atlas A2/A3 系列产品（dav-2201）
 
-> 编译时通过 `-DCMAKE_ASC_ARCHITECTURES=dav-2201` 选择 Atlas A2/A3 。
+> 编译时通过 `-DCMAKE_ASC_ARCHITECTURES=dav-2201` 选择 Atlas A2/A3 系列产品 。
 
 #### UB Bank 结构与冲突类型
 
@@ -140,7 +142,7 @@ bank 冲突主要分为三类：
 
 **ND2NZ 实现**：
 
-vcopy 的 `Copy()` 自带 repeat，单条 Copy 覆盖 `actualTileH` 行 × 8 个 C0 列；非尾块时即 `144×128` half，一行 8 个 C0 列只需要 1 次 Copy：
+`Copy()` 自带 repeat，单条 Copy 覆盖 `actualTileH` 行 × 8 个 C0 列；非尾块时即 `144×128` half，一行 8 个 C0 列只需要 1 次 `Copy()`，因此在`tileW`方向进行循环：
 
 ```cpp
 AscendC::CopyRepeatParams copyParams;
@@ -176,7 +178,7 @@ for (uint32_t k = 0; k < tileW / vecLenHalf; ++k) {
 
 UB 的 16 个 bank group 各自可以并行接收写入；地址按 32B 一块为单位顺序循环分配：第 1 个 32B 块属于 bank group 0、第 2 个属于 bank group 1、……、第 17 个又回到 bank group 0 重新一轮。**一拍内多个写如果都要去同一个 bank group，就只能排队**。
 
-单条 vcopy 一拍要把 8 个 32B 块写到 UB，相邻两个落点之间隔 `dstNzC0Stride = 144` 个 32B 块。**144 刚好是 16 的整数倍**——每跳 144 步都会回到同一个 bank group。结果是 8 个写全部挤到 bank group 0，硬件只能依次处理，单条 vcopy 从 1 拍拉长为 **8 拍**，aiv_vec_time 显著膨胀。
+单条 copy 一拍要把 8 个 32B 块写到 UB，相邻两个落点之间隔 `dstNzC0Stride = 144` 个 32B 块。**144 刚好是 16 的整数倍**——每跳 144 步都会回到同一个 bank group。结果是 8 个写全部挤到 bank group 0，硬件只能依次处理，单条 copy 从 1 拍拉长为 **8 拍**，aiv_vec_time 显著膨胀。
 
 **S1 落点示意图**：
 
@@ -206,14 +208,13 @@ UB 的 16 个 bank group 各自可以并行接收写入；地址按 32B 一块�
 
 **优化效果分析**：
 - `aiv_vec_time = 47.790 μs`。
-- 冲突点在 Vec 写阶段：vcopy 的 8 个 32B 块全打 bank group 0。
-- 读侧（vcopy 的源）紧凑无冲突，不是瓶颈。
+- 主要冲突点在 Vec 写阶段：copy 的 8 个 32B 块全打 bank group 0。
 
-#### Case 2: 每个 C0 列偏移 1 个 DataBlock
+#### Case 2: nzBuf 多申请一行
 
 **实现方式**：编译时 `-DSCENARIO_NUM=2`。
 
-在 Case 1 紧凑排放的基础上，**让每个 C0 列的起始位置比前一列多偏移 1 个 DataBlock**，向量写落点便能在不同 bank group 间轮转。
+在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点便能在不同 bank group 间轮转。
 
 **关键代码**：
 
@@ -225,11 +226,11 @@ Ping-Pong 流水与 Case 1 完全一致，参见上文。
 
 **规避原理**：
 
-把 `dstNzC0Stride` 从 144 改成 145，相比于 Case1 在 UB 上多申请了一行空间，相邻两个 C0 列的起始地址之间隔 145 个 32B 块。每 145 步，相当于在 16 个 bank group 里走完 9 整轮后又额外多迈 1 步，落点依次进入 bank group 0、1、2、……、7，**8 个写分散到 8 个不同 bank group**，硬件可以并发处理，单条 vcopy **1 拍**完成。
+把 `dstNzC0Stride` 从 144 改成 145，相比于 Case1 在 UB 上多申请了一行空间，相邻两个写落点之间隔 145 个 32B 块。每 145 步，相当于在 16 个 bank group 里走完 9 整轮后又额外多迈 1 步，落点依次进入 bank group 0、1、2、……、7，**8 个写分散到 8 个不同 bank group**，硬件可以并发处理，单条 copy **1 拍**完成。
 
-每个 C0 列尾部多 1 行（1 个 32B 块），原本相邻的两个 32B 块在 NZ 排布中起始地址需间隔 `145 * 32B`，在 UB 中正好错开一个 bank group。
+多申请的这一行空间不作为有效数据写回 GM，只用于改变 UB 内写落点的 bank 分布。
 
-**图：Case 2 偏移 1 个 DataBlock 后 ND 到 NZ 的示意图**
+**图：Case 2 nzBuf 多申请一行后的 ND 到 NZ 示意图**
 
 <img src="figures/datand2nzS2.png" width="80%">
 
@@ -255,16 +256,16 @@ Ping-Pong 流水与 Case 1 完全一致，参见上文。
 
 `ndBuf` 占用 = `tileH * tileW * sizeof(half) = 144 * 128 * 2 = 36864 B = 36 KB`
 
-`nzBuf` 有效数据 DataBlock 数 = `(tileH - 1) * dstNzNStride + (tileC0Cols - 1) * dstNzC0Stride + 1`。S2 额外在末尾多预留 1 个 DataBlock 作为 padding，不写回 GM。
+`nzBuf` DataBlock 数统计的是 UB 实际申请空间，不是写回 GM 的有效数据量。S1 按 144 行紧凑申请，为 `144 × 8 = 1152` 个 DataBlock；S2 的 `dstNzC0Stride = 145`，相当于 `nzBuf` 多申请一行空间，因此为 `145 × 8 = 1160` 个 DataBlock。
 
 | 场景 | `ndBuf` 占用 | `nzBuf` DataBlock 数 | `nzBuf` 占用 |
 |:---:|:---:|:---:|:---:|
 | S1 (stride=144) | 36864 B = 36 KB | 1152 | 1152 × 32 B = 36864 B = 36 KB（紧凑） |
-| S2 (stride=145) | 36864 B = 36 KB | 1160 | 1160 × 32 B = 37120 B ≈ 36.3 KB（含 7 段 32B 偏移位 + 1 段 32B padding） |
+| S2 (stride=145) | 36864 B = 36 KB | 1160 | 1160 × 32 B = 37120 B ≈ 36.3 KB（按 145 行申请） |
 
-这些偏移位在 UB→GM 的 MTE3 阶段由 `outParams.srcStride = dstNzC0Stride - tileH` 跳过，不会写回 GM。
+多申请的这一行空间在 UB→GM 的 MTE3 阶段由 `outParams.srcStride = dstNzC0Stride - tileH` 跳过，不会写回 GM。
 
-双缓冲后，每套 buffer 包含一个 `ndBuf` 和一个 `nzBuf`。S1 总 UB 占用为 `2 × (36864 B + 36864 B) = 147456 B = 144 KB`，S2 总 UB 占用为 `2 × (36864 B + 37120 B) = 147968 B ≈ 144.5 KB`，满足 Atlas A2/A3 系列产品 192 KB UB 的约束。
+双缓冲后，每套 buffer 包含一个 `ndBuf` 和一个 `nzBuf`。S1 总 UB 占用为 `2 × (36864 B + 36864 B) = 147456 B = 144 KB`，S2 总 UB 占用为 `2 × (36864 B + 37120 B) = 147968 B ≈ 144.5 KB`，不会超过 UB Bank 内存。
 
 **性能数据**（Atlas A2/A3 系列产品，当前 `144×128` 配置，48 核）：
 
@@ -284,11 +285,16 @@ Ping-Pong 流水与 Case 1 完全一致，参见上文。
 
 #### UB Bank 结构与冲突类型
 
-Ascend 950PR/Ascend 950DT 上，Unified Buffer 总大小 256KB，划分为 16 个 bank（每个 bank 512 行 × 32B = 16KB）；这 16 个 bank 进一步组织为 **8 个 bank group**，每个 bank group 包含 2 个 bank。Vector 计算单元每拍能从每个 bank group 中读取或写入一行数据。
+Ascend 950PR/Ascend 950DT 上，Unified Buffer 总大小 256KB，划分为 16 个 bank（每个 bank 512 行 × 32B = 16KB）；这 16 个 bank 进一步组织为 **8 个 bank group**，每个 bank group 包含 2 个 bank（bank `i` 与 bank `i+8` 同属 bank group `i`，即 `bank group = bank % 8`）。Vector 计算单元每拍能从每个 bank group 中读取或写入一行数据。
 
-**图：Ascend 950PR/Ascend 950DT UB Bank 结构示意图**（箭头方向表示内存排布顺序）
+**图：Ascend 950PR/Ascend 950DT UB Bank 结构示意图**
 
 <img src="figures/ubBankStruct3510.png" width="80%">
+
+**地址采用低位交织**：UB 内连续地址以 32B 为单位在 bank0~bank15 间循环 —— 第 1 个 32B 块落到 bank0、第 2 个落到 bank1、……、第 16 个落到 bank15，第 17 个回到 bank0 的下一行，依次类推。
+
+**图：Ascend 950PR/Ascend 950DT UB Bank 内存排布示意图**（其中箭头方向表示内存排布顺序）
+<img src="figures/UB-3510.png" width="80%">
 
 bank 冲突主要分为三类：
 
@@ -338,22 +344,22 @@ for (uint16_t k = 0; k < vecsPerRow; ++k) {
 
 **冲突原理**：
 
-UB 的 8 个 bank group 各自可以并行接收写入；地址按 32B 一块为单位顺序循环分配：第 1 个 32B 块属于 bank group 0、第 2 个属于 bank group 1、……、第 9 个又回到 bank group 0 重新一轮。**一拍内多个写如果都要去同一个 bank group，就只能排队**。
+按低位交织规则，地址每跳 1 个 32B 块就换一个物理 bank（16 步走完一轮），每跳 8 步走完一轮 bank group。**一拍内多个写如果都要去同一个 bank group，就只能排队**。
 
-单条 `Reg::StoreAlign<DATA_BLOCK_COPY>` 一拍要把 8 个 32B 块写到 UB，相邻两个落点之间隔 `dstNzC0Stride = 144` 个 32B 块。**144 刚好是 8 的整数倍**——每跳 144 步都会回到同一个 bank group。结果是 8 个写全部挤到 bank group 0，硬件只能依次处理，单条 StoreAlign 从 1 拍拉长为 **8 拍**，aiv_vec_time 显著膨胀。
+单条 `Reg::StoreAlign<DATA_BLOCK_COPY>` 一拍要把 8 个 32B 块写到 UB，相邻两个落点之间隔 `dstNzC0Stride = 144` 个 32B 块。**144 = 16 × 9，是 16 的整数倍**——每跳 144 步不仅回到同一个 bank group，更回到完全相同的物理 bank（bank 0）。结果是 8 个写全部挤到 bank 0，硬件只能依次处理，单条 StoreAlign 从 1 拍拉长为 **8 拍**，aiv_vec_time 显著膨胀。
 
 **S1 落点示意图**：
 
 ```text
 单条 StoreAlign 的 8 个写在 UB 上的落点：
-  DataBlock 0 → 第   0 个 32B 块  → bank group 0
-  DataBlock 1 → 第 144 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 2 → 第 288 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 3 → 第 432 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 4 → 第 576 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 5 → 第 720 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 6 → 第 864 个 32B 块  → bank group 0   ◀ 同一 bank group
-  DataBlock 7 → 第1008 个 32B 块  → bank group 0   ◀ 同一 bank group
+  DataBlock 0 → 第   0 个 32B 块  → bank 0 → bank group 0
+  DataBlock 1 → 第 144 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 2 → 第 288 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 3 → 第 432 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 4 → 第 576 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 5 → 第 720 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 6 → 第 864 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
+  DataBlock 7 → 第1008 个 32B 块  → bank 0 → bank group 0   ◀ 同一 bank
 ```
 
 **图：Ascend 950PR/Ascend 950DT Case 1 的 UB bank group 冲突示意图**
@@ -368,19 +374,18 @@ UB 的 8 个 bank group 各自可以并行接收写入；地址按 32B 一块为
 
 **优化效果分析**：
 - `aiv_vec_time = 45.25 μs`，是 Case 2 的 ~4.95 倍。
-- 冲突点在 Vec 写阶段：VEC_STORE 流水内每条 StoreAlign 都因 bank-group 冲突排队 8 拍。
-- 读侧（VEC_LOAD 读 ndBuf）紧凑无冲突，不是瓶颈。
+- 冲突点在 Vec 写阶段：VEC_STORE 流水内每条 StoreAlign 都因 bank-group 写写冲突排队 8 拍。
 
 **性能瓶颈定位**：
 > ⚠️ **bank 冲突在 Vec 流水**
 >
 > 在 Regbase 架构下，`Reg::LoadAlign` 走 **VEC_LOAD** 子流水、`Reg::StoreAlign` 走 **VEC_STORE** 流水，不在 MTE 上。常规 MTE 类 bank-conflict 计数器看不到，需要看 vec 流水或单指令周期数。
 
-#### Case 2: 每个 C0 列偏移 1 个 DataBlock
+#### Case 2: nzBuf 多申请一行
 
 **实现方式**：编译时 `-DSCENARIO_NUM=2`。
 
-在 Case 1 紧凑排放的基础上，**让每个 C0 列的起始位置比前一列多偏移 1 个 DataBlock**，向量写落点便能在不同 bank group 间轮转。
+在 Case 1 紧凑排放的基础上，**将 `dstNzC0Stride` 从 `tileH` 调整为 `tileH + 1`**，相当于 `nzBuf` 多申请一行空间，让向量写落点便能在不同 bank group 间轮转。
 
 **关键代码**：
 
@@ -388,50 +393,52 @@ UB 的 8 个 bank group 各自可以并行接收写入；地址按 32B 一块为
 constexpr uint32_t dstNzC0Stride = (SCENARIO == 1) ? tileH : (tileH + 1);
 ```
 
-Ping-Pong 流水与 Atlas A2/A3 Case 1 完全一致，参见上文。
-
 **规避原理**：
 
-把 `dstNzC0Stride` 从 144 改成 145，相比于 Case1 在 UB 上多申请了一行空间，相邻两个 C0 列的起始地址之间隔 145 个 32B 块。每跳 145 步，相当于在 8 个 bank group 里走完 18 整轮后又额外多迈 1 步，落点依次进入 bank group 0、1、2、……、7，**8 个写正好打满 8 个 bank group**，硬件可以并发处理，单条 StoreAlign **1 拍**完成。
+把 `dstNzC0Stride` 从 144 改成 145，相比于 Case1 在 UB 上多申请了一行空间，相邻两个写落点之间隔 145 个 32B 块。**145 = 16 × 9 + 1**，每跳一次物理 bank 索引 +1，8 个落点依次落到 8 个相邻物理 bank；又因 `bank group = bank % 8`，这 8 个 bank 同时分属 8 个不同 bank group，**8 个写正好分散至 8 个 bank group**，硬件可以并发处理，单条 StoreAlign **1 拍**完成。本实现中 nzBuf 起始位置已偏移到 bank 8（见下方"补充"小节），因此 8 个落点实际是 bank 8 ~ bank 15。
 
-每个 C0 列尾部多 1 行（1 个 32B 块），原本相邻的两个 32B 块在 NZ 排布中起始地址需间隔 `145 * 32B`，在 UB 中正好错开一个 bank group。
+多申请的这一行空间不作为有效数据写回 GM，只用于改变 UB 内写落点的 bank 分布。
 
-**图：Case 2 偏移 1 个 DataBlock 后 ND 到 NZ 的示意图**
+**图：Case 2 nzBuf 多申请一行后的 ND 到 NZ 示意图**
 
 <img src="figures/datand2nzS2.png" width="80%">
 
-**S2 落点示意图**：
+**S2 落点示意图**（nzBuf 已偏移到 bank 8 起步）：
 
 ```text
-单条 StoreAlign 的 8 个写在 UB 上的落点：
-  DataBlock 0 → 第   0 个 32B 块  → bank group 0
-  DataBlock 1 → 第 145 个 32B 块  → bank group 1
-  DataBlock 2 → 第 290 个 32B 块  → bank group 2
-  DataBlock 3 → 第 435 个 32B 块  → bank group 3
-  DataBlock 4 → 第 580 个 32B 块  → bank group 4
-  DataBlock 5 → 第 725 个 32B 块  → bank group 5
-  DataBlock 6 → 第 870 个 32B 块  → bank group 6
-  DataBlock 7 → 第1015 个 32B 块  → bank group 7
+单条 StoreAlign 的 8 个写在 UB 上的落点（"第 N 个 32B 块"按 nzBuf 起点算）：
+  DataBlock 0 → 第   0 个 32B 块  → bank 8  → bank group 0
+  DataBlock 1 → 第 145 个 32B 块  → bank 9  → bank group 1
+  DataBlock 2 → 第 290 个 32B 块  → bank 10 → bank group 2
+  DataBlock 3 → 第 435 个 32B 块  → bank 11 → bank group 3
+  DataBlock 4 → 第 580 个 32B 块  → bank 12 → bank group 4
+  DataBlock 5 → 第 725 个 32B 块  → bank 13 → bank group 5
+  DataBlock 6 → 第 870 个 32B 块  → bank 14 → bank group 6
+  DataBlock 7 → 第1015 个 32B 块  → bank 15 → bank group 7
 ```
 
 **图：Ascend 950PR/Ascend 950DT Case 2 的 UB bank group 分散落点示意图**
 
 <img src="figures/s2bank3510.png" width="80%">
 
+> **补充：nzBuf 起始地址偏移到 bank 8**
+>
+> 950PR 上 S2 还把 nzBuf 起始地址在紧贴 ndBuf 末尾的基础上**再多偏移 8 个 datablock = 256B**，让 nzBuf 起步于 bank 8。这样一拍 V_LOAD 读 ndBuf 行 0 落在 bank 0~7，V_STORE 落在 bank 8~15，物理 bank 不相交，可降低同拍 V_LOAD / V_STORE 读写冲突（同一个Bank内读写冲突）。
+
 **UB 占用变化**：
 
 `ndBuf` 占用 = `tileH * tileW * sizeof(half) = 144 * 128 * 2 = 36864 B = 36 KB`
 
-`nzBuf` 有效数据 DataBlock 数 = `(tileH - 1) * dstNzNStride + (tileC0Cols - 1) * dstNzC0Stride + 1`。S2 额外在末尾多预留 1 个 DataBlock 作为 padding，不写回 GM。
+`nzBuf` DataBlock 数统计的是 UB 实际申请空间，不是写回 GM 的有效数据量。S1 按 144 行紧凑申请，为 `144 × 8 = 1152` 个 DataBlock；S2 的 `dstNzC0Stride = 145`，相当于 `nzBuf` 多申请一行空间，因此为 `145 × 8 = 1160` 个 DataBlock。
 
 | 场景 | `ndBuf` 占用 | `nzBuf` DataBlock 数 | `nzBuf` 占用 |
 |:---:|:---:|:---:|:---:|
 | S1 (stride=144) | 36864 B = 36 KB | 1152 | 1152 × 32 B = 36864 B = 36 KB（紧凑） |
-| S2 (stride=145) | 36864 B = 36 KB | 1160 | 1160 × 32 B = 37120 B ≈ 36.3 KB（含 7 段 32B 偏移位 + 1 段 32B padding） |
+| S2 (stride=145) | 36864 B = 36 KB | 1160 | 1160 × 32 B = 37120 B ≈ 36.3 KB（按 145 行申请） |
 
-这些偏移位在 UB→GM 的 MTE3 阶段由 `outParams.srcStride = dstNzC0Stride - tileH` 跳过，不会写回 GM。
+多申请的这一行空间在 UB→GM 的 MTE3 阶段由 `outParams.srcStride = dstNzC0Stride - tileH` 跳过，不会写回 GM。
 
-双缓冲后，每套 buffer 包含一个 `ndBuf` 和一个 `nzBuf`。S1 总 UB 占用为 `2 × (36864 B + 36864 B) = 147456 B = 144 KB`，S2 总 UB 占用为 `2 × (36864 B + 37120 B) = 147968 B ≈ 144.5 KB`，满足 Ascend 950PR/Ascend 950DT 256 KB UB 的约束。
+双缓冲后，每套 buffer 包含一个 `ndBuf` 和一个 `nzBuf`。S1 总 UB 占用为 `2 × (36864 B + 36864 B) = 147456 B = 144 KB`；S2 还为两块 `nzBuf` 各引入一段 256 B 的 bank-8 起步偏移（详见上文"补充"小节），总 UB 占用为 `2 × (36864 B + 37120 B) + 2 × 256 B = 148480 B ≈ 145 KB`，满足 Ascend 950PR/Ascend 950DT 256 KB UB 的约束。
 
 **性能数据**（Ascend 950PR/Ascend 950DT，当前 `144×128` 配置，64 核）：
 
@@ -495,7 +502,7 @@ T_{\text{base}} = \frac{M \times N}{128 \times 1.65 \times 10^9 \times 64}
                 \approx 4.965\mu s
 $$
 
-实测 `aiv_vec_time` 为 `9.14μs`，未达理论峰值，原因是 **vloop 内指令的实际发射顺序由硬件调度决定**：指令下发槽不是每个 cycle 都能凑出"本轮 store + 下一轮 load"这种理想组合，此时仍然存在 bank 冲突。
+实测 `aiv_vec_time` 为 `9.14μs`，与 4.965μs 理论值的差距来自两个叠加因素：(1) V_STORE stride=145 每次起始 bank +1，多轮循环后还会与V_LOAD落至一个bank，仅靠 buffer 偏移无法逐行完美错开；(2) vloop 指令双发，发射槽位不是每个 cycle 都能凑出"本轮 store + 下一轮 load"的理想组合，带来冲突。本样例主在演示如何解决 NZ 写的写写冲突，端到端 Task Duration 已被 MTE2/MTE3 主导（`aiv_mte2_ratio`高达96.7%），vec 时间不在关键路径上。
 
 ### 优化要点总结
 
@@ -509,28 +516,16 @@ $$
 ## 编译运行
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，root用户安装CANN软件包
-
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build   # 创建并进入build目录
   cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;  # 编译工程，默认npu模式
@@ -553,7 +548,7 @@ $$
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU 调试、NPU 仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：`dav-2201` 对应 Atlas A2/A3 训练/推理系列，`dav-3510` 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `1`（默认）、`2` | bank 冲突场景编号 |
 
   执行结果如下，说明精度对比成功：

@@ -3,11 +3,14 @@
 ## 概述
 
 本样例基于静态Tensor编程范式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步、UnitFlag、L2Cache等多种优化手段，实现高性能矩阵乘法运算。本样例基于基础API实现，与高阶API版本所使用的优化方法相同，样例目标为基于静态Tensor编程范式展示调优实现细节。
-## 支持的产品
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+## 本样例支持的产品及CANN软件版本
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -31,8 +34,6 @@
   - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]
 
 - 样例规格：
-
-
 
 <table>
 <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
@@ -61,8 +62,8 @@
 | aic_fixpipe_time(μs) | FixPipe（L0C 到 GM 搬运）的执行时间 |
 | aic_fixpipe_ratio | FixPipe 的时间占比，反映结果写回的访存压力 |
 
-
 ### 数据流路径：
+
 ```
 GM ──(MTE2, DataCopy)──> L1 ──(MTE1, LoadData)──> L0A/L0B ──(Cube, Mmad)──> L0C ──(Fixpipe)──> GM
        DataCopyInA/B             DataLoadA/B                   Compute             CopyOut
@@ -82,7 +83,6 @@ MTE1:               |─ A2 Ping ──|─ A2 Pong ──|─ A2 Ping ──| .
 Cube:                            |─ Mmad ─────|─ Mmad ─────| ...
 Fixpipe:                           |─ CopyOut ──|(unitflag)
 ```
-
 
 **L1 双缓冲布局**：A1 占 L1 前半（0~256KB），B1 占 L1 后半（256~512KB），各自再分为 Ping/Pong 两块：
 
@@ -117,7 +117,6 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 
 通过 `stepKa`/`stepKb` 参数将多个基本块打包为一次 DataCopyIn 操作（称为"大包"），减少 MTE2 搬运次数。例如 `stepKa=8` 表示一次将 8 个 baseM * baseK 块从 GM 搬入 L1。
 
-
 ```cpp
 // DataCopyInA: 一次搬入 stepKa 个 baseK 块
 AscendC::Nd2NzParams nd2nzParams;
@@ -140,12 +139,12 @@ nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
 
 ```cpp
 // 初始化：预置反向同步 flag，防止首次 WaitFlag 死锁
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(0);  // A1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(1);  // A1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(2);  // B1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(3);  // B1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(0);     // L0 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(1);     // L0 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);  // A1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);  // A1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);  // B1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);  // B1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);     // L0 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong 可写
 ```
 
 **大包粒度的正向同步**：DataLoad 从 L1 大包中按K方向逐个base块读取数据，只需在读取大包首个base块时等待数据就绪，后续base块与首个在同一个大包内，无需重复等待：
@@ -166,6 +165,33 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 在 Atlas A2/A3 架构上，本样例使用 `LoadData3DParamsV2`（即 LoadData3D）替代 `LoadData2DParams`（即 LoadData2D）完成 L1→L0 的数据搬运。这是一个关键的指令队列优化。
 
 **问题背景**：MTE1 指令队列深度为 32。使用 LoadData2D 时，由于单条 LoadData2D 指令搬运粒度有限，搬运一个 baseM×baseK 的切片需要用 for 循环发射多条 LoadData2D 指令。例如 baseM=128、baseK=64 时，最少需要发射 `baseK/16 = 4` 条 LoadData2D 指令。
+
+**代码实现**：使用 LoadData2D 时，需要按 `CUBE_BLOCK` 粒度循环发射多条搬运指令；改为 LoadData3D 后，可用一条指令描述完整的 base 切片。
+
+优化前，`baseK=64` 时循环次数为 4：
+
+```cpp
+AscendC::LoadData2DParams loadDataParams;
+for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
+    AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
+}
+```
+
+优化后，使用 `LoadData3DParamsV2` 一次性描述 `baseM * baseK` 切片：
+
+```cpp
+AscendC::LoadData3DParamsV2<half> loadDataParams;
+loadDataParams.l1H = 1;
+loadDataParams.l1W = baseM;
+loadDataParams.channelSize = baseK;
+loadDataParams.kExtension = baseK;
+loadDataParams.mExtension = curMAlign;
+loadDataParams.mStartPt = 0;
+loadDataParams.kStartPt = 0;
+AscendC::LoadData(a2Local, a1Local[srcAddr], loadDataParams);
+```
+
+这样每个 base 切片的 MTE1 指令数从多条 `LoadData2D` 降为 1 条 `LoadData3D`，可以降低 MTE1 队列占用。B 矩阵非转置输入时，同样通过 `LoadData3DParamsV2` 配置 `enTranspose = true` 完成转置搬运。
 
 > **注意**：Atlas A5 芯片提供了 `LoadData2DParamsV2` 接口，单条指令即可完成搬运，无需 LoadData3D。因此本样例通过 `__NPU_ARCH__` 条件编译区分两种架构的 LoadData 实现。
 
@@ -296,14 +322,14 @@ k=4:  WaitFlag(B1Pong) → DataLoad(B1Pong) → Compute
 k=5:  DataLoad → Compute
 k=6:  DataLoad → Compute
 k=7:  DataLoad(释放A1Ping B1Pong) → Compute → DataCopyIn(B1Pong) → DataCopyIn(A1Ping)
-k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute 
+k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad → Compute
 ...
 ```
-
 
 ### 性能数据分析
 
 #### Atlas A2训练系列芯片性能数据
+
 - Scenario 1：不使能 L2Cache 切分，singleCoreM=2048, singleCoreN=1536，24 核一轮全覆盖
 - Scenario 2：使能 L2Cache 切分，singleCoreM=1024, singleCoreN=1536，24 核分 2 轮计算
 
@@ -315,7 +341,6 @@ k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad
 除去启动开销，已达成该芯片 84.7% 的峰值算力。
 
 使能 L2Cache 切分后，aic_mte2_time 从 3552.248μs 降低到 3487.068μs，降低了 1.84%。当前切分策略较简单，用户可进一步优化 L2Cache 切分策略以提高 MTE2 带宽。
-
 
 #### Ascend 950PR芯片性能数据
 
@@ -331,7 +356,6 @@ k=8:  WaitFlag(A1Pong已就绪✓) → WaitFlag(B1Ping已就绪✓) → DataLoad
 
 使能 L2Cache 切分后在 Ascend 950PR 芯片上没有明显效果，原因如下：L2Cache 优化的目标是缓解 MTE2 bound，但当前瓶颈为 Cube 计算而非数据搬运，因此减少 MTE2 耗时无法提升整体性能；此外 L2Cache 切分将计算分为 2 轮调度，引入了额外的 Scalar 开销和调度开销，导致 Scenario 2 的 Task Duration 略高于 Scenario 1。同时，Scenario 2 的 aic_mte2_time（1892.742μs）反而略高于 Scenario 1（1874.267μs），这是因为当样例处于 Cube bound 时，MTE2 流水线被 Cube 计算阻塞，profiler 采集的 aic_mte2_time 包含了流水线等待时间而非纯粹的数据搬运时间，L2Cache 优化虽然减少了实际数据访问延迟，但被 Cube 计算瓶颈掩盖，无法在 MTE2 指标上体现。
 
-
 ### 理论性能分析
 
 #### Cube 计算性能分析
@@ -342,8 +366,7 @@ $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_nu
 
 Cube 计算耗时误差：
 
-$$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{3082.158 - 3022.92}{3022.92} = 1.95\%$$
-
+$$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{3082.158 - 3022.92}{3022.92} = 1.96\%$$
 
 **Ascend 950PR 芯片**：样例参数 M=N=K=8192，baseM=256，baseN=256，baseK=64，该处理器主频为 1.65GHz，每 cycle 处理 16×16×16 次乘加运算。
 
@@ -352,7 +375,6 @@ $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_nu
 Cube 计算耗时误差：
 
 $$误差 = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{2564.813 - 2542.00}{2542.00} = 0.90\%$$
-
 
 #### MTE2 带宽分析
 
@@ -390,8 +412,6 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
 相比于 Atlas A2 训练系列芯片，Ascend 950PR 芯片数据搬运更为高效，MTE2 带宽利用率更高。
 
-
-
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
@@ -404,24 +424,16 @@ $$MTE2耗时误差 = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录

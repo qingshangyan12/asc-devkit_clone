@@ -27,11 +27,13 @@
   </tr>
 </table>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -279,7 +281,7 @@ if ASCEND_IS_AIV {
 ```
 (2) GetBlockIdx(获取当前核的index)在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置NUM_BLOCKS=8、AIC与AIV的比例为1:2，因此GetBlockIdx在AIC和AIV的取值范围分别为0-7和0-15。
 
-(3) 样例采用静态tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+(3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 #### 3.2 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
@@ -292,30 +294,23 @@ if ASCEND_IS_AIV {
 ```
  (2) 模式 1 要求参与同步的 2个AIV 必须属于同一个AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的 GetBlockIdx=2、3 同属第 2 个 AI Core(下标从 1 开始)；若将GetBlockIdx改为 3 和 4(分别属于两个不同的AI Core)，程序将卡死。
 
- (3) 样例采用静态tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+ (3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
     
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   SCENARIO_NUM=0  # 设置场景编号（取值为0、1、2）
   mkdir -p build && cd build;      # 创建并进入build目录
@@ -339,7 +334,7 @@ if ASCEND_IS_AIV {
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品、dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`（默认）、`1`、`2` | 场景编号：0（纯Vector模式0）、1（纯Vector模式1）、2（Cube+Vector融合） |
 
 - 执行结果

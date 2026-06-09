@@ -1,10 +1,13 @@
 # BroadCastVecToMM样例
 
 ## 概述
-本样例基于BroadCastVecToMM实现数据广播搬运，将位于UB（Unified Buffer）上数据进行广播并搬运到CO1（L0C Buffer）。
+本样例基于BroadCastVecToMM实现数据广播搬运，将位于UB（Unified Buffer）上数据进行广播并搬运到L0C Buffer。
 
-## 支持的产品
-- Atlas 推理系列产品AI Core
+## 本样例支持的产品及CANN软件版本
+
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas 推理系列产品AI Core | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 ```
@@ -20,7 +23,7 @@
 ## 样例描述
 - 样例功能：
 
-  本样例将位于UB（Unified Buffer）上的shape为[1, 16]的数据广播到[16, 16]，并搬运到CO1（L0C Buffer）。接口资料参考BroadCastVecToMM。
+  本样例将位于UB（Unified Buffer）上的shape为[1, 16]的数据广播到[16, 16]，并搬运到L0C Buffer。接口资料参考BroadCastVecToMM。
 - 样例规格：
 
   <table border="2">
@@ -36,8 +39,8 @@
 
   - kernel实现
     - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer），并将广播后的数据搬出到GM（Global Memory）。
-    - 调用BroadCastVecToMM基础API，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到CO1（L0C Buffer）。
-    - 调用DataCopy增强数据搬运接口，将广播后的数据从CO1（L0C Buffer）搬运到UB（Unified Buffer）。
+    - 调用BroadCastVecToMM基础API，将UB（Unified Buffer）上的数据从[1, 16]广播到[16, 16]，并搬运到L0C Buffer。
+    - 调用DataCopy增强数据搬运接口，将广播后的数据从L0C Buffer搬运到UB（Unified Buffer）。
 
   - 调用实现
 
@@ -46,23 +49,16 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2002 ..;make -j;                      # 编译工程，默认npu模式

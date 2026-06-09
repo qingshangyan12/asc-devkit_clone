@@ -6,9 +6,9 @@
 
 -   **\_\_NPU\_ARCH\_\_**
 
-    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。AI处理器型号和\_\_NPU\_ARCH\_\_对应关系如下表所示：
+    \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。该宏由四位数字组成，其中前三位数字用于标识AI Core的IP核\(Intellectual Property Core\)类型，第四位数字标识该AI Core同一个IP核的配置版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下表所示：
 
-    **表 1** AI处理器型号和\_\_NPU\_ARCH\_\_的对应关系
+    **表 1** 产品型号和NPU架构版本的对应关系
 
     <a name="table65291052154114"></a>
     <table><thead align="left"><tr id="row1852915527411"><th class="cellrowborder" valign="top" width="49.59%" id="mcps1.2.3.1.1"><p id="p12529952134112"><a name="p12529952134112"></a><a name="p12529952134112"></a><span id="ph5758231184918"><a name="ph5758231184918"></a><a name="ph5758231184918"></a>AI处理器</span>型号</p>
@@ -71,7 +71,7 @@
 
     ASCEND\_IS\_AIV和ASCEND\_IS\_AIC是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。基于分离模式（AIC核和AIV核分离）开发融合算子时，算子逻辑中同时涉及AIV核和AIC核的处理逻辑，并需要进行核间同步，此时需要通过ASCEND\_IS\_AIV/ ASCEND\_IS\_AIC进行AIV和AIC核代码的隔离。
 
-    >[!NOTE]说明 
+    >[!NOTE]说明
     >当使用高阶API Matmul时，其内部已通过REGIST\_MATMUL\_OBJ宏方式实现了AIV与AIC核代码的隔离，用户无需再使用该宏进行处理。
 
     以MatmulNzCustom算子为例，该算子在分离模式下需要分别在AIV核和AIC核上实现不同的逻辑。具体而言，AIV核负责将矩阵数据搬入Unified Buffer，完成数据的重排（将矩阵数据转换为NZ格式），并将其写入Global Memory。而AIC核则直接从Global Memory读取已经重排好的NZ格式数据，并执行矩阵乘法（Matmul）计算。由于AIV核和AIC核的代码逻辑不同，需要通过ASCEND\_IS\_AIV和ASCEND\_IS\_AIC宏进行代码隔离，确保在编译时分别生成适用于AIV核和AIC核的代码。
@@ -119,9 +119,9 @@
 
     ASCENDC\_CUBE\_ONLY是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。
 
-    基于分离模式开发非融合算子时，在只有矩阵计算的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，使能纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
+    基于分离模式开发非融合算子时，在只有矩阵计算的算子场景下，可以通过设置ASCENDC\_CUBE\_ONLY，开启纯Cube模式完成Matmul计算，减少消息通信的性能开销，提升算子性能。
 
-    >[!CAUTION]注意 
+    >[!CAUTION]注意
     >ASCENDC\_CUBE\_ONLY宏必须在\#include "lib/matmul\_intf.h"之前设置。
 
     以matmul\_custom算子为例，高阶API Matmul默认使用MIX模式，即用户从AIV侧发起消息，通过消息通信框架中转消息后，在AIC侧执行Matmul计算。这套消息处理机制会带来额外的Scalar性能开销。相较于MIX模式，纯Cube模式可以直接跳过消息通信框架，完成Matmul计算，提升算子性能。
@@ -131,7 +131,7 @@
     ```
     #define ASCENDC_CUBE_ONLY
     #include "lib/matmul_intf.h"
-    
+
     using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
     using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
     using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
@@ -162,7 +162,7 @@
     // Only callable from device functions with same kind
     // of execution space
     __aicore__ void bar() {}
-    
+
     // Define a kernel function execute on AI Core device
     __global__ __aicore__ void foo() {
       bar(); // OK.
@@ -181,16 +181,16 @@
 
     ```
     __aicore__ int f() {}
-    
+
     // defines a host side function
     int foo() {}
-    
+
     // defines a host side function
     __host__ int bar() {
       f();     // Error.
       foo();   // OK.
     }
-    
+
     // Error.
     __global__ __host__ void kfunc() {}
     ```
@@ -208,9 +208,9 @@
     ```
     // Define a AI CPU kernel function in AI CPU device file
     __aicpu__ void foo() {} // Error, single __aicpu__ identifier without _global__
-    __global__ void foo() {} // Error, single __global__ identifier without __aicpu__ 
+    __global__ void foo() {} // Error, single __global__ identifier without __aicpu__
     __global__ __aicpu__  void foo() {} // Error, return type is void
-    __global__ __aicpu__  int foo(void *a) {} // OK 
+    __global__ __aicpu__  int foo(void *a) {} // OK
     __global__ __aicpu__  int foo(int a) {} // Error, input param is not pointer
     __global__ __aicpu__  int foo(void *a, void *b) {} // Error, input param num is not one
     ```
@@ -270,13 +270,13 @@
      __schedmode__(1) __global__ __mix__(1, 2) void OP1() // OP1使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
     {
         AscendC::SyncAll();
-        ....    
+        ....
     }
      __schedmode__(1) __global__ __mix__(1, 2) void OP2() // OP2使用了SyncAll接口，且存在多流并发的可能，需要设置batch mode（mode 1）
     {
         AscendC::SyncAll();
-        ....    
-    } 
+        ....
+    }
     __schedmode__(0) __global__ __vector__ void OP3() {...} // OP3没有使用SyncAll接口，可以设置为normal mode(mode 0)，按照正常规则执行算子。
     or
     __global__ __vector__ void OP3() {...} // 不设置__schedmode__，默认为normal mode。
@@ -418,7 +418,7 @@ __ubuf__ __gm__ int i;
 __ubuf__ int * __gm__ ptr;
 ```
 
->[!NOTE]说明 
+>[!NOTE]说明
 >**重要**：不同地址空间指针的大小可能不同。例如，不能认为 sizeof\(\_\_gm\_\_ int \*\)总是等于sizeof\(\_\_ubuf\_\_ int \*\)，譬如编译器或许可能在某些系统上以32bit存储\_\_ubuf\_\_指针。
 
 -   **private地址空间**
@@ -426,16 +426,16 @@ __ubuf__ int * __gm__ ptr;
     private地址空间是大多数变量的默认地址空间，特别是局部变量。
 
     ```
-    // m is in a specific kernel parameter address space, 
+    // m is in a specific kernel parameter address space,
     // it's physical location is implementation determined.
     __global__ __vector__ void foo(int m) {
       // OK. i is an int variable allocated in private address space
       int i;
     }
-    
+
     __aicore__ void bar(int k) { //OK. k is in private address space
       // OK. i is an int variable allocated in private address space
-      int i; 
+      int i;
     }
     ```
 
@@ -445,12 +445,12 @@ __ubuf__ int * __gm__ ptr;
 
     ```
     __gm__ int *var; // var point to an array of int elements
-    
+
     typedef struct {
         float a[3];
         int b[2];
     } foo_t;
-    
+
     __gm__ foo_t *info; // info point to an array of foo_t elements
     ```
 
@@ -473,17 +473,17 @@ __ubuf__ int * __gm__ ptr;
     class ObjTy{
       ObjTy(){...}
       void print(){...}
-    
+
     private:
       int a;
       int b;
     };
-    
-    __global__ __aicore__ 
+
+    __global__ __aicore__
     void foo(__ca__ int * ptr) { // Error. Cannot have __ca__
                                  // qualifier in kernel arguments
       // OK
-      __ca__ int *ptr; 
+      __ca__ int *ptr;
     }
     ```
 
@@ -504,6 +504,48 @@ __ubuf__ int * __gm__ ptr;
 </td>
 <td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p id="p778516378353"><a name="p778516378353"></a><a name="p778516378353"></a>常量值由框架自动设置，AIC核下，配置为AscendC::AIC，AIV核下，配置为AscendC::AIV。</p>
 <p id="p278616379351"><a name="p278616379351"></a><a name="p278616379351"></a>可以通过对该常量值的判断，来实现了AIV与AIC核代码的区分和隔离。功能等同于直接使用ASCEND_IS_AIV、ASCEND_IS_AIC。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_UB_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下Unified Buffer（UB）的容量，可用于编译期获取UB资源大小。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L1_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L1 Buffer的容量，可用于编译期获取L1 Buffer大小。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0A_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0A Buffer的容量，可用于编译期获取L0A Buffer大小。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0B_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0B Buffer的容量，可用于编译期获取L0B Buffer大小。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_L0C_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下L0C Buffer的容量，可用于编译期获取L0C资源大小。</p>
+</td>
+</tr>
+<tr><td class="cellrowborder" valign="top" width="16.14838516148385%" headers="mcps1.1.4.1.1 "><p>constexpr uint64_t ASC_BT_SIZE</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.847415258474154%" headers="mcps1.1.4.1.2 "><p>取值由当前AI处理器决定，若该AI处理器不存在这块空间，则默认配置为0。</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.00419958004199%" headers="mcps1.1.4.1.3 "><p>表示当前AI处理器架构下BiasTable Buffer的容量，可用于编译期获取BiasTable资源大小。</p>
 </td>
 </tr>
 </tbody>
@@ -534,36 +576,58 @@ __ubuf__ int * __gm__ ptr;
 <td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="p169211933512"><a name="p169211933512"></a><a name="p169211933512"></a>当前核的索引，用于代码内部的多核逻辑控制及多核偏移量计算等。</p>
 </td>
 </tr>
+<tr id="rowSubBlockNum"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockNum"><a name="pSubBlockNum"></a><a name="pSubBlockNum"></a>sub_block_num</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockNum"><a name="pGetSubBlockNum"></a><a name="pGetSubBlockNum"></a>GetSubBlockNum</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockNumDesc"><a name="pSubBlockNumDesc"></a><a name="pSubBlockNumDesc"></a>当前任务配置的子块（SubBlock）数量，仅在Mix场景（__mix__编程模式）下的Vector核上有效，用于确定AIV核在组合内的并行粒度。</p>
+</td>
+</tr>
+<tr id="rowSubBlockIdx"><td class="cellrowborder" valign="top" width="15.988401159884011%" headers="mcps1.1.4.1.1 "><p id="pSubBlockIdx"><a name="pSubBlockIdx"></a><a name="pSubBlockIdx"></a>sub_block_idx</p>
+</td>
+<td class="cellrowborder" valign="top" width="25.977402259774017%" headers="mcps1.1.4.1.2 "><p id="pGetSubBlockIdx"><a name="pGetSubBlockIdx"></a><a name="pGetSubBlockIdx"></a>GetSubBlockIdx</p>
+</td>
+<td class="cellrowborder" valign="top" width="58.03419658034197%" headers="mcps1.1.4.1.3 "><p id="pSubBlockIdxDesc"><a name="pSubBlockIdxDesc"></a><a name="pSubBlockIdxDesc"></a>当前子块（SubBlock）的索引，仅在Mix场景（__mix__编程模式）下的Vector核上有效。在Mix场景中，AIV核的逻辑位置由block_idx和sub_block_idx共同确定。</p>
+</td>
+</tr>
 </tbody>
 </table>
-
 通常，建议用户使用内置变量对应的API获取所需值，不建议用户直接使用内置变量。因为内置变量反映的是单个硬件资源的配置信息，对于软件栈整合硬件资源、扩展硬件的功能，内置变量的值与实际语义可能不符。
 
-例如，在Atlas 推理系列产品中，当启用KERNEL\_TYPE\_MIX\_VECTOR\_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block\_idx在这两种核心上都是从0开始计数，用户无法直接通过block\_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block\_idx增加偏移量（AI Core的block\_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
+例如，在Atlas 推理系列产品中，当启用KERNEL_TYPE_MIX_VECTOR_CORE时，算子会同时运行在AI Core和Vector Core上。此时，block_idx在这两种核心上都是从0开始计数，用户无法直接通过block_idx来切分数据和控制多核逻辑。而GetBlockIdx在Vector Core上对block_idx增加偏移量（AI Core的block_num），从而保证返回的值能够正确反映多核环境下的实际逻辑。
 
-## SIMD与SIMT混合编程场景<a name="section952111671314"></a>
+在Mix场景（使用`__mix__`函数执行空间限定符）下，Vector核（AIV）的逻辑位置需要通过block_idx和sub_block_idx共同确定：`logic_idx = block_idx * sub_block_num + sub_block_idx`。其中block_idx标识当前组合在整个grid中的位置，sub_block_idx标识当前AIV在组合内的位置。开发者应使用GetBlockIdx和GetSubBlockIdx API组合获取完整的逻辑位置信息，而非直接使用内置变量。
 
-SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_进行标识，通过在SIMD的\_\_aicore\_\_函数中使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMD与SIMT混合编程简介/扩展语法/核函数配置-147.md)调用SIMT入口函数。被SIMT VF入口函数调用的函数使用\_\_simt\_callee\_\_进行标识。
+## 核函数配置<a name="section97005415463"></a>
 
--   \_\_simt\_vf\_\_ <a name="li611618392141"></a>
+在调用\_\_global\_\_限定符修饰的函数时必须指定执行配置。执行配置通过在函数名和带括号的参数列表之间插入如下形式的表达式来指定：
 
-    函数标记宏，用于标记SIMT VF入口函数，函数无返回值。使用asc\_vf\_call接口调用SIMT VF入口函数，启动VF子任务。
+```
+<<<numBlocks, dynUBufSize, stream>>>
+```
 
-    ```
-    __simt_vf__ inline void KernelAdd(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-    ```
+其中：
+-   numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中使用内置变量[block_idx](../语言扩展层/SIMD-BuiltIn关键字.md#内置变量)获取；
 
-    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md#section776244992018)。
+    >[!NOTE]说明 
+    >numBlocks是逻辑核的概念，取值范围为\[1,65535\]。为了充分利用硬件资源，一般设置为物理核的核数或其倍数。
+    >- 对于耦合模式和分离模式，numBlocks在运行时的意义和设置规则有一些区别，具体说明如下：
+    >    - 耦合模式：由于其Vector、Cube单元是集成在一起的，numBlocks用于设置启动多个AI Core核实例执行，不区分Vector、Cube。AI Core的核数可以通过[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)或者[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)获取。
+    >    - 分离模式
+    >        - 针对仅包含Vector计算的算子，numBlocks用于设置启动多少个Vector（AIV）实例执行，比如某款AI处理器上有40个Vector核，建议设置为40。
+    >        - 针对仅包含Cube计算的算子，numBlocks用于设置启动多少个Cube（AIC）实例执行，比如某款AI处理器上有20个Cube核，建议设置为20。
+    >        - 针对Vector/Cube融合计算的算子，启动时，按照AIV和AIC组合启动，numBlocks用于设置启动多少个组合执行，比如某款AI处理器上有40个Vector核和20个Cube核，一个组合是2个Vector核和1个Cube核，建议设置为20，此时会启动20个组合，即40个Vector核和20个Cube核。**注意：该场景下，设置的numBlocks逻辑核的核数不能超过物理核（2个Vector核和1个Cube核组合为1个物理核）的核数。**
+    >        - AIC/AIV的核数分别通过[GetCoreNumAic](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAic.md)和[GetCoreNumAiv](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetCoreNumAiv.md)接口获取。
+    >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
-    -   指针类型：\_\_ubuf\_\_ \*、\_\_gm\_\_ \*；
-    -   标量类型：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
+-   dynUBufSize：Dynamic Unified Buffer Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
+-   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
--   \_\_simt\_callee\_\_
+以下示例展示了内核函数的声明与调用方式。
 
-    函数标记宏，用于标记SIMT VF非入口函数，函数可以有返回值，允许被SIMT VF入口函数或其他非入口函数调用。
-
-    ```
-    __simt_callee__ inline float add(float x, float y)
-    ```
-
-Ascend C为SIMT编程、SIMD与SIMT混合编程提供了布尔、整形、浮点型的标量数据类型和短向量数据类型，提供了用于表达线程块、线程网格三维信息的内置变量。 关于内置数据格式的详细说明请参见[内置数据类型](SIMT-BuiltIn关键字.md#section1835494915576)，内置变量请参见[内置变量](SIMT-BuiltIn关键字.md#section13165113520576)。
+```
+// 声明
+__global__ __vector__ void add_custom(float* x, float* y, float* z);
+// 调用
+add_custom<<<numBlocks, dynUBufSize, stream>>>(x, y, z);
+```

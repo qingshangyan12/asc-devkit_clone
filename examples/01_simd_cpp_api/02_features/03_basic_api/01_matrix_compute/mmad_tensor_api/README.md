@@ -4,9 +4,13 @@
 
 本样例基于Tensor API编程方式实现动态Shape矩阵乘法和随路量化计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
+
+> **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
 ## 目录结构介绍
 
@@ -47,15 +51,17 @@
 
   在核函数直调样例中，样例默认支持的shape为：M = 1024, N = 1024, K = 256。
 
-  <table border="2">
-  <caption>表1：样例规格表</caption>
-  <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Quant</td></tr>
-  <tr><td rowspan="4" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x (矩阵A)</td><td align="left">[M, K]</td><td align="left">int8_t</td><td align="left">ND</td></tr>
-  <tr><td align="left">y (矩阵B，转置存储)</td><td align="left">[N, K]</td><td align="left">int8_t</td><td align="left">DN</td></tr>
-  <tr><td align="left">quant</td><td align="left">[N]</td><td align="left">uint64_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z (矩阵C)</td><td align="left">[M, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">mmad_tensor_api</td></tr>
+  <a name="表1"></a>
+  <table border="2" align="center">
+  <caption style="font-weight: normal;">
+      <span style="font-weight: bold; font-size: 1.2em;">📌 表1：样例规格表</span></caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul with Quant</td></tr>
+  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x (矩阵A)</td><td align="center">[M, K]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">y (矩阵B，转置存储)</td><td align="center">[N, K]</td><td align="center">int8_t</td><td align="center">DN</td></tr>
+  <tr><td align="center">quant</td><td align="center">[N]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z (矩阵C)</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_quant_custom</td></tr>
   </table>
 
   编译期模板参数默认值：
@@ -87,27 +93,16 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令，**当前仅支持使用[CANN master](./../../../../../../docs/quick_start.md#下载-cann-master)**。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。，**当前仅支持使用[CANN master](./../../../../../../docs/quick_start.md#下载-cann-master)**。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程

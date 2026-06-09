@@ -6,11 +6,13 @@
 
 > **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -29,45 +31,42 @@
   **调用GetTPipePtr接口**
 
   ```cpp
-  class KernelAdd {
-      // 没有TPipe成员变量
-
-      __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum)
-      {
-          // 调用GetTPipePtr获取TPipe指针并使用
-          GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
-      }
-  };
-
-  __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
+  template <uint32_t totalLength, uint32_t tileNum>
+  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
   {
+      // 没有TPipe变量
+      // ...
+      // 调用GetTPipePtr获取TPipe指针并使用
+      GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+  }
+
+  template <uint32_t totalLength, uint32_t tileNum>
+  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+  {
+      AscendC::TPipe pipe;
       // 不用显式传入TPipe指针
-      KernelAdd op;
-      op.Init(x, y, z, tiling.totalLength, tiling.tileNum);
-      op.Process();
+      Process<totalLength, tileNum>(x, y, z);
   }
   ```
 
   **不调用GetTPipePtr接口（核函数显式传入TPipe指针）**
 
   ```cpp
-  class KernelAdd {
-      AscendC::TPipe* pipe;  // 需要TPipe指针成员变量
-
-      __aicore__ inline void Init(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, uint32_t totalLength, uint32_t tileNum, AscendC::TPipe* pipeIn)
-      {
-          pipe = pipeIn;
-          pipe->InitBuffer(inQueueX, BUFFER_NUM, this->tileLength * sizeof(float));
-      }
-  };
-
-  __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AddCustomTilingData tiling)
+  template <uint32_t totalLength, uint32_t tileNum>
+  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AscendC::TPipe* pipe)
   {
-      // 需要显式传入TPipe指针
+      // 需要TPipe指针入参
+      // ...
+      // 使用传入的TPipe指针
+      pipe->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+  }
+
+  template <uint32_t totalLength, uint32_t tileNum>
+  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+  {
       AscendC::TPipe pipe;
-      KernelAdd op;
-      op.Init(x, y, z, tiling.totalLength, tiling.tileNum, &pipe);
-      op.Process();
+      // 需要显式传入TPipe指针
+      Process<totalLength, tileNum>(x, y, z, &pipe);
   }
   ```
 
@@ -131,27 +130,16 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
@@ -170,10 +158,10 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

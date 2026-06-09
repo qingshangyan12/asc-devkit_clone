@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于DataCopy实现数据随路量化激活搬运，将矩阵乘的结果从CO1（L0C Buffer）搬运到GM（Global Memory），并支持随路NZ2ND、随路量化、relu激活能力组合。本样例给出了6种不同的测试场景（scenario）。
+本样例基于DataCopy实现数据随路量化激活搬运，将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），并支持随路NZ2ND、随路量化、relu激活能力组合。本样例给出了6种不同的测试场景（scenario）。
     <table>
  	  	 	<tr>
  	  	 		<td>scenarioNum</td>
@@ -55,11 +55,13 @@
  	  	 	</tr>
  	  	 </table>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -76,7 +78,7 @@
 ## 样例描述
 
 - 样例功能  
-  将矩阵乘的结果从CO1（L0C Buffer）搬运到GM（Global Memory），支持以下两种随路量化模式：
+  将矩阵乘的结果从L0C Buffer搬运到GM（Global Memory），支持以下两种随路量化模式：
   - Scalar量化：使用SetFixpipePreQuantFlag接口设置Scalar量化参数。
   - Tensor量化：使用SetFixPipeConfig接口设置Tensor量化参数。  
   并支持与随路NZ2ND、relu激活能力组合。接口资料参考随路量化激活搬运。
@@ -159,7 +161,7 @@
 
     - 调用Mmad接口，将输入shape[128, 128]的矩阵A和输入shape[128, 256]的矩阵B做矩阵乘法，得到输出shape[128, 256]的结果矩阵。
 
-    - 配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，将Mmad计算出的结果从CO1（L0C Buffer）搬出到GM（Global Memory）。
+    - 配置DataCopyCO12DstParams参数用于DataCopy随路量化激活搬运，将Mmad计算出的结果从L0C Buffer搬出到GM（Global Memory）。
 
   - 调用实现  
     使用内核调用符`<<<>>>`调用核函数。
@@ -168,41 +170,30 @@
  
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
-  SCENARIO=1
+  SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO   # 生成测试输入数据
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
 
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
   
   示例如下：
   ```bash
-  cmake -DSCENARIO_NUM=$SCENARIO -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

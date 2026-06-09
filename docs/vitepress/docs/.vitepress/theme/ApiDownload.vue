@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vitepress'
-import JSZip from 'jszip'
 
 const route = useRoute()
 const loading = ref(false)
+const progress = ref('')
 const isApiPage = computed(() => route.path.startsWith('/api/'))
 
 function getFilterVersion() {
@@ -16,39 +16,64 @@ function getFilterVersion() {
 }
 
 function filterContentByVersion(content, version) {
-  const htmlBlockRegex = /<p>\s*CANNFILTER_DIV_(\w+)_OPEN\s*<\/p>([\s\S]*?)<p>\s*CANNFILTER_DIV_\1_CLOSE\s*<\/p>/g
-  const plainBlockRegex = /CANNFILTER_DIV_(\w+)_OPEN[ \t]*\n?([\s\S]*?)CANNFILTER_DIV_\1_CLOSE/g
+  const htmlBlockRegex = /<p>\s*CANNFILTER_DIV_([A-Za-z0-9_,]+)_OPEN\s*<\/p>([\s\S]*?)<p>\s*CANNFILTER_DIV_\1_CLOSE\s*<\/p>/g
+  const plainBlockRegex = /CANNFILTER_DIV_([A-Za-z0-9_,]+)_OPEN[ \t]*\n?([\s\S]*?)CANNFILTER_DIV_\1_CLOSE/g
+
+  content = filterCannFilterTags(content, version)
 
   if (version === 'all') {
     content = content.replace(htmlBlockRegex, '$2')
     content = content.replace(plainBlockRegex, '$2')
-    return content
+  } else {
+    content = content.replace(htmlBlockRegex, (match, ver, inner) => ver === version ? inner : '')
+    content = content.replace(plainBlockRegex, (match, ver, inner) => ver === version ? inner : '')
   }
 
-  content = content.replace(htmlBlockRegex, (match, ver, inner) => ver === version ? inner : '')
-  content = content.replace(plainBlockRegex, (match, ver, inner) => ver === version ? inner : '')
+  content = content.replace(/<term\b[^>]*>([\s\S]*?)<\/term>/gi, '$1')
+  content = content.replace(/<ph\b[^>]*>([\s\S]*?)<\/ph>/gi, '$1')
+  content = content.replace(/<__gm__\b[^>]*>([\s\S]*?)<\/__gm__>/gi, '$1')
+  content = content.replace(/<__ubuf__\b[^>]*>([\s\S]*?)<\/__ubuf__>/gi, '$1')
   return content
 }
 
-function getSidebarLinks() {
-  if (typeof document === 'undefined') return []
-  const links = document.querySelectorAll('.VPSidebar a[href^="/api/"]')
-  const hrefs = [...links].map(a => a.getAttribute('href'))
-  return [...new Set(hrefs)]
-}
+function filterCannFilterTags(src, version) {
+  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
+  const stack = []
+  const parts = []
+  let lastIdx = 0
+  let match
+  while ((match = tagRegex.exec(src)) !== null) {
+    const pos = match.index
+    const isClose = match[1] === '/'
+    const attrs = match[3]
+    const before = src.slice(lastIdx, pos)
+    const suppress = stack.length > 0 && stack[stack.length - 1]
 
-function hrefToSourcePath(href) {
-  const relative = href.replace(/^\/api\//, '').replace(/\/$/, '')
-  return '/api-source/' + relative + '.md'
-}
-
-async function checkExists(url) {
-  try {
-    const resp = await fetch(url, { method: 'HEAD' })
-    return resp.ok
-  } catch {
-    return false
+    if (isClose) {
+      if (stack.length > 0) {
+        stack.pop()
+      }
+      if (!suppress) {
+        const curSuppress = stack.length > 0 && stack[stack.length - 1]
+        if (!curSuppress) parts.push(before)
+      }
+      lastIdx = pos + match[0].length
+    } else {
+      if (!suppress) parts.push(before)
+      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
+      if (attrMatch && version !== 'all') {
+        const types = attrMatch[1].split(',').map(s => s.trim())
+        const include = types.includes(version)
+        stack.push(!include)
+      } else {
+        stack.push(false)
+      }
+      lastIdx = pos + match[0].length
+    }
   }
+  parts.push(src.slice(lastIdx))
+  const result = parts.join('')
+  return result.replace(/<\/?cann-filter\b[^>]*>/gi, '')
 }
 
 function timestamp() {
@@ -76,54 +101,70 @@ function downloadBlob(blob, filename) {
 async function handleDownload() {
   const version = getFilterVersion()
   const versionLabel = version === 'all' ? 'all' : ('v' + version)
-  const hrefs = getSidebarLinks()
-
-  if (hrefs.length === 0) {
-    return
-  }
 
   loading.value = true
+  progress.value = '下载数据中...'
 
   try {
-    const sourcePaths = []
-    const batchSize = 30
+    const resp = await fetch('/api-source/bundle.json')
+    if (!resp.ok) throw new Error(`Bundle not found (HTTP ${resp.status})`)
 
-    for (let i = 0; i < hrefs.length; i += batchSize) {
-      const batch = hrefs.slice(i, i + batchSize)
-      const results = await Promise.all(batch.map(async (href) => {
-        const path = hrefToSourcePath(href)
-        const ok = await checkExists(path)
-        return ok ? path : null
-      }))
-      sourcePaths.push(...results.filter(Boolean))
-    }
+    const total = Number(resp.headers.get('content-length') || '0')
+    const reader = resp.body.getReader()
+    const chunks = []
+    let received = 0
 
-    const zip = new JSZip()
-
-    for (let i = 0; i < sourcePaths.length; i += batchSize) {
-      const batch = sourcePaths.slice(i, i + batchSize)
-      const results = await Promise.all(batch.map(async (sp) => {
-        try {
-          const resp = await fetch(sp)
-          if (!resp.ok) return null
-          let content = await resp.text()
-          content = filterContentByVersion(content, version)
-          const filename = sp.replace(/^\/api-source\//, '')
-          return { filename, content }
-        } catch {
-          return null
-        }
-      }))
-      for (const r of results) {
-        if (r) zip.file(r.filename, r.content)
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(value)
+      received += value.length
+      if (total > 0) {
+        progress.value = `下载中 ${Math.round(received / total * 100)}%`
       }
     }
 
+    progress.value = '解析数据中...'
+    const rawBlob = new Blob(chunks)
+    const text = await rawBlob.text()
+    const bundle = JSON.parse(text)
+
+    const entries = Object.entries(bundle)
+    const fileTotal = entries.length
+    if (fileTotal === 0) {
+      console.error('No source files in bundle')
+      return
+    }
+
+    progress.value = '打包中 0%'
+    const JSZip = (await import('jszip')).default
+    const zip = new JSZip()
+    let processed = 0
+
+    for (const [relPath, content] of entries) {
+      const filtered = filterContentByVersion(content, version)
+      zip.file(relPath, filtered)
+      processed++
+      if (processed % 100 === 0) {
+        const pct = Math.round(processed / fileTotal * 100)
+        progress.value = `打包中 ${pct}%`
+        await new Promise(r => setTimeout(r, 0))
+      }
+    }
+
+    progress.value = '生成 ZIP...'
     const blob = await zip.generateAsync({ type: 'blob' })
     const ts = timestamp()
     downloadBlob(blob, 'AscendC-API_' + versionLabel + '_' + ts + '.zip')
+    progress.value = ''
   } catch (err) {
     console.error('Download failed:', err)
+    progress.value = `失败: ${err.message}`
+    setTimeout(() => {
+      if (progress.value.startsWith('失败:')) {
+        progress.value = ''
+      }
+    }, 5000)
   } finally {
     loading.value = false
   }
@@ -131,38 +172,48 @@ async function handleDownload() {
 </script>
 
 <template>
-  <button
-    v-if="isApiPage"
-    class="api-download-btn"
-    :class="{ loading }"
-    :disabled="loading"
-    :title="loading ? '打包中...' : '下载全部 API Markdown'"
-    @click="handleDownload"
-  >
-    <svg
-      v-if="!loading"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+  <div v-if="isApiPage" class="api-download-wrapper">
+    <button
+      class="api-download-btn"
+      :class="{ loading }"
+      :disabled="loading"
+      :title="loading ? progress : '下载全部 API Markdown'"
+      @click="handleDownload"
     >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="7 10 12 15 17 10" />
-      <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-    <span v-else class="spinner" />
-  </button>
+      <svg
+        v-if="!loading"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      <span v-else class="spinner" />
+    </button>
+    <div v-if="progress" class="download-progress" :class="{ error: progress.startsWith('失败:') }">{{ progress }}</div>
+  </div>
 </template>
 
 <style scoped>
-.api-download-btn {
+.api-download-wrapper {
   position: fixed;
   bottom: 40px;
   right: 96px;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.api-download-btn {
   width: 44px;
   height: 44px;
   border: 1px solid var(--vp-c-divider);
@@ -173,7 +224,6 @@ async function handleDownload() {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99;
   transition: all 0.3s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -201,6 +251,21 @@ async function handleDownload() {
   border-top-color: var(--vp-c-brand-1);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+.download-progress {
+  font-size: 11px;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+  background: var(--vp-c-bg-soft);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.download-progress.error {
+  color: var(--vp-c-danger-1);
+  border-color: var(--vp-c-danger-1);
 }
 
 @keyframes spin {

@@ -11,6 +11,14 @@ import type { SearchConfig } from './type'
 import { formatPagefindResult } from './search'
 import { formatShowDate } from './utils'
 
+if (typeof window !== 'undefined' && !window.__pagefind__) {
+  import('/pagefind/pagefind.js').then(m => {
+    if (!window.__pagefind__) {
+      window.__pagefind__ = m
+    }
+  }).catch(() => {})
+}
+
 const searchResult = ref<{ route: string; meta: Record<string, any> }[]>([])
 const searchConfig: SearchConfig = _searchConfig
 
@@ -78,6 +86,7 @@ watch(Escape, (v) => {
 })
 
 const searchWords = ref('')
+const searching = ref(false)
 function inlineSearch() {
   if (!searchWords.value) {
     searchResult.value = []
@@ -93,16 +102,8 @@ function inlineSearch() {
 }
 
 const chineseRegex = /[\u4E00-\u9FA5]/g
-const segmenterCh = Intl?.Segmenter && new Intl.Segmenter('zh-CN', { granularity: 'word' })
 function chineseSearchOptimize(input: string) {
-  if (segmenterCh) {
-    const splitWords = Array.from(segmenterCh?.segment(input))
-    return splitWords.map(v => v.segment).join(' ')
-  }
-  return input
-    .replace(chineseRegex, ' $& ')
-    .replace(/\s+/g, ' ')
-    .trim()
+  return input.replace(chineseRegex, '\u200A$&\u200A').replace(/\s+/g, '\u200A').trim()
 }
 
 const searchDelayTime = computed(() => finalSearchConfig.value?.delay ?? 300)
@@ -110,46 +111,59 @@ const searchDelayTime = computed(() => finalSearchConfig.value?.delay ?? 300)
 watch(
   () => searchWords.value,
   async () => {
-    if (!window?.__pagefind__?.search) {
-      inlineSearch()
+    if (!searchWords.value) {
+      searchResult.value = []
+      searching.value = false
       return
     }
+    if (!window?.__pagefind__?.search) {
+      inlineSearch()
+      searching.value = false
+      return
+    }
+
+    searching.value = true
 
     const searchText
       = typeof finalSearchConfig.value.customSearchQuery === 'function'
         ? finalSearchConfig.value.customSearchQuery(searchWords.value)
-        : (chineseRegex.test(searchWords.value) ? chineseSearchOptimize(searchWords.value) : searchWords.value)
-    await window?.__pagefind__
-      ?.debouncedSearch?.(searchText, {}, searchDelayTime.value)
-      .then(async (pagefindSearchResult: any) => {
-        if (pagefindSearchResult === null) {
-          return
-        }
-        const pagefindResults = await Promise.all(
-          pagefindSearchResult.results.map((v: any) => v.data())
-        )
-        const formattedResults = pagefindResults
-          .map((r) => {
-            const results = formatPagefindResult(r, finalSearchConfig.value.pageResultCount || 1)
-            return results.map((result) => {
-              result.route = result.route.startsWith(site.value.base)
-                ? result.route
-                : withBase(result.route)
-              return result
-            })
-          })
-          .flat()
-          .filter((v) => {
-            return ignorePublish.value || v.meta.publish !== false
-          })
+        : (/[\u4E00-\u9FA5]/.test(searchWords.value) ? chineseSearchOptimize(searchWords.value) : searchWords.value)
 
-        if (finalSearchConfig.value.sort) {
-          formattedResults.sort(finalSearchConfig.value.sort)
-        }
-        searchResult.value = formattedResults.filter(
-          finalSearchConfig.value.filter ?? (() => true)
-        )
-      })
+    try {
+      const pagefindSearchResult: any = await window?.__pagefind__
+        ?.debouncedSearch?.(searchText, {}, searchDelayTime.value)
+
+      if (pagefindSearchResult === null) {
+        return
+      }
+      const pagefindResults = await Promise.all(
+        pagefindSearchResult.results.slice(0, 30).map((v: any) => v.data())
+      )
+      const formattedResults = pagefindResults
+        .map((r) => {
+          const results = formatPagefindResult(r, finalSearchConfig.value.pageResultCount || 1)
+          return results.map((result) => {
+            result.route = result.route.startsWith(site.value.base)
+              ? result.route
+              : withBase(result.route)
+            return result
+          })
+        })
+        .flat()
+        .filter((v) => {
+          return ignorePublish.value || v.meta.publish !== false
+        })
+
+      if (finalSearchConfig.value.sort) {
+        formattedResults.sort(finalSearchConfig.value.sort)
+      }
+      searchResult.value = formattedResults.filter(
+        finalSearchConfig.value.filter ?? (() => true)
+      )
+    }
+    finally {
+      searching.value = false
+    }
 
     nextTick(() => {
       document.querySelectorAll('div[aria-disabled="true"]').forEach((v) => {
@@ -235,7 +249,7 @@ function stripExt(url: string) {
 }
 
 function breadcrumb(url: string) {
-  const segments = stripExt(url).replace(/\/$/, '').split('/').filter(Boolean)
+  const segments = stripExt(url).replace(/\/$/, '').split('/').filter(Boolean).map(decodeURIComponent)
   if (segments.length <= 1) return ''
   const topLevels = ['api', 'guide', 'zh', 'en']
   let start = topLevels.includes(segments[0]) ? 1 : 0
@@ -263,7 +277,7 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
       <span class="search-tip">{{
         finalSearchConfig?.btnPlaceholder || 'Search'
       }}</span>
-      <span class="metaKey"> {{ metaKey }} K </span>
+      <span v-if="metaKey" class="metaKey"> {{ metaKey }} K </span>
     </div>
     <ClientOnly>
       <Command.Dialog :visible="searchModal" theme="algolia">
@@ -297,7 +311,10 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
         <template #body>
           <div class="search-dialog" :class="{ 'detail-list': showDetail }">
             <Command.List>
-              <Command.Empty v-if="!searchResult.length">
+              <div v-if="searching" class="search-loading">
+                <span class="search-spinner"></span> 搜索中...
+              </div>
+              <Command.Empty v-else-if="!searchResult.length">
                 {{ finalSearchConfig?.emptyText || 'No results found.' }}
               </Command.Empty>
               <Command.Group v-else :heading="headingText">
@@ -505,6 +522,31 @@ const pageResultCount = computed(() => finalSearchConfig.value.pageResultCount |
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+</style>
+
+<style lang="css">
+.search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 0;
+  color: var(--vp-c-text-2);
+  font-size: 14px;
+}
+
+.search-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--vp-c-divider);
+  border-top-color: var(--vp-c-brand-1);
+  border-radius: 50%;
+  animation: search-spin 0.6s linear infinite;
+}
+
+@keyframes search-spin {
+  to { transform: rotate(360deg); }
 }
 </style>
 
