@@ -21,7 +21,7 @@
 #ifndef LIB_SOFTMAX_LOGSOFTMAX_H
 #define LIB_SOFTMAX_LOGSOFTMAX_H
 
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/activation/softmax_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)

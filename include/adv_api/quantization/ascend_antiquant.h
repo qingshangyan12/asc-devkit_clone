@@ -20,7 +20,7 @@
 
 #ifndef LIB_QUANTIZATION_ASCEND_ANTIQUANT_H
 #define LIB_QUANTIZATION_ASCEND_ANTIQUANT_H
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #include "include/adv_api/quantization/ascend_antiquant_utils.h"
 #include "../../../impl/adv_api/detail/quantization/antiquant/ascend_antiquant_impl.h"
 namespace AscendC {

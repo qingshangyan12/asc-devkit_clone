@@ -22,7 +22,7 @@
 #ifndef LIB_MATH_POWER_H
 #define LIB_MATH_POWER_H
 
-#include "kernel_tensor.h"
+#include "include/basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/power/power_common_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
