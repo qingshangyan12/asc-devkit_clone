@@ -27,6 +27,10 @@
 #include <cstdlib>
 #include <acl/acl.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static void* gLibHandle = nullptr;
 static int gHcommVersion = 0;
 
@@ -103,3 +107,7 @@ void HcommDlInit(void) {
     HCCL_INFO("[HcclWrapper-DEBUG] HcommDlInit completed successfully, final gLibHandle=%p", gLibHandle);
     HCCL_INFO("[HcclWrapper-DEBUG] ===== HcommDlInit NORMAL RETURN =====");
 }
+
+#ifdef __cplusplus
+}
+#endif
