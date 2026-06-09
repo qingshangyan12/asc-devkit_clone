@@ -18,7 +18,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
 
-支持UB与UB之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
+支持Unified Buffer与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
 - Unified Buffer -> Unified Buffer
