@@ -121,6 +121,17 @@
 
 - 位于Unified Buffer的地址必须32字节对齐。
 - 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- CopyRepeatParams结构体参数的值需在取值范围内：
+
+    **表 4**  CopyRepeatParams结构体参数取值范围
+
+    | 参数名 | 取值范围 |
+    | --- | --- |
+    | dstStride | [0, 65535] |
+    | srcStride | [0, 65535] |
+    | dstRepeatSize | [0, 4095] |
+    | srcRepeatSize | [0, 4095] |
+
 - <cann-filter npu-type = "A3,910b">repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
