@@ -48,28 +48,15 @@ public:
     __aicore__ inline static void DataCopyImpl(const T& dst, const U& src, const FixpipeParams& params)
     {
         if constexpr (IsL0COutBatchNZ2NZV<T, U>) {
-            EmitBatchNZ2NZDataCopy<trait, quantPre>(dst, src, params);
+            EmitDataCopy<trait, quantPre>(dst, src, dst.Layout(), src.Layout(), params);
         } else if constexpr (IsL0COutSrcBatchLayoutV<U>) {
-            EmitDataCopy<trait, quantPre>(dst, src, Te::Get<1>(dst.Layout()), Te::Get<1>(src.Layout()), params);
+            EmitDataCopy<trait, quantPre>(dst, src, Get<1>(dst.Layout()), Get<1>(src.Layout()), params);
         } else {
             EmitDataCopy<trait, quantPre>(dst, src, dst.Layout(), src.Layout(), params);
         }
     }
 
 private:
-    template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U>
-    __aicore__ inline static void EmitBatchNZ2NZDataCopy(const T& dst, const U& src, const FixpipeParams& params)
-    {
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
-        for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
-            EmitDataCopy<trait, quantPre>(
-                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
-                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)),
-                Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
-        }
-    }
-
     template <const CopyL0C2GMTrait& trait, QuantMode_t quantPre, typename T, typename U, typename DstLayout,
               typename SrcLayout>
     __aicore__ inline static void EmitDataCopy(
@@ -78,20 +65,7 @@ private:
     {
         constexpr bool isNdFormat = IsL0COutNDFormatV<T>;
         constexpr bool isDnFormat = IsL0COutDNFormatV<T>;
-        constexpr bool isNzFormat = IsL0COutNZFormatV<T>;
-
-        uint32_t nSize = Std::min(GetTotalColumnShape(srcLayout), GetTotalColumnShape(dstLayout));
-        uint32_t mSize = Std::min(GetTotalRowShape(srcLayout), GetTotalRowShape(dstLayout));
-        uint32_t srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcLayout) / FRACTAL_FIXED;
-        uint32_t dstStride = 0;
-
-        if constexpr (isNdFormat) {
-            dstStride = GetL0COutNDStride<T>(dstLayout);
-        } else if constexpr (isDnFormat) {
-            dstStride = GetL0COutDNStride<T>(dstLayout);
-        } else if constexpr (isNzFormat) {
-            dstStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(dstLayout);
-        }
+        auto copyParams = MakeL0COutCopyParams<T, U>(dstLayout, srcLayout);
 
         bool reluEn = trait.enableRelu;
         uint8_t unitFlag = params.unitFlag;
@@ -101,8 +75,9 @@ private:
         uint8_t cacheMode = dst.Engine().GetCacheMode();
         bool isChannelSplit = trait.enableChannelSplit;
 
-        CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(dst, src, nSize, mSize, srcStride, dstStride, cacheMode,
-                                                        reluEn, unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
+        CopyMatrixCcToGmInstr::DataCopy<quantPre, T, U>(
+            dst, src, copyParams.nSize, copyParams.mSize, copyParams.srcStride, copyParams.dstStride, cacheMode,
+            reluEn, unitFlag, isChannelSplit, nz2ndEn, nz2dnEn);
     }
 };
 
@@ -115,7 +90,7 @@ public:
             EmitBatchNZ2NZDataCopy<trait, quantPre>(dst, src, quant, params);
         } else if constexpr (IsL0COutSrcBatchLayoutV<U>) {
             EmitDataCopy<trait, quantPre>(
-                dst, src, quant, Te::Get<1>(dst.Layout()), Te::Get<1>(src.Layout()), params);
+                dst, src, quant, Get<1>(dst.Layout()), Get<1>(src.Layout()), params);
         } else {
             EmitDataCopy<trait, quantPre>(dst, src, quant, dst.Layout(), src.Layout(), params);
         }
@@ -131,9 +106,9 @@ private:
         auto srcLayout = src.Layout();
         for (uint32_t batchIndex = 0; batchIndex < Get<0>(srcLayout.Shape()); ++batchIndex) {
             EmitDataCopy<trait, quantPre>(
-                dst(MakeL0COutBatchCoord(dstLayout.Shape(), batchIndex)),
-                src(MakeL0COutBatchCoord(srcLayout.Shape(), batchIndex)), quant,
-                Te::Get<1>(dstLayout), Te::Get<1>(srcLayout), params);
+                dst(MakeL0COutNZBatchCoord(batchIndex)),
+                src(MakeL0COutNZBatchCoord(batchIndex)), quant,
+                Get<1>(dstLayout), Get<1>(srcLayout), params);
         }
     }
 
