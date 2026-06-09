@@ -380,11 +380,11 @@
 </tr>
 <tr id="row55001333313"><td class="cellrowborder" valign="top" width="15.310000000000002%" headers="mcps1.2.3.1.1 "><p id="p115000313310"><a name="p115000313310"></a><a name="p115000313310"></a>unitFlag</p>
 </td>
-<td class="cellrowborder" valign="top" width="84.69%" headers="mcps1.2.3.1.2 "><p id="p103614380020"><a name="p103614380020"></a><a name="p103614380020"></a>unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：</p>
+<td class="cellrowborder" valign="top" width="84.69%" headers="mcps1.2.3.1.2 "><p id="p103614380020"><a name="p103614380020"></a><a name="p103614380020"></a>unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：</p>
 <p id="p1225131744220"><a name="p1225131744220"></a><a name="p1225131744220"></a>0：保留值；</p>
-<p id="p3836113514213"><a name="p3836113514213"></a><a name="p3836113514213"></a>2：使能unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；</p>
-<p id="p173663815011"><a name="p173663815011"></a><a name="p173663815011"></a>3：使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。</p>
-<p id="p14988589213"><a name="p14988589213"></a><a name="p14988589213"></a>使能该功能时，Mmad指令的unitFlag在最后1个分形设置为3、其余分形计算设置为2即可。</p>
+<p id="p3836113514213"><a name="p3836113514213"></a><a name="p3836113514213"></a>2：开启unitFlag，硬件执行完指令之后，不会关闭unitFlag功能；</p>
+<p id="p173663815011"><a name="p173663815011"></a><a name="p173663815011"></a>3：开启unitFlag，硬件执行完指令之后，会将unitFlag功能关闭。</p>
+<p id="p14988589213"><a name="p14988589213"></a><a name="p14988589213"></a>开启该功能时，Mmad指令的unitFlag在最后1个分形设置为3、其余分形计算设置为2即可。</p>
 <p id="p181158034917"><a name="p181158034917"></a><a name="p181158034917"></a>该参数仅支持如下型号：</p>
 <p id="p15176104155816"><a name="p15176104155816"></a><a name="p15176104155816"></a><span id="ph14470441185817"><a name="ph14470441185817"></a><a name="ph14470441185817"></a>Ascend 950PR/Ascend 950DT</span></p>
 <p id="p15910825145415"><a name="p15910825145415"></a><a name="p15910825145415"></a><span id="ph1292674871116"><a name="ph1292674871116"></a><a name="ph1292674871116"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_2"><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a>Atlas A2 推理系列产品</term></span></p>
