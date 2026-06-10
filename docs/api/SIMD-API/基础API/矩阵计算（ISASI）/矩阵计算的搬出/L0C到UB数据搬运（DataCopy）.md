@@ -1,4 +1,4 @@
-# L0C Buffer到UB数据搬运（DataCopy、仅Atlas推理系列产品AI Core支持）<a name="ZH-CN_TOPIC_0000002382867725"></a>
+# L0C Buffer到UB数据搬运（DataCopy）<a name="ZH-CN_TOPIC_0000002382867725"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -111,26 +111,14 @@
 
 ## 数据类型<a id="section8664371012"></a>
 
-下文的数据通路均通过逻辑位置TPosition来表达，并注明了对应的物理通路。
+源操作数和目的操作数的数据类型保持一致时，支持的数据类型为：half、float、int32_t、uint32_t|
 
-**表 7**  Local Memory -\> Local Memory具体通路和支持的数据类型
+**表 7**  源操作数和目的操作数的数据类型不一致时的支持情况
 
-|支持型号|数据通路|源操作数和目的操作数的数据类型 (两者保持一致)|
-|----------|----------|----------|
-|Atlas 推理系列产品AI Core|CO1 -> CO2（L0C Buffer -> UB）|half、float、int32_t、uint32_t|
-
-**表 8**  Local Memory -\> Local Memory具体通路和支持的数据类型（支持源操作数和目的操作数的数据类型不一致）
-
-|产品型号|数据通路|源操作数的数据类型|目的操作数的数据类型|
-|----------|----------|----------|----------|
-|Atlas 推理系列产品AI Core|CO1 -> CO2（L0C Buffer -> UB）|float|half|
-|Atlas 推理系列产品AI Core|CO1 -> CO2（L0C Buffer -> UB）|int32_t|int8_t、uint8_t、int16_t、half|
-
-**表 9**  enhancedParams不生效时支持的通路（此时支持接口调用但增强数据搬运不生效，功能等同于基础数据搬运）
-
-|支持型号|数据通路|
+|源操作数的数据类型|目的操作数的数据类型|
 |----------|----------|
-|Atlas 推理系列产品AI Core|GM -> VECIN<br>GM -> A1、B1<br>VECIN -> VECCALC或VECCALC -> VECOUT<br>VECIN、VECCALC、VECOUT -> A1、B1<br>VECOUT、CO2 -> GM|
+|float|half|
+|int32_t|int8_t、uint8_t、int16_t、half|
 
 ## 返回值说明<a name="section16867144513189"></a>
 

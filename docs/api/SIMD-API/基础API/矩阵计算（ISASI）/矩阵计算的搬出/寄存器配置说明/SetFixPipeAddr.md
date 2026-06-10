@@ -55,7 +55,7 @@ __aicore__ inline void SetEleSrcPara(const LocalTensor <half>& eleWiseData, uint
 }
 ```
 
-- 针对Atlas 200I/500 A2 推理产品，完整示例如下。随路格式转换数据搬运，通路：CO1-\>GM。
+- 针对Atlas 200I/500 A2 推理产品，完整示例如下。随路格式转换数据搬运，通路：L0C Buffer-\>GM。
 
     示例：Mmad含有矩阵乘偏置，左矩阵和右矩阵的数据类型为int8\_t，结果矩阵的数据类型为int32\_t。量化模式DEQF16，scalar量化参数为0.5，将Mmad计算出的结果由int32\_t量化成half并搬出。
 

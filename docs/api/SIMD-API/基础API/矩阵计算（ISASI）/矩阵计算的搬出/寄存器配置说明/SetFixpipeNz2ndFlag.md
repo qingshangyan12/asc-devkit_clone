@@ -1,6 +1,6 @@
-# SetFixpipeNz2ndFlag<a name="ZH-CN_TOPIC_0000002569070993"></a>
+# SetFixpipeNz2ndFlag<a id="ZH-CN_TOPIC_0000002569070993"></a>
 
-## 产品支持情况<a name="zh-cn_topic_0000002516209232_section18204144912492"></a>
+## 产品支持情况<a id="zh-cn_topic_0000002516209232_section18204144912492"></a>
 
 |产品|是否支持|
 |----------|:----------:|
@@ -14,11 +14,11 @@
 |Kirin X90|√|
 |Kirin  9030|√|
 
-## 功能说明<a name="zh-cn_topic_0000002516209232_section618mcpsimp"></a>
+## 功能说明<a id="zh-cn_topic_0000002516209232_section618mcpsimp"></a>
 
 DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
-## 函数原型<a name="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
+## 函数原型<a id="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
 
 ```cpp
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
@@ -34,7 +34,7 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 
 </cann-filter>
 
-## 参数说明<a name="zh-cn_topic_0000002516209232_section622mcpsimp"></a>
+## 参数说明<a id="zh-cn_topic_0000002516209232_section622mcpsimp"></a>
 
 <cann-filter npu_type = "A3,910b,310b">
 
@@ -80,27 +80,17 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 
 ## 数据类型
 
-<cann-filter npu_type = "A3,910b,310b,x90,9030">
+参数的数据类型见[函数原型](#zh-cn_topic_0000002516209232_section620mcpsimp)。
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品、Kirin X90、Kirin 9030，参数的数据类型均为uint16_t。
-
-</cann-filter>
-
-<cann-filter npu_type = "950">
-
-针对Ascend 950PR/Ascend 950DT，参数ndNum、srcNdStride的数据类型为uint16_t，参数dstNdStride的数据类型为uint32_t。
-
-</cann-filter>
-
-## 返回值说明<a name="section640mcpsimp"></a>
+## 返回值说明<a id="section640mcpsimp"></a>
 
 无
 
-## 约束说明<a name="zh-cn_topic_0000002516209232_section633mcpsimp"></a>
+## 约束说明<a id="zh-cn_topic_0000002516209232_section633mcpsimp"></a>
 
 无
 
-## 调用示例<a name="section6461234123118"></a>
+## 调用示例<a id="section6461234123118"></a>
 
 完整示例可参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 

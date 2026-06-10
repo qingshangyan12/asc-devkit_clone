@@ -2,7 +2,7 @@
 
 **特性说明：**
 
-矩阵搬出时，NZ2ND功能即为实现NZ格式到ND格式的矩阵转换。<cann-filter npu_type = "A3,910b">可以通过调用[DataCopy](../L0C到GM数据搬运（DataCopy）.md)数据搬运接口与配置相应寄存器[SetFixpipeNz2ndFlag](../寄存器配置说明/SetFixpipeNz2ndFlag.md)接口开启该能力。针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，可以通过[Fixpipe接口](../L0C到GM数据搬运（Fixpipe）.md)配置对应[Fixpipe搬运参数（FixpipeParamsV220）](../L0C到GM数据搬运（Fixpipe）.md)开启。</cann-filter>
+矩阵搬出时，NZ2ND功能即为实现NZ格式到ND格式的矩阵转换。
 
 NZ2ND转化过程可以参考以下伪代码：
 

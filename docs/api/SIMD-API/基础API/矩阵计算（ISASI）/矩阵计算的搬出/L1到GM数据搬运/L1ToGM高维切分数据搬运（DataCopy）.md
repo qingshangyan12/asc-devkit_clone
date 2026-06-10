@@ -66,19 +66,27 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 源矩阵和目的矩阵支持的数据类型保持一致。
 
-<cann-filter npu_type = "A3,910b">
+<cann-filter npu_type = "A3">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：
-
-int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 </cann-filter>
 
-<cann-filter npu_type = "x90,9030">
+<cann-filter npu_type = "910b">
 
-针对Kirin X90、Kirin 9030，支持数据类型为：
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
-int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
+</cann-filter>
+
+<cann-filter npu_type = "x90">
+
+针对Kirin X90，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
+
+</cann-filter>
+
+<cann-filter npu_type = "9030">
+
+Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float、int64_t、uint64_t、double。
 
 </cann-filter>
 

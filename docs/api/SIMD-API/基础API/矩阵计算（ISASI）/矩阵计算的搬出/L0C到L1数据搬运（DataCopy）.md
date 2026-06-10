@@ -72,50 +72,22 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足6对齐。 |
 | intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002511188540_table35908519282)。<br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
-<cann-filter npu_type = "A3,910b">
-
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-
 **表 3**  DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002511188540_table35908519282"></a>
 
 | 参数名称 | 含义 |
 |----------|----------|
-| sid | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
+| sid | 此参数用户无需关注，设置为0即可。 |
 | nSize | 源NZ矩阵在N方向上的大小。取值范围nSize∈[0, 4095]，nSize必须为16的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | mSize | 源NZ矩阵在M方向上的大小。取值范围为mSize∈[0, 65535]。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | dstStride | 目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0， 单位为datablock（32字节）。 |
 | srcStride | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)），T为src的数据类型，其值应填成mSize对16向上取整。 |
 | unitFlag | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&bull; 0（2'b00）：不开启unitFlag。<br>&bull; 1（2'b01）：无效值。<br>&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位。<br>&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../矩阵计算/关键特性说明/UnitFlag.md)章节。 |
-| clipReluPre | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
-| eltWiseOp | 此参数用户无需关注，设置为0即可。<br>注：兼容旧款产品接口传入，Atlas A2 训练系列产品/Atlas A2 推理系列产品不做处理 |
+| clipReluPre | <cann-filter npu_type = "950,A3,910b">该参数仅在Atlas 200I/500 A2 推理产品支持。<br></cann-filter><cann-filter npu_type = "310b">用于配置是否开启ClipReLU操作，参数类型为uint8_t，取值如下：0，不开启ClipReLU；1，开启ClipReLU，此时需要调用[SetFixPipeClipRelu](./寄存器配置说明/SetFixPipeClipRelu.md)来设置clipReLU的最大值。<br>&bull; 该操作在随路量化后进行，quantPre配置后才能使用，当前支持的量化模式有F322F16/DEQF16/VDEQF16/QF322B8_PRE/VQF322B8_PRE/REQ8/VREQ8。<br></cann-filter> |
+| eltWiseOp | <cann-filter npu_type = "950,A3,910b">该参数仅在Atlas 200I/500 A2 推理产品支持。<br></cann-filter><cann-filter npu_type = "310b">用于配置是否开启Elementwise操作及操作模式。Elementwise操作是指进行随路量化后，可以逐个元素加/减一个LocalTensor，大小为mSize * nSize，具体LocalTensor地址相关参数需要调用[SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)来设置。<br>eltWiseOp参数类型为uint8_t，取值如下：<br>&bull; 0：不开启Elementwise<br>&bull; 1：Elementwise Addition<br>&bull; 2：Elementwise Subtraction<br></cann-filter> |
 | quantPre | 用于控制量化模式，QuantMode_t类型，具体定义如下：<br>&bull; half/bfloat16_t输出，此参数需配置为QuantMode_t::F322F16/QuantMode_t::F322BF16。<br>&bull; 配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数。<br>&bull; 配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数，其中tensor量化参数需要通过DataCopy从L1 Buffer搬运至Fixpipe Buffer。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。此通路不支持NoQuant模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能，此通路不支持<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
 | reluPre | 用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&bull; 0：不开启ReLU<br>&bull; 1：Normal ReLU |
 | channelSplit | 仅在L0C Buffer(CO1) -> GM通路时生效，此通路设置为false即可。 |
 | nz2ndEn | 仅在L0C Buffer(CO1) -> GM通路时生效，此通路设置为false即可。 |
-
-</cann-filter>
-
-<cann-filter npu_type = "950,310b">
-
-针对Ascend 950PR/Ascend 950DT、Atlas 200I/500 A2 推理产品：
-
-**表 4**  DataCopyCO12DstParams结构体参数定义（C0取值：一般情况下，C0 = 16；开启channelSplit（channel切分）时，C0 = 8）
-
-|参数名称|含义|
-|----------|----------|
-|nSize|src横向方向的size大小。<br>&bull; 不开启NZ2ND功能，必须为C0的倍数，此时连续传输数据块的个数为nSize / C0。<br>&bull; 开启NZ2ND功能，不受限制。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|mSize|src纵向方向的size大小。<br>&bull; 不开启NZ2ND功能，连续传输数据块的大小为mSize \* C0个元素的长度。<br>&bull; 开启NZ2ND功能，NZ/ND矩阵的大小为mSize \* nSize。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。**|
-|dstStride|&bull; 不开启NZ2ND功能<br>dst相邻连续数据片段间隔（前面一个数据块的头与后面数据块的头的间隔），取值不为0。单位为dataBlock（32字节）。<br>&bull; 开启NZ2ND功能<br>dst同一ND矩阵的相邻行的偏移（头与头），取值不为0， 单位为元素。|
-|srcStride|&bull; 不开启NZ2ND功能<br>src相邻连续数据片段间隔（前面一个数据块的头与后面数据块的头的间隔），必须为16的倍数。取值范围：srcStride∈[0, 65535]， 单位：C0_Size(C0 * sizeof(U)，U为src的数据类型)。<br>&bull; 开启NZ2ND功能<br>src同一NZ矩阵的相邻Z排布的偏移（头与头），必须为16的倍数，取值范围：srcStride∈[0, 65535]，单位C0_size。|
-|quantPre|用于控制量化模式，QuantMode_t类型，具体定义如下。默认值为QuantMode_t::NoQuant，即不开启量化功能。<br>配置为scalar量化时，需要调用[SetFixpipePreQuantFlag](./寄存器配置说明/SetFixpipePreQuantFlag.md)接口来设置scalar量化参数；配置为tensor量化时，需要调用[SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)来设置tensor量化参数。<pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能<br>    F322F16,      // float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // int32_t量化成half，scalar量化<br>    VDEQF16,      // int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre>|
-|reluPre|用于配置ReLU操作的模式，类型为uint8_t，取值如下：<br>&bull; 0：不开启ReLU<br>&bull; 1：Normal ReLU|
-|channelSplit|类型为bool，配置是否开启channel切分，对于float类型的dst生效。<br>&bull; false：不开启<br>&bull; true：开启|
-|nz2ndEn|类型为bool，配置是否开启NZ2ND的格式转换，仅在CO1 -> GM通路生效。<br>如果要开启NZ2ND的功能需要同步调用[SetFixpipeNz2ndFlag](./寄存器配置说明/SetFixpipeNz2ndFlag.md)来设置格式转换的相关配置信息。<br>&bull; false：不开启<br>&bull; true：开启|
-|<cann-filter npu_type = "310b"> clipReluPre <br>该参数仅在Atlas 200I/500 A2 推理产品支持。|用于配置是否开启ClipReLU操作，参数类型为uint8_t，取值如下：0，不开启ClipReLU；1，开启ClipReLU，此时需要调用[SetFixPipeClipRelu](./寄存器配置说明/SetFixPipeClipRelu.md)来设置clipReLU的最大值。<br>&bull; 该操作在随路量化后进行，quantPre配置后才能使用，当前支持的量化模式有F322F16/DEQF16/VDEQF16/QF322B8_PRE/VQF322B8_PRE/REQ8/VREQ8。 |
-|eltWiseOp <br>该参数仅在Atlas 200I/500 A2 推理产品支持。|用于配置是否开启Elementwise操作及操作模式。Elementwise操作是指进行随路量化后，可以逐个元素加/减一个LocalTensor，大小为mSize * nSize，具体LocalTensor地址相关参数需要调用[SetFixPipeAddr](./寄存器配置说明/SetFixPipeAddr.md)来设置。<br>eltWiseOp参数类型为uint8_t，取值如下：<br>&bull; 0：不开启Elementwise<br>&bull; 1：Elementwise Addition<br>&bull; 2：Elementwise Subtraction<br> </cann-filter> |
-|sid|预留参数，为后续的功能做保留，开发者暂时无需关注。|
-
-</cann-filter>
 
 ## 数据类型<a id="zh-cn_topic_0000002511188540_section4219135304818"></a>
 
@@ -132,9 +104,31 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 
 </cann-filter>
 
-<cann-filter npu_type = "A3,910b,310b">
+<cann-filter npu_type = "A3">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品，DataCopy接口支持的数据类型组合如下：
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，DataCopy接口支持的数据类型组合如下：
+
+| 源矩阵（L0C Buffer） | 目的矩阵（GM） |
+| ---------- | ---------- |
+| float | int8_t、uint8_t、half、bfloat16_t |
+| int32_t | int8_t、uint8_t、half |
+
+</cann-filter>
+
+<cann-filter npu_type = "910b">
+
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，DataCopy接口支持的数据类型组合如下：
+
+| 源矩阵（L0C Buffer） | 目的矩阵（GM） |
+| ---------- | ---------- |
+| float | int8_t、uint8_t、half、bfloat16_t |
+| int32_t | int8_t、uint8_t、half |
+
+</cann-filter>
+
+<cann-filter npu_type = "310b">
+
+针对Atlas 200I/500 A2 推理产品，DataCopy接口支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（GM） |
 | ---------- | ---------- |

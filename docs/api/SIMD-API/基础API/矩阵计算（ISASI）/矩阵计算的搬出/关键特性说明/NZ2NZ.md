@@ -4,11 +4,19 @@
 
 矩阵计算的搬出过程中NZ2NZ的核心功能体现为，矩阵计算结果搬出前后保持NZ数据排布不变。
 
-NZ2NZ转化过程可以参考以下伪代码：
-
 <cann-filter npu_type = "A3,910b">
+以如下产品型号为例：
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+<cann-filter npu_type = "A3">
+Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+</cann-filter>
+<cann-filter npu_type = "910b">
+
+Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
+</cann-filter>
+
+NZ2NZ转化过程可以参考以下伪代码：
 
 ```cpp
 for (j = 0; j < mSize; j++) {
@@ -20,8 +28,6 @@ for (j = 0; j < mSize; j++) {
     }
 }
 ```
-
-</cann-filter>
 
 伪代码使用的参数具体说明如下：
 
@@ -35,7 +41,7 @@ for (j = 0; j < mSize; j++) {
 
 - mSize与nSize分别表示矩阵M方向和N方向上的维度。
 - srcStride表示源NZ矩阵中不同Z分形列的间隔，单位为C0\_Size（C0\_Size=16\*sizeof\(T\)，T为操作数的数据类型）。
-- dstStride表示目标NZ矩阵中不同Z分形列的间隔。<cann-filter npu_type = "A3,910b">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，单位为32字节。</cann-filter>
+- dstStride表示目标NZ矩阵中不同Z分形列的间隔，单位为32字节。
 
 **特性约束：**
 
@@ -46,15 +52,9 @@ for (j = 0; j < mSize; j++) {
 
 **使用示例：**
 
-<cann-filter npu_type = "A3,910b">
-
 **图 1**  NZ2NZ示意图<a name="zh-cn_topic_0000002515820868_fig199191646174210"></a>  
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品：
-
 ![](../../../../../figures/Fixpipe_NZ2NZ.png)
-
-</cann-filter>
 
 示意图中参数设置示例（通过Fixpipe接口搬运并去除dummy数据）和解释说明如下：
 
@@ -62,6 +62,6 @@ for (j = 0; j < mSize; j++) {
 - nSize=48，表示源NZ矩阵中待搬运矩阵在N方向上的大小为48个元素。
 - mSize=24，表示源NZ矩阵中待搬运矩阵在M方向上的大小为24个元素。
 - srcStride=64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为64 \* C0\_Size。
-<cann-filter npu_type = "A3,910b">
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，dstStride = 40，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40\*32字节。
+- dstStride = 40，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40\*32字节。
+
 </cann-filter>

@@ -134,9 +134,20 @@
 
 </cann-filter>
 
-<cann-filter npu_type = "A3,910b">
+<cann-filter npu_type = "A3">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型组合如下：
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型组合如下：
+
+| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| ---------- | ---------- |
+| float | int8_t、uint8_t、half、bfloat16_t |
+| int32_t | int8_t、uint8_t、half |
+
+</cann-filter>
+
+<cann-filter npu_type = "910b">
+
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型组合如下：
 
 | 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
 | ---------- | ---------- |
@@ -204,7 +215,7 @@
 
 <cann-filter npu_type = "950,A3,910b">
 
-针对Ascend 950PR/Ascend 950DT、Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1)；
+Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1)；
 
 - 示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
 
