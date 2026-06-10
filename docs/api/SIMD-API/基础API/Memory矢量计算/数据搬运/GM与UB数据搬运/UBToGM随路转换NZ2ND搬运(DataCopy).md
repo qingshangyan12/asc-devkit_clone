@@ -77,7 +77,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 - ndNum = 2，表示源NZ矩阵的数目为2（NZ矩阵1为A1\~A8 + B1\~B8，NZ矩阵2为C1\~C8 + D1\~D8）。
 - nValue = 4，NZ矩阵的行数，也就是矩阵的高度为4。
 - dValue = 32，NZ矩阵的列数，也就是矩阵的宽度为32个元素。
-- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即A1到C1的距离，为256个元素（32个DataBlock \* 8个元素）
+- srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即A1到C1的距离，为256个元素（32个DataBlock \* 8个元素）。
 - srcNStride = 4，表示同一个源NZ矩阵的相邻Z排布的偏移，即A1到B1的距离，为64个元素（8个DataBlock \* 8个元素）。
 - dstDStride = 144，表示一个目的ND矩阵的相邻行之间的偏移，即A1和A3之间的距离，为18个DataBlock，即18 \* 8 = 144个元素。
 - dstNdMatrixStride = 40，表示dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，为5个DataBlock，5 \* 8 = 40个元素。

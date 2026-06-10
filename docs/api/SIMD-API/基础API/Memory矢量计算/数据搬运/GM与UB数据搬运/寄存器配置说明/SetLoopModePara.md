@@ -85,9 +85,9 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Normal模式
 
     ```cpp
-    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
-    // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐
-    // padding值设为-1
+    // 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
+    // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
+    // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
@@ -100,9 +100,9 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - SetLoopModePara使能loop mode，Compact模式
 
     ```cpp
-    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
-    // Normal模式：每个block搬运40B后填充24B使其64字节对齐
-    // padding值设为-1
+    // 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）。
+    // Normal模式：每个block搬运40B后填充24B使其64字节对齐。
+    // padding值设为-1。
     AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
     AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
@@ -115,10 +115,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 - 五维数据搬运
 
     ```cpp
-    // 场景6：五维数据搬运GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8
-    // Normal模式，使用loop mode
-    // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节
-    // 最终UB连续存放为[512, 128]
+    // 场景6：五维数据搬运GM[2, 4, 3, 128, 126]int8 -> UB[512, 128]int8。
+    // Normal模式，使用loop mode。
+    // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节。
+    // 最终UB连续存放为[512, 128]。
 
     // Stride参数说明：
     // - loop1SrcStride=128*126：第2维stride，每次loop1源地址跳过128*126字节
@@ -143,7 +143,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     };
     AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
 
-    // 第0维for循环搬运2次
+    // 第0维for循环搬运2次。
     for (uint32_t dim0 = 0; dim0 < 2; dim0++) {
         constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126;  // 第0维源stride
         constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;   // 第0维目的stride

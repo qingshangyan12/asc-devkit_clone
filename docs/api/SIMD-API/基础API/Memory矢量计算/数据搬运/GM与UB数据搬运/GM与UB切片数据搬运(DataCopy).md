@@ -178,7 +178,7 @@ $$startIndex < endIndex \le shapeValue$$
 ## 调用示例<a name="zh-cn_topic_0000002565968945_section088124295117"></a>
 
 ```cpp
-// 配置切片搬运参数
+// 配置切片搬运参数。
 AscendC::SliceInfo srcSliceInfoIn[] = {{16, 70, 7, 3, 87}, {0, 2, 1, 1, 3}};
 AscendC::SliceInfo dstSliceInfoIn[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
 uint32_t dimValueIn = 2;
@@ -196,13 +196,13 @@ for (uint32_t i = 0; i < dimValueIn; i++) {
     dstSliceInfo[i].shapeValue = dstSliceInfoIn[i].shapeValue;
 }
 
-// 先后进行两个数据通路的切片搬运
-// Global Memory -> Unified Buffer: MTE2流水搬运
+// 先后进行两个数据通路的切片搬运。
+// Global Memory -> Unified Buffer: MTE2流水搬运。
 AscendC::DataCopy(srcLocal, srcGlobal, dstSliceInfo, srcSliceInfo, dimValue);
-// 等待MTE2搬运完成，MTE3可以开始
+// 等待MTE2搬运完成，MTE3可以开始。
 AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
-// Unified Buffer -> Global Memory: MTE3流水搬运
+// Unified Buffer -> Global Memory: MTE3流水搬运。
 AscendC::DataCopy(dstGlobal, srcLocal, dstSliceInfo, dstSliceInfo, dimValue);
 ```
 

@@ -54,7 +54,7 @@
 | :--- | :---: | :--- |
 | dst | 输出 | 目的操作数，类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)。 |
 | src | 输入 | 源操作数，类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor简介.md)。 |
-| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表4](#table_nddma_4)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表5](#table_nddma_5)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]</pre> |
+| params | 输入 | 搬运参数NdDmaParams类型，定义如下，具体参数说明请参考[表4](#table_nddma_4)。<br><pre>template &lt;typename T, uint8_t dim&gt;<br>struct NdDmaParams  {<br>    NdDmaLoopInfo&lt;dim&gt; loopInfo;<br>    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。<br>};</pre><br>NdDmaLoopInfo类型，定义如下，具体参数说明请参考[表5](#table_nddma_5)。<br><pre>template &lt;uint8_t dim&gt;<br>struct NdDmaLoopInfo  {<br>    uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.<br>    uint32_t loopDstStride[dim] = {0}; // dst stride info per loop.<br>    uint32_t loopSize[dim] = {0}; // Loop size per loop.<br>    uint8_t loopLpSize[dim] = {0}; // Left padding size per loop.<br>    uint8_t loopRpSize[dim] = {0}; // Right padding size per loop.<br>};<br>// 注意：dim的有效范围为[1,5]。</pre> |
 
 **表 3**  NdDmaConfig结构体参数定义<a name="table_nddma_3"></a>
 
@@ -128,18 +128,18 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 - 场景1：2D Padding场景，常数填充方式
 
     ```cpp
-    // xGmShape：[16, 32]，搬运8列2行数据，左Padding 15，上Padding 13，右Padding 17，下Padding 3，xLocalShape：[32, 64]
+    // xGmShape：[16, 32]，搬运8列2行数据，左Padding 15，上Padding 13，右Padding 17，下Padding 3，xLocalShape：[32, 64]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 32}, {1, 64}, {32, 16}, {15, 13}, {17, 3}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};  // padding的值为0
     AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
 - 场景2：2D Padding场景，最近值填充方式
 
     ```cpp
-    // xGmShape：[28, 15]，搬运3列4行数据，左Padding 11，上Padding 3，右Padding 6，下Padding 1，xLocalShape：[32, 32]
+    // xGmShape：[28, 15]，搬运3列4行数据，左Padding 11，上Padding 3，右Padding 6，下Padding 1，xLocalShape：[32, 32]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 15}, {1, 32}, {15, 28}, {11, 3}, {6, 1}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
     AscendC::NdDmaDci();  // 刷新cache
@@ -151,33 +151,33 @@ Ascend 950PR/Ascend 950DT支持的数据类型为：b8、b16、b32、b64。
 - 场景3：2D Transpose场景
 
     ```cpp
-    // xGmShape：[16, 64]，搬运8列4行数据，xLocalShape：[64, 16]
+    // xGmShape：[16, 64]，搬运8列4行数据，xLocalShape：[64, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {16, 1}, {64, 16}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
     AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
 - 场景4：2D BroadCast场景
 
     ```cpp
-    // xGmShape：[1, 16]，搬运16列1行数据并进行广播，xLocalShape：[3, 16]
+    // xGmShape：[1, 16]，搬运16列1行数据并进行广播，xLocalShape：[3, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 0}, {1, 16}, {16, 3}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
     AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 
 - 场景5：2D Slice场景
 
     ```cpp
-    // xGmShape：[32, 64]，将16*10的矩阵截取为一个5*7的矩阵，xLocalShape：[16, 16]
+    // xGmShape：[32, 64]，将16*10的矩阵截取为一个5*7的矩阵，xLocalShape：[16, 16]。
     AscendC::NdDmaLoopInfo<2> loopInfo{{1, 64}, {1, 16}, {16, 16}, {0, 0}, {0, 0}};
     AscendC::NdDmaParams<T, 2> params{loopInfo, 0};
     AscendC::NdDmaDci();  // 刷新cache
-    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传
+    static constexpr AscendC::NdDmaConfig dmaConfig;  // 使用默认参数，也可以不传。
     AscendC::DataCopy<T, 2, dmaConfig>(xLocal, xGm, params);
     ```
 

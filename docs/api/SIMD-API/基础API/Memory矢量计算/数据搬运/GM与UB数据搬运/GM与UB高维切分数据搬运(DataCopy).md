@@ -207,10 +207,10 @@
     // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor。
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
-    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
+    intriParams.blockCount = 1; // 连续数据块个数为1。
+    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
+    intriParams.srcGap = 0; // 源操作数做连续搬运。
+    intriParams.dstGap = 0; // 目的操作数连续排布。
     AscendC::DataCopy(srcLocal, srcGlobal, intriParams);
     ```
 
@@ -227,10 +227,10 @@
     // dstLocal为half类型的LocalTensor，dstGlobal为half类型的GlobalTensor。
     // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运。
     DataCopyParams intriParams;
-    intriParams.blockCount = 1; // 连续数据块个数为1
-    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
-    intriParams.srcGap = 0; // 源操作数做连续搬运
-    intriParams.dstGap = 0; // 目的操作数连续排布
+    intriParams.blockCount = 1; // 连续数据块个数为1。
+    intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素。
+    intriParams.srcGap = 0; // 源操作数做连续搬运。
+    intriParams.dstGap = 0; // 目的操作数连续排布。
     AscendC::DataCopy(dstGlobal, dstLocal, intriParams);
     ```
 
