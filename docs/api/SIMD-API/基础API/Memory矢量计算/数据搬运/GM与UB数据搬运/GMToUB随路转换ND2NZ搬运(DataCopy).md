@@ -52,7 +52,7 @@
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#section4219135304818)。 |
-| enableSmallC0 | SmallC0模式开关：当dValue小于等于4的时候，C0_SIZE会补齐到4 * sizeof(T) Bytes。<br>默认不开启。 |
+| enableSmallC0 | SmallC0模式开关：当dValue小于等于4的时候，C0_SIZE会补齐到4 * sizeof(T)字节。<br>默认不开启。 |
 
 **表 2**  参数说明
 

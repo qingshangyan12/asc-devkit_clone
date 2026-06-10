@@ -2,7 +2,7 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 不支持数据搬运模式PaddingMode的原型 | 支持数据搬运模式PaddingMode的原型 |
+| 产品 | 不支持数据搬运模式mode的原型 | 支持数据搬运模式mode的原型 |
 | :--- | :---: | :---: |
 |<cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | √ </cann-filter>|
 |<cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | x </cann-filter>|
@@ -70,10 +70,10 @@
 
 | 参数名 | 描述 |
 | :--- | :--- |
-| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]。<cann-filter npu-type="910b,A3"><br> |
+| blockCount | 指定该指令包含的连续传输数据块个数，数据类型为uint16_t，取值范围：blockCount∈[0, 4095]。 |
 | blockLen | 指定该指令每个连续传输数据块长度，**该指令支持非对齐搬运**，**每个连续传输数据块长度单位为字节**。数据类型为uint32_t，取值范围：blockLen∈[0, 2097151]**，blockLen必须是sizeof(T)的整数倍，需要注意不要超过UB空间大小**。 |
-| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。<cann-filter npu-type="950"><br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 65535]。</cann-filter> |
-| dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。<cann-filter npu-type="950"><br>特别地，针对Ascend 950PR/Ascend 950DT，数据类型为int64_t，取值范围为[0, 2^40-1]。</cann-filter> |
+| srcStride | 源操作数，相邻连续数据块的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>源操作数的逻辑位置为VECIN/VECOUT，单位为dataBlock（32字节）。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。不同产品中srcStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。 |
+| dstStride | 目的操作数，相邻连续数据块间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值）。<br>目的操作数的逻辑位置为GM，单位为字节。<br>数据类型为uint32_t，取值范围为[0, 2^32-1]。不同产品中dstStride的数据类型和支持的取值范围可能不同，详细请参考[约束说明](#section633mcpsimp)。 |
 | rsv | 保留字段。 |
 
 下面通过两个场景介绍Unified Buffer到Global Memory的非对齐搬运，分别对应32字节对齐和非32字节对齐：
@@ -142,9 +142,10 @@
 
     <cann-filter npu-type="950">
 
-    **说明**：针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的取值范围的说明如下：
-    - srcStride：取值范围为[0, 65535]
-    - dstStride：取值范围为[0, 2^40-1]
+    > [!NOTE]说明
+    > 特别地，针对Ascend 950PR/Ascend 950DT，srcStride和dstStride的数据类型和取值范围如下：
+    > - srcStride：数据类型为int64_t，取值范围为[0, 65535]。
+    > - dstStride：数据类型为int64_t，取值范围为[0, 2^40-1]。
 
     </cann-filter>
 

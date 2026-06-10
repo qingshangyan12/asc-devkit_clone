@@ -67,8 +67,8 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| blockCount | 搬运的数据块个数。数据类型为uint16_t，取值范围：blockCount∈[0, 4095]，默认值为1。<cann-filter npu-type="910b,A3"><br>|
-| blockLen | 搬运的每个数据块长度。数据类型为uint16_t，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。<cann-filter npu-type="910b,A3"> </cann-filter>|
+| blockCount | 搬运的数据块个数。数据类型为uint16_t，取值范围：blockCount∈[0, 4095]，默认值为1。 |
+| blockLen | 搬运的每个数据块长度。数据类型为uint16_t，取值范围：blockLen∈[0, 65535]，单位：DataBlock（32B）。 |
 | srcGap | 源操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：srcGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，srcGap无意义，设置为0即可。 |
 | dstGap | 目的操作数相邻数据块之间的间隔（即前一个数据块**结束地址**与后一个数据块**起始地址**的差值），数据类型为uint16_t，取值范围：dstGap∈[0, 65535]，单位：DataBlock（32B）。<br>&bull; blockCount = 1时，dstGap无意义，设置为0即可。 |
 
@@ -194,7 +194,7 @@
     - Atlas A2 训练系列产品/Atlas A2 推理系列产品
     - Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
-在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过`npu-smi info -t topo`命令查询HCCS物理链路。
+    在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，仅支持HCCS物理链路，不支持其他通路；开发者开发过程中，需要关注涉及卡间通信的物理通路，可通过`npu-smi info -t topo`命令查询HCCS物理链路。
 
 </cann-filter>
 
