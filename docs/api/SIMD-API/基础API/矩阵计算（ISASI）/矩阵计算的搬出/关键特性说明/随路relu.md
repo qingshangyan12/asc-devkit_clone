@@ -1,4 +1,4 @@
-# 随路ReLU<a name="ZH-CN_TOPIC_0000002538231206"></a>
+# 随路relu<a name="ZH-CN_TOPIC_0000002538231206"></a>
 
 **特性说明：**
 
