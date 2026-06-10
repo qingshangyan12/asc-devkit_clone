@@ -637,19 +637,17 @@ using CastSub_hifloat8_t_to_float = TupleMap<
 >;
 
 // From instruction/rounding_ops.h
-using CastSub_bfloat16_t_to_bfloat16_t = CastRoundMode;
-
-using CastSub_float_to_float = CastRoundMode;
-
-using CastSub_half_to_half = CastRoundMode;
-
-using CastRoundMode = TupleMap<
+using CastRoundingMap = TupleMap<
     Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
     Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
     Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
     Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
     Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
 >;
+
+using CastSub_bfloat16_t_to_bfloat16_t = CastRoundingMap;
+using CastSub_float_to_float = CastRoundingMap;
+using CastSub_half_to_half = CastRoundingMap;
 
 template <typename SrcType, typename DstType>
 struct CastSubMap {
