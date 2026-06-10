@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -302,30 +302,30 @@ __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src,
  *          This is a hardware-level instruction that requires manual synchronization.
  */
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
 
-__aicore__ inline void asc_copy_gm2l0a(__ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
 
-__aicore__ inline void asc_copy_gm2l0b(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int4b_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
 
 
 
