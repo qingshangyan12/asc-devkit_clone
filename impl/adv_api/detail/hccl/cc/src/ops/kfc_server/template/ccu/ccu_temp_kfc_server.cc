@@ -47,9 +47,21 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
     CcuKernelInfo kernelInfo;
     strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcServer");
     kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuKfcServerKernel);
-    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();  
-    // TODO：其他参数赋值  
+
+    // KfcServer 内联录制 AlltoAllMesh1D，需要为其申请远端 channel
+    std::vector<HcclChannelDesc> channelDescs;
+    CHK_RET(CalcChannelRequestMesh1D(comm, param, topoInfo, subCommRanks_, channelDescs));
+
+    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();
+    // arg 经 host 旁路在录制期交给 AlltoAllMesh1DFunc 使用，字段须与
+    // CcuKernelArgAlltoAllMesh1D 对齐（两结构体布局一致）
+    kernelArg->rankSize = subCommRanks_[0].size();
+    kernelArg->rankId = mySubCommRank_;
+    kernelArg->loadFromMem = param.isMc2;
+    kernelArg->opParam = param;
+    kernelArg->subCommRanks = subCommRanks_;
     kernelInfo.setKernelArg(kernelArg);
+    kernelInfo.channels = channelDescs;
 
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);
 
