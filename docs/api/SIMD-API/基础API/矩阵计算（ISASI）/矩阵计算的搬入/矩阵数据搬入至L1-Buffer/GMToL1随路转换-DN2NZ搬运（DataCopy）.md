@@ -84,6 +84,8 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 
 ## 调用示例<a id="section122101199486"></a>
 
+示例代码片段如下：
+
 ```cpp
 // dstLocal：存放DataCopy的输出Tensor，仅支持L1 Buffer（A1/B1）
 // srcGlobal：存放DataCopy的输入Tensor，仅支持Global Memory

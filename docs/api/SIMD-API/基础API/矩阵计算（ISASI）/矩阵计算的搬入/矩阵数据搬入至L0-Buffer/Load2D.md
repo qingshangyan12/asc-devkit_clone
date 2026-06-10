@@ -253,13 +253,13 @@ dstGap为2：表示目的操作数上，前一个数据分形的尾地址与后�
 
 ## 调用示例
 
-一、A矩阵不转置，half数据类型下，L1 Buffer（TPosition: A1）->L0A Buffer（TPosition: A2） 数据排布示意图
+一、如下示例中：在A矩阵不转置，数据类型为half的场景下，可以直接调用Load2D接口，无需开启转置相关参数。
+
+搬运过程的数据排布变化示意图如下：
 
 ![](../../../../../figures/load2d_l12l0a_nontrans.png)
 
-**使用示例片段：**
-
-a矩阵不转置，因此L1 Buffer->L0A Buffer可以直接调用Load2D接口（无需开启转置）
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize;
@@ -275,15 +275,13 @@ for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
 }
 ```
 
-完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
+二、如下示例中：在A矩阵转置，数据类型为half的场景下，调用Load2D接口需开启转置相关参数。
 
-二、A矩阵转置，half数据类型下，L1 Buffer（TPosition: A1）->L0A Buffer（TPosition: A2） 数据排布示意图
+搬运过程的数据排布变化示意图如下：
 
 ![](../../../../../figures/load2d_l12l0a_trans.png)
 
-**使用示例片段：**
-
-a矩阵转置，且输入数据类型为half，因此也可以直接调用Load2D指令（开启转置）
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[0]) * fractalSize;
@@ -299,5 +297,3 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
     AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
 }
 ```
-
-完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。

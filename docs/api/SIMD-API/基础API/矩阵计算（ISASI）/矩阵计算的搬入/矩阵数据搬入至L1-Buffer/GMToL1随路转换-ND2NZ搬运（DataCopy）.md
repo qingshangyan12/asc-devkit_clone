@@ -42,7 +42,15 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 Atlas 推理系列产品AI Core；
 </cann-filter>
 
-<cann-filter npu_type="A3,910b,310p">
+<cann-filter npu_type="x90">
+Kirin X90；
+</cann-filter>
+
+<cann-filter npu_type="9030">
+Kirin 9030；
+</cann-filter>
+
+<cann-filter npu_type="A3,910b,310p,x90,9030">
 
 ```cpp
 template <typename T>
@@ -64,7 +72,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a id="zh-cn_topic_0000002566538879_section16128134420472"></a>
 
-<cann-filter npu_type="A3,910b,310p">
+<cann-filter npu_type="A3,910b,310p,x90,9030">
 
 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 推理系列产品AI Core：
 
@@ -135,6 +143,18 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 <cann-filter npu_type="310p">
 
 针对Atlas 推理系列产品AI Core，支持数据类型为：int16_t、uint16_t、int32_t、uint32_t、half、float。
+
+</cann-filter>
+
+<cann-filter npu_type="x90">
+
+Kirin X90，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
+
+</cann-filter>
+
+<cann-filter npu_type="9030">
+
+Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、half。
 
 </cann-filter>
 
@@ -215,11 +235,13 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 ## 调用示例<a id="zh-cn_topic_0000002566538879_section088124295117"></a>
 
-A矩阵不转置，half数据类型下，GM->L1 Buffer搬运过程中进行随路ND到NZ的数据排布转换示意图
+如下示例中：在A矩阵不转置，数据类型为half的场景下，使用DataCopy进行随路ND2NZ数据搬运。
+
+搬运过程的数据排布变化示意图如下：
 
 ![](../../../../../figures/datacopy_gm2l1_nd2nz_demo.png)
 
-如下示例中：GM上为ND数据排布，搬运到L1 Buffer上为NZ数据排布
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[DataCopy_GM2L1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 // m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 * fractalShape[1]
@@ -240,5 +262,3 @@ nd2nzA1Params.dstNzNStride = 1;
 nd2nzA1Params.dstNzMatrixStride = 0;
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
-
-完整示例请参考：[DataCopy_GM2L1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。

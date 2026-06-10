@@ -117,6 +117,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 调用示例<a id="zh-cn_topic_0000002535739034_section088124295117"></a>
 
+示例代码片段如下：
+
 ```cpp
 // srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
 // 使用传入count参数的搬运接口，完成连续搬运

@@ -95,7 +95,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 
 ## 调用示例
 
-完整使用样例请参见[Load2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_2dv2_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[Load2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_2dv2_l12l0)。
 
 ```cpp
 // Load2DV2: Nz -> Nz

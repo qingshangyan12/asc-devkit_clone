@@ -108,6 +108,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 调用示例
 
+示例代码片段如下：
+
 ```cpp
 // dstLocal、srcLocal为half类型的LocalTensor，分别位于L1 Buffer和UB
 // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运

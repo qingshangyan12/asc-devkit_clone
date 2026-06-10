@@ -171,6 +171,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 调用示例<a id="zh-cn_topic_0000002566658905_section088124295117"></a>
 
+示例代码片段如下：
+
 ```cpp
 // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
 DataCopyParams intriParams;

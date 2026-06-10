@@ -371,13 +371,13 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ### 示例 1：b8数据类型，A矩阵需要转置的场景
 
-A矩阵转置，b8数据类型下，L1 Buffer->L0A Buffer数据排布示意图：
+在数据类型为b8，A矩阵转置的场景下，Load2D接口不支持转置，因此需要调用LoadDataWithTranspose接口完成数据搬运。
+
+搬运过程的数据排布变化示意图如下：
 
 ![](../../../../../figures/loaddatawithtrans_l12l0a_b8.png)
 
-**使用示例片段：**
-
-a矩阵转置，但由于是b8数据类型，Load2D不支持转置，因此需要调用LoadDataWithTranspose接口。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load\_data\_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 // dstoffset要根据A矩阵在L0 Buffer上，宽度方向的对齐来求解
@@ -398,11 +398,9 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 ```
 
-完整示例请参考：[load\_data\_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
-
 ### 示例 2：int8_t数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为int8_t类型，shape为[40,70]，输入b矩阵为int8_t类型，shape为[70,50]，输出c的类型为int32_t。a矩阵从A1->A2转置，b矩阵从B1->B2转置，之后进行Mmad计算和Fixpipe计算。完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为int8_t类型，shape为[40,70]，输入b矩阵为int8_t类型，shape为[70,50]，输出c的类型为int32_t。a矩阵从A1->A2转置，b矩阵从B1->B2转置，之后进行Mmad计算和Fixpipe计算。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint16_t m = 40, k = 70, n = 50;
@@ -440,7 +438,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
 
 ### 示例 3：half数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为half类型，shape为[40,70]，输入b矩阵为half类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为half类型，shape为[40,70]，输入b矩阵为half类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint16_t m = 40, k = 70, n = 50;
@@ -478,7 +476,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
 
 ### 示例 4：：float数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为float类型，shape为[40,70]，输入b矩阵为float类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为float类型，shape为[40,70]，输入b矩阵为float类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t m = 40, k = 70, n = 50;
@@ -517,7 +515,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
 
 ### 示例 5：使用LoadData2dTransposeParamsV2结构体作为参数的场景
 
-该示例使用了LoadData2dTransposeParamsV2结构体作为参数，输入a矩阵为int8_t类型，shape为[128,128]，输入数据格式为NZ，输入b矩阵为int8_t类型，shape为[128,256]，输入数据格式为NZ，输出c的类型为float。a矩阵从A1->A2不转置，b矩阵从B1->B2转置，示例仅展示接口调用过程，其余计算和搬运不作参考。
+该示例使用了LoadData2dTransposeParamsV2结构体作为参数，输入a矩阵为int8_t类型，shape为[128,128]，输入数据格式为NZ，输入b矩阵为int8_t类型，shape为[128,256]，输入数据格式为NZ，输出c的类型为float。a矩阵从A1->A2不转置，b矩阵从B1->B2转置，示例仅展示接口调用过程，其余计算和搬运不作参考。完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32 m = 256;
@@ -546,5 +544,3 @@ qidB1_.FreeTensor(rightMatrix);
 ```
 
 </cann-filter>
-
-完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。

@@ -102,17 +102,12 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
+示例代码片段如下：
+
 ```cpp
 // srcLocal为half类型的L1 Buffer空间上的LocalTensor
 // workLocal为half类型的UB空间上的LocalTensor
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // UB -> L1 Buffer，搬运过程中完成ND->NZ格式转换
 AscendC::DataCopy(srcLocal, workLocal, intriParams);
-```
-
-结果示例：
-
-```text
-输入数据（workLocal）：[1 2 3 ... 1024]
-输出数据（srcLocal）：[1 2 ... 15 16 33 34 ... 47 48 65 66 ... 79 80 97 98 ... 111 112 ... 1009 1010... 1023 1024]
 ```

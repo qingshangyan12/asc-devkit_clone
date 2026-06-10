@@ -413,15 +413,13 @@ repeatMode =1的时候filter窗口中读取数据的位置保持不变，每个r
 
 ## 调用示例<a id="zh-cn_topic_0000002512171652_section088124295117"></a>
 
-一、A矩阵转置，shape为[k,m]，b32数据类型下，GM->L1 Buffer->L0A Buffer数据排布分别是ND、NZ和ZZ。但是L1 Buffer->L0A Buffer的时候，无法调用LoadDataWithTranspose指令对进行转置，因为在K轴方向两个连续的分形并不能合并为一个16\*16的方块，示意图如下：
+如下示例中：A矩阵转置，shape为[k,m]，b32数据类型下，GM->L1 Buffer->L0A Buffer数据排布分别是ND、NZ和ZZ。但是L1 Buffer->L0A Buffer的时候，无法调用LoadDataWithTranspose指令对进行转置，因为在K轴方向两个连续的分形并不能合并为一个16\*16的方块，示意图如下：
 
 ![](../../../../../figures/load3d_l1tol0a_b32demo.png)
 
 此时可以调用Load3D接口实现A矩阵转置。调用LoadData3DV2指令时，在写入L0A Buffer之前会先分别将A矩阵高度和宽度轴向16、8对齐，接着该指令会将整个A矩阵进行转置并且每一个分形也转置，最终写入到L0A Buffer的A矩阵是ZZ排布
 
-**使用示例片段：**
-
-调用Load3D接口实现A矩阵转置
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
 
 ```cpp
 // Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho \* wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci \* kh \* kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
@@ -458,6 +456,4 @@ loadDataParams.fMatrixCtrl = false;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```
 
-完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
-
-关于如何使用Load3D进行2D数据搬运，更多的样例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)。
+关于如何使用Load3D进行2D数据搬运，请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/load_data_l12l0)中的对应场景。

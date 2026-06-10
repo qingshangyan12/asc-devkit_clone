@@ -53,7 +53,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本示例中，输入bias形状为\[1, 32\]，输出c的形状为\[32, 32\]，格式为Nz。
+本示例中，输入bias形状为\[1, 32\]，输出c的形状为\[32, 32\]，格式为Nz，调用示例图如下：
 
 **图 2**  调用示例图<a name="fig496292825418"></a>  
 

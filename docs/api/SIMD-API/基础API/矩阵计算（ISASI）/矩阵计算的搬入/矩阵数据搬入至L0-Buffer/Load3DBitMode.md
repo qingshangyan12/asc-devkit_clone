@@ -112,7 +112,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 
 ## 调用示例<a id="section6461234123118"></a>
 
-该调用示例支持的运行平台为Atlas 推理系列产品AI Core。
+示例代码片段如下：
 
 ```cpp
 uint16_t C1 = 2;
@@ -127,5 +127,5 @@ uint8_t padList[4] = {padLeft, padRight, padTop, padBottom};
 LoadData3DParamsV2 param = { padList, H, W, 0, 0, 0, -1, -1, strideW, strideH, Kw, Kh, dilationW, dilationH, 1, 0, fmRepeat, 0, (half)(0)};
 Load3DBitModeParam paramBitMode(param);
 AscendC::LoadData<A2, A1, half>(featureMapA2, featureMapA1, paramBitMode);
-AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
+// AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
 ```

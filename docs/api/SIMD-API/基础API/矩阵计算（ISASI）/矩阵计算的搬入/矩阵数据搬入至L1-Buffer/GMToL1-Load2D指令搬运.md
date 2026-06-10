@@ -112,11 +112,13 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 调用示例<a id="zh-cn_topic_0000002567745223_section088124295117"></a>
 
-half数据类型下，GM->L1 Buffer数据排布示意图
+如下示例中：在数据类型为half的场景下，通过调用Load2D指令完成GM->L1 Buffer的Nz2Nz数据搬运。
+
+搬运过程的数据排布变化示意图如下：
 
 ![](../../../../../figures/load2d_gm2l1_demo.png)
 
-如下示例中：GM上为Nz数据排布、shape为[M,K]的A矩阵，调用Load2D指令完成GM->L1 Buffer的Nz2Nz搬运。
+示例代码片段如下：
 
 ```cpp
 // m=32, k=32, fractalShape[0] = 16,fractalShape[1] = 16, fractalSize = 256;
