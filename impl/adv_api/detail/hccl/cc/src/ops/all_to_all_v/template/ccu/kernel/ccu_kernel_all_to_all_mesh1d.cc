@@ -31,9 +31,10 @@ static CcuResult ParseKernelArg(AlltoAllMesh1DContext &ctx, CcuKernelArgAlltoAll
 
 static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
 {
-    HCCL_ERROR("[CcuKernelAlltoAllMesh1D] start InitResource.");
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] start InitResource.");
     const auto *arg = ctx.arg;
     uint32_t channelIdx = 0;
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] obtain arg, arg == nullptr:[%u].", (arg == nullptr));
 
     if (arg->channelCount == 0) {
         HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channels is empty!");
@@ -44,14 +45,14 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
     ctx.input.resize(arg->rankSize);
     ctx.output.resize(arg->rankSize);
     ctx.token.resize(arg->rankSize);
-    HCCL_ERROR("[CcuKernelAlltoAllMesh1D] ctx resize finished!");
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] ctx resize finished!");
     for (uint64_t peerId = 0; peerId < arg->rankSize; peerId++) {
-        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] start for peerid[%llu/%llu], rankId = %llu", peerId, arg->rankSize, arg->rankId);
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] start for peerid[%llu/%llu], rankId = %llu", peerId, arg->rankSize, arg->rankId);
         if (peerId != arg->rankId) {
             ctx.input[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], INPUT_XN_ID);
             ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], OUTPUT_XN_ID);
             ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], TOKEN_XN_ID);
-            HCCL_ERROR("[CcuKernelAlltoAllMesh1D] GetResByChannel finished!");
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] GetResByChannel finished!");
             channelIdx++;
         }
     }
