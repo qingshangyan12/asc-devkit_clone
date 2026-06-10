@@ -2,7 +2,7 @@
 
 GlobalTensor用来存放Global Memory（外部存储）的全局数据。
 
-GlobalTensor public成员函数如下。类型T支持基础数据类型以及[TensorTrait](../TensorTrait/TensorTrait.md)类型，但需要遵循使用此GlobalTensor的指令的数据类型支持情况。
+GlobalTensor public成员函数如下。类型T支持基础数据类型以及[TensorTrait](../../辅助数据结构/TensorTrait/TensorTrait.md)类型，但需要遵循使用此GlobalTensor的指令的数据类型支持情况。
 
 ```cpp
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T> {
@@ -40,4 +40,3 @@ public:
     ...
 };
 ```
-
