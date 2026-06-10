@@ -36,7 +36,7 @@ __aicore__ inline void InitDumpImpl(bool mixFlag, uint32_t gmLen)
 
 __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 {
-    asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape);
+    __asc_aicore::asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape);
 }
 
 template <typename T>

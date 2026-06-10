@@ -49,7 +49,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 {
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
-        asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape);
+        __asc_aicore::asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape);
     }
 }
 
