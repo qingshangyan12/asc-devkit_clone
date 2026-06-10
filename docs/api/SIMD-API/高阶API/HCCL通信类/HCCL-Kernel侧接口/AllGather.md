@@ -145,7 +145,7 @@ __aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 </table>
 
 **图 1**  AllGather通信示例<a name="fig1266464712199"></a>  
-![](../../../../figures/AllGather通信示例.png "AllGather通信示例")
+![AllGather通信示例](../../../../figures/AllGather通信示例.png)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 

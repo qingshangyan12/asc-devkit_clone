@@ -144,7 +144,7 @@ __aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_
 </table>
 
 **图 1**  AllReduce三轮切分通信示例<a name="fig5638165920312"></a>  
-![](../../../../figures/AllReduce三轮切分通信示例.png "AllReduce三轮切分通信示例")
+![AllReduce三轮切分通信示例](../../../../figures/AllReduce三轮切分通信示例.png)
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
