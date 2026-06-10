@@ -171,6 +171,27 @@ protected:
     void SetUp() {}
     void TearDown() {}
 };
+
+static uint32_t GetTPipeAddrPool(const TPipe& pipe, Hardware hard)
+{
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+    return pipe.g_tpipeImpl.bufPool_[static_cast<uint8_t>(hard)].maxAddr;
+#else
+    (void)pipe;
+    return Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(hard)];
+#endif
+}
+
+static uint64_t GetTPipeEventOccupy(const TPipe& pipe, HardEvent evt)
+{
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+    return pipe.g_tpipeImpl.eventPool_[EventToIndex(evt)].eventOccupy;
+#else
+    (void)pipe;
+    return Internal::g_occupyEventPool[EventToIndex(evt)];
+#endif
+}
+
 /* ********************************* TPipe Construction ********************************* */
 TEST_F(TEST_TPIPE, TPipeConstructionTest)
 {
@@ -179,7 +200,7 @@ TEST_F(TEST_TPIPE, TPipeConstructionTest)
     EXPECT_EQ(pipe->g_tpipeImpl.curBufSize_, 0);
     // check hardware addr, alias bufpool
     for (int32_t i = 0; i < (int32_t)Hardware::MAX; i++) {
-        EXPECT_EQ(Internal::g_tPipeAddrBufPool[i], 0);
+        EXPECT_EQ(GetTPipeAddrPool(*pipe, static_cast<Hardware>(i)), 0);
     }
 
     // for cpu debug, check all space allocated
@@ -199,7 +220,7 @@ TEST_F(TEST_TPIPE, TPipeInitBufferWithTBufTest)
     uint32_t len = 128;
     TPipe pipe;
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 0);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], 0);
+    EXPECT_EQ(GetTPipeAddrPool(pipe, hardPos), 0);
     pipe.InitBuffer(buf, len);
     EXPECT_EQ(buf.bufStart, &(pipe.g_tpipeImpl.buf_[0]));
     EXPECT_EQ(buf.bufStart->address, 0);
@@ -209,7 +230,7 @@ TEST_F(TEST_TPIPE, TPipeInitBufferWithTBufTest)
     EXPECT_EQ(buf.bufStart->dataLen, len);
     EXPECT_EQ(buf.bufStart->usertag, -1);
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 1);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], len);
+    EXPECT_EQ(GetTPipeAddrPool(pipe, hardPos), len);
 
     uint32_t lenGet = 32;
     TBufHandle bufHandle = buf.Get(lenGet);
@@ -262,7 +283,7 @@ TEST_F(TEST_TPIPE, TPipeInitBufferWithTQueTest)
         buf++;
     }
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 2);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], num * len);
+    EXPECT_EQ(GetTPipeAddrPool(pipe, hardPos), num * len);
 }
 
 /* **************************** TPipe Reset api ****************************** */
@@ -276,10 +297,10 @@ TEST_F(TEST_TPIPE, TPipeReset)
 
     pipe.InitBuffer(que, num, len);
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 2);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], num * len);
+    EXPECT_EQ(GetTPipeAddrPool(pipe, hardPos), num * len);
     pipe.Reset();
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 0);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], 0);
+    EXPECT_EQ(GetTPipeAddrPool(pipe, hardPos), 0);
 }
 
 /* **************************** TPipe GetAbsAddr ****************************** */
@@ -368,6 +389,50 @@ constexpr int32_t R_5 = 5;
 constexpr int32_t R_6 = 6;
 constexpr int32_t R_7 = 7;
 #endif
+
+TEST_F(TEST_TPIPE, TPipeAllocReleaseEventIDTest)
+{
+    TPipe pipe;
+    EXPECT_EQ(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0);
+
+    auto firstId = pipe.AllocEventID<HardEvent::MTE2_MTE1>();
+    auto secondId = pipe.AllocEventID<HardEvent::MTE2_MTE1>();
+    EXPECT_EQ(firstId, R_0);
+    EXPECT_EQ(secondId, R_1);
+    EXPECT_EQ(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0x3);
+
+    pipe.ReleaseEventID<HardEvent::MTE2_MTE1>(firstId);
+    EXPECT_EQ(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0x2);
+    EXPECT_EQ(pipe.AllocEventID<HardEvent::MTE2_MTE1>(), firstId);
+    EXPECT_EQ(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0x3);
+}
+
+TEST_F(TEST_TPIPE, TPipeFetchEventIDTest)
+{
+    TPipe pipe;
+    EXPECT_EQ(pipe.FetchEventID<HardEvent::MTE2_MTE1>(), R_0);
+
+    auto firstId = pipe.AllocEventID<HardEvent::MTE2_MTE1>();
+    auto secondId = pipe.AllocEventID<HardEvent::MTE2_MTE1>();
+    EXPECT_EQ(firstId, R_0);
+    EXPECT_EQ(secondId, R_1);
+    EXPECT_EQ(pipe.FetchEventID<HardEvent::MTE2_MTE1>(), R_2);
+    EXPECT_EQ(pipe.FetchEventID(HardEvent::MTE2_MTE1), R_2);
+
+    pipe.ReleaseEventID<HardEvent::MTE2_MTE1>(firstId);
+    EXPECT_EQ(pipe.FetchEventID<HardEvent::MTE2_MTE1>(), R_0);
+}
+
+TEST_F(TEST_TPIPE, TPipeResetClearsEventPoolTest)
+{
+    TPipe pipe;
+    EXPECT_EQ(pipe.AllocEventID<HardEvent::MTE2_MTE1>(), R_0);
+    EXPECT_NE(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0);
+
+    pipe.Reset();
+    EXPECT_EQ(GetTPipeEventOccupy(pipe, HardEvent::MTE2_MTE1), 0);
+    EXPECT_EQ(pipe.FetchEventID<HardEvent::MTE2_MTE1>(), R_0);
+}
 // struct AllocEventIDParams {
 //     HardEvent evt;
 //     vector<int32_t> allocOrRelease;  // if 999 --- allocEvtID; if 0/1/2/3 ---- release evtID

@@ -1219,11 +1219,26 @@
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1453712312015"><a name="p1453712312015"></a><a name="p1453712312015"></a>针对分离模式，AI Core上的Cube核（AIC）与Vector核（AIV）之间的同步等待指令。</p>
 </td>
 </tr>
-<tr id="row13905175871"><td class="cellrowborder" rowspan="3" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p123688281178"><a name="p123688281178"></a><a name="p123688281178"></a>同步控制</p>
+<tr id="row13905175871"><td class="cellrowborder" rowspan="6" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p123688281178"><a name="p123688281178"></a><a name="p123688281178"></a>同步控制</p>
 </td>
 <td class="cellrowborder" valign="top" width="27.63%" headers="mcps1.2.4.1.2 "><p id="p99126441977"><a name="p99126441977"></a><a name="p99126441977"></a><a href="基础API/同步控制/核内同步/Mutex(ISASI)/Mutex(ISASI).md">Mutex</a></p>
 </td>
 <td class="cellrowborder" valign="top" width="59.99%" headers="mcps1.2.4.1.3 "><p id="p1190519517715"><a name="p1190519517715"></a><a name="p1190519517715"></a><span id="ph1520973121010"><a name="ph1520973121010"></a><a name="ph1520973121010"></a>Mutex用于核内异步流水指令之间的同步处理，其功能类似于传统CPU中的锁机制。通过锁定指定流水再释放流水来完成流水间的同步依赖。每个锁有固定的一个MutexID，该ID可通过用户自定义（范围为0-27）或者通过<a href="基础API/同步控制/核内同步/AllocMutexID-(ISASI).md">AllocMutexID/ReleaseMutexID</a>进行申请释放。</span></p>
+</td>
+</tr>
+<tr id="row13905175872"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p532817527717"><a name="p532817527717"></a><a name="p532817527717"></a><a href="基础API/同步控制/核内同步/AllocEventID.md">AllocEventID</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p147126719715"><a name="p147126719715"></a><a name="p147126719715"></a>从框架获取并占用一个TEventID，与<a href="基础API/同步控制/核内同步/ReleaseEventID.md">ReleaseEventID</a>配合使用，管理HardEvent同步事件ID的获取和释放。</p>
+</td>
+</tr>
+<tr id="row13905175873"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p532817527718"><a name="p532817527718"></a><a name="p532817527718"></a><a href="基础API/同步控制/核内同步/FetchEventID.md">FetchEventID</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p147126719716"><a name="p147126719716"></a><a name="p147126719716"></a>根据HardEvent获取一个当前可用的TEventID，但不占用该ID，适用于临时使用事件ID的场景。</p>
+</td>
+</tr>
+<tr id="row13905175874"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p532817527719"><a name="p532817527719"></a><a name="p532817527719"></a><a href="基础API/同步控制/核内同步/ReleaseEventID.md">ReleaseEventID</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p147126719717"><a name="p147126719717"></a><a name="p147126719717"></a>从框架释放一个TEventID，与<a href="基础API/同步控制/核内同步/AllocEventID.md">AllocEventID</a>配合使用。</p>
 </td>
 </tr>
 <tr id="row7712137571"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p532817527716"><a name="p532817527716"></a><a name="p532817527716"></a><a href="基础API/同步控制/核内同步/AllocMutexID-(ISASI).md">AllocMutexID</a></p>

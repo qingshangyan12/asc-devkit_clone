@@ -46,6 +46,7 @@ set(CONFIGS_LIST
     "dav-c100|1001|-D__DAV_C100__|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
     "dav-m200|2002|-D__DAV_M200__|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
     "dav-m300|3002|-D__DAV_M300__|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
+    "dav-l300|3003|-D__DAV_L300__|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
     "dav-m310|3102|-D__DAV_M310__"
     "dav-510r2|5102|-DASCENDC_DEBUG=1|-DASCENDC_DUMP=1"
 )
@@ -137,6 +138,12 @@ function(create_check_targets NPU_MODE MODE_SUFFIX MODE_DEFINES)
                 list(SUBLIST CONFIG_ITEMS 2 -1 CONFIG_DEFS)
             else()
                 set(CONFIG_DEFS "")
+            endif()
+
+            if(CONFIG_NAME STREQUAL "dav-l300" AND
+                NOT (NPU_MODE STREQUAL "OFF" AND MODE_SUFFIX STREQUAL "_single" AND
+                    REL_TEST_FILE STREQUAL "tests/api/basic_api/ascendc_header_checker/kernel_tpipe.cpp"))
+                continue()
             endif()
 
             # 合并所有定义 (NPU 使用 --cce-aicore-arch=CONFIG_NAME, CPU 使用 -D__NPU_ARCH__=CONFIG_ARCH)
