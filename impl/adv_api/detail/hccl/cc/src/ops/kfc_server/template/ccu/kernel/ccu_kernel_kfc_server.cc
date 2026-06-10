@@ -40,16 +40,6 @@ const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
-ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
-                                ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
-                                ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                ccu::Variable goSize3, ccu::Variable goSize4, ccu::Variable argHandle) {
-    HCCL_INFO("[CcuKernelKfcServer] start ccuFunc AlltoAllMesh1DFunc!");
-    CcuKernelArg arg = reinterpret_cast<CcuKernelArg>(argHandle.handle);
-    CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
-                           sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
-});
-
 // new---20260603
 static CcuResult ParseKernelArg(KfcServerContext &ctx)
 {
@@ -252,6 +242,15 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
     // 存放<每轮算子参数>的寄存器
     ccu::Array<ccu::Variable> param(CCU_PARAM_NUM_PER_DIE);
 
+    static ccu::Func foo([&](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
+                            ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
+                            ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
+                            ccu::Variable goSize3, ccu::Variable goSize4) {
+        HCCL_INFO("[CcuKernelKfcServer] start ccuFunc AlltoAllMesh1DFunc!");
+        CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
+                                sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
+    });
+
     CCU_WHILE(repeatCond == 0)
     {
         // 等待本轮开始信号
@@ -265,12 +264,10 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
-            ccu::Variable argHandle;
-            argHandle = reinterpret_cast<uint64_t>(arg);
-            ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
-                                              param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
-                                              param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                              param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], argHandle);
+            ccu::CallFunc<foo>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+                                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
+                                param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11]);
         } 
 
         MissionPostSync(ctx);
@@ -333,9 +330,13 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
+    HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
     CCU_CHK_RET(InitResource(ctx));
+    HCCL_INFO("[CcuKernelKfcServer] InitResource finish");
     CCU_CHK_RET(LoadArgs(ctx));
+    HCCL_INFO("[CcuKernelKfcServer] LoadArgs finish");
     CCU_CHK_RET(CompArgs(ctx));
+    HCCL_INFO("[CcuKernelKfcServer] CompArgs finish");
 
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) {
