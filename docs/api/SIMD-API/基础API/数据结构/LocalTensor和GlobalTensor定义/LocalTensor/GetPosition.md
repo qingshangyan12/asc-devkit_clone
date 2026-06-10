@@ -63,7 +63,7 @@ __aicore__ inline int32_t GetPosition() const
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-LocalTensor所在的[TPosition](../数据结构/辅助数据结构//TPosition.md)逻辑位置。
+LocalTensor所在的[TPosition](../../辅助数据结构/TPosition.md)逻辑位置。
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

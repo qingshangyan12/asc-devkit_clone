@@ -93,7 +93,7 @@ struct SumParams{
 -   当前仅支持ND格式的输入，不支持其他格式。
 -   一维输入的outter值填为1；二维输入按实际情况填写outter和n，inner计算请按如上公式计算，否则功能不正确。
 -   srcTensor需要能够容纳内轴对齐后的数据占用空间大小，dstTensor需要能够容纳outter个结果对齐后的数据占用空间大小。
--   对于Sum，其内部使用的底层相加方式和[ReduceSum](../../../基础API/Memory矢量计算/归约计算/ReduceSum.md)以及[WholeReduceSum](../../../基础API/Memory矢量计算/归约计算/WholeReduceSum.md)的内部的相加方式一致，采用二叉树方式，两两相加：
+-   对于Sum，其内部使用的底层相加方式和[ReduceSum](../../../基础API/Memory矢量计算/归约计算/ReduceSum.md)以及[ReduceRepeat](../../../基础API/Memory矢量计算/归约计算/ReduceRepeat.md)的内部的相加方式一致，采用二叉树方式，两两相加：
 
     假设源操作数为128个half类型的数据\[data0,data1,data2...data127\]，一个repeat可以计算完，计算过程如下。
 

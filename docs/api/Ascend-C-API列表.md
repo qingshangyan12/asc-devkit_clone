@@ -22,7 +22,7 @@ Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到
 <td class="cellrowborder" valign="top" width="33.333333333333336%" headers="mcps1.1.4.1.3 "><p id="p1014610015168"><a name="p1014610015168"></a><a name="p1014610015168"></a>实现对硬件能力的抽象，开放芯片的能力，保证完备性和兼容性。标注为ISASI（Instruction Set Architecture Special Interface，硬件体系结构相关的接口）类别的API，不能保证跨硬件版本兼容。</p>
 </td>
 </tr>
-<tr id="row414620011618"><td class="cellrowborder" valign="top" headers="mcps1.1.4.1.1 "><p id="p11464015163"><a name="p11464015163"></a><a name="p11464015163"></a><a href="SIMD-API/C-API.md">C API</a></p>
+<tr id="row414620011618"><td class="cellrowborder" valign="top" headers="mcps1.1.4.1.1 "><p id="p11464015163"><a name="p11464015163"></a><a name="p11464015163"></a><a href="SIMD-API/C-API/C-API.md">C API</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.1.4.1.2 "><p id="p814610181615"><a name="p814610181615"></a><a name="p814610181615"></a>纯C接口，开放芯片完备编程能力，支持数组分配内存，一般基于指针编程，提供与业界一致的C语言编程体验。</p>
 </td>
@@ -55,4 +55,3 @@ Ascend C 提供了一套层次化的 API 体系，涵盖了从底层 C 扩展到
 </tr>
 </tbody>
 </table>
-
