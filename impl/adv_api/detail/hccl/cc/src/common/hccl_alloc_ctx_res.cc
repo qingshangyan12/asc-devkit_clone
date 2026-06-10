@@ -625,6 +625,9 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         // 将算子类型和算法枚举保存到opResCtx
         opResCtx.opType[i] = ccTiling->opType;
         opResCtx.algorithmType[i] = it->second;
+        
+        opResCtx.isKfc[i] = true;
+        opParam.isKfc = true;
 
         HCCL_INFO("[CcuSelectAlg] ccTiling[%u]: opType[%u], algName[%s], algorithmType[%u]",
             i, ccTiling->opType, algName.c_str(), opResCtx.algorithmType[i]);

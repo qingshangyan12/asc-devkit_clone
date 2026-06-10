@@ -712,11 +712,15 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
         resRequest.notifyNumOnMainThread, resRequest.channels.size());
     CHK_RET(calcResRet);
 
-    // kfc算法kernel资源准备
-    std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
-    CHK_PRT_RET(
-        ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
-    CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+    // kfc算法kernel资源准备 - 仅当isKfc为true时执行
+    if (param.isKfc && param.engine == COMM_ENGINE_CCU) {
+        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] preparing KFC Server kernel for opType[%d], algTag[%s]",
+            param.opType, param.algTag);
+        std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        CHK_PRT_RET(
+            ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
+        CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+    }
 
 
     // host侧资源

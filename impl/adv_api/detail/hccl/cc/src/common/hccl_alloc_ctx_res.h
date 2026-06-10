@@ -104,6 +104,7 @@ struct OpResCtx {
     uint64_t resCtx;  // 资源地址，用于资源下发时的处理
     uint32_t opType[MAX_OP_NUM];
     uint32_t algorithmType[MAX_OP_NUM];
+    bool isKfc[MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
 
 enum AlgorithmType {
