@@ -30,7 +30,7 @@
 | AIC | 初始化[Load3D接口调用时Pad填充的数值](../../矩阵计算（ISASI）/数据搬运/SetLoadDataPaddingValue.md#功能说明)为0。 |
 | AIC | 初始化[使用Load3D时A1/B1的边界值](../../矩阵计算（ISASI）/数据搬运/SetLoadDataBoundary.md#功能说明)为0，表示无边界。 |
 | AIV | 将[Mask](../../Memory矢量计算/SIMD计算说明/掩码/概述.md)配置为全1，表示所有数都参与计算。 |
-| AIV | [重置loop mode的参数](../../Memory数据搬运/ResetLoopModePara.md)。 |
+| AIV | [重置loop mode的参数](../../Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/ResetLoopModePara.md)。 |
 
 **各产品实际执行的初始化项如下：**
 
