@@ -154,11 +154,12 @@
             -   [矩阵计算分形介绍](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/矩阵计算分形介绍.md)
                 -   [背景与核心概念](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/背景与核心概念.md)
                 -   [关键分形格式详解](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md)
+
                 <cann-filter npu-type="910b,A3,A5">
 
                 -   [辅助矩阵分形格式详解](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/辅助矩阵分形格式详解.md)
 
-            </cann-filter>
+                </cann-filter>
             
             -   [矩阵计算的搬入](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/总体说明.md)
                 -   [总体说明](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/总体说明.md)

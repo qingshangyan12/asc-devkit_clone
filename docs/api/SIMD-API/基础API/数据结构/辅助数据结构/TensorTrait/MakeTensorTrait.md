@@ -77,7 +77,7 @@ __aicore__ inline constexpr auto MakeTensorTrait(const LayoutType& t)
 </tr>
 <tr id="row1545073919457"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.1.3.1.1 "><p id="p1745103924512"><a name="p1745103924512"></a><a name="p1745103924512"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.1.3.1.2 "><p id="p1401735165413"><a name="p1401735165413"></a><a name="p1401735165413"></a>数据存放的逻辑位置，<a href="../数据结构/辅助数据结构//TPosition.md">Tposition</a>类型。</p>
+<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.1.3.1.2 "><p id="p1401735165413"><a name="p1401735165413"></a><a name="p1401735165413"></a>数据存放的逻辑位置，<a href="../TPosition.md">Tposition</a>类型。</p>
 </td>
 </tr>
 <tr id="row1076563718543"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.1.3.1.1 "><p id="p167661637135419"><a name="p167661637135419"></a><a name="p167661637135419"></a>LayoutType</p>

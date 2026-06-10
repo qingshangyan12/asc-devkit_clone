@@ -96,7 +96,7 @@ void SetValue(const uint32_t index, const T1 value) const
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-不要大量使用SetValue对LocalTensor进行赋值，会使性能下降。若需要大批量赋值，请根据实际场景选择[数据填充基础API接口](../../基础API/Memory矢量计算/数据填充/数据填充.md)或数据填充高阶API接口（[Pad](../../高阶API/张量变换/Pad.md)、[Broadcast](../../高阶API/张量变换/Broadcast.md)），以及在需要生成递增数列的场景，选择[Arange](../../高阶API/索引计算/Arange-94.md)。
+不要大量使用SetValue对LocalTensor进行赋值，会使性能下降。若需要大批量赋值，请根据实际场景选择[数据填充基础API接口](../../../Memory矢量计算/数据填充/数据填充.md)或数据填充高阶API接口（[Pad](../../../../高阶API/张量变换/Pad.md)、[Broadcast](../../../../高阶API/张量变换/Broadcast.md)），以及在需要生成递增数列的场景，选择[Arange](../../../../高阶API/索引计算/Arange-94.md)。
 
 ## 调用示例<a name="section17531157161314"></a>
 
@@ -118,4 +118,3 @@ for (int32_t i = 0; i < srcLen; ++i) {
 // 示例2结果如下：
 // 数据(inputLocal): [99 99 99  ... 99]
 ```
-

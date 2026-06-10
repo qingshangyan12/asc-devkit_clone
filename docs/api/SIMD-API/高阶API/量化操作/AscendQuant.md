@@ -335,7 +335,7 @@ constexpr AscendQuantConfig ASCEND_QUANT_DEFAULT_CFG = {0, 0, 0, 0};
 | 参数名 | 描述 |
 | --- | --- |
 | scaleT | 量化参数scale和offset的数据类型。支持的数据类型为：half、bfloat16_t、float。 |
-| config | 量化接口配置参数，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>hasOffset：量化参数offset是否参与计算。True：表示offset参数参与计算。False：表示offset参数不参与计算。<br>kDim：group的计算方向，即k方向。仅在PER_GROUP场景有效，支持的取值如下：0：k轴是第0轴，即m方向为group的计算方向；1：k轴是第1轴，即n方向为group的计算方向。<br>roundMode：量化过程中，数据由高精度数据类型转换为低精度数据类型的舍入模式，支持的取值有：CAST_NONE、CAST_RINT、CAST_ROUND、CAST_FLOOR、CAST_CEIL、CAST_TRUNC、CAST_HYBRID，各个舍入模式的详细介绍请参考[精度转换规则](../../基础API/Memory矢量计算/类型转换/Cast.md#table235404962912)。不同数据类型的量化支持不同的舍入模式，当量化过程中使用了不支持的舍入模式时，将回退到默认的舍入模式；例如，bfloat16_t数据类型量化为hifloat8_t数据类型时，如果配置的roundMode为不支持的CAST_RINT，实际执行量化时将回退到默认的roundMode（CAST_ROUND）。不同数据类型支持的舍入模式请见表4。 |
+| config | 量化接口配置参数，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>hasOffset：量化参数offset是否参与计算。True：表示offset参数参与计算。False：表示offset参数不参与计算。<br>kDim：group的计算方向，即k方向。仅在PER_GROUP场景有效，支持的取值如下：0：k轴是第0轴，即m方向为group的计算方向；1：k轴是第1轴，即n方向为group的计算方向。<br>roundMode：量化过程中，数据由高精度数据类型转换为低精度数据类型的舍入模式，支持的取值有：CAST_NONE、CAST_RINT、CAST_ROUND、CAST_FLOOR、CAST_CEIL、CAST_TRUNC、CAST_HYBRID，各个舍入模式的详细介绍请参考[精度转换规则](../../../SIMD-API/基础API/数据结构/precision_conversion.md#tab1)。不同数据类型的量化支持不同的舍入模式，当量化过程中使用了不支持的舍入模式时，将回退到默认的舍入模式；例如，bfloat16_t数据类型量化为hifloat8_t数据类型时，如果配置的roundMode为不支持的CAST_RINT，实际执行量化时将回退到默认的roundMode（CAST_ROUND）。不同数据类型支持的舍入模式请见表4。 |
 | policy | 量化策略配置参数，AscendQuantPolicy枚举类型，可取值如下：<br>PER_TENSOR：预留参数，暂不支持。<br>PER_CHANNEL：预留参数，暂不支持。<br>PER_TOKEN：配置为PER_TOKEN场景。<br>PER_GROUP：配置为PER_GROUP场景。<br>PER_CHANNEL_PER_GROUP：预留参数，暂不支持。<br>PER_TOKEN_PER_GROUP：预留参数，暂不支持。 |
 
 ```
