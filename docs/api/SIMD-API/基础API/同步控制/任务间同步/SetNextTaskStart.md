@@ -52,6 +52,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_FIX>
     __aicore__ inline void SetNextTaskStart()
     ```
+
 </cann-filter>
 
 <cann-filter npu-type="310p,910">
@@ -68,6 +69,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     template<pipe_t AIV_PIPE = PIPE_MTE3, pipe_t AIC_PIPE = PIPE_MTE3>
     __aicore__ inline void SetNextTaskStart()
     ```
+
 </cann-filter>
 
 ## 参数说明<a name="section622mcpsimp"></a>
