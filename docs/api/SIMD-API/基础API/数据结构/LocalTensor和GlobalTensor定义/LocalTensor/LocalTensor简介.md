@@ -76,10 +76,9 @@ public:
 </thead>
 <tbody><tr id="row1545073919457"><td class="cellrowborder" valign="top" width="21.8%" headers="mcps1.2.3.1.1 "><p id="p1745103924512"><a name="p1745103924512"></a><a name="p1745103924512"></a>T</p>
 </td>
-<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001441184464_p1742518920145"><a name="zh-cn_topic_0000001441184464_p1742518920145"></a><a name="zh-cn_topic_0000001441184464_p1742518920145"></a>类型T可以支持基础数据类型以及<a href="../TensorTrait/TensorTrait.md">TensorTrait</a>类型，但需要遵循使用此LocalTensor接口的数据类型支持情况。</p>
+<td class="cellrowborder" valign="top" width="78.2%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000001441184464_p1742518920145"><a name="zh-cn_topic_0000001441184464_p1742518920145"></a><a name="zh-cn_topic_0000001441184464_p1742518920145"></a>类型T可以支持基础数据类型以及<a href="../../辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型，但需要遵循使用此LocalTensor接口的数据类型支持情况。</p>
 <p id="p2740141254519"><a name="p2740141254519"></a><a name="p2740141254519"></a>特别地，针对根据指定的逻辑位置/地址/长度，返回Tensor对象的构造函数，类型T仅支持基础数据类型。</p>
 </td>
 </tr>
 </tbody>
 </table>
-
