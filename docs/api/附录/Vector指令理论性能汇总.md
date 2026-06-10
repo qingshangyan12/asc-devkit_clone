@@ -26,56 +26,56 @@
 | Add | int16_t | 128 |
 | Add | int32_t | 64 |
 | Add | float | 64 |
-| Exp | half（fp16） | 32 |
+| Exp | half | 32 |
 | Exp | float | 32 |
-| Ln | half（fp16） | 32 |
+| Ln | half | 32 |
 | Ln | float | 32 |
-| Abs | half（fp16） | 128 |
+| Abs | half | 128 |
 | Abs | float | 64 |
-| Reciprocal | half（fp16） | 128 |
+| Reciprocal | half | 128 |
 | Reciprocal | float | 64 |
-| Sqrt | half（fp16） | 32 |
+| Sqrt | half | 32 |
 | Sqrt | float | 32 |
-| Rsqrt | half（fp16） | 128 |
+| Rsqrt | half | 128 |
 | Rsqrt | float | 64 |
-| Relu | half（fp16） | 128 |
+| Relu | half | 128 |
 | Relu | float | 64 |
 | Relu | int32_t | 64 |
-| Sub | half（fp16） | 128 |
+| Sub | half | 128 |
 | Sub | int16_t | 128 |
 | Sub | int32_t | 64 |
 | Sub | float | 64 |
-| Mul | half（fp16） | 128 |
+| Mul | half | 128 |
 | Mul | int16_t | 128 |
 | Mul | int32_t | 64 |
 | Mul | float | 64 |
-| Div | half（fp16） | 32 |
+| Div | half | 32 |
 | Div | float | 32 |
-| Max | half（fp16） | 128 |
+| Max | half | 128 |
 | Max | int16_t | 128 |
 | Max | int32_t | 64 |
 | Max | float | 64 |
-| Min | half（fp16） | 128 |
+| Min | half | 128 |
 | Min | int16_t | 128 |
 | Min | int32_t | 64 |
 | Min | float | 64 |
-| Adds | half（fp16） | 128 |
+| Adds | half | 128 |
 | Adds | int16_t | 128 |
 | Adds | int32_t | 64 |
 | Adds | float | 64 |
-| Muls | half（fp16） | 128 |
+| Muls | half | 128 |
 | Muls | int16_t | 128 |
 | Muls | int32_t | 64 |
 | Muls | float | 64 |
-| Maxs | half（fp16） | 128 |
+| Maxs | half | 128 |
 | Maxs | int16_t | 128 |
 | Maxs | int32_t | 64 |
 | Maxs | float | 64 |
-| Mins | half（fp16） | 128 |
+| Mins | half | 128 |
 | Mins | int16_t | 128 |
 | Mins | int32_t | 64 |
 | Mins | float | 64 |
-| LeakyRelu | half（fp16） | 128 |
+| LeakyRelu | half | 128 |
 | LeakyRelu | int16_t | 128 |
 | LeakyRelu | int32_t | 64 |
 | LeakyRelu | float | 64 |
@@ -176,11 +176,11 @@
 <a name="table76761043412"></a>
 | 接口 | src数据类型 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- | --- |
-| ReduceDataBlock | half（fp16） | half（fp16） | 128/7 |
+| ReduceDataBlock | half | half | 128/7 |
 | ReduceDataBlock | float | float | 64 |
-| ReduceRepeat | half（fp16） | half（fp16） | 128/7 |
+| ReduceRepeat | half | half | 128/7 |
 | ReduceRepeat | float | float | 64/7 |
-| ReducePairElem | half（fp16） | half（fp16） | 128 |
+| ReducePairElem | half | half | 128 |
 | ReducePairElem | float | float | 64 |
 | ReduceMax/ReduceMin/ReduceSum | - | - | 软仿指令，不涉及理论并行度 |
 
@@ -213,9 +213,9 @@
 <a name="table1361419514367"></a>
 | 接口 | dst数据类型 | 理论并行度（element/cycle） |
 | --- | --- | --- |
-| Sort32 | half（fp16） | 2 |
+| Sort32 | half | 2 |
 | Sort32 | float | 2 |
-| MrgSort | half（fp16） | 2 |
+| MrgSort | half | 2 |
 | MrgSort | float | 2 |
 
 **表 10**  离散与聚合类指令理论性能汇总
