@@ -21,25 +21,13 @@ C1 = 1
 H = 4
 W = 4
 C0 = 16
+CIN = C1 * C0
 COUT = 16
-KH = 3
-KW = 3
+KH = 1
+KW = 1
 STRIDE = (1, 1)
 DILATION = (1, 1)
-PADDING = (1, 1, 1, 1)  # top, bottom, left, right
-
-
-def nc1hwc0_to_nhwc(x):
-    n, c1, h, w, c0 = x.shape
-    return x.transpose(0, 2, 3, 1, 4).reshape(n, h, w, c1 * c0)
-
-
-def nhwc_to_nc1hwc0(x, c0=16):
-    n, h, w, c = x.shape
-    c1 = (c + c0 - 1) // c0
-    if c1 * c0 != c:
-        x = np.pad(x, ((0, 0), (0, 0), (0, 0), (0, c1 * c0 - c)), mode="constant")
-    return x.reshape(n, h, w, c1, c0).transpose(0, 3, 1, 2, 4)
+PADDING = (0, 0, 0, 0)  # top, bottom, left, right
 
 
 def conv2d_nhwc(x, weight, stride, dilation, padding):
@@ -69,20 +57,15 @@ def conv2d_nhwc(x, weight, stride, dilation, padding):
 
 
 def gen_golden_data():
-    fmap = np.random.uniform(-1, 1, (BATCH, C1, H, W, C0)).astype(np.float16)
-    weight = np.random.uniform(-1, 1, (C1, KH, KW, COUT, C0)).astype(np.float16)
-    weight_fz = weight.reshape(C1 * KH * KW, COUT // 16, 16, C0)
-
-    fmap_nhwc = nc1hwc0_to_nhwc(fmap)
-    weight_calc = weight.transpose(3, 0, 4, 1, 2).reshape(COUT, C1 * C0, KH, KW)
-    golden = conv2d_nhwc(fmap_nhwc, weight_calc, STRIDE, DILATION, PADDING)
-    golden_nc1hwc0 = nhwc_to_nc1hwc0(golden, C0).astype(np.float16)
+    fmap = np.random.uniform(-1, 1, (BATCH, H, W, CIN)).astype(np.float16)
+    weight = np.random.uniform(-1, 1, (COUT, CIN, KH, KW)).astype(np.float16)
+    golden = conv2d_nhwc(fmap, weight, STRIDE, DILATION, PADDING).astype(np.float16)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
     fmap.tofile("./input/x1_gm.bin")
-    weight_fz.tofile("./input/x2_gm.bin")
-    golden_nc1hwc0.tofile("./output/golden.bin")
+    weight.tofile("./input/x2_gm.bin")
+    golden.tofile("./output/golden.bin")
 
 
 if __name__ == "__main__":
