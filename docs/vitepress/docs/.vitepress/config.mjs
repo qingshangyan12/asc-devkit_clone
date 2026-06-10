@@ -524,6 +524,7 @@ export default defineConfig({
         resolve: {
           alias: {
             './VPNavBarSearch.vue': resolve(import.meta.dirname, 'theme', 'Search.vue'),
+            './components/VPSidebar.vue': resolve(import.meta.dirname, 'theme', 'CustomSidebar.vue'),
           },
         },
       }),
