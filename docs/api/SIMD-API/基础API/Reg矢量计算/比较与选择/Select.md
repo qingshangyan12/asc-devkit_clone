@@ -67,7 +67,7 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| U | 源操作数和目的操作数的RegTensor类型， 例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
+| U | 源操作数和目的操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
 **表 2**  参数说明
 
