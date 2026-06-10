@@ -1,4 +1,4 @@
-# Ascend C资料贡献指南
+﻿# Ascend C资料贡献指南
 
 ## 概述
 
@@ -82,18 +82,18 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 
 | 序号 | 节标题 | 是否必须 | 说明 |
 |------|--------|----------|------|
-| 1 | 产品支持情况 | ✅ 必须 | 页面最顶部，表格列出每个芯片对每个函数原型的支持情况 |
-| 2 | 功能说明 | ✅ 必须 | 总述 + 头文件路径 + 数学公式/示意图 + 样例链接 |
-| 3 | 矩阵/张量计算说明表 | 条件必须 | 矩阵计算类API必须有，按产品系列分表 |
-| 4 | 函数原型  | ✅ 必须 | 所有重载原型，按功能分支分组 |
-| 5 | 参数说明  | ✅ 必须 | 主参数表 + 嵌套结构体参数表 |
-| 6 | 数据类型  | ✅ 必须 | 分产品系列列出支持的类型组合表|
-| 7 | 返回值说明  | 条件必须 | 有返回值的API必须有 |
-| 8 | 约束说明  | ✅ 必须 | 全部使用约束，含对齐/格式/NOP/同步阈值/特殊值处理 |
-| 9 | 理论性能说明 | 推荐 | cycle计算公式 + 分产品系列的并行度/参数表 |
-| 10 | 调用示例  | ✅ 必须 | 代码片段示例 + 链接到样例库 |
-| 11 | 关联API | 条件必须 | 同一版本内的互斥API + 功能相近API |
-
+| 1 | 产品支持情况 | ✅ 必须 | 页面最顶部，列表列出每个产品系列的支持状态，参考高阶API现有格式 |
+| 2 | 功能说明 | ✅ 必须 | 总述 + 数学公式/示意图 |
+| 3 | 头文件 | ✅ 必须 | 独立节，列出需要包含的头文件路径，参考SIMT API格式 |
+| 4 | 矩阵/张量计算说明表 | 条件必须 | 矩阵计算类API必须有，按产品系列分表 |
+| 5 | 函数原型  | ✅ 必须 | 所有重载原型，每个原型一个代码块 |
+| 6 | 参数说明  | ✅ 必须 | 主参数表 + 嵌套结构体参数表 |
+| 7 | 数据类型  | 条件必须 | 矩阵/向量计算类API必须；工具类/配置类API不需要 |
+| 8 | 返回值说明  | 条件必须 | 有返回值的API必须有 |
+| 9 | 约束说明  | ✅ 必须 | 单参数约束就近说明；多参数/组合约束独立段落描述 |
+| 10 | 理论性能说明 | 推荐 | cycle计算公式 + 分产品系列的并行度/参数表 |
+| 11 | 调用示例  | ✅ 必须 | 代码片段示例 + 链接到样例库（如有对应样例） |
+| 12 | 关联API | 条件必须 | 同一版本内的互斥API + 功能相近API |
 ---
 
 **1. 产品支持情况**
@@ -121,14 +121,14 @@ API参考手册是**接口详情权威源**，每个API页面必须包含以下�
 
 **2. 功能说明**
 
-**格式要求**：3要素必须齐全——总述段落 + 头文件 + 数学表达式。
+**格式要求**：2要素必须齐全——总述段落 + 数学表达式。
 
 **样板写法**：
 
 ```
 ## 功能说明
 
-头文件为: `#include "basic_api/kernel_operator_mm_intf.h"`
+
 
 Mmad接口是AscendC面向昇腾 AI 芯片的矩阵乘加核心计算接口，专为高性能算子开发设计，
 封装了昇腾 NPU 硬件的矩阵乘加计算能力...
@@ -141,7 +141,7 @@ C = A × B + Bias
 ```
 
 **编写要求**：
-- **头文件**必须写明具体include路径
+- 总述段说明API的定位（面向什么场景、封装了什么硬件能力）
 - 总述段说明API的定位（面向什么场景、封装了什么硬件能力）
 - 数学公式必须给出（不能只用文字描述）
 - 如有示意图/数据流图，嵌入图片并标注图序号
@@ -149,7 +149,30 @@ C = A × B + Bias
 
 ---
 
-#### 3. 矩阵/张量计算说明表
+
+**3. 头文件**
+
+**格式要求**：独立一节，列出需要包含的头文件路径。参考SIMT API的写法。
+
+**样板写法**：
+
+```
+## 头文件
+
+需要包含的头文件：
+
+```cpp
+#include "basic_api/kernel_operator_mm_intf.h"
+```
+```
+
+**编写要求**：
+- 头文件独立成节，不混入功能说明段落中
+- 列出完整的include路径
+- 如有多个头文件（Host侧+Kernel侧不同头文件），分别列出并标注适用侧
+
+---
+#### 4. 矩阵/张量计算说明表
 
 **适用范围**：矩阵计算类API（Mmad、LoadData、Fixpipe等）必须有此表。非矩阵计算API跳过。
 
@@ -181,29 +204,35 @@ C = A × B + Bias
 
 ---
 
-#### 4. 函数原型
+#### 5. 函数原型
 
-**格式要求**：按功能分支分组列出所有重载。每组先给概述，再列模板签名。
+**格式要求**：按功能分支分组列出所有重载。每个原型单独一个代码块，配1-2行功能说明。
 
 **样板写法**：
 
 ```cpp
-// 不支持bias
+// 不支持bias：基础矩阵乘加原型
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
     const LocalTensor<S>& b, const MmadParams& mmadParams)
+```
 
-// 支持bias
+```cpp
+// 支持bias：带偏置矩阵乘加原型
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
     const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+```
 
-// 不传入bias（BitMode版本）
+```cpp
+// 不传入bias（BitMode版本）：位域联合体参数原型
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
     const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+```
 
-// 传入bias（BitMode版本）
+```cpp
+// 传入bias（BitMode版本）：位域联合体+偏置原型
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
     const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
@@ -217,7 +246,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ---
 
-#### 5. 参数说明
+#### 6. 参数说明
 
 **格式要求**：分两层——主参数表 + 嵌套结构体参数表。
 
@@ -263,7 +292,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ---
 
-#### 6. 数据类型
+#### 7. 数据类型
 
 **格式要求**：分产品系列列出类型组合表。分"无bias"和"有bias"两张表。
 
@@ -298,7 +327,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ---
 
-#### 7. 返回值说明（条件必须）
+#### 8. 返回值说明（条件必须）
 
 **适用范围**：有返回值的API（如Cast返回LocalTensor引用、GetBlockIdx返回uint32_t等）。
 
@@ -320,9 +349,9 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 ---
 
-#### 8. 约束说明
+#### 9. 约束说明
 
-**格式要求**：每条约束用独立段落，含代码示例和阈值公式。
+**格式要求**：分两层描述。单个参数的约束在参数说明表格内就近说明（如对齐要求、取值范围）；多参数间的约束关系、多接口组合使用的约束，在独立的"约束说明"段落中集中描述。
 
 **样板写法**：
 
@@ -363,7 +392,7 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 
 ---
 
-#### 9. 理论性能说明（推荐）
+#### 10. 理论性能说明（推荐）
 
 **格式要求**：计算公式 + 分产品系列的参数表。
 
@@ -395,7 +424,7 @@ Mmad和Fixpipe的unitFlag需同步开启。前n-1条设为2（维持占用），
 
 ---
 
-#### 10. 调用示例
+#### 11. 调用示例
 
 **格式要求**：链接到样例库 + 场景分类表。
 
@@ -417,11 +446,11 @@ extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR 
 ```
 
 **编写要求**：
-- 必须链接到样例仓库的具体目录
+- 链接到样例仓库的具体目录（如有对应的样例）。很多接口目前没有对应样例，此时可省略样例链接。
 
 ---
 
-#### 11. 关联API（条件必须）
+#### 12. 关联API（条件必须）
 
 **格式要求**：分三个层次——互斥API（警告框）→ 相似API选择指引（表格）→ 底层映射（折叠）。
 
