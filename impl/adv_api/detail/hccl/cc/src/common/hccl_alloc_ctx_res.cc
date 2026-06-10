@@ -608,7 +608,7 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         std::string algName;
         std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-        HCCL_INFO("[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully!", i);
+        HCCL_INFO("[CcuSelectAlg]SelectAlgAndPrepareEngine[%u] successfully, algName = [%s]!", i, algName.c_str());
 
         // 若选择到AICPU算法（algName不在CCU algorithmMap中）则直接报错并退出
         auto it = algorithmMap.find(algName);

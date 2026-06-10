@@ -44,6 +44,7 @@ ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAdd
                                 ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                 ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                 ccu::Variable goSize3, ccu::Variable goSize4, ccu::Variable argHandle) {
+    HCCL_INFO("[CcuKernelKfcServer] start ccuFunc AlltoAllMesh1DFunc!");
     CcuKernelArg arg = reinterpret_cast<CcuKernelArg>(argHandle.handle);
     CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
                            sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
