@@ -74,7 +74,7 @@ __aicore__ inline void SetShapeInfo(const ShapeInfo& shapeInfo)
 </td>
 <td class="cellrowborder" valign="top" width="12.98%" headers="mcps1.2.4.1.2 "><p id="p158449584436"><a name="p158449584436"></a><a name="p158449584436"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="73.08%" headers="mcps1.2.4.1.3 "><p id="p2022751513112"><a name="p2022751513112"></a><a name="p2022751513112"></a><a href="../数据结构/辅助数据结构//ShapeInfo.md">ShapeInfo</a>结构体。</p>
+<td class="cellrowborder" valign="top" width="73.08%" headers="mcps1.2.4.1.3 "><p id="p2022751513112"><a name="p2022751513112"></a><a name="p2022751513112"></a><a href="../../辅助数据结构/ShapeInfo.md">ShapeInfo</a>结构体。</p>
 </td>
 </tr>
 </tbody>

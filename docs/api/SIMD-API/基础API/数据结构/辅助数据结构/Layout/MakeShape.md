@@ -73,7 +73,7 @@ __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 </td>
 <td class="cellrowborder" valign="top" width="15.340000000000002%" headers="mcps1.1.4.1.2 "><p id="p9731042114910"><a name="p9731042114910"></a><a name="p9731042114910"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p39081929172310"><a name="p39081929172310"></a><a name="p39081929172310"></a>表示输入类型的形参包，使用方法和约束说明同<a href="../../../Utils-API/CPP标准库/容器函数/容器函数.md">Std::tuple</a>。</p>
+<td class="cellrowborder" valign="top" width="67.44%" headers="mcps1.1.4.1.3 "><p id="p39081929172310"><a name="p39081929172310"></a><a name="p39081929172310"></a>表示输入类型的形参包，使用方法和约束说明同<a href="../../../../../Utils-API//CPP标准库/容器函数/容器函数.md">Std::tuple</a>。</p>
 </td>
 </tr>
 </tbody>
