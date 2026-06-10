@@ -1,4 +1,4 @@
-# asc_copy_ub2gm
+﻿# asc_copy_ub2gm
 
 ## 产品支持情况
 
@@ -22,7 +22,7 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint
 - 高维切分搬运
 
 ```c++
-__aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_ub2gm(__gm__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_gap, uint16_t dst_gap)
 ```
 
 - 同步计算
@@ -38,8 +38,8 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
 | dst | 输出 | 目的GM地址。 |
 | src | 输入 | 源UB地址。 |
 | size | 输入 | 搬运数据大小（字节）。 |
-| n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
-| len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
+| burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+| leburst_count | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
 | src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 | dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 

@@ -1,4 +1,4 @@
-# asc_lt_scalar
+﻿# asc_lt_scalar
 
 ## 产品支持情况
 
@@ -16,15 +16,15 @@
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src00_block_stride, uint16_t dst_repeat_stride, uint16_t src00_repeat_stride)
+    __aicore__ inline void asc_lt_scalar(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src00_block_stride, uint16_t dst_repeat_stride, uint16_t src00_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ half* src0, half value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src00_block_stride, uint16_t dst_repeat_stride, uint16_t src00_repeat_stride)
+    __aicore__ inline void asc_lt_scalar_sync(__ubuf__ uint8_t* dst, __ubuf__ float* src0, float value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src00_block_stride, uint16_t dst_repeat_stride, uint16_t src00_repeat_stride)
     ```
 
 ## 参数说明
@@ -32,12 +32,12 @@
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量）的起始地址。 |
+| src0 | 输入 | 源操作数（矢量）的起始地址。 |
 | value | 输入 | 源操作数（标量）。 |
 | dst_block_stride |  输入 |目的操作数单次迭代内不同DataBlock间地址步长。 |
-| src_block_stride |  输入 |源操作数单次迭代内不同DataBlock间地址步长。 |
+| src00_block_stride |  输入 |源操作数单次迭代内不同DataBlock间地址步长。 |
 | dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
-| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
+| src00_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
 | repeat | 输入 | 迭代次数。
 
 
@@ -52,8 +52,8 @@ PIPE_V
 ## 约束说明
 
 - 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
-- dst、src的起始地址需要32字节对齐。
-- dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。
+- dst、src0的起始地址需要32字节对齐。
+- dst按照小端顺序排序成二进制结果，对应src0中相应位置的数据比较结果。
 - 当结果输出到目的地址中时，mask参数不生效。
 
 ## 调用示例
@@ -62,14 +62,14 @@ PIPE_V
 // 结果输出到目标地址中，固定为128个元素
 constexpr uint32_t total_length = 128;
 __ubuf__ uint8_t dst[total_length / 8];
-__ubuf__ half src[total_length];
+__ubuf__ half src0[total_length];
 half scalar = 20;
 uint8_t repeat = 1;
 uint8_t dst_block_stride = 1;
-uint8_t src_block_stride = 1;
+uint8_t src00_block_stride = 1;
 uint8_t dst_repeat_stride = 8;
-uint8_t src_repeat_stride = 8;
+uint8_t src00_repeat_stride = 8;
 …… // 数据搬运及同步操作
-asc_lt_scalar(dst, src, scalar, repeat, dst_block_stride, src_block_stride, dst_repeat_stride, src_repeat_stride);
+asc_lt_scalar(dst, src0, scalar, repeat, dst_block_stride, src00_block_stride, dst_repeat_stride, src00_repeat_stride);
 …… // 同步操作
 ```
