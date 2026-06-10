@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含1个矩阵复制基准版本以及3个逐步优化的转置kernel版本，从直接索引转置开始，逐步引入UB中转、全局访存合并以及通过padding降低UB Bank冲突的优化方法，展示SIMT编程方式下矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含1个矩阵复制基准版本以及3个逐步优化的转置kernel版本，从直接索引转置开始，逐步引入UB中转、全局访存合并以及通过padding避免UB bank冲突，展示SIMT编程方式下矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -49,7 +49,7 @@
 | Case 0 | 按相同坐标读写，不执行转置，GM连续读、连续写       | copy_kernel                           | 矩阵复制版本（基准）                    |
 | Case 1 | 直接按照转置公式计算输出坐标                       | transpose_naive_kernel                | 直接索引转置版本                        |
 | Case 2 | 通过UB暂存tile并交换读写方向，GM读写更接近连续访问 | transpose_coalesced_kernel            | UB中转 + 全局访存合并实现转置           |
-| Case 3 | 在UB tile中增加padding降低bank冲突                 | transpose_avoid_bank_conflicts_kernel | UB中转 + 全局访存合并 + 避免UB Bank冲突 |
+| Case 3 | 在UB tile中增加padding避免bank冲突                 | transpose_avoid_bank_conflicts_kernel | UB中转 + 全局访存合并 + 避免UB bank冲突 |
 
 #### 线程块布局
 
@@ -106,7 +106,7 @@ int index = x_index + width * y_index;
 | aiv_scalar_time(μs) | scalar类型指令（标量类运算指令）耗时，单位为μs                                            |
 | aiv_scalar_ratio    | scalar类型指令（标量类运算指令）的cycle数在total cycle数中的占用比                        |
 
-除Task Duration外，本例中其余指标均展示的为所有block上性能指标的平均值。
+除Task Duration外，本例中其余指标展示的是所有block上性能指标的平均值。
 
 ### Case 0: 矩阵复制版本
 
@@ -155,7 +155,7 @@ output[index] = input[index];
 - 线程先按原坐标从GM读取输入元素，再计算该元素转置后的输出位置，并把数据直接写到转置后的GM地址
 - GM读取方向连续，GM写回方向不连续
 
-下图展示了Case 1的数据流，其中标红展示了一个Warp在读取GM和写入GM时处理的元素。对于同一个Warp的线程会读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读，在写回到输出时，相邻线程却被拆散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，这通常会显著影响整体吞吐。
+下图展示了Case 1的数据流，其中标红元素表示一个Warp在读取GM和写入GM时处理的元素。同一个Warp的线程读取GM输入中tile的一行元素，写回到GM输出中tile的一列。在读取GM输入时，相邻线程访问的元素地址连续，为连续读；在写回到输出时，相邻线程访问的地址分散到输出矩阵的不同行上，为不连续写。因此，这一版的核心问题是转置后的写回地址不再连续，整体吞吐受到影响。
 
 <img src="./figures/case1.png" width="60%">
 
@@ -197,7 +197,7 @@ output[index_out] = input[index_in];
 
 <img src="./figures/case2.png" width="60%">
 
-与Case 1不同的是，Case 1中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程会被打散到输出矩阵的不同行上，而Case 2中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，整体耗时通常会明显低于Case 1。
+与Case 1不同的是，Case 1中线程是“直接把输入元素写到转置后的GM位置”，所以相邻线程访问的输出地址分散到矩阵的不同行上；Case 2中，线程先把数据放到UB里，把原来不连续的全局写访问转移到UB内的不连续读。因此，这一版的核心收益是：虽然增加了一次UB读写和一次同步，但换来了GM侧“读连续、写也连续”的访问模式，本组数据中整体耗时明显低于Case 1。
 
 **关键代码**：
 
@@ -228,13 +228,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 - 相比Case 1的naive transpose，Task Duration从60.477μs降低到35.945μs，耗时下降约40.6%，整体性能提升约1.68倍
 - Case 2通过UB中转把Case 1中的非连续GM写转移为UB侧访问，使GM读写都更接近连续访问，因此Task Duration明显降低
-- 与Case 0的copy基线相比，Case 2的Task Duration仍高约45.1%。这部分差距主要来自额外的UB读写、同步以及转置方向的UB访问开销
+- 与Case 0的copy基线相比，Case 2的Task Duration仍高约45.1%。Case 2相比copy版本额外引入了UB读写、同步以及转置方向的UB访问开销
 
 ---
 
-### Case 3: UB中转 + 全局访存合并 + 避免UB Bank冲突的转置版本
+### Case 3: UB中转 + 全局访存合并 + 避免UB bank冲突的转置版本
 
-**优化目标**：在全局访存合并版本的基础上，通过UB padding降低转置读阶段的bank冲突
+**优化目标**：在全局访存合并版本的基础上，通过UB padding避免转置读阶段的bank冲突
 
 **核心实现**：
 
@@ -243,13 +243,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 - 同步后，从UB写回到GM与Case 2完全一致
 - 该版本没有改变算法路径，也没有改变block和线程切分，只是调整了UB中的物理布局
 
-下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中Bank Conflict是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
+下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank conflict是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
 
 UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两行，每行128KB，前128KB对应bank0到bank7，后128KB对应bank8到bank15。bank0和bank8属于同一个group，bank1和bank9属于同一个group，依此类推。
 
 <img src="./figures/bank结构示意图.png">
 
-在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B，判断是否冲突的关键是同一条UB访问指令下，同一Warp的并发线程是否会集中访问少数几个sub bank。
+在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。判断UB bank冲突时，需要看同一条UB访问指令中，同一Warp的并发线程分别访问哪些bank、bank group和sub bank。
 
 - **读写冲突**：读操作和写操作同时尝试访问同一个bank下的同一个sub bank。
 - **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的sub bank。
@@ -262,11 +262,11 @@ UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两�
 
 远小于128KB，所以一个tile通常只会落在前128KB区域内。在本文分析里，可以把它近似看成只使用`bank0~bank7`。
 
-case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示了前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出，在访问UB时，32个线程会集中访问两个bank中的两个sub bank，也就是一个sub bank会有16个线程同时访问，产生大量的读冲突。
+Case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在Case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出；访问UB时，32个线程会集中访问两个bank中的两个sub bank，即每个sub bank有16个线程同时访问，属于读读冲突场景。
 
 <img src="./figures/case2bank.png">
 
-case 3中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素跨越17个sub bank存储，此时同一列的元素会被错开排布在不同的sub bank。case 3中在访问UB时，32个线程的访问会被分布到32个sub bank中，也就是同一条访问指令下一个sub bank仅会有一个线程访问，大大降低了冲突的规模。
+Case 3中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个sub bank，同一列元素会错开排布到不同的sub bank。Case 3访问UB时，32个线程的访问会分布到32个sub bank中，即同一条访问指令下每个sub bank仅有一个线程访问，从而避免上述读读冲突。
 
 <img src="./figures/case3bank.png">
 
@@ -288,7 +288,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 **优化手段**：
 
 - 对UB tile增加+2 padding，使每行stride从32个float变为34个float
-- 通过改变UB中同一列元素的bank分布，降低同一Warp转置读阶段集中访问少数bank的概率
+- 通过改变UB中同一列元素的bank和sub bank分布，避免同一Warp转置读阶段的读读冲突
 
 **性能数据**：
 
@@ -312,21 +312,21 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 **综合优化效果**：
 
 - 从Case 1直接索引转置到Case 3完整优化版本，Task Duration从60.477μs降低到26.725μs，耗时下降约55.8%，整体性能提升约2.26倍
-- Case 3相比Case 0 copy基线仅高约7.9%，说明通过GM访存合并和UB Bank冲突优化后，矩阵转置已经接近连续GM读写基线
+- Case 3相比Case 0 copy基线仅高约7.9%，说明通过GM访存合并和避免UB bank冲突后，矩阵转置已经接近连续GM读写基线
 
 | Case version | Task Duration(μs) | Task Duration相对Case 0 | 优化点                                |
 | ------------ | ----------------- | ----------------------- | ------------------------------------- |
 | Case 0       | 24.777            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
 | Case 1       | 60.477            | **2.44x耗时**     | 直接索引转置，GM连续读、非连续写      |
 | Case 2       | 35.945            | **1.45x耗时**     | UB中转，全局访存合并                  |
-| Case 3       | 26.725            | **1.08x耗时**     | UB中转，全局访存合并，避免UB Bank冲突 |
+| Case 3       | 26.725            | **1.08x耗时**     | UB中转，全局访存合并，避免UB bank冲突 |
 
 ## 调优建议
 
 1. **先建立copy基线**：在分析访存类算子性能时，建议先测量copy场景耗时，再用实际算子的性能与其做对比。
 2. **优先关注GM访存连续性**：矩阵转置计算量很小，端到端耗时主要受读写访存模式影响。
 3. **使用UB中转改善写回模式**：当直接转置导致GM非连续写时，可以将不连续访问转移到UB侧，换取GM侧连续读写。
-4. **继续分析UB Bank冲突**：GM访存合并后，UB转置读阶段的bank冲突可能成为下一层瓶颈，可以通过padding等方式调整UB物理布局。
+4. **继续分析UB bank冲突**：GM访存合并后，UB转置读阶段的bank冲突可能成为下一层瓶颈，可以通过padding等方式调整UB物理布局，避免同一Warp的并发线程集中访问相同bank资源。
 
 ## 编译运行
 
