@@ -4,13 +4,13 @@
 
 |产品   | 是否支持 |
 | ------------|:----:|
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
-| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
-| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | �?</cann-filter>|
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    �?    |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    �?    |
 
 ## 功能说明
 
-获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一个0出现的位置，如果没找到则返回-1。
+获取一个uint64_t类型数字的二进制表示中从最低有效位开始的第一�?出现的位置，如果没找到则返回-1�?
 
 ## 函数原型
 
@@ -24,9 +24,9 @@ __aicore__ inline int64_t asc_ffz(uint64_t value)
 | :------ | :--- | :------------ |
 |value   |输入   |输入数据，数据类型是uint64_t。|
 
-## 返回值说明
+## 返回值说�?
 
-value中第一个0出现的位置。
+value中第一�?出现的位置�?
 
 ## 流水类型
 
@@ -34,12 +34,12 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 
 ```c++
 uint64_t value = 33;
-// 输出数据count_first_zero为1
+// 输出数据count_first_zero�?
 int64_t count_first_zero = asc_ffz(value);
 ```

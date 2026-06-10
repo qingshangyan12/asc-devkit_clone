@@ -4,11 +4,11 @@
 
 | 产品 | 是否支持  |
 | :-----------| :------: |
-| <term>Ascend 950PR/Ascend 950DT</term> |    √     |
+| <term>Ascend 950PR/Ascend 950DT</term> |    �?    |
 
 ## 功能说明
 
-block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应VECCORE与CUBECORE中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大于0，则计数器减一，同时后续指令开始执行。
+block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配合使用，是block内不同Core的流水线同步指令，用于向每个Core的同步寄存器发送同步信号。每个sync_id对应VECCORE与CUBECORE中的一个初始值为0的计数器。asc_sync_intra_arrive指令后其他CORE对应的计数器增加1；执行asc_sync_intra_wait时如果对应的计数器数值为0则阻塞不执行；如果对应的计数器大�?，则计数器减一，同时后续指令开始执行�?
 
 ## 函数原型
 
@@ -19,14 +19,14 @@ block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配�
 
 ## 参数说明
 
-| 参数名 | 输入/输出 | 描述 |
+| 参数�?| 输入/输出 | 描述 |
 | :---  | :--- | :--- |
-| pipe | 输入 | 该指令的执行流水线。 |
+| pipe | 输入 | 该指令的执行流水线�?|
 | sync_id | 输入 | 事件标号。|
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -34,19 +34,19 @@ PIPE_S
 
 ## 约束说明
 
-- 需要保证每一个ID的4位计数器不会溢出，否则会出现异常。
-- 需要保证相同的ID只会被一个流水线控制。
-- 每个ID对应一个4位计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减。 
-- 三个CORE的ID映射规则如下：
-    - ID为0~15的VECCORE0的asc_sync_intra_arrive指令会被映射到CUBECORE的0~15的ID。 
-    - ID为0~15的VECCORE1的asc_sync_intra_arrive指令会被映射到CUBECORE的16~31的ID。 
-    - ID为0~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE0的0~15的ID。 
-    - ID为16~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE1的0~15的ID。 
+- 需要保证每一个ID�?位计数器不会溢出，否则会出现异常�?
+- 需要保证相同的ID只会被一个流水线控制�?
+- 每个ID对应一�?位计数器，特定CORE的同步ID计数器可通过其他CORE发起的asc_sync_intra_arrive递增；也可通过本身发起的asc_sync_intra_wait递减�?
+- 三个CORE的ID映射规则如下�?
+    - ID�?~15的VECCORE0的asc_sync_intra_arrive指令会被映射到CUBECORE�?~15的ID�?
+    - ID�?~15的VECCORE1的asc_sync_intra_arrive指令会被映射到CUBECORE�?6~31的ID�?
+    - ID�?~15的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE0�?~15的ID�?
+    - ID�?6~31的CUBECORE的asc_sync_intra_arrive指令会被映射到VECCORE1�?~15的ID�?
 
 ## 调用示例
 
 ```cpp
-//设置同步指令事件标号为1
+//设置同步指令事件标号�?
 uint64_t sync_id = 1;
 asc_sync_intra_arrive(PIPE_S, sync_id);
 asc_sync_intra_wait(PIPE_S, sync_id);  

@@ -4,11 +4,11 @@
 
 |产品   | 是否支持 |
 | ------------|:----:|
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | �?</cann-filter>|
 
 ## 功能说明
 
-当[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)接口的padding_mode参数为true时，该值将设置为Padding的填充固定值。fp8_e8m0_t，fp8_e5m2_t，fp8_e4m3fn_t类型的数据需转换成int8_t类型后再调用本接口。
+当[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)接口的padding_mode参数为true时，该值将设置为Padding的填充固定值。fp8_e8m0_t，fp8_e5m2_t，fp8_e4m3fn_t类型的数据需转换成int8_t类型后再调用本接口�?
 
 ## 函数原型
 
@@ -26,13 +26,13 @@ __aicore__ inline void asc_set_ndim_pad_value(float pad_value)
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| pad_value | 输入 | 用于设置asc_ndim_copy_gm2ub接口Padding的填充固定值。数据类型需要与asc_ndim_copy_gm2ub接口中dst和src的数据类型保持一致。 |
+| pad_value | 输入 | 用于设置asc_ndim_copy_gm2ub接口Padding的填充固定值。数据类型需要与asc_ndim_copy_gm2ub接口中dst和src的数据类型保持一致�?|
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -40,7 +40,7 @@ PIPE_S
 
 ## 约束说明
 
-需配合[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)使用。
+需配合[asc_ndim_copy_gm2ub](./asc_ndim_copy_gm2ub.md)使用�?
 
 ## 调用示例
 

@@ -4,23 +4,23 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| Ascend 950PR/Ascend 950DT | �?|
 
 ## 功能说明
 
-此函数用于将32B对齐UB地址起始的连续2 x VL长度的数据，以数据类型宽度为单个元素，随Load搬运解交织后，写入2个矢量数据寄存器。
+此函数用于将32B对齐UB地址起始的连�? x VL长度的数据，以数据类型宽度为单个元素，随Load搬运解交织后，写�?个矢量数据寄存器�?
 
-如下图，以float数据类型，Ascend 950PR/Ascend 950DT产品为例：VL = 256B，可包含64个float元素，当调用`asc_loadalign_deintlv`后，其数据从UB到Reg的排布如下图。
+如下图，以float数据类型，Ascend 950PR/Ascend 950DT产品为例：VL = 256B，可包含64个float元素，当调用`asc_loadalign_deintlv`后，其数据从UB到Reg的排布如下图�?
 
 ![](../../figures/asc_loadalign_deintlv.png)
 
 
 
-> 提示：使用此函数需包含`reg_load.h`头文件。
+> 提示：使用此函数需包含`reg_load.h`头文件�?
 
 ## 函数原型
 
-`asc_loadalign_deintlv`按源地址的寻址方式分为三类：[基址寻址接口](#base-addressing-api)、[标量偏移寻址接口](#base-scalar-offset-api)、[地址寄存器偏移寻址接口](#base-register-indexed-api)。其支持的入参可参考[数据类型](#data-type)章节。
+`asc_loadalign_deintlv`按源地址的寻址方式分为三类：[基址寻址接口](#base-addressing-api)、[标量偏移寻址接口](#base-scalar-offset-api)、[地址寄存器偏移寻址接口](#base-register-indexed-api)。其支持的入参可参考[数据类型](#data-type)章节�?
 
 ### 基址寻址接口<a name="base-addressing-api"></a>
 
@@ -45,7 +45,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
 
 ### 标量偏移寻址接口<a name="base-scalar-offset-api"></a>
 
-> 源数据UB的地址通过`src + offset`计算得到，并要求src + offset计算得到的UB地址满足32B对齐要求。
+> 源数据UB的地址通过`src + offset`计算得到，并要求src + offset计算得到的UB地址满足32B对齐要求�?
 
 
 ```cpp
@@ -69,7 +69,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 
 ### 地址寄存器偏移寻址接口<a name="base-register-indexed-api"></a>
 
-> 源数据UB的地址由硬件根据循环嵌套层数以及迭代次数，自动更新`iter_reg offset`后计算得到，并要求src 满足32B对齐要求。需配合[`asc_create_iter_reg`](../reg_vector/asc_create_iter_reg.md)使用。
+> 源数据UB的地址由硬件根据循环嵌套层数以及迭代次数，自动更新`iter_reg offset`后计算得到，并要求src 满足32B对齐要求。需配合[`asc_create_iter_reg`](../reg_vector/asc_create_iter_reg.md)使用�?
 
 ```cpp
 // DEINTLV搬入模式
@@ -93,20 +93,20 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst0 | 输出 | 目的操作数（矢量数据寄存器）。 |
-| dst1 | 输出 | 目的操作数（矢量数据寄存器）。 |
-| src | 输入 | 源操作数（矢量）UB起始地址，需要32B对齐。 |
-| offset | 输入 | 地址偏移量（标量偏移寻址接口：元素为单位）。 |
+| dst0 | 输出 | 目的操作数（矢量数据寄存器）�?|
+| dst1 | 输出 | 目的操作数（矢量数据寄存器）�?|
+| src | 输入 | 源操作数（矢量）UB起始地址，需�?2B对齐�?|
+| offset | 输入 | 地址偏移量（标量偏移寻址接口：元素为单位）�?|
 
-矢量数据寄存器详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)�?
 
 ## 数据类型<a name="data-type"></a>
 
-`asc_loadalign_deintlv`支持的数据类型如下表所示。三类寻址接口均支持表中的数据类型。
+`asc_loadalign_deintlv`支持的数据类型如下表所示。三类寻址接口均支持表中的数据类型�?
 
-| 数据位宽 | 数据类别 | 源数据类型(src) | 目的寄存器类型(dst0/dst1) |
+| 数据位宽 | 数据类别 | 源数据类�?src) | 目的寄存器类�?dst0/dst1) |
 | :------- | :------- | :-------------- | :------------------------ |
 | b4       | 整型     | `int4b_t`       | `vector_int4x2_t`         |
 | b4       | 浮点     | `fp4x2_e1m2_t`  | `vector_fp4x2_e1m2_t`     |
@@ -125,9 +125,9 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 | b32      | 整型     | `uint32_t`      | `vector_uint32_t`         |
 | b32      | 整型     | `float`         | `vector_float`            |
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -135,13 +135,13 @@ PIPE_V
 
 ## 约束说明
 
-- [基址寻址接口](#base-addressing-api)中的src需要32B对齐，且src地址不超过UB最大地址减去2 x VL，否则会导致读UB越界报错。
-- [标量偏移寻址接口](#base-scalar-offset-api)和[地址寄存器偏移寻址接口](#base-register-indexed-api)中的src + offset结果需要32B对齐，且结果不超过UB最大地址减去2 x VL，否则会导致读UB越界报错。
-- [地址寄存器偏移寻址接口](#base-register-indexed-api)需要配合[`asc_create_iter_reg`](../reg_vector/asc_create_iter_reg.md)使用。
+- [基址寻址接口](#base-addressing-api)中的src需�?2B对齐，且src地址不超过UB最大地址减去2 x VL，否则会导致读UB越界报错�?
+- [标量偏移寻址接口](#base-scalar-offset-api)和[地址寄存器偏移寻址接口](#base-register-indexed-api)中的src + offset结果需�?2B对齐，且结果不超过UB最大地址减去2 x VL，否则会导致读UB越界报错�?
+- [地址寄存器偏移寻址接口](#base-register-indexed-api)需要配合[`asc_create_iter_reg`](../reg_vector/asc_create_iter_reg.md)使用�?
 
 ## 调用示例
 
-读取UB上32B对齐的地址`src`开始的连续float数据。
+读取UB�?2B对齐的地址`src`开始的连续float数据�?
 
 ### 基址寻址接口
 

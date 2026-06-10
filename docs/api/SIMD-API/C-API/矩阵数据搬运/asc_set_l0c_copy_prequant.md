@@ -4,13 +4,13 @@
 
 |产品   | 是否支持 |
 | ------------|:----:|
-| <cann-filter npu_type="950">Ascend 950PR/Ascend 950DT | √    </cann-filter>|
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √    |
+| <cann-filter npu_type="950">Ascend 950PR/Ascend 950DT | �?   </cann-filter>|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | �?   |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | �?   |
 
 ## 功能说明
 
-数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。
+数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数�?
 
 ## 函数原型
 
@@ -24,9 +24,9 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config)
 |------------|------------|-----------|
 | config     | 输入     | 量化过程中使用到的标量量化参数。|
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -34,7 +34,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 

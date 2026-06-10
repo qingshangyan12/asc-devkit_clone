@@ -4,14 +4,14 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| Ascend 950PR/Ascend 950DT | �?|
 
 ## 功能说明
 
-数据搬运接口，适用于从UB非32B对齐地址起始连续搬入。
+数据搬运接口，适用于从UB�?2B对齐地址起始连续搬入�?
 
-- asc_loadunalign_postupdate（不带iter_reg入参）：配合asc_loadunalign（不带iter_reg入参）接口使用。
-- asc_loadunalign_postupdate（带iter_reg入参）：配合asc_loadunalign（带iter_reg入参）接口使用。
+- asc_loadunalign_postupdate（不带iter_reg入参）：配合asc_loadunalign（不带iter_reg入参）接口使用�?
+- asc_loadunalign_postupdate（带iter_reg入参）：配合asc_loadunalign（带iter_reg入参）接口使用�?
 
 ## 函数原型
 
@@ -54,19 +54,19 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int4x2_t& dst, vec
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数（矢量）的起始地址。 |
+| dst | 输出 | 目的操作数（矢量）�?|
+| src0 | 输入 | 源操作数（矢量数据寄存器）�?|
+| src1 | 输入 | 源操作数（矢量）的起始地址�?|
 | offset | 输入 | 存储地址的偏移量。实际搬运UB起始地址为src1+offset |
 | count | 输入 | 搬运完成后offset在自增前被更新为offset+count|
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)�?
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -74,7 +74,7 @@ PIPE_V
 
 ## 约束说明
 
-- 接口中的src1不需要32B对齐。
+- 接口中的src1不需�?2B对齐�?
 
 ## 调用示例
 

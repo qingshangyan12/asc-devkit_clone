@@ -4,12 +4,12 @@
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √    |
-| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √    |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    �?   |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    �?   |
 
 ## 功能说明
 
-分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。
+分离模式下，获取一个AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量�?
 
 ## 函数原型
 
@@ -19,9 +19,9 @@ __aicore__ inline int64_t asc_get_sub_block_num()
 
 ## 参数说明
 
-无
+�?
 
-## 返回值说明
+## 返回值说�?
 
 
 不同Kernel类型下，在AIC和AIV上调用该接口的返回值如下：
@@ -37,8 +37,8 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 
-无
+�

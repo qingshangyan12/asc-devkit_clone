@@ -4,11 +4,11 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| Ascend 950PR/Ascend 950DT | �?|
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，对齐场景推荐使用[asc_storealign](./asc_storealign)接口。
+reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，对齐场景推荐使用[asc_storealign](./asc_storealign)接口�?
 
 ## 函数原型
 
@@ -32,7 +32,7 @@ __simd_callee__ inline void asc_store(__ubuf__  uint32_t* dst, vector_uint32_t s
 __simd_callee__ inline void asc_store(__ubuf__  float* dst, vector_float src)
 __simd_callee__ inline void asc_store(__ubuf__  int64_t* dst, vector_int64_t src)
 
-// 传入count参数，搬运count个元素
+// 传入count参数，搬运count个元�?
 __simd_callee__ inline void asc_store(__ubuf__  int8_t* dst, vector_int8_t src, uint32_t count)
 __simd_callee__ inline void asc_store(__ubuf__  uint8_t* dst, vector_uint8_t src, uint32_t count)  
 __simd_callee__ inline void asc_store(__ubuf__  int16_t* dst, vector_int16_t src, uint32_t count)
@@ -53,17 +53,17 @@ __simd_callee__ inline void asc_store(__ubuf__  int4b_t* dst, vector_int4x2_t sr
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量数据寄存器）。 |
-| count | 输入 | 搬运元素数量。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址�?|
+| src | 输入 | 源操作数（矢量数据寄存器）�?|
+| count | 输入 | 搬运元素数量�?|
 
-矢量数据寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)�?
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -71,7 +71,7 @@ PIPE_V
 
 ## 约束说明
 
-- count的取值范围为[1, VL/sizeof(dst)]，VL为矢量长度。超出该范围会导致未定义行为。
+- count的取值范围为[1, VL/sizeof(dst)]，VL为矢量长度。超出该范围会导致未定义行为�?
 
 ## 调用示例
 

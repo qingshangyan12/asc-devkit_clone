@@ -4,11 +4,11 @@
 
 |产品|是否支持|
 | :------------ | :------------: |
-| Ascend 950PR/Ascend 950DT | √ |
+| Ascend 950PR/Ascend 950DT | �?|
 
 ## 功能说明
 
-按元素判断src0_i != src1_i是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。
+按元素判断src0_i != src1_i是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果�?个bit�?
 
 ## 函数原型
 
@@ -31,13 +31,13 @@ __simd_callee__ inline void asc_ne(vector_bool& dst, vector_float src0, vector_f
 |dst| 输出 |目的操作数（掩码寄存器）。|
 |src0| 输入 |源操作数（矢量数据寄存器）。|
 |src1| 输入 |源操作数（矢量数据寄存器）。|
-| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。 |
+| mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，�?时不参与计算。mask未筛选的元素在输出中置零�?|
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg数据类型定义.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../reg数据类型定义.md)�?
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -45,7 +45,7 @@ PIPE_V
 
 ## 约束说明
 
-无
+�?
 
 
 ## 调用示例
@@ -56,6 +56,6 @@ vector_uint8_t src0;
 vector_uint8_t src1;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址
-asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址。
+asc_loadalign(src1, src1_addr); // src1_addr是外部输入的UB内存空间地址�?
 asc_ne(dst, src0, src1, mask);
 ```

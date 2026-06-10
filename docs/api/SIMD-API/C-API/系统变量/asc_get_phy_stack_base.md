@@ -4,13 +4,13 @@
 
 | 产品     | 是否支持 |
 | ----------- |:----:|
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
-| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
-| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | �?</cann-filter>|
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    �?    |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    �?    |
 
 ## 功能说明
 
-获取物理堆栈基地址。
+获取物理堆栈基地址�?
 
 ## 函数原型
 
@@ -20,11 +20,11 @@ __aicore__ inline int64_t asc_get_phy_stack_base()
 
 ## 参数说明
 
-无
+�?
 
-## 返回值说明
+## 返回值说�?
 
-物理堆栈基地址。
+物理堆栈基地址�?
 
 ## 流水类型
 
@@ -32,11 +32,11 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 
 ```cpp
 int64_t phy_stack_base = asc_get_phy_stack_base();
-printf("phy stack base is %x", phy_stack_base);// 需用%x将其打印成十六进制的数
+printf("phy stack base is %x", phy_stack_base);// 需�?x将其打印成十六进制的�?
 ```

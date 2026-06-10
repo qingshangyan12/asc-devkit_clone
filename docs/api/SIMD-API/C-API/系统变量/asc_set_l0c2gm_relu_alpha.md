@@ -4,18 +4,18 @@
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| <term>Ascend 950PR/Ascend 950DT</term> |    √     |
+| <term>Ascend 950PR/Ascend 950DT</term> |    �?    |
 
 ## 功能说明
 
-对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
+对RELU_ALPHA寄存器中的值进行设置。这是一�?4bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值�?
 
-其中各bit含义如下：
+其中各bit含义如下�?
 
 | bit范围 |                                           含义                                           | 
 |:------|:--------------------------------------------------------------------------------------:|
-| 31:13 | 表示ReLU_PRE中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将以1位符号位，8位指数位和10位尾数位的格式用于计算，不能是INF/NAN。  |
-| 63:45 | 表示ReLU_POST中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将以1位符号位，8位指数位和10位尾数位的格式用于计算，不能是INF/NAN。 |
+| 31:13 | 表示ReLU_PRE中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将�?位符号位�?位指数位�?0位尾数位的格式用于计算，不能是INF/NAN�? |
+| 63:45 | 表示ReLU_POST中Scalar ReLU的M2值，只有Scalar ReLU时生效。硬件将�?位符号位�?位指数位�?0位尾数位的格式用于计算，不能是INF/NAN�?|
 
 ## 函数原型
 
@@ -27,11 +27,11 @@ __aicore__ inline void asc_set_l0c2gm_relu_alpha(uint64_t config)
 
 |参数名|输入/输出| 描述        |
 | :------ | :---  |:----------|
-|config   |输入   | 待设置的寄存器值。 |
+|config   |输入   | 待设置的寄存器值�?|
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -39,7 +39,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 

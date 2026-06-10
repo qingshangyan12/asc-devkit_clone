@@ -5,8 +5,8 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √ |
-| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √ |
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | �?|
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | �?|
 
 ### 功能说明
 
@@ -14,11 +14,11 @@
 $$
 dst_i = Cast(src_i * scale)
 $$
-其中的scale可通过[asc_set_deq_scale](asc_set_deq_scale.md)设置。
+其中的scale可通过[asc_set_deq_scale](asc_set_deq_scale.md)设置�?
 
 ### 函数原型
 
-- 前n个数据计算
+- 前n个数据计�?
 
     ```cpp
     __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
@@ -38,20 +38,20 @@ $$
 
 ### 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src | 输入 | 源操作数（矢量）的起始地址。 |
-| count | 输入 | 参与计算的元素个数。 |
-| repeat | 输入 | 迭代次数。 |
-| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长。 |
-| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长。 |
-| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长。 |
-| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址�?|
+| src | 输入 | 源操作数（矢量）的起始地址�?|
+| count | 输入 | 参与计算的元素个数�?|
+| repeat | 输入 | 迭代次数�?|
+| dst_block_stride | 输入 | 目的操作数单次迭代内不同DataBlock间地址步长�?|
+| src_block_stride | 输入 | 源操作数单次迭代内不同DataBlock间地址步长�?|
+| dst_repeat_stride | 输入 | 目的操作数相邻迭代间相同DataBlock的地址步长�?|
+| src_repeat_stride | 输入 | 源操作数相邻迭代间相同DataBlock的地址步长�?|
 
-### 返回值说明
+### 返回值说�?
 
-无
+�?
 
 ### 流水类型
 
@@ -59,9 +59,9 @@ PIPE_V
 
 ### 约束说明
 
-- 需配合[asc_set_deq_scale](./asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。
-- dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 需配合[asc_set_deq_scale](./asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数�?
+- dst、src的起始地址需�?2字节对齐�?
+- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约�?md#通用地址重叠约束)�?
 
 ### 调用示例
 
@@ -70,5 +70,5 @@ constexpr uint64_t total_length = 128;    // total_length指参与计算的数�
 __ubuf__ int32_t src[total_length];
 __ubuf__ half dst[total_length];
 asc_set_deq_scale(2.0);
-…… // 数据搬运及同步操作
+…�?// 数据搬运及同步操�?
 asc_deq_int322half(dst, src, total_length);

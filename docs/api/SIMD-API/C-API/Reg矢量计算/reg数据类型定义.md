@@ -1,8 +1,8 @@
 # reg数据类型定义
 
-## 矢量数据寄存器
+## 矢量数据寄存�?
 
-矢量数据寄存器用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B。例如对于矢量数据类型vector_float，该寄存器可存储的元素数量为256B / sizeof(float) = 64个。
+矢量数据寄存器用于存储矢量数据，其位宽为VL（Vector Length），可存储VL/sizeof(T)的数据（T表示数据类型）。在Ascend 950PR/Ascend 950DT版本中， VL = 256B。例如对于矢量数据类型vector_float，该寄存器可存储的元素数量为256B / sizeof(float) = 64个�?
 
 以下是以位宽为分类，列举的所有矢量数据寄存器的数据类型：
 
@@ -13,8 +13,8 @@
 | b32       | vector_int32_t/vector_uint32_t/vector_float |
 | b64       | vector_int64_t/vector_uint64_t |
 
-**注意：**
-vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元。
+**注意�?*
+vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元�?
 
 ### 调用示例
 
@@ -24,9 +24,9 @@ half index = 0;
 asc_arange(dst, index);
 ```
 
-## 掩码寄存器
+## 掩码寄存�?
 
-掩码寄存器的数据类型为vector_bool，用于矢量计算中选择参与计算的元素，其位宽为VL/8。
+掩码寄存器的数据类型为vector_bool，用于矢量计算中选择参与计算的元素，其位宽为VL/8�?
 
 ![vector_bool](../figures/vector_bool.png)
 
@@ -40,9 +40,9 @@ vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操�
 
 ## 非对齐寄存器
 
-非对齐寄存器包括vector_load_unalign和vector_store_unalign。这些寄存器作为缓冲区，用于在UB和矢量数据寄存器之间进行连续的非对齐数据搬运，其中非对齐特指数据起始地址未按32字节对齐。在搬运过程中，非对齐数据首先被加载到专用的非对齐寄存器，随后通过相应的搬运接口完成数据的分块读取或写入。
+非对齐寄存器包括vector_load_unalign和vector_store_unalign。这些寄存器作为缓冲区，用于在UB和矢量数据寄存器之间进行连续的非对齐数据搬运，其中非对齐特指数据起始地址未按32字节对齐。在搬运过程中，非对齐数据首先被加载到专用的非对齐寄存器，随后通过相应的搬运接口完成数据的分块读取或写入�?
 
-在读非对齐地址前，vector_load_unalign应该通过asc_loadunalign_pre初始化，然后再使用asc_loadunalign。在写非对齐地址时，应先使用asc_storeunalign，再使用asc_storeunalign_post进行处理。
+在读非对齐地址前，vector_load_unalign应该通过asc_loadunalign_pre初始化，然后再使用asc_loadunalign。在写非对齐地址时，应先使用asc_storeunalign，再使用asc_storeunalign_post进行处理�?
 
 ### 调用示例
 
@@ -63,15 +63,15 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
         asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
         asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size); // 配合vector_load_unalign的使用，非对齐搬入源数据
         asc_neg(dst, src, mask);
-        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数据
+        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数�?
         asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0); // 处理非对齐搬出的尾块
     }
 }
 ```
 
-## 地址寄存器
+## 地址寄存�?
 
-地址寄存器的数据类型为iter_reg，用于存储地址偏移量。iter_reg通过asc_create_iter_reg初始化，然后在循环之中使用iter_reg存储地址偏移量。iter_reg在每层循环中根据所设置的步长进行自增。
+地址寄存器的数据类型为iter_reg，用于存储地址偏移量。iter_reg通过asc_create_iter_reg初始化，然后在循环之中使用iter_reg存储地址偏移量。iter_reg在每层循环中根据所设置的步长进行自增�?
 
 ### 调用示例
 

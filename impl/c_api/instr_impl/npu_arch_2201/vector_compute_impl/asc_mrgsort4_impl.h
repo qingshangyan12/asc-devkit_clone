@@ -25,42 +25,42 @@
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 // repeat == 1, no limit
-// repeat > 1, limit: len0==len1==len2==len3, valid_bit==0xb1111, if_exhausted_suspension==false
+// repeat > 1, limit: len0==len1==len2==len3, valid_bit==0xb1111, enable_exhausted_suspension==false
 __aicore__ inline void asc_mrgsort4_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     if ASC_IS_AIV {
         vmrgsort4(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-            if_exhausted_suspension, valid_bit);
+            enable_exhausted_suspension, valid_bit);
     }
 }
 
 __aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mrgsort4_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     if ASC_IS_AIV {
         vmrgsort4(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-            if_exhausted_suspension, valid_bit);
+            enable_exhausted_suspension, valid_bit);
     }
 }
 
 __aicore__ inline void asc_mrgsort4_sync_impl(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
     asc_sync_post_process();
 }
 

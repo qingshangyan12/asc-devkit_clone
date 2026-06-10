@@ -4,13 +4,13 @@
 
 | 产品         | 是否支持 |
 | :-----------------------| :-----:|
-| Ascend 950PR/Ascend 950DT | √ |
+| Ascend 950PR/Ascend 950DT | �?|
 
 ## 功能说明
 
-reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。
+reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景�?
 
-该接口使用uint32_t作为存储偏移量，不改变源操作数在UB上的地址，每次循环的调用都需要用户手动更新目的操作数在UB上的地址。
+该接口使用uint32_t作为存储偏移量，不改变源操作数在UB上的地址，每次循环的调用都需要用户手动更新目的操作数在UB上的地址�?
 
 ## 函数原型
 
@@ -36,18 +36,18 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t*& dst, vector_stor
 
 ## 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数�? | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| dst | 输出 | 目的操作数（矢量）的起始地址。 |
-| src0 | 输入/输出 | 非对齐寄存器，用于保存非对齐数据，长度32B。 |
-| src1 | 输入 | 源操作数（矢量数据寄存器）。 |
-| count | 输入 | 存储搬运的个数。 |
+| dst | 输出 | 目的操作数（矢量）的起始地址�?|
+| src0 | 输入/输出 | 非对齐寄存器，用于保存非对齐数据，长�?2B�?|
+| src1 | 输入 | 源操作数（矢量数据寄存器）�?|
+| count | 输入 | 存储搬运的个数�?|
 
-矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+矢量数据寄存器和非对齐寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)�?
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -55,13 +55,13 @@ PIPE_V
 
 ## 约束说明
 
-- 该接口中的dst不需要32B对齐。
-- 调用该接口之后，需要调用[asc_storeunalign_post](./asc_storeunalign_post.md)接口处理非对齐搬出的尾块。
+- 该接口中的dst不需�?2B对齐�?
+- 调用该接口之后，需要调用[asc_storeunalign_post](./asc_storeunalign_post.md)接口处理非对齐搬出的尾块�?
 
 ## 调用示例
 
 ```cpp
-// dst地址为8，非32B对齐，占用的地址为UB[8:520]。
+// dst地址�?，非32B对齐，占用的地址为UB[8:520]�?
 __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(8);
 vector_store_unalign ureg;
 vector_uint32_t src;
@@ -74,8 +74,8 @@ for (uint32_t i = 0; i < repeat; i++) {
     // 第二次：ureg[0:2] + src[0:62] 写入 dst[62:126]（即UB[256:512]）；同时src[62:64] 写入 ureg[0:2]
     asc_storeunalign(dst + i*count, ureg, src, count);
 }
-// dst结束地址为520，即dst + repeat * count * sizeof(uint32_t)，所以offset要配置为repeat * count
+// dst结束地址�?20，即dst + repeat * count * sizeof(uint32_t)，所以offset要配置为repeat * count
 int32_t offset = repeat * count;
-// ureg[0:2] 写入 dst[126:128]（即UB[512:520]）
+// ureg[0:2] 写入 dst[126:128]（即UB[512:520]�?
 asc_storeunalign_post(dst, ureg, offset);
 ```

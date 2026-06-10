@@ -4,13 +4,13 @@
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √    |
-| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √    |
-| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | √ </cann-filter>|
+| <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    �?   |
+| <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    �?   |
+| <cann-filter npu_type="950"><term>Ascend 950PR/Ascend 950DT</term>  | �?</cann-filter>|
 
 ## 功能说明
 
-位操作函数，用于将一个uint64_t整数bits的第idx位设置为0。
+位操作函数，用于将一个uint64_t整数bits的第idx位设置为0�?
 
 ## 函数原型
 
@@ -22,12 +22,12 @@ __aicore__ inline uint64_t asc_clear_nthbit(uint64_t bits, int64_t idx)
 
 |参数名|输入/输出|描述|
 |------------|------------|-----------|
-| bits    | 输入     | 表示需要修改的值。   |
+| bits    | 输入     | 表示需要修改的值�?  |
 | idx     | 输入     | 位索引，表示需要设置为0的位的位置。|
 
-## 返回值说明
+## 返回值说�?
 
-修改后的uint64_t整数。
+修改后的uint64_t整数�?
 
 ## 流水类型
 
@@ -35,7 +35,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 

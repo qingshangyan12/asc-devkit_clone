@@ -4,20 +4,20 @@
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| <term>Ascend 950PR/Ascend 950DT</term> |    √     |
+| <term>Ascend 950PR/Ascend 950DT</term> |    �?    |
 
 ## 功能说明
 
-对MTE2_NZ_PARA寄存器中的值进行设置，可以在调用[asc_copy_gm2l1_dn2nz](../矩阵数据搬运/asc_copy_gm2l1_dn2nz.md)和[asc_copy_gm2l1_nd2nz](../矩阵数据搬运/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)前设置相关参数。
+对MTE2_NZ_PARA寄存器中的值进行设置，可以在调用[asc_copy_gm2l1_dn2nz](../矩阵数据搬运/asc_copy_gm2l1_dn2nz.md)和[asc_copy_gm2l1_nd2nz](../矩阵数据搬运/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)前设置相关参数�?
 
-MTE2_NZ_PARA是一个64bit的寄存器，其中各bit含义如下：
+MTE2_NZ_PARA是一�?4bit的寄存器，其中各bit含义如下�?
 
 | bit范围 |        含义         |
 |:------|:-----------------:|
-| 15:0  |  需要搬运的ND/DN矩阵数量。  | 
-| 31:16 | N维度上相邻两个block块之间的间隔。 |
-| 47:32 | 同一个NZ矩阵中2个C0列之间的间隔。 |
-| 63:48 | 两个ND/DN矩阵中两个NZ矩阵之间的间隔。 |
+| 15:0  |  需要搬运的ND/DN矩阵数量�? | 
+| 31:16 | N维度上相邻两个block块之间的间隔�?|
+| 47:32 | 同一个NZ矩阵�?个C0列之间的间隔�?|
+| 63:48 | 两个ND/DN矩阵中两个NZ矩阵之间的间隔�?|
 
 ## 函数原型
 
@@ -29,11 +29,11 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config)
 
 |参数名|输入/输出| 描述        |
 | :------ | :---  |:----------|
-| config | 输入 | 待设置的寄存器值。 |
+| config | 输入 | 待设置的寄存器值�?|
 
-## 返回值说明
+## 返回值说�?
 
-无
+�?
 
 ## 流水类型
 
@@ -41,7 +41,7 @@ PIPE_S
 
 ## 约束说明
 
-无
+�?
 
 ## 调用示例
 ```cpp
