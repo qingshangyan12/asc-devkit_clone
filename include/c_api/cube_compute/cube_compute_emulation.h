@@ -78,7 +78,7 @@ __aicore__ inline void asc_mmad_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__
  * @param [in] unit_flag Unit flag for operation control
  * @param [in] enable_k_direction_align Whether to enable K direction alignment
  * @param [in] enable_weight_offset Whether weight offset is enabled
- * @param [in] enable_cube_init Whether to initialize cube with bias buffer
+ * @param [in] enable_cube_init Whether to initialize cube
  * @param [in] enable_cube_zero_init Whether to initialize cube to zero
  * @details Performs C = A * B matrix multiplication with bfloat16 inputs and float output,
  *          supporting offset parameters. This is a synchronized version.
@@ -136,14 +136,14 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c, __ca__ int4b_t* a, __
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] n Columns of matrix B
  * @param [in] unit_flag Unit flag for operation control
- * @param [in] cmatrix_source Source of C matrix
- * @param [in] cmatrix_init_val Initial value of C matrix
+ * @param [in] enable_cube_init Source of C matrix
+ * @param [in] enable_cube_zero_init Initial value of C matrix
  * @details Performs sparse C = A * B matrix multiplication with int8 inputs and int32 output.
  *          This is a synchronized version that includes built-in synchronization.
  */
 __aicore__ inline void asc_mmad_sparse_sync(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m,
-                                             uint16_t k, uint16_t n, uint8_t unit_flag, bool cmatrix_source,
-                                             bool cmatrix_init_val);
+                                             uint16_t k, uint16_t n, uint8_t unit_flag, bool enable_cube_init,
+                                             bool enable_cube_zero_init);
 
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /*

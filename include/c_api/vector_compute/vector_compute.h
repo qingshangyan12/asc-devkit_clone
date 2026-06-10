@@ -1,4 +1,4 @@
-﻿/**
+/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -134,12 +134,12 @@ __aicore__ inline void asc_set_vector_mask(uint64_t mask1, uint64_t mask0);
  * @brief Set dequantization scale with offset
  * @param [in] scale Scale value for dequantization
  * @param [in] offset Offset value for dequantization
- * @param [in] sign_mode Whether to use signed mode
+ * @param [in] enable_signed Whether to use signed mode
  * @details Configures dequantization parameters for converting quantized data to floating point.
  */
-__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode);
+__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool enable_signed);
 __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE],
-                int16_t offset_arr[ASC_VDEQ_SIZE], bool sign_mode_arr[ASC_VDEQ_SIZE]);
+                int16_t offset_arr[ASC_VDEQ_SIZE], bool enable_signed_arr[ASC_VDEQ_SIZE]);
 
 /*
  * @ingroup VectorCompute
@@ -284,27 +284,27 @@ __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __
  * @param [in] element_length_1 Length of second element group
  * @param [in] element_length_2 Length of third element group
  * @param [in] element_length_3 Length of fourth element group
- * @param [in] if_exhausted_suspension Whether to suspend when exhausted
+ * @param [in] enable_exhausted_suspension Whether to suspend when exhausted
  * @param [in] valid_bit Valid bit mask
  * @details Performs merge sort on 4 element groups for half or float data.
  */
 __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0,
                                     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
-                                    bool if_exhausted_suspension, uint8_t valid_bit);
+                                    bool enable_exhausted_suspension, uint8_t valid_bit);
 __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0,
                                     uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3,
-                                    bool if_exhausted_suspension, uint8_t valid_bit);
+                                    bool enable_exhausted_suspension, uint8_t valid_bit);
 
 // ============================================================================
-// Gather and Transpose Operations - Data gathering and transposing
+// Gather and enable_transpose Operations - Data gathering and transposing
 // ============================================================================
 
 /*
  * @ingroup VectorCompute
- * @brief Transpose operation for int16/uint16 data types
+ * @brief enable_transpose operation for int16/uint16 data types
  * @param [out] dst Destination buffer for transposed result
  * @param [in] src Source buffer
- * @details Performs matrix transpose on int16_t or uint16_t data.
+ * @details Performs matrix enable_transpose on int16_t or uint16_t data.
  */
 __aicore__ inline void asc_transpose(__ubuf__ int16_t* dst, __ubuf__ int16_t* src);
 __aicore__ inline void asc_transpose(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src);
@@ -1101,16 +1101,16 @@ __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* 
  * @param [in] element_length_1 Length of second element group
  * @param [in] element_length_2 Length of third element group
  * @param [in] element_length_3 Length of fourth element group
- * @param [in] if_exhausted_suspension Whether to suspend when exhausted
+ * @param [in] enable_exhausted_suspension Whether to suspend when exhausted
  * @param [in] valid_bit Valid bit mask
  * @details Performs merge sort on 4 element groups for half or float data.
  */
 __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit);
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit);
 __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit);
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit);
 
 /*
  * @ingroup VectorCompute
@@ -1665,7 +1665,7 @@ __aicore__ inline void asc_gather(__ubuf__ float* dst, __ubuf__ float* src, __ub
 
 /*
  * @ingroup VectorCompute
- * @brief Transpose matrix for int16/uint16 data types
+ * @brief enable_transpose matrix for int16/uint16 data types
  * @param [out] dst Destination buffer for transposed result
  * @param [in] src Source buffer
  * @details Performs matrix transposition. Supports int16_t and uint16_t data types.

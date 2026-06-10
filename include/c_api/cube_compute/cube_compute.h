@@ -37,12 +37,12 @@
 /*
  * @ingroup CubeCompute
  * @brief Set L0C to GM configuration
- * @param [in] relu_pre ReLU configuration parameter
- * @param [in] quant_pre Quantization configuration parameter
+ * @param [in] relu_pre_mode ReLU configuration parameter
+ * @param [in] quant_pre_mode Quantization configuration parameter
  * @param [in] enable_unit_flag Whether to enable unit flag
  * @details Configure L0C to GM transfer parameters for subsequent matrix operations
  */
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_mode, uint64_t quant_pre_mode, bool enable_unit_flag);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -145,13 +145,13 @@ __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ 
  * @param [in] k Columns of matrix A / Rows of matrix B
  * @param [in] n Columns of matrix B
  * @param [in] unit_flag Unit flag for operation control
- * @param [in] cmatrix_source Source of C matrix
- * @param [in] cmatrix_init_val Initial value of C matrix
+ * @param [in] enable_cube_init Source of C matrix
+ * @param [in] enable_cube_zero_init Initial value of C matrix
  * @details Performs sparse C = A * B matrix multiplication with int8 inputs and int32 output.
  *          This is a hardware-level interface that requires manual synchronization.
  */
 __aicore__ inline void asc_mmad_sparse(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b, uint16_t m, uint16_t k,
-                                       uint16_t n, uint8_t unit_flag, bool cmatrix_source, bool cmatrix_init_val);
+                                       uint16_t n, uint8_t unit_flag, bool enable_cube_init, bool enable_cube_zero_init);
 
 /*
  * @ingroup CubeCompute

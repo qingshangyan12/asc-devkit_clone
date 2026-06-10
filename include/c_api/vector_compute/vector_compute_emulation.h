@@ -23,7 +23,7 @@
  *          - Sorting operations: mrgsort4, etc.
  *          - Mathematical functions: exp, log, abs, relu, sqrt, rsqrt, rcp, etc.
  *          - Bit operations: and, or, not, shiftleft, shiftright, etc.
- *          - Data manipulation: duplicate, copy, gather, transpose, select, etc.
+ *          - Data manipulation: duplicate, copy, gather, enable_transpose, select, etc.
  *          Supported data types: half, float, int8_t, int16_t, int32_t, int64_t,
  *          uint8_t, uint16_t, uint32_t, bfloat16_t, int4b_t, etc.
  * 
@@ -1256,7 +1256,7 @@ __aicore__ inline void asc_add_relu(__ubuf__ int16_t* dst, __ubuf__ int16_t* src
 __aicore__ inline void asc_add_relu_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
 
 // ============================================================================
-// Data Manipulation Operations - Duplicate, copy, gather, transpose operations
+// Data Manipulation Operations - Duplicate, copy, gather, enable_transpose operations
 // ============================================================================
 
 /*
@@ -1422,7 +1422,7 @@ __aicore__ inline void asc_select(__ubuf__ half* dst, __ubuf__ half* src0, __ubu
 __aicore__ inline void asc_select(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
 // ============================================================================
-// Gather and Transpose Operations
+// Gather and enable_transpose Operations
 // ============================================================================
 
 /*
@@ -1452,7 +1452,7 @@ __aicore__ inline void asc_gather_sync(__ubuf__ float* dst, __ubuf__ float* src,
 
 /*
  * @ingroup VectorCompute
- * @brief Transpose matrix for int16/uint16 data types
+ * @brief enable_transpose matrix for int16/uint16 data types
  * @param [out] dst Destination buffer for transposed result
  * @param [in] src Source buffer
  * @details Transposes the input matrix. Supports int16_t and uint16_t data types.

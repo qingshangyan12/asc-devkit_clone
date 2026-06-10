@@ -1922,15 +1922,15 @@ __aicore__ inline void asc_min_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32
     asc_min_scalar_sync_impl(dst, src, value, count);
 }
 
-__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool sign_mode)
+__aicore__ inline void asc_set_deq_scale(float scale, int16_t offset, bool enable_signed)
 {
-    asc_set_deq_scale_impl(scale, offset, sign_mode);
+    asc_set_deq_scale_impl(scale, offset, enable_signed);
 }
 
 __aicore__ inline void asc_set_deq_scale(__ubuf__ uint64_t* tmp, float scale_arr[ASC_VDEQ_SIZE],
-                int16_t offset_arr[ASC_VDEQ_SIZE], bool sign_mode_arr[ASC_VDEQ_SIZE])
+                int16_t offset_arr[ASC_VDEQ_SIZE], bool enable_signed_arr[ASC_VDEQ_SIZE])
 {
-    asc_set_deq_scale_impl(tmp, scale_arr, offset_arr, sign_mode_arr);
+    asc_set_deq_scale_impl(tmp, scale_arr, offset_arr, enable_signed_arr);
 }
 
 __aicore__ inline void asc_set_deq_scale(half scale)
@@ -3045,34 +3045,34 @@ __aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[4])
 // ==========asc_mrgsort4(half/float)==========
 __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
 }
 
 __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_sync_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
 }
 
 __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
 }
 
 __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN],
     uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2,
-    uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+    uint16_t element_length_3, bool enable_exhausted_suspension, uint8_t valid_bit)
 {
     asc_mrgsort4_sync_impl(dst, src, repeat, element_length_0, element_length_1, element_length_2, element_length_3,
-        if_exhausted_suspension, valid_bit);
+        enable_exhausted_suspension, valid_bit);
 }
 
 // ==========asc_mul_add(half/float)==========
