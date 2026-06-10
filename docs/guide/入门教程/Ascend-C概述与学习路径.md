@@ -12,7 +12,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 为满足不同场景的诉求，Ascend C构建了从单指令抽象、单核公共算法到多核算子的多层级API体系，其总体逻辑架构如下：
 
-<img src="../../figures/architecture.png" alt="架构图" width="850px" height="580px">
+<img src="../figures/architecture_ascendc.png" alt="架构图" width="840px">
 
 - **语言扩展层C API**：纯C接口，提供数组内存分配、基于指针的计算接口，延续业界熟悉的C编程体验，并完整开放芯片能力。Ascend 950PR/Ascend 950DT新增SIMT、SIMD/SIMT混合编程能力。
 - **基础API**：以单指令为抽象的C++类库，一般基于Tensor编程，并逐步通过Layout完善Tensor编程体验。
