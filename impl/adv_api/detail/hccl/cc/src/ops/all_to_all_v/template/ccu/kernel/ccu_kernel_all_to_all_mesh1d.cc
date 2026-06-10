@@ -196,16 +196,22 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
 
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
     CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish ParseKernelArg!");
     CCU_CHK_RET(InitResource(ctx));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish InitResource!");
     CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset, sliceSize,
                                   goSize1, goSize2, goSize3, goSize4));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish LoadArgs!");
 
     PreSync(ctx);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PreSync!");
 
     CCU_CHK_RET(DoAlltoAll(ctx));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish DoAlltoAll!");
 
 
     PostSync(ctx);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PostSync!");
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
 
     return CCU_SUCCESS;
