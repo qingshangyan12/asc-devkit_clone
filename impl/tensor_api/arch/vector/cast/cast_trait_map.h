@@ -567,31 +567,6 @@ using CastSub_uint32_t_to_int16_t = TupleMap<
     Std::tuple<Std::tuple<Std::ignore_t, CastSatMode::Sat, CastIndexPos::Odd>, Inst::U322Int16SatOdd>
 >;
 
-// From instruction/rounding_ops.h
-using CastSub_bfloat16_t_to_bfloat16_t = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
-
-using CastSub_float_to_float = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
-
-using CastSub_half_to_half = TupleMap<
-    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
-    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
-    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
-    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
-    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
->;
-
 // From instruction/uint_uint.h
 using CastSub_uint16_t_to_uint32_t = TupleMap<
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, Std::ignore_t>, Inst::U162UInt32NoSatEven>,
@@ -659,6 +634,21 @@ using CastSub_hifloat8_t_to_float = TupleMap<
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP1>, Inst::Hif82FloatP1>,
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP2>, Inst::Hif82FloatP2>,
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Hif82FloatP3>
+>;
+
+// From instruction/rounding_ops.h
+using CastSub_bfloat16_t_to_bfloat16_t = CastRoundMode;
+
+using CastSub_float_to_float = CastRoundMode;
+
+using CastSub_half_to_half = CastRoundMode;
+
+using CastRoundMode = TupleMap<
+    Std::tuple<Std::tuple<Inst::Rint, Std::ignore_t, Std::ignore_t>, Inst::Rint>,
+    Std::tuple<Std::tuple<Inst::Round, Std::ignore_t, Std::ignore_t>, Inst::Round>,
+    Std::tuple<Std::tuple<Inst::Floor, Std::ignore_t, Std::ignore_t>, Inst::Floor>,
+    Std::tuple<Std::tuple<Inst::Ceil, Std::ignore_t, Std::ignore_t>, Inst::Ceil>,
+    Std::tuple<Std::tuple<Inst::Trunc, Std::ignore_t, Std::ignore_t>, Inst::Trunc>
 >;
 
 template <typename SrcType, typename DstType>
