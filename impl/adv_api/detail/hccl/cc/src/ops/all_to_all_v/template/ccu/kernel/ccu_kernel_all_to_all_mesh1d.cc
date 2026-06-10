@@ -34,28 +34,105 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] start InitResource.");
     const auto *arg = ctx.arg;
     uint32_t channelIdx = 0;
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] obtain arg, arg == nullptr:[%u].", (arg == nullptr));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] obtain arg, arg == nullptr:[%u].", static_cast<uint32_t>(arg == nullptr));
 
-    if (arg->channelCount == 0) {
-        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channels is empty!");
+    if (arg == nullptr) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] InitResource failed, kernel arg is nullptr.");
         return CcuResult::CCU_E_INTERNAL;
     }
 
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] InitResource arg snapshot: rankSize[%llu], rankId[%u], "
+        "channelCount[%u], loadFromMem[%u].",
+        static_cast<unsigned long long>(arg->rankSize), arg->rankId, arg->channelCount,
+        static_cast<uint32_t>(arg->loadFromMem));
+
+    if (arg->rankSize == 0 || arg->rankSize > CCU_MAX_RANK_SIZE) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] invalid rankSize[%llu], maxRankSize[%llu].",
+            static_cast<unsigned long long>(arg->rankSize), static_cast<unsigned long long>(CCU_MAX_RANK_SIZE));
+        return CcuResult::CCU_E_INTERNAL;
+    }
+    if (arg->rankId >= arg->rankSize) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] invalid rankId[%u], rankSize[%llu].",
+            arg->rankId, static_cast<unsigned long long>(arg->rankSize));
+        return CcuResult::CCU_E_INTERNAL;
+    }
+
+    const uint64_t expectedChannelCount = arg->rankSize - 1;
+    if (arg->channelCount < expectedChannelCount) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] insufficient channels, channelCount[%u], expected[%llu], "
+            "rankSize[%llu], rankId[%u].",
+            arg->channelCount, static_cast<unsigned long long>(expectedChannelCount),
+            static_cast<unsigned long long>(arg->rankSize), arg->rankId);
+        return CcuResult::CCU_E_INTERNAL;
+    }
+    if (arg->channelCount > expectedChannelCount) {
+        HCCL_WARNING("[CcuKernelAlltoAllMesh1D] channelCount[%u] is larger than expected[%llu], "
+            "only first expected channels will be used.",
+            arg->channelCount, static_cast<unsigned long long>(expectedChannelCount));
+    }
+
     // 按照rank号从小到大遍历channels，遇到本rank就填充本地资源，否则依次取远端资源，要求算法返回的Link同样是按顺序排列的
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] resize ctx.input start, size[%llu].",
+        static_cast<unsigned long long>(arg->rankSize));
     ctx.input.resize(arg->rankSize);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] resize ctx.output start, size[%llu].",
+        static_cast<unsigned long long>(arg->rankSize));
     ctx.output.resize(arg->rankSize);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] resize ctx.token start, size[%llu].",
+        static_cast<unsigned long long>(arg->rankSize));
     ctx.token.resize(arg->rankSize);
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] ctx resize finished!");
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] ctx resize finished, inputSize[%zu], outputSize[%zu], tokenSize[%zu].",
+        ctx.input.size(), ctx.output.size(), ctx.token.size());
     for (uint64_t peerId = 0; peerId < arg->rankSize; peerId++) {
-        HCCL_INFO("[CcuKernelAlltoAllMesh1D] start for peerid[%llu/%llu], rankId = %llu", peerId, arg->rankSize, arg->rankId);
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] process peerId[%llu/%llu], rankId[%u], channelIdx[%u].",
+            static_cast<unsigned long long>(peerId), static_cast<unsigned long long>(arg->rankSize),
+            arg->rankId, channelIdx);
         if (peerId != arg->rankId) {
-            ctx.input[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], INPUT_XN_ID);
-            ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], OUTPUT_XN_ID);
-            ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], TOKEN_XN_ID);
-            HCCL_INFO("[CcuKernelAlltoAllMesh1D] GetResByChannel finished!");
+            if (channelIdx >= arg->channelCount) {
+                HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channelIdx[%u] out of range, channelCount[%u], "
+                    "peerId[%llu], rankId[%u], rankSize[%llu].",
+                    channelIdx, arg->channelCount, static_cast<unsigned long long>(peerId), arg->rankId,
+                    static_cast<unsigned long long>(arg->rankSize));
+                return CcuResult::CCU_E_INTERNAL;
+            }
+
+            const auto channel = arg->channels[channelIdx];
+            if (channel == 0) {
+                HCCL_WARNING("[CcuKernelAlltoAllMesh1D] channel handle is zero, channelIdx[%u], peerId[%llu].",
+                    channelIdx, static_cast<unsigned long long>(peerId));
+            }
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get input variable start, channelIdx[%u], peerId[%llu], "
+                "resId[%d], channel[0x%llx].",
+                channelIdx, static_cast<unsigned long long>(peerId), INPUT_XN_ID,
+                static_cast<unsigned long long>(channel));
+            ctx.input[peerId] = ccu::GetResByChannel<ccu::Variable>(channel, INPUT_XN_ID);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get input variable finished, peerId[%llu], handle[0x%llx].",
+                static_cast<unsigned long long>(peerId), static_cast<unsigned long long>(ctx.input[peerId].handle));
+
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get output variable start, channelIdx[%u], peerId[%llu], "
+                "resId[%d], channel[0x%llx].",
+                channelIdx, static_cast<unsigned long long>(peerId), OUTPUT_XN_ID,
+                static_cast<unsigned long long>(channel));
+            ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(channel, OUTPUT_XN_ID);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get output variable finished, peerId[%llu], handle[0x%llx].",
+                static_cast<unsigned long long>(peerId), static_cast<unsigned long long>(ctx.output[peerId].handle));
+
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get token variable start, channelIdx[%u], peerId[%llu], "
+                "resId[%d], channel[0x%llx].",
+                channelIdx, static_cast<unsigned long long>(peerId), TOKEN_XN_ID,
+                static_cast<unsigned long long>(channel));
+            ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(channel, TOKEN_XN_ID);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] get token variable finished, peerId[%llu], handle[0x%llx].",
+                static_cast<unsigned long long>(peerId), static_cast<unsigned long long>(ctx.token[peerId].handle));
             channelIdx++;
+        } else {
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] skip local peerId[%llu], channelIdx[%u].",
+                static_cast<unsigned long long>(peerId), channelIdx);
         }
     }
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] InitResource channel traversal finished, usedChannelCount[%u], "
+        "expectedChannelCount[%llu].",
+        channelIdx, static_cast<unsigned long long>(expectedChannelCount));
 
     // CCU_CHK_RET(ccu::CreateLoopExecutor(&ctx.enginePool, MAX_RANK_SIZE));
 
