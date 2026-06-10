@@ -12,6 +12,7 @@
 |--------------------------------------------------------------------------------------------| ---------------------------------------------------- | --- |
 | [batch_matmul_tensor_api](./batch_matmul_tensor_api) | 本样例基于Tensor API编程方式实现带Bias的Batch Matmul计算 | Ascend 950PR/Ascend 950DT |
 | [batch_matmul](./batch_matmul) |  本样例介绍在输入为float数据类型并且左、右矩阵均不转置的场景下，带batch的矩阵乘法，其中GM -> L1通路采用DataCopy（Nd2NzParams）批量搬运，L0C -> GM、L0C -> L1通路采用Fixpipe批量搬运，L1 -> L0A / L0B搬运和Mmad矩阵乘循环执行batch次 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [conv2d_forward](./conv2d_forward) |  本样例介绍使用基础API实现Conv2D前向计算，通过LoadData3DV2完成img2col空间展开、Mmad矩阵乘累加、Fixpipe搬出，并以SCENARIO_NUM切换Nd2Nz/Dn2Nz搬入、img2col的repeat搬运、显式SetFmatrix/SetLoadDataPaddingValue等多种场景 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [fixpipe_l0c2gm](./fixpipe_l0c2gm) |  本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到GM（Global Memory） | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [fixpipe_l0c2l1](./fixpipe_l0c2l1) |  本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到L1（L1 Buffer） | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [fixpipe_l0c2ub](./fixpipe_l0c2ub) |  本样例介绍如何使用Fixpipe将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer） | Ascend 950PR/Ascend 950DT |
