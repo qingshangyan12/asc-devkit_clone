@@ -1,4 +1,4 @@
-# asc_scatter
+﻿# asc_scatter
 
 ## 产品支持情况
 
@@ -54,6 +54,6 @@ vector_half dst;
 __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_uint16_t index;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_scatter(dst, src, index, mask);
 ```

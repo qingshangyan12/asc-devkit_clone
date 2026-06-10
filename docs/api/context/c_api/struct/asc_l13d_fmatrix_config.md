@@ -1,4 +1,4 @@
-# asc_l13d_fmatrix_config
+﻿# asc_l13d_fmatrix_config
 
 asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a)/[asc_copy_l12l0b](../cube_datamove/asc_copy_l12l0b)的3D格式搬运接口的Feature map属性参数。
 

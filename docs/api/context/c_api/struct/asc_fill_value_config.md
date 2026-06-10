@@ -1,4 +1,4 @@
-# asc_fill_value_config
+﻿# asc_fill_value_config
 
 asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。
 

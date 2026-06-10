@@ -1,4 +1,4 @@
-# asc_pair_reduce_sum
+﻿# asc_pair_reduce_sum
 
 ## 产品支持情况
 
@@ -45,6 +45,6 @@ PIPE_V
 vector_half dst;
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_pair_reduce_sum(dst, src, mask);
 ```

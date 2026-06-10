@@ -1,4 +1,4 @@
-# asc_truncate
+﻿# asc_truncate
 
 ## 产品支持情况
 

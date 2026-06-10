@@ -1,4 +1,4 @@
-
+﻿
 # asc_get_arch_ver
 
 ## 产品支持情况

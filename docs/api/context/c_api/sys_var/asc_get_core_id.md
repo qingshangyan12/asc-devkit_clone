@@ -1,4 +1,4 @@
-# asc_get_core_id
+﻿# asc_get_core_id
 
 ## 产品支持情况
 

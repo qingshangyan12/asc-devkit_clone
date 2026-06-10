@@ -1,4 +1,4 @@
-# asc_int82int32
+﻿# asc_int82int32
 
 ## 产品支持情况
 
@@ -53,6 +53,6 @@ PIPE_V
 vector_int8_t src;
 vector_int32_t dst;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_int82int32(dst, src, mask);
 ```

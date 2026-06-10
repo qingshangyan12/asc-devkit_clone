@@ -1,4 +1,4 @@
-# asc_bfloat162e1m2x2
+﻿# asc_bfloat162e1m2x2
 
 ## 产品支持情况
 
@@ -91,6 +91,6 @@ PIPE_V
 vector_bfloat16_t src;
 vector_fp4x2_e1m2_t dst;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_bfloat162e1m2x2_rn(dst, src, mask);
 ```

@@ -1,4 +1,4 @@
-
+﻿
 # asc_deq_int162b8
 
 ## 产品支持情况
@@ -87,8 +87,8 @@ __ubuf__ int16_t src[total_length];
 __ubuf__ int8_t dst[total_length];
 float scale = 1.0;        // 量化参数为1
 int16_t offset = 0;       // 不带偏移
-bool sign_mode = true;    // 量化结果带符号（dst为int8_t类型）
-asc_set_deq_scale(scale, offset, sign_mode);    // 计算公式为dst = src
+bool enable_signed = true;    // 量化结果带符号（dst为int8_t类型）
+asc_set_deq_scale(scale, offset, enable_signed);    // 计算公式为dst = src
 asc_deq_int162b8_h(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的下半块
 asc_deq_int162b8_l(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的上半块
 ```

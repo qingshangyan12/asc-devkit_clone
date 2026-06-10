@@ -1,4 +1,4 @@
-# asc_frequency_histogram
+﻿# asc_frequency_histogram
 
 ## 产品支持情况
 
@@ -53,6 +53,6 @@ PIPE_V
 vector_uint16_t dst;
 vector_uint8_t src;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_frequency_histogram_bin0(dst, src, mask);
 ```

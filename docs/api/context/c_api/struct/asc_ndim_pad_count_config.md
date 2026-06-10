@@ -1,4 +1,4 @@
-# asc_ndim_pad_count_config
+﻿# asc_ndim_pad_count_config
 
 asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。
 

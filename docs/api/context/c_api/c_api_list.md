@@ -1,4 +1,4 @@
-# C API
+﻿# C API
 C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
 ## 数据结构
