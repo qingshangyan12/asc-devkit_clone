@@ -77,9 +77,15 @@ DataCopy数据搬运支持将矩阵计算用到的bias参数从L1 Buffer移动�
 
 </cann-filter>
 
-<cann-filter npu_type = "A3,910b">
+<cann-filter npu_type = "A3">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：src支持half、int32_t、float，dst支持int32_t、float。
+针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：src支持half、int32_t、float，dst支持int32_t、float。
+
+</cann-filter>
+
+<cann-filter npu_type = "910b">
+
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：src支持half、int32_t、float，dst支持int32_t、float。
 
 </cann-filter>
 

@@ -100,9 +100,15 @@ Ascend 950PR/Ascend 950DT，支持数据类型为：uint8_t、int8_t、uint16_t�
 
 </cann-filter>
 
-<cann-filter npu_type="A3,910b">
+<cann-filter npu_type="A3">
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：int4b_t、uint8_t、int8_t、uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float，int4b_t仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer通路。
+Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持数据类型为：int4b_t、uint8_t、int8_t、uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float，int4b_t仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer通路。
+
+</cann-filter>
+
+<cann-filter npu_type="910b">
+
+Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持数据类型为：int4b_t、uint8_t、int8_t、uint16_t、int16_t、half、bfloat16_t、uint32_t、int32_t、float，int4b_t仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer通路。
 
 </cann-filter>
 
