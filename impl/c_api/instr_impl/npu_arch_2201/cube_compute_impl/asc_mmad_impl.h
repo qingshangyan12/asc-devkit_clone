@@ -21,197 +21,197 @@
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                     bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-            c_matrix_source, c_matrix_init_val);
+            enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ bfloat16_t* a,
                                           __cb__ bfloat16_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t unit_flag, bool enable_k_direction_align,
-                                          bool c_matrix_source, bool c_matrix_init_val)
+                                          bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-                  c_matrix_source, c_matrix_init_val);
+                  enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bfloat16_t* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t feat_offset,
                                      uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-                                     bool enable_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-            enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+            enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ bfloat16_t* a,
                                           __cb__ bfloat16_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool enable_weight_offset, bool c_matrix_source,
-                                          bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init,
+                                          bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-                  enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+                  enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ half* a, __cb__ half* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                     bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-            c_matrix_source, c_matrix_init_val);
+            enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ half* a, __cb__ half* b,
                                           uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-                  c_matrix_source, c_matrix_init_val);
+                  enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ half* a, __cb__ half* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t feat_offset,
                                      uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-                                     bool enable_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-            enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+            enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ half* a, __cb__ half* b,
                                           uint16_t m, uint16_t n, uint16_t k,
                                           uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool enable_weight_offset, bool c_matrix_source,
-                                          bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init,
+                                          bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-                  enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+                  enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float* a, __cb__ float* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                     bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-            c_matrix_source, c_matrix_init_val);
+            enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float* a, __cb__ float* b,
                                           uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-                  c_matrix_source, c_matrix_init_val);
+                  enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float* a, __cb__ float* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t feat_offset,
                                      uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-                                     bool enable_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-            enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+            enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float* a, __cb__ float* b,
                                           uint16_t m, uint16_t n, uint16_t k,
                                           uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool enable_weight_offset, bool c_matrix_source,
-                                          bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init,
+                                          bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-                  enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+                  enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                     bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-            c_matrix_source, c_matrix_init_val);
+            enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                           uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-                  c_matrix_source, c_matrix_init_val);
+                  enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_impl(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                      uint16_t m, uint16_t n, uint16_t k, uint8_t feat_offset,
                                      uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-                                     bool enable_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+                                     bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-            enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+            enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_sync_impl(__cc__ int32_t* c, __ca__ int8_t* a, __cb__ int8_t* b,
                                           uint16_t m, uint16_t n, uint16_t k,
                                           uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag,
-                                          bool enable_k_direction_align, bool enable_weight_offset, bool c_matrix_source,
-                                          bool c_matrix_init_val)
+                                          bool enable_k_direction_align, bool enable_weight_offset, bool enable_cube_init,
+                                          bool enable_cube_zero_init)
 {
     asc_mmad_impl(c, a, b, m, n, k, feat_offset, smask_offset, unit_flag,
-                  enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+                  enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_s4_impl(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ int4b_t* b,
                                         uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
-                                        bool enable_k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+                                        bool enable_k_direction_align, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, m, n, k, unit_flag,
-               enable_k_direction_align, c_matrix_source, c_matrix_init_val);
+               enable_k_direction_align, enable_cube_init, enable_cube_zero_init);
     }
 }
 
 __aicore__ inline void asc_mmad_s4_sync_impl(__cc__ int32_t* c, __ca__ int4b_t* a,
                                              __cb__ int4b_t* b, uint16_t m, uint16_t n,
                                              uint16_t k, uint8_t unit_flag, bool enable_k_direction_align,
-                                             bool c_matrix_source, bool c_matrix_init_val)
+                                             bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_s4_impl(c, a, b, m, n, k, unit_flag, enable_k_direction_align,
-                     c_matrix_source, c_matrix_init_val);
+                     enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
 __aicore__ inline void asc_mmad_s4_impl(__cc__ int32_t* c, __ca__ int4b_t* a, __cb__ int4b_t* b,
                                         uint16_t m, uint16_t n, uint16_t k, uint8_t feat_offset,
                                         uint8_t smask_offset, uint8_t unit_flag, bool enable_k_direction_align,
-                                        bool enable_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+                                        bool enable_weight_offset, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
         mad_s4(c, (__ca__ void*)a, (__cb__ void*)b, m, n, k, feat_offset,
-               smask_offset, unit_flag, enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+               smask_offset, unit_flag, enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     }
 }
 
@@ -219,10 +219,10 @@ __aicore__ inline void asc_mmad_s4_sync_impl(__cc__ int32_t* c, __ca__ int4b_t* 
                                              __cb__ int4b_t* b, uint16_t m, uint16_t n,
                                              uint16_t k, uint8_t feat_offset, uint8_t smask_offset,
                                              uint8_t unit_flag, bool enable_k_direction_align, bool enable_weight_offset,
-                                             bool c_matrix_source, bool c_matrix_init_val)
+                                             bool enable_cube_init, bool enable_cube_zero_init)
 {
     asc_mmad_s4_impl(c, a, b, m, n, k, feat_offset, smask_offset,
-                     unit_flag, enable_k_direction_align, enable_weight_offset, c_matrix_source, c_matrix_init_val);
+                     unit_flag, enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
     asc_sync_post_process();
 }
 
