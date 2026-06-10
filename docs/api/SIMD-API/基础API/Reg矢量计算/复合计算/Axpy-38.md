@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为 "basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_ternary\_scalar\_intf.h"。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_ternary_scalar_intf.h"`。
 
 该接口根据mask对dstReg、srcReg和标量scalarValue按元素执行乘加操作，将结果写入dstReg。计算公式如下：
 
@@ -92,12 +92,12 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 
 **表 3**  数据类型组合
 
-| srcReg | scalarValue | dstReg |
-| :----- | :---------- | :----- |
-| half | half | half |
-| float | float | float |
-| uint64_t | uint64_t | uint64_t |
-| int64_t | int64_t | int64_t |
+| srcReg   | scalarValue | dstReg   |
+| :------- | :---------- | :------- |
+| half     | half        | half     |
+| float    | float       | float    |
+| int64_t  | int64_t     | int64_t  |
+| uint64_t | uint64_t    | uint64_t |
 
 **int64_t、uint64_t为软仿数据类型。**
 

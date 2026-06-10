@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_binary\_intf.h"（对RegTensor操作）、"basic\_api/reg\_compute/kernel\_reg\_compute\_maskreg\_intf.h"（对MaskReg操作）。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`（对RegTensor操作）、`"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"`（对MaskReg操作）。
 
 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作：
 
@@ -86,7 +86,7 @@
   |-------|------|
   | T | 操作数数据类型。 |
   | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-  | U | srcReg0、srcReg1、dstReg RegTensor类型， 例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
+  | U | srcReg0、srcReg1、dstReg的RegTensor类型， 例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
 
   **表2**  参数说明
 
@@ -103,10 +103,10 @@
 
   | 参数名 | 描述 |
   |-------|------|
-  | dst | 目的操作数。 |
-  | src0 | 源操作数。 |
-  | src1 | 源操作数。 |
-  | mask | 指示在计算过程中哪些bit有效。 |
+  | dst | 目的操作数。类型为MaskReg。 |
+  | src0 | 源操作数。类型为MaskReg。 |
+  | src1 | 源操作数。类型为MaskReg。 |
+  | mask | 指示在计算过程中哪些bit有效。类型为MaskReg。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -122,43 +122,43 @@
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
--   对RegTensor操作
+- 对RegTensor操作
 
-    ```
-    template <typename T>
-    __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg0;
-        AscendC::Reg::RegTensor<T> srcReg1;
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-            AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);       
-            AscendC::Reg::Xor(dstReg, srcReg0, srcReg1, mask);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-        }
-    }
-    ```
+  ```cpp
+  template <typename T>
+  __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  {
+      AscendC::Reg::RegTensor<T> srcReg0;
+      AscendC::Reg::RegTensor<T> srcReg1;
+      AscendC::Reg::RegTensor<T> dstReg;
+      AscendC::Reg::MaskReg mask;
+      for (uint16_t i = 0; i < repeatTimes; i++) {
+          mask = AscendC::Reg::UpdateMask<T>(count);
+          AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+          AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);       
+          AscendC::Reg::Xor(dstReg, srcReg0, srcReg1, mask);
+          AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+      }
+  }
+  ```
 
--   对MaskReg操作
+- 对MaskReg操作
 
-    ```
-    template <typename T>
-    __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg;
-        AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-        AscendC::Reg::MaskReg src1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-        AscendC::Reg::MaskReg dst;
-        AscendC::Reg::MaskReg mask;
-        for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-            AscendC::Reg::Xor(dst, src0, src1, mask);
-            AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-        }
-    }
-    ```
+  ```cpp
+  template <typename T>
+  __simd_vf__ inline void XorVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  {
+      AscendC::Reg::RegTensor<T> srcReg;
+      AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+      AscendC::Reg::MaskReg src1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+      AscendC::Reg::MaskReg dst;
+      AscendC::Reg::MaskReg mask;
+      for (uint16_t i = 0; i < (uint16_t)repeatTimes; ++i) {
+          mask = AscendC::Reg::UpdateMask<T>(count);
+          AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+          AscendC::Reg::Xor(dst, src0, src1, mask);
+          AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
+          AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+      }
+  }
+  ```
