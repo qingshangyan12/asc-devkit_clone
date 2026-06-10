@@ -56,6 +56,8 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 
 namespace __asc_simd_vf {
 template <class... Args>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
