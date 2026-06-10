@@ -52,15 +52,31 @@ __aicore__ inline void asc_dump(__cbuf__ T* input, uint32_t desc, uint32_t dump_
 
 namespace __asc_simd_vf {
 template <typename T, typename U>
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __attribute__((unavailable("SIMD VF dump functions are forbidden when compile option "    \
+        "--cce-disable-asc-reserved-ubuf is enabled")))
+#endif
 __simd_callee__ inline void asc_dump_reg(U& input, uint32_t desc, uint32_t dump_size);
 
 template <typename T>
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __attribute__((unavailable("SIMD VF dump functions are forbidden when compile option "    \
+        "--cce-disable-asc-reserved-ubuf is enabled")))
+#endif
 __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 
 template <typename T, typename U>
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __attribute__((unavailable("SIMD VF dump functions are forbidden when compile option "    \
+        "--cce-disable-asc-reserved-ubuf is enabled")))
+#endif
 __simd_callee__ inline void asc_dump(U& input, uint32_t desc, uint32_t dump_size);
 
 template <typename T>
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __attribute__((unavailable("SIMD VF dump functions are forbidden when compile option "    \
+        "--cce-disable-asc-reserved-ubuf is enabled")))
+#endif
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size);
 }
 

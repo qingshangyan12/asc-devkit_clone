@@ -56,6 +56,10 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 
 namespace __asc_simd_vf {
 template <class... Args>
+#if defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __attribute__((unavailable("SIMD VF dump functions are forbidden when compile option "    \
+        "--cce-disable-asc-reserved-ubuf is enabled")))
+#endif
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
