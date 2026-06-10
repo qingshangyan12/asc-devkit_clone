@@ -45,10 +45,12 @@ namespace AscendC {
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Axpy is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const U& scalarValue,
     uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
@@ -66,7 +68,9 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst, const LocalTensor<U>& src
 } // namespace AscendC
 #pragma end_pipe
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_ternary_scalar_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TERNARY_SCALAR_INTF_H__)

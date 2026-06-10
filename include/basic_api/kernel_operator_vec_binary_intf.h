@@ -54,11 +54,13 @@ namespace AscendC {
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Add is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Add is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -94,11 +96,13 @@ __aicore__ inline void Add(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Sub is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Sub is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -134,11 +138,13 @@ __aicore__ inline void Sub(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Mul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Mul is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -175,11 +181,13 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
+__ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
+__ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -233,11 +241,13 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "MulAddDst is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                  const LocalTensor<U>& src1, const uint64_t mask[], const uint8_t repeatTime,
                                  const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "MulAddDst is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                  const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime,
                                  const BinaryRepeatParams& repeatParams);
@@ -273,11 +283,13 @@ __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Max is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Max is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -313,11 +325,13 @@ __aicore__ inline void Max(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Min is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Min is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -353,11 +367,13 @@ __aicore__ inline void Min(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "And is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "And is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                            const BinaryRepeatParams& repeatParams);
@@ -393,11 +409,13 @@ __aicore__ inline void And(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Or is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                           const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "Or is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                           const BinaryRepeatParams& repeatParams);
@@ -414,7 +432,6 @@ template <typename T>
 __aicore__ inline void Or(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                           const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * ShiftLeft                                             *
  * ************************************************************************************************* */
@@ -444,7 +461,6 @@ __aicore__ inline void ShiftLeft(const LocalTensor<T>& dst, const LocalTensor<T>
 template <typename T, typename U>
 __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
     const LocalTensor<U>& src1, const int32_t& count);
-#endif
 
 /* **************************************************************************************************
  * AddRelu                                             *
@@ -465,11 +481,13 @@ __aicore__ inline void ShiftRight(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "AddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "AddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                const BinaryRepeatParams& repeatParams);
@@ -505,21 +523,29 @@ __aicore__ inline void AddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, 3510,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0,
                                   const LocalTensor<int32_t>& src1, uint64_t mask[], const uint8_t repeatTime,
                                   const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, 3510,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                   const LocalTensor<U>& src1, uint64_t mask[], const uint8_t repeatTime,
                                   const BinaryRepeatParams& repeatParams);
 
 template <bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, 3510,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0,
                                   const LocalTensor<int32_t>& src1, uint64_t mask, const uint8_t repeatTime,
                                   const BinaryRepeatParams& repeatParams);
 
 template <typename T, typename U, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(2201, 3510,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                   const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime,
                                   const BinaryRepeatParams& repeatParams);
@@ -531,10 +557,14 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
+__ASC_USE_RESERVED_UBUF__(2201,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<half>& dst, const LocalTensor<int32_t>& src0,
                                   const LocalTensor<int32_t>& src1, const int32_t& count);
 
 template <typename T, typename U>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "AddDeqRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U>& src0,
                                   const LocalTensor<U>& src1, const int32_t& count);
 
@@ -557,11 +587,15 @@ __aicore__ inline void AddDeqRelu(const LocalTensor<T>& dst, const LocalTensor<U
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                    const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                    const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAdd is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                    const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                    const BinaryRepeatParams& repeatParams);
@@ -597,23 +631,31 @@ __aicore__ inline void FusedMulAdd(const LocalTensor<T>& dst, const LocalTensor<
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "MulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void MulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
 
 // FusedMulAddRelu has been updated, please use MulAddRelu instead.
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "FusedMulAddRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                        const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                        const BinaryRepeatParams& repeatParams);
@@ -654,11 +696,13 @@ __aicore__ inline void FusedMulAddRelu(const LocalTensor<T>& dst, const LocalTen
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "SubRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime,
                                const BinaryRepeatParams& repeatParams);
 
 template <typename T, bool isSetMask = true>
+__ASC_USE_RESERVED_UBUF__(3510, "SubRelu is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime,
                                const BinaryRepeatParams& repeatParams);
@@ -667,7 +711,6 @@ template <typename T>
 __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                                const LocalTensor<T>& src1, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 /* **************************************************************************************************
  * Prelu                                             *
  * ************************************************************************************************* */
@@ -740,10 +783,11 @@ template <typename T, typename U>
 __aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count);
 
-#endif
 }  // namespace AscendC
 #pragma end_pipe
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
+#endif
 #endif  // ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_BINARY_INTF_H__)

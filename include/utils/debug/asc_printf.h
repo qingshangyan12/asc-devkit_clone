@@ -23,6 +23,7 @@
 
 #include "impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
+#include "kernel_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 
@@ -42,7 +43,7 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
 namespace __asc_aicore {
@@ -56,6 +57,8 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 
 namespace __asc_simd_vf {
 template <class... Args>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);

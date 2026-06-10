@@ -4,14 +4,15 @@
 
 本样例以简单自定义算子为基础，展示了其编译、打包成自定义算子包，并部署到CANN环境中的流程。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-本样例支持如下产品型号：
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-- Atlas 200I/500 A2 推理产品
-- Atlas 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Atlas 200I/500 A2 推理产品 | >= CANN 9.0.0 |
+| Atlas 推理系列产品 | >= CANN 9.0.0 |
 
 > 注意: 本样例中涉及多个算子示例，请以各个算子示例实际支持的产品型号为准。
 
@@ -63,26 +64,38 @@ $$
 
 ## 样例规格描述
 
-- Add
+- AddCustom
   <table border="2" align="center">
-  <caption>表1：Add样例规格描述</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
+  <caption>表1：AddCustom样例规格描述</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
+  </table>
+
+- AddCustomTilingSink
+
+  <table border="2" align="center">
+  <caption>表2：AddCustomTilingSink样例规格描述</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustomTilingSink</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom, add_custom_tiling_sink</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_tiling_sink</td></tr>
   </table>
 
 - AddCustomTemplate
 
   <table border="2" align="center">
-  <caption>表2：AddCustomTemplate样例规格描述</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Add</td></tr>
+  <caption>表3：AddCustomTemplate样例规格描述</caption>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustomTemplate</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float16/float</td><td align="center">ND</td></tr>
+  <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float16/float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float16/float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom_template</td></tr>
   <tr><td rowspan="6" align="center">模板参数</td><td colspan="4" align="center">template&lt;typename D_T_X, typename D_T_Y, typename D_T_Z, int TILE_NUM, int IS_SPLIT&gt;</td>
       <tr><td>D_T_X</td><td colspan="1">typename</td><td colspan="2">数据类型(half，float)</td></tr>
@@ -96,7 +109,7 @@ $$
 - LeakyRelu
 
   <table border="2" align="center">
-  <caption>表3：LeakyRelu样例规格描述</caption>
+  <caption>表4：LeakyRelu样例规格描述</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">LeakyRelu</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 200, 1024]</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -130,7 +143,7 @@ $$
 
 - LeakyRelu</br>
   - kernel实现：</br>
-    基于高阶API接口`LeakyRelu`实现。</br>
+    基于基础API接口组合实现，使用`Maxs`、`Mins`、`Muls`、`Add`完成LeakyRelu计算。</br>
 
   - tiling实现：</br>
     TilingData参数设计，`LeakyReluCustomTilingData`参数本质上是和并行数据切分相关的参数，本示例样例使用了3个tiling参数：`totalLength`、`tileNum`、`negativeSlope`。`totalLength`、`tileNum`与Add样例类似，`negativeSlope`表示LeakyRelu的负半轴斜率系数，作为计算参数传递给kernel侧。</br>
@@ -142,24 +155,12 @@ $$
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 编译、打包样例并部署
 

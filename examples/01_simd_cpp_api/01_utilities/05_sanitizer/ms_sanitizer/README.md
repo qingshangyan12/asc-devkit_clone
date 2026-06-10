@@ -1,24 +1,26 @@
-# msSanitizer样例说明
+# ms_sanitizer样例说明
 
 ## 概述
 
-msSanitizer用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过`mssanitizer`运行样例并定位异常。
+msSanitizer是基于昇腾AI处理器的异常检测工具，用于检测Ascend C样例运行过程中的内存访问、内存泄漏、未使用内存、竞争和未初始化访问等异常。本样例以Add计算为载体，展示如何通过msSanitizer工具运行样例并定位异常。
 
-本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`mssanitizer.asc`，重新编译后通过`mssanitizer`体验对应异常检测能力。
+本样例代码为正确实现。用户可以按照“异常场景检测”章节中的说明修改`ms_sanitizer.asc`，重新编译后通过msSanitizer工具体验对应的异常检测能力。
 
 请参考[算子开发工具](https://www.hiascend.com/document/redirect/CannCommercialToolOpDev)中的“环境准备”章节，获取详细的安装指南和步骤。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
 ```
-├── msSanitizer
+├── ms_sanitizer
 │   ├── CMakeLists.txt       // 编译工程文件
-│   ├── mssanitizer.asc      // Ascend C样例实现和Host侧调用样例
+│   ├── ms_sanitizer.asc     // Ascend C样例实现和Host侧调用样例
 │   └── README.md            // 样例说明
 ```
 
@@ -34,7 +36,7 @@ z = x + y
 
 ## 异常场景检测
 
-复现异常场景时，需要先按对应说明修改`mssanitizer.asc`中的代码，再在`build`目录下重新编译并运行对应检测命令。如果只修改源码但没有重新编译，`mssanitizer`仍会运行旧的`demo`，不会检测到新改入的错误。
+复现异常场景时，需要先按对应说明修改`ms_sanitizer.asc`中的代码，再在`build`目录下重新编译并运行对应检测命令。如果只修改源码但没有重新编译，`mssanitizer`仍会运行旧的`demo`，不会检测到新改入的错误。
 
 - **内存检测**
 
@@ -154,24 +156,16 @@ z = x + y
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j

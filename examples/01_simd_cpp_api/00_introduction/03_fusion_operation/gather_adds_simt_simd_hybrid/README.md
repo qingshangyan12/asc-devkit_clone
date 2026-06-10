@@ -4,11 +4,11 @@
 本样例基于SIMT和SIMD混合编程模式实现gather和adds计算，以SIMT编程方式实现离散内存访问操作gather，以SIMD编程方式实现连续内存访问操作adds。
 
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-- \>= CANN 9.0.0-beta.2
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0-beta.2 |
 
 ## 目录结构介绍
 
@@ -57,17 +57,17 @@
   ```
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   ...
-  uint32_t gatherIdx = index[idx];
+  uint32_t gather_idx = index[idx];
   ...
-  gatherOutput[threadIdx.x] = input[gatherIdx];
+  gather_output[threadIdx.x] = input[gather_idx];
   ```
 
   （2）simd_adds将UB（Unified Buffer）中数据做加1操作。调用Reg::LoadAlign将数据从UB（Unified Buffer）搬运到寄存器上，调用Reg::Adds完成加1运算并输出到目标寄存器，最后调用Reg::StoreAlign将数据从寄存器搬运到UB。重复上述操作即可完成1024个数据元素的加1运算。
   ```
-  for (uint16_t i = 0; i < repeatTimes; i++) {
-      AscendC::Reg::LoadAlign(srcReg0, input + i * oneRepeatSize);
-      AscendC::Reg::Adds(dstReg0, srcReg0, ADDS_ADDEND, maskReg);
-      AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg0, maskReg);
+  for (uint16_t i = 0; i < repeat_times; i++) {
+      AscendC::Reg::LoadAlign(src_reg0, input + i * one_repeat_size);
+      AscendC::Reg::Adds(dst_reg0, src_reg0, adds_addend, mask_reg);
+      AscendC::Reg::StoreAlign(output + i * one_repeat_size, dst_reg0, mask_reg);
   }
   ```
 
@@ -80,24 +80,16 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程（默认npu模式）

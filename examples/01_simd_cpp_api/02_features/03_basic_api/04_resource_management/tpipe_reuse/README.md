@@ -6,11 +6,13 @@
 
 > **注意：** 本样例仅适用于基于TPipe和TQue的编程模式。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -28,7 +30,7 @@
 
 - 样例功能
 
-  本样例以Muls计算为例展示TPipe的重复申请与释放。
+  本样例以两次完整的Muls计算为例，展示TPipe的重复申请与释放。前一次计算的TPipe对象先Destroy，后一次计算的TPipe对象才能Init。
 
 - 样例规格
 
@@ -64,15 +66,9 @@
 
   - Kernel实现
 
-    - 调用TPipe::Init接口初始化TPipe对象，调用TPipe::InitBuffer接口为TQue分配内存空间。
+    - 创建pipe1对象，调用TPipe::Init接口初始化，计算，并调用TPipe::Destroy接口销毁pipe1对象。
 
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）。
-
-    - 调用Muls接口，将输入tensor与值为3的标量相乘。
-
-    - 调用DataCopy基础API，将计算结果从UB（Unified Buffer）搬运至GM（Global Memory）。
-
-    - 调用TPipe::Destroy接口销毁TPipe对象，实现TPipe重复申请与使用。
+    - 创建pipe2对象，调用TPipe::Init接口初始化，计算，并调用TPipe::Destroy接口销毁pipe2对象。
 
   - 调用实现
 
@@ -84,27 +80,16 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
-
-  - 默认路径，非root用户安装CANN软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
   mkdir -p build && cd build;      # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;    # 编译工程，默认npu模式
@@ -125,10 +110,10 @@
 
 - 编译选项说明
 
-  | 参数 | 说明 | 可选值 | 默认值 |
-  |------|------|---------|--------|
-  | CMAKE_ASC_RUN_MODE | 运行模式 | npu, cpu, sim | npu |
-  | CMAKE_ASC_ARCHITECTURES | NPU硬件架构 | dav-2201, dav-3510 | dav-2201 |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果
 

@@ -4,11 +4,13 @@
 
 本样例展示 Global Memory 到 UB、Global Memory 到 L1 的数据搬运实践。样例不包含计算逻辑，重点用于观察 MTE2 搬运行为，以及分块粒度、非对齐数据搬运、L2Cache 复用、同地址访问冲突规避对数据搬运性能的影响，对比 DataCopy/DataCopyPad 在不同搬运模式下的性能表现。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -93,6 +95,19 @@ L2Cache 性能表在 MTE2 耗时之外，还会展示 Cache 命中、缺失和�
 <tr><td><code>Nd2NzParams.dstNzC0Stride</code></td><td><code>AlignUp(tileM, 16)</code></td><td>L1 中 NZ 布局的 C0 方向跨度</td></tr>
 </table>
 
+本样例中，单次 DataCopy 源数据量均按 `tileM * curCols * sizeof(half)` 计算：
+
+<table>
+<tr><th>路径</th><th>场景</th><th>Tile</th><th>单次搬运量</th></tr>
+<tr><td rowspan="3">GM 到 UB</td><td>场景1</td><td><code>[1,64]</code></td><td><code>128B</code></td></tr>
+<tr><td>场景2</td><td><code>[64,64]</code></td><td><code>8192B</code></td></tr>
+<tr><td>场景3</td><td><code>[64,1024]</code></td><td><code>131072B</code></td></tr>
+<tr><td rowspan="2">GM 到 L1</td><td>场景1</td><td><code>[64,64]</code></td><td><code>8192B</code></td></tr>
+<tr><td>场景2</td><td><code>[64,256]</code></td><td><code>32768B</code></td></tr>
+</table>
+
+分块变大后，每次指令实际搬运的数据更多，循环次数和指令发射次数同步减少。
+
 **分核与数据载入模式**：
 
 ```text
@@ -165,6 +180,8 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 
 非对齐时，最后一个 N 方向 tile 的 `curCols` 小于 `TILE_N`。UB 路径中，`DataCopyParams.blockLen` 会从完整的 `TILE_N * sizeof(half)` 变成 `curCols * sizeof(half)`；L1 路径中，`Nd2NzParams.dValue` 会从完整的 `TILE_N` 变成 `curCols`。
 
+本样例非对齐场景中，GM 到 UB 的完整 tile 搬运量为 `64 * 1024 * 2B = 131072B`，尾块为 `64 * 1023 * 2B = 130944B`；GM 到 L1 的完整 tile 搬运量为 `64 * 256 * 2B = 32768B`，尾块为 `64 * 255 * 2B = 32640B`。非对齐场景并不是总数据量明显增加，而是尾块需要额外边界处理，导致搬运效率下降。
+
 **对比方式**：保持分块大小不变，将 `N` 从 `12288` 改为 `12287`，观察非对齐数据处理对端到端耗时和 MTE2 耗时的影响。
 
 **GM 到 UB 性能数据**：
@@ -201,6 +218,12 @@ Ascend 950 系列按 GM 带宽约 1.6TB/s 估算，理论耗时约 188.74μs。�
 分片重复搬运时，先令 `quarterN=N/4`，再对每个 `splitIdx` 调用 `RepeatCopy(splitIdx * quarterN, quarterN, 4)`，即每次只在 N 方向的 1/4 分片内连续重复 4 次。两种写法搬运总数据量相同，但分片后每个分片约为 75.50MB，单次工作集更小，更容易在连续重复访问时保留在 L2Cache 中。
 
 **对比方式**：比较整块矩阵沿相同路径连续搬 4 次，与 N 方向切 4 份后每份连续搬 4 次。后者在每个分片内连续重复访问，更容易观察 L2Cache 复用收益。
+
+场景5 / 6（GM 到 UB）和场景4 / 5（GM 到 L1）均使用 `Tile=[64,1024]`。单次 `DataCopyPad` 或 `DataCopy（Nd2NzParams）` 搬运的源数据量为：
+
+$$64 \times 1024 \times sizeof(half) = 64 \times 1024 \times 2B = 131072B = 0.131072MB$$
+
+整块重复搬运时，每轮工作集为 `301.99MB`，连续 4 次总读入 `1207.96MB`；N 方向切 4 份后，每个分片工作集为 `75.50MB`，总读入数据量仍为 `1207.96MB`，但每个分片更容易被 L2Cache 保留并复用。
 
 **L2Cache 复用模式**：
 
@@ -312,14 +335,26 @@ Atlas A2/A3 系列和 Ascend 950 系列的 profiler 输出字段不同，命中�
 
 **实现方式**：same addr 场景中所有核按相同 `mBlockIdx` 顺序访问输入矩阵；offset addr 场景中每个核按 `(mBlockIdx + blockIdx) % numBlocks` 错开访问顺序。
 
-该优化点不改变单次 DataCopy 的搬运形状，只改变不同核访问 GM 分片的顺序。same addr 模式下，所有核在同一个 `mBlockIdx` 上同步访问相同地址段；offset addr 模式下，`curMBlockIdx` 会按 `blockIdx` 在每组 `numBlocks` 个 M 块内轮转，降低同一时刻多核访问同一 GM 地址段的概率。
+该优化点不改变单次 DataCopy 的搬运形状，只改变不同核访问 GM 分片的顺序。每个核都会完整载入一遍输入矩阵，整体会将同一矩阵重复读取 `numBlocks` 次。same addr 模式下，所有核在同一个 `mBlockIdx` 上同步访问相同地址段；offset addr 模式下，`curMBlockIdx` 会按 `blockIdx` 在每组 `numBlocks` 个 M 块内轮转，降低同一时刻多核访问同一 GM 地址段的概率。
 
 **关键代码**：
 
 ```cpp
-uint32_t blockGroupStart = (mBlockIdx / numBlocks) * numBlocks;
-uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % numBlocks : mBlockIdx;
+constexpr uint32_t fullMBlockCount = m / singleCoreM;
+constexpr uint32_t mTileCount = singleCoreM / tileM;
+
+for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
+    uint32_t blockGroupStart = (mBlockIdx / numBlocks) * numBlocks;
+    uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % numBlocks : mBlockIdx;
+    uint32_t mStart = curMBlockIdx * singleCoreM;
+
+    for (uint32_t mTileIdx = 0; mTileIdx < mTileCount; mTileIdx++) {
+        uint32_t mIdx = mStart + mTileIdx * tileM;
+    }
+}
 ```
+
+本样例中，每次 DataCopy 在 N 方向按 `tileN` 粒度搬运；`offsetAddr=true` 时通过错开各核访问分片的顺序，让不同核在同一时刻访问不同的 GM 地址段。
 
 **对比方式**：所有核完整载入同一输入矩阵，比较相同顺序访问与按核错开访问顺序。错开访问通过调整并行分片访问顺序，降低同一时刻多核访问同地址的冲突概率。
 
@@ -346,7 +381,6 @@ uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % 
 **优化效果分析**：
 - offset addr 通过错开多核访问顺序，降低同一时刻访问同一 GM 地址段的冲突概率。Atlas A2/A3 系列的 UB/L1 场景和 Ascend 950 系列的 L1 场景收益更明显。
 - 从端到端性能看，Atlas A2/A3 系列的 UB 场景提升约 64.0%，Ascend 950 系列的 L1 场景提升约 97.5%；Ascend 950 系列的 UB 场景收益较小。
-- 建议在多核重复读取同一大块 GM 数据、且各核访问顺序高度一致时，可以采用 `blockIdx` 错开分片访问顺序等策略，降低同一时刻集中访问相同地址段造成的带宽竞争。
 
 ### 优化要点总结
 
@@ -363,36 +397,23 @@ uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % 
 
 - 配置环境变量
 
-  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
+  请根据当前环境上 CANN 开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
 
-  - 默认路径，root 用户安装 CANN 软件包
 
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非 root 用户安装 CANN 软件包
-
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径 install_path，安装 CANN 软件包
-
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
 
+  在本样例目录下执行如下命令。
   ```bash
-  SCENARIO_NUM=1
+  SCENARIO_NUM=1 ASC_ARCH=dav-2201
   COPY_DST=UB
-  ASC_ARCH=dav-2201
-  mkdir -p build
-  cd build
-  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..
-  make -j
+  mkdir -p build && cd build
+  cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCOPY_DST=$COPY_DST -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..;make -j; 
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM -copyDst $COPY_DST -arch $ASC_ARCH
   ./demo
   ```
@@ -424,7 +445,6 @@ uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % 
   ```bash
   msprof ./demo
   msprof --ai-core=on --aic-metrics=L2Cache ./demo    # L2Cache 相关场景使用
-  msprof op simulator ./demo                          # 仿真模式使用
   ```
 
   采集后会在当前目录生成 `PROF_` 前缀目录，性能汇总文件位于 `mindstudio_profiler_output` 目录下。
