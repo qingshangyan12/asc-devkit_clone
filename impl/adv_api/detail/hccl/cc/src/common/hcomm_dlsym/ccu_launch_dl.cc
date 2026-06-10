@@ -9,6 +9,7 @@
  */
 
 #include "ccu_launch_dl.h"
+#include "log.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
