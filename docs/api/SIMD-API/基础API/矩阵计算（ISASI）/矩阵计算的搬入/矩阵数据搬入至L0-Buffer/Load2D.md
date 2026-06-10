@@ -21,34 +21,49 @@
 负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512字节的数据分形为单位进行搬运，支持如下数据通路的搬运：
 
 <cann-filter npu_type="A3,910b,310b,910,310p,x90,9030">
+
 针对如下产品型号：
 
 <cann-filter npu_type="A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310b">
+
 Atlas 200I/500 A2 推理产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="910">
+
 Atlas 训练系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="x90">
+
 Kirin X90；
+
 </cann-filter>
 
 <cann-filter npu_type="9030">
+
 Kirin 9030；
+
 </cann-filter>
 
 支持GM->L0A Buffer、GM->L0B Buffer、L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
@@ -73,34 +88,49 @@ Kirin 9030；
 ## 函数原型
 
 <cann-filter npu_type="A3,910b,310b,910,310p,x90,9030">
+
 针对如下产品型号：
 
 <cann-filter npu_type="A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310b">
+
 Atlas 200I/500 A2 推理产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="910">
+
 Atlas 训练系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="x90">
+
 Kirin X90；
+
 </cann-filter>
 
 <cann-filter npu_type="9030">
+
 Kirin 9030；
+
 </cann-filter>
 
 ```cpp

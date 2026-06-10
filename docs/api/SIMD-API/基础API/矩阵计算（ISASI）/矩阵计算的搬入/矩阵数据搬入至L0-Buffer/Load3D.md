@@ -33,14 +33,19 @@ Load3D仅支持如下数据通路：L1 Buffer->L0A Buffer; L1 Buffer->L0B Buffer
 ## 函数原型<a id="zh-cn_topic_0000002512171652_section82039854412"></a>
 
 <cann-filter npu_type="910,310p">
+
 针对如下产品型号：
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="910">
+
 Atlas 训练系列产品；
+
 </cann-filter>
 
 **Load3Dv1接口：**
@@ -53,30 +58,43 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </cann-filter>
 
 <cann-filter npu_type="950,A3,910b,310b,310p,x90">
+
 针对如下产品型号：
 
 <cann-filter npu_type="950">
+
 Ascend 950PR/Ascend 950DT；
+
 </cann-filter>
 
 <cann-filter npu_type="A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310b">
+
 Atlas 200I/500 A2 推理产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="x90">
+
 Kirin X90；
+
 </cann-filter>
 
 **Load3Dv2接口：**
@@ -120,14 +138,19 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 |loadDataParams|输入| LoadData参数结构体，类型为：<cann-filter npu_type="910,310p"><br>&bull; LoadData3DParamsV1，具体参考[表3](#zh-cn_topic_0000002512171652_table679014222918)。</cann-filter><cann-filter npu_type="950,A3,910b,310b,310p,x90"><br>&bull; LoadData3DParamsV2，具体参考[表4](#zh-cn_topic_0000002512171652_table193501032193419)。</cann-filter><cann-filter npu_type="950"><br>&bull; LoadData3DParamsV2Pro，具体参考[表5](#zh-cn_topic_0000002512171652_table118027314415)。</cann-filter><br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 <cann-filter npu_type="910,310p">
+
 针对如下产品型号，LoadData3DParamsV1结构体内参数说明见下表：
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="910">
+
 Atlas 训练系列产品；
+
 </cann-filter>
 
 **表 3**  LoadData3DParamsV1结构体内参数说明<a id="zh-cn_topic_0000002512171652_table679014222918"></a>
@@ -157,30 +180,43 @@ Atlas 训练系列产品；
 </cann-filter>
 
 <cann-filter npu_type="950,A3,910b,310b,310p,x90">
+
 针对如下产品型号，LoadData3DParamsV2结构体内参数说明见下表：
 
 <cann-filter npu_type="950">
+
 Ascend 950PR/Ascend 950DT；
+
 </cann-filter>
 
 <cann-filter npu_type="A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310b">
+
 Atlas 200I/500 A2 推理产品；
+
 </cann-filter>
 
 <cann-filter npu_type="310p">
+
 Atlas 推理系列产品 AI Core；
+
 </cann-filter>
 
 <cann-filter npu_type="x90">
+
 Kirin X90；
+
 </cann-filter>
 
 **表 4**  LoadData3DParamsV2结构体内参数说明<a id="zh-cn_topic_0000002512171652_table193501032193419"></a>
@@ -320,11 +356,15 @@ Kirin X90；
 - 针对如下产品型号：
 
     <cann-filter npu_type = "A3">
+
     Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
     </cann-filter>
     
     <cann-filter npu_type = "910b">
+
     Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
     </cann-filter>
 
     L1 Buffer-\>L0B Buffer通路不支持b4/b8类型数据；转置场景下，L1 Buffer-\>L0A Buffer通路不支持b8数据类型。
@@ -355,14 +395,19 @@ Kirin X90；
 首先L1 Buffer->L0B Buffer通路不支持非转置场景；而对于L1 Buffer->L0A Buffer通路，根据不同的产品形态有不同的分形排布转换：
 
 <cann-filter npu_type="A3,910b">
+
 针对如下产品型号：
 
 <cann-filter npu_type = "A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type = "910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 Load3D会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成L0A Buffer中所需的ZZ分形排布，如下b16类型场景的示意图所示：
@@ -374,14 +419,19 @@ Load3D会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成
 **转置场景：**
 
 <cann-filter npu_type="A3,910b">
+
 针对如下产品型号：
 
 <cann-filter npu_type = "A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type = "910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 Load3D仅在b16/b32数据类型下支持转置（enTranspose=True），按照类型详细说明：
@@ -413,14 +463,19 @@ L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要�
 Load3D可以通过配置mExtension和kExtension来完成多个方向的数据块搬运，我们把这里的多块数据的搬运看成一次迭代，Load3D支持通过配置repeat mode，能实现在M方向(height)或者K方向(width)进行repeat搬运，也就是说，调用一次Load3D接口可以完成多次迭代的数据搬运，如下图所示，其中repeatStride和repeatTime还有沿哪个方向repeat，我们通过SetLoadDataRepeat配置。
 
 <cann-filter npu_type="A3,910b">
+
 针对如下产品型号：
 
 <cann-filter npu_type = "A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type = "910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 M方向repeat示意图：
