@@ -28,9 +28,15 @@ ND到NZ的格式转换等价于DN到ZN的格式转换，如[图1](#zh-cn_topic_0
 
 ## 函数原型<a id="zh-cn_topic_0000002566538879_section82039854412"></a>
 
-<cann-filter npu_type="A3,910b,310p,x90,9030">
+<cann-filter npu_type="950,A3,910b,310p,x90,9030">
 
 针对如下产品型号：
+
+<cann-filter npu_type="950">
+
+Ascend 950PR/Ascend 950DT：
+
+</cann-filter>
 
 <cann-filter npu_type="A3">
 
