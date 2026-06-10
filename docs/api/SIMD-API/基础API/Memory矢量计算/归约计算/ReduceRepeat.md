@@ -26,7 +26,6 @@
 
 ![](../../../../figures/ReduceRepeat.png "ReduceRepeat计算示意图")
 
-完整示例请参考：[ReduceRepeat样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/whole_reduce_min_max_sum)。
 
 ## 函数原型
 
