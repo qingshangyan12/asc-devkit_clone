@@ -97,26 +97,26 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 
 - SetFlag和WaitFlag必须成对使用，且SetFlag和WaitFlag的参数必须完全一致（包括模板参数event和输入参数eventID）。如果不匹配，会引发timeout问题。例如，`SetFlag<HardEvent::S_MTE3>(1)`和`WaitFlag<HardEvent::MTE3_MTE1>(1)`并不匹配，因为其模板参数event不同。
 
-- 在**使用TPipe和TQue编程方式**时，eventID需要通过**AllocEventID**或者**FetchEventID**来获取。
+- 在**使用TPipe和TQue编程方式**时，eventID需要通过[AllocEventID](../../资源管理/Pipe和Que框架/TPipe/AllocEventID.md)或者[FetchEventID](../../资源管理/Pipe和Que框架/TPipe/FetchEventID.md)来获取。
 
 - 在使用**静态Tensor编程方式**时，事件的类型和事件ID由开发者自行管理，建议使用事件ID0-5，事件ID6用于系统内部规划（当前未使用），事件ID7用于TPipe编程中的**自动同步**功能，目前暂不建议直接使用事件ID6-7。
 
 - eventID的取值范围如下：
 <cann-filter npu-type="950">
 
-    - Ascend 950PR/Ascend 950DT，数据范围为：0-7
+    - Ascend 950PR/Ascend 950DT，数据范围为：0-7。
 </cann-filter>
 <cann-filter npu-type="A3">
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7
+    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7。
 </cann-filter>
 <cann-filter npu-type="910b">
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7
+    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7。
 </cann-filter>
 <cann-filter npu-type="310p">
-    - Atlas 推理系列产品AI Core，数据范围为：0-7
+    - Atlas 推理系列产品AI Core，数据范围为：0-7。
 </cann-filter>
 <cann-filter npu-type="910">
-    - Atlas 训练系列产品，数据范围为：0-3
+    - Atlas 训练系列产品，数据范围为：0-3。
 </cann-filter>
 
 ## 调用示例<a name="section837496171220"></a>
