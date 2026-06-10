@@ -293,6 +293,13 @@ public:
         kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
         kernelArg = static_cast<void*>(arg.get());
     }
+
+    // kernelArg 仅以裸指针注册给 CCU 框架，框架不持有其所有权。注册容器
+    // （AlgResourceRequest）析构后对象即被释放，而 kernel 在 Orchestrate
+    // 阶段才执行 —— 调用方需取出该 shared_ptr 延长生命周期，避免悬垂访问。
+    std::shared_ptr<CcuKernelArgBase> getKernelArgSmartPtr() const {
+        return kernelArgSmartPtr;
+    }
 };
 
 // 算法taskArg入参最大个数，用于快速下发缓存

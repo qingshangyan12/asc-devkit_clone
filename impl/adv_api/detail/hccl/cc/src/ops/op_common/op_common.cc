@@ -84,6 +84,13 @@ struct HcclDfxOpInfo {
 namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
+
+// CCU kernelArg 仅以裸指针注册给框架，框架不持有所有权；而注册容器
+// AlgResourceRequest 是 HcclGetAlgRes 的栈局部变量，返回即析构、arg 对象随之
+// 释放，但 kernel 在其后的 Orchestrate 阶段才执行 —— 会解引用悬垂指针导致
+// coredump。此处按 algTag 长期持有这些 shared_ptr，使 arg 活过 kernel 执行期，
+// 并与 g_hostCtx 的资源复用粒度保持一致（同 algTag 再次进入时覆盖刷新）。
+thread_local std::map<std::string, std::vector<std::shared_ptr<CcuKernelArgBase>>> g_ccuKernelArgHold;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
 
 static uint64_t GetTokenFromBuffInfo(void* bufferAddr, uint64_t bufferSize)
@@ -1244,6 +1251,17 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     u32 currentResGroup = 0;
     u32 maxResGroup = 0;
     resCtxHost->ccuKernels.resize(totalKernelNum);
+
+    // 以 comm 为粒度长期持有本次注册的 kernelArg，延长其生命周期至 kernel 执行期。
+    // 同一 comm 再次进入注册时覆盖刷新，避免历史 arg 无限堆积。
+    std::vector<std::shared_ptr<CcuKernelArgBase>> &argHold =
+        g_ccuKernelArgHold[std::to_string(reinterpret_cast<uintptr_t>(comm))];
+    argHold.clear();
+    for (CcuKernelInfo &kernelInfo : resRequest.ccuKernelInfos) {
+        if (auto sp = kernelInfo.getKernelArgSmartPtr()) {
+            argHold.push_back(sp);
+        }
+    }
 
     while (currentResGroup <= maxResGroup) {
         HCCL_INFO("[HcclWrapper-DEBUG] Calling HcommCcuKernelRegisterStart...");

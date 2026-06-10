@@ -40,12 +40,19 @@ const uint32_t DIE1_ID = 1;
 constexpr const char* DIE1_START_SIG = "Die1StartSig";
 constexpr const char* DIE1_END_SIG = "Die1EndSig";
 
+// AlltoAllMesh1DFunc 的 lambda body 在 host 录制期执行（emit 指令），其中对
+// arg 的访问（resize/GetResByChannel/channels[...]）都是 host C++ 操作，必须在
+// 录制期就拿到有效的 host 指针。ccu::Variable 承载的是运行期值（device 回放时
+// 才写入），录制期只有符号 ID，无法用来传递 host 指针——故改用 host 侧旁路。
+static CcuKernelArg g_alltoAllMesh1DArg = nullptr;
+
 ccu::Func AlltoAllMesh1DFunc([](ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                 ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                 ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                 ccu::Variable goSize3, ccu::Variable goSize4, ccu::Variable argHandle) {
     HCCL_INFO("[CcuKernelKfcServer] start ccuFunc AlltoAllMesh1DFunc!");
-    CcuKernelArg arg = reinterpret_cast<CcuKernelArg>(argHandle.handle);
+    (void)argHandle;  // 不再用 Variable 传指针，保留形参仅为对齐 CallFunc 参数个数
+    CcuKernelArg arg = g_alltoAllMesh1DArg;
     CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
                            sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
 });
@@ -265,6 +272,8 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
+            // 录制期把有效的 host arg 指针交给 AlltoAllMesh1DFunc（不经 Variable）
+            g_alltoAllMesh1DArg = arg;
             ccu::Variable argHandle;
             argHandle = reinterpret_cast<uint64_t>(arg);
             ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
@@ -313,6 +322,8 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         // 读取本轮参数
         LoadFuncParamFromMemory(paramAddr, param, ctx);
 
+        // 录制期把有效的 host arg 指针交给 AlltoAllMesh1DFunc（不经 Variable）
+        g_alltoAllMesh1DArg = arg;
         ccu::Variable argHandle;
         argHandle = reinterpret_cast<uint64_t>(arg);
         ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
