@@ -364,17 +364,8 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     ThreadHandle threadHandle = resourceCtx.threads[0];
     CHK_PRT_RET(threadHandle == 0, HCCL_ERROR("invalid threadHandle"), CCU_E_PARA);
 
-    // 根据 isKfc 标志选择 kernel：isKfc=true 时使用 CcuKfcServerKernel，否则使用原始 kernel
-    bool useKfc = opRes->isKfc[0];
-    CcuKernelHandle kernelHandle;
-    if (useKfc) {
-        CHK_PRT_RET(resourceCtx.ccuKernels.size() < 2,
-            HCCL_ERROR("isKfc=true but ccuKernels.size()[%zu] < 2, need CcuKfcServerKernel",
-                resourceCtx.ccuKernels.size()), CCU_E_PARA);
-        kernelHandle = resourceCtx.ccuKernels[1];
-    } else {
-        kernelHandle = resourceCtx.ccuKernels[0];
-    }
+    // HcclGetCcuKernel 已根据 isKfc 过滤，isKfc=true 时 ccuKernels[0] 即为 CcuKfcServerKernel
+    CcuKernelHandle kernelHandle = resourceCtx.ccuKernels[0];
     CHK_PRT_RET(kernelHandle == 0, HCCL_ERROR("invalid kernelHandle"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);

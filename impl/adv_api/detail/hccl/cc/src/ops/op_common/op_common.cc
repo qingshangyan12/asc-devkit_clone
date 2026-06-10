@@ -1252,10 +1252,35 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
         HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
         HCCL_E_INTERNAL);
 
+    // 若 ccuKernelInfos 中存在 CcuKernelKfcServer，则过滤掉其他 kernel，只注册 KfcServer
+    bool hasKfcServer = false;
+    for (auto& kernelInfo : resRequest.ccuKernelInfos) {
+        if (std::string(kernelInfo.kernelFuncName) == "CcuKernelKfcServer") {
+            hasKfcServer = true;
+            break;
+        }
+    }
+    std::vector<CcuKernelInfo> kernelsToRegister;
+    if (hasKfcServer) {
+        for (auto& kernelInfo : resRequest.ccuKernelInfos) {
+            if (std::string(kernelInfo.kernelFuncName) == "CcuKernelKfcServer") {
+                kernelsToRegister.push_back(kernelInfo);
+            } else {
+                HCCL_INFO("[HcclGetCcuKernel] KfcServer present, skipping kernel[%s]", kernelInfo.kernelFuncName);
+            }
+        }
+    } else {
+        kernelsToRegister = resRequest.ccuKernelInfos;
+    }
+
+    u32 registerNum = static_cast<u32>(kernelsToRegister.size());
+    CHK_PRT_RET(registerNum == 0,
+        HCCL_ERROR("[HcclGetCcuKernel] no kernel to register!"), HCCL_E_INTERNAL);
+
     // 按照resgroup进行注册
     u32 currentResGroup = 0;
     u32 maxResGroup = 0;
-    resCtxHost->ccuKernels.resize(totalKernelNum);
+    resCtxHost->ccuKernels.resize(registerNum);
 
     while (currentResGroup <= maxResGroup) {
         HCCL_INFO("[HcclWrapper-DEBUG] Calling HcommCcuKernelRegisterStart...");
@@ -1267,8 +1292,8 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
             HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
             return ConvertCcuToHccl(regStartRet);
         }
-        for (u32 i = 0; i < totalKernelNum; i++) {
-            CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
+        for (u32 i = 0; i < registerNum; i++) {
+            CcuKernelInfo& kernelInfo = kernelsToRegister[i];
             if (kernelInfo.resGroup > maxResGroup) {
                 maxResGroup = kernelInfo.resGroup;
             }
@@ -1295,7 +1320,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
         }
         currentResGroup++;
     }
-    resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
+    resCtxHost->ccuKernelNum = {registerNum};
     HCCL_INFO("[HcclGetCcuKernel] done, ccuKernels.size()[%zu]", resCtxHost->ccuKernels.size());
     return HCCL_SUCCESS;
 }
