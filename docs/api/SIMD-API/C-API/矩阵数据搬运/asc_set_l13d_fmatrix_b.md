@@ -1,4 +1,4 @@
-# asc_set_l13d_fmatrix_b
+﻿# asc_set_l13d_fmatrix_b
 
 ## 产品支持情况
 
@@ -11,7 +11,7 @@
 ## 功能说明
 
 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](./asc_copy_l12l0a)/[asc_copy_l12l0b](./asc_copy_l12l0b)的3D格式搬运接口时配置填充数值。
-仅当asc_copy_l12l0a/asc_copy_l12l0b接口的f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。
+仅当asc_copy_l12l0a/asc_copy_l12l0b接口的enable_f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。
 
 ## 函数原型
 

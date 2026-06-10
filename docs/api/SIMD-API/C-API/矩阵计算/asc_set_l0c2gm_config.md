@@ -1,4 +1,4 @@
-# asc_set_l0c2gm_config
+﻿# asc_set_l0c2gm_config
 ## 产品支持情况
 
 |产品   | 是否支持 |
@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_mode, uint64_t quant_pre_mode, bool enable_unit_flag)
 ```
 
 ## 参数说明
@@ -44,5 +44,5 @@ PIPE_S
 ```cpp
 constexpr uint64_t relu_pre = 0;
 constexpr uint64_t quant_pre = 0x1000;// 假设量化操作有效地址为 0x1000
-asc_set_l0c2gm_config(relu_pre, quant_pre, true);
+asc_set_l0c2gm_config(relu_pre_mode, quant_pre_mode, true);
 ```
