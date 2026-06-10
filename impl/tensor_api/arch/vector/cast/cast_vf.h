@@ -76,12 +76,12 @@ public:
 };
 
 // Two-level lookup to avoid template recursion depth overflow.
-// First level: (SrcType, DstType) -> sub-map.  Second level: (RoundMode, SatMode, IndexPos) -> Inst.
+// First level: CastSubMap<SrcType, DstType> -> sub-map.  Second level: (RoundMode, SatMode, IndexPos) -> Inst.
 struct CastTrait2CastFunc {
 private:
     template <typename SrcType, typename DstType, typename RoundMode, typename SatMode, typename IndexPos>
     struct Impl {
-        using SubMap = typename CastBucketMap::template Get<Std::tuple<SrcType, DstType>>;
+        using SubMap = typename CastSubMap<SrcType, DstType>::type;
         using type = typename SubMap::template Get<Std::tuple<RoundMode, SatMode, IndexPos>>;
     };
 public:

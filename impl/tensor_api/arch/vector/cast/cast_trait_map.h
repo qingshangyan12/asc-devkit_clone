@@ -661,64 +661,77 @@ using CastSub_hifloat8_t_to_float = TupleMap<
     Std::tuple<Std::tuple<Std::ignore_t, Std::ignore_t, CastIndexPos::PartP3>, Inst::Hif82FloatP3>
 >;
 
-using CastBucketMap = TupleMap<
-    Std::tuple<Std::tuple<bfloat16_t, bfloat16_t>, CastSub_bfloat16_t_to_bfloat16_t>,
-    Std::tuple<Std::tuple<bfloat16_t, float>, CastSub_bfloat16_t_to_float>,
-    Std::tuple<Std::tuple<bfloat16_t, fp4x2_e1m2_t>, CastSub_bfloat16_t_to_fp4x2_e1m2_t>,
-    Std::tuple<Std::tuple<bfloat16_t, fp4x2_e2m1_t>, CastSub_bfloat16_t_to_fp4x2_e2m1_t>,
-    Std::tuple<Std::tuple<bfloat16_t, half>, CastSub_bfloat16_t_to_half>,
-    Std::tuple<Std::tuple<bfloat16_t, int32_t>, CastSub_bfloat16_t_to_int32_t>,
-    Std::tuple<Std::tuple<float, bfloat16_t>, CastSub_float_to_bfloat16_t>,
-    Std::tuple<Std::tuple<float, float>, CastSub_float_to_float>,
-    Std::tuple<Std::tuple<float, fp8_e4m3fn_t>, CastSub_float_to_fp8_e4m3fn_t>,
-    Std::tuple<Std::tuple<float, fp8_e5m2_t>, CastSub_float_to_fp8_e5m2_t>,
-    Std::tuple<Std::tuple<float, half>, CastSub_float_to_half>,
-    Std::tuple<Std::tuple<float, hifloat8_t>, CastSub_float_to_hifloat8_t>,
-    Std::tuple<Std::tuple<float, int16_t>, CastSub_float_to_int16_t>,
-    Std::tuple<Std::tuple<float, int32_t>, CastSub_float_to_int32_t>,
-    Std::tuple<Std::tuple<float, int64_t>, CastSub_float_to_int64_t>,
-    Std::tuple<Std::tuple<fp4x2_e1m2_t, bfloat16_t>, CastSub_fp4x2_e1m2_t_to_bfloat16_t>,
-    Std::tuple<Std::tuple<fp4x2_e2m1_t, bfloat16_t>, CastSub_fp4x2_e2m1_t_to_bfloat16_t>,
-    Std::tuple<Std::tuple<fp8_e4m3fn_t, float>, CastSub_fp8_e4m3fn_t_to_float>,
-    Std::tuple<Std::tuple<fp8_e5m2_t, float>, CastSub_fp8_e5m2_t_to_float>,
-    Std::tuple<Std::tuple<half, bfloat16_t>, CastSub_half_to_bfloat16_t>,
-    Std::tuple<Std::tuple<half, float>, CastSub_half_to_float>,
-    Std::tuple<Std::tuple<half, half>, CastSub_half_to_half>,
-    Std::tuple<Std::tuple<half, hifloat8_t>, CastSub_half_to_hifloat8_t>,
-    Std::tuple<Std::tuple<half, int16_t>, CastSub_half_to_int16_t>,
-    Std::tuple<Std::tuple<half, int32_t>, CastSub_half_to_int32_t>,
-    Std::tuple<Std::tuple<half, int4x2_t>, CastSub_half_to_int4x2_t>,
-    Std::tuple<Std::tuple<half, int8_t>, CastSub_half_to_int8_t>,
-    Std::tuple<Std::tuple<half, uint8_t>, CastSub_half_to_uint8_t>,
-    Std::tuple<Std::tuple<hifloat8_t, float>, CastSub_hifloat8_t_to_float>,
-    Std::tuple<Std::tuple<hifloat8_t, half>, CastSub_hifloat8_t_to_half>,
-    Std::tuple<Std::tuple<int16_t, float>, CastSub_int16_t_to_float>,
-    Std::tuple<Std::tuple<int16_t, half>, CastSub_int16_t_to_half>,
-    Std::tuple<Std::tuple<int16_t, int32_t>, CastSub_int16_t_to_int32_t>,
-    Std::tuple<Std::tuple<int16_t, uint32_t>, CastSub_int16_t_to_uint32_t>,
-    Std::tuple<Std::tuple<int16_t, uint8_t>, CastSub_int16_t_to_uint8_t>,
-    Std::tuple<Std::tuple<int32_t, float>, CastSub_int32_t_to_float>,
-    Std::tuple<Std::tuple<int32_t, int16_t>, CastSub_int32_t_to_int16_t>,
-    Std::tuple<Std::tuple<int32_t, int64_t>, CastSub_int32_t_to_int64_t>,
-    Std::tuple<Std::tuple<int32_t, uint16_t>, CastSub_int32_t_to_uint16_t>,
-    Std::tuple<Std::tuple<int32_t, uint8_t>, CastSub_int32_t_to_uint8_t>,
-    Std::tuple<Std::tuple<int4x2_t, bfloat16_t>, CastSub_int4x2_t_to_bfloat16_t>,
-    Std::tuple<Std::tuple<int4x2_t, half>, CastSub_int4x2_t_to_half>,
-    Std::tuple<Std::tuple<int4x2_t, int16_t>, CastSub_int4x2_t_to_int16_t>,
-    Std::tuple<Std::tuple<int64_t, float>, CastSub_int64_t_to_float>,
-    Std::tuple<Std::tuple<int64_t, int32_t>, CastSub_int64_t_to_int32_t>,
-    Std::tuple<Std::tuple<int8_t, half>, CastSub_int8_t_to_half>,
-    Std::tuple<Std::tuple<int8_t, int16_t>, CastSub_int8_t_to_int16_t>,
-    Std::tuple<Std::tuple<int8_t, int32_t>, CastSub_int8_t_to_int32_t>,
-    Std::tuple<Std::tuple<uint16_t, uint32_t>, CastSub_uint16_t_to_uint32_t>,
-    Std::tuple<Std::tuple<uint16_t, uint8_t>, CastSub_uint16_t_to_uint8_t>,
-    Std::tuple<Std::tuple<uint32_t, int16_t>, CastSub_uint32_t_to_int16_t>,
-    Std::tuple<Std::tuple<uint32_t, uint16_t>, CastSub_uint32_t_to_uint16_t>,
-    Std::tuple<Std::tuple<uint32_t, uint8_t>, CastSub_uint32_t_to_uint8_t>,
-    Std::tuple<Std::tuple<uint8_t, half>, CastSub_uint8_t_to_half>,
-    Std::tuple<Std::tuple<uint8_t, uint16_t>, CastSub_uint8_t_to_uint16_t>,
-    Std::tuple<Std::tuple<uint8_t, uint32_t>, CastSub_uint8_t_to_uint32_t>
->;
+template <typename SrcType, typename DstType>
+struct CastSubMap {
+    using type = TupleMap<>;
+};
+
+#define ASCENDC_CAST_SUB_MAP_NAME(SRC_TYPE, DST_TYPE) CastSub_##SRC_TYPE##_to_##DST_TYPE
+#define ASCENDC_CAST_SUB_MAP(SRC_TYPE, DST_TYPE)           \
+    template <>                                            \
+    struct CastSubMap<SRC_TYPE, DST_TYPE> {                \
+        using type = ASCENDC_CAST_SUB_MAP_NAME(SRC_TYPE, DST_TYPE); \
+    };
+
+ASCENDC_CAST_SUB_MAP(bfloat16_t, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(bfloat16_t, float)
+ASCENDC_CAST_SUB_MAP(bfloat16_t, fp4x2_e1m2_t)
+ASCENDC_CAST_SUB_MAP(bfloat16_t, fp4x2_e2m1_t)
+ASCENDC_CAST_SUB_MAP(bfloat16_t, half)
+ASCENDC_CAST_SUB_MAP(bfloat16_t, int32_t)
+ASCENDC_CAST_SUB_MAP(float, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(float, float)
+ASCENDC_CAST_SUB_MAP(float, fp8_e4m3fn_t)
+ASCENDC_CAST_SUB_MAP(float, fp8_e5m2_t)
+ASCENDC_CAST_SUB_MAP(float, half)
+ASCENDC_CAST_SUB_MAP(float, hifloat8_t)
+ASCENDC_CAST_SUB_MAP(float, int16_t)
+ASCENDC_CAST_SUB_MAP(float, int32_t)
+ASCENDC_CAST_SUB_MAP(float, int64_t)
+ASCENDC_CAST_SUB_MAP(fp4x2_e1m2_t, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(fp4x2_e2m1_t, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(fp8_e4m3fn_t, float)
+ASCENDC_CAST_SUB_MAP(fp8_e5m2_t, float)
+ASCENDC_CAST_SUB_MAP(half, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(half, float)
+ASCENDC_CAST_SUB_MAP(half, half)
+ASCENDC_CAST_SUB_MAP(half, hifloat8_t)
+ASCENDC_CAST_SUB_MAP(half, int16_t)
+ASCENDC_CAST_SUB_MAP(half, int32_t)
+ASCENDC_CAST_SUB_MAP(half, int4x2_t)
+ASCENDC_CAST_SUB_MAP(half, int8_t)
+ASCENDC_CAST_SUB_MAP(half, uint8_t)
+ASCENDC_CAST_SUB_MAP(hifloat8_t, float)
+ASCENDC_CAST_SUB_MAP(hifloat8_t, half)
+ASCENDC_CAST_SUB_MAP(int16_t, float)
+ASCENDC_CAST_SUB_MAP(int16_t, half)
+ASCENDC_CAST_SUB_MAP(int16_t, int32_t)
+ASCENDC_CAST_SUB_MAP(int16_t, uint32_t)
+ASCENDC_CAST_SUB_MAP(int16_t, uint8_t)
+ASCENDC_CAST_SUB_MAP(int32_t, float)
+ASCENDC_CAST_SUB_MAP(int32_t, int16_t)
+ASCENDC_CAST_SUB_MAP(int32_t, int64_t)
+ASCENDC_CAST_SUB_MAP(int32_t, uint16_t)
+ASCENDC_CAST_SUB_MAP(int32_t, uint8_t)
+ASCENDC_CAST_SUB_MAP(int4x2_t, bfloat16_t)
+ASCENDC_CAST_SUB_MAP(int4x2_t, half)
+ASCENDC_CAST_SUB_MAP(int4x2_t, int16_t)
+ASCENDC_CAST_SUB_MAP(int64_t, float)
+ASCENDC_CAST_SUB_MAP(int64_t, int32_t)
+ASCENDC_CAST_SUB_MAP(int8_t, half)
+ASCENDC_CAST_SUB_MAP(int8_t, int16_t)
+ASCENDC_CAST_SUB_MAP(int8_t, int32_t)
+ASCENDC_CAST_SUB_MAP(uint16_t, uint32_t)
+ASCENDC_CAST_SUB_MAP(uint16_t, uint8_t)
+ASCENDC_CAST_SUB_MAP(uint32_t, int16_t)
+ASCENDC_CAST_SUB_MAP(uint32_t, uint16_t)
+ASCENDC_CAST_SUB_MAP(uint32_t, uint8_t)
+ASCENDC_CAST_SUB_MAP(uint8_t, half)
+ASCENDC_CAST_SUB_MAP(uint8_t, uint16_t)
+ASCENDC_CAST_SUB_MAP(uint8_t, uint32_t)
+
+#undef ASCENDC_CAST_SUB_MAP
+#undef ASCENDC_CAST_SUB_MAP_NAME
 
 } // namespace Te
 } // namespace AscendC
