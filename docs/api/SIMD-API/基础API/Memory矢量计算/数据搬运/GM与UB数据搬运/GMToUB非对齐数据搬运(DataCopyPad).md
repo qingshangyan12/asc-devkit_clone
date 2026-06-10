@@ -190,6 +190,17 @@
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
+- 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
+- <cann-filter npu-type = "A3,910b">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
+  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
+  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
+</cann-filter>
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则参数dstStride、leftPadding、rightPadding无效。
+
+</cann-filter>
+
 - 位于Global Memory的源地址必须1字节对齐，位于Unified Buffer的目的地址必须32字节对齐。
 - leftPadding、rightPadding所占字节数均不能超过32B。
 - blockLen必须是sizeof\(T\)的整数倍。
@@ -212,19 +223,6 @@
      > - srcStride：数据类型为int64_t，取值范围为[-blockLen, 2^40-1]。当srcStride = -blockLen时，表示每次传输的连续数据块均为同一块，即重复搬运第一个数据块。
      > - dstStride：数据类型为int64_t，取值范围为[0, 65535]。
     </cann-filter>
-
-- 结构体DataCopyPadExtParams的参数取值范围需要考虑不要超过UB空间大小。
-
-- <cann-filter npu-type = "A3,910b">当DataCopyExtParams结构体参数blockCount、blockLen任意一个值为0时，该接口将被视为NOP（空操作）。该说明针对如下型号生效：
-  - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
-  - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
-</cann-filter>
-
-<cann-filter npu-type="950">
-
-- 针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则参数dstStride、leftPadding、rightPadding无效。
-
-</cann-filter>
 
 ## 调用示例<a name="section177231425115410"></a>
 
