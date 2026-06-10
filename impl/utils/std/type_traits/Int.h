@@ -52,6 +52,7 @@ using _1024   = Int<1024>;
 using _2048   = Int<2048>;
 using _4096   = Int<4096>;
 
+
 #define STD_INT_BINARY_OP(OP) \
 template <auto t, auto u> \
 __aicore__ inline constexpr Int<(t OP u)> operator OP (Int<t>, Int<u>) { \
