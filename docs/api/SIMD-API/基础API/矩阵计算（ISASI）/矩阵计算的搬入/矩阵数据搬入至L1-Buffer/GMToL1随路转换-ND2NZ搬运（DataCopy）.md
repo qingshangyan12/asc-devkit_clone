@@ -28,6 +28,7 @@ ND到NZ的格式转换等价于DN到ZN的格式转换，如[图1](#zh-cn_topic_0
 
 ## 函数原型<a id="zh-cn_topic_0000002566538879_section82039854412"></a>
 
+<cann-filter npu_type="A3,910b,310p,x90,9030">
 针对如下产品型号：
 
 <cann-filter npu_type="A3">
@@ -50,8 +51,6 @@ Kirin X90；
 Kirin 9030；
 </cann-filter>
 
-<cann-filter npu_type="A3,910b,310p,x90,9030">
-
 ```cpp
 template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
@@ -73,8 +72,27 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 ## 参数说明<a id="zh-cn_topic_0000002566538879_section16128134420472"></a>
 
 <cann-filter npu_type="A3,910b,310p,x90,9030">
+针对如下产品型号，模板参数说明见下表：
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 推理系列产品AI Core：
+<cann-filter npu_type="A3">
+Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+</cann-filter>
+
+<cann-filter npu_type="910b">
+Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+</cann-filter>
+
+<cann-filter npu_type="310p">
+Atlas 推理系列产品AI Core；
+</cann-filter>
+
+<cann-filter npu_type="x90">
+Kirin X90；
+</cann-filter>
+
+<cann-filter npu_type="9030">
+Kirin 9030；
+</cann-filter>
 
 **表 1**  模板参数说明
 
