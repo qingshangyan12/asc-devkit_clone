@@ -57,7 +57,7 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 
 参考[调用示例](SetFmatrix.md#section642mcpsimp)
 
-展示代码示例片段：
+展示代码示例片段，完整示例请参考[conv2d_forward样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/conv2d_forward)中场景3。
 
 ```cpp
 // Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw,代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
