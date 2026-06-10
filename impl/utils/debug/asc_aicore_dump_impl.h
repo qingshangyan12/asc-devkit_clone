@@ -233,6 +233,11 @@ template<typename T>
 __aicore__ inline void asc_dump(T* input, uint32_t desc, uint32_t dump_size) {
     ASCENDC_ASSERT((false), "asc_dump is not supported in cpu mode.");
 }
+
+__aicore__ inline void asc_dump_shape_impl(const uint32_t shapeDim, const uint32_t* shape)
+{
+    ASCENDC_ASSERT((false), "asc_dump_shape_impl is not supported in cpu mode.");
+}
 } // namespace __asc_aicore
 
 using namespace __asc_aicore;
