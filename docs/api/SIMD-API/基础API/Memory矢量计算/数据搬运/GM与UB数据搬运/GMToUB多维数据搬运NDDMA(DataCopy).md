@@ -12,7 +12,6 @@
 |<cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | x </cann-filter>|
 |<cann-filter npu-type="910"> Atlas 训练系列产品 | x </cann-filter>|
 
-
 ## 功能说明<a name="section474617392321"></a>
 
 头文件路径为：`"basic_api/kernel_operator_data_copy_intf.h"`。
@@ -20,6 +19,7 @@
 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+
 - Global Memory -> Unified Buffer
     - GM -> VECIN
 

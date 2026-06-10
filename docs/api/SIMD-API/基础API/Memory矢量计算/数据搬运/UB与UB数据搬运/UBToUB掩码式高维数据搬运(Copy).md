@@ -21,6 +21,7 @@
 支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
     - VECIN -> VECOUT
@@ -120,7 +121,7 @@
 ## 约束说明<a name="zh-cn_topic_0000002567699435_section2045914466492"></a>
 
 - 位于Unified Buffer的地址必须32字节对齐。
-- 操作数地址重叠约束请参考[地址重叠约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section668772811100)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../../../通用说明和约束.md#通用地址重叠约束)。
 - CopyRepeatParams结构体参数的值需在取值范围内：
 
     **表 4**  CopyRepeatParams结构体参数取值范围

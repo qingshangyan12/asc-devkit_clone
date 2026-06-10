@@ -23,6 +23,7 @@
 <cann-filter npu-type="950">特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。</cann-filter>
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+
 - Global Memory -> Unified Buffer
     - GM -> VECIN
     - GM -> VECOUT
@@ -30,7 +31,7 @@
 
 填充的数据有两种配置方式：
 
-- 配置结构体[DataCopyPadExtParams](#zh-cn_topic_0000002565888823_table2036831862917)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
+- 配置结构体[DataCopyPadExtParams](#table_gm2ub_pad_4)的参数paddingValue，此时DataCopyPadExtParams的参数isPad需要设置为true。
 - 使用寄存器配置接口[SetPadValue](寄存器配置说明/SetPadValue(ISASI).md)在接口外部设置需要填充的数据，此时DataCopyPadExtParams的参数isPad需要设置为false。
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -217,6 +218,7 @@
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 </cann-filter>
+
 <cann-filter npu-type="950">
 
 - 针对Ascend 950PR/Ascend 950DT，若PaddingMode为Compact模式，则参数dstStride、leftPadding、rightPadding无效。

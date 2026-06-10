@@ -21,6 +21,7 @@
 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
 
 具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+
 - Global Memory -> Unified Buffer
     - GM -> VECIN
 - Unified Buffer -> Global Memory
