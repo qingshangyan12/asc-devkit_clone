@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为：basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_binary\_scalar\_intf.h
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf.h"`。
 
 ShiftRights指令根据mask对源操作数srcReg，按照scalarValue进行右移操作，将结果写入目的操作数dstReg。根据源操作数的数据类型，右移操作分为以下两种情况：
 
@@ -58,7 +58,7 @@ ShiftRights指令根据mask对源操作数srcReg，按照scalarValue进行右移
   逻辑右移会将二进制数整体向右移动指定的位数，最低位被丢弃，最高位用0填充。例如，二进制数1010101010101010（uint16\_t类型）逻辑右移1位后，结果为0101010101010101。
 - **数据类型为有符号类型：执行算术右移。**
 
-  算术右移会将二进制数整体向右移动指定的位数，最低位被丢弃，最高位复制符号位。例如，二进制数1010101010101010（int16\_t 类型）算术右移1位后，结果为1101010101010101；算术右移3位后，结果为1111010101010101。
+  算术右移会将二进制数整体向右移动指定的位数，最低位被丢弃，最高位复制符号位。例如，二进制数1010101010101010（int16\_t类型）算术右移1位后，结果为1101010101010101；算术右移3位后，结果为1111010101010101。
 
 $$
 dstReg_i = srcReg_i \gg scalarValue
@@ -95,10 +95,6 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 
 无
 
-## 约束说明<a name="section633mcpsimp"></a>
-
-无
-
 ## 数据类型
 
 **表 3** 数据类型支持情况
@@ -116,7 +112,13 @@ __simd_callee__ inline void ShiftRights(S& dstReg, S& srcReg, U scalarValue, Mas
 
 **int64\_t、uint64\_t为软仿数据类型。**
 
-## 谓用示例<a name="section642mcpsimp"></a>
+## 约束说明<a name="section633mcpsimp"></a>
+
+- 对于逻辑位移（无符号数据类型），如果位移量（srcReg1）大于数据类型位宽，则输出为0。
+- 对于算术位移（有符号数据类型），如果srcReg0小于0，位移量大于数据类型位宽，则输出-1；如果srcReg0大于0，位移量大于数据类型位宽，则输出0。
+- scalarValue不支持设置为负数，负数行为未定义。
+
+## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
 template<typename T, typename U>

@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_fused\_intf.h"。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_fused_intf.h"`。
 
 srcReg0与srcReg1相减，差值作为e的指数计算， 根据mask将计算结果写入dstReg。公式如下：
 

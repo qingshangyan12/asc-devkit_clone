@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_fused\_intf.h"。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_fused_intf.h"`。
 
 该接口用于将源操作数src与标量scalar相乘，再按照CAST\_ROUND模式将结果转换为half类型，根据mask将计算结果写入目的操作数dst。计算公式如下：
 

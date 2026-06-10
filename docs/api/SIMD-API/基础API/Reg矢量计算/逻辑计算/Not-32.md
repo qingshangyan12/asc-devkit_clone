@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为："basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_unary\_intf.h"（对RegTensor操作）、"basic\_api/reg\_compute/kernel\_reg\_compute\_maskreg\_intf.h"（对MaskReg操作）。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_unary_intf.h"`（对RegTensor操作）、`"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"`（对MaskReg操作）。
 
 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作：
 

@@ -49,19 +49,19 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件引用路径为：basic\_api/reg\_compute/kernel\_reg\_compute\_vec\_binary\_intf.h
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`。
 
 ShiftLeft指令根据mask对源操作数srcReg0，按照srcReg1对应元素进行左移操作，将结果写入目的操作数dstReg。根据源操作数的数据类型，左移操作分为以下两种情况：
 
 - **数据类型为无符号类型：执行逻辑左移。**
 
-  逻辑左移会将二进制数整体向左移动指定的位数，最高位被丢弃，最低位用0填充。例如，二进制数1010101010101010（uint16\_t 类型）逻辑左移1位后，结果为0101010101010100。
+  逻辑左移会将二进制数整体向左移动指定的位数，最高位被丢弃，最低位用0填充。例如，二进制数1010101010101010（uint16\_t类型）逻辑左移1位后，结果为0101010101010100。
 - **数据类型为有符号类型：执行算术左移。**
 
-  算术左移会将二进制数整体向左移动指定的位数，次高位被丢弃，最低位用0填充。例如，二进制数1010101010101010（int16\_t 类型）算术左移1位后，结果为1101010101010100；算术左移3位后，结果为1101010101010000。
+  算术左移会将二进制数整体向左移动指定的位数，次高位被丢弃，最低位用0填充。例如，二进制数1010101010101010（int16\_t类型）算术左移1位后，结果为1101010101010100；算术左移3位后，结果为1101010101010000。
 
 $$
-dstReg_i = srcReg0_i << srcReg1_i
+dstReg_i = srcReg0_i \ll srcReg1_i
 $$
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -80,7 +80,7 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 | T | 源操作数数据类型。 |
 | U | 左移参数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| S | srcReg0/dstReg的RegTensor类型， 例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
+| S | srcReg0、dstReg的RegTensor类型， 例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
 | V | srcReg1的RegTensor类型， 例如RegTensor<int32_t>，由编译器自动推导，用户不需要填写。 |
 
 **表 2**  参数说明
@@ -89,7 +89,7 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 |---|---|---|
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。<br>源操作数的数据类型需要与目的操作数保持一致。 |
-| srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。<br>不支持设置为负数。 |
+| srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。<br>不支持设置为负数，负数行为未定义。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
