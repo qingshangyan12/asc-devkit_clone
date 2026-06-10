@@ -97,7 +97,7 @@
 **表 3**  复合计算类指令理论性能汇总
 
 <a name="table1089823515222"></a>
-| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element/cycle） |
+| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位：element/cycle） |
 | --- | --- | --- | --- | --- |
 | Axpy | half | half | half | 128 |
 | Axpy | float | float | float | 64 |
@@ -130,7 +130,7 @@
 **表 4**  比较与选择类指令理论性能汇总
 
 <a name="table205131952256"></a>
-| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位element/cycle） |
+| 接口 | src0数据类型 | scalar/src1数据类型 | dst数据类型 | 硬件并行度（单位：element/cycle） |
 | --- | --- | --- | --- | --- |
 | Compare | half | half | uint8_t、int8_t | 128 |
 | Compare | float | float | uint8_t、int8_t | 64 |

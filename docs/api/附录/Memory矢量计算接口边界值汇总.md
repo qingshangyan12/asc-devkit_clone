@@ -29,7 +29,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 
 注：
 
-- float 数据类型输入仅支持INF/NAN模式（即使配置饱和模式，输出结果也与INF/NAN模式输出结果一致）；half、int16_t 及 int32_t 类型输入，默认输出INF/NAN模式的结果。
+- float数据类型输入仅支持INF/NAN模式（即使配置饱和模式，输出结果也与INF/NAN模式输出结果一致）；half、int16_t及int32_t类型输入，默认输出INF/NAN模式的结果。
 - **绝大部分场景下，INF/NAN模式的输出结果与IEEE754标准结果一致。如存在不一致的情况，会在对应接口处备注说明。**
 
 ## Memory矢量计算接口输出inf/nan的场景总结
@@ -232,15 +232,15 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half | inf | inf | inf | **65504.0** |
 | half | inf | -inf | nan | **0.0** |
 | half | -inf | -inf | -inf | **-65504.0** |
-| float | -3.4028235e+38 (MIN) | -3.4028235e+38 (MIN)/-inf | -inf | -inf |
-| float | -3.4028235e+38 (MIN) | 3.4028235e+38 (MAX) | 0.0 | 0.0 |
-| float | -3.4028235e+38 (MIN) | 0.0/-0.0 | -3.4028235e+38 | -3.4028235e+38 |
-| float | -3.4028235e+38 (MIN) | nan | nan | nan |
-| float | -3.4028235e+38 (MIN) | inf | inf | inf |
-| float | 3.4028235e+38 (MAX) | 3.4028235e+38 (MAX)/inf | inf | inf |
-| float | 3.4028235e+38 (MAX) | 0.0/-0.0 | 3.4028235e+38 | 3.4028235e+38 |
-| float | 3.4028235e+38 (MAX) | nan | nan | nan |
-| float | 3.4028235e+38 (MAX) | -inf | -inf | -inf |
+| float | -3.4028235e+38（MIN） | -3.4028235e+38（MIN）/-inf | -inf | -inf |
+| float | -3.4028235e+38 (MIN) | 3.4028235e+38（MAX） | 0.0 | 0.0 |
+| float | -3.4028235e+38（MIN） | 0.0/-0.0 | -3.4028235e+38 | -3.4028235e+38 |
+| float | -3.4028235e+38（MIN） | nan | nan | nan |
+| float | -3.4028235e+38（MIN） | inf | inf | inf |
+| float | 3.4028235e+38（MAX） | 3.4028235e+38（MAX）/inf | inf | inf |
+| float | 3.4028235e+38（MAX） | 0.0/-0.0 | 3.4028235e+38 | 3.4028235e+38 |
+| float | 3.4028235e+38（MAX） | nan | nan | nan |
+| float | 3.4028235e+38（MAX） | -inf | -inf | -inf |
 | float | 0.0 | 0.0/-0.0 | 0.0 | 0.0 |
 | float | 0.0 | nan | nan | nan |
 | float | 0.0 | inf | inf | inf |
@@ -811,7 +811,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 20**  Axpy特殊值/边界值输入的计算结果
 
 <a name="table1819218568247"></a>
-| src取值/scalarValue取值 | 中间阶段(src * scalarValue) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src取值/scalarValue取值 | 中间阶段（src*scalarValue） | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- | --- |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | +0 | +0 | +0 |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | -0 | +0 | -0 |
@@ -841,20 +841,20 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | MAX | -inf | +0 |
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | MIN | -inf | MIN |
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | nan | nan | +0 |
-| 使得src * scalarValue = MAX | MAX | MAX | +0 | MAX | MAX |
-| 使得src * scalarValue = MAX | MAX | MAX | -0 | MAX | MAX |
-| 使得src * scalarValue = MAX | MAX | MAX | +inf | +inf | MAX |
-| 使得src * scalarValue = MAX | MAX | MAX | -inf | -inf | MIN |
-| 使得src * scalarValue = MAX | MAX | MAX | MAX | MAX | MAX |
-| 使得src * scalarValue = MAX | MAX | MAX | MIN | +0 | +0 |
-| 使得src * scalarValue = MAX | MAX | MAX | nan | nan | +0 |
-| 使得src * scalarValue = MIN | MIN | MIN | +0 | MIN | MIN |
-| 使得src * scalarValue = MIN | MIN | MIN | -0 | MIN | MIN |
-| 使得src * scalarValue = MIN | MIN | MIN | +inf | +inf | MAX |
-| 使得src * scalarValue = MIN | MIN | MIN | -inf | -inf | MIN |
-| 使得src * scalarValue = MIN | MIN | MIN | MAX | +0 | +0 |
-| 使得src * scalarValue = MIN | MIN | MIN | MIN | -inf | MIN |
-| 使得src * scalarValue = MIN | MIN | MIN | nan | nan | +0 |
+| 使得src*scalarValue=MAX | MAX | MAX | +0 | MAX | MAX |
+| 使得src*scalarValue=MAX | MAX | MAX | -0 | MAX | MAX |
+| 使得src*scalarValue=MAX | MAX | MAX | +inf | +inf | MAX |
+| 使得src*scalarValue=MAX | MAX | MAX | -inf | -inf | MIN |
+| 使得src*scalarValue=MAX | MAX | MAX | MAX | MAX | MAX |
+| 使得src*scalarValue=MAX | MAX | MAX | MIN | +0 | +0 |
+| 使得src*scalarValue=MAX | MAX | MAX | nan | nan | +0 |
+| 使得src*scalarValue=MIN | MIN | MIN | +0 | MIN | MIN |
+| 使得src*scalarValue=MIN | MIN | MIN | -0 | MIN | MIN |
+| 使得src*scalarValue=MIN | MIN | MIN | +inf | +inf | MAX |
+| 使得src*scalarValue=MIN | MIN | MIN | -inf | -inf | MIN |
+| 使得src*scalarValue=MIN | MIN | MIN | MAX | +0 | +0 |
+| 使得src*scalarValue=MIN | MIN | MIN | MIN | -inf | MIN |
+| 使得src*scalarValue=MIN | MIN | MIN | nan | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | -0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +inf | nan | MAX |
@@ -868,7 +868,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 21**  MulAddDst特殊值/边界值输入的计算结果
 
 <a name="table1042313583406"></a>
-| src0取值/src1取值 | 中间阶段(src0 * src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/src1取值 | 中间阶段（src0*src1） | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- | --- |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | +0 | +0 | +0 |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | -0 | +0 | -0 |
@@ -898,20 +898,20 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | MAX | -inf | +0 |
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | MIN | -inf | MIN |
 | 当源操作数与目的操作数数据类型一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN<br>当源操作数与目的操作数数据类型不一致：<br>+inf/-inf<br>+inf/MIN<br>-inf/MAX | -inf | MIN | nan | nan | +0 |
-| 使得src0 * src1 = MAX | MAX | MAX | +0 | MAX | MAX |
-| 使得src0 * src1 = MAX | MAX | MAX | -0 | MAX | MAX |
-| 使得src0 * src1 = MAX | MAX | MAX | +inf | +inf | MAX |
-| 使得src0 * src1 = MAX | MAX | MAX | -inf | -inf | MIN |
-| 使得src0 * src1 = MAX | MAX | MAX | MAX | MAX | MAX |
-| 使得src0 * src1 = MAX | MAX | MAX | MIN | +0 | +0 |
-| 使得src0 * src1 = MAX | MAX | MAX | nan | nan | +0 |
-| 使得src0 * src1 = MIN | MIN | MIN | +0 | MIN | MIN |
-| 使得src0 * src1 = MIN | MIN | MIN | -0 | MIN | MIN |
-| 使得src0 * src1 = MIN | MIN | MIN | +inf | +inf | MAX |
-| 使得src0 * src1 = MIN | MIN | MIN | -inf | -inf | MIN |
-| 使得src0 * src1 = MIN | MIN | MIN | MAX | +0 | +0 |
-| 使得src0 * src1 = MIN | MIN | MIN | MIN | -inf | MIN |
-| 使得src0 * src1 = MIN | MIN | MIN | nan | nan | +0 |
+| 使得src0*src1=MAX | MAX | MAX | +0 | MAX | MAX |
+| 使得src0*src1=MAX | MAX | MAX | -0 | MAX | MAX |
+| 使得src0*src1=MAX | MAX | MAX | +inf | +inf | MAX |
+| 使得src0*src1=MAX | MAX | MAX | -inf | -inf | MIN |
+| 使得src0*src1=MAX | MAX | MAX | MAX | MAX | MAX |
+| 使得src0*src1=MAX | MAX | MAX | MIN | +0 | +0 |
+| 使得src0*src1=MAX | MAX | MAX | nan | nan | +0 |
+| 使得src0*src1=MIN | MIN | MIN | +0 | MIN | MIN |
+| 使得src0*src1=MIN | MIN | MIN | -0 | MIN | MIN |
+| 使得src0*src1=MIN | MIN | MIN | +inf | +inf | MAX |
+| 使得src0*src1=MIN | MIN | MIN | -inf | -inf | MIN |
+| 使得src0*src1=MIN | MIN | MIN | MAX | +0 | +0 |
+| 使得src0*src1=MIN | MIN | MIN | MIN | -inf | MIN |
+| 使得src0*src1=MIN | MIN | MIN | nan | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | -0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +inf | nan | MAX |
@@ -925,7 +925,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 22**  FusedMulAdd特殊值/边界值输入的计算结果
 
 <a name="table1158211814515"></a>
-| src0取值/dst取值 | 中间阶段(src0 * dst) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | src1取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/dst取值 | 中间阶段（src0*dst） | 中间阶段（饱和模式，仅输出为half数据类型时支持） | src1取值 | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- | --- |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | +0 | +0 | +0 |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | -0 | +0 | -0 |
@@ -955,20 +955,20 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | MAX | -inf | +0 |
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | MIN | -inf | MIN |
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | nan | nan | +0 |
-| 使得src0 * dst = MAX | MAX | MAX | +0 | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | -0 | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | +inf | +inf | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | -inf | -inf | MIN |
-| 使得src0 * dst = MAX | MAX | MAX | MAX | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | MIN | +0 | +0 |
-| 使得src0 * dst = MAX | MAX | MAX | nan | nan | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | +0 | MIN | MIN |
-| 使得src0 * dst = MIN | MIN | MIN | -0 | MIN | MIN |
-| 使得src0 * dst = MIN | MIN | MIN | +inf | +inf | MAX |
-| 使得src0 * dst = MIN | MIN | MIN | -inf | -inf | MIN |
-| 使得src0 * dst = MIN | MIN | MIN | MAX | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | MIN | -inf | MIN |
-| 使得src0 * dst = MIN | MIN | MIN | nan | nan | +0 |
+| 使得src0*dst=MAX | MAX | MAX | +0 | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | -0 | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | +inf | +inf | MAX |
+| 使得src0*dst=MAX | MAX | MAX | -inf | -inf | MIN |
+| 使得src0*dst=MAX | MAX | MAX | MAX | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | MIN | +0 | +0 |
+| 使得src0*dst=MAX | MAX | MAX | nan | nan | +0 |
+| 使得src0*dst=MIN | MIN | MIN | +0 | MIN | MIN |
+| 使得src0*dst=MIN | MIN | MIN | -0 | MIN | MIN |
+| 使得src0*dst=MIN | MIN | MIN | +inf | +inf | MAX |
+| 使得src0*dst=MIN | MIN | MIN | -inf | -inf | MIN |
+| 使得src0*dst=MIN | MIN | MIN | MAX | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | MIN | -inf | MIN |
+| 使得src0*dst=MIN | MIN | MIN | nan | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | -0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +inf | nan | MAX |
@@ -982,7 +982,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 23**  MulAddRelu特殊值/边界值输入的计算结果
 
 <a name="table126194714473"></a>
-| src0取值/dst取值 | 中间阶段1(src0 * dst) | 中间阶段1（饱和模式，仅输出为half数据类型时支持） | src1取值 | 中间阶段2（INF/NAN模式） | 中间阶段2（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/dst取值 | 中间阶段1（src0*dst） | 中间阶段1（饱和模式，仅输出为half数据类型时支持） | src1取值 | 中间阶段2（INF/NAN模式） | 中间阶段2（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | +0 | +0 | +0 | +0 | +0 |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | -0 | +0 | -0 | +0 | +0 |
@@ -1012,20 +1012,20 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | MAX | -inf | +0 | +0 | +0 |
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | MIN | -inf | MIN | +0 | +0 |
 | +inf/-inf<br>+inf/MIN<br>-inf/MAX<br>MAX/MIN | -inf | MIN | nan | nan | +0 | nan | +0 |
-| 使得src0 * dst = MAX | MAX | MAX | +0 | MAX | MAX | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | -0 | MAX | MAX | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | +inf | +inf | MAX | +inf | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | -inf | -inf | MIN | +0 | +0 |
-| 使得src0 * dst = MAX | MAX | MAX | MAX | MAX | MAX | MAX | MAX |
-| 使得src0 * dst = MAX | MAX | MAX | MIN | +0 | +0 | +0 | +0 |
-| 使得src0 * dst = MAX | MAX | MAX | nan | nan | +0 | nan | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | +0 | MIN | MIN | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | -0 | MIN | MIN | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | +inf | +inf | MAX | +inf | MAX |
-| 使得src0 * dst = MIN | MIN | MIN | -inf | -inf | MIN | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | MAX | +0 | +0 | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | MIN | -inf | MIN | +0 | +0 |
-| 使得src0 * dst = MIN | MIN | MIN | nan | nan | +0 | nan | +0 |
+| 使得src0*dst=MAX | MAX | MAX | +0 | MAX | MAX | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | -0 | MAX | MAX | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | +inf | +inf | MAX | +inf | MAX |
+| 使得src0*dst=MAX | MAX | MAX | -inf | -inf | MIN | +0 | +0 |
+| 使得src0*dst=MAX | MAX | MAX | MAX | MAX | MAX | MAX | MAX |
+| 使得src0*dst=MAX | MAX | MAX | MIN | +0 | +0 | +0 | +0 |
+| 使得src0*dst=MAX | MAX | MAX | nan | nan | +0 | nan | +0 |
+| 使得src0*dst=MIN | MIN | MIN | +0 | MIN | MIN | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | -0 | MIN | MIN | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | +inf | +inf | MAX | +inf | MAX |
+| 使得src0*dst=MIN | MIN | MIN | -inf | -inf | MIN | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | MAX | +0 | +0 | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | MIN | -inf | MIN | +0 | +0 |
+| 使得src0*dst=MIN | MIN | MIN | nan | nan | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +0 | nan | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | -0 | nan | +0 | nan | +0 |
 | nan/任意值<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | +inf | nan | MAX | nan | MAX |
@@ -1039,14 +1039,14 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 24**  AddRelu特殊值/边界值输入的计算结果
 
 <a name="table143801137164310"></a>
-| src0取值/src1取值 | 中间阶段(src0 + src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/src1取值 | 中间阶段(src0+src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- |
 | +0/+0<br>+0/-0 | +0 | +0 | +0 | +0 |
 | -0/-0 | -0 | -0 | +0 | +0 |
 | +inf/+inf<br>+inf/MAX<br>+inf/MIN<br>+0/+inf<br>-0/+inf<br>MAX/MAX | +inf | MAX | +inf | MAX |
 | -inf/-inf<br>-inf/MAX<br>-inf/MIN<br>+0/-inf<br>-0/+inf<br>MIN/MIN | -inf | MIN | +0 | +0 |
-| 使得src0 + src1 = MAX | MAX | MAX | MAX | MAX |
-| 使得src0 + src1 = MIN | MIN | MIN | +0 | +0 |
+| 使得src0+src1=MAX | MAX | MAX | MAX | MAX |
+| 使得src0+src1=MIN | MIN | MIN | +0 | +0 |
 | nan/任意值<br>+inf/-inf | nan | +0 | nan | +0 |
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
@@ -1054,14 +1054,14 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 25**  SubRelu特殊值/边界值输入的计算结果
 
 <a name="table7783335111811"></a>
-| src0取值/src1取值 | 中间阶段(src0 - src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/src1取值 | 中间阶段(src0-src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- |
 | +0/+0<br>+0/-0 | +0 | +0 | +0 | +0 |
 | -0/+0 | -0 | -0 | +0 | +0 |
 | +inf/-inf<br>+inf/MAX<br>+inf/MIN<br>+0/-inf<br>-0/-inf<br>MAX/MIN<br>MAX/-inf<br>MIN/-inf | +inf | MAX | +inf | MAX |
 | -inf/-inf<br>-inf/MAX<br>-inf/MIN<br>+0/-inf<br>-0/+inf<br>MIN/MIN | -inf | MIN | +0 | +0 |
-| 使得src0 - src1 = MAX | MAX | MAX | MAX | MAX |
-| 使得src0 - src1 = MIN | MIN | MIN | +0 | +0 |
+| 使得src0-src1=MAX | MAX | MAX | MAX | MAX |
+| 使得src0-src1=MIN | MIN | MIN | +0 | +0 |
 | nan/任意值<br>+inf/+inf<br>-inf/-inf | nan | +0 | nan | +0 |
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
@@ -1069,21 +1069,21 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 26**  AddReluCast特殊值/边界值输入的计算结果
 
 <a name="table494414452367"></a>
-| src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1(src0 + src1)（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
+| src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1（src0+src1）（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
 | --- | --- | --- | --- | --- |
 | float/float/half | +0/+0<br>+0/-0 | +0 | +0 | +0 |
 | float/float/half | -0/-0 | -0 | +0 | +0 |
 | float/float/half | +inf/+inf<br>+inf/MAX<br>+inf/MIN<br>+0/+inf<br>-0/+inf<br>MAX/MAX | +inf | +inf | +inf |
 | float/float/half | -inf/-inf<br>-inf/MAX<br>-inf/MIN<br>+0/-inf<br>-0/+inf<br>MIN/MIN | -inf | +0 | +0 |
-| float/float/half | 使得 src0 + src1 = MAX | MAX | MAX | MAX |
-| float/float/half | 使得 src0 + src1 = MIN | MIN | +0 | +0 |
+| float/float/half | 使得src0+src1=MAX | MAX | MAX | MAX |
+| float/float/half | 使得src0+src1=MIN | MIN | +0 | +0 |
 | float/float/half | nan/任意值<br>+inf/-inf | nan | nan | +0 |
 | half/half/int8_t | +0/+0<br>+0/-0 | +0 | +0 | 0 |
 | half/half/int8_t | -0/-0 | -0 | +0 | 0 |
 | half/half/int8_t | +inf/+inf<br>+inf/MAX<br>+inf/MIN<br>+0/+inf<br>-0/+inf<br>MAX/MAX | +inf | +inf | MAX |
 | half/half/int8_t | -inf/-inf<br>-inf/MAX<br>-inf/MIN<br>+0/-inf<br>-0/+inf<br>MIN/MIN | -inf | +0 | 0 |
-| half/half/int8_t | 使得 src0 + src1 = MAX | MAX | MAX | MAX |
-| half/half/int8_t | 使得 src0 + src1 = MIN | MIN | +0 | 0 |
+| half/half/int8_t | 使得src0+src1=MAX | MAX | MAX | MAX |
+| half/half/int8_t | 使得src0+src1=MIN | MIN | +0 | 0 |
 | half/half/int8_t | nan/任意值<br>+inf/-inf | nan | nan | 0 |
 | int16_t/int16_t/int8_t | 0/0 | 0 | 0 | 0 |
 | int16_t/int16_t/int8_t | MAX/MAX | MAX | MAX | MAX |
@@ -1094,21 +1094,21 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 27**  SubReluCast特殊值/边界值输入的计算结果
 
 <a name="table1418126172917"></a>
-| src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1(src0 - src1)（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
+| src0数据类型/src1数据类型/dst数据类型 | src0取值/src1取值 | 中间阶段1（src0-src1）（INF/NAN模式） | 中间阶段2（INF/NAN模式） | dst输出（INF/NAN模式） |
 | --- | --- | --- | --- | --- |
 | float/float/half | +0/+0<br>+0/-0<br>-0/-0 | +0 | +0 | +0 |
 | float/float/half | -0/+0 | -0 | +0 | +0 |
 | float/float/half | +inf/-inf<br>+inf/MAX<br>+inf/MIN<br>+0/-inf<br>-0/-inf<br>MAX/MIN | +inf | +inf | +inf |
 | float/float/half | -inf/+0<br>-inf/+0<br>-inf/MAX<br>-inf/MIN<br>+0/+inf<br>-0/+inf<br>MIN/MAX | -inf | +0 | +0 |
-| float/float/half | 使得src0 - src1 = MAX | MAX | MAX | MAX |
-| float/float/half | 使得src0 - src1 = MIN | MIN | +0 | +0 |
+| float/float/half | 使得src0-src1=MAX | MAX | MAX | MAX |
+| float/float/half | 使得src0-src1=MIN | MIN | +0 | +0 |
 | float/float/half | nan/任意值<br>+inf/+inf<br>-inf/-inf | nan | nan | +0 |
 | half/half/int8_t | +0/+0<br>+0/-0<br>-0/-0 | +0 | +0 | 0 |
 | half/half/int8_t | -0/-0 | -0 | +0 | 0 |
 | half/half/int8_t | +inf/-inf<br>+inf/MAX<br>+inf/MIN<br>+inf/0<br>+inf/-0<br>+0/-inf<br>-0/-inf<br>MAX/MIN | +inf | +inf | MAX |
 | half/half/int8_t | -inf/-inf<br>-inf/MAX<br>-inf/MIN<br>+0/-inf<br>-0/+inf<br>MIN/MIN | -inf | +0 | 0 |
-| half/half/int8_t | 使得 src0 - src1 = MAX | MAX | MAX | MAX |
-| half/half/int8_t | 使得 src0 - src1 = MIN | MIN | +0 | 0 |
+| half/half/int8_t | 使得src0-src1=MAX | MAX | MAX | MAX |
+| half/half/int8_t | 使得src0-src1=MIN | MIN | +0 | 0 |
 | half/half/int8_t | nan/任意值<br>+inf/+inf<br>-inf/-inf | nan | nan | 0 |
 | int16_t/int16_t/int8_t | 0/0 | 0 | 0 | 0 |
 | int16_t/int16_t/int8_t | MAX/MIN | MAX | MAX | MAX |
@@ -1119,14 +1119,14 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 **表 28**  MulCast特殊值/边界值输入的计算结果
 
 <a name="table1698216295159"></a>
-| src0取值/src1取值 | 中间阶段(src0 * src1) | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
+| src0取值/src1取值 | 中间阶段（src0*src1） | 中间阶段（饱和模式，仅输出为half数据类型时支持） | dst输出（INF/NAN模式） | dst输出（饱和模式，仅输出为half数据类型时支持） |
 | --- | --- | --- | --- | --- |
 | +0/+0<br>-0/-0<br>+0/MAX<br>-0/MIN | +0 | +0 | 0 | 0 |
 | +0/-0<br>+0/MIN<br>-0/MAX | -0 | -0 | 0 | 0 |
 | MAX/MAX<br>+inf/MAX<br>-inf/MIN | +inf | MAX | MAX | MAX |
 | MAX/MIN<br>+inf/MIN<br>-inf/MAX | -inf | MIN | MIN | MIN |
-| 使得src0 * src1 = MAX | MAX | MAX | MAX | MAX |
-| 使得src0 * src1 = MIN | MIN | MIN | MIN | MIN |
+| 使得src0*src1=MAX | MAX | MAX | MAX | MAX |
+| 使得src0*src1=MIN | MIN | MIN | MIN | MIN |
 | nan/任意数<br>+0/+inf<br>+0/-inf<br>-0/+inf<br>-0/-inf | nan | +0 | 0 | 0 |
 
 注：dst的元素取值（INF/NAN模式）列结果，与IEEE754理论结果一致。
@@ -1149,7 +1149,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 
 ## 比较与选择<a name="section829519484517"></a>
 
-注：  
+注：
 - 下表中的MAX/MIN对应操作数对应数据类型下的最大值和最小值。
 - GetCmpMask为设置比较掩码寄存器的数据搬运操作，不涉及特殊值/边界值。
 
@@ -1248,8 +1248,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 注：
 
 -   CMPMODE::NE模式中，在数据类型为half和float时，Compare接口计算结果存在与IEEE754理论结果不同：
-    -   src0 = nan，src1 = MIN/MAX/+0/-0/nan/+inf/-inf 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1
-    -   src0 = MIN/MAX/+0/-0/nan/+inf/-inf，src1 =nan 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1
+    -   src0=nan，src1=MIN/MAX/+0/-0/nan/+inf/-inf时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
+    -   src0=MIN/MAX/+0/-0/nan/+inf/-inf，src1=nan时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
 
 -   在其余模式中，dst输出数据（INF/NAN模式）、dst输出数据（饱和模式）结果，与IEEE754理论结果一致。
 
@@ -1348,8 +1348,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 注：
 
 -   CMPMODE::NE模式中，在数据类型为half和float时，Compares接口计算结果存在与IEEE754理论结果不同：
-    -   src0 = nan，scalar = MIN/MAX/+0/-0/nan/+inf/-inf 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
-    -   src0 = MIN/MAX/+0/-0/nan/+inf/-inf，scalar =nan 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
+    -   src0=nan，scalar=MIN/MAX/+0/-0/nan/+inf/-inf时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
+    -   src0=MIN/MAX/+0/-0/nan/+inf/-inf，scalar=nan时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
 
 -   在其余模式中，dst输出数据（INF/NAN模式）、dst输出数据（饱和模式）结果，与IEEE754理论结果一致。
 
@@ -1410,14 +1410,14 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | int16_t/float | MAX | 32768.00 | 32768.00 |
 | int16_t/float | MIN | -32768.00 | -32768.00 |
 | int16_t/float | 0 | +0 | +0 |
-| bfloat16_t/int32_t | 3.3895314e+38 (MAX) | 2147483647 | 2147483647 |
-| bfloat16_t/int32_t | -3.3895314e+38 (MIN) | -2147483648 | -2147483648 |
+| bfloat16_t/int32_t | 3.3895314e+38（MAX） | 2147483647 | 2147483647 |
+| bfloat16_t/int32_t | -3.3895314e+38（MIN） | -2147483648 | -2147483648 |
 | bfloat16_t/int32_t | 0 | 0 | 0 |
 | bfloat16_t/int32_t | +inf | 2147483647 | 2147483647 |
 | bfloat16_t/int32_t | -inf | -2147483648 | -2147483648 |
 | bfloat16_t/int32_t | nan | 0 | 0 |
-| bfloat16_t/float | 3.3895314e+38 (MAX) | 3.3895314e+38 | 3.3895314e+38 |
-| bfloat16_t/float | -3.3895314e+38 (MIN) | -3.3895314e+38 | -3.3895314e+38 |
+| bfloat16_t/float | 3.3895314e+38（MAX） | 3.3895314e+38 | 3.3895314e+38 |
+| bfloat16_t/float | -3.3895314e+38（MIN） | -3.3895314e+38 | -3.3895314e+38 |
 | bfloat16_t/float | 0 | 0 | 0 |
 | bfloat16_t/float | +inf | +inf | +inf |
 | bfloat16_t/float | -inf | -inf | -inf |
@@ -1431,7 +1431,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | int32_t/int64_t | 2147483647（MAX） | 2147483647 | 2147483647 |
 | int32_t/int64_t | -2147483648（MIN） | -2147483648 | -2147483648 |
 | float/int16_t | 3.4028235e+38（MAX） | 32767 | 32767 |
-| float/int16_t | -3.4028235e+38（MIN) | -32768 | -32768 |
+| float/int16_t | -3.4028235e+38（MIN） | -32768 | -32768 |
 | float/int16_t | 0 | 0 | 0 |
 | float/int16_t | +inf | 32767 | 32767 |
 | float/int16_t | -inf | -32768 | -32768 |

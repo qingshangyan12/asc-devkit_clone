@@ -90,7 +90,7 @@
 | 数据搬运 | DataCopy(UB->UB) | AIV | PIPE_V |
 | 数据搬运 | Copy | AIV | PIPE_V |
 
-**表 2**  CUBE API流水类型汇总
+**表 2**  Cube API流水类型汇总
 
 <a name="table12311219174812"></a>
 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
@@ -125,6 +125,7 @@
 | SetLreluALPHA | AIC | PIPE_S |
 
 **表 3**  标量计算指令流水类型汇总
+
 | API接口名称 | 流水类型 |
 | --- | --- |
 | GetBitCount | PIPE_S |
