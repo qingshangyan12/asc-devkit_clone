@@ -7,15 +7,15 @@
 
 | 产品 | 是否支持 | 备注 |
 | --- | --- | --- |
-| <cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ </cann-filter>| 该接口生效 |
-| <cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>| 该接口生效 |
-| <cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="910"> Atlas 训练系列产品 | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="x90"> Kirin X90 | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
-| <cann-filter npu-type="9030"> Kirin 9030 | √ </cann-filter>| 仅保证编译兼容，实际功能不生效。 |
+| <cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT | √ | 该接口生效</cann-filter> |
+| <cann-filter npu-type="A3"> Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ | 该接口生效</cann-filter> |
+| <cann-filter npu-type="910b"> Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="310b"> Atlas 200I/500 A2 推理产品 | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="310p"> Atlas 推理系列产品AI Core | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="310p"> Atlas 推理系列产品Vector Core | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="910"> Atlas 训练系列产品 | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="x90"> Kirin X90 | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
+| <cann-filter npu-type="9030"> Kirin 9030 | √ | 仅保证编译兼容，实际功能不生效。</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -34,7 +34,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 <cann-filter npu-type="950,A3,910b,310b,x90,9030">
 
-- 该原型在如下产品型号支持：
+- 该原型支持如下产品型号：
 
     <cann-filter npu-type="950"> Ascend 950PR/Ascend 950DT </cann-filter>
 
@@ -56,7 +56,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
 
 <cann-filter npu-type="310p,910">
 
-- 该原型在如下产品型号支持：
+- 该原型支持如下产品型号：
 
     <cann-filter npu-type="310p"> Atlas 推理系列产品AI Core </cann-filter>
 
