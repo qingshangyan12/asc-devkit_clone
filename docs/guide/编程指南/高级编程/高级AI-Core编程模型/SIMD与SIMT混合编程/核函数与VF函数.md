@@ -48,13 +48,13 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 -   入参支持指针类型（需使用\_\_gm\_\_修饰）和Ascend C内置数据类型；
 -   指针参数必须是指向Global Memory上的内存地址，使用\_\_gm\_\_修饰。
 
-核函数的调用是通过<<<...\>\>\>内核调用符在Host侧调用，语法如下：
+核函数的调用是通过<<<...\>\>\>核函数调用符在Host侧调用，语法如下：
 
 ```
 kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 ```
 
-内核调用符内的配置参数说明如下：
+核函数调用符内的配置参数说明如下：
 
 <a name="zh-cn_topic_0000002571578013_table942016184315"></a>
 | 参数 | 类型 | 说明 | 约束 |
@@ -95,7 +95,7 @@ SIMT VF函数有以下约束：
 
 -   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及其组成的指针、数组、结构体类型，且指针类型必须指向GM或者UB内存。
 -   函数返回类型必须是void。
--   SIMT VF内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
+-   SIMT VF内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_callee\_\_函数。
 
 ## \_\_simt\_callee\_\_子函数<a name="zh-cn_topic_0000002571578013_section4680126514"></a>
 
@@ -115,4 +115,19 @@ return_type result = function_name(arg1, arg2, ...);
 
 -   入参仅支持Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）和指针类型。
 -   函数返回值只能是Ascend C的[内置数据类型](../../../语言扩展层/SIMD&SIMT-BuiltIn关键字.md#zh-cn_topic_0000002571575581_section1880403364916)（int32\_t、uint32\_t、float、half等）及对应的指针类型。
--   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_aicore\_\_函数。
+-   函数内只能调用\_\_simt\_callee\_\_函数或constexpr \_\_callee\_\_函数。
+
+### 与SIMT编程核函数调用的差异
+
+在[SIMT编程](../../../编程模型/AI-Core-SIMT编程/核函数.md#核函数的调用)中，核函数自身即为线程级并行的执行体，线程计算逻辑直接写在核函数体内，并通过核函数调用符一次性配置网格与线程；而在SIMD与SIMT混合编程中，核函数仅作为Device侧的入口函数，不直接承载SIMT线程级逻辑，SIMT线程级计算下沉到通过`asc_vf_call`调用的SIMT VF函数中。二者在核函数调用上的主要差异如下：
+
+| 对比项 | SIMT编程 | SIMD与SIMT混合编程 |
+| --- | --- | --- |
+| 核函数修饰符 | `__global__` | `__global__ __vector__` |
+| 线程级计算逻辑位置 | 直接位于核函数体内 | 位于VF函数（`__simt_vf__`）内，由核函数通过`asc_vf_call`调用 |
+| 核函数调用符 | `kernel<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...)` | `kernel<<<block_num, dyn_ub_size, stream>>>(...)` |
+| 核函数调用符参数个数 | 4个 | 3个 |
+| 线程数（blockDim）的指定位置 | 在核函数调用符的`threads_per_block`参数中指定 | 不在核函数调用符中指定，由核函数内`asc_vf_call`的`dim3(blockDim)`参数指定 |
+| 网格规模（gridDim）的指定位置 | 在核函数调用符的`blocks_per_grid`参数中指定 | 在核函数调用符的`block_num`参数中指定 |
+
+关键区别在于：SIMT编程的核函数调用符同时配置了网格规模与线程块内线程数（`<<<blocks_per_grid, threads_per_block, ...>>>`）；而混合编程的核函数调用符仅配置核数（`block_num`），**线程数不在核函数调用符中设置**，而是在核函数内部通过`asc_vf_call`的`dim3(blockDim)`参数指定。因此混合编程将“核数配置”与“线程数配置”分离到了核函数调用符和`asc_vf_call`两处。
