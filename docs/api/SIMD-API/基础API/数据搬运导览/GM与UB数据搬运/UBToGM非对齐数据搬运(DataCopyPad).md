@@ -4,7 +4,7 @@
 
 对于非32字节对齐的场景，在读取Unified Buffer数据时会填入dummy假数据对齐到32B，搬入Global Memory时会将dummy空数据丢弃，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../../其他数据类型/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
     - VECIN -> GM
