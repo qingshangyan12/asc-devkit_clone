@@ -47,8 +47,8 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
     CcuKernelInfo kernelInfo;
     strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcServer");
     kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuKfcServerKernel);
-    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();  
-    // TODO：其他参数赋值  
+    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();
+    // TODO：其他参数赋值
     kernelInfo.setKernelArg(kernelArg);
 
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

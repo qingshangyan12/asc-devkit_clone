@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <exception>
 #include "ccu_kernel_alg_base.h"
 #include "ccu_kernel_all_to_all_mesh1d.h"
 
@@ -49,10 +50,26 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
     for (uint64_t peerId = 0; peerId < arg->rankSize; peerId++) {
         HCCL_INFO("[CcuKernelAlltoAllMesh1D] start for peerid[%llu/%llu], rankId = %llu", peerId, arg->rankSize, arg->rankId);
         if (peerId != arg->rankId) {
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] peerId=%llu use channelIdx=%u (channelCount=%u, CCU_MAX_RANK_SIZE=%llu)",
+                      peerId, channelIdx, arg->channelCount, (unsigned long long)CCU_MAX_RANK_SIZE);
+            if (channelIdx >= arg->channelCount) {
+                HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channelIdx[%u] >= channelCount[%u], would overflow channels!",
+                           channelIdx, arg->channelCount);
+                return CcuResult::CCU_E_INTERNAL;
+            }
+            if (channelIdx >= CCU_MAX_RANK_SIZE) {
+                HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channelIdx[%u] >= CCU_MAX_RANK_SIZE[%llu], array out of bound!",
+                           channelIdx, (unsigned long long)CCU_MAX_RANK_SIZE);
+                return CcuResult::CCU_E_INTERNAL;
+            }
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] before GetResByChannel INPUT, channel handle=%p",
+                      (void *)arg->channels[channelIdx]);
             ctx.input[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], INPUT_XN_ID);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] got INPUT, before GetResByChannel OUTPUT");
             ctx.output[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], OUTPUT_XN_ID);
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] got OUTPUT, before GetResByChannel TOKEN");
             ctx.token[peerId] = ccu::GetResByChannel<ccu::Variable>(arg->channels[channelIdx], TOKEN_XN_ID);
-            HCCL_INFO("[CcuKernelAlltoAllMesh1D] GetResByChannel finished!");
+            HCCL_INFO("[CcuKernelAlltoAllMesh1D] GetResByChannel finished for peerId=%llu!", peerId);
             channelIdx++;
         }
     }
@@ -186,7 +203,26 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
                                   ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
                                   ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg)
 {
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] enter kernel, raw arg ptr=%p", (void *)arg);
     auto *kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D *>(arg);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] after static_cast, kernelArg=%p", (void *)kernelArg);
+    if (kernelArg == nullptr) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] kernelArg is nullptr after cast!");
+        return CcuResult::CCU_E_INTERNAL;
+    }
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] dbg rankSize=%llu rankId=%u channelCount=%u loadFromMem=%d CCU_MAX_RANK_SIZE=%llu",
+              (unsigned long long)kernelArg->rankSize, kernelArg->rankId, kernelArg->channelCount,
+              (int)kernelArg->loadFromMem, (unsigned long long)CCU_MAX_RANK_SIZE);
+    if (kernelArg->rankSize > CCU_MAX_RANK_SIZE) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] rankSize[%llu] exceeds CCU_MAX_RANK_SIZE[%llu]!",
+                   (unsigned long long)kernelArg->rankSize, (unsigned long long)CCU_MAX_RANK_SIZE);
+        return CcuResult::CCU_E_INTERNAL;
+    }
+    if (kernelArg->rankId >= kernelArg->rankSize) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] rankId[%u] >= rankSize[%llu]!",
+                   kernelArg->rankId, (unsigned long long)kernelArg->rankSize);
+        return CcuResult::CCU_E_INTERNAL;
+    }
 
     AlltoAllMesh1DContext ctx;
     ctx.arg = kernelArg;
@@ -200,24 +236,32 @@ CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputA
     ctx.enginePool = 0;
 
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D run");
-    CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish ParseKernelArg!");
-    CCU_CHK_RET(InitResource(ctx));
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish InitResource!");
-    CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset, sliceSize,
-                                  goSize1, goSize2, goSize3, goSize4));
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish LoadArgs!");
+    try {
+        CCU_CHK_RET(ParseKernelArg(ctx, kernelArg));
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish ParseKernelArg!");
+        CCU_CHK_RET(InitResource(ctx));
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish InitResource!");
+        CCU_CHK_RET(LoadArgs(ctx, inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset, sliceSize,
+                                      goSize1, goSize2, goSize3, goSize4));
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish LoadArgs!");
 
-    PreSync(ctx);
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PreSync!");
+        PreSync(ctx);
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PreSync!");
 
-    CCU_CHK_RET(DoAlltoAll(ctx));
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish DoAlltoAll!");
+        CCU_CHK_RET(DoAlltoAll(ctx));
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish DoAlltoAll!");
 
 
-    PostSync(ctx);
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PostSync!");
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
+        PostSync(ctx);
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] finish PostSync!");
+        HCCL_INFO("[CcuKernelAlltoAllMesh1D] AlltoAllMesh1D end");
+    } catch (const std::exception &e) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] caught std::exception: %s", e.what());
+        return CcuResult::CCU_E_INTERNAL;
+    } catch (...) {
+        HCCL_ERROR("[CcuKernelAlltoAllMesh1D] caught unknown exception!");
+        return CcuResult::CCU_E_INTERNAL;
+    }
 
     return CCU_SUCCESS;
 }
