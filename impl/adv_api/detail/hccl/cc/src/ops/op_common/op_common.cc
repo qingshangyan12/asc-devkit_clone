@@ -714,12 +714,17 @@ HcclResult HcclGetAlgRes(HcclComm comm, OpParam& param, std::unique_ptr<InsCollA
 
     // kfc算法kernel资源准备 - 仅当isKfc为true时执行
     if (param.isKfc && param.engine == COMM_ENGINE_CCU) {
-        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] preparing KFC Server kernel for opType[%d], algTag[%s]",
-            param.opType, param.algTag);
+        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] preparing KFC Server kernel for opType[%d], algTag[%s], "
+            "ccuKernelInfos.size()[%zu] before CcuKfcServer CalcRes",
+            param.opType, param.algTag, resRequest.ccuKernelInfos.size());
         std::unique_ptr<InsCollAlgBase> ccuKfcExecutor = CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
+        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] generated ccuKfcExecutor!");
         CHK_PRT_RET(
             ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
         CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+        HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
+            "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
+            resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
     }
 
 
@@ -1232,6 +1237,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     CcuInsHandle insHandle{0};
     uint32_t insNum = 0;
     CHK_RET(HcclCommQueryCcuIns(comm, &insHandle, &insNum));
+    HCCL_INFO("[HcclGetCcuKernel] HcclCommQueryCcuIns returned insNum[%u]", insNum);
     CHK_PRT_RET(insNum != 1,
         HCCL_ERROR("[HcclGetCcuKernel] HcclCommQueryCcuIns fail! insNum is [%u]", insNum),
         HCCL_E_INTERNAL);
@@ -1240,6 +1246,8 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     for (auto t: resRequest.ccuKernelNum) {
         totalKernelNum += t;
     }
+    HCCL_INFO("[HcclGetCcuKernel] totalKernelNum[%u], ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
+        totalKernelNum, resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
     CHK_PRT_RET(totalKernelNum != resRequest.ccuKernelInfos.size(),
         HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
         HCCL_E_INTERNAL);
@@ -1254,7 +1262,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
 
         CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
         HCCL_INFO("[HcclWrapper-DEBUG] HcommCcuKernelRegisterStart returned: %d", regStartRet);
-        
+
         if (regStartRet != CCU_SUCCESS) {
             HCCL_ERROR("ccu kernel register start failed: ccuRet -> %d", regStartRet);
             return ConvertCcuToHccl(regStartRet);
@@ -1268,16 +1276,17 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
                 continue;
             }
 
-            HCCL_DEBUG("[HcclGetCcuKernel] kernelFuncName[%s]", kernelInfo.kernelFuncName);
+            HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", i, kernelInfo.kernelFuncName);
             CcuKernelHandle kernelHandle;
             CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
                                                       reinterpret_cast<void*>(kernelInfo.kernelFunc),
                                                       kernelInfo.kernelArg, &kernelHandle);
             if (regRet != CCU_SUCCESS) {
-                HCCL_ERROR("ccu kernel register failed: ccuRet -> %d", regRet);
+                HCCL_ERROR("ccu kernel register failed for kernel[%u][%s]: ccuRet -> %d", i, kernelInfo.kernelFuncName, regRet);
                 return ConvertCcuToHccl(regRet);
             }
             resCtxHost->ccuKernels[i] = kernelHandle;
+            HCCL_INFO("[HcclGetCcuKernel] kernel[%u][%s] registered successfully, handle[%llu]", i, kernelInfo.kernelFuncName, kernelHandle);
         }
         CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
         if (regEndRet != CCU_SUCCESS) {
@@ -1287,6 +1296,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
         currentResGroup++;
     }
     resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
+    HCCL_INFO("[HcclGetCcuKernel] done, ccuKernels.size()[%zu]", resCtxHost->ccuKernels.size());
     return HCCL_SUCCESS;
 }
 
