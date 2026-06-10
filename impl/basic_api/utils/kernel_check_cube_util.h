@@ -23,6 +23,7 @@
 #if ASCENDC_CPU_DEBUG
 #include <string>
 #include "kernel_utils.h"
+
 namespace AscendC {
 namespace check {
 struct MmadApiParams {
