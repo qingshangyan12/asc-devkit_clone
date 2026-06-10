@@ -1,4 +1,4 @@
-# asc_le_scalar
+﻿# asc_le_scalar
 
 ## 产品支持情况
 
@@ -54,6 +54,11 @@ vector_bool dst;
 vector_int8_t src;
 int8_t value = 5;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Reg矢量计算/reg_vector/asc_le_scalar.md
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 asc_le_scalar(dst, src, value, mask);
+=======
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
+asc_le(dst, src, value, mask);
+>>>>>>> origin/c_api:docs/api/context/c_api/reg/reg_vector/asc_le_scalar.md
 ```

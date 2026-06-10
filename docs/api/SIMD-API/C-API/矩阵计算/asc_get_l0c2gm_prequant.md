@@ -1,4 +1,4 @@
-# asc_get_l0c2gm_prequant
+﻿# asc_get_l0c2gm_prequant
 
 ## 产品支持情况
 

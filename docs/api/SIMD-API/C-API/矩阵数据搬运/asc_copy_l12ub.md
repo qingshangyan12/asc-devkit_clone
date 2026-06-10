@@ -18,7 +18,11 @@
     ```
 
 - 同步搬运
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12ub.md
     ```cpp
+=======
+    ```c++
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12ub.md
     __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void * dst, __cbuf__ void * src, bool sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
     ```
 
@@ -44,8 +48,13 @@ PIPE_MTE1
 
 ## 约束说明
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12ub.md
 - dst、src的起始地址需要32字节对齐。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+=======
+- dst、src_addr的起始地址需要32字节对齐。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12ub.md
 - 由于此接口实现了Cube核与Vector核间的数据搬运，所以如果核函数调用了该接口，则不能使用__cube__或__vector__的执行空间修饰符，否则会导致执行失败。
 
 ## 调用示例

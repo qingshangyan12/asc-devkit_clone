@@ -1,4 +1,4 @@
-# asc_int322float
+﻿# asc_int322float
 
 ## 产品支持情况
 
@@ -59,6 +59,6 @@ PIPE_V
 vector_int32_t src;
 vector_float dst;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_int322float_rn(dst, src, mask);
 ```

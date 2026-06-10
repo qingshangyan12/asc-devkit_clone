@@ -1,4 +1,4 @@
-# asc_gather
+﻿# asc_gather
 
 ## 产品支持情况
 
@@ -114,8 +114,12 @@ PIPE_V
     ```cpp
     vector_half dst;
     vector_half src;
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Reg矢量计算/reg_load/asc_gather.md
     vector_uint16_t index;
     asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+=======
+    asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
+>>>>>>> origin/c_api:docs/api/context/c_api/reg/reg_load/asc_gather.md
     asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
     asc_gather(dst, src, index);
     ```

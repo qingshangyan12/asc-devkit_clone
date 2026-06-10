@@ -1,4 +1,4 @@
-# asc_int162half
+﻿# asc_int162half
 
 ## 产品支持情况
 
@@ -59,6 +59,6 @@ PIPE_V
 vector_half dst;
 vector_int16_t src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_int162half_rd(dst, src, mask);
 ```

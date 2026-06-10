@@ -1,4 +1,9 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Memory矢量计算/asc_vdeq_int162b8.md
 # asc_vdeq_int162b8
+=======
+﻿
+# asc_vdeq_int162b8_h
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_compute/asc_vdeq_int162b8.md
 
 ## 产品支持情况
 

@@ -23,7 +23,11 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, ui
 - 高维切分搬运
 
 ```c++
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矢量数据搬运/asc_copy_ub2ub.md
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_gap, uint16_t dst_gap)
+=======
+__aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_datamove/asc_copy_ub2ub.md
 ```
 
 - 同步计算
@@ -41,7 +45,11 @@ __aicore__ inline void asc_copy_ub2ub_sync(__ubuf__ void* dst, __ubuf__ void* sr
 | src | 输入 | 源UB地址。 |
 | size | 输入 | 搬运数据大小（字节）。 |
 | burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矢量数据搬运/asc_copy_ub2ub.md
 | leburst_count | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
+=======
+| burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_datamove/asc_copy_ub2ub.md
 | src_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 | dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 

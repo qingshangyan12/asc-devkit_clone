@@ -21,8 +21,13 @@
 表2 Padding配置涉及的所有参数及其传入接口，其中i表示第i维，可取值[0,4]
 | 参数 | 传入接口 | 描述 |
 | :--- | :------- | :--- |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矢量数据搬运/asc_ndim_copy_gm2ub.md
 | enable_padding | 本接口 | 表示Padding值填取方式，类型为bool。<br>&bull; true：使能常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; false：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
 | pad_value | [asc_set_ndim_pad_value](./asc_set_ndim_pad_value.md) | 当enable_padding为true时，该值将作为Padding的填充固定值。当enable_padding为false时，该值不生效。 |
+=======
+| enable_padding | 本接口 | 表示Padding值填取方式，类型为bool。<br>&bull; True：使能常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; False：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
+| pad_value | [asc_set_ndim_pad_value](./asc_set_ndim_pad_value.md) | 当padding_mode为True时，该值将作为Padding的填充固定值。当padding_mode为False时，该值不生效。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
 | loopi_lp_count | <br>&bull; 0维：本接口 <br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 表示每个维度内，左侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
 | loopi_rp_count | <br>&bull; 0维：本接口 <br>&bull; 1至4维：[asc_set_ndim_pad_count](./asc_set_ndim_pad_count.md) | 表示每个维度内，右侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
 
@@ -77,7 +82,11 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* sr
 | loop4_size | 输入 | 表示4维处理的元素个数（不包含Padding元素）。<br> 单位为元素个数，取值范围为[1, 2^20-1]。 |
 | loop0_lp_count | 输入 | 表示0维左侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
 | loop0_rp_count | 输入 | 表示0维右侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矢量数据搬运/asc_ndim_copy_gm2ub.md
 | enable_padding | 输入 | 表示Padding值填取方式。<br>&bull; true：使能常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; false：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
+=======
+| enable_padding | 输入 | 表示Padding值填取方式。<br>&bull; True：使能常数填充方式，即所有Padding值为固定值pad_value。<br>&bull; False：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
 | cache_mode | 输入 | L2 cache模式。 |
 
 ## 返回值说明
@@ -122,7 +131,11 @@ uint64_t loop2_dst_stride = 0;
 uint64_t loop3_dst_stride = 0;
 uint64_t loop4_dst_stride = 0;
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矢量数据搬运/asc_ndim_copy_gm2ub.md
 bool enable_padding = true;
+=======
+bool enable_padding = false;
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
 half pad_value = 88.0;
 uint8_t loop0_lp_count = 2;
 uint8_t loop1_lp_count = 2;

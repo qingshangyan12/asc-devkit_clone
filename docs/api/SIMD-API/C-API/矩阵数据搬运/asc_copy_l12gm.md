@@ -15,12 +15,20 @@
 
 - 常规搬运
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md
     ```cpp
+=======
+    ```c++
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12gm.md
     __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
     ```
 - 同步搬运
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md
     ```cpp
+=======
+    ```c++
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12gm.md
     __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
     ```
 
@@ -33,8 +41,13 @@
 | src | 输入    | 源操作数的起始地址。|
 | burst_count | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | burst_len | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md
 | src_stride | 输入    | 相邻迭代间，源操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。 |
 | dst_stride | 输入    | 相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。单位为32字节。 |
+=======
+| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32个字节。 |
+| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32个字节。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12gm.md
 
 ## 返回值说明
 
@@ -57,11 +70,19 @@ PIPE_MTE1
 constexpr uint16_t burst_count = 1;
 //待搬运的每个连续传输数据块的长度为32个字节
 constexpr uint16_t burst_len = 1;
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md
 //相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
+=======
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为0
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12gm.md
 constexpr uint16_t src_stride = 0;
 //相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
 constexpr uint16_t dst_stride = 1;
 __cbuf__ half src[256];
 __gm__ half dst[256];
 asc_copy_l12gm(dst, src, burst_count, burst_len, src_stride, dst_stride);
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md
 ```
+=======
+```
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12gm.md

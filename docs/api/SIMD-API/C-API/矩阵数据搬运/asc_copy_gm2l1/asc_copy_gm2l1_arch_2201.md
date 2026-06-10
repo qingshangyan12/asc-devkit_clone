@@ -29,6 +29,7 @@
 
 - 普通搬运模式（高维切分）
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
     ```cpp
     __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
                                       uint16_t burst_len, uint16_t src_gap, uint16_t dst_stride)
@@ -48,6 +49,27 @@
                                       uint16_t burst_len, uint16_t src_gap, uint16_t dst_stride)
     __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
                                       uint16_t burst_len, uint16_t src_gap, uint16_t dst_stride)
+=======
+    ```c++
+    __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad1(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad2(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad3(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad4(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad5(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad6(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad7(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src, uint16_t burst_count,
+                                      uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
     ```
 
 - 普通搬运模式（同步）
@@ -142,8 +164,13 @@ constexpr uint16_t burst_len = 512 * sizeof(half) / 32;
 // 源操作数做连续搬运
 constexpr uint16_t src_gap = 0;
 // 目的操作数连续排布
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
 constexpr uint16_t dst_stride = 0;
 asc_copy_gm2l1((__cbuf__ void*)dst, (__gm__ void*)src, burst_count, burst_len, src_gap, dst_stride);
+=======
+constexpr uint16_t dst_gap = 0;
+asc_copy_gm2l1((__cbuf__ void*)dst, (__gm__ void*)src, burst_count, burst_len, src_gap, dst_gap);
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
 
 // 2D数据搬运模式
 //搬运的起始分块为1

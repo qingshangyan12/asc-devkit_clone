@@ -40,22 +40,40 @@
 
 - 高维切分搬运 3D格式
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
     ```cpp
     __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
+=======
+    ```c++
+    __aicore__ inline void asc_copy_l12l0b(__cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b(__cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
     ```
 
 - 同步高维切分搬运 3D格式
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
     ```cpp
     __aicore__ inline void asc_copy_l12l0b_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
     __aicore__ inline void asc_copy_l12l0b_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_enable_filter_size_w, bool enable_enable_filter_size_h, bool enable_enable_transpose, bool enable_enable_f_matrix_ctrl, uint16_t channel_size)
+=======
+    ```c++
+    __aicore__ inline void asc_copy_l12l0b_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+    __aicore__ inline void asc_copy_l12l0b_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_w_extend, bool enable_filter_h_extend, bool enable_transpose, bool enable_f_matrix_ctrl, uint16_t channel_size)
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
     ```
 
 ## 参数说明
@@ -85,10 +103,17 @@
 | filter_h | 输入 | 卷积核height，取值范围：[1, 255]。 |
 | dilation_filter_w | 输入 | 卷积核width膨胀系数，取值范围：[1, 255]。 |
 | dilation_filter_h | 输入 | 卷积核height膨胀系数，取值范围：[1, 255]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
 | enable_enable_filter_size_w | 输入 | 是否在filter_w的基础上将卷积核width增加256个元素。true表示增加；false表示不增加。 |
 | enable_enable_filter_size_h | 输入 | 是否在filter_h的基础上将卷积核height增加256个元素。true表示增加；false表示不增加。 |
 | enable_enable_transpose | 输入 | 是否启用转置功能，对整个目标矩阵进行转置，仅在源操作数为half类型时有效。true表示启用；false表示不启用。 |
 | enable_enable_f_matrix_ctrl | 输入 | 表示asc_copy_l12l0b指令从左矩阵还是右矩阵获取FeatureMap的属性描述，当前只支持设置为false。 |
+=======
+| enable_filter_w_extend | 输入 | 是否在filter_w的基础上将卷积核width增加256个元素。true表示增加；false表示不增加。 |
+| enable_filter_h_extend | 输入 | 是否在filter_h的基础上将卷积核height增加256个元素。true表示增加；false表示不增加。 |
+| enable_transpose | 输入 | 是否启用转置功能，对整个目标矩阵进行转置，仅在源操作数为half类型时有效。true表示启用；false表示不启用。 |
+| enable_f_matrix_ctrl | 输入 | 表示asc_copy_l12l0b指令从左矩阵还是右矩阵获取FeatureMap的属性描述，当前只支持设置为false。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
 | channel_size | 输入 | 源操作数的通道数，取值范围：[1, 63]。 对于uint32_t/int32_t/float，channelSize可取值为4，N * 8，N * 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N * 16，N * 16 + 4，N * 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 * N，N * 32 + 4，N * 32 + 8，N * 32 + 16；对于int4b_t，ChannelSize可取值为8，16，32，N * 64，N * 64 + 8，N * 64 + 16，N * 64 + 32。N为正整数。|
 
 ## 返回值说明

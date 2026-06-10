@@ -1,3 +1,7 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_load_image_to_cbuf.md
+=======
+﻿
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_load_image_to_cbuf.md
 # asc_load_image_to_cbuf
 
 ## 产品支持情况

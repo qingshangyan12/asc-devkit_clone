@@ -76,6 +76,11 @@ constexpr uint16_t dst_gap = 1;
 constexpr uint16_t conv_control = 0;
 __cbuf__ half src[256];
 __biasbuf__ half dst[256];
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
 uint64_t dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
 asc_copy_l12bt(dst_addr, src, conv_control, burst_count, burst_len, source_gap, dst_gap);
+=======
+uint64_t dst = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
+asc_copy_l12bt(dst, src, conv_control, burst_count, burst_len, source_gap, dst_gap);
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
 ```

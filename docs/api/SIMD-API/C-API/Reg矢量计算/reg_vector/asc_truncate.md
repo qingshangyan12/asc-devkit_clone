@@ -1,4 +1,8 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Reg矢量计算/reg_vector/asc_truncate.md
 # asc_trunc / asc_rint / asc_round / asc_floor / asc_ceil
+=======
+﻿# asc_truncate
+>>>>>>> origin/c_api:docs/api/context/c_api/reg/reg_vector/asc_truncate.md
 
 ## 产品支持情况
 

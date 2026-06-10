@@ -1,4 +1,4 @@
-# asc_scatter
+﻿# asc_scatter
 
 ## 产品支持情况
 
@@ -54,5 +54,9 @@ vector_half dst;
 __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_uint16_t index;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Reg矢量计算/reg_load/asc_scatter.md
+=======
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
+>>>>>>> origin/c_api:docs/api/context/c_api/reg/reg_load/asc_scatter.md
 asc_scatter(dst, src, index, mask);
 ```

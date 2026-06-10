@@ -1,3 +1,7 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵计算/asc_enable_hf32.md
+=======
+﻿
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_compute/asc_enable_hf32.md
 # asc_enable_hf32
 
 ## 产品支持情况

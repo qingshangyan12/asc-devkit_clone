@@ -22,6 +22,7 @@
 
 - 常规搬运
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0c.md
     ```cpp
     __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_stride, uint16_t dst_stride)
     __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ half* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_stride, uint16_t dst_stride)
@@ -41,6 +42,27 @@
     __aicore__ inline void asc_copy_l12l0c_sync(__cc__ float* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_stride, uint16_t dst_stride)
     __aicore__ inline void asc_copy_l12l0c_sync(__cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_stride, uint16_t dst_stride)
     __aicore__ inline void asc_copy_l12l0c_sync(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t burst_count, uint16_t leburst_count, uint16_t src_stride, uint16_t dst_stride)
+=======
+    ```c++
+    __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ half* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ float* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    ```
+- 同步搬运
+
+    ```c++
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ half* dst, __cbuf__ half* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ half* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ float* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+    __aicore__ inline void asc_copy_l12l0c_sync(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0c.md
     ```
 
 ## 参数说明
@@ -51,9 +73,15 @@
 | dst | 输出    | 目的操作数的起始地址。|
 | src | 输入    | 源操作数的起始地址。|
 | burst_count | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0c.md
 | leburst_count | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
 | src_stride | 输入    | 表示相邻迭代间，源操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。 |
 | dst_stride | 输入    | 表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。 |
+=======
+| burst_len | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
+| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32个字节。 |
+| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32个字节。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0c.md
 
 ## 返回值说明
 
@@ -75,12 +103,22 @@ PIPE_MTE1
 //待搬运的连续传输数据块为1个
 constexpr uint16_t burst_count = 1;
 //待搬运的每个连续传输数据块的长度为32个字节
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0c.md
 constexpr uint16_t leburst_count = 1;
 //相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为64个字节
+=======
+constexpr uint16_t burst_len = 1;
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0c.md
 constexpr uint16_t src_stride = 1;
 //相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
 constexpr uint16_t dst_stride = 0;
 __cbuf__ half src[256];
 __cc__ half dst[256];
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0c.md
 asc_copy_l12l0c(dst, src, burst_count, leburst_count, src_stride, dst_stride);
 ```
+=======
+asc_copy_l12l0c(dst, src, burst_count, burst_len, src_stride, dst_stride);
+```
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12l0c.md

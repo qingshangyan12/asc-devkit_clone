@@ -1,4 +1,8 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/Memory矢量计算/asc_get_reduce_min_cnt.md
 # asc_get_reduce_min_cnt
+=======
+﻿# asc_repeat_reduce_min
+>>>>>>> origin/c_api:docs/api/context/c_api/vector_compute/asc_get_reduce_min_cnt.md
 
 ## 产品支持情况
 

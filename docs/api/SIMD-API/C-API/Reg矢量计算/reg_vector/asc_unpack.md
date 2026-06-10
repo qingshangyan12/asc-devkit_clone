@@ -1,4 +1,4 @@
-# asc_unpack
+﻿# asc_unpack
 
 ## 产品支持情况
 
@@ -51,6 +51,6 @@ PIPE_V
 ```cpp
 vector_uint16_t dst;
 vector_uint8_t src;
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_unpack_upper(dst, src);
 ```

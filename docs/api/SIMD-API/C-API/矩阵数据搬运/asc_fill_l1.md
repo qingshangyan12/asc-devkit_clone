@@ -1,3 +1,7 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_fill_l1.md
+=======
+﻿
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_fill_l1.md
 # asc_fill_l1
 
 ## 产品支持情况

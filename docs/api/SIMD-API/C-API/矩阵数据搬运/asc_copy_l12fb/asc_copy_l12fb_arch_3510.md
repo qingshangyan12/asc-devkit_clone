@@ -19,7 +19,11 @@
 
 - 高维切分搬运
     ```cpp
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
     __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t source_gap, uint16_t dst_gap)
+=======
+    __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap_size, uint16_t dst_gap_size)
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
     ```
 
 - 同步搬运
@@ -35,9 +39,15 @@
 | src | 输入 | 源操作数起始地址。 |
 | size | 输入 | 搬运数据大小（字节）。|
 | burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
 | burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为64B。取值范围：[1, 65535]。 |
 | source_gap | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
 | dst_gap | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为64B。 |
+=======
+| burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）。取值范围：[1, 65535]。 |
+| src_gap_size | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
+| dst_gap_size | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
 
 ## 返回值说明
 

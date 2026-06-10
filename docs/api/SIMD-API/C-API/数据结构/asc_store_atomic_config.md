@@ -1,4 +1,4 @@
-# asc_store_atomic_config
+﻿# asc_store_atomic_config
 
 asc_store_atomic_config参数包含原子操作使能位与原子操作类型，用于[asc_get_store_atomic_config](../原子操作/asc_get_store_atomic_config.md)接口使用。
 

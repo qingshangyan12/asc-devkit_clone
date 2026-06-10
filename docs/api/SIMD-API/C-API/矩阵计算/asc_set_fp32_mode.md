@@ -1,3 +1,7 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵计算/asc_set_fp32_mode.md
+=======
+﻿
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_compute/asc_set_fp32_mode.md
 # asc_set_fp32_mode
 
 ## 产品支持情况

@@ -1,5 +1,9 @@
 ﻿# asc_set_l0c2gm_config
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵计算/asc_set_l0c2gm_config.md
 ## 产品支持情况
+=======
+## AI处理器支持情况
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_compute/asc_set_l0c2gm_config.md
 
 |产品   | 是否支持 |
 | ------------|:----:|
@@ -13,7 +17,11 @@
 
 ## 函数原型
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵计算/asc_set_l0c2gm_config.md
 ```cpp
+=======
+```c++
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_compute/asc_set_l0c2gm_config.md
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_mode, uint64_t quant_pre_mode, bool enable_unit_flag)
 ```
 
@@ -41,8 +49,16 @@ PIPE_S
 
 ## 调用示例
 
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/矩阵计算/asc_set_l0c2gm_config.md
 ```cpp
 constexpr uint64_t relu_pre_mode = 0;
 constexpr uint64_t quant_pre_mode = 0x1000;// 假设量化操作有效地址为 0x1000
 asc_set_l0c2gm_config(relu_pre_mode, quant_pre_mode, true);
 ```
+=======
+```c++
+constexpr uint64_t relu_pre_mode = 0;
+constexpr uint64_t quant_pre_mode = 0x1000;// 假设量化操作有效地址为 0x1000
+asc_set_l0c2gm_config(relu_pre_mode, quant_pre_mode, true);
+```
+>>>>>>> origin/c_api:docs/api/context/c_api/cube_compute/asc_set_l0c2gm_config.md

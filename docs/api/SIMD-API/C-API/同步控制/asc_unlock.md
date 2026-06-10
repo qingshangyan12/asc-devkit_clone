@@ -1,5 +1,9 @@
+<<<<<<< HEAD:docs/api/SIMD-API/C-API/同步控制/asc_unlock.md
 # asc_unlock
 
+=======
+﻿# asc_unlock
+>>>>>>> origin/c_api:docs/api/context/c_api/sync/asc_unlock.md
 ## 产品支持情况
 
 | 产品 | 是否支持  |
