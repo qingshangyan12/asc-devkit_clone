@@ -51,7 +51,7 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_fused_intf.h"`。
 
-srcReg0与srcReg1相减，差值作为e的指数计算， 根据mask将计算结果写入dstReg。公式如下：
+srcReg0与srcReg1相减，差值作为e的指数计算，根据mask将计算结果写入dstReg。公式如下：
 
 srcReg数据类型为float时：
 
@@ -114,7 +114,7 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 - 本接口不修改全局寄存器的值。
 - 源操作数类型为half时，Vector计算单元一次计算只处理最多64个元素，mask的有效情况以输入数据类型为准，只有偶数位有效，有效位共128bit，参考下图：
 
-![3-3-4-6-3_约束说明](../../../../figures/RegLayout-23.png)
+![3-3-4-6-3_约束说明](../../../../figures/3-3-4-6-3_约束说明.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

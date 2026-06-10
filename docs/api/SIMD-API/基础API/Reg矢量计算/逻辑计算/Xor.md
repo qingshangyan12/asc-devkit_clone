@@ -59,7 +59,7 @@
 
 - 对MaskReg操作：
 
-  根据mask对两个输入MaskReg数据src0、src1按位异或（^）操作，将结果写入ds。
+  根据mask对两个输入MaskReg数据src0、src1按位异或（^）操作，将结果写入dst。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -86,7 +86,7 @@
   |-------|------|
   | T | 操作数数据类型。 |
   | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-  | U | srcReg0、srcReg1、dstReg的RegTensor类型， 例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
+  | U | srcReg0、srcReg1、dstReg的RegTensor类型，例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
 
   **表2**  参数说明
 

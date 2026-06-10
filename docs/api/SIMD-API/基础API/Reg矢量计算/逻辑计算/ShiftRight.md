@@ -80,8 +80,8 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 | T | 源操作数数据类型。 |
 | U | 右移参数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| S | srcReg0、dstReg的RegTensor类型， 例如RegTensor<uint32_t\>，由编译器自动推导，用户不需要填写。 |
-| V | srcReg1的RegTensor类型， 例如RegTensor<int32_t\>，由编译器自动推导，用户不需要填写。 |
+| S | srcReg0、dstReg的RegTensor类型，例如RegTensor<uint32_t\>，由编译器自动推导，用户不需要填写。 |
+| V | srcReg1的RegTensor类型，例如RegTensor<int32_t\>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
@@ -111,6 +111,7 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 | int64_t  | int64_t  | int64_t |
 | uint64_t | uint64_t | int64_t |
 
+**int64_t、uint64_t为软仿数据类型。**
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
