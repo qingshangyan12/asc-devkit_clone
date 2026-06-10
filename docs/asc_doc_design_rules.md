@@ -86,7 +86,7 @@ Ascend C资料体系由**四份**核心文档组成（入门教程归入编程�
 - API参考页面的概念引用就近行内链接（非集中在页面底部）
 - **注意方向**：算子实践参考→API参考手册（查接口详情），API参考手册不需要反向链接到算子实践参考
 - 跨代迁移指南同时是链接发起方和接收方：向外链接到编程指南（概念变更）和API参考手册（新API详情）；接收其他文档涉及版本差异时指向它的链接
-- 样例库地址：https://gitcode.com/cann/asc-devkit/tree/master/examples
+- 所有资料涉及的完整代码样例引用到样例库，样例库地址：https://gitcode.com/cann/asc-devkit/tree/master/examples
 
 ### 术语统一入口
 
