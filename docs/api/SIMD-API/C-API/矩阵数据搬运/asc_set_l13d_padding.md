@@ -1,8 +1,8 @@
-# asc_set_l13d_padding
+﻿# asc_set_l13d_padding
 
-## 产品支持情况
+## AI处理器支持情况
 
-|产品   | 是否支持 |
+|AI处理器类型   | 是否支持 |
 | ------------|:----:|
 | Ascend 950PR/Ascend 950DT |    √     |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √    |
@@ -10,11 +10,11 @@
 
 ## 功能说明
 
-设置Pad属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/)接口时配置填充数值。
+设置Pad属性描述，用于在调用[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)接口时配置填充数值。
 
 ## 函数原型
 
-```cpp
+```c++
 __aicore__ inline void asc_set_l13d_padding(uint64_t config)
 __aicore__ inline void asc_set_l13d_padding(half config)
 __aicore__ inline void asc_set_l13d_padding(int16_t config)
@@ -41,7 +41,7 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
+```c++
 constexpr uint64_t config = 0;
 asc_set_l13d_padding(config);
 ```

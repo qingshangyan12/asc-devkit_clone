@@ -1,4 +1,4 @@
-# asc_set_l0c2gm_lrelu_alpha
+﻿# asc_set_l0c2gm_lrelu_alpha
 
 ## 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 函数原型
 
-```cpp
+```c++
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config)
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config)
 ```
@@ -39,7 +39,7 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
+```c++
 half config = 0.5;
 asc_set_l0c2gm_lrelu_alpha(config);
 ```

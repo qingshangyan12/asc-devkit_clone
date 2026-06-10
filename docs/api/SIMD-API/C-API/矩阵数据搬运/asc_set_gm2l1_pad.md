@@ -37,21 +37,11 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-asc_set_gm2l1_loop_size(2, 2);
-asc_set_gm2l1_loop1_stride(96, 128);
-asc_set_gm2l1_loop2_stride(192, 288);
+asc_set_gm2l1_loop_size(loop1_size, loop2_size);
+asc_set_gm2l1_loop1_stride(loop1_src_stride, loop1_dst_stride);
+asc_set_gm2l1_loop2_stride(loop2_src_stride, loop2_dst_stride);
 // 源操作数非对齐，需要填补数据
 asc_set_gm2l1_pad(0);
-constexpr uint32_t burst_count = 2;
-constexpr uint32_t burst_len = 2;
-constexpr uint8_t left_padding_count = 1;
-constexpr uint8_t right_padding_count = 0;
-constexpr bool enable_data_select = false;
-constexpr uint8_t l2_cache_ctl = 0;
-constexpr uint64_t burst_src_stride = 0;
-constexpr uint32_t burst_dst_stride = 0;
-__gm__ half src[256];
-__cbuf__ half dst[256];
-asc_copy_gm2l1_align(dst, src, burst_count, burst_len,  left_padding_count, right_padding_count, enable_data_select, l2_cache_ctl, burst_src_stride, burst_dst_stride);
+asc_copy_gm2l1_align(dst, src, size);
 asc_set_gm2l1_loop_size(1, 1);
 ```

@@ -1,3 +1,4 @@
+﻿
 # asc_load_image_to_cbuf
 
 ## 产品支持情况
@@ -13,14 +14,14 @@
 
 ## 函数原型
 
-- 常规搬运
+- 常规计算
 
     ```cpp
     __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
     __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
     ```
 
-- 同步搬运
+- 同步计算
 
     ```cpp
     __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
@@ -53,13 +54,13 @@ PIPE_MTE2
 ## 约束说明
 
 - dst的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ## 调用示例
 
 ```cpp
 constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
-__cbuf__ half dst[total_length];
+__ca__ half dst[total_length];
 // 加载图片时的高度与宽度均为1，起始地址为(0,0)，源图片水平宽度为1，不做padding
 asc_load_image_to_cbuf(dst, 1, 1, 0, 0, 1, 0, 0, 0, 0);
 ```

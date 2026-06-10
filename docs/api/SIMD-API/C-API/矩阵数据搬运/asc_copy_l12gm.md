@@ -1,8 +1,8 @@
 ﻿# asc_copy_l12gm
 
-## 产品支持情况
+## AI处理器支持情况
 
-| 产品 | 是否支持  |
+| AI处理器类型 | 是否支持  |
 | :----------------------- | :------: |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
@@ -15,13 +15,13 @@
 
 - 常规搬运
 
-    ```cpp
-    __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    ```c++
+    __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
     ```
 - 同步搬运
 
-    ```cpp
-    __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+    ```c++
+    __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride)
     ```
 
 ## 参数说明
@@ -33,8 +33,8 @@
 | src | 输入    | 源操作数的起始地址。|
 | burst_count | 输入    | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | burst_len | 输入    | 待搬运的每个连续传输数据块的长度，单位为32个字节。取值范围：[1, 65535]。 |
-| src_gap | 输入    | 相邻迭代间，源操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。 |
-| dst_gap | 输入    | 相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。单位为32字节。 |
+| src_stride | 输入    | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔，单位为32个字节。 |
+| dst_stride | 输入    | 相邻迭代间，目标操作数前一个分形起始地址与后一个分形起始地址的间隔，单位为32个字节。 |
 
 ## 返回值说明
 
@@ -57,11 +57,11 @@ PIPE_MTE1
 constexpr uint16_t burst_count = 1;
 //待搬运的每个连续传输数据块的长度为32个字节
 constexpr uint16_t burst_len = 1;
-//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
-constexpr uint16_t src_gap = 0;
-//相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
-constexpr uint16_t dst_gap = 1;
+//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为0
+constexpr uint16_t src_stride = 0;
+//相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为32个字节
+constexpr uint16_t dst_stride = 1;
 __cbuf__ half src[256];
 __gm__ half dst[256];
-asc_copy_l12gm(dst, src, burst_count, burst_len, src_gap, dst_gap);
+asc_copy_l12gm(dst, src, burst_count, burst_len, src_stride, dst_stride);
 ```

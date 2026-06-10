@@ -1,8 +1,8 @@
 ﻿# asc_copy_l12fb
 
-## 产品支持情况
+## AI处理器支持情况
 
-| 产品 | 是否支持  |
+| AI处理器类型 | 是否支持  |
 | :----------------------- | :------: |
 | <term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> |    √     |
 | <term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> |    √     |
@@ -14,7 +14,7 @@
 ## 函数原型
 
 - 前n个数据搬运
-    ```cpp
+    ```c++
     __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 
@@ -24,7 +24,7 @@
     ```
 
 - 同步搬运
-    ``cpp
+    ```c++
     __aicore__ inline void asc_copy_l12fb_sync(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size)
     ```
 
@@ -51,7 +51,7 @@ PIPE_MTE1
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_instruction.md#通用地址重叠约束)。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例

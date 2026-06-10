@@ -1,4 +1,4 @@
-# asc_set_l13d_rpt
+﻿# asc_set_l13d_rpt
 
 ## 产品支持情况
 
@@ -14,7 +14,7 @@
 
 ## 函数原型
 
-```cpp
+```c++
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 ```
 
@@ -22,7 +22,7 @@ __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| config | 输入 | 用于设置Load3Dv2接口的repeat参数，详细说明请参考[asc_load3d_v2_config.md](../数据结构/asc_load3d_v2_config.md)。 |
+| config | 输入 | 用于设置Load3Dv2接口的repeat参数，详细说明请参考[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)。 |
 
 ## 返回值说明
 
@@ -34,11 +34,11 @@ PIPE_S
 
 ## 约束说明
 
-- 需配合[asc_load3d_v2_config.md](../数据结构/asc_load3d_v2_config.md)使用，用于设置Load3Dv2接口的repeat参数。
+- 需配合[asc_load3d_v2_config.md](../struct/asc_load3d_v2_config.md)使用，用于设置Load3Dv2接口的repeat参数。
 
 ## 调用示例
 
-```cpp
+```c++
 asc_load3d_v2_config config;
 asc_set_l13d_rpt(config); // 设置Load3D的repeat相关参数为默认值rpt_stride：0，rpt_time：1，rpt_mode：0
 ```

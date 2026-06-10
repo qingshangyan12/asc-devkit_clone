@@ -10,12 +10,12 @@
 
 ## 功能说明
 
-设置Feature map属性描述，用于在调用[asc_copy_l12l0a](./asc_copy_l12l0a)/[asc_copy_l12l0b](./asc_copy_l12l0b)的3D格式搬运接口时配置填充数值。
-仅当asc_copy_l12l0a/asc_copy_l12l0b接口的enable_f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。
+设置Feature map属性描述，用于在调用[asc_copy_l12l0a](./asc_copy_l12l0a.md)/[asc_copy_l12l0b](./asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。
+仅当asc_copy_l12l0a/asc_copy_l12l0b接口的f_matrix_ctrl参数指示从右矩阵获取FeatureMap的属性时使用本接口设置Feature map属性描述，否则使用asc_set_l13d_fmatrix接口。
 
 ## 函数原型
 
-```cpp
+```c++
 __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 ```
 
@@ -23,7 +23,7 @@ __aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
 
 | 参数名  | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
-| config | 输入 | 用于设置asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的Feature map属性参数，详细说明请参考[asc_l13d_fmatrix_config](../数据结构/asc_l13d_fmatrix_config.md)。 |
+| config | 输入 | 用于设置asc_copy_l12l0a/asc_copy_l12l0b的3D格式搬运接口的Feature map属性参数，详细说明请参考[asc_l13d_fmatrix_config](../struct/asc_l13d_fmatrix_config.md)。 |
 
 ## 返回值说明
 
@@ -39,7 +39,7 @@ PIPE_S
 
 ## 调用示例
 
-```cpp
+```c++
 asc_l13d_fmatrix_config config;
 asc_set_l13d_fmatrix_b(config);
 ```

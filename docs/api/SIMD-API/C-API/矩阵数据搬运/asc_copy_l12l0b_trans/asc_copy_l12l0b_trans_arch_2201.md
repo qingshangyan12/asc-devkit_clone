@@ -22,7 +22,7 @@
 - dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
 - dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形的结束地址与后一个分形起始地址的间隔为0（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b8示例一.png)
+![](../../figures/asc_copy_l12l0b_trans_b8示例一.png)
 
 如下图示例：
 
@@ -30,7 +30,7 @@
 - dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址和下一个迭代第一个分形起始地址无间隔。
 - dst_frac_gap = 2，表示每个迭代内目的操作数前一个分形的结束地址与后一个分形起始地址的间隔为2（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b8示例二.png)
+![](../../figures/asc_copy_l12l0b_trans_b8示例二.png)
 
 - 对于half/bfloat16_t数据类型，每次迭代处理16 × 16 × 2B数据，可处理1个分形（一个分形512B），每次迭代中，源操作数中1个16 × 16分形将被转置。
   - 因为每次迭代处理16 × 16 × 2B数据，需要3次迭代可以完成，repeat_time = 3；
@@ -38,7 +38,7 @@
   - dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址无间隔；
   - 该场景下，因为其分形即为方块矩阵，每个迭代处理一个分形，不存在迭代内分形的间隔，该参数设置无效。
 
-![](../../figures/asc_copy_l12l0_trans_b16示例.png)
+![](../../figures/asc_copy_l12l0b_trans_b16示例.png)
 
 - 对于float/int32_t/uint32_t数据类型，每次迭代处理16 × 16 × 4B数据，可处理2个分形（一个分形512B），每次迭代中，源操作数2个连续的16 × 8分形将被合并为1个16 × 16的方块矩阵，基于方块矩阵做转置，转置后分裂为2个16 × 8分形，根据目的操作数分形间隔等参数可以有不同的排布。
 如下图示例：
@@ -47,38 +47,38 @@
   - dst_gap = 1，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔为1（单位：512B）；
   - dst_frac_gap = 0，表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址的间隔为0（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b32示例一.png)
+![](../../figures/asc_copy_l12l0b_trans_b32示例一.png)
 
 如下图示例：
 - repeat_time和src_stride的解释和上图示例一致。
 - dst_gap = 0，表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址和下一个迭代第一个分形起始地址无间隔。
 - dst_frac_gap = 2，表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址的间隔为2（单位：512B）。
 
-![](../../figures/asc_copy_l12l0_trans_b32示例二.png)
+![](../../figures/asc_copy_l12l0b_trans_b32示例二.png)
 
 
 ## 函数原型
 
 - 高维切分搬运
 ```cpp
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
 ```
 
 - 同步高维切分搬运 
 ```cpp
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint64_t dst_frac_gap)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint64_t dst_frac_stride)
 ```
 
 ## 参数说明
@@ -90,9 +90,9 @@ __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float* dst, __cbuf__ fl
 | index_id |输入 |方块矩阵的ID，搬运起始位置为源操作数中第几个方块矩阵（0 为源操作数中第1个方块矩阵）。取值范围：index_id∈[0, 65535]。|
 | repeat |输入 |迭代重复次数。repeat∈[0, 255]。<br> 对于uint8_t/int8_t数据类型，每次迭代处理32 × 32 × 1B数据；<br> 对于half/bfloat16_t数据类型，每次迭代处理16 × 16 × 2B数据；<br> 对于float/int32_t/uint32_t数据类型，每次迭代处理16 × 16 × 4B数据。|
 | src_stride | 输入|表示相邻迭代间，源操作数前一个方块矩阵与后一个方块矩阵起始地址的间隔，单位：（1024B）。取值范围：src_stride∈[0, 65535]。<br> 对于uint8_t/int8_t数据类型，单位是32 × 32 × 1B； <br> 对于half/bfloat16_t数据类型，单位是16 × 16 × 2B；<br> 对于float/int32_t/uint32_t数据类型，单位是16 × 16 × 4B； <br> 对于int4b_t数据类型，每次迭代处理16 × 64 × 0.5B数据。|
-| dst_gap | 输入|表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。取值范围：dst_gap∈[0, 65535]。 |
+| dst_stride | 输入|表示相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔。取值范围：dst_stride∈[0, 65535]。 |
 | enable_addr_decrement | 输入| 控制地址更新方式。<br>false: 递增，每次迭代在前一个地址的基础上加上src_stride。<br>true: 递减，每次迭代在前一个地址的基础上减去src_stride。 |
-| dst_frac_gap | 输入  | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512B，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t时有效。|
+| dst_frac_stride | 输入  | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512B，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t时有效。|
 
 
 
@@ -123,10 +123,10 @@ uint8_t nBlockSize = 32;
 uint8_t repeat = n / nBlockSize;
 uint16_t index_id = 0;
 uint16_t src_stride = 1;
-uint16_t dst_gap = 1;
+uint16_t dst_stride = 1;
 bool enable_addr_decrement = false;
-uint64_t dst_frac_gap = 0;
+uint64_t dst_frac_stride = 0;
 
 // 搬运过程
-asc_copy_l12l0b_trans(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, dst_frac_gap);
+asc_copy_l12l0b_trans(dst, src, index_id, repeat, src_stride, dst_stride, enable_addr_decrement, dst_frac_stride);
 ```
