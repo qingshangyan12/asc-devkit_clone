@@ -143,8 +143,8 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l13d_size](矩阵数据搬运/asc_set_l13d_size.md)                                                                     | 设置[asc_copy_l12l0a](矩阵数据搬运/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](矩阵数据搬运/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。 |
 | [asc_load_image_to_cbuf](矩阵数据搬运/asc_load_image_to_cbuf.md)                                                           | 将图像数据从Global Memory搬运到L1 Buffer。 |
 | [asc_copy_l12bt](矩阵数据搬运/asc_copy_l12bt)                                                                              | 将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer中。 |
-| [asc_copy_l12fb](矩阵数据搬运/asc_copy_l12fb)                                                                              | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
-| [asc_copy_l12fb_v2](矩阵数据搬运/asc_copy_l12fb_v2.md)                                                                     | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_copy_l12fb_arch_2201](矩阵数据搬运/asc_copy_l12fb_arch_2201.md)                                                                              | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
+| [asc_copy_l12fb_arch_3510](矩阵数据搬运/asc_copy_l12fb_arch_3510.md)                                                                     | 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数。 |
 | [asc_copy_l12l0a](矩阵数据搬运/asc_copy_l12l0a)                                                                            | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0A Buffer里。 |
 | <cann-filter npu_type = "950"> [asc_copy_l12ub](矩阵数据搬运/asc_copy_l12ub.md)                                            | 将数据从L1 Buffer搬运到Unified Buffer中。</cann-filter> |
 | [asc_copy_l12l0b](矩阵数据搬运/asc_copy_l12l0b)                                                                            | 用于搬运存放在L1 Buffer里的512B大小的矩阵到L0B Buffer里。 |
@@ -322,16 +322,17 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 
 |   API名称   |   说明   |
 |----------|-----------|
+| [asc_load](Reg矢量计算/reg_load/asc_load.md) | reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。 |
 | [asc_loadalign](Reg矢量计算/reg_load/asc_loadalign/) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
-| [asc_loadalign_postupdate](Reg矢量计算/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，开启post mod。 |
-| [asc_storealign](Reg矢量计算/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
+| [asc_loadalign](Reg矢量计算/reg_load/asc_loadalign_deintlv.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作。 |
+| [asc_loadalign_postupdate](Reg矢量计算/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mod。 |
+| [asc_loadunalign_pre](Reg矢量计算/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](Reg矢量计算/reg_load/asc_loadunalign.md)接口使用。 |
+| [asc_loadunalign](Reg矢量计算/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
 | [asc_gather](Reg矢量计算/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
 | [asc_gather_datablock](Reg矢量计算/reg_load/asc_gather_datablock.md) | 给定源操作数在UB中的基地址和索引，根据索引位置将源操作数按DataBlock收集到目的操作数中。 |
 | [asc_get_mask_spr](Reg矢量计算/reg_load/asc_get_mask_spr.md) | 从特殊寄存器SPR{MASK1, MASK0}读取mask值并根据数据类型格式返回对应的mask数据，MASK0、MASK1均为64bit的寄存器。 |
-| [asc_load](Reg矢量计算/reg_load/asc_load.md) | reg计算数据搬运接口，支持从UB非32字节对齐的源地址src搬运至矢量数据寄存器，搬运量为VL。 |
-| [asc_loadunalign](Reg矢量计算/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
-| [asc_loadunalign_pre](Reg矢量计算/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](Reg矢量计算/reg_load/asc_loadunalign.md)接口使用。 |
 | [asc_store](Reg矢量计算/reg_store/asc_store.md) | reg计算数据搬运接口，适用于从矢量数据寄存器搬出到UB的场景，不区分是否对齐，在追求极致性能时，应尽量避免使用该接口。 |
+| [asc_storealign](Reg矢量计算/reg_store/asc_storealign/) | reg计算数据搬运接口，适用于从矢量数据寄存器连续对齐搬出到UB的场景，并支持多种搬出模式。 |
 | [asc_storeunalign](Reg矢量计算/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_postupdate](Reg矢量计算/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
@@ -384,7 +385,7 @@ Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列�
 | [asc_ge_scalar](Reg矢量计算/reg_vector/asc_ge_scalar.md) | ge（greater than or equal to），对源操作数与标量执行逐元素比较。 |
 | [asc_gt](Reg矢量计算/reg_vector/asc_gt.md) | gt（greater than），对源操作数执行逐元素比较。 |
 | [asc_gt_scalar](Reg矢量计算/reg_vector/asc_gt_scalar.md) | gt（greater than），对源操作数与标量执行逐元素比较。 |
-| [asc_half2bf16](Reg矢量计算/reg_vector/asc_half2bf16.md) | 将half类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |
+| [asc_half2bfloat16](Reg矢量计算/reg_vector/asc_half2bfloat16.md) | 将half类型数据转换为bfloat16_t类型，并支持多种舍入模式。 |
 | [asc_half2float](Reg矢量计算/reg_vector/asc_half2float.md) | 将half类型数据转换为float类型。 |
 | [asc_half2hif8](Reg矢量计算/reg_vector/asc_half2hif8.md) | 将half类型转换为hifloat8_t类型，并支持多种舍入模式。 |
 | [asc_half2int16](Reg矢量计算/reg_vector/asc_half2int16.md) | 将half类型数据转换为int16_t类型，并支持多种舍入模式。 |
