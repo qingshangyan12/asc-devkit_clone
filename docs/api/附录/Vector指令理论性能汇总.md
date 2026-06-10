@@ -59,6 +59,7 @@
 | Min | int16_t | 128 |
 | Min | int32_t | 64 |
 | Min | float | 64 |
+| BilinearInterpolation(ISASI) | half | 软仿指令，不涉及理论并行度 |
 | Adds | half | 128 |
 | Adds | int16_t | 128 |
 | Adds | int32_t | 64 |

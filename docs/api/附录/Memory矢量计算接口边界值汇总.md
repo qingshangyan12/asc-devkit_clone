@@ -1348,8 +1348,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 注：
 
 -   CMPMODE::NE模式中，在数据类型为half和float时，Compares接口计算结果存在与IEEE754理论结果不同：
-    -   src0 = nan，scalar = MIN/MAX/+0/-0/nan/+inf/-inf 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1
-    -   src0 = MIN/MAX/+0/-0/nan/+inf/-inf，scalar =nan 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1
+    -   src0 = nan，scalar = MIN/MAX/+0/-0/nan/+inf/-inf 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
+    -   src0 = MIN/MAX/+0/-0/nan/+inf/-inf，scalar =nan 时，实际结果：dst输出数据（INF/NAN模式和饱和模式）均为0/0/0/0/0/0/0，IEEE754理论结果：1/1/1/1/1/1/1。
 
 -   在其余模式中，dst输出数据（INF/NAN模式）、dst输出数据（饱和模式）结果，与IEEE754理论结果一致。
 

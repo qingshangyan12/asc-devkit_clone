@@ -125,68 +125,68 @@
 | SetLreluALPHA | AIC | PIPE_S |
 
 **表 3**  标量计算指令流水类型汇总
-| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
-| --- | --- | --- |
-| GetBitCount |  | PIPE_S |
-| CountLeadingZero |  | PIPE_S |
-| GetSFFValue |  | PIPE_S |
-| CountBitsCntSameAsSignBit |  | PIPE_S |
-| Cast（float转half、int32_t） |  | PIPE_S |
-| Cast（float转bfloat16_t） |  | PIPE_S |
-| Cast（bfloat16_t转float） |  | PIPE_S |
-| ReadGmByPassDCache(ISASI) |  | PIPE_S |
-| WriteGmByPassDCache(ISASI) |  | PIPE_S |
+| API接口名称 | 流水类型 |
+| --- | --- |
+| GetBitCount | PIPE_S |
+| CountLeadingZero | PIPE_S |
+| GetSFFValue | PIPE_S |
+| CountBitsCntSameAsSignBit | PIPE_S |
+| Cast（float转half、int32_t） | PIPE_S |
+| Cast（float转bfloat16_t） | PIPE_S |
+| Cast（bfloat16_t转float） | PIPE_S |
+| ReadGmByPassDCache(ISASI) | PIPE_S |
+| WriteGmByPassDCache(ISASI) | PIPE_S |
 
 **表 4**  同步指令流水类型汇总
 
 <a name="table1054353913238"></a>
-| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
-| --- | --- | --- |
-| SetFlag/WaitFlag |  | PIPE_S |
-| PipeBarrier |  | PIPE_S |
-| DataSyncBarrier |  | PIPE_S |
-| CrossCoreSetFlag |  | PIPE_S |
-| CrossCoreWaitFlag |  | PIPE_S |
-| SyncAll |  | PIPE_S |
-| SetNextTaskStart |  | PIPE_S |
-| WaitPreTaskEnd |  | PIPE_S |
+| API接口名称 | 流水类型 |
+| --- | --- |
+| SetFlag/WaitFlag | PIPE_S |
+| PipeBarrier | PIPE_S |
+| DataSyncBarrier | PIPE_S |
+| CrossCoreSetFlag | PIPE_S |
+| CrossCoreWaitFlag | PIPE_S |
+| SyncAll | PIPE_S |
+| SetNextTaskStart | PIPE_S |
+| WaitPreTaskEnd | PIPE_S |
 
 **表 5**  原子操作流水类型汇总
 
 <a name="table25871912193814"></a>
-| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
-| --- | --- | --- |
-| SetAtomicAdd |  | PIPE_S |
-| SetAtomicMax |  | PIPE_S |
-| SetAtomicMin |  | PIPE_S |
-| SetAtomicType |  | PIPE_S |
-| DisableDmaAtomic |  | PIPE_S |
-| GetStoreAtomicConfig(ISASI) |  | PIPE_S |
-| SetStoreAtomicConfig(ISASI) |  | PIPE_S |
+| API接口名称 | 流水类型 |
+| --- | --- |
+| SetAtomicAdd | PIPE_S |
+| SetAtomicMax | PIPE_S |
+| SetAtomicMin | PIPE_S |
+| SetAtomicType | PIPE_S |
+| DisableDmaAtomic | PIPE_S |
+| GetStoreAtomicConfig(ISASI) | PIPE_S |
+| SetStoreAtomicConfig(ISASI) | PIPE_S |
 
 **表 6**  工具接口流水类型汇总
 
 <a name="table1147331317457"></a>
-| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
-| --- | --- | --- |
-| InitSocState |  | PIPE_S |
-| GetBlockNum |  | PIPE_S |
-| GetBlockIdx |  | PIPE_S |
-| GetTaskRatio |  | PIPE_S |
-| GetSubBlockNum |  | PIPE_S |
-| GetSubBlockIdx |  | PIPE_S |
-| GetDataBlockSizeInBytes |  | PIPE_S |
-| GetSystemCycle |  | PIPE_S |
-| GetProgramCounter |  | PIPE_S |
-| GetArchVersion |  | PIPE_S |
+| API接口名称 | 流水类型 |
+| --- | --- |
+| InitSocState | PIPE_S |
+| GetBlockNum | PIPE_S |
+| GetBlockIdx | PIPE_S |
+| GetTaskRatio | PIPE_S |
+| GetSubBlockNum | PIPE_S |
+| GetSubBlockIdx | PIPE_S |
+| GetDataBlockSizeInBytes | PIPE_S |
+| GetSystemCycle | PIPE_S |
+| GetProgramCounter | PIPE_S |
+| GetArchVersion | PIPE_S |
 
 **表 7**  缓存控制接口流水类型汇总
 
-| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
-| --- | --- | --- |
-| DataCachePreload |  | PIPE_S |
-| DataCacheCleanAndInvalid |  | PIPE_S |
-| ICachePreLoad(ISASI) |  | PIPE_S |
-| GetICachePreloadStatus(ISASI) |  | PIPE_S |
+| API接口名称 | 流水类型 |
+| --- | --- |
+| DataCachePreload | PIPE_S |
+| DataCacheCleanAndInvalid | PIPE_S |
+| ICachePreLoad(ISASI) | PIPE_S |
+| GetICachePreloadStatus(ISASI) | PIPE_S |
 
 </cann-filter>
