@@ -37,8 +37,23 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 ## 参数说明<a id="zh-cn_topic_0000002516209232_section622mcpsimp"></a>
 
 <cann-filter npu_type = "A3,910b,310b">
+针对如下产品型号，参数说明见下表：
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas 200I/500 A2 推理产品：
+<cann-filter npu_type = "A3">
+Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
+</cann-filter>
+
+<cann-filter npu_type = "910b">
+Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
+</cann-filter>
+
+<cann-filter npu_type = "310b">
+
+Atlas 200I/500 A2 推理产品；
+
+</cann-filter>
 
 **表 1**  参数说明
 
@@ -65,8 +80,15 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 </cann-filter>
 
 <cann-filter npu_type = "x90,9030">
+针对如下产品型号，参数说明见下表：
 
-针对Kirin X90、Kirin 9030：
+<cann-filter npu_type = "x90">
+Kirin X90；
+</cann-filter>
+
+<cann-filter npu_type = "9030">
+Kirin 9030；
+</cann-filter>
 
 **表 3**  参数说明
 

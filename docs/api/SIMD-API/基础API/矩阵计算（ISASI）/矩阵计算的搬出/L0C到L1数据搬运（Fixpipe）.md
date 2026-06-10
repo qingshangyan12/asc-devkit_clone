@@ -22,7 +22,17 @@
 
 <cann-filter npu_type = "A3,910b">
 
-以Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品为例，下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
+以如下产品型号为例：
+
+<cann-filter npu_type = "A3">
+Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+</cann-filter>
+
+<cann-filter npu_type = "910b">
+Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+</cann-filter>
+
+下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 **图 1**  L0C2L1流程图<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
@@ -73,7 +83,7 @@
 | 参数名 | 描述 |
 |----------|----------|
 | T/U | 目的操作数/源操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002511188540_section4219135304818)。 |
-| config | Fixpipe相关配置参数，类型为FixpipeConfig。取值如下：<br>&bull; **CFG_ROW_MAJOR（默认取值）**：开启NZ2ND，输出数据格式为ND格式。<cann-filter npu_type = "A3,910b">针对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品，在L0C Buffer -> L1 Buffer通路下不生效。</cann-filter><br>&bull; CFG_NZ：NZ2NZ，输出数据格式为NZ格式。<br><cann-filter npu_type = "950">&bull; CFG_COLUMN_MAJOR：针对Ascend 950PR/Ascend 950DT，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 用于用户指定目的地址的位置是否是UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 输出数据格式仍为NZ格式。<br>    ROW_MAJOR, // 开启NZ2ND，输出数据格式为ND格式。<br><cann-filter npu_type = "950">    COLUMN_MAJOR, // 仅Ascend 950PR/Ascend 950DT支持，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu_type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 仅Ascend 950PR/Ascend 950DT支持</cann-filter></pre> |
+| config | Fixpipe相关配置参数，类型为FixpipeConfig。取值如下：<br>&bull; **CFG_ROW_MAJOR（默认取值）**：开启NZ2ND，输出数据格式为ND格式。<cann-filter npu_type = "A3,910b">针对<cann-filter npu_type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu_type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>在L0C Buffer -> L1 Buffer通路下不生效。</cann-filter><br>&bull; CFG_NZ：NZ2NZ，输出数据格式为NZ格式。<br><cann-filter npu_type = "950">&bull; CFG_COLUMN_MAJOR：针对Ascend 950PR/Ascend 950DT，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 用于用户指定目的地址的位置是否是UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 输出数据格式仍为NZ格式。<br>    ROW_MAJOR, // 开启NZ2ND，输出数据格式为ND格式。<br><cann-filter npu_type = "950">    COLUMN_MAJOR, // 仅Ascend 950PR/Ascend 950DT支持，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu_type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 仅Ascend 950PR/Ascend 950DT支持</cann-filter></pre> |
 | S | 参数cbufWorkspace的数据类型，即随路量化参数的数据类型。<br>&bull; 当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。<br>&bull; 当目的操作数、源操作数、cbufWorkspace使用TensorTrait类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。<br>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 
 **表 2**  Fixpipe参数说明
@@ -195,7 +205,15 @@
 
 <cann-filter npu_type = "A3,910b">
 
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品特殊值/边界值约束说明：
+- 针对如下产品型号，特殊值/边界值约束说明如下：
+
+    <cann-filter npu_type = "A3">
+    Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+    </cann-filter>
+    
+    <cann-filter npu_type = "910b">
+    Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+    </cann-filter>
 
     对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
 
