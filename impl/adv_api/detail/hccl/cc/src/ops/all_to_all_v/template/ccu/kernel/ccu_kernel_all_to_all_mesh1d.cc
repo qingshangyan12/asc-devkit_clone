@@ -261,9 +261,11 @@ static CcuResult DoAlltoAll(AlltoAllMesh1DContext &ctx)
 CcuResult CcuAlltoAllMesh1DKernel(ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo,
                                   ccu::Variable srcStride, ccu::Variable srcOffset, ccu::Variable dstOffset,
                                   ccu::Variable sliceSize, ccu::Variable goSize1, ccu::Variable goSize2,
-                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg &arg)
+                                  ccu::Variable goSize3, ccu::Variable goSize4, CcuKernelArg arg)
 {
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] raw kernel arg ptr[%p].", arg);
     auto *kernelArg = static_cast<CcuKernelArgAlltoAllMesh1D *>(arg);
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] cast kernel arg ptr[%p].", kernelArg);
 
     AlltoAllMesh1DContext ctx;
     ctx.arg = kernelArg;
