@@ -1,10 +1,23 @@
 # Memory矢量计算接口边界值汇总<a name="ZH-CN_TOPIC_0000002533514388"></a>
 
-## 概述<a name="section3674181114910"></a>
-
 <cann-filter npu-type="A3,910b">
 
-本节汇总介绍了Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品的Memory矢量计算接口在边界值输入下的两类输出结果：
+## 概述<a name="section3674181114910"></a>
+
+本节汇总介绍了Memory矢量计算接口在边界值输入下的两类输出结果，以下内容针对如下型号生效：
+
+<cann-filter npu-type="A3">
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
+</cann-filter>
+<cann-filter npu-type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+</cann-filter>
+
+Memory矢量计算接口在边界值输入下，有两类输出结果：
 
 - INF/NAN模式（非饱和模式）
 
@@ -19,7 +32,7 @@
 - float 数据类型输入仅支持INF/NAN模式（即使配置饱和模式，输出结果也与INF/NAN模式输出结果一致）；half、int16_t 及 int32_t 类型输入，默认输出INF/NAN模式的结果。
 - **绝大部分场景下，INF/NAN模式的输出结果与IEEE754标准结果一致。如存在不一致的情况，会在对应接口处备注说明。**
 
-矢量计算接口输出inf/nan的场景总结如下表：
+## Memory矢量计算接口输出inf/nan的场景总结
 
 **表 1**  浮点数计算输出inf/nan的场景
 
@@ -30,6 +43,8 @@
 | **计算结果发生溢出**<br>例外情况：<br>&bull; 非nan值（不包含0）除以0，比如Div/Sqrt/Reciprocal等指令<br>&bull; ln(0.0) = -inf；ln(-0.0) = -inf<br>&bull; rsqrt(0.0) = inf; rsqrt(-0.0) = -inf | inf | inf区分+inf和-inf |
 | **输入包含nan** | nan | nan不区分正负 |
 | **计算结果产生nan**<br>举例：<br>&bull; (-inf) - (-inf) = nan，比如Add/Sub/Reduce等指令<br>&bull; (-inf) + inf = nan，比如Add/Sub/Reduce等指令<br>&bull; 0 * (+/-inf) = nan，比如Mul等指令<br>&bull; (+/-inf)/(+/-inf) = nan<br>&bull; 0/0 = nan<br>&bull; ln/Sqrt/Rsqrt指令输入为负值 | nan | nan不区分正负 |
+
+具体明细请参考如下各类API接口。
 
 ## 基础算术<a name="section12606472427"></a>
 

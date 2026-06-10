@@ -1,5 +1,20 @@
 # API流水类型汇总<a name="ZH-CN_TOPIC_0000002533354434"></a>
 
+<cann-filter npu-type="A3,910b">
+
+本节汇总介绍了一些主要的API的流水类型，以下内容针对如下型号生效：
+
+<cann-filter npu-type="A3">
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
+</cann-filter>
+<cann-filter npu-type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+</cann-filter>
+
 **表 1**  Memory矢量计算API流水类型汇总
 
 <a name="table132070121817"></a>
@@ -42,6 +57,9 @@
 | 比较与选择 | Compare（结果存入寄存器） | AIV | PIPE_V |
 | 比较与选择 | Compares | AIV | PIPE_V |
 | 比较与选择 | GetCmpMask(ISASI) | AIV | PIPE_V |
+| 比较与选择 | SetCmpMask(ISASI) | AIV | PIPE_V |
+| 比较与选择 | Select | AIV | PIPE_V |
+| 比较与选择 | GatherMask | AIV | PIPE_V |
 | 类型转换 | Cast | AIV | PIPE_V |
 | 归约计算 | ReduceDataBlock | AIV | PIPE_V |
 | 归约计算 | ReduceRepeat | AIV | PIPE_V |
@@ -70,6 +88,7 @@
 | 数据搬运 | DataCopyPad(GM->UB) | AIV | PIPE_MTE2 |
 | 数据搬运 | DataCopyPad(UB->GM) | AIV | PIPE_MTE3 |
 | 数据搬运 | DataCopy(UB->UB) | AIV | PIPE_V |
+| 数据搬运 | Copy | AIV | PIPE_V |
 
 **表 2**  CUBE API流水类型汇总
 
@@ -105,7 +124,20 @@
 | SetFixpipeNz2ndFlag | AIC | PIPE_S |
 | SetLreluALPHA | AIC | PIPE_S |
 
-**表 3**  同步指令流水类型汇总
+**表 3**  标量计算指令流水类型汇总
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
+| --- | --- | --- |
+| GetBitCount |  | PIPE_S |
+| CountLeadingZero |  | PIPE_S |
+| GetSFFValue |  | PIPE_S |
+| CountBitsCntSameAsSignBit |  | PIPE_S |
+| Cast（float转half、int32_t） |  | PIPE_S |
+| Cast（float转bfloat16_t） |  | PIPE_S |
+| Cast（bfloat16_t转float） |  | PIPE_S |
+| ReadGmByPassDCache(ISASI) |  | PIPE_S |
+| WriteGmByPassDCache(ISASI) |  | PIPE_S |
+
+**表 4**  同步指令流水类型汇总
 
 <a name="table1054353913238"></a>
 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
@@ -115,8 +147,11 @@
 | DataSyncBarrier |  | PIPE_S |
 | CrossCoreSetFlag |  | PIPE_S |
 | CrossCoreWaitFlag |  | PIPE_S |
+| SyncAll |  | PIPE_S |
+| SetNextTaskStart |  | PIPE_S |
+| WaitPreTaskEnd |  | PIPE_S |
 
-**表 4**  原子操作流水类型汇总
+**表 5**  原子操作流水类型汇总
 
 <a name="table25871912193814"></a>
 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
@@ -126,12 +161,15 @@
 | SetAtomicMin |  | PIPE_S |
 | SetAtomicType |  | PIPE_S |
 | DisableDmaAtomic |  | PIPE_S |
+| GetStoreAtomicConfig(ISASI) |  | PIPE_S |
+| SetStoreAtomicConfig(ISASI) |  | PIPE_S |
 
-**表 5**  工具接口流水类型汇总
+**表 6**  工具接口流水类型汇总
 
 <a name="table1147331317457"></a>
 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
+| InitSocState |  | PIPE_S |
 | GetBlockNum |  | PIPE_S |
 | GetBlockIdx |  | PIPE_S |
 | GetTaskRatio |  | PIPE_S |
@@ -141,3 +179,14 @@
 | GetSystemCycle |  | PIPE_S |
 | GetProgramCounter |  | PIPE_S |
 | GetArchVersion |  | PIPE_S |
+
+**表 7**  缓存控制接口流水类型汇总
+
+| API接口名称 | 执行核（AIC/AIV） | 流水类型 |
+| --- | --- | --- |
+| DataCachePreload |  | PIPE_S |
+| DataCacheCleanAndInvalid |  | PIPE_S |
+| ICachePreLoad(ISASI) |  | PIPE_S |
+| GetICachePreloadStatus(ISASI) |  | PIPE_S |
+
+</cann-filter>

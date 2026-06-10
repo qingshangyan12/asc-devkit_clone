@@ -1,8 +1,23 @@
 # Vector指令理论性能汇总<a name="ZH-CN_TOPIC_0000002557396789"></a>
 
-**表 1**  基础算术类指令理论性能汇总
+<cann-filter npu-type="A3,910b">
+
+本节汇总介绍了一些主要的Vector指令的理论性能，以下内容针对如下型号生效：
+
+<cann-filter npu-type="A3">
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
+</cann-filter>
+<cann-filter npu-type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+</cann-filter>
 
 注：缓存控制、同步控制和原子操作类指令，不涉及理论性能。
+
+**表 1**  基础算术类指令理论性能汇总
 
 <a name="table291476204714"></a>
 | 接口 | 输入/输出数据类型 | 硬件并行度（单位：element/cycle） |
@@ -108,7 +123,7 @@
 | MulAddRelu | half | half | half | 128 |
 | MulAddRelu | float | float | float | 64 |
 | CastDequant | int16_t | NA | int8_t/uint8_t | 128 |
-| CastDequant | int32_t |  | half | 64 |
+| CastDequant | int32_t | NA | half | 64 |
 | AddDeqRelu | - | - | - | 软仿指令，不涉及理论并行度 |
 
 **表 4**  比较与选择类指令理论性能汇总
@@ -124,7 +139,17 @@
 | Compares | half | half | uint8_t | 128 |
 | Compares | float | float | uint8_t | 64 |
 | Compares | int32_t | int32_t | uint8_t | 64 |
-| GetCmpMask(ISASI) |  |  |  |  |
+| Select | half | half | uint8_t | 128 |
+| Select | float | float | uint8_t | 64 |
+| GetCmpMask(ISASI) | - | - | - | 1 |
+| SetCmpMask(ISASI) | - | - | - | 1 |
+| GatherMask | half | uint16_t | half | 64 |
+| GatherMask | bfloat16_t | uint16_t | bfloat16_t | 64 |
+| GatherMask | uint16_t | uint16_t | uint16_t | 64 |
+| GatherMask | int16_t | uint16_t | int16_t | 64 |
+| GatherMask | float | uint32_t | float | 32 |
+| GatherMask | uint32_t | uint32_t | uint32_t | 32 |
+| GatherMask | int32_t | uint16_t | int32_t | 32 |
 
 **表 5**  类型转换类指令理论性能汇总
 
@@ -186,11 +211,12 @@
 **表 9**  排序组合类指令理论性能汇总
 
 <a name="table1361419514367"></a>
-| 接口 | src0数据类型 | src1数据类型 | dst数据类型 | 理论并行度（element/cycle） |
-| --- | --- | --- | --- | --- |
-| Sort32 | half（fp16） | uint32_t | half（fp16） | 64 |
-| Sort32 | float | uint32_t | float | 32 |
-| MrgSort（待补充） | - | - | - | - |
+| 接口 | dst数据类型 | 理论并行度（element/cycle） |
+| --- | --- | --- |
+| Sort32 | half（fp16） | 2 |
+| Sort32 | float | 2 |
+| MrgSort | half（fp16） | 2 |
+| MrgSort | float | 2 |
 
 **表 10**  离散与聚合类指令理论性能汇总
 
@@ -225,11 +251,13 @@
 | Cast（float转bfloat16_t） | - | - | 软仿指令，不涉及理论并行度 |
 | Cast（bfloat16_t转float） | - | - | 软仿指令，不涉及理论并行度 |
 
-**表 13**  系统变量访问类指令理论性能汇总
+**表 13**  工具接口类指令理论性能汇总
 
 <a name="table1843362415383"></a>
 | 接口 | 理论并行度（cycle/instruction） |
 | --- | --- |
+| InitSocState | 软仿指令，不涉及理论并行度 |
+| Async | 静态编译，无消耗 |
 | GetBlockNum | 1 |
 | GetBlockIdx（AIC） | 1 |
 | GetBlockIdx（AIV） | 软仿指令，不涉及理论并行度 |
@@ -241,10 +269,4 @@
 | GetProgramCounter | 软仿指令，不涉及理论并行度 |
 | GetArchVersion | 软仿指令，不涉及理论并行度 |
 
-**表 14**  工具接口类指令理论性能汇总
-
-<a name="table14541161453912"></a>
-| 接口 | 理论并行度（cycle/instruction） |
-| --- | --- |
-| InitSocState | 软仿指令，不涉及理论并行度 |
-| Async | 静态编译，无消耗 |
+</cann-filter>

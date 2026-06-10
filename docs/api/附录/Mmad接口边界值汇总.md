@@ -2,7 +2,18 @@
 
 <cann-filter npu-type="A3,910b">
 
-本节汇总介绍了Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品的Mmad计算接口在边界值输入下的输出结果：
+本节汇总介绍了Mmad计算接口在边界值输入下的输出结果，以下内容针对如下型号生效：
+
+<cann-filter npu-type="A3">
+
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+
+</cann-filter>
+<cann-filter npu-type="910b">
+
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+
+</cann-filter>
 
 **表 1**  Mmad特殊值/边界值输入的计算结果说明
 
