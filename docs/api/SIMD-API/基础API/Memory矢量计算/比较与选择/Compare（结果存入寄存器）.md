@@ -122,7 +122,7 @@
 <td class="cellrowborder" valign="top" width="11.81118111811181%" headers="mcps1.2.4.1.2 "><p id="p757693163410"><a name="p757693163410"></a><a name="p757693163410"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="74.52745274527453%" headers="mcps1.2.4.1.3 "><p id="p39493381252"><a name="p39493381252"></a><a name="p39493381252"></a>源操作数。</p>
-<p id="p17287403258"><a name="p17287403258"></a><a name="p17287403258"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p17287403258"><a name="p17287403258"></a><a name="p17287403258"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p441153312304"><a name="p441153312304"></a><a name="p441153312304"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -149,7 +149,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="11.81118111811181%" headers="mcps1.2.4.1.2 "><p id="p172551556134814"><a name="p172551556134814"></a><a name="p172551556134814"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="74.52745274527453%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001429830437_p12596185919348"><a name="zh-cn_topic_0000001429830437_p12596185919348"></a><a name="zh-cn_topic_0000001429830437_p12596185919348"></a>控制操作数地址步长的参数。<a href="../../../其他数据类型/BinaryRepeatParams.md">BinaryRepeatParams</a>类型，包含操作数相邻迭代间相同datablock的地址步长，操作数同一迭代内不同datablock的地址步长等参数。</p>
+<td class="cellrowborder" valign="top" width="74.52745274527453%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001429830437_p12596185919348"><a name="zh-cn_topic_0000001429830437_p12596185919348"></a><a name="zh-cn_topic_0000001429830437_p12596185919348"></a>控制操作数地址步长的参数。<a href="../../数据结构/辅助数据结构//BinaryRepeatParams.md">BinaryRepeatParams</a>类型，包含操作数相邻迭代间相同datablock的地址步长，操作数同一迭代内不同datablock的地址步长等参数。</p>
 <p id="zh-cn_topic_0000001429830437_p1156819418442"><a name="zh-cn_topic_0000001429830437_p1156819418442"></a><a name="zh-cn_topic_0000001429830437_p1156819418442"></a>相邻迭代间的地址步长参数说明请参考<span id="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"></a><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph18976413195617"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">repeatStride</a></span>；同一迭代内DataBlock的地址步长参数说明请参考<span id="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"></a><a name="zh-cn_topic_0000001429830437_zh-cn_topic_0000001487959374_ph19976131385613"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">dataBlockStride</a></span>。</p>
 </td>
 </tr>
@@ -223,4 +223,3 @@
 输出数据(cmpMask寄存器): 
 [122  86 237  94 150   3 226 242]
 ```
-

@@ -104,7 +104,7 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
 </td>
 <td class="cellrowborder" valign="top" width="11.450000000000001%" headers="mcps1.2.4.1.2 "><p id="p1579635215228"><a name="p1579635215228"></a><a name="p1579635215228"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="78.7%" headers="mcps1.2.4.1.3 "><p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<td class="cellrowborder" valign="top" width="78.7%" headers="mcps1.2.4.1.3 "><p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p82871514192410"><a name="p82871514192410"></a><a name="p82871514192410"></a>LocalTensor的起始地址需要16字节对齐。</p>
 </td>
 </tr>
@@ -200,4 +200,3 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src)
     AscendC::SetVectorMask<float>(mask);
     AscendC::Select(dst, sel, src0, repeat, repeatParams);
     ```
-

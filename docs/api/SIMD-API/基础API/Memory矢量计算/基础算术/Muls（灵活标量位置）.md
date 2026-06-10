@@ -147,7 +147,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 <td class="cellrowborder" valign="top" width="9.49%" headers="mcps1.2.4.1.2 "><p id="p3534104620153"><a name="p3534104620153"></a><a name="p3534104620153"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="p19206175051520"><a name="p19206175051520"></a><a name="p19206175051520"></a>目的操作数。</p>
-<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p5945720195112"><a name="p5945720195112"></a><a name="p5945720195112"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p3247968151"><a name="p3247968151"></a><a name="p3247968151"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 <p id="p468305719192"><a name="p468305719192"></a><a name="p468305719192"></a><span id="ph126252025205"><a name="ph126252025205"></a><a name="ph126252025205"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：half/bfloat16_t/int16_t/float/int32_t/uint64_t/int64_t/complex32/complex64</p>
 </td>
@@ -194,7 +194,7 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.49%" headers="mcps1.2.4.1.2 "><p id="p1393942810108"><a name="p1393942810108"></a><a name="p1393942810108"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="p199391128141020"><a name="p199391128141020"></a><a name="p199391128141020"></a>元素操作控制结构信息，具体请参考<a href="../../../其他数据类型/UnaryRepeatParams.md">UnaryRepeatParams</a>。</p>
+<td class="cellrowborder" valign="top" width="76%" headers="mcps1.2.4.1.3 "><p id="p199391128141020"><a name="p199391128141020"></a><a name="p199391128141020"></a>元素操作控制结构信息，具体请参考<a href="../../数据结构/辅助数据结构//UnaryRepeatParams.md">UnaryRepeatParams</a>。</p>
 </td>
 </tr>
 </tbody>
@@ -268,4 +268,3 @@ constexpr BinaryConfig DEFAULT_BINARY_CONFIG = {1};</pre>
 // 标量在后，src1Local[0]作为标量
 输出数据dstLocal：[2 4 6 ... 1024]
 ```
-

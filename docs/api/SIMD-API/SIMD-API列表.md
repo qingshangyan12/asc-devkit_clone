@@ -13,7 +13,7 @@
 </thead>
 <tbody><tr id="row102681557105520"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p12251181311560"><a name="p12251181311560"></a><a name="p12251181311560"></a><a href="基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p2025215484579"><a name="p2025215484579"></a><a name="p2025215484579"></a><span id="ph4396131516585"><a name="ph4396131516585"></a><a name="ph4396131516585"></a>LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置<a href="其他数据类型/TPosition.md">TPosition</a>为<span>VECIN、VECOUT、VECCALC、</span>A1<span>、</span>A2<span>、</span>B1<span>、</span>B2<span>、</span>CO1<span>、</span>CO2。</span></p>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p2025215484579"><a name="p2025215484579"></a><a name="p2025215484579"></a><span id="ph4396131516585"><a name="ph4396131516585"></a><a name="ph4396131516585"></a>LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置<a href="基础API/数据结构/辅助数据结构/TPosition.md">TPosition</a>为<span>VECIN、VECOUT、VECCALC、</span>A1<span>、</span>A2<span>、</span>B1<span>、</span>B2<span>、</span>CO1<span>、</span>CO2。</span></p>
 </td>
 </tr>
 <tr id="row026925718557"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p142691057115518"><a name="p142691057115518"></a><a name="p142691057115518"></a><a href="基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a></p>
