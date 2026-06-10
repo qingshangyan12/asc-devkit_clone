@@ -1,33 +1,48 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useRoute } from 'vitepress'
+import { ref, computed, watchPostEffect } from 'vue'
+import { useData } from 'vitepress'
 
 const props = defineProps({
   item: { type: Object, required: true },
   depth: { type: Number, required: true },
 })
 
-const route = useRoute()
+const { page } = useData()
 
-const currentPath = computed(() => route.path.replace(/\.html$/, ''))
+// 复刻 VitePress 原生的链接归一化与 active 判定:基于 page.relativePath(原始未编码路径),
+// 经 decodeURI + 去掉 .md/.html 扩展名后比较,避免中文/特殊字符在 route.path 中被百分号编码导致匹配失败。
+const HASH_OR_QUERY_RE = /[?#].*$/
+const INDEX_OR_EXT_RE = /(?:(^|\/)index)?\.(?:md|html)$/
+
+function normalize(path) {
+  return decodeURI(path).replace(HASH_OR_QUERY_RE, '').replace(INDEX_OR_EXT_RE, '$1')
+}
+
+function isActive(currentPath, matchPath) {
+  if (matchPath === undefined) return false
+  return normalize(matchPath) === normalize(`/${currentPath}`)
+}
+
+function containsActiveLink(currentPath, items) {
+  return items.some(item => {
+    if (isActive(currentPath, item.link)) return true
+    return item.items ? containsActiveLink(currentPath, item.items) : false
+  })
+}
 
 const hasChildren = computed(() => props.item.items && props.item.items.length > 0)
 const isLink = computed(() => !!props.item.link)
-const isActiveLink = computed(() => isLink.value && currentPath.value === props.item.link)
+const isActiveLink = computed(() => isActive(page.value.relativePath, props.item.link))
+const hasActive = computed(() => {
+  if (isActiveLink.value) return true
+  return props.item.items ? containsActiveLink(page.value.relativePath, props.item.items) : false
+})
 
-function hasActiveChild(item) {
-  if (!item.items) return currentPath.value === (item.link || false)
-  return item.items.some(c => hasActiveChild(c))
-}
-const hasActive = computed(() => hasActiveChild(props.item))
+const collapsed = ref(props.item.collapsed !== undefined ? props.item.collapsed : true)
 
-const collapsed = ref(
-  hasActiveChild(props.item) ? false
-    : (props.item.collapsed !== undefined ? props.item.collapsed : true)
-)
-
-watch(hasActive, (active) => {
-  if (active && hasChildren.value) {
+// 当前页命中(自身或子孙)时强制展开;随路由变化自动跟踪。手动 toggle 不会被此 effect 重新触发。
+watchPostEffect(() => {
+  if ((isActiveLink.value || hasActive.value) && hasChildren.value) {
     collapsed.value = false
   }
 })
