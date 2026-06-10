@@ -19,14 +19,19 @@
 矩阵计算的结果存放在L0C Buffer，DataCopy接口用于将结果搬运至Global Memory（GM）中，并且在搬运过程中支持随路格式转换等操作。
 
 <cann-filter npu_type = "A3,910b">
+
 以如下产品型号为例：
 
 <cann-filter npu_type = "A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
 
 <cann-filter npu_type = "910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+
 </cann-filter>
 
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
@@ -127,11 +132,15 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 - 针对如下产品型号，特殊值/边界值约束说明如下：
 
     <cann-filter npu_type = "A3">
+
     Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
     </cann-filter>
     
     <cann-filter npu_type = "910b">
+
     Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+    
     </cann-filter>
 
     对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：

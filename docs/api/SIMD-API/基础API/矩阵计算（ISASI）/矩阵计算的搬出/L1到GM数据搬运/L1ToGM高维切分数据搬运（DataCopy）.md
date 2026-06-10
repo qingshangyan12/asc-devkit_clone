@@ -108,6 +108,7 @@ Kirin 9030，支持数据类型为：int8_t、uint8_t、int16_t、uint16_t、hal
     Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 
     </cann-filter>
+    
     <cann-filter npu_type = "A3">
 
     Atlas A3 训练系列产品/Atlas A3 推理系列产品；

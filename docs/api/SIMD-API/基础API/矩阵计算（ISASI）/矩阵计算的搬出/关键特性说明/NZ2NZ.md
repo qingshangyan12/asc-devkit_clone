@@ -5,11 +5,15 @@
 矩阵计算的搬出过程中NZ2NZ的核心功能体现为，矩阵计算结果搬出前后保持NZ数据排布不变。
 
 <cann-filter npu_type = "A3,910b">
+
 以如下产品型号为例：
 
 <cann-filter npu_type = "A3">
+
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+
 </cann-filter>
+
 <cann-filter npu_type = "910b">
 
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；

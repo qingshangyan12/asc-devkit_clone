@@ -3,12 +3,15 @@
 矩阵搬出支持多种随路量化与随路ReLU的组合，芯片支持的全量场景组合参考下表，接下来将对下表中的随路量化ReLU算法逐一介绍。
 
 <cann-filter npu_type = "A3,910b">
+
 针对如下产品型号，随路量化与随路ReLU的组合情况如下：
 
 <cann-filter npu_type = "910b">
+
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 
 </cann-filter>
+
 <cann-filter npu_type = "A3">
 
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
