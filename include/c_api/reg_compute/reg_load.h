@@ -66,7 +66,7 @@ __simd_callee__ inline void asc_gather(vector_half& dst, __ubuf__ half* src, vec
 __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index,
     vector_bool mask);
 
-// ==========源操作数和目的数都为寄存�?========
+// ==========源操作数和目的数都为寄存器=========
 // ==========asc_gather(u8/s8/half/u16/s16/u32/s32/bf16/e4m3/e5m2/e8m0)=========
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src,
     vector_uint8_t index);
@@ -1363,6 +1363,8 @@ __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t*
 
 __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src, iter_reg offset);
 
+__simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src, iter_reg offset);
+
 __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src, iter_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset);
@@ -1593,7 +1595,7 @@ __simd_callee__ inline void asc_scatter(vector_int32_t& dst, __ubuf__ int32_t* s
 
 __simd_callee__ inline void asc_scatter(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask);
 
-__simd_callee__ inline void asc_scatter(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask);
+__simd_callee__ inline void asc_scatter(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline void asc_scatter(vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask);
 
