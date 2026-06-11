@@ -235,6 +235,10 @@ public:
     {
         return address_.bufferHandle;
     }
+    __asc_aicore__ inline TBufHandle GetBuffHandle() const
+    {
+        return address_.bufferHandle;
+    }
 public:
     TBuffAddr address_;
 };
