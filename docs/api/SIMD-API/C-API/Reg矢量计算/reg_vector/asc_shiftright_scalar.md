@@ -1,4 +1,4 @@
-# asc_shiftright_scalar
+﻿# asc_shiftright_scalar
 
 ## 产品支持情况
 
@@ -10,7 +10,7 @@
 
 根据mask对源操作数src执行右移，右移的位数由输入参数value决定，将结果写入目的操作数dst。
 对于无符号数据类型执行逻辑右移，去掉低位，高位填充为0。
-对于有符号数据类型执行算术右移，去掉低位，高位复制符号位。
+对于有数据类型执行算术右移，去掉低位，高位复制符号位。
 
 计算公式如下：
 
@@ -59,6 +59,6 @@ vector_uint16_t dst;
 vector_uint16_t src;
 int16_t value = 1;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
+asc_loadalign(src, src); // src_addr是外部输入的UB内存空间地址。
 asc_shiftright_scalar(dst, src, value, mask);
 ```

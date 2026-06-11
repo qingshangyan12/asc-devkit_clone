@@ -1,15 +1,15 @@
-# asc_set_l0c2gm_quant_post
+﻿# asc_set_l0c2gm_quant_post
 
 ## 产品支持情况
 
 | 产品 | 是否支持 |
 | :-----------| :------: |
-| <term>Ascend 950PR/Ascend 950DT</term> |    √     |
+| Ascend 950PR/Ascend 950DT |    √     |
 
 ## 功能说明
 
 对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后处理阶段量化信息。
-其中各bit含义如下，其中各种量化模式的说明可见[asc_copy_l0c2l1](../矩阵数据搬运/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)中对各种量化模式的说明：
+其中各bit含义如下，其中各种量化模式的说明可见[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)中对各种量化模式的说明：
 
 | bit范围 |                                                           含义                                                           |
 | :-----------|:----------------------------------------------------------------------------------------------------------------------:|
@@ -52,7 +52,7 @@ const uint64_t MASK_BIT9 = 0x200;
 const uint64_t MASK_31_13 = 0xFFFFE000;
 
 uint64_t field_8_0 = 0x1AB;
-uint64_t bit_9 = 1;
+uint64_t bit9 =1;
 uint64_t field_31_13 = 0x000EF;
 
 uint64_t config = 0;

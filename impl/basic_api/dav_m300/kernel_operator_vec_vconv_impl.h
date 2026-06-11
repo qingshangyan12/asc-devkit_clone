@@ -587,10 +587,10 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
@@ -609,7 +609,7 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
             vadd(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vrelu(vreg3, vreg2, preg, MODE_ZEROING);
             vcvt(vreg4, vreg3, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
             vsstb(vreg4, dst + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -628,7 +628,7 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
         vector_bool pregLower = plt_b16(sregLower, POST_UPDATE);
@@ -673,10 +673,10 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         vector_bool pregLower;
         vector_bool preg;
@@ -695,7 +695,7 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
             vadd(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vrelu(vreg3, vreg2, preg, MODE_ZEROING);
             vcvt(vreg4, vreg3, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
             vsstb(vreg4, dst + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -718,7 +718,7 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         vector_bool pregLower;
         vector_bool preg;
         preg = movp_b32();
@@ -759,10 +759,10 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
@@ -793,7 +793,7 @@ __aicore__ inline void AddReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(64);
@@ -827,10 +827,10 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
@@ -849,7 +849,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
             vsub(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vrelu(vreg3, vreg2, preg, MODE_ZEROING);
             vcvt(vreg4, vreg3, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
             vsstb(vreg4, dst + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -868,7 +868,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
         vector_bool pregLower = plt_b16(sregLower, POST_UPDATE);
@@ -913,10 +913,10 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         vector_bool pregLower;
         vector_bool preg;
@@ -935,7 +935,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
             vsub(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vrelu(vreg3, vreg2, preg, MODE_ZEROING);
             vcvt(vreg4, vreg3, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg4, (vector_u16&)vreg4, LOWER, MODE_ZEROING);
             vsstb(vreg4, dst + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -958,7 +958,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         vector_bool pregLower;
         vector_bool preg;
         preg = movp_b32();
@@ -999,10 +999,10 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ int8_t* dst, __ubuf__ half* src0
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_f16 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_half vreg3;
         vector_s8 vreg4;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
@@ -1033,7 +1033,7 @@ __aicore__ inline void SubReluCastImpl(__ubuf__ half* dst, __ubuf__ float* src0,
         vector_f32 vreg1;
         vector_f32 vreg2;
         vector_f32 vreg3;
-        vector_f16 vreg4;
+        vector_half vreg4;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(64);

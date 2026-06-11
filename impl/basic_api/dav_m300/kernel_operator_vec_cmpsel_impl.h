@@ -34,8 +34,8 @@ namespace AscendC {
 #define CONTINUOUS_MODE_B16_VCMPV_VF(cmpMode)                                                      \
     __VEC_SCOPE__                                                                                  \
     {                                                                                              \
-        vector_f16 vreg0;                                                                          \
-        vector_f16 vreg1;                                                                          \
+        vector_half vreg0;                                                                          \
+        vector_half vreg1;                                                                          \
         uint32_t sreg = static_cast<uint32_t>(mask);                                                            \
         vector_bool preg0 = plt_b16(sreg, POST_UPDATE);                                            \
         vector_bool preg1;                                                                         \
@@ -98,8 +98,8 @@ namespace AscendC {
 #define BITS_MODE_B16_VCMPV_VF(cmpMode)                                                            \
     __VEC_SCOPE__                                                                                  \
     {                                                                                              \
-        vector_f16 vreg0;                                                                          \
-        vector_f16 vreg1;                                                                          \
+        vector_half vreg0;                                                                          \
+        vector_half vreg1;                                                                          \
         vector_bool preg0;                                                                         \
         plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);                                         \
         vector_bool preg1;                                                                         \
@@ -163,8 +163,8 @@ namespace AscendC {
 #define COUNTER_MODE_B16_VCMPV_VF(cmpMode)                                                         \
     __VEC_SCOPE__                                                                                  \
     {                                                                                              \
-        vector_f16 vreg0;                                                                          \
-        vector_f16 vreg1;                                                                          \
+        vector_half vreg0;                                                                          \
+        vector_half vreg1;                                                                          \
         vector_bool preg0;                                                                         \
         uint32_t sreg = static_cast<uint32_t>(count);                                                        \
         vector_bool preg1;                                                                         \
@@ -677,7 +677,7 @@ __aicore__ inline void VcmpvsImpl(__ubuf__ U* dst, __ubuf__ DATA_TYPE* src0, con
 
 VCMPVS_IMPL_BITWISE(uint16_t, vector_u16, BITS_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_BITWISE(int16_t, vector_s16, BITS_MODE_B16_VCMPVS_VF)
-VCMPVS_IMPL_BITWISE(half, vector_f16, BITS_MODE_B16_VCMPVS_VF)
+VCMPVS_IMPL_BITWISE(half, vector_half, BITS_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_BITWISE(uint32_t, vector_u32, BITS_MODE_B32_VCMPVS_VF)
 VCMPVS_IMPL_BITWISE(int32_t, vector_s32, BITS_MODE_B32_VCMPVS_VF)
 VCMPVS_IMPL_BITWISE(float, vector_f32, BITS_MODE_B32_VCMPVS_VF)
@@ -699,7 +699,7 @@ VCMPVS_IMPL_CONTINUOUS(uint16_t, vector_u16, CONTINUOUS_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_CONTINUOUS(int16_t, vector_s16, CONTINUOUS_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_CONTINUOUS(uint32_t, vector_u32, CONTINUOUS_MODE_B32_VCMPVS_VF)
 VCMPVS_IMPL_CONTINUOUS(int32_t, vector_s32, CONTINUOUS_MODE_B32_VCMPVS_VF)
-VCMPVS_IMPL_CONTINUOUS(half, vector_f16, CONTINUOUS_MODE_B16_VCMPVS_VF)
+VCMPVS_IMPL_CONTINUOUS(half, vector_half, CONTINUOUS_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_CONTINUOUS(float, vector_f32, CONTINUOUS_MODE_B32_VCMPVS_VF)
 
 // CompareScalar::Level 2
@@ -717,7 +717,7 @@ VCMPVS_IMPL_COUNTER(uint16_t, vector_u16, COUNTER_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_COUNTER(int16_t, vector_s16, COUNTER_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_COUNTER(uint32_t, vector_u32, COUNTER_MODE_B32_VCMPVS_VF)
 VCMPVS_IMPL_COUNTER(int32_t, vector_s32, COUNTER_MODE_B32_VCMPVS_VF)
-VCMPVS_IMPL_COUNTER(half, vector_f16, COUNTER_MODE_B16_VCMPVS_VF)
+VCMPVS_IMPL_COUNTER(half, vector_half, COUNTER_MODE_B16_VCMPVS_VF)
 VCMPVS_IMPL_COUNTER(float, vector_f32, COUNTER_MODE_B32_VCMPVS_VF)
 
 /* ***************************************************************************************
@@ -741,9 +741,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             uint32_t sreg = static_cast<uint32_t>(mask);
             vector_bool preg0 = plt_b16(sreg, POST_UPDATE);
             vector_bool preg1;
@@ -761,9 +761,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             uint32_t sreg = static_cast<uint32_t>(mask);
             vector_bool preg0 = plt_b16(sreg, POST_UPDATE);
             vector_bool preg1;
@@ -878,9 +878,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
         KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vbr(vreg1, src1);
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg0 = plt_b16(sreg, POST_UPDATE);
@@ -975,9 +975,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             vector_bool preg0;
             plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // mask位宽扩展
             vector_bool preg1;
@@ -995,9 +995,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             vector_bool preg0;
             plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);  // mask位宽扩展
             vector_bool preg1;
@@ -1133,9 +1133,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vbr(vreg1, src1);
         vector_bool preg0;
         plds(preg0, ((__ubuf__ uint32_t*)tempBuf), 0, US);
@@ -1246,9 +1246,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
         KERNEL_LOG(KERNEL_ERROR, "Failed to check dtype in Select, current api support dtype selMask:  uint8_t / uint16_t / uint32_t / uint64_t");});
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vbr(vreg1, src1);
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg0;
@@ -1333,9 +1333,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     if (selMode == SELMODE::VSEL_CMPMASK_SPR) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             uint32_t sreg = static_cast<uint32_t>(count);
             vector_bool preg0;
             vector_bool preg1;
@@ -1353,9 +1353,9 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     } else if (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         __VEC_SCOPE__
         {
-            vector_f16 vreg0;
-            vector_f16 vreg1;
-            vector_f16 vreg2;
+            vector_half vreg0;
+            vector_half vreg1;
+            vector_half vreg2;
             uint32_t sreg = static_cast<uint32_t>(count);
             vector_bool preg0;
             vector_bool preg1;

@@ -37,12 +37,12 @@
 /*
  * @ingroup CubeCompute
  * @brief Set L0C to GM configuration
- * @param [in] relu_pre_mode ReLU configuration parameter
- * @param [in] quant_pre_mode Quantization configuration parameter
+ * @param [in] relu_pre_addr ReLU configuration address
+ * @param [in] quant_pre_addr Quantization configuration address
  * @param [in] enable_unit_flag Whether to enable unit flag
  * @details Configure L0C to GM transfer parameters for subsequent matrix operations
  */
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_mode, uint64_t quant_pre_mode, bool enable_unit_flag);
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
@@ -308,19 +308,19 @@ __aicore__ inline void asc_mmad(__cc__ float* c, __ca__ bfloat16_t* a, __cb__ bf
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e4m3fn_t* a, __cb__ fp8_e4m3fn_t* b,
+__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float8_e4m3_t* a, __cb__ float8_e4m3_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e4m3fn_t* a, __cb__ fp8_e5m2_t* b,
+__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float8_e4m3_t* a, __cb__ float8_e5m2_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e5m2_t* a, __cb__ fp8_e4m3fn_t* b,
+__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float8_e5m2_t* a, __cb__ float8_e4m3_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 
-__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ fp8_e5m2_t* a, __cb__ fp8_e5m2_t* b,
+__aicore__ inline void asc_mmad(__cc__ float* c, __ca__ float8_e5m2_t* a, __cb__ float8_e5m2_t* b,
                                 uint16_t m, uint16_t n, uint16_t k, uint8_t unit_flag,
                                 bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init);
 

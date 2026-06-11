@@ -66,8 +66,8 @@ __aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ float *dst, __gm__ floa
     asc_sync_post_process();
 }
 
-// fp8_e4m3fn_t
-__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint32_t m_start_position, uint32_t k_start_position,
+// float8_e4m3_t
+__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ float8_e4m3_t *dst, __gm__ float8_e4m3_t *src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl)
 {
     if ASC_IS_AIC {
@@ -75,15 +75,15 @@ __aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp
     }
 }
 
-__aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint32_t m_start_position, uint32_t k_start_position,
+__aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ float8_e4m3_t *dst, __gm__ float8_e4m3_t *src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl)
 {
     asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctrl);
     asc_sync_post_process();
 }
 
-// fp8_e5m2_t
-__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position,
+// float8_e5m2_t
+__aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ float8_e5m2_t *dst, __gm__ float8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl)
 {
     if ASC_IS_AIC {
@@ -91,7 +91,7 @@ __aicore__ inline void asc_copy_gm2l1_impl(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_
     }
 }
 
-__aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position,
+__aicore__ inline void asc_copy_gm2l1_sync_impl(__cbuf__ float8_e5m2_t *dst, __gm__ float8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position,
                                         uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl)
 {
     asc_copy_gm2l1_impl(dst, src, m_start_position, k_start_position, dst_stride, m_step, k_step, decomp_mode, l2_cache_ctrl);

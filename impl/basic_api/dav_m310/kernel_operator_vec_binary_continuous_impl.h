@@ -37,9 +37,9 @@ __aicore__ inline void AddImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;
@@ -133,9 +133,9 @@ __aicore__ inline void SubImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;
@@ -230,9 +230,9 @@ __aicore__ inline void MulImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;
@@ -326,9 +326,9 @@ __aicore__ inline void DivImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;
@@ -378,9 +378,9 @@ __aicore__ inline void MaxImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;
@@ -474,9 +474,9 @@ __aicore__ inline void MinImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = 128;

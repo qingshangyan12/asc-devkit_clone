@@ -44,9 +44,9 @@ __aicore__ inline void MulCastCalc(const LocalTensor<int8_t> &dst, const LocalTe
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_s8 vreg3;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
@@ -64,7 +64,7 @@ __aicore__ inline void MulCastCalc(const LocalTensor<int8_t> &dst, const LocalTe
             vsldb(vreg1, (__ubuf__ half*)src1.GetPhyAddr() + i * strideOffset1, strideConfig1, preg);
             vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
             vsstb(vreg3, (__ubuf__ int8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -79,10 +79,10 @@ __aicore__ inline void MulCastCalc(const LocalTensor<uint8_t> &dst, const LocalT
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_u8 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_uint8_t vreg3;
         uint32_t sregLower = static_cast<uint32_t>(mask);
         uint32_t sregUpper = static_cast<uint32_t>(mask);
         vector_bool pregLower = plt_b8(sregLower, POST_UPDATE);
@@ -99,7 +99,7 @@ __aicore__ inline void MulCastCalc(const LocalTensor<uint8_t> &dst, const LocalT
             vsldb(vreg1, (__ubuf__ half*)src1.GetPhyAddr() + i * strideOffset1, strideConfig1, preg);
             vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
             vsstb(vreg3, (__ubuf__ uint8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -127,9 +127,9 @@ __aicore__ inline void MulCastCalc(const LocalTensor<int8_t> &dst, const LocalTe
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_s8 vreg3;
         vector_bool pregLower;
         vector_bool preg;
@@ -147,7 +147,7 @@ __aicore__ inline void MulCastCalc(const LocalTensor<int8_t> &dst, const LocalTe
             vsldb(vreg1, (__ubuf__ half*)src1.GetPhyAddr() + i * strideOffset1, strideConfig1, preg);
             vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
             vsstb(vreg3, (__ubuf__ int8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -167,10 +167,10 @@ __aicore__ inline void MulCastCalc(const LocalTensor<uint8_t> &dst, const LocalT
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_u8 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_uint8_t vreg3;
         vector_bool pregLower;
         vector_bool preg;
         preg = movp_b16();
@@ -187,7 +187,7 @@ __aicore__ inline void MulCastCalc(const LocalTensor<uint8_t> &dst, const LocalT
             vsldb(vreg1, (__ubuf__ half*)src1.GetPhyAddr() + i * strideOffset1, strideConfig1, preg);
             vmul(vreg2, vreg0, vreg1, preg, MODE_ZEROING);
             vcvt(vreg3, vreg2, preg, ROUND_R, RS_ENABLE, PART_EVEN);
-            vpack((vector_u8&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
+            vpack((vector_uint8_t&)vreg3, (vector_u16&)vreg3, LOWER, MODE_ZEROING);
             vsstb(vreg3, (__ubuf__ uint8_t*)dst.GetPhyAddr() + i * strideOffset2, strideConfig2, pregLower);
         }
     }
@@ -209,9 +209,9 @@ __aicore__ inline void MulCastCalc(const LocalTensor<int8_t> &dst, const LocalTe
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_s8 vreg3;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
@@ -237,10 +237,10 @@ __aicore__ inline void MulCastCalc(const LocalTensor<uint8_t> &dst, const LocalT
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
-        vector_u8 vreg3;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
+        vector_uint8_t vreg3;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);

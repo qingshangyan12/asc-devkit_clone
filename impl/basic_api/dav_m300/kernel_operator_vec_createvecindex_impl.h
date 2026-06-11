@@ -87,7 +87,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<half> &dst, const half fir
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
+        vector_half vreg0;
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         vci(vreg0, firstValue, INC_ORDER);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
@@ -208,7 +208,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<half> &dst, const half fir
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
+        vector_half vreg0;
         vector_bool preg = movp_b16();
         vci(vreg0, firstValue, INC_ORDER);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {
@@ -279,7 +279,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<half> dst, const half firs
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
+        vector_half vreg0;
         vector_bool preg;
         vci(vreg0, firstValue, INC_ORDER);
         for (uint16_t i = 0; i < static_cast<uint16_t>(repeatTime); ++i) {

@@ -118,7 +118,7 @@ REGISTER_GATHER_MASK_B16(int16_t, s16)
                 vector_align ureg0;                                                                                    \
                 vector_##vector_type vreg0;                                                                            \
                 vector_##vector_type vreg1;                                                                            \
-                vector_u8 vreg2;                                                                                       \
+                vector_uint8_t vreg2;                                                                                       \
                 vector_bool preg0;                                                                                     \
                 vector_bool preg1;                                                                                     \
                 vector_bool preg2;                                                                                     \

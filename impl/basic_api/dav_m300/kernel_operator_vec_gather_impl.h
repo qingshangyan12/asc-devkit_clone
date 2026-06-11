@@ -110,7 +110,7 @@ __aicore__ inline void GatherImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
     {
         vector_u32  indexReg;
         vector_u32  indexRegSec;
-        vector_f16  dstReg;
+        vector_half  dstReg;
         uint32_t sregPlt = static_cast<uint32_t>(count);
         vector_bool indexMask = pset_b32(PAT_ALL);
         vector_bool preg;
@@ -141,7 +141,7 @@ __aicore__ inline void GatherImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
         vector_u16  indexU16;
         vector_u16  lowerU16;
         vector_u16  highU16;
-        vector_f16  dstReg;
+        vector_half  dstReg;
         vector_bool indexMask = pset_b32(PAT_ALL);
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -169,7 +169,7 @@ __aicore__ inline void GatherImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal,
         vector_u32  indexReg;
         vector_u32  indexRegSec;
         vector_bool indexMask = pset_b32(PAT_ALL);
-        vector_f16  dstReg;
+        vector_half  dstReg;
         vector_bool dstPreg;
         dstPreg = movp_b16();
 
@@ -399,9 +399,9 @@ __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dstLocal, __ubuf__ DATA_TYP
     }                                                                                                           \
 }
 GATHERB_T8(GatherbImpl, int8_t, vector_s8);
-GATHERB_T8(GatherbImpl, uint8_t, vector_u8);
-GATHERB_T16(GatherbImpl, half, vector_f16);
-GATHERB_T16(GatherbImpl, bfloat16_t, vector_bf16);
+GATHERB_T8(GatherbImpl, uint8_t, vector_uint8_t);
+GATHERB_T16(GatherbImpl, half, vector_half);
+GATHERB_T16(GatherbImpl, bfloat16_t, vector_bfloat16_t);
 GATHERB_T16(GatherbImpl, int16_t, vector_s16);
 GATHERB_T16(GatherbImpl, uint16_t, vector_u16);
 GATHERB_T32(GatherbImpl, float, vector_f32);

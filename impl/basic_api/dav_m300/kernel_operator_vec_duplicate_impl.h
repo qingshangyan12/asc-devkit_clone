@@ -44,7 +44,7 @@ __aicore__ inline void DuplicateImpl(__ubuf__ half* dstLocal, const half& scalar
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg;
+        vector_half vreg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig = ((static_cast<uint32_t>(dstBlockStride)) << 16);
@@ -158,7 +158,7 @@ __aicore__ inline void DuplicateImpl(__ubuf__ half* dstLocal, const half& scalar
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg;
+        vector_half vreg;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig = ((static_cast<uint32_t>(dstBlockStride)) << 16);
@@ -285,7 +285,7 @@ __aicore__ inline void DuplicateImpl(__ubuf__ half* dstLocal, const half& scalar
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg;
+        vector_half vreg;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint16_t repeatTime = CeilDivision(count, 128);

@@ -50,9 +50,9 @@ __aicore__ inline void AddImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -178,9 +178,9 @@ __aicore__ inline void AddImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -287,9 +287,9 @@ __aicore__ inline void SubImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -415,9 +415,9 @@ __aicore__ inline void SubImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -525,9 +525,9 @@ __aicore__ inline void MulImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
 
@@ -657,9 +657,9 @@ __aicore__ inline void MulImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -767,9 +767,9 @@ __aicore__ inline void DivImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
 
@@ -833,9 +833,9 @@ __aicore__ inline void DivImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -905,9 +905,9 @@ __aicore__ inline void MaxImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
 
@@ -1030,9 +1030,9 @@ __aicore__ inline void MaxImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);
@@ -1140,9 +1140,9 @@ __aicore__ inline void MinImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tmpBuf), 0, US);
 
@@ -1272,9 +1272,9 @@ __aicore__ inline void MinImpl(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
-        vector_f16 vreg2;
+        vector_half vreg0;
+        vector_half vreg1;
+        vector_half vreg2;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.src0BlkStride)) << 16);

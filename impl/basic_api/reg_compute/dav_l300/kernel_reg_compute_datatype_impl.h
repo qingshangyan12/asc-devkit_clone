@@ -40,7 +40,7 @@ template <> struct TypeGet<uint16_t> {
     using T = vector_u16;
 };
 template <> struct TypeGet<half> {
-    using T = vector_f16;
+    using T = vector_half;
 };
 template <> struct TypeGet<uint64_t> {
     using T = vector_u64;
@@ -52,7 +52,7 @@ template <> struct TypeGet<int16_t> {
     using T = vector_s16;
 };
 template <> struct TypeGet<uint8_t> {
-    using T = vector_u8;
+    using T = vector_uint8_t;
 };
 template <> struct TypeGet<int8_t> {
     using T = vector_s8;
@@ -64,7 +64,7 @@ template <> struct TypeGet<int4x2_t> {
     using T = vector_s4x2;
 };
 template <> struct TypeGet<bfloat16_t> {
-    using T = vector_bf16;
+    using T = vector_bfloat16_t;
 };
 } // namespace Reg
 } // namespace AscendC

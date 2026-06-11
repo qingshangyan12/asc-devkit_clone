@@ -18,7 +18,7 @@
 
 #endif
 
-using vector_uint8_t = vector_u8;
+using vector_u8 = vector_uint8_t;
 using vector_uint16_t = vector_u16;
 using vector_uint32_t = vector_u32;
 using vector_uint64_t = vector_u64;
@@ -26,8 +26,8 @@ using vector_int8_t = vector_s8;
 using vector_int16_t = vector_s16;
 using vector_int32_t = vector_s32;
 using vector_int64_t = vector_s64;
-using vector_bfloat16_t = vector_bf16;
-using vector_half = vector_f16;
+using vector_bf16 = vector_bfloat16_t;
+using vector_f16 = vector_half;
 using vector_float = vector_f32;
 using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;

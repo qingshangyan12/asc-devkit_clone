@@ -112,7 +112,7 @@ __aicore__ inline void ScatterImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
     {
         vector_u32  indexReg;
         vector_u32  indexRegSec;
-        vector_f16  srcReg;
+        vector_half  srcReg;
         uint32_t sregPlt = static_cast<uint32_t>(count);
         vector_bool indexMask = pset_b32(PAT_ALL);
         vector_bool preg;
@@ -140,7 +140,7 @@ __aicore__ inline void ScatterImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
     {
         vector_u32  indexReg;
         vector_u32  indexRegSec;
-        vector_f16  srcReg;
+        vector_half  srcReg;
         vector_bool indexMask = pset_b32(PAT_ALL);
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -168,7 +168,7 @@ __aicore__ inline void ScatterImplB16(__ubuf__ T *dstLocal, __ubuf__ T *srcLocal
         vector_u32  indexReg;
         vector_u32  indexRegSec;
         vector_bool indexMask = pset_b32(PAT_ALL);
-        vector_f16  srcReg;
+        vector_half  srcReg;
         vector_bool srcPreg;
         srcPreg = movp_b16();
 
