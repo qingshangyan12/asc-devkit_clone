@@ -1,4 +1,4 @@
-# asc_storealign（NORM搬出模式）
+# asc_storealign_norm
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# asc_storealign（INTLV搬出模式）
+# asc_storealign_intlv
 
 ## 产品支持情况
 

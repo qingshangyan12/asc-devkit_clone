@@ -1,4 +1,4 @@
-# asc_loadalign（DEINTLV搬入模式）
+# asc_loadalign_deintlv
 
 ## 产品支持情况
 

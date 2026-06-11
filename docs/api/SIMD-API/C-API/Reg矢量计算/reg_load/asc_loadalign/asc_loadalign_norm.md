@@ -1,4 +1,4 @@
-# asc_loadalign（NORM搬入模式）
+# asc_loadalign_norm
 
 ## 产品支持情况
 

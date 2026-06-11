@@ -1,4 +1,4 @@
-# asc_storealign（PACK搬出模式）
+# asc_storealign_pack
 
 ## 产品支持情况
 

@@ -1,4 +1,4 @@
-# asc_loadalign（BRCV3搬入模式）
+# asc_loadalign_brc_v3
 
 ## 产品支持情况
 

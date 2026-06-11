@@ -1,4 +1,4 @@
-# asc_storealign（FIRST搬出模式）
+# asc_storealign_first
 
 ## 产品支持情况
 

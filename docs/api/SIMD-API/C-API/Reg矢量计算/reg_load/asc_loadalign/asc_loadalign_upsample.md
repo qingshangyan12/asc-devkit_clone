@@ -1,4 +1,4 @@
-# asc_loadalign（UP2X搬入模式）
+# asc_loadalign_upsample
 
 ## 产品支持情况
 
