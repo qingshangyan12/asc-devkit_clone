@@ -33,7 +33,6 @@ __aicore__ inline void asc_copy_ub2gm_sync(__gm__ void* dst, __ubuf__ void* src,
 
 ## 参数说明
 
-表1 参数说明
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的GM地址。 |

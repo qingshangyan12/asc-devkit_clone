@@ -19,6 +19,7 @@
 #include "instr_impl/npu_arch_3510/cube_compute_impl/asc_enable_hf32_trans_impl.h"
 #include "instr_impl/npu_arch_3510/cube_compute_impl/asc_set_fp32_mode_impl.h"
 #include "instr_impl/npu_arch_3510/cube_compute_impl/asc_enable_hif8_impl.h"
+#include "instr_impl/npu_arch_3510/cube_compute_impl/asc_enable_fp8_impl.h"
 #include "instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_m_impl.h"
 #include "instr_impl/npu_arch_3510/cube_compute_impl/asc_set_mmad_direction_n_impl.h"
 
@@ -328,6 +329,11 @@ __aicore__ inline void asc_set_fp32_mode()
 __aicore__ inline void asc_enable_hif8()
 {
     asc_enable_hif8_impl();
+}
+
+__aicore__ inline void asc_enable_fp8()
+{
+    asc_enable_fp8_impl();
 }
 
 __aicore__ inline void asc_set_mmad_direction_m()
