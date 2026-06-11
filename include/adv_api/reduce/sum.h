@@ -21,8 +21,8 @@
 #ifndef LIB_REDUCE_SUM_H
 #define LIB_REDUCE_SUM_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_basic_intf.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "include/adv_api/reduce/sum_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
@@ -31,7 +31,7 @@
 #include "../../../impl/adv_api/detail/reduce/sum/sum_common_impl.h"
 #endif
 #if ASCENDC_CPU_DEBUG
-#include "kernel_log.h"
+#include "../../../impl/basic_api/kernel_log.h"
 #include <type_traits>
 #endif
 namespace AscendC {
