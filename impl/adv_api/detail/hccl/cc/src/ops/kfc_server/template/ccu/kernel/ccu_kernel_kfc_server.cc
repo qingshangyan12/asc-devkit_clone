@@ -339,8 +339,6 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
     KfcServerContext ctx;
-
-    HCCL_INFO("[CcuKernelKfcServer] channelCount: [%lu]", arg->channelCount);
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
     HCCL_INFO("[CcuKernelKfcServer] ParseKernelArg finish");
