@@ -1,6 +1,7 @@
 .vscode
 .idea/
 /build/
+/build_ut/
 build_out
 output
 __pycache__/
@@ -22,3 +23,5 @@ build_device/
 .agent/skills/gitcode-issue
 .agent/skills/api-doc-generator
 .agent/skills/gitcode-pipeline
+.claude/
+.opencode/
