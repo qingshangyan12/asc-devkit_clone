@@ -112,8 +112,9 @@ private:
 };
 
 constexpr uint64_t CCU_MS_INTERLEAVE         = 8;
-constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 64;
+constexpr uint64_t CCU_MS_DEFAULT_LOOP_COUNT = 128;
 constexpr uint64_t CCU_MS_SIZE               = 4096;
+constexpr uint64_t NUM_TWO                   = 2;
 
 constexpr uint32_t LOCAL_COPY_MS_PER_LOOP = 8;
 constexpr uint32_t CCU_MS_LOCAL_COPY_LOOP_COUNT = 8;
@@ -138,6 +139,12 @@ struct GroupOpSizeVars {
     ccu::Variable residual;
 };
 
+struct GroupCopyVar {
+    ccu::LocalAddr loopSrc[2];
+    ccu::LocalAddr loopDst[2];
+    ccu::Variable  loopLen[2];
+};
+
 struct CcuKernelCtxBase {
     struct CcuLoopEntity {
         std::unique_ptr<ccu::Func> body[2];
@@ -151,6 +158,8 @@ struct CcuKernelCtxBase {
 
     std::map<std::string, CcuLoopEntity> loopMap;
     CcuLoopExecutors enginePool;
+
+    GroupCopyVar gcVar;
 
     void CreateLoopEntity(std::string loopStr) {
         loopMap.emplace(loopStr, CcuLoopEntity());
@@ -167,12 +176,6 @@ struct GroupReduceVar {
     ccu::LocalAddr loopLocalSrc[2];
     ccu::Variable  loopLen[2];
     ccu::Variable  loopLenExp[2];
-};
-
-struct GroupCopyVar {
-    ccu::LocalAddr loopSrc[2];
-    ccu::LocalAddr loopDst[2];
-    ccu::Variable  loopLen[2];
 };
 
 std::vector<uint64_t> CalGoSize(uint64_t size);
