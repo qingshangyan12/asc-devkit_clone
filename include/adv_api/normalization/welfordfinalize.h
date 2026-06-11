@@ -21,7 +21,7 @@
 #ifndef LIB_NORMALIZATION_WELFORDFINALIZE_H
 #define LIB_NORMALIZATION_WELFORDFINALIZE_H
 #include "include/adv_api/normalization/welfordfinalize_utils.h"
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/welfordfinalize/welfordfinalize_common_impl.h"

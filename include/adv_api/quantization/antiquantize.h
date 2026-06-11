@@ -20,8 +20,8 @@
 
 #ifndef LIB_QUANTIZATION_ANTIQUANTIZE_H
 #define LIB_QUANTIZATION_ANTIQUANTIZE_H
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_basic_intf.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/quantization/antiquantize/antiquantize_common.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/quantization/antiquantize/antiquantize_impl.h"
