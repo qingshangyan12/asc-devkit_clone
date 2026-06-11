@@ -71,8 +71,8 @@ __aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ half* dst, __cc__ floa
     asc_sync_post_process();
 }
 
-// float8_e4m3_t  float
-__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size,
+// fp8_e4m3fn_t  float
+__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ fp8_e4m3fn_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -85,7 +85,7 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst, __cc__ 
     }
 }
 
-__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -97,8 +97,8 @@ __aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst, __
     asc_sync_post_process();
 }
 
-// float8_e5m2_t  float
-__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size,
+// fp8_e5m2_t  float
+__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ fp8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -111,7 +111,7 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst, __cc__ 
     }
 }
 
-__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e5m2_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ fp8_e5m2_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -279,8 +279,8 @@ __aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ half* dst, __cc__ int3
     asc_sync_post_process();
 }
 
-// float8_e4m3_t  int32_t
-__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size,
+// fp8_e4m3fn_t  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ fp8_e4m3fn_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -293,7 +293,7 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e4m3_t *dst, __cc__ 
     }
 }
 
-__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ fp8_e4m3fn_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -305,8 +305,8 @@ __aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e4m3_t* dst, __
     asc_sync_post_process();
 }
 
-// float8_e5m2_t  int32_t
-__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size,
+// fp8_e5m2_t  int32_t
+__aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ fp8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,
@@ -319,7 +319,7 @@ __aicore__ inline void asc_copy_l0c2ub_impl(__ubuf__ float8_e5m2_t *dst, __cc__ 
     }
 }
 
-__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ float8_e5m2_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
+__aicore__ inline void asc_copy_l0c2ub_sync_impl(__ubuf__ fp8_e5m2_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size,
                             uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode,
                             uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode,
                             uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant,

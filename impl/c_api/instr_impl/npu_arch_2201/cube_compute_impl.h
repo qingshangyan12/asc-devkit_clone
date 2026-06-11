@@ -235,9 +235,9 @@ __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c, __ca__ int4b_t* a, __
                           unit_flag, enable_k_direction_align, enable_weight_offset, enable_cube_init, enable_cube_zero_init);
 }
 
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_mode, uint64_t quant_pre_mode, bool enable_unit_flag)
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag)
 {
-    asc_set_l0c2gm_config_impl(relu_pre_mode, quant_pre_mode, enable_unit_flag);
+    asc_set_l0c2gm_config_impl(relu_pre_addr, quant_pre_addr, enable_unit_flag);
 }
 
 __aicore__ inline uint64_t asc_get_l0c2gm_relu()

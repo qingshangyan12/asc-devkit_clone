@@ -28,7 +28,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ bfloat16_t* dst, __gm__ bfloa
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -43,7 +43,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ half* dst, __gm__ half* src, 
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -58,7 +58,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ float* dst, __gm__ float* src
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -73,7 +73,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ int32_t* dst, __gm__ int32_t*
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -88,7 +88,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ uint8_t* dst, __gm__ uint8_t*
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -103,7 +103,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ int8_t* dst, __gm__ int8_t* s
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -118,7 +118,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ uint32_t* dst, __gm__ uint32_
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca(dst, src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 
@@ -133,7 +133,7 @@ __aicore__ inline void asc_copy_gm2l0a_impl(__ca__ int4b_t* dst, __gm__ int4b_t*
     uint16_t src_stride, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        load_gm_to_ca_s4((__ca__ void*)dst, (__gm__ void*)src, base_idx, repeat, src_stride, dst_stride, 0, inc);
+        load_gm_to_ca_s4((__ca__ void*)dst, (__gm__ void*)src, base_idx, repeat, src_stride, dst_gap, 0, inc);
     }
 }
 

@@ -649,14 +649,14 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t
  * @param [in] src_stride Source stride value (int16_t for signed stride support)
  * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to L0A buffer (__ca__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ half *dst, __cbuf__ half *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
@@ -694,14 +694,14 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp4x2_e1m2_t *dst, __cbuf__ f
  * @param [in] src_stride Source stride value (int16_t for signed stride support)
  * @param [in] dst_stride Destination stride value
  * @details Transposes and copies data from Cube Buffer (__cbuf__) to L0A buffer (__ca__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ half *dst, __cbuf__ half *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
@@ -739,14 +739,14 @@ __aicore__ inline void asc_copy_l12l0a_transpose_sync(__ca__ fp4x2_e1m2_t *dst, 
  * @param [in] src_stride Source stride value (int16_t for signed stride support)
  * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to L0B buffer (__cb__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ half *dst, __cbuf__ half *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
@@ -784,14 +784,14 @@ __aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp4x2_e1m2_t *dst, __cbuf__ f
  * @param [in] src_stride Source stride value (int16_t for signed stride support)
  * @param [in] dst_stride Destination stride value
  * @details Transposes and copies data from Cube Buffer (__cbuf__) to L0B buffer (__cb__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, int4b_t, fp4x2_e2m1_t, fp4x2_e1m2_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
-__aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
 __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ half *dst, __cbuf__ half *src, uint16_t m_start_position, uint16_t k_start_position, uint8_t m_step, uint8_t k_step, int16_t src_stride, uint16_t dst_stride);
 
@@ -829,14 +829,14 @@ __aicore__ inline void asc_copy_l12l0b_transpose_sync(__cb__ fp4x2_e1m2_t *dst, 
  * @param [in] dst_frac_gap Destination fractional gap
  * @param [in] src_frac_gap Source fractional gap
  * @details Transposes and copies data from Cube Buffer (__cbuf__) to L0B buffer (__cb__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, int4b_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, int4b_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
-__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+__aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
 __aicore__ inline void asc_copy_l12l0b_trans_sync(__cb__ half *dst, __cbuf__ half *src, uint16_t index_id, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
 
@@ -922,14 +922,14 @@ __aicore__ inline void asc_copy_l12l0c_sync(__cc__ uint32_t *dst, __cbuf__ uint3
  * @param [in] fmatrix_ctrl Feature matrix control flag
  * @param [in] channel_size Channel size value
  * @details Copies data from Cube Buffer (__cbuf__) to L0A buffer (__ca__) for convolution operations.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, int16_t, uint16_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, int16_t, uint16_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
+__aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
-__aicore__ inline void asc_copy_l12l0a_sync(__ca__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
+__aicore__ inline void asc_copy_l12l0a_sync(__ca__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
 __aicore__ inline void asc_copy_l12l0a_sync(__ca__ half *dst, __cbuf__ half *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
@@ -970,14 +970,14 @@ __aicore__ inline void asc_copy_l12l0a_sync(__ca__ uint16_t *dst, __cbuf__ uint1
  * @param [in] fmatrix_ctrl Feature matrix control flag
  * @param [in] channel_size Channel size value
  * @details Copies data from Cube Buffer (__cbuf__) to L0B buffer (__cb__) for convolution operations.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, int16_t, uint16_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int32_t, int8_t, uint32_t, uint8_t, int16_t, uint16_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ bfloat16_t *dst, __cbuf__ bfloat16_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ float8_e4m3_t *dst, __cbuf__ float8_e4m3_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
+__aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp8_e4m3fn_t *dst, __cbuf__ fp8_e4m3fn_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
-__aicore__ inline void asc_copy_l12l0b_sync(__cb__ float8_e5m2_t *dst, __cbuf__ float8_e5m2_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
+__aicore__ inline void asc_copy_l12l0b_sync(__cb__ fp8_e5m2_t *dst, __cbuf__ fp8_e5m2_t *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
 __aicore__ inline void asc_copy_l12l0b_sync(__cb__ half *dst, __cbuf__ half *src, uint16_t k_extension, uint16_t m_extension, uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h, uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h, bool enable_filter_size_w, bool enable_filter_size_h, bool enable_transpose, bool fmatrix_ctrl, uint16_t channel_size);
 
@@ -1046,14 +1046,14 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ uint8_t *dst, __gm__ u
  * @param [in] loop4_src_stride Loop 4 source stride (uint64_t)
  * @param [in] enable_smallc0 Small C0 enable flag
  * @details Converts DN format data from Global Memory (__gm__) to NZ format in Cube Buffer (__cbuf__).
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
-__aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ float8_e4m3_t *dst, __gm__ float8_e4m3_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
+__aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
-__aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ float8_e5m2_t *dst, __gm__ float8_e5m2_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
+__aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
 __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ half *dst, __gm__ half *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
@@ -1085,14 +1085,14 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ uint8_t *dst, __gm__ u
  * @param [in] loop4_src_stride Loop 4 source stride (uint64_t)
  * @param [in] enable_smallc0 Small C0 enable flag
  * @details Converts ND format data from Global Memory (__gm__) to NZ format in Cube Buffer (__cbuf__) for 3510 architecture.
- *          Supports bfloat16_t, float8_e4m3_t, float8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t data types.
+ *          Supports bfloat16_t, fp8_e4m3fn_t, fp8_e5m2_t, half, float, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
-__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ float8_e4m3_t *dst, __gm__ float8_e4m3_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
+__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
-__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ float8_e5m2_t *dst, __gm__ float8_e5m2_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
+__aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ half *dst, __gm__ half *src, uint64_t loop1_src_stride, uint8_t l2_cache_ctrl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool enable_smallc0);
 
@@ -1145,17 +1145,6 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half *src, uin
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ float *src, uint32_t size);
 
 __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ int32_t *src, uint32_t size);
-
-/*
- * @ingroup CubeDataMove
- * @brief Copy data from Cube Buffer (L1) to Feature Buffer (L1) version 2 for various data types
- * @param [out] dst Destination buffer pointer in Feature Buffer (L1)
- * @param [in] src Source buffer pointer in Cube Buffer (L1)
- * @param [in] size Data size in bytes to copy
- * @details Copies data from Cube Buffer (__cbuf__) to Feature Buffer (__fbuf__) in L1 memory (version 2).
- *          This is a software emulation interface with automatic synchronization.
- */
-__aicore__ inline void asc_copy_l12fb_v2_sync(__fbuf__ void *dst, __cbuf__ void *src, uint32_t size);
 
 /*
  * @ingroup CubeDataMove
@@ -1230,16 +1219,16 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ void *dst, __cc__ int32_t *
  * @param [in] enable_broadcast Broadcast enable flag
  * @param [in] enable_nz2dn NZ to DN conversion enable flag
  * @details Copies data from L0C buffer (__cc__) to Global Memory (__gm__) with full quantization and ReLU support.
- *          Supports bfloat16_t, half, float8_e4m3_t, float8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void data types.
+ *          Supports bfloat16_t, half, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ bfloat16_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ half *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ float8_e4m3_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ fp8_e4m3fn_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ float8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ fp8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ hifloat8_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
@@ -1253,9 +1242,9 @@ __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ bfloat16_t *dst, __cc__ int32
 
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ half *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ float8_e4m3_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ fp8_e4m3fn_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ float8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2gm_sync(__gm__ fp8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ hifloat8_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t l2_cache_ctrl, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
@@ -1295,16 +1284,16 @@ __aicore__ inline void asc_copy_l0c2gm_sync(__gm__ void *dst, __cc__ int32_t *sr
  * @param [in] enable_broadcast Broadcast enable flag
  * @param [in] enable_nz2dn NZ to DN conversion enable flag
  * @details Copies data from L0C buffer (__cc__) to Unified Buffer (__ubuf__) with full quantization and ReLU support.
- *          Supports bfloat16_t, half, float8_e4m3_t, float8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void data types.
+ *          Supports bfloat16_t, half, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t, int8_t, uint8_t, float, int32_t, void data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ bfloat16_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ half *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ float8_e4m3_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ fp8_e4m3fn_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ float8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ fp8_e5m2_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ hifloat8_t *dst, __cc__ float *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
@@ -1318,9 +1307,9 @@ __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ bfloat16_t *dst, __cc__ int
 
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ half *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ float8_e4m3_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ fp8_e4m3fn_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
-__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ float8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
+__aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ fp8_e5m2_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
 __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ hifloat8_t *dst, __cc__ int32_t *src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride, uint8_t dual_dst_ctl, bool sub_blockid, uint8_t clip_relu_pre_mode, uint8_t unit_flag, uint64_t quant_pre_mode, uint8_t relu_pre_mode, bool enable_split, bool enable_nz2nd, uint64_t quant_post_mode, uint8_t relu_post_mode, bool enable_clip_relu_post_mode, uint8_t eltwise_op, bool enable_antiquant, bool enable_c0_pad, bool enable_broadcast, bool enable_nz2dn);
 
@@ -1347,16 +1336,16 @@ __aicore__ inline void asc_copy_l0c2ub_sync(__ubuf__ void *dst, __cc__ int32_t *
  * @param [in] decomp_mode Decomposition mode setting
  * @param [in] l2_cache_ctrl L2 cache control value
  * @details Copies data from Global Memory (__gm__) to Cube Buffer (__cbuf__) with decomposition mode for 3510 architecture.
- *          Supports bfloat16_t, float, float8_e4m3_t, float8_e5m2_t, half, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, void data types.
+ *          Supports bfloat16_t, float, fp8_e4m3fn_t, fp8_e5m2_t, half, hifloat8_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint8_t, float4_e1m2x2_t, float4_e2m1x2_t, void data types.
  *          This is a software emulation interface with automatic synchronization.
  */
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
 
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float *dst, __gm__ float *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
 
-__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float8_e4m3_t *dst, __gm__ float8_e4m3_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
+__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
 
-__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float8_e5m2_t *dst, __gm__ float8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
+__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
 
 __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ half *dst, __gm__ half *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctrl);
 
