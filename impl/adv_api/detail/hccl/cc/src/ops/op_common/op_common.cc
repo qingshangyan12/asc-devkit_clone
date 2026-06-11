@@ -43,6 +43,7 @@
 #include "cann_host_bridge.h"
 #include "ccu_launch_dl.h"
 #include "ccu_log.h"
+#include "ccu_kernel_kfc_server.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 
 #ifdef __cplusplus
@@ -1262,10 +1263,14 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
     }
     std::vector<CcuKernelInfo> kernelsToRegister;
     if (hasKfcServer) {
+        CcuKernelInfo lastKernel;
         for (auto& kernelInfo : resRequest.ccuKernelInfos) {
             if (std::string(kernelInfo.kernelFuncName) == "CcuKernelKfcServer") {
+                HCCL_INFO("[HcclGetCcuKernel] KfcServer inheriting kernelargs from[%s]", lastKernel.kernelFuncName);
+                InheritKfcServerKernelArg(lastKernel, kernelInfo);
                 kernelsToRegister.push_back(kernelInfo);
             } else {
+                lastKernel = kernelInfo;
                 HCCL_INFO("[HcclGetCcuKernel] KfcServer present, skipping kernel[%s]", kernelInfo.kernelFuncName);
             }
         }
@@ -1302,8 +1307,6 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
             }
 
             HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", i, kernelInfo.kernelFuncName);
-            CcuKernelHandle kernelHandle;
-            HCCL_INFO("[HcclGetCcuKernel] ChannelCount[%s]", kernelInfo.kernelArg->ChannelCount);
             CcuKernelHandle kernelHandle;
             CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
                                                       reinterpret_cast<void*>(kernelInfo.kernelFunc),

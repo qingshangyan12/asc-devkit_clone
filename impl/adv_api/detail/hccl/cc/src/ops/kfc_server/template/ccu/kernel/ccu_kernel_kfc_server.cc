@@ -364,4 +364,26 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 // new---20260603
 
 
+// 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
+void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &dstKernel)
+{
+    std::string srcName(srcKernel.kernelFuncName);
+    auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
+
+    if (srcName == "CcuKernelAlltoAllMesh1D") {
+        auto *srcArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
+        kfcArg->channelCount = srcArg->channelCount;
+        memcpy_s(kfcArg->channels, sizeof(kfcArg->channels), srcArg->channels, sizeof(srcArg->channels));
+        kfcArg->rankSize = srcArg->rankSize;
+        kfcArg->rankId = srcArg->rankId;
+        kfcArg->loadFromMem = srcArg->loadFromMem;
+        kfcArg->opParam = srcArg->opParam;
+        kfcArg->subCommRanks = srcArg->subCommRanks;
+    } else {
+        HCCL_WARNING("[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
+    }
+
+    dstKernel.setKernelArg(kfcArg);
+}
+
 }// mc2_ops_hccl

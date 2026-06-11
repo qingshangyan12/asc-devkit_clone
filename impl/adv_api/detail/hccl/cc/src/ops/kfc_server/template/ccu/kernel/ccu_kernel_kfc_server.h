@@ -86,6 +86,10 @@ public:
 };
 
 CcuResult CcuKfcServerKernel(CcuKernelArg arg);
+
+// 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
+void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &dstKernel);
+
 }//mc2_ops_hccl
 
 #endif
