@@ -222,4 +222,3 @@ inline void asc_stcg(half2* address, half2 val)
         asc_stcg(src + idx, val[idx]);
     }
     ```
-

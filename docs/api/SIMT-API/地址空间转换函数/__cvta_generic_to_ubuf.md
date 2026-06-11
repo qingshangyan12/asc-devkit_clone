@@ -33,6 +33,13 @@ size_t __cvta_generic_to_ubuf(const void* ptr)
 ## 返回值说明
 
 输入指针指向Unified Buffer内存空间的地址值。
+该接口不对输入指针的地址空间合法性进行运行时校验。只有当`ptr`实际指向Unified Buffer内存空间时，返回值是有效的Unified Buffer地址值。特殊场景说明如下：
+
+| 输入场景 | 实测现象 |
+| --- | --- |
+| `ptr`为Global Memory指针 | 未定义行为，返回值不是有效Unified Buffer地址。 |
+| `ptr`为`nullptr` | 返回`0x00000000fff80000`。 |
+| `ptr`为栈空间指针 | 编译阶段报错。 |
 
 ## 约束说明
 
@@ -58,4 +65,3 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* d
     dst[idx] = __cvta_generic_to_ubuf(ptr + threadIdx.x);
 }
 ```
-

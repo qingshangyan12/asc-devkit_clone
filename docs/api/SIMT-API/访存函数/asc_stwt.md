@@ -222,4 +222,3 @@ inline void asc_stwt(half2* address, half2 val)
         asc_stwt(src + idx, val[idx]);
     }
     ```
-

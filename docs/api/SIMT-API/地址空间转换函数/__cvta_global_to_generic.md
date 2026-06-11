@@ -32,7 +32,12 @@ void* __cvta_global_to_generic(size_t rawbits)
 
 ## 返回值说明
 
-指向Global Memory内存空间的指针。
+指向Global Memory内存空间的指针。该接口不校验`rawbits`是否为有效Global Memory地址。异常场景示例说明如下：
+
+| 输入场景 | 实测现象 |
+| --- | --- |
+| `rawbits`为`0` | 返回指针使用`__isGlobal`、`__isUbuf`、`__isLocal`均判断为0。 |
+| `rawbits`为全1 | 返回指针使用`__isGlobal`判断为1，但该指针不是可安全访问的Global Memory地址。 |
 
 ## 约束说明
 
@@ -59,4 +64,3 @@ __global__ __launch_bounds__(1024) void kernel__cvta_global_to_generic(uint32_t*
     dst[idx] = *(uint32_t*)ptr;
 }
 ```
-
