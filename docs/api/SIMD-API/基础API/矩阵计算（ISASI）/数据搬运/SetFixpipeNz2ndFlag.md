@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)（CO1-\>GM、CO1-\>A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)（CO1-\>GM、CO1-\>A1）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -128,7 +128,7 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 
 ## 调用示例<a name="section6461234123118"></a>
 
-完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)。
+完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)。
 
 ```
 uint16_t ndNum = 2;

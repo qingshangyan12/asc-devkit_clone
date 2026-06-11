@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)（CO1-\>GM）过程中进行随路量化后，通过调用该接口设置ClipRelu操作的最大值。
+[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)（CO1-\>GM）过程中进行随路量化后，通过调用该接口设置ClipRelu操作的最大值。
 
 ClipRelu计算公式为min\(clipReluMaxVal，srcData\)，clipReluMaxVal为通过该接口设置的最大值，srcData为源数据。
 
@@ -102,7 +102,7 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ## 调用示例<a name="section6461234123118"></a>
 
-完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)。
+完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)。
 
 ```
 uint64_t clipReluMaxVal = 0x3c00;
