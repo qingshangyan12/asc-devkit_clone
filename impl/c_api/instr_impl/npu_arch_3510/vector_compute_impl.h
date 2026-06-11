@@ -5046,6 +5046,26 @@ __simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_
 }
 
 // ==========asc_uint322uint16==========
+__simd_callee__ inline void asc_uint322uint16_sat(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    asc_uint322uint16_sat_impl(dst, src, mask);
+}
+
+__simd_callee__ inline void asc_uint322uint16(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    asc_uint322uint16_impl(dst, src, mask);
+}
+
+__simd_callee__ inline void asc_uint322uint16_sat_v2(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    asc_uint322uint16_sat_v2_impl(dst, src, mask);
+}
+
+__simd_callee__ inline void asc_uint322uint16_v2(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    asc_uint322uint16_v2_impl(dst, src, mask);
+}
+
 __simd_callee__ inline void asc_uint322uint16_sat(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     asc_uint322uint16_sat_impl(dst, src, mask, pos);
