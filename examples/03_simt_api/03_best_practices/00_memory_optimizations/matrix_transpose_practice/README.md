@@ -245,28 +245,23 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank conflict是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
 
-UB中的bank划分如下图所示。UB总大小为256KB，可以看成前后两行，每行128KB，前128KB对应bank0到bank7，后128KB对应bank8到bank15。bank0和bank8属于同一个group，bank1和bank9属于同一个group，依此类推。
+UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank group = bank % 8`）。在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。
 
 <img src="./figures/bank结构示意图.png">
 
-在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。判断UB bank冲突时，需要看同一条UB访问指令中，同一Warp的并发线程分别访问哪些bank、bank group和sub bank。
+**地址采用低位交织：** UB内连续地址以32B为单位在bank0~bank15间循环 —— 第1个32B块落到bank0、第2个落到bank1、……、第16个落到 bank15，第17个回到bank0的下一行，依次类推。
 
-- **读写冲突**：读操作和写操作同时尝试访问同一个bank下的同一个sub bank。
+SIMT编程方式下bank冲突主要有以下几种：
+
+- **读写冲突**：读操作和写操作同时尝试访问同一个bank group的相同编号的sub bank
 - **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的sub bank。
-- **读读冲突**：两个读操作同时尝试访问同一个bank下的同一个sub bank，或者两个以上读操作同时尝试访问同一个bank group的相同编号的sub bank。
+- **读读冲突**：两个读操作同时尝试访问同一个bank group的相同编号的sub bank，或者两个以上读操作同时尝试访问同一个bank group的相同编号的sub bank。
 
-由于本样例中的tile很小：
-
-- `32×32×4B = 4096B`
-- `32×34×4B = 4352B`
-
-远小于128KB，所以一个tile通常只会落在前128KB区域内。在本文分析里，可以把它近似看成只使用 `bank0~bank7`。
-
-Case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，为了展示方便这里只展示前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在Case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出；访问UB时，32个线程会集中访问两个bank中的两个sub bank，即每个sub bank有16个线程同时访问，属于读读冲突场景。
+Case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，按照地址地位交织的规则，tile数组的第一行row 1刚好覆盖bank 0～bank 3，row 2覆盖bank 4～bank 7，row 3则覆盖bank 8～bank 9，为了展示方便这里只展示前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在Case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出；访问UB时，32个线程会集中访问两个bank group的sub bank 0，属于读读冲突场景。
 
 <img src="./figures/case2bank.png">
 
-Case 3中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个sub bank，同一列元素会错开排布到不同的sub bank。Case 3访问UB时，32个线程的访问会分布到32个sub bank中，即同一条访问指令下每个sub bank仅有一个线程访问，从而避免上述读读冲突。
+Case 3中对UB中的tile数组增加两列padding，由每行32个元素改为34个元素，其在UB上的排列如下图所示。由于每行有34个元素，行跨度变为17个sub bank，同一列元素会错开排布到不同的sub bank。Case 3访问UB时，32个线程的访问会分布到各个bank gourp的每个sub bank中，即同一条访问指令下每个sub bank仅有一个线程访问，从而避免上述读读冲突。
 
 <img src="./figures/case3bank.png">
 
