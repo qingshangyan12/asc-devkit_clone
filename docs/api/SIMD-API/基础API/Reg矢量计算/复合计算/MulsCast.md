@@ -73,9 +73,9 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 | T0 | 目的操作数数据类型。 |
 | T1 | 源操作数的数据类型。 |
 | T2 | 标量源操作数的数据类型。 |
-| layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>本接口只支持RegLayout::ZERO，RegLayout::ONE。<br>src为half类型时使用，float时不生效，half类型时，RegLayout::ZERO表示从b16 RegTensor偶数位读取half元素转换成float，RegLayout::ONE表示从b16 RegTensor奇数位读取half元素转换成float。 |
-| T3 | dstReg的RegTensor类型， 例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
-| T4 | srcReg的RegTensor类型， 例如RegTensor&lt;float&gt;，由编译器自动推导，用户不需要填写。 |
+| layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>• 支持RegLayout::ZERO、RegLayout::ONE。 |
+| T3 | dstReg的RegTensor类型， 例如RegTensor<float\>，由编译器自动推导，用户不需要填写。 |
+| T4 | srcReg的RegTensor类型， 例如RegTensor<float\>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
