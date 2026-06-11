@@ -23,6 +23,8 @@ extern "C" __simd_vf__ void datacopy_test()
     AscendC::Reg::AddrReg a1, b1, c1;
     __ubuf__ uint8_t* aAddr;
     __ubuf__ uint32_t* bAddr;
+    AscendC::LocalTensor<uint8_t> aLocal;
+    AscendC::LocalTensor<uint32_t> bLocal;
     AscendC::Reg::MaskReg mask;
     AscendC::Reg::UnalignRegForLoad u1;
 
@@ -190,4 +192,48 @@ extern "C" __simd_vf__ void datacopy_test()
     // template <typename T>
     // __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, UnalignRegForStore& ureg);
     AscendC::Reg::StoreUnAlign(bAddr, mask, u1);
+
+    // LocalTensor overloads for UB and Reg data movement
+    AscendC::Reg::LoadAlign(a, aLocal);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(a, aLocal, 5);
+    AscendC::Reg::LoadAlign(a, aLocal, a1);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(a, b, aLocal);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE,
+        AscendC::Reg::LoadDist::DIST_DINTLV_B8>(a, b, aLocal, 5);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::LoadDist::DIST_DINTLV_B8>(a, b, aLocal, a1);
+    AscendC::Reg::StoreAlign(aLocal, a, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(aLocal, a, 5, mask);
+    AscendC::Reg::StoreAlign(aLocal, a, a1, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::StoreDist::DIST_INTLV_B8>(aLocal, a, b, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::StoreDist::DIST_INTLV_B8>(aLocal, a, b, a1, mask);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(a, aLocal, 1, mask);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY,
+        AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(a, aLocal, 1, 8, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(aLocal, a, 1, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY,
+        AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(aLocal, a, 1, 8, mask);
+    AscendC::Reg::LoadUnAlignPre(u1, aLocal);
+    AscendC::Reg::LoadUnAlign(a, u1, aLocal, 5);
+    AscendC::Reg::LoadUnAlign(a, u1, aLocal);
+    AscendC::Reg::Load(a, aLocal);
+    AscendC::Reg::LoadUnAlignPre(u1, aLocal, a1);
+    AscendC::Reg::LoadUnAlign(a, u1, aLocal, a1, 5);
+    AscendC::Reg::StoreUnAlign(aLocal, a, u1, 5);
+    AscendC::Reg::StoreUnAlignPost(aLocal, u1, 5);
+    AscendC::Reg::Store(aLocal, a);
+    AscendC::Reg::Store(aLocal, a, 5);
+    AscendC::Reg::StoreUnAlign(aLocal, a, u1, a1);
+    AscendC::Reg::StoreUnAlignPost(aLocal, u1, a1);
+    AscendC::Reg::StoreUnAlign(aLocal, a, u1);
+    AscendC::Reg::StoreUnAlignPost(aLocal, u1);
+    AscendC::Reg::Gather(j, bLocal, j, mask);
+    AscendC::Reg::GatherB(a, aLocal, j, mask);
+    AscendC::Reg::Scatter(aLocal, a, d, mask);
+    AscendC::Reg::LoadAlign(mask, aLocal, a1);
+    AscendC::Reg::LoadAlign(mask, aLocal);
+    AscendC::Reg::LoadAlign<uint8_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(mask, aLocal, 5);
+    AscendC::Reg::StoreAlign(aLocal, mask, a1);
+    AscendC::Reg::StoreAlign(aLocal, mask);
+    AscendC::Reg::StoreAlign<uint8_t, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(aLocal, mask, 5);
+    AscendC::Reg::StoreUnAlign(bLocal, mask, u1);
 }
