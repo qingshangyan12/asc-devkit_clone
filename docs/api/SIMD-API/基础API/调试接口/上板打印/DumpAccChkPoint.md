@@ -95,7 +95,7 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor, uint32_t i
 | ------ | ------ | ------ |
 | tensor | 输入 | 需要dump的Tensor。<br>•待dump的tensor位于Unified Buffer/L1 Buffer/L0C Buffer时使用LocalTensor类型的tensor参数输入。<br>•待dump的tensor位于Global Memory时使用GlobalTensor类型的tensor参数输入。|
 | index | 输入 | 用户自定义附加信息（行号或其他自定义数字）。|
-| countOff | 输入 | 偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束。具体参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)|
+| countOff | 输入 | 偏移元素个数。偏移后的Tensor地址需要满足所在物理位置的对齐约束。具体参考[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。|
 | dumpSize | 输入 | 需要dump的元素个数。|
 
 ## 数据类型
