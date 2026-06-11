@@ -265,8 +265,10 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
         CCU_IF(opType == AlgorithmType::CcuAlltoAllMesh1D) {
-            CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
-                                    sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
+            CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+                                    param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                                    param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
+                                    param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
             /*
             ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                               param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
@@ -316,8 +318,10 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         LoadFuncParamFromMemory(paramAddr, param, ctx);
 
         ccu::Variable argHandle;
-        CcuAlltoAllMesh1DKernel(inputAddr, outputAddr, tokenInfo, srcStride, srcOffset, dstOffset,
-                                sliceSize, goSize1, goSize2, goSize3, goSize4, arg);
+        CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
+                                param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
+                                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
+                                param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
         /*
         argHandle = reinterpret_cast<uint64_t>(arg);
         ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
