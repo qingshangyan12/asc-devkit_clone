@@ -12,6 +12,8 @@
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。
 
+接口支持batch模式。batch模式用于一次描述多个形状相同的bias块，Layout在原ND Layout最外层增加Batch维度，可通过`MakeFrameLayout<NDLayoutPtn, T>(batch, 1, n)`或`MakeFrameLayout<NDExtLayoutPtn, T>(batch, 1, n)`构造。
+
 ## 函数原型
 
 - 执行L1 Buffer到BiasTable Buffer的数据搬运。
@@ -72,6 +74,14 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 源Tensor内存地址和大小需要满足32Byte对齐要求
 - 目的Tensor内存地址和大小需要满足64Byte对齐要求。
 - 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据
+- batch模式要求源张量和目的张量同时携带Batch维度（即两者Layout均包含Batch轴或均不包含），且Batch数量一致；去掉Batch维度后的单个矩阵Layout需要满足当前通路支持的格式组合。
+- batch模式下，源张量和目的张量列方向Shape必须按C0_SIZE（32Byte，分别即`C0_ELEMENT<srcType>`和`C0_ELEMENT<dstType>`）对齐。
+
+## 关键特性说明
+
+### batch搬运
+
+batch模式在矩阵最外层增加Batch维度，适用于连续搬运多个形状相同的bias块。源张量和目的张量均需为`ND`或`NDExt`格式，且二者格式一致。用户只需要在构造Layout时传入Batch参数，`Copy`调用形式与非batch模式保持一致。
 
 ## 调用示例
 
@@ -92,6 +102,37 @@ __aicore__ inline void CopyL1ToBTExample()
     auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
     auto btTensor = MakeTensor(MakeMemPtr(btBuf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+
+    auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
+    Copy(copyAtom, btTensor, l1Tensor);
+}
+```
+
+batch模式调用示例：
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyBatchL1ToBTExample()
+{
+    using SrcType = half;
+    using DstType = float;
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t n = 16;
+
+    // batch模式下源/目的张量列方向Shape需按C0_SIZE（32Byte）对齐，
+    // 分别向上对齐到 C0_ELEMENT<srcType> 和 C0_ELEMENT<dstType>。
+    constexpr uint32_t srcN = Std::ceil_align(n, Std::Int<C0_ELEMENT<SrcType>>{});
+    constexpr uint32_t dstN = Std::ceil_align(n, Std::Int<C0_ELEMENT<DstType>>{});
+
+    __cbuf__ SrcType l1Buf[batch * srcN];
+    __biasbuf__ DstType btBuf[batch * dstN];
+
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NDExtLayoutPtn>(batch, 1, srcN));
+
+    auto btTensor = MakeTensor(MakeMemPtr(btBuf), MakeFrameLayout<NDExtLayoutPtn>(batch, 1, dstN));
 
     auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
     Copy(copyAtom, btTensor, l1Tensor);
