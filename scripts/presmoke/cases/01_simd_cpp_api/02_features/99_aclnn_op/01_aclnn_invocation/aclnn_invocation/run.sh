@@ -19,7 +19,7 @@ presmoke_case_init "$CASE_REL"
 case_build() {
     mkdir -p "$BUILD_DIR"
     presmoke_ensure_custom_op_package
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. $RUN_MODE_ARG')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
 }
 

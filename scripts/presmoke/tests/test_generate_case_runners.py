@@ -9,6 +9,7 @@ from pathlib import Path
 
 from presmoke.generate_case_runners import (
     ARCH_OVERRIDES,
+    NO_CMAKE_ARCH_INJECTION_CASES,
     apply_case_overrides,
     command_env_prefix,
     explicit_skip_reason,
@@ -127,6 +128,29 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertIn("cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES", script)
         self.assertIn("cmake --build build -j'", script)
         self.assertNotIn("cmake --build build -j -DCMAKE_ASC_ARCHITECTURES", script)
+
+    def test_parallel_ops_package_does_not_pass_unused_arch_to_top_cmake(self) -> None:
+        script = render_runner_from_parts(
+            "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package",
+            [],
+            [Command("./build/add_custom/custom_opp_*.run", "package_run")],
+            [],
+        )
+        self.assertIn("local cmake_args=(cmake -S . -B build)", script)
+        self.assertNotIn("local cmake_args=(cmake -S . -B build \"-DCMAKE_ASC_ARCHITECTURES=$ARCH\")", script)
+        self.assertIn('rm -rf "$CASE_DIR/build" "$BUILD_DIR"', script)
+
+    def test_no_arch_injection_cases_do_not_pass_unused_cmake_arch(self) -> None:
+        for rel_path in sorted(NO_CMAKE_ARCH_INJECTION_CASES - {"01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package"}):
+            with self.subTest(rel_path=rel_path):
+                script = render_runner_from_parts(
+                    rel_path,
+                    [Command("cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201", "cmake"), Command("make -j", "make")],
+                    [Command("./demo", "run")],
+                    [],
+                )
+                self.assertNotIn("CMAKE_ASC_ARCHITECTURES", script)
+                self.assertIn("$RUN_MODE_ARG", script)
 
     def test_msprof_application_with_parent_python_runs_from_build_dir(self) -> None:
         script = render_runner_from_parts(
