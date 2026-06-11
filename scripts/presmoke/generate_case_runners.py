@@ -39,6 +39,7 @@ SPECIAL_PREFIXES = (
 )
 
 CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/custom_op"
+PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package"
 
 CUSTOM_OP_PACKAGE_DEPENDENTS = {
     "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
@@ -50,6 +51,7 @@ CUSTOM_OP_PACKAGE_DEPENDENTS = {
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 ARCH_OVERRIDES = {
     "01_simd_cpp_api/02_features/00_compilation/custom_op": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/01_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
@@ -135,6 +137,7 @@ def main() -> int:
         )
         reports.append(report)
 
+    remove_stale_runners(runners_root, reports)
     write_manifest(reports_root, reports)
     LOG.info("generated_runners=%s", len(reports))
     LOG.info("low_confidence=%s", sum(1 for item in reports if item.confidence != "high"))
@@ -334,12 +337,43 @@ def explicit_skip_reason(rel: str) -> str:
 def render_runner(
     spec: RunnerRenderSpec,
 ) -> str:
+    if spec.rel == PARALLEL_OPS_PACKAGE_CASE:
+        return render_parallel_ops_package_runner(spec)
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
     lines = [
         *runner_header(spec),
         *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds)]),
         *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
+        *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
+        "case_clean() {",
+        "    presmoke_default_clean",
+        "}",
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def render_parallel_ops_package_runner(spec: RunnerRenderSpec) -> str:
+    lines = [
+        *runner_header(spec),
+        "case_build() {",
+        '    local cmake_args=(cmake -S . -B build "-DCMAKE_ASC_ARCHITECTURES=$ARCH")',
+        '    if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then',
+        '        cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")',
+        "    fi",
+        '    if [[ -n "${RUN_MODE_ARG:-}" ]]; then',
+        '        cmake_args+=("$RUN_MODE_ARG")',
+        "    fi",
+        "",
+        '    mkdir -p "$BUILD_DIR"',
+        '    (cd "$CASE_DIR" && soc_version=$SOC_VERSION presmoke_run_command "${cmake_args[@]}")',
+        '    (cd "$CASE_DIR" && soc_version=$SOC_VERSION presmoke_run_command cmake --build build -j)',
+        "}",
+        "",
+        *runner_function("case_run", indent_commands(spec.run_cmds, default_cd_build=True)),
         *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
         "case_clean() {",
         "    presmoke_default_clean",
@@ -489,6 +523,26 @@ def write_manifest(reports_root: Path, reports: List[CaseReport]) -> None:
         json.dumps([asdict(report) for report in reports], ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+
+
+def remove_stale_runners(runners_root: Path, reports: List[CaseReport]) -> None:
+    expected = {item.case for item in reports}
+    for runner in list(runners_root.rglob("run.sh")):
+        rel = runner.parent.relative_to(runners_root).as_posix()
+        if rel in expected:
+            continue
+        LOG.info("remove_stale_runner=%s", rel)
+        runner.unlink()
+        remove_empty_parents(runner.parent, runners_root)
+
+
+def remove_empty_parents(path: Path, stop: Path) -> None:
+    while path != stop:
+        try:
+            path.rmdir()
+        except OSError:
+            return
+        path = path.parent
 
 
 if __name__ == "__main__":
