@@ -31,6 +31,7 @@ class LoadDataL12L0MxScaleB3510 {
 public:
     template <const CopyL12L0ScaleBTrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src) {
+        CheckTemplate<trait, T, U>();
         if constexpr (T::layoutType::depth == FIVE_DIM_DATA) {
             BatchLoadDataImpl<trait, T, U>(dst, src);
         } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
@@ -53,7 +54,6 @@ private:
     template <const CopyL12L0ScaleBTrait& trait, typename T, typename U>
     __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
     {
-        CheckTemplate<trait, T, U>();
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
         uint16_t mStartPosition = 0;
@@ -70,14 +70,13 @@ private:
     template <const CopyL12L0ScaleBTrait& trait, typename T, typename U>
     __aicore__ inline static void BatchLoadDataImpl(const T& dst, const U& src)
     {
-        CheckTemplate<trait, T, U>();
         auto dstLayout = dst.Layout();
         auto srcLayout = src.Layout();
         auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
         auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
-        uint8_t mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
+        uint8_t mStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(Get<1>(dstLayout));
         mStep *= Get<0>(dstLayout.Shape());
         auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
         auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Column, 1>(srcNoBatchLayout) >> 5;
