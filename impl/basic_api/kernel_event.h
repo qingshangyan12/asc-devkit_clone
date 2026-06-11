@@ -365,7 +365,7 @@ __aicore__ constexpr TPosition GetDefaultPosition(Hardware hard)
     return TPosition::MAX;
 }
 
-__aicore__ constexpr Hardware GetPhyType(TPosition pos)
+__asc_aicore__ constexpr Hardware GetPhyType(TPosition pos)
 {
     ASSERT(pos != TPosition::MAX);
     Hardware hard = Hardware::UB;
