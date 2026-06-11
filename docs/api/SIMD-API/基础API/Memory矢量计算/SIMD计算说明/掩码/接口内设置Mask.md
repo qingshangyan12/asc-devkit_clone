@@ -4,7 +4,7 @@
 
 - **前n个数据计算**
 
-    采用[Counter模式](概述.md#mask-mode)进行前n个数据计算，接口内部会先调用SetMaskCount，然后根据接口参数count调用SetVectorMask，再进行计算，计算完成后调用ResetMask、SetMaskNorm恢复系统默认Normal模式。
+    采用[Counter模式](概述.md)进行前n个数据计算，接口内部会先调用SetMaskCount，然后根据接口参数count调用SetVectorMask，再进行计算，计算完成后调用ResetMask、SetMaskNorm恢复系统默认Normal模式。
 
     调用示例：
 
@@ -42,7 +42,7 @@
 
 ## Normal模式
 
-在[Normal计算模式](概述.md#mask-mode)中，Mask寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
+在[Normal计算模式](概述.md)中，Mask寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
 
 **注：Normal为默认模式。若未发生模式切换，则无需重复配置该模式。**
 
