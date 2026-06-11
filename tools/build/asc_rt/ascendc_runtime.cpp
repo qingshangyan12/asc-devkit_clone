@@ -287,7 +287,8 @@ uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t num
 {
     aclrtFuncHandle funcHandle;
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtBinaryGetFunctionByEntry(handle, key, &funcHandle));
-    return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, static_cast<void *>(args), size, nullptr, 0);
+    return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, static_cast<void *>(args), size,
+        nullptr, 0);
 }
 
 uint32_t GetAscendCoreSyncAddr(void **addr)
