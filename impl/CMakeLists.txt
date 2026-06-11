@@ -35,5 +35,7 @@ if(NOT BUILD_OPEN_PROJECT)
     DESTINATION
     ${INSTALL_INCLUDE_DIR}/asc/include/adv_api)
 
+  configure_file(${ASCENDC_ADV_API_CMAKE_DIR}/tiling_directory.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/tiling_directory.cmake @ONLY)
   install(SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/tiling_directory.cmake COMPONENT asc-devkit)
 endif()
