@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](../../../../../../docs/api/SIMT-API/原子操作/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：</br>
+本样例展示了如何利用 Ascend C 的SIMT的[`asc_atomic_add()`](../../../../../../docs/api/SIMT-API/原子操作/asc_atomic_add.md)接口，高效统计输入字节序列中每个字节值的出现频率。功能示意如下图：<br>
 <img src="figures/introduction.png" alt="intro" style="width: 50%; height: auto;">
 
 ## 支持的产品
@@ -61,12 +61,12 @@ Warp对局部直方图中每个桶的计数是在UB中通过`asc_atomic_add`进�
 说明：
   1. 由于UB读写延迟更低，所以直方图计数的写操作在UB上进行。
   2. UB的最大可用空间为216KB，当前启动的核数为72核，每个核采用默认1024个线程的配置（即32个Warp）。由于每个Warp需要占用1KB空间，32个Warp共需32KB，可以一次性放置在UB中。
-  3. 如果一个ThreadBlock中的Warp都维护一个局部直方图，会导致严重的线程冲突，影响性能，所以每个Warp都会维护一份局部直方图，当前Warp内的线程只会针对对应的局部直方图进行竞争写入，Warp内的线程按grid-stride读取输入并通过`asc_atomic_add`将每个字节对应桶的计数加1，然后在ThreadBlock内合并所有Warp的局部直方图。 其中`asc_atomic_add`用于对同一Warp的局部直方图中的桶计数做原子累加，保证多个线程同时命中同一个bin时更新结果正确。</br>
+  3. 如果一个ThreadBlock中的Warp都维护一个局部直方图，会导致严重的线程冲突，影响性能，所以每个Warp都会维护一份局部直方图，当前Warp内的线程只会针对对应的局部直方图进行竞争写入，Warp内的线程按grid-stride读取输入并通过`asc_atomic_add`将每个字节对应桶的计数加1，然后在ThreadBlock内合并所有Warp的局部直方图。 其中`asc_atomic_add`用于对同一Warp的局部直方图中的桶计数做原子累加，保证多个线程同时命中同一个bin时更新结果正确。<br>
 
 ### 阶段二
 
 整体流程：从GM中获取到局部直方图的数据，每个ThreadBlock负责对所有的局部直方图中的一个桶进行求和，每个线程会将局部直方图中对应桶的计数写入UB中，然后在UB中完成归约求和，最后结果写入GM。
-流程图如下：下图以Block0为例，Block0负责计算索引为0的桶的计数，即bin[0]。该Block中的每个线程将对应局部直方图的bin[0]，写入UB。例如，线程0会把局部直方图0中bin[0]写入到UB的索引为0的位置，线程1会把局部直方图1中bin[0]写入到UB的索引为1的位置，以此类推。最后UB中存储每个局部直方图的bin[0]的计数，然后对UB上的数据进行规约求和，得到总的bin[0]，最后将结果写回GM。
+流程图如下：下图以Block0为例，Block0负责计算索引为0的桶的计数，即bin[0]。该Block中的每个线程将对应局部直方图的bin[0]，写入UB。例如，线程0会把局部直方图0中bin[0]写入到UB的索引为0的位置，线程1会把局部直方图1中bin[0]写入到UB的索引为1的位置，以此类推。最后UB中存储每个局部直方图的bin[0]的计数，然后对UB上的数据进行归约求和，得到总的bin[0]，最后将结果写回GM。
 
 <img src="figures/merge_his.png" alt="merge_his" style="width: 50%; height: auto;">
 
