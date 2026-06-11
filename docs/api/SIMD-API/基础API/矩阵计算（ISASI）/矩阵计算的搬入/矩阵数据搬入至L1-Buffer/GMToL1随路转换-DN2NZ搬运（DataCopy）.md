@@ -84,22 +84,4 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 
 ## 调用示例<a id="section122101199486"></a>
 
-示例代码片段如下：
-
-```cpp
-// dstLocal：存放DataCopy的输出Tensor，仅支持L1 Buffer（A1/B1）
-// srcGlobal：存放DataCopy的输入Tensor，仅支持Global Memory
-
-AscendC::Dn2NzParams dn2nzParams(
-    /* dnNum             */ 1,
-    /* nValue            */ 32,
-    /* dValue            */ 32,
-    /* srcDnMatrixStride */ 0,
-    /* srcDValue         */ 32,
-    /* dstNzC0Stride     */ 32,
-    /* dstNzNStride      */ 1,
-    /* dstNzMatrixStride */ 0
-);
-// 将GM中DN的格式的数据，按照dn2nzParams定义的规则，转换为NZ并拷贝到L1 Buffer（A1/B1）中
-AscendC::DataCopy(dstLocal, srcGlobal, dn2nzParams);
-```
+完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/00_data_movement/data_copy_gm2l1)中场景3。

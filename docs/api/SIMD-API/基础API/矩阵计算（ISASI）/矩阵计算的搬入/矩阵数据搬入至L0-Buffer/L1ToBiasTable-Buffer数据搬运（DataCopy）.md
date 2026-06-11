@@ -103,4 +103,29 @@ DataCopy数据搬运支持将矩阵计算用到的bias参数从L1 Buffer移动�
 
 ## 调用示例<a id="zh-cn_topic_0000002566886667_section088124295117"></a>
 
-无
+L1->Bias Table Buffer，搬运 Bias 参数。
+
+```cpp
+// c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32, 0, 0}，否则为 {1, 16, 0, 0}。
+AscendC::LocalTensor<outputType> bias1Local(AscendC::TPosition::C1, c1Addr, biasSizeAlign);
+AscendC::LocalTensor<outputType> bias2Local(AscendC::TPosition::C2, c2Addr, biasSizeAlign);
+
+if constexpr (SCENARIO_NUM == 4) {
+    SplitBias(bias1Local, bias2Local);
+}
+
+__aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
+                                AscendC::LocalTensor<outputType> bias2Local)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    AscendC::DataCopyParams c12c2Params =
+        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 32), 0, 0};
+#else
+    AscendC::DataCopyParams c12c2Params =
+        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 64), 0, 0};
+#endif
+    AscendC::DataCopy(bias2Local, bias1Local, c12c2Params);
+}
+```
+
+完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/00_data_movement/data_copy_gm2l1)中场景4。
