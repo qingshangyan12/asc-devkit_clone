@@ -20,13 +20,13 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
-__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag)
+__aicore__ inline void asc_set_l0c2gm_config_impl(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag)
 { 
     if ASC_IS_AIC {
         asc_capi_fpc_reg_config config;
         config.config = 0;
-        config.relu_units = relu_pre;
-        config.quant_units = quant_pre;
+        config.relu_units = relu_pre_addr;
+        config.quant_units = quant_pre_addr;
         config.unit_flag = enable_unit_flag;
         set_fpc(config.config);
     }
