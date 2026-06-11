@@ -112,6 +112,8 @@
 01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming
 01_simd_cpp_api/02_features/01_invocation/aclnn_invocation
 01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin
+01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin
+01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom
 01_simd_cpp_api/02_features/01_invocation/aclop_invocation
 01_simd_cpp_api/03_libraries/05_sort/sort
 01_simd_cpp_api/03_libraries/02_normalization/layernorm_v2
@@ -144,7 +146,7 @@
 01_simd_cpp_api/03_libraries/00_matrix/matmul_nbuffer33
 01_simd_cpp_api/03_libraries/01_activation/softmaxflashv2
 01_simd_cpp_api/03_libraries/00_matrix/matmul_triangle
-01_simd_cpp_api/03_libraries/00_matrix/matmul_fused_mannul
+01_simd_cpp_api/03_libraries/00_matrix/matmul_fused_manual
 01_simd_cpp_api/03_libraries/00_matrix/matmul_preload
 01_simd_cpp_api/03_libraries/00_matrix/matmul_unitflag
 01_simd_cpp_api/03_libraries/00_matrix/matmul_a2b2_share

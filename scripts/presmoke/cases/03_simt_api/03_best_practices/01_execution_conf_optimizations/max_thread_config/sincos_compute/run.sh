@@ -11,26 +11,26 @@
 
 set -euo pipefail
 
-CASE_REL=01_simd_cpp_api/03_libraries/00_matrix/matmul_fused_mannul
+CASE_REL=03_simt_api/03_best_practices/01_execution_conf_optimizations/max_thread_config/sincos_compute
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../../../_case_entry.sh"
+source "$SCRIPT_DIR/../../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
 case_build() {
     mkdir -p "$BUILD_DIR"
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
     (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py')
 }
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./demo)
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc './sincos_compute 1024')
+    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc './sincos_compute 512')
 }
 
 case_verify() {
     mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/verify_result.py output/output.bin output/golden.bin')
+    :
 }
 
 case_clean() {
