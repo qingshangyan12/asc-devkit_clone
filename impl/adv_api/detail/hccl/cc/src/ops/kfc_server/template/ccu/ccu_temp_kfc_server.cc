@@ -39,19 +39,24 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
     // 不需要从流
     resourceRequest.notifyNumOnMainThread = 0;
     resourceRequest.slaveThreadNum = 0;
-    // kernel数量
-    resourceRequest.ccuKernelNum.push_back(1);
     HCCL_DEBUG("[CcuTempKfcServer::CalcRes] notifyNumOnMainThread[%u] slaveThreadNum[%u]",
                resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
+    // 构建 KfcServer kernelInfo
     CcuKernelInfo kernelInfo;
     strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcServer");
     kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuKfcServerKernel);
-    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();  
-    // TODO：其他参数赋值  
-    kernelInfo.setKernelArg(kernelArg);
 
-    resourceRequest.ccuKernelInfos.push_back(kernelInfo);
+    // 从 ccuKernelInfos 最后一项继承属性到当前 KfcServer kernel，然后替换最后一项
+    if (!resourceRequest.ccuKernelInfos.empty()) {
+        HCCL_INFO("[CcuTempKfcServer::CalcRes] inheriting kernelargs from[%s]",
+                   resourceRequest.ccuKernelInfos.back().kernelFuncName);
+        InheritKfcServerKernelArg(resourceRequest.ccuKernelInfos.back(), kernelInfo);
+        resourceRequest.ccuKernelInfos.back() = kernelInfo;
+    } else {
+        HCCL_ERROR("[CcuTempKfcServer::CalcRes] no preceding kernel to inherit from, KfcServer requires a source kernel");
+        return HCCL_E_PARA;
+    }
 
     HCCL_DEBUG("[CcuTempKfcServer::CalcRes] dimsize=%llu, ccuKernelInfos.size()=%llu",
                subCommRanks_[0].size(), resourceRequest.ccuKernelInfos.size());
