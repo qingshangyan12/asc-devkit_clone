@@ -17,7 +17,7 @@ source "$SCRIPT_DIR/../../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
 case_build() {
-    local cmake_args=(cmake -S . -B build "-DCMAKE_ASC_ARCHITECTURES=$ARCH")
+    local cmake_args=(cmake -S . -B build)
     if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then
         cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")
     fi
@@ -42,7 +42,7 @@ case_verify() {
 }
 
 case_clean() {
-    presmoke_default_clean
+    rm -rf "$CASE_DIR/build" "$BUILD_DIR"
 }
 
 presmoke_case_main "$@"
