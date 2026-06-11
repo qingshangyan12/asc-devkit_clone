@@ -144,6 +144,14 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
 {
     // TODO GetDieId()
     const uint32_t getDieId = 1;
+    // 单Die场景：等待HBM中的信号
+    CCU_WHILE(turnStartSig != 1)
+    {
+        ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
+    }
+    turnStartSig = 0;                       // reset Xn
+    ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
+    /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：等待HBM中的信号
         CCU_WHILE(turnStartSig != 1)
@@ -168,11 +176,14 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
             ccu::EventWait(ctx.exportDieSig, 1);         // 会自动reset CKE
         }
     }
+    */
 }
 
 void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEndSig, KfcServerContext &ctx)
 {
     const uint32_t getDieId = 1;    // TODO GetDieId()
+    Store(turnEndSig, hbmSigAddr);
+    /*
     CCU_IF (ctx.dieNum == SINGLE_DIE) {
         // 单Die场景：Set本轮完成信号到HBM
         Store(turnEndSig, hbmSigAddr);
@@ -187,6 +198,7 @@ void SetTurnEndSig(const ccu::Variable &hbmSigAddr, const ccu::Variable &turnEnd
             ccu::EventRecord(ctx.importDieSig, 1);
         }
     }
+    */
 }
 
 void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable> &param, KfcServerContext &ctx)
@@ -196,6 +208,7 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
     doubleDie = CCU_PARAM_NUM_PER_DIE * CCU_ONE_PARAM_SIZE;
     ccu::Variable addr = paramAddr;
 
+    /*
     // TODO GetDieId()
     const uint32_t getDieId = 1;
     CCU_IF (ctx.dieNum == DOUBLE_DIE) {
@@ -203,6 +216,7 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
             addr = addr + doubleDie;
         }  
     }
+    */
 
     // 一次性读取本轮32个参数
     ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE);
