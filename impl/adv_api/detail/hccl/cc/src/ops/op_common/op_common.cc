@@ -1303,6 +1303,8 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
 
             HCCL_INFO("[HcclGetCcuKernel] registering kernel[%u]: kernelFuncName[%s]", i, kernelInfo.kernelFuncName);
             CcuKernelHandle kernelHandle;
+            HCCL_INFO("[HcclGetCcuKernel] ChannelCount[%s]", kernelInfo.kernelArg->ChannelCount);
+            CcuKernelHandle kernelHandle;
             CcuResult regRet = HcommCcuKernelRegister(insHandle, kernelInfo.kernelFuncName,
                                                       reinterpret_cast<void*>(kernelInfo.kernelFunc),
                                                       kernelInfo.kernelArg, &kernelHandle);

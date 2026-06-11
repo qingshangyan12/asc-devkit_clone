@@ -34,7 +34,7 @@ static CcuResult InitResource(AlltoAllMesh1DContext &ctx)
     HCCL_INFO("[CcuKernelAlltoAllMesh1D] start InitResource.");
     const auto *arg = ctx.arg;
     uint32_t channelIdx = 0;
-    HCCL_INFO("[CcuKernelAlltoAllMesh1D] obtain arg, arg == nullptr:[%u].", (arg == nullptr));
+    HCCL_INFO("[CcuKernelAlltoAllMesh1D] obtain arg, channelCount:[%u].", (arg->channelCount));
 
     if (arg->channelCount == 0) {
         HCCL_ERROR("[CcuKernelAlltoAllMesh1D] channels is empty!");
