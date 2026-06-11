@@ -95,6 +95,7 @@ Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因�
 ```
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
+
 ### 中级性能优化
 
 本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。以下重点说明CV融合的实现机制。
