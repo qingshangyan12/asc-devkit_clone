@@ -32,6 +32,12 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__ fp8_e8m0_t* dst, vector_st
 __simd_callee__ inline void asc_storeunalign(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1, uint32_t count)
 __simd_callee__ inline void asc_storeunalign(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1, uint32_t count)
 __simd_callee__ inline void asc_storeunalign(__ubuf__ int4b_t*& dst, vector_store_unalign& src0, vector_int4x2_t src1, uint32_t count)
+__simd_callee__ inline void asc_storeunalign(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
+__simd_callee__ inline void asc_storeunalign(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
+__simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
+    vector_bool src1)
 ```
 
 ## 参数说明
