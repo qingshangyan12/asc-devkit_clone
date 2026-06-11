@@ -68,6 +68,7 @@ TEST_F(TestTiling, TestAddInputTdMallocFailed)
 }
 
 
+
 TEST_F(TestTiling, GetShapeSize)
 {
     EXPECT_EQ(ge::Shape().GetShapeSize(), 0);
