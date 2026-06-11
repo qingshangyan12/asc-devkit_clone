@@ -2,7 +2,7 @@
 
 ## 概述
 
-基于Ascend C SIMT的内存访问样例，展示SIMT编程中Global Memory离散访存和跨核数据同步相关API的使用方法。
+基于Ascend C SIMT的内存访问样例，展示SIMT编程中Global Memory离散访存、原子操作及跨核数据同步相关API的使用方法。
 
 ## 样例列表
 
