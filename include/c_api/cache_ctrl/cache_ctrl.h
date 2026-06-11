@@ -27,8 +27,6 @@
 
 #endif
 
-#if defined(__NPU_ARCH__) 
-
 /*
  * @ingroup CacheControl
  * @brief Preload instruction cache
@@ -65,14 +63,6 @@ __aicore__ inline void asc_simd_dcci_single(__gm__ void* dst);
  */
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-/*
- * @ingroup CacheControl
- * @brief Clean and invalidate entire Unified Buffer cache
- * @details Clean and invalidate all data cache entries for Unified Buffer (NPU architecture 2201 only)
- */
-__aicore__ inline void asc_dcci_entire_ub();
-#endif
 
 /*
  * @ingroup CacheControl
@@ -112,6 +102,15 @@ __aicore__ inline int64_t asc_get_icache_preload_status();
  */
 __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset);
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+/*
+ * @ingroup CacheControl
+ * @brief Clean and invalidate entire Unified Buffer cache
+ * @details Clean and invalidate all data cache entries for Unified Buffer (NPU architecture 2201 only)
+ */
+__aicore__ inline void asc_dcci_entire_ub();
+#endif
+
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 /*
  * @ingroup CacheControl
@@ -121,7 +120,7 @@ __aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t o
 __aicore__ inline void asc_dci();
 #endif
 
-#endif
+#endif // INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H)  
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
