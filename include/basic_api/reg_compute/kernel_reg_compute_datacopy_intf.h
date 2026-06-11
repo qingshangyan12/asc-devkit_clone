@@ -30,6 +30,9 @@ namespace Reg {
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr);
 
+template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src);
+
 template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T*& srcAddr, int32_t postUpdateStride);
 
@@ -49,6 +52,9 @@ __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T* srcAdd
 // vst
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, MaskReg& mask);
+
+template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, MaskReg& mask);
 
 template <typename T = DefaultType, PostLiteral postMode, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, int32_t postUpdateStride, MaskReg& mask);
@@ -179,4 +185,3 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_H__
 #endif
-

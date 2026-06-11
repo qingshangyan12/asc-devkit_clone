@@ -154,14 +154,14 @@ public:
     inline void Print(uint32_t len);
     int32_t ToFile(const std::string& fileName) const;
 #else
-    __aicore__ inline uint64_t GetPhyAddr() const;
-    __aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
+    __callee__ inline uint64_t GetPhyAddr() const;
+    __callee__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
     __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
     template <typename U> __aicore__ inline LocalTensor<U> ReinterpretCast() const;
     template <typename S> __aicore__ inline __inout_pipe__(S)
         void SetValue(const uint32_t index, const S value) const;
-    __aicore__ inline LocalTensor operator[](const uint32_t offset) const;
+    __callee__ inline LocalTensor operator[](const uint32_t offset) const;
 
     template <typename S>
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "

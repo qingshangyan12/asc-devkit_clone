@@ -667,11 +667,11 @@ int32_t LocalTensor<T>::ToFile(const std::string &fileName) const
 }
 // Npu Impl
 #else
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
+template <typename T> __callee__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
 {
     return GetPhyAddr(0);
 }
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
+template <typename T> __callee__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
 {
     if constexpr (IsSameType<PrimType, int4b_t>::value) {
         return this->address_.bufferAddr + offset / INT4_TWO;
@@ -848,7 +848,7 @@ template <typename U> __aicore__ inline __inout_pipe__(S)
     }
 }
 
-template <typename T> __aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
+template <typename T> __callee__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
 {
     LocalTensor result = *this;
     if constexpr (IsHalfByteDataType<PrimType>()) {
