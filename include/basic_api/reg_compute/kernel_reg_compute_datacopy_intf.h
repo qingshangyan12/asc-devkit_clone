@@ -21,6 +21,7 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H
 #define ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H
 
+#include "kernel_tensor.h"
 #include "kernel_reg_compute_common_intf.h"
 #include "kernel_reg_compute_utils.h"
 
@@ -30,76 +31,145 @@ namespace Reg {
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr);
 
+template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src);
+
 template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T*& srcAddr, int32_t postUpdateStride);
 
+template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDist::DIST_NORM, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, int32_t postUpdateStride);
+
 template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr, AddrReg offset);
+
+template <typename T = DefaultType, LoadDist dist = LoadDist::DIST_NORM, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, AddrReg offset);
 
 // vld dual
 template <typename T = DefaultType, LoadDist dist, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T* srcAddr);
 
+template <typename T = DefaultType, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src);
+
 template <typename T = DefaultType, PostLiteral postMode, LoadDist dist, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T*& srcAddr, int32_t postUpdateStride);
 
+template <typename T = DefaultType, PostLiteral postMode, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src,
+                                      int32_t postUpdateStride);
+
 template <typename T = DefaultType, LoadDist dist, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T* srcAddr, AddrReg offset);
+
+template <typename T = DefaultType, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src, AddrReg offset);
 
 // vst
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, MaskReg& mask);
 
+template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, MaskReg& mask);
+
 template <typename T = DefaultType, PostLiteral postMode, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, int32_t postUpdateStride, MaskReg& mask);
 
+template <typename T = DefaultType, PostLiteral postMode, StoreDist dist = StoreDist::DIST_NORM, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, int32_t postUpdateStride, MaskReg& mask);
+
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, AddrReg offset, MaskReg& mask);
+
+template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, AddrReg offset, MaskReg& mask);
 
 // vst dual
 template <typename T = DefaultType, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, MaskReg& mask);
 
 template <typename T = DefaultType, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg0, U& srcReg1, MaskReg& mask);
+
+template <typename T = DefaultType, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, AddrReg offset,
+                                       MaskReg& mask);
+
+template <typename T = DefaultType, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg0, U& srcReg1, AddrReg offset,
                                        MaskReg& mask);
 
 // vsldb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr, uint32_t dataBlockStride, MaskReg& mask);
 
+template <typename T = DefaultType, DataCopyMode dataMode, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, uint32_t dataBlockStride, MaskReg& mask);
+
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
 __simd_callee__ inline void LoadAlign(U &dstReg, __ubuf__ T*& srcAddr, uint32_t dataBlockStride, uint32_t repeatStride,
                                       MaskReg& mask);
+
+template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, uint32_t dataBlockStride,
+                                      uint32_t repeatStride, MaskReg& mask);
 
 // vsstb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, uint32_t dataBlockStride, MaskReg& mask);
 
+template <typename T = DefaultType, DataCopyMode dataMode, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, uint32_t dataBlockStride, MaskReg& mask);
+
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, uint32_t dataBlockStride, uint32_t repeatStride,
                                        MaskReg& mask);
+
+template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, uint32_t dataBlockStride,
+                                       uint32_t repeatStride, MaskReg& mask);
 
 // vldas/vldus
 template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
 
+template <typename T>
+__simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, const LocalTensor<T>& src);
+
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr,
+                                        uint32_t postUpdateStride);
+
+template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src,
                                         uint32_t postUpdateStride);
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
 
 template <typename T = DefaultType, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src);
+
+template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Load(U& dstReg, __ubuf__ T* srcAddr);
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Load(U& dstReg, const LocalTensor<T>& src);
 
 // vlda/vldu
 template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr, AddrReg& areg);
 
+template <typename T>
+__simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, const LocalTensor<T>& src, AddrReg& areg);
+
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr, AddrReg& areg,
+                                        uint32_t inc);
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src, AddrReg& areg,
                                         uint32_t inc);
 
 // vstus/vstas
@@ -107,67 +177,124 @@ template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MOD
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg,
                                          uint32_t postUpdateStride);
 
+template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg,
+                                         uint32_t postUpdateStride);
+
 template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, int32_t postUpdateStride);
+
+template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg,
+                                             int32_t postUpdateStride);
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg);
 
 template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Store(const LocalTensor<T>& dst, U& srcReg);
+
+template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg, uint32_t count);
+
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Store(const LocalTensor<T>& dst, U& srcReg, uint32_t count);
 
 // vstu/vsta
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg, AddrReg& areg);
 
+template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg,
+                                         AddrReg& areg);
+
 template <typename T>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, AddrReg& areg);
+
+template <typename T>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg, AddrReg& areg);
 
 // vstur/vstar
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T* dstAddr, U& srcReg, UnalignRegForStore& ureg);
 
+template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg);
+
 template <typename T>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T* dstAddr, UnalignRegForStore& ureg);
+
+template <typename T>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg);
 
 // vgather2
 template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3,
           typename T4>
 __simd_callee__ inline void Gather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask);
 
+template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
+__simd_callee__ inline void Gather(T3& dstReg, const LocalTensor<T1>& base, T4& index, MaskReg& mask);
+
 // vgatherb
 template <typename T = DefaultType, typename U, typename S>
 __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, MaskReg& mask);
+
+template <typename T = DefaultType, typename U, typename S>
+__simd_callee__ inline void GatherB(U& dstReg, const LocalTensor<T>& base, S& index, MaskReg& mask);
 
 // vscatter
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
 __simd_callee__ inline void Scatter(__ubuf__ T* baseAddr, S& srcReg, V& index, MaskReg& mask);
 
+template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
+__simd_callee__ inline void Scatter(const LocalTensor<T>& base, S& srcReg, V& index, MaskReg& mask);
+
 // pld
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T* srcAddr, AddrReg offset);
+
+template <typename T, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src, AddrReg offset);
 
 // plds
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T* srcAddr);
 
+template <typename T, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src);
+
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T*& srcAddr, int32_t offset);
+
+template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src, int32_t offset);
 
 // pst
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask, AddrReg offset);
 
+template <typename T, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask, AddrReg offset);
+
 // psts
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask);
 
+template <typename T, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask);
+
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, MaskReg& mask, int32_t offset);
+
+template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask, int32_t offset);
 
 // pstu
 template <typename T>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, UnalignRegForStore& ureg);
+
+template <typename T>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, MaskReg& mask, UnalignRegForStore& ureg);
 
 } // namespace Reg
 } // namespace AscendC
@@ -179,4 +306,3 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_H__
 #endif
-
