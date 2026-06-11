@@ -1,0 +1,282 @@
+/**
+* Copyright (c) 2026 Huawei Technologies Co., Ltd.
+* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+* CANN Open Software License Agreement Version 2.0 (the "License").
+* Please refer to the License for details. You may not use this file except in compliance with the License.
+* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+* See LICENSE in the root of the software repository for the full text of the License.
+*/
+
+/*!
+ * \file conv2d_api_impl.h
+ * \brief
+ */
+#ifndef API_CONV2D_API_IMPL_H
+#define API_CONV2D_API_IMPL_H
+
+#include "lib/conv/conv2d/conv2d_config.h" // #include "../../../../../include/adv_api/conv/conv2d/conv2d_config.h"  // [zj]TODO
+#include "conv2d_util.h"
+
+namespace Conv2dApi {
+using namespace AscendC;
+
+template<typename Intf, class Config>
+struct Conv2dApiImpl {
+public:
+    using ConvParam = typename Config::ConvParam;
+    constexpr static uint32_t ImplType = Config::implType;
+
+public:
+    __aicore__ inline Conv2dApiImpl() {}
+
+    struct ContextData: public Config::ContextData {
+        __aicore__ inline ContextData()
+        {
+        }
+
+        TPipe *pipe;
+        const TConv2DApiTiling* __restrict convTiling;
+
+        GlobalTensor<typename Config::FmapT> fmapGm;
+        GlobalTensor<typename Config::WeightT> weightGm;
+        GlobalTensor<typename Config::BiasT> biasGm;
+        GlobalTensor<typename Config::PreQuantT> preQuantGm;
+        GlobalTensor<typename Config::PreReluT> preReluGm;
+        GlobalTensor<typename Config::PreClipReluT> preClipReluGm;
+        GlobalTensor<typename Config::EltwiseT> eltwiseGm;
+        GlobalTensor<typename Config::AntiQuantT> antiQuantGm;
+        GlobalTensor<typename Config::PostQuantT> postQuantGm;
+        GlobalTensor<typename Config::PostReluT> postReluGm;
+        GlobalTensor<typename Config::PostClipReluT> postClipReluGm;
+
+        // [zj]TODO: preload
+        TQue<QuePosition::A1, 1> queueFmapL1;
+        TQue<QuePosition::B1, 1> queueWeightL1;
+        TQue<QuePosition::B1, 1> queueBiasL1;
+        TQue<QuePosition::B1, 1> queuePreQuantL1;
+        TQue<QuePosition::B1, 1> queuePreReluL1;
+        TQue<QuePosition::B1, 1> queuePreClipReluL1;
+        TQue<QuePosition::B1, 1> queueAntiQuantL1;
+        TQue<QuePosition::A1, 1> queueEltwiseL1;
+        TQue<QuePosition::B1, 1> queuePostQuantL1;
+        TQue<QuePosition::B1, 1> queuePostReluL1;
+        TQue<QuePosition::B1, 1> queuePostClipReluL1;
+        TQue<QuePosition::CO1, 1> queueOutputL1; // [zj]TODO: dual output
+        TQue<QuePosition::CO1, 1> queueCL0;
+
+        TQue<TPosition::C2, 1> queueBiasBT;
+        TQue<TPosition::C2PIPE2GM, 1> queuePreQuantFB;
+        TQue<TPosition::C2PIPE2GM, 1> queuePreReluFB;
+        TQue<TPosition::C2PIPE2GM, 1> queuePreClipReluFB;
+        TQue<TPosition::C2PIPE2GM, 1> queueAntiQuantFB;
+        TQue<TPosition::C2PIPE2GM, 1> queuePostQuantFB;
+        TQue<TPosition::C2PIPE2GM, 1> queuePostReluFB;
+        TQue<TPosition::C2PIPE2GM, 1> queuePostClipReluFB;
+
+        TBuf<TPosition::A2> l0aBuf;
+        TBuf<TPosition::B2> l0bBuf;
+
+        LocalTensor<typename Config::FmapT> fmapL1;
+        LocalTensor<typename Config::WeightT> weightL1;
+        LocalTensor<typename Config::BiasT> biasL1;
+        LocalTensor<typename Config::PreQuantT> preQuantL1;
+        LocalTensor<typename Config::PreReluT> preReluL1;
+        LocalTensor<typename Config::PreClipReluT> preClipReluL1;
+        LocalTensor<typename Config::AntiQuantT> antiQuantL1;
+        LocalTensor<typename Config::EltwiseT> eltwiseL1;
+        LocalTensor<typename Config::PostQuantT> postQuantL1;
+        LocalTensor<typename Config::PostReluT> postReluL1;
+        LocalTensor<typename Config::PostClipReluT> postClipReluL1;
+        LocalTensor<typename Config::OutputT> outputL1;
+        LocalTensor<typename Config::OutputT> output1L1;
+
+        LocalTensor<typename Config::FmapT> wholeAl0Tensor;
+        LocalTensor<typename Config::FmapT> al0;
+        LocalTensor<typename Config::WeightT> wholeBl0Tensor;
+        LocalTensor<typename Config::WeightT> bl0;
+        LocalTensor<typename Config::L0cT> cl0;
+
+        LocalTensor<typename Config::BiasT> biasBT;
+        LocalTensor<typename Config::PreQuantT> preQuantFB;
+        LocalTensor<typename Config::PreReluT> preReluFB;
+        LocalTensor<typename Config::PreClipReluT> preClipReluFB;
+        LocalTensor<typename Config::AntiQuantT> antiQuantFB;
+        LocalTensor<typename Config::PostQuantT> postQuantFB;
+        LocalTensor<typename Config::PostReluT> postReluFB;
+        LocalTensor<typename Config::PostClipReluT> postClipReluFB;
+
+        // [zj]TODO: del no need
+
+        uint64_t singleCoreCi;
+        uint64_t singleCoreCo;
+        uint64_t singleCoreM;
+        uint64_t singleCoreHo;
+        uint64_t singleCoreWo;
+
+        uint64_t orgCi;
+        uint64_t orgCo;
+        uint64_t orgHi;
+        uint64_t orgWi;
+        uint64_t orgHo;
+        uint64_t orgWo;
+        uint64_t kernelH;
+        uint64_t kernelW;
+
+        uint64_t dilatedKernelH;
+        uint64_t dilatedKernelW;
+
+        uint64_t fmapOneBatchSize;
+        uint64_t outputOneBatchSize;
+
+        // Used in m_mode
+        uint64_t mAL1;
+        uint64_t mL0;
+        uint8_t mAL1UpdateFlag; // Mmode, A GM->L1是否需要更新寄存器
+
+        int64_t ciStartPos;
+        int64_t coStartPos;
+        // Used in m_mode
+        uint64_t mStartPos;
+        // Used in hw_mode
+        int64_t hiStartPos;
+        int64_t wiStartPos;
+
+        uint8_t isFirstIterate; // 是否第一次循环
+
+        uint64_t iter; // 整体循环
+        uint64_t kIter; // k方向循环, DDR->L0
+        uint64_t batchIter; // batch方向循环
+        uint64_t kAL1Iter; // A, GM->L1, k方向循环
+        uint64_t kBL1Iter; // B, GM->L1, k方向循环
+        uint64_t nBL1Iter; // B, GM->L1, n方向循环
+        uint64_t kAL0Iter; // A, L1->L0, k方向循环
+        uint64_t kBL0Iter; // B, L1->L0, k方向循环
+        uint64_t nL0Iter; // B, L1->L0, n方向循环
+        // Used in m_mode
+        uint64_t mAL1Iter; // A, GM->L1, m方向循环
+        uint64_t mL0Iter; // A, L1->L0, m方向循环
+        // Used in hw_mode
+        uint64_t hoAL1Iter; // A, GM->L1, ho方向循环
+        uint64_t woAL1Iter; // A, GM->L1, wo方向循环
+        uint64_t hoL0Iter; // A, L1->L0, ho方向循环
+        uint64_t woL0Iter; // A, L1->L0, wo方向循环
+
+        uint64_t ddr2l1LoopBatch; // ddr2l1 batch维度循环次数
+        uint64_t ddr2l1LoopN; // ddr2l1 n维度循环次数, CeilDiv(singleCoreCo, nBl1), maxNBL1Iter = ddr2l1LoopN - 1
+        uint64_t l12l0LoopN; // ddr2l1 n维度循环次数, L1中为切分整块、切分尾块循环次数不同, maxNL0Iter = l12l0LoopN - 1
+        uint64_t ddr2l0LoopK; // ddr2l1 k维度循环次数，CeilDIV(AlignB(singleCoreCi * kernelHxkernelW, k0), kL0)
+        // Used in m_mode
+        uint64_t ddr2l1LoopM; // ddr2l1 m维度循环次数
+        uint64_t l12l0LoopM; // l12l0 m维度循环次数
+        // Used in hw_mode
+        uint64_t ddr2l1LoopH; // ddr2l1 h维度循环次数
+        uint64_t ddr2l1LoopW; // ddr2l1 w维度循环次数
+        uint64_t l12l0LoopH; // l12l0 h维度循环次数
+        uint64_t l12l0LoopW; // l12l0 w维度循环次数
+
+        uint64_t multiKAL1; // A, L1->L0, k方向循环次数, kAL1 / kL0, maxKL0Iter = ddr2l0LoopK - 1
+        uint64_t multiKBL1; // A, L1->L0, k方向循环次数, kBL1 / kL0, maxKL0Iter = ddr2l0LoopK - 1
+
+        uint64_t maxKAL1Iter; // kAL1Iter迭代器最大值
+        uint64_t maxKBL1Iter; // kBL1Iter迭代器最大值
+        uint64_t maxNBL1Iter; // nBL1Iter迭代器最大值, maxNBL1Iter = ddr2l1LoopN - 1
+        uint64_t maxKL0Iter; // kAL0Iter、kBL0Iter迭代器最大值，maxKL0Iter = ddr2l0LoopK - 1
+        uint64_t maxNL0Iter; // nL0Iter代器最大值, maxNL0Iter = l12l0LoopN - 1
+        // Used in m_mode
+        uint64_t maxMAL1Iter; // mAL1Iter迭代器最大值
+        uint64_t maxML0Iter; // mL0Iter迭代器最大值
+        // Used in hw_mode
+        uint64_t maxHoL1Iter; // hoAL1Iter迭代器最大值
+        uint64_t maxWoL1Iter; // woAL1Iter迭代器最大值
+        uint64_t maxHoL0Iter; // hoL0Iter迭代器最大值
+        uint64_t maxWoL0Iter; // woL0Iter迭代器最大值
+
+        uint64_t kAL1Tail; // AL1上k方向的切分尾块大小
+        uint64_t kBL1Tail; // BL1上k方向的切分尾块大小
+        uint64_t nBL1Tail; // BL1上n方向的切分尾块大小
+        uint64_t kL0Tail; // L0上k方向的切分尾块大小
+        uint64_t nL0Tail; // L0上n方向的切分尾块大小
+        // Used in m_mode
+        uint64_t mAL1Tail; // AL1上m方向的切分尾块大小
+        uint64_t mAL0Tail; // AL0上m方向的切分尾块大小
+        // Used in hw_mode
+        uint64_t hoAL1Tail; // AL1上h0方向的切分尾块大小
+        uint64_t woAL1Tail; // AL1上wo方向的切分尾块大小
+        uint64_t woL1SmallTail; // woAL1Tail % woL0
+        uint64_t hoL0Tail; // L0上ho方向的切分尾块大小
+        uint64_t woL0Tail; // L0上wo方向的切分尾块大小
+
+        uint64_t currentNBL1; // 当前BL1 n方向切分块大小，区分整块、尾块
+        uint64_t currentNL0Align; // currentNL0对齐到N0=16, 不需要currentNL0, 所以没保存
+        // Used in m_mode
+        uint64_t currentMAL1; // 当前AL1 m方向切分块大小，区分整块、尾块
+        uint64_t currentML0Align; // currentML0对齐到M0=16, 不需要currentML0, 所以没保存
+        // Used in hw_mode
+        uint64_t currentHoL1; // 当前L1 ho方向切分块大小，区分整块、尾块
+        uint64_t currentWoL1; // 当前L1 wo方向切分块大小，区分整块、尾块
+        uint64_t currentHoL0; // 当前L0 ho方向切分块大小，区分整块、尾块
+        uint64_t currentWoL0; // 当前L01 wo方向切分块大小，区分整块、尾块
+
+        uint8_t kAL1fullload; // A, GM->L1, k方向是否全载
+        uint8_t kBL1fullload; // B, GM->L1, k方向是否全载
+
+        uint8_t loadAL1Flag; // 当前循环是否载入AL1的标志
+        uint8_t loadBL1Flag; // 当前循环是否载入BL1的标志
+        uint8_t loadAL0Flag; // 当前循环是否载入AL0的标志
+        uint8_t loadBL0Flag; // 当前循环是否载入BL0的标志
+
+        uint64_t lastLoopKAL1StartPos; // ddr2l0LoopK - multiKAL1，最后一次A L1->L0的k方向循环序号
+        uint64_t lastLoopKBL1StartPos; // ddr2l0LoopK - multiKBL1，最后一次B L1->L0的k方向循环序号
+
+        uint16_t kL0FullLoadAl0PingPongFlag; // LoadL0Moudle中al0PingPongFlag
+        uint16_t kL0FullLoadBl0PingPongFlag; // LoadL0Moudle中bl0PingPongFlag
+
+        // [zj]TODO: group conv
+        // // Used in opt group mode(groups > 1)
+        // ConvFunc::LoadGM2UBTools<Intf> loadGm2UBTools;
+        // ConvFunc::TransND2NZTools<Intf> transND2NZTools;
+        // ConvFunc::LoadUB2L1Tools<Intf> loadUB2L1Tools;
+
+        // TBuf<TPosition::VECIN> ndUbBuf;
+        // TBuf<TPosition::VECOUT> nzUbBuf;
+        // TBuf<TPosition::VECCALC> indexUbBuf;
+        // TBuf<TPosition::B1> l1Buf;
+
+        // LocalTensor<typename Config::WeightT> nzTensor;
+
+        // uint16_t ciPerGroup;
+        // uint16_t coPerGroup;
+        // uint16_t ciOpt;
+        // uint16_t ci1Opt;
+        // uint16_t ciOptAlign;
+        // uint16_t kUbSize;
+        // uint16_t coOpt;
+        // uint16_t co1Opt;
+        // uint16_t coOptAlign;
+        // uint16_t singleGroups;       // groups
+        // uint16_t singleGroupOpt;     // groupOpt
+        // uint16_t groupOptIter;
+        // uint16_t vecId;              // V: vec id(0/1) C: groupOptvecid(0/16)
+        // uint16_t ddr2l1LoopKB;
+        // uint16_t loadUB2L1Iter;
+        // uint16_t ddr2l1LoopInner;
+        // uint16_t ddr2l1LoopTmp;
+        // uint16_t innerIter;
+        // uint16_t ddr2l1LoopOuter;
+        // uint16_t outerIter;
+        // uint16_t bL1LoadTimes;
+
+        // uint32_t ubBufSize;          // WeightNDNZUB
+        // uint32_t bL1SpaceSize;       // WeightL1
+
+        // uint8_t pingPongFlag;
+    };
+
+    struct ImplDataType {
+        __aicore__ inline ImplDataType() {};
+    };
+};
+}  // namespace Conv2dApi
+
+#endif // API_CONV2D_API_IMPL_H
