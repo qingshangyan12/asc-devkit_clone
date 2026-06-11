@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-此接口用于获取执行[asc_mrgsort4](./asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。使用时，需要将asc_mrgsort4中的if_exhausted_suspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令停止。
+此接口用于获取执行[asc_mrgsort4](./asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。使用时，需要将asc_mrgsort4中的enable_exhausted_suspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令停止。
 
 ## 函数原型
 
@@ -34,7 +34,7 @@ PIPE_S
 
 ## 约束说明
 
-- 需和[asc_mrgsort4](./asc_mrgsort4.md)操作配合使用，且需asc_mrgsort4中的if_exhausted_suspension参数配置为true。
+- 需和[asc_mrgsort4](./asc_mrgsort4.md)操作配合使用，且需asc_mrgsort4中的enable_exhausted_suspension参数配置为true。
 - 需通过同步操作确保[asc_mrgsort4](./asc_mrgsort4.md)执行完成后再调用本接口获取结果。
 
 ## 调用示例
@@ -51,13 +51,13 @@ __ubuf__ float dst[array_length * 4];
 
 uint8_t repeat = 1;
 uint8_t valid_bit = 0b1111;
-bool if_exhausted_suspension = true;
+bool enable_exhausted_suspension = true;
 src[0] = &src_workspace[0];
 src[1] = &src_workspace[1 * array_length];
 src[2] = &src_workspace[2 * array_length];
 src[3] = &src_workspace[3 * array_length];
 
-asc_mrgsort4(dst, src, repeat, element_length, element_length, element_length, element_length, if_exhausted_suspension, valid_bit);
+asc_mrgsort4(dst, src, repeat, element_length, element_length, element_length, element_length, enable_exhausted_suspension, valid_bit);
 asc_sync();
 
 uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN];
