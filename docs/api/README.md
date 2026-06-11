@@ -103,7 +103,23 @@
 
                 -   [辅助矩阵分形格式详解](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算分形介绍/辅助矩阵分形格式详解.md)
 
-                </cann-filter>
+            </cann-filter>
+            
+            -   [矩阵计算的搬入](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/总体说明.md)
+                -   [总体说明](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/总体说明.md)
+                -   [矩阵计算输入搬运约束](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵计算输入搬运约束.md)
+                -   [L1 Buffer/L0A Buffer/L0B Buffer内存结构介绍](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/L1-L0A-B内存结构介绍.md)
+                -   [辅助配置接口](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/辅助配置接口.md)
+                    -   [Fill](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/Fill.md)
+                    -   [SetFmatrix](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetFmatrix.md)
+                    -   [SetFmatrixBitMode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetFmatrixBitMode.md)
+                    -   [SetLoadDataBoundary](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataBoundary.md)
+                    -   [SetLoadDataRepeat](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataRepeat.md)
+                    -   [SetLoadDataPaddingValue](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetLoadDataPaddingValue.md)
+                    -   [LoadDataUnzip](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadDataUnzip.md)
+                    -   [LoadImageToLocal](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadImageToLocal.md)
+                    -   [LoadUnzipIndex](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/LoadUnzipIndex.md)
+                    -   [SetAippFunctions](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/辅助配置接口/SetAippFunctions.md)
             -   [数据搬运](SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/数据搬运.md)
                 -   [Fill](SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/Fill.md)
                 -   [LoadData](SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)
@@ -133,17 +149,49 @@
 
             -   [矩阵计算](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/矩阵计算.md)
                 -   [Mmad](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)
+
+                <cann-filter npu-type="950">
+
+                -   [MmadMx](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/MmadMx.md)
                 -   [MmadBitMode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/MmadBitMode.md)
+
+                </cann-filter>
+
+                <cann-filter npu-type="910b,A3">
+
                 -   [MmadWithSparse](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/MmadWithSparse.md)
-                -   [SetMMRowMajor](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/SetMMRowMajor.md)
-                -   [SetMMColumnMajor](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/SetMMColumnMajor.md)
-                -   [SetHF32Mode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/SetHF32Mode.md)
-                -   [SetHF32TransMode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/SetHF32TransMode.md)
+
+                </cann-filter>
+
+                -   [关键特性说明](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/关键特性说明.md)
+                    -   [GEMV](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/关键特性说明/GEMV.md)
+
+                    <cann-filter npu-type="950,910b,A3,310b">
+
+                    -   [HF32](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/关键特性说明/HF32.md)
+                    -   [UnitFlag](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/关键特性说明/UnitFlag.md)
+
+                    </cann-filter>
+
+                    <cann-filter npu-type="910b,A3,x90,9030">
+
+                    -   [K方向对齐约束](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/关键特性说明/K方向对齐约束.md)
+
+                    </cann-filter>
+
+                <cann-filter npu-type="950,910b,A3,310b">
+
+                -   [寄存器配置说明](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/寄存器配置说明.md)
+                    -   [SetMMColumnMajor/SetMMRowMajor](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)
+                    -   [SetHF32Mode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/寄存器配置说明/SetHF32Mode.md)
+                    -   [SetHF32TransMode](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/寄存器配置说明/SetHF32TransMode.md)
+
+                </cann-filter>
+
                 -   [Conv2D（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Conv2D（废弃）.md)
                 -   [Gemm（废弃）](SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Gemm（废弃）.md)
         -   [Memory矢量计算](SIMD-API/基础API/Memory矢量计算/Memory矢量计算.md)
             -   [Vector逻辑架构](SIMD-API/基础API/Memory矢量计算/Vector逻辑架构/Vector逻辑架构.md)
-
             -   [SIMD计算说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/SIMD计算说明.md)
                 -   [概述](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/概述.md)
                 -   [连续计算](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/连续计算.md)
@@ -153,6 +201,26 @@
                     -   [通用说明](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/通用说明.md)
                     -   [接口内设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口内设置Mask.md)
                     -   [接口外设置Mask](SIMD-API/基础API/Memory矢量计算/SIMD计算说明/掩码/接口外设置Mask.md)
+
+            -   [数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/数据搬运.md)
+                -   [GM与UB数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB数据搬运.md)
+                    -   [GM与UB连续数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB连续数据搬运(DataCopy).md)
+                    -   [GM与UB高维切分数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB高维切分数据搬运(DataCopy).md)
+                    -   [GM与UB切片数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB切片数据搬运(DataCopy).md)
+                    -   [GM -> UB随路转换ND2NZ搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB随路转换ND2NZ搬运(DataCopy).md)
+                    -   [UB -> GM随路转换NZ2ND搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md)
+                    -   [GM -> UB多维数据搬运NDDMA(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB多维数据搬运NDDMA(DataCopy).md)
+                    -   [GM -> UB非对齐数据搬运(DataCopyPad)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)
+                    -   [UB -> GM非对齐数据搬运(DataCopyPad)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/UBToGM非对齐数据搬运(DataCopyPad).md)
+                    -   [寄存器配置说明](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/寄存器配置说明.md)
+                        -   [SetPadValue(ISASI)](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetPadValue(ISASI).md)
+                        -   [SetLoopModePara](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/SetLoopModePara.md)
+                        -   [ResetLoopModePara](SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/寄存器配置说明/ResetLoopModePara.md)
+                -   [UB与UB数据搬运](SIMD-API/基础API/Memory矢量计算/数据搬运/UB与UB数据搬运/UB与UB数据搬运.md)
+                    -   [UB -> UB连续数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB连续数据搬运(DataCopy).md)
+                    -   [UB -> UB高维切分数据搬运(DataCopy)](SIMD-API/基础API/Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB高维切分数据搬运(DataCopy).md)
+                    -   [UB -> UB连续数据搬运(Copy)](SIMD-API/基础API/Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB连续数据搬运(Copy).md)
+                    -   [UB -> UB掩码式高维数据搬运(Copy)](SIMD-API/基础API/Memory矢量计算/数据搬运/UB与UB数据搬运/UBToUB掩码式高维数据搬运(Copy).md)
 
             -   [基础算术](SIMD-API/基础API/Memory矢量计算/基础算术/基础算术.md)
                 -   [Exp](SIMD-API/基础API/Memory矢量计算/基础算术/Exp.md)
@@ -213,6 +281,7 @@
                 -   [MulsCast\(ISASI\)](SIMD-API/基础API/Memory矢量计算/复合计算/MulsCast(ISASI).md)
 
             -   [比较与选择](SIMD-API/基础API/Memory矢量计算/比较与选择/比较与选择.md)
+                -   [概述](SIMD-API/基础API/Memory矢量计算/比较与选择/概述.md)
                 -   [Compare](SIMD-API/基础API/Memory矢量计算/比较与选择/Compare.md)
                 -   [Compare（结果存入寄存器）](SIMD-API/基础API/Memory矢量计算/比较与选择/Compare（结果存入寄存器）.md)
                 -   [Compares](SIMD-API/基础API/Memory矢量计算/比较与选择/Compares.md)
@@ -230,19 +299,25 @@
                 -   [Truncate\(ISASI\)](SIMD-API/基础API/Memory矢量计算/类型转换/Truncate(ISASI).md)
 
             -   [归约计算](SIMD-API/基础API/Memory矢量计算/归约计算/归约计算.md)
-                -   [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)
-                -   [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)
-                -   [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)
-                -   [WholeReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/WholeReduceMax.md)
-                -   [WholeReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/WholeReduceMin.md)
-                -   [WholeReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/WholeReduceSum.md)
-                -   [BlockReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/BlockReduceMax.md)
-                -   [BlockReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/BlockReduceMin.md)
-                -   [BlockReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/BlockReduceSum.md)
-                -   [PairReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/PairReduceSum.md)
-                -   [RepeatReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/RepeatReduceSum.md)
-                -   [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatSumSpr(ISASI).md)
-                -   [GetReduceRepeatMaxMinSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/GetReduceRepeatMaxMinSpr(ISASI).md)
+            
+                - [概述](SIMD-API/基础API/Memory矢量计算/归约计算/Introduction.md)
+                
+                - [ReduceDataBlock](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceDataBlock.md) 
+                
+                - [ReduceRepeat](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceRepeat.md)  
+                
+                - [ReducePairElem](SIMD-API/基础API/Memory矢量计算/归约计算/ReducePairElem.md)  
+                
+                - [ReduceMax](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMax.md)  
+                
+                - [ReduceMin](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceMin.md)  
+                
+                - [ReduceSum](SIMD-API/基础API/Memory矢量计算/归约计算/ReduceSum.md)  
+                
+                - [寄存器辅助接口](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/寄存器辅助接口.md)
+
+                    - [GetReduceRepeatSumSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatSumSpr(ISASI).md)
+                    - [GetReduceRepeatMaxMinSpr\(ISASI\)](SIMD-API/基础API/Memory矢量计算/归约计算/寄存器辅助接口/GetReduceRepeatMaxMinSpr(ISASI).md)
 
             -   [数据排布转换](SIMD-API/基础API/Memory矢量计算/数据排布转换/数据排布转换.md)
                 -   [Transpose](SIMD-API/基础API/Memory矢量计算/数据排布转换/Transpose.md)
@@ -811,6 +886,7 @@
                     -   [asc_loadalign_v5](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_v5.md)
                     -   [asc_loadalign_v6](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_v6.md)
                 -   [asc_loadalign_postupdate](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign_postupdate.md)
+                -   [asc_loadalign_deintlv](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign_deintlv.md)
                 -   [asc_gather](SIMD-API/C-API/Reg矢量计算/reg_load/asc_gather.md)
                 -   [asc_gather_datablock](SIMD-API/C-API/Reg矢量计算/reg_load/asc_gather_datablock.md)
                 -   [asc_get_mask_spr](SIMD-API/C-API/Reg矢量计算/reg_load/asc_get_mask_spr.md)
@@ -968,8 +1044,8 @@
             -   [asc_copy_l0c2l1](SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md)
             -   [asc_copy_l0c2ub](SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2ub.md)
             -   [asc_copy_l12bt](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12bt/asc_copy_l12bt_arch_2201.md)
-            -   [asc_copy_l12fb](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb/asc_copy_l12fb_arch_2201.md)
-            -   [asc_copy_l12fb_v2](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb_v2.md)
+            -   [asc_copy_l12fb_arch_2201](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb/asc_copy_l12fb_arch_2201.md)
+            -   [asc_copy_l12fb_arch_3510](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md)
             -   [asc_copy_l12gm](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12gm.md)
             -   [asc_copy_l12l0a](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)
             -   [asc_copy_l12l0a_mx](SIMD-API/C-API/矩阵数据搬运/asc_copy_l12l0a_mx.md)
@@ -2529,6 +2605,8 @@
         -   [asc\_ldca](SIMT-API/访存函数/asc_ldca.md)
         -   [asc\_stcg](SIMT-API/访存函数/asc_stcg.md)
         -   [asc\_stwt](SIMT-API/访存函数/asc_stwt.md)
+        -   [asc\_dcci\_single](SIMT-API/访存函数/asc_dcci_single.md)
+        -   [asc\_dcci\_entire](SIMT-API/访存函数/asc_dcci_entire.md)
 
 
 -   [Utils API](Utils-API/Utils-API.md)
@@ -2745,7 +2823,7 @@
         -   [aclrtcGetCompileLog](Utils-API/RTC/aclrtcGetCompileLog.md)
         -   [RTC错误码](Utils-API/RTC/RTC错误码.md)
 
-    -   [log](Utils-API/log/log1.md)
+    -   [log](Utils-API/log/log.md)
         -   [ASC\_CPU\_LOG](Utils-API/log/ASC_CPU_LOG.md)
 
     -   [调测接口](Utils-API/调测接口/调测接口.md)
