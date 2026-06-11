@@ -103,19 +103,6 @@ __aicore__ inline void asc_set_store_atomic_config(uint16_t type, uint16_t op);
  */
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
-/*
- * @ingroup AtomicOperations
- * @brief Architecture-specific atomic configuration functions (deprecated)
- * @details These functions are deprecated and will be moved to lower-level implementation files.
- *          Users should use the unified asc_set_store_atomic_config() function instead.
- * @deprecated Use asc_set_store_atomic_config() for all architectures
- */
-#if __NPU_ARCH__ == 2201
-__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
-#elif __NPU_ARCH__ == 3510
-__aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op);
-#endif
-
 #endif // __NPU_ARCH__
 #endif
 
