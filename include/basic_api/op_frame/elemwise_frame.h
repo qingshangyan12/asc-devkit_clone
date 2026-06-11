@@ -19,7 +19,7 @@
 
 #ifndef ASCENDC_KERNEL_FRAME_H
 #define ASCENDC_KERNEL_FRAME_H
-#include "kernel_operator.h"
+#include "include/kernel_operator.h"
 
 [[deprecated(__FILE__ " is deprecated, please do not use!")]]
 typedef void ElemwiseFrameHeader;
