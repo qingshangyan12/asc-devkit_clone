@@ -4,13 +4,11 @@
 
 本样例基于Tensor API编程方式实现动态Shape矩阵乘法和随路量化计算。矩阵A不转置，矩阵B转置存储，A/B矩阵数据类型为int8，Mmad累加类型为int32，输出矩阵C数据类型为half。量化系数quant以uint64_t格式输入，在Fixpipe阶段对L0C中的int32累加结果进行缩放并写回GM。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \> CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
@@ -95,7 +93,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。，**当前仅支持使用[CANN master](./../../../../../../docs/quick_start.md#下载-cann-master)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](./../../../../../../docs/quick_start.md#下载-cann-master)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

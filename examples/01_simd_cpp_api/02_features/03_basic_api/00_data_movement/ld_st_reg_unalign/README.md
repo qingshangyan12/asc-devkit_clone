@@ -18,12 +18,11 @@
 	 </table>
 
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 ```
@@ -44,13 +43,9 @@
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">float</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">1</td></tr>
   </table>
@@ -63,13 +58,9 @@
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
-  </tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[14, 255]</td><td align="center">uint16_t</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[14, 16]</td><td align="center">uint16_t</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">4</td></tr>
   </table>

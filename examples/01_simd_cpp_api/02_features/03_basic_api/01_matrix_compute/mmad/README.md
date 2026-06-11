@@ -4,15 +4,13 @@
 
 本样例介绍了输入为ND格式，B4 / B8 / B16 / B32输入数据类型（具体以int4_t / int8_t / bfloat16 / float为例），四种输入数据类型下的矩阵乘法，说明如何通过Mmad指令实现矩阵乘法计算（C = A x B + Bias）。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -21,6 +19,7 @@
 │   ├── figures                     // 图示
 │   ├── scripts
 │   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
+│   │   ├── mmad.py                 // 矩阵乘法辅助脚本
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
@@ -175,7 +174,7 @@
   - Bias [1, 40] float类型
 - 输出：C [30, 40] float类型，ND格式
 - 实现：使用`Mmad`实现矩阵乘法运算，传入biasTensor，该场景下`mmadParams.cmatrixSource`参数无效
-- 说明：float类型输入，A矩阵转置场景下，需要使用`mmadParams.kDirectionAlign`来解决K轴实际向`CeilAlign(K, 8*2)`对齐，与Mmad指令默认要求对齐到`CeilAlign(K, 8)`不一的问题。该场景下该参数设置为真，K轴对齐到`CeilAlign(K, 16)`，矩阵计算单元从L0A读取数据会跳过填充的无效数据，其余场景下该参数默认为flase，K轴仍向`CeilAlign(K, 8)`对齐，如下图2所示：
+- 说明：float类型输入，A矩阵转置场景下，需要使用`mmadParams.kDirectionAlign`来解决K轴实际向`CeilAlign(K, 8*2)`对齐，与Mmad指令默认要求对齐到`CeilAlign(K, 8)`不一致的问题。该场景下该参数设置为真，K轴对齐到`CeilAlign(K, 16)`，矩阵计算单元从L0A读取数据会跳过填充的无效数据，其余场景下该参数默认为false，K轴仍向`CeilAlign(K, 8)`对齐，如下图2所示：
 
 <p align="center">
   <img src="figures/mmad_f32_L0A_转置.png" width="1100">
@@ -233,12 +232,12 @@ Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬
 
   在本样例目录下执行如下命令。
   ```bash
-  SCENARIO=1
+  SCENARIO_NUM=1
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO ..;make -j;    # 编译工程，默认npu模式
-  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO   # 生成测试输入数据
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;    # 编译工程，默认npu模式
+  python3 ../scripts/gen_data.py -scenarioNum=$SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  python3 ../scripts/verify_result.py -scenarioNum=$SCENARIO_NUM output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
   使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
@@ -246,7 +245,7 @@ Mmad计算中包含了补齐的无效数据，需要配合Fixpipe指令在L0C搬
   示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO ..;make -j; # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。

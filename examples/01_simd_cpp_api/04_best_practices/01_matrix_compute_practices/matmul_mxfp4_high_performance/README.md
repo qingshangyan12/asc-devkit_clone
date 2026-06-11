@@ -8,13 +8,11 @@
 - Case 1: 多核 MDL 常量化 tiling（scaleA/B 与 A/B 同步搬运）
 - Case 2: 多核 MDL 常量化 tiling（在**GM→L1搬运中**，scaleA/B 相对 A/B 按照倍数多倍搬运，`mxTypePara`）
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR / Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -143,7 +141,7 @@ REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
 
 **说明**：
 
-A/B 的 base 块大小：`baseM * baseK * 0.5 = 256 * 256 * 0.5 = 32,768 B = 32 KB`, scaleA/scaleB 的 base 块大小：`256 * (256/32) * 1 = 2,048 B = 2 KB` 。
+A/B 的 base 块大小：`baseM * baseK * 0.5 = 256 * 256 * 0.5 = 32,768 B = 32 KB`, scaleA/scaleB 的 base 块大小：`256 * (256/32) * 1 = 2,048 B = 2 KB`。
 
 case1 单次 GM→L1 搬运量：
 
@@ -186,8 +184,8 @@ Case1/Case2 在 scale 侧的差异主要体现在“单次搬运粒度与搬运�
 
 - 端到端时延：`750.219 -> 693.283 μs`，减少 `56.936 μs`，收益 `7.59%`。
 - MTE2 绝对耗时：`753.906 -> 612.536 μs`，减少 `141.370 μs`，收益 `18.75%`。
-- MTE2 占比：`0.982 -> 0.885`，下降 `9.7%` 。
-- MAC 占比：`0.881 -> 0.926`，提升 `4.5%` 。
+- MTE2 占比：`0.982 -> 0.885`，下降 `9.7%`。
+- MAC 占比：`0.881 -> 0.926`，提升 `4.5%`。
 
 **调优 Tips**：
 > MX Matmul 的关键差异在于 `scale` 与 A/B 的搬运可解耦；当 `aic_mte2_ratio` 偏高时，优先通过 `mxTypePara` 调整 `scale` 搬运比例以提升 L1 复用、减少重复 GM->L1 搬运。

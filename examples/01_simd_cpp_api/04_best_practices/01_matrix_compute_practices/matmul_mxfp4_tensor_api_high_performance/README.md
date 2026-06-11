@@ -4,13 +4,11 @@
 
 本样例介绍如何基于 Ascend C Tensor API 和静态 Tensor 编程方式，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步等多种优化手段，实现一个高性能的 MxFP4 Matmul kernel。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR / Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \> CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
 
 > **说明：** 该样例依赖尚未正式发布的CANN特性，请使用最新的CANN master包。
 
@@ -158,7 +156,7 @@ MxMatmul 的输入不是两路，而是四路：A、B、ScaleA、ScaleB。因此
 
 通过 `stepK=2` 一次搬入 `stepK * baseM * baseK` 的 A 矩阵数据 和 `stepK * baseN * baseK` 的 B 矩阵数据，减少搬运指令数量，提高 GM 到 L1 的搬运效率。
 
-scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * stepK * baseM * baseSK` 的 ScaleA 矩阵数据 和 `scaleFactorK * stepK * baseN * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = basK / 32`。它的作用是让 ScaleA/ScaleB 在 K 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
+scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * stepK * baseM * baseSK` 的 ScaleA 矩阵数据 和 `scaleFactorK * stepK * baseN * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = baseK / 32`。它的作用是让 ScaleA/ScaleB 在 K 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
 
 以 A 矩阵数据搬运为例，`Copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
 

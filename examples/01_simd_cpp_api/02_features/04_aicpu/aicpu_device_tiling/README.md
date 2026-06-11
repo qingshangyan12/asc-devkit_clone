@@ -3,15 +3,13 @@
 
 本样例介绍使用AI CPU算子进行tiling下沉计算。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 ```
@@ -55,6 +53,8 @@
 - 执行结果
 
   执行结果如下，说明执行成功：
+  其中，`__mix__(1, 2)`会启动1个Cube执行单元和2个Vector执行单元，因此`Hello World`日志会打印3次。
+
   ```bash
   MyAicpuKernel inited
   MyAicpuKernel inited type 1 mode 2 len 4 end!

@@ -1,18 +1,16 @@
-# 自定义样例工程+TensorFlow内置样例样例
+# 自定义样例工程+TensorFlow内置样例
 
 ## 概述
 
 本样例基于Add计算展示如何将Ascend C自定义算子映射到TensorFlow内置算子，并通过TensorFlow调用。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -36,12 +34,12 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 编译、打包和部署自定义样例工程
 
-  运行此样例前，需先进入[自定义样例工程样例](../../../00_compilation/custom_op/)目录完成编译、打包和部署。
+  运行此样例前，需先进入[自定义样例工程样例](../../../00_compilation/custom_op)目录完成编译、打包和部署。
 
   > [!NOTE]注意
-  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/00_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用样例名称OriginOpType为"AddV2"，如下所示：
+  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/00_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddV2"，如下所示：
   >
-  > ```cc
+  > ```cpp
   > REGISTER_CUSTOM_OP("AddCustom")
   >   .FrameworkType(TENSORFLOW)      // type: TENSORFLOW
   >   .OriginOpType("AddV2")      // name in tf module
@@ -70,6 +68,6 @@
 
   执行结果如下，说明执行成功。
 
-  ```log
+  ```text
   test pass
   ```

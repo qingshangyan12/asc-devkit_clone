@@ -4,15 +4,13 @@
 
 本样例以 `8192 × 8192` half ND 矩阵到全局紧凑 NZ 布局的转换为例，介绍UB 上向量写阶段的 bank 冲突如何产生、如何规避。整个调优过程分为两个步骤（case 1-2），通过调整 `dstNzC0Stride` 这一个参数对比性能。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -116,7 +114,7 @@ ND和NZ的数据排布如图所示
 
 ### Atlas A2/A3 系列产品（dav-2201）
 
-> 编译时通过 `-DCMAKE_ASC_ARCHITECTURES=dav-2201` 选择 Atlas A2/A3 系列产品 。
+> 编译时通过 `-DCMAKE_ASC_ARCHITECTURES=dav-2201` 选择 Atlas A2/A3 系列产品。
 
 #### UB Bank 结构与冲突类型
 

@@ -4,13 +4,11 @@
 
 A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -33,28 +31,24 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   本样例中：M = 428, N = 479, K = 158。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">hifloat8、fp8_e4m3fn、fp8_e5m2</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">hifloat8、fp8_e4m3fn、fp8_e5m2</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fp8_custom</td></tr>
   </table>
 - 样例实现： 
   - Kernel关键步骤
-    - 创建Matmul对象，数据类型为按照DT_MODE设置为各种fp8数据类型。
+    - 创建Matmul对象，数据类型为按照SCENARIO_NUM设置为各种fp8数据类型。
       ```cpp
-      #if DT_MODE == 1
+      #if SCENARIO_NUM == 1
       MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
-      #elif DT_MODE == 2
+      #elif SCENARIO_NUM == 2
       MatmulFp8Kernel<fp8_e5m2_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif DT_MODE == 3
+      #elif SCENARIO_NUM == 3
       MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif DT_MODE == 4
+      #elif SCENARIO_NUM == 4
       MatmulFp8Kernel<fp8_e5m2_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
       #else
       MatmulFp8Kernel<hifloat8_t, hifloat8_t, float, float> MatmulFp8Kernel;
@@ -83,7 +77,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 - 样例执行
 
-  - DT_MODE ： 设置A、B的数据类型组合
+  - SCENARIO_NUM：设置A、B的数据类型组合
     - 0 : 对应A hifloat8   B hifloat8场景
     - 1 : 对应A fp8_e4m3fn B fp8_e4m3fn场景
     - 2 : 对应A fp8_e5m2   B fp8_e5m2场景
@@ -92,8 +86,8 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
   ```bash
   mkdir -p build && cd build;        # 创建并进入build目录
-  cmake -DDT_MODE=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;      # 编译工程, 0可选01234， 例如cmake .. -DDT_MODE=1;make -j;
-  python3 ../scripts/gen_data.py  0  # 生成测试输入数据, 0可选01234， 例如python3 ../scripts/gen_data.py  1
+  cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;      # 编译工程, 0可选01234， 例如cmake .. -DSCENARIO_NUM=1;make -j;
+  python3 ../scripts/gen_data.py -scenarioNum=0  # 生成测试输入数据, 0可选01234， 例如python3 ../scripts/gen_data.py -scenarioNum=1
   ./demo                             # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
@@ -102,8 +96,8 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
   示例如：
   ```bash
-  cmake -DDT_MODE=0 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
-  cmake -DDT_MODE=0 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
+  cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # cpu调试模式
+  cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
@@ -112,7 +106,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `DT_MODE` | `0`、`1`、`2`、`3`、`4` | 场景编号，具体见样例说明 |
+  | `SCENARIO_NUM` | `0`、`1`、`2`、`3`、`4` | 场景编号，具体见样例说明 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
 

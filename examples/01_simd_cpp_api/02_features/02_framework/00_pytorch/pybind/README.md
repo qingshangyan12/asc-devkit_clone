@@ -4,15 +4,13 @@
 
 本样例基于Add算子展示如何使用pybind11注册自定义算子。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -37,14 +35,10 @@
   <table border="2" align="center">
   <caption>表1：AddCustom样例规格描述</caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
-  </tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">half</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">half</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 
@@ -56,7 +50,7 @@
 
   `add_custom.asc`使用了`pybind11`库来将c++代码封装成python模块。该代码实现中定义了一个名为`m`的pybind11模块，其中包含一个名为`ascendc_add`的函数。该函数与`ascendc_ops::ascendc_add`函数相同，用于将c++函数转成python函数，例如：
 
-  ```c++
+  ```cpp
   PYBIND11_MODULE(ascendc_ops, m)
   {
       m.doc() = "add_custom pybind11 interfaces";
