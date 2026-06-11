@@ -359,7 +359,6 @@ public:
     //     ctx.singleGroups = singleGroups;
     //     ctx.singleGroupOpt = singleGroupOpt;
     //     ctx.singleCoreCi = singleGroups * ctx.ciPerGroup;
-
     //     if ASCEND_IS_AIC_CONV {
     //         InitKDirectionValue();
     //         if constexpr (groupType == static_cast<int8_t>(ConvGroupType::OPT_GROUP_CONV)) {
@@ -719,6 +718,9 @@ private:
         uint64_t alignCinKhKwB = AlignB(ctx.convTiling->singleCoreCi * ctx.convTiling->kernelHxkernelW, k0b);
         ctx.kAL1fullload = alignCinKhKwA == ctx.convTiling->kAL1;
         ctx.kBL1fullload = alignCinKhKwB == ctx.convTiling->kBL1;
+
+        ctx.kL0FullLoadAl0PingPongFlag = 0;
+        ctx.kL0FullLoadBl0PingPongFlag = 0;
 
         ctx.hasBias = ctx.convTiling->hasBias;
         ctx.hasPreQuant = ctx.convTiling->hasPreQuant;
@@ -1125,13 +1127,21 @@ private:
         copyOutIns.SetParams(ctx);
     }
 
-    // [zj]TODO: check calc vars, 一致性
     __aicore__ inline void CalcMDirectionVar()
     {
-        ctx.l12l0LoopM = ctx.mAL1Iter == ctx.maxMAL1Iter ? CeilDIV(ctx.mAL1Tail, ctx.mL0) :
-                                                           CeilDIV(ctx.mAL1, ctx.mL0);
-        ctx.maxML0Iter = ctx.l12l0LoopM - 1;
-        ctx.mAL1UpdateFlag = true; // [zj]TOD0: can be optimized
+        if constexpr (hasML1IterFlag) {
+            ctx.currentMAL1 = ctx.mAL1Iter == ctx.maxMAL1Iter ? ctx.mAL1Tail :
+                                                                ctx.mAL1;
+            ctx.mAL1UpdateFlag = true; // [zj]TOD0: can be optimized
+        }
+
+        if constexpr (hasML0IterFlag) { // [zj]TODO: check if need
+            ctx.l12l0LoopM = CeilDIV(ctx.currentMAL1, ctx.mL0);
+            ctx.maxML0Iter = ctx.l12l0LoopM - 1;
+            ctx.mAL0Tail = ctx.currentMAL1 % ctx.mL0;
+            ctx.mAL0Tail = ctx.mAL0Tail == 0 ? ctx.mL0 : ctx.mAL0Tail;
+            (void)CalcCurrentML0MMode();
+        }
     }
 
     __aicore__ inline void CalcHoDirectionVar()
@@ -1146,6 +1156,7 @@ private:
             ctx.maxHoL0Iter = ctx.l12l0LoopH - 1;
             ctx.hoL0Tail = ctx.currentHoL1 % ctx.convTiling->hoL0;
             ctx.hoL0Tail = ctx.hoL0Tail == 0 ? ctx.convTiling->hoL0 : ctx.hoL0Tail;
+            ctx.currentHoL0 = ctx.hoL0Tail;
         }
     }
 
@@ -1165,20 +1176,29 @@ private:
                                                                      ctx.convTiling->woL1;
             }
         }
+
         if constexpr (hasWL0IterFlag) {
             ctx.l12l0LoopW = CeilDIV(ctx.currentWoL1, ctx.convTiling->woL0);
             ctx.maxWoL0Iter = ctx.l12l0LoopW - 1;
             ctx.woL0Tail = ctx.currentWoL1 % ctx.convTiling->woL0;
             ctx.woL0Tail = ctx.woL0Tail == 0 ? ctx.convTiling->woL0 : ctx.woL0Tail;
+            ctx.currentWoL0 = ctx.woL0Tail;
         }
     }
 
     __aicore__ inline void CalcCoDirectionVar()
     {
+        if constexpr (hasNL1IterFlag) {
+            ctx.currentNBL1 = ctx.nBL1Iter == ctx.maxNBL1Iter ? ctx.nBL1Tail :
+                                                                ctx.convTiling->nBL1;
+        }
+
         if constexpr (hasNL0IterFlag) {
-            ctx.l12l0LoopN = ctx.nBL1Iter == ctx.maxNBL1Iter ? CeilDIV(ctx.nBL1Tail, ctx.convTiling->nL0) :
-                                                               ctx.convTiling->multiNBL1;
+            ctx.l12l0LoopN = CeilDIV(ctx.currentNBL1, ctx.convTiling->nL0);
             ctx.maxNL0Iter = ctx.l12l0LoopN - 1;
+            ctx.nL0Tail = ctx.currentNBL1 % ctx.convTiling->nL0;
+            ctx.nL0Tail = ctx.nL0Tail == 0 ? ctx.convTiling->nL0 : ctx.nL0Tail;
+            (void)CalcCurrentNL0();
         }
     }
 
@@ -1385,53 +1405,223 @@ private:
         ctx.iter++;
     }
 
-    __aicore__ inline void SetMNBeforeIterateK()
+    __aicore__ inline void FirstIterateImplMMode()
     {
-        uint64_t currentML0 = 0;
-        if constexpr (outputOrder == static_cast<int8_t>(ConvOutputOrder::M_MODE)) {
-            currentML0 = CalcCurrentML0MMode();
-        } else {
-            currentML0 = CalcCurrentML0HWMode();
-        }
-        printf("currentML0: %ld\n", currentML0);
+        ctx.batchIter = 0;
+        ctx.mAL1Iter = 0;
+        ctx.nBL1Iter = 0;
+        ctx.mL0Iter = 0;
+        ctx.nL0Iter = 0;
 
-        uint64_t currentNL0 = CalcCurrentNL0();
-        printf("currentNL0: %ld\n", currentNL0);
+        ctx.loadAL1Flag = true;
+        ctx.loadBL1Flag = true;
+        ctx.loadAL0Flag = true;
+        ctx.loadBL0Flag = true;
 
-        loadAL0Ins.SetM(ctx, ctx.currentML0Align, currentML0);
-        loadBL0Ins.SetN(ctx, ctx.currentNL0Align);
-        loadBiasL1Ins.SetN(ctx, currentNL0);
-        loadPreQuantL1Ins.SetN(ctx, currentNL0);
-        loadPreReluL1Ins.SetN(ctx, currentNL0);
-        loadPreClipReluL1Ins.SetN(ctx, currentNL0);
-        loadAntiQuantL1Ins.SetN(ctx, currentNL0);
-        loadEltwiseL1Ins.SetN(ctx, currentNL0);
-        loadEltwiseNonBrcL1Ins.SetMN(ctx, currentML0, ctx.currentNL0Align);
-        loadPostQuantL1Ins.SetN(ctx, currentNL0);
-        loadPostReluL1Ins.SetN(ctx, currentNL0);
-        loadPostClipReluL1Ins.SetN(ctx, currentNL0);
-        loadBiasBTIns.SetN(ctx, ctx.currentNL0Align);
-        loadPreQuantFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadPreReluFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadPreClipReluFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadAntiQuantFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadPostQuantFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadPostReluFBIns.SetN(ctx, ctx.currentNL0Align);
-        loadPostClipReluFBIns.SetN(ctx, ctx.currentNL0Align);
-        madIns.SetMN(ctx, ctx.currentML0Align, currentML0, ctx.currentNL0Align);
-        if constexpr (formatOutput == ConvFormat::NC1HWC0) {
-            copyOutIns.SetMN(ctx, currentML0, ctx.currentNL0Align);
-        } else {
-            copyOutIns.SetMN(ctx, currentML0, currentNL0);
-        }
+        ctx.isFirstIterate = false;
+
+        // if constexpr (groupType == static_cast<int8_t>(ConvGroupType::OPT_GROUP_CONV)) {
+        //     ctx.loadUB2L1Iter = 0;
+        // }
+
+        // [zj]TODO: check if need
+        CalcMDirectionVar();
+        CalcCoDirectionVar();
     }
 
-    __aicore__ inline void UpdateHoL0WoL0()
+    __aicore__ inline bool IterateL0MFirstMMode()
     {
-        ctx.currentHoL0 = ctx.hoL0Iter == ctx.maxHoL0Iter ? ctx.hoL0Tail :
-                                                            ctx.convTiling->hoL0;
-        ctx.currentWoL0 = ctx.woL0Iter == ctx.maxWoL0Iter ? ctx.woL0Tail :
-                                                            ctx.convTiling->woL0;
+        ctx.mL0Iter++;
+        if (ctx.mL0Iter == ctx.l12l0LoopM) {
+            ctx.mL0Iter = 0;
+        } else {
+            ctx.loadBL0Flag = false;
+            return true;
+        }
+
+        if constexpr (kl0FullLoadFlag) {
+            ctx.kL0FullLoadAl0PingPongFlag = 0;
+        }
+
+        if constexpr (hasNL0IterFlag) {
+            ctx.nL0Iter++;
+            ctx.loadBL0Flag = true;
+            if (ctx.nL0Iter == ctx.l12l0LoopN) {
+                ctx.nL0Iter = 0;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    __aicore__ inline bool IterateMFirstMMode()
+    {
+        if (IterateL0MFirstMMode()) {
+            return true;
+        }
+
+        if (ctx.kAL1fullload) {
+            ctx.queueFmapL1.FreeTensor(ctx.fmapL1);
+        }
+
+        ctx.mAL1Iter++;
+        ctx.loadAL1Flag = true;
+        if (ctx.mAL1Iter == ctx.ddr2l1LoopM) {
+            ctx.mAL1Iter = 0;
+            CalcMDirectionVar();
+        } else {
+            CalcMDirectionVar();
+            return true;
+        }
+
+        ctx.batchIter++;
+        if (ctx.batchIter == ctx.ddr2l1LoopBatch) {
+            ctx.batchIter = 0;
+        } else {
+            ctx.loadAL1Flag = true;
+            ctx.loadBL1Flag = false;
+            return true;
+        }
+
+        if (ctx.kBL1fullload) {
+            ctx.queueWeightL1.FreeTensor(ctx.weightL1);
+        }
+
+        if constexpr (hasNL1IterFlag) {
+            ctx.nBL1Iter++;
+            CalcCoDirectionVar();
+            ctx.loadBL1Flag = true;
+            if (ctx.nBL1Iter != ctx.ddr2l1LoopN) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    __aicore__ inline bool IterateL0NFirstMMode()
+    {
+        if constexpr (hasNL0IterFlag) {
+            ctx.nL0Iter++;
+            if (ctx.nL0Iter == ctx.l12l0LoopN) {
+                ctx.nL0Iter = 0;
+            } else {
+                ctx.loadAL0Flag = false;
+                return true;
+            }
+        }
+
+        if constexpr (kl0FullLoadFlag) {
+            ctx.kL0FullLoadBl0PingPongFlag = 0;
+        }
+
+        ctx.mL0Iter++;
+        ctx.loadAL0Flag = true;
+        if (ctx.mL0Iter == ctx.l12l0LoopM) {
+            ctx.mL0Iter = 0;
+        } else {
+            return true;
+        }
+
+        return false;
+    }
+
+    __aicore__ inline bool IterateNFirstMMode()
+    {
+        if (IterateL0NFirstMMode()) {
+            return true;
+        }
+
+        // [zj]TODO: check
+        // if (ctx.kBL1fullload) {
+        //     ctx.queueWeightL1.FreeTensor(ctx.weightL1);
+        // }
+
+        if constexpr (hasNL1IterFlag) {
+            ctx.nBL1Iter++;
+            ctx.loadBL1Flag = true;
+            if (ctx.nBL1Iter == ctx.ddr2l1LoopN) {
+                ctx.nBL1Iter = 0;
+                CalcCoDirectionVar();
+                
+            } else {
+                CalcCoDirectionVar();
+                return true;
+            }
+        }
+
+        if (ctx.kAL1fullload) {
+            ctx.queueFmapL1.FreeTensor(ctx.fmapL1);
+        }
+
+        ctx.mAL1Iter++;
+        ctx.loadAL1Flag = true;
+        if (ctx.mAL1Iter == ctx.ddr2l1LoopM) {
+            ctx.mAL1Iter = 0;
+            CalcMDirectionVar();
+        } else {
+            CalcMDirectionVar();
+            return true;
+        }
+
+        ctx.batchIter++;
+        if (likely(ctx.batchIter != ctx.ddr2l1LoopBatch)) {
+            ctx.loadAL1Flag = true;
+            ctx.loadBL1Flag = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    __aicore__ inline bool UpdateCommonItersMModeMFirst(Iters& iters)
+    {
+        iters.mAL1Iter = ctx.mAL1Iter;
+        iters.batchIter = ctx.batchIter;
+        iters.nBL1Iter = ctx.nBL1Iter;
+
+        iters.mAL1Iter += 1;
+        if (iters.mAL1Iter <= ctx.maxMAL1Iter) {
+            return false;
+        }
+        iters.mAL1Iter = 0;
+        iters.batchIter += 1;
+        if (iters.batchIter < ctx.ddr2l1LoopBatch) {
+            return false;
+        }
+        iters.batchIter = 0;
+        iters.nBL1Iter += 1;
+        if (iters.nBL1Iter <= ctx.maxNBL1Iter) {
+            return false;
+        }
+        iters.endTag = true;
+        return true;
+    }
+
+    __aicore__ inline bool UpdateCommonItersMModeNFirst(Iters& iters)
+    {
+        iters.nBL1Iter = ctx.nBL1Iter;
+        iters.mAL1Iter = ctx.mAL1Iter;
+        iters.batchIter = ctx.batchIter;
+
+        iters.nBL1Iter += 1;
+        if (iters.nBL1Iter <= ctx.maxNBL1Iter) {
+            return false;
+        }
+        iters.nBL1Iter = 0;
+        iters.mAL1Iter += 1;
+        if (iters.mAL1Iter <= ctx.maxMAL1Iter) {
+            return false;
+        }
+        iters.mAL1Iter = 0;
+        iters.batchIter += 1;
+        if (iters.batchIter < ctx.ddr2l1LoopBatch) {
+            return false;
+        }
+        iters.endTag = true;
+        return true;
     }
 
     __aicore__ inline void FirstIterateImplHWMode()
@@ -1442,9 +1632,6 @@ private:
         ctx.nBL1Iter = 0;
         ctx.woL0Iter = 0;
         ctx.hoL0Iter = 0;
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter = 0;
-        }
         ctx.batchIter = 0;
         ctx.loadAL1Flag = true;
         ctx.loadBL1Flag = true;
@@ -1548,15 +1735,6 @@ private:
             return true;
         }
 
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter++;
-            if (ctx.dOutIter == ctx.ddr2l1LoopD) {
-                ctx.dOutIter = 0;
-            } else {
-                return true;
-            }
-        }
-
         ctx.batchIter++;
         if (ctx.batchIter == ctx.ddr2l1LoopBatch) {
             ctx.batchIter = 0;
@@ -1648,15 +1826,6 @@ private:
             return true;
         }
 
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter++;
-            if (ctx.dOutIter == ctx.ddr2l1LoopD) {
-                ctx.dOutIter = 0;
-            } else {
-                return true;
-            }
-        }
-
         ctx.batchIter++;
         if (likely(ctx.batchIter != ctx.ddr2l1LoopBatch)) {
             ctx.loadAL1Flag = true;
@@ -1726,242 +1895,6 @@ private:
         return true;
     }
 
-    __aicore__ inline void FirstIterateImplMMode()
-    {
-        ctx.mL0Iter = 0;
-        ctx.nL0Iter = 0;
-        ctx.mAL1Iter = 0;
-        ctx.nBL1Iter = 0;
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter = 0;
-        }
-        ctx.batchIter = 0;
-        ctx.loadAL1Flag = true;
-        ctx.loadBL1Flag = true;
-        ctx.loadAL0Flag = true;
-        ctx.loadBL0Flag = true;
-        ctx.isFirstIterate = false;
-
-        if constexpr (groupType == static_cast<int8_t>(ConvGroupType::OPT_GROUP_CONV)) {
-            ctx.loadUB2L1Iter = 0;
-        }
-
-        CalcMDirectionVar();
-        CalcCoDirectionVar();
-    }
-
-    __aicore__ inline bool IterateL0MFirstMMode()
-    {
-        ctx.mL0Iter++;
-        if (ctx.mL0Iter == ctx.l12l0LoopM) {
-            ctx.mL0Iter = 0;
-        } else {
-            ctx.loadBL0Flag = false;
-            return true;
-        }
-
-        if constexpr (kl0FullLoadFlag) {
-            ctx.kL0FullLoadAl0PingPongFlag = 0;
-        }
-
-        if constexpr (hasNL0IterFlag) {
-            ctx.nL0Iter++;
-            ctx.loadBL0Flag = true;
-            if (ctx.nL0Iter == ctx.l12l0LoopN) {
-                ctx.nL0Iter = 0;
-            } else {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    __aicore__ inline bool IterateMFirstMMode()
-    {
-        if (IterateL0MFirstMMode()) {
-            return true;
-        }
-
-        if (ctx.kAL1fullload) {
-            ctx.queueFmapL1.FreeTensor(ctx.fmapL1);
-        }
-
-        ctx.mAL1Iter++;
-        ctx.loadAL1Flag = true;
-        if (ctx.mAL1Iter == ctx.ddr2l1LoopM) {
-            ctx.mAL1Iter = 0;
-            CalcMDirectionVar();
-        } else {
-            CalcMDirectionVar();
-            return true;
-        }
-
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter++;
-            if (ctx.dOutIter == ctx.ddr2l1LoopD) {
-                ctx.dOutIter = 0;
-            } else {
-                return true;
-            }
-        }
-
-        ctx.batchIter++;
-        if (ctx.batchIter == ctx.ddr2l1LoopBatch) {
-            ctx.batchIter = 0;
-        } else {
-            ctx.loadAL1Flag = true;
-            ctx.loadBL1Flag = false;
-            return true;
-        }
-
-        if (ctx.kBL1fullload) {
-            ctx.queueWeightL1.FreeTensor(ctx.weightL1);
-        }
-
-        if constexpr (hasNL1IterFlag) {
-            ctx.nBL1Iter++;
-            CalcCoDirectionVar();
-            ctx.loadBL1Flag = true;
-            if (ctx.nBL1Iter != ctx.ddr2l1LoopN) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    __aicore__ inline bool IterateL0NFirstMMode()
-    {
-        if constexpr (hasNL0IterFlag) {
-            ctx.nL0Iter++;
-            if (ctx.nL0Iter == ctx.l12l0LoopN) {
-                ctx.nL0Iter = 0;
-            } else {
-                ctx.loadAL0Flag = false;
-                return true;
-            }
-        }
-
-        if constexpr (kl0FullLoadFlag) {
-            ctx.kL0FullLoadBl0PingPongFlag = 0;
-        }
-
-        ctx.mL0Iter++;
-        ctx.loadAL0Flag = true;
-        if (ctx.mL0Iter == ctx.l12l0LoopM) {
-            ctx.mL0Iter = 0;
-        } else {
-            return true;
-        }
-
-        return false;
-    }
-
-    __aicore__ inline bool IterateNFirstMMode()
-    {
-        if (IterateL0NFirstMMode()) {
-            return true;
-        }
-
-        // if (ctx.kBL1fullload) {
-        //     ctx.queueWeightL1.FreeTensor(ctx.weightL1);
-        // }
-
-        if constexpr (hasNL1IterFlag) {
-            ctx.nBL1Iter++;
-            ctx.loadBL1Flag = true;
-            if (ctx.nBL1Iter == ctx.ddr2l1LoopN) {
-                ctx.nBL1Iter = 0;
-                CalcCoDirectionVar();
-                
-            } else {
-                CalcCoDirectionVar();
-                return true;
-            }
-        }
-
-        if (ctx.kAL1fullload) {
-            ctx.queueFmapL1.FreeTensor(ctx.fmapL1);
-        }
-
-        ctx.mAL1Iter++;
-        ctx.loadAL1Flag = true;
-        if (ctx.mAL1Iter == ctx.ddr2l1LoopM) {
-            ctx.mAL1Iter = 0;
-            CalcMDirectionVar();
-        } else {
-            CalcMDirectionVar();
-            return true;
-        }
-
-        if constexpr (formatOutput == ConvFormat::NCDHW) {
-            ctx.dOutIter++;
-            if (ctx.dOutIter == ctx.ddr2l1LoopD) {
-                ctx.dOutIter = 0;
-            } else {
-                return true;
-            }
-        }
-
-        ctx.batchIter++;
-        if (likely(ctx.batchIter != ctx.ddr2l1LoopBatch)) {
-            ctx.loadAL1Flag = true;
-            ctx.loadBL1Flag = true;
-            return true;
-        }
-
-        return false;
-    }
-
-    __aicore__ inline bool UpdateCommonItersMModeMFirst(Iters& iters)
-    {
-        iters.mAL1Iter = ctx.mAL1Iter;
-        iters.batchIter = ctx.batchIter;
-        iters.nBL1Iter = ctx.nBL1Iter;
-
-        iters.mAL1Iter += 1;
-        if (iters.mAL1Iter <= ctx.maxMAL1Iter) {
-            return false;
-        }
-        iters.mAL1Iter = 0;
-        iters.batchIter += 1;
-        if (iters.batchIter < ctx.ddr2l1LoopBatch) {
-            return false;
-        }
-        iters.batchIter = 0;
-        iters.nBL1Iter += 1;
-        if (iters.nBL1Iter <= ctx.maxNBL1Iter) {
-            return false;
-        }
-        iters.endTag = true;
-        return true;
-    }
-
-    __aicore__ inline bool UpdateCommonItersMModeNFirst(Iters& iters)
-    {
-        iters.nBL1Iter = ctx.nBL1Iter;
-        iters.mAL1Iter = ctx.mAL1Iter;
-        iters.batchIter = ctx.batchIter;
-
-        iters.nBL1Iter += 1;
-        if (iters.nBL1Iter <= ctx.maxNBL1Iter) {
-            return false;
-        }
-        iters.nBL1Iter = 0;
-        iters.mAL1Iter += 1;
-        if (iters.mAL1Iter <= ctx.maxMAL1Iter) {
-            return false;
-        }
-        iters.mAL1Iter = 0;
-        iters.batchIter += 1;
-        if (iters.batchIter < ctx.ddr2l1LoopBatch) {
-            return false;
-        }
-        iters.endTag = true;
-        return true;
-    }
-
     __aicore__ inline bool UpdateCommonIters(Iters& iters)
     {
         if constexpr (outputOrder == static_cast<int8_t>(ConvOutputOrder::M_MODE) &&
@@ -2023,13 +1956,62 @@ private:
         return false;
     }
 
+    __aicore__ inline void UpdateHoL0WoL0()
+    {
+        ctx.currentHoL0 = ctx.hoL0Iter == ctx.maxHoL0Iter ? ctx.hoL0Tail :
+                                                            ctx.convTiling->hoL0;
+        ctx.currentWoL0 = ctx.woL0Iter == ctx.maxWoL0Iter ? ctx.woL0Tail :
+                                                            ctx.convTiling->woL0;
+    }
+
+    __aicore__ inline void SetMNBeforeIterateK()
+    {
+        uint64_t currentML0 = 0;
+        if constexpr (outputOrder == static_cast<int8_t>(ConvOutputOrder::M_MODE)) {
+            currentML0 = CalcCurrentML0MMode();
+        } else {
+            currentML0 = CalcCurrentML0HWMode();
+        }
+        printf("currentML0: %ld\n", currentML0);
+
+        uint64_t currentNL0 = CalcCurrentNL0();
+        printf("currentNL0: %ld\n", currentNL0);
+
+        loadAL0Ins.SetM(ctx, ctx.currentML0Align, currentML0);
+        loadBL0Ins.SetN(ctx, ctx.currentNL0Align);
+        loadBiasL1Ins.SetN(ctx, currentNL0);
+        loadPreQuantL1Ins.SetN(ctx, currentNL0);
+        loadPreReluL1Ins.SetN(ctx, currentNL0);
+        loadPreClipReluL1Ins.SetN(ctx, currentNL0);
+        loadAntiQuantL1Ins.SetN(ctx, currentNL0);
+        loadEltwiseL1Ins.SetN(ctx, currentNL0);
+        loadEltwiseNonBrcL1Ins.SetMN(ctx, currentML0, ctx.currentNL0Align);
+        loadPostQuantL1Ins.SetN(ctx, currentNL0);
+        loadPostReluL1Ins.SetN(ctx, currentNL0);
+        loadPostClipReluL1Ins.SetN(ctx, currentNL0);
+        loadBiasBTIns.SetN(ctx, ctx.currentNL0Align);
+        loadPreQuantFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadPreReluFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadPreClipReluFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadAntiQuantFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadPostQuantFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadPostReluFBIns.SetN(ctx, ctx.currentNL0Align);
+        loadPostClipReluFBIns.SetN(ctx, ctx.currentNL0Align);
+        madIns.SetMN(ctx, ctx.currentML0Align, currentML0, ctx.currentNL0Align);
+        if constexpr (formatOutput == ConvFormat::NC1HWC0) {
+            copyOutIns.SetMN(ctx, currentML0, ctx.currentNL0Align);
+        } else {
+            copyOutIns.SetMN(ctx, currentML0, currentNL0);
+        }
+    }
+
     __aicore__ inline void ReduceOneK()
     {
         if (unlikely(ctx.loadBL1Flag)) {
             LoadBL1Moudle();
             ctx.weightL1 = ctx.queueWeightL1.template DeQue<WeightT>();
         }
-        // [zj]ToDo
+        // [zj]TODO: preload need check
         if (mPreLoadAFlag) {
             if (unlikely(ctx.loadAL1Flag)) {
                 printf("iterate fmap preload setspr\n");
@@ -2037,19 +2019,25 @@ private:
                 ctx.mAL1UpdateFlag = false;
                 printf("iterate fmap preload deque\n");
                 LocalTensor<FmapT> fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
-                printf("[0]kAL1Iter: %ld, mAL1Iter: %ld, batchIter: %ld\n", ctx.kAL1Iter, ctx.mAL1Iter, ctx.batchIter);
-                printf("[0]kAL1Iter: %ld, hoAL1Iter: %ld, woAL1Iter: %ld, batchIter: %ld\n", ctx.kAL1Iter, ctx.hoAL1Iter, ctx.woAL1Iter, ctx.batchIter);
+                printf(
+                    "[0]kAL1Iter: %ld, mAL1Iter: %ld, batchIter: %ld,\n[0]kAL1Iter: %ld, hoAL1Iter: %ld, woAL1Iter: "
+                    "%ld, batchIter: %ld\n",
+                    ctx.kAL1Iter, ctx.mAL1Iter, ctx.batchIter, ctx.kAL1Iter, ctx.hoAL1Iter, ctx.woAL1Iter,
+                    ctx.batchIter);
                 Iters iters;
                 if (!UpdateItersByFmap(iters, true)) {
                     printf("iterate fmap preload\n");
-                    printf("[1]kAL1Iter: %ld, mAL1Iter: %ld, batchIter: %ld\n", iters.kAL1Iter, iters.mAL1Iter, iters.batchIter);
-                    printf("[1]kAL1Iter: %ld, hoAL1Iter: %ld, woAL1Iter: %ld, batchIter: %ld\n", iters.kAL1Iter, iters.hoAL1Iter, iters.woAL1Iter, iters.batchIter);
+                    printf(
+                        "[1]kAL1Iter: %ld, mAL1Iter: %ld, batchIter: %ld,\n[1]kAL1Iter: %ld, hoAL1Iter: %ld, "
+                        "woAL1Iter: %ld, batchIter: %ld\n",
+                        iters.kAL1Iter, iters.mAL1Iter, iters.batchIter, iters.kAL1Iter, iters.hoAL1Iter,
+                        iters.woAL1Iter, iters.batchIter);
                     if ((outputOrder == static_cast<int8_t>(ConvOutputOrder::M_MODE) &&
-                            (iters.kAL1Iter != ctx.kAL1Iter || iters.mAL1Iter != ctx.mAL1Iter ||
-                            iters.batchIter != ctx.batchIter)) ||
+                         (iters.kAL1Iter != ctx.kAL1Iter || iters.mAL1Iter != ctx.mAL1Iter ||
+                          iters.batchIter != ctx.batchIter)) ||
                         (outputOrder == static_cast<int8_t>(ConvOutputOrder::HW_MODE) &&
-                            (iters.hoAL1Iter != ctx.hoAL1Iter || iters.woAL1Iter != ctx.woAL1Iter ||
-                            iters.mAL1Iter != ctx.mAL1Iter || iters.batchIter != ctx.batchIter))) {
+                         (iters.hoAL1Iter != ctx.hoAL1Iter || iters.woAL1Iter != ctx.woAL1Iter ||
+                          iters.mAL1Iter != ctx.mAL1Iter || iters.batchIter != ctx.batchIter))) {
                         bool mAL1UpdateFlag = ctx.mAL1UpdateFlag;
                         ctx.mAL1UpdateFlag = true;
                         LoadAL1BaseMoudle(iters);
@@ -2084,9 +2072,9 @@ private:
         } else if (!ctx.kAL1fullload && ctx.kBL1fullload) {
             updateIterByFmapTag = true;
         }
+
         if (ctx.loadAL1Flag || !ctx.kAL1fullload) {
             ctx.kAL1Iter = 0;
-            // [zj]ToDo
             LoadAL1BaseMoudle();
             if (ctx.kAL1fullload) {
                 ctx.fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
@@ -2246,7 +2234,6 @@ private:
     {
         SetMNBeforeIterateK();
 
-        // [zj]ToDo
         if (ctx.hasBias) {
             if (!ctx.convTiling->biasFullLoadFlag) {
                 ctx.biasL1 = ctx.queueBiasL1.template AllocTensor<BiasT>();
@@ -2259,95 +2246,91 @@ private:
             ctx.queueBiasBT.EnQue(ctx.biasBT);
             ctx.biasBT = ctx.queueBiasBT.template DeQue<L0cT>();
         }
-        // [zj]ToDo
-        if (ctx.hasPreQuant) {
+        if (ctx.hasVectorPreQuant) {
             if (!ctx.convTiling->fixpParamsFullLoadFlag) {
-                if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
-                    event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
-                    SetFlag<HardEvent::FIX_MTE2>(eventId);
-                    WaitFlag<HardEvent::FIX_MTE2>(eventId);
-                }
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
                 ctx.preQuantL1 = ctx.queuePreQuantL1.template AllocTensor<PreQuantT>();
                 loadPreQuantL1Ins.LoadChannelWiseL1(ctx, ctx.preQuantL1, ctx.preQuantGm);
                 ctx.queuePreQuantL1.EnQue(ctx.preQuantL1);
                 ctx.preQuantL1 = ctx.queuePreQuantL1.template DeQue<PreQuantT>();
             }
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
             ctx.preQuantFB = ctx.queuePreQuantFB.template AllocTensor<PreQuantT>();
-            loadPreQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_PRE_QUANT, ctx.preQuantFB,
-                                                        ctx.preQuantL1);
+            loadPreQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_PRE_QUANT, ctx.preQuantFB, ctx.preQuantL1);
             ctx.queuePreQuantFB.EnQue(ctx.preQuantFB);
             ctx.preQuantFB = ctx.queuePreQuantFB.template DeQue<PreQuantT>();
-    #endif
+#endif
         }
-        if (ctx.hasPreRelu) {
+        if (ctx.hasVectorPreRelu) {
             if (!ctx.convTiling->fixpParamsFullLoadFlag) {
-                if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
-                    event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
-                    SetFlag<HardEvent::FIX_MTE2>(eventId);
-                    WaitFlag<HardEvent::FIX_MTE2>(eventId);
-                }
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
                 ctx.preReluL1 = ctx.queuePreReluL1.template AllocTensor<PreReluT>();
                 loadPreReluL1Ins.LoadChannelWiseL1(ctx, ctx.preReluL1, ctx.preReluGm);
                 ctx.queuePreReluL1.EnQue(ctx.preReluL1);
                 ctx.preReluL1 = ctx.queuePreReluL1.template DeQue<PreReluT>();
             }
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
             ctx.preReluFB = ctx.queuePreReluFB.template AllocTensor<PreReluT>();
             loadPreReluFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_PRE_RELU, ctx.preReluFB, ctx.preReluL1);
             ctx.queuePreReluFB.EnQue(ctx.preReluFB);
             ctx.preReluFB = ctx.queuePreReluFB.template DeQue<PreReluT>();
-    #endif
+#endif
         }
-        if (ctx.hasAntiQuant) {
+        if (ctx.hasVectorPreClipRelu) {
             if (!ctx.convTiling->fixpParamsFullLoadFlag) {
-                if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
-                    event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
-                    SetFlag<HardEvent::FIX_MTE2>(eventId);
-                    WaitFlag<HardEvent::FIX_MTE2>(eventId);
-                }
-                ctx.antiQuantL1 =
-                    ctx.queueAntiQuantL1.template AllocTensor<AntiQuantT>();
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
+                ctx.preClipReluL1 = ctx.queuePreClipReluL1.template AllocTensor<PreClipReluT>();
+                loadPreClipReluL1Ins.LoadChannelWiseL1(ctx, ctx.preClipReluL1, ctx.preClipReluGm);
+                ctx.queuePreClipReluL1.EnQue(ctx.preClipReluL1);
+                ctx.preClipReluL1 = ctx.queuePreClipReluL1.template DeQue<PreClipReluT>();
+            }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+            ctx.preClipReluFB = ctx.queuePreClipReluFB.template AllocTensor<PreClipReluT>();
+            loadPreClipReluFBIns.LoadFixpParamFb(
+                ctx, DST_MEM_BLOCK_PRE_CLIP_RELU, ctx.preClipReluFB, ctx.preClipReluL1);
+            ctx.queuePreClipReluFB.EnQue(ctx.preClipReluFB);
+            ctx.preClipReluFB = ctx.queuePreClipReluFB.template DeQue<PreClipReluT>();
+#endif
+        }
+        if (ctx.hasVectorAntiQuant) {
+            if (!ctx.convTiling->fixpParamsFullLoadFlag) {
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
+                ctx.antiQuantL1 = ctx.queueAntiQuantL1.template AllocTensor<AntiQuantT>();
                 loadAntiQuantL1Ins.LoadChannelWiseL1(ctx, ctx.antiQuantL1, ctx.antiQuantGm);
                 ctx.queueAntiQuantL1.EnQue(ctx.antiQuantL1);
                 ctx.antiQuantL1 = ctx.queueAntiQuantL1.template DeQue<AntiQuantT>();
             }
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
             ctx.antiQuantFB = ctx.queueAntiQuantFB.template AllocTensor<AntiQuantT>();
-            loadAntiQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_ANTI_QUANT, ctx.antiQuantFB,
-                                                            ctx.antiQuantL1);
+            loadAntiQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_ANTI_QUANT, ctx.antiQuantFB, ctx.antiQuantL1);
             ctx.queueAntiQuantFB.EnQue(ctx.antiQuantFB);
             ctx.antiQuantFB = ctx.queueAntiQuantFB.template DeQue<AntiQuantT>();
-    #endif
-        }
-        if (ctx.hasPostQuant) {
-            if (!ctx.convTiling->fixpParamsFullLoadFlag) {
-                if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
-                    event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
-                    SetFlag<HardEvent::FIX_MTE2>(eventId);
-                    WaitFlag<HardEvent::FIX_MTE2>(eventId);
-                }
-                ctx.postQuantL1 = ctx.queuePostQuantL1.template AllocTensor<PostQuantT>();
-                loadPostQuantL1Ins.LoadChannelWiseL1(ctx, ctx.postQuantL1, ctx.postQuantGm);
-                ctx.queuePostQuantL1.EnQue(ctx.postQuantL1);
-                ctx.postQuantL1 = ctx.queuePostQuantL1.template DeQue<PostQuantT>();
-            }
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
-            ctx.postQuantFB = ctx.queuePostQuantFB.template AllocTensor<PostQuantT>();
-            loadPostQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_POST_QUANT, ctx.postQuantFB,
-                                                         ctx.postQuantL1);
-            ctx.queuePostQuantFB.EnQue(ctx.postQuantFB);
-            ctx.postQuantFB = ctx.queuePostQuantFB.template DeQue<PostQuantT>();
-    #endif
+#endif
         }
         if (ctx.hasEltwise) {
             if (ctx.eltwiseBrcEn) {
                 if (!ctx.convTiling->fixpParamsFullLoadFlag) {
-                    if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
-                        event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
-                        SetFlag<HardEvent::FIX_MTE2>(eventId);
-                        WaitFlag<HardEvent::FIX_MTE2>(eventId);
-                    }
+                    // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                    //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                    //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                    //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                    // }
                     ctx.eltwiseL1 = ctx.queueEltwiseL1.template AllocTensor<EltwiseT>();
                     loadEltwiseL1Ins.LoadChannelWiseL1(ctx, ctx.eltwiseL1, ctx.eltwiseGm);
                     ctx.queueEltwiseL1.EnQue(ctx.eltwiseL1);
@@ -2360,12 +2343,69 @@ private:
                 ctx.eltwiseL1 = ctx.queueEltwiseL1.template DeQue<EltwiseT>();
             }
         }
+        if (ctx.hasVectorPostQuant) {
+            if (!ctx.convTiling->fixpParamsFullLoadFlag) {
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
+                ctx.postQuantL1 = ctx.queuePostQuantL1.template AllocTensor<PostQuantT>();
+                loadPostQuantL1Ins.LoadChannelWiseL1(ctx, ctx.postQuantL1, ctx.postQuantGm);
+                ctx.queuePostQuantL1.EnQue(ctx.postQuantL1);
+                ctx.postQuantL1 = ctx.queuePostQuantL1.template DeQue<PostQuantT>();
+            }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+            ctx.postQuantFB = ctx.queuePostQuantFB.template AllocTensor<PostQuantT>();
+            loadPostQuantFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_POST_QUANT, ctx.postQuantFB, ctx.postQuantL1);
+            ctx.queuePostQuantFB.EnQue(ctx.postQuantFB);
+            ctx.postQuantFB = ctx.queuePostQuantFB.template DeQue<PostQuantT>();
+#endif
+        }
+        if (ctx.hasVectorPostRelu) {
+            if (!ctx.convTiling->fixpParamsFullLoadFlag) {
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
+                ctx.postReluL1 = ctx.queuePostReluL1.template AllocTensor<PostReluT>();
+                loadPostReluL1Ins.LoadChannelWiseL1(ctx, ctx.postReluL1, ctx.postReluGm);
+                ctx.queuePostReluL1.EnQue(ctx.postReluL1);
+                ctx.postReluL1 = ctx.queuePostReluL1.template DeQue<PostReluT>();
+            }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+            ctx.postReluFB = ctx.queuePostReluFB.template AllocTensor<PostReluT>();
+            loadPostReluFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_POST_RELU, ctx.postReluFB, ctx.postReluL1);
+            ctx.queuePostReluFB.EnQue(ctx.postReluFB);
+            ctx.postReluFB = ctx.queuePostReluFB.template DeQue<PostReluT>();
+#endif
+        }
+        if (ctx.hasVectorPostClipRelu) {
+            if (!ctx.convTiling->fixpParamsFullLoadFlag) {
+                // if constexpr (groupType != static_cast<int8_t>(ConvGroupType::NORMAL_CONV)) {
+                //     event_t eventId = static_cast<event_t>(ctx.pipe->FetchEventID(HardEvent::FIX_MTE2));
+                //     SetFlag<HardEvent::FIX_MTE2>(eventId);
+                //     WaitFlag<HardEvent::FIX_MTE2>(eventId);
+                // }
+                ctx.postClipReluL1 = ctx.queuePostClipReluL1.template AllocTensor<PostClipReluT>();
+                loadPostClipReluL1Ins.LoadChannelWiseL1(ctx, ctx.postClipReluL1, ctx.postClipReluGm);
+                ctx.queuePostClipReluL1.EnQue(ctx.postClipReluL1);
+                ctx.postClipReluL1 = ctx.queuePostClipReluL1.template DeQue<PostClipReluT>();
+            }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+            ctx.postClipReluFB = ctx.queuePostClipReluFB.template AllocTensor<PostClipReluT>();
+            loadPostClipReluFBIns.LoadFixpParamFb(ctx, DST_MEM_BLOCK_POST_CLIP_RELU, ctx.postClipReluFB, ctx.postClipReluL1);
+            ctx.queuePostClipReluFB.EnQue(ctx.postClipReluFB);
+            ctx.postClipReluFB = ctx.queuePostClipReluFB.template DeQue<PostClipReluT>();
+#endif
+        }
 
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
         ctx.outputL1 = ctx.queueOutputL1.template AllocTensor<OutputT>();
-    #else
+#else
         ctx.cl0 = ctx.queueCL0.template AllocTensor<L0cT>();
-    #endif
+#endif
 
         // reduceK priority: 1.KL0FullLoad 2.L1DB Preload 3. ordinary reduceK
         if constexpr (kl0FullLoadFlag) {
@@ -2378,19 +2418,49 @@ private:
 
         FreeL1Tensor();
 
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
         ctx.queueOutputL1.EnQue(ctx.outputL1);
         ctx.outputL1 = ctx.queueOutputL1.template DeQue<OutputT>();
-    #else
+#else
         ctx.queueCL0.EnQue(ctx.cl0);
         ctx.cl0 = ctx.queueCL0.template DeQue<L0cT>();
-    #endif
+#endif
 
         ctx.kIter = 0;
     }
 
+    __aicore__ inline bool IterateImplMMode(bool enPartialSum)
+    {
+        if (ctx.isFirstIterate) {
+            FirstIterateImplMMode();
+            if (mPreLoadAFlag) {
+                if (ctx.maxKBL1Iter == 0 && ctx.maxNBL1Iter == 0) {
+                    LoadBL1Moudle();
+                    ctx.weightL1 = ctx.queueWeightL1.template DeQue<WeightT>();
+                    ctx.loadBL1Flag = false;
+                }
+                printf("first iterate fmap preload\n");
+                LoadAL1Moudle();
+                ctx.loadAL1Flag = true;
+            }
+        } else if constexpr (iterateMFirstFlag) {
+            if (IterateMFirstMMode() == false) {
+                return false;
+            }
+        } else if constexpr (iterateNFirstFlag) {
+            if (IterateNFirstMMode() == false) {
+                return false;
+            }
+        }
+
+        IterateK();
+
+        return true;
+    }
+
     __aicore__ inline bool IterateImplHWMode(bool enPartialSum)
     {
+        // [zj]TODO: preload
         if (ctx.isFirstIterate) {
             FirstIterateImplHWMode();
         } else if constexpr (iterateMFirstFlag) {
@@ -2404,37 +2474,6 @@ private:
         }
 
         UpdateHoL0WoL0();
-
-        IterateK();
-
-        return true;
-    }
-
-    __aicore__ inline bool IterateImplMMode(bool enPartialSum)
-    {
-        if (ctx.isFirstIterate) {
-            FirstIterateImplMMode();
-            // [zj]ToDo
-            if (mPreLoadAFlag) {
-                if (ctx.maxKBL1Iter == 0 && ctx.maxNBL1Iter == 0) {
-                    LoadBL1Moudle();
-                    ctx.weightL1 = ctx.queueWeightL1.template DeQue<WeightT>();
-                    ctx.loadBL1Flag = false;
-                }
-                printf("first iterate fmap preload\n");
-                ctx.kAL1Iter = ctx.kIter / ctx.multiKAL1;
-                LoadAL1BaseMoudle();
-                ctx.loadAL1Flag = true;
-            }
-        } else if constexpr (iterateMFirstFlag) {
-            if (IterateMFirstMMode() == false) {
-                return false;
-            }
-        } else if constexpr (iterateNFirstFlag) {
-            if (IterateNFirstMMode() == false) {
-                return false;
-            }
-        }
 
         IterateK();
 

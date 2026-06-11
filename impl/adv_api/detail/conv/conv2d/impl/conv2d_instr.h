@@ -24,9 +24,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165)
     #include "dav_5101/conv2d_instr_impl.h"
-    #include "dav_5101/conv2d_instr_hw_mode_impl.h"
     #include "dav_5101/conv2d_instr_m_mode_impl.h"
-#else
+    #include "dav_5101/conv2d_instr_hw_mode_impl.h"
 #endif
 
 #endif // API_CONV2D_INSTR_H
