@@ -13,7 +13,7 @@ set -e
 
 SUPPORTED_SHORT_OPTS=("h" "j" "t" "p" "f")
 SUPPORTED_LONG_OPTS=(
-    "help" "cov" "cache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
+    "help" "cov" "cache" "ccache" "pkg" "asan" "make_clean" "cann_3rd_lib_path" "test" "cann_path" "adv_test" "adv_test_two" "arm_test" "basic_test_one" "basic_test_two" "basic_test_three" "basic_test_four" "basic_test_five" "build-type" "extra-cmake-args" "changed_file" "enable-sign" "sign-script"
 )
 
 CURRENT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
@@ -21,8 +21,11 @@ BUILD_DIR=${CURRENT_DIR}/build
 OUTPUT_DIR=${CURRENT_DIR}/build_out
 CANN_3RD_LIB_PATH=${BUILD_DIR}
 USER_ID=$(id -u)
-CPU_NUM=$(($(cat /proc/cpuinfo | grep "^processor" | wc -l)))
-THREAD_NUM=32
+CPU_NUM=$(getconf _NPROCESSORS_ONLN 2>/dev/null || nproc 2>/dev/null || echo 1)
+THREAD_NUM=${CPU_NUM}
+if [[ "$THREAD_NUM" -gt 32 ]]; then
+  THREAD_NUM=32
+fi
 BUILD_TYPE="Release"
 ENABLE_BUILD_DEVICE=ON
 USE_CXX11_ABI=0
@@ -50,7 +53,7 @@ usage() {
         echo $dotted_line
         echo "    --pkg                Compile run package"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+        echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
         echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
         echo "    --asan               Enable ASAN (address Sanitizer)"
         echo $dotted_line
@@ -64,7 +67,7 @@ usage() {
         echo $dotted_line
         echo "    -t, --test           Build and run all unit tests"
         echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
-        echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+        echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
         echo "    --adv_test            Build and run the adv part of unit tests"
         echo "    --adv_test_two        Build and run the adv_test_two part of unit tests"
         echo "    --arm_test            Build and run the arm part of unit tests"
@@ -100,7 +103,7 @@ usage() {
   echo "    The following are all supported arguments:"
   echo $dotted_line
   echo "    -h, --help           Display help information"
-  echo "    -j                   Compile thread nums, default is 16, eg: -j 8"
+  echo "    -j                   Compile thread nums, default is min(online CPU, 32), eg: -j 8"
   echo "    -t, --test           Build and run all unit tests"
   echo "    -p, --cann_path      Set the cann package installation directory, eg: /usr/local/Ascend/cann"
   echo "    --adv_test            Build and run the adv part of unit tests"
@@ -115,6 +118,7 @@ usage() {
   echo "    --cann_3rd_lib_path  Set the path for third-party library dependencies, eg: ./build"
   echo "    --cov                Enable code coverage for unit tests"
   echo "    --asan               Enable ASAN (address Sanitizer)"
+  echo "    --cache, --ccache    Use compiler launcher cache program, eg: --cache ccache"
   echo "    --make_clean         Clean build artifacts"
   echo "    --build-type=<TYPE>"
   echo "                         Specify build type (TYPE options: Release/Debug), Default:Release"
@@ -175,6 +179,11 @@ check_option_validity() {
 
   if [[ "$arg" =~ ^-[^-] ]]; then
     if [[ $arg =~ ^-j[0-9]+$ ]]; then
+      local jobs="${arg#-j}"
+      if [[ "$jobs" -le 0 ]]; then
+        log "[ERROR] -j only support positive integers."
+        return 1
+      fi
       return 0
     fi
 
@@ -191,6 +200,16 @@ check_option_validity() {
     fi
   fi
   return 0
+}
+
+require_option_value() {
+  local opt_name="$1"
+  local opt_value="$2"
+
+  if [[ -z "$opt_value" || "$opt_value" == -* ]]; then
+    log "[ERROR] ${opt_name} requires a value."
+    exit 1
+  fi
 }
 
 check_help_combinations() {
@@ -288,7 +307,7 @@ check_param_with_help() {
 }
 
 check_param_j() {
-  if [[ ! $THREAD_NUM =~ ^-?[0-9]+$ ]]; then
+  if [[ ! $THREAD_NUM =~ ^[0-9]+$ || "$THREAD_NUM" -le 0 ]]; then
    log "[ERROR] -j only support positive integers."
    exit 1
   fi
@@ -346,8 +365,22 @@ set_options() {
       usage
       exit 0
       ;;
-    --ccache)
+    --cache=*|--ccache=*)
+      CCACHE_PROGRAM="${1#*=}"
+      require_option_value "${1%%=*}" "${CCACHE_PROGRAM}"
+      if ! command -v "${CCACHE_PROGRAM}" >/dev/null 2>&1; then
+        log "[ERROR] cache program not found: ${CCACHE_PROGRAM}"
+        exit 1
+      fi
+      shift
+      ;;
+    --cache|--ccache)
+      require_option_value "$1" "$2"
       CCACHE_PROGRAM="$2"
+      if ! command -v "${CCACHE_PROGRAM}" >/dev/null 2>&1; then
+        log "[ERROR] cache program not found: ${CCACHE_PROGRAM}"
+        exit 1
+      fi
       shift 2
       ;;
     -p=*|--cann_path=*)
@@ -435,30 +468,39 @@ set_options() {
       clean
       exit 0
       ;;
-    -j*)
-      THREAD_NUM="${1#-j}"
-      check_param_j
-      shift
-      ;;
     -j=*)
       THREAD_NUM="${1#*=}"
       check_param_j
       shift
       ;;
+    -j*)
+      THREAD_NUM="${1#-j}"
+      check_param_j
+      shift
+      ;;
     -j)
+      require_option_value "$1" "$2"
       THREAD_NUM="$2"
       check_param_j
       shift 2
       ;;
     -f)
+      require_option_value "$1" "$2"
       CHANGED_FILES="$2"
       CI_MODE=TRUE
       shift 2
       ;;
     --changed_file=*)
       CHANGED_FILES="${1#*=}"
+      require_option_value "${1%%=*}" "${CHANGED_FILES}"
       CI_MODE=TRUE
       shift
+      ;;
+    --changed_file)
+      require_option_value "$1" "$2"
+      CHANGED_FILES="$2"
+      CI_MODE=TRUE
+      shift 2
       ;;
     --build-type=*)
       BUILD_TYPE="${1#*=}"
@@ -598,8 +640,12 @@ set_ci_mode() {
     CHANGED_FILES=${CURRENT_DIR}/$CHANGED_FILES
   fi
   log "[INFO] CI mode: changed file path is $CHANGED_FILES"
+  if [[ ! -f "$CHANGED_FILES" ]]; then
+    log "[ERROR] CI mode: changed file not found: $CHANGED_FILES"
+    exit 1
+  fi
   log "[INFO] CI mode: context in changed file: "
-  cat $CHANGED_FILES
+  cat "$CHANGED_FILES"
 
   if [[ -n "$CHANGED_FILES" ]]; then
     log "[INFO] CI mode: processing changed files for CI mode."
@@ -633,6 +679,9 @@ main() {
   set_env
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DASCEND_CANN_PACKAGE_PATH=${ASCEND_CANN_PACKAGE_PATH}"
+  if [ -n "${CCACHE_PROGRAM}" ];then
+    CUSTOM_OPTION="${CUSTOM_OPTION} -DCMAKE_C_COMPILER_LAUNCHER=${CCACHE_PROGRAM} -DCMAKE_CXX_COMPILER_LAUNCHER=${CCACHE_PROGRAM}"
+  fi
 
   if [ -n "${TEST}" ];then
     CUSTOM_OPTION="${CUSTOM_OPTION} -DENABLE_TEST=ON -DTEST_MOD=all"
