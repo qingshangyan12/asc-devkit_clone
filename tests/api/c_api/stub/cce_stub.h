@@ -543,6 +543,11 @@ inline void copy_gm_to_ubuf_align_v2(__ubuf__ void* dst_addr, __gm__ void* src_a
     uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
 {
 }
+// asc_copy_ub2gm_impl uses void*; stub_fun.h void* overload lacks l2_cache_mode param.
+inline void copy_ubuf_to_gm_align_v2(__gm__ void* dst_addr, __ubuf__ void* src_addr, uint8_t sid, uint32_t burst_num,
+    uint32_t burst_len, uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
+{
+}
 #endif
 
 // ==========vstar===========

@@ -14,6 +14,26 @@
 
 ## 函数原型
 
+- 前n个数据搬运
+
+```cpp
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
+
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
+```
+
+- 高维切分搬运
+
 ```c++
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ int8_t* dst, __ubuf__ int8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_gap, uint32_t src_gap)
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint8_t* dst, __ubuf__ uint8_t* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_gap, uint32_t src_gap)
@@ -29,12 +49,31 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ uint32_t* dst, __ubuf__ uint3
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ float* dst, __ubuf__ float* src, uint16_t n_burst, uint32_t len_burst, uint8_t l2_cache_mode, uint64_t dst_gap, uint32_t src_gap)
 ```
 
+- 同步计算
+
+```cpp
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t size)
+
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ half* dst, __gm__ half* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t size)
+__aicore__ inline void asc_copy_ub2gm_align_sync(__ubuf__ float* dst, __gm__ float* src, uint32_t size)
+```
+
 ## 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
 | dst | 输出 | 目的操作数在GM的起始地址。 |
 | src | 输入 | 源操作数在UB的起始地址。 |
+| size | 输入 | 搬运数据大小（字节）。 |
 | n_burst | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, 4095]。 |
 | len_burst | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, 2097151]。 |
 | l2_cache_mode | 输入 | 配置数据在L2 Cache中的管理策略。取值说明如下：  <br>&bull; 0：DISABLE模式，适用于仅需访问一次的数据。 <br>&bull; 1：NORMAL模式，适用于重用模式未知或不极端的数据。 <br>&bull; 2：LAST模式，适用于高频重复访问的数据。 <br>&bull; 4：PERSISTENT模式，适用于需要长期驻留在缓存中的数据。 |
@@ -54,6 +93,7 @@ PIPE_MTE3
 - dst的起始地址要求按照对应数据类型所占字节数对齐。
 - src的起始地址要求32字节对齐。
 - 如果需要执行多条asc_copy_ub2gm_align指令，且asc_copy_ub2gm_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../同步控制/asc_sync_notify.md)和[asc_sync_wait](../../同步控制/asc_sync_wait.md)），保证多个asc_copy_ub2gm_align指令的串行化，防止出现异常数据。
+- 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例
 
