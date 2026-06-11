@@ -48,7 +48,11 @@ namespace AscendC {
  */
 struct ShapeInfo {
 public:
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    __callee__ inline ShapeInfo() {}
+#else
     __aicore__ inline ShapeInfo() {}
+#endif
     __aicore__ inline ShapeInfo(const uint8_t inputShapeDim, const uint32_t inputShape[],
         const uint8_t inputOriginalShapeDim, const uint32_t inputOriginalShape[], const DataFormat inputFormat)
         : shapeDim(inputShapeDim), originalShapeDim(inputOriginalShapeDim), dataFormat(inputFormat)
@@ -133,7 +137,11 @@ template <typename T> class SymbolOverrideCompare;
 template <typename T> class LocalTensor : public BaseLocalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    __callee__ inline LocalTensor<T>() {};
+#else
     __aicore__ inline LocalTensor<T>() {};
+#endif
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ~LocalTensor();
     explicit LocalTensor<T>(TBuffAddr& address);
@@ -145,7 +153,11 @@ public:
     __inout_pipe__(S) PrimType GetValue(const uint32_t offset) const;
     __inout_pipe__(S) PrimType& operator()(const uint32_t offset) const;
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    template <typename U> __callee__ inline LocalTensor<U> ReinterpretCast() const;
+#else
     template <typename U> __aicore__ inline LocalTensor<U> ReinterpretCast() const;
+#endif
     template <typename S> __inout_pipe__(S) void SetValue(const uint32_t index, const S value) const;
     LocalTensor operator[](const uint32_t offset) const;
 
@@ -154,14 +166,25 @@ public:
     inline void Print(uint32_t len);
     int32_t ToFile(const std::string& fileName) const;
 #else
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    __callee__ inline uint64_t GetPhyAddr() const;
+    __callee__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
+    __callee__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
+    __callee__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
+    template <typename U> __callee__ inline LocalTensor<U> ReinterpretCast() const;
+    template <typename S> __callee__ inline __inout_pipe__(S)
+    void SetValue(const uint32_t index, const S value) const;
+    __callee__ inline LocalTensor operator[](const uint32_t offset) const;
+#else
     __aicore__ inline uint64_t GetPhyAddr() const;
     __aicore__ inline uint64_t GetPhyAddr(const uint32_t offset) const;
     __aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const;
     __aicore__ inline __inout_pipe__(S) __ubuf__ PrimType& operator()(const uint32_t offset) const;
     template <typename U> __aicore__ inline LocalTensor<U> ReinterpretCast() const;
     template <typename S> __aicore__ inline __inout_pipe__(S)
-        void SetValue(const uint32_t index, const S value) const;
+    void SetValue(const uint32_t index, const S value) const;
     __aicore__ inline LocalTensor operator[](const uint32_t offset) const;
+#endif
 
     template <typename S>
     [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
@@ -172,9 +195,14 @@ public:
     template <typename U>
     __aicore__ inline LocalTensor<T>(uint32_t addr, const U& layout);
     __aicore__ inline LocalTensor<T>(uint32_t addr);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    __callee__ inline int32_t GetPosition() const;
+    __callee__ inline uint32_t GetSize() const;
+#else
     __aicore__ inline int32_t GetPosition() const;
-    __aicore__ inline void SetSize(const uint32_t size);
     __aicore__ inline uint32_t GetSize() const;
+#endif
+    __aicore__ inline void SetSize(const uint32_t size);
 
     [[deprecated("NOTICE: GetLength has been deprecated and will be removed in the next version. Please do not use "
                  "it!")]]
@@ -190,8 +218,8 @@ public:
     __aicore__ inline void operator = (const SymbolOverrideDiv<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideOr<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideAnd<T>& symbolOverride);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    template <typename U> __aicore__ inline void operator = (const SymbolOverrideCompare<U>& symbolOverride);
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) 
+    template <typename U> __aicore__ inline void operator = (const SymbolOverrideCompare<U>& symbolOverride); 
 #else
     __aicore__ inline void operator = (const SymbolOverrideCompare<float>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideCompare<half>& symbolOverride);
@@ -264,7 +292,6 @@ public:
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
     template <typename U> __aicore__ inline GlobalTensor<U> ReinterpretCast() const;
 #endif
-
 public:
     // element number of Tensor
     uint64_t bufferSize_;
@@ -293,7 +320,7 @@ public:
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc();
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc();
-    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
+    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type
     __aicore__ inline Alloc(const LayoutType& layout);
 
 private:

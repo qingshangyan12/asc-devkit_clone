@@ -374,7 +374,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
     } else if (pos == TPosition::A1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::A2) {
-hard = Hardware::L0A;
+        hard = Hardware::L0A;
     } else if (pos == TPosition::B1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::B2) {
@@ -427,7 +427,78 @@ hard = Hardware::L0A;
         hard = Hardware::FIXBUF;
 #endif
     } else if (pos == TPosition::CO1) {
-hard = Hardware::L0C;
+        hard = Hardware::L0C;
+    } else if (pos == TPosition::SHM) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::TSCM) {
+        hard = Hardware::L1;
+    }
+    return hard;
+}
+
+__asc_aicore__ constexpr Hardware GetPhysicalType(TPosition pos)
+{
+    ASSERT(pos != TPosition::MAX);
+    Hardware hard = Hardware::UB;
+    if (pos == TPosition::GM) {
+        hard = Hardware::GM;
+    } else if (pos == TPosition::A1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::A2) {
+        hard = Hardware::L0A;
+    } else if (pos == TPosition::B1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::B2) {
+        hard = Hardware::L0B;
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::UB;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::L0C;
+    } else if (pos == TPosition::CO2) {
+        hard = Hardware::UB;
+#elif (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003)
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::BIAS;
+    } else if (pos == TPosition::CO2) {
+        hard = Hardware::GM;
+    } else if (pos == TPosition::C2PIPE2GM) {
+        hard = Hardware::FIXBUF;
+#elif (__NPU_ARCH__ == 3002)
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::BIAS;
+    } else if (pos == TPosition::C2PIPE2GM) {
+        hard = Hardware::FIXBUF;
+#elif (__NPU_ARCH__ == 3102)
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::BIAS;
+#elif (__NPU_ARCH__ == 5102)
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::BIAS;
+    } else if (pos == TPosition::CO2) {
+        hard = Hardware::GM;
+    } else if (pos == TPosition::C2PIPE2GM) {
+        hard = Hardware::FIXBUF;
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3113))
+    } else if (pos == TPosition::C1) {
+        hard = Hardware::L1;
+    } else if (pos == TPosition::C2) {
+        hard = Hardware::BIAS;
+    } else if (pos == TPosition::CO2) {
+        hard = Hardware::GM;
+    } else if (pos == TPosition::C2PIPE2GM) {
+        hard = Hardware::FIXBUF;
+#endif
+    } else if (pos == TPosition::CO1) {
+        hard = Hardware::L0C;
     } else if (pos == TPosition::SHM) {
         hard = Hardware::L1;
     } else if (pos == TPosition::TSCM) {
