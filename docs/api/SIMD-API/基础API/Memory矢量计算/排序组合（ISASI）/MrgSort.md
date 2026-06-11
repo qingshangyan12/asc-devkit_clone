@@ -62,7 +62,7 @@ template <typename T>
 __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& src, const MrgSort4Info& params)
 ```
 
-## 参数说明<a name="section622mcpsimp"></a>
+## 参数说明<a name="参数说明"></a><a name="section622mcpsimp"></a>
 
 **表1**  模板参数说明
 

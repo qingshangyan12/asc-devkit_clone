@@ -91,7 +91,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ void *dst, __cc__ int32_t *src, 
 | broadcast_en        | 输入    | 是否开启广播能力。<br/>&bull;false：不开启；<br/>&bull;true：开启，在数据搬运时沿M轴方向进行数据广播。                                                                                                         |
 | NZ2DN_en        | 输入    |  开启NZ2DN开关。<br/>&bull;false：不开启；<br/>&bull;true：开启。                                                                                       |
 
-矢量数据寄存器的详细说明请参见[reg数据类型定义.md](../../reg/reg数据类型定义.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义.md](../../Reg矢量计算/reg数据类型定义.md)。
 
 ## 返回值说明
 

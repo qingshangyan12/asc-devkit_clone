@@ -30,7 +30,7 @@ int64_t sffValue = AscendC::GetSFFValue<1>(0x1000000000000100ULL); // 返回8
 
 **图 1** 使用GetSFFValue查找从最低有效位开始首个1的位置<a name="fig1"></a>
 
-![使用GetSFFValue查找从最低有效位开始首个1的位置](../../../figures/GetSFFValue.png "使用GetSFFValue查找从最低有效位开始首个1的位置")
+![使用GetSFFValue查找从最低有效位开始首个1的位置](../../../figures/GetSFFValue.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

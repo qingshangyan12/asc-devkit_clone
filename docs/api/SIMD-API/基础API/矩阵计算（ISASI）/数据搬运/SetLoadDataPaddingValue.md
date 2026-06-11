@@ -57,7 +57,7 @@
 </tbody>
 </table>
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明<a name="功能说明"></a><a name="section618mcpsimp"></a>
 
 用于调用[Load3Dv1接口](LoadData/Load3D.md#li1135744819417)/[Load3Dv2接口](LoadData/Load3D.md#li83241850104315)时设置Pad填充的数值。Load3Dv1/Load3Dv2的模板参数isSetPadding设置为true时，用户需要通过本接口设置Pad填充的数值，设置为false时，本接口设置的填充值不生效。
 

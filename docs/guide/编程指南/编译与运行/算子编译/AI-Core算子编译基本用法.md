@@ -13,7 +13,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 ```
 
 AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
+!["aicore 编译流程示意图"](../../../figures/aicore_compilation.png)
 
 - 异构编译
   ```shell
@@ -79,7 +79,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 ```
 
 AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
+!["aicore simt编译流程示意图"](../../../figures/aicore_simt_comilation.png)
 
 ## 基本编译命令汇总
 |编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|

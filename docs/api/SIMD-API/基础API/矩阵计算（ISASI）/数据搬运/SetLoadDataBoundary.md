@@ -47,7 +47,7 @@
 </tbody>
 </table>
 
-## 功能说明<a name="section618mcpsimp"></a>
+## 功能说明<a name="功能说明"></a><a name="section618mcpsimp"></a>
 
 设置[Load3D](LoadData/LoadData.md)时A1/B1边界值。
 

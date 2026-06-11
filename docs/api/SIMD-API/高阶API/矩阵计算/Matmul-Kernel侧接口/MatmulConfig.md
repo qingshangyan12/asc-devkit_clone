@@ -2,8 +2,8 @@
 
 模板参数MatmulConfig，用于配置Matmul模板信息以及相关的配置参数。不配置默认开启Norm模板，Norm模板的介绍请参考[表 模板特性](#table6981133810309)。MatmulConfig的参数说明见[表2](#table1761013213153)。MatmulConfig的定义方式有：
 
--   该模板参数可选取提供的模板之一，当前提供的MatmulConfig模板取值范围为【CFG\_NORM、CFG\_MDL、CFG\_IBSHARE\_NORM、MM\_CFG\_BB】，分别对应默认的Norm、MDL、IBShare、BasicBlock模板。各模板的介绍请参考[表1](#table6981133810309)。
--   该模板参数可以基于各类获取模板的接口，自定义模板参数配置，获取自定义模板。各类获取模板的接口包括：[GetNormalConfig](GetNormalConfig.md)、[GetMDLConfig](GetMDLConfig.md)、[GetSpecialMDLConfig](GetSpecialMDLConfig.md)、[GetIBShareNormConfig](GetIBShareNormConfig.md)、[GetBasicConfig](GetBasicConfig.md)。
+-   <a name="li661233281512"></a>该模板参数可选取提供的模板之一，当前提供的MatmulConfig模板取值范围为【CFG\_NORM、CFG\_MDL、CFG\_IBSHARE\_NORM、MM\_CFG\_BB】，分别对应默认的Norm、MDL、IBShare、BasicBlock模板。各模板的介绍请参考[表1](#table6981133810309)。
+-   <a name="li0460173613513"></a>该模板参数可以基于各类获取模板的接口，自定义模板参数配置，获取自定义模板。各类获取模板的接口包括：[GetNormalConfig](GetNormalConfig.md)、[GetMDLConfig](GetMDLConfig.md)、[GetSpecialMDLConfig](GetSpecialMDLConfig.md)、[GetIBShareNormConfig](GetIBShareNormConfig.md)、[GetBasicConfig](GetBasicConfig.md)。
 -   另外，MatmulConfig可拆分为[MatmulShapeParams](GetMMConfig.md#table16317184295116)、[MatmulQuantParams](GetMMConfig.md#table8313111211573)、[MatmulBatchParams](GetMMConfig.md#table15129204644)、[MatmulFuncParams](GetMMConfig.md#table66217141862)二级子Config，使用[GetMMConfig](GetMMConfig.md)接口，设置需要的二级子Config和[MatmulConfigMode](GetMMConfig.md#table17837129144319)，可以更加灵活的获取自定义的模板参数配置MatmulConfig。
 
 **表 1**  模板特性

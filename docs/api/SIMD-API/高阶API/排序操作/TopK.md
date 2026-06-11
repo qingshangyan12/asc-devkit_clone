@@ -282,6 +282,7 @@ struct TopKInfo {
     Kirin 9030，支持的数据类型为：half。
     <!-- end id12 -->
 
+<a name="section94691236101419"></a>
 ## 调用示例
 
 本样例实现了Normal模式代码逻辑。
