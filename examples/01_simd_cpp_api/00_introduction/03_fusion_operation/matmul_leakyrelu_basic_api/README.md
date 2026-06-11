@@ -85,23 +85,24 @@
 
     样例整体流程如下（展示Cube核和Vector核协同计算）：
 
-      **1）Cube核：Matmul矩阵乘**
-
       > **前置说明：Ascend AI Core内存层级与数据通路**
       >
       > Ascend AI Core内部有多级片上缓存，数据从外部DDR（Global Memory, GM）逐级搬运至计算单元：
       > - **GM（Global Memory）**：芯片外部DDR，存放输入/输出数据，容量最大但访问延迟最高
       > - **L1**：片上缓存（Cube侧主要存放A/B矩阵数据），由MTE2引擎从GM搬入
       > - **L0A/L0B**：Cube矩阵计算单元的输入缓存，由MTE1引擎从L1搬入
-      > - **L0C（CO1）**：Cube矩阵计算单元的输出缓存，存放Mmad计算结果
+      > - **L0C**：Cube矩阵计算单元的输出缓存，存放Mmad计算结果
       > - **UB（Unified Buffer，AscendC中对应TPosition::VECCALC）**：Vector侧片上缓存，存放Vector计算所需的输入/输出数据
       >
       > 数据需在搬运过程中进行格式转换（ND→Nz/Zn），因为Cube计算单元要求特定的分形（Fractal）排布格式，而非ND排布。
       >
       > 同步机制说明：
       > - **核内同步**：[SetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)/[WaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)用于同一核内不同流水线引擎之间的依赖同步，如MTE2搬运完成后通知MTE1可以开始搬运
-      > - **核间同步**：[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)/CrossCoreWaitFlag用于不同核之间的依赖同步，如Cube核完成计算后通知Vector核可以开始读取数据
+      > - **核间同步**：[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)/[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)用于不同核之间的依赖同步，如Cube核完成计算后通知Vector核可以开始读取数据
 
+      **1）数据流路径**
+
+      Cube侧数据流：
       ```
       GM(A:ND,half) -> L1(A:Nz,half) -> L0A(A:Nz,half) -
                   │                  │                 │
@@ -122,9 +123,7 @@
       > - Ascend 950PR/Ascend 950DT产品：L0A的分型为Nz
       > - Atlas A2/A3系列产品：L0A的分型为Zz
 
-
-      **2）核间同步**
-
+      核间同步与Vector侧数据流（1个Cube核的结果由2个Vector核处理）：
       ```
       Cube核:  Fixpipe -> GM(C:ND,half)
                           │
@@ -136,10 +135,7 @@
                   MTE2搬运（baseM/2×baseN）    VEC计算            MTE3写出
       ```
 
-      **Vector核（1个Cube核的结果由2个Vector核处理）：LeakyRelu激活**<br>
-      上图中，Vector核需要等待对应Cube核完成结果写回后，再读取GM中的Matmul结果并执行LeakyRelu激活。
-
-      **3）流程详解**：
+      **2）流程详解**：
 
       1. **Cube核计算阶段**：
 
@@ -176,13 +172,7 @@
 
           **内存搬运与计算流程**：
 
-          - **LocalTensor创建**：使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)（片上内存分配器，按申请顺序自动分配，避免手动维护地址偏移）创建各位置的[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)（片上内存张量，数据驻留在L1/L0/UB等片上缓存）。各位置含义如下：
-            - **A1（TPosition::A1）**：L1缓存中存放左矩阵A的Nz格式数据，DataCopy GM→L1的目的端
-            - **B1（TPosition::B1）**：L1缓存中存放右矩阵B的Nz格式数据，DataCopy GM→L1的目的端
-            - **A2（TPosition::A2）**：L0A缓存中存放左矩阵A的分形数据，LoadData L1→L0A的目的端，Mmad的左输入
-            - **B2（TPosition::B2）**：L0B缓存中存放右矩阵B的分形数据，LoadData L1→L0B的目的端，Mmad的右输入
-            - **CO1（TPosition::CO1）**：L0C缓存中存放Mmad计算结果，Mmad的输出端，Fixpipe的源端
-            其中A、B矩阵在L1中的临时空间由同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移
+          - **LocalTensor创建**：使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)（片上内存分配器，按申请顺序自动分配，避免手动维护地址偏移）为各片上缓存创建[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)（片上内存张量）。其中A、B矩阵在L1中的临时空间由同一个L1 allocator按申请顺序分配，避免手动维护L1地址偏移
           - **GM → L1**：使用[DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)将A、B矩阵从GM搬运到L1，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
           - **L1 → L0A/L0B**：使用[LoadData](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)将数据搬运到L0A和L0B，B矩阵需要转置（Nz→Zn）
           - **L0A/L0B → L0C**：使用[Mmad](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)（矩阵乘累加指令）执行矩阵乘加，累加K轴方向的所有数据块
@@ -200,7 +190,7 @@
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
                   AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-                  // L1: A/B矩阵的临时存储; L0A/L0B: Cube计算单元输入; L0C(CO1): Cube计算单元输出
+                  // L1: A/B矩阵的临时存储; L0A/L0B: Cube计算单元输入; L0C: Cube计算单元输出
                   // Alloc的TPosition模板参数可缺省，Alloc函数会根据allocator对应的物理位置给出默认值
                   AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<half>(baseM * baseK);
                   AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<half>(baseK * baseN);
@@ -263,11 +253,8 @@
           }
           ```
 
-      2. **核间同步**：
-          - Cube核完成一个baseM×baseN的Matmul结果后，通过[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)（核间同步标志设置，通知其他核数据就绪）设置标志
-          - Vector核通过`CrossCoreWaitFlag`（核间同步标志等待，阻塞直到标志被设置）等待标志，确保Matmul计算完成后才开始LeakyRelu
-
-      3. **Vector核计算阶段**：
+      2. **Vector核计算阶段**：
+          - **核间同步**：Vector核通过[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)（核间同步标志等待，阻塞直到标志被设置）等待Cube核完成Fixpipe写回，确保Matmul计算完成后才开始LeakyRelu
           - **LocalTensor创建**：使用UB allocator创建`VECCALC`位置的[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)，用于承载当前Vector核处理的半块结果
           - **GM → UB**：使用[DataCopyPad](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopyPad(ISASI).md)（带Padding的GM与UB之间数据搬运）将Matmul结果搬运到UB，每个Vector核处理baseM/2×baseN的数据
           - **UB计算**：使用[LeakyRelu](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/基础算术/LeakyRelu.md)（LeakyReLU激活函数，负值部分乘以negativeSlope）执行激活计算，负值部分乘以0.001
@@ -496,7 +483,7 @@
 
 | 阶段 | 数据流动/行为 | 实现目的/原因 |
 |:---|:---|:---|
-| 初始化 | 使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)分配A1/B1（L1）、A2/B2（L0A/L0B）、CO1（L0C）等[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) | 按申请顺序自动分配片上内存，避免手动维护地址偏移 |
+| 初始化 | 使用[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md)分配L1、L0A/L0B、L0C等片上缓存的[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) | 按申请顺序自动分配片上内存，避免手动维护地址偏移 |
 | GM → L1 | [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)将A/B矩阵从GM搬入L1，同时完成ND→Nz格式转换 | Cube计算单元要求Nz分形排布格式，因此在搬运时必须将ND格式转为Nz格式，避免额外转换开销 |
 | L1 → L0A/L0B | [LoadData](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/数据搬运/LoadData/LoadData.md)将A矩阵从L1搬入L0A（Nz→Zz/Nz），B矩阵从L1搬入L0B（Nz→Zn转置） | B矩阵需要转置是因为Mmad指令要求B矩阵以Zn（转置Nz）格式输入 |
 | L0A/L0B → L0C | [Mmad](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算/Mmad.md)执行矩阵乘加，在K方向累加所有数据块 | 完成A×B的矩阵乘计算，K方向分块累加确保正确性 |

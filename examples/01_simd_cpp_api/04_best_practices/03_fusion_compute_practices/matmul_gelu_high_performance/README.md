@@ -111,11 +111,11 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
 
 ```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
+__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
 {
     AscendC::InitSocState();
     KernelMmadVector<...> op;
-    op.Init(a, b, c);
+    op.Init(xMatrix, yMatrix, zMatrix);
     op.Process();
     AscendC::PipeBarrier<PIPE_ALL>();
 }
@@ -146,23 +146,7 @@ AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 ```
 
-### 3. 中级性能优化
-
-详见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md)
-
-**Scenario 1 — CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
-
-AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
-
-### 4. 高阶极限打磨
-
-详见 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md)
-
-**Scenario 2 — CV融合-UB直通**（仅Ascend 950PR支持）
-
-AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
-
-#### 5. GELU计算实现
+#### 3. GELU计算实现
 
 **A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
 
@@ -198,7 +182,7 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
 
 GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/gelu_high_performance/README.md)。
 
-#### 6. `__mix__(1,2)` 模式下的多核切分
+#### 4. `__mix__(1,2)` 模式下的多核切分
 
 `__mix__(1,2)` 模式下，`GetBlockIdx()` 在AIC侧和AIV侧各自独立编号：AIC侧返回0~numAICores-1，AIV侧返回0~numAIVCores-1。由于每个逻辑核对应2个AIV，AIV侧需要将 `GetBlockIdx() / 2` 映射回逻辑核ID，从而与AIC侧使用相同的多核切分策略：
 
@@ -213,56 +197,27 @@ uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
 ```
 
+### 3. 中级性能优化
+
+详见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md)
+
+**Scenario 1 — CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
+
+AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
+
+### 4. 高阶极限打磨
+
+详见 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md)
+
+**Scenario 2 — CV融合-UB直通**（仅Ascend 950PR支持）
+
+AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
+
 ### 性能数据分析
 
 > 以下数据基于msprof工具测量，取5次中位数。矩阵规格M=4096, K=1024, N=1536(A2)/N=1024(950PR)，输入数据类型float16，输出数据类型float32。
 
-#### Atlas A2训练系列芯片性能数据
-
-- Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1536，24核
-
-详细数据见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md#性能数据)
-
-#### Ascend 950PR芯片性能数据
-
-- Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1024，32核
-- Scenario 2：CV融合-UB直通，singleCoreM=2048, singleCoreN=1024，32核
-
-详细数据见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md#性能数据) 和 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md#性能数据)
-
-#### 性能数据解读
-
-**Scenario 1：CV融合-GM中转（中级性能优化）**
-
-以Ascend 950PR芯片数据为例：
-- 单独Gelu任务耗时348.868μs，单独Matmul任务耗时2601.311μs
-- Scenario 1融合后总耗时2606.91μs，与Matmul单独执行时间基本一致
-
-这表明采用CV融合方式编写时，AIV的Vector计算时间基本被AIC的Cube计算时间完全覆盖。由于Cube和Vector可以并行执行，整体任务执行时间不是简单的C+V叠加，而是基本等于Cube计算时间（即Matmul时间），实现了高效的流水并行。
-
-下图展示了Scenario 1（CV融合-GM中转）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果写入GM，AIV侧从GM读取数据完成GELU计算，两者按(baseM × baseN)块粒度流水并行：
-
-![Scenario1 CV融合-GM中转流水并行](figures/CVParallell_L0C_GM_UB.png)
-> 💡 使用 msProf 工具需安装 CANN 商用/社区版，详细信息可参考[msOpProf工具安装指南](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md)。流水图基于msprof工具上板获取，获取命令：`msprof op --aic-metrics=PipeTimeline ./demo`
-
-**MTE2时间显著减少的原因：**
-
-对比数据可以发现：
-- 单独Gelu计算的aiv_mte2_time为320.543μs
-- Scenario 1中aiv_mte2_time仅为57.145μs，减少约82.2%
-
-原因分析：虽然Scenario 1中AIV也需要从GM将数据读取到UB，但AIC的Fixpipe将Matmul计算结果写入GM后，数据会被缓存在L2 Cache中。当AIV发起MTE2操作从GM读取数据时，由于数据已在L2 Cache中命中，实际是从L2 Cache读取而非从GM读取，因此MTE2时间显著减少。这也是CV融合场景下的一个隐式性能优化点。
-
-**Scenario 2：CV融合-UB直通（高阶极限打磨）**
-
-以Ascend 950PR芯片数据为例：
-- Scenario 2融合后总耗时2573.584μs，相比Scenario 1的2606.91μs进一步减少约33μs
-- Scenario 2中aiv_mte2_time仅为0.005μs，相比Scenario 1的57.145μs几乎降为零
-
-下图展示了Scenario 2（CV融合-UB直通）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果直接写入UB（不经过GM中转），AIV侧直接在UB上进行GELU计算，省去了GM→UB的MTE2搬运开销：
-
-![Scenario2 CV融合-UB直通流水并行](figures/CVParallell_L0C_UB.png)
-
+详细数据及解读见 [中级性能优化：CV融合-GM中转](matmul_gelu_中级性能优化.md#性能数据) 和 [高阶极限打磨：CV融合-UB直通](matmul_gelu_高阶极限打磨.md#性能数据)
 
 ## 编译运行
 
