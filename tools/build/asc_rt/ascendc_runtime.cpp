@@ -547,7 +547,7 @@ static uint32_t AscendCExecutorVectorCoreLaunchKernel(void* binHandle, const uin
     return ASCENDC_SUCCESS;
 }
 
-void StreamStateCallback(aclrtStream stream, aclrtStreamState state, const void *args)
+void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args)
 {
     (void)args;
     if (state == ACL_RT_STREAM_STATE_CREATE_POST) {
@@ -569,11 +569,6 @@ void StreamStateCallback(aclrtStream stream, aclrtStreamState state, const void 
         ASCENDLOGI("after g_ascStreamMap.size() is %zu.", g_ascStreamMap.size());
     }
     return;
-}
-
-static void StreamStateCallbackAdapter(aclrtStream stream, aclrtStreamState state, void *args)
-{
-    StreamStateCallback(stream, state, args);
 }
 
 static uint32_t AscendCExecutorGetStreamAndEvent(
@@ -612,7 +607,7 @@ static uint32_t AscendCExecutorGetStreamAndEvent(
     if (g_ascendCRegistedCallBack) {
         return ASCENDC_SUCCESS;
     }
-    ASCENDC_ASSERT_RTOK_RETVAL(aclrtRegStreamStateCallback("AscendCDestroySteam", StreamStateCallbackAdapter, nullptr));
+    ASCENDC_ASSERT_RTOK_RETVAL(aclrtRegStreamStateCallback("AscendCDestroySteam", StreamStateCallback, nullptr));
 
     g_ascendCRegistedCallBack = true;
     return ASCENDC_SUCCESS;

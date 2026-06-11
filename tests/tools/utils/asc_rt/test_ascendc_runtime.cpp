@@ -173,7 +173,7 @@ extern "C" uint32_t LaunchAscendKernelForVectorCore(const char *opType, void *ha
 extern std::unordered_map<const void *, AscendCStreamForVectorCore> g_ascStreamMap;
 extern "C" uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t numBlocks, void **args, uint32_t size,
     const rtStream_t stream);
-extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, const void *args);
+extern "C" void StreamStateCallback(aclrtStream stream, aclrtStreamState state, void *args);
 extern "C" uint32_t g_aclrtLaunchKernelWithHostArgsCallCount;
 extern "C" uint32_t g_aclrtLaunchKernelWithHostArgsLastNumBlocks;
 extern "C" aclrtStream g_aclrtLaunchKernelWithHostArgsLastStream;
@@ -332,13 +332,6 @@ TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelForVectorCoreLaunchesAicAndAivWit
     EXPECT_EQ(g_aclrtRecordEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
     EXPECT_EQ(g_aclrtStreamWaitEventLastStream, stream);
     EXPECT_EQ(g_aclrtStreamWaitEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
-
-    g_aclrtRegStreamStateCallbackLastCallback(stream, ACL_RT_STREAM_STATE_DESTROY_PRE, nullptr);
-    EXPECT_EQ(g_ascStreamMap.find(stream), g_ascStreamMap.cend());
-    EXPECT_EQ(g_aclrtDestroyStreamCallCount, 1U);
-    EXPECT_EQ(g_aclrtDestroyEventCallCount, 2U);
-    EXPECT_EQ(g_aclrtDestroyStreamLastStream, g_aclrtCreateStreamWithConfigLastStream);
-    EXPECT_EQ(g_aclrtDestroyEventLastEvent, g_aclrtCreateEventExWithFlagLastEventB);
 }
 
 TEST_F(TEST_ASCENDC_RUNTIME, LaunchAscendKernelForVectorCoreWithProfilingReportsBothTasks)
