@@ -173,7 +173,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_custom_op_provider_runner_uses_locked_installer_in_run_step(self) -> None:
         script = render_runner_from_parts(
-            "01_simd_cpp_api/02_features/00_compilation/custom_op",
+            "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op",
             [Command(":", "build")],
             [Command(":", "run")],
             [],
@@ -183,11 +183,11 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertEqual(script.count("presmoke_ensure_custom_op_package"), 2)
 
     def test_dependency_and_tensorflow_skip_rules(self) -> None:
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_compilation/custom_op"))
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/01_invocation/aclnn_invocation"))
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin"))
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom"))
-        self.assertIn("TensorFlow 2.6.5", explicit_skip_reason("01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
+        self.assertIn("TensorFlow 2.6.5", explicit_skip_reason("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
 
     def test_matmul_fp8_is_950_only(self) -> None:
         self.assertEqual(
@@ -198,23 +198,23 @@ class GenerateCaseRunnersTest(unittest.TestCase):
     def test_custom_op_provider_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
         self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib"],
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib"],
             expected,
         )
         self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/00_compilation/custom_op"],
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"],
             expected,
         )
 
     def test_custom_op_dependent_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
         for rel_path in [
-            "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
-            "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
-            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
-            "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom",
-            "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
-            "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+            "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
+            "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
+            "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
+            "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
         ]:
             self.assertEqual(ARCH_OVERRIDES[rel_path], expected)
 
@@ -252,8 +252,8 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_skip_runner_clean_still_removes_build_directory(self) -> None:
         project_root = Path(__file__).resolve().parents[3]
-        runner = project_root / "scripts/presmoke/cases/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/run.sh"
-        build_dir = project_root / "examples/01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin/build_npu"
+        runner = project_root / "scripts/presmoke/cases/01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin/run.sh"
+        build_dir = project_root / "examples/01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin/build_npu"
 
         with tempfile.TemporaryDirectory(dir=project_root) as tmp:
             marker = build_dir / "presmoke_clean_marker"
@@ -286,7 +286,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            custom_op = root / "examples/01_simd_cpp_api/02_features/00_compilation/custom_op"
+            custom_op = root / "examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
             state = root / ".presmoke_state"
             custom_op.mkdir(parents=True)
             state.mkdir()

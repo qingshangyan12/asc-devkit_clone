@@ -185,7 +185,7 @@ presmoke_ensure_custom_op_package() {
 _presmoke_ensure_custom_op_package_locked() {
     local root custom_case_dir build_dir state_dir stamp arch mode package
     root="$(presmoke_project_root)"
-    custom_case_dir="$root/examples/01_simd_cpp_api/02_features/00_compilation/custom_op"
+    custom_case_dir="$root/examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
     if [[ ! -d "$custom_case_dir" ]]; then
         echo "custom_op case directory not found: $custom_case_dir" >&2
         return 2
