@@ -21,7 +21,7 @@
 #ifndef LIB_CUBE_GROUP_INTF_H
 #define LIB_CUBE_GROUP_INTF_H
 
-#include "kernel_operator.h"
+#include "include/kernel_operator.h"
 namespace AscendC {
 typedef void CubeResGroupDeprecatedHeader;
 using LibCubeResGroupInterface = CubeResGroupDeprecatedHeader;
