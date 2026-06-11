@@ -21,24 +21,9 @@
 #include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_none_impl.h"
 #include "instr_impl/npu_arch_2201/atomic_impl/asc_get_store_atomic_config_impl.h"
 #include "instr_impl/npu_arch_2201/atomic_impl/asc_set_store_atomic_config_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_bfloat_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_float_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_float16_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_int_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_int8_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_int16_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_bfloat_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_float_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_float16_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_int_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_int8_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_int16_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_bfloat_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_float_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_float16_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_int_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_int8_impl.h"
-#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_int16_impl.h"
+#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_add_impl.h"
+#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_max_impl.h"
+#include "instr_impl/npu_arch_2201/atomic_impl/asc_set_atomic_min_impl.h"
 
 __aicore__ inline void asc_set_atomic_none()
 {
@@ -48,6 +33,11 @@ __aicore__ inline void asc_set_atomic_none()
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config)
 {
     asc_get_store_atomic_config_impl(config);
+}
+
+__aicore__ inline void asc_set_store_atomic_config(uint16_t type, uint16_t op)
+{
+    asc_set_store_atomic_config_v1_impl(type, op);
 }
 
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
@@ -143,6 +133,18 @@ __aicore__ inline void asc_set_atomic_min_int8()
 __aicore__ inline void asc_set_atomic_min_int16()
 {
     asc_set_atomic_min_int16_impl();
+}
+
+/*
+ * @ingroup AtomicOperations
+ * @brief Architecture-specific atomic configuration functions (deprecated)
+ * @details These functions are deprecated and will be moved to lower-level implementation files.
+ *          Users should use the unified asc_set_store_atomic_config() function instead.
+ * @deprecated Use asc_set_store_atomic_config() for all architectures
+ */
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
+{
+    asc_set_store_atomic_config_v1_impl(type, op);
 }
 
 #endif
