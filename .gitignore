@@ -22,3 +22,4 @@ build_device/
 .agent/skills/gitcode-pipeline
 .claude/
 .opencode/
+docs/vitepress/docs/.vitepress/theme/outline-index.json
