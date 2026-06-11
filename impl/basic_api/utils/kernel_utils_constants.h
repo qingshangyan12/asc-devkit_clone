@@ -546,15 +546,15 @@ struct IntegerSubType {
 
     static Storage const mask = Storage(((static_cast<uint64_t>(1)) << static_cast<uint32_t>(kBits)) - 1);
     Storage storage;
-    __aicore__ inline IntegerSubType() = default;
+    __asc_aicore__ inline IntegerSubType() = default;
 
-    __aicore__ inline IntegerSubType(uint32_t value)
+    __asc_aicore__ inline IntegerSubType(uint32_t value)
         : storage(reinterpret_cast<Storage const &>(value) & mask) {}
 
-    __aicore__ inline IntegerSubType(int32_t value)
+    __asc_aicore__ inline IntegerSubType(int32_t value)
         : storage(reinterpret_cast<Storage const &>(value) & mask) {}
 
-    __aicore__ inline operator T() const
+    __asc_aicore__ inline operator T() const
     {
         if (kSigned && ((storage & Storage(static_cast<uint64_t>(1) << static_cast<uint32_t>(kBits - 1))) != 0)) {
             // Sign extend
@@ -563,17 +563,17 @@ struct IntegerSubType {
         return T(storage);
     }
 
-    __aicore__ inline bool operator == (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator == (IntegerSubType const &rhs) const
     {
         return storage == rhs.storage;
     }
 
-    __aicore__ inline bool operator != (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator != (IntegerSubType const &rhs) const
     {
         return storage != rhs.storage;
     }
 
-    __aicore__ inline bool operator > (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator > (IntegerSubType const &rhs) const
     {
         bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
         bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
@@ -583,7 +583,7 @@ struct IntegerSubType {
         return this->storage > rhs.storage;
     }
 
-    __aicore__ inline bool operator >= (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator >= (IntegerSubType const &rhs) const
     {
         bool lhsIsNeg = (this->storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(this->kBits - 1)));
         bool rhsIsNeg = (rhs.storage & (static_cast<uint64_t>(1) << static_cast<uint32_t>(rhs.kBits - 1)));
@@ -593,12 +593,12 @@ struct IntegerSubType {
         return storage >= rhs.storage;
     }
 
-    __aicore__ inline bool operator < (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator < (IntegerSubType const &rhs) const
     {
         return !(*this >= rhs);
     }
 
-    __aicore__ inline bool operator <= (IntegerSubType const &rhs) const
+    __asc_aicore__ inline bool operator <= (IntegerSubType const &rhs) const
     {
         return !(*this > rhs);
     }

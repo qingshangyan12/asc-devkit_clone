@@ -62,6 +62,14 @@ using float8_e8m0_t = fp8_e8m0_t;
 #define SPLIT_CORE_VEC
 #endif
 
+#ifndef __asc_aicore__
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#define __asc_aicore__ __callee__
+#else
+#define __asc_aicore__ __aicore__
+#endif
+#endif // __asc_aicore__
+
 #if defined(ASCENDC_CPU_DEBUG)
 extern int32_t g_coreType;
 #define ASCEND_IS_AIV (g_coreType == AscendC::AIV)
