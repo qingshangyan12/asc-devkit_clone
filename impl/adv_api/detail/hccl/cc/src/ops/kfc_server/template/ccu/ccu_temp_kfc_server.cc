@@ -16,6 +16,27 @@
 #include "ccu_launch_dl.h"
 
 namespace mc2_ops_hccl {
+// 从源 CcuKernelInfo 继承属性到 KfcServer 的 CcuKernelInfo
+void InheritKfcServerKernelArg(const CcuKernelInfo &srcKernel, CcuKernelInfo &dstKernel)
+{
+    std::string srcName(srcKernel.kernelFuncName);
+    auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
+
+    if (srcName == "CcuKernelAlltoAllMesh1D") {
+        auto *srcArg = static_cast<CcuKernelArgAlltoAllMesh1D*>(srcKernel.kernelArg);
+        kfcArg->rankSize = srcArg->rankSize;
+        kfcArg->rankId = srcArg->rankId;
+        kfcArg->loadFromMem = srcArg->loadFromMem;
+        kfcArg->opParam = srcArg->opParam;
+        kfcArg->subCommRanks = srcArg->subCommRanks;
+    } else {
+        HCCL_WARNING("[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
+    }
+
+    dstKernel.setKernelArg(kfcArg);
+    // 继承源 kernelInfo 的 channels（由 CalcChannelRequestMesh1D 在 CalcRes 中赋值）
+    dstKernel.channels = srcKernel.channels;
+}
 
 CcuTempKfcServer::CcuTempKfcServer(const OpParam& param, const u32 rankId,
                                    const std::vector<std::vector<u32>> &subCommRanks)
