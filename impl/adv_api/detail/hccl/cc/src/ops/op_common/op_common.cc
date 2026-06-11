@@ -1292,6 +1292,7 @@ HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
             HCCL_INFO("[HcclGetCcuKernel] kernel[%u][%s] registered successfully, handle[%llu]", i, kernelInfo.kernelFuncName, kernelHandle);
         }
         CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
+        HCCL_INFO("[HcclGetCcuKernel] HcommCcuKernelRegisterEnd finished!");
         if (regEndRet != CCU_SUCCESS) {
             HCCL_ERROR("ccu kernel register end failed: ccuRet -> %d", regEndRet);
             return ConvertCcuToHccl(regEndRet);

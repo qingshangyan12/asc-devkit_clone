@@ -507,7 +507,7 @@ static HcclResult AcquireAlgResources(HcclComm comm, OpParam &opParam,
         CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
         opParam.resCtx = *resCtxOut;
     }
-    
+    HCCL_INFO("[AcquireAlgResources]end AcquireAlgResources!");
     return HCCL_SUCCESS;
 }
 

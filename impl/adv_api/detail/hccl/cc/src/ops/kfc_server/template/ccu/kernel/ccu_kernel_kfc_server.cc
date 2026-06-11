@@ -65,13 +65,13 @@ static CcuResult LoadArgs(KfcServerContext &ctx)
 {
     uint32_t argId = 0;
 
+    // 顺序需与 kfcServerArgs 中的字段顺序一致：xnAddr, ckeAddr, dieNum, missionNum, missionIndex, token
     CCU_CHK_RET(ccu::LoadArg(ctx.xnAddr, argId++));
     CCU_CHK_RET(ccu::LoadArg(ctx.ckeAddr, argId++));
-    CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
     CCU_CHK_RET(ccu::LoadArg(ctx.dieNum, argId++));
-
     CCU_CHK_RET(ccu::LoadArg(ctx.missionNum, argId++));
     CCU_CHK_RET(ccu::LoadArg(ctx.missionIndex, argId++));
+    CCU_CHK_RET(ccu::LoadArg(ctx.token, argId++));
 
     return CCU_SUCCESS;
 }

@@ -244,7 +244,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     }
     aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, aclrtMemcpyKind(1));
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
-
+    HCCL_INFO("[AllocComResourceByTilingCcu]end AllocComResourceByTilingCcu!");
     return HCCL_SUCCESS;
 }
 
