@@ -8,11 +8,13 @@
 
 ## 功能说明
 
-头文件路径为：`"tensor_api/tensor.h"`。
+头文件为：`#include "tensor_api/tensor.h"`
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L0C Buffer中的矩阵计算结果搬运到Unified Buffer。L0C Buffer中的数据通常为`Mmad`的输出，数据格式为`NZ`。搬运到Unified Buffer时，接口会根据目的张量格式自动选择`NZ`到`ND`、`NZ`到`DN`或`NZ`到`NZ`的随路格式转换。
 
 L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16_t的直接转换输出，以及配合标量或张量量化参数的随路量化输出。随路Relu、双目的模式和舍入方式通过`CopyL0C2UBTrait`配置；`Mmad`与`Fixpipe`细粒度并行相关的`unitFlag`通过`FixpipeParams`配置。
+
+接口支持batch模式。batch模式用于一次描述多个形状相同的矩阵计算结果，Layout在原矩阵Layout最外层增加Batch维度。源张量可通过`MakeFrameLayout<NZLayoutPtn>(batch, m, n)`构造，目的张量可通过`MakeFrameLayout<NDExtLayoutPtn>(batch, m, n)`、`MakeFrameLayout<DNExtLayoutPtn>(batch, m, n)`或`MakeFrameLayout<NZLayoutPtn>(batch, m, n)`构造。
 
 随路量化、随路Relu、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径如下图所示。图中的F32到F16、F32到BF16为非量化模式，仅进行cast；其余路径为不量化、随路scalar或tensor量化模式。针对Ascend 950PR/Ascend 950DT，还支持NZ2DN随路格式转换。
 
@@ -59,8 +61,8 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16
 |参数名|输入/输出|描述|
 |--------|--------|--------|
 |atomCopy|输入|搬运原子对象，可由`MakeCopy(CopyL0C2UB{})`或`MakeCopy(CopyL0C2UB{}, CopyL0C2UBTraitDefault{})`构造。|
-|dst|输出|目的张量，存储位置为`Location::UB`。数据格式支持`ND`、`DN`和`NZ`。|
-|src|输入|源张量，存储位置为`Location::L0C`，数据格式为`NZ`，通常为`Mmad`的计算结果。|
+|dst|输出|目的张量，存储位置为`Location::UB`。数据格式支持`ND`、`DN`和`NZ`；batch模式下支持在最外层增加Batch维度。|
+|src|输入|源张量，存储位置为`Location::L0C`，数据格式为`NZ`，通常为`Mmad`的计算结果；batch模式下支持在最外层增加Batch维度。|
 |quant|输入|可选量化参数。传入`uint64_t`时表示scalar量化参数；传入张量时表示tensor量化参数，张量位于L1 Buffer，元素类型为`uint64_t`。|
 |fixpipeParams|输入|可选搬运参数，类型为`FixpipeParams`，通过`atomCopy`的`with`接口绑定到搬运原子对象，未绑定时使用默认值。|
 
@@ -149,7 +151,9 @@ L0C Buffer到Unified Buffer搬运根据是否传入量化参数自动选择量�
 ## 约束说明
 
 - 源矩阵`NZ`格式，地址要求64字节对齐。目的矩阵地址要求32字节对齐。
-- 目的矩阵为NZ输出时，通常要求N方向大小为16的倍数。
+- 目的矩阵为`NZ`输出时，目的张量内存需要按照N方向16对齐后的物理容量申请。
+- batch模式要求源张量和目的张量均带Batch维度，且去掉Batch维度后的单个矩阵Layout需要满足当前通路支持的格式组合。接口按照源张量的Batch数量搬运；若目的张量需要写入更多Batch空间，用户需要在外层循环中对目的张量进行Slice后多次调用`Copy`。
+- batch模式下，源张量和目的张量去掉Batch维度后的单个矩阵Shape需要保持一致；`NZ`输出场景按`ceil(m, 16) * ceil(n, 16)`计算单个Batch的物理容量。
 - tensor量化参数张量应位于L1 Buffer，元素类型为`uint64_t`，地址要求32字节对齐。详细约束参见[随路量化](quant_pre.md)。
 - 使能`unitFlag`时，需要配合`Mmad`同时使能。
 - 使用`RoundMode::HYBRID`时，源类型必须为`float`，目的类型必须为`hifloat8_t`。
@@ -159,6 +163,12 @@ L0C Buffer到Unified Buffer搬运根据是否传入量化参数自动选择量�
 ## 关键特性
 
 L0C Buffer到Unified Buffer搬运涉及[随路量化](quant_pre.md)、[随路Relu](relu_pre.md)、[Int8/Int4 Channel Merge](int8_int4_channel_merge.md)、[L0C Buffer到Unified Buffer双目标模式](l0c_to_ub_dual_dst.md)等关键特性。
+
+### batch搬运
+
+batch模式在矩阵最外层增加Batch维度，适用于一次搬运多个形状相同的`Mmad`结果。源张量为`NZ`格式，目的张量支持`ND`、`DN`或`NZ`格式。用户只需要在构造Layout时传入Batch参数，`Copy`调用形式与非batch模式保持一致。
+
+batch `NZ`到`ND`或`DN`搬运时，接口根据Batch维度和Batch stride完成多矩阵搬运；batch `NZ`到`NZ`搬运时，接口按`NZ`物理排布搬运多个Batch的连续数据。使用tensor量化参数时，量化参数仍按单个矩阵N方向描述。
 
 ## 调用示例
 
@@ -213,5 +223,29 @@ __aicore__ inline void CopyL0CToUB()
 
     auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
     Copy(atom, ub, l0c, quant);
+}
+```
+
+### batch模式输出
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyBatchL0CToUB()
+{
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t m = 32;
+    constexpr uint32_t n = 64;
+
+    __cc__ float l0cBuf[batch * m * n];
+    __ubuf__ half ubBuf[batch * m * n];
+
+    auto l0c = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn>(batch, m, n));
+    auto ub = MakeTensor(MakeMemPtr(ubBuf), MakeFrameLayout<NDExtLayoutPtn>(batch, m, n));
+
+    auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
+    Copy(atom, ub, l0c);
 }
 ```
