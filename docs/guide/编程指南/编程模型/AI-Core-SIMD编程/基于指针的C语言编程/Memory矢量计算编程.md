@@ -189,7 +189,7 @@ asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_st
 Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeat_time参数被忽略，系统根据元素数量自动计算迭代次数。
 例如计算200个half类型元素时，受Unified Buffer的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
 
-<img src="image-4.png" alt="Count模式计算" width="400" />
+<img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="400" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -217,7 +217,7 @@ asc_set_mask_normal();
 
 该模式下，可以指定单次迭代内计算前n个连续元素，其他数据不参与计算。例如：对src数据(shape(256)，数据类型为half)，该数据需通过2次迭代计算完（每次迭代计算128个元素），可通过设置mask = 100，表示第1次迭代计算[0, 99]范围的元素，第2次迭代计算[128, 227]范围的元素参与计算，其他元素不参与计算。
 
-<img src="image-5.png" alt="单次迭代内连续计算" width="400" />
+<img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="400" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -239,7 +239,7 @@ asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
 该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。
 以src数据(shape(256)，数据类型为half)为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：
 
-<img src="image-6.png" alt="单次迭代内逐bit计算" width="400" />
+<img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="400" />
 
 ```c
 __ubuf__ half dst_ub[256];

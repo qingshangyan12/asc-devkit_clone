@@ -78,11 +78,11 @@ extern __ubuf__ char dynamic_buffer[];
 
 为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。以Ascend 950PR/Ascend 950DT产品为例，Unified Buffer总大小为256K，包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。
 
-<img src="image.png" alt="UB Bank冲突示意图" width="800" />
+<img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
 该架构地址使用低位编址, 地址排布如下图所示, 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 
-![低位交织地址排布](image-1.png)
+![低位交织地址排布](../../../../figures/低位交织地址排布.png)
 
 每个bank一拍只能完成一读或者一写，每个bank group最多只允许2读0写或者1读1写。根据内存结构，bank冲突主要可以分为以下三种类型：
 - 读写冲突：读操作和写操作同时尝试访问同一个bank，或者两个读操作和一个写操作同时尝试访问同一个bank group。
@@ -130,7 +130,7 @@ __ubuf__ float x[4096];
 __ubuf__ float y[4096];
 __ubuf__ float z[4096];
 ```
-<img src="image-2.png" alt="地址优化前内存排布" width="500" />
+<img src="../../../../figures/地址优化前内存排布.png" alt="地址优化前内存排布" width="500" />
 
 通过优化地址，使用数组分配内存时适当扩大内存申请，各个操作数据的地址分别为：
 - x：起始地址0x00000，x长度为4096 * sizeof(float) 字节
@@ -143,7 +143,7 @@ __ubuf__ float y[(8 * 16 * 1024 - (4096 * sizeof(float))) / sizeof(float)];
 __ubuf__ float z[4096];
 ```
 
-<img src="image-3.png" alt="地址优化后内存排布" width="500" />
+<img src="../../../../figures/地址优化后内存排布.png" alt="地址优化后内存排布" width="500" />
 
 #### 2.4.2 L1 Buffer & L0 Buffer
 
