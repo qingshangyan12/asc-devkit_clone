@@ -98,7 +98,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### 中级性能优化
 
-本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。以下重点说明CV融合的实现机制。
+本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。
 
 #### Matmul优化手段
 
@@ -115,7 +115,41 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 |------|---------|------|
 | [Case 1](../../02_reg_compute/gelu_high_performance/README.md#case-1-启用regbase-api和vf融合能力) | RegBase API + VF融合 | 寄存器级计算减少中间Load/Store，利用双发特性提升IPC |
 
-### 核心特性
+#### GELU计算实现
+
+**A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
+
+```cpp
+__aicore__ inline void GeluMemBaseCompute(
+    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
+{
+    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
+    AscendC::PipeBarrier<PIPE_V>();
+    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
+    ……
+}
+```
+
+**Ascend 950PR架构**：使用RegBase方式（VF函数），中间计算在寄存器内完成，无需额外UB缓冲区，减少数据在UB和Reg之间的交互：
+
+```cpp
+__simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
+{
+    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+    AscendC::Reg::MaskReg mask;
+    AscendC::Reg::RegTensor<float> xReg, yReg;
+
+    for (uint16_t i = 0; i < loopNum; ++i) {
+        mask = AscendC::Reg::UpdateMask<float>(n);
+        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
+        ……
+        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+    }
+}
+```
+
+GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
 
 以下重点说明AIC↔AIV的CV融合机制。
 
@@ -159,43 +193,7 @@ AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 ```
 
-#### 3. GELU计算实现
-
-**A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
-
-```cpp
-__aicore__ inline void GeluMemBaseCompute(
-    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
-    AscendC::PipeBarrier<PIPE_V>();
-    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
-    ……
-}
-```
-
-**Ascend 950PR架构**：使用RegBase方式（VF函数），中间计算在寄存器内完成，无需额外UB缓冲区，减少数据在UB和Reg之间的交互：
-
-```cpp
-__simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
-        ……
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
-}
-```
-
-GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
-
-#### 4. `__mix__(1,2)` 模式下的多核切分
+#### 3. `__mix__(1,2)` 模式下的多核切分
 
 `__mix__(1,2)` 模式下，`GetBlockIdx()` 在AIC侧和AIV侧各自独立编号：AIC侧返回0~numAICores-1，AIV侧返回0~numAIVCores-1。由于每个逻辑核对应2个AIV，AIV侧需要将 `GetBlockIdx() / 2` 映射回逻辑核ID，从而与AIC侧使用相同的多核切分策略：
 
@@ -211,6 +209,9 @@ uint32_t nIterIdx = logicCoreId / mIter;
 ```
 
 ### 高阶极限打磨
+
+在高阶极限打磨阶段，CV融合层面提供两种数据通路：Scenario 1通过GM中转实现CV融合（所有架构支持），Scenario 2通过Fixpipe直通UB实现CV融合（仅Ascend 950PR支持），省去GM中转的读写开销。
+Matmul和Gelu相关高阶极限打磨手段请参考下方列表。
 
 #### Matmul优化手段
 
