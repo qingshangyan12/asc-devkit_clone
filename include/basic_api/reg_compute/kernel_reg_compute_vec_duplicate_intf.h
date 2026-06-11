@@ -44,11 +44,10 @@ __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& 
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_duplicate_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_DUPLICATE_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_DUPLICATE_INTF_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_DUPLICATE_INTF_H__
 #endif
-
