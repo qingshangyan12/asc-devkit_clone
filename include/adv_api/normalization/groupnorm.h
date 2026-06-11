@@ -21,7 +21,7 @@
 
 #ifndef LIB_NORMALIZATION_GROUPNORM_H
 #define LIB_NORMALIZATION_GROUPNORM_H
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002)
 #include "../../../impl/adv_api/detail/normalization/groupnorm/groupnorm_common_impl.h"

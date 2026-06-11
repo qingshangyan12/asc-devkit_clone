@@ -21,7 +21,7 @@
 #ifndef LIB_MATH_LOGICAL_XOR_H
 #define LIB_MATH_LOGICAL_XOR_H
 
-#include "kernel_tensor.h"
+#include "../../basic_api/kernel_tensor.h"
 #include "include/adv_api/math/logical_xor_utils.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
