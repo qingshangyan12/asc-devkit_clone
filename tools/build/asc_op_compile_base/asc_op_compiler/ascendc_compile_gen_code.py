@@ -370,7 +370,10 @@ def _gen_compile_cmd(src_file: str, dst_file: str, compile_option_tuple, tiling_
     for opt in compile_option_tuple.mllvm_options:
         compile_cmd += [opt]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
-        compile_cmd += ["--cce-enable-sanitizer", "-g"]
+        if CommonUtility.is_c310():
+            compile_cmd += ["-g"]
+        else:
+            compile_cmd += ["--cce-enable-sanitizer", "-g"]
         compile_cmd += ["-mllvm", "-cce-aicore-long-call", "-mllvm", "-cce-aicore-jump-expand=true"]
     if with_tiling_file:
         compile_cmd += ["-include", tiling_file]

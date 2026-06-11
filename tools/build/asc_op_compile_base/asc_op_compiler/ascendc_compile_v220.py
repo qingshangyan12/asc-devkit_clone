@@ -57,7 +57,7 @@ def _gen_compile_cmd_c310(src_file: str, dst_file: str, compile_option_tuple, su
                     "-mllvm", "-cce-aicore-dcci-insert-for-scalar=false"
                     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
-        compile_cmd += ["--cce-enable-sanitizer", "-g"]
+        compile_cmd += ["-g"]
         compile_cmd += ["-mllvm", "-cce-aicore-long-call", "-mllvm", "-cce-aicore-jump-expand=true"]
 
     for opt in compile_option_tuple.mllvm_options:
