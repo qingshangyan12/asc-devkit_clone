@@ -287,7 +287,7 @@ uint32_t LaunchAscendKernel(void *handle, const uint64_t key, const uint32_t num
 {
     aclrtFuncHandle funcHandle;
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtBinaryGetFunctionByEntry(handle, key, &funcHandle));
-    return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, args, size,
+    return aclrtLaunchKernelWithHostArgs(funcHandle, numBlocks, stream, nullptr, static_cast<void *>(args), size,
         nullptr, 0);
 }
 
@@ -522,7 +522,7 @@ static uint32_t AscendCExecutorLaunchKernel(void* binHandle, const uint64_t tili
     aclrtLaunchKernelCfg cfg = {attrList, attrLen};
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtLaunchKernelWithHostArgs(
         funcHandle, numBlocks, stream, &cfg,
-        args, size, nullptr, 0));
+        static_cast<void *>(args), size, nullptr, 0));
     return ASCENDC_SUCCESS;
 }
 
@@ -544,7 +544,7 @@ static uint32_t AscendCExecutorVectorCoreLaunchKernel(void* binHandle, const uin
     aclrtLaunchKernelCfg cfg = {attrList, attrLen};
     ASCENDC_ASSERT_RTOK_RETVAL(aclrtLaunchKernelWithHostArgs(
         funcHandle, numBlocks, stream, &cfg,
-        args, size, nullptr, 0));
+        static_cast<void *>(args), size, nullptr, 0));
     return ASCENDC_SUCCESS;
 }
 
