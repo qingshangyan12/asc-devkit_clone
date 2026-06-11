@@ -99,4 +99,49 @@
 
 ## 调用示例<a name="section177231425115410"></a>
 
-无
+以下示例展示[图1](#fig9329040132719)所示的场景：数据类型为half，单个DataBlock（32字节）含16个half元素，将UB中的ND格式数据经GM中转后，以NZ格式搬入L1 Buffer。
+
+```cpp
+constexpr uint32_t dataBlockElemCount = 16;
+constexpr uint32_t srcElemCount = (3 * 7) * dataBlockElemCount;
+constexpr uint32_t dstElemCount = (7 * 6) * dataBlockElemCount;
+constexpr uint32_t tscmAddr = 0;
+
+// 源操作数：UB。
+AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECIN, ubAddr, srcElemCount);
+
+// 目的操作数：L1 Buffer。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::TSCM, tscmAddr, dstElemCount);
+
+AscendC::DataCopyExtParams copyParams;
+// VECIN->GM阶段搬运3个连续传输数据块。
+copyParams.blockCount = 3;
+// 每个连续传输数据块包含6个DataBlock。
+copyParams.blockLen = 6 * 32;
+// 源操作数在UB，单位为DataBlock；相邻行之间跳过1个DataBlock。
+copyParams.srcStride = 1;
+// 中转目的端为GM，单位为字节；相邻行之间保留2个空白DataBlock，即64B。
+copyParams.dstStride = 64;
+// 保留字段，固定填0。
+copyParams.rsv = 0;
+
+AscendC::Nd2NzParams nd2nzParams;
+// 本接口约束ndNum仅支持设置为1。
+nd2nzParams.ndNum = 1;
+// ND矩阵高度为3行。
+nd2nzParams.nValue = 3;
+// 每行宽度为6个DataBlock。
+nd2nzParams.dValue = 6 * dataBlockElemCount;
+// 仅1个ND矩阵，不涉及相邻ND矩阵间隔。
+nd2nzParams.srcNdMatrixStride = 0;
+// GM中相邻行起始地址间隔为8个DataBlock。
+nd2nzParams.srcDValue = 8 * dataBlockElemCount;
+// 目的NZ中同一源行的相邻DataBlock间隔为7个DataBlock。
+nd2nzParams.dstNzC0Stride = 7;
+// 目的NZ中相邻源行转换后的起始地址间隔为2个DataBlock。
+nd2nzParams.dstNzNStride = 2;
+// 仅1个NZ矩阵。
+nd2nzParams.dstNzMatrixStride = 1;
+
+AscendC::DataCopyPad(dstLocal, srcLocal, copyParams, nd2nzParams);
+```
