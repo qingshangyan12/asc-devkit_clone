@@ -17,8 +17,10 @@
 #include "hcomm_primitives.h"
 #include "dfx/task_exception_fun.h"
 #include "kernel_launch.h"
+#include "hcomm_primitives_dl.h"
 #include "hcomm_diag_dl.h"
 #include "hcomm_device_profiling_dl.h"
+#include "exec_timeout_manager.h"
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
@@ -316,9 +318,15 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
                 maxNotifyNum = resCtx.notifyNumPerThread[i];
             }
         }
+        if (HcommIsSupportHcommThreadResAcquireTimeOut()) {
+            CHK_RET(HcclThreadResAcquireTimeOut(resCtx.fullTimeout));
+        }
+        if (HcommIsSupportHcommSetNotifyWaitTimeOut()) {
+            CHK_RET(HcclSetNotifyWaitTimeOut(resCtx.waitTimeout));
+        }
         HCCL_DEBUG("[%s]Notify wait on thread[%llu], maxNotifyNum[%u], timeout[%u]", __func__, thread,
-            maxNotifyNum, CUSTOM_TIMEOUT);
-        CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
+            maxNotifyNum, resCtx.waitTimeout);
+        CHK_RET(HcclThreadNotifyWaitOnThreadDefault(thread, maxNotifyNum, resCtx.waitTimeout));
 
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
         if (executor.get() == nullptr) {
@@ -326,6 +334,8 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             return 1;
         }
 
+        // 设置执行超时时间
+        ExecTimeoutManager::Instance().SetExecTimeout(param->opConfig.execTimeout);
         // 执行算法编排
         if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
             HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
