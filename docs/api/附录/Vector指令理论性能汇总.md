@@ -150,7 +150,7 @@
 | GatherMask | int16_t | uint16_t | int16_t | 64 |
 | GatherMask | float | uint32_t | float | 32 |
 | GatherMask | uint32_t | uint32_t | uint32_t | 32 |
-| GatherMask | int32_t | uint16_t | int32_t | 32 |
+| GatherMask | int32_t | uint32_t | int32_t | 32 |
 
 **表 5**  类型转换类指令理论性能汇总
 

@@ -148,7 +148,7 @@
 | DataSyncBarrier | PIPE_S |
 | CrossCoreSetFlag | PIPE_S |
 | CrossCoreWaitFlag | PIPE_S |
-| SyncAll | PIPE_S |
+| SyncAll（硬件同步接口） | PIPE_S |
 | SetNextTaskStart | PIPE_S |
 | WaitPreTaskEnd | PIPE_S |
 
