@@ -26,10 +26,18 @@ project(kernel_samples LANGUAGES ASC CXX)
 #   5 - ReduceRepeat<SUM>非对齐场景：对每行非对齐数据求和，输入float类型[13, 57]，输出[1, 13]
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-5)")
 
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+if(NOT SCENARIO_NUM MATCHES "^[1-5]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1,2,3,4,5, got: ${SCENARIO_NUM}")
+endif()
 
 add_executable(demo
     reduce_repeat.asc
+)
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
 
 target_compile_options(demo PRIVATE

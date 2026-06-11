@@ -24,10 +24,18 @@ project(kernel_samples LANGUAGES ASC CXX)
 #   3 - ReduceDataBlock<SUM, float>：每个datablock内求和，输入[1, 128]，输出[1, 16]
 set(SCENARIO_NUM "1" CACHE STRING "Scene number (1-3)")
 
-add_definitions(-DSCENARIO_NUM=${SCENARIO_NUM})
+message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")
+
+if(NOT SCENARIO_NUM MATCHES "^[1-3]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1,2,3, got: ${SCENARIO_NUM}")
+endif()
 
 add_executable(demo
     reduce_data_block.asc
+)
+
+target_compile_definitions(demo PRIVATE
+    SCENARIO_NUM=${SCENARIO_NUM}
 )
 
 target_compile_options(demo PRIVATE
