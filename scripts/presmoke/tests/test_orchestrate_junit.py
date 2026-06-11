@@ -79,7 +79,7 @@ class OrchestrateJunitTest(unittest.TestCase):
                                 "steps": [{"kind": "build", "command": "bash run.sh build", "rc": 2, "duration_s": 2.5}],
                             },
                             {
-                                "example": "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin",
+                                "example": "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
                                 "arch": "dav-3510",
                                 "mode": "npu",
                                 "status": "SKIP",
