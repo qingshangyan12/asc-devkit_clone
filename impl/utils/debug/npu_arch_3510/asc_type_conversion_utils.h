@@ -373,12 +373,12 @@ __aicore__ constexpr inline float cast_type(const T& bVal)
         uiNum = get_scalar_bitcode_value<hifloat8_t, uint8_t>(bVal);
         result = __fp_conv::hif8_to_fp32(uiNum);
         return get_scalar_bitcode_value<uint32_t, float>(result);
-    } else if constexpr (std::is_same<T, float8_e5m2_t>::value) {
-        uiNum = get_scalar_bitcode_value<float8_e5m2_t, uint8_t>(bVal);
+    } else if constexpr (std::is_same<T, fp8_e5m2_t>::value) {
+        uiNum = get_scalar_bitcode_value<fp8_e5m2_t, uint8_t>(bVal);
         result  = __fp_conv::fp8e5m2_to_fp32(uiNum);
         return get_scalar_bitcode_value<uint32_t, float>(result);
-    } else if constexpr (std::is_same<T, float8_e4m3_t>::value) {
-        uiNum = get_scalar_bitcode_value<float8_e4m3_t, uint8_t>(bVal);
+    } else if constexpr (std::is_same<T, fp8_e4m3fn_t>::value) {
+        uiNum = get_scalar_bitcode_value<fp8_e4m3fn_t, uint8_t>(bVal);
         result = __fp_conv::fp8e4m3_to_fp32(uiNum);
         return get_scalar_bitcode_value<uint32_t, float>(result);
     } else if constexpr (std::is_same<T, float4_e1m2x2_t>::value) {

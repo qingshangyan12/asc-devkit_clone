@@ -98,7 +98,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ hifloat8_t* dst,
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst);
+        __ubuf__ fp8_e4m3fn_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst);
         vstas(src, dst_tmp, offset);
     }
 }
@@ -106,7 +106,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* ds
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src, int32_t offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst);
+        __ubuf__ fp8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst);
         vstas(src, dst_tmp, offset);
     }
 }
@@ -216,7 +216,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ bfloat16_t* dst,
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst);
+        __ubuf__ fp8_e4m3fn_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst);
         vstar(src, dst_tmp);
     }
 }
@@ -224,7 +224,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* ds
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst);
+        __ubuf__ fp8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst);
         vstar(src, dst_tmp);
     }
 }
@@ -341,7 +341,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ hifloat8_t* dst,
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* dst, vector_store_unalign src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst);
+        __ubuf__ fp8_e4m3fn_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst);
         vsta(src, dst_tmp, offset);
     }
 }
@@ -349,7 +349,7 @@ __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e4m3fn_t* ds
 __simd_callee__ inline void asc_storeunalign_post_impl(__ubuf__ fp8_e5m2_t* dst, vector_store_unalign src, iter_reg offset)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst);
+        __ubuf__ fp8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst);
         vsta(src, dst_tmp, offset);
     }
 }

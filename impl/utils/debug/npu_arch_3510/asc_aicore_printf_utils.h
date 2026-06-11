@@ -33,7 +33,7 @@ __aicore__ inline void set_scalar_param_impl(__gm__ uint8_t* paramAddr, uint32_t
         *((__gm__ int64_t *)scalarAddr) = static_cast<int64_t>(scalar);
     } else if constexpr(std::is_unsigned<T>::value) {
         *((__gm__ uint64_t *)scalarAddr) = static_cast<uint64_t>(scalar);
-    } else if constexpr(is_same_in_list<T, bfloat16_t, float8_e5m2_t, float8_e8m0_t, float8_e4m3_t, hifloat8_t>()) {
+    } else if constexpr(is_same_in_list<T, bfloat16_t, fp8_e5m2_t, float8_e8m0_t, fp8_e4m3fn_t, hifloat8_t>()) {
         *((__gm__ float *)scalarAddr) = to_float(scalar);
     } else if constexpr(std::is_pointer<T>::value) {
         *((__gm__ uint64_t *)scalarAddr) = (uintptr_t)scalar;
@@ -60,7 +60,7 @@ __simd_callee__ inline void set_scalar_param_vf_impl(__ubuf__ uint8_t* param_add
         *((__ubuf__ int64_t *)scalar_addr) = static_cast<int64_t>(scalar);
     } else if constexpr(std::is_unsigned<T>::value) {
         *((__ubuf__ uint64_t *)scalar_addr) = static_cast<uint64_t>(scalar);
-    } else if constexpr(is_same_in_list<T, bfloat16_t, float8_e5m2_t, float8_e8m0_t, float8_e4m3_t, hifloat8_t>()) {
+    } else if constexpr(is_same_in_list<T, bfloat16_t, fp8_e5m2_t, float8_e8m0_t, fp8_e4m3fn_t, hifloat8_t>()) {
         *((__ubuf__ float *)scalar_addr) = to_float(scalar);
     } else if constexpr(std::is_pointer<T>::value) {
         *((__ubuf__ uint64_t *)scalar_addr) = (uintptr_t)scalar;

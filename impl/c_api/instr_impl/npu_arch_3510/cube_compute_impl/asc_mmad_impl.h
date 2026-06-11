@@ -44,8 +44,8 @@ __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ bfloat16_t* a,
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
-                                     __cb__ float8_e4m3_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
+                                     __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n,
                                      uint16_t k, uint8_t unit_flag, bool disable_gemv, bool enable_cube_init,
                                      bool enable_cube_zero_init)
 {
@@ -55,8 +55,8 @@ __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
     }
 }
 
-__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
-                                          __cb__ float8_e4m3_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
+                                          __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t unit_flag, bool disable_gemv,
                                           bool enable_cube_init, bool enable_cube_zero_init)
 {
@@ -65,8 +65,8 @@ __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e4m3_t*
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
-                                     __cb__ float8_e5m2_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
+                                     __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n,
                                      uint16_t k, uint8_t unit_flag, bool disable_gemv, bool enable_cube_init,
                                      bool enable_cube_zero_init)
 {
@@ -76,8 +76,8 @@ __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
     }
 }
 
-__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e4m3_t* a,
-                                          __cb__ float8_e5m2_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
+                                          __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t unit_flag, bool disable_gemv,
                                           bool enable_cube_init, bool enable_cube_zero_init)
 {
@@ -86,8 +86,8 @@ __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e4m3_t*
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
-                                     __cb__ float8_e4m3_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
+                                     __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n,
                                      uint16_t k, uint8_t unit_flag, bool disable_gemv, bool enable_cube_init,
                                      bool enable_cube_zero_init)
 {
@@ -97,8 +97,8 @@ __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
     }
 }
 
-__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
-                                          __cb__ float8_e4m3_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
+                                          __cb__ fp8_e4m3fn_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t unit_flag, bool disable_gemv,
                                           bool enable_cube_init, bool enable_cube_zero_init)
 {
@@ -107,8 +107,8 @@ __aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e5m2_t*
     asc_sync_post_process();
 }
 
-__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
-                                     __cb__ float8_e5m2_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
+                                     __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n,
                                      uint16_t k, uint8_t unit_flag, bool disable_gemv, bool enable_cube_init,
                                      bool enable_cube_zero_init)
 {
@@ -118,8 +118,8 @@ __aicore__ inline void asc_mmad_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
     }
 }
 
-__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ float8_e5m2_t* a,
-                                          __cb__ float8_e5m2_t* b, uint16_t m, uint16_t n,
+__aicore__ inline void asc_mmad_sync_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
+                                          __cb__ fp8_e5m2_t* b, uint16_t m, uint16_t n,
                                           uint16_t k, uint8_t unit_flag, bool disable_gemv,
                                           bool enable_cube_init, bool enable_cube_zero_init)
 {

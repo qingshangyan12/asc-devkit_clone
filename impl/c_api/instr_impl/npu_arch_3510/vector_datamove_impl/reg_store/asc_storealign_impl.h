@@ -103,7 +103,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e4m3fn_t* dst_alig
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, 0, NORM_B8, mask);
     }
 }
@@ -121,7 +121,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e5m2_t* dst_align3
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, 0, NORM_B8, mask);
     }
 }
@@ -239,7 +239,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  fp8_e4m3fn_t* dst_
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, 0, ONEPT_B8, mask);
     }
 }
@@ -257,7 +257,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  fp8_e5m2_t* dst_al
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, 0, ONEPT_B8, mask);
     }
 }
@@ -474,7 +474,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e4m3fn_t* ds
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src0, src1, dst_align32b_tmp, 0, INTLV_B8, mask);
     }
 }
@@ -495,7 +495,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e5m2_t* dst_
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src0, src1, dst_align32b_tmp, 0, INTLV_B8, mask);
     }
 }
@@ -618,7 +618,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e4m3fn_t* dst_align
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, offset, NORM_B8, mask);
     }
 }
@@ -636,7 +636,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e5m2_t* dst_align32
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, offset, NORM_B8, mask);
     }
 }
@@ -754,7 +754,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ fp8_e4m3fn_t* dst_a
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
     }
 }
@@ -772,7 +772,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__ fp8_e5m2_t* dst_ali
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
     }
 }
@@ -1000,7 +1000,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__ fp8_e4m3fn_t* dst
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsts(src0, src1, dst_align32b_tmp, offset, INTLV_B8, mask);
     }
 }
@@ -1010,7 +1010,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__ fp8_e5m2_t* dst_a
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsts(src0, src1, dst_align32b_tmp, offset, INTLV_B8, mask);
     }
 }
@@ -1386,7 +1386,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e4m3fn_t* dst_alig
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vst(src, dst_align32b_tmp, offset, NORM_B8, mask);
     }
 }
@@ -1395,7 +1395,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__  fp8_e5m2_t* dst_align3
     vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vst(src, dst_align32b_tmp, offset, NORM_B8, mask);
     }
 }
@@ -1522,7 +1522,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  fp8_e4m3fn_t* dst_
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vst(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
     }
 }
@@ -1531,7 +1531,7 @@ __simd_callee__ inline void asc_storealign_1st_impl(__ubuf__  fp8_e5m2_t* dst_al
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vst(src, dst_align32b_tmp, offset, ONEPT_B8, mask);
     }
 }
@@ -1759,7 +1759,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e4m3fn_t* ds
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vst(src0, src1, dst_align32b_tmp, offset, INTLV_B8, mask);
     }
 }
@@ -1769,7 +1769,7 @@ __simd_callee__ inline void asc_storealign_intlv_impl(__ubuf__  fp8_e5m2_t* dst_
 {
     if ASC_IS_AIV {
         vector_bool mask;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vst(src0, src1, dst_align32b_tmp, offset, INTLV_B8, mask);
     }
 }
@@ -1823,7 +1823,7 @@ union asc_store_align_config{
         };
 };
 
-// ==========asc_storealign_impl(int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/float8_e4m3_t/float8_e5m2_t/float8_e8m0_t/bfloat16_t/half/float)==========
+// ==========asc_storealign_impl(int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/fp8_e4m3fn_t/fp8_e5m2_t/float8_e8m0_t/bfloat16_t/half/float)==========
 __simd_callee__ inline void asc_storealign_impl(__ubuf__ int8_t* dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -1911,7 +1911,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e4m3fn_t* dst_align
         asc_store_align_config config;
         config.block_stride = block_stride;
         config.repeat_stride = repeat_stride;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsstb(src, dst_align32b_tmp, config.config, mask);
     }
 }
@@ -1922,7 +1922,7 @@ __simd_callee__ inline void asc_storealign_impl(__ubuf__ fp8_e5m2_t* dst_align32
         asc_store_align_config config;
         config.block_stride = block_stride;
         config.repeat_stride = repeat_stride;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsstb(src, dst_align32b_tmp, config.config, mask);
     }
 }
@@ -1966,7 +1966,7 @@ union asc_store_align_config_post{
         };
 };
 
-// ==========asc_storealign_postupdate_impl(int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/float8_e4m3_t/float8_e5m2_t/float8_e8m0_t/bfloat16_t/half/float)==========
+// ==========asc_storealign_postupdate_impl(int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/fp8_e4m3fn_t/fp8_e5m2_t/float8_e8m0_t/bfloat16_t/half/float)==========
 __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ int8_t* dst_align32b, vector_int8_t src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -2054,7 +2054,7 @@ __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ fp8_e4m3fn_t
         asc_store_align_config_post config;
         config.block_stride = block_stride;
         config.repeat_stride = repeat_stride;
-        __ubuf__ float8_e4m3_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst_align32b);
+        __ubuf__ fp8_e4m3fn_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst_align32b);
         vsstb(src, dst_align32b_tmp, config.config, mask, POST_UPDATE);
     }
 }
@@ -2065,7 +2065,7 @@ __simd_callee__ inline void asc_storealign_postupdate_impl(__ubuf__ fp8_e5m2_t* 
         asc_store_align_config_post config;
         config.block_stride = block_stride;
         config.repeat_stride = repeat_stride;
-        __ubuf__ float8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst_align32b);
+        __ubuf__ fp8_e5m2_t* dst_align32b_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst_align32b);
         vsstb(src, dst_align32b_tmp, config.config, mask, POST_UPDATE);
     }
 }

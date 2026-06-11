@@ -108,8 +108,8 @@ __aicore__ inline void asc_mmad_mx_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
     uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
-        __ca__ float8_e4m3_t* a_matrix_tmp = reinterpret_cast<__ca__ float8_e4m3_t*>(a);
-        __cb__ float8_e4m3_t* b_matrix_tmp = reinterpret_cast<__cb__ float8_e4m3_t*>(b);
+        __ca__ fp8_e4m3fn_t* a_matrix_tmp = reinterpret_cast<__ca__ fp8_e4m3fn_t*>(a);
+        __cb__ fp8_e4m3fn_t* b_matrix_tmp = reinterpret_cast<__cb__ fp8_e4m3fn_t*>(b);
         mad_mx(c, a_matrix_tmp, b_matrix_tmp, m, n, k,
             unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
     }
@@ -129,8 +129,8 @@ __aicore__ inline void asc_mmad_mx_impl(__cc__ float* c, __ca__ fp8_e4m3fn_t* a,
     uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
-        __ca__ float8_e4m3_t* a_matrix_tmp = reinterpret_cast<__ca__ float8_e4m3_t*>(a);
-        __cb__ float8_e5m2_t* b_matrix_tmp = reinterpret_cast<__cb__ float8_e5m2_t*>(b);
+        __ca__ fp8_e4m3fn_t* a_matrix_tmp = reinterpret_cast<__ca__ fp8_e4m3fn_t*>(a);
+        __cb__ fp8_e5m2_t* b_matrix_tmp = reinterpret_cast<__cb__ fp8_e5m2_t*>(b);
         mad_mx(c, a_matrix_tmp, b_matrix_tmp, m, n, k,
             unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
     }
@@ -150,8 +150,8 @@ __aicore__ inline void asc_mmad_mx_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
     uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
-        __ca__ float8_e5m2_t* a_matrix_tmp = reinterpret_cast<__ca__ float8_e5m2_t*>(a);
-        __cb__ float8_e4m3_t* b_matrix_tmp = reinterpret_cast<__cb__ float8_e4m3_t*>(b);
+        __ca__ fp8_e5m2_t* a_matrix_tmp = reinterpret_cast<__ca__ fp8_e5m2_t*>(a);
+        __cb__ fp8_e4m3fn_t* b_matrix_tmp = reinterpret_cast<__cb__ fp8_e4m3fn_t*>(b);
         mad_mx(c, a_matrix_tmp, b_matrix_tmp, m, n, k,
             unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
     }
@@ -171,8 +171,8 @@ __aicore__ inline void asc_mmad_mx_impl(__cc__ float* c, __ca__ fp8_e5m2_t* a,
     uint8_t unit_flag, bool disable_gemv, bool enable_cube_init, bool enable_cube_zero_init)
 {
     if ASC_IS_AIC {
-        __ca__ float8_e5m2_t* a_matrix_tmp = reinterpret_cast<__ca__ float8_e5m2_t*>(a);
-        __cb__ float8_e5m2_t* b_matrix_tmp = reinterpret_cast<__cb__ float8_e5m2_t*>(b);
+        __ca__ fp8_e5m2_t* a_matrix_tmp = reinterpret_cast<__ca__ fp8_e5m2_t*>(a);
+        __cb__ fp8_e5m2_t* b_matrix_tmp = reinterpret_cast<__cb__ fp8_e5m2_t*>(b);
         mad_mx(c, a_matrix_tmp, b_matrix_tmp, m, n, k,
             unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
     }

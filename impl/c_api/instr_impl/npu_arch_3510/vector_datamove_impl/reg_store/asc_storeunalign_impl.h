@@ -102,7 +102,7 @@ __simd_callee__ inline void asc_storeunalign_impl(__ubuf__  fp8_e4m3fn_t* dst, v
     vector_fp8_e4m3fn_t src1, uint32_t count)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(dst);
+        __ubuf__ fp8_e4m3fn_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(dst);
         vstus(src0, count, src1, dst_tmp);
     }
 }
@@ -119,7 +119,7 @@ __simd_callee__ inline void asc_storeunalign_impl(__ubuf__  fp8_e5m2_t* dst, vec
     vector_fp8_e5m2_t src1, uint32_t count)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(dst);
+        __ubuf__ fp8_e5m2_t* dst_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(dst);
         vstus(src0, count, src1, dst_tmp);
     }
 }

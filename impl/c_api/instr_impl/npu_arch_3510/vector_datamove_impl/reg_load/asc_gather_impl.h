@@ -95,7 +95,7 @@ __simd_callee__ inline void asc_gather_impl(vector_fp8_e4m3fn_t& dst, __ubuf__  
     vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e4m3_t* src_tmp = reinterpret_cast<__ubuf__ float8_e4m3_t*>(src);
+        __ubuf__ fp8_e4m3fn_t* src_tmp = reinterpret_cast<__ubuf__ fp8_e4m3fn_t*>(src);
         vgather2(dst, src_tmp, index, mask);
     }
 }
@@ -104,7 +104,7 @@ __simd_callee__ inline void asc_gather_impl(vector_hifloat8_t& dst, __ubuf__ hif
     vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        __ubuf__ fp8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(src);
         vgather2(reinterpret_cast<vector_fp8_e5m2_t&>(dst), src_tmp, index, mask);
     }
 }
@@ -113,7 +113,7 @@ __simd_callee__ inline void asc_gather_impl(vector_fp8_e5m2_t& dst, __ubuf__  fp
     vector_uint16_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
-        __ubuf__ float8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ float8_e5m2_t*>(src);
+        __ubuf__ fp8_e5m2_t* src_tmp = reinterpret_cast<__ubuf__ fp8_e5m2_t*>(src);
         vgather2(dst, src_tmp, index, mask);
     }
 }
@@ -159,7 +159,7 @@ __simd_callee__ inline void asc_gather_impl(vector_bfloat16_t& dst, __ubuf__ bfl
     }
 }
 
-// ==========源操作数和目的数都为寄存�?========
+// ==========源操作数和目的数都为寄存�?========
 __simd_callee__ inline void asc_gather_impl(vector_int8_t& dst, vector_int8_t src,
     vector_uint8_t index)
 {
