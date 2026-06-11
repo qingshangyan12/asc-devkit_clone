@@ -84,6 +84,7 @@ static CcuResult CompArgs(KfcServerContext &ctx)
     addrBias = CCU_TASK_NUM_MAX * CCU_ONE_PARAM_SIZE;       // 偏移8轮的总宽度
     ctx.recordAddr = ctx.ckeAddr + addrBias;
 
+    /*
     // 2、DieNum的-----missionId=0
     // 双Die场景才需要导入导出
     CCU_IF(ctx.dieNum == DOUBLE_DIE) {
@@ -96,7 +97,6 @@ static CcuResult CompArgs(KfcServerContext &ctx)
         ctx.importDieSig = (getDieId == DIE1_ID) ? DIE1_END_SIG : DIE1_START_SIG;
     }
 
-    /*
     // 3、mission处理----多Mission场景才需要，暂且不需要 
     CCU_IF (ctx.missionNum != 1) {
         // TODO：[这里暂且不会走进来]
