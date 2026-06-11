@@ -28,7 +28,7 @@
 
 namespace AscendC {
 template <Hardware pos>
-__aicore__ inline uint32_t GetDynamicMemStartPos() {
+__asc_aicore__ inline uint32_t GetDynamicMemStartPos() {
 // dynamic array is not supported in cpu mode
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
     if constexpr (pos == Hardware::UB) {
@@ -44,12 +44,12 @@ __aicore__ inline uint32_t GetDynamicMemStartPos() {
 
 #if defined(__NPU_ARCH__)
 template <typename Shape, size_t... Is>
-__aicore__ inline constexpr auto ProdImpl(const Shape& t, Std::index_sequence<Is...>) {
+__asc_aicore__ inline constexpr auto ProdImpl(const Shape& t, Std::index_sequence<Is...>) {
     return (Std::get<Is>(t) * ... * 1);
 }
 
 template <typename... Args>
-__aicore__ inline constexpr auto Prod(const Shape<Args...>& t) {
+__asc_aicore__ inline constexpr auto Prod(const Shape<Args...>& t) {
     return ProdImpl(t, Std::make_index_sequence<sizeof...(Args)>{});
 }
 
@@ -238,7 +238,7 @@ __inout_pipe__(S) typename LocalTensor<T>::PrimType& LocalTensor<T>::operator()(
     return *(GetPhyAddr(offset));
 }
 template <typename T>
-template <typename U> __aicore__ inline LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
+template <typename U> __asc_aicore__ inline LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
 {
     LocalTensor<U> output;
     output.address_.logicPos = static_cast<uint8_t>(this->GetPosition());
@@ -669,11 +669,11 @@ int32_t LocalTensor<T>::ToFile(const std::string &fileName) const
 }
 // Npu Impl
 #else
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
+template <typename T> __asc_aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
 {
     return GetPhyAddr(0);
 }
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
+template <typename T> __asc_aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
 {
     if constexpr (IsSameType<PrimType, int4b_t>::value) {
         return this->address_.bufferAddr + offset / INT4_TWO;
@@ -692,7 +692,7 @@ template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(cons
         return this->address_.bufferAddr + offset * sizeof(PrimType);
     }
 }
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     typename LocalTensor<T>::PrimType LocalTensor<T>::GetValue(const uint32_t index) const
 {
     if ASCEND_IS_AIC {
@@ -744,14 +744,14 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
         return *(reinterpret_cast<__ubuf__ PrimType*>(GetPhyAddr(index)));
     }
 }
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     __ubuf__ typename LocalTensor<T>::PrimType& LocalTensor<T>::operator()(const uint32_t offset) const
 {
     return *(reinterpret_cast<__ubuf__ PrimType*>(GetPhyAddr(offset)));
 }
 
 template <typename T>
-template <typename U> __aicore__ inline __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
+template <typename U> __asc_aicore__ inline __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
 {
     LocalTensor<U> output;
     output.address_.logicPos = static_cast<uint8_t>(this->GetPosition());
@@ -780,7 +780,7 @@ template <typename U> __aicore__ inline __sync_alias__ LocalTensor<U> LocalTenso
 }
 
 template <typename T>
-template <typename U> __aicore__ inline __inout_pipe__(S)
+template <typename U> __asc_aicore__ inline __inout_pipe__(S)
     void LocalTensor<T>::SetValue(const uint32_t index, const U value) const
 {
     if ASCEND_IS_AIC {
@@ -850,7 +850,7 @@ template <typename U> __aicore__ inline __inout_pipe__(S)
     }
 }
 
-template <typename T> __aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
+template <typename T> __asc_aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
 {
     LocalTensor result = *this;
     if constexpr (IsHalfByteDataType<PrimType>()) {
@@ -881,18 +881,18 @@ template <typename T>
 template <typename U>
 [[deprecated("NOTICE: SetAddrWithOffset has been deprecated and will be removed in the next version. "
     "Please do not use it!")]]
-__aicore__ inline void LocalTensor<T>::SetAddrWithOffset(LocalTensor<U> &src, uint32_t offset)
+__asc_aicore__ inline void LocalTensor<T>::SetAddrWithOffset(LocalTensor<U> &src, uint32_t offset)
 {
     this->address_ = src.address_;
     this->address_.bufferAddr += offset * sizeof(PrimT<U>);
 }
 #endif
-template <typename T> __aicore__ inline int32_t LocalTensor<T>::GetPosition() const
+template <typename T> __asc_aicore__ inline int32_t LocalTensor<T>::GetPosition() const
 {
     return this->address_.logicPos;
 }
 
-template <typename T> __aicore__ inline void LocalTensor<T>::SetSize(const uint32_t size)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::SetSize(const uint32_t size)
 {
 #if ASCENDC_CPU_DEBUG
     uint32_t len = IsSameType<PrimType, int4b_t>::value ? size / INT4_TWO : size * sizeof(PrimType);
@@ -920,7 +920,7 @@ template <typename T> __aicore__ inline void LocalTensor<T>::SetSize(const uint3
     }
 }
 template <typename T>
-__aicore__ inline uint32_t LocalTensor<T>::GetSize() const
+__asc_aicore__ inline uint32_t LocalTensor<T>::GetSize() const
 {
     if constexpr (IsHalfByteDataType<PrimType>()) {
         return this->address_.dataLen * INT4_TWO;
@@ -943,13 +943,13 @@ __aicore__ inline uint32_t LocalTensor<T>::GetSize() const
 template <typename T>
 [[deprecated("NOTICE: GetLength has been deprecated and will be removed in the next version. Please do not use "
                 "it!")]]
-__aicore__ inline uint32_t LocalTensor<T>::GetLength() const
+__asc_aicore__ inline uint32_t LocalTensor<T>::GetLength() const
 {
     return this->address_.dataLen;
 }
 
 template <typename T>
-__aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
+__asc_aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
 {
     this->address_.dataLen = dataLen;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -962,14 +962,14 @@ __aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
     }
 #endif
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::SetUserTag(const TTagType tag)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::SetUserTag(const TTagType tag)
 {
     auto ptr = reinterpret_cast<TBufType*>(this->address_.bufferHandle);
     ASCENDC_DEBUG_ASSERT((ptr != nullptr),
                     KERNEL_LOG_INTERNAL(KERNEL_ERROR, "ptr can not be nullptr"));
     ptr->usertag = tag;
 }
-template <typename T> __aicore__ inline TTagType LocalTensor<T>::GetUserTag() const
+template <typename T> __asc_aicore__ inline TTagType LocalTensor<T>::GetUserTag() const
 {
     auto ptr = reinterpret_cast<TBufType*>(this->address_.bufferHandle);
     ASCENDC_DEBUG_ASSERT((ptr != nullptr),
@@ -979,7 +979,7 @@ template <typename T> __aicore__ inline TTagType LocalTensor<T>::GetUserTag() co
 
 template <typename T>
 template <typename U>
-__aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
+__asc_aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
 {
 #if ASCENDC_CPU_DEBUG
     ASCENDC_DEBUG_ASSERT((pos != AscendC::TPosition::GM) && (pos != AscendC::TPosition::MAX),
@@ -1016,14 +1016,14 @@ __aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
+__asc_aicore__ inline LocalTensor<T>::LocalTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
 {
     static_assert(!is_tensorTrait_v<T>, "currently not support TensorTrait type!!");
     CreateTensor<T>(pos, addr, tileSize);
 }
 
 template <typename T>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
+__asc_aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert((T::tPos != TPosition::GM) && (T::tPos != TPosition::MAX),
@@ -1037,7 +1037,7 @@ __aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr)
 
 template <typename T>
 template <typename U>
-__aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
+__asc_aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
 {
     static_assert(is_tensorTrait_v<T>, "only support TensorTrait type Tensor!");
     static_assert((T::tPos != TPosition::GM) && (T::tPos != TPosition::MAX),
@@ -1047,27 +1047,27 @@ __aicore__ inline LocalTensor<T>::LocalTensor(uint32_t addr, const U& layout)
 }
 
 // symbol override
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideAdd<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideAdd<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideSub<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideSub<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideMul<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideMul<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideDiv<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideDiv<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideOr<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideOr<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideAnd<T>& symbolOverride)
+template <typename T> __asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideAnd<T>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
@@ -1075,84 +1075,84 @@ template <typename T> __aicore__ inline void LocalTensor<T>::operator = (const S
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
 template <typename U>
-__aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideCompare<U>& symbolOverride)
+__asc_aicore__ inline void LocalTensor<T>::operator = (const SymbolOverrideCompare<U>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
 #else
-template <typename T> __aicore__ inline void
+template <typename T> __asc_aicore__ inline void
     LocalTensor<T>::operator = (const SymbolOverrideCompare<float>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
-template <typename T> __aicore__ inline void
+template <typename T> __asc_aicore__ inline void
     LocalTensor<T>::operator = (const SymbolOverrideCompare<half>& symbolOverride)
 {
     symbolOverride.Process(*this);
 }
 #endif
 
-template <typename T> __aicore__ inline SymbolOverrideAdd<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideAdd<T>
     LocalTensor<T>::operator + (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideAdd<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideSub<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideSub<T>
     LocalTensor<T>::operator - (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideSub<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideMul<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideMul<T>
     LocalTensor<T>::operator *(const LocalTensor<T>& src1) const
 {
     return SymbolOverrideMul<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideDiv<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideDiv<T>
     LocalTensor<T>::operator / (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideDiv<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideOr<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideOr<T>
     LocalTensor<T>::operator | (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideOr<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideAnd<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideAnd<T>
     LocalTensor<T>::operator & (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideAnd<T>(*this, src1);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator < (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::LT);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator > (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::GT);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator != (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::NE);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator == (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::EQ);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator <= (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::LE);
 }
-template <typename T> __aicore__ inline SymbolOverrideCompare<T>
+template <typename T> __asc_aicore__ inline SymbolOverrideCompare<T>
     LocalTensor<T>::operator >= (const LocalTensor<T>& src1) const
 {
     return SymbolOverrideCompare<T>(*this, src1, CMPMODE::GE);
 }
-template <typename T> __aicore__ inline void
+template <typename T> __asc_aicore__ inline void
     LocalTensor<T>::SetShapeInfo(const ShapeInfo& shapeInfo)
 {
     static_assert(IsSameType<T, PrimType>::value, "only primitive type Tensor has shape info!");
@@ -1160,7 +1160,7 @@ template <typename T> __aicore__ inline void
         shapeInfo_ = shapeInfo;
 #endif
 }
-template <typename T> __aicore__ inline ShapeInfo LocalTensor<T>::GetShapeInfo() const
+template <typename T> __asc_aicore__ inline ShapeInfo LocalTensor<T>::GetShapeInfo() const
 {
     static_assert(IsSameType<T, PrimType>::value, "only primitive type Tensor has shape info!");
 #ifndef SPLIT_CORE_CUBE
@@ -1171,7 +1171,7 @@ template <typename T> __aicore__ inline ShapeInfo LocalTensor<T>::GetShapeInfo()
 #endif
 }
 
-template <typename T> __aicore__ inline void
+template <typename T> __asc_aicore__ inline void
     GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTensor<T>::PrimType* buffer, uint64_t bufferSize)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1196,7 +1196,7 @@ template <typename T> __aicore__ inline void
 }
 
 template <typename T>
-__aicore__ inline void GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTensor<T>::PrimType* buffer)
+__asc_aicore__ inline void GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTensor<T>::PrimType* buffer)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     this->oriAddress_ = buffer;
@@ -1221,7 +1221,7 @@ __aicore__ inline void GlobalTensor<T>::SetGlobalBuffer(__gm__ typename GlobalTe
 #endif
 }
 
-template <typename T> __aicore__ inline
+template <typename T> __asc_aicore__ inline
     const __gm__ typename GlobalTensor<T>::PrimType* GlobalTensor<T>::GetPhyAddr() const
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1231,7 +1231,7 @@ template <typename T> __aicore__ inline
 #endif
 }
 
-template <typename T> __aicore__ inline
+template <typename T> __asc_aicore__ inline
     __gm__ typename GlobalTensor<T>::PrimType* GlobalTensor<T>::GetPhyAddr(const uint64_t offset) const
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1277,7 +1277,7 @@ template <typename T> __aicore__ inline
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
 template <typename T>
 template <typename U>
-__aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
+__asc_aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
 {
     uintptr_t addr = (reinterpret_cast<uintptr_t>(buffer)) & (~0b111111);
     return addr;
@@ -1285,7 +1285,7 @@ __aicore__ inline uintptr_t GlobalTensor<T>::AlignPtr(__gm__ U* buffer) const
 #endif
 
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     typename GlobalTensor<T>::PrimType GlobalTensor<T>::GetValue(const uint64_t offset)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1334,7 +1334,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 }
 #endif
 
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     typename GlobalTensor<T>::PrimType GlobalTensor<T>::GetValue(const uint64_t offset) const
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1387,7 +1387,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 }
 
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     __gm__ typename GlobalTensor<T>::PrimType& GlobalTensor<T>::operator()(const uint64_t offset)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1405,7 +1405,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 }
 #endif
 
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     __gm__ typename GlobalTensor<T>::PrimType& GlobalTensor<T>::operator()(const uint64_t offset) const
 
 {
@@ -1422,7 +1422,7 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
 #endif
 }
 
-template <typename T> __aicore__ inline
+template <typename T> __asc_aicore__ inline
     void GlobalTensor<T>::SetValue(const uint64_t offset, typename GlobalTensor<T>::PrimType value)
 {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -1516,7 +1516,7 @@ template <typename T> __aicore__ inline
 #endif
 }
 
-template <typename T> __aicore__ inline GlobalTensor<T>::GlobalTensor()
+template <typename T> __asc_aicore__ inline GlobalTensor<T>::GlobalTensor()
 {
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     this->lastWriteCacheAddr = 0;
@@ -1525,7 +1525,7 @@ template <typename T> __aicore__ inline GlobalTensor<T>::GlobalTensor()
 }
 
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
-template <typename T> __aicore__ inline GlobalTensor<T>::~GlobalTensor()
+template <typename T> __asc_aicore__ inline GlobalTensor<T>::~GlobalTensor()
 {
     if (lastWriteCacheAddr != 0) {
         dcci(reinterpret_cast<__gm__ uint64_t *>(lastWriteCacheAddr),
@@ -1534,12 +1534,12 @@ template <typename T> __aicore__ inline GlobalTensor<T>::~GlobalTensor()
 }
 #endif
 
-template <typename T> __aicore__ inline uint64_t GlobalTensor<T>::GetSize() const
+template <typename T> __asc_aicore__ inline uint64_t GlobalTensor<T>::GetSize() const
 {
     return bufferSize_;
 }
 
-template <typename T> __aicore__ inline GlobalTensor<T> GlobalTensor<T>::operator[](const uint64_t offset) const
+template <typename T> __asc_aicore__ inline GlobalTensor<T> GlobalTensor<T>::operator[](const uint64_t offset) const
 {
     GlobalTensor result = *this;
     if constexpr (IsHalfByteDataType<PrimType>()) {
@@ -1566,7 +1566,7 @@ template <typename T> __aicore__ inline GlobalTensor<T> GlobalTensor<T>::operato
     return result;
 }
 
-template <typename T> __aicore__ inline void GlobalTensor<T>::SetShapeInfo(const ShapeInfo& shapeInfo)
+template <typename T> __asc_aicore__ inline void GlobalTensor<T>::SetShapeInfo(const ShapeInfo& shapeInfo)
 {
     static_assert(IsSameType<T, PrimType>::value, "only primitive type Tensor has shape info!");
 #ifndef SPLIT_CORE_CUBE
@@ -1574,7 +1574,7 @@ template <typename T> __aicore__ inline void GlobalTensor<T>::SetShapeInfo(const
 #endif
 }
 
-template <typename T> __aicore__ inline ShapeInfo GlobalTensor<T>::GetShapeInfo() const
+template <typename T> __asc_aicore__ inline ShapeInfo GlobalTensor<T>::GetShapeInfo() const
 {
     static_assert(IsSameType<T, PrimType>::value, "only primitive type Tensor has shape info!");
 #ifndef SPLIT_CORE_CUBE
@@ -1587,7 +1587,7 @@ template <typename T> __aicore__ inline ShapeInfo GlobalTensor<T>::GetShapeInfo(
 
 template <typename T>
 template<CacheRwMode rwMode>
-__aicore__ inline void GlobalTensor<T>::SetL2CacheHint(CacheMode mode) {
+__asc_aicore__ inline void GlobalTensor<T>::SetL2CacheHint(CacheMode mode) {
     this->cacheMode_ = mode;
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     this->address_ = L2CacheAlter<PrimType, rwMode>(this->address_, mode);
@@ -1605,7 +1605,7 @@ __aicore__ inline void GlobalTensor<T>::SetL2CacheHint(CacheMode mode) {
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T>
-template <typename U> __aicore__ inline GlobalTensor<U> GlobalTensor<T>::ReinterpretCast() const
+template <typename U> __asc_aicore__ inline GlobalTensor<U> GlobalTensor<T>::ReinterpretCast() const
 {
     GlobalTensor<U> output;
     output.address_ = reinterpret_cast<__gm__ U*>(reinterpret_cast<__gm__ int64_t*>(this->address_));
@@ -1620,7 +1620,7 @@ template <typename U> __aicore__ inline GlobalTensor<U> GlobalTensor<T>::Reinter
 #endif
 
 template <Hardware hard>
-__aicore__ inline LocalMemAllocator<hard>::LocalMemAllocator()
+__asc_aicore__ inline LocalMemAllocator<hard>::LocalMemAllocator()
 {
     static_assert((hard != Hardware::GM) && (hard != Hardware::MAX) && "illegal hardware position GM or MAX");
 #if defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)
@@ -1634,14 +1634,14 @@ __aicore__ inline LocalMemAllocator<hard>::LocalMemAllocator()
 }
 
 template <Hardware hard>
-__aicore__ inline uint32_t LocalMemAllocator<hard>::GetCurAddr() const
+__asc_aicore__ inline uint32_t LocalMemAllocator<hard>::GetCurAddr() const
 {
     return head_;
 }
 
 template <Hardware hard>
 template <TPosition pos, class DataType, uint32_t tileSize>
-__aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
+__asc_aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 {
     static_assert(!is_tensorTrait_v<DataType>, "currently not support TensorTrait type!");
     static_assert(GetPhyType(pos) == hard, "logic pos and hardware pos not matched.");
@@ -1652,7 +1652,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 
 template <Hardware hard>
 template <class DataType, uint32_t tileSize>
-__aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
+__asc_aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 {
     static_assert(!is_tensorTrait_v<DataType>, "currently not support TensorTrait type!");
     LocalTensor<DataType> output(GetDefaultPosition(hard), head_, tileSize);
@@ -1662,7 +1662,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 
 template <Hardware hard>
 template <TPosition pos, class DataType>
-__aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t tileSize)
+__asc_aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t tileSize)
 {
     static_assert(!is_tensorTrait_v<DataType>, "currently not support TensorTrait type!");
     static_assert(GetPhyType(pos) == hard, "logic pos and hardware pos not matched.");
@@ -1673,7 +1673,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t 
 
 template <Hardware hard>
 template <class DataType>
-__aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t tileSize)
+__asc_aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t tileSize)
 {
     static_assert(!is_tensorTrait_v<DataType>, "currently not support TensorTrait type!");
     LocalTensor<DataType> output(GetDefaultPosition(hard), head_, tileSize);
@@ -1682,7 +1682,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc(uint32_t 
 }
 template <Hardware hard>
 template <class DataType>
-__aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
+__asc_aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 {
     static_assert(is_tensorTrait_v<DataType>, "only support TensorTrait type!");
     static_assert(GetPhyType(DataType::tPos) == hard, "logic pos and hardware pos not matched.");
@@ -1695,7 +1695,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 
 template <Hardware hard>
 template <class DataType, typename LayoutType>
-__aicore__ inline typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
+__asc_aicore__ inline typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
     LocalMemAllocator<hard>::Alloc(const LayoutType& layout)
 {
     static_assert(is_tensorTrait_v<DataType>, "only support TensorTrait type!");
