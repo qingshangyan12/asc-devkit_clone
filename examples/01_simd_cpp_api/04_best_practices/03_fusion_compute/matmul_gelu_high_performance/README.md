@@ -22,8 +22,7 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── figures                 // 图示
-│   ├── mmad_gelu.asc           // Ascend C样例实现
-│   └── README.md               // 样例说明文档
+│   └── mmad_gelu.asc           // Ascend C样例实现
 ```
 
 ## 样例描述
@@ -83,13 +82,13 @@ $$
 
 本样例提供两种CV融合场景：
 
-**Scenario 1：CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
+**Scenario 1：CV融合-GM中转（中级性能优化）**（A2/A3/Ascend 950PR均支持）
 
 ```
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
-**Scenario 2：CV融合-UB直通**（仅Ascend 950PR支持）
+**Scenario 2：CV融合-UB直通（高阶极限打磨）**（仅Ascend 950PR支持）
 
 Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算
 
@@ -97,126 +96,26 @@ Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因�
 GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
 ```
 
-### 核心特性
+### 中级性能优化
 
-本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。以下重点说明CV融合的实现机制。
+本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
 
-以下重点说明AIC↔AIV的CV融合机制。
+#### Matmul优化手段
 
-#### 1. CV融合架构：`__mix__(1,2)` 核函数
+| Case | 优化手段 | 说明 |
+|------|---------|------|
+| [Case 1](../../01_matrix_compute/matmul_high_performance/README.md#case-1-单核tiling优化-single_core_tiling) | 单核Tiling优化 | 优化base块参数，降低访存计算比 |
+| [Case 2](../../01_matrix_compute/matmul_high_performance/README.md#case-2-多核切分-2x12-multi_core_split_2_12) | 多核切分 2x12 | 引入多核并行计算，均衡负载分配 |
+| [Case 3](../../01_matrix_compute/matmul_high_performance/README.md#case-3-多核切分-4x6-multi_core_split_4_6) | 多核切分 4x6 | 优化多核切分策略，地址512B对齐，减少同地址访问 |
+| [Case 4](../../01_matrix_compute/matmul_high_performance/README.md#case-4-多核使用mdl模板-multi_core_mdl) | 多核使用MDL模板 | 启用L1多块缓存，大包搬运，减少MTE2循环搬运次数 |
 
-本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
+#### Gelu优化手段
 
-```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
-{
-    AscendC::InitSocState();
-    KernelMmadVector<...> op;
-    op.Init(a, b, c);
-    op.Process();
-    AscendC::PipeBarrier<PIPE_ALL>();
-}
-```
+| Case | 优化手段 | 说明 |
+|------|---------|------|
+| [Case 1](../../02_reg_compute/gelu_high_performance/README.md#case-1-启用regbase-api和vf融合能力) | RegBase API + VF融合 | 寄存器级计算减少中间Load/Store，利用双发特性提升IPC |
 
-在 `Process()` 中，通过 `ASCEND_IS_AIC` 和 `ASCEND_IS_AIV` 宏区分AIC和AIV的执行路径：
-
-```cpp
-if ASCEND_IS_AIC {
-    // AIC侧：Buffer分配 + 计算循环 + Fixpipe搬出
-    ProcessLoopAic(...);
-}
-if ASCEND_IS_AIV {
-    // AIV侧：GELU向量计算 + 搬出至GM
-    ProcessLoopAiv();
-}
-```
-
-#### 2. 跨核同步：AIC→AIV 数据就绪通知
-
-AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `CrossCoreSetFlag` 通知AIV侧数据已就绪；AIV侧通过 `CrossCoreWaitFlag` 等待该信号，然后开始GELU计算：
-
-```cpp
-// AIC侧 CopyOutAic():
-AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
-
-// AIV侧 GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
-```
-
-#### 3. Scenario 1：CV融合-GM中转
-
-AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
-
-**AIC侧**：Fixpipe L0C → GM
-
-```cpp
-// A2/A3架构
-AscendC::FixpipeParamsV220 fixpipeParams;
-fixpipeParams.nSize = curN;
-fixpipeParams.mSize = curM;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
-
-// Ascend 950PR架构
-AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = curM;
-fixpipeParams.nSize = curN;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
-```
-
-**AIV侧**：GM → xUB → GELU → geluOutUB → GM
-
-`__mix__(1,2)` 模式下每个逻辑核有2个AIV，Fixpipe输出到GM的M行数据按M/2行拆分给两个AIV处理。每个AIV通过 `GetSubBlockIdx() % 2` 获取自己的子块索引，独立完成各自M/2行的GELU计算：
-
-```cpp
-uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
-
-// Step 1: DataCopy GM → xUB
-AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
-
-// Step 2: GELU计算
-// A2/A3: GeluMemBaseCompute(xUB, geluOutUB, computeLen);
-// Ascend 950PR:    GeluRegBaseCompute(xUB, geluOutUB, computeLen);
-
-// Step 3: DataCopy geluOutUB → GM
-AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
-```
-
-#### 4. Scenario 2：CV融合-UB直通（仅Ascend 950PR支持）
-
-AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构Fixpipe从L0C到UB。
-
-**AIC侧**：Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度拆分给2个AIV）
-
-```cpp
-AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
-fixpipeParams.nSize = curN;
-fixpipeParams.srcStride = curMAlign;
-fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
-```
-
-**AIV侧**：UB → GELU → geluOutUB → GM
-
-AIV侧无需DataCopy GM→UB，直接对xUB进行GELU计算：
-
-```cpp
-// GELU计算：xUB作为输入，geluOutUB作为输出
-GeluRegBaseCompute(xUB, geluOutUB, computeLen);
-
-// DataCopy: geluOutUB → GM
-uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
-```
-
-#### 5. GELU计算实现
+#### GELU计算实现
 
 **A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
 
@@ -250,9 +149,49 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
 }
 ```
 
-GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
+以下重点说明AIC↔AIV的CV融合机制。
 
-#### 6. `__mix__(1,2)` 模式下的多核切分
+#### 1. CV融合架构：`__mix__(1,2)` 核函数
+
+本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
+
+```cpp
+__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+{
+    AscendC::InitSocState();
+    KernelMmadVector<...> op;
+    op.Init(xMatrix, yMatrix, zMatrix);
+    op.Process();
+    AscendC::PipeBarrier<PIPE_ALL>();
+}
+```
+
+在 `Process()` 中，通过 `ASCEND_IS_AIC` 和 `ASCEND_IS_AIV` 宏区分AIC和AIV的执行路径：
+
+```cpp
+if ASCEND_IS_AIC {
+    // AIC侧：Buffer分配 + 计算循环 + Fixpipe搬出
+    ProcessLoopAic(...);
+}
+if ASCEND_IS_AIV {
+    // AIV侧：GELU向量计算 + 搬出至GM
+    ProcessLoopAiv();
+}
+```
+
+#### 2. 跨核同步：AIC→AIV 数据就绪通知
+
+AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `CrossCoreSetFlag` 通知AIV侧数据已就绪；AIV侧通过 `CrossCoreWaitFlag` 等待该信号，然后开始GELU计算：
+
+```cpp
+// AIC侧 CopyOutAic():
+AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
+
+// AIV侧 GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
+AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
+```
+
+#### 3. `__mix__(1,2)` 模式下的多核切分
 
 `__mix__(1,2)` 模式下，`GetBlockIdx()` 在AIC侧和AIV侧各自独立编号：AIC侧返回0~numAICores-1，AIV侧返回0~numAIVCores-1。由于每个逻辑核对应2个AIV，AIV侧需要将 `GetBlockIdx() / 2` 映射回逻辑核ID，从而与AIC侧使用相同的多核切分策略：
 
@@ -267,33 +206,105 @@ uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
 ```
 
-### 性能数据分析
+### 高阶极限打磨
 
-#### Atlas A2训练系列芯片性能数据
+在高阶极限打磨阶段，CV融合层面提供两种数据通路：Scenario 1通过GM中转实现CV融合（所有架构支持），Scenario 2通过Fixpipe直通UB实现CV融合（仅Ascend 950PR支持），省去GM中转的读写开销。
+Matmul和Gelu相关高阶极限打磨手段请参考下方列表。
 
-- Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1536，24核
+#### Matmul优化手段
+
+| Case | 优化手段 | 说明 |
+|------|---------|------|
+| [Case 5](../../01_matrix_compute/matmul_high_performance/README.md#case-5-多核mdl--l1cache优化-multi_core_mdl_l1cache) | MDL + L1Cache优化 | 手动调整Tiling参数，充分利用L1缓存 |
+| [Case 6](../../01_matrix_compute/matmul_high_performance/README.md#case-6-多核mdl--l1cache--l2cache-multi_core_mdl_l1cache_l2cache) | MDL + L1Cache + L2Cache | 分块计算适配L2Cache，提高缓存命中率 |
+| [Case 7](../../01_matrix_compute/matmul_high_performance/README.md#case-7-多核mdl--l1cache--l2cache--constants-tiling-multi_core_mdl_l1cache_l2cache_constants) | + Constants Tiling | Tiling常量化，减少运行时Scalar计算开销 |
+| [Case 8](../../01_matrix_compute/matmul_high_performance/README.md#case-8-多核mdl--l1cache--l2cache--constants-tiling--unitflag-multi_core_mdl_l1cache_l2cache_constants_unitflag) | + UnitFlag | 细粒度流水同步，MMAD与FIXPIPE流水并行 |
+
+#### Gelu优化手段
+
+| Case | 优化手段 | 说明 |
+|------|---------|------|
+| [Case 2](../../02_reg_compute/gelu_high_performance/README.md#case-2-启用regbase-apivf融合能力和循环展开优化) | VF融合 + 循环展开 | #pragma unroll展开循环，提高指令级并行度 |
+
+#### CV融合-GM中转
+
+**Scenario 1：CV融合-GM中转**（A2/A3/Ascend 950PR均支持）
+
+AIC侧通过Fixpipe将L0C计算结果写入GM，AIV侧从GM读取数据到UB后进行GELU计算，再将结果写回GM。这种方式所有架构均支持。
+
+数据流路径：
+```
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> GM ──(MTE2)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+```
+
+**AIC侧实现**
+
+Fixpipe L0C → GM
+
+```cpp
+// A2/A3架构
+AscendC::FixpipeParamsV220 fixpipeParams;
+fixpipeParams.nSize = curN;
+fixpipeParams.mSize = curM;
+fixpipeParams.srcStride = curMAlign;
+fixpipeParams.dstStride = N;
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+
+// Ascend 950PR架构
+AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+fixpipeParams.mSize = curM;
+fixpipeParams.nSize = curN;
+fixpipeParams.srcStride = curMAlign;
+fixpipeParams.dstStride = N;
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+```
+
+**AIV侧实现**
+
+GM → xUB → GELU → geluOutUB → GM
+
+`__mix__(1,2)` 模式下每个逻辑核有2个AIV，Fixpipe输出到GM的M行数据按M/2行拆分给两个AIV处理。每个AIV通过 `GetSubBlockIdx() % 2` 获取自己的子块索引，独立完成各自M/2行的GELU计算：
+
+```cpp
+uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
+uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
+
+// Step 1: DataCopy GM → xUB
+AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
+
+// Step 2: GELU计算
+// A2/A3: GeluMemBaseCompute(xUB, geluOutUB, computeLen);
+// Ascend 950PR:    GeluRegBaseCompute(xUB, geluOutUB, computeLen);
+
+// Step 3: DataCopy geluOutUB → GM
+AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
+```
+
+**性能数据**
+
+> 以下数据基于msprof工具测量，取5次中位数。矩阵规格M=4096, K=1024, N=1536(A2)/N=1024(950PR)，输入数据类型float16，输出数据类型float32。
+
+##### Atlas A2训练系列芯片
+
+- singleCoreM=2048, singleCoreN=1536，24核
 
 | Scenario | Task Type | Task Duration(μs) | Block Num | Mix Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |------|-----------|-------------------|-----------|---------------|-----------------|------------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|---------------------|-------------------|--------------|-----------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|
-|Gelu计算 | AI_VECTOR_CORE | 369.827 | 48 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 358.91 | 236.506 | 0.659 | 8.293 | 0.023 | 316.672 | 0.882 | 150.033 | 0.418 |
+| Gelu计算 | AI_VECTOR_CORE | 369.827 | 48 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 358.91 | 236.506 | 0.659 | 8.293 | 0.023 | 316.672 | 0.882 | 150.033 | 0.418 |
 | Matmul计算 | AI_CORE | 4227.605 | 24 | 0 | 3760.55 | 3083.197 | 0.82 | 338.636 | 0.09 | 2516.081 | 0.669 | 3685.713 | 0.98 | 193.704 | 0.052 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Scenario 1 | MIX_AIC | 4236.944 | 24 | 48 | 3770.16 | 3083.235 | 0.818 | 531.971 | 0.141 | 2520.852 | 0.669 | 3687.839 | 0.978 | 193.933 | 0.051 | 3773.6 | 174.327 | 0.046 | 2.016 | 0.001 | 90.315 | 0.024 | 66.373 | 0.018 |
 
-#### Ascend 950PR芯片性能数据
+##### Ascend 950PR芯片
 
-- Scenario 1：CV融合-GM中转，singleCoreM=2048, singleCoreN=1024，32核
-- Scenario 2：CV融合-UB直通，singleCoreM=2048, singleCoreN=1024，32核
+- singleCoreM=2048, singleCoreN=1024，32核
 
 | Scenario | Task Type | Task Duration(μs) | Block Num | Mix Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
 |------|-----------|-------------------|-----------|---------------|-----------------|------------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|------------------|----------------|---------------------|-------------------|--------------|-----------------|---------------|---------------------|------------------|------------------|----------------|
 | Gelu计算(RegBase) | AI_VECTOR_CORE | 348.868 | 64 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 347.99 | 66.277 | 0.19 | 3.03 | 0.009 | 320.543 | 0.921 | 314.547 | 0.904 |
 | Matmul计算 | AI_CORE | 2601.311 | 32 | 0 | 2600.55 | 2593.264 | 0.997 | 104.582 | 0.04 | 816.91 | 0.314 | 1875.057 | 0.721 | 252.163 | 0.097 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Scenario 1 | MIX_AIC | 2606.91 | 32 | 64 | 2605.9 | 2597.856 | 0.997 | 105.131 | 0.04 | 818.781 | 0.314 | 1917.737 | 0.736 | 252.231 | 0.097 | 2605.93 | 59.897 | 0.023 | 1.783 | 0.001 | 57.145 | 0.022 | 50.516 | 0.019 |
-| Scenario 2 | MIX_AIC | 2573.584 | 32 | 64 | 2572.67 | 2565.251 | 0.997 | 104.669 | 0.041 | 819.934 | 0.319 | 2096.38 | 0.815 | 212.403 | 0.083 | 2572.69 | 60.438 | 0.023 | 1.138 | 0 | 0.005 | 0 | 68.76 | 0.027 |
 
-#### 性能数据解读
-
-**Scenario 1：CV融合-GM中转**
+##### 性能数据解读
 
 以Ascend 950PR芯片数据为例：
 - 单独Gelu任务耗时348.868μs，单独Matmul任务耗时2601.311μs
@@ -314,7 +325,62 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 原因分析：虽然Scenario 1中AIV也需要从GM将数据读取到UB，但AIC的Fixpipe将Matmul计算结果写入GM后，数据会被缓存在L2 Cache中。当AIV发起MTE2操作从GM读取数据时，由于数据已在L2 Cache中命中，实际是从L2 Cache读取而非从GM读取，因此MTE2时间显著减少。这也是CV融合场景下的一个隐式性能优化点。
 
-**Scenario 2：CV融合-UB直通**
+#### CV融合-UB直通
+
+**Scenario 2：CV融合-UB直通**（仅Ascend 950PR支持）
+
+AIC侧通过Fixpipe将L0C计算结果直接写入UB，AIV侧无需从GM读取数据，直接在UB上进行GELU计算后将结果写回GM。这种方式省去了GM中转的读写开销，但仅Ascend 950PR架构支持Fixpipe从L0C到UB。
+
+Ascend 950PR新增L0C->UB的通路，A2/A3不支持，芯片能力增强，因此在Ascend 950PR架构中可以不经过GM直接将矩阵乘结果输出到UB进行GELU计算。
+
+数据流路径：
+```
+GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C ──(Fixpipe)──> UB ──(Gelu)──> UB ──(MTE3)──> GM
+```
+
+**AIC侧实现**
+
+Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度拆分给2个AIV）
+
+```cpp
+AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
+fixpipeParams.nSize = curN;
+fixpipeParams.srcStride = curMAlign;
+fixpipeParams.dstStride = curN;
+fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
+```
+
+**AIV侧实现**
+
+UB → GELU → geluOutUB → GM
+
+AIV侧无需DataCopy GM→UB，直接对xUB进行GELU计算：
+
+```cpp
+// GELU计算：xUB作为输入，geluOutUB作为输出
+GeluRegBaseCompute(xUB, geluOutUB, computeLen);
+
+// DataCopy: geluOutUB → GM
+uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
+uint32_t offset = baseM / 2 * N;
+AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
+```
+
+**性能数据**
+
+> 以下数据基于msprof工具测量，取5次中位数。矩阵规格M=4096, K=1024, N=1024，输入数据类型float16，输出数据类型float32。
+
+##### Ascend 950PR芯片
+
+- singleCoreM=2048, singleCoreN=1024，32核
+
+| Scenario | Task Type | Task Duration(μs) | Block Num | Mix Block Num | aicore_time(μs) | aic_mac_time(μs) | aic_mac_ratio | aic_scalar_time(μs) | aic_scalar_ratio | aic_mte1_time(μs) | aic_mte1_ratio | aic_mte2_time(μs) | aic_mte2_ratio | aic_fixpipe_time(μs) | aic_fixpipe_ratio | aiv_time(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio |
+|------|-----------|-------------------|-----------|---------------|-----------------|------------------|---------------|---------------------|------------------|------------------|----------------|------------------|----------------|------------------|----------------|---------------------|-------------------|--------------|-----------------|---------------|---------------------|------------------|------------------|----------------|
+| Scenario 2 | MIX_AIC | 2573.584 | 32 | 64 | 2572.67 | 2565.251 | 0.997 | 104.669 | 0.041 | 819.934 | 0.319 | 2096.38 | 0.815 | 212.403 | 0.083 | 2572.69 | 60.438 | 0.023 | 1.138 | 0 | 0.005 | 0 | 68.76 | 0.027 |
+
+##### 性能数据解读
 
 以Ascend 950PR芯片数据为例：
 - Scenario 2融合后总耗时2573.584μs，相比Scenario 1的2606.91μs进一步减少约33μs
@@ -323,7 +389,6 @@ uint32_t nIterIdx = logicCoreId / mIter;
 下图展示了Scenario 2（CV融合-UB直通）场景下AIC和AIV的流水并行执行过程。AIC侧完成Matmul计算后通过Fixpipe将结果直接写入UB（不经过GM中转），AIV侧直接在UB上进行GELU计算，省去了GM→UB的MTE2搬运开销：
 
 ![Scenario2 CV融合-UB直通流水并行](figures/CVParallell_L0C_UB.png)
-
 
 ## 编译运行
 
@@ -339,7 +404,7 @@ uint32_t nIterIdx = logicCoreId / mIter;
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -382,7 +447,37 @@ uint32_t nIterIdx = logicCoreId / mIter;
   test pass!
   ```
 
-### 性能分析
+## 功能调试
+
+### printf
+
+该接口提供CPU域/NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
+```
+
+> **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0的方式关闭打印功能。
+
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+// Vector核LeakyRelu结果
+AscendC::Div(yLocal, xLocal, yLocal, n);
+AscendC::DumpTensor(yLocal, 1, 16);
+```
+
+> **注意：** [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+
+### 性能调试
 
 使用 `msprof` 工具获取详细性能数据：
 
@@ -401,4 +496,10 @@ PROF_xxxx_XXXXXX
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt
+```
+
+查看具体的性能分析结果：
+```
+# 查看Task Duration 以及各项数据
+cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```
