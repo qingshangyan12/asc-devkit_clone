@@ -156,11 +156,11 @@
         RUNTIME_IMPLICIT_INFO: Hardware Sync Flag
         VERSION: 1
         RUNTIME_IMPLICIT_INFO: SIMT Printf Flag
-        .ascend.meta. [0]: matmul_leakyrelu_custom_mix_aic
+        .ascend.meta. [0]: _Z23matmul_leakyrelu_customPhS_S_S_S_N7AscendC6tiling11TCubeTilingE_mix_aic
         KERNEL_TYPE: MIX_AIC_MAIN
         CROSS_CORE_SYNC: USE_SYNC
         MIX_TASK_RATION: [1:2]
-        .ascend.meta. [1]: matmul_leakyrelu_custom_mix_aiv
+        .ascend.meta. [1]: _Z23matmul_leakyrelu_customPhS_S_S_S_N7AscendC6tiling11TCubeTilingE_mix_aiv
         KERNEL_TYPE: MIX_AIC_MAIN
         CROSS_CORE_SYNC: USE_SYNC
         MIX_TASK_RATION: [1:2]
