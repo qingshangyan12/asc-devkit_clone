@@ -9,6 +9,9 @@
 */
 #ifndef __TESTS_C_API_STUB__
 #define __TESTS_C_API_STUB__
+#ifndef ULL
+#define ULL unsigned long long
+#endif
 #include <cstdint>
 #include "stub_fun.h"
 
