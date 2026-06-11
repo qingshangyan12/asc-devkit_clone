@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
+add_subdirectory(ascendc_reg_header_checker)
+
 set(MICRO_PRODUCT_TYPE_LIST_INIT ascend950pr_9599)
 set(MICRO_PRODUCT_TYPE_LIST ${MICRO_PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
 
@@ -61,6 +63,7 @@ foreach(product_type ${MICRO_PRODUCT_TYPE_LIST})
 
     target_compile_options(ascendc_ut_reg_compute_${product_type} PRIVATE
         -fno-access-control
+        -UASCENDC_DEBUG
     )
 
     target_link_libraries(ascendc_ut_reg_compute_${product_type} PRIVATE

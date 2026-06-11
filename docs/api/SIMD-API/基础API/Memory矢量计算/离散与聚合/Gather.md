@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section17600329101418"></a>
 
-头文件路径为："basic\_api/kernel\_operator\_vec\_gather\_intf\_impl.h"。
+头文件路径为："basic\_api/kernel\_operator\_vec\_gather\_intf.h"。
 
 Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和基地址（srcBaseAddr），根据基地址和地址偏移量确定输入张量的索引，将输入张量中对应元素收集到结果张量（dst）中。
 
@@ -64,7 +64,7 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
         dst[i] = src[(srcBaseAddr + srcOffset[i]) // inputType.itemsize]
 ```
 
-完整示例请参考：[Gather真值计算](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)。
+完整示例请参考：[Gather真值计算](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)。
 
 ## 函数原型<a name="section15660625202219"></a>
 
@@ -157,7 +157,7 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 
 ## 调用示例<a name="section11276201527"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
 
 - tensor高维切分计算样例-mask连续模式。
 

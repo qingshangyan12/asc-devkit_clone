@@ -8,7 +8,7 @@
 
 **图 1** 二进制精度舍入规则示意图<a name="fig1"></a>
 
-![二进制精度舍入规则示意图](../../../figures/binary_rounding.png "二进制精度舍入规则示意图")
+![二进制精度舍入规则示意图](../../../figures/binary_rounding.png)
 
 各精度舍入模式对待舍入部分的判断规则如下表所示：
 
@@ -418,7 +418,7 @@
 
 ### int32_t → half
 
-当前数据类型组合仅支持配合[SetDeqScale](../Memory矢量计算/量化设置/SetDeqScale.md)接口使用进行数据量化并完成精度转换，精度舍入模式不生效。
+当前数据类型组合仅支持配合[SetDeqScale](../Memory矢量计算/类型转换/寄存器配置说明/SetDeqScale.md)接口使用进行数据量化并完成精度转换，精度舍入模式不生效。
 
 输出：$src / 2^{17} \times scale \times 2^{17}$。
 

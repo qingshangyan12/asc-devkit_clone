@@ -3,12 +3,11 @@
 ## 概述
 使用数据来源为VECOUT的用户自定义TSCM的输入的Matmul样例，开发者可以自主管理L1 Buffer以高效利用硬件资源。TSCM即Temp Swap Cache Memory，用于临时把数据交换到额外空间。该场景由开发者管理L1 Buffer，再将输入矩阵数据对应的L1 Buffer地址作为Matmul的输入。
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 ```
@@ -31,15 +30,11 @@
   本样例中：M = 32, N = 256, K = 32。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_tscm_src_vecout_custom</td></tr>
   </table>
 
