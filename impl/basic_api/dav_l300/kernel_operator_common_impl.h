@@ -57,7 +57,7 @@ struct TypeGet<uint16_t> {
 };
 template <>
 struct TypeGet<half> {
-    using T = vector_f16;
+    using T = vector_half;
 };
 template <>
 struct TypeGet<int16_t> {
@@ -65,7 +65,7 @@ struct TypeGet<int16_t> {
 };
 template <>
 struct TypeGet<uint8_t> {
-    using T = vector_u8;
+    using T = vector_uint8_t;
 };
 template <>
 struct TypeGet<int8_t> {

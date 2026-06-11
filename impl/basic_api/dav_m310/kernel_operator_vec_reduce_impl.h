@@ -52,8 +52,8 @@ namespace AscendC {
 #define BITBYBIT_MODE_HALF_REDUCE_VF(reduceFunc, dstStrideOffset)                 \
     __VEC_SCOPE__                                                                 \
     {                                                                             \
-        vector_f16 vreg0;                                                         \
-        vector_f16 vreg1;                                                         \
+        vector_half vreg0;                                                         \
+        vector_half vreg1;                                                         \
         vector_align ureg;                                                        \
         vector_bool preg;                                                         \
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);                         \
@@ -525,8 +525,8 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ half* dst, __ubuf__ half* src
     }
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -601,8 +601,8 @@ __aicore__ inline void WholeReduceMaxImpl(__ubuf__ half* dst, __ubuf__ half* src
     }
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);
@@ -697,8 +697,8 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ half* dst, __ubuf__ half* src
     }
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -774,8 +774,8 @@ __aicore__ inline void WholeReduceMinImpl(__ubuf__ half* dst, __ubuf__ half* src
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);
@@ -955,8 +955,8 @@ __aicore__ inline void ReduceMaxIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -983,8 +983,8 @@ __aicore__ inline void ReduceMaxIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);
@@ -1071,8 +1071,8 @@ __aicore__ inline void ReduceMinIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -1099,8 +1099,8 @@ __aicore__ inline void ReduceMinIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);
@@ -1187,8 +1187,8 @@ __aicore__ inline void ReduceSumIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -1215,8 +1215,8 @@ __aicore__ inline void ReduceSumIntrinsicsImpl(__ubuf__ half* sharedTmpBuffer, _
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_align ureg;
         vector_bool preg;
         plds(preg, ((__ubuf__ uint32_t*)tempBuf), 0, US);

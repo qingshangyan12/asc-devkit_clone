@@ -85,7 +85,7 @@ __aicore__ inline void BrcbImpl(__ubuf__ half* dst, __ubuf__ half* src0, const u
     __VEC_SCOPE__
     {
         int32_t dstRepOffset = 0;
-        vector_f16 vreg0;
+        vector_half vreg0;
         int32_t sreg0 = 0;
         int32_t sreg1 = 0;
         vector_bool preg0;

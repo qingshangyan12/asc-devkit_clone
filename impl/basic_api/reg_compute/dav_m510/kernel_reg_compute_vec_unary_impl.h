@@ -550,13 +550,13 @@ template <MaskMergeMode mode = MaskMergeMode::ZEROING>
 __simd_callee__ inline void LogXImpl(RegTensor<half>& dstReg, RegTensor<half>& srcReg, MaskReg& mask,
                                      const float lnXReciprocal)
 {
-    vector_f16 f16RegLow;
-    vector_f16 f16RegHigh;
+    vector_half f16RegLow;
+    vector_half f16RegHigh;
     vector_f32 f32RegLow;
     vector_f32 f32RegHigh;
     vector_bool MaskLow;
     vector_bool MaskHigh;
-    vector_f16 tmpReg;
+    vector_half tmpReg;
     constexpr auto patAll = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::ALL)>();
     vector_bool maskAll = pset_b32(patAll);
     constexpr auto patVal = std::integral_constant<::Pat, static_cast<::Pat>(Reg::MaskPattern::H)>();

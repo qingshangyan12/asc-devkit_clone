@@ -116,7 +116,7 @@ struct TypeGet<half> {
 #if defined(__ASC_NPU_HOST__)
     using T = int;
 #else
-    using T = vector_f16;
+    using T = vector_half;
 #endif
 };
 
@@ -125,7 +125,7 @@ struct TypeGet<bfloat16_t> {
 #if defined(__ASC_NPU_HOST__)
     using T = int;
 #else
-    using T = vector_bf16;
+    using T = vector_bfloat16_t;
 #endif
 };
 
@@ -143,7 +143,7 @@ struct TypeGet<uint8_t> {
 #if defined(__ASC_NPU_HOST__)
     using T = int;
 #else
-    using T = vector_u8;
+    using T = vector_uint8_t;
 #endif
 };
 

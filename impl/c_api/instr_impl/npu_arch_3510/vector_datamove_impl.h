@@ -1764,7 +1764,7 @@ __simd_callee__ inline void asc_gather(vector_bfloat16_t& dst, __ubuf__ bfloat16
 }
 
 
-// ==========源操作数和目的数都为寄存�?========
+// ==========源操作数和目的数都为寄存�?========
 // ==========asc_gather(u8/s8/half/u16/s16/u32/s32/bf16/e4m3/e5m2/e8m0)=========
 __simd_callee__ inline void asc_gather(vector_int8_t& dst, vector_int8_t src,
     vector_uint8_t index)
@@ -6277,7 +6277,7 @@ __simd_callee__ inline void asc_scatter(vector_uint32_t& dst, __ubuf__ uint32_t*
     asc_scatter_impl(dst, src, index, mask);
 }
 
-__simd_callee__ inline void asc_scatter(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
+__simd_callee__ inline void asc_scatter(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
 {
     asc_scatter_impl(dst, src, index, mask);
 }

@@ -46,8 +46,8 @@ __aicore__ inline void AddsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -145,8 +145,8 @@ __aicore__ inline void AddsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -232,8 +232,8 @@ __aicore__ inline void AddsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);
@@ -331,8 +331,8 @@ __aicore__ inline void MulsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -432,8 +432,8 @@ __aicore__ inline void MulsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -519,8 +519,8 @@ __aicore__ inline void MulsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);
@@ -618,8 +618,8 @@ __aicore__ inline void MaxsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -717,8 +717,8 @@ __aicore__ inline void MaxsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -804,8 +804,8 @@ __aicore__ inline void MaxsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);
@@ -903,8 +903,8 @@ __aicore__ inline void MinsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -1002,8 +1002,8 @@ __aicore__ inline void MinsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -1089,8 +1089,8 @@ __aicore__ inline void MinsImpl(__ubuf__ half* dst, __ubuf__ half* src, half sca
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);
@@ -1786,8 +1786,8 @@ __aicore__ inline void LeakyReluImpl(__ubuf__ half* dst, __ubuf__ half* src, hal
 
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -1833,8 +1833,8 @@ __aicore__ inline void LeakyReluImpl(__ubuf__ half* dst, __ubuf__ half* src, hal
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(mask);
         vector_bool preg = plt_b16(sreg, POST_UPDATE);
         uint32_t strideConfig0 = ((static_cast<uint32_t>(repeatParams.srcBlkStride)) << 16);
@@ -1881,8 +1881,8 @@ __aicore__ inline void LeakyReluImpl(__ubuf__ half* dst, __ubuf__ half* src, hal
 {
     __VEC_SCOPE__
     {
-        vector_f16 vreg0;
-        vector_f16 vreg1;
+        vector_half vreg0;
+        vector_half vreg1;
         uint32_t sreg = static_cast<uint32_t>(count);
         vector_bool preg;
         uint32_t sregLower = static_cast<uint32_t>(128);

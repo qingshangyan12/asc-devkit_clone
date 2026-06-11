@@ -59,9 +59,9 @@ namespace AscendC {
     }                                                                                       \
 
 #define MIX_AXPY_IMPL(dst, src, scalarValue, repeatTime, repeatParams, preg)                           \
-    vector_f16 srcVreg;                                                                                \
-    vector_f16 tmpVreg;                                                                                \
-    vector_f16 zeroVreg;                                                                               \
+    vector_half srcVreg;                                                                                \
+    vector_half tmpVreg;                                                                                \
+    vector_half zeroVreg;                                                                               \
     vector_f32 cvtVreg;                                                                                \
     vector_f32 dstVreg;                                                                                \
     vector_f32 addVreg;                                                                                \
@@ -192,9 +192,9 @@ __aicore__ inline void AxpyFmixImpl(__ubuf__ float* dst, __ubuf__ half* src, hal
                                     const int32_t& count)
 {
     __VEC_SCOPE__ {
-        vector_f16 srcVreg;
-        vector_f16 tmpVreg;
-        vector_f16 zeroVreg;
+        vector_half srcVreg;
+        vector_half tmpVreg;
+        vector_half zeroVreg;
         vector_f32 cvtVreg;
         vector_f32 dstVreg;
         vector_f32 addVreg;

@@ -287,16 +287,16 @@ __aicore__ inline void FUNC_NAME(__ubuf__ DATA_TYPE* dst, __ubuf__ DATA_TYPE* sr
 UNARY_VEC_NORMAL_NOT_SUPPORT(ExpImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(ExpImpl);
 
-UNARY_VEC_NORMAL_T16(ExpImpl, vexp, half, vector_f16);
+UNARY_VEC_NORMAL_T16(ExpImpl, vexp, half, vector_half);
 UNARY_VEC_NORMAL_T32(ExpImpl, vexp, float, vector_f32);
 
-UNARY_VEC_BITWISE_T16(ExpImpl, vexp, half, vector_f16);
+UNARY_VEC_BITWISE_T16(ExpImpl, vexp, half, vector_half);
 UNARY_VEC_BITWISE_T32(ExpImpl, vexp, float, vector_f32);
 
 // // Exp::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(ExpImpl);
 
-UNARY_VEC_COUNTER_T16(ExpImpl, vexp, half, vector_f16);
+UNARY_VEC_COUNTER_T16(ExpImpl, vexp, half, vector_half);
 UNARY_VEC_COUNTER_T32(ExpImpl, vexp, float, vector_f32);
 
 
@@ -307,16 +307,16 @@ UNARY_VEC_COUNTER_T32(ExpImpl, vexp, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(LnImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(LnImpl);
 
-UNARY_VEC_NORMAL_T16(LnImpl, vln, half, vector_f16);
+UNARY_VEC_NORMAL_T16(LnImpl, vln, half, vector_half);
 UNARY_VEC_NORMAL_T32(LnImpl, vln, float, vector_f32);
 
-UNARY_VEC_BITWISE_T16(LnImpl, vln, half, vector_f16);
+UNARY_VEC_BITWISE_T16(LnImpl, vln, half, vector_half);
 UNARY_VEC_BITWISE_T32(LnImpl, vln, float, vector_f32);
 
 // // Ln::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(LnImpl);
 
-UNARY_VEC_COUNTER_T16(LnImpl, vln, half, vector_f16);
+UNARY_VEC_COUNTER_T16(LnImpl, vln, half, vector_half);
 UNARY_VEC_COUNTER_T32(LnImpl, vln, float, vector_f32);
 
 
@@ -328,13 +328,13 @@ UNARY_VEC_NORMAL_NOT_SUPPORT(AbsImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(AbsImpl);
 
 UNARY_VEC_NORMAL_T8(AbsImpl, vabs, int8_t, vector_s8);
-UNARY_VEC_NORMAL_T16(AbsImpl, vabs, half, vector_f16);
+UNARY_VEC_NORMAL_T16(AbsImpl, vabs, half, vector_half);
 UNARY_VEC_NORMAL_T32(AbsImpl, vabs, float, vector_f32);
 UNARY_VEC_NORMAL_T16(AbsImpl, vabs, int16_t, vector_s16);
 UNARY_VEC_NORMAL_T32(AbsImpl, vabs, int32_t, vector_s32);
 
 UNARY_VEC_BITWISE_T8(AbsImpl, vabs, int8_t, vector_s8);
-UNARY_VEC_BITWISE_T16(AbsImpl, vabs, half, vector_f16);
+UNARY_VEC_BITWISE_T16(AbsImpl, vabs, half, vector_half);
 UNARY_VEC_BITWISE_T32(AbsImpl, vabs, float, vector_f32);
 UNARY_VEC_BITWISE_T16(AbsImpl, vabs, int16_t, vector_s16);
 UNARY_VEC_BITWISE_T32(AbsImpl, vabs, int32_t, vector_s32);
@@ -343,7 +343,7 @@ UNARY_VEC_BITWISE_T32(AbsImpl, vabs, int32_t, vector_s32);
 UNARY_VEC_COUNTER_NOT_SUPPORT(AbsImpl);
 
 UNARY_VEC_COUNTER_T8(AbsImpl, vabs, int8_t, vector_s8);
-UNARY_VEC_COUNTER_T16(AbsImpl, vabs, half, vector_f16);
+UNARY_VEC_COUNTER_T16(AbsImpl, vabs, half, vector_half);
 UNARY_VEC_COUNTER_T32(AbsImpl, vabs, float, vector_f32);
 UNARY_VEC_COUNTER_T16(AbsImpl, vabs, int16_t, vector_s16);
 UNARY_VEC_COUNTER_T32(AbsImpl, vabs, int32_t, vector_s32);
@@ -355,16 +355,16 @@ UNARY_VEC_COUNTER_T32(AbsImpl, vabs, int32_t, vector_s32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(ReciprocalImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(ReciprocalImpl);
 
-UNARY_VEC_NORMAL_T16(ReciprocalImpl, vrec, half, vector_f16);
+UNARY_VEC_NORMAL_T16(ReciprocalImpl, vrec, half, vector_half);
 UNARY_VEC_NORMAL_T32(ReciprocalImpl, vrec, float, vector_f32);
 
-UNARY_VEC_BITWISE_T16(ReciprocalImpl, vrec, half, vector_f16);
+UNARY_VEC_BITWISE_T16(ReciprocalImpl, vrec, half, vector_half);
 UNARY_VEC_BITWISE_T32(ReciprocalImpl, vrec, float, vector_f32);
 
 // // Rec::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(ReciprocalImpl);
 
-UNARY_VEC_COUNTER_T16(ReciprocalImpl, vrec, half, vector_f16);
+UNARY_VEC_COUNTER_T16(ReciprocalImpl, vrec, half, vector_half);
 UNARY_VEC_COUNTER_T32(ReciprocalImpl, vrec, float, vector_f32);
 
 
@@ -375,16 +375,16 @@ UNARY_VEC_COUNTER_T32(ReciprocalImpl, vrec, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(SqrtImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(SqrtImpl);
 
-UNARY_VEC_NORMAL_T16(SqrtImpl, vsqrt, half, vector_f16);
+UNARY_VEC_NORMAL_T16(SqrtImpl, vsqrt, half, vector_half);
 UNARY_VEC_NORMAL_T32(SqrtImpl, vsqrt, float, vector_f32);
 
-UNARY_VEC_BITWISE_T16(SqrtImpl, vsqrt, half, vector_f16);
+UNARY_VEC_BITWISE_T16(SqrtImpl, vsqrt, half, vector_half);
 UNARY_VEC_BITWISE_T32(SqrtImpl, vsqrt, float, vector_f32);
 
 // // Sqrt::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(SqrtImpl);
 
-UNARY_VEC_COUNTER_T16(SqrtImpl, vsqrt, half, vector_f16);
+UNARY_VEC_COUNTER_T16(SqrtImpl, vsqrt, half, vector_half);
 UNARY_VEC_COUNTER_T32(SqrtImpl, vsqrt, float, vector_f32);
 
 
@@ -395,16 +395,16 @@ UNARY_VEC_COUNTER_T32(SqrtImpl, vsqrt, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(RsqrtImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(RsqrtImpl);
 
-UNARY_VEC_NORMAL_T16(RsqrtImpl, vrsqrt, half, vector_f16);
+UNARY_VEC_NORMAL_T16(RsqrtImpl, vrsqrt, half, vector_half);
 UNARY_VEC_NORMAL_T32(RsqrtImpl, vrsqrt, float, vector_f32);
 
-UNARY_VEC_BITWISE_T16(RsqrtImpl, vrsqrt, half, vector_f16);
+UNARY_VEC_BITWISE_T16(RsqrtImpl, vrsqrt, half, vector_half);
 UNARY_VEC_BITWISE_T32(RsqrtImpl, vrsqrt, float, vector_f32);
 
 // // Rec::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(RsqrtImpl);
 
-UNARY_VEC_COUNTER_T16(RsqrtImpl, vrsqrt, half, vector_f16);
+UNARY_VEC_COUNTER_T16(RsqrtImpl, vrsqrt, half, vector_half);
 UNARY_VEC_COUNTER_T32(RsqrtImpl, vrsqrt, float, vector_f32);
 
 
@@ -415,20 +415,20 @@ UNARY_VEC_COUNTER_T32(RsqrtImpl, vrsqrt, float, vector_f32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(NotImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(NotImpl);
 
-UNARY_VEC_NORMAL_T8(NotImpl, vnot, uint8_t, vector_u8)
+UNARY_VEC_NORMAL_T8(NotImpl, vnot, uint8_t, vector_uint8_t)
 UNARY_VEC_NORMAL_T8(NotImpl, vnot, int8_t, vector_s8)
 UNARY_VEC_NORMAL_T16(NotImpl, vnot, uint16_t, vector_u16);
 UNARY_VEC_NORMAL_T16(NotImpl, vnot, int16_t, vector_s16);
-UNARY_VEC_NORMAL_T16(NotImpl, vnot, half, vector_f16);
+UNARY_VEC_NORMAL_T16(NotImpl, vnot, half, vector_half);
 UNARY_VEC_NORMAL_T32(NotImpl, vnot, float, vector_f32);
 UNARY_VEC_NORMAL_T32(NotImpl, vnot, uint32_t, vector_u32);
 UNARY_VEC_NORMAL_T32(NotImpl, vnot, int32_t, vector_s32);
 
-UNARY_VEC_BITWISE_T8(NotImpl, vnot, uint8_t, vector_u8)
+UNARY_VEC_BITWISE_T8(NotImpl, vnot, uint8_t, vector_uint8_t)
 UNARY_VEC_BITWISE_T8(NotImpl, vnot, int8_t, vector_s8)
 UNARY_VEC_BITWISE_T16(NotImpl, vnot, uint16_t, vector_u16);
 UNARY_VEC_BITWISE_T16(NotImpl, vnot, int16_t, vector_s16);
-UNARY_VEC_BITWISE_T16(NotImpl, vnot, half, vector_f16);
+UNARY_VEC_BITWISE_T16(NotImpl, vnot, half, vector_half);
 UNARY_VEC_BITWISE_T32(NotImpl, vnot, float, vector_f32);
 UNARY_VEC_BITWISE_T32(NotImpl, vnot, uint32_t, vector_u32);
 UNARY_VEC_BITWISE_T32(NotImpl, vnot, int32_t, vector_s32);
@@ -436,11 +436,11 @@ UNARY_VEC_BITWISE_T32(NotImpl, vnot, int32_t, vector_s32);
 // // // Not::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(NotImpl);
 
-UNARY_VEC_COUNTER_T8(NotImpl, vnot, uint8_t, vector_u8);
+UNARY_VEC_COUNTER_T8(NotImpl, vnot, uint8_t, vector_uint8_t);
 UNARY_VEC_COUNTER_T8(NotImpl, vnot, int8_t, vector_s8);
 UNARY_VEC_COUNTER_T16(NotImpl, vnot, uint16_t, vector_u16);
 UNARY_VEC_COUNTER_T16(NotImpl, vnot, int16_t, vector_s16);
-UNARY_VEC_COUNTER_T16(NotImpl, vnot, half, vector_f16);
+UNARY_VEC_COUNTER_T16(NotImpl, vnot, half, vector_half);
 UNARY_VEC_COUNTER_T32(NotImpl, vnot, float, vector_f32);
 UNARY_VEC_COUNTER_T32(NotImpl, vnot, uint32_t, vector_u32);
 UNARY_VEC_COUNTER_T32(NotImpl, vnot, int32_t, vector_s32);
@@ -454,18 +454,18 @@ UNARY_VEC_COUNTER_T32(NotImpl, vnot, int32_t, vector_s32);
 UNARY_VEC_NORMAL_NOT_SUPPORT(ReluImpl);
 UNARY_VEC_BITWISE_NOT_SUPPORT(ReluImpl);
 
-UNARY_VEC_NORMAL_T16(ReluImpl, vrelu, half, vector_f16);
+UNARY_VEC_NORMAL_T16(ReluImpl, vrelu, half, vector_half);
 UNARY_VEC_NORMAL_T32(ReluImpl, vrelu, float, vector_f32);
 UNARY_VEC_NORMAL_T32(ReluImpl, vrelu, int32_t, vector_s32);
 
-UNARY_VEC_BITWISE_T16(ReluImpl, vrelu, half, vector_f16);
+UNARY_VEC_BITWISE_T16(ReluImpl, vrelu, half, vector_half);
 UNARY_VEC_BITWISE_T32(ReluImpl, vrelu, float, vector_f32);
 UNARY_VEC_BITWISE_T32(ReluImpl, vrelu, int32_t, vector_s32);
 
 // // Relu::Level 2
 UNARY_VEC_COUNTER_NOT_SUPPORT(ReluImpl);
 
-UNARY_VEC_COUNTER_T16(ReluImpl, vrelu, half, vector_f16);
+UNARY_VEC_COUNTER_T16(ReluImpl, vrelu, half, vector_half);
 UNARY_VEC_COUNTER_T32(ReluImpl, vrelu, float, vector_f32);
 UNARY_VEC_COUNTER_T32(ReluImpl, vrelu, int32_t, vector_s32);
 }

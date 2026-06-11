@@ -298,7 +298,7 @@ __aicore__ inline void CopyImpl(__ubuf__ half* dst, __ubuf__ half* src, const ui
     }
     __VEC_SCOPE__
     {
-        vector_f16 vreg;
+        vector_half vreg;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
@@ -319,7 +319,7 @@ __aicore__ inline void CopyImpl(__ubuf__ bfloat16_t* dst, __ubuf__ bfloat16_t* s
     }
     __VEC_SCOPE__
     {
-        vector_bf16 vreg;
+        vector_bfloat16_t vreg;
         vector_bool preg;
         preg = movp_b16();
         uint32_t strideConfig0 = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
@@ -498,7 +498,7 @@ __aicore__ inline void CopyImpl(__ubuf__ half *dst, __ubuf__ half *src, const ui
         uint32_t sreg = mask;
         __VEC_SCOPE__
         {
-            vector_f16 vreg;
+            vector_half vreg;
             uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
             uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
             vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -517,7 +517,7 @@ __aicore__ inline void CopyImpl(__ubuf__ half *dst, __ubuf__ half *src, const ui
     uint16_t tailRepeat = (tail == 0) ? 0 : 1;
     __VEC_SCOPE__
     {
-        vector_f16 vreg;
+        vector_half vreg;
         uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
         uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
         vector_bool preg = pset_b16(PAT_ALL);
@@ -542,7 +542,7 @@ __aicore__ inline void CopyImpl(__ubuf__ bfloat16_t *dst, __ubuf__ bfloat16_t *s
         uint32_t sreg = mask;
         __VEC_SCOPE__
         {
-            vector_bf16 vreg;
+            vector_bfloat16_t vreg;
             uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
             uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
             vector_bool preg = plt_b16(sreg, POST_UPDATE);
@@ -561,7 +561,7 @@ __aicore__ inline void CopyImpl(__ubuf__ bfloat16_t *dst, __ubuf__ bfloat16_t *s
     uint16_t tailRepeat = (tail == 0) ? 0 : 1;
     __VEC_SCOPE__
     {
-        vector_bf16 vreg;
+        vector_bfloat16_t vreg;
         uint32_t srcStride = (static_cast<uint32_t>(repeatParams.srcStride) << 16);
         uint32_t dstStride = (static_cast<uint32_t>(repeatParams.dstStride) << 16);
         vector_bool preg = pset_b16(PAT_ALL);
