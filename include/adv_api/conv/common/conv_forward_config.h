@@ -1,4 +1,5 @@
-/**
+
+*
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -44,6 +45,7 @@ struct ConvParam {
     constexpr static int8_t groupConvType = -1;
 };
 
+
 CONV_DECLARE_DEFINE_MEMBER(ConvParam, outputOrder, int8_t, INT8_MAX)
 CONV_DECLARE_DEFINE_MEMBER(ConvParam, l0pingpong, int8_t, INT8_MAX)
 CONV_DECLARE_DEFINE_MEMBER(ConvParam, bl1bypass, int8_t, INT8_MAX)
@@ -61,7 +63,11 @@ struct GetDstType<float> {
 
 template <>
 struct GetDstType<half> {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161)
+    using Type = int32_t;
+#else
     using Type = float;
+#endif
 };
 
 template <>
@@ -72,6 +78,20 @@ struct GetDstType<bfloat16_t> {
 template <>
 struct GetDstType<int8_t> {
     using Type = int32_t;
+};
+
+template <>
+struct GetDstType<int16_t> {
+    using Type = int32_t;
+};
+
+template <>
+struct GetDstType<fp8_e4m3fn_t> {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161)
+    using Type = int32_t;
+#else
+    using Type = float;
+#endif
 };
 
 template <AscendC::TPosition POSITION, ConvCommonApi::ConvFormat FORMAT, typename TYPE>
