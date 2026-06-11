@@ -1073,7 +1073,7 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
 def link_kernel_obj(compile_info: CompileInfo, op_info: OpInfo, tiling_info: TilingInfo):
     msg_info = "<{}> <{}> link kernel start".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
-    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
+    if global_var_storage.get_variable("ascendc_enable_sanitizer") and global_var_storage.get_variable("ascendc_short_soc_version") != "Ascend950":
         _mssanitizer_link(compile_info.dst_file, compile_info.dst_file, compile_info.compile_log_path)
     # split .o 4
     split_sub_kernel_objs(compile_info.dst_file, tiling_info, compile_info)
