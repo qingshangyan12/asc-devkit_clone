@@ -27,14 +27,14 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
 #if __NPU_ARCH__ == 1001
-#include "dav_c100/kernel_operator_sys_var_impl.h"
-#include "dav_c100/kernel_operator_set_atomic_impl.h"
+#include "../../dav_c100/kernel_operator_sys_var_impl.h"
+#include "../../dav_c100/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 2002
-#include "dav_m200/kernel_operator_sys_var_impl.h"
-#include "dav_m200/kernel_operator_set_atomic_impl.h"
+#include "../../dav_m200/kernel_operator_sys_var_impl.h"
+#include "../../dav_m200/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 2201
-#include "dav_c220/kernel_operator_sys_var_impl.h"
-#include "dav_c220/kernel_operator_set_atomic_impl.h"
+#include "../kernel_operator_sys_var_impl.h"
+#include "../kernel_operator_set_atomic_impl.h"
 #endif
 #include "kfc_log.h"
 

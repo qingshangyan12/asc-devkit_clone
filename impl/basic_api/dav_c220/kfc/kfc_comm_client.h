@@ -20,7 +20,7 @@
 #ifndef __KERNEL_KFC_COMM_CLIENT_H__
 #define __KERNEL_KFC_COMM_CLIENT_H__
 
-#include "kernel_macros.h"
+#include "../../kernel_macros.h"
 #include "kfc_comm.h"
 #include "kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)

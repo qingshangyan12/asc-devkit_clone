@@ -23,7 +23,7 @@
 #define IMPL_MATH_ACOSH_ACOSH_COMMON_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../common/check.h"
 #ifdef ASCENDC_CPU_DEBUG

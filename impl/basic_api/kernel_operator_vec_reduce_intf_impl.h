@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 #include "mstx_local_tensor_info.h"
-#include "utils/std/type_traits/enable_if.h"
+#include "../utils/std/type_traits/enable_if.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_reduce_impl.h"

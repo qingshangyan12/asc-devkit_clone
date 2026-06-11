@@ -23,7 +23,7 @@
 #define IMPL_MATH_TANH_TANH_C310_IMPL_H
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "../../common/check.h"
 
 namespace AscendC {

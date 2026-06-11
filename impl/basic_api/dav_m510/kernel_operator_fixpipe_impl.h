@@ -22,7 +22,7 @@
 
 #include "kernel_tpipe.h"
 #include "kernel_operator_block_sync_intf.h"
-#include "kernel_process_lock.h"
+#include "../kernel_process_lock.h"
 
 namespace AscendC {
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)

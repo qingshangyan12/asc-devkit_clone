@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 #define IMPL_MATMUL_UTILS_MATMUL_PARAM_H
 
-#include "kernel_macros.h"
+#include "../../../../basic_api/kernel_macros.h"
 #include "kernel_basic_intf.h"
 #include "include/adv_api/matmul/tiling.h"
 #include "../dfx/dfx_proxy.h"
