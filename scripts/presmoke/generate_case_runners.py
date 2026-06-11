@@ -35,30 +35,30 @@ LOG = logging.getLogger(__name__)
 SPECIAL_PREFIXES = (
     "01_simd_cpp_api/02_features/00_",
     "01_simd_cpp_api/02_features/01_",
-    "01_simd_cpp_api/02_features/02_",
+    "01_simd_cpp_api/02_features/99_",
 )
 
-CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/custom_op"
-PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package"
+CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
+PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package"
 
 CUSTOM_OP_PACKAGE_DEPENDENTS = {
-    "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation",
-    "01_simd_cpp_api/02_features/01_invocation/aclop_invocation",
-    "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin",
-    "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming",
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+    "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
 }
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 ARCH_OVERRIDES = {
-    "01_simd_cpp_api/02_features/00_compilation/custom_op": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/00_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/00_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/01_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/01_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/02_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/02_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/04_aicpu/tiling_sink_programming": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
+    "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
     "01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8": ["dav-3510"],
@@ -323,13 +323,13 @@ def requires_custom_op_package(rel: str) -> bool:
         return True
     if rel in CUSTOM_OP_PACKAGE_DEPENDENTS:
         return True
-    if "/02_framework/01_tensorflow/" in rel:
+    if "/00_framework/01_tensorflow/" in rel:
         return True
     return False
 
 
 def explicit_skip_reason(rel: str) -> str:
-    if "/02_framework/01_tensorflow/" in rel:
+    if "/00_framework/01_tensorflow/" in rel:
         return TENSORFLOW_SKIP_REASON
     return ""
 
