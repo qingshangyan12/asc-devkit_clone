@@ -124,7 +124,7 @@ __aicore__ inline void asc_dump_shape_impl(const uint32_t shapeDim, const uint32
     shapeTlv->length = tlvLen - sizeof(uint32_t[2]);
     shapeTlv->dim = shapeDim;
     for (uint32_t i = 0; i < 8; ++i) {
-        dumpTlv->shape[i] = i < shapeDim ? shape[i] : 1;
+        shapeTlv->shape[i] = i < shapeDim ? shape[i] : 1;
     }
     shapeTlv->resv = static_cast<uint32_t>(0U);
     asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(shapeTlv));
