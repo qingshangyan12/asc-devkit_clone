@@ -85,7 +85,7 @@
 
 ## 约束说明<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section794123819592"></a>
 
-- 为了保持接口兼容，该接口不建议使用。
+- 为了保留接口兼容，推荐[<<<>>>](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/调试调优/功能调试/CPU域孪生调试.md)编译使用。
 - 除了func、blkdim以外，其他的变量都必须是通过[GmAlloc](GmAlloc.md)分配的共享内存的指针；传入的参数的数量和顺序都必须和kernel保持一致。
 
 ## 调用示例<a name="zh-cn_topic_0000001963799134_zh-cn_topic_0000001541924164_section82241477610"></a>
@@ -107,7 +107,7 @@
 2.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
 
     **图 1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
-    ![](../../../../figures/cpu_side_run_verify_steps.png "CPU侧运行验证步骤")
+    ![](../../../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
     ```cpp
     int32_t main(int32_t argc, char* argv[])
