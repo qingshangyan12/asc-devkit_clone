@@ -183,7 +183,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
 **图 1**  不开启NZ2ND参数的单搬运模式设置示意图<a name="fig128961542184620"></a>  
 
-![](../../../../figures/不使能NZ2ND参数的单搬运模式设置示意图.png "不开启NZ2ND参数的单搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数的单搬运模式设置示意图.png "不开启NZ2ND参数的单搬运模式设置示意图")
 
 **双目标控制模式：**
 
@@ -205,7 +205,7 @@ M方向切分：
 
 **图 2**  不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
 
-![](../../../../figures/不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
 
 ### 开启NZ2ND随路格式转换
 
@@ -221,7 +221,7 @@ M方向切分：
 
 **图 3**  开启NZ2ND参数设置示意图<a name="fig79783143556"></a>  
 
-![](../../../../figures/使能NZ2ND参数设置示意图.png "开启NZ2ND参数设置示意图")
+![](../../../../figures/开启NZ2ND参数设置示意图.png "开启NZ2ND参数设置示意图")
 
 **单搬运模式：**
 
@@ -235,7 +235,7 @@ M方向切分：
 
 **图 4**  开启NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
 
-![](../../../../figures/使能NZ2ND参数的单搬入模式设置示意图.png "开启NZ2ND参数的单搬入模式设置示意图")
+![](../../../../figures/开启NZ2ND参数的单搬入模式设置示意图.png "开启NZ2ND参数的单搬入模式设置示意图")
 
 **双目标控制模式：**
 
@@ -250,7 +250,7 @@ M方向切分：
 
     **图 5**  开启NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
 
-    ![](../../../../figures/使能NZ2ND参数双搬入模式设置示意图.png "开启NZ2ND参数双搬入模式设置示意图")
+    ![](../../../../figures/开启NZ2ND参数双搬入模式设置示意图.png "开启NZ2ND参数双搬入模式设置示意图")
 
 ### 开启NZ2DN随路格式转换
 
@@ -270,7 +270,7 @@ M方向切分：
 
 **图 6**  开启NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
 
-![](../../../../figures/使能NZ2DN单搬运模式示意图1.png "开启NZ2DN单搬运模式示意图1")
+![](../../../../figures/开启NZ2DN单搬运模式示意图1.png "开启NZ2DN单搬运模式示意图1")
 
 - dnNum = 2，表示源NZ矩阵的数目为2。图中蓝色区域为NZ矩阵1，红色区域为NZ矩阵2。
 - nSize = 24，表示源NZ矩阵（图中蓝色区域）在N方向上的大小为24个元素。
@@ -284,7 +284,7 @@ M方向切分：
 
 **图 7**  开启NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
 
-![](../../../../figures/使能NZ2DN单搬运模式示意图2.png "开启NZ2DN单搬运模式示意图2")
+![](../../../../figures/开启NZ2DN单搬运模式示意图2.png "开启NZ2DN单搬运模式示意图2")
 
 </cann-filter>
 
@@ -297,6 +297,9 @@ M方向切分：
 - 示例：通路L0C Buffer-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置开启Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/fixpipe_l0c2ub)。
 
     ```cpp
+    // L0C Buffer->UB 搬运，目的位置为UB，需将FixpipeConfig的isToUB配置为true。
+    constexpr AscendC::FixpipeConfig CFG_ROW_MAJOR_UB = {AscendC::CO2Layout::ROW_MAJOR, true};
+
     AscendC::LocalTensor<outputType> cUB;
     cUB = AscendC::LocalTensor<outputType>(AscendC::TPosition::VECOUT, 0, cSingleSize);
     
