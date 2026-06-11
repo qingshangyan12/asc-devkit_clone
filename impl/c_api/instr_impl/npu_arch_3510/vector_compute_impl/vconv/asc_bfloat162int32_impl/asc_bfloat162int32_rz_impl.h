@@ -18,6 +18,30 @@
     "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_bfloat162int32_impl/asc_bfloat162int32_rz_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
+__simd_callee__ inline void asc_bfloat162int32_rz_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)4, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_bfloat162int32_rz_sat_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)4, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_bfloat162int32_rz_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)4, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_bfloat162int32_rz_sat_impl(vector_int32_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_bf162s32_x(src, mask, (ULL)4, (ULL)1, (ULL)1);
+    }
+}
 #endif
 
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_ASC_BFLOAT162INT32_RZ_IMPL_H

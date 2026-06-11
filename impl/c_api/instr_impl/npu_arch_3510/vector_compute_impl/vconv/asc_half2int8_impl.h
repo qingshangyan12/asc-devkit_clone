@@ -158,4 +158,124 @@ __simd_callee__ inline void asc_half2int8_rna_sat_v2_impl(vector_int8_t& dst, ve
     }
 }
 
+__simd_callee__ inline void asc_half2int8_rd_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)2, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rd_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)2, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rd_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)2, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rd_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)2, (ULL)1, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_ru_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)3, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_ru_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)3, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_ru_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)3, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_ru_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)3, (ULL)1, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rz_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)4, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rz_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)4, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rz_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)4, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rz_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)4, (ULL)1, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rn_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)0, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rn_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)0, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rn_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)0, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rn_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)0, (ULL)1, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rna_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)1, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rna_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)1, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rna_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)1, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2int8_rna_sat_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162s8_x(src, mask, (ULL)1, (ULL)1, (ULL)1);
+    }
+}
 #endif

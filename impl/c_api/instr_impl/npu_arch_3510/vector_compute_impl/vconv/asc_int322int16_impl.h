@@ -46,4 +46,28 @@ __simd_callee__ inline void asc_int322int16_sat_v2_impl(vector_int16_t& dst, vec
     }
 }
 
+__simd_callee__ inline void asc_int322int16_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s322s16_x(src, mask, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_int322int16_sat_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s322s16_x(src, mask, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_int322int16_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s322s16_x(src, mask, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_int322int16_sat_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtii_s322s16_x(src, mask, (ULL)1, (ULL)1);
+    }
+}
 #endif
