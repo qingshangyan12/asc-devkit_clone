@@ -103,6 +103,10 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 - 本接口操作数为寄存器，不涉及地址对齐。
 - 本接口不修改全局寄存器的值。
 
+## 关键特性说明
+
+在硬件层面单条指令完成乘加融合计算，精度高于分开执行Mul和Add。
+
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp

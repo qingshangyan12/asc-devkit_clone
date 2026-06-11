@@ -112,6 +112,10 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 - 本接口不修改全局寄存器的值。
 - 本接口支持的int64\_t、uint64\_t为软仿数据类型。
 
+## 关键特性说明
+
+对于非软仿实现的数据类型，在硬件层面单条指令完成乘加融合计算，精度高于分开执行Mul和Add。
+
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
