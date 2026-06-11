@@ -210,6 +210,7 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
 
 void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 {
+    HCCL_INFO("[KfcServerGenCircularQueue] KfcServerGenCircularQueue start");
     // 存放《控制repeat循环执行的条件》的寄存器
     ccu::Variable repeatCond;
     repeatCond = 0;
@@ -248,11 +249,14 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
     {
         // 等待本轮开始信号
         WaitTurnStartSig(waitAddr, turnStartSig, ctx);
+        HCCL_INFO("[KfcServerGenCircularQueue] WaitTurnStartSig finished.");
 
         // 读取本轮参数
         LoadFuncParamFromMemory(paramAddr, param, ctx);
+        HCCL_INFO("[KfcServerGenCircularQueue] LoadFuncParamFromMemory finished.");
 
         MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
+        HCCL_INFO("[KfcServerGenCircularQueue] MissionPreSync finished.");
 
         ccu::Variable opType;
         opType = param[HBM_PARAM_IDX_0];
@@ -261,6 +265,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
                                     param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
                                     param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
                                     param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
+            HCCL_INFO("[KfcServerGenCircularQueue] CcuAlltoAllMesh1DKernel finished.");
             /*
             ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                               param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
@@ -270,9 +275,11 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         } 
 
         MissionPostSync(ctx);
+        HCCL_INFO("[KfcServerGenCircularQueue] MissionPostSync finished.");
 
         // Set本轮完成信号
         SetTurnEndSig(recordAddr, turnEndSig, ctx);
+        HCCL_INFO("[KfcServerGenCircularQueue] SetTurnEndSig finished.");
         waitAddr += ckeSize;
         recordAddr += ckeSize;
         paramAddr += paramSize;
