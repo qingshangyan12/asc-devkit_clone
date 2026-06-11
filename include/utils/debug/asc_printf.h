@@ -21,9 +21,9 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
 #endif
 
-#include "impl/utils/sys_macros.h"
+#include "../../../impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
-#include "kernel_macros.h"
+#include "../../../impl/basic_api/kernel_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 #ifndef ASCENDC_SIMD_VF_DEBUG
