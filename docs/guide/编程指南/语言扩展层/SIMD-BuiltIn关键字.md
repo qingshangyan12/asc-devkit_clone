@@ -67,7 +67,7 @@
     }
     ```
 
--   **ASCEND\_IS\_AIV、ASCEND\_IS\_AIC**
+-   **ASCEND\_IS\_AIV、ASCEND\_IS\_AIC**<a li="li19530175294118"></a>
 
     ASCEND\_IS\_AIV和ASCEND\_IS\_AIC是通过C++宏实现的条件判断语句，用于在\_\_aicore\_\_修饰的函数中实现代码的条件编译。基于分离模式（AIC核和AIV核分离）开发融合算子时，算子逻辑中同时涉及AIV核和AIC核的处理逻辑，并需要进行核间同步，此时需要通过ASCEND\_IS\_AIV/ ASCEND\_IS\_AIC进行AIV和AIC核代码的隔离。
 
@@ -553,7 +553,7 @@ SIMD与SIMT混合编程场景中，SIMT VF的入口函数使用\_\_simt\_vf\_\_�
     __simt_vf__ inline void KernelAdd(__gm__ float* x, __gm__ float* y, __gm__ float* z)
     ```
 
-    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../编程模型/AI-Core-SIMD编程/SIMD与SIMT混合编程.md#section776244992018)。
+    \_\_simt\_vf\_\_标记的SIMT VF函数支持的参数类型如下。\_\_simt\_vf\_\_的使用示例请参考[编程示例](../高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md#section776244992018)。
 
     -   指针类型：\_\_ubuf\_\_ \*、\_\_gm\_\_ \*；
     -   标量类型：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
