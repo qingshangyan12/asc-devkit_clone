@@ -8,6 +8,20 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "alg_data_trans_wrapper.h"
+#include "exec_timeout_manager.h"
+#include "hcomm_primitives_dl.h"
+
+namespace {
+HcclResult HcommChannelNotifyWaitOnThread(ThreadHandle thread, ChannelHandle channel, u32 localNotifyIdx, u32 timeout)
+{
+    return HcclChannelNotifyWaitOnThreadDefault(thread, channel, localNotifyIdx, timeout);
+}
+
+HcclResult HcommThreadNotifyWaitOnThread(ThreadHandle thread, u32 notifyIdx, u32 timeout)
+{
+    return HcclThreadNotifyWaitOnThreadDefault(thread, notifyIdx, timeout);
+}
+}
 
 namespace mc2_ops_hccl {
 
