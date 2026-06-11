@@ -48,6 +48,24 @@ CUSTOM_OP_PACKAGE_DEPENDENTS = {
     "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
 }
 
+# These projects either build host-only apps, superbuild subprojects, or C API
+# samples with their own explicit --npu-arch option. Passing
+# CMAKE_ASC_ARCHITECTURES to their top-level CMake only produces an unused
+# variable warning.
+NO_CMAKE_ARCH_INJECTION_CASES = {
+    "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
+    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib",
+    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package",
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+    "02_simd_c_api/00_introduction/00_quickstart/hello_world_npu",
+    "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
+    "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
+    "02_simd_c_api/02_features/03_c_api/00_vector_compute/00_sync_add",
+    "02_simd_c_api/02_features/03_c_api/00_vector_compute/01_async_add",
+    "02_simd_c_api/02_features/03_c_api/00_vector_compute/02_c_api_delicacy_async_add",
+}
+
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 ARCH_OVERRIDES = {
     "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op": ["dav-2201", "dav-3510"],
@@ -341,9 +359,10 @@ def render_runner(
         return render_parallel_ops_package_runner(spec)
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
+    inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
     lines = [
         *runner_header(spec),
-        *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds)]),
+        *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds, inject_cmake_arch=inject_cmake_arch)]),
         *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
         *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
         "case_clean() {",
@@ -360,7 +379,7 @@ def render_parallel_ops_package_runner(spec: RunnerRenderSpec) -> str:
     lines = [
         *runner_header(spec),
         "case_build() {",
-        '    local cmake_args=(cmake -S . -B build "-DCMAKE_ASC_ARCHITECTURES=$ARCH")',
+        "    local cmake_args=(cmake -S . -B build)",
         '    if [[ -n "${NLOHMANN_JSON_URL:-}" ]]; then',
         '        cmake_args+=("-DNLOHMANN_JSON_URL=$NLOHMANN_JSON_URL")',
         "    fi",
@@ -376,7 +395,7 @@ def render_parallel_ops_package_runner(spec: RunnerRenderSpec) -> str:
         *runner_function("case_run", indent_commands(spec.run_cmds, default_cd_build=True)),
         *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
         "case_clean() {",
-        "    presmoke_default_clean",
+        '    rm -rf "$CASE_DIR/build" "$BUILD_DIR"',
         "}",
         "",
         'presmoke_case_main "$@"',
@@ -425,21 +444,25 @@ def case_entry_relative_path(rel: str) -> str:
     return "../" * depth + "_case_entry.sh"
 
 
-def indent_commands(commands: Iterable[Command], default_cd_build: bool = False) -> List[str]:
+def indent_commands(
+    commands: Iterable[Command],
+    default_cd_build: bool = False,
+    inject_cmake_arch: bool = True,
+) -> List[str]:
     lines: List[str] = []
     for command in commands:
         if isinstance(command, str):
             command = Command(command, "shell")
-        lines.append(indent_command(command, default_cd_build))
+        lines.append(indent_command(command, default_cd_build, inject_cmake_arch))
     return lines
 
 
-def indent_command(command: Command, default_cd_build: bool = False) -> str:
+def indent_command(command: Command, default_cd_build: bool = False, inject_cmake_arch: bool = True) -> str:
     raw = command.raw
     if not raw or raw == ":":
         return "    :"
     raw = rewrite_runtime_arch_options(raw)
-    raw = rewrite_runtime_cmake_options(raw)
+    raw = rewrite_runtime_cmake_options(raw, inject_cmake_arch)
     quoted = shlex.quote(raw)
     env_prefix = command_env_prefix(command)
     runner = f"{env_prefix}bash -lc {quoted}"
@@ -466,12 +489,12 @@ def command_runs_from_build_dir(command: str, default_cd_build: bool = False) ->
     return default_cd_build and command.startswith("./") and not command.startswith("./build/")
 
 
-def rewrite_runtime_cmake_options(command: str) -> str:
+def rewrite_runtime_cmake_options(command: str, inject_cmake_arch: bool = True) -> str:
     if not command.startswith("cmake ") or not is_cmake_configure(command):
         return command
     command = re.sub(
         r"-DCMAKE_ASC_ARCHITECTURES=(?:'[^']*'|\"[^\"]*\"|[^ \t;]+)",
-        '-DCMAKE_ASC_ARCHITECTURES="$ARCH"',
+        '-DCMAKE_ASC_ARCHITECTURES="$ARCH"' if inject_cmake_arch else "",
         command,
     )
     command = re.sub(
@@ -479,7 +502,8 @@ def rewrite_runtime_cmake_options(command: str) -> str:
         "",
         command,
     )
-    if "-DCMAKE_ASC_ARCHITECTURES=" not in command:
+    command = re.sub(r"[ \t]+", " ", command).strip()
+    if inject_cmake_arch and "-DCMAKE_ASC_ARCHITECTURES=" not in command:
         command = f'{command} -DCMAKE_ASC_ARCHITECTURES="$ARCH"'
     return f"{command} $RUN_MODE_ARG"
 
