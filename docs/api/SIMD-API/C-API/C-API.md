@@ -204,6 +204,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_mmad_direction_n](cube_compute/asc_set_mmad_direction_n.md)| 设置mmad计算时优先通过M/N中的M方向，然后通过N方向产生结果，M为矩阵的行，N为矩阵的列。 |
 | [asc_enable_hf32_trans](cube_compute/asc_enable_hf32_trans.md)| 设置HF32模式取整方式，需要先使用asc_enable_hf32开启HF32取整模式。 |
 | <cann-filter npu_type = "950"> [asc_enable_hif8](cube_compute/asc_enable_hif8.md) | 用于设置Mmad计算开启HiF8模式，开启该模式后L0A Buffer/L0B Buffer中的8bit数据将在参与矩阵乘法运算前被转化为hifloat8_t类型数据。 </cann-filter> |
+| <cann-filter npu_type = "950"> [asc_enable_fp8](cube_compute/asc_enable_fp8.md) | 用于设置Mmad计算开启FP8模式，开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。 </cann-filter> |
 | [asc_mmad](cube_compute/asc_mmad.md) | 完成矩阵乘加操作。 |
 | [asc_mmad_sparse](cube_compute/asc_mmad_sparse.md) | 完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。 |
 | [asc_set_fp32_mode](cube_compute/asc_set_fp32_mode.md) | 用于设置Mmad计算开启FP32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据在参与Mmad计算之前不做舍入处理。 |

@@ -280,6 +280,8 @@ __aicore__ inline void asc_set_fp32_mode();
 
 __aicore__ inline void asc_enable_hif8();
 
+__aicore__ inline void asc_enable_fp8();
+
 __aicore__ inline void asc_set_mmad_direction_m();
 
 __aicore__ inline void asc_set_mmad_direction_n();

@@ -1205,6 +1205,7 @@
             -   [asc_enable_hf32](SIMD-API/C-API/cube_compute/asc_enable_hf32.md)
             -   [asc_enable_hf32_trans](SIMD-API/C-API/cube_compute/asc_enable_hf32_trans.md)
             -   [asc_enable_hif8](SIMD-API/C-API/cube_compute/asc_enable_hif8.md)
+            -   [asc_enable_fp8](SIMD-API/C-API/cube_compute/asc_enable_fp8.md)
             -   [asc_get_l0c2gm_prequant](SIMD-API/C-API/cube_compute/asc_get_l0c2gm_prequant.md)
             -   [asc_get_l0c2gm_relu](SIMD-API/C-API/cube_compute/asc_get_l0c2gm_relu.md)
             -   [asc_get_l0c2gm_unitflag](SIMD-API/C-API/cube_compute/asc_get_l0c2gm_unitflag.md)
