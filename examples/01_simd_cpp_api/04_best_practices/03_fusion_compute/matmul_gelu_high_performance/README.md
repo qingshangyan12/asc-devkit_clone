@@ -447,7 +447,37 @@ AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + loca
   test pass!
   ```
 
-### 性能分析
+## 功能调试
+
+### printf
+
+该接口提供CPU域/NPU域调试场景下的格式化输出功能。
+
+在算子kernel侧实现代码中需要输出日志信息的地方调用printf接口打印相关内容。
+
+示例如下：
+
+```cpp
+AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
+```
+
+> **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0的方式关闭打印功能。
+
+### DumpTensor
+
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32\_t数据类型的信息），比如打印当前行号等。
+
+在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
+
+```cpp
+// Vector核LeakyRelu结果
+AscendC::Div(yLocal, xLocal, yLocal, n);
+AscendC::DumpTensor(yLocal, 1, 16);
+```
+
+> **注意：** [DumpTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+
+### 性能调试
 
 使用 `msprof` 工具获取详细性能数据：
 
@@ -466,4 +496,10 @@ PROF_xxxx_XXXXXX
     ├── msprof_*.json
     ├── xx_*.csv
     └── README.txt
+```
+
+查看具体的性能分析结果：
+```
+# 查看Task Duration 以及各项数据
+cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 ```
