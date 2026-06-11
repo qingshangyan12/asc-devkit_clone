@@ -49,6 +49,11 @@ __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr)
 {
     DataCopyImpl<T, dist, U>(dstReg, srcAddr);
 }
+template <typename T, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src)
+{
+    DataCopyImpl<T, dist, U>(dstReg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
+}
 
 template <typename T = DefaultType, PostLiteral postMode, LoadDist dist = LoadDist::DIST_NORM, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
@@ -58,6 +63,12 @@ __simd_callee__ inline void DataCopy(U& dstReg, __ubuf__ T*& srcAddr, int32_t po
 template <typename T, PostLiteral postMode, LoadDist dist, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
 {
+    DataCopyImpl<T, postMode, dist, U>(dstReg, srcAddr, postUpdateStride);
+}
+template <typename T, PostLiteral postMode, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, int32_t postUpdateStride)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
     DataCopyImpl<T, postMode, dist, U>(dstReg, srcAddr, postUpdateStride);
 }
 
@@ -71,6 +82,11 @@ __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr, AddrReg of
 {
     DataCopyImpl<T, dist, U>(dstReg, srcAddr, offset);
 }
+template <typename T, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, AddrReg offset)
+{
+    DataCopyImpl<T, dist, U>(dstReg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), offset);
+}
 
 // vld dual
 template <typename T = DefaultType, LoadDist dist, typename U>
@@ -83,6 +99,11 @@ __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T* srcAdd
 {
     DataCopyImpl<T, dist, U>(dstReg0, dstReg1, srcAddr);
 }
+template <typename T, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src)
+{
+    DataCopyImpl<T, dist, U>(dstReg0, dstReg1, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
+}
 
 template <typename T = DefaultType, PostLiteral postMode, LoadDist dist, typename U>
 __simd_callee__ inline void DataCopy(U& dstReg0, U& dstReg1, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
@@ -92,6 +113,13 @@ __simd_callee__ inline void DataCopy(U& dstReg0, U& dstReg1, __ubuf__ T*& srcAdd
 template <typename T, PostLiteral postMode, LoadDist dist, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T*& srcAddr, int32_t postUpdateStride)
 {
+    DataCopyImpl<T, postMode, dist, U>(dstReg0, dstReg1, srcAddr, postUpdateStride);
+}
+template <typename T, PostLiteral postMode, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src,
+                                      int32_t postUpdateStride)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
     DataCopyImpl<T, postMode, dist, U>(dstReg0, dstReg1, srcAddr, postUpdateStride);
 }
 
@@ -105,6 +133,11 @@ __simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, __ubuf__ T* srcAdd
 {
     DataCopyImpl<T, dist, U>(dstReg0, dstReg1, srcAddr, offset);
 }
+template <typename T, LoadDist dist, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg0, U& dstReg1, const LocalTensor<T>& src, AddrReg offset)
+{
+    DataCopyImpl<T, dist, U>(dstReg0, dstReg1, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), offset);
+}
 
 // vst
 template <typename T = DefaultType, StoreDist dist = StoreDist::DIST_NORM, typename U>
@@ -117,6 +150,11 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, MaskReg& 
 {
     DataCopyImpl<T, dist, U>(dstAddr, srcReg, mask);
 }
+template <typename T, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, MaskReg& mask)
+{
+    DataCopyImpl<T, dist, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg, mask);
+}
 
 template <typename T = DefaultType, PostLiteral postMode, StoreDist dist = StoreDist::DIST_NORM, typename U>
 __simd_callee__ inline void DataCopy(__ubuf__ T*& dstAddr, U& srcReg, int32_t postUpdateStride, MaskReg& mask)
@@ -126,6 +164,12 @@ __simd_callee__ inline void DataCopy(__ubuf__ T*& dstAddr, U& srcReg, int32_t po
 template <typename T, PostLiteral postMode, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, int32_t postUpdateStride, MaskReg& mask)
 {
+    DataCopyImpl<T, postMode, dist, U>(dstAddr, srcReg, postUpdateStride, mask);
+}
+template <typename T, PostLiteral postMode, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, int32_t postUpdateStride, MaskReg& mask)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
     DataCopyImpl<T, postMode, dist, U>(dstAddr, srcReg, postUpdateStride, mask);
 }
 
@@ -139,6 +183,11 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, AddrReg o
 {
     DataCopyImpl<T, dist, U>(dstAddr, srcReg, offset, mask);
 }
+template <typename T, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, AddrReg offset, MaskReg& mask)
+{
+    DataCopyImpl<T, dist, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg, offset, mask);
+}
 
 // vst dual
 template <typename T = DefaultType, StoreDist dist, typename U>
@@ -150,6 +199,11 @@ template <typename T, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, MaskReg& mask)
 {
     DataCopyImpl<T, dist, U>(dstAddr, srcReg0, srcReg1, mask);
+}
+template <typename T, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    DataCopyImpl<T, dist, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg0, srcReg1, mask);
 }
 
 template <typename T = DefaultType, StoreDist dist, typename U>
@@ -164,6 +218,12 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcRe
 {
     DataCopyImpl<T, dist, U>(dstAddr, srcReg0, srcReg1, offset, mask);
 }
+template <typename T, StoreDist dist, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg0, U& srcReg1, AddrReg offset,
+                                       MaskReg& mask)
+{
+    DataCopyImpl<T, dist, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg0, srcReg1, offset, mask);
+}
 
 // vsldb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
@@ -175,6 +235,11 @@ template <typename T, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr, uint32_t dataBlockStride, MaskReg& mask)
 {
     DataCopyImpl<T, dataMode, U>(dstReg, srcAddr, dataBlockStride, mask);
+}
+template <typename T, DataCopyMode dataMode, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, uint32_t dataBlockStride, MaskReg& mask)
+{
+    DataCopyImpl<T, dataMode, U>(dstReg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), dataBlockStride, mask);
 }
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
@@ -189,6 +254,13 @@ __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T*& srcAddr, uint32_t 
 {
     DataCopyImpl<T, dataMode, postMode, U>(dstReg, srcAddr, dataBlockStride, repeatStride, mask);
 }
+template <typename T, DataCopyMode dataMode, PostLiteral postMode, typename U>
+__simd_callee__ inline void LoadAlign(U& dstReg, const LocalTensor<T>& src, uint32_t dataBlockStride,
+                                      uint32_t repeatStride, MaskReg& mask)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
+    DataCopyImpl<T, dataMode, postMode, U>(dstReg, srcAddr, dataBlockStride, repeatStride, mask);
+}
 
 // vsstb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
@@ -200,6 +272,11 @@ template <typename T, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, uint32_t dataBlockStride, MaskReg& mask)
 {
     DataCopyImpl<T, dataMode, U>(dstAddr, srcReg, dataBlockStride, mask);
+}
+template <typename T, DataCopyMode dataMode, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, uint32_t dataBlockStride, MaskReg& mask)
+{
+    DataCopyImpl<T, dataMode, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg, dataBlockStride, mask);
 }
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
@@ -214,6 +291,13 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, uint32_t
 {
     DataCopyImpl<T, dataMode, postMode, U>(dstAddr, srcReg, dataBlockStride, repeatStride, mask);
 }
+template <typename T, DataCopyMode dataMode, PostLiteral postMode, typename U>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, U& srcReg, uint32_t dataBlockStride,
+                                       uint32_t repeatStride, MaskReg& mask)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
+    DataCopyImpl<T, dataMode, postMode, U>(dstAddr, srcReg, dataBlockStride, repeatStride, mask);
+}
 
 // vldas/vldus
 template <typename T>
@@ -226,6 +310,11 @@ __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* 
 {
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr);
 }
+template <typename T>
+__simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, const LocalTensor<T>& src)
+{
+    DataCopyUnAlignPreImpl<T>(ureg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
+}
 
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
 __simd_callee__ inline void DataCopyUnAlign(U& dstReg, UnalignReg& ureg, __ubuf__ T*& srcAddr, uint32_t postUpdateStride)
@@ -235,6 +324,13 @@ __simd_callee__ inline void DataCopyUnAlign(U& dstReg, UnalignReg& ureg, __ubuf_
 template <typename T, PostLiteral postMode, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr, uint32_t postUpdateStride)
 {
+    DataCopyUnAlignImpl<T, postMode, U>(dstReg, ureg, srcAddr, postUpdateStride);
+}
+template <typename T, PostLiteral postMode, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src,
+                                        uint32_t postUpdateStride)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
     DataCopyUnAlignImpl<T, postMode, U>(dstReg, ureg, srcAddr, postUpdateStride);
 }
 
@@ -248,11 +344,21 @@ __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ub
 {
     DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr);
 }
+template <typename T, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src)
+{
+    DataCopyUnAlignImpl<T, U>(dstReg, ureg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
+}
 
 template <typename T, typename U>
 __simd_callee__ inline void Load(U& dstReg, __ubuf__ T* srcAddr)
 {
     LoadImpl<T, U>(dstReg, srcAddr);
+}
+template <typename T, typename U>
+__simd_callee__ inline void Load(U& dstReg, const LocalTensor<T>& src)
+{
+    LoadImpl<T, U>(dstReg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
 }
 
 // vlda/vldu
@@ -265,6 +371,11 @@ template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr, AddrReg& areg)
 {
     DataCopyUnAlignPreImpl<T>(ureg, srcAddr, areg);
+}
+template <typename T>
+__simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, const LocalTensor<T>& src, AddrReg& areg)
+{
+    DataCopyUnAlignPreImpl<T>(ureg, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), areg);
 }
 
 template <typename T = DefaultType, typename U>
@@ -279,6 +390,13 @@ __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ub
 {
     DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr, areg, inc);
 }
+template <typename T, typename U>
+__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, const LocalTensor<T>& src, AddrReg& areg,
+                                        uint32_t inc)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
+    DataCopyUnAlignImpl<T, U>(dstReg, ureg, srcAddr, areg, inc);
+}
 
 // vstus/vstas
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
@@ -289,6 +407,13 @@ __simd_callee__ inline void DataCopyUnAlign(__ubuf__ T*& dstAddr, U& srcReg, Una
 template <typename T, PostLiteral postMode, typename U>
 __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg, uint32_t postUpdateStride)
 {
+    DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, postUpdateStride);
+}
+template <typename T, PostLiteral postMode, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg,
+                                         uint32_t postUpdateStride)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
     DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, postUpdateStride);
 }
 
@@ -302,17 +427,34 @@ __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegFor
 {
     DataCopyUnAlignPostImpl<T, postMode>(dstAddr, ureg, postUpdateStride);
 }
+template <typename T, PostLiteral postMode>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg,
+                                             int32_t postUpdateStride)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
+    DataCopyUnAlignPostImpl<T, postMode>(dstAddr, ureg, postUpdateStride);
+}
 
 template <typename T, typename U>
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg)
 {
     StoreImpl<T, U>(dstAddr, srcReg);
 }
+template <typename T, typename U>
+__simd_callee__ inline void Store(const LocalTensor<T>& dst, U& srcReg)
+{
+    StoreImpl<T, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg);
+}
 
 template <typename T, typename U>
 __simd_callee__ inline void Store(__ubuf__ T* dstAddr, U& srcReg, uint32_t count)
 {
     StoreImpl<T, U>(dstAddr, srcReg, count);
+}
+template <typename T, typename U>
+__simd_callee__ inline void Store(const LocalTensor<T>& dst, U& srcReg, uint32_t count)
+{
+    StoreImpl<T, U>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg, count);
 }
 
 // vstu/vsta
@@ -326,6 +468,13 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, Unalig
 {
     DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, areg);
 }
+template <typename T, PostLiteral postMode, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg,
+                                         AddrReg& areg)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
+    DataCopyUnAlignImpl<T, postMode, U>(dstAddr, srcReg, ureg, areg);
+}
 
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T*& dstAddr, UnalignReg& ureg, AddrReg& areg)
@@ -335,6 +484,12 @@ __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T*& dstAddr, UnalignReg
 template <typename T>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, AddrReg& areg)
 {
+    DataCopyUnAlignPostImpl<T>(dstAddr, ureg, areg);
+}
+template <typename T>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg, AddrReg& areg)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
     DataCopyUnAlignPostImpl<T>(dstAddr, ureg, areg);
 }
 
@@ -349,6 +504,11 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T* dstAddr, U& srcReg, Unalign
 {
     DataCopyUnAlignImpl(dstAddr, srcReg, ureg);
 }
+template <typename T, PostLiteral postMode, typename U>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, U& srcReg, UnalignRegForStore& ureg)
+{
+    DataCopyUnAlignImpl(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), srcReg, ureg);
+}
 
 template <typename T>
 __simd_callee__ inline void DataCopyUnAlignPost(__ubuf__ T* dstAddr, UnalignReg& ureg)
@@ -359,6 +519,11 @@ template <typename T>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T* dstAddr, UnalignRegForStore& ureg)
 {
     DataCopyUnAlignPostImpl(dstAddr, ureg);
+}
+template <typename T>
+__simd_callee__ inline void StoreUnAlignPost(const LocalTensor<T>& dst, UnalignRegForStore& ureg)
+{
+    DataCopyUnAlignPostImpl(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), ureg);
 }
 
 // vgather2
@@ -373,6 +538,11 @@ __simd_callee__ inline void Gather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index,
 {
     DataCopyGatherImpl<T0, T1, T2, T3, T4>(dstReg, baseAddr, index, mask);
 }
+template <typename T0, typename T1, typename T2, typename T3, typename T4>
+__simd_callee__ inline void Gather(T3& dstReg, const LocalTensor<T1>& base, T4& index, MaskReg& mask)
+{
+    DataCopyGatherImpl<T0, T1, T2, T3, T4>(dstReg, reinterpret_cast<__ubuf__ T1*>(base.GetPhyAddr()), index, mask);
+}
 
 // vgatherb
 template <typename T = DefaultType, typename U, typename S>
@@ -384,6 +554,11 @@ template <typename T, typename U, typename S>
 __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, MaskReg& mask)
 {
     DataCopyGatherBImpl<T, U, S>(dstReg, baseAddr, index, mask);
+}
+template <typename T, typename U, typename S>
+__simd_callee__ inline void GatherB(U& dstReg, const LocalTensor<T>& base, S& index, MaskReg& mask)
+{
+    DataCopyGatherBImpl<T, U, S>(dstReg, reinterpret_cast<__ubuf__ T*>(base.GetPhyAddr()), index, mask);
 }
 
 // vscatter
@@ -399,6 +574,11 @@ __simd_callee__ inline void Scatter(__ubuf__ T* baseAddr, S& srcReg, V& index,
 {
     DataCopyScatterImpl<T, U, S, V>(baseAddr, srcReg, index, mask);
 }
+template <typename T, typename U, typename S, typename V>
+__simd_callee__ inline void Scatter(const LocalTensor<T>& base, S& srcReg, V& index, MaskReg& mask)
+{
+    DataCopyScatterImpl<T, U, S, V>(reinterpret_cast<__ubuf__ T*>(base.GetPhyAddr()), srcReg, index, mask);
+}
 
 // pld
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
@@ -410,6 +590,11 @@ template <typename T, MaskDist dist>
 __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T* srcAddr, AddrReg offset)
 {
     DataCopyImpl<T, dist>(mask, srcAddr, offset);
+}
+template <typename T, MaskDist dist>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src, AddrReg offset)
+{
+    DataCopyImpl<T, dist>(mask, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()), offset);
 }
 
 // plds
@@ -423,6 +608,11 @@ __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T* srcAddr)
 {
     DataCopyImpl<T, dist>(mask, srcAddr);
 }
+template <typename T, MaskDist dist>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src)
+{
+    DataCopyImpl<T, dist>(mask, reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr()));
+}
 
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(MaskReg& mask, __ubuf__ T*& srcAddr, int32_t offset)
@@ -432,6 +622,12 @@ __simd_callee__ inline void DataCopy(MaskReg& mask, __ubuf__ T*& srcAddr, int32_
 template <typename T, PostLiteral postMode, MaskDist dist>
 __simd_callee__ inline void LoadAlign(MaskReg& mask, __ubuf__ T*& srcAddr, int32_t offset)
 {
+    DataCopyImpl<T, postMode, dist>(mask, srcAddr, offset);
+}
+template <typename T, PostLiteral postMode, MaskDist dist>
+__simd_callee__ inline void LoadAlign(MaskReg& mask, const LocalTensor<T>& src, int32_t offset)
+{
+    __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(src.GetPhyAddr());
     DataCopyImpl<T, postMode, dist>(mask, srcAddr, offset);
 }
 
@@ -446,6 +642,11 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask, AddrR
 {
     DataCopyImpl<T, dist>(dstAddr, mask, offset);
 }
+template <typename T, MaskDist dist>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask, AddrReg offset)
+{
+    DataCopyImpl<T, dist>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), mask, offset);
+}
 
 // psts
 template <typename T, MaskDist dist = MaskDist::DIST_NORM>
@@ -458,6 +659,11 @@ __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, MaskReg& mask)
 {
     DataCopyImpl<T, dist>(dstAddr, mask);
 }
+template <typename T, MaskDist dist>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask)
+{
+    DataCopyImpl<T, dist>(reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr()), mask);
+}
 
 template <typename T, PostLiteral postMode, MaskDist dist = MaskDist::DIST_NORM>
 __simd_callee__ inline void DataCopy(__ubuf__ T*& dstAddr, MaskReg& mask, int32_t offset)
@@ -467,6 +673,12 @@ __simd_callee__ inline void DataCopy(__ubuf__ T*& dstAddr, MaskReg& mask, int32_
 template <typename T, PostLiteral postMode, MaskDist dist>
 __simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, MaskReg& mask, int32_t offset)
 {
+    DataCopyImpl<T, postMode, dist>(dstAddr, mask, offset);
+}
+template <typename T, PostLiteral postMode, MaskDist dist>
+__simd_callee__ inline void StoreAlign(const LocalTensor<T>& dst, MaskReg& mask, int32_t offset)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
     DataCopyImpl<T, postMode, dist>(dstAddr, mask, offset);
 }
 
@@ -481,6 +693,12 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 {
     return DataCopyUnAlignImpl<T>(dstAddr, mask, ureg);
 }
+template <typename T>
+__simd_callee__ inline void StoreUnAlign(const LocalTensor<T>& dst, MaskReg& mask, UnalignRegForStore& ureg)
+{
+    __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(dst.GetPhyAddr());
+    DataCopyUnAlignImpl<T>(dstAddr, mask, ureg);
+}
 
 }  // namespace Reg
 }  // namespace AscendC
@@ -490,4 +708,3 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_IMPL__
 #endif
-
