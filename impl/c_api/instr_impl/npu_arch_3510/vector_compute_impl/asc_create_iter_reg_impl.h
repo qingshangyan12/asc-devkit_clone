@@ -18,26 +18,42 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
-// f(bxx, 形参列表)：为每个 bxx 生成 4 个重载（1~4 个 offset）
-#define ASC_ITER_REG_ARITIES(f, bxx)                                                                 \
-    f(bxx, uint32_t offset)                                                                          \
-    f(bxx, uint32_t offset0, uint32_t offset1)                                                       \
-    f(bxx, uint32_t offset0, uint32_t offset1, uint32_t offset2)                                     \
-    f(bxx, uint32_t offset0, uint32_t offset1, uint32_t offset2, uint32_t offset3)
-
-#define ASC_ITER_REG_IMPL_FN(bxx, ...)                                                               \
-    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx##_impl(__VA_ARGS__)                    \
+#define ASC_DEFINE_ITER_REG_IMPL(bxx)                                                                \
+    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx##_impl(uint32_t offset)                \
     {                                                                                                \
         if ASC_IS_AIV {                                                                              \
-            return vag_##bxx(__VA_ARGS__);                                                           \
+            return vag_##bxx(offset);                                                                \
+        }                                                                                            \
+        return iter_reg{};                                                                           \
+    }                                                                                                \
+    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx##_impl(uint32_t offset0, uint32_t offset1) \
+    {                                                                                                \
+        if ASC_IS_AIV {                                                                              \
+            return vag_##bxx(offset0, offset1);                                                      \
+        }                                                                                            \
+        return iter_reg{};                                                                           \
+    }                                                                                                \
+    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx##_impl(uint32_t offset0, uint32_t offset1, \
+        uint32_t offset2)                                                                            \
+    {                                                                                                \
+        if ASC_IS_AIV {                                                                              \
+            return vag_##bxx(offset0, offset1, offset2);                                            \
+        }                                                                                            \
+        return iter_reg{};                                                                           \
+    }                                                                                                \
+    __simd_callee__ inline iter_reg asc_create_iter_reg_##bxx##_impl(uint32_t offset0, uint32_t offset1, \
+        uint32_t offset2, uint32_t offset3)                                                          \
+    {                                                                                                \
+        if ASC_IS_AIV {                                                                              \
+            return vag_##bxx(offset0, offset1, offset2, offset3);                                   \
         }                                                                                            \
         return iter_reg{};                                                                           \
     }
 
-ASC_ITER_REG_ARITIES(ASC_ITER_REG_IMPL_FN, b32)
-ASC_ITER_REG_ARITIES(ASC_ITER_REG_IMPL_FN, b16)
-ASC_ITER_REG_ARITIES(ASC_ITER_REG_IMPL_FN, b8)
+ASC_DEFINE_ITER_REG_IMPL(b32)
+ASC_DEFINE_ITER_REG_IMPL(b16)
+ASC_DEFINE_ITER_REG_IMPL(b8)
 
-#undef ASC_ITER_REG_IMPL_FN
+#undef ASC_DEFINE_ITER_REG_IMPL
 
 #endif
