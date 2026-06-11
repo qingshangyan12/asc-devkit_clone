@@ -27,6 +27,8 @@
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
 namespace AscendC {
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
+
 template <class... Args>
 __aicore__ inline void PrintfImpl(DumpType printType, __gm__ const char* fmt, Args&&... args)
 {

@@ -32,6 +32,8 @@
 #include "impl/utils/debug/asc_aicore_time_impl.h"
 
 namespace AscendC {
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
+
 template <typename T>
 __aicore__ constexpr inline Internal::DumpTensorDataType GetTensorDataType();
 
