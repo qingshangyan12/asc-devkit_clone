@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <cstring>
 #include "channel.h"
 #include "hccl_ccu_res.h"
 #include "ccu_assist_pub.h"
@@ -47,8 +48,17 @@ HcclResult CcuTempKfcServer::CalcRes(HcclComm comm, const OpParam& param, const 
     CcuKernelInfo kernelInfo;
     strcpy(kernelInfo.kernelFuncName, "CcuKernelKfcServer");
     kernelInfo.kernelFunc = reinterpret_cast<void *>(CcuKfcServerKernel);
-    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();  
-    // TODO：其他参数赋值  
+    auto kernelArg = std::make_shared<CcuKernelArgKfcServer>();
+    for (const auto &existKernelInfo : resourceRequest.ccuKernelInfos) {
+        if (strcmp(existKernelInfo.kernelFuncName, "CcuKernelAlltoAllMesh1D") == 0) {
+            kernelArg->opKernelArgHolder = existKernelInfo.getKernelArg();
+            kernelArg->opKernelArg = static_cast<CcuKernelArg>(existKernelInfo.kernelArg);
+            break;
+        }
+    }
+    CHK_PRT_RET(kernelArg->opKernelArg == nullptr,
+        HCCL_ERROR("[CcuTempKfcServer::CalcRes] failed to find CcuKernelAlltoAllMesh1D kernel arg."),
+        HCCL_E_INTERNAL);
     kernelInfo.setKernelArg(kernelArg);
 
     resourceRequest.ccuKernelInfos.push_back(kernelInfo);

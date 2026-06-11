@@ -11,6 +11,7 @@
 #ifndef HCCL_CCU_KERNEL_KFC_SERVER_H
 #define HCCL_CCU_KERNEL_KFC_SERVER_H
 
+#include <memory>
 #include <vector>
 #include <ios>
 #include "utils.h"
@@ -34,6 +35,8 @@ struct CcuKernelArgKfcServer: CcuKernelArgBase{
     bool                                    loadFromMem;
     OpParam                                 opParam;
     std::vector<std::vector<uint32_t>>      subCommRanks;
+    std::shared_ptr<CcuKernelArgBase>       opKernelArgHolder;
+    CcuKernelArg                            opKernelArg = nullptr;
 };
 
 // 第一层同步：missionId=0 与missionId>0之间的

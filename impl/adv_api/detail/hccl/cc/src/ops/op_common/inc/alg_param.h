@@ -293,6 +293,11 @@ public:
         kernelArgSmartPtr = std::static_pointer_cast<CcuKernelArgBase>(arg);
         kernelArg = static_cast<void*>(arg.get());
     }
+
+    std::shared_ptr<CcuKernelArgBase> getKernelArg() const
+    {
+        return kernelArgSmartPtr;
+    }
 };
 
 // 算法taskArg入参最大个数，用于快速下发缓存

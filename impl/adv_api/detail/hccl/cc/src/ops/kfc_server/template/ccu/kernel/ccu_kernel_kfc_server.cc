@@ -216,7 +216,7 @@ void LoadFuncParamFromMemory(ccu::Variable &paramAddr, ccu::Array<ccu::Variable>
     ccu::Load(addr, param, CCU_PARAM_NUM_PER_DIE);
 }
 
-void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
+void KfcServerGenCircularQueue(CcuKernelArg &opKernelArg, KfcServerContext &ctx)
 {
     // 存放《控制repeat循环执行的条件》的寄存器
     ccu::Variable repeatCond;
@@ -268,7 +268,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
             CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                     param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
                                     param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                    param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
+                                    param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], opKernelArg);
             /*
             ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                               param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
@@ -295,7 +295,7 @@ void KfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 
 }
 
-void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
+void SlaveKfcServerGenCircularQueue(CcuKernelArg &opKernelArg, KfcServerContext &ctx)
 {
     // 算子签名
     ccu::Variable signature;
@@ -321,7 +321,7 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
         CcuAlltoAllMesh1DKernel(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
                                 param[HBM_PARAM_IDX_4], param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_6],
                                 param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], param[HBM_PARAM_IDX_9],
-                                param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], arg);
+                                param[HBM_PARAM_IDX_10], param[HBM_PARAM_IDX_11], opKernelArg);
         /*
         argHandle = reinterpret_cast<uint64_t>(arg);
         ccu::CallFunc<AlltoAllMesh1DFunc>(param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], param[HBM_PARAM_IDX_3],
@@ -339,6 +339,12 @@ void SlaveKfcServerGenCircularQueue(CcuKernelArg &arg, KfcServerContext &ctx)
 CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 {
     KfcServerContext ctx;
+    auto *kernelArg = static_cast<CcuKernelArgKfcServer *>(arg);
+    if (kernelArg == nullptr || kernelArg->opKernelArg == nullptr) {
+        HCCL_ERROR("[CcuKernelKfcServer] op kernel arg is null.");
+        return CcuResult::CCU_E_INTERNAL;
+    }
+    CcuKernelArg opKernelArg = kernelArg->opKernelArg;
 
     HCCL_INFO("[CcuKernelKfcServer] KfcServer run");
     CCU_CHK_RET(ParseKernelArg(ctx));
@@ -352,9 +358,9 @@ CcuResult CcuKfcServerKernel(CcuKernelArg arg)
 
     HCCL_INFO("[GenCircularQueue] KfcServer start");
     CCU_IF(ctx.missionIndex == 0) {
-        KfcServerGenCircularQueue(arg, ctx);
+        KfcServerGenCircularQueue(opKernelArg, ctx);
     } CCU_ELSE {
-        SlaveKfcServerGenCircularQueue(arg, ctx);
+        SlaveKfcServerGenCircularQueue(opKernelArg, ctx);
     }
 
     HCCL_INFO("[CcuKernelKfcServer] KfcServer end");
