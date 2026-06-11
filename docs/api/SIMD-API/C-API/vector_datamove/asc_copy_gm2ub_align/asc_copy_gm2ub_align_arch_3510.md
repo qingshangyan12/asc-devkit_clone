@@ -81,7 +81,7 @@ __aicore__ inline void asc_copy_gm2ub_align_sync(__ubuf__ float* dst, __gm__ flo
 | enable_constant_pad | 输入 | 配置非对齐填充值是否为常量。取值说明如下：  <br>&bull; true：填充值为接口[asc_set_copy_pad_val](../asc_set_copy_pad_val.md)设置的值。 <br>&bull; false：填充值为输入数据的第一个值。 |
 | l2_cache_mode | 输入 | 配置数据在L2 Cache中的管理策略。取值说明如下：  <br>&bull; 0：DISABLE模式，适用于仅需访问一次的数据。 <br>&bull; 1：NORMAL模式，适用于重用模式未知或不极端的数据。 <br>&bull; 2：LAST模式，适用于高频重复访问的数据。 <br>&bull; 4：PERSISTENT模式，适用于需要长期驻留在缓存中的数据。 |
 | src_stride | 输入 | 源操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
-| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为DataBlock（32字节）。 |
+| dst_stride | 输入 | 目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面一个数据块的头的间隔）。<br>单位为字节。 |
 
 ## 返回值说明
 
@@ -98,6 +98,7 @@ PIPE_MTE2
 - 如果需要执行多条asc_copy_gm2ub_align指令，且asc_copy_gm2ub_align指令的目的地址存在重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个asc_copy_gm2ub_align指令的串行化，防止出现异常数据。
 - left_padding_num、right_padding_num的字节数均不能超过32Bytes。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
+- 当dst_stride不等于len_burst时，dst_stride要求32字节对齐。
 
 ## 调用示例
 

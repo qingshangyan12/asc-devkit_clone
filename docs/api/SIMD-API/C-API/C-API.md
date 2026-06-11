@@ -161,9 +161,9 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)                                                           | 设置Feature map属性描述，用于在调用[asc_copy_l12l0a](cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口时配置填充数值。从右矩阵获取FeatureMap的属性时使用该接口。|
 | [asc_set_l0c2gm_lrelu_alpha](cube_datamove/asc_set_l0c2gm_lrelu_alpha.md)                                                   | 用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。 |
 | [asc_copy_ub2ub](vector_datamove/asc_copy_ub2ub.md)                                                                         | 将数据从Unified Buffer搬运到Unified Buffer。 |
-| [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub.md)                                                                         | 将数据从Global Memory搬运到Unified Buffer。 |
+| [asc_copy_gm2ub](vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md)                                                                         | 将数据从Global Memory搬运到Unified Buffer。 |
 | [asc_copy_gm2ub_align](vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)                                                                | 提供数据非对齐搬运的功能，将数据从Global Memory搬运到Unified Buffer，并支持8位/16位/32位数据类型搬运。 |
-| [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm.md)                                                                         | 将数据从Unified Buffer搬运到Global Memory。 |
+| [asc_copy_ub2gm](vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md)                                                                         | 将数据从Unified Buffer搬运到Global Memory。 |
 | [asc_copy_ub2gm_align](vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)                                                                | 将数据从Unified Buffer搬运到Global Memory，支持8位/16位/32位分块拷贝操作。 |
 | [asc_set_copy_pad_val](vector_datamove/asc_set_copy_pad_val.md)                                                             | 和asc_copy_gm2ub_align或asc_copy_ub2gm_align接口配合使用，设置连续搬运数据块左右两侧需要填补的数据值。 |
 | [asc_copy_ub2l1](vector_datamove/asc_copy_ub2l1.md)                                                                         | 将数据从Unified Buffer (UB)搬运到L1 Buffer。 |
