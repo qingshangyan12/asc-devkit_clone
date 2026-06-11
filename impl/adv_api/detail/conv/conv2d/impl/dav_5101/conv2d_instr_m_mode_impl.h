@@ -16,11 +16,64 @@
 #ifndef API_CONV2D_INSTR_M_MODE_IMPL_H
 #define API_CONV2D_INSTR_M_MODE_IMPL_H
 
-#include "../../conv_config.h"
+#include "lib/conv/conv2d_config.h" // #include "../../../../../include/adv_api/conv/conv2d/conv2d_config.h"  // [zj]TODO
 #include "../../conv_util.h"
 
 namespace Conv2dApiFunc {
 using namespace AscendC;
+
+template <class Intf>
+class CopyEltwiseToolsMMode {
+public:
+    __aicore__ inline CopyEltwiseToolsMMode()
+    {
+    }
+
+    __aicore__ inline void SetParams(const typename Intf::ContextType &ctx)
+    {
+        // ctx_ = ctx;
+        valueHoWo_ = ctx.orgHo * ctx.orgWo;
+    }
+
+    __aicore__ inline void SetMN(const typename Intf::ContextType &ctx, uint64_t m, uint64_t n)
+    {
+        currentML0_ = m;
+        currentNL0_ = n;
+    }
+
+    __aicore__ inline uint64_t CalcOffset(const typename Intf::ContextType &ctx)
+    {
+        printf("[eltwiseL1]batchIter: %ld, mAL1Iter: %ld, mL0Iter: %ld, nBL1Iter: %ld, nL0Iter: %ld\n",
+               ctx.batchIter, ctx.mAL1Iter, ctx.mL0Iter, ctx.nBL1Iter, ctx.nL0Iter);
+        uint64_t c0 = (C0_SIZE / sizeof(typename Intf::EltwiseT));
+        uint64_t offsetCout = ctx.nBL1Iter * ctx.convTiling->nBL1 +
+                              ctx.nL0Iter * ctx.convTiling->nL0;
+        uint64_t offset = (ctx.mAL1Iter * ctx.mAL1 + ctx.mL0Iter * ctx.mL0) * c0 +
+                          ctx.batchIter * ctx.outputOneBatchSize +
+                          offsetCout / c0 * valueHoWo_ * c0 + offsetCout % c0;
+        return offset;
+    }
+
+    __aicore__ inline void CopyElt(const typename Intf::ContextType &ctx)
+    {
+        uint64_t offset = CalcOffset(ctx);
+        uint64_t c0 = (C0_SIZE / sizeof(typename Intf::EltwiseT));
+        DataCopyParams intriParams;
+        intriParams.blockCount = currentNL0_ / c0;
+        intriParams.blockLen = currentML0_;
+        intriParams.srcStride = valueHoWo_ - currentML0_;
+        intriParams.dstStride = 0;
+        printf("[eltwiseL1]eltwiseL1GmOffset: %ld, blockCount: %ld, blockLen: %ld, srcStride: %ld, dstStride: %ld\n",
+               offset, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
+        DataCopy<typename Intf::EltwiseT>(ctx.eltwiseL1, ctx.eltwiseGm[offset], intriParams);
+    }
+
+private:
+    // typename Intf::ContextType *ctx_;
+    uint64_t valueHoWo_;
+    uint64_t currentML0_;
+    uint64_t currentNL0_;
+};
 
 template <class Intf>
 class LoadAL0ToolsMMode {
@@ -88,59 +141,6 @@ private:
     uint64_t xm_;
     uint64_t xt_;
     uint64_t xmtmp_;
-};
-
-template <class Intf>
-class CopyEltwiseToolsMMode {
-public:
-    __aicore__ inline CopyEltwiseToolsMMode()
-    {
-    }
-
-    __aicore__ inline void SetParams(const typename Intf::ContextType &ctx)
-    {
-        // ctx_ = ctx;
-        valueHoWo_ = ctx.orgHo * ctx.orgWo;
-    }
-
-    __aicore__ inline void SetMN(const typename Intf::ContextType &ctx, uint64_t m, uint64_t n)
-    {
-        currentML0_ = m;
-        currentNL0_ = n;
-    }
-
-    __aicore__ inline uint64_t CalcOffset(const typename Intf::ContextType &ctx)
-    {
-        printf("[eltwiseL1]batchIter: %ld, mAL1Iter: %ld, mL0Iter: %ld, nBL1Iter: %ld, nL0Iter: %ld\n",
-               ctx.batchIter, ctx.mAL1Iter, ctx.mL0Iter, ctx.nBL1Iter, ctx.nL0Iter);
-        uint64_t c0 = (C0_SIZE / sizeof(typename Intf::EltwiseT));
-        uint64_t offsetCout = ctx.nBL1Iter * ctx.convTiling->nBL1 +
-                              ctx.nL0Iter * ctx.convTiling->nL0;
-        uint64_t offset = (ctx.mAL1Iter * ctx.mAL1 + ctx.mL0Iter * ctx.mL0) * c0 +
-                          ctx.batchIter * ctx.outputOneBatchSize +
-                          offsetCout / c0 * valueHoWo_ * c0 + offsetCout % c0;
-        return offset;
-    }
-
-    __aicore__ inline void CopyElt(const typename Intf::ContextType &ctx)
-    {
-        uint64_t offset = CalcOffset(ctx);
-        uint64_t c0 = (C0_SIZE / sizeof(typename Intf::EltwiseT));
-        DataCopyParams intriParams;
-        intriParams.blockCount = currentNL0_ / c0;
-        intriParams.blockLen = currentML0_;
-        intriParams.srcStride = valueHoWo_ - currentML0_;
-        intriParams.dstStride = 0;
-        printf("[eltwiseL1]eltwiseL1GmOffset: %ld, blockCount: %ld, blockLen: %ld, srcStride: %ld, dstStride: %ld\n",
-               offset, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride);
-        DataCopy<typename Intf::EltwiseT>(ctx.eltwiseL1, ctx.eltwiseGm[offset], intriParams);
-    }
-
-private:
-    // typename Intf::ContextType *ctx_;
-    uint64_t valueHoWo_;
-    uint64_t currentML0_;
-    uint64_t currentNL0_;
 };
 
 template <class Intf>

@@ -142,9 +142,9 @@ public:
         int64_t hiStartPos;
         int64_t wiStartPos;
 
-        uint8_t isFirstIterate; // 是否第一次循环
+        uint8_t isFirstIterate; // 是否第一次循环，即是否第一次Iterate
 
-        uint64_t iter; // 整体循环
+        uint64_t iter; // 整体所有循环
         uint64_t kIter; // k方向循环, DDR->L0
         uint64_t batchIter; // batch方向循环
         uint64_t kAL1Iter; // A, GM->L1, k方向循环
@@ -229,8 +229,8 @@ public:
         uint64_t lastLoopKAL1StartPos; // ddr2l0LoopK - multiKAL1，最后一次A L1->L0的k方向循环序号
         uint64_t lastLoopKBL1StartPos; // ddr2l0LoopK - multiKBL1，最后一次B L1->L0的k方向循环序号
 
-        uint16_t kL0FullLoadAl0PingPongFlag; // LoadL0Moudle中al0PingPongFlag
-        uint16_t kL0FullLoadBl0PingPongFlag; // LoadL0Moudle中bl0PingPongFlag
+        uint16_t kL0FullLoadAl0PingPongFlag; // LoadL0Moudle中al0PingPongFlag，用于计算当前是ping还是pong，随循环递增
+        uint16_t kL0FullLoadBl0PingPongFlag; // LoadL0Moudle中bl0PingPongFlag，用于计算当前是ping还是pong，随循环递增
 
         // [zj]TODO: group conv
         // // Used in opt group mode(groups > 1)
