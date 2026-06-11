@@ -21,7 +21,7 @@
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_mm_intf.h"
 #include "kernel_operator_fixpipe_intf.h"
-#include "kernel_utils.h"
+#include "../../../../../basic_api/kernel_utils.h"
 
 namespace Conv3dApiFunc {
 

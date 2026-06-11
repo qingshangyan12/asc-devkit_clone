@@ -24,7 +24,7 @@
 #include "kernel_tpipe.h"
 #include "../../../include/basic_api/kernel_operator_vec_binary_scalar_intf.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 namespace AscendC {

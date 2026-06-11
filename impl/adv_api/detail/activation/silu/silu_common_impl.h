@@ -28,7 +28,7 @@
 #include "../../api_check/kernel_api_check.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/activation/silu/silu_check.h"
-#include "kernel_log.h"
+#include "../../../../basic_api/kernel_log.h"
 #include <type_traits>
 #endif
 namespace AscendC {

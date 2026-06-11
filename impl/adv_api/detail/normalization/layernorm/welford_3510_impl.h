@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_WELFORD_C310_IMPL_H
 
 #include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/normalization/normalize.h"
 #include "layernorm_3510_utils.h"

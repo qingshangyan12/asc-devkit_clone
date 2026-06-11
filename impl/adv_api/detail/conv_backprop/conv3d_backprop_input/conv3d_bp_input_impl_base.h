@@ -20,7 +20,7 @@
 #include "conv3d_bp_input_func.h"
 #include "../common/conv3d_bp_util.h"
 #include "kernel_basic_intf.h"
-#include "kernel_utils.h"
+#include "../../../../basic_api/kernel_utils.h"
 
 namespace ConvBackpropApi {
 template <typename Intf, class Config_>

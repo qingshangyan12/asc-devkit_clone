@@ -26,7 +26,7 @@
 #include "kernel_operator_block_sync_intf.h"
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 #pragma begin_pipe(V)

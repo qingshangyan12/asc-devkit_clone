@@ -24,8 +24,8 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_utils.h"
-#include "kernel_log.h"
+#include "../../../../basic_api/kernel_utils.h"
+#include "../../../../basic_api/kernel_log.h"
 namespace AscendC {
 // Generating an underlying arithmetic sequence through scalar operations.
 template <typename RegT, typename ScalarT>

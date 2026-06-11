@@ -19,7 +19,7 @@
 
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_utils.h"
+#include "../../../../basic_api/kernel_utils.h"
 #include "kernel_operator_vec_cmpsel_intf.h"
 #include "kernel_operator_vec_vconv_intf.h"
 

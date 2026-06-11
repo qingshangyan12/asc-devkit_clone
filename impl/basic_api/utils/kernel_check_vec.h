@@ -22,7 +22,7 @@
 #define ASCENDC_MODULE_CHECK_VEC_H
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check_util.h"
+#include "../kernel_check_util.h"
 #include "kernel_common.h"
 #include "kernel_struct_unary.h"
 #include "kernel_struct_mm.h"

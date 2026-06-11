@@ -23,7 +23,7 @@
 #include "kernel_tensor.h"
 #include "kernel_operator_common_impl.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 namespace AscendC {
