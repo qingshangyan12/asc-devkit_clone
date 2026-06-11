@@ -122,29 +122,25 @@ static CcuResult CompArgs(KfcServerContext &ctx)
 
 void MissionPreSync(ccu::Variable &func, KfcServerContext &ctx)
 {
-    CCU_IF (ctx.missionNum == 1 ) {
-        return;
-    }
-
     // TODO:多mission场景
-    CCU_IF (ctx.missionIndex == 0) {
+    CCU_IF (ctx.missionNum != 1) {
+        CCU_IF (ctx.missionIndex == 0) {
 
-    } CCU_ELSE {
+        } CCU_ELSE {
 
+        }
     }
 }
 
 void MissionPostSync(KfcServerContext &ctx)
 {
-    CCU_IF (ctx.missionNum == 1 ) {
-        return;
-    }
-
     // TODO:多mission场景
-    CCU_IF (ctx.missionIndex == 0) {
+    CCU_IF (ctx.missionNum != 1) {
+        CCU_IF (ctx.missionIndex == 0) {
 
-    } CCU_ELSE {
+        } CCU_ELSE {
 
+        }
     }
 }
 
