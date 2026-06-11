@@ -2198,6 +2198,8 @@ def _mssanitizer_link(src_file, dst_file, compile_log_path=None):
         The dst object file.
     """
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+    if short_soc_version == "Ascend950":
+        return
     if short_soc_version not in global_var_storage.get_variable("ascendc_asan_obj_path"):
         raise Exception("asan config file not support asan.a path")
     if not isinstance(src_file, list):

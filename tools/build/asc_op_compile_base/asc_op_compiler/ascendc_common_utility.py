@@ -695,6 +695,8 @@ def is_enable_sanitizer(compile_options):
     if ascend_home_path is None:
         return False
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+    if short_soc_version == "Ascend950":
+        return True
     pre_asan_obj_path = {}
 
     js = {
