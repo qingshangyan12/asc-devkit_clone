@@ -116,6 +116,10 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 
 ![3-3-4-6-3_约束说明](../../../../figures/3-3-4-6-3_约束说明.png)
 
+## 关键特性说明
+
+精度提升。当源操作数数据类型为half，目的操作数数据类型为float时，会将源操作数提升精度到float再进行计算。
+
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
