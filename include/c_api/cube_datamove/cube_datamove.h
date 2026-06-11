@@ -301,31 +301,33 @@ __aicore__ inline void asc_copy_gm2l1_pad8(__cbuf__ void* dst, __gm__ void* src,
  * @details Copies data from Global Memory to Cube Buffer with stride parameters.
  *          This is a hardware-level instruction that requires manual synchronization.
  */
- __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_gm2l0a(__ca__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0a(__ca__ int4b_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
 
 __aicore__ inline void asc_copy_gm2l0b(__cb__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ half* dst, __gm__ half* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ float* dst, __gm__ float* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int32_t* dst, __gm__ int32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int8_t* dst, __gm__ int8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ uint32_t* dst, __gm__ uint32_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ uint8_t* dst, __gm__ uint8_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
-__aicore__ inline void asc_copy_gm2l0b(__cb__ int4b_t* dst, __gm__ int4b_t* src, uint16_t base_idx, uint8_t repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ half* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ float* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ uint32_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ uint8_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+__aicore__ inline void asc_copy_gm2l0b(__cb__ int4b_t* dst,.*repeat, uint16_t src_stride, uint16_t dst_gap);
+
+
 
 /*
  * @ingroup CubeDataMove
@@ -542,30 +544,30 @@ __aicore__ inline void asc_set_l13d_size(uint64_t value);
  * @param [in] src_stride Interval between starting addresses of adjacent square matrices in source operand
  * @param [in] dst_stride Interval from end address of first fractal in previous iteration to start address of first fractal in next iteration
  * @param [in] enable_addr_decrement Address update mode. false: increment; true: decrement
- * @param [in] dst_frac_gap Interval between adjacent fractals within each iteration in destination operand, unit is 512B
+ * @param [in] dst_frac_stride Interval between adjacent fractals within each iteration in destination operand, unit is 512B
  * @details Implements enable_transpose 2D format data loading from L1 Buffer to L0A Buffer.
  *          This is a hardware-level instruction that requires manual synchronization.
  */
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ half* dst, __cbuf__ half* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ float* dst, __cbuf__ float* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 /*
  * @ingroup CubeDataMove
@@ -578,31 +580,31 @@ __aicore__ inline void asc_copy_l12l0a_trans(__ca__ uint8_t* dst, __cbuf__ uint8
  * @param [in] src_stride Interval between starting addresses of adjacent square matrices in source operand
  * @param [in] dst_stride Interval from end address of first fractal in previous iteration to start address of first fractal in next iteration
  * @param [in] enable_addr_decrement Address update mode. false: increment; true: decrement
- * @param [in] dst_frac_gap Interval between adjacent fractals within each iteration in destination operand, unit is 512B
+ * @param [in] dst_frac_stride Interval between adjacent fractals within each iteration in destination operand, unit is 512B
  * @details Implements enable_transpose 2D format data loading from L1 Buffer to L0B Buffer.
  *          This is a hardware-level instruction that requires manual synchronization.
  */
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, 
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id,
-    uint8_t repeat, uint16_t src_stride, uint16_t dst_gap, bool enable_addr_decrement, uint16_t dst_frac_gap);
+    uint8_t repeat, uint16_t src_stride, uint16_t dst_stride, bool enable_addr_decrement, uint16_t dst_frac_stride);
 
 /*
  * @ingroup CubeDataMove
@@ -675,7 +677,7 @@ __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_
  * @param [in] burst_len Length of each burst
  * @param [in] pad_func_mode Padding function mode
  * @param [in] src_stride Source stride value
- * @param [in]  Destination stride value
+ * @param [in] dst_stride Destination stride value
  */
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t burst_count, uint32_t burst_len, uint8_t pad_func_mode,
                                      uint64_t src_stride, uint32_t dst_stride);
@@ -938,13 +940,13 @@ __aicore__ inline void asc_set_gm2l1_nz_para(uint64_t config);
  * @param [in] src Source buffer in Cube Buffer (L1)
  * @param [in] burst_count Number of burst transfers
  * @param [in] burst_len Length of each burst
- * @param [in] src_gap Source gap value
- * @param [in] dst_gap Destination gap value
+ * @param [in] src_stride Source stride value
+ * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to Global Memory (__gm__).
  *          This is a hardware-level instruction that requires manual synchronization.
  */
 __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t burst_count, uint16_t burst_len,
-                                     uint16_t src_gap, uint16_t dst_gap);
+                                     uint16_t src_stride, uint16_t dst_stride);
 
 /*
  * @ingroup CubeDataMove
@@ -1186,49 +1188,49 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ fp4x2_e1m2_t* dst, __cbu
  * @param [in] index_id Index identifier
  * @param [in] repeat Number of repeat operations
  * @param [in] src_stride Source stride value
- * @param [in] dst_gap Destination gap value
- * @param [in] dst_frac_gap Destination fractional stride
- * @param [in] src_frac_gap Source fractional stride
+ * @param [in] dst_stride Destination stride value
+ * @param [in] dst_frac_stride Destination fractional stride
+ * @param [in] src_frac_stride Source fractional stride
  * @details Copies data from Cube Buffer (L1) to Cube L0B Buffer with transposed addressing mode.
  */
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e4m3_t* dst, __cbuf__ float8_e4m3_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float8_e5m2_t* dst, __cbuf__ float8_e5m2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ half* dst, __cbuf__ half* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float* dst, __cbuf__ float* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ hifloat8_t* dst, __cbuf__ hifloat8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int32_t* dst, __cbuf__ int32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int8_t* dst, __cbuf__ int8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ uint8_t* dst, __cbuf__ uint8_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float4_e1m2x2_t* dst, __cbuf__ float4_e1m2x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ float4_e2m1x2_t* dst, __cbuf__ float4_e2m1x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int4b_t* dst, __cbuf__ int4b_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
-    uint16_t dst_gap, uint16_t dst_frac_gap, uint16_t src_frac_gap);
+    uint16_t dst_stride, uint16_t dst_frac_stride, uint16_t src_frac_stride);
 
 /*
  * @ingroup CubeDataMove
@@ -1238,24 +1240,24 @@ __aicore__ inline void asc_copy_l12l0b_trans(__cb__ int4b_t* dst, __cbuf__ int4b
  * @param [in] src Source buffer in Cube Buffer (L1)
  * @param [in] burst_count Number of burst transfers
  * @param [in] burst_len Length of each burst
- * @param [in] src_gap Source gap value
- * @param [in] dst_gap Destination gap value
+ * @param [in] src_stride Source stride value
+ * @param [in] dst_stride Destination stride value
  * @details Copies data from Cube Buffer (__cbuf__) to Cube L0C Buffer (__cc__).
  */
 __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ bfloat16_t* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ half* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ half* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ bfloat16_t* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ float* dst, __cbuf__ float* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ int32_t* dst, __cbuf__ int32_t* src, uint16_t burst_count, uint16_t burst_len,
-                                        uint16_t src_gap, uint16_t dst_gap);
+                                        uint16_t src_stride, uint16_t dst_stride);
 __aicore__ inline void asc_copy_l12l0c(__cc__ uint32_t* dst, __cbuf__ uint32_t* src, uint16_t burst_count, uint16_t burst_len,
-  	                                    uint16_t src_gap, uint16_t dst_gap);
+  	                                    uint16_t src_stride, uint16_t dst_stride);
 
 /*
  * @ingroup CubeDataMove
@@ -1288,6 +1290,15 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ float* src, uint32_
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint16_t conv_control, uint16_t burst_count,
                                       uint16_t burst_len, uint16_t source_gap, uint16_t dst_gap);
 __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ int32_t* src, uint32_t size);
+
+/**
+ * @ingroup CubeDataMove
+ * @brief Copy data from L1 buffer to Feature buffer version 2 (3510 architecture)
+ */
+__aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void * dst, __cbuf__ void * src, uint16_t burst_count,
+                                             uint16_t burst_len, uint16_t src_stride, uint16_t dst_stride);
+__aicore__ inline void asc_copy_l12fb_v2(__fbuf__ void* dst, __cbuf__ void* src, uint32_t size);
+
 
 /**
  * @ingroup CubeDataMove
