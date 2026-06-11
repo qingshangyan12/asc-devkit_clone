@@ -1,10 +1,10 @@
-# asc_trunc / asc_rint / asc_round / asc_floor / asc_ceil
+﻿# asc_truncate
 
 ## 产品支持情况
 
 | 产品     | 是否支持 |
 | ----------- | :----: |
-| Ascend 950PR/Ascend 950DT | √ |
+| <term>Ascend 950PR/Ascend 950DT</term> | √ |
 
 
 ## 功能说明

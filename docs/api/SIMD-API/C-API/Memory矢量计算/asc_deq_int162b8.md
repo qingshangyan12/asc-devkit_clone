@@ -1,4 +1,4 @@
-
+﻿
 # asc_deq_int162b8
 
 ## 产品支持情况
@@ -21,7 +21,7 @@
 计算公式如下:
 
 $$
-dst_i = (src_i * scale) + offset
+dst_i = (src_i*scale)+offset
 $$
 
 ## 函数原型
@@ -77,7 +77,7 @@ PIPE_V
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../general_instruction.md#通用地址重叠约束)。
 
 ## 调用示例
 
@@ -89,6 +89,6 @@ float scale = 1.0;        // 量化参数为1
 int16_t offset = 0;       // 不带偏移
 bool enable_signed = true;    // 量化结果带符号（dst为int8_t类型）
 asc_set_deq_scale(scale, offset, enable_signed);    // 计算公式为dst = src
-asc_deq_int162b8_h(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的上半块
-asc_deq_int162b8_l(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的下半块
+asc_deq_int162b8_h(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的下半块
+asc_deq_int162b8_l(dst, src, total_length);    // 将src转换为int8_t类型并存放在dst每个DataBlock的上半块
 ```

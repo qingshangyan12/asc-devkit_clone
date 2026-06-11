@@ -1,8 +1,8 @@
-# asc_copy_l12bt
+﻿# asc_copy_l12bt
 
-## 产品支持情况
+## AI处理器支持情况
 
-| 产品 | 是否支持  |
+| AI处理器类型 | 是否支持  |
 | :----------------------- | :------: |
 |<cann-filter npu_type = "950"> Ascend 950PR/Ascend 950DT | √</cann-filter> |
 
@@ -13,7 +13,7 @@
 ## 函数原型
 
 - 前n个数据搬运
-    ```cpp
+    ```c++
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ half* src, uint32_t size)
@@ -31,7 +31,7 @@
     ```
 
 - 同步搬运
-    ```cpp
+    ```c++
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ bfloat16_t* src, uint32_t size)
     __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ half* src, uint32_t size)
@@ -63,7 +63,7 @@ PIPE_MTE1
 ## 约束说明
 
 - dst、src的起始地址需要32字节对齐。
-- 操作数地址重叠约束请参考[通用地址重叠约束](../../通用说明和约束.md#通用地址重叠约束)。
+- 操作数地址重叠约束请参考[通用地址重叠约束](../../general_instruction.md#通用地址重叠约束)。
 - 当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。
 
 ## 调用示例
@@ -76,6 +76,6 @@ constexpr uint16_t dst_gap = 1;
 constexpr uint16_t conv_control = 0;
 __cbuf__ half src[256];
 __biasbuf__ half dst[256];
-uint64_t dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
-asc_copy_l12bt(dst_addr, src, conv_control, burst_count, burst_len, source_gap, dst_gap);
+uint64_t dst = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
+asc_copy_l12bt(dst, src, conv_control, burst_count, burst_len, source_gap, dst_gap);
 ```
