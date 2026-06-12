@@ -120,7 +120,7 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-<img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="600" />
+<img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
 
 ### 3.1 高维切分计算
 
@@ -129,11 +129,11 @@ Memory矢量计算提供连续计算和高维切分两种计算模式，并可�
 #### 3.1.1 迭代控制
 Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
 
-<img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="600" />
+<img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="800" />
 
 矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeat_time取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
 
-<img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="600" />
+<img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
 
 #### 3.1.2 地址间隔配置
 
@@ -141,13 +141,13 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
 非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同`data_block`之间在读取数据时出现一个`data_block`的间隔，如下图所示。
 
-<img src="../../../../figures/data_block_stride示例.png" alt="data_block_stride示例" width="600" />
+<img src="../../../../figures/data_block_stride示例.png" alt="data_block_stride示例" width="800" />
 
 > 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个data_block。
 
 下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
 
-<img src="../../../../figures/单次迭代内源和目的操作数读写示例.png" alt="单次迭代内源和目的操作数读写示例" width="600" />
+<img src="../../../../figures/单次迭代内源和目的操作数读写示例.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
 
 其中**repeat_stride**是指相邻迭代间相同`data_block`的地址步长, 可通过设置`repeat_stride`来灵活控制不同的场景。
 
@@ -179,7 +179,7 @@ asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_st
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
-<img src="../../../../figures/掩码操作示意图.png" alt="掩码操作示意图" width="600" />
+<img src="../../../../figures/掩码操作示意图.png" alt="掩码操作示意图" width="800" />
 
 每一位掩码对应数据中的一个元素的位置，通过有效位和无效位标记，实现对数据操作的精细化开关控制。
 掩码由固定位宽的数值表示：有效位（通常为1）：对应元素正常参与计算。无效位（通常为0）：对应元素被屏蔽，不执行操作。
@@ -189,7 +189,7 @@ asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_st
 Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeat_time参数被忽略，系统根据元素数量自动计算迭代次数。
 例如计算200个half类型元素时，受Unified Buffer的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
 
-<img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="400" />
+<img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="600" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -221,7 +221,7 @@ asc_set_mask_normal();
 
 该模式下，可以指定单次迭代内计算前n个连续元素，其他数据不参与计算。例如：对src数据(shape(256)，数据类型为half)，该数据需通过2次迭代计算完（每次迭代计算128个元素），可通过设置mask = 100，表示第1次迭代计算[0, 99]范围的元素，第2次迭代计算[128, 227]范围的元素参与计算，其他元素不参与计算。
 
-<img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="400" />
+<img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -243,7 +243,7 @@ asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
 该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。
 以src数据(shape(256)，数据类型为half)为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：
 
-<img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="400" />
+<img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -324,6 +324,6 @@ __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* 
         }
     }
 }
+```
 
 详细样例请参考: [c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)
-```
