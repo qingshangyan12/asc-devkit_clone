@@ -15,7 +15,7 @@
 ```cpp
 // 从矢量数据寄存器搬出到UB
 
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int16_t* dst_align32b, vector_int16_t src, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int32_t* dst_align32b, vector_int32_t src, vector_bool mask)
@@ -26,7 +26,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  half* dst_align32b, ve
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, vector_float src, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, vector_bool mask)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int16_t* dst_align32b, vector_int16_t src, iter_reg offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, iter_reg offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset, vector_bool mask)
@@ -37,7 +37,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  half* dst_align32b, ve
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, iter_reg offset, vector_bool mask)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int16_t* dst_align32b, vector_int16_t src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
@@ -48,7 +48,7 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  half* dst_align32b, ve
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, vector_float src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset, vector_bool mask)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  int16_t* dst_align32b, vector_int16_t src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
@@ -61,22 +61,22 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__  bfloat16_t*
 
 // 从掩码寄存器搬出到UB
 
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst, vector_bool src)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst, vector_bool src)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst, vector_bool src)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst,  vector_bool src,  iter_reg offset)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst,  vector_bool src,  iter_reg offset)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst,  vector_bool src,  iter_reg offset)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst, vector_bool src, int32_t offset)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst, vector_bool src, int32_t offset)
 __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst, vector_bool src, int32_t offset)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint32_t*& dst, vector_bool src, int32_t offset)
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint16_t*& dst, vector_bool src, int32_t offset)
 __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& dst, vector_bool src, int32_t offset)
@@ -118,20 +118,20 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// 从矢量数据寄存器搬出 - 不带偏移（v1）
+// 从矢量数据寄存器搬出 - 不带偏移
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_storealign_pack(dst_align32b, src, mask);
 
-// 从矢量数据寄存器搬出 - PostUpdate（v4）
+// 从矢量数据寄存器搬出 - PostUpdate
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 int32_t offset = 128;
 asc_storealign_pack_postupdate(dst_align32b, src, offset, mask);
 
-// 从掩码寄存器搬出（v1）
+// 从掩码寄存器搬出
 __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(0);
 vector_bool src;
 asc_storealign_pack(dst, src);
