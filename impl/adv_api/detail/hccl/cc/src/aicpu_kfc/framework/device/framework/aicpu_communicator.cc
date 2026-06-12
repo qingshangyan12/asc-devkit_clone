@@ -399,7 +399,9 @@ HcclResult HcclCommAicpu::InitTinyMem(const HcclOpResParam *commParam)
 HcclResult HcclCommAicpu::InitTimeOutConfig(const HcclOpResParam *commParam)
 {
     CHK_PTR_NULL(commParam);
-    CHK_RET(HcclSetSqeTimeOut(dispatcher_, commParam->config.notifyWaitTime));
+    u64 sqeTimeOut = (commParam->config.notifyWaitTime == 0) ?
+        commParam->config.notifyWaitTime : (commParam->config.notifyWaitTime + AICPU_SQE_TIMEOUT_INC);
+    CHK_RET(HcclSetSqeTimeOut(dispatcher_, sqeTimeOut));
     linkTimeOut_ = commParam->config.linkTimeOut;
     return HCCL_SUCCESS;
 }

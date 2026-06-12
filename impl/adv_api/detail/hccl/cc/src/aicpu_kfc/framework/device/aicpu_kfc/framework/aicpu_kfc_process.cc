@@ -386,7 +386,8 @@ HcclResult InitAicpuOpNotify(HccCommResParamTask *commParam, AicpuComContext *ct
 
 HcclResult InitTimeOutConfig(HccCommResParamTask *commParam, AicpuComContext *ctx)
 {
-    ctx->dfxExtendInfo.dfxTimeOutConfig.sqeTimeOutTimeOut = commParam->config.notifyWaitTime;
+    ctx->dfxExtendInfo.dfxTimeOutConfig.sqeTimeOutTimeOut = (commParam->config.notifyWaitTime == 0) ?
+        commParam->config.notifyWaitTime : (commParam->config.notifyWaitTime + AICPU_SQE_TIMEOUT_INC);
     ctx->dfxExtendInfo.dfxTimeOutConfig.sqeCreditTimeOut = RT_STARS_NEVER_TIMEOUT_KERNEL_CREDIT;
     ctx->dfxExtendInfo.dfxTimeOutConfig.sqeWaitTimeOut = dfx::kKfcTimeOut;
     ctx->dfxExtendInfo.dfxTimeOutConfig.sqFullWaitTimeOut = dfx::kSqFullWaitTimeOut;

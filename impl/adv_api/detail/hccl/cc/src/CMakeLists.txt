@@ -78,6 +78,7 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/executor_base.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/executor/executor_v2_base.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/exec_timeout_manager.cc
 
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/alg_template_base.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/alg_v2_template_base.cc

@@ -35,8 +35,10 @@
 #include "alg_param.h"
 #include "alg_type.h"
 #include "op_common.h"
+#include "aicpu_timeout.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
+#include "hcomm_primitives_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
@@ -82,6 +84,17 @@ namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
+
+void UpdateAicpuTimeoutCtx(const OpParam &param, AlgResourceCtxSerializable &resCtx)
+{
+    AicpuTimeout timeout = DeriveAicpuTimeout(param.opConfig.execTimeout);
+    resCtx.waitTimeout = timeout.waitTimeout;
+    resCtx.fullTimeout = timeout.fullTimeout;
+    HCCL_INFO("[AicpuTimeout] execTimeout[%u], waitTimeout[%u], fullTimeout[%u], "
+        "hostNotifyTimeout[%u], kernelLaunchTimeout[%u], hcommDefaultTimeoutSupported[%u].",
+        param.opConfig.execTimeout, timeout.waitTimeout, timeout.fullTimeout, timeout.hostNotifyTimeout,
+        timeout.kernelLaunchTimeout, static_cast<u32>(IsHcommDefaultTimeoutSupported()));
+}
 
 // 检查非对称拓扑支持情况
 // 仅 AllGather, AllReduce, ReduceScatter 支持跨框非对称拓扑，其他算子拦截
@@ -288,6 +301,7 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         param.commName, beginTime);
     // 在原先的commName中添加执行模式，得到commModeTag
     param.hcclComm = comm;
+    CHK_RET(SetExecTimeout(param));
     bool isOpBase = true;
     const char* opModeStr = isOpBase ? "_opbase" : "_offload";
     auto ret = sprintf_s(param.commModeTag, sizeof(param.commModeTag), "%s_%s", param.commName, opModeStr);
@@ -460,8 +474,13 @@ HcclResult HcclAicpuKernelEntranceLaunch(HcclComm comm, OpParam &param, ThreadHa
         return ret;
     }
     // Host stream等待Device的通知
-    u16 NOTIFY_WAIT_TIME = 27 * 68;
-    CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, NOTIFY_WAIT_TIME)));
+    AicpuTimeout timeout = DeriveAicpuTimeout(param.opConfig.execTimeout);
+    u32 hostNotifyWaitTime = IsHcommDefaultTimeoutSupported() ? timeout.hostNotifyTimeout :
+        AddAicpuTimeoutOffset(param.opConfig.execTimeout, AICPU_HOST_NOTIFY_TIMEOUT_OFFSET);
+    if (HcommIsSupportHcommSetNotifyWaitTimeOut()) {
+        CHK_RET(HcclSetNotifyWaitTimeOut(hostNotifyWaitTime));
+    }
+    CHK_RET(HcclThreadNotifyWaitOnThreadDefault(cpuTsThread, HOST_WAIT_AICPU_NOTIFYIDX, hostNotifyWaitTime));
 
     HCCL_INFO("[asc][AlgoExecute][HcclAicpuKernelEntranceLaunch] end, opType[%d], algName[%s], algTag[%s].",
         param.opType, param.algName, param.algTag);
@@ -497,12 +516,13 @@ HcclResult AicpuKernelLaunch(HcclComm comm, OpParam &param, ThreadHandle unfoldT
     CHK_PRT_RET(ret != ACL_SUCCESS,
         HCCL_ERROR("[aclrtKernelArgsFinalize]errNo[0x%016llx] args finalize failed, kernelName:%s",
             ret, kernelName.c_str()), HCCL_E_RUNTIME);
-    // notifywait默认1836等待时长
-    u16 NOTIFY_DEFAULT_WAIT_TIME = 27 * 68;
+    AicpuTimeout timeout = DeriveAicpuTimeout(param.opConfig.execTimeout);
+    u16 kernelLaunchTimeout = IsHcommDefaultTimeoutSupported() ? timeout.kernelLaunchTimeout :
+        ToKernelLaunchTimeout(AddAicpuTimeoutOffset(param.opConfig.execTimeout, AICPU_KERNEL_TIMEOUT_OFFSET));
     aclrtLaunchKernelCfg cfg;
     aclrtLaunchKernelAttr attr;
     attr.id = ACL_RT_LAUNCH_KERNEL_ATTR_TIMEOUT;
-    attr.value.timeout = NOTIFY_DEFAULT_WAIT_TIME;
+    attr.value.timeout = kernelLaunchTimeout;
     cfg.numAttrs = 1;
     cfg.attrs = &attr;
     constexpr u32 numBlocks = 1;
@@ -791,6 +811,7 @@ HcclResult HcclAllocAlgResourceAICPU(
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
+    UpdateAicpuTimeoutCtx(param, *resCtxHost);
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
     CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
@@ -1523,6 +1544,27 @@ bool ShouldUseInnerOp(OpExecuteConfig opExecuteConfig)
     }
 
     return false;
+}
+
+HcclResult SetExecTimeout(OpParam &param)
+{
+    double execTimeoutValue = 0;
+    if (!GetExternalInputExecTimeout(execTimeoutValue)) {
+        param.opConfig.execTimeout = CUSTOM_TIMEOUT;
+        HCCL_INFO("[OpCommon] Exec timeout is not set, use default value: %u seconds", CUSTOM_TIMEOUT);
+    } else if (execTimeoutValue < 0 || execTimeoutValue > UINT32_MAX) {
+        HCCL_WARNING("[OpCommon] Exec timeout value %.2f out of range, use default: %u seconds",
+            execTimeoutValue, CUSTOM_TIMEOUT);
+        param.opConfig.execTimeout = CUSTOM_TIMEOUT;
+    } else {
+        param.opConfig.execTimeout = static_cast<uint32_t>(execTimeoutValue);
+        if (param.opConfig.execTimeout == 0) {
+            HCCL_INFO("[OpCommon] Exec timeout is disabled (never timeout).");
+        } else {
+            HCCL_INFO("[OpCommon] Set exec timeout to: %u seconds", param.opConfig.execTimeout);
+        }
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startut)

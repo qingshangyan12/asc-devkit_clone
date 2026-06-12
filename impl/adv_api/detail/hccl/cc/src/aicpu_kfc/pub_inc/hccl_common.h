@@ -86,9 +86,9 @@ constexpr u32 HCCL_FFTS_CAPACITY = 65535;           // FFTS+子图最大容量
 constexpr char HCCL_WORLD_GROUP[] = "hccl_world_group";
 
 // Notify时间增量数值
-constexpr u64 AICPU_H2D_TIMEOUT_INC = 27; // AICPU host-device同步的notify超时时间增量数值
-constexpr u64 AICPU_KERNEL_TIMEOUT_INC = 25; // AICPU kernel超时时间增量数值
-constexpr u64 AICPU_SQE_TIMEOUT_INC = 22; // AICPU 执行超时时间增量数值
+constexpr u64 AICPU_H2D_TIMEOUT_INC = 50; // AICPU host-device同步的notify超时时间增量数值
+constexpr u64 AICPU_KERNEL_TIMEOUT_INC = 30; // AICPU kernel超时时间增量数值
+constexpr u64 AICPU_SQE_TIMEOUT_INC = 30; // AICPU 执行超时时间增量数值
 constexpr u64 AICPU_RTSQ_TIMEOUT_INC = 20; // AICPU 下发等待超时时间增量数值
 
 constexpr s64 HCCL_ALIGN_SIZE = 4096;  // hccl  对齐方式， 按4KB来对齐

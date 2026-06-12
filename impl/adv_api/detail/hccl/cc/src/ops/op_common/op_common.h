@@ -97,6 +97,8 @@ HcclResult HcclCheckTag(const char *tag);
 
 HcclResult SetOpParamAlgTag(OpParam &param, const std::string &algName);
 
+HcclResult SetExecTimeout(OpParam &param);
+
 HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam &param, ThreadHandle thread, u32 notifyNum);
 
 HcclResult GetMainThreadInfo(HcclComm comm, const OpParam &param, ThreadHandle &thread, u32 &notifyNum);
