@@ -15,9 +15,9 @@ src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配�
 
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
-```cpp
-template <typename T, bool enableSmallC0 = false>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
-```
+    ```cpp
+    template <typename T, bool enableSmallC0 = false>
+    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
+    ```
 
 </cann-filter>
