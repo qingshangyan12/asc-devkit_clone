@@ -34,6 +34,8 @@
 
 #endif
 
+#include "c_api/cube_compute/cube_compute_emulation.h"
+
 /*
  * @ingroup CubeCompute
  * @brief Set L0C to GM configuration

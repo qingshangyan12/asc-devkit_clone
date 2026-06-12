@@ -27,6 +27,8 @@
 
 #endif
 
+#include "c_api/cube_datamove/cube_datamove_emulation.h"
+
 /*
  * @ingroup CubeDataMove
  * @brief Copy data from L1 buffer to Feature buffer

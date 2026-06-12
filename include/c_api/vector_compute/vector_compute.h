@@ -31,6 +31,7 @@
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "instr_impl/npu_arch_3510/vector_compute_impl.h"
 #endif
+#include "c_api/vector_compute/vector_compute_emulation.h"
 
 /*
  * @ingroup VectorCompute
@@ -2291,4 +2292,3 @@ __aicore__ inline void asc_squeeze(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* sr
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS  
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC_C_API_H  
 #endif    
-
