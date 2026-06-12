@@ -176,11 +176,16 @@ __cb__ half l0b_buffer[n_size * k_size];    // L0B Buffer, 512 bytes aligned
 __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 ```
 
-同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式：
-- L1 Buffer  : FRACTAL_Nz
-- L0A Buffer : FRACTAL_Nz (Ascend 950PR/Ascend 950DT架构该内存分形为Nz, Atlas A2/A3训练和推理系列产品为Zz分形)
-- L0B Buffer : FRACTAL_Zn
-- L0C Buffer : FRACTAL_Nz
+同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式。不同产品型号的分形格式存在差异，具体对比如下：
+
+**表 3** 不同产品型号的分形格式对比
+
+| 存储单元 | Atlas A2/A3训练和推理系列产品 | Ascend 950PR/Ascend 950DT |
+|---------|----------------------------|---------------------------|
+| L1 Buffer | Nz | Nz |
+| L0A Buffer | Zz | Nz |
+| L0B Buffer | Zn | Zn |
+| L0C Buffer | Nz | Nz |
 
 以`FRACTAL_Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
 

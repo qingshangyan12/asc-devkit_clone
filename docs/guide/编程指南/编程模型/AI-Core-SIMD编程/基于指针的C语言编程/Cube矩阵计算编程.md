@@ -15,7 +15,7 @@ Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → 
 
 ## 2. 矩阵计算分形介绍
 
-矩阵计算单元采用分块计算逻辑，例如可并行处理16×16的矩阵分片。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
+矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元（fractal）的基本粒度，硬件可以并行处理多个fractal。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
 为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。
 昇腾AI处理器的矩阵计算单元为追求极高的数据吞吐率与计算密度，采用了专有的硬件架构设计。与通用CPU常用的连续线性存储不同，该单元要求输入输出数据必须符合特定的分形存储格式。在使用Ascend C的Mmad类接口进行算子开发时，深入理解这些数据格式对于实现正确的数据搬运、分块及性能优化至关重要。
 为便于理解与记忆，文档采用“大Y小x”的直观命名法：
@@ -267,7 +267,7 @@ asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_
 
 ## Cube矩阵计算示例(Ascend 950PR/Ascend 950DT)
 
-实现矩阵乘计算C(M, N) = A(M, K) × B(K, N)，其中M=64, K=128, N=64，数据类型为half。C语言编程实现如下：
+实现矩阵乘计算C(M, N) = A(M, K) × B(K, N)，其中M=64, K=128, N=64，数据类型为half。Ascend C语言实现如下：
 ```c
 extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ half* b_gm, __gm__ float* c_gm)
 {
@@ -333,6 +333,17 @@ extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ ha
     asc_sync_wait(PIPE_CUBE, PIPE_MTE3, EVENT_ID0);
     
     // 7. Transfer results to GM, configure inline transfer information
+    // Parameter mapping for asc_copy_l0c2gm:
+    // dst_addr=c_gm, src_addr=l0c_buf
+    // n_size=BLOCK_N (64), m_size=BLOCK_M (64)
+    // loop_dst_stride=BLOCK_N (destination ND stride)
+    // loop_src_stride=16 (source Nz stride, in C0_SIZE units)
+    // l2_cache_ctl=1 (NORMAL mode)
+    // clip_relu_pre=0, unit_flag_ctrl=0, quant_pre=0
+    // relu_pre=0, enable_split=false, enable_nz2nd=true
+    // quant_post=0, relu_post=0, enable_clip_relu_post=false
+    // eltwise_op=0, enable_eltwise_antq=false, enable_c0_pad=false
+    // enable_broadcast=false, enable_nz2dn=false (950PR specific)
     asc_copy_l0c2gm(c_gm, l0c_buf, BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0,
         0, QuantMode_t::NoQuant, 0, false, true, 0, 0, false, false, 0, false, false, false, false, false, false);
 }
