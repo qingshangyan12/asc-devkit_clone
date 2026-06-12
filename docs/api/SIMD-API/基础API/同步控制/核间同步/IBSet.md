@@ -108,4 +108,4 @@ if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行�
 }
 ```
 
-完整样例请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/06_sync_control/ib_set_wait)。
+完整样例请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/ib_set_wait)。

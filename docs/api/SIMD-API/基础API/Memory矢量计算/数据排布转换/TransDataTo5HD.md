@@ -61,9 +61,9 @@
 
 头文件路径为："basic\_api/kernel\_operator\_vec\_transpose\_intf.h"。
 
-TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算/矩阵计算分形介绍/关键分形格式详解.md#NC1HWC0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
+TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md#nc1hwc0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
 
-为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose/scripts/gen_data.py)。
+为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose/scripts/gen_data.py)。
 
 ## 函数原型<a name="zh-cn_topic_0000001521260417_section620mcpsimp"></a>
 
@@ -159,7 +159,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   - dstRepStride：设置为0，让目的操作数的有效起始位置为dstList的起始位置。
 
   ```cpp
-  AscendC::TransDataTomorrowHDParams transDataParams;
+  AscendC::TransDataTo5HDParams transDataParams;
   transDataParams.dstHighHalf = true; // 只对int8_t、uint8_t的入参有效，从srcLocalList的高半位读取数据
   transDataParams.srcHighHalf = true; // 只对int8_t、uint8_t的入参有效，写入dstLocalList的高半位
   transDataParams.repeatTimes = 1;    // 重复迭代次数，每次repeat处理16个DataBlock
@@ -245,7 +245,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
 
 - 入参类型是LocalTensor的调用方式：
 

@@ -94,7 +94,11 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #else
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #if defined(SPLIT_CORE_VEC)
+#if defined(__ASC_DISABLE_VF_STACK_RESERVED__)
+    constexpr uint32_t RESERVED_UB_SIZE = 2 * 1024;
+#else
     constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
+#endif
     return get_shmem_sz() - RESERVED_UB_SIZE;
 #else
     return TOTAL_UB_SIZE;  // cube core not support get_shmem_sz
@@ -124,9 +128,7 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 }
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_sys_var_intf_impl.h"
-#endif
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_H__)

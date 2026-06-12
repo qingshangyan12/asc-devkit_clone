@@ -18,7 +18,8 @@
 ├── torch_library_report_tensor
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── torch_library_report_tensor.py   // PyTorch调用脚本
-│   └── torch_library_report_tensor.asc  // torch.library算子注册、Profiling上报和Add Kernel实现
+│   ├── torch_library_report_tensor.asc  // torch.library算子注册、Profiling上报和Add Kernel实现
+│   └── README.md                        // 样例说明文档
 ```
 
 ## 样例描述
@@ -94,7 +95,7 @@
 
   请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓或[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)的安装说明，选取支持的`Python`版本配套发行版，完成`torch`和`torch-npu`的安装。
   
-  > torch_npu 的版本为 26.0.0 。
+  > torch_npu 的版本为 26.0.0。
 
 - 安装前置依赖
 

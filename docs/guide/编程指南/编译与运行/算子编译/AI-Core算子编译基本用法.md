@@ -13,7 +13,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 ```
 
 AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
+![aicore 编译流程示意图](../../../figures/aicore_compilation.png)
 
 - 异构编译
   ```shell
@@ -42,13 +42,13 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
   ```c++
   // ------- definition.asc -------
-  extern __gm__ int dev_var = 5;
+  __gm__ int dev_var = 5;
   __aicore__ int device_function();
  
   // ------- example.asc -------
-  extern __aicore__ int device_varibale;
+  extern __gm__ int dev_var;
   __aicore__  int device_function();
-  __global__  __aicore__ void kernel(int *var) {
+  __global__  __vector__ void kernel(int *var) {
     dev_var = 0;
     *var = device_function();
   }
@@ -79,7 +79,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 ```
 
 AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
+![aicore simt编译流程示意图](../../../figures/aicore_simt_comilation.png)
 
 ## 基本编译命令汇总
 |编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
@@ -118,7 +118,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 </td>
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p15492151411271"><a name="p15492151411271"></a><a name="p15492151411271"></a>否</p>
 </td>
-<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p11492114142717"><a name="p11492114142717"></a><a name="p11492114142717"></a>编译时指定的<span id="ph12176116185918"><a name="ph12176116185918"></a><a name="ph12176116185918"></a>AI处理器</span>型号，npu-soc和npu-arch同时配置时，优先使能npu-arch。</p>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p11492114142717"><a name="p11492114142717"></a><a name="p11492114142717"></a>编译时指定的<span id="ph12176116185918"><a name="ph12176116185918"></a><a name="ph12176116185918"></a>AI处理器</span>型号，npu-soc和npu-arch同时配置时，优先采用npu-arch的配置。</p>
 <p id="p15587811201611"><a name="p15587811201611"></a><a name="p15587811201611"></a><span id="ph1195412562597"><a name="ph1195412562597"></a><a name="ph1195412562597"></a>AI处理器</span>的型号请通过如下方式获取：</p>
 <a name="ul1124912113117"></a><a name="ul1124912113117"></a><ul id="ul1124912113117"><li>针对如下产品：在安装<span id="zh-cn_topic_0000001265392790_ph196874123168"><a name="zh-cn_topic_0000001265392790_ph196874123168"></a><a name="zh-cn_topic_0000001265392790_ph196874123168"></a>AI处理器</span>的服务器执行<strong id="zh-cn_topic_0000001265392790_b17687612191618"><a name="zh-cn_topic_0000001265392790_b17687612191618"></a><a name="zh-cn_topic_0000001265392790_b17687612191618"></a>npu-smi info</strong>命令进行查询，获取<strong id="zh-cn_topic_0000001265392790_b10161437131915"><a name="zh-cn_topic_0000001265392790_b10161437131915"></a><a name="zh-cn_topic_0000001265392790_b10161437131915"></a>Name</strong>信息。实际配置值为AscendName，例如<strong id="zh-cn_topic_0000001265392790_b16284944181920"><a name="zh-cn_topic_0000001265392790_b16284944181920"></a><a name="zh-cn_topic_0000001265392790_b16284944181920"></a>Name</strong>取值为<em id="zh-cn_topic_0000001265392790_i1478775919179"><a name="zh-cn_topic_0000001265392790_i1478775919179"></a><a name="zh-cn_topic_0000001265392790_i1478775919179"></a>xxxyy</em>，实际配置值为Ascend<em id="zh-cn_topic_0000001265392790_i1678775901719"><a name="zh-cn_topic_0000001265392790_i1678775901719"></a><a name="zh-cn_topic_0000001265392790_i1678775901719"></a>xxxyy</em>。<p id="zh-cn_topic_0000001265392790_p3529538154519"><a name="zh-cn_topic_0000001265392790_p3529538154519"></a><a name="zh-cn_topic_0000001265392790_p3529538154519"></a><span id="zh-cn_topic_0000001265392790_ph1483216010188"><a name="zh-cn_topic_0000001265392790_ph1483216010188"></a><a name="zh-cn_topic_0000001265392790_ph1483216010188"></a><term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
 <p id="zh-cn_topic_0000001265392790_p1193517020467"><a name="zh-cn_topic_0000001265392790_p1193517020467"></a><a name="zh-cn_topic_0000001265392790_p1193517020467"></a><span id="zh-cn_topic_0000001265392790_ph783112021813"><a name="zh-cn_topic_0000001265392790_ph783112021813"></a><a name="zh-cn_topic_0000001265392790_ph783112021813"></a><term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
@@ -184,7 +184,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p685743143118"><a name="p685743143118"></a><a name="p685743143118"></a>否</p>
 </td>
 <td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1961764455616"><a name="p1961764455616"></a><a name="p1961764455616"></a>编译时增加代码正确性校验信息。使用sanitizer选项时，需要同步添加-g选项，且不能在-O0场景下使用。</p>
-<p id="p485717333110"><a name="p485717333110"></a><a name="p485717333110"></a>注意，启用该选项后GlobalTensor默认使能L2 Cache，无法通过AscendC::SetL2CacheHint接口设置不使能L2 Cache的模式。</p>
+<p id="p485717333110"><a name="p485717333110"></a><a name="p485717333110"></a>注意，启用该选项后GlobalTensor默认使用L2 Cache，无法通过AscendC::SetL2CacheHint接口设置不使用L2 Cache的模式。</p>
 </td>
 </tr>
 <tr id="row236103412553"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p114041048134211"><a name="p114041048134211"></a><a name="p114041048134211"></a>-fPIC</p>
@@ -248,7 +248,7 @@ add_executable(demo
 ```cmake
 # CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx覆盖默认值
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
-# 启用SIMT编译模式
+# CMAKE_ASC_ENABLE_SIMT：启用SIMT编译模式，需要在find_package(ASC)前设置
 set(CMAKE_ASC_ENABLE_SIMT ON)
 
 find_package(ASC)
@@ -299,7 +299,13 @@ add_executable(demo
 | CMAKE_ASC_COMPILER_AR | 静态库归档工具，默认使用系统ar工具。设置后，静态库的归档命令将使用该工具替代默认ar。 |
 | CMAKE_ASC_COMPILER_LINKER | 链接驱动，默认使用bisheng编译器作为链接驱动，仅在有明确替换需求时设置。 |
 | CMAKE_ASC_ENABLE_SIMT | 是否启用SIMT编译模式，设置为ON时在编译命令中自动注入--enable-simt选项，默认为OFF。 |
-| CMAKE_INSTALL_PREFIX | 用于指定CMake执行install时，安装的路径前缀，执行install后编译产物（ascendc_library中指定的target以及对应的头文件）会安装在该路径下。默认路径为当前目录的out目录下。 |
+| CMAKE_INSTALL_PREFIX | 为CMake的内置变量，用于指定CMake执行install命令时，安装的路径前缀。|
+
+>[!CAUTION]注意
+> 在CMake工程中，影响Ascend C语言初始化、编译器探测和编译规则生成的变量，
+> 需要在`find_package(ASC)`前设置，或在执行`cmake`配置命令时通过`-D`指定。
+> 这些变量在Ascend C语言初始化过程中会被读取，若在`find_package(ASC)`之后再设置，
+> 可能不会影响已经生成的编译规则。
 
 ## 其他编译相关说明
 
@@ -389,9 +395,11 @@ add_executable(demo
 </tbody>
 </table>
 
-### 高阶API常用链接库 <a name="section57020345148"></a>
-
-| 使用场景 |名称  | 动态库路径 |
-|--|--|--|
-| 使用高阶API相关的Tiling接口时需要同时链接。 |libtiling_api.a</br> libregister.so</br> libgraph_base.so | ${ASCEND_HOME_PATH}/lib64  |
-| 使用PlatformAscendC相关硬件平台信息接口时需要链接。 | libplatform.so | ${ASCEND_HOME_PATH}/lib64 |
+### 高阶API常用链接库 
+在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
+|链接库名称|作用描述|使用场景|动态库路径|
+|--|--|--|--|
+|libtiling_api.a|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libregister.so|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libgraph_base.so|基础数据结构和接口库。|调用ge::Shape，ge::DataType等基础结构体时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libplatform.so|硬件平台信息库。|使用PlatformAscendC相关硬件平台信息接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
