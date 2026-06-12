@@ -135,7 +135,7 @@
 <a name="screen1929612197911"></a><a name="screen1929612197911"></a><pre class="screen" codetype="Cpp" id="screen1929612197911">template &lt;typename T, uint8_t dim&gt;
 struct NdDmaParams  {
     NdDmaLoopInfo&lt;dim&gt; loopInfo;
-    T constantValue;  // 若有左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。
+    T constantValue;  // 若有左右Padding，且不开启NearestValueMode时，该值将作为Padding值填充。
 };</pre>
 <p id="p395104375712"><a name="p395104375712"></a><a name="p395104375712"></a>NdDmaLoopInfo类型，定义如下，具体参数说明请参考<a href="#table725271775813">表 NdDmaLoopInfo结构体参数定义</a>。</p>
 <a name="screen84611628155618"></a><a name="screen84611628155618"></a><pre class="screen" codetype="Cpp" id="screen84611628155618">template &lt;uint8_t dim&gt;
@@ -169,8 +169,8 @@ struct NdDmaLoopInfo  {
 <tr id="row2968131992515"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p0180154115816"><a name="p0180154115816"></a><a name="p0180154115816"></a>isNearestValueMode</p>
 </td>
 <td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p4353141191111"><a name="p4353141191111"></a><a name="p4353141191111"></a>表示Padding值填取方式，类型为bool。</p>
-<p id="p17325184218514"><a name="p17325184218514"></a><a name="p17325184218514"></a>True：使能最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充，可参考<a href="#fig10722115123919">图1</a>。</p>
-<p id="p1582110246532"><a name="p1582110246532"></a><a name="p1582110246532"></a>False：使能常数填充方式，即所有Padding值填充为固定值NdDmaParams::constantValue。</p>
+<p id="p17325184218514"><a name="p17325184218514"></a><a name="p17325184218514"></a>True：开启最近值填充方式，即左右Padding值会选取当前维度最左或最右的值进行填充，可参考<a href="#fig10722115123919">图1</a>。</p>
+<p id="p1582110246532"><a name="p1582110246532"></a><a name="p1582110246532"></a>False：开启常数填充方式，即所有Padding值填充为固定值NdDmaParams::constantValue。</p>
 <p id="p10561101719473"><a name="p10561101719473"></a><a name="p10561101719473"></a>当数据类型为b64时，参数isNearestValueMode的值应为False。</p>
 </td>
 </tr>
@@ -209,7 +209,7 @@ struct NdDmaLoopInfo  {
 </tr>
 <tr id="row12478163518812"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.3.1.1 "><p id="p194781351084"><a name="p194781351084"></a><a name="p194781351084"></a>constantValue</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.00999999999999%" headers="mcps1.2.3.1.2 "><p id="p1724511071219"><a name="p1724511071219"></a><a name="p1724511071219"></a>数据类型为T的数值，当存在维度左右Padding，且不使能NearestValueMode时，该值将作为Padding值填充。</p>
+<td class="cellrowborder" valign="top" width="85.00999999999999%" headers="mcps1.2.3.1.2 "><p id="p1724511071219"><a name="p1724511071219"></a><a name="p1724511071219"></a>数据类型为T的数值，当存在维度左右Padding，且不开启NearestValueMode时，该值将作为Padding值填充。</p>
 <p id="p113651418121810"><a name="p113651418121810"></a><a name="p113651418121810"></a>当数据类型为b64时，参数constantValue的值应为0。</p>
 </td>
 </tr>
@@ -261,16 +261,16 @@ struct NdDmaLoopInfo  {
 以下以2维的例子介绍几个典型使用场景。
 
 **图 1**  2D Padding场景<a name="fig10722115123919"></a>  
-![](../../../../figures/2D-Padding场景.png "2D-Padding场景")
+![2D-Padding场景](../../../../figures/2D-Padding场景.png)
 
 **图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
-![](../../../../figures/2D-Transpose场景.png "2D-Transpose场景")
+![2D-Transpose场景](../../../../figures/2D-Transpose场景.png)
 
 **图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
-![](../../../../figures/2D-BroadCast场景.png "2D-BroadCast场景")
+![2D-BroadCast场景](../../../../figures/2D-BroadCast场景.png)
 
 **图 4**  2D Slice场景<a name="fig13061435132915"></a>  
-![](../../../../figures/2D-Slice场景.png "2D-Slice场景")
+![2D-Slice场景](../../../../figures/2D-Slice场景.png)
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
@@ -313,7 +313,7 @@ struct NdDmaLoopInfo  {
 
 ## 调用示例<a name="section122101199486"></a>
 
-完整算子样例参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
+完整算子样例参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
 
 ```
 // T：搬运数据的类型

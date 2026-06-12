@@ -32,7 +32,9 @@
 │   │   └── verify_result.py               // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                     // 编译工程文件
 │   ├── data_utils.h                       // 数据读入写出函数
-│   └── pattern_transformation.asc         // AscendC算子实现 & 调用样例
+│   ├── figures                            // README中图片资源目录
+│   ├── pattern_transformation.asc         // AscendC算子实现 & 调用样例
+│   └── README.md                          // 样例说明文档
 ```
 
 ## 样例规格
@@ -108,7 +110,7 @@ for (uint32_t i = 0; i < mBlocks; ++i) {
 }
 ```
 
-在 Ascend 950PR/Ascend 950DT 中，L1->L0A需要不需要做分型转换，保持Nz分形，通过Load2D 接口实现，相关代码如下：
+在 Ascend 950PR/Ascend 950DT 中，L1->L0A不需要做分形转换，保持Nz分形，通过Load2D 接口实现，相关代码如下：
 
 ```cpp
 constexpr uint32_t mBlocks = M / CUBE_BLOCK;

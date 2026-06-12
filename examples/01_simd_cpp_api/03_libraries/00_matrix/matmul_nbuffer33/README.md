@@ -19,7 +19,8 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_nbuffer33.asc    // Ascend C样例实现 & 调用样例
+│   ├── matmul_nbuffer33.asc    // Ascend C样例实现 & 调用样例
+│   └── README.md               // 样例说明文档
 ```
 ## 样例描述
 - 样例功能：  
@@ -36,15 +37,11 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
   本样例中：M = 256, N = 512, K = 192。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_nbuffer33_custom</td></tr>
   </table>
 - 样例实现： 
@@ -113,10 +110,6 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
 - 执行结果
 
   执行结果如下，说明精度对比成功：
-  ```bash
-  test pass!
-  ```
-  执行结果如下，说明精度对比成功。
   ```bash
   test pass!
   ```

@@ -122,7 +122,7 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-完整调用示例参考[SetLoadDataBoundary样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/set_loaddata_boundary_910B)。
+完整调用示例参考[SetLoadDataBoundary样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_compatibility_guide/set_loaddata_boundary)。
 
 ```
 uint16_t channelSize = 32;
@@ -133,7 +133,7 @@ uint16_t C0, C1;
 uint8_t dilationH = 2, dilationW = 2;
 
 uint8_t padList[PAD_SIZE] = {0, 0, 0, 0};
-AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT); // 使能FM内存排布模式， 从left寄存器获取信息
+AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT); // 启用FM内存排布模式， 从left寄存器获取信息
 AscendC::SetLoadDataPaddingValue(0);
 AscendC::SetLoadDataRepeat({0, 1, 0});
 AscendC::SetLoadDataBoundary((uint32_t)0);

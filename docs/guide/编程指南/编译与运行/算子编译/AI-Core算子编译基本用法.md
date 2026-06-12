@@ -13,7 +13,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 ```
 
 AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
+![aicore 编译流程示意图](../../../figures/aicore_compilation.png)
 
 - 异构编译
   ```shell
@@ -79,7 +79,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 ```
 
 AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
+![aicore simt编译流程示意图](../../../figures/aicore_simt_comilation.png)
 
 ## 基本编译命令汇总
 |编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
@@ -118,7 +118,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 </td>
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p15492151411271"><a name="p15492151411271"></a><a name="p15492151411271"></a>否</p>
 </td>
-<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p11492114142717"><a name="p11492114142717"></a><a name="p11492114142717"></a>编译时指定的<span id="ph12176116185918"><a name="ph12176116185918"></a><a name="ph12176116185918"></a>AI处理器</span>型号，npu-soc和npu-arch同时配置时，优先使能npu-arch。</p>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p11492114142717"><a name="p11492114142717"></a><a name="p11492114142717"></a>编译时指定的<span id="ph12176116185918"><a name="ph12176116185918"></a><a name="ph12176116185918"></a>AI处理器</span>型号，npu-soc和npu-arch同时配置时，优先采用npu-arch的配置。</p>
 <p id="p15587811201611"><a name="p15587811201611"></a><a name="p15587811201611"></a><span id="ph1195412562597"><a name="ph1195412562597"></a><a name="ph1195412562597"></a>AI处理器</span>的型号请通过如下方式获取：</p>
 <a name="ul1124912113117"></a><a name="ul1124912113117"></a><ul id="ul1124912113117"><li>针对如下产品：在安装<span id="zh-cn_topic_0000001265392790_ph196874123168"><a name="zh-cn_topic_0000001265392790_ph196874123168"></a><a name="zh-cn_topic_0000001265392790_ph196874123168"></a>AI处理器</span>的服务器执行<strong id="zh-cn_topic_0000001265392790_b17687612191618"><a name="zh-cn_topic_0000001265392790_b17687612191618"></a><a name="zh-cn_topic_0000001265392790_b17687612191618"></a>npu-smi info</strong>命令进行查询，获取<strong id="zh-cn_topic_0000001265392790_b10161437131915"><a name="zh-cn_topic_0000001265392790_b10161437131915"></a><a name="zh-cn_topic_0000001265392790_b10161437131915"></a>Name</strong>信息。实际配置值为AscendName，例如<strong id="zh-cn_topic_0000001265392790_b16284944181920"><a name="zh-cn_topic_0000001265392790_b16284944181920"></a><a name="zh-cn_topic_0000001265392790_b16284944181920"></a>Name</strong>取值为<em id="zh-cn_topic_0000001265392790_i1478775919179"><a name="zh-cn_topic_0000001265392790_i1478775919179"></a><a name="zh-cn_topic_0000001265392790_i1478775919179"></a>xxxyy</em>，实际配置值为Ascend<em id="zh-cn_topic_0000001265392790_i1678775901719"><a name="zh-cn_topic_0000001265392790_i1678775901719"></a><a name="zh-cn_topic_0000001265392790_i1678775901719"></a>xxxyy</em>。<p id="zh-cn_topic_0000001265392790_p3529538154519"><a name="zh-cn_topic_0000001265392790_p3529538154519"></a><a name="zh-cn_topic_0000001265392790_p3529538154519"></a><span id="zh-cn_topic_0000001265392790_ph1483216010188"><a name="zh-cn_topic_0000001265392790_ph1483216010188"></a><a name="zh-cn_topic_0000001265392790_ph1483216010188"></a><term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term11962195213215"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term184716139811"></a>Atlas A2 推理系列产品</term></span></p>
 <p id="zh-cn_topic_0000001265392790_p1193517020467"><a name="zh-cn_topic_0000001265392790_p1193517020467"></a><a name="zh-cn_topic_0000001265392790_p1193517020467"></a><span id="zh-cn_topic_0000001265392790_ph783112021813"><a name="zh-cn_topic_0000001265392790_ph783112021813"></a><a name="zh-cn_topic_0000001265392790_ph783112021813"></a><term id="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"></a><a name="zh-cn_topic_0000001265392790_zh-cn_topic_0000001312391781_term354143892110"></a>Atlas 200I/500 A2 推理产品</term></span></p>
@@ -184,7 +184,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p685743143118"><a name="p685743143118"></a><a name="p685743143118"></a>否</p>
 </td>
 <td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1961764455616"><a name="p1961764455616"></a><a name="p1961764455616"></a>编译时增加代码正确性校验信息。使用sanitizer选项时，需要同步添加-g选项，且不能在-O0场景下使用。</p>
-<p id="p485717333110"><a name="p485717333110"></a><a name="p485717333110"></a>注意，启用该选项后GlobalTensor默认使能L2 Cache，无法通过AscendC::SetL2CacheHint接口设置不使能L2 Cache的模式。</p>
+<p id="p485717333110"><a name="p485717333110"></a><a name="p485717333110"></a>注意，启用该选项后GlobalTensor默认使用L2 Cache，无法通过AscendC::SetL2CacheHint接口设置不使用L2 Cache的模式。</p>
 </td>
 </tr>
 <tr id="row236103412553"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p114041048134211"><a name="p114041048134211"></a><a name="p114041048134211"></a>-fPIC</p>
