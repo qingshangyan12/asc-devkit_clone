@@ -197,13 +197,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitV2(
-    GM_ADDR context, const void* initTiling)
+    GM_ADDR context, __gm__ const void* initTiling)
 {
     HcclTilingVersion version =
         (initTiling != nullptr ? HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION :
                                  HcclTilingVersion::DEPRECATED_TILING_VERSION);
     if (initTiling != nullptr) {
-        const Mc2InitTilingInner *tilingInner = static_cast<const Mc2InitTilingInner *>(initTiling);
+        const __gm__ Mc2InitTilingInner *tilingInner = static_cast<const __gm__ Mc2InitTilingInner *>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
         }
@@ -237,7 +237,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     ASCENDC_HCCL_API_ASSERT(
         curVersion_ == HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION, { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure Hccl::InitV2 func has been called successfully!");
-    const uint32_t opType = (reinterpret_cast<Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
+    const uint32_t opType = (reinterpret_cast<__gm__ Mc2CcTilingInner*>(tilingBaseAddr_ + offset))->opType;
     ASCENDC_HCCL_API_ASSERT(
         opType >= 0 && opType < static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL), { return HCCL_FAILED; },
         "Call SetCcTiling failed, ensure cmdType is valid");

@@ -67,7 +67,7 @@ public:
 
     __aicore__ inline void Init(GM_ADDR context, __gm__ void* initTiling = nullptr);
 
-    __aicore__ inline void InitV2(GM_ADDR context, const void* initTiling);
+    __aicore__ inline void InitV2(GM_ADDR context, __gm__ const void* initTiling);
 
     __aicore__ inline int32_t SetCcTiling(__gm__ void* ccOpTilingData);
 
