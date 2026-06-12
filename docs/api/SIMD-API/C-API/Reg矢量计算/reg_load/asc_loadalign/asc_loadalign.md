@@ -200,6 +200,40 @@ vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign_postupdate(dst, src, block_stride, repeat_stride, mask);
 ```
 
+
+## Mask寄存器搬入
+
+Reg矢量计算数据搬运接口，适用于从UB搬入MaskReg。支持普通搬运、上采样搬运和下采样搬运，每种搬运模式均支持无偏移、int32_t偏移和iter_reg偏移。
+
+```cpp
+// 普通搬运
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src)
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+
+// 上采样搬运
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src)
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+
+// 下采样搬运
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src)
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
+__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
+```
+
+**约束说明**：offset在缺省时默认偏移值offset=0。用户可以通过自增基地址或者偏移的方式使能。
+
+**调用示例**：
+
+```cpp
+constexpr uint64_t total_length = 256;
+vector_bool dst = asc_create_mask_b16(PAT_ALL);
+__ubuf__ uint32_t src[total_length];
+iter_reg offset = asc_create_iter_reg_b32(64);
+asc_loadalign(dst, src, offset);
+```
+
 ## 其他搬入模式
 
 - **[asc_loadalign_brc_elem2all](asc_loadalign_brc_elem2all.md)** - BRC搬入模式
@@ -210,4 +244,3 @@ asc_loadalign_postupdate(dst, src, block_stride, repeat_stride, mask);
  - **[asc_loadalign_brc_datablock2all](asc_loadalign_brc_datablock2all.md)** - BRC_DATABLOCK2ALL搬入模式
  - **[asc_loadalign_brc_elem2datablock](asc_loadalign_brc_elem2datablock.md)** - BRC_ELEM2DATABLOCK搬入模式
 - **[asc_loadalign_deintlv](asc_loadalign_deintlv.md)** - DEINTLV搬入模式
-- **[asc_loadalign_mask](asc_loadalign_mask.md)** - Mask寄存器搬入
