@@ -68,8 +68,7 @@
 - `aclrtMemcpy` — Host与Device间数据拷贝
 - `aclrtBinaryLoadFromData` — 将编译产物加载到设备
 - `aclrtBinaryGetFunction` — 通过编译阶段获取的mangled name查找核函数句柄
-- `aclrtKernelArgsInit` / `aclrtKernelArgsAppend` / `aclrtKernelArgsFinalize` — 配置核函数参数（依次追加三个Device内存指针：`x`、`y`、`z`）
-- `aclrtLaunchKernelWithConfig` — 在指定stream上启动核函数，指定1个block执行
+- `aclrtLaunchKernelWithArgsArray` — 通过Host侧参数数组传入三个Device内存指针参数（`x`、`y`、`z`），并在指定stream上启动核函数，指定1个block执行
 - `aclrtSynchronizeStream` — 等待stream上核函数执行完成
 
 Host侧C++内完成数据生成与精度校验，不依赖外部脚本。
