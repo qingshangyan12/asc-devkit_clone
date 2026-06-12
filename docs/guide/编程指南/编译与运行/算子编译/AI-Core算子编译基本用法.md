@@ -390,6 +390,7 @@ add_executable(demo
 </table>
 
 ### 高阶API常用链接库 
+<<<<<<< HEAD
 在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
 |链接库名称|作用描述|使用场景|动态库路径|
 |--|--|--|--|
@@ -397,3 +398,46 @@ add_executable(demo
 |libregister.so|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
 |libgraph_base.so|基础数据结构和接口库。|调用ge::Shape，ge::DataType等基础结构体时需要链接。|${ASCEND_HOME_PATH}/lib64|
 |libplatform.so|硬件平台信息库。|使用PlatformAscendC相关硬件平台信息接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+=======
+在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。 <a name="section57020345148"></a>
+
+<a name="table545745125417"></a>
+<table><thead align="left"><tr id="row3461457541"><th class="cellrowborder" id="mcps1.2.4.1.1"><p id="p446174535418"><a name="p446174535418"></a><a name="p446174535418"></a>名称</p>
+</th>
+<th class="cellrowborder" id="mcps1.2.4.1.2"><p id="p174684595413"><a name="p174684595413"></a><a name="p174684595413"></a>作用描述</p>
+</th>
+<th class="cellrowborder" id="mcps1.2.4.1.3"><p id="p6463459549"><a name="p6463459549"></a><a name="p6463459549"></a>使用场景</p>
+</th>
+<th class="cellrowborder" valign="top" id="mcps1.2.4.1.3"><p id="p6463459549"><a name="p6463459549"></a><a name="p6463459549"></a>动态库路径</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row5465454546"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p154611454540"><a name="p154611454540"></a><a name="p154611454540"></a>libtiling_api.a</p>
+</td>
+<td rowspan="2" class="cellrowborder" headers="mcps1.2.4.1.2 "><p id="p134611450541"><a name="p134611450541"></a><a name="p134611450541"></a>Tiling函数相关库。</p>
+</td>
+<td rowspan="2" class="cellrowborder" headers="mcps1.2.4.1.3 "><pid="p194634510544"><a name="p194634510544"></a><a name="p194634510544"></a>使用高阶API相关的Tiling接口时需要链接。</p>
+</td>
+<td rowspan="4" class="cellrowborder" headers="mcps1.2.4.1.3 "><p id="p194634510544"><a name="p194634510544"></a><a name="p194634510544"></a>${ASCEND_HOME_PATH}/lib64</p>
+</td>
+</tr>
+<tr id="row246945115419"><td class="cellrowborder" headers="mcps1.2.4.1.1 "><p id="p1946124575411"><a name="p1946124575411"></a><a name="p1946124575411"></a>libregister.so</p>
+</td>
+</tr>
+<tr id="row046245115413"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p19466459541"><a name="p19466459541"></a><a name="p19466459541"></a>libgraph_base.so</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p19461445125419"><a name="p19461445125419"></a><a name="p19461445125419"></a>基础数据结构和接口库。</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.3 "><p id="p24674535412"><a name="p24674535412"></a><a name="p24674535412"></a>调用ge::Shape，ge::DataType等基础结构体时需要链接。</p>
+</td>
+</tr>
+<tr id="row154634513544"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p114644575413"><a name="p114644575413"></a><a name="p114644575413"></a>libplatform.so</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p446184512545"><a name="p446184512545"></a><a name="p446184512545"></a>硬件平台信息库。</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.3 "><p id="p1346645165417"><a name="p1346645165417"></a><a name="p1346645165417"></a>使用PlatformAscendC相关硬件平台信息接口时需要链接。</p>
+</td>
+</tr>
+</tbody>
+</table>
+>>>>>>> 3fac3dfca386c979f2834b4725ba453a24440bb9
