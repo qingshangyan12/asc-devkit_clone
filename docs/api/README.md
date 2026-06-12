@@ -1022,7 +1022,7 @@
                     -   [asc_loadalign_brc_datablock2all](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_brc_datablock2all.md)
                     -   [asc_loadalign_brc_elem2datablock](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_brc_elem2datablock.md)
                     -   [asc_loadalign_deintlv](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_deintlv.md)
-                -   [asc_loadalign_postupdate](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign_postupdate.md)
+                -   [asc_loadalign_postupdate](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign/asc_loadalign_postupdate.md)
                 -   [asc_loadalign_deintlv](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign_deintlv.md)
                 -   [asc_loadalign_deintlv_postupdate](SIMD-API/C-API/Reg矢量计算/reg_load/asc_loadalign_deintlv_postupdate.md)
                 -   [asc_gather](SIMD-API/C-API/Reg矢量计算/reg_load/asc_gather.md)
