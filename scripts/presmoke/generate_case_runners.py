@@ -38,8 +38,8 @@ SPECIAL_PREFIXES = (
     "01_simd_cpp_api/02_features/99_",
 )
 
-CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
-PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package"
+CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
+PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"
 TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming"
 TILING_SINK_GENERATE_TASK_PATTERN = (
     "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks "
@@ -47,8 +47,8 @@ TILING_SINK_GENERATE_TASK_PATTERN = (
 )
 
 CUSTOM_OP_PACKAGE_DEPENDENTS = {
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
     TILING_SINK_PROGRAMMING_CASE,
 }
@@ -59,10 +59,10 @@ CUSTOM_OP_PACKAGE_DEPENDENTS = {
 # variable warning.
 NO_CMAKE_ARCH_INJECTION_CASES = {
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
-    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib",
-    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package",
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib",
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
     "02_simd_c_api/00_introduction/00_quickstart/hello_world_npu",
     "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
     "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
@@ -73,18 +73,18 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 ARCH_OVERRIDES = {
-    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
-    "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation": ["dav-2201", "dav-3510"],
+    "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom": ["dav-2201", "dav-3510"],
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin": ["dav-2201", "dav-3510"],
     "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming": ["dav-2201", "dav-3510"],
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
-    "01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8": ["dav-3510"],
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
 }
 
 ARCH_ENV_KEYS = {

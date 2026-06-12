@@ -51,7 +51,7 @@ class OrchestrateJunitTest(unittest.TestCase):
                         "parallel_config": {"jobs": 8, "npu_slots": 1},
                         "results": [
                             {
-                                "example": "01_simd_cpp_api/03_libraries/00_matrix/matmul_ibshareAB",
+                                "example": "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareAB",
                                 "arch": "dav-3510",
                                 "mode": "npu",
                                 "status": "PASS",
@@ -112,7 +112,7 @@ class OrchestrateJunitTest(unittest.TestCase):
 
             cases = {case.attrib["name"]: case for case in suite.findall("testcase")}
             pass_case = cases["matmul_ibshareAB [npu]"]
-            self.assertEqual(pass_case.attrib["classname"], "01_simd_cpp_api.03_libraries.00_matrix")
+            self.assertEqual(pass_case.attrib["classname"], "01_simd_cpp_api.04_advanced_api.00_matmul")
             self.assertIsNone(pass_case.find("failure"))
             self.assertIsNone(pass_case.find("skipped"))
             pass_out = pass_case.findtext("system-out") or ""
