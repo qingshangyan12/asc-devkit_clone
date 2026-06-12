@@ -76,7 +76,7 @@ extern __ubuf__ char dynamic_buffer[];
 
 #### 2.4.2 Bank冲突优化
 
-为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。以Ascend 950PR/Ascend 950DT产品为例，Unified Buffer总大小为256K，包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。
+为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。**Unified Buffer容量因产品型号而异**：以Ascend 950PR/Ascend 950DT产品为例，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
 
 <img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
@@ -133,10 +133,11 @@ __ubuf__ float z[4096];
 <img src="../../../../figures/地址优化前内存排布.png" alt="地址优化前内存排布" width="500" />
 
 通过优化地址，使用数组分配内存时适当扩大内存申请，各个操作数据的地址分别为：
-- x：起始地址0x00000，x长度为4096 * sizeof(float) 字节
-- y：起始地址0x04000，y长度为(8 * 16 * 1024 - (4096 * sizeof(float)))字节
-- z：起始地址0x20000，z长度为4096 * sizeof(float) 字节
-y多申请空间，确保z不会和x/y落入同一个bank。
+- x：起始地址0x00000，x长度为4096 * sizeof(float) = 16384字节
+- y：起始地址0x04000，y长度为(8 * 16 * 1024 - 16384) = 114688字节（实际分配28672个float元素）
+- z：起始地址0x20000（即0x00000 + 8 × 16KB = 131072字节），z长度为16384字节
+
+**优化原理**：UB的256KB空间划分为16个bank（每个16KB）。通过扩大y的申请，使z的起始地址偏移128KB（跨越8个bank），确保z不会和x/y落入同一个bank或bank group，从而避免读写冲突。
 ```c
 __ubuf__ float x[4096];
 __ubuf__ float y[(8 * 16 * 1024 - (4096 * sizeof(float))) / sizeof(float)];
@@ -178,7 +179,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式。不同产品型号的分形格式存在差异，具体对比如下：
 
-**表 3** 不同产品型号的分形格式对比
+**表 1** 不同产品型号的分形格式对比
 
 | 存储单元 | Atlas A2/A3训练和推理系列产品 | Ascend 950PR/Ascend 950DT |
 |---------|----------------------------|---------------------------|

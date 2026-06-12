@@ -1,6 +1,6 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用语言扩展C API编写基于Unified Buffer（以下简称UB）的**矢量计算代码**，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程，该能力主要在Atlas A2/A3训练和推理系列产品上提供。
+本文介绍如何在Ascend C中使用语言扩展C API编写基于Unified Buffer（以下简称UB）的**矢量计算代码**，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。**Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。**
 
 AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。矢量计算通过Vector计算单元完成，源操作数和目的操作数均通过Unified Buffer（UB）存储。
 
@@ -131,7 +131,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 <img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="600" />
 
-矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。由于硬件限制，repeat_time不能超过255。
+矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeat_time取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
 
 <img src="../../../../figures/2次迭代Exp计算示意图.png" alt="2次迭代Exp计算示意图" width="600" />
 
