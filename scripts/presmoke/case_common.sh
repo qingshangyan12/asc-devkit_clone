@@ -102,6 +102,35 @@ presmoke_run_command() {
     "$@"
 }
 
+presmoke_ascend_log_root() {
+    printf '%s\n' "${PRESMOKE_ASCEND_LOG_ROOT:-$HOME/ascend/log}"
+}
+
+presmoke_clear_plog() {
+    local log_root
+    log_root="$(presmoke_ascend_log_root)"
+    rm -rf "$log_root/debug/plog" "$log_root/run/plog" 2>/dev/null || true
+    mkdir -p "$log_root/debug/plog" "$log_root/run/plog"
+}
+
+presmoke_verify_tiling_sink_task_log() {
+    local pattern="$1"
+    local debug_plog
+    debug_plog="$(presmoke_ascend_log_root)/debug/plog"
+    if [[ ! -d "$debug_plog" ]]; then
+        echo "tiling sink plog directory not found: $debug_plog" >&2
+        return 1
+    fi
+    if grep -R -F -n -- "$pattern" "$debug_plog" >&2; then
+        echo "tiling sink task generation log matched" >&2
+        return 0
+    fi
+    echo "tiling sink task generation log not found: $pattern" >&2
+    echo "searched directory: $debug_plog" >&2
+    find "$debug_plog" -type f 2>/dev/null | sed 's#^#plog file: #' >&2 || true
+    return 1
+}
+
 presmoke_with_lock() {
     local name="$1"
     shift
