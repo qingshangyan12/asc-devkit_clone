@@ -41,11 +41,6 @@ public:
     
     HcclResult CalcAlgHierarchyInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo,
                                     AlgHierarchyInfoForAllLevel& algHierarchyInfo) override;
-#ifndef AICPU_COMPILE
-    HcclResult FastLaunch(const OpParam &param, const CcuFastLaunchCtx *resCtx) override;
-    HcclResult FastLaunchSaveCtx(const OpParam &param, const TemplateResource &templateAlgResIntra,
-                                 const TemplateResource &templateAlgResInter);
-#endif
 
 private:
     HcclResult OrchestrateLoop(const OpParam &param, const AlgResourceCtxSerializable &resCtx, InsAlgTemplate0 &tempAlgIntra,
@@ -63,11 +58,6 @@ private:
 
     uint64_t rankIdxLevel0_{0};
     uint64_t rankIdxLevel1_{0};
-
-    u32 ccuKernelLaunchNumIntra0_{0};
-    u32 ccuKernelLaunchNumInter0_{0};
-    u32 ccuKernelLaunchNumIntra1_{0};
-    u32 ccuKernelLaunchNumInter1_{0};
 
     ThreadHandle              controlThread_{0};
     std::vector<ThreadHandle> templateMainThreads_;

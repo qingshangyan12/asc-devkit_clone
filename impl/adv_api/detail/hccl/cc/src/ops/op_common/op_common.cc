@@ -15,6 +15,7 @@
 #include <cstdlib>  // 包含getenv函数
 #include <cstring>  // 包含strcmp函数
 #include <stdexcept>
+#include <limits>
 #include <hccl/hccl_types.h>
 #include "hccl/base.h"
 #include "sal.h"
@@ -35,11 +36,13 @@
 #include "alg_param.h"
 #include "alg_type.h"
 #include "op_common.h"
+#include "aicpu_timeout.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "hcomm_primitives_dl.h"
 #include "cann_host_bridge.h"
 
 #ifdef __cplusplus
@@ -82,6 +85,42 @@ namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
+
+void UpdateAicpuTimeoutCtx(const OpParam &param, AlgResourceCtxSerializable &resCtx)
+{
+    AicpuTimeout timeout = DeriveAicpuTimeout(param.opConfig.execTimeout);
+    resCtx.waitTimeout = timeout.waitTimeout;
+    resCtx.fullTimeout = timeout.fullTimeout;
+    HCCL_INFO("[AicpuTimeout] execTimeout[%u], waitTimeout[%u], fullTimeout[%u], "
+        "hostNotifyTimeout[%u], kernelLaunchTimeout[%u], hcommDefaultTimeoutSupported[%u].",
+        param.opConfig.execTimeout, timeout.waitTimeout, timeout.fullTimeout, timeout.hostNotifyTimeout,
+        timeout.kernelLaunchTimeout, static_cast<u32>(IsHcommDefaultTimeoutSupported()));
+}
+
+HcclResult SetExecTimeout(OpParam &param)
+{
+    double execTimeoutValue = 0;
+    if (!GetExternalInputExecTimeout(execTimeoutValue)) {
+        param.opConfig.execTimeout = CUSTOM_TIMEOUT;
+        HCCL_INFO("[OpCommon] Exec timeout is not set, use default value: %u seconds", CUSTOM_TIMEOUT);
+        return HCCL_SUCCESS;
+    }
+
+    if (execTimeoutValue < 0 || execTimeoutValue > std::numeric_limits<uint32_t>::max()) {
+        HCCL_WARNING("[OpCommon] Exec timeout value %.2f out of range, use default: %u seconds",
+            execTimeoutValue, CUSTOM_TIMEOUT);
+        param.opConfig.execTimeout = CUSTOM_TIMEOUT;
+        return HCCL_SUCCESS;
+    }
+
+    param.opConfig.execTimeout = static_cast<uint32_t>(execTimeoutValue);
+    if (param.opConfig.execTimeout == 0) {
+        HCCL_INFO("[OpCommon] Exec timeout is disabled.");
+    } else {
+        HCCL_INFO("[OpCommon] Set exec timeout to: %u seconds", param.opConfig.execTimeout);
+    }
+    return HCCL_SUCCESS;
+}
 
 // 检查非对称拓扑支持情况
 // 仅 AllGather, AllReduce, ReduceScatter 支持跨框非对称拓扑，其他算子拦截
@@ -220,62 +259,24 @@ HcclResult SetOpParamFastLaunchTag(OpParam &param)
 
 bool ShouldGoCcuFastLaunch(HcclComm comm, OpParam &param, CcuFastLaunchCtx **ccuFastLaunchCtx)
 {
-    param.hcclComm = comm;
-    
-    // 1. 是ccu模式
-    if (GetExternalInputHcclCcuMSMode()) {
-        HCCL_DEBUG("[HcclExecOp] is ccu ms mode");
-        param.opExecuteConfig = OpExecuteConfig::CCU_MS;
-        param.engine = CommEngine::COMM_ENGINE_CCU;
-    } else if (GetExternalInputHcclCcuSchedMode()) {
-        HCCL_DEBUG("[HcclExecOp] is ccu sched mode");
-        param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
-        param.engine = CommEngine::COMM_ENGINE_CCU;
-    } else {
-        // 非CCU模式，返回走正常流程
-        return false;
+    (void)comm;
+    (void)param;
+    if (ccuFastLaunchCtx != nullptr) {
+        *ccuFastLaunchCtx = nullptr;
     }
-
-    CHK_RET(SetOpParamFastLaunchTag(param));
-    
-    // 2. 查到engineCtx
-    uint64_t size = 0;
-    void *fastLaunchCtxPtr = nullptr;
-    if (HcclEngineCtxGet(comm, param.fastLaunchTag, CommEngine::COMM_ENGINE_CCU, &fastLaunchCtxPtr, &size) == HCCL_SUCCESS) {
-        HCCL_INFO("[ShouldGoCcuFastLaunch] get fastLaunchCtx success, size is %u", size);
-        *ccuFastLaunchCtx = reinterpret_cast<CcuFastLaunchCtx*>(fastLaunchCtxPtr);
-        return true;
+    if (GetExternalInputHcclCcuMSMode() || GetExternalInputHcclCcuSchedMode()) {
+        HCCL_ERROR("[ShouldGoCcuFastLaunch] CCU fast launch is not supported in mc2_client.");
     }
     return false;
 }
 
 HcclResult HcclExecOpCcuFastLaunch(HcclComm comm, OpParam &param, const CcuFastLaunchCtx *ccuFastLaunchCtx)
 {
-    std::string algName = ccuFastLaunchCtx->algName;
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] start, opType[%d], algName[%s], "
-        "fastLaunchTag[%s], engine[%d], opExecuteConfig[%d].", param.opType, algName.c_str(), param.fastLaunchTag,
-        param.engine, param.opExecuteConfig);
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    
-    void *cclBufferAddr;
-    uint64_t cclBufferSize;
-    // 从通信域获取CCL buffer
-    CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
-    // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
-    param.hcclBuff = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
-    
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] before FastLaunch, opType[%d], algName[%s], "
-        "cclBufferAddr[%p], cclBufferSize[%llu].", param.opType, algName.c_str(), cclBufferAddr, cclBufferSize);
-    HcclResult fastLaunchRet = executor->FastLaunch(param, ccuFastLaunchCtx);
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] after FastLaunch, ret[%d], opType[%d], "
-        "algName[%s].", fastLaunchRet, param.opType, algName.c_str());
-    CHK_RET(fastLaunchRet);
-    
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOpCcuFastLaunch] end, opType[%d], algName[%s].", param.opType,
-        algName.c_str());
-    return HCCL_SUCCESS;
+    (void)comm;
+    (void)param;
+    (void)ccuFastLaunchCtx;
+    HCCL_ERROR("[HcclExecOpCcuFastLaunch] CCU fast launch is not supported in mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult HcclExecOp(HcclComm comm, OpParam &param,
@@ -286,6 +287,7 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         "opExecuteConfig[%d], opMode[%d], stream[%p], commName[%s], beginTime[%llu].", param.opType,
         algName.c_str(), param.algTag, param.engine, param.opExecuteConfig, param.opMode, param.stream,
         param.commName, beginTime);
+    CHK_RET(SetExecTimeout(param));
     // 在原先的commName中添加执行模式，得到commModeTag
     param.hcclComm = comm;
     bool isOpBase = true;
@@ -791,6 +793,7 @@ HcclResult HcclAllocAlgResourceAICPU(
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
+    UpdateAicpuTimeoutCtx(param, *resCtxHost);
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
     CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
@@ -1067,104 +1070,46 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
                         std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
                         AlgHierarchyInfoForAllLevel& algHierarchyInfo, void **resCtxSequence, uint64_t& ctxSize)
 {
-    resCtxHost->topoInfo = *topoInfo;
-    resCtxHost->algHierarchyInfo = algHierarchyInfo;
-
-    // 创建资源，并填充到Host内存上
-    HcclResult ret = HcclAllocAlgResourceCcu(comm, param, resRequest, resCtxHost);
-    if (ret != HCCL_SUCCESS) {
-        HCCL_ERROR("failed to alloc alg resource.");
-        return ret;
-    }
-    // 序列化
-    std::vector<char> seq = resCtxHost->Serialize();
-    uint64_t size = seq.size();
-
-    void *ctx = nullptr;
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, param.engine, size, &ctx));
-    memcpy_s(ctx, size, seq.data(), size);
-    *resCtxSequence = ctx;
-    ctxSize = size;
-    HCCL_INFO("Execute GetAlgResCCU success.");
-    return HCCL_SUCCESS;
+    (void)comm;
+    (void)param;
+    (void)resRequest;
+    (void)resCtxHost;
+    (void)topoInfo;
+    (void)algHierarchyInfo;
+    (void)resCtxSequence;
+    (void)ctxSize;
+    HCCL_ERROR("[GetAlgResCcu] CCU resource allocation is not supported in mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult HcclAllocAlgResourceCcu(HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
                                    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
-    HCCL_INFO("Start to execute AllocAlgResource.");
-    void *cclBufferAddr;
-    uint64_t cclBufferSize;
-    // 从通信域获取CCL buffer
-    CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
-    // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
-    resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
-    resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
-    resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
-    resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
-    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
-    CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-    CHK_RET(HcclGetCcuKernel(comm, resRequest, resCtxHost));
-    return HCCL_SUCCESS;
+    (void)comm;
+    (void)param;
+    (void)resRequest;
+    (void)resCtxHost;
+    HCCL_ERROR("[HcclAllocAlgResourceCcu] CCU resource allocation is not supported in mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam &param, AlgResourceRequest &resRequest)
 {
-    // 以kernel为粒度申请channel
-    for (CcuKernelInfo& kernelInfo: resRequest.ccuKernelInfos) {
-        std::vector<HcclChannelDesc> &kernelChannelRequest = kernelInfo.channels;
-
-        u32 channelNum = kernelChannelRequest.size();
-        std::vector<ChannelHandle> kernelChannels;
-        kernelChannels.resize(channelNum);
-
-        if (channelNum > 0) {
-            CHK_RET(HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(),
-                channelNum, kernelChannels.data()));
-        }
-        kernelInfo.kernelArg->channels = kernelChannels;
-        HCCL_INFO("[HcclGetChannelForCcu] Get [%lu] channels", channelNum);
-    }
-    return HCCL_SUCCESS;
+    (void)comm;
+    (void)param;
+    (void)resRequest;
+    HCCL_ERROR("[HcclGetChannelForCcu] CCU channel allocation is not supported in mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult HcclGetCcuKernel(HcclComm comm, AlgResourceRequest &resRequest,
                           std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
 {
-    u32 totalKernelNum = 0;
-    for (auto t: resRequest.ccuKernelNum) {
-        totalKernelNum += t;
-    }
-    CHK_PRT_RET(totalKernelNum != resRequest.ccuKernelInfos.size(),
-        HCCL_ERROR("[HcclGetCcuKernel]ccuKernel num not match!"),
-        HCCL_E_INTERNAL);
-
-    // 按照resgroup进行注册
-    u32 currentResGroup = 0;
-    u32 maxResGroup = 0;
-    resCtxHost->ccuKernels.resize(totalKernelNum);
-    while (currentResGroup <= maxResGroup) {
-        for (u32 i = 0; i < totalKernelNum; i++) {
-            CcuKernelInfo& kernelInfo = resRequest.ccuKernelInfos[i];
-            if (kernelInfo.resGroup > maxResGroup) {
-                maxResGroup = kernelInfo.resGroup;
-            }
-            if (kernelInfo.resGroup != currentResGroup) {
-                continue;
-            }
-            void* kernelArgPtr = static_cast<void*>(kernelInfo.kernelArg.get()); // 保证没有释放
-            void* creatorPtr = static_cast<void*>(&kernelInfo.creator);
-
-            HCCL_DEBUG("[AllocAlgResource] kernelArgPtr[%p], creator[%p]", kernelArgPtr, &(kernelInfo.creator));
-            CcuKernelHandle handle;
-            CHK_RET(HcclCcuKernelRegister(comm, &handle, creatorPtr, kernelArgPtr));
-            resCtxHost->ccuKernels[i] = handle;
-        }
-        CHK_RET(HcclCcuKernelRegisterFinish(comm));
-        currentResGroup++;
-    }
-    resCtxHost->ccuKernelNum = resRequest.ccuKernelNum;
-    return HCCL_SUCCESS;
+    (void)comm;
+    (void)resRequest;
+    (void)resCtxHost;
+    HCCL_ERROR("[HcclGetCcuKernel] CCU kernel registration is not supported in mc2_client.");
+    return HCCL_E_NOT_SUPPORT;
 }
 
 HcclResult GetAlgResDPU(HcclComm comm, const OpParam &param, AlgResourceRequest &resRequest,
@@ -1430,15 +1375,13 @@ HcclResult ApplyOpExpansionMode(OpParam &param, HcclOpExpansionMode finalMode)
             HCCL_DEBUG("[ApplyOpExpansionMode] AICPU mode selected.");
             break;
         case static_cast<HcclOpExpansionMode>(opExpansionModeCcuMs):
-            param.opExecuteConfig = OpExecuteConfig::CCU_MS;
-            param.engine = CommEngine::COMM_ENGINE_CCU;
-            HCCL_DEBUG("[ApplyOpExpansionMode] CCU_MS mode selected.");
-            break;
+            (void)param;
+            HCCL_ERROR("[ApplyOpExpansionMode] CCU_MS mode is not supported in mc2_client.");
+            return HCCL_E_NOT_SUPPORT;
         case static_cast<HcclOpExpansionMode>(opExpansionModeCcuSched):
-            param.opExecuteConfig = OpExecuteConfig::CCU_SCHED;
-            param.engine = CommEngine::COMM_ENGINE_CCU;
-            HCCL_DEBUG("[ApplyOpExpansionMode] CCU_SCHED mode selected.");
-            break;
+            (void)param;
+            HCCL_ERROR("[ApplyOpExpansionMode] CCU_SCHED mode is not supported in mc2_client.");
+            return HCCL_E_NOT_SUPPORT;
         default:
             // 回退到aicpu
             HCCL_WARNING("[ApplyOpExpansionMode] Invalid HcclOpExpansionMode: %d, fallback to AICPU_TS.", finalMode);
@@ -1500,12 +1443,9 @@ HcclResult HcclGetRemoteBuff(HcclComm comm, ChannelHandle channel, const char *m
 
 bool HcclCheckCcuEnableOpen()
 {
-    const char* envValue = std::getenv("HCCL_ENABLE_OPEN_CCU");
-
-    if (envValue != nullptr && std::strcmp(envValue, "1") == 0) {
-        return true;
+    if (std::getenv("HCCL_ENABLE_OPEN_CCU") != nullptr) {
+        HCCL_ERROR("[HcclCheckCcuEnableOpen] CCU open mode is not supported in mc2_client.");
     }
-
     return false;
 }
 
@@ -1519,7 +1459,8 @@ bool ShouldUseInnerOp(OpExecuteConfig opExecuteConfig)
     if (isAicpuOrHostMode) {
         return !HcclCheckAicpuEnableOpen();
     } else if (isCcuMode) {
-        return !HcclCheckCcuEnableOpen();
+        HCCL_ERROR("[ShouldUseInnerOp] CCU mode is not supported in mc2_client.");
+        return false;
     }
 
     return false;
