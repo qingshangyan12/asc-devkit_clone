@@ -195,6 +195,25 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         )
         self.assertLess(script.index("presmoke_ensure_custom_op_package"), script.index("cmake .."))
 
+    def test_tiling_sink_runner_validates_sink_task_generation_log(self) -> None:
+        script = render_runner_from_parts(
+            "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+            [],
+            [Command("python3 test_add_custom_tiling_sink.py", "run")],
+            [],
+            custom_op_dependency=True,
+        )
+
+        self.assertIn("presmoke_clear_plog", script)
+        self.assertIn("ASCEND_GLOBAL_LOG_LEVEL=1", script)
+        self.assertIn("python3 test_add_custom_tiling_sink.py", script)
+        self.assertIn("presmoke_verify_tiling_sink_task_log", script)
+        self.assertIn(
+            "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks "
+            "for the tiling sink, sk_flag [0].",
+            script,
+        )
+
     def test_custom_op_provider_runner_uses_locked_installer_in_run_step(self) -> None:
         script = render_runner_from_parts(
             "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op",
