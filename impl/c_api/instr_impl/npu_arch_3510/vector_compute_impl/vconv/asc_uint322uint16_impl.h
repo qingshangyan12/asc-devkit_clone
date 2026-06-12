@@ -20,6 +20,34 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
+__simd_callee__ inline void asc_uint322uint16_sat_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, RS_ENABLE, PART_EVEN, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_uint322uint16_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, RS_DISABLE, PART_EVEN, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_uint322uint16_sat_v2_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, RS_ENABLE, PART_ODD, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_uint322uint16_v2_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, RS_DISABLE, PART_ODD, MODE_ZEROING);
+    }
+}
+
 __simd_callee__ inline void asc_uint322uint16_sat_impl(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     if ASC_IS_AIV {

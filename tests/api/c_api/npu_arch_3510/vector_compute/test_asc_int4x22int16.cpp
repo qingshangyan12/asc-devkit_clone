@@ -14,3 +14,93 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt, asc_int4x22int16, vcvt_s42s16, vector_int
 TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt_v2, asc_int4x22int16_v2, vcvt_s42s16, vector_int16_t, vector_int4x2_t, 1);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt_v3, asc_int4x22int16_v3, vcvt_s42s16, vector_int16_t, vector_int4x2_t, 2);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt_v4, asc_int4x22int16_v4, vcvt_s42s16, vector_int16_t, vector_int4x2_t, 3);
+
+// ========== Renamed pos-parameter overload tests ==========
+
+class TestVcvtPos2501 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s4x22s16_x_PosStub_2501(vector_int16_t dst, vector_int4x2_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2501, asc_int4x22int16_ASC_DISPERSE_Succ) {
+    vector_int16_t dst;
+    vector_int4x2_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s4x22s16_x, void(vector_int16_t, vector_int4x2_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s4x22s16_x_PosStub_2501));
+
+    asc_int4x22int16(dst, src, mask, ASC_DISPERSE_FIRST_QUARTER);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos2502 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s4x22s16_x_PosStub_2502(vector_int16_t dst, vector_int4x2_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2502, asc_int4x22int16_ASC_DISPERSE_Succ) {
+    vector_int16_t dst;
+    vector_int4x2_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s4x22s16_x, void(vector_int16_t, vector_int4x2_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s4x22s16_x_PosStub_2502));
+
+    asc_int4x22int16(dst, src, mask, ASC_DISPERSE_SECOND_QUARTER);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos2503 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s4x22s16_x_PosStub_2503(vector_int16_t dst, vector_int4x2_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2503, asc_int4x22int16_ASC_DISPERSE_Succ) {
+    vector_int16_t dst;
+    vector_int4x2_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s4x22s16_x, void(vector_int16_t, vector_int4x2_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s4x22s16_x_PosStub_2503));
+
+    asc_int4x22int16(dst, src, mask, ASC_DISPERSE_THIRD_QUARTER);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos2504 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s4x22s16_x_PosStub_2504(vector_int16_t dst, vector_int4x2_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2504, asc_int4x22int16_ASC_DISPERSE_Succ) {
+    vector_int16_t dst;
+    vector_int4x2_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s4x22s16_x, void(vector_int16_t, vector_int4x2_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s4x22s16_x_PosStub_2504));
+
+    asc_int4x22int16(dst, src, mask, ASC_DISPERSE_FOURTH_QUARTER);
+    GlobalMockObject::verify();
+}

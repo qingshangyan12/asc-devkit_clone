@@ -40,4 +40,28 @@ __simd_callee__ inline void asc_e1m2x22bfloat16_v4_impl(vector_bfloat16_t& dst, 
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
+__simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f4e1m2x22bf16_x(src, mask, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f4e1m2x22bf16_x(src, mask, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f4e1m2x22bf16_x(src, mask, (ULL)2);
+    }
+}
+__simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f4e1m2x22bf16_x(src, mask, (ULL)3);
+    }
+}
 #endif
