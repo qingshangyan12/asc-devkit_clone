@@ -131,7 +131,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_parallel_ops_package_does_not_pass_unused_arch_to_top_cmake(self) -> None:
         script = render_runner_from_parts(
-            "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package",
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package",
             [],
             [Command("./build/add_custom/custom_opp_*.run", "package_run")],
             [],
@@ -141,7 +141,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertIn('rm -rf "$CASE_DIR/build" "$BUILD_DIR"', script)
 
     def test_no_arch_injection_cases_do_not_pass_unused_cmake_arch(self) -> None:
-        for rel_path in sorted(NO_CMAKE_ARCH_INJECTION_CASES - {"01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package"}):
+        for rel_path in sorted(NO_CMAKE_ARCH_INJECTION_CASES - {"01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/parallel_ops_package"}):
             with self.subTest(rel_path=rel_path):
                 script = render_runner_from_parts(
                     rel_path,
@@ -216,7 +216,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_custom_op_provider_runner_uses_locked_installer_in_run_step(self) -> None:
         script = render_runner_from_parts(
-            "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op",
+            "01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op",
             [Command(":", "build")],
             [Command(":", "run")],
             [],
@@ -226,34 +226,34 @@ class GenerateCaseRunnersTest(unittest.TestCase):
         self.assertEqual(script.count("presmoke_ensure_custom_op_package"), 2)
 
     def test_dependency_and_tensorflow_skip_rules(self) -> None:
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"))
-        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"))
+        self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin"))
         self.assertTrue(requires_custom_op_package("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
         self.assertIn("TensorFlow 2.6.5", explicit_skip_reason("01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom"))
 
     def test_matmul_fp8_is_950_only(self) -> None:
         self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8"],
+            ARCH_OVERRIDES["01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8"],
             ["dav-3510"],
         )
 
     def test_custom_op_provider_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
         self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op_static_lib"],
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib"],
             expected,
         )
         self.assertEqual(
-            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"],
+            ARCH_OVERRIDES["01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"],
             expected,
         )
 
     def test_custom_op_dependent_cases_support_910b_and_950(self) -> None:
         expected = ["dav-2201", "dav-3510"]
         for rel_path in [
-            "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
-            "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
+            "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation",
+            "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin",
             "01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom",
             "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
@@ -263,8 +263,8 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
     def test_arch_overrides_are_applied_before_planning(self) -> None:
         spec = ExampleSpec(
-            Path("examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8"),
-            "01_simd_cpp_api/03_libraries/00_matrix/matmul_fp8",
+            Path("examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8"),
+            "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8",
             [Command("cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201", "cmake")],
             ["dav-2201", "dav-3510"],
             ["npu"],
@@ -329,7 +329,7 @@ class GenerateCaseRunnersTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            custom_op = root / "examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
+            custom_op = root / "examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op"
             state = root / ".presmoke_state"
             custom_op.mkdir(parents=True)
             state.mkdir()
