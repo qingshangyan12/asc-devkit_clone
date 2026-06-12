@@ -4,7 +4,7 @@
 
 AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
 
-## 1. 矩阵计算数据流
+## 1. 矩阵编程的基本步骤
 
 Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → `CopyL0C2GM`。
 当我们描述一个常见的Cube矩阵计算时，需要执行以下四个步骤：
@@ -13,7 +13,10 @@ Cube矩阵计算的数据流为：`CopyGM2L1` → `CopyL12L0A/B` → `Mmad` → 
 3. 通过`asc_mmad`接口对L0A Buffer和L0B Buffer中的数据进行矩阵计算，结果输出到L0C Buffer。
 4. 通过`asc_copy_l0c2gm`接口将L0C Buffer的结果搬运到GM中，支持随路量化、ReLU等操作。
 
-## 2. 矩阵计算分形介绍
+## 矩阵矢量计算内存管理
+### 内存申请
+
+### 矩阵计算内存布局
 
 矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元（fractal）的基本粒度，硬件可以并行处理多个fractal。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
 为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。**16×16是矩阵计算单元的基本分形粒度，适用于所有支持Cube计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
@@ -90,7 +93,7 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 
 ## 3. 矩阵搬运能力说明
 
-### 3.1 矩阵搬入能力
+### 3.1 矩阵数据搬入
 
 矩阵搬入接口实现Global Memory到L0A/L0B Buffer的数据传输，通常与Mmad接口配合使用。该接口支持多种搬运模式：二维搬运、三维格式转换、压缩数据解压、矩阵转置、稀疏化数据处理等。
 
@@ -180,7 +183,7 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_ste
 asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
-### 3.2 矩阵搬出能力
+### 3.2 矩阵数据搬出
 
 矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用，而针对Ascend 950PR/Ascend 950DT还支持L0C到UB Buffer的传输、NZ2DN格式转换以及UB双目标模式, 矩阵搬出能力如下图所示:
 
@@ -227,6 +230,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2gm/)
 
+
 ## 4. 矩阵计算能力说明
 
 `asc_mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对Atlas A2/A3训练和推理系列产品L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而Ascend 950PR/Ascend 950DT产品L0A Buffer分形为Nz。
@@ -264,6 +268,9 @@ bool enable_cube_zero_init = true;
 
 asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
 ```
+## 矩阵计算的同步
+
+MTE2， MTE1， MTE3
 
 ## Cube矩阵计算示例(Ascend 950PR/Ascend 950DT)
 
@@ -292,8 +299,10 @@ extern "C" __global__ __aicore__ void matmul_kernel(__gm__ half* a_gm, __gm__ ha
     nz_config |= static_cast<uint64_t>(dst_nd_num);
     asc_set_gm2l1_nz_para(nz_config);
     // 1.2 Call asc_copy_gm2l1_nd2nz copy interface to implement GM2L1 transfer operation, where n_value is 64, d_value is 128
+
     // src_d_value indicates number of elements in one row of source matrix, value is 128. Only one ND matrix, src_nd_matrix_stride is 0.
     asc_copy_gm2l1_nd2nz(a_l1_buf, a_gm, 128, 1, BLOCK_M, BLOCK_K, 0, false);
+    
     
     // 2. Transfer B matrix from GM to L1
     // 2.1 Set parameters in L1 Buffer, parameters are same as A matrix

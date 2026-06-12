@@ -1,26 +1,50 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用语言扩展C API编写基于Unified Buffer（以下简称UB）的**矢量计算代码**，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。**Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。**
+本文介绍如何在Ascend C中使用C语言编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
-AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。矢量计算通过Vector计算单元完成，源操作数和目的操作数均通过Unified Buffer（UB）存储。
+## Memory矢量编程的基本步骤
 
-![硬件架构图3510](../../../../figures/硬件架构图3510.png)
-
-## 1. Memory矢量计算数据流
-
-Memory矢量计算的数据流为：`CopyIn` → `Compute` → `CopyOut`。核内参与Memory矢量计算的硬件单元包括：
-
-- **矢量计算执行单元**：从UB读取数据，完成计算后将结果写回UB。
-- **数据搬运单元**：负责在Global Memory（GM）和UB之间搬运数据。
-- **标量计算单元**：处理矢量计算所需的标量计算（例如地址计算、循环控制）。
-
-当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
+Memory矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
 
 1. 通过DMA将数据从Global Memory搬入到Local Memory
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-## 2. 矢量搬运能力说明
+## Memory矢量计算内存管理
+
+Memory矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算, 开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过数组定义的方式进行申请, 开发者可以通过动态或者静态的方式申请Unified Buffer进行矢量计算。
+
+- 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
+
+```c
+__global__ __vector__ void add_custom(...)
+{
+    constexpr uint32_t ub_size = 256;
+    __ubuf__ half static_buffer[ub_size];  // Compiler automatically aligns to 32 bytes
+}
+```
+
+- 动态申请：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
+
+```c
+// Device侧：声明动态共享内存
+__global__ void add_custom(...)
+{
+    extern __ubuf__ char dynamic_buf[];
+    // ...
+}
+
+// Host侧：通过<<<>>>中的第三个参数指定动态共享内存大小
+int32_t main(int argc, char const *argv[])
+{
+    // ...
+    uint32_t dyn_ubuf_size = 1024 * sizeof(char);
+    add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+    // ...
+}
+```
+
+## Memory数据搬运
 
 Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
 
@@ -37,7 +61,7 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 <td>非连续多块数据搬运，可配置块数和间隔</td>
 </tr>
 <tr>
-<td rowspan="3">gm2ub</td>
+<td rowspan="3">Global M</td>
 <td>连续搬运</td>
 <td><code>asc_copy_gm2ub</code></td>
 <td>连续地址的一维数据搬运</td>
@@ -115,7 +139,9 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 
 如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。
 
-## 3. Memory矢量计算能力说明
+修改:更多的搬运能力参考API手册
+
+## 3. Memory数据计算
 
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
@@ -268,62 +294,34 @@ asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
 asc_add(z, x, y, 4096);
 ```
 
-## 4. Memory矢量计算示例
+## Memory矢量计算同步控制
 
-结合上述Memory矢量搬运和计算的能力，开发者可以基于C语言实现Memory矢量计算算子。下面是一个矢量加法示例，实现c = a + b功能：
+AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Memory矢量计算需通过流水同步接口确保正确执行。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → Unified Buffer）、计算（Unified Buffer）、数据搬出（Unified Buffer → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
+
+当开发者进行一个矢量加法计算时(Ascend 950PR/Ascend 950DT产品), 开发者可以通过`asc_lock`&`asc_unlock`的方式完成对这三个步骤的同步。
 ```c
-constexpr uint32_t C_API_ONE_BLOCK_SIZE = 32;
-constexpr uint32_t C_API_ONE_REPEAT_BYTE_SIZE = 256;
-constexpr uint32_t C_API_TOTAL_LENGTH = 16384;
-constexpr uint32_t C_API_TILE_NUM = 8;
-constexpr uint32_t C_API_TILE_LENGTH = 256;
-__vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+__global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
-    asc_init();
-    uint32_t block_len = C_API_TOTAL_LENGTH / asc_get_block_num();
-    uint32_t tile_len = block_len / C_API_TILE_NUM;
+    uint8_t mutex_id = 1;
+    // ...
+    // 1. 步骤一: 数据搬入, 执行流水为PIPE_MTE2
+    asc_lock(PIPE_MTE2, mutex_id);
+    asc_copy_gm2ub_align(x_local, x_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
+    asc_copy_gm2ub_align(y_local, y_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
+    asc_unlock(PIPE_MTE2, mutex_id);
 
-    __gm__ float* xGm = x + asc_get_block_idx() * block_len;
-    __gm__ float* yGm = y + asc_get_block_idx() * block_len;
-    __gm__ float* zGm = z + asc_get_block_idx() * block_len;
-
-    __ubuf__ float xLocal[C_API_TILE_LENGTH];
-    __ubuf__ float yLocal[C_API_TILE_LENGTH];
-    __ubuf__ float zLocal[C_API_TILE_LENGTH];
-
-    uint16_t burst_len = tile_len;
-    for (uint32_t i = 0; i < C_API_TILE_NUM; i++) {
-        if (i != 0) {
-            asc_sync_wait(PIPE_V, PIPE_MTE2, EVENT_ID0);
-        }
-
-        burst_len = tile_len * sizeof(float) / C_API_ONE_BLOCK_SIZE;
-        asc_copy_gm2ub(xLocal, xGm + i * tile_len, 1, burst_len, 0, 0);
-        asc_copy_gm2ub(yLocal, yGm + i * tile_len, 1, burst_len, 0, 0);
-
-        asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-        asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-
-        if (i != 0) {
-            asc_sync_wait(PIPE_MTE3, PIPE_V, EVENT_ID0);
-        }
-
-        asc_add(zLocal, xLocal, yLocal, tile_len * sizeof(float) / C_API_ONE_REPEAT_BYTE_SIZE, 1, 1, 1, 8, 8, 8);
-
-        if (i != (C_API_TILE_NUM-1)) {
-            asc_sync_notify(PIPE_V, PIPE_MTE2, EVENT_ID0);
-        }
-
-        asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-        asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-
-        asc_copy_ub2gm(zGm + i * tile_len, zLocal, 1, burst_len, 0, 0);
-
-        if (i != (C_API_TILE_NUM-1)) {
-            asc_sync_notify(PIPE_MTE3, PIPE_V, EVENT_ID0);
-        }
-    }
+    // 2. 步骤二: 计算, 执行流水为PIPE_V
+    asc_lock(PIPE_V, mutex_id);
+    asc_add(z, x, y, 4096);
+    asc_unlock(PIPE_V, mutex_id);
+    
+    // 3. 步骤三: 数据搬出, 执行流水为PIPE_MTE3
+    asc_lock(PIPE_MTE3, mutex_id);
+    asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);
+    asc_lock(PIPE_MTE3, mutex_id);
 }
 ```
 
-详细样例请参考: [c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)
+## Memory矢量计算示例
+
+结合上述Memory矢量搬运与计算能力，开发者可基于C语言实现Memory矢量计算算子。具体开发实践可参考c_api_add样例 (../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)，使用C语言编程接口完成Memory矢量算子的开发。
