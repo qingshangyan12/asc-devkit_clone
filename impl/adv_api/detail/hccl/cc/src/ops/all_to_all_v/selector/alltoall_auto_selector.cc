@@ -186,4 +186,5 @@ SelectorStatus AlltoAllAutoSelector::SelectDPUAlgo(const TopoInfoWithNetLayerDet
 }
 
 REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLTOALL, 18, AlltoAllAutoSelector);
+REGISTER_SELECTOR_BY_OPTYPE(HcclCMDType::HCCL_CMD_ALLTOALLV, 18, AlltoAllAutoSelector);
 } // namespace mc2_ops_hccl
