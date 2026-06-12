@@ -32,7 +32,7 @@
 | float | 乘法阶段 | 0.0 | +inf/-inf | nan |
 | float | 乘法阶段 | nan | 任意输入 | nan |
 | float | 乘法阶段 | 任意输入 | nan | nan |
-| float | 乘法阶段 | 任意输入 | 任意输入 | 结果溢出情况下，正向溢出为INF，负向溢出为-INF |
+| float | 乘法阶段 | 任意输入 | 任意输入 | 结果溢出情况下，正向溢出为inf，负向溢出为-inf |
 | float | 加法阶段 | +inf | -inf | nan |
 | float | 加法阶段 | +inf | +inf/norm | +inf |
 | float | 加法阶段 | -inf | +inf | nan |

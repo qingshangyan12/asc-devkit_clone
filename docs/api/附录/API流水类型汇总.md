@@ -119,6 +119,8 @@
 | DataCopy(L0C->GM) | AIC | PIPE_FIX |
 | DataCopy(L0C->L1) | AIC | PIPE_FIX |
 | DataCopy(L1->GM) | AIC | PIPE_MTE3 |
+| Fixpipe(L0C->GM) | AIC | PIPE_FIX |
+| Fixpipe(L0C->L1) | AIC | PIPE_FIX |
 | SetFixPipeConfig | AIC | PIPE_S |
 | SetFixpipePreQuantFlag | AIC | PIPE_S |
 | SetFixpipeNz2ndFlag | AIC | PIPE_S |
