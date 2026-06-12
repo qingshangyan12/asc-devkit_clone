@@ -8,12 +8,12 @@
 
 ## 功能说明
 
-解压缩模式V2（UNPACKV2），按无符号整型u8加载VL/4长度数据，unpack到VL长度u32类型，中间位置补0。支持多种偏移/地址变体。
+四分之一解压缩模式，按无符号整型u8加载VL/4长度数据，unpack到VL长度u32类型，中间位置补0。支持多种偏移/地址变体。
 
 ## 函数原型
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
@@ -24,7 +24,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ub
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, iter_reg offset)
@@ -35,7 +35,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e8m0_t& dst, __ubuf
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, iter_reg offset)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
@@ -46,7 +46,7 @@ __simd_callee__ inline void asc_loadalign_unpack4(vector_fp8_e4m3fn_t& dst, __ub
 __simd_callee__ inline void asc_loadalign_unpack4(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_unpack4(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_unpack4_postupdate(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
@@ -78,18 +78,18 @@ PIPE_V
 
 ## 约束说明
 
-- iter_reg方式传入偏移时，该接口中的src需要32B对齐（v2）。
+- iter_reg方式传入偏移时，该接口中的src需要32B对齐。
 - offset在缺省时默认偏移值offset=0。
 
 ## 调用示例
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 vector_int8_t dst;
 __ubuf__ int8_t* src;
 asc_loadalign_unpack4(dst, src);
 
-// 硬件自动Post Update（v4）
+// 硬件自动Post Update
 vector_int8_t dst;
 __ubuf__ int8_t* src;
 int32_t offset;

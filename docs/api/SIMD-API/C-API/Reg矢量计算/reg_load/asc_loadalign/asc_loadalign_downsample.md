@@ -13,7 +13,7 @@
 ## 函数原型
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src)
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
@@ -28,7 +28,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, iter_reg offset)
@@ -43,7 +43,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __u
 __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ half* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, iter_reg offset)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_loadalign_downsample(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
@@ -58,7 +58,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst, __ubuf__ 
 __simd_callee__ inline void asc_loadalign_downsample(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_half& dst
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_bfloat16_t& dst, __ubuf__ bfloat16_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_int4x2_t& dst, __ubuf__ int4b_t*& src, int32_t offset)
 
-// Mask寄存器搬入 - 下采样搬运（v6）
+// Mask寄存器搬入 - 下采样搬运
 __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src)
 __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst, __ubuf__ uint32_t* src, iter_reg offset)
@@ -99,24 +99,24 @@ PIPE_V
 
 ## 约束说明
 
-- iter_reg方式传入偏移时，该接口中的src需要32B对齐（v2）。
+- iter_reg方式传入偏移时，该接口中的src需要32B对齐。
 - offset在缺省时默认偏移值offset=0。
 
 ## 调用示例
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 vector_half dst;
 __ubuf__ half* src;
 asc_loadalign_downsample(dst, src);
 
-// 硬件自动Post Update（v4）
+// 硬件自动Post Update
 vector_half dst;
 __ubuf__ half* src;
 int32_t offset;
 asc_loadalign_downsample_postupdate(dst, src, offset);
 
-// Mask寄存器搬入（v6）
+// Mask寄存器搬入
 vector_bool dst = asc_create_mask_b16(PAT_ALL);
 __ubuf__ uint32_t src[256];
 iter_reg offset = asc_create_iter_reg_b32(64);

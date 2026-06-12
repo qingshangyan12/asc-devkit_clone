@@ -13,7 +13,7 @@ Broadcast模式（BRC），搬运一个b8/b16/b32类型的数据，并Broadcast�
 ## 函数原型
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int8_t& dst, __ubuf__ int8_t* src)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_uint8_t& dst, __ubuf__ uint8_t* src)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src)
@@ -31,7 +31,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_uint32_t& dst, __u
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_float& dst, __ubuf__ float* src)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int4x2_t& dst, __ubuf__ int4b_t* src)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_uint8_t& dst, __ubuf__ uint8_t* src, iter_reg offset)
@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int32_t& dst, __ub
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_float& dst, __ubuf__ float* src, iter_reg offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int4x2_t& dst, __ubuf__ int4b_t* src, iter_reg offset)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
@@ -67,7 +67,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_uint32_t& dst, __u
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_float& dst, __ubuf__ float* src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_loadalign_brc_elem2all_postupdate(vector_int8_t& dst, __ubuf__ int8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all_postupdate(vector_uint8_t& dst, __ubuf__ uint8_t*& src, int32_t offset)
 __simd_callee__ inline void asc_loadalign_brc_elem2all_postupdate(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t*& src, int32_t offset)
@@ -106,24 +106,24 @@ PIPE_V
 
 ## 约束说明
 
-- iter_reg方式传入偏移时，该接口中的src需要32B对齐（v2）。
+- iter_reg方式传入偏移时，该接口中的src需要32B对齐。
 - offset在缺省时默认偏移值offset=0。
 
 ## 调用示例
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 vector_half dst;
 __ubuf__ half* src;
 asc_loadalign_brc_elem2all(dst, src);
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 iter_reg offset = 0x10;
 vector_half dst;
 asc_loadalign_brc_elem2all(dst, src, offset);
 
-// 硬件自动Post Update（v4）
+// 硬件自动Post Update
 vector_half dst;
 __ubuf__ half* src;
 int32_t offset;

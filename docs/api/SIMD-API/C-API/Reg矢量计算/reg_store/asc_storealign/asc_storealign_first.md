@@ -13,7 +13,7 @@ FIRST搬出模式，忽略mask，向dst_align32b中搬运src第一个元素，�
 ## 函数原型
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int8_t* dst_align32b, vector_int8_t src)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int16_t* dst_align32b, vector_int16_t src)
@@ -31,7 +31,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e2m1_t* dst_align
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src)
 
-// 通过iter_reg传入偏移（v2）
+// 通过iter_reg传入偏移
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int8_t* dst_align32b, vector_int8_t src, iter_reg offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src, iter_reg offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int16_t* dst_align32b, vector_int16_t src, iter_reg offset)
@@ -49,7 +49,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e2m1_t* dst_align
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, iter_reg offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, iter_reg offset)
 
-// 通过int32_t传入偏移（v3）
+// 通过int32_t传入偏移
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int8_t* dst_align32b, vector_int8_t src, int32_t offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src, int32_t offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int16_t* dst_align32b, vector_int16_t src, int32_t offset)
@@ -67,7 +67,7 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e2m1_t* dst_align
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, int32_t offset)
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset)
 
-// 硬件自动Post Update模式（v4）
+// 硬件自动Post Update模式
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int8_t* dst_align32b, vector_int8_t src, int32_t offset)
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src, int32_t offset)
 __simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int16_t* dst_align32b, vector_int16_t src, int32_t offset)
@@ -104,12 +104,12 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-// 不带偏移（v1）
+// 不带偏移
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 asc_storealign_1st(dst_align32b, src);
 
-// 硬件自动Post Update（v4）
+// 硬件自动Post Update
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 int32_t offset = 128;
