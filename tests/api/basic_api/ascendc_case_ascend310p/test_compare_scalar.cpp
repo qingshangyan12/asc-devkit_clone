@@ -26,7 +26,7 @@ protected:
     void TearDown() { AscendC::SetGCoreType(0); }
 };
 
-template <typename T, bool USE_COMPARES>
+template <typename T, bool USE_COMPARES>   
 void MainVecCompareLevel2Demo(
     __gm__ uint8_t* __restrict__ dstGm, __gm__ uint8_t* __restrict__ src0Gm, uint32_t dataSize)
 {
