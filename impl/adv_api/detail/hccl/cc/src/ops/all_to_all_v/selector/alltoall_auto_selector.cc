@@ -60,13 +60,15 @@ SelectorStatus AlltoAllAutoSelector::SelectCcuScheduleAlgo(const TopoInfoWithNet
                 HCCL_DEBUG("[AlltoAllAutoSelector][%s] TWO_DIE_NOT_REGULAR not match", __func__);
                 return SelectorStatus::NOT_MATCH;
             } else {
-                selectAlgName = "CcuAlltoAllMesh1D";
+                selectAlgName = (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) ?
+                    "CcuAlltoAllVMesh1D" : "CcuAlltoAllMesh1D";
             }
         } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) {
             // PCIE-SW定制机型，Mesh无法链接全卡时，需要跨pcie链路，不支持ccu模式
             if (topoInfo->level0PcieMix) {
                 if (IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH)) {
-                    selectAlgName = "CcuAlltoAllMesh1D";
+                    selectAlgName = (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALLV) ?
+                        "CcuAlltoAllVMesh1D" : "CcuAlltoAllMesh1D";
                 } else {
                     HCCL_WARNING("[AlltoAllAutoSelector] pcie mixed topo is not supported yet for ccu schedule mode.");
                     return SelectorStatus::NOT_MATCH;
