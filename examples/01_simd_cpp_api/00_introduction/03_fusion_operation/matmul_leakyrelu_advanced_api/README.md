@@ -19,9 +19,10 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── matmul_leakyrelu_advanced_api.asc // Ascend C样例实现 & 调用样例
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
+│   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
@@ -154,6 +155,8 @@
 |------|--------|------|
 | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+  > **说明：** 当 `CMAKE_ASC_ARCHITECTURES=dav-3510` 时，编译工程会自动为ASC编译添加 `-DENABLE_CV_COMM_VIA_SSBUF=true`，开启SSBUF通信；`dav-2201` 场景不会添加该编译宏。
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

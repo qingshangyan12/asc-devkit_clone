@@ -19,7 +19,8 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_fp8.asc          // Ascend C样例实现 & 调用样例
+│   ├── matmul_fp8.asc          // Ascend C样例实现 & 调用样例
+│   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
@@ -31,15 +32,11 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   本样例中：M = 428, N = 479, K = 158。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">Matmul</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">hifloat8、fp8_e4m3fn、fp8_e5m2</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">hifloat8、fp8_e4m3fn、fp8_e5m2</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmul_fp8_custom</td></tr>
   </table>
 - 样例实现： 
@@ -81,7 +78,7 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
 
 - 样例执行
 
-  - SCENARIO_NUM ： 设置A、B的数据类型组合
+  - SCENARIO_NUM：设置A、B的数据类型组合
     - 0 : 对应A hifloat8   B hifloat8场景
     - 1 : 对应A fp8_e4m3fn B fp8_e4m3fn场景
     - 2 : 对应A fp8_e5m2   B fp8_e5m2场景
