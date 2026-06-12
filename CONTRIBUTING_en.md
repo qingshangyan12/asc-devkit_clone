@@ -1,4 +1,4 @@
-# Contribution Guide
+﻿# Contribution Guide
 
 This project welcomes developers to experience and participate in contributions. Before participating in community contributions, see [cann-community](https://gitcode.com/cann/community) to understand the code of conduct, sign the CLA agreement, and learn about the contribution process for source code repositories.
 
@@ -35,10 +35,10 @@ C API provides pure C style interfaces, conforming to C language operator develo
 
 ## Documentation Contribution Guide
 
-This project includes four core Ascend C documentation sets (Programming Guide, API Reference, Operator Practice Reference, Cross-generation Migration Guide). Developers can contribute by fixing errors, supplementing content, or sharing optimization experiences.
+This project includes five core Ascend C documentation sets (Getting Started Tutorial, Programming Guide, API Reference, Operator Practice Reference, Cross-generation Migration Guide). Developers can contribute by fixing errors, supplementing content, or sharing optimization experiences.
 
 - **Documentation Writing Guide**: [docs/en/asc_doc_contributing.md](./docs/en/asc_doc_contributing.md) — Contribution scenarios, writing conventions, PR checklist
-- **Documentation Design Principles**: [docs/asc_doc_design_rules.md](./docs/asc_doc_design_rules.md)  — Discoverability, readability, completeness design specification
+- **Documentation Design Principles**: [docs/en/asc_doc_design_rules.md](./docs/en/asc_doc_design_rules.md) — Discoverability, readability, completeness design specification
 
 ## Developer Contribution Scenarios
 
