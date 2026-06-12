@@ -15,9 +15,9 @@ src和dst分别为源操作数和目的操作数；loadDataParam为搬运参数�
 
 - 仅Ascend 950PR/Ascend 950DT支持
 
-```cpp
-template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
-```
+    ```cpp
+    template <typename T>
+    __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
+    ```
 
 </cann-filter>
