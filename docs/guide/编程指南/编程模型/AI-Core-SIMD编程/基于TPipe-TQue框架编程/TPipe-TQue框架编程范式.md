@@ -14,8 +14,8 @@
 ![](../../../../figures/流水线并行示意图.png "流水线并行示意图")
 
 结合上一章的阐述可总结出：Ascend C流水线体系由两大核心模块共同支撑：
-- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TPipe.md)** 资源管理器：统一管理系统内存资源和用于同步的事件等；
-- **[TQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TQue.md)** 队列：完成Stage任务之间的同步和通信。
+- **[TPipe](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/TPipe.md)** 资源管理器：统一管理系统内存资源和用于同步的事件等；
+- **[TQue](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/TQue.md)** 队列：完成Stage任务之间的同步和通信。
 
 基于这套机制，Ascend C固化了矢量、矩阵、融合三类算子的标准化流水线编程范式。下文将结合硬件特性与工程实例逐一展开。
 
@@ -70,14 +70,14 @@ for-loop {
 }
 ```
 
-任务间数据传递所使用的内存、事件等资源，统一由TPipe管理。如下内存管理示意图所示，TPipe通过[InitBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/InitBuffer.md)接口对外提供队列内存初始化功能，开发者可通过该接口为指定队列分配内存。
+任务间数据传递所使用的内存、事件等资源，统一由TPipe管理。如下内存管理示意图所示，TPipe通过[InitBuffer](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/InitBuffer.md)接口对外提供队列内存初始化功能，开发者可通过该接口为指定队列分配内存。
 
-队列内存初始化完成后，当需要内存时通过[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/AllocTensor.md)为LocalTensor分配内存；当该LocalTensor完成相关计算不再使用时，再调用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/FreeTensor.md)回收其内存。
+队列内存初始化完成后，当需要内存时通过[AllocTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/AllocTensor.md)为LocalTensor分配内存；当该LocalTensor完成相关计算不再使用时，再调用[FreeTensor](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/FreeTensor.md)回收其内存。
 
 **图 2**  内存管理示意图<a name="fig375042942717"></a>  
 ![](../../../../figures/内存管理示意图.png "内存管理示意图")
 
-编程过程中使用的临时变量内存同样由TPipe管理。临时变量可使用TBuf数据结构申请指定TPosition上的存储空间。通过TBuf申请的内存仅能参与计算，不可执行队列的入队、出队操作。具体接口使用说明请参见[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/TBuf.md)。
+编程过程中使用的临时变量内存同样由TPipe管理。临时变量可使用TBuf数据结构申请指定TPosition上的存储空间。通过TBuf申请的内存仅能参与计算，不可执行队列的入队、出队操作。具体接口使用说明请参见[TBuf](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/TBuf.md)。
 
 遵循上述范式编程，即可实现单核数据的并行处理。待处理数据被切分为多个分片，每个并行任务依次完成对所有分片的处理。任务间的箭头表示数据依赖，例如CopyIn完成第一个分片的处理后，Compute才能开始处理该分片。
 
@@ -113,7 +113,7 @@ Cube计算流程本质上也可归纳为CopyIn、Compute、CopyOut三个阶段�
 
 ![](../../../../figures/矩阵编程逻辑位置示意图-3.png)
 
-如图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetTensorC.md)接口。示例如下：
+如图所示：CopyIn阶段对应[SetTensorA](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/SetTensorA.md)、[SetTensorB](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/SetTensorB.md)、[SetBias](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/SetBias.md)接口；Compute阶段对应[Iterate](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/Iterate.md)接口；CopyOut阶段对应[GetTensorC](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/GetTensorC.md)接口。示例如下：
 
 ```
 // 创建Matmul对象，需传入A、B、C、Bias的参数类型信息

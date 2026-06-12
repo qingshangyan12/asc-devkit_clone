@@ -145,7 +145,7 @@ SIMD与SIMT编程存在以下差异：
 -   所有线程均可通过Data Cache（DCache）访问全局内存（GM），Data Cache是从UB上单独划分出来的一个缓存空间，内存大小可配置范围为32KB到128KB，具体配置方法详见下文[UB内存分配](#section3725125414229)。
 
 在SIMD工作模式下，各个内存的工作流程如下：
--   SIMD的Register File（简称RF）包含多种类型的Reg矢量计算寄存器，用于SIMD VF函数内部存储计算数据，Reg的类型请见[Reg数据类型定义](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/RegTensor.md)。
+-   SIMD的Register File（简称RF）包含多种类型的Reg矢量计算寄存器，用于SIMD VF函数内部存储计算数据，Reg的类型请见[Reg数据类型定义](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/RegTensor.md)。
 -   单核内所有VF Reg寄存器共享内存资源UB。
 -   在SIMD模式下，不支持直接从全局内存加载数据到Reg矢量计算寄存器，需先将数据从全局内存GM搬运至UB，再通过显式的Load/Store指令，从UB加载到Reg矢量计算寄存器中执行计算操作。
 
@@ -249,7 +249,7 @@ UB（即Unified Buffer）内存空间总大小为256KB，参考[图3](#fig184031
 
 ## 编程示例<a name="section776244992018"></a>
 
-样例中介绍的算子完整代码请参见[SIMD与SIMT混合编程实现gather&adds算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/00_introduction/03_fusion_operation/gather_adds_simt_simd_hybrid)。
+样例中介绍的算子完整代码请参见[SIMD与SIMT混合编程实现gather&adds算子样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.3/examples/01_simd_cpp_api/00_introduction/03_fusion_operation/gather_adds_simt_simd_hybrid)。
 
 ```
 __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void simt_gather(__gm__ float* input, __gm__ uint32_t* index, __ubuf__ float* gatherOutput, uint32_t inputTotalLength,

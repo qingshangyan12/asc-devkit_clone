@@ -4,21 +4,21 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
 
 -   系统workspace：Ascend C API需要预留的workspace内存
 
-    API在计算过程需要一些workspace内存作为缓存，因此算子需要为API预留workspace内存，预留内存大小通过[GetLibApiWorkSpaceSize](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetLibApiWorkSpaceSize.md)接口获取。
+    API在计算过程需要一些workspace内存作为缓存，因此算子需要为API预留workspace内存，预留内存大小通过[GetLibApiWorkSpaceSize](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/GetLibApiWorkSpaceSize.md)接口获取。
 
 -   用户workspace：算子实现使用到的workspace内存
 
     算子内部需要通过额外的device内存进行数据交换或者缓存的时候才需要分配，根据实际情况自行分配。使用场景如下：
 
     -   需要使用Unified Buffer和L1 Buffer上的空间且空间不够用时，可以将数据暂存至workspace上。
-    -   调用[SyncAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SyncAll.md)等API接口时，需要workspace作为入参。
+    -   调用[SyncAll](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/SyncAll.md)等API接口时，需要workspace作为入参。
     -   其他需要使用Global Memory上内存空间的场景。
 
 不同开发方式下，具体的使用方法如下：
 
 -   工程化算子开发方式
 
-    在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul Kernel侧接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/Matmul-Kernel侧接口.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
+    在tiling函数中先通过GetWorkspaceSizes接口获取workspace大小的存放位置，再设置workspace的大小，框架侧会为其申请对应大小的设备侧Global Memory，在对应的算子kernel侧实现时可以使用这块workspace内存。在使用[Matmul Kernel侧接口](https://gitcode.com/cann/asc-devkit/blob/9.1.0-beta.3/docs/api/context/Matmul-Kernel侧接口.md)等需要系统workspace的高阶API时，设置的workspace空间大小为系统workspace和用户workspace之和。
 
     ```
     // 用户自定义的tiling函数
