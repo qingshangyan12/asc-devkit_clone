@@ -366,7 +366,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_950.cpp
+    hcomm/test_hcomm_roce_950.cpp
     hcomm/test_hcomm_urma_950.cpp
 )
 
@@ -414,6 +414,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
     target_compile_options(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
         -fno-access-control
         -Werror
+        -UASCENDC_DEBUG
     )
 
     target_link_libraries(ascendc_ut_adv_api_kernel_${product_type} PRIVATE

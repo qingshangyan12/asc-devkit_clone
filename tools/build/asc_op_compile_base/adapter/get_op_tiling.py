@@ -1263,6 +1263,10 @@ p_tilingdata")
     class_body += "#endif\n"
     class_body += "#else\n"
     class_body += "#if __NPU_ARCH__ == 3510 && defined(__ASCENDC_ENABLE_VEC_TAIL_TILING_COPY__) \n"
+    class_body += "#if defined(__ASC_DISABLE_RESERVED_UBUF__)\n"
+    class_body += "#error \"GET_TILING_DATA macros using reserved UB are forbidden when compile option " \
+        "--cce-disable-asc-reserved-ubuf is enabled\"\n"
+    class_body += "#endif\n"
     class_body += _gen_tiling_copy_through_reserved_ub()
     class_body += "#else \n"
     class_body += "    __ubuf__ uint8_t *tilingdata_in_ub = (__ubuf__ uint8_t *)get_imm(0);\n"
@@ -1307,7 +1311,7 @@ def get_tiling_copy_func_and_micro(class_name):
     class_body += get_tiling_data_func()
 
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-    if short_soc_version in ["Ascend950", "MC62", "MC32DM11A"]:
+    if short_soc_version in ["Ascend950", "Ascend350", "MC62", "MC32DM11A"]:
         # use __AUX__ to create a new struct to reduce running time. __AUX__ name does not matter
         # original: initialize, then write value    use __AUX__: write value, then interpret_cast to needed struct
         class_body += _get_tiling_data_without_time_stamp(class_name)

@@ -8,8 +8,8 @@
 | <cann-filter npu-type="A3"><term>Atlas A3 训练系列产品/Atlas A3 推理系列产品</term> | √</cann-filter> |
 | <cann-filter npu-type="910b"><term>Atlas A2 训练系列产品/Atlas A2 推理系列产品</term> | √</cann-filter> |
 | <cann-filter npu-type="310b"><term>Atlas 200I/500 A2 推理产品</term> | √</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 AI Core</term> | √</cann-filter> |
-| <cann-filter npu-type="310p"><term>Atlas 推理系列产品 Vector Core</term> | x</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品AI Core</term> | √</cann-filter> |
+| <cann-filter npu-type="310p"><term>Atlas 推理系列产品Vector Core</term> | x</cann-filter> |
 | <cann-filter npu-type="910"><term>Atlas 训练系列产品</term> | √</cann-filter> |
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -56,4 +56,4 @@ AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
 AscendC::DisableDmaAtomic();
 ```
 
-完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。
+完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/06_atomic/data_movement_with_atomic_operations/data_movement_with_atomic_operations.asc)。

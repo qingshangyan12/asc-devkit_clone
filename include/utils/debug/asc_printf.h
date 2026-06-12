@@ -23,8 +23,12 @@
 
 #include "impl/utils/sys_macros.h"
 #include "simt_api/device_types.h"
+#include "kernel_macros.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#ifndef ASCENDC_SIMD_VF_DEBUG
+#define ASCENDC_SIMD_VF_DEBUG
+#endif
 
 namespace __asc_simt_vf {
 template <class... Args>
@@ -56,6 +60,8 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 
 namespace __asc_simd_vf {
 template <class... Args>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);

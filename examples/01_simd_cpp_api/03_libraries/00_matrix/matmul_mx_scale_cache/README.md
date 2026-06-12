@@ -6,13 +6,11 @@
 
 以左量化系数矩阵scaleA K方向多倍缓存，且倍数为scaleFactorK为例：在数据从GM搬运到A1（L1 Buffer）的MTE2搬运过程中，A矩阵一次性搬运stepM * stepK个base块，而scaleA矩阵则一次搬运stepM * (scaleFactorK * stepK)个base块并缓存保持在A1中。后续Iterate计算时，scaleA矩阵缓存数据依次与A矩阵中不同的数据完成广播乘法运算。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 ```
@@ -44,17 +42,13 @@
   本样例中：M = 32，N = 128，K = 128，scaleK = 4。其中scaleK为K整除32的结果4。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="5" align="center">MatmulMxTypeParaCustom</td></tr>
-  </tr>
   <tr><td rowspan="6" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td><td align="center">isTrans</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">scaleA</td><td align="center">[M, scaleK]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">fp8_e5m2_t</td><td align="center">ND</td><td align="center">false</td></tr>
   <tr><td align="center">scaleB</td><td align="center">[scaleK, N]</td><td align="center">fp8_e8m0_t</td><td align="center">ND</td><td align="center">true</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td><td align="center">-</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">matmulMxTypeParaCustom</td></tr>
   </table>
 - 样例实现： 

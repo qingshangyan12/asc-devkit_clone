@@ -1,15 +1,14 @@
 # M方向预加载Matmul样例
 ## 概述
-M/N方向预加载的Matmul样例，可以减少MET2间隙。在MTE2流水间隙较大，且M/N数值较大时，可以开启对应的M/N方向预加载功能，提前加载A矩阵/B矩阵数据。
+M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙较大，且M/N数值较大时，可以开启对应的M/N方向预加载功能，提前加载A矩阵/B矩阵数据。
 
-## 支持的产品
-- Ascend 950PR/Ascend 950DT
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+## 本样例支持的产品及CANN软件版本
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构
 ```
@@ -37,15 +36,11 @@ M/N方向预加载的Matmul样例，可以减少MET2间隙。在MTE2流水间隙
   本样例中：M = 128, N = 24576, K = 512。
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
-  </tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
-  </tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
-  </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_preload_custom</td></tr>
   </table>
 
