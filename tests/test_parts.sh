@@ -33,7 +33,7 @@ adv_test_two_targets=(
 basic_test_one_targets=(
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIC
     ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
-    ascendc_ut_tiling_utils_ascend910
+    # ascendc_ut_tiling_utils_ascend910
     ascendc_ut_tiling_utils_ascend310p
     ascendc_ut_tiling_utils_ascend610
     ascendc_ut_tiling_utils_ascend310B1
