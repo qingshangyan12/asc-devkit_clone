@@ -22,8 +22,8 @@ int32_t SetDoubleBuffer(bool a, bool b, bool c, bool bias, bool transND2NZ = tru
 | b | 输入 | 设置B矩阵是否开启double buffer。 |
 | c | 输入 | 设置C矩阵是否开启double buffer。 |
 | bias | 输入 | 设置Bias矩阵是否开启double buffer。 |
-| transND2NZ | 输入 | 设置是否需要[ND2NZ](../../../../基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md#fig128961542184620)。 |
-| transNZ2ND | 输入 | 设置是否需要[NZ2ND](../../../../基础API/Memory数据搬运/DataCopy/随路转换NZ2ND搬运.md#fig15851251122815)。 |
+| transND2NZ | 输入 | 设置是否需要[ND2NZ](../../../../基础API/数据搬运导览/GM与L1或L0数据搬运/GMToL1随路转换-ND2NZ搬运(DataCopy).md)。 |
+| transNZ2ND | 输入 | 设置是否需要[NZ2ND](../../../../基础API/数据搬运导览/GM与UB数据搬运/UBToGM随路转换NZ2ND搬运(DataCopy).md)。 |
 
 ## 返回值说明
 
