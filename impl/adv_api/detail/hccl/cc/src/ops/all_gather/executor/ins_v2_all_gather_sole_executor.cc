@@ -11,14 +11,6 @@
 #include "topo_match_1d.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
-#ifndef AICPU_COMPILE
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_mem2mem.h"
-#include "ccu_temp_all_gather_2dies_mesh_1d_mem2mem.h"
-#include "ccu_temp_all_gather_2dies_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#endif
 #include "topo_match_ubx.h"
 #include <cstddef>
 namespace mc2_ops_hccl {
@@ -71,7 +63,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
     myRank_ = resCtx.topoInfo.userRank;
 
     threads_ = resCtx.threads;
-    if (param.engine != CommEngine::COMM_ENGINE_AIV && param.engine != CommEngine::COMM_ENGINE_CCU) {
+    if (param.engine != CommEngine::COMM_ENGINE_AIV) {
         CHK_RET(RestoreChannelMap(resCtx, remoteRankToChannelInfo_));
     }
     dataCount_ = param.DataDes.count;
@@ -100,9 +92,6 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 
     // 准备资源
     TemplateResource templateAlgRes;
-    if (param.engine == COMM_ENGINE_CCU) {
-        templateAlgRes.ccuKernels = resCtx.ccuKernels;
-    }
     if (param.engine != CommEngine::COMM_ENGINE_AIV && remoteRankToChannelInfo_.size() > 0) {
         templateAlgRes.channels = remoteRankToChannelInfo_[0];
     }
@@ -187,29 +176,4 @@ REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1DUBX, InsV2Al
                  
 REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherNHRUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
                  InsTempAllGatherNHR);
-#ifndef AICPU_COMPILE
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
-                 CcuTempAllGatherMesh1DMem2Mem);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-                 CcuTempAllGatherMesh1D);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2Mem, InsV2AllGatherSoleExecutor, TopoMatch1D,
-                 CcuTempAllGatherNHR1DMem2Mem);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuKernelAllGather2DiesMeshMem2Mem1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGather2DiesMeshMem2Mem1D);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuKernelAllGather2DiesMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempAllGather2DiesMesh1D);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-                 CcuTempAllGatherMesh1D);
-
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherNHR1DMem2MemUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-                 CcuTempAllGatherNHR1DMem2Mem);
-                 
-REGISTER_EXEC_V2(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherMesh1DMem2MemUBX, InsV2AllGatherSoleExecutor, TopoMatchUBX,
-                 CcuTempAllGatherMesh1DMem2Mem);
-#endif
 }  // namespace mc2_ops_hccl

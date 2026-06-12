@@ -11,19 +11,10 @@
 #include "math.h"
 #include "alg_data_trans_wrapper.h"
 #include "hccl_res.h"
-#include "ccu_alg_template_base.h"
 
 // AICPU template 头文件
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
-
-#ifndef AICPU_COMPILE
-// CCU template 头文件
-#include "ccu_temp_all_gather_mesh_1D.h"
-#include "ccu_temp_all_gather_nhr_1D_multi_jetty_mem2mem.h"
-#include "ccu_temp_all_gather_mesh_1D_mem2mem.h"
-
-#endif
 
 constexpr u32 CLOS_PORT_NUM = 4;
 
@@ -92,30 +83,21 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
                                               temp1ResReq.notifyNumPerThread.begin(),
                                               temp1ResReq.notifyNumPerThread.end());
     
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
-        resourceRequest.ccuKernelNum.emplace_back(temp0ResReq.ccuKernelNum[0]);
-        resourceRequest.ccuKernelNum.emplace_back(temp1ResReq.ccuKernelNum[0]);
-        resourceRequest.ccuKernelInfos.insert(resourceRequest.ccuKernelInfos.end(), temp0ResReq.ccuKernelInfos.begin(),
-                                              temp0ResReq.ccuKernelInfos.end());
-        resourceRequest.ccuKernelInfos.insert(resourceRequest.ccuKernelInfos.end(), temp1ResReq.ccuKernelInfos.begin(),
-                                              temp1ResReq.ccuKernelInfos.end());
-    } else {
-        std::vector<HcclChannelDesc> temp0Channels;
-        std::vector<HcclChannelDesc> temp1Channels;
-        CommTopo temp0PriorityTopo = COMM_TOPO_1DMESH;
-        CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, temp0HierarchyInfo, temp0Channels, temp0PriorityTopo));
-        CommTopo temp1PriorityTopo = COMM_TOPO_CLOS;
-        CHK_RET(CalcChannelRequestNHRWithPriorityTopo(comm, param, topoInfo, temp1HierarchyInfo, temp1Channels, temp1PriorityTopo));
+    std::vector<HcclChannelDesc> temp0Channels;
+    std::vector<HcclChannelDesc> temp1Channels;
+    CommTopo temp0PriorityTopo = COMM_TOPO_1DMESH;
+    CHK_RET(CalcChannelRequestMesh1DWithPriorityTopo(comm, param, topoInfo, temp0HierarchyInfo, temp0Channels, temp0PriorityTopo));
+    CommTopo temp1PriorityTopo = COMM_TOPO_CLOS;
+    CHK_RET(CalcChannelRequestNHRWithPriorityTopo(comm, param, topoInfo, temp1HierarchyInfo, temp1Channels, temp1PriorityTopo));
 
-        CHK_PRT_RET(temp0Channels.size() != temp1Channels.size(),
-            HCCL_ERROR("[InsV2AllGatherConcurrentExecutor][CalcRes] temp0Channels.size()[%zu] is not equal to temp1Channels.size()[%zu]",
-                    temp0Channels.size(), temp1Channels.size()),
-            HcclResult::HCCL_E_INTERNAL);
-        resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), temp0Channels.begin(),
-                                           temp0Channels.end());
-        resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), temp1Channels.begin(),
-            temp1Channels.end());
-    }
+    CHK_PRT_RET(temp0Channels.size() != temp1Channels.size(),
+        HCCL_ERROR("[InsV2AllGatherConcurrentExecutor][CalcRes] temp0Channels.size()[%zu] is not equal to temp1Channels.size()[%zu]",
+                temp0Channels.size(), temp1Channels.size()),
+        HcclResult::HCCL_E_INTERNAL);
+    resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), temp0Channels.begin(),
+                                       temp0Channels.end());
+    resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), temp1Channels.begin(),
+        temp1Channels.end());
     return HCCL_SUCCESS;
 }
 
@@ -220,17 +202,11 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     // 分配threads
     PrepareResForTemplate(algTemplate0, algTemplate1);
 
-    // 分配channels或者ccuKernels
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
-        tmp0CcuKernels_.assign(resCtx.ccuKernels.begin(), resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0]);
-        tmp1CcuKernels_.assign(resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0], resCtx.ccuKernels.begin() + resCtx.ccuKernelNum[0] + resCtx.ccuKernelNum[1]);
-    } else {
-        const u64 splitIndex = rankSize_ - 1; // 默认第一个算法为mesh，使用 rankSize_ - 1 个 link
-        for (u64 i = 0; i < resCtx.channels[0].size(); ++i) {
-            const auto& channel = resCtx.channels[0][i];
-            auto& targetMap = (i < splitIndex) ? tmp0LinkMap_ : tmp1LinkMap_;
-            targetMap[channel.remoteRank].push_back(channel);
-        }
+    const u64 splitIndex = rankSize_ - 1; // 默认第一个算法为mesh，使用 rankSize_ - 1 个 link
+    for (u64 i = 0; i < resCtx.channels[0].size(); ++i) {
+        const auto& channel = resCtx.channels[0][i];
+        auto& targetMap = (i < splitIndex) ? tmp0LinkMap_ : tmp1LinkMap_;
+        targetMap[channel.remoteRank].push_back(channel);
     }
 
     // 算法展开
@@ -256,13 +232,8 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     TemplateResource templateAlgResforTemp1;
     templateAlgResforTemp1.threads = tmp1Threads_;
 
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
-        templateAlgResforTemp0.ccuKernels = tmp0CcuKernels_;
-        templateAlgResforTemp1.ccuKernels = tmp1CcuKernels_;
-    } else {
-        templateAlgResforTemp0.channels = tmp0LinkMap_;
-        templateAlgResforTemp1.channels = tmp1LinkMap_;
-    }
+    templateAlgResforTemp0.channels = tmp0LinkMap_;
+    templateAlgResforTemp1.channels = tmp1LinkMap_;
 
     TemplateDataParams AlgParamsforTemp0;
     TemplateDataParams AlgParamsforTemp1;
@@ -357,14 +328,5 @@ HcclResult InsV2AllGatherConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
 // 算法注册
 REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherConcurrentMesh1DNHR, InsV2AllGatherConcurrentExecutor,
                               TopoMatchUBX, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
-
-#ifndef AICPU_COMPILE
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherConcurrentMesh1DNHRMem, InsV2AllGatherConcurrentExecutor,
-    TopoMatchUBX, CcuTempAllGatherMesh1DMem2Mem, CcuTempAllGatherNHR1DMultiJettyMem2Mem);
-
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_ALLGATHER, CcuAllGatherConcurrentMesh1DNHR,
-                               InsV2AllGatherConcurrentExecutor, TopoMatchUBX, CcuTempAllGatherMesh1D,
-                               CcuTempAllGatherNHR1DMultiJettyMem2Mem);
-#endif
 
 }  // namespace

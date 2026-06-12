@@ -59,8 +59,6 @@ private:
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::map<u32, std::vector<ChannelInfo>> tmp0LinkMap_;
     std::map<u32, std::vector<ChannelInfo>> tmp1LinkMap_;
-    std::vector<CcuKernelHandle> tmp0CcuKernels_;
-    std::vector<CcuKernelHandle> tmp1CcuKernels_;
 };
 }
 

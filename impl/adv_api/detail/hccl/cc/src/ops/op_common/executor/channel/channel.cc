@@ -132,6 +132,11 @@ HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol> &
     switch (param.engine) {
         case CommEngine::COMM_ENGINE_AICPU:
         case CommEngine::COMM_ENGINE_AICPU_TS:
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_PCIE);
+            protocols.push_back(CommProtocol::COMM_PROTOCOL_UBOE);
+            break;
         case CommEngine::COMM_ENGINE_CCU:
             protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_CTP);
             protocols.push_back(CommProtocol::COMM_PROTOCOL_UBC_TP);
@@ -150,6 +155,10 @@ HcclResult GetProtocolByEngine(const OpParam& param, std::vector<CommProtocol> &
                          static_cast<int>(param.engine));
             break;
     }
+    for (auto protocol : protocols) {
+        HCCL_INFO("[GetProtocolByEngine] engine[%d], expectedProtocol[%d].",
+            static_cast<int>(param.engine), static_cast<int>(protocol));
+    }
     return HCCL_SUCCESS;
 }
 
@@ -166,14 +175,19 @@ HcclResult CreateChannelFromLink(HcclComm comm, u32 myRank, u32 rank, uint32_t n
     channelDesc.remoteEndpoint.protocol = link.dstEndpointDesc.protocol;
     channelDesc.remoteEndpoint.commAddr = link.dstEndpointDesc.commAddr;
     channelDesc.remoteEndpoint.loc = link.dstEndpointDesc.loc;
-    HCCL_DEBUG("%s local device phyId: %u, remote device phyId: %u.",
-                funcName.c_str(), channelDesc.localEndpoint.loc.device.devPhyId,
-                channelDesc.remoteEndpoint.loc.device.devPhyId);
-    HCCL_INFO("%s Add channel request between %zu and %zu, netLayerIdx %u, "
-              "linkListIdx %u, protocol %zu",
-              funcName.c_str(), myRank, channelDesc.remoteRank, netLayer, idx, channelDesc.remoteEndpoint.protocol);
     channelDesc.channelProtocol = link.linkAttr.linkProtocol;
     channelDesc.notifyNum = NORMAL_NOTIFY_NUM;
+    HCCL_INFO("%s Add channel request between %u and %u, netLayerIdx %u, linkListIdx %u, "
+              "localEndpointProtocol[%d], remoteEndpointProtocol[%d], channelProtocol[%d], "
+              "localLocType[%d], remoteLocType[%d], localDevPhyId[%u], remoteDevPhyId[%u].",
+              funcName.c_str(), myRank, channelDesc.remoteRank, netLayer, idx,
+              static_cast<int>(channelDesc.localEndpoint.protocol),
+              static_cast<int>(channelDesc.remoteEndpoint.protocol),
+              static_cast<int>(channelDesc.channelProtocol),
+              static_cast<int>(channelDesc.localEndpoint.loc.locType),
+              static_cast<int>(channelDesc.remoteEndpoint.loc.locType),
+              channelDesc.localEndpoint.loc.device.devPhyId,
+              channelDesc.remoteEndpoint.loc.device.devPhyId);
     channels.push_back(channelDesc);
     return HCCL_SUCCESS;
 }
