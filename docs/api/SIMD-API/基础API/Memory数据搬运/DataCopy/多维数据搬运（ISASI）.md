@@ -261,16 +261,16 @@ struct NdDmaLoopInfo  {
 以下以2维的例子介绍几个典型使用场景。
 
 **图 1**  2D Padding场景<a name="fig10722115123919"></a>  
-![](../../../../figures/2D-Padding场景.png "2D-Padding场景")
+![2D-Padding场景](../../../../figures/2D-Padding场景.png)
 
 **图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
-![](../../../../figures/2D-Transpose场景.png "2D-Transpose场景")
+![2D-Transpose场景](../../../../figures/2D-Transpose场景.png)
 
 **图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
-![](../../../../figures/2D-BroadCast场景.png "2D-BroadCast场景")
+![2D-BroadCast场景](../../../../figures/2D-BroadCast场景.png)
 
 **图 4**  2D Slice场景<a name="fig13061435132915"></a>  
-![](../../../../figures/2D-Slice场景.png "2D-Slice场景")
+![2D-Slice场景](../../../../figures/2D-Slice场景.png)
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
@@ -313,7 +313,7 @@ struct NdDmaLoopInfo  {
 
 ## 调用示例<a name="section122101199486"></a>
 
-完整算子样例参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
+完整算子样例参考：[多维数据搬运样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/00_data_movement/data_copy_gm2ub_nddma)。
 
 ```
 // T：搬运数据的类型
