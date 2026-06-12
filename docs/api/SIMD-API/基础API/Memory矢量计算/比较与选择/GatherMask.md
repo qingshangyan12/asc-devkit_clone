@@ -236,7 +236,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-- 用户自定义Tensor示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景二。
+<<<<<<< HEAD
+- 用户自定义Tensor示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/02_memory_vector_compute/gather)场景二。
+=======
+-   用户自定义Tensor样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景二。
+>>>>>>> 2cee38201 (cOptimize 01_simd_cpp_api sample directory structure)
 
     ```cpp
     uint32_t mask = 70; // 每次迭代内参与计算的元素
@@ -254,7 +258,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
     AscendC::GatherMask (dstLocal, src0Local, src1Local, true, mask, { 1, 2, 4, 0 }, rsvdCnt);
     ```
 
-- 内置固定模式示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/02_memory_vector_compute/gather)场景一。
+- 内置固定模式示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景一。
 
     ```cpp
     uint32_t mask = 0; // 每次迭代内参与计算的元素，normal模式下mask建议设置为0

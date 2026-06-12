@@ -222,7 +222,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 
 ## 调用示例<a name="section1227835243314"></a>
 
-本示例仅展示Compute流程中的部分代码。如需运行，请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/copy_ub2ub)实现完整的代码。
+本示例仅展示Compute流程中的部分代码。如需运行，请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)实现完整的代码。
 
 本示例中操作数数据类型为int16\_t。
 

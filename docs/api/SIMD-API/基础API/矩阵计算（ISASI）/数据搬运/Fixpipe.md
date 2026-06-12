@@ -550,7 +550,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为40 \* 16个元素。
 
 **图 1**  不使能NZ2ND参数的单搬运模式设置示意图、<a name="fig128961542184620"></a>  
-![](../../../../figures/不使能NZ2ND参数的单搬运模式设置示意图.png "不使能NZ2ND参数的单搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数的单搬运模式设置示意图.png "不使能NZ2ND参数的单搬运模式设置示意图")
 
 双目标控制模式：
 
@@ -571,7 +571,7 @@ M方向切分：
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中UB0（或UB1）中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40 \*  16个元素。
 
 **图 2**  不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
-![](../../../../figures/不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
 
 使能NZ2ND的情况下，参数设置示例和解释说明如下：
 
@@ -585,7 +585,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 3**  使能NZ2ND参数设置示意图<a name="fig79783143556"></a>  
-![](../../../../figures/使能NZ2ND参数设置示意图.png "使能NZ2ND参数设置示意图")
+![](../../../../figures/开启NZ2ND参数设置示意图.png "使能NZ2ND参数设置示意图")
 
 单搬入模式
 
@@ -599,7 +599,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 4**  使能NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
-![](../../../../figures/使能NZ2ND参数的单搬入模式设置示意图.png "使能NZ2ND参数的单搬入模式设置示意图")
+![](../../../../figures/开启NZ2ND参数的单搬入模式设置示意图.png "使能NZ2ND参数的单搬入模式设置示意图")
 
 双搬入模式
 
@@ -614,7 +614,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
     **图 5**  使能NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
-    ![](../../../../figures/使能NZ2ND参数双搬入模式设置示意图.png "使能NZ2ND参数双搬入模式设置示意图")
+    ![](../../../../figures/开启NZ2ND参数双搬入模式设置示意图.png "使能NZ2ND参数双搬入模式设置示意图")
 
 使能NZ2DN的情况下，参数设置示例和解释说明如下：
 
@@ -632,7 +632,7 @@ M方向切分：
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 80 =3840个元素。
 
 **图 6**  使能NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
-![](../../../../figures/使能NZ2DN单搬运模式示意图1.png "使能NZ2DN单搬运模式示意图1")
+![](../../../../figures/开启NZ2DN单搬运模式示意图1.png "使能NZ2DN单搬运模式示意图1")
 
 单搬运模式：
 
@@ -648,7 +648,7 @@ M方向切分：
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 60 = 2880个元素。
 
 **图 7**  使能NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
-![](../../../../figures/使能NZ2DN单搬运模式示意图2.png "使能NZ2DN单搬运模式示意图2")
+![](../../../../figures/开启NZ2DN单搬运模式示意图2.png "使能NZ2DN单搬运模式示意图2")
 
 ## 约束说明<a name="section205941531307"></a>
 
@@ -659,7 +659,7 @@ M方向切分：
 
 ## 调用示例<a name="section93513321362"></a>
 
--   示例一：通路CO1-\>GM。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2gm)。
+-   示例一：通路CO1-\>GM。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm)。
 
     ```
         AscendC::GlobalTensor<outputType> cGM;
@@ -680,7 +680,7 @@ M方向切分：
         AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
     ```
 
--   示例二：通路CO1-\>C1。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8\_t，不使能Nz2Nd的格式转换，使能Scalar量化。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2l1)。
+-   示例二：通路CO1-\>C1。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8\_t，不使能Nz2Nd的格式转换，使能Scalar量化。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
 
     ```
         AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
@@ -725,7 +725,7 @@ M方向切分：
     #endif
     ```
 
--   示例三：通路CO1-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/fixpipe_l0c2ub)。
+-   示例三：通路CO1-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)。
 
     ```
     AscendC::LocalTensor<outputType> cUB;

@@ -17,7 +17,8 @@
 ```
 ├── hello_world
 │   ├── CMakeLists.txt      // 编译工程文件
-│   └── hello_world.asc     // Ascend C样例实现 & 调用样例
+│   ├── hello_world.asc     // Ascend C样例实现 & 调用样例
+│   └── README.md           // 样例说明文档
 ```
 
 ## 编译运行
@@ -48,7 +49,7 @@
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU仿真模式
   ```
 
-  若需详细了解CPU调试相关内容，请参考[03_cpudebug样例](../../../01_utilities/03_cpudebug)。
+  若需详细了解CPU调试相关内容，请参考[06_cpu_debug样例](../../../01_utilities/06_cpu_debug)。
 
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
