@@ -47,48 +47,56 @@ unset(_cmake_expected_targets)
 find_library(ascend910_LIBRARY
     NAMES lib_pvmodel.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend910A/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend910A/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend310p_LIBRARY
     NAMES lib_pvmodel.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend310P1/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend310P1/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend610_LIBRARY
     NAMES lib_pvmodel.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend610/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend610/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend910B1_LIBRARY
     NAMES libpem_davinci.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend910B1/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend910B1/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend310B1_LIBRARY
     NAMES libpem_davinci.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend310B1/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend310B1/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend950pr_9599_LIBRARY
     NAMES libpem_davinci.so
     PATHS ${ASCEND_DIR}/*/simulator/dav_3510/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/dav_3510/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(ascend610Lite_LIBRARY
     NAMES libpem_davinci.so
     PATHS ${ASCEND_DIR}/*/simulator/Ascend610Lite/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/Ascend610Lite/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(mc62cm12aa_LIBRARY
     NAMES libpem_davinci.so
     PATHS ${ASCEND_DIR}/*/simulator/MC62CM12AA/lib
+          ${ASCEND_CANN_PACKAGE_PATH}/tools/simulator/MC62CM12AA/lib
     NO_CMAKE_SYSTEM_PATH
     NO_CMAKE_FIND_ROOT_PATH)
 
