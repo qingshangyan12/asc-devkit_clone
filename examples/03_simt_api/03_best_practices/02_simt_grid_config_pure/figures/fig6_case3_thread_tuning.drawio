@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="thread_tuning_compare" id="thread-tuning">
+    <mxGraphModel dx="900" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="540" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="subnote" value="" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="40" y="44" width="780" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Plot frame: x 120..780 ; y 100(=5.0us)..400(=3.5us), 200px per us -->
+        <mxCell id="yaxis" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="120" y="100" as="sourcePoint" /><mxPoint x="120" y="400" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="xaxis" value="" style="endArrow=none;html=1;strokeColor=#000000;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="120" y="400" as="sourcePoint" /><mxPoint x="780" y="400" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="ylabel" value="Task Duration (us)" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="20" y="220" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="brk" value="" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="110" y="402" width="20" height="16" as="geometry" /></mxCell>
+
+        <!-- Y gridlines + labels: 3.5,4.0,4.5,5.0 ; 100px per 0.5us -->
+        <mxCell id="g35" value="3.5" style="text;html=1;align=right;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="84" y="390" width="28" height="20" as="geometry" /></mxCell>
+        <mxCell id="g40" value="4.0" style="text;html=1;align=right;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="84" y="290" width="28" height="20" as="geometry" /></mxCell>
+        <mxCell id="g45" value="4.5" style="text;html=1;align=right;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="84" y="190" width="28" height="20" as="geometry" /></mxCell>
+        <mxCell id="g50" value="5.0" style="text;html=1;align=right;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="84" y="90" width="28" height="20" as="geometry" /></mxCell>
+        <mxCell id="ln40" value="" style="endArrow=none;html=1;strokeColor=#E0E0E0;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="120" y="300" as="sourcePoint" /><mxPoint x="780" y="300" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ln45" value="" style="endArrow=none;html=1;strokeColor=#E0E0E0;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="120" y="200" as="sourcePoint" /><mxPoint x="780" y="200" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="ln50" value="" style="endArrow=none;html=1;strokeColor=#E0E0E0;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="120" y="100" as="sourcePoint" /><mxPoint x="780" y="100" as="targetPoint" /></mxGeometry></mxCell>
+
+        <!-- Group 1: 16核  blue 4.742->top152 h248 ; green 4.692->top162 h238 -->
+        <mxCell id="b1a" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#3B5A82;" vertex="1" parent="1"><mxGeometry x="190" y="152" width="55" height="248" as="geometry" /></mxCell>
+        <mxCell id="b1av" value="4.742" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="188" y="134" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="b1b" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#82B366;strokeColor=#557A33;" vertex="1" parent="1"><mxGeometry x="250" y="162" width="55" height="238" as="geometry" /></mxCell>
+        <mxCell id="b1bv" value="4.692" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="248" y="144" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="imp1" value="↓1.1%" style="text;html=1;align=center;fontSize=12;fontColor=#CC0000;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="205" y="112" width="90" height="18" as="geometry" /></mxCell>
+        <mxCell id="x1" value="16核 (每核1024元素)" style="text;html=1;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="170" y="404" width="160" height="20" as="geometry" /></mxCell>
+
+        <!-- Group 2: 32核  blue 3.982->top304 h96 ; green 3.870->top326 h74 -->
+        <mxCell id="b2a" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#3B5A82;" vertex="1" parent="1"><mxGeometry x="400" y="304" width="55" height="96" as="geometry" /></mxCell>
+        <mxCell id="b2av" value="3.982" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="398" y="286" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="b2b" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#82B366;strokeColor=#557A33;" vertex="1" parent="1"><mxGeometry x="460" y="326" width="55" height="74" as="geometry" /></mxCell>
+        <mxCell id="b2bv" value="3.870" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="458" y="308" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="imp2" value="↓2.8%" style="text;html=1;align=center;fontSize=12;fontColor=#CC0000;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="415" y="264" width="90" height="18" as="geometry" /></mxCell>
+        <mxCell id="x2" value="32核 (每核512元素)" style="text;html=1;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="380" y="404" width="160" height="20" as="geometry" /></mxCell>
+
+        <!-- Group 3: 64核  blue 4.294->top241 h159 ; green 4.214->top257 h143 -->
+        <mxCell id="b3a" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#3B5A82;" vertex="1" parent="1"><mxGeometry x="610" y="241" width="55" height="159" as="geometry" /></mxCell>
+        <mxCell id="b3av" value="4.294" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="608" y="223" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="b3b" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#82B366;strokeColor=#557A33;" vertex="1" parent="1"><mxGeometry x="670" y="257" width="55" height="143" as="geometry" /></mxCell>
+        <mxCell id="b3bv" value="4.214" style="text;html=1;align=center;fontSize=10;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="668" y="239" width="59" height="16" as="geometry" /></mxCell>
+        <mxCell id="imp3" value="↓1.9%" style="text;html=1;align=center;fontSize=12;fontColor=#CC0000;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="625" y="201" width="90" height="18" as="geometry" /></mxCell>
+        <mxCell id="x3" value="64核 (每核256元素)" style="text;html=1;align=center;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="590" y="404" width="160" height="20" as="geometry" /></mxCell>
+
+        <!-- Legend: top-right inside plot -->
+        <mxCell id="lgbox" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;" vertex="1" parent="1"><mxGeometry x="496" y="108" width="280" height="56" as="geometry" /></mxCell>
+        <mxCell id="lg1box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#3B5A82;" vertex="1" parent="1"><mxGeometry x="506" y="118" width="18" height="13" as="geometry" /></mxCell>
+        <mxCell id="lg1txt" value="2048线程（固定上限，含空转线程）" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="528" y="113" width="244" height="18" as="geometry" /></mxCell>
+        <mxCell id="lg2box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#82B366;strokeColor=#557A33;" vertex="1" parent="1"><mxGeometry x="506" y="140" width="18" height="13" as="geometry" /></mxCell>
+        <mxCell id="lg2txt" value="线程数=每核实际元素数（无空转线程）" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1"><mxGeometry x="528" y="135" width="244" height="18" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
