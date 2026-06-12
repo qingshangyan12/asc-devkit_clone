@@ -153,10 +153,10 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 | 场景 | repeat_stride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
-| 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeat_stride连续计算场景" width="400" /> |
-| 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeat_stride非连续计算场景" width="400" /> |
+| 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeat_stride连续计算场景" width="600" /> |
+| 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeat_stride非连续计算场景" width="600" /> |
 | 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeat_stride反复计算场景" width="400" /> |
-| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeat_stride部分重复计算" width="400" /> |
+| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeat_stride部分重复计算" width="600" /> |
 
 当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
 
