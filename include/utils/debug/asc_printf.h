@@ -25,6 +25,9 @@
 #include "simt_api/device_types.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
+#ifndef ASCENDC_SIMD_VF_DEBUG
+#define ASCENDC_SIMD_VF_DEBUG
+#endif
 
 namespace __asc_simt_vf {
 template <class... Args>
