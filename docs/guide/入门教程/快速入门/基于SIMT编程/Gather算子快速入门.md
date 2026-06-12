@@ -17,17 +17,17 @@
 - **算子设计**：
 
     - **Device端核函数编程接口**
-        - 核函数定义：通过 [\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 修饰符声明。
-        - 数据划分：使用内置关键字 [threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md) 计算线程索引，并为每个线程分配需要处理的数据元素。
+        - 核函数定义：通过[\_\_global\_\_](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md)修饰符声明。
+        - 数据划分：使用内置关键字[threadIdx、blockIdx、blockDim](../../../编程指南/语言扩展层/SIMT-BuiltIn关键字.md)计算线程索引，并为每个线程分配需要处理的数据元素。
         - 数据搬入：无需额外接口，直接通过指针访问即可。
         - 数据计算：根据`index`中的索引值及操作符`[]`读取输入数据。
         - 数据搬出：无需额外接口，直接通过指针访问即可。
     - **Host端运行时接口**
-        - 内存分配：使用 `aclrtMallocHost`分配Host Memory，`aclrtMalloc`分配Device Memory。
-        - 数据搬入：使用 `aclrtMemcpy` 将输入数据从Host Memory拷贝到Device Memory。
-        - 启动NPU计算任务：通过 `<<<...>>>`语法糖启动核函数。
+        - 内存分配：使用`aclrtMallocHost`分配Host Memory，`aclrtMalloc`分配Device Memory。
+        - 数据搬入：使用`aclrtMemcpy`将输入数据从Host Memory拷贝到Device Memory。
+        - 启动NPU计算任务：通过`<<<...>>>`语法糖启动核函数。
         - 同步等待：调用`aclrtSynchronizeStream`等待当前Stream上的任务完成，或调用`aclrtSynchronizeDevice`等待Device上所有任务完成。
-        - 数据搬出：使用 `aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
+        - 数据搬出：使用`aclrtMemcpy`将计算结果从Device Memory拷贝回Host Memory。
 
 - **算子代码实现**：
 
