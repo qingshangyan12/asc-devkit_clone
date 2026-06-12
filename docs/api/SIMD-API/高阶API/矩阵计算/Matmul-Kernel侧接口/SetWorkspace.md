@@ -13,7 +13,7 @@
 
 ## 功能说明
 
-[Iterate](Iterate.md)计算的[异步场景](GetTensorC.md#li17508136205415)，调用本接口申请一块临时空间来缓存计算结果，然后调用[GetTensorC](GetTensorC.md#li17508136205415)时会在该临时空间中获取C的矩阵分片。
+[Iterate](Iterate.md)计算的[异步场景](GetTensorC.md)，调用本接口申请一块临时空间来缓存计算结果，然后调用[GetTensorC](GetTensorC.md)时会在该临时空间中获取C的矩阵分片。
 
 [IterateNBatch](IterateNBatch.md)计算时，调用本接口申请一块临时空间来缓存计算结果，然后根据[同步或异步场景](IterateNBatch.md#table8746171282418)进行其它接口的调用。
 
