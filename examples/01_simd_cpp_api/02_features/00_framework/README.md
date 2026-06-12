@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了PyTorch、TensorFlow和ONNX框架的自定义算子实现方法。
+本样例介绍了PyTorch、TensorFlow、ONNX框架以及GE原生构图场景的自定义算子实现方法。
 
 ## 样例列表
 
