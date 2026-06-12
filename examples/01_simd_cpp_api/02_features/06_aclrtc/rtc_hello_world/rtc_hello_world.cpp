@@ -19,11 +19,11 @@
 } while(0)
 
 const char *src = R""""(
-    #include "debug/asc_printf.h"
-    extern "C" __global__ __vector__ void hello_world()
-    {
-        printf("Hello World!!!\n");
-    }
+#include "utils/debug/asc_printf.h"
+extern "C" __global__ __vector__ void hello_world()
+{
+    printf("Hello World!!!\n");
+}
 )"""";
 
 int main(int argc, char *argv[])
@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
     std::vector<char> deviceELF(binDataSizeRet);
     ASCENDC_CHECK(aclrtcGetBinData(prog, deviceELF.data()));
 
-    // ----------------------------------------------- aclrt part ------------------------------------------------
     aclrtBinHandle binHandle = nullptr;
     aclrtBinaryLoadOptions loadOption;
     loadOption.numOpt = 1;
@@ -61,18 +60,15 @@ int main(int argc, char *argv[])
     ASCENDC_CHECK(aclrtSetDevice(0));
     ASCENDC_CHECK(aclrtBinaryLoadFromData(deviceELF.data(), binDataSizeRet, &loadOption, &binHandle));
 
-
     aclrtFuncHandle funcHandle = nullptr;
     const char *funcName = "hello_world";
     ASCENDC_CHECK(aclrtBinaryGetFunction(binHandle, funcName, &funcHandle));
 
-    aclrtArgsHandle argsHandle = nullptr;
-    ASCENDC_CHECK(aclrtKernelArgsInit(funcHandle, &argsHandle));
-    ASCENDC_CHECK(aclrtKernelArgsFinalize(argsHandle));
     // 核函数执行
     uint32_t numBlocks = 8;
-    ASCENDC_CHECK(aclrtLaunchKernelWithConfig(funcHandle, numBlocks, nullptr, nullptr, argsHandle, nullptr));
+    ASCENDC_CHECK(aclrtLaunchKernelWithArgsArray(funcHandle, numBlocks, nullptr, nullptr, nullptr));
     ASCENDC_CHECK(aclrtSynchronizeDevice());
+
     ASCENDC_CHECK(aclrtBinaryUnLoad(binHandle));
     ASCENDC_CHECK(aclrtResetDevice(0));
 
