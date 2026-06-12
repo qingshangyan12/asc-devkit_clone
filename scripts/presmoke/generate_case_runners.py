@@ -40,12 +40,17 @@ SPECIAL_PREFIXES = (
 
 CUSTOM_OP_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op"
 PARALLEL_OPS_PACKAGE_CASE = "01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/parallel_ops_package"
+TILING_SINK_PROGRAMMING_CASE = "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming"
+TILING_SINK_GENERATE_TASK_PATTERN = (
+    "GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks "
+    "for the tiling sink, sk_flag [0]."
+)
 
 CUSTOM_OP_PACKAGE_DEPENDENTS = {
     "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation",
     "01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclop_invocation",
     "01_simd_cpp_api/02_features/00_framework/02_onnx/onnx_plugin",
-    "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
+    TILING_SINK_PROGRAMMING_CASE,
 }
 
 # These projects either build host-only apps, superbuild subprojects, or C API
@@ -357,6 +362,8 @@ def render_runner(
 ) -> str:
     if spec.rel == PARALLEL_OPS_PACKAGE_CASE:
         return render_parallel_ops_package_runner(spec)
+    if spec.rel == TILING_SINK_PROGRAMMING_CASE:
+        return render_tiling_sink_programming_runner(spec)
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
     inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
@@ -364,6 +371,30 @@ def render_runner(
         *runner_header(spec),
         *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds, inject_cmake_arch=inject_cmake_arch)]),
         *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
+        *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
+        "case_clean() {",
+        "    presmoke_default_clean",
+        "}",
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def render_tiling_sink_programming_runner(spec: RunnerRenderSpec) -> str:
+    build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
+    lines = [
+        *runner_header(spec),
+        *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds)]),
+        *runner_function(
+            "case_run",
+            [
+                "    presmoke_clear_plog",
+                *indent_tiling_sink_run_commands(spec.run_cmds),
+                f"    presmoke_verify_tiling_sink_task_log {shlex.quote(TILING_SINK_GENERATE_TASK_PATTERN)}",
+            ],
+        ),
         *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
         "case_clean() {",
         "    presmoke_default_clean",
@@ -454,6 +485,18 @@ def indent_commands(
         if isinstance(command, str):
             command = Command(command, "shell")
         lines.append(indent_command(command, default_cd_build, inject_cmake_arch))
+    return lines
+
+
+def indent_tiling_sink_run_commands(commands: Iterable[Command]) -> List[str]:
+    lines: List[str] = []
+    for command in commands:
+        raw = rewrite_runtime_arch_options(command.raw)
+        raw = rewrite_runtime_cmake_options(raw)
+        quoted = shlex.quote(raw)
+        env_prefix = command_env_prefix(command)
+        runner = f"ASCEND_GLOBAL_LOG_LEVEL=1 {env_prefix}bash -lc {quoted}"
+        lines.append(f'    (cd "{command_workdir(raw, default_cd_build=True)}" && {runner})')
     return lines
 
 

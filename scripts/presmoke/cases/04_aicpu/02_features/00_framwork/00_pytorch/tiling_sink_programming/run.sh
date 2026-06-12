@@ -23,7 +23,9 @@ case_build() {
 
 case_run() {
     mkdir -p "$BUILD_DIR"
-    (cd "$CASE_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 test_add_custom_tiling_sink.py')
+    presmoke_clear_plog
+    (cd "$CASE_DIR" && ASCEND_GLOBAL_LOG_LEVEL=1 soc_version=$SOC_VERSION bash -lc 'python3 test_add_custom_tiling_sink.py')
+    presmoke_verify_tiling_sink_task_log 'GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks for the tiling sink, sk_flag [0].'
 }
 
 case_verify() {
