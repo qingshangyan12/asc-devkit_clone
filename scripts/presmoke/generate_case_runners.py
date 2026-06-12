@@ -369,7 +369,10 @@ def render_runner(
     inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
     lines = [
         *runner_header(spec),
-        *runner_function("case_build", [*build_prefix, *indent_commands(spec.build_cmds, inject_cmake_arch=inject_cmake_arch)]),
+        *runner_function(
+            "case_build",
+            [*build_prefix, *indent_commands(spec.build_cmds, inject_cmake_arch=inject_cmake_arch)],
+        ),
         *runner_function("case_run", [*run_prefix, *indent_commands(spec.run_cmds, default_cd_build=True)]),
         *runner_function("case_verify", indent_commands(spec.verify_cmds, default_cd_build=True)),
         "case_clean() {",
