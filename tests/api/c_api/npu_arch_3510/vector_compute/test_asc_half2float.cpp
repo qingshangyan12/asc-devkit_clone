@@ -35,3 +35,49 @@ TEST_F(TestHalf2Float, half_to_float_Succ)
     asc_half2float(dst, src, mask);
     GlobalMockObject::verify();
 }
+
+// ========== Renamed pos-parameter overload tests ==========
+
+class TestVcvtPos1001 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtff_f162f32_x_PosStub_1001(vector_float dst, vector_half src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos1001, asc_half2float_ASC_POSITION_Succ) {
+    vector_float dst;
+    vector_half src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtff_f162f32_x, void(vector_float, vector_half, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtff_f162f32_x_PosStub_1001));
+
+    asc_half2float(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos1002 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtff_f162f32_x_PosStub_1002(vector_float dst, vector_half src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos1002, asc_half2float_ASC_POSITION_Succ) {
+    vector_float dst;
+    vector_half src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtff_f162f32_x, void(vector_float, vector_half, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtff_f162f32_x_PosStub_1002));
+
+    asc_half2float(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}

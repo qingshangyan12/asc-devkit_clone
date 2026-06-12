@@ -12,3 +12,49 @@
 
 TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt, asc_int82int16, vcvt, vector_int16_t, vector_int8_t, 0);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_3(Vcvt_v2, asc_int82int16_v2, vcvt, vector_int16_t, vector_int8_t, 1);
+
+// ========== Renamed pos-parameter overload tests ==========
+
+class TestVcvtPos2801 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s82s16_x_PosStub_2801(vector_int16_t dst, vector_int8_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2801, asc_int82int16_ASC_POSITION_Succ) {
+    vector_int16_t dst;
+    vector_int8_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s82s16_x, void(vector_int16_t, vector_int8_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s82s16_x_PosStub_2801));
+
+    asc_int82int16(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos2802 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtii_s82s16_x_PosStub_2802(vector_int16_t dst, vector_int8_t src, vector_bool mask, unsigned long long a0) {}
+}
+
+TEST_F(TestVcvtPos2802, asc_int82int16_ASC_POSITION_Succ) {
+    vector_int16_t dst;
+    vector_int8_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtii_s82s16_x, void(vector_int16_t, vector_int8_t, vector_bool, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtii_s82s16_x_PosStub_2802));
+
+    asc_int82int16(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}

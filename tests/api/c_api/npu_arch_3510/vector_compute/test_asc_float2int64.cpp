@@ -34,3 +34,357 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz, asc_float2int64_rz, vcvt, vector_int64
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz1, asc_float2int64_rz_sat, vcvt, vector_int64_t, vector_float, 17);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz2, asc_float2int64_rz_v2, vcvt, vector_int64_t, vector_float, 18);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_rz3, asc_float2int64_rz_sat_v2, vcvt, vector_int64_t, vector_float, 19);
+
+// ========== Renamed pos-parameter overload tests ==========
+
+class TestVcvtPos901 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_901(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos901, asc_float2int64_rd_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_901));
+
+    asc_float2int64_rd(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos902 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_902(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos902, asc_float2int64_rd_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_902));
+
+    asc_float2int64_rd_sat(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos903 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_903(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos903, asc_float2int64_rd_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_903));
+
+    asc_float2int64_rd(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos904 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_904(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos904, asc_float2int64_rd_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_904));
+
+    asc_float2int64_rd_sat(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos905 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_905(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos905, asc_float2int64_rn_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_905));
+
+    asc_float2int64_rn(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos906 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_906(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos906, asc_float2int64_rn_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_906));
+
+    asc_float2int64_rn_sat(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos907 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_907(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos907, asc_float2int64_rn_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_907));
+
+    asc_float2int64_rn(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos908 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_908(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos908, asc_float2int64_rn_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_908));
+
+    asc_float2int64_rn_sat(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos909 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_909(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos909, asc_float2int64_ru_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_909));
+
+    asc_float2int64_ru(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos910 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_910(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos910, asc_float2int64_ru_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_910));
+
+    asc_float2int64_ru_sat(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos911 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_911(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos911, asc_float2int64_ru_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_911));
+
+    asc_float2int64_ru(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos912 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_912(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos912, asc_float2int64_ru_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_912));
+
+    asc_float2int64_ru_sat(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos913 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_913(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos913, asc_float2int64_rz_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_913));
+
+    asc_float2int64_rz(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos914 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_914(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos914, asc_float2int64_rz_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_914));
+
+    asc_float2int64_rz_sat(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos915 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_915(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos915, asc_float2int64_rz_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_915));
+
+    asc_float2int64_rz(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+class TestVcvtPos916 : public testing::Test {
+protected:
+    void SetUp() {} void TearDown() {}
+};
+
+namespace {
+void __builtin_cce_vcvtfi_f322s64_x_PosStub_916(vector_int64_t dst, vector_float src, vector_bool mask, unsigned long long a0, unsigned long long a1, unsigned long long a2) {}
+}
+
+TEST_F(TestVcvtPos916, asc_float2int64_rz_sat_ASC_POSITION_Succ) {
+    vector_int64_t dst;
+    vector_float src;
+    vector_bool mask;
+
+    MOCKER_CPP(__builtin_cce_vcvtfi_f322s64_x, void(vector_int64_t, vector_float, vector_bool, unsigned long long, unsigned long long, unsigned long long))
+        .times(1)
+        .will(invoke(__builtin_cce_vcvtfi_f322s64_x_PosStub_916));
+
+    asc_float2int64_rz_sat(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
