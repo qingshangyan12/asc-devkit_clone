@@ -34,7 +34,7 @@ target_compile_options(demo PRIVATE
 )
 
 target_link_libraries(demo PRIVATE
-    /home/yyc/pkgs/cann/x86_64-linux/devlib/libascend_hal.so
-    /home/yyc/pkgs/cann/x86_64-linux/devlib/libascendcl.so
+    /usr/local/Ascend/driver/lib64/driver/libascend_hal.so
+    /home/yyc/pkgs/cann/x86_64-linux/lib64/libascendcl.so
     /home/yyc/pkgs/cann/x86_64-linux/lib64/libruntime.so
 )
