@@ -139,7 +139,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_2(pipe, idx) TRACE_STOP_1(idx)
 #endif
 
-if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #define TRACE_START_1(apid) asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0x400)
 #define TRACE_STOP_1(apid) asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0xc00)
 
