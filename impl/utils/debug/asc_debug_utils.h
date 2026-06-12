@@ -302,7 +302,7 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
         uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
@@ -314,7 +314,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         pipe_barrier(PIPE_ALL);
         asc_vf_debug_ub2gm();
