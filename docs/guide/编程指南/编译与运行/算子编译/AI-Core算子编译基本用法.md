@@ -299,7 +299,7 @@ add_executable(demo
 | CMAKE_ASC_COMPILER_AR | 静态库归档工具，默认使用系统ar工具。设置后，静态库的归档命令将使用该工具替代默认ar。 |
 | CMAKE_ASC_COMPILER_LINKER | 链接驱动，默认使用bisheng编译器作为链接驱动，仅在有明确替换需求时设置。 |
 | CMAKE_ASC_ENABLE_SIMT | 是否启用SIMT编译模式，设置为ON时在编译命令中自动注入--enable-simt选项，默认为OFF。 |
-| CMAKE_INSTALL_PREFIX | 用于指定CMake执行install时，安装的路径前缀，执行install后编译产物（ascendc_library中指定的target以及对应的头文件）会安装在该路径下。默认路径为当前目录的out目录下。 |
+| CMAKE_INSTALL_PREFIX | 为CMake的内置变量，用于指定CMake执行install命令时，安装的路径前缀。|
 
 ## 其他编译相关说明
 
