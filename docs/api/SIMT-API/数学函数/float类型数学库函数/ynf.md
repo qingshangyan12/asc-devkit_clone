@@ -45,6 +45,7 @@ inline float ynf(int n, float x)
 
 -   使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
 -   n的最大取值为128。
+-   当 n 较大（约 n≥70）且 x 处于中等范围（约 n\*0.25 < x < n\*10）时，递推缩放因子 `scale_factor` 的绝对值可能落入 subnormal 区间（< 1.17549435e-38）；底层 DML 除法对该 subnormal 值执行 FTZ（刷零为 ±0），导致最终 `value / scale_factor` 结果为 ±Inf 而非数学上正确的有限值。此行为属于实现缺陷（非 DML 设计内 FTZ），当前返回值与标准 libm 不一致。若业务对 Y_n(x) 精度敏感且 n 较大，建议在 host 侧使用 double 精度计算或改用渐近公式。
 
 ## 需要包含的头文件
 
