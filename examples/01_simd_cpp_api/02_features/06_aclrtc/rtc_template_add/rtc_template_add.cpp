@@ -135,14 +135,12 @@ __vector__ __global__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z)
 
     CHECK_ACL(aclrtBinaryGetFunction(binHandle, manglingName, &funcHandle));
 
-    aclrtArgsHandle argsHandle = nullptr;
-    aclrtParamHandle paramHandle = nullptr;
-    CHECK_ACL(aclrtKernelArgsInit(funcHandle, &argsHandle));
-    CHECK_ACL(aclrtKernelArgsAppend(argsHandle, (void **)&xDevice, sizeof(uintptr_t), &paramHandle));
-    CHECK_ACL(aclrtKernelArgsAppend(argsHandle, (void **)&yDevice, sizeof(uintptr_t), &paramHandle));
-    CHECK_ACL(aclrtKernelArgsAppend(argsHandle, (void **)&zDevice, sizeof(uintptr_t), &paramHandle));
-    CHECK_ACL(aclrtKernelArgsFinalize(argsHandle));
-    CHECK_ACL(aclrtLaunchKernelWithConfig(funcHandle, numBlocks, stream, nullptr, argsHandle, nullptr));
+    void *kernelArgs[] = {
+        static_cast<void *>(&xDevice),
+        static_cast<void *>(&yDevice),
+        static_cast<void *>(&zDevice),
+    };
+    CHECK_ACL(aclrtLaunchKernelWithArgsArray(funcHandle, numBlocks, stream, nullptr, kernelArgs));
 
     CHECK_ACL(aclrtSynchronizeStream(stream));
     CHECK_ACL(aclrtMemcpy(zHost, outputByteSize, zDevice, outputByteSize, ACL_MEMCPY_DEVICE_TO_HOST));

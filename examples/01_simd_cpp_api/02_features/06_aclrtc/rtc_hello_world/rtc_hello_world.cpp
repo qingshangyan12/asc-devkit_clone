@@ -66,12 +66,9 @@ int main(int argc, char *argv[])
     const char *funcName = "hello_world";
     ASCENDC_CHECK(aclrtBinaryGetFunction(binHandle, funcName, &funcHandle));
 
-    aclrtArgsHandle argsHandle = nullptr;
-    ASCENDC_CHECK(aclrtKernelArgsInit(funcHandle, &argsHandle));
-    ASCENDC_CHECK(aclrtKernelArgsFinalize(argsHandle));
     // 核函数执行
     uint32_t numBlocks = 8;
-    ASCENDC_CHECK(aclrtLaunchKernelWithConfig(funcHandle, numBlocks, nullptr, nullptr, argsHandle, nullptr));
+    ASCENDC_CHECK(aclrtLaunchKernelWithArgsArray(funcHandle, numBlocks, nullptr, nullptr, nullptr));
     ASCENDC_CHECK(aclrtSynchronizeDevice());
     ASCENDC_CHECK(aclrtBinaryUnLoad(binHandle));
     ASCENDC_CHECK(aclrtResetDevice(0));
