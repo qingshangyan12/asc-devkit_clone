@@ -1,8 +1,8 @@
-# Matmul高阶API使能MDL模板<a name="ZH-CN_TOPIC_0000002374905781"></a>
+# Matmul高阶API开启MDL模板<a name="ZH-CN_TOPIC_0000002374905781"></a>
 
 ## 案例介绍<a name="section5590915836"></a>
 
-本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，使能MDL模板对算子性能的提升效果。在MDL模板中，MTE2流水从Global Memory到A1/B1的数据搬运为一次性大包搬运，即一次MTE2能搬入多个Matmul计算的基本块，提升带宽利用率，使后续的MTE1流水尽可能复用A1/B1内基本块的缓存数据，减少MTE2的搬运次数。MDL模板的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
+本案例呈现了在矩阵乘算子场景中，使用Matmul高阶API进行矩阵乘法计算，开启MDL模板对算子性能的提升效果。在MDL模板中，MTE2流水从Global Memory到A1/B1的数据搬运为一次性大包搬运，即一次MTE2能搬入多个Matmul计算的基本块，提升带宽利用率，使后续的MTE1流水尽可能复用A1/B1内基本块的缓存数据，减少MTE2的搬运次数。MDL模板的详细介绍请参考[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/MatmulConfig.md)。
 
 -   MDL模板的适用场景
 
@@ -101,7 +101,7 @@ Tiling参数如下：
 **图 2**  MDL模板流水示意图<a name="fig15563371352"></a>  
 ![](../../../figures/MDL模板流水示意图.png "MDL模板流水示意图")
 
-Matmul API使能MDL模板的完整样例请参考[使能UnitFlag功能和MDL模板的Mamtul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_unitflag)。使能MDL模板的主要步骤如下：
+Matmul API开启MDL模板的完整样例请参考[开启UnitFlag功能和MDL模板的Mamtul样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.2/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_unitflag)。开启MDL模板的主要步骤如下：
 
 1.  创建Matmul对象，使用默认的MDL模板参数CFG\_MDL。
 
@@ -128,4 +128,4 @@ Matmul API使能MDL模板的完整样例请参考[使能UnitFlag功能和MDL模�
 
 ## 总结<a name="section1593812115413"></a>
 
-大Shape输入、MTE2搬运次数多，且MTE1流水等MTE2流水的同步等待耗时较长的场景下，可以使能MDL模板。通过实现MTE2从Global Memory一次性搬入多个基本块到A1或B1，使后续的MTE1流水能尽量复用A1/B1的缓存数据，减少MTE2的搬运次数，从而提升算子性能。
+大Shape输入、MTE2搬运次数多，且MTE1流水等MTE2流水的同步等待耗时较长的场景下，可以开启MDL模板。通过实现MTE2从Global Memory一次性搬入多个基本块到A1或B1，使后续的MTE1流水能尽量复用A1/B1的缓存数据，减少MTE2的搬运次数，从而提升算子性能。
