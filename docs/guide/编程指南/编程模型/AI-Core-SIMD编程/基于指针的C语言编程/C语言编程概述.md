@@ -145,7 +145,7 @@ __ubuf__ float z[4096];
 
 <img src="../../../../figures/地址优化后内存排布.png" alt="地址优化后内存排布" width="500" />
 
-#### 2.4.2 L1 Buffer & L0 Buffer
+#### 2.4.3 L1 Buffer & L0 Buffer
 
 Cube计算单元是AI Core中专用于执行矩阵运算的单元，高亮部分展示了Cube计算单元及其直接访问的专用缓存：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
