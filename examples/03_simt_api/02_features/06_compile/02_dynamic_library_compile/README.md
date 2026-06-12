@@ -41,7 +41,7 @@ gather算子实现了从长度为100000的一维输入向量中获取指定索�
 使用 `-shared` 选项将 `.asc` 混合文件编译为动态共享库（.so）。具体编译命令如下：
 
 ```shell
-bisheng -shared gather_kernel.asc -o libgather_kernel.so -fPIC --npu-arch=dav-3510 --enable-simt
+bisheng -shared kernel.asc -o libkernel.so -fPIC --npu-arch=dav-3510 --enable-simt
 ```
 
 其中，`--npu-arch` 为编译时指定的AI处理器架构，本样例仅支持 `dav-3510`，各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)进行查询。`--enable-simt` 用于指定SIMT方式编译。
@@ -54,8 +54,8 @@ bisheng -shared gather_kernel.asc -o libgather_kernel.so -fPIC --npu-arch=dav-35
 
 ```cmake
 # 将.asc文件编译为动态共享库
-add_library(gather_kernel SHARED
-    gather_kernel.asc)
+add_library(kernel SHARED
+    kernel.asc)
 ```
 
 ## 编译运行
