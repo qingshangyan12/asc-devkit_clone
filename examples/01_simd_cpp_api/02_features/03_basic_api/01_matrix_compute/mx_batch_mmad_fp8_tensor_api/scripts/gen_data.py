@@ -16,11 +16,12 @@ import numpy as np
 import ml_dtypes
 
 BATCH_SIZE = 2
-M_SIZE = 64
-N_SIZE = 64
-K_SIZE = 128
+M_SIZE = 32
+N_SIZE = 48
+K_SIZE = 96
 SCALE_CEIL_NUMBER = 32
 SCALE_ALIGN_NUMBER = 2
+K_ALIGN_NUMBER = 64
 FRACTAL_FIXED = 16
 C0_ELEMENT_SCALE = 2
 # Three scenes pair each scale pattern once: (ScaleAND, ScaleBND) / (ScaleADN, ScaleBDN) / (ZZ, NN).
@@ -95,16 +96,21 @@ def layout_fractal_nn(scale):  # NN: addr = (n//16)*(alignRow*16) + (n%16)*c0 + 
 
 
 def gen_golden_data():
-    scale_k = align_up((K_SIZE + SCALE_CEIL_NUMBER - 1) // SCALE_CEIL_NUMBER, SCALE_ALIGN_NUMBER)
+    # MX Mmad needs K aligned to 64. Pad matrices/scale along K to K_align; the padded K-tail is zero
+    # so it contributes nothing to the matmul, and scale_k is derived from the aligned K.
+    k_align = align_up(K_SIZE, K_ALIGN_NUMBER)
+    scale_k = align_up((k_align + SCALE_CEIL_NUMBER - 1) // SCALE_CEIL_NUMBER, SCALE_ALIGN_NUMBER)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
     rng = np.random.default_rng(2026)
-    # fp8 matrices: draw float values, then round to the nearest e4m3fn so the golden uses
-    # exactly the values the hardware sees. Keep the magnitude small to stay well within e4m3 range.
-    x1_raw = rng.uniform(-2.0, 2.0, [BATCH_SIZE, M_SIZE, K_SIZE]).astype(FP8_DTYPE)
-    x2_raw = rng.uniform(-2.0, 2.0, [BATCH_SIZE, K_SIZE, N_SIZE]).astype(FP8_DTYPE)
+    # fp8 matrices: draw float values for the real K range, zero-pad the K-tail up to k_align, then
+    # round to the nearest e4m3fn so the golden uses exactly the values the hardware sees.
+    x1_raw = np.zeros([BATCH_SIZE, M_SIZE, k_align], dtype=FP8_DTYPE)
+    x2_raw = np.zeros([BATCH_SIZE, k_align, N_SIZE], dtype=FP8_DTYPE)
+    x1_raw[:, :, :K_SIZE] = rng.uniform(-2.0, 2.0, [BATCH_SIZE, M_SIZE, K_SIZE]).astype(FP8_DTYPE)
+    x2_raw[:, :K_SIZE, :] = rng.uniform(-2.0, 2.0, [BATCH_SIZE, K_SIZE, N_SIZE]).astype(FP8_DTYPE)
     x1_scale_gm = rng.integers(127, 130, [BATCH_SIZE, M_SIZE, scale_k], dtype=np.uint8)
     x2_scale_gm = rng.integers(127, 130, [BATCH_SIZE, scale_k, N_SIZE], dtype=np.uint8)
 
@@ -112,17 +118,17 @@ def gen_golden_data():
     x2_mx = 2 ** (x2_scale_gm.astype(np.float64) - 127)
     x1_values = x1_raw.astype(np.float64)
     x2_values = x2_raw.astype(np.float64)
-    x1_full = np.zeros([BATCH_SIZE, M_SIZE, K_SIZE], dtype=np.float64)
-    x2_full = np.zeros([BATCH_SIZE, K_SIZE, N_SIZE], dtype=np.float64)
+    x1_full = np.zeros([BATCH_SIZE, M_SIZE, k_align], dtype=np.float64)
+    x2_full = np.zeros([BATCH_SIZE, k_align, N_SIZE], dtype=np.float64)
 
-    for k_idx in range(K_SIZE):
+    for k_idx in range(k_align):
         x1_full[:, :, k_idx] = x1_values[:, :, k_idx] * x1_mx[:, :, k_idx // SCALE_CEIL_NUMBER]
         x2_full[:, k_idx, :] = x2_values[:, k_idx, :] * x2_mx[:, k_idx // SCALE_CEIL_NUMBER, :]
 
     golden = np.matmul(x1_full, x2_full).astype(np.float32)
     # Each scene is built and run separately; every scene produces this same logical result.
 
-    # A GM ND: row-major [B, M, K]. B GM DN: transposed to [B, N, K] row-major bytes.
+    # A GM ND: row-major [B, M, K_align]. B GM DN: transposed to [B, N, K_align] row-major bytes.
     x1_raw.view(np.uint8).tofile("./input/x1_gm.bin")
     np.ascontiguousarray(x2_raw.transpose(0, 2, 1)).view(np.uint8).tofile("./input/x2_gm.bin")
 
