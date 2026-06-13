@@ -1,27 +1,22 @@
-# GE原生构图接入`<<<>>>`样例
+# Ascend C算子接入GE样例
 
 ## 概述
 
-本样例基于AddCustom算子展示如何把Ascend C `<<<>>>`核函数调用接入GE原生图执行链路。
+本样例基于AddCustom算子展示如何把Ascend C `<<<>>>`核函数调用接入GE（Graph Engine，图引擎）原生图执行链路。
 
-如果只想验证一个Ascend C核函数是否能启动，或者只在主机侧手动管理输入、输出和stream，直接调用`<<<>>>`即可，不需要GE入图。当自定义算子需要作为计算图的一部分参与执行，例如使用GE图引擎接口构建Graph、上层框架或图编译流程会把模型下沉到GE执行、需要GE在图编译阶段识别自定义算子的输入输出和shape/dtype时，就需要把自定义算子接入GE图。
+> **什么是GE？** <br>GE是昇腾计算架构中的图执行引擎。与Eager模式（每个算子下发后立即执行）不同，GE图模式将所有算子构造成一张图，以图为单位下发执行。相较于单个计算操作依次下发的方式，图模式具备图的全局视角，能够更有效地简化和优化计算图操作，从而获得更优执行性能。详细内容可参考：[图模式开发指南](https://hiascend.com/document/redirect/CannCommunityGraphguide)。
 
-本样例展示的核心链路为：
+**执行流程简述**：
 
-```text
-add_custom.asc中的Ascend C kernel
-  -> AddCustom::Execute中直接调用add_custom<<<...>>>(...)
-  -> REG_AUTO_MAPPING_OP(AddCustom)注册GE执行实现
-  -> add_custom_proto.h通过REG_OP(AddCustom)声明算子原型
-  -> graph.cpp创建Data(x)、Data(y)、AddCustom图节点
-  -> Session::RunGraph执行整张GE图
-```
+1. `add_custom_proto.h` 中 `REG_OP(AddCustom)` 声明算子原型（有哪些输入、输出）
+2. `graph.cpp` 根据原型创建 `ge::op::AddCustom` 图节点，并通过 `Session::RunGraph` 执行整张GE图
+3. GE运行到 `AddCustom` 节点时，自动调用 `add_custom.asc` 中的 `AddCustom::Execute()`
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
@@ -29,12 +24,17 @@ add_custom.asc中的Ascend C kernel
 
 ```
 ├── triple_chevron_notation
-│   ├── CMakeLists.txt          // 编译GE custom op和在线构图执行程序
-│   ├── add_custom.asc          // Ascend C kernel + GE执行实现 + 直接<<<>>>调用
-│   ├── add_custom_proto.h      // AddCustom算子原型，供GE构图侧创建ge::op::AddCustom
-│   ├── graph.cpp               // GE在线构图和Session::RunGraph执行验证
+│   ├── CMakeLists.txt          // 编译工程：产出自定义算子动态库 + 在线构图执行程序
+│   ├── add_custom.asc          // Ascend C核函数实现 + GE算子执行实现（InferShape/InferDataType/Execute）
+│   ├── add_custom_proto.h      // 算子原型声明（REG_OP），供GE构图侧创建算子节点
+│   ├── graph.cpp               // GE在线构图（Data + AddCustom节点）和Session::RunGraph执行验证
 │   └── README.md               // 样例说明文档
 ```
+
+> **文件角色说明**：本样例共4个源文件，分属"GE构图侧"和"算子执行侧"两个世界：
+> - **构图侧**（`graph.cpp` + `add_custom_proto.h`）：负责描述"图长什么样"——有哪些算子节点、如何连接
+> - **执行侧**（`add_custom.asc`）：负责描述"算子怎么算"——GE运行到该节点时执行什么代码
+> - **构建系统**（`CMakeLists.txt`）：将执行侧编译为动态库（供GE加载），将构图侧编译为可执行程序
 
 ## 样例描述
 
@@ -57,47 +57,70 @@ add_custom.asc中的Ascend C kernel
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
   </table>
 
-- 自定义算子原型：
+### 第一步：声明算子原型（add_custom_proto.h）
 
-  GE构图时需要根据算子原型创建算子实例。官方“使用图引擎接口全新构建Graph”文档中说明，构建Graph前需要了解算子原型，算子原型描述输入、输出、属性等信息，并通过`REG_OP`、`INPUT`、`OUTPUT`、`ATTR`、`OP_END_FACTORY_REG`等接口注册。
+GE构图时需要知道每个算子"长什么样"——有几个输入、几个输出、各是什么数据类型。这些信息通过算子原型（Operator Proto）描述，并用`REG_OP`宏注册。
 
-  本样例在`add_custom_proto.h`中通过`REG_OP(AddCustom)`声明自定义算子原型，`graph.cpp`依赖该原型创建`ge::op::AddCustom`节点。
+本样例在 `add_custom_proto.h` 中声明 `AddCustom` 算子原型：两个 float 输入 `x`、`y`，一个 float 输出 `z`。
 
-  ```cpp
-  REG_OP(AddCustom)
-      .INPUT(x, TensorType({DT_FLOAT}))
-      .INPUT(y, TensorType({DT_FLOAT}))
-      .OUTPUT(z, TensorType({DT_FLOAT}))
-      .OP_END_FACTORY_REG(AddCustom);
-  ```
+```cpp
+REG_OP(AddCustom)
+    .INPUT(x, TensorType({DT_FLOAT}))
+    .INPUT(y, TensorType({DT_FLOAT}))
+    .OUTPUT(z, TensorType({DT_FLOAT}))
+    .OP_END_FACTORY_REG(AddCustom);
+```
 
-- GE在线构图：
+### 第二步：GE在线构图（graph.cpp）
 
-  本样例在`graph.cpp`中创建`Data("x")`和`Data("y")`作为图输入，创建`ge::op::AddCustom("add_custom")`作为自定义算子节点，并通过`Session::RunGraph`执行整张GE图。
+本样例在 `graph.cpp` 中使用GE API构造一张包含3个节点的计算图：
 
-  ```cpp
-  auto add = ge::op::AddCustom("add_custom").set_input_x(x).set_input_y(y);
-  session.RunGraph(GRAPH_ID, inputs, outputs);
-  ```
+```cpp
+// 1. 创建两个数据输入节点
+auto x = ge::op::Data("x");       // 输入 x
+auto y = ge::op::Data("y");       // 输入 y
 
-- GE自定义算子执行实现：
+// 2. 创建 AddCustom 算子节点，将 x、y 连接到它的输入
+auto add = ge::op::AddCustom("add_custom").set_input_x(x).set_input_y(y);
 
-  本样例在`add_custom.asc`中实现`ge::AddCustom`。`AddCustom::InferShape()`和`AddCustom::InferDataType()`用于让GE在图编译阶段得到输出shape和dtype；`AddCustom::Execute()`是GE执行到该节点时进入用户代码的位置。
+// 3. 将节点组装为图，并执行
+graph->SetInputs({x, y}).SetOutputs({add});
+session.RunGraph(GRAPH_ID, inputs, outputs);
+```
 
-  `AddCustom::Execute()`内部直接使用GE提供的stream调用Ascend C核函数：
+`Session::RunGraph` 是整个样例的运行入口。GE引擎会按图的拓扑顺序依次执行各节点——运行到 `AddCustom` 节点时，自动调用 `add_custom.asc` 中的 `AddCustom::Execute()`。
 
-  ```cpp
-  add_custom<BLOCK_LENGTH><<<BLOCK_NUM, nullptr, ctx->GetStream()>>>(
-      (float *)const_cast<void *>(x->GetAddr()),
-      (float *)const_cast<void *>(y->GetAddr()),
-      (float *)z->GetAddr());
-  ```
+### 第三步：实现GE算子执行逻辑（add_custom.asc）
 
-  `REG_AUTO_MAPPING_OP(AddCustom)`用于把GE图中的`AddCustom`节点映射到这里的用户实现。因此，本样例中的`<<<>>>`调用不是由测试程序直接发起，而是由GE图节点的执行入口发起。
+本样例在 `add_custom.asc` 中实现 `ge::AddCustom` 类，继承 `EagerExecuteOp` 和 `ShapeInferOp`，提供三个关键方法：
 
-- Ascend C核函数实现：
+| 方法 | 调用时机 | 作用 |
+|------|---------|------|
+| `InferShape()` | 图编译阶段 | 推导输出张量的 shape（本样例中输出与输入 shape 相同） |
+| `InferDataType()` | 图编译阶段 | 推导输出张量的数据类型（本样例中输出与输入 dtype 相同） |
+| `Execute()` | 图运行阶段，GE执行到该节点时 | 获取输入地址，调用 Ascend C 核函数执行计算 |
 
-  本样例使用8个核完成计算，每个核处理2048个`float`元素。每个核按`block_idx * blockLength`计算当前核负责的GM偏移，计算流程为GM输入搬运到UB，调用`AscendC::Add`完成向量加法，再将结果从UB搬回GM输出。
+`Execute()` 内部通过 **三重尖括号 `<<<>>>`** 语法发起核函数调用：
+
+```cpp
+add_custom<BLOCK_LENGTH><<<BLOCK_NUM, nullptr, ctx->GetStream()>>>(
+    (float *)const_cast<void *>(x->GetAddr()),
+    (float *)const_cast<void *>(y->GetAddr()),
+    (float *)z->GetAddr());
+```
+
+最后，`REG_AUTO_MAPPING_OP(AddCustom)` 将 GE 图中的 `AddCustom` 节点映射到此处定义的 `ge::AddCustom` 类。因此，`<<<>>>` 调用不是由测试程序直接发起，而是由 GE 图节点的执行入口自动触发。
+
+### 第四步：Ascend C核函数实现（add_custom.asc）
+
+核函数 `add_custom` 使用8个核完成计算，每个核处理2048个 `float` 元素。每个核的计算流程为：
+
+```text
+1. 按 block_idx * blockLength 计算当前核负责的 Global Memory 偏移
+2. 将 GM 输入数据搬运到 UB（Unified Buffer）
+3. 调用 AscendC::Add 完成向量加法
+4. 将结果从 UB 搬回 GM 输出
+```
 
 ## 编译运行
 
@@ -122,6 +145,8 @@ add_custom.asc中的Ascend C kernel
   ./demo    # 执行样例
   ```
 
+  > **为什么需要设置 `ASCEND_CUSTOM_OPP_PATH`？** 编译产出的自定义算子动态库（`libadd_custom_op.so`）和算子原型头文件位于 `build/output/` 目录下。GE 运行时需要加载该动态库才能识别 `AddCustom` 算子并调用其执行实现。`ASCEND_CUSTOM_OPP_PATH` 环境变量告诉 GE 到哪里查找自定义算子包。
+
 - 编译选项说明
 
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
@@ -138,7 +163,6 @@ add_custom.asc中的Ascend C kernel
   AddCustom GE triple-chevron sample success.
   ```
 
-  看到`AddCustom GE triple-chevron sample success.`且`./demo`返回码为0，说明GE图执行成功。该样例的运行入口是`Session::RunGraph`，可用于确认自定义算子是作为GE图节点执行，而不是由测试程序直接调用`add_custom<<<...>>>`。
 
 ## 相关文档
 
