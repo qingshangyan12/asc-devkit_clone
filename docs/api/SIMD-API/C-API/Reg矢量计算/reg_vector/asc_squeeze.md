@@ -10,7 +10,7 @@
 
 将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。
 
-asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_ar_spr](../../系统变量/asc_get_ar_spr.md)接口获取。
+asc_squeeze_stored接口搭配[asc_storeunalign_postupdate](../reg_store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_ar_spr](../../sys_var/asc_get_ar_spr.md)接口获取。
 
 ## 函数原型
 
@@ -28,19 +28,19 @@ asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_store/asc_storeun
   __simd_callee__ inline void asc_squeeze(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
   __simd_callee__ inline void asc_squeeze(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
   __simd_callee__ inline void asc_squeeze(vector_float& dst, vector_float src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_half& dst, vector_half src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_squeeze_v2(vector_float& dst, vector_float src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_int8_t& dst, vector_int8_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_hifloat8_t& dst, vector_hifloat8_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_int16_t& dst, vector_int16_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_uint16_t& dst, vector_uint16_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_half& dst, vector_half src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_bfloat16_t& dst, vector_bfloat16_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_int32_t& dst, vector_int32_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_uint32_t& dst, vector_uint32_t src, vector_bool mask)
+  __simd_callee__ inline void asc_squeeze_stored(vector_float& dst, vector_float src, vector_bool mask)
   ```
 
 ## 参数说明
@@ -80,5 +80,5 @@ vector_int8_t src;
 vector_bool mask = asc_create_mask_b8(PAT_ALL);
 asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址。
 vector_int8_t dst;
-asc_squeeze_v2(dst, src, mask);
+asc_squeeze_stored(dst, src, mask);
 ```
