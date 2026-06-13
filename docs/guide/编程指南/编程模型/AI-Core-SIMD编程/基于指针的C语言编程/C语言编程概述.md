@@ -235,7 +235,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <tr>
 <td rowspan="2"><strong>多流水同步</strong></td>
 <td><p><strong>机制一</strong>: 通过锁定指定流水再释放流水来完成流水间的同步依赖。用于核内异步流水之间的同步处理，其功能类似于传统CPU中的锁机制。该同步机制为Ascend 950PR/Ascend 950DT新引入机制，相较于notify/wait方式使用更简便。</p></td>
-<td><code>asc_lock</code> / <code>asc_unlock</code></td>
+<td><code>asc_lock</code> & <code>asc_unlock</code></td>
 <td>
         <code>uint8_t mutex_id = 1;</code><br>
         <code></code><br>
@@ -250,7 +250,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 </tr>
 <tr>
 <td><p><strong>机制二</strong>: 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。</p></td>
-<td><code>asc_sync_notify</code> / <code>asc_sync_wait</code></td>
+<td><code>asc_sync_notify</code> & <code>asc_sync_wait</code></td>
 <td>
         <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
         <code>asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);</code><br>
@@ -261,7 +261,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <tr>
 <td><strong>单流水同步</strong></td>
 <td><p>等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。</p></td>
-<td><code>asc_sync_pipe</code> / <code>asc_sync_*</code></td>
+<td><code>asc_sync_pipe</code> & <code>asc_sync_mte2等</code></td>
 <td>
         <code>asc_add(dst, src1, src0, total_length);</code><br>
         <code>asc_sync_pipe(PIPE_V);</code><br>
