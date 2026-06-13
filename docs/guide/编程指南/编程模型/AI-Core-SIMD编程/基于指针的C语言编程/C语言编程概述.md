@@ -206,13 +206,6 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 为确保流水线间正确执行，AI Core针对不同应用场景提供了多种同步机制，开发者可根据实际需求灵活选择合适的同步方式来实现算子功能。
 
-| 同步类型 | 核心作用及场景说明 | 适用场景 | 关键接口 |
-|---------|---------|---------|---------|
-| **多流水同步** | 通过锁定指定流水，防止多流水间并发冲突，为Ascend 950PR/Ascend 950DT新引入能力 | 多流水并发访问同一UB区域时(修改：说明950优先建议使用) | `asc_lock` / `asc_unlock` |
-| **多流水同步** | 建立两条流水间的依赖关系 | 源流水完成后目的流水才能执行 | `asc_sync_notify` / `asc_sync_wait` |
-| **单流水同步** | 等待同一流水内前序指令完成 | 同一流水内存在前后数据依赖 | `asc_sync_pipe` / `asc_sync_*` |
-| **内存屏障** | 等待所有前序内存访问完成 | 存在数据依赖或内存依赖的场景 | `asc_sync_data_barrier` |
-
 <table>
 <thead>
 <tr>
@@ -228,7 +221,9 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <td><p><strong>机制一</strong>: 通过锁定指定流水再释放流水来完成流水间的同步依赖。用于核内异步流水之间的同步处理，其功能类似于传统CPU中的锁机制。该同步机制为Ascend 950PR/Ascend 950DT新引入机制，相较于notify/wait方式使用更简便。</p></td>
 <td><code>asc_lock</code> / <code>asc_unlock</code></td>
 <td>
-<pre><code>uint8_t mutex_id = 1;
+<pre><code>
+uint8_t mutex_id = 1;
+
 asc_lock(PIPE_MTE2, mutex_id);
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
 asc_unlock(PIPE_MTE2, mutex_id);
@@ -242,7 +237,8 @@ asc_unlock(PIPE_V, mutex_id);</code></pre>
 <td><p><strong>机制二</strong>: 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。</p></td>
 <td><code>asc_sync_notify</code> / <code>asc_sync_wait</code></td>
 <td>
-<pre><code>asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
+<pre><code>
+asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
 
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
@@ -255,7 +251,8 @@ asc_add(dst, src1, src0, total_length);</code></pre>
 <td><p>等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。</p></td>
 <td><code>asc_sync_pipe</code> / <code>asc_sync_*</code></td>
 <td>
-<pre><code>asc_add(dst, src1, src0, total_length);
+<pre><code>
+asc_add(dst, src1, src0, total_length);
 asc_sync_pipe(PIPE_V);
 asc_sub(dst, dst, src0, total_length);</code></pre>
 </td>
@@ -270,7 +267,6 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
 </tr>
 </tbody>
 </table>
-
 
 ### 3.2 核间同步
 
@@ -301,11 +297,13 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
       <td><p>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</p></td>
       <td><code>asc_sync_inter_arrive</code> / <code>asc_sync_inter_wait</code></td>
       <td>
-<pre><code>if ASCEND_IS_AIC {
-    int64_t flagID = 1;
-    asc_sync_inter_arrive(PIPE_S, flagID);
-    asc_sync_inter_wait(PIPE_S, flagID);
-}</code></pre>
+<pre><code>
+    if ASCEND_IS_AIC {
+        int64_t flagID = 1;
+        asc_sync_inter_arrive(PIPE_S, flagID);
+        asc_sync_inter_wait(PIPE_S, flagID);
+    }
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -313,11 +311,13 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
       <td><p>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</p></td>
       <td><code>asc_sync_inter_arrive</code> / <code>asc_sync_inter_wait</code></td>
       <td>
-<pre><code>if ASCEND_IS_AIV {
-    int64_t flagID = 1;
-    asc_sync_inter_arrive(PIPE_S, flagID);
-    asc_sync_inter_wait(PIPE_S, flagID);
-}</code></pre>
+<pre><code>
+    if ASCEND_IS_AIV {
+        int64_t flagID = 1;
+        asc_sync_inter_arrive(PIPE_S, flagID);
+        asc_sync_inter_wait(PIPE_S, flagID);
+    }
+    </code></pre>
       </td>
     </tr>
     <tr>
@@ -325,12 +325,14 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
       <td><code>asc_sync_intra_arrive</code> / <code>asc_sync_intra_wait</code></td>
       <td>
-<pre><code>if ASCEND_IS_AIC {
-    asc_sync_intra_arrive(PIPE_FIX, 0);
-}
-if ASCEND_IS_AIV {
-    asc_sync_intra_wait(PIPE_MTE3, 0);
-}</code></pre>
+<pre><code>
+    if ASCEND_IS_AIC {
+        asc_sync_intra_arrive(PIPE_FIX, 0);
+    }
+    if ASCEND_IS_AIV {
+        asc_sync_intra_wait(PIPE_MTE3, 0);
+    }
+    </code></pre>
       </td>
     </tr>
     <tr>
@@ -338,19 +340,19 @@ if ASCEND_IS_AIV {
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
       <td><code>asc_sync_intra_arrive</code> / <code>asc_sync_intra_wait</code></td>
       <td>
-<pre><code>if ASCEND_IS_AIV {
-    int64_t flagID = 0;
-    asc_sync_intra_arrive(PIPE_V, flagID);
-    asc_sync_intra_wait(PIPE_V, flagID);
-}</code></pre>
+<pre><code>
+    if ASCEND_IS_AIV {
+        int64_t flagID = 0;
+        asc_sync_intra_arrive(PIPE_V, flagID);
+        asc_sync_intra_wait(PIPE_V, flagID);
+    }
+    </code></pre>
       </td>
     </tr>
   </tbody>
 </table>
 
 > 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离;
-
-
 
 ## 4. 算子类型
 
