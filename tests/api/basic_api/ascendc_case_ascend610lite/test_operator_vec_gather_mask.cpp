@@ -104,3 +104,19 @@ TEST_P(Reducev2Testsuite, Reducev2TestCase)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+TEST_F(Reducev2Testsuite, GatherMaskIndexTensorWithEmptyMask)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> srcBuf;
+    TBuf<TPosition::VECCALC> indexBuf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(srcBuf, 1024);
+    pipe.InitBuffer(indexBuf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t rsvdCnt = 0;
+    GatherMask(dstBuf.Get<half>(), srcBuf.Get<half>(), indexBuf.Get<uint16_t>(), false, 0, {1, 1, 0, 0}, rsvdCnt);
+
+    EXPECT_EQ(rsvdCnt, 0U);
+}

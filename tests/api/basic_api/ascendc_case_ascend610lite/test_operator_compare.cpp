@@ -145,3 +145,19 @@ VEC_CMP_TESTCASE(float, GE, LEVEL0_COUNT_MODE);
 VEC_CMP_TESTCASE(half, GE, LEVEL0_COUNT_MODE);
 VEC_CMP_TESTCASE(float, NE, LEVEL0_COUNT_MODE);
 VEC_CMP_TESTCASE(half, NE, LEVEL0_COUNT_MODE);
+
+TEST_F(TEST_COMPARE, CompareBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> src0Buf;
+    TBuf<TPosition::VECCALC> src1Buf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(src0Buf, 1024);
+    pipe.InitBuffer(src1Buf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    Compare(dstBuf.Get<uint8_t>(), src0Buf.Get<half>(), src1Buf.Get<half>(), CMPMODE::LT, mask, 0, {0, 1, 1, 0, 8, 8});
+
+    SUCCEED();
+}

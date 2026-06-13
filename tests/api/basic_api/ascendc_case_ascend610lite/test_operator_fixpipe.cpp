@@ -301,4 +301,28 @@ TEST_P(FixpipeTestsuite, FixpipeTestCase)
         EXPECT_EQ(outputData[i], 0x00);
     }
 }
+
+TEST_F(FixpipeTestsuite, CheckFixpipeL0CToL1Param)
+{
+    TPipe pipe;
+    TBuf<TPosition::A1> dstBuf;
+    TBuf<TPosition::CO1> srcBuf;
+    pipe.InitBuffer(dstBuf, 1024);
+    pipe.InitBuffer(srcBuf, 1024);
+
+    LocalTensor<half> dst = dstBuf.Get<half>();
+    LocalTensor<float> src = srcBuf.Get<float>();
+    FixpipeParamsM310 params;
+    params.nSize = 16;
+    params.mSize = 16;
+    params.srcStride = 16;
+    params.dstStride = 16;
+    params.quantPre = QuantMode_t::F322F16;
+
+    CheckFixpipeL0C2L1Param<half, float, CFG_ROW_MAJOR>(
+        reinterpret_cast<__cbuf__ half*>(dst.GetPhyAddr()), reinterpret_cast<__cc__ float*>(src.GetPhyAddr()),
+        params);
+
+    SUCCEED();
+}
 } // namespace AscendC

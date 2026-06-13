@@ -73,3 +73,20 @@ TEST_P(ReduceSimpleTestsuite, ReduceSimpleTestCase)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+TEST_F(ReduceSimpleTestsuite, ReduceBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> srcBuf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    TBuf<TPosition::VECCALC> workBuf;
+    pipe.InitBuffer(srcBuf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+    pipe.InitBuffer(workBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    WholeReduceSum(dstBuf.Get<half>(), srcBuf.Get<half>(), mask, 0, 1, 1, 8);
+    ReduceMax(dstBuf.Get<half>(), srcBuf.Get<half>(), workBuf.Get<half>(), mask, 0, 1, false);
+
+    SUCCEED();
+}

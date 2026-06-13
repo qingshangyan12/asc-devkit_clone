@@ -486,3 +486,18 @@ TEST_P(UnarySimpleTestsuite, UnarySimpleTestCase)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+TEST_F(VecUnaryTestSuite, AbsBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> srcBuf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(srcBuf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    UnaryRepeatParams unaryParams {1, 1, 8, 8};
+    Abs(dstBuf.Get<half>(), srcBuf.Get<half>(), mask, 0, unaryParams);
+
+    SUCCEED();
+}
