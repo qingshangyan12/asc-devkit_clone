@@ -1,0 +1,409 @@
+# NPU内存模型
+
+本文从硬件和编程语义两个层面描述NPU侧内存模型：硬件层面关注内存空间、数据流向、缓存层级和带宽；编程语义层面关注内存操作、可见性、数据一致性和同步。本文面向Ascend C SIMD算子开发，也会在必要处说明SIMT或SIMD与SIMT混合编程中的差异。
+
+本文的写法参考GPU内存模型文档：先定义参与内存访问的对象，再定义内存操作和顺序关系，最后说明哪些访问结果是可预期的，哪些需要开发者通过同步或缓存控制来保证。
+
+## 1. 模型范围
+
+本文讨论Device侧Kernel执行期间的内存行为，包括：
+
+- AI Core内的Scalar、Vector、Cube、MTE、FixPipe等执行单元。
+- Global Memory、L2 Cache、DCache、ICache、Unified Buffer、L1/L0 Buffer和Register等内存层级。
+- `DataCopy`、`GetValue`、`SetValue`、`DataCacheCleanAndInvalid`、`ReadGmByPassDCache`、`WriteGmByPassDCache`、`DataSyncBarrier`、`SetFlag/WaitFlag`、`SyncAll`、`CrossCoreSetFlag/CrossCoreWaitFlag`等接口引入的内存语义。
+
+本文不定义Host侧C/C++语言内存模型，也不完整定义原子操作的数学语义。原子操作相关规则请参考[原子操作关键特性说明](../../../../api/SIMD-API/基础API/原子操作/关键特性说明.md)。
+
+## 2. 硬件内存空间
+
+NPU内存系统可以看作由全局内存、共享缓存、核内私有缓存和核内本地存储组成。
+
+| 内存空间 | 位置 | 可见范围 | 典型访问者 | 语义特征 |
+| --- | --- | --- | --- | --- |
+| Global Memory（GM/HBM） | 核外 | Device侧全局可见 | MTE、FixPipe、Scalar、SIMT线程 | 容量最大，访问延迟最高，是跨核交换数据的基础位置。 |
+| L2 Cache | 核外共享缓存 | 多个AI Core共享 | MTE访问GM、Scalar访问GM缺失时、SIMT访存 | 缓存GM数据和指令，主要影响性能；共享特性降低多核间L2副本不一致问题。 |
+| DCache | 核内Data Cache | 单核私有 | Scalar访问GM数据、SIMT部分GM访问 | 可能采用延迟写回；与GM之间的一致性需要开发者显式保证。 |
+| ICache | 核内Instruction Cache | 单核私有 | Scalar取指 | 只读指令缓存，不作为数据一致性讨论重点。 |
+| Unified Buffer（UB） | AI Core片内 | 核内可见 | Vector、Scalar、MTE、SIMT共享内存 | Vector计算的主要输入输出位置，高带宽、低延迟，但需显式搬运和同步。 |
+| L1 Buffer | AI Core片内 | 核内可见 | Cube、MTE、FixPipe | Cube计算的数据中转区。 |
+| L0A/L0B Buffer | Cube近端 | 核内可见 | Cube | Cube矩阵计算输入。 |
+| L0C Buffer | Cube近端 | 核内可见 | Cube、FixPipe | Cube计算输出和累加结果。 |
+| Register | 计算单元近端 | 线程或指令私有 | Reg矢量计算、SIMT线程 | 延迟最低、带宽最高，但生命周期和可见性最受限。 |
+
+硬件规格随产品变化。基础架构中，Scalar访问数据段时可通过DCache缓存，DCache以64B Cache Line为单位加载；L2 Cache以Cache Line为单位缓存访问GM的数据，Cache Line大小随硬件规格可能为128B、256B或512B。相关硬件描述见[基本架构](../../../编程指南/高级编程/硬件实现/基本架构.md)和[系统缓存概述](../../../../api/SIMD-API/基础API/缓存控制/系统缓存概述.md)。
+
+## 3. 数据流向
+
+### 3.1 Vector数据流
+
+Vector计算的典型数据流为：
+
+```text
+GM -> L2 Cache -> UB -> Vector -> UB -> L2 Cache -> GM
+```
+
+其中，GM到UB通常由MTE2执行，UB到GM通常由MTE3执行。Vector本身不直接从GM取操作数，源数据和目标数据通常位于UB。该路径的正确性重点是流水顺序：MTE2搬入完成后Vector才能读取UB，Vector写UB完成后MTE3才能搬出结果。
+
+### 3.2 Cube数据流
+
+Cube计算的典型数据流为：
+
+```text
+GM -> L2 Cache -> L1 -> L0A/L0B -> Cube -> L0C -> FixPipe -> GM
+```
+
+也可能存在：
+
+```text
+L0C -> FixPipe -> L1
+```
+
+Cube路径通常涉及分形格式、L1/L0容量和FixPipe随路转换。该路径的正确性重点是MTE、Cube、FixPipe之间的流水同步，以及AIC/AIV协同时的核间同步。
+
+### 3.3 Scalar数据流
+
+Scalar访问GM数据的典型读路径为：
+
+```text
+GM -> L2 Cache -> DCache -> Scalar
+```
+
+如果DCache命中，Scalar可以直接从DCache读取，而不访问GM。Scalar写GM时，写入可能先更新本核DCache中的Cache Line，并将其标记为Dirty。Dirty数据何时写回GM取决于缓存策略、Cache Line替换或软件显式Clean操作。
+
+因此，Scalar路径与MTE路径的语义不同：MTE搬运GM和Local Memory之间的数据，不经过Scalar DCache；Scalar读写GM则可能被本核DCache影响。
+
+### 3.4 SIMT数据流
+
+SIMT模式下，线程读取Global Memory时，数据可经由Data Cache中转到寄存器。SIMT访存函数可以指定不同缓存策略，例如：
+
+- `asc_ldca`：优先从Data Cache加载，缺失时尝试L2 Cache，再从GM加载。
+- `asc_ldcg`：从L2 Cache或GM加载，减少对Data Cache的占用。
+- `asc_stcg`：写入GM并缓存到L2 Cache，不缓存至Data Cache。
+- `asc_stwt`：写入GM并缓存至Data Cache和L2 Cache。
+
+SIMT的完整线程级模型不在本文展开，接口含义可参考[SIMT访存函数](../../../../api/SIMT-API/访存函数/访存函数.md)。
+
+## 4. 带宽与访问粒度
+
+内存模型中的带宽不是正确性语义，但它决定了应该如何组织数据流。通常可以按以下层次理解：
+
+```text
+Register / L0 / UB  >  L1 / L2 Cache  >  GM/HBM
+```
+
+更靠近计算单元的存储延迟更低、带宽更高，但容量更小、可见范围更窄；GM容量最大、全局可见，但访问代价最高。
+
+可参考的带宽量级如下：
+
+| 产品或场景 | L2 Cache带宽量级 | HBM/GM带宽量级 | 说明 |
+| --- | --- | --- | --- |
+| Atlas A2训练系列样例 | 约5TB/s | 约1.8TB/s | 矩阵计算MTE2带宽分析中的理论估算。 |
+| Ascend 950PR样例 | 约5TB/s | 约1.6TB/s | 同一矩阵计算样例中的理论估算。 |
+
+这些数值来自样例中的理论分析，不是所有场景的保证值。实际带宽会受到数据布局、Cache命中率、搬运粒度、ND2NZ格式转换、流水阻塞、同地址访问、核数和调度方式影响。相关样例见[Matmul基础API高性能样例](../../../../../examples/01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_basic_api_high_performance/README.md)。
+
+访问粒度会影响带宽利用率和一致性：
+
+- Scalar DCache以64B Cache Line为单位加载和写回。
+- L2 Cache以Cache Line为单位缓存GM数据，具体大小随硬件规格可能为128B、256B或512B。
+- MTE2从GM搬运到UB时，按Cache Line大小搬运通常性能更优。
+- 多核同时访问连续512B范围内的GM地址，可能因一致性要求被串行处理，见[避免同地址访问](避免同地址访问.md)。
+
+## 5. 内存操作
+
+本文将Device侧内存操作分为以下几类。
+
+### 5.1 搬运操作
+
+搬运操作由MTE或FixPipe执行，典型接口包括`DataCopy`、`DataCopyPad`以及高阶API内部的数据搬运。
+
+典型方向包括：
+
+```text
+MTE2: GM -> UB
+MTE2: GM -> L1 / L0A / L0B
+MTE1: L1 -> L0A / L0B
+MTE3: UB -> GM
+FixPipe: L0C -> GM / L1
+```
+
+搬运操作的顺序由其所属流水和同步事件决定。程序文本中先写的`DataCopy`不意味着其他流水已经能读取结果；只有当对应流水的读写完成，并通过同步建立依赖后，后续流水才能安全消费数据。
+
+### 5.2 计算单元读写操作
+
+Vector和Cube计算通常只读写片上Local Memory：
+
+- Vector读写UB。
+- Cube读L0A/L0B，读写L0C。
+- Reg矢量计算读写Register，必要时再与UB交互。
+
+这些操作不直接建立GM可见性。计算结果需要通过MTE3或FixPipe搬出到GM后，其他核或后续算子才可能从GM读取到结果。
+
+### 5.3 Scalar经过DCache的GM操作
+
+`GlobalTensor::GetValue`和`GlobalTensor::SetValue`属于Scalar访问GM的典型形式。
+
+- `GetValue`可能从本核DCache读取旧Cache Line。
+- `SetValue`可能只修改本核DCache，不立刻写回GM。
+- 写回粒度为Cache Line；多个核写同一Cache Line内不同元素仍可能发生覆盖。
+
+相关机制见[Scalar读写数据](../../../技术附录/概念原理和术语/内存访问原理/Scalar读写数据.md)、[GlobalTensor::GetValue](../../../../api/SIMD-API/基础数据结构/GlobalTensor/GetValue-1.md)和[GlobalTensor::SetValue](../../../../api/SIMD-API/基础数据结构/GlobalTensor/SetValue-3.md)。
+
+### 5.4 绕过DCache的Scalar GM操作
+
+`ReadGmByPassDCache`和`WriteGmByPassDCache`不经过DCache直接访问GM。
+
+该类操作适合控制数据和信号量，例如核间状态位、轮询标志、少量标量结果。它可以避免DCache旧值和Cache Line写回覆盖问题，但不能替代顺序同步。如果先写数据再写标志位，仍需要`DataSyncBarrier<MemDsbT::DDR>()`保证前序GM写完成。
+
+### 5.5 缓存控制操作
+
+缓存控制操作改变Cache Line状态，不等价于普通读写。
+
+| 操作 | 语义 |
+| --- | --- |
+| Preload | 软件显式将指定GM地址所在数据预加载到DCache。 |
+| Clean | 将Dirty Cache Line写回GM。 |
+| Invalid | 将Cache Line标记为无效；若存在Dirty数据且未Clean，数据可能被丢弃。 |
+| CleanAndInvalid（DCCI） | 先Clean再Invalid，用于保证DCache与GM一致，并使后续访问重新从GM加载。 |
+
+`DataCacheCleanAndInvalid`就是DCCI语义的主要接口。其Clean阶段把DCache中的Dirty Data写回GM，Invalid阶段使对应Cache Line失效。接口详情见[DataCacheCleanAndInvalid](../../../../api/SIMD-API/基础API/缓存控制/DataCacheCleanAndInvalid.md)。
+
+### 5.6 同步操作
+
+同步操作本身不搬运业务数据，但建立执行顺序或等待关系：
+
+- `SetFlag/WaitFlag`：建立核内不同流水之间的依赖。
+- `PipeBarrier`：约束同一序列中的前后指令完成关系。
+- `DataSyncBarrier`：等待指定内存位置的前序访问完成。
+- `SyncAll`：多个核之间的同步点。
+- `CrossCoreSetFlag/CrossCoreWaitFlag`：更细粒度的核间同步。
+
+同步只解决“什么时候继续执行”的问题，不自动解决DCache与GM的数据一致性问题。
+
+## 6. 顺序模型
+
+### 6.1 程序顺序与流水顺序
+
+AI Core中的指令会由Scalar调度到不同序列，例如Vector序列、Cube序列、MTE序列等。同一序列内指令按进入序列的顺序执行；不同序列可以并行执行。
+
+因此，以下写法只表示指令被发射的文本顺序：
+
+```cpp
+AscendC::DataCopy(local, global, len);
+AscendC::Add(dstLocal, src0Local, src1Local, len);
+```
+
+它不自动保证`Add`执行时`DataCopy`已经把数据写入UB。正确模型是通过事件建立顺序：
+
+```cpp
+AscendC::DataCopy(local, global, len);
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventId);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventId);
+AscendC::Add(dstLocal, src0Local, src1Local, len);
+```
+
+### 6.2 数据依赖顺序
+
+如果操作B读取操作A写入的数据，必须满足：
+
+1. A所属流水已完成写入。
+2. A写入的位置对B可见。
+3. B所属流水在同步后再发起读取。
+
+例如，MTE2写UB后Vector读UB，需要MTE2到Vector的同步；Vector写UB后MTE3读UB，需要Vector到MTE3的同步；Scalar写GM后其他核读GM，需要Scalar写完成、必要的DCache写回和核间通知。
+
+### 6.3 Scalar GM顺序
+
+`DataSyncBarrier<MemDsbT::DDR>()`用于等待前序GM访问完成。典型消息传递顺序为：
+
+```cpp
+AscendC::WriteGmByPassDCache<T>(dataAddr, value);
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
+AscendC::WriteGmByPassDCache<T>(flagAddr, 1);
+```
+
+这个顺序表示：读取方观察到`flagAddr == 1`后，可以认为flag写入之前的GM写已经完成。完整样例见[DataSyncBarrier样例](../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。
+
+## 7. 数据一致性模型
+
+### 7.1 一致性对象
+
+本文主要讨论以下一致性对象：
+
+- GM中的同一地址或同一地址范围。
+- 同一条DCache Cache Line。
+- 通过MTE或Scalar访问同一GM数据时形成的跨路径一致性。
+- 多个核通过GM通信时形成的跨核一致性。
+
+### 7.2 L2 Cache一致性
+
+L2 Cache是多核共享缓存。对于MTE访问GM的路径，L2 Cache主要是性能层面的缓存：命中L2可减少GM访问；未命中时再访问GM并更新L2。因为L2是共享缓存，通常不需要像每核DCache一样处理多核副本不一致问题。
+
+注意：L2 Cache是否命中不应作为程序正确性的前提。程序不能依赖“某数据一定在L2”来建立可见性。
+
+### 7.3 DCache一致性
+
+DCache是每核私有缓存，是NPU内存一致性中最容易出错的部分。
+
+在延迟写回策略下，Scalar写GM可能只更新本核DCache，并将Cache Line标记为Dirty。其他核读取GM时，可能看不到该写入；本核后续读同一地址时，也可能从DCache命中旧值或本地值。
+
+因此，以下规则成立：
+
+- 如果Scalar写GM后需要其他核或后续搬运路径看到该数据，必须在合适位置执行DCCI，或直接使用`WriteGmByPassDCache`。
+- 如果Scalar读GM地址，而该地址可能被其他核或外部路径修改，必须先刷新对应DCache状态，或使用`ReadGmByPassDCache`。
+- 多核写同一Cache Line内不同元素不是安全的独立写入；DCache写回以Cache Line为粒度，后写回的Cache Line可能覆盖先前写回结果。
+
+### 7.4 DCCI、DCI和DCache回写
+
+`DataCacheCleanAndInvalid`的语义是：
+
+```text
+DCCI = Clean + Invalid
+```
+
+其中：
+
+- Clean：把Dirty数据写回GM。
+- Invalid：使Cache Line失效，后续访问重新从GM加载。
+
+`DCI`只做Invalid，不做Clean。如果Cache Line中存在Dirty数据，直接Invalid可能导致这些数据丢失。因此，使用`--cce-no-dcache-flush`把算子尾部默认DCCI替换为DCI时，必须确认程序不依赖尾部DCCI写回脏数据，或者已经手动调用`DataCacheCleanAndInvalid`完成写回。相关说明见[设置DCI编译选项来减少算子尾开销](../头尾开销优化/设置DCI编译选项来减少算子尾开销.md)。
+
+### 7.5 Cache Line粒度
+
+DCache的关键粒度是64B Cache Line。`DataCacheCleanAndInvalid<CacheLine::SINGLE_CACHE_LINE>`只操作传入地址所在的Cache Line；如果地址非64B对齐，可能需要多次调用才能覆盖完整数据范围。
+
+多核写入GM时，应尽量让不同核写入的地址至少按Cache Line隔离。对于小粒度信号量，建议优先使用Bypass DCache接口，而不是通过`SetValue`写入同一Cache Line中的不同元素。
+
+## 8. 同步模型
+
+### 8.1 核内同步
+
+核内同步用于协调同一AI Core内不同流水：
+
+| 同步方式 | 作用 |
+| --- | --- |
+| `SetFlag/WaitFlag` | 在两个流水之间建立生产者-消费者关系。 |
+| `PipeBarrier` | 等待同一序列前序指令读写完成后再执行后序指令。 |
+| `TQue`/队列同步 | 在TPipe编程范式中封装流水间依赖。 |
+| `DataSyncBarrier` | 等待指定内存位置的前序访问完成。 |
+
+核内同步解决本核内操作的先后关系，不自动把DCache中的Dirty数据写回GM。
+
+### 8.2 核间同步
+
+核间同步用于让多个核在某个逻辑点对齐：
+
+- `SyncAll`用于全核或指定核数同步。
+- `CrossCoreSetFlag/CrossCoreWaitFlag`用于更细粒度同步。
+- GM信号量可用于软件同步，但需要保证数据写入、数据可见和标志位写入的顺序。
+
+核间同步不是缓存一致性协议。若同步前某核通过Scalar DCache写GM，其他核在同步后仍可能看不到该写入，除非写入方先执行DCCI或使用Bypass DCache写GM。
+
+### 8.3 同步与一致性的组合
+
+正确的跨核发布数据通常需要同时满足“写回”和“排序”：
+
+```cpp
+// 写业务数据：可能经过DCache
+global.SetValue(0, value);
+
+// 写回DCache，保证业务数据到达GM
+AscendC::DataCacheCleanAndInvalid<
+    uint64_t,
+    AscendC::CacheLine::SINGLE_CACHE_LINE,
+    AscendC::DcciDst::CACHELINE_OUT>(global);
+
+// 等待前序GM访问完成，再发布标志位
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
+AscendC::WriteGmByPassDCache<uint64_t>(flagAddr, 1);
+```
+
+如果业务数据本身也使用Bypass DCache写入，则可以省去DCCI，但仍需要`DataSyncBarrier`保证数据写先于标志位写：
+
+```cpp
+AscendC::WriteGmByPassDCache<uint64_t>(dataAddr, value);
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
+AscendC::WriteGmByPassDCache<uint64_t>(flagAddr, 1);
+```
+
+## 9. 典型执行模式
+
+### 9.1 大块张量计算
+
+```text
+GM -> UB -> Vector -> UB -> GM
+```
+
+推荐使用MTE搬运和Vector计算，并通过流水同步控制顺序。该模式的主要问题是带宽利用率、对齐、搬运粒度和流水重叠，不是DCache一致性。
+
+### 9.2 多核通过GM交换控制信息
+
+```text
+Writer Core: 写数据 -> 写回/等待 -> 写flag
+Reader Core: 轮询flag -> 读数据
+```
+
+控制信息建议使用Bypass DCache接口。若使用`SetValue`，必须显式DCCI。
+
+### 9.3 AIC/AIV协同
+
+Cube路径和Vector路径之间常通过GM、L1或同步事件协作。若AIC完成L0C到GM搬出后，AIV再从GM搬入UB，需要使用合适的CrossCore同步或全核同步，确保搬出完成后再搬入。
+
+### 9.4 SIMD与SIMT混合访问
+
+SIMD和SIMT混合编程时，UB可能被SIMD VF、SIMT VF和MainScalar共同使用。UB本身是核内共享资源，但不同流水或执行空间之间存在并发访问，需要同步。访问GM时，SIMT VF和MainScalar可能经过各自Data Cache，因此要额外关注读取旧值和写回时机。相关说明见[SIMD与SIMT混合编程内存层级](../../../编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程/内存层级.md)。
+
+## 10. 反例
+
+### 10.1 只同步，不写回DCache
+
+```cpp
+global.SetValue(0, value);
+AscendC::SyncAll();
+```
+
+`SyncAll`只建立核间同步点，不保证`SetValue`写入的Dirty Cache Line已经回到GM。其他核同步后读取GM仍可能读到旧值。
+
+### 10.2 轮询GetValue
+
+```cpp
+while (global.GetValue(0) != 1) {
+}
+```
+
+如果`global[0]`所在Cache Line已经进入本核DCache，循环可能反复读取旧值。轮询GM信号量应使用`ReadGmByPassDCache`，并按需要插入`Nop`释放Bus。
+
+### 10.3 多核写同一Cache Line
+
+```cpp
+global.SetValue(AscendC::GetBlockIdx(), value);
+AscendC::DataCacheCleanAndInvalid<
+    uint64_t,
+    AscendC::CacheLine::SINGLE_CACHE_LINE,
+    AscendC::DcciDst::CACHELINE_OUT>(global);
+```
+
+不同核写不同元素，但这些元素可能位于同一条64B Cache Line。DCCI写回时以后执行核的Cache Line为准，可能覆盖其他核写入。
+
+### 10.4 用DCI替代DCCI但未手动写回
+
+如果算子通过`* __gm__`或`GlobalTensor::SetValue`修改GM，却开启选项使算子尾部只做DCI，DCache中的Dirty数据可能未回写GM，后续算子可能读到旧数据。
+
+## 11. 设计规则
+
+1. 大块张量数据优先走MTE和Local Memory，不要用Scalar逐元素访问GM。
+2. 把“同步”和“缓存一致性”分开考虑：同步控制执行顺序，DCCI/Bypass控制数据是否到达GM。
+3. Scalar写GM后如果需要其他核可见，使用`DataCacheCleanAndInvalid`或`WriteGmByPassDCache`。
+4. Scalar读可能被其他核修改的GM，使用`DataCacheCleanAndInvalid`后读，或直接使用`ReadGmByPassDCache`。
+5. 跨核发布数据时，先保证数据写回GM，再用`DataSyncBarrier`保证写顺序，最后写标志位。
+6. 多核写GM时避免共享同一条64B DCache Line。
+7. L2 Cache用于提升性能，不作为程序正确性的同步机制。
+
+## 12. 推荐阅读
+
+- [基本架构](../../../编程指南/高级编程/硬件实现/基本架构.md)：硬件执行单元、存储单元、MTE数据流和指令流。
+- [系统缓存概述](../../../../api/SIMD-API/基础API/缓存控制/系统缓存概述.md)：Cache类型、Clean/Invalid、Write-Back/Write-Through。
+- [Scalar读写数据](../../../技术附录/概念原理和术语/内存访问原理/Scalar读写数据.md)：`GetValue`/`SetValue`与DCache一致性。
+- [DataCacheCleanAndInvalid](../../../../api/SIMD-API/基础API/缓存控制/DataCacheCleanAndInvalid.md)：DCCI接口语义和Cache Line粒度。
+- [DataSyncBarrier](../../../../api/SIMD-API/基础API/同步控制/核内同步/DataSyncBarrier(ISASI).md)：Scalar GM访问顺序。
+- [SyncAll](../../../../api/SIMD-API/基础API/同步控制/核间同步/SyncAll.md)、[CrossCoreSetFlag](../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreSetFlag(ISASI).md)、[CrossCoreWaitFlag](../../../../api/SIMD-API/基础API/同步控制/核间同步/CrossCoreWaitFlag(ISASI).md)：核间同步。
