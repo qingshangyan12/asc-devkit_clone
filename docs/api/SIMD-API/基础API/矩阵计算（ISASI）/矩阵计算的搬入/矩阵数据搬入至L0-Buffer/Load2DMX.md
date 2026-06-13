@@ -16,9 +16,22 @@
 
 ## 功能说明<a id="section618mcpsimp"></a>
 
-Load2DMX接口支持如下数据通路的搬运：
+头文件路径为：basic_api/kernel_operator_mm_intf.h。
 
-L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
+负责完成矩阵计算所需的左右矩阵数据和对应的左右量化系数矩阵数据的搬运。其中左右矩阵数据以大小为512字节的数据分形为单位进行搬运，左右量化系数矩阵以32字节的数据分形为单位进行搬运。支持的数据通路如下：
+
+- 左右矩阵：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
+- 量化系数矩阵：L1 Buffer->L0A_MX Buffer、L1 Buffer->L0B_MX Buffer。
+
+其中，L0A_MX/L0B_MX Buffer的大小为4KB，和L0A/L0B地址的映射关系如下：
+
+$$L0A\_MX\ Buffer\ Address = L0A\ Address / 16$$
+
+$$L0B\_MX\ Buffer\ Address = L0B\ Address / 16$$
+
+- 对于b4数据类型，左右矩阵数据分形在L0A Buffer中为一个16×64的矩阵，在L0B Buffer中为一个64×16的矩阵。
+- 对于b8数据类型，左右矩阵数据分形在L0A Buffer中为一个16×32的矩阵，在L0B Buffer中为一个32×16的矩阵。
+- 量化系数矩阵分形是一个固定数据类型为fp8_e8m0_t、分形大小为16×2的矩阵。
 
 ## 函数原型<a id="section620mcpsimp"></a>
 
@@ -43,7 +56,7 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 | 参数名称 | 含义 |
 | ---------- | ---------- |
 | T | 源操作数和目的操作数的数据类型。 |
-| U | 针对Load2DMX接口，U用来表示dst的数据类型，当src为fp8_e5m2_t、fp8_e4m3fn_t时，U需为T对应的MX数据类型，即AscendC::mx_fp8_e5m2_t和AscendC::mx_fp8_e4m3_t，否则编译失败。除此之外的数据类型要求T和U一致。 |
+| U | 针对Load2DMX接口，U用来表示dst的数据类型，要求T和U一致。 |
 
 **表 2** 通用参数说明<a name="table18368155193919"></a>
 
@@ -74,7 +87,9 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 
 下图为ScaleA从L1 Buffer搬运至L0A Buffer过程中的配置参数示意。每一行为32字节，对应着[图1](#fig138710913432)中的一个分形。xStep为M维度分形的个数，如图中的xStep = M / 16 = 3，yStep为K维度32字节的个数，如图中的yStep = K / 32 / 2 = 21，srcStride和dstStride同理，表示在K维度上32字节的个数。
 
-![](../../../../../figures/Nd2Nz转换示意图.png)
+**图 2**  ScaleA从L1 Buffer搬运至L0A Buffer的配置参数示意
+
+![](../../../../../figures/Nd2Nz转换示意图.png "ScaleA从L1 Buffer搬运至L0A Buffer的配置参数示意")
 
 ## 数据类型
 
@@ -87,6 +102,20 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 ## 约束说明<a id="section633mcpsimp"></a>
 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../../通用说明和约束.md#section796754519912)。
+
+## 关键特性说明
+
+左右矩阵搬运的相关关键特性与Load2DV2一致，可参考[Load2DV2的关键特性说明](Load2DV2.md)。
+
+量化系数矩阵的搬运特性说明如下，起始地址计算公式为：
+
+$$startAddr = srcAddr + (xStartPosition \times \lvert srcStride \rvert + yStartPosition) \times 32B$$
+
+量化系数矩阵分形是一个固定数据类型为fp8_e8m0_t、分形大小为16×2的矩阵，搬运示意图如下：
+
+**图3** 量化系数矩阵搬运示意图
+
+![](../../../../../figures/load2dmx_scale_transfer_demo.png "量化系数矩阵搬运示意图")
 
 ## 调用示例
 
