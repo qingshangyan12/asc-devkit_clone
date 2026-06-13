@@ -106,10 +106,18 @@ if __name__ == '__main__':
 
     print("[LOG]:  ", sys.argv[1], sys.argv[2])
     file_list = []
-    for root, dirs, files in os.walk(sys.argv[1]):
-        for file in files:
-            if file.endswith("tilingdata.h"):
-                file_list.append(os.path.join(root, file))
+    # argv[1] 为主扫描目录(include/adv_api)；argv[3:] 为额外扫描目录(如 asc-comm 迁出后
+    # hccl tilingdata 所在目录)，用于保证生成的 kernel_tiling.h 仍包含 Mc2 等结构体定义。
+    scan_dirs = [sys.argv[1]] + sys.argv[3:]
+    seen_names = set()
+    for scan_dir in scan_dirs:
+        if not scan_dir or not os.path.isdir(scan_dir):
+            continue
+        for root, dirs, files in os.walk(scan_dir):
+            for file in files:
+                if file.endswith("tilingdata.h") and file not in seen_names:
+                    seen_names.add(file)
+                    file_list.append(os.path.join(root, file))
     file_list.sort()
     
     tiling_source = ""

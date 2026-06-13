@@ -18,6 +18,13 @@ set(TILING_DATA_DEF_DIR ${ASCENDC_INCLUDE_DIR}/adv_api)
 set(KERNEL_TILING_DIR ${PROJECT_BINARY_DIR})
 set(KERNEL_TILING_HEAD ${KERNEL_TILING_DIR}/kernel_tiling/kernel_tiling.h)
 
+# asc-comm 迁出后，hccl 的 *tilingdata.h 不再位于 include/adv_api 下，但生成的 kernel_tiling.h
+# 仍需包含其中的 Mc2InitTiling/Mc2CcTiling 等结构体(对外伞头 tiling_api.h -> hccl_tiling.h 依赖
+# 这些全局类型)。asc-comm 的头由 cmake/third_party/asc-comm.cmake 通过软链暴露在
+# ${CMAKE_BINARY_DIR}/asc_comm_headers/hccl，这里把该目录作为额外扫描源传给生成脚本。
+# 软链在 configure 阶段(asc-comm.cmake)建立，早于本生成命令的 build 阶段执行。
+set(ASC_COMM_TILING_SCAN_DIR ${CMAKE_BINARY_DIR}/asc_comm_headers/hccl)
+
 if(NOT BUILD_OPEN_PROJECT)
     add_custom_command(
         OUTPUT ${KERNEL_TILING_HEAD}
@@ -29,7 +36,7 @@ if(NOT BUILD_OPEN_PROJECT)
 else()
     add_custom_command(
         OUTPUT ${KERNEL_TILING_HEAD}
-        COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR} ${KERNEL_TILING_HEAD}
+        COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR} ${KERNEL_TILING_HEAD} ${ASC_COMM_TILING_SCAN_DIR}
         DEPENDS ${GEN_KERNEL_TILING_DATA_SCRIPT}
     )
 endif()
@@ -64,5 +71,4 @@ add_library(asc_host_headers INTERFACE)
 target_include_directories(
   asc_host_headers
   INTERFACE $<BUILD_INTERFACE:${ASCENDC_DIR}/include/utils>
-            $<BUILD_INTERFACE:${ASCENDC_DIR}/include/adv_api/hccl/internal>
 )
