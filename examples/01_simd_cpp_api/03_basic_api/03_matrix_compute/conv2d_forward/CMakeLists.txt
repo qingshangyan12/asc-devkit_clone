@@ -10,15 +10,15 @@
 
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510")
+set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, sim")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "conv2d_forward currently supports dav-3510 only, but got ${CMAKE_ASC_ARCHITECTURES}")
+if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510" AND NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-2201")
+    message(FATAL_ERROR "conv2d_forward supports dav-3510 and dav-2201, but got ${CMAKE_ASC_ARCHITECTURES}")
 endif()
 
 add_executable(demo
