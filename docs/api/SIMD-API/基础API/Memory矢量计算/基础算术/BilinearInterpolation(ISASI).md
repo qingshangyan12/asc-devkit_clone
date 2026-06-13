@@ -14,9 +14,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/kernel_operator_vec_bilinearinterpolation_intf"`
+头文件路径为：`"basic_api/kernel_operator_vec_bilinearinterpolation_intf.h"`。
 
-BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代 + 垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问 + 权重乘加的向量运算场景（数据Gather + Multiply + Reduce）。
+BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭代+垂直迭代的双层循环完成乘累加运算，适用于非规则数据访问+权重乘加的向量运算场景（数据Gather+Multiply+Reduce）。
 
 注：该接口是为了兼容旧款产品接口而添加的软仿接口。
 
@@ -35,18 +35,18 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 -   src0 = \[1, 2, 3, ..., 512\]，共计512个half数据；
 -   src0Offset = \[0, 32, 64, ..., 992\]，共计32个uint32数据；
 -   src1 = \[2, 3, 4, ..., 33\]，共计32个half数据；
--   hRepeat=2；vRepeat=2；mask = 128；vROffset = 128。
+-   hRepeat=2；vRepeat=2；mask=128；vROffset=128。
 
-1.  按datablock粒度，收集输入src0张量到临时Buffer。
+1.  按DataBlock粒度，收集输入src0张量到临时Buffer。
 
-    总共hRepeat \* vRepeat次迭代，每个迭代从输入的src0Offset读取8个偏移值，每个偏移值指向src0的一个datablock起始地址。
+    总共hRepeat \* vRepeat次迭代，每个迭代从输入的src0Offset读取8个偏移值，每个偏移值指向src0的一个DataBlock起始地址。
 
-    调用[Gatherb](Gatherb.md#ZH-CN_TOPIC_0000002574024777)接口，Gatherb接口接受输入张量（src0）、datablock偏移张量（src0offset），根据索引位置将输入张量按dataBlock（32Bytes）收集到临时张量（sharedTmpBuffer）中。
+    调用[Gatherb](../离散与聚合/Gatherb(ISASI).md)接口，Gatherb接口接受输入张量（src0）、DataBlock偏移张量（src0Offset），根据索引位置将输入张量按DataBlock（32Bytes）收集到临时张量（sharedTmpBuffer）中。
 
     该步骤计算过程如下：
 
-    -   总迭代次数： hRepeat \* vRepeat = 2 \* 2 = 4；
-    -   每次迭代处理的元素个数：8 \* 32 / sizeof\(half\) = 128；\(8个datablock，每个datablock的大小为32B）
+    -   总迭代次数：hRepeat \* vRepeat = 2 \* 2 = 4；
+    -   每次迭代处理的元素个数：8 \* 32 / sizeof\(half\) = 128；\(8个DataBlock，每个DataBlock的大小为32B）
     -   每次迭代收集结果
         -   迭代0：sharedTmpBuffer\[0:127\] = \[1, 2, ..., 128\]；
         -   迭代1：sharedTmpBuffer\[128:255\] = \[129, 130, ..., 256\]；
@@ -55,17 +55,17 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 2.  将输入的张量src1进行广播填充。
 
-    调用[Brcb](Brcb.md#ZH-CN_TOPIC_0000002543424524)接口，每次迭代从输入张量src1中取8个数，填充到结果张量sharedTmpBuffer的8个datablock中（每个dataBlock是32Bytes）。
+    调用[Brcb](../数据填充/Brcb.md)接口，每次迭代从输入张量src1中取8个数，填充到结果张量sharedTmpBuffer的8个DataBlock中（每个DataBlock是32Bytes）。
 
     该步骤计算过程如下：
 
     -   步骤1收集的src0张量占用的空间大小 = 总迭代次数 \* 每次迭代处理的元素个数 = 4 \* 128 = 512；所以广播src1的元素从sharedTmpBuffer\[512\]开始存放。
     -   Brcb指令迭代次数repeatTime = src1的数据长度 / 8 = 16 / 8 = 2次。（Brcb指令每次迭代取8个数）
-    -   将输入src1张量中的8个数据，填充到sharedTmpBuffer\[512\]位置起的8个datablock中去。输入是half数据类型，故每个元素复制32 / sizeof\(half\) = 16次。
+    -   将输入src1张量中的8个数据，填充到sharedTmpBuffer\[512\]位置起的8个DataBlock中去。输入是half数据类型，故每个元素复制32 / sizeof\(half\) = 16次。
 
         结果：sharedTmpBuffer\[512:1024\] = \[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, ..., 33, 33\]。
 
-3.  收集的src0张量与广播后的src1张量，调用[Mul](Mul.md#ZH-CN_TOPIC_0000002543264788)执行逐元素乘法，结果覆盖sharedTmpBuffer。
+3.  收集的src0张量与广播后的src1张量，调用[Mul](Mul.md)执行逐元素乘法，结果覆盖sharedTmpBuffer。
 
     迭代计算次数：hRepeat \* vRepeat = 2 \* 2 = 4。
 
@@ -73,58 +73,58 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
     -   repeatMode=false
 
-        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个datablock，每个datablock的每个值均与src1（数据存放位置为sharedTmpBuffer\[512:1024\]）的单个数值相乘。
+        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock的每个值均与src1（数据存放位置为sharedTmpBuffer\[512:1024\]）的单个数值相乘。
 
         -   整个计算过程如下：
-            -   迭代0计算过程：第1个datablock（sharedTmpBuffer\[0:15\]）到第8个datablock（sharedTmpBuffer\[112:127\]），均与src1的2相乘。
+            -   迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）到第8个DataBlock（sharedTmpBuffer\[112:127\]），均与src1的2相乘。
 
                 即sharedTmpBuffer\[0:127\] = \[1 \* 2, ..., 128 \* 2\]；
 
-            -   迭代1计算过程：第1个datablock（sharedTmpBuffer\[128:143\]）到第8个datablock（sharedTmpBuffer\[240:255\]），均与src1的3相乘。
+            -   迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）到第8个DataBlock（sharedTmpBuffer\[240:255\]），均与src1的3相乘。
 
                 即sharedTmpBuffer\[128:255\] = \[129 \* 3, ..., 256 \* 3\]；
 
-            -   迭代2计算过程：第1个datablock（sharedTmpBuffer\[256:271\]）到第8个datablock（sharedTmpBuffer\[368:383\]），均与src1的4相乘。
+            -   迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）到第8个DataBlock（sharedTmpBuffer\[368:383\]），均与src1的4相乘。
 
                 即sharedTmpBuffer\[256:383\] = \[257 \* 4, ..., 384 \* 4\]；
 
-            -   迭代3计算过程：第1个datablock（sharedTmpBuffer\[384:399\]）到第8个datablock（sharedTmpBuffer\[496:511\]），均与src1的5相乘。
+            -   迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）到第8个DataBlock（sharedTmpBuffer\[496:511\]），均与src1的5相乘。
 
                 即sharedTmpBuffer\[384:511\] = \[385 \* 5, ..., 512 \* 5\]；
 
     -   repeatMode=true
 
-        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个datablock，每个datablock分别与src1（存放位置为sharedTmpBuffer\[512:1024\]）的1个数值相乘，即src0的8个datablock分别对应src1的8个数值。
+        每次迭代，src0（数据存放位置为sharedTmpBuffer\[0:511\]）读取8个DataBlock，每个DataBlock分别与src1（存放位置为sharedTmpBuffer\[512:1024\]）的1个数值相乘，即src0的8个DataBlock分别对应src1的8个数值。
 
         -   整个计算过程如下：
-            -   迭代0计算过程：第1个datablock（sharedTmpBuffer\[0:15\]）与src1的2相乘，第2个datablock（sharedTmpBuffer\[16:31\]）与src1的3相乘；...依次类推，第8个datablock（sharedTmpBuffer\[112:127\]）与src1的9相乘。
+            -   迭代0计算过程：第1个DataBlock（sharedTmpBuffer\[0:15\]）与src1的2相乘，第2个DataBlock（sharedTmpBuffer\[16:31\]）与src1的3相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[112:127\]）与src1的9相乘。
 
                 即sharedTmpBuffer\[0:127\] = \[1 \* 2, ..., 16 \* 2, 17 \* 3, ..., 128 \* 9\]；
 
-            -   迭代1计算过程：第1个datablock（sharedTmpBuffer\[128:143\]）与src1的10相乘，第2个datablock（sharedTmpBuffer\[144:159\]）与src1的11相乘；...依次类推，第8个datablock（sharedTmpBuffer\[240:255\]）与src1的17相乘。
+            -   迭代1计算过程：第1个DataBlock（sharedTmpBuffer\[128:143\]）与src1的10相乘，第2个DataBlock（sharedTmpBuffer\[144:159\]）与src1的11相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[240:255\]）与src1的17相乘。
 
                 即sharedTmpBuffer\[128:255\] = \[129 \* 10, ..., 144 \* 10, 145 \* 11, ..., 256 \* 17\]；
 
-            -   迭代2计算过程：第1个datablock（sharedTmpBuffer\[256:271\]）与src1的18相乘，第2个datablock（sharedTmpBuffer\[272:287\]）与src1的19相乘；...依次类推，第8个datablock（sharedTmpBuffer\[368:383\]）与src1的25相乘。
+            -   迭代2计算过程：第1个DataBlock（sharedTmpBuffer\[256:271\]）与src1的18相乘，第2个DataBlock（sharedTmpBuffer\[272:287\]）与src1的19相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[368:383\]）与src1的25相乘。
 
-                即sharedTmpBuffer\[256:383\] = \[257 \* 18, ..., 272 \* 18, 273 \* 19, ..., 384 \* 25\]  
+                即sharedTmpBuffer\[256:383\] = \[257 \* 18, ..., 272 \* 18, 273 \* 19, ..., 384 \* 25\]；
 
-            -   迭代3计算过程：第1个datablock（sharedTmpBuffer\[384:399\]）与src1的26相乘，第2个datablock（sharedTmpBuffer\[400:415\]）与src1的27相乘；...依次类推，第8个datablock（sharedTmpBuffer\[496:511\]）与src1的33相乘。
+            -   迭代3计算过程：第1个DataBlock（sharedTmpBuffer\[384:399\]）与src1的26相乘，第2个DataBlock（sharedTmpBuffer\[400:415\]）与src1的27相乘；...依次类推，第8个DataBlock（sharedTmpBuffer\[496:511\]）与src1的33相乘。
 
-                即sharedTmpBuffer\[384:511\] =  \[385 \* 26, ..., 390 \* 26, 391 \* 27, ..., 512 \* 33\]；
+                即sharedTmpBuffer\[384:511\] = \[385 \* 26, ..., 390 \* 26, 391 \* 27, ..., 512 \* 33\]；
 
 4.  水平迭代累加，输出到dst。
 
-    调用[Add](Add.md#ZH-CN_TOPIC_0000002574024685)接口完成以下处理：
+    调用[Add](Add.md)接口完成以下处理：
 
-    -   dst\[0:127\] = sharedTmpBuffer\[0:127\]  + sharedTmpBuffer\[128:255\]；
+    -   dst\[0:127\] = sharedTmpBuffer\[0:127\] + sharedTmpBuffer\[128:255\]；
     -   dst\[128:256\] = sharedTmpBuffer\[256:383\] + sharedTmpBuffer\[384:511\]；
 
 ## 函数原型<a name="zh-cn_topic_0000002560891889_section82039854412"></a>
 
 -   mask逐bit模式：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void BilinearInterpolation(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
         const LocalTensor<uint32_t> &src0Offset, const LocalTensor<T> &src1, uint64_t mask[], uint8_t hRepeat,
@@ -134,7 +134,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 -   mask连续模式：
 
-    ```
+    ```cpp
     template <typename T>
     __aicore__ inline void BilinearInterpolation(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
         const LocalTensor<uint32_t> &src0Offset, const LocalTensor<T> &src1, uint64_t mask, uint8_t hRepeat,
@@ -144,11 +144,13 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
+### 模板参数及接口参数说明
+
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
 |---|---|
-| T | 操作数数据类型。<br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，支持的数据类型为：half。</cann-filter><br><cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half。</cann-filter><br><cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half。</cann-filter><br><cann-filter npu-type="310p">Atlas 推理系列产品AI Core，支持的数据类型为：half。</cann-filter> |
+| T | 操作数数据类型。 |
 
 **表 2**  参数说明
 
@@ -159,11 +161,37 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 | src0Offset | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。<br>&bull; 逐bit模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。mask为数组形式，数组长度和数组元素的取值范围和操作数的数据类型有关。当操作数为16位时，数组长度为2，mask[0]、mask[1]∈[0, 2<sup>64</sup>-1]并且不同时为0；当操作数为32位时，数组长度为1，mask[0]∈(0, 2<sup>64</sup>-1)；当操作数为64位时，数组长度为1，mask[0]∈(0, 2<sup>32</sup>-1)。例如，mask=[8, 0]，8=0b1000，表示仅第4个元素参与计算。<br>&bull; 连续模式：表示前面连续的多少个元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，mask∈[1, 128]；当操作数为32位时，mask∈[1, 64]；当操作数为64位时，mask∈[1, 32]。 |
 | hRepeat | 输入 | 水平方向迭代次数，取值范围为[1, 255]。 |
-| repeatMode | 输入 | 迭代模式：<br>&bull; false：每次迭代src0读取的8个datablock中每个值均与src1的单个数值相乘。<br>&bull; true：每次迭代src0的每个datablock分别与src1的1个数值相乘，共消耗8个block和8个elements。 |
+| repeatMode | 输入 | 迭代模式：<br>&bull; false：每次迭代src0读取的8个DataBlock中每个值均与src1的单个数值相乘。<br>&bull; true：每次迭代src0的每个DataBlock分别与src1的1个数值相乘，共消耗8个DataBlock和8个element。 |
 | dstBlkStride | 输入 | 单次迭代内，目的操作数不同DataBlock间地址步长，以32B为单位。 |
 | vROffset | 输入 | 垂直迭代间，目的操作数地址偏移量，以元素为单位，取值范围为[128, 65535)，vROffset * sizeof(T)需要保证32字节对齐。 |
 | vRepeat | 输入 | 垂直方向迭代次数，取值范围为[1, 255]。 |
-| sharedTmpBuffer | 输入 | 临时空间。<br><cann-filter npu-type="950">Ascend 950PR/Ascend 950DT，不需要分配临时空间。</cann-filter><br><cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。</cann-filter><br><cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。</cann-filter><br><cann-filter npu-type="310p">Atlas 推理系列产品AI Core，需要保证至少分配了src0OffsetLocal.GetSize() * sizeof(uint32_t)字节的空间。</cann-filter> |
+| sharedTmpBuffer | 输入 | 临时空间。具体空间说明请参考下面的[sharedTmpBuffer空间说明](#sharedtmpbuffer空间说明)。 |
+
+### sharedTmpBuffer空间说明
+
+<cann-filter npu-type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，不需要分配临时空间。
+
+</cann-filter>
+
+<cann-filter npu-type="A3">
+
+- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。
+
+</cann-filter>
+
+<cann-filter npu-type="910b">
+
+- 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，需要保证至少分配了src0.GetSize() * 32 + src1.GetSize() * 32字节的空间。
+
+</cann-filter>
+
+<cann-filter npu-type="310p">
+
+- 针对Atlas 推理系列产品AI Core，需要保证至少分配了src0OffsetLocal.GetSize() * sizeof(uint32_t)字节的空间。
+
+</cann-filter>
 
 ## 数据类型
 
@@ -175,17 +203,15 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
--   操作数地址对齐要求请参见[Unified Buffer地址对齐约束](Unified-Buffer介绍.md#zh-cn_topic_0000002524627718_section796754519912)。
+-   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 -   src0、src1、src0Offset之间不允许地址重叠。
 -   两个垂直repeat的目的地址之间不允许地址重叠，vROffset的取值范围为\[128, 65535\)。
 -   水平方向迭代次数，取值范围为\[1, 255\]。
 -   垂直方向迭代次数，取值范围为\[1, 255\]。
 -   输入的临时空间sharedTmpBuffer，需要保证至少分配了src0.GetSize\(\) \* 32 + src1.GetSize\(\) \* 32字节的空间。
-
 -   支持数据类型为：half。
 -   src0Offset的取值要求如下：
     -   取值应保证src0元素类型位宽对齐。
-
     -   偏移地址后需要32字节对齐。
     -   偏移地址后不能超出UB大小数据的范围。
     -   地址偏移的取值范围：不能超出uint32\_t的范围。
@@ -194,7 +220,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 -   接口样例-mask连续模式
 
-    ```
+    ```cpp
     AscendC::LocalTensor<half> dstLocal, src0Local, src1Local;
     AscendC::LocalTensor<uint32_t> src0OffsetLocal;
     AscendC::LocalTensor<uint8_t> tmpLocal;
@@ -211,7 +237,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 -   接口样例-mask逐bit模式
 
-    ```
+    ```cpp
     AscendC::LocalTensor<half> dstLocal, src0Local, src1Local;
     AscendC::LocalTensor<uint32_t> src0OffsetLocal;
     AscendC::LocalTensor<uint8_t> tmpLocal;
@@ -228,7 +254,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 结果示例如下：
 
-```
+```text
 输入数据(src0Local,half): [1,2,3,...,512]
 输入数据(src1Local,half): [2,3,4,...,17]
 输入数据(src0OffsetLocal,uint32_t): [0,32,64,...,992]
