@@ -18,17 +18,30 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-add_executable(demo
-    reduce.asc
+# 定义所有需要编译的 .asc 文件及其对应的可执行目标名
+set(ASC_SOURCES
+    reduce_sum_2level.asc
+    reduce_sum_seq.asc
+    reduce_sum_binary.asc
+    reduce_max.asc
+    reduce_min.asc
 )
 
-target_link_libraries(demo PRIVATE
-    tiling_api
-    register
-    platform
-    m
-)
-
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
-)
+# 批量创建可执行目标
+foreach(source ${ASC_SOURCES})
+    get_filename_component(target_name ${source} NAME_WE)
+    set(target "demo_${target_name}")
+    
+    add_executable(${target} ${source})
+    
+    target_link_libraries(${target} PRIVATE
+        tiling_api
+        register
+        platform
+        m
+    )
+    
+    target_compile_options(${target} PRIVATE
+        $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+        )
+endforeach()
