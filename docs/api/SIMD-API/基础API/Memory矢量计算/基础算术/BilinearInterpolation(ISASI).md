@@ -24,7 +24,9 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 **图 1**  BilinearInterpolation计算流程示意图
 
-![](../../../../figures/图1-BlockReduceSum求和示意图.png)
+![](../../../../figures/bilinearInterpolation_1.png)
+
+![](../../../../figures/bilinearInterpolation_2.png)
 
 结合上面的计算流程示意图，下面以一个具体示例，来介绍BilinearInterpolation整个计算过程。
 
