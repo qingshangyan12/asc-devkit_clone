@@ -31,7 +31,9 @@ CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
 VERSION_INFO="8.5.0"
-CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
+# 默认留空，签名脚本随 asc-comm 源码发布，由 cmake/third_party/asc-comm.cmake 依据
+# 真实的 asc-comm 源码路径自动推导；如需自定义可通过 --sign-script 显式指定。
+CUSTOM_SIGN_SCRIPT=""
 
 dotted_line="----------------------------------------------------------------"
 
@@ -574,13 +576,8 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    if [ "${tag}" == "hccl_checker_ops_stest" ]; then
-      local hccl_st_dir="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm"
-      bash ${hccl_st_dir}/build.sh
-    else
-      TARGETS="${TARGETS} --target ${tag}"
-      TEST_MOD="${tag},${TEST_MOD}"
-    fi
+    TARGETS="${TARGETS} --target ${tag}"
+    TEST_MOD="${tag},${TEST_MOD}"
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
