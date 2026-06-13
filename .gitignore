@@ -23,3 +23,6 @@ build_device/
 .agent/skills/gitcode-issue
 .agent/skills/api-doc-generator
 .agent/skills/gitcode-pipeline
+.agent/*
+.claude/*
+.opencode/*

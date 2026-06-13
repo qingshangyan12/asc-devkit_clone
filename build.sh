@@ -31,7 +31,7 @@ CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
 VERSION_INFO="8.5.0"
-CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
+CUSTOM_SIGN_SCRIPT="${BUILD_DIR}/asc-comm/src/aicore/mc2/scripts/sign/community_sign_build.py"
 
 dotted_line="----------------------------------------------------------------"
 
@@ -574,13 +574,8 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    if [ "${tag}" == "hccl_checker_ops_stest" ]; then
-      local hccl_st_dir="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm"
-      bash ${hccl_st_dir}/build.sh
-    else
-      TARGETS="${TARGETS} --target ${tag}"
-      TEST_MOD="${tag},${TEST_MOD}"
-    fi
+    TARGETS="${TARGETS} --target ${tag}"
+    TEST_MOD="${tag},${TEST_MOD}"
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
