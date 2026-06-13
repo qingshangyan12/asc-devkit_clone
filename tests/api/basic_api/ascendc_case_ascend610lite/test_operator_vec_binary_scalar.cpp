@@ -433,3 +433,18 @@ SCALAR_BINARY_UNSPPORT_TYPE(Maxs, 2, uint32_t, uint16_t, uint8_t, int8_t);
 SCALAR_BINARY_UNSPPORT_TYPE(Mins, 3, uint32_t, uint16_t, uint8_t, int8_t);
 SCALAR_BINARY_UNSPPORT_TYPE(ShiftLeft, 4, float, half, uint8_t, int8_t);
 SCALAR_BINARY_UNSPPORT_TYPE(ShiftRight, 5, float, half, uint8_t, int8_t);
+
+TEST_F(BinaryScalarTestsuite, AddsBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> srcBuf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(srcBuf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    UnaryRepeatParams unaryParams {1, 1, 8, 8};
+    Adds(dstBuf.Get<half>(), srcBuf.Get<half>(), static_cast<half>(1.0F), mask, 0, unaryParams);
+
+    SUCCEED();
+}

@@ -370,3 +370,20 @@ UNSUPPORT_MAP(Min, min, uint8_t, int8_t, uint16_t,          uint32_t           )
 UNSUPPORT_MAP(Div, div, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t  );
 UNSUPPORT_MAP(Or,  or,  uint8_t, int8_t,                    uint32_t, int32_t, half, float);
 UNSUPPORT_MAP(And, and, uint8_t, int8_t,                    uint32_t, int32_t, half, float);
+
+TEST_F(VecBinaryTestSuite, AddBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> src0Buf;
+    TBuf<TPosition::VECCALC> src1Buf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(src0Buf, 1024);
+    pipe.InitBuffer(src1Buf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    BinaryRepeatParams binaryParams {1, 1, 1, 8, 8, 8};
+    Add(dstBuf.Get<half>(), src0Buf.Get<half>(), src1Buf.Get<half>(), mask, 0, binaryParams);
+
+    SUCCEED();
+}

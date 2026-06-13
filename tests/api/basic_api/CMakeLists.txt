@@ -24,6 +24,7 @@ set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910B1_AIV
     ascend910B1_AIV_MSTX
     ascend310B1
+    ascend610Lite
     ascend950pr_9599_AIC
     ascend950pr_9599_AIV_BASIC
     ascend950pr_9599_AIV_FRAMEWORK

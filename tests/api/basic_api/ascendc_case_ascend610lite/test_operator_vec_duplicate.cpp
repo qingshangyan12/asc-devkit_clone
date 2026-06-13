@@ -227,3 +227,15 @@ DUP_CHECK_RESULT_TEST(DupTestSuite_check_Output_int16, int16_t, DuplicateImpl);
 DUP_CHECK_RESULT_TEST(DupTestSuite_check_Output_int32, int32_t, DuplicateImpl);
 DUP_CHECK_RESULT_TEST(DupTestSuite_check_Output_uint16, uint16_t, DuplicateImpl);
 DUP_CHECK_RESULT_TEST(DupTestSuite_check_Output_uint32, uint32_t, DuplicateImpl);
+
+TEST_F(DuplicateTestsuite, DuplicateBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    Duplicate(dstBuf.Get<half>(), static_cast<half>(1.0F), mask, 0, 1, 8);
+
+    SUCCEED();
+}

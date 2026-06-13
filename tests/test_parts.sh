@@ -60,7 +60,7 @@ basic_test_two_targets=(
     ascendc_ut_basic_api_ascend310p
     ascendc_ut_basic_api_ascend610
     ascendc_ut_basic_api_ascend310B1
-    # ascendc_ut_basic_api_ascend610Lite
+    ascendc_ut_basic_api_ascend610Lite
     ascendc_ut_basic_api_ascend910B1_AIC
     ascendc_ut_basic_api_ascend910B1_AIV
     ascendc_ut_basic_api_ascend910B1_AIV_MSTX

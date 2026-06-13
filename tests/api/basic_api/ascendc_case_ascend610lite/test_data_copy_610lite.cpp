@@ -252,3 +252,21 @@ TEST_P(SetPadValueTestsuite, testSetPadValue)
         EXPECT_EQ(dstGm[i], 0x00);
     }
 }
+
+TEST(DataCopyPadSimpleTest, UbToGm)
+{
+    constexpr uint32_t dataSize = 256;
+    TPipe pipe;
+    TBuf<TPosition::VECIN> srcBuf;
+    pipe.InitBuffer(srcBuf, dataSize);
+    LocalTensor<uint8_t> srcLocal = srcBuf.Get<uint8_t>();
+
+    uint8_t gm[dataSize] = {};
+    GlobalTensor<uint8_t> dstGlobal;
+    dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ uint8_t*>(gm), dataSize);
+
+    DataCopyPad(dstGlobal, srcLocal, DataCopyParams {1, 1, 0, 0});
+    DataCopyPad(dstGlobal, srcLocal, DataCopyExtParams {1, 32, 0, 0, 0});
+
+    EXPECT_EQ(gm[0], 0U);
+}

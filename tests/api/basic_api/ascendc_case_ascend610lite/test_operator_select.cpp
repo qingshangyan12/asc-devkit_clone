@@ -149,3 +149,23 @@ VEC_SELECT_LEVEL2_TESTCASE(float, VSEL_TENSOR_SCALAR_MODE, LEVEL0_BIT_MODE);
 VEC_SELECT_LEVEL2_TESTCASE(half, VSEL_TENSOR_SCALAR_MODE, LEVEL0_BIT_MODE);
 VEC_SELECT_LEVEL2_TESTCASE(float, VSEL_TENSOR_SCALAR_MODE, LEVEL0_COUNT_MODE);
 VEC_SELECT_LEVEL2_TESTCASE(half, VSEL_TENSOR_SCALAR_MODE, LEVEL0_COUNT_MODE);
+
+TEST_F(TEST_SELECT, SelectTensorTensorBitMaskWithEmptyRepeat)
+{
+    TPipe pipe;
+    TBuf<TPosition::VECCALC> selMaskBuf;
+    TBuf<TPosition::VECCALC> src0Buf;
+    TBuf<TPosition::VECCALC> src1Buf;
+    TBuf<TPosition::VECCALC> dstBuf;
+    pipe.InitBuffer(selMaskBuf, 1024);
+    pipe.InitBuffer(src0Buf, 1024);
+    pipe.InitBuffer(src1Buf, 1024);
+    pipe.InitBuffer(dstBuf, 1024);
+
+    uint64_t mask[2] = {0, 0};
+    BinaryRepeatParams params {1, 1, 1, 8, 8, 8};
+    Select(dstBuf.Get<half>(), selMaskBuf.Get<uint8_t>(), src0Buf.Get<half>(), src1Buf.Get<half>(),
+        SELMODE::VSEL_TENSOR_TENSOR_MODE, mask, 0, params);
+
+    SUCCEED();
+}
