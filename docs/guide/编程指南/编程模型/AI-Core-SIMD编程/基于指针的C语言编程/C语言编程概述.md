@@ -411,7 +411,7 @@ Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来�
 - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
 - bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
 
-![矩阵乘示意图](image-1.png)
+![矩阵乘示意图](../../../../figures/矩阵乘示意图.png)
 
 ```c
 // Define Cube matrix operator, marked with __cube__ to execute on Device Cube core, suitable for operators with only Cube computation
@@ -437,7 +437,7 @@ CV融合计算程序由多个独立的小算子融合而成，其功能与多个
 
 比如对于LLM大模型中最核心的一个融合算子Flash Attention， 其核心实现如下图。图中的Matmul算子（Cube）、Scale算子（Vector）、Mask算子（Vector）、SoftMax算子（Vector）融合为一个大的算子Flash Attention。
 
-![Flash Attention核心实现](image.png)
+![Flash Attention核心实现](../../../../figures/Flash-Attention核心实现.png)
 
 ```c
 // Define CV fusion operator, marked with __mix__ to execute on Device, suitable for operators combining Cube and Vector computation
