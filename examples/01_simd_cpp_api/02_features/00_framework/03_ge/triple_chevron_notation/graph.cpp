@@ -34,8 +34,17 @@ constexpr size_t ELEMENT_COUNT = static_cast<size_t>(BLOCK_NUM * BLOCK_LENGTH);
 constexpr float X_SCALE = 0.1F;
 constexpr float Y_SCALE = 0.2F;
 
+// |o>-----------------------------------
+// |o>      x    y
+// |o>       \  /
+// |o>    add_custom0     y
+// |o>          \        /
+// |o>       add_custom1
+// |o>-----------------------------------
+// 图构造说明：本例构造两个AddCustom节点，验证GE图中可连续调用通过三尖括号启动的Ascend C核函数
 std::unique_ptr<ge::Graph> BuildGraph()
 {
+    // 构造两个Data节点作为图输入，shape、format和dtype与AddCustom算子声明保持一致
     ge::TensorDesc tensorDesc(ge::Shape({BLOCK_NUM, BLOCK_LENGTH}), ge::FORMAT_ND, ge::DT_FLOAT);
     auto x = ge::op::Data("x");
     x.update_input_desc_x(tensorDesc);
@@ -45,11 +54,16 @@ std::unique_ptr<ge::Graph> BuildGraph()
     y.update_input_desc_x(tensorDesc);
     y.update_output_desc_y(tensorDesc);
 
-    auto add = ge::op::AddCustom("add_custom").set_input_x(x).set_input_y(y);
-    add.update_output_desc_z(tensorDesc);
+    // 第一个AddCustom节点计算x + y
+    auto add0 = ge::op::AddCustom("add_custom0").set_input_x(x).set_input_y(y);
+    add0.update_output_desc_z(tensorDesc);
+
+    // 第二个AddCustom节点继续计算add_custom0 + y，作为整图输出
+    auto add1 = ge::op::AddCustom("add_custom1").set_input_x(add0).set_input_y(y);
+    add1.update_output_desc_z(tensorDesc);
 
     std::vector<Operator> inputs{x, y};
-    std::vector<Operator> outputs{add};
+    std::vector<Operator> outputs{add1};
     auto graph = std::make_unique<ge::Graph>("TripleChevronAddGraph");
     graph->SetInputs(inputs).SetOutputs(outputs);
     return graph;
@@ -57,6 +71,7 @@ std::unique_ptr<ge::Graph> BuildGraph()
 
 ge::Tensor BuildInputTensor(float scale)
 {
+    // 按固定比例构造输入数据，便于后续生成golden结果并校验
     ge::TensorDesc tensorDesc(ge::Shape({BLOCK_NUM, BLOCK_LENGTH}), ge::FORMAT_ND, ge::DT_FLOAT);
     ge::Tensor tensor(tensorDesc);
     std::vector<float> data(ELEMENT_COUNT);
@@ -72,15 +87,18 @@ ge::Tensor BuildInputTensor(float scale)
 
 std::vector<float> BuildGolden()
 {
+    // golden与图构造规则保持一致，期望结果为(x + y) + y
     std::vector<float> golden(ELEMENT_COUNT);
     for (size_t i = 0U; i < golden.size(); ++i) {
-        golden[i] = static_cast<float>(i) * X_SCALE + static_cast<float>(i) * Y_SCALE;
+        golden[i] = static_cast<float>(i) * X_SCALE + static_cast<float>(i) * Y_SCALE +
+            static_cast<float>(i) * Y_SCALE;
     }
     return golden;
 }
 
 bool CheckOutputTensor(const ge::Tensor &outputTensor)
 {
+    // 先校验输出shape和数据长度，再逐元素比较计算结果
     const auto tensorDesc = outputTensor.GetTensorDesc();
     const auto dims = tensorDesc.GetShape().GetDims();
     if ((dims.size() != 2U) || (dims[0] != BLOCK_NUM) || (dims[1] != BLOCK_LENGTH)) {
@@ -124,6 +142,7 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv;
 
+    // 初始化GE，并指定运行设备和图运行模式
     std::map<ge::AscendString, ge::AscendString> options = {
         {"ge.exec.deviceId", "1"},
         {"ge.graphRunMode", "0"},
@@ -136,36 +155,36 @@ int main(int argc, char *argv[])
     }
 
     int retCode = 0;
-    {
-        ge::Session session(options);
-        auto graph = BuildGraph();
-        if (graph == nullptr) {
-            std::cerr << "BuildGraph failed." << std::endl;
-            (void)ge::GEFinalize();
-            return 1;
-        }
+    // 创建GE会话，添加图后通过RunGraph触发两个AddCustom节点依次执行
+    ge::Session session(options);
+    auto graph = BuildGraph();
+    if (graph == nullptr) {
+        std::cerr << "BuildGraph failed." << std::endl;
+        (void)ge::GEFinalize();
+        return 1;
+    }
 
-        const auto addGraphRet = session.AddGraph(GRAPH_ID, *graph);
-        if (addGraphRet != ge::SUCCESS) {
-            std::cerr << "AddGraph failed, ret: " << addGraphRet << std::endl;
+    const auto addGraphRet = session.AddGraph(GRAPH_ID, *graph);
+    if (addGraphRet != ge::SUCCESS) {
+        std::cerr << "AddGraph failed, ret: " << addGraphRet << std::endl;
+        retCode = 1;
+    } else {
+        // 构造输入Tensor，执行图并检查输出是否符合golden结果
+        std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE), BuildInputTensor(Y_SCALE)};
+        std::vector<ge::Tensor> outputs;
+        const auto runRet = session.RunGraph(GRAPH_ID, inputs, outputs);
+        if (runRet != ge::SUCCESS) {
+            std::cerr << "RunGraph failed, ret: " << runRet << std::endl;
+            retCode = 1;
+        } else if (outputs.empty()) {
+            std::cerr << "RunGraph succeeded but outputs is empty." << std::endl;
+            retCode = 1;
+        } else if (!CheckOutputTensor(outputs[0])) {
             retCode = 1;
         } else {
-            std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE), BuildInputTensor(Y_SCALE)};
-            std::vector<ge::Tensor> outputs;
-            const auto runRet = session.RunGraph(GRAPH_ID, inputs, outputs);
-            if (runRet != ge::SUCCESS) {
-                std::cerr << "RunGraph failed, ret: " << runRet << std::endl;
-                retCode = 1;
-            } else if (outputs.empty()) {
-                std::cerr << "RunGraph succeeded but outputs is empty." << std::endl;
-                retCode = 1;
-            } else if (!CheckOutputTensor(outputs[0])) {
-                retCode = 1;
-            } else {
-                std::cout << "AddCustom GE triple-chevron sample success." << std::endl;
-            }
-            (void)session.RemoveGraph(GRAPH_ID);
+            std::cout << "AddCustom GE triple-chevron sample success." << std::endl;
         }
+        (void)session.RemoveGraph(GRAPH_ID);
     }
 
     const auto finalizeRet = ge::GEFinalize();
