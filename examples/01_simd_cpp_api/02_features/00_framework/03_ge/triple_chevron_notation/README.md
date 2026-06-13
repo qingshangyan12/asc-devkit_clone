@@ -1,103 +1,66 @@
-# GE原生构图接入`<<<>>>`样例
+# Ascend C算子接入GE样例
 
 ## 概述
 
-本样例基于AddCustom算子展示如何把Ascend C `<<<>>>`核函数调用接入GE原生图执行链路。
+本样例以AddCustom算子为例，介绍如何把Ascend C `<<<>>>`核函数调用接入GE（Graph Engine，图引擎）原生图执行链路。
 
-如果只想验证一个Ascend C核函数是否能启动，或者只在主机侧手动管理输入、输出和stream，直接调用`<<<>>>`即可，不需要GE入图。当自定义算子需要作为计算图的一部分参与执行，例如使用GE图引擎接口构建Graph、上层框架或图编译流程会把模型下沉到GE执行、需要GE在图编译阶段识别自定义算子的输入输出和shape/dtype时，就需要把自定义算子接入GE图。
+> **什么是GE？** <br>
+> GE是昇腾计算架构中的图执行引擎。与每个算子下发后立即执行的方式不同，GE图模式会先把算子组织成一张计算图，再以图为单位执行。图模式具备全局视角，便于图优化和统一调度。更多背景可参考：[图模式开发指南](https://hiascend.com/document/redirect/CannCommunityGraphguide)。
 
-本样例展示的核心链路为：
+**接入路径**：
+- 算子实现：在 `add_custom.asc` 中实现Ascend C核函数，完成一次 `z = x + y` 计算。
+- GE接入：声明 `AddCustom` 算子原型，实现GE执行入口，并在 `graph.cpp` 中构造GE图。
+- 图执行：`Session::RunGraph` 执行整张图，GE运行到 `AddCustom` 节点时调用算子侧执行实现。
 
-```text
-add_custom.asc中的Ascend C kernel
-  -> AddCustom::Execute中直接调用add_custom<<<...>>>(...)
-  -> REG_AUTO_MAPPING_OP(AddCustom)注册GE执行实现
-  -> add_custom_proto.h通过REG_OP(AddCustom)声明算子原型
-  -> graph.cpp创建Data(x)、Data(y)、AddCustom图节点
-  -> Session::RunGraph执行整张GE图
-```
+<img src="figures/execution_flow.png" width="75%">
+
+上图从左到右展示了完整接入链路。左侧是构图侧：先通过算子原型声明 `AddCustom`，再在 `graph.cpp` 中把 `Data` 节点和两个 `AddCustom` 节点连成GE图，最后通过 `Session::RunGraph` 触发整图执行。右侧是算子侧：GE运行到每个 `AddCustom` 节点时，会进入 `add_custom.asc` 中注册的执行实现，并由该执行入口通过 `<<<>>>` 启动Ascend C核函数。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
-```
+```text
 ├── triple_chevron_notation
-│   ├── CMakeLists.txt          // 编译GE custom op和在线构图执行程序
-│   ├── add_custom.asc          // Ascend C kernel + GE执行实现 + 直接<<<>>>调用
-│   ├── add_custom_proto.h      // AddCustom算子原型，供GE构图侧创建ge::op::AddCustom
-│   ├── graph.cpp               // GE在线构图和Session::RunGraph执行验证
+│   ├── CMakeLists.txt          // 编译工程：产出自定义算子动态库和GE在线构图执行程序
+│   ├── add_custom.asc          // 算子侧：Ascend C核函数实现和GE算子执行实现
+│   ├── add_custom_proto.h      // 构图侧：AddCustom算子原型声明
+│   ├── figures                 // 图示
+│   ├── graph.cpp               // 构图侧：构造GE图并调用Session::RunGraph执行
 │   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
 
-- 样例功能：
 
-  Add计算公式为：
 
-  ```
-  z = x + y
-  ```
+## 样例实现
 
-- 样例规格：
-  <table border="2" align="center">
-  <caption>表1：AddCustom样例规格描述</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
-  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
-  </table>
+### 算子实现
 
-- 自定义算子原型：
+算子实现的核心内容在 `add_custom.asc` 中，Add的计算公式为：
 
-  GE构图时需要根据算子原型创建算子实例。官方“使用图引擎接口全新构建Graph”文档中说明，构建Graph前需要了解算子原型，算子原型描述输入、输出、属性等信息，并通过`REG_OP`、`INPUT`、`OUTPUT`、`ATTR`、`OP_END_FACTORY_REG`等接口注册。
+$$
+z = x + y
+$$
 
-  本样例在`add_custom_proto.h`中通过`REG_OP(AddCustom)`声明自定义算子原型，`graph.cpp`依赖该原型创建`ge::op::AddCustom`节点。
+- x：输入，形状为[8, 2048]，数据类型为float；
+- y：输入，形状为[8, 2048]，数据类型为float；
+- z：输出，形状为[8, 2048]，数据类型为float；
 
-  ```cpp
-  REG_OP(AddCustom)
-      .INPUT(x, TensorType({DT_FLOAT}))
-      .INPUT(y, TensorType({DT_FLOAT}))
-      .OUTPUT(z, TensorType({DT_FLOAT}))
-      .OP_END_FACTORY_REG(AddCustom);
-  ```
+### 接入GE需要额外补充的内容
 
-- GE在线构图：
+如果要让这个Ascend C算子作为GE图中的节点执行，还需要补充GE相关内容：
 
-  本样例在`graph.cpp`中创建`Data("x")`和`Data("y")`作为图输入，创建`ge::op::AddCustom("add_custom")`作为自定义算子节点，并通过`Session::RunGraph`执行整张GE图。
-
-  ```cpp
-  auto add = ge::op::AddCustom("add_custom").set_input_x(x).set_input_y(y);
-  session.RunGraph(GRAPH_ID, inputs, outputs);
-  ```
-
-- GE自定义算子执行实现：
-
-  本样例在`add_custom.asc`中实现`ge::AddCustom`。`AddCustom::InferShape()`和`AddCustom::InferDataType()`用于让GE在图编译阶段得到输出shape和dtype；`AddCustom::Execute()`是GE执行到该节点时进入用户代码的位置。
-
-  `AddCustom::Execute()`内部直接使用GE提供的stream调用Ascend C核函数：
-
-  ```cpp
-  add_custom<BLOCK_LENGTH><<<BLOCK_NUM, nullptr, ctx->GetStream()>>>(
-      (float *)const_cast<void *>(x->GetAddr()),
-      (float *)const_cast<void *>(y->GetAddr()),
-      (float *)z->GetAddr());
-  ```
-
-  `REG_AUTO_MAPPING_OP(AddCustom)`用于把GE图中的`AddCustom`节点映射到这里的用户实现。因此，本样例中的`<<<>>>`调用不是由测试程序直接发起，而是由GE图节点的执行入口发起。
-
-- Ascend C核函数实现：
-
-  本样例使用8个核完成计算，每个核处理2048个`float`元素。每个核按`block_idx * blockLength`计算当前核负责的GM偏移，计算流程为GM输入搬运到UB，调用`AscendC::Add`完成向量加法，再将结果从UB搬回GM输出。
+- 在 `add_custom_proto.h` 中通过 `REG_OP(AddCustom)` 声明算子原型，使GE构图侧知道该算子有哪些输入、输出和数据类型。算子原型的概念可参考[什么是算子原型](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0008.html)。
+- 在 `add_custom.asc` 中实现 `ge::AddCustom` 执行类，提供shape推导、dtype推导和执行入口，并通过 `REG_AUTO_MAPPING_OP(AddCustom)` 建立GE节点到执行实现的映射。
+- 在 `graph.cpp` 中基于算子原型创建 `ge::op::AddCustom` 节点，组织成GE图并通过 `Session::RunGraph` 执行。通过算子原型构建Graph可参考[通过算子原型构建Graph](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0009.html)。
 
 ## 编译运行
 
@@ -133,14 +96,7 @@ add_custom.asc中的Ascend C kernel
   成功时可观察到如下输出：
 
   ```bash
-  Output: 0 0.3 0.6 0.9 ...
-  Golden: 0 0.3 0.6 0.9 ...
+  Output: 0 0.5 1 1.5 ...
+  Golden: 0 0.5 1 1.5 ...
   AddCustom GE triple-chevron sample success.
   ```
-
-  看到`AddCustom GE triple-chevron sample success.`且`./demo`返回码为0，说明GE图执行成功。该样例的运行入口是`Session::RunGraph`，可用于确认自定义算子是作为GE图节点执行，而不是由测试程序直接调用`add_custom<<<...>>>`。
-
-## 相关文档
-
-- [什么是算子原型](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0008.html)
-- [通过算子原型构建Graph](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0009.html)

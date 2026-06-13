@@ -25,7 +25,9 @@ execute_process(
 find_package(Torch REQUIRED HINTS ${TORCH_CMAKE_PREFIX_PATH})
 
 add_library(ascendc_ops SHARED
-    add_custom.asc
+    add_custom_kernel.asc
+    add_custom_pytorch.asc
+    add_custom_ge.asc
 )
 
 target_include_directories(ascendc_ops PRIVATE
