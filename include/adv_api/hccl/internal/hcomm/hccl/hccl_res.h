@@ -11,6 +11,7 @@
 #define HCCL_RES_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include "acl/acl_rt.h"
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
@@ -28,13 +29,16 @@ typedef void *HcclMemHandle;
 const uint32_t HCCL_RES_TAG_MAX_LEN = 255;
 
 const uint32_t HCCL_CHANNEL_MAGIC_WORD = 0x0f0f0f0f;
-const uint32_t HCCL_CHANNEL_VERSION = 1;    // HcclChannelDesc更新时，HCCL_CHANNEL_VERSION + 1
+const uint32_t HCCL_CHANNEL_VERSION_ONE = 1;
+const uint32_t HCCL_CHANNEL_VERSION = 2;    // HcclChannelDesc更新时，HCCL_CHANNEL_VERSION + 1
 
 /**
  * @brief 通道描述参数
  * @note 1、结构体需要将union内的raws完成初始化，union内及内部的结构体可以在末尾扩展新内容，但是总内存不能超过128字节。
  * union内扩展可以不需自增版本号，但是要增加双向兼容处理逻辑。
  * 2、结构体末尾允许扩展内容，但是每次扩展需要自增版本号，添加新增字段的初始化，且增加双向兼容处理逻辑。
+ * ABI v1：HCCL_CHANNEL_VERSION_ONE，无 union 之后的 qos 字段。
+ * ABI v2：HCCL_CHANNEL_VERSION，在 union 之后增加 uint32_t qos（通信域 QoS，与协议解耦）。
  */
 typedef struct {
     CommAbiHeader header;
@@ -53,9 +57,14 @@ typedef struct {
             uint32_t retryInterval;   ///< 重传间隔(ms)（对应协议计算公式）
             uint8_t tc;               ///< 流量类别(QoS)
             uint8_t sl;               ///< 服务等级(QoS)
+            uint32_t qpThreshold;      ///< 多QP场景下，每个QP最小数据量(B)
         } roceAttr;
     };
+    uint32_t qos;                      ///< 通信域QoS，与协议解耦
 } HcclChannelDesc;
+
+/** v1 描述符在内存中的长度（不含 union 之后的 trailing qos），用于兼容校验。 */
+#define HCCL_CHANNEL_DESC_ABI_V1_SIZE (offsetof(HcclChannelDesc, qos))
 
 #ifndef LIKELY
 #define LIKELY(x) (__builtin_expect(!!(x), 1))
@@ -88,6 +97,7 @@ static inline HcclResult HcclChannelDescInit(HcclChannelDesc *channelDesc, uint3
             channelDesc->notifyNum  = 0;
             channelDesc->memHandles = nullptr;
             channelDesc->memHandleNum = 0;
+            channelDesc->qos = HCCL_COMM_QOS_CONFIG_NOT_SET;
 
             // 显式设置EndpointDesc相关字段为无效值
             if (UNLIKELY(EndpointDescInit(&channelDesc->localEndpoint, 1) != HCCL_SUCCESS) ||
