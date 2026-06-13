@@ -218,13 +218,14 @@ hRepeat=2；vRepeat=2；mask=128；vROffset=128。
     -   偏移地址后需要32字节对齐。
     -   偏移地址后不能超出UB大小数据的范围。
     -   地址偏移的取值范围：不能超出uint32\_t的范围。
+-   当参数repeatMode配置为true时，需确保src1的有效数据长度*16 ≥ src0的数据长度。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
 -   接口样例-mask连续模式
 
     ```cpp
-    AscendC::LocalTensor<half> dstLocal, src0Local, src1Local;
+    AscendC::LocalTensor<half> dstLocal, src0Local, src1Local; // repeatMode = false，src1Local的数据长度为16即可
     AscendC::LocalTensor<uint32_t> src0OffsetLocal;
     AscendC::LocalTensor<uint8_t> tmpLocal;
     uint64_t mask = 128;        // mask连续模式
@@ -259,7 +260,7 @@ hRepeat=2；vRepeat=2；mask=128；vROffset=128。
 
 ```text
 输入数据(src0Local,half): [1,2,3,...,512]
-输入数据(src1Local,half): [2,3,4,...,33]
+输入数据(src1Local,half): [2,3,4,...,17]
 输入数据(src0OffsetLocal,uint32_t): [0,32,64,...,992]
 输出数据(dstLocal,half): [389, 394, 399, 404, ...,4096]
 ```
