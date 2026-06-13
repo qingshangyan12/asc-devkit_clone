@@ -562,6 +562,12 @@ class SchedulerTest(unittest.TestCase):
 
         self.assertEqual(scheduled - planned, set())
         self.assertEqual(planned - scheduled, set())
+        missing_runners = [
+            name
+            for name in scheduled
+            if not (project_root / "scripts" / "presmoke" / "cases" / name / "run.sh").is_file()
+        ]
+        self.assertEqual(missing_runners, [])
 
     def test_cli_schedule_file_overrides_builtin_schedule_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
