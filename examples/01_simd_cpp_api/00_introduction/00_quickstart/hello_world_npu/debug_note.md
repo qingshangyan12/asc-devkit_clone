@@ -1,4 +1,10 @@
-dfx_region存在硬件bug,使用前需插入pipe_barrier<>, 对实际流水有点影响
+dfx_region存在硬件bug,使用前需插入pipe_barrier<>, 对实际流水有点影响, MTE2,MTE3启动，一次latency 300 cycles.
+
+需要在算子尾巴压入NOP，保证数据能流出来
+
+biu打印有1M限制，当前算子内容变多会导致整体数据太大，以至于打不出来。
+
+每个AI core block会有一个channel，采样
 
 - hello_world.asc
     - 增加 profiling sampler 独立线程
