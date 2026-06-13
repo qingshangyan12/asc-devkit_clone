@@ -19,18 +19,18 @@
 
 #include "instr_impl/npu_arch_3510/utils_impl.h"
 
-__aicore__ inline void asc_copy_l12ub_impl(__ubuf__ void *dst, __cbuf__ void *src, bool sub_blockid,
-                        uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12ub_impl(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid,
+                        uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        copy_cbuf_to_ubuf(dst, src, sub_blockid, burst_count, burst_len, src_gap, dst_gap);
+        copy_cbuf_to_ubuf(dst_addr, src_addr, sub_blockid, n_burst, len_burst, src_gap, dst_gap);
     }
 }
 
-__aicore__ inline void asc_copy_l12ub_sync_impl(__ubuf__ void *dst, __cbuf__ void *src, bool sub_blockid,
-                        uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12ub_sync_impl(__ubuf__ void *dst_addr, __cbuf__ void *src_addr, bool sub_blockid,
+                        uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
 {
-    asc_copy_l12ub_impl(dst, src, sub_blockid, burst_count, burst_len, src_gap, dst_gap);
+    asc_copy_l12ub_impl(dst_addr, src_addr, sub_blockid, n_burst, len_burst, src_gap, dst_gap);
     asc_sync_post_process();
 }
 

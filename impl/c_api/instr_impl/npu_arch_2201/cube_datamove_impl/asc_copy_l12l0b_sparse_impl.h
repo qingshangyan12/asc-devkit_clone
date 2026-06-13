@@ -26,8 +26,8 @@ __aicore__ inline void asc_copy_l12l0b_sparse_impl(__cb__ int8_t* dst, __cbuf__ 
         asc_sparse_addr_config addr_config;
         addr_config.src = (uint64_t)src & 0xffffffff;
         addr_config.index = (uint64_t)index & 0xffffffff;
-        __cbuf__ int8_t* src = reinterpret_cast<__cbuf__ int8_t*>(addr_config.config);
-        load_cbuf_to_cb_sp(dst, src, start_index, repeat);
+        __cbuf__ int8_t* src_addr = reinterpret_cast<__cbuf__ int8_t*>(addr_config.config);
+        load_cbuf_to_cb_sp(dst, src_addr, start_index, repeat);
     }
 }
 
