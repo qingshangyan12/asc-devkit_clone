@@ -27,14 +27,14 @@ __global__ __vector__ void add_custom(...)
 - 动态申请：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
 
 ```c
-// Device侧：声明动态共享内存
+// Device-side: declare dynamic shared memory
 __global__ __vector__ void add_custom(...)
 {
     extern __ubuf__ half dynamic_buf[];
     // ...
 }
 
-// Host侧：通过<<<>>>中的第三个参数指定动态共享内存大小
+// Host-side: specify dynamic shared memory size via third parameter in <<<>>>
 int32_t main(int argc, char const *argv[])
 {
     // ...
@@ -181,7 +181,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 |------|------------------|-------------|--------|
 | 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeat_stride连续计算场景" width="600" /> |
 | 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeat_stride非连续计算场景" width="600" /> |
-| 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeat_stride反复计算场景" width="400" /> |
+| 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeat_stride反复计算场景" width="600" /> |
 | 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeat_stride部分重复计算" width="600" /> |
 
 当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
@@ -304,18 +304,18 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 {
     uint8_t mutex_id = 1;
     // ...
-    // 1. 步骤一: 数据搬入, 执行流水为PIPE_MTE2
+    // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
     asc_lock(PIPE_MTE2, mutex_id);
     asc_copy_gm2ub_align(x_local, x_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
     asc_copy_gm2ub_align(y_local, y_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
     asc_unlock(PIPE_MTE2, mutex_id);
 
-    // 2. 步骤二: 计算, 执行流水为PIPE_V
+    // 2. Step 2: Compute, execution pipeline is PIPE_V
     asc_lock(PIPE_V, mutex_id);
     asc_add(z, x, y, 4096);
     asc_unlock(PIPE_V, mutex_id);
     
-    // 3. 步骤三: 数据搬出, 执行流水为PIPE_MTE3
+    // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     asc_lock(PIPE_MTE3, mutex_id);
     asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);
     asc_lock(PIPE_MTE3, mutex_id);

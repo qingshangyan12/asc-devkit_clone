@@ -24,29 +24,29 @@ Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带
 结合下述示例, Host使用`aclrtMalloc`分配Device侧的全局内存，并通过`aclrtMemcpy`将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；然后通过<<<>>>拉齐Deivce侧核函数进行运算；通过`aclrtMalloc`分配的Device全局内存需使用`aclrtFree`接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 此外，核函数需使用__global__函数前缀进行声明。 该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。
 ```c
-// 核函数实现, 通过__global__来装饰核函数入口 
+// Kernel implementation, decorated with __global__ to mark kernel entry point
 __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
-    // Kernel内部逻辑实现，用户根据具体的算子场景实现
+    // Kernel internal logic implementation, customized based on operator scenario
 }
 
-// Host函数, 分配Device内存, 并通过aclrtMemory函数拷贝到Device内存，并通过<<<>>>方式启动核函数
+// Host function: allocate Device memory, copy data via aclrtMemcpy, launch kernel via <<<>>>
 std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
-    // 获取host侧的buffer指针
+    // Get host-side buffer pointers
     uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
     uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
     uint8_t *zHost = nullptr;
-    // 分配Device内存
+    // Allocate Device memory
     aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    // 通过aclrtMemcpy函数将Host内存拷贝到Device 内存上
+    // Copy data from Host memory to Device memory via aclrtMemcpy
     aclrtMemcpy((uint8_t*)xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy((uint8_t*)yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    // 通过<<<>>>调用Kernel函数实现，直接传入xDevice, yDevice, zDevice等Device 内存。
+    // Launch kernel via <<<>>>, passing Device memory pointers xDevice, yDevice, zDevice
     add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
     aclrtSynchronizeStream(stream);
-    // 释放Device内存
+    // Release Device memory
     aclrtFree(xDevice);
     aclrtFree(yDevice);
     aclrtFree(zDevice);
@@ -76,20 +76,34 @@ __global__ __vector__ void add_custom(...)
 **动态申请**：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
 
 ```c
-// Device侧：声明动态共享内存
-__global__ void add_custom(...)
+// Device-side: declare dynamic shared memory
+__global__ __vector__ void add_custom(...)
 {
     extern __ubuf__ char dynamic_buf[];
     // ...
 }
 
-// Host侧：通过<<<>>>中的第三个参数指定动态共享内存大小
+// Host-side: specify dynamic shared memory size via third parameter in <<<>>>
 int32_t main(int argc, char const *argv[])
 {
     // ...
     uint32_t dyn_ubuf_size = 1024 * sizeof(char);
     add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
     // ...
+}
+```
+
+另外，开发者也可以通过定义结构体的方式来定义内存结构体, 这样可以简化算子中内存定义的代码部分。
+```c
+// Define src0 and src1 memory blocks unified via struct
+__ubuf__ strude ubuf_ {
+    half src0_buffer[128];
+    half src1_buffer[128];
+};
+
+__global__ __vector__ void add_custom(...) {
+    src_ubuf struct local_buf{};
+    __ubuf__ src_ubuf* src_buffer = (__ubuf__ src_ubuf*)&local_buf;
 }
 ```
 
@@ -225,7 +239,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 uint8_t mutex_id = 1;
 
 asc_lock(PIPE_MTE2, mutex_id);
-asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
+asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
 asc_unlock(PIPE_MTE2, mutex_id);
 
 asc_lock(PIPE_V, mutex_id);
@@ -238,7 +252,7 @@ asc_unlock(PIPE_V, mutex_id);</code></pre>
 <td><code>asc_sync_notify</code> / <code>asc_sync_wait</code></td>
 <td>
 <pre><code>
-asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, total_length * sizeof(float));
+asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
 
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
@@ -367,7 +381,7 @@ Vector矢量计算主要包含基础算术、归约计算、数据类型转换�
 以Add计算为例，当开发者需要计算4096长度的向量加法, 可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
 
 ```c
-// 定义Vector矢量计算算子, 通过__vector__标识该核函数在设备端Vector核上执行，适用于仅包含Vector计算的算子。
+// Define Vector operator, marked with __vector__ to execute on Device Vector core, suitable for operators with only Vector computation
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
     __ubuf__ float x[4096];
@@ -398,7 +412,7 @@ Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来�
 ![矩阵乘示意图](image-1.png)
 
 ```c
-// 定义Cube矩阵计算算子, 通过__cube__标识该核函数在设备端Cube核上执行，适用于仅包含Cube计算的算子。
+// Define Cube matrix operator, marked with __cube__ to execute on Device Cube core, suitable for operators with only Cube computation
 __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
     __cbuf__ half a_l1_buf[BLOCK_M * BLOCK_K];   // L1 staging area
@@ -407,11 +421,11 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
     __cb__ half l0b_buf[BLOCK_K * BLOCK_N];    // L0B input
     __cc__ float l0c_buf[BLOCK_M * BLOCK_N];   // L0C output
 
-    // GM2L1 和L12L0搬运操作等
+    // GM2L1 and L12L0 data transfer operations
     // ...
     // Execute Mmad, computation size is (BLOCK_M, BLOCK_K, BLOCK_N)
     asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
-    // 矩阵搬出
+    // Matrix data transfer out
 }
 ```
 
@@ -424,7 +438,7 @@ CV融合计算程序由多个独立的小算子融合而成，其功能与多个
 ![Flash Attention核心实现](image.png)
 
 ```c
-// 定义Cube矩阵计算算子, 通过__cube__标识该核函数在设备端Cube核上执行，适用于仅包含Cube计算的算子。
+// Define CV fusion operator, marked with __mix__ to execute on Device, suitable for operators combining Cube and Vector computation
 __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
     if ASCEND_IS_AIV {

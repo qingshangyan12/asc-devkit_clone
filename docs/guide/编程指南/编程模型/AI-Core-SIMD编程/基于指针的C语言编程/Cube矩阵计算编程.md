@@ -17,7 +17,7 @@ Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 �
 ### 矩阵计算内存申请
 
 矩阵计算编程主要通过L0 Buffer进行矩阵计算。开发者需将输入数据从Global Memory搬入L1 Buffer，再从L1 Buffer搬入L0 Buffer，最终通过Cube计算指令完成计算。L1 Buffer与
-L0 Buffer均通过数组定义的方式申请，开发者可采用静态或动态方式申请Local Memory资源
+L0 Buffer均通过数组定义的方式申请，开发者一般可采用静态Cube侧Local Memory资源。
 
 - 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
 
@@ -27,29 +27,15 @@ __global__ __cube__ void add_custom(...)
   constexpr uint32_t m_size = 128;
   constexpr uint32_t n_size = 128;
   constexpr uint32_t k_size = 256;
-  // 申请L1A/B Buffer
+  // Allocate L1A/B Buffer
   __cbuf__ half static_l1a_buffer[m_size * k_size];
   __cbuf__ half static_l1b_buffer[n_size * k_size];
-  // 申请L0A/B/C Buffer
+  // Allocate L0A/B/C Buffer
   __ca__ half static_l0a_buffer[m_size * k_size];
   __cb__ half static_l0b_buffer[n_size * k_size];
   __cb__ half static_l0c_buffer[m_size * n_size];
   
-  // ... 使用Buffer进行矩阵计算
-}
-```
-
-- 动态申请：同Unified Buffer，Cube侧的Local Memory也可以通过动态的方式进行内存的申请。
-
-```c
-// Device侧：声明动态共享内存
-__global__ __vector__ void add_custom(...)
-{
-    extern __cbuf__ half dynamic_l1[];
-    extern __ca__ half dynamic_l0a[];
-    extern __cb__ half dynamic_l0b[];
-    extern __cc__ half dynamic_l0c[];
-    // ...
+  // ... Use Buffer for matrix computation
 }
 ```
 
@@ -353,24 +339,24 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 {
     uint8_t mutex_id = 1;
     ...
-    // 1. 步骤一: 数据搬入（Global Memory → L1 Buffer）, 执行流水为PIPE_MTE2
+    // 1. Step 1: Data transfer in (Global Memory → L1 Buffer), execution pipeline is PIPE_MTE2
     asc_lock(PIPE_MTE2, mutex_id);
     asc_copy_gm2l1_nd2nz(a_l1_buf, a_gm, 128, 1, BLOCK_M, BLOCK_K, 0, false);
     asc_copy_gm2l1_nd2nz(b_l1_buf, b_gm, 64, 1, BLOCK_K, BLOCK_N, 0, false);
     asc_unlock(PIPE_MTE2, mutex_id);
     ...
-    // 2. 步骤二: 数据搬入（L1 Buffer → L0A/B Buffer）, 执行流水为PIPE_MTE1
+    // 2. Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), execution pipeline is PIPE_MTE1
     asc_lock(PIPE_MTE1, mutex_id);
     asc_copy_l12l0a(l0a_buf, a_l1_buf, 0, 0, 4, 8, 1, 1);
     asc_copy_l12l0b_transpose(l0b_buf, b_l1_buf, 0, 0, 4, 8, 1, 1);
     asc_unlock(PIPE_MTE1, mutex_id);
     ...
-    // 3. 步骤三: 矩阵计算（L0A/B Buffer → L0C Buffer）, 执行流水为PIPE_M
+    // 3. Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), execution pipeline is PIPE_M
     asc_lock(PIPE_M, mutex_id);
     asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
     asc_unlock(PIPE_M, mutex_id);
     ...
-    // 4. 步骤四: 数据搬出（L0C Buffer → Global Memory）, 执行流水为PIPE_MTE3
+    // 4. Step 4: Data transfer out (L0C Buffer → Global Memory), execution pipeline is PIPE_MTE3
     asc_lock(PIPE_MTE3, mutex_id);
     asc_copy_l0c2gm(c_gm, l0c_buf, BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0,
         0, QuantMode_t::NoQuant, 0, false, true, 0, 0, false, false, 0, false, false, false, false, false, false);
