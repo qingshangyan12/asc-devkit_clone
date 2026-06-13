@@ -28,9 +28,9 @@ __global__ __vector__ void add_custom(...)
 
 ```c
 // Device侧：声明动态共享内存
-__global__ void add_custom(...)
+__global__ __vector__ void add_custom(...)
 {
-    extern __ubuf__ char dynamic_buf[];
+    extern __ubuf__ half dynamic_buf[];
     // ...
 }
 
