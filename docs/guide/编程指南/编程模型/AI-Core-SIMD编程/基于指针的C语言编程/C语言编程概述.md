@@ -96,14 +96,16 @@ int32_t main(int argc, char const *argv[])
 另外，开发者也可以通过定义结构体的方式来定义内存结构体, 这样可以简化算子中内存定义的代码部分。
 ```c
 // Define src0 and src1 memory blocks unified via struct
-__ubuf__ strude ubuf_ {
-    half src0_buffer[128];
-    half src1_buffer[128];
+__ubuf__ strude src_ubuf {
+    half src0[128];
+    half src1[128];
 };
 
 __global__ __vector__ void add_custom(...) {
     src_ubuf struct local_buf{};
     __ubuf__ src_ubuf* src_buffer = (__ubuf__ src_ubuf*)&local_buf;
+    ...
+    asc_add(dst, src_buffer.src0, src_buffer.src1, 128);
 }
 ```
 
