@@ -104,9 +104,9 @@ Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector�
 
 #### AIC内部存储L1 Buffer & L0 Buffer
 
-Cube计算单元是AI Core中专用于执行矩阵运算的单元，高亮部分展示了Cube计算单元及其直接访问的专用缓存：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
+Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算单元直接访问的专用缓存为：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
-<img src="../../../../figures/矩阵计算单元架构图.png" alt="矩阵计算单元架构图" width="800" />
+在C语言编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等, 不同的存储空间使用不同的地址限定符标识指定, AIC内部主要地址限定符如下:
 
 **存储单元及地址限定符说明**：
 
@@ -119,7 +119,7 @@ Cube计算单元是AI Core中专用于执行矩阵运算的单元，高亮部分
 | Fixpipe Buffer | 存储量化参数 | `__fbuf__` | `__fbuf__ half fixpipe_buffer[128];` |
 | BiasTable Buffer | 存储Bias数据 | `__biasbuf__` | `__biasbuf__ half bias_buffer[64];` |
 
-在C指针编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等, 不同的存储空间使用不同的地址限定符标识指定, 如下面例子所示:
+结合地址限定符，开发者可以直接通过数组定义的方式申请一块内存块，如下方代码所示：
 
 ```c
 constexpr uint32_t m_size = 256;

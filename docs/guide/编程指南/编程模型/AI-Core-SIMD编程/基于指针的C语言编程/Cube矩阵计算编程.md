@@ -67,11 +67,11 @@ __global__ __vector__ void add_custom(...)
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
 针对Atlas A2/A3训练和推理系列产品，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
 
-<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="600" />
+<img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
 
 针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
 
-<img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="600" />
+<img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
 #### ND 格式(N-Dimension)
 
@@ -112,7 +112,7 @@ Zn格式主要用于L0B Buffer中存放数据, 如果离线处理好的右矩阵
 
 根据上述信息，Global Memory采用ND格式，L1 Buffer采用Nz格式，因此需进行ND2NZ格式转换。
 
-<img src="../../../../figures/ND2NZ格式转换.png" alt="ND2NZ格式转换" width="600" />
+<img src="../../../../figures/ND2NZ格式转换.png" alt="ND2NZ格式转换" width="800" />
 
 以上图为例，图中展示了一个具体的 M=40, K=56 的矩阵（数据类型为 half），在从 Global Memory (GM) 搬运至 L1 Buffer 并转换为 Nz 格式时的内存排布变化：
 - 原始数据 (ND 格式)：
@@ -141,9 +141,9 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 结合上述数据流和分形知识，C语言编程提供以下矩阵搬入能力（完整接口见API参考手册）：
 | 数据通路 | 功能    | C语言编程接口  | 分行支持情况 |
 |---------|---------|---------------|-------------|
-| gm2l1   | 随路转换ND2NZ搬运  | `asc_copy_gm2l1_nd2nz` | ![ND->Nz](../../../../figures/ND-Nz.png) |
-| l12l0a  | 高维切分数据搬运  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png) Ascend 950PR/Ascend 950DT上L0A分形为Nz, 搬运时为Nz-Nz |
-| l12l0b  | 非对齐数据搬运  | `asc_copy_l12l0b` | ![Nz->Zn](../../../../figures/Nz-Zn.png)|
+| Global Memory → L1 Buffer   | 随路转换ND2NZ搬运  | `asc_copy_gm2l1_nd2nz` | ![ND->Nz](../../../../figures/ND-Nz.png) |
+| L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0A Buffer中  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png) Ascend 950PR/Ascend 950DT上L0A分形为Nz, 搬运时为Nz-Nz |
+| L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0B Buffer中  | `asc_copy_l12l0b` | ![Nz->Zn](../../../../figures/Nz-Zn.png)|
 
 #### GM2L1 随路转换ND2NZ搬运
 
@@ -151,7 +151,7 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 
 该能力通过`asc_copy_gm2l1_nd2nz`接口实现，配置`src_nd_matrix_stride`、`src_d_value`等参数完成GM2L1搬运和ND2NZ格式转换。
 
-<img src="../../../../figures/GM到L1的ND2NZ搬运示例.png" alt="GM到L1的ND2NZ搬运示例" width="600" />
+<img src="../../../../figures/GM到L1的ND2NZ搬运示例.png" alt="GM到L1的ND2NZ搬运示例" width="700" />
 
 
 以上图为例, 实现A矩阵(Shape(16, 23), 数据类型为half)从GM搬运到L1的能力, 针对Atlas A2/A3训练和推理系列产品, 调用接口如下：
@@ -191,7 +191,7 @@ asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value, src
 
 该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分型转换到Zz或Zn格式，C语言编程提供了asc_copy_l12l0a和asc_copy_l12l0b接口，其中针对Ascend 950PR/Ascend 950DT的asc_copy_l12l0a接口可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
 
-<img src="../../../../figures/L12L0A非转置搬运.png" alt="L12L0A非转置搬运" width="600" />
+<img src="../../../../figures/L12L0A非转置搬运.png" alt="L12L0A非转置搬运" width="700" />
 
 通过如下方式调用可完成上述的`L1 Buffer`到`L0A Buffer`的搬入操作。
 ```c
@@ -215,7 +215,7 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_ste
 
 当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（Ascend 950PR/Ascend 950DT），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
-<img src="../../../../figures/需要转置的处理场景.png" alt="需要转置的处理场景" width="600" />
+<img src="../../../../figures/需要转置的处理场景.png" alt="需要转置的处理场景" width="800" />
 
 ```c
 // Use transpose interface to complete processing
@@ -228,21 +228,21 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 针对Atlas A2/A3训练和推理系列产品：
 
-<img src="../../../../figures/矩阵搬出流程-AtlasA2A3.png" alt="矩阵搬出流程" width="600" />
+<img src="../../../../figures/矩阵搬出流程-AtlasA2A3.png" alt="矩阵搬出流程" width="800" />
 
 针对Ascend 950PR/Ascend 950DT：
 
-<img src="../../../../figures/矩阵搬出流程-Ascend950PR.png" alt="矩阵搬出流程" width="600" />
+<img src="../../../../figures/矩阵搬出流程-Ascend950PR.png" alt="矩阵搬出流程" width="800" />
 
 矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图展示了这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对Ascend 950PR/Ascend 950DT，还额外支持NZ2DN格式转换。
 
 针对Atlas A2/A3训练和推理系列产品：
 
-<img src="../../../../figures/L0C2GM搬运-AtlasA2A3.png" alt="L0C2GM搬运" width="600" />
+<img src="../../../../figures/L0C2GM搬运-AtlasA2A3.png" alt="L0C2GM搬运" width="800" />
 
 针对Ascend 950PR/Ascend 950DT：
 
-<img src="../../../../figures/L0C2GM搬运-Ascend950PR.png" alt="L0C2GM搬运" width="600" />
+<img src="../../../../figures/L0C2GM搬运-Ascend950PR.png" alt="L0C2GM搬运" width="800" />
 
 C语言编程提供了`asc_copy_l0c2gm`来使能发挥芯片的各种随路能力, 通过直接传入配置参数可完成随路搬运的操作.
 ```c

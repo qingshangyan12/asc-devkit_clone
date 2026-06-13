@@ -324,4 +324,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Memory矢量计算示例
 
-结合上述Memory矢量搬运与计算能力，开发者可基于C语言实现Memory矢量计算算子。具体开发实践可参考c_api_add样例 (../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)，使用C语言编程接口完成Memory矢量算子的开发。
+结合上述Memory矢量搬运与计算能力，开发者可基于C语言实现Memory矢量计算算子。具体开发实践可参考[c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)，使用C语言编程接口完成Memory矢量算子的开发。
