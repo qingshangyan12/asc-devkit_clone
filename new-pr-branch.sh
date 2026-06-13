@@ -1,4 +1,4 @@
-#!/bin/bash
+
 # new-pr-branch.sh
 # 功能：基于主线仓 master 最新内容创建新分支并推送到 fork 仓
 # 用法：./new-pr-branch.sh [PR标题]
