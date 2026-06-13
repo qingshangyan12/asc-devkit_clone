@@ -333,6 +333,13 @@ file(
   ../../adv_api/hccl/hccl_tiling.h
   ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/hccl/hccl_tiling.h
   SYMBOLIC)
+# hccl_tiling.h 以同目录相对路径引用 detail/hccl_tiling_impl_def.h，需把 detail 子目录一并软链，
+# 否则 host tiling(asc/include/tiling/hccl)下编译找不到 detail 头(冒烟 matmul_advanced_api 失败)。
+file(
+  CREATE_LINK
+  ../../adv_api/hccl/detail
+  ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/hccl/detail
+  SYMBOLIC)
 
 # mean
 file(MAKE_DIRECTORY
