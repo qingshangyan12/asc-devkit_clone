@@ -2,17 +2,33 @@
 
 ## 产品支持情况<a id="zh-cn_topic_0000002538001510_section18204144912492"></a>
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002538001510_section618mcpsimp"></a>
 
@@ -58,7 +74,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 | 参数名 | 含义 |
 | ---------- | ---------- |
 | blockCount | 待搬运的连续传输数据块个数。uint16_t类型，取值范围：blockCount∈[1, 4095]。<br>**注：blockCount = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| blockLen | 待搬运的每个连续传输数据块长度，dst位于Fixpipe Buffer时，单位为128字节。uint16_t类型，取值范围：blockLen∈[1, 65535]。<br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
+| blockLen | 待搬运的每个连续传输数据块长度，dst位于Fixpipe Buffer时，单位为128B。uint16_t类型，取值范围：blockLen∈[1, 65535]。<br><!-- npu="950" id10 -->针对Ascend 950PR/Ascend 950DT，单位为64B。<!-- end id10 --><br>**注：blockLen = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcGap | 在L1 Buffer -> Fixpipe Buffer场景中，srcGap特指源操作数相邻连续数据块的间隔（前面一个数据块的头与后面数据块的头的间隔），单位为DataBlock（32字节）。uint16_t类型，srcGap ∈[0, 2^16-1]。<br>&nbsp;&nbsp;&bull; blockCount = 1时，srcGap无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; blockCount ≠ 1时，当srcGap=0时，表示重复搬出源操作数的第一个数据块。 |
 | dstGap | 在L1 Buffer -> Fixpipe Buffer场景中，dstGap特指目的操作数相邻连续数据块的间隔（前面一个数据块的头与后面数据块的头的间隔），单位为DataBlock（128字节）。uint16_t类型，dstGap不要超出该数据类型的取值范围，dstGap  ∈[1, 2^16-1]。<br>&nbsp;&nbsp;&bull; blockCount = 1时，dstGap无意义，设置为0即可。<br>&nbsp;&nbsp;&bull; blockCount ≠ 1时，当dstGap=0时，表示目的矩阵中搬入的每个数据块都会覆盖第一个数据块。 |
 
@@ -72,6 +88,9 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 ## 约束说明<a id="section_constraint"></a>
 
+<!-- npu="950" id11 -->
+- 针对Ascend 950PR/Ascend 950DT，blockLen参数单位为64B。
+<!-- end id11 -->
 - dst物理内存为Fixpipe Buffer起始地址要求128字节对齐，src物理内存为L1 Buffer，起始地址要求32字节对齐。
 - blockCount取值范围：blockCount∈[1, 4095]，设置为0表示不执行，此指令将被视为NOP并报告警告。
 - srcGap∈[0, 2^16-1]，dstGap∈[1, 2^16-1]。
