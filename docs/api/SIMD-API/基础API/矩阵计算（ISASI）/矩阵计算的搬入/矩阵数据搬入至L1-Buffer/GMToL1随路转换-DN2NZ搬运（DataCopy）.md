@@ -20,6 +20,12 @@
 
 随路格式转换数据搬运，适用于在搬运时进行DN到NZ格式的转换。数据从Global Memory搬运至L1 Buffer（TPosition为A1/B1），搬运过程中完成DN->NZ格式转换。
 
+DN到NZ的格式转换等价于ND到ZN的格式转换，如下图所示：
+
+**图1** DN到NZ格式转换示意图
+
+![](../../../../../figures/gm2l1_dn2nz_concept.png "DN到NZ格式转换示意图")
+
 ## 函数原型<a id="section1954364615315"></a>
 
 ```cpp
@@ -57,18 +63,49 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 |dstNzNStride|目的NZ矩阵中，Z型矩阵相邻行起始地址之间的偏移。取值范围：dstNzNStride∈[1, 65535]，单位：C0_SIZE（32字节）。|
 |dstNzMatrixStride|目的NZ矩阵中，相邻NZ矩阵起始地址间的偏移，取值范围：dstNzMatrixStride∈[0, 65535]，单位为元素。|
 
-DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以half数据类型为例）：
+**连续搬运**
 
-- dnNum = 2，表示搬运的ND矩阵的数量为2。
+以half数据类型为例，下图为DN2NZ连续搬运示意图。Dn2NzParams结构体参数配置说明如下：
+
+- dnNum = 1，表示搬运的DN矩阵的数量为1。
+- nValue = 16，一个DN矩阵的列数。
+- dValue = 23，一个DN矩阵的行数。当dValue \* sizeof\(T\)不满足32字节对齐时，在目的矩阵中会补0对齐到32字节。
+- srcDnMatrixStride = 0，只有一个DN矩阵，该值为0。
+- srcDValue = 16，表示源矩阵一行的所含元素个数，即16个half数据类型的元素。
+- dstNzC0Stride = 16，NZ矩阵中相邻Z矩阵起始地址的偏移，偏移为16个C0\_SIZE，也就是16 \* 32字节。
+- dstNzNStride = 1，表示NZ矩阵中相邻行起始地址的偏移。
+- dstNzMatrixStride = 0，输入只有一个DN矩阵，该值为0。
+
+**图2** DN2NZ转换示意图（连续搬运）
+
+![](../../../../../figures/gm2l1_dn2nz_continuous.png "DN2NZ转换示意图（连续搬运）")
+
+**非连续搬运**
+
+以half数据类型为例，下图为DN2NZ非连续搬运示意图。Dn2NzParams结构体参数配置说明如下：
+
+- dnNum = 2，表示搬运的DN矩阵的数量为2。
 - nValue = 8，一个DN矩阵的列数。
 - dValue = 23，一个DN矩阵的行数。当dValue \* sizeof\(T\)不满足32字节对齐时，在目的矩阵中会补0对齐到32字节。
-- srcDnMatrixStride  = 500，表示相邻DN矩阵起始地址的偏移，每行16个元素，共25行，偏移为16 \* 25= 400个元素。
+- srcDnMatrixStride = 500，表示相邻DN矩阵起始地址的偏移。
 - srcDValue = 16，表示源矩阵一行的所含元素个数，即16个half数据类型的元素。
 - dstNzC0Stride = 37，NZ矩阵中相邻Z矩阵起始地址的偏移，偏移为37个C0\_SIZE。
 - dstNzNStride = 2，表示NZ矩阵中相邻行起始地址的偏移。
 - dstNzMatrixStride = 320，相邻NZ矩阵起始地址的偏移，每行16个元素，共20行，偏移为16 \* 20 = 320个元素。
 
-![](../../../../../figures/gm2l1_dn2nz.png)
+**图3** DN2NZ转换示意图（非连续搬运）
+
+![](../../../../../figures/gm2l1_dn2nz.png "DN2NZ转换示意图（非连续搬运）")
+
+**SmallC0模式**
+
+当dValue小于等于4的时候，可以使能SmallC0模式，C0\_SIZE会对齐到4 \* sizeof\(T\)字节，当dValue \* sizeof\(T\)不满足4 \* sizeof\(T\)对齐时，在目的矩阵中会补0对齐到4 \* sizeof\(T\)。若整个目的矩阵没有C0\_SIZE（32字节）对齐，则目的矩阵中尾部补0直到32字节对齐。
+
+在该模式下，dstNzNStride参数和dstNzC0Stride参数，无需配置。
+
+**图4** DN2NZ转换示意图（SmallC0模式）
+
+![](../../../../../figures/gm2l1_dn2nz_smallc0.png "DN2NZ转换示意图（SmallC0模式）")
 
 ## 数据类型<a id="section4219135304818"></a>
 
@@ -80,7 +117,24 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 
 ## 约束说明
 
-无
+- 当输入数据类型是b4时，DN2NZ过程中数据是基于b8类型进行处理，因此参数需要根据b8类型进行设置，nValue必须是2的倍数。
+- 位于Global Memory的源地址必须1字节对齐，位于L1 Buffer的目的地址必须32字节对齐。
+- 当Dn2NzParams结构体参数dnNum、nValue、dValue任意一个值为0时，该指令不会执行，该接口将被视为NOP（空操作）。
+- 搬运至L1 Buffer的数据不能重叠，如果存在重叠写入，硬件不会产生任何警告或错误，并且不保证重叠数据的写入顺序。
+- Dn2NzParams结构体参数的值需在取值范围内，参数取值范围如[表4](#table_dn2nz_range)所示。
+
+**表 4**  Dn2NzParams结构体参数取值范围<a id="table_dn2nz_range"></a>
+
+|参数名称|取值范围|
+|----------|----------|
+|dnNum|[0, 4095]|
+|nValue|[0, 16384]|
+|dValue|[0, 2^21-1]|
+|srcDnMatrixStride|[0, 2^40-1]|
+|srcDValue|[1, 2^40-1]|
+|dstNzC0Stride|[1, 16384]|
+|dstNzNStride|[1, 16384]|
+|dstNzMatrixStride|[0, 65535]|
 
 ## 调用示例<a id="section122101199486"></a>
 
