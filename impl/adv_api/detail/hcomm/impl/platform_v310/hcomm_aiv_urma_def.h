@@ -86,9 +86,11 @@ private:
 private:
     LocalTensor<uint32_t> wqeItem_;
     LocalTensor<uint32_t> cqeItem_;
+#if 0 // default
     LocalTensor<uint32_t> sqPI_;
     LocalTensor<uint32_t> sqCI_;
     LocalTensor<uint32_t> cqCI_;
+#endif
 };
 } // namespace AscendC
 
