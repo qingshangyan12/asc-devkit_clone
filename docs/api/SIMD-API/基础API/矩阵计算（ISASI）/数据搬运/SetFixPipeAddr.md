@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)（CO1-\>GM）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。
+[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)（CO1-\>GM）过程中进行随路量化后，通过调用该接口设置Elementwise操作时LocalTensor的地址。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

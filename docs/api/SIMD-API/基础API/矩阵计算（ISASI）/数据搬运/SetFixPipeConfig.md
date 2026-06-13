@@ -59,7 +59,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)（CO1-\>GM、CO1-\>A1）过程中进行随路量化时，通过调用该接口设置量化流程中tensor量化参数。
+[DataCopy](../../Memory数据搬运/DataCopy/随路量化激活搬运.md)（CO1-\>GM、CO1-\>A1）过程中进行随路量化时，通过调用该接口设置量化流程中tensor量化参数。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
