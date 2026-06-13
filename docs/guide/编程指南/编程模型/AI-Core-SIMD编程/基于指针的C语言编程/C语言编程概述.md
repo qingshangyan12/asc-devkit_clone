@@ -239,11 +239,9 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <td>
 <pre><code>
 uint8_t mutex_id = 1;
-
 asc_lock(PIPE_MTE2, mutex_id);
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
 asc_unlock(PIPE_MTE2, mutex_id);
-
 asc_lock(PIPE_V, mutex_id);
 asc_add(shared_buffer, x_local, y_local);
 asc_unlock(PIPE_V, mutex_id);</code></pre>
@@ -255,10 +253,8 @@ asc_unlock(PIPE_V, mutex_id);</code></pre>
 <td>
 <pre><code>
 asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
-
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-
 asc_add(dst, src1, src0, total_length);</code></pre>
 </td>
 </tr>
