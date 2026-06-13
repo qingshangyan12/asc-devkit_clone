@@ -89,7 +89,7 @@ AIV的内存层级如下：
 
 **图 3** Regbase编程总体结构
 
-![](../../../../figures/Regbase编程模型总体结构.png "RRegbase编程模型总体结构")
+![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
 
 ### VF函数与执行域
 
@@ -129,14 +129,14 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store` 的执行过程，�
 ```cpp
 __aicore__ inline void compute()
 {
-    // 1. 准备输入/输出数据。
+    // 1. Prepare input/output data.
     // ...
 
-    // 2. 通过asc_vf_call进入寄存器级VF函数域。
+    // 2. Enter register-level VF function domain via asc_vf_call.
     asc_vf_call<add_vf>(dst_addr, src0_addr, src1_addr,
                         one_repeat_size, repeat_times);
 
-    // 3. 收尾工作。
+    // 3. Finalize work.
     // ...
 }
 ```
@@ -181,16 +181,16 @@ for (i = 0; i < repeat_times; ++i) {
 
 
 ```cpp
-// 申请矢量数据寄存器，定义数据类型为float
+// Allocate vector data register with float data type
 vector_float vector_reg;
 
-// 申请矢量数据寄存器，定义数据类型为half
+// Allocate vector data register with half data type
 vector_half vector_reg;
 
-// 将UB地址为src_addr的数据加载到vector_float src0_reg
+// Load data from UB address src_addr to vector_float src0_reg
 asc_load(src0_reg, src_addr);
 
-// vector_float src0_reg, src1_reg, dst_reg计算加法
+// Compute addition with vector_float src0_reg, src1_reg, dst_reg
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
 
@@ -214,16 +214,16 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 `vector_bool`的创建以及常见的使用方式如下：
 
 ```cpp
-// 直接申请掩码寄存器
+// Directly allocate mask register
 vector_bool mask_reg;
 
-// 创建全部元素有效的掩码寄存器
+// Create mask register with all elements valid
 vector_bool mask_reg = asc_create_mask_b32(PAT_ALL);
 
-// 根据剩余元素更新创建掩码寄存器
+// Create mask register based on remaining elements update
 vector_bool mask = asc_update_mask_b32(remainCount);
 
-// vector_bool mask_reg作为控制参与计算有效元素掩码
+// Use vector_bool mask_reg as mask to control valid elements in computation
 asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 ```
 
@@ -232,10 +232,10 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 当用作1bit元素参与运算时，支持vector_* 和vector_bool的混合计算以及vector_bool和vector_bool的计算
 
 ```cpp
-// vector_bool dst_mask_reg作为x计算参数与vector_* src0_vector_reg计算
+// Use vector_bool dst_mask_reg as x computation parameter with vector_* src0_vector_reg
 asc_select(dst_mask_reg, src0_vector_reg, src1_vector_reg, mask_reg);
 
-// vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg 作为参数计算
+// Compute with vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg as parameters
 asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 ```
 
@@ -244,9 +244,9 @@ asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 `iter_reg`用于保存UB访问的地址偏移量。它把原本需要在循环体内反复执行的标量地址计算转化为寄存器化的地址管理，最多支持四维偏移叠加。`AddrReg`通过`asc_create_iter_reg_b*`初始化，偏移量计算公式为：`offset = index0*stride0 + index1*stride1 + ...`。
 
 ```cpp
-// 申请地址迭代寄存器
+// Allocate address iteration register
 iter_reg a_reg;
-// 作为b32元素的2维偏移叠加
+// Use as 2D offset accumulation for b32 elements
 for(uint16_t i = 0;i < extent1; i++){
     for(uint16_t j = 0;j < extent2; j++){
         a_reg = asc_create_iter_reg_b32(i, stride0, j, stride1);
@@ -260,13 +260,13 @@ for(uint16_t i = 0;i < extent1; i++){
 `vector_load_unalign`用于实现从UB非对齐地址连续搬入到矢量数据寄存器的临时缓存，首先通过`asc_loadunalign_pre`初始化，将包含非对齐的数据载入`vector_load_unalign`，然后调用`asc_loadunalign`搬运数据。具体的使用流程可以参考后续[特性描述](#section_part4)章节中对非对齐搬运的描述。
 
 ```
-// 申请搬入非对齐寄存器
+// Allocate load unalign register
 vector_load_unalign ureg0;
 
-// 使用非对齐UB地址src_addr, 初始化vector_load_unalign
+// Initialize vector_load_unalign using unaligned UB address src_addr
 asc_loadunalign_pre(ureg0, src_addr);
 
-// 将非对齐UB地址src_addr开始的数据，搬入矢量数据寄存器 src_reg
+// Load data starting from unaligned UB address src_addr into vector data register src_reg
 asc_loadunalign(src_reg, ureg0, src_addr);
 ```
 
@@ -275,13 +275,13 @@ asc_loadunalign(src_reg, ureg0, src_addr);
 `vector_store_unalign`用于实现从矢量数据寄存器搬出到UB非对齐地址的临时缓存，首先通过`asc_storeunalign`搬运数据，尾部数据会保留在`vector_store_unalign`，最后调用一次`asc_storeunalign_post`，将`vector_store_unalign`内的尾部数据搬出到UB，具体的使用流程可以参考后续[特性描述](#section_part4)章节中对非对齐搬运的描述。
 
 ```cpp
-// 申请搬出非对齐寄存器
+// Allocate store unalign register
 vector_store_unalign ureg0;
 
-// 搬出vreg0 到非对齐UB地址dst_addr
+// Store vreg0 to unaligned UB address dst_addr
 asc_storeunalign(dst_addr, vreg0, ureg0, stride);
 
-// 将搬出非对齐寄存器尾部数据搬出到UB
+// Store tail data from store unalign register to UB
 asc_storeunalign_post(dst_addr, ureg0, 0);
 ```
 
@@ -299,7 +299,7 @@ asc_storeunalign_post(dst_addr, ureg0, 0);
 显式同步通过asc_mem_bar实现：
 
 ```cpp
-// store数据UB地址和load数据UB地址相同时，插入源Store到目的Load同步
+// Insert source Store to destination Load synchronization when store and load UB addresses are the same
 asc_store(ub_addr, vreg0);
 asc_mem_bar(VST_LD);
 asc_load(vreg1, ub_addr);
@@ -334,7 +334,7 @@ Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API�
 下面是一个compute调用的VF函数示例，实现`dst[i] = src0[i] + src1[i]`：
 
 ```cpp
-// VF函数：在寄存器域完成向量加法
+// VF function: complete vector addition in register domain
 __simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
                                __ubuf__ float* src0_addr,
                                __ubuf__ float* src1_addr,
@@ -355,7 +355,7 @@ __simd_vf__ inline void add_vf(__ubuf__ float* dst_addr,
     }
 }
 
-// 调用方：在__aicore__域准备LocalTensor和UB地址
+// Caller: prepare LocalTensor and UB address in __aicore__ domain
 __aicore__ inline void compute(__ubuf__ float* dst_addr,
                                __ubuf__ float* src0_addr,
                                __ubuf__ float* src1_addr,
@@ -386,13 +386,13 @@ Reg矢量编程的关键特性按用途分为三大类：
 [`asc_load`](../../../../../api/c_api/reg/reg_load/asc_load.md) / [`asc_store`](../../../../../api/c_api/reg/reg_store/asc_store.md)是不区分UB地址是否对齐的通用搬运接口，用于将连续VL数据在UB与矢量数据寄存器之间搬运，或将不超过一个VL的元素数据从矢量数据寄存器搬出到UB。
 
 ```cpp
-// 搬运1个VL长度的数据，从UB地址src_addr到矢量数据寄存器src_reg
+// Transfer 1 VL length data from UB address src_addr to vector data register src_reg
 asc_load(src_reg, src_addr);
 
-// 搬运1个VL长度的数据，从矢量数据寄存器到UB地址dst_addr
+// Transfer 1 VL length data from vector data register to UB address dst_addr
 asc_store(dst_addr, dst_reg);
 
-// 搬运少于1个VL长度的数据10个元素，从矢量数据寄存器到UB地址dst_addr
+// Transfer less than 1 VL length data (10 elements) from vector data register to UB address dst_addr
 asc_store(dst_addr, dst_reg, 10);
 ```
 
@@ -408,7 +408,7 @@ asc_store(dst_addr, dst_reg, 10);
 for (uint16_t i = 0; i < repeat_times; ++i) {
     uint32_t offset = i * one_repeat_size;
     asc_loadalign(srcReg, src_addr + offset);
-    // RegTensor上的计算
+    // Computation on RegTensor
     ...
     asc_storealign(dst_addr + offset, dstReg, mask);
 }
@@ -473,7 +473,7 @@ vector_store_unalign store_ureg;
 asc_loadunalign_pre(load_ureg, src_addr);
 for (uint16_t i = 0; i < repeat_times; ++i) {
     asc_loadunalign(src_reg, load_ureg, src_addr, stride);
-    // Reg矢量计算
+    // Reg vector computation
     ...
     asc_storeunalign(dst_addr, dst_reg, store_ureg, stride);
 }
