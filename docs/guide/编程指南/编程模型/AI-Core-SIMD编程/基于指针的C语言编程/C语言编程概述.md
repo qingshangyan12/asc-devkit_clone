@@ -313,23 +313,36 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
       <td><pre><code>asc_sync_inter_arrive
                      asc_sync_inter_wait</code></pre></td>
       <td>
-        <pre><code>if ASCEND_IS_AIC {&#10;    int64_t flagID = 1;&#10;    asc_sync_inter_arrive(PIPE_S, flagID);&#10;    asc_sync_inter_wait(PIPE_S, flagID);&#10;}</code></pre>
+        <code>if ASCEND_IS_AIC {</code><br>
+        <code>    int64_t flagID = 1;</code><br>
+        <code>    asc_sync_inter_arrive(PIPE_S, flagID);</code><br>
+        <code>    asc_sync_inter_wait(PIPE_S, flagID);</code><br>
+        <code>}</code>
       </td>
     </tr>
     <tr>
       <td><strong>所有AIV核同步</strong></td>
       <td><p>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</p></td>
-      <td><pre><code>asc_sync_inter_arrive&#10;asc_sync_inter_wait</code></pre></td>
+      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
       <td>
-        <pre><code>if ASCEND_IS_AIV {&#10;    int64_t flagID = 1;&#10;    asc_sync_inter_arrive(PIPE_S, flagID);&#10;    asc_sync_inter_wait(PIPE_S, flagID);&#10;}</code></pre>
+        <code>if ASCEND_IS_AIV {</code><br>
+        <code>    int64_t flagID = 1;</code><br>
+        <code>    asc_sync_inter_arrive(PIPE_S, flagID);</code><br>
+        <code>    asc_sync_inter_wait(PIPE_S, flagID);</code><br>
+        <code>}</code>
       </td>
     </tr>
     <tr>
       <td><strong>单个AI Core内AIC与AIV同步</strong></td>
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
-      <td><pre><code>asc_sync_intra_arrive&#10;asc_sync_intra_wait</code></pre></td>
+      <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
       <td>
-        <pre><code>if ASCEND_IS_AIC {&#10;    asc_sync_intra_arrive(PIPE_FIX, 0);&#10;}&#10;if ASCEND_IS_AIV {&#10;    asc_sync_intra_wait(PIPE_MTE3, 0);&#10;}</code></pre>
+        <code>if ASCEND_IS_AIC {</code><br>
+        <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
+        <code>}</code><br>
+        <code>if ASCEND_IS_AIV {</code><br>
+        <code>    asc_sync_intra_wait(PIPE_MTE3, 0);</code><br>
+        <code>}</code>
       </td>
     </tr>
     <tr>
