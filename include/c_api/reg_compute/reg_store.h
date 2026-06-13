@@ -126,14 +126,14 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, v
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src,
     vector_bool mask);
 
-// ==========asc_storealign_pack_v2(float/u32/s32)=========
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
+// ==========asc_storealign_pack_quarter(float/u32/s32)=========
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  float* dst_align32b, vector_float src,
     vector_bool mask);
 
 // ==========asc_storealign_intlv(u8/s8/half/u16/s16/u32/s32/bf16/e4m3/e5m2/e8m0/e2m1/e1m2)=========
@@ -293,13 +293,13 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__ bfloat16_t* dst_align32
     vector_bool mask);
 
 // storealign_pack_v2
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask);
 
 // storealign_intlv
@@ -424,13 +424,13 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ bfloat16_t* 
     vector_bool mask);
 
 // storealign_pack_v2
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ int32_t* dst_align32b, vector_int32_t src, int32_t offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ uint32_t* dst_align32b, vector_uint32_t src, int32_t offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_postupdate_v2(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ float* dst_align32b, vector_float src, int32_t offset,
     vector_bool mask);
 
 // ==========通过地址寄存器传入偏移，用户可以选择更新偏移或者更新目的操作数的地址=========
@@ -544,14 +544,14 @@ __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, v
 __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, iter_reg offset,
     vector_bool mask);
 
-// ==========asc_storealign_pack_v2(float/u32/s32)=========
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
+// ==========asc_storealign_pack_quarter(float/u32/s32)=========
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_align32b, vector_int32_t src, iter_reg offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, iter_reg offset,
     vector_bool mask);
 
-__simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset,
+__simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  float* dst_align32b, vector_float src, iter_reg offset,
     vector_bool mask);
 
 // ==========asc_storealign_intlv(u8/s8/half/u16/s16/u32/s32/bf16/e4m3/e5m2/e8m0/e2m1/e1m2)=========
