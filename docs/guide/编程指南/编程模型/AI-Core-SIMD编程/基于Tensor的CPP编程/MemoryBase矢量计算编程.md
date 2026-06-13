@@ -27,32 +27,6 @@ __global__ __aicore__ void add_custom(...)
 }
 ```
 
-### 2.2 扩展Tensor(带有Layout)定义
-
-Ascend 950PR/Ascend 950DT在Tensor基础上引入Layout布局概念，将Shape和Stride移到编译期确定，实现类型安全和分形布局自动生成。
-
-```cpp
-// Extended Tensor (Tensor API) definition: created via MakeTensor, carries Shape and Stride
-auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
-```
-
-### 2.3 基于TPipe和TQue的内存管理
-
-TPipe和TQue是MemoryBase编程模型的内存管理框架，用于管理数据在Unified Buffer上的存储和流动。
-
-**TPipe**：管道管理器，负责协调多个队列之间的数据流动。
-
-**TQue**：队列管理器，负责管理Unified Buffer上的内存分配和释放。
-
-```cpp
-AscendC::TPipe pipe;
-AscendC::TQue<AscendC::TPosition::VECIN, 2> inQueue;
-AscendC::TQue<AscendC::TPosition::VECOUT, 1> outQueue;
-
-pipe.InitBuffer(inQueue, BUFFER_NUM, BUFFER_SIZE);
-pipe.InitBuffer(outQueue, BUFFER_NUM, BUFFER_SIZE);
-```
-
 ## 3. Memory数据搬运
 
 Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
@@ -291,7 +265,7 @@ AscendC::Add(dst_ub, src0_ub, src1_ub, 2, { 1, 1, 1, 8, 8, 8 });
 AscendC::Add(zTensor, xTensor, yTensor, 4096);
 ```
 
-## 5. MemoryBase矢量计算同步控制
+## 5. Memory矢量计算同步控制
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Memory矢量计算需通过流水同步接口确保正确执行。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → Unified Buffer）、计算（Unified Buffer）、数据搬出（Unified Buffer → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
