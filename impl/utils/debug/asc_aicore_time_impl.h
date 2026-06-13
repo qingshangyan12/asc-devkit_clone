@@ -15,7 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
 
@@ -55,6 +55,7 @@ __aicore__ inline void asc_time_stamp(uint32_t desc_id)
     asc_time_stamp_impl(desc_id);
 }
 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 __aicore__ inline void asc_prof_start()
 {
     bisheng::cce::metrics_prof_start();
@@ -64,6 +65,7 @@ __aicore__ inline void asc_prof_stop()
 {
     bisheng::cce::metrics_prof_stop();
 }
+#endif
 
 __aicore__ inline uint64_t clock_impl(void)
 {
