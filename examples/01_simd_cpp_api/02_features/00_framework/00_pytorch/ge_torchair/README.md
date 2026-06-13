@@ -1,114 +1,121 @@
-# PyTorch自定义算子通过TorchAir接入GE图样例
+# Ascend C算子接入PyTorch图模式样例
 
 ## 概述
 
-本样例基于AddCustom算子展示PyTorch自定义算子如何通过TorchAir接入GE图执行。PyTorch侧注册`ascendc_ops::ascendc_add`的schema和Meta实现，使`torch.compile`能够捕获该自定义算子节点；TorchAir converter再将该节点映射为GE `AddCustom`节点，最终由GE执行入口下发Ascend C kernel。
+本样例以AddCustom算子为例，介绍Ascend C算子如何通过TorchAir接入PyTorch图模式。核心链路为：`Ascend C kernel -> GE交付件 -> TorchAir入图 -> 图模式执行`。
 
-## 为什么要通过TorchAir接入GE图执行
+> **什么是TorchAir图模式接入？** <br>
+> TorchAir承担PyTorch图到GE图的转换工作。关于PyTorch侧接口如何进入TorchAir/GE图执行链路，可参考[TorchAir图模式接入概述](https://www.hiascend.com/document/detail/zh/Pytorch/2600/modthirdparty/torchairuseguide/docs/zh/custom_op_graph/overview.md)。
 
-如果只希望在PyTorch中直接调用一个Ascend C核函数，可以使用`pybind`或`torch_library`样例中的方式：Python侧调用自定义接口，C++侧拿到当前NPU stream后直接通过`<<<>>>`下发kernel。这类方式适合单算子功能验证或eager执行，不需要把自定义算子交给GE图引擎调度。
+**核心链路**：
 
-当自定义算子需要参与PyTorch图模式执行时，就需要一条从PyTorch图到GE图的转换链路。TorchAir承担的就是PyTorch到GE的lowering工作：`torch.compile`先捕获`torch.ops.ascendc_ops.ascendc_add`，再由TorchAir converter把该PyTorch自定义算子转换为GE `AddCustom`节点。这样自定义算子就不再是Python测试脚本里的单独直调kernel，而是GE图中的一个节点。
-
-通过TorchAir接入GE图执行的典型场景包括：
-
-- 需要验证自定义算子在`torch.compile`图模式下能被捕获、转换并执行。
-- 上层模型希望整体下沉到GE执行，自定义算子需要作为图节点参与编译和调度。
-- 需要让PyTorch侧提供schema和Meta推导，让图捕获阶段知道自定义算子的输入、输出、shape和dtype。
-- 需要让GE侧提供`AddCustom`原型、shape/dtype推导和`Execute()`实现，让TorchAir转换出的GE节点能被GE识别并执行。
-
-本样例展示的是PyTorch + TorchAir + GE的完整接入关系；如果目标只是PyTorch eager直调，请优先参考同目录下的[pybind](../pybind)或[torch_library](../torch_library)样例。
+1. 在 `add_custom_kernel.asc` 中实现Ascend C Add kernel。
+2. 在 `add_custom_ge.asc` 中实现GE `AddCustom` 交付件，包括算子原型、shape/dtype推导和 `Execute` 执行入口。
+3. `add_custom_test.py` 通过 `torch.ops.load_library` 加载编译生成的 `libascendc_ops.so`，使PyTorch侧接口和GE `AddCustom` 交付件注册生效。
+4. 在 `add_custom_pytorch.asc` 和 `add_custom_test.py` 中补充PyTorch侧schema/Meta注册和TorchAir converter，使模型中的 `ascendc_add` 节点可以映射到GE `AddCustom` 节点。
+5. 通过 `add_custom_test.py` 使用TorchAir后端执行 `torch.compile` 图模式测试，并校验GE图执行结果。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
-```
+```text
 ├── ge_torchair
 │   ├── CMakeLists.txt          // 编译工程文件
-│   ├── add_custom.asc          // Ascend C kernel + PyTorch schema/Meta + GE AddCustom
+│   ├── add_custom_kernel.asc   // Ascend C kernel实现
+│   ├── add_custom_pytorch.asc  // PyTorch侧schema和Meta注册
+│   ├── add_custom_ge.asc       // GE AddCustom原型注册和执行实现
 │   ├── add_custom_test.py      // TorchAir图模式验证脚本
 │   └── README.md               // 样例说明文档
 ```
 
-## 样例描述
+## 样例实现
 
-- 样例功能：
+### Ascend C计算实现
 
-  Add计算公式为：
+`add_custom_kernel.asc` 实现Add计算对应的Ascend C kernel，Add的计算公式为：
 
-  ```
-  z = x + y
-  ```
+$$
+z = x + y
+$$
 
-- 样例规格：
-  <table border="2" align="center">
-  <caption>表1：AddCustom样例规格描述</caption>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">AddCustom</td></tr>
-  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td align="center">y</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[8, 2048]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">add_custom</td></tr>
-  </table>
-  
-- Ascend C核函数实现：
+- x：输入，形状为 `[8, 2048]`，数据类型为float，格式为ND；
+- y：输入，形状为 `[8, 2048]`，数据类型为float，格式为ND；
+- z：输出，形状为 `[8, 2048]`，数据类型为float，格式为ND。
 
-  本样例使用8个核完成计算，每个核处理2048个`float`元素。每个核按`block_idx * blockLength`计算当前核负责的GM偏移，计算流程为GM输入搬运到UB，调用`AscendC::Add`完成向量加法，再将结果从UB搬回GM输出。
+### GE交付件实现
 
-- PyTorch自定义算子注册：
+`add_custom_ge.asc` 提供GE侧需要的 `AddCustom` 原型、shape/dtype推导和执行入口。GE运行到 `AddCustom` 节点时进入执行入口，并启动 `add_custom_kernel.asc` 中的Ascend C kernel。
 
-  本样例在`add_custom.asc`中使用`TORCH_LIBRARY_FRAGMENT`注册`ascendc_ops::ascendc_add`的schema，使Python侧可以通过`torch.ops.ascendc_ops.ascendc_add`引用该自定义算子。
+通过算子原型构建GE节点的基础概念可参考[什么是算子原型](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0008.html)和[通过算子原型构建Graph](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/programug/graphdevg/atlasag_25_0009.html)。
 
-  ```cpp
-  TORCH_LIBRARY_FRAGMENT(ascendc_ops, m)
-  {
-      m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
-  }
-  ```
+### TorchAir入图需要的内容
 
-  同时通过`TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m)`注册Meta实现，用于在`torch.compile`捕获图时提供输出shape和dtype推导。
+`add_custom_pytorch.asc` 提供PyTorch侧可见的 `ascendc_ops::ascendc_add` 接口。图捕获阶段主要需要两类信息：接口签名和Meta实现。
 
-- TorchAir converter：
+接口签名用于让Python侧能够通过 `torch.ops.ascendc_ops.ascendc_add(x, y)` 找到该接口：
 
-  `add_custom_test.py`通过`torch.ops.load_library`加载编译生成的`libascendc_ops.so`，再注册TorchAir converter，将PyTorch自定义算子映射为GE `AddCustom`节点。
+```cpp
+TORCH_LIBRARY_FRAGMENT(ascendc_ops, m)
+{
+    m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
+}
+```
 
-  ```python
-  @torchair.register_fx_node_ge_converter(torch.ops.ascendc_ops.ascendc_add.default)
-  def convert_ascendc_add(x, y, z=None, meta_outputs=None):
-      return torchair.ge.custom_op(
-          "AddCustom",
-          inputs={"x": x, "y": y},
-          outputs=["z"],
-      )
-  ```
+`torch.compile` 捕获图时不会执行真实NPU计算，但需要推导输出Tensor信息，因此还需要注册Meta实现：
 
-- GE自定义算子执行实现：
+```cpp
+TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m)
+{
+    m.impl("ascendc_add", TORCH_FN(AscendcAddMeta));
+}
+```
 
-  本样例在`add_custom.asc`中注册GE `AddCustom`原型和执行实现。GE图执行到`AddCustom`节点时进入`AddCustom::Execute()`，申请输出Tensor，并使用GE提供的stream通过`<<<>>>`下发Ascend C kernel。
+### TorchAir到GE节点转换
 
-  ```cpp
-  ascendc_ops::add_custom<ascendc_ops::BLOCK_LENGTH><<<ascendc_ops::BLOCK_NUM, nullptr, ctx->GetStream()>>>(
-      static_cast<float *>(const_cast<void *>(x->GetAddr())),
-      static_cast<float *>(const_cast<void *>(y->GetAddr())),
-      static_cast<float *>(z->GetAddr()));
-  ```
+`add_custom_test.py` 注册TorchAir converter，将 `torch.ops.ascendc_ops.ascendc_add` 转换为GE `AddCustom`节点：
 
-- 动态库内容说明：
+```python
+@torchair.register_fx_node_ge_converter(torch.ops.ascendc_ops.ascendc_add.default)
+def convert_ascendc_add(x, y, z=None, meta_outputs=None):
+    return torchair.ge.custom_op(
+        "AddCustom",
+        inputs={"x": x, "y": y},
+        outputs=["z"],
+    )
+```
 
-  编译生成的`build/libascendc_ops.so`由`add_custom.asc`生成，同时包含PyTorch schema、Meta实现、GE `AddCustom`原型注册、GE `AddCustom`执行实现和`add_custom` kernel。Python测试脚本通过`torch.ops.load_library("libascendc_ops.so")`加载该动态库后，PyTorch注册和GE注册都会生效；TorchAir转换出的GE `AddCustom`节点也可以在执行阶段下发Ascend C kernel。
+### 加载与图模式执行
+
+实现和注册内容编译进 `libascendc_ops.so` 后，`add_custom_test.py` 先加载该动态库，使PyTorch侧接口和GE `AddCustom` 交付件注册生效：
+
+```python
+torch.ops.load_library(LIB_PATH)
+```
+
+模型中通过 `torch.ops.ascendc_ops.ascendc_add` 调用该接口，再交给 `torch.compile` 捕获并使用TorchAir后端执行：
+
+```python
+class AddCustomModel(torch.nn.Module):
+    def forward(self, x, y):
+        return torch.ops.ascendc_ops.ascendc_add(x, y)
+
+opt_model = torch.compile(model, fullgraph=True, backend=npu_backend, dynamic=False)
+```
+
+编译后的模型在NPU侧执行，GE运行到 `AddCustom` 节点时进入 `add_custom_ge.asc` 中的执行入口，并启动 `add_custom_kernel.asc` 中的Ascend C kernel。
 
 ## 编译运行
 
 - 安装PyTorch、Ascend Extension for PyTorch插件以及TorchAir
 
-  请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓、[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)和TorchAir配套安装说明，选取支持的`Python`版本配套发行版，完成`torch`、`torch-npu`和`torchair`的安装。
+  请参考[pytorch: Ascend Extension for PyTorch](https://gitcode.com/Ascend/pytorch)开源代码仓、[Ascend Extension for PyTorch昇腾社区](https://hiascend.com/document/redirect/Pytorch-index)和TorchAir配套安装说明，选取支持的 `Python` 版本配套发行版，完成 `torch`、`torch-npu` 和 `torchair` 的安装。
 
 - 配置环境变量
 
@@ -125,18 +132,25 @@
   在本样例根目录下执行如下步骤，运行该样例。
 
   ```bash
-  mkdir -p build && cd build;      # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..; make -j;    # 编译工程
-  python3 ../add_custom_test.py    # 执行样例
+  # 创建并进入build目录
+  mkdir -p build && cd build;
+
+  # 编译单算子，生成libascendc_ops.so
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
+
+  # 加载libascendc_ops.so，并执行TorchAir图模式测试
+  python3 ../add_custom_test.py
   ```
 
 - 编译选项说明
 
-  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品 与 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：`dav-2201` 对应Atlas A2训练系列产品/Atlas A2推理系列产品与Atlas A3训练系列产品/Atlas A3推理系列产品，`dav-3510` 对应Ascend 950PR/Ascend 950DT |
 
 - 执行结果
+
+  `add_custom_test.py` 会在CPU侧生成输入Tensor和标准加法结果，再将输入拷贝到NPU侧执行编译后的图模式模型。执行完成后，脚本将NPU输出拷回CPU，并通过 `torch.testing.assert_close` 对比图模式输出和CPU标准结果。
 
   执行结果如下，说明TorchAir图模式执行结果与CPU标准加法结果对齐。
 
@@ -144,7 +158,3 @@
   Ran 1 test in **s
   OK
   ```
-
-## 相关文档
-
-- [自定义算子入图概述](https://www.hiascend.com/document/detail/zh/Pytorch/2600/modthirdparty/torchairuseguide/docs/zh/custom_op_graph/overview.md)
