@@ -94,6 +94,15 @@ asc-devkit:
       - impl/basic_api/dav_m510/kfc/kfc_comm.h
       - impl/basic_api/dav_m510/kfc/kfc_comm_client.h
       - impl/basic_api/dav_m510/kfc/kfc_comm_server.h
+      - impl/basic_api/dav_m510/kernel_operator_data_copy_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_determine_compute_sync_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_fixpipe_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_binary_scalar_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_cmpsel_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_duplicate_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_template_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_unary_impl.h
+      - impl/basic_api/dav_m510/kernel_operator_vec_vconv_impl.h
       - impl/basic_api/dav_c310/kfc/kfc_comm_client.h
       - impl/basic_api/dav_3510/kernel_operator_reg_others_impl.h
       - impl/basic_api/kernel_operator_mm_bitmode_struct.h
