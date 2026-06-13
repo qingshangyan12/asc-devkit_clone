@@ -86,30 +86,6 @@ namespace mc2_ops_hccl {
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
 
-namespace {
-constexpr u32 AICPU_TS_UB_QOS_DEFAULT = 4U;
-
-bool IsUbQosProtocol(CommProtocol protocol)
-{
-    return protocol == COMM_PROTOCOL_UBC_CTP || protocol == COMM_PROTOCOL_UBC_TP ||
-           protocol == COMM_PROTOCOL_UB_MEM || protocol == COMM_PROTOCOL_UBOE;
-}
-
-void ApplyAicpuTsChannelQos(const CommEngine commEngine, std::vector<HcclChannelDesc> &channelRequest)
-{
-    if (commEngine != COMM_ENGINE_AICPU_TS) {
-        return;
-    }
-
-    for (auto &channelDesc : channelRequest) {
-        if (IsUbQosProtocol(channelDesc.channelProtocol) &&
-            channelDesc.qos == HCCL_COMM_QOS_CONFIG_NOT_SET) {
-            channelDesc.qos = AICPU_TS_UB_QOS_DEFAULT;
-        }
-    }
-}
-} // namespace
-
 void UpdateAicpuTimeoutCtx(const OpParam &param, AlgResourceCtxSerializable &resCtx)
 {
     AicpuTimeout timeout = DeriveAicpuTimeout(param.opConfig.execTimeout);
@@ -998,13 +974,11 @@ HcclResult HcclGetChannelImpl(const u32 level, HcclComm comm, const OpParam &par
         }
     }
     if (channelNum > 0) {
-        ApplyAicpuTsChannelQos(commEngine, channelRequest);
         for (u32 idx = 0; idx < channelNum; idx++) {
             const HcclChannelDesc &channelDesc = channelRequest[idx];
             HCCL_INFO("[HcclGetChannelImpl][ChannelRequest] level[%u], idx[%u], channelNum[%u], engine[%d], "
                       "remoteRank[%u], localEndpointProtocol[%d], remoteEndpointProtocol[%d], channelProtocol[%d], "
-                      "localLocType[%d], remoteLocType[%d], localDevPhyId[%u], remoteDevPhyId[%u], notifyNum[%u], "
-                      "qos[%u].",
+                      "localLocType[%d], remoteLocType[%d], localDevPhyId[%u], remoteDevPhyId[%u], notifyNum[%u].",
                       level, idx, channelNum, static_cast<int>(commEngine), channelDesc.remoteRank,
                       static_cast<int>(channelDesc.localEndpoint.protocol),
                       static_cast<int>(channelDesc.remoteEndpoint.protocol),
@@ -1013,7 +987,7 @@ HcclResult HcclGetChannelImpl(const u32 level, HcclComm comm, const OpParam &par
                       static_cast<int>(channelDesc.remoteEndpoint.loc.locType),
                       channelDesc.localEndpoint.loc.device.devPhyId,
                       channelDesc.remoteEndpoint.loc.device.devPhyId,
-                      channelDesc.notifyNum, channelDesc.qos);
+                      channelDesc.notifyNum);
         }
         CHK_RET(HcclChannelAcquire(comm, commEngine, channelRequest.data(),
             channelNum, levelNChannels.data()));
