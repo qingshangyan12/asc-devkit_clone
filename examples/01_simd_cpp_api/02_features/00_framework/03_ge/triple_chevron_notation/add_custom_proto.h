@@ -8,8 +8,8 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 
-#ifndef EXAMPLES_01_SIMD_CPP_API_02_FEATURES_02_FRAMEWORK_03_GE_TRIPLE_CHEVRON_NOTATION_ADD_CUSTOM_PROTO_H_
-#define EXAMPLES_01_SIMD_CPP_API_02_FEATURES_02_FRAMEWORK_03_GE_TRIPLE_CHEVRON_NOTATION_ADD_CUSTOM_PROTO_H_
+#ifndef ADD_CUSTOM_PROTO_H_
+#define ADD_CUSTOM_PROTO_H_
 
 #include "graph/operator_reg.h"
 
@@ -21,4 +21,4 @@ REG_OP(AddCustom)
     .OP_END_FACTORY_REG(AddCustom);
 }  // namespace ge
 
-#endif  // EXAMPLES_01_SIMD_CPP_API_02_FEATURES_02_FRAMEWORK_03_GE_TRIPLE_CHEVRON_NOTATION_ADD_CUSTOM_PROTO_H_
+#endif  // ADD_CUSTOM_PROTO_H_
