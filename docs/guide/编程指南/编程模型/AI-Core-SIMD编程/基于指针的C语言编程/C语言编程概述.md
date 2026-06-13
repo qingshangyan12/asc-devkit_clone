@@ -239,12 +239,15 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <td>
 <pre><code>
 uint8_t mutex_id = 1;
+
 asc_lock(PIPE_MTE2, mutex_id);
-asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
+asc_copy_gm2ub((__ubuf__ void*)src0, ...);
 asc_unlock(PIPE_MTE2, mutex_id);
+
 asc_lock(PIPE_V, mutex_id);
 asc_add(shared_buffer, x_local, y_local);
-asc_unlock(PIPE_V, mutex_id);</code></pre>
+asc_unlock(PIPE_V, mutex_id);
+</code></pre>
 </td>
 </tr>
 <tr>
@@ -252,7 +255,7 @@ asc_unlock(PIPE_V, mutex_id);</code></pre>
 <td><code>asc_sync_notify</code> / <code>asc_sync_wait</code></td>
 <td>
 <pre><code>
-asc_copy_gm2ub((__ubuf__ void*)src0, (__gm__ void*)src0_gm, ...);
+asc_copy_gm2ub((__ubuf__ void*)src0, ...);
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_add(dst, src1, src0, total_length);</code></pre>
@@ -307,10 +310,12 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
     <tr>
       <td><strong>所有AIC核同步</strong></td>
       <td><p>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</p></td>
-      <td><code>asc_sync_inter_arrive</code> / <code>asc_sync_inter_wait</code></td>
+      <td><pre><code>asc_sync_inter_arrive
+        asc_sync_inter_wait</code></pre></td>
       <td>
 <pre><code>
     if ASCEND_IS_AIC {
+        
         int64_t flagID = 1;
         asc_sync_inter_arrive(PIPE_S, flagID);
         asc_sync_inter_wait(PIPE_S, flagID);
@@ -321,7 +326,8 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
     <tr>
       <td><strong>所有AIV核同步</strong></td>
       <td><p>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</p></td>
-      <td><code>asc_sync_inter_arrive</code> / <code>asc_sync_inter_wait</code></td>
+      <td><pre><code>asc_sync_inter_arrive
+      asc_sync_inter_wait</code></pre></td>
       <td>
 <pre><code>
     if ASCEND_IS_AIV {
@@ -335,7 +341,8 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
     <tr>
       <td><strong>单个AI Core内AIC与AIV同步</strong></td>
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
-      <td><code>asc_sync_intra_arrive</code> / <code>asc_sync_intra_wait</code></td>
+      <td><pre><code>asc_sync_intra_arrive</code>
+      <code>asc_sync_intra_wait</code></pre></td>
       <td>
 <pre><code>
     if ASCEND_IS_AIC {
@@ -350,15 +357,9 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
     <tr>
       <td><strong>单个AI Core内两个AIV间同步</strong></td>
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
-      <td><code>asc_sync_intra_arrive</code> / <code>asc_sync_intra_wait</code></td>
+      <td> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。 </td>
       <td>
-<pre><code>
-    if ASCEND_IS_AIV {
-        int64_t flagID = 0;
-        asc_sync_intra_arrive(PIPE_V, flagID);
-        asc_sync_intra_wait(PIPE_V, flagID);
-    }
-    </code></pre>
+        <pre><code> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。 </code></pre>
       </td>
     </tr>
   </tbody>
