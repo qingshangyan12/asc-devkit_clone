@@ -15,7 +15,7 @@
 
 ## 功能说明
 
-头文件路径为：\#include "basic\_api/kernel\_operator\_mm\_intf.h"。
+头文件路径为：`#include "basic_api/kernel_operator_mm_intf.h"`。
 
 MmadWithSparse接口负责完成特殊稀疏矩阵乘加操作。稀疏矩阵是一种特殊类型的矩阵，即矩阵中包含较多的零元素。4：2结构化稀疏要求一个连续的4个权重或激活值的组（通常是张量中的一行或一列）中，最多只有2个值为非零，其余2个强制为零。
 
@@ -108,7 +108,7 @@ $$
 ## 函数原型
 
 ```cpp
-template <typename T = int32_t, typename U = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true, typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
+template <typename T = int32_t, typename U = int8_t, typename std::enable_if<std::is_same<PrimT<T>, int32_t>::value, bool>::type = true, typename std::enable_if<std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
 __aicore__ inline void MmadWithSparse(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<U>& filter, const MmadParams& mmadParams)
 ```
 
@@ -199,8 +199,8 @@ AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
 // mmad需要指定矩阵的维度进行计算
-uint32 m = 128;
-uint32 k = 64;
-uint32 n = 128;
-AscendC::MmadWithSparse(c1Local, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
+uint32_t m = 128;
+uint32_t k = 64;
+uint32_t n = 128;
+AscendC::MmadWithSparse(cLocal, a2Local, b2Local, { m, n, k, false, 0, false, false, false });
 ```

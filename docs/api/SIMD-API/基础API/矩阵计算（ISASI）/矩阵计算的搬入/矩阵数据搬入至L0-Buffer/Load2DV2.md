@@ -2,17 +2,33 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明
 
@@ -49,10 +65,10 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ----------- | ------ |
 | dst | 输出 | 目的操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](../矩阵计算输入搬运约束.md)。<br>起始地址对齐约束参考[对齐约束](../矩阵计算输入搬运约束.md)。<br>数据类型和src的数据类型保持一致。<br>支持的物理存储位置为L0A Buffer（TPosition: A2）/L0B Buffer（TPosition: B2）。 |
-| src | 输入 | 源操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](../矩阵计算输入搬运约束.md)。<br>起始地址对齐约束参考[对齐约束](../矩阵计算输入搬运约束.md)。<br>数据类型和dst的数据类型保持一致。<br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）/Global Memory（TPosition: GM）。 |
-| loadDataParam | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#表3)。 |
+| src | 输入 | 源操作数，类型为LocalTensor。<br>分形约束参考[矩阵计算输入搬运约束](../矩阵计算输入搬运约束.md)。<br>起始地址对齐约束参考[对齐约束](../矩阵计算输入搬运约束.md)。<br>数据类型和dst的数据类型保持一致。<br>支持的物理存储位置为L1 Buffer（TPosition: A1/B1）。|
+| loadDataParam | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#table_load2dv2_params)。 |
 
-**表3** LoadData2DParamsV2结构体内参数说明<a id="表3"></a>
+**表3** LoadData2DParamsV2结构体内参数说明<a id="table_load2dv2_params"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ------ |
@@ -90,7 +106,57 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 
 ## 约束说明
 
-无
+- mStep和kStep为0时，表示不执行搬运，该接口将被视为NOP（空操作）。
+- 当目的地址位于L0A Buffer/L0B Buffer时，地址必须512字节对齐；当源地址或目的地址位于L1 Buffer时，地址必须32字节对齐。
+- 对于矩阵转置操作，不同的数据类型需要满足不同的mStep和kStep约束：b4数据类型时，mStep必须是4的倍数；b8数据类型时，mStep必须是2的倍数；b16数据类型时，mStep必须是1的倍数；b32数据类型时，kStep必须是2的倍数。
+
+## 关键特性说明
+
+### 非转置场景搬入及搬运起始位置计算
+
+利用mStep和kStep搬运多个方向的数据块，以[M, K]的NZ分形为例：
+
+- mStartPosition为2，说明M方向搬运起始位置是在距离源操作数起始位置M轴方向16×2=64个元素的位置。
+- kStartPosition为2，说明K方向搬运起始位置是距离源操作数起始位置K轴方向32B×2=64B的位置。
+- srcStride为5，表示源操作数中，K方向前一个分形起始地址与后一个分形起始地址的间隔为5。
+- dstStride为3，表示目的操作数中，K方向前一个分形起始地址与后一个分形起始地址的间隔为3。
+
+起始地址计算公式为：
+
+$$startAddr = srcAddr + (kStartPosition \times \lvert srcStride \rvert + mStartPosition) \times 512B$$
+
+因此，最终的搬运起始位置为第十三个分形矩阵（源操作数起始地址开始为第1个分形矩阵）。
+
+**图2** 搬运起始位置示意图
+
+![](../../../../../figures/load2dv2_start_addr_demo.png "搬运起始位置示意图")
+
+### 转置场景搬入
+
+对b4/b8/b16/b32的矩阵转置操作，需要满足mStep和kStep的约束：
+
+- b4数据类型时，mStep必须是4的倍数。
+- b8数据类型时，mStep必须是2的倍数。
+- b16数据类型时，mStep必须是1的倍数。
+- b32数据类型时，kStep必须是2的倍数。
+
+各数据类型转置示意图如下：
+
+**图3** b4数据类型转置示意图
+
+![](../../../../../figures/load2dv2_l12l0_trans_b4.png "b4数据类型转置示意图")
+
+**图4** b8数据类型转置示意图
+
+![](../../../../../figures/load2dv2_l12l0_trans_b8.png "b8数据类型转置示意图")
+
+**图5** b16数据类型转置示意图
+
+![](../../../../../figures/load2dv2_l12l0_trans_b16.png "b16数据类型转置示意图")
+
+**图6** b32数据类型转置示意图
+
+![](../../../../../figures/load2dv2_l12l0_trans_b32.png "b32数据类型转置示意图")
 
 ## 调用示例
 
