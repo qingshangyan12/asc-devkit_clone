@@ -311,56 +311,53 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
       <td><strong>所有AIC核同步</strong></td>
       <td><p>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</p></td>
       <td><pre><code>asc_sync_inter_arrive
-        asc_sync_inter_wait</code></pre></td>
+                     asc_sync_inter_wait</code></pre></td>
       <td>
-<pre><code>
-    if ASCEND_IS_AIC {
-        
-        int64_t flagID = 1;
-        asc_sync_inter_arrive(PIPE_S, flagID);
-        asc_sync_inter_wait(PIPE_S, flagID);
-    }
-</code></pre>
+        <pre><code>
+            if ASCEND_IS_AIC {
+                int64_t flagID = 1;
+                asc_sync_inter_arrive(PIPE_S, flagID);
+                asc_sync_inter_wait(PIPE_S, flagID);
+            }
+        </code></pre>
       </td>
     </tr>
     <tr>
       <td><strong>所有AIV核同步</strong></td>
       <td><p>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</p></td>
       <td><pre><code>asc_sync_inter_arrive
-      asc_sync_inter_wait</code></pre></td>
+                     asc_sync_inter_wait</code></pre></td>
       <td>
-<pre><code>
-    if ASCEND_IS_AIV {
-        int64_t flagID = 1;
-        asc_sync_inter_arrive(PIPE_S, flagID);
-        asc_sync_inter_wait(PIPE_S, flagID);
-    }
-    </code></pre>
+        <pre><code>
+            if ASCEND_IS_AIV {
+                int64_t flagID = 1;
+                asc_sync_inter_arrive(PIPE_S, flagID);
+                asc_sync_inter_wait(PIPE_S, flagID);
+            }
+        </code></pre>
       </td>
     </tr>
     <tr>
       <td><strong>单个AI Core内AIC与AIV同步</strong></td>
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
-      <td><pre><code>asc_sync_intra_arrive</code>
-      <code>asc_sync_intra_wait</code></pre></td>
+      <td><pre><code>asc_sync_intra_arrive
+                     asc_sync_intra_wait</code></pre></td>
       <td>
-<pre><code>
-    if ASCEND_IS_AIC {
-        asc_sync_intra_arrive(PIPE_FIX, 0);
-    }
-    if ASCEND_IS_AIV {
-        asc_sync_intra_wait(PIPE_MTE3, 0);
-    }
-    </code></pre>
+        <pre><code>
+            if ASCEND_IS_AIC {
+                asc_sync_intra_arrive(PIPE_FIX, 0);
+            }
+            if ASCEND_IS_AIV {
+                asc_sync_intra_wait(PIPE_MTE3, 0);
+            }
+        </code></pre>
       </td>
     </tr>
     <tr>
       <td><strong>单个AI Core内两个AIV间同步</strong></td>
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
       <td> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。 </td>
-      <td>
-        <pre><code> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。 </code></pre>
-      </td>
+      <td> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。</td>
     </tr>
   </tbody>
 </table>
