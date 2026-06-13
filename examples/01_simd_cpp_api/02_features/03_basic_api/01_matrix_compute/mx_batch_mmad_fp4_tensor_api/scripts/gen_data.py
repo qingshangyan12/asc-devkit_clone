@@ -15,11 +15,12 @@ import os
 import numpy as np
 
 BATCH_SIZE = 2
-M_SIZE = 64
-N_SIZE = 64
-K_SIZE = 128
+M_SIZE = 32
+N_SIZE = 48
+K_SIZE = 96
 SCALE_CEIL_NUMBER = 32
 SCALE_ALIGN_NUMBER = 2
+K_ALIGN_NUMBER = 64
 FRACTAL_FIXED = 16
 C0_ELEMENT_SCALE = 2
 FP4_PACKED_FACTOR = 2
@@ -103,14 +104,19 @@ def layout_fractal_nn(scale):  # NN: addr = (n//16)*(alignRow*16) + (n%16)*c0 + 
 
 
 def gen_golden_data():
-    scale_k = align_up((K_SIZE + SCALE_CEIL_NUMBER - 1) // SCALE_CEIL_NUMBER, SCALE_ALIGN_NUMBER)
+    # MX Mmad needs K aligned to 64. Pad matrices/scale along K to k_align; the padded K-tail uses
+    # fp4 code 0 (== value 0.0) so it contributes nothing to the matmul, and scale_k follows k_align.
+    k_align = align_up(K_SIZE, K_ALIGN_NUMBER)
+    scale_k = align_up((k_align + SCALE_CEIL_NUMBER - 1) // SCALE_CEIL_NUMBER, SCALE_ALIGN_NUMBER)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
 
     rng = np.random.default_rng(2026)
-    x1_codes = rng.integers(0, 16, [BATCH_SIZE, M_SIZE, K_SIZE], dtype=np.uint8)
-    x2_codes = rng.integers(0, 16, [BATCH_SIZE, K_SIZE, N_SIZE], dtype=np.uint8)
+    x1_codes = np.zeros([BATCH_SIZE, M_SIZE, k_align], dtype=np.uint8)
+    x2_codes = np.zeros([BATCH_SIZE, k_align, N_SIZE], dtype=np.uint8)
+    x1_codes[:, :, :K_SIZE] = rng.integers(0, 16, [BATCH_SIZE, M_SIZE, K_SIZE], dtype=np.uint8)
+    x2_codes[:, :K_SIZE, :] = rng.integers(0, 16, [BATCH_SIZE, K_SIZE, N_SIZE], dtype=np.uint8)
     x1_scale_gm = rng.integers(127, 130, [BATCH_SIZE, M_SIZE, scale_k], dtype=np.uint8)
     x2_scale_gm = rng.integers(127, 130, [BATCH_SIZE, scale_k, N_SIZE], dtype=np.uint8)
 
@@ -118,10 +124,10 @@ def gen_golden_data():
     x2_mx = 2 ** (x2_scale_gm.astype(np.float64) - 127)
     x1_values = FP4_E1M2_VALUES[x1_codes]
     x2_values = FP4_E1M2_VALUES[x2_codes]
-    x1_full = np.zeros([BATCH_SIZE, M_SIZE, K_SIZE], dtype=np.float64)
-    x2_full = np.zeros([BATCH_SIZE, K_SIZE, N_SIZE], dtype=np.float64)
+    x1_full = np.zeros([BATCH_SIZE, M_SIZE, k_align], dtype=np.float64)
+    x2_full = np.zeros([BATCH_SIZE, k_align, N_SIZE], dtype=np.float64)
 
-    for k_idx in range(K_SIZE):
+    for k_idx in range(k_align):
         x1_full[:, :, k_idx] = x1_values[:, :, k_idx] * x1_mx[:, :, k_idx // SCALE_CEIL_NUMBER]
         x2_full[:, k_idx, :] = x2_values[:, k_idx, :] * x2_mx[:, k_idx // SCALE_CEIL_NUMBER, :]
 
