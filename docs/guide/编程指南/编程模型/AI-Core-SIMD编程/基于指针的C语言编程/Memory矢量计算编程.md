@@ -139,7 +139,7 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 
 如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。
 
-修改:更多的搬运能力参考API手册
+更多的搬运能力可参考API手册。
 
 ## 3. Memory数据计算
 
@@ -318,7 +318,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     asc_lock(PIPE_MTE3, mutex_id);
     asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);
-    asc_lock(PIPE_MTE3, mutex_id);
+    asc_unlock(PIPE_MTE3, mutex_id);
 }
 ```
 

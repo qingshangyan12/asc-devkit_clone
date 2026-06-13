@@ -89,7 +89,7 @@ AIV的内存层级如下：
 
 **图 3** Regbase编程总体结构
 
-![](../../../../figures/Regbase编程模型总体结构.png "RRegbase编程模型总体结构")
+![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
 
 ### VF函数与执行域
 
