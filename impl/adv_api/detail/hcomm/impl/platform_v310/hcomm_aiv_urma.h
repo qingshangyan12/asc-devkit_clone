@@ -336,7 +336,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
 #endif
 
     if constexpr (commit) {
-        st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa, 0));
+        st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
     }
     HcommUrmaDumpWqeCtx(sqeCtx);
     return HCOMM_SUCCESS;
