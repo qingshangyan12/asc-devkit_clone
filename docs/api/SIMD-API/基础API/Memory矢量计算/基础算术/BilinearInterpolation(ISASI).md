@@ -32,12 +32,16 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
 假设计算场景的输入如下：
 
--   src0 = \[1, 2, 3, ..., 512\]，共计512个half数据；
--   src0Offset = \[0, 32, 64, ..., 992\]，共计32个uint32数据；
--   src1 = \[2, 3, 4, ..., 33\]，共计32个half数据；
--   hRepeat=2；vRepeat=2；mask=128；vROffset=128。
+```text
+src0 = \[1, 2, 3, ..., 512\]，共计512个half数据；  
+src0Offset = \[0, 32, 64, ..., 992\]，共计32个uint32数据；  
+src1 = \[2, 3, 4, ..., 33\]，共计32个half数据；  
+hRepeat=2；vRepeat=2；mask=128；vROffset=128。  
+```
 
-1.  按DataBlock粒度，收集输入src0张量到临时Buffer。
+具体计算流程拆解分析如下：
+
+- 步骤1. 按DataBlock粒度，收集输入src0张量到临时Buffer。
 
     总共hRepeat \* vRepeat次迭代，每个迭代从输入的src0Offset读取8个偏移值，每个偏移值指向src0的一个DataBlock起始地址。
 
@@ -53,7 +57,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
         -   迭代2：sharedTmpBuffer\[256:383\] = \[257, 258, ..., 384\]；
         -   迭代3：sharedTmpBuffer\[384:511\] = \[385, 386, ..., 512\]；
 
-2.  将输入的张量src1进行广播填充。
+- 步骤2. 将输入的张量src1进行广播填充。
 
     调用[Brcb](../数据填充/Brcb.md)接口，每次迭代从输入张量src1中取8个数，填充到结果张量sharedTmpBuffer的8个DataBlock中（每个DataBlock的大小为32B）。
 
@@ -65,7 +69,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
         结果：sharedTmpBuffer\[512:1024\] = \[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, ..., 33, 33\]。
 
-3.  收集的src0张量与广播后的src1张量，调用[Mul](Mul.md)执行逐元素乘法，结果覆盖sharedTmpBuffer。
+- 步骤3. 收集的src0张量与广播后的src1张量，调用[Mul](Mul.md)执行逐元素乘法，结果覆盖sharedTmpBuffer。
 
     迭代计算次数：hRepeat \* vRepeat = 2 \* 2 = 4。
 
@@ -113,7 +117,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 
                 即sharedTmpBuffer\[384:511\] = \[385 \* 26, ..., 390 \* 26, 391 \* 27, ..., 512 \* 33\]；
 
-4.  水平迭代累加，输出到dst。
+- 步骤4. 水平迭代累加，输出到dst。
 
     调用[Add](Add.md)接口完成以下处理：
 
@@ -161,7 +165,7 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 | src0Offset | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
 | mask[]/mask | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | hRepeat | 输入 | 水平方向迭代次数，取值范围为[1, 255]。 |
-| repeatMode | 输入 | 迭代模式：<br>&bull; false：每次迭代src0读取的8个DataBlock中每个值均与src1的单个数值相乘。<br>&bull; true：每次迭代src0的每个DataBlock分别与src1的1个数值相乘，共消耗8个DataBlock和8个element。 |
+| repeatMode | 输入 | 迭代模式：<br>&bull; false：每次迭代src0读取的8个DataBlock中每个值均与src1的单个数值相乘。<br>&bull; true：每次迭代src0的每个DataBlock分别与src1的1个数值相乘，即1次迭代共消耗src0的8个DataBlock和src1的8个element。 |
 | dstBlkStride | 输入 | 单次迭代内，目的操作数不同DataBlock间地址步长，以32B为单位。 |
 | vROffset | 输入 | 垂直迭代间，目的操作数地址偏移量，以元素为单位，取值范围为[128, 65535)，vROffset * sizeof(T)需要保证32字节对齐。 |
 | vRepeat | 输入 | 垂直方向迭代次数，取值范围为[1, 255]。 |
@@ -204,12 +208,12 @@ BilinearInterpolation属于双目矢量类计算接口，核心通过水平迭�
 ## 约束说明<a name="section633mcpsimp"></a>
 
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
--   src0、src1、src0Offset之间不允许地址重叠。
--   两个垂直repeat的目的地址之间不允许地址重叠，vROffset的取值范围为\[128, 65535\)。
+-   src0、src1、src0Offset之间不允许地址重叠，且两个垂直repeat的目的地址之间不允许地址重叠。
+-   参数vROffset的取值范围为\[128, 65535\)。
 -   水平方向迭代次数，取值范围为\[1, 255\]。
 -   垂直方向迭代次数，取值范围为\[1, 255\]。
 -   输入的临时空间sharedTmpBuffer，空间大小要求请参考[sharedTmpBuffer空间说明](#sharedtmpbuffer空间说明)。
--   src0Offset的取值要求如下：
+-   参数src0Offset的取值要求如下：
     -   取值应保证src0元素类型位宽对齐。
     -   偏移地址后需要32字节对齐。
     -   偏移地址后不能超出UB大小数据的范围。
