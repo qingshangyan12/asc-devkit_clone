@@ -194,8 +194,19 @@ _extract_section() {
             }
             print
         }
-    ' "$_file" | sed '/^[[:space:]]*$/{ N; /^\n$/d }' | awk '
-        { lines[NR]=$0 } END { while(NR>0 && lines[NR]~/^[[:space:]]*$/) NR--; for(i=1;i<=NR;i++) print lines[i] }
+    ' "$_file" | awk '
+        /^[[:space:]]*$/ {
+            pending_blank=1
+            next
+        }
+        {
+            if (pending_blank && seen) {
+                print ""
+            }
+            pending_blank=0
+            seen=1
+            print
+        }
     '
 }
 
