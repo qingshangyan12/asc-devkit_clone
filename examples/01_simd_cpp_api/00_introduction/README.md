@@ -13,4 +13,4 @@
 | [02_matrix](./02_matrix) | 矩阵乘计算 |
 | [03_fusion_operation](./03_fusion_operation) | 融合计算 |
 | [04_reg_compute](./04_reg_compute) | 基于RegBase编程的向量计算 |
-| [05_simd_simt_hybrid](./05_simd_simt_hybrid) | SIMD与SIMT混合编程示例 |
+| [05_simd_simt_hybrid](./05_simd_simt_hybrid) | SIMD与SIMT混合编程示例 | 
