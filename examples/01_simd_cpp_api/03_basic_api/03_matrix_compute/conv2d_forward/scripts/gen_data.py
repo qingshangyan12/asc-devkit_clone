@@ -17,17 +17,23 @@ import numpy as np
 np.random.seed(19)
 
 BATCH = 4
-C1 = 1
-H = 4
-W = 4
 C0 = 16
-CIN = C1 * C0
+C1 = 2
+CIN = C1 * C0            # 32
+H = 9
+W = 9
 COUT = 16
-KH = 1
-KW = 1
-STRIDE = (1, 1)
-DILATION = (1, 1)
-PADDING = (0, 0, 0, 0)  # top, bottom, left, right
+KH = 3
+KW = 3
+STRIDE = (2, 2)
+DILATION = (2, 2)
+PADDING = (2, 2, 2, 2)   # top, bottom, left, right
+
+CUBE_BLOCK = 16
+
+
+def ceil_align(value, factor):
+    return (value + factor - 1) // factor * factor
 
 
 def conv2d_nhwc(x, weight, stride, dilation, padding):
@@ -56,6 +62,25 @@ def conv2d_nhwc(x, weight, stride, dilation, padding):
     return y
 
 
+def weight_to_cout_k(weight):
+    # weight: [Cout, Cin, KH, KW]，Cin = C1 * C0
+    # 经探针实测：dav-3510 img2col 在 A2 的 K 轴顺序为 (C1, KH, KW, C0)，
+    # 即 C1 在最外层、C0 在最内层：k = ((c1*KH + hk)*KW + wk)*C0 + c0。
+    # 输出 [Cout, K] 行优先，经 kernel 侧 Dn2Nz -> L1 NZ -> LoadData2D 转置 -> L0B 与 img2col 对齐。
+    cout, cin, kh, kw = weight.shape
+    k = cin * kh * kw
+    out = np.zeros((cout, k), dtype=np.float16)
+    for co in range(cout):
+        for c1 in range(C1):
+            for c0 in range(C0):
+                ci = c1 * C0 + c0
+                for hk in range(kh):
+                    for wk in range(kw):
+                        k_idx = ((c1 * kh + hk) * kw + wk) * C0 + c0
+                        out[co, k_idx] = weight[co, ci, hk, wk]
+    return out.reshape(-1)
+
+
 def gen_golden_data():
     fmap = np.random.uniform(-1, 1, (BATCH, H, W, CIN)).astype(np.float16)
     weight = np.random.uniform(-1, 1, (COUT, CIN, KH, KW)).astype(np.float16)
@@ -63,8 +88,10 @@ def gen_golden_data():
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
+    # FeatureMap 以 NHWC 顺序写盘，kernel 侧通过 Nd2Nz 转为 NC1HWC0。
     fmap.tofile("./input/x1_gm.bin")
-    weight.tofile("./input/x2_gm.bin")
+    # Weight 按 img2col 的 K 序排布为 [Cout, K] 行优先写盘。
+    weight_to_cout_k(weight).tofile("./input/x2_gm.bin")
     golden.tofile("./output/golden.bin")
 
 
