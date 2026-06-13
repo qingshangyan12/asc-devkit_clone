@@ -78,7 +78,7 @@ dst和src使用[TensorTrait](../../../基础数据结构/TensorTrait/TensorTrait
 |---|---|
 | T | 操作数数据类型。 |
 | U | scalarValue的数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码/掩码.md)。<br><cann-filter npu-type="950,310b">针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <cann-filter npu-type="950">Ascend 950PR/Ascend 950DT</cann-filter><br>&bull; <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品</cann-filter></cann-filter> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。<br><!-- npu="950,310b" id23 -->针对以下型号，tensor前n个数据计算API中的isSetMask参数不生效，保持默认值即可。<br>&bull; <!-- npu="950" id21 -->Ascend 950PR/Ascend 950DT<!-- end id21 --><br>&bull; <!-- npu="310b" id22 -->Atlas 200I/500 A2 推理产品<!-- end id22 --><!-- end id23 --> |
 
 **表 2**  参数说明
 

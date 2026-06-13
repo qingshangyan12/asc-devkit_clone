@@ -65,8 +65,8 @@ $dst_i = |src_i|$
 | 参数名 | 描述 |
 |---|---|
 | T | 操作数数据类型。 |
-| <cann-filter npu-type="950">U | tensor前n个复数计算接口中的源操作数数据类型。</cann-filter> |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
+| <!-- npu="950" id20 -->U | tensor前n个复数计算接口中的源操作数数据类型。<!-- end id20 --> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表 2**  参数说明
 
