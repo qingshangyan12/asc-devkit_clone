@@ -12,6 +12,74 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
+if(NOT TARGET tikicpulib::ascend610Lite)
+    find_library(ASCENDC_TIKICPULIB_610LITE_PEM
+        NAMES libpem_davinci.so
+        PATHS
+            ${ASCEND_CANN_PACKAGE_PATH}/*/simulator/Ascend610Lite/lib
+            ${ASCEND_CANN_PACKAGE_PATH}/*/simulator/dav_3102/lib
+        NO_CMAKE_SYSTEM_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+    if(NOT ASCENDC_TIKICPULIB_610LITE_PEM)
+        message(FATAL_ERROR "Failed to locate Ascend610Lite simulator libpem_davinci.so.")
+    endif()
+
+    get_filename_component(ASCENDC_TIKICPULIB_ROOT "${tikicpulib_DIR}/../.." ABSOLUTE)
+    unset(ASCENDC_TIKICPULIB_610LITE_CPUDEBUG CACHE)
+    find_library(ASCENDC_TIKICPULIB_610LITE_CPUDEBUG
+        NAMES libcpudebug.so
+        PATHS
+            ${ASCENDC_TIKICPULIB_ROOT}/lib/Ascend310B1
+            ${ASCENDC_TIKICPULIB_ROOT}/lib/Ascend950PR_9599
+        NO_CMAKE_SYSTEM_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+    if(NOT ASCENDC_TIKICPULIB_610LITE_CPUDEBUG)
+        message(FATAL_ERROR "Failed to locate a compatible cpudebug libcpudebug.so for Ascend610Lite.")
+    endif()
+
+    get_filename_component(ASCENDC_TIKICPULIB_610LITE_SIM_LIB_DIR "${ASCENDC_TIKICPULIB_610LITE_PEM}" DIRECTORY)
+    add_library(tikicpulib_ascend610Lite_interpreter INTERFACE)
+    target_compile_definitions(tikicpulib_ascend610Lite_interpreter INTERFACE
+        __CCE_AICORE__=310
+        __DAV_M310__
+        __NPU_ARCH__=3102
+        _GLIBCXX_USE_CXX11_ABI=0
+        __CCE_KT_TEST__=1
+        ASCENDC_CPU_DEBUG=1
+        ASCENDC_DEBUG=1
+    )
+    target_compile_options(tikicpulib_ascend610Lite_interpreter INTERFACE -std=c++17)
+    target_include_directories(tikicpulib_ascend610Lite_interpreter INTERFACE
+        ${ASCENDC_TIKICPULIB_ROOT}/lib/include
+        ${ASCENDC_TIKICPULIB_ROOT}/../../include
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/tikcpp/tikcfw
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/tikcpp/tikcfw/impl
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/tikcpp/tikcfw/interface
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/ascendc/include/highlevel_api/lib
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/ascendc/include/highlevel_api/impl
+        ${ASCENDC_TIKICPULIB_ROOT}/../../compiler/ascendc/include/highlevel_api/lib/matmul
+        ${ASCENDC_TIKICPULIB_ROOT}/../../include/base
+    )
+    target_link_directories(tikicpulib_ascend610Lite_interpreter INTERFACE
+        ${ASCENDC_TIKICPULIB_ROOT}/lib
+        ${ASCENDC_TIKICPULIB_610LITE_SIM_LIB_DIR}
+        ${ASCENDC_TIKICPULIB_ROOT}/../../lib64
+    )
+    target_link_libraries(tikicpulib_ascend610Lite_interpreter INTERFACE
+        -Wl,-Bdynamic,--no-as-needed
+        c_sec
+        -lpem_davinci
+        ${ASCENDC_TIKICPULIB_610LITE_CPUDEBUG}
+        cpudebug_stubreg
+        cpudebug_cceprint
+        cpudebug_npuchk
+        -Wl,--as-needed
+    )
+    add_library(tikicpulib::ascend610Lite ALIAS tikicpulib_ascend610Lite_interpreter)
+endif()
+
 add_subdirectory(ascendc_header_checker)
 
 add_subdirectory(ascendc_host_header_checker)
@@ -24,6 +92,7 @@ set(BASIC_UT_PRODUCT_TYPE_LIST_INIT
     ascend910B1_AIV
     ascend910B1_AIV_MSTX
     ascend310B1
+    ascend610Lite
     ascend950pr_9599_AIC
     ascend950pr_9599_AIV_BASIC
     ascend950pr_9599_AIV_FRAMEWORK
@@ -92,9 +161,8 @@ file(GLOB ASCENDC_TEST_ascend310B1_CASE_SRC_FILES
 )
 
 # ascend610Lite test cases
-file(GLOB ASCENDC_TEST_ascend610Lite_CASE_SRC_FILES
-    ascendc_case_common/test_kernel_pop_stack_buffer.cpp
-    ascendc_case_ascend610lite/*.cpp
+set(ASCENDC_TEST_ascend610Lite_CASE_SRC_FILES
+    ascendc_case_ascend610lite/test_m310_coverage.cpp
 )
 
 # ascend950pr_9599 basic test cases
