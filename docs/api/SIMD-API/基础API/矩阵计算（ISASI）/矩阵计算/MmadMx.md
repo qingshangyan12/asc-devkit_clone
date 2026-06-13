@@ -17,7 +17,7 @@
 
 ## 功能说明
 
-头文件路径为：\#include "basic\_api/kernel\_operator\_mm\_intf.h"。
+头文件路径为：`#include "basic_api/kernel_operator_mm_intf.h"`。
 
 MmadMx（全称Microscaling Mmad）为带有量化系数的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。MmadMx场景中，左量化系数矩阵与左矩阵乘积，右量化系数矩阵与右矩阵乘积，对两个乘积的结果做矩阵乘法。
 
@@ -85,6 +85,7 @@ MmadMx的计算公式为：C=(scaleA⊗A)*(scaleB⊗B)+Bias，“⊗”表示广
   template <typename T, typename U, typename S>
   __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
   ```
+
 - 传入bias
 
   ```cpp
