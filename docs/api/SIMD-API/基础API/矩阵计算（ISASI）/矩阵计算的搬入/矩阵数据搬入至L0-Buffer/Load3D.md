@@ -428,6 +428,16 @@ Load3D会自动完成分形的变换，从L1 Buffer上的NZ分形排布转换成
 
 </cann-filter>
 
+<cann-filter npu_type="950">
+
+针对Ascend 950PR/Ascend 950DT：
+
+L1 Buffer上的分形排布就是L0A Buffer中所需的NZ分形排布，Load3D不会进行分形排布转换，如下b16类型场景的示意图所示：
+
+![](../../../../../figures/load3d_l1tol0a_b16_nontrans_950.png)
+
+</cann-filter>
+
 **转置场景：**
 
 <cann-filter npu-type = "A3,910b">
@@ -470,6 +480,42 @@ L1 Buffer->L0B Buffer通路下，Load3D接口会自动完成转置，不需要�
 
 </cann-filter>
 
+<cann-filter npu_type="950">
+
+针对Ascend 950PR/Ascend 950DT：
+
+Load3D在b8/b16/b32数据类型下均支持转置，其中，L1 Buffer->L0A Buffer通路通过开启enTranspose参数开启转置，L1 Buffer->L0B Buffer通路下会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效。下面按照类型详细说明。
+
+**L1 Buffer->L0A Buffer通路：**
+
+对于b8场景：每个分形大小是16×32，转置场景下，2个连续的16×32的分形拼接为一个32×32的方块矩阵，再进行转置并拆分为2个16×32的分形，转置示意图如下：
+
+![](../../../../../figures/load3d_l1tol0a_b8_trans_950.png)
+
+对于b16场景：每个分形大小是16×16，转置场景下，除了每个分形矩阵自身会被转置，每个分形矩阵在整个二维特征图中的位置也会被转置，转置示意图如下：
+
+![](../../../../../figures/load3d_l1tol0a_b16_trans_950.png)
+
+对于b32场景：每个分形大小是16×8，转置场景示意图如下：
+
+![](../../../../../figures/load3d_l1tol0a_b32_trans_950.png)
+
+**L1 Buffer->L0B Buffer通路：** 该通路下，Load3D接口会自动完成转置，不需要配置enTranspose参数，enTranspose参数此时无效。
+
+b8场景示意图如下：
+
+![](../../../../../figures/load3d_l1tol0b_b8_trans_950.png)
+
+b16场景示意图如下：
+
+![](../../../../../figures/load3d_l1tol0b_b16_trans_950.png)
+
+b32场景示意图如下：
+
+![](../../../../../figures/load3d_l1tol0b_b32_trans_950.png)
+
+</cann-filter>
+
 ### Repeat Mode<a id="zh-cn_topic_0000002512171652_section131671145123912"></a>
 
 Load3D可以通过配置mExtension和kExtension来完成多个方向的数据块搬运，我们把这里的多块数据的搬运看成一次迭代，Load3D支持通过配置repeat mode，能实现在M方向(height)或者K方向(width)进行repeat搬运，也就是说，调用一次Load3D接口可以完成多次迭代的数据搬运，如下图所示，其中repeatStride和repeatTime还有沿哪个方向repeat，我们通过SetLoadDataRepeat配置。
@@ -505,6 +551,28 @@ K方向repeat示意图：
 同样的，当我们调用Load3D指令在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3。
 
 ![](../../../../../figures/load3d_repeatmode_k_trans.png)
+
+</cann-filter>
+
+<cann-filter npu_type="950">
+
+针对Ascend 950PR/Ascend 950DT：
+
+**M方向repeat示意图：**
+
+![](../../../../../figures/load3d_repeatmode_m_950.png)
+
+同样的，当我们调用Load3D指令在M方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在M方向进行repeat搬运时的转置示意图，其中repeatMode=0，repeatStride=2，repeatTime=3，dstStride=3。
+
+![](../../../../../figures/load3d_repeatmode_m_trans_950.png)
+
+**K方向repeat示意图：**
+
+![](../../../../../figures/load3d_repeatmode_k_950.png)
+
+同样的，当我们调用Load3D指令在K方向进行repeat搬运时，如果我们开启转置，则重复过程中的所有分块矩阵也将被视为一个整体大矩阵，并按照我们前文所述的转置场景进行处理。以b32场景为例，下图给出了在K方向进行repeat搬运时的转置示意图，其中repeatMode=1，repeatStride=2，repeatTime=3，dstStride=3。
+
+![](../../../../../figures/load3d_repeatmode_k_trans_950.png)
 
 </cann-filter>
 

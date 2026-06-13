@@ -102,7 +102,36 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 
 ## 约束说明
 
-无
+- 本接口通过软件仿真实现，首先会进行数据分形的转换，然后再通过搬运指令进行数据的搬运。
+- 本接口内部会申请一块临时的UB空间用于数据分形的转换，开发者无需申请，但是需要预留临时空间的大小，空间大小计算公式如下（单位为字节）：
+
+$$((dValue \times sizeof(T) / 32 - 1) \times dstNzC0Stride + (nValue - 1) \times dstNzNStride + 1) \times 32$$
+
+- 本接口仅支持配置ndNum为1。
+- 位于Unified Buffer的源地址必须32字节对齐，位于L1 Buffer的目的地址必须32字节对齐。
+- Nd2NzParams结构体参数ndNum、nValue、dValue设置不能为0。
+- 搬运至L1 Buffer的数据不能重叠，如果存在重叠写入，硬件不会产生任何警告或错误，并且不保证重叠数据的写入顺序。
+
+<cann-filter npu_type="950">
+
+- 针对Ascend 950PR/Ascend 950DT，支持ub->L1的1:2硬通道的方式；同时提供1:1的兼容模式，解决A2/A3的代码迁移兼容问题，这种模式走Global Memory进行中转，效率稍低。
+
+</cann-filter>
+
+- Nd2NzParams结构体参数的值需在取值范围内，参数取值范围如[表4](#table_ub_nd2nz_range)所示。
+
+**表 4**  Nd2NzParams结构体参数取值范围<a id="table_ub_nd2nz_range"></a>
+
+|参数名称|取值范围|
+|----------|----------|
+|ndNum|[1]|
+|nValue|[1, 16384]|
+|dValue|[1, 65535]|
+|srcNdMatrixStride|[0, 65535]|
+|srcDValue|[1, 65535]|
+|dstNzC0Stride|[1, 16384]|
+|dstNzNStride|[1, 16384]|
+|dstNzMatrixStride|[0, 65535]|
 
 ## 调用示例<a id="section10309141400"></a>
 
