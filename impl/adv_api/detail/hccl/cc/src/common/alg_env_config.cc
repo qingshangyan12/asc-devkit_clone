@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include <limits>
 
 #include "log.h"
 #include "adapter_error_manager_pub.h"
@@ -85,6 +86,13 @@ HcclResult ParseExecTimeout()
     double execTimeOut = 0;
     if (SalStrToDouble(execTimeOutEnv, execTimeOut) != HCCL_SUCCESS) {
         HCCL_WARNING("[ParseExecTimeout] HCCL_EXEC_TIMEOUT[%s] parse failed, use default.",
+            execTimeOutEnv.c_str());
+        g_algEnvConfig.execTimeOutSet = false;
+        g_algEnvConfig.execTimeout = 0;
+        return HCCL_E_PARA;
+    }
+    if (execTimeOut > std::numeric_limits<uint32_t>::max()) {
+        HCCL_WARNING("[ParseExecTimeout] HCCL_EXEC_TIMEOUT[%s] is too large, use default.",
             execTimeOutEnv.c_str());
         g_algEnvConfig.execTimeOutSet = false;
         g_algEnvConfig.execTimeout = 0;

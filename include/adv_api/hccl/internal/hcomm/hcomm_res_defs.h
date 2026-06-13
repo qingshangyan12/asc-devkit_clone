@@ -23,7 +23,8 @@ extern "C" {
 static const uint32_t COMM_ADDR_EID_LEN = 16U;
 static const uint32_t HCOMM_CHANNEL_MAGIC_WORD = 0x0fcf0f0fU;
 static const uint32_t HCOMM_CHANNEL_VERSION_ONE = 1U;
-static const uint32_t HCOMM_CHANNEL_VERSION = HCOMM_CHANNEL_VERSION_ONE;
+/** ABI v2: add protocol-independent communication domain qos after the union. */
+static const uint32_t HCOMM_CHANNEL_VERSION = 2U;
 
 typedef int32_t HcommResult;
 
@@ -78,6 +79,7 @@ typedef enum {
     COMM_PROTOCOL_UBC_CTP = 4,    ///< 华为统一总线UBC_CTP
     COMM_PROTOCOL_UBC_TP = 5,     ///< 华为统一总线UBC_TP
     COMM_PROTOCOL_UB_MEM = 6,     ///< UB_MEM
+    COMM_PROTOCOL_UBOE = 7,       ///< UBoE
 } CommProtocol;
 
 /**
@@ -188,6 +190,8 @@ typedef enum {
 /**
  * @brief 通道描述参数
  * @note 结构体末尾扩展需要自增版本号，并补充兼容处理逻辑。
+ *       ABI v1: HCOMM_CHANNEL_VERSION_ONE, no trailing qos field.
+ *       ABI v2: HCOMM_CHANNEL_VERSION, add uint32_t qos after the union.
  */
 typedef struct {
     CommAbiHeader header;            ///< ABI头部，包含版本等信息
@@ -207,12 +211,20 @@ typedef struct {
             uint32_t retryInterval;  ///< 重传间隔（ms）
             uint8_t tc;              ///< 流量类别（QoS)
             uint8_t sl;              ///< 服务等级（QoS)
+            uint32_t qpThreshold;    ///< 多QP场景下，每个QP最小数据量(B)
         } roceAttr;
         struct {
             uint32_t qos;            ///< HCCS QoS
         } hccsAttr;
+        struct {
+            uint32_t sqDepth;        ///< UB队列深度，0表示使用默认值
+        } ubAttr;
     };
+    uint32_t qos;                    ///< 通信域QoS，与协议解耦
 } HcommChannelDesc;
+
+/** v1 descriptor size without the trailing qos field, used for ABI compatibility checks. */
+#define HCOMM_CHANNEL_DESC_ABI_V1_SIZE (offsetof(HcommChannelDesc, qos))
 
 /**
  * @brief 初始化EndpointDesc结构体

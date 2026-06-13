@@ -35,8 +35,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/wrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aiv
     # ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/hostdpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/topo
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/interface_graph_mode
@@ -47,8 +45,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aicpu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/reduce_scatter/template/ccu/kernel
 
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/executor
@@ -56,8 +52,6 @@ set(INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aicpu
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/aiv
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu
-    ${CMAKE_CURRENT_SOURCE_DIR}/ops/all_gather/template/ccu/kernel
 )
 
 

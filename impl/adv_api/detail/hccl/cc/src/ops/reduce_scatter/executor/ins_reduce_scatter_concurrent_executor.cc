@@ -12,11 +12,6 @@
 #include "ins_reduce_scatter_concurrent_executor.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_temp_reduce_scatter_mesh_1D.h"
-#ifndef AICPU_COMPILE
-#include "ccu_temp_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D_mem2mem.h"
-#include "ccu_temp_reduce_scatter_mesh_1D.h"
-#endif
 namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
@@ -109,21 +104,7 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
                            channelDescs0.size(), channelDescs1.size()),
                 HcclResult::HCCL_E_INTERNAL);
 
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
-        resourceRequest.ccuKernelNum.insert(resourceRequest.ccuKernelNum.end(),
-                                            temp0ResReq.ccuKernelNum.begin(),
-                                            temp0ResReq.ccuKernelNum.end());
-        resourceRequest.ccuKernelNum.insert(resourceRequest.ccuKernelNum.end(),
-                                            temp1ResReq.ccuKernelNum.begin(),
-                                            temp1ResReq.ccuKernelNum.end());
-        // 将两个合并
-        resourceRequest.ccuKernelInfos.insert(resourceRequest.ccuKernelInfos.end(),
-                                                temp0ResReq.ccuKernelInfos.begin(),
-                                                temp0ResReq.ccuKernelInfos.end());
-        resourceRequest.ccuKernelInfos.insert(resourceRequest.ccuKernelInfos.end(),
-                                                temp1ResReq.ccuKernelInfos.begin(),
-                                                temp1ResReq.ccuKernelInfos.end());
-    } else if (param.engine == CommEngine::COMM_ENGINE_AICPU) {
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU) {
         resourceRequest.channels.resize(1);
         resourceRequest.channels[0].insert(resourceRequest.channels[0].end(), channelDescs0.begin(),
                                             channelDescs0.end());
@@ -170,11 +151,7 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
     templateAlgResforTemp0.threads = temp0Threads_; // 这里用重新算出的thream计算
     TemplateResource templateAlgResforTemp1;
     templateAlgResforTemp1.threads = temp1Threads_;
-    if (param.engine == CommEngine::COMM_ENGINE_CCU) {
-        // CCU模式处理逻辑
-        templateAlgResforTemp0.ccuKernels.push_back(resCtx.ccuKernels[0]);
-        templateAlgResforTemp1.ccuKernels.push_back(resCtx.ccuKernels[1]);
-    } else if (param.engine == CommEngine::COMM_ENGINE_AIV) {
+    if (param.engine == CommEngine::COMM_ENGINE_AIV) {
             // AIV模式
             templateAlgResforTemp0.aivCommInfoPtr = resCtx.aivCommInfoPtr;
             templateAlgResforTemp1.aivCommInfoPtr = resCtx.aivCommInfoPtr;
@@ -363,10 +340,4 @@ HcclResult InsReduceScatterConcurrentExecutor<AlgTopoMatch, InsAlgTemplate0, Ins
 
 REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterConcurrentMeshNHR, InsReduceScatterConcurrentExecutor, TopoMatchUBX,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR);
-#ifndef AICPU_COMPILE
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterConcurrentMeshNHRSche, InsReduceScatterConcurrentExecutor, TopoMatchUBX,
-    CcuTempReduceScatterMesh1DMem2Mem, CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
-REGISTER_EXECUTOR_BY_TWO_TEMPS(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuReduceScatterConcurrentMeshNHRMs, InsReduceScatterConcurrentExecutor, TopoMatchUBX,
-    CcuTempReduceScatterMesh1D, CcuTempReduceScatterNhrMultiJettyMem2Mem1D);
-#endif
 }
