@@ -2,23 +2,46 @@
 
 ## 产品支持情况<a id="zh-cn_topic_0000002566886667_section796754519912"></a>
 
-| 产品 | 是否支持 |
-| ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：不支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
+<!-- npu="x90" id8 -->
+- Kirin X90：不支持
+<!-- end id8 -->
+<!-- npu="9030" id9 -->
+- Kirin 9030：不支持
+<!-- end id9 -->
 
 ## 功能说明<a id="zh-cn_topic_0000002566886667_section106841136114319"></a>
 
 头文件路径为：basic_api/kernel_operator_data_copy_intf.h。
 
 DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动到BiasTable Buffer。
+
+<!-- npu="910b,A3" id10 -->
+针对Atlas A2 训练系列产品/Atlas A2 推理系列产品和Atlas A3 训练系列产品/Atlas A3 推理系列产品，Bias Table Buffer总大小为1KB。
+<!-- end id10 -->
+<!-- npu="950" id11 -->
+针对Ascend 950PR/Ascend 950DT，Bias Table Buffer总大小为4KB。
+<!-- end id11 -->
 
 ## 函数原型<a id="zh-cn_topic_0000002566886667_section82039854412"></a>
 
@@ -71,32 +94,26 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
 ## 数据类型<a id="zh-cn_topic_0000002566886667_section4219135304818"></a>
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id12 -->
 针对Ascend 950PR/Ascend 950DT，不同参数支持数据类型不一样，具体请参考如下：
 
 - src支持的数据为：half、bfloat16_t、int32_t、float；
 - dst支持的数据为：int32_t、float。
+<!-- end id12 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "A3">
-
+<!-- npu="A3" id13 -->
 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，不同参数支持数据类型不一样，具体请参考如下：
 
 - src支持的数据为：half、int32_t、float；
 - dst支持的数据为：int32_t、float。
+<!-- end id13 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
+<!-- npu="910b" id14 -->
 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，不同参数支持数据类型不一样，具体请参考如下：
 
 - src支持的数据为：half、int32_t、float；
 - dst支持的数据为：int32_t、float。
-
-</cann-filter>
+<!-- end id14 -->
 
 ## 返回值说明
 
@@ -111,30 +128,20 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 - 当dst位于BiasTable Buffer时，blockLen单位为64字节，dstGap单位为32字节。
 - blockLen对不同型号单位不一样，具体请参考如下：
 
-    <cann-filter npu-type = "A3,910b">
-    
+    <!-- npu="A3,910b" id15 -->
     - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，单位为64字节。
-    
-    </cann-filter>
-    
-    <cann-filter npu-type = "950">
-    
+    <!-- end id15 -->
+    <!-- npu="950" id16 -->
     - 针对Ascend 950PR/Ascend 950DT，单位为32字节，blockLen必须为偶数。
-    
-    </cann-filter>
+    <!-- end id16 -->
 - dstGap对不同型号单位不一样，具体请参考如下：
-    
-    <cann-filter npu-type = "A3,910b">
-    
+
+    <!-- npu="A3,910b" id17 -->
     - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品，单位为64字节。
-    
-    </cann-filter>
-    
-    <cann-filter npu-type = "950">
-    
+    <!-- end id17 -->
+    <!-- npu="950" id18 -->
     - 针对Ascend 950PR/Ascend 950DT，单位为32字节。
-    
-    </cann-filter>
+    <!-- end id18 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002566886667_section088124295117"></a>
 
