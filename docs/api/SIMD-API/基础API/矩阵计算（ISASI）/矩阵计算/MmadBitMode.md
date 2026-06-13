@@ -17,7 +17,7 @@
 
 ## 功能说明
 
-头文件路径为：\#include "basic\_api/kernel\_operator\_mm\_intf.h"。
+头文件路径为：`#include "basic_api/kernel_operator_mm_intf.h"`。
 
 MmadBitMode对于MmadParams结构体构造进行了优化，本接口适用于scalar流水成为性能优化瓶颈的场景，支持基础Mmad/MmadMx计算功能。本接口与Mmad/MmadMx接口的差异在于参数传入的方式不同，本接口传入的是联合结构体MmadBitModeParams。MmadBitModeParams类参数设计思想说明：
 
@@ -46,6 +46,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
   template <typename T, typename U, typename S>
   __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
   ```
+
 - 传入bias
 
   ```cpp
