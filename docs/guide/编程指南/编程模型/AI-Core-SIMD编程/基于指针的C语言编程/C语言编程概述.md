@@ -237,48 +237,44 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <td><p><strong>机制一</strong>: 通过锁定指定流水再释放流水来完成流水间的同步依赖。用于核内异步流水之间的同步处理，其功能类似于传统CPU中的锁机制。该同步机制为Ascend 950PR/Ascend 950DT新引入机制，相较于notify/wait方式使用更简便。</p></td>
 <td><code>asc_lock</code> / <code>asc_unlock</code></td>
 <td>
-<pre><code>
-uint8_t mutex_id = 1;
-
-asc_lock(PIPE_MTE2, mutex_id);
-asc_copy_gm2ub((__ubuf__ void*)src0, ...);
-asc_unlock(PIPE_MTE2, mutex_id);
-
-asc_lock(PIPE_V, mutex_id);
-asc_add(shared_buffer, x_local, y_local);
-asc_unlock(PIPE_V, mutex_id);
-</code></pre>
-</td>
+        <code>uint8_t mutex_id = 1;</code><br>
+        <code></code><br>
+        <code>asc_lock(PIPE_MTE2, mutex_id);</code><br>
+        <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
+        <code>asc_unlock(PIPE_MTE2, mutex_id);</code><br>
+        <code></code><br>
+        <code>asc_lock(PIPE_V, mutex_id);</code><br>
+        <code>asc_add(shared_buffer, x_local, y_local);</code><br>
+        <code>asc_unlock(PIPE_V, mutex_id);</code>
+      </td>
 </tr>
 <tr>
 <td><p><strong>机制二</strong>: 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。</p></td>
 <td><code>asc_sync_notify</code> / <code>asc_sync_wait</code></td>
 <td>
-<pre><code>
-asc_copy_gm2ub((__ubuf__ void*)src0, ...);
-asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_add(dst, src1, src0, total_length);</code></pre>
-</td>
+        <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
+        <code>asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);</code><br>
+        <code>asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);</code><br>
+        <code>asc_add(dst, src1, src0, total_length);</code>
+      </td>
 </tr>
 <tr>
 <td><strong>单流水同步</strong></td>
 <td><p>等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。</p></td>
 <td><code>asc_sync_pipe</code> / <code>asc_sync_*</code></td>
 <td>
-<pre><code>
-asc_add(dst, src1, src0, total_length);
-asc_sync_pipe(PIPE_V);
-asc_sub(dst, dst, src0, total_length);</code></pre>
-</td>
+        <code>asc_add(dst, src1, src0, total_length);</code><br>
+        <code>asc_sync_pipe(PIPE_V);</code><br>
+        <code>asc_sub(dst, dst, src0, total_length);</code>
+      </td>
 </tr>
 <tr>
 <td><strong>内存访问顺序控制</strong></td>
 <td><p>等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。</p></td>
 <td><code>asc_sync_data_barrier</code></td>
 <td>
-<pre><code>asc_sync_data_barrier(mem_dsb_t::DSB_ALL);</code></pre>
-</td>
+        <code>asc_sync_data_barrier(mem_dsb_t::DSB_ALL);</code>
+      </td>
 </tr>
 </tbody>
 </table>
@@ -348,8 +344,8 @@ asc_sub(dst, dst, src0, total_length);</code></pre>
     <tr>
       <td><strong>单个AI Core内两个AIV间同步</strong></td>
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
-      <td> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。 </td>
-      <td> 该功能当前C语言编程路径暂不支持，后续版本将提供支持。</td>
+      <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code> </td>
+      <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code></td>
     </tr>
   </tbody>
 </table>
