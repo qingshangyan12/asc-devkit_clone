@@ -51,10 +51,16 @@ set(GEN_TILING_SCRIPT ${ASCENDC_DIR}/impl/adv_api/cmake/scripts/gen_kernel_tilin
 set(TILING_DEF_DIR ${ASCENDC_DIR}/include/adv_api)
 set(KERNEL_TILING_FILE ${CMAKE_BINARY_DIR}/kernel_tiling/kernel_tiling.h)
 
+# asc-comm 迁出后，hccl 的 *tilingdata.h 不再位于 include/adv_api 下。生成 kernel_tiling.h 时
+# 需额外扫描 asc-comm 头(由 cmake/third_party/asc-comm.cmake 软链到 build/asc_comm_headers/hccl)，
+# 否则缺失 Mc2InitTiling/Mc2CcTiling，导致 UT 编译 hccl_tiling.h 失败。与 impl/adv_api/
+# gen_kernel_tiling.cmake 的生成命令保持一致。
+set(ASC_COMM_TILING_SCAN_DIR ${CMAKE_BINARY_DIR}/asc_comm_headers/hccl)
+
 if (NOT EXISTS "${KERNEL_TILING_FILE}")
     add_custom_command(
         OUTPUT ${KERNEL_TILING_FILE}
-        COMMAND ${Python3_EXECUTABLE} ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR} ${KERNEL_TILING_FILE}
+        COMMAND ${Python3_EXECUTABLE} ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR} ${KERNEL_TILING_FILE} ${ASC_COMM_TILING_SCAN_DIR}
         DEPENDS ${GEN_TILING_SCRIPT} ${TILING_DEF_DIR}
         COMMENT "Generating kernel tiling configuration header"
     )

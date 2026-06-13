@@ -26,6 +26,9 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
     ${ASCENDC_DIR}/impl/simt_api
+    # asc-comm 迁出后，kernel_api.h 在 __NPU_ARCH__==3510 时引用 hccl/*、hcomm/* 头，
+    # 由 cmake/third_party/asc-comm.cmake 暴露的搜索根解析(hccl->mc2, hcomm->hcomm 软链)。
+    ${ASC_COMM_HEADER_INCLUDE_DIR}
 )
 
 # # ================ simt_api kernel ut ================
