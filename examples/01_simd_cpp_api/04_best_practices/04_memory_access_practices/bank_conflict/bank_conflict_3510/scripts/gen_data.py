@@ -74,14 +74,14 @@ def gen_golden_debug_512():
 def gen_golden_gather(case, repeat=1):
     N = 256
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    if case == 8:
-        indices = np.tile(np.arange(8, dtype=np.uint32), N // 8)[:N]
+    if case == 9:
+        indices = np.zeros(N, dtype=np.uint32)
     elif case == 10:
+        indices = np.tile(np.arange(8, dtype=np.uint32), N // 8)[:N]
+    elif case == 12:
         indices = np.empty(N, dtype=np.uint32)
         indices[::2] = 0
         indices[1::2] = 128
-    elif case == 11:
-        indices = np.zeros(N, dtype=np.uint32)
     else:
         indices = np.arange(N, dtype=np.uint32)
 
@@ -95,20 +95,27 @@ def gen_golden_gather(case, repeat=1):
 
 
 def gen_golden_data(case=1, repeat=1):
-    if case in (1, 2, 3):              # AddVF, AddSingleVF, AddVF offset
-        x, y, golden = gen_golden_add()
-    elif case == 4:                     # AddVF overlap
-        x, y, golden = gen_golden_overlap()
-    elif case == 5:                     # AddWithInstrLoadVF
-        x, y, golden = gen_golden_dintlv()
-    elif case in (6, 7):                  # AddsVF (4096)
+    # 一读一写：Case 1(无冲突基线), Case 2(读写冲突)
+    if case in (1, 2):
         x, y, golden = gen_golden_adds()
-    elif case == 12:                      # AddsVFWithStride1 (512)
-        x, y, golden = gen_golden_adds_512()
-    elif case == 13:                      # AddsVFWithStride2 (512, debug)
-        x, y, golden = gen_golden_debug_512()
-    elif case in (8, 9, 10, 11):       # GatherAndScatterVF
+    # 二读一写 dst=src0+src1：Case 3(全冲突基准), Case 4(消除读读), Case 5(消除读写), Case 7(全冲突+展开)
+    elif case in (3, 4, 5, 7):
+        x, y, golden = gen_golden_add()
+    # 二读一写 地址重叠(完全不冲突)：Case 6
+    elif case == 6:
+        x, y, golden = gen_golden_overlap()
+    # 二读一写 双搬入 DINTLV：Case 8
+    elif case == 8:
+        x, y, golden = gen_golden_dintlv()
+    # 离散访存 Gather/Scatter：Case 9-12
+    elif case in (9, 10, 11, 12):
         x, y, golden = gen_golden_gather(case, repeat)
+    # 一读一写 stride=1：Case 13
+    elif case == 13:
+        x, y, golden = gen_golden_adds_512()
+    # 一读一写 stride=8 debug：Case 14
+    elif case == 14:
+        x, y, golden = gen_golden_debug_512()
     else:
         raise ValueError(f"Unknown case: {case}")
 

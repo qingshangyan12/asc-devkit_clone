@@ -4,37 +4,7 @@
 #include "kernel_operator.h"
 
 #if CASE_NUM == 1
-// 既有读写冲突又有读读冲突（基准）
-constexpr uint32_t TOTAL_LENGTH = 4096;
-constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
-using T1 = float;
-using T2 = float;
-using T3 = float;
-#define USED_VF AddVF
-#elif CASE_NUM == 2
-// Case 1 的无循环展开版本，用于对比展开对 bank 冲突的影响
-constexpr uint32_t TOTAL_LENGTH = 4096;
-constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
-using T1 = float;
-using T2 = float;
-using T3 = float;
-#define USED_VF AddSingleVF
-#elif CASE_NUM == 3
-// 二读一写，地址偏移消除读读冲突
-constexpr uint32_t TOTAL_LENGTH = 4096;
-constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4100;
-constexpr uint32_t zLocalAddr = 0x8900;
-using T1 = float;
-using T2 = float;
-using T3 = float;
-#define USED_VF AddVF
-#elif CASE_NUM == 4
-// 地址重叠，读指令减半
+// 一读一写，无冲突基线：src0=bank0, dst=bank1
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -42,19 +12,9 @@ constexpr uint32_t zLocalAddr = 0x4100;
 using T1 = float;
 using T2 = float;
 using T3 = float;
-#define USED_VF AddVF
-#elif CASE_NUM == 5
-// 双搬入 DINTLV_B32
-constexpr uint32_t TOTAL_LENGTH = 4096;
-constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
-using T1 = float;
-using T2 = float;
-using T3 = float;
-#define USED_VF AddWithInstrLoadVF
-#elif CASE_NUM == 6
-// 一读一写，同 bank 读写冲突
+#define USED_VF AddsVF
+#elif CASE_NUM == 2
+// 一读一写，读写冲突：src0/dst 同 bank=0
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -63,8 +23,38 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #define USED_VF AddsVF
-#elif CASE_NUM == 7
-// 一读一写，消除读写冲突
+#elif CASE_NUM == 3
+// 二读一写，全冲突(读读+读写)基准：src0/src1/dst 同 bank=0，无循环展开
+constexpr uint32_t TOTAL_LENGTH = 4096;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x4000;
+constexpr uint32_t zLocalAddr = 0x8000;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddSingleVF
+#elif CASE_NUM == 4
+// 二读一写，消除读读冲突：src0=bank0, src1=bank1, dst=bank1
+constexpr uint32_t TOTAL_LENGTH = 4096;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x4100;
+constexpr uint32_t zLocalAddr = 0x8900;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddVF
+#elif CASE_NUM == 5
+// 二读一写，消除读写冲突：src0=bank0, src1=bank0, dst=bank1
+constexpr uint32_t TOTAL_LENGTH = 4096;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x4000;
+constexpr uint32_t zLocalAddr = 0x8100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddVF
+#elif CASE_NUM == 6
+// 二读一写，地址重叠完全不冲突：src0=src1=bank0, dst=bank1
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -72,19 +62,29 @@ constexpr uint32_t zLocalAddr = 0x4100;
 using T1 = float;
 using T2 = float;
 using T3 = float;
-#define USED_VF AddsVF
-#elif CASE_NUM == 8
-// 离散访存冲突：idx [0..7] 重复
-constexpr uint32_t TOTAL_LENGTH = 256;
+#define USED_VF AddVF
+#elif CASE_NUM == 7
+// 二读一写，全冲突 + 循环展开：同 Case 3 地址，循环展开优化
+constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x0400;
-constexpr uint32_t zLocalAddr = 0x0400;
-using T1 = uint32_t;
+constexpr uint32_t yLocalAddr = 0x4000;
+constexpr uint32_t zLocalAddr = 0x8000;
+using T1 = float;
 using T2 = float;
 using T3 = float;
-#define USED_VF GatherAndScatterVF
+#define USED_VF AddVF
+#elif CASE_NUM == 8
+// 二读一写，双搬入 DINTLV_B32 交织读取
+constexpr uint32_t TOTAL_LENGTH = 4096;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x4000;
+constexpr uint32_t zLocalAddr = 0x8000;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddWithInstrLoadVF
 #elif CASE_NUM == 9
-// 离散访存无冲突：idx 连续 [0..255]
+// 离散访存基准：idx 全 0，同地址合并为单次读取
 constexpr uint32_t TOTAL_LENGTH = 256;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0400;
@@ -94,7 +94,7 @@ using T2 = float;
 using T3 = float;
 #define USED_VF GatherAndScatterVF
 #elif CASE_NUM == 10
-// 离散访存 subbank 冲突：idx [0,128] 交替
+// 离散访存：idx [0..7] 重复，同地址合并读取
 constexpr uint32_t TOTAL_LENGTH = 256;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0400;
@@ -104,7 +104,7 @@ using T2 = float;
 using T3 = float;
 #define USED_VF GatherAndScatterVF
 #elif CASE_NUM == 11
-// 离散访存无 subbank 冲突：idx 全 0，全部 coalesce
+// 离散访存：idx 连续 [0..255]，跨 bank 分散
 constexpr uint32_t TOTAL_LENGTH = 256;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0400;
@@ -114,7 +114,17 @@ using T2 = float;
 using T3 = float;
 #define USED_VF GatherAndScatterVF
 #elif CASE_NUM == 12
-// 一读一写，DATA_BLOCK_COPY 跨步读写，对标 Case 7 对比跨步 vs 连续的性能差异
+// 离散访存 subbank 冲突：idx [0,128] 交替
+constexpr uint32_t TOTAL_LENGTH = 256;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0400;
+constexpr uint32_t zLocalAddr = 0x0400;
+using T1 = uint32_t;
+using T2 = float;
+using T3 = float;
+#define USED_VF GatherAndScatterVF
+#elif CASE_NUM == 13
+// 一读一写，DATA_BLOCK_COPY stride=1 横着搬运，连续 8 个 DataBlock
 constexpr uint32_t TOTAL_LENGTH = 512;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -123,8 +133,8 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #define USED_VF AddsVFWithStride1
-#elif CASE_NUM == 13
-// 一读一写，竖着搬运 stride=8，对标 Case 12 对比竖着 vs 横着的性能差异
+#elif CASE_NUM == 14
+// 一读一写，DATA_BLOCK_COPY stride=8 竖着搬运，非连续 8 个 DataBlock
 constexpr uint32_t TOTAL_LENGTH = 512;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
