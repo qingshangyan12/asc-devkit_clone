@@ -17,6 +17,8 @@
                 <filteritem type="filename" name="*.csv" desc="csv file"/>
                 <filteritem type="filename" name="*.png" desc="png file"/>
                 <filteritem type="filename" name="help.info" desc="help info file"/>
+                <filteritem type="filename" name="LICENSE" desc="license text"/>
+                <filteritem type="filename" name="Third_Party_Open_Source_Software_Notice" desc="third party notice"/>
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
                 <filteritem type="filename" name=".gitmodules" desc="git submodule"/>
@@ -24,6 +26,8 @@
                 <filteritem type="filename" name="*.csv" desc="csv file"/>
                 <filteritem type="filename" name="*.png" desc="png file"/>
                 <filteritem type="filename" name="help.info" desc="help info file"/>
+                <filteritem type="filename" name="LICENSE" desc="license text"/>
+                <filteritem type="filename" name="Third_Party_Open_Source_Software_Notice" desc="third party notice"/>
             </filefilter>
             <filefilter name="licenseFileNamePolicyFilter" desc="Filters for LICENSE file policies">
             </filefilter>
@@ -33,6 +37,8 @@
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png" desc="png file"/>
+                <filteritem type="filename" name=".clangd" desc="clangd config"/>
+                <filteritem type="filename" name="SWSCRL.crl" desc="certificate revocation list"/>
             </filefilter>
 
         </filefilterlist>

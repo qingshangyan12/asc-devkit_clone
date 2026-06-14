@@ -69,6 +69,7 @@ fi
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 REPO_NAME=$(basename "$REPO_ROOT")
 OAT_REPORT_DIR="$REPO_ROOT/oat_reports"
+RUN_REPORT_DIR=""
 
 echo "[OAT] Running OAT scan (Python Edition) — INCREMENTAL MODE"
 echo "[OAT] Project: $REPO_NAME"
@@ -120,12 +121,13 @@ if [ -z "$FILE_LIST" ]; then
     exit 0
 fi
 
-echo "[OAT] Checking $FILE_COUNT staged file(s)..."
+echo "[OAT] Checking $FILE_COUNT input file(s)..."
 
 # ---------------------------------------------------------------------------
 # 4. Ensure oat_reports/ exists and is in .gitignore
 # ---------------------------------------------------------------------------
 mkdir -p "$OAT_REPORT_DIR"
+RUN_REPORT_DIR=$(mktemp -d "$OAT_REPORT_DIR/run.XXXXXX")
 
 _GITIGNORE="$REPO_ROOT/.gitignore"
 for _entry in "oat_reports" "log"; do
@@ -136,41 +138,38 @@ for _entry in "oat_reports" "log"; do
 done
 
 # ---------------------------------------------------------------------------
-# 5. Build oat command — use OAT.xml if present in repo root
-# ---------------------------------------------------------------------------
-_OAT_CMD="$_PYTHON -m oat -mode s -s $REPO_ROOT -r $OAT_REPORT_DIR -n $REPO_NAME -w 1 -f $FILE_LIST"
-
-_OAT_XML="$REPO_ROOT/OAT.xml"
-if [ -f "$_OAT_XML" ]; then
-    _OAT_CMD="$_OAT_CMD -oatconfig $_OAT_XML"
-fi
-
-# ---------------------------------------------------------------------------
 # 6. Run oat scan
 # ---------------------------------------------------------------------------
 echo ""
 echo "[OAT] Running compliance scan..."
 
+_OAT_XML="$REPO_ROOT/OAT.xml"
+_OAT_LOG="$RUN_REPORT_DIR/oat.log"
 set +e
-eval "$_OAT_CMD" >/dev/null 2>&1
+if [ -f "$_OAT_XML" ]; then
+    "$_PYTHON" -m oat -mode s -s "$REPO_ROOT" -r "$RUN_REPORT_DIR" -n "$REPO_NAME" -w 1 -f "$FILE_LIST" -oatconfig "$_OAT_XML" >"$_OAT_LOG" 2>&1
+else
+    "$_PYTHON" -m oat -mode s -s "$REPO_ROOT" -r "$RUN_REPORT_DIR" -n "$REPO_NAME" -w 1 -f "$FILE_LIST" >"$_OAT_LOG" 2>&1
+fi
 _OAT_RC=$?
 set -e
 
 if [ "$_OAT_RC" -ne 0 ] && [ "$_OAT_RC" -ne 1 ]; then
     echo ""
-    echo "[OAT] [WARNING] oat exited with unexpected code $_OAT_RC."
-    echo "[OAT] Try re-running manually:"
-    echo "  $_OAT_CMD"
-    echo "[OAT] Skipping OAT check, continuing commit..."
-    exit 0
+    echo "[OAT] [ERROR] oat exited with unexpected code $_OAT_RC."
+    echo "[OAT] Log:"
+    sed -n '1,120p' "$_OAT_LOG" 2>/dev/null || true
+    echo "[OAT] Commit blocked to avoid a false pass."
+    exit 1
 fi
 
 # ---------------------------------------------------------------------------
 # 7. Parse report and write result.txt
 #    Only: Invalid File Type + License Header Invalid (no copyright)
 # ---------------------------------------------------------------------------
-REPORT_FILE="$OAT_REPORT_DIR/PlainReport_${REPO_NAME}.txt"
-RESULT_FILE="$OAT_REPORT_DIR/result.txt"
+REPORT_FILE="$RUN_REPORT_DIR/PlainReport_${REPO_NAME}.txt"
+RESULT_FILE="$RUN_REPORT_DIR/result.txt"
+LATEST_RESULT_FILE="$OAT_REPORT_DIR/result.txt"
 
 # Section headers used as stop-boundaries when extracting sections
 _ALL_HEADERS="Invalid File Type Total Count:|License Not Compatible Total Count:|License Header Invalid Total Count:|Copyright Header Invalid Total Count:|No License File Total Count:|No Readme.OpenSource Total Count:|No Readme Total Count:|Import Invalid Total Count:|Redundant License File Total Count:|Third Party Software Info Total Count:"
@@ -211,6 +210,15 @@ _extract_section() {
 }
 
 if [ ! -f "$REPORT_FILE" ]; then
+    if [ "$_OAT_RC" -ne 0 ]; then
+        echo ""
+        echo "[OAT] [ERROR] oat exited with code $_OAT_RC but did not generate a report."
+        echo "[OAT] Log:"
+        sed -n '1,120p' "$_OAT_LOG" 2>/dev/null || true
+        echo "[OAT] Commit blocked to avoid a false pass."
+        exit 1
+    fi
+
     echo "[OAT] [OK] No report generated; all reportable checks passed or supplied files were filtered ($FILE_COUNT file(s) checked)."
     {
         echo "==================================="
@@ -227,6 +235,8 @@ if [ ! -f "$REPORT_FILE" ]; then
         echo "License Header Invalid Total Count: 0"
         echo "==================================="
     } > "$RESULT_FILE"
+    cp "$RESULT_FILE" "$LATEST_RESULT_FILE" 2>/dev/null || true
+    rm -rf "$RUN_REPORT_DIR"
     exit 0
 fi
 
@@ -260,6 +270,7 @@ _SECTION_LIC=$(_extract_section "$REPORT_FILE" "License Header Invalid Total Cou
     echo "$_SECTION_LIC"
     echo "==================================="
 } > "$RESULT_FILE"
+cp "$RESULT_FILE" "$LATEST_RESULT_FILE" 2>/dev/null || true
 
 # Clean up full plain report (keep only result.txt)
 rm -f "$REPORT_FILE"
@@ -290,6 +301,7 @@ fi
 
 echo ""
 echo "[OAT] [OK] All checks passed ($FILE_COUNT file(s) checked)."
-echo "[OAT] Summary: cat $RESULT_FILE"
+echo "[OAT] Summary: cat $LATEST_RESULT_FILE"
 echo ""
+rm -rf "$RUN_REPORT_DIR"
 exit 0
