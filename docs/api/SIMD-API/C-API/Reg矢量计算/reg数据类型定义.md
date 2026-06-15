@@ -16,7 +16,7 @@
 **注意：**
 vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t这三个矢量数据类型在内存中的排布需要将两个元素打包为一个字节的存储单元。
 
-### 调用示例<a name="调用示例-1"></a>
+### 调用示例
 
 ```cpp
 vector_half dst;
@@ -30,7 +30,7 @@ asc_arange(dst, index);
 
 ![vector_bool](../figures/vector_bool.png)
 
-### 调用示例<a name="调用示例-2"></a>
+### 调用示例
 
 ```cpp
 uint32_t length = 255;
@@ -44,7 +44,7 @@ vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操�
 
 在读非对齐地址前，vector_load_unalign应该通过asc_loadunalign_pre初始化，然后再使用asc_loadunalign。在写非对齐地址时，应先使用asc_storeunalign，再使用asc_storeunalign_post进行处理。
 
-### 调用示例<a name="调用示例-3"></a>
+### 调用示例
 
 ```cpp
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
@@ -73,7 +73,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 地址寄存器的数据类型为iter_reg，用于存储地址偏移量。iter_reg通过asc_create_iter_reg初始化，然后在循环之中使用iter_reg存储地址偏移量。iter_reg在每层循环中根据所设置的步长进行自增。
 
-### 调用示例<a name="调用示例-4"></a>
+### 调用示例
 
 ```cpp
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
