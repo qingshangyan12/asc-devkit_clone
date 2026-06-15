@@ -177,7 +177,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 
 以读写冲突为例，当进行一组`dst = src0 + src1`的矢量加法计算时，如果`src0`的起始地址在0x0000，`dst`的起始地址为0x4000，结合Bank的排布，可以看到当前`src0`和`dst`的地址分别属于同一个bank和同一个bank group，则存在读写冲突。
 
-当遇到Bank冲突的时候，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生，详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
+当遇到Bank冲突时，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生，详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
 
 ## 同步机制
 
@@ -203,7 +203,7 @@ AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以
 
 <img src="../../../../figures/同步顺序.png" alt="同步顺序示意图" width="800" />
 
-> 📌 提示：上例描述为主要路径，当`Scalar`执行单元读写GM或者UB时，也需要考虑`Scalar`流水与其他流水的同步。
+> 📌 提示：上例描述的是主要路径，当`Scalar`执行单元读写GM或者UB时，也需要考虑`Scalar`流水与其他流水的同步。
 
 AI Core上的执行单元分别属于不同的执行流水，同步即是保证不同执行流水间能够正确执行，如下为AI Core内的主要执行流水。
 
@@ -315,7 +315,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
     </tr>
     <tr>
       <td><strong>单个AI Core内两个AIV子核之间同步</strong></td>
-      <td><p>同步单个AI Core内两个AIV核同步，通常用于Vector算子内需要分组进行同步的场景。</p></td>
+      <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内需要分组进行同步的场景。</p></td>
       <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
       <td>
         <code>if ASCEND_IS_AIV {</code><br>

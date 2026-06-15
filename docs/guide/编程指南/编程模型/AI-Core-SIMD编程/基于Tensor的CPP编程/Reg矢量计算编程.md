@@ -424,7 +424,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 ![](../../../../figures/Reg非对齐读1.png "Reg非对齐读1")
 
-1. 先使用非对齐的UB地址初始化`UnalignRegForLoad`，会将UB地址截断到32B对齐地址32，再将一个DataBlock 32B数据搬入到`UnalignRegForLoad`。
+1. 先使用非对齐的UB地址初始化`UnalignRegForLoad`，会将UB地址截断到32B对齐地址32，再将一个32B的DataBlock数据载入`UnalignRegForLoad`。
 
    **图 7**  初始化`UnalignRegForLoad`
 
