@@ -59,7 +59,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="18.81188118811881%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -82,7 +82,7 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 </tbody>
 </table>
 
-**表 2**  LoadDataRepeatParam结构体参数说明
+**表2**  LoadDataRepeatParam结构体参数说明
 
 <a name="table15780447181917"></a>
 <table><thead align="left"><tr id="row0780947111915"><th class="cellrowborder" valign="top" width="15.25%" id="mcps1.2.3.1.1"><p id="p1780124771913"><a name="p1780124771913"></a><a name="p1780124771913"></a>参数名称</p>
@@ -94,21 +94,21 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 <tbody><tr id="row1921141719215"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p6340835122118"><a name="p6340835122118"></a><a name="p6340835122118"></a>repeatStride</p>
 </td>
 <td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p12340173514212"><a name="p12340173514212"></a><a name="p12340173514212"></a>height/width方向上的前一个迭代与后一个迭代起始地址的距离，取值范围：n∈[0, 65535]，默认值为0。</p>
-<a name="ul146791315738"></a><a name="ul146791315738"></a><ul id="ul146791315738"><li>repeatMode为0，repeatStride的单位为16个元素。</li><li>repeatMode为1，repeatStride的单位和具体型号有关。下文中的data_type指Load3Dv2中源操作数的数据类型。<p id="p1140374875318"><a name="p1140374875318"></a><a name="p1140374875318"></a><span id="ph1675675114341"><a name="ph1675675114341"></a><a name="ph1675675114341"></a>Ascend 950PR/Ascend 950DT</span>，repeatStride的单位为32/sizeof(data_type)个元素 。</p>
-<p id="p1869715122417"><a name="p1869715122417"></a><a name="p1869715122417"></a><span id="ph1769716124414"><a name="ph1769716124414"></a><a name="ph1769716124414"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，repeatStride的单位为32/sizeof(data_type)个元素 。</p>
-<p id="p2069711212419"><a name="p2069711212419"></a><a name="p2069711212419"></a><span id="ph2069712121843"><a name="ph2069712121843"></a><a name="ph2069712121843"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，repeatStride的单位为32/sizeof(data_type)个元素 。</p>
+<a name="ul146791315738"></a><a name="ul146791315738"></a><ul id="ul146791315738"><li>repeatMode为0，repeatStride的单位为16个元素。</li><li>repeatMode为1，repeatStride的单位和具体型号有关。下文中的data_type指Load3Dv2中源操作数的数据类型。<p id="p1140374875318"><a name="p1140374875318"></a><a name="p1140374875318"></a><span id="ph1675675114341"><a name="ph1675675114341"></a><a name="ph1675675114341"></a>Ascend 950PR/Ascend 950DT</span>，repeatStride的单位为32/sizeof(data_type)个元素。</p>
+<p id="p1869715122417"><a name="p1869715122417"></a><a name="p1869715122417"></a><span id="ph1769716124414"><a name="ph1769716124414"></a><a name="ph1769716124414"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，repeatStride的单位为32/sizeof(data_type)个元素。</p>
+<p id="p2069711212419"><a name="p2069711212419"></a><a name="p2069711212419"></a><span id="ph2069712121843"><a name="ph2069712121843"></a><a name="ph2069712121843"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，repeatStride的单位为32/sizeof(data_type)个元素。</p>
 <p id="p10698101211411"><a name="p10698101211411"></a><a name="p10698101211411"></a><span id="ph869871212411"><a name="ph869871212411"></a><a name="ph869871212411"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>，repeatStride的单位为64/sizeof(data_type)个元素。</p>
 </li></ul>
 </td>
 </tr>
 <tr id="row13851184516228"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p164179505229"><a name="p164179505229"></a><a name="p164179505229"></a>repeatTime</p>
 </td>
-<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p8417135012216"><a name="p8417135012216"></a><a name="p8417135012216"></a>height/width方向上的迭代次数，取值范围：repeatTime ∈[0, 255] 。默认值为1。</p>
+<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p8417135012216"><a name="p8417135012216"></a><a name="p8417135012216"></a>height/width方向上的迭代次数，取值范围：repeatTime ∈[0, 255]。默认值为1。</p>
 </td>
 </tr>
 <tr id="row1078074711194"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p334033518217"><a name="p334033518217"></a><a name="p334033518217"></a>repeatMode</p>
 </td>
-<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p1734053517219"><a name="p1734053517219"></a><a name="p1734053517219"></a>控制repeat迭代的方向，取值范围：k∈[0, 1] 。默认值为0。</p>
+<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p1734053517219"><a name="p1734053517219"></a><a name="p1734053517219"></a>控制repeat迭代的方向，取值范围：k∈[0, 1]。默认值为0。</p>
 <p id="p9880145919259"><a name="p9880145919259"></a><a name="p9880145919259"></a>0：迭代沿height方向；</p>
 <p id="p432516193267"><a name="p432516193267"></a><a name="p432516193267"></a>1：迭代沿width方向。</p>
 </td>
@@ -119,4 +119,3 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](SetFmatrix.md#section642mcpsimp)
-

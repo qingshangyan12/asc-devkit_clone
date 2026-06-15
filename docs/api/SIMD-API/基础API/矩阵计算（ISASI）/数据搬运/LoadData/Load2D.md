@@ -87,7 +87,7 @@ A1-\>A2; B1-\>B2。
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table07381635103112"></a>
 <table><thead align="left"><tr id="row117393350314"><th class="cellrowborder" valign="top" width="16.55%" id="mcps1.2.3.1.1"><p id="p14739335193119"><a name="p14739335193119"></a><a name="p14739335193119"></a>参数名称</p>
@@ -116,7 +116,7 @@ A1-\>A2; B1-\>B2。
 </tbody>
 </table>
 
-**表 2**  通用参数说明
+**表2**  通用参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.89168916891689%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -133,7 +133,7 @@ A1-\>A2; B1-\>B2。
 </td>
 <td class="cellrowborder" valign="top" width="71.99719971997199%" headers="mcps1.2.4.1.3 "><p id="p66101129164712"><a name="p66101129164712"></a><a name="p66101129164712"></a>目的操作数，类型为LocalTensor。</p>
 <p id="p3610102994715"><a name="p3610102994715"></a><a name="p3610102994715"></a>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：</p>
-<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为 (32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
+<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为(32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
 </td>
 </tr>
 <tr id="row1836875519393"><td class="cellrowborder" valign="top" width="16.89168916891689%" headers="mcps1.2.4.1.1 "><p id="p7650141019171"><a name="p7650141019171"></a><a name="p7650141019171"></a>src</p>
@@ -156,7 +156,7 @@ A1-\>A2; B1-\>B2。
 </tbody>
 </table>
 
-**表 3**  LoadData2DParams结构体内参数说明
+**表3**  LoadData2DParams结构体内参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="18.56%" id="mcps1.2.3.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -167,7 +167,7 @@ A1-\>A2; B1-\>B2。
 </thead>
 <tbody><tr id="row5956546509"><td class="cellrowborder" valign="top" width="18.56%" headers="mcps1.2.3.1.1 "><p id="p1855384918180"><a name="p1855384918180"></a><a name="p1855384918180"></a>startIndex</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.44%" headers="mcps1.2.3.1.2 "><p id="p35535499185"><a name="p35535499185"></a><a name="p35535499185"></a>分形矩阵ID，说明搬运起始位置为源操作数中第几个分形（0为源操作数中第1个分形矩阵）。取值范围：startIndex∈[0, 65535] 。单位：512B。默认为0。</p>
+<td class="cellrowborder" valign="top" width="81.44%" headers="mcps1.2.3.1.2 "><p id="p35535499185"><a name="p35535499185"></a><a name="p35535499185"></a>分形矩阵ID，说明搬运起始位置为源操作数中第几个分形（0为源操作数中第1个分形矩阵）。取值范围：startIndex∈[0, 65535]。单位：512B。默认为0。</p>
 </td>
 </tr>
 <tr id="row4956154125018"><td class="cellrowborder" valign="top" width="18.56%" headers="mcps1.2.3.1.1 "><p id="p955315493182"><a name="p955315493182"></a><a name="p955315493182"></a>repeatTimes</p>
@@ -207,7 +207,7 @@ A1-\>A2; B1-\>B2。
 </tbody>
 </table>
 
-**表 4**  LoadData2DParamsV2结构体内参数说明
+**表4**  LoadData2DParamsV2结构体内参数说明
 
 <a name="table49630346128"></a>
 <table><thead align="left"><tr id="row1963934151219"><th class="cellrowborder" valign="top" width="18.37%" id="mcps1.2.3.1.1"><p id="p696313340124"><a name="p696313340124"></a><a name="p696313340124"></a>参数名称</p>
@@ -278,7 +278,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 -   ifTranspose = false，表示不启用转置。
 -   sid = 0，预留参数，配置为0即可。
 
-**图 1**  LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）<a name="fig13901164574218"></a>  
+**图1**  LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）<a name="fig13901164574218"></a>  
 ![](../../../../../figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png "LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）")
 
 ## 约束说明<a name="section633mcpsimp"></a>
@@ -322,4 +322,3 @@ loadDataParams.dstStride = mStep;
 loadDataParams.ifTranspose = false;
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```
-

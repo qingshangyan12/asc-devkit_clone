@@ -69,7 +69,7 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -91,7 +91,7 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
 </td>
 <td class="cellrowborder" valign="top" width="10.35103510351035%" headers="mcps1.2.4.1.2 "><p id="p176332345336"><a name="p176332345336"></a><a name="p176332345336"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.98759875987598%" headers="mcps1.2.4.1.3 "><p id="p96331334153318"><a name="p96331334153318"></a><a name="p96331334153318"></a>源操作数width，取值范围：l1W∈[1, 32767] 。</p>
+<td class="cellrowborder" valign="top" width="75.98759875987598%" headers="mcps1.2.4.1.3 "><p id="p96331334153318"><a name="p96331334153318"></a><a name="p96331334153318"></a>源操作数width，取值范围：l1W∈[1, 32767]。</p>
 </td>
 </tr>
 <tr id="row3609135711444"><td class="cellrowborder" valign="top" width="13.661366136613662%" headers="mcps1.2.4.1.1 "><p id="p4791358204412"><a name="p4791358204412"></a><a name="p4791358204412"></a>padList</p>
@@ -133,7 +133,7 @@ uint16_t C0, C1;
 uint8_t dilationH = 2, dilationW = 2;
 
 uint8_t padList[PAD_SIZE] = {0, 0, 0, 0};
-AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT); // 启用FM内存排布模式， 从left寄存器获取信息
+AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT); // 启用FM内存排布模式，从left寄存器获取信息
 AscendC::SetLoadDataPaddingValue(0);
 AscendC::SetLoadDataRepeat({0, 1, 0});
 AscendC::SetLoadDataBoundary((uint32_t)0);
@@ -142,4 +142,3 @@ AscendC::LoadData<fmap_T, LOAD3D_CONFIG>(featureMapA2, featureMapA1,
     { padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0 });
 AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
 ```
-

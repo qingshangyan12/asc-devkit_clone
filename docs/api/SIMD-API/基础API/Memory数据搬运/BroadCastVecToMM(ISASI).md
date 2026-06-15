@@ -51,7 +51,7 @@
 
 将矢量数据广播到矩阵中，每个数据块中的每16个elements会被连续复制16次；当前支持的数据传输通路：VECIN/VECCALC/VECOUT-\>CO1。
 
-**图 1**  功能示例<a name="fig1730933122314"></a>  
+**图1**  功能示例<a name="fig1730933122314"></a>  
 ![](../../../figures/功能示例.png "功能示例")
 
 ## 函数原型<a name="section620mcpsimp"></a>
@@ -63,7 +63,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="17.43%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -87,7 +87,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table284254116544"></a>
 <table><thead align="left"><tr id="row10842204115543"><th class="cellrowborder" valign="top" width="18.5018501850185%" id="mcps1.2.4.1.1"><p id="p565185175414"><a name="p565185175414"></a><a name="p565185175414"></a><strong id="b16565112547"><a name="b16565112547"></a><a name="b16565112547"></a>参数名称</strong></p>
@@ -154,7 +154,7 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 
 本示例中，输入bias形状为\[1, 32\]，输出c的形状为\[32, 32\]，格式为Nz。
 
-**图 2**  调用示例图<a name="fig496292825418"></a>  
+**图2**  调用示例图<a name="fig496292825418"></a>  
 ![](../../../figures/调用示例图.png "调用示例图")
 
 本示例仅展示样例中的部分代码。如需运行，请参考[BroadCastVecToMM样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/broadcast_ub2l0c)实现完整的代码。
@@ -165,4 +165,3 @@ __aicore__ inline void BroadCastVecToMM(const LocalTensor<T> &dst, const LocalTe
 // srcGap = 0, dstGap = 1. 源操作数与目的操作数之间连续
 AscendC::BroadCastVecToMM(brcLocal, srcLocal, 1, 1, 0, 1)
 ```
-

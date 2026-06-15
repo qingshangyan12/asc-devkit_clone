@@ -70,7 +70,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="17.41%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -102,7 +102,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="17.661766176617665%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -123,7 +123,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 <p id="p17644116247"><a name="p17644116247"></a><a name="p17644116247"></a><span id="ph26443161442"><a name="ph26443161442"></a><a name="ph26443161442"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_2"><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_2"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_2"><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a><a name="zh-cn_topic_0000001312391781_term184716139811_2"></a>Atlas A2 推理系列产品</term></span>，支持的TPosition为A1/A2/B1/B2。</p>
 <p id="p56447161944"><a name="p56447161944"></a><a name="p56447161944"></a><span id="ph3644016948"><a name="ph3644016948"></a><a name="ph3644016948"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_2"><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_2"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_2"><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a><a name="zh-cn_topic_0000001312391781_term131434243115_2"></a>Atlas A3 推理系列产品</term></span>，支持的TPosition为A1/A2/B1/B2。</p>
 <p id="p12645316848"><a name="p12645316848"></a><a name="p12645316848"></a><span id="ph164531618417"><a name="ph164531618417"></a><a name="ph164531618417"></a><term id="zh-cn_topic_0000001312391781_term354143892110_2"><a name="zh-cn_topic_0000001312391781_term354143892110_2"></a><a name="zh-cn_topic_0000001312391781_term354143892110_2"></a>Atlas 200I/500 A2 推理产品</term></span>，支持的TPosition为A1/A2/B1/B2。</p>
-<p id="p46455161649"><a name="p46455161649"></a><a name="p46455161649"></a><span id="ph864519166416"><a name="ph864519166416"></a><a name="ph864519166416"></a>Ascend 950PR/Ascend 950DT</span>， 支持的TPosition为A1/B1。</p>
+<p id="p46455161649"><a name="p46455161649"></a><a name="p46455161649"></a><span id="ph864519166416"><a name="ph864519166416"></a><a name="ph864519166416"></a>Ascend 950PR/Ascend 950DT</span>，支持的TPosition为A1/B1。</p>
 <p id="p1951017519562"><a name="p1951017519562"></a><a name="p1951017519562"></a><span id="ph458106105616"><a name="ph458106105616"></a><a name="ph458106105616"></a>Kirin X90</span>，支持的TPosition为A1/A2/B1/B2。</p>
 <p id="p5899141520216"><a name="p5899141520216"></a><a name="p5899141520216"></a><span id="ph15899201514212"><a name="ph15899201514212"></a><a name="ph15899201514212"></a>Kirin 9030</span>，支持的TPosition为A1/A2/B1/B2。</p>
 <p id="p16287121461618"><a name="p16287121461618"></a><a name="p16287121461618"></a>如果TPosition为A1/B1，起始地址需要满足32B对齐；如果TPosition为A2/B2，起始地址需要满足512B对齐。</p>
@@ -150,7 +150,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 </tbody>
 </table>
 
-**表 3**  InitConstValueParams结构体参数说明
+**表3**  InitConstValueParams结构体参数说明
 
 <a name="table15780447181917"></a>
 <table><thead align="left"><tr id="row0780947111915"><th class="cellrowborder" valign="top" width="15.25%" id="mcps1.2.3.1.1"><p id="p1780124771913"><a name="p1780124771913"></a><a name="p1780124771913"></a>参数名称</p>
@@ -162,12 +162,12 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 <tbody><tr id="row10780647151919"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p7662195112120"><a name="p7662195112120"></a><a name="p7662195112120"></a>repeatTimes</p>
 </td>
 <td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p1140916508219"><a name="p1140916508219"></a><a name="p1140916508219"></a>迭代次数。默认值为0。</p>
-<a name="ul98581524450"></a><a name="ul98581524450"></a><ul id="ul98581524450"><li><span>仅支持配置迭代次数（repeatTimes）和初始化值（initValue）场景下，repeatTimes∈[0, 255]。</span></li><li>支持配置所有参数场景下，repeatTimes∈[0, 32767] 。</li></ul>
+<a name="ul98581524450"></a><a name="ul98581524450"></a><ul id="ul98581524450"><li><span>仅支持配置迭代次数（repeatTimes）和初始化值（initValue）场景下，repeatTimes∈[0, 255]。</span></li><li>支持配置所有参数场景下，repeatTimes∈[0, 32767]。</li></ul>
 </td>
 </tr>
 <tr id="row6780947191919"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p1778310122113"><a name="p1778310122113"></a><a name="p1778310122113"></a>blockNum</p>
 </td>
-<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p1634012352218"><a name="p1634012352218"></a><a name="p1634012352218"></a>每次迭代初始化的数据块个数，取值范围：blockNum∈[0, 32767] 。默认值为0。</p>
+<td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p1634012352218"><a name="p1634012352218"></a><a name="p1634012352218"></a>每次迭代初始化的数据块个数，取值范围：blockNum∈[0, 32767]。默认值为0。</p>
 <a name="ul16932118103412"></a><a name="ul16932118103412"></a><ul id="ul16932118103412"><li>dst的位置为A1/B1时，每一个block（数据块）大小是32B；</li><li>dst的位置为A2/B2时，每一个block（数据块）大小是512B。</li></ul>
 </td>
 </tr>
@@ -175,7 +175,7 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 </td>
 <td class="cellrowborder" valign="top" width="84.75%" headers="mcps1.2.3.1.2 "><p id="p71261136859"><a name="p71261136859"></a><a name="p71261136859"></a>目的操作数前一个迭代结束地址到后一个迭代起始地址之间的距离。</p>
 <a name="ul1196025153512"></a><a name="ul1196025153512"></a><ul id="ul1196025153512"><li>dst的位置为A1/B1时，单位是32B；</li><li>dst的位置为A2/B2时，单位是512B。</li></ul>
-<p id="p1734053517219"><a name="p1734053517219"></a><a name="p1734053517219"></a>取值范围：dstGap∈[0, 32767] 。默认值为0。</p>
+<p id="p1734053517219"><a name="p1734053517219"></a><a name="p1734053517219"></a>取值范围：dstGap∈[0, 32767]。默认值为0。</p>
 </td>
 </tr>
 <tr id="row1761285762117"><td class="cellrowborder" valign="top" width="15.25%" headers="mcps1.2.3.1.1 "><p id="p4579316202119"><a name="p4579316202119"></a><a name="p4579316202119"></a>initValue</p>
@@ -197,5 +197,5 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 ```
 uint32 mLength = 16;
 uint32 kLength = 16;
-Fill(leftMatrix, {1, static_cast<uint16_t>(mLength * kLength * sizeof(float) / 32), 0, 1}); // 给leftMatrix填充 mLength * kLength长度的数据为1， 按32B的颗粒进行填充
+Fill(leftMatrix, {1, static_cast<uint16_t>(mLength * kLength * sizeof(float) / 32), 0, 1}); // 给leftMatrix填充mLength * kLength长度的数据为1，按32B的颗粒进行填充
 ```

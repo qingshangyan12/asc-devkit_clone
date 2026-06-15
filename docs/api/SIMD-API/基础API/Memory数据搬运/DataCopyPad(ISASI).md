@@ -119,7 +119,7 @@
 
 不同产品型号对函数原型的支持存在差异，请参考下表中的支持度信息，选择产品型号支持的函数原型进行开发。
 
-**表 1**  不同产品型号对函数原型的支持度
+**表1**  不同产品型号对函数原型的支持度
 
 <a name="table19300151419354"></a>
 <table><thead align="left"><tr id="row143011314143513"><th class="cellrowborder" valign="top" width="29.909999999999997%" id="mcps1.2.4.1.1"><p id="p19301171413514"><a name="p19301171413514"></a><a name="p19301171413514"></a>产品型号</p>
@@ -163,7 +163,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 2**  模板参数说明
+**表2**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="18.21%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -193,7 +193,7 @@
 </tbody>
 </table>
 
-**表 3**  接口参数说明
+**表3**  接口参数说明
 
 <a name="zh-cn_topic_0235751031_table33761356"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.529999999999998%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
@@ -251,7 +251,7 @@
 
 下文表格中列出的结构体参数定义请参考$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 4**  DataCopyExtParams结构体参数定义
+**表4**  DataCopyExtParams结构体参数定义
 
 <a name="table10572141063919"></a>
 <table><thead align="left"><tr id="row185738102393"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p1573101033918"><a name="p1573101033918"></a><a name="p1573101033918"></a>参数名称</p>
@@ -267,7 +267,7 @@
 </tr>
 <tr id="row1657315104398"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p19573171073914"><a name="p19573171073914"></a><a name="p19573171073914"></a>blockLen</p>
 </td>
-<td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p15731210203917"><a name="p15731210203917"></a><a name="p15731210203917"></a>指定该指令每个连续传输数据块长度，<strong id="b8573710103918"><a name="b8573710103918"></a><a name="b8573710103918"></a>该指令支持非对齐搬运</strong>，<strong id="b157321093915"><a name="b157321093915"></a><a name="b157321093915"></a>每个连续传输数据块长度单位为字节</strong>。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]<strong id="b13906164114712"><a name="b13906164114712"></a><a name="b13906164114712"></a>，blockLen必须是 sizeof(T) 的整数倍，需要注意UB不要超限</strong>。</p>
+<td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p15731210203917"><a name="p15731210203917"></a><a name="p15731210203917"></a>指定该指令每个连续传输数据块长度，<strong id="b8573710103918"><a name="b8573710103918"></a><a name="b8573710103918"></a>该指令支持非对齐搬运</strong>，<strong id="b157321093915"><a name="b157321093915"></a><a name="b157321093915"></a>每个连续传输数据块长度单位为字节</strong>。数据类型为uint32_t，取值范围：blockLen∈[1, 2097151]<strong id="b13906164114712"><a name="b13906164114712"></a><a name="b13906164114712"></a>，blockLen必须是sizeof(T)的整数倍，需要注意UB不要超限</strong>。</p>
 </td>
 </tr>
 <tr id="row17573201017390"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p175731610183919"><a name="p175731610183919"></a><a name="p175731610183919"></a>srcStride</p>
@@ -298,7 +298,7 @@
 </tbody>
 </table>
 
-**表 5**  DataCopyParams结构体参数定义
+**表5**  DataCopyParams结构体参数定义
 
 <a name="table9182515919"></a>
 <table><thead align="left"><tr id="row151816516917"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p18182513916"><a name="p18182513916"></a><a name="p18182513916"></a>参数名称</p>
@@ -314,7 +314,7 @@
 </tr>
 <tr id="row2968131992515"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p878011470264"><a name="p878011470264"></a><a name="p878011470264"></a>blockLen</p>
 </td>
-<td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p11780174752617"><a name="p11780174752617"></a><a name="p11780174752617"></a>指定该指令每个连续传输数据块长度，<strong id="b129631824161419"><a name="b129631824161419"></a><a name="b129631824161419"></a>该指令支持非对齐搬运</strong>，<strong id="b916772219137"><a name="b916772219137"></a><a name="b916772219137"></a>每个连续传输数据块长度单位为字节</strong>。数据类型为uint16_t，blockLen不要超出该数据类型的取值范围，<strong id="b15410480426"><a name="b15410480426"></a><a name="b15410480426"></a>blockLen必须是 sizeof(T) 的整数倍</strong>。</p>
+<td class="cellrowborder" valign="top" width="85%" headers="mcps1.2.3.1.2 "><p id="p11780174752617"><a name="p11780174752617"></a><a name="p11780174752617"></a>指定该指令每个连续传输数据块长度，<strong id="b129631824161419"><a name="b129631824161419"></a><a name="b129631824161419"></a>该指令支持非对齐搬运</strong>，<strong id="b916772219137"><a name="b916772219137"></a><a name="b916772219137"></a>每个连续传输数据块长度单位为字节</strong>。数据类型为uint16_t，blockLen不要超出该数据类型的取值范围，<strong id="b15410480426"><a name="b15410480426"></a><a name="b15410480426"></a>blockLen必须是sizeof(T)的整数倍</strong>。</p>
 </td>
 </tr>
 <tr id="row1589112062510"><td class="cellrowborder" valign="top" width="15%" headers="mcps1.2.3.1.1 "><p id="p378018478265"><a name="p378018478265"></a><a name="p378018478265"></a>srcStride</p>
@@ -330,7 +330,7 @@
 </tbody>
 </table>
 
-**表 6**  DataCopyPadExtParams<T\>结构体参数定义
+**表6**  DataCopyPadExtParams<T\>结构体参数定义
 
 <a name="table844881954715"></a>
 <table><thead align="left"><tr id="row11449201964714"><th class="cellrowborder" valign="top" width="18.44%" id="mcps1.2.3.1.1"><p id="p18449151934710"><a name="p18449151934710"></a><a name="p18449151934710"></a>参数名称</p>
@@ -368,7 +368,7 @@
 </tbody>
 </table>
 
-**表 7**  DataCopyPadParams结构体参数定义
+**表7**  DataCopyPadParams结构体参数定义
 
 <a name="table990103991413"></a>
 <table><thead align="left"><tr id="row29013931412"><th class="cellrowborder" valign="top" width="18.44%" id="mcps1.2.3.1.1"><p id="p3900394148"><a name="p3900394148"></a><a name="p3900394148"></a>参数名称</p>
@@ -471,7 +471,7 @@
         -   **dstNzNStride**为src中ndMatrix的相邻行在NZ矩阵中相隔多少个datablock，如A1\~B1的距离，即为2个datablock（A1 + 空白）；
         -   **dstNzMatrixStride**为相邻NZ矩阵之间的元素个数，因为仅涉及1个NZ矩阵，所以可以填为1。
 
-    **图 1**  VECIN/VECOUT-\>TSCM搬运示意图<a name="fig9329040132719"></a>  
+    **图1**  VECIN/VECOUT-\>TSCM搬运示意图<a name="fig9329040132719"></a>  
     ![](../../../figures/VECIN-VECOUT--TSCM搬运示意图.png "VECIN-VECOUT--TSCM搬运示意图")
 
 -   <a name="li1975762118172"></a>搬运模式的配置示例
@@ -485,7 +485,7 @@
 
         blockLen为48，每个连续传输数据块包含48字节；srcStride为0，因为源操作数的逻辑位置为GM，srcStride的单位为字节，即源操作数相邻数据块之间紧密排列；dstStride为0，因为目的操作数的逻辑位置为VECIN、VECOUT，dstStride的单位为DataBlock（32字节），目的操作数相邻数据块之间紧密排列，不会填充数据
 
-        blockLen \* blockCount + leftPadding + rightPadding 满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
+        blockLen \* blockCount + leftPadding + rightPadding满足32字节对齐，isPad为false，左右两侧填充的数据值会默认为随机值，否则为paddingValue。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的总长度为160字节。
 
         ![](../../../figures/paddingMode.png)
 
@@ -515,4 +515,3 @@ AscendC::DataCopyPad(dstGlobal, src0Global, copyParams, padParams);
 输入数据src0Global: [1 2 3 ... 32]
 输出数据dstGlobal:[1 2 3 ... 20]
 ```
-

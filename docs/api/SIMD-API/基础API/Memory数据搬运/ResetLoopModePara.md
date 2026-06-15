@@ -59,7 +59,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table1927871911568"></a>
 <table><thead align="left"><tr id="row162781519105612"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="p12278131911565"><a name="p12278131911565"></a><a name="p12278131911565"></a>参数名</p>
@@ -102,7 +102,7 @@ AscendC::DataCopyExtParams copyParams{2, 48 * sizeof(int8_t), 0, 0, 0}; // 结�
 AscendC::DataCopyPadExtParams<half> padParams{false, 0, 0, 0};
 AscendC::LoopModeParams loopParam2Ub {2, 2, 96, 128, 192, 288};
 AscendC::SetLoopModePara(loopParam2Ub, DataCopyMVType::OUT_TO_UB);
-AscendC::DataCopyPad<int8_t, PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams); // 从GM->VECIN搬运 48 * 2 * 2 * 2 = 384Bytes
+AscendC::DataCopyPad<int8_t, PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams); // 从GM->VECIN搬运48 * 2 * 2 * 2 = 384Bytes
 AscendC::ResetLoopModePara(DataCopyMVType::OUT_TO_UB);
 AscendC::LoopModeParams loopParam2Gm {2, 2, 128, 96, 288, 192};
 AscendC::SetLoopModePara(loopParam2Gm, DataCopyMVType::UB_TO_OUT);

@@ -69,7 +69,7 @@ __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const Fm
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -101,7 +101,7 @@ __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const Fm
 </tbody>
 </table>
 
-**表 2**  SetFMatrixBitMode类参数说明
+**表2**  SetFMatrixBitMode类参数说明
 
 <a name="table85031523118"></a>
 <table><thead align="left"><tr id="row1750310523111"><th class="cellrowborder" valign="top" width="13.639999999999999%" id="mcps1.2.3.1.1"><p id="p135037521514"><a name="p135037521514"></a><a name="p135037521514"></a>参数名称</p>
@@ -140,7 +140,7 @@ __aicore__ inline SetFMatrixBitModeParams(const LoadData3DParamsV2<T> &loadData3
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对congfig0直接进行逐bit位修改来修改参数。
 
-**表 3**  SetFMatrixBitModeConfig0结构体参数说明
+**表3**  SetFMatrixBitModeConfig0结构体参数说明
 
 <a name="table1162220101434"></a>
 <table><thead align="left"><tr id="row1362218101636"><th class="cellrowborder" valign="top" width="13.59%" id="mcps1.2.3.1.1"><p id="p3622610938"><a name="p3622610938"></a><a name="p3622610938"></a>参数名称</p>
@@ -157,31 +157,31 @@ __aicore__ inline SetFMatrixBitModeParams(const LoadData3DParamsV2<T> &loadData3
 </tr>
 <tr id="row2622110633"><td class="cellrowborder" valign="top" width="13.59%" headers="mcps1.2.3.1.1 "><p id="p1262261015314"><a name="p1262261015314"></a><a name="p1262261015314"></a>l1W</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p1362251018311"><a name="p1362251018311"></a><a name="p1362251018311"></a>源操作数width，取值范围：l1W∈[1, 32767] 。</p>
+<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p1362251018311"><a name="p1362251018311"></a><a name="p1362251018311"></a>源操作数width，取值范围：l1W∈[1, 32767]。</p>
 <p id="p144611270018"><a name="p144611270018"></a><a name="p144611270018"></a>该参数是位域结构体的第二低位参数，占用16bit，可以使用SetFMatrixBitMode类对象的SetL1W()函数设置其值。</p>
 </td>
 </tr>
 <tr id="row106221310138"><td class="cellrowborder" valign="top" width="13.59%" headers="mcps1.2.3.1.1 "><p id="p96226100312"><a name="p96226100312"></a><a name="p96226100312"></a>padList0</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p1162311020311"><a name="p1162311020311"></a><a name="p1162311020311"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的 padding_left值，取值范围：[0,255]。默认为0。</p>
+<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p1162311020311"><a name="p1162311020311"></a><a name="p1162311020311"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的padding_left值，取值范围：[0,255]。默认为0。</p>
 <p id="p4271630904"><a name="p4271630904"></a><a name="p4271630904"></a>该参数是位域结构体的第三低位参数，占用8bit，可以使用SetFMatrixBitMode类对象的SetPadList()函数设置其值。</p>
 </td>
 </tr>
 <tr id="row1262310101733"><td class="cellrowborder" valign="top" width="13.59%" headers="mcps1.2.3.1.1 "><p id="p662316101032"><a name="p662316101032"></a><a name="p662316101032"></a>padList1</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p136236103318"><a name="p136236103318"></a><a name="p136236103318"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的 padding_right值，取值范围：[0,255]。默认为0。</p>
+<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p136236103318"><a name="p136236103318"></a><a name="p136236103318"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的padding_right值，取值范围：[0,255]。默认为0。</p>
 <p id="p1515652916113"><a name="p1515652916113"></a><a name="p1515652916113"></a>该参数是位域结构体的第四低位参数，占用8bit，可以使用SetFMatrixBitMode类对象的SetPadList()函数设置其值。</p>
 </td>
 </tr>
 <tr id="row9623151012313"><td class="cellrowborder" valign="top" width="13.59%" headers="mcps1.2.3.1.1 "><p id="p562316101037"><a name="p562316101037"></a><a name="p562316101037"></a>padList2</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p462351010315"><a name="p462351010315"></a><a name="p462351010315"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的 padding_top值，取值范围：[0,255]。默认为0。</p>
+<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p462351010315"><a name="p462351010315"></a><a name="p462351010315"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的padding_top值，取值范围：[0,255]。默认为0。</p>
 <p id="p125213311115"><a name="p125213311115"></a><a name="p125213311115"></a>该参数是位域结构体的第五低位参数，占用8bit，可以使用SetFMatrixBitMode类对象的SetPadList()函数设置其值。</p>
 </td>
 </tr>
 <tr id="row1362314108319"><td class="cellrowborder" valign="top" width="13.59%" headers="mcps1.2.3.1.1 "><p id="p1462316101734"><a name="p1462316101734"></a><a name="p1462316101734"></a>padList3</p>
 </td>
-<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p2062318102037"><a name="p2062318102037"></a><a name="p2062318102037"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的 padding_bottom值，取值范围：[0,255]。默认为0。</p>
+<td class="cellrowborder" valign="top" width="86.41%" headers="mcps1.2.3.1.2 "><p id="p2062318102037"><a name="p2062318102037"></a><a name="p2062318102037"></a>对应<a href="SetFmatrix.md#table8955841508">表1</a>中padding列表中的padding_bottom值，取值范围：[0,255]。默认为0。</p>
 <p id="p321918350118"><a name="p321918350118"></a><a name="p321918350118"></a>该参数是位域结构体的最高位参数，占用8bit，可以使用SetFMatrixBitMode类对象的SetPadList()函数设置其值。</p>
 </td>
 </tr>
@@ -242,4 +242,3 @@ inQueueWeB2.EnQue<weight_T>(weightB2);
 inQueueFmA1.FreeTensor(featureMapA1);
 inQueueWeB1.FreeTensor(weightB1);
 ```
-

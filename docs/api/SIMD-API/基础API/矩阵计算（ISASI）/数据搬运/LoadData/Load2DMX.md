@@ -83,7 +83,7 @@ A1-\>A2; B1-\>B2。
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table07381635103112"></a>
 <table><thead align="left"><tr id="row117393350314"><th class="cellrowborder" valign="top" width="16.55%" id="mcps1.2.3.1.1"><p id="p14739335193119"><a name="p14739335193119"></a><a name="p14739335193119"></a>参数名称</p>
@@ -107,7 +107,7 @@ A1-\>A2; B1-\>B2。
 </tbody>
 </table>
 
-**表 2**  通用参数说明
+**表2**  通用参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.89168916891689%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -124,7 +124,7 @@ A1-\>A2; B1-\>B2。
 </td>
 <td class="cellrowborder" valign="top" width="71.99719971997199%" headers="mcps1.2.4.1.3 "><p id="p66101129164712"><a name="p66101129164712"></a><a name="p66101129164712"></a>目的操作数，类型为LocalTensor。</p>
 <p id="p3610102994715"><a name="p3610102994715"></a><a name="p3610102994715"></a>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：</p>
-<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为 (32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
+<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为(32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
 </td>
 </tr>
 <tr id="row1836875519393"><td class="cellrowborder" valign="top" width="16.89168916891689%" headers="mcps1.2.4.1.1 "><p id="p7650141019171"><a name="p7650141019171"></a><a name="p7650141019171"></a>src</p>
@@ -154,7 +154,7 @@ A1-\>A2; B1-\>B2。
 </tbody>
 </table>
 
-**表 3**  LoadData2DMxParams结构体参数说明
+**表3**  LoadData2DMxParams结构体参数说明
 
 <a name="table15901153712305"></a>
 <table><thead align="left"><tr id="row1902163763012"><th class="cellrowborder" valign="top" width="18.56%" id="mcps1.2.3.1.1"><p id="p9902137173019"><a name="p9902137173019"></a><a name="p9902137173019"></a>参数名称</p>
@@ -198,7 +198,7 @@ A1-\>A2; B1-\>B2。
 
 下面通过一个具体的示例来解释LoadData2DMX结构体参数。假设A矩阵shape为（M，K），则ScaleA矩阵shape为（M，K/32），ScaleA数据类型为fp8\_e8m0\_t，ScaleA矩阵分形排布见[图1](#fig138710913432)。
 
-**图 1**  ScaleA在L0A的分形排布<a name="fig138710913432"></a>  
+**图1**  ScaleA在L0A的分形排布<a name="fig138710913432"></a>  
 ![](../../../../../figures/ScaleA在L0A的分形排布.png "ScaleA在L0A的分形排布")
 
 下图为ScaleA从L1搬运至L0A过程中的配置参数示意。每一行为32Byte，对应着[图1](#fig138710913432)中的一个分形。xStep为M维度分形的个数，如图中的xStep = M / 16 = 3，yStep为K维度32Byte的个数，如图中的yStep = K / 32 / 2 = 21，srcStride和dstStride同理，表示在K维度上32Byte的个数。
@@ -212,4 +212,3 @@ A1-\>A2; B1-\>B2。
 ## 返回值说明<a name="section640mcpsimp"></a>
 
 无
-

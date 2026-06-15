@@ -63,7 +63,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 ## 参数说明<a name="section14983445508"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table49614585413"></a>
 <table><thead align="left"><tr id="row996115820412"><th class="cellrowborder" valign="top" width="14.729999999999999%" id="mcps1.2.3.1.1"><p id="p10961458104110"><a name="p10961458104110"></a><a name="p10961458104110"></a>参数名</p>
@@ -80,7 +80,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 </tbody>
 </table>
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 <a name="table917mcpsimp"></a>
 <table><thead align="left"><tr id="row923mcpsimp"><th class="cellrowborder" valign="top" width="15.02%" id="mcps1.2.4.1.1"><p id="p925mcpsimp"><a name="p925mcpsimp"></a><a name="p925mcpsimp"></a>参数名称</p>
@@ -116,7 +116,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 </tbody>
 </table>
 
-**表 3**  Nz2NdParamsFull结构体内参数定义
+**表3**  Nz2NdParamsFull结构体内参数定义
 
 <a name="table15841351172811"></a>
 <table><thead align="left"><tr id="row5583451132815"><th class="cellrowborder" valign="top" width="17.349999999999998%" id="mcps1.2.3.1.1"><p id="p1558335112820"><a name="p1558335112820"></a><a name="p1558335112820"></a>参数名称</p>
@@ -142,7 +142,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 </tr>
 <tr id="row1358415517282"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p165841151162813"><a name="p165841151162813"></a><a name="p165841151162813"></a>srcNdMatrixStride</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p19584551122814"><a name="p19584551122814"></a><a name="p19584551122814"></a>源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256 (16 * 16) 个元素。</p>
+<td class="cellrowborder" valign="top" width="82.65%" headers="mcps1.2.3.1.2 "><p id="p19584551122814"><a name="p19584551122814"></a><a name="p19584551122814"></a>源相邻NZ矩阵的偏移（头与头），取值范围：srcNdMatrixStride∈[1, 512]，单位256 (16 * 16)个元素。</p>
 </td>
 </tr>
 <tr id="row558419514287"><td class="cellrowborder" valign="top" width="17.349999999999998%" headers="mcps1.2.3.1.1 "><p id="p95841051202818"><a name="p95841051202818"></a><a name="p95841051202818"></a>srcNStride</p>
@@ -169,11 +169,11 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 -   nValue = 4，NZ矩阵的行数，也就是矩阵的高度为4。
 -   dValue = 32，NZ矩阵的列数，也就是矩阵的宽度为32个元素。
 -   srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即为A1\~C1的距离，即为256个元素\(16个DataBlock \* 16个元素\)。
--   srcNStride = 4,  表示同一个源NZ矩阵的相邻Z排布的偏移，即为A1到B1的距离，即为64个元素\(4个DataBlock\* 16个元素\)。
+-   srcNStride = 4,表示同一个源NZ矩阵的相邻Z排布的偏移，即为A1到B1的距离，即为64个元素\(4个DataBlock\* 16个元素\)。
 -   dstDStride = 160，表达一个目的ND矩阵的相邻行之间的偏移，即A1和A2之间的距离，即为10个DataBlock，即10 \* 16 = 160个元素。
 -   dstNdMatrixStride = 48，表达dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，即为3个DataBlock，3 \* 16 = 48个元素。
 
-**图 1**  NZ2ND转换示意图（half数据类型）<a name="fig15851251122815"></a>  
+**图1**  NZ2ND转换示意图（half数据类型）<a name="fig15851251122815"></a>  
 ![](../../../../figures/NZ2ND转换示意图（half数据类型）.png "NZ2ND转换示意图（half数据类型）")
 
 以float数据类型为例，NZ2ND转换示意图如下，样例中参数设置值和解释说明如下：
@@ -182,11 +182,11 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 -   nValue = 4，NZ矩阵的行数，也就是矩阵的高度为4。
 -   dValue = 32，NZ矩阵的列数，也就是矩阵的宽度为32个元素。
 -   srcNdMatrixStride = 1，表达相邻NZ矩阵起始地址间的偏移，即A1到C1的距离，为256个元素\(32个DataBlock \* 8个元素\)
--   srcNStride = 4,  表示同一个源NZ矩阵的相邻Z排布的偏移，即A1到B1的距离，为64个元素 \(8个DataBlock \* 8个元素\)。
+-   srcNStride = 4,表示同一个源NZ矩阵的相邻Z排布的偏移，即A1到B1的距离，为64个元素 \(8个DataBlock \* 8个元素\)。
 -   dstDStride = 144，表示一个目的ND矩阵的相邻行之间的偏移，即A1和A3之间的距离，为18个DataBlock，即18 \* 8 = 144个元素。
 -   dstNdMatrixStride = 40，表示dst中第x个目的ND矩阵的起点和第x+1个目的ND矩阵的起点的偏移，即A1和C1之间的距离，为5个DataBlock，5 \* 8 = 40个元素。
 
-**图 2**  NZ2ND转换示意图（float数据类型）<a name="fig5586175192811"></a>  
+**图2**  NZ2ND转换示意图（float数据类型）<a name="fig5586175192811"></a>  
 ![](../../../../figures/NZ2ND转换示意图（float数据类型）.png "NZ2ND转换示意图（float数据类型）")
 
 ## 返回值说明<a name="section129001927113216"></a>
@@ -201,14 +201,14 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 下文的数据通路均通过逻辑位置[TPosition](../../数据结构/辅助数据结构//TPosition.md#table5376122715308)来表达，并注明了对应的物理通路。TPosition与物理内存的映射关系见[表1](../../../通用说明和约束.md#table07372185712)。
 
-**表 4**  Local Memory -\> Global Memory具体通路和支持的数据类型
+**表4**  Local Memory -\> Global Memory具体通路和支持的数据类型
 
 <a name="table393440155510"></a>
 <table><thead align="left"><tr id="row393412018551"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p16934807556"><a name="p16934807556"></a><a name="p16934807556"></a>产品型号</p>
 </th>
 <th class="cellrowborder" valign="top" width="24.05%" id="mcps1.2.4.1.2"><p id="p1893430155514"><a name="p1893430155514"></a><a name="p1893430155514"></a>数据通路</p>
 </th>
-<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p1493440195515"><a name="p1493440195515"></a><a name="p1493440195515"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
+<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p1493440195515"><a name="p1493440195515"></a><a name="p1493440195515"></a>源操作数和目的操作数的数据类型(两者保持一致)</p>
 </th>
 </tr>
 </thead>

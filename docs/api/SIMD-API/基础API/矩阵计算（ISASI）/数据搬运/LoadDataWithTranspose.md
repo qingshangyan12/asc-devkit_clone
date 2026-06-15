@@ -148,7 +148,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table17296541585"></a>
 <table><thead align="left"><tr id="row92913547813"><th class="cellrowborder" valign="top" width="22.869999999999997%" id="mcps1.2.3.1.1"><p id="p1117617228103"><a name="p1117617228103"></a><a name="p1117617228103"></a>参数名</p>
@@ -170,7 +170,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="23.002300230023003%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -229,7 +229,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </tbody>
 </table>
 
-**表 3**  LoadData2dTransposeParams结构体内参数说明
+**表3**  LoadData2dTransposeParams结构体内参数说明
 
 <a name="table13526111319538"></a>
 <table><thead align="left"><tr id="row175271813105316"><th class="cellrowborder" valign="top" width="15.28152815281528%" id="mcps1.2.4.1.1"><p id="p6527713145318"><a name="p6527713145318"></a><a name="p6527713145318"></a>参数名称</p>
@@ -244,7 +244,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </td>
 <td class="cellrowborder" valign="top" width="12.451245124512452%" headers="mcps1.2.4.1.2 "><p id="p75532491189"><a name="p75532491189"></a><a name="p75532491189"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.26722672267228%" headers="mcps1.2.4.1.3 "><p id="p13419321144217"><a name="p13419321144217"></a><a name="p13419321144217"></a>方块矩阵ID，搬运起始位置为源操作数中第几个方块矩阵（0 为源操作数中第1个方块矩阵）。取值范围：startIndex∈[0, 65535] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.26722672267228%" headers="mcps1.2.4.1.3 "><p id="p13419321144217"><a name="p13419321144217"></a><a name="p13419321144217"></a>方块矩阵ID，搬运起始位置为源操作数中第几个方块矩阵（0为源操作数中第1个方块矩阵）。取值范围：startIndex∈[0, 65535]。默认为0。</p>
 <p id="p35535499185"><a name="p35535499185"></a><a name="p35535499185"></a>例如，源操作数中有20个大小为16*8*4B的分形（数据类型为float），startIndex=1表示搬运起始位置为第2个方块矩阵，即将第3和第4个分形从源操作数中转置到目的操作数中（第1、2个分形组成第1个方块矩阵，第3、4个分形组成第2个方块矩阵）。</p>
 </td>
 </tr>
@@ -297,7 +297,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </tbody>
 </table>
 
-**表 4**  LoadData2dTransposeParamsV2结构体内参数说明
+**表4**  LoadData2dTransposeParamsV2结构体内参数说明
 
 <a name="table64891930194618"></a>
 <table><thead align="left"><tr id="row134891330114616"><th class="cellrowborder" valign="top" width="15.28152815281528%" id="mcps1.2.4.1.1"><p id="p8489133017468"><a name="p8489133017468"></a><a name="p8489133017468"></a>参数名称</p>
@@ -312,7 +312,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 </td>
 <td class="cellrowborder" valign="top" width="12.44124412441244%" headers="mcps1.2.4.1.2 "><p id="p649033054610"><a name="p649033054610"></a><a name="p649033054610"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.27722772277228%" headers="mcps1.2.4.1.3 "><p id="p1649003024619"><a name="p1649003024619"></a><a name="p1649003024619"></a>方块矩阵 ID，搬运起始位置为源操作数中第几个分形。取值范围：startIndex∈[0, 65535] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.27722772277228%" headers="mcps1.2.4.1.3 "><p id="p1649003024619"><a name="p1649003024619"></a><a name="p1649003024619"></a>方块矩阵ID，搬运起始位置为源操作数中第几个分形。取值范围：startIndex∈[0, 65535]。默认为0。</p>
 </td>
 </tr>
 <tr id="row194908302464"><td class="cellrowborder" valign="top" width="15.28152815281528%" headers="mcps1.2.4.1.1 "><p id="p5490330174620"><a name="p5490330174620"></a><a name="p5490330174620"></a>repeatTimes</p>
@@ -386,7 +386,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
     uint32_t fractalNum = 2
     uint32_t fractalSize = fractalShape[0] * fractalShape[1];
     
-    // A矩阵 LoadDataWithTranspose: Nz -> Zz
+    // A矩阵LoadDataWithTranspose: Nz -> Zz
     // dstoffset要根据A矩阵在L0上，宽度方向的对齐来求解
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
@@ -401,7 +401,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
     	AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
     }
     
-    // B矩阵 LoadDataWithTranspose: Nz -> Zn
+    // B矩阵LoadDataWithTranspose: Nz -> Zn
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
     uint32_t srcOffset = fractalSize * fractalNum;
@@ -426,7 +426,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
     uint32_t fractalNum = 1
     uint32_t fractalSize = fractalShape[0] * fractalShape[1];
     
-    // A矩阵 LoadDataWithTranspose: Nz -> Zz
+    // A矩阵LoadDataWithTranspose: Nz -> Zz
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
     uint32_t srcOffset = CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
@@ -440,7 +440,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
       AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
     }
     
-    // B矩阵 LoadDataWithTranspose: Nz -> Zn
+    // B矩阵LoadDataWithTranspose: Nz -> Zn
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
     uint32_t srcOffset = fractalSize * fractalNum;
@@ -463,7 +463,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
     uint32_t fractalShape[1] = 32 / sizeof(float);
     uint32_t fractalNum = 2
     uint32_t fractalSize = fractalShape[0] * fractalShape[1];
-    // A矩阵 LoadDataWithTranspose: Zz -> Zz
+    // A矩阵LoadDataWithTranspose: Zz -> Zz
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(k, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
     uint32_t srcOffset = fractalSize * fractalNum;
@@ -477,7 +477,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
       AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
     }
     
-    // B矩阵 LoadDataWithTranspose: Nz -> Zn
+    // B矩阵LoadDataWithTranspose: Nz -> Zn
     // CeilDivision计算两个整数相除，结果向上取整
     uint32_t dstOffset = CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
     uint32_t srcOffset = CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
@@ -520,4 +520,3 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
     qidB2_.EnQue(b2);
     qidB1_.FreeTensor(rightMatrix);
     ```
-

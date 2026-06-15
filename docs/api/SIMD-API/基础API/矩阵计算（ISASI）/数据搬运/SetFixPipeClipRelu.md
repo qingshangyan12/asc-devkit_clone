@@ -71,7 +71,7 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.371637163716375%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -108,4 +108,3 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 uint64_t clipReluMaxVal = 0x3c00;
 SetFixPipeClipRelu(clipReluMaxVal); // 开启Relu的情况下，先进行Relu操作，再进行clip，clipReluMaxVal为通过该接口设置的最大值
 ```
-

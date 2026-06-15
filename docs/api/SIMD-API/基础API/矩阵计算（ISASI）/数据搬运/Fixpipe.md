@@ -163,7 +163,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="14.08%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -210,7 +210,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="14.18141814181418%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -263,7 +263,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </tbody>
 </table>
 
-**表 3**  Fixpipe搬运参数（FixpipeParamsV220/FixpipeParamsM300）结构体说明
+**表3**  Fixpipe搬运参数（FixpipeParamsV220/FixpipeParamsM300）结构体说明
 
 <a name="table16798200165314"></a>
 <table><thead align="left"><tr id="row1979815015536"><th class="cellrowborder" valign="top" width="13.459999999999999%" id="mcps1.2.4.1.1"><p id="p1979819019535"><a name="p1979819019535"></a><a name="p1979819019535"></a>参数名称</p>
@@ -301,14 +301,14 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p187991001538"><a name="p187991001538"></a><a name="p187991001538"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.49000000000001%" headers="mcps1.2.4.1.3 "><p id="p16221439111013"><a name="p16221439111013"></a><a name="p16221439111013"></a>源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：srcStride∈[0, 65535]， 单位：C0_Size(16*sizeof(T)，T为src的数据类型)。</p>
+<td class="cellrowborder" valign="top" width="76.49000000000001%" headers="mcps1.2.4.1.3 "><p id="p16221439111013"><a name="p16221439111013"></a><a name="p16221439111013"></a>源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：srcStride∈[0, 65535]，单位：C0_Size(16*sizeof(T)，T为src的数据类型)。</p>
 </td>
 </tr>
 <tr id="row779911045318"><td class="cellrowborder" valign="top" width="13.459999999999999%" headers="mcps1.2.4.1.1 "><p id="p97991104537"><a name="p97991104537"></a><a name="p97991104537"></a>dstStride</p>
 </td>
 <td class="cellrowborder" valign="top" width="10.05%" headers="mcps1.2.4.1.2 "><p id="p107991005319"><a name="p107991005319"></a><a name="p107991005319"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.49000000000001%" headers="mcps1.2.4.1.3 "><a name="ul4462818706"></a><a name="ul4462818706"></a><ul id="ul4462818706"><li>不使能NZ2ND功能<p id="p187991003533"><a name="p187991003533"></a><a name="p187991003533"></a>目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0， 单位：datablock(32Bytes)。</p>
+<td class="cellrowborder" valign="top" width="76.49000000000001%" headers="mcps1.2.4.1.3 "><a name="ul4462818706"></a><a name="ul4462818706"></a><ul id="ul4462818706"><li>不使能NZ2ND功能<p id="p187991003533"><a name="p187991003533"></a><a name="p187991003533"></a>目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：datablock(32Bytes)。</p>
 </li></ul>
 <a name="ul1078723912015"></a><a name="ul1078723912015"></a><ul id="ul1078723912015"><li>使能NZ2ND功能<p id="p1706171910"><a name="p1706171910"></a><a name="p1706171910"></a>目的ND矩阵每一行中的元素个数，取值不为0 ，单位：element。</p>
 </li></ul>
@@ -378,7 +378,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </tbody>
 </table>
 
-**表 4**  FixpipeParamsArch3510结构体参数说明
+**表4**  FixpipeParamsArch3510结构体参数说明
 
 <a name="table134331412112119"></a>
 <table><thead align="left"><tr id="row174331512172117"><th class="cellrowborder" valign="top" width="14.19%" id="mcps1.2.4.1.1"><p id="p17433191210216"><a name="p17433191210216"></a><a name="p17433191210216"></a>参数名称</p>
@@ -415,14 +415,14 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="9.16%" headers="mcps1.2.4.1.2 "><p id="p2434141216218"><a name="p2434141216218"></a><a name="p2434141216218"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><p id="p643413129218"><a name="p643413129218"></a><a name="p643413129218"></a>源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：srcStride∈[0, 65535]， 单位：C0_Size(16*sizeof(T), T为src的数据类型)。</p>
+<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><p id="p643413129218"><a name="p643413129218"></a><a name="p643413129218"></a>源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：srcStride∈[0, 65535]，单位：C0_Size(16*sizeof(T), T为src的数据类型)。</p>
 </td>
 </tr>
 <tr id="row16434912112110"><td class="cellrowborder" valign="top" width="14.19%" headers="mcps1.2.4.1.1 "><p id="p1743431262112"><a name="p1743431262112"></a><a name="p1743431262112"></a>dstStride</p>
 </td>
 <td class="cellrowborder" valign="top" width="9.16%" headers="mcps1.2.4.1.2 "><p id="p043411129218"><a name="p043411129218"></a><a name="p043411129218"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><a name="ul12435212192115"></a><a name="ul12435212192115"></a><ul id="ul12435212192115"><li>不使能NZ2ND功能<p id="p1943571282110"><a name="p1943571282110"></a><a name="p1943571282110"></a>目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0， 单位：element。</p>
+<td class="cellrowborder" valign="top" width="76.64999999999999%" headers="mcps1.2.4.1.3 "><a name="ul12435212192115"></a><a name="ul12435212192115"></a><ul id="ul12435212192115"><li>不使能NZ2ND功能<p id="p1943571282110"><a name="p1943571282110"></a><a name="p1943571282110"></a>目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。</p>
 </li></ul>
 <a name="ul943541262117"></a><a name="ul943541262117"></a><ul id="ul943541262117"><li>使能NZ2ND/NZ2DN功能<p id="p10435191216219"><a name="p10435191216219"></a><a name="p10435191216219"></a>目的ND矩阵每一行中的元素个数，取值不为0 ，单位：element。</p>
 </li></ul>
@@ -483,8 +483,8 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
     __aicore__ inline TransformParams(){};
     using PARAMS = Nz2DnParams;
 };</pre>
-<p id="p10826134221615"><a name="p10826134221615"></a><a name="p10826134221615"></a>CO2Layout 布局类型如下：</p>
-<a name="ul16939237203213"></a><a name="ul16939237203213"></a><ul id="ul16939237203213"><li>ROW_MAJOR<p id="p6946145093113"><a name="p6946145093113"></a><a name="p6946145093113"></a>当启用该模式时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2ND转换。</p>
+<p id="p10826134221615"><a name="p10826134221615"></a><a name="p10826134221615"></a>CO2Layout布局类型如下：</p>
+<a name="ul16939237203213"></a><a name="ul16939237203213"></a><ul id="ul16939237203213"><li>ROW_MAJOR<p id="p6946145093113"><a name="p6946145093113"></a><a name="p6946145093113"></a>当启用该模式时，该指令被定义为从L0C到目标位置的数据移动，并附带NZ2ND转换。</p>
 <a name="screen6946165012319"></a><a name="screen6946165012319"></a><pre class="screen" codetype="Cpp" id="screen6946165012319">struct Nz2NdParams {
     uint16_t ndNum = 1;
     uint16_t srcNdStride = 0;
@@ -493,7 +493,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 <p id="p1094615508312"><a name="p1094615508312"></a><a name="p1094615508312"></a>ndNum: 源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围：ndNum∈[1, 65535]。</p>
 <p id="p1494618506318"><a name="p1494618506318"></a><a name="p1494618506318"></a>srcNdStride: 不同NZ矩阵起始地址之间的间隔，取值范围：srcNdStride∈[0, 65535]，单位: C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。</p>
 <p id="p794619502312"><a name="p794619502312"></a><a name="p794619502312"></a>dstNdStride: 目的相邻ND矩阵起始地址之间的偏移，取值范围：dstNdstride∈[1, 2^32 -1]，单位：element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。</p>
-</li><li>COLUMN_MAJOR<p id="p083421611326"><a name="p083421611326"></a><a name="p083421611326"></a>当启用该模式时， 该指令被定义为从L0C到目标位置的数据移动，并附带NZ2DN转换。</p>
+</li><li>COLUMN_MAJOR<p id="p083421611326"><a name="p083421611326"></a><a name="p083421611326"></a>当启用该模式时，该指令被定义为从L0C到目标位置的数据移动，并附带NZ2DN转换。</p>
 <a name="screen1883410164328"></a><a name="screen1883410164328"></a><pre class="screen" codetype="Cpp" id="screen1883410164328">struct Nz2DnParams {
     uint16_t dnNum = 1;
     uint16_t srcNzMatrixStride = 0;
@@ -503,7 +503,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 <p id="p168341216193217"><a name="p168341216193217"></a><a name="p168341216193217"></a>dnNum: 传输DN矩阵的数目，取值范围：dnNum∈[1, 65535]。</p>
 <p id="p10834141618328"><a name="p10834141618328"></a><a name="p10834141618328"></a>srcNzMatrixStride: 不同源NZ矩阵的偏移（头与头），单位: C0_SIZE。</p>
 <p id="p2834101611324"><a name="p2834101611324"></a><a name="p2834101611324"></a>dstDnMatrixStride: 目的相邻DN矩阵起始地址间的偏移，取值范围：dstDnMatrixdstride∈[1, 2^32 -1]，单位：element。</p>
-<p id="p1834171610321"><a name="p1834171610321"></a><a name="p1834171610321"></a>srcNzC0Stride: 源矩阵NZ分形中相邻行的地址偏移（头与头）,  单位：C0_SIZE。</p>
+<p id="p1834171610321"><a name="p1834171610321"></a><a name="p1834171610321"></a>srcNzC0Stride: 源矩阵NZ分形中相邻行的地址偏移（头与头）,单位：C0_SIZE。</p>
 </li></ul>
 <a name="ul1930331712359"></a><a name="ul1930331712359"></a><ul id="ul1930331712359"><li>NZ<p id="p83941448125315"><a name="p83941448125315"></a><a name="p83941448125315"></a>当启用该模式时，为普通搬运DMA模式，表示从L0C到目标位置的正常数据移动。</p>
 </li></ul>
@@ -540,7 +540,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 
 不使能NZ2ND的情况下，参数设置示例（通过Fixpipe接口搬运并去除dummy数据）和解释说明如下：
 
-当M方向上的数据元素个数不是16的倍数时，搬入时会额外读取dummy数据，并在写入目标位置后丢弃这些dummy数据。矩阵块被定义为连续的16\*16的数据块，数据块的个数为M/16向上取整， 矩阵块的长度为M\*16\*sizeof\(T\)，T是数据类型。
+当M方向上的数据元素个数不是16的倍数时，搬入时会额外读取dummy数据，并在写入目标位置后丢弃这些dummy数据。矩阵块被定义为连续的16\*16的数据块，数据块的个数为M/16向上取整，矩阵块的长度为M\*16\*sizeof\(T\)，T是数据类型。
 
 单搬运模式：
 
@@ -549,7 +549,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 -   srcStride = 64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为40 \* 16个元素。
 
-**图 1**  不使能NZ2ND参数的单搬运模式设置示意图、<a name="fig128961542184620"></a>  
+**图1**  不使能NZ2ND参数的单搬运模式设置示意图、<a name="fig128961542184620"></a>  
 ![](../../../../figures/不开启NZ2ND参数的单搬运模式设置示意图.png "不使能NZ2ND参数的单搬运模式设置示意图")
 
 双目标控制模式：
@@ -570,7 +570,7 @@ M方向切分：
 -   srcStride = 64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个块Z排布矩阵的起始地址与第二个Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中UB0（或UB1）中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40 \*  16个元素。
 
-**图 2**  不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
+**图2**  不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
 ![](../../../../figures/不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
 
 使能NZ2ND的情况下，参数设置示例和解释说明如下：
@@ -581,10 +581,10 @@ M方向切分：
 -   mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 -   srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 -   dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
--   srcNdStride = 16,  表示不同NZ矩阵起始地址之间的间隔为16 \*  16 \* C0\_Size。
+-   srcNdStride = 16,表示不同NZ矩阵起始地址之间的间隔为16 \*  16 \* C0\_Size。
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图 3**  使能NZ2ND参数设置示意图<a name="fig79783143556"></a>  
+**图3**  使能NZ2ND参数设置示意图<a name="fig79783143556"></a>  
 ![](../../../../figures/开启NZ2ND参数设置示意图.png "使能NZ2ND参数设置示意图")
 
 单搬入模式
@@ -595,10 +595,10 @@ M方向切分：
 -   mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 -   srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 -   dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
--   srcNdStride = 256,  表示不同NZ矩阵起始地址之间的间隔为256，单位为C0\_Size。
+-   srcNdStride = 256,表示不同NZ矩阵起始地址之间的间隔为256，单位为C0\_Size。
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图 4**  使能NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
+**图4**  使能NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
 ![](../../../../figures/开启NZ2ND参数的单搬入模式设置示意图.png "使能NZ2ND参数的单搬入模式设置示意图")
 
 双搬入模式
@@ -609,11 +609,11 @@ M方向切分：
 -   mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 -   srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图红框区域中左侧浅色Z排布矩阵的起始地址与右侧深色Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 -   dstStride = 64，表示目的ND矩阵每一行中的元素个数为64。
--   ndNum = 2, 表示源NZ矩阵的数目。
--   srcNdStride = 240 ,  表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
+-   ndNum = 2,表示源NZ矩阵的数目。
+-   srcNdStride = 240 ,表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-    **图 5**  使能NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
+    **图5**  使能NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
     ![](../../../../figures/开启NZ2ND参数双搬入模式设置示意图.png "使能NZ2ND参数双搬入模式设置示意图")
 
 使能NZ2DN的情况下，参数设置示例和解释说明如下：
@@ -626,12 +626,12 @@ M方向切分：
 -   mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 -   srcStride = 80，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中相邻两块蓝色Z排布的起始地址之间的间隔为80 \* C0\_Size。
 -   dstStride = 80，表示目的DN矩阵每一行中的元素个数为80。
--   ndNum = 2, 表示源NZ矩阵的数目。
+-   ndNum = 2,表示源NZ矩阵的数目。
 -   srcNzMatrixStride = 240，表示不同源NZ矩阵的偏移，即下图中第一个蓝色Z排布的起始地址和第二个紫色Z排布的起始地址之间的间隔为240 \* C0\_Size。
 -   srcNzC0Stride = 1：表示源矩阵NZ分形相邻行的地址偏移，。
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 80 =3840个元素。
 
-**图 6**  使能NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
+**图6**  使能NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
 ![](../../../../figures/开启NZ2DN单搬运模式示意图1.png "使能NZ2DN单搬运模式示意图1")
 
 单搬运模式：
@@ -642,17 +642,17 @@ M方向切分：
 -   mSize = 24，表示源NZ矩阵在M方向上的大小为24个元素。
 -   srcStride = 80，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图中相邻两块蓝色Z排布的起始地址之间的间隔为80 \* C0\_Size。
 -   dstStride = 60，表示目的DN矩阵每一行中的元素个数为80。
--   ndNum = 2, 表示源NZ矩阵的数目。
+-   ndNum = 2,表示源NZ矩阵的数目。
 -   srcNzMatrixStride = 240，表示不同源NZ矩阵的偏移，即下图中第一个蓝色Z排布的起始地址和第二个紫色Z排布的起始地址之间的间隔为240 \* C0\_Size。
 -   srcNzC0Stride = 2：表示源矩阵NZ分形相邻行的地址偏移。
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 60 = 2880个元素。
 
-**图 7**  使能NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
+**图7**  使能NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
 ![](../../../../figures/开启NZ2DN单搬运模式示意图2.png "使能NZ2DN单搬运模式示意图2")
 
 ## 约束说明<a name="section205941531307"></a>
 
--   ndNum=0 表示不执行，此指令将不被执行并报warning。
+-   ndNum=0表示不执行，此指令将不被执行并报warning。
 -   对于量化输入为float32数据类型的说明如下：
     -   标准的IEEE 754 float32格式为：1bit符号位，8bits指数位，23bits尾数位；当前AI处理器支持的float32格式为：1bit符号位，8bits指数位，10bits尾数位。
     -   如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。

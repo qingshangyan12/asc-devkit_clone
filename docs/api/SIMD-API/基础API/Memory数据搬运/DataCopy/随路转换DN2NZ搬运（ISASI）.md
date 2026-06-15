@@ -60,7 +60,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table49614585413"></a>
 <table><thead align="left"><tr id="row996115820412"><th class="cellrowborder" valign="top" width="14.729999999999999%" id="mcps1.2.3.1.1"><p id="p10961458104110"><a name="p10961458104110"></a><a name="p10961458104110"></a>参数名</p>
@@ -82,7 +82,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table917mcpsimp"></a>
 <table><thead align="left"><tr id="row923mcpsimp"><th class="cellrowborder" valign="top" width="15.02%" id="mcps1.2.4.1.1"><p id="p925mcpsimp"><a name="p925mcpsimp"></a><a name="p925mcpsimp"></a>参数名称</p>
@@ -117,7 +117,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 </tbody>
 </table>
 
-**表 3**  Dn2NzParams结构体参数定义
+**表3**  Dn2NzParams结构体参数定义
 
 <a name="table9182515919"></a>
 <table><thead align="left"><tr id="row151816516917"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p18182513916"><a name="p18182513916"></a><a name="p18182513916"></a>参数名称</p>
@@ -184,14 +184,14 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
-**表 4**  数据通路和数据类型
+**表4**  数据通路和数据类型
 
 <a name="table14255161718545"></a>
 <table><thead align="left"><tr id="row3255181710543"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p52550177546"><a name="p52550177546"></a><a name="p52550177546"></a>支持型号</p>
 </th>
 <th class="cellrowborder" valign="top" width="23.93%" id="mcps1.2.4.1.2"><p id="p13255191735420"><a name="p13255191735420"></a><a name="p13255191735420"></a>数据通路（通过<a href="../../数据结构/辅助数据结构//TPosition.md#table5376122715308">TPosition</a>表达）</p>
 </th>
-<th class="cellrowborder" valign="top" width="65.03%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
+<th class="cellrowborder" valign="top" width="65.03%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型(两者保持一致)</p>
 </th>
 </tr>
 </thead>
@@ -229,6 +229,6 @@ AscendC::Dn2NzParams dn2nzParams(
     /* dstNzNStride      */ 1,
     /* dstNzMatrixStride */ 0
 );
-// 将GM中DN的格式的数据， 按照 dn2nzParams 定义的规则，转换为NZ并拷贝到A1/B1中
+// 将GM中DN的格式的数据，按照dn2nzParams 定义的规则，转换为NZ并拷贝到A1/B1中
 AscendC::DataCopy(dstLocal, srcGlobal, dn2nzParams);
 ```

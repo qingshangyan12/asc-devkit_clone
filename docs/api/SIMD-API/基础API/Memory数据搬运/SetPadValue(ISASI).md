@@ -62,7 +62,7 @@ __aicore__ inline void SetPadValue(T paddingValue)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table19493819151620"></a>
 <table><thead align="left"><tr id="row149311195164"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="p249381971616"><a name="p249381971616"></a><a name="p249381971616"></a>参数名</p>
@@ -92,7 +92,7 @@ __aicore__ inline void SetPadValue(T paddingValue)
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table1055216132132"></a>
 <table><thead align="left"><tr id="row105531513121315"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="p5553171319138"><a name="p5553171319138"></a><a name="p5553171319138"></a>参数名</p>
@@ -160,4 +160,3 @@ AscendC::DataCopyPad(srcLocal, m_srcGlobal, dataCopyExtParams, padParams);
 输入数据（srcGm, shape = [32, 31]）：[[1, 2, 3, ..., 31], [1, 2, 3, ..., 31], ... , [1, 2, 3, ..., 31]]
 输出数据（dstGm, shape = [32, 32]）：[[1, 2, 3, ..., 31, 1], [1, 2, 3, ..., 31, 1], ... , [1, 2, 3, ..., 31, 1]]
 ```
-

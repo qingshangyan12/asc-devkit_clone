@@ -70,7 +70,7 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -90,7 +90,7 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 <p id="p19771228162513"><a name="p19771228162513"></a><a name="p19771228162513"></a><span id="ph1577628112515"><a name="ph1577628112515"></a><a name="ph1577628112515"></a><term id="zh-cn_topic_0000001312391781_term1964153212227_1"><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a><a name="zh-cn_topic_0000001312391781_term1964153212227_1"></a>Atlas 推理系列产品</term>AI Core</span>，支持的数据类型为：int8_t/uint8_t/half/int16_t/uint16_t</p>
 <p id="p990614114434"><a name="p990614114434"></a><a name="p990614114434"></a><span id="ph126684217571"><a name="ph126684217571"></a><a name="ph126684217571"></a><term id="zh-cn_topic_0000001312391781_term11962195213215_1"><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a><a name="zh-cn_topic_0000001312391781_term11962195213215_1"></a>Atlas A2 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term184716139811_1"><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a><a name="zh-cn_topic_0000001312391781_term184716139811_1"></a>Atlas A2 推理系列产品</term></span>，支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
 <p id="p523904010149"><a name="p523904010149"></a><a name="p523904010149"></a><span id="ph16239174011416"><a name="ph16239174011416"></a><a name="ph16239174011416"></a><term id="zh-cn_topic_0000001312391781_term1253731311225_1"><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a><a name="zh-cn_topic_0000001312391781_term1253731311225_1"></a>Atlas A3 训练系列产品</term>/<term id="zh-cn_topic_0000001312391781_term131434243115_1"><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a><a name="zh-cn_topic_0000001312391781_term131434243115_1"></a>Atlas A3 推理系列产品</term></span>，支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
-<p id="p10287193011329"><a name="p10287193011329"></a><a name="p10287193011329"></a><span id="ph8287730143217"><a name="ph8287730143217"></a><a name="ph8287730143217"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>， 支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
+<p id="p10287193011329"><a name="p10287193011329"></a><a name="p10287193011329"></a><span id="ph8287730143217"><a name="ph8287730143217"></a><a name="ph8287730143217"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>，支持数据类型：int8_t/uint8_t/half/int16_t/uint16_t/bfloat16_t/int32_t/uint32_t/float</p>
 <p id="p189605211794"><a name="p189605211794"></a><a name="p189605211794"></a><span id="ph1513911443012"><a name="ph1513911443012"></a><a name="ph1513911443012"></a>Kirin X90</span>，支持数据类型：int8_t/half</p>
 <p id="p726910232914"><a name="p726910232914"></a><a name="p726910232914"></a><span id="ph1737614320304"><a name="ph1737614320304"></a><a name="ph1737614320304"></a>Kirin 9030</span>，支持数据类型：half</p>
 </td>
@@ -105,4 +105,3 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](SetFmatrix.md#section642mcpsimp)
-

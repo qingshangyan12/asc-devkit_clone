@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
 | <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
@@ -38,24 +38,24 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
-**表 1** 模板参数说明<a name="table07381635103112"></a>
+**表1** 模板参数说明<a name="table07381635103112"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
 | T | 源操作数和目的操作数的数据类型。 |
 | U | 针对Load2DMX接口，U用来表示dst的数据类型，当src为fp8_e5m2_t、fp8_e4m3fn_t时，U需为T对应的MX数据类型，即AscendC::mx_fp8_e5m2_t和AscendC::mx_fp8_e4m3_t，否则编译失败。除此之外的数据类型要求T和U一致。 |
 
-**表 2** 通用参数说明<a name="table18368155193919"></a>
+**表2** 通用参数说明<a name="table18368155193919"></a>
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32字节 / sizeof(T))。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为(32字节 / sizeof(T))  \* 16。<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32字节 / sizeof(T))。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
 | srcMx | 输入 | 源操作数，类型为LocalTensor，仅支持fp8_e8m0_t类型。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考表[Load2DV2](Load2DV2.md)中的LoadData2DParamsV2结构体内参数说明。 |
 | loadMxDataParams | 输入 | LoadData参数结构体，类型为LoadData2DMxParams，具体参考[表3](#table15901153712305)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
-**表 3** LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
+**表3** LoadData2DMxParams结构体参数说明<a name="table15901153712305"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -68,7 +68,7 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 
 下面通过一个具体的示例来解释LoadData2DMxParams结构体参数。假设A矩阵shape为（M，K），则ScaleA矩阵shape为（M，K/32），ScaleA数据类型为fp8_e8m0_t，ScaleA矩阵分形排布见[图1](#fig138710913432)。
 
-**图 1** ScaleA在L0A Buffer的分形排布<a id="fig138710913432"></a>
+**图1** ScaleA在L0A Buffer的分形排布<a id="fig138710913432"></a>
 
 ![](../../../../../figures/ScaleA在L0A的分形排布.png "ScaleA在L0A Buffer的分形排布")
 

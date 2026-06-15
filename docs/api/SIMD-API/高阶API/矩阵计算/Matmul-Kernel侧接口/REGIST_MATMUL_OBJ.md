@@ -12,7 +12,7 @@ REGIST_MATMUL_OBJ(tpipe, workspace, ...)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -47,4 +47,3 @@ REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm1, mm1tiling, mm2, mm2tiling, m
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm);
 mm.Init(&tiling);
 ```
-

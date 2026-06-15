@@ -72,7 +72,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="13.44%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -94,7 +94,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -124,7 +124,7 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
 </td>
 <td class="cellrowborder" valign="top" width="10.35103510351035%" headers="mcps1.2.4.1.2 "><p id="p19487171515178"><a name="p19487171515178"></a><a name="p19487171515178"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.98759875987598%" headers="mcps1.2.4.1.3 "><p id="p3487131516175"><a name="p3487131516175"></a><a name="p3487131516175"></a>UnitFlag清空标志位，默认值为false。通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后， 对于L0C中的每个内存块（512B），提供一个单元标志位，用于指示该块是否可读或可写。</p>
+<td class="cellrowborder" valign="top" width="75.98759875987598%" headers="mcps1.2.4.1.3 "><p id="p3487131516175"><a name="p3487131516175"></a><a name="p3487131516175"></a>UnitFlag清空标志位，默认值为false。通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。当UnitFlag开关打开后，对于L0C中的每个内存块（512B），提供一个单元标志位，用于指示该块是否可读或可写。</p>
 <a name="ul1049794662411"></a><a name="ul1049794662411"></a><ul id="ul1049794662411"><li>false：关闭UnitFlag配置。</li><li>true：打开UnitFlag配置。</li></ul>
 </td>
 </tr>
@@ -160,9 +160,8 @@ __aicore__inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const L
     AscendC::LocalTensor<uint64_t> deqFB = inQueueDeqFB.AllocTensor<uint64_t>(); // deq tensor在Fix上的地址
     uint16_t fbufBurstLen = deqSize / 128;  // l1->fix, burst_len unit is 128Bytes
     AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
-    AscendC::DataCopy(deqFB, workA1, dataCopyParams); 通过DataCopy搬入C2PIPE2GM。
+    AscendC::DataCopy(deqFB, workA1, dataCopyParams);通过DataCopy搬入C2PIPE2GM。
     AscendC::SetFixPipeConfig(deqFB); // 设置量化tensor
     AscendC::PipeBarrier<PIPE_FIX>();
 }
 ```
-

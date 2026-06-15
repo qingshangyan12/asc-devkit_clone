@@ -61,7 +61,7 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -94,4 +94,3 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)
 ## 调用示例<a name="section642mcpsimp"></a>
 
 参考[调用示例](SetFmatrix.md#section642mcpsimp)。
-

@@ -110,7 +110,7 @@
 
 ## 参数说明<a name="section1251613311396"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table49614585413"></a>
 <table><thead align="left"><tr id="row996115820412"><th class="cellrowborder" valign="top" width="14.719999999999999%" id="mcps1.2.3.1.1"><p id="p10961458104110"><a name="p10961458104110"></a><a name="p10961458104110"></a>参数名</p>
@@ -133,7 +133,7 @@
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table917mcpsimp"></a>
 <table><thead align="left"><tr id="row923mcpsimp"><th class="cellrowborder" valign="top" width="15.02%" id="mcps1.2.4.1.1"><p id="p925mcpsimp"><a name="p925mcpsimp"></a><a name="p925mcpsimp"></a>参数名称</p>
@@ -169,7 +169,7 @@
 </tbody>
 </table>
 
-**表 3**  Nd2NzParams结构体参数定义
+**表3**  Nd2NzParams结构体参数定义
 
 <a name="table844881954715"></a>
 <table><thead align="left"><tr id="row11449201964714"><th class="cellrowborder" valign="top" width="18.44%" id="mcps1.2.3.1.1"><p id="p18449151934710"><a name="p18449151934710"></a><a name="p18449151934710"></a>参数名称</p>
@@ -232,12 +232,12 @@ ND2NZ转换示意图如下，样例中参数设置值和解释说明如下：
 -   dstNzNStride = 2，表示src中一个ND矩阵的第x行和第x+1行转换为NZ格式后在dst中的偏移，即A1和B1在dst之间的偏移为2个DataBlock。
 -   dstNzMatrixStride = 96，表达dst中第x个ND矩阵的起点和第x+1个ND矩阵的起点的偏移，即A1和C1之间的距离，即为6个DataBlock，6 \* 16 = 96个元素。
 
-**图 1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>  
+**图1**  ND2NZ转换示意图（half数据类型）<a name="fig128961542184620"></a>  
 ![](../../../../figures/ND2NZ转换示意图（half数据类型）.png "ND2NZ转换示意图（half数据类型）")
 
 enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
-**图 2**  enableSmallC0开启模式下的ND2NZ转换示意图 （half数据类型）<a name="fig07641913195410"></a>  
+**图2**  enableSmallC0开启模式下的ND2NZ转换示意图（half数据类型）<a name="fig07641913195410"></a>  
 ![](../../../../figures/enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）.png "enableSmallC0开启模式下的ND2NZ转换示意图-（half数据类型）")
 
 ## 返回值说明<a name="section446456163012"></a>
@@ -252,14 +252,14 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 
 下文的数据通路均通过逻辑位置[TPosition](../../数据结构/辅助数据结构//TPosition.md#table5376122715308)来表达，并注明了对应的物理通路。TPosition与物理内存的映射关系见[表1](../../../通用说明和约束.md#table07372185712)。
 
-**表 4**  Global Memory -\> Local Memory具体通路和支持的数据类型
+**表4**  Global Memory -\> Local Memory具体通路和支持的数据类型
 
 <a name="table14255161718545"></a>
 <table><thead align="left"><tr id="row3255181710543"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p52550177546"><a name="p52550177546"></a><a name="p52550177546"></a>产品型号</p>
 </th>
 <th class="cellrowborder" valign="top" width="24.05%" id="mcps1.2.4.1.2"><p id="p13255191735420"><a name="p13255191735420"></a><a name="p13255191735420"></a>数据通路</p>
 </th>
-<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
+<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型(两者保持一致)</p>
 </th>
 </tr>
 </thead>
@@ -319,14 +319,14 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 </tbody>
 </table>
 
-**表 5**  Local Memory -\> Local Memory具体通路和支持的数据类型
+**表5**  Local Memory -\> Local Memory具体通路和支持的数据类型
 
 <a name="table199181635105620"></a>
 <table><thead align="left"><tr id="row79189351566"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p159189351562"><a name="p159189351562"></a><a name="p159189351562"></a>产品型号</p>
 </th>
 <th class="cellrowborder" valign="top" width="24.05%" id="mcps1.2.4.1.2"><p id="p7918133555612"><a name="p7918133555612"></a><a name="p7918133555612"></a>数据通路</p>
 </th>
-<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p18918103516566"><a name="p18918103516566"></a><a name="p18918103516566"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
+<th class="cellrowborder" valign="top" width="64.91%" id="mcps1.2.4.1.3"><p id="p18918103516566"><a name="p18918103516566"></a><a name="p18918103516566"></a>源操作数和目的操作数的数据类型(两者保持一致)</p>
 </th>
 </tr>
 </thead>

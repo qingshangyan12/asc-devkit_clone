@@ -74,7 +74,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table07381635103112"></a>
 <table><thead align="left"><tr id="row117393350314"><th class="cellrowborder" valign="top" width="16.55%" id="mcps1.2.3.1.1"><p id="p14739335193119"><a name="p14739335193119"></a><a name="p14739335193119"></a>参数名称</p>
@@ -102,7 +102,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </tbody>
 </table>
 
-**表 2**  通用参数说明
+**表2**  通用参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.89168916891689%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -119,7 +119,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </td>
 <td class="cellrowborder" valign="top" width="71.99719971997199%" headers="mcps1.2.4.1.3 "><p id="p66101129164712"><a name="p66101129164712"></a><a name="p66101129164712"></a>目的操作数，类型为LocalTensor。</p>
 <p id="p3610102994715"><a name="p3610102994715"></a><a name="p3610102994715"></a>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：</p>
-<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为 (32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
+<a name="ul76107290479"></a><a name="ul76107290479"></a><ul id="ul76107290479"><li>A2：ZZ格式/NZ格式；对应的分形大小为16 * (32B / sizeof(T))。</li><li>B2：ZN格式；对应的分形大小为(32B / sizeof(T))  * 16。</li><li>A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32B / sizeof(T))。</li></ul>
 </td>
 </tr>
 <tr id="row1836875519393"><td class="cellrowborder" valign="top" width="16.89168916891689%" headers="mcps1.2.4.1.1 "><p id="p7650141019171"><a name="p7650141019171"></a><a name="p7650141019171"></a>src</p>
@@ -142,7 +142,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </tbody>
 </table>
 
-**表 3**  Load2DBitModeParam类参数说明
+**表3**  Load2DBitModeParam类参数说明
 
 <a name="table10539223195311"></a>
 <table><thead align="left"><tr id="row05391923195317"><th class="cellrowborder" valign="top" width="18.459999999999997%" id="mcps1.2.3.1.1"><p id="p753962317532"><a name="p753962317532"></a><a name="p753962317532"></a>参数名称</p>
@@ -207,7 +207,7 @@ Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对congfig0和config1直接进行逐bit位修改来修改参数。
 
-**表 4**  Load2DBitModeConfig0结构体参数说明
+**表4**  Load2DBitModeConfig0结构体参数说明
 
 <a name="table4109172132317"></a>
 <table><thead align="left"><tr id="row1610914216237"><th class="cellrowborder" valign="top" width="18.42%" id="mcps1.2.3.1.1"><p id="p111096219231"><a name="p111096219231"></a><a name="p111096219231"></a>参数名称</p>
@@ -249,7 +249,7 @@ Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结
 
 Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#table49630346128)。
 
-**表 5**  Load2DBitModeConfig1结构体参数说明
+**表5**  Load2DBitModeConfig1结构体参数说明
 
 <a name="table122891852142311"></a>
 <table><thead align="left"><tr id="row72891452172315"><th class="cellrowborder" valign="top" width="18.2%" id="mcps1.2.3.1.1"><p id="p7289152152311"><a name="p7289152152311"></a><a name="p7289152152311"></a>参数名称</p>
@@ -275,7 +275,7 @@ Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的
 
 Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[表4](Load2D.md#table49630346128)。
 
-**表 6**  Load2DBitModeParam类成员函数说明
+**表6**  Load2DBitModeParam类成员函数说明
 
 <a name="table1123714295457"></a>
 <table><thead align="left"><tr id="row32383296458"><th class="cellrowborder" valign="top" width="18.22%" id="mcps1.2.3.1.1"><p id="p723882974510"><a name="p723882974510"></a><a name="p723882974510"></a>函数名称</p>
@@ -383,4 +383,3 @@ AscendC::LoadData<A2, A1, half>(featureMapA2, featureMapA1, paramBitMode);
 inQueueFmA2.EnQue<half>(featureMapA2);
 inQueueFmA1.FreeTensor(featureMapA1);
 ```
-

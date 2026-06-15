@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-将图像数据从Global Memory搬运到Local Memory。 搬运过程中可以完成图像预处理操作：包括图像翻转，改变图像尺寸（抠图，裁边，缩放，伸展），以及色域转换，类型转换等。图像预处理的相关参数通过[SetAippFunctions](SetAippFunctions.md)进行配置。
+将图像数据从Global Memory搬运到Local Memory。搬运过程中可以完成图像预处理操作：包括图像翻转，改变图像尺寸（抠图，裁边，缩放，伸展），以及色域转换，类型转换等。图像预处理的相关参数通过[SetAippFunctions](SetAippFunctions.md)进行配置。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -60,7 +60,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.371637163716375%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -96,7 +96,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </tbody>
 </table>
 
-**表 2**  LoadImageToLocalParams结构体内参数说明
+**表2**  LoadImageToLocalParams结构体内参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -111,7 +111,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p75532491189"><a name="p75532491189"></a><a name="p75532491189"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p35535499185"><a name="p35535499185"></a><a name="p35535499185"></a>从源图中加载图片的水平宽度，单位为像素，取值范围：horizSize∈[2, 4095] 。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p35535499185"><a name="p35535499185"></a><a name="p35535499185"></a>从源图中加载图片的水平宽度，单位为像素，取值范围：horizSize∈[2, 4095]。</p>
 </td>
 </tr>
 <tr id="row4956154125018"><td class="cellrowborder" valign="top" width="16.46164616461646%" headers="mcps1.2.4.1.1 "><p id="p955315493182"><a name="p955315493182"></a><a name="p955315493182"></a>vertSize</p>
@@ -125,7 +125,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p6553449121814"><a name="p6553449121814"></a><a name="p6553449121814"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p65651740538"><a name="p65651740538"></a><a name="p65651740538"></a>加载图片在源图片上的水平起始地址，单位为像素，取值范围：horizStartPos∈[0, 4095] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p65651740538"><a name="p65651740538"></a><a name="p65651740538"></a>加载图片在源图片上的水平起始地址，单位为像素，取值范围：horizStartPos∈[0, 4095]。默认为0。</p>
 <p id="p88061141137"><a name="p88061141137"></a><a name="p88061141137"></a>注意：当输入图片为YUV420SP、XRGB8888， RGB888和YUV400格式时，该参数需要是偶数。</p>
 </td>
 </tr>
@@ -133,7 +133,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p1355314971811"><a name="p1355314971811"></a><a name="p1355314971811"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p234518101766"><a name="p234518101766"></a><a name="p234518101766"></a>加载图片在源图片上的垂直起始地址，单位为像素，取值范围：vertStartPos∈[0, 4095] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p234518101766"><a name="p234518101766"></a><a name="p234518101766"></a>加载图片在源图片上的垂直起始地址，单位为像素，取值范围：vertStartPos∈[0, 4095]。默认为0。</p>
 <p id="p83171329446"><a name="p83171329446"></a><a name="p83171329446"></a>注意：当输入图片为YUV420SP格式时，该参数需要是偶数。</p>
 </td>
 </tr>
@@ -141,7 +141,7 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p105545496187"><a name="p105545496187"></a><a name="p105545496187"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p1130219124815"><a name="p1130219124815"></a><a name="p1130219124815"></a>源图像水平宽度 ，单位为像素，取值范围：srcHorizSize∈[2, 4095] 。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p1130219124815"><a name="p1130219124815"></a><a name="p1130219124815"></a>源图像水平宽度，单位为像素，取值范围：srcHorizSize∈[2, 4095]。</p>
 <p id="p061124212720"><a name="p061124212720"></a><a name="p061124212720"></a>注意：当输入图片为YUV420SP格式时，该参数需要是偶数。</p>
 </td>
 </tr>
@@ -149,28 +149,28 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p15554164914188"><a name="p15554164914188"></a><a name="p15554164914188"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p835216479810"><a name="p835216479810"></a><a name="p835216479810"></a>目的图像顶部填充的像素数 ，取值范围：topPadSize∈[0, 32] ，默认为0。进行数据填充时使用，需要先调用<a href="SetAippFunctions.md">SetAippFunctions</a>通过<a href="SetAippFunctions.md#table8955841508">AippPaddingParams</a>配置填充的数值，再通过topPadSize、botPadSize、leftPadSize、rightPadSize配置填充的大小范围。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p835216479810"><a name="p835216479810"></a><a name="p835216479810"></a>目的图像顶部填充的像素数，取值范围：topPadSize∈[0, 32]，默认为0。进行数据填充时使用，需要先调用<a href="SetAippFunctions.md">SetAippFunctions</a>通过<a href="SetAippFunctions.md#table8955841508">AippPaddingParams</a>配置填充的数值，再通过topPadSize、botPadSize、leftPadSize、rightPadSize配置填充的大小范围。</p>
 </td>
 </tr>
 <tr id="row497391184"><td class="cellrowborder" valign="top" width="16.46164616461646%" headers="mcps1.2.4.1.1 "><p id="p16554134921816"><a name="p16554134921816"></a><a name="p16554134921816"></a>botPadSize</p>
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p19554114910183"><a name="p19554114910183"></a><a name="p19554114910183"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p155541749141820"><a name="p155541749141820"></a><a name="p155541749141820"></a>目的图像底部填充的像素数，取值范围：botPadSize∈[0, 32] ，默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p155541749141820"><a name="p155541749141820"></a><a name="p155541749141820"></a>目的图像底部填充的像素数，取值范围：botPadSize∈[0, 32]，默认为0。</p>
 </td>
 </tr>
 <tr id="row113654148595"><td class="cellrowborder" valign="top" width="16.46164616461646%" headers="mcps1.2.4.1.1 "><p id="p1536531455915"><a name="p1536531455915"></a><a name="p1536531455915"></a>leftPadSize</p>
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p536531411596"><a name="p536531411596"></a><a name="p536531411596"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p1871912112910"><a name="p1871912112910"></a><a name="p1871912112910"></a>目的图像左边填充的像素数，取值范围：leftPadSize∈[0, 32] ，默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p1871912112910"><a name="p1871912112910"></a><a name="p1871912112910"></a>目的图像左边填充的像素数，取值范围：leftPadSize∈[0, 32]，默认为0。</p>
 </td>
 </tr>
 <tr id="row12646161755910"><td class="cellrowborder" valign="top" width="16.46164616461646%" headers="mcps1.2.4.1.1 "><p id="p4646151745920"><a name="p4646151745920"></a><a name="p4646151745920"></a>rightPadSize</p>
 </td>
 <td class="cellrowborder" valign="top" width="11.29112911291129%" headers="mcps1.2.4.1.2 "><p id="p864681715594"><a name="p864681715594"></a><a name="p864681715594"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p95861946994"><a name="p95861946994"></a><a name="p95861946994"></a>目的图像右边填充的像素数，取值范围：rightPadSize∈[0, 32] ，默认为0。</p>
+<td class="cellrowborder" valign="top" width="72.24722472247225%" headers="mcps1.2.4.1.3 "><p id="p95861946994"><a name="p95861946994"></a><a name="p95861946994"></a>目的图像右边填充的像素数，取值范围：rightPadSize∈[0, 32]，默认为0。</p>
 </td>
 </tr>
 <tr id="row1597316591537"><td class="cellrowborder" valign="top" width="16.46164616461646%" headers="mcps1.2.4.1.1 "><p id="p1535104110411"><a name="p1535104110411"></a><a name="p1535104110411"></a>sid</p>
@@ -219,4 +219,3 @@ aippConfig.cPaddingParams.cPaddingValue = cPaddingValue;
 AscendC::SetAippFunctions(fmGlobal, fmGlobal[gmSrc0Size], inputFormat, aippConfig);
 AscendC::LoadImageToLocal(featureMapA1, { horizSize, vertSize, horizStartPos, vertStartPos, srcHorizSize, topPadSize, botPadSize, leftPadSize, rightPadSize });
 ```
-

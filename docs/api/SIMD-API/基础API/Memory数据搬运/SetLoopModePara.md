@@ -62,7 +62,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 <a name="table1055216132132"></a>
 <table><thead align="left"><tr id="row105531513121315"><th class="cellrowborder" valign="top" width="16.49%" id="mcps1.2.4.1.1"><p id="p5553171319138"><a name="p5553171319138"></a><a name="p5553171319138"></a>参数名</p>
@@ -77,7 +77,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 </td>
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p755318134134"><a name="p755318134134"></a><a name="p755318134134"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p964217483714"><a name="p964217483714"></a><a name="p964217483714"></a>循环模式参数 LoopModeParams类型，定义如下，具体参数说明请参考<a href="#table1940815635619">表2</a>。</p>
+<td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p964217483714"><a name="p964217483714"></a><a name="p964217483714"></a>循环模式参数LoopModeParams类型，定义如下，具体参数说明请参考<a href="#table1940815635619">表2</a>。</p>
 <pre class="screen" id="screen1929612197911"><a name="screen1929612197911"></a><a name="screen1929612197911"></a>struct LoopModeParams {
         loop1Size = 0;
         loop2Size = 0;
@@ -102,7 +102,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 </tbody>
 </table>
 
-**表 2**  LoopModeParams结构体参数说明
+**表2**  LoopModeParams结构体参数说明
 
 <a name="table1940815635619"></a>
 <table><thead align="left"><tr id="row1940813563564"><th class="cellrowborder" valign="top" width="16.689999999999998%" id="mcps1.2.3.1.1"><p id="p1408155635620"><a name="p1408155635620"></a><a name="p1408155635620"></a>参数名称</p>
@@ -148,7 +148,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 </tbody>
 </table>
 
-**表 3**  DataCopyMVType结构体参数说明
+**表3**  DataCopyMVType结构体参数说明
 
 <a name="table1166074612214"></a>
 <table><thead align="left"><tr id="row2066014461221"><th class="cellrowborder" valign="top" width="16.689999999999998%" id="mcps1.2.3.1.1"><p id="p11660174612227"><a name="p11660174612227"></a><a name="p11660174612227"></a>参数名称</p>
@@ -176,10 +176,10 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 -   再设置SetLoopModePara中LoopModeParams的参数：loop1Size = 2，loop2Size = 2，loop1SrcStride = 96，loop2SrcStride =192，loop1DstStride =  128，loop2DstStride = 288，DataCopyMVType为OUT\_TO\_UB，表明内层循环和外层循坏的次数分别为2次，内层循环和外层循环中相邻迭代源操作数的数据块间隔分别为96Bytes和192Bytes，内层循环和外层循环中相邻迭代目的操作数的数据块间隔分别为128Bytes和288Bytes，通路是从GM搬运到UB；
 -   使用以上配置，调用SetLoopModePara再调用DataCopyPad就可以开启DataCopyPad的loop模式完成数据类型为int8\_t的数据块大小为384的数据搬运。详细图解如下：
 
-**图 1**  源操作数搬运场景示例<a name="fig6671114911311"></a>  
+**图1**  源操作数搬运场景示例<a name="fig6671114911311"></a>  
 ![](../../../figures/源操作数搬运场景示例.png "源操作数搬运场景示例")
 
-**图 2**  目的操作数搬运场景示例<a name="fig226181311513"></a>  
+**图2**  目的操作数搬运场景示例<a name="fig226181311513"></a>  
 ![](../../../figures/目的操作数搬运场景示例.png "目的操作数搬运场景示例")
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -202,7 +202,7 @@ AscendC::DataCopyExtParams copyParams{2, 48 * sizeof(int8_t), 0, 0, 0}; // 结�
 AscendC::DataCopyPadExtParams<half> padParams{false, 0, 0, 0};
 AscendC::LoopModeParams loopParam2Ub {2, 2, 96, 128, 192, 288};
 AscendC::SetLoopModePara(loopParam2Ub, DataCopyMVType::OUT_TO_UB);
-AscendC::DataCopyPad<int8_t, PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams); // 从GM->VECIN搬运 48 * 2 * 2 * 2 = 384Bytes
+AscendC::DataCopyPad<int8_t, PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams); // 从GM->VECIN搬运48 * 2 * 2 * 2 = 384Bytes
 AscendC::ResetLoopModePara(DataCopyMVType::OUT_TO_UB);
 AscendC::LoopModeParams loopParam2Gm {2, 2, 128, 96, 288, 192};
 AscendC::SetLoopModePara(loopParams2Gm, DataCopyMVType::UB_TO_OUT);
@@ -216,4 +216,3 @@ AscendC::ResetLoopModePara(DataCopyMVType::UB_TO_OUT);
 输入数据src0Global: [1 2 3 ... 384]
 输出数据dstGlobal:[1 2 3 ... 384]
 ```
-

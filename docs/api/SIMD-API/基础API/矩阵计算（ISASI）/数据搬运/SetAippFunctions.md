@@ -54,22 +54,22 @@
 -   **数据填充**：在图片HW方向上padding。分为如下几种模式：
     -   模式0：常量填充模式，padding区域各位置填充为常数，支持设置每个通道填充的常数。该模式下仅支持左右padding，不支持上下padding。
 
-        **图 1**  常量填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig56681157121916"></a>  
+        **图1**  常量填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig56681157121916"></a>  
         ![](../../../../figures/常量填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）.png "常量填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）")
 
     -   模式1：行列填充模式，padding区域各位置填充行/列上最邻近源图片位置的数据。
 
-        **图 2**  行列填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig4239143712713"></a>  
+        **图2**  行列填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig4239143712713"></a>  
         ![](../../../../figures/行列填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）.png "行列填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）")
 
     -   模式2：块填充模式，按照padding的宽高，从源图片拷贝数据块进行padding区域填充。
 
-        **图 3**  块填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig38821202817"></a>  
+        **图3**  块填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig38821202817"></a>  
         ![](../../../../figures/块填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）.png "块填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）")
 
     -   模式3：镜像块填充模式，按照padding的宽高，从源图片拷贝数据块的镜像进行padding区域填充。
 
-        **图 4**  镜像块填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig14371141920261"></a>  
+        **图4**  镜像块填充模式（图片中间的绿色区域表示原始数据，其他为padding数据）<a name="fig14371141920261"></a>  
         ![](../../../../figures/镜像块填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）.png "镜像块填充模式（图片中间的绿色区域表示原始数据-其他为padding数据）")
 
 -   **通道交换**：将图片通道进行交换。
@@ -88,9 +88,9 @@
 -   **数据类型转换**：转换像素的数据类型，支持uint8\_t转换为int8\_t或half。当uint8\_t转换成int8\_t的时候，输出数据范围限制在\[-128， 127\]。
 
     ```
-    // 例1：实现uint8_t ->int8_t 的类型转换，同时实现零均值化：设置每个通道mean值为该通道所有数据的平均值（min和var值无效，不用设置）。
+    // 例1：实现uint8_t ->int8_t的类型转换，同时实现零均值化：设置每个通道mean值为该通道所有数据的平均值（min和var值无效，不用设置）。
     output[i][j][k] = input[i][j][k] - mean[k]
-    // 例2：实现uint8_t -> fp16 的类型转换，同时实现归一化：设置每个通道mean值为该通道所有数据的平均值，min值为该通道所有数据零均值化后的最小值，var值为该通道所有数据的最大值减最小值的倒数。
+    // 例2：实现uint8_t -> fp16的类型转换，同时实现归一化：设置每个通道mean值为该通道所有数据的平均值，min值为该通道所有数据零均值化后的最小值，var值为该通道所有数据的最大值减最小值的倒数。
     uint8_t -> fp16:  output[i][j][k] = (input[i][j][k] - mean[k] - min[k]) * var[k]
     ```
 
@@ -128,7 +128,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table07381635103112"></a>
 <table><thead align="left"><tr id="row117393350314"><th class="cellrowborder" valign="top" width="16.580000000000002%" id="mcps1.2.3.1.1"><p id="p14739335193119"><a name="p14739335193119"></a><a name="p14739335193119"></a>参数名称</p>
@@ -151,7 +151,7 @@
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.371637163716375%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -269,7 +269,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 3**  AippPaddingParams结构体内参数说明
+**表3**  AippPaddingParams结构体内参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="17.94179417941794%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -322,7 +322,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 4**  AippSwapParams结构体内参数说明
+**表4**  AippSwapParams结构体内参数说明
 
 <a name="table679014222918"></a>
 <table><thead align="left"><tr id="row67907213292"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p7790192122918"><a name="p7790192122918"></a><a name="p7790192122918"></a>参数名称</p>
@@ -357,7 +357,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 5**  AippSingleLineParams结构体内参数说明
+**表5**  AippSingleLineParams结构体内参数说明
 
 <a name="table193501032193419"></a>
 <table><thead align="left"><tr id="row235043213342"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p18350163220344"><a name="p18350163220344"></a><a name="p18350163220344"></a>参数名称</p>
@@ -378,7 +378,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 6**  AippDataTypeConvParams结构体内参数说明
+**表6**  AippDataTypeConvParams结构体内参数说明
 
 <a name="table14611192613519"></a>
 <table><thead align="left"><tr id="row136113261355"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p96111426756"><a name="p96111426756"></a><a name="p96111426756"></a>参数名称</p>
@@ -468,7 +468,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 7**  AippChannelPaddingParams结构体内参数说明
+**表7**  AippChannelPaddingParams结构体内参数说明
 
 <a name="table163681812917"></a>
 <table><thead align="left"><tr id="row10363182091"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p536101810917"><a name="p536101810917"></a><a name="p536101810917"></a>参数名称</p>
@@ -498,7 +498,7 @@ struct AippChannelPaddingParams {
 </tbody>
 </table>
 
-**表 8**  AippColorSpaceConvParams结构体内参数说明
+**表8**  AippColorSpaceConvParams结构体内参数说明
 
 <a name="table7858175271018"></a>
 <table><thead align="left"><tr id="row2859252151016"><th class="cellrowborder" valign="top" width="16.46164616461646%" id="mcps1.2.4.1.1"><p id="p485917525104"><a name="p485917525104"></a><a name="p485917525104"></a>参数名称</p>
@@ -700,4 +700,3 @@ struct AippChannelPaddingParams {
     AscendC::SetAippFunctions(fmGlobal, fmGlobal[gmSrc0Size], inputFormat, aippConfig);
     AscendC::LoadImageToLocal(featureMapA1, { horizSize, vertSize, horizStartPos, vertStartPos, srcHorizSize, topPadSize, botPadSize, leftPadSize, rightPadSize });
     ```
-

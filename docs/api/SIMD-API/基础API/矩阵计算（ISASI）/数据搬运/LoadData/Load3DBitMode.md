@@ -70,7 +70,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table07381635103112"></a>
 <table><thead align="left"><tr id="row117393350314"><th class="cellrowborder" valign="top" width="16.55%" id="mcps1.2.3.1.1"><p id="p14739335193119"><a name="p14739335193119"></a><a name="p14739335193119"></a>参数名称</p>
@@ -99,7 +99,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </tbody>
 </table>
 
-**表 2**  通用参数说明
+**表2**  通用参数说明
 
 <a name="table18368155193919"></a>
 <table><thead align="left"><tr id="row1036805543911"><th class="cellrowborder" valign="top" width="16.89168916891689%" id="mcps1.2.4.1.1"><p id="p1836835511393"><a name="p1836835511393"></a><a name="p1836835511393"></a>参数名称</p>
@@ -139,7 +139,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 </tbody>
 </table>
 
-**表 3**  Load3DBitModeParam类参数说明
+**表3**  Load3DBitModeParam类参数说明
 
 <a name="table106611666584"></a>
 <table><thead align="left"><tr id="row766110612583"><th class="cellrowborder" valign="top" width="18.52%" id="mcps1.2.3.1.1"><p id="p0661166115810"><a name="p0661166115810"></a><a name="p0661166115810"></a>参数名称</p>
@@ -188,7 +188,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对congfig0和config1直接进行逐bit位修改来修改参数。
 
-**表 4**  Load3DBitModeConfig0结构体参数说明
+**表4**  Load3DBitModeConfig0结构体参数说明
 
 <a name="table184321224173"></a>
 <table><thead align="left"><tr id="row10432152419712"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.3.1.1"><p id="p1243210240717"><a name="p1243210240717"></a><a name="p1243210240717"></a>参数名称</p>
@@ -199,28 +199,28 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </thead>
 <tbody><tr id="row124321424577"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.3.1.1 "><p id="p843219248713"><a name="p843219248713"></a><a name="p843219248713"></a>kStep</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p2029162111396"><a name="p2029162111396"></a><a name="p2029162111396"></a>该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。取值范围: kStep∈[1, 65535] 。</p>
+<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p2029162111396"><a name="p2029162111396"></a><a name="p2029162111396"></a>该指令在目的操作数width维度的传输长度，如果不覆盖最右侧的分形，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数；覆盖的情况则无倍数要求。取值范围: kStep∈[1, 65535]。</p>
 <p id="p84324248713"><a name="p84324248713"></a><a name="p84324248713"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的kExtension含义相同）</p>
 <p id="p15706183624720"><a name="p15706183624720"></a><a name="p15706183624720"></a>该参数是位域结构体的最低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetKExtension()函数设置其值，使用GetKExtension()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row1043312411716"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.3.1.1 "><p id="p343319241376"><a name="p343319241376"></a><a name="p343319241376"></a>mStep</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p1874614235397"><a name="p1874614235397"></a><a name="p1874614235397"></a>该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围：mStep∈[1, 65535] 。</p>
+<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p1874614235397"><a name="p1874614235397"></a><a name="p1874614235397"></a>该指令在目的操作数height维度的传输长度，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围：mStep∈[1, 65535]。</p>
 <p id="p1643315248718"><a name="p1643315248718"></a><a name="p1643315248718"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的mExtension含义相同）</p>
 <p id="p12651214493"><a name="p12651214493"></a><a name="p12651214493"></a>该参数是位域结构体的第二低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetMExtension()函数设置其值，使用GetMExtension()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row1443311243713"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.3.1.1 "><p id="p943352414715"><a name="p943352414715"></a><a name="p943352414715"></a>kPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p118121125143912"><a name="p118121125143912"></a><a name="p118121125143912"></a>该指令在目的操作数width维度的起点，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数。取值范围[0, 65535] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p118121125143912"><a name="p118121125143912"></a><a name="p118121125143912"></a>该指令在目的操作数width维度的起点，对于half类型，应为16的倍数，对于int8_t/uint8_t应为32的倍数。取值范围[0, 65535]。默认为0。</p>
 <p id="p124331624373"><a name="p124331624373"></a><a name="p124331624373"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的kStartPt含义相同）</p>
 <p id="p2632183114914"><a name="p2632183114914"></a><a name="p2632183114914"></a>该参数是位域结构体的第三低位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetKStartPt()函数设置其值，使用GetKStartPt()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row12433172419720"><td class="cellrowborder" valign="top" width="18.54%" headers="mcps1.2.3.1.1 "><p id="p1943342413715"><a name="p1943342413715"></a><a name="p1943342413715"></a>mPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p84232027173917"><a name="p84232027173917"></a><a name="p84232027173917"></a>该指令在目的操作数height维度的起点，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围[0, 65535] 。默认为0。</p>
+<td class="cellrowborder" valign="top" width="81.46%" headers="mcps1.2.3.1.2 "><p id="p84232027173917"><a name="p84232027173917"></a><a name="p84232027173917"></a>该指令在目的操作数height维度的起点，如果不覆盖最下侧的分形，对于half/int8_t/uint8_t，应为16的倍数；覆盖的情况则无倍数要求。取值范围[0, 65535]。默认为0。</p>
 <p id="p743342415711"><a name="p743342415711"></a><a name="p743342415711"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的mStartPt含义相同）</p>
 <p id="p18104735124915"><a name="p18104735124915"></a><a name="p18104735124915"></a>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetMStartPt()函数设置其值，使用GetMStartPt()函数获取其值。</p>
 </td>
@@ -228,7 +228,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </tbody>
 </table>
 
-**表 5**  Load3DBitModeConfig1结构体参数说明
+**表5**  Load3DBitModeConfig1结构体参数说明
 
 <a name="table87491086815"></a>
 <table><thead align="left"><tr id="row57497818816"><th class="cellrowborder" valign="top" width="18.73%" id="mcps1.2.3.1.1"><p id="p167491985819"><a name="p167491985819"></a><a name="p167491985819"></a>参数名称</p>
@@ -239,35 +239,35 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </thead>
 <tbody><tr id="row9749781482"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p12749118982"><a name="p12749118982"></a><a name="p12749118982"></a>strideW</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p24581283916"><a name="p24581283916"></a><a name="p24581283916"></a>卷积核在源操作数width维度滑动的步长，取值范围：strideW∈[1, 63] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p24581283916"><a name="p24581283916"></a><a name="p24581283916"></a>卷积核在源操作数width维度滑动的步长，取值范围：strideW∈[1, 63]。</p>
 <p id="p47496810810"><a name="p47496810810"></a><a name="p47496810810"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的strideW含义相同）</p>
 <p id="p757122945116"><a name="p757122945116"></a><a name="p757122945116"></a>该参数是位域结构体的最低位参数，占用6bit，可以使用Load3DBitModeParam类对象的SetStrideW()函数设置其值，使用GetStrideW()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row3749188582"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p77491082083"><a name="p77491082083"></a><a name="p77491082083"></a>strideH</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p203413173393"><a name="p203413173393"></a><a name="p203413173393"></a>卷积核在源操作数height 维度滑动的步长，取值范围：strideH∈[1, 63] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p203413173393"><a name="p203413173393"></a><a name="p203413173393"></a>卷积核在源操作数height维度滑动的步长，取值范围：strideH∈[1, 63]。</p>
 <p id="p17749168584"><a name="p17749168584"></a><a name="p17749168584"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的strideH含义相同）</p>
 <p id="p6581532155112"><a name="p6581532155112"></a><a name="p6581532155112"></a>该参数是位域结构体的第二低位参数，占用6bit，可以使用Load3DBitModeParam类对象的SetStrideH()函数设置其值，使用GetStrideH()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row157491581982"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p11749158481"><a name="p11749158481"></a><a name="p11749158481"></a>Wk</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1788215316399"><a name="p1788215316399"></a><a name="p1788215316399"></a>卷积核width，取值范围：Wk∈[1, 255] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1788215316399"><a name="p1788215316399"></a><a name="p1788215316399"></a>卷积核width，取值范围：Wk∈[1, 255]。</p>
 <p id="p17493816813"><a name="p17493816813"></a><a name="p17493816813"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的filterW含义相同）</p>
 <p id="p23141635205115"><a name="p23141635205115"></a><a name="p23141635205115"></a>该参数是位域结构体的第三低位参数，占用8bit，可以使用Load3DBitModeParam类对象的SetFilterW()函数设置其值，使用GetFilterW()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row13749381783"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p87501385811"><a name="p87501385811"></a><a name="p87501385811"></a>Hk</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p8493334123911"><a name="p8493334123911"></a><a name="p8493334123911"></a>卷积核height，取值范围：Hk∈[1, 255] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p8493334123911"><a name="p8493334123911"></a><a name="p8493334123911"></a>卷积核height，取值范围：Hk∈[1, 255]。</p>
 <p id="p3750138085"><a name="p3750138085"></a><a name="p3750138085"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的filterH含义相同）</p>
 <p id="p44881337125112"><a name="p44881337125112"></a><a name="p44881337125112"></a>该参数是位域结构体的第四低位参数，占用8bit，可以使用Load3DBitModeParam类对象的SetFilterH()函数设置其值，使用GetFilterH()函数获取其值。</p>
 </td>
 </tr>
 <tr id="row77501581887"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p14750783816"><a name="p14750783816"></a><a name="p14750783816"></a>dilationW</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1635133613916"><a name="p1635133613916"></a><a name="p1635133613916"></a>卷积核width膨胀系数，取值范围：dilationW∈[1, 255] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p1635133613916"><a name="p1635133613916"></a><a name="p1635133613916"></a>卷积核width膨胀系数，取值范围：dilationW∈[1, 255]。</p>
 <p id="p18750168489"><a name="p18750168489"></a><a name="p18750168489"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的dilationFilterW含义相同）</p>
 <p id="p11947203917519"><a name="p11947203917519"></a><a name="p11947203917519"></a>该参数是位域结构体的第五低位参数，占用8bit，可以使用Load3DBitModeParam类对象的SetDilationFilterW()函数设置其值，使用GetDilationFilterW()函数获取其值。</p>
 </td>
@@ -281,7 +281,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </tr>
 <tr id="row1375011813817"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p1775028383"><a name="p1775028383"></a><a name="p1775028383"></a>filterW</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p0759203910397"><a name="p0759203910397"></a><a name="p0759203910397"></a>是否在filterW的基础上将卷积核width增加256 个元素。true，增加；false，不增加。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p0759203910397"><a name="p0759203910397"></a><a name="p0759203910397"></a>是否在filterW的基础上将卷积核width增加256个元素。true，增加；false，不增加。</p>
 <p id="p67502818813"><a name="p67502818813"></a><a name="p67502818813"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的filterSizeW含义相同）</p>
 <p id="p863234415516"><a name="p863234415516"></a><a name="p863234415516"></a>该参数是位域结构体的第七低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetFilterSizeW()函数设置其值，使用GetFilterSizeW()函数获取其值。</p>
 </td>
@@ -295,7 +295,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </tr>
 <tr id="row1673153119810"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p1741431584"><a name="p1741431584"></a><a name="p1741431584"></a>transpose</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p12388915112311"><a name="p12388915112311"></a><a name="p12388915112311"></a>是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为 bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p12388915112311"><a name="p12388915112311"></a><a name="p12388915112311"></a>是否启用转置功能，对整个目标矩阵进行转置，支持数据类型为bool，仅在目的TPosition为A2，且源操作数为half类型时有效。默认为false。</p>
 <a name="ul938831592314"></a><a name="ul938831592314"></a><ul id="ul938831592314"><li>true：启用</li><li>false：不启用</li></ul>
 <p id="p744132517265"><a name="p744132517265"></a><a name="p744132517265"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的enTranspose含义相同）</p>
 <p id="p72431350205113"><a name="p72431350205113"></a><a name="p72431350205113"></a>该参数是位域结构体的第九低位参数，占用1bit，可以使用Load3DBitModeParam类对象的SetTranspose()函数设置其值，使用GetTranspose()函数获取其值。</p>
@@ -311,7 +311,7 @@ __aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DPara
 </tr>
 <tr id="row38706390816"><td class="cellrowborder" valign="top" width="18.73%" headers="mcps1.2.3.1.1 "><p id="p10870173912818"><a name="p10870173912818"></a><a name="p10870173912818"></a>sizeChannel</p>
 </td>
-<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p4202155119234"><a name="p4202155119234"></a><a name="p4202155119234"></a>源操作数的通道数，取值范围：channelSize∈[1, 63] 。</p>
+<td class="cellrowborder" valign="top" width="81.27%" headers="mcps1.2.3.1.2 "><p id="p4202155119234"><a name="p4202155119234"></a><a name="p4202155119234"></a>源操作数的通道数，取值范围：channelSize∈[1, 63]。</p>
 <p id="p520205142317"><a name="p520205142317"></a><a name="p520205142317"></a>channelSize的取值要求为：对于uint32_t/int32_t/float，channelSize可取值为4，N * 8，N * 8 + 4；对于half/bfloat16，channelSize可取值为4，8，N * 16，N * 16 + 4，N * 16 + 8；对于int8_t/uint8_t，channelSize可取值为4，8，16， 32 * N，N * 32 + 4，N * 32 + 8，N * 32 + 16；对于int4b_t，ChannelSize可取值为8，16，32，N * 64，N * 64 + 8，N * 64 + 16，N * 64 + 32。N为正整数。</p>
 <p id="p879503515265"><a name="p879503515265"></a><a name="p879503515265"></a>（与<a href="Load3D.md#table193501032193419">表4</a>中的channelSize含义相同）</p>
 <p id="p22641854155118"><a name="p22641854155118"></a><a name="p22641854155118"></a>该参数是位域结构体的最高位参数，占用16bit，可以使用Load3DBitModeParam类对象的SetChannelSize()函数设置其值，使用GetChannelSize()函数获取其值。</p>
@@ -347,4 +347,3 @@ Load3DBitModeParam paramBitMode(param);
 AscendC::LoadData<A2, A1, half>(featureMapA2, featureMapA1, paramBitMode);
 AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
 ```
-

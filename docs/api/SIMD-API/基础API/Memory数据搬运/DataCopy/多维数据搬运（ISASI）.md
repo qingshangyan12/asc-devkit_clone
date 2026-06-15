@@ -68,7 +68,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table49614585413"></a>
 <table><thead align="left"><tr id="row996115820412"><th class="cellrowborder" valign="top" width="14.729999999999999%" id="mcps1.2.3.1.1"><p id="p10961458104110"><a name="p10961458104110"></a><a name="p10961458104110"></a>参数名</p>
@@ -84,12 +84,12 @@
 </tr>
 <tr id="row63251529183414"><td class="cellrowborder" valign="top" width="14.729999999999999%" headers="mcps1.2.3.1.1 "><p id="p049932711012"><a name="p049932711012"></a><a name="p049932711012"></a>dim</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p12499132714109"><a name="p12499132714109"></a><a name="p12499132714109"></a>搬运的数据维度, 数据类型为uint8_t，支持的维度为[1, 5]。</p>
+<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p12499132714109"><a name="p12499132714109"></a><a name="p12499132714109"></a>搬运的数据维度,数据类型为uint8_t，支持的维度为[1, 5]。</p>
 </td>
 </tr>
 <tr id="row3964131831012"><td class="cellrowborder" valign="top" width="14.729999999999999%" headers="mcps1.2.3.1.1 "><p id="p2499627101017"><a name="p2499627101017"></a><a name="p2499627101017"></a>config</p>
 </td>
-<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p18499327181016"><a name="p18499327181016"></a><a name="p18499327181016"></a>搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考<a href="#table9182515919">表 NdDmaConfig结构体参数定义</a>。</p>
+<td class="cellrowborder" valign="top" width="85.27%" headers="mcps1.2.3.1.2 "><p id="p18499327181016"><a name="p18499327181016"></a><a name="p18499327181016"></a>搬运配置选项，NdDmaConfig类型，定义如下，具体参数说明请参考<a href="#table9182515919">表NdDmaConfig结构体参数定义</a>。</p>
 <a name="screen2499192718104"></a><a name="screen2499192718104"></a><pre class="screen" codetype="Cpp" id="screen2499192718104">struct NdDmaConfig {
     static constexpr uint16_t unsetPad = 0xffff;
     bool isNearestValueMode = false;
@@ -102,7 +102,7 @@
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table917mcpsimp"></a>
 <table><thead align="left"><tr id="row923mcpsimp"><th class="cellrowborder" valign="top" width="15.02%" id="mcps1.2.4.1.1"><p id="p925mcpsimp"><a name="p925mcpsimp"></a><a name="p925mcpsimp"></a>参数名称</p>
@@ -131,13 +131,13 @@
 </td>
 <td class="cellrowborder" valign="top" width="9.86%" headers="mcps1.2.4.1.2 "><p id="p71115140262"><a name="p71115140262"></a><a name="p71115140262"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.12%" headers="mcps1.2.4.1.3 "><p id="p964217483714"><a name="p964217483714"></a><a name="p964217483714"></a>搬运参数 NdDmaParams类型，定义如下，具体参数说明请参考<a href="#table1247813351789">表 NdDmaParams结构体参数定义</a>。</p>
+<td class="cellrowborder" valign="top" width="75.12%" headers="mcps1.2.4.1.3 "><p id="p964217483714"><a name="p964217483714"></a><a name="p964217483714"></a>搬运参数NdDmaParams类型，定义如下，具体参数说明请参考<a href="#table1247813351789">表NdDmaParams结构体参数定义</a>。</p>
 <a name="screen1929612197911"></a><a name="screen1929612197911"></a><pre class="screen" codetype="Cpp" id="screen1929612197911">template &lt;typename T, uint8_t dim&gt;
 struct NdDmaParams  {
     NdDmaLoopInfo&lt;dim&gt; loopInfo;
     T constantValue;  // 若有左右Padding，且不开启NearestValueMode时，该值将作为Padding值填充。
 };</pre>
-<p id="p395104375712"><a name="p395104375712"></a><a name="p395104375712"></a>NdDmaLoopInfo类型，定义如下，具体参数说明请参考<a href="#table725271775813">表 NdDmaLoopInfo结构体参数定义</a>。</p>
+<p id="p395104375712"><a name="p395104375712"></a><a name="p395104375712"></a>NdDmaLoopInfo类型，定义如下，具体参数说明请参考<a href="#table725271775813">表NdDmaLoopInfo结构体参数定义</a>。</p>
 <a name="screen84611628155618"></a><a name="screen84611628155618"></a><pre class="screen" codetype="Cpp" id="screen84611628155618">template &lt;uint8_t dim&gt;
 struct NdDmaLoopInfo  {
     uint64_t loopSrcStride[dim] = {0}; // src stride info per loop.
@@ -152,7 +152,7 @@ struct NdDmaLoopInfo  {
 </tbody>
 </table>
 
-**表 3**  NdDmaConfig结构体参数定义
+**表3**  NdDmaConfig结构体参数定义
 
 <a name="table9182515919"></a>
 <table><thead align="left"><tr id="row151816516917"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p18182513916"><a name="p18182513916"></a><a name="p18182513916"></a>参数名称</p>
@@ -192,7 +192,7 @@ struct NdDmaLoopInfo  {
 </tbody>
 </table>
 
-**表 4**  NdDmaParams结构体参数定义
+**表4**  NdDmaParams结构体参数定义
 
 <a name="table1247813351789"></a>
 <table><thead align="left"><tr id="row1147863511819"><th class="cellrowborder" valign="top" width="14.99%" id="mcps1.2.3.1.1"><p id="p1147813514810"><a name="p1147813514810"></a><a name="p1147813514810"></a>参数名称</p>
@@ -204,7 +204,7 @@ struct NdDmaLoopInfo  {
 <tbody><tr id="row1847873513818"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.3.1.1 "><p id="p12121135141012"><a name="p12121135141012"></a><a name="p12121135141012"></a>loopInfo</p>
 </td>
 <td class="cellrowborder" valign="top" width="85.00999999999999%" headers="mcps1.2.3.1.2 "><p id="p1453710521859"><a name="p1453710521859"></a><a name="p1453710521859"></a>每维进行搬运的信息，类型为NdDmaLoopInfo&lt;dim&gt;。</p>
-<p id="p184785351286"><a name="p184785351286"></a><a name="p184785351286"></a>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考<a href="#table725271775813">表 NdDmaLoopInfo结构体参数定义</a>。</p>
+<p id="p184785351286"><a name="p184785351286"></a><a name="p184785351286"></a>NdDmaLoopInfo结构中数组类型的参数，其数组索引值对应实际维度信息，索引0 - 4对应1 - 5维。具体参数介绍可参考<a href="#table725271775813">表NdDmaLoopInfo结构体参数定义</a>。</p>
 </td>
 </tr>
 <tr id="row12478163518812"><td class="cellrowborder" valign="top" width="14.99%" headers="mcps1.2.3.1.1 "><p id="p194781351084"><a name="p194781351084"></a><a name="p194781351084"></a>constantValue</p>
@@ -216,7 +216,7 @@ struct NdDmaLoopInfo  {
 </tbody>
 </table>
 
-**表 5**  NdDmaLoopInfo结构体参数定义
+**表5**  NdDmaLoopInfo结构体参数定义
 
 <a name="table725271775813"></a>
 <table><thead align="left"><tr id="row32523179589"><th class="cellrowborder" valign="top" width="15%" id="mcps1.2.3.1.1"><p id="p62531117195812"><a name="p62531117195812"></a><a name="p62531117195812"></a>参数名称</p>
@@ -260,28 +260,28 @@ struct NdDmaLoopInfo  {
 
 以下以2维的例子介绍几个典型使用场景。
 
-**图 1**  2D Padding场景<a name="fig10722115123919"></a>  
+**图1**  2D Padding场景<a name="fig10722115123919"></a>  
 ![2D-Padding场景](../../../../figures/2D-Padding场景.png)
 
-**图 2**  2D Transpose场景<a name="fig104451143104510"></a>  
+**图2**  2D Transpose场景<a name="fig104451143104510"></a>  
 ![2D-Transpose场景](../../../../figures/2D-Transpose场景.png)
 
-**图 3**  2D BroadCast场景<a name="fig4654326132913"></a>  
+**图3**  2D BroadCast场景<a name="fig4654326132913"></a>  
 ![2D-BroadCast场景](../../../../figures/2D-BroadCast场景.png)
 
-**图 4**  2D Slice场景<a name="fig13061435132915"></a>  
+**图4**  2D Slice场景<a name="fig13061435132915"></a>  
 ![2D-Slice场景](../../../../figures/2D-Slice场景.png)
 
 ## 通路说明<a name="section631mcpsimp"></a>
 
-**表 6**  数据通路和数据类型
+**表6**  数据通路和数据类型
 
 <a name="table14255161718545"></a>
 <table><thead align="left"><tr id="row3255181710543"><th class="cellrowborder" valign="top" width="11.04%" id="mcps1.2.4.1.1"><p id="p52550177546"><a name="p52550177546"></a><a name="p52550177546"></a>支持型号</p>
 </th>
 <th class="cellrowborder" valign="top" width="23.93%" id="mcps1.2.4.1.2"><p id="p13255191735420"><a name="p13255191735420"></a><a name="p13255191735420"></a>数据通路（通过<a href="../../数据结构/辅助数据结构//TPosition.md#table5376122715308">TPosition</a>表达）</p>
 </th>
-<th class="cellrowborder" valign="top" width="65.03%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型 (两者保持一致)</p>
+<th class="cellrowborder" valign="top" width="65.03%" id="mcps1.2.4.1.3"><p id="p6255617175419"><a name="p6255617175419"></a><a name="p6255617175419"></a>源操作数和目的操作数的数据类型(两者保持一致)</p>
 </th>
 </tr>
 </thead>
