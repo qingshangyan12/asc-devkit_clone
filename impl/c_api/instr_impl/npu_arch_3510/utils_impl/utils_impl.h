@@ -45,4 +45,28 @@ union asc_gm2ub_loop_stride_config {
     };
 };
 
+enum class asc_position {
+    EVEN = 0,
+    ODD
+};
+
+constexpr std::integral_constant<asc_position, asc_position::EVEN> ASC_POSITION_EVEN;
+constexpr std::integral_constant<asc_position, asc_position::ODD> ASC_POSITION_ODD;
+
+enum class asc_disperse_quarter {
+    FIRST = 0,
+    SECOND,
+    THIRD,
+    FOURTH
+};
+
+constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> ASC_DISPERSE_FIRST_QUARTER;
+constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> ASC_DISPERSE_SECOND_QUARTER;
+constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> ASC_DISPERSE_THIRD_QUARTER;
+constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> ASC_DISPERSE_FOURTH_QUARTER;
+
+#ifndef ULL
+#define ULL unsigned long long
+#endif
+
 #endif

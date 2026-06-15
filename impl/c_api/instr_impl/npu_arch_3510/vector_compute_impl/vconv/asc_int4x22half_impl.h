@@ -53,6 +53,31 @@ __simd_callee__ inline void asc_int4x22half_v4_impl(vector_half& dst, vector_int
     }
 }
 
+
+__simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtif_s4x22f16_x(src, mask, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtif_s4x22f16_x(src, mask, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtif_s4x22f16_x(src, mask, (ULL)2);
+    }
+}
+__simd_callee__ inline void asc_int4x22half_impl(vector_half& dst, vector_int4x2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtif_s4x22f16_x(src, mask, (ULL)3);
+    }
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

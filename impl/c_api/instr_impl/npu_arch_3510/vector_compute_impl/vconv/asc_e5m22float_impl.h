@@ -53,6 +53,31 @@ __simd_callee__ inline void asc_e5m22float_v4_impl(vector_float& dst, vector_fp8
     }
 }
 
+
+__simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)2);
+    }
+}
+__simd_callee__ inline void asc_e5m22float_impl(vector_float& dst, vector_fp8_e5m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_f8e5m22f32_x(src, mask, (ULL)3);
+    }
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

@@ -47,6 +47,31 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_v4_impl(vector_fp4x2_e2m1_t& 
         vcvt(dst, src, mask, ROUND_R, PART_P3, MODE_ZEROING);
     }
 }
+
+__simd_callee__ inline void asc_bfloat162e2m1x2_rn_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_rn_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_rn_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)0, (ULL)2);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_rn_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)0, (ULL)3);
+    }
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
