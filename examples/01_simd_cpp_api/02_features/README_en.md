@@ -10,4 +10,5 @@ This document introduces Ascend C SIMD feature samples, covering compilation pro
 | -------------- | ----------- |
 | [00_framework](./00_framework) | This sample introduces custom operator implementation methods for PyTorch, TensorFlow, and ONNX frameworks |
 | [05_aclrtc](./05_aclrtc) | This sample demonstrates using Aclrtc (runtime compilation) interfaces to compile Ascend C kernel functions in string form on the Host side and complete the loading and execution of compilation results |
+| [06_compile](./06_compile) | This sample introduces various compilation modes for SIMD programming, including basic compilation, separate compilation, dynamic library compilation, and static library compilation |
 | [99_acl_based](./99_acl_based) | This sample introduces the implementation of custom operator compilation projects and Aclnn/Aclop operator invocation |
