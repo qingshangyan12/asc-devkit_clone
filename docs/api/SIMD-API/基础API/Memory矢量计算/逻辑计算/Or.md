@@ -121,10 +121,10 @@ $dst_i = src0_i | src1_i$
 
   <!-- npu="A3" id9 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-<!-- end id9 -->
+  <!-- end id9 -->
   <!-- npu="910b" id10 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-<!-- end id10 -->
+  <!-- end id10 -->
 <!-- end id11 -->
 <!-- npu="A3,910b,310b,310p,910" id19 -->
 - 特别地，针对uint32_t/int32_t类型的Or操作，支持通过ReinterpretCast的方式来实现：使用Local Tensor的ReinterpretCast转换成uint16_t/int16_t后再调用Or进行计算。直接传入uint32_t/int32_t类型的数据，在不同版本型号上表现会有所差异，考虑到算子在各个版本中的兼容性，不建议使用这种直接传入的方式：
@@ -134,29 +134,29 @@ $dst_i = src0_i | src1_i$
 
       <!-- npu="A3" id12 -->
       - Atlas A3 训练系列产品/Atlas A3 推理系列产品。
-<!-- end id12 -->
+      <!-- end id12 -->
 
       <!-- npu="910b" id13 -->
       - Atlas A2 训练系列产品/Atlas A2 推理系列产品。
-<!-- end id13 -->
-<!-- end id14 -->
+      <!-- end id13 -->
+    <!-- end id14 -->
 
     <!-- npu="310b" id15 -->
     - CPU告警提示不支持该数据类型。上述说明适用于：
       - Atlas 200I/500 A2 推理产品。
-<!-- end id15 -->
+    <!-- end id15 -->
 
     <!-- npu="310p,910" id18 -->
     - 编译报错提示不支持该数据类型。上述说明适用于：
 
       <!-- npu="310p" id16 -->
       - Atlas 推理系列产品AI Core。
-<!-- end id16 -->
+      <!-- end id16 -->
 
       <!-- npu="910" id17 -->
       - Atlas 训练系列产品。
-<!-- end id17 -->
-<!-- end id18 -->
+      <!-- end id17 -->
+    <!-- end id18 -->
 <!-- end id19 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
