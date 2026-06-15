@@ -91,7 +91,7 @@
   **表 2**  参数说明
 
   | 参数名 | 输入/输出 | 描述 |
-  |-------|----------|------|
+  | :----- | :-------- | :--- |
   | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
   | srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
   | srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
@@ -133,7 +133,7 @@
       for (uint16_t i = 0; i < repeatTimes; i++) {
           mask = AscendC::Reg::UpdateMask<T>(count);
           AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-          AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);        
+          AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
           AscendC::Reg::And(dstReg, srcReg0, srcReg1, mask);
           AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
       }

@@ -71,7 +71,7 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
-|---|---|
+| :----- | :--- |
 | T | 目的操作数和源操作数的数据类型。 |
 | store | GatherMaskMode选择是否将有效元素的总字节数存入AR寄存器，AR寄存器描述参考[表 模板参数说明](../系统变量访问/GetSpr.md#table4835205712588)。<br>• NO_STORE_REG，有效元素的总字节数不存入AR寄存器；<br>• STORE_REG，有效元素的总字节数存入AR寄存器。 |
 | U | srcReg、dstReg的RegTensor类型，例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
@@ -79,7 +79,7 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 **表 2**  函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
+| :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg | 输入 | 源操作数。<br>类型为RegTensor。 |
 | mask | 输入 | mask用于控制每次迭代内参与计算的元素。 |

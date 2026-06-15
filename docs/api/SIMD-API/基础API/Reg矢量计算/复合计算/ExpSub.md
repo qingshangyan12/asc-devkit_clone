@@ -77,7 +77,7 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 **表 1**  模板参数说明
 
 | 参数名 | 描述 |
-| --- | --- |
+| :----- | :--- |
 | T | 目的操作数数据类型。 |
 | U | 源操作数数据类型。 |
 | layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>• src类型为half类型时，支持RegLayout::ZERO、RegLayout::ONE。具体特性参考[RegLayout](../数据类型/RegLayout.md)。<br>• src类型为float类型时，配置不生效。 |
@@ -88,7 +88,7 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| --- | --- | --- |
+| :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。 |
@@ -103,9 +103,9 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 **表 3**  数据类型组合
 
 | srcReg0 | srcReg1 | dstReg |
-| :--- | :--- | :--- |
-| half | half | float|
-| float | float | float|
+| :------ | :------ | :----- |
+| half    | half    | float  |
+| float   | float   | float  |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
