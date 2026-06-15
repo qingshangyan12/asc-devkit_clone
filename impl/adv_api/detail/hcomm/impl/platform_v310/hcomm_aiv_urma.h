@@ -78,11 +78,23 @@ __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __g
     }
 }
 
+// __aicore__ inline void HcommUrmaFillSgeCtx(
+//     __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* localAddr)
+// {
+//     sgeCtx->len = static_cast<uint32_t>(messageLen);
+//     sgeCtx->va = reinterpret_cast<uint64_t>(localAddr);
+// }
+
+template <HcommUrmaOpCode opCode>
 __aicore__ inline void HcommUrmaFillSgeCtx(
-    __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* localAddr)
+    __ubuf__ HcommUrmaSgeCtx* sgeCtx, uint64_t messageLen, __gm__ uint8_t* localAddr, uint64_t value)
 {
     sgeCtx->len = static_cast<uint32_t>(messageLen);
     sgeCtx->va = reinterpret_cast<uint64_t>(localAddr);
+    if constexpr (opCode == HcommUrmaOpCode::FAA) {
+        __ubuf__ uint64_t* addDataAddr = (__ubuf__ uint64_t*)((__ubuf__ uint8_t*)sgeCtx + sizeof(HcommUrmaSgeCtx));
+        *addDataAddr = value;
+    }
 }
 
 __aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __ubuf__ uint8_t* sgeAddr)
@@ -299,9 +311,9 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
         sgeAddr += sizeof(HcommUrmaNotifyCtx);
     }
     __ubuf__ HcommUrmaSgeCtx* sgeCtx = (__ubuf__ HcommUrmaSgeCtx*)sgeAddr;
-    HcommUrmaFillSgeCtx(sgeCtx, len, (__gm__ uint8_t*)localAddr);
+    HcommUrmaFillSgeCtx(sgeCtx, len, (__gm__ uint8_t*)localAddr, notifyVal);
 
-    // SQE & SGE cache flush
+    // SQE & SGE cache flush  缓存刷新
     uint64_t sqBaseAddr = sqCtx.contextInfo.ubJfs.sqVa;
     uint32_t wqeSize = sqCtx.contextInfo.ubJfs.wqeSize;
     uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
@@ -309,7 +321,13 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     AscendC::GlobalTensor<uint32_t> sqeGlobal;
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
     PipeBarrier<PIPE_ALL>();
-    constexpr uint32_t wqeBbCnt = opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY ? 2U : 1U;
+    // constexpr uint32_t wqeBbCnt = opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY ? 2U : 1U;
+    constexpr uint32_t wqeBbCnt = (
+        opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY || 
+        opCode == HcommUrmaOpCode::FAA ||
+        opCode == HcommUrmaOpCode::CAS
+    ) ? 2U : 1U;
+
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     PipeBarrier<PIPE_ALL>();
 
@@ -404,6 +422,13 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::ReadNbi(
     ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len)
 {
     return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::READ, config>(channel, src, dst, len);
+}
+
+// 发起远端dst内存数据addVal，并将原来的旧值返回src
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+    __aicore__ inline int32_t FetchAdd(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal)
+{
+    return PostSend<commit, commitPipe, reqPipe, HcommUrmaOpCode::FAA, config>(channel, dst, src, 1, nullptr, addVal);
 }
 
 template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
