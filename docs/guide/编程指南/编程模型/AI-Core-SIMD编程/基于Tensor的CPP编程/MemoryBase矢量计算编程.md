@@ -39,65 +39,95 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 </thead>
 <tbody>
 <tr>
-<td>高维切分</td>
-<td><code>DataCopy(dst, src, datacopyParams)</code></td>
-<td>非连续多块数据搬运，可配置块数和间隔</td>
-</tr>
-<tr>
-<td rowspan="2">Global Memory → UB</td>
+<td rowspan="3">Global Memory → UB</td>
 <td>连续搬运</td>
 <td><code>DataCopy(dst, src, count)</code></td>
 <td>连续地址的一维数据搬运</td>
 </tr>
 <tr>
-<td>高维切分</td>
+<td>高维切分搬运</td>
 <td><code>DataCopy(dst, src, datacopyParams)</code></td>
 <td>非连续多块数据搬运，可配置块数和间隔</td>
 </tr>
 <tr>
-<td rowspan="2">UB → Global Memory</td>
+<td>非对齐搬运</td>
+<td><code>DataCopy(dst, src, dataCopyExtParams, padParams)</code></td>
+<td>地址非32B对齐，支持自定义填充</td>
+</tr>
+<tr>
+<td rowspan="3">UB → Global Memory</td>
 <td>连续搬运</td>
 <td><code>DataCopy(dst, src, count)</code></td>
 <td>连续地址的一维数据搬运</td>
 </tr>
 <tr>
-<td>高维切分</td>
+<td>高维切分搬运</td>
 <td><code>DataCopy(dst, src, datacopyParams)</code></td>
 <td>非连续多块数据搬运，可配置块数和间隔</td>
+</tr>
+<tr>
+<td>非对齐搬运</td>
+<td><code>DataCopy(dst, src, dataCopyExtParams)</code></td>
+<td>地址非32B对齐，支持自定义填充</td>
 </tr>
 </tbody>
 </table>
 
 根据上述矢量搬运能力的描述，开发者可以根据不同的场景选择合适的接口进行处理。
 
-**高维切分搬运**：当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(16, 256)，数据类型为half)为例，隔行将数据搬运到`Unified Buffer`中，可通过如下方式实现：
+**连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据元素个数即可。例如srcGlobal数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`DataCopy`直接调用：
 
-```cpp
-// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
-uint16_t burst_count = 8;
-// Length of single data block (in 32B units): value is 256 * sizeof(half) / 32
-uint16_t burst_len = 256 * sizeof(half) / 32;
-// Stride from previous block to next block in source data (in 32B units): interval of two rows between blocks, value is 256 * 2 * sizeof(half) / 32
-uint16_t src_stride = 256 * 2 * sizeof(half) / 32;
-// Stride from previous block to next block in destination data (in 32B units): data blocks are consecutive, value is 256 * sizeof(half) / 32
-uint16_t dst_stride = 256 * sizeof(half) / 32;
+![连续数据搬运](../../../../figures/连续数据搬运.png)
 
-DataCopyParams intriParams;
-intriParams.blockCount = burst_count;
-intriParams.blockLen = burst_len;
-intriParams.srcGap = src_stride - burst_len;
-intriParams.dstGap = dst_stride - burst_len;
-
-AscendC::DataCopy(dst_ub, src_gm, intriParams);
+```c
+AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ```
 
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-**连续搬运**：如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据大小（字节）即可。例如src_gm数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`DataCopy`直接调用：
+**高维切分搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(256)，数据类型为half)为例，进行如下图数据搬运时, 可通过C++ Tensor接口直接进行搬运操作：
 
-```cpp
-uint32_t size = 256 * sizeof(half);
-AscendC::DataCopy(dst_ub, src_gm, size);
+![非连续搬运](../../../../figures/非连续搬运.png)
+
+```c
+// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
+uint16_t blockCount = 2;
+// Length of single data block (in 32B units): value is 8
+uint16_t blockLen = 8;
+// Gap from previous block to next block in source data (in 32B units): interval of two rows between blocks, value is 0
+uint16_t srcGap = 0;
+// Gap from previous block to next block in destination data (in 32B units): data blocks are consecutive, value is 1
+uint16_t dstGap = 1;
+
+DataCopyParams copyParams {blockCount, blockLen, srcGap, dstGap};
+AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
+```
+
+**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`asc_copy_gm2ub`完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
+
+![非对齐搬入能力](../../../../figures/非对齐搬入能力.png)
+
+在上图中, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
+在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
+```c
+// Number of consecutive data blocks: transfer two consecutive data blocks
+uint16_t burstCount = 2;
+// Length of single data block (in bytes): value is 54
+uint32_t burstLen = 54;
+// Stride from previous block to next block in source data: source data stride unit is 1B
+uint32_t srcStride = 1;
+// Stride from previous block to next block in destination data: UB operation constraint address must be 32B aligned, value is 32 / 32
+uint32_t dstStride = 32 / 32;
+// 是否需要填充用户自定义的数据, false表示用户不需要指定填充值，会默认填充随机值。
+bool enableFillPadValue = true;
+// Left padding of transfer result (element count): value is 4 / sizeof(half) = 2
+uint8_t leftPaddingNum = 2;
+// Right padding of transfer result (element count): value is 6 / sizeof(half) = 3
+uint8_t rightPaddingNum = 3;
+
+AscendC::DataCopyExtParams copyParams {burst_count, burst_len, src_stride, dst_stride, 0}; 
+AscendC::DataCopyPadExtParams<half> padParams {enableFillPadValue, leftPaddingNum, rightPaddingNum, 0};
+
+AscendC::DataCopyPad(dstLocal, srcGlobal, copyParams, padParams);
 ```
 
 > 📌 该接口主要为了提升用户数据搬运的易用性，由软件层面提供，底层通过高维切分接口实现。
@@ -115,7 +145,7 @@ Memory矢量计算提供连续计算和高维切分两种计算模式，并可�
 
 ### 高维切分计算
 
-高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等，能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
+高维切分能力主要是支持对计算接口设置`repeatTime`、`stride`和`mask`参数等，能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
 
 #### 迭代控制
 
@@ -123,50 +153,51 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 <img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="800" />
 
-矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeat_time取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
+矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeatTime设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeatTime取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
 
 <img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
 
 #### 地址间隔配置
 
-矢量计算单元还支持带间隔的向量计算，通过`data_block_stride`（单次迭代内不同`data_block`间地址步长）和`repeat_stride`（相邻迭代间相同`data_block`的地址步长）来进行配置。`data_block_stride`是指单次迭代内不同`data_block`间地址步长。其取值不能超过UB大小限制。
-连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
-非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同`data_block`之间在读取数据时出现一个`data_block`的间隔，如下图所示。
+矢量计算单元还支持带间隔的向量计算，通过`dataBlockStride`（单次迭代内不同`dataBlock`间地址步长）和`repeatStride`（相邻迭代间相同`dataBlock`的地址步长）来进行配置。`dataBlockStride`是指单次迭代内不同`dataBlock`间地址步长。其取值不能超过UB大小限制。
+连续计算，`dataBlockStride`设置为1，对同一迭代内的8个`dataBlock`数据连续进行处理。
+非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同`dataBlock`之间在读取数据时出现一个`dataBlock`的间隔，如下图所示。
 
-<img src="../../../../figures/data_block_stride示例.png" alt="data_block_stride示例" width="800" />
+<img src="../../../../figures/dataBlockStride示例.png" alt="dataBlockStride示例" width="800" />
 
-> 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个data_block。
+> 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个dataBlock。
 
-下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
+下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`dataBlockStride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`dataBlockStride`配置为1，表示单次迭代内地址连续。
 
 <img src="../../../../figures/单次迭代内源和目的操作数读写示例.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
 
-其中**repeat_stride**是指相邻迭代间相同`data_block`的地址步长，可通过设置`repeat_stride`来灵活控制不同的场景。
+其中**repeatStride**是指相邻迭代间相同`dataBlock`的地址步长，可通过设置`repeatStride`来灵活控制不同的场景。
 
-| 场景 | repeat_stride取值 | 数据读取特点 | 适用场景 |
+| 场景 | repeatStride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
-| 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeat_stride连续计算场景" width="600" /> |
-| 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeat_stride非连续计算场景" width="600" /> |
-| 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeat_stride反复计算场景" width="600" /> |
-| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeat_stride部分重复计算" width="600" /> |
+| 连续计算 | 8 | 每轮迭代读取连续8个dataBlock，完成所有输入数据的计算 | <img src="../../../../figures/repeatStride连续计算场景.png" alt="repeatStride连续计算场景" width="600" /> |
+| 非连续计算 | >8 (如10) | 相邻迭代间存在dataBlock间隔，地址不连续 | <img src="../../../../figures/repeatStride非连续计算场景.png" alt="repeatStride非连续计算场景" width="600" /> |
+| 反复计算 | 0 | 对首个连续8个dataBlock反复读取和计算 | <img src="../../../../figures/repeatStride反复计算场景.png" alt="repeatStride反复计算场景" width="600" /> |
+| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeatStride部分重复计算.png" alt="repeatStride部分重复计算" width="600" /> |
 
-当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
+当 `repeatTime`>1 时，通过多次迭代完成计算。`repeatStride` 表示相邻迭代间相同位置`dataBlock`的起始地址间隔（以 `dataBlock` 为单位）。例如 `repeatStride` = 9 时，第一迭代的第1个 `dataBlock` 与第二迭代的第1个 `dataBlock` 间隔9个 `dataBlock`。
 
 ![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图.png)
 
-通过C++ Tensor接口配置 `repeat_stride` 和 `data_block_stride` 实现上述多次迭代功能。
+通过C++ Tensor接口配置 `repeatStride` 和 `dataBlockStride` 实现上述多次迭代功能。
 
 ```cpp
 // 上述示例repeat间隔为9, 则通过如下配置可完成对应的操作
-uint8_t repeat_time = 1;
-uint8_t dst_block_stride = 1;
-uint8_t src0_block_stride = 1;
-uint8_t src1_block_stride = 1;
-uint8_t dst_repeat_stride = 9;
-uint8_t src0_repeat_stride = 9;
-uint8_t src1_repeat_stride = 9;
+uint16_t mask = 128;
+uint8_t repeatTime = 1;
+uint8_t dstBlockStride = 1;
+uint8_t src0BlockStride = 1;
+uint8_t src1BlockStride = 1;
+uint8_t dstRepeatStride = 9;
+uint8_t src0RepeatStride = 9;
+uint8_t src1RepeatStride = 9;
 
-AscendC::Add(zTensor, xTensor, yTensor, mask, repeat_time, { dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride });
+AscendC::Add(zTensor, xTensor, yTensor, mask, repeatTime, { dstBlockStride, src0BlockStride, src1BlockStride, dstRepeatStride, src0RepeatStride, src1RepeatStride });
 ```
 
 #### 掩码设置
@@ -180,16 +211,15 @@ AscendC::Add(zTensor, xTensor, yTensor, mask, repeat_time, { dst_block_stride, s
 
 掩码设置提供了两种模式：**Counter模式**和**Normal模式**。
 
-Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeat_time参数被忽略，系统根据元素数量自动计算迭代次数。
+Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeatTime参数被忽略，系统根据元素数量自动计算迭代次数。
 例如计算200个half类型元素时，受Unified Buffer的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
 
 <img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="600" />
 
 ```cpp
-AscendC::LocalTensor<half> dst_ub;
-AscendC::LocalTensor<half> src0_ub;
-AscendC::LocalTensor<half> src1_ub;
-half scalar_value = 1.0;
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+half scalarValue = 1.0;
 
 // 1. Direct transfer processing (temporarily omitted)
 // 2. Use high-dimensional segmentation API for computation
@@ -197,7 +227,7 @@ half scalar_value = 1.0;
 AscendC::SetMaskCount();
 // 2.2 Set Mask value to 200, indicating this computation processes 200 elements
 AscendC::SetVectorMask(0, static_cast<uint64_t>(200)); 
-AscendC::Adds(dst_ub, src0_ub, scalar_value, 1, { 1, 1, 1, 8, 8, 8 });
+AscendC::Adds(dstLocal, src0Local, scalarValue, 1, { 1, 1, 1, 8, 8, 8 });
 
 // 3. Default needs to reset to Normal mode, if subsequent still requires Counter mode then no need to reset to Normal mode
 AscendC::SetMaskNormal();
@@ -220,10 +250,9 @@ AscendC::SetMaskNormal();
 <img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
 
 ```cpp
-AscendC::LocalTensor<half> dst_ub;
-AscendC::LocalTensor<half> src0_ub;
-AscendC::LocalTensor<half> src1_ub;
-half scalar_value = 1.0;
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+half scalarValue = 1.0;
 
 // 1. Data transfer (temporarily omitted)
 // 2. Use high-dimensional segmentation API for computation
@@ -231,7 +260,7 @@ half scalar_value = 1.0;
 AscendC::SetMaskNormal();
 // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
 AscendC::SetVectorMask(0, static_cast<uint64_t>(100)); 
-AscendC::Adds(dst_ub, src0_ub, scalar_value, 2, { 1, 1, 1, 8, 8, 8 });
+AscendC::Adds(dstLocal, src0Local, scalarValue, 2, { 1, 1, 1, 8, 8, 8 });
 ```
 
 - 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 2^64-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 2^64-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 2^32-1]。
@@ -242,9 +271,9 @@ AscendC::Adds(dst_ub, src0_ub, scalar_value, 2, { 1, 1, 1, 8, 8, 8 });
 <img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
 
 ```cpp
-AscendC::LocalTensor<half> dst_ub;
-AscendC::LocalTensor<half> src0_ub;
-AscendC::LocalTensor<half> src1_ub;
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+AscendC::LocalTensor<half> src1Local;
 
 // 1. Data transfer (temporarily omitted)
 // 2. Use high-dimensional segmentation API for computation
@@ -252,7 +281,7 @@ AscendC::LocalTensor<half> src1_ub;
 AscendC::SetMaskNormal();
 // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
 AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000); 
-AscendC::Add(dst_ub, src0_ub, src1_ub, 2, { 1, 1, 1, 8, 8, 8 });
+AscendC::Add(dstLocal, src0Local, src1Local, 2, { 1, 1, 1, 8, 8, 8 });
 ```
 
 ### 连续计算
@@ -262,7 +291,7 @@ AscendC::Add(dst_ub, src0_ub, src1_ub, 2, { 1, 1, 1, 8, 8, 8 });
 以Add接口为例，当开发者需要计算4096长度的向量加法，C++ Tensor编程通过如下形式调用：
 
 ```cpp
-AscendC::Add(zTensor, xTensor, yTensor, 4096);
+AscendC::Add(dstLocal, src0Local, src1Local, 4096);
 ```
 
 ## Memory矢量计算同步控制

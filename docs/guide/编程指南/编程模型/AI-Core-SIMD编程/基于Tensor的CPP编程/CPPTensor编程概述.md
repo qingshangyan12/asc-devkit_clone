@@ -8,131 +8,146 @@ C++ Tensor编程是Ascend C SIMD编程路径的核心高级接口，基于Tensor
 
 ## 内存层级
 
-AI Core采用分级存储架构，不同计算单元的编程视角有所差异：
-
-**Cube矩阵计算**：采用「Global Memory → L1/L0系列Buffer」两级层级，其中L1 Buffer、L0A/L0B Buffer、L0C Buffer均服务于矩阵计算。
-
-**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级。Global Memory存放输入输出数据，Unified Buffer作为矢量计算数据中间缓存，Register位于Vector计算单元最内层，直接与矢量计算执行单元交互。
+AI Core采用分级存储架构，Cube矩阵计算采用「Global Memory → L1/L0系列Buffer」两级层级服务于矩阵计算，Vector矢量计算传统架构为「Global Memory → UB」两级层级，而Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级，其中Global Memory存放输入输出数据、Unified Buffer作为矢量计算中间缓存、Register位于Vector计算单元最内层直接与执行单元交互。
 
 <img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
-### 外部存储（Global Memory）
+### Tensor内存抽象
 
-Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可通过GlobalTensor访问Global Memory。Global Memory具有持久性：通过全局内存分配的空间，其中存储的数据将持续保留，直到该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
+Tensor本质是对内存地址的抽象封装，通过数组方式管理内存并执行计算，更匹配SIMD硬件执行模型。其核心思想是将原始内存地址抽象为Tensor对象，实现从"地址操作"到"对象管理"的编程层次提升。
 
-结合下述示例，Host使用`aclrtMalloc`分配Device侧的全局内存，并通过`aclrtMemcpy`将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；然后通过<<<>>>拉起Device侧核函数进行运算；通过`aclrtMalloc`分配的Device全局内存需使用`aclrtFree`接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+根据芯片分级存储架构，Tensor分为两类：**GlobalTensor**对应Global Memory，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程数据。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
 
-此外，核函数需使用`__global__`函数前缀进行声明。该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。
+#### 基础Tensor与扩展Tensor
 
-在Device侧，C++ Tensor编程使用
+**基础Tensor（不带Layout）**仅封装数据指针与大小信息，无法表达数据的物理排布方式。开发者在执行搬运和计算时必须手动传入size/count参数、自行计算偏移与步长，面对高维张量时易出错且代码冗长。
 
 ```cpp
-// Kernel implementation, decorated with __global__ to mark kernel entry point
+__global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z) {
+  // 定义GlobalTensor并设置缓冲区
+  AscendC::GlobalTensor<float> xGm, yGm, zGm;
+  xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
+  yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
+  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+
+  // 通过Allocator分配Local Memory(Unified Buffer)
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
+
+  // 搬运和计算操作需手动传入size参数
+  AscendC::DataCopy(xLocal, xGm, blockLength);
+  AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+}
+```
+
+**扩展Tensor（带有Layout）**封装Shape和Stride信息，接口自动推导操作参数，实现编译期类型安全。开发者无需关注内存布局细节，一行代码即可完成切片、搬运与计算。当前能力使能于Cube矩阵计算，后续将逐步支持Vector矢量计算。
+
+```cpp
+__global__ __cube__ void matmul_custom(__gm__ half* a, __gm__ half* b, __gm__ half* c) {
+  // 定义带有Layout的GlobalTensor
+  auto gmA = MakeTensor(MakeMemPtr(a), MakeFrameLayout<NDExtLayoutPtn>(M, K));
+  auto gmB = MakeTensor(MakeMemPtr(b), MakeFrameLayout<NDExtLayoutPtn>(K, N));
+  auto gmC = MakeTensor(MakeMemPtr(c), MakeFrameLayout<NDExtLayoutPtn>(M, N));
+
+  // 构造带有Layout的LocalTensor
+  __cbuf__ half l1ABuf[baseM * K];
+  __cbuf__ half l1BBuf[K * baseN];
+  auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), l1ALayout);
+  auto l1BTensor = MakeTensor(MakeMemPtr(l1BBuf), l1BLayout);
+
+  // Copy自动推导参数，无需手动传入size
+  Copy(l1ATensor, globalA);
+  Copy(l1BTensor, globalB);
+}
+```
+
+### 外部存储
+
+Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。Global Memory具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
+
+用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+
+```cpp
+// 核函数定义（使用__global__前缀标识Host调用、Device执行）
 __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
-    // Kernel internal logic implementation, customized based on operator scenario
+    AscendC::GlobalTensor<float> xGm;
+    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
 }
 
-// Host function: allocate Device memory, copy data via aclrtMemcpy, launch kernel via <<<>>>
+// Host侧：分配Device内存、拷贝数据、拉起核函数
 std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
-    // Get host-side buffer pointers
     uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
     uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
-    uint8_t *zHost = nullptr;
-    // Allocate Device memory
+
+    // 分配Device内存
     aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    // Copy data from Host memory to Device memory via aclrtMemcpy
-    aclrtMemcpy((uint8_t*)xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    aclrtMemcpy((uint8_t*)yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    // Launch kernel via <<<>>>, passing Device memory pointers xDevice, yDevice, zDevice
+
+    // Host到Device数据拷贝
+    aclrtMemcpy(xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclrtMemcpy(yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
+
+    // 拉起核函数
     add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
     aclrtSynchronizeStream(stream);
-    // Release Device memory
+
+    // 释放内存
     aclrtFree(xDevice);
     aclrtFree(yDevice);
     aclrtFree(zDevice);
 }
 ```
 
-### 内部存储（Local Memory）
+### 内部存储
 
-AI Core包含三类基础计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务于不同计算单元：Unified Buffer支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
+AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：Unified Buffer支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
 
-C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操作地址限定符。Tensor携带类型、形状、位置属性，API自动推断操作参数。
+#### Unified Buffer
 
-#### AIV内部存储之Unified Buffer
+Unified Buffer是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
 
-Unified Buffer是AI Core内主要用于矢量计算单元的内部存储单元，位于每个Vector Core（AIV）内部。与外部存储空间相比，Unified Buffer的容量较小，但具有更高的带宽和更低的访问延迟，可视为内核执行期间由用户管理的高速缓存资源。
+在C++ Tensor编程中，通过`LocalTensor`对象管理Unified Buffer内存：
 
-在C++ Tensor编程中，用户通过LocalTensor对象管理Unified Buffer内存，通过LocalMemAllocator分配器申请内存空间。
-
-**基础Tensor(不带Layout)定义**：通过`LocalMemAllocator`内存分配器创建，用户可指定物理存储位置和内存大小。
-
-```cpp
-__global__ __aicore__ void add_custom(...)
-{
-    constexpr uint32_t ub_size = 256;
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-    AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, ub_size>();
-}
-```
-
-**扩展Tensor(带有Layout)定义**：Ascend 950PR/Ascend 950DT在Tensor基础上引入Layout布局概念，将Shape和Stride移到编译期确定，实现类型安全和分形布局自动生成。
+- **基础Tensor**：通过`LocalMemAllocator`分配器创建，指定物理存储位置和内存大小
+- **扩展Tensor**：通过`MakeTensor`创建，携带Shape和Stride信息
 
 ```cpp
-// Extended Tensor (Tensor API) definition: created via MakeTensor, carries Shape and Stride
+// 基础Tensor：通过Allocator分配
+AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
+
+// 扩展Tensor：通过MakeTensor创建
 auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
 ```
 
 > 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
 
-#### AIV内部存储之Register File
+#### Register File
 
-Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过直接定义RegTensor方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
+Ascend 950PR/Ascend 950DT引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过定义RegTensor方式进行寄存器编程。详见[Reg矢量计算编程](./Reg矢量计算编程.md)。
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
 
-#### AIC内部存储L1 Buffer & L0 Buffer
+#### L1 Buffer & L0 Buffer
 
-Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算单元直接访问的专用缓存为：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
+Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存储右矩阵，L0C Buffer存储累加值和计算结果。L1 Buffer用于缓存矩阵计算输入数据。
 
-在C++ Tensor编程中，用户通过LocalTensor对象管理L1 Buffer、L0A Buffer、L0B Buffer、L0C Buffer等内存，Tensor自动携带存储位置属性。
+通过`LocalTensor`对象管理这些存储单元：
 
-**存储单元及Tensor类型说明**：
+| 存储单元 | 作用 | 示例 |
+|---------|------|------|
+| L1 Buffer | 缓存矩阵计算输入数据 | `LocalTensor<half> l1_buffer;` |
+| L0A Buffer | 存储左矩阵 | `LocalTensor<half> l0a_buffer;` |
+| L0B Buffer | 存储右矩阵 | `LocalTensor<half> l0b_buffer;` |
+| L0C Buffer | 存储计算结果 | `LocalTensor<half> l0c_buffer;` |
+| Fixpipe Buffer | 存储量化参数 | `LocalTensor<half> fixpipe_buffer;` |
+| BiasTable Buffer | 存储Bias数据 | `LocalTensor<half> bias_buffer;` |
 
-| 存储单元 | 作用 | Tensor类型 | 示例 |
-|---------|------|-----------|------|
-| L1 Buffer | 缓存矩阵计算输入数据 | `LocalTensor<T>` | `LocalTensor<half> l1_buffer;` |
-| L0A Buffer | 存储左矩阵 | `LocalTensor<T>` | `LocalTensor<half> l0a_buffer;` |
-| L0B Buffer | 存储右矩阵 | `LocalTensor<T>` | `LocalTensor<half> l0b_buffer;` |
-| L0C Buffer | 存储计算结果 | `LocalTensor<T>` | `LocalTensor<half> l0c_buffer;` |
-| Fixpipe Buffer | 存储量化参数 | `LocalTensor<T>` | `LocalTensor<half> fixpipe_buffer;` |
-| BiasTable Buffer | 存储Bias数据 | `LocalTensor<T>` | `LocalTensor<half> bias_buffer;` |
-
-结合Tensor对象，开发者可以通过LocalMemAllocator的方式申请一块内存块，如下方代码所示：
-
-```cpp
-constexpr uint32_t m_size = 256;
-constexpr uint32_t n_size = 128;
-constexpr uint32_t k_size = 256;
-
-AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
-AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
-AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
-AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-
-LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
-LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, n_size * k_size>();
-LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
-LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, n_size * k_size>();
-LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
-```
-
-同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式。不同产品型号的分形格式存在差异，具体对比如下：
-
-**表 1** 不同产品型号的分形格式对比
+为提升Cube计算效率，L1 Buffer和L0 Buffer采用分形格式。不同产品型号的分形格式存在差异：
 
 | 存储单元 | Atlas A2/A3训练和推理系列产品 | Ascend 950PR/Ascend 950DT |
 |---------|----------------------------|---------------------------|
@@ -141,7 +156,7 @@ LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
 | L0B Buffer | Zn | Zn |
 | L0C Buffer | Nz | Nz |
 
-以`FRACTAL_Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
+以`FRACTAL_Nz`为例，内存排布采用大N外部column major（列主序）+ 小z内部row major（行主序）存放：
 
 ![FRACTAL_Nz内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
 
@@ -194,7 +209,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 | 流水类型 | 含义 |
 |---------|------|
-| **PIPE_S** | 标量流水线，为此流水 |
+| **PIPE_S** | 标量流水线 |
 | **PIPE_V** | 矢量计算流水及部分硬件架构下的L0C Buffer→Unified Buffer数据搬运流水 |
 | **PIPE_M** | 矩阵计算流水 |
 | **PIPE_MTE1** | L1 Buffer→L0A Buffer、L1 Buffer→L0B Buffer数据搬运流水 |
@@ -299,8 +314,19 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
       </td>
     </tr>
     <tr>
+      <td><strong>单个AI Core内两个AIV子核之间同步</strong></td>
+      <td><p>同步单个AI Core内两个AIV核同步，通常用于Vector算子内需要分组进行同步的场景。</p></td>
+      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
+      <td>
+        <code>if ASCEND_IS_AIV {</code><br>
+        <code>    AscendC::CrossCoreSetFlag&lt;0x1, PIPE_MTE3&gt;(flagID);</code><br>
+        <code>    AscendC::CrossCoreWaitFlag(flagID);</code><br>
+        <code>}</code>
+      </td>
+    </tr>
+    <tr>
       <td><strong>单个AI Core内AIC与AIV同步</strong></td>
-      <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
+      <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。两个AIV同时触发AIC等待。</p></td>
       <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
       <td>
         <code>if ASCEND_IS_AIC {</code><br>
@@ -311,6 +337,21 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
         <code>}</code>
       </td>
     </tr>
+    <tr>
+      <td><strong>单个AI Core内AIC与AIV同步(Ascend 950PR/Ascend 950DT新引入)</strong></td>
+      <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。AIV0与AIV1可单独触发AIC等待。</p></td>
+      <td><code>CrossCoreSetFlag</code><br><code>CrossCoreWaitFlag</code></td>
+      <td>
+        <code>if ASCEND_IS_AIC {</code><br>
+        <code>    AscendC::CrossCoreSetFlag&lt;0x4, PIPE_FIX&gt;(0);</code><br>
+        <code>    AscendC::CrossCoreSetFlag&lt;0x4, PIPE_FIX&gt;(16);</code><br>
+        <code>}</code><br>
+        <code>if ASCEND_IS_AIV {</code><br>
+        <code>    AscendC::CrossCoreWaitFlag(0);</code><br>
+        <code>}</code>
+      </td>
+    </tr>
+
   </tbody>
 </table>
 
@@ -330,7 +371,7 @@ Vector矢量计算主要包含基础算术、归约计算、数据类型转换�
 
 ```cpp
 // Define Vector operator, marked with __aicore__ to execute on Device, suitable for operators with only Vector computation
-__global__ __aicore__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
+__global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
     AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
     AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 4096>();

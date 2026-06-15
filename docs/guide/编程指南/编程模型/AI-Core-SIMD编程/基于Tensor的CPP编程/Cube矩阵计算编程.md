@@ -1,7 +1,8 @@
 # Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于`L1 Buffer`、`L0A Buffer`等片上存储的**矩阵计算代码**，该能力是Ascend C最基础、最通用的矩阵编程方式。
-AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
+本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于`L1 Buffer`、`L0A Buffer`等片上存储的**矩阵计算代码**。
+
+AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核）。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer存储左矩阵，L0B Buffer存储右矩阵，L0C Buffer存储初始化累加值和矩阵计算结果。
 
 ## 矩阵编程的基本步骤
 
@@ -18,8 +19,6 @@ Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 �
 
 矩阵计算编程主要通过L0 Buffer进行矩阵计算。开发者需将输入数据从Global Memory搬入L1 Buffer，再从L1 Buffer搬入L0 Buffer，最终通过Cube计算指令完成计算。L1 Buffer与L0 Buffer均通过LocalTensor对象进行管理，开发者可通过LocalMemAllocator分配器申请矩阵计算所需的内存空间。
 
-- 基础Tensor(不带Layout)定义：通过`LocalMemAllocator`内存分配器创建，用户可指定物理存储位置和内存大小。
-
 ```cpp
 __global__ __cube__ void add_custom(...)
 {
@@ -33,12 +32,12 @@ __global__ __cube__ void add_custom(...)
   AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
   
   // Allocate L1A/B Buffer
-  LocalTensor<half> static_l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
-  LocalTensor<half> static_l1b_buffer = l1Allocator.Alloc<half, n_size * k_size>();
+  LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
+  LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, n_size * k_size>();
   // Allocate L0A/B/C Buffer
-  LocalTensor<half> static_l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
-  LocalTensor<half> static_l0b_buffer = l0bAllocator.Alloc<half, n_size * k_size>();
-  LocalTensor<float> static_l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
+  LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
+  LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, n_size * k_size>();
+  LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
   
   // ... Use Buffer for matrix computation
 }
@@ -117,10 +116,9 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
   右侧 L1 Buffer 中，数据被重组为 3 x 4 个分形块。
   Z 字流动： 每个 16 x 16 的小方块内部，以及方块之间，均按照特定的 Z 字形顺序存储（如图中折线箭头所示），完成了从"线性"到"分形"的物理映射，做好了进入 Cube 计算的准备。
 
-Ascend C编程中直接提供了`Global Memory`到`L1 Buffer`中的C++ Tensor编程接口，通过该接口可以直接将`Global Memory`数据搬入`L1 Buffer`并完成ND2NZ格式转换。
-C++ Tensor编程提供了`DataCopy`接口配合`Nd2NzParams`参数来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950PR/Ascend 950DT上，还支持从DN到Nz的格式转换搬运。
+## 基础Tensor编程范式
 
-## 矩阵搬运能力说明
+基础Tensor仅封装数据指针与大小信息，开发者需手动配置搬运参数、计算分形步长、管理内存布局。适用于需要精细控制硬件行为的场景。
 
 ### 矩阵数据搬入
 
@@ -147,7 +145,7 @@ C++ Tensor编程提供了`DataCopy`接口配合`Nd2NzParams`参数来完成GM2L1
 以上图为例，实现A矩阵(Shape(16, 23)，数据类型为half)从GM搬运到L1的能力，针对Atlas A2/A3训练和推理系列产品，调用接口如下：
 
 ```cpp
-// Allocate L1 Buffer space, m direction is 16, k direction 23 aligned up to 32
+// Allocate L1 Buffer space
 constexpr uint64_t m = 16;
 constexpr uint64_t k = 32;
 AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
@@ -180,13 +178,13 @@ AscendC::LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, 2304>();
 // m_step is 2, k_step is 3, indicating transfer of 6 data blocks
 uint8_t m_step = 2;
 uint8_t k_step = 3;
-// mStartPosition is 2, indicates M direction transfer starting position is at M axis direction 16*2=64 elements away from source operand starting position
+// mStartPosition is 2, indicates M direction transfer starting position
 uint16_t m_start_position = 2;
-// kStartPosition is 2, indicates K direction transfer starting position is at K axis direction 32B*2=64B position away from source operand starting position
+// kStartPosition is 2, indicates K direction transfer starting position
 uint16_t k_start_position = 2;
-// srcStride is 5, indicates in source operand, interval between starting addresses of previous fractal and next fractal in K direction is 5
+// srcStride is 5, indicates interval between fractal starting addresses in K direction
 int16_t src_stride = 5;
-// dstStride is 3: indicates in destination operand, interval between starting addresses of previous fractal and next fractal in K direction is 3
+// dstStride is 3: indicates interval between fractal starting addresses in K direction
 int16_t dst_stride = 3;
 
 AscendC::L12L0Params l12l0Params{m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride};
@@ -241,19 +239,19 @@ AscendC::DataCopy(dst_addr, src_addr, l0c2gmParams);
 另外，对于是否开启unit_flag，nz2nd信息的设置，需配置相应参数以启用不同功能。对应的接口和处理能力如下：
 
 ```cpp
-// 1.0 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
+// 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
 AscendC::SetL0C2GMConfig(relu_pre_addr, quant_pre_addr, enable_unit_flag);
 
-// 2.0 数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+// 数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 AscendC::SetL0C2GMNZ2ND(nd_num, src_nd_stride, dst_nd_stride);
 
-// 3.0 对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
+// 对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
 AscendC::SetL0C2GMLeakyReluAlpha(config);
 ```
 
 详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/C++-API/矩阵数据搬运/asc_copy_l0c2gm/)
 
-## 矩阵计算能力说明
+### 矩阵计算
 
 `Mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对Atlas A2/A3训练和推理系列产品L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而Ascend 950PR/Ascend 950DT产品L0A Buffer分形为Nz。
 
@@ -296,7 +294,7 @@ AscendC::SetL0C2GMLeakyReluAlpha(config);
 C++ Tensor编程提供了一系列`Mmad`重载接口，支持不同数据类型的矩阵计算。以下代码实现上图中的矩阵乘计算。
 
 ```cpp
-// 1. Define L0A/L0B matrix sizes
+// Define L0A/L0B matrix sizes
 constexpr uint32_t l0_m_size = 64;
 constexpr uint32_t l0_k_size = 64;
 constexpr uint32_t l0_n_size = 64;
@@ -309,8 +307,7 @@ AscendC::LocalTensor<half> a_matrix = l0aAllocator.Alloc<half, l0_m_size * l0_k_
 AscendC::LocalTensor<half> b_matrix = l0bAllocator.Alloc<half, l0_k_size * l0_n_size>();
 AscendC::LocalTensor<float> c_matrix = l0cAllocator.Alloc<float, l0_m_size * l0_n_size>();
 
-// 2. Configure Mmad parameters
-// 2.1. Actual matrix sizes participating in computation (m, n, k)
+// Configure Mmad parameters
 // m direction: 3 fractals, actual value = 3 × 16 = 48
 constexpr uint16_t m = 48;
 // n direction: 3 fractals, actual value = 3 × 16 = 48
@@ -318,21 +315,21 @@ constexpr uint16_t n = 48;
 // k direction: 4 fractals, actual value = 4 × 16 = 64
 constexpr uint16_t k = 64;
 
-// 2.2 Feature parameters
-// unit_flag: Controls fine-grained parallelism of Mmad and Fixpipe instructions. When enabled, results are transferred out immediately after computing each fractal.
+// Feature parameters
+// unit_flag: Controls fine-grained parallelism of Mmad and Fixpipe instructions
 uint8_t unit_flag = 0;
 // disable_gemv: Configures whether to enable GEMV mode when M=1
 bool disable_gemv = false;
-// enable_cube_init: Enables C matrix initial value loading. false: do not initialize L0C; true: load initial value from BT Buffer.
+// enable_cube_init: Enables C matrix initial value loading
 bool enable_cube_init = false;
-// enable_cube_zero_init: Enables C matrix default zero initialization. true: initialize to 0; false: control initialization via enable_cube_init parameter.
+// enable_cube_zero_init: Enables C matrix default zero initialization
 bool enable_cube_zero_init = true;
 
 AscendC::MmadParams mmadParams{m, n, k, unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init};
 AscendC::Mmad(c_matrix, a_matrix, b_matrix, mmadParams);
 ```
 
-## 矩阵计算的同步
+### 同步机制
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Cube计算需通过流水同步接口确保正确执行。Cube矩阵计算主要包含四步：数据搬入（Global Memory → L1 Buffer）、数据搬入（L1 Buffer → L0A/B Buffer）、矩阵计算（L0A/B Buffer → L0C Buffer）、数据搬出（L0C Buffer → Global Memory）。四个步骤分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_FIX流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
@@ -360,30 +357,29 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
     b_gm.SetGlobalBuffer((__gm__ half*)y);
     c_gm.SetGlobalBuffer((__gm__ float*)z);
     
-    ...
-    // 1. Step 1: Data transfer in (Global Memory → L1 Buffer), execution pipeline is PIPE_MTE2
+    // Step 1: Data transfer in (Global Memory → L1 Buffer), pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
     AscendC::Nd2NzParams nd2nzParams{1, BLOCK_M, BLOCK_K, 0, BLOCK_K, BLOCK_K, 1, 0};
     AscendC::DataCopy(a_l1_buf, a_gm, nd2nzParams);
     AscendC::Nd2NzParams nd2nzParamsB{1, BLOCK_K, BLOCK_N, 0, BLOCK_N, BLOCK_N, 1, 0};
     AscendC::DataCopy(b_l1_buf, b_gm, nd2nzParamsB);
     AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
-    ...
-    // 2. Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), execution pipeline is PIPE_MTE1
+    
+    // Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), pipeline is PIPE_MTE1
     AscendC::Mutex::Lock<PIPE_MTE1>(mutex_id);
     AscendC::L12L0Params l12l0aParams{0, 0, 4, 8, 1, 1};
     AscendC::DataCopy(l0a_buf, a_l1_buf, l12l0aParams);
     AscendC::L12L0TransposeParams l12l0bParams{0, 0, 4, 8, 1, 1};
     AscendC::DataCopy(l0b_buf, b_l1_buf, l12l0bParams);
     AscendC::Mutex::Unlock<PIPE_MTE1>(mutex_id);
-    ...
-    // 3. Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), execution pipeline is PIPE_M
+    
+    // Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), pipeline is PIPE_M
     AscendC::Mutex::Lock<PIPE_M>(mutex_id);
     AscendC::MmadParams mmadParams{BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false};
     AscendC::Mmad(l0c_buf, l0a_buf, l0b_buf, mmadParams);
     AscendC::Mutex::Unlock<PIPE_M>(mutex_id);
-    ...
-    // 4. Step 4: Data transfer out (L0C Buffer → Global Memory), execution pipeline is PIPE_FIX
+    
+    // Step 4: Data transfer out (L0C Buffer → Global Memory), pipeline is PIPE_FIX
     AscendC::Mutex::Lock<PIPE_FIX>(mutex_id);
     AscendC::L0C2GMParams l0c2gmParams{BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0, 0, 0, false, true, 0, 0, false, false, 0, false, false, false, false, false};
     AscendC::DataCopy(c_gm, l0c_buf, l0c2gmParams);
@@ -391,6 +387,118 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 }
 ```
 
-## Cube矩阵计算示例
+### 基于基础Tensor的矩阵计算编程示例
 
-当前C++ Tensor API样例正在开发中，完整矩阵计算实现示例将在后续版本中补充。开发者可参考API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C++-API/)。
+结合上述矩阵计算的搬运与计算能力，开发者可基于C++ Tensor编程实现矩阵类算子。具体开发实践可参考[matmul实现样例](../../../../../../examples/01_simd_cpp_api/00_introduction/02_matrix/matmul_basic_api/)。
+
+## 扩展Tensor编程范式
+
+Ascend 950PR/950DT在Tensor基础上引入Layout布局概念，将Shape和Stride移到编译期确定，实现类型安全和分形布局自动生成。开发者只需定义Tensor的Layout，搬运和计算接口自动推断底层参数，大幅降低矩阵算子开发难度。
+
+> 📌 扩展Tensor(带有layout)能力从**Ascend 950PR/Ascend 950DT**开始支持。
+
+#### Layout的层次化表述
+
+我们使用Shape和Stride来表达Layout排布格式，Shape用于表达Layout形状，Stride则用于区分不同的排布。比如下图中的行优先和列优先排布：
+
+- 行优先:Shape (2, 4) Stride (4, 1)
+- 列优先:Shape (2, 4) Stride (1, 2)
+
+图中每个方格中的数字表示该位置元素在内存中按顺序排列时的下标。对于相同的矩阵位置，排布方式不同时，其在内存中的顺序可能是不同的，例如，矩阵坐标 (1, 0) 在行优先和列优先的情况下，对应元素在内存中的顺序分别是4和1。
+
+![行优先排布](../../../../figures/行优先排布.png)
+
+![列优先排布](../../../../figures/列优先排布.png)
+
+通常Shape或者Stride中的元素是一个单独的正整数（如上文的示例），但是遇到一些复杂的内存排布情况可能无法表达，所以采用层次化表述法，该方式中，元素也可以是一个元组。元组的第一个元素用于描述不同层次中矩阵的行数，元组的第二个元素用于描述不同层次中矩阵的列数。
+例如在下图中，Layout的Shape和Stride分别为：
+
+- Shape((2, 3), (2, 4))
+- Stride((1, 4), (2, 12))
+
+![层次化Layout表达](../../../../figures/层次化Layout表达.png)
+
+图中展示了两层矩阵：内层矩阵为内部用灰色线包裹的矩阵，外层矩阵为将内层矩阵视为一个元素时黑色线包裹的矩阵。Shape的第一个元素描述行方向的形状，(2, 3)表示内层矩阵和外层矩阵的行数分别为2和3；Shape的第二个元素描述的是列方向上的形状，(2，4)表示内存矩阵和外层矩阵的列数分别为2和4。Stride中的每个元素与Shape中的元素对应，表示该对应维度下，相邻元素首地址在内存地址上的间隔，图片中用箭头表示了每个维度相邻元素的首地址间隔。
+
+#### 矩阵计算中的分形表达
+
+在基于Ascend C进行矩阵编程场景下，会用到以下几种常用的Layout，这些格式都采用如上文介绍的层次化表述法来表达，要求有内外层两层矩阵。其中行排布可以看作Z字形排布，列排布可以看作N字形排布，Layout的分形名称从前到后依次描述从外层到内层的排布顺序，比如NZLayout格式表示外层为N字形排布，内层为Z字形排布。四维Layout的具体表达方式如下：
+
+```cpp
+Layout = ((Shape): (Stride))
+Shape = ((ShapeRow0, ShapeRow1), (ShapeColumn0, ShapeColumn1))
+Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
+```
+
+以Nz分形为例，Nz分形格式的内层分形Shape中，ShapeRow0固定为16行，ShapeColumn0固定为32Byte / sizeof(T)，内层分形的Stride中，StrideRow0固定为32Byte / sizeof(T)，StrideColumn0也固定为1，即内层分形按z字形组织，外层分形按N字形组织。ShapeRow1需满足row方向16对齐，ShapeColumn1需满足column方向上32B对齐。
+
+<img src="../../../../figures/Nz数据排布格式.png" alt="Nz数据排布格式" width="400" />
+
+下面是一个连续的NZ Layout示例，其中C0_ELEMENT = Std::Int<32>{} / sizeof(T)。
+
+```cpp
+Layout = ((Shape) : (Stride))
+Shape = ((Std::Int<16>{}, ceil_div(row, Std::Int<16>{})), (C0_ELEMENT, ceil_div(column, C0_ELEMENT)))
+Stride = ((C0_ELEMENT, C0_ELEMENT * Std::Int<16>{}), (Std::Int<1>{}, C0_ELEMENT * ceil_align(row, Std::Int<16>{})))
+```
+
+#### Layout的构造
+
+结合如上分形表达的描述, 基于Layout的能力, C++ Tensor编程提供了原始的Layout构造接口, 例如, 需要创建一个多维的内存排布的形状(128, 256, 128)时, 可通过`MakeLayout`接口直接构造。
+
+```cpp
+auto threeDimLayout = MakeLayout(MakeShape(128, 256, 128));
+```
+
+而对于一个Nz分形的排布, 也可以通过`MakeLayout`来构造一个层次化的Layout表达, 譬如, 对于外层大小为(128, 256), 数据类型为half的Nz数据而言，其可以通过`MakeLayout`构造一个四维的layout排布:
+```cpp
+// 定义(128, 256)的Nz分型, 其四维表达为: ((16, 128 / 16), (16, 256 / 16))
+auto NzLayout = MakeLayout(MakeShape((16, 8), (16, 16)));
+```
+
+Cube矩阵计算中对于不同的内部存储都有着自己独特的分形结构，为了简化用户的编写,  C++ Tensor编程提供了`MakeFrameLayout`来简化用户编写生成如上的四维Layout定义：
+```cpp
+// 通过MakeFrameLayout来简化用户对于Nz分形的定义, 用户只需要感知对应存储的分形结构, 无需直接表达四维结构
+auto NzLayout = MakeFrameLayout<NZLayoutPtn>(128, 256);
+```
+
+### 基于Layout的Tensor表达
+
+扩展的Tensor即是将上述的Layout信息内置到Tensor结构中, 该Tensor是对基础Tensor的扩展实现, 其由数据指针和数据布局组成。一个Tensor对象同时描述"数据放在哪里"和"数据长什么样"。
+C++ Tensor提供了`MakeTensor`函数让开发者能够简便的构造出带有Layout的扩展Tensor结构, 定义一个(shape = (128, 256), type = half)的Global Memory和一个同等大小的L1 Buffer数据块，通过结合Layout构造函数可以表达为:
+
+```cpp
+// 构造Global Memory & L1 Buffer的Layout形状 
+auto globalLayout = MakeLayout(MakeShape(128, 256));
+auto l1Layout = MakeFrameLayout<NZLayoutPtn>(128, 256);
+
+// 通过指针 + Layout构造GlobalTensor & L1 LocalTensor
+auto globalTensor = MakeTensor(gmPtr, globalLayout);
+auto l1Tensor = MakeTensor(l1Ptr, l1Layout);
+```
+
+### 矩阵搬运和计算
+
+基础搬运接口需手动传入`count`或`DataCopyParams`参数指定搬运长度和搬运模式。扩展Tensor携带Shape、Stride和存储位置信息，编译器自动推断搬运参数和物理通路，简化接口调用。同时提供**Atom定制接口**，开发者可基于CopyTraits自定义搬运行为（如自定义搬运模式、随路处理等），满足特殊场景定制需求。
+
+- **GM2L1搬运**: `Copy(dst, src)`搬运矩阵数据到L1 Buffer，支持随路格式转换（ND2NZ、DN2NZ、NZ2NZ等），开发者定义源Tensor和目的Tensor的Layout，接口自动处理格式转换。
+```cpp
+// Directly specify Global Tensor and Local Tensor for equal size copy, interface automatically infers copy parameters
+Copy(l1Tensor, globalBias);
+
+// Specify Global Tensor offset to copy a slice from Global Tensor
+Copy(l1Tensor, globalBias.Slice(MakeCoord(0, j * baseN), MakeShape(1, curN)));
+
+// Create custom CopyAtom based on OP, CopyGM2L1 implements custom GM->L1 copy capability
+auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+Copy(atomCopy, dstTensor, srcTensor);
+
+// Fixpipe inline quantization example
+Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantScalar);
+```
+
+同样，对于`L1 Buffer`->`L0A Buffer`/`L0B Buffer`的搬运接口以及矩阵计算接口也只需要指定对应的操作Tensor, 开发者无需感知具体的操作细节参数, 对于矩阵计算编程, 极大的简化了开发者编写算子的难度。
+
+### 基于扩展Tensor的矩阵计算示例
+
+结合上述矩阵计算的搬运与计算能力，开发者可基于C++ Tensor编程实现矩阵类算子。具体开发实践可参考[matmul实现样例](../../../../../../examples/01_simd_cpp_api/00_introduction/02_matrix/matmul_tensor_api/)。
