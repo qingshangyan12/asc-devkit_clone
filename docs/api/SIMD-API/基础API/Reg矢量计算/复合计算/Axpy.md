@@ -99,14 +99,11 @@ __simd_callee__ inline void Axpy(S& dstReg, S& srcReg, const U scalarValue, Mask
 | int64_t  | int64_t     | int64_t  |
 | uint64_t | uint64_t    | uint64_t |
 
-**int64_t、uint64_t为软仿数据类型。**
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 本接口支持寄存器重叠。
 - 本接口操作数为寄存器，不涉及地址对齐。
 - 本接口不修改全局寄存器的值。
-- 本接口支持的int64\_t、uint64\_t为软仿数据类型。
 
 ## 调用示例<a name="section98571172212"></a>
 

@@ -111,8 +111,6 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 | int64_t  | int64_t  | int64_t |
 | uint64_t | uint64_t | int64_t |
 
-**int64\_t、uint64\_t为软仿数据类型。**
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 对于逻辑位移（无符号数据类型），如果位移量（srcReg1）大于数据类型位宽，则输出为0。
