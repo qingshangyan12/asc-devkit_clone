@@ -72,7 +72,6 @@ $dst_i = e^{src_i}$
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-
 - 传入config的原型
 
     - tensor前n个数据连续计算
@@ -96,8 +95,6 @@ $dst_i = e^{src_i}$
             template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
             __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
             ```
-
-
 
 - 不传入config的原型
 
@@ -123,7 +120,6 @@ $dst_i = e^{src_i}$
             __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
             ```
 
-
 ## 参数说明<a name="section176711403104"></a>
 
 **表 1**  模板参数说明
@@ -132,7 +128,7 @@ $dst_i = e^{src_i}$
 |---|---|
 | T | 操作数数据类型。 |
 | isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符`MASK_PLACEHOLDER`。<br>具体使用方式可参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
-| <cann-filter npu-type="950">config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ExpConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;ExpAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;ExpConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;ExpAlgo&nbsp;algo&nbsp;=&nbsp;ExpAlgo::INTRINSIC;<br>};<br>通过ExpConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ExpAlgo::INTRINSIC、ExpAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ExpAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_EXP_CONFIG的取值如下：<br><br>constexpr&nbsp;ExpConfig&nbsp;DEFAULT_EXP_CONFIG&nbsp;=&nbsp;{&nbsp;ExpAlgo::INTRINSIC&nbsp;};<br></cann-filter> |
+| <!-- npu="950" id22 -->config | 该参数仅支持Ascend 950PR/Ascend 950DT。<br>用于配置Subnormal计算模式，ExpConfig类型，定义如下：<br><br>enum&nbsp;class&nbsp;ExpAlgo&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;INTRINSIC&nbsp;=&nbsp;0,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_TRUE,<br>&nbsp;&nbsp;&nbsp;&nbsp;PRECISION_1ULP_FTZ_FALSE,<br>};<br>struct&nbsp;ExpConfig&nbsp;{<br>&nbsp;&nbsp;&nbsp;&nbsp;ExpAlgo&nbsp;algo&nbsp;=&nbsp;ExpAlgo::INTRINSIC;<br>};<br>通过ExpConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：<br>&bull; ExpAlgo::INTRINSIC、ExpAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。<br>&bull; ExpAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。<br>该参数的默认值DEFAULT_EXP_CONFIG的取值如下：<br><br>constexpr&nbsp;ExpConfig&nbsp;DEFAULT_EXP_CONFIG&nbsp;=&nbsp;{&nbsp;ExpAlgo::INTRINSIC&nbsp;};<br><!-- end id22 --> |
 
 **表 2**  参数说明
 
@@ -158,22 +154,16 @@ T支持的数据类型为：half、float。
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<cann-filter npu-type="A3,910b">
-
+<!-- npu="A3,910b" id21 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
-  <cann-filter npu-type="A3">
-
+  <!-- npu="A3" id19 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-  </cann-filter>
-  <cann-filter npu-type="910b">
-
+  <!-- end id19 -->
+  <!-- npu="910b" id20 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
+  <!-- end id20 -->
 
-  </cann-filter>
-
-</cann-filter>
+<!-- end id21 -->
 
 ## 调用示例<a name="section176061616102911"></a>
 
@@ -203,16 +193,15 @@ T支持的数据类型为：half、float。
     AscendC::Exp(dstLocal, srcLocal, 512);
     ```
 
-    <cann-filter npu-type="950">
 
-    以下示例仅支持Ascend 950PR/Ascend 950DT
+<!-- npu="950" id23 -->
+以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
     static constexpr ExpConfig config = { ExpAlgo::PRECISION_1ULP_FTZ_FALSE };
     AscendC::Exp<T, config>(dstLocal, srcLocal, 512);
     ```
-
-    </cann-filter>
+<!-- end id23 -->
 
 结果示例如下：
 
