@@ -27,7 +27,7 @@
 #include "utils/kernel_utils_struct_dma_params.h"
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
-#include "utils/debug/asc_debug_utils.h"
+#include "../utils/debug/asc_debug_utils.h"
 
 #include "kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"

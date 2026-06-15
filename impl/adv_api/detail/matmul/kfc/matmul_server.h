@@ -22,7 +22,7 @@
 #ifndef IMPL_MATMUL_KFC_MATMUL_SERVER_H
 #define IMPL_MATMUL_KFC_MATMUL_SERVER_H
 
-#include "kernel_operator_common_intf_impl.h"
+#include "../../../../basic_api/kernel_operator_common_intf_impl.h"
 #include "kernel_operator_cache_intf.h"
 #include "matmul_server_utils.h"
 #include "../utils/matmul_config_utils.h"

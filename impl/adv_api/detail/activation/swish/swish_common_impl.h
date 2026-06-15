@@ -23,7 +23,7 @@
 
 #if ASCENDC_CPU_DEBUG
 #include <type_traits>
-#include "kernel_log.h"
+#include "../../../../basic_api/kernel_log.h"
 #endif
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
