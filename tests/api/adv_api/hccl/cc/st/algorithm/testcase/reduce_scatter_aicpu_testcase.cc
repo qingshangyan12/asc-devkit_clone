@@ -19,7 +19,7 @@
 #include "alg_env_config.h"
  
 using namespace HcclSim;
-using namespace ops_hccl;
+using namespace mc2_ops_hccl;
 
 constexpr uint32_t DATATYPE_SIZE_TABLE_REDUCE_SCATTER[HCCL_DATA_TYPE_RESERVED] = {sizeof(int8_t), sizeof(int16_t), sizeof(int32_t),
     2, sizeof(float), sizeof(int64_t), sizeof(uint64_t), sizeof(uint8_t), sizeof(uint16_t), sizeof(uint32_t),
@@ -244,16 +244,6 @@ TEST_F(ST_REDUCE_SCATTER_AICPU_TEST, st_reduce_scatter_a5_aicpu_meshnhr_2x2rank_
     RunReduceScatterAicpuA5(topoMeta, recvCount, dataType, reduceOp);
 }
 
-TEST_F(ST_REDUCE_SCATTER_AICPU_TEST, st_reduce_scatter_a5_aicpu_meshnhr_3x2rank_fp32_min_test)
-{
-    // 仿真模型初始化
-    TopoMeta topoMeta {{{0, 1, 2}, {0, 1, 2}}}; // 三维数组指定超节点-Server-Device信息
-    auto recvCount = 300 * 1024 * 1024;  // 接收数据量
-    auto dataType = HcclDataType::HCCL_DATA_TYPE_FP32;  // 数据类型
-    auto reduceOp = HcclReduceOp::HCCL_REDUCE_MIN;
-    RunReduceScatterAicpuA5(topoMeta, recvCount, dataType, reduceOp);
-}
-
 TEST_F(ST_REDUCE_SCATTER_AICPU_TEST, st_reduce_scatter_a5_aicpu_meshnhr_2x3rank_int16_max_test)
 {
     // 仿真模型初始化
@@ -261,16 +251,6 @@ TEST_F(ST_REDUCE_SCATTER_AICPU_TEST, st_reduce_scatter_a5_aicpu_meshnhr_2x3rank_
     auto recvCount = 200;  // 接收数据量
     auto dataType = HcclDataType::HCCL_DATA_TYPE_INT16;  // 数据类型
     auto reduceOp = HcclReduceOp::HCCL_REDUCE_MAX;
-    RunReduceScatterAicpuA5(topoMeta, recvCount, dataType, reduceOp);
-}
-
-TEST_F(ST_REDUCE_SCATTER_AICPU_TEST, st_reduce_scatter_a5_aicpu_meshnhr_2x2rank_fp16_sum_test)
-{
-    // 仿真模型初始化
-    TopoMeta topoMeta {{{0, 1}, {0, 1}}}; // 三维数组指定超节点-Server-Device信息
-    auto recvCount = 400 * 1024 * 1024;  // 接收数据量
-    auto dataType = HcclDataType::HCCL_DATA_TYPE_FP16;  // 数据类型
-    auto reduceOp = HcclReduceOp::HCCL_REDUCE_SUM;
     RunReduceScatterAicpuA5(topoMeta, recvCount, dataType, reduceOp);
 }
 

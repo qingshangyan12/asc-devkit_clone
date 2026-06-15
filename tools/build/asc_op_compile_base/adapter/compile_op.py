@@ -361,7 +361,7 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or CommonUtility.is_m510())
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not CommonUtility.is_c310()
     workspace_idx = 0
     if needs_ffts:
         func_params.append("GM_ADDR ffts_addr")
@@ -703,7 +703,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and \
-                    (CommonUtility.is_c310() or CommonUtility.is_m510()):
+                    CommonUtility.is_c310():
         check_custom_dcci_end_false(compile_option_tuple)
 
     source += "}\n\n"
@@ -1062,10 +1062,6 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
             _compile_ascendc_cce_v220_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_m510():
-        compile_info.code_channel = CORE_TYPE_CUBE
-        compile_info.hard_sync = False
-        _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -1322,9 +1318,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
-    # dump function determins how kernel wrapper will be, must be handle early
-    handle_dump_options(compile_info, compile_option_tuple)
-
+    # dump ktype handle
+    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
@@ -1349,7 +1344,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
-        handle_dump_options(compile_info_origin, compile_option_tuple_origin)
+        # dump ktype handle
+        compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
         handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
         workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
                                                 distinct_tag, kernel_meta_dir)
@@ -1398,7 +1394,7 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
-    need_impl_mode_macro = (CommonUtility.is_c310() or CommonUtility.is_m510()) and \
+    need_impl_mode_macro = CommonUtility.is_c310() and \
         isinstance(op_info.impl_mode, str) and op_info.impl_mode != ""
     if need_impl_mode_macro:
         impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
@@ -1456,7 +1452,7 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
-    need_impl_mode_macro = (CommonUtility.is_c310() or CommonUtility.is_m510()) and \
+    need_impl_mode_macro = CommonUtility.is_c310() and \
         isinstance(op_info.impl_mode, str) and op_info.impl_mode != ""
     if need_impl_mode_macro:
         impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
@@ -1481,18 +1477,6 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
 
     compile_op_common_part(cce_file, origin_func_name, op_info, compile_option_tuple, infered_info_from_ifile,
                             extend_options)
-
-
-def handle_dump_options(compile_info: CompileInfo, compile_option_tuple):
-    # dump ktype handle
-    compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-
-    # dump or acc or timestamp or recognize_simtvf will need extra workspace
-    ascendc_enable_dump_workspace = ("-DASCENDC_DUMP=0" not in compile_option_tuple.compile_options) or \
-        (global_var_storage.get_variable("ascendc_time_stamp_compile_options") is True) or \
-        "-DASCENDC_ACC_DUMP" in compile_option_tuple.compile_options or \
-        (global_var_storage.get_variable("ascendc_recognize_simtvf") is True)
-    global_var_storage.set_variable("ascendc_enable_dump_workspace", ascendc_enable_dump_workspace)
 
 
 def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option_tuple):
@@ -2101,26 +2085,6 @@ def get_core_info(compile_info: CompileInfo):
         return arch, sub_core_type, optional_core
     else:
         raise Exception(f"invalid code_channel = {compile_info.code_channel}")
-
-
-def _compile_ascendc_cce_m510(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
-    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
-
-    Args:
-        compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
-        tiling_info (TilingInfo): tiling info
-    """
-    sub_core_type = "AIC"
-    optional_core = "AiCore"
-    arch = None
-    set_soc_spec(optional_core)
-    tiling_key_list = call_bisheng_v220(compile_info, compile_option_tuple, tiling_info, arch, \
-        compile_info.code_channel)
-    _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
-    if not tiling_info.static_shape_flag:
-        _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
-            compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
 
 
 def _compile_ascendc_cce_regbase(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):

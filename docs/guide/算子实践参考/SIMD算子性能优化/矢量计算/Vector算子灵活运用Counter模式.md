@@ -8,7 +8,7 @@ Counter模式下，用户不需要计算迭代次数以及判断是否存在尾�
 
 提示：Normal模式和Counter模式、掩码的介绍可参考[如何使用掩码操作API](../../../编程指南/类库API/基础API/常用操作速查指导/如何使用掩码操作API.md)。
 
-以下反例和正例中的代码均以[AddCustom](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.3/examples/01_simd_cpp_api/02_features/00_compilation/custom_op)算子为例，修改其中Add接口的调用代码，以说明Counter模式的优势。
+以下反例和正例中的代码均以[AddCustom](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.2/examples/01_simd_cpp_api/02_features/00_compilation/custom_op)算子为例，修改其中Add接口的调用代码，以说明Counter模式的优势。
 
 ```
 AscendC::Add(zLocal, xLocal, yLocal, this->tileLength);

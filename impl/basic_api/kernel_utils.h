@@ -27,6 +27,7 @@
 #include "utils/kernel_utils_struct_dma_params.h"
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
+#include "utils/debug/asc_debug_utils.h"
 
 #include "kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
@@ -46,7 +47,7 @@ __BLOCK_LOCAL__ __inline__ half g_deqValue;
 __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
@@ -258,6 +259,13 @@ enum class TimeStampId : uint32_t {
 
     TIME_STAMP_MAX = 0xffff,
 };
+
+template <auto funcPtr, typename... Args> __aicore__ inline void AscVFCallImpl(Args &&... args)
+{
+    AscVFDebugInitUb();
+    funcPtr(args...);
+    AscVFDebugTransferUb();
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_UTILS_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_UTILS_H__)

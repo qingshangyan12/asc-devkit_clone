@@ -11,10 +11,11 @@
 #include "topo_match_1d.h"
 #include "topo_match_multilevel.h"
 #include "topo_match_ubx.h"
+#include "channel.h"
 
 #include <algorithm>
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 namespace {
 constexpr u32 NET_LAYER0 = 0;
 constexpr u32 NET_LAYER1 = 1;
@@ -270,4 +271,28 @@ HcclResult TopoMatchUBX::MatchTopo(const HcclComm comm, TopoInfoWithNetLayerDeta
     }
     return HCCL_SUCCESS;
 }
-} // namespace ops_hccl
+
+HcclResult CalcChannelRequestMesh1DLevel0(HcclComm comm, const OpParam& param,
+    const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
+{
+    (void)comm;
+    (void)param;
+    (void)topoInfo;
+    (void)subcommInfo;
+    channels.clear();
+    return HCCL_SUCCESS;
+}
+
+HcclResult CalcChannelRequestMesh1DLevel1(HcclComm comm, const OpParam& param,
+    const TopoInfoWithNetLayerDetails* topoInfo,
+    const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
+{
+    (void)comm;
+    (void)param;
+    (void)topoInfo;
+    (void)subcommInfo;
+    channels.clear();
+    return HCCL_SUCCESS;
+}
+} // namespace mc2_ops_hccl

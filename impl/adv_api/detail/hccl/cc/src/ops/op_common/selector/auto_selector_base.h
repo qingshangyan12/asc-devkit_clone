@@ -16,7 +16,7 @@
 #include "log.h"
 #include "alg_env_config.h"
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 
 constexpr uint64_t SMALL_COUNT_512KB = 512*1024; // Byte, UB协议一次传输的最大size
 constexpr uint64_t LARGE_COUNT_1024KB = 1024*1024; // Byte, 可掩盖多mission尾块开销
@@ -101,6 +101,7 @@ public:
     bool IsLayerAllConnetedWithTopo(const TopoInfoWithNetLayerDetails *topoInfo, const u32 netLayer, const CommTopo topoType) const;
     HcclResult CheckMeshNumEqualToClosNum(const TopoInfoWithNetLayerDetails *topoInfo, bool &isEqual) const;
     HcclResult CheckClosNumMultipleOfMeshNum(const TopoInfoWithNetLayerDetails *topoInfo, bool &isMultiple) const;
+    bool IsTwoLevelNetLayer(const TopoInfoWithNetLayerDetails *topoInfo) const;
     bool IsInputOutputOverlap(const OpParam &opParam) const;
 
 private:

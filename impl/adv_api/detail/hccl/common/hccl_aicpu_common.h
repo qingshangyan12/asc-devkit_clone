@@ -119,45 +119,45 @@ __aicore__ inline void AssembleHcclMsgV2(const CommonPrepareParam &param, HcclTi
 }
 __aicore__ inline void AssembleHcclMsg(const CommonPrepareParam &param, HcclTilingVersion ver, HcclHandle handle,
                                        uint64_t tiling, __gm__ HcclMsg *dst, __gm__ ControlHcclMsg *controlMsgGM)
-{	 
-    HcclMsg tmp{};	 
-    static uint8_t primitiveId = 0U;	 
-    static bool isResetPrimitiveId = false;	 
-    FlushDataCache(controlMsgGM);	 
-    if (controlMsgGM->resetSeq > 0) {	 
-        controlMsgGM->resetSeq = 0;	 
-        if (!isResetPrimitiveId) {	 
-            primitiveId = 0U;	 
-            isResetPrimitiveId = true;	 
-        }	 
-    } 
-    tmp.commType.msgType = param.commType.msgType; 
-    if (param.commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE) { 
-        primitiveId = 0U; 
-        isResetPrimitiveId = false; 
-    } else { 
-        tmp.opType = param.op;	 
-        tmp.sendBuffer = reinterpret_cast<uint64_t>(param.sendBuf);	 
-        tmp.recvBuffer = reinterpret_cast<uint64_t>(param.recvBuf);	 
-        tmp.dataCnt = param.count;	 
-        tmp.strideCount = param.strideCount;	 
-        if (ver == HcclTilingVersion::DEPRECATED_TILING_VERSION) {	 
-            tmp.addMsg.v0Msg.hcclDataType = param.dataType;	 
-            tmp.addMsg.v0Msg.repeatCnt = param.repeat;	 
-            tmp.addMsg.v0Msg.selfHandleID = handle;	 
-            tmp.addMsg.v0Msg.seqNum = primitiveId++;	 
-            tmp.addMsg.v0Msg.version = ver;	 
-        } else {	 
-            tmp.addMsg.v1Msg.ccOpTilingData = tiling;	 
-            tmp.addMsg.v1Msg.hcclDataType = param.dataType;	 
-            tmp.addMsg.v1Msg.repeatCnt = param.repeat;	 
-            tmp.addMsg.v1Msg.selfHandleID = handle;	 
-            tmp.addMsg.v1Msg.seqNum = primitiveId++;	 
-            tmp.addMsg.v1Msg.version = ver;	 
-        }	 
-    }	 
-    tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;	 
-    CopyHcclMsg(reinterpret_cast<const uint8_t *>(&tmp), dst);	 
+{
+    HcclMsg tmp{};
+    static uint8_t primitiveId = 0U;
+    static bool isResetPrimitiveId = false;
+    FlushDataCache(controlMsgGM);
+    if (controlMsgGM->resetSeq > 0) {
+        controlMsgGM->resetSeq = 0;
+        if (!isResetPrimitiveId) {
+            primitiveId = 0U;
+            isResetPrimitiveId = true;
+        }
+    }
+    tmp.commType.msgType = param.commType.msgType;
+    if (param.commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE) {
+        primitiveId = 0U;
+        isResetPrimitiveId = false;
+    } else {
+        tmp.opType = param.op;
+        tmp.sendBuffer = reinterpret_cast<uint64_t>(param.sendBuf);
+        tmp.recvBuffer = reinterpret_cast<uint64_t>(param.recvBuf);
+        tmp.dataCnt = param.count;
+        tmp.strideCount = param.strideCount;
+        if (ver == HcclTilingVersion::DEPRECATED_TILING_VERSION) {
+            tmp.addMsg.v0Msg.hcclDataType = param.dataType;
+            tmp.addMsg.v0Msg.repeatCnt = param.repeat;
+            tmp.addMsg.v0Msg.selfHandleID = handle;
+            tmp.addMsg.v0Msg.seqNum = primitiveId++;
+            tmp.addMsg.v0Msg.version = ver;
+        } else {
+            tmp.addMsg.v1Msg.ccOpTilingData = tiling;
+            tmp.addMsg.v1Msg.hcclDataType = param.dataType;
+            tmp.addMsg.v1Msg.repeatCnt = param.repeat;
+            tmp.addMsg.v1Msg.selfHandleID = handle;
+            tmp.addMsg.v1Msg.seqNum = primitiveId++;
+            tmp.addMsg.v1Msg.version = ver;
+        }
+    }
+    tmp.addMsg.v0Msg.valid = HCCL_MSG_VALID_MASK;
+    CopyHcclMsg(reinterpret_cast<const uint8_t *>(&tmp), dst);
 }
 
 __aicore__ inline void AssembleHcclMsg(const CommonPrepareParam &param, int8_t srcGroupID,

@@ -40,6 +40,7 @@
 #include "hccl_rank_graph_dl.h"
 #include "rt.h"
 #include "dlhcomm_function.h"
+#include "cann_host_bridge.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,7 +78,7 @@ struct HcclDfxOpInfo {
 }
 #endif
 
-namespace ops_hccl {
+namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0;// host主流wait aicpu流的notify idx
@@ -295,11 +296,22 @@ HcclResult HcclExecOp(HcclComm comm, OpParam &param,
         return HCCL_E_INTERNAL;
     }
 
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p].",
-        param.opType, algName.c_str(), executor.get());
+    bool useCannResCtx =
+        (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
+         param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+
+    std::unique_ptr<InsCollAlgBase> executor = nullptr;
+    if (useCannResCtx) {
+        executor = GetAlgExecViaCann(param.opType, algName);
+    } else {
+        executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param.opType, algName);
+    }
+    CHK_PRT_RET(executor.get() == nullptr,
+        HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+    HCCL_INFO("[asc][AlgoExecute][HcclExecOp] executor resolved, opType[%d], algName[%s], executor[%p], "
+        "useCannResCtx[%d].", param.opType, algName.c_str(), executor.get(), useCannResCtx);
 
     // 资源结构体
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
@@ -500,7 +512,7 @@ HcclResult AicpuKernelLaunch(HcclComm comm, OpParam &param, ThreadHandle unfoldT
     constexpr u32 numBlocks = 1;
     // 通过Thread获取展开流stream
     void* unfoldStream = nullptr;
-    auto& HcclThreadResGetInfoFunc = ops_hccl::DlHcommFunction::GetInstance();
+    auto& HcclThreadResGetInfoFunc = mc2_ops_hccl::DlHcommFunction::GetInstance();
     // 如果不支持这个接口则不走提前展开
     if (!HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo || param.opMode == OpMode::OFFLOAD) {
         HCCL_INFO("[asc][AlgoExecute][AicpuKernelLaunch] launch on main stream, opMode[%d], stream[%p].",
@@ -537,7 +549,7 @@ HcclResult CaptureSlaveStreams(HcclComm comm, aclrtStream mainStream, const std:
         return HCCL_SUCCESS;
     }
     //thread[0] is main thread
-    auto& HcclThreadResGetInfoFunc = ops_hccl::DlHcommFunction::GetInstance();
+    auto& HcclThreadResGetInfoFunc = mc2_ops_hccl::DlHcommFunction::GetInstance();
     for (size_t i = 1; i < threads.size(); ++i) {
         void* stream = nullptr;
         CHK_PRT_RET(!HcclThreadResGetInfoFunc.dlHcclThreadResGetInfo, HCCL_ERROR("AclGraph is not support."),
@@ -1528,4 +1540,4 @@ HcclResult LogHcclExit(const std::string &opName, const char *tag, HcclUs startu
     return HCCL_SUCCESS;
 }
 
-}  // namespace ops_hccl
+}  // namespace mc2_ops_hccl
