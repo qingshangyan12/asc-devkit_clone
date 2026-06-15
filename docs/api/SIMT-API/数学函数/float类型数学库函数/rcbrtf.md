@@ -41,7 +41,12 @@ x的立方根的倒数。
 
 ## 约束说明
 
-无
+Ascend 950PR/Ascend 950DT底层采用DML实现rcbrt，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入x落在subnormal区间（0 < |x| < 1.17549435e-38）时，与cbrtf同根因，底层位操作缺少subnormal浮点数的implicit 1 bit导致Newton迭代收敛至错误值，rcbrtf(sn)返回1/错误值，而非按非FTZ标准库（如libm）得到的正确立方根倒数。
+-   **输出FTZ**：rcbrtf的正常输入返回值不会落入subnormal区间，该场景一般不会触发。
+
+若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
 
 ## 需要包含的头文件
 

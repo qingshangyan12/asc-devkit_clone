@@ -48,7 +48,12 @@ y/x的反正切值。
 
 ## 约束说明
 
-无
+Ascend 950PR/Ascend 950DT底层采用DML实现atan2，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入y或x落在subnormal区间（0 < |val| < 1.17549435e-38）时，先被刷零为±0再参与运算。当所有输入均为subnormal时，底层DML运算产生y/x = 0/0 = NaN，atan2f(sn, sn)返回NaN（设计外行为）；当仅分子为subnormal时，0/normal=0，atan2f(sn, normal)返回0。
+-   **输出FTZ**：atan2f的输出范围为(-π, π]，不会落入subnormal区间，该场景不会触发。
+
+若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
 
 ## 需要包含的头文件
 

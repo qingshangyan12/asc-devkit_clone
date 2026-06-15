@@ -45,7 +45,12 @@ a^2 + b^2 + c^2 + d^2的平方根的倒数。
 
 ## 约束说明
 
-无
+Ascend 950PR/Ascend 950DT底层采用DML实现rnorm4d，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入a、b、c或d落在subnormal区间（0 < |val| < 1.17549435e-38）时，先被刷零为±0再参与运算。当仅部分输入为subnormal时，返回值与normal输入一致；当所有输入均为subnormal时，底层norm4df返回NaN，rnorm4df(sn, sn, sn, sn) = 1/NaN = NaN（设计外行为），而非按非FTZ标准库（如libm）得到的有限值。
+-   **输出FTZ**：rnorm4df的输出为正数倒数，正常输入难以使输出落入subnormal区间，该场景一般不会触发。
+
+若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
 
 ## 需要包含的头文件
 

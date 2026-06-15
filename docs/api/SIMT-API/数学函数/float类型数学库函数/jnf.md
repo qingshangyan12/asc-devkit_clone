@@ -44,6 +44,13 @@ inline float jnf(int n, float x)
 -   使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
 -   n的最大取值为128。
 
+Ascend 950PR/Ascend 950DT底层采用DML实现jn，不支持subnormal（非规格化数），对输入与输出均执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入x落在subnormal区间（0 < |x| < 1.17549435e-38）时，x先被刷零为±0再参与运算，jnf(n, sn)与jnf(n, 0)返回值一致（设计内FTZ行为）。
+-   **输出FTZ**：当真实结果落入subnormal区间时（如jnf(85, 22)≈3.31e-41），输出被刷零为±0，而非按非FTZ标准库（如libm）得到的subnormal值。
+
+若业务对subnormal输入或输出结果的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
+
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。

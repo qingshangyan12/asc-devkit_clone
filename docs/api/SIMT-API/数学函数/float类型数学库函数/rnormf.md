@@ -47,6 +47,13 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根的倒数。
 -   输入数据a的长度必须大于等于参数n。
 -   若n过大，接口性能无法保证。
 
+Ascend 950PR/Ascend 950DT底层采用DML实现rnorm（rnormf = 1/normf），与normf/hypotf同根因，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入a中元素落在subnormal区间（0 < |a\[i\]| < 1.17549435e-38）时，先被刷零为±0再参与运算。当所有元素均为subnormal时，normf返回NaN，rnormf = 1/NaN = NaN（设计外行为），而非按非FTZ标准库（如libm）得到的有限值；当仅部分元素为subnormal时，rnormf结果与normal输入一致。
+-   **输出FTZ**：rnormf的输出为正数平方根的倒数，正常输入难以使输出落入subnormal区间，该场景一般不会触发。
+
+若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
+
 ## 需要包含的头文件
 
 使用该接口需要包含"simt\_api/math\_functions.h"头文件。
