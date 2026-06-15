@@ -88,8 +88,6 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 数据类型
 
-支持的数据类型为：int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16\_t、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
-
 **表 3**  数据类型组合
 
 | srcReg和scalarValue数据类型 | dst数据类型 |
@@ -108,7 +106,6 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 本接口支持的int64\_t、uint64\_t为软仿数据类型。
 - 通过mask参数控制的未选中元素在目的操作数中被置零。
 - 异常和边界值处理：待补充。
 

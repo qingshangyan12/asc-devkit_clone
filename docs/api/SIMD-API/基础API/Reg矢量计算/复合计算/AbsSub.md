@@ -99,11 +99,9 @@ __simd_callee__ inline void AbsSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 | float   | float   | float   |
 | int64_t | int64_t | int64_t |
 
-**int64_t为软仿数据类型。**
-
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 本接口支持的int64_t为软仿数据类型。
+无
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

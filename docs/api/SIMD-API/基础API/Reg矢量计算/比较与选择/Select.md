@@ -104,7 +104,6 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 本接口支持的bool、int64\_t、uint64\_t为软仿数据类型。
 - 通过mask参数控制的未选中的元素保持源操作数的值而非清零。
 
 ## 调用示例<a name="section12223121385116"></a>
