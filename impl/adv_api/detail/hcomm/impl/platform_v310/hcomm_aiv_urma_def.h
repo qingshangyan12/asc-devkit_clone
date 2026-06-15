@@ -68,6 +68,9 @@ public:
         auto const &config = URMA_DEFAULT_CFG>
     __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t len,
         GM_ADDR notifyAddr, uint64_t notifyVal);
+    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t FetchAdd(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal);
     template <pipe_t pipe = PIPE_S>
     __aicore__ inline int32_t Commit(ChannelHandle channel);
     template <pipe_t pipe = PIPE_MTE3>
