@@ -18,6 +18,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ![](../../../../../figures/zh-cn_image_0000002549011155.png)
 
+接口支持batch模式。batch模式下，源张量和目的张量的Layout需要在原有`NN`分形Layout最前面增加batch维，Shape形态为`(B, 原NN分形Shape)`，其中`B`表示batch数量。L0ScaleB Buffer中各batch之间的间隔由右矩阵L0B Buffer地址排布决定，用户需要使用`MakeLayout`或`MakePatternLayout`手动配置正确的Shape和Stride。
+
 ## 函数原型
 
 - 执行L1 Buffer到L0ScaleB Buffer的数据搬运。
@@ -73,6 +75,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 - 源张量和目的张量数据格式为`NN`，使用`MakeFrameLayout<NNLayoutPtn, _2>(...)`构造。
 - 源地址和目的地址需要满足32 Byte对齐要求。
+- batch模式下不提供根据右矩阵Tensor自动推导L0ScaleB Layout的简易接口。L0ScaleB Buffer地址仍由右矩阵L0B Buffer地址按1/16地址编码换算得到。配置L0ScaleB Layout的batch维Stride时，需要先计算右矩阵L0B Buffer单batch占用字节数，再按1/16地址编码换算为Scale地址Stride。
 
 ## 调用示例
 
@@ -95,6 +98,44 @@ __aicore__ inline void CopyL1ToL0ScaleBExample()
     // ScaleB地址由右矩阵的L0B Buffer地址按1/16地址编码换算得到。
     auto l0ScaleBPtr = MakeMemPtr<Location::L0ScaleB, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0BBuf) / 16);
     auto l0ScaleBTensor = MakeTensor(l0ScaleBPtr, MakeFrameLayout<NNLayoutPtn, _2>(scaleK, n));
+
+    auto copyAtom = MakeCopy(CopyL12L0ScaleB{}, CopyL12L0ScaleBTraitDefault{});
+    Copy(copyAtom, l0ScaleBTensor, l1Tensor);
+}
+```
+
+batch模式示例如下。
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyL1ToL0ScaleBBatchExample()
+{
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t k = 32;
+    constexpr uint32_t n = 16;
+    constexpr uint32_t scaleK = k / 16;
+
+    __cbuf__ fp8_e8m0_t l1Buf[batch * scaleK * n];
+    __cb__ fp8_e5m2_t l0BBuf[batch * k * n];
+
+    auto l1ScaleLayout = MakeFrameLayout<NNLayoutPtn, _2>(batch, scaleK, n);
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), l1ScaleLayout);
+
+    // L0ScaleB的batch维Stride由右矩阵L0B Buffer单batch占用字节数换算得到。
+    auto l0ScaleBBaseLayout = MakeFrameLayout<NNLayoutPtn, _2>(scaleK, n);
+    using L0ScaleBLayoutTrait = GetLayoutTrait<decltype(l0ScaleBBaseLayout)>;
+    constexpr uint32_t l0BMatrixSingleBatchBytes = k * n * sizeof(fp8_e5m2_t);
+    constexpr uint32_t l0ScaleBBatchStride = l0BMatrixSingleBatchBytes / 16;
+    auto l0ScaleBLayout = MakePatternLayout<NNLayoutPtn, L0ScaleBLayoutTrait>(
+        MakeShape(batch, l0ScaleBBaseLayout.Shape()),
+        MakeStride(l0ScaleBBatchStride, l0ScaleBBaseLayout.Stride()));
+
+    // ScaleB地址由右矩阵的L0B Buffer地址按1/16地址编码换算得到。
+    auto l0ScaleBPtr = MakeMemPtr<Location::L0ScaleB, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0BBuf) / 16);
+    auto l0ScaleBTensor = MakeTensor(l0ScaleBPtr, l0ScaleBLayout);
 
     auto copyAtom = MakeCopy(CopyL12L0ScaleB{}, CopyL12L0ScaleBTraitDefault{});
     Copy(copyAtom, l0ScaleBTensor, l1Tensor);
