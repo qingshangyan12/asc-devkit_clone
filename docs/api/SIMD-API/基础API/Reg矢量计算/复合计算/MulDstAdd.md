@@ -91,11 +91,11 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 
 **表 3**  数据类型组合
 
-| srcReg0 | srcReg1 | dstReg |
-| :--- | :--- | :--- |
-| half | half | float|
+| srcReg0    | srcReg1    | dstReg     |
+| :--------- | :--------- | :--------- |
+| half       | half       | float      |
 | bfloat16_t | bfloat16_t | bfloat16_t |
-| float | float | float|
+| float      | float      | float      |
 
 ## 约束说明<a name="section633mcpsimp"></a>
 

@@ -71,7 +71,7 @@ __simd_callee__ inline void AbsSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
-|--------|------|
+| :----- | :--- |
 | T | 源操作数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
 | U | srcReg0、srcReg1、dstReg的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
@@ -79,7 +79,7 @@ __simd_callee__ inline void AbsSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 **表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|--------|-----------|------|
+| :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。 |

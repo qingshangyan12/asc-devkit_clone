@@ -69,7 +69,7 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
-|---|---|
+| :----- | :--- |
 | T0 | 目的操作数数据类型。 |
 | T1 | 源操作数的数据类型。 |
 | T2 | 标量源操作数的数据类型。 |
@@ -80,7 +80,7 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
+| :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg | 输入 | 源操作数。<br>类型为RegTensor。 |
 | scalarValue | 输入 | 源操作数。<br>类型为标量。 |

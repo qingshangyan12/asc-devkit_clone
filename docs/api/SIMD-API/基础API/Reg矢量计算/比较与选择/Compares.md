@@ -67,7 +67,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
-|---|---|
+| :----- | :--- |
 | T | 矢量源操作数数据类型。 |
 | mode | 比较模式。支持如下取值：<br>- LT：小于（less than）<br>- GT：大于（greater than）<br>- GE：大于或等于（greater than or equal to）<br>- EQ：等于（equal to）<br>- NE：不等于（not equal to）<br>- LE：小于或等于（less than or equal to） |
 | U | 源操作数的RegTensor类型，由编译器自动推导，用户不需要填写。 |
@@ -76,7 +76,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
+| :----- | :-------- | :--- |
 | dst | 输出 | MaskReg类型，目的操作数。 |
 | srcReg | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | scalarValue | 输入 | 源操作数。<br>类型为标量。 |
@@ -93,7 +93,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 **表 3**  数据类型组合
 
 | srcReg和scalarValue数据类型 | dst数据类型 |
-|--------------------------|-------------|
+| :-------------------------- | :---------- |
 | int8_t | MaskReg |
 | uint8_t | MaskReg |
 | int16_t | MaskReg |

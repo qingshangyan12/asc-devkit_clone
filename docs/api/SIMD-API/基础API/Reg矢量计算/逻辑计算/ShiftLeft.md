@@ -76,7 +76,7 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 **表1**  模板参数说明
 
 | 参数名 | 描述 |
-|---|---|
+| :----- | :--- |
 | T | 源操作数数据类型。 |
 | U | 左移参数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
@@ -86,7 +86,7 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-|---|---|---|
+| :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。<br>源操作数的数据类型需要与目的操作数保持一致。 |
 | srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。<br>不支持设置为负数，负数行为未定义。 |
@@ -101,7 +101,7 @@ __simd_callee__ inline void ShiftLeft(S& dstReg, S& srcReg0, V& srcReg1, MaskReg
 **表 3**  数据类型支持情况
 
 | dstReg   | srcReg0  | srcReg1 |
-| -------- | -------- | ------- |
+| :------- | :------- | :------ |
 | int8_t   | int8_t   | int8_t  |
 | uint8_t  | uint8_t  | int8_t  |
 | int16_t  | int16_t  | int16_t |
@@ -132,7 +132,7 @@ __simd_vf__ inline void ShiftLeftVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, _
     for (uint16_t i = 0; i < repeatTimes; i++) {
         mask = AscendC::Reg::UpdateMask<T>(count);
         AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);       
+        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
         AscendC::Reg::ShiftLeft(dstReg, srcReg0, srcReg1, mask);
         AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
     }
