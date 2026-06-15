@@ -45,6 +45,7 @@ __simd_callee__ inline void asc_hif82float_v4_impl(vector_float& dst, vector_hif
     }
 }
 
+
 __simd_callee__ inline void asc_hif82float_impl(vector_float& dst, vector_hifloat8_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

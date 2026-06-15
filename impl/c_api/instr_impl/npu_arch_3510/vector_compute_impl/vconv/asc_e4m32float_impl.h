@@ -46,6 +46,7 @@ __simd_callee__ inline void asc_e4m32float_v4_impl(vector_float& dst, vector_fp8
     }
 }
 
+
 __simd_callee__ inline void asc_e4m32float_impl(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

@@ -158,6 +158,7 @@ __simd_callee__ inline void asc_half2int8_rna_sat_v2_impl(vector_int8_t& dst, ve
     }
 }
 
+
 __simd_callee__ inline void asc_half2int8_rd_impl(vector_int8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     if ASC_IS_AIV {

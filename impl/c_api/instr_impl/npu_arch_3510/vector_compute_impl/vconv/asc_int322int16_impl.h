@@ -46,6 +46,7 @@ __simd_callee__ inline void asc_int322int16_sat_v2_impl(vector_int16_t& dst, vec
     }
 }
 
+
 __simd_callee__ inline void asc_int322int16_impl(vector_int16_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     if ASC_IS_AIV {

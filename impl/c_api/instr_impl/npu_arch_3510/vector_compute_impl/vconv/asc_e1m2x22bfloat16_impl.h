@@ -40,6 +40,7 @@ __simd_callee__ inline void asc_e1m2x22bfloat16_v4_impl(vector_bfloat16_t& dst, 
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
+
 __simd_callee__ inline void asc_e1m2x22bfloat16_impl(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

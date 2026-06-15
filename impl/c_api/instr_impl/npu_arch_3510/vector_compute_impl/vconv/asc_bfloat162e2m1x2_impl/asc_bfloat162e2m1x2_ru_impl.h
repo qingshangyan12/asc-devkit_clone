@@ -13,30 +13,6 @@
     "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/vconv/asc_bfloat162e2m1x2_ru_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
-__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)0);
-    }
-}
-__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)1);
-    }
-}
-__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)2);
-    }
-}
-__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)3);
-    }
-}
 #endif
 
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_VECTOR_COMPUTE_IMPL_VCON_ASC_BFLOAT162E2M1X2_IMPL_ASC_BFLOAT162E2M1X2_RU_IMPL_H
@@ -69,6 +45,31 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_v4_impl(vector_fp4x2_e2m1_t& 
 {
     if ASC_IS_AIV {
         vcvt(dst, src, mask, ROUND_C, PART_P3, MODE_ZEROING);
+    }
+}
+
+__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SECOND> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)2);
+    }
+}
+__simd_callee__ inline void asc_bfloat162e2m1x2_ru_impl(vector_fp4x2_e2m1_t& dst, vector_bfloat16_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtff_bf162f4e2m1x2_x(src, mask, (ULL)3, (ULL)3);
     }
 }
 #endif

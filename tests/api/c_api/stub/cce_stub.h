@@ -9,9 +9,6 @@
 */
 #ifndef __TESTS_C_API_STUB__
 #define __TESTS_C_API_STUB__
-#ifndef ULL
-#define ULL unsigned long long
-#endif
 #include <cstdint>
 #include "stub_fun.h"
 
@@ -430,53 +427,57 @@ typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
 constexpr Lowest_Type POS_LOWEST = Lowest_Type();
 constexpr Highest_Type POS_HIGHEST = Highest_Type();
 
-// ========== __builtin_cce_vcvt* stubs for UT compilation ==========
-inline vector_half __builtin_cce_vcvtff_f322f16_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_half(); }
-inline vector_half __builtin_cce_vcvtif_s82f16_x(vector_int8_t src, vector_bool mask, unsigned long long a) { return vector_half(); }
-inline vector_half __builtin_cce_vcvtif_u82f16_x(vector_uint8_t src, vector_bool mask, unsigned long long a) { return vector_half(); }
-inline vector_half __builtin_cce_vcvtff_hif82f16_x(vector_hifloat8_t src, vector_bool mask, unsigned long long a) { return vector_half(); }
-inline vector_half __builtin_cce_vcvtif_s4x22f16_x(vector_int4x2_t src, vector_bool mask, unsigned long long a) { return vector_half(); }
-inline vector_bfloat16_t __builtin_cce_vcvtff_f322bf16_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_bfloat16_t(); }
-inline vector_bfloat16_t __builtin_cce_vcvtff_f4e1m2x22bf16_x(vector_fp4x2_e1m2_t src, vector_bool mask, unsigned long long a) { return vector_bfloat16_t(); }
-inline vector_bfloat16_t __builtin_cce_vcvtff_f4e2m1x22bf16_x(vector_fp4x2_e2m1_t src, vector_bool mask, unsigned long long a) { return vector_bfloat16_t(); }
-inline vector_bfloat16_t __builtin_cce_vcvtif_s4x22bf16_x(vector_int4x2_t src, vector_bool mask, unsigned long long a) { return vector_bfloat16_t(); }
-inline vector_float __builtin_cce_vcvtff_bf162f32_x(vector_bfloat16_t src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtff_f162f32_x(vector_half src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtff_f8e4m32f32_x(vector_fp8_e4m3fn_t src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtff_f8e5m22f32_x(vector_fp8_e5m2_t src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtff_hif82f32_x(vector_hifloat8_t src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtif_s162f32_x(vector_int16_t src, vector_bool mask, unsigned long long a) { return vector_float(); }
-inline vector_float __builtin_cce_vcvtif_s642f32_x(vector_int64_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_float(); }
-inline vector_int16_t __builtin_cce_vcvtii_s82s16_x(vector_int8_t src, vector_bool mask, unsigned long long a) { return vector_int16_t(); }
-inline vector_int16_t __builtin_cce_vcvtii_u82u16_x(vector_uint8_t src, vector_bool mask, unsigned long long a) { return vector_int16_t(); }
-inline vector_int16_t __builtin_cce_vcvtfi_f322s16_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_int16_t(); }
-inline vector_int16_t __builtin_cce_vcvtii_s322s16_x(vector_int32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_int16_t(); }
-inline vector_int16_t __builtin_cce_vcvtii_s4x22s16_x(vector_int4x2_t src, vector_bool mask, unsigned long long a) { return vector_int16_t(); }
-inline vector_int16_t __builtin_cce_vcvtii_u322s16_x(vector_uint32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_int16_t(); }
-inline vector_uint16_t __builtin_cce_vcvtii_s322u16_x(vector_int32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint16_t(); }
-inline vector_uint16_t __builtin_cce_vcvtii_u322u16_x(vector_uint32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint16_t(); }
-inline vector_int32_t __builtin_cce_vcvtfi_bf162s32_x(vector_bfloat16_t src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_int32_t(); }
-inline vector_int32_t __builtin_cce_vcvtfi_f162s32_x(vector_half src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_int32_t(); }
-inline vector_int32_t __builtin_cce_vcvtii_s162s32_x(vector_int16_t src, vector_bool mask, unsigned long long a) { return vector_int32_t(); }
-inline vector_int32_t __builtin_cce_vcvtii_s82s32_x(vector_int8_t src, vector_bool mask, unsigned long long a) { return vector_int32_t(); }
-inline vector_int32_t __builtin_cce_vcvtii_s642s32_x(vector_int64_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_int32_t(); }
-inline vector_uint32_t __builtin_cce_vcvtii_s162u32_x(vector_int16_t src, vector_bool mask, unsigned long long a) { return vector_uint32_t(); }
-inline vector_uint32_t __builtin_cce_vcvtii_u162u32_x(vector_uint16_t src, vector_bool mask, unsigned long long a) { return vector_uint32_t(); }
-inline vector_uint32_t __builtin_cce_vcvtii_u82u32_x(vector_uint8_t src, vector_bool mask, unsigned long long a) { return vector_uint32_t(); }
-inline vector_int64_t __builtin_cce_vcvtfi_f322s64_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_int64_t(); }
-inline vector_int64_t __builtin_cce_vcvtii_s322s64_x(vector_int32_t src, vector_bool mask, unsigned long long a) { return vector_int64_t(); }
-inline vector_int8_t __builtin_cce_vcvtfi_f162s8_x(vector_half src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_int8_t(); }
-inline vector_uint8_t __builtin_cce_vcvtfi_f162u8_x(vector_half src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_uint8_t(); }
-inline vector_uint8_t __builtin_cce_vcvtii_s162u8_x(vector_int16_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint8_t(); }
-inline vector_uint8_t __builtin_cce_vcvtii_u162u8_x(vector_uint16_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint8_t(); }
-inline vector_uint8_t __builtin_cce_vcvtii_s322u8_x(vector_int32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint8_t(); }
-inline vector_uint8_t __builtin_cce_vcvtii_u322u8_x(vector_uint32_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_uint8_t(); }
-inline vector_hifloat8_t __builtin_cce_vcvtff_f162hif8_x(vector_half src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_hifloat8_t(); }
-inline vector_hifloat8_t __builtin_cce_vcvtff_f322hif8_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_hifloat8_t(); }
-inline vector_fp8_e4m3fn_t __builtin_cce_vcvtff_f322f8e4m3_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_fp8_e4m3fn_t(); }
-inline vector_fp8_e5m2_t __builtin_cce_vcvtff_f322f8e5m2_x(vector_float src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_fp8_e5m2_t(); }
-inline vector_fp4x2_e1m2_t __builtin_cce_vcvtff_bf162f4e1m2x2_x(vector_bfloat16_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_fp4x2_e1m2_t(); }
-inline vector_fp4x2_e2m1_t __builtin_cce_vcvtff_bf162f4e2m1x2_x(vector_bfloat16_t src, vector_bool mask, unsigned long long a, unsigned long long b) { return vector_fp4x2_e2m1_t(); }
-inline vector_int4x2_t __builtin_cce_vcvtfi_f162s4x2_x(vector_half src, vector_bool mask, unsigned long long a, unsigned long long b, unsigned long long c) { return vector_int4x2_t(); }
+#ifndef ULL
+#define ULL unsigned long long
+#endif
+
+// __builtin_cce_vcvt* stubs for UT compilation
+inline vector_f16 __builtin_cce_vcvtff_f322f16_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_f16(); }
+inline vector_f16 __builtin_cce_vcvtif_s82f16_x(vector_s8 src, vector_bool mask, ULL a) { return vector_f16(); }
+inline vector_f16 __builtin_cce_vcvtif_u82f16_x(vector_u8 src, vector_bool mask, ULL a) { return vector_f16(); }
+inline vector_f16 __builtin_cce_vcvtff_hif82f16_x(vector_hif8 src, vector_bool mask, ULL a) { return vector_f16(); }
+inline vector_f16 __builtin_cce_vcvtif_s4x22f16_x(vector_s4x2 src, vector_bool mask, ULL a) { return vector_f16(); }
+inline vector_bf16 __builtin_cce_vcvtff_f322bf16_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_bf16(); }
+inline vector_bf16 __builtin_cce_vcvtff_f4e1m2x22bf16_x(vector_f4e1m2x2 src, vector_bool mask, ULL a) { return vector_bf16(); }
+inline vector_bf16 __builtin_cce_vcvtff_f4e2m1x22bf16_x(vector_f4e2m1x2 src, vector_bool mask, ULL a) { return vector_bf16(); }
+inline vector_bf16 __builtin_cce_vcvtif_s4x22bf16_x(vector_s4x2 src, vector_bool mask, ULL a) { return vector_bf16(); }
+inline vector_f32 __builtin_cce_vcvtff_bf162f32_x(vector_bf16 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtff_f162f32_x(vector_f16 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtff_f8e4m32f32_x(vector_f8e4m3 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtff_f8e5m22f32_x(vector_f8e5m2 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtff_hif82f32_x(vector_hif8 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtif_s162f32_x(vector_s16 src, vector_bool mask, ULL a) { return vector_f32(); }
+inline vector_f32 __builtin_cce_vcvtif_s642f32_x(vector_s64 src, vector_bool mask, ULL a, ULL b) { return vector_f32(); }
+inline vector_s16 __builtin_cce_vcvtii_s82s16_x(vector_s8 src, vector_bool mask, ULL a) { return vector_s16(); }
+inline vector_u16 __builtin_cce_vcvtii_u82u16_x(vector_u8 src, vector_bool mask, ULL a) { return vector_u16(); }
+inline vector_s16 __builtin_cce_vcvtfi_f322s16_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_s16(); }
+inline vector_s16 __builtin_cce_vcvtii_s322s16_x(vector_s32 src, vector_bool mask, ULL a, ULL b) { return vector_s16(); }
+inline vector_s16 __builtin_cce_vcvtii_s4x22s16_x(vector_s4x2 src, vector_bool mask, ULL a) { return vector_s16(); }
+inline vector_s16 __builtin_cce_vcvtii_u322s16_x(vector_u32 src, vector_bool mask, ULL a, ULL b) { return vector_s16(); }
+inline vector_u16 __builtin_cce_vcvtii_s322u16_x(vector_s32 src, vector_bool mask, ULL a, ULL b) { return vector_u16(); }
+inline vector_u16 __builtin_cce_vcvtii_u322u16_x(vector_u32 src, vector_bool mask, ULL a, ULL b) { return vector_u16(); }
+inline vector_s32 __builtin_cce_vcvtfi_bf162s32_x(vector_bf16 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_s32(); }
+inline vector_s32 __builtin_cce_vcvtfi_f162s32_x(vector_f16 src, vector_bool mask, ULL a, ULL b) { return vector_s32(); }
+inline vector_s32 __builtin_cce_vcvtii_s162s32_x(vector_s16 src, vector_bool mask, ULL a) { return vector_s32(); }
+inline vector_s32 __builtin_cce_vcvtii_s82s32_x(vector_s8 src, vector_bool mask, ULL a) { return vector_s32(); }
+inline vector_s32 __builtin_cce_vcvtii_s642s32_x(vector_s64 src, vector_bool mask, ULL a, ULL b) { return vector_s32(); }
+inline vector_u32 __builtin_cce_vcvtii_s162u32_x(vector_s16 src, vector_bool mask, ULL a) { return vector_u32(); }
+inline vector_u32 __builtin_cce_vcvtii_u162u32_x(vector_u16 src, vector_bool mask, ULL a) { return vector_u32(); }
+inline vector_u32 __builtin_cce_vcvtii_u82u32_x(vector_u8 src, vector_bool mask, ULL a) { return vector_u32(); }
+inline vector_s64 __builtin_cce_vcvtfi_f322s64_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_s64(); }
+inline vector_s64 __builtin_cce_vcvtii_s322s64_x(vector_s32 src, vector_bool mask, ULL a) { return vector_s64(); }
+inline vector_s8 __builtin_cce_vcvtfi_f162s8_x(vector_f16 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_s8(); }
+inline vector_u8 __builtin_cce_vcvtfi_f162u8_x(vector_f16 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_u8(); }
+inline vector_u8 __builtin_cce_vcvtii_s162u8_x(vector_s16 src, vector_bool mask, ULL a, ULL b) { return vector_u8(); }
+inline vector_u8 __builtin_cce_vcvtii_u162u8_x(vector_u16 src, vector_bool mask, ULL a, ULL b) { return vector_u8(); }
+inline vector_u8 __builtin_cce_vcvtii_s322u8_x(vector_s32 src, vector_bool mask, ULL a, ULL b) { return vector_u8(); }
+inline vector_u8 __builtin_cce_vcvtii_u322u8_x(vector_u32 src, vector_bool mask, ULL a, ULL b) { return vector_u8(); }
+inline vector_hif8 __builtin_cce_vcvtff_f162hif8_x(vector_f16 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_hif8(); }
+inline vector_hif8 __builtin_cce_vcvtff_f322hif8_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_hif8(); }
+inline vector_f8e4m3 __builtin_cce_vcvtff_f322f8e4m3_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_f8e4m3(); }
+inline vector_f8e5m2 __builtin_cce_vcvtff_f322f8e5m2_x(vector_f32 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_f8e5m2(); }
+inline vector_f4e1m2x2 __builtin_cce_vcvtff_bf162f4e1m2x2_x(vector_bf16 src, vector_bool mask, ULL a, ULL b) { return vector_f4e1m2x2(); }
+inline vector_f4e2m1x2 __builtin_cce_vcvtff_bf162f4e2m1x2_x(vector_bf16 src, vector_bool mask, ULL a, ULL b) { return vector_f4e2m1x2(); }
+inline vector_s4x2 __builtin_cce_vcvtfi_f162s4x2_x(vector_f16 src, vector_bool mask, ULL a, ULL b, ULL c) { return vector_s4x2(); }
 
 #endif

@@ -18,30 +18,6 @@
 "impl/c_api/instr_impl/npu_arch_3510/vector_compute_impl/asc_half2uint8_rz_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use "#include "c_api/asc_simd.h"" and use public functions or variables defined in interface headers files."
 #define ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
-__simd_callee__ inline void asc_half2uint8_rz_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)0, (ULL)0);
-    }
-}
-__simd_callee__ inline void asc_half2uint8_rz_sat_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)1, (ULL)0);
-    }
-}
-__simd_callee__ inline void asc_half2uint8_rz_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)0, (ULL)1);
-    }
-}
-__simd_callee__ inline void asc_half2uint8_rz_sat_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
-{
-    if ASC_IS_AIV {
-        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)1, (ULL)1);
-    }
-}
 #endif
 
 #ifndef IMPL_C_API_INSTR_VECTOR_COMPUTE_ASC_HALF2UINT8_RZ_IMPL_H
@@ -77,6 +53,31 @@ __simd_callee__ inline void asc_half2uint8_rz_sat_v2_impl(vector_uint8_t& dst, v
     }
 }
 
+
+__simd_callee__ inline void asc_half2uint8_rz_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)0, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2uint8_rz_sat_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)1, (ULL)0);
+    }
+}
+__simd_callee__ inline void asc_half2uint8_rz_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)0, (ULL)1);
+    }
+}
+__simd_callee__ inline void asc_half2uint8_rz_sat_impl(vector_uint8_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_position, asc_position::ODD> pos)
+{
+    if ASC_IS_AIV {
+        dst = __builtin_cce_vcvtfi_f162u8_x(src, mask, (ULL)4, (ULL)1, (ULL)1);
+    }
+}
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

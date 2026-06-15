@@ -40,6 +40,7 @@ __simd_callee__ inline void asc_int82int32_v4_impl(vector_int32_t& dst, vector_i
         vcvt(dst, src, mask, PART_P3, MODE_ZEROING);
     }
 }
+
 __simd_callee__ inline void asc_int82int32_impl(vector_int32_t& dst, vector_int8_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

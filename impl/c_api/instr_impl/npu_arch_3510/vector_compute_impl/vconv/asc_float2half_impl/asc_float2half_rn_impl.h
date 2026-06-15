@@ -45,6 +45,7 @@ __simd_callee__ inline void asc_float2half_rn_sat_v2_impl(vector_half& dst, vect
         vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
 }
+
 __simd_callee__ inline void asc_float2half_rn_impl(vector_half& dst, vector_float src, vector_bool mask, std::integral_constant<asc_position, asc_position::EVEN> pos)
 {
     if ASC_IS_AIV {

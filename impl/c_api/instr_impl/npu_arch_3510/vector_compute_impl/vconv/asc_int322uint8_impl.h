@@ -72,6 +72,7 @@ __simd_callee__ inline void asc_int322uint8_sat_v4_impl(vector_uint8_t& dst, vec
         vcvt(dst, src, mask, RS_ENABLE, PART_P3, MODE_ZEROING);
     }
 }
+
 __simd_callee__ inline void asc_int322uint8_impl(vector_uint8_t& dst, vector_int32_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

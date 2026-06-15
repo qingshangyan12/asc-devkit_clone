@@ -46,6 +46,7 @@ __simd_callee__ inline void asc_int4x22bfloat16_v4_impl(vector_bfloat16_t& dst, 
     }
 }
 
+
 __simd_callee__ inline void asc_int4x22bfloat16_impl(vector_bfloat16_t& dst, vector_int4x2_t src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {

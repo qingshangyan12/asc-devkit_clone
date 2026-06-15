@@ -70,6 +70,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat_v4_impl(vector_int4x2_t& dst,
     }
 }
 
+
 __simd_callee__ inline void asc_half2int4x2_ru_impl(vector_int4x2_t& dst, vector_half src, vector_bool mask, std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FIRST> pos)
 {
     if ASC_IS_AIV {
