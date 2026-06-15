@@ -23,6 +23,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 接口支持非转置搬运和转置搬运。源张量和目的张量的Layout需要匹配当前通路支持的格式组合。
 
+接口支持batch模式。batch模式下，源张量和目的张量的Layout需要在原有分形Layout最前面增加batch维，Shape形态为`(B, 原分形Shape)`，其中`B`表示batch数量。用户可使用`MakeFrameLayout<NZLayoutPtn, DataType>(B, m, k)`或`MakeFrameLayout<ZNLayoutPtn, DataType>(B, m, k)`构造带batch维的Layout；如果各batch之间不是紧凑连续排布，可使用`MakeLayout`或`MakePatternLayout`手动配置Shape和Stride。
+
 ## 函数原型
 
 - 执行L1 Buffer到L0A Buffer的数据搬运。
@@ -125,6 +127,10 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ![](../../../../../figures/transpose_b32.png)
 
+### Batch搬运
+
+当源张量和目的张量均使用带batch维的Layout时，`Copy`接口会按照batch维描述的数据范围完成L1 Buffer到L0A Buffer的数据搬运。非转置搬运可使用`NZ`到`NZ`格式组合，转置搬运可使用`ZN`到`NZ`格式组合。
+
 ## 调用示例
 
 ```cpp
@@ -144,6 +150,32 @@ __aicore__ inline void CopyL1ToL0AExample()
     auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
 
     auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, AType>(m, k));
+
+    auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
+    Copy(copyAtom, l0aTensor, l1Tensor);
+}
+```
+
+batch模式示例如下。
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyL1ToL0ABatchExample()
+{
+    using AType = half;
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t m = 16;
+    constexpr uint32_t k = 16;
+
+    __cbuf__ AType l1Buf[batch * m * k];
+    __ca__ AType l0aBuf[batch * m * k];
+
+    auto layout = MakeFrameLayout<NZLayoutPtn, AType>(batch, m, k);
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), layout);
+    auto l0aTensor = MakeTensor(MakeMemPtr(l0aBuf), layout);
 
     auto copyAtom = MakeCopy(CopyL12L0A{}, CopyL12L0ATraitDefault{});
     Copy(copyAtom, l0aTensor, l1Tensor);
