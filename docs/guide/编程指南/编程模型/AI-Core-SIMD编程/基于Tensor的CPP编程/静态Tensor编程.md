@@ -918,3 +918,53 @@
 </tr>
 </tbody>
 </table>
+
+## 使用8KB预留接口的API<a name="section_reserved_ubuf_api"></a>
+
+以下API内部会使用Ascend C预留的8KB UB空间。开启`--cce-disable-asc-reserved-ubuf`编译选项后，在对应产品版本下调用下表中的API会触发编译期诊断。
+
+<a name="table_reserved_ubuf_api"></a>
+<table><thead align="left"><tr id="row_reserved_ubuf_api_header"><th class="cellrowborder" valign="top" width="32%" id="mcps_reserved_ubuf_api_1"><p id="p_reserved_ubuf_api_header_version"><a name="p_reserved_ubuf_api_header_version"></a><a name="p_reserved_ubuf_api_header_version"></a>版本号</p>
+</th>
+<th class="cellrowborder" valign="top" width="18%" id="mcps_reserved_ubuf_api_2"><p id="p_reserved_ubuf_api_header_type"><a name="p_reserved_ubuf_api_header_type"></a><a name="p_reserved_ubuf_api_header_type"></a>API类别</p>
+</th>
+<th class="cellrowborder" valign="top" width="50%" id="mcps_reserved_ubuf_api_3"><p id="p_reserved_ubuf_api_header_name"><a name="p_reserved_ubuf_api_header_name"></a><a name="p_reserved_ubuf_api_header_name"></a>API名</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr id="row_reserved_ubuf_api_2201_basic"><td class="cellrowborder" rowspan="2" valign="top" width="32%" headers="mcps_reserved_ubuf_api_1 "><p id="p_reserved_ubuf_api_2201"><a name="p_reserved_ubuf_api_2201"></a><a name="p_reserved_ubuf_api_2201"></a>Atlas A3 训练系列产品/Atlas A3 推理系列产品、Atlas A2 训练系列产品/Atlas A2 推理系列产品</p>
+</td>
+<td class="cellrowborder" valign="top" width="18%" headers="mcps_reserved_ubuf_api_2 "><p id="p_reserved_ubuf_api_2201_basic_type"><a name="p_reserved_ubuf_api_2201_basic_type"></a><a name="p_reserved_ubuf_api_2201_basic_type"></a>基础API</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps_reserved_ubuf_api_3 "><p id="p_reserved_ubuf_api_2201_basic_names"><a name="p_reserved_ubuf_api_2201_basic_names"></a><a name="p_reserved_ubuf_api_2201_basic_names"></a>AddDeqRelu、Select</p>
+</td>
+</tr>
+<tr id="row_reserved_ubuf_api_2201_adv"><td class="cellrowborder" valign="top" headers="mcps_reserved_ubuf_api_2 "><p id="p_reserved_ubuf_api_2201_adv_type"><a name="p_reserved_ubuf_api_2201_adv_type"></a><a name="p_reserved_ubuf_api_2201_adv_type"></a>高阶API</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps_reserved_ubuf_api_3 "><p id="p_reserved_ubuf_api_2201_adv_names"><a name="p_reserved_ubuf_api_2201_adv_names"></a><a name="p_reserved_ubuf_api_2201_adv_names"></a>Digamma、Lgamma、Power、Sign、LayerNorm、WelfordFinalize、DropOut、SelectWithBytesMask</p>
+</td>
+</tr>
+<tr id="row_reserved_ubuf_api_3510_basic"><td class="cellrowborder" rowspan="2" valign="top" width="32%" headers="mcps_reserved_ubuf_api_1 "><p id="p_reserved_ubuf_api_3510"><a name="p_reserved_ubuf_api_3510"></a><a name="p_reserved_ubuf_api_3510"></a>Ascend 950PR/Ascend 950DT</p>
+</td>
+<td class="cellrowborder" valign="top" width="18%" headers="mcps_reserved_ubuf_api_2 "><p id="p_reserved_ubuf_api_3510_basic_type"><a name="p_reserved_ubuf_api_3510_basic_type"></a><a name="p_reserved_ubuf_api_3510_basic_type"></a>基础API</p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps_reserved_ubuf_api_3 "><p id="p_reserved_ubuf_api_3510_basic_memory_copy"><a name="p_reserved_ubuf_api_3510_basic_memory_copy"></a><a name="p_reserved_ubuf_api_3510_basic_memory_copy"></a>Memory数据搬运：Copy</p>
+<p id="p_reserved_ubuf_api_3510_basic_arithmetic"><a name="p_reserved_ubuf_api_3510_basic_arithmetic"></a><a name="p_reserved_ubuf_api_3510_basic_arithmetic"></a>基础算术：Exp、Ln、Abs、Reciprocal、Sqrt、Rsqrt、Relu、Add、Sub、Mul、Div、Max、Min、Adds、Muls、Maxs、Mins、LeakyRelu、Subs、Divs</p>
+<p id="p_reserved_ubuf_api_3510_basic_logic"><a name="p_reserved_ubuf_api_3510_basic_logic"></a><a name="p_reserved_ubuf_api_3510_basic_logic"></a>逻辑计算：Not、And、Or、ShiftLeft、ShiftRight、Ands、Ors</p>
+<p id="p_reserved_ubuf_api_3510_basic_compound"><a name="p_reserved_ubuf_api_3510_basic_compound"></a><a name="p_reserved_ubuf_api_3510_basic_compound"></a>复合计算：Axpy、CastDequant、CastDeq、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu、MulAddRelu</p>
+<p id="p_reserved_ubuf_api_3510_basic_cmpsel"><a name="p_reserved_ubuf_api_3510_basic_cmpsel"></a><a name="p_reserved_ubuf_api_3510_basic_cmpsel"></a>比较与选择：Compare、Compares、CompareScalar、Select、GatherMask</p>
+<p id="p_reserved_ubuf_api_3510_basic_cast"><a name="p_reserved_ubuf_api_3510_basic_cast"></a><a name="p_reserved_ubuf_api_3510_basic_cast"></a>类型转换：Cast</p>
+<p id="p_reserved_ubuf_api_3510_basic_reduce"><a name="p_reserved_ubuf_api_3510_basic_reduce"></a><a name="p_reserved_ubuf_api_3510_basic_reduce"></a>归约计算：ReduceRepeat、ReduceDataBlock、ReducePairElem、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、WholeReduceMax、WholeReduceMin、WholeReduceSum</p>
+<p id="p_reserved_ubuf_api_3510_basic_fill"><a name="p_reserved_ubuf_api_3510_basic_fill"></a><a name="p_reserved_ubuf_api_3510_basic_fill"></a>数据填充：Duplicate</p>
+<p id="p_reserved_ubuf_api_3510_basic_debug"><a name="p_reserved_ubuf_api_3510_basic_debug"></a><a name="p_reserved_ubuf_api_3510_basic_debug"></a>调测接口：asc_dump_reg、asc_dump、asc_dump_ubuf</p>
+<p id="p_reserved_ubuf_api_3510_basic_kernel_tiling"><a name="p_reserved_ubuf_api_3510_basic_kernel_tiling"></a><a name="p_reserved_ubuf_api_3510_basic_kernel_tiling"></a>Kernel-Tiling：GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER</p>
+</td>
+</tr>
+<tr id="row_reserved_ubuf_api_3510_adv"><td class="cellrowborder" valign="top" headers="mcps_reserved_ubuf_api_2 "><p id="p_reserved_ubuf_api_3510_adv_type"><a name="p_reserved_ubuf_api_3510_adv_type"></a><a name="p_reserved_ubuf_api_3510_adv_type"></a>高阶API</p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps_reserved_ubuf_api_3 "><p id="p_reserved_ubuf_api_3510_adv_names"><a name="p_reserved_ubuf_api_3510_adv_names"></a><a name="p_reserved_ubuf_api_3510_adv_names"></a>Cos、Power、Sin、AscendAntiQuant、AscendDequant、AdjustSoftMaxRes、SoftMax、TopK、Matmul</p>
+</td>
+</tr>
+</tbody>
+</table>

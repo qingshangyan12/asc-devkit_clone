@@ -215,6 +215,23 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 <td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>SIMT编程场景，指定SIMT方式编译。</p>
 </td>
 </tr>
+</tr>
+<tr id="row109271176132"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p1092701741311"><a name="p1092701741311"></a><a name="p1092701741311"></a>--cce-disable-asc-reserved-ubuf</p>
+</td>
+<td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p49274178137"><a name="p49274178137"></a><a name="p49274178137"></a>否</p>
+</td>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。
+
+使用8KB预留接口的API列表参考：
+[使用8KB预留接口的API](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用8kb预留接口的api)，在迁移该类API时需要注意不同芯片架构对UB预留空间的使用情况不同。
+</tr>
+<tr id="row109271176132"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p1092701741311"><a name="p1092701741311"></a><a name="p1092701741311"></a>--cce-disable-vf-stack-reserved-ubuf</p>
+</td>
+<td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p49274178137"><a name="p49274178137"></a><a name="p49274178137"></a>否</p>
+</td>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>禁用VF stack预留UB空间。开启后，编译器不再为寄存器溢出场景预留该部分UB空间，该空间可作为普通UB空间使用。</p>
+</td>
+</tr>
 </tbody>
 </table>
 
