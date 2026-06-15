@@ -106,25 +106,11 @@ __aicore__ inline AscendC::TPipe* GetTPipePtr()
 #endif
 
 namespace AscendC {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-namespace Internal {
-template <HardEvent evt>
-__aicore__ inline TEventID AllocEventIDFromTPipe();
-
-template <HardEvent evt>
-__aicore__ inline void ReleaseEventIDFromTPipe(TEventID id);
-
-template <HardEvent evt>
-__aicore__ inline TEventID FetchEventIDFromTPipe();
-}
-#endif
-
-
 template <HardEvent evt>
 __aicore__ inline TEventID AllocEventID()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-    return Internal::AllocEventIDFromTPipe<evt>();
+    return 0;
 #else
     ASCENDC_DEBUG_ASSERT((evt < HardEvent::MAX),
                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)));
@@ -143,7 +129,7 @@ template <HardEvent evt>
 __aicore__ inline void ReleaseEventID(TEventID id)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-    return Internal::ReleaseEventIDFromTPipe<evt>(id);
+    return;
 #else
     ASCENDC_DEBUG_ASSERT((id >= 0 && id < QUE_MAX_EVENT),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d",
@@ -158,7 +144,7 @@ __aicore__ inline void ReleaseEventID(TEventID id)
 template <HardEvent evt> __aicore__ inline TEventID FetchEventID()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
-    return Internal::FetchEventIDFromTPipe<evt>();
+    return 0;
 #else
     return Internal::FetchEventIDImpl(evt);
 #endif
