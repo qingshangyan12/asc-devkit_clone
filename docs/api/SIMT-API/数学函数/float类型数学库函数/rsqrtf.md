@@ -38,10 +38,14 @@ inline float rsqrtf(float x)
 -   当x为inf时，返回值为0。
 -   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
+-   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，1/√0=+Inf，而非libm得到的有限值（约2e22量级），属于设计外Inf真bug。
+-   当x为-0时，返回值为-inf，而非libm标准期望的+inf（符号翻转偏差）。
 
 ## 约束说明
 
 本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
+
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

@@ -35,10 +35,16 @@ inline float erfcf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为0。
 -   当x为-inf时，返回值为2。
+-   当erfcf的真实计算结果落入subnormal区间（0 < |result| < 1.17549435e-38）时，输出被刷零（Flush-To-Zero）为0。该场景在x为大正输入时触发：erfcf(大正输入)按libm标准应为subnormal量级的小正数，DML实现将其FTZ为0。
 
 ## 约束说明
 
-无
+Ascend 950PR/Ascend 950DT底层采用DML实现erfc，不支持subnormal（非规格化数），对输出执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：erfcf的正常浮点输入不会因FTZ产生明显偏差，该场景一般不会触发。
+-   **输出FTZ**：当erfcf的真实计算结果落入subnormal区间（0 < |result| < 1.17549435e-38）时，输出被刷零为0。该场景在x为大正输入时触发：erfcf(大正输入)按libm标准应为subnormal量级的小正数，DML实现将其FTZ为0。此FTZ行为属于设计内行为，对大多数业务场景影响有限。
+
+若业务对erfcf在大正输入下的subnormal精度敏感，需在host侧做相应补偿。
 
 ## 需要包含的头文件
 

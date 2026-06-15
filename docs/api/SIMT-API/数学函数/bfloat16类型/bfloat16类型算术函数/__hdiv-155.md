@@ -48,10 +48,14 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 | <0 | -0 | inf | ASCRT_MAX_NORMAL_BF16 |
 | ±0 | 非0 | 符号由x和y的符号异或决定，值为0 | 符号由x和y的符号异或决定，值为0 |
 | x，y任意一个为nan | nan | 0 |  |
+-   当x和y同时为subnormal（非规格化数）时，双侧FTZ使x→0、y→0，导致0/0=nan，而非libm得到的正常有限商值（此为已知偏差）。
+-   当仅y为subnormal时，y经b2f上抬FTZ→0后，x/0→Inf，而非libm得到的约1/sn量级的有限值（此为已知偏差）。
+-   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，该操作数经F32上抬后被刷零（Flush-To-Zero）当作±0处理后再参与除法运算。
+-   当商结果经F32下抬至bfloat16后落入subnormal区间时，返回值被刷零为±0，而非libm得到的subnormal值。
 
 ## 约束说明
 
-无
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

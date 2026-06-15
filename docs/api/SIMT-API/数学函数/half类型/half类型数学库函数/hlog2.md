@@ -37,10 +37,11 @@ inline half hlog2(half x)
 -   当x小于0或x为nan时，返回值为nan。
 -   当x为0时，返回值为-inf。
 -   当x为inf时，返回值为inf。
+-   当x为subnormal（非规格化数，即0 < |x| < 2^-14≈6.104e-5）时，x经h2f上抬FTZ→0后，log2f(0)→-Inf，返回值为-inf，而非libm得到的约-14（此为已知偏差，根因同hlog）。
 
 ## 约束说明
 
-无
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

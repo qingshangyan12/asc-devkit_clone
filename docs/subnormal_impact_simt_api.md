@@ -246,77 +246,85 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 测试用例位于 `simt_rdv_new/test_case_agent/test_f32/`，复用该目录
 `build.sh dav-3510 <test_dir>` 框架（ACL + `__simt_vf__` kernel + `asc_vf_call`）。
 
-| 接口 | 类型 | 输入 subnormal | 输出 subnormal | 特殊值 | 正常域 ULP | 结论 | 资料已改 |
-|------|------|----------------|----------------|--------|------------|------|----------|
-| `sqrtf` | F32 | **FTZ**：5/5 例输出 0（libm 为 ~1e-19~1e-23）→ 不一致 | 本批未触发（sqrt 输出落不进 subnormal 区） | NaN/±Inf/负数/±0 全一致，无设计外 NaN/Inf | 1.0/2.0/4.0/0.25/1e30/1e-30 全 ok，精度不退化 | **输入侧 FTZ 确认**；行为属设计内但原资料未载明 | 是（sqrtf.md 补「返回值说明/约束说明」）|
-| `y0f` | F32 组合(Div+Log+Sqrt) | 5/5 例**一致**：subnormal 输入经 logf 预缩放保护，不触发 FTZ | 未触发 | NaN/±Inf/±0/负数/1e14 全一致（1e14>1e13 为实现截断 return 0，非 FTZ） | 0.1~1e6 各分支全 ok，精度不退化 | **不受 subnormal/FTZ 影响**；logf 预缩放(x*2^23)保护有效；预筛曾错判 IMPACT | 否（实测与 libm 一致，无需补充）|
-| `ynf` | F32 组合(Div+Exp+Log+Sqrt) | 8/8 例**一致**（数学值已超 FLT_MAX→两路均 -Inf） | **中间值 FTZ 真bug**：n≈85,x≈22 时递推 `scale_factor` 变 subnormal(-8.55e-39)→最终 `1/scale_factor` DML Div FTZ→0→返回 -Inf（libm 正确返回 -1.17e38 finite） | NaN/±Inf/±0/负数/n<0 全一致 | n=5~60 ok；n=85 x=22 **真 bug**（-Inf vs -1.17e38）；n=85 x≥50 ok | **真 bug**：递推缩放 scale_factor 落入 subnormal 被 FTZ→除法结果错误为 ±Inf；非设计内 FTZ | 是（ynf.md 约束说明补中间值 subnormal bug + 规避建议）|
-| `expf` | F32 直接(Exp) | subnormal 输入 FTZ→exp(subnormal)≈1 一致（数学值≈1） | **输出侧 FTZ**：exp(-88)=0 vs libm 6.05e-39(subnormal)；exp(-149)=0 两路均 0 ok | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：exp 大负输入的 subnormal 输出被刷零为 +0；设计内 FTZ | 待补 |
-| `logf` | F32 直接(Log) | 3/3 例**一致**：subnormal 输入经预缩放保护(x*2^23)完全正确 | 未触发（log 输出不落 subnormal） | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：预缩放保护有效 | 否 |
-| `rsqrtf` | F32 直接(Sqrt+Div) | **输入侧 FTZ**：3/3 subnormal 输入→FTZ→1/√0=+Inf vs libm finite(~2e22)→**设计外 Inf** | 未触发 | -0→-Inf vs libm +Inf（符号翻转） | 正常域全 ok | **输入侧 FTZ 确认+真bug**：subnormal x 被 FTZ→0→√0=0→1/0=Inf而非数学正确值 finite | 待补 |
-| `fdividef` | F32 直接(Div) | **输入+输出侧 FTZ**：1/max_subnormal→Inf vs libm 8.5e37(**设计外 Inf**)；subnormal numerator→0 | **输出侧 FTZ**：1/FLT_MAX→0 vs libm 2.94e-39(subnormal)；1e-38/10→0 vs 1e-39 | 全一致 | 正常域全 ok | **双侧 FTZ 确认**：商落入 subnormal 被 FTZ→±0；subnormal 操作数也被 FTZ→±0 再除 | 待补 |
-| `powf` | F32 直接(Exp+Log) | subnormal base→FTZ→pow(0,exp)=0 vs libm nonzero | 输出侧 FTZ：2^-126→0 vs libm MIN_NORMAL；2^-149→0（输出 subnormal FTZ） | Inf^0→NaN vs libm 1(**unexpected**) | 正常域全 ok | **双侧 FTZ+特殊值偏差**：base/result subnormal 被 FTZ；Inf^0 应返回 1 但返回 NaN | 待补 |
-| `exp2f` | F32 直接(=powf(2,x)) | subnormal 输入→exp2f(sn)≈1 一致 | **输出侧 FTZ**：2^-126→0 vs libm FLT_MIN；2^-149→0 vs smallest subnormal | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：大负输入的 subnormal 输出被刷零；路径经 expf DML 原语，设计内 FTZ | 待补 |
-| `exp10f` | F32 直接(=powf(10,x)) | subnormal 输入→exp10f(sn)≈1 一致 | **输出侧 FTZ**：10^-38→0 vs libm 1e-38(subnormal)；10^-40→0 vs 1e-40 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：与 expf 同机制，设计内 FTZ | 待补 |
-| `expm1f` | F32 直接(=expf(x)-1) | **输入侧 FTZ**：subnormal x→1+x=1.0→expm1=0 vs libm≈x | 未触发 | 全一致 | 1e-10→0 vs libm 1e-10(**精度偏差**) | **输入侧 FTZ+精度真bug**：subnormal 被 float 加法吸收→expm1=0；正常域小 x(≤1e-10)也无 Taylor 退化路径→0 vs libm≈x | 待补 |
-| `log2f` | F32 直接(=logf/logf(2)) | 3/3 例**一致**：logf 预缩放保护有效 | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：logf 预缩放 + 常量除法不引入 FTZ | 否 |
-| `log10f` | F32 直接(=logf/logf(10)) | 3/3 例**一致**：同 log2f | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：同 log2f | 否 |
-| `log1pf` | F32 直接(=logf(1+x)) | **输入侧 FTZ**：subnormal x→1+x=1.0→log1p=0 vs libm≈x | 未触发 | 全一致 | 1e-10→0 vs libm 1e-10；1e-8→0 vs 9.999e-9(**精度偏差**) | **输入侧 FTZ+精度真bug**：1+subnormal=1.0→log1p=0；正常域小 x 也因 float 加法截断→0 vs libm≈x | 待补 |
-| F16 `hexp` | F16 直接(__expf on half) | subnormal→exp(≈0)≈1 一致 | 未触发（F16 exp 输出域无 subnormal 产生） | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：half subnormal 经 DML __expf 后≈1，与 libm F16 结果一致 | 否 |
-| F16 `hexp2` | F16(=powf(2,cvt_float)) | subnormal→≈1 一致 | 1 DIFF：hexp2(-24)=0 vs 0.25（F16 输出域截断） | 全一致 | 正常域全 ok | **输出侧 FTZ**：F16 值域极窄(2^-14~2^16)，subnormal 输出在 F16 中无表示 | 否 |
-| F16 `hexp10` | F16(=powf(10,cvt_float)) | subnormal→≈1 一致 | 未触发 | 全一致 | 全 ok | **不受影响**：F16 值域内无额外 FTZ | 否 |
-| F16 `hlog` | F16 直接(__logf on half) | 3/3 例**一致**：subnormal 输入经 DML __logf 保护 | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：__logf 对 half subnormal 处理正确 | 否 |
-| F16 `hlog2` | F16(=logf/log2) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
-| F16 `hlog10` | F16(=logf/log10) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
-| F16 `hsqrt` | F16 直接(__sqrtf on half) | 3/3 例**一致**：sqrt(subnormal_half)→F16 normal | 未触发 | 全一致 | 全 ok | **不受影响**：sqrt 将 F16 subnormal 输入放大到 normal 范围 | 否 |
-| F16 `hrsqrt` | F16(=1/hsqrt) | 3/3 例**一致**：1/sqrt(sn)=large F16 normal 或 Inf | 未触发 | 全一致 | 全 ok | **不受影响**：结果在 F16 正常域或 math overflow | 否 |
-| F16 `hrcp` | F16(=1/half) | 3/3 例**一致**：1/sn=F16 Inf 或 large normal（math overflow） | 未触发 | 全一致 | 全 ok | **不受影响**：F16 值域限制使 1/sn overflow 为 Inf，与数学一致 | 否 |
-| BF16 `hexp` | BF16(cvt→F32→expf→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：hexp(bf16(-88))→0 vs libm 5.97e-39 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：与 F32 expf 同机制，设计内 FTZ | 待补 |
-| BF16 `hexp2` | BF16(cvt→F32→exp2f→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：2^-126→0 vs FLT_MIN；1 borderline | 全一致 | 正常域全 ok | 同 F32 exp2f，设计内 FTZ | 待补 |
-| BF16 `hexp10` | BF16(cvt→F32→exp10f→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：10^-38→0；10^-40→0 | 全一致 | 正常域全 ok | 同 F32 exp10f，设计内 FTZ | 待补 |
-| BF16 `hlog` | BF16(cvt→F32→logf→cvt) | 3/3 例**一致**：logf 预缩放保护有效 | 未触发 | 全一致 | 全 ok | **不受影响**：同 F32 logf | 否 |
-| BF16 `hlog2` | BF16(cvt→F32→log2f→cvt) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
-| BF16 `hlog10` | BF16(cvt→F32→log10f→cvt) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
-| BF16 `hsqrt` | BF16(cvt→F32→sqrtf→cvt) | **输入侧 FTZ**：3/3 BF16 subnormal→F32 subnormal→sqrtf FTZ→0 | 未触发 | 全一致 | 正常域全 ok | **输入侧 FTZ 确认**：同 F32 sqrtf，设计内 FTZ | 待补 |
-| BF16 `hrsqrt` | BF16(cvt→F32→1/sqrtf→cvt) | **输入侧 FTZ+真bug**：3/3 BF16 subnormal→sqrtf→0→1/0=Inf vs libm finite | 未触发 | 全一致 | 正常域全 ok | **真bug**：同 F32 rsqrtf，subnormal→FTZ→0→1/√0=Inf | 待补 |
-| BF16 `hrcp` | BF16(=1/bfloat16_t) | **真bug**：2/3 BF16 subnormal→1/sn→Inf vs libm finite | 未触发 | 全一致 | 正常域全 ok | **真bug**：BF16 除法对 subnormal denominator FTZ→0→1/0=Inf | 待补 |
-| `coshf` | F32 组合(Exp) | subnormal→coshf(sn)≈1 一致 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：FTZ→0→cosh(0)=1，与数学≈1一致 | 否 |
-| `sinhf` | F32 组合(Exp+Taylor) | 3/3 例**一致**：Taylor 分支保留 subnormal | 未触发 | 全一致 | 正常域全 ok | **不受影响**：|x|≤0.1 Taylor 分支用纯 float 算术，subnormal 保留 | 否 |
-| `tanhf` | F32 组合(Exp+Div) | **输入侧 FTZ+精度真bug**：5/5 DIFF：sn→0 vs ≈sn；MN→0 vs ≈MN | 未触发 | 全一致 | 正常域全 ok | **精度真bug**：tanhf=1-2/(expf(2x)+1)，小 x→expf≈1→1-1=0，无 Taylor 退化路径 | 待补 |
-| `acoshf` | F32 组合(Log+Sqrt) | subnormal<1→NaN 一致（数学正确） | 未触发 | 全一致 | FLT_MAX→inf vs libm≈89(**溢出bug**) | **不受 FTZ 影响**；FLT_MAX 溢出为独立 bug（sqrt(x²+1)溢出） | 否（溢出另报） |
-| `asinhf` | F32 组合(Log+Sqrt+Taylor) | 3/3 例**一致**：Taylor 分支保留 subnormal | 未触发 | 全一致 | FLT_MAX→inf vs≈89(**溢出bug**) | **不受 FTZ 影响**；FLT_MAX 溢出为独立 bug | 否（溢出另报） |
-| `hypotf` | F32 组合(Sqrt+Div+FMA) | **真bug**：hypotf(sn,sn)→NaN vs libm finite（DML div 0/0=NaN） | 未触发 | hypotf(0,sn)=|sn| ✓；hypotf(sn,normal)=normal ✓ | 正常域全 ok | **真bug**：两 subnormal→DML b/a FTZ→0/0=NaN→整条链 NaN | 待补 |
-| `rhypotf` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：rhypotf(sn,sn)=NaN vs libm finite（1/hypotf-NaN=NaN） | 未触发 | 同 hypotf 正确案例 | 正常域全 ok | **真bug**：同 hypotf 根因，1/NaN=NaN | 待补 |
-| `asinf` | F32 组合(Sqrt+Taylor) | 3/3 例**一致**：|x|<0.707 走 Taylor 分支，subnormal 保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：小 |x| Taylor 分支不调 sqrtf | 否 |
-| `acosf` | F32 组合(=PIO2-asinf) | 3/3 例**一致**：同 asinf | 未触发 | 全一致 | 正常域全 ok | **不受影响**：同 asinf | 否 |
-| `atanf` | F32 组合(Div+Taylor) | **真bug**：5/5 DIFF（4 in-FTZ+1 near-MN）：sn→0 vs ≈sn；MN→0.2×MN vs MN | 未触发 | 全一致 | 正常域全 ok | **真bug**：`__internal_sign(clip)` 对 subnormal/near-MN 精度不足→`clip*2^62/(|clip*2^62|+2.168e-19)`≈0.2而非±1→dst×0.2毁结果；最小 sn→dst×3e-8→double-subnormal→FTZ→0 | 待补 |
-| `atan2f` | F32 组合(Div+atanf) | **真bug**：3 unexpected NaN（sn/sn→DML div 0/0=NaN）+2 in-FTZ（sn/normal→0/normal=0→atanf(0)=0） | 未触发 | NaN/±Inf/±0 全一致 | 正常域全 ok | **真bug**：dual-subnormal→y/x FTZ→0/0=NaN；single-subnormal→numerator FTZ→0→atanf(0)=0 vs libm≈y/x | 待补 |
-| `atanhf` | F32 组合(Log+Div) | **精度真bug**：4/4 DIFF（in-FTZ）：sn→0 vs ≈sn；logf((1+sn)/(1-sn))=0 | 未触发 | ±1→inf vs nan（domain handling差） | 正常域全 ok | **精度真bug**：`logf((1+x)/(1-x))/2` 对 subnormal x 无 Taylor 退化→(1±sn)≈1→logf(1)=0；±1 返回 inf vs libm nan 非 FTZ | 待补 |
-| `cbrtf` | F32 组合(位运算+Div) | **真bug**：3/3 DIFF（in-FTZ）：subnormal 位操作缺 implicit 1→x_adjusted 错→Newton 迭代错 | 未触发 | 全一致 | 正常域全 ok | **真bug**：subnormal→exp_bits=0→exponent=-127→k=-42→x_adjusted 仅改 exponent 未加 implicit 1→mantissa 错→Newton 迭代收敛到错值→结果错 | 待补 |
-| `rcbrtf` | F32 组合(位运算+Div) | **真bug**：2/2 DIFF（in-FTZ）：同 cbrtf 根因 | 未触发 | 全一致 | 正常域全 ok | **真bug**：同 cbrtf，subnormal 位操作缺 implicit 1 | 待补 |
-| `sinf` | F32 组合(纯Taylor) | 3/3 例**一致**：纯 Taylor+fmaf，subnormal 保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：纯 Taylor+float 算术，无 DML 原语 | 否 |
-| `cosf` | F32 组合(纯Taylor) | 3/3 例**一致**：同 sinf | 未触发 | 全一致 | 正常域全 ok | **不受影响**：同 sinf | 否 |
-| `tanf` | F32 组合(Taylor+Div) | 3/3 例**一致**：Taylor 保留 subnormal | 未触发 | 全一致 | 正常域全 ok | **不受影响**：小 x 赴 Taylor 路径，subnormal 保留 | 否 |
-| `sinpif` | F32(=sinf(x*PI)) | 3/3 例**一致**：x*PI→normal→sinf(subnormal*PI)≈subnormal*PI | 未触发 | ±1→-8.7e-8 vs 1.22e-16(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：精度差属 argument reduction 问题，非 subnormal/FTZ | 否 |
-| `cospif` | F32(=cosf(x*PI)) | 3/3 例**一致**：x*PI→normal→cosf(sn*PI)≈1 | 未触发 | 0.5→-4.37e-8 vs 6.12e-17(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：同 sinpif | 否 |
-| `tanpif` | F32(=tanf(x*PI)) | 3/3 例**一致**：x*PI→normal→tanf(sn*PI)≈sn*PI | 未触发 | ±1→±8.7e-8(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：同 sinpif | 否 |
-| `norm3df` | F32 组合(Sqrt+Div+FMA) | **真bug**：8/8 unexpected NaN（所有含 subnormal 的输入→NaN vs libm finite） | 未触发 | NaN/±Inf/±0/normal 全一致；(sn,normal,normal)正确 | 正常域全 ok | **真bug**：同 hypotf 根因，m=subnormal→a/m/b/m/c/m DML div 0/0=NaN→fmaf(NaN,...)=NaN→sqrtf(NaN)=NaN→m*NaN=NaN | 待补 |
-| `norm4df` | F32 组合(Sqrt+Div+FMA) | **真bug**：6/6 unexpected NaN（含 subnormal 的输入→NaN vs libm finite） | 未触发 | NaN/±Inf/±0/normal 全一致；(sn,normal,normal,normal)正确 | 正常域全 ok | **真bug**：同 hypotf/norm3df 根因，m=subnormal→DML div 0/0=NaN | 待补 |
-| `rnorm3df` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：8/8 unexpected NaN（1/norm3df(sn,sn,sn)=1/NaN=NaN） | 未触发 | 同 norm3df 正确案例 | 正常域全 ok | **真bug**：1/NaN=NaN，同 norm3df 根因 | 待补 |
-| `rnorm4df` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：6/6 unexpected NaN | 未触发 | 同 norm4df 正确案例 | 正常域全 ok | **真bug**：1/NaN=NaN，同 norm4df 根因 | 待补 |
-| `erff` | F32 组合(Exp2+Taylor) | 3/3 例**一致**：subnormal→|x|<1.00296→Taylor分支→fmaf保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：小|x| Taylor 纯 float 算术 | 否 |
-| `erfcf` | F32 组合(Exp2+Div) | 3/3 例**一致**：erfcf(sn)≈1 | **输出侧 FTZ**：erfcf(10)=0 vs libm 1.4e-45 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：erfcf 大正输入 → 1-exp2f(-poly) → exp2f 输出 subnormal → FTZ→0 → 1-0=0 | 待补 |
-| `erfcxf` | F32 组合(Exp2+Div) | 3/3 例**一致**：erfcxf(sn)≈1 | 未触发 | 全一致(subnormal) | 正常域全 ok | **不受 subnormal/FTZ 影响**：subnormal→abs_x<10.055→poly+div(正常中间值) | 否 |
-| `erfinvf` | F32 组合(Log2+Rsqrt+Div) | 1/3 例**一致**(最小sn)；2/3 近-MN 精度DIFF(ratio≈0.84，非FTZ) | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 FTZ 影响**：subnormal→else分支(pure fmaf)；近-MN 精度偏差系 SIMT 多项式精度 | 否 |
-| `tgammaf` | F32 组合(Log+Div+Pow) | **不受影响**：subnormal→overflow→两路均Inf；MN→frexpf+ldexpf保护→correct | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：最小sn→overflow(两路Inf)；MN→__internal_euler_gamma 用 frexpf+ldexpf(1/m)保护 | 否 |
-| `lgammaf` | F32 组合(Log+Taylor) | 5/5 例**一致**：__internal_compute_ln 有 subnormal 预缩放保护 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：__internal_compute_ln 同 logf 的 x*2^23 预缩放保护 | 否 |
-| `cyl_bessel_i0f` | F32 组合(Exp+Rsqrt+Div) | 5/5 例**一致**：subnormal→else分支(x<9)→pure Taylor→≈1 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：|x|<9 Taylor 分支无 DML 原语 | 否 |
-| `cyl_bessel_i1f` | F32 组合(Exp+Rsqrt+Div) | 5/5 例**一致**：同 i0f | 未触发 | 全一致 | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：同 i0f；正常域 DIFF 系 SIMT 精度 | 否 |
-| `j0f` | F32 组合(Trig+Div) | 5/5 例**一致**：subnormal→else(x≤8)→Taylor→≈1 | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：小 x Taylor 分支；正常域 DIFF 系 SIMT 精度 | 否 |
-| `j1f` | F32 组合(Trig+Div) | 5/5 例**一致**：subnormal→Taylor→≈0或≈x/2 | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：同 j0f | 否 |
-| `y1f` | F32 组合(Log+Div+Trig) | 2/2 例**一致**(最小sn)→-Inf(overflow，数学正确) | 未触发 | y1f(MN)=finite ✓ | 正常域精度 DIFF | **不受 FTZ 影响**：最小sn→Y_1(sn)超 FLT_MAX→两路均-Inf；MN→finite ✓ | 否 |
-| `normcdff` | F32 组合(Erfcf) | 5/5 例**一致**：normcdff(sn)=0.5(数学正确) | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：经 erfcf(x/√2)，subnormal→x/√2→subnormal→erfcf≈1→0.5*(1+erf(≈0))≈0.5 | 否 |
-| `scalbnf` | F32 组合(Pow+Div) | 1/1 DIFF(in-FTZ)：scalbnf(sn,-10)→subnormal 结果 FTZ→0 vs libm finite | 未触发 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：scalbnf(sn,-10)=sn*2^-10→结果 subnormal→FTZ→0；实现含 `x/__powf(2,n)` DML 路径 | 待补 |
+| 序号 | 接口 | 类型 | 输入 subnormal | 输出 subnormal | 特殊值 | 正常域 ULP | 结论 | 资料已改 |
+|------|------|------|----------------|----------------|--------|------------|------|----------|
+| 1 | `sqrtf` | F32 | **FTZ**：5/5 例输出 0（libm 为 ~1e-19~1e-23）→ 不一致 | 本批未触发（sqrt 输出落不进 subnormal 区） | NaN/±Inf/负数/±0 全一致，无设计外 NaN/Inf | 1.0/2.0/4.0/0.25/1e30/1e-30 全 ok，精度不退化 | **输入侧 FTZ 确认**；行为属设计内但原资料未载明 | 是（sqrtf.md 补「返回值说明/约束说明」）|
+| 2 | `y0f` | F32 组合(Div+Log+Sqrt) | 5/5 例**一致**：subnormal 输入经 logf 预缩放保护，不触发 FTZ | 未触发 | NaN/±Inf/±0/负数/1e14 全一致（1e14>1e13 为实现截断 return 0，非 FTZ） | 0.1~1e6 各分支全 ok，精度不退化 | **不受 subnormal/FTZ 影响**；logf 预缩放(x*2^23)保护有效；预筛曾错判 IMPACT | 否（实测与 libm 一致，无需补充）|
+| 3 | `ynf` | F32 组合(Div+Exp+Log+Sqrt) | 8/8 例**一致**（数学值已超 FLT_MAX→两路均 -Inf） | **中间值 FTZ 真bug**：n≈85,x≈22 时递推 `scale_factor` 变 subnormal(-8.55e-39)→最终 `1/scale_factor` DML Div FTZ→0→返回 -Inf（libm 正确返回 -1.17e38 finite） | NaN/±Inf/±0/负数/n<0 全一致 | n=5~60 ok；n=85 x=22 **真 bug**（-Inf vs -1.17e38）；n=85 x≥50 ok | **真 bug**：递推缩放 scale_factor 落入 subnormal 被 FTZ→除法结果错误为 ±Inf；非设计内 FTZ | 是（ynf.md 约束说明补中间值 subnormal bug + 规避建议）|
+| 4 | `expf` | F32 直接(Exp) | subnormal 输入 FTZ→exp(subnormal)≈1 一致（数学值≈1） | **输出侧 FTZ**：exp(-88)=0 vs libm 6.05e-39(subnormal)；exp(-149)=0 两路均 0 ok | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：exp 大负输入的 subnormal 输出被刷零为 +0；设计内 FTZ | 待补 |
+| 5 | `logf` | F32 直接(Log) | 3/3 例**一致**：subnormal 输入经预缩放保护(x*2^23)完全正确 | 未触发（log 输出不落 subnormal） | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：预缩放保护有效 | 否 |
+| 6 | `rsqrtf` | F32 直接(Sqrt+Div) | **输入侧 FTZ**：3/3 subnormal 输入→FTZ→1/√0=+Inf vs libm finite(~2e22)→**设计外 Inf** | 未触发 | -0→-Inf vs libm +Inf（符号翻转） | 正常域全 ok | **输入侧 FTZ 确认+真bug**：subnormal x 被 FTZ→0→√0=0→1/0=Inf而非数学正确值 finite | 待补 |
+| 7 | `fdividef` | F32 直接(Div) | **输入+输出侧 FTZ**：1/max_subnormal→Inf vs libm 8.5e37(**设计外 Inf**)；subnormal numerator→0 | **输出侧 FTZ**：1/FLT_MAX→0 vs libm 2.94e-39(subnormal)；1e-38/10→0 vs 1e-39 | 全一致 | 正常域全 ok | **双侧 FTZ 确认**：商落入 subnormal 被 FTZ→±0；subnormal 操作数也被 FTZ→±0 再除 | 待补 |
+| 8 | `powf` | F32 直接(Exp+Log) | subnormal base→FTZ→pow(0,exp)=0 vs libm nonzero | 输出侧 FTZ：2^-126→0 vs libm MIN_NORMAL；2^-149→0（输出 subnormal FTZ） | Inf^0→NaN vs libm 1(**unexpected**) | 正常域全 ok | **双侧 FTZ+特殊值偏差**：base/result subnormal 被 FTZ；Inf^0 应返回 1 但返回 NaN | 待补 |
+| 9 | `exp2f` | F32 直接(=powf(2,x)) | subnormal 输入→exp2f(sn)≈1 一致 | **输出侧 FTZ**：2^-126→0 vs libm FLT_MIN；2^-149→0 vs smallest subnormal | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：大负输入的 subnormal 输出被刷零；路径经 expf DML 原语，设计内 FTZ | 待补 |
+| 10 | `exp10f` | F32 直接(=powf(10,x)) | subnormal 输入→exp10f(sn)≈1 一致 | **输出侧 FTZ**：10^-38→0 vs libm 1e-38(subnormal)；10^-40→0 vs 1e-40 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：与 expf 同机制，设计内 FTZ | 待补 |
+| 11 | `expm1f` | F32 直接(=expf(x)-1) | **输入侧 FTZ**：subnormal x→1+x=1.0→expm1=0 vs libm≈x | 未触发 | 全一致 | 1e-10→0 vs libm 1e-10(**精度偏差**) | **输入侧 FTZ+精度真bug**：subnormal 被 float 加法吸收→expm1=0；正常域小 x(≤1e-10)也无 Taylor 退化路径→0 vs libm≈x | 待补 |
+| 12 | `log2f` | F32 直接(=logf/logf(2)) | 3/3 例**一致**：logf 预缩放保护有效 | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：logf 预缩放 + 常量除法不引入 FTZ | 否 |
+| 13 | `log10f` | F32 直接(=logf/logf(10)) | 3/3 例**一致**：同 log2f | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：同 log2f | 否 |
+| 14 | `log1pf` | F32 直接(=logf(1+x)) | **输入侧 FTZ**：subnormal x→1+x=1.0→log1p=0 vs libm≈x | 未触发 | 全一致 | 1e-10→0 vs libm 1e-10；1e-8→0 vs 9.999e-9(**精度偏差**) | **输入侧 FTZ+精度真bug**：1+subnormal=1.0→log1p=0；正常域小 x 也因 float 加法截断→0 vs libm≈x | 待补 |
+| 15 | F16 `hexp` | F16 直接(__expf on half) | subnormal→exp(≈0)≈1 一致 | 未触发（F16 exp 输出域无 subnormal 产生） | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：half subnormal 经 DML __expf 后≈1，与 libm F16 结果一致 | 否 |
+| 16 | F16 `hexp2` | F16(=powf(2,cvt_float)) | subnormal→≈1 一致 | 1 DIFF：hexp2(-24)=0 vs 0.25（F16 输出域截断） | 全一致 | 正常域全 ok | **输出侧 FTZ**：F16 值域极窄(2^-14~2^16)，subnormal 输出在 F16 中无表示 | 否 |
+| 17 | F16 `hexp10` | F16(=powf(10,cvt_float)) | subnormal→≈1 一致 | 未触发 | 全一致 | 全 ok | **不受影响**：F16 值域内无额外 FTZ | 否 |
+| 18 | F16 `hlog` | F16 直接(__logf on half) | 3/3 例**一致**：subnormal 输入经 DML __logf 保护 | 未触发 | 全一致 | 全 ok | **不受 subnormal/FTZ 影响**：__logf 对 half subnormal 处理正确 | 否 |
+| 19 | F16 `hlog2` | F16(=logf/log2) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
+| 20 | F16 `hlog10` | F16(=logf/log10) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
+| 21 | F16 `hsqrt` | F16 直接(__sqrtf on half) | 3/3 例**一致**：sqrt(subnormal_half)→F16 normal | 未触发 | 全一致 | 全 ok | **不受影响**：sqrt 将 F16 subnormal 输入放大到 normal 范围 | 否 |
+| 22 | F16 `hrsqrt` | F16(=1/hsqrt) | 3/3 例**一致**：1/sqrt(sn)=large F16 normal 或 Inf | 未触发 | 全一致 | 全 ok | **不受影响**：结果在 F16 正常域或 math overflow | 否 |
+| 23 | F16 `hrcp` | F16(=1/half) | 3/3 例**一致**：1/sn=F16 Inf 或 large normal（math overflow） | 未触发 | 全一致 | 全 ok | **不受影响**：F16 值域限制使 1/sn overflow 为 Inf，与数学一致 | 否 |
+| 24 | BF16 `hexp` | BF16(cvt→F32→expf→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：hexp(bf16(-88))→0 vs libm 5.97e-39 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：与 F32 expf 同机制，设计内 FTZ | 待补 |
+| 25 | BF16 `hexp2` | BF16(cvt→F32→exp2f→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：2^-126→0 vs FLT_MIN；1 borderline | 全一致 | 正常域全 ok | 同 F32 exp2f，设计内 FTZ | 待补 |
+| 26 | BF16 `hexp10` | BF16(cvt→F32→exp10f→cvt) | subnormal→≈1 一致 | **输出侧 FTZ**：10^-38→0；10^-40→0 | 全一致 | 正常域全 ok | 同 F32 exp10f，设计内 FTZ | 待补 |
+| 27 | BF16 `hlog` | BF16(cvt→F32→logf→cvt) | 3/3 例**一致**：logf 预缩放保护有效 | 未触发 | 全一致 | 全 ok | **不受影响**：同 F32 logf | 否 |
+| 28 | BF16 `hlog2` | BF16(cvt→F32→log2f→cvt) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
+| 29 | BF16 `hlog10` | BF16(cvt→F32→log10f→cvt) | 3/3 例**一致** | 未触发 | 全一致 | 全 ok | 同 hlog | 否 |
+| 30 | BF16 `hsqrt` | BF16(cvt→F32→sqrtf→cvt) | **输入侧 FTZ**：3/3 BF16 subnormal→F32 subnormal→sqrtf FTZ→0 | 未触发 | 全一致 | 正常域全 ok | **输入侧 FTZ 确认**：同 F32 sqrtf，设计内 FTZ | 待补 |
+| 31 | BF16 `hrsqrt` | BF16(cvt→F32→1/sqrtf→cvt) | **输入侧 FTZ+真bug**：3/3 BF16 subnormal→sqrtf→0→1/0=Inf vs libm finite | 未触发 | 全一致 | 正常域全 ok | **真bug**：同 F32 rsqrtf，subnormal→FTZ→0→1/√0=Inf | 待补 |
+| 32 | BF16 `hrcp` | BF16(=1/bfloat16_t) | **真bug**：2/3 BF16 subnormal→1/sn→Inf vs libm finite | 未触发 | 全一致 | 正常域全 ok | **真bug**：BF16 除法对 subnormal denominator FTZ→0→1/0=Inf | 待补 |
+| 33 | `coshf` | F32 组合(Exp) | subnormal→coshf(sn)≈1 一致 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：FTZ→0→cosh(0)=1，与数学≈1一致 | 否 |
+| 34 | `sinhf` | F32 组合(Exp+Taylor) | 3/3 例**一致**：Taylor 分支保留 subnormal | 未触发 | 全一致 | 正常域全 ok | **不受影响**：|x|≤0.1 Taylor 分支用纯 float 算术，subnormal 保留 | 否 |
+| 35 | `tanhf` | F32 组合(Exp+Div) | **输入侧 FTZ+精度真bug**：5/5 DIFF：sn→0 vs ≈sn；MN→0 vs ≈MN | 未触发 | 全一致 | 正常域全 ok | **精度真bug**：tanhf=1-2/(expf(2x)+1)，小 x→expf≈1→1-1=0，无 Taylor 退化路径 | 待补 |
+| 36 | `acoshf` | F32 组合(Log+Sqrt) | subnormal<1→NaN 一致（数学正确） | 未触发 | 全一致 | FLT_MAX→inf vs libm≈89(**溢出bug**) | **不受 FTZ 影响**；FLT_MAX 溢出为独立 bug（sqrt(x²+1)溢出） | 否（溢出另报） |
+| 37 | `asinhf` | F32 组合(Log+Sqrt+Taylor) | 3/3 例**一致**：Taylor 分支保留 subnormal | 未触发 | 全一致 | FLT_MAX→inf vs≈89(**溢出bug**) | **不受 FTZ 影响**；FLT_MAX 溢出为独立 bug | 否（溢出另报） |
+| 38 | `hypotf` | F32 组合(Sqrt+Div+FMA) | **真bug**：hypotf(sn,sn)→NaN vs libm finite（DML div 0/0=NaN） | 未触发 | hypotf(0,sn)=|sn| ✓；hypotf(sn,normal)=normal ✓ | 正常域全 ok | **真bug**：两 subnormal→DML b/a FTZ→0/0=NaN→整条链 NaN | 待补 |
+| 39 | `rhypotf` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：rhypotf(sn,sn)=NaN vs libm finite（1/hypotf-NaN=NaN） | 未触发 | 同 hypotf 正确案例 | 正常域全 ok | **真bug**：同 hypotf 根因，1/NaN=NaN | 待补 |
+| 40 | `asinf` | F32 组合(Sqrt+Taylor) | 3/3 例**一致**：|x|<0.707 走 Taylor 分支，subnormal 保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：小 |x| Taylor 分支不调 sqrtf | 否 |
+| 41 | `acosf` | F32 组合(=PIO2-asinf) | 3/3 例**一致**：同 asinf | 未触发 | 全一致 | 正常域全 ok | **不受影响**：同 asinf | 否 |
+| 42 | `atanf` | F32 组合(Div+Taylor) | **真bug**：5/5 DIFF（4 in-FTZ+1 near-MN）：sn→0 vs ≈sn；MN→0.2×MN vs MN | 未触发 | 全一致 | 正常域全 ok | **真bug**：`__internal_sign(clip)` 对 subnormal/near-MN 精度不足→`clip*2^62/(|clip*2^62|+2.168e-19)`≈0.2而非±1→dst×0.2毁结果；最小 sn→dst×3e-8→double-subnormal→FTZ→0 | 待补 |
+| 43 | `atan2f` | F32 组合(Div+atanf) | **真bug**：3 unexpected NaN（sn/sn→DML div 0/0=NaN）+2 in-FTZ（sn/normal→0/normal=0→atanf(0)=0） | 未触发 | NaN/±Inf/±0 全一致 | 正常域全 ok | **真bug**：dual-subnormal→y/x FTZ→0/0=NaN；single-subnormal→numerator FTZ→0→atanf(0)=0 vs libm≈y/x | 待补 |
+| 44 | `atanhf` | F32 组合(Log+Div) | **精度真bug**：4/4 DIFF（in-FTZ）：sn→0 vs ≈sn；logf((1+sn)/(1-sn))=0 | 未触发 | ±1→inf vs nan（domain handling差） | 正常域全 ok | **精度真bug**：`logf((1+x)/(1-x))/2` 对 subnormal x 无 Taylor 退化→(1±sn)≈1→logf(1)=0；±1 返回 inf vs libm nan 非 FTZ | 待补 |
+| 45 | `cbrtf` | F32 组合(位运算+Div) | **真bug**：3/3 DIFF（in-FTZ）：subnormal 位操作缺 implicit 1→x_adjusted 错→Newton 迭代错 | 未触发 | 全一致 | 正常域全 ok | **真bug**：subnormal→exp_bits=0→exponent=-127→k=-42→x_adjusted 仅改 exponent 未加 implicit 1→mantissa 错→Newton 迭代收敛到错值→结果错 | 待补 |
+| 46 | `rcbrtf` | F32 组合(位运算+Div) | **真bug**：2/2 DIFF（in-FTZ）：同 cbrtf 根因 | 未触发 | 全一致 | 正常域全 ok | **真bug**：同 cbrtf，subnormal 位操作缺 implicit 1 | 待补 |
+| 47 | `sinf` | F32 组合(纯Taylor) | 3/3 例**一致**：纯 Taylor+fmaf，subnormal 保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：纯 Taylor+float 算术，无 DML 原语 | 否 |
+| 48 | `cosf` | F32 组合(纯Taylor) | 3/3 例**一致**：同 sinf | 未触发 | 全一致 | 正常域全 ok | **不受影响**：同 sinf | 否 |
+| 49 | `tanf` | F32 组合(Taylor+Div) | 3/3 例**一致**：Taylor 保留 subnormal | 未触发 | 全一致 | 正常域全 ok | **不受影响**：小 x 赴 Taylor 路径，subnormal 保留 | 否 |
+| 50 | `sinpif` | F32(=sinf(x*PI)) | 3/3 例**一致**：x*PI→normal→sinf(subnormal*PI)≈subnormal*PI | 未触发 | ±1→-8.7e-8 vs 1.22e-16(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：精度差属 argument reduction 问题，非 subnormal/FTZ | 否 |
+| 51 | `cospif` | F32(=cosf(x*PI)) | 3/3 例**一致**：x*PI→normal→cosf(sn*PI)≈1 | 未触发 | 0.5→-4.37e-8 vs 6.12e-17(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：同 sinpif | 否 |
+| 52 | `tanpif` | F32(=tanf(x*PI)) | 3/3 例**一致**：x*PI→normal→tanf(sn*PI)≈sn*PI | 未触发 | ±1→±8.7e-8(精度差,非FTZ) | 正常域全 ok | **不受 FTZ 影响**：同 sinpif | 否 |
+| 53 | `norm3df` | F32 组合(Sqrt+Div+FMA) | **真bug**：8/8 unexpected NaN（所有含 subnormal 的输入→NaN vs libm finite） | 未触发 | NaN/±Inf/±0/normal 全一致；(sn,normal,normal)正确 | 正常域全 ok | **真bug**：同 hypotf 根因，m=subnormal→a/m/b/m/c/m DML div 0/0=NaN→fmaf(NaN,...)=NaN→sqrtf(NaN)=NaN→m*NaN=NaN | 待补 |
+| 54 | `norm4df` | F32 组合(Sqrt+Div+FMA) | **真bug**：6/6 unexpected NaN（含 subnormal 的输入→NaN vs libm finite） | 未触发 | NaN/±Inf/±0/normal 全一致；(sn,normal,normal,normal)正确 | 正常域全 ok | **真bug**：同 hypotf/norm3df 根因，m=subnormal→DML div 0/0=NaN | 待补 |
+| 55 | `rnorm3df` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：8/8 unexpected NaN（1/norm3df(sn,sn,sn)=1/NaN=NaN） | 未触发 | 同 norm3df 正确案例 | 正常域全 ok | **真bug**：1/NaN=NaN，同 norm3df 根因 | 待补 |
+| 56 | `rnorm4df` | F32 组合(Sqrt+Div+FMA+Div) | **真bug**：6/6 unexpected NaN | 未触发 | 同 norm4df 正确案例 | 正常域全 ok | **真bug**：1/NaN=NaN，同 norm4df 根因 | 待补 |
+| 57 | `erff` | F32 组合(Exp2+Taylor) | 3/3 例**一致**：subnormal→|x|<1.00296→Taylor分支→fmaf保留 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：小|x| Taylor 纯 float 算术 | 否 |
+| 58 | `erfcf` | F32 组合(Exp2+Div) | 3/3 例**一致**：erfcf(sn)≈1 | **输出侧 FTZ**：erfcf(10)=0 vs libm 1.4e-45 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：erfcf 大正输入 → 1-exp2f(-poly) → exp2f 输出 subnormal → FTZ→0 → 1-0=0 | 待补 |
+| 59 | `erfcxf` | F32 组合(Exp2+Div) | 3/3 例**一致**：erfcxf(sn)≈1 | 未触发 | 全一致(subnormal) | 正常域全 ok | **不受 subnormal/FTZ 影响**：subnormal→abs_x<10.055→poly+div(正常中间值) | 否 |
+| 60 | `erfinvf` | F32 组合(Log2+Rsqrt+Div) | 1/3 例**一致**(最小sn)；2/3 近-MN 精度DIFF(ratio≈0.84，非FTZ) | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 FTZ 影响**：subnormal→else分支(pure fmaf)；近-MN 精度偏差系 SIMT 多项式精度 | 否 |
+| 60b | `erfcinvf` | F32 组合(Log2+Rsqrt+Div) | **无法定量比较**：libm golden erfcinv 对极小输入(subnormal→erfcinv(sn)≈10)返回 NAN(golden bug)；SIMT 返回 finite≈10(数学正确) | 未触发 | libm golden 有 bug(返回NAN)，SIMT返回finite | SIMT 正常域 ok | **golden 不可用**：SIMT 对 sn 返回 finite≈10(数学≈Φ^{-1}(1-sn)≈√(-2ln(sn))≈10)，与数学预期一致；但 libm golden 有 NAN bug 无法直接比较；实现路径同 erfinvf(log2f+rsqrtf)，subnormal→log2f 保护有效 | 否(无法定量确认) |
+| 61 | `tgammaf` | F32 组合(Log+Div+Pow) | **不受影响**：subnormal→overflow→两路均Inf；MN→frexpf+ldexpf保护→correct | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：最小sn→overflow(两路Inf)；MN→__internal_euler_gamma 用 frexpf+ldexpf(1/m)保护 | 否 |
+| 62 | `lgammaf` | F32 组合(Log+Taylor) | 5/5 例**一致**：__internal_compute_ln 有 subnormal 预缩放保护 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：__internal_compute_ln 同 logf 的 x*2^23 预缩放保护 | 否 |
+| 63 | `cyl_bessel_i0f` | F32 组合(Exp+Rsqrt+Div) | 5/5 例**一致**：subnormal→else分支(x<9)→pure Taylor→≈1 | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：|x|<9 Taylor 分支无 DML 原语 | 否 |
+| 64 | `cyl_bessel_i1f` | F32 组合(Exp+Rsqrt+Div) | 5/5 例**一致**：同 i0f | 未触发 | 全一致 | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：同 i0f；正常域 DIFF 系 SIMT 精度 | 否 |
+| 65 | `j0f` | F32 组合(Trig+Div) | 5/5 例**一致**：subnormal→else(x≤8)→Taylor→≈1 | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：小 x Taylor 分支；正常域 DIFF 系 SIMT 精度 | 否 |
+| 66 | `j1f` | F32 组合(Trig+Div) | 5/5 例**一致**：subnormal→Taylor→≈0或≈x/2 | 未触发 | 全一致(subnormal) | 正常域精度 DIFF(非FTZ) | **不受 subnormal/FTZ 影响**：同 j0f | 否 |
+| 67 | `y1f` | F32 组合(Log+Div+Trig) | 2/2 例**一致**(最小sn)→-Inf(overflow，数学正确) | 未触发 | y1f(MN)=finite ✓ | 正常域精度 DIFF | **不受 FTZ 影响**：最小sn→Y_1(sn)超 FLT_MAX→两路均-Inf；MN→finite ✓ | 否 |
+| 68 | `normcdff` | F32 组合(Erfcf) | 5/5 例**一致**：normcdff(sn)=0.5(数学正确) | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：经 erfcf(x/√2)，subnormal→x/√2→subnormal→erfcf≈1→0.5*(1+erf(≈0))≈0.5 | 否 |
+| 69 | `scalbnf` | F32 组合(Pow+Div) | 1/1 DIFF(in-FTZ)：scalbnf(sn,-10)→subnormal 结果 FTZ→0 vs libm finite | 未触发 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：scalbnf(sn,-10)=sn*2^-10→结果 subnormal→FTZ→0；实现含 `x/__powf(2,n)` DML 路径 | 待补 |
+| 70 | `__hdiv`(F16) | F16 直接(Div) | 0 DIFF：F16 subnormal 经 DML 后结果与 libm F16 一致（F16 值域极窄，sn→≈0→div 行为与数学一致） | 未触发（F16 值域窄，商一般不落 subnormal） | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：F16 值域限制(MIN_NORMAL=2^-14)使 subnormal 输入经 DML 后与数学预期一致 | 否 |
+| 71 | `__hdiv`(BF16) | BF16 直接(Div) | **真bug**：sn/sn→DML 0/0=NaN vs libm 1；1/sn_max→Inf vs libm finite(8.57e37)；MN/sn_min→Inf vs 128 | **输出侧 FTZ**：MN/2→0 vs libm 5.88e-39；MN/4→0 vs 2.94e-39；1/BF16_MAX→0 vs 2.94e-39 | **真bug**：sn/sn→unexpected NaN(3/3 例)；1/sn_max→unexpected Inf | 正常域全 ok | **真bug+双侧 FTZ**：BF16 经 F32 upcast 路径，DML 除法双侧 FTZ；dual-subnormal→0/0=NaN；与 F32 fdividef/BF16 hrcp 同根因 | 待补 |
+| 72 | `jnf` | F32 组合(Div+Exp+Log+Sqrt) | 0 DIFF(subnormal)：subnormal x→case3(logf/expf 保护)→与 libm 一致 | **输出侧 FTZ**：jnf(85,22.04)→0 vs libm 3.31e-41(subnormal)；数学结果落入 subnormal 被 FTZ→0 | NaN/±Inf/±0/n<0 全一致 | n=5/10/20 ok；n=85 x=22 **输出 FTZ**(0 vs 3.31e-41)；n=85 x≥50 ok | **输出侧 FTZ 确认**：jnf 大 n 小 x 的数学结果落入 subnormal → FTZ→0；subnormal 输入经 case3 logf 保护不受影响；设计内 FTZ | 待补 |
+| 73 | `scalblnf` | F32 组合(=scalbnf(x,cast_int32)) | 1 DIFF(in-FTZ)：scalblnf(sn_mid,-10)→0 vs libm 5.74e-42 | 未触发 | 全一致 | 正常域全 ok | **与 scalbnf 同根因**：scalblnf→scalbnf→DML __powf 路径；sn*2^-10→subnormal→FTZ→0；设计内 FTZ | 待补 |
+| 74 | `normcdfinvf` | F32 组合(Div+Exp+Log+Sqrt) | 4 DIFF(in-FTZ)：subnormal→算法路径正常(logf 保护)，但 SIMT 多项式对极小输入精度不足 | 未触发 | 3 unexpected：+Inf→NaN vs Inf；-Inf→NaN vs -Inf；-1→NaN vs -Inf | 正常域全 ok(0.01→-2.326✓; 0.5→0✓; 0.999→3.090✓) | **SIMT 精度偏差(非 FTZ)**：subnormal 输入路径正常(logf 预缩放有效)，但多项式对 log2f(item)≈-149 精度不足；特殊值域处理差异非 FTZ | 否(非 FTZ 主导) |
+| 75 | `normf` | F32 组合(Div+Sqrt) | **真bug**：normf(2,[sn,sn])→NaN vs libm finite；dual-subnormal→DML 0/0=NaN(同 hypotf 根因) | 未触发 | 全一致 | 正常域全 ok；normf(2,[sn,normal])→1 ✓ | **真bug**：dual-subnormal→m=subnormal→a/m DML div 0/0=NaN→fma(NaN,..)=NaN→sqrtf(NaN)=NaN→m*NaN=NaN | 待补 |
+| 76 | `rnormf` | F32 组合(Div) | **真bug**：rnormf(2,[sn,sn])→NaN vs libm finite(1/NaN=NaN，同 normf 根因) | 未触发 | 全一致 | 正常域全 ok | **真bug**：1/normf(NaN)=NaN，同 normf/hypotf 根因 | 待补 |
 
 > sqrtf 实测明细：`0x00000001 / 0x00000010 / 0x007FFFFF / 0x00400000 / 1e-40`
 > 五个 subnormal 输入，设备一律返回 `+0`，而非 FTZ libm 返回对应小正数。
@@ -408,7 +416,10 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 > **erfcf**：erfcf(sn)≈1 OK；1 DIFF 为输出侧 FTZ：erfcf(10)=0 vs libm 1.4e-45（exp2f 大负→subnormal 输出 FTZ→0→1-0=0），同 exp2f/expf 设计内 FTZ。
 > **erfcxf**：0 DIFF(subnormal)；erfcxf(+Inf)=0 vs -nan 1 DIFF（特殊值处理差异，非 FTZ）。
 > **erfinvf**：subnormal 输入 0 DIFF（最小sn 保留）；近-MN 有精度 DIFF(ratio≈0.84)，系 SIMT 多项式精度而非 FTZ。
-> **erfcinvf**：golden 函数对极小输入有 bug（返回 NAN），SIMT 实际对 sn 返回正确 finite 值≈10。
+> **erfcinvf（序号60b）**：golden 函数 libm erfcinv 对极小输入（subnormal→erfcinv(sn)≈10）返回 NAN（golden bug），
+> SIMT 实际对 sn 返回 finite≈10（数学正确：erfcinv(sn) ≈ Φ^{-1}(1-sn) ≈ √(-2ln(sn)) ≈ 10）。
+> 实现路径同 erfinvf：subnormal→negLog=ln(sn) → log2f 有预缩放保护 → rsqrtf(negLog) 正常域 → 结果 ≈ 10 finite。
+> 无法定量确认一致性（golden NAN bug），但 SIMT 输出与数学预期一致。
 > **tgammaf**：0 DIFF。sn→Inf(overflow，两路一致)；MN→8.5e37(正确，frexpf+ldexpf 保护生效)。
 > **lgammaf**：0 DIFF。__internal_compute_ln 同 logf 的 x*2^23 预缩放保护有效，subnormal 输入完全正确。
 > **cyl_bessel_i0f/i1f**：0 DIFF(subnormal)。|x|<9 Taylor 分支，sn→≈1/≈x/2。
@@ -433,3 +444,38 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 > **sinf/cosf/tanf**：0 DIFF。纯 Taylor+float 算术，无 DML 原语，subnormal 保留。
 > **sinpif/cospif/tanpif**：subnormal 输入 0 DIFF（x*PI→normal→三角函数保留）。
 > 正常域有精度 DIFF（如 sinpif(1)→-8.7e-8 vs 1.22e-16）属 argument reduction 精度问题，非 subnormal/FTZ。
+
+> 补测接口实测明细（序号 70~76）：
+
+> **F16 __hdiv（序号70）**：0 DIFF。F16 值域极窄（MIN_NORMAL=2^-14），subnormal 输入经 DML 后≈±0，
+> div(≈0, normal)≈0（与数学一致），div(normal, ≈0)→Inf（与数学一致），
+> div(≈0, ≈0)=NaN（与 0/0 IEEE 一致）。与 F32 fdividef 不同，F16 无额外的 FTZ 问题。
+
+> **BF16 __hdiv（序号71）**：13 DIFF。BF16 经 cvt→F32→DML 除法→cvt_bfloat16 路径，
+> BF16 subnormal 映射为 F32 subnormal（相同指数范围），因此 BF16 的 subnormal/FTZ 行为
+> **与 F32 fdividef 完全一致**：
+> - 输入侧 FTZ：sn/1→0 vs libm nonzero（10 例）
+> - 输出侧 FTZ：MN/2→0 vs 5.88e-39（3 例）
+> - 真 bug：sn/sn→DML 0/0=NaN vs 1；1/sn_max→Inf vs 8.57e37；MN/sn_min→Inf vs 128（5 unexpected NaN/Inf）
+
+> **jnf（序号72）**：1 DIFF(out-FTZ)。subnormal x(0x00000001~0x007FFFFF) 各 n(0~85) 输入全一致：
+> jnf(0,sn)=j0f(sn)≈1；jnf(1,sn)=j1f(sn)≈0；jnf(2~85,sn)→case3(logf/expf 保护)→0。
+> jnf(85, 22.041975)→0 vs libm 3.31e-41(subnormal)：数学结果 J_85(22) ≈ 3e-41，
+> 落入 subnormal 区被 FTZ→0。与 expf 输出侧 FTZ 同机制，属设计内 FTZ。
+
+> **scalblnf（序号73）**：1 DIFF(in-FTZ)。scalblnf(sn_mid=0x00400000, -10)→0 vs libm 5.74e-42。
+> scalblnf 实现 = scalbnf(x, (int32_t)n)，与 scalbnf 完全同路径同根因。
+> sn*2^-10 结果落入 subnormal → FTZ→0。设计内 FTZ。
+
+> **normcdfinvf（序号74）**：13 DIFF，但**非 FTZ 主导**。subnormal 输入(0x00000001~0x00400000)→
+> 算法路径正常：float 加法 x+x 保留 subnormal（不 FTZ），log2f(subnormal) 有保护，
+> rsqrtf 正常域运算正确。但 SIMT 多项式对极小输入(log2f(item)≈-149)精度不足，
+> 导致结果偏离数学 Φ^{-1}(sn)≈-20~-13 约 6~7 个单位（-14.12 vs math ≈-20）。
+> 特殊值差异：+Inf→NaN vs Inf 等，属 domain handling 差异而非 FTZ。
+> 正常域精度正确：0.01→-2.326✓、0.5→0✓、0.999→3.090✓。
+
+> **normf/rnormf 真 bug（序号75/76）**：normf(2,[sn,sn])→NaN vs libm 1.4e-45。
+> 根因与 hypotf/norm3df/norm4df 完全相同：m=max(|a[i]|)=subnormal，
+> a/m 中 DML 除法 sn/sn → FTZ→0/0=NaN → fma(NaN,...)=NaN → sqrtf(NaN)=NaN → m*NaN=NaN。
+> normf(2,[sn,normal])→1 ✓（m=normal→a/m=sn/normal→FTZ→0→sqrt(0²+1²)=1→m*1=normal）。
+> rnormf = 1/normf → 1/NaN=NaN。

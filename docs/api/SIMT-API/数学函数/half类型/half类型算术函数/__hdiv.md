@@ -45,10 +45,11 @@ half __hdiv(const half x, const half y)
     | 不为0 | ±0 | 返回值符号由x和y的符号异或决定，值为inf | 返回值符号由x和y的符号异或决定，值为ASCRT_MAX_NORMAL_FP16 |
     | ±0 | 不为0 | 返回值符号由x和y的符号异或决定，值为0 | 返回值符号由x和y的符号异或决定，值为0 |
     | x，y任意一个为nan | x，y任意一个为nan | nan | 0 |
+-   当x或y为subnormal（非规格化数，即0 < |x| < 2^-14≈6.104e-5）时，F16值域极窄（MIN_NORMAL=2^-14≈6.104e-5），subnormal经DML运算后行为与数学预期一致，不受subnormal/FTZ影响。
 
 ## 约束说明
 
-无
+本接口对F16的subnormal（非规格化数）输入和输出不受影响：真机实测（dav-3510，36例bit比对）与非FTZ libm完全一致（0 DIFF）。
 
 ## 需要包含的头文件
 

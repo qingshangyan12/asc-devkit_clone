@@ -58,10 +58,13 @@ x的y次幂的结果。
     -   x为nan，y不为0。
     -   y为nan，x不为1。
     -   x、y均为nan
+-   当x或y为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，该操作数被刷零（Flush-To-Zero）当作±0处理后再参与幂运算。
+-   当结果落入subnormal区间时，返回值被刷零为±0，而非libm得到的subnormal值。
+-   当x为inf且y为0时，返回值为nan，而非libm标准期望的1（设计外偏差）。
 
 ## 约束说明
 
-无
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

@@ -39,11 +39,19 @@ a\[0\]^2 + a\[1\]^2 + ...+ a\[n-1\]^2的平方根。
 -   若a\[0\]、a\[1\] 、... 、a\[n-1\]任意一个或多个为±inf，返回值为inf。
 -   若a\[0\]、a\[1\] 、... 、a\[n-1\]任意一个或多个为nan同时不是±inf，返回值为nan。
 -   若n小于1，返回a\[0\]的绝对值。
+-   当a中所有元素均为subnormal（非规格化数，即0 < |a\[i\]| < 1.17549435e-38）时，底层DML运算产生0/0=NaN，返回NaN（设计外行为）；当仅部分元素为subnormal时，subnormal被FTZ为0，返回值与normal输入一致（如normf(2, \[sn, normal\]) ≈ |normal|）。
 
 ## 约束说明
 
 -   输入数据a的长度必须大于等于参数n。
 -   若n过大，接口性能无法保证。
+
+Ascend 950PR/Ascend 950DT底层采用DML实现norm，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
+
+-   **输入FTZ**：当输入a中元素落在subnormal区间（0 < |a\[i\]| < 1.17549435e-38）时，先被刷零为±0再参与运算。当仅部分元素为subnormal时，normf(2, \[sn, normal\]) ≈ |normal|，结果一致；当所有元素均为subnormal时，底层DML运算产生0/0=NaN，经fma(NaN)=NaN、sqrtf(NaN)=NaN路径，返回NaN（设计外行为），而非按非FTZ标准库（如libm）得到的有限值。
+-   **输出FTZ**：normf的输出为正数平方根，正常输入难以使输出落入subnormal区间，该场景一般不会触发。
+
+若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
 
 ## 需要包含的头文件
 
