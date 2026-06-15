@@ -25,8 +25,8 @@ target_compile_options(demo PRIVATE
     $<$<COMPILE_LANGUAGE:ASC>:--cce-simd-vf-fusion=false>
 )
 
-message(STATUS "CASE_NUM = ${CASE_NUM}")
+message(STATUS "SCENARIO_NUM = ${SCENARIO_NUM}")
 
 target_compile_definitions(demo PRIVATE
-    CASE_NUM=${CASE_NUM}
+    SCENARIO_NUM=${SCENARIO_NUM}
 )

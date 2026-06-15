@@ -1,7 +1,7 @@
 #!/bin/bash
 # Bank conflict benchmark for dav-3510
 # Usage:
-#   CASE_NUM=1 bash test.sh          # single case with profiling
+#   SCENARIO_NUM=1 bash test.sh          # single case with profiling
 #   bash test.sh                     # all 11 cases, accuracy only
 #   bash test.sh profile             # all 11 cases with msprof profiling
 
@@ -11,8 +11,8 @@ WORKDIR=$(cd "$(dirname "$0")" && pwd)
 RUN_PROFILE=false
 [[ "$1" == "profile" ]] && RUN_PROFILE=true
 
-if [[ -n "$CASE_NUM" ]]; then
-    CASES=("$CASE_NUM")
+if [[ -n "$SCENARIO_NUM" ]]; then
+    CASES=("$SCENARIO_NUM")
 else
     CASES=(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15)
 fi
@@ -37,7 +37,7 @@ for case in "${CASES[@]}"; do
     cmake -S "$WORKDIR" -B "$WORKDIR/build" \
         -DCMAKE_ASC_RUN_MODE=npu \
         -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-        -DCASE_NUM=$case -Wno-dev 2>&1 | grep "CASE_NUM\|Build files\|Built"
+        -DCASE_NUM=$case -Wno-dev 2>&1 | grep "SCENARIO_NUM\|Build files\|Built"
     make -C "$WORKDIR/build" -j 2>&1 | grep "Built"
 
     rm -rf "$WORKDIR/input" "$WORKDIR/output"

@@ -133,8 +133,8 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### 分析结论
 
-- src0 和 src1 地址完全重叠，共用同一块 UB 空间。硬件地址匹配合并后只触发一次 Load，有效变为 1R1W。
-- 由于 dst 在 bank1，与 src0/src1 不在同一 bank，**不发生冲突**。
+- src0 和 src1 地址完全重叠，共用同一块 UB 空间。硬件地址匹配合并后只触发一次读，有效变为一读一写。
+- 由于dst在bank1，与src0/src1不在同一 bank，**不发生冲突**。
 
 ## Case 2：二读一写，src0与dst地址重叠
 
@@ -152,7 +152,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### 分析结论
 
-- src0 与 dst 地址重叠（同 bank 0 同 depth 行），读取 src0 和写入 dst 同时进行，**存在读写冲突**。在 Atlas A2/A3 系列产品上，读写地址重叠能够被硬件优化从而消除冲突。
+- src0 与 dst 地址重叠（同 bank 0 同 depth 行），读取 src0 和写入 dst 同时进行，**存在读写冲突**，而在 Atlas A2/A3 系列产品上，读写地址重叠能够被硬件优化从而消除冲突。
 - src1 在 bank1（同 BG 不同 bank），与 src0 无读读冲突。
 
 ## Case 3：二读一写，全冲突基准 — src0、src1和dst同一bank，无循环展开
@@ -190,7 +190,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 ### 分析结论
 
 - src0=bank0，src1=bank1，dst=bank1。src0 和 src1 落在不同 bank，读读冲突消除。但 src1 和 dst 同在 bank1，仍存在读写冲突。
-- 消除读读冲突后性能未提升，说明 **与读写冲突相比，3510 上读读冲突开销极小，不是瓶颈**。此外 Case 4 的 buffer 间存在 256B/2048B 空隙，地址不连续也略微削弱性能。
+- 消除读读冲突后性能未提升，说明 **3510 上读读冲突开销极小，不是瓶颈**。
 
 ## Case 5：二读一写，消除读写冲突 — src0与src1同bank，dst在不同bank
 
@@ -209,7 +209,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 ### 分析结论
 
 - src0=bank0，src1=bank0，dst=bank1。src0 和 src1 同落在 bank0，存在读读冲突。但 dst 在 bank1，读写冲突消除。
-- 与 Case 4 相比：Case 5 快 8.1%，核心原因是消除了开销较大的读写冲突。此外Case 5 的三块buffer（0x0000→0x4000→0x8100）完全连续无空隙，地址连续性也带来小幅增益。
+- 与 Case 4 相比：Case 5 快 8.1%，说明读写冲突开销大，消除后性能有提升。
 
 ## Case 6：二读一写，全冲突 + 循环展开
 
@@ -264,8 +264,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### 分析结论
 
-- index 全 0，Gather 所有 64 个元素命中同一地址 → 硬件通过地址合并将 64 次请求合并为单次读取。
-- 无subbank冲突。
+- index 全 0，Gather 所有元素命中同一地址 → 硬件通过地址合并将多次请求合并为单次读取，因此无subbank冲突。
 
 ## Case 9：离散读写，Gather指令的数据索引在[0..7]重复
 
@@ -328,23 +327,17 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
 | dst | `0x4100` | `010000010 0 000 00000` | 1 | 0 |
 
-### 搬运方式
+### UB 读写示意
 
 ![case12](./figures/case12.png)
 
-```
-i=0: src0[0..63]     → dst[0..63]
-i=1: src0[64..127]   → dst[64..127]
-...
-i=7: src0[448..511]  → dst[448..511]
-```
+### 搬运方式
 
-8 轮 × 每轮 64 元素（8 个连续 DataBlock），横着铺满 512 个 float32。
+迭代8轮 ，每轮读写8个连续DataBlock。
 
 ### 分析结论
 
-- `DATA_BLOCK_COPY` stride=1：8 个 DataBlock 连续排布（间隔 32B），等价于普通 `LoadAlign`指令。
-- 单条非连续搬运指令8个DataBlock分散到不同的bankgroup，不发生冲突。
+- 每次迭代的8个DataBlock 连续排布（间隔 32B），等价于普通 `LoadAlign`指令，此时单条非连续搬运指令8个DataBlock分散到不同的bankgroup，不发生冲突。
 
 ## Case 13：对512个（8*64）元素进行加一操作，按列计算，每次repeat读取8个不连续的DataBlock
 
@@ -358,18 +351,11 @@ i=7: src0[448..511]  → dst[448..511]
 
 ### 搬运方式
 
-```
-i=0: src0[0..7],  src0[64..71],  ..., src0[448..455]  → dst 同上
-i=1: src0[8..15], src0[72..79],..., src0[456..463]  → dst 同上
-...
-i=7: src0[56..63], ..., src0[504..511]  → dst 同上
-```
-
-8 轮 × 8 个 DataBlock，每个 DataBlock 间隔 **256B（stride=8 × 32B = 64 float）**，竖着覆盖 512 个 float32。
+迭代8轮 ，每轮读写8个DataBlock，每个DataBlock间隔256B。
 
 ### 分析结论
 
-- `DATA_BLOCK_COPY` stride=8：8 个 DataBlock 均从 bankgroup0 的不同 depth 行读取，命中**同 bank group 不同行**，发生bank冲突，对比case12性能劣化。
+- 每次迭代的8个DataBlock均从同一bank group的不同depth行读取，命中**同 bank group 不同行**，发生bank冲突，对比case12性能劣化。
 
 ## Case 14：一读一写，同DataBlock重复读取
 
@@ -386,19 +372,11 @@ i=7: src0[56..63], ..., src0[504..511]  → dst 同上
 
 ### 搬运方式
 
-```
-i=0: Load src0[0]    ×8 (block stride=0) → dst[0..63]
-i=1: Load src0[64]   ×8 → dst[64..127]
-...
-i=7: Load src0[448]  ×8 → dst[448..511]
-```
-
-8 轮 × 64 元素，每轮 Load srcBlockStride=0（8 个 DataBlock 均指向同一 32B 基地址），Store stride=1（连续排布）。
+迭代8轮，每轮读取的8个DataBlock均指向同一32B基地址，写回时8个DataBlock连续排布。
 
 ### 分析结论
 
-- srcBlockStride=0 时，同一 REPEAT 内 8 个 DataBlock 全部命中同一地址，硬件自动合并为单次读取，寄存器被填充为 8 份相同数据。
-- 同DataBlock重复读取几乎无额外开销。
+- 同一迭代内8个DataBlock 全部命中同一地址，硬件自动合并为单次读取，寄存器被填充为 8 份相同数据，无额外开销。
 
 ## Case 15：一读一写，每次迭代从同一首地址读取
 
@@ -412,19 +390,11 @@ i=7: Load src0[448]  ×8 → dst[448..511]
 
 ### 搬运方式
 
-```
-i=0: Load src0[0..63]   → dst[0..63]
-i=1: Load src0[0..63]   → dst[64..127]
-...
-i=7: Load src0[0..63]   → dst[448..511]
-```
-
-8 轮 × 64 元素，每轮 Load 从固定首地址 src0（不偏移），Store stride=1 连续写入不同位置。
+迭代8轮，每轮从固定首地址 src0（不偏移）读取8个连续的DataBlock，写回时8个DataBlock连续排布。
 
 ### 分析结论
 
-- 8 轮迭代均从同一个首地址加载，输出相同数据到8个DataBlock。
-- 每次迭代从同一首地址读取几乎无额外开销。
+- 8 轮迭代均从同一个首地址加载，每次迭代从同一首地址读取几乎无额外开销。
 
 ## 小结
 
@@ -475,11 +445,11 @@ source /path/to/cann/set_env.sh
 ### 编译与运行（单个 Case）
 
 ```bash
-export CASE_NUM=1          # 1-15 可选
+export SCENARIO_NUM=1          # 1-15 可选
 mkdir -p build && cd build
-cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-Ascend 950PR/Ascend 950DT -DCASE_NUM=${CASE_NUM}
+cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-Ascend 950PR/Ascend 950DT -DCASE_NUM=${SCENARIO_NUM}
 make -j
-python3 ../scripts/gen_data.py --case ${CASE_NUM}
+python3 ../scripts/gen_data.py --case ${SCENARIO_NUM}
 ./demo                     # 精度验证 + 打点性能（输出 cycles 计数到 stdout）
 python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin
 ```
@@ -496,5 +466,5 @@ bash test.sh profile     # 精度验证 + profiling
 | 选项 | 可选值 | 说明 |
 |:----:|:------:|:----|
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构版本 |
-| `CASE_NUM` | 1-13 | 切换测试场景 |
+| `SCENARIO_NUM` | 1-13 | 切换测试场景 |
 | `CMAKE_ASC_RUN_MODE` | `npu` | 上板运行模式 |
