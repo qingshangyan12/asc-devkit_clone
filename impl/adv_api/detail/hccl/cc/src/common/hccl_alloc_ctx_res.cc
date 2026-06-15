@@ -20,6 +20,15 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
 };
 
+CommEngine OpExecuteConfigToCommEngine(uint8_t &commEngine) {
+    if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::AICPU_TS) {
+        return COMM_ENGINE_AICPU;
+    } else if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
+        return COMM_ENGINE_CCU;
+    }
+    return COMM_ENGINE_RESERVED;
+}
+
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
 {   
     // 检查comm是否为空指针
@@ -71,10 +80,10 @@ HcclResult CheckIsReduce(const Mc2CcTilingInner *ccTiling, bool *isReduce)
 
 HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint8_t &commEngine)
 {
-    commEngine = static_cast<uint8_t>(COMM_ENGINE_RESERVED);
+    commEngine = static_cast<uint8_t>(OpExecuteConfig::DEFAULT);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
-        if (commEngine == static_cast<uint8_t>(COMM_ENGINE_RESERVED)) {
+        if (commEngine == static_cast<uint8_t>(OpExecuteConfig::DEFAULT)) {
             commEngine = ccTiling->commEngine;
         }
         if (ccTiling->commEngine != commEngine) {
@@ -83,8 +92,8 @@ HcclResult ObtainCommEngine(const void *ccTilingList[], uint32_t tilingNum, uint
         }
     }
     
-    if (commEngine != static_cast<uint8_t>(COMM_ENGINE_AICPU) &&
-        commEngine != static_cast<uint8_t>(COMM_ENGINE_CCU)) {
+    if (commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU_TS) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_ERROR("Invalid commEngine %u.", commEngine);
         return HCCL_E_NOT_SUPPORT;
     }
@@ -142,11 +151,11 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
         std::string tagParam = ctxTag + "_" + std::to_string(i);
         void *opParamPtr = nullptr;
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
-        if (HcclEngineCtxGet(comm, tagParam.c_str(), static_cast<CommEngine>(ccTiling->commEngine), &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
             HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%u]", tagParam.c_str(), opParamPtr, opParamSize);
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         } else {
-            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), static_cast<CommEngine>(ccTiling->commEngine), opParamSize, &opParamPtr));
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opParamSize, &opParamPtr));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         }
         HCCL_INFO("HcclAllocOpResCtx the %dth opParam: opParamAddr[%u], opParamSize[%u]", i, opParamAddr[i], opParamSize);
@@ -167,11 +176,11 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
     std::string tagWorkSpace = ctxTag + "_workSpace";
     void *workSpacePtr = nullptr;
     const Mc2CcTilingInner *ccTiling0 = static_cast<const Mc2CcTilingInner *>(ccTilingList[0]);
-    if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), &workSpacePtr, &memSize) == HCCL_SUCCESS) {
+    if (HcclEngineCtxGet(comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), &workSpacePtr, &memSize) == HCCL_SUCCESS) {
         HCCL_INFO("HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%u]", tagWorkSpace.c_str(), workSpacePtr, memSize);
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), memSize, &workSpacePtr));
+        CHK_RET(HcclEngineCtxCreate(comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     }
     HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
@@ -187,10 +196,10 @@ HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std
     // 4. 申请OpResCtx的内存空间
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
-    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), opResCtxPtr, &opResCtxSize) == HCCL_SUCCESS) {
+    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxPtr, &opResCtxSize) == HCCL_SUCCESS) {
         HCCL_INFO("HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]", tagOpResCtx.c_str(), opResCtxPtr, opResCtxSize);
     } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), opResCtxSize, opResCtxPtr));
+        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxSize, opResCtxPtr));
     }
 
     HCCL_INFO("HcclAllocOpResCtx the opResCtx: opResCtxAddr[%u], opResCtxSize[%u]", opResCtxPtr, opResCtxSize);
@@ -408,7 +417,7 @@ HcclResult InitOpParamByTiling(HcclComm comm, void *stream, const std::string &t
 {
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
-    opParam.engine = static_cast<CommEngine>(ccTiling->commEngine);
+    opParam.engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
