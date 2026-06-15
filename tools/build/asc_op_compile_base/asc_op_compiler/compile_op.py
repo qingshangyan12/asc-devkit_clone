@@ -1398,6 +1398,7 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
     kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
 
     compile_option_tuple.compile_options.append('-DASCENDC_TPL_KERNEL')
+    compile_option_tuple.compile_options.append('-g')
     distinct_tag = CommonUtility.get_distinct_filename_tag()
     compile_log_path = None
     if global_var_storage.get_variable("ascendc_compile_debug_config"):
