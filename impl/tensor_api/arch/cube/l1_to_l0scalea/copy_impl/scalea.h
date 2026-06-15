@@ -31,6 +31,7 @@ class LoadDataL12L0MxScaleA3510 {
 public:
     template <const CopyL12L0ScaleATrait& trait, typename T, typename U>
     __aicore__ inline static void Run(const T& dst, const U& src) {
+        CheckTemplate<trait, T, U>();
         if constexpr (T::layoutType::depth == FIVE_DIM_DATA) {
             BatchLoadDataImpl<trait, T, U>(dst, src);
         } else if constexpr (T::layoutType::depth == FOUR_DIM_DATA) {
@@ -50,12 +51,10 @@ private:
         CheckLayoutPattern<T, U>();
     }
 
-    template <const CopyL12L0ScaleATrait& trait, typename T, typename U>
-    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
+    template <typename DstT, typename SrcT, typename DstLayoutT, typename SrcLayoutT>
+    __aicore__ inline static void LoadDataFractal(const DstT& dst, const SrcT& src,
+        const DstLayoutT& dstLayout, const SrcLayoutT& srcLayout)
     {
-        CheckTemplate<trait, T, U>();
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
         uint16_t mStartPosition = 0;
         uint16_t kStartPosition = 0;
         auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstLayout);
@@ -68,23 +67,23 @@ private:
     }
 
     template <const CopyL12L0ScaleATrait& trait, typename T, typename U>
+    __aicore__ inline static void LoadDataImpl(const T& dst, const U& src)
+    {
+        LoadDataFractal(dst, src, dst.Layout(), src.Layout());
+    }
+
+    template <const CopyL12L0ScaleATrait& trait, typename T, typename U>
     __aicore__ inline static void BatchLoadDataImpl(const T& dst, const U& src)
     {
-        CheckTemplate<trait, T, U>();
-        auto dstLayout = dst.Layout();
-        auto srcLayout = src.Layout();
-        auto dstNoBatchLayout = RemoveBatchDim(dstLayout);
-        auto srcNoBatchLayout = RemoveBatchDim(srcLayout);
-        uint16_t mStartPosition = 0;
-        uint16_t kStartPosition = 0;
-        auto mStep = GetElement<AttrInfo::Shape, AttrInfo::Row, 1>(dstNoBatchLayout);
-        mStep *= Get<0>(dstLayout.Shape());
-        auto kStep = GetElement<AttrInfo::Shape, AttrInfo::Column, 1>(dstNoBatchLayout);
-        auto srcStride = GetElement<AttrInfo::Stride, AttrInfo::Row, 1>(srcNoBatchLayout) >> 5;
-        auto dstStride = kStep;
-        uint64_t mxDstAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.Data().Get()));
-        LoadCbufToL0MxScaleA3510::LoadData(mxDstAddr, src, mStartPosition, kStartPosition, mStep, kStep,
-            srcStride, dstStride);
+        auto dstNoBatchLayout = RemoveBatchDim(dst.Layout());
+        auto srcNoBatchLayout = RemoveBatchDim(src.Layout());
+        auto batchNum = Get<0>(dst.Layout().Shape());
+        for (uint32_t i = 0; i < batchNum; ++i) {
+            LoadDataFractal(
+                dst(MakeCoord(i, MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0)))),
+                src(MakeCoord(i, MakeCoord(MakeCoord(0, 0), MakeCoord(0, 0)))),
+                dstNoBatchLayout, srcNoBatchLayout);
+        }
     }
 };
 } // namespace Te
