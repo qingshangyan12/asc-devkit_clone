@@ -28,7 +28,7 @@ fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char *custo
 }
 PlatformAscendC* PlatformAscendCManager::PlatformAscendCManagerInit(const char *customSocVersion)
 {
-    fe::PlatFormInfos pfs;
+    static fe::PlatFormInfos pfs;
     static PlatformAscendC pfc(&pfs);
     platformInfo = &pfc;
     return nullptr;

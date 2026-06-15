@@ -287,8 +287,10 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
             ptr->usertag = -1;
             curPoolAddr += len;
         }
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         ASCENDC_ASSERT((curPoolAddr <= bufferInitLen.at(pool)), {
             KERNEL_LOG(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool)); });
+#endif
         Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] = curPoolAddr;
         this->g_tpipeImpl.curBufSize_ += num;
         ASCENDC_ASSERT((this->g_tpipeImpl.curBufSize_ < QBUF_MAX_LEN), {
@@ -334,9 +336,11 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
     ptr->usertag = -1;
     curPoolAddr += len;
     ptr++;
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_ASSERT((curPoolAddr <= bufferInitLen.at(pool)), {
         KERNEL_LOG(KERNEL_ERROR, "curPoolAddr is %d, exceeds the limit %d", curPoolAddr, bufferInitLen.at(pool));
     });
+#endif
     Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] = curPoolAddr;
     this->g_tpipeImpl.curBufSize_ += 1;
     ASCENDC_ASSERT((this->g_tpipeImpl.curBufSize_ < QBUF_MAX_LEN), {
@@ -379,8 +383,10 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len)
         reinterpret_cast<uint64_t>(&bufPool.tBufPoolImpl));
 #endif
     curPoolAddr += len;
+#if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     ASCENDC_ASSERT((curPoolAddr <= bufferInitLen.at(pool)),
         { KERNEL_LOG(KERNEL_ERROR, "curPoolAddr is %d, limits is %d", curPoolAddr, bufferInitLen.at(pool)); });
+#endif
     Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(pool)] = curPoolAddr;
     ASCENDC_ASSERT(
         (Internal::g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::L1)] <= this->g_tpipeImpl.tscmBufferPtr_), {
