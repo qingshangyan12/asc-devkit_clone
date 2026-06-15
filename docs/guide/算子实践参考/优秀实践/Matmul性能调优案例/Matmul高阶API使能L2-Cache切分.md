@@ -1,12 +1,12 @@
-# Matmul高阶API使能L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
+# Matmul高阶API开启L2 Cache切分<a name="ZH-CN_TOPIC_0000002341067578"></a>
 
 ## 案例介绍<a name="section5590915836"></a>
 
-本案例呈现了在Matmul计算过程中，输入和输出的数据总量超过L2 Cache大小时，通过L2 Cache数据切分对算子性能的提升效果。使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。
+本案例呈现了在Matmul计算过程中，输入和输出的数据总量超过L2 Cache大小时，通过L2 Cache数据切分对算子性能的提升效果。开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.2/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。
 
 本案例使用的AI处理器的L2 Cache大小为192MB，L2 Cache纯读带宽约为GM的3到4倍，两者之间存在较大差距。在搬入或搬出相同数据量的情况下，访问L2 Cache内的数据比访问GM更快。若数据无法命中L2 Cache，即需要访问的数据不在L2 Cache内，导致需要访问GM进行读写，带宽利用效率较低，最终算子搬入或搬出数据成为算子整个运行过程的性能瓶颈。
 
--   使能L2 Cache切分的适用场景
+-   开启L2 Cache切分的适用场景
 
     输入和输出的数据量超过L2 Cache的大小。
 
@@ -52,7 +52,7 @@
 
 ## 分析主要瓶颈点<a name="section10759361232"></a>
 
-当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API使能Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
+当前案例基于Tiling全量常量化进一步优化，Tiling全量常量化请参考[Matmul高阶API开启Tiling全量常量化](Matmul高阶API使能Tiling全量常量化.md)案例。优化前的Profiling数据如下，C列的aic\_time是867us，K列的aic\_mte2\_time是861.9us，MTE2占比为99%，MTE2数据搬运是当前算子性能的瓶颈。
 
 ![](../../../figures/zh-cn_image_0000002410305297.png)
 
@@ -84,7 +84,7 @@
     **图 3**  优化点三示意图<a name="fig12727153717911"></a>  
     ![](../../../figures/优化点三示意图.png "优化点三示意图")
 
-Matmul API使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。实现L2 Cache切分的关键步骤如下：
+Matmul API开启L2 Cache切分的完整样例请参考[L2 Cache切分的算子样例](https://gitcode.com/cann/asc-devkit/tree/9.1.0-beta.2/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_l2cache)。实现L2 Cache切分的关键步骤如下：
 
 1.  判断是否需要进行L2 Cache切分。如果数据总量超过设定的L2 Cache大小，则计算L2 Cache切分数目。
 
@@ -175,5 +175,4 @@ Matmul API使能L2 Cache切分的完整样例请参考[L2 Cache切分的算子�
 
 ## 总结<a name="section1593812115413"></a>
 
-在Matmul计算数据量超过L2 Cache大小的场景下，可以考虑使能L2 Cache切分，提高L2 Cache命中率，利用L2 Cache高带宽特性提升算子性能。
-
+在Matmul计算数据量超过L2 Cache大小的场景下，可以考虑开启L2 Cache切分，提高L2 Cache命中率，利用L2 Cache高带宽特性提升算子性能。
