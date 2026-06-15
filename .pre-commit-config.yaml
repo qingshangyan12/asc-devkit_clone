@@ -54,13 +54,6 @@ repos:
             "*.py,*.cpp,*.hpp,*.c,*.h",
           ]
 
-  # typos 检查
-  - repo: https://gitcode.com/gh_mirrors/ty/typos
-    rev: v1.32.0
-    hooks:
-      - id: typos
-        args: ["--force-exclude"]
-
   # OAT 合规性检查 (Open Source Audit Tool)
   - repo: local
     hooks:

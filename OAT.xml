@@ -19,7 +19,6 @@
                 <filteritem type="filename" name="*.json" desc="metadata or configuration file"/>
                 <filteritem type="filename" name="*.md" desc="documentation file"/>
                 <filteritem type="filename" name="*.png" desc="image file"/>
-                <filteritem type="filename" name="*.toml" desc="configuration file"/>
                 <filteritem type="filename" name="*.cpp.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.h.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.ini.txt" desc="generated configuration fixture file"/>
@@ -43,7 +42,6 @@
                 <filteritem type="filename" name="*.json" desc="metadata or configuration file"/>
                 <filteritem type="filename" name="*.md" desc="documentation file"/>
                 <filteritem type="filename" name="*.png" desc="image file"/>
-                <filteritem type="filename" name="*.toml" desc="configuration file"/>
                 <filteritem type="filename" name="*.cpp.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.h.txt" desc="generated source fixture file"/>
                 <filteritem type="filename" name="*.ini.txt" desc="generated configuration fixture file"/>
