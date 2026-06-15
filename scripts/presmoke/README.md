@@ -49,7 +49,7 @@ Run one case:
 
 ```bash
 bash scripts/run_presmoke.sh \
-  --filter 01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad_unitflag
+  --filter 01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag
 ```
 
 Write reports to a specific directory:
@@ -160,6 +160,7 @@ They preserve the required custom-op ordering:
 - `aclnn`, `aclop`, `onnx`, `tensorflow`, and `tiling_sink` run after `custom_op`.
 
 New cases not listed in a schedule file are appended to the end, then the custom-op dependency order is enforced again.
+The full watch entry enables strict fixed-schedule coverage checks by default, so stale or missing entries fail fast.
 
 To regenerate a fixed schedule from a previous run:
 

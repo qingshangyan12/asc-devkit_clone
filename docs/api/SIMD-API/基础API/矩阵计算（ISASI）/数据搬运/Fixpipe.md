@@ -203,7 +203,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 <tr id="row162252057304"><td class="cellrowborder" valign="top" width="14.08%" headers="mcps1.2.3.1.1 "><p id="p182256513019"><a name="p182256513019"></a><a name="p182256513019"></a>S</p>
 </td>
 <td class="cellrowborder" valign="top" width="85.92%" headers="mcps1.2.3.1.2 "><p id="p973319214339"><a name="p973319214339"></a><a name="p973319214339"></a>cbufWorkspace的数据类型。</p>
-<a name="ul7112101853218"></a><a name="ul7112101853218"></a><ul id="ul7112101853218"><li>当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。</li><li>当目的操作数、源操作数、cbufWorkspace使用<a href="../../../基础数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。</li></ul>
+<a name="ul7112101853218"></a><a name="ul7112101853218"></a><ul id="ul7112101853218"><li>当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。</li><li>当目的操作数、源操作数、cbufWorkspace使用<a href="../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。</li></ul>
 <p id="p187025511315"><a name="p187025511315"></a><a name="p187025511315"></a>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。</p>
 </td>
 </tr>
@@ -225,7 +225,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="10.291029102910292%" headers="mcps1.2.4.1.2 "><p id="p5590551181016"><a name="p5590551181016"></a><a name="p5590551181016"></a>输出</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p255711621817"><a name="p255711621817"></a><a name="p255711621817"></a>目的操作数，类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>或<a href="../../../基础数据结构/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</p>
+<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p255711621817"><a name="p255711621817"></a><a name="p255711621817"></a>目的操作数，类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>或<a href="../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a>。</p>
 <a name="ul16146134605518"></a><a name="ul16146134605518"></a><ul id="ul16146134605518"><li>针对LocalTensor：<p id="p81673546560"><a name="p81673546560"></a><a name="p81673546560"></a><span id="ph16979343205618"><a name="ph16979343205618"></a><a name="ph16979343205618"></a><term id="zh-cn_topic_0000001312391781_term354143892110_1"><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a><a name="zh-cn_topic_0000001312391781_term354143892110_1"></a>Atlas 200I/500 A2 推理产品</term></span>，支持的数据类型为：int8_t、uint8_t、half、bfloat16_t、float、half、int32_t。</p>
 <p id="p1463883873214"><a name="p1463883873214"></a><a name="p1463883873214"></a><span id="ph1263893863210"><a name="ph1263893863210"></a><a name="ph1263893863210"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：int8_t、uint8_t、half、bfloat16_t、float、half、int32_t。</p>
 </li><li>针对GlobalTensor：<p id="p71581752135517"><a name="p71581752135517"></a><a name="p71581752135517"></a><span id="ph14920205581619"><a name="ph14920205581619"></a><a name="ph14920205581619"></a>Ascend 950PR/Ascend 950DT</span>，支持的数据类型为：int8_t、uint8_t、hifloat8_t、fp8_e4m3fn_t、half、bfloat16_t、int32_t、float。</p>
@@ -242,7 +242,7 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};</pre>
 </td>
 <td class="cellrowborder" valign="top" width="10.291029102910292%" headers="mcps1.2.4.1.2 "><p id="p628711148165"><a name="p628711148165"></a><a name="p628711148165"></a>输入</p>
 </td>
-<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p49136785815"><a name="p49136785815"></a><a name="p49136785815"></a>源操作数，支持的TPosition为CO1，为Mmad接口计算的结果，类型为LocalTensor数据结构的定义请参考<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>。支持的数据类型为float/int32_t，支持的TPosition为CO1，数据格式为NZ格式。起始地址需要满足64B对齐。</p>
+<td class="cellrowborder" valign="top" width="75.52755275527552%" headers="mcps1.2.4.1.3 "><p id="p49136785815"><a name="p49136785815"></a><a name="p49136785815"></a>源操作数，支持的TPosition为CO1，为Mmad接口计算的结果，类型为LocalTensor数据结构的定义请参考<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>。支持的数据类型为float/int32_t，支持的TPosition为CO1，数据格式为NZ格式。起始地址需要满足64B对齐。</p>
 </td>
 </tr>
 <tr id="row0800184819273"><td class="cellrowborder" valign="top" width="14.18141814181418%" headers="mcps1.2.4.1.1 "><p id="p4800104842720"><a name="p4800104842720"></a><a name="p4800104842720"></a>intriParams</p>
@@ -550,7 +550,7 @@ struct TransformParams&lt;CO2Layout::COLUMN_MAJOR&gt; {
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为40 \* 16个元素。
 
 **图 1**  不使能NZ2ND参数的单搬运模式设置示意图、<a name="fig128961542184620"></a>  
-![](../../../../figures/不使能NZ2ND参数的单搬运模式设置示意图.png "不使能NZ2ND参数的单搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数的单搬运模式设置示意图.png "不使能NZ2ND参数的单搬运模式设置示意图")
 
 双目标控制模式：
 
@@ -571,7 +571,7 @@ M方向切分：
 -   dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中UB0（或UB1）中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40 \*  16个元素。
 
 **图 2**  不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
-![](../../../../figures/不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
 
 使能NZ2ND的情况下，参数设置示例和解释说明如下：
 
@@ -585,7 +585,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 3**  使能NZ2ND参数设置示意图<a name="fig79783143556"></a>  
-![](../../../../figures/使能NZ2ND参数设置示意图.png "使能NZ2ND参数设置示意图")
+![](../../../../figures/开启NZ2ND参数设置示意图.png "使能NZ2ND参数设置示意图")
 
 单搬入模式
 
@@ -599,7 +599,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
 **图 4**  使能NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
-![](../../../../figures/使能NZ2ND参数的单搬入模式设置示意图.png "使能NZ2ND参数的单搬入模式设置示意图")
+![](../../../../figures/开启NZ2ND参数的单搬入模式设置示意图.png "使能NZ2ND参数的单搬入模式设置示意图")
 
 双搬入模式
 
@@ -614,7 +614,7 @@ M方向切分：
 -   dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
     **图 5**  使能NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
-    ![](../../../../figures/使能NZ2ND参数双搬入模式设置示意图.png "使能NZ2ND参数双搬入模式设置示意图")
+    ![](../../../../figures/开启NZ2ND参数双搬入模式设置示意图.png "使能NZ2ND参数双搬入模式设置示意图")
 
 使能NZ2DN的情况下，参数设置示例和解释说明如下：
 
@@ -632,7 +632,7 @@ M方向切分：
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 80 =3840个元素。
 
 **图 6**  使能NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
-![](../../../../figures/使能NZ2DN单搬运模式示意图1.png "使能NZ2DN单搬运模式示意图1")
+![](../../../../figures/开启NZ2DN单搬运模式示意图1.png "使能NZ2DN单搬运模式示意图1")
 
 单搬运模式：
 
@@ -648,7 +648,7 @@ M方向切分：
 -   dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 60 = 2880个元素。
 
 **图 7**  使能NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
-![](../../../../figures/使能NZ2DN单搬运模式示意图2.png "使能NZ2DN单搬运模式示意图2")
+![](../../../../figures/开启NZ2DN单搬运模式示意图2.png "使能NZ2DN单搬运模式示意图2")
 
 ## 约束说明<a name="section205941531307"></a>
 
@@ -659,7 +659,7 @@ M方向切分：
 
 ## 调用示例<a name="section93513321362"></a>
 
--   示例一：通路CO1-\>GM。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/03_matrix_compute/fixpipe_l0c2gm)。
+-   示例一：通路CO1-\>GM。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm)。
 
     ```
         AscendC::GlobalTensor<outputType> cGM;
@@ -680,7 +680,7 @@ M方向切分：
         AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
     ```
 
--   示例二：通路CO1-\>C1。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8\_t，不使能Nz2Nd的格式转换，使能Scalar量化。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
+-   示例二：通路CO1-\>C1。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8\_t，不使能Nz2Nd的格式转换，使能Scalar量化。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1)。
 
     ```
         AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
@@ -725,7 +725,7 @@ M方向切分：
     #endif
     ```
 
--   示例三：通路CO1-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/03_matrix_compute/fixpipe_l0c2ub)。
+-   示例三：通路CO1-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置使能Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)。
 
     ```
     AscendC::LocalTensor<outputType> cUB;
@@ -738,4 +738,3 @@ M方向切分：
     fixpipeParams.dstStride = baseN;
     AscendC::Fixpipe<outputType, l0cType, CFG_ROW_MAJOR_UB>(cUB, c, fixpipeParams);
     ```
-

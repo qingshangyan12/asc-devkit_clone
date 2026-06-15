@@ -111,7 +111,7 @@ $$
 | count        | 输入      | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。 |
 | mask/mask[]  | 输入      | mask用于控制每次迭代内参与计算的元素。<br>设置详见[掩码操作](../SIMD计算说明/掩码/掩码.md) |
 | repeatTime   | 输入      | 重复迭代次数。<br>矢量计算单元，每次读取连续的256字节数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分API](../SIMD计算说明/高维切分.md)。 |
-| repeatParams | 输入      | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md#地址间隔配置)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md#地址间隔配置)。 |
+| repeatParams | 输入      | 控制操作数地址步长的参数。[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md#地址间隔配置)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md#地址间隔配置)。 |
 
 ## 数据类型<a name="zh-cn_topic_0000002547893099_section4219135304818"></a>
 
@@ -230,7 +230,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请参考完整样例[复合计算样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/element_wise_compound_compute)。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请参考完整样例[复合计算样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_compound_compute)。
 
 - tensor高维切分计算样例-mask连续模式。
 

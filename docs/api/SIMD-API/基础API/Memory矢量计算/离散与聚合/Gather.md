@@ -64,7 +64,7 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
         dst[i] = src[(srcBaseAddr + srcOffset[i]) // inputType.itemsize]
 ```
 
-完整示例请参考：[Gather真值计算](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)。
+完整示例请参考：[Gather真值计算](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)。
 
 ## 函数原型<a name="section15660625202219"></a>
 
@@ -102,7 +102,7 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dst | 输出 | 目的操作数，类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br><br>LocalTensor的起始地址需要按照32字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br><br>LocalTensor的起始地址需要按照32字节对齐。<br><br>数据类型和dst保持一致。 |
 | srcOffset | 输入 | 每个元素在src中对应的地址偏移，类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br><br>LocalTensor的起始地址需要32字节对齐。<br><br>该偏移量相对于src的起始基地址而言。单位为字节。取值要求见[约束说明](#约束说明)。 |
 | srcBaseAddr | 输入 | 用于指定Gather操作中源操作数的起始位置，单位为字节。取值应保证src元素类型位宽对齐，否则会导致非预期行为。 |
@@ -157,7 +157,7 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 
 ## 调用示例<a name="section11276201527"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景三中Compute函数的部分代码即可。
 
 - tensor高维切分计算样例-mask连续模式。
 

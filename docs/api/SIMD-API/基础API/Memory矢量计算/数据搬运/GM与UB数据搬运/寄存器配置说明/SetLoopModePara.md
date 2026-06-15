@@ -18,7 +18,7 @@
 
 DataCopy、DataCopyPad过程中通过该接口使能loop mode并且设置loop mode的参数，在数据搬运结束后通过[ResetLoopModePara](ResetLoopModePara.md)重置loop mode的参数。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../../../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -156,4 +156,4 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
     AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
-完整样例请参考[DataCopyPad样例场景4、5、6](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。
+完整样例请参考[DataCopyPad样例场景4、5、6](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。

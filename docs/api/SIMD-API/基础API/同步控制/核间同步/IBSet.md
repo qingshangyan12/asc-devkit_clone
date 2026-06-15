@@ -74,8 +74,8 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。 |
-| ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。 |
+| ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | blockIdx | 输入 | 表示等待核的idx号，取值范围：[0, 核数-1]。 |
 | eventID | 输入 | 用来控制当前核的set、wait事件。 |
 
@@ -108,4 +108,4 @@ if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行�
 }
 ```
 
-完整样例请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/05_sync_control/ib_set_wait)。
+完整样例请参考[IBSet与IBWait核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/ib_set_wait)。

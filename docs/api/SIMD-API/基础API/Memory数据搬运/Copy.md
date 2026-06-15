@@ -132,7 +132,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p755318134134"><a name="p755318134134"></a><a name="p755318134134"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p65530137137"><a name="p65530137137"></a><a name="p65530137137"></a>目的操作数。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。</p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a>类型为<a href="../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。</p>
 </td>
 </tr>
 <tr id="row6553613191315"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="p195531113161311"><a name="p195531113161311"></a><a name="p195531113161311"></a>src</p>
@@ -140,7 +140,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p155310135134"><a name="p155310135134"></a><a name="p155310135134"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p158685516535"><a name="p158685516535"></a><a name="p158685516535"></a>源操作数。</p>
-<p id="p138399710538"><a name="p138399710538"></a><a name="p138399710538"></a>类型为<a href="../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。</p>
+<p id="p138399710538"><a name="p138399710538"></a><a name="p138399710538"></a>类型为<a href="../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。起始地址需要保证32字节对齐。</p>
 <p id="p1955311137135"><a name="p1955311137135"></a><a name="p1955311137135"></a>源操作数的数据类型需要与目的操作数保持一致。</p>
 </td>
 </tr>
@@ -167,7 +167,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 <td class="cellrowborder" valign="top" width="11.93%" headers="mcps1.2.4.1.2 "><p id="p135541313101314"><a name="p135541313101314"></a><a name="p135541313101314"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="71.58%" headers="mcps1.2.4.1.3 "><p id="p51982261556"><a name="p51982261556"></a><a name="p51982261556"></a>重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。</p>
-<p id="p17845145813432"><a name="p17845145813432"></a><a name="p17845145813432"></a>关于该参数的具体描述请参考<span id="zh-cn_topic_0000001530181537_ph43961850144019"><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a href="https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/C++类库API/基础API/接口分类说明/高维切分API.md" target="_blank" rel="noopener noreferrer">高维切分API</a></span>。</p>
+<p id="p17845145813432"><a name="p17845145813432"></a><a name="p17845145813432"></a>关于该参数的具体描述请参考<span id="zh-cn_topic_0000001530181537_ph43961850144019"><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a name="zh-cn_topic_0000001530181537_ph43961850144019"></a><a href="../Memory矢量计算/SIMD计算说明/高维切分.md" target="_blank" rel="noopener noreferrer">高维切分API</a></span>。</p>
 </td>
 </tr>
 <tr id="row195541813181310"><td class="cellrowborder" valign="top" width="16.49%" headers="mcps1.2.4.1.1 "><p id="p15554121320132"><a name="p15554121320132"></a><a name="p15554121320132"></a>repeatParams</p>
@@ -222,7 +222,7 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
 
 ## 调用示例<a name="section1227835243314"></a>
 
-本示例仅展示Compute流程中的部分代码。如需运行，请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/00_data_movement/copy_ub2ub)实现完整的代码。
+本示例仅展示Compute流程中的部分代码。如需运行，请参考[Copy样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub)实现完整的代码。
 
 本示例中操作数数据类型为int16\_t。
 
@@ -275,4 +275,3 @@ VECIN，VECCALC，VECOUT之间的搬运指令，支持mask操作和DataBlock间�
     输出数据dstLocal:
     [9 -2 8 ... 9]
     ```
-
