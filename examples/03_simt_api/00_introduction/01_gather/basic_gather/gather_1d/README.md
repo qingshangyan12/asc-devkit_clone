@@ -24,7 +24,7 @@
 ## 算子描述
 
 - 算子功能：  
-  gather_1d算子实现了从shape为[100000]的一维输入向量中，根据index中每个元素获取1个数据的功能。算子输出output第i个元素计算公式为：
+  gather_1d算子实现了从shape为[100000]的一维输入张量中，根据index中每个元素获取1个数据的功能。算子输出output第i个元素计算公式为：
 
   ```text
   output[i] = input[index[i]]
