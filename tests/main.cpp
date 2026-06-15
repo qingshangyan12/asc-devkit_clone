@@ -12,5 +12,6 @@
 int32_t main(int32_t argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int32_t ret = RUN_ALL_TESTS();
+    _Exit(ret);
 }
