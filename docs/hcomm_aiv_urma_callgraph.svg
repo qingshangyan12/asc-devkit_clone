@@ -8,7 +8,7 @@
 </filter>
 </defs>
 <rect width="1200" height="980" fill="#f8fafc"/>
-<text x="600" y="35" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="18" fill="#1e293b" text-anchor="middle" font-weight="bold">HcommImpl&lt;COMM_PROTOCOL_UBC_CTP&gt; AIV直驱URMA 代码逻辑调用图</text>
+<text x="600" y="35" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="18" fill="#1e293b" text-anchor="middle" font-weight="bold">AIV直驱URMA代码逻辑图</text>
 <rect x="30" y="55" width="1140" height="110" rx="12" fill="#e0e7ff" stroke="#4f46e5" stroke-width="1.5" opacity="1.0"/>
 <text x="90" y="75" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="14" fill="#4f46e5" text-anchor="middle" font-weight="bold">用户调用层</text>
 <rect x="100" y="95" width="150" height="50" rx="8" fill="#ffffff" stroke="#4f46e5" stroke-width="2" opacity="1.0"/>

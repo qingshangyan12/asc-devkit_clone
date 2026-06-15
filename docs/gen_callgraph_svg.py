@@ -76,7 +76,7 @@ def build_svg():
     parts.append(f'<rect width="{W}" height="{H}" fill="{C_BG}"/>')
 
     # ─── Title ───
-    parts.append(text(W // 2, 35, "HcommImpl&lt;COMM_PROTOCOL_UBC_CTP&gt; AIV直驱URMA 代码逻辑调用图",
+    parts.append(text(W // 2, 35, "AIV直驱URMA代码逻辑图",
                       size=18, bold=True, font=TITLE_FONT))
 
     # ═══════════════════════════════════════════════════════════════════
