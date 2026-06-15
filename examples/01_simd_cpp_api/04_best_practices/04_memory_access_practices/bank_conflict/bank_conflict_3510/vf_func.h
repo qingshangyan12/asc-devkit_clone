@@ -57,22 +57,6 @@ __simd_vf__ inline void AddWithInstrLoadVF(__ubuf__ T* src0, __ubuf__ T* src1, _
 }
 
 template <typename T>
-__simd_vf__ inline void AddsVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
-{
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    AscendC::Reg::RegTensor<T> reg0, reg1, reg2, reg3;
-    constexpr uint16_t mainRepeatTimes = repeatTimes / 2;
-    for (uint16_t i = 0; i < mainRepeatTimes; ++i) {
-        AscendC::Reg::LoadAlign(reg0, src0 + oneRepSize * i);
-        AscendC::Reg::LoadAlign(reg1, src0 + oneRepSize * (mainRepeatTimes + i));
-        AscendC::Reg::Adds(reg2, reg0, (T)0, mask);
-        AscendC::Reg::Adds(reg3, reg1, (T)0, mask);
-        AscendC::Reg::StoreAlign(dst + oneRepSize * i, reg2, mask);
-        AscendC::Reg::StoreAlign(dst + oneRepSize * (mainRepeatTimes + i), reg3, mask);
-    }
-}
-
-template <typename T>
 __simd_vf__ inline void AddsVFWithStride1(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     // 横着搬运512个数: 8轮×64元素
