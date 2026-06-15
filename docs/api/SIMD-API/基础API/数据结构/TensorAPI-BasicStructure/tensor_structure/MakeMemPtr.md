@@ -10,7 +10,7 @@
 
 需要包含的头文件为：#include "tensor_api/tensor.h"。
 
-MakeMemPtr用于构造带物理存储位置标记和数据类型信息的内存指针适配器HardwareMemPtr。支持的物理位置如[表](#支持的物理位置)所示。
+MakeMemPtr用于构造带物理存储位置标记和数据类型信息的内存指针适配器HardwareMemPtr，支持的物理位置如下表所示。
 
 MakeMemPtr提供三种调用形式：
 

@@ -201,7 +201,7 @@ Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 
     下面是一个连续的NN Layout示例。
 
-   ```cpp
+    ```cpp
     Layout = ((Shape) : (Stride))
     Shape = ((_2{}, row / _2{}), (_16{}, ceil_div(column, _16{})))
     Stride = ((_1{}, _32{}), (_2{}, row * _16{}))
