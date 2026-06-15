@@ -49,14 +49,14 @@ UB 18 位地址编码遵循如下规则：
 
 | case | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | src0/src1/dst 首地址分布在不同 bank group 的不同 bank | 无读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 | 基线性能参照 |
-| 2 | dst = src0 + src1 | src0/src1 首地址在同一个 bank | **有读读冲突** | 0 | 0x4000 | 0x10000 | 4195 | 验证同 bank 读读冲突 |
-| 3 | dst = src0 + src1 | src0/src1 首地址在同一个 bank group | **有读读冲突** | 0 | 0x10000 | 0x14100 | 4195 | 验证同 bank group 读读冲突 |
+| 1 | dst = src0 + src1 | src0/src1/dst 首地址分布在不同 bank group 的不同 bank | 无读读、读写冲突 | 0 | 0x10100 | 0x20000 | 2418 | 基线性能参照（无bank冲突） |
+| 2 | dst = src0 + src1 | src0/src1 首地址在同一个 bank | **有读读冲突** | 0 | 0x4000 | 0x10000 | 4195 | 验证读读冲突（多个读操作访问同一个bank） |
+| 3 | dst = src0 + src1 | src0/src1 首地址在同一个 bank group | **有读读冲突** | 0 | 0x10000 | 0x14100 | 4195 | 验证读读冲突（多个读操作访问同一个bank group） |
 | 4 | dst = src0 + src1 | src0/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x4000 | 2501 | 作为 case 5 的基线参照 |
-| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 对比 case 4，验证读写冲突 |
-| 6 | dst = src0 + src1 | src1/dst 首地址在同一个 bank | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x10100 | 2501 | src1/dst 地址重叠基线参照 |
-| 7 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 首地址重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 case 8/case 6，验证 src0RepStride 影响 |
-| 8 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 首地址重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 case 7，验证 src0RepStride=8 消除冲突 |
+| 5 | dst = src0 + src1 | src0/dst 首地址不在同一个 bank | **有读写冲突** | 0 | 0x10100 | 0x4020 | 3612 | 验证读写冲突（对比case5） |
+| 6 | dst = src0 + src1 | src1/dst 首地址在同一个 bank，<br>src1/dst 地址完全重叠 | 无读写冲突（硬件优化） | 0 | 0x10100 | 0x10100 | 2501 | 验证src/dst地址重叠（无读写冲突，硬件优化） |
+| 7 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=1），<br>src1/dst 地址完全重叠 | **有读读冲突** | 0 | 0x10100 | 0x10100 | 3778 | 对比 case 6/case 8，验证 src0RepStride 配置跟bank冲突的关联 |
+| 8 | dst = src0 + src1 | src0 每次repeat重复读取同一 datablock（src0BlkStride=0, src0RepStride=8），<br>src1/dst 地址完全重叠 | 无读读、读写冲突 | 0 | 0x10100 | 0x10100 | 2501 | 对比 case 7，验证 src0RepStride 配置跟bank冲突的关联 |
 
 各 case 的详细分析见下文对应章节。
 
@@ -212,7 +212,7 @@ UB 18 位地址编码遵循如下规则：
 
 分析结果：src0 与 dst 每次 repeat 都会访问到相同的 bank，导致读写冲突。
 
-## Case 6：src1/dst 首地址在同一个 bank——无读写冲突（硬件优化）
+## Case 6：src1/dst 首地址在同一个 bank，src1/dst 地址重叠——无读写冲突（硬件优化）
 
 ### 地址解码
 
@@ -335,6 +335,6 @@ UB 18 位地址编码遵循如下规则：
 
 ## 小结
 
-- 读读冲突：只要两个读操作访问同一 bank group（不论 bank_id 是否相同），即触发读读冲突。（同一个bank group只有1组读口和1组写口，写写冲突类似）
+- 读读冲突：只要两个读操作访问同一 bank group（不论 bank_id 是否相同），即触发读读冲突。
 - 读写冲突：读写操作访问同一 bank，会触发读写冲突（同一个bank一拍只能1读或1写）。例外情况：读操作与写操作repeat首个datablock在同一个bank，后面的7个datablock也分别在同一个bank，硬件可将写入延后 1 个 repeat 以规避读写冲突的情况。
 - blkStride=0的场景：repeat内不会重复读取，只读1次。repStride=0的场景：repeat间不会重复读取，只读1次。

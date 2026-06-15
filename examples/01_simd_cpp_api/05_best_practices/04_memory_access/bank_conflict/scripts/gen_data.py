@@ -11,19 +11,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-"""
-gen_data.py — bank_conflict 样例数据生成
-
-支持 CASE_NUM=1~8，按地址重叠关系分两类优化：
-
-  1. CASE 1~5 — z 与 x/y 无地址重叠
-     1000 次 z = x + y 幂等，golden = x + y，无需循环。
-
-  2. CASE 6, 7, 8 — z == y（完全重叠），单次 Add 内无跨 repeat 干扰
-     每次迭代 result += src0_pattern，需逐次累加以保证 float32 精度一致。
-     src0_pattern 根据 src0BlkStride / src0RepStride 构建。
-"""
-
 import numpy as np
 import os
 import argparse
@@ -36,19 +23,7 @@ REPEAT_TIMES = TOTAL_LENGTH // ITEMS_PER_ITER  # 64
 DATABLOCK_FLOATS = 8                      # 32 bytes / sizeof(float) = 8 floats per DataBlock
 NUM_BLOCKS_PER_REPEAT = ITEMS_PER_ITER // DATABLOCK_FLOATS  # 8
 
-# ---- 地址配置 (来自 config.h，单位: 字节) ----
-ADDR_CONFIGS = {
-    1: (0x00000, 0x10100, 0x20000),
-    2: (0x00000, 0x04000, 0x10000),
-    3: (0x00000, 0x10000, 0x14100),
-    4: (0x00000, 0x10100, 0x04000),
-    5: (0x00000, 0x10100, 0x04020),
-    6: (0x00000, 0x10100, 0x10100),
-    7: (0x00000, 0x10100, 0x10100),
-    8: (0x00000, 0x10100, 0x10100),
-}
-
-# ---- BinaryRepeatParams: (dstBlkS, src0BlkS, src1BlkS, dstRepS, src0RepS, src1RepS) ----
+# ---- BinaryRepeatParams: (dstBlkStride, src0BlkStride, src1BlkStride, dstRepStride, src0RepStride, src1RepStride) ----
 STRIDE_CONFIGS = {
     1: (1, 1, 1, 8, 8, 8),
     2: (1, 1, 1, 8, 8, 8),
@@ -62,7 +37,7 @@ STRIDE_CONFIGS = {
 
 
 def _build_src0_pattern(x_data, case_num):
-    """根据 Add 高维切分语义，构建一次 Add 调用中 src0 的完整读取模式。
+    """根据 Add 高维切分语义和输入的BinaryRepeatParams，构造一次 Add 调用中 src0 的读取结果。
 
     对 repeat r (0..63)、DataBlock k (0..7)：
       src0 起始地址 = x_off + r * src0RepStride * 8 + k * src0BlkStride * 8
@@ -83,9 +58,6 @@ def _gen_golden_no_overlap(x_data, y_data):
 
 
 def _gen_golden_z_eq_y(x_data, y_data, case_num):
-    """CASE 6, 7, 8: z == y，无跨 repeat 干扰。
-    每次 Add 调用 result += src0_pattern，逐次累加保证 float32 精度一致。
-    """
     src0_pattern = _build_src0_pattern(x_data, case_num)
     result = y_data.copy()
     for _ in range(REPEAT_TIMES_FOR_INSTR_EXCUTE):
@@ -99,8 +71,10 @@ def gen_golden_data(case_num):
     input_y = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
 
     if case_num in (1, 2, 3, 4, 5):
+        # x, y, z无地址重叠
         golden = _gen_golden_no_overlap(input_x, input_y)
     else:
+        # y和z地址完全重叠
         golden = _gen_golden_z_eq_y(input_x, input_y, case_num)
 
     os.makedirs("input", exist_ok=True)
