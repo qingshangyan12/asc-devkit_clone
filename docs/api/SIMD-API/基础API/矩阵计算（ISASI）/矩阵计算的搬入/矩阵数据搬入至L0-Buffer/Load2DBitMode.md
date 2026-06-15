@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x </cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "x90">Kirin X90 | x </cann-filter> |
 | <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
@@ -29,7 +29,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表 1** 模板参数说明
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -37,15 +37,15 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 | Src | 源操作数存储的逻辑位置（TPosition），仅Load2DBitMode接口使用。 |
 | Dst | 目的操作数存储的逻辑位置（TPosition），仅Load2DBitMode接口使用。 |
 
-**表2** 通用参数说明
+**表 2** 通用参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为(32字节 / sizeof(T))  \* 16。<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32字节 / sizeof(T))。 |
+| dst | 输出 | 目的操作数，类型为LocalTensor。<br>数据连续排列顺序由目的操作数所在TPosition决定，具体约束如下：<br>&nbsp;&nbsp;&bull; A2：ZZ格式/NZ格式；对应的分形大小为16 \* (32字节 / sizeof(T))。<br>&nbsp;&nbsp;&bull; B2：ZN格式；对应的分形大小为 (32字节 / sizeof(T))  \* 16。<br>&nbsp;&nbsp;&bull; A1/B1：无格式要求，一般情况下为NZ格式。NZ格式下，对应的分形大小为16 * (32字节 / sizeof(T))。 |
 | src | 输入 | 源操作数，类型为LocalTensor。<br>数据类型需要与dst保持一致。 |
 | loadDataParams | 输入 | LoadData参数结构体，类型为Load2DBitModeParam，具体参考[表3](#table10539223195311)。<br>上述结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_mm.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
-**表3** Load2DBitModeParam类参数说明<a id="table10539223195311"></a>
+**表 3** Load2DBitModeParam类参数说明<a id="table10539223195311"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -82,18 +82,18 @@ Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
 
-**表4** Load2DBitModeConfig0结构体参数说明<a name="table4109172132317"></a>
+**表 4** Load2DBitModeConfig0结构体参数说明<a name="table4109172132317"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
 | mStartPosition | 以M*K矩阵为例，源矩阵M轴方向的起始位置，单位为16个元素。<br>该参数是位域结构体的最低位参数，占用16bit，可以使用Load2DBitModeParam类对象的SetMStartPosition()函数设置其值，使用GetMStartPosition()函数获取其值，具体参考[表6](#table1123714295457)。 |
 | kStartPosition | 以M*K矩阵为例，源矩阵K轴方向的起始位置，单位为32字节。<br>该参数是位域结构体的第二低位参数，占用16bit，可以使用Load2DBitModeParam类对象的SetKStartPosition()函数设置其值，使用GetKStartPosition()函数获取其值，具体参考[表6](#table1123714295457)。 |
-| mStep | 以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16个元素。取值范围：mStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，mStep除需满足 [0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull;当数据类型为b4时，mStep必须是4的倍数；<br>&nbsp;&nbsp;&bull;当数据类型为b8时，mStep必须是2的倍数；<br>&nbsp;&nbsp;&bull;当数据类型为b16时，mStep必须是1的倍数；<br>&nbsp;&nbsp;&bull;当数据类型为b32时，mStep无额外约束。<br>该参数是位域结构体的第三低位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetMStep()函数设置其值，使用GetMStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
-| kStep | 以M*K矩阵为例，源矩阵K轴方向搬运长度，单位为32字节。取值范围：kStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，kStep除需满足[0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull;当数据类型为b4、b8或b16时，kStep没有额外约束；<br>&nbsp;&nbsp;&bull;当数据类型为b32时，kStep必须是2的倍数。<br>该参数是位域结构体的最高位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetKStep()函数设置其值，使用GetKStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
+| mStep | 以M*K矩阵为例，源矩阵M轴方向搬运长度，单位为16个元素。取值范围：mStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，mStep除需满足 [0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull; 当数据类型为b4时，mStep必须是4的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b8时，mStep必须是2的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b16时，mStep必须是1的倍数；<br>&nbsp;&nbsp;&bull; 当数据类型为b32时，mStep无额外约束。<br>该参数是位域结构体的第三低位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetMStep()函数设置其值，使用GetMStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
+| kStep | 以M*K矩阵为例，源矩阵K轴方向搬运长度，单位为32字节。取值范围：kStep∈[0, 255]。<br>通过ifTranspose参数启用转置功能时，kStep除需满足[0, 255]的取值范围外，还需满足以下额外约束：<br>&nbsp;&nbsp;&bull; 当数据类型为b4、b8或b16时，kStep没有额外约束；<br>&nbsp;&nbsp;&bull; 当数据类型为b32时，kStep必须是2的倍数。<br>该参数是位域结构体的最高位参数，占用8bit，可以使用Load2DBitModeParam类对象的SetKStep()函数设置其值，使用GetKStep()函数获取其值，具体参考[表6](#table1123714295457)。 |
 
 Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[Load2D](Load2D.md)。
 
-**表5** Load2DBitModeConfig1结构体参数说明<a name="table122891852142311"></a>
+**表 5** Load2DBitModeConfig1结构体参数说明<a name="table122891852142311"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -102,7 +102,7 @@ Load2DBitModeConfig0结构体参数的含义与LoadData2DParamsV2结构体中的
 
 Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的同名参数含义相同，具体参考[Load2D](Load2D.md)。
 
-**表6** Load2DBitModeParam类成员函数说明<a name="table1123714295457"></a>
+**表 6** Load2DBitModeParam类成员函数说明<a name="table1123714295457"></a>
 
 | 函数名称 | 功能 |
 | ---------- | ---------- |
@@ -133,4 +133,61 @@ Load2DBitModeConfig1结构体参数的含义与LoadData2DParamsV2结构体中的
 
 ## 调用示例<a id="section6461234123118"></a>
 
-无
+完整搬运流程请参考[Load2DV2样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0)。Load2DBitMode的使用可以参考下面的调用示例，L1上为NZ数据排布、shape为[M,K]的A矩阵，调用LoadData指令完成L1->L0A的Nz2Nz搬运。
+
+- 示例一：使用LoadData2DParamsV2构造Load2DBitModeParam
+
+```cpp
+constexpr uint32_t fractalElemCount = 256;
+constexpr uint32_t tensorElemCount = 4 * fractalElemCount;
+
+// 源操作数：L1 Buffer，存放32x32的half矩阵。
+AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::A1, a1Addr, tensorElemCount);
+
+// 目的操作数：L0A Buffer，预留4个512B分形接收完整32x32 half矩阵。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A2, a2Addr, tensorElemCount);
+
+AscendC::LoadData2DParamsV2 loadDataParams;
+// 从源矩阵M轴第0个16元素开始搬运。
+loadDataParams.mStartPosition = 0;
+// 从源矩阵K轴第0个32B开始搬运。
+loadDataParams.kStartPosition = 0;
+// M方向搬运2 * 16个元素。
+loadDataParams.mStep = 2;
+// K方向搬运32个half，即2 * 32B。
+loadDataParams.kStep = 2;
+// 源L1的M方向有2个分形，K方向相邻源分形起始地址间隔为2 * 512B。
+loadDataParams.srcStride = 2;
+// 目的L0A按2个M方向分形连续排布，K方向相邻目的分形起始地址间隔为2 * 512B。
+loadDataParams.dstStride = 2;
+// 不对每个分形做转置，保持L1中的分形方向搬入L0A。
+loadDataParams.ifTranspose = false;
+// 预留参数，固定配置为0。
+loadDataParams.sid = 0;
+
+// 使用LoadData2DParamsV2构造bit mode参数，底层以bit位形式传递上述搬运配置。
+AscendC::Load2DBitModeParam bitModeParams(loadDataParams);
+AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(dstLocal, srcLocal, bitModeParams);
+```
+
+- 示例二：使用Set函数修改Load2DBitModeParam
+
+```cpp
+AscendC::Load2DBitModeParam bitModeParams;
+// 从源矩阵M轴第0个16元素开始搬运。
+bitModeParams.SetMStartPosition(0);
+// 从源矩阵K轴第0个32B开始搬运。
+bitModeParams.SetKStartPosition(0);
+// M方向搬运2 * 16个元素。
+bitModeParams.SetMStep(2);
+// K方向搬运32个half，即2 * 32B。
+bitModeParams.SetKStep(2);
+// 源L1的M方向有2个分形，K方向相邻源分形起始地址间隔为2 * 512B。
+bitModeParams.SetSrcStride(2);
+// 目的L0A按2个M方向分形连续排布，K方向相邻目的分形起始地址间隔为2 * 512B。
+bitModeParams.SetDstStride(2);
+// 不对每个分形做转置，保持L1中的分形方向搬入L0A。
+bitModeParams.SetIfTranspose(false);
+
+AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(dstLocal, srcLocal, bitModeParams);
+```

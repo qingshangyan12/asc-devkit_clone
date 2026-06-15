@@ -29,13 +29,13 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表 1** 模板参数说明
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
 | T | 源操作数和目的操作数的数据类型。 |
 
-**表2** 通用参数说明
+**表 2** 通用参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -43,7 +43,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 | src | 输入 | 源操作数，类型为GlobalTensor。数据类型需要与dst保持一致。 |
 | loadDataParam | 输入 | LoadData参数结构体，类型为LoadData2DParamsV2，具体参考[表3](#table49630346128)。 |
 
-**表3** LoadData2DParamsV2结构体内参数说明<a id="table49630346128"></a>
+**表 3** LoadData2DParamsV2结构体内参数说明<a id="table49630346128"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -67,7 +67,7 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 - ifTranspose = false，表示不启用转置。
 - sid = 0，预留参数，配置为0即可。
 
-**图1** LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）<a id="fig13901164574218"></a>
+**图 1** LoadData2DParamsV2结构体参数示例（以half数据类型，不启用转置为例）<a id="fig13901164574218"></a>
 
 ![](../../../../../figures/LoadData2DParamsV2结构体参数示例（以half数据类型-不启用转置为例）.png)
 
@@ -86,4 +86,38 @@ LoadData2DParamsV2结构体在不启用转置时，示意图如下，参数设�
 
 ## 调用示例<a id="section6461234123118"></a>
 
-无
+以[图 1](#fig13901164574218)所示的场景为例，源矩阵为GM上Nz排布的half数据，从M轴第2个分形、K轴第2个32B块开始，搬运2个M方向分形、3个K方向32B块到L1 Buffer。
+
+```cpp
+constexpr uint32_t fractalElemCount = 256;
+constexpr uint32_t srcElemCount = 25 * fractalElemCount;
+constexpr uint32_t dstElemCount = 9 * fractalElemCount;
+
+// 源操作数：GM上按Nz分形排布存放half数据。一个512B分形包含256个half。
+// GM shape为80 * 80，M方向和K方向各有5个小分形，因此预留5 * 5 = 25个512B分形。
+AscendC::GlobalTensor<half> srcGm;
+srcGm.SetGlobalBuffer((__gm__ half *)src, srcElemCount);
+
+// 目的操作数：L1 Buffer，目的矩阵为3 * 3个小分形，因此预留9个512B分形。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, dstElemCount);
+
+AscendC::LoadData2DParamsV2 loadDataParams;
+// 源矩阵M轴起始位置为第32个元素，即2 * 16个元素。
+loadDataParams.mStartPosition = 2;
+// 源矩阵K轴起始位置为第32个half，即2 * 32B。
+loadDataParams.kStartPosition = 2;
+// M方向搬运32个元素，即2 * 16个元素。
+loadDataParams.mStep = 2;
+// K方向搬运48个half，即3 * 32B。
+loadDataParams.kStep = 3;
+// GM源矩阵M方向有5个小分形。
+loadDataParams.srcStride = 5;
+// 目的A1矩阵M方向有3个小分形。
+loadDataParams.dstStride = 3;
+// 不启用转置。
+loadDataParams.ifTranspose = false;
+// 预留参数，固定配置为0。
+loadDataParams.sid = 0;
+
+AscendC::LoadData(dstLocal, srcGm, loadDataParams);
+```
