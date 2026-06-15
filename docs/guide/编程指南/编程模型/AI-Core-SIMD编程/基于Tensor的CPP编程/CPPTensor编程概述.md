@@ -18,9 +18,9 @@ Tensor本质是对内存地址的抽象封装，通过数组方式管理内存�
 
 根据芯片分级存储架构，Tensor分为两类：**GlobalTensor**对应Global Memory，存放算子输入/输出数据；**LocalTensor**对应片上内存（UB、L1、L0A/L0B/L0C等缓冲区），承载计算过程数据。Tensor体系持续演进：基础Tensor仅携带数据指针和大小信息，需手动传递操作参数；扩展Tensor引入Layout概念，携带Shape和Stride信息，接口可自动推导搬运长度、计算元素数等参数，大幅降低编程复杂度。
 
-#### 基础Tensor与扩展Tensor
+#### 基础Tensor与扩展Tensor抽象定义
 
-**基础Tensor（不带Layout）**仅封装数据指针与大小信息，无法表达数据的物理排布方式。开发者在执行搬运和计算时必须手动传入size/count参数、自行计算偏移与步长，面对高维张量时易出错且代码冗长。
+- 基础Tensor(不带Layout)仅封装数据指针与大小信息，无法表达数据的物理排布方式。开发者在执行搬运和计算时必须手动传入size/count参数、自行计算偏移与步长，面对高维张量时易出错且代码冗长。
 
 ```cpp
 __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z) {
@@ -42,7 +42,7 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-**扩展Tensor（带有Layout）**封装Shape和Stride信息，接口自动推导操作参数，实现编译期类型安全。开发者无需关注内存布局细节，一行代码即可完成切片、搬运与计算。当前能力使能于Cube矩阵计算，后续将逐步支持Vector矢量计算。
+- 扩展Tensor(带有Layout)封装Shape和Stride信息，接口自动推导操作参数，实现编译期类型安全。开发者无需关注内存布局细节，一行代码即可完成切片、搬运与计算。当前能力使能于Cube矩阵计算，后续将逐步支持Vector矢量计算。
 
 ```cpp
 __global__ __cube__ void matmul_custom(__gm__ half* a, __gm__ half* b, __gm__ half* c) {
