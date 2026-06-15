@@ -24,19 +24,19 @@ Tensor本质是对内存地址的抽象封装，通过数组方式管理内存�
 
 ```cpp
 __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z) {
-  // 定义GlobalTensor并设置缓冲区
+  // Define GlobalTensor and set buffer
   AscendC::GlobalTensor<float> xGm, yGm, zGm;
   xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
   yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
   zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
-  // 通过Allocator分配Local Memory(Unified Buffer)
+  // Allocate Local Memory (Unified Buffer) through Allocator
   AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
   AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
   AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
   AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
 
-  // 搬运和计算操作需手动传入size参数
+  // Data copy and computation operations require manual size parameter input
   AscendC::DataCopy(xLocal, xGm, blockLength);
   AscendC::Add(zLocal, xLocal, yLocal, blockLength);
 }
@@ -46,18 +46,18 @@ __global__ __vector__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ```cpp
 __global__ __cube__ void matmul_custom(__gm__ half* a, __gm__ half* b, __gm__ half* c) {
-  // 定义带有Layout的GlobalTensor
+  // Define GlobalTensor with Layout
   auto gmA = MakeTensor(MakeMemPtr(a), MakeFrameLayout<NDExtLayoutPtn>(M, K));
   auto gmB = MakeTensor(MakeMemPtr(b), MakeFrameLayout<NDExtLayoutPtn>(K, N));
   auto gmC = MakeTensor(MakeMemPtr(c), MakeFrameLayout<NDExtLayoutPtn>(M, N));
 
-  // 构造带有Layout的LocalTensor
+  // Construct LocalTensor with Layout
   __cbuf__ half l1ABuf[baseM * K];
   __cbuf__ half l1BBuf[K * baseN];
   auto l1ATensor = MakeTensor(MakeMemPtr(l1ABuf), l1ALayout);
   auto l1BTensor = MakeTensor(MakeMemPtr(l1BBuf), l1BLayout);
 
-  // Copy自动推导参数，无需手动传入size
+  // Copy automatically infers parameters, no manual size input required
   Copy(l1ATensor, globalA);
   Copy(l1BTensor, globalB);
 }
@@ -70,32 +70,32 @@ Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带
 用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
 ```cpp
-// 核函数定义（使用__global__前缀标识Host调用、Device执行）
+// Kernel function definition (using __global__ prefix to indicate Host call, Device execution)
 __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
     AscendC::GlobalTensor<float> xGm;
     xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
 }
 
-// Host侧：分配Device内存、拷贝数据、拉起核函数
+// Host side: allocate Device memory, copy data, launch kernel function
 std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
     uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
     uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
 
-    // 分配Device内存
+    // Allocate Device memory
     aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
 
-    // Host到Device数据拷贝
+    // Host to Device data copy
     aclrtMemcpy(xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
     aclrtMemcpy(yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
 
-    // 拉起核函数
+    // Launch kernel function
     add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
     aclrtSynchronizeStream(stream);
 
-    // 释放内存
+    // Free memory
     aclrtFree(xDevice);
     aclrtFree(yDevice);
     aclrtFree(zDevice);
@@ -116,11 +116,11 @@ Unified Buffer是AI Core内主要用于矢量计算的内部存储单元，位�
 - **扩展Tensor**：通过`MakeTensor`创建，携带Shape和Stride信息
 
 ```cpp
-// 基础Tensor：通过Allocator分配
+// Basic Tensor: allocate through Allocator
 AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
 
-// 扩展Tensor：通过MakeTensor创建
+// Extended Tensor: create through MakeTensor
 auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
 ```
 

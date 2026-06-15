@@ -34,13 +34,13 @@
     开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。如果需要通过规避Bank冲突或者复用内存来获得极致性能时，推荐使用该方式。
 
 ```
-    // 方式1：使用LocalMemAllocator进行内存分配
+    // Method 1: Use LocalMemAllocator for memory allocation
     AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
     AscendC::LocalTensor<float> xLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
     AscendC::LocalTensor<float> yLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
     AscendC::LocalTensor<float> zLocalPing = ubAllocator.Alloc<float, TILE_LENGTH>();
 
-    // 方式2：直接使用LocalTensor构造函数构造Tensor
+    // Method 2: Use LocalTensor constructor directly to construct Tensor
     AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, TILE_LENGTH);
     AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, TILE_LENGTH);
     AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, TILE_LENGTH);
@@ -109,18 +109,18 @@
 在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
 
 ```
-    // ping
+    // ping buffer
     AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
     AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
     AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
-    // pong
+    // pong buffer
     AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
     AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
     AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
 
     uint32_t totalBlocks = GetTotalBlocks();
 
-    // double buffer
+    // double buffer synchronization
     AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
     AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
     AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);

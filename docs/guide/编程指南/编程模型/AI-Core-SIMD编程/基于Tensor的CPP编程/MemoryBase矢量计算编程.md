@@ -116,7 +116,7 @@ uint32_t burstLen = 54;
 uint32_t srcStride = 1;
 // Stride from previous block to next block in destination data: UB operation constraint address must be 32B aligned, value is 32 / 32
 uint32_t dstStride = 32 / 32;
-// 是否需要填充用户自定义的数据, false表示用户不需要指定填充值，会默认填充随机值。
+// Whether to fill with user-defined data, false means no custom fill value, random values will be filled by default
 bool enableFillPadValue = true;
 // Left padding of transfer result (element count): value is 4 / sizeof(half) = 2
 uint8_t leftPaddingNum = 2;

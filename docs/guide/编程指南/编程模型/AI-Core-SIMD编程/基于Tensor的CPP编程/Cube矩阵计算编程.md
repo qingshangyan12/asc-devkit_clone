@@ -31,10 +31,10 @@ __global__ __cube__ void add_custom(...)
   AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
   AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
   
-  // Allocate L1A/B Buffer
+  // Allocate L1 Buffer for matrix A and B
   LocalTensor<half> l1a_buffer = l1Allocator.Alloc<half, m_size * k_size>();
   LocalTensor<half> l1b_buffer = l1Allocator.Alloc<half, n_size * k_size>();
-  // Allocate L0A/B/C Buffer
+  // Allocate L0A/L0B/L0C Buffer for matrix computation
   LocalTensor<half> l0a_buffer = l0aAllocator.Alloc<half, m_size * k_size>();
   LocalTensor<half> l0b_buffer = l0bAllocator.Alloc<half, n_size * k_size>();
   LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
@@ -452,13 +452,13 @@ auto threeDimLayout = MakeLayout(MakeShape(128, 256, 128));
 
 而对于一个Nz分形的排布, 也可以通过`MakeLayout`来构造一个层次化的Layout表达, 譬如, 对于外层大小为(128, 256), 数据类型为half的Nz数据而言，其可以通过`MakeLayout`构造一个四维的layout排布:
 ```cpp
-// 定义(128, 256)的Nz分型, 其四维表达为: ((16, 128 / 16), (16, 256 / 16))
+// Define Nz fractal with shape (128, 256), its 4D representation is: ((16, 128 / 16), (16, 256 / 16))
 auto NzLayout = MakeLayout(MakeShape((16, 8), (16, 16)));
 ```
 
 Cube矩阵计算中对于不同的内部存储都有着自己独特的分形结构，为了简化用户的编写,  C++ Tensor编程提供了`MakeFrameLayout`来简化用户编写生成如上的四维Layout定义：
 ```cpp
-// 通过MakeFrameLayout来简化用户对于Nz分形的定义, 用户只需要感知对应存储的分形结构, 无需直接表达四维结构
+// Use MakeFrameLayout to simplify Nz fractal definition, user only needs to perceive the fractal structure of corresponding storage, no need to directly express 4D structure
 auto NzLayout = MakeFrameLayout<NZLayoutPtn>(128, 256);
 ```
 
@@ -468,11 +468,11 @@ auto NzLayout = MakeFrameLayout<NZLayoutPtn>(128, 256);
 C++ Tensor提供了`MakeTensor`函数让开发者能够简便的构造出带有Layout的扩展Tensor结构, 定义一个(shape = (128, 256), type = half)的Global Memory和一个同等大小的L1 Buffer数据块，通过结合Layout构造函数可以表达为:
 
 ```cpp
-// 构造Global Memory & L1 Buffer的Layout形状 
+// Construct Layout for Global Memory & L1 Buffer 
 auto globalLayout = MakeLayout(MakeShape(128, 256));
 auto l1Layout = MakeFrameLayout<NZLayoutPtn>(128, 256);
 
-// 通过指针 + Layout构造GlobalTensor & L1 LocalTensor
+// Construct GlobalTensor & L1 LocalTensor through pointer + Layout
 auto globalTensor = MakeTensor(gmPtr, globalLayout);
 auto l1Tensor = MakeTensor(l1Ptr, l1Layout);
 ```
