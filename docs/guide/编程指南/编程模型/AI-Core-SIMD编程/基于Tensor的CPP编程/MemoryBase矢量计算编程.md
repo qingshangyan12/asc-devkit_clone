@@ -77,16 +77,15 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 
 **连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据元素个数即可。例如srcGlobal数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`DataCopy`直接调用：
 
-![连续数据搬运](../../../../figures/连续数据搬运.png)
+<img src="../../../../figures/连续数据搬运.png" alt="连续数据搬运" width="800" />
 
 ```c
 AscendC::DataCopy(dstLocal, srcGlobal, 256);
 ```
 
-
 **高维切分搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(256)，数据类型为half)为例，进行如下图数据搬运时, 可通过C++ Tensor接口直接进行搬运操作：
 
-![非连续搬运](../../../../figures/非连续搬运.png)
+<img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
 
 ```c
 // Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
@@ -104,7 +103,7 @@ AscendC::DataCopy(dstLocal, srcGlobal, copyParams);
 
 **非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如需要进行如下图所示的搬运，则无法通过`asc_copy_gm2ub`完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`DataCopyPad`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
 
-![非对齐搬入能力](../../../../figures/非对齐搬入能力.png)
+<img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
 在上图中, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
 在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
