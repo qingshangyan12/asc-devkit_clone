@@ -2,11 +2,11 @@
 
 C++ Tensor编程是Ascend C SIMD编程路径的核心高级接口，基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力。开发者通过LocalTensor、GlobalTensor、RegTensor等Tensor对象管理内存，无需直接操作指针地址，搬运计算接口直接操作Tensor对象即可完成数据流转。该路径适用于追求开发效率、类型安全、代码可维护性的算子开发场景，是习惯C++面向对象编程的开发者快速上手NPU算子开发的关键技术路径。本章旨在帮助开发者建立对C++ Tensor编程的系统化认知，理解其Tensor抽象编程范式、核心编程模型与开发方法论。
 
-## 1. Kernel函数
+## Kernel函数
 
 [核函数](../核函数.md)在前序章节已作介绍，C++ Tensor编程在核函数定义与调用上沿用SIMD编程通用规范，无额外语法约束。
 
-## 2. 内存层级
+## 内存层级
 
 AI Core采用分级存储架构，不同计算单元的编程视角有所差异：
 
@@ -16,13 +16,15 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 <img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
 
-### 2.1 外部存储（Global Memory）
+### 外部存储（Global Memory）
 
 Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可通过GlobalTensor访问Global Memory。Global Memory具有持久性：通过全局内存分配的空间，其中存储的数据将持续保留，直到该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
 结合下述示例，Host使用`aclrtMalloc`分配Device侧的全局内存，并通过`aclrtMemcpy`将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；然后通过<<<>>>拉起Device侧核函数进行运算；通过`aclrtMalloc`分配的Device全局内存需使用`aclrtFree`接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
 此外，核函数需使用`__global__`函数前缀进行声明。该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。
+
+在Device侧，C++ Tensor编程使用
 
 ```cpp
 // Kernel implementation, decorated with __global__ to mark kernel entry point
@@ -54,13 +56,13 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 }
 ```
 
-### 2.2 内部存储（Local Memory）
+### 内部存储（Local Memory）
 
 AI Core包含三类基础计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务于不同计算单元：Unified Buffer支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
 
 C++ Tensor编程将物理内存抽象为Tensor对象，开发者无需直接操作地址限定符。Tensor携带类型、形状、位置属性，API自动推断操作参数。
 
-#### 2.2.1 AIV内部存储之Unified Buffer
+#### AIV内部存储之Unified Buffer
 
 Unified Buffer是AI Core内主要用于矢量计算单元的内部存储单元，位于每个Vector Core（AIV）内部。与外部存储空间相比，Unified Buffer的容量较小，但具有更高的带宽和更低的访问延迟，可视为内核执行期间由用户管理的高速缓存资源。
 
@@ -86,13 +88,13 @@ auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
 
 > 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
 
-#### 2.2.2 AIV内部存储之Register File
+#### AIV内部存储之Register File
 
 Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C++ Tensor编程通过直接定义RegTensor方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
 
-#### 2.2.3 AIC内部存储L1 Buffer & L0 Buffer
+#### AIC内部存储L1 Buffer & L0 Buffer
 
 Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算单元直接访问的专用缓存为：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
@@ -143,7 +145,7 @@ LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
 
 ![FRACTAL_Nz内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
 
-#### 2.2.4 Bank冲突
+#### Bank冲突
 
 为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以Unified Buffer为例，Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
 
@@ -162,7 +164,7 @@ LocalTensor<float> l0c_buffer = l0cAllocator.Alloc<float, m_size * n_size>();
 
 当遇到Bank冲突的时候，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生，详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
 
-## 3. 同步机制
+## 同步机制
 
 在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。
 
@@ -170,7 +172,7 @@ AI Core的同步主要分为**核内同步**和**核间同步**。
 
 ---
 
-### 3.1 核内同步
+### 核内同步
 
 AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
 
@@ -249,7 +251,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 </tbody>
 </table>
 
-### 3.2 核间同步
+### 核间同步
 
 当一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能执行时，则需要通过核间同步来确保多核间的时序正确性。
 
@@ -314,11 +316,11 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 > 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离;
 
-## 4. 算子类型
+## 算子类型
 
 前序章节抽象硬件架构已阐述，AI Core包含Vector和Cube两类计算单元，分别用于向量计算和矩阵计算。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
 
-### 4.1 Vector矢量计算
+### Vector矢量计算
 
 Vector矢量计算主要包含基础算术、归约计算、数据类型转换等矢量计算。
 
@@ -346,7 +348,7 @@ Ascend 950PR/Ascend 950DT新一代架构，引入寄存器可编程能力，在�
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
 
-### 4.2 Cube矩阵计算
+### Cube矩阵计算
 
 Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
 
@@ -380,7 +382,7 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 }
 ```
 
-### 4.3 Mix CV融合计算
+### Mix CV融合计算
 
 CV融合计算程序由多个独立的小算子融合而成，其功能与多个小算子的功能等价，性能方面通常优于独立的小算子。用户可以根据实际业务场景诉求，按照具体算法自由融合向量（Vector）、矩阵（Cube）算子以达到性能上的收益。融合了Cube计算、Vector计算的算子统称为CV融合算子。
 
@@ -408,6 +410,6 @@ __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 融合算子在提升性能与充分发挥算力的基础上，通过合并算子减少计算量与内存占用、优化数据流传输、简化代码实现，实现计算效率、资源利用率与代码质量的同步提升。
 
-## 5. 总结
+## 总结
 
 本章系统阐述了C++ Tensor编程的核心定位与技术体系。作为SIMD编程的高级接口，C++ Tensor编程基于Tensor对象抽象封装内存地址，提供类型安全、编译期检查的高层次编程能力，帮助开发者提升开发效率、降低编程复杂度。进一步学习可以参考[Cube矩阵计算编程](./Cube矩阵计算编程.md)、[MemoryBase矢量计算编程](./MemoryBase矢量计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。

@@ -3,7 +3,7 @@
 本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于`L1 Buffer`、`L0A Buffer`等片上存储的**矩阵计算代码**，该能力是Ascend C最基础、最通用的矩阵编程方式。
 AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
 
-## 1. 矩阵编程的基本步骤
+## 矩阵编程的基本步骤
 
 Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 → 数据搬出。当我们描述一个常见的Cube矩阵计算时，需要执行以下四个步骤：
 
@@ -12,9 +12,9 @@ Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 �
 3. 进行矩阵计算，计算结果存储在`L0C Buffer`中
 4. 通过DMA将数据从`L0C Buffer`搬出到`Global Memory`
 
-## 2. 矩阵计算内存管理
+## 矩阵计算内存管理
 
-### 2.1 矩阵计算内存申请
+### 矩阵计算内存申请
 
 矩阵计算编程主要通过L0 Buffer进行矩阵计算。开发者需将输入数据从Global Memory搬入L1 Buffer，再从L1 Buffer搬入L0 Buffer，最终通过Cube计算指令完成计算。L1 Buffer与L0 Buffer均通过LocalTensor对象进行管理，开发者可通过LocalMemAllocator分配器申请矩阵计算所需的内存空间。
 
@@ -44,7 +44,7 @@ __global__ __cube__ void add_custom(...)
 }
 ```
 
-### 2.2 矩阵计算内存布局
+### 矩阵计算内存布局
 
 矩阵计算单元采用分块计算逻辑，其中16×16是矩阵计算单元（fractal）的基本粒度，硬件可以并行处理多个fractal。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行"收集"数据，这种非连续访问会导致内存效率显著下降。
 为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。**16×16是矩阵计算单元的基本分形粒度，适用于所有支持Cube计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
@@ -53,7 +53,7 @@ __global__ __cube__ void add_custom(...)
  - 大Y（Z/N）：表示分形矩阵之间的排列顺序（Z为行主序，N为列主序）。
  - 小x（z/n）：表示分形矩阵内部元素的排列顺序（z为行主序，n为列主序）。
 
-### 2.3 关键分形格式详解
+### 关键分形格式详解
 
 矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。
 为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
@@ -65,11 +65,11 @@ __global__ __cube__ void add_custom(...)
 
 <img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
-#### 2.3.1 ND 格式(N-Dimension)
+#### ND 格式(N-Dimension)
 
 ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube计算单元。
 
-#### 2.3.2 Nz 格式
+#### Nz 格式
 
 Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
@@ -82,7 +82,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 > - **L1 Buffer**: 存储中间数据。分形形状为16×(32B/sizeof(DataType))，大小512字节，便于转换为Zz和Zn格式。
 > - **L0A Buffer（仅Ascend 950PR/Ascend 950DT）**: 存储左矩阵。
 
-#### 2.3.3 Zz 格式
+#### Zz 格式
 
 针对Atlas A2/A3训练和推理系列产品，L0A Buffer使用此格式（Ascend 950PR/Ascend 950DT使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
@@ -90,7 +90,7 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 
 在矩阵乘法中，A矩阵逐行读取数据。Zz格式的行主序特性使同一行元素物理地址连续，与计算访问模式匹配，便于Cube单元左侧通道通过DMA连续读取，避免跨步访问，提升数据搬运效率。
 
-#### 2.3.4 Zn 格式
+#### Zn 格式
 
 Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩阵数据直接为Zn格式，则在`Global Memory`和`L1 Buffer`上存储该格式。该格式采用大Z(外部行主序) + 小n(内部列主序)。
 
@@ -98,7 +98,7 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
 
 矩阵乘法需读取B矩阵列向量。普通行主序存储导致列数据地址跳跃。Zn格式在分形内部按列存储，使列数据在L0B中紧凑排列，便于Cube单元右侧通道线性读取完整列向量，避免跨步访问。
 
-### 2.4 格式转换
+### 格式转换
 
 根据上述信息，Global Memory采用ND格式，L1 Buffer采用Nz格式，因此需进行ND2NZ格式转换。
 
@@ -120,9 +120,9 @@ Zn格式主要用于L0B Buffer中存放数据，如果离线处理好的右矩�
 Ascend C编程中直接提供了`Global Memory`到`L1 Buffer`中的C++ Tensor编程接口，通过该接口可以直接将`Global Memory`数据搬入`L1 Buffer`并完成ND2NZ格式转换。
 C++ Tensor编程提供了`DataCopy`接口配合`Nd2NzParams`参数来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950PR/Ascend 950DT上，还支持从DN到Nz的格式转换搬运。
 
-## 3. 矩阵搬运能力说明
+## 矩阵搬运能力说明
 
-### 3.1 矩阵数据搬入
+### 矩阵数据搬入
 
 矩阵搬入接口实现Global Memory到L0A/L0B Buffer的数据传输，通常与Mmad接口配合使用。该接口支持多种搬运模式：二维搬运、三维格式转换、压缩数据解压、矩阵转置、稀疏化数据处理等。
 
@@ -136,7 +136,7 @@ C++ Tensor编程提供了`DataCopy`接口配合`Nd2NzParams`参数来完成GM2L1
 | L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0A Buffer中  | `DataCopy(dst, src, l12l0Params)` | ![Nz->Zz](../../../../figures/Nz-Zz.png) Ascend 950PR/Ascend 950DT上L0A分形为Nz, 搬运时为Nz-Nz |
 | L1 Buffer → L0B Buffer  | 将L1 Buffer数据搬运到L0B Buffer中  | `DataCopy(dst, src, l12l0Params)` | ![Nz->Zn](../../../../figures/Nz-Zn.png) |
 
-#### 3.1.1 GM2L1 随路转换ND2NZ搬运
+#### GM2L1 随路转换ND2NZ搬运
 
 该能力主要实现将矩阵从`Global Memory`搬运至`L1 Buffer`，并支持在数据搬运时进行ND到Nz格式的转换。
 
@@ -163,7 +163,7 @@ AscendC::Nd2NzParams intriParams{1, 16, 23, 0, 32, 32, 1, 0};
 AscendC::DataCopy(dst, srcGlobal, intriParams);
 ```
 
-#### 3.1.2 L12L0 数据搬运
+#### L12L0 数据搬运
 
 该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分形转换到Zz或Zn格式，C++ Tensor编程提供了`DataCopy`接口配合`L12L0Params`参数，其中针对Ascend 950PR/Ascend 950DT的L12L0A搬运可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
 
@@ -204,7 +204,7 @@ AscendC::L12L0TransposeParams l12l0TransposeParams{m_start_position, k_start_pos
 AscendC::DataCopy(l0a_buffer, l1_buffer, l12l0TransposeParams);
 ```
 
-### 3.2 矩阵数据搬出
+### 矩阵数据搬出
 
 矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换(NZ2ND)、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用，而针对Ascend 950PR/Ascend 950DT还支持L0C到UB Buffer的传输、NZ2DN格式转换以及UB双目标模式，矩阵搬出能力如下图所示：
 
@@ -253,7 +253,7 @@ AscendC::SetL0C2GMLeakyReluAlpha(config);
 
 详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/C++-API/矩阵数据搬运/asc_copy_l0c2gm/)
 
-## 4. 矩阵计算能力说明
+## 矩阵计算能力说明
 
 `Mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对Atlas A2/A3训练和推理系列产品L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而Ascend 950PR/Ascend 950DT产品L0A Buffer分形为Nz。
 
@@ -332,7 +332,7 @@ AscendC::MmadParams mmadParams{m, n, k, unit_flag, disable_gemv, enable_cube_ini
 AscendC::Mmad(c_matrix, a_matrix, b_matrix, mmadParams);
 ```
 
-## 5. 矩阵计算的同步
+## 矩阵计算的同步
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Cube计算需通过流水同步接口确保正确执行。Cube矩阵计算主要包含四步：数据搬入（Global Memory → L1 Buffer）、数据搬入（L1 Buffer → L0A/B Buffer）、矩阵计算（L0A/B Buffer → L0C Buffer）、数据搬出（L0C Buffer → Global Memory）。四个步骤分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_FIX流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
@@ -391,6 +391,6 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 }
 ```
 
-## 6. Cube矩阵计算示例
+## Cube矩阵计算示例
 
 当前C++ Tensor API样例正在开发中，完整矩阵计算实现示例将在后续版本中补充。开发者可参考API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C++-API/)。

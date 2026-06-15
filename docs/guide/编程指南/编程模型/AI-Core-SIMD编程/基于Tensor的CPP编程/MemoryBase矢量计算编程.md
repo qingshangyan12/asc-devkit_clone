@@ -2,7 +2,7 @@
 
 本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为MemoryBase矢量计算编程。MemoryBase矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
-## 1. MemoryBase矢量编程的基本步骤
+## MemoryBase矢量编程的基本步骤
 
 MemoryBase矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
 
@@ -10,11 +10,11 @@ MemoryBase矢量计算的数据流为：数据搬入 → 计算 → 数据搬出
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-## 2. MemoryBase矢量计算内存管理
+## MemoryBase矢量计算内存管理
 
 MemoryBase矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算，开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过LocalTensor对象进行管理，开发者可以通过LocalMemAllocator分配器申请Unified Buffer进行矢量计算。
 
-### 2.1 基础Tensor(不带Layout)定义
+### 基础Tensor(不带Layout)定义
 
 通过`LocalMemAllocator`内存分配器创建，用户可指定物理存储位置和内存大小。
 
@@ -27,7 +27,7 @@ __global__ __aicore__ void add_custom(...)
 }
 ```
 
-## 3. Memory数据搬运
+## Memory数据搬运
 
 Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
 
@@ -106,18 +106,18 @@ AscendC::DataCopy(dst_ub, src_gm, size);
 
 更多的搬运能力可参考API手册。
 
-## 4. Memory数据计算
+## Memory数据计算
 
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
 <img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
 
-### 4.1 高维切分计算
+### 高维切分计算
 
 高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等，能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
 
-#### 4.1.1 迭代控制
+#### 迭代控制
 
 Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
 
@@ -127,7 +127,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 <img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
 
-#### 4.1.2 地址间隔配置
+#### 地址间隔配置
 
 矢量计算单元还支持带间隔的向量计算，通过`data_block_stride`（单次迭代内不同`data_block`间地址步长）和`repeat_stride`（相邻迭代间相同`data_block`的地址步长）来进行配置。`data_block_stride`是指单次迭代内不同`data_block`间地址步长。其取值不能超过UB大小限制。
 连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
@@ -169,7 +169,7 @@ uint8_t src1_repeat_stride = 9;
 AscendC::Add(zTensor, xTensor, yTensor, mask, repeat_time, { dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride });
 ```
 
-#### 4.1.3 掩码设置
+#### 掩码设置
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
@@ -255,7 +255,7 @@ AscendC::SetVectorMask(0x000000000000AAAA, 0x0000000000000000);
 AscendC::Add(dst_ub, src0_ub, src1_ub, 2, { 1, 1, 1, 8, 8, 8 });
 ```
 
-### 4.2 连续计算
+### 连续计算
 
 连续计算是C++ Tensor编程提供的简化计算接口，该能力由软件层面实现。开发者使用该接口无需配置mask掩码，连续计算针对源操作数的连续n个数据进行计算并连续写入目的操作数，解决一维数据的连续计算问题。
 
@@ -265,7 +265,7 @@ AscendC::Add(dst_ub, src0_ub, src1_ub, 2, { 1, 1, 1, 8, 8, 8 });
 AscendC::Add(zTensor, xTensor, yTensor, 4096);
 ```
 
-## 5. Memory矢量计算同步控制
+## Memory矢量计算同步控制
 
 AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Memory矢量计算需通过流水同步接口确保正确执行。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → Unified Buffer）、计算（Unified Buffer）、数据搬出（Unified Buffer → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
 
@@ -304,6 +304,6 @@ __global__ __aicore__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-## 6. MemoryBase矢量计算示例
+## MemoryBase矢量计算示例
 
 结合上述MemoryBase矢量搬运与计算能力，开发者可基于C++ Tensor实现Memory矢量计算算子。具体开发实践可参考[cpp_api_add样例](../../../../../../examples/02_simd_cpp_api/00_introduction/01_add/cpp_api_add/)，使用C++ Tensor编程接口完成Memory矢量算子的开发。
