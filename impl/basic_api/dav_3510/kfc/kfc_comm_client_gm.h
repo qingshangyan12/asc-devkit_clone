@@ -54,7 +54,7 @@ public:
             }
             ASCENDC_ASSERT((workspace != nullptr), { KERNEL_LOG(KERNEL_ERROR, "workspace can not be nullptr"); });
             ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "tpipe ptr can not be nullptr"); });
-            ASCENDC_ASSERT((GetBaseAddrCpu((int8_t)TPosition::VECIN) != nullptr),
+            ASCENDC_ASSERT((GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) != nullptr),
                            { KERNEL_LOG(KERNEL_ERROR, "vecin base addr can not be nullptr"); });
             // Note that the addresses of aic and aiv are exchanged.
             this->msgSendStart = (__gm__ KfcMsg *)GetMsgHead(workspace, subBlockID);
@@ -67,7 +67,7 @@ public:
 
             // During debugging, CPU need to know the global variable address of the tpipe.
 #if ASCENDC_CPU_DEBUG
-            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetBaseAddrCpu((int8_t)TPosition::VECIN) +
+            ubMsg = reinterpret_cast<__ubuf__ KfcMsg *>(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::VECIN) +
                 TOTAL_UB_SIZE + 2*1024 - sizeof(KfcMsg));
 #else
             // 310的ub total 256kb, TOTAL_UB_SIZE: 248kb, ascendc: 2kb, 约定kfc使用2kb内的末位128b地址，kfcMsg定长128b

@@ -174,9 +174,9 @@ __aicore__ inline void TransDataTo5HD(
 #if ASCENDC_CPU_DEBUG
     for (int8_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
         uint64_t dstAddr =
-            (uint8_t*)dstList[i] - (uint8_t*)(GetBaseAddrCpu(int8_t(AscendC::TPosition(TPosition::VECIN))));
+            (uint8_t*)dstList[i] - (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         uint64_t srcAddr =
-            (uint8_t*)srcList[i] - (uint8_t*)(GetBaseAddrCpu(int8_t(AscendC::TPosition(TPosition::VECIN))));
+            (uint8_t*)srcList[i] - (uint8_t*)(GetTPipePtr()->GetBaseAddr(int8_t(AscendC::TPosition(TPosition::VECIN))));
         ASCENDC_DEBUG_ASSERT(
             (dstAddr % ONE_BLK_SIZE == 0),
             KERNEL_LOG_INTERNAL(
