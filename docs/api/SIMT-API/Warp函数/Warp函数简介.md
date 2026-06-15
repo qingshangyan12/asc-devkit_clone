@@ -14,14 +14,14 @@ Warp函数用于同一Warp内的轻量级线程协作，常见能力包括条件
 | 活跃线程 | 当前指令路径上实际参与执行的Thread。分支发散时，未进入当前路径的Thread不参与该路径上的Warp函数计算。 |
 | 分支发散 | 同一Warp内不同Thread进入不同分支路径，硬件会分批执行不同路径，未执行当前路径的Thread处于非活跃状态。 |
 
-## API列表
+## Warp函数分类
 
-| 类别 | 接口 | 功能说明 |
-| --- | --- | --- |
-| Warp Vote类函数 | [asc\_all](Warp-Vote类函数/asc_all.md)、[asc\_any](Warp-Vote类函数/asc_any.md)、[asc\_ballot](Warp-Vote类函数/asc_ballot.md)、[asc\_activemask](Warp-Vote类函数/asc_activemask.md) | 对Warp内活跃线程的条件值进行汇总，获取全真、任意为真、位图或活跃线程掩码。 |
-| Warp Shfl类函数 | [asc\_shfl](Warp-Shfl类函数/asc_shfl.md)、[asc\_shfl\_up](Warp-Shfl类函数/asc_shfl_up.md)、[asc\_shfl\_down](Warp-Shfl类函数/asc_shfl_down.md)、[asc\_shfl\_xor](Warp-Shfl类函数/asc_shfl_xor.md) | 在Warp内按Lane ID交换寄存器数据，可用于邻近线程通信、扫描和规约。 |
-| Warp Reduce类函数 | [asc\_reduce\_add](Warp-Reduce类函数/asc_reduce_add.md)、[asc\_reduce\_max](Warp-Reduce类函数/asc_reduce_max.md)、[asc\_reduce\_min](Warp-Reduce类函数/asc_reduce_min.md) | 对Warp内活跃线程的输入值执行求和、最大值或最小值规约。 |
-| Lane ID类函数 | [laneid](Lane-ID类函数/laneid.md)、[lanemask\_eq](Lane-ID类函数/lanemask_eq.md)、[lanemask\_le](Lane-ID类函数/lanemask_le.md)、[lanemask\_lt](Lane-ID类函数/lanemask_lt.md)、[lanemask\_ge](Lane-ID类函数/lanemask_ge.md)、[lanemask\_gt](Lane-ID类函数/lanemask_gt.md) | 获取当前Thread的Lane ID或生成基于Lane ID的Lane Mask。 |
+| 类别 |  功能说明 |
+| --- |  --- |
+| Warp Vote类函数 | 对Warp内活跃线程的条件值进行汇总，获取全真、任意为真、位图或活跃线程掩码。 |
+| Warp Shfl类函数 | 在Warp内按Lane ID交换寄存器数据，可用于邻近线程通信、扫描和规约。 |
+| Warp Reduce类函数 | 对Warp内活跃线程的输入值执行求和、最大值或最小值规约。 |
+| Lane ID类函数 | 获取当前Thread的Lane ID或生成基于Lane ID的Lane Mask。 |
 
 ## 典型场景
 
