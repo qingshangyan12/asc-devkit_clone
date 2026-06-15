@@ -106,13 +106,40 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
 AI Core包含三类计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务不同计算单元：Unified Buffer支撑矢量计算，L1 Buffer和L0 Buffer支撑矩阵计算。
 
-#### Unified Buffer
+#### AIV内部存储之Unified Buffer
 
 Unified Buffer是AI Core内主要用于矢量计算的内部存储单元，位于每个Vector Core（AIV）内部。容量较小但带宽高、延迟低，可视为内核执行期间由用户管理的高速缓存。
 
-在C++ Tensor编程中，通过`LocalTensor`对象管理Unified Buffer内存：
+在C++ Tensor编程中，通过`LocalTensor`对象管理Unified Buffer内存，其中对于**基础Tensor(不带Layout)**而言, 主要通过`LocalMemAllocator`物理存储位置和内存大小来创建对应的Tensor。LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，LocalMemAllocator只是一个简单的线性分配器，并不提供内存释放以及其它内存管理的能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
 
-- **基础Tensor**：通过`LocalMemAllocator`分配器创建，指定物理存储位置和内存大小
+```cpp
+__global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+{
+  // Basic Tensor: allocate through Allocator
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
+}
+```
+
+另外, 开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。
+```cpp
+__global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
+{
+  // 开发者手动指定x, y, z的地址
+  uint64_t xAddrPing = 0;
+  uint64_t yAddrPing = 1024;
+  uint64_t zAddrPing = 2048;
+
+  // 通过构造函数指定物理存储位置和地址、大小等构造LocalTensor
+  AscendC::LocalTensor<float> xLocalPing(AscendC::TPosition::VECCALC, xAddrPing, 256);
+  AscendC::LocalTensor<float> yLocalPing(AscendC::TPosition::VECCALC, yAddrPing, 256);
+  AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, 256);
+}
+```
+> 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，跟物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/通用说明和约束.md)
+
+相比于基础Tensor的定义, 扩展Tensor除了支持开发者自定义内存地址外, 同时支持通过数组的方式构建内存地址, 并通过`MakeTensor`创建Tensor对象, 同时在构建Tensor的时候也传入的Layout的定义, 将Layout信息赋予给LocalTensor对象, 。 
+
 - **扩展Tensor**：通过`MakeTensor`创建，携带Shape和Stride信息
 
 ```cpp
@@ -121,7 +148,7 @@ AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
 
 // Extended Tensor: create through MakeTensor
-auto ubTensor = MakeTensor(ubPointer, MakeShape(128, 64));
+auto ubTensor = MakeTensor(ubPointer, MakeLayout(MakeShape(128, 64)));
 ```
 
 > 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
@@ -146,6 +173,8 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 | L0C Buffer | 存储计算结果 | `LocalTensor<half> l0c_buffer;` |
 | Fixpipe Buffer | 存储量化参数 | `LocalTensor<half> fixpipe_buffer;` |
 | BiasTable Buffer | 存储Bias数据 | `LocalTensor<half> bias_buffer;` |
+
+同Unified Buffer的申请方式, 开发者可以通过
 
 为提升Cube计算效率，L1 Buffer和L0 Buffer采用分形格式。不同产品型号的分形格式存在差异：
 

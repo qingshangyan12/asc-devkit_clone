@@ -1,18 +1,18 @@
-# MemoryBase矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
+# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为MemoryBase矢量计算编程。MemoryBase矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍如何在Ascend C中使用C++ Tensor编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
 
-## MemoryBase矢量编程的基本步骤
+## Memory矢量编程的基本步骤
 
-MemoryBase矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
+Memory矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
 
 1. 通过DMA将数据从Global Memory搬入到Local Memory
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-## MemoryBase矢量计算内存管理
+## Memory矢量计算内存管理
 
-MemoryBase矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算，开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过LocalTensor对象进行管理，开发者可以通过LocalMemAllocator分配器申请Unified Buffer进行矢量计算。
+Memory矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算，开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过LocalTensor对象进行管理，开发者可以通过LocalMemAllocator分配器申请Unified Buffer进行矢量计算。
 
 ### 基础Tensor(不带Layout)定义
 
@@ -332,6 +332,6 @@ __global__ __aicore__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 }
 ```
 
-## MemoryBase矢量计算示例
+## Memory矢量计算示例
 
-结合上述MemoryBase矢量搬运与计算能力，开发者可基于C++ Tensor实现Memory矢量计算算子。具体开发实践可参考[cpp_api_add样例](../../../../../../examples/02_simd_cpp_api/00_introduction/01_add/cpp_api_add/)，使用C++ Tensor编程接口完成Memory矢量算子的开发。
+结合上述Memory矢量搬运与计算能力，开发者可基于C++ Tensor实现Memory矢量计算算子。具体开发实践可参考[cpp_api_add样例](../../../../../../examples/02_simd_cpp_api/00_introduction/01_add/cpp_api_add/)，使用C++ Tensor编程接口完成Memory矢量算子的开发。
