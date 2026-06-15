@@ -77,31 +77,24 @@ $dst_i = src0_i | src1_i$
 <!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
 <!-- end id1 -->
-
 <!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id2 -->
-
 <!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id3 -->
-
 <!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id4 -->
-
 <!-- npu="310p" id5 -->
 - 针对Atlas 推理系列产品AI Core，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id5 -->
-
 <!-- npu="910" id6 -->
 - 针对Atlas 训练系列产品，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id6 -->
-
 <!-- npu="x90" id7 -->
 - 针对Kirin X90，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id7 -->
-
 <!-- npu="9030" id8 -->
 - 针对Kirin 9030，T支持的数据类型为：int16_t、uint16_t。
 <!-- end id8 -->
