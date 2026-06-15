@@ -102,7 +102,7 @@ __aicore__ inline void SetFixPipeClipRelu(uint64_t config)
 
 ## 调用示例<a name="section6461234123118"></a>
 
-完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)。
+完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#li152921471718)。
 
 ```
 uint64_t clipReluMaxVal = 0x3c00;

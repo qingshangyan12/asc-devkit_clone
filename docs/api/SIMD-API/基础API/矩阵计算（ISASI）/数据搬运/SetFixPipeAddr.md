@@ -100,7 +100,7 @@ __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_
 
 ## 调用示例<a name="section6461234123118"></a>
 
-完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)。
+完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#li152921471718)。
 
 DataCopy随路量化搬运后，可以逐个元素加/减一个大小为mSize \* nSize的LocalTensor，具体LocalTensor地址相关参数需要调用[SetFixPipeAddr](SetFixPipeAddr.md)来设置。
 

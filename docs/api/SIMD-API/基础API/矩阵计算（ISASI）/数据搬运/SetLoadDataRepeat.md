@@ -49,7 +49,7 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-用于设置[Load3Dv2接口](LoadData/Load3D.md#ZH-CN_TOPIC_0000002478631652)的repeat参数。设置repeat参数后，可以通过调用一次Load3Dv2接口完成多个迭代的数据搬运。
+用于设置[Load3Dv2接口](LoadData/Load3D.md#li1135744819417)的repeat参数。设置repeat参数后，可以通过调用一次Load3Dv2接口完成多个迭代的数据搬运。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 

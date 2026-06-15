@@ -148,7 +148,7 @@ quantPre和reluPre必须是Fixpipe Buffer上的Tensor。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#section2409153316111)。
+完整示例可参考[完整示例](../../Memory数据搬运/DataCopy/随路量化激活搬运.md#li178441955134010)。
 
 ```
 __aicore__inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const LocalTensor <int32_t>& quantPreTensor)
