@@ -24,7 +24,7 @@ Global Memory与L1 Buffer/L0 Buffer之间的数据搬运提供了灵活、分层
 
 DataCopy能够实现Global Memory和L1 Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -55,7 +55,7 @@ DataCopy能够实现Global Memory和L1 Buffer之间的连续数据搬运和非�
 
 高维切分是指能够通过配置数据块个数、单个数据块长度、地址偏移等搬运参数实现非连续搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -84,7 +84,7 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，并支持在数据搬运时进行[ND](../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md)到[NZ](../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md)格式的转换。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -117,7 +117,7 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，并支持在数据搬运时进行[DN](../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md)到[NZ](../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md)格式的转换。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -141,7 +141,7 @@ src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配�
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，并支持在数据搬运时提供非对齐数据搬运功能，可以根据开发者的需要自行填充数据。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -163,7 +163,7 @@ src和dst分别为源操作数和目的操作数；dataCopyParams和padParams为
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -183,7 +183,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 该接口主要实现将数据从Global Memory搬运至L1 Buffer，负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L1 Buffer
     - GM -> A1/B1
@@ -205,7 +205,7 @@ src和dst分别为源操作数和目的操作数；loadDataParam为搬运参数�
 
 该接口主要实现将数据从Global Memory搬运至L0A Buffer，负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L0A Buffer
     - GM -> A2
@@ -223,7 +223,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 该接口主要实现将数据从Global Memory搬运至L0B Buffer，负责完成普通矩阵计算所需的2D格式数据的搬运，以大小为512Byte的数据分形为单位进行搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> L0B Buffer
     - GM -> B2
@@ -241,7 +241,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 该接口主要实现将数据从L0C Buffer搬运至Global Memory，并支持多种随路能力的组合，需要设置不同的寄存器。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - L0C Buffer -> Global Memory
     - CO1 -> GM
@@ -259,7 +259,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>
 
 该接口主要实现将数据从L0C Buffer搬运至Global Memory，并支持多种随路能力的组合，接口内包含了设置寄存器与数据搬运能力。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - L0C Buffer -> Global Memory
     - CO1 -> GM

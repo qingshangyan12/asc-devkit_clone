@@ -26,7 +26,7 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 
 支持Global Memory与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -58,7 +58,7 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -88,7 +88,7 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
 
 该接口为软仿接口，从易用性角度出发进行设计，支持数据的切片搬运，提取多维Tensor数据的子集进行搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -118,7 +118,7 @@ src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo�
 
 该接口为软仿接口，从易用性角度出发进行设计，支持在从Global Memory到Unified Buffer的数据搬运过程中进行ND到NZ格式的转换。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -149,7 +149,7 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 
 该接口为软仿接口，从易用性角度出发进行设计，支持在从Unified Buffer到Global Memory的数据搬运过程中进行NZ到ND格式的转换。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
     - VECOUT -> GM
@@ -168,7 +168,7 @@ __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>
 
 多维数据搬运接口，相比于基础数据搬运接口，可更加自由配置搬入的维度信息以及对应的Stride。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -196,7 +196,7 @@ src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的
 
 <cann-filter npu-type="950">特别地，针对Ascend 950PR/Ascend 950DT，支持Compact模式，该模式支持单个数据块非32字节对齐，将所有数据块合并成一个连续数据块，在该数据块右侧填充数据至32字节对齐。</cann-filter>
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -231,7 +231,7 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 
 对于非32字节对齐的场景，在读取Unified Buffer数据时会填入dummy假数据对齐到32B，搬入Global Memory时会将dummy空数据丢弃，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
     - VECIN -> GM

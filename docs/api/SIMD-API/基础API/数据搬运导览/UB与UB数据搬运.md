@@ -19,7 +19,7 @@ Unified Buffer（UB）之间的数据搬运提供了灵活的接口支持，共�
 
 支持Unified Buffer与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
@@ -40,7 +40,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 高维切分数据搬运可通过配置数据块个数、单个数据块长度、地址偏移等搬运参数，同时支持非连续和连续的数据搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
@@ -59,7 +59,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 支持Unified Buffer和Unified Buffer之间的连续数据搬运，数据搬运时格式和内容保持不变。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC
@@ -82,7 +82,7 @@ __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Unified Buffer
     - VECIN -> VECCALC

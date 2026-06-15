@@ -4,7 +4,7 @@
 
 DataCopy能够实现L1 Buffer至Fixpipe Buffer的连续数据搬运，数据搬运时格式和内容保持不变。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - L1 Buffer -> Fixpipe Buffer
     - C1 -> C2PIPE2GM
@@ -24,7 +24,7 @@ DataCopy能够实现L1 Buffer至Fixpipe Buffer的连续数据搬运和非连续�
 
 高维切分是指能够通过配置数据块个数、单个数据块长度、地址偏移等搬运参数实现非连续搬运。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../基础API/数据结构/辅助数据结构/TPosition.md)表示）：
 
 - L1 Buffer -> Fixpipe Buffer
     - C1 -> C2PIPE2GM
