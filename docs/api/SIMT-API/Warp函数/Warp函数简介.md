@@ -1,0 +1,66 @@
+# Warp函数
+
+Warp是SIMT线程执行和调度的基本单位。一个Thread Block内的线程会按照线性线程号被划分为多个Warp，当前一个Warp包含32个Thread。同一Warp内的Thread执行相同的指令流，但每个Thread拥有独立的寄存器和Lane ID，可处理不同的数据地址和分支路径。
+
+Warp函数用于同一Warp内的轻量级线程协作，常见能力包括条件投票、寄存器数据交换、Warp内规约和Lane信息查询。与通过Unified Buffer进行数据交换相比，Warp函数通常直接在Warp内完成寄存器级通信，适合小范围、低开销的线程协作场景。
+
+## 基本概念
+
+| 概念 | 说明 |
+| --- | --- |
+| Warp | SIMT执行中的线程分组，当前一个Warp包含32个Thread。 |
+| Lane | Warp内单个Thread对应的执行位置。 |
+| Lane ID | Thread在当前Warp内的编号，取值范围为[0, 31]。 |
+| 活跃线程 | 当前指令路径上实际参与执行的Thread。分支发散时，未进入当前路径的Thread不参与该路径上的Warp函数计算。 |
+| 分支发散 | 同一Warp内不同Thread进入不同分支路径，硬件会分批执行不同路径，未执行当前路径的Thread处于非活跃状态。 |
+
+## API列表
+
+| 类别 | 接口 | 功能说明 |
+| --- | --- | --- |
+| Warp Vote类函数 | [asc\_all](Warp-Vote类函数/asc_all.md)、[asc\_any](Warp-Vote类函数/asc_any.md)、[asc\_ballot](Warp-Vote类函数/asc_ballot.md)、[asc\_activemask](Warp-Vote类函数/asc_activemask.md) | 对Warp内活跃线程的条件值进行汇总，获取全真、任意为真、位图或活跃线程掩码。 |
+| Warp Shfl类函数 | [asc\_shfl](Warp-Shfl类函数/asc_shfl.md)、[asc\_shfl\_up](Warp-Shfl类函数/asc_shfl_up.md)、[asc\_shfl\_down](Warp-Shfl类函数/asc_shfl_down.md)、[asc\_shfl\_xor](Warp-Shfl类函数/asc_shfl_xor.md) | 在Warp内按Lane ID交换寄存器数据，可用于邻近线程通信、扫描和规约。 |
+| Warp Reduce类函数 | [asc\_reduce\_add](Warp-Reduce类函数/asc_reduce_add.md)、[asc\_reduce\_max](Warp-Reduce类函数/asc_reduce_max.md)、[asc\_reduce\_min](Warp-Reduce类函数/asc_reduce_min.md) | 对Warp内活跃线程的输入值执行求和、最大值或最小值规约。 |
+| Lane ID类函数 | [laneid](Lane-ID类函数/laneid.md)、[lanemask\_eq](Lane-ID类函数/lanemask_eq.md)、[lanemask\_le](Lane-ID类函数/lanemask_le.md)、[lanemask\_lt](Lane-ID类函数/lanemask_lt.md)、[lanemask\_ge](Lane-ID类函数/lanemask_ge.md)、[lanemask\_gt](Lane-ID类函数/lanemask_gt.md) | 获取当前Thread的Lane ID或生成基于Lane ID的Lane Mask。 |
+
+## 典型场景
+
+### Warp内条件汇总
+
+Vote类函数适合判断同一Warp内是否存在满足条件的Thread，或将每个Lane的条件结果压缩成bit mask。
+
+```cpp
+uint32_t active_mask = asc_activemask();
+uint32_t hit_mask = asc_ballot(value > threshold);
+int32_t has_hit = asc_any(value > threshold);
+```
+
+### Warp内寄存器交换
+
+Shfl类函数可直接读取同一Warp内其他Lane的寄存器值，减少通过Unified Buffer中转数据的开销。
+
+```cpp
+int32_t lane = laneid();
+int32_t next_value = asc_shfl_down(value, 1);
+```
+
+在使用Shfl类函数时，需要确保目标Lane处于活跃状态。如果目标Lane为非活跃状态，读取结果可能是未初始化值。
+
+### Warp内规约
+
+Reduce类函数用于同一Warp内快速完成求和、最大值或最小值计算。
+
+```cpp
+float warp_sum = asc_reduce_add(value);
+float warp_max = asc_reduce_max(value);
+```
+
+对于浮点规约，规约树的计算顺序可能与顺序累加不同，低位舍入结果可能存在差异。
+
+## 使用建议
+
+-   Warp函数只在当前Warp内生效，不能用于跨Warp或跨Thread Block的数据同步。
+-   Warp函数面向活跃线程执行。若代码存在分支发散，需要确认参与计算的Lane集合符合预期。
+-   Shfl类函数读取其他Lane的寄存器值时，应避免读取非活跃Lane的数据。
+-   Reduce类函数适合Warp内小范围规约；跨Warp或跨Thread Block规约通常需要结合Unified Buffer、同步机制或原子操作。
+-   Warp函数不等价于内存栅栏。需要约束内存可见性或Thread Block内阶段同步时，请使用[同步与内存栅栏](../同步与内存栅栏/同步与内存栅栏.md)相关接口。
