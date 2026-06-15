@@ -14,9 +14,6 @@
 """
 gen_data.py — bank_conflict 样例数据生成
 
-结合 Add API 高维切分语义（参考 Add.md），模拟 kernel 中 Add 指令在 UB 上的实际读写行为，
-生成与 NPU 输出一致的 golden 数据。
-
 支持 CASE_NUM=1~9，按地址重叠关系分三类优化：
 
   1. CASE 1~5 — z 与 x/y 无地址重叠
@@ -70,19 +67,6 @@ STRIDE_CONFIGS = {
 }
 
 
-def _check_no_overlap(case_num):
-    """检查 z 区域是否与 x/y 区域无地址重叠。"""
-    x_addr, y_addr, z_addr = ADDR_CONFIGS[case_num]
-    byte_len = TOTAL_LENGTH * 4
-
-    def overlap(a1, l1, a2, l2):
-        return not (a1 + l1 <= a2 or a2 + l2 <= a1)
-
-    z_y = overlap(z_addr, byte_len, y_addr, byte_len)
-    z_x = overlap(z_addr, byte_len, x_addr, byte_len)
-    return not (z_y or z_x)
-
-
 def _build_src0_pattern(x_data, case_num):
     """根据 Add 高维切分语义，构建一次 Add 调用中 src0 的完整读取模式。
 
@@ -100,12 +84,11 @@ def _build_src0_pattern(x_data, case_num):
     return src0
 
 
-def _gen_no_overlap(x_data, y_data):
-    """CASE 1~5: z 与 x/y 无重叠，1000 次 z = x + y 幂等。"""
+def _gen_golden_no_overlap(x_data, y_data):
     return (x_data + y_data).astype(np.float32)
 
 
-def _gen_z_eq_y(x_data, y_data, case_num):
+def _gen_golden_z_eq_y(x_data, y_data, case_num):
     """CASE 6, 8, 9: z == y，无跨 repeat 干扰。
     每次 Add 调用 result += src0_pattern，逐次累加保证 float32 精度一致。
     """
@@ -116,7 +99,7 @@ def _gen_z_eq_y(x_data, y_data, case_num):
     return result
 
 
-def _gen_case7(x_data, y_data):
+def _gen_golden_case7(x_data, y_data):
     """CASE 7: z = y + 8 floats，跨 repeat 读写干扰。
     1000 次迭代后收敛到不动点（512 < 1000 即可收敛），由 stride-8 累加和解析计算：
       golden[i::8] = cumsum(x[i::8]) + y[i]
@@ -131,12 +114,12 @@ def gen_golden_data(case_num):
     input_x = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
     input_y = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
 
-    if case_num == 7:
-        golden = _gen_case7(input_x, input_y)
-    elif _check_no_overlap(case_num):
-        golden = _gen_no_overlap(input_x, input_y)
+    if case_num in (1, 2, 3, 4, 5):
+        golden = _gen_golden_no_overlap(input_x, input_y)
+    elif case_num == 7:
+        golden = _gen_golden_case7(input_x, input_y)
     else:
-        golden = _gen_z_eq_y(input_x, input_y, case_num)
+        golden = _gen_golden_z_eq_y(input_x, input_y, case_num)
 
     os.makedirs("input", exist_ok=True)
     os.makedirs("output", exist_ok=True)
