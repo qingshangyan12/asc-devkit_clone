@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -18,7 +16,7 @@
 
 ## 函数原型
 
-```C++
+```c++
 int any(int predicate) const
 ```
 
@@ -32,7 +30,7 @@ int any(int predicate) const
 
 ## 返回值说明
 
-`thread_block_tile`组内所有活跃线程的输入均为0，返回0，否则返回1。
+`thread_block_tile`组内所有线程的输入均为0，返回0，否则返回1。
 
 ## 约束说明
 

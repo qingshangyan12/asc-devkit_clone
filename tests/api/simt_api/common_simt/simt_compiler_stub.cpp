@@ -35,16 +35,6 @@ int32_t asc_get_block_num()
     return 8;
 }
 
-int32_t laneid()
-{
-    return 0;
-}
-
-uint32_t lanemask_lt()
-{
-    return 0xFFFFFFFF;
-}
-
 int64_t clz(uint64_t x)
 {
     int32_t count = 0;
@@ -74,10 +64,4 @@ bool CheckFunVecBinaryScalarImpl(VecBinaryScalarApiParams &chkParams, const uint
 }
 bool CheckFunVecBinaryScalarImpl(VecBinaryScalarApiParams &chkParams, const char *intriName) { return true; }
 }
-}
-
-uint64_t atomicAdd(uint64_t *addr, uint64_t val) {
-    uint64_t ret = *addr;
-    *addr += val;
-    return ret;
 }

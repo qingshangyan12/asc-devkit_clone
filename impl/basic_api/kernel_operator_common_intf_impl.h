@@ -98,12 +98,11 @@ __aicore__ inline void SetNextTaskStart()
 {
 #ifdef __ASCENDC_ENABLE_SET_NEXT_TASK_START
     SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE>();
-    return;
-#endif
+#else
     if constexpr (FORCE) {
         SetNextTaskStartImpl<AIV_PIPE, AIC_PIPE, true>();
-        return;
     }
+#endif
 }
 
 template<bool FORCE>
@@ -111,12 +110,11 @@ __aicore__ inline void WaitPreTaskEnd()
 {
 #ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END
     WaitPreTaskEndImpl();
-    return;
-#endif
+#else
     if constexpr (FORCE) {
         WaitPreTaskEndImpl<-1, true>();
-        return;
     }
+#endif
 }
 
 __aicore__ inline void InitSocState()
@@ -143,7 +141,7 @@ __aicore__ inline __in_pipe__(V)
     uint32_t tail = size % popSize;
     uint32_t roundSize = round != 0 ? popSize : 0;
     DuplicateImpl<T>((__ubuf__ T*)popBuffer.GetPhyAddr(), value, popSize);
-    event_t eventIDVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+    event_t eventIDVToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
     SetFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     WaitFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     struct DataCopyExtParams repeatParams;

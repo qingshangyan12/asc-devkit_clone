@@ -121,10 +121,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
         constexpr auto ppModeValue = std::integral_constant<::Part_T, static_cast<::Part_T>(layoutMode)>();
         if constexpr (SupportType<Tuple<T, U>, Tuple<int4x2_t, int16_t>>()) {
             // vcvt_ii s162s4x2
-            RegTensor<half> halfTmp;
-            constexpr auto roundModeValue = std::integral_constant<::ROUND, GetRound<RoundMode::CAST_RINT>()>();
-            vcvt(halfTmp, srcReg, mask, roundModeValue, modeValue);
-            vcvt_f162s4(dstReg, halfTmp, mask, roundModeValue, satModeValue, ppModeValue, modeValue);
+            vcvt_s162s4(dstReg, srcReg, mask, satModeValue, ppModeValue, modeValue);
         } else {
             // vcvt_ii u322u8/s322u8
             vcvt(dstReg, srcReg, mask, satModeValue, ppModeValue, modeValue);
@@ -506,8 +503,8 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
 {
     using ActualT = typename S::ActualT;
     using ActualU = typename V::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualU>, "U type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(Std::is_same_v<U, DefaultType> || Std::is_same_v<U, ActualU>, "U type is not correct!");
     if constexpr (trait.mrgMode == MaskMergeMode::MERGING) {
         static_assert(SupportEnum<trait.layoutMode, RegLayout::UNKNOWN, RegLayout::ZERO>(),
             "current Cast api only supported MERGING Mode for RegLayout::UNKNOWN/ZERO on current device!");
@@ -581,4 +578,3 @@ __simd_callee__ inline void CastImpl(S& dstReg, V& srcReg, MaskReg& mask)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_VCONV_IMPL__
 #endif
-

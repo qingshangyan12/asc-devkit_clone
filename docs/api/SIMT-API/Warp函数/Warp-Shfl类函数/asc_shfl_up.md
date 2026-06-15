@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -54,6 +52,14 @@ inline half asc_shfl_up(half var, uint32_t delta, int32_t width = warpSize)
 inline half2 asc_shfl_up(half2 var, uint32_t delta, int32_t width = warpSize)
 ```
 
+```
+inline bfloat16_t asc_shfl_up(bfloat16_t var, uint32_t delta, int32_t width = warpSize)
+```
+
+```
+inline bfloat16x2_t asc_shfl_up(bfloat16x2_t var, uint32_t delta, int32_t width = warpSize)
+```
+
 ## 参数说明
 
 **表 1**  参数说明
@@ -76,7 +82,7 @@ Warp内指定线程的var值。
 
 ## 需要包含的头文件
 
-使用除half、half2类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```
 #include "simt_api/device_warp_functions.h"
@@ -86,9 +92,19 @@ Warp内指定线程的var值。
 #include "simt_api/asc_fp16.h"
 ```
 
+```
+#include "simt_api/asc_bf16.h"
+```
+
 ## 调用示例
 
--   SIMT编程场景：
+完整样例请参考[Sobel边缘检测样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/02_features/01_api_features/03_warp_instruction/sobel_warp_shfl/README.md)。
+
+以下示例包含两类用法：示例1使用asc\_shfl\_up获取Warp分组内相对当前线程向前偏移delta的线程的输入值；示例2使用asc\_shfl\_up在每个Warp内进行归约求和。
+
+-   示例1：
+
+    SIMT编程场景：
 
     ```
     __global__ __launch_bounds__(1024) void KernelShflUp(int32_t* dst)
@@ -101,26 +117,9 @@ Warp内指定线程的var值。
          int32_t result = asc_shfl_up(laneId, 2, 16);
          dst[idx] = result;
     }
-
-    // asc_shfl_up实现reducesum
-    __global__ __launch_bounds__(1024) void KernelShflUpReduceSum(int32_t* dst)
-    {
-         // asc_vf_call参数：dim3{1024, 1, 1}
-         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-         int32_t laneId = idx % 32;
-         int32_t value = laneId;
-
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
-
-         dst[idx] = value;
-    }
     ```
 
--   SIMD与SIMT混合编程场景：
+    SIMD与SIMT混合编程场景：
 
     ```
     __simt_vf__ __launch_bounds__(1024) inline void KernelShflUp(__gm__ int32_t* dst)
@@ -134,8 +133,32 @@ Warp内指定线程的var值。
          int32_t result = asc_shfl_up(laneId, 2, 16);
          dst[idx] = result;
     }
+    ```
 
-    // asc_shfl_up实现reducesum
+-   示例2：
+
+    SIMT编程场景：
+
+    ```
+    __global__ __launch_bounds__(1024) void KernelShflUpReduceSum(int32_t* dst)
+    {
+         int idx = threadIdx.x + blockIdx.x * blockDim.x;
+         int32_t laneId = idx % 32;
+         int32_t value = laneId;
+
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
+
+         dst[idx] = value; // 归约求和结果位于每个Warp内laneId为31的线程
+    }
+    ```
+
+    SIMD与SIMT混合编程场景：
+
+    ```
     __simt_vf__ __launch_bounds__(1024) inline void KernelShflUpReduceSum(__gm__ int32_t* dst)
     {
          // asc_vf_call参数：dim3{1024, 1, 1}
@@ -143,12 +166,12 @@ Warp内指定线程的var值。
          int32_t laneId = idx % 32;
          int32_t value = laneId;
 
-         value += asc_shfl_up(value, 16, 31); // 16
-         value += asc_shfl_up(value, 8, 31);  // 8
-         value += asc_shfl_up(value, 4, 31);  // 4
-         value += asc_shfl_up(value, 2, 31);  // 2
-         value += asc_shfl_up(value, 1, 31);  // 1
+         value += asc_shfl_up(value, 16, 32);
+         value += asc_shfl_up(value, 8, 32);
+         value += asc_shfl_up(value, 4, 32);
+         value += asc_shfl_up(value, 2, 32);
+         value += asc_shfl_up(value, 1, 32);
 
-         dst[idx] = value;
+         dst[idx] = value; // 归约求和结果位于每个Warp内laneId为31的线程
     }
     ```

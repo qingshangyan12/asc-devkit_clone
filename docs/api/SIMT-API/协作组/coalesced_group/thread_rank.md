@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -38,7 +36,7 @@ unsigned long long thread_rank() const
 
 示例代码中的条件分支将一个warp中所有线程id是偶数的线程组成`coalesced_group`协作组，组内各线程`thread_rank`接口返回结果如下图所示。
 
-**图 1**  coalesced_group组内个线程rank  
+**图 1**  coalesced_group组内各线程rank  
 ![](../../../figures/coalesced_group_rank.png "coalesced_group_rank")
 
 - SIMT编程场景：

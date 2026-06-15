@@ -12,7 +12,7 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 为满足不同场景的诉求，Ascend C构建了从单指令抽象、单核公共算法到多核算子的多层级API体系，其总体逻辑架构如下：
 
-<img src="../../figures/architecture.png" alt="架构图" width="850px" height="580px">
+<img src="../figures/architecture_ascendc.png" alt="架构图" width="1000px">
 
 - **语言扩展层C API**：纯C接口，提供数组内存分配、基于指针的计算接口，延续业界熟悉的C编程体验，并完整开放芯片能力。Ascend 950PR/Ascend 950DT新增SIMT、SIMD/SIMT混合编程能力。
 - **基础API**：以单指令为抽象的C++类库，一般基于Tensor编程，并逐步通过Layout完善Tensor编程体验。
@@ -56,14 +56,13 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
    - [编程模型概述](../编程指南/编程模型/编程模型.md)
    - **SIMD编程**：[Ascend C SIMD编程模型](../编程指南/编程模型/AI-Core-SIMD编程/概述.md)
        - [基于指针的C语言编程](../编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
-       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的C++编程/静态Tensor编程.md)
+       - [基于Tensor的C++编程](../编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md)
        - [基于TPipe-TQue框架编程](../编程指南/编程模型/AI-Core-SIMD编程/基于TPipe-TQue框架编程/TPipe-TQue框架编程原理.md)
    - **SIMT编程**：[Ascend C SIMT编程模型](../编程指南/编程模型/AI-Core-SIMT编程/概述.md)
    - [语言扩展层概述](../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)
-- **构建与运行**：
-   - [编译与运行](../编程指南/编译与运行/编译与运行.md)
-      - [异步执行](../编程指南/编译与运行/异步执行.md)
-      - [算子编译](../编程指南/编译与运行/算子编译/毕昇编译器.md)
+- **编译与运行**：
+   - [异步执行](../编程指南/编译与运行/异步执行.md)
+   - [算子编译](../编程指南/编译与运行/算子编译/毕昇编译器.md)
 - **调试与调优**
    - [调试调优概述](../编程指南/调试调优/概述.md)
    - [功能调试](../编程指南/调试调优/功能调试/CPU域孪生调试.md)
@@ -104,4 +103,5 @@ CANN基于分层架构设计，实现了上层应用与底层硬件的无缝衔�
 
 - [基本概念与术语](../技术附录/概念原理和术语/术语表.md)
 - [C++语言标准支持](../技术附录/CPP标准支持/概述.md)
-- [Ascend C API参考（含每个API的规格与约束）](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [Ascend C API参考](https://hiascend.com/document/redirect/CannCommunityAscendCApi)
+- [CANN Runtime 接口可参考《应用开发（C&C++）》](https://hiascend.com/document/redirect/CannCommunityadev)

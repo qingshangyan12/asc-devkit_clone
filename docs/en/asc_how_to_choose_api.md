@@ -83,7 +83,7 @@ You can also refer to the following key dimensions for quick decision-making:
 
 **Examples**
 - [SIMD Add Operator Example (with Synchronous Computation Interface)](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
-- [SIMT Add Operator Example (Matching Industry Habits)](../../examples/03_simt_api/00_introduction/01_add/add.asc)
+- [SIMT Gather Operator Example (Matching Industry Habits)](../../examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d/gather_1d.asc)
 - For more examples, refer to [examples directory](https://gitcode.com/cann/asc-devkit/tree/master/examples)
 
 ---
@@ -101,8 +101,8 @@ You can also refer to the following key dimensions for quick decision-making:
 - Scenarios that require developing extreme performance operators in production environments while maintaining code maintainability and extensibility.
 
 **Examples**
-- [SIMD Add Operator Example with Tque / Tpipe Automatic Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_vector/add_tpipe_tque/add.asc)
-- [SIMD Add Operator Example with LocalMemoryAllocator Independent Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_vector/add/add.asc)
+- [SIMD Add Operator Example with Tque / Tpipe Automatic Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque/add_tpipe_tque.asc)
+- [SIMD Add Operator Example with LocalMemoryAllocator Independent Memory and Synchronization Management](../../examples/01_simd_cpp_api/00_introduction/01_add/add/add.asc)
 - Tensor API Example Based on Layout (to be added)
 
 ---
@@ -118,8 +118,8 @@ You can also refer to the following key dimensions for quick decision-making:
 - Scenarios that want to reuse mature algorithm implementations and shorten development cycles.
 
 **Examples**
-- [Softmax API Example](../../examples/01_simd_cpp_api/03_libraries/01_activation/softmax/softmax.asc)
-- [Matmul API Example](../../examples/01_simd_cpp_api/03_libraries/00_matrix)
+- [Softmax API Example](../../examples/01_simd_cpp_api/04_advanced_api/01_activation/softmax/softmax.asc)
+- [Matmul API Example](../../examples/01_simd_cpp_api/04_advanced_api/00_matmul)
 
 ---
 

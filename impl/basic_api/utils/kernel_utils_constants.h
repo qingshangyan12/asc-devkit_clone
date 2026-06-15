@@ -180,6 +180,8 @@ const uint32_t TOTAL_L1_SIZE = 512 * 1024;
 const uint32_t TOTAL_L0C_SIZE = 64 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
 const uint32_t ONE_BLOCK_SIZE = 32;
+#else
+const uint32_t VECTOR_REG_WIDTH = 256;
 #endif
 
 #if !defined(__NPU_HOST__) && !defined(__ASCC_HOST__)
@@ -348,9 +350,30 @@ const uint64_t LOAD_STRIDE_H = 8;
 
 namespace Internal {
 constexpr int32_t TSCM_CROSS_SYNC_ID_MAX = 11;
-}
-
 #if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1) || defined(ASCENDC_DEBUG)
+// load2d param size
+constexpr int32_t ASC_MAX_LOAD2D_SID = 15;
+
+// load3dv1 param size
+constexpr int32_t ASC_MAX_LOAD3D_L1 = 32767;
+constexpr int32_t ASC_MIN_LOAD3D_C1_IDX = 0;
+constexpr int32_t ASC_MAX_LOAD3D_C1_IDX = 4095;
+constexpr int32_t ASC_MIN_LOAD3D_LEFT_TOP = -255;
+constexpr int32_t ASC_MAX_LOAD3D_LEFT_TOP = 32767;
+constexpr int32_t ASC_MIN_LOAD3D_STRIDE = 1;
+constexpr int32_t ASC_MAX_LOAD3D_STRIDE = 63;
+constexpr int32_t ASC_MAX_LOAD3D_FILTER = 255;
+constexpr int32_t ASC_MIN_LOAD3D_FILTER = 1;
+constexpr int32_t ASC_MIN_LOAD3D_FETCH_FILTER = 0;
+constexpr int32_t ASC_MAX_LOAD3D_FETCH_FILTER = 254;
+constexpr int32_t ASC_MIN_LOAD3D_DILATION_FILTER = 1;
+constexpr int32_t ASC_MAX_LOAD3D_JUMP_STRIDE = 127;
+constexpr int32_t ASC_MIN_LOAD3D_JUMP_STRIDE = 1;
+constexpr int32_t ASC_MIN_LOAD3D_REPEAT_TIMES = 1;
+#endif
+} // namespace Internal
+
+#if (defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1)
 // param check size
 const int32_t MAX_BLOCK_COUNT = 4095;
 const int32_t MIN_BLOCK_COUNT = 1;
@@ -724,20 +747,22 @@ constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_AIV = 0b1001;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MIX_TO_MIX = 0b1010;
 #endif
 
-// early-start mask For super kernel early start V3
-// |  24bits  |   4bits  |   4bits  |
-// | reserved | aivqueue | aicqueue |
+// early-start mask for super kernel early start V3.
+// Low 16 bits layout: | 4bits ctrl(mask) | 4bits reserved | 4bits aivqueue(mask) | 4bits aicqueue(mask) |
 namespace Internal {
-// aic task que
+// aic task que func config
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_SET = 1U << 0;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIC_WAIT = 1U << 1;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_SET = 1U << 2;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_WAIT = 1U << 3;
-// aiv task que
+// aiv task que func config
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_SET = 1U << 4;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIV_WAIT = 1U << 5;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIV_TO_AIC_SET = 1U << 6;
 constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_MASK_AIC_TO_AIV_WAIT = 1U << 7;
+// control bits
+// If set, WaitPreTaskEndV3Impl uses loose sync; otherwise it uses tight sync.
+constexpr uint32_t ASCENDC_SUPER_KERNEL_EARLY_START_CTRL_SPLIT_CORE = 1U << 15;
 } // namespace Internal
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)

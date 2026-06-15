@@ -1,7 +1,7 @@
 # 基于样例工程完成Kernel直调<a name="ZH-CN_TOPIC_0000001731910633"></a>
 
 >[!NOTE]说明 
->本章节介绍的基于样例工程完成Kernel直调的方式，后续不再演进。推荐开发者直接使用命令行或者编写Cmake文件进行编译，详细内容请参考[AI Core SIMD编译](../编译与运行/AI-Core-SIMD编译/算子编译简介.md)。
+>本章节介绍的基于样例工程完成Kernel直调的方式，后续不再演进。推荐开发者直接使用命令行或者编写Cmake文件进行编译，详细内容请参考[AI Core SIMD编译](../编译与运行/算子编译/AI-Core算子编译基本用法.md)。
 
 下文将以Add矢量算子为例对Kernel直调算子开发流程进行详细介绍。
 
@@ -169,7 +169,7 @@ AddKernelInvocationNeo
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
     >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetBlockIdx.md)来获取block\_idx。
+    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
     >- argument list：参数列表，与核函数的参数列表保持一致。
 
@@ -443,7 +443,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 ## CPU侧验证核函数<a name="section13472164395818"></a>
 
-在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/AI-Core-SIMD编译/算子编译简介.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试，实际上是通过标准的GCC编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
+在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试，实际上是通过标准的GCC编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
 **图 5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
 ![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png "CPU域和NPU域的核函数运行逻辑对比-36")
@@ -535,4 +535,3 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 >        aclInit、aclFinalize、aclrtGetVersion。
 >    - 运行时管理
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
-

@@ -30,7 +30,7 @@
 | [asc_atomic_dec](../原子操作/asc_atomic_dec.md) | 对Unified Buffer或Global Memory上address的数值进行原子减1操作，如果address上的数值等于0或大于指定数值val，则对address赋值为val，否则将address上数值减1。 |
 | [asc_atomic_cas](../原子操作/asc_atomic_cas.md) | 对Unified Buffer或Global Memory上address的数值进行原子比较赋值操作，如果address上的数值等于指定数值compare，则对address赋值为指定数值val，否则address的数值不变。 |
 | [asc_atomic_and](../原子操作/asc_atomic_and.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子与（&）操作，即将address数值与（&）val的结果赋值到Unified Buffer或Global Memory上。 |
-| [asc_atomic_or](../原子操作/asc_atomic_or.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子或（|）操作，即将address数值或（|）val的结果赋值到Unified Buffer或Global Memory上。 |
+| [asc_atomic_or](../原子操作/asc_atomic_or.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子或（\|）操作，即将address数值或（\|）val的结果赋值到Unified Buffer或Global Memory上。 |
 | [asc_atomic_xor](../原子操作/asc_atomic_xor.md) | 对Unified Buffer或Global Memory上address的数值与指定数值val进行原子异或（^）操作，即将address数值异或（^）val的结果赋值到Unified Buffer或Global Memory上。 |
 
 ## Warp函数
@@ -61,9 +61,20 @@
 | [asc_reduce_max](../Warp函数/Warp-Reduce类函数/asc_reduce_max.md) | 对Warp内所有活跃线程输入的val求最大值。 |
 | [asc_reduce_min](../Warp函数/Warp-Reduce类函数/asc_reduce_min.md) | 对Warp内所有活跃线程输入val求最小值。 |
 
+**表 7** LaneID类函数
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [laneid](../Warp函数/Lane-ID类函数/laneid.md) | 获取线程在其线程束内的索引。 |
+| [lanemask_eq](../Warp函数/Lane-ID类函数/lanemask_eq.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，只有当前线程所在的lane位被置为1，其余位为0。 |
+| [lanemask_le](../Warp函数/Lane-ID类函数/lanemask_le.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid小于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_lt](../Warp函数/Lane-ID类函数/lanemask_lt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格小于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_ge](../Warp函数/Lane-ID类函数/lanemask_ge.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid大于等于当前线程”的线程的对应位设为1，其余位为0。 |
+| [lanemask_gt](../Warp函数/Lane-ID类函数/lanemask_gt.md) | 提供当前线程的一个32位掩码，在当前线程所属的Warp中，将“laneid严格大于当前线程”的线程的对应位设为1，其余位为0。 |
+
 ## 数学函数
 
-**表 7**  half类型算术函数
+**表 8**  half类型算术函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -76,7 +87,7 @@
 | [__hneg](../数学函数/half类型/half类型算术函数/__hneg.md) | 获取输入half类型数据的负值。 |
 | [__hfma_relu](../数学函数/half类型/half类型算术函数/__hfma_relu.md) | 对输入half类型数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST_RINT模式舍入。负数结果置为0。 |
 
-**表 8**  half类型比较函数
+**表 9**  half类型比较函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -99,7 +110,7 @@
 | [__hmax_nan](../数学函数/half类型/half类型比较函数/__hmax_nan.md) | 获取两个输入数据中的最大值。任一输入为nan时返回nan。 |
 | [__hmin_nan](../数学函数/half类型/half类型比较函数/__hmin_nan.md) | 获取两个输入数据中的最小值。任一输入为nan时返回nan。 |
 
-**表 9**  half类型数学库函数
+**表 10**  half类型数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -120,7 +131,7 @@
 | [hceil](../数学函数/half类型/half类型数学库函数/hceil.md) | 获取大于或等于输入数据的最小整数值。 |
 | [htrunc](../数学函数/half类型/half类型数学库函数/htrunc.md) | 获取对输入数据的浮点数截断后的整数。 |
 
-**表 10**  half类型精度转换函数
+**表 11**  half类型精度转换函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -218,15 +229,18 @@
 | [__float22half2_rn](../数学函数/half类型/half类型精度转换函数/__float22half2_rn.md) | 将float2类型数据遵循CAST_RINT模式转换为half2类型，返回转换后的half2类型数据。 |
 | [__low2half](../数学函数/half类型/half类型精度转换函数/__low2half.md) | 返回输入数据的低16位。 |
 | [__low2half2](../数学函数/half类型/half类型精度转换函数/__low2half2.md) | 将输入数据的低16位填充到half2并返回。 |
+| [__low2float](../数学函数/half类型/half类型精度转换函数/__low2float.md) | 将输入数据的低16位转换为浮点数并返回结果。 |
+| [__lowhigh2highlow](../数学函数/half类型/half类型精度转换函数/__lowhigh2highlow.md) | 将输入数据的高低16位进行交换并返回。 |
 | [__high2half](../数学函数/half类型/half类型精度转换函数/__high2half.md) | 提取输入half2的高16位，并返回 |
 | [__high2half2](../数学函数/half类型/half类型精度转换函数/__high2half2.md) | 将输入数据的的高16位填充到half2并返回结果。 |
+| [__high2float](../数学函数/half类型/half类型精度转换函数/__high2float.md) | 将输入数据的高16位转换为float类型并返回结果。 |
 | [__highs2half2](../数学函数/half类型/half类型精度转换函数/__highs2half2.md) | 分别提取两个half2输入的高16位，并填充到half2中。返回填充后的数据。 |
 | [__lows2half2](../数学函数/half类型/half类型精度转换函数/__lows2half2.md) | 分别提取两个half2输入的低16位，并填充到half2中。返回填充后的数据。 |
 | [__halves2half2](../数学函数/half类型/half类型精度转换函数/__halves2half2.md) | 将输入的数据分别填充为half2前后两个分量，返回填充后数据。 |
 | [__half22float2](../数学函数/half类型/half类型精度转换函数/__half22float2.md) | 将half2的两个分量分别转换为float，并填充到float2返回。 |
 | [__ushort_as_half](../数学函数/half类型/half类型精度转换函数/__ushort_as_half.md) | 将unsigned short int的按位重新解释为half，即将unsigned short int的数据存储的位按照half的格式进行读取。 |
 
-**表 11**  half2类型算术函数
+**表 12**  half2类型算术函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -240,7 +254,7 @@
 | [__hfmax2_relu](../数学函数/half类型/half2类型算术函数/__hfmax2_relu.md) | 计算两个half2类型数据各分量的乘加的结果（前两个输入相乘后与第三个输入相加），并遵循CAST_RINT模式舍入。负数结果置为0。 |
 | [__hcmadd](../数学函数/half类型/half2类型算术函数/__hcmadd.md) | 将三个half2输入视为复数（第一个分量为实部，第二个分量为虚部），执行复数乘加运算x*y+z。 |
 
-**表 12**  half2类型比较函数
+**表 13**  half2类型比较函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -286,7 +300,7 @@
 | [__hminx2](../数学函数/half类型/half2类型比较函数/__hminx2.md) | 获取两个half2类型数据各分量的最小值。 |
 | [__hminx2_nan](../数学函数/half类型/half2类型比较函数/__hminx2_nan.md) | 获取两个half2类型数据各分量的最小值。任一分量为nan时对应结果为nan。 |
 
-**表 13**  half2类型数学库函数
+**表 14**  half2类型数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -307,7 +321,7 @@
 | [h2ceil](../数学函数/half类型/half2类型数学库函数/h2ceil.md) | 获取大于或等于输入数据各元素的最小整数值。 |
 | [h2trunc](../数学函数/half类型/half2类型数学库函数/h2trunc.md) | 获取对输入数据各元素的浮点数截断后的整数。 |
 
-**表 14**  bfloat16类型算术函数
+**表 15**  bfloat16类型算术函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -320,7 +334,7 @@
 | [__hneg](../数学函数/bfloat16类型/bfloat16类型算术函数/__hneg-156.md) | 获取输入bfloat16类型数据的负值。 |
 | [__hfma_relu](../数学函数/bfloat16类型/bfloat16类型算术函数/__hfma_relu-157.md) | 对输入bfloat16类型数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST_RINT模式舍入。负数结果置为0。 |
 
-**表 15**  bfloat16类型比较函数
+**表 16**  bfloat16类型比较函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -343,7 +357,7 @@
 | [__hmax_nan](../数学函数/bfloat16类型/bfloat16类型比较函数/__hmax_nan-174.md) | 获取两个输入数据中的最大值。任一输入为nan时返回nan。 |
 | [__hmin_nan](../数学函数/bfloat16类型/bfloat16类型比较函数/__hmin_nan-175.md) | 获取两个输入数据中的最小值。任一输入为nan时返回nan。 |
 
-**表 16**  bfloat16数学库函数
+**表 17**  bfloat16数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -364,7 +378,7 @@
 | [hceil](../数学函数/bfloat16类型/bfloat16类型数学库函数/hceil-190.md) | 获取大于或等于输入数据的最小整数值。 |
 | [htrunc](../数学函数/bfloat16类型/bfloat16类型数学库函数/htrunc-191.md) | 获取对输入数据的浮点数截断后的整数。 |
 
-**表 17**  bfloat16类型精度转换函数
+**表 18**  bfloat16类型精度转换函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -456,7 +470,7 @@
 | [__bfloat1622float2](../数学函数/bfloat16类型/bfloat16类型精度转换函数/__bfloat1622float2.md) | 将bfloat16x2的两个分量分别转换为float，并填充到float2返回。 |
 | [__ushort_as_bfloat16](../数学函数/bfloat16类型/bfloat16类型精度转换函数/__ushort_as_bfloat16.md) | 将unsigned short int的按位重新解释为bfloat16，即将unsigned short int的数据存储的位按照bfloat16的格式进行读取。 |
 
-**表 18**  bfloat16x2类型算术函数
+**表 19**  bfloat16x2类型算术函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -470,7 +484,7 @@
 | [__hfmax2_relu](../数学函数/bfloat16类型/bfloat16x2类型算术函数/__hfmax2_relu-199.md) | 计算两个bfloat16x2_t类型数据各分量的乘加的结果（前两个输入相乘后与第三个输入相加），并遵循CAST_RINT模式舍入。负数结果置为0。 |
 | [__hcmadd](../数学函数/bfloat16类型/bfloat16x2类型算术函数/__hcmadd-200.md) | 将三个bfloat16x2_t输入视为复数（第一个分量为实部，第二个分量为虚部），执行复数乘加运算x*y+z。 |
 
-**表 19**  bfloat16x2类型比较函数
+**表 20**  bfloat16x2类型比较函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -516,7 +530,7 @@
 | [__hminx2](../数学函数/bfloat16类型/bfloat16x2类型比较函数/__hminx2-240.md) | 获取两个bfloat16x2_t类型数据各分量的最小值。 |
 | [__hminx2_nan](../数学函数/bfloat16类型/bfloat16x2类型比较函数/__hminx2_nan-241.md) | 获取两个bfloat16x2_t类型数据各分量的最小值。任一分量为nan时对应结果为nan。 |
 
-**表 20**  bfloat16x2类型数学库函数
+**表 21**  bfloat16x2类型数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -537,7 +551,7 @@
 | [h2ceil](../数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2ceil-256.md) | 获取大于或等于输入数据各元素的最小整数值。 |
 | [h2trunc](../数学函数/bfloat16类型/bfloat16x2类型数学库函数/h2trunc-257.md) | 获取对输入数据各元素的浮点数截断后的整数。 |
 
-**表 21**  float类型数学库函数
+**表 22**  float类型数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -610,12 +624,12 @@
 | [fmodf](../数学函数/float类型数学库函数/fmodf.md) | 获取输入数据x除以y的余数。求余数时，商取x除以y浮点数结果的整数部分。 |
 | [remainderf](../数学函数/float类型数学库函数/remainderf.md) | 获取输入数据x除以y的余数。求余数时，商取最接近x除以y浮点数结果的整数，当x除以y的浮点数结果与左右最接近的整数距离相等时，商取偶数。 |
 | [copysignf](../数学函数/float类型数学库函数/copysignf.md) | 获取由第一个输入x的数值部分和第二个输入y的符号部分拼接得到的浮点数。 |
-| [nearbyIntf](../数学函数/float类型数学库函数/nearbyintf.md) | 获取与输入浮点数最接近的整数，输入浮点数与左右整数的距离相等时，返回偶数。 |
+| [nearbyintf](../数学函数/float类型数学库函数/nearbyintf.md) | 获取与输入浮点数最接近的整数，输入浮点数与左右整数的距离相等时，返回偶数。 |
 | [nextafterf](../数学函数/float类型数学库函数/nextafterf.md) | 如果y大于x，返回比x大的下一个可表示的浮点值，即浮点数二进制最低位加1。<br><br>如果y小于x，返回比x小的下一个可表示的浮点值，即浮点数二进制最低位减1。<br><br>如果y等于x，返回x。 |
 | [scalbnf](../数学函数/float类型数学库函数/scalbnf.md) | 获取输入数据x与2的n次方的乘积。 |
 | [scalblnf](../数学函数/float类型数学库函数/scalblnf.md) | 获取输入数据x与2的n次方的乘积。 |
 | [modff](../数学函数/float类型数学库函数/modff.md) | 将输入数据分解为小数部分和整数部分。 |
-| [fdivdef](../数学函数/float类型数学库函数/fdividef.md) | 获取两个输入数据相除的结果。 |
+| [fdividef](../数学函数/float类型数学库函数/fdividef.md) | 获取两个输入数据相除的结果。 |
 | [signbit](../数学函数/float类型数学库函数/signbit.md) | 获取输入数据的符号位。 |
 | [__saturatef](../数学函数/float类型数学库函数/__saturatef.md) | 将输入数据钳位到[0.0, 1.0]区间。 |
 | [__fdividef](../数学函数/float类型数学库函数/__fdividef.md) | 获取两个输入数据相除的结果。 |
@@ -632,7 +646,7 @@
 | [isnan](../数学函数/float类型数学库函数/isnan1.md) | 判断浮点数是否为nan。 |
 | [isinf](../数学函数/float类型数学库函数/isinf1.md) | 判断浮点数是否为无穷。 |
 
-**表 22**  类型转换函数
+**表 23**  类型转换函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -686,7 +700,7 @@
 | [__float_as_int](../数学函数/数据类型转换/类型转换函数/__float_as_int.md) | 将浮点数中的位重新解释为有符号整数。 |
 | [__float_as_uint](../数学函数/数据类型转换/类型转换函数/__float_as_uint.md) | 将浮点数中的位重新解释为无符号整数。 |
 
-**表 23**  整型数学库函数
+**表 24**  整型数学库函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -722,7 +736,7 @@
 
 ## 访存函数<a name="section1064618511375"></a>
 
-**表 24**  访存函数
+**表 25**  访存函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -730,10 +744,12 @@
 | [asc_ldca](../访存函数/asc_ldca.md) | 首先从Data Cache加载缓存数据，若未命中，则尝试从L2 Cache加载。如果Data Cache和L2 Cache中均未找到所需数据，则从Global Memory中读取数据，然后将其缓存到L2 Cache和Data Cache中。 |
 | [asc_stcg](../访存函数/asc_stcg.md) | 将指定数据存储到Global Memory的地址address中，并缓存到L2 Cache，但不缓存至Data Cache。 |
 | [asc_stwt](../访存函数/asc_stwt.md) | 将指定数据存储到Global Memory的地址address中，并缓存至Data Cache和L2 Cache。 |
+| [asc_dcci_single](../访存函数/asc_dcci_single.md) | 刷新指定地址所在的Cache Line，保证数据读取时Cache的一致性。 |
+| [asc_dcci_entire](../访存函数/asc_dcci_entire.md) | 刷新核内的整个Data Cache，保证数据读取时Cache的一致性。 |
 
 ## 地址空间谓词函数<a name="section97001946144014"></a>
 
-**表 25**  地址空间谓词函数
+**表 26**  地址空间谓词函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -743,7 +759,7 @@
 
 ## 地址空间转换函数
 
-**表 26**  地址空间转换函数
+**表 27**  地址空间转换函数
 
 | 接口名 | 功能描述 |
 | --- | --- |
@@ -755,13 +771,6 @@
 | [__cvta_local_to_generic](../地址空间转换函数/__cvta_local_to_generic.md) | 将栈空间的地址值转换为对应的指针。 |
 
 ## 协作组
-
-**表 27**  协作组划分接口
-
-| 接口名 | 功能描述 |
-| --- | --- |
-| [tiled_partition](../协作组/tiled_partition.md) | 将一个线程组划分为多个更小、固定大小的子组。 |
-| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个字组。 |
 
 **表 28**  thread_block接口
 
@@ -814,3 +823,9 @@
 | [any](../协作组/thread_block_tile/any.md) | 判断是否有组内线程的输入不为0。 |
 | [all](../协作组/thread_block_tile/all.md) | 判断是否所有组内线程的输入均不为0。 |
 
+**表 31**  协作组划分接口
+
+| 接口名 | 功能描述 |
+| --- | --- |
+| [tiled_partition](../协作组/tiled_partition.md) | 将一个线程组按指定大小划分为多个子组。 |
+| [binary_partition](../协作组/binary_partition.md) | 根据一个标签（0或1）将父组划分为两个子组。 |

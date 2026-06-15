@@ -21,7 +21,7 @@
 ```
 
 ## 算子描述
-  gather算子实现了从形状为100000 * 128的二维向量中获取指定索引的12288行数据的功能，具体功能描述可参考[Gather算子详情](../../../02_features/00_resource_management/basic_gather/README.md)章节。
+  gather算子实现了从shape为[100000,128]的二维向量中获取指定索引的12288行数据的功能，具体功能描述可参考[Gather算子详情](../../../00_introduction/01_gather/basic_gather/gather_2d/README.md)章节。
 
 ## msProf工具介绍
 msProf工具是单算子性能分析工具。包含msprof op和msprof op simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
@@ -59,25 +59,18 @@ msProf工具是单算子性能分析工具。包含msprof op和msprof op simulat
 ## 编译运行
 
 在本样例根目录下执行如下步骤，编译并执行算子。
-- 配置环境变量
+- 配置环境变量  
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，选择对应配置环境变量的命令。
-  - 默认路径，root用户安装CANN软件包
-    ```bash
-    source /usr/local/Ascend/cann/set_env.sh
-    ```
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-  - 默认路径，非root用户安装CANN软件包
-    ```bash
-    source $HOME/Ascend/cann/set_env.sh
-    ```
-
-  - 指定路径install_path，安装CANN软件包
-    ```bash
-    source ${install_path}/cann/set_env.sh
-    ```
+  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
 
 - 样例执行
+
+  在本样例目录下执行如下命令。
 
   ```bash
   mkdir -p build && cd build;           # 创建并进入build目录
