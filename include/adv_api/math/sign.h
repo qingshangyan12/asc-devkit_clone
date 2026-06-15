@@ -32,9 +32,8 @@
 #endif
 
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #pragma begin_pipe(V)
+
 namespace AscendC {
 /*!
  * \ingroup Sign
@@ -47,10 +46,15 @@ namespace AscendC {
  * \param [in] calCount: the number of elements to be processed.
  */
 template <typename T, bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     SignCompute<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
+#endif
 }
 
 /*!
@@ -63,6 +67,8 @@ __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] sharedTmpBuffer: input local temporary Tensor
  */
 template <typename T, bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer)
 {
@@ -79,6 +85,8 @@ __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] calCount: the number of elements to be processed.
  */
 template <typename T, bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     // Only for AI Vector Core.
@@ -87,7 +95,10 @@ __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T
     }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
+    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     SignCompute<T, isReuseSource>(dstTensor, srcTensor, calCount);
+#endif
 #else
     // Using the Stack Space to Allocate sharedTmpBuffer
     LocalTensor<uint8_t> sharedTmpBuffer;
@@ -106,13 +117,14 @@ __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T
  * \param [in] srcTensor: input LocalTensor
  */
 template <typename T, bool isReuseSource = false>
+__ASC_USE_RESERVED_UBUF__(2201,
+    "Sign is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sign(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
 {
     Sign<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
 }
 }  // namespace AscendC
 #pragma end_pipe
-#endif
 
 #endif  // LIB_MATH_SIGN_H
 

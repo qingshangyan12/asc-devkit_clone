@@ -3,10 +3,10 @@
 通过PyTorch框架进行模型的训练、推理时，会调用很多算子进行计算。开发者开发的自定义算子如果需要集成部署到PyTorch框架，有如下几种方式：
 
 -   Kernel直调：通过适配torch.library或Pybind注册自定义算子，可以实现PyTorch框架调用算子Kernel程序。
--   单算子API调用：该模式下的适配插件开发流程和具体样例请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide) 中的“《Ascend Extension for PyTorch 框架特性指南》 > 基于OpPlugin算子适配开发”章节。
--   图模式调用：自定义算子在Pytorch图模式下的适配开发指导请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide) 中的“《Pytorch图模式使用(TorchAir)》 >  自定义算子入图”章节。
+-   单算子API调用：该模式下的适配插件开发流程和具体样例请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“《Ascend Extension for PyTorch 框架特性指南》 > 基于OpPlugin算子适配开发”章节。
+-   图模式调用：自定义算子在Pytorch图模式下的适配开发指导请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“《Pytorch图模式使用(TorchAir)》 >  自定义算子入图”章节。
 
-**图 1**  Pytorch框架部署方式<a name="fig1969201074516"></a>  
+**图1**  Pytorch框架部署方式<a name="fig1969201074516"></a>  
 ![](../../../../figures/Pytorch框架部署方式.png "Pytorch框架部署方式")
 
 **本节主要提供通过torch.library与Pybind注册自定义算子并实现PyTorch框架调用算子Kernel程序的指导。**
@@ -18,7 +18,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 ## torch.library<a name="section9528173218278"></a>
 
-下面代码以add\_custom（Add自定义算子为例）算子为例，介绍通过torch.library如何调用算子Kernel程序，文档中仅介绍核心步骤，完整样例请参考[torch.library样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/02_framework/00_pytorch/torch_library)。
+下面代码以add\_custom（Add自定义算子为例）算子为例，介绍通过torch.library如何调用算子Kernel程序，文档中仅介绍核心步骤，完整样例请参考[torch.library样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/torch_library)。
 
 1.  环境准备。
 
@@ -29,7 +29,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 2.  实现NPU上的自定义算子。
 
-    包括算子Kernel实现，并使用<<<\>\>\>接口调用算子核函数完成指定的运算。样例中的c10\_npu::getCurrentNPUStream接口用于获取当前npu流，返回值类型NPUStream，使用方式请参考 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide) 中的“API >《Ascend Extension for PyTorch 自定义API参考》”。
+    包括算子Kernel实现，并使用<<<\>\>\>接口调用算子核函数完成指定的运算。样例中的c10\_npu::getCurrentNPUStream接口用于获取当前npu流，返回值类型NPUStream，使用方式请参考 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide)中的“API >《Ascend Extension for PyTorch 自定义API参考》”。
 
     需要注意的是，本样例的输入x，y的内存是在外层的Python调用脚本中分配的。
 
@@ -79,7 +79,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 ## Pybind<a name="section1788413437123"></a>
 
-下面代码以add\_custom算子为例，介绍通过Pybind方式实现Pytorch脚本中调用自定义算子的流程。文档中仅介绍核心步骤，完整样例请参考[Pybind样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/02_framework/00_pytorch/pybind)。
+下面代码以add\_custom算子为例，介绍通过Pybind方式实现Pytorch脚本中调用自定义算子的流程。文档中仅介绍核心步骤，完整样例请参考[Pybind样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_framework/00_pytorch/pybind)。
 
 1.  环境准备。
 

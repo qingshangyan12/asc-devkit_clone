@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -56,7 +54,7 @@ inline bfloat16x2_t asc_atomic_min(bfloat16x2_t *address, bfloat16x2_t val)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -65,7 +63,7 @@ inline bfloat16x2_t asc_atomic_min(bfloat16x2_t *address, bfloat16x2_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表 2**  不同数据类型支持的内存范围
+**表2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -100,13 +98,29 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 调用示例
 
+示例场景为：多个线程扫描延迟数组，使用`asc_atomic_min`接口将全局最低延迟写入同一个结果地址。输入参数说明如下：
+
+| 名称 | 说明 |
+| --- | --- |
+| `latency` | 每个元素表示一次请求的延迟值。 |
+| `min_latency` | Global Memory中的最小值结果，kernel启动前初始化为足够大的值。 |
+| `n` | 延迟样本数量。 |
+
+核心代码实现如下：
+
 -   SIMT编程场景：
 
-    ```
-    __global__ __launch_bounds__(1024) void KernelAtomicMin(float* dst, float* src)
+    ```cpp
+    __global__ __launch_bounds__(256) void find_min_latency(uint32_t *min_latency,
+                                                           uint32_t *latency,
+                                                           uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_min(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        asc_atomic_min(min_latency, latency[idx]);
     }
     ```
 
@@ -114,11 +128,23 @@ Unified Buffer或Global Memory上的初始数据。
 
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
-    ```
-    __simt_vf__ __launch_bounds__(1024) inline void KernelAtomicMin(__gm__ float* dst, __gm__ float* src)
+    ```cpp
+    __simt_vf__ __launch_bounds__(1024) inline void find_min_latency(__gm__ uint32_t *min_latency,
+                                                                    __gm__ uint32_t *latency,
+                                                                    uint32_t n)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        asc_atomic_min(dst + idx, src[idx]);
+        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= n) {
+            return;
+        }
+
+        asc_atomic_min(min_latency, latency[idx]);
     }
     ```
 
+输出结果示例如下：
+
+```
+latency: 31, 20, 45
+min_latency: 20 // 表明所有线程并发更新后得到最小值
+```

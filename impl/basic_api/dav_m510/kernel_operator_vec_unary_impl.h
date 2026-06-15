@@ -237,7 +237,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
         if constexpr (isMaskBitMode) {
             if constexpr (SupportBytes<T, 1>()) {
                 ASCENDC_ASSERT(isSetMask, "mask must be set when sizeof(T) is 1.");
-                auto eventIDV2S = GetTPipePtr()->FetchEventID(HardEvent::V_S);
+                auto eventIDV2S = FetchEventID<HardEvent::V_S>();
                 SetFlag<HardEvent::V_S>(eventIDV2S);
                 WaitFlag<HardEvent::V_S>(eventIDV2S);
                 maskBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 4);
@@ -245,7 +245,7 @@ __aicore__ inline void VecUnaryLevel0Template(__ubuf__ T *dst, __ubuf__ T *src, 
                 maskBuf[1] = maskArray[1];
                 maskBuf[2] = maskArray[2];
                 maskBuf[3] = maskArray[3];
-                auto eventIDS2V = GetTPipePtr()->FetchEventID(HardEvent::S_V);
+                auto eventIDS2V = FetchEventID<HardEvent::S_V>();
                 SetFlag<HardEvent::S_V>(eventIDS2V);
                 WaitFlag<HardEvent::S_V>(eventIDS2V);
             } else if constexpr (isSetMask) {
@@ -572,7 +572,7 @@ __aicore__ inline void AbsImpl(__ubuf__ T *dst, __ubuf__ U *src, const uint32_t 
 {
     static_assert(SupportType<T, half, float>() && SupportType<U, complex32, complex64>(),
         "current data type is not supported on current device!");
-    static_assert(std::is_same_v<T, typename U::EleType>, "dst type do not match with src complex elements' type");
+    static_assert(Std::is_same_v<T, typename U::EleType>, "dst type do not match with src complex elements' type");
     __VEC_SCOPE__
     {
         Reg::RegTensor<U, Reg::RegTraitNumTwo> vSrcReg0;

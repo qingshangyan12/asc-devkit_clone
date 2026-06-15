@@ -1,13 +1,13 @@
-# 使能Iterate或IterateAll异步接口避免AIC/AIV同步依赖<a name="ZH-CN_TOPIC_0000001893695885"></a>
+# 启用Iterate或IterateAll异步接口避免AIC/AIV同步依赖<a name="ZH-CN_TOPIC_0000001893695885"></a>
 
 【优先级】高
 
-【描述】在MIX场景，即AIC（AI Cube核）和AIV（AI Vector核）混合编程中，调用Matmul Iterate或者IterateAll时，AIV发送消息到AIC启动Matmul计算。若通过Iterate<true\>同步方式，如[图1 同步方式消息发送示意图](#fig99236286201)，每次调用都会触发一次消息发送，而通过Iterate<false\>异步方式，如[图2 异步方式消息发送示意图](#fig1511392207)，仅第一次需要发送消息，后续无需发送消息，从而减少Cube与Vector核间交互，减少核间通信开销。因此，MIX场景推荐使用Iterate<false\>或者IterateAll<false\>异步接口（注意：使用异步接口时需要设置Workspace）。
+【描述】在MIX场景，即AIC（AI Cube核）和AIV（AI Vector核）混合编程中，调用Matmul Iterate或者IterateAll时，AIV发送消息到AIC启动Matmul计算。若通过Iterate<true\>同步方式，如[图1同步方式消息发送示意图](#fig99236286201)，每次调用都会触发一次消息发送，而通过Iterate<false\>异步方式，如[图2 异步方式消息发送示意图](#fig1511392207)，仅第一次需要发送消息，后续无需发送消息，从而减少Cube与Vector核间交互，减少核间通信开销。因此，MIX场景推荐使用Iterate<false\>或者IterateAll<false\>异步接口（注意：使用异步接口时需要设置Workspace）。
 
-**图 1**  同步方式消息发送示意图<a name="fig99236286201"></a>  
+**图1**  同步方式消息发送示意图<a name="fig99236286201"></a>  
 ![](../../../figures/同步方式消息发送示意图.png "同步方式消息发送示意图")
 
-**图 2**  异步方式消息发送示意图<a name="fig1511392207"></a>  
+**图2**  异步方式消息发送示意图<a name="fig1511392207"></a>  
 ![](../../../figures/异步方式消息发送示意图.png "异步方式消息发送示意图")
 
 【反例】
@@ -56,4 +56,3 @@ while(mm.template Iterate<false>()){
     ...
 }
 ```
-

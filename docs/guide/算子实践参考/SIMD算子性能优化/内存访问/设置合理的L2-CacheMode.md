@@ -32,7 +32,7 @@ L2 Cache的带宽相比GM的带宽有数倍的提升，因此当数据命中L2 C
 
 Ascend C基于GlobalTensor提供了SetL2CacheHint接口，用户可以根据需要指定CacheMode。
 
-考虑如下场景，构造两个Tensor的相加计算，输入x、y和输出z的Shape均为\(8192, 8192\)。下文完整样例请参考[设置合理L2 CacheMode样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute_practices/add_high_performance)。
+考虑如下场景，构造两个Tensor的相加计算，输入x、y和输出z的Shape均为\(8192, 8192\)。下文完整样例请参考[设置合理L2 CacheMode样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)。
 
 <a name="table12921549195512"></a>
 <table><thead align="left"><tr id="row1229364945511"><th class="cellrowborder" valign="top" width="6.813978389954251%" id="mcps1.1.4.1.1"><p id="p2081249145715"><a name="p2081249145715"></a><a name="p2081249145715"></a>实现方案</p>
@@ -47,7 +47,7 @@ Ascend C基于GlobalTensor提供了SetL2CacheHint接口，用户可以根据需�
 </td>
 <td class="cellrowborder" valign="top" width="42.67497323079919%" headers="mcps1.1.4.1.2 "><p id="p1764591574211"><a name="p1764591574211"></a><a name="p1764591574211"></a>总数据量384MB，其中：x：128MB；y：128MB；z：128MB。</p>
 <p id="p13628115612406"><a name="p13628115612406"></a><a name="p13628115612406"></a>使用48个核参与计算，按行方向切分6份，列方向切分8份。</p>
-<p id="p5900191641514"><a name="p5900191641514"></a><a name="p5900191641514"></a>x、y、z 对应GlobalTensor的CacheMode均设置为CACHE_MODE_NORMAL，需要经过L2 Cache，需要进入L2 Cache的总数据量为384MB。</p>
+<p id="p5900191641514"><a name="p5900191641514"></a><a name="p5900191641514"></a>x、y、z对应GlobalTensor的CacheMode均设置为CACHE_MODE_NORMAL，需要经过L2 Cache，需要进入L2 Cache的总数据量为384MB。</p>
 </td>
 <td class="cellrowborder" valign="top" width="50.51104837924658%" headers="mcps1.1.4.1.3 "><p id="p2198131313619"><a name="p2198131313619"></a><a name="p2198131313619"></a>总数据量384MB，其中：x：128MB；y：128MB；z：128MB。</p>
 <p id="p3198111373618"><a name="p3198111373618"></a><a name="p3198111373618"></a>使用48个核参与计算，按行方向切分6份，列方向切分8份。</p>
@@ -77,4 +77,3 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);</pre>
 >msprof op --launch-count=2 --output=./prof ./execute_add_op
 >```
 >重点关注Memory.csv中的aiv\_gm\_to\_ub\_bw\(GB/s\)和aiv\_main\_mem\_write\_bw\(GB/s\)写带宽的速率。
-

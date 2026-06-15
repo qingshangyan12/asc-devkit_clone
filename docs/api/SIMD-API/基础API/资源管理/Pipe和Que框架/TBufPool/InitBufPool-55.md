@@ -79,7 +79,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table1550165916920"></a>
 <table><thead align="left"><tr id="row115015591391"><th class="cellrowborder" valign="top" width="12.139999999999999%" id="mcps1.2.3.1.1"><p id="p12501159099"><a name="p12501159099"></a><a name="p12501159099"></a>参数名</p>
@@ -101,7 +101,7 @@
 </tbody>
 </table>
 
-**表 2**  InitBufPool\(T& bufPool, uint32\_t len\) 原型定义参数说明
+**表2**  InitBufPool\(T& bufPool, uint32\_t len\)原型定义参数说明
 
 <a name="table1960411494236"></a>
 <table><thead align="left"><tr id="row17605204922320"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p6605649122315"><a name="p6605649122315"></a><a name="p6605649122315"></a>参数名称</p>
@@ -129,7 +129,7 @@
 </tbody>
 </table>
 
-**表 3**  InitBufPool\(T& bufPool, uint32\_t len, U& shareBuf\) 原型定义参数说明
+**表3**  InitBufPool\(T& bufPool, uint32\_t len, U& shareBuf\)原型定义参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>
@@ -178,7 +178,7 @@
 
 数据量较大且内存有限时，无法一次完成所有数据搬运，需要拆分成多个阶段计算，每次计算使用其中的一部分数据，可以通过TBufPool资源池进行内存地址复用。本例中，从Tpipe划分出资源池tbufPool0，tbufPool0为src0Gm分配空间后，继续分配了资源池tbufPool1，指定tbufPool1与tbufPool2复用并分别运用于第一、二轮计算，此时tbufPool1及tbufPool2共享起始地址及长度。
 
-完整样例链接可以参考[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/04_resource_management/tbufpool_management)。
+完整样例链接可以参考[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management)。
 
 ```
 AscendC::TPipe* pipe;
@@ -208,4 +208,3 @@ tbufPool2.Reset();
 tbufPool0.Reset();
 pipe->Reset();
 ```
-

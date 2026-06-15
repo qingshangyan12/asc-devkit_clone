@@ -2,19 +2,17 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
-对输入数据x、y、z，计算x与y相乘加上z的结果， 并遵循CAST\_RINT模式对结果进行舍入处理。
+对输入数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST\_RINT模式对结果进行舍入处理。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002545900872.png)
 
@@ -26,7 +24,7 @@ inline bfloat16_t __hfma(bfloat16_t x, bfloat16_t y, bfloat16_t z)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -79,4 +77,3 @@ x \* y+ z的值。本接口不受全局饱和模式影响，特殊值如下：
         dst[idx] = __hfma(x[idx], y[idx], z[idx]);
     }
     ```
-

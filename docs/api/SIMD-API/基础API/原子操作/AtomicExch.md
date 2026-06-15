@@ -60,7 +60,7 @@ __aicore__ inline T AtomicExch(__gm__ T *address, T value)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="zh-cn_topic_0235751031_table33761356"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="8.63%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
@@ -78,7 +78,7 @@ __aicore__ inline T AtomicExch(__gm__ T *address, T value)
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table1055216132132"></a>
 <table><thead align="left"><tr id="row105531513121315"><th class="cellrowborder" valign="top" width="8.959999999999999%" id="mcps1.2.4.1.1"><p id="p1663233972817"><a name="p1663233972817"></a><a name="p1663233972817"></a>参数名</p>
@@ -116,7 +116,7 @@ GM地址上做原子操作前的数据。
 
 ## 调用示例<a name="section177231425115410"></a>
 
-更多样例请参见[ScalarAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/08_atomic_operations/scalar_atomic_operations)。
+更多样例请参见[ScalarAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations)。
 
 ```
 // 传入全局数据地址，初始化dstGlobal与dstLocal
@@ -124,7 +124,7 @@ dstGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dataSize);
 
 LocalTensor<T> dstLocal = inQueueX.AllocTensor<T>();
 uint32_t value = 2;
-uint32_t a = AscendC::AtomicExch(reinterpret_cast<__gm__ uint32_t *>(dstGm), values);
+uint32_t a = AscendC::AtomicExch(reinterpret_cast<__gm__ uint32_t *>(dstGm), value);
 // 先执行完原子操作之后才能进行搬运操作，有数据依赖
 event_t eventIdSToMte2 = static_cast<event_t>(GetTPipePtr()->AllocEventID<HardEvent::S_MTE2>());
 // 手动插入MTE2等待Scalar的同步
@@ -140,12 +140,11 @@ DataCopy(dstLocal, dstGlobal, dataSize);
 原GM数据dst: [1,1,1,1,1,...,1] 
 核1：
 原子计算后GM数据dst: [2,1,1,1,1,...,1] 
-返回值 a: 1
+返回值a: 1
 核2：
 原子计算后GM数据dst: [2,1,1,1,1,...,1] 
-返回值 a: 2
+返回值a: 2
 核3：
 原子计算后GM数据dst: [2,1,1,1,1,...,1] 
-返回值 a: 2
+返回值a: 2
 ```
-

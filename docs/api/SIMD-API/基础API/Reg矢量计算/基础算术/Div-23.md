@@ -62,7 +62,7 @@ __simd_callee__ inline void Div(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.310000000000002%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
@@ -80,7 +80,7 @@ __simd_callee__ inline void Div(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 <tr id="row18835145716587"><td class="cellrowborder" valign="top" width="18.310000000000002%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>mode</p>
 </td>
 <td class="cellrowborder" valign="top" width="81.69%" headers="mcps1.2.3.1.2 "><p id="p1315151232819"><a name="p1315151232819"></a><a name="p1315151232819"></a>可配置为MaskMergeMode的枚举或DivSpecificMode的结构体指针。</p>
-<a name="ul1131085281310"></a><a name="ul1131085281310"></a><ul id="ul1131085281310"><li>配置MaskMergeMode，选择MERGING模式或ZEROING模式。<a name="ul1163765616511"></a><a name="ul1163765616511"></a><ul id="ul1163765616511"><li>ZEROING，mask未筛选的元素在dstReg中置零。</li><li>MERGING, 暂不支持。</li></ul>
+<a name="ul1131085281310"></a><a name="ul1131085281310"></a><ul id="ul1131085281310"><li>配置MaskMergeMode，选择MERGING模式或ZEROING模式。<a name="ul1163765616511"></a><a name="ul1163765616511"></a><ul id="ul1163765616511"><li>ZEROING，mask未筛选的元素在dstReg中置零。</li><li>MERGING,暂不支持。</li></ul>
 </li><li>配置DivSpecificMode<pre class="screen" id="screen18481935171419"><a name="screen18481935171419"></a><a name="screen18481935171419"></a>enum class DivAlgo {
     INTRINSIC = 0,
     DIFF_COMPENSATION,
@@ -94,7 +94,7 @@ struct DivSpecificMode {
     bool precisionMode = false;
     DivAlgo algo = DivAlgo::INTRINSIC;
 };</pre>
-<p id="p175231030713"><a name="p175231030713"></a><a name="p175231030713"></a>当precisionMode为true时，使能更高精度的Div计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前只针对float数据类型生效。</p>
+<p id="p175231030713"><a name="p175231030713"></a><a name="p175231030713"></a>当precisionMode为true时，开启更高精度的Div计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前只针对float数据类型生效。</p>
 </li></ul>
 <a name="ul11875104117375"></a><a name="ul11875104117375"></a><ul id="ul11875104117375"><li>algo：用于配置Subnormal模式。<a name="ul1639612391388"></a><a name="ul1639612391388"></a><ul id="ul1639612391388"><li>DivAlgo::INTRINSIC、DivAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，最大精度误差为1 ulp。</li><li>DivAlgo::DIFF_COMPENSATION、DivAlgo::PRECISION_0ULP_FTZ_TRUE，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float、complex64数据类型。</li><li>DivAlgo::PRECISION_0ULP_FTZ_FALSE，支持Subnormal数据计算，使用差值补偿算法得出结果，最大精度误差为0 ulp。目前，该算法支持float数据类型。</li><li>DivAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。目前，该算法支持half、float数据类型。</li></ul>
 </li></ul>
@@ -108,7 +108,7 @@ struct DivSpecificMode {
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="zh-cn_topic_0235751031_table33761356"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0235751031_row27598891"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0235751031_p20917673"><a name="zh-cn_topic_0235751031_p20917673"></a><a name="zh-cn_topic_0235751031_p20917673"></a>参数名</p>
@@ -188,4 +188,3 @@ __simd_vf__ inline void DivVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf_
     }
 }
 ```
-

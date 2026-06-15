@@ -27,6 +27,22 @@
 #include "kernel_operator_symbol_override_impl.h"
 
 namespace AscendC {
+template <Hardware pos>
+__aicore__ inline uint32_t GetDynamicMemStartPos() {
+// dynamic array is not supported in cpu mode
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+    if constexpr (pos == Hardware::UB) {
+    extern __ubuf__ uint32_t dynamicStartUB[];
+    return (uint64_t)(&dynamicStartUB[0]);
+} else {
+    return 0;
+}
+#else
+    return 0;
+#endif
+}
+
+#if defined(__NPU_ARCH__)
 template <typename Shape, size_t... Is>
 __aicore__ inline constexpr auto ProdImpl(const Shape& t, Std::index_sequence<Is...>) {
     return (Std::get<Is>(t) * ... * 1);
@@ -37,20 +53,6 @@ __aicore__ inline constexpr auto Prod(const Shape<Args...>& t) {
     return ProdImpl(t, Std::make_index_sequence<sizeof...(Args)>{});
 }
 
-template <Hardware pos>
-__aicore__ inline uint32_t GetDynamicMemStartPos() {
-// dynamic array is not supported in cpu mode
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
-    if constexpr (pos == Hardware::UB) {
-        extern __ubuf__ uint32_t dynamicStartUB[];
-        return (uint64_t)(&dynamicStartUB[0]);
-    } else {
-        return 0;
-    }
-#else
-    return 0;
-#endif
-}
 
 // CPU Impl
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
@@ -440,7 +442,7 @@ inline std::string GetComplexStr(const T& val)
     static constexpr uint32_t all32BitsOne = 0xFFFFFFFF;
     static_assert(SupportType<T, complex32, complex64>(), "Unsupported complex type.");
     std::string str = "";
-    if constexpr(std::is_same_v<T, complex32>) {
+    if constexpr(Std::is_same_v<T, complex32>) {
         if (val.imag.ToFloat() > 0 || !(*(reinterpret_cast<const uint16_t*>(&val.imag)) & all16BitsOne)) {
             str += std::to_string(val.real.ToFloat()) + "+" + std::to_string(val.imag.ToFloat()) + "j ";
         } else {
@@ -488,10 +490,10 @@ inline void LocalTensor<T>::Print(uint32_t len)
                 if constexpr ((sizeof(PrimType) == sizeof(int8_t)) || (sizeof(PrimType) == sizeof(bool))) {
                     os_ << static_cast<int32_t>(GetValue(i * blockNum + j)) << " ";
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-                } else if constexpr (std::is_same_v<PrimType, fp8_e4m3fn_t> || std::is_same_v<PrimType, fp8_e5m2_t> ||
-                                     std::is_same_v<PrimType, hifloat8_t>) {
+                } else if constexpr (Std::is_same_v<PrimType, fp8_e4m3fn_t> || Std::is_same_v<PrimType, fp8_e5m2_t> ||
+                                     Std::is_same_v<PrimType, hifloat8_t>) {
                     os_ << GetValue(i * blockNum + j).ToFloat() << " ";
-                } else if constexpr (std::is_same_v<PrimType, complex32> || std::is_same_v<PrimType, complex64>) {
+                } else if constexpr (Std::is_same_v<PrimType, complex32> || Std::is_same_v<PrimType, complex64>) {
                     PrimType val = GetValue(i * blockNum + j);
                     os_ << GetComplexStr(val);
 #endif
@@ -507,10 +509,10 @@ inline void LocalTensor<T>::Print(uint32_t len)
                 if constexpr ((sizeof(PrimType) == sizeof(int8_t)) || (sizeof(PrimType) == sizeof(bool))) {
                     os_ << static_cast<int32_t>(GetValue(rowNum * blockNum + i)) << " ";
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-                } else if constexpr (std::is_same_v<PrimType, fp8_e4m3fn_t> || std::is_same_v<PrimType, fp8_e5m2_t> ||
-                                     std::is_same_v<PrimType, hifloat8_t>) {
+                } else if constexpr (Std::is_same_v<PrimType, fp8_e4m3fn_t> || Std::is_same_v<PrimType, fp8_e5m2_t> ||
+                                     Std::is_same_v<PrimType, hifloat8_t>) {
                     os_ << GetValue(rowNum * blockNum + i).ToFloat() << " ";
-                } else if constexpr (std::is_same_v<PrimType, complex32> || std::is_same_v<PrimType, complex64>) {
+                } else if constexpr (Std::is_same_v<PrimType, complex32> || Std::is_same_v<PrimType, complex64>) {
                     PrimType val = GetValue(rowNum * blockNum + i);
                     os_ << GetComplexStr(val);
 #endif
@@ -952,6 +954,10 @@ __aicore__ inline void LocalTensor<T>::SetBufferLen(uint32_t dataLen)
     this->address_.dataLen = dataLen;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if ASCEND_IS_AIV {
+        this->address_.bufferAddr = set_ub_addr_upper_bound(this->address_.bufferAddr, dataLen * sizeof(T));
+    }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+    if (GetPhyType(AscendC::TPosition(this->GetPosition())) == Hardware::UB) {
         this->address_.bufferAddr = set_ub_addr_upper_bound(this->address_.bufferAddr, dataLen * sizeof(T));
     }
 #endif
@@ -1699,9 +1705,11 @@ __aicore__ inline typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<D
     LocalTensor<DataType> tensorOut(head_, layout);
     head_ += SizeOfBits<liteType>::value * tensorOut.GetSize() / SizeOfBits<uint8_t>::value;
     return tensorOut;
-}   
+}
+#endif // defined(__NPU_ARCH__)
 }
 #endif // KERNEL_TENSOR_H
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_IMPL_H__

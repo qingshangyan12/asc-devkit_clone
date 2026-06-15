@@ -25,10 +25,10 @@
 - Ascend 950PR新增及兼容支持样例共计约260个，包含[SIMT样例](./examples/03_simt_api)、[SIMD样例](./examples/01_simd_cpp_api)（框架类、基础API、高阶API、最佳实践等），并按照编程模型和样例类别对[样例目录结构进行调整](https://gitcode.com/cann/asc-devkit/pull/1223)，提升样例目录结构的易读性。
 - 融合编译与<<<>>>调用方式支持[CPU模式](https://gitcode.com/cann/asc-tools/pull/138)以及[SIM仿真模式](https://gitcode.com/cann/asc-devkit/blob/master/cmake/asc/asc_modules/CMakeASCInformation.cmake)。
 ### 📖 资料文档
-- 新增90+ [Reg编程接口API](./docs/api/context/Reg%E7%9F%A2%E9%87%8F%E8%AE%A1%E7%AE%97.md)资料，Reg矢量计算API是面向RegBase架构开发的API，用户可通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。
-- 新增SIMT[快速入门](docs/guide/入门教程/快速入门/基于SIMT编程/Add自定义算子开发.md)、[编程模型](docs/guide/编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)和[算子实现](docs/guide/算子实践参考/SIMT算子实现/基础知识.md)介绍。
+- 新增90+ [Reg编程接口API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg矢量计算.md)资料，Reg矢量计算API是面向RegBase架构开发的API，用户可通过该API直接对芯片中涉及Vector计算的寄存器进行操作，实现更大的灵活性和更好的性能。
+- 新增SIMT[快速入门](docs/guide/入门教程/快速入门/基于SIMT编程/Gather算子快速入门.md)、[编程模型](docs/guide/编程指南/编程模型/AI-Core-SIMT编程/抽象硬件架构.md)和[算子实现](docs/guide/算子实践参考/SIMT算子实现/基础知识.md)介绍。
 - 新增SIMD与SIMT[混合编程模型](docs/guide/编程指南/高级编程/高级AI-Core编程模型/SIMD与SIMT混合编程.md)、[算子实现](docs/guide/算子实践参考/SIMD与SIMT混合算子实现/基础知识.md)、[性能优化](docs/guide/算子实践参考/SIMD与SIMT混合算子性能优化/内存访问/使用Unified-Buffer提升内存访问效率.md)介绍。
-- 新增[SIMT API](docs/api/context/简介-140.md)资料章节。
+- 新增[SIMT API](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/SIMT-API.md)资料章节。
 - 新增[兼容性迁移指南](docs/guide/跨代迁移兼容性指南/Ascend-C-API兼容策略.md)（220x架构版本迁移到351x架构版本）。
 - 昇腾社区中，Ascend C算子开发新增[可视化专区](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/opdevg/Ascendcopdevg/atlas_ascendc_map_10_0017.html)，通过视频呈现Cube和Vector算子的执行过程。
 
@@ -66,7 +66,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
 其总体逻辑架构图如下所示：
 
-<img src="docs/figures/architecture.png" alt="架构图"  width="850px" height="580px">
+<img src="docs/guide/figures/architecture_ascendc.png" alt="架构图"  width="1000px">
 
 - **语言扩展层C API**：纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力；
 - **基础API**：单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；
@@ -92,7 +92,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 │   ├── aicpu_api                       # Ascend C AI CPU API实现源代码
 │   ├── basic_api                       # Ascend C 基础API实现源代码
 │   ├── c_api                           # Ascend C 语言扩展层C API实现源代码
-│   ├── experimental                    # Ascend C TENSOR API实现源代码
+│   ├── tensor_api                      # Ascend C TENSOR API实现源代码
 │   ├── simt_api                        # Ascend C SIMT API实现源代码
 │   └── utils                           # Ascend C 工具类实现源代码
 ├── include                             # Ascend C API接口声明源代码
@@ -100,7 +100,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 │   ├── aicpu_api                       # Ascend C AI CPU API声明源代码
 │   ├── basic_api                       # Ascend C 基础API声明源代码
 │   ├── c_api                           # Ascend C 语言扩展层C API声明源代码
-│   ├── experimental                    # Ascend C TENSOR API声明源代码
+│   ├── tensor_api                      # Ascend C TENSOR API声明源代码
 │   ├── simt_api                        # Ascend C SIMT API声明源代码
 │   └── utils                           # Ascend C 工具类声明源代码
 ├── scripts                             # 打包相关脚本

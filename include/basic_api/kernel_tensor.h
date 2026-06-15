@@ -234,7 +234,11 @@ private:
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
+#if defined(__NPU_ARCH__)
     __aicore__ inline GlobalTensor<T>();
+#else
+    __aicore__ inline GlobalTensor<T>(){}
+#endif
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline ~GlobalTensor<T>();
 #endif

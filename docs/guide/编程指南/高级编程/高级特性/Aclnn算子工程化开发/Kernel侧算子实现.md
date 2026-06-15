@@ -26,7 +26,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 提供GET\_TILING\_DATA，用于获取算子kernel入口函数传入的tiling信息，并填入注册的Tiling结构体中，此函数会以宏展开的方式进行编译。注意，对应的算子host实现中需要定义TilingData结构体，实现并注册计算TilingData的Tiling函数。具体请参考[Host侧Tiling实现](Host侧Tiling实现/基本流程.md)。
 
-核函数中调用[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GET_TILING_DATA.md)获取TilingData的样例如下：
+核函数中调用[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA.md)获取TilingData的样例如下：
 
 ```
 extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
@@ -113,7 +113,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
     }
     ```
 
--   如下示例中，算子中有两个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（16, 32）和 （1, 16, 16, 32），出参shape\_out用于存放该shape信息。示例如下：
+-   如下示例中，算子中有两个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（16, 32）和（1, 16, 16, 32），出参shape\_out用于存放该shape信息。示例如下：
 
     ```
     extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {

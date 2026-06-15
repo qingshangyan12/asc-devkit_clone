@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -26,7 +24,7 @@ inline float jnf(int n, float x)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -56,23 +54,41 @@ inline float jnf(int n, float x)
 
 ## 调用示例
 
--   SIMT编程场景：
+- SIMT编程场景：
 
     ```
-    __global__ __launch_bounds__(256) void KernelJn(float* dst, int* n, float* x)
+    __global__ __launch_bounds__(256) void compute_jnf(float *result, const int *n, const float *x, uint32_t count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = jnf(n[idx], x[idx]);
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = jnf(n[idx], x[idx]);
     }
     ```
 
--   SIMD与SIMT混合编程场景：
+- SIMD与SIMT混合编程场景：
 
     ```
-    __simt_vf__ __launch_bounds__(256) inline void KernelJn(__gm__ float* dst, __gm__ int* n, __gm__ float* x)
+    __simt_vf__ __launch_bounds__(256) inline void compute_jnf_vf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
     {
-        int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        dst[idx] = jnf(n[idx], x[idx]);
+        const uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+        if (idx >= count) {
+            return;
+        }
+        result[idx] = jnf(n[idx], x[idx]);
+    }
+
+    __global__ __vector__ void run_jnf(__gm__ float *result, __gm__ const int *n, __gm__ const float *x, uint32_t count)
+    {
+        asc_vf_call<compute_jnf_vf>(dim3(256), result, n, x, count);
     }
     ```
 
+输入输出示例如下：
+
+```
+n：1, 2, 3, 1
+x：0.25, 0.75, 1.25, 1.75
+result: 0.124026 0.06707399 0.03686836 0.5801562
+```

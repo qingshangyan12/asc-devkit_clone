@@ -83,7 +83,7 @@ graph TD
 
 **示例**
 - [SIMD Add 算子示例（带同步计算接口）](../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
-- [SIMT Add 算子示例（匹配业界习惯）](../examples/03_simt_api/00_introduction/01_add/add.asc)
+- [SIMT Gather 算子示例（匹配业界习惯）](../examples/03_simt_api/00_introduction/01_gather/basic_gather/gather_1d/gather_1d.asc)
 - 更多样例请参考 [examples 目录](https://gitcode.com/cann/asc-devkit/tree/master/examples)
 
 ---
@@ -101,8 +101,8 @@ graph TD
 - 需要在生产环境中开发极致性能算子，同时希望保持代码可维护性与可扩展性的场景。
 
 **示例**
-- [基于 Tque / Tpipe 自动管理内存与同步的 SIMD Add 算子示例](../examples/01_simd_cpp_api/00_introduction/01_vector/add_tpipe_tque/add.asc)
-- [基于 LocalMemoryAllocator 自主管理内存与同步的 SIMD Add 算子示例](../examples/01_simd_cpp_api/00_introduction/01_vector/add/add.asc)
+- [基于 Tque / Tpipe 自动管理内存与同步的 SIMD Add 算子示例](../examples/01_simd_cpp_api/00_introduction/01_add/add_tpipe_tque/add_tpipe_tque.asc)
+- [基于 LocalMemoryAllocator 自主管理内存与同步的 SIMD Add 算子示例](../examples/01_simd_cpp_api/00_introduction/01_add/add/add.asc)
 - 基于 Layout 的 Tensor API 示例（待补充）
 
 ---
@@ -118,8 +118,8 @@ graph TD
 - 希望复用成熟算法实现、缩短开发周期的场景。
 
 **示例**
-- [Softmax API 示例](../examples/01_simd_cpp_api/03_libraries/01_activation/softmax/softmax.asc)
-- [Matmul API 示例](../examples/01_simd_cpp_api/03_libraries/00_matrix)
+- [Softmax API 示例](../examples/01_simd_cpp_api/04_advanced_api/01_activation/softmax/softmax.asc)
+- [Matmul API 示例](../examples/01_simd_cpp_api/04_advanced_api/00_matmul)
 
 ---
 

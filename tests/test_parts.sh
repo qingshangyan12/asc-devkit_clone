@@ -85,6 +85,7 @@ basic_test_three_targets=(
     ascendc_run_all_header_checks
     ascendc_run_all_header_checks_cpu
     ascendc_run_all_header_checks_cpu_single
+    ascendc_run_all_reg_header_checks
 )
 
 basic_test_four_targets=(
@@ -107,8 +108,6 @@ basic_test_five_targets=(
     ascendc_ut_c_api_ascend950pr_9599_AIC
     ascendc_ut_c_api_ascend950pr_9599_AIV
     ascendc_ut_reg_compute_ascend950pr_9599
-    ascendc_ut_tensor_api_NPU_ARCH_2201_AIC
-    ascendc_ut_tensor_api_NPU_ARCH_2201_AIV
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIC
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIV
     ascendc_ut_simt_api_ascend950pr_9599
@@ -122,4 +121,6 @@ arm_test_targets=(
     ascendc_run_all_host_header_checks
     ascendc_run_all_host_header_checks_npu
     ascendc_run_all_host_header_checks_npu_single
+    adv_api_run_all_host_header_checks_npu
+    adv_api_run_all_host_header_checks_npu_single
 )

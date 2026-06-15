@@ -7,7 +7,14 @@ const isApiPage = ref(false)
 
 const filterOptions = [
   { value: 'all', label: '全量' },
-  { value: '950', label: '950' },
+  { value: '950', label: 'Ascend 950' },
+  { value: 'A3', label: 'Atlas A3' },
+  { value: '910b', label: 'Atlas A2' },
+  { value: '910', label: 'Atlas 训练系列' },
+  { value: '310p', label: 'Atlas 推理系列' },
+  { value: '310b', label: 'Atlas 200I/500 A2' },
+  { value: 'x90', label: 'Kirin X90' },
+  { value: '9030', label: 'Kirin 9030' },
 ]
 
 const selectedFilter = ref('all')
@@ -28,12 +35,21 @@ function applyFilter() {
   if (!content) return
 
   const allFilterDivs = content.querySelectorAll('[data-filter]')
+  content.querySelectorAll('tr').forEach(tr => { tr.style.display = '' })
 
   if (selectedFilter.value === 'all') {
     allFilterDivs.forEach(el => { el.style.display = '' })
   } else {
     allFilterDivs.forEach(el => {
-      el.style.display = el.getAttribute('data-filter') === selectedFilter.value ? '' : 'none'
+      const filterValue = el.getAttribute('data-filter')
+      const match = filterValue.split(',').map(s => s.trim()).includes(selectedFilter.value)
+      el.style.display = match ? '' : 'none'
+    })
+    content.querySelectorAll('tr').forEach(tr => {
+      const filterDivs = tr.querySelectorAll('[data-filter]')
+      if (filterDivs.length === 0) return
+      const anyVisible = Array.from(filterDivs).some(el => el.style.display !== 'none')
+      tr.style.display = anyVisible ? '' : 'none'
     })
   }
 }
@@ -63,6 +79,7 @@ watch(() => route.path, async (path) => {
 
 <template>
   <div class="cann-filter-bar" :class="{ hidden: !isApiPage }">
+    <span class="filter-label">版本</span>
     <select v-model="selectedFilter" class="filter-select" :disabled="!isApiPage" @change="onFilterChange">
       <option v-for="opt in filterOptions" :key="opt.value" :value="opt.value">
         {{ opt.label }}

@@ -2,14 +2,14 @@
 
 基于Ascend C方式实现带有Tiling的算子的开发流程如下图所示。
 
-**图 1**  算子开发流程<a name="zh-cn_topic_0000002236197677_fig18330201774715"></a>  
+**图1**  算子开发流程<a name="zh-cn_topic_0000002236197677_fig18330201774715"></a>  
 ![](../../../../figures/算子开发流程.png "算子开发流程")
 
 ## 算子分析<a name="zh-cn_topic_0000002236197677_section179012044886"></a>
 
 本样例为输入数据在核间均分、核内均分场景。本样例的Tiling策略为：数据整体长度TOTAL\_LENGTH为8 \* 2048，数据平均分配到8个核上运行，每个核上计算的数据长度BLOCK\_LENGTH为2048，将单核上的数据切分成16块（此处切分成16块仅用来作为Tiling的样例，并不代表性能最佳，仅供参考），每块数据的长度TILE\_LENGTH为128。数据切分示意如下图所示：
 
-**图 2**  数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1986021174914"></a>  
+**图2**  数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1986021174914"></a>  
 ![](../../../../figures/数据切分示意图.png "数据切分示意图")
 
 通过以上分析，得到Ascend C  Add算子的设计规格如下：
@@ -17,7 +17,7 @@
 -   算子类型（OpType）：Add
 -   算子输入输出：
 
-    **表 1**  Add算子输入输出规格
+    **表1**  Add算子输入输出规格
 
     <a name="table4934296305"></a>
     <table><thead align="left"><tr id="row59358913304"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p5503181819300"><a name="p5503181819300"></a><a name="p5503181819300"></a><strong id="b1850331853010"><a name="b1850331853010"></a><a name="b1850331853010"></a>name</strong></p>
@@ -72,7 +72,7 @@
 
 前述场景中算子的输入和输出均为固定shape，然而在实际的算子开发场景中，这些信息是支持动态变化的，场景会更加灵活和复杂。动态shape场景下，输入的shape是未知的。一些与输入shape相关的变量（比如每次搬运的块大小等），需要通过Tiling计算出来，然后传递到kernel侧，kernel侧使用该参数进行后续的计算。
 
-具体实现方式为：分析设计Tiling参数、定义Tiling结构体，在Host侧通过上下文获取输入输出的shape信息，根据shape信息，计算Tiling参数并设置到对应的Tiling结构体中；通过核函数入口参数将Tiling信息传入核函数，在核函数内通过解析Tiling结构体，获取并使用相关参数来实现核函数内部逻辑，详细介绍请参考[Host侧tiling实现](../../../../编程指南/附录/工程化算子开发/Host侧Tiling实现/基本流程.md)。本节将以上述分析中的切分策略为例，说明如何实现Tiling。
+具体实现方式为：分析设计Tiling参数、定义Tiling结构体，在Host侧通过上下文获取输入输出的shape信息，根据shape信息，计算Tiling参数并设置到对应的Tiling结构体中；通过核函数入口参数将Tiling信息传入核函数，在核函数内通过解析Tiling结构体，获取并使用相关参数来实现核函数内部逻辑，详细介绍请参考[Host侧tiling实现](../../../../编程指南/高级编程/高级特性/Aclnn算子工程化开发/Host侧Tiling实现/基本流程.md)。本节将以上述分析中的切分策略为例，说明如何实现Tiling。
 
 基于本节的切分策略，Tiling需要定义如下参数：
 
@@ -134,20 +134,20 @@ Kernel侧算子实现仍遵循[矢量算子核函数实现流程](../基础矢�
 
     由于本样例中将数据分配到了多个核上进行处理，每个核处理不同的数据，因此不同核要处理的数据在Global Memory上的地址不同，在初始化函数Init中，需要获取单核所需处理的输入输出在Global Memory上的内存偏移地址，并将该偏移地址设置到GlobalTensor中。
 
-    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
+    以获取输入x在Global Memory上的内存偏移地址为例，数据整体长度TOTAL\_LENGTH为8 \* 2048，平均分配到8个核上运行，每个核上处理的数据长度blockLength为2048，调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)接口获取当前核的index，x + blockLength \* GetBlockIdx\(\)即为单核处理程序中x在Global Memory上的内存偏移地址，获取偏移地址后，使用GlobalTensor类的[SetGlobalBuffer](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/SetGlobalBuffer.md)接口设定该核上Global Memory的起始地址以及长度，具体示意图请参考[图3](#zh-cn_topic_0000002236197677_fig398721711313)。代码如下所示：
 
     ```
     xGm.SetGlobalBuffer((__gm__ half *)x + this->blockLength * AscendC::GetBlockIdx(), this->blockLength);
     ```
 
-    **图 3**  多核并行处理示意图<a name="zh-cn_topic_0000002236197677_fig398721711313"></a>  
+    **图3**  多核并行处理示意图<a name="zh-cn_topic_0000002236197677_fig398721711313"></a>  
     ![](../../../../figures/多核并行处理示意图-38.png "多核并行处理示意图-38")
 
 -   通过Pipe内存管理对象为输入输出Queue分配内存。
 
     对于单核上的处理数据，可以进行数据切块（Tiling），在本示例中，仅作为参考，将单核上的数据（2048个数）切分成16块（并不意味着16块就是性能最优），每块tileLength（128）个数据。数据切分示意图如[图4](#zh-cn_topic_0000002236197677_fig1319211154719)所示。
 
-    **图 4**  单核数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1319211154719"></a>  
+    **图4**  单核数据切分示意图<a name="zh-cn_topic_0000002236197677_fig1319211154719"></a>  
     ![](../../../../figures/单核数据切分示意图-39.png "单核数据切分示意图-39")
 
     与[基础矢量算子](../基础矢量算子.md)相比，在通过Pipe内存管理对象为输入输出Queue分配内存时，需使用单核内每个数据块的长度tileLength作为分配内存的长度。比如，为输入x的Queue分配内存，可以通过如下代码段实现，Pipe为inQueueX分配了一块大小为tileLength \* sizeof\(half\)个字节的内存块，每个内存块能容纳tileLength（128）个half类型数据。
@@ -217,4 +217,3 @@ CopyOut函数实现代码如下：
     ...
 }
 ```
-

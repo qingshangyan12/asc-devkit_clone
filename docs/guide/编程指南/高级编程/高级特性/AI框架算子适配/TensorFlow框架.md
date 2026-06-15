@@ -25,7 +25,7 @@
 3.  [算子入图（GE图）开发](../算子入图开发/基本开发流程.md)。算子入图场景下，需要提供shape推导等算子入图适配函数的实现。
 4.  TensorFlow框架适配插件开发。详细说明见[适配插件开发](#section1820291291414)。
 5.  编译部署。通过工程编译脚本完成算子的编译部署，分为[算子包编译](../Aclnn算子工程化开发/算子包编译/算子工程编译.md)和[算子动态库编译](../Aclnn算子工程化开发/算子动态库和静态库编译.md)两种方式。
-6.  TensorFlow框架算子调用。详细说明见[TensorFlow原生算子映射到CANN算子](#section6342138121512)和[TensorFlow自定义算子开发并映射到CANN算子](#section18276103563719)。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/02_framework/02_onnx)。
+6.  TensorFlow框架算子调用。详细说明见[TensorFlow原生算子映射到CANN算子](#section6342138121512)和[TensorFlow自定义算子开发并映射到CANN算子](#section18276103563719)。完整样例请参考[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/00_framework/02_onnx)。
 
 ## 适配插件开发<a name="section1820291291414"></a>
 
@@ -76,7 +76,7 @@ REGISTER_CUSTOM_OP("FlashAttentionScore")
 
 -   REGISTER\_CUSTOM\_OP：注册自定义算子，传入算子的_OpType_，需要与算子原型注册中的_OpType_保持一致。
     -   FrameworkType：TENSORFLOW代表原始框架为TensorFlow。
-    -   OriginOpType：算子在原始框架中的类型。对于TensorFlow自定义算子，还需要完成[TensorFlow自定义算子的开发](#li312982016383)，这里的OriginOpType与REGISTER\_OP注册算子名相同，对于TensorFlow原生算子， 即为原生算子名。
+    -   OriginOpType：算子在原始框架中的类型。对于TensorFlow自定义算子，还需要完成[TensorFlow自定义算子的开发](#li312982016383)，这里的OriginOpType与REGISTER\_OP注册算子名相同，对于TensorFlow原生算子，即为原生算子名。
     -   ParseParamsByOperatorFn：用来注册解析算子参数实现映射关系的回调函数，需要用户自定义实现回调函数ParseParamByOpFunc。原始TensorFlow算子中参数与CANN算子中参数一一对应时，可直接使用自动映射回调函数AutoMappingByOpFn自动实现映射。
     -   ParseOpToGraphFn：当TensorFlow算子与CANN算子原型定义不一致（比如CANN算子原型定义原型中有可选输入，但TensorFlow原型定义中不支持可选输入，没有可选输入）的情况时，用来注册调整算子原型映射关系的回调函数。
 
@@ -202,7 +202,7 @@ REGISTER_CUSTOM_OP("AddCustom")   // 当前Ascend C自定义算子名
     using namespace tensorflow;
     
     // 通过TensorFlow提供的REGISTER_OP接口完成算子原型的注册
-    REGISTER_OP("AddCustom")        // TensorFlow 注册算子名
+    REGISTER_OP("AddCustom")        // TensorFlow注册算子名
         .Input("x: T")              // 算子原型，输入参数x，类型为T
         .Input("y: T")              // 算子原型，输入参数y，类型为T
         .Output("z: T")             // 算子原型，输入参数z，类型为T
@@ -416,7 +416,7 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
       (void)npu_fa_op.SetInput("key", inputs[index++]);
       (void)npu_fa_op.SetInput("value", inputs[index++]);
     
-      // 5. 可选输入需要判断type属性的个数是否为0，不为0则表示可选输入已经使能
+      // 5. 可选输入需要判断type属性的个数是否为0，不为0则表示可选输入已经启用
       std::vector<DataType> real_shift_type;
       (void)tf_op.GetAttr("real_shift_type", real_shift_type);
       if (!real_shift_type.empty()) {
@@ -619,13 +619,13 @@ TensorFlow的原型定义中不支持可选输入，对于包含可选输入的�
     from tensorflow.python.framework import ops
     import tensorflow as tf
     tfOpLib = tf.load_op_library("../build/tf_ops/libflashattention.so")
-    # 假如外部未使能该可选输入，则给底层传入空列表
+    # 假如外部未启用该可选输入，则给底层传入空列表
     def create_optional_input_list(input):
         input_list = []
         if not input is None:
             input_list.append(input)
         return input_list
-    # flash_attention_score 封装函数
+    # flash_attention_score封装函数
     def npu_flash_attention(query, key, value, head_num, input_layout, real_shift=None, drop_mask=None, padding_mask=None,
                             atten_mask=None, prefix=None, actual_seq_qlen=None, actual_seq_kvlen=None,
                             q_start_idx=None, kv_start_idx=None, d_scale_q=None,d_scale_k=None,d_scale_v=None,query_rope=None,key_rope=None,scale_value=1.0, keep_prob=1.0,

@@ -55,9 +55,8 @@ set(CMAKE_ASC_FLAGS_INIT "$ENV{ASCFLAGS} ${CMAKE_ASC_FLAGS_INIT}")
 # Materialize CMAKE_ASC_FLAGS and CMAKE_ASC_FLAGS_<CONFIG> as cache STRINGs.
 cmake_initialize_per_config_variable(CMAKE_ASC_FLAGS "Flags used by the ASC compiler")
 
-# Auto-inject --npu-arch=<arch> for NPU mode.
-if(CMAKE_ASC_ARCHITECTURES AND
-   (NOT CMAKE_ASC_RUN_MODE OR CMAKE_ASC_RUN_MODE STREQUAL "npu"))
+# Auto-inject --npu-arch=<arch>.
+if(CMAKE_ASC_ARCHITECTURES)
     string(APPEND CMAKE_ASC_FLAGS " --npu-arch=${CMAKE_ASC_ARCHITECTURES}")
 endif()
 
@@ -161,6 +160,16 @@ endif()
 
 set(CMAKE_ASC_INFORMATION_LOADED 1)   # 标记Cmake已经加载初始化ASC编程语言
 
+if(NOT DEFINED CMAKE_ASC_RUN_MODE OR CMAKE_ASC_RUN_MODE STREQUAL "")
+    set(CMAKE_ASC_RUN_MODE "npu")
+endif()
+
+set(_ASC_SUPPORTED_RUN_MODES npu cpu sim)
+if(NOT CMAKE_ASC_RUN_MODE IN_LIST _ASC_SUPPORTED_RUN_MODES)
+    message(FATAL_ERROR
+        "ASC: CMAKE_ASC_RUN_MODE='${CMAKE_ASC_RUN_MODE}' is unsupported, should be npu, cpu, or sim.")
+endif()
+
 if(CMAKE_ASC_RUN_MODE STREQUAL "sim")
     set(_ARCH_TO_DIR_MAP
         "dav-2002" "dav_2002"
@@ -208,7 +217,7 @@ if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
 -isystem$ENV{ASCEND_HOME_PATH}/asc/include/tiling -isystem$ENV{ASCEND_HOME_PATH}/asc/include/utils")
 
         # 添加编译选项
-        string(APPEND CMAKE_ASC_FLAGS "-g -D_GLIBCXX_USE_CXX11_ABI=0 -DASCENDC_DEBUG=1 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
+        string(APPEND CMAKE_ASC_FLAGS " -g -D_GLIBCXX_USE_CXX11_ABI=0 -D__NPU_ARCH__=${_SHORT_NPU_ARCH} --run-mode=cpu ${ASC_CPU_SYSTEM_INCLUDE_OPTIONS}")
 
         # 配置链接选项
         string(APPEND CMAKE_ASC_LINK_FLAGS "--run-mode=cpu -Wl,--disable-new-dtags")

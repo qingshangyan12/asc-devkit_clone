@@ -2,15 +2,13 @@
 
 ## 产品支持情况
 
-| 产品 | 是否支持 |
-| --- | --- |
-| Ascend 950PR/Ascend 950DT | √ |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | x |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | x |
-| Atlas 200I/500 A2 推理产品 | x |
-| Atlas 推理系列产品AI Core | x |
-| Atlas 推理系列产品Vector Core | x |
-| Atlas 训练系列产品 | x |
+- Ascend 950PR/Ascend 950DT：支持
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 推理系列产品AI Core：不支持
+- Atlas 推理系列产品Vector Core：不支持
+- Atlas 训练系列产品：不支持
 
 ## 功能说明
 
@@ -19,12 +17,12 @@
 ## 函数原型
 
 ```
-inline inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
+inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
 ```
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -85,4 +83,3 @@ inline inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16
         asc_vf_call<simt_lows2bfloat162>(dim3(1024), (__gm__ bfloat16x2_t*)input1, (__gm__ bfloat16x2_t*)input2, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
-
