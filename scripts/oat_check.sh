@@ -138,7 +138,7 @@ for _entry in "oat_reports" "log"; do
 done
 
 # ---------------------------------------------------------------------------
-# 6. Run oat scan
+# 5. Run oat scan
 # ---------------------------------------------------------------------------
 echo ""
 echo "[OAT] Running compliance scan..."
@@ -164,8 +164,8 @@ if [ "$_OAT_RC" -ne 0 ] && [ "$_OAT_RC" -ne 1 ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# 7. Parse report and write result.txt
-#    Only: Invalid File Type + License Header Invalid (no copyright)
+# 6. Parse report and write result.txt
+#    Only: Invalid File Type + License Header Invalid + Copyright Header Invalid
 # ---------------------------------------------------------------------------
 REPORT_FILE="$RUN_REPORT_DIR/PlainReport_${REPO_NAME}.txt"
 RESULT_FILE="$RUN_REPORT_DIR/result.txt"
@@ -209,6 +209,130 @@ _extract_section() {
     '
 }
 
+_read_count() {
+    _file="$1"
+    _marker="$2"
+    grep "^$_marker" "$_file" 2>/dev/null | grep -oE '[0-9]+' | head -1
+}
+
+_append_section_details() {
+    _file="$1"
+    _marker="$2"
+    _extract_section "$_file" "$_marker" | awk 'NR > 1 && /^Name:/ { print }'
+}
+
+_release_result_lock() {
+    if [ -n "$_RESULT_LOCK_DIR" ] && [ -d "$_RESULT_LOCK_DIR" ]; then
+        rmdir "$_RESULT_LOCK_DIR" 2>/dev/null || true
+    fi
+    trap - EXIT HUP INT TERM
+}
+
+_acquire_result_lock() {
+    _RESULT_LOCK_DIR="$OAT_REPORT_DIR/.result.lock"
+    while ! mkdir "$_RESULT_LOCK_DIR" 2>/dev/null; do
+        sleep 0.1
+    done
+    trap '_release_result_lock' EXIT HUP INT TERM
+}
+
+_result_session_id() {
+    if [ -n "$OAT_REPORT_SESSION_ID" ]; then
+        printf '%s\n' "$OAT_REPORT_SESSION_ID"
+    elif [ "$PRE_COMMIT" = "1" ]; then
+        printf 'precommit-%s\n' "$PPID"
+    else
+        printf 'manual-%s\n' "$$"
+    fi
+}
+
+_write_aggregate_result() {
+    _manifest_file="$1"
+    _target_file="$2"
+    _detail_type="$RUN_REPORT_DIR/aggregate_invalid_type.details"
+    _detail_license="$RUN_REPORT_DIR/aggregate_license.details"
+    _detail_copyright="$RUN_REPORT_DIR/aggregate_copyright.details"
+
+    : > "$_detail_type"
+    : > "$_detail_license"
+    : > "$_detail_copyright"
+
+    _AGG_FILES=0
+    _AGG_RUNS=0
+    _AGG_INVALID_TYPE=0
+    _AGG_LICENSE_INVALID=0
+    _AGG_COPYRIGHT_INVALID=0
+
+    while IFS= read -r _result_file; do
+        [ -f "$_result_file" ] || continue
+        _AGG_RUNS=$(( _AGG_RUNS + 1 ))
+
+        _files_checked=$(_read_count "$_result_file" "Files Checked:" || true)
+        _invalid_type=$(_read_count "$_result_file" "Invalid File Type Total Count:" || true)
+        _license_invalid=$(_read_count "$_result_file" "License Header Invalid Total Count:" || true)
+        _copyright_invalid=$(_read_count "$_result_file" "Copyright Header Invalid Total Count:" || true)
+
+        _files_checked=${_files_checked:-0}
+        _invalid_type=${_invalid_type:-0}
+        _license_invalid=${_license_invalid:-0}
+        _copyright_invalid=${_copyright_invalid:-0}
+
+        _AGG_FILES=$(( _AGG_FILES + _files_checked ))
+        _AGG_INVALID_TYPE=$(( _AGG_INVALID_TYPE + _invalid_type ))
+        _AGG_LICENSE_INVALID=$(( _AGG_LICENSE_INVALID + _license_invalid ))
+        _AGG_COPYRIGHT_INVALID=$(( _AGG_COPYRIGHT_INVALID + _copyright_invalid ))
+
+        _append_section_details "$_result_file" "Invalid File Type Total Count:" >> "$_detail_type"
+        _append_section_details "$_result_file" "License Header Invalid Total Count:" >> "$_detail_license"
+        _append_section_details "$_result_file" "Copyright Header Invalid Total Count:" >> "$_detail_copyright"
+    done < "$_manifest_file"
+
+    _AGG_TOTAL_ISSUES=$(( _AGG_INVALID_TYPE + _AGG_LICENSE_INVALID + _AGG_COPYRIGHT_INVALID ))
+
+    {
+        echo "==================================="
+        echo "OAT Scan Result Summary"
+        echo "==================================="
+        printf "Scan Time: %s\n" "$(date '+%Y-%m-%d %H:%M:%S')"
+        echo "Project: $REPO_NAME"
+        echo "Files Checked: $_AGG_FILES"
+        echo "Runs Aggregated: $_AGG_RUNS"
+        echo ""
+        echo "-----------------------------------"
+        echo "Invalid File Type Total Count: $_AGG_INVALID_TYPE"
+        [ ! -s "$_detail_type" ] || cat "$_detail_type"
+        echo ""
+        echo "-----------------------------------"
+        echo "License Header Invalid Total Count: $_AGG_LICENSE_INVALID"
+        [ ! -s "$_detail_license" ] || cat "$_detail_license"
+        echo ""
+        echo "-----------------------------------"
+        echo "Copyright Header Invalid Total Count: $_AGG_COPYRIGHT_INVALID"
+        [ ! -s "$_detail_copyright" ] || cat "$_detail_copyright"
+        echo "==================================="
+    } > "$_target_file"
+}
+
+_register_result() {
+    _current_session=$(_result_session_id)
+    _session_file="$OAT_REPORT_DIR/.result_session"
+    _manifest_file="$OAT_REPORT_DIR/.result_manifest"
+
+    _acquire_result_lock
+
+    _previous_session=""
+    [ ! -f "$_session_file" ] || _previous_session=$(cat "$_session_file" 2>/dev/null || true)
+    if [ "$_previous_session" != "$_current_session" ]; then
+        printf '%s\n' "$_current_session" > "$_session_file"
+        : > "$_manifest_file"
+    fi
+
+    printf '%s\n' "$RESULT_FILE" >> "$_manifest_file"
+    _write_aggregate_result "$_manifest_file" "$LATEST_RESULT_FILE"
+
+    _release_result_lock
+}
+
 if [ ! -f "$REPORT_FILE" ]; then
     if [ "$_OAT_RC" -ne 0 ]; then
         echo ""
@@ -233,26 +357,32 @@ if [ ! -f "$REPORT_FILE" ]; then
         echo ""
         echo "-----------------------------------"
         echo "License Header Invalid Total Count: 0"
+        echo ""
+        echo "-----------------------------------"
+        echo "Copyright Header Invalid Total Count: 0"
         echo "==================================="
     } > "$RESULT_FILE"
-    cp "$RESULT_FILE" "$LATEST_RESULT_FILE" 2>/dev/null || true
-    rm -rf "$RUN_REPORT_DIR"
+    _register_result
     exit 0
 fi
 
 # Parse counts
 _INVALID_TYPE=$(grep "^Invalid File Type Total Count:" "$REPORT_FILE" | grep -oE '[0-9]+' | head -1)
 _LICENSE_INVALID=$(grep "^License Header Invalid Total Count:" "$REPORT_FILE" | grep -oE '[0-9]+' | head -1)
+_COPYRIGHT_INVALID=$(grep "^Copyright Header Invalid Total Count:" "$REPORT_FILE" | grep -oE '[0-9]+' | head -1)
 _INVALID_TYPE=${_INVALID_TYPE:-0}
 _LICENSE_INVALID=${_LICENSE_INVALID:-0}
+_COPYRIGHT_INVALID=${_COPYRIGHT_INVALID:-0}
 
 # Extract detail sections
 _SECTION_TYPE=$(_extract_section "$REPORT_FILE" "Invalid File Type Total Count:")
 _SECTION_LIC=$(_extract_section "$REPORT_FILE" "License Header Invalid Total Count:")
+_SECTION_COPYRIGHT=$(_extract_section "$REPORT_FILE" "Copyright Header Invalid Total Count:")
 
 # Fallback to bare count line if section is empty
 [ -n "$_SECTION_TYPE" ] || _SECTION_TYPE="Invalid File Type Total Count: $_INVALID_TYPE"
 [ -n "$_SECTION_LIC"  ] || _SECTION_LIC="License Header Invalid Total Count: $_LICENSE_INVALID"
+[ -n "$_SECTION_COPYRIGHT" ] || _SECTION_COPYRIGHT="Copyright Header Invalid Total Count: $_COPYRIGHT_INVALID"
 
 # Write result.txt
 {
@@ -268,17 +398,20 @@ _SECTION_LIC=$(_extract_section "$REPORT_FILE" "License Header Invalid Total Cou
     echo ""
     echo "-----------------------------------"
     echo "$_SECTION_LIC"
+    echo ""
+    echo "-----------------------------------"
+    echo "$_SECTION_COPYRIGHT"
     echo "==================================="
 } > "$RESULT_FILE"
-cp "$RESULT_FILE" "$LATEST_RESULT_FILE" 2>/dev/null || true
+_register_result
 
 # Clean up full plain report (keep only result.txt)
 rm -f "$REPORT_FILE"
 
 # ---------------------------------------------------------------------------
-# 8. Block commit if issues found
+# 7. Block commit if issues found
 # ---------------------------------------------------------------------------
-TOTAL_ISSUES=$(( _INVALID_TYPE + _LICENSE_INVALID ))
+TOTAL_ISSUES=$(( _INVALID_TYPE + _LICENSE_INVALID + _COPYRIGHT_INVALID ))
 
 if [ "$TOTAL_ISSUES" -gt 0 ]; then
     echo ""
@@ -289,8 +422,10 @@ if [ "$TOTAL_ISSUES" -gt 0 ]; then
     echo "[OAT] Found $TOTAL_ISSUES compliance issue(s):"
     echo "  - Invalid File Type:       $_INVALID_TYPE"
     echo "  - License Header Invalid:  $_LICENSE_INVALID"
+    echo "  - Copyright Header Invalid: $_COPYRIGHT_INVALID"
     echo ""
     echo "[OAT] Details:"
+    echo "  cat $LATEST_RESULT_FILE"
     echo "  cat $RESULT_FILE"
     echo ""
     echo "Fix the issues and recommit, or skip with:"
@@ -300,8 +435,12 @@ if [ "$TOTAL_ISSUES" -gt 0 ]; then
 fi
 
 echo ""
-echo "[OAT] [OK] All checks passed ($FILE_COUNT file(s) checked)."
-echo "[OAT] Summary: cat $LATEST_RESULT_FILE"
+if [ "${_AGG_TOTAL_ISSUES:-0}" -gt 0 ]; then
+    echo "[OAT] [OK] Current batch passed ($FILE_COUNT file(s) checked)."
+    echo "[OAT] Aggregate summary still has $_AGG_TOTAL_ISSUES issue(s): cat $LATEST_RESULT_FILE"
+else
+    echo "[OAT] [OK] All checks passed ($_AGG_FILES file(s) checked across $_AGG_RUNS run(s))."
+    echo "[OAT] Summary: cat $LATEST_RESULT_FILE"
+fi
 echo ""
-rm -rf "$RUN_REPORT_DIR"
 exit 0
