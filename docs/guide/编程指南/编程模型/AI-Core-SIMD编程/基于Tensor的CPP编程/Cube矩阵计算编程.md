@@ -430,7 +430,7 @@ Shape = ((ShapeRow0, ShapeRow1), (ShapeColumn0, ShapeColumn1))
 Stride = ((StrideRow0, StrideRow1), (StrideColumn0, StrideColumn1))
 ```
 
-以Nz分形为例，Nz分形格式的内层分形Shape中，ShapeRow0固定为16行，ShapeColumn0固定为32Byte / sizeof(T)，内层分形的Stride中，StrideRow0固定为32Byte / sizeof(T)，StrideColumn0也固定为1，即内层分形按z字形组织，外层分形按N字形组织。ShapeRow1需满足row方向16对齐，ShapeColumn1需满足column方向上32B对齐。
+以Nz分形为例，Nz分形格式的内层分形Shape中，ShapeRow0固定为16行，ShapeColumn0固定为32Byte / sizeof(T)，内层分形的Stride中，StrideRow0固定为32Byte / sizeof(T)，StrideColumn0也固定为1，即内层分形按z字形组织，外层分形按N字形组织。ShapeRow1需满足row方向16对齐，ShapeColumn1需满足column方向32B对齐。
 
 <img src="../../../../figures/Nz数据排布格式.png" alt="Nz数据排布格式" width="400" />
 

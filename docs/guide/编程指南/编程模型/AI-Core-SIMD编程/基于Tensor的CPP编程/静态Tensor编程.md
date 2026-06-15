@@ -27,7 +27,7 @@
 
 -   通过[LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator.md)指定硬件位置进行Tensor分配。
 
-    LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配。LocalMemAllocator不提供内存释放能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
+    LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，不提供内存释放能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
 
 -   通过[LocalTensor构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor构造函数.md)创建Tensor，极致性能场景推荐使用此方式。
 
@@ -48,7 +48,7 @@
 
 ## 同步管理<a name="section4338114663610"></a>
 
-根据前文介绍的硬件架构，AI Core内部异步并行计算存在多条流水（包括矢量计算、矩阵计算、数据搬入、数据搬出等），多条流水之间存在数据依赖时，需要插入对应的同步事件。静态Tensor编程方式下，开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)手动插入同步，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。另外由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证跨硬件版本兼容。
+根据前文介绍的硬件架构，AI Core内部异步并行计算存在多条流水（包括矢量计算、矩阵计算、数据搬入、数据搬出等），多条流水之间存在数据依赖时，需要插入对应的同步事件。静态Tensor编程方式下，开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)手动插入同步，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。此外，需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证跨硬件版本兼容。
 
 在同步依赖中，根据数据依赖和指令执行关系，存在两种依赖关系，即正向同步（循环内依赖）与反向同步（循环间依赖）：
 
@@ -106,7 +106,7 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
 
 ```
     // ping
