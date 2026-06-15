@@ -65,4 +65,8 @@ constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::SEC
 constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::THIRD> ASC_DISPERSE_THIRD_QUARTER;
 constexpr std::integral_constant<asc_disperse_quarter, asc_disperse_quarter::FOURTH> ASC_DISPERSE_FOURTH_QUARTER;
 
+#ifndef ULL
+#define ULL unsigned long long
+#endif
+
 #endif
