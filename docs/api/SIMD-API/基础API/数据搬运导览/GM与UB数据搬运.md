@@ -225,7 +225,7 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 
 </cann-filter>
 
-## UB -> GM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
+## UB -> GM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460502"></a>
 
 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。
 

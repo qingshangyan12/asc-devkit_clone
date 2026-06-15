@@ -15,7 +15,7 @@ Unified Buffer（UB）之间的数据搬运提供了灵活的接口支持，共�
 | UB->UB | 连续数据搬运(Copy) | 支持连续数据搬运，数据搬运时格式和内容保持不变。 |
 | UB->UB | 掩码式高维数据搬运(Copy) | 支持mask操作和DataBlock间隔操作，支持在接口内部和接口外部设置mask。 |
 
-## UB -> UB连续数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908021"></a>
+## UB -> UB连续数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382907025"></a>
 
 支持Unified Buffer与Unified Buffer之间的连续数据搬运，数据在传输过程中保持原始格式和内容不变。
 
@@ -34,7 +34,7 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
 
-## UB -> UB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908021"></a>
+## UB -> UB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908321"></a>
 
 支持Unified Buffer与Unified Buffer之间的高维切分数据搬运，数据在传输过程中保持原始格式和内容不变。
 
@@ -78,7 +78,7 @@ template <typename T, bool isSetMask = true>
 __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
 
-## UB -> UB掩码式高维数据搬运(Copy)<a name="ZH-CN_TOPIC_0000002575088175"></a>
+## UB -> UB掩码式高维数据搬运(Copy)<a name="ZH-CN_TOPIC_0000002575088676"></a>
 
 支持Unified Buffer和Unified Buffer之间的数据搬运，数据搬运时格式和内容保持不变，支持mask操作和DataBlock间隔操作。
 
