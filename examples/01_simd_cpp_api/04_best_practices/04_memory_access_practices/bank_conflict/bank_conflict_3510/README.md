@@ -63,7 +63,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 其中 `b = (base >> 5) & 0xF`。8个DataBlock覆盖BG 0-7各一次。
 
-## bank冲突类型（适用于Reg数据搬入/Reg数据搬出）
+## bank冲突类型（适用于Reg数据搬入/搬出API）
 
 根据内存结构，bank冲突主要分为以下三种类型：
 - **读读冲突**：对比Atlas A2/A3系列产品，bankgroup下的读读冲突减少，多个读操作同时访问同一个bank或两个以上读操作同时访问同一个bank group才会引发冲突。

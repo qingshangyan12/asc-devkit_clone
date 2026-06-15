@@ -8,7 +8,7 @@ constexpr uint16_t oneRepSize = 256 / sizeof(float);
 constexpr uint16_t repeatTimes = TOTAL_LENGTH / oneRepSize;
 
 template <typename T>
-__simd_vf__ inline void AddVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddWithUnRollVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
     AscendC::Reg::RegTensor<T> reg0, reg1, reg2, reg3, reg4, reg5;
@@ -25,9 +25,9 @@ __simd_vf__ inline void AddVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* ds
     }
 }
 
-// Single-instruction version (no loop unrolling), for comparison with AddVF
+// Single-instruction version (no loop unrolling), for comparison with AddWithUnRollVF
 template <typename T>
-__simd_vf__ inline void AddSingleVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddWithoutUnRollVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
     AscendC::Reg::RegTensor<T> reg0, reg1, reg2;
@@ -57,7 +57,7 @@ __simd_vf__ inline void AddWithInstrLoadVF(__ubuf__ T* src0, __ubuf__ T* src1, _
 }
 
 template <typename T>
-__simd_vf__ inline void AddsVFWithStride1(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddsByRowVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     // 横着搬运512个数: 8轮×64元素
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -70,7 +70,7 @@ __simd_vf__ inline void AddsVFWithStride1(__ubuf__ T* src0, __ubuf__ T* src1, __
 }
 
 template <typename T>
-__simd_vf__ inline void AddsVFWithStride2(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddsByColVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     // stride=8, 竖着搬运: 分8块×64列, 每次加载1个DataBlock(8元素), 64轮拼满一行
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -83,7 +83,7 @@ __simd_vf__ inline void AddsVFWithStride2(__ubuf__ T* src0, __ubuf__ T* src1, __
 }
 
 template <typename T>
-__simd_vf__ inline void AddsVFWithStride3(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddsWithBlockOverlap(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     // 测试BlockStride为0
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -96,7 +96,7 @@ __simd_vf__ inline void AddsVFWithStride3(__ubuf__ T* src0, __ubuf__ T* src1, __
 }
 
 template <typename T>
-__simd_vf__ inline void AddsVFWithStride4(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void AddsWithRepeatOverlap(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     // 测试srcRepeatStride为0
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
