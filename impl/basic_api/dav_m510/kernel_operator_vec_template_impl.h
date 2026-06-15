@@ -21,7 +21,7 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_TEMPLATE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_TEMPLATE_IMPL_H
 
-#include "kernel_utils.h"
+#include "../kernel_utils.h"
 #include "kernel_struct_binary.h"
 
 // Forward declaration

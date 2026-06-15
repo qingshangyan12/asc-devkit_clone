@@ -20,9 +20,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCE_INTERFACE_H
 
-#include "kernel_macros.h"
+#include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
-#include "utils/kernel_utils_mode.h"
+#include "../../impl/basic_api/utils/kernel_utils_mode.h"
 #include "utils/common_types.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

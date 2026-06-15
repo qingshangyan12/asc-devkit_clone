@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_COMMON_PRE_IMPL_H
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002

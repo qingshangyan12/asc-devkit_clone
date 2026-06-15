@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_CHECK_VEC_BINARY_H
 
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check_util.h"
+#include "../kernel_check_util.h"
 #include "kernel_common.h"
 #include "kernel_struct_binary.h"
 

@@ -28,8 +28,8 @@
 #include "include/utils/std/type_traits.h"
 #include "include/utils/std/utility.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "kernel_check_util.h"
-#include "kernel_check.h"
+#include "../../../../../basic_api/kernel_check_util.h"
+#include "../../../../../basic_api/kernel_check.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

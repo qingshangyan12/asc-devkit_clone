@@ -26,7 +26,7 @@
 #else
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/math/tan.h"
 #include "include/adv_api/math/sin.h"

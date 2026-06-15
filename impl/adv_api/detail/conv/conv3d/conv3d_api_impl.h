@@ -18,7 +18,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "kernel_utils.h"
+#include "../../../../basic_api/kernel_utils.h"
 #include "conv3d_util.h"
 #include "include/adv_api/conv/conv3d/conv3d_config.h"
 #include "conv3d_common_func.h"
