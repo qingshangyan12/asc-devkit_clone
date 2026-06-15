@@ -45,13 +45,13 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
 ## 参数说明<a id="zh-cn_topic_0000002566886667_section16128134420472"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
 | T、U | 输入 | 操作数的数据类型。具体支持情况请参考[数据类型](#zh-cn_topic_0000002566886667_section4219135304818)。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -60,7 +60,7 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 | count | 输入 | 参与搬运的元素个数。`count * sizeof(T)`需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。 |
 | repeatParams | 输入 | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。具体定义请参考"basic_api/interface/kernel_struct_data_copy.h"，参数说明见[表3](#zh-cn_topic_0000002566886667_table9182515919)。 |
 
-**表 3** DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566886667_table9182515919"></a>
+**表3** DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566886667_table9182515919"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -138,4 +138,29 @@ DataCopy数据搬运支持将矩阵计算用到的Bias参数从L1 Buffer移动�
 
 ## 调用示例<a id="zh-cn_topic_0000002566886667_section088124295117"></a>
 
-无
+L1 Buffer->Bias Table Buffer，搬运Bias参数。
+
+```cpp
+// c1Addr = 128 * 1024、c2Addr = 0；__NPU_ARCH__ == 3510时c12c2Params = {1, 32, 0, 0}，否则为 {1, 16, 0, 0}。
+AscendC::LocalTensor<outputType> bias1Local(AscendC::TPosition::C1, c1Addr, biasSizeAlign);
+AscendC::LocalTensor<outputType> bias2Local(AscendC::TPosition::C2, c2Addr, biasSizeAlign);
+
+if constexpr (SCENARIO_NUM == 4) {
+    SplitBias(bias1Local, bias2Local);
+}
+
+__aicore__ inline void SplitBias(AscendC::LocalTensor<outputType> bias1Local,
+                                AscendC::LocalTensor<outputType> bias2Local)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    AscendC::DataCopyParams c12c2Params =
+        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 32), 0, 0};
+#else
+    AscendC::DataCopyParams c12c2Params =
+        {1, static_cast<uint16_t>(biasSizeAlign * sizeof(outputType) / 64), 0, 0};
+#endif
+    AscendC::DataCopy(bias2Local, bias1Local, c12c2Params);
+}
+```
+
+完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景4。

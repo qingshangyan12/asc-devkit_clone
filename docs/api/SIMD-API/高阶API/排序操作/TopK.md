@@ -48,10 +48,10 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 
     以float类型，ND格式，shape为\[outter,  inner\]的输入Tensor为例，描述TopK高阶API内部算法框图，如下图所示。
 
-    **图 1**  TopK算法框图  
+    **图1**  TopK算法框图  
     ![](../../../figures/TopK算法框图.png "TopK算法框图")
 
-    **图 2**  TopK算法框图  
+    **图2**  TopK算法框图  
     ![](../../../figures/TopK算法框图-51.png "TopK算法框图-51")
 
     根据TopKMode不同的模式选择，可分为两个分支。
@@ -147,7 +147,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 
     该算法仅在Ascend 950PR/Ascend 950DT上支持。
 
-    **图 3**  TopK算法框图  
+    **图3**  TopK算法框图  
     ![](../../../figures/TopK算法框图-52.png "TopK算法框图-52")
 
     计算过程分为如下几步：
@@ -197,7 +197,7 @@ TopK提供了两种不同的排序算法，MERGE\_SORT算法和RADIX\_SELECT算�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -225,14 +225,14 @@ enum class TopKOrder {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dstValueLocal | 输出 | 目的操作数。用于保存排序出的k个值。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>Normal模式：<br>输出shape为outter * k_pad，即输出outter条数据，每条数据的长度是k_pad。k_pad是根据输入的数据类型将k向上32Byte对齐后的值。<br>开发者需要为dstValueLocal开辟k_pad * outter * sizeof(T)大小的空间。<br>输出每条数据的前k个值就是该条的前k个最大值/最小值。每条数据的k+1~k_pad个元素不填值，是一些随机值。<br>k_pad计算方式为：<br>当输入的srcLocal和dstValueLocal的类型是float时，float是4字节，因此将k向上取整设置为8的倍数k_pad，即可满足32Byte对齐。<br>k_pad = (k + 7) / 8 * 8<br>当输入的srcLocal和dstValueLocal的类型是half时，half是2字节，因此将k向上取整设置为16的倍数k_pad，即可满足32Byte对齐。<br>    k_pad = (k + 15) / 16 * 16<br><br>Small模式：<br>输出shape为outter * k，即输出outter条数据，每条数据的长度是k。<br>输出值需要k * outter * sizeof(T)大小的空间来进行保存。开发者要根据该大小和框架的对齐要求来为dstValueLocal分配实际的内存空间。 <br>**此处需要注意：遵循框架对内存申请的要求（开辟内存的大小满足32Byte对齐），即k * outter * sizeof(T)不是32Byte对齐时，需要向上进行32Byte对齐。为了对齐而多开辟的内存空间不填值，为一些随机值。** |
 | dstIndexLocal | 输出 | 目的操作数。用于保存排序出的k个值对应的索引。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>Normal模式：<br>输出shape为outter *kpad_index，即输出outter条数据，每条数据的长度是kpad_index。kpad_index是根据输入的索引类型将k向上32Byte对齐后的值。<br>开发者需要为dstIndexLocal开辟kpad_index * outter * sizeof(int32_t)大小的空间。<br>其中每条数据的前k个值就是该条的前k个最大值/最小值对应的索引。每条数据的k+1~kpad_index个索引不填值，是一些随机值。<br>k_pad计算方式为：由于dstIndexLocal是int32_t类型，是4字节。因此将k向上取整设置为8的倍数kpad_index，即可满足32Byte对齐。<br>kpad_index = (k + 7) / 8 * 8<br><br>Small模式：<br>输出shape为outter *k，即输出outter条数据，每条数据的长度是k。<br>输出索引需要k * outter * sizeof(int32_t)大小的空间来进行保存。开发者要根据该大小和框架的对齐要求来为dstIndexLocal分配实际的内存空间。<br>**注意：遵循框架对内存开辟的要求（开辟内存的大小满足32Byte对齐），即k * outter * sizeof(int32_t)不是32Byte对齐时，需要向上进行32Byte对齐。为了对齐而多开辟的内存空间不填值，为一些随机值。** |
 | srcLocal | 输入 | 源操作数。用于保存待排序的值。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>Atlas 推理系列产品AI Core上：<br>输入数据的shape为outter * inner。开发者需要为其开辟outter * inner * sizeof(T)大小的空间。<br>当n < inner时，开发者需要对srcLocal里outter条数据进行补齐操作，每条数据都需要从n补齐到inner长度。<br>补齐的规则：要求填充的数据不能影响整体排序。建议使用如下的填充方法：在取前k个最大值的时候，填充的值需要是**输入数据类型**的最小值；在取前k个最小值的时候，填充的值需要是**输入数据类型**的最大值。 |
-| srcIndexLocal | 输入 | 源操作数。用于保存待排序的值对应的索引。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>该参数和模板参数isInitIndex配合使用，isInitIndex为false时，srcIndexLocal只需进行定义，不需要赋值，将定义后的srcIndexLocal传入接口即可；isInitIndex为true时，开发者需要通过srcIndexLocal参数传入索引值。srcIndexLocal参数设置的规则如下：<br><br>Normal模式：<br>输入索引数据的shape为1 * inner， 此处outter条数据都使用相同的索引。开发者需要为其开辟inner * sizeof(int32_t)大小的空间。<br>当n < inner时，开发者需要对索引数据进行补齐操作，将该条数据从n补齐到inner长度。<br>补齐的规则：要求填充的索引不能影响整体排序。建议使用如下的填充方法：填充的值在原始索引的基础上递增。例如，原始索引为0，1，2，...，n-1，填充后的索引为 0，1，2，...， n ，n + 1，...，inner-1。<br><br>Small模式：<br>输入索引数据的shape为outter * inner。开发者需要为其开辟outter * inner * sizeof(int32_t)大小的空间。<br>当n < 32时，开发者需要对outter条数据进行补齐操作，每条数据都需要从n补齐到32的长度。<br>补齐的规则：要求填充的数据不能影响整体排序。建议使用如下的填充方法：填充的值在原始索引的基础上递增例如，原始索引为0，1，2，...，n-1，填充后的索引为0， 1，2，...， n ，n + 1，...，inner-1。 |
+| srcIndexLocal | 输入 | 源操作数。用于保存待排序的值对应的索引。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>该参数和模板参数isInitIndex配合使用，isInitIndex为false时，srcIndexLocal只需进行定义，不需要赋值，将定义后的srcIndexLocal传入接口即可；isInitIndex为true时，开发者需要通过srcIndexLocal参数传入索引值。srcIndexLocal参数设置的规则如下：<br><br>Normal模式：<br>输入索引数据的shape为1 * inner，此处outter条数据都使用相同的索引。开发者需要为其开辟inner * sizeof(int32_t)大小的空间。<br>当n < inner时，开发者需要对索引数据进行补齐操作，将该条数据从n补齐到inner长度。<br>补齐的规则：要求填充的索引不能影响整体排序。建议使用如下的填充方法：填充的值在原始索引的基础上递增。例如，原始索引为0，1，2，...，n-1，填充后的索引为0，1，2，...， n ，n + 1，...，inner-1。<br><br>Small模式：<br>输入索引数据的shape为outter * inner。开发者需要为其开辟outter * inner * sizeof(int32_t)大小的空间。<br>当n < 32时，开发者需要对outter条数据进行补齐操作，每条数据都需要从n补齐到32的长度。<br>补齐的规则：要求填充的数据不能影响整体排序。建议使用如下的填充方法：填充的值在原始索引的基础上递增例如，原始索引为0，1，2，...，n-1，填充后的索引为0， 1，2，...， n ，n + 1，...，inner-1。 |
 | finishLocal | 输入 | 源操作数。用于指定某些行的排序是无效排序，其shape为(outter, 1)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>针对Ascend 950PR/Ascend 950DT，该参数为预留参数，暂未启用，为后续的功能扩展做保留，取值为false。<br><br>该参数和模板参数isHasfinish配合使用，Normal模式下支持isHasfinish配置为true/false，Small模式下仅支持isHasfinish配置为false。<br>isHasfinish配置为true：<br>finishLocal对应的outter行的值为true时，该行排序无效，排序后输出的dstIndexLocal的k个索引值会全部被置为n。<br>finishLocal对应的outter行的值为false时，该行排序有效。<br><br>isHasfinish配置为false时，finishLocal只需进行定义，不需要赋值，将定义后的finishLocal传入接口即可。定义样例如下：LocalTensor<bool> finishLocal; |
 | tmpLocal | 输入 | 临时空间。接口内部复杂计算时用于存储中间变量，由开发者提供，临时空间大小的获取方式请参考[TopK Tiling](TopK-Tiling.md)。数据类型固定uint8_t。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，**逻辑位置仅支持VECCALC，不支持其他逻辑位置。** |
 | k | 输入 | 获取前k个最大值或最小值及其对应的索引。数据类型为int32_t。<br><br>k的大小应该满足：1 <= k <= n。 |
@@ -282,7 +282,7 @@ struct TopKInfo {
     Kirin 9030，支持的数据类型为：half。
     <!-- end id12 -->
 
-## 调用示例
+## 调用示例<a name="section94691236101419"></a>
 
 本样例实现了Normal模式代码逻辑。
 
@@ -323,7 +323,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_NORMAL, defaultTopKConfig>(dstLocalValue, dstLocalIndex, srcLocalValue, srcLocalIndex, srcLocalFinish, k, topKTilingData, topKInfo, isLargest);
 ```
 
-**表 3**  Normal模式的样例解析
+**表3**  Normal模式的样例解析
 
 | 样例描述 | 本样例为对shape为（2，32）、数据类型为float的矩阵进行排序的示例，分别求取每行数据的前5个最小值。<br><br>使用Normal模式的接口，开发者自行传入输入数据索引，传入finishLocal来指定某些行的排序是无效排序。 |
 | --- | --- |
@@ -369,7 +369,7 @@ AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_N
 AscendC::TopK<T, isInitIndex, isHasfinish, isReuseSrc, AscendC::TopKMode::TOPK_NSMALL, defaultTopKConfig>(dstLocalValue, dstLocalIndex, srcLocalValue, srcLocalIndex, srcLocalFinish, k, topKTilingData, topKInfo, isLargest);
 ```
 
-**表 4**  Small模式的样例解析
+**表4**  Small模式的样例解析
 
 | 样例描述 | 本样例为对shape为(4，17)、类型为float的输入数据进行排序的示例，求取每行数据的前8个最大值。<br><br>使用Small模式的接口，开发者自行传入输入数据索引。 |
 | --- | --- |

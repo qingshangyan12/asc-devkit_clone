@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
 | <cann-filter npu-type = "x90">Kirin X90 | √ </cann-filter> |
 | <cann-filter npu-type = "9030">Kirin 9030 | x </cann-filter> |
@@ -22,7 +22,7 @@ LoadDataWithTranspose负责完成普通矩阵计算所需的2D格式的数据的
 
 L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
-实现原理可参考伪代码：[LoadDataWithTranspose伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0/scripts/load_data_with_transpose.py)。
+实现原理可参考伪代码：[LoadDataWithTranspose伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load_data_with_transpose.py)。
 
 ## 函数原型<a id="zh-cn_topic_0000002543851571_section82039854412"></a>
 
@@ -44,13 +44,13 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 ## 参数说明<a id="zh-cn_topic_0000002543851571_section16128134420472"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | -------- | ------ |
 | T | 模板参数，类型为LocalTensor。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ----------- | ------ |
@@ -67,11 +67,11 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 - 特别针对Ascend 950PR/Ascend 950DT，类型为LoadData2dTransposeParamsV2。参数说明请参考[表4](#zh-cn_topic_0000002543851571_table64891930194618)。
 </cann-filter>
 
-**表 3** LoadData2dTransposeParams结构体内参数说明<a id="zh-cn_topic_0000002543851571_table13526111319538"></a>
+**表3** LoadData2dTransposeParams结构体内参数说明<a id="zh-cn_topic_0000002543851571_table13526111319538"></a>
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ----------- | ------ |
-| startIndex | 输入 | 方块矩阵ID，搬运起始位置为源操作数中第几个方块矩阵（0 为源操作数中第1个方块矩阵）。取值范围：startIndex∈[0, 65535]。默认为0。<br>例如，源操作数中有20个大小为16\*8\*4字节的分形（数据类型为float），startIndex=1表示搬运起始位置为第2个方块矩阵，即将第3和第4个分形从源操作数中转置到目的操作数中（第1、2个分形组成第1个方块矩阵，第3、4个分形组成第2个方块矩阵）。<br>特性细节可参考：[设置搬运起始位置](#zh-cn_topic_0000002543851571_section520575413118)。 |
+| startIndex | 输入 | 方块矩阵ID，搬运起始位置为源操作数中第几个方块矩阵（0为源操作数中第1个方块矩阵）。取值范围：startIndex∈[0, 65535]。默认为0。<br>例如，源操作数中有20个大小为16\*8\*4字节的分形（数据类型为float），startIndex=1表示搬运起始位置为第2个方块矩阵，即将第3和第4个分形从源操作数中转置到目的操作数中（第1、2个分形组成第1个方块矩阵，第3、4个分形组成第2个方块矩阵）。<br>特性细节可参考：[设置搬运起始位置](#zh-cn_topic_0000002543851571_section520575413118)。 |
 | repeatTimes | 输入 | 迭代次数。<br>对于uint8_t/int8_t数据类型，每次迭代处理32\*32\*1字节数据；<br>对于half/bfloat16_t数据类型，每次迭代处理16\*16\*2字节数据；<br>对于float/int32_t/uint32_t数据类型，每次迭代处理16\*16\*4字节数据。<br>对于int4b_t数据类型，每次迭代处理16\*64\*0.5字节数据。<br>取值范围：repeatTimes∈[0, 255]。默认为0。<br>**注：repeatTimes = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcStride | 输入 | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔。这里的单位实际上是拼接后的方块矩阵的大小。<br>对于uint8_t/int8_t数据类型，单位是32\*32\*1字节；<br>对于half/bfloat16_t数据类型，单位是16\*16\*2字节；<br>对于float/int32_t/uint32_t数据类型，单位是16\*16\*4字节。<br>对于int4b_t数据类型，每次迭代处理16\*64\*0.5字节数据。<br>取值范围：srcStride∈[0, 65535]。默认为0。<br>**注：srcStride = 0表示在连续的重复执行周期之间，重复获取相同的分形矩阵。**<br>特性细节可参考：[非连续搬入](#zh-cn_topic_0000002543851571_section1750533101219)。 |
 | dstGap | 输入 | 相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔，单位：512字节。取值范围：dstGap∈[0, 65535]。默认为0。<br>**注：dstGap = 0表示目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址无间隔，分形连续排布。**<br>特性细节可参考：[非连续搬入](#zh-cn_topic_0000002543851571_section1750533101219)。 |
@@ -82,7 +82,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 针对Ascend 950PR/Ascend 950DT，类型为LoadData2dTransposeParamsV2，请参考下表：
 
-**表 4** LoadData2dTransposeParamsV2结构体内参数说明<a id="zh-cn_topic_0000002543851571_table64891930194618"></a>
+**表4** LoadData2dTransposeParamsV2结构体内参数说明<a id="zh-cn_topic_0000002543851571_table64891930194618"></a>
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ----------- | ------ |
@@ -226,12 +226,12 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ### 分形转置<a id="zh-cn_topic_0000002543851571_section10110103802915"></a>
 
-对int4b_t/int8_t/half/float的矩阵转置操作，所需的不同 512 字节分形数量不同：
+对int4b_t/int8_t/half/float的矩阵转置操作，所需的不同512 字节分形数量不同：
 
-- int4b_t数据类型时，4个连续的16×64的分形拼接为一个64×64的方块矩阵，再进行转置并拆分为 4 个 16×64 的分形。
-- int8_t数据类型时，2个连续的16×32的分形拼接为一个32×32的方块矩阵，再进行转置并拆分为 2 个 16×32 的分形。
-- half数据类型时，仅读取1个16×16 的分形，并直接进行转置。
-- float数据类型时，2个连续的16×8的分形拼接为一个16×16的方块矩阵，再进行转置并拆分为 2 个 16×8 的分形。
+- int4b_t数据类型时，4个连续的16×64的分形拼接为一个64×64的方块矩阵，再进行转置并拆分为4个16×64的分形。
+- int8_t数据类型时，2个连续的16×32的分形拼接为一个32×32的方块矩阵，再进行转置并拆分为2 个16×32 的分形。
+- half数据类型时，仅读取1个16×16的分形，并直接进行转置。
+- float数据类型时，2个连续的16×8的分形拼接为一个16×16的方块矩阵，再进行转置并拆分为2 个16×8的分形。
 
 具体场景如下：
 
@@ -365,7 +365,7 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ## 调用示例<a id="zh-cn_topic_0000002543851571_section088124295117"></a>
 
-### 示例 1：b8数据类型，A矩阵需要转置的场景
+### 示例1：b8数据类型，A矩阵需要转置的场景
 
 在数据类型为b8，A矩阵转置的场景下，Load2D接口不支持转置，因此需要调用LoadDataWithTranspose接口完成数据搬运。
 
@@ -373,7 +373,7 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ![](../../../../../figures/loaddatawithtrans_l12l0a_b8.png)
 
-示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load\_data\_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load\_data\_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 // dstoffset要根据A矩阵在L0 Buffer上，宽度方向的对齐来求解
@@ -394,14 +394,13 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 ```
 
-### 示例 2：int8_t数据类型，A、B矩阵需要转置的场景
+### 示例2：int8_t数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为int8_t类型，shape为[40,70]，输入b矩阵为int8_t类型，shape为[70,50]，输出c的类型为int32_t。a矩阵从A1->A2转置，b矩阵从B1->B2转置，之后进行Mmad计算和Fixpipe计算。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为int8_t类型，shape为[40,70]，输入b矩阵为int8_t类型，shape为[70,50]，输出c的类型为int32_t。a矩阵从A1->A2转置，b矩阵从B1->B2转置，之后进行Mmad计算和Fixpipe计算。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint16_t m = 40, k = 70, n = 50;
-uint32_t fractalShape[0] = 16;
-uint32_t fractalShape[1] = 32 / sizeof(int8_t);
+uint32_t fractalShape[2] = {16, 32 / sizeof(int8_t)};
 uint32_t fractalNum = 2;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
 
@@ -419,27 +418,26 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffset = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
-uint32_t srcOffset = fractalSize * fractalNum;
-AscendC::LoadData2dTransposeParams loadDataParams;
-loadDataParams.startIndex = 0;
-loadDataParams.repeatTimes = CeilDivision(n, fractalShape[1]);
-loadDataParams.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
-loadDataParams.dstGap = 1;
-loadDataParams.dstFracGap = 0;
+uint32_t dstOffsetB = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t srcOffsetB = fractalSize * fractalNum;
+AscendC::LoadData2dTransposeParams loadDataParamsB;
+loadDataParamsB.startIndex = 0;
+loadDataParamsB.repeatTimes = CeilDivision(n, fractalShape[1]);
+loadDataParamsB.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
+loadDataParamsB.dstGap = 1;
+loadDataParamsB.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
-    AscendC::LoadDataWithTranspose(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
+    AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
-### 示例 3：half数据类型，A、B矩阵需要转置的场景
+### 示例3：half数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为half类型，shape为[40,70]，输入b矩阵为half类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为half类型，shape为[40,70]，输入b矩阵为half类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint16_t m = 40, k = 70, n = 50;
-uint32_t fractalShape[0] = 16;
-uint32_t fractalShape[1] = 32 / sizeof(half);
+uint32_t fractalShape[2] = {16, 32 / sizeof(half)};
 uint32_t fractalNum = 1;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
 
@@ -457,29 +455,29 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffset = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
-uint32_t srcOffset = fractalSize * fractalNum;
-AscendC::LoadData2dTransposeParams loadDataParams;
-loadDataParams.startIndex = 0;
-loadDataParams.repeatTimes = CeilDivision(n, fractalShape[1]);
-loadDataParams.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
-loadDataParams.dstGap = 0;
-loadDataParams.dstFracGap = 0;
+uint32_t dstOffsetB = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t srcOffsetB = fractalSize * fractalNum;
+AscendC::LoadData2dTransposeParams loadDataParamsB;
+loadDataParamsB.startIndex = 0;
+loadDataParamsB.repeatTimes = CeilDivision(n, fractalShape[1]);
+loadDataParamsB.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
+loadDataParamsB.dstGap = 0;
+loadDataParamsB.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
-  AscendC::LoadDataWithTranspose(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
-### 示例 4：float数据类型，A、B矩阵需要转置的场景
+### 示例4：float数据类型，A、B矩阵需要转置的场景
 
-该示例输入a矩阵为float类型，shape为[40,70]，输入b矩阵为float类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例输入a矩阵为float类型，shape为[40,70]，输入b矩阵为float类型，shape为[70,50]，输出c的类型为float。a矩阵从A1->A2转置，b矩阵从B1->B2转置。示例代码片段如下，仅展示样例中的部分代码，完整使用样例请参见[LoadData_L12L0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t m = 40, k = 70, n = 50;
-uint32_t fractalShape[0] = 16;
-uint32_t fractalShape[1] = 32 / sizeof(float);
+uint32_t fractalShape[2] = {16, 32 / sizeof(float)};
 uint32_t fractalNum = 2;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
+
 // A矩阵LoadDataWithTranspose: Zz -> Zz
 uint32_t dstOffset = CeilDivision(k, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
 uint32_t srcOffset = fractalSize * fractalNum;
@@ -494,24 +492,24 @@ for (int i = 0; i < CeilDivision(m, fractalShape[1] * fractalNum); ++i) {
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffset = CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
-uint32_t srcOffset = CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
-AscendC::LoadData2dTransposeParams loadDataParams;
-loadDataParams.startIndex = 0;
-loadDataParams.repeatTimes = CeilDivision(n, fractalShape[1] * fractalNum);
-loadDataParams.srcStride = 1;
-loadDataParams.dstGap = 0;
-loadDataParams.dstFracGap = CeilDivision(n, fractalShape[0]) - 1;
+uint32_t dstOffsetB = CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
+uint32_t srcOffsetB = CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
+AscendC::LoadData2dTransposeParams loadDataParamsB;
+loadDataParamsB.startIndex = 0;
+loadDataParamsB.repeatTimes = CeilDivision(n, fractalShape[1] * fractalNum);
+loadDataParamsB.srcStride = 1;
+loadDataParamsB.dstGap = 0;
+loadDataParamsB.dstFracGap = CeilDivision(n, fractalShape[0]) - 1;
 for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
-    AscendC::LoadDataWithTranspose(b2Local[i * dstOffset], b1Local[i * srcOffset], loadDataParams);
+    AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
 <cann-filter npu-type = "950">
 
-### 示例 5：使用LoadData2dTransposeParamsV2结构体作为参数的场景
+### 示例5：使用LoadData2dTransposeParamsV2结构体作为参数的场景
 
-该示例使用了LoadData2dTransposeParamsV2结构体作为参数，输入a矩阵为int8_t类型，shape为[128,128]，输入数据格式为NZ，输入b矩阵为int8_t类型，shape为[128,256]，输入数据格式为NZ，输出c的类型为float。a矩阵从A1->A2不转置，b矩阵从B1->B2转置，示例仅展示接口调用过程，其余计算和搬运不作参考。完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+该示例使用了LoadData2dTransposeParamsV2结构体作为参数，输入a矩阵为int8_t类型，shape为[128,128]，输入数据格式为NZ，输入b矩阵为int8_t类型，shape为[128,256]，输入数据格式为NZ，输出c的类型为float。a矩阵从A1->A2不转置，b矩阵从B1->B2转置，示例仅展示接口调用过程，其余计算和搬运不作参考。完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32 m = 256;

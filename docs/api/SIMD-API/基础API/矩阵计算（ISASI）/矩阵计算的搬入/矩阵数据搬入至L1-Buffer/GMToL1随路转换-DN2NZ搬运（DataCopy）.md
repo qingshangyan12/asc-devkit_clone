@@ -29,14 +29,14 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a id="section622mcpsimp"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T | 源操作数或者目的操作数的数据类型。 |
 | enableSmallC0 | SmallC0模式开关：当dValue小于等于4的时候，C0_SIZE会补齐到4 * sizeof(T)字节，默认不开启。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -44,7 +44,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 | src | 输入 | 源操作数，类型为GlobalTensor，存储位置为Global Memory。 |
 | intriParams | 输入 | 搬运参数，Dn2NzParams类型，具体参数说明请参考[表3](#table9182515919)。 |
 
-**表 3** Dn2NzParams结构体参数定义<a id="table9182515919"></a>
+**表3** Dn2NzParams结构体参数定义<a id="table9182515919"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -84,22 +84,30 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 
 ## 调用示例<a id="section122101199486"></a>
 
-示例代码片段如下：
+如下示例中：在A矩阵转置，数据类型为half的场景下，使用DataCopy进行随路DN2NZ数据搬运。
+
+搬运过程的数据排布变化示意图如下：
+
+![](../../../../../figures/datacopy_gm2l1_dn2nz_demo.png)
+
+示例代码片段如下，完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景3。
 
 ```cpp
-// dstLocal：存放DataCopy的输出Tensor，仅支持L1 Buffer（A1/B1）
-// srcGlobal：存放DataCopy的输入Tensor，仅支持Global Memory
+// m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 * fractalShape[1] 
+AscendC::Dn2NzParams dn2nzA1Params; 
+// 传输DN矩阵的数目 
+dn2nzA1Params.dnNum = 1; 
+// DN矩阵的列数 
+dn2nzA1Params.nValue = 40; 
+// DN矩阵的行数 
+dn2nzA1Params.dValue = 56; 
+// 只传输了1个DN矩阵，该参数无效 
+dn2nzA1Params.srcDnMatrixStride = 0; 
+// 源操作数中同一DN矩阵行起始地址间的偏移 
+dn2nzA1Params.srcDValue = 40; 
+dn2nzA1Params.dstNzC0Stride = CeilAlign(m, fractalShape[0]); 
+dn2nzA1Params.dstNzNStride = 1; 
+dn2nzA1Params.dstNzMatrixStride = 0; 
+AscendC::DataCopy(a1Local, aGM, dn2nzA1Params);
 
-AscendC::Dn2NzParams dn2nzParams(
-    /* dnNum             */ 1,
-    /* nValue            */ 32,
-    /* dValue            */ 32,
-    /* srcDnMatrixStride */ 0,
-    /* srcDValue         */ 32,
-    /* dstNzC0Stride     */ 32,
-    /* dstNzNStride      */ 1,
-    /* dstNzMatrixStride */ 0
-);
-// 将GM中DN的格式的数据，按照dn2nzParams定义的规则，转换为NZ并拷贝到L1 Buffer（A1/B1）中
-AscendC::DataCopy(dstLocal, srcGlobal, dn2nzParams);
 ```
