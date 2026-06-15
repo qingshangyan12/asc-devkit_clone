@@ -152,31 +152,24 @@ $dst_i = src0_i / src1_i$
 <!-- npu="950" id19 -->
 - 针对Ascend 950PR/Ascend 950DT，T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float、complex32、int64_t、uint64_t、complex64。数据类型complex32、int64_t、uint64_t、complex64仅支持tensor前n个数据计算接口和整个tensor参与计算的运算符重载。
 <!-- end id19 -->
-
 <!-- npu="A3" id20 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T支持的数据类型为：half、float。
 <!-- end id20 -->
-
 <!-- npu="910b" id21 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T支持的数据类型为：half、float。
 <!-- end id21 -->
-
 <!-- npu="310b" id22 -->
 - 针对Atlas 200I/500 A2 推理产品，T支持的数据类型为：half、float。
 <!-- end id22 -->
-
 <!-- npu="310p" id23 -->
 - 针对Atlas 推理系列产品AI Core，T支持的数据类型为：half、float。
 <!-- end id23 -->
-
 <!-- npu="910" id24 -->
 - 针对Atlas 训练系列产品，T支持的数据类型为：half、float。
 <!-- end id24 -->
-
 <!-- npu="x90" id25 -->
 - 针对Kirin X90，T支持的数据类型为：half、float。
 <!-- end id25 -->
-
 <!-- npu="9030" id26 -->
 - 针对Kirin 9030，T支持的数据类型为：half、float。
 <!-- end id26 -->

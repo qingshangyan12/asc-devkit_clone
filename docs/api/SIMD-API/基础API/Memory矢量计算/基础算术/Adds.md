@@ -113,31 +113,24 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 <!-- npu="950" id10 -->
 - 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、half、bfloat16_t、int32_t、float、complex32、int64_t、uint64_t、complex64。数据类型int8_t、uint8_t、complex32、int64_t、uint64_t、complex64仅支持tensor前n个数据计算接口。
 <!-- end id10 -->
-
 <!-- npu="A3" id11 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id11 -->
-
 <!-- npu="910b" id12 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id12 -->
-
 <!-- npu="310b" id13 -->
 - 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id13 -->
-
 <!-- npu="310p" id14 -->
 - 针对Atlas 推理系列产品AI Core，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id14 -->
-
 <!-- npu="910" id15 -->
 - 针对Atlas 训练系列产品，T和U支持的数据类型为：half、float。
 <!-- end id15 -->
-
 <!-- npu="x90" id16 -->
 - 针对Kirin X90，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id16 -->
-
 <!-- npu="9030" id17 -->
 - 针对Kirin 9030，T和U支持的数据类型为：int16_t、half、int32_t、float。
 <!-- end id17 -->
