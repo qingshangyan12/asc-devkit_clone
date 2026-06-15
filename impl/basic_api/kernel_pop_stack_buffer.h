@@ -40,8 +40,9 @@ template <typename T, TPosition pos> __aicore__ inline bool PopStackBuffer(Local
 {
     TBuffAddr addr;
     addr.logicPos = (int8_t)pos;
+    ASCENDC_ASSERT((GetTPipePtr() != nullptr), { KERNEL_LOG(KERNEL_ERROR, "GetTPipePtr is nullptr"); });
     uint64_t endAddress = GetEndAddress<pos>();
-    uint64_t queEndAddress = GetQueueEndAddress<pos>();
+    uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
     ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
                    { KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress); });
     ASCENDC_ASSERT((endAddress > queEndAddress), {
@@ -66,7 +67,7 @@ template <typename T, TPosition pos> __aicore__ inline bool PopStackBuffer(Local
 template <TPosition pos> __aicore__ inline bool PopStackBuffer(TBuf<pos>& popBuffer, TBufType& bufStart)
 {
     uint64_t endAddress = GetEndAddress<pos>();
-    uint64_t queEndAddress = GetQueueEndAddress<pos>();
+    uint64_t queEndAddress = GetTPipePtr()->GetQueueEndAddress<pos>();
     ASCENDC_ASSERT((queEndAddress % ONE_BLK_SIZE == 0),
                    { KERNEL_LOG(KERNEL_ERROR, "queEndAddress is %lu, which must be 32B aligned", queEndAddress); });
     ASCENDC_ASSERT((endAddress > queEndAddress), {
