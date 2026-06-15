@@ -1855,6 +1855,7 @@ Contents of section
             code_channel = 0
             ret = call_bisheng_v220(compile_info, compile_option_tuple, tiling_info, arch, code_channel)
             self.assertEqual(ret, ['0'])
+            DFXSectionGenerator().dfx_info_reset(op_info)
             tiling_info.static_shape_flag = False
             gen_kernel_fun(compile_info, origin_func_name, op_info, tiling_info, CompileOptionTuple([], []))
             ret = call_bisheng_v220(compile_info, compile_option_tuple, tiling_info, arch, code_channel)
