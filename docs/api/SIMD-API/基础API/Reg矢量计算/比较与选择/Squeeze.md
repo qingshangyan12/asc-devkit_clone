@@ -51,11 +51,11 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf.h"`。
 
-将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如[图1](#zh-cn_topic_0000002568284054_fig4982141403920)所示。
+将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如[图1](#figure1)所示。
 
-**图 1**  Squeeze计算示意图
+**图 1**  Squeeze计算示意图<a id="figure1"></a>
 
-![](../../../../figures/Squeeze计算示意图.png)
+![Squeeze计算示意图](../../../../figures/reg_squeeze.png)
 
 特别地，当模板参数store取值为GatherMaskMode::STORE\_REG时，Squeeze会将有效元素的总字节数存入AR特殊寄存器。此时配合使用[连续非对齐搬出](../Reg数据搬运/连续非对齐搬出.md)的场景3接口（无需显式传入偏移量），StoreUnAlign会自动从AR寄存器读取有效字节数作为地址偏移，参考[调用示例](#调用示例)。
 

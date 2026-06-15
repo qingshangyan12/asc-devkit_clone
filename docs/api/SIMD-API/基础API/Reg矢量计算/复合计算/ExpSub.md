@@ -114,7 +114,7 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 - 本接口不修改全局寄存器的值。
 - 源操作数类型为half时，Vector计算单元一次计算只处理最多64个元素，mask的有效情况以输入数据类型为准，只有偶数位有效，有效位共128bit，参考下图：
 
-![3-3-4-6-3_约束说明](../../../../figures/3-3-4-6-3_约束说明.png)
+  ![ExpSub处理half类型示意图](../../../../figures/reg_expsub_half.png)
 
 ## 关键特性说明
 
