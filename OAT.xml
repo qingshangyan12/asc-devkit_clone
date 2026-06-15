@@ -4,53 +4,18 @@
         <licensefile></licensefile>
         <policylist>
             <policy name="projectPolicy" desc="">
-                <policyitem type="license" name="CANN-2.0" path=".*" rule="may" group="defaultGroup" filefilter="defaultPolicyFilter" desc=""/>
-                <policyitem type="copyright" name="Huawei Technologies Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc=""/>
-                <policyitem type="filetype" name="!binary" path=".*" rule="must" group="defaultGroup" filefilter="binaryFileTypePolicyFilter" desc=""/>
+                <policyitem type="license" name="cann License" path=".*" filefilter ="licenseFileNamePolicyFilter" desc=""/>
+                <policyitem type="filetype" name="!binary" path=".*" rule="must" group="defaultGroup" filefilter="binaryFileTypePolicyFilter" desc="Reject binary files unless explicitly filtered"/>
             </policy>
         </policylist>
         <filefilterlist>
-            <filefilter name="defaultPolicyFilter" desc="Filters for compatibility,license header policies">
-                <filteritem type="filename" name="*.csv" desc="data file"/>
-                <filteritem type="filename" name="*.gitignore" desc="git ignore file"/>
-                <filteritem type="filename" name="*.info" desc="metadata file"/>
-                <filteritem type="filename" name="*.ini" desc="configuration file"/>
-                <filteritem type="filename" name="*.json" desc="metadata or configuration file"/>
-                <filteritem type="filename" name="*.lock" desc="dependency lock file"/>
-                <filteritem type="filename" name="*.md" desc="documentation file"/>
-                <filteritem type="filename" name="*.png" desc="image file"/>
-                <filteritem type="filename" name="*.rst" desc="documentation file"/>
-                <filteritem type="filename" name="*.svg" desc="image file"/>
-                <filteritem type="filename" name="*.toml" desc="configuration file"/>
-                <filteritem type="filename" name="*.cpp.txt" desc="generated source fixture file"/>
-                <filteritem type="filename" name="*.h.txt" desc="generated source fixture file"/>
-                <filteritem type="filename" name="*.ini.txt" desc="generated configuration fixture file"/>
-                <filteritem type="filename" name="*.xml" desc="configuration or metadata file"/>
-                <filteritem type="filename" name="*.yaml" desc="configuration file"/>
-                <filteritem type="filename" name="*.yml" desc="configuration file"/>
-                <filteritem type="filename" name=".clang-format" desc="tool configuration file"/>
-                <filteritem type="filename" name=".clangd" desc="tool configuration file"/>
-                <filteritem type="filename" name=".gitattributes" desc="git attributes file"/>
-                <filteritem type="filename" name=".gitmodules" desc="git submodule file"/>
-                <filteritem type="filename" name="CHANGELOG" desc="documentation file"/>
-                <filteritem type="filename" name="CODEOWNERS" desc="repository metadata file"/>
-                <filteritem type="filename" name="CONTRIBUTING" desc="documentation file"/>
-                <filteritem type="filename" name="LICENSE" desc="license text"/>
-                <filteritem type="filename" name="NOTICE" desc="notice text"/>
-                <filteritem type="filename" name="OAT.xml" desc="audit tool configuration file"/>
-                <filteritem type="filename" name="README" desc="documentation file"/>
-                <filteritem type="filename" name="SECURITY" desc="documentation file"/>
-                <filteritem type="filename" name="Third_Party_Open_Source_Software_Notice" desc="third party notice"/>
-                <filteritem type="filename" name="go.mod" desc="dependency metadata file"/>
-                <filteritem type="filename" name="go.sum" desc="dependency checksum file"/>
-                <filteritem type="filename" name="package-lock.json" desc="dependency lock file"/>
-                <filteritem type="filename" name="package.json" desc="package metadata file"/>
-                <filteritem type="filename" name="pnpm-lock.yaml" desc="dependency lock file"/>
-                <filteritem type="filename" name="poetry.lock" desc="dependency lock file"/>
-                <filteritem type="filename" name="requirements.txt" desc="dependency metadata file"/>
-                <filteritem type="filename" name="yarn.lock" desc="dependency lock file"/>
+            <filefilter name="defaultFilter" desc="Files not to check">
+            </filefilter>
+            <filefilter name="defaultPolicyFilter" desc="Filters for compatibility, license header policies">
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies">
+            </filefilter>
+            <filefilter name="licenseFileNamePolicyFilter" desc="Filters for LICENSE file policies">
                 <filteritem type="filename" name="*.csv" desc="data file"/>
                 <filteritem type="filename" name="*.gitignore" desc="git ignore file"/>
                 <filteritem type="filename" name="*.info" desc="metadata file"/>
@@ -89,8 +54,6 @@
                 <filteritem type="filename" name="poetry.lock" desc="dependency lock file"/>
                 <filteritem type="filename" name="requirements.txt" desc="dependency metadata file"/>
                 <filteritem type="filename" name="yarn.lock" desc="dependency lock file"/>
-            </filefilter>
-            <filefilter name="licenseFileNamePolicyFilter" desc="Filters for LICENSE file policies">
             </filefilter>
             <filefilter name="readmeFileNamePolicyFilter" desc="Filters for README file policies">
             </filefilter>
@@ -98,21 +61,20 @@
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filename" name="*.png" desc="png file"/>
-                <filteritem type="filename" name=".clangd" desc="clangd config"/>
                 <filteritem type="filename" name="SWSCRL.crl" desc="certificate revocation list"/>
             </filefilter>
 
         </filefilterlist>
         <licensematcherlist>
-            <licensematcher name="CANN License" desc="License for CANN Open Software">
+            <licensematcher name="cann License" desc="If the scanning result is InvalidLicense, you can define matching rules here. Note that quotation marks must be escaped.">
                 <licensetext name="
-                    * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-                    * CANN Open Software License Agreement Version 2.0 (the &quot;License&quot;).
-                    * Please refer to the License for details. You may not use this file except in compliance with the License.
-                    * THIS SOFTWARE IS PROVIDED ON AN &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-                    * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-                    * See LICENSE in the root of the software repository for the full text of the License.
-                    " desc=""/>
+                    This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+                    CANN Open Software License Agreement Version 2.0 (the &quot;License&quot;).
+                    Please refer to the License for details. You may not use this file except in compliance with the License.
+                    THIS SOFTWARE IS PROVIDED ON AN &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+                    INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+                    See LICENSE in the root of the software repository for the full text of the License.
+                " desc=""/>
             </licensematcher>
         </licensematcherlist>
     </oatconfig>
