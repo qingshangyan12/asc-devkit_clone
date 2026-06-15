@@ -60,6 +60,41 @@ struct Bucket {
 };
 ```
 
+### 结构体设计
+
+哈希表插入过程涉及哈希表首地址、容量、桶大小、输入key/value等多项信息，若在函数间逐一传递这些参数，接口会变得冗长，模块间耦合也会增加。因此，样例通过结构体分别封装哈希表上下文和输入数据，提升代码可读性和维护性。
+
+除用于描述桶数据布局的`Bucket`外，样例定义`KeyValueData`保存本次插入的输入key/value、value维度和key数量。输入数据作为kernel的独立结构体入参传入，并在执行插入操作时作为`insert`函数的入参使用。
+
+```C++
+struct KeyValueData {
+    int64_t* keys;       // 输入key
+    float* values;       // 输入value
+    uint32_t value_dim;  // value维度
+    uint32_t key_num;    // 输入key数量
+
+    __aicore__ inline int64_t load_key(uint32_t kv_idx) const; // 读取key
+    __aicore__ inline float load_value(uint32_t kv_idx, uint32_t j) const; // 读取value
+};
+```
+
+`HashTableContext`保存哈希表自身参数。kernel通过该结构体计算桶地址，并完成目标桶的查找和写入；写入value时，`insert`函数通过入参读取`KeyValueData`中的输入数据。
+
+```C++
+struct HashTableContext {
+    uint8_t* table_addr;     // 哈希表首地址
+    uint32_t capacity;       // 哈希表容量
+    uint32_t bucket_size;    // 桶大小
+
+    __aicore__ inline Bucket* get_bucket(uint32_t bucket_idx) const; // 获取桶地址
+    __aicore__ inline Bucket* query(int64_t key, int32_t& success); // 查找并占用桶
+    __aicore__ inline void insert(Bucket* bucket, const KeyValueData* input,
+                                  uint32_t kv_idx, int32_t lane_id); // 写入value
+};
+```
+
+`Bucket`是`HashTableContext`操作的目标内存结构，其中`state`和`flag`分别用于key发布同步和桶写权限控制。
+
 ## 算子描述
 
 - 算子功能：  
