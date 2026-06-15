@@ -1,3 +1,4 @@
 docs/api/context/c_api/figures/*.png filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 docs/figures/*.png filter=lfs diff=lfs merge=lfs -text
+docs/api/figures/matrix_computation_workflow_tensor_api.png filter=lfs diff=lfs merge=lfs -text
