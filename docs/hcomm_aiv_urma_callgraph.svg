@@ -35,17 +35,17 @@
 <text x="470" y="245" font-family="Consolas, 'Source Code Pro', monospace" font-size="14" fill="#d97706" text-anchor="middle" font-weight="bold">PostSend&lt;OpCode&gt;</text>
 <text x="470" y="275" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >1. HcommFindBufferIdx</text>
 <text x="470" y="308" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (查找远端buffer索引)</text>
-<text x="470" y="341" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >2. Gm2Ub(sqPI)</text>
+<text x="470" y="341" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >2. sqPI</text>
 <text x="470" y="374" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (读取SQ头指针)</text>
 <text x="470" y="407" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >3. PollCqWhenSqOverflow</text>
-<text x="470" y="440" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (SQ满时自动排水)</text>
+<text x="470" y="440" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (SQ满时自动poll cq)</text>
 <text x="470" y="473" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >4. HcommUrmaFillSqeCtx</text>
 <text x="470" y="506" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (填充SQE结构)</text>
 <text x="470" y="539" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >5. HcommUrmaFillSgeCtx</text>
 <text x="470" y="572" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (填充SGE结构)</text>
-<text x="470" y="605" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >6. DataCopy(UB→SQ)</text>
-<text x="470" y="638" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (WQE拷贝到SQ)</text>
-<text x="470" y="671" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >7. 更新sqPI, Ub2Gm</text>
+<text x="470" y="605" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >6. 更新WQE内容</text>
+<text x="470" y="638" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (WQE刷新到对应gm地址)</text>
+<text x="470" y="671" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >7. 更新sqPI</text>
 <text x="470" y="704" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   (sqPI回写GM)</text>
 <text x="470" y="737" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >8. if(commit) → Commit</text>
 <line x1="385" y1="145" x2="430" y2="223" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" />
@@ -56,17 +56,15 @@
 <text x="820" y="313" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >(通知硬件处理SQ)</text>
 <line x1="805" y1="145" x2="820" y2="233" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" />
 <path d="M 630 727 L 720 285" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
-<rect x="720" y="395" width="200" height="320" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" opacity="1.0"/>
-<text x="820" y="419" font-family="Consolas, 'Source Code Pro', monospace" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="bold">PollCq</text>
-<text x="820" y="450" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >1. 读取cqCI</text>
-<text x="820" y="482" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >2. 循环等待CQE</text>
-<text x="820" y="514" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   owner位翻转</text>
-<text x="820" y="546" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >3. 检查status</text>
-<text x="820" y="578" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >   &amp; substatus</text>
-<text x="820" y="610" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >4. 更新cqCI</text>
-<text x="820" y="642" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >5. Ring CQ doorbell</text>
-<text x="820" y="674" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >6. 更新sqCI</text>
-<line x1="1015" y1="145" x2="820" y2="393" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" />
+<rect x="720" y="425" width="200" height="240" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5" opacity="1.0"/>
+<text x="820" y="449" font-family="Consolas, 'Source Code Pro', monospace" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="bold">PollCq</text>
+<text x="820" y="480" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >1. 读取cqCI</text>
+<text x="820" y="512" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >2. 循环等待CQE</text>
+<text x="820" y="544" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >3. 检查status</text>
+<text x="820" y="576" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >4. 更新cqCI</text>
+<text x="820" y="608" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >5. Ring CQ doorbell</text>
+<text x="820" y="640" font-family="Consolas, 'Source Code Pro', monospace" font-size="12" fill="#1e293b" text-anchor="middle" >6. 更新sqCI</text>
+<line x1="1015" y1="145" x2="820" y2="423" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" />
 <rect x="30" y="810" width="1140" height="140" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5" opacity="1.0"/>
 <text x="90" y="830" font-family="Arial, 'Noto Sans SC', sans-serif" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="bold">硬件层 (URMA Engine)</text>
 <rect x="150" y="850" width="220" height="60" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="2" opacity="1.0"/>
@@ -80,7 +78,7 @@
 <line x1="670" y1="880" x2="770" y2="880" stroke="#475569" stroke-width="1.8" marker-end="url(#arrowhead)" />
 <text x="720" y="870" font-family="Consolas, 'Source Code Pro', monospace" font-size="10" fill="#64748b" text-anchor="middle" >完成通知</text>
 <path d="M 470 765 L 260 850" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
-<text x="410" y="780" font-family="Consolas, 'Source Code Pro', monospace" font-size="10" fill="#64748b" text-anchor="start" >DataCopy WQE→SQ</text>
-<path d="M 880 850 L 820 715" fill="none" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
+<text x="410" y="780" font-family="Consolas, 'Source Code Pro', monospace" font-size="10" fill="#64748b" text-anchor="start" >WQE刷新→SQ(GM)</text>
+<path d="M 880 850 L 820 665" fill="none" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arrowhead)" stroke-dasharray="6,3"/>
 <text x="50" y="955" font-family="Consolas, 'Source Code Pro', monospace" font-size="11" fill="#64748b" text-anchor="start" >━━ 同步调用    ┈┈ 异步/条件调用</text>
 </svg>

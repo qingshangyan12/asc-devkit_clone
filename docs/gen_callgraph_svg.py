@@ -133,17 +133,17 @@ def build_svg():
     steps = [
         "1. HcommFindBufferIdx",
         "   (查找远端buffer索引)",
-        "2. Gm2Ub(sqPI)",
+        "2. sqPI",
         "   (读取SQ头指针)",
         "3. PollCqWhenSqOverflow",
-        "   (SQ满时自动排水)",
+        "   (SQ满时自动poll cq)",
         "4. HcommUrmaFillSqeCtx",
         "   (填充SQE结构)",
         "5. HcommUrmaFillSgeCtx",
         "   (填充SGE结构)",
-        "6. DataCopy(UB→SQ)",
-        "   (WQE拷贝到SQ)",
-        "7. 更新sqPI, Ub2Gm",
+        "6. 更新WQE内容",
+        "   (WQE刷新到对应gm地址)",
+        "7. 更新sqPI",
         "   (sqPI回写GM)",
         "8. if(commit) → Commit",
     ]
@@ -172,17 +172,15 @@ def build_svg():
 
     # ─── Drain / PollCq box (right-lower) ───
     dr_x = 720
-    dr_y = ly2_y + 210
+    dr_y = ly2_y + 240
     dr_w = 200
-    dr_h = 320
+    dr_h = 240
     parts.append(rect(dr_x, dr_y, dr_w, dr_h, "#f0fdf4", C_BOX_HW))
     parts.append(text(dr_x + dr_w // 2, dr_y + 24, "PollCq", size=14, bold=True, color=C_BOX_HW))
     dr_steps = [
         "1. 读取cqCI",
         "2. 循环等待CQE",
-        "   owner位翻转",
         "3. 检查status",
-        "   &amp; substatus",
         "4. 更新cqCI",
         "5. Ring CQ doorbell",
         "6. 更新sqCI",
@@ -237,7 +235,7 @@ def build_svg():
     parts.append(arrow_path(
         f"M {ps_x + ps_w // 2} {ps_y + ps_h} L {sq_x + sq_w // 2} {sq_y}",
         color=C_BOX_IMPL, dashed=True))
-    parts.append(text(ps_x + ps_w // 2 - 60, ps_y + ps_h + 15, "DataCopy WQE→SQ",
+    parts.append(text(ps_x + ps_w // 2 - 60, ps_y + ps_h + 15, "WQE刷新→SQ(GM)",
                       size=10, color=C_SUBTITLE, anchor="start"))
 
     # Arrow from CQ to PollCq
