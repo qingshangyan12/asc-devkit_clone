@@ -121,7 +121,7 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
 }
 ```
 
-另外, 开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。
+此外，开发者可通过LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理。使用时需合理规划地址分配，确保不超过物理存储上限，并在保证功能正确的前提下进行内存复用。
 ```cpp
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
 {
