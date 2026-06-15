@@ -20,7 +20,7 @@
 
 DataCopy数据搬运支持将随路量化参数从L1 Buffer移动到Fixpipe Buffer。Fixpipe Buffer包含两种参数：pre_stage的量化参数，这些参数各自独立存储，并拥有独立的地址空间。量化参数和ReLU参数通过dst地址的高16位（dst[31:16]）进行区分，具体如下：
 
-**图 1** Fixpipe Buffer图示
+**图1** Fixpipe Buffer图示
 
 ![](../../../../../figures/fixpipe_buffer_02.png)
 
@@ -38,22 +38,22 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 参数说明<a id="section_param_desc"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T | 操作数的数据类型。对于pre_stage的量化参数的搬运需要设置为uint64_t。支持的数据类型请参考[数据类型](#section_data_type)。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为LocalTensor。存储位置为Fixpipe Buffer，目的地址需要128字节对齐。 |
 | src | 输入 | 源操作数，类型为LocalTensor，存储位置为L1 Buffer，源地址需要32字节对齐。 |
 | repeatParams | 输入 | 搬运参数，DataCopyParams类型。通过该参数可配置搬运的数据块大小、个数、间隔等信息，同时支持非连续和连续搬运。<br>具体定义请参考"basic_api/interface/kernel_struct_data_copy.h" |
-| count | 输入 | 参与搬运的元素个数。count * sizeof(T) 需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。 |
+| count | 输入 | 参与搬运的元素个数。count * sizeof(T)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。 |
 
-**表 3** DataCopyParams结构体参数定义
+**表3** DataCopyParams结构体参数定义
 
 | 参数名 | 含义 |
 | ---------- | ---------- |
@@ -80,4 +80,29 @@ src数据类型支持uint64_t，dst数据类型支持uint64_t。
 
 ## 调用示例<a id="section_call_example"></a>
 
-无
+L1 Buffer(C1)->Fixpipe Buffer(C2PIPE2GM)，搬运Vector量化参数。
+
+```cpp
+// c1Addr = 0、fbAddr = 0、N = 256、n = 256；burstLen = CeilAlign(256 * sizeof(uint64_t), 128) / 128 = 16，dataCopyParams = {1, 16, 0, 0}。
+AscendC::LocalTensor<uint64_t> quantAlphaTensor(AscendC::TPosition::C1, c1Addr, N);
+
+if constexpr (scenarioNum == 2 || scenarioNum == 4 || scenarioNum == 6) {
+    CopyQuantAlphaGmToL1(quantAlphaTensor);
+}
+
+// vector quant mode
+if constexpr (scenarioNum == 2) {
+    intriParams.quantPre = QuantMode_t::VDEQF16;
+} else if constexpr (scenarioNum == 4) {
+    intriParams.quantPre = QuantMode_t::VQF322B8_PRE;
+} else {
+    intriParams.quantPre = QuantMode_t::VREQ8;
+}
+AscendC::LocalTensor<uint64_t> fbTensor(AscendC::TPosition::C2PIPE2GM, fbAddr, N);
+uint16_t burstLen = CeilAlign(n * sizeof(uint64_t), 128) / 128;
+AscendC::DataCopyParams dataCopyParams(1, burstLen, 0, 0);
+AscendC::DataCopy(fbTensor, quantAlphaTensor, dataCopyParams);
+AscendC::SetFixPipeConfig(fbTensor);
+```
+
+完整示例请参考[L1->Fixpipe Buffer数据搬运(DataCopy)](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)中场景2、4、6。

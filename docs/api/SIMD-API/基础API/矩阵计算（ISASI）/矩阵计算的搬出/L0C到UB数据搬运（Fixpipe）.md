@@ -66,33 +66,33 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
 ## 参数说明<a name="zh-cn_topic_0000002549846732_section16128134420472"></a>
 
-**表 1** Fixpipe模板参数说明
+**表1** Fixpipe模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T/U | 目的操作数/源操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002549846732_section4219135304818)。 |
 | config | Fixpipe相关配置参数，类型为FixpipeConfig。取值如下：<br>&nbsp;&nbsp;&bull; **CFG_ROW_MAJOR（默认取值）**：开启NZ2ND，输出数据格式为ND格式。<br>&nbsp;&nbsp;&bull; CFG_NZ：NZ2NZ，输出数据格式为NZ格式。<br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; CFG_COLUMN_MAJOR：针对Ascend 950PR/Ascend 950DT，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 用于用户指定目的地址的位置是否是UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 输出数据格式仍为NZ格式。<br>    ROW_MAJOR, // 开启NZ2ND，输出数据格式为ND格式。<br><cann-filter npu-type = "950">    COLUMN_MAJOR, // 仅Ascend 950PR/Ascend 950DT支持，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu-type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 仅Ascend 950PR/Ascend 950DT支持</cann-filter></pre> |
-| S | 参数cbufWorkspace的数据类型，即随路量化参数的数据类型。<br>&nbsp;&nbsp;&bull; 当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。<br>&nbsp;&nbsp;&bull; 当目的操作数、源操作数、cbufWorkspace使用TensorTrait类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。<br>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
+| S | 参数cbufWorkspace的数据类型，即随路量化参数的数据类型。<br>&nbsp;&nbsp;&bull;当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。<br>&nbsp;&nbsp;&bull;当目的操作数、源操作数、cbufWorkspace使用TensorTrait类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。<br>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
 
-**表 2** Fixpipe参数说明
+**表2** Fixpipe参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor。数据格式为NZ、ND格式。ND地址需求满足1字节对齐，NZ地址需满足32字节对齐。<cann-filter npu-type = "950"><br>针对Ascend 950PR/Ascend 950DT，还支持数据格式为DN，地址需满足32字节对齐。</cann-filter> |
 | src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足6对齐。 |
-| intriParams | 输入 | Fixpipe搬运参数，具体定义请参考 "basic_api/interface/kernel_struct_fixpipe.h"。<br>参数说明请参考Fixpipe搬运参数（FixpipeParamsArch3510、FixpipeParamsM300）结构体说明。 |
-| cbufWorkspace | 输入 | 量化参数，类型为`LocalTensor<uint64_t>`，支持的物理地址为L1 Buffer（TPosition为C1），地址需满足32字节对齐。<br>&nbsp;&nbsp;&bull; 当quantPre为VDEQF16、VQF322B8_PRE、VREQ8时支持。<br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; 针对Ascend 950PR/Ascend 950DT，除上述外还有VQF322FP8_PRE、VQF322HIF8_PRE、VQF322HIF8_PRE_HYBRID、VQS322BF16_PRE、VQF322F16_PRE、VQF322BF16_PRE、VQF322F32_PRE支持。<br></cann-filter>quantPre介绍请参考Fixpipe搬运参数结构体中quantPre部分。 |
+| intriParams | 输入 | Fixpipe搬运参数，具体定义请参考"basic_api/interface/kernel_struct_fixpipe.h"。<br>参数说明请参考Fixpipe搬运参数（FixpipeParamsArch3510、FixpipeParamsM300）结构体说明。 |
+| cbufWorkspace | 输入 | 量化参数，类型为`LocalTensor<uint64_t>`，支持的物理地址为L1 Buffer（TPosition为C1），地址需满足32字节对齐。<br>&nbsp;&nbsp;&bull;当quantPre为VDEQF16、VQF322B8_PRE、VREQ8时支持。<br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull;针对Ascend 950PR/Ascend 950DT，除上述外还有VQF322FP8_PRE、VQF322HIF8_PRE、VQF322HIF8_PRE_HYBRID、VQS322BF16_PRE、VQF322F16_PRE、VQF322BF16_PRE、VQF322F32_PRE支持。<br></cann-filter>quantPre介绍请参考Fixpipe搬运参数结构体中quantPre部分。 |
 
 <cann-filter npu-type = "950">
 
-**表 3** Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
+**表3** Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
 
 | 参数名称 | 数据类型 | 含义 |
 | ---------- | ---------- | ---------- |
-| nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[0, 4095]。<br>&nbsp;&nbsp;&bull; 若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启channelSplit功能，nSize必须为16的倍数。<br>&nbsp;&nbsp;&bull; 若开启NZ2ND功能，nSize*sizeof(T)必须为32的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
+| nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[0, 4095]。<br>&nbsp;&nbsp;&bull;若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull;若不开启channelSplit功能，nSize必须为16的倍数。<br>&nbsp;&nbsp;&bull;若开启NZ2ND功能，nSize*sizeof(T)必须为32的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | mSize | 输入 | 源NZ矩阵在M方向上的大小，取值范围为mSize∈[0, 65535]。<br>若开启NZ2DN功能，mSize*sizeof(T)必须为32的倍数。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcStride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_SIZE（16\*sizeof(T)，T为src的数据类型）。 |
-| dstStride | 输入 | &bull; 不开启NZ2ND功能：目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为element。<br>&bull; 开启NZ2ND/NZ2DN功能：目的ND矩阵每一行中的元素个数，取值不为0，单位为element。 |
+| dstStride | 输入 | &bull;不开启NZ2ND功能：目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为element。<br>&bull;开启NZ2ND/NZ2DN功能：目的ND矩阵每一行中的元素个数，取值不为0，单位为element。 |
 | quantPre | 输入 | QuantMode_t是一个枚举类型，用于控制量化模式，默认值为QuantMode_t::NoQuant，即不开启量化功能。QuantMode_t取值如下：<br>&nbsp;&nbsp;&bull; NoQuant，不开启量化功能。<br>&nbsp;&nbsp;&bull; F322F16，float cast成half，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; F322BF16，float cast成bfloat16_t，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; DEQF16，int32_t量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VDEQF16，int32_t量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322B8_PRE，float量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322B8_PRE，float量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; REQ8，int32_t量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VREQ8，int32_t量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322FP8_PRE，float量化成fp8_e4m3fn_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322FP8_PRE，float量化成fp8_e4m3fn_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322HIF8_PRE，float量化成hifloat8_t(Half to Away Round)，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE，float量化成hifloat8_t(Half to Away Round)，tensor量化。<br>&nbsp;&nbsp;&bull; QF322HIF8_PRE_HYBRID，float量化成hifloat8_t(Hybrid Round)，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE_HYBRID，float量化成hifloat8_t(Hybrid Round)，tensor量化。<br>&nbsp;&nbsp;&bull; QS322BF16_PRE，int32_t量化成bfloat16_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQS322BF16_PRE，int32_t量化成bfloat16_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322F16_PRE，float量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322F16_PRE，float量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322BF16_PRE，float量化成bfloat16_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322BF16_PRE，float量化成bfloat16_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322F32_PRE，float量化成float，scalar量化，该量化模式精度无法达到双万分之一，可以达到双千分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../../高阶API/量化操作/AscendDequant.md)高阶API。<br>&nbsp;&nbsp;&bull; VQF322F32_PRE，float量化成float，tensor量化，该量化模式精度无法达到双万分之一，可以达到双千分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../../高阶API/量化操作/AscendDequant.md)高阶API。 |
 | deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
 | reluEn | 输入 | 是否开启ReLU的开关：<br>&nbsp;&nbsp;&bull; false：不开启ReLU功能；<br>&nbsp;&nbsp;&bull; true：开启ReLU功能。 |
@@ -106,14 +106,14 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
 <cann-filter npu-type = "310b">
 
-**表 4** Fixpipe搬运参数（FixpipeParamsM300）结构体说明
+**表4** Fixpipe搬运参数（FixpipeParamsM300）结构体说明
 
 | 参数名称 | 数据类型 | 含义 |
 | ---------- | ---------- | ---------- |
-| nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[1, 4095]。<br>&nbsp;&nbsp;&bull; 若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启channelSplit功能，nSize必须为16的倍数。 |
-| mSize | 输入 | 源NZ矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启NZ2ND功能，取值范围为mSize∈[1, 65535]。<br>&nbsp;&nbsp;&bull; 开启NZ2ND功能，取值范围为mSize∈[1, 8192]。 |
+| nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[1, 4095]。<br>&nbsp;&nbsp;&bull;若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull;若不开启channelSplit功能，nSize必须为16的倍数。 |
+| mSize | 输入 | 源NZ矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull;不开启NZ2ND功能，取值范围为mSize∈[1, 65535]。<br>&nbsp;&nbsp;&bull;开启NZ2ND功能，取值范围为mSize∈[1, 8192]。 |
 | srcStride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_SIZE(16\*sizeof(T)，T为src的数据类型)。 |
-| dstStride | 输入 | &bull; 不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock(32字节)。<br>&bull; 开启NZ2ND功能，目的ND矩阵每一行中的元素个数，取值不为0 ，单位为element。 |
+| dstStride | 输入 | &bull;不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock(32字节)。<br>&bull;开启NZ2ND功能，目的ND矩阵每一行中的元素个数，取值不为0 ，单位为element。 |
 | quantPre | 输入 | QuantMode_t是一个枚举类型，用于控制量化模式，默认值为QuantMode_t::NoQuant，即不开启量化功能。QuantMode_t取值如下：<br>&nbsp;&nbsp;&bull; NoQuant，不开启量化功能。<br>&nbsp;&nbsp;&bull; F322F16，float cast成half，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; F322BF16，float cast成bfloat16_t，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; DEQF16，int32_t量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VDEQF16，int32_t量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322B8_PRE，float量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322B8_PRE，float量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; REQ8，int32_t量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VREQ8，int32_t量化成uint8_t/int8_t，tensor量化 |
 | deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
 | ndNum | 输入 | 源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[1, 65535]。 |
@@ -172,7 +172,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 
 不开启NZ2ND的情况下，参数设置示例（通过Fixpipe接口搬运并去除dummy数据）和解释说明如下：
 
-当M方向上的数据元素个数不是16的倍数时，搬入时会额外读取dummy数据，并在写入目标位置后丢弃这些dummy数据。矩阵块被定义为连续的16\*16的数据块，数据块的个数为M/16向上取整， 矩阵块的长度为M\*16\*sizeof\(T\)，T是数据类型。
+当M方向上的数据元素个数不是16的倍数时，搬入时会额外读取dummy数据，并在写入目标位置后丢弃这些dummy数据。矩阵块被定义为连续的16\*16的数据块，数据块的个数为M/16向上取整，矩阵块的长度为M\*16\*sizeof\(T\)，T是数据类型。
 
 **单搬运模式：**
 
@@ -181,9 +181,9 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 - srcStride = 64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为64 \* C0\_Size。
 - dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中第一个蓝色Z排布的起始地址与第二个蓝色Z排布的起始地址之间的间隔为40 \* 16个元素。
 
-**图 1** 不开启NZ2ND参数的单搬运模式设置示意图<a name="fig128961542184620"></a>  
+**图1** 不开启NZ2ND参数的单搬运模式设置示意图<a name="fig128961542184620"></a>  
 
-![](../../../../figures/不使能NZ2ND参数的单搬运模式设置示意图.png "不开启NZ2ND参数的单搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数的单搬运模式设置示意图.png "不开启NZ2ND参数的单搬运模式设置示意图")
 
 **双目标控制模式：**
 
@@ -203,9 +203,9 @@ M方向切分：
 - srcStride = 64，表示源NZ矩阵中待搬运矩阵相邻Z排布的起始地址偏移，即下图中第一个块Z排布矩阵的起始地址与第二个Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
 - dstStride = 40 \* C0，表示目的NZ矩阵中相邻Z排布的起始地址偏移，即下图中UB0（或UB1）中第一个Z排布的起始地址与第二个Z排布的起始地址之间的间隔为40 \*  16个元素。
 
-**图 2** 不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
+**图2** 不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图<a name="fig6561154491913"></a>  
 
-![](../../../../figures/不使能NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
+![](../../../../figures/不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图.png "不开启NZ2ND参数和NZ2DN参数的双目标搬运模式设置示意图")
 
 ### 开启NZ2ND随路格式转换
 
@@ -219,9 +219,9 @@ M方向切分：
 - srcNdStride = 16，表示不同NZ矩阵起始地址之间的间隔为16 \*  16 \* C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图 3** 开启NZ2ND参数设置示意图<a name="fig79783143556"></a>  
+**图3** 开启NZ2ND参数设置示意图<a name="fig79783143556"></a>  
 
-![](../../../../figures/使能NZ2ND参数设置示意图.png "开启NZ2ND参数设置示意图")
+![](../../../../figures/开启NZ2ND参数设置示意图.png "开启NZ2ND参数设置示意图")
 
 **单搬运模式：**
 
@@ -233,9 +233,9 @@ M方向切分：
 - srcNdStride = 256，表示不同NZ矩阵起始地址之间的间隔为256，单位为C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-**图 4** 开启NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
+**图4** 开启NZ2ND参数的单搬入模式设置示意图<a name="fig11991024112516"></a>  
 
-![](../../../../figures/使能NZ2ND参数的单搬入模式设置示意图.png "开启NZ2ND参数的单搬入模式设置示意图")
+![](../../../../figures/开启NZ2ND参数的单搬入模式设置示意图.png "开启NZ2ND参数的单搬入模式设置示意图")
 
 **双目标控制模式：**
 
@@ -248,9 +248,9 @@ M方向切分：
 - srcNdStride = 240，表示不同NZ矩阵起始地址之间的间隔为240 \* C0\_Size。
 - dstNdStride  = 4096，表示目的相邻ND矩阵起始地址之间的偏移为4096个元素。
 
-    **图 5** 开启NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
+    **图5** 开启NZ2ND参数双搬入模式设置示意图<a name="fig8810182815117"></a>  
 
-    ![](../../../../figures/使能NZ2ND参数双搬入模式设置示意图.png "开启NZ2ND参数双搬入模式设置示意图")
+    ![](../../../../figures/开启NZ2ND参数双搬入模式设置示意图.png "开启NZ2ND参数双搬入模式设置示意图")
 
 ### 开启NZ2DN随路格式转换
 
@@ -268,9 +268,9 @@ M方向切分：
 - srcNzC0Stride = 1：表示源矩阵NZ分形相邻行的地址偏移。
 - dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 80 =3840个元素。
 
-**图 6** 开启NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
+**图6** 开启NZ2DN单搬运模式示意图1<a name="fig19772110476"></a>  
 
-![](../../../../figures/使能NZ2DN单搬运模式示意图1.png "开启NZ2DN单搬运模式示意图1")
+![](../../../../figures/开启NZ2DN单搬运模式示意图1.png "开启NZ2DN单搬运模式示意图1")
 
 - dnNum = 2，表示源NZ矩阵的数目为2。图中蓝色区域为NZ矩阵1，红色区域为NZ矩阵2。
 - nSize = 24，表示源NZ矩阵（图中蓝色区域）在N方向上的大小为24个元素。
@@ -282,9 +282,9 @@ M方向切分：
 - srcNzC0Stride = 2：表示源矩阵NZ分形相邻行的地址偏移。
 - dstDnMatrixStride：表示相邻DN矩阵起始地址间的偏移为48 \* 60 = 2880个元素。
 
-**图 7** 开启NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
+**图7** 开启NZ2DN单搬运模式示意图2<a name="fig769114585716"></a>  
 
-![](../../../../figures/使能NZ2DN单搬运模式示意图2.png "开启NZ2DN单搬运模式示意图2")
+![](../../../../figures/开启NZ2DN单搬运模式示意图2.png "开启NZ2DN单搬运模式示意图2")
 
 </cann-filter>
 
@@ -292,11 +292,14 @@ M方向切分：
 
 <cann-filter npu-type = "950">
 
-完整样例请参考[fixpipe\_l0c2ub样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/fixpipe_l0c2ub)；
+完整样例请参考[fixpipe\_l0c2ub样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)；
 
-- 示例：通路L0C Buffer-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置开启Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/fixpipe_l0c2ub)。
+- 示例：通路L0C Buffer-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置开启Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)。
 
     ```cpp
+    // L0C Buffer->UB 搬运，目的位置为UB，需将FixpipeConfig的isToUB配置为true。
+    constexpr AscendC::FixpipeConfig CFG_ROW_MAJOR_UB = {AscendC::CO2Layout::ROW_MAJOR, true};
+
     AscendC::LocalTensor<outputType> cUB;
     cUB = AscendC::LocalTensor<outputType>(AscendC::TPosition::VECOUT, 0, cSingleSize);
     

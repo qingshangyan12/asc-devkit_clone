@@ -33,13 +33,13 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 参数说明
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T | 操作数的数据类型。源操作数和目的操作数的数据类型保持一致。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -113,7 +113,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 ## 调用示例
 
-示例代码片段如下：
+示例代码片段如下，完整示例请参考：[DataCopy_UB2L1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_ub2l1)。
 
 ```cpp
 // dstLocal、srcLocal为half类型的LocalTensor，分别位于L1 Buffer和UB
