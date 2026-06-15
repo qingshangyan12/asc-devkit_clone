@@ -20,7 +20,7 @@ std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
 };
 
-CommEngine OpExecuteConfigToCommEngine(uint8_t &commEngine) {
+CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine) {
     if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::AICPU_TS) {
         return COMM_ENGINE_AICPU;
     } else if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
