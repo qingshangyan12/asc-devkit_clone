@@ -23,6 +23,8 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 接口支持非转置搬运和转置搬运。源张量和目的张量的Layout需要匹配当前通路支持的格式组合。
 
+接口支持Batch模式。Batch模式下，源张量和目的张量的Layout需要在原有分形Layout最前面增加Batch维，Shape形态为`(B, 单矩阵Shape)`，其中`B`表示Batch数量。用户可使用`MakeFrameLayout<ZNLayoutPtn, DataType>(B, k, n)`或`MakeFrameLayout<NZLayoutPtn, DataType>(B, k, n)`构造带Batch维的Layout；如果各Batch之间不是紧凑连续排布，可使用`MakeLayout`或`MakePatternLayout`手动配置Shape和Stride。
+
 ## 函数原型
 
 - 执行L1 Buffer到L0B Buffer的数据搬运。
@@ -125,6 +127,10 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ![](../../../../../figures/transpose_b32.png)
 
+### Batch搬运
+
+当源张量和目的张量均使用带Batch维的Layout时，`Copy`接口会按照Batch维描述的数据范围完成L1 Buffer到L0B Buffer的数据搬运。非转置搬运可使用`ZN`到`ZN`格式组合，转置搬运可使用`NZ`到`ZN`格式组合。
+
 ## 调用示例
 
 ```cpp
@@ -144,6 +150,32 @@ __aicore__ inline void CopyL1ToL0BExample()
     auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
 
     auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
+
+    auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+    Copy(copyAtom, l0bTensor, l1Tensor);
+}
+```
+
+Batch模式示例如下。
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+__aicore__ inline void CopyL1ToL0BBatchExample()
+{
+    using BType = half;
+    constexpr uint32_t batch = 2;
+    constexpr uint32_t k = 16;
+    constexpr uint32_t n = 16;
+
+    __cbuf__ BType l1Buf[batch * k * n];
+    __cb__ BType l0bBuf[batch * k * n];
+
+    auto layout = MakeFrameLayout<ZNLayoutPtn, BType>(batch, k, n);
+    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), layout);
+    auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), layout);
 
     auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
     Copy(copyAtom, l0bTensor, l1Tensor);
