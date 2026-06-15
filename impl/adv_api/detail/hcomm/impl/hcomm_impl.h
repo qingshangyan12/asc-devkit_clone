@@ -71,6 +71,14 @@ __aicore__ inline int32_t Hcomm<commProtocol>::ReadNbi(
 }
 
 template <CommProtocol commProtocol>
+template <bool commit, pipe_t commitPipe, pipe_t reqPipe, auto const &config>
+__aicore__ inline int32_t Hcomm<commProtocol>::FetchAdd(
+    ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal)
+{
+    return impl_.template FetchAdd<commit, commitPipe, reqPipe, config>(channel, dst, src, addVal);
+}
+
+template <CommProtocol commProtocol>
 template <pipe_t pipe>
 __aicore__ inline int32_t Hcomm<commProtocol>::Commit(ChannelHandle channel)
 {

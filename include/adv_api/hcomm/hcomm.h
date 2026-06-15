@@ -98,6 +98,10 @@ public:
     __aicore__ inline int32_t WriteWithNotifyNbi(ChannelHandle channel, GM_ADDR dst, GM_ADDR src,
         uint64_t len, GM_ADDR notifyAddr, uint64_t notifyVal);
 
+    template <bool commit = true, pipe_t commitPipe = PIPE_S, pipe_t reqPipe = PIPE_MTE3,
+        auto const &config = URMA_DEFAULT_CFG>
+    __aicore__ inline int32_t FetchAdd(ChannelHandle channel, GM_ADDR dst, GM_ADDR src, uint64_t addVal);
+
     /*!
      * @class Hcomm
      * @brief The task launching interface of the Read point-to-point communication operator.
