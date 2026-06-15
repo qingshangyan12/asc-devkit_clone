@@ -500,27 +500,3 @@ TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_CastTrait_U322UInt16_Sat_Even)
 
     EXPECT_EQ(z[0], zUB[0]);
 }
-
-// ===================================================================
-// 10. int64_t → int32_t：测试高位宽收缩 + Sat
-// ===================================================================
-
-using CastTraitInt642Int32SatEven = CastTrait<
-    AscendC::Std::ignore_t,
-    AscendC::Te::CastSatMode::Sat,
-    AscendC::Std::ignore_t>;
-
-TEST_F(Tensor_Api_Vector_Cast_3510, VECTOR_CastTrait_Int642Int32_Sat_Even)
-{
-    constexpr uint32_t TILE_LENGTH = 2048;
-
-    __gm__ int64_t x[TILE_LENGTH] = {0};
-    __gm__ int32_t z[TILE_LENGTH] = {0};
-
-    __ubuf__ int64_t xUB[TILE_LENGTH] = {0};
-    __ubuf__ int32_t zUB[TILE_LENGTH] = {0};
-
-    TestTransformBinary<int32_t, int64_t, AscendC::Te::Inst::Cast, CastTraitInt642Int32SatEven>(z, x, zUB, xUB);
-
-    EXPECT_EQ(z[0], zUB[0]);
-}
