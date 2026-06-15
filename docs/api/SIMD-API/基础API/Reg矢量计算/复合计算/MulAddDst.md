@@ -72,7 +72,7 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 | :----- | :--- |
 | T | 操作数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| U | dstReg、srcReg0、srcReg1的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
+| U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 

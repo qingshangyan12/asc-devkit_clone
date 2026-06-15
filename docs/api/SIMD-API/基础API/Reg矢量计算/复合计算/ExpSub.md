@@ -82,8 +82,8 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 | U | 源操作数数据类型。 |
 | layout | [RegLayout](../数据类型/RegLayout.md)枚举类型。<br>• src类型为half类型时，支持RegLayout::ZERO、RegLayout::ONE。具体特性参考[RegLayout](../数据类型/RegLayout.md)。<br>• src类型为float类型时，配置不生效。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| S | 由编译器自动推导，用户不需要填写。 |
-| V | 由编译器自动推导，用户不需要填写。 |
+| S | 目的操作数的RegTensor类型，例如RegTensor<float\>，由编译器自动推导，用户不需要填写。 |
+| V | 源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 

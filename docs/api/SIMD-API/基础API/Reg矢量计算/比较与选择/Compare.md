@@ -106,7 +106,6 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 
 - 通过mask参数控制的未选中元素在目的操作数中被置零。
 - 操作数重叠约束：srcReg0和srcReg1可以是同一个RegTensor。
-- 异常和边界值处理：待补充。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
