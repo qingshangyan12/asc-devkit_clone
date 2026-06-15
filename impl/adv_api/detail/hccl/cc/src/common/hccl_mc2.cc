@@ -230,7 +230,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     (void*)resCtx.workSpace, resCtx.workSpaceSize);
 
     // 逐算子选择算法 + 资源准备（executor->CalcRes + GetAlgResCcu）
-    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, resCtx));
+    CHK_RET(CcuSelectAlg(comm, stream, topoTag, ccTilingList, tilingNum, mc2Tiling, resCtx));
     HCCL_INFO("[AllocComResourceByTilingCcu]CcuSelectAlg successfully!");
 
     // 申请OpResCtx硬件内存并写入
@@ -308,7 +308,7 @@ HcclAllocComResourceByTiling(HcclComm comm, void *stream, void *mc2Tiling, void 
         CHK_RET(AllocComResourceByTilingAicpu(comm, stream, mc2Tiling,
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
-        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_MS!");
+        HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
         CHK_RET(AllocComResourceByTilingCcu(comm, stream, mc2Tiling,
             ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else {

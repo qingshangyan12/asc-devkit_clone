@@ -594,11 +594,12 @@ HcclResult GetOpParam(HcclComm comm, void* stream, const std::string &tag, const
 
 // CCU路径逐算子：算法选择 + 资源准备（参照GetOpParam形式）
 HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[],
-    const void *ccTilingList[], uint32_t tilingNum, OpResCtx &opResCtx)
+    const void *ccTilingList[], uint32_t tilingNum, void *mc2Tiling, OpResCtx &opResCtx)
 {
     HCCL_INFO("[CcuSelectAlg]start CcuSelectAlg!");
-    HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]", 
+    HCCL_INFO("[CcuSelectAlg]received: workspace[%p], size[%llu]",
     (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
+    Mc2InitTilingInner *initTiling = static_cast<Mc2InitTilingInner *>(mc2Tiling);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner *ccTiling = static_cast<const Mc2CcTilingInner *>(ccTilingList[i]);
 
@@ -634,12 +635,12 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         // 将算子类型和算法枚举保存到opResCtx
         opResCtx.opType[i] = ccTiling->opType;
         opResCtx.algorithmType[i] = it->second;
-        
+
         opResCtx.isKfc[i] = true;
         opParam.isKfc = true;
 
         HCCL_INFO("[CcuSelectAlg] ccTiling[%u]: opType[%u], algName[%s], algorithmType[%u]",
-            i, ccTiling->opType, algName.c_str(), opResCtx.algorithmType[i]);
+            i, opResCtx.opType[i], algName.c_str(), opResCtx.algorithmType[i]);
 
         // 资源准备（executor->CalcRes + GetAlgResCcu）
         bool skipGetRes = false;
@@ -652,6 +653,23 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         void *resCtxSequence = nullptr;
         CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), opResCtx, &resCtxSequence));
         HCCL_INFO("[CcuSelectAlg]GetCcuOpParamResCtx[%u] successfully!", i);
+
+        // 申请存放OpParam的设备内存，并将opParam拷贝到设备
+        std::string tagParam = std::to_string(i) + "_" + std::string(opParam.algTag);
+        void *opParamPtr = nullptr;
+        uint64_t opParamSize = sizeof(OpParam);
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_CCU, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+            HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]",
+                tagParam.c_str(), opParamPtr, opParamSize);
+        } else {
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_CCU, opParamSize, &opParamPtr));
+        }
+        aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, aclrtMemcpyKind(1));
+        CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+        opResCtx.algInfo[i].opParam = reinterpret_cast<uint64_t>(opParamPtr);
+        opResCtx.algInfo[i].offset = initTiling->offset[i];
+        HCCL_INFO("[CcuSelectAlg] ccTiling[%u]: opParamAddr[%llu], offset[%u]",
+            i, opResCtx.algInfo[i].opParam, opResCtx.algInfo[i].offset);
     }
 
     return HCCL_SUCCESS;
