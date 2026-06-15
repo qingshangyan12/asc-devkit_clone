@@ -4,7 +4,8 @@
         <licensefile></licensefile>
         <policylist>
             <policy name="projectPolicy" desc="">
-                <policyitem type="license" name="cann License" path=".*" filefilter ="licenseFileNamePolicyFilter" desc=""/>
+                <policyitem type="license" name="cann License" path=".*" group="defaultGroup" filefilter ="licenseFileNamePolicyFilter" desc=""/>
+                <policyitem type="copyright" name="Huawei Technologies Co., Ltd." path=".*" rule="may" group="defaultGroup" filefilter="copyrightPolicyFilter" desc=""/>
                 <policyitem type="filetype" name="!binary" path=".*" rule="must" group="defaultGroup" filefilter="binaryFileTypePolicyFilter" desc="Reject binary files unless explicitly filtered"/>
             </policy>
         </policylist>
@@ -63,7 +64,6 @@
                 <filteritem type="filename" name="*.png" desc="png file"/>
                 <filteritem type="filename" name="SWSCRL.crl" desc="certificate revocation list"/>
             </filefilter>
-
         </filefilterlist>
         <licensematcherlist>
             <licensematcher name="cann License" desc="If the scanning result is InvalidLicense, you can define matching rules here. Note that quotation marks must be escaped.">
