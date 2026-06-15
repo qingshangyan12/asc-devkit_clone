@@ -23,11 +23,25 @@ def gen_golden_add():
     return x, y, x + y
 
 
-def gen_golden_overlap():
+def gen_golden_adds():
+    N = 4096
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    return x, y, y.astype(np.float32)
+
+
+def gen_golden_case1():
     N = 4096
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
     return x, y, 2.0 * y
+
+
+def gen_golden_case2(repeat=1):
+    N = 4096
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    return x, y, x + repeat * y
 
 
 def gen_golden_dintlv():
@@ -41,49 +55,19 @@ def gen_golden_dintlv():
     return x, y, golden
 
 
-def gen_golden_adds():
-    N = 4096
-    x = np.random.uniform(1, 100, [N]).astype(np.float32)
-    y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    return x, y, y.astype(np.float32)
-
-
-def gen_golden_debug():
-    N = 4096
-    x = np.ones(N, dtype=np.float32)
-    y = np.ones(N, dtype=np.float32)
-    golden = np.ones(N, dtype=np.float32)
-    return x, y, golden
-
-
-def gen_golden_adds_512():
-    N = 512
-    x = np.random.uniform(1, 100, [N]).astype(np.float32)
-    y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    return x, y, y.astype(np.float32)
-
-
-def gen_golden_debug_512():
-    N = 512
-    x = np.ones(N, dtype=np.float32)
-    y = np.ones(N, dtype=np.float32)
-    golden = np.ones(N, dtype=np.float32)
-    return x, y, golden
-
-
 def gen_golden_gather(case, repeat=1):
     N = 256
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    if case == 9:
+    if case == 8:
         indices = np.zeros(N, dtype=np.uint32)
-    elif case == 10:
+    elif case == 9:
         indices = np.tile(np.arange(8, dtype=np.uint32), N // 8)[:N]
-    elif case == 12:
+    elif case == 10:
+        indices = np.arange(N, dtype=np.uint32)
+    elif case == 11:
         indices = np.empty(N, dtype=np.uint32)
         indices[::2] = 0
         indices[1::2] = 128
-    else:
-        indices = np.arange(N, dtype=np.uint32)
 
     golden = y.copy()
     one_rep = 64
@@ -94,28 +78,51 @@ def gen_golden_gather(case, repeat=1):
     return indices, y, golden
 
 
+def gen_golden_adds_512():
+    N = 512
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    return x, y, y.astype(np.float32)
+
+
+def gen_golden_block_stride0():
+    N = 512
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    golden = np.zeros(N, dtype=np.float32)
+    for i in range(8):
+        for j in range(64):
+            golden[i * 64 + j] = y[i * 64 + j % 8]
+    return x, y, golden
+
+
+def gen_golden_repeat_stride0():
+    N = 512
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    golden = np.tile(y[:64], 8)
+    return x, y, golden
+
+
 def gen_golden_data(case=1, repeat=1):
-    # 一读一写：Case 1(无冲突基线), Case 2(读写冲突)
-    if case in (1, 2):
-        x, y, golden = gen_golden_adds()
-    # 二读一写 dst=src0+src1：Case 3(全冲突基准), Case 4(消除读读), Case 5(消除读写), Case 7(全冲突+展开)
-    elif case in (3, 4, 5, 7):
+    if case == 1:
+        x, y, golden = gen_golden_case1()
+    elif case == 2:
+        x, y, golden = gen_golden_case2(repeat)
+    elif case in (3, 4, 5, 6):
         x, y, golden = gen_golden_add()
-    # 二读一写 地址重叠(完全不冲突)：Case 6
-    elif case == 6:
-        x, y, golden = gen_golden_overlap()
-    # 二读一写 双搬入 DINTLV：Case 8
-    elif case == 8:
+    elif case == 7:
         x, y, golden = gen_golden_dintlv()
-    # 离散访存 Gather/Scatter：Case 9-12
-    elif case in (9, 10, 11, 12):
+    elif case in (8, 9, 10, 11):
         x, y, golden = gen_golden_gather(case, repeat)
-    # 一读一写 stride=1：Case 13
+    elif case == 12:
+        x, y, golden = gen_golden_adds_512()
     elif case == 13:
         x, y, golden = gen_golden_adds_512()
-    # 一读一写 stride=8 debug：Case 14
     elif case == 14:
-        x, y, golden = gen_golden_debug_512()
+        x, y, golden = gen_golden_block_stride0()
+    elif case == 15:
+        x, y, golden = gen_golden_repeat_stride0()
     else:
         raise ValueError(f"Unknown case: {case}")
 

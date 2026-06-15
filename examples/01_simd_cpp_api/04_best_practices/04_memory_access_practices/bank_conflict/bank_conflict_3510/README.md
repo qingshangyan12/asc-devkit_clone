@@ -86,35 +86,37 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 | case | 计算公式 | 场景描述 | bank 冲突情况 | src0 首地址 | src1 首地址 | dst 首地址 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | **地址重叠完全不冲突**：src0=src1，硬件合并为单次读取 | **无冲突** | 0x0000 | 0x0000 | 0x4100 | 1,122,381 | **性能基准** |
-| 2 | dst = src0 + src1 | **src0与dst地址重叠**: src1不同bank，读写冲突 | **读写冲突** | 0x0000 | 0x4100 | 0x0000 | TBD | src0/dst重叠 |
-| 3 | dst = src0 + src1 | **全冲突(读读+读写)**: 三路同 bank=0，无循环展开 | **全冲突** | 0x0000 | 0x4000 | 0x8000 | 1,422,763 | 全冲突参照 |
-| 4 | dst = src0 + src1 | 消除读读冲突：src0/src1 不同 bank | 仅读写冲突 | 0x0000 | 0x4100 | 0x8900 | 1,440,726 | 读读冲突开销极小(2读口可分摊) |
-| 5 | dst = src0 + src1 | 消除读写冲突：src0/src1 同 bank，dst 不同 bank | 仅读读冲突 | 0x0000 | 0x4000 | 0x8100 | 1,333,115 | 读写冲突是瓶颈(仅1写口)+地址连续增益 |
-| 6 | dst = src0 + src1 | 全冲突 + 循环展开：同 Case 3，循环展开优化 | **全冲突** | 0x0000 | 0x4000 | 0x8000 | 1,330,823 | 循环展开有 6.5% 收益 |
-| 7 | dst = src0 + src1 | 全冲突 + 双搬入 DINTLV_B32 | 无读读冲突 | 0x0000 | 0x4000 | 0x8000 | 1,480,826 | 双搬入无收益(慢 4.1%) |
+| 1 | dst = src0 + src1 | **完全不冲突**：src0=src1，硬件合并为单次读取，dst不同bank | **无冲突** | 0x0000 | 0x0000 | 0x4100 | 1,120,614 | **性能基准** |
+| 2 | dst = src0 + src1 | **src0与dst重叠**: src1不同bank，读写冲突 | **读写冲突** | 0x0000 | 0x4100 | 0x0000 | 1,472,830 | src0/dst重叠，在Ascend 950PR/Ascend 950DT中读写地址重叠，读写冲突仍然发生 |
+| 3 | dst = src0 + src1 | **全冲突(读读+读写)**: 三路同 bank=0，无循环展开 | **全冲突** | 0x0000 | 0x4000 | 0x8000 | 1,420,634 | 全冲突参照，地址连续减少了部分开销 |
+| 4 | dst = src0 + src1 | 消除读读冲突：src0/src1 不同 bank | 仅读写冲突 | 0x0000 | 0x4100 | 0x8900 | 1,440,511 | 读读冲突开销小 |
+| 5 | dst = src0 + src1 | 消除读写冲突：src0/src1 同 bank，dst 不同 bank | 仅读读冲突 | 0x0000 | 0x4000 | 0x8100 | 1,330,843 | 读写冲突开销大，优化后收益明显 |
+| 6 | dst = src0 + src1 | 全冲突 + 循环展开：同 Case 3，循环展开优化 | **全冲突** | 0x0000 | 0x4000 | 0x8000 | 1,330,608 | 循环展开有正向收益 |
+| 7 | dst = src0 + src1 | 全冲突 + 双搬入 DINTLV_B32 | 读写冲突 | 0x0000 | 0x4000 | 0x8000 | 1,480,654 | 双搬入接口无收益 |
 
 ### 离散访存场景（Case 8-11）
 
 | case | 计算公式 | 场景描述 | subbank 冲突情况 | index 地址 | data 地址 | index 模式 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 8 | Gather + Add + Scatter | Gather数据索引全为0，起始地址全部重叠 | 同地址合并为单次读取，无冲突 | 0x0000 | 0x0400 | 全 0 | 650,798 | 基准参照 |
-| 9 | Gather + Add + Scatter | Gather数据索引[0..7]重复 | 同地址合并读取，无冲突 | 0x0000 | 0x0400 | [0..7]×32 重复 | 650,886 | 同地址合并无冲突 |
-| 10 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨 bank 分散，无冲突 | 0x0000 | 0x0400 | [0..255] 连续 | 650,689 | 跨bank分散无冲突 |
-| 11 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | **同 subbank 不同行冲突** | 0x0000 | 0x0400 | 0、128 交替 | **750,828** | 对比 Case 8 |
+| 8 | Gather + Add + Scatter | Gather数据索引全为0，起始地址全部重叠 | 同地址合并为单次读取，无冲突 | 0x0000 | 0x0400 | 全 0 | 650,677 | 基准参照 |
+| 9 | Gather + Add + Scatter | Gather数据索引[0..7]重复 | 同地址合并读取，无冲突 | 0x0000 | 0x0400 | [0..7]×32 重复 | 650,835 | 同地址合并无冲突 |
+| 10 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨 bank 分散，无冲突 | 0x0000 | 0x0400 | [0..255] 连续 | 650,697 | 跨bank分散无冲突 |
+| 11 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | **同 subbank 不同行冲突** | 0x0000 | 0x0400 | 0、128 交替 | **750,709** | 对比 Case 8，性能劣化 |
 
-### 非连续搬运跨步对比（Case 12-13）
+### 非连续搬运跨步对比（Case 12-15）
 
 | case | 计算公式 | 场景描述 | 冲突情况 | src0 首地址 | dst 首地址 | 搬运方式 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 12 | dst = src0 | 512元素按行计算，连续8个DataBlock，stride=1 | 无冲突 | 0x0000 | 0x4100 | DataBlock连续搬运 | 440,904 | 基准 |
-| 13 | dst = src0 | **512元素按列计算，间隔256B 8个不连续DataBlock，stride=8** | **读读冲突** | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,739 | 竖着搬运慢 3.43x |
+| 12 | dst = src0 | 512元素按行计算，连续8个DataBlock，stride=1 | 无冲突 | 0x0000 | 0x4100 | DataBlock连续搬运 | 442,224 | 基准 |
+| 13 | dst = src0 | **512元素按列计算，间隔256B 8个不连续DataBlock，stride=8** | **读读冲突** | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,649 | 竖着搬运慢 3.42x |
+| 14 | dst = src0 | **srcBlockStride=0**：同一 REPEAT 内 8 个 DataBlock 均指向同一基地址 | 同地址合并 | 0x0000 | 0x4100 | DataBlock stride=0 | 443,499 | 同地址合并，无额外开销 |
+| 15 | dst = src0 | **srcRepeatStride=0**：8 轮迭代固定从 src0[0..63] 加载 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=1,repeat=0 | 440,810 | 同首地址重复读，无冲突 |
 
-> **说明**：Case 12/13 的 `TOTAL_LENGTH = 512`，各计算 512 个 float32。
+
 
 各 case 的详细分析见下文对应章节。
 
-## Case 1：二读一写，地址重叠完全不冲突 — 唯一实现2R1W无冲突的方式
+## Case 1：二读一写，src0与src1重叠，dst不同bank，无冲突
 
 ### 地址解码
 
@@ -126,15 +128,15 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-(同 Case 5 的图)
+![case1](./figures/case1.png)
+
 
 ### 分析结论
 
 - src0 和 src1 地址完全重叠，共用同一块 UB 空间。硬件地址匹配合并后只触发一次 Load，有效变为 1R1W。
-- 由于 dst 在 bank1，与 src0/src1 不在同一 bank，**完全不冲突**。这是 3510 上唯一能让 2R1W 完全无冲突的方式。
-- Case 1 vs Case 3 = 1,122,381 vs 1,422,763 cycles（快 21.1%）。
+- 由于 dst 在 bank1，与 src0/src1 不在同一 bank，**不发生冲突**。
 
-## Case 2：二读一写，src0与dst地址重叠读写冲突 — src0=dst=bank0，src1=bank1
+## Case 2：二读一写，src0与dst地址重叠
 
 ### 地址解码
 
@@ -144,11 +146,14 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 | src1 | `0x4100` | `010000010 0 000 00000` | 1 | 0 |
 | dst | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
 
+### UB 读写示意
+
+![case2](./figures/case2.png)
+
 ### 分析结论
 
-- src0 与 dst 地址重叠（同 bank 0 同 depth 行），读取 src0 和写入 dst 同时进行，**存在读写冲突**。
-- src1 在 bank1（同 BG 不同 bank），与 src0 无读读冲突，但三路 tensor 均在 BG 0，超出单个 BG 的端口能力（最多 2 读或 1 读 1 写）。
-- 与 Case 1 对比：Case 1 通过 src0=src1 重叠消除读端口压力（硬件合并为 1 读），Case 2 则是 src0=dst 重叠，读写冲突不可避免。
+- src0 与 dst 地址重叠（同 bank 0 同 depth 行），读取 src0 和写入 dst 同时进行，**存在读写冲突**。在 Atlas A2/A3 系列产品上，读写地址重叠能够被硬件优化从而消除冲突。
+- src1 在 bank1（同 BG 不同 bank），与 src0 无读读冲突。
 
 ## Case 3：二读一写，全冲突基准 — src0、src1和dst同一bank，无循环展开
 
@@ -162,14 +167,11 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case1_2](./figures/case1_2.png)
-
-- 未做循环展开，VF单次迭代内处理 1 个 repeat，共迭代 `total_iterations = 4096 × 4 ÷ 256 = 64` 次。
+![case3](./figures/case3.png)
 
 ### 分析结论
 
 - src0、src1、dst 三路首地址均映射到 bank 0：虽然 8 个 DataBlock 分散在 BG 0-7，但三路 tensor 的对应 DataBlock 都落在相同 bank，**存在读读冲突和读写冲突**。
-- 作为二读一写场景的全冲突基准 Case，性能为 1,422,763 cycles。
 
 ## Case 4：二读一写，消除读读冲突 — src0与src1不同bank，dst与src1同bank
 
@@ -183,12 +185,12 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case3](./figures/case3.png)
+![case4](./figures/case4.png)
 
 ### 分析结论
 
 - src0=bank0，src1=bank1，dst=bank1。src0 和 src1 落在不同 bank，读读冲突消除。但 src1 和 dst 同在 bank1，仍存在读写冲突。
-- Case 4 vs Case 3 = 1,440,726 vs 1,422,763 cycles（Case 4 反而慢 1.3%）。消除读读冲突后性能未提升，说明 **3510 上读读冲突开销极小，不是瓶颈**。原因：每个 BG 有 2 个读口，读读冲突可被另一个读口分摊；每个 BG 只有 1 个写口，读写冲突才是严格瓶颈。此外 Case 4 的 buffer 间存在 256B/2048B 空隙，地址不连续也略微削弱性能。
+- 消除读读冲突后性能未提升，说明 **与读写冲突相比，3510 上读读冲突开销极小，不是瓶颈**。此外 Case 4 的 buffer 间存在 256B/2048B 空隙，地址不连续也略微削弱性能。
 
 ## Case 5：二读一写，消除读写冲突 — src0与src1同bank，dst在不同bank
 
@@ -202,12 +204,12 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case4](./figures/case4.png)
+![case5](./figures/case5.png)
 
 ### 分析结论
 
 - src0=bank0，src1=bank0，dst=bank1。src0 和 src1 同落在 bank0，存在读读冲突。但 dst 在 bank1，读写冲突消除。
-- Case 5 vs Case 3 = 1,333,115 vs 1,422,763 cycles（快 6.3%）。与 Case 4 相比：Case 5 快 8.1%，核心原因是消除了读写冲突（每个 BG 只有 1 个写口，是严格瓶颈），而 Case 4 消除的读读冲突（2 个读口可分摊）几乎无价值。次要因素：Case 5 的三块 buffer（0x0000→0x4000→0x8100）完全连续无空隙，地址连续性也带来小幅增益。
+- 与 Case 4 相比：Case 5 快 8.1%，核心原因是消除了开销较大的读写冲突。此外Case 5 的三块buffer（0x0000→0x4000→0x8100）完全连续无空隙，地址连续性也带来小幅增益。
 
 ## Case 6：二读一写，全冲突 + 循环展开
 
@@ -217,15 +219,13 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case1_2](./figures/case1_2.png)
-
-- 循环展开每次迭代处理 2 个 repeat，共迭代 `total_iterations = 4096 × 4 ÷ 256 ÷ 2 = 32` 次。
+读写冲突示意同 Case 3，详见 Case 3 UB 读写示意。
 
 ### 分析结论
 
 - 地址布局与 Case 3 完全相同，冲突特征相同。
 - 唯一差异是使用循环展开，每次处理两个 repeat，增加指令级并行。
-- Case 6 vs Case 3 = 1,330,823 vs 1,422,763 cycles（快 6.5%），循环展开在该场景下有正收益（属于指令级优化，非 bank 冲突优化）。
+- 对比case3，循环展开在该场景下有正收益（属于指令级优化，非 bank 冲突优化）。
 
 ## Case 7：二读一写，双搬入 DINTLV_B32 交织读取
 
@@ -239,12 +239,12 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case5](./figures/case5.png)
+![case7](./figures/case7.png)
 
 ### 分析结论
 
 - 使用 `LoadDist::DIST_DINTLV_B32` 双搬入模式，一条指令同时取回 src0 和 src1（各取 64 bytes 交错排列），消除读读冲突。
-- Case 7 vs Case 3 = 1,480,826 vs 1,422,763 cycles（慢 4.1%），**双搬入在 Ascend 950PR/Ascend 950DT 上没有带来收益**。
+- 对比case3无明显收益。
 
 ## Case 8：离散读写，Gather指令的数据索引全为0，起始地址全部重叠
 
@@ -258,14 +258,14 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case11](./figures/case11.png)
+![case8](./figures/case8.png)
 
 - index 模式：全部为 0，即每次 Gather 都从 data[0] 读取同一个位置。
 
 ### 分析结论
 
 - index 全 0，Gather 所有 64 个元素命中同一地址 → 硬件通过地址合并将 64 次请求合并为单次读取。
-- 性能 650,798 cycles，作为离散访存基准（用于对比 Case 11 的 subbank 冲突开销）。
+- 无subbank冲突。
 
 ## Case 9：离散读写，Gather指令的数据索引在[0..7]重复
 
@@ -275,7 +275,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case8](./figures/case8.png)
+![case9](./figures/case9.png)
 
 - 索引排布：`[0, 1, 2, 3, 4, 5, 6, 7]` 重复 32 次（共 256 个元素），由 Gather 读取；
 - data buffer 起始地址 `0x0400`，每条 Gather 指令从 data 中按 index 取 64 个 float32；
@@ -283,8 +283,7 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### 分析结论
 
-- Gather 从 data 中按 index 取 64 个元素：index 仅有 [0..7] 共 8 个 unique 值，很多元素命中相同地址 → 硬件自动合并同地址请求，同地址只需一次读取。
-- 每 subbank 仅 2 个 unique addr，读取 2 次即完成，**无 subbank 冲突**。性能为 650,886 cycles。
+- Gather 从 data 中按 index 取 64 个元素：index 仅有 [0..7] 共 8 个 unique 值，大量元素命中相同地址 → 硬件自动合并同地址请求，同地址只需一次读取，降低了subbank冲突。
 
 ## Case 10：离散读写，Gather指令的数据索引在[0..255]连续
 
@@ -294,15 +293,14 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case9](./figures/case9.png)
+![case10](./figures/case10.png)
 
 - index 模式：`[0, 1, 2, ..., 255]` 连续递增，每条 Gather 指令处理 64 个连续 index；
 - data buffer 起始地址 `0x0400`，dst 与 data 地址重叠。
 
 ### 分析结论
 
-- Gather 跨 8 个 bank 分散读取，每 subbank 仅 2 次读操作。连续 index 自然分散到不同 subbank，**无 subbank 冲突**。
-- 性能 650,689 cycles，与 Case 9 相当。
+- Gather 跨 8 个 bank 分散读取，每 subbank 仅 2 次读操作。连续 index 自然分散到不同 subbank，降低了subbank冲突。
 
 ## Case 11：离散读写，Gather指令的数据索引0,128交替
 
@@ -312,15 +310,14 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 ### UB 读写示意
 
-![case10](./figures/case10.png)
+![case11](./figures/case11.png)
 
 - index 模式：偶数位置为 `0`，奇数位置为 `128`（`[0, 128, 0, 128, ...]` 交替）；
 - `0` 和 `128` 在 Ascend 950PR/Ascend 950DT 上都落入 bank 0 的同一 subbank，但属于**不同 depth 行**。
 
 ### 分析结论
 
-- Gather 命中**同 subbank + 不同起始地址**（相同 subbank，不同 depth 行），单读口需排队，取出时间翻倍。
-- Case 11 vs Case 8 = 750,828 vs 650,798 cycles（**+15.4%**）。
+- Gather 命中**同 subbank + 不同起始地址**（相同 subbank，不同 depth 行），单读口需排队，subbank冲突明显。
 
 ## Case 12：对512个（8*64）元素进行加一操作，按行计算，每次repeat读取8个连续的DataBlock
 
@@ -346,8 +343,8 @@ i=7: src0[448..511]  → dst[448..511]
 
 ### 分析结论
 
-- `DATA_BLOCK_COPY` stride=1：8 个 DataBlock 连续排布（间隔 32B），等价于普通 `LoadAlign`。
-- 性能 440,904 cycles，作为竖着搬运的基准参照。
+- `DATA_BLOCK_COPY` stride=1：8 个 DataBlock 连续排布（间隔 32B），等价于普通 `LoadAlign`指令。
+- 单条非连续搬运指令8个DataBlock分散到不同的bankgroup，不发生冲突。
 
 ## Case 13：对512个（8*64）元素进行加一操作，按列计算，每次repeat读取8个不连续的DataBlock
 
@@ -355,9 +352,11 @@ i=7: src0[448..511]  → dst[448..511]
 
 同 Case 12 地址配置。
 
-### 搬运方式
+### UB 读写示意
 
 ![case13](./figures/case13.png)
+
+### 搬运方式
 
 ```
 i=0: src0[0..7],  src0[64..71],  ..., src0[448..455]  → dst 同上
@@ -370,17 +369,70 @@ i=7: src0[56..63], ..., src0[504..511]  → dst 同上
 
 ### 分析结论
 
-- `DATA_BLOCK_COPY` stride=8：8 个 DataBlock 均从 bankgroup0 的不同 depth 行读取，命中**同 bank group 不同行**。
-- Case 13 vs Case 12 = 1,510,739 vs 440,904 cycles（**慢 3.43x**）。
+- `DATA_BLOCK_COPY` stride=8：8 个 DataBlock 均从 bankgroup0 的不同 depth 行读取，命中**同 bank group 不同行**，发生bank冲突，对比case12性能劣化。
 
+## Case 14：一读一写，同DataBlock重复读取
+
+### 地址解码
+
+| 操作数 | 首地址 | 18 位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id |
+| --- | --- | --- | --- | --- |
+| src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
+| dst | `0x4100` | `010000010 0 000 00000` | 1 | 0 |
+
+### UB 读写示意
+
+![case14](./figures/case14.png)
+
+### 搬运方式
+
+```
+i=0: Load src0[0]    ×8 (block stride=0) → dst[0..63]
+i=1: Load src0[64]   ×8 → dst[64..127]
+...
+i=7: Load src0[448]  ×8 → dst[448..511]
+```
+
+8 轮 × 64 元素，每轮 Load srcBlockStride=0（8 个 DataBlock 均指向同一 32B 基地址），Store stride=1（连续排布）。
+
+### 分析结论
+
+- srcBlockStride=0 时，同一 REPEAT 内 8 个 DataBlock 全部命中同一地址，硬件自动合并为单次读取，寄存器被填充为 8 份相同数据。
+- 同DataBlock重复读取几乎无额外开销。
+
+## Case 15：一读一写，每次迭代从同一首地址读取
+
+### 地址解码
+
+同 Case 12 地址配置。
+
+### UB 读写示意
+
+![case15](./figures/case15.png)
+
+### 搬运方式
+
+```
+i=0: Load src0[0..63]   → dst[0..63]
+i=1: Load src0[0..63]   → dst[64..127]
+...
+i=7: Load src0[0..63]   → dst[448..511]
+```
+
+8 轮 × 64 元素，每轮 Load 从固定首地址 src0（不偏移），Store stride=1 连续写入不同位置。
+
+### 分析结论
+
+- 8 轮迭代均从同一个首地址加载，输出相同数据到8个DataBlock。
+- 每次迭代从同一首地址读取几乎无额外开销。
 
 ## 小结
 
-- **二读一写冲突必然发生**：Ascend 950PR/Ascend 950DT 仅有 8 个 BG，一条 VF 指令覆盖全部 BG。2R1W 模式下只要 src0 ≠ src1，每个 BG 必然二读一写，超出单个 BG 的端口能力（最多二读或一读一写），冲突不可避免。**地址重叠（Case 1）是唯一能让 2R1W 完全无冲突的方式**（硬件将两读合并为一读）。
-- **读写冲突是主要瓶颈，读读冲突可忽略**：Case 5 消除读写冲突后快 6.3%，Case 4 消除读读冲突后反而慢 1.3%。根本原因是 3510 每个 BG 有 2 个读口但仅 1 个写口——读读冲突可被第二个读口分摊，读写冲突无法分摊。
-- **双搬入无收益**：Case 7 vs Case 3 = 1,480,826 vs 1,422,763 cycles（慢 4.1%），Ascend 950PR/Ascend 950DT 上读读冲突不是瓶颈。
-- **指令优化带来额外收益**（非 bank 冲突原因）：地址重叠（Case 1）省 Load，比全冲突快 21.1%；循环展开（Case 6 vs Case 3）有 6.5% 收益。
-- **后续可扩展更多读取模式**：当前仅覆盖了 LoadAlign、DINTLV_B32、DATA_BLOCK_COPY 三种读模式，后续可补充 `DIST_BLK`（同一 DataBlock 重复读取）和不同 stride（2/4/16）的 DATA_BLOCK_COPY 对比，探究不同 LoadDist 下的 bank 冲突差异。
+- **二读一写冲突必然发生**：Ascend 950PR/Ascend 950DT 仅有 8 个 BG，一条 VF 指令覆盖全部 BG。2R1W 模式下只要 src0 ≠ src1，每个 BG 必然发生二读一写，超出单个 BG 的读写能力（最多二读或一读一写），冲突不可避免。**地址重叠（Case 1）是唯一能让二读一写完全无冲突的方式**（硬件将两读合并为一读），在Atlas A2/A3 系列产品中， 可以通过读写地址重叠触发硬件优化，在Ascend 950PR/Ascend 950DT中没有触发。
+- **读写冲突开销大于读读冲突**：消除读写冲突后的收益大于消除读读冲突后的收益。
+- **双搬入无收益**：Case 7 vs Case 3 = 1,480,654 vs 1,420,634 cycles（慢 4.2%）。
+- **循环展开带来额外收益**（非 bank 冲突原因）：地址重叠（Case 1）省 Load，比全冲突快 21.1%；循环展开（Case 6 vs Case 3）有 6.3% 收益。
+- **同DataBlock数据重复读取和同Repeat重复读取性能无劣化**：Case 14（443,499 cycles）和 Case 15（440,810 cycles）与基准 Case 12（442,224 cycles）性能相当。
 
 ## 目录结构
 
@@ -392,7 +444,8 @@ i=7: src0[56..63], ..., src0[504..511]  → dst 同上
 ├── CMakeLists.txt                // 编译工程
 ├── test.sh                       // 测试脚本
 ├── figures/                      // 各 Case UB 内存分布图
-│   ├── case1_2.png
+│   ├── case1.png
+│   ├── case2.png
 │   ├── case3.png
 │   ├── case4.png
 │   ├── case5.png
@@ -403,7 +456,9 @@ i=7: src0[56..63], ..., src0[504..511]  → dst 同上
 │   ├── case10.png
 │   ├── case11.png
 │   ├── case12.png
-│   └── case13.png
+│   ├── case13.png
+│   ├── case14.png
+│   └── case15.png
 └── scripts/
     ├── gen_data.py               // 测试数据生成
     └── verify_result.py          // 精度验证
@@ -420,7 +475,7 @@ source /path/to/cann/set_env.sh
 ### 编译与运行（单个 Case）
 
 ```bash
-export CASE_NUM=1          # 1-13 可选
+export CASE_NUM=1          # 1-15 可选
 mkdir -p build && cd build
 cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-Ascend 950PR/Ascend 950DT -DCASE_NUM=${CASE_NUM}
 make -j

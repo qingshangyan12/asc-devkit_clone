@@ -82,6 +82,32 @@ __simd_vf__ inline void AddsVFWithStride2(__ubuf__ T* src0, __ubuf__ T* src1, __
     }
 }
 
+template <typename T>
+__simd_vf__ inline void AddsVFWithStride3(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+{
+    // 测试BlockStride为0
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::RegTensor<T> reg0, reg1;
+    for (uint16_t i = 0; i < 8; ++i) {
+        AscendC::Reg::LoadAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(reg0, src0 + oneRepSize * i, 0, mask);
+        AscendC::Reg::Adds(reg1, reg0, (T)0, mask);
+        AscendC::Reg::StoreAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + oneRepSize * i, reg1, 1, mask);
+    }
+}
+
+template <typename T>
+__simd_vf__ inline void AddsVFWithStride4(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+{
+    // 测试srcRepeatStride为0
+    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+    AscendC::Reg::RegTensor<T> reg0, reg1;
+    for (uint16_t i = 0; i < 8; ++i) {
+        AscendC::Reg::LoadAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(reg0, src0, 1, mask);
+        AscendC::Reg::Adds(reg1, reg0, (T)0, mask);
+        AscendC::Reg::StoreAlign<T, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(dst + oneRepSize * i, reg1, 1, mask);
+    }
+}
+
 template <typename T1, typename T2, typename T3>
 __simd_vf__ inline void GatherAndScatterVF(__ubuf__ T1* src0, __ubuf__ T2* src1, __ubuf__ T3* dst)
 {

@@ -133,6 +133,26 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #define USED_VF AddsVFWithStride2
+#elif CASE_NUM == 14
+// 一读一写，DATA_BLOCK_COPY srcBlockStride=0，同 DataBlock 重复读取
+constexpr uint32_t TOTAL_LENGTH = 512;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0000;
+constexpr uint32_t zLocalAddr = 0x4100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddsVFWithStride3
+#elif CASE_NUM == 15
+// 一读一写，DATA_BLOCK_COPY srcRepeatStride=0，每次迭代从同一首地址读取
+constexpr uint32_t TOTAL_LENGTH = 512;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0000;
+constexpr uint32_t zLocalAddr = 0x4100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#define USED_VF AddsVFWithStride4
 #endif
 
 #endif // BANK_CONFLICT_CONFIG_H
