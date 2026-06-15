@@ -762,16 +762,16 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
      * before write, the local may come from MTE2/V, so need insert MTE3 wait V/MTE2
      * after write, the local may used to compute or copy out, need insert V/MTE2 wait MTE3
      */
-    event_t eventIDVToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+    event_t eventIDVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
     SetFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     WaitFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
-    event_t eventIDMTE2ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE3>());
+    event_t eventIDMTE2ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE3));
     SetFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
     WaitFlag<HardEvent::MTE2_MTE3>(eventIDMTE2ToMTE3);
     if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::GM)) {
         DataCopyUB2GMImpl(reinterpret_cast<__gm__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), copyParams);
-        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE2>());
+        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE2));
         SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
@@ -779,11 +779,11 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
             writeOffset));
         DataCopyUB2L1Impl(reinterpret_cast<__cbuf__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), copyParams);
-        event_t eventIDMTE3ToMTE1 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE1>());
+        event_t eventIDMTE3ToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE1));
         SetFlag<HardEvent::MTE3_MTE1>(eventIDMTE3ToMTE1);
         WaitFlag<HardEvent::MTE3_MTE1>(eventIDMTE3ToMTE1);
     }
-    event_t eventIDMTE3ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE3_V>());
+    event_t eventIDMTE3ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_V));
     SetFlag<HardEvent::MTE3_V>(eventIDMTE3ToV);
     WaitFlag<HardEvent::MTE3_V>(eventIDMTE3ToV);
 }
@@ -797,9 +797,9 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const Da
      * after read, the local may used to compute or copy out, need insert V/MTE2 wait MTE3
      */
     if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::GM)) {
-        event_t eventIDVToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE2>());
-        event_t eventIDMTE2ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE2_V>());
-        event_t eventIDMTE2ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE3>());
+        event_t eventIDVToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE2));
+        event_t eventIDMTE2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
+        event_t eventIDMTE2ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE3));
         SetFlag<HardEvent::V_MTE2>(eventIDVToMTE2);
         WaitFlag<HardEvent::V_MTE2>(eventIDVToMTE2);
         DataCopyGM2UBImpl(reinterpret_cast<__ubuf__ T*>(read.GetPhyAddr()),
@@ -812,9 +812,9 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const Da
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
         ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned \n",
             readOffset));
-        event_t eventIDVToMTE1 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE1>());
-        event_t eventIDMTE1ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE1_V>());
-        event_t eventIDMTE1ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE1_MTE3>());
+        event_t eventIDVToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE1));
+        event_t eventIDMTE1ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_V));
+        event_t eventIDMTE1ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_MTE3));
         SetFlag<HardEvent::V_MTE1>(eventIDVToMTE1);
         WaitFlag<HardEvent::V_MTE1>(eventIDVToMTE1);
         DataCopyL12UBImpl(reinterpret_cast<__ubuf__ T*>(read.GetPhyAddr()),
@@ -839,9 +839,9 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
     int computeSize = writeSize != 0 ? writeSize : GetShapeSize(write.GetShapeInfo());
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = computeSize / AscendCUtils::GetC0Count(sizeof(T));
-    event_t eventIDVToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
-    event_t eventIDMTE2ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE3>());
-    event_t eventIDMTE3ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE3_V>());
+    event_t eventIDVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+    event_t eventIDMTE2ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE3));
+    event_t eventIDMTE3ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_V));
     SetFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     WaitFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
 
@@ -850,7 +850,7 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
     if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::GM)) {
         DataCopyUB2GMImpl(reinterpret_cast<__gm__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), repeatParams);
-        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE2>());
+        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE2));
         SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     } else if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::L1)) {
@@ -860,7 +860,7 @@ __aicore__ inline void TPipe::WriteSpmBuffer(const LocalTensor<T>& write, const 
             writeSize));
         DataCopyUB2L1Impl(reinterpret_cast<__cbuf__ T*>(g_tpipeImpl.spmInfo_.spmAddr) + writeOffset,
             reinterpret_cast<__ubuf__ T*>(write.GetPhyAddr()), repeatParams);
-        event_t eventIDMTE3ToMTE1 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE1>());
+        event_t eventIDMTE3ToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE1));
         SetFlag<HardEvent::MTE3_MTE1>(eventIDMTE3ToMTE1);
         WaitFlag<HardEvent::MTE3_MTE1>(eventIDMTE3ToMTE1);
     }
@@ -880,9 +880,9 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const in
     struct DataCopyParams repeatParams;
     repeatParams.blockLen = computeSize / AscendCUtils::GetC0Count(sizeof(T));
     if (g_tpipeImpl.spmInfo_.spmBufType == static_cast<uint8_t>(Hardware::GM)) {
-        event_t eventIDVToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE2>());
-        event_t eventIDMTE2ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE2_V>());
-        event_t eventIDMTE2ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE3>());
+        event_t eventIDVToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE2));
+        event_t eventIDMTE2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_V));
+        event_t eventIDMTE2ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE3));
         SetFlag<HardEvent::V_MTE2>(eventIDVToMTE2);
         WaitFlag<HardEvent::V_MTE2>(eventIDVToMTE2);
         DataCopyGM2UBImpl(reinterpret_cast<__ubuf__ T*>(read.GetPhyAddr()),
@@ -897,9 +897,9 @@ __aicore__ inline void TPipe::ReadSpmBuffer(const LocalTensor<T>& read, const in
         ASCENDC_DEBUG_ASSERT((readOffset % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readOffset is %d, which must be 32B aligned \n",
             readOffset));
         ASCENDC_DEBUG_ASSERT((readSize % ONE_BLK_SIZE == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "readSize is %d, which must be 32B aligned \n", readSize));
-        event_t eventIDVToMTE1 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE1>());
-        event_t eventIDMTE1ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE1_V>());
-        event_t eventIDMTE1ToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::MTE1_MTE3>());
+        event_t eventIDVToMTE1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE1));
+        event_t eventIDMTE1ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_V));
+        event_t eventIDMTE1ToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE1_MTE3));
         SetFlag<HardEvent::V_MTE1>(eventIDVToMTE1);
         WaitFlag<HardEvent::V_MTE1>(eventIDVToMTE1);
         DataCopyL12UBImpl(reinterpret_cast<__ubuf__ T*>(read.GetPhyAddr()),

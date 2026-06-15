@@ -144,7 +144,7 @@ __aicore__ inline void DataCopyUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, const
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #endif
-        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
@@ -196,7 +196,7 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #endif
-        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
@@ -569,7 +569,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #endif
-        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
@@ -619,7 +619,7 @@ __aicore__ inline void DataCopyPadUB2L1Impl(__cbuf__ T* dst, __ubuf__ T* src, co
 #else
         GM_ADDR gmAddr = (GetKfcClient()->AllocUB(tensorSize, ubAddr));
 #endif
-        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
         SetFlag<HardEvent::V_MTE3>(eventID);
         WaitFlag<HardEvent::V_MTE3>(eventID);
         // 2.进行对等拷贝ub->GM
@@ -660,7 +660,7 @@ __aicore__ inline void ScmDataCopy(__gm__ void* kfcMsgPtr)
     copy_gm_to_cbuf((__cbuf__ void*)dst, (__gm__ void*)scmCopyParams->src, (int8_t)0, static_cast<uint16_t>(intriParams.blockCount),
         static_cast<uint16_t>(intriParams.blockLen), static_cast<uint16_t>(intriParams.srcStride), static_cast<uint16_t>(intriParams.dstStride), (pad_t)0);
 #endif
-    event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE1>());
+    event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
     SetFlag<HardEvent::MTE2_MTE1>(eventID);
     WaitFlag<HardEvent::MTE2_MTE1>(eventID);
 }
@@ -698,7 +698,7 @@ __aicore__ inline void ScmDataCopyND2NZ(__gm__ void* kfcMsgPtr)
             intriParams.ndNum, intriParams.nValue, intriParams.dValue, intriParams.srcNdMatrixStride,
             intriParams.srcDValue, intriParams.dstNzC0Stride, intriParams.dstNzNStride, intriParams.dstNzMatrixStride);
     }
-    event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::MTE2_MTE1>());
+    event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_MTE1));
     SetFlag<HardEvent::MTE2_MTE1>(eventID);
     WaitFlag<HardEvent::MTE2_MTE1>(eventID);
 }

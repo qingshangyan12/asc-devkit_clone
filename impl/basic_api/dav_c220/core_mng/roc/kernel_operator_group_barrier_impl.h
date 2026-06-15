@@ -119,7 +119,7 @@ __aicore__ inline void GroupBarrier<pipeMode>::__WriteCurrentValue(__gm__ Barrie
 {
     if ASCEND_IS_AIV {
         uint32_t num = (arriveSize >= waitSize) ? arriveSize : waitSize;
-        event_t eventID = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
+        event_t eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
         SetFlag<HardEvent::S_MTE3>(eventID);
         WaitFlag<HardEvent::S_MTE3>(eventID);
         SetAtomicAddImpl<int32_t>();
