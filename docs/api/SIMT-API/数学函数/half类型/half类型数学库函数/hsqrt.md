@@ -38,7 +38,6 @@ inline half hsqrt(half x)
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
--   当x为subnormal（非规格化数，即0 < |x| < 2^-14≈6.104e-5）时，x经h2f上抬FTZ→0后，sqrtf(0)→0，返回值为+0，而非libm得到的约2^-7~2^-11量级的小正数；其符号位保留（-subnormal的平方根仍按负数输入返回nan）。
 
 ## 约束说明
 

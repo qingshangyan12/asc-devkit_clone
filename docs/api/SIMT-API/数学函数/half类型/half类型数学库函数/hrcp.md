@@ -37,7 +37,6 @@ inline half hrcp(half x)
 -   当x为0时，返回值为inf。
 -   当x为inf时，返回值为0。
 -   当x为nan时，返回值为nan。
--   当x为subnormal（非规格化数，即0 < |x| < 2^-14≈6.104e-5）时，DML rcp将subnormal视为0，hrcp(sn)→Inf，而非libm得到的约2^14~2^15量级的有限值（此为已知偏差）。
 
 ## 约束说明
 

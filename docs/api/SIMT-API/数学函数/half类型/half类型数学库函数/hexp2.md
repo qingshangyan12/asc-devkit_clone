@@ -38,7 +38,6 @@ inline half hexp2(half x)
 -   当x为-inf时，返回值为0。
 -   当x为nan时，返回值为nan。
 -   当结果超出float的最大范围时，返回值为inf。
--   当x为subnormal（非规格化数，即0 < |x| < 2^-14≈6.104e-5）时，hexp2(sn)≈1，与数学预期一致。但当x为较小负值使2^x落入F16 subnormal区间时，输出被刷零为0，而非libm得到的接近F16最小规格化数的值。
 
 ## 约束说明
 

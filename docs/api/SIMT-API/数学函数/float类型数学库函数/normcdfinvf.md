@@ -38,7 +38,6 @@ inline float normcdfinvf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为1时，返回值为inf。
 -   当x∉\[0,1\]时，返回nan。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，subnormal输入路径经logf保护后可正常运算（输入不被刷零），但SIMT实现的多项式逼近对极小输入精度不足，结果与libm存在精度偏差（非FTZ主导）。
 
 ## 约束说明
 

@@ -37,7 +37,6 @@ inline float tanhf(float x)
 -   当x为inf时，返回值为1.0。
 -   当x为-inf时，返回值为-1.0。
 -   当x为nan时，返回值为nan。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，tanhf(sn)返回0，而非按非FTZ标准库（如libm）得到的约等于sn的值（tanhf(sn) ≈ sn）。
 
 ## 约束说明
 

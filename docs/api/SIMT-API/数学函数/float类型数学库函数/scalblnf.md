@@ -38,7 +38,6 @@ inline float scalblnf(float x, int64_t n)
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为-inf。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，scalblnf(sn, n)返回±0。当x为正常值但x×2^n的结果落入subnormal区间时，输出被刷零为±0，而非按非FTZ标准库（如libm）得到的subnormal有限值。
 
 ## 约束说明
 

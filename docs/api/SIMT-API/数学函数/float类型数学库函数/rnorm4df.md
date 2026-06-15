@@ -42,7 +42,6 @@ a^2 + b^2 + c^2 + d^2的平方根的倒数。
 -   若a、b、c、d都为0，返回值为inf。
 -   若a、b、c、d任意一个或多个为±inf，返回值为0。
 -   若a、b、c、d任意一个或多个为nan同时不是±inf，返回值为nan。
--   当所有输入均为subnormal（非规格化数，即0 < |val| < 1.17549435e-38）时，底层norm4df返回NaN，rnorm4df(sn, sn, sn, sn) = 1/NaN = NaN（设计外行为）；当仅部分输入为subnormal时，subnormal被FTZ为0，返回值与normal输入一致。
 
 ## 约束说明
 

@@ -38,7 +38,6 @@ x的立方根的倒数。
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为0。
 -   当x为-inf时，返回值为0。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，与cbrtf同根因，底层位操作缺少subnormal浮点数的implicit 1 bit导致Newton迭代收敛至错误值，rcbrtf(sn)返回1/错误值，而非正确的立方根倒数。
 
 ## 约束说明
 

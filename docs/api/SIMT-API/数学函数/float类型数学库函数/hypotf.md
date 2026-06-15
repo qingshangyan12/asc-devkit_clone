@@ -38,7 +38,6 @@ x^2 + y^2的平方根。
 -   若x^2 + y^2的平方根超出float最大范围，返回值为inf。
 -   若x，y任意一个为±inf，返回值为inf。
 -   若x，y任意一个为nan，另外不为±inf，返回值为nan。
--   当所有输入均为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，底层DML运算产生0/0=NaN，返回NaN（设计外行为）；当仅部分输入为subnormal时，subnormal被FTZ为0，返回值与normal输入一致（如hypotf(sn, normal) ≈ normal）。
 
 ## 约束说明
 

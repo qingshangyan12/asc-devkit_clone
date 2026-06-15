@@ -41,7 +41,6 @@ inline bfloat16_t hsqrt(bfloat16_t x)
 | -inf | nan | 0 |
 | nan | nan | 0 |
 | 小于0 | nan | 0 |
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x经b2f上抬FTZ→0后，sqrtf(0)→0，返回值为+0，而非libm得到的约sqrt(sn)量级的小正数；其符号位保留（-subnormal的平方根仍按负数输入返回nan）。
 
 ## 约束说明
 

@@ -1,0 +1,7 @@
+block_id,sub_block_id,aic_time(us),aic_total_cycles,aic_cube_ratio,aic_cube_fp_ratio,aic_cube_int_ratio,aic_cube_total_instr_number,aic_cube_fp_instr_number,aic_cube_int_instr_number,aiv_time(us),aiv_total_cycles,aiv_vec_ratio,aiv_vec_vf_ratio,aiv_vec_sfu_ratio,aiv_vec_simt_vf_ratio,
+0,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.143636,11787,0.945873,0.000000,0.000000,0.945873,
+1,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.436970,12271,0.944585,0.000000,0.000000,0.944585,
+2,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.414546,12234,0.942946,0.000000,0.000000,0.942946,
+3,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.030909,11601,0.960090,0.000000,0.000000,0.960090,
+4,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.320000,12078,0.961997,0.000000,0.000000,0.961997,
+5,vector0,NA,NA,NA,NA,NA,NA,NA,NA,7.140606,11782,0.964268,0.000000,0.000000,0.964268,

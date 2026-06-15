@@ -82,7 +82,8 @@ F32/F16/BF16 三类数据类型的 subnormal 阈值（绝对值下界，即最�
 | `hrsqrt` `h2rsqrt` | F16 | Sqrt+Div | `1.0/hsqrt(x)` | 高 |
 | `hrcp` `h2rcp` | F16 | Div | `1.0/x`，大输入 → 倒数 subnormal | 高 |
 | `hexp/hlog/hsqrt/hrsqrt/hrcp`(BF16) `h2*` | BF16 | Exp/Log/Sqrt/Div | upcast F32 后调 `expf/logf/sqrtf`，按 F32 阈值 | 高 |
-| `__hdiv` `__hdivx2`(F16/BF16) | F16/BF16 | Div | 商落入 subnormal | 高 |
+| `__hdiv` `__hdivx2`(BF16) | BF16 | Div | sn/sn→NaN(真bug)；商落入 subnormal→FTZ→0 | 高 |
+| `__hdiv` `__hdivx2`(F16) | F16 | Div | 不受 subnormal/FTZ 影响(真机实测0 DIFF) | 低 |
 | `fdividef` | F32 | Div | 商落入 subnormal | 高 |
 
 ### 3.2 含 subnormal 中间值的组合接口（中风险，重点排查）
@@ -318,7 +319,7 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 | 67 | `y1f` | F32 组合(Log+Div+Trig) | 2/2 例**一致**(最小sn)→-Inf(overflow，数学正确) | 未触发 | y1f(MN)=finite ✓ | 正常域精度 DIFF | **不受 FTZ 影响**：最小sn→Y_1(sn)超 FLT_MAX→两路均-Inf；MN→finite ✓ | 否 |
 | 68 | `normcdff` | F32 组合(Erfcf) | 5/5 例**一致**：normcdff(sn)=0.5(数学正确) | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：经 erfcf(x/√2)，subnormal→x/√2→subnormal→erfcf≈1→0.5*(1+erf(≈0))≈0.5 | 否 |
 | 69 | `scalbnf` | F32 组合(Pow+Div) | 1/1 DIFF(in-FTZ)：scalbnf(sn,-10)→subnormal 结果 FTZ→0 vs libm finite | 未触发 | 全一致 | 正常域全 ok | **输出侧 FTZ 确认**：scalbnf(sn,-10)=sn*2^-10→结果 subnormal→FTZ→0；实现含 `x/__powf(2,n)` DML 路径 | 待补 |
-| 70 | `__hdiv`(F16) | F16 直接(Div) | 0 DIFF：F16 subnormal 经 DML 后结果与 libm F16 一致（F16 值域极窄，sn→≈0→div 行为与数学一致） | 未触发（F16 值域窄，商一般不落 subnormal） | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：F16 值域限制(MIN_NORMAL=2^-14)使 subnormal 输入经 DML 后与数学预期一致 | 否 |
+| 70 | `__hdiv`(F16) | F16 直接(Div) | 0 DIFF | 未触发 | 全一致 | 正常域全 ok | **不受 subnormal/FTZ 影响**：真机实测（dav-3510，36例 bit 比对，golden=d2h 非 FTZ）与非 FTZ libm 完全一致；之前"10 DIFF"系 golden 函数 d2h bug（subnormal 舍入逻辑错误+normal 舍入溢出）所致 | 否 |
 | 71 | `__hdiv`(BF16) | BF16 直接(Div) | **真bug**：sn/sn→DML 0/0=NaN vs libm 1；1/sn_max→Inf vs libm finite(8.57e37)；MN/sn_min→Inf vs 128 | **输出侧 FTZ**：MN/2→0 vs libm 5.88e-39；MN/4→0 vs 2.94e-39；1/BF16_MAX→0 vs 2.94e-39 | **真bug**：sn/sn→unexpected NaN(3/3 例)；1/sn_max→unexpected Inf | 正常域全 ok | **真bug+双侧 FTZ**：BF16 经 F32 upcast 路径，DML 除法双侧 FTZ；dual-subnormal→0/0=NaN；与 F32 fdividef/BF16 hrcp 同根因 | 待补 |
 | 72 | `jnf` | F32 组合(Div+Exp+Log+Sqrt) | 0 DIFF(subnormal)：subnormal x→case3(logf/expf 保护)→与 libm 一致 | **输出侧 FTZ**：jnf(85,22.04)→0 vs libm 3.31e-41(subnormal)；数学结果落入 subnormal 被 FTZ→0 | NaN/±Inf/±0/n<0 全一致 | n=5/10/20 ok；n=85 x=22 **输出 FTZ**(0 vs 3.31e-41)；n=85 x≥50 ok | **输出侧 FTZ 确认**：jnf 大 n 小 x 的数学结果落入 subnormal → FTZ→0；subnormal 输入经 case3 logf 保护不受影响；设计内 FTZ | 待补 |
 | 73 | `scalblnf` | F32 组合(=scalbnf(x,cast_int32)) | 1 DIFF(in-FTZ)：scalblnf(sn_mid,-10)→0 vs libm 5.74e-42 | 未触发 | 全一致 | 正常域全 ok | **与 scalbnf 同根因**：scalblnf→scalbnf→DML __powf 路径；sn*2^-10→subnormal→FTZ→0；设计内 FTZ | 待补 |
@@ -385,6 +386,7 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 > hsqrt(half_subnormal)→F16 normal（sqrt 放大了约 2^12 倍），无 FTZ。
 > hrsqrt/hrcp 对 subnormal 输入的 overflow（1/sn=Inf）是数学正确行为（F16 值域溢出）。
 > 仅 hexp2 有 1 个输出侧差异（hexp2(-24)=0 vs 0.25），因 F16 无法表示 2^-24 的 subnormal 输出。
+> __hdiv(F16) 真机重测（修正 golden 函数 d2h 的 subnormal 舍入 bug 后）为 0 DIFF，不受 subnormal/FTZ 影响。
 
 > BF16 3.1 实测明细：9 个 BF16 直接原语全部实测。BF16 经 cvt_float→F32→DML→cvt_bfloat16 路径，
 > BF16 subnormal 映射为 F32 subnormal（相同指数范围），因此 BF16 的 subnormal/FTZ 行为
@@ -447,9 +449,8 @@ Ffs / IsNan / IsInf / IsFinite / Fdim / Fmod / Remainder`（不含内部除法�
 
 > 补测接口实测明细（序号 70~76）：
 
-> **F16 __hdiv（序号70）**：0 DIFF。F16 值域极窄（MIN_NORMAL=2^-14），subnormal 输入经 DML 后≈±0，
-> div(≈0, normal)≈0（与数学一致），div(normal, ≈0)→Inf（与数学一致），
-> div(≈0, ≈0)=NaN（与 0/0 IEEE 一致）。与 F32 fdividef 不同，F16 无额外的 FTZ 问题。
+> **F16 __hdiv（序号70）**：**0 DIFF**。修正 golden 函数 d2h 的 subnormal 舍入 bug（原 d2h 对 subnormal 值的隐含位计算错误导致 golden 偏高约512倍，normal 舍入溢出到 Inf）后，真机实测36例与非 FTZ libm 完全一致。
+> F16 __hdiv 不受 subnormal/FTZ 影响。之前"10 DIFF"系 golden 函数 bug 所致。
 
 > **BF16 __hdiv（序号71）**：13 DIFF。BF16 经 cvt→F32→DML 除法→cvt_bfloat16 路径，
 > BF16 subnormal 映射为 F32 subnormal（相同指数范围），因此 BF16 的 subnormal/FTZ 行为

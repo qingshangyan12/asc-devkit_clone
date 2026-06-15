@@ -35,7 +35,6 @@ inline float erfcf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为0。
 -   当x为-inf时，返回值为2。
--   当erfcf的真实计算结果落入subnormal区间（0 < |result| < 1.17549435e-38）时，输出被刷零（Flush-To-Zero）为0。该场景在x为大正输入时触发：erfcf(大正输入)按libm标准应为subnormal量级的小正数，DML实现将其FTZ为0。
 
 ## 约束说明
 

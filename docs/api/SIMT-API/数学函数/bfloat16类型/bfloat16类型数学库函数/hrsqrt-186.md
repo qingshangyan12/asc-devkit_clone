@@ -41,7 +41,6 @@ inline bfloat16_t hrsqrt(bfloat16_t x)
 | -inf | nan | 0 |
 | nan | nan | 0 |
 | 小于0 | nan | 0 |
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x经b2f上抬FTZ→0后，1/√(0)→Inf，返回值为inf，而非libm得到的有限值（此为已知偏差，根因同F32 rsqrtf）。
 
 ## 约束说明
 

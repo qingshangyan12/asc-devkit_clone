@@ -38,7 +38,6 @@ inline float exp2f(float x)
 -   当x为-inf时，返回值为0。
 -   当x为nan时，返回值为nan。
 -   当结果超出float的最大范围时，返回值为inf。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，返回值为1.0，与数学期望2^sn≈1一致；当结果本身落入subnormal区间时，返回值被刷零为+0，而非libm得到的subnormal值。
 
 ## API映射关系
 

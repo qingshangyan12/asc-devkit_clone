@@ -38,7 +38,6 @@ inline float jnf(int n, float x)
 -   当n<0时，返回值为nan。
 -   当x=inf或-inf时，返回值为0。
 -   当x=nan时，返回值为nan。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，jnf(n, sn)与jnf(n, 0)返回值一致（设计内FTZ行为）。当结果落入subnormal区间时（如jnf(85, 22)≈3.31e-41），输出被刷零为±0，而非libm得到的subnormal值。
 
 ## 约束说明
 

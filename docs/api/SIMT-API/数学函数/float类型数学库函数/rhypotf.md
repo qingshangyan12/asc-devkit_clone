@@ -40,7 +40,6 @@ x^2 + y^2的平方根的倒数。
 -   若x和y都为0，返回值为inf。
 -   若x，y任意一个为±inf，返回值为0。
 -   若x，y任意一个为nan，另一个不为±inf，返回值为nan。
--   当所有输入均为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，底层hypotf返回NaN，rhypotf(sn, sn) = 1/NaN = NaN（设计外行为）；当仅部分输入为subnormal时，subnormal被FTZ为0，返回值与normal输入一致。
 
 ## 约束说明
 

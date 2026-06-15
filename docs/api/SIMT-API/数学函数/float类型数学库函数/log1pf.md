@@ -37,7 +37,6 @@ inline float log1pf(float x)
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为nan。
 -   当x为nan时，返回值为nan。
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x被刷零（Flush-To-Zero）当作0处理，返回值为0.0，但数学期望log1pf(sn)≈sn（非零），属于真bug——丢失了subnormal区间的精度信息。
 
 ## 约束说明
 

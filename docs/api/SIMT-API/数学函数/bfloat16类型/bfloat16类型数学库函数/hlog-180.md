@@ -40,7 +40,6 @@ inline bfloat16_t hlog(bfloat16_t x)
 | -inf, nan | nan | 0（nan被饱和为0） |
 | 0 | -inf | -ASCRT_MAX_NORMAL_BF16 |
 | x小于0 | nan | 0 |
--   当x为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，x经b2f上抬FTZ→0后，logf(0)→-Inf，返回值为-inf，而非libm得到的约-126（此为已知偏差）。
 
 ## 约束说明
 

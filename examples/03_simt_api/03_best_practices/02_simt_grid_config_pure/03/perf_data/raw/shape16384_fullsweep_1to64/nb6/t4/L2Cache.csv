@@ -1,0 +1,7 @@
+block_id,sub_block_id,aic_time(us),aic_total_cycles,aic_read_close_hit,aic_read_close_miss,aic_read_close_victim,aic_read_far_hit,aic_read_far_miss,aic_read_far_victim,aic_read_hit_rate(%),aic_write_close_hit,aic_write_close_miss,aic_write_close_victim,aic_write_far_hit,aic_write_far_miss,aic_write_far_victim,aic_write_hit_rate(%),aiv_time(us),aiv_total_cycles,aiv_read_close_hit,aiv_read_close_miss,aiv_read_close_victim,aiv_read_far_hit,aiv_read_far_miss,aiv_read_far_victim,aiv_read_hit_rate(%),aiv_write_close_hit,aiv_write_close_miss,aiv_write_close_victim,aiv_write_far_hit,aiv_write_far_miss,aiv_write_far_victim,aiv_write_hit_rate(%),
+0,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.070909,11667,217,765,969,158,636,0,13.661202,36,0,6,44,0,0,93.023262,
+1,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.424242,12250,244,719,1006,172,619,0,15.072463,61,39,4,14,26,0,52.083332,
+2,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.413939,12233,254,708,987,159,650,0,14.974620,60,36,8,11,23,0,51.449276,
+3,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.081818,11685,243,713,1016,164,628,0,14.725037,68,37,4,19,33,0,54.037266,
+4,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.085454,11691,267,675,979,162,679,0,15.532223,63,39,4,14,29,0,51.677853,
+5,vector0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,7.216969,11908,253,658,1071,144,646,0,14.321789,68,36,8,13,26,0,53.642387,

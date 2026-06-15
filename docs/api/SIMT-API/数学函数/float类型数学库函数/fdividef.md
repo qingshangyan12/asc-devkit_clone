@@ -37,8 +37,6 @@ inline float fdividef(float x, float y)
 -   当x为负数，y为0.0时，返回值为-inf。
 -   当x为0.0，y为0.0时，返回值为nan。
 -   当x、y任意一个为nan时，返回值为nan。
--   当x或y为subnormal（非规格化数，即0 < |x| < 1.17549435e-38）时，该操作数被刷零（Flush-To-Zero）当作±0处理后再参与除法运算。
--   当商结果落入subnormal区间时，返回值被刷零为±0，而非libm得到的subnormal值。
 
 ## 约束说明
 
