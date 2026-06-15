@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2026-05-28T12:00:00.000Z" agent="Mozilla/5.0" version="22.0.0" type="device">
+  <diagram name="Page-1" id="fig2">
+    <mxGraphModel dx="1422" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Case 5 vs Case 6: 每核工作集与 stride 循环对比" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="1000" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="totalTitle" value="共同输入：index_total_length = 1024 × 1024 = 1,048,576 个元素" style="text;html=1;align=center;fontSize=13;fontStyle=1;fillColor=#E1D5E7;strokeColor=#9673A6" vertex="1" parent="1">
+          <mxGeometry x="280" y="60" width="800" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="case5Box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#B85450;strokeWidth=2;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="640" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="case5Title" value="Case 5: gridDim = 1024 (核数 ≫ 物理核)" style="text;html=1;align=center;fontSize=15;fontStyle=1;fillColor=#F8CECC;strokeColor=#B85450" vertex="1" parent="1">
+          <mxGeometry x="60" y="130" width="600" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="case5Param" value="rows_per_block = 1,048,576 / 1024 = 1024&#xa;每个block接管 1024 个元素&#xa;每条线程 stride 循环只跑 1 次" style="text;html=1;align=left;fontSize=11;fontFamily=Courier New;fillColor=#FFF2CC;strokeColor=#D6B656;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="60" y="180" width="600" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="case5BlocksTitle" value="逻辑核 (1024个block) 排成 16 个 wave 串行" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="250" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c5w0" value="Wave 0&#xa;(B0~B63)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5w1" value="Wave 1&#xa;(B64~B127)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="145" y="280" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5w2" value="Wave 2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="230" y="280" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5wdots" value="......" style="text;html=1;align=center;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="295" y="280" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5w15" value="Wave 15&#xa;(B960~B1023)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="500" y="280" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5BlockTitle" value="单个 block 工作集 (示意 B0)" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c5Worksize" value="1024 个元素 (4KB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="60" y="370" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c5LoopTitle" value="block 内 stride 循环 (THREAD_NUM=1024)" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c5Code" value="for (local_idx = threadIdx.x; local_idx &lt; 1024; local_idx += 1024) {&#xa;    /* 循环只跑 1 次：每条线程处理 1 个元素 */&#xa;}" style="text;html=1;align=left;fontSize=10;fontFamily=Courier New;fillColor=#FFFFFF;strokeColor=#666666;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="60" y="455" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c5Iter" value="t0→e0    t1→e1    t2→e2    ...    t1023→e1023" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="60" y="515" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="c5IterNote" value="单次 stride 后所有线程任务完成 → vector pipe 占用窗口很短 (~2.6 μs)" style="text;html=1;align=center;fontSize=10;fillColor=none;strokeColor=none;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c5PerfTitle" value="性能数据" style="text;html=1;align=center;fontSize=12;fontStyle=1;fillColor=#F5F5F5;strokeColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="60" y="590" width="600" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="c5Perf" value="Task Duration : 53.132 μs&#xa;aiv_time      :  2.613 μs&#xa;aiv_vec_ratio :  0.939&#xa;每核 UB 占用  :  4 KB" style="text;html=1;align=left;fontSize=11;fontFamily=Courier New;fillColor=#FFFFFF;strokeColor=#666666;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="60" y="615" width="600" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c5Issue" value="问题：1024 个逻辑核要分 16 wave 串行调度&#xa;每核工作集太小 → 调度开销在端到端中占大头" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=11;fontStyle=1;align=center" vertex="1" parent="1">
+          <mxGeometry x="60" y="710" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="case6Box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#82B366;strokeWidth=2;dashed=1" vertex="1" parent="1">
+          <mxGeometry x="720" y="110" width="640" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="case6Title" value="Case 6: gridDim = 64 (核数 = 物理核 ✓)" style="text;html=1;align=center;fontSize=15;fontStyle=1;fillColor=#D5E8D4;strokeColor=#82B366" vertex="1" parent="1">
+          <mxGeometry x="740" y="130" width="600" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="case6Param" value="rows_per_block = 1,048,576 / 64 = 16,384&#xa;每个block接管 16,384 个元素&#xa;每条线程 stride 循环跑 16 次" style="text;html=1;align=left;fontSize=11;fontFamily=Courier New;fillColor=#FFF2CC;strokeColor=#D6B656;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="740" y="180" width="600" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="case6BlocksTitle" value="逻辑核 (64个block) 单 wave 铺满物理核 P0~P63" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="250" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Wave" value="Wave 0 (B0 → P0,  B1 → P1,  ...,  B63 → P63) — 全部并行" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="280" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c6BlockTitle" value="单个 block 工作集 (示意 B0)" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="340" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Worksize" value="16,384 个元素 (64KB) — 是 Case 5 的 16×" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="740" y="370" width="600" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c6LoopTitle" value="block 内 stride 循环 (THREAD_NUM=1024)" style="text;html=1;align=center;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="430" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Code" value="for (local_idx = threadIdx.x; local_idx &lt; 16384; local_idx += 1024) {&#xa;    /* 循环跑 16 次：每条线程顺序处理 16 个元素 */&#xa;}" style="text;html=1;align=left;fontSize=10;fontFamily=Courier New;fillColor=#FFFFFF;strokeColor=#666666;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="740" y="455" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Iter1" value="iter 0: t0→e0     t1→e1     ...  t1023→e1023" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="740" y="515" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Iter2" value="iter 1: t0→e1024  t1→e1025  ...  t1023→e2047" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="740" y="535" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6IterDots" value="..." style="text;html=1;align=center;fontSize=12;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="740" y="555" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Iter16" value="iter 15: t0→e15360 t1→e15361 ...  t1023→e16383" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=10;fontFamily=Courier New" vertex="1" parent="1">
+          <mxGeometry x="740" y="575" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c6PerfTitle" value="性能数据" style="text;html=1;align=center;fontSize=12;fontStyle=1;fillColor=#F5F5F5;strokeColor=#666666" vertex="1" parent="1">
+          <mxGeometry x="740" y="605" width="600" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Perf" value="Task Duration : 33.319 μs   ↓ 37.3%&#xa;aiv_time      : 31.364 μs   ↑ 12×&#xa;aiv_vec_ratio :  0.986&#xa;每核 UB 占用  : 64 KB" style="text;html=1;align=left;fontSize=11;fontFamily=Courier New;fillColor=#FFFFFF;strokeColor=#666666;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="740" y="630" width="600" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c6Win" value="收益：64 个逻辑核单 wave 完成，无排队&#xa;每核 16,384 元素摊薄调度头开销 → vector pipe 占用接近 100%" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;fontStyle=1;align=center" vertex="1" parent="1">
+          <mxGeometry x="740" y="725" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#6C8EBF;strokeWidth=4" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="685" y="440" as="sourcePoint" />
+            <mxPoint x="715" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrowLabel" value="优化&#xa;1.59×" style="text;html=1;align=center;fontSize=11;fontStyle=1;fillColor=#DAE8FC;strokeColor=#6C8EBF" vertex="1" parent="1">
+          <mxGeometry x="678" y="395" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bottom" value="核心思路：将 gridDim 从 1024 调到 64 匹配物理核数；每核工作集从 1024 扩展到 16,384，让有效计算时间填满 vector pipe" style="text;html=1;align=center;fontSize=12;fontStyle=1;fillColor=#DAE8FC;strokeColor=#6C8EBF" vertex="1" parent="1">
+          <mxGeometry x="40" y="830" width="1320" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

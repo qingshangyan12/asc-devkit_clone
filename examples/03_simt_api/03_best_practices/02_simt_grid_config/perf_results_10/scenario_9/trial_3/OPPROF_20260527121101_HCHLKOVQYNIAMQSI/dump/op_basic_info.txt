@@ -1,0 +1,10 @@
+Op Name=gather_adds_kernel
+Block Dim=64
+Run Soc Version=Ascend950PR_9589
+Device Id=0
+Pid=430267
+Current Freq=1650
+Rated Freq=1650
+Is MC2=0
+Is Lccl=0
+Has Simt=1

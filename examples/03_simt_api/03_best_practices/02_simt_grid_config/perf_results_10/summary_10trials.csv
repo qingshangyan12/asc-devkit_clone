@@ -1,0 +1,11 @@
+Scenario,Op Name,Block Dim,Trials,Mean(us),Min(us),Max(us),Std(us)
+scenario_1,vf_kernel,36,10,2.0361,1.8580,2.2950,0.1295
+scenario_2,vf_kernel,64,10,2.4815,2.2330,2.7670,0.1775
+scenario_3,vf_kernel,128,10,3.3327,3.0730,3.5340,0.1674
+scenario_4,vf_kernel,1024,10,16.4521,16.2890,16.6940,0.1182
+scenario_5,vf_kernel,36,10,2.2010,1.8850,2.6320,0.1820
+scenario_6,vf_kernel,1024,10,16.4944,16.2810,16.6960,0.1460
+scenario_7,vf_kernel,64,10,2.9988,2.7350,3.2040,0.1535
+scenario_8,gather_adds_kernel,1024,10,49.5460,48.9590,49.9800,0.3257
+scenario_9,gather_adds_kernel,64,10,11.0964,10.8640,11.3690,0.1374
+scenario_10,gather_adds_kernel_vf_inside,64,10,9.9448,9.7490,10.2970,0.1628

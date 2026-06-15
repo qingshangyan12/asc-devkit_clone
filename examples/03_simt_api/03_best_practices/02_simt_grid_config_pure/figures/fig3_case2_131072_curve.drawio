@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" modified="2026-05-30T15:00:00.000Z" agent="Mozilla/5.0" version="22.0.0" type="device">
+  <diagram name="Page-1" id="fig3">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Case 2 中shape (131072) ：Task Duration 随核数变化" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="150" y="20" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ylabel" value="Task Duration (us)" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="20" y="250" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xlabel" value="核数 (gridDim.x，每block固定2048线程)" style="text;html=1;align=center;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="500" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="yaxis" style="endArrow=none;html=1;strokeColor=#333333;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="90" as="sourcePoint" />
+            <mxPoint x="140" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xaxis" style="endArrow=none;html=1;strokeColor=#333333;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="140" y="470" as="sourcePoint" />
+            <mxPoint x="740" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g16" style="endArrow=none;html=1;strokeColor=#E0E0E0;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="140" y="128" as="sourcePoint" /><mxPoint x="740" y="128" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="g14" style="endArrow=none;html=1;strokeColor=#E0E0E0;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="140" y="204" as="sourcePoint" /><mxPoint x="740" y="204" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="g12" style="endArrow=none;html=1;strokeColor=#E0E0E0;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="140" y="280" as="sourcePoint" /><mxPoint x="740" y="280" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="g10" style="endArrow=none;html=1;strokeColor=#E0E0E0;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="140" y="356" as="sourcePoint" /><mxPoint x="740" y="356" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="g8" style="endArrow=none;html=1;strokeColor=#E0E0E0;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="140" y="432" as="sourcePoint" /><mxPoint x="740" y="432" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="yl16" value="16" style="text;html=1;align=right;fontSize=11;" vertex="1" parent="1"><mxGeometry x="100" y="118" width="32" height="20" as="geometry" /></mxCell>
+        <mxCell id="yl14" value="14" style="text;html=1;align=right;fontSize=11;" vertex="1" parent="1"><mxGeometry x="100" y="194" width="32" height="20" as="geometry" /></mxCell>
+        <mxCell id="yl12" value="12" style="text;html=1;align=right;fontSize=11;" vertex="1" parent="1"><mxGeometry x="100" y="270" width="32" height="20" as="geometry" /></mxCell>
+        <mxCell id="yl10" value="10" style="text;html=1;align=right;fontSize=11;" vertex="1" parent="1"><mxGeometry x="100" y="346" width="32" height="20" as="geometry" /></mxCell>
+        <mxCell id="yl8" value="8" style="text;html=1;align=right;fontSize=11;" vertex="1" parent="1"><mxGeometry x="100" y="422" width="32" height="20" as="geometry" /></mxCell>
+        <mxCell id="xl16" value="16" style="text;html=1;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="195" y="474" width="40" height="20" as="geometry" /></mxCell>
+        <mxCell id="xl32" value="32" style="text;html=1;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="345" y="474" width="40" height="20" as="geometry" /></mxCell>
+        <mxCell id="xl64" value="64" style="text;html=1;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="495" y="474" width="40" height="20" as="geometry" /></mxCell>
+        <mxCell id="xl128" value="128" style="text;html=1;align=center;fontSize=12;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="645" y="474" width="40" height="20" as="geometry" /></mxCell>
+        <mxCell id="physline" style="endArrow=none;html=1;strokeColor=#9673A6;strokeWidth=2;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="515" y="90" as="sourcePoint" /><mxPoint x="515" y="470" as="targetPoint" /></mxGeometry>
+        </mxCell>
+        <mxCell id="physlabel" value="物理核上限 = 64" style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#9673A6;" vertex="1" parent="1"><mxGeometry x="435" y="95" width="160" height="20" as="geometry" /></mxCell>
+        <mxCell id="e1" style="endArrow=none;html=1;strokeColor=#82B366;strokeWidth=3;" edge="1" parent="1" source="p16" target="p32"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="endArrow=none;html=1;strokeColor=#82B366;strokeWidth=3;" edge="1" parent="1" source="p32" target="p64"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="endArrow=none;html=1;strokeColor=#B85450;strokeWidth=3;" edge="1" parent="1" source="p64" target="p128"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="p16" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#ffffff;strokeWidth=2;" vertex="1" parent="1"><mxGeometry x="208" y="92" width="14" height="14" as="geometry" /></mxCell>
+        <mxCell id="p32" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6C8EBF;strokeColor=#ffffff;strokeWidth=2;" vertex="1" parent="1"><mxGeometry x="358" y="344" width="14" height="14" as="geometry" /></mxCell>
+        <mxCell id="p64" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#82B366;strokeColor=#ffffff;strokeWidth=2;" vertex="1" parent="1"><mxGeometry x="508" y="434" width="14" height="14" as="geometry" /></mxCell>
+        <mxCell id="p128" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#B85450;strokeColor=#ffffff;strokeWidth=2;" vertex="1" parent="1"><mxGeometry x="658" y="354" width="14" height="14" as="geometry" /></mxCell>
+        <mxCell id="v16" value="16.753" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#6C8EBF;" vertex="1" parent="1"><mxGeometry x="180" y="70" width="70" height="20" as="geometry" /></mxCell>
+        <mxCell id="v32" value="10.127" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#6C8EBF;" vertex="1" parent="1"><mxGeometry x="330" y="322" width="70" height="20" as="geometry" /></mxCell>
+        <mxCell id="v64" value="7.753" style="text;html=1;align=center;fontSize=12;fontStyle=1;fontColor=#82B366;" vertex="1" parent="1"><mxGeometry x="480" y="452" width="70" height="20" as="geometry" /></mxCell>
+        <mxCell id="v128" value="9.857" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#B85450;" vertex="1" parent="1"><mxGeometry x="630" y="330" width="70" height="20" as="geometry" /></mxCell>
+        <mxCell id="ann64" value="最优 = 物理核 64" style="text;html=1;align=center;fontSize=11;fontStyle=1;fillColor=#D5E8D4;strokeColor=#82B366;rounded=1;" vertex="1" parent="1"><mxGeometry x="430" y="430" width="130" height="24" as="geometry" /></mxCell>
+        <mxCell id="ann128" value="越过物理核，排队等待 +27%" style="text;html=1;align=center;fontSize=11;fontStyle=1;fillColor=#F8CECC;strokeColor=#B85450;rounded=1;" vertex="1" parent="1"><mxGeometry x="590" y="280" width="180" height="24" as="geometry" /></mxCell>
+        <mxCell id="anndown" value="加核到物理核前持续受益（下降）" style="text;html=1;align=center;fontSize=11;fontStyle=2;fontColor=#82B366;" vertex="1" parent="1"><mxGeometry x="200" y="210" width="220" height="20" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
