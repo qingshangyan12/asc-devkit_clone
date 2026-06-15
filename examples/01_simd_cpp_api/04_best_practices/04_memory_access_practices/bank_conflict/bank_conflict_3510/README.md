@@ -1,20 +1,20 @@
-# UB Bank 冲突及离散访存场景验证与分析
+# UB Bank 冲突及离散访存场景验证与分析(架构3510)
 
 ## UB（Unified Buffer）内存结构
+
+![UB Architecture](./figures/ub_arch.png)
 
 - 在 Ascend 950PR/Ascend 950DT 中，UB 空间大小为 256KB；
 - 共有 16 个 **bank**，组成 8 个 **bank group**，每个 bank group 包含 2 个 bank（`bank_id` = 0, 1）；
 - 每个 bank 由 512 行组成（`BANK_DEPTH = 512`），每行长度为 32B（`BANK_WIDTH = 32B`），即每个 bank 大小为 16KB；
-- 每个 bank group 提供 2 个**读口**和 1 个**写口**，每个bank group最多支持两读或者一读一写。
+- 每个bank group最多支持两读或者一读一写。
 - bank_number 相同代表是同一个 bank；bank_group_id 相同代表是同一个 bank group。
-
-![UB Architecture](./figures/ub_arch.png)
 
 ## subbank内存结构
 
-**subbank内存结构只有在离散访存时才被感知**
+**subbank内存结构只有在使用离散与聚合API时需要关注**
 
-Ascend 950PR/Ascend 950DT 每个 bank（32B 宽）分为 4 个 subbank，各 8B 宽 × 512 行深度，各有独立读口：
+Ascend 950PR/Ascend 950DT的每个 bank（32B 宽）分为 4 个 subbank，各 8B 宽 × 512 行深度，各有独立读口：
 
 ```
 bank 内部 layout（一行 32B）：
@@ -24,7 +24,7 @@ bank 内部 layout（一行 32B）：
 └────────┴────────┴────────┴────────┘
 ```
 
-离散访存（Gather/Scatter）时，每个元素可能落入不同的 subbank。同一 subbank 内多个不同地址的读取需要排队，产生 subbank 冲突；而连续访存（LoadAlign/StoreAlign）每次搬运 256B 连续数据，顺序覆盖 4 个 subbank，不感知 subbank 边界。
+使用离散与聚合API时，每个元素可能落入不同的 subbank。同一 subbank 内多个不同地址的读取需要排队，产生 subbank 冲突。
 
 ## UB 地址编码规则
 
@@ -54,35 +54,31 @@ Ascend 950PR/Ascend 950DT的 UB 18 位地址采用**低位交织**编码规则�
 
 从 `base` 地址开始的 8 个 DataBlock 映射到 8 个不同 bank group：
 
-| DataBlock | 偏移 | 物理 bank | BG | BANK |
-|:--:|:----:|:---------:|:--:|:----:|
-| 0 | +0x00 | b | b&7 | b>>3 |
-| 1 | +0x20 | b+1 | (b+1)&7 | (b+1)>>3 |
-| ... | ... | ... | ... | ... |
-| 7 | +0xE0 | b+7 | (b+7)&7 | (b+7)>>3 |
+| DataBlock | 偏移 | 物理 bank | BG |
+|:--:|:----:|:---------:|:--:|
+| 0 | +0x00 | b | b%7 |
+| 1 | +0x20 | b+1 | (b+1)%7 |
+| ... | ... | ... | ... |
+| 7 | +0xE0 | b+7 | (b+7)%7 |
 
 其中 `b = (base >> 5) & 0xF`。8 个 DataBlock 覆盖 BG 0-7 各一次。
 
-## bank 冲突类型（适用连续访存）
+## bank 冲突类型（适用于Reg数据搬入/Reg数据搬出）
 
 根据内存结构，bank 冲突主要分为以下三种类型：
-- **读读冲突**：多个读操作同时访问同一个 bank，或两个以上读操作同时访问同一个 bank group。
+- **读读冲突**：对比Atlas A2/A3系列产品，bankgroup下的读读冲突减少，多个读操作同时访问同一个bank或两个以上读操作同时访问同一个 bank group才会引发冲突。
 - **写写冲突**：多个写操作同时访问同一个 bank group。
 - **读写冲突**：读操作和写操作同时访问同一个 bank。
 
-## 二读一写冲突必然性
+## subbank冲突规则（适用离散与聚合API）
 
-在 Ascend 950PR/Ascend 950DT 上，一条 VF 指令读/写 256B 数据正好覆盖全部 8 个 bank group。由于每个 bank group 最多支持两读或一读一写，两条 Load + 一条 Store 的 2R1W 模式下，**只要 src0 ≠ src1（地址不重叠），每个 bank group 必然出现二读一写，冲突一定发生**。只有地址重叠（src0 = src1）时，硬件将两次读取合并为一次，有效变为 1R1W，才能实现完全不冲突。
-
-## subbank冲突规则（适用离散访存）
-
-- 离散数据属于**不同 subbank**，无冲突（subbank各自独立读口/写口）。
+- 离散数据属于**不同 subbank**，无冲突。
 - 离散数据属于**同 subbank的同起始地址**，无冲突（硬件合并为一次读）。
 - 离散数据属于**同 subbank + 不同起始地址**，发生冲突。
 
 ## 测试场景概览
 
-本文围绕 bank 冲突和离散访存两个角度展开验证分析。所有场景的输入数据类型为 `float`（离散访存场景的 index 为 `uint32_t`），采用 Reg 级 LoadAlign/StoreAlign 指令，通过循环展开执行 1000 次以放大性能差异。
+本文围绕 bank 冲突和离散访存两个角度展开验证分析。所有场景的输入数据类型为 `float`（离散访存场景的 index 为 `uint32_t`），通过循环展开执行 1000 次以放大性能差异。
 
 > **性能说明**：下表"打点性能"为指令连续执行 1000 次的总 cycles 数（`GetSystemCycle` 打点），数值越低性能越好。
 
