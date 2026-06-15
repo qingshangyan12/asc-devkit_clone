@@ -10,7 +10,7 @@
 
 需要包含的头文件为：#include "tensor_api/tensor.h"。
 
-MakeFrameLayout用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。
+MakeFrameLayout用于根据标准分形排布模式构造带类型信息的Layout对象。该接口接收矩阵的行数、列数，结合指定的LayoutPattern（排布模式）和LayoutTrait（布局特征参数）计算Shape和Stride，构造Layout对象。该接口也支持在矩阵维度前传入batch维度，用于构造多batch矩阵的Layout。
 
 LayoutPattern决定数据在内存中的分形排列方式，不同存储位置间的搬运和计算操作要求源/目的张量满足特定的LayoutPattern组合。
 
@@ -19,6 +19,16 @@ LayoutPattern决定数据在内存中的分形排列方式，不同存储位置�
 ```cpp
 template <typename LayoutPattern, typename TraitType, typename... Args>
 __aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+```
+
+常用调用形式如下。
+
+```cpp
+// 构造单个矩阵Layout，m为行数，n为列数。
+auto layout = MakeFrameLayout<LayoutPattern, TraitType>(m, n);
+
+// 构造batch矩阵Layout，batch为矩阵个数，m为单个矩阵的行数，n为单个矩阵的列数。
+auto batchLayout = MakeFrameLayout<LayoutPattern, TraitType>(batch, m, n);
 ```
 
 ### LayoutTrait的指定方式
@@ -56,7 +66,7 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 | :--- | :---: | :--- |
 | LayoutPattern | 输入 | 布局模式模板参数。支持的LayoutPattern及数据排布格式见[Layout和层次化表述法](Layout和层次化表述法.md)。 |
 | TraitType | 输入 | 布局特征类型，默认内部根据LayoutPattern自动推导。支持上述四种传递方式。 |
-| Args | 输入 | 构造参数。常见为矩阵的行数m和列数n。各LayoutPattern的构造参数数量可能不同。 |
+| Args | 输入 | 构造参数。常见为矩阵的行数m和列数n；batch模式为batch、m、n。各LayoutPattern的构造参数数量可能不同。 |
 
 ## 返回值说明
 
@@ -66,6 +76,7 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 
 - LayoutPattern必须是已支持的排布模式之一，不支持的模式会触发编译期报错。
 - 构造参数的个数和含义由LayoutPattern决定。常见二维场景传入(m, n)即可。
+- batch模式传入(batch, m, n)，其中m和n表示单个矩阵的行数和列数，batch表示连续排布的矩阵个数。
 - TraitType必须为整型常量、TraitType类型或具体数据类型，不支持的类型会触发编译期报错。
 
 ## 调用示例
@@ -95,4 +106,12 @@ struct MyLayoutTrait {
     static constexpr auto C0_ELEMENT = Std::Int<16>{};
 };
 auto layoutCustom = MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n);
+
+// 构造batch矩阵布局
+auto layoutBatchNZ = MakeFrameLayout<NZLayoutPtn, float>(batch, m, n);
+auto l1BatchTensor = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutBatchNZ);
+
+// 构造MX场景的scale batch布局
+auto layoutBatchScaleA = MakeFrameLayout<ScaleANDLayoutPtn>(batch, scaleM, scaleK);
+auto gmScaleTensor = MakeTensor(MakeMemPtr<Location::GM>(scaleAddr), layoutBatchScaleA);
 ```
