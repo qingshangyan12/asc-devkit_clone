@@ -185,7 +185,6 @@ $dst_i = \frac{1}{src_i}$
   <!-- npu="910b" id28 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id28 -->
-
 <!-- end id29 -->
 
 - 如果src中的数值为0，可能会产生未知结果。

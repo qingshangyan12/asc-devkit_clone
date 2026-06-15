@@ -139,7 +139,6 @@ T和U支持的数据类型为：half、float。
   <!-- npu="910b" id11 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id11 -->
-
 <!-- end id12 -->
 
 ## 调用示例<a name="section112161084424"></a>

@@ -192,7 +192,6 @@ $dst_i = src0_i / src1_i$
   <!-- npu="910b" id28 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id28 -->
-
 <!-- end id29 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

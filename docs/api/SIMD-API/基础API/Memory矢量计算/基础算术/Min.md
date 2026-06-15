@@ -126,7 +126,6 @@ $dst_i = min(src0_i, src1_i)$
   <!-- npu="910b" id19 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id19 -->
-
 <!-- end id20 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>

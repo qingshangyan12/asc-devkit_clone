@@ -152,7 +152,6 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
   <!-- npu="910b" id19 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
   <!-- end id19 -->
-
 <!-- end id20 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
