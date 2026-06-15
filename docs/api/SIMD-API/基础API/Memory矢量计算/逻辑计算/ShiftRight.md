@@ -100,55 +100,39 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 
 ### scalarValue取值说明
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id1 -->
 - 针对Ascend 950PR/Ascend 950DT，scalarValue的取值应大于等于0。逻辑右移的情况下，如果右移的位数大于src数据类型位宽，dst的全部元素被赋值为0；算术右移的情况下，如果右移的位数大于src数据类型位宽，源操作数元素为正数，对应的目的操作数元素被赋值为0，源操作数元素为负数，对应的目的操作数元素被赋值为-1。
+<!-- end id1 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id2 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+<!-- end id2 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id3 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
+<!-- end id3 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id4 -->
 - 针对Atlas 200I/500 A2 推理产品，当src为uint16_t或int16_t类型时，scalarValue的取值范围为[0, 16]；当src为uint32_t或int32_t类型时，scalarValue的取值范围为[0, 32]。
-
-</cann-filter>
+<!-- end id4 -->
 
 ## 数据类型
 
-<cann-filter npu-type="950">
-
+<!-- npu="950" id5 -->
 - 针对Ascend 950PR/Ascend 950DT，T和U支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t、int64_t、uint64_t。数据类型int8_t、uint8_t、int64_t、uint64_t仅支持tensor前n个数据计算接口。
+<!-- end id5 -->
 
-</cann-filter>
-
-<cann-filter npu-type="A3">
-
+<!-- npu="A3" id6 -->
 - 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id6 -->
 
-</cann-filter>
-
-<cann-filter npu-type="910b">
-
+<!-- npu="910b" id7 -->
 - 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
+<!-- end id7 -->
 
-</cann-filter>
-
-<cann-filter npu-type="310b">
-
+<!-- npu="310b" id8 -->
 - 针对Atlas 200I/500 A2 推理产品，T和U支持的数据类型为：int16_t、uint16_t、int32_t、uint32_t。
-
-</cann-filter>
+<!-- end id8 -->
 
 ## 返回值说明<a name="section194321251175110"></a>
 
@@ -159,22 +143,16 @@ dst和src使用[TensorTrait](../../数据结构/辅助数据结构/TensorTrait/T
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../../通用说明和约束.md)。
 
-<cann-filter npu-type="A3,910b">
-
+<!-- npu="A3,910b" id11 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
 
-  <cann-filter npu-type="A3">
-
+  <!-- npu="A3" id9 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
-
-  </cann-filter>
-  <cann-filter npu-type="910b">
-
+<!-- end id9 -->
+  <!-- npu="910b" id10 -->
   - Atlas A2 训练系列产品/Atlas A2 推理系列产品
-
-  </cann-filter>
-
-</cann-filter>
+<!-- end id10 -->
+<!-- end id11 -->
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
