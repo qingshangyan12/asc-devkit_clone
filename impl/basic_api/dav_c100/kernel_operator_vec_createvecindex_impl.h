@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_VEC_CREATEVECINDEX_IMPL_H
 #include "kernel_tensor.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 #pragma begin_pipe(V)

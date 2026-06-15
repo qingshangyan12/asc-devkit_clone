@@ -24,7 +24,7 @@
 #include "kernel_operator_vec_template_impl.h"
 #include "reg_compute/kernel_reg_compute_intf.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 namespace AscendC {

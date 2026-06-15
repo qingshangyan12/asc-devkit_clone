@@ -23,7 +23,7 @@
 #define IMPL_MATH_SIGN_SIGN_COMMON_IMPL_H
 #include <type_traits>
 #include "kernel_basic_intf.h"
-#include "kernel_log.h"
+#include "../../../../basic_api/kernel_log.h"
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "../../common/check.h"

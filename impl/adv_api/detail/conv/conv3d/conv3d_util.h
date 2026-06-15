@@ -18,7 +18,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tiling/kernel_tiling.h"
-#include "kernel_utils.h"
+#include "../../../../basic_api/kernel_utils.h"
 #include "../common/conv_forward_util.h"
 
 namespace Conv3dApi {

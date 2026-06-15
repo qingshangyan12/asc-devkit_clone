@@ -23,7 +23,7 @@
 #include "kernel_common.h"
 #include "kernel_struct_binary.h"
 #if ASCENDC_CPU_DEBUG
-#include "kernel_check.h"
+#include "../kernel_check.h"
 #endif
 
 #pragma begin_pipe(V)

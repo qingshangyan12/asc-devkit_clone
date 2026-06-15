@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_LAYERNORM_LAYERNORM_COMMON_IMPL_H
 
 #include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/normalization/normalize.h"
 #include "layernorm_common_basic_impl.h"

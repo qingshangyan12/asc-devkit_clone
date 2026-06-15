@@ -23,7 +23,7 @@
 #define IMPL_MATH_TAN_TAN_COMMON_IMPL_H
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "../../common/check.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/math/tan/tan_check.h"

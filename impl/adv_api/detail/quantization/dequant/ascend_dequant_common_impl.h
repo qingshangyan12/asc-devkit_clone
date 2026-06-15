@@ -25,7 +25,7 @@
 
 #include "kernel_basic_intf.h"
 #include "kernel_tensor.h"
-#include "kernel_pop_stack_buffer.h"
+#include "../../../../basic_api/kernel_pop_stack_buffer.h"
 #include "ascend_dequant_common.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/quantization/dequant/dequant_check.h"
