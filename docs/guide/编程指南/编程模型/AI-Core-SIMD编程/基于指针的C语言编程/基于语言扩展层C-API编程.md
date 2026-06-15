@@ -255,14 +255,14 @@ __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* 
     __ubuf__ float yLocal[TILE_LENGTH];
     __ubuf__ float zLocal[TILE_LENGTH];
 
-    asc_copy_gm2ub((__ubuf__ void*)xLocal, (__gm__ void*)xGm, blockLength * sizeof(float));
-    asc_copy_gm2ub((__ubuf__ void*)yLocal, (__gm__ void*)yGm, blockLength * sizeof(float));
+    asc_copy_gm2ub(xLocal, xGm, blockLength * sizeof(float));
+    asc_copy_gm2ub(yLocal, yGm, blockLength * sizeof(float));
     asc_sync();
 
     asc_add(zLocal, xLocal, yLocal, blockLength);
     asc_sync();
 
-    asc_copy_ub2gm((__gm__ void*)zGm, (__ubuf__ void*)zLocal, blockLength * sizeof(float));
+    asc_copy_ub2gm(zGm, zLocal, blockLength * sizeof(float));
     asc_sync();
 }
 ```
@@ -286,12 +286,12 @@ __vector__ __global__ __aicore__ void add_custom(__gm__ float* x, __gm__ float* 
 
     uint32_t blockLength = TILE_LENGTH * NUM_BLOCKS / asc_get_block_num();
 
-    asc_copy_gm2ub_sync((__ubuf__ void*)xLocal, (__gm__ void*)(x + asc_get_block_idx() * blockLength), blockLength * sizeof(float));
-    asc_copy_gm2ub_sync((__ubuf__ void*)yLocal, (__gm__ void*)(y + asc_get_block_idx() * blockLength), blockLength * sizeof(float));
+    asc_copy_gm2ub_sync(xLocal, (x + asc_get_block_idx() * blockLength), blockLength * sizeof(float));
+    asc_copy_gm2ub_sync(yLocal, (y + asc_get_block_idx() * blockLength), blockLength * sizeof(float));
 
     asc_add_sync(zLocal, xLocal, yLocal, blockLength);
 
-    asc_copy_ub2gm_sync((__gm__ void*)(z + asc_get_block_idx() * blockLength), (__ubuf__ void*)zLocal, blockLength * sizeof(float));
+    asc_copy_ub2gm_sync((z + asc_get_block_idx() * blockLength), zLocal, blockLength * sizeof(float));
 }
 
 ```
