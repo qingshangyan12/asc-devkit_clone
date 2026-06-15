@@ -14,18 +14,14 @@
 """
 gen_data.py — bank_conflict 样例数据生成
 
-支持 CASE_NUM=1~9，按地址重叠关系分三类优化：
+支持 CASE_NUM=1~8，按地址重叠关系分两类优化：
 
   1. CASE 1~5 — z 与 x/y 无地址重叠
      1000 次 z = x + y 幂等，golden = x + y，无需循环。
 
-  2. CASE 6, 8, 9 — z == y（完全重叠），单次 Add 内无跨 repeat 干扰
+  2. CASE 6, 7, 8 — z == y（完全重叠），单次 Add 内无跨 repeat 干扰
      每次迭代 result += src0_pattern，需逐次累加以保证 float32 精度一致。
      src0_pattern 根据 src0BlkStride / src0RepStride 构建。
-
-  3. CASE 7 — z = y + 8 floats（部分重叠），单次 Add 内存在跨 repeat 读写干扰
-     1000 次迭代后（> 512）收敛到不动点，golden 可由 stride-8 累加和解析计算：
-       golden[i::8] = cumsum(x[i::8]) + y[i]
 """
 
 import numpy as np
@@ -48,9 +44,8 @@ ADDR_CONFIGS = {
     4: (0x00000, 0x10100, 0x04000),
     5: (0x00000, 0x10100, 0x04020),
     6: (0x00000, 0x10100, 0x10100),
-    7: (0x00000, 0x10100, 0x10120),
+    7: (0x00000, 0x10100, 0x10100),
     8: (0x00000, 0x10100, 0x10100),
-    9: (0x00000, 0x10100, 0x10100),
 }
 
 # ---- BinaryRepeatParams: (dstBlkS, src0BlkS, src1BlkS, dstRepS, src0RepS, src1RepS) ----
@@ -61,9 +56,8 @@ STRIDE_CONFIGS = {
     4: (1, 1, 1, 8, 8, 8),
     5: (1, 1, 1, 8, 8, 8),
     6: (1, 1, 1, 8, 8, 8),
-    7: (1, 1, 1, 8, 8, 8),
-    8: (1, 0, 1, 8, 1, 8),
-    9: (1, 0, 1, 8, 8, 8),
+    7: (1, 0, 1, 8, 1, 8),
+    8: (1, 0, 1, 8, 8, 8),
 }
 
 
@@ -89,7 +83,7 @@ def _gen_golden_no_overlap(x_data, y_data):
 
 
 def _gen_golden_z_eq_y(x_data, y_data, case_num):
-    """CASE 6, 8, 9: z == y，无跨 repeat 干扰。
+    """CASE 6, 7, 8: z == y，无跨 repeat 干扰。
     每次 Add 调用 result += src0_pattern，逐次累加保证 float32 精度一致。
     """
     src0_pattern = _build_src0_pattern(x_data, case_num)
@@ -99,16 +93,6 @@ def _gen_golden_z_eq_y(x_data, y_data, case_num):
     return result
 
 
-def _gen_golden_case7(x_data, y_data):
-    """CASE 7: z = y + 8 floats，跨 repeat 读写干扰。
-    1000 次迭代后收敛到不动点（512 < 1000 即可收敛），由 stride-8 累加和解析计算：
-      golden[i::8] = cumsum(x[i::8]) + y[i]
-    """
-    x_mat = x_data.reshape(-1, 8)  # (512, 8)
-    golden = (np.cumsum(x_mat, axis=0) + y_data[:8]).reshape(-1)
-    return golden.astype(np.float32)
-
-
 def gen_golden_data(case_num):
     np.random.seed(0)
     input_x = np.random.uniform(1, 100, [TOTAL_LENGTH]).astype(np.float32)
@@ -116,8 +100,6 @@ def gen_golden_data(case_num):
 
     if case_num in (1, 2, 3, 4, 5):
         golden = _gen_golden_no_overlap(input_x, input_y)
-    elif case_num == 7:
-        golden = _gen_golden_case7(input_x, input_y)
     else:
         golden = _gen_golden_z_eq_y(input_x, input_y, case_num)
 
@@ -133,7 +115,7 @@ def gen_golden_data(case_num):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate test data for bank_conflict")
     parser.add_argument("--case", "-c", type=int, default=None,
-                        help="case number (1-9), overrides CASE_NUM env")
+                        help="case number (1-8), overrides CASE_NUM env")
     args = parser.parse_args()
 
     case_num = args.case if args.case is not None else int(os.environ.get("CASE_NUM", "1"))

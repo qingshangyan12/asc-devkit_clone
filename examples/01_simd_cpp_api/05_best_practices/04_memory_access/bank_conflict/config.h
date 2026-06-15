@@ -44,15 +44,9 @@ constexpr uint32_t zLocalAddr = 0x10100;
 
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x10100;
-constexpr uint32_t zLocalAddr = 0x10120;
-
-#elif CASE_NUM == 8
-
-constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x10100;
 constexpr uint32_t zLocalAddr = 0x10100;
 
-#elif CASE_NUM == 9
+#elif CASE_NUM == 8
 
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x10100;
