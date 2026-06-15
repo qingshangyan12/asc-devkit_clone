@@ -918,3 +918,38 @@
 </tr>
 </tbody>
 </table>
+
+>[!CAUTION]注意
+> 同一接口若提供多个重载原型，可能只有部分原型会使用UB预留空间。
+## 使用8KB预留空间的API<a name="section_reserved_ubuf_api"></a>
+
+以下API内部会使用Ascend C预留的8KB UB空间。开启`--cce-disable-asc-reserved-ubuf`编译选项后，在对应产品版本下调用下表中的API会触发编译期报错。
+>[!CAUTION]注意
+> 同一接口若提供多个重载原型，可能只有部分原型会使用UB预留空间。
+
+<!-- npu="A3,910b" id1 -->
+**表5**  针对 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用8KB预留空间的API范围
+
+| API类别 | API名 |
+| --- | --- |
+| 基础API | AddDeqRelu、Select |
+| 高阶API | Digamma、Lgamma、Power、Sign、LayerNorm、DropOut、SelectWithBytesMask |
+<!-- end id1 -->
+
+<!-- npu="950" id2 -->
+**表6**  针对 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用8KB预留空间的API范围
+
+| API类别 | API名 |
+| --- | --- |
+| 基础API > Memory数据搬运 | Copy |
+| 基础API > 基础算术 | Exp、Ln、Abs、Reciprocal、Sqrt、Rsqrt、Relu、Add、Sub、Mul、Div、Max、Min、Adds、Muls、Maxs、Mins、LeakyRelu、Subs、Divs |
+| 基础API > 逻辑计算 | Not、And、Or、ShiftLeft、ShiftRight、Ands、Ors |
+| 基础API > 复合计算 | Axpy、CastDequant、CastDeq、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu、MulAddRelu |
+| 基础API > 比较与选择 | Compare、Compares、CompareScalar、Select、GatherMask |
+| 基础API > 类型转换 | Cast |
+| 基础API > 归约计算 | ReduceRepeat、ReduceDataBlock、ReducePairElem、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、WholeReduceMax、WholeReduceMin、WholeReduceSum |
+| 基础API > 数据填充 | Duplicate |
+| 基础API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |
+| 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
+| 高阶API | AscendAntiQuant、AdjustSoftMaxRes、TopK |
+<!-- end id2 -->
