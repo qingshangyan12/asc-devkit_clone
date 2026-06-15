@@ -22,7 +22,7 @@ SocVersion PlatformAscendCManager::SocVersionMap(const char* socVersionStr) { re
 fe::PlatFormInfos* PlatformAscendCManager::PlatformAscendCInit(const char* customSocVersion) { return nullptr; }
 PlatformAscendC* PlatformAscendCManager::PlatformAscendCManagerInit(const char* customSocVersion)
 {
-    fe::PlatFormInfos pfs;
+    static fe::PlatFormInfos pfs;
     static PlatformAscendC pfc(&pfs);
     platformInfo = &pfc;
     return nullptr;
