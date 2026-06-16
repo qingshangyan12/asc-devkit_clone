@@ -21,9 +21,8 @@ REGISTER_OP("AddCustom") // TensorFlow自定义算子名称
     .Input("y: T")       // 输入tensor y
     .Output("z: T")      // 输出tensor z
     .Attr("T: {half}")   // 属性T，支持half数据类型
-    .SetShapeFn(
-        shape_inference::
-            BroadcastBinaryOpShapeFn); // 设置shape函数，用于推断输出tensor的shape，BroadcastBinaryOpShapeFn函数用于处理输入、输出tensor的shape相同的情况
+    // 设置shape函数，用于推断输出tensor的shape，BroadcastBinaryOpShapeFn函数用于处理输入、输出tensor的shape相同的情况
+    .SetShapeFn(shape_inference::BroadcastBinaryOpShapeFn);
 
 // TensorFlow自定义算子的CPU实现
 class AddCustomOp : public OpKernel {
