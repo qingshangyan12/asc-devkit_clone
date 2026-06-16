@@ -23,11 +23,11 @@ T shfl_down(T var, unsigned int delta) const
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| var | 输入 | 线程用于交换的输入操作数。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t。 |
+| var | 输入 | 线程用于交换的输入操作数。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t、bfloat16_t、bfloat16x2_t。 |
 | delta | 输入 | 期望获取的`var`值所在线程在组内相对当前线程的向后偏移值。 |
 
 ## 返回值说明
@@ -42,7 +42,7 @@ T shfl_down(T var, unsigned int delta) const
 
 以4个线程为一组划分线程块，获取协作组内当前线程向后偏移`delta`的线程输入的`var`值。
 
-**图 1**  shfl_down接口返回结果示意图  
+**图1**  shfl_down接口返回结果示意图  
 ![](../../../figures/thread_block_tile_shfl_down.png "thread_block_tile_shfl_down")
 
 - SIMT编程场景：

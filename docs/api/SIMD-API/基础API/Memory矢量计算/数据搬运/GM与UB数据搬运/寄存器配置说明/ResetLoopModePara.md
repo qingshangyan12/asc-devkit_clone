@@ -18,7 +18,7 @@
 
 重置loop mode的参数。与[SetLoopModePara](SetLoopModePara.md)搭配使用，在使能loop mode并且设置loop mode的参数的数据搬运场景下，数据搬运结束后需要调用该函数来重置loop mode参数。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../../../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -33,7 +33,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|----------|------|

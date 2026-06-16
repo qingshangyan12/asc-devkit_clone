@@ -23,11 +23,11 @@ T shfl_xor(T var, unsigned int lane_mask) const
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| var | 输入 | 线程用于交换的输入操作数。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t。 |
+| var | 输入 | 线程用于交换的输入操作数。支持的数据类型为：half、int32_t、uint32_t、float、half2、int64_t、uint64_t、bfloat16_t、bfloat16x2_t。 |
 | lane_mask | 输入 | 与当前线程rank做异或运算的操作数。 |
 
 ## 返回值说明
@@ -42,7 +42,7 @@ T shfl_xor(T var, unsigned int lane_mask) const
 
 以4个线程为一组划分线程块，获取组内当前线程rank与`lane_mask`按位异或后对应rank线程输入的`var`值。
 
-**图 1**  shfl_xor接口返回结果示意图  
+**图1**  shfl_xor接口返回结果示意图  
 ![](../../../figures/thread_block_tile_shfl_xor.png "thread_block_tile_shfl_xor")
 
 - SIMT编程场景：

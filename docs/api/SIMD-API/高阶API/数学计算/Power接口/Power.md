@@ -123,7 +123,7 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -142,15 +142,15 @@ struct PowerConfig {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src0Tensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| src1Tensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
+| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src0Tensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
+| src1Tensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
 | src0Scalar/src1Scalar | 输入 | 源操作数，类型为Scalar。源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时内存空间。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>针对3个power接口，不同输入数据类型情况下，临时空间大小BufferSize的获取方式请参考[GetPowerMaxMinTmpSize](GetPowerMaxMinTmpSize.md)。 |
+| sharedTmpBuffer | 输入 | 临时内存空间。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>针对3个power接口，不同输入数据类型情况下，临时空间大小BufferSize的获取方式请参考[GetPowerMaxMinTmpSize](GetPowerMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明
@@ -198,7 +198,7 @@ AscendC::Power<T, false>(dstLocal, srcLocalBase, scalarValueExp);
 // AscendC::Power<srcType, false, config>(dstLocal, scalarValue, srcLocal2);
 ```
 
-AscendC::Power<T, false\>\(dstLocal, srcLocalBase, srcLocalExp\) 示例数据如下：
+AscendC::Power<T, false\>\(dstLocal, srcLocalBase, srcLocalExp\)示例数据如下：
 
 ```
 输入数据(srcLocalBase): [2 3 4 5 6 7 8 9]
@@ -206,7 +206,7 @@ AscendC::Power<T, false\>\(dstLocal, srcLocalBase, srcLocalExp\) 示例数据如
 输出数据(dstLocal): [16 27 16 5 1296 343 64 9]
 ```
 
-AscendC::Power<T, false\>\(dstLocal, scalarValueBase, srcLocalExp\) 示例数据如下：
+AscendC::Power<T, false\>\(dstLocal, scalarValueBase, srcLocalExp\)示例数据如下：
 
 ```
 输入数据(scalarValueBase): 2
@@ -214,7 +214,7 @@ AscendC::Power<T, false\>\(dstLocal, scalarValueBase, srcLocalExp\) 示例数据
 输出数据(dstLocal): [16 8 4 2 16 8 4 2]
 ```
 
-AscendC::Power<T, false\>\(dstLocal, srcLocalBase, scalarValueExp\) 示例数据如下：
+AscendC::Power<T, false\>\(dstLocal, srcLocalBase, scalarValueExp\)示例数据如下：
 
 ```
 输入数据(srcLocalBase): [2 3 4 5 6 7 8 9]

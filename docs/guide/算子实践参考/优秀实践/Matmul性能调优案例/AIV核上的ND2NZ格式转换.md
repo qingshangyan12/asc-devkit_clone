@@ -2,7 +2,7 @@
 
 ## 案例介绍<a name="section17413194624510"></a>
 
-本案例展示了在矩阵乘算子场景中，使用Matmul高阶API进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMT算子实现/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及数据搬运。但在数据非256字节对齐时，[随路ND2NZ指令](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/随路转换ND2NZ搬运.md)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐数据搬运存在的效率低的问题，从而提升算子性能。
+本案例展示了在矩阵乘算子场景中，使用Matmul高阶API进行计算，对内轴（内轴即矩阵的行方向）非256字节对齐的输入矩阵，在AIV核上进行ND2NZ格式转换对算子性能提升的效果。为提升Cube单元的计算效率，ND格式的输入矩阵在执行Cube计算前会先转换为NZ格式，ND格式和NZ格式的具体内容可参考[数据格式](../../SIMD算子实现/矩阵编程（高阶API）/基础知识.md#zh-cn_topic_0000001622194138_section1453415011)。Matmul API内部使用随路ND2NZ指令同时进行格式转换以及数据搬运。但在数据非256字节对齐时，[随路ND2NZ指令](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-ND2NZ搬运（DataCopy）.md)存在带宽利用率低的问题。因此输入矩阵的内轴非256字节对齐时，在进行Matmul计算前，利用AIV核上Vector计算单元完成ND格式到NZ格式的转换，可以避免随路非对齐数据搬运存在的效率低的问题，从而提升算子性能。
 
 -   AIV核上的ND2NZ格式转换的适用场景
 
@@ -10,7 +10,7 @@
 
 本案例的算子规格如下：
 
-**表 1**  算子规格
+**表1**  算子规格
 
 <a name="table101751125175213"></a>
 <table><thead align="left"><tr id="row8175525185219"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1417582516529"><a name="p1417582516529"></a><a name="p1417582516529"></a>输入</p>
@@ -113,7 +113,7 @@
 -   优化后的Cube流水图如下所示，不使用随路ND2NZ指令对B矩阵进行格式转换后，MTE2的占比明显下降。![](../../../figures/zh-cn_image_0000002443251985.png)
 -   优化后的Profiling数据如下，可以看到同时使用Cube单元和Vector单元，aic\_time最大耗时90.95us，其中aic\_mte2\_ratio占比明显降低。![](../../../figures/zh-cn_image_0000002381162386.png)![](../../../figures/zh-cn_image_0000002414561861.png)
 
-**表 2**  端到端性能对比
+**表2**  端到端性能对比
 
 <a name="table135810433437"></a>
 <table><thead align="left"><tr id="row65820433437"><th class="cellrowborder" valign="top" width="22.61%" id="mcps1.2.5.1.1"><p id="p75827438435"><a name="p75827438435"></a><a name="p75827438435"></a>优化方法</p>

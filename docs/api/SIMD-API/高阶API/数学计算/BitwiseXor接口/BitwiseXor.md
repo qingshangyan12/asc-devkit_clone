@@ -25,7 +25,7 @@ __aicore__ inline void BitwiseXor(const LocalTensor<T>& dst, const LocalTensor<T
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -38,12 +38,12 @@ struct BitwiseXorConfig {
 };
 ```
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 类型 | 说明 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| src0、src1 | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| src0、src1 | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型需要与目的操作数保持一致。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明
@@ -74,4 +74,3 @@ AscendC::BitwiseXor(dst, src0, src1, count);
 输出数据（dst）:
 [79, 14, 21, 81, ... -24]
 ```
-

@@ -18,7 +18,7 @@
 
 以float类型，ND格式，firstValue和diffValue输入Scalar为例，描述Arange高阶API内部算法框图，如下图所示。
 
-**图 1**  Arange算法框图  
+**图1**  Arange算法框图  
 ![](../../../figures/Arange算法框图.png "Arange算法框图")
 
 计算过程分为如下几步，均在Vector上进行：
@@ -36,17 +36,17 @@ __aicore__ inline void Arange(const LocalTensor<T>& dst, const T firstValue, con
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。不同型号支持的数据类型请参考[支持的数据类型](#li73338460199)。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。dst的大小应大于等于count * sizeof(T)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。dst的大小应大于等于count * sizeof(T)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | firstValue | 输入 | 等差数列的首个元素值。 |
 | diffValue | 输入 | 等差数列元素之间的差值，应大于等于0。 |
 | count | 输入 | 等差数列的长度。count>0。 |

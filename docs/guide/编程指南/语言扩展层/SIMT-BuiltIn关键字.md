@@ -4,12 +4,12 @@
 
 函数执行空间限定符（Function Execution Space Qualifier）指示函数是在Host侧执行还是在Device侧执行，以及能被调用的空间范围。
 
-**表 1**  函数执行空间限定符概览
+**表1**  函数执行空间限定符概览
 
 <a name="table121121062614"></a>
 | 函数执行空间限定符 | 执行空间（Host） | 执行空间（Device） | 允许调用函数空间（Host） | 允许调用函数空间（Device） |
 | --- | --- | --- | --- | --- |
-| \_\_host\_\_， 无限定符 | √ | x | √ | x |
+| \_\_host\_\_，无限定符 | √ | x | √ | x |
 | \_\_aicore\_\_ | x | √ | x | √ |
 | \_\_global\_\_ | x | √ | √ | x |
 
@@ -95,16 +95,16 @@
     -   对于二维线程块，其线程ID为二维结构，其计算公式为：
 
         ```
-        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x；
-        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y；
+        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
+        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
         ```
 
     -   对于三维线程块，其线程ID为三维结构，其计算公式为：
 
         ```
-        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x；
-        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y；
-        thread_id_z = blockIdx.z * blockDim.z + threadIdx.z；
+        thread_id_x = blockIdx.x * blockDim.x + threadIdx.x;
+        thread_id_y = blockIdx.y * blockDim.y + threadIdx.y;
+        thread_id_z = blockIdx.z * blockDim.z + threadIdx.z;
         ```
 
 当前提供了以下仅在Device上可用的int类型的内置变量：
@@ -117,7 +117,7 @@
 
 目前提供了一系列适用于Device侧的数据类型，包括标量和短向量。短向量是由多个元素组成的简单向量。
 
-**表 2**  标量数据类型
+**表2**  标量数据类型
 
 <a name="table114921244133211"></a>
 | 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
@@ -149,20 +149,20 @@
 | signed short (16bit) | short2 | short3 | short4 |
 | unsigned int | uint2 | uint3 | uint4 |
 | signed int | int2 | int3 | int4 |
-| 无符号的长整型 (64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
-| 有符号的长整型 (64bit) | longlong2 | longlong3 | longlong4 |
-| 无符号的长整型 (32bit) | ulong2 | ulong3 | ulong4 |
-| 有符号的长整型 (32bit) | long2 | long3 | long4 |
+| 无符号的长整型(64bit) | ulonglong2 | ulonglong3 | ulonglong4 |
+| 有符号的长整型(64bit) | longlong2 | longlong3 | longlong4 |
+| 无符号的长整型(32bit) | ulong2 | ulong3 | ulong4 |
+| 有符号的长整型(32bit) | long2 | long3 | long4 |
 | 浮点型，1符号位，2指数位，1尾数位 | float4_e2m1x2_t | - | - |
 | 浮点型，1符号位，1指数位，2尾数位 | float4_e1m2x2_t | - | - |
 | 浮点型，1符号位，4指数位，3尾数位 | float8_e4m3x2_t | - | - |
 | 浮点型，1符号位，5指数位，2尾数位 | float8_e5m2x2_t | - | - |
-| 浮点型 hif8 | hifloat8x2_t | - | - |
+| 浮点型hif8 | hifloat8x2_t | - | - |
 | 浮点型，1符号位，5指数位，10尾数位 | half2 | - | - |
 | 浮点型，1符号位，8指数位，7尾数位 | bfloat16x2_t | - | - |
 | 浮点型，1符号位，8指数位，23尾数位 | float2 | float3 | float4 |
 
-**表 3**  短向量数据类型
+**表3**  短向量数据类型
 
 <a name="table13856144241"></a>
 | 数据类型 | 内存大小（字节） | 地址对齐（字节） |
@@ -187,7 +187,7 @@
 
 SIMT编程提供了一系列运算符，用于执行数学运算。以下是支持的运算符列表。
 
-**表 4**  SIMT编程支持的运算符列表
+**表4**  SIMT编程支持的运算符列表
 
 <a name="table11745172843710"></a>
 | 类别 | 运算符 | bool | int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t | half/bfloat16_t/float | half2/bfloat16x2_t | hifloat8_t |
@@ -216,6 +216,8 @@ SIMT编程提供了一系列运算符，用于执行数学运算。以下是支�
 | 逻辑运算符 | \|\| | √ | √ | √ | x | x |
 | 逻辑运算符 | ! | √ | √ | √ | x | x |
 | 条件运算符 | a ? b : c | √ | √ | √ | √ | x |
+
+> **约束说明**：除法运算符（/）当前不支持Subnormal（指数位全为0，且尾数位不全为0，表示接近零的极小值）输入，当输入为Subnormal值时会被刷为0。
 
 运算符使用示例如下所示：
 
@@ -257,7 +259,7 @@ res[idx] = x[idx] > y[idx] ? x[idx] : y[idx];
 
 -   blocks\_per\_grid：dim3类型，用于指定网格（Grid）的维度与规模。blocks\_per\_grid.x \* blocks\_per\_grid.y \* blocks\_per\_grid.z等于启动的线程块总数，不能超过65535。
 -   threads\_per\_block：dim3类型，用于指定每个线程块（Thread Block）的维度与规模。threads\_per\_block.x \* threads\_per\_block.y \* threads\_per\_block.z等于每个线程块包含的线程数，需要小于等于\_\_launch\_bounds\_\_配置。
--   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#共享内存unified-buffer)中的“动态申请”方式。
+-   dyn\_ubuf\_size：size\_t类型，用于指定每个线程块动态分配的共享内存大小，单位为字节。这部分内存供数组使用，具体用法请参考[共享内存](../编程模型/AI-Core-SIMT编程/内存层级.md#section66329146410)中的“动态申请”方式。
 -   stream：aclrtStream类型，指定关联的流，用于维护异步操作的执行顺序。
 
 以下示例展示了内核函数的声明与调用方式。
@@ -274,7 +276,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
 在执行函数之前，会先对上述配置参数进行校验。如果blocks\_per\_grid或threads\_per\_block超出设备的最大允许规模，或dyn\_ubuf\_size超过分配静态内存后剩余的可用共享内存，该函数将会执行失败。
 
-一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\) 限定符或 \_\_maxnreg\_\_\(\) 限定符指定。
+一个核函数所使用的寄存器数量会显著影响常驻线程束的数量。核函数使用的寄存器数量通过 \_\_launch\_bounds\_\_\(\)限定符或 \_\_maxnreg\_\_\(\)限定符指定。
 
 使用上述两个可选配置的限定符时，请注意如下约束：
 -   \_\_launch\_bounds\_\_或\_\_maxnreg\_\_只能在\_\_global\_\_函数中使用。
@@ -286,7 +288,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
   
     函数标记宏，在核函数上可选配置，用于指定核函数启动的最大线程数。最大线程数决定了每个线程可分配的寄存器数量，具体对应关系请见下表，寄存器用于存储线程中的局部变量，若局部变量的个数超出寄存器个数，容易出现栈溢出等问题。建议最大线程数与启动核函数时的dim3线程数保持一致。
     
-    **表 5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
+    **表5**  \_\_launch\_bounds\_\_的Thread数量与每个Thread可用寄存器数
 
     <a name="table1715318510594"></a>
     | Thread的个数(个) | 每个Thread可用寄存器个数(个) |
@@ -319,7 +321,7 @@ add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(x, y, 
 
     每个线程可用的最大寄存器数量对每个block实际启动的线程数有限制，具体对应关系请见下表。
 
-    **表 6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与每个block实际可启动的线程数
+    **表6**  \_\_maxnreg\_\_的每个Thread最多可分配的寄存器数与每个block实际可启动的线程数
 
     | 单个线程最多可分配的寄存器数量(个) | 每个block实际可启动的线程数(个) |
     | --- | --- |

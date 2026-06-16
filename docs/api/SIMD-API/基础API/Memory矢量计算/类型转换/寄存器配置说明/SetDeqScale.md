@@ -53,11 +53,11 @@
 
 本接口用于设置DEQSCALE寄存器的值，DEQSCALE寄存器位宽为64bit，用于Vector计算单元上的量化计算，寄存器中存放的参数在不同场景下的含义不同：
 
-**表 1**  DEQSCALE寄存器比特位含义映射表
+**表1**  DEQSCALE寄存器比特位含义映射表
 
 | 模式 | 比特位数 | 变量名 | 含义 |
 | :--- | :------- | :----- | :--- |
-| [AddDeqRelu](../../复合计算/AddDeqRelu.md#AddDeqRelu)、[Cast](../Cast.md)、[CastDequant](../../复合计算/CastDequant.md#CastDequant)的s322f16场景 | 0~15 | scale | 一个half类型数据。 |
+| [AddDeqRelu](../../复合计算/AddDeqRelu.md)、[Cast](../Cast.md)、[CastDequant](../../复合计算/CastDequant.md)的s322f16场景 | 0~15 | scale | 一个half类型数据。 |
 | CastDequant不开启向量量化的s162b8场景 | 0~31 | scale | 一个float类型数据M（硬件在计算时将其视为(1,8,10)格式，即1个符号位、8个指数位和10个尾数位）。 |
 | CastDequant不开启向量量化的s162b8场景 | 37~45 | offset | 一个有符号的9位整数。 |
 | CastDequant不开启向量量化的s162b8场景 | 46 | signMode | 用于指示量化结果是否有符号（其中0表示无符号，1表示有符号）。 |
@@ -86,13 +86,13 @@
 
 ## 参数说明<a name="zh-cn_topic_0000002563051145_section138547361666"></a>
 
-**表 2**  模板参数说明
+**表2**  模板参数说明
 
 | 参数名 | 描述 |
 | :-- | :-- |
 | T | 输入量化Tensor的数据类型。支持的数据类型为uint64_t。 |
 
-**表 3**  参数说明
+**表3**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :--- | :--- |
@@ -102,7 +102,7 @@
 | vdeq | 输入 | 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>用于CastDequant（isVecDeq=true）的场景，输入量化tensor，大小为128Byte。 |
 | vdeqInfo | 输入 | [VdeqInfo](#table4)类型，用于CastDequant（isVecDeq=true）的场景，结构体内包含量化tensor中的16组量化参数，接口会读取结构体内的参数，填充到vdeq。 |
 
-**表 4**  VdeqInfo结构体内参数说明<a id="table4"></a>
+**表4**  VdeqInfo结构体内参数说明<a id="table4"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
