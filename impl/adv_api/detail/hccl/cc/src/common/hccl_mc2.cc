@@ -249,7 +249,7 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     aclError aclRet2 = aclrtMemcpy(&readback, opResCtxSize,
                                *opResCtx, opResCtxSize,
                                ACL_MEMCPY_DEVICE_TO_HOST);
-    HCCL_INFO("[CCU] verify opResCtx@dev[%p]: ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
+    HCCL_INFO("[CCU_DEBUG] verify opResCtx@dev[%p]: ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
         *opResCtx, readback.workSpace, readback.workSpaceSize,
         readback.xnAddr, readback.ckeAddr, readback.rankId, readback.rankSize);
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);

@@ -145,6 +145,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     // ensure hcclMsgArea 512B aligned
     AscendC::PRINTF("obtain workspace info\n");
     uint64_t msgAddr = newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace;
+    AscendC::PRINTF("obtain msgAddr\n");
     if (msgAddr & 0x1ff) {
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
