@@ -21,11 +21,6 @@
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 namespace __asc_aicore {
-__aicore__ inline uint32_t asc_ub_atomic_dec_impl(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return atomicDec(address, val);
-}
-
 __aicore__ inline uint32_t asc_atomic_dec_impl(__gm__ uint32_t* address, uint32_t val)
 {
     return atomicDec(address, val);
