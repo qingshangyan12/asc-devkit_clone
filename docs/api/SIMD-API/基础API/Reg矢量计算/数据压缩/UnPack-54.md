@@ -49,8 +49,12 @@
 
 ## 功能说明<a name="section1922292299"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf_impl"`。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf"`。
 对于无符号整型，将源操作数srcReg中低半部分或高半部分的元素以高位填0扩充位宽的方式写入dstReg。对于有符号整型，将源操作数srcReg中低半部分或高半部分的元素以保持符号位扩充位宽的方式写入dstReg。
+
+**图 1**  UnPack示意图
+
+![UnPack](../../../../figures/reg_unpack.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -82,7 +86,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 
 ## 数据类型
 
-**表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a>  
+**表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a> 
 | T数据类型 | U数据类型 |
 | ------ | ------ |
 | int16_t | int8_t |
