@@ -120,7 +120,6 @@ $dst_i = \sim src_i$
 
 <!-- npu="A3,910b" id18 -->
 - 针对如下型号，当参数count或repeatTime取值为0时，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
-
   <!-- npu="A3" id19 -->
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
   <!-- end id19 -->
