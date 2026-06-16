@@ -146,7 +146,7 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 ```
 > 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](../../../../../api/SIMD-API/C-API/矢量数据搬运/)。
+以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矢量数据搬运/)。
 
 ## Memory数据计算
 
@@ -330,4 +330,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Memory矢量计算示例
 
-结合上文介绍的数据搬运、计算、同步能力，即可基于C语言开发完整的Memory矢量计算算子。完整工程示例可参考：[c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)。
+结合上文介绍的数据搬运、计算、同步能力，即可基于C语言开发完整的Memory矢量计算算子。完整工程示例可参考：[c_api_add样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)。

@@ -193,7 +193,7 @@ int16_t dst_stride = 3;
 asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
 ```
 
-搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](../../../../../api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
+搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
 
 当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（Ascend 950PR/Ascend 950DT），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
@@ -249,7 +249,7 @@ __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_str
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2gm/)
+详细说明可参考接口说明文档[Cube接口说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2gm/)
 
 
 ## 矩阵计算能力说明
@@ -362,4 +362,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Cube矩阵计算示例
 
-目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C-API/)。
+目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅API文档了解[Cube接口详细说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/)。
