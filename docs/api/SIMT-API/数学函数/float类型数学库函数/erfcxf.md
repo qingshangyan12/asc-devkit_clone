@@ -36,10 +36,11 @@ inline float erfcxf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为-inf时，返回值为inf。
 -   当x为inf时，返回0。
+-   当x为正的大数且数学结果为Subnormal数据时，返回值为+0。
 
 ## 约束说明
 
-无
+-   不支持Subnormal场景：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符不支持Subnormal场景，当x为正的大数时，内部计算的倒数可能为Subnormal数据，导致本接口最终结果为+0。
 
 ## 需要包含的头文件
 
@@ -70,4 +71,3 @@ inline float erfcxf(float x)
         y[idx] = erfcxf(x[idx]);
     }
     ```
-
