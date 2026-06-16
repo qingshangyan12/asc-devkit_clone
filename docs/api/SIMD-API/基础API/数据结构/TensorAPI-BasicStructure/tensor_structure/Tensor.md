@@ -375,6 +375,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
 ```cpp
 using namespace AscendC::Te;
+constexpr uint64_t gmAddr = 128;
 
 // 示例1：构造一个GM张量
 auto gmLayout = MakeLayout(MakeShape(128, 128), MakeStride(128, 1));

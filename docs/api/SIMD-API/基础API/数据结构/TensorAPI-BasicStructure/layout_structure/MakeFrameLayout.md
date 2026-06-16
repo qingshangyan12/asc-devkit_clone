@@ -43,8 +43,8 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述数据类型、C0大小或其他布局特征，且现有默认Trait、_C0或固定默认Trait都无法满足需求的场景。自定义Trait需要满足底层布局推导所要求的类型约定。
    ```cpp
    struct MyLayoutTrait {
-       using DataType = float;
-       static constexpr auto C0_SIZE = Std::Int<16>{};
+       using type = float;
+       static constexpr auto C0_ELEMENT = Std::Int<16>{};
    };
 
    MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
@@ -91,8 +91,8 @@ auto l1TensorC0 = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutC0);
 
 // 自定义Trait构造
 struct MyLayoutTrait {
-    using DataType = float;
-    static constexpr auto C0_SIZE = Std::Int<16>{};
+    using type = float;
+    static constexpr auto C0_ELEMENT = Std::Int<16>{};
 };
 auto layoutCustom = MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n);
 ```
