@@ -12,7 +12,7 @@ repos:
     rev: v18.1.8
     hooks:
       - id: clang-format
-        files: ^tests/.*\.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
+        files: ^(tests|inlcude)/.*\.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
         exclude: ^tests/python/aclrt_launch_kernel/stub_files/
         args:
           - "--style=file"
