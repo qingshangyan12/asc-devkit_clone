@@ -36,7 +36,7 @@ void MainC100VecReduce(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __res
     LocalTensor<T> workLocal = workTbuf.Get<T>();
 
     DataCopy(inputLocal, inputGlobal, srcDataSize);
-    event_t eventIdMte2ToV = static_cast<event_t>(FetchEventID<HardEvent::MTE2_V>());
+    event_t eventIdMte2ToV = static_cast<event_t>(GetTPipePtr()->FetchEventID<HardEvent::MTE2_V>());
     SetFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
     WaitFlag<HardEvent::MTE2_V>(eventIdMte2ToV);
 
@@ -59,7 +59,7 @@ void MainC100VecReduce(__gm__ uint8_t* __restrict__ srcGm, __gm__ uint8_t* __res
     ReduceMax<T>(outputLocal, inputLocal, workLocal, multiStageCount, true);
     ReduceMin<T>(outputLocal, inputLocal, workLocal, multiStageCount, true);
 
-    event_t eventIdVToMte3 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
+    event_t eventIdVToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID<HardEvent::V_MTE3>());
     SetFlag<HardEvent::V_MTE3>(eventIdVToMte3);
     WaitFlag<HardEvent::V_MTE3>(eventIdVToMte3);
     DataCopy(outputGlobal, outputLocal, dstDataSize);
