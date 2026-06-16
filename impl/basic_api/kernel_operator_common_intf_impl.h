@@ -20,14 +20,14 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_COMMON_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
-#include "kernel_struct_mm.h"
-#include "kernel_operator_data_copy_intf.h"
+#include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_operator_data_copy_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
 #endif
-#include "kernel_operator_sys_var_intf.h"
+#include "../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 /*
  * ingroup：SetAtomicAdd
@@ -141,7 +141,7 @@ __aicore__ inline __in_pipe__(V)
     uint32_t tail = size % popSize;
     uint32_t roundSize = round != 0 ? popSize : 0;
     DuplicateImpl<T>((__ubuf__ T*)popBuffer.GetPhyAddr(), value, popSize);
-    event_t eventIDVToMTE3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+    event_t eventIDVToMTE3 = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
     SetFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     WaitFlag<HardEvent::V_MTE3>(eventIDVToMTE3);
     struct DataCopyExtParams repeatParams;

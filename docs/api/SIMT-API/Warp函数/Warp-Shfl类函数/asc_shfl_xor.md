@@ -18,7 +18,7 @@
 
 例如，Warp内32个活跃线程调用asc\_shfl\_xor\(LaneId, 1, 16\)接口，每个线程的返回值为当前线程LaneId^1对应线程的var值。
 
-**图 1**  asc\_shfl\_xor结果示意图
+**图1**  asc\_shfl\_xor结果示意图
 
 ![](../../../figures/asc_shfl_xor结果示意图.png "asc_shfl_xor结果示意图")
 
@@ -52,9 +52,17 @@ inline half asc_shfl_xor(half var, int32_t lane_mask, int32_t width = warpSize)
 inline half2 asc_shfl_xor(half2 var, int32_t lane_mask, int32_t width = warpSize)
 ```
 
+```
+inline bfloat16_t asc_shfl_xor(bfloat16_t var, int32_t lane_mask, int32_t width = warpSize)
+```
+
+```
+inline bfloat16x2_t asc_shfl_xor(bfloat16x2_t var, int32_t lane_mask, int32_t width = warpSize)
+```
+
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -72,7 +80,7 @@ Warp内指定线程的var值。
 
 ## 需要包含的头文件
 
-使用除half、half2类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```
 #include "simt_api/device_warp_functions.h"
@@ -80,6 +88,10 @@ Warp内指定线程的var值。
 
 ```
 #include "simt_api/asc_fp16.h"
+```
+
+```
+#include "simt_api/asc_bf16.h"
 ```
 
 ## 调用示例

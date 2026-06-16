@@ -9,8 +9,12 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
+<!-- npu="x90" id1 -->
 - Kirin X90：不支持
+<!-- end id1 -->
+<!-- npu="9030" id2 -->
 - Kirin 9030：不支持
+<!-- end id2 -->
 
 ## 功能说明
 
@@ -28,7 +32,7 @@ __aicore__ inline void SetTensorScaleA(const LocalTensor<ScaleT>& leftMatrix, bo
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

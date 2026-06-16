@@ -9,12 +9,16 @@
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
+<!-- npu="x90" id1 -->
 - Kirin X90：不支持
-- Kirin  9030：不支持
+<!-- end id1 -->
+<!-- npu="9030" id2 -->
+- Kirin 9030：不支持
+<!-- end id2 -->
 
 ## 功能说明
 
-用于配置IBShare模板的参数，获取自定义IBShare模板。IBShare模板的介绍请参考[表 模板特性](MatmulConfig.md#table6981133810309)。
+用于配置IBShare模板的参数，获取自定义IBShare模板。IBShare模板的介绍请参考[表模板特性](MatmulConfig.md#table6981133810309)。
 
 ## 函数原型
 
@@ -26,7 +30,7 @@ __aicore__ constexpr MatmulConfig GetIBShareNormConfig(const bool intrinsicsLimi
 
 本接口的所有参数用于设置[MatmulConfig结构体](MatmulConfig.md#table1761013213153)中的参数，其中互相对应的参数的功能作用相同。
 
-**表 1**  接口参数说明
+**表1**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |

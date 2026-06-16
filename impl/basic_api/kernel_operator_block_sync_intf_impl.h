@@ -21,19 +21,19 @@
 #define ASCENDC_MODULE_OPERATOR_BLOCK_SYNC_INTERFACE_IMPL_H
 
 #include "kernel_event.h"
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
+#include "../../include/basic_api/kernel_tensor.h"
+#include "../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_struct_mm.h"
-#include "kernel_operator_data_copy_intf.h"
+#include "../../include/basic_api/kernel_struct_mm.h"
+#include "../../include/basic_api/kernel_operator_data_copy_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
 #endif
-#include "kernel_operator_sys_var_intf.h"
+#include "../../include/basic_api/kernel_operator_sys_var_intf.h"
 
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_sync_impl.h"
@@ -155,12 +155,12 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t> &gmWorkspace,
 
     while (true) {
         DataCopy(ubWorkspace, localSyncGM, ONE_BLK_SIZE / sizeof(int32_t));
-        event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+        event_t eventIdMte2ToS = static_cast<event_t>(FetchEventID<HardEvent::MTE2_S>());
         SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         if (ubWorkspace.GetValue(0) == 0) {
             ubWorkspace.SetValue(0, 1);
-            event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
+            event_t eventIdSToMte3 = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
             SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             DataCopy(localSyncGM, ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t));
@@ -196,12 +196,12 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t> &gmWorkspace,
 
     while (true) {
         DataCopy(ubWorkspace, localSyncGM, ONE_BLK_SIZE / sizeof(int32_t));
-        event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+        event_t eventIdMte2ToS = static_cast<event_t>(FetchEventID<HardEvent::MTE2_S>());
         SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         if (ubWorkspace.GetValue(0) == 1) {
             ubWorkspace.SetValue(0, 0);
-            event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
+            event_t eventIdSToMte3 = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
             SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
             DataCopy(localSyncGM, ubWorkspace, ONE_BLK_SIZE / sizeof(int32_t));

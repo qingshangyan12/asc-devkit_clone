@@ -9,7 +9,9 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
+<!-- npu="x90" id1 -->
 - Kirin X90：支持
+<!-- end id1 -->
 
 ## 功能说明
 
@@ -27,13 +29,13 @@ template <bool sync = true> __aicore__ inline void IterateAll(const LocalTensor<
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | sync | 获取C矩阵过程分为同步和异步两种模式：<br>同步：需要同步等待IterateAll执行结束。<br>异步：不需要同步等待IterateAll执行结束。<br><br>通过该参数设置同步或者异步模式：同步模式设置为true；异步模式设置为false，默认为同步模式。<br><br>Atlas 200I/500 A2 推理产品只支持设置为true。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -63,7 +65,9 @@ template <bool sync = true> __aicore__ inline void IterateAll(const LocalTensor<
 
     Atlas 200I/500 A2 推理产品，支持的数据类型为：half、float、bfloat16_t、int32_t。
 
+    <!-- npu="x90" id2 -->
     Kirin X90，支持的数据类型为：half、int8_t、int32_t。
+    <!-- end id2 -->
 
 ## 调用示例
 

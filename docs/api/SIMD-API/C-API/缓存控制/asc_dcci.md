@@ -23,7 +23,7 @@ Scalar单元访问Global Memory，首先会访问每个核内的Data Cache，因
 读取Global Memory的数据，但该数据可能在外部被其余核修改，此时需要使用asc_dcci接口，直接访问Global Memory，获取最新数据；
 用户通过Scalar单元写Global Memory的数据，希望立刻写出，也需要使用asc_dcci接口。
 
-Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../sys_var/asc_set_ctrl.md)接口使用，将CTRL[49]设置为1'b1，开启datacache模式。
+Scalar单元访问UB数据时，该接口需配合[asc_set_ctrl()](../系统变量/asc_set_ctrl.md)接口使用，将CTRL[49]设置为1'b1，开启datacache模式。
 
 <cann-filter npu_type = "950">
 
@@ -68,8 +68,8 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-// 示例1：SINGLE_CACHE_LINE 模式，假设首地址为0x40（64B对齐）
-// total_length 指参与计算的数据长度
+// 示例1：SINGLE_CACHE_LINE模式，假设首地址为0x40（64B对齐）
+// total_length指参与计算的数据长度
 constexpr uint64_t total_length = 32;
 __gm__ int16_t src[total_length];
 for( int i = 0; i < total_length; i++) {

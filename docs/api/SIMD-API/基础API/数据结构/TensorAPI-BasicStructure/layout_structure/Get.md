@@ -27,7 +27,7 @@ __aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
 
 ## 参数说明
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
   | 参数名 | 类型 | 描述 |
 |--------|------|------|
@@ -36,7 +36,7 @@ __aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
 | Tuple | 输入 | 元组，Shape和Stride都是Tuple的别名。 |
 | Is... | size_t | 索引序列，用于编译时递归选择shape和stride的子结构。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
   | 参数名 | 类型 | 描述 |
 |--------|------|------|
@@ -66,7 +66,13 @@ auto v1 = Get<1, 0>(t);
 
 auto layout = MakeLayout(MakeShape(MakeShape(10, 20), MakeShape(10, 20)), MakeStride(MakeStride(10, 100), MakeStride(1, 2000)));
 
+<<<<<<< HEAD:docs/api/SIMD-API/基础API/数据结构/TensorAPI-BasicStructure/layout_structure/Get.md
 // 提取第 0 和第 1 维度
 auto subLayout = Get<1>(layout);
 // subLayout  = MakeLayout(MakeShape(10, 20), MakeStride(1, 2000));
+=======
+// 提取第0和第1维度
+auto subLayout = Get<0, 1>(layout);
+// subLayout = MakeLayout(MakeShape(10, 20), ...对应的stride)
+>>>>>>> upstream/master:docs/api/SIMD-API/基础数据结构/TensorAPI-BasicStructure/layout_structure/Get.md
 ```

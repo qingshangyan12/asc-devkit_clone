@@ -16,7 +16,7 @@ Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自�
 
 2. C矩阵是一个（1\*N）的向量，当1×N向量被划分为多个1×16子向量时，每个子向量在L0C Buffer中占用1024B（u8/s8/f162f32）。但实际有效数据仅占最低32B或64B。例如，当N=50时，共划分4个1\*16子向量，占用4\*512B = 2048B（f162f16），其中有效数据仅为4\*32B = 128B。
 
-**图 1** GEMV模式，矩阵乘示意图
+**图1** GEMV模式，矩阵乘示意图
 ![GEMV模式-矩阵乘示意图](../../../../../figures/mmad_gemv.png "GEMV模式-矩阵乘示意图")
 
 **使用优势：**
@@ -27,19 +27,19 @@ M=1时自动开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进
 
     将A矩阵从L1 Buffer（TPosition:A1）搬运到L0A Buffer（TPosition:A2）时，1\*256的向量被当作16\*16的矩阵进行处理，调用LoadData接口一次完成16\*16分形大小的矩阵搬运。B矩阵的搬运以及矩阵乘计算跟基础场景相同，如下图所示。
 
-    **图 2** GEMV模式M=1的矩阵乘计算示意图
+    **图2** GEMV模式M=1的矩阵乘计算示意图
     ![GEMV模式M=1的矩阵乘计算示意图](../../../../../figures/mmad_gemv_compare.png "GEMV模式M=1的矩阵乘计算示意图")
 
 - 非GEMV模式
 
     将A矩阵从L1 Buffer（TPosition:A1）搬运到L0A Buffer（TPosition:A2）时，1\*256的向量被当作非对齐矩阵数据进行处理，将M方向对齐到32字节后进行搬运。调用LoadData接口每次搬运16\*16分形大小的矩阵，一共搬运K/16=16次，导致搬运数据量增加，性能相较于GEMV模式差，如下图所示。
 
-    **图 3** 非GEMV模式M!=1的矩阵乘计算示意图
+    **图3** 非GEMV模式M!=1的矩阵乘计算示意图
 ![非GEMV模式M=1的矩阵乘计算示意图](../../../../../figures/mmad_nongemv_compare.png "非GEMV模式M=1的矩阵乘计算示意图")
 
 **使用示例：**
 
-**表 1** 示例配置说明
+**表1** 示例配置说明
 
 | 矩阵 | 维度大小 | 数据类型 |
 | --- | --- | --- |
@@ -51,10 +51,10 @@ A矩阵为1\* 4096的向量，从软件侧可以视为64\*64的（针对Ascend 9
 
 C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用16 \* 1024B = 16384B\(f162f32\)，其中有效数据仅仅为16 \* 64B = 1024B；
 
-**图 4** GEMV模式矩阵乘示意图
+**图4** GEMV模式矩阵乘示意图
 ![GEMV模式-矩阵乘示意图-demo](../../../../../figures/mmad_gemv_demo.png "GEMV模式-矩阵乘示意图-demo")
 
-GEMV功能的完整示例：[GEMV样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/mmad_gemv)。
+GEMV功能的完整示例：[GEMV样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_gemv)。
 
 ```cpp
 AscendC::MmadParams mmadParams;

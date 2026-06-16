@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √ </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | √ </cann-filter> |
 | <cann-filter npu-type = "x90">Kirin X90 | √ </cann-filter> |
 | <cann-filter npu-type = "9030">Kirin 9030 | √ </cann-filter> |
@@ -31,7 +31,7 @@
 - 对于b16数据类型，每个数据分形为一个16×16的矩阵。
 - 对于b32数据类型，每个数据分形在L0A Buffer中为一个16×8的矩阵，在L0B Buffer中为一个8×16的矩阵。
 
-实现原理可参考伪代码：[Load2D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0/scripts/load2d.py)。
+实现原理可参考伪代码：[Load2D伪代码](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load2d.py)。
 
 ## 函数原型
 
@@ -109,7 +109,7 @@ Atlas 训练系列产品，支持数据类型为：uint8_t、int8_t、uint16_t�
 
 <cann-filter npu-type = "310p">
 
-Atlas 推理系列产品 AI Core，支持数据类型为：int4b_t、uint8_t、int8_t、uint16_t、int16_t、half；**注：int4b_t仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer通路。**
+Atlas 推理系列产品AI Core，支持数据类型为：int4b_t、uint8_t、int8_t、uint16_t、int16_t、half；**注：int4b_t仅支持L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer通路。**
 
 </cann-filter>
 
@@ -137,7 +137,7 @@ Kirin 9030，支持数据类型为：half。
 - 当源地址位于GM时，指令执行占用的流水为PIPE_MTE2；当源地址位于L1 Buffer时，指令执行占用的流水为PIPE_MTE1。
 - 当srcStride=0时，表示连续的repeat之间读取源操作数中的同一块数据分形。
 <cann-filter npu-type = "310p">
-- 对于Atlas 推理系列产品 AI Core，在配合Mmad接口使用、B矩阵数据类型为S4场景下，如果通过ifTranspose参数启用转置，只支持64×64的分形。
+- 对于Atlas 推理系列产品AI Core，在配合Mmad接口使用、B矩阵数据类型为S4场景下，如果通过ifTranspose参数启用转置，只支持64×64的分形。
 </cann-filter>
 - 不同型号的物理存储位置不同，开发者可以参考如下：
     - 支持的物理存储位置为Global Memory（TPosition: GM）/L1 Buffer（TPosition: A1/B1）。
@@ -262,7 +262,7 @@ dstGap为2：表示目的操作数上，前一个数据分形的尾地址与后�
 
 ![](../../../../../figures/load2d_l12l0a_nontrans.png)
 
-示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize;
@@ -284,7 +284,7 @@ for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
 
 ![](../../../../../figures/load2d_l12l0a_trans.png)
 
-示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/load_data_l12l0)。
+示例代码片段如下，仅展示样例中的部分代码，完整示例请参考：[load_data_l12l0样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。
 
 ```cpp
 uint32_t dstOffset = CeilDivision(k, fractalShape[0]) * fractalSize;

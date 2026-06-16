@@ -31,7 +31,7 @@ Mmad和Fixpipe接口设置unitFlag值为2/3后，系统会启动单元标志位�
 
 在调用Mmad接口时，需要通过**[SetMMColumnMajor/SetMMRowMajor](../寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md)**接口设置Mmad的计算方向。当Fixpipe使能了NZ2ND或ChannelMerge等layout变换时，需将Mmad的计算方向设置为N方向优先，即调用SetMMRowMajor()；反之，若未使用这些特性，则应将计算方向设置为M方向优先，即调用SetMMColumnMajor()。
 
-**图 1** Mmad和Fixpipe同时沿M方向写/读
+**图1** Mmad和Fixpipe同时沿M方向写/读
 ![Mmad和Fixpipe同时沿M方向写-读](../../../../../figures/mmad_unitflag.png "Mmad和Fixpipe同时沿M方向写-读")
 
 **特性约束：**
@@ -49,7 +49,7 @@ for (auto kIndex = 0; kIndex < kRound; ++kIndex) {
         // 前kRound-1次迭代设置为2，保证Mmad在K迭代循环中可以一直写入L0C Buffer
         mmadParams.unitFlag = 2;
     } else {
-        // 最后一次迭代设置为3，将单元标志位设成1, 保证Fixpipe可以读L0C Buffer
+        // 最后一次迭代设置为3，将单元标志位设成1,保证Fixpipe可以读L0C Buffer
         mmadParams.unitFlag = 3;
     }
     AscendC::Mmad(c, a, b, mmadParams);
@@ -63,9 +63,9 @@ fixpipeParams.unitFlag = 3;
 AscendC::Fixpipe(cGM, c, fixpipeParams);
 ```
 
-开启与不开启unitFlag功能的完整示例：[UnitFlag示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/mmad_unitflag)
+开启与不开启unitFlag功能的完整示例：[UnitFlag示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_unitflag)
 
-**表 1** 性能示例说明（以输入数据类型half为例，无业务实测表示忽略指令的前后序操作，只考虑单指令性能，包含带宽延迟等开销）
+**表1** 性能示例说明（以输入数据类型half为例，无业务实测表示忽略指令的前后序操作，只考虑单指令性能，包含带宽延迟等开销）
 
 | M | N | K | UnitFlag | LOOP_COUNT | Mmad理论值（cycle） | Mmad无业务实测值（cycle） |
 | --- | --- | --- | --- | --- | --- | --- |
