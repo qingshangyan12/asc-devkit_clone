@@ -66,13 +66,7 @@ auto v1 = Get<1, 0>(t);
 
 auto layout = MakeLayout(MakeShape(MakeShape(10, 20), MakeShape(10, 20)), MakeStride(MakeStride(10, 100), MakeStride(1, 2000)));
 
-<<<<<<< HEAD:docs/api/SIMD-API/基础API/数据结构/TensorAPI-BasicStructure/layout_structure/Get.md
 // 提取第 0 和第 1 维度
 auto subLayout = Get<1>(layout);
 // subLayout  = MakeLayout(MakeShape(10, 20), MakeStride(1, 2000));
-=======
-// 提取第0和第1维度
-auto subLayout = Get<0, 1>(layout);
-// subLayout = MakeLayout(MakeShape(10, 20), ...对应的stride)
->>>>>>> upstream/master:docs/api/SIMD-API/基础数据结构/TensorAPI-BasicStructure/layout_structure/Get.md
 ```
