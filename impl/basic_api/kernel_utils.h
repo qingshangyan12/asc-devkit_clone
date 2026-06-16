@@ -44,21 +44,8 @@ inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
 #if !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)))
 namespace Internal {
-__BLOCK_LOCAL__ __inline__ uint16_t g_occupyEventPool[EVENT_NUM] = {};
+// __BLOCK_LOCAL__ __inline__ uint16_t g_occupyEventPool[EVENT_NUM] = {};
 __BLOCK_LOCAL__ __inline__ uint32_t g_tPipeAddrBufPool[static_cast<uint8_t>(Hardware::MAX)] = {};
-}
-#endif
-
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 && \
-    !(defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113)))
-inline uint8_t* GetBaseAddrCpu(int8_t logicPos)
-{
-    auto positionHardMap = ConstDefiner::Instance().positionHardMap;
-    ASCENDC_ASSERT((positionHardMap.find(static_cast<TPosition>(logicPos)) != positionHardMap.end()),
-                   { KERNEL_LOG(KERNEL_ERROR, "illegal logicPos %d ", static_cast<int32_t>(logicPos)); });
-    Hardware hardType = positionHardMap.at(static_cast<TPosition>(logicPos));
-    ASCENDC_ASSERT((hardType != Hardware::GM), { KERNEL_LOG(KERNEL_ERROR, "hardware position can not be gm"); });
-    return ConstDefiner::Instance().GetHardwareBaseAddr(hardType);
 }
 #endif
 
