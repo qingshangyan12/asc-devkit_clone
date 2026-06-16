@@ -37,10 +37,11 @@ for case in "${CASES[@]}"; do
     cmake -S "$WORKDIR" -B "$WORKDIR/build" \
         -DCMAKE_ASC_RUN_MODE=npu \
         -DCMAKE_ASC_ARCHITECTURES=dav-3510 \
-        -DCASE_NUM=$case -Wno-dev 2>&1 | grep "SCENARIO_NUM\|Build files\|Built"
+        -DSCENARIO_NUM=$case -Wno-dev 2>&1 | grep "SCENARIO_NUM\|Build files\|Built"
     make -C "$WORKDIR/build" -j 2>&1 | grep "Built"
 
-    rm -rf "$WORKDIR/input" "$WORKDIR/output"
+    cd "$WORKDIR"
+    rm -rf input output
 
     # Extract REPEAT_TIMES from source to keep golden in sync
     REPEAT=$(grep -oP 'REPEAT_TIMES_FOR_INSTR_EXCUTE\s*=\s*\K\d+' "$WORKDIR/bank_conflict.asc" 2>/dev/null || echo 1)
@@ -50,7 +51,7 @@ for case in "${CASES[@]}"; do
 
     VERIFY_RESULT="FAIL"
     python3 "$WORKDIR/scripts/verify_result.py" \
-        "$WORKDIR/output/output_z.bin" "$WORKDIR/output/golden.bin" > /dev/null 2>&1 && VERIFY_RESULT="PASS"
+        output/output_z.bin output/golden.bin > /dev/null 2>&1 && VERIFY_RESULT="PASS"
     echo "Result: $VERIFY_RESULT"
 
     if $RUN_PROFILE; then

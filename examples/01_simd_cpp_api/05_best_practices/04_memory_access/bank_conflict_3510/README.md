@@ -50,7 +50,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ## DataBlock映射
 
-一条VF Load/Store指令每次处理256B = 8个DataBlock。每个DataBlock = 32B。
+一条读/写指令每次处理256B = 8个DataBlock。每个DataBlock = 32B。
 
 从 `base` 地址开始的8个DataBlock映射到8个不同bank group：
 
@@ -86,30 +86,30 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 | case | 计算公式 | 场景描述 | bank冲突情况 | src0首地址 | src1首地址 | dst首地址 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | dst = src0 + src1 | src0/src1同bank，发生读读冲突，与dst不同bank，无读写冲突 | 读读冲突 | 0x0000 | 0x4000 | 0x8100 | 1,330,843 | 发生读读冲突 |
-| 2 | dst = src0 + src1 | src0/dst同bank，发生读写冲突，与src1不同bank，无读读冲突，**src0/dst重叠** | 读写冲突 | 0x0000 | 0x4100 | 0x0000 | 1,472,830 | 发生写写冲突，对比case1性能更低 |
-| 3 | dst = src0 + src1 | src1/dst同bank，发生读写冲突，src0/src1不同bank，无读读冲突 | 读写冲突 | 0x0000 | 0x4100 | 0x8900 | 1,440,511 | 发生写写冲突，对比case1性能更低 |
-| 4 | dst = src0 + src1 | **使用双搬入读取** | 读写冲突 | 0x0000 | - | 0x8000 | 1,480,654 | 使用双搬入读取，对比case1性能劣化不明显 |
-| 5 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突，**无循环展开** | 读读冲突+读写冲突 | 0x0000 | 0x4000 | 0x8000 | 1,420,634 | 全冲突场景 |
-| 6 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突，**通过循环展开优化** | 读读冲突+读写冲突 | 0x0000 | 0x4000 | 0x8000 | 1,330,608 | 使用循环展开优化，对比case5性能有所提升 |
+| 1 | dst = src0 + src1 | src0/src1同bank，发生读读冲突，与dst不同bank，无读写冲突 | 读读冲突 | 0x0000 | 0x5000 | 0xA100 | 1,330,862 | 发生读读冲突 |
+| 2 | dst = src0 + src1 | src0/dst同bank，发生读写冲突，与src1不同bank，无读读冲突，**src0/dst重叠** | 读写冲突 | 0x0000 | 0x5100 | 0x0000 | 1,470,506 | 发生读写冲突 |
+| 3 | dst = src0 + src1 | src1/dst同bank，发生读写冲突，src0/src1不同bank，无读读冲突 | 读写冲突 | 0x0000 | 0x5100 | 0xA100 | 1,440,524 | 发生读写冲突 |
+| 4 | dst = src0 + src1 | **使用双搬入读取** | 读写冲突 | 0x0000 | - | 0xA000 | 1,480,727 | 使用双搬入读取，对比case1性能劣化不明显 |
+| 5 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突，**无循环展开** | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 1,420,476 | 全冲突场景 |
+| 6 | dst = src0 + src1 | src0/src1/dst同bank，既有读读冲突，又有读写冲突，**通过循环展开优化** | 读读冲突+读写冲突 | 0x0000 | 0x5000 | 0xA000 | 1,330,647 | 使用循环展开优化，对比case5性能提升6.3% |
 
 ### 离散与聚合场景（Case 7-10）
 
 | case | 计算公式 | 场景描述 | subbank冲突情况 | index地址 | data地址 | index模式 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 7 | Gather + Add + Scatter | Gather数据索引全为0，起始地址全部重叠 | 同地址合并为单次读取，无冲突 | 0x0000 | 0x0400 | 全0 | 650,677 | 基准参照 |
-| 8 | Gather + Add + Scatter | Gather数据索引[0..7]重复 | 同地址合并读取，无冲突 | 0x0000 | 0x0400 | [0..7]×32重复 | 650,835 | 数据分散在同一bank的不同sub bank， 接近case7性能 |
-| 9 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨bank分散，无冲突 | 0x0000 | 0x0400 | [0..255] 连续 | 650,697 | 数据分散在8个bank group的不同sub bank，接近case7性能 |
-| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | 同subbank不同行冲突 | 0x0000 | 0x0400 | 0、128交替 | **750,709** | 对比Case 7，性能劣化 |
+| 7 | Gather + Add + Scatter | Gather数据索引全为0，起始地址全部重叠 | 同地址合并为单次读取，无冲突 | 0x0000 | 0x0400 | 全0 | 650,834 | 基准参照 |
+| 8 | Gather + Add + Scatter | Gather数据索引[0..7]重复 | 同地址合并读取，无冲突 | 0x0000 | 0x0400 | [0..7]×32重复 | 650,884 | 数据分散在同一bank的不同sub bank，接近case7性能 |
+| 9 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨bank分散，无冲突 | 0x0000 | 0x0400 | [0..255] 连续 | 650,803 | 数据分散在8个bank group的不同sub bank，接近case7性能 |
+| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | 同subbank不同行冲突 | 0x0000 | 0x0400 | 0、128交替 | **752,528** | 对比Case 7，性能劣化15.6% |
 
 ### 非连续搬运跨步对比（Case 11-14）
 
 | case | 计算公式 | 场景描述 | 冲突情况 | src0首地址 | dst首地址 | 搬运方式 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 11 | dst = src0 | 512元素按行计算，repeat内8个DataBlock连续排布，repeat间间隔256B | 无冲突 | 0x0000 | 0x4100 | DataBlock连续搬运 | 442,224 | 基准 |
-| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B | 读读冲突+写写冲突+读写冲突 | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,649 | 触发同一repeat内的bank冲突，对比case11，性能劣化明显 |
-| 13 | dst = src0 | 同一repeat内8个DataBlock均从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=0 | 443,499 | 同地址合并，无额外开销，接近case11性能 |
-| 14 | dst = src0 | 8轮迭代，每次迭代数据从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=1,repeat=0 | 440,810 | 同首地址重复读，无冲突，接近case11性能 |
+| 11 | dst = src0 | 512元素按行计算，repeat内8个DataBlock连续排布，repeat间间隔256B | 无冲突 | 0x0000 | 0x4100 | DataBlock连续搬运 | 440,732 | 基准 |
+| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B | 读读冲突+写写冲突+读写冲突 | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,511,791 | 触发同一repeat内的bank冲突，对比case11，性能劣化明显 |
+| 13 | dst = src0 | 同一repeat内8个DataBlock均从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=0 | 440,875 | 同地址合并，无额外开销，接近case11性能 |
+| 14 | dst = src0 | 8轮迭代，每次迭代数据从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=1,repeat=0 | 440,777 | 同首地址重复读，无冲突，接近case11性能 |
 
 
 各case的详细分析见下文对应章节。
@@ -121,8 +121,8 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 操作数 | 首地址 | 18位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id
 | --- | --- | --- | --- | --- |
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
-| src1 | `0x4000` | `010000000 0 000 00000` | 0 | 0 |
-| dst | `0x8100` | `100000010 0 000 00000` | 1 | 0 |
+| src1 | `0x5000` | `000101000 0 000 00000` | 0 | 0 |
+| dst | `0xA100` | `001010000 1 000 00000` | 1 | 0 |
 
 ### UB读写示意
 
@@ -131,7 +131,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### 分析结论
 
 - src0=bank0，src1=bank0，dst=bank1。src0和src1同落在bank0，存在读读冲突。但dst在bank1，读写冲突消除。
-- 与Case 3相比快8.1%，说明读写冲突开销大，消除后性能有提升。
+- 与Case 3相比快8.2%，Ascend 950PR/Ascend 950DT的bank group存在2个读口，当同一repeat的读指令冲突后，由于读读之间无数据依赖，可以同时执行其它repeat不冲突的读指令，缓解读读冲突。
 
 ## Case 2：二读一写，src0/dst同bank，发生读写冲突，与src1不同bank，无读读冲突，src0/dst重叠
 
@@ -140,7 +140,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 操作数 | 首地址 | 18位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id |
 | --- | --- | --- | --- | --- |
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
-| src1 | `0x4100` | `010000010 0 000 00000` | 1 | 0 |
+| src1 | `0x5100` | `000101000 1 000 00000` | 1 | 0 |
 | dst | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
 
 ### UB读写示意
@@ -149,7 +149,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 分析结论
 
-- src0与dst地址重叠（同bank 0同depth行），读取src0和写入dst同时进行，**存在读写冲突**，而在Atlas A2/A3系列产品上，读写地址重叠能够被硬件优化从而消除冲突。
+- src0与dst地址重叠（同bank 0同depth行），**存在读写冲突**，并且该冲突在Ascend 950PR/Ascend 950DT上不能被硬件优化。
 - src1在bank1（同BG不同bank），与src0无读读冲突。
 
 ## Case 3：二读一写，src1/dst同bank，发生读写冲突，src0/src1不同bank，无读读冲突
@@ -159,8 +159,8 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 操作数 | 首地址 | 18位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id
 | --- | --- | --- | --- | --- |
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
-| src1 | `0x4100` | `010000010 0 000 00000` | 1 | 0 |
-| dst | `0x8900` | `100010010 0 000 00000` | 1 | 0 |
+| src1 | `0x5100` | `000101000 1 000 00000` | 1 | 0 |
+| dst | `0xA100` | `001010000 1 000 00000` | 1 | 0 |
 
 ### UB读写示意
 
@@ -168,8 +168,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 分析结论
 
-- src0=bank0，src1=bank1，dst=bank1。src0和src1落在不同bank，读读冲突消除。但src1和dst同在bank1，仍存在读写冲突。
-- 消除读读冲突后性能未提升，说明 **3510上读读冲突开销极小，不是瓶颈**。
+- src0=bank0，src1=bank1，dst=bank1。src0和src1落在不同bank，无读读冲突，但src1和dst同在bank1，存在读写冲突。
 
 ## Case 4：二读一写，使用双搬入读取
 
@@ -179,7 +178,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | --- | --- | --- | --- | --- |
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
 | src1 | `0x4000` | `010000000 0 000 00000` | 0 | 0 |
-| dst | `0x8000` | `100000000 0 000 00000` | 0 | 0 |
+| dst | `0xA000` | `001010000 0 000 00000` | 0 | 0 |
 
 ### UB读写示意
 
@@ -197,8 +196,8 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 操作数 | 首地址 | 18位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id |
 | --- | --- | --- | --- | --- |
 | src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
-| src1 | `0x4000` | `010000000 0 000 00000` | 0 | 0 |
-| dst | `0x8000` | `100000000 0 000 00000` | 0 | 0 |
+| src1 | `0x5000` | `000101000 0 000 00000` | 0 | 0 |
+| dst | `0xA000` | `001010000 0 000 00000` | 0 | 0 |
 
 ### UB读写示意
 
@@ -221,7 +220,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### 分析结论
 
 - 地址布局与Case 5完全相同，冲突特征相同。
-- 唯一差异是使用循环展开，每次处理两个repeat，增加指令级并行。
+- 唯一差异是使用循环展开，增加指令级并行。
 - 对比Case 5，循环展开在该场景下有正收益。
 
 ## Case 7：离散读写，Gather数据索引全为0，起始地址全部重叠
@@ -238,7 +237,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ![case7](./figures/case7.png)
 
-- index模式：全部为0，即每次Gather都从data[0] 读取同一个位置。
+- index全部为0，即每次Gather都从data[0]读取同一个位置。
 
 ### 分析结论
 
@@ -260,7 +259,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 分析结论
 
-- Gather从data中按index取64个元素：index仅有 [0..7] 共8个unique值，大量元素命中相同地址 → 硬件自动合并同地址请求，同地址只需一次读取，降低了subbank冲突。
+- Gather从data中按index取64个元素：index仅有 [0..7] 共8个unique值，大量元素命中相同地址 → 硬件自动合并同地址请求，同地址只需一次读取，subbank冲突降低。
 
 ## Case 9：离散读写，Gather指令的数据索引在[0..255]连续
 
@@ -277,7 +276,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 分析结论
 
-- Gather跨8个bank分散读取，每subbank仅2次读操作。连续index自然分散到不同subbank，降低了subbank冲突。
+- Gather跨8个bank分散读取，每subbank仅2次读操作。连续index自然分散到不同subbank，subbank冲突降低。
 
 ## Case 10：离散读写，Gather数据索引0、128交替重复
 
@@ -378,29 +377,29 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 连续对齐搬运的bank冲突
 
-1. 读读冲突与读写冲突开销不同。case1存在读读冲突，case3存在读写冲突，但case3性能劣化于case1约8%。
-2. 二读一写下必然存在bank冲突。由于Ascend 950PR/Ascend 950DT一条指令处理256B（8个DataBlock），覆盖全部的8个BG，因此二读一写会发生在一个bank group，超出单个bank group的能力。（在Atlas A2/A3中，由于bank group个数多一倍，冲突可消除）。
-3. 读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然出发了bank冲突。（在Atlas A2/A3中，读写地址重叠可以被硬件优化，消除bank冲突）。
-4. 双搬入指令搬运对性能劣化不明显。case4与case5性能接近。
-5. 由于Ascend 950PR/Ascend 950DT采用低位编址，bank冲突的开销小于Atlas A2/A3系列产品。
+1. 读读冲突与读写冲突开销不同。case1存在读读冲突，case3存在读写冲突，但case3性能劣化于case1约8.2%。
+2. 二读一写下必然存在bank冲突。由于Ascend 950PR/Ascend 950DT一条指令处理256B（8个DataBlock），覆盖全部的8个BG，因此二读一写会发生在一个bank group，超出单个bank group的能力。（在Atlas A2/A3中，由于bank group个数多一倍，冲突可消除），在实际场景中，由于采用Regbase架构，UB读写指令的使用降低，bank冲突往往为非瓶颈点。
+3. 读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然触发了bank冲突。（在Atlas A2/A3中，读写地址重叠可以被硬件优化，消除bank冲突）。
+4. 双搬入指令搬运对性能劣化不明显，case4与case5性能接近。
+5. Ascend 950PR/Ascend 950DT采用低位编址，bank冲突的开销小于Atlas A2/A3系列产品，bank冲突造成的空隙可以被其它指令填满，通过改变首地址优化bank冲突收益有限。
 
 ### 非连续对齐搬运的bank冲突
 
-1. 连续DataBlock排布不产生冲突。case11每个repeat内8个DataBlock间隔32B连续排布，命中8个不同BG，442,224 cycles（基准）。
-2. 非连续DataBlock排布触发严重bank冲突（DataBlock间隔256B）。case12按列搬运，每个repeat内8个DataBlock间隔256B，全部落入**同一bank group的不同depth行**，发生读读+写写+读写三类冲突叠加，1,510,649 cycles，比基准慢3.4倍。
-3. repeat内同地址重复读取硬件自动合并。case13同一repeat内8个DataBlock均指向同一32B基地址，硬件合并为单次读取，443,499 cycles，接近基准。
-4. repeat间同首地址重复读取无劣化。case14的8轮迭代均从同一首地址加载，440,810 cycles，与基准持平。
+1. 连续DataBlock排布不产生冲突。case11每个repeat内8个DataBlock间隔32B连续排布，命中8个不同BG，440,732 cycles（基准）。
+2. 非连续DataBlock排布触发严重bank冲突（DataBlock间隔256B）。case12按列搬运，每个repeat内8个DataBlock间隔256B，全部落入**同一bank group的不同depth行**，发生读读+写写+读写三类冲突叠加，1,511,791 cycles，比基准慢约3.4倍。
+3. repeat内同地址重复读取硬件自动合并。case13同一repeat内8个DataBlock均指向同一32B基地址，硬件合并为单次读取，440,875 cycles，接近基准。
+4. repeat间同首地址重复读取无劣化。case14的8轮迭代均从同一首地址加载，440,777 cycles，与基准持平。
 
 ### 离散与聚合API的subbank冲突
 
-1. 同地址合并，无subbank冲突。case7 index全为0，所有Gather命中同一地址，硬件合并为单次读取，650,677 cycles（基准）。
-2. 少量unique index重复无冲突。case8使用[0..7]×32重复index，仅8个unique地址被大量重复命中，同地址请求硬件合并，650,835 cycles，接近基准。
-3. 连续index跨bank分散无冲突。case9使用[0..255]连续递增index，256个unique地址自然分散到不同bank/subBank，650,697 cycles，接近基准。
-4. 同subbank不同行触发明显冲突。case10使用0/128交替index，二者落入**同一subbank但不同depth行**，读取需排队，750,709 cycles，比基准慢15.4%。
+1. 同地址合并，无subbank冲突。case7 index全为0，所有Gather命中同一地址，硬件合并为单次读取，650,834 cycles（基准）。
+2. 少量unique index重复无冲突。case8使用[0..7]×32重复index，仅8个unique地址被大量重复命中，同地址请求硬件合并，650,884 cycles，接近基准。
+3. 连续index跨bank分散无冲突。case9使用[0..255]连续递增index，256个unique地址自然分散到不同bank/subBank，650,803 cycles，接近基准。
+4. 同subbank不同行触发明显冲突。case10使用0/128交替index，二者落入**同一subbank但不同depth行**，读取需排队，752,528 cycles，比基准慢15.6%。
 
 ### bank冲突优化建议
 
-1. 循环展开增加指令双发概率可对冲bank冲突带来的影响。case6在case5全冲突地址布局基础上使用循环展开（每次处理两个repeat），增加指令级并行，性能提升6.3%，与仅有读读冲突的case1持平。
+1. 循环展开增加指令双发概率可对冲bank冲突带来的影响。case6在case5全冲突地址布局基础上使用循环展开（每次处理两个repeat），性能得到提升。
 2. 同地址重复读取无需额外优化。case13/14的同地址重复读取由硬件自动合并，性能与连续搬运基准持平。
 
 
