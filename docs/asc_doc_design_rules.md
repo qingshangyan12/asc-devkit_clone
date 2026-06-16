@@ -40,7 +40,6 @@ Ascend C资料体系由**五份**核心文档组成，通过交叉链接形成�
 **补充说明**：
 - 样例库（`asc-devkit/examples/`）**不属于**Ascend C资料体系，但五份文档中的代码示例均可链接到样例库
 - 技术附录（术语表、原理、语法限制）归入编程指南，作为共享知识基础设施
-- 入门教程独立成册，目录位于 `docs/guide/入门教程/`，包含概述、环境准备、快速入门（SIMD/SIMT）
 
 ---
 
@@ -128,38 +127,24 @@ Ascend C资料体系由**五份**核心文档组成，通过交叉链接形成�
 
 ## 可读性（Readability）
 
-### 按抽象层级使用术语
-
-文档按章节的抽象层级使用对应术语，**首次跨界时必须关联**：
-
-| 章节层级 | 使用术语 | 首次跨界处理 |
-|---------|---------|-------------|
-| 高层（抽象硬件架构、概述） | 抽象名：Global Memory、Local Memory、计算单元 | 不突兀混入UB、L0A等底层名 |
-| 低层（编程模型、数据搬运） | 硬件名：UB、L1 Buffer、L0A/B/C | **首次出现时**括号关联：`UB（即抽象架构中Local Memory的一部分）` |
-| API层（API参考手册） | API名：DataCopy、LocalTensor | **首次出现时**关联硬件名：`DataCopy（触发MTE数据搬运单元指令）` |
-
-**反面案例（禁止）**：抽象硬件架构文档直接写"数据通过UB搬入VEC运算"，跳过抽象层。
-
 ### 易混概念显式区分
 
 名称相近、层级易混淆的概念必须用对比表或关系图**显式区分**：
 
-**必须区分的概念组**：
+**必须区分的概念组（举例说明）**：
 
 | 概念组 | 区分维度 | 区分形式 |
 |--------|---------|---------|
 | SPMD vs SIMD vs SIMT | SPMD=编程模型、SIMD=指令执行模式、SIMT=线程执行模式 | 层级关系图 |
-| 四步法(Tiling→搬→算→搬) vs TPipe四步(Alloc→EnQue→...) | 编程流程vs流水管理范式 | 对比表 |
-| DMA vs MTE vs DataCopy | 三层名同一件事 | 术语映射表 |
-| MemBase(基础API) vs RegBase(VF融合API) | 计算位置不同(UB vs寄存器)、Load/Store次数不同 | 对比表+场景推荐 |
-| Block vs CTA | Ascend C编程单元vs CUDA等价概念 | 竞品映射表 |
-| `LocalTensor` vs `GlobalTensor` vs `TBuf` | 计算用/外部用/临时用缓冲区 | 对照表+场景推荐 |
-| `__ubuf__` vs `__cbuf__` vs `__gm__` | UB空间/L1空间/GM空间地址限定符 | 对照表 |
-| `asc_`前缀vs `Ascend C::`前缀vs `cce::`前缀 | C API / C++ API / Intrinsics | 命名规则表 |
+| DMA vs MTE vs DataCopy | 相似概念的统一说明 | 术语映射表 |
+| MemBase vs RegBase | 计算位置不同(UB vs 寄存器)、Load/Store次数不同 | 对比表+场景推荐 |
+| 跨步搬运术语（`gap` vs `stride`） | Ascend C vs 业界通用概念 | 概念映射表 |
+| 地址空间限定符（`__ubuf__` vs `__cbuf__` vs `__gm__`） | UB/L1/GM等物理地址空间 | 对照表 |
+| API命名规则 | C API / 基础API / 高阶API / SIMT API | 命名规则表 |
 
 **具体要求**：
 - 在**首次出现混淆可能的位置**就给出区分，不延后
-- 禁止用一个概念的代码示例暗示等价于另一概念
+- 针对能等价映射业界概念但不同名的术语，需要提供概念映射表，否则，需要重点说明其与业界概念的差异
 
 ### 约束前置且醒目
 
@@ -219,10 +204,6 @@ API文档中Host侧和Kernel侧必须明确标注和分离：
 - Host侧API（Tiling计算、workspace分配）与Kernel侧API（计算接口、数据搬运）分节展示
 - 编程指南中有Host/Kernel分工全景图
 - 涉及跨侧数据传递的概念（workspace/Tiling），提供端到端调用链路图
-
-### SIMT章节业界参考
-
-**仅适用于SIMT编程模型章节**。SIMT核心概念参考业界的说明方式，提供概念映射表（Block↔CTA、Warp↔Warp、Lane↔Thread、`__aicore__`↔`__global__`）和关键差异说明。
 
 ---
 
