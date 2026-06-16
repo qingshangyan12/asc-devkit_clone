@@ -46,7 +46,7 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -65,18 +65,18 @@ struct NormalizeConfig {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| output | 输出 | 目的操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| outputRstd | 输出 | 标准差的倒数，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputMean | 输入 | 均值，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputVariance | 输入 | 方差，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputX | 输入 | 源操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| gamma | 输入 | 缩放系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。gamma的数据类型精度不低于源操作数的数据类型精度。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| beta | 输入 | 平移系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。beta的数据类型精度不低于源操作数的数据类型精度。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[Normalize Tiling](Normalize-Tiling.md)。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| output | 输出 | 目的操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| outputRstd | 输出 | 标准差的倒数，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputMean | 输入 | 均值，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputVariance | 输入 | 方差，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputX | 输入 | 源操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gamma | 输入 | 缩放系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。gamma的数据类型精度不低于源操作数的数据类型精度。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| beta | 输入 | 平移系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。beta的数据类型精度不低于源操作数的数据类型精度。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[Normalize Tiling](Normalize-Tiling.md)。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | epsilon | 输入 | 防除零的权重系数。 |
 | para | 输入 | Normalize计算所需的参数信息。NormalizePara类型，定义如下方代码所示，其中参数的含义如下。<br>aLength：指定输入inputX的A轴长度。<br>rLength：指定输入inputX的R轴长度。<br>rLengthWithPadding：指定输入inputX的R轴对齐后的长度，该值是32B对齐的。 |
 
@@ -112,16 +112,16 @@ struct NormalizePara {
 ## 调用示例
 
 ```
-// yLocal: 输出归一化后的结果 y，shape 为 [A, R]
-// rstdLocal: 输出标准差的倒数（1 / sqrt(variance + epsilon)），shape 为 [A]
-// meanLocal: 输入的均值，shape 为 [A]
-// varianceLocal: 输入的方差，shape 为 [A]
-// xLocal: 输入数据 X，shape 为 [A, R]，数据类型与 output 一致
-// gammaLocal: 缩放参数 gamma，shape 为 [R]
-// betaLocal: 平移参数 beta，shape 为 [R]
+// yLocal: 输出归一化后的结果y，shape为 [A, R]
+// rstdLocal: 输出标准差的倒数（1 / sqrt(variance + epsilon)），shape为 [A]
+// meanLocal: 输入的均值，shape为 [A]
+// varianceLocal: 输入的方差，shape为 [A]
+// xLocal: 输入数据X，shape为 [A, R]，数据类型与output一致
+// gammaLocal: 缩放参数gamma，shape为 [R]
+// betaLocal: 平移参数beta，shape为 [R]
 // epsilon: 防除零系数
-// para: 包含 A、R 维度信息的 NormalizePara 结构体
-// config: Normalize 配置参数，指定是否跳过 gamma/beta、reduce 模式等
+// para: 包含A、R维度信息的NormalizePara结构体
+// config: Normalize配置参数，指定是否跳过gamma/beta、reduce模式等
 
 constexpr AscendC::NormalizeConfig CONFIG {
     .reducePattern = AscendC::ReducePattern::AR,
@@ -131,17 +131,17 @@ constexpr AscendC::NormalizeConfig CONFIG {
     .isOnlyOutput = false
 };
 
-// 使用 Normalize 接口执行层归一化计算
+// 使用Normalize接口执行层归一化计算
 AscendC::Normalize<DTYPE_Y, DTYPE_X, false, CONFIG>(
-    yLocal,          // 输出：归一化结果 y，shape [A, R]
-    rstdLocal,       // 输出：标准差倒数 rstd，shape [A]
-    meanLocal,       // 输入：均值 mean，shape [A]
-    varianceLocal,   // 输入：方差 variance，shape [A]
-    xLocal,          // 输入：原始数据 X，shape [A, R]
+    yLocal,          // 输出：归一化结果y，shape [A, R]
+    rstdLocal,       // 输出：标准差倒数rstd，shape [A]
+    meanLocal,       // 输入：均值mean，shape [A]
+    varianceLocal,   // 输入：方差variance，shape [A]
+    xLocal,          // 输入：原始数据X，shape [A, R]
     gammaLocal,      // 输入：缩放系数γ，shape [R]
     betaLocal,       // 输入：平移系数β，shape [R]
     epsilon,         // 输入：防除零系数ε
-    para             // 输入：Tiling 参数，包含 aLength、rLength、rLengthWithPadding
+    para             // 输入：Tiling参数，包含aLength、rLength、rLengthWithPadding
 );
 ```
 

@@ -64,17 +64,17 @@ __aicore__ inline void GetCmpMask(const LocalTensor<T>& dst)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | [Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令的比较结果。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要16字节对齐。 |
+| dst | 输出 | [Compare（结果存入寄存器）](Compare（结果存入寄存器）.md)指令的比较结果。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要16字节对齐。 |
 
 ## 数据类型
 

@@ -25,7 +25,7 @@ __aicore__ inline void Where(const LocalTensor<T>& dst, const U& src0, const S& 
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -34,13 +34,13 @@ __aicore__ inline void Where(const LocalTensor<T>& dst, const U& src0, const S& 
 | S | LocalTensor类型或标量类型。根据输入参数src1自动推导类型，开发者无需配置该参数，保证src1的数据类型与目的操作数保持一致即可。 |
 | V | 条件的数据类型，当前支持的数据类型为：bool。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 类型 | 说明 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | src0、src1 | 输入 | 源操作数。类型为标量或LocalTensor，当类型为LocalTensor时，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型需要与目的操作数保持一致。 |
-| condition | 输入 | 条件操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| condition | 输入 | 条件操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | count | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明
@@ -73,4 +73,3 @@ AscendC::Where(dst, src0, src1,  condition, count);
 输出数据（dst）:
 [-1, 2, -3, ... -511, 512]
 ```
-

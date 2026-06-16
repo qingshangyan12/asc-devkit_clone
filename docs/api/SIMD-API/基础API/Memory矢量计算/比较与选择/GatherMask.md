@@ -92,7 +92,7 @@
 
     </cann-filter>
 
-- 用户自定义模式：对应函数原型中src1Pattern的数据类型为LocalTensor，迭代间间隔由src1RepeatStride决定， 迭代内src1Pattern连续消耗。
+- 用户自定义模式：对应函数原型中src1Pattern的数据类型为LocalTensor，迭代间间隔由src1RepeatStride决定，迭代内src1Pattern连续消耗。
 
 GatherMask接口计算过程如下图所示，参数设置为：mask=70，repeatTimes=2，src0Block=0，src0BlockStride=1，src0RepeatStride=8，src1RepeatStride=0。
 
@@ -137,13 +137,13 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 图2、图3采用用户自定义模式进行计算，自定义输入的Tensor为\[0x99999999,...,0x99999999\]，对应二进制为1001…1001，每四个元素取第一个和第四个元素。
 
-**图 1**  GatherMask内置固定模式计算示意图
+**图1**  GatherMask内置固定模式计算示意图
 
 ![](../../../../figures/GatherMask1.png)
 
 <cann-filter npu-type = "950,A3,910b,310b,310p">
 
-**图 2**  GatherMask用户自定义模式计算示意图（配置方式一）
+**图2**  GatherMask用户自定义模式计算示意图（配置方式一）
 
 ![](../../../../figures/GatherMask2.png)
 
@@ -151,7 +151,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 <cann-filter npu-type = "310p">
 
-**图 3**  GatherMask用户自定义模式计算示意图（配置方式二）
+**图3**  GatherMask用户自定义模式计算示意图（配置方式二）
 
 ![](../../../../figures/GatherMask3.png)
 
@@ -175,7 +175,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名称 | 描述 |
 | --- | --- |
@@ -183,19 +183,19 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 | U | 用户自定义模式下src1Pattern的数据类型。 |
 | mode | 预留参数，为后续功能做预留，当前提供默认值，用户无需设置该参数。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
-| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>数据类型需要与目的操作数保持一致。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
+| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>数据类型需要与目的操作数保持一致。 |
 | src1Pattern | 输入 | gather mask（数据收集的掩码），分为内置固定模式和用户自定义模式两种，根据内置固定模式对应的二进制掩码或者用户自定义输入的Tensor数值对应的二进制掩码从源操作数中选取元素写入目的操作数中。1为选取，0为不选取。具体说明请参考[功能说明](#section618mcpsimp)。<br>注：内置固定模式下src1RepeatStride参数无效。 |
-| reduceMode | 输入 | 用于选择mask参数模式，数据类型为bool，支持如下取值：<br>&bull; false：Normal模式。该模式下，每次repeat操作256Bytes数据，总的数据计算量为repeatTimes * 256Bytes。此模式下mask参数无效，建议设置为0。<br>&bull; true：Counter模式。根据mask等参数含义的不同，该模式存在两种配置方式。具体说明请参考[功能说明](#section618mcpsimp)。<br>两种取值都支持：<br>&bull; 按需配置src0BlockStride、src0RepeatStride参数。<br>&bull; 支持src1Pattern配置为内置固定模式或用户自定义模式。用户自定义模式下可根据实际情况配置src1RepeatStride。<br> |
+| reduceMode | 输入 | 用于选择mask参数模式，数据类型为bool，支持如下取值：<br>&bull; false：Normal模式。该模式下，每次repeat操作256Bytes数据，总的数据计算量为repeatTimes * 256Bytes。此模式下mask参数无效，建议设置为0。<br>&bull; true：Counter模式。根据mask等参数含义的不同，该模式存在两种配置方式。具体说明请参考[功能说明](#section618mcpsimp)。<br>两种取值都支持：<br>&bull;按需配置src0BlockStride、src0RepeatStride参数。<br>&bull;支持src1Pattern配置为内置固定模式或用户自定义模式。用户自定义模式下可根据实际情况配置src1RepeatStride。<br> |
 | mask | 输入 | 用于控制每次迭代内参与计算的元素。根据reduceMode，分为两种模式：<br>&bull; Normal模式：mask无效，建议设置为0。<br>&bull; Counter模式：取值范围[1, 2<sup>32</sup> – 1]。不同的版本型号Counter模式下，mask参数表示含义不同。具体配置规则参考上文reduceMode参数描述。<br> |
 | gatherMaskParams | 输入 | 控制操作数地址步长的数据结构，GatherMaskParams类型。<br>具体参数说明[表3 GatherMaskParams结构体参数说明](#GatherMaskParams)。 |
 | rsvdCnt | 输出 | 该条指令筛选后保留下来的元素计数，对应dstLocal中有效元素个数，数据类型为uint64_t。 |
 
-**表 3**  GatherMaskParams结构体参数说明<a id = "GatherMaskParams"></a>
+**表3**  GatherMaskParams结构体参数说明<a id = "GatherMaskParams"></a>
 
 | 参数名称 | 描述 |
 | --- | --- |
@@ -206,7 +206,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 数据类型
 
-**表 4**  数据类型组合情况
+**表4**  数据类型组合情况
 
 | src0数据类型 | src1Pattern数据类型 | dst数据类型 |
 | --- | --- | --- |
@@ -236,11 +236,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-<<<<<<< HEAD
-- 用户自定义Tensor示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/02_memory_vector_compute/gather)场景二。
-=======
--   用户自定义Tensor样例示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景二。
->>>>>>> 2cee38201 (cOptimize 01_simd_cpp_api sample directory structure)
+-   用户自定义Tensor示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景二。
 
     ```cpp
     uint32_t mask = 70; // 每次迭代内参与计算的元素
@@ -249,11 +245,11 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
     // src0Local：源操作数
     // src1Local：存放数据收集的掩码的Tensor
     // dstLocal：目的操作数
-    // reduceMode = true;    使用Counter模式
+    // reduceMode = true;使用Counter模式
     // {}中的参数为：
-    // src0BlockStride = 1;  单次迭代内数据间隔1个DataBlock，即数据连续读取和写入
+    // src0BlockStride = 1;单次迭代内数据间隔1个DataBlock，即数据连续读取和写入
     // repeatTimes = 2;      Counter模式时，仅在部分产品型号下会生效
-    // src0RepeatStride = 4; 源操作数迭代间数据间隔4个DataBlock
+    // src0RepeatStride = 4;源操作数迭代间数据间隔4个DataBlock
     // src1RepeatStride = 0; src1迭代间数据间隔0个DataBlock，即原位置读取
     AscendC::GatherMask (dstLocal, src0Local, src1Local, true, mask, { 1, 2, 4, 0 }, rsvdCnt);
     ```
@@ -268,9 +264,9 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
     // src0Local：源操作数
     // src1Pattern：内置固定模式取值
     // src0Local：目的地址与源地址复用
-    // reduceMode = false; 使用normal模式
+    // reduceMode = false;使用normal模式
     // {}中的参数为：
-    // src0BlockStride = 1; 单次迭代内数据间隔1个Block，即数据连续读取和写入
+    // src0BlockStride = 1;单次迭代内数据间隔1个Block，即数据连续读取和写入
     // repeatTimes = 4;重复迭代4次
     // src0RepeatStride = 8;源操作数迭代数据间隔8个DataBlock
     // src1RepeatStride = 0;重复一次，故设置为0

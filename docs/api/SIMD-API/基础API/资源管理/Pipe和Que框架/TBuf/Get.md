@@ -79,7 +79,7 @@
 
 ## 参数说明<a name="section85121215142514"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table012895562310"></a>
 <table><thead align="left"><tr id="row2128195532318"><th class="cellrowborder" valign="top" width="12.65%" id="mcps1.2.3.1.1"><p id="p1212885512232"><a name="p1212885512232"></a><a name="p1212885512232"></a>参数名称</p>
@@ -96,7 +96,7 @@
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table1794522316251"></a>
 <table><thead align="left"><tr id="row19456238252"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p119458239258"><a name="p119458239258"></a><a name="p119458239258"></a>参数名称</p>
@@ -123,7 +123,7 @@ len的数值是Tensor中元素的个数，len\*sizeof\(T\)不能超过TBuf初始
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
-获取到的[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor.md)。
+获取到的[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。
 
 ## 调用示例<a name="section5725818154718"></a>
 
@@ -153,4 +153,3 @@ AscendC::LocalTensor<int32_t> tensor1 = calcBuf.Get<int32_t>();
 // 用户指定tensor1的第256个int32_t的偏移位置为tensor2的首地址，实际上tensor2可以使用的内存大小为1024字节，两个tensor首地址相差256 * sizeof(int32_t)字节
 auto tensor2 = tensor1[256];
 ```
-

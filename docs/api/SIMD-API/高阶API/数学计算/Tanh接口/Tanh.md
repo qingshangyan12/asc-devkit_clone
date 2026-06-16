@@ -66,7 +66,7 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -84,13 +84,13 @@ struct TanhConfig {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Tanh内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetTanhMaxMinTmpSize](GetTanhMaxMinTmpSize.md)。 |
+| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>源操作数的数据类型需要与目的操作数保持一致。 |
+| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>用于Tanh内部复杂计算时存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[GetTanhMaxMinTmpSize](GetTanhMaxMinTmpSize.md)。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
 ## 返回值说明
@@ -112,12 +112,12 @@ struct TanhConfig {
 
 // 接口框架申请临时空间，全部参与计算
 AscendC::Tanh(dstLocal, srcLocal);
-// 接口框架申请临时空间，部分参与计算, 需要参与计算的元素个数为512
+// 接口框架申请临时空间，部分参与计算,需要参与计算的元素个数为512
 AscendC::Tanh(dstLocal, srcLocal, 512);
 
 // 通过sharedTmpBuffer入参传入临时空间，全部参与计算
 AscendC::Tanh(dstLocal, srcLocal, sharedTmpBuffer);
-// 通过sharedTmpBuffer入参传入临时空间，部分参与计算, 需要参与计算的元素个数为512
+// 通过sharedTmpBuffer入参传入临时空间，部分参与计算,需要参与计算的元素个数为512
 AscendC::Tanh(dstLocal, srcLocal, sharedTmpBuffer, 512);
 static constexpr AscendC::TanhAlgo algo = AscendC::TanhAlgo::SUBSECTION_COMPENSATION;
 static constexpr AscendC::TanhConfig config = { algo };

@@ -2,7 +2,7 @@
 
 除了前述[基础知识](../基础知识.md)和[算子实现](../算子实现.md)中介绍的基本计算能力外，Matmul矩阵编程还提供了适用于不同场景的处理能力及多种功能，具体场景和功能列于下表中，详细内容请见后续章节。
 
-**表 1**  Matmul功能特性表
+**表1**  Matmul功能特性表
 
 <a name="zh-cn_topic_0000002298078557_table1220612410208"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002298078557_row19206141132015"><th class="cellrowborder" valign="top" width="23.64%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002298078557_p52061441122017"><a name="zh-cn_topic_0000002298078557_p52061441122017"></a><a name="zh-cn_topic_0000002298078557_p52061441122017"></a>特性描述</p>
@@ -58,7 +58,7 @@
 </tr>
 <tr id="zh-cn_topic_0000002298078557_row2748530162319"><td class="cellrowborder" valign="top" width="23.64%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002298078557_p141909471896"><a name="zh-cn_topic_0000002298078557_p141909471896"></a><a name="zh-cn_topic_0000002298078557_p141909471896"></a><a href="TSCM输入的矩阵乘.md">TSCM输入的矩阵乘</a></p>
 </td>
-<td class="cellrowborder" valign="top" width="76.36%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002298078557_p1748143002320"><a name="zh-cn_topic_0000002298078557_p1748143002320"></a><a name="zh-cn_topic_0000002298078557_p1748143002320"></a>对内存逻辑位置为<a href="../../../../编程指南/概念原理和术语/术语表.md#p1392229512">TSCM</a>的左矩阵A或右矩阵B实现矩阵乘计算。</p>
+<td class="cellrowborder" valign="top" width="76.36%" headers="mcps1.2.3.1.2 "><p id="zh-cn_topic_0000002298078557_p1748143002320"><a name="zh-cn_topic_0000002298078557_p1748143002320"></a><a name="zh-cn_topic_0000002298078557_p1748143002320"></a>对内存逻辑位置为<a href="../../../../技术附录/概念原理和术语/术语表.md#p1392229512">TSCM</a>的左矩阵A或右矩阵B实现矩阵乘计算。</p>
 </td>
 </tr>
 <tr id="zh-cn_topic_0000002298078557_row1737123113238"><td class="cellrowborder" valign="top" width="23.64%" headers="mcps1.2.3.1.1 "><p id="zh-cn_topic_0000002298078557_p1218910471691"><a name="zh-cn_topic_0000002298078557_p1218910471691"></a><a name="zh-cn_topic_0000002298078557_p1218910471691"></a><a href="矩阵乘输出的N方向对齐.md">矩阵乘输出的N方向对齐</a></p>
@@ -84,7 +84,7 @@
 </tbody>
 </table>
 
-**表 2**  BatchMatmu功能l特性表
+**表2**  BatchMatmu功能l特性表
 
 <a name="zh-cn_topic_0000002298078557_table1558122415575"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002298078557_row1255852419575"><th class="cellrowborder" valign="top" width="24.04%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002298078557_p4558162445718"><a name="zh-cn_topic_0000002298078557_p4558162445718"></a><a name="zh-cn_topic_0000002298078557_p4558162445718"></a>特性描述</p>
