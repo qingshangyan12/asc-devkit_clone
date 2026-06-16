@@ -137,20 +137,16 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     AscendC::PRINTF("[CCU_DEBUG]context=0x%llx, newCcuFlag_=%u\n",
                 reinterpret_cast<uint64_t>(context), newCcuFlag_);
     
-    // 添加详细调试：检查context的前几个字段
-    uint64_t* contextData = reinterpret_cast<__gm__ uint64_t*>(context);
+// 添加详细调试：检查context的前几个字段
+    __gm__ uint64_t* contextData = reinterpret_cast<__gm__ uint64_t*>(context);
     AscendC::PRINTF("[CCU_DEBUG] context[0]=0x%llx (expect version or workSpace)\n", contextData[0]);
     AscendC::PRINTF("[CCU_DEBUG] context[1]=0x%llx (expect workspace or workSpaceSize)\n", contextData[1]);
     AscendC::PRINTF("[CCU_DEBUG] context[2]=0x%llx (expect workspaceSize or rankId)\n", contextData[2]);
     
     if (newCcuFlag_) {
         hcclNewContext_ = (__gm__ HcclApi::OpResCtx*)context;
-        AscendC::PRINTF("[CCU_DEBUG] Using OpResCtx: workspace=0x%llx, workspaceSize=0x%llx\n",
-                    hcclNewContext_->workspace, hcclNewContext_->workspaceSize);
     } else {
         hcclContext_ = (__gm__ HcclCombineOpParam*)context;
-        AscendC::PRINTF("[CCU_DEBUG] Using HcclCombineOpParam: workSpace=0x%llx, workSpaceSize=0x%llx\n",
-                    hcclContext_->workSpace, hcclContext_->workSpaceSize);
     }
 
     // ensure hcclMsgArea 512B aligned
