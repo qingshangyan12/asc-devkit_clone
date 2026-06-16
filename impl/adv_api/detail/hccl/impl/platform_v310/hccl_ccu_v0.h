@@ -409,7 +409,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     ccuMsg_.xnAddr = hcclContext_->xnOffset + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
-
+    ccuMsg_.waitCKEAddr = GetWaitCkeAddr(resourceId);
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
     }
@@ -439,7 +439,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
-    WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+    // WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+    WriteHBMData(ccuMsg_.waitCKEAddr, CCU_MSG_CKE_SET_VALUE);
 }
 
 template <const auto& config>
@@ -576,12 +577,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
     if (workingFlag_) {
         HcclHandle handleId = curHandleId_ - 1;
 
-        while (handleFinishCnt_[handleId] < handleCommitCnt_[handleId]) {
-            Wait(handleId);
-        }
+        // while (handleFinishCnt_[handleId] < handleCommitCnt_[handleId]) {
+        //     Wait(handleId);
+        // }
 
         KERNEL_LOG(KERNEL_INFO, "ApiClient Finalize handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
-
+        globalCurWaitId_ = 0;
         ccuMsg_.commitCKEAddr = GetCommitCkeAddr(globalCurWaitId_);
         ccuMsg_.xnAddr = hcclContext_->xnOffset + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
