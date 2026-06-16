@@ -49,8 +49,8 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_membar_intf_impl"`。
-Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。MemType用于标识不同的流水线类型，其具体取值与含义详见(表 MemType取值说明)[#table2_memtype]。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_membar_intf"`。
+Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。MemType用于标识不同的流水线类型，其具体取值与含义详见[表 MemType取值说明](#table2_memtype)。
 
 **图1**  流水线等待示意图<a name="fig2635167165614"></a>  
 ![](../../../../figures/流水线等待示意图.png "流水线等待示意图")
@@ -77,8 +77,8 @@ __simd_callee__ inline void LocalMemBar()
 | ------ | ------ |
 | VEC_STORE | SIMD_VF函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，如StoreAlign、StoreUnAlign、Store。 |
 | VEC_LOAD | SIMD_VF函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，如LoadAlign、LoadUnAlign、Load。 |
-| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。<br>对应标量写入UB的指令，如Duplicate。 |
-| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。<br>对应UB读取标量的指令，如[GetValue](../../../基础数据结构/LocalTensor/GetValue.md#section618mcpsimp)。 |
+| SCALAR_STORE | SIMD_VF函数内标量写UB流水线。<br>对应标量写入UB的指令。 |
+| SCALAR_LOAD | SIMD_VF函数内标量读UB流水线。<br>对应UB读取标量的指令。 |
 | VEC_ALL | SIMD_VF函数内所有矢量读写UB流水线。 |
 | SCALAR_ALL | SIMD_VF函数内所有标量读写UB流水线。 |
 
