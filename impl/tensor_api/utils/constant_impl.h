@@ -170,7 +170,7 @@ inline constexpr bool IsDataType = IsOneOfAttrV<Std::remove_cvref_t<DataType>, h
                                                 || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
 template <typename DataType>
-inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
+inline constexpr bool IsB4Type = IsOneOfAttrV<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat4x2_t>;
 
 template<typename T = Std::ignore_t>
 __aicore__ inline constexpr size_t GetC0Size() {
