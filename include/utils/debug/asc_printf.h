@@ -48,13 +48,17 @@ namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     printf_impl(fmt, args...);
+#endif
 }
 
 template <class... Args>
 __aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     printf_impl(fmt, args...);
+#endif
 }
 } // namespace __asc_aicore
 #else
