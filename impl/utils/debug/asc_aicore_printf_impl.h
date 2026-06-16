@@ -273,7 +273,9 @@ enum class DumpType : uint8_t {
 template <class... Args>
 __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 {
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     std::printf(fmt, args...);
+#endif
 }
 
 template <class... Args>
