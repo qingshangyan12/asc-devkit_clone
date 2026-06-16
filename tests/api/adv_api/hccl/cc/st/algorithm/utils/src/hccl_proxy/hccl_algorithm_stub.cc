@@ -57,24 +57,30 @@ HcclResult haclrtGetCaptureInfo(aclrtStream stream, aclmdlRICaptureStatus &captu
 
 }
 
+#include <cstdio>
+
 extern "C" {
 
 void HcommDlInit(void)
 {
+    fprintf(stderr, "[HcclWrapper-STUB] HcommDlInit stub called (EMPTY IMPLEMENTATION)\n");
 }
 
 int GetHcommVersion(void)
 {
+    fprintf(stderr, "[HcclWrapper-STUB] GetHcommVersion stub called\n");
     return 90000009;
 }
 
 bool HcommIsProfilingSupported()
 {
+    fprintf(stderr, "[HcclWrapper-STUB] HcommIsProfilingSupported stub called\n");
     return true;
 }
 
 bool HcommIsExportThreadSupported()
 {
+    fprintf(stderr, "[HcclWrapper-STUB] HcommIsExportThreadSupported stub called\n");
     return true;
 }
 
