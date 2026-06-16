@@ -1,10 +1,10 @@
 ﻿# C语言编程概述
 
-C 语言编程是 Ascend C SIMD 编程路径的底层核心接口，可直接映射 NPU 硬件指令，支持开发者对向量处理单元、矩阵运算单元、本地存储等硬件资源进行精细化控制。开发者可手动规划本地内存布局、管控数据流转、插入硬件流水同步指令、调整数据搬运与计算的流水并行策略，围绕计算单元、存储层次和流水同步机制来组织代码实现。该编程方式适用于对性能和可控性要求较高的算子开发场景，也是习惯 C 语言编程、追求极致性能的开发者充分释放 NPU 硬件潜能的核心技术路径。基于以上定位，下面从核函数、内存架构、同步机制、算子开发四大核心模块，逐一讲解 Ascend C 语言编程的核心规则与使用方法。
+C语言编程是Ascend C SIMD编程路径的底层核心接口，可直接映射NPU硬件指令，支持开发者对向量处理单元、矩阵运算单元、本地存储等硬件资源进行精细化控制。开发者可手动规划本地内存布局、管控数据流转、插入硬件流水同步指令、调整数据搬运与计算的流水并行策略，围绕计算单元、存储层次和流水同步机制来组织代码实现。该编程方式适用于对性能和可控性要求较高的算子开发场景，也是习惯C语言编程、追求极致性能的开发者充分释放NPU硬件潜能的核心技术路径。基于以上定位，下面从核函数、内存架构、同步机制、算子开发四大核心模块，逐一讲解Ascend C语言编程的核心规则与使用方法。
 
 ## Kernel函数
 
-[核函数](../核函数.md)在前序章节已作介绍。Ascend C 语言编程完全沿用 SIMD 编程的核函数定义与调用规范，未新增额外语法约束。核函数是运行在 Device 侧的执行入口，所有内存读写、数据搬运、计算逻辑均在核函数内部实现。下文将首先介绍C语言编程的内存层级，这也是核函数开发的基础。
+[核函数](../核函数.md)在前序章节已作介绍。Ascend C语言编程完全沿用SIMD编程的核函数定义与调用规范，未新增额外语法约束。核函数是运行在Device侧的执行入口，所有内存读写、数据搬运、计算逻辑均在核函数内部实现。下文将首先介绍C语言编程的内存层级，这也是核函数开发的基础。
 
 ## 内存层级
 
@@ -21,9 +21,9 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
-结合下述示例说明：Host 侧通过aclrtMalloc接口分配 Device 侧全局内存，通过aclrtMemcpy完成 Host 与 Device 全局内存间的数据互拷（Host→Device 或 Device→Host）；随后通过 <<<>>> 语法触发 Device 侧核函数执行运算；此外，通过aclrtMalloc分配的 Device 全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+结合下述示例说明：Host侧通过aclrtMalloc接口分配Device侧全局内存，通过aclrtMemcpy完成Host与Device全局内存间的数据互拷（Host→Device或Device→Host）；随后通过<<<>>>语法触发Device侧核函数执行运算；此外，通过aclrtMalloc分配的Device全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
-此外，核函数需使用__global__函数前缀进行声明。 该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。完整的调用流程为：Host 分配 GM 内存 → 数据拷贝 → 启动核函数 → 释放内存，示例代码如下：
+此外，核函数需使用__global__函数前缀进行声明。该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。完整的调用流程为：Host分配GM内存 → 数据拷贝 → 启动核函数 → 释放内存，示例代码如下：
 
 ```c
 // Kernel implementation, decorated with __global__ to mark kernel entry point
@@ -61,7 +61,7 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
 #### AIV内部存储之Unified Buffer
 
-Unified Buffer 是 AI Core 中服务于矢量计算单元的核心内部存储单元，部署在每个 Vector Core（AIV）内部。相较于外部存储空间，Unified Buffer 容量更小，但具备更高的带宽和更低的访问延迟，可作为内核执行期间由用户自主管理的高速缓存资源。
+Unified Buffer是AI Core中服务于矢量计算单元的核心内部存储单元，部署在每个Vector Core（AIV）内部。相较于外部存储空间，Unified Buffer容量更小，但具备更高的带宽和更低的访问延迟，可作为内核执行期间由用户自主管理的高速缓存资源。
 
 在C指针编程中，用户可通过数组定义的方式动态或静态申请Unified Buffer。
 
@@ -112,7 +112,7 @@ __global__ __vector__ void add_custom(...) {
 }
 ```
 
-> 📌 Unified Buffer 的内存地址必须按 32 字节对齐，目的是匹配硬件总线的数据传输粒度和 SIMD 计算单元的并行处理能力；若地址非对齐访问，会直接导致程序运行时错误。
+> 📌 Unified Buffer的内存地址必须按32字节对齐，目的是匹配硬件总线的数据传输粒度和SIMD计算单元的并行处理能力；若地址非对齐访问，会直接导致程序运行时错误。
 
 #### AIV内部存储之Register File
 
@@ -188,13 +188,13 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 ## 同步机制
 
-前文介绍了 AI Core 的多级存储与计算单元架构。由于 DMA 搬运、矢量计算、矩阵计算等单元均为异步并行执行，数据读写、计算操作存在强依赖，因此必须依靠同步机制管控执行时序，保证程序逻辑正确。在编程场景中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机，以保障程序执行结果的正确性。若未通过同步机制严格控制执行顺序，会导致计算结果不一致、程序行为不可预测等问题。
+前文介绍了AI Core的多级存储与计算单元架构。由于DMA搬运、矢量计算、矩阵计算等单元均为异步并行执行，数据读写、计算操作存在强依赖，因此必须依靠同步机制管控执行时序，保证程序逻辑正确。在编程场景中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机，以保障程序执行结果的正确性。若未通过同步机制严格控制执行顺序，会导致计算结果不一致、程序行为不可预测等问题。
 
 AI Core的同步主要分为**核内同步**和**核间同步**。
 
 ### 核内同步
 
-AI Core 内部的执行单元（如 MTE2 数据搬运单元、Vector 计算单元等）采用异步并行方式运行，当多个单元读写同一存储资源时，必然存在数据依赖关系。为保障数据一致性和计算结果的正确性，必须通过同步控制来协调各单元的操作时序。
+AI Core内部的执行单元（如MTE2数据搬运单元、Vector计算单元等）采用异步并行方式运行，当多个单元读写同一存储资源时，必然存在数据依赖关系。为保障数据一致性和计算结果的正确性，必须通过同步控制来协调各单元的操作时序。
 
 下图示例描述了一个常见的Vector计算数据流：
 
@@ -202,7 +202,7 @@ AI Core 内部的执行单元（如 MTE2 数据搬运单元、Vector 计算单�
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
 
-上述不同执行单元对应 AI Core 内部不同的硬件流水线，各流水线分工明确，具体分类如下表：
+上述不同执行单元对应AI Core内部不同的硬件流水线，各流水线分工明确，具体分类如下表：
 
 <img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
 
@@ -280,7 +280,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 </tbody>
 </table>
 
-以上为单个 AI Core 内部各流水线、执行单元的同步方案。当业务逻辑需要跨多个 AI Core 协作时，则需要使用核间同步机制。
+以上为单个AI Core内部各流水线、执行单元的同步方案。当业务逻辑需要跨多个AI Core协作时，则需要使用核间同步机制。
 
 ### 核间同步
 
@@ -288,7 +288,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 <img src="../../../../figures/核间同步业务场景示例.png" alt="核间同步业务场景示例" width="800" />
 
-从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个 group 内细分为 block（主核）和 subblock（从核），二者比例为 1:N（N≥1）；其中，block 代表主核的数量，subblock 代表单个主核关联的从核数量。
+从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分为block（主核）和subblock（从核），二者比例为1:N（N≥1）；其中，block代表主核的数量，subblock代表单个主核关联的从核数量。
 
 <img src="../../../../figures/block和subblock之间关系.png" alt="block和subblock之间关系" width="800" />
 
@@ -360,7 +360,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 ## 算子类型
 
-结合前文介绍的 AI Core 计算单元、多级内存架构与同步机制，基于硬件能力可开发三类算子：矢量算子、矩阵算子、融合算子。前序章节对硬件架构的介绍中已说明：AI Core 包含 Vector（矢量计算）和 Cube（矩阵计算）两类核心计算单元，分别对应矢量计算和矩阵计算场景。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
+结合前文介绍的AI Core计算单元、多级内存架构与同步机制，基于硬件能力可开发三类算子：矢量算子、矩阵算子、融合算子。前序章节对硬件架构的介绍中已说明：AI Core包含Vector（矢量计算）和Cube（矩阵计算）两类核心计算单元，分别对应矢量计算和矩阵计算场景。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
 
 ### Vector矢量计算
 
@@ -394,7 +394,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发, Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
 
-以Matmul矩阵乘计算为例, 开发者通过操作Cube矩阵计算能力可以完成如下图所示的c = a * b + bias的能力。
+以Matmul矩阵乘计算为例, 开发者通过操作Cube矩阵计算能力可以完成如下图所示的`c = a * b + bias`的能力。
 - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
 - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
 - bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
@@ -421,7 +421,7 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 
 ### Mix CV融合计算
 
-将矢量计算与矩阵计算融合在同一个算子中，即为 CV 融合算子，可进一步提升整体性能。开发者可根据业务场景，自由融合Vector、Cube算子以优化性能 —— 融合了 Cube 计算和 Vector 计算的算子统称为 CV 融合算子。例如 LLM 大模型核心的 Flash Attention 算子，就是将 Matmul（Cube）、Scale（Vector）、Mask（Vector）、SoftMax（Vector）等操作融合为一个算子，核心实现如下：
+将矢量计算与矩阵计算融合在同一个算子中，即为CV融合算子，可进一步提升整体性能。开发者可根据业务场景，自由融合Vector、Cube算子以优化性能 —— 融合了Cube计算和Vector计算的算子统称为CV融合算子。例如LLM大模型核心的Flash Attention算子，就是将Matmul（Cube）、Scale（Vector）、Mask（Vector）、SoftMax（Vector）等操作融合为一个算子，核心实现如下：
 
 
 ![Flash Attention核心实现](../../../../figures/Flash-Attention核心实现.png)
@@ -449,4 +449,4 @@ __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 ## 总结
 
-本章从技术定位出发，依次讲解了C语言编程的核函数规范、内存层级、、内外核同步机制以及三类算子开发范式。作为底层硬件编程接口，该路径可充分挖掘 NPU 算力。如需深入实践，可参考以下专项文档：[Memory矢量计算编程](./Memory矢量计算编程.md)、[Cube矩阵计算编程](./Cube矩阵计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
+本章从技术定位出发，依次讲解了C语言编程的核函数规范、内存层级、内外核同步机制以及三类算子开发范式。作为底层硬件编程接口，该路径可充分挖掘NPU算力。如需深入实践，可参考以下专项文档：[Memory矢量计算编程](./Memory矢量计算编程.md)、[Cube矩阵计算编程](./Cube矩阵计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
