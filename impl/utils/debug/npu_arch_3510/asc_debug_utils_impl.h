@@ -69,17 +69,16 @@ __simd_callee__ inline void enable_asc_diagnostics()
 __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx = 0)
 {
 #if defined(ASCENDC_SIMD_VF_DEBUG)
-    constexpr uint32_t safeStaticLen = 32;
-    static __ubuf__ uint64_t info[safeStaticLen];
+    constexpr uint64_t printfUbufAddrStore = 0x40000;
+    __ubuf__ uint64_t* infoAddr = reinterpret_cast<__ubuf__ uint64_t*>(printfUbufAddrStore);
+    auto* bufInfo = reinterpret_cast<__ubuf__ BlockVFBufInfo*>(*infoAddr);
     if (addr != 0) {
-        info[0] = addr;
         // clear data workspace when initializing
-        auto* bufInfo = reinterpret_cast<__ubuf__ BlockVFBufInfo*>(addr);
         bufInfo->writeLen = 0;
         bufInfo->pidx = 0;
         bufInfo->blockIdx = blockIdx;
     }
-    return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(info[0]);
+    return bufInfo;
 #else
     return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(0);
 #endif
