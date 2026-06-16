@@ -349,66 +349,6 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><strong>单个AI Core内两个AIV间同步</strong></td>
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
       <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code> </td>
-      <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code></td>
-    </tr>
-  </tbody>
-</table>
-
-<table>
-  <thead>
-    <tr>
-      <th>核间同步类型</th>
-      <th>场景说明</th>
-      <th>主要接口</th>
-      <th>实现代码示例</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>所有AIC核同步</strong></td>
-      <td>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</td>
-      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
-      <td>
-<pre><code>if ASCEND_IS_AIC {
-    int64_t flagID = 1;
-    asc_sync_inter_arrive(PIPE_S, flagID);
-    asc_sync_inter_wait(PIPE_S, flagID);
-}</code></pre>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>所有AIV核同步</strong></td>
-      <td>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</td>
-      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
-      <td>
-<pre><code>if ASCEND_IS_AIV {
-    int64_t flagID = 1;
-    asc_sync_inter_arrive(PIPE_S, flagID);
-    asc_sync_inter_wait(PIPE_S, flagID);
-}</code></pre>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>单个AI Core内AIC与AIV同步</strong></td>
-      <td>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</td>
-      <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
-      <td>
-<pre><code>if ASCEND_IS_AIC {
-    // Atlas A2/A3: AIC sends one arrive
-    asc_sync_intra_arrive(PIPE_FIX, 0);
-    // Ascend 950PR/Ascend 950DT: AIC sends two arrives
-    asc_sync_intra_arrive(PIPE_FIX, 0);
-    asc_sync_intra_arrive(PIPE_FIX, 16);
-}
-if ASCEND_IS_AIV {
-    asc_sync_intra_wait(PIPE_MTE3, 0);
-}</code></pre>
-      </td>
-    </tr>
-    <tr>
-      <td><strong>单个AI Core内两个AIV间同步</strong></td>
-      <td>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</td>
-      <td>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</td>
       <td>-</td>
     </tr>
   </tbody>
