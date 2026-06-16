@@ -16,7 +16,8 @@
 
 ```
 ├── tiling_sink_programming
-│   └── test_add_custom_tiling_sink.py   // PyTorch图模式下Tiling下沉调用测试脚本
+│   ├── test_add_custom_tiling_sink.py   // PyTorch图模式下Tiling下沉调用测试脚本
+│   └── README.md                        // 样例说明文档
 ```
 
 ## 代码实现介绍
@@ -34,7 +35,7 @@
 
 - 编译、打包和部署自定义算子工程
 
-  运行此样例前，需先进入[自定义算子工程样例](../../../../../01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op)目录完成编译、打包和部署。
+  运行此样例前，需先进入[自定义算子工程样例](../../../../../01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
 - 安装前置依赖
 
