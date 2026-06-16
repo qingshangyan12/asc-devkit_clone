@@ -67,9 +67,9 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ## 约束说明
 
 -   本接口不支持打印除换行符之外的其他转义字符。
--   SIMT VF中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过acl.json中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
--   printf在SIMT VF中调用，会占用SIMT栈空间，请合理控制调用printf次数，防止SIMT栈溢出。
--   在仿真环境下，使用printf接口会增加算子运行时间，通过在VF代码中判断线程ID，可以仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
+-   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过acl.json中的"simt\_printf\_fifo\_size"字段进行配置，配置范围最小为1MB，最大为64MB。当打印数据量较大时，建议增加缓存空间。
+-   在SIMT中调用printf接口，会占用额外的SIMT栈空间，请合理控制调用printf次数，防止SIMT栈溢出。
+-   在仿真环境下，使用printf接口会增加算子运行时间，通过在代码中判断线程ID，可以仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
 -   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为32KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围最小为1KB，最大为64MB。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 -   SIMD场景下，根据算子执行方式的不同，printf的打印结果输出方式不同。动态图或者单算子直调场景下，待输出内容会被解析并打印在屏幕上；静态图场景下，整图算子需要全下沉到NPU侧执行，无法直接调用接口打印出单个算子的信息，因此需要在模型执行完毕后，将待输出内容落盘在dump文件中，dump文件需要通过工具解析为可读内容。
     -   dump文件落盘路径按照优先级排列如下：
@@ -157,9 +157,41 @@ simd vf: int=1, uint=2, float=5.000000, string=AscendC
 ......
 ```
 
-## SIMT示例
+## SIMT调用示例
 
+```c++
+#include "simt_api/asc_simt.h"
+#include "utils/debug/asc_printf.h"
+
+// <<<>>>启动核函数时线程参数：dim3(8, 2, 8)
+__global__ __launch_bounds__(128) void SimtCompute()
+{
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+    int z = threadIdx.z;
+    printf("simt: d: (%d, %d, %d), f: %f, s: %s\n", x, y, z, 3.14f, "pass");
+}
 ```
+
+NPU模式下，程序运行时打印效果如下：
+
+```bash
+simt: d: (0, 0, 0), f: 3.140000, s: pass
+simt: d: (0, 0, 1), f: 3.140000, s: pass
+simt: d: (0, 0, 2), f: 3.140000, s: pass
+simt: d: (0, 0, 3), f: 3.140000, s: pass
+simt: d: (0, 0, 4), f: 3.140000, s: pass
+simt: d: (0, 0, 5), f: 3.140000, s: pass
+simt: d: (0, 0, 6), f: 3.140000, s: pass
+simt: d: (0, 0, 7), f: 3.140000, s: pass
+simt: d: (0, 1, 0), f: 3.140000, s: pass
+simt: d: (0, 1, 1), f: 3.140000, s: pass
+......
+```
+
+## SIMT VF调用示例
+
+```c++
 #include "kernel_operator.h"
 #include "simt_api/asc_simt.h"
 #include "utils/debug/asc_printf.h"
@@ -176,7 +208,7 @@ __simt_vf__ __launch_bounds__(128) inline void SimtCompute()
 
 NPU模式下，程序运行时打印效果如下：
 
-```
+```bash
 simt vf: d: (0, 0, 0), f: 3.140000, s: pass
 simt vf: d: (0, 0, 1), f: 3.140000, s: pass
 simt vf: d: (0, 0, 2), f: 3.140000, s: pass
