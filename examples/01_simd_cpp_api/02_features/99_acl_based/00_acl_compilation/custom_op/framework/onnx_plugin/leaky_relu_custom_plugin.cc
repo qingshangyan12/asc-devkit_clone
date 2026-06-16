@@ -31,8 +31,8 @@ Status ParseOnnxParamsLeakyReluCustom(const ge::Operator& op_src, ge::Operator& 
         json attrs = json::parse(attrs_string.GetString());
         for (json attr : attrs["attribute"]) {
             if (attr["name"] == "alpha" && attr["type"] == kTypeFloat) {
-                negative_slope_str =
-                    attr["f"]; // float type in json has accuracy loss, so we use string type to store it
+                // float type in json has accuracy loss, so we use string type to store it
+                negative_slope_str = attr["f"];
                 negative_slope = atof(negative_slope_str.c_str());
             }
         }
