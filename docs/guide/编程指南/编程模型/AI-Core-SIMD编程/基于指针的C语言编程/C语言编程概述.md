@@ -99,14 +99,14 @@ int32_t main(int argc, char const *argv[])
 
 ```c
 // Define src0 and src1 memory blocks unified via struct
-typedef struct {
+typedef struct asc_src_buffer_s {
     half src0_buf[128];
     half src1_buf[128];
-} asc_src_buf;
+} asc_src_buffer_t;
 
 __global__ __vector__ void add_custom(...) {
-    __ubuf__ asc_src_ubuf local_buf{};
-    __ubuf__ asc_src_ubuf* src_buffer = (__ubuf__ asc_src_ubuf*)&local_buf;
+    __ubuf__ asc_src_buffer_t local_buf{};
+    __ubuf__ asc_src_buffer_t* src_buffer = (__ubuf__ asc_src_buffer_t*)&local_buf;
     ...
     asc_add(dst, src_buffer.src0_buf, src_buffer.src1_buf, 128);
 }
