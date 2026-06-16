@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 /* !
  * \file kernel_reg_compute_datacopy_intf.h
@@ -61,32 +61,31 @@ template <typename T = DefaultType, StoreDist dist, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, MaskReg& mask);
 
 template <typename T = DefaultType, StoreDist dist, typename U>
-__simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, AddrReg offset,
-                                       MaskReg& mask);
+__simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg0, U& srcReg1, AddrReg offset, MaskReg& mask);
 
 // vsldb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void LoadAlign(U& dstReg, __ubuf__ T* srcAddr, uint32_t dataBlockStride, MaskReg& mask);
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
-__simd_callee__ inline void LoadAlign(U &dstReg, __ubuf__ T*& srcAddr, uint32_t dataBlockStride, uint32_t repeatStride,
-                                      MaskReg& mask);
+__simd_callee__ inline void LoadAlign(
+    U& dstReg, __ubuf__ T*& srcAddr, uint32_t dataBlockStride, uint32_t repeatStride, MaskReg& mask);
 
 // vsstb
 template <typename T = DefaultType, DataCopyMode dataMode, typename U>
 __simd_callee__ inline void StoreAlign(__ubuf__ T* dstAddr, U& srcReg, uint32_t dataBlockStride, MaskReg& mask);
 
 template <typename T = DefaultType, DataCopyMode dataMode, PostLiteral postMode, typename U>
-__simd_callee__ inline void StoreAlign(__ubuf__ T*& dstAddr, U& srcReg, uint32_t dataBlockStride, uint32_t repeatStride,
-                                       MaskReg& mask);
+__simd_callee__ inline void StoreAlign(
+    __ubuf__ T*& dstAddr, U& srcReg, uint32_t dataBlockStride, uint32_t repeatStride, MaskReg& mask);
 
 // vldas/vldus
 template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
 
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
-__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr,
-                                        uint32_t postUpdateStride);
+__simd_callee__ inline void LoadUnAlign(
+    U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr, uint32_t postUpdateStride);
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T* srcAddr);
@@ -99,13 +98,13 @@ template <typename T>
 __simd_callee__ inline void LoadUnAlignPre(UnalignRegForLoad& ureg, __ubuf__ T* srcAddr, AddrReg& areg);
 
 template <typename T = DefaultType, typename U>
-__simd_callee__ inline void LoadUnAlign(U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr, AddrReg& areg,
-                                        uint32_t inc);
+__simd_callee__ inline void LoadUnAlign(
+    U& dstReg, UnalignRegForLoad& ureg, __ubuf__ T*& srcAddr, AddrReg& areg, uint32_t inc);
 
 // vstus/vstas
 template <typename T = DefaultType, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE, typename U>
-__simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg,
-                                         uint32_t postUpdateStride);
+__simd_callee__ inline void StoreUnAlign(
+    __ubuf__ T*& dstAddr, U& srcReg, UnalignRegForStore& ureg, uint32_t postUpdateStride);
 
 template <typename T, PostLiteral postMode = PostLiteral::POST_MODE_UPDATE>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegForStore& ureg, int32_t postUpdateStride);
@@ -131,8 +130,7 @@ template <typename T>
 __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T* dstAddr, UnalignRegForStore& ureg);
 
 // vgather2
-template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3,
-          typename T4>
+template <typename T0 = DefaultType, typename T1, typename T2 = DefaultType, typename T3, typename T4>
 __simd_callee__ inline void Gather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index, MaskReg& mask);
 
 // vgatherb
@@ -179,4 +177,3 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_H__
 #endif
-
