@@ -49,9 +49,13 @@
 
 ## 功能说明<a name="section16390191715619"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf_impl"`。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf.h"`。
 
 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。
+
+**图 1**  Pack示意图
+
+![Pack](../../../../figures/reg_pack.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -68,7 +72,7 @@ __simd_callee__ inline void Pack(S& dstReg, V& srcReg)
 | ------ | ------ |
 | T | 目的操作数数据类型。<br> 源操作数和目的操作数的数据类型约束参考见[表 源操作数和目的操作数的数据类型对应表](#table3)。|
 | U | 源操作数数据类型。 |
-| part | 枚举类型，用于控制写入dstReg的低半部分还是高半部分。<br>• HighLowPart::LOWEST，低位模式，写入dstReg的低半部分；<br>• HighLowPart::HIGHEST，高位模式，写入dstReg的高半部分。<br> 注：RegTraitNumTwo只支持LOWEST模式。|
+| part | 枚举类型，用于控制写入dstReg的低半部分还是高半部分。<br>• HighLowPart::LOWEST，低位模式，写入dstReg的低半部分。<br>• HighLowPart::HIGHEST，高位模式，写入dstReg的高半部分。<br> 注：RegTraitNumTwo只支持LOWEST模式。|
 | S | 目的操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
 | V | 源操作数RegTensor类型，由编译器自动推导，用户不需要填写。 |
 
