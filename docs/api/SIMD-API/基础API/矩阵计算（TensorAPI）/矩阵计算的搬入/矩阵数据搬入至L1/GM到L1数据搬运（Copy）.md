@@ -17,6 +17,7 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 连续数据搬入：源数据从Global Memory搬入L1 Buffer后数据格式不变。
 - 高维切分数据搬入：源/目的侧存在步长时，根据Layout推导多段搬运。
 - 随路格式转换搬入：从Global Memory搬入L1 Buffer的同时完成ND/DN等到NZ/ZN等的矩阵格式转换。
+- Batch多矩阵搬入：源/目的Layout带Batch轴时，一次`Copy`完成多个矩阵的搬运，支持`ND2NZ`、`DN2NZ`、`ND2ZN`、`DN2ZN`随路格式转换。
 - Scale数据搬入：用于MX矩阵计算中ScaleA/ScaleB数据从Global Memory搬入L1 Buffer。
 
 ## 函数原型
@@ -105,6 +106,7 @@ Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用
 - 数据连续搬运场景中，搬运字节数需要32B对齐。若未对齐，搬运量会向下取整到32B对齐。
 - 高维切分搬运场景中，搬运长度、源步长和目的步长均按32B对齐。
 - 当输入数据是b4类型时，按b8类型搬运粒度处理，Layout推导参数需要满足对应粒度约束。
+- Batch多矩阵搬入仅支持`ND2NZ`、`DN2NZ`、`ND2ZN`、`DN2ZN`四类格式转换；Batch数受搬运指令字段范围限制，需不大于4095。
 
 ## 关键特性说明
 
@@ -134,6 +136,22 @@ DN2NZ非连续搬运表示源侧或目的侧存在步长、切分维度等高维
 
 Scale数据搬入用于矩阵计算中scale相关数据从Global Memory搬入L1 Buffer。A矩阵相关scale支持`ScaleAND`到`ZZ`、`ScaleADN`到`ZZ`、`ZZ`到`ZZ`的格式转换。B矩阵相关scale支持`ScaleBND`到`NN`、`ScaleBDN`到`NN`、`NN`到`NN`的格式转换。
 
+### Batch多矩阵搬入
+
+Batch多矩阵搬入表示一次`Copy`完成多个矩阵的搬运。当源张量和目的张量的Layout带有Batch轴时，`Copy`自动按Batch轴循环完成各矩阵的搬运，接口调用方式与单矩阵搬运完全一致，无需额外传入Batch相关参数。
+
+Batch场景支持`ND2NZ`、`DN2NZ`、`ND2ZN`、`DN2ZN`四类随路格式转换搬入。
+
+带Batch轴的Layout在原二维矩阵Layout外层增加一维Batch，可通过`MakeFrameLayout`的三参重载构造，形式为`MakeFrameLayout<LayoutPattern, Trait>(B, M, K)`，其中`B`为Batch数，`M`、`K`为单个矩阵的行、列。Layout语义为：
+
+- Shape为`(B, 原矩阵Shape)`。
+- Stride为`(M * K, 原矩阵Stride)`，即各矩阵在内存上按`M * K`连续排布。
+
+搬运行为：
+
+- 源（Global Memory）侧：各Batch的源地址间距由Layout的Batch轴Stride决定，既支持Batch间连续排布，也支持Batch间非连续排布（由Stride表达）。
+- 目的（L1 Buffer）侧：各Batch在L1 Buffer上连续摆放，Batch间距为对齐后的单矩阵占用大小。
+
 ## 调用示例
 
 以下示例将Global Memory中的ND矩阵搬入L1 Buffer，并转换为NZ格式。
@@ -150,9 +168,36 @@ __aicore__ inline void CopyGmToL1(__gm__ half* gmAddr)
 {
     __cbuf__ half l1Buf[M * K];
 
+    // 源张量：Global Memory上的ND格式矩阵；目的张量：L1 Buffer上的NZ格式矩阵
     auto gmA = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(M, K));
     auto l1A = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, half>(M, K));
 
+    // 构造GM到L1搬运原子对象，Copy根据源/目的Layout自动完成ND到NZ的随路格式转换
+    auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+    Copy(copyGm2L1, l1A, gmA);
+}
+```
+
+以下示例将Global Memory中的B个ND矩阵一次性搬入L1 Buffer，并转换为NZ格式。源张量和目的张量均使用带Batch轴的Layout，接口调用方式与单矩阵搬运一致。
+
+```cpp
+#include "tensor_api/tensor.h"
+
+using namespace AscendC::Te;
+
+constexpr uint32_t B = 4;
+constexpr uint32_t M = 32;
+constexpr uint32_t K = 64;
+
+__aicore__ inline void CopyBatchGmToL1(__gm__ half* gmAddr)
+{
+    __cbuf__ half l1Buf[B * M * K];
+
+    // 构造带Batch轴的源/目的Layout（B个矩阵），三参MakeFrameLayout在原二维Layout外层增加一维Batch
+    auto gmA = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
+    auto l1A = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, half>(B, M, K));
+
+    // 调用方式与单矩阵一致，Copy自动按Batch轴循环完成B个矩阵的ND到NZ搬运
     auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
     Copy(copyGm2L1, l1A, gmA);
 }
