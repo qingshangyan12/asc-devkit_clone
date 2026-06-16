@@ -19,10 +19,12 @@
 #ifndef ASCENDC_MODULE_OPERATOR_H
 #define ASCENDC_MODULE_OPERATOR_H
 
+#include "impl/utils/debug/asc_printf_config.h"
 #include "kernel_tpipe.h"
 #include "kernel_tensor.h"
 #include "kernel_type.h"
 #include "kernel_operator_intf.h"
+#include "impl/utils/debug/asc_printf_impl.h"
 
 #endif // ASCENDC_MODULE_OPERATOR_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_H)

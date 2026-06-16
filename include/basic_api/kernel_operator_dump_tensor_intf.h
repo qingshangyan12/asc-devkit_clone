@@ -24,7 +24,7 @@
 #include "kernel_tensor.h"
 #include "../../impl/basic_api/kernel_log.h"
 #include "utils/debug/asc_assert.h"
-#include "utils/debug/asc_printf.h"
+#include "impl/utils/debug/asc_aicore_printf_intf.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
