@@ -224,7 +224,7 @@
 </tr>
 <tr id="row267074213433"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1167094274316"><a name="p1167094274316"></a><a name="p1167094274316"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p156703427434"><a name="p156703427434"></a><a name="p156703427434"></a>WholeReduceMax、WholeReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、GetReduceMaxMinCount</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p156703427434"><a name="p156703427434"></a><a name="p156703427434"></a>WholeReduceMax、WholeReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、ReduceMax、ReduceMin、ReduceSum、ReduceDataBlock、ReducePairElem、ReduceRepeat、GetReduceMaxMinCount</p>
 </td>
 </tr>
 <tr id="row067015420439"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p667094294319"><a name="p667094294319"></a><a name="p667094294319"></a>基础API &gt; 矢量计算 &gt; 数据转换</p>
@@ -234,7 +234,7 @@
 </tr>
 <tr id="row66709428433"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p7670842124315"><a name="p7670842124315"></a><a name="p7670842124315"></a>基础API &gt; 矢量计算 &gt; 数据填充</p>
 </td>
-<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1867064211432"><a name="p1867064211432"></a><a name="p1867064211432"></a>Duplicate</p>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p1867064211432"><a name="p1867064211432"></a><a name="p1867064211432"></a>Duplicate、Brcb、CreateVecIndex</p>
 </td>
 </tr>
 <tr id="row11670174211438"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p767044244315"><a name="p767044244315"></a><a name="p767044244315"></a>基础API &gt; 矢量计算 &gt; 排序组合</p>
@@ -265,6 +265,11 @@
 <tr id="row166701142174317"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p126701142174316"><a name="p126701142174316"></a><a name="p126701142174316"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
 <td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p167024224318"><a name="p167024224318"></a><a name="p167024224318"></a>SetFlag/WaitFlag、PipeBarrier</p>
+</td>
+</tr>
+<tr id="row967194264312"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1867114424312"><a name="p1867114424312"></a><a name="p1867114424312"></a>基础API &gt; 同步控制 &gt; 核间同步</p>
+</td>
+<td class="cellrowborder" valign="top" width="69.72%" headers="mcps1.2.3.1.2 "><p id="p767144294315"><a name="p767144294315"></a><a name="p767144294315"></a>IBSet、IBWait、SyncAll、InitDetermineComputeWorkspace、WaitPreBlock、NotifyNextBlock</p>
 </td>
 </tr>
 <tr id="row166719424430"><td class="cellrowborder" valign="top" width="30.28%" headers="mcps1.2.3.1.1 "><p id="p1067184244310"><a name="p1067184244310"></a><a name="p1067184244310"></a>基础API &gt; 缓存控制</p>
@@ -760,14 +765,14 @@
 </tr>
 <tr id="row7987193534118"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p898712358414"><a name="p898712358414"></a><a name="p898712358414"></a>基础API &gt; 矢量计算 &gt; 归约计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p675915224145"><a name="p675915224145"></a><a name="p675915224145"></a>ReduceMax、ReduceMin、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p675915224145"><a name="p675915224145"></a><a name="p675915224145"></a>ReduceMax、ReduceMin、ReduceSum、WholeReduceSum、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p1398713564110"><a name="p1398713564110"></a><a name="p1398713564110"></a>-</p>
 </td>
 </tr>
 <tr id="row19871835174112"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p298716354416"><a name="p298716354416"></a><a name="p298716354416"></a>基础API &gt; 矢量计算 &gt; 数据转换</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p79872035154118"><a name="p79872035154118"></a><a name="p79872035154118"></a>Transpose</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p79872035154118"><a name="p79872035154118"></a><a name="p79872035154118"></a>Transpose、TransDataTo5HD</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p149871335154112"><a name="p149871335154112"></a><a name="p149871335154112"></a>-</p>
 </td>
@@ -862,7 +867,7 @@
 </tr>
 <tr id="row28501428172718"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p388253912712"><a name="p388253912712"></a><a name="p388253912712"></a>基础API &gt; 同步控制 &gt; 核间同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p6882143920272"><a name="p6882143920272"></a><a name="p6882143920272"></a>CrossCoreSetFlag、CrossCoreWaitFlag、SyncAll</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p6882143920272"><a name="p6882143920272"></a><a name="p6882143920272"></a>CrossCoreSetFlag、CrossCoreWaitFlag、IBSet、IBWait、SyncAll、InitDetermineComputeWorkspace、WaitPreBlock、NotifyNextBlock</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p9882173914275"><a name="p9882173914275"></a><a name="p9882173914275"></a>-</p>
 </td>
