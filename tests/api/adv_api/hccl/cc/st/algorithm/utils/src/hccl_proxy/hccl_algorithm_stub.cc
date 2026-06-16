@@ -58,13 +58,6 @@ HcclResult haclrtGetCaptureInfo(aclrtStream stream, aclmdlRICaptureStatus& captu
 
 extern "C" {
 
-<<<<<<< Updated upstream
-void HcommDlInit(void) {}
-
-int GetHcommVersion(void) { return 90000009; }
-
-bool HcommIsProfilingSupported() { return true; }
-=======
 void HcommDlInit(void)
 {
     fprintf(stderr, "[HcclWrapper-STUB] HcommDlInit stub called (EMPTY IMPLEMENTATION)\n");
@@ -87,7 +80,6 @@ bool HcommIsExportThreadSupported()
     fprintf(stderr, "[HcclWrapper-STUB] HcommIsExportThreadSupported stub called\n");
     return true;
 }
->>>>>>> Stashed changes
 
 bool HcommIsExportThreadSupported() { return true; }
 }
