@@ -333,6 +333,7 @@
                 -   [LeakyRelu](SIMD-API/基础API/Reg矢量计算/基础算术/LeakyRelu-30.md)
 
             -   [逻辑计算](SIMD-API/基础API/Reg矢量计算/逻辑计算/逻辑计算.md)
+                -   [概述](SIMD-API/基础API/Reg矢量计算/逻辑计算/概述.md)
                 -   [Not](SIMD-API/基础API/Reg矢量计算/逻辑计算/Not.md)
                 -   [And](SIMD-API/基础API/Reg矢量计算/逻辑计算/And.md)
                 -   [Or](SIMD-API/基础API/Reg矢量计算/逻辑计算/Or.md)
@@ -352,6 +353,7 @@
                 -   [MulsCast](SIMD-API/基础API/Reg矢量计算/复合计算/MulsCast.md)
 
             -   [比较与选择](SIMD-API/基础API/Reg矢量计算/比较与选择/比较与选择.md)
+                -   [概述](SIMD-API/基础API/Reg矢量计算/比较与选择/概述.md)
                 -   [Compare](SIMD-API/基础API/Reg矢量计算/比较与选择/Compare.md)
                 -   [Compares](SIMD-API/基础API/Reg矢量计算/比较与选择/Compares.md)
                 -   [Select](SIMD-API/基础API/Reg矢量计算/比较与选择/Select.md)
