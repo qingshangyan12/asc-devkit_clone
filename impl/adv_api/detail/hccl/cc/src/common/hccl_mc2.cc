@@ -243,8 +243,8 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
         CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), COMM_ENGINE_CCU, opResCtxSize, opResCtx));
     }
     aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, aclrtMemcpyKind(1));
-    HCCL_INFO("[CCU_DEBUG] opResCtxPtr=%p, *opResCtx=%p, size=%llu ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu", 
-            opResCtx, *opResCtx, opResCtxSize, opResCtx.workSpace, opResCtx.workSpaceSize, opResCtx.xnAddr, opResCtx.ckeAddr, opResCtx.rankId, opResCtx.rankSize);
+    HCCL_INFO("[CCU_DEBUG] opResCtxPtr=%p, *opResCtx=%p, size=%llu ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
+            opResCtx, *opResCtx, opResCtxSize, resCtx.workSpace, resCtx.workSpaceSize, resCtx.xnAddr, resCtx.ckeAddr, resCtx.rankId, resCtx.rankSize);
     OpResCtx readback{};
     aclError aclRet2 = aclrtMemcpy(&readback, opResCtxSize,
                                *opResCtx, opResCtxSize,
