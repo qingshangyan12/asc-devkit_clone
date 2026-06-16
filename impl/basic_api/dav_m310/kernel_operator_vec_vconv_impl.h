@@ -19,12 +19,12 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VCONV_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VCONV_IMPL_H
-#include "kernel_utils.h"
-#include "kernel_struct_binary.h"
-#include "kernel_struct_unary.h"
-#include "kernel_struct_vdeq.h"
-#include "kernel_tpipe.h"
-#include "kernel_common.h"
+#include "../kernel_utils.h"
+#include "../../../include/basic_api/kernel_struct_binary.h"
+#include "../../../include/basic_api/kernel_struct_unary.h"
+#include "../../../include/basic_api/kernel_struct_vdeq.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_common.h"
 
 namespace AscendC {
 #define VCVT_U8_TO_F16(roundMode) vcvt(vreg1, vreg0, preg, PART_EVEN)
@@ -217,7 +217,7 @@ namespace AscendC {
         maskBuf[1] = mask[1];                                                                               \
         maskBuf[2] = 0;                                                                                     \
         maskBuf[3] = 0;                                                                                     \
-        event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());            \
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));            \
         SetFlag<HardEvent::S_V>(eventIdSToV);                                                               \
         WaitFlag<HardEvent::S_V>(eventIdSToV);                                                              \
         CAST_LV0_VF(srcTypeShort, dstTypeShort, srcBits, dstBits, repeatSize, roundMode,            \

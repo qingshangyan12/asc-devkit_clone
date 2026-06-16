@@ -20,10 +20,10 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 
-#include "kernel_utils.h"
-#include "kernel_tpipe.h"
+#include "../kernel_utils.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 #include "kernel_operator_vec_template_impl.h"
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace AscendC {
 namespace CmpSelInternal {
@@ -85,7 +85,7 @@ __aicore__ inline void VcmpImpl(
 {
     static_assert(SupportType<T, half, float>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
@@ -151,7 +151,7 @@ __aicore__ inline void VcmpImpl(
                 break;
         }
     }
-    event_t eventIdVToS = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     if constexpr (sizeof(T) == 2) {
@@ -170,7 +170,7 @@ __aicore__ inline void VcmpImpl(
 {
     static_assert(SupportType<T, half, float>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
@@ -233,7 +233,7 @@ __aicore__ inline void VcmpImpl(
                 break;
         }
     }
-    event_t eventIdVToS = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     if constexpr (sizeof(T) == 2) {
@@ -1504,7 +1504,7 @@ __aicore__ inline void SelectCal(
         "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     __ubuf__ uint64_t *tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2);
-    event_t eventIdVToS = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
+    event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
     SetFlag<HardEvent::V_S>(eventIdVToS);
     WaitFlag<HardEvent::V_S>(eventIdVToS);
     if constexpr (selMode == SELMODE::VSEL_CMPMASK_SPR) {
@@ -1514,7 +1514,7 @@ __aicore__ inline void SelectCal(
         } else {
             (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf)) = Internal::g_cmpMaskLow;
         }
-        event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -1525,7 +1525,7 @@ __aicore__ inline void SelectCal(
     }
     else if constexpr (selMode == SELMODE::VSEL_TENSOR_TENSOR_MODE) {
         uint64_t selAddr = Internal::g_cmpMaskLow;
-        event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {
@@ -1588,7 +1588,7 @@ __aicore__ inline void SelectCal(
     static_assert(SupportType<U, uint8_t, uint16_t, uint32_t, uint64_t>(), "current data type is not supported!");
     bool isCounterMode = Internal::IsCounterMode();
     T scalar = *reinterpret_cast<T*>(&Internal::g_cmpMaskLow);
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     if (isCounterMode) {

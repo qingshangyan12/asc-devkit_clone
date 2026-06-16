@@ -1,4 +1,4 @@
-# UB -> UB掩码式高维数据搬运\(Copy\)<a name="ZH-CN_TOPIC_0000002575088175"></a>
+# UBToUB掩码式高维数据搬运(Copy)<a name="ZH-CN_TOPIC_0000002575088175"></a>
 
 ## 产品支持情况<a name="zh-cn_topic_0000002567699435_section796754519912"></a>
 
@@ -53,7 +53,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002567699435_section4219135304818)。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br>isSetMask的具体使用方式可参考[掩码](../../SIMD计算说明/掩码/概述.md)。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表2**  参数说明
 

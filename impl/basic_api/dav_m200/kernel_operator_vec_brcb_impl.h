@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BRCB_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BRCB_IMPL_H
-#include "kernel_struct_brcb.h"
-#include "kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_struct_brcb.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -127,10 +127,10 @@ __aicore__ inline void BrcbImpl(__ubuf__ T* dst, __ubuf__ T* src0, const uint8_t
         uint16_t dstRptEle = ONE_BLK_SIZE / sizeof(T) * repeatParams.dstRepStride;
         uint64_t mask = ONE_BLK_SIZE / sizeof(T);
         AscendCUtils::SetMask<T>(mask);
-        event_t eventID0 = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
-        event_t eventID1 = static_cast<event_t>(FetchEventID<HardEvent::MTE2_S>());
-        event_t eventID2 = static_cast<event_t>(FetchEventID<HardEvent::V_S>());
-        event_t eventID3 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_S>());
+        event_t eventID0 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+        event_t eventID1 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+        event_t eventID2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
+        event_t eventID3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_S));
         SetFlag<HardEvent::MTE2_S>(eventID1);
         WaitFlag<HardEvent::MTE2_S>(eventID1);
         SetFlag<HardEvent::V_S>(eventID2);

@@ -28,7 +28,7 @@
 
   $$output[i][j] = input[index[i][j]]$$
 
-  - input为输入张量，数据类型为float，形状因Case不同而异：Case 0/1/2为[2200000]，Case 3为[20000]
+  - input为输入张量，数据类型为float，形状为[2200000]
   - index为索引张量，数据类型为uint32，形状因Case不同而异：Case 0/1/2为[1024, 2048]，Case 3为[8, 2048]，索引范围为[0, input_total_length)
   - output为输出张量，数据类型为float，形状与index相同
   - 计算过程：根据index[i][j]索引从input中采集对应位置的数据，写入output[i][j]位置
@@ -38,7 +38,7 @@
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Gather</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input</td><td align="center">[2200000]/[20000]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">input</td><td align="center">[2200000]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">index</td><td align="center">[1024,2048]/[8,2048]</td><td align="center">uint32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">output</td><td align="center">[1024,2048]/[8,2048]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">empty_kernel / gather_kernel</td></tr>
@@ -61,7 +61,7 @@
 
 | 指标                | 说明                                                                                      |
 | ------------------- | ----------------------------------------------------------------------------------------- |
-| Task Duration(us)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
+| Task Duration(μs)   | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间                  |
 
 ### Case 0: 空核函数调度开销（SCENARIO_NUM=1-5）
 
@@ -77,20 +77,20 @@
 **关键代码**：
 
 ```cpp
-__simt_vf__ __launch_bounds__(THREAD_NUM) inline void simt_empty(...)
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...)
 {}
 
 __global__ __vector__ void empty_kernel(...)
 {
     for (uint32_t vf_idx = 0; vf_idx < vf_call_times; vf_idx++) {
-        asc_vf_call<simt_empty>(dim3(THREAD_NUM), ...);
+        asc_vf_call<simt_empty>(dim3(MAX_THREAD_NUM), ...);
     }
 }
 ```
 
 **性能数据**：
 
-| SCENARIO_NUM | 线程块个数 | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | Task Duration(μs) |
 | :----------: | :-------: | :---------------: |
 | 1 | 1 | 3.933 |
 | 2 | 32 | 4.413 |
@@ -100,8 +100,8 @@ __global__ __vector__ void empty_kernel(...)
 
 **分析**：
 
-- 1→32→64→128：Task Duration从3.933us升到5.269us，调度开销逐步增长
-- 128→1024：Task Duration从5.269us陡增到13.687us，调度开销随线程块数量增加而显著增长
+- 1→32→64→128：Task Duration从3.933μs升到5.269μs，调度开销逐步增长
+- 128→1024：Task Duration从5.269μs陡增到13.687μs，调度开销随线程块数量增加而显著增长
 
 **结论**：
 
@@ -122,7 +122,7 @@ __global__ __vector__ void empty_kernel(...)
 
 **性能数据**：
 
-| SCENARIO_NUM | 线程块个数 | vf调用次数 | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | vf调用次数 | Task Duration(μs) |
 | :----------: | :-------: | :--------: | :---------------: |
 | 6 | 32 | 2 | 4.503 |
 | 7 | 64 | 2 | 4.869 |
@@ -162,27 +162,28 @@ vf调用也存在调度开销，应尽量调用1次vf处理完所有数据
 - 三个场景均使用核函数`gather_kernel`，差异在于线程块个数和每个线程处理的数据量
 - input形状为[2200000]，index和output形状为[1024, 2048]
 - Gather算子计算逻辑较简单，主要受访存带宽影响，属于Memory Bound类型。本样例整体计算量较小，占用寄存器较少，因此每个线程块的线程数可配置为2048
-- `vf_loop_times = rows_per_block / thread_num`：rows_per_block为每核处理元素数，thread_num为线程数，每个线程以for循环方式处理本block负责的全部元素
+- vf函数`simt_gather`采用grid-stride loop：以`blockIdx.x * blockDim.x + threadIdx.x`为起始索引，以`gridDim.x * blockDim.x`为步长遍历index数组，每个线程以for循环方式处理本block负责的全部元素
+- 线程数量通过`resolve_thread_num`按每核实际处理元素数分配：当每核处理元素数≥2048时取2048，否则取实际处理元素数
 
 **关键代码**：
 
 ```cpp
-// simt_gather: SIMT vf函数 —— 以blockDim.x为步长做for循环
-__simt_vf__ __launch_bounds__(THREAD_NUM) inline void simt_gather(..., uint32_t index_start, uint32_t vf_loop_times)
+// simt_gather: SIMT vf函数 —— grid-stride loop，以总线程数为步长遍历整个index数组
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_gather(..., uint32_t index_total_length)
 {
-    for (uint32_t vf_idx = 0; vf_idx < vf_loop_times; vf_idx++) {
-        uint32_t idx = threadIdx.x + index_start + vf_idx * blockDim.x;
-        uint32_t gather_idx = index[idx];
-        output[idx] = input[gather_idx];
+    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t stride = gridDim.x * blockDim.x;
+    for (uint32_t i = idx; i < index_total_length; i += stride) {
+        uint32_t gather_idx = index[i];
+        if (gather_idx >= input_total_length) { gather_idx = 0; }
+        output[i] = input[gather_idx];
     }
 }
 
-// gather_kernel: 核函数计算每个block的起始索引后调用simt_gather
-__global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
+// gather_kernel: 核函数调用simt_gather，线程数量由resolve_thread_num自适应分配
+__global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 {
-    uint32_t rows_per_block = index_total_length / gridDim.x;
-    uint32_t index_start = blockIdx.x * rows_per_block;
-    asc_vf_call<simt_gather>(dim3(thread_num), ..., index_start, vf_loop_times);
+    asc_vf_call<simt_gather>(dim3(thread_num), ..., index_total_length);
 }
 ```
 
@@ -195,14 +196,13 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 - **逻辑核**：启动的线程块数量，是软件侧希望启动的并行任务数
 - **物理核**：硬件实际拥有的Vector Core数量，需要通过[aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/runtimeapi/aclcppdevg_03_1867.html)在运行期查询获取（本样例环境为64），代码示例如下：
   ```cpp
-  int32_t device_id = 0;
-  int64_t physical_aiv_core_num = 0;
-  aclError ret = aclrtGetDeviceInfo(
-      static_cast<uint32_t>(device_id),
-      ACL_DEV_ATTR_VECTOR_CORE_NUM,
-      &physical_aiv_core_num);
-  if (ret == ACL_SUCCESS) {
-      printf("Physical AIV (Vector Core) num: %ld\n", physical_aiv_core_num);
+  // 运行期查询物理 Vector Core(AIV)数量；查询失败时返回 AIV_CORE_NUM
+  uint32_t query_aiv_core_num(int32_t device_id)
+  {
+      int64_t core_num = 0;
+      aclError ret = aclrtGetDeviceInfo(
+          static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
+      return (ret == ACL_SUCCESS && core_num > 0) ? static_cast<uint32_t>(core_num) : AIV_CORE_NUM;
   }
   ```
 
@@ -210,7 +210,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **性能数据**：
 
-| SCENARIO_NUM | 线程块个数 | 每核处理元素数 | 每线程处理元素数(vf_call_times) | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | 每核处理元素数 | 每线程处理元素数 | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :---------------: |
 | 9 | 1024 | 2048 | 1 | 78.533 |
 | **10** | **64** | **32768** | **16** | **62.649** |
@@ -222,8 +222,8 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **分析**：
 
-- **`线程块数量=64`相比`线程块数量=1024`，Task Duration从78.533us降低到62.649us，耗时下降约20.2%，性能提升约26%**。线程块数量从1024降到64，启动和调度的线程块数量显著减少，调度开销大幅降低
-- **`线程块数量=64`相比`线程块数量=32`，Task Duration从113.609us降低到62.649us，耗时下降约45.2%，性能提升约82%**。同样的单线程多数据写法下，`线程块数量=64`具备更高的并行度；虽然线程块数量增加会带来更多启动和调度开销，但这部分开销小于并行度提升带来的收益，因此整体耗时更低
+- **`线程块数量=64`相比`线程块数量=1024`，Task Duration从78.533μs降低到62.649μs，耗时下降约20.2%，性能提升约26%**。线程块数量从1024降到64，启动和调度的线程块数量显著减少，调度开销大幅降低
+- **`线程块数量=64`相比`线程块数量=32`，Task Duration从113.609μs降低到62.649μs，耗时下降约44.8%，性能提升约82%**。同样的grid-stride loop写法下，`线程块数量=64`具备更高的并行度；虽然线程块数量增加会带来更多启动和调度开销，但这部分开销小于并行度提升带来的收益，因此整体耗时更低
 - 受硬件资源限制，实际可并行执行的物理核数量存在上限。由于一个物理核同一时刻只能驻留并执行一个线程块，当`线程块数量=1024`时，超出物理核数量的线程块需要等待前序线程块执行完成后再调度，额外的启动和调度固定开销会明显增加；当`线程块数量=32`时，只使用了一半物理核，空闲物理核较多，并行度不足，单线程块工作量翻倍
 
 **结论**：
@@ -241,13 +241,12 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 **核心实现**：
 
 - 五个场景均使用核函数`gather_kernel`
-- input形状为[20000]，index和output形状为[8, 2048]
-- SCENARIO_NUM=12-13设置4 / 8核，线程数量固定2048（每核处理元素数≥2048）
-- SCENARIO_NUM=14-16设置16 / 32 / 物理核数，线程数量直接按每核处理元素数分配（1024 / 512 / 256），消除空转线程
+- input形状为[2200000]，index和output形状为[8, 2048]
+- 线程数量通过`resolve_thread_num`按每核实际处理元素数分配：每核处理元素数小于2048时降低线程数量，消除空转线程
 
 **性能数据**：
 
-| SCENARIO_NUM | 线程块个数 | 线程数量 | 每核处理元素数 | 每线程处理元素数(vf_call_times) | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | 线程数量 | 每核处理元素数 | 每线程处理元素数 | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :-------: | :---------------: |
 | 12 | 4 | 2048 | 4096 | 2 | 9.989 |
 | 13 | 8 | 2048 | 2048 | 1 | 8.755 |
@@ -263,8 +262,8 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 - 折线呈"先降后升"的谷形，**最优线程块数量 = 16（物理核数的1/4）**，并非打满64核
 - 线程块数量从4依次增加到8、16时，Task Duration持续下降（9.989 → 8.755 → 7.832），并行收益持续提高
-- 16→32：线程块数量翻倍，Task Duration从7.832us升到7.959us，**耗时增加约1.6%**。此时每核工作量已较小，新增核数带来的调度开销开始接近并行收益
-- 32→64（物理核）：线程块数量继续增加，Task Duration从7.959us升到8.820us，**耗时增加约10.8%**。小shape下每核任务量较小（256/512元素），增加线程块数量带来的调度开销反超并行收益
+- 16→32：线程块数量翻倍，Task Duration从7.832μs升到7.959μs，**耗时增加约1.6%**。此时每核工作量已较小，新增核数带来的调度开销开始接近并行收益
+- 32→64（物理核）：线程块数量继续增加，Task Duration从7.959μs升到8.820μs，**耗时增加约10.8%**。小shape下每核任务量较小（256/512元素），增加线程块数量带来的调度开销反超并行收益
 - 与Case 2对照：同样的kernel，shape小到一定程度后最优线程块数量从64降到16，说明"最优线程块数量"随shape缩小而变化，必须实测
 
 **结论**：
@@ -279,7 +278,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **调度开销随线程块数量变化（Case 0）**：
 
-| SCENARIO_NUM | 线程块个数 | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | Task Duration(μs) |
 | ------------ | --------- | ----------------- |
 | 1 | 1 | 3.933 |
 | 2 | 32 | 4.413 |
@@ -291,7 +290,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **vf调用次数对头开销的影响（Case 1）**：
 
-| 对比 | 线程块个数 | vf次数 | Task Duration(us) | 增幅 |
+| 对比 | 线程块个数 | vf次数 | Task Duration(μs) | 增幅 |
 | ---- | --------- | ------ | ----------------- | ---- |
 | SCENARIO_NUM=2→6 | 32 | 1→2 | 4.413 → 4.503 | +2.0% |
 | SCENARIO_NUM=3→7 | 64 | 1→2 | 4.602 → 4.869 | +5.8% |
@@ -301,7 +300,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **大shape的最优线程块数量（Case 2）**：
 
-| SCENARIO_NUM | 线程块个数 | 每核处理元素数 | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | 每核处理元素数 | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :---------------: |
 | 9 | 1024 | 2048 | 78.533 |
 | **10** | **64** | **32768** | **62.649** |
@@ -311,7 +310,7 @@ __global__ __vector__ void gather_kernel(..., uint32_t vf_loop_times)
 
 **小shape的最优线程块数量（Case 3）**：
 
-| SCENARIO_NUM | 线程块个数 | 线程数量 | 每核处理元素数 | Task Duration(us) |
+| SCENARIO_NUM | 线程块个数 | 线程数量 | 每核处理元素数 | Task Duration(μs) |
 | :----------: | :-------: | :-------: | :-------: | :---------------: |
 | 12 | 4 | 2048 | 4096 | 9.989 |
 | 13 | 8 | 2048 | 2048 | 8.755 |
