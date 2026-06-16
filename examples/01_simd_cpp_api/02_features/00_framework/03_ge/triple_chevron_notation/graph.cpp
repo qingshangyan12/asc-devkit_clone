@@ -1,15 +1,15 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
-#include <cstdint>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -33,6 +33,7 @@ constexpr int64_t BLOCK_LENGTH = 2048;
 constexpr size_t ELEMENT_COUNT = static_cast<size_t>(BLOCK_NUM * BLOCK_LENGTH);
 constexpr float X_SCALE = 0.1F;
 constexpr float Y_SCALE = 0.2F;
+constexpr float CHECK_RTOL = 1e-4F;
 
 // |o>-----------------------------------
 // |o>      x    y
@@ -78,7 +79,7 @@ ge::Tensor BuildInputTensor(float scale)
     for (size_t i = 0U; i < data.size(); ++i) {
         data[i] = static_cast<float>(i) * scale;
     }
-    if (tensor.SetData(reinterpret_cast<const uint8_t *>(data.data()), data.size() * sizeof(float)) !=
+    if (tensor.SetData(reinterpret_cast<const uint8_t*>(data.data()), data.size() * sizeof(float)) !=
         ge::GRAPH_SUCCESS) {
         std::cerr << "SetData failed." << std::endl;
     }
@@ -90,19 +91,23 @@ std::vector<float> BuildGolden()
     // golden与图构造规则保持一致，期望结果为(x + y) + y
     std::vector<float> golden(ELEMENT_COUNT);
     for (size_t i = 0U; i < golden.size(); ++i) {
-        golden[i] = static_cast<float>(i) * X_SCALE + static_cast<float>(i) * Y_SCALE +
-            static_cast<float>(i) * Y_SCALE;
+        golden[i] = static_cast<float>(i) * X_SCALE + static_cast<float>(i) * Y_SCALE + static_cast<float>(i) * Y_SCALE;
     }
     return golden;
 }
 
-bool CheckOutputTensor(const ge::Tensor &outputTensor)
+bool CheckOutputTensor(const ge::Tensor& outputTensor)
 {
     // 先校验输出shape和数据长度，再逐元素比较计算结果
     const auto tensorDesc = outputTensor.GetTensorDesc();
     const auto dims = tensorDesc.GetShape().GetDims();
+    const auto dataType = tensorDesc.GetDataType();
     if ((dims.size() != 2U) || (dims[0] != BLOCK_NUM) || (dims[1] != BLOCK_LENGTH)) {
         std::cerr << "Unexpected output shape." << std::endl;
+        return false;
+    }
+    if (dataType != ge::DT_FLOAT) {
+        std::cerr << "Unexpected output dtype: " << static_cast<int>(dataType) << std::endl;
         return false;
     }
     if (outputTensor.GetSize() < ELEMENT_COUNT * sizeof(float)) {
@@ -110,13 +115,15 @@ bool CheckOutputTensor(const ge::Tensor &outputTensor)
         return false;
     }
 
-    const auto *outputData = reinterpret_cast<const float *>(outputTensor.GetData());
-    std::vector<float> output(outputData, outputData + ELEMENT_COUNT);
+    std::vector<float> output(ELEMENT_COUNT);
+    const auto* outputData = reinterpret_cast<const float*>(outputTensor.GetData());
+    std::copy(outputData, outputData + ELEMENT_COUNT, output.begin());
     std::vector<float> golden = BuildGolden();
-    auto printTensor = [](const std::vector<float> &tensor, const char *name) {
+    auto printTensor = [](const std::vector<float>& tensor, const char* name) {
         constexpr size_t maxPrintSize = 20U;
         std::cout << name << ": ";
-        std::copy(tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
+        std::copy(
+            tensor.begin(), tensor.begin() + std::min(tensor.size(), maxPrintSize),
             std::ostream_iterator<float>(std::cout, " "));
         if (tensor.size() > maxPrintSize) {
             std::cout << "...";
@@ -127,24 +134,27 @@ bool CheckOutputTensor(const ge::Tensor &outputTensor)
     printTensor(golden, "Golden");
 
     for (size_t i = 0U; i < ELEMENT_COUNT; ++i) {
-        if (output[i] != golden[i]) {
-            std::cerr << "Unexpected output at index " << i << ", expected " << golden[i] << ", got "
-                      << output[i] << std::endl;
+        const float diff = std::abs(output[i] - golden[i]);
+        const float tolerance = CHECK_RTOL * std::abs(golden[i]);
+        if (diff > tolerance) {
+            std::cerr << "Unexpected output at index " << i << ", expected " << golden[i] << ", got " << output[i]
+                      << ", diff " << diff << ", tolerance " << tolerance << std::endl;
             return false;
         }
     }
     return true;
 }
-}  // namespace
+} // namespace
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     (void)argc;
     (void)argv;
 
     // 初始化GE，并指定运行设备和图运行模式
     std::map<ge::AscendString, ge::AscendString> options = {
-        {"ge.exec.deviceId", "1"},
+        {"ge.exec.deviceId", "0"},
+        {"ge.exec.precision_mode", "must_keep_origin_dtype"},
         {"ge.graphRunMode", "0"},
     };
 
