@@ -21,7 +21,7 @@
 #ifndef LIB_KERNEL_API_H
 #define LIB_KERNEL_API_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102))
 #if (__NPU_ARCH__ != 5102)
 #include "hccl/hccl.h"
 #include "hcomm/hcomm.h"
@@ -121,7 +121,7 @@
 #include "normalization/groupnorm.h"
 #endif // __NPU_ARCH__ == 3510
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 #include "activation/softmax.h"
 #include "index/arithprogression.h"
 #include "activation/sigmoid.h"
@@ -167,8 +167,8 @@
 #include "reduce/reduce_common.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
-    __NPU_ARCH__ == 3002)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 ||    \
+    __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002))
 #include "filter/dropout.h"
 #include "activation/sigmoid.h"
 #include "activation/softmax.h"
@@ -186,7 +186,7 @@
 #include "../utils/std/utility.h"
 #include "../utils/std/algorithm.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+#if !defined(__NPU_ARCH__) || (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201))
 #include "index/arithprogression.h"
 #include "normalization/layernormgrad.h"
 #include "normalization/layernormgradbeta.h"
