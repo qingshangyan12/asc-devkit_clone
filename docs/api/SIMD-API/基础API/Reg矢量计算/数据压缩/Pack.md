@@ -49,9 +49,13 @@
 
 ## 功能说明<a name="section16390191715619"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf_impl"`。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_pack_intf.h"`。
 
 将源操作数srcReg中的元素选取低8位（对于b16类型）、低16位（对于b32类型）、低32位（对于b64类型）写入dstReg的低半部分或高半部分。
+
+**图 1**  Pack示意图
+
+![Pack](../../../../figures/reg_pack.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
