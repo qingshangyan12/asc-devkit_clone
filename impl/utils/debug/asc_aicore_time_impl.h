@@ -51,8 +51,10 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 
 __aicore__ inline void asc_time_stamp(uint32_t desc_id)
 {
+#ifdef ASCENDC_TIME_STAMP_ON 
     enable_asc_diagnostics();
     asc_time_stamp_impl(desc_id);
+#endif
 }
 
 __aicore__ inline void asc_prof_start()
