@@ -49,9 +49,13 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf_impl"`。
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf"`。
 将dstReg中数据根据mask进行解压缩。解压缩方式：dstReg中第0个元素置为0，dstReg中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略不参与统计。
 具体算法如下图所示，DstReg的首位为0，后续mask[i]对应mask值为1时，dst0[i]的值为dst[i-1] + 1；mask[i]对应mask值为0时，dst0[i]的值为dst[i-1]。
+
+**图 1**  Unsqueeze示意图
+
+![Unsqueeze](../../../../figures/reg_unsqueeze.png)
 
 ## 定义原型<a name="section620mcpsimp"></a>
 
