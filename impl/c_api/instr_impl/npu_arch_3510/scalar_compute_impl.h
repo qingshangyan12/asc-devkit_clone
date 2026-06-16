@@ -141,21 +141,6 @@ __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits, int64_t idx)
 
 namespace __asc_aicore {
 // ==========asc_atomic_add==========
-__aicore__ inline int32_t asc_ub_atomic_add(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_add_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_add(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_add_impl(address, val);
-}
-
-__aicore__ inline float asc_ub_atomic_add(__ubuf__ float* address, float val)
-{
-    return asc_ub_atomic_add_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_add(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_add_impl(address, val);
@@ -182,21 +167,6 @@ __aicore__ inline uint64_t asc_atomic_add(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_sub==========
-__aicore__ inline int32_t asc_ub_atomic_sub(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_sub_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_sub(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_sub_impl(address, val);
-}
-
-__aicore__ inline float asc_ub_atomic_sub(__ubuf__ float* address, float val)
-{
-    return asc_ub_atomic_sub_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_sub(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_sub_impl(address, val);
@@ -223,21 +193,6 @@ __aicore__ inline uint64_t asc_atomic_sub(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_exch==========
-__aicore__ inline int32_t asc_ub_atomic_exch(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_exch_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_exch(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_exch_impl(address, val);
-}
-
-__aicore__ inline float asc_ub_atomic_exch(__ubuf__ float* address, float val)
-{
-    return asc_ub_atomic_exch_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_exch(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_exch_impl(address, val);
@@ -264,21 +219,6 @@ __aicore__ inline uint64_t asc_atomic_exch(__gm__ uint64_t* address, uint64_t va
 }
 
 // ==========asc_atomic_max==========
-__aicore__ inline int32_t asc_ub_atomic_max(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_max_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_max(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_max_impl(address, val);
-}
-
-__aicore__ inline float asc_ub_atomic_max(__ubuf__ float* address, float val)
-{
-    return asc_ub_atomic_max_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_max(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_max_impl(address, val);
@@ -305,21 +245,6 @@ __aicore__ inline uint64_t asc_atomic_max(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_min==========
-__aicore__ inline int32_t asc_ub_atomic_min(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_min_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_min(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_min_impl(address, val);
-}
-
-__aicore__ inline float asc_ub_atomic_min(__ubuf__ float* address, float val)
-{
-    return asc_ub_atomic_min_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_min(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_min_impl(address, val);
@@ -346,21 +271,6 @@ __aicore__ inline uint64_t asc_atomic_min(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_cas==========
-__aicore__ inline int32_t asc_ub_atomic_cas(__ubuf__ int32_t* address, int32_t compare, int32_t val)
-{
-    return asc_ub_atomic_cas_impl(address, compare, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_cas(__ubuf__ uint32_t* address, uint32_t compare, uint32_t val)
-{
-    return asc_ub_atomic_cas_impl(address, compare, val);
-}
-
-__aicore__ inline float asc_ub_atomic_cas(__ubuf__ float* address, float compare, float val)
-{
-    return asc_ub_atomic_cas_impl(address, compare, val);
-}
-
 __aicore__ inline int32_t asc_atomic_cas(__gm__ int32_t* address, int32_t compare, int32_t val)
 {
     return asc_atomic_cas_impl(address, compare, val);
@@ -387,16 +297,6 @@ __aicore__ inline uint64_t asc_atomic_cas(__gm__ uint64_t* address, uint64_t com
 }
 
 // ==========asc_atomic_and==========
-__aicore__ inline int32_t asc_ub_atomic_and(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_and_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_and(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_and_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_and(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_and_impl(address, val);
@@ -418,16 +318,6 @@ __aicore__ inline uint64_t asc_atomic_and(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_or==========
-__aicore__ inline int32_t asc_ub_atomic_or(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_or_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_or(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_or_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_or(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_or_impl(address, val);
@@ -449,16 +339,6 @@ __aicore__ inline uint64_t asc_atomic_or(__gm__ uint64_t* address, uint64_t val)
 }
 
 // ==========asc_atomic_xor==========
-__aicore__ inline int32_t asc_ub_atomic_xor(__ubuf__ int32_t* address, int32_t val)
-{
-    return asc_ub_atomic_xor_impl(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_xor(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_xor_impl(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_xor(__gm__ int32_t* address, int32_t val)
 {
     return asc_atomic_xor_impl(address, val);
@@ -480,11 +360,6 @@ __aicore__ inline uint64_t asc_atomic_xor(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_inc==========
-__aicore__ inline uint32_t asc_ub_atomic_inc(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_inc_impl(address, val);
-}
-
 __aicore__ inline uint32_t asc_atomic_inc(__gm__ uint32_t* address, uint32_t val)
 {
     return asc_atomic_inc_impl(address, val);
@@ -496,11 +371,6 @@ __aicore__ inline uint64_t asc_atomic_inc(__gm__ uint64_t* address, uint64_t val
 }
 
 // ==========asc_atomic_dec==========
-__aicore__ inline uint32_t asc_ub_atomic_dec(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return asc_ub_atomic_dec_impl(address, val);
-}
-
 __aicore__ inline uint32_t asc_atomic_dec(__gm__ uint32_t* address, uint32_t val)
 {
     return asc_atomic_dec_impl(address, val);

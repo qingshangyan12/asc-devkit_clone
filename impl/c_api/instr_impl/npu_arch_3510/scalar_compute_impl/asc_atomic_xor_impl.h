@@ -21,16 +21,6 @@
 #include "instr_impl/npu_arch_3510/utils_impl/utils_impl.h"
 
 namespace __asc_aicore {
-__aicore__ inline int32_t asc_ub_atomic_xor_impl(__ubuf__ int32_t* address, int32_t val)
-{
-    return atomicXOr(address, val);
-}
-
-__aicore__ inline uint32_t asc_ub_atomic_xor_impl(__ubuf__ uint32_t* address, uint32_t val)
-{
-    return atomicXOr(address, val);
-}
-
 __aicore__ inline int32_t asc_atomic_xor_impl(__gm__ int32_t* address, int32_t val)
 {
     return atomicXOr(address, val);
