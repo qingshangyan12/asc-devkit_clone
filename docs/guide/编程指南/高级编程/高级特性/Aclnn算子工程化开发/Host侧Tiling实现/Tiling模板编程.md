@@ -2,7 +2,7 @@
 
 在[TilingKey编程](./基本流程.md)章节介绍的TilingKey编程方式中，TilingKey不易于记忆和理解，因为它们通常是较长又没有明确含义的数字。
 
-在涉及多个TilingKey的场景中，开发者依赖TilingKey来管理kernel的实现，无论是在管理还是使用上都会遇到相当大的复杂性。为了简化这一过程，可以采用模板编程的方法来替代传统的TilingKey编程，从而减少对TilingKey数值标识的依赖，使kernel的管理更加直观和高效。使用步骤如下，完整样例请参考[Tiling模板编程样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/00_compilation/custom_op)。
+在涉及多个TilingKey的场景中，开发者依赖TilingKey来管理kernel的实现，无论是在管理还是使用上都会遇到相当大的复杂性。为了简化这一过程，可以采用模板编程的方法来替代传统的TilingKey编程，从而减少对TilingKey数值标识的依赖，使kernel的管理更加直观和高效。使用步骤如下，完整样例请参考[Tiling模板编程样例](hhttps://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op)。
 
 1.  <a name="li1949014102516"></a>在[自定义算子工程](../../Aclnn算子工程化开发/概述.md)的op\_kernel目录下，新增定义模板参数和模板参数组合的头文件，本示例中头文件命名为tiling\_key\_add\_custom\_template.h。
 
@@ -22,7 +22,6 @@
     );
 
     // 模板参数组合
-    // 用于调用GET_TPL_TILING_KEY获取TilingKey时，接口内部校验TilingKey是否合法
     ASCENDC_TPL_SEL(
         ASCENDC_TPL_ARGS_SEL(
         ASCENDC_TPL_DATATYPE_SEL(D_T_X, C_DT_FLOAT16),
@@ -63,13 +62,13 @@
     );
     ```
 
-    上述接口仅用于为当前模板参数组合指定Tiling结构体，不作为kernel的模板参数传入，也不参与ASCENDC_TPL_SEL_PARAM或GET_TPL_TILING_KEY的参数顺序。未配置ASCENDC_TPL_TILING_STRUCT_SEL的模板参数组合，将使用REGISTER_TILING_DEFAULT注册的默认Tiling结构体；使用该接口时，必须提供默认Tiling结构体。kernel侧可通过GET_TILING_DATA_WITH_STRUCT(TilingStructName, tiling_data, tiling)读取指定结构体对应的tiling数据。
+    上述接口仅用于在host侧为当前模板参数组合指定Tiling结构体，不作为kernel的模板参数传入，同时也不影响ASCENDC_TPL_SEL_PARAM或GET_TPL_TILING_KEY的参数顺序。若未配置ASCENDC_TPL_TILING_STRUCT_SEL的模板参数组合，在使用该接口时，必须传入REGISTER_TILING_DEFAULT注册的默认Tiling结构体。kernel侧可通过GET_TILING_DATA_WITH_STRUCT(TilingStructName, tiling_data, tiling)读取指定结构体对应的tiling数据。
 
 2.  host侧调用ASCENDC\_TPL\_SEL\_PARAM接口自动生成并配置TilingKey。
 
     -   host实现文件中包含[步骤1](#li1949014102516)中定义模板参数和模板参数组合的头文件，以及Tiling结构体定义头文件。
     -   通过GetTilingData获取Tiling结构体指针，并对其成员变量进行赋值。
-    -   调用ASCENDC\_TPL\_SEL\_PARAM接口自动生成并配置TilingKey，ASCENDC\_TPL\_SEL\_PARAM输入参数为模板参数的具体值，传入时需要与定义模板参数和模板参数组合的头文件中的模板参数顺序保持一致。
+    -   调用ASCENDC\_TPL\_SEL\_PARAM接口自动生成并配置TilingKey，ASCENDC\_TPL\_SEL\_PARAM输入参数为模板参数的具体值，出于性能考虑，传入时需要与模板参数声明处的顺序保持一致。
 
     ```
     #include "../../op_kernel/add_custom_template/add_custom_template_tiling.h"
@@ -114,7 +113,7 @@
 3.  kernel侧实现
 
     -   kernel实现文件中包含[步骤1](#li1949014102516)中定义模板参数和模板参数组合的头文件，以及Tiling结构体定义头文件。
-    -   核函数添加template模板，以便支持模板参数的传入，参数顺序需要与定义模板参数和模板参数组合的头文件中的模板参数顺序保持一致。
+    -   核函数添加template模板，以便支持模板参数的传入，参数顺序需要与模板参数声明处的参数顺序保持一致，用于编译期对TilingKey的校验。
     -   通过REGISTER\_TILING\_DEFAULT注册Tiling结构体，通过GET\_TILING\_DATA\_WITH\_STRUCT解析Tiling数据。
     -   通过对模板参数的分支判断，选择不同的kernel侧实现。
 
