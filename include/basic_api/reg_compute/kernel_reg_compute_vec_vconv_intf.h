@@ -37,7 +37,9 @@ __simd_callee__ inline void Truncate(S& dstReg, S& srcReg, MaskReg& mask);
 } // namespace Reg
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_vconv_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_VCONV_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_VCONV_INTF_H__)

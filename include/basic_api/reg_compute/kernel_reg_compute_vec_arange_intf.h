@@ -31,7 +31,9 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 } // namespace Reg
 } // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_arange_intf_impl.h"
+#endif
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_ARANGE_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_ARANGE_INTF_H__)
