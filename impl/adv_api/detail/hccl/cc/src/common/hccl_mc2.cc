@@ -236,22 +236,17 @@ HcclResult AllocComResourceByTilingCcu(HcclComm comm, void *stream, void *mc2Til
     // 申请OpResCtx硬件内存并写入
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
-    if (HcclEngineCtxGet(comm, tagOpResCtx.c_str(), COMM_ENGINE_CCU, opResCtx, &opResCtxSize) == HCCL_SUCCESS) {
-        HCCL_INFO("HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]",
-            tagOpResCtx.c_str(), *opResCtx, opResCtxSize);
-    } else {
-        CHK_RET(HcclEngineCtxCreate(comm, tagOpResCtx.c_str(), COMM_ENGINE_CCU, opResCtxSize, opResCtx));
-    }
-    aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, opResCtxSize, aclrtMemcpyKind(1));
-    HCCL_INFO("[CCU_DEBUG] opResCtxPtr=%p, *opResCtx=%p, size=%llu ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
-            opResCtx, *opResCtx, opResCtxSize, resCtx.workSpace, resCtx.workSpaceSize, resCtx.xnAddr, resCtx.ckeAddr, resCtx.rankId, resCtx.rankSize);
-    OpResCtx readback{};
-    aclError aclRet2 = aclrtMemcpy(&readback, opResCtxSize,
-                               *opResCtx, opResCtxSize,
-                               ACL_MEMCPY_DEVICE_TO_HOST);
-    HCCL_INFO("[CCU_DEBUG] verify opResCtx@dev[%p]: ws=0x%llx wsSize=0x%llx xn=0x%llx cke=0x%llx rankId=%llu rankSize=%llu",
-        *opResCtx, readback.workSpace, readback.workSpaceSize,
-        readback.xnAddr, readback.ckeAddr, readback.rankId, readback.rankSize);
+    bool newCreated = false;
+    CHK_RET(HcclDevMemAcquire(comm, tagOpResCtx.c_str(), &opResCtxSize, opResCtx, &newCreated));
+    CHK_PRT_RET(*opResCtx == nullptr,
+        HCCL_ERROR("HcclDevMemAcquire returned nullptr, tagOpResCtx[%s].", tagOpResCtx.c_str()), HCCL_E_PTR);
+    CHK_PRT_RET(opResCtxSize < sizeof(OpResCtx),
+        HCCL_ERROR("HcclDevMemAcquire size[%llu] is smaller than OpResCtx[%zu], tagOpResCtx[%s].",
+            opResCtxSize, sizeof(OpResCtx), tagOpResCtx.c_str()),
+        HCCL_E_PARA);
+    HCCL_INFO("HcclDevMemAcquire success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%llu], newCreated[%d]",
+        tagOpResCtx.c_str(), *opResCtx, opResCtxSize, newCreated);
+    aclError aclRet = aclrtMemcpy(*opResCtx, opResCtxSize, &resCtx, sizeof(OpResCtx), aclrtMemcpyKind(1));
     CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
     HCCL_INFO("[AllocComResourceByTilingCcu]end AllocComResourceByTilingCcu!");
     return HCCL_SUCCESS;
@@ -347,7 +342,12 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
-    const auto *opRes = reinterpret_cast<const OpResCtx *>(opResCtx);
+    OpResCtx opResHost{};
+    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx), aclrtMemcpyKind(2));
+    CHK_PRT_RET(aclRet != ACL_ERROR_NONE,
+        HCCL_ERROR("[%s] copy opResCtx from device failed, opResCtx[%p], ret[%d].", __func__, opResCtx, aclRet),
+        CCU_E_INTERNAL);
+    const auto *opRes = &opResHost;
     CHK_PRT_RET(opRes->algInfo[0].opParam == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opRes->algInfo[0].opParam),
         CCU_E_PARA);

@@ -29,6 +29,23 @@ CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine) {
     return COMM_ENGINE_RESERVED;
 }
 
+static HcclResult AcquireDeviceMem(HcclComm comm, const std::string &tag, uint64_t expectedSize, void **addr)
+{
+    CHK_PTR_NULL(addr);
+    uint64_t size = expectedSize;
+    bool newCreated = false;
+    CHK_RET(HcclDevMemAcquire(comm, tag.c_str(), &size, addr, &newCreated));
+    CHK_PRT_RET(*addr == nullptr,
+        HCCL_ERROR("[%s] failed, tag[%s] addr is nullptr.", __func__, tag.c_str()), HCCL_E_PTR);
+    CHK_PRT_RET(size < expectedSize,
+        HCCL_ERROR("[%s] failed, tag[%s] size[%llu] is smaller than expected[%llu].",
+            __func__, tag.c_str(), size, expectedSize),
+        HCCL_E_PARA);
+    HCCL_INFO("[%s] tag[%s], addr[%p], size[%llu], newCreated[%d].",
+        __func__, tag.c_str(), *addr, size, newCreated);
+    return HCCL_SUCCESS;
+}
+
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
 {   
     // 检查comm是否为空指针
@@ -117,12 +134,9 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag,
     void *comParamPtr  = nullptr;
     void *comSyncPtr   = nullptr;
 
-    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_CCU,
-        Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_CCU,
-        comParamBufSize, &comParamPtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_CCU,
-        comSyncBufSize, &comSyncPtr));
+    CHK_RET(AcquireDeviceMem(comm, tagWorkspace, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(AcquireDeviceMem(comm, tagComParam, comParamBufSize, &comParamPtr));
+    CHK_RET(AcquireDeviceMem(comm, tagComSync, comSyncBufSize, &comSyncPtr));
 
     opResCtx.workSpace      = reinterpret_cast<uint64_t>(workspacePtr);
     opResCtx.workSpaceSize  = Hccl::MC2_WORKSPACE_SIZE;
@@ -654,22 +668,23 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         CHK_RET(GetCcuOpParamResCtx(comm, algName, opParam, topoInfo.get(), opResCtx, &resCtxSequence));
         HCCL_INFO("[CcuSelectAlg]GetCcuOpParamResCtx[%u] successfully!", i);
 
-        // 申请存放OpParam的设备内存，并将opParam拷贝到设备
-        std::string tagParam = std::to_string(i) + "_" + std::string(opParam.algTag);
-        void *opParamPtr = nullptr;
+        std::string tagParam = topoTag[i] + "_ccu_opParam";
         uint64_t opParamSize = sizeof(OpParam);
+        void *opParamPtr = nullptr;
         if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_CCU, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
-            HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]",
-                tagParam.c_str(), opParamPtr, opParamSize);
+            CHK_PRT_RET(opParamSize < sizeof(OpParam),
+                HCCL_ERROR("[CcuSelectAlg] opParam ctx size[%llu] is smaller than expected[%zu], tag[%s].",
+                    opParamSize, sizeof(OpParam), tagParam.c_str()),
+                HCCL_E_PARA);
         } else {
+            opParamSize = sizeof(OpParam);
             CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_CCU, opParamSize, &opParamPtr));
         }
-        aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, aclrtMemcpyKind(1));
-        CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
+        CHK_PTR_NULL(opParamPtr);
+        CHK_SAFETY_FUNC_RET(memcpy_s(opParamPtr, opParamSize, &opParam, sizeof(OpParam)));
         opResCtx.algInfo[i].opParam = reinterpret_cast<uint64_t>(opParamPtr);
-        opResCtx.algInfo[i].offset = initTiling->offset[i];
-        HCCL_INFO("[CcuSelectAlg] ccTiling[%u]: opParamAddr[%llu], offset[%u]",
-            i, opResCtx.algInfo[i].opParam, opResCtx.algInfo[i].offset);
+        HCCL_INFO("[CcuSelectAlg] cached opParam[%u], tag[%s], opParamAddr[%p], resCtx[%p], ctxSize[%llu].",
+            i, tagParam.c_str(), opParamPtr, opParam.resCtx, opParam.ctxSize);
     }
 
     return HCCL_SUCCESS;
