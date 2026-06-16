@@ -148,7 +148,7 @@ AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
 AscendC::LocalTensor<half> ubTensor = ubAllocator.Alloc<half, 256>();
 
 // Extended Tensor: create through MakeTensor
-auto ubTensor = MakeTensor(ubPointer, MakeLayout(MakeShape(128, 64)));
+auto ubTensor = AscendC::Te::MakeTensor(ubPointer, AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 64)));
 ```
 
 > 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。

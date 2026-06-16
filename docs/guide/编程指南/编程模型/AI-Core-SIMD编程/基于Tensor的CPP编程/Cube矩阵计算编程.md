@@ -447,19 +447,19 @@ Stride = ((C0_ELEMENT, C0_ELEMENT * Std::Int<16>{}), (Std::Int<1>{}, C0_ELEMENT 
 结合如上分形表达的描述, 基于Layout的能力, C++ Tensor编程提供了原始的Layout构造接口, 例如, 需要创建一个多维的内存排布的形状(128, 256, 128)时, 可通过`MakeLayout`接口直接构造。
 
 ```cpp
-auto threeDimLayout = MakeLayout(MakeShape(128, 256, 128));
+auto threeDimLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256, 128));
 ```
 
 而对于一个Nz分形的排布, 也可以通过`MakeLayout`来构造一个层次化的Layout表达, 譬如, 对于外层大小为(128, 256), 数据类型为half的Nz数据而言，其可以通过`MakeLayout`构造一个四维的layout排布:
 ```cpp
 // Define Nz fractal with shape (128, 256), its 4D representation is: ((16, 128 / 16), (16, 256 / 16))
-auto NzLayout = MakeLayout(MakeShape((16, 8), (16, 16)));
+auto NzLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape((16, 8), (16, 16)));
 ```
 
 Cube矩阵计算中对于不同的内部存储都有着自己独特的分形结构，为了简化用户的编写,  C++ Tensor编程提供了`MakeFrameLayout`来简化用户编写生成如上的四维Layout定义：
 ```cpp
 // Use MakeFrameLayout to simplify Nz fractal definition, user only needs to perceive the fractal structure of corresponding storage, no need to directly express 4D structure
-auto NzLayout = MakeFrameLayout<NZLayoutPtn>(128, 256);
+auto NzLayout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256);
 ```
 
 ### 基于Layout的Tensor表达
@@ -469,12 +469,12 @@ C++ Tensor提供了`MakeTensor`函数让开发者能够简便的构造出带有L
 
 ```cpp
 // Construct Layout for Global Memory & L1 Buffer 
-auto globalLayout = MakeLayout(MakeShape(128, 256));
-auto l1Layout = MakeFrameLayout<NZLayoutPtn>(128, 256);
+auto globalLayout = AscendC::Te::MakeLayout(AscendC::Te::MakeShape(128, 256));
+auto l1Layout = AscendC::Te::MakeFrameLayout<AscendC::Te::NZLayoutPtn>(128, 256);
 
 // Construct GlobalTensor & L1 LocalTensor through pointer + Layout
-auto globalTensor = MakeTensor(gmPtr, globalLayout);
-auto l1Tensor = MakeTensor(l1Ptr, l1Layout);
+auto globalTensor = AscendC::Te::MakeTensor(gmPtr, globalLayout);
+auto l1Tensor = AscendC::Te::MakeTensor(l1Ptr, l1Layout);
 ```
 
 ### 矩阵搬运和计算
@@ -484,17 +484,17 @@ auto l1Tensor = MakeTensor(l1Ptr, l1Layout);
 - **GM2L1搬运**: `Copy(dst, src)`搬运矩阵数据到L1 Buffer，支持随路格式转换（ND2NZ、DN2NZ、NZ2NZ等），开发者定义源Tensor和目的Tensor的Layout，接口自动处理格式转换。
 ```cpp
 // Directly specify Global Tensor and Local Tensor for equal size copy, interface automatically infers copy parameters
-Copy(l1Tensor, globalBias);
+AscendC::Te::Copy(l1Tensor, globalBias);
 
 // Specify Global Tensor offset to copy a slice from Global Tensor
-Copy(l1Tensor, globalBias.Slice(MakeCoord(0, j * baseN), MakeShape(1, curN)));
+AscendC::Te::Copy(l1Tensor, globalBias.Slice(AscendC::Te::MakeCoord(0, j * baseN), AscendC::Te::MakeShape(1, curN)));
 
 // Create custom CopyAtom based on OP, CopyGM2L1 implements custom GM->L1 copy capability
-auto atomCopy = MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
-Copy(atomCopy, dstTensor, srcTensor);
+auto atomCopy = AscendC::Te::MakeCopy(CopyGM2L1{}, DataCopyTraitDefault{});
+AscendC::Te::Copy(atomCopy, dstTensor, srcTensor);
 
 // Fixpipe inline quantization example
-Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantScalar);
+AscendC::Te::Copy(CopyAtom<CopyTraits<CopyL0C2GM, FixpipeTraitDefault>>{}, globalC, l0CTensor, quantScalar);
 ```
 
 同样，对于`L1 Buffer`->`L0A Buffer`/`L0B Buffer`的搬运接口以及矩阵计算接口也只需要指定对应的操作Tensor, 开发者无需感知具体的操作细节参数, 对于矩阵计算编程, 极大的简化了开发者编写算子的难度。
