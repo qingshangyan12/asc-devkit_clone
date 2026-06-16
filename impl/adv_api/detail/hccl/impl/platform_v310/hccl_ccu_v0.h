@@ -134,7 +134,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     // 只有 alltoall 且 ccu的会走到这里，并设为true
     AscendC::PRINTF("start setting hcclNewContext_, newCcuFlag_:[%u]\n", newCcuFlag_);
-    AscendC::PRINTF("context=0x%llx, newCcuFlag_=%u\n",
+    AscendC::PRINTF("[CCU_DEBUG]context=0x%llx, newCcuFlag_=%u\n",
                 reinterpret_cast<uint64_t>(context), newCcuFlag_);
     if (newCcuFlag_) {
         hcclNewContext_ = (__gm__ HcclApi::OpResCtx*)context;
