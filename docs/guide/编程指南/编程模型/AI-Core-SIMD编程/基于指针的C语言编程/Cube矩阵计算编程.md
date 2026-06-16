@@ -243,13 +243,13 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float
 
 另外，对于是否开启unit_flag, nz2nd信息的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
 ```c
-// 1.0 数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。
+// 1.0 When performing inline quantization during data movement, call this interface to set vector quantization parameters in the quantization flow.
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
 
-// 2.0 数据搬运过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+// 2.0 When performing inline format conversion (NZ to ND) during data movement, call this interface to set format conversion configuration.
 __aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
 
-// 3.0 对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。
+// 3.0 Set the value in RELU_ALPHA register. This is a 64-bit register storing the alpha value used in Scalar ReLU during fixpipe or cube instructions.
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 ```
 

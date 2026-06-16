@@ -70,16 +70,16 @@ C API通过C风格的地址限定符描述不同层级内存，并且可以通�
 -   内部存储（包含Unified Buffer、L1 Buffer等）：由用户自行申请空间，通过地址限定符关键字在Kernel内声明。无自动垃圾回收机制，需开发者严格控制生命周期。以申请UB空间为例：
 
 ```
-// 在数组变量声明中使用地址空间限定符
-// total_length指参与计算的数据长度
+// Use address space qualifier in array variable declaration
+// total_length refers to the data length involved in computation
 constexpr uint64_t total_length = 256;
 __ubuf__ float xLocal[ total_length ];
 __ubuf__ float yLocal[ total_length ];
 __ubuf__ float zLocal[ total_length ];
 
-// 在指针变量声明中使用地址空间限定符
-uint64_t offset = 0;                                   // 首先为src0申请内存，从0开始。
-__ubuf__ half* src0 = (__ubuf__ half*)asc_get_phy_buf_addr(offset);    // 获取src0的地址，通过__ubuf__关键字指定该地址指向UB内存。
+// Use address space qualifier in pointer variable declaration
+uint64_t offset = 0;                                   // First allocate memory for src0, starting from 0.
+__ubuf__ half* src0 = (__ubuf__ half*)asc_get_phy_buf_addr(offset);    // Get src0 address, specify it points to UB memory via __ubuf__ keyword.
 ```
 
 ## 同步控制<a name="section6735112217720"></a>
@@ -138,34 +138,34 @@ NPU内部有不同的计算单元，在计算前往往需要把计算数据搬�
 第一种：和静态Tensor编程方式一致的同步接口，主要通过asc\_sync\_notify/asc\_sync\_wait接口来精细化管理，需要手动管理事件的类型和事件ID，还需要考虑正向同步（循环内依赖）与反向同步（循环间依赖）。极致性能场景推荐使用此方式。使用示例如下：
 
 ```
-// 本片段仅用于说明数据搬运、矢量计算、同步操作间的关系。各接口的完整参数及上下文请参考下文中的编程示例。
-asc_copy_gm2ub(); // GM->UB的搬运流水
+// This snippet only illustrates the relationship between data movement, vector computation, and synchronization. For complete parameters and context, refer to programming examples below.
+asc_copy_gm2ub(); // GM->UB data movement pipeline
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-asc_add(); // 矢量计算流水
+asc_add(); // Vector computation pipeline
 asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
 asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-asc_copy_ub2gm(); // UB->GM的搬运流水
+asc_copy_ub2gm(); // UB->GM data movement pipeline
 ```
 
 第二种：不感知流水类型的同步接口，将asc\_sync接口添加在对应流水类型的指令后面来实现。使用这类同步接口时，不需要考虑指令流水类型，接口内部会自动管理所有指令流水的同步，简化同步指令。性能不敏感场景下，可以使用此方式。使用示例如下：
 
 ```
-// 本片段仅用于说明数据搬运、矢量计算、同步操作间的关系。各接口的完整参数及上下文请参考下文中的编程示例。
-asc_copy_gm2ub();// GM->UB的搬运流水
-asc_sync(); // 全同步无需考虑后面的指令流水
-asc_add(); // 矢量计算流水
-asc_sync(); // 全同步无需考虑后面的指令流水
-asc_copy_ub2gm(); // UB->GM的搬运流水
+// This snippet only illustrates the relationship between data movement, vector computation, and synchronization. For complete parameters and context, refer to programming examples below.
+asc_copy_gm2ub();// GM->UB data movement pipeline
+asc_sync(); // Full synchronization, no need to consider subsequent instruction pipelines
+asc_add(); // Vector computation pipeline
+asc_sync(); // Full synchronization, no need to consider subsequent instruction pipelines
+asc_copy_ub2gm(); // UB->GM data movement pipeline
 ```
 
 另外，C API还提供了一组包含同步能力的搬运及计算接口，开发者无需显式手动管理同步，同步操作隐藏在相应的接口中。性能不敏感场景下，推荐使用此方式。使用示例如下：
 
 ```
-// 本片段仅用于说明数据搬运、矢量计算、同步操作间的关系。各接口的完整参数及上下文请参考下文中的编程示例。
-asc_copy_gm2ub_sync(); // GM->UB的搬运流水同时包含了和后面的任意指令流水的同步
-asc_add_sync(); // 矢量计算流水同时包含了和后面的任意指令流水的同步
-asc_copy_ub2gm_sync(); // UB->GM的搬运流水同时包含了和后面的任意指令流水的同步
+// This snippet only illustrates the relationship between data movement, vector computation, and synchronization. For complete parameters and context, refer to programming examples below.
+asc_copy_gm2ub_sync(); // GM->UB data movement pipeline with built-in synchronization for any subsequent instruction pipeline
+asc_add_sync(); // Vector computation pipeline with built-in synchronization for any subsequent instruction pipeline
+asc_copy_ub2gm_sync(); // UB->GM data movement pipeline with built-in synchronization for any subsequent instruction pipeline
 ```
 
 ## 编程示例<a name="section1825793122916"></a>

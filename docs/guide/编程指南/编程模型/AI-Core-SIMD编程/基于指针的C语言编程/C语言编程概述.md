@@ -332,11 +332,11 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
       <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
       <td>
-        <code>// 场景描述: 两个AIV跟AIC之间的同步, Atlas A2/A3训练和推理系列产品支持两个AIV同时触发AIC等待，Ascend 950PR/Ascend 950DT后支持AIV0与AIV1单独触发AIC等待</code><br>
+        <code>// Scenario: Synchronization between two AIVs and AIC. Atlas A2/A3 training/inference products support two AIVs triggering AIC wait simultaneously, Ascend 950PR/Ascend 950DT and later support AIV0 and AIV1 triggering AIC wait separately</code><br>
         <code>if ASCEND_IS_AIC {</code><br>
-        <code>    // Atlas A2/A3训练和推理系列产品, AIC发送一条arrive, 两个AIV同时等待</code><br>
+        <code>    // Atlas A2/A3 training/inference products: AIC sends one arrive, two AIVs wait simultaneously</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
-        <code>    // Ascend 950PR/Ascend 950DT产品, AIC发送两个arrive, 两个AIV分别等待</code><br>
+        <code>    // Ascend 950PR/Ascend 950DT products: AIC sends two arrives, two AIVs wait separately</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 16);</code><br>
         <code>}</code><br>

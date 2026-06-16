@@ -194,11 +194,11 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
 
-![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图_c.png)
+<img src="../../../../figures/多次迭代非连续场景示意图_c.png" alt="多次迭代非连续场景示意图" width="800" />
 
 通过 C 风格接口配置 `repeat_stride` 和 `data_block_stride` 实现上述多次迭代功能。
 ```c
-// 上述示例repeat间隔为9, 则通过如下配置可完成对应的操作
+// In the above example with repeat interval of 9, the following configuration achieves the corresponding operation
 uint8_t repeat_time = 1;
 uint8_t dst_block_stride = 1;
 uint8_t src0_block_stride = 1;
