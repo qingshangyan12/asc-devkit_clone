@@ -32,15 +32,15 @@ struct Pointer {
 ```cpp
 constexpr int32_t size = 256;
 __ubuf__ float ubData[size];
-__cbuf__ float L1Data[size];
-__ca__ float caData[size];
+__cbuf__ float l1Data[size];
+__ca__ float l0AData[size];
 
 // 创建Unified Buffer指针
 auto ubPtr = AscendC::Te::MakeMemPtr(ubData);
 
 // 创建L1 Buffer指针
-auto l1Ptr = AscendC::Te::MakeMemPtr(L1Data);
+auto l1Ptr = AscendC::Te::MakeMemPtr(l1Data);
 
 // 创建L0A Buffer指针
-auto caPtr = AscendC::Te::MakeMemPtr(caData);
+auto caPtr = AscendC::Te::MakeMemPtr(l0AData);
 ```
