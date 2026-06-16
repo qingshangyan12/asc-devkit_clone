@@ -53,7 +53,9 @@ using __asc_aicore::printf;
 using __asc_aicore::PRINTF;
 }  // namespace AscendC
 
+#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_dump_tensor_intf_impl.h"
+#endif
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_H__)
