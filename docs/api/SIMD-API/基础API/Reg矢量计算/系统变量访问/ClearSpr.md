@@ -49,8 +49,9 @@
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
-头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf_impl"`。
-该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见[表 SpecialPurposeReg模板参数说明](./GetSpr.md#table37531617424)。 
+头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_gather_mask_intf"`。
+
+该接口用于对指定的特殊目的寄存器（SpecialPurposeReg）进行清零操作。通过模板参数spr指定目标特殊寄存器，调用后该寄存器的值被置为0，当前支持的特殊寄存器见表 SpecialPurposeReg模板参数说明。
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
