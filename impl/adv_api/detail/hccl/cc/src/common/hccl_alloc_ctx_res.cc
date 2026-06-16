@@ -117,11 +117,11 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag,
     void *comParamPtr  = nullptr;
     void *comSyncPtr   = nullptr;
 
-    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_CCU,
+    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV,
         Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_CCU,
+    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV,
         comParamBufSize, &comParamPtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_CCU,
+    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV,
         comSyncBufSize, &comSyncPtr));
 
     opResCtx.workSpace      = reinterpret_cast<uint64_t>(workspacePtr);
@@ -658,13 +658,13 @@ HcclResult CcuSelectAlg(HcclComm comm, void *stream, const std::string topoTag[]
         std::string tagParam = std::to_string(i) + "_" + std::string(opParam.algTag);
         void *opParamPtr = nullptr;
         uint64_t opParamSize = sizeof(OpParam);
-        if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_CCU, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
+        if (HcclEngineCtxGet(comm, tagParam.c_str(), COMM_ENGINE_AIV, &opParamPtr, &opParamSize) == HCCL_SUCCESS) {
             HCCL_INFO("HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%llu]",
                 tagParam.c_str(), opParamPtr, opParamSize);
         } else {
-            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_CCU, opParamSize, &opParamPtr));
+            CHK_RET(HcclEngineCtxCreate(comm, tagParam.c_str(), COMM_ENGINE_AIV, opParamSize, &opParamPtr));
         }
-        aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, aclrtMemcpyKind(1));
+        aclError aclRet = aclrtMemcpy(opParamPtr, opParamSize, &opParam, opParamSize, ACL_MEMCPY_HOST_TO_DEVICE);
         CHK_RET(aclRet == ACL_ERROR_NONE ? HCCL_SUCCESS : HCCL_E_RUNTIME);
         opResCtx.algInfo[i].opParam = reinterpret_cast<uint64_t>(opParamPtr);
         opResCtx.algInfo[i].offset = initTiling->offset[i];
