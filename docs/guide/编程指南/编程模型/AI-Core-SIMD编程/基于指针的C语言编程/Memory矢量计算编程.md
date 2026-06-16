@@ -46,7 +46,7 @@ int32_t main(int argc, char const *argv[])
 
 ## Memory数据搬运
 
-Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
+Global Memory与Unified Buffer之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
 
 开发者通过灵活配置结构体参数，精确控制数据块数量、地址长度及间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，提升向量算子的执行效率。
 
@@ -56,35 +56,35 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 </thead>
 <tbody>
 <tr>
-<td>高维切分</td>
-<td><code>asc_copy_gm2ub</code></td>
-<td>非连续多块数据搬运，可配置块数和间隔</td>
-</tr>
-<tr>
-<td rowspan="3">Global M</td>
+<td rowspan="3">Global Memory -> Unified Buffer</td>
 <td>连续搬运</td>
-<td><code>asc_copy_gm2ub</code></td>
+<td><code>asc_copy_gm2ub(dst, src, size)</code></td>
 <td>连续地址的一维数据搬运</td>
 </tr>
 <tr>
+<td>非连续搬运</td>
+<td><code>asc_copy_gm2ub(dst, src, burst_count, burst_len, src_gap, dst_gap)</code></td>
+<td>非连续多块数据搬运，可配置块数和间隔</td>
+</tr>
+<tr>
 <td>非对齐</td>
-<td><code>asc_copy_gm2ub_align</code></td>
+<td><code>asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, enable_constant_pad, l2_cache_mode, src_stride, dst_stride)</code></td>
 <td>地址非32B对齐，支持自定义填充</td>
 </tr>
 <tr>
-<td>高维切分</td>
-<td><code>asc_copy_ub2gm</code></td>
-<td>非连续多块数据搬运，可配置块数和间隔</td>
-</tr>
-<tr>
-<td rowspan="3">ub2gm</td>
+<td rowspan="3">Unified Buffer -> Global Memory</td>
 <td>连续搬运</td>
-<td><code>asc_copy_ub2gm</code></td>
+<td><code>asc_copy_ub2gm(dst, src, size)</code></td>
 <td>连续地址的一维数据搬运</td>
 </tr>
 <tr>
+<td>非连续搬运</td>
+<td><code>asc_copy_ub2gm(dst, src, burst_count, burst_len, src_gap, dst_gap)</code></td>
+<td>非连续多块数据搬运，可配置块数和间隔</td>
+</tr>
+<tr>
 <td>非对齐</td>
-<td><code>asc_copy_ub2gm_align</code></td>
+<td><code>asc_copy_ub2gm_align(dst, src, burst_count, burst_len, l2_cache_mode, dst_stride, src_stride)</code></td>
 <td>地址非32B对齐</td>
 </tr>
 </tbody>
@@ -92,31 +92,40 @@ Global Memory（GM）与Unified Buffer（UB）之间的数据搬运提供了多�
 
 根据上述矢量搬运能力的描述, 开发者可以根据不同的场景选择合适的接口进行处理。
 
-**高维切分搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(16, 256)，数据类型为half)为例，隔行将数据搬运到`Unified Buffer`中，可通过如下方式实现：
-```c
-// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
-uint16_t burst_count = 8;
-// Length of single data block (in 32B units): value is 256 * sizeof(half) / 32
-uint16_t burst_len = 256 * sizeof(half) / 32;
-// Stride from previous block to next block in source data (in 32B units): interval of two rows between blocks, value is 256 * 2 * sizeof(half) / 32
-uint16_t src_stride = 256 * 2 * sizeof(half) / 32;
-// Stride from previous block to next block in destination data (in 32B units): data blocks are consecutive, value is 256 * sizeof(half) / 32
-uint16_t dst_stride = 256 * sizeof(half) / 32;
-
-asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
-```
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
-
 **连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据大小（字节）即可。例如src_gm数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`asc_copy_gm2ub`直接调用：
+
+<img src="../../../../figures/连续数据搬运.png" alt="连续数据搬运" width="800" />
+
 ```c
 uint32_t size = 256 * sizeof(half);
 asc_copy_gm2ub(dst_ub, src_gm, size);
 ```
+
+
 > 📌 该接口主要为了提升用户数据搬运的易用性，由软件层面提供，底层通过高维切分接口实现。
+
+**非连续搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(256)，数据类型为half)为例，进行如下图数据搬运时，可通过如下方式实现：
+
+<img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
+
+```c
+// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
+uint16_t burst_count = 2;
+// Length of single data block (in 32B units): value is 8
+uint16_t burst_len = 8;
+// Stride from previous block to next block in source data (in 32B units): interval of two rows between blocks, value is 1
+uint16_t src_stride = 1;
+// Stride from previous block to next block in destination data (in 32B units): data blocks are consecutive, value is 2
+uint16_t dst_stride = 2;
+
+asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
+```
+
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 **非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如将上述示例中的src_gm数据修改为(shape(16, 200)，数据类型为half)，则无法通过`asc_copy_gm2ub`完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`asc_copy_gm2ub_align`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
 
-![非对齐搬入能力](../../../../figures/非对齐搬入能力.png)
+<img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
 以上图为例, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
 在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
@@ -124,7 +133,7 @@ asc_copy_gm2ub(dst_ub, src_gm, size);
 // Number of consecutive data blocks: transfer two consecutive data blocks
 uint16_t burst_count = 2;
 // Length of single data block (in bytes): value is 54
-uint16_t burst_len = 54;
+uint16_t burst_len = 8;
 // Stride from previous block to next block in source data: source data stride unit is 1B
 uint16_t src_stride = 1;
 // Stride from previous block to next block in destination data: UB operation constraint address must be 32B aligned, value is 32 / 32
@@ -136,17 +145,16 @@ uint8_t right_padding_num = 3;
 
 asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, false, 0, src_stride, dst_stride);
 ```
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。
-
-更多的搬运能力可参考API手册。
+如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。更多的搬运能力可参考[API手册](../../../../../api/SIMD-API/C-API/矢量数据搬运/)。
 
 ## 3. Memory数据计算
 
 Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
 以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
 
-<img src="../../../../figures/Memory矢量计算模式示意图.png" alt="Memory矢量计算模式示意图" width="800" />
+<img src="../../../../figures/Memory矢量计算模式示意图_c.png" alt="Memory矢量计算模式示意图" width="800" />
 
 ### 3.1 高维切分计算
 
@@ -155,11 +163,11 @@ Memory矢量计算提供连续计算和高维切分两种计算模式，并可�
 #### 3.1.1 迭代控制
 Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
 
-<img src="../../../../figures/DataBlock迭代示意图.png" alt="DataBlock迭代示意图" width="800" />
+<img src="../../../../figures/DataBlock迭代示意图_c.png" alt="DataBlock迭代示意图" width="800" />
 
 矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeat_time取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
 
-<img src="../../../../figures/2次迭代Exp计算.png" alt="2次迭代Exp计算" width="800" />
+<img src="../../../../figures/2次迭代Exp计算_c.png" alt="2次迭代Exp计算" width="800" />
 
 #### 3.1.2 地址间隔配置
 
@@ -167,26 +175,26 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
 非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同`data_block`之间在读取数据时出现一个`data_block`的间隔，如下图所示。
 
-<img src="../../../../figures/data_block_stride示例.png" alt="data_block_stride示例" width="800" />
+<img src="../../../../figures/data_block_stride示例_c.png" alt="data_block_stride示例" width="800" />
 
 > 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个data_block。
 
 下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
 
-<img src="../../../../figures/单次迭代内源和目的操作数读写示例.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
+<img src="../../../../figures/单次迭代内源和目的操作数读写示例_c.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
 
 其中**repeat_stride**是指相邻迭代间相同`data_block`的地址步长, 可通过设置`repeat_stride`来灵活控制不同的场景。
 
 | 场景 | repeat_stride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
-| 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景.png" alt="repeat_stride连续计算场景" width="600" /> |
-| 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景.png" alt="repeat_stride非连续计算场景" width="600" /> |
-| 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景.png" alt="repeat_stride反复计算场景" width="600" /> |
-| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算.png" alt="repeat_stride部分重复计算" width="600" /> |
+| 连续计算 | 8 | 每轮迭代读取连续8个data_block，完成所有输入数据的计算 | <img src="../../../../figures/repeat_stride连续计算场景_c.png" alt="repeat_stride连续计算场景" width="600" /> |
+| 非连续计算 | >8 (如10) | 相邻迭代间存在data_block间隔，地址不连续 | <img src="../../../../figures/repeat_stride非连续计算场景_c.png" alt="repeat_stride非连续计算场景" width="600" /> |
+| 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景_c.png" alt="repeat_stride反复计算场景" width="600" /> |
+| 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算_c.png" alt="repeat_stride部分重复计算" width="600" /> |
 
 当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
 
-![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图.png)
+![多次迭代非连续场景示意图](../../../../figures/多次迭代非连续场景示意图_c.png)
 
 通过 C 风格接口配置 `repeat_stride` 和 `data_block_stride` 实现上述多次迭代功能。
 ```c
@@ -205,7 +213,7 @@ asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_st
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
-<img src="../../../../figures/掩码操作示意图.png" alt="掩码操作示意图" width="800" />
+<img src="../../../../figures/掩码操作示意图_c.png" alt="掩码操作示意图" width="800" />
 
 每一位掩码对应数据中的一个元素的位置，通过有效位和无效位标记，实现对数据操作的精细化开关控制。
 掩码由固定位宽的数值表示：有效位（通常为1）：对应元素正常参与计算。无效位（通常为0）：对应元素被屏蔽，不执行操作。

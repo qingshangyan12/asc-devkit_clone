@@ -14,7 +14,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 **Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级。Global Memory存放输入输出数据，Unified Buffer作为矢量计算数据中间缓存，Register位于Vector计算单元最内层，直接与矢量计算执行单元交互。
 
-<img src="../../../../figures/AI%20Core存储层次结构.png" alt="AI Core存储层次结构" width="800" />
+<img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
 
 
 ### 外部存储（Global Memory）
@@ -160,11 +160,11 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 | L0B Buffer | Zn | Zn |
 | L0C Buffer | Nz | Nz |
 
-以`FRACTAL_Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
+以`Nz`为例，内存排布如下图所示，整块内存通过大N外部column major（列主序）+ 小z内部row major（行主序）存放。
 
-![FRACTAL_Nz内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
+![Nz内存排布示意图](../../../../figures/FRACTAL_NZ内存排布示意图.png)
 
-#### 2.4.2 Bank冲突
+#### Bank冲突
 
 为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以Unified Buffer为例, Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
 
@@ -183,15 +183,14 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 当遇到Bank冲突的时候, 会引起算子性能的下降, 通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生, 详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
 
-## 3. 同步机制
+## 同步机制
 
 在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。
 
 AI Core的同步主要分为**核内同步**和**核间同步**。
 
----
 
-### 3.1 核内同步
+### 核内同步
 
 AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
 
@@ -279,7 +278,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 </tbody>
 </table>
 
-### 3.2 核间同步
+### 核间同步
 
 当一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能执行时，则需要通过核间同步来确保多核间的时序正确性。
 
@@ -333,8 +332,13 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
       <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
       <td>
+        <code>// 场景描述: 两个AIV跟AIC之间的同步, Atlas A2/A3训练和推理系列产品支持两个AIV同时触发AIC等待，Ascend 950PR/Ascend 950DT后支持AIV0与AIV1单独触发AIC等待</code><br>
         <code>if ASCEND_IS_AIC {</code><br>
+        <code>    // Atlas A2/A3训练和推理系列产品, AIC发送一条arrive, 两个AIV同时等待</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
+        <code>    // Ascend 950PR/Ascend 950DT产品, AIC发送两个arrive, 两个AIV分别等待</code><br>
+        <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
+        <code>    asc_sync_intra_arrive(PIPE_FIX, 16);</code><br>
         <code>}</code><br>
         <code>if ASCEND_IS_AIV {</code><br>
         <code>    asc_sync_intra_wait(PIPE_MTE3, 0);</code><br>
@@ -352,7 +356,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 > 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离;
 
-## 4. 算子类型
+## 算子类型
 
 前序章节抽象硬件架构已阐述，AI Core包含Vector和Cube两类计算单元，分别用于向量计算和矩阵计算。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
 
