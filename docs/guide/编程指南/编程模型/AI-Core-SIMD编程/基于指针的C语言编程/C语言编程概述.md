@@ -1,10 +1,10 @@
 ﻿# C语言编程概述
 
-C语言编程是Ascend C SIMD编程路径的底层核心接口，直接映射NPU硬件指令，提供对向量处理单元、矩阵运算单元、本地存储等硬件资源的精细控制能力。开发者可手动规划本地内存布局、控制数据流转、插入硬件流水同步、调整搬运与计算的流水并行，直接面向计算单元、存储层次和流水同步组织代码。该路径适用于对性能和可控性要求较高的算子开发场景，是追求极致性能、习惯C语言编程的开发者解锁NPU硬件潜能的关键技术路径。本章旨在帮助开发者建立对C语言编程的系统化认知，理解其底层技术定位、核心编程范式与开发方法论。
+C 语言编程是 Ascend C SIMD 编程路径的底层核心接口，可直接映射 NPU 硬件指令，支持开发者对向量处理单元、矩阵运算单元、本地存储等硬件资源进行精细化控制。开发者可手动规划本地内存布局、管控数据流转、插入硬件流水同步指令、调整数据搬运与计算的流水并行策略，围绕计算单元、存储层次和流水同步机制来组织代码实现。该编程方式适用于对性能和可控性要求较高的算子开发场景，也是习惯 C 语言编程、追求极致性能的开发者充分释放 NPU 硬件潜能的核心技术路径。基于以上定位，下面从核函数、内存架构、同步机制、算子开发四大核心模块，逐一讲解 Ascend C 语言编程的核心规则与使用方法。
 
 ## Kernel函数
 
-[核函数](../核函数.md)在前序章节已作介绍，C语言编程在核函数定义与调用上沿用SIMD编程通用规范，无额外语法约束。
+[核函数](../核函数.md)在前序章节已作介绍。Ascend C 语言编程完全沿用 SIMD 编程的核函数定义与调用规范，未新增额外语法约束。核函数是运行在 Device 侧的执行入口，所有内存读写、数据搬运、计算逻辑均在核函数内部实现。下文将首先介绍C语言编程的内存层级，这也是核函数开发的基础。
 
 ## 内存层级
 
@@ -19,10 +19,12 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 ### 外部存储（Global Memory）
 
-Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Memory。Global Memory具有持久性：通过全局内存分配的空间，其中存储的数据将持续保留，直到该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
+Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
-结合下述示例, Host使用`aclrtMalloc`分配Device侧的全局内存，并通过`aclrtMemcpy`将数据从Host拷贝到Device侧的全局内存，或将数据从Device的全局内存拷贝回Host内存；然后通过<<<>>>拉齐Device侧核函数进行运算；通过`aclrtMalloc`分配的Device全局内存需使用`aclrtFree`接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
-此外，核函数需使用__global__函数前缀进行声明。 该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。
+结合下述示例说明：Host 侧通过aclrtMalloc接口分配 Device 侧全局内存，通过aclrtMemcpy完成 Host 与 Device 全局内存间的数据互拷（Host→Device 或 Device→Host）；随后通过 <<<>>> 语法触发 Device 侧核函数执行运算；此外，通过aclrtMalloc分配的 Device 全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+
+此外，核函数需使用__global__函数前缀进行声明。 该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。完整的调用流程为：Host 分配 GM 内存 → 数据拷贝 → 启动核函数 → 释放内存，示例代码如下：
+
 ```c
 // Kernel implementation, decorated with __global__ to mark kernel entry point
 __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
@@ -55,11 +57,11 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
 ### 内部存储（Local Memory）
 
-AI Core包含三类基础计算单元：Cube负责矩阵计算、Vector负责矢量计算、Scalar负责标量计算。计算前需将数据从外部存储加载到内部存储，不同存储单元服务于不同计算单元：Unified Buffer支撑矢量计算, L1 Buffer和L0 Buffer支撑矩阵计算。
+上文介绍了外部全局内存（Global Memory），接下来说明AI Core内部高速存储。AI Core包含 Cube、Vector、Scalar 三类计算单元，数据必须从外部存储加载至内部存储后才能执行计算。内部存储按服务对象分为两大体系：服务矢量计算的AIV内部存储、服务矩阵计算的AIC内部存储。
 
 #### AIV内部存储之Unified Buffer
 
-Unified Buffer是AI Core内主要用于矢量计算单元的内部存储单元，位于每个Vector Core（AIV）内部。与外部存储空间相比，Unified Buffer的容量较小，但具有更高的带宽和更低的访问延迟，可视为内核执行期间由用户管理的高速缓存资源。
+Unified Buffer 是 AI Core 中服务于矢量计算单元的核心内部存储单元，部署在每个 Vector Core（AIV）内部。相较于外部存储空间，Unified Buffer 容量更小，但具备更高的带宽和更低的访问延迟，可作为内核执行期间由用户自主管理的高速缓存资源。
 
 在C指针编程中，用户可通过数组定义的方式动态或静态申请Unified Buffer。
 
@@ -73,7 +75,7 @@ __global__ __vector__ void add_custom(...)
 }
 ```
 
-**动态申请**：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
+**动态申请**：除静态分配外，也可在运行阶段动态指定UB大小，即动态申请方式，用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
 
 ```c
 // Device-side: declare dynamic shared memory
@@ -88,28 +90,29 @@ int32_t main(int argc, char const *argv[])
 {
     // ...
     uint32_t dyn_ubuf_size = 1024 * sizeof(char);
-    add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+    add_custom<<<block_nums, dyn_ubuf_size, stream>>>(...);
     // ...
 }
 ```
 
-另外，开发者也可以通过定义结构体的方式来定义内存结构体, 这样可以简化算子中内存定义的代码部分。
+除基础数组定义外，还可通过结构体整合多块内存，简化复杂算子的内存管理：
+
 ```c
 // Define src0 and src1 memory blocks unified via struct
-__ubuf__ struct src_ubuf {
-    half src0[128];
-    half src1[128];
-};
+typedef struct {
+    half src0_buf[128];
+    half src1_buf[128];
+} asc_src_buf;
 
 __global__ __vector__ void add_custom(...) {
-    src_ubuf struct local_buf{};
-    __ubuf__ src_ubuf* src_buffer = (__ubuf__ src_ubuf*)&local_buf;
+    __ubuf__ asc_src_ubuf local_buf{};
+    __ubuf__ asc_src_ubuf* src_buffer = (__ubuf__ asc_src_ubuf*)&local_buf;
     ...
-    asc_add(dst, src_buffer.src0, src_buffer.src1, 128);
+    asc_add(dst, src_buffer.src0_buf, src_buffer.src1_buf, 128);
 }
 ```
 
-> 📌 Unified Buffer地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
+> 📌 Unified Buffer 的内存地址必须按 32 字节对齐，目的是匹配硬件总线的数据传输粒度和 SIMD 计算单元的并行处理能力；若地址非对齐访问，会直接导致程序运行时错误。
 
 #### AIV内部存储之Register File
 
@@ -122,7 +125,7 @@ Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector�
 
 Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算单元直接访问的专用缓存为：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
-在C语言编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等, 不同的存储空间使用不同的地址限定符标识指定, AIC内部主要地址限定符如下:
+在C语言编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等, 不同Cube专用存储对应专属地址限定符，具体说明如下表：
 
 **存储单元及地址限定符说明**：
 
@@ -135,7 +138,7 @@ Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算�
 | Fixpipe Buffer | 存储量化参数 | `__fbuf__` | `__fbuf__ half fixpipe_buffer[128];` |
 | BiasTable Buffer | 存储Bias数据 | `__biasbuf__` | `__biasbuf__ half bias_buffer[64];` |
 
-结合地址限定符，开发者可以直接通过数组定义的方式申请一块内存块，如下方代码所示：
+结合地址限定符，开发者可以直接通过数组定义的方式申请一块内存块，示例如下：
 
 ```c
 constexpr uint32_t m_size = 256;
@@ -149,7 +152,7 @@ __cb__ half l0b_buffer[n_size * k_size];    // L0B Buffer, 512 bytes aligned
 __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 ```
 
-同时为了对矩阵乘法等计算密集型任务进行优化，提升Cube计算效率，AI Core对于L1 Buffer、L0 Buffer都采用了分形格式。不同产品型号的分形格式存在差异，具体对比如下：
+同时为优化矩阵乘法等计算密集型任务、提升Cube计算效率，AI Core的L1、L0 Buffer均采用分形内存排布格式（硬件定制化内存布局，适配矩阵计算访存特征）。不同硬件产品的分形格式存在差异，对比如下表：
 
 **表 1** 不同产品型号的分形格式对比
 
@@ -166,7 +169,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 #### Bank冲突
 
-为了提高数据访问的效率和吞吐量，内部存储采用了bank（大小相等的内存模块）结构设计。以Unified Buffer为例, Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
+上文介绍了各类内部存储的定义、排布格式。由于AI Core内部存储采用Bank分组架构，不当的内存访问会引发Bank冲突，进而降低算子性能。下面以Unified Buffer为例，介绍Bank冲突的相关原理，在Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
 
 <img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
@@ -185,20 +188,21 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 ## 同步机制
 
-在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。
+前文介绍了 AI Core 的多级存储与计算单元架构。由于 DMA 搬运、矢量计算、矩阵计算等单元均为异步并行执行，数据读写、计算操作存在强依赖，因此必须依靠同步机制管控执行时序，保证程序逻辑正确。在编程场景中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机，以保障程序执行结果的正确性。若未通过同步机制严格控制执行顺序，会导致计算结果不一致、程序行为不可预测等问题。
 
 AI Core的同步主要分为**核内同步**和**核间同步**。
 
-
 ### 核内同步
 
-AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。
+AI Core 内部的执行单元（如 MTE2 数据搬运单元、Vector 计算单元等）采用异步并行方式运行，当多个单元读写同一存储资源时，必然存在数据依赖关系。为保障数据一致性和计算结果的正确性，必须通过同步控制来协调各单元的操作时序。
 
 下图示例描述了一个常见的Vector计算数据流：
 
 1. 通过DMA将数据从Global Memory搬入到Local Memory
 2. 进行矢量计算
 3. 通过DMA将数据从Local Memory搬出到Global Memory
+
+上述不同执行单元对应 AI Core 内部不同的硬件流水线，各流水线分工明确，具体分类如下表：
 
 <img src="../../../../figures/Vector计算数据流.png" alt="Vector计算数据流" width="800" />
 
@@ -233,15 +237,13 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 <tbody>
 <tr>
 <td rowspan="2"><strong>多流水同步</strong></td>
-<td><p><strong>机制一</strong>: 通过锁定指定流水再释放流水来完成流水间的同步依赖。用于核内异步流水之间的同步处理，其功能类似于传统CPU中的锁机制。该同步机制为Ascend 950PR/Ascend 950DT新引入机制，相较于notify/wait方式使用更简便。</p></td>
+<td><p><strong>机制一</strong>: 通过 “锁定 - 释放” 指定流水的方式，解决核内异步流水间的同步依赖问题；该机制功能类似于传统 CPU 的锁机制，是 Ascend 950PR/Ascend 950DT 新引入的同步方式，相较于 notify/wait 更易使用。 </p></td>
 <td><code>asc_lock</code> & <code>asc_unlock</code></td>
 <td>
         <code>uint8_t mutex_id = 1;</code><br>
-        <code></code><br>
         <code>asc_lock(PIPE_MTE2, mutex_id);</code><br>
         <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
         <code>asc_unlock(PIPE_MTE2, mutex_id);</code><br>
-        <code></code><br>
         <code>asc_lock(PIPE_V, mutex_id);</code><br>
         <code>asc_add(shared_buffer, x_local, y_local);</code><br>
         <code>asc_unlock(PIPE_V, mutex_id);</code>
@@ -278,15 +280,15 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 </tbody>
 </table>
 
+以上为单个 AI Core 内部各流水线、执行单元的同步方案。当业务逻辑需要跨多个 AI Core 协作时，则需要使用核间同步机制。
+
 ### 核间同步
 
-当一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能执行时，则需要通过核间同步来确保多核间的时序正确性。
-
-以下图为例，AIC需要依赖于AIV的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
+若某个核的计算依赖其他相关核的全部计算结果，则需通过核间同步机制保障多核执行的时序正确性。以下图为例，AIC需要依赖于AIV的ReduceSum计算结果。由于整体矢量较大，必须拆分为多个部分，由每个AIV分别完成部分计算。每个AIV将其部分计算结果通过原子累加写入GM。AIC需要读取的必须是所有AIV均完成累加后的最终结果。
 
 <img src="../../../../figures/核间同步业务场景示例.png" alt="核间同步业务场景示例" width="800" />
 
-从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个group内细分block及subblock，block与subblock比例为1:N（N>=1），block表示多少个"主核"，subblock表示一个"主核"带多少个"从核"。
+从上图可以看到，当前AI Core是由AIC核和AIV核组成，其中AIC核主要用于Cube计算，AIV核负责Vector计算。AIC/AIV按group进行划分。一个 group 内细分为 block（主核）和 subblock（从核），二者比例为 1:N（N≥1）；其中，block 代表主核的数量，subblock 代表单个主核关联的从核数量。
 
 <img src="../../../../figures/block和subblock之间关系.png" alt="block和subblock之间关系" width="800" />
 
@@ -358,7 +360,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 ## 算子类型
 
-前序章节抽象硬件架构已阐述，AI Core包含Vector和Cube两类计算单元，分别用于向量计算和矩阵计算。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
+结合前文介绍的 AI Core 计算单元、多级内存架构与同步机制，基于硬件能力可开发三类算子：矢量算子、矩阵算子、融合算子。前序章节对硬件架构的介绍中已说明：AI Core 包含 Vector（矢量计算）和 Cube（矩阵计算）两类核心计算单元，分别对应矢量计算和矩阵计算场景。Cube计算单元部署于AIC核，Vector计算单元部署于AIV核，每个核均配备独立的Scalar单元，可独立加载各自的代码段。基于AI Core的硬件能力，开发者可实现Vector矢量算子、Cube矩阵算子及Mix CV融合算子三类算子。
 
 ### Vector矢量计算
 
@@ -384,13 +386,13 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ```
 
-Ascend 950PR/Ascend 950DT新一代架构, 引入寄存器可编程能力，在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
+以上为传统架构的矢量计算编程方式；Ascend 950PR/Ascend 950DT新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
 
 > 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
 
 ### Cube矩阵计算
 
-Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
+除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发, Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
 
 以Matmul矩阵乘计算为例, 开发者通过操作Cube矩阵计算能力可以完成如下图所示的c = a * b + bias的能力。
 - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
@@ -419,9 +421,8 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 
 ### Mix CV融合计算
 
-CV融合计算程序由多个独立的小算子融合而成，其功能与多个小算子的功能等价，性能方面通常优于独立的小算子。用户可以根据实际业务场景诉求，按照具体算法自由融合向量（Vector）、矩阵（Cube）算子以达到性能上的收益。融合了Cube计算、Vector计算的算子统称为CV融合算子。
+将矢量计算与矩阵计算融合在同一个算子中，即为 CV 融合算子，可进一步提升整体性能。开发者可根据业务场景，自由融合Vector、Cube算子以优化性能 —— 融合了 Cube 计算和 Vector 计算的算子统称为 CV 融合算子。例如 LLM 大模型核心的 Flash Attention 算子，就是将 Matmul（Cube）、Scale（Vector）、Mask（Vector）、SoftMax（Vector）等操作融合为一个算子，核心实现如下：
 
-比如对于LLM大模型中最核心的一个融合算子Flash Attention， 其核心实现如下图。图中的Matmul算子（Cube）、Scale算子（Vector）、Mask算子（Vector）、SoftMax算子（Vector）融合为一个大的算子Flash Attention。
 
 ![Flash Attention核心实现](../../../../figures/Flash-Attention核心实现.png)
 
@@ -444,8 +445,8 @@ __global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 
 ```
 
-融合算子在提升性能与充分发挥算力的基础上，通过合并算子减少计算量与内存占用、优化数据流传输、简化代码实现，实现计算效率、资源利用率与代码质量的同步提升。
+融合算子可合并多个独立小算子，减少整体计算量与内存占用、优化数据流传输路径、简化代码实现逻辑，最终实现计算效率、硬件资源利用率与代码可维护性的同步提升。
 
 ## 总结
 
-本章系统阐述了C语言编程的核心定位与技术体系。作为SIMD编程的底层接口，C语言编程直接映射NPU硬件指令，提供指令级透明可控能力，帮助开发者实现硬件峰值性能与精准问题定位。进一步学习可以参考[Cube矩阵计算编程](./Cube矩阵计算编程.md)、[Memory矢量计算编程](./Memory矢量计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。
+本章从技术定位出发，依次讲解了C语言编程的核函数规范、内存层级、、内外核同步机制以及三类算子开发范式。作为底层硬件编程接口，该路径可充分挖掘 NPU 算力。如需深入实践，可参考以下专项文档：[Memory矢量计算编程](./Memory矢量计算编程.md)、[Cube矩阵计算编程](./Cube矩阵计算编程.md)和[Reg矢量计算编程](./Reg矢量计算编程.md)。

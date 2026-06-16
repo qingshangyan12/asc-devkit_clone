@@ -1,20 +1,20 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用C语言编程API编写基于Unified Buffer（以下简称UB）的矢量计算代码，该能力是Ascend C最基础、最通用的矢量编程方式。这种基于UB内存的编程方式称为Memory矢量计算编程。Memory矢量计算在Atlas A2/A3训练和推理系列产品上提供完整的UB直接编程能力；Ascend 950PR/Ascend 950DT虽然支持UB操作，但推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍基于统一缓存（Unified Buffer，下文简称 UB）的 Ascend C 矢量计算开发方法，该计算能力简称 Memory 矢量计算编程，是 Ascend C 中最基础、应用最广泛的矢量编程方式。Atlas A2/A3 训练推理系列产品原生支持完整的 UB 直接编程能力；Ascend 950PR/Ascend 950DT引入寄存器计算能力, 推荐使用Reg矢量计算编程以获得更高性能。
 
 ## Memory矢量编程的基本步骤
 
-Memory矢量计算的数据流为：数据搬入 → 计算 → 数据搬出。当我们描述一个常见的Vector矢量计算时，需要执行以下三个步骤：
+Memory 矢量计算的标准数据流分为数据搬入、计算、数据搬出三个阶段，完整流程如下：
 
-1. 通过DMA将数据从Global Memory搬入到Local Memory
-2. 进行矢量计算
-3. 通过DMA将数据从Local Memory搬出到Global Memory
+1. 通过 DMA 将数据从全局内存（Global Memory）搬运至本地内存（Local Memory）；
+2. 进行矢量计算；
+3. 计算完成后，通过 DMA 将结果从本地内存搬运回全局内存（Global Memory）。
 
 ## Memory矢量计算内存管理
 
-Memory矢量编程主要是通过Local Memory(Unified Buffer)进行矢量计算, 开发者必须将输入搬入到Unified Buffer并通过Vector计算指令完成计算。其中Unified Buffer通过数组定义的方式进行申请, 开发者可以通过动态或者静态的方式申请Unified Buffer进行矢量计算。
+Memory 矢量计算依托本地内存中的 UB 完成运算，开发者需先将输入数据搬运至 UB，再调用矢量计算指令执行计算。UB 支持通过数组形式声明，分为静态申请和动态申请两种方式。
 
-- 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
+- 静态申请：分配固定大小的内存空间，空间尺寸在编译阶段确定，运行时无法修改。
 
 ```c
 __global__ __vector__ void add_custom(...)
@@ -46,9 +46,8 @@ int32_t main(int argc, char const *argv[])
 
 ## Memory数据搬运
 
-Global Memory与Unified Buffer之间的数据搬运提供了多样化的接口，支持丰富的数据搬运场景。为实现高效的Vector计算，系统支持将数据从GM搬运至UB，供Vector计算单元进行向量计算；计算完成后，再将结果从UB搬回GM，完成数据闭环。
-
-开发者通过灵活配置结构体参数，精确控制数据块数量、地址长度及间隔等关键属性，实现连续和非连续数据搬运（高维切分数据搬运），充分释放硬件的数据搬运与计算协同能力，提升向量算子的执行效率。
+昇腾 NPU 提供多组专用接口，实现全局内存（GM）与统一缓存（UB）之间的数据搬运，适配各类业务场景。为保障矢量计算效率，标准流程为：数据从 GM 搬运至 UB 完成计算，计算结果再从 UB 回写至 GM，形成完整数据链路。
+开发者可灵活配置参数，精准控制数据块数量、长度、地址间隔等属性，实现连续数据搬运与非连续（高维切分）数据搬运，充分发挥硬件搬运与计算的协同能力，提升矢量算子整体执行效率。
 
 <table>
 <thead>
@@ -56,7 +55,7 @@ Global Memory与Unified Buffer之间的数据搬运提供了多样化的接口�
 </thead>
 <tbody>
 <tr>
-<td rowspan="3">Global Memory -> Unified Buffer</td>
+<td rowspan="3">Global Memory -> UB</td>
 <td>连续搬运</td>
 <td><code>asc_copy_gm2ub(dst, src, size)</code></td>
 <td>连续地址的一维数据搬运</td>
@@ -72,7 +71,7 @@ Global Memory与Unified Buffer之间的数据搬运提供了多样化的接口�
 <td>地址非32B对齐，支持自定义填充</td>
 </tr>
 <tr>
-<td rowspan="3">Unified Buffer -> Global Memory</td>
+<td rowspan="3">UB -> Global Memory</td>
 <td>连续搬运</td>
 <td><code>asc_copy_ub2gm(dst, src, size)</code></td>
 <td>连续地址的一维数据搬运</td>
@@ -92,7 +91,7 @@ Global Memory与Unified Buffer之间的数据搬运提供了多样化的接口�
 
 根据上述矢量搬运能力的描述, 开发者可以根据不同的场景选择合适的接口进行处理。
 
-**连续搬运**: 如果开发者需要将一块连续的`Global Memory`搬运到`Unified Buffer`时，只需指定搬运数据大小（字节）即可。例如src_gm数据(shape(256)，数据类型为half)，需搬入到`Unified Buffer`中，通过`asc_copy_gm2ub`直接调用：
+**连续搬运**: 若需将 GM 中连续地址的数据搬运至 UB，仅需指定搬运数据的字节长度即可。例如将形状为 256、数据类型为 half 的 src_gm 数据搬入 UB，可直接调用 `asc_copy_gm2ub` 接口：
 
 <img src="../../../../figures/连续数据搬运.png" alt="连续数据搬运" width="800" />
 
@@ -101,10 +100,10 @@ uint32_t size = 256 * sizeof(half);
 asc_copy_gm2ub(dst_ub, src_gm, size);
 ```
 
-
 > 📌 该接口主要为了提升用户数据搬运的易用性，由软件层面提供，底层通过高维切分接口实现。
 
-**非连续搬运**: 当用户需要将多块非连续的`Global Memory`搬入到一块`Unified Buffer`时，可通过高维切分模式配置搬运数据块的个数、单个数据块的长度、每个数据块之间的间隔。以src_gm数据(shape(256)，数据类型为half)为例，进行如下图数据搬运时，可通过如下方式实现：
+**非连续搬运**: 若需将 GM 中多段非连续数据搬入同一段 UB 空间，可通过高维切分模式，配置数据块数量、单块长度、块间间隔等参数。以形状为 256、数据类型为 half 的 src_gm 为例，对应搬运逻辑与代码实现如下：
+
 
 <img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
 
@@ -123,7 +122,7 @@ asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 
 > 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-**非对齐搬运**: 高维切分数据搬运提供了用户进行非连续多个数据块搬入的能力，但该接口要求`Global Memory`中搬运的长度和间隔都必须保证是32B对齐的，因此对于一些非对齐场景无法支持。例如将上述示例中的src_gm数据修改为(shape(16, 200)，数据类型为half)，则无法通过`asc_copy_gm2ub`完成隔行数据的搬运，此时需要突破32B的约束限制。Ascend C根据芯片能力，提供了`asc_copy_gm2ub_align`接口来支持该搬运形式，该接口可以指定以字节为单位的burst_len和stride信息，完成搬运操作。
+**非对齐搬运**: 基础高维切分接口要求 GM 的数据长度与地址间隔均按 32 字节对齐，无法适配非对齐场景。例如将数据改为形状 (16, 200)、类型为 half 的 src_gm 后，asc_copy_gm2ub 无法实现隔行搬运。针对该场景，Ascend C 提供 `asc_copy_gm2ub_align` 非对齐搬运接口，支持以字节为单位配置数据块长度与地址步长，突破 32 字节对齐限制。
 
 <img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
@@ -132,7 +131,7 @@ asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 ```c
 // Number of consecutive data blocks: transfer two consecutive data blocks
 uint16_t burst_count = 2;
-// Length of single data block (in bytes): value is 54
+// Length of single data block (in bytes): value is 8
 uint16_t burst_len = 8;
 // Stride from previous block to next block in source data: source data stride unit is 1B
 uint16_t src_stride = 1;
@@ -147,29 +146,32 @@ asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_p
 ```
 > 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
-如上就完成了从`Global Memory`到`Unified Buffer`的搬入动作，反之从`Unified Buffer`搬出到`Global Memory`中也采用同样的能力进行处理。更多的搬运能力可参考[API手册](../../../../../api/SIMD-API/C-API/矢量数据搬运/)。
+以上为 GM 向 UB 的数据搬入逻辑，UB 向 GM 的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](../../../../../api/SIMD-API/C-API/矢量数据搬运/)。
 
-## 3. Memory数据计算
+## Memory数据计算
 
-Memory矢量计算提供连续计算和高维切分两种计算模式，并可通过掩码实现数据选择性参与计算。
-以Add接口为例，两种计算模式的调用方式示意图如下。其中，连续计算简单直观，适合一维Tensor连续数据处理；高维切分计算灵活可控，支持迭代执行和地址间隔配置。开发者可根据实际业务需求选择合适的计算方式。
+Memory 矢量计算包含连续计算和高维切分计算两种模式，同时支持掩码功能，可灵活控制参与计算的数据范围。
+下文以加法接口为例，结合示意图说明两种模式的差异：连续计算用法简单，适用于一维张量的连续数据运算；高维切分计算灵活性更强，支持迭代运算与自定义地址间隔。开发者可根据业务场景按需选择。
 
 <img src="../../../../figures/Memory矢量计算模式示意图_c.png" alt="Memory矢量计算模式示意图" width="800" />
 
-### 3.1 高维切分计算
+### 高维切分计算
 
 高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等, 能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
 
-#### 3.1.1 迭代控制
-Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock数据块内部地址连续，长度为32Byte）进行计算，并写入对应的8个DataBlock中。
+#### 迭代控制
+
+矢量计算单元单次迭代从 UB 读取 8 个连续的 DataBlock（每个 32 字节），运算结果写入目的 UB 的 8 个对应 DataBlock。
 
 <img src="../../../../figures/DataBlock迭代示意图_c.png" alt="DataBlock迭代示意图" width="800" />
 
-矢量计算API支持开发者通过repeatTime来配置迭代次数，从而控制指令的多次迭代执行。假设repeat_time设置为2，矢量计算单元会进行2个迭代的计算，可计算出2 × 8（每个迭代8个DataBlock） × 32Byte = 512Byte的结果。如果数据类型为half，则计算了256个元素。下图展示了2次迭代Exp计算的示意图。**由于硬件限制，repeat_time取值范围为[1, 255]，该限制适用于所有支持Memory矢量计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
+若设置 repeat_time（迭代次数）为 2，单元将执行两轮迭代，总处理数据量为 2 × 8 × 32 字节 = 512 字节；若数据类型为 half（2 字节 / 元素），则对应处理 256 个元素
+
+> 📌 硬件约束：repeat_time 取值范围为 1~255，该约束对 Atlas A2/A3、Ascend 950PR/Ascend 950DT 全系列产品生效。
 
 <img src="../../../../figures/2次迭代Exp计算_c.png" alt="2次迭代Exp计算" width="800" />
 
-#### 3.1.2 地址间隔配置
+#### 地址间隔配置
 
 矢量计算单元还支持带间隔的向量计算，通过`data_block_stride`（单次迭代内不同`data_block`间地址步长）和`repeat_stride`（相邻迭代间相同`data_block`的地址步长）来进行配置。`data_block_stride`是指单次迭代内不同`data_block`间地址步长。其取值不能超过UB大小限制。
 连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
@@ -177,7 +179,7 @@ Vector计算单元每个迭代会从UB中取出8个DataBlock（每个DataBlock�
 
 <img src="../../../../figures/data_block_stride示例_c.png" alt="data_block_stride示例" width="800" />
 
-> 📌 若dst_block_stride == 0, 等同于dst_block_stride = 1; 若src_block_stride = 0, 则源操作数将始终复用第一个data_block。
+> 📌 若dst_block_stride == 0，等效于dst_block_stride = 1；若src_block_stride = 0，源操作数将始终复用第一个 DataBlock。
 
 下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
 
@@ -209,21 +211,19 @@ uint8_t src1_repeat_stride = 9;
 
 asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
 ```
-#### 3.1.3 掩码设置
+#### 掩码设置
 
 针对同一个迭代中的数据，可以通过mask参数进行掩码操作来控制实际参与计算的个数。下图为进行Abs计算时通过mask逐比特模式按位控制哪些元素参与计算的示意图，1表示参与计算，0表示不参与计算。
 
 <img src="../../../../figures/掩码操作示意图_c.png" alt="掩码操作示意图" width="800" />
 
 每一位掩码对应数据中的一个元素的位置，通过有效位和无效位标记，实现对数据操作的精细化开关控制。
-掩码由固定位宽的数值表示：有效位（通常为1）：对应元素正常参与计算。无效位（通常为0）：对应元素被屏蔽，不执行操作。
+掩码为固定位宽数值，规则如下：有效位（值为 1）代表对应元素参与计算，无效位（值为 0）代表对应元素被屏蔽，不参与运算。
 
-掩码设置提供了两种模式：**Counter模式**和**Normal模式**。
+掩码设置提供了两种模式：Counter模式和Normal模式，Normal模式又包含连续模式、逐比特模式。
+Counter模式适用于连续元素的计算场景。该模式下，掩码寄存器仅低 64 位有效，用于标识参与计算的元素总数；接口会自动忽略 repeat_time，由系统根据元素数量自动匹配迭代次数。例如计算200个half类型元素时，受UB的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
 
-Counter模式用于计算连续N个元素。该模式下，Mask寄存器仅低64bit有效，表示参与计算的元素数量；repeat_time参数被忽略，系统根据元素数量自动计算迭代次数。
-例如计算200个half类型元素时，受Unified Buffer的32B对齐约束，需申请256个元素空间。此时使用Counter模式，可精确处理实际元素数量，避免多余计算。
-
-<img src="../../../../figures/Count模式计算.png" alt="Count模式计算" width="600" />
+<img src="../../../../figures/Count模式计算.png" alt="Counter模式计算" width="600" />
 
 ```c
 __ubuf__ half dst_ub[256];
@@ -243,7 +243,7 @@ asc_set_mask_normal();
 ```
 
 在**Normal计算**模式中，MASK寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
-> 📌 Normal 为默认模式。若未发生模式切换，则无需重复配置该模式。
+> 📌 Normal为默认模式。若未发生模式切换，则无需重复配置该模式。
 
 在Normal计算模式下，mask参数用来控制单次迭代内参与计算的元素个数，可通过`asc_set_vector_mask`来设置mask的值。
 
@@ -293,20 +293,18 @@ asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000);
 asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
 ```
 
-### 3.2 连续计算
+### 连续计算
 
-连续计算是C语言编程提供的简化计算接口，该能力由软件层面实现。开发者使用该接口无需配置mask掩码，连续计算针对源操作数的连续n个数据进行计算并连续写入目的操作数，解决一维数据的连续计算问题。
-
-以Add接口为例，当开发者需要计算4096长度的向量加法，C语言编程通过如下形式调用：
+连续计算是软件层提供的简化接口，使用时无需配置掩码，可直接对源操作数中连续的 N 个数据执行运算，并将结果连续写入目的操作数，主要用于一维数据的批量计算。
+以加法运算为例，如需对长度为 4096 的矢量执行加法，调用方式如下：
 ```c
-asc_add(z, x, y, 4096);
+asc_add(z, x, y, 4096); // 4096: number of consecutive elements involved in addition.
 ```
 
 ## Memory矢量计算同步控制
 
-AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Memory矢量计算需通过流水同步接口确保正确执行。Memory矢量计算流程较Cube矩阵计算更为简洁，主要包含三步：数据搬入（Global Memory → Unified Buffer）、计算（Unified Buffer）、数据搬出（Unified Buffer → Global Memory）。三个步骤分别对应PIPE_MTE2、PIPE_V、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
+AI Core 内部的 MTE2 搬运单元、矢量计算单元等均为异步并行运行，多个单元读写同一块存储资源时会产生数据依赖。因此 Memory 矢量计算必须借助流水同步接口，保障流程正常执行。Memory 矢量计算流程比矩阵计算更简洁，分为数据搬入、计算、数据搬出三个阶段，分别对应流水线 PIPE_MTE2、PIPE_V、PIPE_MTE3，需通过核内同步接口约束执行顺序，保证流程串行执行。在 Ascend 950PR/Ascend 950DT 产品中，可使用 `asc_lock` 与 `asc_unlock` 接口实现三阶段的同步控制。以下为矢量加法的完整示例：
 
-当开发者进行一个矢量加法计算时(Ascend 950PR/Ascend 950DT产品), 开发者可以通过`asc_lock`&`asc_unlock`的方式完成对这三个步骤的同步。
 ```c
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
@@ -332,4 +330,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Memory矢量计算示例
 
-结合上述Memory矢量搬运与计算能力，开发者可基于C语言实现Memory矢量计算算子。具体开发实践可参考[c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)，使用C语言编程接口完成Memory矢量算子的开发。
+结合上文介绍的数据搬运、计算、同步能力，即可基于 C 语言开发完整的 Memory 矢量计算算子。完整工程示例可参考：[c_api_add样例](../../../../../../examples/02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add/)。

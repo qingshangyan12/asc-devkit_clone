@@ -1,23 +1,21 @@
 ﻿# Cube矩阵计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍如何在Ascend C中使用语言扩展C API编写基于`L1 Buffer`、`L0A Buffer`等片上存储的**矩阵计算代码**，该能力是Ascend C最基础、最通用的矩阵编程方式。
-AI Core包含Vector计算单元（部署于AIV核）和Cube计算单元（部署于AIC核），分别用于矢量和矩阵类计算。Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。
+本文介绍基于 Ascend C 语言扩展 API，依托 L1 Buffer、L0 系列片上缓存实现矩阵计算的开发方法，该方式是 Ascend C 中最基础、通用的矩阵编程方案。
+AI Core 包含两类计算单元：Vector 单元部署在 AIV 核，负责矢量计算；Cube 单元部署在 AIC 核，负责矩阵计算。Cube 单元拥有专属片上缓存：L0A Buffer 存放左矩阵、L0B Buffer 存放右矩阵、L0C Buffer 用于保存初始累加值与矩阵运算结果。
 
-## 1. 矩阵编程的基本步骤
+## Cube矩阵计算核心步骤
 
-Cube矩阵计算的基本步骤为：数据搬入 → 数据加载 → 计算 → 数据搬出。当我们描述一个常见的Cube矩阵计算时，需要执行以下四个步骤：
-
-1. 通过DMA将数据从`Global Memory`搬入到`Local Memory(L1 Buffer)`
-2. 通过数据加载将`L1 Buffer`搬入到`L0A Buffer & L0B Buffer`
-3. 进行矩阵计算, 计算结果存储在`L0C Buffer`中
-4. 通过DMA将数据从`L0C Buffer`搬出到`Global Memory`
+Cube 矩阵计算整体分为数据搬入、数据加载、矩阵计算、数据搬出四个阶段，完整流程如下：
+1. 通过 DMA 将数据从 Global Memory 搬运至 Local Memory（L1 Buffer）；
+2. 将 L1 Buffer 中的数据加载至 L0A Buffer、L0B Buffer；
+3. 执行矩阵计算，结果存入 L0C Buffer；
+4. 通过 DMA 将计算结果从 L0C Buffer 搬运回 Global Memory。
 
 ## 矩阵计算内存管理
 
 ### 矩阵计算内存申请
 
-矩阵计算编程主要通过L0 Buffer进行矩阵计算。开发者需将输入数据从Global Memory搬入L1 Buffer，再从L1 Buffer搬入L0 Buffer，最终通过Cube计算指令完成计算。L1 Buffer与
-L0 Buffer均通过数组定义的方式申请，开发者一般可采用静态Cube侧Local Memory资源。
+矩阵计算主要依托 L0 Buffer 完成运算。开发者需要先将输入数据从 Global Memory 搬运至 L1 Buffer，再加载到 L0 Buffer，最后调用 Cube 计算指令完成运算。L1 Buffer 与 L0 Buffer 均通过数组形式声明，本指南主要介绍静态内存申请方式。
 
 - 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
 
@@ -41,21 +39,23 @@ __global__ __cube__ void add_custom(...)
 
 ### 矩阵计算内存布局
 
-矩阵计算单元采用分块计算逻辑，对于half数据类型，16×16是矩阵计算单元的基本分形粒度，硬件可以并行处理多个fractal。在传统的线性存储布局（如行主序或列主序）中，数据按行或列连续存放。当需要读取一个16×16的矩形数据块时，若直接从内存中获取，则需访问不连续的多个内存地址以逐行“收集”数据，这种非连续访问会导致内存效率显著下降。
-为解决上述问题，引入了矩阵分形存储格式。该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。硬件仅需发起一次连续读取，即可将整个数据块加载至片上寄存器，避免了多地址寻址开销，从而大幅提升矩阵计算单元的数据吞吐率。**16×16是矩阵计算单元的基本分形粒度，适用于所有支持Cube计算的产品型号（Atlas A2/A3训练和推理系列产品、Ascend 950PR/Ascend 950DT）。**
-昇腾AI处理器的矩阵计算单元为追求极高的数据吞吐率与计算密度，采用了专有的硬件架构设计。与通用CPU常用的连续线性存储不同，该单元要求输入输出数据必须符合特定的分形存储格式。在使用Ascend C的Mmad类接口进行算子开发时，深入理解这些数据格式对于实现正确的数据搬运、分块及性能优化至关重要。
+Cube 单元采用分块计算逻辑，对于 half 类型数据，硬件最小计算粒度为 16×16 分形块，可并行处理多个分形。传统行主序、列主序等线性存储模式下，读取 16×16 数据块时会产生大量非连续内存访问，大幅降低访存效率。
+为解决该问题，昇腾引入矩阵分形存储格式。软件层会对数据重新排布，让每个 16×16 计算块在物理内存中连续存储，硬件单次读取即可加载整块数据，消除零散寻址带来的开销，有效提升数据吞吐能力。
+16×16 是 Cube 单元统一的基础分形粒度，Atlas A2/A3、Ascend 950PR/Ascend 950DT 全系列产品均遵循该规范。昇腾 Cube 单元为极致发挥算力，采用不同于通用 CPU 的存储规则，输入、输出数据都需要匹配指定分形格式。使用 Ascend C 的 Mmad 接口开发算子时，掌握各类分形格式，是保证数据搬运、分块逻辑正确以及性能优化的关键。
+
 为便于理解与记忆，文档采用“大Y小x”的直观命名法：
  - 大Y（Z/N）：表示分形矩阵之间的排列顺序（Z为行主序，N为列主序）。
  - 小x（z/n）：表示分形矩阵内部元素的排列顺序（z为行主序，n为列主序）。
 
 ### 关键分形格式详解
-矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。
-为了适配矩阵计算单元的物理读取路径，不同的产品形态有不同的格式要求：
-针对Atlas A2/A3训练和推理系列产品，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
+
+矩阵分形格式用于定义多维张量在内存中的排布规则。受硬件读取逻辑影响，不同产品型号对矩阵乘法 C = A × B 的格式要求存在差异：
+
+- 针对Atlas A2/A3训练和推理系列产品，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Zz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式。如图1所示：
 
 <img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
 
-针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
+- 针对Ascend 950PR/Ascend 950DT，矩阵乘法 C = A × B 要求：左矩阵 A 使用 Nz 格式，右矩阵 B 使用 Zn 格式，结果矩阵 C 使用 Nz 格式，如图2所示：
 
 <img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
@@ -96,7 +96,7 @@ Zn格式主要用于L0B Buffer中存放数据, 如果离线处理好的右矩阵
 
 ### 格式转换
 
-根据上述信息，Global Memory采用ND格式，L1 Buffer采用Nz格式，因此需进行ND2NZ格式转换。
+Global Memory 中的原始数据为 ND 通用线性格式，而 L1 Buffer 要求使用 Nz 格式，因此数据搬运过程中需要完成 ND 到 Nz 的格式转换。
 
 <img src="../../../../figures/ND2NZ格式转换.png" alt="ND2NZ格式转换" width="800" />
 
@@ -133,12 +133,9 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 
 #### GM2L1 随路转换ND2NZ搬运
 
-该能力主要实现将矩阵从`Global Memory`搬运至`L1 Buffer`，并支持在数据搬运时进行ND到Nz格式的转换。
-
-该能力通过`asc_copy_gm2l1_nd2nz`接口实现，配置`src_nd_matrix_stride`、`src_d_value`等参数完成GM2L1搬运和ND2NZ格式转换。
+该功能用于将 Global Memory 中的矩阵搬运至 L1 Buffer，并在搬运过程中同步完成 ND 到 Nz 的格式转换，主要依托 `asc_copy_gm2l1_nd2nz` 接口实现，通过配置对应参数即可完成数据搬运与格式转换。
 
 <img src="../../../../figures/GM到L1的ND2NZ搬运示例.png" alt="GM到L1的ND2NZ搬运示例" width="700" />
-
 
 以上图为例, 实现A矩阵(Shape(16, 23), 数据类型为half)从GM搬运到L1的能力, 针对Atlas A2/A3训练和推理系列产品, 调用接口如下：
 
@@ -175,7 +172,7 @@ asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value, src
 
 #### L12L0 数据搬运
 
-该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分型转换到Zz或Zn格式，C语言编程提供了asc_copy_l12l0a和asc_copy_l12l0b接口，其中针对Ascend 950PR/Ascend 950DT的asc_copy_l12l0a接口可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
+该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分型转换到Zz或Zn格式，C语言编程提供了`asc_copy_l12l0a`和`asc_copy_l12l0b`接口，其中针对Ascend 950PR/Ascend 950DT的`asc_copy_l12l0a`接口可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
 
 <img src="../../../../figures/L12L0A非转置搬运.png" alt="L12L0A非转置搬运" width="700" />
 
@@ -258,7 +255,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 ## 矩阵计算能力说明
 
-`asc_mmad`是Ascend C封装NPU硬件计算能力的矩阵乘加核心接口，用于全连接层、卷积层等算子开发，实现C = A × B + C的矩阵乘加计算（输入为L0A Buffer和L0B Buffer，输出为L0C Buffer），其中针对Atlas A2/A3训练和推理系列产品L0A Buffer分形为Zz、L0B Buffer分形为Zn、L0C Buffer分形为Nz，而Ascend 950PR/Ascend 950DT产品L0A Buffer分形为Nz。
+`asc_mmad` 是 Ascend C 封装 NPU 硬件能力的核心矩阵乘加接口，广泛应用于全连接、卷积等算子，实现 C = A × B + C 运算。计算输入取自 L0A Buffer、L0B Buffer，结果写入 L0C Buffer。不同产品对应的缓存分形格式前文已说明。
 
 ![Ascend 950PR/Ascend 950DT `asc_mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
@@ -303,7 +300,7 @@ C语言编程提供了一系列`asc_mmad`重载接口，支持不同数据类型
 constexpr uint32_t l0_m_size = 64;
 constexpr uint32_t l0_k_size = 64;
 constexpr uint32_t l0_n_size = 64;
-__ca__ c_matrix[l0_m_size * l0_k_size];
+__ca__ a_matrix[l0_m_size * l0_k_size];
 __cb__ b_matrix[l0_k_size * l0_n_size];
 __cc__ c_matrix[l0_m_size * l0_n_size];
 
@@ -331,9 +328,9 @@ asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_
 
 ## 矩阵计算的同步
 
-AI Core内部执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行方式运行，读写同一存储资源时可能存在数据依赖关系。因此，Cube计算需通过流水同步接口确保正确执行。Cube矩阵计算主要包含四步：数据搬入（Global Memory → L1 Buffer）、数据搬入（L1 Buffer → L0A/B Buffer）、矩阵计算（L0A/B Buffer → L0C Buffer）、数据搬出（L0C Buffer → Global Memory）。四个步骤分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_MTE3流水线，需通过核内同步接口协调执行顺序，确保各步骤按序完成。
+AI Core 内部的搬运、计算单元均为异步并行工作，多个单元访问同一片存储资源时会产生数据依赖。因此 Cube 计算必须借助流水同步接口管控执行时序。
+矩阵计算的四个阶段分别对应 PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_MTE3 四条流水线，需要使用核内同步接口保证流程串行执行。在 Ascend 950PR/Ascend 950DT 产品中，可使用 `asc_lock` 与 `asc_unlock` 接口实现全流程同步控制。
 
-当开发者进行一个矩阵乘法计算时(Ascend 950PR/Ascend 950DT产品), 开发者可以通过`asc_lock`&`asc_unlock`的方式完成对这四个步骤的同步。
 ```c
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {
@@ -366,4 +363,4 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ## Cube矩阵计算示例
 
-当前C API样例正在开发中，完整矩阵计算实现示例将在后续版本中补充。开发者可参考API文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C-API/)。
+目前完整的矩阵计算工程样例仍在开发，后续版本会持续补充。开发者可查阅 API 文档了解[Cube接口详细说明](../../../../../api/SIMD-API/C-API/)。
