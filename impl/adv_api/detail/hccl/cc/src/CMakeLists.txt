@@ -8,7 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
-option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" OFF)
+option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
 
 set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
