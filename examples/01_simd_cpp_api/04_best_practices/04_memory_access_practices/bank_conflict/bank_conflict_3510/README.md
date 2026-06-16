@@ -100,14 +100,14 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 7 | Gather + Add + Scatter | Gather数据索引全为0，起始地址全部重叠 | 同地址合并为单次读取，无冲突 | 0x0000 | 0x0400 | 全0 | 650,677 | 基准参照 |
 | 8 | Gather + Add + Scatter | Gather数据索引[0..7]重复 | 同地址合并读取，无冲突 | 0x0000 | 0x0400 | [0..7]×32重复 | 650,835 | 数据分散在同一bank的不同sub bank， 接近case7性能 |
 | 9 | Gather + Add + Scatter | Gather数据索引[0..255]连续 | 跨bank分散，无冲突 | 0x0000 | 0x0400 | [0..255] 连续 | 650,697 | 数据分散在8个bank group的不同sub bank，接近case7性能 |
-| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | **同subbank不同行冲突** | 0x0000 | 0x0400 | 0、128交替 | **750,709** | 对比Case 7，性能劣化 |
+| 10 | Gather + Add + Scatter | Gather数据索引0、128交替重复 | 同subbank不同行冲突 | 0x0000 | 0x0400 | 0、128交替 | **750,709** | 对比Case 7，性能劣化 |
 
 ### 非连续搬运跨步对比（Case 11-14）
 
 | case | 计算公式 | 场景描述 | 冲突情况 | src0首地址 | dst首地址 | 搬运方式 | 打点性能(cycles) | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 11 | dst = src0 | 512元素按行计算，repeat内8个DataBlock连续排布，repeat间间隔256B | 无冲突 | 0x0000 | 0x4100 | DataBlock连续搬运 | 442,224 | 基准 |
-| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B | **读读冲突+写写冲突+读写冲突** | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,649 | 触发同一repeat内的bank冲突，对比case11，性能劣化明显 |
+| 12 | dst = src0 | 512元素按列计算，repeat内8个DataBlock间间隔256B，repeat间间隔32B | 读读冲突+写写冲突+读写冲突 | 0x0000 | 0x4100 | DataBlock非连续搬运 | 1,510,649 | 触发同一repeat内的bank冲突，对比case11，性能劣化明显 |
 | 13 | dst = src0 | 同一repeat内8个DataBlock均从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=0 | 443,499 | 同地址合并，无额外开销，接近case11性能 |
 | 14 | dst = src0 | 8轮迭代，每次迭代数据从同一起始地址读取数据 | 无冲突 | 0x0000 | 0x4100 | DataBlock stride=1,repeat=0 | 440,810 | 同首地址重复读，无冲突，接近case11性能 |
 
@@ -133,7 +133,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - src0=bank0，src1=bank0，dst=bank1。src0和src1同落在bank0，存在读读冲突。但dst在bank1，读写冲突消除。
 - 与Case 3相比快8.1%，说明读写冲突开销大，消除后性能有提升。
 
-## Case 2：二读一写，src0/dst同bank，发生读写冲突，与src1不同bank，无读读冲突，**src0/dst重叠**
+## Case 2：二读一写，src0/dst同bank，发生读写冲突，与src1不同bank，无读读冲突，src0/dst重叠
 
 ### 地址解码
 
@@ -171,7 +171,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - src0=bank0，src1=bank1，dst=bank1。src0和src1落在不同bank，读读冲突消除。但src1和dst同在bank1，仍存在读写冲突。
 - 消除读读冲突后性能未提升，说明 **3510上读读冲突开销极小，不是瓶颈**。
 
-## Case 4：二读一写，**使用双搬入读取**
+## Case 4：二读一写，使用双搬入读取
 
 ### 地址解码
 
@@ -190,7 +190,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 - 使用 `LoadDist::DIST_DINTLV_B32` 双搬入模式，一条指令一次读取512B，无读读冲突。
 - 对比Case 5无明显收益。
 
-## Case 5：二读一写，src0/src1/dst同bank，既有读读冲突，又有读写冲突，**无循环展开**
+## Case 5：二读一写，src0/src1/dst同bank，既有读读冲突，又有读写冲突，无循环展开
 
 ### 地址解码
 
@@ -208,7 +208,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 - src0、src1、dst三路首地址均映射到bank 0：虽然8个DataBlock分散在BG 0-7，但三路tensor的对应DataBlock都落在相同bank，**存在读读冲突和读写冲突**。
 
-## Case 6：二读一写，src0/src1/dst同bank，既有读读冲突，又有读写冲突，**通过循环展开优化**
+## Case 6：二读一写，src0/src1/dst同bank，既有读读冲突，又有读写冲突，通过循环展开优化
 
 ### 地址解码
 
