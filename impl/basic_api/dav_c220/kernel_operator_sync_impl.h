@@ -20,13 +20,13 @@
 #ifndef ASCENDC_MODULE_OPERATOR_SYNC_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SYNC_IMPL_H
 
-#include "utils/kernel_utils_constants.h"
-#include "kernel_tpipe.h"
+#include "../utils/kernel_utils_constants.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TPIPE_H__
 #endif
-#include "kernel_common.h"
+#include "../../../include/basic_api/kernel_common.h"
 namespace AscendC {
 
 __aicore__ inline void ClcSyncCount(__gm__ int32_t* localSyncGM, __ubuf__ int32_t* ubWorkspaceAddr,
@@ -35,12 +35,12 @@ __aicore__ inline void ClcSyncCount(__gm__ int32_t* localSyncGM, __ubuf__ int32_
     if (isFirst) {
         __ubuf__ int32_t* localUbAddr = ubWorkspaceAddr + (blockIdx * DEFAULT_BLK_NUM);
         *(reinterpret_cast<__ubuf__ int32_t*>(localUbAddr)) = 1;
-        event_t eventIdSToMte3 = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
+        event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
         SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
         WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
         copy_ubuf_to_gm(static_cast<__gm__ void*>(localSyncGM), static_cast<__ubuf__ void*>(localUbAddr), 0, 1, 1, 0,
             0);
-        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE2>());
+        event_t eventIDMTE3ToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE2));
         SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
         count = 1;
@@ -79,17 +79,17 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
     __ubuf__ int32_t* localUbAddr = ubWorkspaceAddr + (blockIdx * DEFAULT_BLK_NUM);
 
     copy_gm_to_ubuf(static_cast<__ubuf__ void*>(localUbAddr), static_cast<__gm__ void*>(localSyncGM), 0, 1, 1, 0, 0);
-    event_t eventIdMte2ToS = static_cast<event_t>(FetchEventID<HardEvent::MTE2_S>());
+    event_t eventIdMte2ToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
     SetFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
     WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
     int32_t curValue = *(reinterpret_cast<__ubuf__ int32_t*>(localUbAddr)) + 1;
     bool isFirst = curValue == 1 ? true : false;
     *(reinterpret_cast<__ubuf__ int32_t*>(localUbAddr)) = curValue;
-    event_t eventIdSToMte3 = static_cast<event_t>(FetchEventID<HardEvent::S_MTE3>());
+    event_t eventIdSToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE3));
     SetFlag<HardEvent::S_MTE3>(eventIdSToMte3);
     WaitFlag<HardEvent::S_MTE3>(eventIdSToMte3);
     copy_ubuf_to_gm(static_cast<__gm__ void*>(localSyncGM), static_cast<__ubuf__ void*>(localUbAddr), 0, 1, 1, 0, 0);
-    event_t eventIDMTE3ToMTE2 = static_cast<event_t>(FetchEventID<HardEvent::MTE3_MTE2>());
+    event_t eventIDMTE3ToMTE2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE3_MTE2));
     SetFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     WaitFlag<HardEvent::MTE3_MTE2>(eventIDMTE3ToMTE2);
     int32_t totalBlockCount = ONE_BLK_FLOAT_NUM * totalBlocks;
@@ -101,7 +101,7 @@ __aicore__ inline void SoftSyncAllImpl(__gm__ int32_t* gmWorkspaceAddr, __ubuf__
         WaitFlag<HardEvent::MTE2_S>(eventIdMte2ToS);
         int32_t count = 0;
         ClcSyncCount(localSyncGM, ubWorkspaceAddr, blockIdx, totalBlocks, isFirst, count);
-        event_t eventIdSToMte2 = static_cast<event_t>(FetchEventID<HardEvent::S_MTE2>());
+        event_t eventIdSToMte2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE2));
         SetFlag<HardEvent::S_MTE2>(eventIdSToMte2);
         WaitFlag<HardEvent::S_MTE2>(eventIdSToMte2);
         if (count >= (totalBlocks * curValue)) {

@@ -17,8 +17,8 @@
 #define ASCENDC_MODULE_OPERATOR_DATA_COPY_IMPL_H
 #include "kernel_operator_vec_duplicate_impl.h"
 #include "kernel_operator_sync_impl.h"
-#include "kernel_pop_stack_buffer.h"
-#include "kernel_struct_unary.h"
+#include "../kernel_pop_stack_buffer.h"
+#include "../../../include/basic_api/kernel_struct_unary.h"
 #include "kernel_operator_vec_template_impl.h"
 #include "kernel_operator_vec_binary_scalar_impl.h"
 #include <utility>
@@ -628,7 +628,7 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
     uint16_t alignedDValueBlockNum = (intriParams.dValue * sizeof(T) - 1) / ONE_BLK_SIZE + 1;
     uint16_t alignedDValue = cols * ONE_BLK_SIZE / sizeof(T);
     TransND2NZ((__ubuf__ T*)popBuffer.GetPhyAddr(), src, rows, cols, static_cast<T>(0));
-    auto eventID = FetchEventID<HardEvent::V_MTE3>();
+    auto eventID = GetTPipePtr()->FetchEventID(HardEvent::V_MTE3);
     SetFlag<HardEvent::V_MTE3>(eventID);
     WaitFlag<HardEvent::V_MTE3>(eventID);
     CopyUbufToCbuf(dst, (__ubuf__ T*)popBuffer.GetPhyAddr(), 1, actualSize / ONE_BLK_SIZE, 0, 0);

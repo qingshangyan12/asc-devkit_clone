@@ -20,8 +20,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_SEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_SEL_IMPL_H
 
-#include "kernel_utils.h"
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../kernel_utils.h"
+#include "../../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace AscendC {
 namespace SelInternal {
@@ -130,7 +130,7 @@ __aicore__ inline void SelectCal(
         } else {
             (*(__ubuf__ uint64_t *)((__ubuf__ uint64_t *)tempBuf)) = Internal::g_cmpMaskLow;
         }
-        event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+        event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
         SetFlag<HardEvent::S_V>(eventIdSToV);
         WaitFlag<HardEvent::S_V>(eventIdSToV);
         if (isCounterMode) {

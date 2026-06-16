@@ -1,12 +1,12 @@
 /**
-* Copyright (c) 2025 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 #include <gtest/gtest.h>
 #define private public
 #define protected public
@@ -16,15 +16,12 @@
 namespace AscendC {
 class TQueWithBufIDTest : public testing::Test {
 protected:
-    void SetUp() {
-        AscendC::SetGCoreType(1);
-    }
-    void TearDown() {
-        AscendC::SetGCoreType(0);
-    }
+    void SetUp() { AscendC::SetGCoreType(1); }
+    void TearDown() { AscendC::SetGCoreType(0); }
 
     template <typename T>
-    void GetData(LocalTensor<T>& tensor, uint32_t& addr, uint32_t& len, uint8_t& bufId) {
+    void GetData(LocalTensor<T>& tensor, uint32_t& addr, uint32_t& len, uint8_t& bufId)
+    {
         TBufHandle handle = tensor.GetBufferHandle();
         TBufType* bufType = reinterpret_cast<TBufType*>(handle);
         addr = bufType->address;
@@ -41,7 +38,7 @@ TEST_F(TQueWithBufIDTest, testAicQueInitBuffer)
     uint32_t len = 1024;
     TPipe pipe;
     EXPECT_EQ(pipe.g_tpipeImpl.curBufSize_, 0);
-    EXPECT_EQ(Internal::g_tPipeAddrBufPool[(uint8_t)hardPos], 0);
+    EXPECT_EQ(pipe.g_tpipeImpl.bufPool_[static_cast<uint8_t>(hardPos)].maxAddr, 0);
     pipe.InitBuffer(tscm, 1, len);
     pipe.InitBuffer(que, 1, len);
     EXPECT_EQ(que.bufStart, &(pipe.g_tpipeImpl.buf_[1]));
@@ -64,8 +61,7 @@ TEST_F(TQueWithBufIDTest, testAicQueInitBufferWithBufferID2)
         .bufferNumber = 1,
         .consumerSize = 0,
         .consumer = {},
-        .enableStaticEvtId = true
-    };
+        .enableStaticEvtId = true};
     TQue<TPosition::A1, 1> que;
     TQue<TPosition::B1, 1, &config> que1;
     Hardware hardPos = GetPhyType(TPosition::A1);
@@ -99,8 +95,7 @@ TEST_F(TQueWithBufIDTest, testAicQueInitBufferWithDifferentQue)
         .bufferNumber = 2,
         .consumerSize = 0,
         .consumer = {},
-        .enableStaticEvtId = true
-    };
+        .enableStaticEvtId = true};
     TQue<TPosition::A1, 2, &config> a1Que;
     TQue<TPosition::B1, 2, &config> b1Que;
     uint32_t len = 1024;
@@ -131,8 +126,7 @@ TEST_F(TQueWithBufIDTest, testAicTscmQueInitWithBufId)
         .bufferNumber = 1,
         .consumerSize = 0,
         .consumer = {},
-        .enableStaticEvtId = true
-    };
+        .enableStaticEvtId = true};
     TSCM<TPosition::GM, 1> tscmGm;
     TSCM<TPosition::VECIN, 1> tscmVecin;
     TSCM<TPosition::GM, 1, &config> tscmGmStatic;
