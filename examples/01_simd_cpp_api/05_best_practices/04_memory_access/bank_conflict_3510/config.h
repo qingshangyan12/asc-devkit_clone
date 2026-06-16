@@ -7,8 +7,8 @@
 // 二读一写，消除读写冲突：src0=bank0, src1=bank0, dst=bank1
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8100;
+constexpr uint32_t yLocalAddr = 0x5000;
+constexpr uint32_t zLocalAddr = 0xA100;
 using T1 = float;
 using T2 = float;
 using T3 = float;
@@ -16,7 +16,7 @@ using T3 = float;
 // 二读一写，src0与dst地址重叠读写冲突：src0=dst=bank0, src1=bank1
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4100;
+constexpr uint32_t yLocalAddr = 0x5100;
 constexpr uint32_t zLocalAddr = 0x0000;
 using T1 = float;
 using T2 = float;
@@ -25,8 +25,8 @@ using T3 = float;
 // 二读一写，消除读读冲突：src0=bank0, src1=bank1, dst=bank1
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4100;
-constexpr uint32_t zLocalAddr = 0x8900;
+constexpr uint32_t yLocalAddr = 0x5100;
+constexpr uint32_t zLocalAddr = 0xA100;
 using T1 = float;
 using T2 = float;
 using T3 = float;
@@ -35,7 +35,7 @@ using T3 = float;
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
+constexpr uint32_t zLocalAddr = 0xA000;
 using T1 = float;
 using T2 = float;
 using T3 = float;
@@ -43,17 +43,17 @@ using T3 = float;
 // 二读一写，全冲突(读读+读写)：src0/src1/dst 同 bank=0，无循环展开
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
+constexpr uint32_t yLocalAddr = 0x5000;
+constexpr uint32_t zLocalAddr = 0xA000;
 using T1 = float;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 6
-// 二读一写，全冲突 + 循环展开：同 Case 4 地址，循环展开优化
+// 二读一写，全冲突 + 循环展开：同 Case 5 地址，循环展开优化
 constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x4000;
-constexpr uint32_t zLocalAddr = 0x8000;
+constexpr uint32_t yLocalAddr = 0x5000;
+constexpr uint32_t zLocalAddr = 0xA000;
 using T1 = float;
 using T2 = float;
 using T3 = float;
