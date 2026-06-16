@@ -521,7 +521,7 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len, U &shareBuf)
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     ASCENDC_DEBUG_ASSERT((evt < HardEvent::MAX),
                    KERNEL_LOG_INTERNAL(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)));
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
@@ -531,14 +531,14 @@ template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
             QUE_MAX_EVENT));
     ptr->eventOccupy = sbitset1(ptr->eventOccupy, lastId);
     return lastId;
-#else
-    return ::AscendC::AllocEventID<evt>();
-#endif
+// #else
+//     return ::AscendC::AllocEventID<evt>();
+// #endif
 }
 
 template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID id)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     ASCENDC_DEBUG_ASSERT((id >= 0 && id < QUE_MAX_EVENT),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d",
             static_cast<int32_t>(id), QUE_MAX_EVENT));
@@ -546,37 +546,37 @@ template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID i
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
     ptr->eventOccupy = sbitset0(ptr->eventOccupy, id);
     return;
-#else
-    return ::AscendC::ReleaseEventID<evt>(id);
-#endif
+// #else
+//     return ::AscendC::ReleaseEventID<evt>(id);
+// #endif
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
     auto lastId = sff0(ptr->eventOccupy);
     ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT));
     return lastId;
-#else
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
-#endif
+// #else
+//     return ::AscendC::Internal::FetchEventIDImpl(evt);
+// #endif
 }
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+// #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
     auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);
     auto lastId = sff0(ptr->eventOccupy);
     ASCENDC_DEBUG_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0),
         KERNEL_LOG_INTERNAL(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId,
             QUE_MAX_EVENT));
     return lastId;
-#else
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
-#endif
+// #else
+//     return ::AscendC::Internal::FetchEventIDImpl(evt);
+// #endif
 }
 
 template <TPosition pos> __aicore__ inline uint64_t TPipe::GetQueueEndAddress()
@@ -1083,9 +1083,14 @@ __aicore__ inline void TPipe::ResetPool()
     for (int32_t i = 0; i < static_cast<int32_t>(Hardware::MAX); i++, buf++) {
         *buf = 0;
     }
-    auto evt = Internal::g_occupyEventPool;
+    // chuchu 
+    auto evt1 = Internal::g_occupyEventPool;
+    for (int32_t i = 0; i < EVENT_NUM; i++, evt1++) {
+        *evt1 = 0;
+    }
+    auto evt = g_tpipeImpl.eventPool_;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
-        *evt = 0;
+        evt->eventOccupy = 0;
     }
 #endif
     g_tpipeImpl.shareBufPool_.start[static_cast<uint8_t>(TShareBuf::ShareHard::L1)] = -1;

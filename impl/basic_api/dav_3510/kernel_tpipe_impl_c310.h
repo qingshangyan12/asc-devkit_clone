@@ -442,22 +442,50 @@ __aicore__ inline bool TPipe::InitBufPool(T &bufPool, uint32_t len, U &shareBuf)
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::AllocEventID()
 {
-    return ::AscendC::AllocEventID<evt>();
+    ASCENDC_ASSERT((evt < HardEvent::MAX),	 
+                { KERNEL_LOG(KERNEL_ERROR, "illegal event %d", static_cast<int32_t>(evt)); }); 
+    auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt); 
+    auto lastId = sff0(ptr->eventOccupy); 
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), { 
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId, 
+            QUE_MAX_EVENT); 
+    }); 
+    ptr->eventOccupy = sbitset1(ptr->eventOccupy, lastId); 
+    return lastId;
 }
 
 template <HardEvent evt> __aicore__ inline void TPipe::ReleaseEventID(TEventID id)
 {
-    return ::AscendC::ReleaseEventID<evt>(id);
+    ASCENDC_ASSERT((id >= 0 && id < QUE_MAX_EVENT), {	 
+    KERNEL_LOG(KERNEL_ERROR, "current id is %d, which should be larger than 0, and smaller than %d", 
+        static_cast<int32_t>(id), QUE_MAX_EVENT); 
+    }); 
+    ASCENDC_ASSERT((evt != HardEvent::MAX), { KERNEL_LOG(KERNEL_ERROR, "evt cannot be HardEvent::MAX"); }); 
+    auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt); 
+    ptr->eventOccupy = sbitset0(ptr->eventOccupy, id); 
+    return;
 }
 
 __aicore__ inline TEventID TPipe::FetchEventID(HardEvent evt)
 {
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
+    auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);	 
+    auto lastId = sff0(ptr->eventOccupy); 
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), { 
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId, 
+            QUE_MAX_EVENT); 
+    }); 
+    return lastId;
 }
 
 template <HardEvent evt> __aicore__ inline TEventID TPipe::FetchEventID()
 {
-    return ::AscendC::Internal::FetchEventIDImpl(evt);
+    auto ptr = this->g_tpipeImpl.eventPool_ + EventToIndex(evt);	 
+    auto lastId = sff0(ptr->eventOccupy); 
+    ASCENDC_ASSERT((lastId < QUE_MAX_EVENT && lastId >= 0), { 
+        KERNEL_LOG(KERNEL_ERROR, "current id is %ld, max buffer number in same queue position is %d", lastId, 
+            QUE_MAX_EVENT); 
+    }); 
+    return lastId;
 }
 
 // NOTICE: GetAbsAddr has been deprecated and will be removed in the next version. Please do not use it!
@@ -915,6 +943,10 @@ __aicore__ inline void TPipe::ResetPool()
         }
     }
 #endif
+    auto evt = g_tpipeImpl.eventPool_;
+    for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
+        evt->eventOccupy = 0;
+    }
     auto evt = Internal::g_occupyEventPool;
     for (int32_t i = 0; i < EVENT_NUM; i++, evt++) {
         *evt = 0;
