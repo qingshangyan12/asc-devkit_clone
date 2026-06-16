@@ -64,6 +64,7 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 **表1**  模板参数说明
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.21%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
 </th>
@@ -92,12 +93,17 @@ __simd_callee__ inline void Arange(S& dstReg, U scalarValue);
 </tbody>
 </table>
 =======
+=======
+>>>>>>> 22ba319dba0be01c730e48c4d87bd076a608932d
 | 参数名称 | 描述 |
 | ------ | ------ |
 | T | 目的操作数的数据类型。 |
 | U | 起始索引值的数据类型。 |
 | S | 目的操作数的RegTensor类型，例如RegTensor<half>，由编译器自动推导，无需用户显式指定。 |
+<<<<<<< HEAD
 >>>>>>> 22ba319db (修改数据压缩资料)
+=======
+>>>>>>> 22ba319dba0be01c730e48c4d87bd076a608932d
 
 **表2**  函数参数说明
 
