@@ -85,7 +85,7 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
   using namespace AscendC::Te;
 
   constexpr int32_t size = 256;
-  __gm__ float data[size];
+  __ubuf__ float data[size];
   auto ptr = MakeMemPtr(data);
 
   auto layout = MakeLayout(MakeShape(2, 2), MakeStride(2, 1));
