@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
-#include "kernel_struct_gather.h"
-#include "kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_struct_gather.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
  
 namespace AscendC {
 template <typename T>
@@ -110,7 +110,7 @@ REGISTER_GATHER_MASK_B16(int16_t, s16)
         uint32_t blockElm = ONE_BLK_SIZE / sizeof(float);                                                            \
         if (reduceMode) {                                                                                              \
             __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);              \
-            event_t eventIDSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));                   \
+            event_t eventIDSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());                   \
             SetFlag<HardEvent::S_V>(eventIDSToV);                                                                      \
             WaitFlag<HardEvent::S_V>(eventIDSToV);                                                                     \
             __VEC_SCOPE__ {                                                                                            \

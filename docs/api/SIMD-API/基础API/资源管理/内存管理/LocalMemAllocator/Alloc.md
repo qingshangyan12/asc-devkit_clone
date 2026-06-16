@@ -77,7 +77,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  原型1和原型2模板参数说明
+**表1**  原型1和原型2模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="17.43%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
@@ -88,7 +88,7 @@
 </thead>
 <tbody><tr id="row18835145716587"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p1383515717581"><a name="p1383515717581"></a><a name="p1383515717581"></a>pos</p>
 </td>
-<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../../其他数据类型/TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（静态Tensor编程场景下，此参数可以省略）。</p>
+<td class="cellrowborder" valign="top" width="82.57%" headers="mcps1.2.3.1.2 "><p id="p18689719202918"><a name="p18689719202918"></a><a name="p18689719202918"></a><a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>位置，需要符合<a href="LocalMemAllocator简介.md">LocalMemAllocator</a>中指定的Hardware物理位置（静态Tensor编程场景下，此参数可以省略）。</p>
 </td>
 </tr>
 <tr id="row199212475441"><td class="cellrowborder" valign="top" width="17.43%" headers="mcps1.2.3.1.1 "><p id="p352033512453"><a name="p352033512453"></a><a name="p352033512453"></a>DataType</p>
@@ -104,7 +104,7 @@
 </tbody>
 </table>
 
-**表 2**  原型2参数说明
+**表2**  原型2参数说明
 
 <a name="table10918948849"></a>
 <table><thead align="left"><tr id="row159181048845"><th class="cellrowborder" valign="top" width="17.22%" id="mcps1.2.4.1.1"><p id="p89187484413"><a name="p89187484413"></a><a name="p89187484413"></a>参数名</p>
@@ -126,7 +126,7 @@
 </tbody>
 </table>
 
-**表 3**  原型3模板参数说明
+**表3**  原型3模板参数说明
 
 <a name="table645894610463"></a>
 <table><thead align="left"><tr id="row12458246134618"><th class="cellrowborder" valign="top" width="27.839999999999996%" id="mcps1.2.3.1.1"><p id="p045817465464"><a name="p045817465464"></a><a name="p045817465464"></a>参数名</p>
@@ -137,7 +137,7 @@
 </thead>
 <tbody><tr id="row945854624614"><td class="cellrowborder" valign="top" width="27.839999999999996%" headers="mcps1.2.3.1.1 "><p id="p8458184610468"><a name="p8458184610468"></a><a name="p8458184610468"></a>TensorTraitType</p>
 </td>
-<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p10458194684613"><a name="p10458194684613"></a><a name="p10458194684613"></a>只支持传入<a href="../../../../基础数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型，TensorTrait的数据类型/逻辑位置/Shape大小需要匹配LocalMemAllocator中指定的物理位置及其剩余空间。</p>
+<td class="cellrowborder" valign="top" width="72.16%" headers="mcps1.2.3.1.2 "><p id="p10458194684613"><a name="p10458194684613"></a><a name="p10458194684613"></a>只支持传入<a href="../../../数据结构/辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a>类型，TensorTrait的数据类型/逻辑位置/Shape大小需要匹配LocalMemAllocator中指定的物理位置及其剩余空间。</p>
 </td>
 </tr>
 </tbody>
@@ -172,4 +172,3 @@ auto layoutMake = AscendC::MakeLayout(shape, stride);
 auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
 auto tensor3 = allocator.Alloc<decltype(tensorTraitMake)>();
 ```
-

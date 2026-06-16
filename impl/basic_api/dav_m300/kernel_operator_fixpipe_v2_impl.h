@@ -21,7 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_V2_IMPL_H
 
 #include "kernel_operator_set_spr_impl.h"
-#include "kernel_struct_fixpipe.h"
+#include "../../../include/basic_api/kernel_struct_fixpipe.h"
 
 namespace AscendC {
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
@@ -77,7 +77,7 @@ template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void CheckCommonFixpipeParam(__cc__ U *src, const FixpipeParamsM300 &params)
 {
 #if ASCENDC_CPU_DEBUG
-    uint64_t srcAbsAddr = src - (U*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::CO1)));
+    uint64_t srcAbsAddr = src - (U*)(GetBaseAddrCpu(int8_t(TPosition::CO1)));
     ASCENDC_ASSERT(srcAbsAddr % L0C_SRC_ALIGN == 0, {KERNEL_LOG(KERNEL_ERROR, "Failed to check srcLocal start address "
         "alignment in Fixpipe, its start address must align with 64B");});
     if (params.isChannelSplit) {

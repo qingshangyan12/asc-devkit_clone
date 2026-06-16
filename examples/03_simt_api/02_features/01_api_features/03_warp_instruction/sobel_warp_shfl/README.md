@@ -28,13 +28,13 @@
 
 本样例计算输入灰度图像的边缘幅值，并将满足阈值条件的边缘像素输出到紧凑列表edge_list。edge_list中每行包含边缘像素的x坐标、y坐标和边缘幅值（strength）。
 
-本样例使用 **Sobel 边缘检测算法** 计算边缘幅值。Sobel 是一种常用的图像边缘检测算法，用于根据像素周围的灰度变化计算该像素的边缘幅值。对于图像中坐标为(x, y)的非边界像素，Sobel 使用该像素周围的 3×3 邻域分别计算水平梯度 `Gx` 和垂直梯度 `Gy`：
+本样例使用 **Sobel 边缘检测算法** 计算边缘幅值。Sobel 是一种常用的图像边缘检测算法，用于根据像素周围的灰度变化计算该像素的边缘幅值。对于图像中坐标为(x, y)的非边界像素，Sobel 使用该像素周围的 3×3 邻域分别计算水平梯度`Gx`和垂直梯度`Gy`：
 
 <p align="center">
   <img src="./figures/sobel.png" width="45%">
 </p>
 
-`Gx` 和 `Gy` 的计算方式如下：
+`Gx`和`Gy`的计算方式如下：
 
 ```text
 Gx = -top_left + top_right - 2 * middle_left + 2 * middle_right - bottom_left + bottom_right
@@ -78,7 +78,7 @@ int y = warp_id / tiles_x;                          // 像素行号：第几行W
 </p>
 
 
-如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、middle和bottom，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
+如上图所示，计算Sobel幅值需要获取当前像素周围3×3邻域共9个像素值。而相邻线程计算各自的Sobel幅值时，同样需要其周围3×3邻域的像素值，因此不同线程的3×3邻域存在重叠。利用这一特点，每个线程先从Global Memory读取同一x坐标上的上、中、下三个像素值，分别保存到寄存器变量top、mid和bot，对应当前像素3×3邻域的中间一列；然后通过[asc_shfl_up()](../../../../../../docs/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md)和[asc_shfl_down()](../../../../../../docs/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_down.md)从相邻线程的寄存器中获取左右两列数据，避免再次从Global Memory读取。
 
 
 
@@ -186,6 +186,5 @@ if (edge_mask & lanemask_eq()) {
 
   执行结果如下，说明精度对比成功。
   ```
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```
-

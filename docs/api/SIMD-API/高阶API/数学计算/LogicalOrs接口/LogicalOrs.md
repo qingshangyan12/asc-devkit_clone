@@ -25,7 +25,7 @@ __aicore__ inline void LogicalOrs(const LocalTensor<T>& dst, const U& src0, cons
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -41,11 +41,11 @@ struct LogicalOrsConfig {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | src0、src1 | 输入 | 源操作数。类型为标量或LocalTensor，类型为LocalTensor时，可以为矢量操作数或标量单点元素，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | count | 输入 | 参与计算的元素个数。 |
 
@@ -94,4 +94,3 @@ AscendC::LogicalOrs<config>(dst, src0, src1, count);
 [ True,  True,  False,  True,  True,  False,  True,  True,  False,  True,
   True,  False,  True,  True,  False,  True,  True,  False,  ...  False]
 ```
-

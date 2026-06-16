@@ -18,7 +18,7 @@
 
 [DataCopyPad](../GMToUB非对齐数据搬运(DataCopyPad).md)从Global Memory将数据非对齐搬运至Unified Buffer时，可根据开发者的需要自行填充数据。SetPadValue用于设置DataCopyPad需要填充的数值。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../../../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Global Memory -> Unified Buffer
     - GM -> VECIN
@@ -33,14 +33,14 @@ __aicore__ inline void SetPadValue(T paddingValue)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
 | T | 输入 | 填充值的数据类型，与DataCopyPad接口搬运的数据类型一致。 |
 | pos | 输入 | 用于指定DataCopyPad接口搬运过程中从Global Memory搬运数据到哪一个目的地址，目的地址通过逻辑位置来表达。支持的取值为：TPosition::VECIN、TPosition::VECOUT、TPosition::MAX，默认值为TPosition::MAX，等效于TPosition::VECIN或TPosition::VECOUT。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |

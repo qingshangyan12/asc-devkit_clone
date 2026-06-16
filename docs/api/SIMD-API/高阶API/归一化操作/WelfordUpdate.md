@@ -18,7 +18,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
 如下图所示，切分数据的Reduce轴，假设切分后每块数据的形状为\[1, k\]，每块数据标号为1，2，3，…，n。
 
-**图 1**  Reduce轴切分示意图  
+**图1**  Reduce轴切分示意图  
 ![](../../../figures/Reduce轴切分示意图.png "Reduce轴切分示意图")
 
 本接口的计算公式如下。进行上述的数据切分后，分n次调用本接口，切分后的每块数据均完成如下公式的计算。
@@ -31,7 +31,7 @@ LayerNorm算法中Reduce轴较大的场景，可以通过切分Reduce轴，联�
 
 Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得到形状为\[1, k\]的Meant<sub>n</sub>和M<sub>n</sub>，Meant<sub>n</sub>和M<sub>n</sub>用于后续[WelfordFinalize](WelfordFinalize.md)接口的计算。
 
-**图 2**  均值Meant<sub>n</sub>计算过程示意图  
+**图2**  均值Meant<sub>n</sub>计算过程示意图  
 ![](../../../figures/均值Meantn计算过程示意图.png "均值Meantn计算过程示意图")
 
 ## 函数原型
@@ -60,7 +60,7 @@ Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -81,16 +81,16 @@ struct WelfordUpdateConfig {
 constexpr WelfordUpdateConfig WFUPDATE_DEFAULT_CFG = {false};
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| outputMean | 输出 | 均值目的操作数，对应接口公式中的Meanti。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>shape和源操作数inputMean需要保持一致。 |
-| outputVariance | 输出 | 方差中间结果目的操作数，对应接口公式中的Mi。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>shape和源操作数inputVariance需要保持一致。 |
-| inputMean | 输入 | 均值源操作数，对应接口公式中的Meanti-1。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputVariance | 输入 | 方差中间结果源操作数，对应接口公式中的Mi-1。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputX | 输入 | 源操作数，对应接口公式中的xi。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 临时空间。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[WelfordUpdate Tiling](WelfordUpdate-Tiling.md)。 |
+| outputMean | 输出 | 均值目的操作数，对应接口公式中的Meanti。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>shape和源操作数inputMean需要保持一致。 |
+| outputVariance | 输出 | 方差中间结果目的操作数，对应接口公式中的Mi。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>shape和源操作数inputVariance需要保持一致。 |
+| inputMean | 输入 | 均值源操作数，对应接口公式中的Meanti-1。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputVariance | 输入 | 方差中间结果源操作数，对应接口公式中的Mi-1。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputX | 输入 | 源操作数，对应接口公式中的xi。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 临时空间。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>临时空间大小BufferSize的获取方式请参考[WelfordUpdate Tiling](WelfordUpdate-Tiling.md)。 |
 | para | 输入 | 计算所需的参数信息。WelfordUpdateParam类型，定义如下方代码所示，其中参数的含义如下。<br>rnLength：预留参数，固定设置为1。<br>abLength：Reduce轴拆分的大小。<br>abComputeLength：从输入的起始地址开始的Reduce轴实际计算长度。<br>nRec：取值为1/i，i为当前调用本接口的累积次数。i的取值范围为[1, n]，n为对输入数据inputX的Reduce轴切分的块数。<br><br>各目的操作数和源操作数的shape均为[rnLength, abLength]。 |
 
 ```
@@ -126,24 +126,24 @@ struct WelfordUpdateParam {
 ## 调用示例
 
 ```
-// outputMean: 输出更新后的均值 Meant，shape 为 [1, abLength]
-// outputVariance: 输出更新后的方差中间结果 Mi，shape 为 [1, abLength]
-// inputMean: 上一时刻的均值 Meant-1，作为输入
-// inputVariance: 上一时刻的方差中间结果 Mi-1，作为输入
-// inputX: 当前时间步的输入数据 xi，shape 为 [1, abLength]
+// outputMean: 输出更新后的均值Meant，shape为 [1, abLength]
+// outputVariance: 输出更新后的方差中间结果Mi，shape为 [1, abLength]
+// inputMean: 上一时刻的均值Meant-1，作为输入
+// inputVariance: 上一时刻的方差中间结果Mi-1，作为输入
+// inputX: 当前时间步的输入数据xi，shape为 [1, abLength]
 // sharedTmpBuffer: 开发者管理的临时空间，用于内部复杂计算
-// para: 包含 Reduce 轴分块信息和归一化系数的参数结构
+// para: 包含Reduce轴分块信息和归一化系数的参数结构
 
-// 使用 WelfordUpdate 接口执行 Welford 在线算法更新
+// 使用WelfordUpdate接口执行Welford在线算法更新
 struct AscendC::WelfordUpdateParam para = { nLength, rLength, abComputeLength, 0.3 };
 AscendC::WelfordUpdate<T, U, false, WELFORD_UPDATE_ENABLE_INPLACE_CFG>(
     outputMean,        // 输出：更新后的均值
     outputVariance,    // 输出：更新后的方差中间结果
     inputMean,         // 输入：上一时刻均值
     inputVariance,     // 输入：上一时刻方差中间结果
-    inputX,            // 输入：当前输入 xi
+    inputX,            // 输入：当前输入xi
     sharedTmpBuffer,   // 输入：临时缓冲区（由开发者提供）
-    para               // 输入：Welford 更新参数
+    para               // 输入：Welford更新参数
 );
 ```
 

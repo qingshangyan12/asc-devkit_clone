@@ -8,8 +8,8 @@
 | <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √</cann-filter> |
 | <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √</cann-filter> |
 | <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √</cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core | √</cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品 Vector Core | x</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √</cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x</cann-filter> |
 | <cann-filter npu-type = "910">Atlas 训练系列产品 | √</cann-filter> |
 
 ## 功能说明
@@ -20,7 +20,7 @@
 
 例如，[a1, a2, a3, a4, a5, a6, ...]的求和结果为[a1+a2, a3+a4, a5+a6, ...]。计算过程如下图所示，灰色部分代表无效元素。
 
-**图 1**  `ReducePairElem<ReduceType::SUM>`示意图
+**图1**  `ReducePairElem<ReduceType::SUM>`示意图
 
 ![ReducePairElem<ReduceType::SUM>示意图](../../../../figures/ReducePairElem.png "ReducePairElem<ReduceType::SUM>示意图")
 
@@ -42,7 +42,7 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -51,12 +51,12 @@
 | U | 源操作数数据类型。 |
 | isSetMask | 是否在接口内部设置`mask`，默认为`true`。<br>&bull; `true`，表示在接口内部设置`mask`。<br>&bull; `false`，表示在接口外部设置`mask`，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置`mask`值。这种模式下，本接口入参中的`mask`值必须设置为占位符`MASK_PLACEHOLDER`。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
-| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | mask[]/mask | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。取值范围为[0, 255]。 |
 | dstRepStride | 输入 | 目的操作数相邻迭代间的地址步长，以一个repeatTime归约后的长度为单位，即128字节。取值范围为[0, $2^{16}-1$]。<cann-filter npu-type = "910"><br>**注意，此参数值Atlas 训练系列产品不支持配置0。**</cann-filter> |
@@ -73,7 +73,7 @@
 - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。</cann-filter>
 - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。</cann-filter>
 - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持half、float。</cann-filter>
-- <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，支持half、float。</cann-filter>
 - <cann-filter npu-type = "910">Atlas 训练系列产品，支持half。</cann-filter>
 
 目的操作数与源操作数的数据类型需要保持一致。
@@ -102,7 +102,7 @@
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
     - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
     - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品</cann-filter>
-    - <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core</cann-filter>
+    - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core</cann-filter>
     - <cann-filter npu-type = "910">Atlas 训练系列产品</cann-filter>
 
 </cann-filter>

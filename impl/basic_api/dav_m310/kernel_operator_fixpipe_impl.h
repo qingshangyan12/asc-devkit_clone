@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
-#include "kernel_struct_fixpipe.h"
-#include "kernel_operator_block_sync_intf.h"
+#include "../../../include/basic_api/kernel_struct_fixpipe.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
 
 namespace AscendC {
 /* **************************************************************************************************
@@ -182,7 +182,7 @@ __aicore__ inline void CheckFixpipeL0C2L1Param(__cbuf__ T *dst, __cc__ U *src, c
 {
     CheckCommonFixpipeParam<T, U, config>(src, params);
 #if ASCENDC_CPU_DEBUG
-    uint64_t dstAbsAddr = dst - (T*)(GetTPipePtr()->GetBaseAddr(int8_t(TPosition::A1)));
+    uint64_t dstAbsAddr = dst - (T*)(GetBaseAddrCpu(int8_t(TPosition::A1)));
     ASCENDC_ASSERT((dstAbsAddr % ONE_BLK_SIZE == 0), {KERNEL_LOG(KERNEL_ERROR, "Failed to check dstLocal start "\
         "address alignment in Fixpipe, when dst position is A1, its start address must align with 32B");});
 #endif

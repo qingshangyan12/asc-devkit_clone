@@ -1,4 +1,4 @@
-# UB -> GM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
+# UBToGM非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
@@ -18,7 +18,7 @@
 
 该接口提供将数据从Unified Buffer非对齐搬运至Global Memory的功能。
 
-具体支持的数据通路为（以[逻辑位置TPosition](../../../../其他数据类型/TPosition.md)表示）：
+具体支持的数据通路为（以[逻辑位置TPosition](../../../数据结构/辅助数据结构/TPosition.md)表示）：
 
 - Unified Buffer -> Global Memory
     - VECIN -> GM
@@ -50,24 +50,24 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :--- | :--- |
 | T | 操作数的数据类型。各产品支持的数据类型请参考[数据类型](#section4219135304818)。 |
 | mode | 配置数据搬运模式。PaddingMode类型，定义如下：<br><pre>enum class PaddingMode : uint8_t {<br>    Normal = 0,  // 默认模式，与原有数据搬运格式保持一致，每次数据搬运都会补齐至32字节对齐<br>    Compact,     // 紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐<br>};</pre> |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| dst | 输出 | 目的操作数，类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor简介.md)。<br>起始地址无地址对齐约束。 |
-| src | 输入 | 源操作数，类型为[LocalTensor](../../../../基础数据结构/LocalTensor/LocalTensor简介.md)。<br>起始地址需要保证32字节对齐。 |
+| dst | 输出 | 目的操作数，类型为[GlobalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)。<br>起始地址无地址对齐约束。 |
+| src | 输入 | 源操作数，类型为[LocalTensor](../../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)。<br>起始地址需要保证32字节对齐。 |
 | dataCopyParams | 输入 | 搬运参数，DataCopyExtParams类型，具体参数说明请参考[表3](#table_ub2gm_pad_3)。 |
 
 下文表格中列出的结构体参数定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data\_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。
 
-**表 3**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_3"></a>
+**表3**  DataCopyExtParams结构体参数定义<a name="table_ub2gm_pad_3"></a>
 
 | 参数名 | 描述 |
 | :--- | :--- |
@@ -85,7 +85,7 @@
 
     对于32字节对齐搬运场景，从Unified Buffer读取的所有数据都会搬运至Global Memory。
 
-    **图 1**  blockLen为32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad3"></a>  
+    **图1**  blockLen为32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad3"></a>  
     ![](../../../../../figures/datacopypad3.png)
 
 - 非32字节对齐场景<a name="非32字节对齐场景"></a>
@@ -94,7 +94,7 @@
 
     对于非32字节对齐的场景，由于Unified Buffer要求32字节对齐，框架在搬出时会自动补充17字节的假数据来保证对齐，搬到Global Memory时再自动将填充的假数据丢弃掉，从而实现Unified Buffer到Global Memory的非对齐搬运。
 
-    **图 2**  blockLen不满足32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad4"></a>  
+    **图2**  blockLen不满足32字节对齐时Unified Buffer到Global Memory的非对齐搬运示意图<a name="fig_datacopypad4"></a>  
     ![](../../../../../figures/datacopypad4.png)
 
 ## 数据类型<a name="section4219135304818"></a>
@@ -132,7 +132,7 @@
 - 位于Unified Buffer的源地址必须32字节对齐，位于Global Memory的目的地址必须1字节对齐。
 - DataCopyExtParams结构体参数的值需在取值范围内：
 
-    **表 4**  DataCopyExtParams结构体参数取值范围
+    **表4**  DataCopyExtParams结构体参数取值范围
 
     | 参数名 | 取值范围 |
     | --- | --- |

@@ -89,7 +89,7 @@ AddKernelInvocationNeo
 
 3.  CPU侧运行验证。完成算子核函数CPU侧运行验证的步骤如下：
 
-    **图 1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
+    **图1**  CPU侧运行验证步骤<a name="fig13576112114442"></a>  
     ![](../../figures/CPU侧运行验证步骤.png "CPU侧运行验证步骤")
 
     ```
@@ -114,7 +114,7 @@ AddKernelInvocationNeo
 
 4.  NPU侧运行验证。完成算子核函数NPU侧运行验证的步骤如下：
 
-    **图 2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
+    **图2**  NPU侧运行验证步骤<a name="fig558132018817"></a>  
     ![](../../figures/NPU侧运行验证步骤.png "NPU侧运行验证步骤")
 
     ```
@@ -169,7 +169,7 @@ AddKernelInvocationNeo
     >ACLRT_LAUNCH_KERNEL(kernel_name)(numBlocks, stream, argument list);
     >```
     >- kernel\_name：算子核函数的名称。
-    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/系统变量访问/GetBlockIdx.md)来获取block\_idx。
+    >- numBlocks：规定了核函数将会在几个核上执行。每个执行该核函数的核会被分配一个逻辑ID，即block\_idx，可以在核函数的实现中调用[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)来获取block\_idx。
     >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
     >- argument list：参数列表，与核函数的参数列表保持一致。
 
@@ -177,7 +177,7 @@ AddKernelInvocationNeo
 
 本节会介绍CMake文件中一些关键环境变量和Cmake命令参数的说明，通常情况下不需要开发者修改，但是这些参数可以帮助开发者更好的理解编译原理，方便有能力的开发者对Cmake进行定制化处理。
 
-**表 1**  环境变量说明
+**表1**  环境变量说明
 
 <a name="table8269104175818"></a>
 <table><thead align="left"><tr id="row126924116583"><th class="cellrowborder" valign="top" width="24.54%" id="mcps1.2.3.1.1"><p id="p182692415584"><a name="p182692415584"></a><a name="p182692415584"></a>环境变量</p>
@@ -219,7 +219,7 @@ AddKernelInvocationNeo
 </tbody>
 </table>
 
-**表 2**  Cmake命令语法说明
+**表2**  Cmake命令语法说明
 
 <a name="table481718169817"></a>
 <table><thead align="left"><tr id="row1981751617812"><th class="cellrowborder" valign="top" width="24.67%" id="mcps1.2.3.1.1"><p id="p188171016288"><a name="p188171016288"></a><a name="p188171016288"></a>Cmake命令</p>
@@ -256,7 +256,7 @@ AddKernelInvocationNeo
 <pre class="screen" id="screen5975184113338"><a name="screen5975184113338"></a><a name="screen5975184113338"></a>ascendc_compile_definitions(&lt;target_name&gt; [PRIVATE]
             [&lt;xxx&gt;...]) </pre>
 <p id="p1655714242611"><a name="p1655714242611"></a><a name="p1655714242611"></a><span id="ph12925144843119"><a name="ph12925144843119"></a><a name="ph12925144843119"></a>Ascend C</span>提供的编译宏介绍如下：</p>
-<a name="ul95991737102913"></a><a name="ul95991737102913"></a><ul id="ul95991737102913"><li>HAVE_WORKSPACE用于表示kernel入口是否包含workspace入参。默认情况下为不包含；增加该编译宏后，表示包含，此时框架会获取kernel入参的倒数第一个参数（未配置<a href="#li6933155615394">HAVE_TILING</a>），或倒数第二个参数（配置HAVE_TILING），自动在kernel侧设置系统workspace，开发者在kernel侧入参处获取的workspace为偏移了系统workspace后的用户workspace。当开发者使用了Matmul Kernel侧接口等需要系统workspace的高阶API时，建议开启此参数，入参排布、系统workspace的设置逻辑与工程化算子开发保持一致，可减少算子实现在不同开发方式间切换带来的修改成本。需要注意的是，host侧开发者仍需要自行申请workspace的空间，系统workspace大小可以通过PlatformAscendCManager的GetLibApiWorkSpaceSize接口获取。HAVE_WORKSPACE的设置样例如下：<pre class="screen" id="screen170874019451"><a name="screen170874019451"></a><a name="screen170874019451"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
+<a name="ul95991737102913"></a><a name="ul95991737102913"></a><ul id="ul95991737102913"><li><a name="li1103101565014"></a>HAVE_WORKSPACE用于表示kernel入口是否包含workspace入参。默认情况下为不包含；增加该编译宏后，表示包含，此时框架会获取kernel入参的倒数第一个参数（未配置<a href="#li6933155615394">HAVE_TILING</a>），或倒数第二个参数（配置HAVE_TILING），自动在kernel侧设置系统workspace，开发者在kernel侧入参处获取的workspace为偏移了系统workspace后的用户workspace。当开发者使用了Matmul Kernel侧接口等需要系统workspace的高阶API时，建议开启此参数，入参排布、系统workspace的设置逻辑与工程化算子开发保持一致，可减少算子实现在不同开发方式间切换带来的修改成本。需要注意的是，host侧开发者仍需要自行申请workspace的空间，系统workspace大小可以通过PlatformAscendCManager的GetLibApiWorkSpaceSize接口获取。HAVE_WORKSPACE的设置样例如下：<pre class="screen" id="screen170874019451"><a name="screen170874019451"></a><a name="screen170874019451"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
     HAVE_WORKSPACE
 )</pre>
 </li><li id="li6933155615394"><a name="li6933155615394"></a><a name="li6933155615394"></a>HAVE_TILING用于表示kernel入口是否含有tiling入参。在配置了HAVE_WORKSPACE之后，此编译宏才会生效。默认情况下为不包含，开关关闭；增加该编译宏后，表示包含，此时框架会将kernel入参的最后一个参数当做tiling，将倒数第二个参数当做workspace。框架不会对此tiling入参做任何处理，仅通过该入参来判断workspace参数的位置，使用此编译宏可以和工程化算子开发保持入参一致，减少算子实现在不同开发方式间切换带来的修改成本。设置样例如下：<pre class="screen" id="screen8986115020458"><a name="screen8986115020458"></a><a name="screen8986115020458"></a>ascendc_compile_definitions(ascendc_kernels_${RUN_MODE} PRIVATE
@@ -294,7 +294,7 @@ AddKernelInvocationNeo
 
 简化的编译流程图如下图所示：将算子核函数源文件编译生成kernel侧的库文件（\*.so或\*.a库文件）；工程框架自动生成核函数调用接口声明头文件；编译main.cpp（算子调用应用程序）时依赖上述头文件，将编译应用程序生成的目标文件和kernel侧的库文件进行链接，生成最终的可执行文件。
 
-**图 3**  编译简化流程图<a name="fig744344916358"></a>  
+**图3**  编译简化流程图<a name="fig744344916358"></a>  
 ![](../../figures/编译简化流程图.png "编译简化流程图")
 
 编译安装结束后在CMAKE\_INSTALL\_PREFIX目录下生成的编译产物示例如下；最终的可执行文件会生成在cmake命令的执行目录下。
@@ -369,7 +369,7 @@ if __name__ == '__main__':
 
 您可以基于样例工程中提供的一键式编译运行脚本进行快速编译，并在CPU侧和NPU侧执行Ascend C算子。一键式编译运行脚本主要完成以下功能：
 
-**图 4**  一键式编译运行脚本流程图<a name="fig125041443583"></a>  
+**图4**  一键式编译运行脚本流程图<a name="fig125041443583"></a>  
 ![](../../figures/一键式编译运行脚本流程图.png "一键式编译运行脚本流程图")
 
 >[!NOTE]说明 
@@ -386,7 +386,7 @@ bash run.sh --run-mode=npu  --soc-version=<soc_version> --install-path=<install_
 bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-prefix>
 ```
 
-**表 3**  脚本参数介绍
+**表3**  脚本参数介绍
 
 <a name="table98393011180"></a>
 <table><thead align="left"><tr id="row98396051814"><th class="cellrowborder" valign="top" width="16.14%" id="mcps1.2.4.1.1"><p id="p283916071814"><a name="p283916071814"></a><a name="p283916071814"></a>参数名</p>
@@ -445,7 +445,7 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 
 在非昇腾设备上，开发者可以利用CPU仿真环境先行进行算子开发和测试，并在准备就绪后，利用昇腾设备进行加速计算。在[编译与运行](../编译与运行/算子编译/AI-Core算子编译基本用法.md)章节，我们已经介绍了算子Kernel程序NPU域的编译运行。相比于NPU域的算子运行逻辑，CPU域调试，实际上是通过标准的GCC编译器编译算子Kernel程序。此时算子Kernel程序链接CPU调测库，执行编译生成的可执行文件，可以完成算子CPU域的运行验证。CPU侧的运行程序，通过GDB通用调试工具进行单步调试，可以精准验证程序执行流程是否符合预期。
 
-**图 5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
+**图5**  CPU域和NPU域的核函数运行逻辑对比<a name="fig1274642720202"></a>  
 ![](../../figures/CPU域和NPU域的核函数运行逻辑对比-36.png "CPU域和NPU域的核函数运行逻辑对比-36")
 
 基于Kernel直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
@@ -535,4 +535,3 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 >        aclInit、aclFinalize、aclrtGetVersion。
 >    - 运行时管理
 >        aclrtSetDevice、aclrtResetDevice、aclrtCreateStream、aclrtCreateStreamWithConfig、aclrtDestroyStream、aclrtDestroyStreamForce、aclrtSynchronizeStream、aclrtCreateContext、aclrtDestroyContext。
-

@@ -60,7 +60,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000001429830437_row118356578583"><th class="cellrowborder" valign="top" width="13.58%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000001429830437_p48354572582"><a name="zh-cn_topic_0000001429830437_p48354572582"></a><a name="zh-cn_topic_0000001429830437_p48354572582"></a>参数名</p>
@@ -79,7 +79,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table8955841508"></a>
 <table><thead align="left"><tr id="row15956194105014"><th class="cellrowborder" valign="top" width="13.661366136613662%" id="mcps1.2.4.1.1"><p id="p7956144195014"><a name="p7956144195014"></a><a name="p7956144195014"></a>参数名称</p>
@@ -95,7 +95,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p102161931162814"><a name="p102161931162814"></a><a name="p102161931162814"></a>输出</p>
 </td>
 <td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p920444891017"><a name="p920444891017"></a><a name="p920444891017"></a>目的操作数。</p>
-<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p16703131355116"><a name="p16703131355116"></a><a name="p16703131355116"></a><span id="zh-cn_topic_0000001530181537_ph173308471594"><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><a name="zh-cn_topic_0000001530181537_ph173308471594"></a><span id="zh-cn_topic_0000001530181537_ph9902231466"><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><a name="zh-cn_topic_0000001530181537_ph9902231466"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816"><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p14735141222810"><a name="p14735141222810"></a><a name="p14735141222810"></a><span id="ph1479701815419"><a name="ph1479701815419"></a><a name="ph1479701815419"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 </td>
 </tr>
@@ -104,7 +104,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
 <td class="cellrowborder" valign="top" width="12.591259125912593%" headers="mcps1.2.4.1.2 "><p id="p7217031182818"><a name="p7217031182818"></a><a name="p7217031182818"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="73.74737473747375%" headers="mcps1.2.4.1.3 "><p id="p1169815471018"><a name="p1169815471018"></a><a name="p1169815471018"></a>源操作数。</p>
-<p id="p1735485614104"><a name="p1735485614104"></a><a name="p1735485614104"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../../基础数据结构/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
+<p id="p1735485614104"><a name="p1735485614104"></a><a name="p1735485614104"></a><span id="zh-cn_topic_0000001530181537_ph173308471594_1"><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><a name="zh-cn_topic_0000001530181537_ph173308471594_1"></a><span id="zh-cn_topic_0000001530181537_ph9902231466_1"><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><a name="zh-cn_topic_0000001530181537_ph9902231466_1"></a><span id="zh-cn_topic_0000001530181537_ph1782115034816_1"><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a><a name="zh-cn_topic_0000001530181537_ph1782115034816_1"></a>类型为<a href="../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a>，支持的TPosition为VECIN/VECCALC/VECOUT。</span></span></span></p>
 <p id="p159291714102816"><a name="p159291714102816"></a><a name="p159291714102816"></a><span id="ph4159191519282"><a name="ph4159191519282"></a><a name="ph4159191519282"></a>LocalTensor的起始地址需要32字节对齐。</span></p>
 <p id="p1521763119281"><a name="p1521763119281"></a><a name="p1521763119281"></a>源操作数的数据类型需要与目的操作数保持一致。</p>
 </td>
@@ -144,7 +144,7 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
 -   接口使用样例
 
     ```
-    // repeatTime = 2, modeNumber = 4, 把32个Region Proposal中的score域元素抽取出来排列成32个连续元素
+    // repeatTime = 2, modeNumber = 4,把32个Region Proposal中的score域元素抽取出来排列成32个连续元素
     AscendC::ProposalExtract(dstLocal, srcLocal, 2, 4);
     ```
 
@@ -192,4 +192,3 @@ __aicore__ inline void ProposalExtract(const LocalTensor<T>& dst, const LocalTen
      -20.67   59.56   35.72   -6.12  -39.4   -11.46   -7.066  30.23  -11.18
      -35.84  -40.88   60.9   -73.3    38.47 ]
     ```
-

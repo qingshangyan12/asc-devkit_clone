@@ -70,17 +70,17 @@ struct Bucket {
   <tr><td rowspan="1" align="center">算子类型(OpType)</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </tr>
   <tr><td rowspan="3" align="center">算子输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">keys</td><td align="center">1, N</td><td align="center">int64_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">values</td><td align="center">N, M</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td align="center">keys</td><td align="center">[1,N]</td><td align="center">int64_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">values</td><td align="center">[N,M]</td><td align="center">float</td><td align="center">ND</td></tr>
   </tr>
   </tr>
-  <tr><td rowspan="1" align="center">算子输出</td><td align="center">table_addr</td><td align="center">1, Z</td><td align="center">Bucket</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">算子输出</td><td align="center">table_addr</td><td align="center">[1,Z]</td><td align="center">Bucket</td><td align="center">ND</td></tr>
   </tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">insert_hash_table</td></tr>
   </table>
 
 - 算子实现：  
-  InsertHashTable算子的实现流程为，每个warp处理一个键值对，warp中线程0负责根据key的哈希值寻找可用桶，线程0-31负责将value存入桶中。线程0寻找可用桶时，通过开放寻址法解决哈希冲突问题，并使用asc_atomic_cas()接口解决多线程冲突问题，使用asc_threadfence()接口解决核间数据同步问题。
+  InsertHashTable算子的实现流程为，每个warp处理一个键值对，warp中线程0负责根据key的哈希值寻找可用桶，线程0-31负责将value存入桶中。线程0寻找可用桶时，通过开放寻址法解决哈希冲突问题，并使用`asc_atomic_cas()`接口解决多线程冲突问题，使用`asc_threadfence()`接口解决核间数据同步问题。
 
 - 调用实现：  
   使用内核调用符<<<>>>调用核函数。

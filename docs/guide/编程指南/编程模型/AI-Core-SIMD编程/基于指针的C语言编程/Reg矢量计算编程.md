@@ -13,7 +13,7 @@
 这种模式下存在三个典型瓶颈：
 
 - **UB读写带宽被反复占用**：中间结果在UB上往返，访存压力随着矢量计算增加而线性放大。
-- **UB Bank 冲突严重**：对UB的反复读写，极大增加了UB Bank冲突的概率。
+- **UB Bank冲突严重**：对UB的反复读写，极大增加了UB Bank冲突的概率。
 - **关键路径被访存拉长**：当计算指令执行时间很短，整体耗时会被UB读写时间占用。
 
 这种“每步落地UB”的开销会成为优化的天花板。
@@ -57,7 +57,7 @@ Reg矢量执行单元、DMA单元和Aux Scalar虽属于不同的硬件执行单�
 1. 有寄存器依赖时，由硬件按指令顺序保证数据依赖正确性，用户无需显式插入同步；但跨寄存器对同一UB区域的读写需要显式插入同步，搬运单元与计算单元之间没有自动顺序约束，详见[流水线同步](#section_sync)。
 2. Reg矢量执行单元和DMA单元在没有数据依赖时可以**同时发射、并行执行**。
 
-**图 1** SIMD Reg矢量执行关系
+**图1** SIMD Reg矢量执行关系
 
 <img src="../../../../figures/Reg执行单元.png" title="Reg执行单元" style="zoom:80%;" />
 
@@ -65,7 +65,7 @@ Reg矢量执行单元、DMA单元和Aux Scalar虽属于不同的硬件执行单�
 
 AIV的内存层级如下：
 
-**图 2** 内存层级关系
+**图2** 内存层级关系
 
 ![](../../../../figures/Reg内存层级.png "Reg内存层级")
 
@@ -74,7 +74,7 @@ AIV的内存层级如下：
 **寄存器作为整体使用**：寄存器无法按索引或偏移访问其中的某个元素或者bit。根据不同的功能，主要分为五类：
 
 1. **矢量计算寄存器**：参与矢量计算的主要寄存器，单个寄存器宽度定义为Vector Length（以下简称VL），可以通过DMA单元与UB进行数据交换。
-2. **掩码寄存器**：用于控制参与矢量计算的有效元素或者代表单bit元素参与计算等，单个寄存器宽度定义为 VL/8，可以通过DMA单元与UB进行数据交换。
+2. **掩码寄存器**：用于控制参与矢量计算的有效元素或者代表单bit元素参与计算等，单个寄存器宽度定义为VL/8，可以通过DMA单元与UB进行数据交换。
 3. **地址寄存器**：辅助Reg矢量搬运单元完成矢量计算寄存器和UB数据交换，用于存储UB地址的偏移，单个寄存器宽度为32bis，不能直接与UB进行数据交换。
 4. **搬入非对齐寄存器**：辅助Reg矢量搬运单元将UB数据搬入到矢量计算寄存器，用于临时存储包含源非对齐UB地址数据的，起始对齐UB地址的1个DataBlock长度的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将UB数据搬入非对齐寄存器。
 5. **搬出非对齐寄存器**：辅助Reg矢量搬运单元将矢量计算寄存器数据搬出到UB，用于临时存储包含需写出非对齐UB地址的对应的矢量寄存器的数据，单个寄存器宽度为DataBlock，可以通过DMA单元将搬出非对齐寄存器数据搬出到UB。
@@ -85,15 +85,15 @@ AIV的内存层级如下：
 
 ### 总体结构
 
-基于寄存器（Regbase）的编程模型是在Memory矢量编程的`数据搬入` -> `Compute` -> `数据搬出`编程模型基础上扩展为`数据搬入` -> `Load` -> `Compute`  ->`Store` -> `数据搬出` 的Reg矢量计算编程模型。
+基于寄存器（Regbase）的编程模型是在Memory矢量编程的`数据搬入` -> `Compute` -> `数据搬出`编程模型基础上扩展为`数据搬入` -> `Load` -> `Compute`  ->`Store` -> `数据搬出`的Reg矢量计算编程模型。
 
-**图 3** Regbase编程总体结构
+**图3** Regbase编程总体结构
 
 ![](../../../../figures/Regbase编程模型总体结构.png "Regbase编程模型总体结构")
 
 ### VF函数与执行域
 
-Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store` 的执行过程，在实现中定义为Vector Function（以下简称VF函数）。为了区分不同的执行域，将在不同执行域的函数使用不同的函数标签，编译期就限制了API的调用关系：
+Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store`的执行过程，在实现中定义为Vector Function（以下简称VF函数）。为了区分不同的执行域，将在不同执行域的函数使用不同的函数标签，编译期就限制了API的调用关系：
 
 | 标签 | 角色 | 调用方 | 可调用对象 |
 | --- | --- | --- | --- |
@@ -113,7 +113,7 @@ Reg矢量计算编程模型中`Load` -> `Compute`  ->`Store` 的执行过程，�
 - **职责清晰**：`__aicore__`负责GM数据搬运、地址计算等外层逻辑；`__simd_vf__`专注寄存器级计算。
 - **优化边界明确**：编译器可以针对VF函数做独立优化（如VF融合），且不影响外层算子结构。
 
-**图 4** 函数标签调用关系
+**图4** 函数标签调用关系
 
 <img src="../../../../figures/reg_calculation_call_hierarchy.png" title="调用层级" style="zoom: 28%;" />
 
@@ -235,7 +235,7 @@ asc_add(dst_reg, src0_reg, src1_reg, mask_reg);
 // Use vector_bool dst_mask_reg as x computation parameter with vector_* src0_vector_reg
 asc_select(dst_mask_reg, src0_vector_reg, src1_vector_reg, mask_reg);
 
-// Compute with vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg as parameters
+// vector_bool src0_mask_reg, src1_mask_reg, dst_mask_reg作为参数计算
 asc_and(dst_mask_reg, src0_mask_reg, src1_mask_reg, mask_reg);
 ```
 
@@ -263,10 +263,10 @@ for(uint16_t i = 0;i < extent1; i++){
 // Allocate load unalign register
 vector_load_unalign ureg0;
 
-// Initialize vector_load_unalign using unaligned UB address src_addr
+// 使用非对齐UB地址src_addr,初始化vector_load_unalign
 asc_loadunalign_pre(ureg0, src_addr);
 
-// Load data starting from unaligned UB address src_addr into vector data register src_reg
+// 将非对齐UB地址src_addr开始的数据，搬入矢量数据寄存器src_reg
 asc_loadunalign(src_reg, ureg0, src_addr);
 ```
 
@@ -278,7 +278,7 @@ asc_loadunalign(src_reg, ureg0, src_addr);
 // Allocate store unalign register
 vector_store_unalign ureg0;
 
-// Store vreg0 to unaligned UB address dst_addr
+// 搬出vreg0到非对齐UB地址dst_addr
 asc_storeunalign(dst_addr, vreg0, ureg0, stride);
 
 // Store tail data from store unalign register to UB
@@ -307,7 +307,7 @@ asc_load(vreg1, ub_addr);
 
 同步的方向包括多个指定的[枚举值](../../../../../api/c_api/reg/reg_vector/asc_mem_bar.md)，用于指定需要同步的两条流水方向。如下图**操作相同UB地址时**，读写依赖需要插入`Load->Store`同步`asc_mem_bar(VLD_ST)` ；写写依赖需要插入Store->Store同步`asc_mem_bar(VST_ST)`  。仅当在读写相同UB地址中间存在寄存器变量依赖计算时，同一数据串行处理，无需插入同步。
 
-**图 5** 流水线同步示意
+**图5** 流水线同步示意
 
 ![](../../../../figures/同步流水1.png "流水线同步")
 
@@ -326,7 +326,7 @@ Reg矢量计算C API（在源码中以`asc_`为前缀，属于语言扩展C API�
 | 分类     | 典型接口                                                     |
 | -------- | ------------------------------------------------------------ |
 | 数据搬运 | `asc_load*` / `asc_store*`                                   |
-| 矢量计算 | `asc_add` / `asc_sub` / `asc_mul` / `asc_div` / `asc_select` / `asc_reduce_*` 等 |
+| 矢量计算 | `asc_add` / `asc_sub` / `asc_mul` / `asc_div` / `asc_select` / `asc_reduce_*`等 |
 | 同步控制 | `asc_mem_bar`                                                |
 
 ### 编程示例
@@ -420,47 +420,47 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 
 非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行数据搬运时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
 
-**非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/c_api/reg/reg_load/asc_loadunalign.md) 组合完成：
+**非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/c_api/reg/reg_load/asc_loadunalign.md)组合完成：
 例如在Ascend 950PR/Ascend 950DT，当想要搬入如下UB地址为48开始的256Bytes数据时:
 
-**图 6** 非对齐搬入预期
+**图6** 非对齐搬入预期
 
 ![](../../../../figures/Reg非对齐读1.png "Reg非对齐读1")
 
 1. 先使用非对齐的UB地址初始化`vector_load_unalign`，会将UB地址截断到32B对齐地址32，再将一个DataBlock 32B数据搬入到`vector_load_unalign`.
 
-   **图 7**  初始化`vector_load_unalign`
+   **图7**  初始化`vector_load_unalign`
 
    ![](../../../../figures/Reg非对齐读2.png "Reg非对齐读2")
 
 2. 调用`asc_loadunalign`搬运数据，从原非对齐UB地址向上对齐到32B后，搬入240B数据，与`vector_load_unalign`中的部分数据拼接成预期读入256B数据后，写入矢量数据寄存器。同时将`vector_load_unalign`内的数据更新为下一次读取UB地址非对齐对应的DataBlock 32B.
 
-   **图 8**  读入预期数据
+   **图8**  读入预期数据
 
    ![](../../../../figures/Reg非对齐读4.png "Reg非对齐读4")
 
-**非对齐搬出**由[`asc_storeunalign`](../../../../../api/c_api/reg/reg_store/asc_storeunalign.md) 和[`asc_storeunalign_post`](../../../../../api/c_api/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
+**非对齐搬出**由[`asc_storeunalign`](../../../../../api/c_api/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](../../../../../api/c_api/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
 例如在Ascend 950PR/Ascend 950DT，当想要搬出如下UB地址为48开始的512Bytes数据时：
 
-**图 9** 非对齐搬出预期
+**图9** 非对齐搬出预期
 
 ![](../../../../figures/Reg非对齐写0.png "Reg非对齐写0")
 
 1. 先使用`asc_storeunalign`，首次循环时：将尾部对齐到32B的长度为240B的矢量数据寄存器数据写入UB，同时将剩余的16B写入`vector_store_unalign`; 
 
-   **图 10** 第一次写出预期数据
+   **图10** 第一次写出预期数据
 
    ![](../../../../figures/Reg非对齐写1.png "Reg非对齐写1")
 
 2. 当第二次循环时：将暂存在`vector_store_unalign`中的16B数据，与本次循环需要写出的矢量数据寄存器中的240B拼接成256B数据后，写出到UB。同时将本次循环中剩余的16B更新写入`vector_store_unalign`; 
 
-   **图 11** 第二次写出预期数据
+   **图11** 第二次写出预期数据
 
    ![](../../../../figures/Reg非对齐写2.png "Reg非对齐写2")
 
 3. 调用`asc_storeunalign_post`将`vector_store_unalign`缓存中尚未写出的尾部数据刷回UB.
 
-   **图 12** 剩余数据写出
+   **图12** 剩余数据写出
 
    ![](../../../../figures/Reg非对齐写3.png "Reg非对齐写3")
 
@@ -481,7 +481,7 @@ asc_storeunalign_post(dst_addr, store_ureg, 0);
 ```
 
 #### PostUpdate模式
-PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr, 同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
+PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; ++i) {
@@ -557,7 +557,7 @@ Hardware Loop是VF循环性能优化的基础。VF中的循环如果满足硬件
 对编译时分支和尾块场景，可使用以下方式替代`if`：
 
 ```cpp
-// 编译时分支：if constexpr 无运行时开销
+// 编译时分支：if constexpr无运行时开销
 if constexpr (has_bias) {
     asc_add(dst_reg, src_reg, bias_reg, mask);
 }
@@ -611,4 +611,3 @@ VF融合可以分成两个层级：
 Reg矢量计算编程基于Ascend 950PR/Ascend 950DT新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
 
 实际开发时，Reg矢量计算不仅要关注接口本身，还需要结合硬件执行特征开发代码。优先使用对齐搬运，保持循环满足Hardware Loop识别规范，并在寄存器资源允许的范围内进行VF融合，通常可以减少搬运、同步和循环启动开销，从而获得更稳定的性能表现。
-

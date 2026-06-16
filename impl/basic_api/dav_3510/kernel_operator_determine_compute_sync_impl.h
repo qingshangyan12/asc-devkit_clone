@@ -20,20 +20,20 @@
 #ifndef ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DETERMINE_COMPUTE_SYNC_IMPL_H
 
-#include "kernel_operator_data_copy_intf.h"
+#include "../../../include/basic_api/kernel_operator_data_copy_intf.h"
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_H__
 #endif
-#include "kernel_common.h"
-#include "kernel_event.h"
-#include "kernel_macros.h"
-#include "kernel_operator_block_sync_intf.h"
-#include "kernel_operator_sys_var_intf.h"
+#include "../../../include/basic_api/kernel_common.h"
+#include "../kernel_event.h"
+#include "../kernel_macros.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
+#include "../../../include/basic_api/kernel_operator_sys_var_intf.h"
 #include "kernel_operator_vec_duplicate_impl.h"
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
-#include "utils/kernel_utils_constants.h"
+#include "../../../include/basic_api/kernel_tensor.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
+#include "../utils/kernel_utils_constants.h"
 
 #if defined (ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -51,7 +51,7 @@ __aicore__ inline void InitDetermineComputeWorkspaceCalc(GlobalTensor<int32_t> &
         auto blockNum = GetBlockNum();
         if (GetBlockIdx() == 0) {
             DuplicateImpl((__ubuf__ int32_t*)ubWorkspace.GetPhyAddr(), 0, B32_DATA_NUM_PER_BLOCK * blockNum);
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
             SetFlag<HardEvent::V_MTE3>(eventID);
             WaitFlag<HardEvent::V_MTE3>(eventID);
             DataCopy(gmWorkspace, ubWorkspace, B32_DATA_NUM_PER_BLOCK * blockNum);
@@ -90,11 +90,11 @@ __aicore__ inline void WaitPreBlockCalc(const GlobalTensor<int32_t> &gmWorkspace
         bool matchFlag;
         do {
             DataCopy(ubWorkspace, gmWorkspace, blockNum * B32_DATA_NUM_PER_BLOCK);
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::MTE2_S));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::MTE2_S>());
             SetFlag<HardEvent::MTE2_S>(eventID);
             WaitFlag<HardEvent::MTE2_S>(eventID);
             matchFlag = CheckUBWorkspace(ubWorkspace, blockIdx, blockNum);
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_MTE2));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::S_MTE2>());
             SetFlag<HardEvent::S_MTE2>(eventID);
             WaitFlag<HardEvent::S_MTE2>(eventID);
         } while (!matchFlag);
@@ -112,17 +112,17 @@ __aicore__ inline void NotifyNextBlockCalc(GlobalTensor<int32_t> &gmWorkspace, L
         int32_t repeatTime = ubWorkspace.GetValue(blockNum * B32_DATA_NUM_PER_BLOCK);
         if (blockIdx + 1 == blockNum) {
             DuplicateImpl((__ubuf__ int32_t*)ubWorkspace.GetPhyAddr(), 0, blockNum * B32_DATA_NUM_PER_BLOCK);
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
             SetFlag<HardEvent::V_MTE3>(eventID);
             WaitFlag<HardEvent::V_MTE3>(eventID);
             DataCopy(gmWorkspace, ubWorkspace, blockNum * B32_DATA_NUM_PER_BLOCK);
         } else {
             auto offset = blockIdx * B32_DATA_NUM_PER_BLOCK;
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
             SetFlag<HardEvent::S_V>(eventID);
             WaitFlag<HardEvent::S_V>(eventID);
             DuplicateImpl((__ubuf__ int32_t*)ubWorkspace[offset].GetPhyAddr(), repeatTime, B32_DATA_NUM_PER_BLOCK);
-            eventID = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
+            eventID = static_cast<event_t>(FetchEventID<HardEvent::V_MTE3>());
             SetFlag<HardEvent::V_MTE3>(eventID);
             WaitFlag<HardEvent::V_MTE3>(eventID);
             DataCopy(gmWorkspace[offset], ubWorkspace[offset], B32_DATA_NUM_PER_BLOCK);
