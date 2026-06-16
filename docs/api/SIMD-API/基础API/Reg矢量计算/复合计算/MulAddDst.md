@@ -66,7 +66,7 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -74,7 +74,7 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
 | U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -89,7 +89,7 @@ __simd_callee__ inline void MulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 
 ## 数据类型
 
-**表 3**  数据类型组合
+**表3** 数据类型组合
 
 | srcReg0    | srcReg1    | dstReg     |
 | ---------- | ---------- | ---------- |

@@ -64,7 +64,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -73,7 +73,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 | U | 矢量源操作数的RegTensor类型，由编译器自动推导，用户不需要填写。 |
 | S | 标量操作数数据类型。 |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -88,7 +88,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 数据类型
 
-**表 3**  数据类型组合
+**表3** 数据类型组合
 
 | srcReg和scalarValue数据类型 | dst数据类型 |
 | :-------------------------- | :---------- |

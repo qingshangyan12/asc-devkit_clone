@@ -64,7 +64,7 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1**  模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -72,7 +72,7 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 | mode | 比较模式。支持如下取值：<br>• LT：小于<br>• GT：大于<br>• GE：大于或等于<br>• EQ：等于<br>• NE：不等于<br>• LE：小于或等于 |
 | U | 源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
-**表2**  参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -86,7 +86,7 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 
 ## 数据类型
 
-**表 3**  数据类型组合
+**表3** 数据类型组合
 
 | srcReg0和srcReg1数据类型 | dst数据类型 |
 | :----------------------- | :---------- |
