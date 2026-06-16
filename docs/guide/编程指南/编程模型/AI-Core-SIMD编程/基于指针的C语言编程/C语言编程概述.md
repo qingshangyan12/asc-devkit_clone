@@ -19,7 +19,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 ### 外部存储（Global Memory）
 
-Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
+Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Memory。Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
 结合下述示例说明：Host侧通过aclrtMalloc接口分配Device侧全局内存，通过aclrtMemcpy完成Host与Device全局内存间的数据互拷（Host→Device或Device→Host）；随后通过<<<>>>语法触发Device侧核函数执行运算；此外，通过aclrtMalloc分配的Device全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
@@ -307,8 +307,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
     <tr>
       <td><strong>所有AIC核同步</strong></td>
       <td><p>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</p></td>
-      <td><pre><code>asc_sync_inter_arrive
-                     asc_sync_inter_wait</code></pre></td>
+      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
       <td>
         <code>if ASCEND_IS_AIC {</code><br>
         <code>    int64_t flagID = 1;</code><br>
@@ -334,7 +333,6 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><p>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</p></td>
       <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
       <td>
-        <code>// Scenario: Synchronization between two AIVs and AIC. Atlas A2/A3 training/inference products support two AIVs triggering AIC wait simultaneously, Ascend 950PR/Ascend 950DT and later support AIV0 and AIV1 triggering AIC wait separately</code><br>
         <code>if ASCEND_IS_AIC {</code><br>
         <code>    // Atlas A2/A3 training/inference products: AIC sends one arrive, two AIVs wait simultaneously</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
@@ -352,6 +350,66 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><p>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</p></td>
       <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code> </td>
       <td> <code>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>核间同步类型</th>
+      <th>场景说明</th>
+      <th>主要接口</th>
+      <th>实现代码示例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>所有AIC核同步</strong></td>
+      <td>同步所有AIC核，通常用于对Cube算子计算结果进行多核累加操作。</td>
+      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
+      <td>
+<pre><code>if ASCEND_IS_AIC {
+    int64_t flagID = 1;
+    asc_sync_inter_arrive(PIPE_S, flagID);
+    asc_sync_inter_wait(PIPE_S, flagID);
+}</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>所有AIV核同步</strong></td>
+      <td>同步所有AIV核，通常用于对Vector算子计算结果进行多核累加操作。</td>
+      <td><code>asc_sync_inter_arrive</code><br><code>asc_sync_inter_wait</code></td>
+      <td>
+<pre><code>if ASCEND_IS_AIV {
+    int64_t flagID = 1;
+    asc_sync_inter_arrive(PIPE_S, flagID);
+    asc_sync_inter_wait(PIPE_S, flagID);
+}</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>单个AI Core内AIC与AIV同步</strong></td>
+      <td>同步单个AI Core内AIC与AIV核，通常用于Mix算子中Cube与Vector间的交互操作。</td>
+      <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
+      <td>
+<pre><code>if ASCEND_IS_AIC {
+    // Atlas A2/A3: AIC sends one arrive
+    asc_sync_intra_arrive(PIPE_FIX, 0);
+    // Ascend 950PR/Ascend 950DT: AIC sends two arrives
+    asc_sync_intra_arrive(PIPE_FIX, 0);
+    asc_sync_intra_arrive(PIPE_FIX, 16);
+}
+if ASCEND_IS_AIV {
+    asc_sync_intra_wait(PIPE_MTE3, 0);
+}</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>单个AI Core内两个AIV间同步</strong></td>
+      <td>同步单个AI Core内两个AIV子核，通常用于Vector算子内AIV核间的协调操作。</td>
+      <td>该功能当前C语言编程路径暂不支持，后续版本将提供支持。</td>
+      <td>-</td>
     </tr>
   </tbody>
 </table>
