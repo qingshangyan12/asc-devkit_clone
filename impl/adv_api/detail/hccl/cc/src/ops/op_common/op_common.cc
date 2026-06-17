@@ -1188,7 +1188,7 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
     uint64_t size = seq.size();
 
     void *ctx = nullptr;
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
+    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AICPU, size, &ctx));
     HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
     aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     *resCtxSequence = ctx;
