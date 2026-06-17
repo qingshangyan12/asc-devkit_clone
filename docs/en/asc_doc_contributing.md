@@ -12,7 +12,7 @@ The Ascend C documentation system consists of five core documents. Developers ca
 | Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/guide/算子实践参考/` |
 | Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/guide/跨代迁移兼容性指南/` |
 
-Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the [Getting Started Tutorial](./guide/入门教程/Ascend-C概述与学习路径.md); developers with prior experience should read the [Programming Guide](./guide/编程指南/本文档组织结构.md).
+Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the [Getting Started Tutorial](../guide/入门教程/Ascend-C概述与学习路径.md); developers with prior experience should read the [Programming Guide](../guide/编程指南/本文档组织结构.mdWS).
 
 ---
 
@@ -346,35 +346,6 @@ For Ascend 950PR/DT products:
 
 **Format**: Two layers. Single-parameter constraints are described inline in the parameter table (e.g., alignment, value range); multi-parameter constraints and multi-interface combination constraints in a separate "Constraints" paragraph.
 
-**Sample**:
-
-```
-## Constraints
-
-- Result matrix C only supports CO1 (L0C Buffer), left matrix A only supports A2 (L0A Buffer), right matrix B only supports B2 (L0B Buffer).
-- When any of M, K, N is 0, the instruction is not executed and is treated as NOP. **NOP.M should be avoided** — NOP.M measured latency is much greater than 1 cycle.
-- When M=1, GEMV mode is enabled by default; matrix A is read in ND format (not treated as ZZ/NZ format), starting address still requires 512-byte alignment.
-- One Mmad computation processes at least A(16×16×half) × B(16×16×half). When valid values are not multiples of 16, invalid data layout is as follows:
-  [Diagram]
-
-### Synchronization Optimization
-When accumulating along the K axis, whether PipeBarrier(PIPE_M) is needed between consecutive Mmad operations depends on computation volume:
-
-if ((m / 16) * (n / 16) < 10) {
-    AscendC::PipeBarrier<PIPE_M>();  // Computation below threshold, sync required
-}
-// When computation exceeds threshold, hardware handles dependency automatically
-
-### UnitFlag Feature Constraints
-Mmad and Fixpipe unitFlag must be enabled synchronously. First n-1 operations set to 2 (maintain occupancy), last operation set to 3 (release occupancy).
-[See UnitFlag Feature Description for details](link)
-
-### Special/Edge Value Constraints
-- Floating-point INF/NAN: Configure saturation/non-saturation mode via CTRL[48]
-- **Mmad should avoid NAN input**, which may cause execution errors
-- Integer types only support saturation mode
-```
-
 **Requirements**:
 - **Location constraints** must specify TPosition enum value, with parenthetical explanation of physical location
 - **NOP constraints** must specify avoidance scenarios and performance impact
@@ -390,54 +361,12 @@ Mmad and Fixpipe unitFlag must be enabled synchronously. First n-1 operations se
 **Scope**: Required for matrix/vector computation APIs involving key hardware features (HF32 mode, GEMV acceleration, UnitFlag parallel control, etc.). Simple APIs (configuration/utility) may omit.
 
 **Format**: Organized by feature into subsections, each with heading + table/paragraph description.
-**Sample** (using Mmad as an example):
-
-```
-## Key Feature Description
-
-### HF32 Mode
-Configure HF32 (Hybrid Float32) mode via SetHF32Mode/SetHF32TransMode to reduce computation through 9-bit exponent sharing for float matrix multiplication.
-| Mode | Description |
-|------|-------------|
-| HF32_OP0 | Exponent sharing along left matrix A column direction |
-| HF32_OP1 | Exponent sharing along right matrix B row direction |
-
-### GEMV Acceleration
-When M=1, Mmad automatically triggers GEMV (matrix-vector multiplication) acceleration path, skipping unnecessary matrix loading.
-
-### UnitFlag Parallel Control
-Controls fine-grained pipeline parallelism between Mmad and Fixpipe. See [UnitFlag Feature Description](UnitFlag.md).
-
-### K-direction Alignment Constraints
-K-direction has specific alignment requirements that vary by data type. See [K-direction Alignment Constraints](K-direction-alignment-constraints.md).
-```
-
-**Requirements**:
-- Each feature gets an independent subsection with ### heading
-- Feature description includes: what it is, when to use, how to configure, what constraints apply
-- Complex features use tables to compare modes
-- Each feature subsection ends with a link to detailed documentation (if available)
 
 ---
 
 #### 10. Theoretical Performance (Appendix Reference)
 
 **Format**: Do not inline cycle formulas in the API page. Reference the appendix instead.
-
-**Sample**:
-
-```
-## Theoretical Performance
-
-For theoretical performance data of this interface, see the appendix:
-- Cube instruction theoretical performance summary: [Cube Instruction Theoretical Performance Summary](api/appendix/Cube-instruction-theoretical-performance-summary.md)
-- Vector instruction theoretical performance summary: [Vector Instruction Theoretical Performance Summary](api/appendix/Vector-instruction-theoretical-performance-summary.md)
-```
-
-**Requirements**:
-- Theoretical performance data maintained centrally in the appendix; API pages no longer inline cycle formulas
-- Reference format is a link to the corresponding appendix page (Cube APIs reference Cube appendix, Vector APIs reference Vector appendix)
-- If the API has special performance considerations (e.g., first-instruction overhead, performance differences with specific parameters), supplement after the appendix reference
 
 ---
 
