@@ -279,7 +279,7 @@ __aicore__ inline void GeluCompute(
 | `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) |
 | `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md) |
 | `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) |
-| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [MoveMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) |
+| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
 
 **原理解析**：
 
