@@ -10,7 +10,7 @@
 
 #include "tests/api/c_api/npu_arch_3510/utils/test_vcvt_instr_utils.h"
 
-TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_ru, asc_float2half_ru, vcvt, vector_half, vector_float, 1);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_ru_sat, asc_float2half_ru_sat, vcvt, vector_half, vector_float, 2);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_ru_v2, asc_float2half_ru_v2, vcvt, vector_half, vector_float, 3);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_1(Vcvt_ru_sat_v2, asc_float2half_ru_sat_v2, vcvt, vector_half, vector_float, 4);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_5(Vcvt_ru, asc_float2half_ru, vcvt, vector_half, vector_float, 1);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_5(Vcvt_ru_sat, asc_float2half_ru_sat, vcvt, vector_half, vector_float, 2);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_5(Vcvt_ru_v2, asc_float2half_ru_v2, vcvt, vector_half, vector_float, 3);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_5(Vcvt_ru_sat_v2, asc_float2half_ru_sat_v2, vcvt, vector_half, vector_float, 4);
