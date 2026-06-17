@@ -70,6 +70,11 @@ public:
         return sqHead_;
     }
 
+    uint32_t GetSqHead() const
+    {
+        return sqHead_;
+    }
+
     void CompleteCurrentSq()
     {
         cqTail_ = sqHead_;
