@@ -55,7 +55,7 @@ a^2 + b^2 + c^2 + d^2的平方根。
 
 ## 约束说明
 
-无
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符/不支持Subnormal场景，当所有输入均为Subnormal数据时，本接口最终返回NaN。
 
 ## 需要包含的头文件
 

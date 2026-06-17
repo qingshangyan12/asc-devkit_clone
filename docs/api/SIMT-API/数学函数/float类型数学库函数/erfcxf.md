@@ -51,7 +51,7 @@ inline float erfcxf(float x)
 
 ## 约束说明
 
-无
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 
@@ -93,6 +93,7 @@ inline float erfcxf(float x)
         asc_vf_call<compute_erfcxf_vf>(dim3(256), result, x, count);
     }
     ```
+
 
 输入输出示例如下：
 

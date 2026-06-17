@@ -52,7 +52,7 @@ inline float atanhf(float x)
 
 ## 约束说明
 
-无
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符/不支持Subnormal场景，当输入x为Subnormal数据时，本接口最终返回0。
 
 ## 需要包含的头文件
 

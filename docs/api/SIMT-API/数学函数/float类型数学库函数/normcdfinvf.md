@@ -52,7 +52,6 @@ inline float normcdfinvf(float x)
 -   当x∉\[0,1\]时，返回nan。
 
 ## 约束说明
-
 无
 
 ## 需要包含的头文件

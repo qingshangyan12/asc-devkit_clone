@@ -53,7 +53,8 @@ inline float y1f(float x)
 
 ## 约束说明
 
-使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
+-   使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
+-   不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：当输入数据为正Subnormal数据时，由于输入会被刷为0，导致本接口最终结果为-inf。
 
 ## 需要包含的头文件
 
@@ -95,6 +96,7 @@ inline float y1f(float x)
         asc_vf_call<compute_y1f_vf>(dim3(256), result, x, count);
     }
     ```
+
 
 输入输出示例如下：
 
