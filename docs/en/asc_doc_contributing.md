@@ -4,15 +4,15 @@
 
 The Ascend C documentation system consists of five core documents. Developers can improve and contribute to the documentation by submitting PRs:
 
-| Document | Content | Directory |
-|----------|---------|-----------|
+| Document | Content | Document Directory |
+|----------|---------|-------------------|
 | Getting Started Tutorial | Ascend C overview, environment setup, quick-start hands-on (HelloWorld, first operator) | `docs/guide/入门教程` |
 | Programming Guide | Programming models, programming paradigms, compilation & execution, hardware architecture, advanced programming | `docs/guide/编程指南` |
 | API Reference Manual | Interface parameters, constraints, examples, API associations | `docs/api/` |
 | Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/guide/算子实践参考/` |
 | Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/guide/跨代迁移兼容性指南/` |
 
-Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the Getting Started Tutorial; developers with prior experience should read the Ascend C Programming Guide.
+Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the [Getting Started Tutorial](./guide/入门教程/Ascend-C概述与学习路径.md); developers with prior experience should read the [Programming Guide](./guide/编程指南/本文档组织结构.md).
 
 ---
 
@@ -38,7 +38,7 @@ If you find that certain content is missing or incomplete in the documentation (
 
 If you have practical experience with Ascend C operator performance optimization to share:
 
-1. Refer to existing tuning case structures under `算子实践参考/优秀实践/`
+1. Refer to existing tuning case structures under `算子实践参考/优秀实践/` directory
 2. Write documentation following the "Performance Optimization Case Writing Convention" in this guide
 3. Submit a PR
 
@@ -53,14 +53,14 @@ Ascend C documentation follows the three-dimension requirements defined in the "
 | Rule | Requirement | Wrong Example | Correct Example |
 |------|-------------|---------------|-----------------|
 | Terminology Layering | High-level chapters use abstract terms; low-level chapters associate hardware terms on first occurrence | Overview document directly writes "data is moved from UB into VEC" | Overview document writes "data is moved from external storage into on-chip storage", low-level document writes "data is moved from Global Memory into UB (on-chip storage)" |
-| Easily Confused Concept Distinction | Similar-named concepts must be distinguished with comparison tables, not left for readers to infer | Only mentions "four-step method" without distinguishing Tiling flow and TPipe pipeline | Use a table to distinguish: four-step = programming flow, TPipe four steps = pipeline management paradigm |
+| Easily Confused Concept Distinction | Similar-named concepts must be distinguished with comparison tables, not left for readers to infer | Only mentions "four-step method" without distinguishing programming flow and pipeline management paradigm | Use a table to distinguish: four-step = programming flow, TPipe four steps = pipeline management paradigm |
 | Constraint Visibility | Hardware constraints should be annotated when concepts first appear, not deferred to later chapters or only exposed through compiler errors | 32B alignment constraint only appears in assert | Add a separate "Constraints and Limitations" paragraph before parameter descriptions |
 | First-occurrence Linking | When content managed by another document is mentioned, add a link on first occurrence only, not repeated | Every mention of DataCopy gets a link | Only the first mention of DataCopy links to the API Reference Manual |
-| No Reverse-order Reading | When concept B depends on concept A, A appears first or B has a clear reference link | API page directly uses TPipe concept without prior introduction | API page starts with a "Prerequisites" section linking to the corresponding Programming Guide chapter |
+| No Reverse-order Reading | When concept B depends on concept A, A appears first or B has a clear reference link | Mmad API reference page directly uses ND/DZ concepts without prior introduction | Before the Mmad API reference page, add a "Matrix Computation Fractal Introduction" section explaining matrix computation fractal-related concepts |
 
 ### Getting Started Tutorial Writing Conventions
 
-The Getting Started Tutorial is the **zero-to-one entry point** for developers new to Ascend C, helping them quickly build a comprehensive overview and complete their first operator.
+The Getting Started Tutorial is the **zero-basis entry point** for developers new to Ascend C, helping them quickly build a comprehensive overview and complete their first operator.
 
 **File Responsibilities**:
 
@@ -71,16 +71,6 @@ The Getting Started Tutorial is the **zero-to-one entry point** for developers n
 | Quick Start / Heterogeneous System & Programming Model | Entry-level concepts: Host/Device, AI Core, SIMD/SIMT selection | In-depth programming model principles (link to Programming Guide) |
 | Quick Start / SIMD Programming | Hands-on: HelloWorld + first operator (Add) | Duplicating the complete programming paradigm from the Programming Guide |
 | Quick Start / SIMT Programming | Hands-on: HelloWorld + first operator (Gather) | Duplicating the complete programming paradigm from the Programming Guide |
-
-**Directory Structure Mapping** (corresponds to Programming Guide chapters, excluding Technical Appendix):
-
-| Tutorial Directory | Corresponding Programming Guide Chapter | Tutorial Purpose |
-|--------------------|---------------------------------------|-----------------|
-| `入门教程/` | Programming Model / Overview | Overview & learning path |
-| `环境准备.md` | Compilation & Execution | Quick environment setup; detailed compilation instructions link to Programming Guide |
-| `快速入门/异构系统与编程模型.md` | Programming Model / Heterogeneous System + Programming Model / Overview | Entry-level concepts + SIMD/SIMT selection; in-depth links to Programming Guide |
-| `快速入门/基于SIMD编程/` | Programming Model / AI-Core-SIMD | HelloWorld + Add operator quick start |
-| `快速入门/基于SIMT编程/` | Programming Model / AI-Core-SIMT | HelloWorld + Gather operator quick start |
 
 **Link Direction**:
 - First mention of in-depth programming concepts → link to corresponding Programming Guide chapter
@@ -124,7 +114,6 @@ The API Reference Manual is the **interface detail authority source**. Each API 
 | 10 | Theoretical Performance (Appendix Reference) | Conditionally Recommended | Reference the theoretical performance appendix instead of inline cycle formulas |
 | 11 | Code Example | ✅ Required | Code snippet + link to sample repository (if a corresponding sample exists; if no sample is available, the link may be omitted) |
 | 12 | Related APIs | Conditionally Required | Mutually exclusive APIs + functionally similar APIs within the same version |
-
 ---
 
 #### 1. Product Support Status
@@ -136,10 +125,10 @@ The API Reference Manual is the **interface detail authority source**. Each API 
 ```
 ## Product Support Status
 
-- Ascend 950PR/Ascend 950DT：Supported
-- Atlas A3 Training Products/Atlas A3 Inference Products：Supported
-- Atlas A2 Training Products/Atlas A2 Inference Products：Supported
-- Atlas 200I/500 A2 Inference Products：Not supported
+- Ascend 950PR/Ascend 950DT: Supported
+- Atlas A3 Training Products/Atlas A3 Inference Products: Supported
+- Atlas A2 Training Products/Atlas A2 Inference Products: Supported
+- Atlas 200I/500 A2 Inference Products: Not supported
 ```
 
 **Requirements**:
@@ -182,7 +171,7 @@ C = A × B + Bias
 
 **Format**: Separate tables by product series, listing physical location, dimensions, and format of tensors involved in computation.
 
-**Sample**:
+**Sample** (using Mmad as an example):
 
 ```
 For Atlas A2/A3 series products:
@@ -212,7 +201,7 @@ For Ascend 950PR/Ascend 950DT products:
 
 **Format**: Group all overloads by function branch. Each prototype in a separate code block with 1-2 lines of description.
 
-**Sample**:
+**Sample** (using Mmad as an example):
 
 ```cpp
 // No bias: basic matrix multiply-accumulate prototype
@@ -300,7 +289,7 @@ __aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
 
 **Format**: List type combination tables by product series. Using Mmad API as an example, separate "no bias" and "with bias" tables.
 
-**Sample**:
+**Sample** (using Mmad as an example):
 
 ```
 For Atlas A2/A3 series products:
@@ -313,18 +302,18 @@ For Atlas A2/A3 series products:
 | bfloat16_t | bfloat16_t | float |
 | int4b_t | int4b_t | int32_t |
 
+For Ascend 950PR/DT products:
+(Similar tables, including fp8/hifloat8 and other unique types)
+
 | Left Matrix A | Right Matrix B | Bias | Result Matrix C |
 |--------------|----------------|------|-----------------|
 | int8_t | int8_t | int32_t | int32_t |
 | half | half | float | float |
 | ... | ... | ... | ... |
-
-For Ascend 950PR/DT products:
-(Similar tables, including fp8/hifloat8 and other unique types)
 ```
 
 **Requirements**:
-- **Must separate by product series**— different chips support different type combinations (e.g., 950PR adds fp8/hifloat8)
+- **Must separate by product series** — different chips support different type combinations (e.g., 950PR adds fp8/hifloat8)
 - No bias and with bias are **different tables** (bias column has additional type constraints)
 - Column headers use type names (no abbreviations), sorted by precision from low to high
 - Each combination is one row; do not merge "int8_t/int4b_t"
@@ -334,6 +323,8 @@ For Ascend 950PR/DT products:
 #### 7. Return Value Description (Conditionally Required)
 
 **Scope**: APIs with return values (e.g., Cast returns LocalTensor reference, GetBlockIdx returns uint32_t).
+
+**Format**: Specify return value type and meaning.
 
 **Sample**:
 
@@ -355,6 +346,35 @@ For Ascend 950PR/DT products:
 
 **Format**: Two layers. Single-parameter constraints are described inline in the parameter table (e.g., alignment, value range); multi-parameter constraints and multi-interface combination constraints in a separate "Constraints" paragraph.
 
+**Sample**:
+
+```
+## Constraints
+
+- Result matrix C only supports CO1 (L0C Buffer), left matrix A only supports A2 (L0A Buffer), right matrix B only supports B2 (L0B Buffer).
+- When any of M, K, N is 0, the instruction is not executed and is treated as NOP. **NOP.M should be avoided** — NOP.M measured latency is much greater than 1 cycle.
+- When M=1, GEMV mode is enabled by default; matrix A is read in ND format (not treated as ZZ/NZ format), starting address still requires 512-byte alignment.
+- One Mmad computation processes at least A(16×16×half) × B(16×16×half). When valid values are not multiples of 16, invalid data layout is as follows:
+  [Diagram]
+
+### Synchronization Optimization
+When accumulating along the K axis, whether PipeBarrier(PIPE_M) is needed between consecutive Mmad operations depends on computation volume:
+
+if ((m / 16) * (n / 16) < 10) {
+    AscendC::PipeBarrier<PIPE_M>();  // Computation below threshold, sync required
+}
+// When computation exceeds threshold, hardware handles dependency automatically
+
+### UnitFlag Feature Constraints
+Mmad and Fixpipe unitFlag must be enabled synchronously. First n-1 operations set to 2 (maintain occupancy), last operation set to 3 (release occupancy).
+[See UnitFlag Feature Description for details](link)
+
+### Special/Edge Value Constraints
+- Floating-point INF/NAN: Configure saturation/non-saturation mode via CTRL[48]
+- **Mmad should avoid NAN input**, which may cause execution errors
+- Integer types only support saturation mode
+```
+
 **Requirements**:
 - **Location constraints** must specify TPosition enum value, with parenthetical explanation of physical location
 - **NOP constraints** must specify avoidance scenarios and performance impact
@@ -369,6 +389,29 @@ For Ascend 950PR/DT products:
 
 **Scope**: Required for matrix/vector computation APIs involving key hardware features (HF32 mode, GEMV acceleration, UnitFlag parallel control, etc.). Simple APIs (configuration/utility) may omit.
 
+**Format**: Organized by feature into subsections, each with heading + table/paragraph description.
+**Sample** (using Mmad as an example):
+
+```
+## Key Feature Description
+
+### HF32 Mode
+Configure HF32 (Hybrid Float32) mode via SetHF32Mode/SetHF32TransMode to reduce computation through 9-bit exponent sharing for float matrix multiplication.
+| Mode | Description |
+|------|-------------|
+| HF32_OP0 | Exponent sharing along left matrix A column direction |
+| HF32_OP1 | Exponent sharing along right matrix B row direction |
+
+### GEMV Acceleration
+When M=1, Mmad automatically triggers GEMV (matrix-vector multiplication) acceleration path, skipping unnecessary matrix loading.
+
+### UnitFlag Parallel Control
+Controls fine-grained pipeline parallelism between Mmad and Fixpipe. See [UnitFlag Feature Description](UnitFlag.md).
+
+### K-direction Alignment Constraints
+K-direction has specific alignment requirements that vary by data type. See [K-direction Alignment Constraints](K-direction-alignment-constraints.md).
+```
+
 **Requirements**:
 - Each feature gets an independent subsection with ### heading
 - Feature description includes: what it is, when to use, how to configure, what constraints apply
@@ -381,16 +424,42 @@ For Ascend 950PR/DT products:
 
 **Format**: Do not inline cycle formulas in the API page. Reference the appendix instead.
 
+**Sample**:
+
+```
+## Theoretical Performance
+
+For theoretical performance data of this interface, see the appendix:
+- Cube instruction theoretical performance summary: [Cube Instruction Theoretical Performance Summary](api/appendix/Cube-instruction-theoretical-performance-summary.md)
+- Vector instruction theoretical performance summary: [Vector Instruction Theoretical Performance Summary](api/appendix/Vector-instruction-theoretical-performance-summary.md)
+```
+
 **Requirements**:
-- Theoretical performance data maintained centrally in the appendix
-- Reference format is a link to the corresponding appendix page
-- If the API has special performance considerations, supplement after the appendix reference
+- Theoretical performance data maintained centrally in the appendix; API pages no longer inline cycle formulas
+- Reference format is a link to the corresponding appendix page (Cube APIs reference Cube appendix, Vector APIs reference Vector appendix)
+- If the API has special performance considerations (e.g., first-instruction overhead, performance differences with specific parameters), supplement after the appendix reference
 
 ---
 
 #### 11. Code Example
 
-**Format**: Code snippet + link to sample repository.
+**Format**: Link to sample repository + scenario classification table.
+
+**Sample**:
+
+```
+## Code Example
+
+### Example Code
+```cpp
+#include "kernel_operator.h"
+
+extern "C" __global__ __aicore__ void mmad_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z) {
+    // Operator internal implementation logic...
+}
+
+For complete matrix multiplication samples, see [Mmad Sample](link).
+```
 
 **Requirements**:
 - Link to the specific directory in the sample repository (if a corresponding sample exists). If no sample is currently available, the link may be omitted.
@@ -470,7 +539,7 @@ Before reading this document, you should understand: xxx concept (link to Progra
 (If applicable: performance-optimized version, multi-data-type version, etc.)
 
 ## Performance Optimization
-(If applicable: list optimization techniques, link to optimization topics)
+(If applicable: list optimization techniques for this operator, link to optimization topics)
 
 ## Common Issues
 (If applicable: common pitfalls during development)
@@ -479,7 +548,7 @@ Before reading this document, you should understand: xxx concept (link to Progra
 **Key Requirements**:
 - For operators with multiple implementation approaches (e.g., MemBase vs RegBase), start with an approach difference table + selection recommendations
 - First API occurrence in code → link to API Reference Manual; subsequent occurrences do not repeat
-- Optimization approaches that vary by architecture version must be annotated with `[Applicable Version: 仅xxx]` and linked to Cross-generation Migration Guide
+- Optimization approaches that vary by architecture version must be annotated with `[Applicable Version: xxx only]` and linked to Cross-generation Migration Guide
 
 ### Cross-generation Migration Guide Writing Conventions
 
@@ -576,7 +645,7 @@ Refer to existing cases under `算子实践参考/优秀实践/` (e.g., FlashAtt
 Before submitting a documentation PR, check each item:
 
 **Content Accuracy**:
-- [ ] All hardware parameter values (capacity, granularity, range) are consistent with Architecture Specifications
+- [ ] All hardware parameter values (capacity, granularity, range) are consistent with [Architecture Specifications](./guide/编程指南/高级编程/硬件实现/架构规格/架构规格.md)
 - [ ] "Fixed value" and other absolute descriptions have been verified (many "fixed values" are actually determined by configuration parameters)
 - [ ] Data path descriptions match actual routes (no contradictions with other documents)
 
@@ -603,33 +672,6 @@ Before submitting a documentation PR, check each item:
 - [ ] Each API has at least 1 minimal runnable example
 - [ ] Examples can be copied, compiled, and run
 - [ ] Multiple data types/parameter combinations are covered (not just single usage)
-
----
-
-## Document Navigation Network
-
-The five documents are connected through cross-references to form a navigation network, following the principle of "whoever mentions content managed by another document adds the link":
-
-```
-Getting Started Tutorial ──in-depth concepts──→ Programming Guide
-                    ──first API mention──→ API Reference Manual
-
-Programming Guide ──first API mention──→ API Reference Manual
-                 ──first optimization──→ Operator Practice Reference
-                 ──version differences──→ Cross-generation Migration Guide
-
-API Reference Manual ──prerequisites──→ Programming Guide
-                     ──version differences──→ Cross-generation Migration Guide
-
-Operator Practice Reference ──first API usage──→ API Reference Manual
-                           ──programming concepts──→ Programming Guide
-                           ──cross-architecture optimization──→ Cross-generation Migration Guide
-
-Cross-generation Migration Guide ──concept definitions──→ Programming Guide
-                               ──new API details──→ API Reference Manual
-```
-
-The sample repository (`asc-devkit/examples/`) is not part of the documentation system, but code examples in the five documents may link to the sample repository.
 
 ---
 
