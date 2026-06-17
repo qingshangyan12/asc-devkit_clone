@@ -51,7 +51,9 @@ inline float erfcxf(float x)
 
 ## 约束说明
 
-无
+<!-- npu="950" id1 -->
+-   不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，在极少数场景下内部计算的除法结果为Subnormal范围内的数据，会被刷为0，导致本接口最终结果为0。
+<!-- end id1 -->
 
 ## 需要包含的头文件
 
@@ -93,6 +95,7 @@ inline float erfcxf(float x)
         asc_vf_call<compute_erfcxf_vf>(dim3(256), result, x, count);
     }
     ```
+
 
 输入输出示例如下：
 
