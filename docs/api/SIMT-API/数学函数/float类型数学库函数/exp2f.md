@@ -57,7 +57,7 @@ inline float exp2f(float x)
 
 ## 约束说明
 
-无
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 
