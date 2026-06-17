@@ -512,6 +512,78 @@ for (uint16_t i = 0; i < extent1; ++i) {
 
 ### 矢量计算
 
+Reg矢量计算接口直接操作矢量数据寄存器或掩码寄存器，通常带有mask参数控制有效元素。主要分为三类：
+
+#### 矢量数据寄存器计算
+
+基础算术接口完成寄存器之间的逐元素计算：
+
+```cpp
+vector_float src0_reg;
+vector_float src1_reg;
+vector_float dst_reg;
+vector_bool mask = asc_create_mask_b32(MASK_PATTERN_ALL);
+
+// 矢量加法
+asc_add(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量乘法
+asc_mul(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量减法
+asc_sub(dst_reg, src0_reg, src1_reg, mask);
+
+// 矢量除法
+asc_div(dst_reg, src0_reg, src1_reg, mask);
+```
+
+标量算术接口完成寄存器与标量的逐元素计算：
+
+```cpp
+float scalar_value = 2.0f;
+
+// 矢量加标量
+asc_adds(dst_reg, src_reg, scalar_value, mask);
+
+// 矢量乘标量
+asc_muls(dst_reg, src_reg, scalar_value, mask);
+```
+
+#### 掩码寄存器计算
+
+逻辑接口可操作矢量数据寄存器或掩码寄存器：
+
+```cpp
+vector_bool mask0;
+vector_bool mask1;
+vector_bool dst_mask;
+
+// 逻辑与
+asc_and(dst_mask, mask0, mask1, mask);
+
+// 逻辑或
+asc_or(dst_mask, mask0, mask1, mask);
+
+// 逻辑非
+asc_not(dst_mask, mask0, mask);
+```
+
+#### 比较与选择
+
+比较接口输出比较结果，选择接口按mask在两个源操作数之间选择：
+
+```cpp
+vector_bool cmp_mask;
+
+// 比较（输出比较结果mask）
+asc_compare(cmp_mask, src0_reg, src1_reg, CMPMODE::EQ, mask);
+
+// 选择（按cmp_mask选择src0或src1）
+asc_select(dst_reg, cmp_mask, src0_reg, src1_reg, SELMODE::SEL, mask);
+```
+
+这些接口往往有更多参数或限制条件，建议在具体使用时查看对应API页面。
+
 #### 尾块处理
 
 当待计算数据总量不是`VL`的整数倍时，最后一轮迭代需要处理不足一个VL的数据。Reg矢量编程通过`asc_update_mask_b*`实现尾块处理：每次调用根据剩余元素数生成当前轮的mask，并在生成后自动减去一个VL对应的元素数。此种写法可以减少循环内通过if判断尾块的操作，避免违反Hardware Loop的约束条件。
