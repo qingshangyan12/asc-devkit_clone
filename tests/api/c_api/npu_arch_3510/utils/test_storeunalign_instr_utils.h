@@ -346,7 +346,7 @@ protected:                                                                      
 };                                                                                              \
                                                                                                 \
 namespace {                                                                                     \
-void cce_name##_##data_type##_Stub(vector_store_unalign& src0, vector_bool src1,                \
+void cce_name##_##data_type##_Stub(vector_store_unalign& src0, vector_bool mask,                \
     __ubuf__ cce_dst_type *&dst) {}                                                             \
 }                                                                                               \
                                                                                                 \
@@ -354,13 +354,13 @@ TEST_F(TestVectorDataMove##class_name##_##data_type##_CApi, c_api_name##_##data_
 {                                                                                               \
     __ubuf__ data_type *dst = reinterpret_cast<__ubuf__ data_type *>(0);                        \
     vector_store_unalign src0;                                                                  \
-    vector_bool src1;                                                                           \
+    vector_bool mask;                                                                           \
                                                                                                 \
     MOCKER_CPP(cce_name, void(vector_store_unalign&, vector_bool, __ubuf__ cce_dst_type *&))    \
         .times(1)                                                                               \
         .will(invoke(cce_name##_##data_type##_Stub));                                           \
                                                                                                 \
-    c_api_name(dst, src0, src1);                                                                \
+    c_api_name(dst, src0, mask);                                                                \
     GlobalMockObject::verify();                                                                 \
 }
 

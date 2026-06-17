@@ -1357,21 +1357,21 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__  int4b_t*& dst, vector_sto
 }
 
 __simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
-    vector_bool src1)
+    vector_bool mask)
 {
-    asc_storeunalign_impl(dst, src0, src1);
+    asc_storeunalign_impl(dst, src0, mask);
 }
 
 __simd_callee__ inline void asc_storeunalign(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
-    vector_bool src1)
+    vector_bool mask)
 {
-    asc_storeunalign_impl(dst, src0, src1);
+    asc_storeunalign_impl(dst, src0, mask);
 }
 
 __simd_callee__ inline void asc_storeunalign(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
-    vector_bool src1)
+    vector_bool mask)
 {
-    asc_storeunalign_impl(dst, src0, src1);
+    asc_storeunalign_impl(dst, src0, mask);
 }
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
