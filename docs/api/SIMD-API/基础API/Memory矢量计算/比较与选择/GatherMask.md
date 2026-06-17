@@ -82,7 +82,7 @@
 
     <cann-filter npu-type="310p">
 
-    Atlas 推理系列产品，支持模式1-6。
+    Atlas 推理系列产品AI Core，支持模式1-6。
 
     </cann-filter>
 
