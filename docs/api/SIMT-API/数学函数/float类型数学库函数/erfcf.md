@@ -50,7 +50,9 @@ inline float erfcf(float x)
 
 ## 约束说明
 
-无
+<!-- npu="950" id1 -->
+-   不支持Subnormal场景：本接口内部实现使用到了[exp2f](exp2f.md)，由于exp2f不支持Subnormal场景，在极少数场景下内部指数计算结果为Subnormal数据，导致本接口最终结果为+0。
+<!-- end id1 -->
 
 ## 需要包含的头文件
 
