@@ -51,7 +51,7 @@ bfloat16_t __hdiv(const bfloat16_t x, const bfloat16_t y)
 
 ## 约束说明
 
-无
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 
