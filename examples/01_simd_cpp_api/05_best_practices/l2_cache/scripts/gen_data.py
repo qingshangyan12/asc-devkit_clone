@@ -25,42 +25,42 @@ ELEMENT_COUNT = M * N
 def gen_golden_data(scenario_num):
     """根据 scenario 编号生成对应的输入数据文件"""
 
-    os.makedirs("input", exist_ok=True)
-    os.makedirs("output", exist_ok=True)
+    input_dir = "./build/input"
+    output_dir = "./build/output"
+    os.makedirs(input_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     rng = np.random.default_rng(0)
 
     if scenario_num <= 3:
         # Case 1-3: 重复搬运场景，仅需一个输入矩阵
         repeat_input = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
-        repeat_input.tofile("./input/repeat_input.bin")
+        repeat_input.tofile(f"{input_dir}/repeat_input.bin")
         print(f"[INFO] Case {scenario_num}: Generated repeat_input.bin with shape [{M}, {N}]")
 
     elif scenario_num <= 5:
         # Case 4-5: Add 算子场景，需要两个输入矩阵
         add_x = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
         add_y = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
-        add_x.tofile("./input/add_x.bin")
-        add_y.tofile("./input/add_y.bin")
+        add_x.tofile(f"{input_dir}/add_x.bin")
+        add_y.tofile(f"{input_dir}/add_y.bin")
         add_output = add_x + add_y
-        add_output.tofile("./output/golden_add.bin")
+        add_output.tofile(f"{output_dir}/golden_add.bin")
         print(f"[INFO] Case {scenario_num}: Generated add_x.bin, add_y.bin with shape [{M}, {N}]")
         print(f"[INFO] Case {scenario_num}: Generated golden_add.bin (x + y) for verification")
 
     else:
-        # Case 6-8: 流水线/并行场景
-        # 生成 Add 算子的两个输入矩阵
+        # Case 6-9: 流水线/并行场景
         add_x = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
         add_y = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
-        add_x.tofile("./input/add_x.bin")
-        add_y.tofile("./input/add_y.bin")
+        add_x.tofile(f"{input_dir}/add_x.bin")
+        add_y.tofile(f"{input_dir}/add_y.bin")
         add_output = add_x + add_y
-        add_output.tofile("./output/golden_add.bin")
+        add_output.tofile(f"{output_dir}/golden_add.bin")
 
-        # 生成 Repeat kernel 的输入矩阵（与 Add 不同的数据，用于展示 L2 污染的影响）
-        rng2 = np.random.default_rng(42)  # 使用不同的种子，确保数据不同
+        rng2 = np.random.default_rng(42)
         repeat_input = rng2.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
-        repeat_input.tofile("./input/repeat_input.bin")
+        repeat_input.tofile(f"{input_dir}/repeat_input.bin")
 
         print(f"[INFO] Case {scenario_num}: Generated add_x.bin, add_y.bin, repeat_input.bin with shape [{M}, {N}]")
         print(f"[INFO] Case {scenario_num}: Generated golden_add.bin (x + y) for verification")

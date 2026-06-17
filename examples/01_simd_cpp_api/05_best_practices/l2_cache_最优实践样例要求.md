@@ -6,7 +6,7 @@
 由于global tensor是默认使能l2 cache的，因此case2相较于case1的区别是调用了SetL2CacheHint接口将l2 cache关闭，可参考：docs\api\SIMD-API\基础数据结构\GlobalTensor\SetL2CacheHint.md。
 
 
-2.case3来源于样例examples\01_simd_cpp_api\05_best_practices\04_memory_access\data_copy的case6，其中COPY_DST为UB。通过case1和case3的对比，希望说明由于L2 cache的容量有限，因此分片重复搬运较整块重复搬运，由于能够减少每次的搬运量，因此能够提高l2 cache的命中率，从而提升性能。
+2.case3来源于样例examples\01_simd_cpp_api\05_best_practices\04_memory_access\data_copy的case5，其中COPY_DST为UB。通过case1和case3的对比，希望说明由于L2 cache的容量有限，因此分片重复搬运较整块重复搬运，由于能够减少每次的搬运量，因此能够提高l2 cache的命中率，从而提升性能。
 
 3.case4和case5则来源于样例examples\01_simd_cpp_api\05_best_practices\00_vector_compute\add_high_performance的case4和case5，目的是说明对于不需要复用的流式数据，关闭默认的l2 cache能够优化性能。
 

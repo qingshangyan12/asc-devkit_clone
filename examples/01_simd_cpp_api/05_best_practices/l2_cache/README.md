@@ -98,40 +98,40 @@ $$z = x + y$$
 
 ## 性能指标说明
 
-### MTE2 性能表
+本样例使用 `msprof op` 工具采集性能数据，生成两类 CSV 文件：
+
+### PipeUtilization.csv
 
 <table>
 <tr><th>字段名</th><th>字段含义</th></tr>
-<tr><td>Task Duration(μs)</td><td>整个任务执行的总时间，算子执行时间以该参数为准。</td></tr>
-<tr><td>*_total_cycles</td><td>Task 执行总 cycle 数。</td></tr>
-<tr><td>*_time(μs)</td><td>Task 在对应 AI Core 上的理论执行时间，单位为 μs。</td></tr>
-<tr><td>*_mte2_time(μs)</td><td>MTE2 类型指令（GM → AI Core 搬运类指令）耗时，单位为 μs。</td></tr>
-<tr><td>*_mte2_ratio</td><td>MTE2 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
-<tr><td>*_mte3_time(μs)</td><td>MTE3 类型指令（UB → GM 搬运类指令）耗时，单位为 μs。</td></tr>
-<tr><td>*_mte3_ratio</td><td>MTE3 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
-<tr><td>*_vec_time(μs)</td><td>vec 类型指令（向量类运算指令）耗时，单位 μs。</td></tr>
-<tr><td>*_vec_ratio</td><td>vec 类型指令的 cycle 数在 total cycle 数中的占用比。</td></tr>
+<tr><td>aiv_time(μs)</td><td>整个 Task 在 Vector AI Core 上的执行时间，以该参数为准评估算子性能。</td></tr>
+<tr><td>aiv_total_cycles</td><td>Task 执行总 cycle 数。</td></tr>
+<tr><td>aiv_vec_time(μs)</td><td>vec 类型指令（向量类运算指令）耗时，单位 μs。</td></tr>
+<tr><td>aiv_vec_ratio</td><td>vec 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
+<tr><td>aiv_mte2_time(μs)</td><td>MTE2 类型指令（GM → AI Core 搬运类指令）耗时，单位为 μs。</td></tr>
+<tr><td>aiv_mte2_ratio</td><td>MTE2 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
+<tr><td>aiv_mte3_time(μs)</td><td>MTE3 类型指令（UB → GM 搬运类指令）耗时，单位为 μs。</td></tr>
+<tr><td>aiv_mte3_ratio</td><td>MTE3 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
+<tr><td>aiv_scalar_time(μs)</td><td>scalar 类型指令（标量运算类指令）耗时，单位 μs。</td></tr>
+<tr><td>aiv_scalar_ratio</td><td>scalar 类型指令的 cycle 数在 total cycle 数中的占比。</td></tr>
 </table>
 
-### L2Cache 性能表
+### L2Cache.csv
 
 <table>
 <tr><th>字段名</th><th>字段含义</th></tr>
-<tr><td>Task Duration(μs)</td><td>整个任务执行的总时间，算子执行时间以该参数为准。</td></tr>
-<tr><td>*_total_cycles</td><td>Task 执行总 cycle 数。</td></tr>
-<tr><td>*_time(μs)</td><td>Task 在对应 AI Core 上的理论执行时间，单位为 μs。</td></tr>
-<tr><td>*_write_cache_hit</td><td>写 Cache 命中的次数。</td></tr>
-<tr><td>*_write_cache_miss_allocate</td><td>写 Cache 缺失后重新分配缓存的次数。</td></tr>
-<tr><td>*_r*_read_cache_hit</td><td>读 r* 通道 Cache 命中次数，r0/r1 为硬件读写的两个通道，分析总读命中次数时需将两个通道累加。</td></tr>
-<tr><td>*_r*_read_cache_miss_allocate</td><td>读 r* 通道 Cache 缺失后重新分配的次数，r0/r1 为硬件读写的两个通道，分析总读缺失次数时需将两个通道累加。</td></tr>
-<tr><td>*_read_local_l2_hit</td><td>读 Cache 命中的次数。</td></tr>
-<tr><td>*_read_local_l2_miss</td><td>读 Cache 缺失次数。</td></tr>
-<tr><td>*_read_local_l2_victim</td><td>读 Cache 未命中并触发 Cache 中数据被换出的次数。</td></tr>
+<tr><td>aiv_time(μs)</td><td>整个 Task 在 Vector AI Core 上的执行时间。</td></tr>
+<tr><td>aiv_total_cycles</td><td>Task 执行总 cycle 数。</td></tr>
+<tr><td>aiv_write_cache_hit</td><td>写 Cache 命中的次数。</td></tr>
+<tr><td>aiv_write_cache_miss_allocate</td><td>写 Cache 缺失后重新分配缓存的次数。</td></tr>
+<tr><td>aiv_r0_read_cache_hit</td><td>读 r0 通道 Cache 命中次数，r0/r1 为硬件读写的两个通道。</td></tr>
+<tr><td>aiv_r0_read_cache_miss_allocate</td><td>读 r0 通道 Cache 缺失后重新分配的次数。</td></tr>
+<tr><td>aiv_r1_read_cache_hit</td><td>读 r1 通道 Cache 命中次数。</td></tr>
+<tr><td>aiv_r1_read_cache_miss_allocate</td><td>读 r1 通道 Cache 缺失后重新分配的次数。</td></tr>
+<tr><td>aiv_read_hit_rate(%)</td><td>读 Cache 命中率 = (r0_hit + r1_hit) / (r0_hit + r1_hit + r0_miss_allocate + r1_miss_allocate)。</td></tr>
 </table>
 
-> **说明**：Atlas A2/A3 系列和 Ascend 950 系列的 profiler 输出字段不同，命中率计算方式也不同。
-> Atlas A2/A3 系列使用 `l2cache_hit_ratio = (r0_hit + r1_hit) / (r0_hit + r1_hit + r0_miss_allocate + r1_miss_allocate)`；
-> Ascend 950 系列使用 `l2cache_hit_ratio = hit / (hit + miss + victim)`。
+> **说明**：以上字段为 Atlas A2/A3 系列使用 `msprof op` 的输出格式。Ascend 950 系列的 profiler 输出字段不同，数据表格暂留空待补充。
 
 ## 样例实现与性能分析
 
@@ -182,29 +182,29 @@ GM 矩阵: [12288, 12288]
 
 **预期**：L2 命中率约 75%（第 1 轮 miss，第 2~4 轮命中）
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>N切4份，每份重复4次，L2默认开启</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>N切4份，每份重复4次，L2默认开启</td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>~304</td><td>~548K</td><td>~0.02</td><td>~0.006%</td><td>~303</td><td>~99.8%</td><td>~0.001</td><td>~0</td><td>~1.0</td><td>~0.3%</td></tr>
 </table>
 
-**L2Cache 性能数据**：
-
-Atlas A2/A3 系列：
+_L2Cache（各核平均值）：_
 
 <table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_r0_read_cache_hit</th><th>aiv_r0_read_cache_miss_allocate</th><th>aiv_r1_read_cache_hit</th><th>aiv_r1_read_cache_miss_allocate</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>~304</td><td>~548K</td><td>~75.0%</td><td>第1轮miss(25%)，第2~4轮命中(75%)，与理论完全一致</td></tr>
 </table>
 
-Ascend 950 系列：
+> **Ascend 950 系列**：数据暂缺，待补充。
 
-<table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_read_local_l2_hit</th><th>aiv_read_local_l2_miss</th><th>aiv_read_local_l2_victim</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-</table>
+**实测 vs 理论分析**：
+
+- **L2 命中率 75.0%**：与理论预测完全一致（4 轮搬运中第 1 轮全部 miss、第 2~4 轮全部命中）。
+- **MTE2 占比 99.8%**：纯数据搬运场景，MTE2 耗时占据绝对主导，vec/scalar/mte3 几乎可忽略。
+- **数据搬运量验证**：75% 命中率下实际从 GM 读取数据量 = 302MB（首轮）+ 3×302MB×25%（后续 miss）= ~528MB；若全部从 GM 读取则需 1208MB。理论加速比 = 1208 / 528 = 2.29×，与实际 Case 2 对比时验证。
 
 ---
 
@@ -228,29 +228,29 @@ ProcessSplitFourAndRepeat4Times(); // 搬运逻辑与 Case 1 完全相同
 
 **预期**：L2 命中率约 0%（数据不写入 L2，无法命中），MTE2 耗时约等于 Case 1 的 4 倍（4 轮全部走 GM），端到端性能明显劣化
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>N切4份，每份重复4次，L2关闭</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>N切4份，每份重复4次，L2关闭</td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>~681</td><td>~1,226K</td><td>~0.02</td><td>~0.003%</td><td>~679</td><td>~99.8%</td><td>~0.001</td><td>~0</td><td>~1.5</td><td>~0.2%</td></tr>
 </table>
 
-**L2Cache 性能数据**：
-
-Atlas A2/A3 系列：
+_L2Cache（各核平均值）：_
 
 <table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_r0_read_cache_hit</th><th>aiv_r0_read_cache_miss_allocate</th><th>aiv_r1_read_cache_hit</th><th>aiv_r1_read_cache_miss_allocate</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>~681</td><td>~1,226K</td><td>~0.0%</td><td>L2 关闭，所有读取均走 GM，命中率几乎为零</td></tr>
 </table>
 
-Ascend 950 系列：
+> **Ascend 950 系列**：数据暂缺，待补充。
 
-<table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_read_local_l2_hit</th><th>aiv_read_local_l2_miss</th><th>aiv_read_local_l2_victim</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-</table>
+**实测 vs 理论分析**：
+
+- **L2 命中率 ~0%**：与预期一致，关闭 L2 Cache 后数据不写入 L2，无法命中。
+- **耗时 681μs vs Case 1 的 304μs = 2.24×**：理论加速比为 1208MB / 528.5MB = 2.29×，实测 2.24× 与理论高度吻合。微小差异来自各核对 GM 带宽的实际竞争。
+- **MTE2 占比 99.8%**：与 Case 1 一致，纯搬运场景 MTE2 占绝对主导。
 
 **优化效果分析**：
 
@@ -288,29 +288,30 @@ RepeatCopy(0, n, 4);
 
 **预期**：L2 命中率接近 0%，MTE2 耗时接近 Case 2（L2 关闭）的水平，端到端性能远差于 Case 1
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>整块矩阵，连续重复4次，L2默认开启</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>整块矩阵，连续重复4次，L2默认开启</td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>~488</td><td>~878K</td><td>~0.02</td><td>~0.004%</td><td>~486</td><td>~99.7%</td><td>~0.001</td><td>~0</td><td>~1.1</td><td>~0.2%</td></tr>
 </table>
 
-**L2Cache 性能数据**：
-
-Atlas A2/A3 系列：
+_L2Cache（各核平均值）：_
 
 <table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_r0_read_cache_hit</th><th>aiv_r0_read_cache_miss_allocate</th><th>aiv_r1_read_cache_hit</th><th>aiv_r1_read_cache_miss_allocate</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>~488</td><td>~878K</td><td>~38%<br/>（block 0-39）<br/>~74%<br/>（block 40-47）</td><td>整块(302MB)超出L2容量(192MB)，多数 block 命中率低；block 40-47 的特殊性未在代码中找到依据</td></tr>
 </table>
 
-Ascend 950 系列：
+> **Ascend 950 系列**：数据暂缺，待补充。
 
-<table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_read_local_l2_hit</th><th>aiv_read_local_l2_miss</th><th>aiv_read_local_l2_victim</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-</table>
+**实测 vs 理论分析**：
+
+- **多数 block（0-39）L2 命中率仅 ~38%**：整块矩阵（302MB）远超 A2/A3 L2 容量（192MB），第 1 轮的数据在第 2 轮之前即被逐出。命中率仅为 Case 1（75%）的一半左右。
+- **耗时 488μs vs Case 1 的 304μs = 1.61×**：理论与实测吻合：Case 3 实际 GM 读取量 = 302MB + 3×302MB×(1-0.38) = ~864MB，Case 1 为 ~528MB，理论比 = 864/528 = 1.64×，与实测 1.61× 接近。
+- **block 40-47 命中率 ~74%**：与 Case 1 一致，但代码中 48 核 workload 完全相同（均为 `M/48` 行），该差异的原因未在代码中找到依据，可能源于 profiler 统计特性或 L2 替换策略的边界效应。
+- **与 Case 2（L2 关闭，681μs）对比**：Case 3 虽 L2 命中率不高，但仍优于完全关闭 L2（488μs < 681μs），说明 L2 即使因容量不足而命中率低，仍能提供一定加速。
 
 **优化效果分析**：
 
@@ -357,13 +358,29 @@ for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
 - 默认 L2 开启时，MTE2 在搬运数据到 UB 的同时，还会将数据写入 L2 Cache（Cache Line 填充）
 - 这个额外的写操作消耗了 L2 Cache 控制器的内部带宽
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Add + 双缓冲，L2默认开启</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Add + 双缓冲，L2默认开启</td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>~536</td><td>~965K</td><td>~29.7</td><td>~5.5%</td><td>~534</td><td>~99.7%</td><td>~151</td><td>~28.2%</td><td>~3.8</td><td>~0.7%</td></tr>
 </table>
+
+_L2Cache：_
+
+<table>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>~536</td><td>~965K</td><td>~0%</td><td>流式数据只读一次，无复用，命中率为零</td></tr>
+</table>
+
+> **Ascend 950 系列**：数据暂缺，待补充。
+
+**实测 vs 理论分析**：
+
+- **L2 命中率 ~0%**：x、y 为流式数据（只读一次），不会发生 Cache Hit，命中率为零符合预期。
+- **PipeUtilization 特征**：Add 算子双缓冲流水，MTE2（搬运）占 ~99.7%，vec（向量加）占 ~5.5%。MTE2 与 MTE3 有显著重叠（mte2_ratio + mte3_ratio > 1.0），说明 Ping-Pong 双缓冲有效实现了搬运与写回的流水线并行。
+- **关注点**：MTE2 额外执行了 L2 Cache 写操作（Cache Line 填充），这是不必要的开销，也是 Case 5 的优化方向。
 
 **优化效果分析**：
 
@@ -397,13 +414,31 @@ ProcessDoubleBuffer(); // 其余逻辑与 Case 4 完全相同
 
 **预期**：MTE2 耗时显著下降（约 30%），端到端性能明显提升
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Add + 双缓冲，L2 bypass</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>Add + 双缓冲，L2 bypass</td></tr>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>~385</td><td>~693K</td><td>~29.7</td><td>~7.7%</td><td>~382</td><td>~99.1%</td><td>~165</td><td>~42.9%</td><td>~3.9</td><td>~1.0%</td></tr>
 </table>
+
+_L2Cache：_
+
+<table>
+<tr><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>~385</td><td>~693K</td><td>~0%</td><td>L2 bypass，数据不经过 L2，命中率为零（符合预期）</td></tr>
+</table>
+
+> **Ascend 950 系列**：数据暂缺，待补充。
+
+**实测 vs 理论分析**：
+
+- **耗时优化 28.2%**：536μs → 385μs。Case 5 通过 bypass 跳过了 L2 Cache 的写入开销，MTE2 搬运效率显著提升。
+- **MTE2 搬运量不变，但耗时下降**：MTE2 从 534μs 降至 382μs（-28.5%），说明 L2 Cache Line 填充写操作实际消耗了可观的 MTE2 带宽。
+- **vec 耗时不变（~29.7μs）**：向量计算与 L2 无关，bypass 不影响计算部分，符合预期。
+- **MTE3 占比上升（28.2% → 42.9%）**：MTE3 耗时基本不变（~151μs → ~165μs），但总时长缩短使占比相对升高。
+- **结论**：对于流式数据（只读一次），使用 `CACHE_MODE_DISABLE` bypass L2 Cache 可获得约 28% 的性能提升，同时避免 L2 污染。
 
 **优化效果分析**：
 
@@ -473,29 +508,35 @@ aclrtSynchronizeStream(stream);
 
 **预期**：DataCopyRepeat 的 L2 命中率低于 Case 1（独立运行时），因为 Add 的流式数据写入了 L2 Cache，挤占了原本可用于缓存 repeat_input 的空间。
 
-**MTE2 性能数据**（仅统计 DataCopyRepeat kernel 的耗时）：
+**性能数据（Atlas A2/A3 系列）**：
+
+> **说明**：Add 和 DataCopyRepeat 先后在全部 48 个核上串行执行，msprof 采集的是整个流水线的综合性能。per-block 统计呈现两个明显分组，以下列出各组数据的特征。
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>Add(L2开)→Repeat(L2开)</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>Add(L2开)→Repeat(L2开)</td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>0-39</td><td>~534</td><td>~961K</td><td>~29.7</td><td>~5.6%</td><td>~531</td><td>~99.5%</td><td>~146</td><td>~27.3%</td><td>~3.8</td><td>~0.7%</td></tr>
+<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~29.7</td><td>~14.6%</td><td>~204</td><td>~99.7%</td><td>~70</td><td>~34.2%</td><td>~3.1</td><td>~1.5%</td></tr>
 </table>
 
-**L2Cache 性能数据**（仅统计 DataCopyRepeat kernel）：
-
-Atlas A2/A3 系列：
+_L2Cache（各 block 平均值）：_
 
 <table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_r0_read_cache_hit</th><th>aiv_r0_read_cache_miss_allocate</th><th>aiv_r1_read_cache_hit</th><th>aiv_r1_read_cache_miss_allocate</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>0-39</td><td>~534</td><td>~961K</td><td>~0%</td><td>综合 Add + Repeat，L2 命中率近零</td></tr>
+<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~0%</td><td>同上</td></tr>
 </table>
 
-Ascend 950 系列：
+> **Ascend 950 系列**：数据暂缺，待补充。
 
-<table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_read_local_l2_hit</th><th>aiv_read_local_l2_miss</th><th>aiv_read_local_l2_victim</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-</table>
+**实测 vs 理论分析**：
+
+- **L2 命中率 ~0%**：与 Case 1（独立运行 Repeat，命中率 75%）形成鲜明对比。Add 写入的 302MB×2=604MB 流式数据挤占了 L2 Cache（192MB），repeat_input 的缓存数据被逐出，导致后续 Repeat 算子无法从 L2 命中。
+- **block 0-39 耗时 ~534μs**：与 Case 4（单独 Add，~536μs）基本一致，Add 部分性能未受干扰。
+- **关注点**：Add 的 L2 污染导致后续 Repeat 算子 L2 命中率从 75% 降至 ~0%，验证了"流式数据 L2 污染后序复用算子"的核心结论。
+
+**优化效果分析**：
 
 ---
 
@@ -527,29 +568,31 @@ aclrtSynchronizeStream(stream);
 
 **预期**：DataCopyRepeat 的 L2 命中率与 Case 1（独立运行）接近，Add 的 L2 bypass 保护了后续算子的 L2 复用
 
-**MTE2 性能数据**（仅统计 DataCopyRepeat kernel 的耗时）：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>Add(L2 bypass)→Repeat(L2开)</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>Add(L2 bypass)→Repeat(L2开)</td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>0-39</td><td>~384</td><td>~691K</td><td>~29.7</td><td>~7.7%</td><td>~381</td><td>~99.3%</td><td>~166</td><td>~43.3%</td><td>~3.8</td><td>~1.0%</td></tr>
+<tr><td>40-47</td><td>~175</td><td>~315K</td><td>~29.7</td><td>~17.0%</td><td>~174</td><td>~99.5%</td><td>~58</td><td>~32.9%</td><td>~3.2</td><td>~1.8%</td></tr>
 </table>
 
-**L2Cache 性能数据**（仅统计 DataCopyRepeat kernel）：
-
-Atlas A2/A3 系列：
+_L2Cache（各 block 平均值）：_
 
 <table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_r0_read_cache_hit</th><th>aiv_r0_read_cache_miss_allocate</th><th>aiv_r1_read_cache_hit</th><th>aiv_r1_read_cache_miss_allocate</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>0-39</td><td>~384</td><td>~691K</td><td>~0%</td><td>综合 Add(bypass) + Repeat，L2 命中率近零</td></tr>
+<tr><td>40-47</td><td>~175</td><td>~315K</td><td>~0%</td><td>同上</td></tr>
 </table>
 
-Ascend 950 系列：
+> **Ascend 950 系列**：数据暂缺，待补充。
 
-<table>
-<tr><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_read_local_l2_hit</th><th>aiv_read_local_l2_miss</th><th>aiv_read_local_l2_victim</th><th>L2Cache命中率</th></tr>
-<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-</table>
+**实测 vs 理论分析**：
+
+- **block 0-39 耗时 ~384μs vs Case 6 同组 ~534μs**：下降 28%，与 Case 5 的 Add bypass 收益一致。Add 绕过了 L2 Cache 额外开销。
+- **block 40-47 耗时 ~175μs vs Case 6 同组 ~204μs**：下降 14%，Add bypass 后 L2 空间更干净，Repeat 受益。
+- **Case 7 vs Case 6 对比**：两端均受益于 L2 bypass，Add 减 28%、Repeat 减 14%。
 
 **优化效果分析**：
 
@@ -591,13 +634,31 @@ aclrtSynchronizeStream(streamRepeat);
 
 **对比方式**：与 Case 7 对比，Case 7 是串行 + Add(L2 bypass)，Case 8 是并行 + Add(L2 开启)，展示并行场景下 L2 污染的叠加效应。
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td>Add(L2开) || Repeat(L2开)</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td>Add(L2开) || Repeat(L2开)</td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>0-39</td><td>~537</td><td>~966K</td><td>~29.7</td><td>~5.5%</td><td>~534</td><td>~99.6%</td><td>~142</td><td>~26.5%</td><td>~3.8</td><td>~0.7%</td></tr>
+<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~29.7</td><td>~14.6%</td><td>~203</td><td>~99.7%</td><td>~67</td><td>~32.8%</td><td>~3.1</td><td>~1.5%</td></tr>
 </table>
+
+_L2Cache（各 block 平均值）：_
+
+<table>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>0-39</td><td>~537</td><td>~966K</td><td>~0%</td><td>综合 Add(L2 开) + Repeat，L2 命中率近零</td></tr>
+<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~0%</td><td>同上</td></tr>
+</table>
+
+> **Ascend 950 系列**：数据暂缺，待补充。
+
+**实测 vs 理论分析**：
+
+- **并行场景中，Add 和 Repeat 同时运行在 48 核上（不同 stream）**，msprof 采集的是两条流水线的综合数据。
+- **block 0-39 耗时 ~537μs**：与 Case 4 单独 Add（~536μs）和 Case 6 串行（~534μs）一致，Add 开 L2 的耗时稳定。
+- **并行 wall time**：瓶颈在 Add 算子（~537μs），Repeat 更早完成。
 
 ---
 
@@ -615,13 +676,31 @@ aclrtSynchronizeStream(streamRepeat);
 
 **对比方式**：与 Case 8 对比，唯一的变量是并行场景下 Add 的 L2 配置（开启 vs bypass）
 
-**MTE2 性能数据**：
+**性能数据（Atlas A2/A3 系列）**：
+
+_PipeUtilization：_
 
 <table>
-<tr><th>架构</th><th>Task Duration(μs)</th><th>说明</th></tr>
-<tr><td>Atlas A2/A3 系列</td><td></td><td>Add(L2 bypass) || Repeat(L2开)</td></tr>
-<tr><td>Ascend 950 系列</td><td></td><td>Add(L2 bypass) || Repeat(L2开)</td></tr>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
+<tr><td>0-39</td><td>~387</td><td>~696K</td><td>~29.7</td><td>~7.7%</td><td>~384</td><td>~99.2%</td><td>~187</td><td>~48.4%</td><td>~3.9</td><td>~1.0%</td></tr>
+<tr><td>40-47</td><td>~178</td><td>~320K</td><td>~29.7</td><td>~16.7%</td><td>~176</td><td>~99.1%</td><td>~57</td><td>~32.0%</td><td>~3.5</td><td>~2.0%</td></tr>
 </table>
+
+_L2Cache（各 block 平均值）：_
+
+<table>
+<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
+<tr><td>0-39</td><td>~387</td><td>~696K</td><td>~0%</td><td>综合 Add(bypass) + Repeat，L2 命中率近零</td></tr>
+<tr><td>40-47</td><td>~178</td><td>~320K</td><td>~0%</td><td>同上</td></tr>
+</table>
+
+> **Ascend 950 系列**：数据暂缺，待补充。
+
+**实测 vs 理论分析**：
+
+- **block 0-39 耗时 ~387μs vs Case 8 同组 ~537μs**：下降 28%，与 Add bypass 收益一致。
+- **block 40-47 耗时 ~178μs vs Case 8 同组 ~204μs**：下降 13%。
+- **并行 wall time 对比**：Case 8 ≈ 537μs，Case 9 ≈ 387μs，L2 bypass 带来 28% 整体加速。
 
 **优化效果分析**：
 
@@ -675,9 +754,7 @@ aclrtSynchronizeStream(streamRepeat);
   mkdir -p build && cd build
   cmake -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH ..
   make -j
-  cd ..
-  python3 scripts/gen_data.py -scenarioNum $SCENARIO_NUM
-  cd build
+  python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM
   ./demo
   ```
 
