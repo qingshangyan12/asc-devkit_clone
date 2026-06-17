@@ -1,6 +1,6 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍基于统一缓存（Unified Buffer，下文简称UB）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。Atlas A2/A3训练推理系列产品原生支持完整的UB直接编程能力；Ascend 950PR/Ascend 950DT引入寄存器计算能力, 推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍基于统一缓存（Unified Buffer，下文简称UB）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。Atlas A3 训练系列产品/Atlas A3 推理系列产品原生支持完整的UB直接编程能力；Ascend 950PR/Ascend 950DT引入寄存器计算能力，推荐使用Reg矢量计算编程以获得更高性能。
 
 ## Memory矢量编程的基本步骤
 
@@ -89,7 +89,7 @@ int32_t main(int argc, char const *argv[])
 </tbody>
 </table>
 
-根据上述矢量搬运能力的描述, 开发者可以根据不同的场景选择合适的接口进行处理。
+根据上述矢量搬运能力的描述，开发者可以根据不同的场景选择合适的接口进行处理。
 
 **连续搬运**: 若需将GM中连续地址的数据搬运至UB，仅需指定搬运数据的字节长度即可。例如将形状为256、数据类型为half的src_gm数据搬入UB，可直接调用`asc_copy_gm2ub`接口：
 
@@ -120,13 +120,13 @@ uint16_t dst_stride = 2;
 asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 ```
 
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A3 训练系列产品/Atlas A3 推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 **非对齐搬运**: 基础高维切分接口要求GM的数据长度与地址间隔均按32字节对齐，无法适配非对齐场景。例如将数据改为形状(16, 200)、类型为half的src_gm后，asc_copy_gm2ub无法实现隔行搬运。针对该场景，Ascend C提供`asc_copy_gm2ub_align`非对齐搬运接口，支持以字节为单位配置数据块长度与地址步长，突破32字节对齐限制。
 
 <img src="../../../../figures/非对齐搬入能力.png" alt="非对齐搬入能力" width="800" />
 
-以上图为例, 将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
+以上图为例，将两个数据块从GM搬运至UB，每个blockLen为54B，源操作数相邻数据块之间的间隔为1B，目的操作数相邻数据块之间的间隔为32B。
 在blockLen左侧和右侧分别填充2个和3个half类型元素，此时blockLen + leftPadding + rightPadding = 54B + 2 * 2B + 3 * 2B = 64B，满足32B对齐。
 ```c
 // Number of consecutive data blocks: transfer two consecutive data blocks
@@ -144,7 +144,7 @@ uint8_t right_padding_num = 3;
 
 asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, false, 0, src_stride, dst_stride);
 ```
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A2/A3训练和推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A3 训练系列产品/Atlas A3 推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矢量数据搬运/)。
 
@@ -157,7 +157,7 @@ Memory矢量计算包含连续计算和高维切分计算两种模式，同时�
 
 ### 高维切分计算
 
-高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等, 能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
+高维切分能力主要是支持对计算接口设置`repeat_time`、`stride`和`mask`参数等，能精确控制指令的迭代执行、操作数的地址间隔和迭代内的掩码。
 
 #### 迭代控制
 
@@ -165,27 +165,27 @@ Memory矢量计算包含连续计算和高维切分计算两种模式，同时�
 
 <img src="../../../../figures/DataBlock迭代示意图_c.png" alt="DataBlock迭代示意图" width="800" />
 
-若设置repeat_time（迭代次数）为2，单元将执行两轮迭代，总处理数据量为2 × 8 × 32字节 = 512字节；若数据类型为half（2字节 / 元素），则对应处理256个元素
+若设置repeat_time（迭代次数）为2，单元将执行两轮迭代，总处理数据量为2 × 8 × 32字节 = 512字节；若数据类型为half（2字节 / 元素），则对应处理256个元素。
 
-> 📌 硬件约束：repeat_time取值范围为1~255，该约束对Atlas A2/A3、Ascend 950PR/Ascend 950DT全系列产品生效。
+> 📌 硬件约束：repeat_time取值范围为1~255，该约束对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Ascend 950PR/Ascend 950DT全系列产品生效。
 
 <img src="../../../../figures/2次迭代Exp计算_c.png" alt="2次迭代Exp计算" width="800" />
 
 #### 地址间隔配置
 
-矢量计算单元还支持带间隔的向量计算，通过`data_block_stride`（单次迭代内不同`data_block`间地址步长）和`repeat_stride`（相邻迭代间相同`data_block`的地址步长）来进行配置。`data_block_stride`是指单次迭代内不同`data_block`间地址步长。其取值不能超过UB大小限制。
-连续计算，`data_block_stride`设置为1，对同一迭代内的8个`data_block`数据连续进行处理。
-非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同`data_block`之间在读取数据时出现一个`data_block`的间隔，如下图所示。
+矢量计算单元还支持带间隔的向量计算，通过`data_block_stride`（单次迭代内不同DataBlock间地址步长）和`repeat_stride`（相邻迭代间相同DataBlock的地址步长）来进行配置。`data_block_stride`是指单次迭代内不同DataBlock间地址步长。其取值不能超过UB大小限制。
+连续计算，`data_block_stride`设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
+非连续计算，`data_block_stride`值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。
 
 <img src="../../../../figures/data_block_stride示例_c.png" alt="data_block_stride示例" width="800" />
 
-> 📌 若dst_block_stride == 0，等效于dst_block_stride = 1；若src_block_stride = 0，源操作数将始终复用第一个 DataBlock。
+> 📌 若dst_block_stride == 0，等效于dst_block_stride = 1；若src_block_stride = 0，源操作数将始终复用第一个DataBlock。
 
 下图给出了单次迭代内源操作数与目的操作数在UB空间的读写示例。示例中源操作数的`data_block_stride`配置为2，表示单次迭代内不同DataBlock间地址步长为2个DataBlock；目的操作数的`data_block_stride`配置为1，表示单次迭代内地址连续。
 
 <img src="../../../../figures/单次迭代内源和目的操作数读写示例_c.png" alt="单次迭代内源和目的操作数读写示例" width="800" />
 
-其中**repeat_stride**是指相邻迭代间相同`data_block`的地址步长, 可通过设置`repeat_stride`来灵活控制不同的场景。
+其中**repeat_stride**是指相邻迭代间相同DataBlock的地址步长，可通过设置`repeat_stride`来灵活控制不同的场景。
 
 | 场景 | repeat_stride取值 | 数据读取特点 | 适用场景 |
 |------|------------------|-------------|--------|
@@ -194,7 +194,7 @@ Memory矢量计算包含连续计算和高维切分计算两种模式，同时�
 | 反复计算 | 0 | 对首个连续8个data_block反复读取和计算 | <img src="../../../../figures/repeat_stride反复计算场景_c.png" alt="repeat_stride反复计算场景" width="600" /> |
 | 部分重复计算 | (0, 8) | 相邻迭代间部分数据重复读取，一般场景不涉及 | <img src="../../../../figures/repeat_stride部分重复计算_c.png" alt="repeat_stride部分重复计算" width="600" /> |
 
-当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置`data_block`的起始地址间隔（以 `data_block` 为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个 `data_block` 与第二迭代的第1个 `data_block` 间隔9个 `data_block`。
+当 `repeat_time`>1 时，通过多次迭代完成计算。`repeat_stride` 表示相邻迭代间相同位置DataBlock的起始地址间隔（以DataBlock为单位）。例如 `repeat_stride` = 9 时，第一迭代的第1个DataBlock与第二迭代的第1个DataBlock间隔9个DataBlock。
 
 <img src="../../../../figures/多次迭代非连续场景示意图_c.png" alt="多次迭代非连续场景示意图" width="800" />
 
@@ -272,7 +272,7 @@ asc_set_vector_mask(0, static_cast<uint64_t>(100));
 asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
 ```
 
-- 单次迭代内逐比特模式: 可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 264-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 264-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 232-1]。
+- 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 264-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 264-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 232-1]。
 
 该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。
 以src数据(shape(256)，数据类型为half)为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：

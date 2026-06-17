@@ -21,7 +21,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟相对较长。用于存储算子的输入数据、输出结果和中间计算数据。运行在Device侧的核函数可直接访问Global Memory。Global Memory具备数据持久性：通过全局内存分配的空间，其存储的数据会一直保留，直至该内存空间被释放或应用程序终止。用户通过Runtime API完成Device侧全局内存的管理。
 
-结合下述示例说明：Host侧通过aclrtMalloc接口分配Device侧全局内存，通过aclrtMemcpy完成Host与Device全局内存间的数据互拷（Host→Device或Device→Host）；随后通过<<<>>>语法触发Device侧核函数执行运算；此外，通过aclrtMalloc分配的Device全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+结合下述示例说明：Host侧通过aclrtMalloc接口分配Device侧全局内存，通过aclrtMemcpy完成Host与Device全局内存间的数据互相拷贝（Host→Device或Device→Host）；随后通过<<<>>>语法触发Device侧核函数执行运算；此外，通过aclrtMalloc分配的Device全局内存，需调用aclrtFree接口释放。有关Runtime API的更多信息与细节，可以参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
 
 此外，核函数需使用__global__函数前缀进行声明。该前缀用于标识函数在Host侧调用、Device侧执行，是Ascend C核函数的标准定义方式，确保编译器正确识别核函数入口并生成相应的硬件执行代码。完整的调用流程为：Host分配GM内存 → 数据拷贝 → 启动核函数 → 释放内存，示例代码如下：
 
@@ -57,7 +57,7 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
 
 ### 内部存储（Local Memory）
 
-上文介绍了外部全局内存（Global Memory），接下来说明AI Core内部高速存储。AI Core包含 Cube、Vector、Scalar 三类计算单元，数据必须从外部存储加载至内部存储后才能执行计算。内部存储按服务对象分为两大体系：服务矢量计算的AIV内部存储、服务矩阵计算的AIC内部存储。
+上文介绍了外部全局内存（Global Memory），接下来说明AI Core内部高速存储。AI Core包含Cube、Vector、Scalar三类计算单元，数据必须从外部存储加载至内部存储后才能执行计算。内部存储按服务对象分为两大体系：服务矢量计算的AIV内部存储、服务矩阵计算的AIC内部存储。
 
 #### AIV内部存储之Unified Buffer
 
@@ -125,7 +125,7 @@ Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector�
 
 Cube计算单元是AI Core中专用于执行矩阵运算的单元，Cube计算单元直接访问的专用缓存为：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始化累加值和矩阵计算结果。
 
-在C语言编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等, 不同Cube专用存储对应专属地址限定符，具体说明如下表：
+在C语言编程中，用户可通过数组定义方式申请`L1 Buffer`和`L0 A Buffer`等，不同Cube专用存储对应专属地址限定符，具体说明如下表：
 
 **存储单元及地址限定符说明**：
 
@@ -156,7 +156,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 **表 1** 不同产品型号的分形格式对比
 
-| 存储单元 | Atlas A2/A3训练和推理系列产品 | Ascend 950PR/Ascend 950DT |
+| 存储单元 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | Ascend 950PR/Ascend 950DT |
 |---------|----------------------------|---------------------------|
 | L1 Buffer | Nz | Nz |
 | L0A Buffer | Zz | Nz |
@@ -169,11 +169,11 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 #### Bank冲突
 
-上文介绍了各类内部存储的定义、排布格式。由于AI Core内部存储采用Bank分组架构，不当的内存访问会引发Bank冲突，进而降低算子性能。下面以Unified Buffer为例，介绍Bank冲突的相关原理，在Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A2/A3训练和推理系列产品的UB容量规格请参考相应硬件架构文档。
+上文介绍了各类内部存储的定义、排布格式。由于AI Core内部存储采用Bank分组架构，不当的内存访问会引发Bank冲突，进而降低算子性能。下面以Unified Buffer为例，介绍Bank冲突的相关原理，在Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A3 训练系列产品/Atlas A3 推理系列产品的UB容量规格请参考相应硬件架构文档。
 
 <img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
-该架构地址使用低位编址, 地址排布如下图所示, 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
+该架构地址使用低位编址，地址排布如下图所示，每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
 
 ![低位交织地址排布](../../../../figures/低位交织地址排布.png)
 
@@ -182,9 +182,9 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 - 写写冲突：多个写操作同时尝试访问同一个bank group。
 - 读读冲突：两个读操作访问同一个bank，或两个以上操作同时尝试访问同一个bank group。
 
-以读写冲突为例，当进行一组`dst = src0 + src1`的矢量加法计算时, 如果`src0`的起始地址在0x0000, `dst`的起始地址为0x4000, 结合Bank的排布, 可以看到当前`src0`和`dst`的地址分别属于同一个bank和同一个bank group, 则存在读写冲突。
+以读写冲突为例，当进行一组`dst = src0 + src1`的矢量加法计算时，如果`src0`的起始地址在0x0000，`dst`的起始地址为0x4000，结合Bank的排布，可以看到当前`src0`和`dst`的地址分别属于同一个bank和同一个bank group，则存在读写冲突。
 
-当遇到Bank冲突的时候, 会引起算子性能的下降, 通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生, 详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
+当遇到Bank冲突的时候，会引起算子性能的下降，通常可以通过优化计算逻辑和优化分配地址方式来避免冲突的产生。详情请参考[避免Bank冲突](../../../../算子实践参考/SIMD算子性能优化/内存访问/避免UB的bank冲突/避免bank冲突（NPU架构版本3510）.md)。
 
 ## 同步机制
 
@@ -212,10 +212,10 @@ AI Core内部的执行单元（如MTE2数据搬运单元、Vector计算单元等
 
 > 📌 提示：上例描述为主要路径，当`Scalar`执行单元读写GM或者UB时，也需要考虑`Scalar`流水与其他流水的同步。
 
-AI Core上的执行单元分别属于不同的执行流水, 同步即是保证不同执行流水间能够正确执行，如下为AI Core内的主要执行流水。
+AI Core上的执行单元分别属于不同的执行流水，同步即是保证不同执行流水间能够正确执行，如下为AI Core内的主要执行流水。
 | 流水类型 | 含义 |
 |---------|------|
-| **PIPE_S** | 标量流水线，为此流水 |
+| **PIPE_S** | 标量流水线 |
 | **PIPE_V** | 矢量计算流水及部分硬件架构下的L0C Buffer→Unified Buffer数据搬运流水 |
 | **PIPE_M** | 矩阵计算流水 |
 | **PIPE_MTE1** | L1 Buffer→L0A Buffer、L1 Buffer→L0B Buffer数据搬运流水 |
@@ -225,60 +225,12 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 为确保流水线间正确执行，AI Core针对不同应用场景提供了多种同步机制，开发者可根据实际需求灵活选择合适的同步方式来实现算子功能。
 
-<table>
-<thead>
-<tr>
-<th>同步类型</th>
-<th>核心作用及场景说明</th>
-<th>关键接口</th>
-<th>实现代码示例</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td rowspan="2"><strong>多流水同步</strong></td>
-<td><p><strong>机制一</strong>: 通过 “锁定 - 释放” 指定流水的方式，解决核内异步流水间的同步依赖问题；该机制功能类似于传统 CPU 的锁机制，是 Ascend 950PR/Ascend 950DT 新引入的同步方式，相较于 notify/wait 更易使用。 </p></td>
-<td><code>asc_lock</code> & <code>asc_unlock</code></td>
-<td>
-        <code>uint8_t mutex_id = 1;</code><br>
-        <code>asc_lock(PIPE_MTE2, mutex_id);</code><br>
-        <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
-        <code>asc_unlock(PIPE_MTE2, mutex_id);</code><br>
-        <code>asc_lock(PIPE_V, mutex_id);</code><br>
-        <code>asc_add(shared_buffer, x_local, y_local);</code><br>
-        <code>asc_unlock(PIPE_V, mutex_id);</code>
-      </td>
-</tr>
-<tr>
-<td><p><strong>机制二</strong>: 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。</p></td>
-<td><code>asc_sync_notify</code> & <code>asc_sync_wait</code></td>
-<td>
-        <code>asc_copy_gm2ub((__ubuf__ void*)src0, ...);</code><br>
-        <code>asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);</code><br>
-        <code>asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);</code><br>
-        <code>asc_add(dst, src1, src0, total_length);</code>
-      </td>
-</tr>
-<tr>
-<td><strong>单流水同步</strong></td>
-<td><p>等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。</p></td>
-<td><code>asc_sync_pipe</code> & <code>asc_sync_mte2等</code></td>
-<td>
-        <code>asc_add(dst, src1, src0, total_length);</code><br>
-        <code>asc_sync_pipe(PIPE_V);</code><br>
-        <code>asc_sub(dst, dst, src0, total_length);</code>
-      </td>
-</tr>
-<tr>
-<td><strong>内存访问顺序控制</strong></td>
-<td><p>等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。</p></td>
-<td><code>asc_sync_data_barrier</code></td>
-<td>
-        <code>asc_sync_data_barrier(mem_dsb_t::DSB_ALL);</code>
-      </td>
-</tr>
-</tbody>
-</table>
+| 同步类型 | 核心作用及场景说明 | 关键接口 | 实现代码示例 |
+|---------|-------------------|---------|-------------|
+| 多流水同步（机制一） | 通过"锁定-释放"指定流水的方式，解决核内异步流水间的同步依赖问题；该机制功能类似于传统CPU的锁机制，是Ascend 950PR/Ascend 950DT新引入的同步方式，相较于notify/wait更易使用。 | `asc_lock` & `asc_unlock` | `uint8_t mutex_id = 1;`<br>`asc_lock(PIPE_MTE2, mutex_id);`<br>`asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_unlock(PIPE_MTE2, mutex_id);`<br>`asc_lock(PIPE_V, mutex_id);`<br>`asc_add(shared_buffer, x_local, y_local);`<br>`asc_unlock(PIPE_V, mutex_id);` |
+| 多流水同步（机制二） | 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。 | `asc_sync_notify` & `asc_sync_wait` | `asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_add(dst, src1, src0, total_length);` |
+| 单流水同步 | 等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。 | `asc_sync_pipe` & `asc_sync_mte2等` | `asc_add(dst, src1, src0, total_length);`<br>`asc_sync_pipe(PIPE_V);`<br>`asc_sub(dst, dst, src0, total_length);` |
+| 内存访问顺序控制 | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `asc_sync_data_barrier` | `asc_sync_data_barrier(mem_dsb_t::DSB_ALL);` |
 
 以上为单个AI Core内部各流水线、执行单元的同步方案。当业务逻辑需要跨多个AI Core协作时，则需要使用核间同步机制。
 
@@ -334,7 +286,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
       <td><code>asc_sync_intra_arrive</code><br><code>asc_sync_intra_wait</code></td>
       <td>
         <code>if ASCEND_IS_AIC {</code><br>
-        <code>    // Atlas A2/A3 training/inference products: AIC sends one arrive, two AIVs wait simultaneously</code><br>
+        <code>    // Atlas A3 training/inference products: AIC sends one arrive, two AIVs wait simultaneously</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
         <code>    // Ascend 950PR/Ascend 950DT products: AIC sends two arrives, two AIVs wait separately</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
@@ -354,7 +306,7 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
   </tbody>
 </table>
 
-> 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离;
+> 📌 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏ASCEND_IS_AIV/ASCEND_IS_AIC来对AIV和AIC的代码进行隔离。
 
 ## 算子类型
 
@@ -364,9 +316,9 @@ AI Core上的执行单元分别属于不同的执行流水, 同步即是保证�
 
 Vector矢量计算主要包含基础算术、归约计算、数据类型转换等矢量计算。
 
-在Atlas A2/A3训练和推理系列产品上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
+在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
 
-以Add计算为例，当开发者需要计算4096长度的向量加法, 可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
+以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
 
 ```c
 // Define Vector operator, marked with __vector__ to execute on Device Vector core, suitable for operators with only Vector computation
@@ -390,9 +342,9 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ### Cube矩阵计算
 
-除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发, Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
+除矢量计算外，Cube单元专门实现矩阵运算，对应矩阵类算子的开发，Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来源于L1 Buffer与L0A/B Buffer。L1 Buffer用于矩阵计算数据缓存，L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer用于存储初始累加值及矩阵计算结果。此类基于Cube计算单元直接操作L1/L0A/L0B/L0C Buffer的编程范式称为[Cube矩阵计算编程](./Cube矩阵计算编程.md)。
 
-以Matmul矩阵乘计算为例, 开发者通过操作Cube矩阵计算能力可以完成如下图所示的`c = a * b + bias`的能力。
+以Matmul矩阵乘计算为例，开发者通过操作Cube矩阵计算能力可以完成如下图所示的`c = a * b + bias`的能力。
 - A、B为源操作数，A为左矩阵，形状为[M, K]；B为右矩阵，形状为[K, N]。
 - C为目的操作数，存放矩阵乘结果的矩阵，形状为[M, N]。
 - bias为矩阵乘偏置，形状为[1, N]。对A*B结果矩阵的每一行都采用该bias进行偏置。
