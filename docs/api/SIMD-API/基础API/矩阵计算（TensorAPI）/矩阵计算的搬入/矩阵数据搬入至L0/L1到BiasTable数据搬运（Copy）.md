@@ -12,7 +12,7 @@
 
 Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的bias数据搬运到BiasTable Buffer，作为Mmad计算中的bias输入。
 
-接口支持batch模式。batch模式用于一次描述多个形状相同的bias块，Layout在原ND Layout最外层增加Batch维度，可通过`MakeFrameLayout<NDLayoutPtn, T>(batch, 1, n)`或`MakeFrameLayout<NDExtLayoutPtn, T>(batch, 1, n)`构造。
+接口支持batch模式。batch模式用于一次完成多块bias数据的搬运。Layout在原Layout最外层增加Batch维度，可通过`MakeFrameLayout<NDLayoutPtn>(batch, 1, n)`或`MakeFrameLayout<NDExtLayoutPtn>(batch, 1, n)`构造。
 
 ## 函数原型
 
@@ -70,11 +70,11 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 ## 约束说明
 
-- 源Tensor内存地址和大小需要满足32Byte对齐要求
-- 目的Tensor内存地址和大小需要满足64Byte对齐要求。
+- 源张量内存地址和大小需要满足32Byte对齐要求
+- 目的张量内存地址和大小需要满足64Byte对齐要求。
 - 由于BiasTable Buffer大小为4KB，因此每次搬运最多4KB数据
-- batch模式要求源张量和目的张量同时携带Batch维度（即两者Layout均包含Batch轴或均不包含），且Batch数量一致；去掉Batch维度后的单个矩阵Layout需要满足当前通路支持的格式组合。
-- batch模式下，源张量和目的张量列方向Shape必须按C0_SIZE（32Byte，分别即`C0_ELEMENT<srcType>`和`C0_ELEMENT<dstType>`）对齐。
+- batch模式要求源张量和目的张量Batch数量一致。
+- batch模式下，如果Global Memory上的Shape大小非对齐，由于L1 Buffer和BiasTable Buffer上有数据对齐要求，源张量和目的张量列方向Shape大小必须按32Byte对齐。
 
 ## 调用示例
 
@@ -87,7 +87,7 @@ __aicore__ inline void CopyL1ToBTExample()
 {
     using SrcType = half;
     using DstType = float;
-    constexpr uint32_t n = 16;
+    constexpr uint32_t n = 15;
 
     __cbuf__ SrcType l1Buf[n];
     __biasbuf__ DstType btBuf[n];
