@@ -51,7 +51,7 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_binary_intf.h"`。
 
-ShiftRight指令根据mask对源操作数srcReg0，按照srcReg1对应元素进行右移操作，将结果写入目的操作数dstReg。根据源操作数的数据类型，右移操作分为以下两种情况：
+`ShiftRight`指令根据mask对源操作数srcReg0，按照srcReg1对应元素进行右移操作，将结果写入目的操作数dstReg。根据源操作数的数据类型，右移操作分为以下两种情况：
 
 - **数据类型为无符号类型：执行逻辑右移。**
 
@@ -80,16 +80,16 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 | T | 源操作数数据类型。 |
 | U | 右移参数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| S | 目的操作数和源操作数的RegTensor类型，例如RegTensor<uint32_t\>，由编译器自动推导，用户不需要填写。 |
-| V | 右移参数的RegTensor类型，例如RegTensor<int32_t\>，由编译器自动推导，用户不需要填写。 |
+| S | 目的操作数和源操作数的`RegTensor`类型，例如`RegTensor<uint32_t>`，由编译器自动推导，用户不需要填写。 |
+| V | 右移参数的`RegTensor`类型，例如`RegTensor<int32_t>`，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。<br>源操作数的数据类型需要与目的操作数保持一致。 |
-| srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。<br>不支持设置为负数，负数行为未定义。 |
+| srcReg0 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。<br>源操作数的数据类型需要与目的操作数保持一致。 |
+| srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。<br>不支持设置为负数，负数行为未定义。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>

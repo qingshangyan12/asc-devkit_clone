@@ -74,15 +74,15 @@ __simd_callee__ inline void AbsSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 | :----- | :--- |
 | T | 源操作数数据类型。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
-| U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
+| U | 目的操作数和源操作数的`RegTensor`类型，例如`RegTensor<half>`，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| srcReg0 | 输入 | 源操作数。<br>类型为RegTensor。 |
-| srcReg1 | 输入 | 源操作数。<br>类型为RegTensor。 |
+| srcReg0 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
+| srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>

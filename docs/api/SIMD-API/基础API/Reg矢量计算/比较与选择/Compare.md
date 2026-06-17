@@ -51,7 +51,7 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_vec_cmpsel_intf.h"`。
 
-逐元素比较两个RegTensor大小，根据模板参数指定的比较模式，将比较结果写入目的操作数MaskReg中对应比特位，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。
+逐元素比较两个[RegTensor](../寄存器数据类型/RegTensor.md)大小，根据模板参数指定的比较模式，将比较结果写入目的操作数[MaskReg](../寄存器数据类型/MaskReg.md)中对应比特位，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。
 
 其中cmp由模板参数mode指定比较模式，取值为EQ/GT/LT/GE/NE/LE。
 
@@ -70,13 +70,13 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 | :----- | :--- |
 | T | 操作数数据类型。 |
 | mode | 比较模式。支持如下取值：<br>• LT：小于<br>• GT：大于<br>• GE：大于或等于<br>• EQ：等于<br>• NE：不等于<br>• LE：小于或等于 |
-| U | 源操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
+| U | 源操作数的`RegTensor`类型，例如`RegTensor<half>`，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
-| dst | 输出 | MaskReg类型，目的操作数。 |
+| dst | 输出 | [MaskReg](../寄存器数据类型/MaskReg.md)类型，目的操作数。 |
 | srcReg0、srcReg1 | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。<br>两个源操作数的数据类型需要与目的操作数保持一致。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
@@ -105,7 +105,7 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 ## 约束说明<a name="section633mcpsimp"></a>
 
 - 通过mask参数控制的未选中元素在目的操作数中被置零。
-- 操作数重叠约束：srcReg0和srcReg1可以是同一个RegTensor。
+- 操作数重叠约束：srcReg0和srcReg1可以是同一个`RegTensor`。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

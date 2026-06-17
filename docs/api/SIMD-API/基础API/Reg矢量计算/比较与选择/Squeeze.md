@@ -57,7 +57,7 @@
 
 ![Squeeze计算示意图](../../../../figures/reg_squeeze.png)
 
-特别地，当模板参数store取值为GatherMaskMode::STORE\_REG时，Squeeze会将有效元素的总字节数存入AR特殊寄存器。此时配合使用[连续非对齐搬出](../Reg数据搬运/连续非对齐搬出.md)的场景3接口（无需显式传入偏移量），StoreUnAlign会自动从AR寄存器读取有效字节数作为地址偏移，参考[调用示例](#调用示例)。
+特别地，当模板参数store取值为`GatherMaskMode::STORE_REG`时，`Squeeze`会将有效元素的总字节数存入AR特殊寄存器。此时配合使用[连续非对齐搬出](../Reg数据搬运/连续非对齐搬出.md)的场景3接口（无需显式传入偏移量），`StoreUnAlign`会自动从AR寄存器读取有效字节数作为地址偏移，参考[调用示例](#调用示例)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -74,14 +74,14 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 | :----- | :--- |
 | T | 目的操作数和源操作数的数据类型。 |
 | store | GatherMaskMode选择是否将有效元素的总字节数存入AR寄存器，AR寄存器描述参考[表 模板参数说明](../系统变量访问/GetSpr.md#table4835205712588)。<br>• NO_STORE_REG，有效元素的总字节数不存入AR寄存器；<br>• STORE_REG，有效元素的总字节数存入AR寄存器。 |
-| U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
+| U | 目的操作数和源操作数的`RegTensor`类型，例如`RegTensor<uint32_t>`，由编译器自动推导，用户不需要填写。 |
 
 **表2**  函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
 | dstReg | 输出 | 目的操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| srcReg | 输入 | 源操作数。<br>类型为RegTensor。 |
+| srcReg | 输入 | 源操作数。<br>类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | mask | 输入 | mask用于控制每次迭代内参与计算的元素。 |
 
 ## 返回值说明
@@ -94,7 +94,7 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 
 ## 约束说明<a name="section177921451558"></a>
 
-- 当模板参数store取值为GatherMaskMode::STORE_REG时，由于硬件约束，StoreUnAlign指令和Squeeze指令必须交替使用，例如：
+- 当模板参数store取值为`GatherMaskMode::STORE_REG`时，由于硬件约束，`StoreUnAlign`指令和`Squeeze`指令必须交替使用，例如：
 
   ```cpp
   Squeeze(dstVreg, srcVreg, mask);
@@ -103,11 +103,11 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
   StoreUnAlign(dstAddr, dstVreg, ureg);
   ```
 
-- 当store取值为GatherMaskMode::NO_STORE_REG时，不涉及AR寄存器，Squeeze和StoreUnAlign不强制交替。
+- 当store取值为`GatherMaskMode::NO_STORE_REG`时，不涉及AR寄存器，`Squeeze`和`StoreUnAlign`不强制交替。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-以下示例展示了Squeeze与StoreUnAlign的典型配合方式（场景3：Squeeze的STORE_REG模式，StoreUnAlign使用AR寄存器中的有效元素字节数作为偏移量）：
+以下示例展示了`Squeeze`与`StoreUnAlign`的典型配合方式（场景3：`Squeeze`的STORE_REG模式，`StoreUnAlign`使用AR寄存器中的有效元素字节数作为偏移量）：
 
 ```cpp
 template<typename T>
