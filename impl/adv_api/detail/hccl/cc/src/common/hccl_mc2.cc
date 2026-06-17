@@ -17,6 +17,7 @@
 #include "op_common.h"
 #include "ccu_assist_pub.h"
 #include "hccl_ccu_res.h"
+#include "adapter_acl.h"
 
 using namespace mc2_ops_hccl;
 
@@ -363,7 +364,14 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
         CCU_E_PARA);
 
     auto *resCtx = static_cast<char *>(ctx->resCtx);
-    std::vector<char> seq(resCtx, resCtx + ctx->ctxSize);
+    // resCtx 为 device 显存（生产端通过 aclrtMemcpy H2D 写入），host 侧不能直接解引用，
+    // 需要先 D2H 拷贝到本地 host buffer 再反序列化。
+    std::vector<char> seq(ctx->ctxSize);
+    aclError aclRet = aclrtMemcpy(seq.data(), ctx->ctxSize, resCtx, ctx->ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(aclRet != ACL_SUCCESS,
+        HCCL_ERROR("[%s] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].",
+            __func__, aclRet, seq.data(), resCtx, ctx->ctxSize),
+        CCU_E_INTERNAL);
     AlgResourceCtxSerializable resourceCtx;
     resourceCtx.DeSerialize(seq);
 

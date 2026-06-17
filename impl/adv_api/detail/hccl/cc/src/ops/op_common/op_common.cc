@@ -1190,7 +1190,12 @@ HcclResult GetAlgResCcu(HcclComm comm, const OpParam& param, AlgResourceRequest&
     void *ctx = nullptr;
     CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
     HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
-    aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
+    aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
+    if (aclRet != ACL_SUCCESS) {
+        HCCL_ERROR("[GetAlgResCcu] aclrtMemcpy H2D failed, ret[%d], dst[%p], src[%p], size[%llu].",
+            aclRet, ctx, seq.data(), size);
+        return HCCL_E_RUNTIME;
+    }
     *resCtxSequence = ctx;
     ctxSize = size;
     HCCL_INFO("[GetAlgResCCU]Execute GetAlgResCCU success.");
