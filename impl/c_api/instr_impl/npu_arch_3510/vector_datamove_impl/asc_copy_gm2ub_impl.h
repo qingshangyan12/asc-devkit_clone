@@ -28,7 +28,7 @@ __aicore__ inline void asc_copy_gm2ub_impl(__ubuf__ void* dst, __gm__ void* src,
     uint16_t n_burst, uint16_t len_burst, uint16_t src_stride, uint16_t dst_stride)
 {
     if ASC_IS_AIV {
-        copy_gm_to_ubuf_align_v2(dst, src, 0, n_burst, len_burst,0, 0, false, 0, src_stride, dst_stride);
+        copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, n_burst, len_burst,0, 0, false, 0, src_stride, dst_stride);
     }
 }
 
