@@ -91,7 +91,7 @@ z = x + y
 
     ```bash
     make -B demo
-    mssanitizer ./demo --leak-check=yes
+    mssanitizer --leak-check=yes ./demo
     ```
 
   - 分配内存未使用：对内存分配后未使用导致的异常。
@@ -111,7 +111,7 @@ z = x + y
 
     ```bash
     make -B demo
-    mssanitizer ./demo --check-unused-memory=yes
+    mssanitizer --check-unused-memory=yes ./demo
     ```
 
 - **竞争检测**
@@ -130,7 +130,7 @@ z = x + y
 
   ```bash
   make -B demo
-  mssanitizer ./demo --tool=racecheck
+  mssanitizer --tool=racecheck ./demo
   ```
 
 - **未初始化检测**
@@ -148,7 +148,7 @@ z = x + y
 
   ```bash
   make -B demo
-  mssanitizer ./demo --tool=initcheck
+  mssanitizer --tool=initcheck ./demo
   ```
 
 ## 编译运行
@@ -172,10 +172,10 @@ z = x + y
 
   # 根据调测需求执行对应的mssanitizer命令。
   mssanitizer ./demo
-  mssanitizer ./demo --leak-check=yes
-  mssanitizer ./demo --check-unused-memory=yes
-  mssanitizer ./demo --tool=racecheck
-  mssanitizer ./demo --tool=initcheck
+  mssanitizer --leak-check=yes ./demo
+  mssanitizer --check-unused-memory=yes ./demo
+  mssanitizer --tool=racecheck ./demo
+  mssanitizer --tool=initcheck ./demo
   ```
 
 - 编译选项说明

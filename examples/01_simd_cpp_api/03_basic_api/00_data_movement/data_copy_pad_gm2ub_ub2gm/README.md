@@ -63,8 +63,8 @@
 - 输入shape：[3, 24]
 - 输出shape：[1, 80]
 - 数据类型：half
-- 参数配置：blockLen=48, blockCount=3, leftPadding=0, rightPadding=16, isPad=false
-- 说明：紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐。此处示例中，leftPadding为0，rightPadding为16，在最后一个数据块右侧填充16字节。目的操作数的数据量为160字节。
+- 参数配置：blockLen=48, blockCount=3, leftPadding=0, rightPadding=8, isPad=true
+- 说明：紧凑模式，允许单次搬运不对齐，统一在整块数据末尾补齐至32字节对齐。此处示例中，leftPadding为0，rightPadding为8，即在最后一个数据块右侧填充8个half元素（16字节）。目的操作数的数据量为160字节。
 
 **场景4：使用SetLoopModePara使能loop mode（Compact模式） ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
 - 输入shape：[1, 320]，如图 1 所示
