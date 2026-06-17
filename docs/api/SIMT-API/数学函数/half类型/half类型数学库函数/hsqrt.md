@@ -55,6 +55,8 @@ inline half hsqrt(half x)
 
 本接口支持的输入数据范围为x大于等于0，否则返回值为nan。
 
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
+
 ## 需要包含的头文件
 
 使用half类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
