@@ -348,8 +348,21 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
+    // HcclEngineCtxCreate 申请的均为 device 显存（参考 hccl_alloc_ctx_res.cc 中
+    // "申请硬件内存"+aclrtMemcpy(ACL_MEMCPY_HOST_TO_DEVICE) 的写入流程），下面三层指针
+    //   *opResCtx (OpResCtx)
+    //   OpResCtx.algInfo[i].opParam -> OpParam
+    //   OpParam.resCtx              -> 序列化字节流
+    // 全部位于 device，host 侧不能直接解引用，需逐层 D2H 拷到本地。
     HCCL_INFO("[CcuKernelLaunch]Obtain OpResCtx.");
-    const auto *opRes = reinterpret_cast<const OpResCtx *>(opResCtx);
+    OpResCtx opResHost{};
+    aclError aclRet = aclrtMemcpy(&opResHost, sizeof(OpResCtx), opResCtx, sizeof(OpResCtx),
+                                  ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(aclRet != ACL_SUCCESS,
+        HCCL_ERROR("[%s] aclrtMemcpy D2H opResCtx failed, ret[%d], src[%p], size[%zu].",
+            __func__, aclRet, opResCtx, sizeof(OpResCtx)),
+        CCU_E_INTERNAL);
+    const auto *opRes = &opResHost;
     CHK_PRT_RET(opRes->algInfo[0].opParam == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opRes->algInfo[0].opParam),
         CCU_E_PARA);
@@ -359,7 +372,15 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
         CCU_E_PARA);
 
     HCCL_INFO("[CcuKernelLaunch]Obtain OpParam.");
-    const auto *ctx = reinterpret_cast<const OpParam *>(opRes->algInfo[0].opParam);
+    void *opParamDev = reinterpret_cast<void *>(opRes->algInfo[0].opParam);
+    OpParam opParamHost{};
+    aclRet = aclrtMemcpy(&opParamHost, sizeof(OpParam), opParamDev, sizeof(OpParam),
+                         ACL_MEMCPY_DEVICE_TO_HOST);
+    CHK_PRT_RET(aclRet != ACL_SUCCESS,
+        HCCL_ERROR("[%s] aclrtMemcpy D2H OpParam failed, ret[%d], src[%p], size[%zu].",
+            __func__, aclRet, opParamDev, sizeof(OpParam)),
+        CCU_E_INTERNAL);
+    const auto *ctx = &opParamHost;
     CHK_PRT_RET(ctx->resCtx == nullptr || ctx->ctxSize == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, resCtx[%p], ctxSize[%llu].",
             ctx->resCtx, ctx->ctxSize),
@@ -367,11 +388,9 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
 
     HCCL_INFO("[CcuKernelLaunch]Obtain resCtx.");
     auto *resCtx = static_cast<char *>(ctx->resCtx);
-    // resCtx 为 device 显存（生产端通过 aclrtMemcpy H2D 写入），host 侧不能直接解引用，
-    // 需要先 D2H 拷贝到本地 host buffer 再反序列化。
     std::vector<char> seq(ctx->ctxSize);
     HCCL_INFO("[CcuKernelLaunch]Start aclrtMemcpy D2H.");
-    aclError aclRet = aclrtMemcpy(seq.data(), ctx->ctxSize, resCtx, ctx->ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
+    aclRet = aclrtMemcpy(seq.data(), ctx->ctxSize, resCtx, ctx->ctxSize, ACL_MEMCPY_DEVICE_TO_HOST);
     CHK_PRT_RET(aclRet != ACL_SUCCESS,
         HCCL_ERROR("[CcuKernelLaunch] aclrtMemcpy D2H failed, ret[%d], dst[%p], src[%p], size[%llu].",
             aclRet, seq.data(), resCtx, ctx->ctxSize),
