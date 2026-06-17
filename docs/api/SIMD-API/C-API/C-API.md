@@ -306,7 +306,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_store_atomic_config_v1](simd_atomic/asc_set_store_atomic_config_v1.md)| 设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。 |
 | <cann-filter npu_type = "950" > [asc_set_store_atomic_config_v2](simd_atomic/asc_set_store_atomic_config_v2.md)| 设置原子操作启用位与原子操作类型的值，适用于Ascend 950PR/Ascend 950DT。</cann-filter>|
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作启用位与原子操作类型的值。 |
-| [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空simd_atomic的状态。 |
+| [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空原子操作的状态。 |
 
 ## 其他操作
 

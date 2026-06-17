@@ -9,7 +9,7 @@
 
 ## 功能说明
 
-将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放cube_compute中的Bias。
+将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。
 
 ## 函数原型
 
