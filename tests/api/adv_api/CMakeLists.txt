@@ -23,6 +23,7 @@ set(ASCENDC_DEP_HEADER_DIR
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/base
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
+    ${ASCEND_CANN_PACKAGE_PATH}/toolkit/tools/tikicpulib/lib/include
     ${CMAKE_BINARY_DIR}
     ${ASCENDC_UTILS_INCLUDE}
 )
