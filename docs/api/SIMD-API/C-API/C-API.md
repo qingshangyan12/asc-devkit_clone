@@ -1,7 +1,7 @@
 # C API
 C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 
-## struct
+## 数据结构
 
 |结构名|说明|
 |-----------------------|-----------------------|
@@ -194,7 +194,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_store_dev](scalar_compute/asc_store_dev.md) | 不经过DCache向GM地址上写数据。 |
 | [asc_float2int32](scalar_compute/asc_float2int32.md) | 将float类型转化为int32_t类型，并支持多种舍入模式。 |
 
-## cube_compute
+## 矩阵计算
 
 矩阵计算类API，单独使用时可以引入cube_compute.h，此类API列表如下：
 
@@ -213,7 +213,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_enable_hf32](cube_compute/asc_enable_hf32.md) | 用于设置Mmad计算开启HF32模式，开启该模式后L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32。 |
 
 
-## sync
+## 同步控制
 
 同步控制类API，单独使用时可以引入sync.h，此类API列表如下：
 
@@ -235,7 +235,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | <cann-filter npu_type = "950"> [asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)| 向核间同步寄存器发送同步信号。 </cann-filter> |
 | <cann-filter npu_type = "950"> [asc_sync_inter_wait](sync/asc_sync_inter_wait.md)| 等待block内同步标志。 </cann-filter> |
 
-## sys_var
+## 系统变量
 
 系统变量类API，单独使用时可以引入sys_var.h，此类API列表如下：
 
@@ -267,7 +267,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_set_l3d_rpt_b](sys_var/asc_set_l3d_rpt_b.md) | 用于设置接口asc_copy_l12l0a、asc_copy_l12l0b的2D格式搬运的repeat参数。|
 
 
-## cache_ctrl
+## 缓存控制
 
 缓存控制类API，单独使用时可以引入cache_ctrl.h，此类API列表如下：
 
@@ -279,7 +279,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_icache_preload_status](cache_ctrl/asc_get_icache_preload_status.md) | 获取ICache的Preload的状态。 |
 | [asc_icache_preload](cache_ctrl/asc_icache_preload.md) | 从指令所在DDR地址预加载数据到对应的cacheline中。 |
 
-## simd_atomic
+## 原子操作
 
 原子操作类API，单独使用时可以引入atomic.h，此类API列表如下：
 
@@ -308,7 +308,7 @@ C API文档目录，整体使用时可以引入asc_simd.h，C API列表如下：
 | [asc_get_store_atomic_config](simd_atomic/asc_get_store_atomic_config.md)| 获取原子操作启用位与原子操作类型的值。 |
 | [asc_set_atomic_none](simd_atomic/asc_set_atomic_none.md) | 清空simd_atomic的状态。 |
 
-## misc
+## 其他操作
 
 |   API名称   |   说明   |
 |----------|-----------|
@@ -337,7 +337,7 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_storeunalign](reg/reg_store/asc_storeunalign.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 | [asc_storeunalign_postupdate](reg/reg_store/asc_storeunalign_postupdate.md) | reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到UB的场景。 |
 
-## reg
+## Reg矢量计算
 
 Reg矢量计算类API，单独使用时可以引入reg_vector.h，此类API列表如下：
 
