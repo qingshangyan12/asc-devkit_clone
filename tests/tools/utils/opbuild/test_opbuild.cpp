@@ -79,6 +79,74 @@ TEST_F(TEST_OPBUILD, OpBuildCoverageModeTest)
     EXPECT_EQ(status, opbuild::OPBUILD_FAILED);
 }
 
+TEST_F(TEST_OPBUILD, CfgGeneratorParamHelperCoverage)
+{
+    std::vector<std::string> opsvec({"Adds"});
+    CfgGenerator cfgGen(opsvec);
+    std::string formats;
+    std::string dataTypes;
+    std::vector<ge::Format> formatVec = {ge::FORMAT_ND, ge::FORMAT_NCHW};
+    std::vector<ge::DataType> dataTypeVec = {ge::DT_FLOAT16, ge::DT_INT64, ge::DT_FLOAT4_E2M1};
+
+    cfgGen.GetParamFormats(formatVec, formats);
+    cfgGen.GetParamDataTypes(dataTypeVec, dataTypes);
+
+    EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_FLOAT), "float32");
+    EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_INT2), "int2");
+    EXPECT_EQ(cfgGen.GetDataTypeName(ge::DT_FLOAT4_E1M2), "float4_e1m2");
+    EXPECT_EQ(cfgGen.GetDataTypeName(static_cast<ge::DataType>(-1)), "unknow");
+    EXPECT_EQ(cfgGen.GetParamTypeName(REQUIRED), "required");
+    EXPECT_EQ(cfgGen.GetParamTypeName(100U), "unknow");
+    EXPECT_EQ(formats, "ND,NCHW");
+    EXPECT_EQ(dataTypes, "float16,int64,float4_e2m1");
+}
+
+TEST_F(TEST_OPBUILD, CfgGeneratorGenParamInfoCoverage)
+{
+    std::string fileName = "cfg_param_info_" + std::to_string(getpid()) + ".txt";
+    std::ofstream outfile = std::ofstream(fileName);
+    OpDef opDef("CfgParamInfoCoverage");
+    opDef.Input("x1")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_FLOAT16})
+        .DataTypeForBinQuery({ge::DT_FLOAT})
+        .Format({ge::FORMAT_ND})
+        .FormatForBinQuery({ge::FORMAT_NCHW})
+        .UnknownShapeFormat({ge::FORMAT_ND})
+        .ValueDepend(REQUIRED);
+    opDef.Input("x2").ParamType(VIRTUAL).DataType({ge::DT_INT64}).InitValue(0);
+    opDef.Output("y1")
+        .ParamType(REQUIRED)
+        .DataType({ge::DT_INT16, ge::DT_FLOAT})
+        .InitValue({{ScalarType::INT16, 1}, {ScalarType::FLOAT32, 3.2}});
+    std::vector<OpParamDef> inputs = opDef.GetInputs();
+    std::vector<OpParamDef> outputs = opDef.GetOutputs();
+
+    std::vector<std::string> opsvec({"CfgParamInfoCoverage"});
+    CfgGenerator cfgGen(opsvec);
+    cfgGen.GenParamInfo(outfile, inputs, false);
+    cfgGen.GenParamInfo(outfile, outputs, true);
+    outfile.close();
+
+    std::ifstream resultFile(fileName);
+    EXPECT_TRUE(resultFile.is_open());
+    std::stringstream streamBuffer;
+    streamBuffer << resultFile.rdbuf();
+    std::string resultString(streamBuffer.str());
+    resultFile.close();
+    EXPECT_NE(resultString.find("input0.for_bin_dtype=float32"), std::string::npos);
+    EXPECT_NE(resultString.find("input0.for_bin_format=NCHW"), std::string::npos);
+    EXPECT_NE(resultString.find("input0.unknownshape_format=ND"), std::string::npos);
+    EXPECT_NE(resultString.find("input0.valueDepend=required"), std::string::npos);
+    EXPECT_NE(resultString.find("input1.paramType=optional"), std::string::npos);
+    EXPECT_NE(resultString.find("input1.virtual=true"), std::string::npos);
+    EXPECT_NE(resultString.find("input1.initValue=0"), std::string::npos);
+    EXPECT_NE(resultString.find("output0.initValue={ \"is_list\" : true"), std::string::npos);
+    EXPECT_NE(resultString.find("\"int16\": { \"type\": \"int16\", \"value\": 1 }"), std::string::npos);
+    EXPECT_NE(resultString.find("\"float32\": { \"type\": \"float32\", \"value\": 3.200000 }"), std::string::npos);
+    EXPECT_EQ(remove(fileName.c_str()), 0);
+}
+
 TEST_F(TEST_OPBUILD, NotGenerateAclnnInterface)
 {
     setenv("OPS_ACLNN_GEN", "0", 1);
@@ -196,6 +264,10 @@ TEST_F(TEST_OPBUILD, OpBuildRunTest)
     opbuild::Params::GetInstance().requiredParams_ = {};
     EXPECT_EQ(ret, 0);
     ret = opbuild_main(4, {"opbuild", so_path, ".", "--aicpu"});
+    opbuild::Params::GetInstance().optionParams_ = {};
+    opbuild::Params::GetInstance().requiredParams_ = {};
+    EXPECT_EQ(ret, 0);
+    ret = opbuild_main(4, {"opbuild", so_path, ".", "--hostcpu"});
     opbuild::Params::GetInstance().optionParams_ = {};
     opbuild::Params::GetInstance().requiredParams_ = {};
     EXPECT_EQ(ret, 0);
