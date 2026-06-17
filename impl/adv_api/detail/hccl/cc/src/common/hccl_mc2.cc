@@ -348,6 +348,12 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
     const auto *opRes = reinterpret_cast<const OpResCtx *>(opResCtx);
+    HCCL_INFO("[CcuKernelLaunch] enter, comm[%p], opResCtx[%p], version[%llu], ws[0x%llx], wsSize[%llu], "
+        "rankId[%llu], rankSize[%llu], opParam[0x%llx], offset[0x%llx], xn[0x%llx], cke[0x%llx], spr[0x%llx], "
+        "resCtx[0x%llx], opType[0][%u], algorithmType[0][%u], isKfc[0][%u].",
+        comm, opResCtx, opRes->version, opRes->workSpace, opRes->workSpaceSize, opRes->rankId, opRes->rankSize,
+        opRes->algInfo[0].opParam, opRes->algInfo[0].offset, opRes->xnAddr, opRes->ckeAddr, opRes->sprAddr,
+        opRes->resCtx, opRes->opType[0], opRes->algorithmType[0], static_cast<uint32_t>(opRes->isKfc[0]));
     CHK_PRT_RET(opRes->algInfo[0].opParam == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, opParam[%llu].", opRes->algInfo[0].opParam),
         CCU_E_PARA);
@@ -357,6 +363,10 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
         CCU_E_PARA);
 
     const auto *ctx = reinterpret_cast<const OpParam *>(opRes->algInfo[0].opParam);
+    HCCL_INFO("[CcuKernelLaunch] opParam, ctx[%p], ctxSize[%llu], resCtx[%p], stream[%p], opType[%u], engine[%u], "
+        "algName[%s], algTag[%s], commName[%s], opThread[%llu].",
+        ctx, ctx->ctxSize, ctx->resCtx, ctx->stream, static_cast<uint32_t>(ctx->opType),
+        static_cast<uint32_t>(ctx->engine), ctx->algName, ctx->algTag, ctx->commName, ctx->opThread);
     CHK_PRT_RET(ctx->resCtx == nullptr || ctx->ctxSize == 0U,
         HCCL_ERROR("invalid ccu op resource ctx, resCtx[%p], ctxSize[%llu].",
             ctx->resCtx, ctx->ctxSize),
@@ -364,8 +374,16 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
 
     auto *resCtx = static_cast<char *>(ctx->resCtx);
     std::vector<char> seq(resCtx, resCtx + ctx->ctxSize);
+    HCCL_INFO("[CcuKernelLaunch] deserialize begin, serializedResCtx[%p], serializedSize[%llu].",
+        ctx->resCtx, ctx->ctxSize);
     AlgResourceCtxSerializable resourceCtx;
     resourceCtx.DeSerialize(seq);
+    HCCL_INFO("[CcuKernelLaunch] deserialize done, threads[%zu], ccuKernels[%zu], ccuKernelNum[%zu], "
+        "kfcServerArgs[%zu], kfcServerArgSize[%u], notifyNumOnMainThread[%u], slaveThreadNum[%u], "
+        "waitTimeout[%u], fullTimeout[%u], topoInfoSeqSize[%u].",
+        resourceCtx.threads.size(), resourceCtx.ccuKernels.size(), resourceCtx.ccuKernelNum.size(),
+        resourceCtx.kfcServerArgs.size(), resourceCtx.kfcServerArgSize, resourceCtx.notifyNumOnMainThread,
+        resourceCtx.slaveThreadNum, resourceCtx.waitTimeout, resourceCtx.fullTimeout, resourceCtx.topoInfoSeqSize);
 
     CHK_PRT_RET(resourceCtx.threads.empty(), HCCL_ERROR("empty ccu threads"), CCU_E_PARA);
     CHK_PRT_RET(resourceCtx.ccuKernels.empty(), HCCL_ERROR("empty ccu kernels"), CCU_E_PARA);
@@ -381,5 +399,16 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
 
     const void *kfcArgs = resourceCtx.kfcServerArgs.empty() ? nullptr :
         static_cast<const void *>(resourceCtx.kfcServerArgs.data());
-    return HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
+    const uint64_t arg0 = resourceCtx.kfcServerArgs.size() > 0 ? resourceCtx.kfcServerArgs[0] : 0U;
+    const uint64_t arg1 = resourceCtx.kfcServerArgs.size() > 1 ? resourceCtx.kfcServerArgs[1] : 0U;
+    const uint64_t arg2 = resourceCtx.kfcServerArgs.size() > 2 ? resourceCtx.kfcServerArgs[2] : 0U;
+    const uint64_t arg3 = resourceCtx.kfcServerArgs.size() > 3 ? resourceCtx.kfcServerArgs[3] : 0U;
+    HCCL_INFO("[CcuKernelLaunch] launch begin, threadHandle[0x%llx], kernelHandle[0x%llx], kfcArgs[%p], "
+        "argSize[%u], argCount[%zu], args[0..3]=[0x%llx, 0x%llx, 0x%llx, 0x%llx].",
+        threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize, resourceCtx.kfcServerArgs.size(),
+        arg0, arg1, arg2, arg3);
+    CcuResult ret = HcommCcuKernelLaunch(threadHandle, kernelHandle, kfcArgs, resourceCtx.kfcServerArgSize);
+    HCCL_INFO("[CcuKernelLaunch] launch end, ret[%d], threadHandle[0x%llx], kernelHandle[0x%llx].",
+        ret, threadHandle, kernelHandle);
+    return ret;
 }
