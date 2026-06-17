@@ -40,7 +40,7 @@ inline float atanhf(float x)
 
 ## 约束说明
 
-无
+不支持Subnormal场景：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符不支持Subnormal场景，当输入x为Subnormal数据或接近最小规格化数时，本接口最终返回0，而非数学上约等于x的值（atanhf(x) ≈ x）。
 
 ## 需要包含的头文件
 

@@ -38,10 +38,12 @@ inline float y1f(float x)
 -   当x=0时，返回值为-inf。
 -   当x=inf时，返回值为0。
 -   当x=nan时，返回值为nan。
+-   当x为部分正Subnormal数据且数学结果为有限值时，返回值为-inf。
 
 ## 约束说明
 
-使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
+-   使用本接口时，配置的线程数不应超过256，否则有栈溢出风险。
+-   不支持Subnormal场景：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符不支持Subnormal场景，当x为正Subnormal数据时，内部计算的除数可能被刷零，导致本接口最终结果为-inf。
 
 ## 需要包含的头文件
 
@@ -72,4 +74,3 @@ inline float y1f(float x)
         dst[idx] = y1f(x[idx]);
     }
     ```
-

@@ -48,7 +48,7 @@ half __hdiv(const half x, const half y)
 
 ## 约束说明
 
-无
+本接口对F16的subnormal（非规格化数）输入和输出不受影响：真机实测（dav-3510，36例bit比对）与非FTZ libm完全一致（0 DIFF）。
 
 ## 需要包含的头文件
 

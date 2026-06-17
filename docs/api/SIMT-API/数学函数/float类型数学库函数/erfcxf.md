@@ -36,10 +36,11 @@ inline float erfcxf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为-inf时，返回值为inf。
 -   当x为inf时，返回0。
+-   当x为正的大数且数学结果为Subnormal数据时，返回值为+0。
 
 ## 约束说明
 
-无
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 
@@ -70,4 +71,3 @@ inline float erfcxf(float x)
         y[idx] = erfcxf(x[idx]);
     }
     ```
-
