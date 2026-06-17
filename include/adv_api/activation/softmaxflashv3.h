@@ -40,18 +40,32 @@ namespace AscendC {
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), max = maxTmp + shiftCurr,
  *            y = exp(x-max), sum = rowsum(y)
  *        if isUpdate = true:
- *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = (rowMeanGlobal + inmean * (n - 1))
- * / n, meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), maxTmp = rowmax(x), shiftCurr =
- * (rowMeanGlobal - mean) * (a / 1 - a), shiftPrev = (inmean - mean) * (a / 1 - a), max = max(maxTmp + shiftCurr, inmax
- * + shiftPrev), y = exp(x-max), sum = rowsum(y) expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum \note
- * support data type: T half, U float \param [out] dstTensor: output y \param [out] meanTensor: output mean \param [out]
- * expSumTensor: output sum \param [out] maxTensor: output max \param [out] expMaxTensor: output expmax, only valid when
- * isUpdate is true \param [in] srcTensor: input x \param [in] inMeanTensor: input last inmean \param [in]
- * inExpSumTensor: input last insum \param [in] inMaxTensor: input last inmax \param [in] softmaxShapeInfo: input src
- * shape \param [in] tiling: input softmaxtiling \param [in] isUpdate: whether to update the sum and expmax \param [in]
- * isReuseSource: reserved param \param [in] isBasicBlock: if src shape[m,k] satisfy the condition(m%8 == 0 && k%64 ==
- * 0), you can set true to improve performance, but it is a reserved param when isDataFormatNZ = true \param [in]
- * isDataFormatNZ: if the data format of input srcTensor is NZ
+ *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x),
+ *            mean = (rowMeanGlobal + inmean * (n - 1)) / n,
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
+ *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a),
+ *            shiftPrev = (inmean - mean) * (a / 1 - a),
+ *            max = max(maxTmp + shiftCurr, inmax + shiftPrev),
+ *            y = exp(x-max), sum = rowsum(y)
+ *            expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum
+ *
+ * \note support data type: T half, U float
+ * \param [out] dstTensor: output y
+ * \param [out] meanTensor: output mean
+ * \param [out] expSumTensor: output sum
+ * \param [out] maxTensor: output max
+ * \param [out] expMaxTensor: output expmax, only valid when isUpdate is true
+ * \param [in] srcTensor: input x
+ * \param [in] inMeanTensor: input last inmean
+ * \param [in] inExpSumTensor: input last insum
+ * \param [in] inMaxTensor: input last inmax
+ * \param [in] softmaxShapeInfo: input src shape
+ * \param [in] tiling: input softmaxtiling
+ * \param [in] isUpdate: whether to update the sum and expmax
+ * \param [in] isReuseSource: reserved param
+ * \param [in] isBasicBlock: if src shape[m,k] satisfy the condition(m%8 == 0 && k%64 == 0), you can set
+ *                           true to improve performance, but it is a reserved param when isDataFormatNZ = true
+ * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
 template <
     typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
@@ -84,18 +98,32 @@ __aicore__ inline void SoftmaxFlashV3(
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), max = maxTmp + shiftCurr,
  *            y = exp(x-max), sum = rowsum(y)
  *        if isUpdate = true:
- *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = (rowMeanGlobal + inmean * (n - 1))
- * / n, meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), maxTmp = rowmax(x), shiftCurr =
- * (rowMeanGlobal - mean) * (a / 1 - a), shiftPrev = (inmean - mean) * (a / 1 - a), max = max(maxTmp + shiftCurr, inmax
- * + shiftPrev), y = exp(x-max), sum = rowsum(y) expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum \note
- * support data type: T half, U float \param [out] dstTensor: output y \param [out] meanTensor: output mean \param [out]
- * expSumTensor: output sum \param [out] maxTensor: output max \param [out] expMaxTensor: output expmax, only valid when
- * isUpdate is true \param [in] srcTensor: input x \param [in] inMeanTensor: input last inmean \param [in]
- * inExpSumTensor: input last insum \param [in] inMaxTensor: input last inmax \param [in] softmaxShapeInfo: input src
- * shape \param [in] tiling: input softmaxtiling \param [in] isUpdate: whether to update the sum and expmax \param [in]
- * isReuseSource: reserved param \param [in] isBasicBlock: if src shape[m,k] satisfy the condition(m%8 == 0 && k%64 ==
- * 0), you can set true to improve performance, but it is a reserved param when isDataFormatNZ = true \param [in]
- * isDataFormatNZ: if the data format of input srcTensor is NZ
+ *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x),
+ *            mean = (rowMeanGlobal + inmean * (n - 1)) / n,
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
+ *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a),
+ *            shiftPrev = (inmean - mean) * (a / 1 - a),
+ *            max = max(maxTmp + shiftCurr, inmax + shiftPrev),
+ *            y = exp(x-max), sum = rowsum(y)
+ *            expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum
+ *
+ * \note support data type: T half, U float
+ * \param [out] dstTensor: output y
+ * \param [out] meanTensor: output mean
+ * \param [out] expSumTensor: output sum
+ * \param [out] maxTensor: output max
+ * \param [out] expMaxTensor: output expmax, only valid when isUpdate is true
+ * \param [in] srcTensor: input x
+ * \param [in] inMeanTensor: input last inmean
+ * \param [in] inExpSumTensor: input last insum
+ * \param [in] inMaxTensor: input last inmax
+ * \param [in] softmaxShapeInfo: input src shape
+ * \param [in] tiling: input softmaxtiling
+ * \param [in] isUpdate: whether to update the sum and expmax
+ * \param [in] isReuseSource: reserved param
+ * \param [in] isBasicBlock: if src shape[m,k] satisfy the condition(m%8 == 0 && k%64 == 0), you can set
+ *                           true to improve performance, but it is a reserved param when isDataFormatNZ = true
+ * \param [in] isDataFormatNZ: if the data format of input srcTensor is NZ
  */
 template <
     typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
