@@ -377,11 +377,11 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 连续对齐搬运的bank冲突
 
-1. 读读冲突与读写冲突开销不同。case1存在读读冲突，case3存在读写冲突，但case3性能劣化于case1约8.2%。
+1. Ascend 950PR/Ascend 950DT采用低位编址，bank冲突的开销小于Atlas A2/A3系列产品，bank冲突造成的空隙可以被其它指令填满，bank冲突触发减少，通过改变首地址优化bank冲突收益有限。
 2. 二读一写下必然存在bank冲突。由于Ascend 950PR/Ascend 950DT一条指令处理256B（8个DataBlock），覆盖全部的8个BG，因此二读一写会发生在一个bank group，超出单个bank group的能力。（在Atlas A2/A3中，由于bank group个数多一倍，冲突可消除），在实际场景中，由于采用Regbase架构，UB读写指令的使用降低，bank冲突往往为非瓶颈点。
-3. 读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然触发了bank冲突。（在Atlas A2/A3中，读写地址重叠可以被硬件优化，消除bank冲突）。
+3. 架构发生变化，读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然触发了bank冲突。
 4. 双搬入指令搬运对性能劣化不明显，case4与case5性能接近。
-5. Ascend 950PR/Ascend 950DT采用低位编址，bank冲突的开销小于Atlas A2/A3系列产品，bank冲突造成的空隙可以被其它指令填满，通过改变首地址优化bank冲突收益有限。
+
 
 ### 非连续对齐搬运的bank冲突
 
@@ -445,7 +445,7 @@ source /path/to/cann/set_env.sh
 ```bash
 export SCENARIO_NUM=1          # 1-14可选
 mkdir -p build && cd build
-cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-Ascend 950PR/Ascend 950DT -DCASE_NUM=${SCENARIO_NUM}
+cmake .. -DSCENARIO_NUM=${SCENARIO_NUM}
 make -j
 python3 ../scripts/gen_data.py --case ${SCENARIO_NUM}
 ./demo                     # 精度验证 + 打点性能（输出cycles计数到stdout）
