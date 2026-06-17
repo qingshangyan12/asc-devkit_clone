@@ -62,14 +62,14 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
 | T | 操作数数据类型。 |
 | U | 源操作数和目的操作数的RegTensor类型，例如RegTensor<half\>，由编译器自动推导，用户不需要填写。 |
 
-**表2** 参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -85,7 +85,7 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 
 支持的数据类型为：bool、int8\_t、uint8\_t、int16\_t、uint16\_t、half、bfloat16\_t、int32\_t、uint32\_t、float、int64\_t、uint64\_t。
 
-**表3** 数据类型组合
+**表3**  数据类型组合
 
 | srcReg0和srcReg1数据类型 | dst数据类型 |
 | :----------------------- | :---------- |

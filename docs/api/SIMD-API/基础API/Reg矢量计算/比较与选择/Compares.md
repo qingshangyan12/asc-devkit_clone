@@ -53,8 +53,6 @@
 
 该接口用于逐元素比较源操作数中每个元素与一个标量的大小关系，根据模板参数指定的比较模式（LT/GT/GE/EQ/NE/LE）判断结果是否为真，若为真则输出MaskReg对应比特位置1，否则置0。
 
-其中mode为比较模式，包括LT（小于）、GT（大于）、GE（大于或等于）、EQ（等于）、NE（不等于）、LE（小于或等于）。
-
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
@@ -64,7 +62,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -73,7 +71,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 | U | 矢量源操作数的RegTensor类型，由编译器自动推导，用户不需要填写。 |
 | S | 标量操作数数据类型。 |
 
-**表2** 参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -88,7 +86,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 数据类型
 
-**表3** 数据类型组合
+**表3**  数据类型组合
 
 | srcReg和scalarValue数据类型 | dst数据类型 |
 | :-------------------------- | :---------- |

@@ -73,7 +73,7 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -83,7 +83,7 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 | S | 目的操作数和源操作数的RegTensor类型，例如RegTensor<uint32_t\>，由编译器自动推导，用户不需要填写。 |
 | V | 右移参数的RegTensor类型，例如RegTensor<int32_t\>，由编译器自动推导，用户不需要填写。 |
 
-**表2** 参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |
@@ -98,7 +98,7 @@ __simd_callee__ inline void ShiftRight(S& dstReg, S& srcReg0, V& srcReg1, MaskRe
 
 ## 数据类型
 
-**表3** 数据类型支持情况
+**表3**  数据类型支持情况
 
 | dstReg   | srcReg0  | srcReg1 |
 | :------- | :------- | :------ |

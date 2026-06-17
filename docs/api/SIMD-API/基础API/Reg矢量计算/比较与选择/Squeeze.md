@@ -53,7 +53,7 @@
 
 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列，剩余位置元素置为0，如[图1](#figure1)所示。
 
-**图 1**  Squeeze计算示意图<a id="figure1"></a>
+**图1**  Squeeze计算示意图<a id="figure1"></a>
 
 ![Squeeze计算示意图](../../../../figures/reg_squeeze.png)
 
@@ -68,7 +68,7 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表1** 模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
@@ -76,7 +76,7 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 | store | GatherMaskMode选择是否将有效元素的总字节数存入AR寄存器，AR寄存器描述参考[表 模板参数说明](../系统变量访问/GetSpr.md#table4835205712588)。<br>• NO_STORE_REG，有效元素的总字节数不存入AR寄存器；<br>• STORE_REG，有效元素的总字节数存入AR寄存器。 |
 | U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<uint32_t>，由编译器自动推导，用户不需要填写。 |
 
-**表2** 函数参数说明
+**表2**  函数参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :----- | :-------- | :--- |

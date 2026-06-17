@@ -80,7 +80,7 @@
 
 - 对RegTensor操作
 
-  **表1** 模板参数说明
+  **表1**  模板参数说明
 
   | 参数名 | 描述 |
   | :----- | :--- |
@@ -88,7 +88,7 @@
   | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型。选择MERGING模式或ZEROING模式。<br>• ZEROING模式下，mask未筛选的元素在dstReg中置零。<br>• MERGING模式当前不支持。 |
   | U | 目的操作数和源操作数的RegTensor类型，例如RegTensor<uint32_t\>，由编译器自动推导，用户不需要填写。 |
 
-  **表2** 参数说明
+  **表2**  参数说明
 
   | 参数名 | 输入/输出 | 描述 |
   | :----- | :-------- | :--- |
@@ -98,6 +98,8 @@
   | mask | 输入 | 指示源操作数元素操作的有效性，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 - 对MaskReg操作
+
+  **表3**  参数说明
 
   | 参数名 | 描述 |
   | :----- | :--- |
@@ -142,21 +144,21 @@
 
 - 对MaskReg操作
 
-    ```
-    template <typename T>
-    __simd_vf__ inline void AndVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg;
-        AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-        AscendC::Reg::MaskReg src1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-        AscendC::Reg::MaskReg dst;
-        AscendC::Reg::MaskReg mask;
-        for (uint16_t i = 0; i < repeatTimes; ++i) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-            AscendC::Reg::And(dst, src0, src1, mask);
-            AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-        }
-    }
-    ```
+  ```cpp
+  template <typename T>
+  __simd_vf__ inline void AndVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  {
+      AscendC::Reg::RegTensor<T> srcReg;
+      AscendC::Reg::MaskReg src0 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+      AscendC::Reg::MaskReg src1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+      AscendC::Reg::MaskReg dst;
+      AscendC::Reg::MaskReg mask;
+      for (uint16_t i = 0; i < repeatTimes; ++i) {
+          mask = AscendC::Reg::UpdateMask<T>(count);
+          AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+          AscendC::Reg::And(dst, src0, src1, mask);
+          AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
+          AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+      }
+  }
+  ```
