@@ -40,7 +40,7 @@ inline float erfcxf(float x)
 
 ## 约束说明
 
--   不支持Subnormal场景：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符不支持Subnormal场景，当x为正的大数时，内部计算的倒数可能为Subnormal数据，导致本接口最终结果为+0。
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

@@ -40,12 +40,7 @@ inline float tanhf(float x)
 
 ## 约束说明
 
-Ascend 950PR/Ascend 950DT底层采用DML实现tanh，不支持subnormal（非规格化数），对输入与中间值均执行刷零（Flush-To-Zero, FTZ）：
-
--   **输入FTZ**：当输入x落在subnormal区间（0 < |x| < 1.17549435e-38）时，x先被刷零为±0再参与运算，因此tanhf(sn)返回0，而非按非FTZ标准库（如libm）得到的约等于sn的值（tanhf(sn) ≈ sn）。此外，当tanhf内部路径exp(-sn)中的sn为subnormal时，exp(0)=1也会导致中间值偏离。
--   **输出FTZ**：tanhf的正常输入返回值范围为(-1, 1)，不会落入subnormal区间，该场景一般不会触发。
-
-若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

@@ -41,12 +41,7 @@ inline float scalbnf(float x, int32_t n)
 
 ## 约束说明
 
-Ascend 950PR/Ascend 950DT底层采用DML实现scalbn（scalbnf(x,n)=x/__powf(2,n)），不支持subnormal（非规格化数），对输入与输出均执行刷零（Flush-To-Zero, FTZ）：
-
--   **输入FTZ**：当输入x落在subnormal区间（0 < |x| < 1.17549435e-38）时，x先被刷零为±0再参与运算，scalbnf(sn, n)返回±0。
--   **输出FTZ**：当真实结果x×2^n落入subnormal区间时（如scalbnf(sn, -10)→sn×2^-10），输出被刷零为±0，而非按非FTZ标准库（如libm）得到的subnormal有限值。
-
-若业务对subnormal输入或输出结果的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
+不支持Subnormal场景：大多数处于Subnormal范围附近的输入和输出值，都会被刷新为保留符号的0。
 
 ## 需要包含的头文件
 

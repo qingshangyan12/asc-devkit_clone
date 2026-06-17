@@ -44,12 +44,7 @@ a^2 + b^2 + c^2的平方根。
 
 ## 约束说明
 
-Ascend 950PR/Ascend 950DT底层采用DML实现norm3d，不支持subnormal（非规格化数），对输入执行刷零（Flush-To-Zero, FTZ）：
-
--   **输入FTZ**：当输入a、b或c落在subnormal区间（0 < |val| < 1.17549435e-38）时，先被刷零为±0再参与运算。当仅部分输入为subnormal时，norm3df(sn, normal, normal) ≈ norm3df(0, normal, normal)，结果一致；当所有输入均为subnormal时，底层DML运算产生a/m = 0/0 = NaN，返回NaN（设计外行为），而非按非FTZ标准库（如libm）得到的有限值。
--   **输出FTZ**：norm3df的输出为正数平方根，正常输入难以使输出落入subnormal区间，该场景一般不会触发。
-
-若业务对subnormal输入的精度敏感，需在调用前自行将subnormal区间的输入上调至最小规格化数，或在host侧做相应补偿。
+不支持Subnormal场景：本接口内部实现使用到了[除法运算符](../../../../guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符)，由于除法运算符不支持Subnormal场景，当所有输入均为Subnormal数据时，本接口最终返回NaN。
 
 ## 需要包含的头文件
 
