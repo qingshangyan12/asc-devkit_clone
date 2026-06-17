@@ -221,11 +221,6 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_
 #endif
     wqeItem_.SetAddr(addr);
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
-#if 0 // default
-    sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
-    sqCI_ = sqPI_[8];
-    cqCI_ = sqCI_[8];
-#endif
     return HCOMM_SUCCESS;
 }
 
@@ -238,26 +233,14 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTens
 
     wqeItem_ = buff.template ReinterpretCast<uint32_t>();
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
-#if 0 // default
-    sqPI_ = cqeItem_[HCOMM_URMA_CQE_U32_NUM];
-    sqCI_ = sqPI_[8];
-    cqCI_ = sqCI_[8];
-#endif
     return HCOMM_SUCCESS;
 }
 
 __aicore__ inline void HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCqWhenSqOverflow(
     ChannelHandle channel, const SqContext& sqCtx, const CqContext& cqCtx, uint32_t curHead)
 {
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> sqCIGlobal;
-    sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
-    Gm2Ub(sqCI_, sqCIGlobal, 1);
-    uint32_t curTail = sqCI_.GetValue(0);
-#else // optim
     __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*> (sqCtx.contextInfo.ubJfs.tailAddr);
     uint32_t curTail = static_cast<uint32_t>(ld_dev(sqTailAddr, 0));
-#endif
     constexpr uint32_t POLL_CQ_THRESHOLD = 10;
     constexpr uint32_t NUM_CQE_PER_POLL_CQ = 100;
     uint32_t cqDepth = cqCtx.contextInfo.ubJfc.cqDepth;
@@ -285,15 +268,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     }
 
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> sqPIGlobal;
-    sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
-    Gm2Ub(sqPI_, sqPIGlobal, 1);
-    uint32_t curHead = sqPI_.GetValue(0);
-#else // optim
     __gm__ uint32_t* headAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.headAddr);
     uint32_t curHead = static_cast<uint32_t>(ld_dev(headAddr, 0));
-#endif
     KERNEL_LOG(KERNEL_INFO, "Hcomm URMA PostSend resolved remoteIdx=%d curHead=%u sqDepth=%u", remoteIdx,
         curHead, sqCtx.contextInfo.ubJfs.sqDepth);
 
@@ -328,12 +304,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     SyncAction<HardEvent::MTE3_S>();
 
     curHead += wqeBbCnt;
-#if 0 // default
-    sqPI_.SetValue(0, curHead);
-    Ub2Gm<uint32_t>(sqPIGlobal, sqPI_, 1);
-#else // optim
     st_dev(curHead, headAddr, 0);
-#endif
 
     if constexpr (commit) {
         st_dev(curHead, reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.dbVa), 0);
@@ -350,15 +321,8 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
     }
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     auto cqCtx = channelEntity->cqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> cqCIGlobal;
-    cqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.tailAddr);
-    Gm2Ub(cqCI_, cqCIGlobal, 1);
-    uint32_t curTail = cqCI_.GetValue(0);
-#else // optim
     __gm__ uint32_t* tailAddr = reinterpret_cast<__gm__ uint32_t*>(cqCtx.contextInfo.ubJfc.tailAddr);
     uint32_t curTail = static_cast<uint32_t>(ld_dev(tailAddr, 0));
-#endif
 
     uint64_t cqBaseAddr = cqCtx.contextInfo.ubJfc.scqVa;
     uint32_t cqeSize = cqCtx.contextInfo.ubJfc.cqeSize;
@@ -399,27 +363,15 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
 #endif
 
     // update CQ tail
-#if 0 // default
-    cqCI_.SetValue(0, curTail);
-    Ub2Gm<uint32_t>(cqCIGlobal, cqCI_, 1);
-#else //optim
     st_dev(curTail, tailAddr, 0);
-#endif
 
     // ring CQ doorbell
     st_dev(curTail & 0xFFFFFFU, (__gm__ uint32_t*)cqCtx.contextInfo.ubJfc.dbVa, 0);
 
     // update WQ tail
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> sqCIGlobal;
-    sqCIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.tailAddr);
-    sqCI_.SetValue(0, curTail);
-    Ub2Gm<uint32_t>(sqCIGlobal, sqCI_, 1);
-#else //optim
     __gm__ uint32_t* sqTailAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.tailAddr);
     st_dev(curTail, sqTailAddr, 0);
-#endif
     return HCOMM_SUCCESS;
 }
 
@@ -451,15 +403,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Commit(ChannelHandle
     (void)pipe;
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> sqPIGlobal;
-    sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
-    Gm2Ub(sqPI_, sqPIGlobal, 1);
-    uint32_t curHead = sqPI_.GetValue(0);
-#else // optim
     __gm__ uint32_t* headAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.headAddr);
     uint32_t curHead = static_cast<uint32_t>(ld_dev(headAddr, 0));
-#endif
 
     st_dev(curHead, (__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.dbVa, 0);
 
@@ -472,15 +417,8 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Drain(ChannelHandle 
     (void)pipe;
     __gm__ ChannelEntity* channelEntity = (__gm__ ChannelEntity*)channel;
     auto sqCtx = channelEntity->sqContextAddr[HCOMM_URMA_DEFAULT_QP_IDX];
-#if 0 // default
-    AscendC::GlobalTensor<uint32_t> sqPIGlobal;
-    sqPIGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqCtx.contextInfo.ubJfs.headAddr);
-    Gm2Ub(sqPI_, sqPIGlobal, 1);
-    uint32_t curHead = sqPI_.GetValue(0);
-#else // optim
     __gm__ uint32_t* headAddr = reinterpret_cast<__gm__ uint32_t*>(sqCtx.contextInfo.ubJfs.headAddr);
     uint32_t curHead = static_cast<uint32_t>(ld_dev(headAddr, 0));
-#endif
 
     uint32_t ret = PollCq(channel, curHead);
     if (ret != HCOMM_SUCCESS) {
