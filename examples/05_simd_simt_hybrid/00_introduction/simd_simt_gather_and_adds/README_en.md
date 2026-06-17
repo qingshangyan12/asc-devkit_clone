@@ -66,7 +66,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
   ```
   for (uint16_t i = 0; i < repeat_times; i++) {
       AscendC::Reg::LoadAlign(src_reg0, input + i * one_repeat_size);
-      AscendC::Reg::Adds(dst_reg0, src_reg0, adds_addend, mask_reg);
+      AscendC::Reg::Adds(dst_reg0, src_reg0, ADDS_ADDEND, mask_reg);
       AscendC::Reg::StoreAlign(output + i * one_repeat_size, dst_reg0, mask_reg);
   }
   ```
