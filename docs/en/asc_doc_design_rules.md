@@ -18,10 +18,6 @@ This design document defines Ascend C documentation requirements across three di
 
 The Ascend C documentation system consists of **five** core documents, connected through cross-references to form a navigable documentation network.
 
-The documentation system architecture diagram is shown below:
-
-<img src="figures/asc_docs_architecture.png" alt="Documentation System Architecture"  width="850px" height="580px">
-
 **Core Navigation Logic**: Each document is both a **link initiator** (when first mentioning content managed by another document, it links to it) and a **link receiver** (when another document mentions content this document is responsible for, it links back).
 
 **Five-document Positioning and Navigation Principles**:

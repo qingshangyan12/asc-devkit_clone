@@ -12,7 +12,7 @@ The Ascend C documentation system consists of five core documents. Developers ca
 | Operator Practice Reference | Operator implementation, performance optimization, tuning cases | `docs/guide/算子实践参考/` |
 | Cross-generation Migration & Compatibility Guide | API compatibility strategies, architecture change mappings, migration steps | `docs/guide/跨代迁移兼容性指南/` |
 
-Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the [Getting Started Tutorial](../guide/入门教程/Ascend-C概述与学习路径.md); developers with prior experience should read the [Programming Guide](../guide/编程指南/本文档组织结构.mdWS).
+Before reading this document, ensure you have a basic understanding of the Ascend AI processor hardware architecture. New developers are recommended to start with the [Getting Started Tutorial](../guide/入门教程/Ascend-C概述与学习路径.md); developers with prior experience should read the [Programming Guide](../guide/编程指南/本文档组织结构.md).
 
 ---
 
@@ -574,7 +574,7 @@ Refer to existing cases under `算子实践参考/优秀实践/` (e.g., FlashAtt
 Before submitting a documentation PR, check each item:
 
 **Content Accuracy**:
-- [ ] All hardware parameter values (capacity, granularity, range) are consistent with [Architecture Specifications](./guide/编程指南/高级编程/硬件实现/架构规格/架构规格.md)
+- [ ] All hardware parameter values (capacity, granularity, range) are consistent with Architecture Specifications
 - [ ] "Fixed value" and other absolute descriptions have been verified (many "fixed values" are actually determined by configuration parameters)
 - [ ] Data path descriptions match actual routes (no contradictions with other documents)
 
