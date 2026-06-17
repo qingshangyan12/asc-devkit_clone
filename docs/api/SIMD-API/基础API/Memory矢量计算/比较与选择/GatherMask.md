@@ -82,19 +82,19 @@
 
     <cann-filter npu-type="310p">
 
-    Atlas 推理系列产品，支持模式1-7。
+    Atlas 推理系列产品，支持模式1-6。
 
     </cann-filter>
 
     <cann-filter npu-type="310b">
 
-    Atlas 200I/500 A2 推理产品，支持模式1-6。
+    Atlas 200I/500 A2 推理产品，支持模式1-7。
 
     </cann-filter>
 
 - 用户自定义模式：对应函数原型中src1Pattern的数据类型为LocalTensor，迭代间间隔由src1RepeatStride决定，迭代内src1Pattern连续消耗。
 
-GatherMask接口计算过程如下图所示，参数设置为：mask=70，repeatTimes=2，src0Block=0，src0BlockStride=1，src0RepeatStride=8，src1RepeatStride=0。
+GatherMask接口计算过程如下图所示，参数设置为：mask=70，repeatTimes=2，src0BlockStride=1，src0RepeatStride=8，src1RepeatStride=0。
 
 以下示例均基于Counter模式，该模式支持两种配置方式：
 
@@ -135,7 +135,7 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 
 图1采用内置固定模式2进行计算，每个repeat取奇数索引元素。
 
-图2、图3采用用户自定义模式进行计算，自定义输入的Tensor为\[0x99999999,...,0x99999999\]，对应二进制为1001…1001，每四个元素取第一个和第四个元素。
+图2、图3采用用户自定义模式进行计算，自定义输入的src1Pattern为\[0x99999999,...,0x99999999\]，对应二进制为1001…1001，每四个元素取第一个和第四个元素。
 
 **图1**  GatherMask内置固定模式计算示意图
 
