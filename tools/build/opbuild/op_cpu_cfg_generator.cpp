@@ -30,49 +30,84 @@ enum class CPUType { AICPU = 0, HOSTCPU = 1 };
 
 std::string CPUCfgGenerator::GetDataTypeName(const ge::DataType& type) const
 {
-    static const std::map<ge::DataType, std::string> DTYPE_NAMES{
-        {ge::DT_FLOAT, "DT_FLOAT"},
-        {ge::DT_FLOAT16, "DT_FLOAT16"},
-        {ge::DT_INT8, "DT_INT8"},
-        {ge::DT_INT16, "DT_INT16"},
-        {ge::DT_INT32, "DT_INT32"},
-        {ge::DT_INT64, "DT_INT64"},
-        {ge::DT_UINT1, "DT_UINT1"},
-        {ge::DT_UINT8, "DT_UINT8"},
-        {ge::DT_UINT16, "DT_UINT16"},
-        {ge::DT_UINT32, "DT_UINT32"},
-        {ge::DT_UINT64, "DT_UINT64"},
-        {ge::DT_BOOL, "DT_BOOL"},
-        {ge::DT_DOUBLE, "DT_DOUBLE"},
-        {ge::DT_DUAL, "DT_DUAL"},
-        {ge::DT_DUAL_SUB_INT8, "DT_DUAL_SUB_INT8"},
-        {ge::DT_DUAL_SUB_UINT8, "DT_DUAL_SUB_UINT8"},
-        {ge::DT_STRING, "DT_STRING"},
-        {ge::DT_COMPLEX64, "DT_COMPLEX64"},
-        {ge::DT_COMPLEX128, "DT_COMPLEX128"},
-        {ge::DT_QINT8, "DT_QINT8"},
-        {ge::DT_QINT16, "DT_QINT16"},
-        {ge::DT_QINT32, "DT_QINT32"},
-        {ge::DT_QUINT8, "DT_QUINT8"},
-        {ge::DT_QUINT16, "DT_QUINT16"},
-        {ge::DT_RESOURCE, "DT_RESOURCE"},
-        {ge::DT_STRING_REF, "DT_STRING_REF"},
-        {ge::DT_INT4, "DT_INT4"},
-        {ge::DT_BF16, "DT_BF16"},
-        {ge::DT_COMPLEX32, "DT_COMPLEX32"},
-        {ge::DT_HIFLOAT8, "DT_HIFLOAT8"},
-        {ge::DT_FLOAT8_E4M3FN, "DT_FLOAT8_E4M3FN"},
-        {ge::DT_FLOAT8_E5M2, "DT_FLOAT8_E5M2"},
-        {ge::DT_FLOAT8_E8M0, "DT_FLOAT8_E8M0"},
-        {ge::DT_FLOAT6_E3M2, "DT_FLOAT6_E3M2"},
-        {ge::DT_FLOAT6_E2M3, "DT_FLOAT6_E2M3"},
-        {ge::DT_FLOAT4_E2M1, "DT_FLOAT4_E2M1"},
-        {ge::DT_FLOAT4_E1M2, "DT_FLOAT4_E1M2"}};
-    auto it = DTYPE_NAMES.find(type);
-    if (it != DTYPE_NAMES.end()) {
-        return it->second;
+    switch (type) {
+        case ge::DT_FLOAT:
+            return "DT_FLOAT";
+        case ge::DT_FLOAT16:
+            return "DT_FLOAT16";
+        case ge::DT_INT8:
+            return "DT_INT8";
+        case ge::DT_INT16:
+            return "DT_INT16";
+        case ge::DT_INT32:
+            return "DT_INT32";
+        case ge::DT_INT64:
+            return "DT_INT64";
+        case ge::DT_UINT1:
+            return "DT_UINT1";
+        case ge::DT_UINT8:
+            return "DT_UINT8";
+        case ge::DT_UINT16:
+            return "DT_UINT16";
+        case ge::DT_UINT32:
+            return "DT_UINT32";
+        case ge::DT_UINT64:
+            return "DT_UINT64";
+        case ge::DT_BOOL:
+            return "DT_BOOL";
+        case ge::DT_DOUBLE:
+            return "DT_DOUBLE";
+        case ge::DT_DUAL:
+            return "DT_DUAL";
+        case ge::DT_DUAL_SUB_INT8:
+            return "DT_DUAL_SUB_INT8";
+        case ge::DT_DUAL_SUB_UINT8:
+            return "DT_DUAL_SUB_UINT8";
+        case ge::DT_STRING:
+            return "DT_STRING";
+        case ge::DT_COMPLEX64:
+            return "DT_COMPLEX64";
+        case ge::DT_COMPLEX128:
+            return "DT_COMPLEX128";
+        case ge::DT_QINT8:
+            return "DT_QINT8";
+        case ge::DT_QINT16:
+            return "DT_QINT16";
+        case ge::DT_QINT32:
+            return "DT_QINT32";
+        case ge::DT_QUINT8:
+            return "DT_QUINT8";
+        case ge::DT_QUINT16:
+            return "DT_QUINT16";
+        case ge::DT_RESOURCE:
+            return "DT_RESOURCE";
+        case ge::DT_STRING_REF:
+            return "DT_STRING_REF";
+        case ge::DT_INT4:
+            return "DT_INT4";
+        case ge::DT_BF16:
+            return "DT_BF16";
+        case ge::DT_COMPLEX32:
+            return "DT_COMPLEX32";
+        case ge::DT_HIFLOAT8:
+            return "DT_HIFLOAT8";
+        case ge::DT_FLOAT8_E4M3FN:
+            return "DT_FLOAT8_E4M3FN";
+        case ge::DT_FLOAT8_E5M2:
+            return "DT_FLOAT8_E5M2";
+        case ge::DT_FLOAT8_E8M0:
+            return "DT_FLOAT8_E8M0";
+        case ge::DT_FLOAT6_E3M2:
+            return "DT_FLOAT6_E3M2";
+        case ge::DT_FLOAT6_E2M3:
+            return "DT_FLOAT6_E2M3";
+        case ge::DT_FLOAT4_E2M1:
+            return "DT_FLOAT4_E2M1";
+        case ge::DT_FLOAT4_E1M2:
+            return "DT_FLOAT4_E1M2";
+        default:
+            return "unknow";
     }
-    return "unknow";
 }
 
 void CPUCfgGenerator::GetParamFormats(std::vector<ge::Format>& formats, std::string& fmtstr) const
