@@ -1,4 +1,4 @@
-export SCENARIO_NUM=1          # 1-14可选
+export SCENARIO_NUM=1          # 有效值: 1-13
 mkdir -p build && cd build
 cmake .. -DSCENARIO_NUM=${SCENARIO_NUM}
 make -j
