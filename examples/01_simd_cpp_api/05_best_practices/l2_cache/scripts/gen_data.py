@@ -48,7 +48,7 @@ def gen_golden_data(scenario_num):
         print(f"[INFO] Case {scenario_num}: Generated golden_add.bin (x + y) for verification")
 
     else:
-        # Case 6-7: 流水线场景
+        # Case 6-8: 流水线/并行场景
         # 生成 Add 算子的两个输入矩阵
         add_x = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
         add_y = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
@@ -68,8 +68,8 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 8),
-                        help="Scenario number (1-7)")
+    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 10),
+                        help="Scenario number (1-9)")
     args = parser.parse_args()
 
     gen_golden_data(args.scenarioNum)

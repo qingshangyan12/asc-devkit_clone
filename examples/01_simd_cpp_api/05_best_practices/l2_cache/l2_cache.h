@@ -21,7 +21,8 @@
  *    通过对比双缓冲场景下 L2 Cache 开启和 bypass 的差异，
  *    揭示对于只读取一次的流式数据，关闭 L2 Cache 可以减少不必要的 cache 写开销。
  *
- * Case 6-7 的流水线效果通过 main 函数先后调用两个 kernel 实现，不在此文件中体现。
+ * Case 6-7 的流水线效果通过 main 函数先后调用两个 kernel 实现。
+ * Case 8-9 的并行效果通过 main 函数在不同 stream 上并行调用两个 kernel 实现。
  */
 
 #ifndef L2_CACHE_H
