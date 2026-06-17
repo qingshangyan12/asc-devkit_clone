@@ -25,8 +25,8 @@ ELEMENT_COUNT = M * N
 def gen_golden_data(scenario_num):
     """根据 scenario 编号生成对应的输入数据文件"""
 
-    input_dir = "./build/input"
-    output_dir = "./build/output"
+    input_dir = "./input"
+    output_dir = "./output"
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
@@ -49,8 +49,24 @@ def gen_golden_data(scenario_num):
         print(f"[INFO] Case {scenario_num}: Generated add_x.bin, add_y.bin with shape [{M}, {N}]")
         print(f"[INFO] Case {scenario_num}: Generated golden_add.bin (x + y) for verification")
 
+    elif scenario_num <= 7:
+        # Case 6-7: 流水线场景（两个独立 kernel 串行）
+        add_x = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
+        add_y = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
+        add_x.tofile(f"{input_dir}/add_x.bin")
+        add_y.tofile(f"{input_dir}/add_y.bin")
+        add_output = add_x + add_y
+        add_output.tofile(f"{output_dir}/golden_add.bin")
+
+        rng2 = np.random.default_rng(42)
+        repeat_input = rng2.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
+        repeat_input.tofile(f"{input_dir}/repeat_input.bin")
+
+        print(f"[INFO] Case {scenario_num}: Generated add_x.bin, add_y.bin, repeat_input.bin with shape [{M}, {N}]")
+        print(f"[INFO] Case {scenario_num}: Generated golden_add.bin (x + y) for verification")
+
     else:
-        # Case 6-9: 流水线/并行场景
+        # Case 10-11: 合并 kernel 场景，需要三个输入矩阵
         add_x = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
         add_y = rng.integers(-2, 3, size=ELEMENT_COUNT, dtype=np.int16).astype(np.float16)
         add_x.tofile(f"{input_dir}/add_x.bin")
@@ -68,8 +84,8 @@ def gen_golden_data(scenario_num):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 10),
-                        help="Scenario number (1-9)")
+    parser.add_argument("-scenarioNum", type=int, default=1,
+                        help="Scenario number (1-7, 10, 11)")
     args = parser.parse_args()
 
     gen_golden_data(args.scenarioNum)

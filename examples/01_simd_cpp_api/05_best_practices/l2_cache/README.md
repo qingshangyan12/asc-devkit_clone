@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例系统性地展示 L2 Cache Mode 配置对不同数据访问模式下的性能影响。样例覆盖**数据复用场景**、**流式数据场景**、**流水线场景**和**并行场景**四大类，通过 9 个 Case 逐步揭示 L2 Cache 的收益、局限以及全局效应，帮助开发者理解何时应开启/关闭 L2 Cache，以及如何通过分片策略最大化 L2 Cache 的利用率。
+本样例系统性地展示 L2 Cache Mode 配置对不同数据访问模式下的性能影响。样例覆盖**数据复用场景**、**流式数据场景**、**流水线场景**和**融合算子场景**四大类，通过 9 个 Case 逐步揭示 L2 Cache 的收益、局限以及全局效应，帮助开发者理解何时应开启/关闭 L2 Cache，以及如何通过分片策略最大化 L2 Cache 的利用率。
 
 **优化路径**：
 
@@ -19,8 +19,10 @@
 全局视角（多算子流水线）
   Case 6: Add(L2开启，污染L2) + DataCopyRepeat(分片重复) → 展示L2污染影响后续算子
   Case 7: Add(L2 bypass) + DataCopyRepeat(分片重复) → 与Case 6对比，展示bypass保后续算子性能
-   Case 8: Add(L2开启) 与 DataCopyRepeat(分片重复) 并行执行 → 展示并行场景下 L2 污染的影响
-   Case 9: Add(L2 bypass) 与 DataCopyRepeat(分片重复) 并行执行 → 与Case 8对比，展示并行场景下 L2 bypass 的保护效果
+
+融合算子（同一 kernel 内顺序执行）
+  Case 10: Add(L2开启) + Repeat(L2开启) 同一process → 与Case 6对照，观察融合算子内的行为
+  Case 11: Add(L2 bypass) + Repeat(L2开启) 同一process → 与Case 10对比，展示融合算子内L2 bypass效果
 ```
 
 ## 本样例支持的产品及CANN软件版本
@@ -70,11 +72,17 @@ $$z = x + y$$
 
 采用双缓冲（Ping-Pong）技术实现数据搬运与向量计算的流水线并行，通过对比 L2 Cache 开启和 bypass 的差异，观察流式数据对 MTE2 搬运效率的影响。
 
-### 流水线场景（Case 6-7）和并行场景（Case 8-9）
+### 流水线场景（Case 6-7）
 
 串行流水线场景将上述两类算子组合为流水线：先执行 Add 算子（Case 4/5），再执行 DataCopyRepeat 算子（Case 1）。通过对比 Add 流式数据的 L2 开启 vs bypass，观察前序算子对后序算子 L2 命中率的全局影响。
 
-并行场景将两个算子通过不同的 stream 并行执行（Case 8-9），与串行 Case 6-7 形成对比，展示并行场景下的 L2 竞争行为。
+### 融合算子场景（Case 10-11）
+
+融合算子场景将 Add 和 DataCopyRepeat 合并到同一个 `__aicore__` 的 `Process()` 函数中顺序执行（Case 10-11），与 Case 6-7（两个独立 kernel 串行）功能等价。区别在于：
+- Case 6-7 通过两个独立 kernel 实现，中间有 kernel 切换的开销和 L2 状态的完整性保持
+- Case 10-11 在同一个 kernel 内顺序执行两个阶段，UB 空间复用，kernel 启动开销仅有一次
+
+通过 Case 10（Add L2 开启）vs Case 11（Add L2 bypass）的对比，可以观察融合算子内部 L2 污染对后续内存访问的影响。
 
 - Add 算子读取 `add_x.bin`、`add_y.bin`（流式数据，只读一次）
 - DataCopyRepeat 算子读取 `repeat_input.bin`（复用数据，分片重复 4 次）
@@ -92,8 +100,8 @@ $$z = x + y$$
 <tr><td>Case 5</td><td>L2 bypass对流式数据的收益</td><td>与Case 4对比：仅关闭流式数据L2</td></tr>
 <tr><td rowspan="2">流水线</td><td>Case 6</td><td>流式数据L2污染 + 复用数据受损</td><td>Add(L2开)→Repeat(L2开) 串行</td></tr>
 <tr><td>Case 7</td><td>流式数据L2 bypass + 复用数据收益</td><td>与Case 6对比：Add改为L2 bypass，串行</td></tr>
-<tr><td rowspan="2">并行</td><td>Case 8</td><td>并行场景 L2 污染</td><td>Add(L2开) || Repeat(L2开)</td></tr>
-<tr><td>Case 9</td><td>并行场景 L2 bypass 保护</td><td>与Case 8对比：Add改为L2 bypass</td></tr>
+<tr><td rowspan="2">融合算子</td><td>Case 10</td><td>同一kernel内L2污染</td><td>Add(L2开)+Repeat在同一process</td></tr>
+<tr><td>Case 11</td><td>同一kernel内L2 bypass保护</td><td>与Case 10对比：Add改为L2 bypass</td></tr>
 </table>
 
 ## 性能指标说明
@@ -450,13 +458,13 @@ _L2Cache：_
 
 ---
 
-## 全局视角：多算子流水线场景和并行场景
+## 全局视角：多算子流水线场景和融合算子场景
 
 ### 背景
 
-在真实推理/训练场景中，多个算子按流水线方式串行执行（如 `LayerNorm → MatMul → Add → Activation`），或通过多 stream 并行执行。前序算子的 L2 Cache 配置不仅影响自身性能，还会影响后续算子的 L2 Cache 命中率，形成全局效应。
+在真实推理/训练场景中，多个算子按流水线方式串行执行（如 `LayerNorm → MatMul → Add → Activation`）。前序算子的 L2 Cache 配置不仅影响自身性能，还会影响后续算子的 L2 Cache 命中率，形成全局效应。
 
-Case 6 和 Case 7 将流式数据场景的 Add 算子（Case 4/5）与复用数据的 DataCopyRepeat 算子（Case 1）组合为流水线，展示前序算子对后序算子的影响。Case 8 和 Case 9 将两个算子通过不同 stream 并行执行，展示并行场景下的 L2 竞争行为。
+Case 6 和 Case 7 将流式数据场景的 Add 算子（Case 4/5）与复用数据的 DataCopyRepeat 算子（Case 1）组合为流水线，展示前序算子对后序算子的影响。Case 10 和 Case 11 将相同逻辑合并到同一个 kernel 的 process 函数中，展示融合算子内的行为。
 
 ### 流水线结构
 
@@ -603,110 +611,89 @@ _L2Cache（各 block 平均值）：_
 
 ---
 
-### Case 8: Add(L2 开启) || DataCopyRepeat(分片重复) 并行执行
+### Case 10: 合并的 Add + Repeat Kernel（Add L2 开启）
 
-**实现方式**：在 main 函数中创建两个 stream，分别下发 Add 和 DataCopyRepeat kernel，二者并行执行。
+**实现方式**：参考 `KernelAddAndRepeat<..., false>::Process()` 函数实现
 
-- `kernel_add<false>` — Add 算子，L2 默认开启（流式数据写入 L2）
-- `kernel_repeat<REPEAT_SPLIT_L2_ON>` — DataCopyRepeat 算子，分片重复 4 次
+将 Add 双缓冲和 DataCopyRepeat 分片重复合并到同一个 `__aicore__` 的 Process 函数中。Phase 1 执行 Add（L2 默认开启），Phase 2 执行 Repeat（分片重复 4 次）。两个阶段在同一 kernel 内顺序执行，UB 空间复用。
 
-**L2 策略**：
-
-- Add: x、y 默认 L2 开启 → 流式数据写入 L2 Cache 并与 Repeat 竞争 L2 空间
-- Repeat: 默认 L2 开启 → 与 Add 同时运行，L2 空间被流式数据抢占
-
-**关键代码**（main 函数中）：
+**关键代码**（l2_cache.h 中）：
 
 ```cpp
-// 创建两个 stream
-aclrtStream streamAdd, streamRepeat;
-aclrtCreateStream(&streamAdd);
-aclrtCreateStream(&streamRepeat);
-
-// 两个 kernel 在不同 stream 上并行下发
-kernel_add<false><<<AIV_CORE_NUM, nullptr, streamAdd>>>(...);
-kernel_repeat<REPEAT_SPLIT_L2_ON><<<AIV_CORE_NUM, nullptr, streamRepeat>>>(...);
-
-// 等待两个 kernel 都完成
-aclrtSynchronizeStream(streamAdd);
-aclrtSynchronizeStream(streamRepeat);
+// 在一个 process 函数中顺序执行 Add + Repeat
+// Phase 1: Add（L2 默认开启）
+AscendC::Add(zLocal, xLocal, yLocal, curLen);         // 向量计算
+// Phase 2: Repeat（N 方向切 4 份，每份重复 4 次）
+for (uint32_t splitIdx = 0; splitIdx < 4; splitIdx++) {
+    for (uint32_t repeatIdx = 0; repeatIdx < 4; repeatIdx++) {
+        // 按 tile 遍历分片内所有数据
+        AscendC::DataCopyPad(ubLocal, repeatGm[...], copyInParams, padParams);
+    }
+}
 ```
 
-**对比方式**：与 Case 7 对比，Case 7 是串行 + Add(L2 bypass)，Case 8 是并行 + Add(L2 开启)，展示并行场景下 L2 污染的叠加效应。
+**L2 策略**：
+- Add phase: x、y 默认 L2 开启 → 流式数据写入 L2，污染缓存空间
+- Repeat phase: 默认 L2 开启 → 期望 L2 复用，但受 Add 污染影响
 
-**性能数据（Atlas A2/A3 系列）**：
+**对比方式**：与 Case 6（两个独立 kernel 串行）功能等价，对比同一 kernel 内的行为和独立 kernel 的行为。
 
-_PipeUtilization：_
+**样例配置**：
+- 与 Case 6 完全相同的输入数据（add_x.bin, add_y.bin, repeat_input.bin）和矩阵切分方式
+- 唯一区别：Case 6 用两个独立 kernel，Case 10 用一个融合 kernel
 
-<table>
-<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
-<tr><td>0-39</td><td>~537</td><td>~966K</td><td>~29.7</td><td>~5.5%</td><td>~534</td><td>~99.6%</td><td>~142</td><td>~26.5%</td><td>~3.8</td><td>~0.7%</td></tr>
-<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~29.7</td><td>~14.6%</td><td>~203</td><td>~99.7%</td><td>~67</td><td>~32.8%</td><td>~3.1</td><td>~1.5%</td></tr>
-</table>
-
-_L2Cache（各 block 平均值）：_
+**MTE2 性能数据**：
 
 <table>
-<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
-<tr><td>0-39</td><td>~537</td><td>~966K</td><td>~0%</td><td>综合 Add(L2 开) + Repeat，L2 命中率近零</td></tr>
-<tr><td>40-47</td><td>~204</td><td>~367K</td><td>~0%</td><td>同上</td></tr>
+<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
+<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>融合kernel，Add(L2开)+Repeat</td></tr>
+<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>融合kernel，Add(L2开)+Repeat</td></tr>
 </table>
 
-> **Ascend 950 系列**：数据暂缺，待补充。
-
-**实测 vs 理论分析**：
-
-- **并行场景中，Add 和 Repeat 同时运行在 48 核上（不同 stream）**，msprof 采集的是两条流水线的综合数据。
-- **block 0-39 耗时 ~537μs**：与 Case 4 单独 Add（~536μs）和 Case 6 串行（~534μs）一致，Add 开 L2 的耗时稳定。
-- **并行 wall time**：瓶颈在 Add 算子（~537μs），Repeat 更早完成。
+**优化效果分析**：
+- Phase 1（Add）过程中，流式数据写入 L2 Cache，占据缓存空间
+- Phase 2（Repeat）开始后，L2 Cache 中已有大量 Add 的流式数据，复用的 repeat_input 数据被挤出
+- 预期 L2 命中率低于 Case 1（单独运行时）
 
 ---
 
-### Case 9: Add(L2 bypass) || DataCopyRepeat(分片重复) 并行执行
+### Case 11: 合并的 Add + Repeat Kernel（Add L2 Bypass）
 
-**实现方式**：与 Case 8 结构相同，唯一区别是 Add 使用 L2 bypass。
+**实现方式**：参考 `KernelAddAndRepeat<..., true>::Process()` 函数实现
 
-- `kernel_add<true>` — Add 算子，L2 bypass（流式数据不写入 L2）
-- `kernel_repeat<REPEAT_SPLIT_L2_ON>` — DataCopyRepeat 算子，分片重复 4 次
+与 Case 10 结构相同，唯一区别是 Add phase 使用 L2 bypass（`SetL2CacheHint(CACHE_MODE_DISABLE)`）。
+
+**关键代码**：
+
+```cpp
+// Phase 1: Add（L2 bypass，不污染 L2）
+if constexpr (addL2Bypass) {
+    addXGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+    addYGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+}
+// ... 双缓冲 Add ...
+// Phase 2: Repeat（与 Case 10 相同，L2 空间干净）
+```
 
 **L2 策略**：
+- Add phase: x、y `SetL2CacheHint(CACHE_MODE_DISABLE)` → 不写入 L2，L2 空间保持干净
+- Repeat phase: 默认 L2 开启 → L2 中无污染数据，命中率理想
 
-- Add: x、y `SetL2CacheHint(CACHE_MODE_DISABLE)` → 不污染 L2
-- Repeat: 默认 L2 开启 → 独享 L2 空间
+**对比方式**：与 Case 10 对比，唯一变量是 Add 的 L2 配置（开启 vs bypass）。与 Case 7（两个独立 kernel）功能等价。
 
-**对比方式**：与 Case 8 对比，唯一的变量是并行场景下 Add 的 L2 配置（开启 vs bypass）
-
-**性能数据（Atlas A2/A3 系列）**：
-
-_PipeUtilization：_
+**MTE2 性能数据**：
 
 <table>
-<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_vec_time(μs)</th><th>aiv_vec_ratio</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>aiv_mte3_time(μs)</th><th>aiv_mte3_ratio</th><th>aiv_scalar_time(μs)</th><th>aiv_scalar_ratio</th></tr>
-<tr><td>0-39</td><td>~387</td><td>~696K</td><td>~29.7</td><td>~7.7%</td><td>~384</td><td>~99.2%</td><td>~187</td><td>~48.4%</td><td>~3.9</td><td>~1.0%</td></tr>
-<tr><td>40-47</td><td>~178</td><td>~320K</td><td>~29.7</td><td>~16.7%</td><td>~176</td><td>~99.1%</td><td>~57</td><td>~32.0%</td><td>~3.5</td><td>~2.0%</td></tr>
+<tr><th>架构</th><th>Task Duration(μs)</th><th>aiv_total_cycles</th><th>aiv_mte2_time(μs)</th><th>aiv_mte2_ratio</th><th>说明</th></tr>
+<tr><td>Atlas A2/A3 系列</td><td></td><td></td><td></td><td></td><td>融合kernel，Add(L2 bypass)+Repeat</td></tr>
+<tr><td>Ascend 950 系列</td><td></td><td></td><td></td><td></td><td>融合kernel，Add(L2 bypass)+Repeat</td></tr>
 </table>
-
-_L2Cache（各 block 平均值）：_
-
-<table>
-<tr><th>block 范围</th><th>aiv_time(μs)</th><th>aiv_total_cycles</th><th>aiv_read_hit_rate(%)</th><th>说明</th></tr>
-<tr><td>0-39</td><td>~387</td><td>~696K</td><td>~0%</td><td>综合 Add(bypass) + Repeat，L2 命中率近零</td></tr>
-<tr><td>40-47</td><td>~178</td><td>~320K</td><td>~0%</td><td>同上</td></tr>
-</table>
-
-> **Ascend 950 系列**：数据暂缺，待补充。
-
-**实测 vs 理论分析**：
-
-- **block 0-39 耗时 ~387μs vs Case 8 同组 ~537μs**：下降 28%，与 Add bypass 收益一致。
-- **block 40-47 耗时 ~178μs vs Case 8 同组 ~204μs**：下降 13%。
-- **并行 wall time 对比**：Case 8 ≈ 537μs，Case 9 ≈ 387μs，L2 bypass 带来 28% 整体加速。
 
 **优化效果分析**：
-
-- 对比 Case 8 vs Case 9，在并行场景下 Add 的 L2 bypass 同样能保护 Repeat 的 L2 命中率
-- 与串行场景（Case 6 vs Case 7）对比，并行场景下 L2 竞争更加激烈，L2 bypass 的保护效果更为显著
-- 说明无论串行还是并行，流式数据的 L2 bypass 都能有效减少对复用数据算子的干扰
+- 与 Case 10 对比，Case 11 的 Add 使用 L2 bypass，避免了流式数据对 L2 的污染
+- Phase 2（Repeat）的 L2 命中率与 Case 1（独立运行）接近
+- 说明在融合算子中，前序流式计算阶段的 L2 bypass 同样能保护后续内存密集阶段的 L2 命中率
+- 与 Case 7 对比，Case 11 在功能上等价，但减少了 kernel 切换开销
 
 ---
 
@@ -771,7 +758,7 @@ _L2Cache（各 block 平均值）：_
 
   | 参数 | 说明 | 可选值 | 默认值 |
   |------|------|--------|--------|
-  | `SCENARIO_NUM` | 场景编号 | 1-9 | 1 |
+  | `SCENARIO_NUM` | 场景编号 | 1-7, 10, 11 | 1 |
   | `CMAKE_ASC_RUN_MODE` | 运行模式 | `npu`、`sim` | `npu` |
   | `CMAKE_ASC_ARCHITECTURES` | NPU 硬件架构 | `dav-2201`、`dav-3510` | `dav-2201` |
 
