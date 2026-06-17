@@ -32,7 +32,7 @@ $$
 
 **说明**：GELU 是神经网络中常用的激活函数，用于替代 ReLU 以获得更平滑的梯度特性。
 
-本样例采用 RegBase 编程方式实现 GELU 计算——与 [01_vector/add 样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_vector/add/README.md) 使用的 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）方式相比，RegBase 允许中间计算结果暂存在寄存器而非 UB 中，减少了 UB 读写次数，适合多步骤融合计算场景。
+本样例采用 RegBase 编程方式实现 GELU 计算——与 [01_add/add 样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md) 使用的 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）方式相比，RegBase 允许中间计算结果暂存在寄存器而非 UB 中，减少了 UB 读写次数，适合多步骤融合计算场景。
 
 完整的数据通路为：GM → UB → 寄存器（逐步计算）→ UB → GM。
 
