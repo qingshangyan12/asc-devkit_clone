@@ -30,13 +30,6 @@ def gen_golden_adds():
     return x, y, y.astype(np.float32)
 
 
-def gen_golden_case1():
-    N = 4096
-    x = np.random.uniform(1, 100, [N]).astype(np.float32)
-    y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    return x, y, x + y
-
-
 def gen_golden_case2(repeat=1):
     N = 4096
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
@@ -44,27 +37,19 @@ def gen_golden_case2(repeat=1):
     return x, y, x + repeat * y
 
 
-def gen_golden_dintlv():
+def gen_golden_case5(repeat=1):
     N = 4096
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    half = N // 2
-    golden = np.zeros(N, dtype=np.float32)
-    golden[:half] = x[::2] + x[1::2]
-    golden[half:] = y[::2] + y[1::2]
-    return x, y, golden
+    return x, y, repeat * x + y
 
 
 def gen_golden_gather(case, repeat=1):
     N = 256
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    if case == 7:
-        indices = np.zeros(N, dtype=np.uint32)
-    elif case == 8:
-        indices = np.tile(np.arange(8, dtype=np.uint32), N // 8)[:N]
-    elif case == 9:
+    if case == 8:
         indices = np.arange(N, dtype=np.uint32)
-    elif case == 10:
+    elif case == 9:
         indices = np.empty(N, dtype=np.uint32)
         indices[::2] = 0
         indices[1::2] = 128
@@ -105,21 +90,19 @@ def gen_golden_repeat_stride0():
 
 
 def gen_golden_data(case=1, repeat=1):
-    if case == 1:
-        x, y, golden = gen_golden_case1()
-    elif case == 2:
-        x, y, golden = gen_golden_case2(repeat)
-    elif case == 4:
-        x, y, golden = gen_golden_dintlv()
-    elif case in (3, 5, 6):
+    if case in (1, 2, 4, 6, 7):
         x, y, golden = gen_golden_add()
-    elif case in (7, 8, 9, 10):
+    elif case == 3:
+        x, y, golden = gen_golden_case2(repeat)
+    elif case == 5:
+        x, y, golden = gen_golden_case5(repeat)
+    elif case in (8, 9):
         x, y, golden = gen_golden_gather(case, repeat)
-    elif case in (11, 12):
+    elif case in (10, 11):
         x, y, golden = gen_golden_adds_512()
-    elif case == 13:
+    elif case == 12:
         x, y, golden = gen_golden_block_stride0()
-    elif case == 14:
+    elif case == 13:
         x, y, golden = gen_golden_repeat_stride0()
     else:
         raise ValueError(f"Unknown case: {case}")
