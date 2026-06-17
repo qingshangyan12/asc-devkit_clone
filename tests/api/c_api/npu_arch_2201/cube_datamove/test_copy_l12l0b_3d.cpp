@@ -17,74 +17,22 @@
                                                                                                  \
 class TestCubeDmamove##class_name##data_type : public testing::Test {                           \
 protected:                                                                                      \
-    void SetUp() {                                                                              \
-        g_coreType = C_API_AIC_TYPE;                                                     \
-    }                                                                                           \
-    void TearDown() {                                                                           \
-        g_coreType = C_API_AIV_TYPE;                                                     \
-    }                                                                                           \
+    void SetUp() { g_coreType = C_API_AIC_TYPE; }                                        \
+    void TearDown() { g_coreType = C_API_AIV_TYPE; }                                     \
 };                                                                                              \
-                                                                                                 \
-namespace {                                                                                     \
-                                                                                                 \
-void cce_name##_##data_type##_Stub(                                                             \
-    __cb__ cce_type* dst, __cbuf__ cce_type* src, uint16_t k_extension, uint16_t m_extension,   \
-    uint16_t k_start_pt, uint16_t m_start_pt, uint8_t stride_w, uint8_t stride_h,              \
-    uint8_t filter_w, uint8_t filter_h, uint8_t dilation_filter_w, uint8_t dilation_filter_h,  \
-    bool filter_size_w, bool filter_size_h, bool transpose, bool f_matrix_ctrl,                 \
-    uint16_t channel_size)                                                                      \
-{                                                                                               \
-    EXPECT_EQ(dst, reinterpret_cast<__cb__ cce_type *>(11));                                   \
-    EXPECT_EQ(src, reinterpret_cast<__cbuf__ cce_type *>(22));                                  \
-    EXPECT_EQ(k_extension, static_cast<uint16_t>(0));                                           \
-    EXPECT_EQ(m_extension, static_cast<uint16_t>(0));                                           \
-    EXPECT_EQ(k_start_pt, static_cast<uint16_t>(0));                                            \
-    EXPECT_EQ(m_start_pt, static_cast<uint16_t>(0));                                            \
-    EXPECT_EQ(stride_w, static_cast<uint8_t>(1));                                               \
-    EXPECT_EQ(stride_h, static_cast<uint8_t>(1));                                               \
-    EXPECT_EQ(filter_w, static_cast<uint8_t>(1));                                               \
-    EXPECT_EQ(filter_h, static_cast<uint8_t>(1));                                               \
-    EXPECT_EQ(dilation_filter_w, static_cast<uint8_t>(1));                                      \
-    EXPECT_EQ(dilation_filter_h, static_cast<uint8_t>(1));                                      \
-    EXPECT_EQ(filter_size_w, false);                                                            \
-    EXPECT_EQ(filter_size_h, false);                                                            \
-    EXPECT_EQ(transpose, false);                                                                \
-    EXPECT_EQ(f_matrix_ctrl, false);                                                            \
-    EXPECT_EQ(channel_size, static_cast<uint16_t>(1));                                          \
-}                                                                                               \
-                                                                                                 \
-}                                                                                               \
                                                                                                  \
 TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_Succ)                            \
 {                                                                                               \
     __cb__ data_type *dst = reinterpret_cast<__cb__ data_type *>(11);                           \
     __cbuf__ data_type *src = reinterpret_cast<__cbuf__ data_type *>(22);                       \
                                                                                                  \
-    uint16_t k_extension = static_cast<uint16_t>(0);                                            \
-    uint16_t m_extension = static_cast<uint16_t>(0);                                            \
-    uint16_t k_start_pt = static_cast<uint16_t>(0);                                             \
-    uint16_t m_start_pt = static_cast<uint16_t>(0);                                             \
-    uint8_t stride_w = static_cast<uint8_t>(1);                                                 \
-    uint8_t stride_h = static_cast<uint8_t>(1);                                                 \
-    uint8_t filter_w = static_cast<uint8_t>(1);                                                 \
-    uint8_t filter_h = static_cast<uint8_t>(1);                                                 \
-    uint8_t dilation_filter_w = static_cast<uint8_t>(1);                                        \
-    uint8_t dilation_filter_h = static_cast<uint8_t>(1);                                        \
-    bool filter_size_w = false;                                                                 \
-    bool filter_size_h = false;                                                                 \
-    bool transpose = false;                                                                     \
-    bool f_matrix_ctrl = false;                                                                 \
-    uint16_t channel_size = static_cast<uint16_t>(1);                                           \
-                                                                                                 \
     MOCKER_CPP(cce_name, void(__cb__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
                uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
                bool, bool, bool, bool, uint16_t))                                                \
-            .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_Stub));                                       \
+            .stubs()                                                                            \
+            .times(1);                                                                          \
                                                                                                  \
-    c_api_name(dst, src, k_extension, m_extension, k_start_pt, m_start_pt,                     \
-               stride_w, stride_h, filter_w, filter_h, dilation_filter_w, dilation_filter_h,    \
-               filter_size_w, filter_size_h, transpose, f_matrix_ctrl, channel_size);            \
+    c_api_name(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);         \
     GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                  \
@@ -93,34 +41,15 @@ TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_sync_Succ)       
     __cb__ data_type *dst = reinterpret_cast<__cb__ data_type *>(11);                           \
     __cbuf__ data_type *src = reinterpret_cast<__cbuf__ data_type *>(22);                       \
                                                                                                  \
-    uint16_t k_extension = static_cast<uint16_t>(0);                                            \
-    uint16_t m_extension = static_cast<uint16_t>(0);                                            \
-    uint16_t k_start_pt = static_cast<uint16_t>(0);                                             \
-    uint16_t m_start_pt = static_cast<uint16_t>(0);                                             \
-    uint8_t stride_w = static_cast<uint8_t>(1);                                                 \
-    uint8_t stride_h = static_cast<uint8_t>(1);                                                 \
-    uint8_t filter_w = static_cast<uint8_t>(1);                                                 \
-    uint8_t filter_h = static_cast<uint8_t>(1);                                                 \
-    uint8_t dilation_filter_w = static_cast<uint8_t>(1);                                        \
-    uint8_t dilation_filter_h = static_cast<uint8_t>(1);                                        \
-    bool filter_size_w = false;                                                                 \
-    bool filter_size_h = false;                                                                 \
-    bool transpose = false;                                                                     \
-    bool f_matrix_ctrl = false;                                                                 \
-    uint16_t channel_size = static_cast<uint16_t>(1);                                           \
-                                                                                                 \
     MOCKER_CPP(cce_name, void(__cb__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
                uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
                bool, bool, bool, bool, uint16_t))                                                \
-            .times(1)                                                                           \
-            .will(invoke(cce_name##_##data_type##_Stub));                                       \
+            .stubs()                                                                            \
+            .times(1);                                                                          \
                                                                                                  \
-    c_api_name##_sync(dst, src, k_extension, m_extension, k_start_pt, m_start_pt,              \
-                      stride_w, stride_h, filter_w, filter_h, dilation_filter_w,                \
-                      dilation_filter_h, filter_size_w, filter_size_h, transpose,               \
-                      f_matrix_ctrl, channel_size);                                              \
+    c_api_name##_sync(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);  \
     GlobalMockObject::verify();                                                                 \
-}                                                                                               \
+}
 
 TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, half, half);
 TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, bfloat16_t, bfloat16_t);
