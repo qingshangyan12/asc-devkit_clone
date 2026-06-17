@@ -174,7 +174,7 @@ inline half2 asc_ldca(half2* address)
 
 ## 返回值说明
 
-返回`address`指向的Global Memory数据。硬件实际取数路径如下：
+返回输入指向的Global Memory的数据。读取数据的执行流程如下：
 
 - 若Data Cache命中，直接从Data Cache返回该地址对应的数据；
 - 若Data Cache未命中但L2 Cache命中，从L2 Cache返回该地址对应的数据；
