@@ -13,8 +13,8 @@
  * \brief
  */
 
-#ifndef STUB_OP_CFG_GENERATOR_H
-#define STUB_OP_CFG_GENERATOR_H
+#ifndef STUB_OP_CPU_CFG_GENERATOR_H
+#define STUB_OP_CPU_CFG_GENERATOR_H
 
 #include <map>
 #include "op_generator.h"
