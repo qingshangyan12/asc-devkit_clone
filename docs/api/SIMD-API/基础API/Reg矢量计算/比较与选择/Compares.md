@@ -67,7 +67,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 | 参数名 | 描述 |
 | :----- | :--- |
 | T | 矢量源操作数数据类型。 |
-| mode | 比较模式。支持如下取值：<br>- LT：小于（less than）<br>- GT：大于（greater than）<br>- GE：大于或等于（greater than or equal to）<br>- EQ：等于（equal to）<br>- NE：不等于（not equal to）<br>- LE：小于或等于（less than or equal to） |
+| mode | 比较模式。支持如下取值：<br>• LT：小于<br>• GT：大于<br>• GE：大于或等于<br>• EQ：等于<br>• NE：不等于<br>• LE：小于或等于 |
 | U | 矢量源操作数的RegTensor类型，由编译器自动推导，用户不需要填写。 |
 | S | 标量操作数数据类型。 |
 
@@ -104,7 +104,7 @@ __simd_callee__ inline void Compares(MaskReg& dst, U& srcReg, S scalarValue, Mas
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- 通过mask参数控制的未选中元素在目的操作数中被置零。
+通过mask参数控制的未选中元素在目的操作数中被置零。
 
 ## 调用示例<a name="section12223121385116"></a>
 
