@@ -29,8 +29,7 @@ TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_Succ)            
     MOCKER_CPP(cce_name, void(__ca__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
                uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
                bool, bool, bool, bool, uint16_t))                                                \
-            .stubs()                                                                            \
-            .times(1);                                                                          \
+            .stubs();                                                                           \
                                                                                                  \
     c_api_name(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);         \
     GlobalMockObject::verify();                                                                 \
@@ -44,8 +43,7 @@ TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_sync_Succ)       
     MOCKER_CPP(cce_name, void(__ca__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
                uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
                bool, bool, bool, bool, uint16_t))                                                \
-            .stubs()                                                                            \
-            .times(1);                                                                          \
+            .stubs();                                                                          \
                                                                                                  \
     c_api_name##_sync(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);  \
     GlobalMockObject::verify();                                                                 \
