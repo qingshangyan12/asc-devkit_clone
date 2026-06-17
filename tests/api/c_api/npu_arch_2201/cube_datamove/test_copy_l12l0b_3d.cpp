@@ -9,11 +9,9 @@
 */
 
 #include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
-#include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(class_name, c_api_name, cce_name, data_type, cce_type)  \
+#define TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(class_name, c_api_name, data_type)                    \
                                                                                                  \
 class TestCubeDmamove##class_name##data_type : public testing::Test {                           \
 protected:                                                                                      \
@@ -25,32 +23,18 @@ TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_Succ)            
 {                                                                                               \
     __cb__ data_type *dst = reinterpret_cast<__cb__ data_type *>(11);                           \
     __cbuf__ data_type *src = reinterpret_cast<__cbuf__ data_type *>(22);                       \
-                                                                                                 \
-    MOCKER_CPP(cce_name, void(__cb__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
-               uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
-               bool, bool, bool, bool, uint16_t))                                                \
-            .stubs();                                                                           \
-                                                                                                 \
     c_api_name(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);         \
-    GlobalMockObject::verify();                                                                 \
 }                                                                                               \
                                                                                                  \
 TEST_F(TestCubeDmamove##class_name##data_type, c_api_name##_3d_sync_Succ)                       \
 {                                                                                               \
     __cb__ data_type *dst = reinterpret_cast<__cb__ data_type *>(11);                           \
     __cbuf__ data_type *src = reinterpret_cast<__cbuf__ data_type *>(22);                       \
-                                                                                                 \
-    MOCKER_CPP(cce_name, void(__cb__ cce_type *, __cbuf__ cce_type *, uint16_t, uint16_t,      \
-               uint16_t, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t,       \
-               bool, bool, bool, bool, uint16_t))                                                \
-            .stubs();                                                                          \
-                                                                                                 \
     c_api_name##_sync(dst, src, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, false, false, false, false, 1);  \
-    GlobalMockObject::verify();                                                                 \
 }
 
-TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, half, half);
-TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, bfloat16_t, bfloat16_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, int32_t, int32_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, uint32_t, uint32_t);
-TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, img2colv2_cbuf_to_cb, float, float);
+TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, half);
+TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, bfloat16_t);
+TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, int32_t);
+TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, uint32_t);
+TEST_CUBE_DATAMOVE_COPY_L12L0B_3D(CopyL12L0B3DCApi, asc_copy_l12l0b, float);
