@@ -53,7 +53,11 @@ inline float normcdfinvf(float x)
 
 ## 约束说明
 
-无
+Ascend 950PR/Ascend 950DT底层实现normcdfinv采用多项式逼近，对极小输入（含subnormal区间）的精度不足：
+
+-   **精度偏差（非FTZ主导）**：当输入x落在subnormal区间（0 < |x| < 1.17549435e-38）时，subnormal输入路径经logf保护可正常运算（输入不被刷零），但多项式逼近对极小输入的精度不足，结果与libm标准库存在偏差，该偏差非FTZ行为所致，而是SIMT实现中特殊值域处理的精度差异。
+
+若业务对极小输入的精度敏感，需在host侧做相应补偿或使用更高精度实现。
 
 ## 需要包含的头文件
 
