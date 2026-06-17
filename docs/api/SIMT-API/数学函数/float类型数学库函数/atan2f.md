@@ -68,7 +68,9 @@ y/x的反正切值。
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+不支持Subnormal场景（Ascend 950PR/Ascend 950DT）：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，当所有输入均为Subnormal数据时，本接口最终返回nan；当仅y为Subnormal数据时，本接口最终返回0。
+<!-- end id7 -->
 
 ## 需要包含的头文件
 
