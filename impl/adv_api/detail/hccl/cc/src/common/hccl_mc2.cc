@@ -344,6 +344,7 @@ HcclAllocComResourceByTilingA5Mc2(HcclComm comm, void *stream, void *mc2Tiling, 
 
 CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
 {
+    HCCL_INFO("[CcuKernelLaunch] called.");
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[%s] comm is nullptr.", __func__), CCU_E_PTR);
     CHK_PRT_RET(opResCtx == nullptr, HCCL_ERROR("[%s] opResCtx is nullptr.", __func__), CCU_E_PTR);
 
