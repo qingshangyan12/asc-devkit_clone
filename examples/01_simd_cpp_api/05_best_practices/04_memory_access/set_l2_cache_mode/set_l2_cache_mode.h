@@ -493,4 +493,171 @@ private:
     uint32_t totalElementsPerCore;
 };
 
+
+// ====================================================================
+// 第三部分：KernelRepeatAndAdd（Case 6-7 新增）
+// 将 Case 1 的分片重复搬运和 Case 4/5 的双缓冲 Add 合并到同一个 Process() 函数中。
+// Add 矩阵：[addM, addN]（与 Case 4/5 一致，[8192, 8192]）
+// Repeat 矩阵：[repeatM, repeatN]（与 Case 1 一致，[12288, 12288]）
+//
+// 模板参数 addL2Bypass 控制 Add 阶段的 L2 Cache 配置：
+//   false: Case 6 — Add L2 默认开启，流式数据写入 L2，然后 Repeat L2 启用
+//   true:  Case 7 — Add L2 bypass，流式数据不污染 L2，然后 Repeat L2 启用
+// ====================================================================
+
+template <uint32_t addM, uint32_t addN, uint32_t repeatM, uint32_t repeatN, uint32_t splitM,
+    uint32_t dataCopyLen, uint32_t repeatTileM, uint32_t repeatTileN, bool addL2Bypass>
+class KernelRepeatAndAdd {
+public:
+    __aicore__ inline KernelRepeatAndAdd() = default;
+
+    /* !
+     * \brief 初始化：Add 矩阵 [addM, addN]，Repeat 矩阵 [repeatM, repeatN]，分别切分
+     */
+    __aicore__ inline void Init(__gm__ uint8_t* addX, __gm__ uint8_t* addY,
+                                __gm__ uint8_t* repeatSrc, __gm__ uint8_t* addZ)
+    {
+        uint32_t blockIdx = AscendC::GetBlockIdx();
+
+        // ---- Add 阶段的切分（基于 addM）----
+        constexpr uint32_t addBaseM = addM / splitM;
+        constexpr uint32_t addRemainder = addM % splitM;
+        uint32_t addActualM;
+        uint32_t addStartM;
+        if (blockIdx < addRemainder) {
+            addActualM = addBaseM + 1;
+            addStartM = blockIdx * addActualM;
+        } else {
+            addActualM = addBaseM;
+            addStartM = addRemainder * (addBaseM + 1) + (blockIdx - addRemainder) * addBaseM;
+        }
+        this->addElementsPerCore = addActualM * addN;
+        addXGm.SetGlobalBuffer((__gm__ half*)addX + addStartM * addN, this->addElementsPerCore);
+        addYGm.SetGlobalBuffer((__gm__ half*)addY + addStartM * addN, this->addElementsPerCore);
+        addZGm.SetGlobalBuffer((__gm__ half*)addZ + addStartM * addN, this->addElementsPerCore);
+
+        // ---- Repeat 阶段的切分（基于 repeatM）----
+        constexpr uint32_t repBaseM = repeatM / splitM;
+        constexpr uint32_t repRemainder = repeatM % splitM;
+        uint32_t repActualM;
+        uint32_t repStartM;
+        if (blockIdx < repRemainder) {
+            repActualM = repBaseM + 1;
+            repStartM = blockIdx * repActualM;
+        } else {
+            repActualM = repBaseM;
+            repStartM = repRemainder * (repBaseM + 1) + (blockIdx - repRemainder) * repBaseM;
+        }
+        this->repeatCoreM = repActualM;
+        repeatGm.SetGlobalBuffer((__gm__ half*)repeatSrc + repStartM * repeatN, repActualM * repeatN);
+    }
+
+    /* !
+     * \brief Case 6/7 的合并 Process：Phase 1 Add（双缓冲） + Phase 2 Repeat（分片重复 4 次）
+     */
+    __aicore__ inline void Process()
+    {
+        // ---- Phase 1: Add 双缓冲 [addM, addN]（抽取自 KernelAdd::ProcessDoubleBuffer）----
+        AscendC::LocalTensor<half> xPing(AscendC::TPosition::VECCALC, xAddrPing, MAX_DATA_COPY_LEN);
+        AscendC::LocalTensor<half> yPing(AscendC::TPosition::VECCALC, yAddrPing, MAX_DATA_COPY_LEN);
+        AscendC::LocalTensor<half> zPing(AscendC::TPosition::VECCALC, zAddrPing, MAX_DATA_COPY_LEN);
+        AscendC::LocalTensor<half> xPong(AscendC::TPosition::VECCALC, xAddrPong, MAX_DATA_COPY_LEN);
+        AscendC::LocalTensor<half> yPong(AscendC::TPosition::VECCALC, yAddrPong, MAX_DATA_COPY_LEN);
+        AscendC::LocalTensor<half> zPong(AscendC::TPosition::VECCALC, zAddrPong, MAX_DATA_COPY_LEN);
+
+        if constexpr (addL2Bypass) {
+            addXGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+            addYGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+        }
+
+        uint32_t totalBlocks = AscendC::DivCeil(addElementsPerCore, dataCopyLen);
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+        AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+
+        for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
+            uint32_t startElement = loopIdx * dataCopyLen;
+            uint32_t remainElements = addElementsPerCore - startElement;
+            uint32_t curLen = remainElements > dataCopyLen ? dataCopyLen : remainElements;
+
+            int32_t eventID = ((loopIdx & 1) == 0 ? EVENT_ID0 : EVENT_ID1);
+            AscendC::LocalTensor<half>& xLocal = ((loopIdx & 1) == 0 ? xPing : xPong);
+            AscendC::LocalTensor<half>& yLocal = ((loopIdx & 1) == 0 ? yPing : yPong);
+            AscendC::LocalTensor<half>& zLocal = ((loopIdx & 1) == 0 ? zPing : zPong);
+
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(eventID);
+            AscendC::DataCopy(xLocal, addXGm[startElement], curLen);
+            AscendC::DataCopy(yLocal, addYGm[startElement], curLen);
+            AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(eventID);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(eventID);
+            AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(eventID);
+            AscendC::Add(zLocal, xLocal, yLocal, curLen);
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE2>(eventID);
+            AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(eventID);
+            AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(eventID);
+            AscendC::DataCopy(addZGm[startElement], zLocal, curLen);
+            AscendC::SetFlag<AscendC::HardEvent::MTE3_V>(eventID);
+        }
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>(EVENT_ID1);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID0);
+        AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(EVENT_ID1);
+
+        // ---- Phase 2: Repeat 分片重复搬运 4 次（抽取自 KernelDataCopyPadGm2Ub）----
+        AscendC::LocalTensor<half> ubLocal(AscendC::TPosition::VECIN, repeatUbAddr, repeatUbBufferSize);
+
+        constexpr uint32_t quarterN = repeatN / 4;
+        uint32_t mStart = 0;   // repeatGm 在 Init 中已偏移到当前核的分片起始地址
+        uint32_t nLoopCount = quarterN / repeatTileN;
+        constexpr uint32_t mLoopCount = repeatCoreM / repeatTileM;
+        AscendC::DataCopyParams copyInParams{
+            static_cast<uint16_t>(repeatTileM),
+            static_cast<uint16_t>(repeatTileN * sizeof(half)),
+            static_cast<uint16_t>((repeatN - repeatTileN) * sizeof(half)),
+            0};
+        AscendC::DataCopyPadParams padParams{false, 0, 0, 0};
+
+        for (uint32_t splitIdx = 0; splitIdx < 4; splitIdx++) {
+            uint32_t nStart = splitIdx * quarterN;
+            for (uint32_t repeatIdx = 0; repeatIdx < 4; repeatIdx++) {
+                for (uint32_t mBlockIdx = 0; mBlockIdx < mLoopCount; mBlockIdx++) {
+                    uint32_t mIdx = mBlockIdx * repeatTileM;  // repeatGm 已偏移，从 0 开始
+                    for (uint32_t nBlockIdx = 0; nBlockIdx < nLoopCount; nBlockIdx++) {
+                        uint32_t nIdx = nBlockIdx * repeatTileN;
+                        AscendC::DataCopyPad(
+                            ubLocal, repeatGm[mIdx * repeatN + nStart + nIdx], copyInParams, padParams);
+                    }
+                }
+            }
+        }
+    }
+
+private:
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    static constexpr uint32_t MAX_DATA_COPY_LEN = 21840;
+#else
+    static constexpr uint32_t MAX_DATA_COPY_LEN = 16384;
+#endif
+
+    // Add 双缓冲 UB 地址布局
+    static constexpr uint32_t xAddrPing = 0;
+    static constexpr uint32_t yAddrPing = MAX_DATA_COPY_LEN * sizeof(half);
+    static constexpr uint32_t zAddrPing = yAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+    static constexpr uint32_t xAddrPong = zAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+    static constexpr uint32_t yAddrPong = xAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+    static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+
+    // Repeat 阶段复用 UB 空间
+    static constexpr uint32_t repeatUbAddr = 0;
+    static constexpr uint32_t repeatUbBufferSize = repeatTileM * repeatTileN;
+
+    AscendC::GlobalTensor<half> addXGm;       // Add 输入 x
+    AscendC::GlobalTensor<half> addYGm;       // Add 输入 y
+    AscendC::GlobalTensor<half> addZGm;       // Add 输出 z
+    AscendC::GlobalTensor<half> repeatGm;     // Repeat 输入
+    uint32_t addElementsPerCore;              // Add 阶段当前核元素数
+    uint32_t repeatCoreM;                     // Repeat 阶段当前核行数
+};
+
 #endif // SET_L2_CACHE_MODE_H

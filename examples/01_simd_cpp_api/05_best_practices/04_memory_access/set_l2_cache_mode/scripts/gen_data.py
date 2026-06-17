@@ -30,7 +30,7 @@ def gen_golden_data(scenario_num):
         input_data = rng.integers(-2, 3, size=m * n, dtype=np.int16).astype(np.float16)
         input_data.tofile("./input/input.bin")
         print(f"[INFO] Case {scenario_num}: Generated input.bin with shape [{m}, {n}]")
-    else:
+    elif scenario_num <= 5:
         # Case 4-5: 抽取自 add_high_performance 样例，矩阵 [8192, 8192]，half 类型
         m = 8192
         n = 8192
@@ -42,11 +42,31 @@ def gen_golden_data(scenario_num):
         golden.tofile("./output/golden.bin")
         print(f"[INFO] Case {scenario_num}: Generated input_x.bin, input_y.bin with shape [{m}, {n}]")
         print(f"[INFO] Case {scenario_num}: Generated golden.bin (x + y) for verification")
+    else:
+        # Case 6-7: 合并 Repeat + Add Kernel
+        # Add 矩阵 [8192, 8192]，Repeat 矩阵 [12288, 12288]
+        add_m = 8192
+        add_n = 8192
+        repeat_m = 12288
+        repeat_n = 12288
+        add_x = rng.integers(-2, 3, size=add_m * add_n, dtype=np.int16).astype(np.float16)
+        add_y = rng.integers(-2, 3, size=add_m * add_n, dtype=np.int16).astype(np.float16)
+        add_x.tofile("./input/input_x.bin")
+        add_y.tofile("./input/input_y.bin")
+        golden = (add_x + add_y).astype(np.float16)
+        golden.tofile("./output/golden.bin")
+
+        rng2 = np.random.default_rng(42)
+        repeat_input = rng2.integers(-2, 3, size=repeat_m * repeat_n, dtype=np.int16).astype(np.float16)
+        repeat_input.tofile("./input/repeat_input.bin")
+
+        print(f"[INFO] Case {scenario_num}: Add=[{add_m},{add_n}], Repeat=[{repeat_m},{repeat_n}]")
+        print(f"[INFO] Case {scenario_num}: Generated golden.bin (x + y) for verification")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-scenarioNum", type=int, default=1, choices=range(1, 6),
-                        help="Scenario number (1-5)")
+    parser.add_argument("-scenarioNum", type=int, default=1,
+                        help="Scenario number (1-7)")
     args = parser.parse_args()
     gen_golden_data(args.scenarioNum)

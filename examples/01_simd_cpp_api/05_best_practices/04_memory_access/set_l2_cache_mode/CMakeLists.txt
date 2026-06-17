@@ -19,8 +19,8 @@ find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-if(NOT SCENARIO_NUM MATCHES "^[1-5]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1 to 5, but got ${SCENARIO_NUM}")
+if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1 to 7, but got ${SCENARIO_NUM}")
 endif()
 
 # 确定硬件架构 ID
