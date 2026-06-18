@@ -149,6 +149,14 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
     return;
 }
 
+template <class... Args> 
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args) 
+{ 
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102
+    __asc_aicore::printf_impl(fmt, args...); 
+#endif
+}
+
 // only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102
 template <class... Args>

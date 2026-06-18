@@ -48,9 +48,10 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &tensor,
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &tensor,
     uint32_t index, uint32_t countOff, uint32_t dumpSize);
+template <class... Args> 
+__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args);
 
 using __asc_aicore::printf;
-using __asc_aicore::PRINTF;
 }  // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_dump_tensor_intf_impl.h"
