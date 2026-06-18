@@ -22,7 +22,7 @@
 #define IMPL_MATMUL_SCHEDULER_SCHEDULER_H
 
 #include "batch/batch_scheduler_single.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "batch/batch_scheduler_v200.h"
 #else
 #include "batch/batch_scheduler.h"
@@ -35,7 +35,7 @@
 #include "base/scheduler_special_mdl.h"
 #include "base/scheduler_n_buffer.h"
 #include "base/scheduler_mdl_partial_output.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "base/scheduler_mdl_mx.h"
 #include "base/scheduler_norm_mx.h"
 #endif

@@ -139,9 +139,9 @@ __aicore__ inline void SoftmaxFlashV2UpdateImpl(
 
     PipeBarrier<PIPE_V>();
     Exp(dst[offset1], dst[offset1], splitSize); // exp(x - max)
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     Adds<float>(maxTensor[offset2], tmpBuffer0, 0, reduceSize);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     DataCopy(maxTensor[offset2], tmpBuffer0, reduceSize);
 #endif
     PipeBarrier<PIPE_V>();
@@ -173,9 +173,9 @@ __aicore__ inline void SoftmaxFlashV2UpdateImpl(
     const LocalTensor<float>& tmpBuffer2 = workLocal[tiling.splitSize + tiling.reduceSize];
     const LocalTensor<float>& tmpBuffer3 =
         workLocal[tiling.splitSize + tiling.reduceSize + tiling.splitM * FLOAT_REPEAT_SIZE];
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     Adds<float>(tmpBuffer1, inMaxTensor[offset2], 0, reduceSize);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     DataCopy(tmpBuffer1, inMaxTensor[offset2], reduceSize);
 #endif
     Cast(tmpBuffer0, src[offset1], RoundMode::CAST_NONE, splitSize);

@@ -158,7 +158,7 @@ public:
     __aicore__ inline void SetTensorA(const LocalTensor<SrcAT>& leftMatrix, bool isTransposeA = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
             ASSERT("SetTensorA localTensor not support when enableMixDualMaster is enabled");
 #endif
         }
@@ -166,7 +166,7 @@ public:
     __aicore__ inline void SetTensorB(const LocalTensor<SrcBT>& rightMatrix, bool isTransposeB = false)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
             ASSERT("SetTensorB localTensor not support when enableMixDualMaster is enabled");
 #endif
         }
@@ -174,7 +174,7 @@ public:
     __aicore__ inline void SetBias(const LocalTensor<BiasT>& inputBias)
     {
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
             ASSERT("SetBias localTensor not support when enableMixDualMaster is enabled");
 #endif
         }
@@ -315,7 +315,7 @@ public:
             KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput.");
         });
         if constexpr (ToMatmulConfig(MM_CFG).enableMixDualMaster) {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
             ASSERT("IterateAll localTensor not support when enableMixDualMaster is enabled");
 #endif
 #if defined(USE_SSBUF)

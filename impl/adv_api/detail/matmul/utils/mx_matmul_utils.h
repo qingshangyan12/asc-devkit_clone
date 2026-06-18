@@ -51,7 +51,7 @@ struct GetL0DataType {
     using Type = T;
 };
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <>
 struct GetMmDstType<fp8_e4m3fn_t> {
     using Type = float;
@@ -104,7 +104,7 @@ __aicore__ inline constexpr static int32_t AuxGetC0Size()
     if (sizeof(SrcT) == sizeof(float)) {
         return Impl::B32_C0SIZE;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     else if (IsTypeOneOfV<SrcT, uint8_t, int8_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t>) {
         return Impl::B8_C0SIZE;
     } else if (IsTypeOneOfV<SrcT, int4b_t, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
@@ -135,7 +135,7 @@ __aicore__ inline constexpr bool IsSupportB8()
     if (IsSameTypeV<SrcT, int8_t>) {
         return true;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if (IsTypeOneOfV<SrcT, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return true;
     }
@@ -149,7 +149,7 @@ __aicore__ inline constexpr bool IsSupportB4()
     if (IsSameTypeV<SrcT, int4b_t>) {
         return true;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
         return true;
     }
@@ -160,7 +160,7 @@ __aicore__ inline constexpr bool IsSupportB4()
 template <typename SrcT>
 __aicore__ inline constexpr bool IsSupportMxFp4()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if (IsTypeOneOfV<SrcT, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
         return true;
     }
@@ -171,7 +171,7 @@ __aicore__ inline constexpr bool IsSupportMxFp4()
 template <typename SrcT>
 __aicore__ inline constexpr bool IsSupportMxFp8()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if (IsTypeOneOfV<SrcT, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return true;
     }
@@ -185,7 +185,7 @@ __aicore__ inline constexpr static bool IsNeedC0Align()
     return IsSupportB8<T>() || IsSupportB4<T>();
 }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 constexpr uint8_t INTRA_MODE = 4;
 template <typename INPUT_TYPE>
 __aicore__ constexpr bool PhyMxScalePosIsL1()
@@ -224,17 +224,12 @@ __aicore__ constexpr int32_t GetBitSize()
     if constexpr (IsSameTypeV<T, AscendC::int4b_t>) {
         return ONE_BYTE_BIT_SIZE / 2;
     }
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (IsTypeOneOfV<T, fp8_e8m0_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return ONE_BYTE_BIT_SIZE;
     }
     if constexpr (IsTypeOneOfV<T, fp4x2_e2m1_t, fp4x2_e1m2_t>) {
         return ONE_BYTE_BIT_SIZE / 2;
-    }
-#endif
-#if __NPU_ARCH__ == 5102
-    if (IsSameTypeV<T, AscendC::int2b_t>) {
-        return ONE_BYTE_BIT_SIZE / 4;
     }
 #endif
 
@@ -265,22 +260,10 @@ __aicore__ inline constexpr auto GetTransBDataType()
         B_TYPE mxBType;
         return mxBType;
     }
-#if __NPU_ARCH__ == 5102
-    else if constexpr (
-        DecompMode(MM_CFG) == DecompressionMode::DECOMP_1bitTo4bit ||
-        DecompMode(MM_CFG) == DecompressionMode::DECOMP_2bitTo4bit) {
-        MatmulType<TPosition::GM, CubeFormat::NZ, int4b_t> bType;
-        return bType;
-    } else if constexpr (DecompMode(MM_CFG) == DecompressionMode::DECOMP_4bitTo8bit) {
-        MatmulType<TPosition::GM, CubeFormat::NZ, int8_t> bType;
-        return bType;
-    }
-#else
     else if constexpr (IsL1BNeedTrans<A_TYPE, B_TYPE, MM_CFG>()) {
         A_TYPE aType;
         return aType;
     }
-#endif
     else {
         B_TYPE bType;
         return bType;
@@ -322,7 +305,7 @@ __aicore__ inline constexpr bool InputPhyPosIsUB()
     }
 }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T>
 constexpr bool SupportMXFP8 = IsTypeOneOfV<T, fp8_e4m3fn_t, fp8_e5m2_t, fp4x2_e2m1_t, fp4x2_e1m2_t>;
 #else

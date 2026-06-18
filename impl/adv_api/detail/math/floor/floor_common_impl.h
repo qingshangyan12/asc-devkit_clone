@@ -21,14 +21,14 @@
 #endif
 #ifndef IMPL_MATH_FLOOR_FLOOR_COMMON_IMPL_H
 #define IMPL_MATH_FLOOR_FLOOR_COMMON_IMPL_H
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "floor_v220_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "floor_v200_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 #include "floor_v300_impl.h"
 #elif defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "floor_3510_impl.h"
 #endif
 

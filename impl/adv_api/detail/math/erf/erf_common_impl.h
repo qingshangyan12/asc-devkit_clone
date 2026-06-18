@@ -27,7 +27,7 @@
 namespace AscendC {
 __aicore__ inline constexpr RoundMode GetErfCastType()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     return RoundMode::CAST_ROUND;
 #else
     return RoundMode::CAST_NONE;

@@ -25,11 +25,11 @@
 
 #include "../common/hcomm_base.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "hcomm_v220_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "hcomm_v310_impl.h"
 #endif
 

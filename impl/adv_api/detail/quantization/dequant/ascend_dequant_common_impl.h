@@ -31,7 +31,7 @@
 #include "../../api_check/kernel_check/quantization/dequant/dequant_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
 #include "ascend_dequant_3510_impl.h"
 #endif
 
@@ -130,7 +130,7 @@ __aicore__ inline constexpr bool IsTemplateValid()
         //                    dst      dtype: half    , float, float,       bfloat16_t
         constexpr bool isValid1 = (IsSameType<scaleT, uint64_t>::value) && (IsSameType<dstT, half>::value);
         constexpr bool isValid2 = (IsSameType<scaleT, float>::value) && (IsSameType<dstT, float>::value);
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         return isValid1 || isValid2;
 #else
         constexpr bool isValid3 = (IsSameType<scaleT, bfloat16_t>::value) && (IsSameType<dstT, float>::value);
@@ -141,7 +141,7 @@ __aicore__ inline constexpr bool IsTemplateValid()
     } else {
         // dtype only support deqScale dtype: bfloat16_t, bfloat16_t, float
         //                    dst      dtype: bfloat16_t, float,      float
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         constexpr bool isValid1 = (IsSameType<scaleT, float>::value) && (IsSameType<dstT, float>::value);
         return isValid1;
 #else
@@ -195,7 +195,7 @@ __aicore__ inline void AscendDequantTmpCalc(
 template <typename dstT>
 __aicore__ inline RoundMode GetFP32CastMode()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     return RoundMode::CAST_NONE;
 #else
     constexpr RoundMode castMode = IsSameType<dstT, bfloat16_t>::value ? RoundMode::CAST_RINT : RoundMode::CAST_NONE;
@@ -448,7 +448,7 @@ __aicore__ inline void AscendDequantImpl(
         "current combination of deqScale dtype and dstTensor dtype is not supported, please check the document");
     UpdateDequantParams<dstT, mode>(params);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
     DequantPerchannelImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
     return;
 #endif
@@ -539,7 +539,7 @@ __aicore__ inline void AscendDequantScalarImpl(
 
     UpdateDequantParams<dstT, mode>(params);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
     DequantPertensorImpl<dstT, scaleT, mode>(dstTensor, srcTensor, deqScale, params);
     return;
 #endif
@@ -572,7 +572,7 @@ __aicore__ inline void AscendDequantScalarImpl(
     AscendDequantScalarImpl<dstT, scaleT, true, mode>(dstTensor, srcTensor, deqScale, sharedTmpBuffer, params);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
 template <
     typename dstT, typename srcT, typename scaleT, const AscendDeQuantConfig& config, const AscendDeQuantPolicy& policy>
 __aicore__ inline void AscendDequantImpl(

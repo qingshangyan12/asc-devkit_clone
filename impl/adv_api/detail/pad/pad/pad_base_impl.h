@@ -211,7 +211,7 @@ __aicore__ inline void UnAlignedPad(
                         PipeBarrier<PIPE_V>();
                     }
                     // load data to tmp1 from src
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                     if (brcbFractalCount == brcbFractal) {
                         for (uint32_t i = 0; i < brcbFractalTailRepeatTimes; i++) {
                             Brcb(

@@ -42,7 +42,7 @@ constexpr int32_t B32_C0SIZE = 8;
 constexpr int32_t B16_C0SIZE = 16;
 constexpr int32_t L0_SIZE = 64 * 1024;
 constexpr int32_t MAX_BLOCK_COUNT_SIZE = 4095;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
 constexpr int32_t DB_FACTOR = 1;
 #else
 constexpr int32_t DB_FACTOR = 2;
@@ -61,31 +61,28 @@ constexpr uint32_t SHARE_LEN_SIZE = 3;
 constexpr static int L1Size_ = 1024 * 1024;
 constexpr static int L0CSize_ = 256 * 1024;
 constexpr static int UBSize_ = 256 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 constexpr static int L1Size_ = 1024 * 1024;
 constexpr static int L0CSize_ = 128 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3003
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr static int L1Size_ = 1024 * 1024;
 constexpr static int UBSize_ = 118 * 1024;
 constexpr static int L0CSize_ = 128 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int UBSize_ = 120 * 1024;
 constexpr static int L0CSize_ = 64 * 1024;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int L0CSize_ = 256 * 1024;
 
 constexpr static int L0AMxSize_ = 4 * 1024;
 constexpr static int L0BMxSize_ = 4 * 1024;
-#elif __NPU_ARCH__ == 5102
-constexpr static int L1Size_ = 1024 * 1024;
-constexpr static int L0CSize_ = 256 * 1024;
 #else
 constexpr static int L1Size_ = 512 * 1024;
 constexpr static int L0CSize_ = 128 * 1024;
 #endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3113
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
 constexpr static int L0ASize_ = 32 * 1024;
 constexpr static int L0BSize_ = 32 * 1024;
 #else
@@ -113,7 +110,7 @@ constexpr int32_t MX_EVEN_FACTOR = 2;
             equal: TOTAL_UB_SIZE * MAX_AIV_NUM
 */
 constexpr int64_t GM_OFFSET = 128 * 2 * 64 * 50 + 128 * 8 * 50 + 192 * 1024 * 50;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
 constexpr FixpipeConfig CFG_ROW_MAJOR_UB = {CO2Layout::ROW_MAJOR, true};
 constexpr FixpipeConfig CFG_NZ_UB = {CO2Layout::NZ, true};
 #else

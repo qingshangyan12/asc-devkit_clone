@@ -27,10 +27,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "xor_membase_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
 #include "xor_v300_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "xor_3510_impl.h"
 #endif
 
 namespace AscendC {

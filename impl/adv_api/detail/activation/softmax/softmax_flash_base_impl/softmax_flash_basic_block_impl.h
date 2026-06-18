@@ -23,9 +23,9 @@
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_FLASH_BASIC_BLOCK_IMPL_H
 
 #include "kernel_basic_intf.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "../membase/v220/softmax_common_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "../membase/v200/softmax_common_impl.h"
 #endif
 namespace AscendC {
