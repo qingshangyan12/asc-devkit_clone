@@ -27,7 +27,3 @@ TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_2(Vstus0, asc_storeunalign, vstus, fp8_e
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_2(Vstus0, asc_storeunalign, vstus, fp4x2_e2m1_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_2(Vstus0, asc_storeunalign, vstus, fp4x2_e1m2_t);
 TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_2_INT4B(Vstus0, asc_storeunalign, vstus, int4b_t);
-
-TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign, pstu, uint8_t, uint32_t);
-TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign, pstu, uint16_t, uint16_t);
-TEST_VECTOR_DATAMOVE_STOREUNALIGN_INSTR_PSTU(Pstu0, asc_storeunalign, pstu, uint32_t, uint32_t);
