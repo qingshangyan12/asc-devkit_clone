@@ -90,14 +90,15 @@ def gen_golden_repeat_stride0():
 
 
 def gen_golden_data(case=1, repeat=1):
+    KERNEL_REPEAT = 1000
     if case in (1, 2, 4, 6, 7):
         x, y, golden = gen_golden_add()
     elif case == 3:
-        x, y, golden = gen_golden_case2(repeat)
+        x, y, golden = gen_golden_case2(KERNEL_REPEAT)
     elif case == 5:
-        x, y, golden = gen_golden_case5(repeat)
+        x, y, golden = gen_golden_case5(KERNEL_REPEAT)
     elif case in (8, 9):
-        x, y, golden = gen_golden_gather(case, repeat)
+        x, y, golden = gen_golden_gather(case, KERNEL_REPEAT)
     elif case in (10, 11):
         x, y, golden = gen_golden_adds_512()
     elif case == 12:

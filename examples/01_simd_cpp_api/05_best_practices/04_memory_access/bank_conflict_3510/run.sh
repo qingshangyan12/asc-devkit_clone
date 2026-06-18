@@ -1,7 +1,0 @@
-export SCENARIO_NUM=1          # 有效值: 1-13
-mkdir -p build && cd build
-cmake .. -DSCENARIO_NUM=${SCENARIO_NUM}
-make -j
-python3 ../scripts/gen_data.py --case ${SCENARIO_NUM}
-./demo                     # 精度验证 + 打点性能（输出cycles计数到stdout）
-python3 ../scripts/verify_result.py output/output_z.bin output/golden.bin
