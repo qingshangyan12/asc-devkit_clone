@@ -155,6 +155,10 @@
         <file value="libacl_rtc.so" file_type="shared"/>
     </file_info>
 
+    <file_info value="ain_host" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64" install_type="all" install_mod="440">
+        <file value="libain_host.so" file_type="shared"/>
+    </file_info>
+
     <file_info value="acl_rtc" copy_type="delivery" src_path="lib/host" dst_path="$(TARGET_ENV)/lib64" install_path="$(TARGET_ENV)/lib64">
         <file value="libascendc_runtime.a" install_mod="440"/>
     </file_info>
