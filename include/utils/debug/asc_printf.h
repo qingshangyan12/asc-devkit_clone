@@ -58,7 +58,6 @@ __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
 namespace __asc_aicore {
 template <class... Args>
 __aicore__ inline void printf(__gm__ const char* fmt, Args&&... args) {}
-template <class... Args>
 } // namespace __asc_aicore
 #endif // (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #endif
