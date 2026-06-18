@@ -86,6 +86,9 @@ uint32_t UpdateMc2InitTiling(uint64_t initTilingAddr, uint64_t ccTilingAddr)
 {
     Mc2InitTilingInner* tilingInner = reinterpret_cast<Mc2InitTilingInner*>(static_cast<uintptr_t>(initTilingAddr));
     uint32_t& cnt = tilingInner->mc2HcommCnt;
+    TILING_LOG_INFO(
+        "UpdateMc2InitTiling enter, initTilingAddr:%#lx, ccTilingAddr:%#lx, current version:%u, current mc2HcommCnt:%u.",
+        initTilingAddr, ccTilingAddr, tilingInner->version, cnt);
     ASCENDC_HOST_ASSERT(
         cnt < MAX_CC_TILING_NUM, return EXIT_FAILURE, "mc2HcommCnt(%u) must be less than or equal %u.", cnt + 1U,
         MAX_CC_TILING_NUM);
@@ -134,6 +137,9 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     impl_.initTilingAddr_ = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&tiling));
     Mc2InitTilingInner* tilingInner = reinterpret_cast<Mc2InitTilingInner*>(&tiling);
     tilingInner->version = INIT_TILING_VERSION;
+    TILING_LOG_INFO(
+        "Init Mc2InitTiling start, tiling addr:%#lx, default version:%u, opType:%u, commEngine:%u.",
+        impl_.initTilingAddr_, tilingInner->version, impl_.opType_, impl_.commEngine_);
     tilingInner->mc2HcommCnt = 0;
     tilingInner->debugMode = impl_.debugMode_;
     tilingInner->preparePosition = 0;
@@ -145,9 +151,18 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     if ((impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALL) || 
         impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLTOALLV)) && 
         (impl_.commEngine_ == 5 || impl_.commEngine_ == 6)) {
+        TILING_LOG_INFO(
+            "Init Mc2InitTiling switch version, opType:%u, commEngine:%u, version:%u -> %u.",
+            impl_.opType_, impl_.commEngine_, tilingInner->version, INIT_TILING_CCU_NEW_VERSION);
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
+    } else {
+        TILING_LOG_INFO(
+            "Init Mc2InitTiling keep default version, opType:%u, commEngine:%u, expected new version:%u.",
+            impl_.opType_, impl_.commEngine_, INIT_TILING_CCU_NEW_VERSION);
     }
+    TILING_LOG_INFO("Init Mc2InitTiling before SetDevType, version:%u.", tilingInner->version);
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
+    TILING_LOG_INFO("Init Mc2InitTiling after SetDevType, version:%u, devType:%u.", tilingInner->version, tilingInner->devType);
 
     TILING_LOG_DEBUG("Mc2InitTiling addr %#lx", impl_.initTilingAddr_);
     PrintMc2InitTiling(*tilingInner);
