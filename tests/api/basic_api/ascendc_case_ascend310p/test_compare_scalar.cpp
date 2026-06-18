@@ -20,7 +20,7 @@ enum MemMode {
     BASIC_BLK_MODE,
 };
 
-class TEST_COMPARE : public testing::Test {
+   class TEST_COMPARE : public testing::Test {
 protected:
     void SetUp() { AscendC::SetGCoreType(2); }
     void TearDown() { AscendC::SetGCoreType(0); }

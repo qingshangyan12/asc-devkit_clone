@@ -31,22 +31,26 @@ namespace AscendC {
 
 /*!
  * \ingroup AntiQuantize
- * \brief For AntiQuantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n num;
+ * \brief For AntiQuantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n elements.
  *        Calculation process depends on AntiQuantize policy. For example, AntiQuantize PER_TENSOR is specified as
- * below: dstTensor[i][j] = round((src[i][j] + offset) * scale) For more information, please refer to document. \tparam
- * AntiQuantizeConfig: {policy, hasOffset, kDim} indicate AntiQuantize config parameters. \tparam DstT: dstTensor data
- * type. \tparam SrcT: srcTensor data type. \tparam ScaleT: scale data type, which can be scalar or LocalTensor
- * depending on policy. \tparam OffsetT: offset data type, which can be scalar or LocalTensor depending on policy.
+ *        below:
+ *            dstTensor[i][j] = round((src[i][j] + offset) * scale)
+ *        For more information, please refer to document.
+ * \tparam config: AntiQuantizeConfig {policy, hasOffset, kDim}.
+ * \tparam DstT: dstTensor data type.
+ * \tparam SrcT: srcTensor data type.
+ * \tparam ScaleT: scale data type, which can be scalar or LocalTensor depending on policy.
+ * \tparam OffsetT: offset data type, which can be scalar or LocalTensor depending on policy.
  * \param [out] dstTensor: Output localTensor.
  * \param [in] srcTensor: Input src localTensor.
  * \param [in] scale: Input scale.
- * \param [in] offset: input offset.
- * \param [in] sharedTmpBuffer�?extra temporary shared space used for intermediate values among calculation process,
+ * \param [in] offset: Input offset.
+ * \param [in] sharedTmpBuffer: extra temporary shared space used for intermediate values among calculation process,
  *             whose required space size should refer to corresponding tiling API, which is defined at
- *             ascend_dequant_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
+ *             antiquantize_tiling.h. Generally, the more space you allocate, the better performance you will achieve,
  *             and the performance reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it
  *             is not guaranteed that the shared space will be cleared after usage, the data could be anything.
- * \param [in] params: AntiQuantizeParams with m, n, groupSize to describe the calculation process like above.
+ * \param [in] params: AntiQuantizeParams with m, n, and groupSize to describe the calculation process above.
  */
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
 __aicore__ inline void AntiQuantize(
@@ -60,17 +64,21 @@ __aicore__ inline void AntiQuantize(
 
 /*!
  * \ingroup AntiQuantize
- * \brief For AntiQuantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n num;
+ * \brief For AntiQuantizeParams {m, n, groupSize}, m means src tensor has m rows, each row has n elements.
  *        Calculation process depends on AntiQuantize policy. For example, AntiQuantize PER_TENSOR is specified as
- * below: dstTensor[i][j] = round((src[i][j] + offset) * scale) For more information, please refer to document. \tparam
- * AntiQuantizeConfig: {policy, hasOffset, kDim} indicate AntiQuantize config parameters. \tparam DstT: dstTensor data
- * type. \tparam SrcT: srcTensor data type. \tparam ScaleT: scale data type, which can be scalar or LocalTensor
- * depending on policy. \tparam OffsetT: offset data type, which can be scalar or LocalTensor depending on policy.
+ *        below:
+ *            dstTensor[i][j] = round((src[i][j] + offset) * scale)
+ *        For more information, please refer to document.
+ * \tparam config: AntiQuantizeConfig {policy, hasOffset, kDim}.
+ * \tparam DstT: dstTensor data type.
+ * \tparam SrcT: srcTensor data type.
+ * \tparam ScaleT: scale data type, which can be scalar or LocalTensor depending on policy.
+ * \tparam OffsetT: offset data type, which can be scalar or LocalTensor depending on policy.
  * \param [out] dstTensor: Output localTensor.
  * \param [in] srcTensor: Input src localTensor.
  * \param [in] scale: Input scale.
- * \param [in] offset: input offset.
- * \param [in] params: AntiQuantizeParams with m, n, groupSize to describe the calculation process like above.
+ * \param [in] offset: Input offset.
+ * \param [in] params: AntiQuantizeParams with m, n, and groupSize to describe the calculation process above.
  */
 template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
 __aicore__ inline void AntiQuantize(
