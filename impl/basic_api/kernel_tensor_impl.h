@@ -238,7 +238,7 @@ __inout_pipe__(S) typename LocalTensor<T>::PrimType& LocalTensor<T>::operator()(
     return *(GetPhyAddr(offset));
 }
 template <typename T>
-template <typename U> __aicore__ inline LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
+template <typename U> __asc_aicore__ inline LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
 {
     LocalTensor<U> output;
     output.address_.logicPos = static_cast<uint8_t>(this->GetPosition());
@@ -669,11 +669,11 @@ int32_t LocalTensor<T>::ToFile(const std::string &fileName) const
 }
 // Npu Impl
 #else
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
+template <typename T> __asc_aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr() const
 {
     return GetPhyAddr(0);
 }
-template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
+template <typename T> __asc_aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(const uint32_t offset) const
 {
     if constexpr (IsSameType<PrimType, int4b_t>::value) {
         return this->address_.bufferAddr + offset / INT4_TWO;
@@ -692,11 +692,11 @@ template <typename T> __aicore__ inline uint64_t LocalTensor<T>::GetPhyAddr(cons
         return this->address_.bufferAddr + offset * sizeof(PrimType);
     }
 }
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     typename LocalTensor<T>::PrimType LocalTensor<T>::GetValue(const uint32_t index) const
 {
     if ASCEND_IS_AIC {
-        if (GetPhyType(AscendC::TPosition(this->GetPosition())) == Hardware::UB) {
+        if (GetPhysicalType(AscendC::TPosition(this->GetPosition())) == Hardware::UB) {
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             if constexpr (SupportType<PrimType, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e4m3fn_t, fp8_e5m2_t, hifloat8_t>()) {
                 PrimType ret;
@@ -744,14 +744,14 @@ template <typename T> __aicore__ inline __inout_pipe__(S)
         return *(reinterpret_cast<__ubuf__ PrimType*>(GetPhyAddr(index)));
     }
 }
-template <typename T> __aicore__ inline __inout_pipe__(S)
+template <typename T> __asc_aicore__ inline __inout_pipe__(S)
     __ubuf__ typename LocalTensor<T>::PrimType& LocalTensor<T>::operator()(const uint32_t offset) const
 {
     return *(reinterpret_cast<__ubuf__ PrimType*>(GetPhyAddr(offset)));
 }
 
 template <typename T>
-template <typename U> __aicore__ inline __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
+template <typename U> __asc_aicore__ inline __sync_alias__ LocalTensor<U> LocalTensor<T>::ReinterpretCast() const
 {
     LocalTensor<U> output;
     output.address_.logicPos = static_cast<uint8_t>(this->GetPosition());
@@ -780,11 +780,11 @@ template <typename U> __aicore__ inline __sync_alias__ LocalTensor<U> LocalTenso
 }
 
 template <typename T>
-template <typename U> __aicore__ inline __inout_pipe__(S)
+template <typename U> __asc_aicore__ inline __inout_pipe__(S)
     void LocalTensor<T>::SetValue(const uint32_t index, const U value) const
 {
     if ASCEND_IS_AIC {
-        if (GetPhyType(AscendC::TPosition(this->GetPosition())) == Hardware::UB) {
+        if (GetPhysicalType(AscendC::TPosition(this->GetPosition())) == Hardware::UB) {
             return;
         }
     }
@@ -850,7 +850,7 @@ template <typename U> __aicore__ inline __inout_pipe__(S)
     }
 }
 
-template <typename T> __aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
+template <typename T> __asc_aicore__ inline LocalTensor<T> LocalTensor<T>::operator[](const uint32_t offset) const
 {
     LocalTensor result = *this;
     if constexpr (IsHalfByteDataType<PrimType>()) {
@@ -887,7 +887,7 @@ __aicore__ inline void LocalTensor<T>::SetAddrWithOffset(LocalTensor<U> &src, ui
     this->address_.bufferAddr += offset * sizeof(PrimT<U>);
 }
 #endif
-template <typename T> __aicore__ inline int32_t LocalTensor<T>::GetPosition() const
+template <typename T> __asc_aicore__ inline int32_t LocalTensor<T>::GetPosition() const
 {
     return this->address_.logicPos;
 }
@@ -920,7 +920,7 @@ template <typename T> __aicore__ inline void LocalTensor<T>::SetSize(const uint3
     }
 }
 template <typename T>
-__aicore__ inline uint32_t LocalTensor<T>::GetSize() const
+__asc_aicore__ inline uint32_t LocalTensor<T>::GetSize() const
 {
     if constexpr (IsHalfByteDataType<PrimType>()) {
         return this->address_.dataLen * INT4_TWO;
@@ -1695,7 +1695,7 @@ __aicore__ inline LocalTensor<DataType> LocalMemAllocator<hard>::Alloc()
 
 template <Hardware hard>
 template <class DataType, typename LayoutType>
-__aicore__ inline typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
+__aicore__ inline typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type
     LocalMemAllocator<hard>::Alloc(const LayoutType& layout)
 {
     static_assert(is_tensorTrait_v<DataType>, "only support TensorTrait type!");

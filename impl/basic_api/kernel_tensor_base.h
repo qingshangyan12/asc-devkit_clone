@@ -217,7 +217,7 @@ public:
         }
     }
 #endif
-    __aicore__ inline TBufHandle GetBufferHandle() const
+    __asc_aicore__ inline TBufHandle GetBufferHandle() const
     {
         return address_.bufferHandle;
     }
