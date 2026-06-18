@@ -125,6 +125,7 @@ Mc2CcTilingConfig::~Mc2CcTilingConfig() = default;
 uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
 {
     // It is not a reduce type or a reduce type, and the reduce type is valid
+    TILING_LOG_DEBUG("Mc2InitTiling opType:%u, commEngine_:%u", impl_.opType_, impl_.commEngine_);
     const bool reduceFlag =
         (impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_ALLREDUCE) ||
          impl_.opType_ == static_cast<uint8_t>(HcclCMDType::HCCL_CMD_REDUCE) ||
