@@ -19,7 +19,7 @@ SuperKernel是一种算子的二进制融合技术，与源码融合不同，它
     注：SuperKernel启动核数为子Kernel的最大启动核数。假设SuperKernel包括算子a（启动核数为4）和算子b（启动核数为2），此时SuperKernel启动核数为4。
 
     -   使用[SyncAll](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0204.html)时，为了解决该问题，可以通过在标定SuperKernel范围时开启feed-sync-all功能，此时系统会在SuperKernel内子Kernel的其余核中插入SyncAll指令，防止卡住超时。
-    -   若使用[CrossCoreSetFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreSetFlag(ISASI).md)和[CrossCoreWaitFlag](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/CrossCoreWaitFlag(ISASI).md)硬同步接口实现全核同步，仅支持子Kernel启动核数与SuperKernel核数相同。
+    -   若使用[CrossCoreSetFlag](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0273.html)和[CrossCoreWaitFlag](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0274.html)硬同步接口实现全核同步，仅支持子Kernel启动核数与SuperKernel核数相同。
 
 -   若自定义算子的Kernel类型设置为KERNEL\_TYPE\_MIX\_AIC\_1\_1，因为SuperKernel会根据启动核数等信息调整SuperKernel的启动比例，此时需特别注意该算子也可以适应SuperKernel的1:2启动比例，确保AIC与AIV之间的硬同步操作正确执行。比如：算子内部使用了AIC与AIV之间的硬同步接口（CrossCoreSetFlag和CrossCoreWaitFlag），不要单独指定某些AIV核调用硬同步接口，使所有AIV核均调用硬同步接口，防止因为硬同步数量不匹配而导致卡死超时；使用Matmul高阶API时，算子逻辑应保证仅有一个AIV0核调用Matmul接口，防止启动两个AIV核之后出现AIV1核消息无法接收导致卡死超时。
 
