@@ -17,11 +17,11 @@
 
 #include "../common/hccl_base.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "hccl_v220_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "hccl_v310_impl.h"
 #endif
 

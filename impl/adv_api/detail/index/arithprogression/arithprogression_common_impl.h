@@ -70,7 +70,7 @@ __aicore__ inline void ArithProgressionImpl(
 {
     CHECK_FUNC_HIGHLEVEL_API(ArithProgression, (T), (dstLocal, firstValue, diffValue, count));
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     if (g_coreType == AIC) {
         return;
     }

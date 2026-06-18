@@ -69,7 +69,7 @@ public:
         ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput), {
             KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput.");
         });
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         GlobalTensor<uint64_t> global;
         global.SetGlobalBuffer((__gm__ uint64_t*)0);
         DataCacheCleanAndInvalid<uint64_t, CacheLine::ENTIRE_DATA_CACHE>(global);
@@ -99,7 +99,7 @@ public:
         ASCENDC_ASSERT((!ToMatmulConfig(MM_CFG).isPartialOutput), {
             KERNEL_LOG(KERNEL_ERROR, "IterateAll is not supported for PartialOutput.");
         });
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         GlobalTensor<uint64_t> global;
         global.SetGlobalBuffer((__gm__ uint64_t*)0);
         DataCacheCleanAndInvalid<uint64_t, CacheLine::ENTIRE_DATA_CACHE>(global);
@@ -161,20 +161,6 @@ public:
             }
         }
     }
-#if __NPU_ARCH__ == 5102
-    __aicore__ inline void WaitIterateAll()
-    {
-        event_t eventIDFixToMte2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::FIX_MTE2));
-        SetFlag<HardEvent::FIX_MTE2>(eventIDFixToMte2);
-        WaitFlag<HardEvent::FIX_MTE2>(eventIDFixToMte2);
-    }
-
-    __aicore__ inline void SetLookupTable(const GlobalTensor<uint64_t>& qtableTensor)
-    {
-        MATMUL_MODULE(QtableProcessor)->SetLookupTable(qtableTensor);
-    }
-
-#endif
 
 #endif
 };

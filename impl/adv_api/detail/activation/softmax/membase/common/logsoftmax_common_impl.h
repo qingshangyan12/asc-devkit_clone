@@ -21,9 +21,9 @@
 #endif
 #ifndef IMPL_ACTIVATION_SOFTMAX_MEMBASE_COMMON_LOGSOFTMAX_COMMON_IMPL_H
 #define IMPL_ACTIVATION_SOFTMAX_MEMBASE_COMMON_LOGSOFTMAX_COMMON_IMPL_H
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "../v220/softmax_common_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "../v200/softmax_common_impl.h"
 #endif
 

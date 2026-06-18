@@ -55,7 +55,7 @@ __aicore__ inline uint32_t Ceil(uint32_t a, uint32_t b)
     return (a + b - 1) / b;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510  || \
     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 {
@@ -82,36 +82,6 @@ __aicore__ inline int32_t CeilDivision(int32_t num1, int32_t num2)
 __aicore__ inline void WriteBackOverflow(GM_ADDR overflowStatus)
 {
     (void)overflowStatus;
-#if (__NPU_ARCH__ == 5102)
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
-    uint64_t statusOverflow[1] = {0};
-    statusOverflow[0] = get_status();
-    statusOverflow[0] = (statusOverflow[0] << 0x20) >> 0x20;
-    uint64_t statusMask = 0x520;
-    statusOverflow[0] = statusOverflow[0] & statusMask;
-    if (statusOverflow[0] != 0) {
-        uint64_t *ptr = (uint64_t *)get_imm(0x43FE0);
-        uint64_t buff[0x4];
-        buff[0x0] = ptr[0x0];
-        buff[0x1] = ptr[0x1];
-        buff[0x2] = ptr[0x2] | statusOverflow[0x0];
-        buff[0x3] = ptr[0x3];
-        if (buff[0x0] == 0) {
-            ptr[0x0] = 0xFFFFFFFFFFFFFFFF;
-            ptr[0x1] = block_idx;
-        }
-        ptr[0x2] = buff[0x2];
-
-        __ubuf__ uint8_t* tmpStatus = (__ubuf__ uint8_t *)get_imm(0);
-        *tmpStatus = 0;
-        if (buff[0x2] > 0) {
-            *tmpStatus = 0x3;
-        }
-        pipe_barrier(PIPE_ALL);
-        copy_ubuf_to_gm(((__gm__ int32_t *)overflowStatus), ((__ubuf__ int32_t *)tmpStatus), 0, 1, 1, 0, 0);
-        pipe_barrier(PIPE_ALL);
-    }
-#endif
 }
 
 template <typename T>
@@ -281,7 +251,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
     };
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
     if (consumerSize <= 1) {
@@ -331,7 +301,7 @@ template <auto T, auto U, auto... Args> __aicore__ constexpr bool SupportEnum()
     return T == U;
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 template <typename T> struct GetComplexElementType {
     using Type = T;
 };
@@ -385,7 +355,7 @@ template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&
 #endif
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)) || defined(__ASC_NPU_HOST__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
@@ -412,7 +382,7 @@ template <typename T> struct IsLocalTensor<LocalTensor<T>> : public TrueType {};
 template <typename T> __aicore__ constexpr bool IsLocalTensorType()
 {
     if constexpr (IsLocalTensor<T>::value) {
-        return SupportType<typename T::PrimType, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, float, 
+        return SupportType<typename T::PrimType, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, float,
             fp8_e5m2_t, fp8_e4m3fn_t, fp8_e8m0_t, int32_t, uint32_t, int64_t, uint64_t, complex32, complex64, double>();
     } else {
         return false;
@@ -427,7 +397,7 @@ template <typename T, typename U> __aicore__ constexpr bool IsLocalTensorType()
 
 template <auto funcPtr, typename... Args> __aicore__ inline void VF_CALL(Args &&... args)
 {
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102) || defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
+#if (defined(__NPU_ARCH__) && defined(SPLIT_CORE_VEC) || defined(ASCENDC_CPU_DEBUG)
     __VEC_SCOPE__
     {
         funcPtr(args...);

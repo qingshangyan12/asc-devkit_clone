@@ -41,7 +41,7 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 }
@@ -53,7 +53,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
@@ -224,13 +224,13 @@ __aicore__ inline void DataCopyWithAtomic(__gm__ int32_t* dst, __ubuf__ int32_t*
 #endif // ASCENDC_CPU_DEBUG
 
 /***************内部定义time stamp id**************************
-定义值范围: 0x000 - 0xfff
+定义值范�? 0x000 - 0xfff
 
 time stamp id按块分组，快说明如下:
-TIME_STAMP_WRAP: NPU套壳函数中的时间戳打点
-TIME_STAMP_TPIPE/BUFFER: TPIPE、BUFFER中的时间戳打点
-TIME_STAMP_MATMUL: MATMUL相关时间戳打点
-TIME_STAMP_TILING_DATA: TILING DATA模块时间戳打点
+TIME_STAMP_WRAP: NPU套壳函数中的时间戳打�?
+TIME_STAMP_TPIPE/BUFFER: TPIPE、BUFFER中的时间戳打�?
+TIME_STAMP_MATMUL: MATMUL相关时间戳打�?
+TIME_STAMP_TILING_DATA: TILING DATA模块时间戳打�?
 TIME_STAMP_MC2_START/END: MC2模块使用打点id范围
 
 TimeStampId更新原则：每个分组新增ID不可改变原有定义的ID值！

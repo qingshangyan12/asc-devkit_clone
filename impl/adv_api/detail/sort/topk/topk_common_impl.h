@@ -33,13 +33,13 @@
 #include "topk_common_utils.h"
 #include "include/adv_api/index/arithprogression.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "topk_v220_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "topk_v200_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) || (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) || (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002
 namespace AscendC {
 template <typename T, bool isInitIndex = false, bool isHasfinish = false, bool isReuseSrc = false>
 __aicore__ inline void TopKNormal(

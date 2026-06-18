@@ -13,7 +13,6 @@
  * \brief
  */
 
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_CEIL_H__
@@ -25,8 +24,6 @@
 #include "kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/ceil/ceil_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
-#include "../../../impl/adv_api/detail/math/ceil/ceil_3510_impl.h"
 #endif
 
 namespace AscendC {
@@ -48,13 +45,13 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Ceil(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
     }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 ||  \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 ||  \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CeilImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 #endif
@@ -70,13 +67,13 @@ __aicore__ inline void Ceil(const LocalTensor<T>& dstTensor, const LocalTensor<T
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Ceil(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
         return;
     }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 ||  \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 ||  \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CeilImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
