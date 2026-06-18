@@ -1350,28 +1350,10 @@ __simd_callee__ inline void asc_storeunalign(__ubuf__  fp4x2_e1m2_t* dst, vector
     asc_storeunalign_impl(dst, src0, src1, count);
 }
 
-__simd_callee__ inline void asc_storeunalign(__ubuf__  int4b_t*& dst, vector_store_unalign& src0,
+__simd_callee__ inline void asc_storeunalign(__ubuf__  int4b_t* dst, vector_store_unalign& src0,
     vector_int4x2_t src1, uint32_t count)
 {
     asc_storeunalign_impl(dst, src0, src1, count);
-}
-
-__simd_callee__ inline void asc_storeunalign(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
-{
-    asc_storeunalign_impl(dst, src0, mask);
-}
-
-__simd_callee__ inline void asc_storeunalign(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
-{
-    asc_storeunalign_impl(dst, src0, mask);
-}
-
-__simd_callee__ inline void asc_storeunalign(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
-{
-    asc_storeunalign_impl(dst, src0, mask);
 }
 
 // ==========偏移固定传入0，由用户自行更新目的操作数的地址=========
@@ -1476,6 +1458,24 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int4b_t*& dst,
     vector_int4x2_t src1, uint32_t count)
 {
     asc_storeunalign_postupdate_impl(dst, src0, src1, count);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, mask);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, mask);
+}
+
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
+{
+    asc_storeunalign_postupdate_impl(dst, src0, mask);
 }
 
 // ==========asc_storeunalign_postupdate(u8/s8/half/u16/s16/float/u32/s32/s64/bf16/e4m3/e5m2/e8m0/e1m2/e2m1)=========

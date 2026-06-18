@@ -33,6 +33,12 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e2m1_t* dst, vector_store_unalign& src0, vector_fp4x2_e2m1_t src1)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ fp4x2_e1m2_t* dst, vector_store_unalign& src0, vector_fp4x2_e1m2_t src1)
     __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ int4b_t* dst, vector_store_unalign& src0, vector_int4x2_t src1)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
+    __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
+    vector_bool mask)
     ```
 
 - 使用uint32_t作为存储偏移量
@@ -87,7 +93,8 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     | :----- | :------- | :------- |
     | dst | 输出 | 目的操作数（矢量）的起始地址。 |
     | src0 | 输入/输出 | 非对齐寄存器，用于保存非对齐数据，长度32B。 |
-    | src1 | 输入 | 源操作数（矢量数据寄存器）。 |
+    | src1 | 输入 | 源操作数（矢量数据寄存器），仅矢量数据寄存器搬出接口需要。 |
+    | mask | 输入 | 源操作数（掩码寄存器），仅MaskReg搬出接口需要。 |
 
 - 使用uint32_t作为存储偏移量
 
@@ -108,6 +115,7 @@ reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对�
     | count | 输入 | 存储搬运的个数（地址寄存器）。 |
 
 矢量数据寄存器、非对齐寄存器和地址寄存器的详细说明请参见[reg数据类型定义.md](../reg数据类型定义.md)。
+- MaskReg搬出（`mask`参数）后，同样需要调用[asc_storeunalign_post](./asc_storeunalign_post.md)处理尾块；尾块处理只需在循环外调用一次。-post接口仅传入`ureg`与`dst`，不需要也不支持`vector_bool`类型参数。
 
 ## 返回值说明
 
@@ -135,6 +143,25 @@ PIPE_V
     asc_storeunalign_postupdate(dst, ureg, src);
     asc_storeunalign_post(dst, ureg);
     ```
+
+- MaskReg连续非对齐搬出
+
+```cpp
+// dst起始地址为8（非32B对齐）。UB上以uint16_t存储时，每次将32B MaskReg压缩为16B写出。
+__ubuf__ uint16_t* dst = (__ubuf__ uint16_t*)asc_get_phy_buf_addr(8);
+vector_store_unalign ureg;
+vector_bool mask;
+uint32_t remain_count = 128;
+uint32_t repeat = 2;
+for (uint32_t i = 0; i < repeat; i++) {
+    // 准备本次待搬出的mask
+    mask = asc_update_mask_b16(remain_count);
+    // 每次调用写出一个MaskReg；跨32B边界的尾块缓存在ureg中
+    asc_storeunalign(dst, ureg, mask);
+}
+// 循环结束后调用一次post，将ureg中剩余数据刷至UB；mask_dst已自增至结束位置，offset为0
+asc_storeunalign_post(dst, ureg, 0);
+```
 
 - 使用uint32_t作为存储偏移量
 
