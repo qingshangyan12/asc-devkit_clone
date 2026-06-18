@@ -36,6 +36,21 @@ enum class CO2Layout : uint8_t {
     COLUMN_MAJOR // ND Column
 };
 
+#if !defined(__NPU_ARCH__)
+struct FixpipeConfig {
+    CO2Layout format;
+    bool isToUB = false;
+    bool enableFixVal = false;
+    __aicore__ constexpr inline FixpipeConfig(CO2Layout format_) : format(format_)
+    , isToUB(false), enableFixVal(false) {}
+
+    __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_) : format(format_)
+    , isToUB(isToUB_), enableFixVal(false) {}
+
+    __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_, bool enableFixVal_) : format(format_)
+    , isToUB(isToUB_), enableFixVal(enableFixVal_) {}
+};
+#else
 struct FixpipeConfig {
     CO2Layout format;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
@@ -70,6 +85,7 @@ struct FixpipeConfig {
 #endif
     {}
 };
+#endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #if (__NPU_ARCH__ == 5102)

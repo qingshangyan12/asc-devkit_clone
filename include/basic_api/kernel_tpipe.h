@@ -46,7 +46,11 @@ struct DataCopyParams;
 
 template <TPosition src, TPosition dst, int32_t depth, auto mask = 0> class TQueBind {
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline TQueBind();
+#else
+    __aicore__ inline TQueBind(){}
+#endif
     __aicore__ inline void FreeBuffer(TBufHandle buf);
     __aicore__ inline TBuffAddr GetBufferAddr(TBufHandle buf);
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
@@ -226,8 +230,13 @@ class TBufPool {
 public:
     static constexpr TPosition poolPos = pos;
 public:
+#if defined(__NPU_ARCH__)
     __aicore__ inline TBufPool();
     __aicore__ inline ~TBufPool();
+#else
+    __aicore__ inline TBufPool(){}
+    __aicore__ inline ~TBufPool(){}
+#endif
     template <class T> __aicore__ inline bool InitBuffer(T& que, uint8_t num, uint32_t len);
     template <TPosition bufPos> __aicore__ inline bool InitBuffer(TBuf<bufPos>& buf, uint32_t len);
     template <class T, class U> __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf);
