@@ -94,7 +94,7 @@ sincos_compute/
 
 **核心实现**：
 - 默认线程数为1024，每个Thread仅可用32个寄存器
-- 每个线程计算元素个数为PER_THREAD_LOOP，超出32个寄存器限制
+- 每个线程计算元素个数为PER\_THREAD\_LOOP，超出32个寄存器限制
 
 **关键代码**：
 
@@ -145,7 +145,7 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 
 **核心优化**：
 - 指定`__launch_bounds__(512)`，每个Thread可用64个寄存器
-- 每个线程计算元素个数为PER_THREAD_LOOP，所需的寄存器在限制范围内
+- 每个线程计算元素个数为PER\_THREAD\_LOOP，所需的寄存器在限制范围内
 
 **关键代码**：
 
