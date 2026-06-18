@@ -22,7 +22,7 @@ constexpr uint32_t half_neg_inf = 0xFC00;
 constexpr int32_t MAX_SHLF_OFFSET = 31;
 constexpr int32_t WARP_SIZE = 32;
 
-#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined (__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 bool __isnan(half x)
 {
     uint16_t* intX = (uint16_t*)&x;
@@ -101,7 +101,7 @@ half2 __expf(half2 x)
  	htmp2 = half(tmp2);
  	return {htmp1, htmp2};
 }
- 	  	 
+
 half2 __logf(half2 x)
 {
  	half htmp1 = x.x;
@@ -114,7 +114,7 @@ half2 __logf(half2 x)
  	htmp2 = half(tmp2);
  	return {htmp1, htmp2};
 }
- 	  	 
+
 half2 __sqrtf(half2 x)
 {
  	half htmp1 = x.x;

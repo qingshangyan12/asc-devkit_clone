@@ -23,7 +23,7 @@
 #include "kernel_tensor.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "include/adv_api/activation/softmax_utils.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
 #include "../../../impl/adv_api/detail/activation/softmax/softmax_common.h"
 #include "../../../impl/adv_api/detail/activation/softmax/softmax_flashv3_base_impl.h"
 #endif
@@ -35,12 +35,12 @@ namespace AscendC {
  * \brief softmax calculation in FlashAttention-2 process:
  *        if isUpdate = false:
  *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = rowMeanGlobal,
- *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), 
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), max = maxTmp + shiftCurr,
  *            y = exp(x-max), sum = rowsum(y)
  *        if isUpdate = true:
  *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = (rowMeanGlobal + inmean * (n - 1)) / n,
- *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), 
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), shiftPrev = (inmean - mean) * (a / 1 - a), max = max(maxTmp + shiftCurr, inmax + shiftPrev),
  *            y = exp(x-max), sum = rowsum(y)
  *            expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum
@@ -72,7 +72,7 @@ __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const Loc
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
     TRACE_START(TraceId::SoftmaxFlashV3);
     SoftmaxFlashV3Impl<T, U, isUpdate, isReuseSource, isBasicBlock, isDataFormatNZ, config>(dstTensor, meanTensor, expSumTensor,
         maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, tiling, params);
@@ -85,12 +85,12 @@ __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const Loc
  * \brief softmax calculation in FlashAttention-2 process:
  *        if isUpdate = false:
  *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = rowMeanGlobal,
- *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), 
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), max = maxTmp + shiftCurr,
  *            y = exp(x-max), sum = rowsum(y)
  *        if isUpdate = true:
  *            rowMeanLocal = rowsum(baseK) / baseK, rowMeanGlobal = rowsum(x), mean = (rowMeanGlobal + inmean * (n - 1)) / n,
- *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a), 
+ *            meanTmp = rowMeanGlobal - rowMeanLocal, x = x - meanTmp * (a / 1 - a),
  *            maxTmp = rowmax(x), shiftCurr = (rowMeanGlobal - mean) * (a / 1 - a), shiftPrev = (inmean - mean) * (a / 1 - a), max = max(maxTmp + shiftCurr, inmax + shiftPrev),
  *            y = exp(x-max), sum = rowsum(y)
  *            expmax = exp(inmax - max + shiftPrev), sum = expmax * insum + sum
@@ -123,7 +123,7 @@ __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const Loc
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
     TRACE_START(TraceId::SoftmaxFlashV3);
     SoftmaxFlashV3Impl<T, U, isUpdate, isReuseSource, isBasicBlock, isDataFormatNZ, config>(dstTensor, meanTensor, expSumTensor,
         maxTensor, srcTensor, expMaxTensor, inMeanTensor, inExpSumTensor, inMaxTensor, sharedTmpBuffer, tiling, params);

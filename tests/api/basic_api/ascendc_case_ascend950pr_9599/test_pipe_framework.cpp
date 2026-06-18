@@ -28,10 +28,10 @@ INSTANTIATE_TEST_CASE_P(SET_PHY_TYPE, TEST_GET_PHY_TYPE,
     ::testing::Values(PhyTypeParams { TPosition::GM, Hardware::GM }, PhyTypeParams { TPosition::A1, Hardware::L1 },
     PhyTypeParams { TPosition::A2, Hardware::L0A }, PhyTypeParams { TPosition::B1, Hardware::L1 },
     PhyTypeParams { TPosition::B2, Hardware::L0B },
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
     PhyTypeParams { TPosition::C1, Hardware::UB }, PhyTypeParams { TPosition::C2, Hardware::L0C },
     PhyTypeParams { TPosition::CO2, Hardware::UB },
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
     PhyTypeParams { TPosition::C1, Hardware::L1 }, PhyTypeParams { TPosition::C2, Hardware::BIAS },
     PhyTypeParams { TPosition::CO2, Hardware::L1 },
 #endif

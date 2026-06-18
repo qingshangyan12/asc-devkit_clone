@@ -225,13 +225,13 @@ __aicore__ inline void BatchNormExeImpl(
         GetBatchNormOutputPre<isBasicBlock>(tmpOutputVariance, params.tempTensorC, epsilon, tiling, params);
         GetBatchNormOutput<isBasicBlock>(params.tempTensorC, output, gamm, beta, tiling, params);
     } else {
-        // 1、outputMean
+        // 1銆乷utputMean
         GetBatchNormOutputMean<isBasicBlock, needCast>(tmpOutputMean, inputX, tiling, params);
-        // 2、outputVariance
+        // 2銆乷utputVariance
         GetBatchNormOutputVariance<isBasicBlock, needCast>(tmpOutputVariance, inputX, tmpOutputMean, tiling, params);
-        // 3、gamma beta vmul+vadd
+        // 3銆乬amma beta vmul+vadd
         GetBatchNormOutputPre<isBasicBlock>(tmpOutputVariance, params.tempTensorC, epsilon, tiling, params);
-        // 4、output
+        // 4銆乷utput
         GetBatchNormOutput<isBasicBlock>(params.tempTensorC, output, gamm, beta, tiling, params);
     }
 }
@@ -249,20 +249,20 @@ __aicore__ inline void BatchNormExeImpl(
         SetMaskNorm();
         ResetMask();
         CastInput<isBasicBlock>(params.tempTensorA, inputX, tiling, params);
-        // 1、outputMean
+        // 1銆乷utputMean
         GetBatchNormOutputMean<isBasicBlock, needCast>(tmpOutputMean, params.tempTensorA, tiling, params);
-        // 2、cast mean from half->float
+        // 2銆乧ast mean from half->float
         GetOutputMeanVariance<isBasicBlock>(outputMean, tmpOutputMean, tiling, params);
-        // 3、outputVariance
+        // 3銆乷utputVariance
         GetBatchNormOutputVariance<isBasicBlock, needCast>(
             tmpOutputVariance, params.tempTensorA, tmpOutputMean, tiling, params);
-        // 4、cast variance from half->float
+        // 4銆乧ast variance from half->float
         GetOutputMeanVariance<isBasicBlock>(outputVariance, tmpOutputVariance, tiling, params);
-        // 5、gamma beta vmul+vadd
+        // 5銆乬amma beta vmul+vadd
         GetBatchNormOutputPre<isBasicBlock>(tmpOutputVariance, params.tempTensorC, epsilon, tiling, params);
-        // 6、output
+        // 6銆乷utput
         GetBatchNormOutput<isBasicBlock>(params.tempTensorC, output, gamm, beta, tiling, params);
-        // 7、cast output from half->float
+        // 7銆乧ast output from half->float
         CastOutput<isBasicBlock>(output, params.tempTensorB, tiling, params);
     } else {
         CastInput<isBasicBlock>(params.tempTensorA, inputX, tiling, params);

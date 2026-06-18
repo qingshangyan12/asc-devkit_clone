@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 #include "instr_impl/npu_arch_2201/cube_datamove_impl.h"
 
@@ -221,7 +221,7 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(float& config);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 // ==========asc_copy_gm2l1==========
 //PAD_NONE
