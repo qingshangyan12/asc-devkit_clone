@@ -28,6 +28,7 @@ class CaseRunnerContext:
     runners_root: Path
     arch: str
     modes: List[str]
+    werror: bool
     cells: List[Cell]
     suggestions: List[Suggestion]
     skipped: List[RunResult]
@@ -50,6 +51,7 @@ def build_case_runner_cells_with_skips(
     modes: Iterable[str],
     includes: Iterable[str],
     excludes: Iterable[str],
+    werror: bool = False,
 ) -> tuple[List[Cell], List[Suggestion], List[RunResult]]:
     runners_root = project_root / "scripts" / "presmoke" / "cases"
     manifest = load_manifest(project_root)
@@ -61,6 +63,7 @@ def build_case_runner_cells_with_skips(
         runners_root=runners_root,
         arch=arch,
         modes=modes_list,
+        werror=werror,
         cells=[],
         suggestions=[],
         skipped=[],
@@ -153,6 +156,8 @@ def make_runner_cell(context: CaseRunnerContext, runner_dir: Path, info: RunnerI
         "PRESMOKE_ARCH": context.arch,
         "PRESMOKE_MODE": mode,
     }
+    if getattr(context, "werror", False):
+        command_env["PRESMOKE_WERROR"] = "1"
     commands = [
         Command(f"bash {runner} clean", "clean", command_env),
         Command(f"bash {runner} build", "build", command_env),

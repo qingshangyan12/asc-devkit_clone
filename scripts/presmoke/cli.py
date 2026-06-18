@@ -36,6 +36,7 @@ from .report import print_console, write_json, write_markdown, write_suggestions
 from .runner import CPU_RUN_TIMEOUT, PipelineOptions, run_cells_pipeline_with_options
 from .scheduler import export_schedule_file, read_schedule_file, schedule_cells, ScheduleOptions
 from .suggest import dedupe_suggestions
+from .werror import enabled_from_env as werror_enabled_from_env
 
 
 LOG = logging.getLogger(__name__)
@@ -121,9 +122,10 @@ def parallel_config(
     return {
         "jobs": jobs,
         "npu_slots": args.npu_slots,
-        "cpu_run_slots": cpu_run_slots,
         "make_jobs": make_jobs,
+        "cpu_run_slots": cpu_run_slots,
         "cpu_run_timeout": cpu_run_timeout,
+        "werror": int(bool(args.werror)),
     }
 
 
@@ -137,6 +139,7 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
             config.modes,
             args.filter,
             args.exclude,
+            werror=args.werror,
         )
         suggestions.extend(runner_suggestions)
     else:
@@ -145,7 +148,12 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
         specs = [parse_readme(path, config.examples_root) for path in examples]
         for spec in specs:
             suggestions.extend(spec.suggestions)
-        cells, planner_suggestions, skipped_results = build_cells_with_skips(specs, config.host_arch, config.modes)
+        cells, planner_suggestions, skipped_results = build_cells_with_skips(
+            specs,
+            config.host_arch,
+            config.modes,
+            werror=args.werror,
+        )
         suggestions.extend(planner_suggestions)
     return CaseSelection(cells, dedupe_suggestions(suggestions), skipped_results)
 
@@ -302,8 +310,11 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--strict-schedule", action="store_true")
     parser.add_argument("--suggestions-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--werror", action="store_true")
     parser.add_argument("-v", "--verbose", action="store_true")
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    args.werror = bool(args.werror or werror_enabled_from_env())
+    return args
 
 
 def resolve_schedule_file(
