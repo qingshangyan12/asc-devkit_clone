@@ -67,12 +67,8 @@ private:
     __aicore__ inline uint64_t GetDbValue(uint32_t qpn);
 
 private:
-    __ubuf__ uint8_t *wqeAddr_;
-    __ubuf__ uint8_t *cqeAddr_;
-    __ubuf__ uint8_t *dbAddr_;
     LocalTensor<uint8_t> wqeUB_;
     LocalTensor<uint8_t> cqeUB_;
-    LocalTensor<uint8_t> dbUB_;
 };
 } // namespace AscendC
 
