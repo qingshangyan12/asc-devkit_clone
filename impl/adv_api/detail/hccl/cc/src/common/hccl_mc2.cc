@@ -411,6 +411,17 @@ CcuResult CcuKernelLaunch(HcclComm comm, void *opResCtx)
     CHK_PRT_RET(resourceCtx.kfcServerArgSize != 0U && resourceCtx.kfcServerArgs.empty(),
         HCCL_ERROR("invalid kfcServerArgs, kfcServerArgSize[%u].", resourceCtx.kfcServerArgSize), CCU_E_PTR);
 
+    HCCL_INFO("[CCU_VERIFY] threads.size=%zu ccuKernels.size=%zu kfcArgs.size=%zu kfcArgSize=%u", resourceCtx.threads.size(),
+    resourceCtx.ccuKernels.size(),
+    resourceCtx.kfcServerArgs.size(),
+    resourceCtx.kfcServerArgSize);
+
+    for (size_t i = 0; i < resourceCtx.kfcServerArgs.size(); ++i) {
+        HCCL_INFO("[CCU_VERIFY] kfcServerArgs[%zu]=0x%llx", i, resourceCtx.kfcServerArgs[i]);
+    }
+
+    HCCL_INFO("[CCU_VERIFY] threadHandle=0x%llx kernelHandle=0x%llx", threadHandle, kernelHandle);
+
     HCCL_INFO("[CcuKernelLaunch]Start HcommCcuKernelLaunch.");
     const void *kfcArgs = resourceCtx.kfcServerArgs.empty() ? nullptr :
         static_cast<const void *>(resourceCtx.kfcServerArgs.data());
