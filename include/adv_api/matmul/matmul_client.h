@@ -3025,13 +3025,11 @@ private:
             if (C_TYPE::layout == LayoutMode::BSNGD) {
                 repeatParams.srcGap = (cubeTiling.GetCLayoutInfoN() * cubeTiling.GetCLayoutInfoG() - batchC) *
                                       cubeTiling.GetSingleCoreN() * sizeof(T) / ONE_BLK_SIZE;
-                ;
             } else if (C_TYPE::layout == LayoutMode::SBNGD) {
                 repeatParams.srcGap =
                     (cubeTiling.GetCLayoutInfoB() * cubeTiling.GetCLayoutInfoN() * cubeTiling.GetCLayoutInfoG() -
                      batchC) *
                     cubeTiling.GetSingleCoreN() * sizeof(T) / ONE_BLK_SIZE;
-                ;
             }
             repeatParams.dstGap = repeatParams.srcGap;
             DataCopy(data, globalTensor, repeatParams);
