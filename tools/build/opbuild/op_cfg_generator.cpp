@@ -21,70 +21,10 @@
 #include "ascendc_tool_log.h"
 #include "op_cfg_generator.h"
 #include "op_build_params.h"
+#include "op_dtype_name_utils.h"
 
 namespace ops {
-namespace {
-struct DataTypeName {
-    ge::DataType type;
-    const char* name;
-};
-
-constexpr DataTypeName CFG_DTYPE_NAMES[] = {
-    {ge::DT_FLOAT, "float32"},
-    {ge::DT_FLOAT16, "float16"},
-    {ge::DT_INT8, "int8"},
-    {ge::DT_INT16, "int16"},
-    {ge::DT_INT32, "int32"},
-    {ge::DT_INT64, "int64"},
-    {ge::DT_UINT1, "uint1"},
-    {ge::DT_UINT8, "uint8"},
-    {ge::DT_UINT16, "uint16"},
-    {ge::DT_UINT32, "uint32"},
-    {ge::DT_UINT64, "uint64"},
-    {ge::DT_BOOL, "bool"},
-    {ge::DT_DOUBLE, "double"},
-    {ge::DT_DUAL, "dual"},
-    {ge::DT_DUAL_SUB_INT8, "dual_sub_int8"},
-    {ge::DT_DUAL_SUB_UINT8, "dual_sub_uint8"},
-    {ge::DT_STRING, "string"},
-    {ge::DT_COMPLEX64, "complex64"},
-    {ge::DT_COMPLEX128, "complex128"},
-    {ge::DT_QINT8, "qint8"},
-    {ge::DT_QINT16, "qint16"},
-    {ge::DT_QINT32, "qint32"},
-    {ge::DT_QUINT8, "quint8"},
-    {ge::DT_QUINT16, "quint16"},
-    {ge::DT_RESOURCE, "resource"},
-    {ge::DT_STRING_REF, "string_ref"},
-    {ge::DT_INT4, "int4"},
-    {ge::DT_INT2, "int2"},
-    {ge::DT_BF16, "bfloat16"},
-    {ge::DT_COMPLEX32, "complex32"},
-    {ge::DT_HIFLOAT8, "hifloat8"},
-    {ge::DT_FLOAT8_E4M3FN, "float8_e4m3fn"},
-    {ge::DT_FLOAT8_E5M2, "float8_e5m2"},
-    {ge::DT_FLOAT8_E8M0, "float8_e8m0"},
-    {ge::DT_FLOAT6_E3M2, "float6_e3m2"},
-    {ge::DT_FLOAT6_E2M3, "float6_e2m3"},
-    {ge::DT_FLOAT4_E2M1, "float4_e2m1"},
-    {ge::DT_FLOAT4_E1M2, "float4_e1m2"}};
-
-template <size_t N>
-const char* FindDataTypeName(const ge::DataType& type, const DataTypeName (&names)[N])
-{
-    for (const auto& item : names) {
-        if (item.type == type) {
-            return item.name;
-        }
-    }
-    return "unknow";
-}
-} // namespace
-
-std::string CfgGenerator::GetDataTypeName(const ge::DataType& type) const
-{
-    return FindDataTypeName(type, CFG_DTYPE_NAMES);
-}
+std::string CfgGenerator::GetDataTypeName(const ge::DataType& type) const { return FindCfgDataTypeName(type); }
 
 std::string CfgGenerator::GetParamTypeName(uint32_t paramType) const
 {
