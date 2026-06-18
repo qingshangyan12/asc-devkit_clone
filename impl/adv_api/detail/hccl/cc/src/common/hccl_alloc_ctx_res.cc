@@ -121,7 +121,7 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag,
         Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
     CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AICPU,
         comParamBufSize, &comParamPtr));
-    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AICPU,
+    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_CCU,
         comSyncBufSize, &comSyncPtr));
 
     opResCtx.workSpace      = reinterpret_cast<uint64_t>(workspacePtr);
