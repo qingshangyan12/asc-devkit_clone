@@ -65,7 +65,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         BlockReduceMax<float, false>(reduceSumBuffer, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_BLK_NUM);
         PipeBarrier<PIPE_V>();
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
@@ -75,7 +75,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 HALF_FACTOR * DEFAULT_REPEAT_STRIDE);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(tmpBuffer1, reduceSumBuffer, splitCeilM, {HALF_FACTOR, HALF_FACTOR * DEFAULT_REPEAT_STRIDE});
         Brcb(
             tmpBuffer1[DEFAULT_BLK_NUM], reduceSumBuffer, splitCeilM,
@@ -113,7 +113,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         PipeBarrier<PIPE_V>();
         BlockReduceSum<float, false>(reduceSumBuffer, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_BLK_NUM);
         PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
         for (uint32_t j = 0; j < splitCeilM; j++) {
@@ -122,7 +122,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 HALF_FACTOR * DEFAULT_REPEAT_STRIDE);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(tmpBuffer1, reduceSumBuffer, splitCeilM, {HALF_FACTOR, HALF_FACTOR * DEFAULT_REPEAT_STRIDE});
         Brcb(
             tmpBuffer1[DEFAULT_BLK_NUM], reduceSumBuffer, splitCeilM,
@@ -181,7 +181,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         PipeBarrier<PIPE_V>();
         BlockReduceMax<float, false>(tmpBuffer2, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
         PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
@@ -190,7 +190,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 maxTensor[offset2 + FLOAT_REPEAT_SIZE * j], tmpBuffer2[FLOAT_NUM_PER_BLK * j], FLOAT_NUM_PER_BLK);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(maxTensor[offset2], tmpBuffer2, splitCeilM, {1, DEFAULT_REPEAT_STRIDE});
 #endif
         PipeBarrier<PIPE_V>();
@@ -218,7 +218,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         PipeBarrier<PIPE_V>();
         BlockReduceSum<float, false>(tmpBuffer2, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
         PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
         for (uint32_t j = 0; j < splitCeilM; j++) {
@@ -226,7 +226,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 sumTensor[offset2 + FLOAT_REPEAT_SIZE * j], tmpBuffer2[FLOAT_NUM_PER_BLK * j], FLOAT_NUM_PER_BLK);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(sumTensor[offset2], tmpBuffer2, splitCeilM, {1, DEFAULT_REPEAT_STRIDE});
 #endif
         PipeBarrier<PIPE_V>();
@@ -277,7 +277,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         BlockReduceMax<float, false>(
             reduceSumBuffer, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
         PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
@@ -286,7 +286,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 maxTensor[offset2 + FLOAT_REPEAT_SIZE * j], reduceSumBuffer[FLOAT_NUM_PER_BLK * j], FLOAT_NUM_PER_BLK);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(maxTensor[offset2], reduceSumBuffer, splitCeilM, {1, DEFAULT_REPEAT_STRIDE});
 #endif
         PipeBarrier<PIPE_V>();
@@ -316,7 +316,7 @@ __aicore__ inline void SoftMaxBasicBlock(
         BlockReduceSum<float, false>(
             reduceSumBuffer, tmpBuffer1, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
         PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         SetFlag<HardEvent::V_S>(eventIdVToS);
         WaitFlag<HardEvent::V_S>(eventIdVToS);
         for (uint32_t j = 0; j < splitCeilM; j++) {
@@ -324,7 +324,7 @@ __aicore__ inline void SoftMaxBasicBlock(
                 sumTensor[offset2 + FLOAT_REPEAT_SIZE * j], reduceSumBuffer[FLOAT_NUM_PER_BLK * j], FLOAT_NUM_PER_BLK);
         }
         ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         Brcb(sumTensor[offset2], reduceSumBuffer, splitCeilM, {1, DEFAULT_REPEAT_STRIDE});
 #endif
         PipeBarrier<PIPE_V>();

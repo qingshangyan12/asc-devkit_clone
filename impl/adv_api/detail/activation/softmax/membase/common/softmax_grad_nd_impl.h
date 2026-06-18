@@ -144,7 +144,7 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
                 BlockReduceSum<float, false>(
                     reduceBuffer, dstBuffer, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
                 PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
                 event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
                 SetFlag<HardEvent::V_S>(eventIdVToS);
                 WaitFlag<HardEvent::V_S>(eventIdVToS);
@@ -154,7 +154,7 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
                         DEFAULT_REPEAT_STRIDE * B16_BYTE_SIZE);
                 }
                 ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                 Brcb(dstBuffer, reduceBuffer, splitCeilM, {B16_BYTE_SIZE, DEFAULT_REPEAT_STRIDE * B16_BYTE_SIZE});
                 Brcb(
                     dstBuffer[DEFAULT_BLK_NUM], reduceBuffer, splitCeilM,
@@ -223,7 +223,7 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
                 BlockReduceSum<float, false>(
                     reduceBuffer, srcBuffer, splitCeilM, MASK_PLACEHOLDER, 1, 1, DEFAULT_REPEAT_STRIDE);
                 PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
                 event_t eventIdVToS = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_S));
                 SetFlag<HardEvent::V_S>(eventIdVToS);
                 WaitFlag<HardEvent::V_S>(eventIdVToS);
@@ -233,7 +233,7 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
                         FLOAT_NUM_PER_BLK);
                 }
                 ResetMask();
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
                 Brcb(dstTensor[offset2], reduceBuffer, splitCeilM, {1, DEFAULT_REPEAT_STRIDE});
 #endif
             } else {

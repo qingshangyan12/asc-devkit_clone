@@ -66,22 +66,20 @@ private:
 
     __aicore__ inline constexpr static uint8_t GetChipType()
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
         return CHIP_TYPE_100;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
         return CHIP_TYPE_200;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         return CHIP_TYPE_220;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
         return CHIP_TYPE_300;
 #elif __NPU_ARCH__ == 3003
         return CHIP_TYPE_L300;
 #elif __NPU_ARCH__ == 3113
         return CHIP_TYPE_L311;
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         return CHIP_TYPE_310;
-#elif __NPU_ARCH__ == 5102
-        return CHIP_TYPE_510R2;
 #else
         static_assert("Find invalid chip type!");
         return CHIP_TYPE_100;

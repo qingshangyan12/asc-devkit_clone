@@ -26,9 +26,9 @@
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "batchnorm_v200_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "batchnorm_v220_impl.h"
 #endif
 
@@ -234,9 +234,9 @@ __aicore__ inline void BrcFirstDim(
 {
     SetMaskNorm();
     ResetMask();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     BrcFirstDimByBrcb<isBasicBlock>(dst, src, tiling, params);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     BrcFirstDimByTransData<isBasicBlock>(dst, src, tiling, params);
 #endif
 }

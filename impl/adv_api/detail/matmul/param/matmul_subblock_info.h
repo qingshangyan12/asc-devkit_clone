@@ -33,7 +33,7 @@ class MatmulSubBlockInfo {
 public:
     __aicore__ inline void SetSubBlockIdx(uint8_t subBlockIdx)
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         ASCENDC_ASSERT((subBlockIdx < MIX_NUM), {
             KERNEL_LOG(KERNEL_ERROR, "subBlockIdx is %d , which should only be [0,%d) ", subBlockIdx, MIX_NUM);
         });

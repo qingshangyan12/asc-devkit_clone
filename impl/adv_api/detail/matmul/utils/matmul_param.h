@@ -52,7 +52,7 @@ struct MatmulParamsNorm : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE, BIAS_T
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
     TQue<TPosition::C1, QUEUE_DEPTH> qidBias_;
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
     TQue<TPosition::A2, QUEUE_DEPTH> qidA2_;
     TQue<TPosition::B2, QUEUE_DEPTH> qidB2_;
 #endif
@@ -202,7 +202,7 @@ struct MatmulParamsIBShareNorm : public MatmulParamsBase<A_TYPE, B_TYPE, C_TYPE,
     using DstT = typename C_TYPE::T;
     using BiasT = typename BIAS_TYPE::T;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
     TQue<TPosition::A2, QUEUE_DEPTH> qidA2_;
     TQue<TPosition::B2, QUEUE_DEPTH> qidB2_;
 #endif

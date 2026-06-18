@@ -43,10 +43,10 @@ __aicore__ inline void SoftMaxGenericNDImpl(
     PipeBarrier<PIPE_V>();
     NewReduceSumLastNDImpl(sumTensor[offset2], dst[offset1], tmpBuffer0, reduceParam);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     TransDivToMulImpl(
         dst[offset1], sumTensor[offset2], tmpBuffer0, reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     GenericDivNDImpl(
         dst[offset1], dst[offset1], sumTensor[offset2], reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
 #endif
@@ -80,9 +80,9 @@ __aicore__ inline void SoftMaxGenericNDImpl(
 
     Cast(sumTensor[offset2], tmpBuffer2, FLOAT2HALF_ROUND_MODE, reduceSize);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     TransDivToMulImpl(tmpBuffer0, tmpBuffer2, tmpBuffer3, reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     GenericDivNDImpl(tmpBuffer0, tmpBuffer0, tmpBuffer2, reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
 #endif
     PipeBarrier<PIPE_V>();
@@ -110,10 +110,10 @@ __aicore__ inline void SoftMaxGenericNDImpl(
     PipeBarrier<PIPE_V>();
     NewReduceSumLastNDImpl(sumTensor[offset2], tmpBuffer0, tmpBuffer1, reduceParam);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     TransDivToMulImpl(
         tmpBuffer0, sumTensor[offset2], tmpBuffer1, reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     GenericDivNDImpl(tmpBuffer0, tmpBuffer0, sumTensor[offset2], reduceParam.originalSrcM, tiling.srcK, tiling.reduceK);
 #endif
     PipeBarrier<PIPE_V>();

@@ -23,7 +23,6 @@ from asc_op_compile_base.asc_op_compiler.generator.kernel_compiler import Kernel
 from asc_op_compile_base.asc_op_compiler.generator.cmd_compiler import CmdCompilerConfig
 from asc_op_compile_base.asc_op_compiler.ascendc_constants import PreCompileType, CompileType, IsolationMacroType
 
-
 class ArchRuntimeConfig(RuntimeConfig):
     def __init__(self):
         # Initialize Config
@@ -47,7 +46,7 @@ class ArchRuntimeConfig(RuntimeConfig):
         with_time_stamp_dynamic = False
         with_time_stamp_static = True
         tiling_format = "uint64"
-        macro_def = ["false", "false", "false", "__NPU_ARCH__ == 5102", "true", "false"]
+        macro_def = ["false", "false", "false", "true", "false"]
         need_const_tiling_qualifier = False
 
         # Code Generator Config
@@ -61,7 +60,7 @@ class ArchRuntimeConfig(RuntimeConfig):
         support_dci = True
         support_raw_aic_only_dump_tensor = False
         support_mix = False
-        dci_macro = "(__NPU_ARCH__ == 5102)"
+        dci_macro = ""
         gen_isolation_macro_type = IsolationMacroType.ISOLATION_MACRO_DEFAULT
 
         cube_core_type_macro = "__DAV_M200__"

@@ -24,7 +24,7 @@
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 namespace AscendC {
 __aicore__ inline void CeilProcess(

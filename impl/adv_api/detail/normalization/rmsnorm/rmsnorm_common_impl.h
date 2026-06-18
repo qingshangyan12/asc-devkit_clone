@@ -23,9 +23,9 @@
 #include "../../api_check/kernel_check/normalization/rmsnorm/rmsnorm_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "rmsnorm_v220_impl.h"
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
 #include "rmsnorm_v200_impl.h"
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)

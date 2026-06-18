@@ -17,7 +17,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_H__
 #endif
 
-
 #ifndef ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
@@ -61,11 +60,10 @@ __aicore__ inline int64_t GetSpr();
 template <SpecialPurposeReg spr>
 __aicore__ inline void ClearSpr();
 
-
 __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {
 #if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
+    ( (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
     return TOTAL_UB_SIZE;
 #else
@@ -76,7 +74,7 @@ __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 __aicore__ inline constexpr uint32_t GetVecLen()
 {
 #if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
+    ( (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
     return VECTOR_REG_WIDTH;
 #else
@@ -87,7 +85,7 @@ __aicore__ inline constexpr uint32_t GetVecLen()
 __aicore__ inline uint32_t GetRuntimeUBSize()
 {
 #if defined(__NPU_ARCH__) &&                                                                                    \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) ||    \
+    ( (__NPU_ARCH__ == 3003) ||    \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return TOTAL_UB_SIZE;
@@ -103,9 +101,6 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 #else
     return TOTAL_UB_SIZE;  // cube core not support get_shmem_sz
 #endif
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
-    constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
-    return get_shmem_sz() - RESERVED_UB_SIZE;  // m510 aicore reserve 8KB
 #else
     return TOTAL_UB_SIZE;
 #endif

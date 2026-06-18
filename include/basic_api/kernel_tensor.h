@@ -190,7 +190,7 @@ public:
     __aicore__ inline void operator = (const SymbolOverrideDiv<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideOr<T>& symbolOverride);
     __aicore__ inline void operator = (const SymbolOverrideAnd<T>& symbolOverride);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
     template <typename U> __aicore__ inline void operator = (const SymbolOverrideCompare<U>& symbolOverride);
 #else
     __aicore__ inline void operator = (const SymbolOverrideCompare<float>& symbolOverride);
@@ -224,7 +224,7 @@ private:
     __aicore__ inline void CreateTensor(TPosition pos, uint32_t addr, uint32_t tileSize);
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     inline void PrintTypicalFloat(uint32_t len, uint32_t dataSize);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
     inline void PrintFp4E2M1(uint32_t len) const;
     inline void PrintFp4E1M2(uint32_t len) const;
 #endif
@@ -261,7 +261,7 @@ public:
     __aicore__ inline ShapeInfo GetShapeInfo() const;
     template<CacheRwMode rwMode = CacheRwMode::RW>
     __aicore__ inline void SetL2CacheHint(CacheMode mode);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
     template <typename U> __aicore__ inline GlobalTensor<U> ReinterpretCast() const;
 #endif
 
@@ -293,7 +293,7 @@ public:
     template <class DataType, uint32_t tileSize> LocalTensor<DataType> __aicore__ inline Alloc();
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc(uint32_t tileSize);
     template <class DataType> LocalTensor<DataType> __aicore__ inline Alloc();
-    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type 
+    template <class DataType, typename LayoutType> typename Std::enable_if<is_layout_v<LayoutType>, LocalTensor<DataType>>::type
     __aicore__ inline Alloc(const LayoutType& layout);
 
 private:
