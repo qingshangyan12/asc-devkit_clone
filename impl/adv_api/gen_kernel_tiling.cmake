@@ -65,6 +65,7 @@ target_include_directories(
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api>
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/simt_api>
+            $<BUILD_INTERFACE:${ASC_COMM_HEADER_INCLUDE_DIR}>
 )
 
 add_library(asc_host_headers INTERFACE)
