@@ -8,121 +8,24 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-set(ASC_COMM_TAG_ID master CACHE STRING "asc-comm git ref for mc2 components")
-set(ASC_COMM_DEFAULT_AUTH_USER "aoe_public" CACHE STRING "default asc-comm git user when token authentication is enabled")
-set(ASC_COMM_DEFAULT_AUTH_PASSWORD "KTZ21WLiB_fZv67g9kzGQiyc")
-set(ASC_COMM_GIT_USER_FROM_TOKEN "")
-set(ASC_COMM_GIT_USER "${ASC_COMM_DEFAULT_AUTH_USER}" CACHE STRING "asc-comm git user for https authentication" FORCE)
-if(DEFINED ENV{ASC_COMM_GIT_TOKEN} AND NOT "$ENV{ASC_COMM_GIT_TOKEN}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{ASC_COMM_GIT_TOKEN}")
-elseif(DEFINED ENV{ASC_COMM_GIT_PASSWORD} AND NOT "$ENV{ASC_COMM_GIT_PASSWORD}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{ASC_COMM_GIT_PASSWORD}")
-elseif(DEFINED ASC_COMM_GIT_TOKEN AND NOT "${ASC_COMM_GIT_TOKEN}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "${ASC_COMM_GIT_TOKEN}")
-elseif(DEFINED ASC_COMM_GIT_PASSWORD AND NOT "${ASC_COMM_GIT_PASSWORD}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "${ASC_COMM_GIT_PASSWORD}")
-elseif(NOT "${ASC_COMM_DEFAULT_AUTH_PASSWORD}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "${ASC_COMM_DEFAULT_AUTH_PASSWORD}")
-elseif(DEFINED ENV{GITCODE_TOKEN} AND NOT "$ENV{GITCODE_TOKEN}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{GITCODE_TOKEN}")
-elseif(DEFINED ENV{GITCODE_PASSWORD} AND NOT "$ENV{GITCODE_PASSWORD}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{GITCODE_PASSWORD}")
-elseif(DEFINED ENV{GIT_PASSWORD} AND NOT "$ENV{GIT_PASSWORD}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{GIT_PASSWORD}")
-elseif(DEFINED ENV{git_token} AND NOT "$ENV{git_token}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{git_token}")
-    if(DEFINED ENV{gitcode_name} AND NOT "$ENV{gitcode_name}" STREQUAL "")
-        set(ASC_COMM_GIT_USER_FROM_TOKEN "$ENV{gitcode_name}")
-    endif()
-elseif(DEFINED ENV{access_token} AND NOT "$ENV{access_token}" STREQUAL "")
-    set(ASC_COMM_GIT_PASSWORD "$ENV{access_token}")
-    if(DEFINED ENV{user_name} AND NOT "$ENV{user_name}" STREQUAL "")
-        set(ASC_COMM_GIT_USER_FROM_TOKEN "$ENV{user_name}")
-    endif()
-endif()
-unset(ASC_COMM_GIT_TOKEN CACHE)
-unset(ASC_COMM_GIT_PASSWORD CACHE)
-if(DEFINED ASC_COMM_GIT_PASSWORD AND NOT "${ASC_COMM_GIT_PASSWORD}" STREQUAL ""
-        AND "${ASC_COMM_GIT_USER}" STREQUAL "")
-    if(NOT "${ASC_COMM_GIT_USER_FROM_TOKEN}" STREQUAL "")
-        set(ASC_COMM_GIT_USER "${ASC_COMM_GIT_USER_FROM_TOKEN}")
-    else()
-        set(ASC_COMM_GIT_USER "${ASC_COMM_DEFAULT_AUTH_USER}")
-    endif()
-endif()
-if(NOT "${ASC_COMM_GIT_USER}" STREQUAL "")
-    set(ASC_COMM_GIT_USER "${ASC_COMM_GIT_USER}" CACHE STRING "asc-comm git user for https authentication" FORCE)
-endif()
-set(ASC_COMM_DEFAULT_GIT_URL "https://gitcode.com/cann/asc-comm.git")
-if(DEFINED ASC_COMM_GIT_PASSWORD AND NOT "${ASC_COMM_GIT_PASSWORD}" STREQUAL ""
-        AND NOT "${ASC_COMM_GIT_USER}" STREQUAL "")
-    set(ASC_COMM_DEFAULT_GIT_URL "https://${ASC_COMM_GIT_USER}@gitcode.com/cann/asc-comm.git")
-endif()
-if(NOT DEFINED ASC_COMM_GIT_URL
-        OR ASC_COMM_GIT_URL STREQUAL "https://gitcode.com/cann/asc-comm.git"
-        OR ASC_COMM_GIT_URL MATCHES "^https://[^/@]+@gitcode\\.com/cann/asc-comm\\.git$")
-    set(ASC_COMM_GIT_URL "${ASC_COMM_DEFAULT_GIT_URL}" CACHE STRING "asc-comm git url" FORCE)
-else()
-    set(ASC_COMM_GIT_URL "${ASC_COMM_GIT_URL}" CACHE STRING "asc-comm git url")
-endif()
-if(DEFINED ASC_COMM_GIT_PASSWORD AND NOT "${ASC_COMM_GIT_PASSWORD}" STREQUAL ""
-        AND NOT "${ASC_COMM_GIT_USER}" STREQUAL "")
-    set(ASC_COMM_GIT_ASKPASS "${CMAKE_BINARY_DIR}/asc_comm_git_askpass.sh")
-    file(WRITE "${ASC_COMM_GIT_ASKPASS}"
-"#!/bin/sh
-case \"$1\" in
-    *Username*) printf '%s\\n' \"$ASC_COMM_GIT_USER\" ;;
-    *) printf '%s\\n' \"$ASC_COMM_GIT_PASSWORD\" ;;
-esac
-")
-    file(CHMOD "${ASC_COMM_GIT_ASKPASS}"
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    )
-    set(ENV{GIT_ASKPASS} "${ASC_COMM_GIT_ASKPASS}")
-    set(ENV{ASC_COMM_GIT_USER} "${ASC_COMM_GIT_USER}")
-    set(ENV{ASC_COMM_GIT_PASSWORD} "${ASC_COMM_GIT_PASSWORD}")
-endif()
+set(ASC_COMM_TAG_ID master CACHE STRING "asc-comm git ref for source checkout")
+# 精简鉴权：不考虑安全因素，固定使用公共账户 aoe_public 及其令牌拉取 asc-comm 仓。
+set(ASC_COMM_GIT_USER "aoe_public")
+set(ASC_COMM_GIT_PASSWORD "KTZ21WLiB_fZv67g9kzGQiyc")
+set(ASC_COMM_GIT_URL
+    "https://${ASC_COMM_GIT_USER}:${ASC_COMM_GIT_PASSWORD}@gitcode.com/cann/asc-comm.git"
+    CACHE STRING "asc-comm git url" FORCE)
 set(ENV{GIT_TERMINAL_PROMPT} "0")
 
-function(asc_comm_checkout_source source_path)
-    execute_process(
-        COMMAND git fetch ${ASC_COMM_GIT_URL} ${ASC_COMM_TAG_ID} --depth=1
-        WORKING_DIRECTORY ${source_path}
-        TIMEOUT 20
-        RESULT_VARIABLE FETCH_RESULT
-        ERROR_VARIABLE FETCH_ERROR
-        OUTPUT_QUIET
-    )
-
-    if(FETCH_RESULT EQUAL 0)
-        set(checkout_ref FETCH_HEAD)
-        message(STATUS "[ThirdPartyLib][asc-comm] fetched ${ASC_COMM_TAG_ID}")
-    else()
-        set(checkout_ref ${ASC_COMM_TAG_ID})
-        message(WARNING "[ThirdPartyLib][asc-comm] Git fetch failed, checkout cached ${ASC_COMM_TAG_ID}: ${FETCH_ERROR}")
-    endif()
-
-    execute_process(
-        COMMAND git checkout ${checkout_ref}
-        WORKING_DIRECTORY ${source_path}
-        RESULT_VARIABLE CHECKOUT_RESULT
-        ERROR_VARIABLE CHECKOUT_ERROR
-        OUTPUT_QUIET
-    )
-    if(NOT CHECKOUT_RESULT EQUAL 0)
-        message(FATAL_ERROR "[ThirdPartyLib][asc-comm] Git checkout failed: ${CHECKOUT_ERROR}")
-    endif()
-endfunction()
-
-if(EXISTS "${CANN_3RD_LIB_PATH}/asc-comm/.git")
+# 本地已存在 asc-comm 源码则直接使用，不再触发任何拉取/checkout；否则才从线上拉取。
+if(EXISTS "${CANN_3RD_LIB_PATH}/asc-comm/include")
     get_filename_component(ASC_COMM_SOURCE_PATH "${CANN_3RD_LIB_PATH}/asc-comm" REALPATH)
-    message(STATUS "[ThirdPartyLib][asc-comm] Find source dir: ${ASC_COMM_SOURCE_PATH}")
-    asc_comm_checkout_source(${ASC_COMM_SOURCE_PATH})
-elseif(EXISTS "${PROJECT_SOURCE_DIR}/../asc-comm/.git")
+    message(STATUS "[ThirdPartyLib][asc-comm] Use local source dir: ${ASC_COMM_SOURCE_PATH}")
+elseif(EXISTS "${PROJECT_SOURCE_DIR}/../asc-comm/include")
     get_filename_component(ASC_COMM_SOURCE_PATH "${PROJECT_SOURCE_DIR}/../asc-comm" REALPATH)
-    message(STATUS "[ThirdPartyLib][asc-comm] Find source dir: ${ASC_COMM_SOURCE_PATH}")
-    asc_comm_checkout_source(${ASC_COMM_SOURCE_PATH})
+    message(STATUS "[ThirdPartyLib][asc-comm] Use local source dir: ${ASC_COMM_SOURCE_PATH}")
 else()
+    message(STATUS "[ThirdPartyLib][asc-comm] Fetching ${ASC_COMM_TAG_ID} from remote.")
     include(FetchContent)
     FetchContent_Declare(
         asc-comm
