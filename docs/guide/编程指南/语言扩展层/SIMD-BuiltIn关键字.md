@@ -286,7 +286,7 @@
 
 -   \_\_simd\_vf\_\_
 
-    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/asc_vf_call-2.md)调用SIMD VF入口函数，启动VF子任务。
+    函数标记宏，用于标记SIMD VF入口函数，函数无返回值。使用[asc\_vf\_call](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_00267.html)调用SIMD VF入口函数，启动VF子任务。
 
     ```
     __simd_vf__ inline void KernelAdd(__ubuf__ float* x, __ubuf__ float* y, __ubuf__ float* z)
