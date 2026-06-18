@@ -135,11 +135,11 @@ output[index] = input[index];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      24.777      |    1.054    |     1739.820     |      0.889      |     0.847     |        0.153        |      0.141      |
+|      21.751      |    0.919    |     1515.731     |      0.743      |     0.817     |        0.164        |      0.169      |
 
 **分析**：
 
-- Case 0的Task Duration为24.777μs，作为连续GM读写场景的耗时基线
+- Case 0的Task Duration为21.751μs，作为连续GM读写场景的耗时基线
 - 后续转置版本需要在完成坐标交换的同时尽量接近该基线
 
 ---
@@ -172,11 +172,11 @@ output[index_out] = input[index_in];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      60.477      |    3.516    |     5801.925     |      3.357      |     0.955     |        0.147        |      0.041      |
+|      61.508      |    3.609    |     5954.297     |      3.441      |     0.954     |        0.156        |      0.043      |
 
 **分析**：
 
-- 与Case 0的copy基线相比，Task Duration从24.777μs增加到60.477μs，约为copy版本的2.44倍
+- 与Case 0的copy基线相比，Task Duration从21.751μs增加到61.508μs，约为copy版本的2.83倍
 - 直接索引转置本身计算量很小，但转置后的GM写回变为跨行、非连续访问，因此端到端耗时明显高于copy基线
 - 该版本GM读取仍然是连续读，但GM写回地址不连续，同一个Warp的写请求难以高效合并，这是Task Duration上升的主要原因
 
@@ -222,13 +222,13 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      35.945      |    1.814    |     2993.315     |      1.646      |     0.910     |        0.156        |      0.083      |
+|      31.926      |    1.606    |     2650.112     |      1.442      |     0.900     |        0.152        |      0.092      |
 
 **分析**：
 
-- 相比Case 1的naive transpose，Task Duration从60.477μs降低到35.945μs，耗时下降约40.6%，整体性能提升约1.68倍
+- 相比Case 1的naive transpose，Task Duration从61.508μs降低到31.926μs，耗时下降约48.1%，整体性能提升约1.93倍
 - Case 2通过UB中转把Case 1中的非连续GM写转移为UB侧访问，使GM读写都更接近连续访问，因此Task Duration明显降低
-- 与Case 0的copy基线相比，Case 2的Task Duration仍高约45.1%。Case 2相比copy版本额外引入了UB读写、同步以及转置方向的UB访问开销
+- 与Case 0的copy基线相比，Case 2的Task Duration仍高约46.8%。Case 2相比copy版本额外引入了UB读写、同步以及转置方向的UB访问开销
 
 ---
 
@@ -255,7 +255,6 @@ UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每
 
 SIMT编程方式下bank冲突主要有以下几种：
 
-- **读写冲突**：读操作和写操作同时尝试访问同一个bank group的相同编号的sub bank
 - **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的sub bank。
 - **读读冲突**：两个读操作同时尝试访问同一个bank group的相同编号的sub bank，或者两个以上读操作同时尝试访问同一个bank group的相同编号的sub bank。
 
@@ -291,14 +290,14 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
 | :---------------: | :----------: | :--------------: | :--------------: | :-----------: | :-----------------: | :--------------: |
-|      26.725      |    1.224    |     2018.943     |      1.059      |     0.869     |        0.152        |      0.121      |
+|      23.483      |    1.055    |     1740.038     |      0.883      |     0.847     |        0.151        |      0.138      |
 
 **分析**：
 
-- 相比Case 2的transpose_coalesced_kernel，Task Duration从35.945μs降低到26.725μs，耗时下降约25.7%，整体性能提升约1.35倍
+- 相比Case 2的transpose_coalesced_kernel，Task Duration从31.926μs降低到23.483μs，耗时下降约26.4%，整体性能提升约1.36倍
 - Case 3在Case 2的基础上通过padding避免UB转置读阶段的bank冲突，因此端到端Task Duration继续下降
-- 相比Case 1的naive transpose，Case 3的Task Duration下降约55.8%，整体性能提升约2.26倍，说明“GM访存合并 + UB bank冲突避免”两步优化在端到端耗时上叠加生效
-- 与Case 0的copy基线相比，Case 3的Task Duration只高约7.9%，已经接近连续GM读写的基准水平。剩余差距主要来自UB中转、同步
+- 相比Case 1的naive transpose，Case 3的Task Duration下降约61.8%，整体性能提升约2.62倍，说明“GM访存合并 + UB bank冲突避免”两步优化在端到端耗时上叠加生效
+- 与Case 0的copy基线相比，Case 3的Task Duration只高约8.0%，已经接近连续GM读写的基准水平。Case 3相比copy版本仍需执行UB中转、同步和UB转置读，仅凭汇总指标不再进一步拆分归因
 
 ---
 
@@ -308,15 +307,15 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 **综合优化效果**：
 
-- 从Case 1直接索引转置到Case 3完整优化版本，Task Duration从60.477μs降低到26.725μs，耗时下降约55.8%，整体性能提升约2.26倍
-- Case 3相比Case 0 copy基线仅高约7.9%，说明通过GM访存合并和避免UB bank冲突后，矩阵转置已经接近连续GM读写基线
+- 从Case 1直接索引转置到Case 3完整优化版本，Task Duration从61.508μs降低到23.483μs，耗时下降约61.8%，整体性能提升约2.62倍
+- Case 3相比Case 0 copy基线仅高约8.0%，说明通过GM访存合并和避免UB bank冲突后，矩阵转置已经接近连续GM读写基线
 
 | Case version | Task Duration(μs) | Task Duration相对Case 0 | 优化点                                |
 | ------------ | ----------------- | ----------------------- | ------------------------------------- |
-| Case 0       | 24.777            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
-| Case 1       | 60.477            | **2.44x耗时**     | 直接索引转置，GM连续读、非连续写      |
-| Case 2       | 35.945            | **1.45x耗时**     | UB中转，全局访存合并                  |
-| Case 3       | 26.725            | **1.08x耗时**     | UB中转，全局访存合并，避免UB bank冲突 |
+| Case 0       | 21.751            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
+| Case 1       | 61.508            | **2.83x耗时**     | 直接索引转置，GM连续读、非连续写      |
+| Case 2       | 31.926            | **1.47x耗时**     | UB中转，全局访存合并                  |
+| Case 3       | 23.483            | **1.08x耗时**     | UB中转，全局访存合并，避免UB bank冲突 |
 
 ## 调优建议
 
