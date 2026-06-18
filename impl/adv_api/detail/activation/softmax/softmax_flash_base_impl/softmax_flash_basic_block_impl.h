@@ -181,7 +181,7 @@ __aicore__ inline void SoftmaxFlashBasicBlock(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201) && ASCENDC_CPU_DEBUG == 0
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201 && ASCENDC_CPU_DEBUG == 0
 __aicore__ inline void SoftmaxFlashBasicBlockFloat(
     const LocalTensor<float>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
     const LocalTensor<float>& src, const LocalTensor<float>& expMaxTensor, const LocalTensor<float>& inSumTensor,
@@ -332,7 +332,7 @@ __aicore__ inline void SoftmaxFlashBasicBlockFloat(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201) && ASCENDC_CPU_DEBUG == 0
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201 && ASCENDC_CPU_DEBUG == 0
 __aicore__ inline void SoftmaxFlashBasicBlock(
     const LocalTensor<half>& dst, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
     const LocalTensor<half>& src, const LocalTensor<half>& expMaxTensor, const LocalTensor<float>& inSumTensor,

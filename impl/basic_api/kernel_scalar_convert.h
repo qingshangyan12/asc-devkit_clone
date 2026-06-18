@@ -26,7 +26,7 @@
 namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                    \
         ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) ||    \
-         (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+         (__NPU_ARCH__ == 3510))
 __aicore__ inline bfloat16_t Cast(const float& fVal)
 {
     constexpr uint32_t fp32SignIdx = 31;
@@ -84,12 +84,12 @@ __aicore__ inline bfloat16_t ToBfloat16(const float& fVal)
     return Cast(fVal);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510))
 template <typename T, typename U = float,
           typename = Std::enable_if_t<
           (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
            Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
-           Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value), 
+           Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value),
           void>>
 __aicore__ constexpr inline U Cast(T bVal)
 {

@@ -137,7 +137,7 @@ public:
         const LocalTensor<AuxDtype>& l1AAuxMatrix = {}, uint16_t aAuxL1K = 0, uint16_t aAuxL1KOffset = 0,
         uint16_t aAuxL1MOffset = 0) const
     {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         LoadData2DParamsV2 loadDataParams;
         loadDataParams.mStartPosition = 0;
         loadDataParams.kStartPosition = 0;
