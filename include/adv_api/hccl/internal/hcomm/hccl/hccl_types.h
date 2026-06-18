@@ -150,9 +150,9 @@ typedef struct HcclCommConfigDef {
     uint32_t hcclRdmaServiceLevel;
     uint32_t hcclWorldRankID;
     uint64_t hcclJobID;
-    uint8_t
-        aclGraphZeroCopyEnable; ///< 只有Reduce类算子(单算子和AclGraph下算法选择不一致)受此配置影响
-                                ///< 0:默认值，关闭aclgraph零拷贝(结果与单算子一致优先) 1:开启aclgraph零拷贝(性能优先)
+    ///< 只有Reduce类算子(单算子和AclGraph下算法选择不一致)受此配置影响
+    ///< 0:默认值，关闭aclgraph零拷贝(结果与单算子一致优先) 1:开启aclgraph零拷贝(性能优先)
+    uint8_t aclGraphZeroCopyEnable;
     int32_t hcclExecTimeOut; // hccl执行超时时间
     char hcclAlgo[HCCL_COMM_ALGO_MAX_LENGTH];
     char hcclRetryEnable[HCCL_COMM_RETRY_ENABLE_MAX_LENGTH];

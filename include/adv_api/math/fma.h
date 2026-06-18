@@ -44,8 +44,8 @@ namespace AscendC {
  *             reaches peak when buffer size is maximum(calculated by tiling function). Moreover, it is not guaranteed
  *             that the shared space will be cleared after usage, the data could be anything.
  * \param [in] count: the number of elements to be processed.
- * \note dst/src0/src1/src2 Tensor must be 32B aligned, and it doesn't allow dst/src0/src1/src2/sharedTmpBuffer tensor
- * address overlap.
+ * \note dst/src0/src1/src2 Tensor must be 32B aligned, and it doesn't allow dst/src0/src1/src2/sharedTmpBuffer
+ *       tensor address overlap.
  */
 template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
 __aicore__ inline void Fma(

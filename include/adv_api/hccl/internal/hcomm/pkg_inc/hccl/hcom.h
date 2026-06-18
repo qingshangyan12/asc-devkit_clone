@@ -109,10 +109,10 @@ typedef struct HcomResResponseDef {
     HcomResResponseDef() : streamNum(0), taskNum(0), opMemSize(0) {}
 } HcomResResponse;
 
-constexpr u32 ALLTOALLV_RANK_MAX_NUM =
-    256; // 受notify数量限制，全连接组网alltoallv最多支持256p 分级alltoallv可以做到512
-constexpr u32 ALLTOALLVC_RANK_MAX_NUM =
-    256; // 受notify数量限制，全连接组网alltoallvc最多支持256p 分级alltoallv可以做到512
+// 受notify数量限制，全连接组网alltoallv最多支持256p 分级alltoallv可以做到512
+constexpr u32 ALLTOALLV_RANK_MAX_NUM = 256;
+// 受notify数量限制，全连接组网alltoallvc最多支持256p 分级alltoallv可以做到512
+constexpr u32 ALLTOALLVC_RANK_MAX_NUM = 256;
 constexpr u32 CCL_OP_TAG_MAX_LEN = 512;
 constexpr u32 ALG_NAME_MAX_LEN = 256; // 最大的group name 长度
 

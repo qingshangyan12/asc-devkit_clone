@@ -149,15 +149,15 @@ public:
      */
     __aicore__ inline void SetSparseIndex(const GlobalTensor<uint8_t>& indexGlobal);
     /**
-     * @brief Set the quantization scale for anti-quantization when A matrix's data type is half and B matrix's data
-     * type is int8
+     * @brief Set the quantization scale for anti-quantization when A matrix's data type is half and B matrix's
+     *        data type is int8
      * @param [in] offsetScalar: quantization scale for addition
      * @param [in] scaleScalar: quantization scale for multiplication
      */
     __aicore__ inline void SetAntiQuantScalar(const SrcT offsetScalar, const SrcT scaleScalar) {}
     /**
-     * @brief Set the quantization vector for anti-quantization when A matrix's data type is half and B matrix's data
-     * type is int8
+     * @brief Set the quantization vector for anti-quantization when A matrix's data type is half and B matrix's
+     *        data type is int8
      * @param [in] offsetTensor: quantization vector for addition
      * @param [in] scaleTensor: quantization vector for multiplication
      */
@@ -250,8 +250,8 @@ public:
      * @param [in] gm: C matrix in GlobalTensor
      * @param [in] enAtomic: whether to enable atomic operations
      * @param [in] enSequentialWrite: whether to enable sequential write mode
-     * @param [in] waitIterateAll: whether to wait for IterateAll to complete by WaitIterateAll when in asynchronous
-     * mode
+     * @param [in] waitIterateAll: whether to wait for IterateAll to complete by WaitIterateAll when in
+     *                             asynchronous mode
      * @param [in] fakeMsg: whether to enable fake message when in IBShare or IntraBlockPartSum mode
      */
     template <bool sync = true>
@@ -275,10 +275,10 @@ public:
      * @param [in] enPartialSum: whether to accumulate the result of Iterate into CO1 data
      * @param [in] enAtomic: whether to enable atomic operations
      * @param [in] enSequentialWrite: whether to enable sequential write mode
-     * @param [in] matrixStrideA: offset between the starting address of adjacent nd matrix in A matrix, in terms of
-     * elements
-     * @param [in] matrixStrideB: offset between the starting address of adjacent nd matrix in B matrix, in terms of
-     * elements
+     * @param [in] matrixStrideA: offset between the starting address of adjacent nd matrix in A matrix,
+     *                            in terms of elements
+     * @param [in] matrixStrideB: offset between the starting address of adjacent nd matrix in B matrix,
+     *                            in terms of elements
      * @param [in] matrixStrideC: reserved parameter
      */
     __aicore__ inline void IterateBatch(
@@ -291,10 +291,10 @@ public:
      * @param [in] enPartialSum: whether to accumulate the result of Iterate into CO1 data
      * @param [in] enAtomic: whether to enable atomic operations
      * @param [in] enSequentialWrite: whether to enable sequential write mode
-     * @param [in] matrixStrideA: offset between the starting address of adjacent nd matrix in A matrix, in terms of
-     * elements
-     * @param [in] matrixStrideB: offset between the starting address of adjacent nd matrix in B matrix, in terms of
-     * elements
+     * @param [in] matrixStrideA: offset between the starting address of adjacent nd matrix in A matrix,
+     *                            in terms of elements
+     * @param [in] matrixStrideB: offset between the starting address of adjacent nd matrix in B matrix,
+     *                            in terms of elements
      * @param [in] matrixStrideC: reserved parameter
      */
     __aicore__ inline void IterateBatch(

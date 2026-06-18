@@ -201,7 +201,6 @@ template <typename T, bool isReuseSource = false, const PowerConfig& config = de
 __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar)
 {
     Power<T, isReuseSource, config>(dstTensor, src0Tensor, src1Scalar, src0Tensor.GetSize());
-    ;
 }
 
 /*!

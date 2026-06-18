@@ -139,7 +139,7 @@ struct MatmulConfig {
     bool intrinsicsCheck; // true: enable loop-based data loading, false: disable loop-based data loading
     bool isNBatch;        // true: Enables multi-batch, false: Disables multi-batch (default value)
     bool enVecND2NZ;      // true: Enable ND2NZ with vector instructions, false: Disable ND2NZ with vector instructions
-                          // only be valid in special basic block mode
+    // only be valid in special basic block mode
     bool doSpecialBasicBlock; // true: Enables the SpecialBasicBlock, false: Disables the SpecialBasicBlock
     uint32_t doMTE2Preload;   // 0: Disabled (default), 1: Enable M-dimension preload, 2: Enable N-dimension preload
     uint32_t singleCoreM;     // Size of the M-axis shape within a single core, in units of elements
@@ -240,8 +240,8 @@ struct MatmulBatchParams {
     bool isNBatch;           // whether invoke IterNBatch to achieve multiple batch inputs and outputs
     BatchMode batchMode;     // relationship between the total size of A/B and the size of L1 Buffer
     bool isBiasBatch = true; // whether the size of the bias include the batch axis
-    BatchOutMode bmmOutMode =
-        BatchOutMode::SINGLE_BATCH; // whether to cache multiple batch outputs to copy out together
+    // whether to cache multiple batch outputs to copy out together
+    BatchOutMode bmmOutMode = BatchOutMode::SINGLE_BATCH;
 };
 
 /**
