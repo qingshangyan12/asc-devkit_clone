@@ -39,7 +39,7 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
     time_stamp_tlv->resv = static_cast<uint16_t>(0U);
     time_stamp_tlv->cycle = asc_debug_get_system_cycle();
     time_stamp_tlv->pc = static_cast<uint64_t>(asc_debug_get_program_counter());
-    time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt()); 
+    time_stamp_tlv->entry = static_cast<uint64_t>(__get_entry_sys_cnt());
     time_stamp_tlv->resvMem[0] = static_cast<uint32_t>(0U);
     time_stamp_tlv->resvMem[1] = static_cast<uint32_t>(0U);
     asc_entire_dcci((__gm__ uint64_t*)time_stamp_tlv);
@@ -139,7 +139,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_2(pipe, idx) TRACE_STOP_1(idx)
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__)
 __aicore__ inline void TRACE_START_1(TraceId apid)
 {}
 __aicore__ inline void TRACE_STOP_1(TraceId apid)

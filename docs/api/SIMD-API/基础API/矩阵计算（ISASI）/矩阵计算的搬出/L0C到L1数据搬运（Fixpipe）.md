@@ -1,257 +1,257 @@
-# L0C到L1数据搬运（Fixpipe）<a id="ZH-CN_TOPIC_0000002538231198"></a>
+# L0C鍒癓1鏁版嵁鎼繍锛團ixpipe锛?a id="ZH-CN_TOPIC_0000002538231198"></a>
 
-## 产品支持情况<a id="zh-cn_topic_0000002511188540_section796754519912"></a>
+## 浜у搧鏀寔鎯呭喌<a id="zh-cn_topic_0000002511188540_section796754519912"></a>
 
-| 产品 | 是否支持 |
+| 浜у搧 | 鏄惁鏀寔 |
 | ---------- | :----------: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | 支持包含FixpipeParamsV220/FixpipeParamsArch3510参数的接口。 </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | 仅支持包含FixpipeParamsV220参数的接口。 </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | 仅支持包含FixpipeParamsV220参数的接口。 </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
-| <cann-filter npu-type = "x90">Kirin X90 | √ </cann-filter> |
-| <cann-filter npu-type = "9030">Kirin 9030 | √ </cann-filter> |
+| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | 鏀寔鍖呭惈FixpipeParamsV220/FixpipeParamsArch3510鍙傛暟鐨勬帴鍙ｃ€?</cann-filter> |
+| <cann-filter npu-type = "A3">Atlas A3 璁粌绯诲垪浜у搧/Atlas A3 鎺ㄧ悊绯诲垪浜у搧 | 浠呮敮鎸佸寘鍚獸ixpipeParamsV220鍙傛暟鐨勬帴鍙ｃ€?</cann-filter> |
+| <cann-filter npu-type = "910b">Atlas A2 璁粌绯诲垪浜у搧/Atlas A2 鎺ㄧ悊绯诲垪浜у搧 | 浠呮敮鎸佸寘鍚獸ixpipeParamsV220鍙傛暟鐨勬帴鍙ｃ€?</cann-filter> |
+| <cann-filter npu-type = "310b">Atlas 200I/500 A2 鎺ㄧ悊浜у搧 | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 鎺ㄧ悊绯诲垪浜у搧AI Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 鎺ㄧ悊绯诲垪浜у搧Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "910">Atlas 璁粌绯诲垪浜у搧 | x </cann-filter> |
+| <cann-filter npu-type = "x90">Kirin X90 | 鈭?</cann-filter> |
+| <cann-filter npu-type = "9030">Kirin 9030 | 鈭?</cann-filter> |
 
-## 功能说明<a id="zh-cn_topic_0000002511188540_section106841136114319"></a>
+## 鍔熻兘璇存槑<a id="zh-cn_topic_0000002511188540_section106841136114319"></a>
 
-头文件路径为：basic_api/kernel_operator_fixpipe_intf.h、basic_api/kernel_operator_data_copy_intf.h。
+澶存枃浠惰矾寰勪负锛歜asic_api/kernel_operator_fixpipe_intf.h銆乥asic_api/kernel_operator_data_copy_intf.h銆?
 
-矩阵计算的结果存放在L0C Buffer，Fixpipe接口用于将结果搬运至L1 Buffer中，并且在搬运过程中支持随路格式转换等操作。
+鐭╅樀璁＄畻鐨勭粨鏋滃瓨鏀惧湪L0C Buffer锛孎ixpipe鎺ュ彛鐢ㄤ簬灏嗙粨鏋滄惉杩愯嚦L1 Buffer涓紝骞朵笖鍦ㄦ惉杩愯繃绋嬩腑鏀寔闅忚矾鏍煎紡杞崲绛夋搷浣溿€?
 
 <cann-filter npu-type = "A3,910b">
 
-以如下产品型号为例：
+浠ュ涓嬩骇鍝佸瀷鍙蜂负渚嬶細
 
 <cann-filter npu-type = "A3">
 
-Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+Atlas A3 璁粌绯诲垪浜у搧/Atlas A3 鎺ㄧ悊绯诲垪浜у搧锛?
 
 </cann-filter>
 
 <cann-filter npu-type = "910b">
 
-Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+Atlas A2 璁粌绯诲垪浜у搧/Atlas A2 鎺ㄧ悊绯诲垪浜у搧锛?
 
 </cann-filter>
 
-下图展示了随路量化、随路ReLU、随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
+涓嬪浘灞曠ず浜嗛殢璺噺鍖栥€侀殢璺疪eLU銆侀殢璺€氶亾鍚堝苟鐨勬湁鏁堢粍鍚堛€佷腑闂存暟鎹被鍨嬪拰鏁版嵁璺緞銆備笅鍥句腑鐨凢32-\>F16涓嶧32-\>BF16涓洪潪閲忓寲妯″紡锛屼粎涓篊ast锛屽叾浣欎负闅忚矾scalar/tensor閲忓寲妯″紡銆?
 
-**图 1** L0C2L1流程图<a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
+**鍥?1** L0C2L1娴佺▼鍥?a id="zh-cn_topic_0000002511188540_fig8956371257"></a>  
 
 ![](../../../../figures/L0C2L1_Function_Combination.png)
 
 </cann-filter>
 
-## 函数原型<a id="zh-cn_topic_0000002511188540_section82039854412"></a>
+## 鍑芥暟鍘熷瀷<a id="zh-cn_topic_0000002511188540_section82039854412"></a>
 
-为了方便用户使用，减少学习理解成本，针对用户经常使用的场景组合，提供了矩阵搬出的组合接口Fixpipe，接口内包含了设置寄存器与数据搬运能力，对应的接口如下：
+涓轰簡鏂逛究鐢ㄦ埛浣跨敤锛屽噺灏戝涔犵悊瑙ｆ垚鏈紝閽堝鐢ㄦ埛缁忓父浣跨敤鐨勫満鏅粍鍚堬紝鎻愪緵浜嗙煩闃垫惉鍑虹殑缁勫悎鎺ュ彛Fixpipe锛屾帴鍙ｅ唴鍖呭惈浜嗚缃瘎瀛樺櫒涓庢暟鎹惉杩愯兘鍔涳紝瀵瑰簲鐨勬帴鍙ｅ涓嬶細
 
-**传入FixpipeParamsArch3510参数的接口：**
+**浼犲叆FixpipeParamsArch3510鍙傛暟鐨勬帴鍙ｏ細**
 
-- 通路L0C Buffer(CO1)->L1 Buffer(C1)，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 閫氳矾L0C Buffer(CO1)->L1 Buffer(C1)锛屼笉寮€鍚殢璺痆tensor閲忓寲](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md)鍔熻兘锛?
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-- 通路L0C Buffer(CO1)->L1 Buffer(C1)，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 閫氳矾L0C Buffer(CO1)->L1 Buffer(C1)锛屽紑鍚殢璺痆tensor閲忓寲](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md)鍔熻兘锛?
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
     ```
 
-**传入FixpipeParamsV220参数的接口：**
+**浼犲叆FixpipeParamsV220鍙傛暟鐨勬帴鍙ｏ細**
 
-- 通路L0C Buffer(CO1)->L1 Buffer(C1)，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 閫氳矾L0C Buffer(CO1)->L1 Buffer(C1)锛屼笉寮€鍚殢璺痆tensor閲忓寲](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md)鍔熻兘锛?
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams)
     ```
 
-- 通路L0C Buffer(CO1)->L1 Buffer(C1)，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
+- 閫氳矾L0C Buffer(CO1)->L1 Buffer(C1)锛屽紑鍚殢璺痆tensor閲忓寲](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md)鍔熻兘锛?
 
     ```cpp
     template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
     __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams)
     ```
 
-## 参数说明<a id="zh-cn_topic_0000002511188540_section16128134420472"></a>
+## 鍙傛暟璇存槑<a id="zh-cn_topic_0000002511188540_section16128134420472"></a>
 
-**表 1** Fixpipe模板参数说明
+**琛?1** Fixpipe妯℃澘鍙傛暟璇存槑
 
-| 参数名 | 描述 |
+| 鍙傛暟鍚?| 鎻忚堪 |
 | ---------- | ---------- |
-| T/U | 目的操作数/源操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002511188540_section4219135304818)。 |
-| config | Fixpipe相关配置参数，类型为FixpipeConfig。取值如下：<br>&nbsp;&nbsp;&bull; **CFG_ROW_MAJOR（默认取值）**：开启NZ2ND，输出数据格式为ND格式。<cann-filter npu-type = "A3,910b">针对<cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，</cann-filter><cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，</cann-filter>在L0C Buffer -> L1 Buffer通路下不生效。</cann-filter><br>&nbsp;&nbsp;&bull; CFG_NZ：NZ2NZ，输出数据格式为NZ格式。<br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; CFG_COLUMN_MAJOR：针对Ascend 950PR/Ascend 950DT，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 用于用户指定目的地址的位置是否是UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 输出数据格式仍为NZ格式。<br>    ROW_MAJOR, // 开启NZ2ND，输出数据格式为ND格式。<br><cann-filter npu-type = "950">    COLUMN_MAJOR, // 仅Ascend 950PR/Ascend 950DT支持，开启NZ2DN，输出数据格式为DN格式。<br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu-type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 仅Ascend 950PR/Ascend 950DT支持</cann-filter></pre> |
-| S | 参数cbufWorkspace的数据类型，即随路量化参数的数据类型。<br>&nbsp;&nbsp;&bull; 当目的操作数、源操作数、cbufWorkspace使用基础数据类型时，模板参数S必须为uint64_t类型，否则编译失败。<br>&nbsp;&nbsp;&bull; 当目的操作数、源操作数、cbufWorkspace使用TensorTrait类型时，模板参数S的LiteType必须为uint64_t类型，否则编译失败。<br>模板参数S后一个模板参数仅用于上述数据类型检查，用户无需关注。 |
+| T/U | 鐩殑鎿嶄綔鏁?婧愭搷浣滄暟鐨勬暟鎹被鍨嬨€傛敮鎸佺殑鏁版嵁绫诲瀷璇峰弬鑰僛鏁版嵁绫诲瀷](#zh-cn_topic_0000002511188540_section4219135304818)銆?|
+| config | Fixpipe鐩稿叧閰嶇疆鍙傛暟锛岀被鍨嬩负FixpipeConfig銆傚彇鍊煎涓嬶細<br>&nbsp;&nbsp;&bull; **CFG_ROW_MAJOR锛堥粯璁ゅ彇鍊硷級**锛氬紑鍚疦Z2ND锛岃緭鍑烘暟鎹牸寮忎负ND鏍煎紡銆?cann-filter npu-type = "A3,910b">閽堝<cann-filter npu-type = "A3">Atlas A3 璁粌绯诲垪浜у搧/Atlas A3 鎺ㄧ悊绯诲垪浜у搧锛?/cann-filter><cann-filter npu-type = "910b">Atlas A2 璁粌绯诲垪浜у搧/Atlas A2 鎺ㄧ悊绯诲垪浜у搧锛?/cann-filter>鍦↙0C Buffer -> L1 Buffer閫氳矾涓嬩笉鐢熸晥銆?/cann-filter><br>&nbsp;&nbsp;&bull; CFG_NZ锛歂Z2NZ锛岃緭鍑烘暟鎹牸寮忎负NZ鏍煎紡銆?br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; CFG_COLUMN_MAJOR锛氶拡瀵笰scend 950PR/Ascend 950DT锛屽紑鍚疦Z2DN锛岃緭鍑烘暟鎹牸寮忎负DN鏍煎紡銆?br></cann-filter><pre>struct FixpipeConfig {<br>    CO2Layout format;<br>    bool isToUB; // 鐢ㄤ簬鐢ㄦ埛鎸囧畾鐩殑鍦板潃鐨勪綅缃槸鍚︽槸UB <br>};<br>enum class CO2Layout : uint8_t {<br>    NZ = 0, // 杈撳嚭鏁版嵁鏍煎紡浠嶄负NZ鏍煎紡銆?br>    ROW_MAJOR, // 寮€鍚疦Z2ND锛岃緭鍑烘暟鎹牸寮忎负ND鏍煎紡銆?br><cann-filter npu-type = "950">    COLUMN_MAJOR, // 浠匒scend 950PR/Ascend 950DT鏀寔锛屽紑鍚疦Z2DN锛岃緭鍑烘暟鎹牸寮忎负DN鏍煎紡銆?br></cann-filter>};<br>constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ};<br>constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR};<cann-filter npu-type = "950"><br>constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR}; // 浠匒scend 950PR/Ascend 950DT鏀寔</cann-filter></pre> |
+| S | 鍙傛暟cbufWorkspace鐨勬暟鎹被鍨嬶紝鍗抽殢璺噺鍖栧弬鏁扮殑鏁版嵁绫诲瀷銆?br>&nbsp;&nbsp;&bull; 褰撶洰鐨勬搷浣滄暟銆佹簮鎿嶄綔鏁般€乧bufWorkspace浣跨敤鍩虹鏁版嵁绫诲瀷鏃讹紝妯℃澘鍙傛暟S蹇呴』涓簎int64_t绫诲瀷锛屽惁鍒欑紪璇戝け璐ャ€?br>&nbsp;&nbsp;&bull; 褰撶洰鐨勬搷浣滄暟銆佹簮鎿嶄綔鏁般€乧bufWorkspace浣跨敤TensorTrait绫诲瀷鏃讹紝妯℃澘鍙傛暟S鐨凩iteType蹇呴』涓簎int64_t绫诲瀷锛屽惁鍒欑紪璇戝け璐ャ€?br>妯℃澘鍙傛暟S鍚庝竴涓ā鏉垮弬鏁颁粎鐢ㄤ簬涓婅堪鏁版嵁绫诲瀷妫€鏌ワ紝鐢ㄦ埛鏃犻渶鍏虫敞銆?|
 
-**表 2** Fixpipe参数说明
+**琛?2** Fixpipe鍙傛暟璇存槑
 
-| 参数名称 | 输入/输出 | 含义 |
+| 鍙傛暟鍚嶇О | 杈撳叆/杈撳嚭 | 鍚箟 |
 | ---------- | ---------- | ---------- |
-| dst | 输出 | 目的操作数，类型为LocalTensor。数据格式为NZ格式。NZ地址需满足32字节对齐。<cann-filter npu-type = "950"><br>针对Ascend 950PR/Ascend 950DT，还支持数据格式为ND、DN，地址需满足32字节对齐。</cann-filter> |
-| src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足6对齐。 |
-| intriParams | 输入 | Fixpipe搬运参数，具体定义请参考 "basic_api/interface/kernel_struct_fixpipe.h"。<br>参数说明请参考Fixpipe搬运参数（FixpipeParamsArch3510、FixpipeParamsV220）结构体说明。 |
-| cbufWorkspace | 输入 | 量化参数，类型为`LocalTensor<uint64_t>`，支持的物理地址为L1 Buffer（TPosition为C1），地址需满足32字节对齐。<br>&nbsp;&nbsp;&bull; 当quantPre为VDEQF16、VQF322B8_PRE、VREQ8时支持。<br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; 针对Ascend 950PR/Ascend 950DT，除上述外还有VQF322FP8_PRE、VQF322HIF8_PRE、VQF322HIF8_PRE_HYBRID、VQS322BF16_PRE、VQF322F16_PRE、VQF322BF16_PRE、VQF322F32_PRE支持。<br></cann-filter>quantPre介绍请参考Fixpipe搬运参数结构体中quantPre部分。 |
+| dst | 杈撳嚭 | 鐩殑鎿嶄綔鏁帮紝绫诲瀷涓篖ocalTensor銆傛暟鎹牸寮忎负NZ鏍煎紡銆侼Z鍦板潃闇€婊¤冻32瀛楄妭瀵归綈銆?cann-filter npu-type = "950"><br>閽堝Ascend 950PR/Ascend 950DT锛岃繕鏀寔鏁版嵁鏍煎紡涓篘D銆丏N锛屽湴鍧€闇€婊¤冻32瀛楄妭瀵归綈銆?/cann-filter> |
+| src | 杈撳叆 | 婧愭搷浣滄暟锛岀被鍨嬩负LocalTensor锛屾敮鎸佺殑鐗╃悊鍦板潃涓篖0C Buffer锛圱Position涓篊O1锛夛紝涓篗mad鎺ュ彛璁＄畻鐨勭粨鏋溿€傛暟鎹牸寮忎负NZ鏍煎紡锛屽湴鍧€闇€瑕佹弧瓒?瀵归綈銆?|
+| intriParams | 杈撳叆 | Fixpipe鎼繍鍙傛暟锛屽叿浣撳畾涔夎鍙傝€?"basic_api/interface/kernel_struct_fixpipe.h"銆?br>鍙傛暟璇存槑璇峰弬鑰僃ixpipe鎼繍鍙傛暟锛團ixpipeParamsArch3510銆丗ixpipeParamsV220锛夌粨鏋勪綋璇存槑銆?|
+| cbufWorkspace | 杈撳叆 | 閲忓寲鍙傛暟锛岀被鍨嬩负`LocalTensor<uint64_t>`锛屾敮鎸佺殑鐗╃悊鍦板潃涓篖1 Buffer锛圱Position涓篊1锛夛紝鍦板潃闇€婊¤冻32瀛楄妭瀵归綈銆?br>&nbsp;&nbsp;&bull; 褰搎uantPre涓篤DEQF16銆乂QF322B8_PRE銆乂REQ8鏃舵敮鎸併€?br><cann-filter npu-type = "950">&nbsp;&nbsp;&bull; 閽堝Ascend 950PR/Ascend 950DT锛岄櫎涓婅堪澶栬繕鏈塚QF322FP8_PRE銆乂QF322HIF8_PRE銆乂QF322HIF8_PRE_HYBRID銆乂QS322BF16_PRE銆乂QF322F16_PRE銆乂QF322BF16_PRE銆乂QF322F32_PRE鏀寔銆?br></cann-filter>quantPre浠嬬粛璇峰弬鑰僃ixpipe鎼繍鍙傛暟缁撴瀯浣撲腑quantPre閮ㄥ垎銆?|
 
-**表 3** Fixpipe搬运参数（FixpipeParamsArch3510）结构体说明
+**琛?3** Fixpipe鎼繍鍙傛暟锛團ixpipeParamsArch3510锛夌粨鏋勪綋璇存槑
 
-| 参数名称 | 数据类型 | 含义 |
+| 鍙傛暟鍚嶇О | 鏁版嵁绫诲瀷 | 鍚箟 |
 | ---------- | ---------- | ---------- |
-| nSize | 输入 | 源NZ矩阵在N方向上的大小，取值范围为nSize ∈[0, 4095]。<br>&nbsp;&nbsp;&bull; 若开启channelSplit功能，nSize必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启channelSplit功能，nSize必须为16的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| mSize | 输入 | 源NZ矩阵在M方向上的大小，取值范围为mSize∈[0, 65535]。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| srcStride | 输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)，T为src的数据类型）。 |
-| dstStride | 输入 | &bull; 不开启NZ2ND功能：目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为element。<br>&bull; 开启NZ2ND/NZ2DN功能：目的ND矩阵每一行中的元素个数，取值不为0，单位为element。 |
-| quantPre | 输入 | QuantMode_t是一个枚举类型，用于控制量化模式，默认值为QuantMode_t::NoQuant，即不开启量化功能。QuantMode_t取值如下：<br>&nbsp;&nbsp;&bull; NoQuant，不开启量化功能。<br>&nbsp;&nbsp;&bull; F322F16，float cast成half，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; F322BF16，float cast成bfloat16_t，cast mode为CAST_RINT模式。<br>&nbsp;&nbsp;&bull; DEQF16，int32_t量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VDEQF16，int32_t量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322B8_PRE，float量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322B8_PRE，float量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; REQ8，int32_t量化成uint8_t/int8_t，scalar量化。<br>&nbsp;&nbsp;&bull; VREQ8，int32_t量化成uint8_t/int8_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322FP8_PRE，float量化成fp8_e4m3fn_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322FP8_PRE，float量化成fp8_e4m3fn_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322HIF8_PRE，float量化成hifloat8_t(Half to Away Round)，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE，float量化成hifloat8_t(Half to Away Round)，tensor量化。<br>&nbsp;&nbsp;&bull; QF322HIF8_PRE_HYBRID，float量化成hifloat8_t(Hybrid Round)，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE_HYBRID，float量化成hifloat8_t(Hybrid Round)，tensor量化。<br>&nbsp;&nbsp;&bull; QS322BF16_PRE，int32_t量化成bfloat16_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQS322BF16_PRE，int32_t量化成bfloat16_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322F16_PRE，float量化成half，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322F16_PRE，float量化成half，tensor量化。<br>&nbsp;&nbsp;&bull; QF322BF16_PRE，float量化成bfloat16_t，scalar量化。<br>&nbsp;&nbsp;&bull; VQF322BF16_PRE，float量化成bfloat16_t，tensor量化。<br>&nbsp;&nbsp;&bull; QF322F32_PRE，float量化成float，scalar量化，该量化模式精度无法达到双万分之一，可以达到双千分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../../高阶API/量化操作/AscendDequant.md)高阶API。<br>&nbsp;&nbsp;&bull; VQF322F32_PRE，float量化成float，tensor量化，该量化模式精度无法达到双万分之一，可以达到双千分之一。如果有双万分之一的精度要求，建议使用[AscendDeQuant](../../../高阶API/量化操作/AscendDequant.md)高阶API。 |
-| deqScalar | 输入 | scalar量化参数，表示单个scale值，quantPre量化模式为scalar量化时需要设置该参数。支持的数据类型为uint64_t。 |
-| reluEn | 输入 | 是否开启ReLU的开关：<br>&nbsp;&nbsp;&bull; false：不开启ReLU功能；<br>&nbsp;&nbsp;&bull; true：开启ReLU功能。 |
-| unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 1（2'b01）：保留值；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
-| params | 输入 | params是类型为TransformParams的成员变量，TransformParams结构体是一个基于模板参数的类型选择器，用于在编译时根据不同的CO2Layout布局类型，自动选择对应的参数类型。<br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout布局类型为ROW_MAJOR时，该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2ND转换，结构体参数如下：<br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&nbsp;&nbsp;&bull; ndNum：源NZ矩阵的数目，也就是传输ND矩阵的数目，取值范围为ndNum∈[0, 65535]。**注：ndNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNdStride：不同NZ矩阵起始地址之间的间隔，取值范围为srcNdStride∈[0, 65535]，单位为C0_SIZE。当ndNum配置为1时，srcNdStride配置为0即可，不生效。<br>&nbsp;&nbsp;&bull; dstNdStride：目的相邻ND矩阵起始地址之间的偏移，取值范围为dstNdStride∈[1, 2^32 -1]，单位为element。当ndNum配置为1时，dstNdStride配置为0即可，不生效。<br><br>CO2Layout布局类型为COLUMN_MAJOR时，该指令被定义为从L0C Buffer到目标位置的数据移动，并附带NZ2DN转换，结构体参数如下：<br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&nbsp;&nbsp;&bull; dnNum：传输DN矩阵的数目，取值范围为dnNum∈[0, 65535]。**注：dnNum=0表示不执行搬运，该接口将被视为NOP（空操作）。**<br>&nbsp;&nbsp;&bull; srcNzMatrixStride：不同源NZ矩阵的偏移（头与头），单位为C0_SIZE。<br>&nbsp;&nbsp;&bull; dstDnMatrixStride：目的相邻DN矩阵起始地址间的偏移，取值范围为dstDnMatrixStride∈[1, 2^32 -1]，单位为element。<br>&nbsp;&nbsp;&bull; srcNzC0Stride：源矩阵NZ分形中相邻行的地址偏移（头与头），单位为C0_SIZE。<br><br>CO2Layout布局类型为NZ时，为普通搬运DMA模式，表示从L0C Buffer到目标位置的正常数据移动。 |
-| dualDstCtrl | 输入 | 双目标模式控制。当启用双目标模式控制时，L0C Buffer中的M×N矩阵将被分成两半，并同时写入两个子块（SUB BLOCK）的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。<br>&nbsp;&nbsp;&bull; 2'b00：单目标模式，将整个矩阵写入通过subBlockId参数配置的目标UB。<br>&nbsp;&nbsp;&bull; 2'b01：双目标模式，按M维度拆分，M / 2 \* N写入每个UB，M必须为2的倍数。<br>&nbsp;&nbsp;&bull; 2'b10：双目标模式，按N维度拆分，M \* N / 2写入每个UB，N须为32的倍数。<br>&nbsp;&nbsp;&bull; 2'b11：保留。<br>dualDstCtrl仅支持在普通搬运模式或NZ2ND搬运场景下使用，不支持随路功能场景。 |
-| subBlockId | 输入 | 在启用单目标模式时指示目标UB的编号。 |
-| isChannelSplit | 输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND功能。 |
+| nSize | 杈撳叆 | 婧怤Z鐭╅樀鍦∟鏂瑰悜涓婄殑澶у皬锛屽彇鍊艰寖鍥翠负nSize 鈭圼0, 4095]銆?br>&nbsp;&nbsp;&bull; 鑻ュ紑鍚痗hannelSplit鍔熻兘锛宯Size蹇呴』涓?鐨勫€嶆暟銆?br>&nbsp;&nbsp;&bull; 鑻ヤ笉寮€鍚痗hannelSplit鍔熻兘锛宯Size蹇呴』涓?6鐨勫€嶆暟銆?br>**娉細nSize=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?* |
+| mSize | 杈撳叆 | 婧怤Z鐭╅樀鍦∕鏂瑰悜涓婄殑澶у皬锛屽彇鍊艰寖鍥翠负mSize鈭圼0, 65535]銆?br>**娉細mSize=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?* |
+| srcStride | 杈撳叆 | 婧怤Z鐭╅樀涓浉閭籞鎺掑竷鐨勮捣濮嬪湴鍧€鍋忕Щ锛屽彇鍊艰寖鍥翠负srcStride鈭圼0, 65535]锛屽崟浣嶄负C0_Size锛?6*sizeof(T)锛孴涓簊rc鐨勬暟鎹被鍨嬶級銆?|
+| dstStride | 杈撳叆 | &bull; 涓嶅紑鍚疦Z2ND鍔熻兘锛氱洰鐨凬Z鐭╅樀涓浉閭籞鎺掑竷鐨勮捣濮嬪湴鍧€鍋忕Щ锛屽彇鍊间笉涓?锛屽崟浣嶄负element銆?br>&bull; 寮€鍚疦Z2ND/NZ2DN鍔熻兘锛氱洰鐨凬D鐭╅樀姣忎竴琛屼腑鐨勫厓绱犱釜鏁帮紝鍙栧€间笉涓?锛屽崟浣嶄负element銆?|
+| quantPre | 杈撳叆 | QuantMode_t鏄竴涓灇涓剧被鍨嬶紝鐢ㄤ簬鎺у埗閲忓寲妯″紡锛岄粯璁ゅ€间负QuantMode_t::NoQuant锛屽嵆涓嶅紑鍚噺鍖栧姛鑳姐€俀uantMode_t鍙栧€煎涓嬶細<br>&nbsp;&nbsp;&bull; NoQuant锛屼笉寮€鍚噺鍖栧姛鑳姐€?br>&nbsp;&nbsp;&bull; F322F16锛宖loat cast鎴恏alf锛宑ast mode涓篊AST_RINT妯″紡銆?br>&nbsp;&nbsp;&bull; F322BF16锛宖loat cast鎴恇float16_t锛宑ast mode涓篊AST_RINT妯″紡銆?br>&nbsp;&nbsp;&bull; DEQF16锛宨nt32_t閲忓寲鎴恏alf锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VDEQF16锛宨nt32_t閲忓寲鎴恏alf锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322B8_PRE锛宖loat閲忓寲鎴恥int8_t/int8_t锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322B8_PRE锛宖loat閲忓寲鎴恥int8_t/int8_t锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; REQ8锛宨nt32_t閲忓寲鎴恥int8_t/int8_t锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VREQ8锛宨nt32_t閲忓寲鎴恥int8_t/int8_t锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322FP8_PRE锛宖loat閲忓寲鎴恌p8_e4m3fn_t锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322FP8_PRE锛宖loat閲忓寲鎴恌p8_e4m3fn_t锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322HIF8_PRE锛宖loat閲忓寲鎴恏ifloat8_t(Half to Away Round)锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE锛宖loat閲忓寲鎴恏ifloat8_t(Half to Away Round)锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322HIF8_PRE_HYBRID锛宖loat閲忓寲鎴恏ifloat8_t(Hybrid Round)锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322HIF8_PRE_HYBRID锛宖loat閲忓寲鎴恏ifloat8_t(Hybrid Round)锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QS322BF16_PRE锛宨nt32_t閲忓寲鎴恇float16_t锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQS322BF16_PRE锛宨nt32_t閲忓寲鎴恇float16_t锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322F16_PRE锛宖loat閲忓寲鎴恏alf锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322F16_PRE锛宖loat閲忓寲鎴恏alf锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322BF16_PRE锛宖loat閲忓寲鎴恇float16_t锛宻calar閲忓寲銆?br>&nbsp;&nbsp;&bull; VQF322BF16_PRE锛宖loat閲忓寲鎴恇float16_t锛宼ensor閲忓寲銆?br>&nbsp;&nbsp;&bull; QF322F32_PRE锛宖loat閲忓寲鎴恌loat锛宻calar閲忓寲锛岃閲忓寲妯″紡绮惧害鏃犳硶杈惧埌鍙屼竾鍒嗕箣涓€锛屽彲浠ヨ揪鍒板弻鍗冨垎涔嬩竴銆傚鏋滄湁鍙屼竾鍒嗕箣涓€鐨勭簿搴﹁姹傦紝寤鸿浣跨敤[AscendDeQuant](../../../楂橀樁API/閲忓寲鎿嶄綔/AscendDequant.md)楂橀樁API銆?br>&nbsp;&nbsp;&bull; VQF322F32_PRE锛宖loat閲忓寲鎴恌loat锛宼ensor閲忓寲锛岃閲忓寲妯″紡绮惧害鏃犳硶杈惧埌鍙屼竾鍒嗕箣涓€锛屽彲浠ヨ揪鍒板弻鍗冨垎涔嬩竴銆傚鏋滄湁鍙屼竾鍒嗕箣涓€鐨勭簿搴﹁姹傦紝寤鸿浣跨敤[AscendDeQuant](../../../楂橀樁API/閲忓寲鎿嶄綔/AscendDequant.md)楂橀樁API銆?|
+| deqScalar | 杈撳叆 | scalar閲忓寲鍙傛暟锛岃〃绀哄崟涓猻cale鍊硷紝quantPre閲忓寲妯″紡涓簊calar閲忓寲鏃堕渶瑕佽缃鍙傛暟銆傛敮鎸佺殑鏁版嵁绫诲瀷涓簎int64_t銆?|
+| reluEn | 杈撳叆 | 鏄惁寮€鍚疪eLU鐨勫紑鍏筹細<br>&nbsp;&nbsp;&bull; false锛氫笉寮€鍚疪eLU鍔熻兘锛?br>&nbsp;&nbsp;&bull; true锛氬紑鍚疪eLU鍔熻兘銆?|
+| unitFlag | 杈撳叆 | unitFlag鏄竴绉峂mad鎸囦护鍜孎ixpipe鎸囦护缁嗙矑搴︾殑骞惰锛屽紑鍚鍔熻兘鍚庯紝纭欢姣忚绠楀畬涓€涓垎褰紝璁＄畻缁撴灉灏变細琚惉鍑恒€傚彇鍊艰鏄庡涓嬶細<br>&nbsp;&nbsp;&bull; 0锛?'b00锛夛細涓嶅紑鍚痷nitFlag锛?br>&nbsp;&nbsp;&bull; 1锛?'b01锛夛細淇濈暀鍊硷紱<br>&nbsp;&nbsp;&bull; 2锛?'b10锛夛細寮€鍚痷nitFlag锛岀‖浠舵墽琛屽畬鎸囦护涔嬪悗锛屼笉浼氳缃瘎瀛樺櫒锛?br>&nbsp;&nbsp;&bull; 3锛?'b11锛夛細寮€鍚痷nitFlag锛岀‖浠舵墽琛屽畬鎸囦护涔嬪悗锛屼細灏唘nitFlag鍏抽棴銆?|
+| params | 杈撳叆 | params鏄被鍨嬩负TransformParams鐨勬垚鍛樺彉閲忥紝TransformParams缁撴瀯浣撴槸涓€涓熀浜庢ā鏉垮弬鏁扮殑绫诲瀷閫夋嫨鍣紝鐢ㄤ簬鍦ㄧ紪璇戞椂鏍规嵁涓嶅悓鐨凜O2Layout甯冨眬绫诲瀷锛岃嚜鍔ㄩ€夋嫨瀵瑰簲鐨勫弬鏁扮被鍨嬨€?br><pre>template \<CO2Layout format\><br>struct TransformParams {};<br>template \<\><br>struct TransformParams\<CO2Layout::NZ\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = uint8_t;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::ROW_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2NdParams;<br>};<br>template \<\><br>struct TransformParams\<CO2Layout::COLUMN_MAJOR\> {<br>    \_\_aicore\_\_ inline TransformParams(){};<br>    using PARAMS = Nz2DnParams;<br>};</pre><br>CO2Layout甯冨眬绫诲瀷涓篟OW_MAJOR鏃讹紝璇ユ寚浠よ瀹氫箟涓轰粠L0C Buffer鍒扮洰鏍囦綅缃殑鏁版嵁绉诲姩锛屽苟闄勫甫NZ2ND杞崲锛岀粨鏋勪綋鍙傛暟濡備笅锛?br><pre>struct Nz2NdParams {<br>    uint16_t ndNum = 1;<br>    uint16_t srcNdStride = 0;<br>    uint32_t dstNdStride = 0; <br>};</pre>&nbsp;&nbsp;&bull; ndNum锛氭簮NZ鐭╅樀鐨勬暟鐩紝涔熷氨鏄紶杈揘D鐭╅樀鐨勬暟鐩紝鍙栧€艰寖鍥翠负ndNum鈭圼0, 65535]銆?*娉細ndNum=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?*<br>&nbsp;&nbsp;&bull; srcNdStride锛氫笉鍚孨Z鐭╅樀璧峰鍦板潃涔嬮棿鐨勯棿闅旓紝鍙栧€艰寖鍥翠负srcNdStride鈭圼0, 65535]锛屽崟浣嶄负C0_SIZE銆傚綋ndNum閰嶇疆涓?鏃讹紝srcNdStride閰嶇疆涓?鍗冲彲锛屼笉鐢熸晥銆?br>&nbsp;&nbsp;&bull; dstNdStride锛氱洰鐨勭浉閭籒D鐭╅樀璧峰鍦板潃涔嬮棿鐨勫亸绉伙紝鍙栧€艰寖鍥翠负dstNdStride鈭圼1, 2^32 -1]锛屽崟浣嶄负element銆傚綋ndNum閰嶇疆涓?鏃讹紝dstNdStride閰嶇疆涓?鍗冲彲锛屼笉鐢熸晥銆?br><br>CO2Layout甯冨眬绫诲瀷涓篊OLUMN_MAJOR鏃讹紝璇ユ寚浠よ瀹氫箟涓轰粠L0C Buffer鍒扮洰鏍囦綅缃殑鏁版嵁绉诲姩锛屽苟闄勫甫NZ2DN杞崲锛岀粨鏋勪綋鍙傛暟濡備笅锛?br><pre>struct Nz2DnParams {<br>    uint16_t dnNum = 1;<br>    uint16_t srcNzMatrixStride = 0;<br>    uint32_t dstDnMatrixStride = 0;<br>    uint16_t srcNzC0Stride = 0; <br>};</pre>&nbsp;&nbsp;&bull; dnNum锛氫紶杈揇N鐭╅樀鐨勬暟鐩紝鍙栧€艰寖鍥翠负dnNum鈭圼0, 65535]銆?*娉細dnNum=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?*<br>&nbsp;&nbsp;&bull; srcNzMatrixStride锛氫笉鍚屾簮NZ鐭╅樀鐨勫亸绉伙紙澶翠笌澶达級锛屽崟浣嶄负C0_SIZE銆?br>&nbsp;&nbsp;&bull; dstDnMatrixStride锛氱洰鐨勭浉閭籇N鐭╅樀璧峰鍦板潃闂寸殑鍋忕Щ锛屽彇鍊艰寖鍥翠负dstDnMatrixStride鈭圼1, 2^32 -1]锛屽崟浣嶄负element銆?br>&nbsp;&nbsp;&bull; srcNzC0Stride锛氭簮鐭╅樀NZ鍒嗗舰涓浉閭昏鐨勫湴鍧€鍋忕Щ锛堝ご涓庡ご锛夛紝鍗曚綅涓篊0_SIZE銆?br><br>CO2Layout甯冨眬绫诲瀷涓篘Z鏃讹紝涓烘櫘閫氭惉杩怐MA妯″紡锛岃〃绀轰粠L0C Buffer鍒扮洰鏍囦綅缃殑姝ｅ父鏁版嵁绉诲姩銆?|
+| dualDstCtrl | 杈撳叆 | 鍙岀洰鏍囨ā寮忔帶鍒躲€傚綋鍚敤鍙岀洰鏍囨ā寮忔帶鍒舵椂锛孡0C Buffer涓殑M脳N鐭╅樀灏嗚鍒嗘垚涓ゅ崐锛屽苟鍚屾椂鍐欏叆涓や釜瀛愬潡锛圫UB BLOCK锛夌殑UB涓紝鍏朵腑鍓嶅崐閮ㄥ垎鍐欏叆SUB BLOCK0锛屽悗鍗婇儴鍒嗗啓鍏UB BLOCK1銆?br>&nbsp;&nbsp;&bull; 2'b00锛氬崟鐩爣妯″紡锛屽皢鏁翠釜鐭╅樀鍐欏叆閫氳繃subBlockId鍙傛暟閰嶇疆鐨勭洰鏍嘦B銆?br>&nbsp;&nbsp;&bull; 2'b01锛氬弻鐩爣妯″紡锛屾寜M缁村害鎷嗗垎锛孧 / 2 \* N鍐欏叆姣忎釜UB锛孧蹇呴』涓?鐨勫€嶆暟銆?br>&nbsp;&nbsp;&bull; 2'b10锛氬弻鐩爣妯″紡锛屾寜N缁村害鎷嗗垎锛孧 \* N / 2鍐欏叆姣忎釜UB锛孨椤讳负32鐨勫€嶆暟銆?br>&nbsp;&nbsp;&bull; 2'b11锛氫繚鐣欍€?br>dualDstCtrl浠呮敮鎸佸湪鏅€氭惉杩愭ā寮忔垨NZ2ND鎼繍鍦烘櫙涓嬩娇鐢紝涓嶆敮鎸侀殢璺姛鑳藉満鏅€?|
+| subBlockId | 杈撳叆 | 鍦ㄥ惎鐢ㄥ崟鐩爣妯″紡鏃舵寚绀虹洰鏍嘦B鐨勭紪鍙枫€?|
+| isChannelSplit | 杈撳叆 | 鏄惁寮€鍚€氶亾鎷嗗垎鐨勫姛鑳姐€傞粯璁や负false锛屼笉寮€鍚鍔熻兘銆備粎鍦╯rc鍜宒st閮戒负float鏃舵墠鑳藉紑鍚€氶亾鎷嗗垎锛屼笖涓嶈兘鍚屾椂寮€鍚疌hannelSplit鍜孨Z2ND鍔熻兘銆?|
 
-**表 4** Fixpipe搬运参数（FixpipeParamsV220）结构体说明
+**琛?4** Fixpipe鎼繍鍙傛暟锛團ixpipeParamsV220锛夌粨鏋勪綋璇存槑
 
-| 参数名称 | 数据类型 | 含义 |
+| 鍙傛暟鍚嶇О | 鏁版嵁绫诲瀷 | 鍚箟 |
 | --- | --- | --- |
-| nSize | 必选输入 | 源NZ矩阵在N方向上的大小。取值范围nSize∈[0, 4095]，nSize必须为16的倍数。<br>**注：nSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| mSize | 必选输入 | 源NZ矩阵在M方向上的大小。取值范围为mSize∈[0, 65535]。<br>**注：mSize=0表示不执行搬运，该接口将被视为NOP（空操作）。** |
-| srcStride | 必选输入 | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围为srcStride∈[0, 65535]，单位为C0_Size（16*sizeof(T)），T为src的数据类型，其值应填成mSize对16向上取整。 |
-| dstStride | 必选输入 | 目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位为datablock（32字节）。 |
-| [quantPre](./关键特性说明/随路量化.md) | 可选输入 | 用于控制量化模式，QuantMode_t类型，默认值为`QuantMode_t::NoQuant`，具体定义如下：<br>&nbsp;&nbsp;&bull; half/bfloat16_t输出，此参数需配置为`QuantMode_t::F322F16`/`QuantMode_t::F322BF16`。<br>注：此参数需要用户手动配置，不会自动推导配置对应量化模式。此通路不支持NoQuant模式。<br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 不开启量化功能，此通路不支持<br>    F322F16,      // Float32_2_Float16：float cast成half，cast mode为CAST_RINT模式<br>    F322BF16,     // Float32_2_BFloat16：float cast成bfloat16_t，cast mode为CAST_RINT模式<br>    DEQF16,       // DeQuant_Float16：int32_t量化成half，scalar量化<br>    VDEQF16,      // Vector_DeQuant_Float16：int32_t量化成half，tensor量化<br>    QF322B8_PRE,  // Quant_Float32_2_B8：float量化成int8_t/uint8_t，scalar量化<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8_t，tensor量化<br>    REQ8,         // ReQuant_int8：int32_t量化成int8_t/uint8_t，scalar量化<br>    VREQ8,        // Vector_ReQuant_int8：int32_t量化成int8_t/uint8_t，tensor量化<br>};</pre> |
-| deqScalar | 可选输入 | scalar量化参数，表示单个scale值，quantPre量化模式为[随路量化](./关键特性说明/随路量化.md)时需要设置该参数。支持的数据类型为`uint64_t`。 |
-| [reluEn](./关键特性说明/随路relu.md) | 可选输入 | 是否开启NormReLU的开关：<br>&nbsp;&nbsp;&bull; `false`：不开启NormReLU功能，默认为`false`；<br>&nbsp;&nbsp;&bull; `true`：开启NormReLU功能。 |
-| unitFlag | 可选输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 1（2'b01）：保留值；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将Mmad指令和Fixpipe指令的unitFlag值设置为2或3。<br>参数设置方案和特性细节可参考：Mmad计算中关键特性说明的[UnitFlag](../Mmad计算/关键特性说明/UnitFlag.md)章节。 |
-| [channelSplit](./关键特性说明/F32-Channel-Split.md) | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路设置为false即可。 |
-| ndNum | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路无需额外设置。 |
-| srcNdStride | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路无需额外设置。 |
-| dstNdStride | 可选输入 | 仅在L0C Buffer（CO1）->GM通路时生效，此通路无需额外设置。 |
+| nSize | 蹇呴€夎緭鍏?| 婧怤Z鐭╅樀鍦∟鏂瑰悜涓婄殑澶у皬銆傚彇鍊艰寖鍥磏Size鈭圼0, 4095]锛宯Size蹇呴』涓?6鐨勫€嶆暟銆?br>**娉細nSize=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?* |
+| mSize | 蹇呴€夎緭鍏?| 婧怤Z鐭╅樀鍦∕鏂瑰悜涓婄殑澶у皬銆傚彇鍊艰寖鍥翠负mSize鈭圼0, 65535]銆?br>**娉細mSize=0琛ㄧず涓嶆墽琛屾惉杩愶紝璇ユ帴鍙ｅ皢琚涓篘OP锛堢┖鎿嶄綔锛夈€?* |
+| srcStride | 蹇呴€夎緭鍏?| 婧怤Z鐭╅樀涓浉閭籞鎺掑竷鐨勮捣濮嬪湴鍧€鍋忕Щ锛屽彇鍊艰寖鍥翠负srcStride鈭圼0, 65535]锛屽崟浣嶄负C0_Size锛?6*sizeof(T)锛夛紝T涓簊rc鐨勬暟鎹被鍨嬶紝鍏跺€煎簲濉垚mSize瀵?6鍚戜笂鍙栨暣銆?|
+| dstStride | 蹇呴€夎緭鍏?| 鐩殑NZ鐭╅樀涓浉閭籞鎺掑竷鐨勮捣濮嬪湴鍧€鍋忕Щ锛屽彇鍊间笉涓?锛屽崟浣嶄负datablock锛?2瀛楄妭锛夈€?|
+| [quantPre](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md) | 鍙€夎緭鍏?| 鐢ㄤ簬鎺у埗閲忓寲妯″紡锛孮uantMode_t绫诲瀷锛岄粯璁ゅ€间负`QuantMode_t::NoQuant`锛屽叿浣撳畾涔夊涓嬶細<br>&nbsp;&nbsp;&bull; half/bfloat16_t杈撳嚭锛屾鍙傛暟闇€閰嶇疆涓篳QuantMode_t::F322F16`/`QuantMode_t::F322BF16`銆?br>娉細姝ゅ弬鏁伴渶瑕佺敤鎴锋墜鍔ㄩ厤缃紝涓嶄細鑷姩鎺ㄥ閰嶇疆瀵瑰簲閲忓寲妯″紡銆傛閫氳矾涓嶆敮鎸丯oQuant妯″紡銆?br><pre>enum QuantMode_t<br>{<br>    NoQuant,      // 涓嶅紑鍚噺鍖栧姛鑳斤紝姝ら€氳矾涓嶆敮鎸?br>    F322F16,      // Float32_2_Float16锛歠loat cast鎴恏alf锛宑ast mode涓篊AST_RINT妯″紡<br>    F322BF16,     // Float32_2_BFloat16锛歠loat cast鎴恇float16_t锛宑ast mode涓篊AST_RINT妯″紡<br>    DEQF16,       // DeQuant_Float16锛歩nt32_t閲忓寲鎴恏alf锛宻calar閲忓寲<br>    VDEQF16,      // Vector_DeQuant_Float16锛歩nt32_t閲忓寲鎴恏alf锛宼ensor閲忓寲<br>    QF322B8_PRE,  // Quant_Float32_2_B8锛歠loat閲忓寲鎴恑nt8_t/uint8_t锛宻calar閲忓寲<br>    VQF322B8_PRE, // Vector_Quant_Float32_2_B8锛歠loat閲忓寲鎴恑nt8_t/uint8_t锛宼ensor閲忓寲<br>    REQ8,         // ReQuant_int8锛歩nt32_t閲忓寲鎴恑nt8_t/uint8_t锛宻calar閲忓寲<br>    VREQ8,        // Vector_ReQuant_int8锛歩nt32_t閲忓寲鎴恑nt8_t/uint8_t锛宼ensor閲忓寲<br>};</pre> |
+| deqScalar | 鍙€夎緭鍏?| scalar閲忓寲鍙傛暟锛岃〃绀哄崟涓猻cale鍊硷紝quantPre閲忓寲妯″紡涓篬闅忚矾閲忓寲](./鍏抽敭鐗规€ц鏄?闅忚矾閲忓寲.md)鏃堕渶瑕佽缃鍙傛暟銆傛敮鎸佺殑鏁版嵁绫诲瀷涓篳uint64_t`銆?|
+| [reluEn](./鍏抽敭鐗规€ц鏄?闅忚矾relu.md) | 鍙€夎緭鍏?| 鏄惁寮€鍚疦ormReLU鐨勫紑鍏筹細<br>&nbsp;&nbsp;&bull; `false`锛氫笉寮€鍚疦ormReLU鍔熻兘锛岄粯璁や负`false`锛?br>&nbsp;&nbsp;&bull; `true`锛氬紑鍚疦ormReLU鍔熻兘銆?|
+| unitFlag | 鍙€夎緭鍏?| unitFlag鏄竴绉峂mad鎸囦护鍜孎ixpipe鎸囦护缁嗙矑搴︾殑骞惰锛屽紑鍚鍔熻兘鍚庯紝纭欢姣忚绠楀畬涓€涓垎褰紝璁＄畻缁撴灉灏变細琚惉鍑恒€傚彇鍊艰鏄庡涓嬶細<br>&nbsp;&nbsp;&bull; 0锛?'b00锛夛細涓嶅紑鍚痷nitFlag锛?br>&nbsp;&nbsp;&bull; 1锛?'b01锛夛細淇濈暀鍊硷紱<br>&nbsp;&nbsp;&bull; 2锛?'b10锛夛細寮€鍚痷nitFlag锛岀‖浠舵墽琛屽畬鎸囦护涔嬪悗锛屼笉澶嶄綅鍗曞厓鏍囪浣嶏紱<br>&nbsp;&nbsp;&bull; 3锛?'b11锛夛細寮€鍚痷nitFlag锛岀‖浠舵墽琛屽畬鎸囦护涔嬪悗锛屽浣嶅崟鍏冩爣璁颁綅銆?br>寮€鍚鍔熻兘鏃讹紝椤诲皢Mmad鎸囦护鍜孎ixpipe鎸囦护鐨剈nitFlag鍊艰缃负2鎴?銆?br>鍙傛暟璁剧疆鏂规鍜岀壒鎬х粏鑺傚彲鍙傝€冿細Mmad璁＄畻涓叧閿壒鎬ц鏄庣殑[UnitFlag](../Mmad璁＄畻/鍏抽敭鐗规€ц鏄?UnitFlag.md)绔犺妭銆?|
+| [channelSplit](./鍏抽敭鐗规€ц鏄?F32-Channel-Split.md) | 鍙€夎緭鍏?| 浠呭湪L0C Buffer锛圕O1锛?>GM閫氳矾鏃剁敓鏁堬紝姝ら€氳矾璁剧疆涓篺alse鍗冲彲銆?|
+| ndNum | 鍙€夎緭鍏?| 浠呭湪L0C Buffer锛圕O1锛?>GM閫氳矾鏃剁敓鏁堬紝姝ら€氳矾鏃犻渶棰濆璁剧疆銆?|
+| srcNdStride | 鍙€夎緭鍏?| 浠呭湪L0C Buffer锛圕O1锛?>GM閫氳矾鏃剁敓鏁堬紝姝ら€氳矾鏃犻渶棰濆璁剧疆銆?|
+| dstNdStride | 鍙€夎緭鍏?| 浠呭湪L0C Buffer锛圕O1锛?>GM閫氳矾鏃剁敓鏁堬紝姝ら€氳矾鏃犻渶棰濆璁剧疆銆?|
 
-## 数据类型<a id="zh-cn_topic_0000002511188540_section4219135304818"></a>
+## 鏁版嵁绫诲瀷<a id="zh-cn_topic_0000002511188540_section4219135304818"></a>
 
-**源矩阵与目的矩阵支持的数据类型组合**
+**婧愮煩闃典笌鐩殑鐭╅樀鏀寔鐨勬暟鎹被鍨嬬粍鍚?*
 
 <cann-filter npu-type = "950">
 
-针对Ascend 950PR/Ascend 950DT，支持的数据类型组合如下：
+閽堝Ascend 950PR/Ascend 950DT锛屾敮鎸佺殑鏁版嵁绫诲瀷缁勫悎濡備笅锛?
 
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| 婧愮煩闃碉紙L0C Buffer锛?| 鐩殑鐭╅樀锛圠1 Buffer锛?|
 | ---------- | ---------- |
-| float | int8_t、uint8_t、hifloat8_t、fp8_e4m3fn_t、half、bfloat16_t、float。 |
-| int32_t | int8_t、uint8_t、half、bfloat16_t、int32_t。 |
+| float | int8_t銆乽int8_t銆乭ifloat8_t銆乫p8_e4m3fn_t銆乭alf銆乥float16_t銆乫loat銆?|
+| int32_t | int8_t銆乽int8_t銆乭alf銆乥float16_t銆乮nt32_t銆?|
 
 </cann-filter>
 
 <cann-filter npu-type = "A3">
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型组合如下：
+閽堝Atlas A3 璁粌绯诲垪浜у搧/Atlas A3 鎺ㄧ悊绯诲垪浜у搧锛屾敮鎸佺殑鏁版嵁绫诲瀷缁勫悎濡備笅锛?
 
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| 婧愮煩闃碉紙L0C Buffer锛?| 鐩殑鐭╅樀锛圠1 Buffer锛?|
 | ---------- | ---------- |
-| float | int8_t、uint8_t、half、bfloat16_t。 |
-| int32_t | int8_t、uint8_t、half。 |
+| float | int8_t銆乽int8_t銆乭alf銆乥float16_t銆?|
+| int32_t | int8_t銆乽int8_t銆乭alf銆?|
 
 </cann-filter>
 
 <cann-filter npu-type = "910b">
 
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型组合如下：
+閽堝Atlas A2 璁粌绯诲垪浜у搧/Atlas A2 鎺ㄧ悊绯诲垪浜у搧锛屾敮鎸佺殑鏁版嵁绫诲瀷缁勫悎濡備笅锛?
 
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| 婧愮煩闃碉紙L0C Buffer锛?| 鐩殑鐭╅樀锛圠1 Buffer锛?|
 | ---------- | ---------- |
-| float | int8_t、uint8_t、half、bfloat16_t。 |
-| int32_t | int8_t、uint8_t、half。 |
+| float | int8_t銆乽int8_t銆乭alf銆乥float16_t銆?|
+| int32_t | int8_t銆乽int8_t銆乭alf銆?|
 
 </cann-filter>
 
 <cann-filter npu-type = "x90">
 
-针对Kirin X90，支持的数据类型组合如下：
+閽堝Kirin X90锛屾敮鎸佺殑鏁版嵁绫诲瀷缁勫悎濡備笅锛?
 
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| 婧愮煩闃碉紙L0C Buffer锛?| 鐩殑鐭╅樀锛圠1 Buffer锛?|
 | ---------- | ---------- |
-| float | int8_t、half。 |
-| int32_t | int8_t、half。 |
+| float | int8_t銆乭alf銆?|
+| int32_t | int8_t銆乭alf銆?|
 
 </cann-filter>
 
 <cann-filter npu-type = "9030">
 
-针对Kirin 9030，支持的数据类型组合如下：
+閽堝Kirin 9030锛屾敮鎸佺殑鏁版嵁绫诲瀷缁勫悎濡備笅锛?
 
-| 源矩阵（L0C Buffer） | 目的矩阵（L1 Buffer） |
+| 婧愮煩闃碉紙L0C Buffer锛?| 鐩殑鐭╅樀锛圠1 Buffer锛?|
 | ---------- | ---------- |
 | float | half |
 | int32_t | half |
 
 </cann-filter>
 
-## 返回值说明
+## 杩斿洖鍊艰鏄?
 
-无
+鏃?
 
-## 约束说明<a id="zh-cn_topic_0000002511188540_section2045914466492"></a>
+## 绾︽潫璇存槑<a id="zh-cn_topic_0000002511188540_section2045914466492"></a>
 
-- 对于量化输入为float32数据类型的说明如下：
-    - 标准的IEEE 754 float32格式为：1bit符号位，8bits指数位，23bits尾数位；当前AI处理器支持的float32格式为：1bit符号位，8bits指数位，10bits尾数位。
-    - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
-- 源矩阵NZ格式地址要求6对齐，目的矩阵NZ格式地址需要满足32字节对齐。
-- 当搬出的mSize、nSize或者ndNum中的任意一个值为0时，该指令不会被执行。ndNum=0时会报warning。
-- 量化和ReLU参数不能为INF/NAN和非规格化数。
-- 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
-- unitFlag特性开启需要配合Mmad同时开启。
+- 瀵逛簬閲忓寲杈撳叆涓篺loat32鏁版嵁绫诲瀷鐨勮鏄庡涓嬶細
+    - 鏍囧噯鐨処EEE 754 float32鏍煎紡涓猴細1bit绗﹀彿浣嶏紝8bits鎸囨暟浣嶏紝23bits灏炬暟浣嶏紱褰撳墠AI澶勭悊鍣ㄦ敮鎸佺殑float32鏍煎紡涓猴細1bit绗﹀彿浣嶏紝8bits鎸囨暟浣嶏紝10bits灏炬暟浣嶃€?
+    - 濡傛灉鐢ㄦ埛鎻愪緵鐨勬槸鏍囧噯鐨処EEE 754 float32杈撳叆锛孉PI鍐呴儴浼氬鐞嗘垚澶勭悊鍣ㄦ敮鎸佺殑float32鏍煎紡杩涜璁＄畻锛屾鏃跺鏋済olden鏁版嵁鐢熸垚杩囩▼涓娇鐢ㄧ殑鏄爣鍑嗙殑IEEE 754 float32鏁版嵁锛屽垯鍙兘寮曞叆绮惧害涓嶅尮閰嶉棶棰橈紝闇€瑕佷慨姝olden鏁版嵁鐨勭敓鎴愶紝灏嗛噺鍖栧弬鏁扮殑23bits灏炬暟浣嶇殑浣?3bits鏁版嵁浣嶆竻闆跺啀鍙備笌閲忓寲璁＄畻銆?
+- 婧愮煩闃礜Z鏍煎紡鍦板潃瑕佹眰6瀵归綈锛岀洰鐨勭煩闃礜Z鏍煎紡鍦板潃闇€瑕佹弧瓒?2瀛楄妭瀵归綈銆?
+- 褰撴惉鍑虹殑mSize銆乶Size鎴栬€卬dNum涓殑浠绘剰涓€涓€间负0鏃讹紝璇ユ寚浠や笉浼氳鎵ц銆俷dNum=0鏃朵細鎶arning銆?
+- 閲忓寲鍜孯eLU鍙傛暟涓嶈兘涓篒NF/NAN鍜岄潪瑙勬牸鍖栨暟銆?
+- 鐩爣鏁版嵁涓嶈兘鏈夐噸鍙犮€傚鏋滃鐩殑鍦板潃鏈夐噸鍙犲啓鍏ワ紝纭欢涓嶄細鎶ュ憡浠讳綍璀﹀憡鍜岄敊璇紝涔熶笉淇濊瘉閲嶅彔鏁版嵁鐨勫啓鍏ラ『搴忋€?
+- unitFlag鐗规€у紑鍚渶瑕侀厤鍚圡mad鍚屾椂寮€鍚€?
 
 <cann-filter npu-type = "A3,910b">
 
-- 针对如下产品型号，特殊值/边界值约束说明如下：
+- 閽堝濡備笅浜у搧鍨嬪彿锛岀壒娈婂€?杈圭晫鍊肩害鏉熻鏄庡涓嬶細
 
     <cann-filter npu-type = "A3">
 
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品；
+    Atlas A3 璁粌绯诲垪浜у搧/Atlas A3 鎺ㄧ悊绯诲垪浜у搧锛?
 
     </cann-filter>
     
     <cann-filter npu-type = "910b">
 
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品；
+    Atlas A2 璁粌绯诲垪浜у搧/Atlas A2 鎺ㄧ悊绯诲垪浜у搧锛?
     
     </cann-filter>
 
-    对于浮点类型INF/NAN输入输出，可以通过CTRL寄存器（控制寄存器）的CTRL\[48\]比特位进行设置，控制浮点数量化搬出时的饱和模式：
+    瀵逛簬娴偣绫诲瀷INF/NAN杈撳叆杈撳嚭锛屽彲浠ラ€氳繃CTRL瀵勫瓨鍣紙鎺у埗瀵勫瓨鍣級鐨凜TRL\[48\]姣旂壒浣嶈繘琛岃缃紝鎺у埗娴偣鏁伴噺鍖栨惉鍑烘椂鐨勯ケ鍜屾ā寮忥細
 
-    - 非饱和模式：CTRL\[48\]设置成1'b1，INF/NAN保持原输出。
-    - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
+    - 闈為ケ鍜屾ā寮忥細CTRL\[48\]璁剧疆鎴?'b1锛孖NF/NAN淇濇寔鍘熻緭鍑恒€?
+    - 楗卞拰妯″紡锛欳TRL\[48\]璁剧疆鎴?'b0锛孖NF杈撳嚭浼氳楗卞拰涓郝盡AX锛孨aN杈撳嚭浼氳楗卞拰涓?銆?
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
+        // 璁剧疆CTRL[48]涓?锛屽紑鍚诞鐐规暟楗卞拰妯″紡
         AscendC::AscendCUtils::SetOverflow(0);
         ```
 
-    对于整数类型只有饱和模式。
+    瀵逛簬鏁存暟绫诲瀷鍙湁楗卞拰妯″紡銆?
 
 </cann-filter>
 
-## 调用示例<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
+## 璋冪敤绀轰緥<a id="zh-cn_topic_0000002511188540_section088124295117"></a>
 
 <cann-filter npu-type = "950,A3,910b">
 
-Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/fixpipe_l0c2l1)；
+Fixpipe瀹屾暣鏍蜂緥璇峰弬鑰僛fixpipe\_l0c2l1鏍蜂緥](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_matrix_compute/fixpipe_l0c2l1)锛?
 
-- 示例：通路L0C Buffer->L1 Buffer。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为int8_t，不开启NZ2ND的格式转换，开启scalar量化。
+- 绀轰緥锛氶€氳矾L0C Buffer->L1 Buffer銆傝緭鍏鐭╅樀鍜孊鐭╅樀鐨勬暟鎹被鍨嬩负half锛岃緭鍑篊鐭╅樀涓篿nt8_t锛屼笉寮€鍚疦Z2ND鐨勬牸寮忚浆鎹紝寮€鍚痵calar閲忓寲銆?
 
     ```cpp
         AscendC::LocalTensor<outputType> c1Local(AscendC::TPosition::C1, c1Addr, cSizeAlignL1);
     
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
         uint16_t c0Size = 32;
         AscendC::FixpipeParamsV220 fixpipeParams;
-        // NZ2NZ场景，FixpipeParamsV220的dstStride单位为datablock（32字节）
+        // NZ2NZ鍦烘櫙锛孎ixpipeParamsV220鐨刣stStride鍗曚綅涓篸atablock锛?2瀛楄妭锛?
         fixpipeParams.dstStride = baseM * c0Size * sizeof(outputType) / AscendC::ONE_BLK_SIZE;
         fixpipeParams.mSize = baseM;
         fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
@@ -267,7 +267,7 @@ Fixpipe完整样例请参考[fixpipe\_l0c2l1样例](https://gitcode.com/cann/asc
     #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         uint16_t c0Size = 32;
         AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::NZ> fixpipeParams;
-        // NZ2NZ场景，FixpipeParamsArch3510的dstStride单位为元素个数
+        // NZ2NZ鍦烘櫙锛孎ixpipeParamsArch3510鐨刣stStride鍗曚綅涓哄厓绱犱釜鏁?
         fixpipeParams.dstStride = baseM * c0Size;
         fixpipeParams.mSize = baseM;
         fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);

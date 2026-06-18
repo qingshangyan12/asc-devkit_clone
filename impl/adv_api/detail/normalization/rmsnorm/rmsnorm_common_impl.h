@@ -233,14 +233,14 @@ __aicore__ inline void RmsNormCompute(
     } else {
         params.srcFp32Addr = src;
     }
-    // step 1: x²
+    // step 1: x虏
     BinaryRepeatParams binaryParams;
     Mul<float, false>(params.tmpAddr, params.srcFp32Addr, params.srcFp32Addr, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    // step 2: ∑x²
+    // step 2: 鈭憍虏
     RmsNormReduceSum<isBasicBlock>(
         params.reducedAddr, params.tmpAddr, params.curBsLength, tiling.hLength, tiling.originalHLength);
-    // step 3: rms = 1/n*�?
+    // step 3: rms = 1/n*鈭?
     SetVectorMask<T>(0, params.curBsLength);
     Muls<float, false>(
         params.reducedAddr, params.reducedAddr, tiling.reciprocalOfHLength, MASK_PLACEHOLDER, 1, unaryParams);

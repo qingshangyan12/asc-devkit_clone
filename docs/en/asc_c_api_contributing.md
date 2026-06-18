@@ -141,90 +141,90 @@ asc_add_sync(dst, src0, src1, count);
 
 ```text
 asc-devkit/
-├── include/
-│   └── c_api/                    # C API header files
-│       ├── vector_compute/       # Vector computation
-│       │   └── vector_compute.h
-│       ├── scalar_compute/       # Scalar computation
-│       │   └── scalar_compute.h
-│       ├── vector_datamove/      # Vector data movement
-│       │   └── vector_datamove.h
-│       ├── cube_compute/         # Cube computation
-│       │   └── cube_compute.h
-│       ├── cube_datamove/        # Cube data movement
-│       │   └── cube_datamove.h
-│       ├── sync/                 # Synchronization control
-│       │   └── sync.h
-│       ├── cache_ctrl/           # Cache control
-│       │   └── cache_ctrl.h
-│       ├── atomic/               # Atomic operations
-│       │   └── atomic.h
-│       ├── sys_var/              # System variables
-│       │   └── sys_var.h
-│       ├── misc/                 # Miscellaneous
-│       │   └── misc.h
-│       ├── utils/                # Utilities and constants
-│       │   ├── debug/
-│       │   │   ├── asc_dump.h
-│       │   │   ├── asc_printf.h
-│       │   │   └── asc_assert.h
-│       │   ├── c_api_constants.h
-│       │   ├── c_api_union.h
-│       │   └── c_api_utils_intf.h
-│       ├── asc_simd.h            # Main entry
-│       └── c_api_utils_intf.h    # Utility interface
-│
-├── impl/
-│   └── c_api/                    # C API implementation
-│       ├── instr_impl/           # Instruction implementation
-│       │   ├── npu_arch_2201/    # NPU ARCH 220X architecture
-│       │   │   ├── vector_compute_impl/
-│       │   │   │   ├── asc_abs_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_datamove_impl/
-│       │   │   │   ├── asc_copy_gm2ub_align_impl.h
-│       │   │   │   └── ...
-│       │   │   ├── vector_compute_impl.h
-│       │   │   ├── vector_datamove_impl.h
-│       │   │   └── ...
-│       │   └── npu_arch_3510/    # NPU ARCH 351X architecture
-│       │       ├── vector_compute_impl/
-│       │       │   ├── asc_abs_impl.h
-│       │       │   └── ...
-│       │       ├── vector_compute_impl.h
-│       │       └── ...
-│       ├── utils/
-│       │   └── c_api_utils_impl.cpp
-│       └── stub/                 # Stub
-│           └── cce_stub.h
-│
-├── tests/
-│   └── api/
-│       └── c_api/                # C API tests
-│           ├── npu_arch_2201/    # NPU ARCH 220X architecture
-│           │   ├── vector_compute/
-│           │   │   ├── test_add_instr.cpp
-│           │   │   ├── test_axpy_instr.cpp
-│           │   │   └── ...
-│           │   ├── scalar_compute/
-│           │   └── ...
-│           ├── npu_arch_3510/    # NPU ARCH 351X architecture
-│           │   └── ...
-│           └── common/           # Common tests
-│               └── test_utils.cpp
-│
-└── docs/
-    └── api/
-        └── context/
-            └── c_api/            # C API documentation
-                ├── vector_compute/
-                │   ├── asc_add.md
-                │   ├── asc_muls.md
-                │   └── ...
-                ├── scalar_compute/
-                ├── vector_datamove/
-                ├── general_instruction.md  # General description
-                └── c_api_list.md           # API list
+鈹溾攢鈹€ include/
+鈹?  鈹斺攢鈹€ c_api/                    # C API header files
+鈹?      鈹溾攢鈹€ vector_compute/       # Vector computation
+鈹?      鈹?  鈹斺攢鈹€ vector_compute.h
+鈹?      鈹溾攢鈹€ scalar_compute/       # Scalar computation
+鈹?      鈹?  鈹斺攢鈹€ scalar_compute.h
+鈹?      鈹溾攢鈹€ vector_datamove/      # Vector data movement
+鈹?      鈹?  鈹斺攢鈹€ vector_datamove.h
+鈹?      鈹溾攢鈹€ cube_compute/         # Cube computation
+鈹?      鈹?  鈹斺攢鈹€ cube_compute.h
+鈹?      鈹溾攢鈹€ cube_datamove/        # Cube data movement
+鈹?      鈹?  鈹斺攢鈹€ cube_datamove.h
+鈹?      鈹溾攢鈹€ sync/                 # Synchronization control
+鈹?      鈹?  鈹斺攢鈹€ sync.h
+鈹?      鈹溾攢鈹€ cache_ctrl/           # Cache control
+鈹?      鈹?  鈹斺攢鈹€ cache_ctrl.h
+鈹?      鈹溾攢鈹€ atomic/               # Atomic operations
+鈹?      鈹?  鈹斺攢鈹€ atomic.h
+鈹?      鈹溾攢鈹€ sys_var/              # System variables
+鈹?      鈹?  鈹斺攢鈹€ sys_var.h
+鈹?      鈹溾攢鈹€ misc/                 # Miscellaneous
+鈹?      鈹?  鈹斺攢鈹€ misc.h
+鈹?      鈹溾攢鈹€ utils/                # Utilities and constants
+鈹?      鈹?  鈹溾攢鈹€ debug/
+鈹?      鈹?  鈹?  鈹溾攢鈹€ asc_dump.h
+鈹?      鈹?  鈹?  鈹溾攢鈹€ asc_printf.h
+鈹?      鈹?  鈹?  鈹斺攢鈹€ asc_assert.h
+鈹?      鈹?  鈹溾攢鈹€ c_api_constants.h
+鈹?      鈹?  鈹溾攢鈹€ c_api_union.h
+鈹?      鈹?  鈹斺攢鈹€ c_api_utils_intf.h
+鈹?      鈹溾攢鈹€ asc_simd.h            # Main entry
+鈹?      鈹斺攢鈹€ c_api_utils_intf.h    # Utility interface
+鈹?
+鈹溾攢鈹€ impl/
+鈹?  鈹斺攢鈹€ c_api/                    # C API implementation
+鈹?      鈹溾攢鈹€ instr_impl/           # Instruction implementation
+鈹?      鈹?  鈹溾攢鈹€ npu_arch_2201/    # NPU ARCH 220X architecture
+鈹?      鈹?  鈹?  鈹溾攢鈹€ vector_compute_impl/
+鈹?      鈹?  鈹?  鈹?  鈹溾攢鈹€ asc_abs_impl.h
+鈹?      鈹?  鈹?  鈹?  鈹斺攢鈹€ ...
+鈹?      鈹?  鈹?  鈹溾攢鈹€ vector_datamove_impl/
+鈹?      鈹?  鈹?  鈹?  鈹溾攢鈹€ asc_copy_gm2ub_align_impl.h
+鈹?      鈹?  鈹?  鈹?  鈹斺攢鈹€ ...
+鈹?      鈹?  鈹?  鈹溾攢鈹€ vector_compute_impl.h
+鈹?      鈹?  鈹?  鈹溾攢鈹€ vector_datamove_impl.h
+鈹?      鈹?  鈹?  鈹斺攢鈹€ ...
+鈹?      鈹?  鈹斺攢鈹€ npu_arch_3510/    # NPU ARCH 351X architecture
+鈹?      鈹?      鈹溾攢鈹€ vector_compute_impl/
+鈹?      鈹?      鈹?  鈹溾攢鈹€ asc_abs_impl.h
+鈹?      鈹?      鈹?  鈹斺攢鈹€ ...
+鈹?      鈹?      鈹溾攢鈹€ vector_compute_impl.h
+鈹?      鈹?      鈹斺攢鈹€ ...
+鈹?      鈹溾攢鈹€ utils/
+鈹?      鈹?  鈹斺攢鈹€ c_api_utils_impl.cpp
+鈹?      鈹斺攢鈹€ stub/                 # Stub
+鈹?          鈹斺攢鈹€ cce_stub.h
+鈹?
+鈹溾攢鈹€ tests/
+鈹?  鈹斺攢鈹€ api/
+鈹?      鈹斺攢鈹€ c_api/                # C API tests
+鈹?          鈹溾攢鈹€ npu_arch_2201/    # NPU ARCH 220X architecture
+鈹?          鈹?  鈹溾攢鈹€ vector_compute/
+鈹?          鈹?  鈹?  鈹溾攢鈹€ test_add_instr.cpp
+鈹?          鈹?  鈹?  鈹溾攢鈹€ test_axpy_instr.cpp
+鈹?          鈹?  鈹?  鈹斺攢鈹€ ...
+鈹?          鈹?  鈹溾攢鈹€ scalar_compute/
+鈹?          鈹?  鈹斺攢鈹€ ...
+鈹?          鈹溾攢鈹€ npu_arch_3510/    # NPU ARCH 351X architecture
+鈹?          鈹?  鈹斺攢鈹€ ...
+鈹?          鈹斺攢鈹€ common/           # Common tests
+鈹?              鈹斺攢鈹€ test_utils.cpp
+鈹?
+鈹斺攢鈹€ docs/
+    鈹斺攢鈹€ api/
+        鈹斺攢鈹€ context/
+            鈹斺攢鈹€ c_api/            # C API documentation
+                鈹溾攢鈹€ vector_compute/
+                鈹?  鈹溾攢鈹€ asc_add.md
+                鈹?  鈹溾攢鈹€ asc_muls.md
+                鈹?  鈹斺攢鈹€ ...
+                鈹溾攢鈹€ scalar_compute/
+                鈹溾攢鈹€ vector_datamove/
+                鈹溾攢鈹€ general_instruction.md  # General description
+                鈹斺攢鈹€ c_api_list.md           # API list
 ```
 
 ### File Organization Principles
@@ -401,7 +401,7 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 
 // Conditional compilation
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
     // NPU ARCH 2201 architecture specific code
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     // NPU ARCH 3510 architecture specific code

@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 #define INCLUDE_C_API_CACHE_CTRL_CACHE_CTRL_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 #include "instr_impl/npu_arch_2201/cache_ctrl_impl.h"
 
@@ -35,7 +35,7 @@ __aicore__ inline void asc_dcci_single(__gm__ void* dst);
 
 __aicore__ inline void asc_ub_dcci_single(__ubuf__ void* dst);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 __aicore__ inline void asc_dcci_entire_ub();
 #endif
 
