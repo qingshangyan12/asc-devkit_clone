@@ -1,7 +1,7 @@
-# SIMT and SIMD Hybrid Programming for Gather and Adds Computation
+# SIMD and SIMT Hybrid Programming for Gather and Adds Computation
 
 ## Overview
-This sample implements gather and adds computation based on SIMT and SIMD hybrid programming mode. It uses SIMT programming to implement discrete memory access operation gather, and SIMD programming to implement continuous memory access operation adds.
+This sample implements gather and adds computation based on SIMD and SIMT hybrid programming mode. It uses SIMT programming to implement discrete memory access operation gather, and SIMD programming to implement continuous memory access operation adds.
 
 
 ## Supported Products and CANN Software Versions
@@ -13,7 +13,7 @@ This sample implements gather and adds computation based on SIMT and SIMD hybrid
 ## Directory Structure
 
 ```text
-├── gather_adds_simt_simd_hybrid
+├── simt_simd_gather_and_adds
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and golden data generation script
 │   │   └── verify_result.py    // Golden data comparison file

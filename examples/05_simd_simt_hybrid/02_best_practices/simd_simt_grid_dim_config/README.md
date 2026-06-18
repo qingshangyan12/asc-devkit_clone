@@ -15,7 +15,7 @@
 ## 目录结构介绍
 
 ```text
-├── simt_and_simd_grid_dim_config
+├── simd_simt_grid_dim_config
 │   ├── figures                // README中的图片资源
 │   ├── CMakeLists.txt         // 编译工程文件
 │   ├── grid_config.asc        // Ascend C算子实现 & 调用样例
