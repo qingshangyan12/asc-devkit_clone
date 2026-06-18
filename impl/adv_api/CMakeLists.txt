@@ -102,7 +102,7 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
 endif()  
 
 if (BUILD_OPEN_PROJECT)
-    include(${CMAKE_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
+    include(${PROJECT_SOURCE_DIR}/cmake/third_party/asc-comm.cmake)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
