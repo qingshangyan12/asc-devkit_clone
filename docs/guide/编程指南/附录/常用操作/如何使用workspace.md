@@ -4,14 +4,14 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
 
 -   系统workspace：Ascend C API需要预留的workspace内存
 
-    API在计算过程需要一些workspace内存作为缓存，因此算子需要为API预留workspace内存，预留内存大小通过[GetLibApiWorkSpaceSize](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/GetLibApiWorkSpaceSize.md)接口获取。
+    API在计算过程需要一些workspace内存作为缓存，因此算子需要为API预留workspace内存，预留内存大小通过[GetLibApiWorkSpaceSize](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_1036.html)接口获取。
 
 -   用户workspace：算子实现使用到的workspace内存
 
     算子内部需要通过额外的device内存进行数据交换或者缓存的时候才需要分配，根据实际情况自行分配。使用场景如下：
 
     -   需要使用Unified Buffer和L1 Buffer上的空间且空间不够用时，可以将数据暂存至workspace上。
-    -   调用[SyncAll](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/context/SyncAll.md)等API接口时，需要workspace作为入参。
+    -   调用[SyncAll](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0204.html)等API接口时，需要workspace作为入参。
     -   其他需要使用Global Memory上内存空间的场景。
 
 不同开发方式下，具体的使用方法如下：
