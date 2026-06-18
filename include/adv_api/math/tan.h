@@ -14,10 +14,10 @@
  * Formula: tan(x) = xP(x) / ((π/2 - x)(π/2 + x)Q(x))
  * The Tan function does not have an elementary function expression, first normalize x to (-π/2, π/2)
  * and then calculating by function approximation.
- * Final solution�?
+ * Final solution�?
  *  k=round(x/π), x0=x-kπ, x0 belongs to (-π/2, π/2)
  *  π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
- *  Final solution�?
+ *  Final solution�?
  *  k = round(x * invpi)
  *  x -= k * pi_0
  *  x -= k * pi_1
@@ -50,13 +50,10 @@
 
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510) || \
+ __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/tan/tan_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113)
-#include "../../../impl/adv_api/detail/math/tan/tan_3510_impl.h"
 #endif
 #endif
 
@@ -106,8 +103,8 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510) || \
+ __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     TanImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 #endif
 }
@@ -127,8 +124,8 @@ __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-    __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510) || \
+ __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     TanImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
 }
@@ -151,7 +148,6 @@ __aicore__ inline void Tan(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 }
 #pragma end_pipe
 } // namespace AscendC
-
 
 #endif // LIB_MATH_TAN_H
 

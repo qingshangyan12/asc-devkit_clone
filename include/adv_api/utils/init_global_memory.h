@@ -24,14 +24,11 @@
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v200_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v220_impl.h"
-#elif (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
-#include "../../../impl/adv_api/detail/utils/init_global_memory/init_global_memory_v310_impl.h"
 #endif
 
 namespace AscendC {
 /* !
- * \brief This function realizes the clear global memory function. 
+ * \brief This function realizes the clear global memory function.
  *
  * \note support data type: uint16_t, int16_t, half, float, uint32_t, int32_t
  *
@@ -60,7 +57,7 @@ template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void Fill(GlobalTensor<T> &gmWorkspaceAddr, const uint64_t size, const T value)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || __NPU_ARCH__ == 3102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 2201)
     InitGlobalMemoryImpl<T>(gmWorkspaceAddr, size, value);
 #endif

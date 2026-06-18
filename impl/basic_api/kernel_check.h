@@ -19,7 +19,6 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_CHECK_H__
 #endif
 
-
 #ifndef ASCENDC_MODULE_CHECK_H
 #define ASCENDC_MODULE_CHECK_H
 
@@ -42,12 +41,6 @@ uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
     // tensorSize is tensor.GetSize()
     if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
         return tensorSize / INT4_TWO;
-#if (__NPU_ARCH__ == 5102)
-    } else if constexpr(IsSameType<PrimT<T>, int2b_t>::value) {
-        return tensorSize / INT2_FOUR;
-    } else if constexpr(IsSameType<PrimT<T>, uint1b_t>::value) {
-        return tensorSize / INT1_EIGHT;
-#endif
     } else {
         return tensorSize * sizeof(PrimT<T>);
     }

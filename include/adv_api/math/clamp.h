@@ -7,7 +7,7 @@
 * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 * See LICENSE in the root of the software repository for the full text of the License.
 */
- 
+
 /* !
  * \file clamp.h
  * \brief
@@ -24,11 +24,9 @@
 #include "include/adv_api/math/clamp_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/math/clamp/clamp_common_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-#include "../../../impl/adv_api/detail/math/clamp/clamp_3510_impl.h"
 #endif
 #include "kernel_pop_stack_buffer.h"
- 
+
 namespace AscendC {
 /* !
  * \brief This function implements replaces numbers greater than scalar with scalar
@@ -56,11 +54,11 @@ __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTens
         return;
     }
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
     ClampMaxImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
 #endif
 }
- 
+
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const T scalar,
     const uint32_t calCount)
@@ -74,7 +72,7 @@ __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTens
     bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ret), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
     ClampMaxImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
 #endif
 }
@@ -94,7 +92,7 @@ __aicore__ inline void ClampMax(const LocalTensor<T>& dstTensor, const LocalTens
 /* **************************************************************************************************
  * ClampMin                                           *
  * ************************************************************************************************* */
- 
+
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const T scalar, const uint32_t calCount)
@@ -104,11 +102,11 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
         return;
     }
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
     ClampMinImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
 #endif
 }
- 
+
 template <typename T, bool isReuseSource = false>
 __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const T scalar,
     const uint32_t calCount)
@@ -122,7 +120,7 @@ __aicore__ inline void ClampMin(const LocalTensor<T>& dstTensor, const LocalTens
     bool ret = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ret), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
     ClampMinImpl<T, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, scalar, calCount);
 #endif
 }
@@ -147,7 +145,7 @@ template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename
 __aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max,
     const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
     ClampImpl<config, T, U, S>(dst, src, min, max, count);
 #endif
 }

@@ -66,7 +66,6 @@ def get_default_optiling_pathlist():
                 full_path_list.append(full_path)
     return full_path_list
 
-
 def get_custom_opp_pathlist():
     vendor_list = []
     custom_opp_dir = None
@@ -86,7 +85,6 @@ def get_custom_opp_pathlist():
         if len(local_path) != 0 and local_path not in vendor_list:
             vendor_list.append(local_path)
     return vendor_list
-
 
 def load_op_host_tiling_lib():
     LogUtil.print_compile_log("", f"load op host tiling lib.", AscendCLogLevel.LOG_INFO)
@@ -119,7 +117,6 @@ tiling_path: {tiling_path}", AscendCLogLevel.LOG_ERROR)
 tiling_path: {tiling_path}", AscendCLogLevel.LOG_ERROR)
             raise Exception(f"An Unknown error occurred, tiling_path: {tiling_path}") from e
     return
-
 
 def load_build_in_lib():
     LogUtil.print_compile_log("", f"load build in tiling lib.", AscendCLogLevel.LOG_INFO)
@@ -160,7 +157,6 @@ def load_build_in_lib():
         return False
     return True
 
-
 def load_lib():
     libregister = ctypes.CDLL("libregister.so")
 
@@ -188,7 +184,6 @@ def load_lib():
 
     return libregister
 
-
 class Field:
     def __init__(self, field):
         """field: used to record information of tiling field
@@ -213,7 +208,6 @@ class Field:
             self.struct_type = field["structType"]
             self.struct_size = int(field["structSize"])
 
-
 class TilingDef:
     def __init__(self, json_value):
         self.class_name = json_value["class_name"]
@@ -226,7 +220,6 @@ class TilingDef:
         self.depth = 0
         for field in json_value["fields"]:
             self.field_list.append(Field(field))
-
 
 def decode(tiling_data, fmt, offset=0):
     """
@@ -307,7 +300,6 @@ def decode(tiling_data, fmt, offset=0):
 
     return [res, offset]
 
-
 def _decode_struct_tiling_data(field, binary_tiling_data, offset, struct_tiling_def_base):
     """ decode struct tiling data
 
@@ -328,7 +320,6 @@ def _decode_struct_tiling_data(field, binary_tiling_data, offset, struct_tiling_
                                             struct_tiling_def_base)
     return [struct_tiling_data, offset + struct_offset]
 
-
 def get_bytes_by_type(dtype):
     type_bytes = {"int8_t": 1, "uint8_t": 1,
                 "int16_t": 2, "uint16_t": 2,
@@ -340,7 +331,6 @@ def get_bytes_by_type(dtype):
     else:
         msg = "get_bytes_by_type cannot find type = " + dtype
         raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, (msg))
-
 
 def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base):
     """ decode tiling data by tiling field info and run_info_tiling_data
@@ -405,7 +395,6 @@ def _decode_tiling_data(tiling_def, run_info_tiling_data, struct_tiling_def_base
         run_info_tiling_data_binary[field.name] = struct_tiling_data
     return [run_info_tiling_data_binary, offset]
 
-
 def get_tiling_def(optype):
     libregister = ctypes.CDLL("libregister.so")
     optype_c = optype.encode('utf_8')
@@ -424,7 +413,6 @@ def get_tiling_def(optype):
     res_info = json.loads(result_info_buf.value)
     class_info = TilingDef(res_info)
     return class_info
-
 
 def get_struct_shape(struct_tiling_def_base):
     # generatre struct definition
@@ -458,7 +446,6 @@ def get_struct_shape(struct_tiling_def_base):
         total_class_body += struct_class
     return total_class_body
 
-
 def is_struct_have_arr(struct_tiling_def, has_arr, struct_tiling_def_base):
     # generate struct value of static shape
     struct_field_list: list = struct_tiling_def.field_list
@@ -472,7 +459,6 @@ def is_struct_have_arr(struct_tiling_def, has_arr, struct_tiling_def_base):
                 has_arr, struct_tiling_def_base)
             has_arr |= sub_has_arr
     return has_arr
-
 
 def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_key_list, optype, \
                                            tiling_key_group_map):
@@ -526,7 +512,6 @@ def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_ke
             codes += tiling_def.class_def
             tiling_struct_dict.add(tiling_def.class_name)
     return codes
-
 
 def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
     tiling_size = len(tiling_raw_data)
@@ -592,7 +577,6 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
         class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     return class_body, tiling_assign_str
 
-
 def gen_static_struct_body_v1(class_name, field_list, tiling_raw_data, struct_tiling_def_base):
     # the only one top-level struct of static-shape one itself
     class_body = f"class {class_name}\n"
@@ -616,7 +600,6 @@ def gen_static_struct_body_v1(class_name, field_list, tiling_raw_data, struct_ti
     class_body += "};\n\n"
     body, tiling_assign_str = gen_micro_assign_value_of_tiling(class_name, tiling_raw_data)
     return class_body, body, tiling_assign_str
-
 
 def gen_micro_assign_value_of_tiling_force_constexpr(tiling_struct: str):
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
@@ -649,7 +632,6 @@ def gen_micro_assign_value_of_tiling_force_constexpr(tiling_struct: str):
         class_body += "    static constexpr tiling_type __ascendc_point##var;                                   \\\n"
         class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     return class_body
-
 
 def gen_static_struct_body_v1_force_constexpr(class_name, field_list, tiling_raw_data, struct_tiling_def_base):
     tiling_size = len(tiling_raw_data)
@@ -711,7 +693,6 @@ def gen_static_struct_body_v1_force_constexpr(class_name, field_list, tiling_raw
     body = gen_micro_assign_value_of_tiling_force_constexpr(class_name)
     return class_body, body, need_std_array
 
-
 def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, \
                      all_dynamic_struct_def_except_self, tiling_const_propagation: bool = False):
     field_list: list = tiling_def.field_list
@@ -748,7 +729,6 @@ def gen_static_shape(tiling_def, tiling_raw_data, struct_tiling_def_base, \
     class_body_ender = f"#endif // __{class_name_upper}_HEADER__\n"
     return (class_body_header + class_body + class_body_ender)
 
-
 def get_dynamic_cpu_assign_tiling_data(struct_tiling_def_base, field_list, left_value, offset=0):
     # generate cpu code for assigning values to variables
     class_body = ""
@@ -771,7 +751,6 @@ def get_dynamic_cpu_assign_tiling_data(struct_tiling_def_base, field_list, left_
             class_body += struct_body
     return class_body, offset
 
-
 def get_dynamic_npu_assign_tiling_data(struct_tiling_def_base, field_list, left_value, offset=0):
     # generate npu code for assigning values to variables
     class_body = ""
@@ -793,7 +772,6 @@ def get_dynamic_npu_assign_tiling_data(struct_tiling_def_base, field_list, left_
                                         struct_field_list, f"{left_value}{field.name}.", offset)
             class_body += struct_body
     return class_body, offset
-
 
 def get_dynamic_assign_tiling_data_by_bytes(total_bytes, prefix_0, prefix_1):
     class_body = ""
@@ -822,7 +800,6 @@ def get_dynamic_assign_tiling_data_by_bytes(total_bytes, prefix_0, prefix_1):
         class_body += f"    (*(uint8_t*)((uint8_t*)tilingdata + {current_offset})) = \
                             (*({prefix_0} uint8_t *)({prefix_1} + {current_offset}));\n"
     return class_body
-
 
 def get_dynamic_assign_tiling_data_by_size(offset, prefix_0, prefix_1):
     class_body = ""
@@ -853,7 +830,6 @@ def get_dynamic_assign_tiling_data_by_size(offset, prefix_0, prefix_1):
     class_body += "    }\n"
     return class_body
 
-
 def gen_dynamic_shape(tiling_def, struct_tiling_def_base):
     class_name_upper = tiling_def.class_name.upper()
     class_body = ""
@@ -875,7 +851,6 @@ def gen_dynamic_shape(tiling_def, struct_tiling_def_base):
     class_body += generate_pointer_directly_assess_data()
     class_body += f"#endif // __{class_name_upper}_HEADER__\n"
     return class_body
-
 
 class TilingInfo:
     def __init__(self):
@@ -953,7 +928,6 @@ class TilingInfo:
     def remove_file(self):
         os.remove(self.tiling_data_file_path)
 
-
 def is_static_input_base_value_depend(input_ele, idx, value_depends: dict, param_types):
     if value_depends is None or value_depends.get(idx) is None or param_types is None:
         return True
@@ -981,13 +955,11 @@ def is_static_input_base_value_depend(input_ele, idx, value_depends: dict, param
             return ((input_ele.get('shape') is not None) and (input_ele.get('const_value') is None)) == False
     return True
 
-
 def _check_negative_shape(shapes):
     for shape in shapes:
         if shape < 0:
             return True
     return False
-
 
 def _check_single_element_shape(ele, idx, enable_vd, value_depends, param_types):
     if _check_negative_shape(ele["shape"]):
@@ -997,13 +969,11 @@ def _check_single_element_shape(ele, idx, enable_vd, value_depends, param_types)
             return True
     return False
 
-
 def _check_input_list_shape(input_list, idx, enable_vd, value_depends, param_types):
     for single in input_list:
         if _check_single_element_shape(single, idx, enable_vd, value_depends, param_types):
             return True
     return False
-
 
 def _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
     for idx, input_ele in enumerate(inputs):
@@ -1017,7 +987,6 @@ def _check_inputs_shape(inputs, enable_vd, value_depends, param_types):
                 return True
     return False
 
-
 def _check_outputs_shape(outputs):
     if outputs is None:
         return False
@@ -1027,7 +996,6 @@ def _check_outputs_shape(outputs):
         if _check_negative_shape(output_ele["shape"]):
             return True
     return False
-
 
 def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, param_types: list = None, enable_vd=False):
     """check if static shape, find dynamic shape if shape<0 in inputs
@@ -1047,7 +1015,6 @@ def is_static_shape(inputs: list, outputs: list, value_depends: dict = None, par
     if _check_outputs_shape(outputs):
         return False
     return True
-
 
 def get_struct_tiling_info(tiling_def, struct_tiling_def_base, depth=0):
     depth += 1
@@ -1071,7 +1038,6 @@ def get_struct_tiling_info(tiling_def, struct_tiling_def_base, depth=0):
                 struct_tiling_def_base[field.struct_type] = struct_tiling_def
                 struct_tiling_def_base = get_struct_tiling_info(struct_tiling_def, struct_tiling_def_base, depth)
     return struct_tiling_def_base
-
 
 def get_dynamic_tiling_struct(tiling_def, struct_tiling_def_base):
     """
@@ -1098,7 +1064,6 @@ def get_dynamic_tiling_struct(tiling_def, struct_tiling_def_base):
     class_def += "}__attribute__((__may_alias__));\n\n"
     return class_def
 
-
 def get_header_and_sub_struct_def(tiling_def, struct_tiling_def_base):
     class_name_upper = tiling_def.class_name.upper()
     start_body = ""
@@ -1119,7 +1084,6 @@ def get_header_and_sub_struct_def(tiling_def, struct_tiling_def_base):
     end_body = f"#endif // __{class_name_upper}_HEADER__\n"
     return start_body, end_body
 
-
 def get_tilingdata_preload():
     class_body = "constexpr uint32_t DC_PRLOAD_LOOP = (all_bytes)/512;\n"
     class_body += "for (uint64_t loop_dc=0; loop_dc < DC_PRLOAD_LOOP; loop_dc++) {\n"
@@ -1133,7 +1097,6 @@ def get_tilingdata_preload():
     class_body += "    dc_preload((uint64_t *)tilingdata, offset);\n"
     class_body += "}\n\n"
     return class_body
-
 
 def _gen_tiling_copy_through_reserved_ub():
     class_body = get_tilingdata_preload()
@@ -1152,7 +1115,6 @@ def _gen_tiling_copy_through_reserved_ub():
     }
     """
     return class_body
-
 
 def _get_tiling_data_without_time_stamp(class_name):
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
@@ -1191,7 +1153,6 @@ def _get_tiling_data_without_time_stamp(class_name):
     class_body += "    decltype(((tiling_type *)0)->member) &var =                                      \\\n"
     class_body += "        reinterpret_cast<decltype(((tiling_type *)0)->member) &>(*(&__aux__##var));  \n\n"
     return class_body
-
 
 def _get_tiling_data_with_time_stamp(class_name):
     class_body = "#ifdef ASCENDC_TIME_STAMP_ON\n"
@@ -1237,7 +1198,6 @@ def _get_tiling_data_with_time_stamp(class_name):
     class_body += "#endif\n"
     return class_body
 
-
 def get_tiling_data_func_head():
     class_body = "#if defined(ASCENDC_CPU_DEBUG)\n"
     class_body += "template <class T>\n"
@@ -1248,7 +1208,6 @@ def get_tiling_data_func_head():
 *p_tilingdata, T *tilingdata)\n"
     class_body += "#endif\n"
     return class_body
-
 
 def get_tiling_data_func():
     class_body = "{\n"
@@ -1271,7 +1230,7 @@ p_tilingdata")
     class_body += "#else \n"
     class_body += "    __ubuf__ uint8_t *tilingdata_in_ub = (__ubuf__ uint8_t *)get_imm(0);\n"
     class_body += "    constexpr uint32_t len_burst = (all_bytes + 31) / 32;\n"
-    class_body += "#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102\n"
+    class_body += "#if __NPU_ARCH__ == 3510 \n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0, 0);\n"
     class_body += get_tilingdata_preload()
@@ -1305,7 +1264,6 @@ len_burst, 0, 0);\n"
     class_body += "}\n\n"
     return class_body
 
-
 def get_tiling_copy_func_and_micro(class_name):
     class_body = get_tiling_data_func_head()
     class_body += get_tiling_data_func()
@@ -1319,7 +1277,6 @@ def get_tiling_copy_func_and_micro(class_name):
         class_body += _get_tiling_data_with_time_stamp(class_name)
     return class_body
 
-
 def _change_param_name_to_name(inputs):
     for input_ele in inputs:
         if input_ele is None:
@@ -1331,7 +1288,6 @@ def _change_param_name_to_name(inputs):
         else:
             if "const_value" in input_ele.keys():
                 input_ele['name'] = input_ele.get('param_name')
-
 
 def gen_static_shape_v2(optype: str, tiling_struct: str, tiling_raw_data: str):
     class_name_upper = optype.upper()
@@ -1369,7 +1325,6 @@ def gen_static_shape_v2(optype: str, tiling_struct: str, tiling_raw_data: str):
     class_body += f"#endif // __{class_name_upper}_HEADER__\n"
     return class_body
 
-
 def gen_dynamic_shape_v2(optype:str, tiling_struct: str):
     class_name_upper = optype.upper()
     class_body = f"#ifndef __{class_name_upper}_HEADER__\n"
@@ -1403,7 +1358,6 @@ def gen_dynamic_shape_v2(optype:str, tiling_struct: str):
     class_body += f"#endif // __{class_name_upper}_HEADER__\n"
     return class_body
 
-
 def _set_runtime_soc_version():
     try:
         full_soc = get_soc_spec("FULL_SOC_VERSION")
@@ -1419,7 +1373,6 @@ def _set_runtime_soc_version():
     except Exception as e:
         LogUtil.print_compile_log("", f"ascendc cannot set runtime soc version: {e}", AscendCLogLevel.LOG_INFO)
         return
-
 
 def get_tiling_info_v2(op_info: OpInfo, tiling_key_list: list, default_tiling_struct: str,
                        tiling_struct_expr_map: dict, value_depends: dict = None, enable_vd=False):
@@ -1483,7 +1436,6 @@ def get_tiling_info_v2(op_info: OpInfo, tiling_key_list: list, default_tiling_st
             tiling_info.file_content = gen_dynamic_shape_v2(optype, "ascendc_trigger_tiling_struct")
     return tiling_info
 
-
 def get_isolate_tiling_info(op_type, json_file):
     tiling_info = TilingInfo()
     try:
@@ -1499,7 +1451,6 @@ def get_isolate_tiling_info(op_type, json_file):
             f"[Main process] load isolate tiling json file: {json_file} failed, exception info: {e}", \
             AscendCLogLevel.LOG_ERROR)
     return tiling_info
-
 
 def get_info_by_traverse_py_stack(op_info: OpInfo, input_tiling_info_dict: dict):
     # offline compile python file name, i.e. AddCustom.py
@@ -1550,7 +1501,6 @@ def get_info_by_traverse_py_stack(op_info: OpInfo, input_tiling_info_dict: dict)
                     AscendCLogLevel.LOG_WARNING)
             break
     return is_offline_op, is_build_in_op, custom_op_tiling_path
-
 
 def get_tiling_info_isolate(op_info: OpInfo, input_tiling_info_dict: dict):
     is_offline_op, is_build_in_op, custom_op_tiling_path = \
@@ -1619,8 +1569,6 @@ def get_tiling_info_isolate(op_info: OpInfo, input_tiling_info_dict: dict):
         input_tiling_info_dict["value_depends"], input_tiling_info_dict["enable_vd"], \
         input_tiling_info_dict["tiling_key_group_map"])
 
-
-
 def get_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_depends: dict = None, \
                     enable_vd=False, tiling_key_group_map: dict = None):
     """get tiling define and tiling data registered by operator developer
@@ -1636,7 +1584,6 @@ def get_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_depends
     """
     load_lib()
     return process_tiling_info(op_info, tiling_key_list, value_depends, enable_vd, tiling_key_group_map)
-
 
 def load_custom_lib(custom_op_tiling_path):
     try:
@@ -1660,7 +1607,6 @@ tiling_path: {custom_op_tiling_path}", AscendCLogLevel.LOG_ERROR)
         raise Exception(f"An Unknown error occurred, tiling_path: {custom_op_tiling_path}") from e
     return False
 
-
 def get_custom_tiling_info(op_info: OpInfo, input_tiling_info_dict: dict, custom_op_tiling_path):
     """get tiling define and tiling data registered by operator developer
 
@@ -1676,7 +1622,6 @@ def get_custom_tiling_info(op_info: OpInfo, input_tiling_info_dict: dict, custom
     return process_tiling_info(op_info, input_tiling_info_dict["tiling_key_list"], \
         input_tiling_info_dict["value_depends"], input_tiling_info_dict["enable_vd"], \
         input_tiling_info_dict["tiling_key_group_map"])
-
 
 def generate_dynamic_tiling_struct_file(optype, tiling_info, tiling_key_list, tiling_key_group_map):
     struct_tiling_def_base = {}
@@ -1728,7 +1673,6 @@ def generate_dynamic_tiling_struct_file(optype, tiling_info, tiling_key_list, ti
     tiling_info.tiling_info_completed = True
     return
 
-
 def get_static_run_info(op_info, context):
     _set_runtime_soc_version()
     _change_param_name_to_name(op_info.inputs)
@@ -1738,7 +1682,6 @@ def get_static_run_info(op_info, context):
     op_info.attrs.append(tiling_config)
     return do_op_tiling(op_info.op_type, compile_info, op_info.origin_inputs, \
         op_info.origin_outputs, None, None, op_info.attrs)
-
 
 def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key_list, tiling_key_group_map, \
                                        tiling_const_propagation: bool = False):
@@ -1787,14 +1730,12 @@ def generate_static_tiling_struct_file(optype, run_info, tiling_info, tiling_key
     tiling_info.tiling_info_completed = True
     return
 
-
 def static_post_process_of_workspace(context, run_info, workspace_size):
     if workspace_size >= 0:
         if len(run_info["workspaces"]) > 1:
             msg = "the num of workspace can not large than 1"
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, msg)
         context.add_workspace("total_workspace", size=workspace_size)
-
 
 def process_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_depends: dict = None, enable_vd=False,
     tiling_key_group_map: dict = None):
@@ -1826,7 +1767,6 @@ def process_tiling_info(op_info: OpInfo, tiling_key_list: list = None, value_dep
         context.add_workspace("total_workspace", size=-1)
     return tiling_info
 
-
 def get_master_tiling_key_from_group(tiling_key: str, tiling_key_group_map: dict = None):
     if tiling_key_group_map is None:
         return "", False
@@ -1837,7 +1777,6 @@ def get_master_tiling_key_from_group(tiling_key: str, tiling_key_group_map: dict
             if tiling_key_slave == tiling_key:
                 return tiling_key_master, True
     return "", False
-
 
 def _get_tiling_def_with_group(tiling_def: TilingDef, optype: str, tiling_key_master: str, \
                                tiling_key_group_map: dict):
@@ -1858,7 +1797,6 @@ def _get_tiling_def_with_group(tiling_def: TilingDef, optype: str, tiling_key_ma
 
     return tiling_def
 
-
 def get_tiling_declaration(optype: str):
     load_lib()
     tiling_info = TilingInfo()
@@ -1871,11 +1809,9 @@ def get_tiling_declaration(optype: str):
     tiling_info.tiling_info_completed = True
     return tiling_info
 
-
 def _add_time_stamp_codes(desc_id: str, space_len: int = 1):
     source = "    " * space_len
     return source + f"AscendC::PrintTimeStamp(static_cast<uint32_t>(AscendC::TimeStampId::{desc_id}));\n\n"
-
 
 def get_tiling_info_by_tiling(op_info: OpInfo, infered_info_from_ifile, value_depends: dict, origin_func_name):
     CommonUtility.print_compile_log(op_info.kernel_name, "get tiling info...", AscendCLogLevel.LOG_INFO)
