@@ -164,7 +164,7 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 
 ### L1->L0B
 
-L1 到 L0B 的搬运，所有产品均为 Nz 格式搬运，**无需兼容性适配**
+L1 到 L0B 的搬运，所有产品均为 Nz 格式搬运，**无需兼容性适配**，同时，用户也可以选择Ascend 950PR/Ascend 950DT中新增的Load2DV2接口进行搬运。
 
 ### Compute
 
