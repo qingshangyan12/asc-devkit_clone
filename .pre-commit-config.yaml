@@ -30,3 +30,14 @@ repos:
         types: [file]
         stages: [pre-commit]
         verbose: true
+
+  # Markdown 链接有效性检查
+  - repo: https://gitcode.com/gh_mirrors/lych/lychee.git
+    rev: lychee-v0.24.2
+    hooks:
+      - id: lychee
+        alias: markdown-link-check
+        name: Markdown link check
+        files: \.(md|markdown|mdx)$
+        args: ["--no-progress", "--config", "markdown-link-check.toml"]
+        stages: [pre-commit, manual]
