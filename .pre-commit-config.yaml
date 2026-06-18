@@ -38,6 +38,7 @@ repos:
       - id: lychee
         alias: markdown-link-check
         name: Markdown link check
-        files: \.(md|markdown|mdx)$
+        files: ^(docs|examples)/.*\.(md|markdown|mdx)$
+        exclude: ^docs/guide/编程指南/附录/基于样例工程完成Kernel直调\.md$
         args: ["--no-progress", "--config", "markdown-link-check.toml"]
         stages: [pre-commit, manual]

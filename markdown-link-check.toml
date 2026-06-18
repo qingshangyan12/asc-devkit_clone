@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 # Markdown link checker configuration for lychee.
-# The hook runs during pre-commit and can also be invoked manually for full scans.
+# The hook runs during pre-commit and can also be invoked manually for full docs/examples scans.
 
 verbose = "warn"
 no_progress = true
