@@ -7051,8 +7051,8 @@
     ]
   },
   {
-    "case": "04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming",
-    "runner": "scripts/presmoke/cases/04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming/run.sh",
+    "case": "04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming",
+    "runner": "scripts/presmoke/cases/04_aicpu/02_features/00_framework/00_pytorch/tiling_sink_programming/run.sh",
     "source": "readme",
     "confidence": "medium",
     "supported_archs": [
