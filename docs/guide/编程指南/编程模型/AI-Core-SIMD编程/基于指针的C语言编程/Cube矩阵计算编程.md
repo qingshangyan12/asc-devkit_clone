@@ -18,29 +18,29 @@ Cube矩阵计算整体分为数据搬入、数据加载、矩阵计算、数据�
 
 - 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
 
-```c
-__global__ __cube__ void add_custom(...)
-{
-    constexpr uint32_t m_size = 128;
-    constexpr uint32_t n_size = 128;
-    constexpr uint32_t k_size = 256;
-    // Allocate L1A/B Buffer
-    __cbuf__ half static_l1a_buffer[m_size * k_size];
-    __cbuf__ half static_l1b_buffer[n_size * k_size];
-    // Allocate L0A/B/C Buffer
-    __ca__ half static_l0a_buffer[m_size * k_size];
-    __cb__ half static_l0b_buffer[n_size * k_size];
-    __cc__ half static_l0c_buffer[m_size * n_size];
+  ```c
+  __global__ __cube__ void add_custom(...)
+  {
+      constexpr uint32_t m_size = 128;
+      constexpr uint32_t n_size = 128;
+      constexpr uint32_t k_size = 256;
+      // Allocate L1A/B Buffer
+      __cbuf__ half static_l1a_buffer[m_size * k_size];
+      __cbuf__ half static_l1b_buffer[n_size * k_size];
+      // Allocate L0A/B/C Buffer
+      __ca__ half static_l0a_buffer[m_size * k_size];
+      __cb__ half static_l0b_buffer[n_size * k_size];
+      __cc__ half static_l0c_buffer[m_size * n_size];
 
-    // ... Use Buffer for matrix computation
-}
-```
+      // ... Use Buffer for matrix computation
+  }
+  ```
 
 ### 矩阵计算内存布局
 
 Cube单元采用分块计算逻辑，硬件最小计算粒度为分形块，可并行处理多个分形。分形块大小取决于数据类型：对于half类型，分形形状为16×16（32B/sizeof(half)=16）；对于int8类型，分形形状为16×32或32×16（32B/sizeof(int8)=32）。传统行主序、列主序等线性存储模式下，读取分形块时会产生大量非连续内存访问，大幅降低访存效率。
 为解决该问题，昇腾引入矩阵分形存储格式。软件层会对数据重新排布，让每个分形块在物理内存中连续存储，硬件单次读取即可加载整块数据，消除零散寻址带来的开销，有效提升数据吞吐能力。
-分形粒度是Cube单元的基础计算规范，Atlas A3 训练系列产品/Atlas A3 推理系列产品、Ascend 950PR/Ascend 950DT全系列产品均遵循该规范，但具体分形形状因数据类型而异。昇腾Cube单元为极致发挥算力，采用不同于通用CPU的存储规则，输入、输出数据都需要匹配指定分形格式。使用Ascend C的Mmad接口开发算子时，掌握各类分形格式，是保证数据搬运、分块逻辑正确以及性能优化的关键。
+分形粒度是Cube单元的基础计算规范，[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)、[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)全系列产品均遵循该规范，但具体分形形状因数据类型而异。昇腾Cube单元为极致发挥算力，采用不同于通用CPU的存储规则，输入、输出数据都需要匹配指定分形格式。使用Ascend C的Mmad接口开发算子时，掌握各类分形格式，是保证数据搬运、分块逻辑正确以及性能优化的关键。
 
 为便于理解与记忆，文档采用“大Y小x”的直观命名法：
 - 大Y（Z/N）：表示分形矩阵之间的排列顺序（Z为行主序，N为列主序）。
@@ -50,11 +50,11 @@ Cube单元采用分块计算逻辑，硬件最小计算粒度为分形块，可�
 
 矩阵分形格式用于定义多维张量在内存中的排布规则。受硬件读取逻辑影响，不同产品型号对矩阵乘法 C = A × B 的格式要求存在差异：
 
-- 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式。如图1所示：
+- 针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，矩阵乘法C = A × B要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式。如图1所示：
 
 <img src="../../../../figures/矩阵乘法场景设计的数据格式.png" alt="矩阵乘法场景设计的数据格式" width="800" />
 
-- 针对Ascend 950PR/Ascend 950DT，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图2所示：
+- 针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，矩阵乘法C = A × B要求：左矩阵A使用Nz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图2所示：
 
 <img src="../../../../figures/矩阵乘法场景涉及的数据格式.png" alt="矩阵乘法场景涉及的数据格式" width="800" />
 
@@ -63,7 +63,7 @@ Cube单元采用分块计算逻辑，硬件最小计算粒度为分形块，可�
 ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube计算单元。
 
 #### Nz 格式
-Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对Ascend 950PR/Ascend 950DT，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
+Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
 <img src="../../../../figures/Nz数据排布格式.png" alt="Nz数据排布格式" width="400" />
 
@@ -73,11 +73,11 @@ Nz是Ascend架构的中间格式，介于线性数据(ND)和计算专用数据(Z
 > 📌 Nz格式在不同Buffer中的应用场景：
 > - **L0C Buffer**: 存储矩阵乘法结果。分形形状取决于数据类型：half为16×16（256元素），int8为16×32或32×16。适合Cube计算单元高效运算。
 > - **L1 Buffer**: 存储中间数据。分形形状为16×(32B/sizeof(DataType))，便于转换为Zz和Zn格式。对于half类型，大小为16×16=256元素（512字节）；对于int8类型，大小为16×32或32×16=512元素（512字节）。
-> - **L0A Buffer（仅Ascend 950PR/Ascend 950DT）**: 存储左矩阵。
+> - **L0A Buffer（仅[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)）**: 存储左矩阵。
 
 #### Zz 格式
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，L0A Buffer使用此格式（Ascend 950PR/Ascend 950DT使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
+针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，L0A Buffer使用此格式（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用Nz格式）。该格式采用大Z（外部行主序）+ 小z（内部行主序）。
 
 <img src="../../../../figures/Zz格式-以half类型为例.png" alt="Zz 格式(以half类型为例)" width="400" />
 
@@ -113,7 +113,7 @@ Global Memory中的原始数据为ND通用线性格式，而L1 Buffer要求使�
   Z字流动：每个16×16的小方块内部，以及方块之间，均按照特定的Z字形顺序存储（如图中折线箭头所示），完成了从“线性”到“分形”的物理映射，做好了进入Cube计算的准备。
 
 Ascend C编程中直接提供了`Global Memory`到`L1 Buffer`中的C语言编程接口，通过该接口可以直接将`Global Memory`数据搬入`L1 Buffer`并完成ND2NZ格式转换。
-C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在Ascend 950PR/Ascend 950DT上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN到Nz的格式转换搬运。
+C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来完成GM2L1的搬运，并随路完成ND2NZ的格式转换处理。另外在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)上，新增了`asc_copy_gm2l1_dn2nz`的能力，支持从DN到Nz的格式转换搬运。
 
 ## 矩阵搬运能力说明
 
@@ -127,8 +127,10 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 | 数据通路 | 功能    | C语言编程接口  | 分行支持情况 |
 |---------|---------|---------------|-------------|
 | Global Memory → L1 Buffer   | 随路转换ND2NZ搬运  | `asc_copy_gm2l1_nd2nz` | ![ND->Nz](../../../../figures/ND-Nz.png) |
-| L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0A Buffer中  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png)<br>Ascend 950PR/Ascend 950DT上L0A分形为Nz，搬运时为Nz-Nz |
+| L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0A Buffer中  | `asc_copy_l12l0a` | ![Nz->Zz](../../../../figures/Nz-Zz.png)<br>[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)上L0A分形为Nz，搬运时为Nz-Nz |
 | L1 Buffer → L0A Buffer  | 将L1 Buffer数据搬运到L0B Buffer中  | `asc_copy_l12l0b` | ![Nz->Zn](../../../../figures/Nz-Zn.png)|
+
+[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)
 
 #### GM2L1 随路转换ND2NZ搬运
 
@@ -136,7 +138,7 @@ C语言编程提供了`asc_set_gm2l1_nz_para`和`asc_copy_gm2l1_nd2nz`接口来�
 
 <img src="../../../../figures/GM到L1的ND2NZ搬运示例.png" alt="GM到L1的ND2NZ搬运示例" width="700" />
 
-以上图为例，实现A矩阵（Shape(16, 23)，数据类型为half）从GM搬运到L1的能力，针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，调用接口如下：
+以上图为例，实现A矩阵（Shape(16, 23)，数据类型为half）从GM搬运到L1的能力，针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)，调用接口如下：
 
 ```c
 // Allocate L1 Buffer space, m direction is 16, k direction 23 aligned up to 32
@@ -171,7 +173,7 @@ asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value, src
 
 #### L12L0 数据搬运
 
-该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分型转换到Zz或Zn格式，C语言编程提供了`asc_copy_l12l0a`和`asc_copy_l12l0b`接口。其中针对Ascend 950PR/Ascend 950DT的`asc_copy_l12l0a`接口可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
+该能力主要实现将矩阵从L1 Buffer搬运至L0A/L0B Buffer并支持从Nz分型转换到Zz或Zn格式，C语言编程提供了`asc_copy_l12l0a`和`asc_copy_l12l0b`接口。其中针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)的`asc_copy_l12l0a`接口可将L1 Buffer中512B大小的矩阵搬运到L0A Buffer，支持2D搬运、转置搬运、3D搬运等模式。
 
 <img src="../../../../figures/L12L0A非转置搬运.png" alt="L12L0A非转置搬运" width="700" />
 
@@ -195,7 +197,7 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_ste
 
 搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
 
-当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（Ascend 950PR/Ascend 950DT），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
+当输入A矩阵（Global Memory）是转置排布(K × M)时，搬入到`L1 Buffer`为(K × N)排布的Nz分形。要使`L0A Buffer`存放(M × K)的Zz或Nz格式（[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)），需要在L12L0A时进行转置，调用`asc_copy_l12l0a_transpose`接口。
 
 <img src="../../../../figures/需要转置的处理场景.png" alt="需要转置的处理场景" width="800" />
 
@@ -206,23 +208,23 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 ### 矩阵数据搬出
 
-矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换（NZ2ND）、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用。而针对Ascend 950PR/Ascend 950DT还支持L0C到UB Buffer的传输、NZ2DN格式转换以及UB双目标模式，矩阵搬出能力如下图所示：
+矩阵搬出接口实现L0C到Global Memory或L1 Buffer的数据传输，支持随路量化、ReLU、格式转换（NZ2ND）、通道拆分合并等操作，开发者通过配置参数控制搬运路径、位置、长度等以充分利用硬件能力，通常在Mmad接口后使用。而针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)还支持L0C到UB Buffer的传输、NZ2DN格式转换以及UB双目标模式，矩阵搬出能力如下图所示：
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
+针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)：
 
 <img src="../../../../figures/矩阵搬出流程-AtlasA2A3.png" alt="矩阵搬出流程" width="800" />
 
-针对Ascend 950PR/Ascend 950DT：
+针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)：
 
 <img src="../../../../figures/矩阵搬出流程-Ascend950PR.png" alt="矩阵搬出流程" width="800" />
 
-矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图展示了这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对Ascend 950PR/Ascend 950DT，还额外支持NZ2DN格式转换。
+矩阵搬出接口支持多种随路能力的灵活组合，以L0C到Global Memory的搬运场景为例：矩阵计算结果暂存于L0C Buffer后需搬运至GM，在此过程中可协同执行随路量化、ReLU激活、格式转换及通道拆分合并等操作。下图展示了这些随路能力的有效组合、中间数据类型及完整数据路径。例如，L0C中的F32数据可通过QF322B8_PRE随路量化得到B8数据，可选使能ReLU后经NZ2NZ/NZ2ND格式转换输出至GM。图中F32→F16和F32→BF16为数据类型转换，其余路径为随路scalar/vector量化模式；针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，还额外支持NZ2DN格式转换。
 
-针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：
+针对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)：
 
 <img src="../../../../figures/L0C2GM搬运-AtlasA2A3.png" alt="L0C2GM搬运" width="800" />
 
-针对Ascend 950PR/Ascend 950DT：
+针对[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)：
 
 <img src="../../../../figures/L0C2GM搬运-Ascend950PR.png" alt="L0C2GM搬运" width="800" />
 
@@ -256,9 +258,9 @@ __aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
 
 `asc_mmad`是Ascend C封装NPU硬件能力的核心矩阵乘加接口，广泛应用于全连接、卷积等算子，实现C = A × B + C运算。计算输入取自L0A Buffer、L0B Buffer，结果写入L0C Buffer。不同产品对应的缓存分形格式前文已说明。
 
-![Ascend 950PR/Ascend 950DT `asc_mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
+![[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) `asc_mmad`计算](../../../../figures/Ascend950PR-Ascend950DT-asc_mmad计算.png)
 
-表 矩阵计算矩阵A、B、C解释说明(Ascend 950PR/Ascend 950DT)
+表 矩阵计算矩阵A、B、C解释说明([NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md))
 | 矩阵计算逻辑 | 矩阵计算物理位置 | 维度 | 输入/输出数据格式 | 数据类型 |
 |-------------|-----------------|------|------------------|---------|
 | A | L0A Buffer | M × K | Nz | 数据类型 |
@@ -301,7 +303,7 @@ asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_
 ## 矩阵计算的同步
 
 AI Core内部的搬运、计算单元均为异步并行工作，多个单元访问同一片存储资源时会产生数据依赖。因此Cube计算必须借助流水同步接口管控执行时序。
-矩阵计算的四个阶段分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_MTE3四条流水线，需要使用核内同步接口保证流程串行执行。在Ascend 950PR/Ascend 950DT产品中，可使用`asc_lock`与`asc_unlock`接口实现全流程同步控制。
+矩阵计算的四个阶段分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_MTE3四条流水线，需要使用核内同步接口保证流程串行执行。在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品中，可使用`asc_lock`与`asc_unlock`接口实现全流程同步控制。
 
 ```c
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)

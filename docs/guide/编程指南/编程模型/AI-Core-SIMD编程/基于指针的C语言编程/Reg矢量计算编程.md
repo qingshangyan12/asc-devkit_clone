@@ -1,6 +1,6 @@
 # Reg矢量计算编程<a name="ZH-CN_TOPIC_0000002600000001"></a>
 
-> 📌 **提示**：Reg矢量编程仅在Ascend 950PR/Ascend 950DT进行SIMD矢量计算编程时支持。
+> 📌 **提示**：Reg矢量编程仅在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)进行SIMD矢量计算编程时支持。
 
 本文介绍如何在Ascend C中使用语言扩展C API进行寄存器级**矢量计算编程**，该能力面向已经熟悉[Ascend C编程模型](../../编程模型概述.md)的开发者。这种基于硬件寄存器的编程方式称为Reg矢量计算编程。
 
@@ -20,7 +20,7 @@
 
 ### Reg矢量计算的定位
 
-为了突破上述Memory矢量编程瓶颈限制，Ascend 950PR/Ascend 950DT在硬件中新增了一级缓存**SIMD Register File**（以下简称寄存器）这一级存储；Reg矢量编程正是面向这一级寄存器的编程方式。其核心思想是：将一段连续的矢量计算保留在寄存器中完成，仅在进入和退出这段计算时与UB交互一次，中间结果可不再回写UB。
+为了突破上述Memory矢量编程瓶颈限制，[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)在硬件中新增了一级缓存**SIMD Register File**（以下简称寄存器）这一级存储；Reg矢量编程正是面向这一级寄存器的编程方式。其核心思想是：将一段连续的矢量计算保留在寄存器中完成，仅在进入和退出这段计算时与UB交互一次，中间结果可不再回写UB。
 
 Reg矢量计算与Memory矢量计算的对比如下：
 
@@ -156,7 +156,7 @@ for (i = 0; i < repeat_times; ++i) {
 
 寄存器根据功能类型主要分以下五类，在实际编程代码中，寄存器作为变量直接使用，由编译器自动分配到硬件寄存器。
 
-| 寄存器类型 | 变量类型定义 | Ascend 950PR/Ascend 950DT |
+| 寄存器类型 | 变量类型定义 | [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) |
 | --- | --- | --- |
 | 矢量数据寄存器 | `vector_*`，例如vector_float | VL = 256B |
 | 掩码寄存器 | `vector_bool` | VL/8 = 32B |
@@ -166,7 +166,7 @@ for (i = 0; i < repeat_times; ++i) {
 
 #### 矢量数据寄存器
 
-在Ascend 950PR/Ascend 950DT中，矢量数据寄存器宽度为VL = 256B，按数据类型解释其中元素数量。
+在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)中，矢量数据寄存器宽度为VL = 256B，按数据类型解释其中元素数量。
 
 
 | 位宽      | 矢量数据类型| 元素数 |
@@ -421,7 +421,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
 非对齐搬运是指UB地址非对齐，但仍需要在UB和矢量数据寄存器之间连续读写数据的场景。在直接与非对齐UB地址进行数据搬运时，硬件性能会急剧下降，为了提升此场景性能，通过`vector_load_unalign` / `vector_store_unalign`作为临时缓存，保存跨对齐边界的数据，通过多轮循环拼接成对齐地址的读写，减少直接访问非对齐UB地址的次数，从而减少非对齐访问的额外开销。
 
 **非对齐搬入**由[`asc_loadunalign_pre`](../../../../../api/c_api/reg/reg_load/asc_loadunalign_pre.md)和[`asc_loadunalign`](../../../../../api/c_api/reg/reg_load/asc_loadunalign.md)组合完成：
-例如在Ascend 950PR/Ascend 950DT，当想要搬入如下UB地址为48开始的256Bytes数据时:
+例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬入如下UB地址为48开始的256Bytes数据时:
 
 **图6** 非对齐搬入预期
 
@@ -440,7 +440,7 @@ for (uint16_t i = 0; i < repeat_times; ++i) {
    ![](../../../../figures/Reg非对齐读4.png "Reg非对齐读4")
 
 **非对齐搬出**由[`asc_storeunalign`](../../../../../api/c_api/reg/reg_store/asc_storeunalign.md)和[`asc_storeunalign_post`](../../../../../api/c_api/reg/reg_store/asc_storeunalign_post.md)组合完成：循环内使用`asc_storeunalign`搬运，循环结束后由`asc_storeunalign_post`将`vector_store_unalign`中的尾部数据搬出到UB。
-例如在Ascend 950PR/Ascend 950DT，当想要搬出如下UB地址为48开始的512Bytes数据时：
+例如在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)，当想要搬出如下UB地址为48开始的512Bytes数据时：
 
 **图9** 非对齐搬出预期
 
@@ -680,6 +680,6 @@ VF融合可以分成两个层级：
 
 ## 小结<a name="section_part7"></a>
 
-Reg矢量计算编程基于Ascend 950PR/Ascend 950DT新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
+Reg矢量计算编程基于[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增的SIMD Register File开放的寄存器级编程能力，使开发者直接组织寄存器搬运、计算、掩码控制和同步操作。它以`__aicore__`和`__simd_vf__`两层执行域为基本结构，其中`__aicore__`侧负责整体任务组织、数据切分和VF调用，`__simd_vf__`侧通过五类寄存器及其配套API完成细粒度矢量计算。
 
 实际开发时，Reg矢量计算不仅要关注接口本身，还需要结合硬件执行特征开发代码。优先使用对齐搬运，保持循环满足Hardware Loop识别规范，并在寄存器资源允许的范围内进行VF融合，通常可以减少搬运、同步和循环启动开销，从而获得更稳定的性能表现。

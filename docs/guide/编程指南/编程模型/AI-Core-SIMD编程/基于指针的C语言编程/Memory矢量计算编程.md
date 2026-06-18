@@ -1,6 +1,6 @@
 ﻿# Memory矢量计算编程<a name="ZH-CN_TOPIC_0000002600000002"></a>
 
-本文介绍基于统一缓存（Unified Buffer，下文简称UB）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。Atlas A3 训练系列产品/Atlas A3 推理系列产品原生支持完整的UB直接编程能力；Ascend 950PR/Ascend 950DT引入寄存器计算能力，推荐使用Reg矢量计算编程以获得更高性能。
+本文介绍基于统一缓存（Unified Buffer，下文简称UB）的Ascend C矢量计算开发方法，该计算能力简称Memory矢量计算编程，是Ascend C中最基础、应用最广泛的矢量编程方式。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)原生支持完整的UB直接编程能力；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器计算能力，推荐使用Reg矢量计算编程以获得更高性能。
 
 ## Memory矢量编程的基本步骤
 
@@ -16,33 +16,33 @@ Memory矢量计算依托本地内存中的UB完成运算，开发者需先将输
 
 - 静态申请：分配固定大小的内存空间，空间尺寸在编译阶段确定，运行时无法修改。
 
-```c
-__global__ __vector__ void add_custom(...)
-{
-    constexpr uint32_t ub_size = 256;
-    __ubuf__ half static_buffer[ub_size];  // Compiler automatically aligns to 32 bytes
-}
-```
+    ```c
+    __global__ __vector__ void add_custom(...)
+    {
+        constexpr uint32_t ub_size = 256;
+        __ubuf__ half static_buffer[ub_size];  // Compiler automatically aligns to 32 bytes
+    }
+    ```
 
 - 动态申请：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
 
-```c
-// Device-side: declare dynamic shared memory
-__global__ __vector__ void add_custom(...)
-{
-    extern __ubuf__ half dynamic_buf[];
-    // ...
-}
+    ```c
+    // Device-side: declare dynamic shared memory
+    __global__ __vector__ void add_custom(...)
+    {
+        extern __ubuf__ half dynamic_buf[];
+        // ...
+    }
 
-// Host-side: specify dynamic shared memory size via third parameter in <<<>>>
-int32_t main(int argc, char const *argv[])
-{
-    // ...
-    uint32_t dyn_ubuf_size = 1024 * sizeof(char);
-    add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
-    // ...
-}
-```
+    // Host-side: specify dynamic shared memory size via third parameter in <<<>>>
+    int32_t main(int argc, char const *argv[])
+    {
+        // ...
+        uint32_t dyn_ubuf_size = 1024 * sizeof(char);
+        add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
+        // ...
+    }
+    ```
 
 ## Memory数据搬运
 
@@ -120,7 +120,7 @@ uint16_t dst_stride = 2;
 asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 ```
 
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A3 训练系列产品/Atlas A3 推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入，[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 **非对齐搬运**: 基础高维切分接口要求GM的数据长度与地址间隔均按32字节对齐，无法适配非对齐场景。例如将数据改为形状(16, 200)、类型为half的src_gm后，asc_copy_gm2ub无法实现隔行搬运。针对该场景，Ascend C提供`asc_copy_gm2ub_align`非对齐搬运接口，支持以字节为单位配置数据块长度与地址步长，突破32字节对齐限制。
 
@@ -144,7 +144,7 @@ uint8_t right_padding_num = 3;
 
 asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, false, 0, src_stride, dst_stride);
 ```
-> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从Ascend 950PR/Ascend 950DT引入，Atlas A3 训练系列产品/Atlas A3 推理系列产品使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
+> 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入，[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
 以上为GM向UB的数据搬入逻辑，UB向GM的数据搬出可使用同系列接口实现。更多搬运接口说明可参考[API手册](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矢量数据搬运/)。
 
@@ -167,7 +167,7 @@ Memory矢量计算包含连续计算和高维切分计算两种模式，同时�
 
 若设置repeat_time（迭代次数）为2，单元将执行两轮迭代，总处理数据量为2 × 8 × 32字节 = 512字节；若数据类型为half（2字节 / 元素），则对应处理256个元素。
 
-> 📌 硬件约束：repeat_time取值范围为1~255，该约束对Atlas A3 训练系列产品/Atlas A3 推理系列产品、Ascend 950PR/Ascend 950DT全系列产品生效。
+> 📌 硬件约束：repeat_time取值范围为1~255，该约束对[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)、[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)全系列产品生效。
 
 <img src="../../../../figures/2次迭代Exp计算_c.png" alt="2次迭代Exp计算" width="800" />
 
@@ -242,56 +242,53 @@ asc_add_scalar(dst_ub, src0_ub, scalar_value, 1, 1, 1, 1, 8, 8, 8);
 asc_set_mask_normal();
 ```
 
-在**Normal计算**模式中，MASK寄存器会作为每个Repeat的掩码使用。只有高维切分支持此模式，在接口上区分为逐bit模式和连续模式。
-> 📌 Normal为默认模式。若未发生模式切换，则无需重复配置该模式。
-
-在Normal计算模式下，mask参数用来控制单次迭代内参与计算的元素个数，可通过`asc_set_vector_mask`来设置mask的值。
+在Normal计算模式（默认模式，若未发生模式切换则无需重复配置）中，MASK寄存器会作为每个Repeat的掩码使用，mask参数可通过`asc_set_vector_mask`设置以控制单次迭代内参与计算的元素个数；只有高维切分支持此模式，在接口上区分为单次迭代内连续模式和单次迭代内逐bit模式。
 
 - 单次迭代内连续模式：表示前n个连续元素参与计算。取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。
 
-> **mask范围推导**：Vector计算单元单次迭代固定处理32B × 8 block = 256B数据，因此mask最大值 = 256B / sizeof(DataType)。当操作数为16位（sizeof=2B）时，mask∈[0, 128]（256/2=128）；当操作数为32位（sizeof=4B）时，mask∈[0, 64]（256/4=64）；当操作数为64位（sizeof=8B）时，mask∈[0, 32]（256/8=32）。此推导规则可推广至其他数据类型（如bfloat16=16bit→mask上限128，fp32=32bit→mask上限64）。
+    > **mask范围推导**：Vector计算单元单次迭代固定处理32B × 8 block = 256B数据，因此mask最大值 = 256B / sizeof(DataType)。当操作数为16位（sizeof=2B）时，mask∈[0, 128]（256/2=128）；当操作数为32位（sizeof=4B）时，mask∈[0, 64]（256/4=64）；当操作数为64位（sizeof=8B）时，mask∈[0, 32]（256/8=32）。此推导规则可推广至其他数据类型（如bfloat16=16bit→mask上限128，fp32=32bit→mask上限64）。
 
-连续模式下，mask超出范围按照对应数据类型下mask最大值计算；mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）；若设置为负值可能产生未定义行为。
+    连续模式下，mask超出范围按照对应数据类型下mask最大值计算；mask = 0表示指令不会执行计算操作，该接口将被视为NOP（空操作）；若设置为负值可能产生未定义行为。
 
-该模式下，可以指定单次迭代内计算前n个连续元素，其他数据不参与计算。例如：对src数据(shape(256)，数据类型为half)，该数据需通过2次迭代计算完（每次迭代计算128个元素），可通过设置mask = 100，表示第1次迭代计算[0, 99]范围的元素，第2次迭代计算[128, 227]范围的元素参与计算，其他元素不参与计算。
+    该模式下，可以指定单次迭代内计算前n个连续元素，其他数据不参与计算。例如：对src数据(shape(256)，数据类型为half)，该数据需通过2次迭代计算完（每次迭代计算128个元素），可通过设置mask = 100，表示第1次迭代计算[0, 99]范围的元素，第2次迭代计算[128, 227]范围的元素参与计算，其他元素不参与计算。
 
-<img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
+    <img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
 
-```c
-__ubuf__ half dst_ub[256];
-__ubuf__ half src0_ub[256];
-__ubuf__ half src1_ub[256];
-half scalar_value = 1.0;
+    ```c
+    __ubuf__ half dst_ub[256];
+    __ubuf__ half src0_ub[256];
+    __ubuf__ half src1_ub[256];
+    half scalar_value = 1.0;
 
-// 1. Data transfer (temporarily omitted)
-// 2. Use high-dimensional segmentation API for computation
-// 2.1 Set mask Normal mode
-asc_set_mask_normal();
-// 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
-asc_set_vector_mask(0, static_cast<uint64_t>(100)); 
-asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
-```
+    // 1. Data transfer (temporarily omitted)
+    // 2. Use high-dimensional segmentation API for computation
+    // 2.1 Set mask Normal mode
+    asc_set_mask_normal();
+    // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
+    asc_set_vector_mask(0, static_cast<uint64_t>(100)); 
+    asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
+    ```
 
 - 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 264-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 264-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 232-1]。
 
-该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。
-以src数据(shape(256)，数据类型为half)为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：
+    该模式下，可以指定maskHigh和maskLow的值，来处理各种掩码操作。如需进行交错计算，则mask设置成01010101...或者10101010...模式即可。
+    以src数据(shape(256)，数据类型为half)为例，通过设置逐bit的掩码，可在单迭代中选取特定bit位的数值参与计算：
 
-<img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
+    <img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
 
-```c
-__ubuf__ half dst_ub[256];
-__ubuf__ half src0_ub[256];
-__ubuf__ half src1_ub[256];
+    ```c
+    __ubuf__ half dst_ub[256];
+    __ubuf__ half src0_ub[256];
+    __ubuf__ half src1_ub[256];
 
-// 1. Data transfer (temporarily omitted)
-// 2. Use high-dimensional segmentation API for computation
-// 2.1 Set mask Normal mode
-asc_set_mask_normal();
-// 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
-asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000); 
-asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
-```
+    // 1. Data transfer (temporarily omitted)
+    // 2. Use high-dimensional segmentation API for computation
+    // 2.1 Set mask Normal mode
+    asc_set_mask_normal();
+    // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
+    asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000); 
+    asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
+    ```
 
 ### 连续计算
 
@@ -303,7 +300,7 @@ asc_add(z, x, y, 4096); // 4096: number of consecutive elements involved in addi
 
 ## Memory矢量计算同步控制
 
-AI Core内部的MTE2搬运单元、矢量计算单元等均为异步并行运行，多个单元读写同一块存储资源时会产生数据依赖。因此Memory矢量计算必须借助流水同步接口，保障流程正常执行。Memory矢量计算流程比矩阵计算更简洁，分为数据搬入、计算、数据搬出三个阶段，分别对应流水线PIPE_MTE2、PIPE_V、PIPE_MTE3，需通过核内同步接口约束执行顺序，保证流程串行执行。在Ascend 950PR/Ascend 950DT产品中，可使用`asc_lock`与`asc_unlock`接口实现三阶段的同步控制。以下为矢量加法的完整示例：
+AI Core内部的MTE2搬运单元、矢量计算单元等均为异步并行运行，多个单元读写同一块存储资源时会产生数据依赖。因此Memory矢量计算必须借助流水同步接口，保障流程正常执行。Memory矢量计算流程比矩阵计算更简洁，分为数据搬入、计算、数据搬出三个阶段，分别对应流水线PIPE_MTE2、PIPE_V、PIPE_MTE3，需通过核内同步接口约束执行顺序，保证流程串行执行。在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品中，可使用`asc_lock`与`asc_unlock`接口实现三阶段的同步控制。以下为矢量加法的完整示例：
 
 ```c
 __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)

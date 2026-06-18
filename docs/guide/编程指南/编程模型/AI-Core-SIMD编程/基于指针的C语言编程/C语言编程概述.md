@@ -12,7 +12,7 @@ AI Core采用分级存储架构，不同计算单元的编程视角有所差异�
 
 **Cube矩阵计算**：采用「Global Memory → L1/L0系列Buffer」两级层级，其中L1 Buffer、L0A/L0B Buffer、L0C Buffer均服务于矩阵计算。
 
-**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；Ascend 950PR/Ascend 950DT引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级。Global Memory存放输入输出数据，Unified Buffer作为矢量计算数据中间缓存，Register位于Vector计算单元最内层，直接与矢量计算执行单元交互。
+**Vector矢量计算**：传统架构采用「Global Memory → UB」两级层级；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器后构建「Global Memory → Unified Buffer → Register」三级层级。Global Memory存放输入输出数据，Unified Buffer作为矢量计算数据中间缓存，Register位于Vector计算单元最内层，直接与矢量计算执行单元交互。
 
 <img src="../../../../figures/AI_Core存储层次结构_c.png" alt="AI Core存储层次结构" width="800" />
 
@@ -116,9 +116,7 @@ __global__ __vector__ void add_custom(...) {
 
 #### AIV内部存储之Register File
 
-Ascend 950PR/Ascend 950DT新一代架构引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
-
-> 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
+[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入寄存器可编程能力，Vector计算单元的所有计算均需经「GM → UB → Register」三级数据流转，在寄存器上完成矢量计算。C语言编程通过直接定义寄存器变量方式进行寄存器编程。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中，有关寄存器类型等描述。
 
 
 #### AIC内部存储L1 Buffer & L0 Buffer
@@ -156,7 +154,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 **表 1** 不同产品型号的分形格式对比
 
-| 存储单元 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | Ascend 950PR/Ascend 950DT |
+| 存储单元 | [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md) | [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) |
 |---------|----------------------------|---------------------------|
 | L1 Buffer | Nz | Nz |
 | L0A Buffer | Zz | Nz |
@@ -169,7 +167,7 @@ __cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
 
 #### Bank冲突
 
-上文介绍了各类内部存储的定义、排布格式。由于AI Core内部存储采用Bank分组架构，不当的内存访问会引发Bank冲突，进而降低算子性能。下面以Unified Buffer为例，介绍Bank冲突的相关原理，在Ascend 950PR/Ascend 950DT产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。Atlas A3 训练系列产品/Atlas A3 推理系列产品的UB容量规格请参考相应硬件架构文档。
+上文介绍了各类内部存储的定义、排布格式。由于AI Core内部存储采用Bank分组架构，不当的内存访问会引发Bank冲突，进而降低算子性能。下面以Unified Buffer为例，介绍Bank冲突的相关原理，在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品上，Unified Buffer总大小为256KB（256 × 1024字节），包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)的UB容量规格请参考相应硬件架构文档。
 
 <img src="../../../../figures/UB_Bank冲突示意图.png" alt="UB Bank冲突示意图" width="800" />
 
@@ -227,8 +225,8 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 | 同步类型 | 核心作用及场景说明 | 关键接口 | 实现代码示例 |
 |---------|-------------------|---------|-------------|
-| 多流水同步（机制一） | 通过"锁定-释放"指定流水的方式，解决核内异步流水间的同步依赖问题；该机制功能类似于传统CPU的锁机制，是Ascend 950PR/Ascend 950DT新引入的同步方式，相较于notify/wait更易使用。 | `asc_lock` & `asc_unlock` | `uint8_t mutex_id = 1;`<br>`asc_lock(PIPE_MTE2, mutex_id);`<br>`asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_unlock(PIPE_MTE2, mutex_id);`<br>`asc_lock(PIPE_V, mutex_id);`<br>`asc_add(shared_buffer, x_local, y_local);`<br>`asc_unlock(PIPE_V, mutex_id);` |
-| 多流水同步（机制二） | 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。Ascend 950PR/Ascend 950DT引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。 | `asc_sync_notify` & `asc_sync_wait` | `asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_add(dst, src1, src0, total_length);` |
+| 多流水同步（机制一） | 通过"锁定-释放"指定流水的方式，解决核内异步流水间的同步依赖问题；该机制功能类似于传统CPU的锁机制，是[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新引入的同步方式，相较于notify/wait更易使用。 | `asc_lock` & `asc_unlock` | `uint8_t mutex_id = 1;`<br>`asc_lock(PIPE_MTE2, mutex_id);`<br>`asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_unlock(PIPE_MTE2, mutex_id);`<br>`asc_lock(PIPE_V, mutex_id);`<br>`asc_add(shared_buffer, x_local, y_local);`<br>`asc_unlock(PIPE_V, mutex_id);` |
+| 多流水同步（机制二） | 通过notify与wait机制实现两条流水间的同步等待，用于核内异步流水的同步协调。[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入mutex机制后，仍保持对该接口的兼容支持，但优先推荐使用mutex机制进行多流水同步。 | `asc_sync_notify` & `asc_sync_wait` | `asc_copy_gm2ub((__ubuf__ void*)src0, ...);`<br>`asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);`<br>`asc_add(dst, src1, src0, total_length);` |
 | 单流水同步 | 等待同一流水内前序指令完成，用于同一流水内存在前后数据依赖。 | `asc_sync_pipe` & `asc_sync_mte2等` | `asc_add(dst, src1, src0, total_length);`<br>`asc_sync_pipe(PIPE_V);`<br>`asc_sub(dst, dst, src0, total_length);` |
 | 内存访问顺序控制 | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `asc_sync_data_barrier` | `asc_sync_data_barrier(mem_dsb_t::DSB_ALL);` |
 
@@ -288,7 +286,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
         <code>if ASCEND_IS_AIC {</code><br>
         <code>    // Atlas A3 training/inference products: AIC sends one arrive, two AIVs wait simultaneously</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
-        <code>    // Ascend 950PR/Ascend 950DT products: AIC sends two arrives, two AIVs wait separately</code><br>
+        <code>    // [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md) products: AIC sends two arrives, two AIVs wait separately</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 0);</code><br>
         <code>    asc_sync_intra_arrive(PIPE_FIX, 16);</code><br>
         <code>}</code><br>
@@ -316,7 +314,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 Vector矢量计算主要包含基础算术、归约计算、数据类型转换等矢量计算。
 
-在Atlas A3 训练系列产品/Atlas A3 推理系列产品上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
+在[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)上，Vector矢量计算的数据来自于Unified Buffer（要求32B对齐），C语言编程在Vector计算单元上提供了通过UB指针直接操作计算的接口能力。此类直接操作UB的编程方式称为Memory矢量计算编程。
 
 以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
 
@@ -336,9 +334,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 
 ```
 
-以上为传统架构的矢量计算编程方式；Ascend 950PR/Ascend 950DT新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
-
-> 📌 寄存器可编程能力从**Ascend 950PR/Ascend 950DT**引入。
+以上为传统架构的矢量计算编程方式；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
 
 ### Cube矩阵计算
 
