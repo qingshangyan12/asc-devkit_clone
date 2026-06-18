@@ -21,8 +21,7 @@ namespace Simt {
 template <class... Args>
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline void PRINTF(const __gm__ char* fmt, Args&&... args);
 
-template <class... Args>
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline void printf(const __gm__ char* fmt, Args&&... args);
+using __asc_simt_vf::printf;
 
 #endif
 #endif
