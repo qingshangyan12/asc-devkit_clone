@@ -8,11 +8,15 @@
 
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问落到同一个bank group的相同编号的sub bank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成bank冲突并增加访问延迟。
 
-**图 1**  bank结构示意图
+**图 1**  Ascend950 bank结构示意图
 
-![img](../../../figures/bank结构示意图（图中箭头方向表示内存排布的顺序）-71.png "bank结构示意图（图中箭头方向表示内存排布的顺序）-71")
+![img](../../../figures/Ascend950bank结构示意图.png "Ascend950 bank结构示意图")
 
 UB地址采用低位交织，连续地址以32B为单位在bank0到bank15之间循环：第1个32B块位于bank0，第2个32B块位于bank1，依次类推；第16个32B块位于bank15，第17个32B块回到bank0的下一行。
+
+**图 2**  Ascend950 bank内存排布示意图
+
+![img](../../../figures/Ascend950bank内存排布示意图.png "Ascend950 bank内存排布示意图")
 
 SIMT编程方式下bank冲突主要有以下几种：
 
