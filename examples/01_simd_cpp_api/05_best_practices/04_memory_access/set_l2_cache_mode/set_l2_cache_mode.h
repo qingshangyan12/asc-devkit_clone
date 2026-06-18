@@ -610,7 +610,7 @@ public:
         constexpr uint32_t quarterN = repeatN / 4;
         uint32_t mStart = 0;   // repeatGm 在 Init 中已偏移到当前核的分片起始地址
         uint32_t nLoopCount = quarterN / repeatTileN;
-        constexpr uint32_t mLoopCount = repeatCoreM / repeatTileM;
+        const uint32_t mLoopCount = repeatCoreM / repeatTileM;
         AscendC::DataCopyParams copyInParams{
             static_cast<uint16_t>(repeatTileM),
             static_cast<uint16_t>(repeatTileN * sizeof(half)),
