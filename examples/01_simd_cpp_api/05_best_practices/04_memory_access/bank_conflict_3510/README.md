@@ -30,6 +30,8 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 | 位数 | 9 bits | 1 bit | 3 bits | 5 bits |
 | 含义 | row_id（bank内行号） | bank_id（bank group内bank编号） | bank_group_id | offset（行内偏移） |
 
+![UB Address](./figures/ub_address.png)
+
 **解码示例**：地址 `0x4100`
 
 将地址转为18位二进制，按位域划分：`00 0100 0001 0000 0000`
@@ -280,7 +282,7 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ### 案例分析
 
 - 地址配置与 Case 8 完全相同，区别在于 index 模式为 0、128 交替重复（每个 repeat 内一半元素通过 index=0 读取，另一半通过 index=128 读取），二者均落在同一 bank 的同一 subbank（sub0），但位于不同 depth 行，离散读取需要在同一 subbank 的不同行间切换，触发 subbank 冲突。
-- Case 8劣化 15.4%，说明 subbank 同地址行冲突对离散与聚合API性能有显著影响。
+- 对比Case 8劣化 15.4%，说明 subbank 同地址行冲突对离散与聚合API性能有显著影响。
 
 
 ## Case 10：一读一写，按行搬运，DataBlock连续排布，无bank冲突
@@ -369,27 +371,26 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 ## 目录结构
 
 ```text
-├── bank_conflict.asc              // 算子host + device代码
-├── config.h                      // 14个Case的地址/类型配置
-├── vf_func.h                     // Vector函数实现
+├── bank_conflict.asc             // 算子host + device代码
+├── config.h                      // 13个Case的地址/数据类型类型配置
+├── vf_func.h                     // vf函数实现
 ├── data_utils.h                  // 数据读写工具
 ├── CMakeLists.txt                // 编译工程
-├── test.sh                       // 测试脚本
 ├── figures/                      // 各Case UB内存分布图
+│   ├── ub_arch.png               // UB架构图
+│   ├── ub_address.png            // UB地址编码图
 │   ├── case1.png
 │   ├── case2.png
 │   ├── case3.png
 │   ├── case4.png
 │   ├── case5.png
-│   ├── case6.png
-│   ├── case7.png
+│   ├── case6_7.png
 │   ├── case8.png
 │   ├── case9.png
 │   ├── case10.png
 │   ├── case11.png
 │   ├── case12.png
-│   ├── case13.png
-│   └── case14.png
+│   └── case13.png
 └── scripts/
     ├── gen_data.py               // 测试数据生成
     └── verify_result.py          // 精度验证
