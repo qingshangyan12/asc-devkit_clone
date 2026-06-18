@@ -40,8 +40,8 @@ static constexpr HcclServerConfig DEFAULT_CFG = {CoreType::DEFAULT, 0};
  *          4) Call the Wait interface (blocking) to wait for the server to complete the corresponding comm task.
  *          5) Call the Finalize interface to notify the server that there will be no comm tasks in the future.
  *             Once all comm tasks are executed, server can exit.
- *        On Atlas A2 训练系列产品/Atlas A2 推理系列产品/Ascend 910_93, users must specify whether the interface runs on
- * the AICube core or the AIVector core when calling interfaces in class Hccl.
+ *        On Atlas A2 训练系列产品/Atlas A2 推理系列产品/Ascend 910_93, users must specify whether
+ *        the interface runs on the AICube core or the AIVector core when calling interfaces in class Hccl.
  * @tparam serverType: Only HcclServerType::HCCL_SERVER_TYPE_AICPU supported.
  *         config: The configuration for the HCCL instance.
  */
@@ -113,8 +113,9 @@ public:
      *                        sendBuf is equal to recvCount * rank size.
      * @param [in] dataType: The datatype of data participating in the ReduceScatter operation.
      * @param [in] op: Reduce type.
-     * @param [in] strideCount: Send reduced data at offset count i*strideCount of sendBuf to rank i, if strideCount>0;
-     * 							Send reduced data at offset count i*recvCount of sendBuf to rank i, if strideCount=0.
+     * @param [in] strideCount: Send reduced data at offset count i*strideCount of sendBuf to rank i,
+     *                          if strideCount > 0; Send reduced data at offset count i*recvCount of sendBuf to rank i,
+     *                          if strideCount = 0.
      * @param [in] repeat: Indicate the number of comm tasks launched by ReduceScatter in the continuous memory
      *                     scenario. Repeat >= 1, and be set 1 as default. When repeat > 1, the sendBuf and recvBuf of
      *                     next comm task will be calculated by server automatically using formula as follow:
@@ -227,8 +228,8 @@ public:
     /*!
      * @class Hccl
      * @brief The task launching interface of the AlltoAllvWrite collective communication operator, returns the
-     * identifier handleId. (task content: Each communication will send a segment of data to a specified memory address
-     * on the designated rank, supporting multiple communications in batch.)
+     *        identifier handleId. (task content: Each communication will send a segment of data to a specified
+     *        memory addresson the designated rank, supporting multiple communications in batch.)
      * @tparam commit: true/false true: simultaneously notify server to execute the task launched by AlltoAllvWrite.
      * @param [in] usrIn: Source data buffer address.
      * @param [in] sendOffsets: A uint64 array represents the offset of data sent by this rank, where 'sendOffsets[i]=n'
@@ -241,8 +242,8 @@ public:
      * @param [in] localDataSize: The size of data send to local rank, using byte as the basic unit.
      * @return The identifier(handleId) of AlltoAllvWrite task. HandleId >= 0 when successful, otherwise return -1.
      * @note 1) This func is used when the size of sendOffsets and sendSizes are large;
-     *       2) The size of sendSizes is rankDim, the value of sendSizes[localRank] is not used, use localDataSize
-     * instead for performance;.
+     *       2) The size of sendSizes is rankDim, and sendSizes[localRank] is not used.
+     *          Use localDataSize instead for performance.
      */
     template <bool commit = false>
     __aicore__ inline HcclHandle AlltoAllvWrite(

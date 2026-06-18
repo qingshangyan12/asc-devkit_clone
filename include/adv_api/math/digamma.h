@@ -69,8 +69,8 @@ __aicore__ inline void Digamma(
  */
 template <typename T, bool isReuseSource = false>
 __ASC_USE_RESERVED_UBUF__(2201, "Digamma is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
-__aicore__
-    inline void Digamma(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+__aicore__ inline void Digamma(
+    const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
     // Only for AI Vector Core.
     if ASCEND_IS_AIC {
