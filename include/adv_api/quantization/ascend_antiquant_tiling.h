@@ -25,7 +25,7 @@ namespace AscendC {
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * return: maximum temporary space required
+ * \return maximum temporary space required
  */
 uint32_t GetAscendAntiQuantMaxTmpSize(
     const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
@@ -38,7 +38,7 @@ uint32_t GetAscendAntiQuantMaxTmpSize(
  * \param [in] isTranspose, enable transpose of input
  * \param [in] inputDataType, input data type
  * \param [in] outputDataType, output data type
- * return: minimum temporary space required
+ * \return minimum temporary space required
  */
 uint32_t GetAscendAntiQuantMinTmpSize(
     const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
@@ -46,7 +46,7 @@ uint32_t GetAscendAntiQuantMinTmpSize(
 
 /*!
  * \brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.
- * The developer selects a proper space size based on this range as the tiling parameter.
+ *        The developer selects a proper space size based on this range as the tiling parameter.
  * \param [in] srcShape, input shape information
  * \param [in] scaleShape, scale shape information
  * \param [in] isTranspose, enable transpose of input
@@ -61,12 +61,18 @@ void GetAscendAntiQuantMaxMinTmpSize(
 
 /*!
  * \brief The calculation of the AscendAntiQuant interface requires the developer to reserve or apply for temporary
- * space. The relationship between the maximum temporary space (maxTmpBuffer) and the space occupied by the input
- * (inputSize x typeSize) is as follows: maxTmpBuffer = maxLiveNodeCount * inputSize * typeSize + extraBuf This
- * interface is used to obtain maxLiveNodeCount and extraBuf. \param [in] srcShape, input shape information \param [in]
- * scaleShape, scale shape information \param [in] isTranspose, enable transpose of input \param [in] inputDataType,
- * input data type \param [in] outputDataType, output data type \param [out] maxLiveNodeCount, the multiple of the
- * maximum temporary space to the input occupied space \param [out] extraBuf, the size of the extra temporary space
+ *        space.
+ *        The relationship between the maximum temporary space (maxTmpBuffer) and the space occupied by the input
+ *        (inputSize x typeSize) is as follows:
+ *            maxTmpBuffer = maxLiveNodeCount * inputSize * typeSize + extraBuf
+ *        This interface is used to obtain maxLiveNodeCount and extraBuf.
+ * \param [in] srcShape, input shape information
+ * \param [in] scaleShape, scale shape information
+ * \param [in] isTranspose, enable transpose of input
+ * \param [in] inputDataType, input data type
+ * \param [in] outputDataType, output data type
+ * \param [out] maxLiveNodeCount, the multiple of the maximum temporary space to the input occupied space
+ * \param [out] extraBuf, the size of the extra temporary space
  */
 void GetAscendAntiQuantTmpBufferFactorSize(
     const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
