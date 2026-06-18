@@ -21,6 +21,7 @@
         -   [AI Core SIMD编程](编程指南/编程模型/AI-Core-SIMD编程/AI-Core-SIMD编程.md)
             -   [概述](编程指南/编程模型/AI-Core-SIMD编程/概述.md)
             -   [抽象硬件架构](编程指南/编程模型/AI-Core-SIMD编程/抽象硬件架构.md)
+            -   [内存模型](编程指南/编程模型/AI-Core-SIMD编程/内存模型.md)
             -   [核函数](编程指南/编程模型/AI-Core-SIMD编程/核函数.md)
             -   [基于指针的C语言编程](编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
                 -   [基于语言扩展层C API编程](编程指南/编程模型/AI-Core-SIMD编程/基于指针的C语言编程/基于语言扩展层C-API编程.md)
