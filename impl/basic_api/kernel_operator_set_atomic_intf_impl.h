@@ -40,6 +40,8 @@
 #include "dav_l300/kernel_operator_set_atomic_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_set_atomic_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_set_atomic_impl.h"
 #endif
 
 namespace AscendC {

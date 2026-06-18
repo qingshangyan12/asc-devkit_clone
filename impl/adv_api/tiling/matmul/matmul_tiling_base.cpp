@@ -30,7 +30,7 @@ namespace matmul_tiling {
 constexpr int32_t MIN_MNK_SIZE = 16;
 constexpr int32_t ALIGN_SIZE = 32;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 constexpr int32_t L0C_SIZE = 64 * 1024;
 constexpr int32_t L0A_SIZE = 32 * 1024;
 constexpr int32_t L0B_SIZE = 32 * 1024;

@@ -48,7 +48,7 @@ __simd_vf__ inline void VfCallArithProgression(
     uint32_t sreg = static_cast<uint32_t>(count);
     Reg::MaskReg preg;
     const uint32_t sregLower = static_cast<uint32_t>(regTrait.REG_NUM * ONE_REPEAT_BYTE_SIZE / sizeof(T));
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
     Reg::Duplicate(stepReg, static_cast<T>(static_cast<int32_t>(sregLower)));
 #else
     Reg::Duplicate(stepReg, static_cast<T>(sregLower));

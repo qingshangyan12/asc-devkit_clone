@@ -26,7 +26,7 @@
 #include "include/adv_api/sort/topk_utils_constants.h"
 
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
-    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+    __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161))
 namespace {
 constexpr uint16_t MIN_SORT32_SIZE = 32;
 constexpr uint16_t MIN_RPSORT16_SIZE = 16;
@@ -60,7 +60,7 @@ constexpr uint32_t TOPK_NORMAL_INNER_MAX_LEN = 4096;
 namespace AscendC {
 
 #if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || \
-    __NPU_ARCH__ == 3113))
+    __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161))
 
 constexpr TopKConfig defaultTopKConfig = { TopKAlgo::MERGE_SORT, TopKOrder::UNSET, true };
 #endif

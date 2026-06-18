@@ -40,7 +40,7 @@ constexpr SortConfig DEFAULT_SORT_CONFIG = {SortType::RADIX_SORT, false};
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
 constexpr auto singleSortElementCount = singleSortElementCountL300;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
 constexpr auto singleSortElementCount = singleSortElementCountL311;
 #else
 constexpr auto singleSortElementCount = singleSortElementCountArch3510;

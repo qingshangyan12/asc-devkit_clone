@@ -94,7 +94,7 @@ __aicore__ inline void TPipe::Init()
 
         SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
     }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
     auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
     ASCENDC_DEBUG_ASSERT((enQueEvtID == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 0"));
     SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
@@ -243,7 +243,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
             currentPoolSize));
 #endif
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
     if constexpr (T::dstPosition == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
@@ -257,7 +257,7 @@ template <class T> __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num,
     ASCENDC_DEBUG_ASSERT((pool != Hardware::MAX), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "buffer pos can not be Hardware::MAX"));
     auto curPoolAddr = this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(pool)].maxAddr;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
     if constexpr (T::dstPosition == TPosition::C2PIPE2GM) {
         curPoolAddr = 0;
     }
@@ -328,7 +328,7 @@ template <TPosition pos> __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf
 
     len = (len + ONE_BLK_SIZE - MIN_BLOCK_LEN) / ONE_BLK_SIZE * ONE_BLK_SIZE;
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
     if constexpr (pos == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
@@ -530,7 +530,7 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
         WaitFlag<HardEvent::M_MTE1>(2);
         ReleaseEventID<HardEvent::M_MTE1>(2);
     }
-#elif __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#elif __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || (__NPU_ARCH__ == 5161)
     WaitFlag<HardEvent::M_MTE1>(0);
     ReleaseEventID<HardEvent::M_MTE1>(0);
     WaitFlag<HardEvent::M_MTE1>(1);

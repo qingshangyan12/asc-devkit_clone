@@ -44,6 +44,8 @@
 #include "dav_l300/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_duplicate_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_vec_duplicate_impl.h"
 #endif
 
 #pragma begin_pipe(V)
@@ -131,7 +133,8 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
     DuplicateImpl<T>((__ubuf__ T*)dst.GetPhyAddr(), scalarValue, count);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
 /*
  * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]

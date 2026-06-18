@@ -112,7 +112,7 @@ public:
                                                    tiling.GetBaseM() * tiling.GetBaseN();
 
         uint32_t lenFactor = 1;
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (MdlInitScene<MM_CFG> && ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             lenFactor = DOUBLE_SIZE;
@@ -120,7 +120,7 @@ public:
 #endif
         MATMUL_MODULE(CubeOutBuffer)->Init(baseMN, lenFactor);
         if constexpr (NormInitScene<MM_CFG>) {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
             MATMUL_MODULE(BiasScheduler)->Init();
 #endif

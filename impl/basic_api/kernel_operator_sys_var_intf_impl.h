@@ -41,6 +41,8 @@
 #include "dav_l300/kernel_operator_sys_var_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_sys_var_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_sys_var_impl.h"
 #endif
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
@@ -129,7 +131,8 @@ __aicore__ inline int64_t GetSystemCycle()
     return GetSystemCycleImpl();
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr(){
     return GetSprImpl<spr>();

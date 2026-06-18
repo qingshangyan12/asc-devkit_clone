@@ -26,6 +26,8 @@
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_vec_unary_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "../../basic_api/reg_compute/dav_l516/kernel_reg_compute_vec_unary_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_unary_impl.h"
 #else
@@ -108,4 +110,3 @@ __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_UNARY_INTF_IMPL__
 #endif
-

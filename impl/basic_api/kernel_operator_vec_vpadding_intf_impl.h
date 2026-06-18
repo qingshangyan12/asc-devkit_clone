@@ -41,6 +41,8 @@
 #include "dav_l300/kernel_operator_vec_vpadding_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_vpadding_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_vec_vpadding_impl.h"
 #endif
 
 #pragma begin_pipe(V)

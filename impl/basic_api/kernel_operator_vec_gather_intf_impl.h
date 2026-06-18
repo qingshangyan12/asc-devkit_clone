@@ -40,6 +40,8 @@
 #include "dav_l300/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_gather_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_vec_gather_impl.h"
 #endif
 
 #pragma begin_pipe(V)
@@ -68,7 +70,7 @@ __aicore__ inline void Gatherb(const LocalTensor<T>& dst, const LocalTensor<T>& 
 #endif
     uint32_t srcLength = src.GetSize();
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113))
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
     GatherImpl((__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)offset.GetPhyAddr(), srcLength, repeatTime, repeatParams);
 #else
@@ -180,7 +182,7 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
 #endif
     uint32_t vectorRegWidth = 256;
 #if (__NPU_ARCH__ == 3003) || \
-    ((__NPU_ARCH__ == 3113))
+    ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
     vectorRegWidth = VECTOR_REG_WIDTH;
 #endif
     uint32_t elementCountSingleRepeat;
@@ -190,14 +192,14 @@ __aicore__ inline void Gather(const LocalTensor<T>& dst, const LocalTensor<T>& s
         elementCountSingleRepeat = 64;
     }
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
     elementCountSingleRepeat = vectorRegWidth / sizeof(T);
     uint32_t repeatStride = vectorRegWidth / ONE_BLK_SIZE;
 #endif
     const uint32_t elementCountTail = count % elementCountSingleRepeat;
     const uint8_t repeatTime = count / elementCountSingleRepeat;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161)
     if (repeatTime > 0) {
         Gather(dst, src, srcOffset, srcBaseOffset, (uint64_t)elementCountSingleRepeat, repeatTime,
             repeatStride);

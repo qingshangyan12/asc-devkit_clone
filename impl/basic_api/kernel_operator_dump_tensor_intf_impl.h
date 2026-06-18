@@ -43,6 +43,8 @@
 #include "dav_l311/kernel_operator_dump_tensor_impl.h"
 #elif (__NPU_ARCH__ == 3102)
 #include "dav_m310/kernel_operator_dump_tensor_impl.h"
+#elif (__NPU_ARCH__ == 5161)
+#include "dav_l516/kernel_operator_dump_tensor_impl.h"
 #endif
 
 #ifdef ASCENDC_CPU_DEBUG
@@ -54,7 +56,7 @@ namespace AscendC {
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
@@ -66,7 +68,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, ui
 template <typename T>
 __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
@@ -78,7 +80,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 template <typename T>
 __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
@@ -91,7 +93,7 @@ __aicore__ inline void DumpTensor(const GlobalTensor<T>& input, uint32_t desc, u
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpTensor is not supported in cpu mode.");});
 #endif
@@ -105,7 +107,7 @@ __aicore__ inline void DumpTensor(const LocalTensor<T>& input, uint32_t desc, ui
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
@@ -124,7 +126,7 @@ __aicore__ inline void DumpAccChkPoint(const LocalTensor<T> &input, uint32_t ind
 template <typename T>
 __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t index, uint32_t countOff, uint32_t dumpSize)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161))
 #else
     ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "DumpAccChkPoint is not supported in cpu mode.");});
 #endif
