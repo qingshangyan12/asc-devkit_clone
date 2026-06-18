@@ -12,7 +12,7 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 
 ![img](../../../figures/Ascend950bank结构示意图.png "Ascend950 bank结构示意图")
 
-UB地址采用低位交织，连续地址以32B为单位在bank0到bank15之间循环：第1个32B块位于bank0，第2个32B块位于bank1，依次类推；第16个32B块位于bank15，第17个32B块回到bank0的下一行。
+UB地址采用低位交织，如下图所示，连续地址以32B为单位在bank0到bank15之间循环：第1个32B块位于bank0，第2个32B块位于bank1，依次类推；第16个32B块位于bank15，第17个32B块回到bank0的下一行。
 
 **图 2**  Ascend950 bank内存排布示意图
 
