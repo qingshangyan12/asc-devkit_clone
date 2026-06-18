@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -30,7 +42,19 @@ unsigned int __isGlobal(const void* ptr)
 
 ## 返回值说明
 
-如果输入的指针指向Global Memory内存空间的地址，则返回1，否则返回0。
+如果输入的指针指向Global Memory内存空间的地址，则返回1，否则返回0。  
+该接口根据输入指针的地址空间信息进行分类判断，不校验该指针是否为可安全访问的有效地址。`__isGlobal`返回1仅表示该指针被分类为Global Memory地址，不代表该地址一定可以安全访问。特殊场景说明如下：  
+| 输入场景 | 返回值 |
+| --- | --- |
+| `ptr`为有效Unified Buffer指针 | 0 |
+| `ptr`为有效栈空间指针 | 0 |
+| `ptr`为`nullptr` | 0 |
+| `ptr`为`(void*)0x1` | 0 |
+| `ptr`为全1地址 | 1 |
+| `ptr`由`__cvta_global_to_generic(0)`或`__cvta_global_to_generic(1)`返回 | 0 |
+| `ptr`由`__cvta_global_to_generic(全1)`返回 | 1 |
+
+因此，不能仅依据`__isGlobal(ptr) == 1`判断`ptr`是否为可安全访问的Global Memory地址。
 
 ## 约束说明
 
