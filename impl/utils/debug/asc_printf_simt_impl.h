@@ -135,6 +135,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void enable_printf()
         __attribute__((used, section(".ascend.meta"))) = {4, 4, 4};
 }
 
+template <int count = 1>
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline void nop()
+{
+    if constexpr (count <= 0) {
+        return;
+    }
+    #pragma unroll
+    for (int i = 0; i < count; ++i) {
+        asm volatile("nop");
+    }
+}
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t get_string_length(const __simt_gm__ char* s)
 {
     uint32_t i = 0;
@@ -208,9 +220,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void ring_buffer_wait(__simt_gm__ RingBufR
     volatile uint64_t tmp = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(&read_info->bufOffset);
     while (end_offset >= tmp) {
         tmp = __ldg<LD_L2CacheType::L2_CACHE_HINT_NORMAL_FV, L1CacheType::NON_CACHEABLE>(&read_info->bufOffset);
+        nop<800>();
     }
 #else
-    while (end_offset > *reinterpret_cast<volatile uint64_t*>(&read_info->bufOffset)) {}
+    while (end_offset > *reinterpret_cast<volatile uint64_t*>(&read_info->bufOffset)) {
+        nop<800>();
+    }
 #endif
 }
 
