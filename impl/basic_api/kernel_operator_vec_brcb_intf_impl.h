@@ -25,7 +25,6 @@
 #include "mstx_local_tensor_info.h"
 #include "kernel_npu_debug.h"
 
-
 #if __NPU_ARCH__ == 1001
 #include "dav_c100/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 2002
@@ -36,8 +35,6 @@
 #include "dav_m300/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_brcb_impl.h"
-#elif (__NPU_ARCH__ == 5102)
-#include "dav_m510/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3113

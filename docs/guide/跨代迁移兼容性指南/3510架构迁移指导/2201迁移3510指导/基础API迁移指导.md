@@ -1,40 +1,40 @@
-# 基础API迁移指导<a name="ZH-CN_TOPIC_0000002470508258"></a>
+# 鍩虹API杩佺Щ鎸囧<a name="ZH-CN_TOPIC_0000002470508258"></a>
 
-本节针对[NPU架构版本3510](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)的芯片变更对基础API兼容性产生的影响进行说明，并提供基础API的兼容性适配方案。
+鏈妭閽堝[NPU鏋舵瀯鐗堟湰3510](../../../缂栫▼鎸囧崡/璇█鎵╁睍灞?SIMD-BuiltIn鍏抽敭瀛?md#table65291052154114)鐨勮姱鐗囧彉鏇村鍩虹API鍏煎鎬т骇鐢熺殑褰卞搷杩涜璇存槑锛屽苟鎻愪緵鍩虹API鐨勫吋瀹规€ч€傞厤鏂规銆?
 
-## 矢量计算<a name="section7364115741514"></a>
+## 鐭㈤噺璁＄畻<a name="section7364115741514"></a>
 
--   **3510架构默认不支持Subnormal功能。**
+-   **3510鏋舵瀯榛樿涓嶆敮鎸丼ubnormal鍔熻兘銆?*
 
-    **说明**：SubNormal浮点数指的是指数位全为0、尾数不为0的浮点数，用于表示比最小正常数更小的值，避免“下溢为0”。3510版本默认不支持Subnormal，Subnormal浮点数在计算中被视为0。
+    **璇存槑**锛歋ubNormal娴偣鏁版寚鐨勬槸鎸囨暟浣嶅叏涓?銆佸熬鏁颁笉涓?鐨勬诞鐐规暟锛岀敤浜庤〃绀烘瘮鏈€灏忔甯告暟鏇村皬鐨勫€硷紝閬垮厤鈥滀笅婧负0鈥濄€?510鐗堟湰榛樿涓嶆敮鎸丼ubnormal锛孲ubnormal娴偣鏁板湪璁＄畻涓瑙嗕负0銆?
 
-    **兼容方案**：通过设置config模板参数来配置Subnormal计算模式。软件模拟对Subnormal数据的处理，通过精度扩展等处理方式来避免Subnormal浮点数下溢为0。
+    **鍏煎鏂规**锛氶€氳繃璁剧疆config妯℃澘鍙傛暟鏉ラ厤缃甋ubnormal璁＄畻妯″紡銆傝蒋浠舵ā鎷熷Subnormal鏁版嵁鐨勫鐞嗭紝閫氳繃绮惧害鎵╁睍绛夊鐞嗘柟寮忔潵閬垮厤Subnormal娴偣鏁颁笅婧负0銆?
 
-    **表 1**  涉及Subnormal的API和config参数说明
+    **琛?1**  娑夊強Subnormal鐨凙PI鍜宑onfig鍙傛暟璇存槑
 
     <a name="table288510533427"></a>
-    <table><thead align="left"><tr id="row388575318425"><th class="cellrowborder" align="center" valign="top" width="27%" id="mcps1.2.3.1.1"><p id="p12885175314420"><a name="p12885175314420"></a><a name="p12885175314420"></a>Ascend C基础API</p>
+    <table><thead align="left"><tr id="row388575318425"><th class="cellrowborder" align="center" valign="top" width="27%" id="mcps1.2.3.1.1"><p id="p12885175314420"><a name="p12885175314420"></a><a name="p12885175314420"></a>Ascend C鍩虹API</p>
     </th>
-    <th class="cellrowborder" align="center" valign="top" width="73%" id="mcps1.2.3.1.2"><p id="p1288585311428"><a name="p1288585311428"></a><a name="p1288585311428"></a>兼容说明</p>
+    <th class="cellrowborder" align="center" valign="top" width="73%" id="mcps1.2.3.1.2"><p id="p1288585311428"><a name="p1288585311428"></a><a name="p1288585311428"></a>鍏煎璇存槑</p>
     </th>
     </tr>
     </thead>
-    <tbody><tr id="row188851453184214"><td class="cellrowborder" align="center" valign="top" width="27%" headers="mcps1.2.3.1.1 "><p id="p1188545310427"><a name="p1188545310427"></a><a name="p1188545310427"></a>Exp、Ln、Reciprocal、Sqrt、Rsqrt、Div</p>
+    <tbody><tr id="row188851453184214"><td class="cellrowborder" align="center" valign="top" width="27%" headers="mcps1.2.3.1.1 "><p id="p1188545310427"><a name="p1188545310427"></a><a name="p1188545310427"></a>Exp銆丩n銆丷eciprocal銆丼qrt銆丷sqrt銆丏iv</p>
     </td>
-    <td class="cellrowborder" align="left" valign="top" width="73%" headers="mcps1.2.3.1.2 "><p id="p1055013361204"><a name="p1055013361204"></a><a name="p1055013361204"></a>以Ln接口为例来进行说明。</p>
-    <p id="p151399151208"><a name="p151399151208"></a><a name="p151399151208"></a>通过LnConfig结构体的参数algo来配置Subnormal计算模式。algo取值如下：</p>
-    <a name="ul118851253124216"></a><a name="ul118851253124216"></a><ul id="ul118851253124216"><li>LnAlgo::INTRINSIC、LnAlgo::PRECISION_1ULP_FTZ_TRUE，使用单指令计算得出结果，所有Subnormal被近似为0。</li><li>LnAlgo::PRECISION_1ULP_FTZ_FALSE，支持Subnormal数据计算。</li></ul>
-    <p id="p9885135319427"><a name="p9885135319427"></a><a name="p9885135319427"></a>该参数默认值DEFAULT_LN_CONFIG的取值如下：</p>
+    <td class="cellrowborder" align="left" valign="top" width="73%" headers="mcps1.2.3.1.2 "><p id="p1055013361204"><a name="p1055013361204"></a><a name="p1055013361204"></a>浠n鎺ュ彛涓轰緥鏉ヨ繘琛岃鏄庛€?/p>
+    <p id="p151399151208"><a name="p151399151208"></a><a name="p151399151208"></a>閫氳繃LnConfig缁撴瀯浣撶殑鍙傛暟algo鏉ラ厤缃甋ubnormal璁＄畻妯″紡銆俛lgo鍙栧€煎涓嬶細</p>
+    <a name="ul118851253124216"></a><a name="ul118851253124216"></a><ul id="ul118851253124216"><li>LnAlgo::INTRINSIC銆丩nAlgo::PRECISION_1ULP_FTZ_TRUE锛屼娇鐢ㄥ崟鎸囦护璁＄畻寰楀嚭缁撴灉锛屾墍鏈塖ubnormal琚繎浼间负0銆?/li><li>LnAlgo::PRECISION_1ULP_FTZ_FALSE锛屾敮鎸丼ubnormal鏁版嵁璁＄畻銆?/li></ul>
+    <p id="p9885135319427"><a name="p9885135319427"></a><a name="p9885135319427"></a>璇ュ弬鏁伴粯璁ゅ€糄EFAULT_LN_CONFIG鐨勫彇鍊煎涓嬶細</p>
     <a name="screen18681133513203"></a><a name="screen18681133513203"></a><pre class="screen" codetype="Cpp" id="screen18681133513203">constexpr LnConfig DEFAULT_LN_CONFIG = { LnAlgo::INTRINSIC };</pre>
     </td>
     </tr>
     </tbody>
     </table>
 
-    可以参考以下代码片段：
+    鍙互鍙傝€冧互涓嬩唬鐮佺墖娈碉細
 
     ```
-    // 定义模板参数
+    // 瀹氫箟妯℃澘鍙傛暟
     constexpr AscendC::LnConfig CONFIG = {
         AscendC::LnAlgo::PRECISION_1ULP_FTZ_FALSE
     };
@@ -42,10 +42,10 @@
     constexpr uint32_t xAddr = 0;
     constexpr uint32_t yAddr = xAddr + DATA_COUNT * sizeof(half);
 
-    // 核函数入口：使用__vector__显式声明Vector核函数，搭配静态Tensor方式编程
+    // 鏍稿嚱鏁板叆鍙ｏ細浣跨敤__vector__鏄惧紡澹版槑Vector鏍稿嚱鏁帮紝鎼厤闈欐€乀ensor鏂瑰紡缂栫▼
     __vector__ __global__ void ln_custom(__gm__ uint8_t* src, __gm__ uint8_t* dst)
     {
-        // 静态Tensor需要手动调用InitSocState初始化全局状态寄存器
+        // 闈欐€乀ensor闇€瑕佹墜鍔ㄨ皟鐢↖nitSocState鍒濆鍖栧叏灞€鐘舵€佸瘎瀛樺櫒
         AscendC::InitSocState();
 
         AscendC::GlobalTensor<half> srcGlobal;
@@ -53,7 +53,7 @@
         srcGlobal.SetGlobalBuffer((__gm__ half*)src, DATA_COUNT);
         dstGlobal.SetGlobalBuffer((__gm__ half*)dst, DATA_COUNT);
 
-        // 直接构造指定地址和存储位置的LocalTensor（静态Tensor方式）
+        // 鐩存帴鏋勯€犳寚瀹氬湴鍧€鍜屽瓨鍌ㄤ綅缃殑LocalTensor锛堥潤鎬乀ensor鏂瑰紡锛?
         AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECCALC, xAddr, DATA_COUNT);
         AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::VECCALC, yAddr, DATA_COUNT);
 
@@ -61,7 +61,7 @@
         AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-        // 调用Ln基础API，传入模板参数
+        // 璋冪敤Ln鍩虹API锛屼紶鍏ユā鏉垮弬鏁?
         AscendC::Ln<half, CONFIG>(dstLocal, srcLocal, DATA_COUNT);
 
         AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
@@ -72,15 +72,15 @@
     }
     ```
 
-## 数据搬运<a name="section7530159122210"></a>
+## 鏁版嵁鎼繍<a name="section7530159122210"></a>
 
--   **DataCopy接口不支持L1 Buffer-\>GM通路。**
+-   **DataCopy鎺ュ彛涓嶆敮鎸丩1 Buffer-\>GM閫氳矾銆?*
 
-    **说明**：硬件删除L1 Buffer到GM的通路，无法将数据从L1 Buffer直接搬运到GM中。现有接口不支持L1 Buffer到GM的直接搬运。
+    **璇存槑**锛氱‖浠跺垹闄1 Buffer鍒癎M鐨勯€氳矾锛屾棤娉曞皢鏁版嵁浠嶭1 Buffer鐩存帴鎼繍鍒癎M涓€傜幇鏈夋帴鍙ｄ笉鏀寔L1 Buffer鍒癎M鐨勭洿鎺ユ惉杩愩€?
 
-    **兼容方案**：对于纯Cube计算场景：在GM多分配一个单位矩阵，通过Mmad矩阵乘法计算输出到L0C Buffer，再从L0C Buffer通过Fixpipe搬运到GM。对于Vector和Cube计算融合场景，可以通过L1 Buffer搬运到UB，再搬运到GM。以下以纯Cube计算场景为例进行说明，介绍算子核心流程，具体可参考[L1到GM搬运兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)。
+    **鍏煎鏂规**锛氬浜庣函Cube璁＄畻鍦烘櫙锛氬湪GM澶氬垎閰嶄竴涓崟浣嶇煩闃碉紝閫氳繃Mmad鐭╅樀涔樻硶璁＄畻杈撳嚭鍒癓0C Buffer锛屽啀浠嶭0C Buffer閫氳繃Fixpipe鎼繍鍒癎M銆傚浜嶸ector鍜孋ube璁＄畻铻嶅悎鍦烘櫙锛屽彲浠ラ€氳繃L1 Buffer鎼繍鍒癠B锛屽啀鎼繍鍒癎M銆備互涓嬩互绾疌ube璁＄畻鍦烘櫙涓轰緥杩涜璇存槑锛屼粙缁嶇畻瀛愭牳蹇冩祦绋嬶紝鍏蜂綋鍙弬鑰僛L1鍒癎M鎼繍鍏煎鎬ф牱渚媇(https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/data_copy_l1togm)銆?
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    1.  灏嗙煩闃礎浠嶨M鎼繍鍒癓1 Buffer銆?
 
         ```
         __aicore__ inline void CopyGmToL1A(AscendC::LocalTensor<T> a1Local)
@@ -90,7 +90,7 @@
         }
         ```
 
-    2.  将矩阵B（矩阵B为单位矩阵）从GM搬运到L1 Buffer。
+    2.  灏嗙煩闃礏锛堢煩闃礏涓哄崟浣嶇煩闃碉級浠嶨M鎼繍鍒癓1 Buffer銆?
 
         ```
         __aicore__ inline void CopyGmToL1B(AscendC::LocalTensor<U> b1Local)
@@ -100,7 +100,7 @@
         }
         ```
 
-    3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
+    3.  灏嗙煩闃礎浠嶭1 Buffer鎼繍鍒癓0A Buffer銆?
 
         ```
         __aicore__ inline void Load2DL1AToL0A(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<T> a2Local)
@@ -111,7 +111,7 @@
         }
         ```
 
-    4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
+    4.  灏嗙煩闃礏浠嶭1 Buffer鎼繍鍒癓0B Buffer銆?
 
         ```
         __aicore__ inline void Load2DL1BToL0B(AscendC::LocalTensor<U> b1Local, AscendC::LocalTensor<U> b2Local)
@@ -122,7 +122,7 @@
         }
         ```
 
-    5.  进行Mmad矩阵计算，结果输出到L0C Buffer。
+    5.  杩涜Mmad鐭╅樀璁＄畻锛岀粨鏋滆緭鍑哄埌L0C Buffer銆?
 
         ```
         __aicore__ inline void Compute(
@@ -134,7 +134,7 @@
         }
         ```
 
-    6.  通过FixPipe将矩阵C从L0C Buffer拷贝到GM。
+    6.  閫氳繃FixPipe灏嗙煩闃礐浠嶭0C Buffer鎷疯礉鍒癎M銆?
 
         ```
         __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<S> co1Local)
@@ -145,20 +145,20 @@
         }
         ```
 
--   **不支持SetLoadDataBoundary接口。**
+-   **涓嶆敮鎸丼etLoadDataBoundary鎺ュ彛銆?*
 
-    **说明**：3510架构硬件删除了L1 Buffer的边界值设定相关寄存器，不再支持SetLoadDataBoundary接口。该接口用于设置Load3D时L1 Buffer的边界值。如果指令在处理源操作数时，源操作数在L1 Buffer上的地址超出设置的边界，则会从L1 Buffer的起始地址开始读取数据。设置为0表示无边界，可以使用整个L1 Buffer。
+    **璇存槑**锛?510鏋舵瀯纭欢鍒犻櫎浜哃1 Buffer鐨勮竟鐣屽€艰瀹氱浉鍏冲瘎瀛樺櫒锛屼笉鍐嶆敮鎸丼etLoadDataBoundary鎺ュ彛銆傝鎺ュ彛鐢ㄤ簬璁剧疆Load3D鏃禠1 Buffer鐨勮竟鐣屽€笺€傚鏋滄寚浠ゅ湪澶勭悊婧愭搷浣滄暟鏃讹紝婧愭搷浣滄暟鍦↙1 Buffer涓婄殑鍦板潃瓒呭嚭璁剧疆鐨勮竟鐣岋紝鍒欎細浠嶭1 Buffer鐨勮捣濮嬪湴鍧€寮€濮嬭鍙栨暟鎹€傝缃负0琛ㄧず鏃犺竟鐣岋紝鍙互浣跨敤鏁翠釜L1 Buffer銆?
 
-    **兼容方案**：
+    **鍏煎鏂规**锛?
 
-    -   [NPU架构版本2201](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)的接口参数boundaryValue设置为0时与3510架构版本等价。
-    -   如果需要在L1 Buffer上循环读取操作数，需要将对应的Load3D接口手动拆分成多条指令，手动绕回。具体代码可参考[SetLoadDataBoundary兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)。
+    -   [NPU鏋舵瀯鐗堟湰2201](../../../缂栫▼鎸囧崡/璇█鎵╁睍灞?SIMD-BuiltIn鍏抽敭瀛?md#table65291052154114)鐨勬帴鍙ｅ弬鏁癰oundaryValue璁剧疆涓?鏃朵笌3510鏋舵瀯鐗堟湰绛変环銆?
+    -   濡傛灉闇€瑕佸湪L1 Buffer涓婂惊鐜鍙栨搷浣滄暟锛岄渶瑕佸皢瀵瑰簲鐨凩oad3D鎺ュ彛鎵嬪姩鎷嗗垎鎴愬鏉℃寚浠わ紝鎵嬪姩缁曞洖銆傚叿浣撲唬鐮佸彲鍙傝€僛SetLoadDataBoundary鍏煎鎬ф牱渚媇(https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/set_loaddata_boundary)銆?
 
     ![](../../../figures/1_zn.png)
 
-    如上图所示，以L1 Buffer到L0A Buffer的搬运为例。矩阵A为half数据类型，大小为32 \* 32的矩阵，假设边界为512B，可以重复搬运数据到L0A Buffer，在每次搬运时设置目的操作数的地址偏移量。
+    濡備笂鍥炬墍绀猴紝浠1 Buffer鍒癓0A Buffer鐨勬惉杩愪负渚嬨€傜煩闃礎涓篽alf鏁版嵁绫诲瀷锛屽ぇ灏忎负32 \* 32鐨勭煩闃碉紝鍋囪杈圭晫涓?12B锛屽彲浠ラ噸澶嶆惉杩愭暟鎹埌L0A Buffer锛屽湪姣忔鎼繍鏃惰缃洰鐨勬搷浣滄暟鐨勫湴鍧€鍋忕Щ閲忋€?
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    1.  灏嗙煩闃礎浠嶨M鎼繍鍒癓1 Buffer銆?
 
         ```
         __aicore__ inline void CopyGmToA1Nd2Nz(AscendC::LocalTensor<T>& leftMatrix)
@@ -169,7 +169,7 @@
         }
         ```
 
-    2.  将矩阵B从GM搬运到L1 Buffer。
+    2.  灏嗙煩闃礏浠嶨M鎼繍鍒癓1 Buffer銆?
 
         ```
         __aicore__ inline void CopyGmToB1Nd2Nz(AscendC::LocalTensor<U>& rightMatrix)
@@ -180,14 +180,14 @@
         }
         ```
 
-    3.  将矩阵A从L1 Buffer搬运到L0A Buffer。
+    3.  灏嗙煩闃礎浠嶭1 Buffer鎼繍鍒癓0A Buffer銆?
 
         ```
             __aicore__ inline void Load3DA1ToL0A(AscendC::LocalTensor<T>& leftMatrix, AscendC::LocalTensor<T>& a2)
             {
                 AscendC::LoadData3DParamsV2Pro loadData3dParamsPro;
                 ...
-        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
                 ...
                 AscendC::SetLoadDataRepeat({0, 1, 0});
                 AscendC::SetLoadDataBoundary(1024);
@@ -196,7 +196,7 @@
                 uint16_t dstStride = AscendC::DivCeil(M / 2, 16);
                 ...
                 AscendC::SetLoadDataRepeatWithStride({0, 1, 0, dstStride});
-                // 多次调用LoadData进行手动绕回
+                // 澶氭璋冪敤LoadData杩涜鎵嬪姩缁曞洖
                 AscendC::LoadData(a2, leftMatrix, loadData3dParamsPro);
                 AscendC::LocalTensor<T> a3 = a2[256];
                 AscendC::LoadData(a3, leftMatrix, loadData3dParamsPro);
@@ -208,7 +208,7 @@
             }
         ```
 
-    4.  将矩阵B从L1 Buffer搬运到L0B Buffer。
+    4.  灏嗙煩闃礏浠嶭1 Buffer鎼繍鍒癓0B Buffer銆?
 
         ```
             __aicore__ inline void Load3DB1ToL0B(AscendC::LocalTensor<U>& rightMatrix, AscendC::LocalTensor<U>& b2)
@@ -218,7 +218,7 @@
                 uint8_t padList[AscendC::PAD_SIZE] = {0, 0, 0, 0};
                 static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
                 AscendC::SetFmatrix(N, 1, padList, AscendC::FmatrixMode::FMATRIX_LEFT);
-        #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
                 AscendC::SetLoadDataRepeat({0, 1, 0});
                 AscendC::SetLoadDataBoundary(0);
                 AscendC::SetLoadDataPaddingValue(0);
@@ -232,7 +232,7 @@
             }
         ```
 
-    5.  矩阵计算。
+    5.  鐭╅樀璁＄畻銆?
 
         ```
         __aicore__ inline void Compute(AscendC::LocalTensor<T>& a2, AscendC::LocalTensor<U>& b2,
@@ -244,7 +244,7 @@
         }
         ```
 
-    6.  将矩阵C从L0C Buffer搬运到GM。
+    6.  灏嗙煩闃礐浠嶭0C Buffer鎼繍鍒癎M銆?
 
         ```
         __aicore__ inline void CopyL0CToGm(AscendC::LocalTensor<V>& co1Local, const AscendC::GlobalTensor<S>& gm)
@@ -256,15 +256,15 @@
         }
         ```
 
-## 矩阵计算<a name="section17560113713122"></a>
+## 鐭╅樀璁＄畻<a name="section17560113713122"></a>
 
--   **Cube计算单元删除int4b\_t数据类型。**
+-   **Cube璁＄畻鍗曞厓鍒犻櫎int4b\_t鏁版嵁绫诲瀷銆?*
 
-    **说明**：相较于2201架构版本，3510架构版本的Cube计算单元不支持int4b\_t。相关的基础API有LoadData、Mmad和LoadDataWithTranspose，这些接口不再支持int4b\_t。
+    **璇存槑**锛氱浉杈冧簬2201鏋舵瀯鐗堟湰锛?510鏋舵瀯鐗堟湰鐨凜ube璁＄畻鍗曞厓涓嶆敮鎸乮nt4b\_t銆傜浉鍏崇殑鍩虹API鏈塋oadData銆丮mad鍜孡oadDataWithTranspose锛岃繖浜涙帴鍙ｄ笉鍐嶆敮鎸乮nt4b\_t銆?
 
-    **兼容方案**：算子侧通过编写CV融合算子在Vector Core进行int4b\_t到int8\_t的Cast转换，再通过UB搬运到L1后进行Mmad计算。具体代码可参考[int4数据类型下Matmul兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)。图层面可以在该算子前增加Cast节点进行int4b\_t到int8\_t的转换。
+    **鍏煎鏂规**锛氱畻瀛愪晶閫氳繃缂栧啓CV铻嶅悎绠楀瓙鍦╒ector Core杩涜int4b\_t鍒癷nt8\_t鐨凜ast杞崲锛屽啀閫氳繃UB鎼繍鍒癓1鍚庤繘琛孧mad璁＄畻銆傚叿浣撲唬鐮佸彲鍙傝€僛int4鏁版嵁绫诲瀷涓婱atmul鍏煎鎬ф牱渚媇(https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/matmul_s4)銆傚浘灞傞潰鍙互鍦ㄨ绠楀瓙鍓嶅鍔燙ast鑺傜偣杩涜int4b\_t鍒癷nt8\_t鐨勮浆鎹€?
 
-    1.  在Vector Core进行int4b\_t到int8\_t的Cast转换，转换后的数据保存到新的GM空间中。
+    1.  鍦╒ector Core杩涜int4b\_t鍒癷nt8\_t鐨凜ast杞崲锛岃浆鎹㈠悗鐨勬暟鎹繚瀛樺埌鏂扮殑GM绌洪棿涓€?
 
         ```
         __aicore__ inline void Unzip(AscendC::GlobalTensor<int8_t>& dstGlobalTensor,
@@ -295,7 +295,7 @@
         }
         ```
 
-    2.  进行int8\_t数据类型的矩阵计算。
+    2.  杩涜int8\_t鏁版嵁绫诲瀷鐨勭煩闃佃绠椼€?
 
         ```
         __aicore__ inline void RunMatmul()
@@ -318,42 +318,42 @@
         }
         ```
 
--   **L0A Buffer分形改变，从ZZ转换为ZN格式。**
+-   **L0A Buffer鍒嗗舰鏀瑰彉锛屼粠ZZ杞崲涓篫N鏍煎紡銆?*
 
-    **说明**：涉及的API有LoadData、Mmad和LoadDataWithTranspose。
+    **璇存槑**锛氭秹鍙婄殑API鏈塋oadData銆丮mad鍜孡oadDataWithTranspose銆?
 
-    -   2201架构版本，参与矩阵乘计算（A \* B = C）时， ABC矩阵的数据排布格式分别为Zz，Zn，Nz。A、B、C矩阵分别位于L0A Buffer、L0B Buffer、L0C Buffer。
+    -   2201鏋舵瀯鐗堟湰锛屽弬涓庣煩闃典箻璁＄畻锛圓 \* B = C锛夋椂锛?ABC鐭╅樀鐨勬暟鎹帓甯冩牸寮忓垎鍒负Zz锛孼n锛孨z銆侫銆丅銆丆鐭╅樀鍒嗗埆浣嶄簬L0A Buffer銆丩0B Buffer銆丩0C Buffer銆?
 
-        矩阵A：每个分形矩阵内部是行主序，分形矩阵之间是行主序。分形Shape为16 x \(32B/sizeof\(AType\)\)，大小为512Byte。
+        鐭╅樀A锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸琛屼富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄涓诲簭銆傚垎褰hape涓?6 x \(32B/sizeof\(AType\)\)锛屽ぇ灏忎负512Byte銆?
 
-        矩阵B：每个分形矩阵内部是列主序，分形矩阵之间是行主序。分形Shape为 \(32B/sizeof\(BType\)\) x 16，大小为512Byte。
+        鐭╅樀B锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸鍒椾富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄涓诲簭銆傚垎褰hape涓?\(32B/sizeof\(BType\)\) x 16锛屽ぇ灏忎负512Byte銆?
 
-        矩阵C：每个分形矩阵内部是行主序，分形矩阵之间是列主序。分形Shape为16 x 16，大小为256个元素。
+        鐭╅樀C锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸琛屼富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄垪涓诲簭銆傚垎褰hape涓?6 x 16锛屽ぇ灏忎负256涓厓绱犮€?
 
         ![](../../../figures/2_zn.png)
 
-    -   3510架构版本，参与矩阵乘计算（A \* B = C）时， ABC矩阵的数据排布格式分别为Nz，Zn，Nz。
+    -   3510鏋舵瀯鐗堟湰锛屽弬涓庣煩闃典箻璁＄畻锛圓 \* B = C锛夋椂锛?ABC鐭╅樀鐨勬暟鎹帓甯冩牸寮忓垎鍒负Nz锛孼n锛孨z銆?
 
-        矩阵A：每个分形矩阵内部是行主序，分形矩阵之间是列主序。其Shape为16 x \(32B/sizeof\(AType\)\)，大小为512Byte。
+        鐭╅樀A锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸琛屼富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄垪涓诲簭銆傚叾Shape涓?6 x \(32B/sizeof\(AType\)\)锛屽ぇ灏忎负512Byte銆?
 
-        矩阵B：每个分形矩阵内部是列主序，分形矩阵之间是行主序。其Shape为 \(32B/sizeof\(BType\)\) x 16，大小为512Byte。
+        鐭╅樀B锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸鍒椾富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄涓诲簭銆傚叾Shape涓?\(32B/sizeof\(BType\)\) x 16锛屽ぇ灏忎负512Byte銆?
 
-        矩阵C：每个分形矩阵内部是行主序，分形矩阵之间是列主序。其Shape为16 x 16，大小为256个元素。
+        鐭╅樀C锛氭瘡涓垎褰㈢煩闃靛唴閮ㄦ槸琛屼富搴忥紝鍒嗗舰鐭╅樀涔嬮棿鏄垪涓诲簭銆傚叾Shape涓?6 x 16锛屽ぇ灏忎负256涓厓绱犮€?
 
         ![](../../../figures/3_zn.png)
 
-    **兼容方案**：非L0A Buffer切分的场景兼容2201版本，L0A Buffer切分的场景需要根据新的分形重新适配。具体代码可参考[pattern_transformation兼容性样例](https://gitcode.com/cann/asc-devkit/tree/c6dc78cfbccfb1a8f910ed4b6845bfacde5d2d9f/examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)。
+    **鍏煎鏂规**锛氶潪L0A Buffer鍒囧垎鐨勫満鏅吋瀹?201鐗堟湰锛孡0A Buffer鍒囧垎鐨勫満鏅渶瑕佹牴鎹柊鐨勫垎褰㈤噸鏂伴€傞厤銆傚叿浣撲唬鐮佸彲鍙傝€僛pattern_transformation鍏煎鎬ф牱渚媇(https://gitcode.com/cann/asc-devkit/tree/c6dc78cfbccfb1a8f910ed4b6845bfacde5d2d9f/examples/01_simd_cpp_api/06_compatibility_guide/pattern_transformation)銆?
 
-    在2201架构中，矩阵计算要求左矩阵为ZZ分形（3510中为NZ），右矩阵为ZN分形，由于L1 Buffer的数据分形为NZ，所以2201架构下将左矩阵从L1 Buffer搬运到L0A Buffer需要额外做NZ分形到ZZ分形的转换，3510架构下则不用转换分形。
+    鍦?201鏋舵瀯涓紝鐭╅樀璁＄畻瑕佹眰宸︾煩闃典负ZZ鍒嗗舰锛?510涓负NZ锛夛紝鍙崇煩闃典负ZN鍒嗗舰锛岀敱浜嶭1 Buffer鐨勬暟鎹垎褰负NZ锛屾墍浠?201鏋舵瀯涓嬪皢宸︾煩闃典粠L1 Buffer鎼繍鍒癓0A Buffer闇€瑕侀澶栧仛NZ鍒嗗舰鍒癦Z鍒嗗舰鐨勮浆鎹紝3510鏋舵瀯涓嬪垯涓嶇敤杞崲鍒嗗舰銆?
 
     ![](../../../figures/4_zn.png)
 
-    分形变化带来的变动主要体现在L1 Buffer到L0A Buffer的搬运过程，以下代码片段进行展示：
+    鍒嗗舰鍙樺寲甯︽潵鐨勫彉鍔ㄤ富瑕佷綋鐜板湪L1 Buffer鍒癓0A Buffer鐨勬惉杩愯繃绋嬶紝浠ヤ笅浠ｇ爜鐗囨杩涜灞曠ず锛?
 
     ```
         __aicore__ inline void DataLoadA(AscendC::LocalTensor<T> a1, AscendC::LocalTensor<T> a2)
         {
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
             constexpr uint32_t mBlocks = M / CUBE_BLOCK;
             constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
             int srcOffset = 0;
@@ -382,21 +382,21 @@
         }
     ```
 
--   **3510架构版本硬件架构删除4：2结构化稀疏功能。**<a name="li69092585134"></a>
+-   **3510鏋舵瀯鐗堟湰纭欢鏋舵瀯鍒犻櫎4锛?缁撴瀯鍖栫█鐤忓姛鑳姐€?*<a name="li69092585134"></a>
 
-    **说明**：LoadDataWithSparse用于将存储在L1 Buffer中的512B稠密权重矩阵搬运到L0B buffer，并同时读取128B的索引矩阵以实现稠密矩阵的稀疏化。由于3510架构版本不支持结构化稀疏功能，因此LoadDataWithSparse在此版本中并不适用。另一方面，MmadWithSparse负责执行矩阵乘加操作，其中右矩阵B为稠密矩阵，需要通过调用LoadDataWithSparse进行载入。由于3510架构不支持LoadDataWithSparse，因此MmadWithSparse也无法在3510架构版本中使用。
+    **璇存槑**锛歀oadDataWithSparse鐢ㄤ簬灏嗗瓨鍌ㄥ湪L1 Buffer涓殑512B绋犲瘑鏉冮噸鐭╅樀鎼繍鍒癓0B buffer锛屽苟鍚屾椂璇诲彇128B鐨勭储寮曠煩闃典互瀹炵幇绋犲瘑鐭╅樀鐨勭█鐤忓寲銆傜敱浜?510鏋舵瀯鐗堟湰涓嶆敮鎸佺粨鏋勫寲绋€鐤忓姛鑳斤紝鍥犳LoadDataWithSparse鍦ㄦ鐗堟湰涓苟涓嶉€傜敤銆傚彟涓€鏂归潰锛孧madWithSparse璐熻矗鎵ц鐭╅樀涔樺姞鎿嶄綔锛屽叾涓彸鐭╅樀B涓虹瀵嗙煩闃碉紝闇€瑕侀€氳繃璋冪敤LoadDataWithSparse杩涜杞藉叆銆傜敱浜?510鏋舵瀯涓嶆敮鎸丩oadDataWithSparse锛屽洜姝madWithSparse涔熸棤娉曞湪3510鏋舵瀯鐗堟湰涓娇鐢ㄣ€?
 
-    **兼容方案**：在算子侧可以不调用LoadDatawithSparse进行矩阵稠密转稀疏操作，然后使用Mmad进行正常的稠密矩阵计算。稀疏矩阵相关算法可参考MmadWithSparse中的介绍。
+    **鍏煎鏂规**锛氬湪绠楀瓙渚у彲浠ヤ笉璋冪敤LoadDatawithSparse杩涜鐭╅樀绋犲瘑杞█鐤忔搷浣滐紝鐒跺悗浣跨敤Mmad杩涜姝ｅ父鐨勭瀵嗙煩闃佃绠椼€傜█鐤忕煩闃电浉鍏崇畻娉曞彲鍙傝€僊madWithSparse涓殑浠嬬粛銆?
 
--   **3510架构版本删除GM-\>L0A Buffer/L0B Buffer通路**
+-   **3510鏋舵瀯鐗堟湰鍒犻櫎GM-\>L0A Buffer/L0B Buffer閫氳矾**
 
-    **说明**：硬件删除GM-\>L0A Buffer/L0B Buffer通路，调用LoadData时，不再支持这些通路。
+    **璇存槑**锛氱‖浠跺垹闄M-\>L0A Buffer/L0B Buffer閫氳矾锛岃皟鐢↙oadData鏃讹紝涓嶅啀鏀寔杩欎簺閫氳矾銆?
 
-    **兼容方案**：实现GM-\>L0A Buffer/L0B Buffer搬运需拆分成两步进行，先从GM搬运到L1 Buffer，再从L1 Buffer搬运到L0A Buffer、L0B Buffer。
+    **鍏煎鏂规**锛氬疄鐜癎M-\>L0A Buffer/L0B Buffer鎼繍闇€鎷嗗垎鎴愪袱姝ヨ繘琛岋紝鍏堜粠GM鎼繍鍒癓1 Buffer锛屽啀浠嶭1 Buffer鎼繍鍒癓0A Buffer銆丩0B Buffer銆?
 
-     以GM-\>L1 Buffer-\>L0A Buffer通路为例可以参考以下步骤：
+     浠M-\>L1 Buffer-\>L0A Buffer閫氳矾涓轰緥鍙互鍙傝€冧互涓嬫楠わ細
 
-    1.  将矩阵A从GM搬运到L1 Buffer。
+    1.  灏嗙煩闃礎浠嶨M鎼繍鍒癓1 Buffer銆?
 
         ```
         __aicore__ inline void CopyGmToA1(AscendC::LocalTensor<T>& leftMatrix)
@@ -406,7 +406,7 @@
         }
         ```
 
-    2.  将矩阵A从L1 Buffer搬运到L0A Buffer。
+    2.  灏嗙煩闃礎浠嶭1 Buffer鎼繍鍒癓0A Buffer銆?
 
         ```
         __aicore__ inline void Load2DA1ToL0A(AscendC::LocalTensor<T>& a1, AscendC::LocalTensor<T>& a2)
@@ -417,15 +417,15 @@
         }
         ```
 
--   **3510架构版本删除L0A Buffer/L0B Buffer初始化的相关硬件指令。**
+-   **3510鏋舵瀯鐗堟湰鍒犻櫎L0A Buffer/L0B Buffer鍒濆鍖栫殑鐩稿叧纭欢鎸囦护銆?*
 
-    **说明**：Fill接口将特定存储位置的LocalTensor初始化为某一具体数值，不支持直接初始化L0A Buffer、L0B Buffer。
+    **璇存槑**锛欶ill鎺ュ彛灏嗙壒瀹氬瓨鍌ㄤ綅缃殑LocalTensor鍒濆鍖栦负鏌愪竴鍏蜂綋鏁板€硷紝涓嶆敮鎸佺洿鎺ュ垵濮嬪寲L0A Buffer銆丩0B Buffer銆?
 
-    **兼容方案**：先通过Fill接口初始化L1 Buffer，再通过LoadData接口将L1 Buffer上的数据搬运到L0A Buffer、L0B Buffer。具体代码可参考[Fill兼容性样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/fill)。
+    **鍏煎鏂规**锛氬厛閫氳繃Fill鎺ュ彛鍒濆鍖朙1 Buffer锛屽啀閫氳繃LoadData鎺ュ彛灏哃1 Buffer涓婄殑鏁版嵁鎼繍鍒癓0A Buffer銆丩0B Buffer銆傚叿浣撲唬鐮佸彲鍙傝€僛Fill鍏煎鎬ф牱渚媇(https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/06_compatibility_guide/fill)銆?
 
-    以GM-\>L1 Buffer-\>L0A Buffer的数据通路为例：
+    浠M-\>L1 Buffer-\>L0A Buffer鐨勬暟鎹€氳矾涓轰緥锛?
 
-    1.  初始化L1 Buffer。
+    1.  鍒濆鍖朙1 Buffer銆?
 
         ```
         __aicore__ inline void InitConstA1(AscendC::LocalTensor<T>& a1Local)
@@ -434,7 +434,7 @@
         }
         ```
 
-    2.  调用LoadData接口将L1 Buffer上的数据搬运到L0A Buffer。
+    2.  璋冪敤LoadData鎺ュ彛灏哃1 Buffer涓婄殑鏁版嵁鎼繍鍒癓0A Buffer銆?
 
         ```
         __aicore__ inline void Load2DA1ToA2(AscendC::LocalTensor<T>& a1Local, AscendC::LocalTensor<T>& a2Local)
@@ -445,18 +445,18 @@
         }
         ```
 
-## 系统变量访问<a name="section34615332215"></a>
+## 绯荤粺鍙橀噺璁块棶<a name="section34615332215"></a>
 
--   **不支持CheckLocalMemoryIA，3510架构版本相关寄存器删除。**
+-   **涓嶆敮鎸丆heckLocalMemoryIA锛?510鏋舵瀯鐗堟湰鐩稿叧瀵勫瓨鍣ㄥ垹闄ゃ€?*
 
-    **说明**：CheckLocalMemoryIA监视设定范围内的UB读写行为，如果监视到有设定范围的读写行为则会出现EXCEPTION报错，未监视到设定范围的读写行为则不会报错。
+    **璇存槑**锛欳heckLocalMemoryIA鐩戣璁惧畾鑼冨洿鍐呯殑UB璇诲啓琛屼负锛屽鏋滅洃瑙嗗埌鏈夎瀹氳寖鍥寸殑璇诲啓琛屼负鍒欎細鍑虹幇EXCEPTION鎶ラ敊锛屾湭鐩戣鍒拌瀹氳寖鍥寸殑璇诲啓琛屼负鍒欎笉浼氭姤閿欍€?
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **鍏煎鏂规**锛氳鎺ュ彛涓鸿皟娴嬫帴鍙ｏ紝瀵瑰姛鑳芥棤褰卞搷銆?
 
-## 调测API<a name="section12611957102116"></a>
+## 璋冩祴API<a name="section12611957102116"></a>
 
--   **L1 Buffer上不支持Tensor信息的打印。**
+-   **L1 Buffer涓婁笉鏀寔Tensor淇℃伅鐨勬墦鍗般€?*
 
-    **说明**：因芯片删除L1 Buffer-\>GM通路，不支持L1 Buffer-\>GM的功能。
+    **璇存槑**锛氬洜鑺墖鍒犻櫎L1 Buffer-\>GM閫氳矾锛屼笉鏀寔L1 Buffer-\>GM鐨勫姛鑳姐€?
 
-    **兼容方案**：该接口为调测接口，对功能无影响。
+    **鍏煎鏂规**锛氳鎺ュ彛涓鸿皟娴嬫帴鍙ｏ紝瀵瑰姛鑳芥棤褰卞搷銆?

@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_VECTOR_DATAMOVE_VECTOR_DATAMOVE_H
 #define INCLUDE_C_API_VECTOR_DATAMOVE_VECTOR_DATAMOVE_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 #include "instr_impl/npu_arch_2201/vector_datamove_impl.h"
 
@@ -46,7 +46,7 @@ __aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value);
 
 __aicore__ inline void asc_set_copy_pad_val(float pad_value);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst, __ubuf__ void* src,
     uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap);

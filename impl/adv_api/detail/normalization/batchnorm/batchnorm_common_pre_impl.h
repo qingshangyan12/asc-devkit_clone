@@ -338,22 +338,22 @@ __aicore__ inline void GetBatchNormOutputVarianceNorm(
     const UnaryRepeatParams mulsUnaryParams;
     SetMaskCount();
     SetVectorMask<float, MaskMode::COUNTER>(0, tiling.shCurLength);
-    // 1、sub shape:[s,h]->[b,s,h]
+    // 1銆乻ub shape:[s,h]->[b,s,h]
     for (uint32_t i = 0; i < tiling.originalBLength; i++) {
         Sub<float, false>(
             params.tempTensorC[i * tiling.shCurLength], inputX[i * params.srcOffset], outputMean, MASK_PLACEHOLDER, 1,
             binaryParams);
     }
     PipeBarrier<PIPE_V>();
-    // 2�?x-meanX)*(x-meanX)   shape:[b,s,h]
+    // 2銆?x-meanX)*(x-meanX)   shape:[b,s,h]
     SetVectorMask<float, MaskMode::COUNTER>(0, tiling.bshCurLength);
     Mul<float, false>(params.tempTensorB, params.tempTensorC, params.tempTensorC, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    // 3�?x-meanX)*(x-meanX) * (1/m)  shape:[b,s,h]
+    // 3銆?x-meanX)*(x-meanX) * (1/m)  shape:[b,s,h]
     Muls<float, false>(
         params.tempTensorA, params.tempTensorB, params.firstDimValueBack, MASK_PLACEHOLDER, 1, mulsUnaryParams);
     PipeBarrier<PIPE_V>();
-    // 4、reduce batch axis  shape:[s,h]
+    // 4銆乺educe batch axis  shape:[s,h]
     GetReduceAddResult<false>(outputVariance, params.tempTensorA, tiling, params);
 }
 

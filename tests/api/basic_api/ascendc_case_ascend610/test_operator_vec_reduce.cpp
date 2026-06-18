@@ -9,8 +9,8 @@
 */
 #include <gtest/gtest.h>
 #include "kernel_log.h"
-static uint8_t g_testRes = 1;      // 全局变量记录运行结果, 如果进入ASCENDC_ASSERT报错，会被置为0
-// 重定义ASCENDC_ASSERT，不Abort，仅修改全局变量通知进入报错分支
+static uint8_t g_testRes = 1;      // 鍏ㄥ眬鍙橀噺璁板綍杩愯缁撴灉, 濡傛灉杩涘叆ASCENDC_ASSERT鎶ラ敊锛屼細琚疆涓?
+// 閲嶅畾涔堿SCENDC_ASSERT锛屼笉Abort锛屼粎淇敼鍏ㄥ眬鍙橀噺閫氱煡杩涘叆鎶ラ敊鍒嗘敮
 #undef ASCENDC_ASSERT
 #define ASCENDC_ASSERT(cond, behavior) \
     do {                               \
@@ -270,7 +270,7 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(TEST_REDUCE_SIMPLE, ReduceSimpleTestsuite,
     ::testing::Values(ReduceTestParams { MainAllReduceSimple<half>, 128, 16, 2, 0 },
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002) // dav-m200
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002 // dav-m200
     ReduceTestParams { MainAllReduceSimple<float>, 64, 16, 4, 0 },
     ReduceTestParams { MainAllReduceSimple<float>, 64, 16, 4, 2 },
     ReduceTestParams { MainAllReduceSimple<float>, 16648, 16, 4, 0 },
