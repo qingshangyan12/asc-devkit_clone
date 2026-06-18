@@ -25,7 +25,7 @@ Tensor原地操作（inplace接口）是一种优化技术，全局申请、保�
 
 -   **配置TQue对象**：在创建TQue对象时，设置深度（depth）为0，启用inplace操作模式。
 -   **调用原地操作接口**：使用inplace接口直接操作LocalTensor。
-    -   [AllocTensor](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0746.html)和[DeQue](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0749.html)区分non-inplace和inplace接口，详情请参考[AllocTensor](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0746.html)、[DeQue](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0749.html)。
+    -   [AllocTensor](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0746.html)和[DeQue](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0141.html)区分non-inplace和inplace接口，详情请参考[AllocTensor](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0746.html)、[DeQue](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0141.html)。
     -   FreeTensor和EnQue不区分non-inplace和inplace接口。
 
 ## 示例代码<a name="section729517189461"></a>
