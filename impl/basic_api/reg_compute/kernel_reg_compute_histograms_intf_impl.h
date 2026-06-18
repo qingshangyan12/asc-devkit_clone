@@ -13,7 +13,6 @@
  * \brief
  */
 
-
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message("impl/basic/reg_compute/kernel_reg_compute_histograms_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file maybe removed in the future. Please use \"#include \"reg_compute/kernel_reg_compute_histograms_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
@@ -27,8 +26,6 @@
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_histograms_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_histograms_impl.h"
-#elif __NPU_ARCH__ == 5102
-#include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_histograms_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_histograms_impl.h"
 #endif

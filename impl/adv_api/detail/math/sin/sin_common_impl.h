@@ -28,7 +28,7 @@
 #include "../../api_check/kernel_check/math/sin/sin_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
 #include "sin_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "sin_v200_impl.h"
@@ -67,7 +67,7 @@ __aicore__ inline void SinSignCompute(
     // kover2
     Muls<float, false>(dstTensor, roundTensor, SIN_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
     SinCastFullMask(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
 #else
     SinCast(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
@@ -158,14 +158,14 @@ __aicore__ inline void SinKpi(
     PipeBarrier<PIPE_V>();
 }
 
-// normalized x to [-π/2, π/2] using x = x-round(x/π)*π
+// normalized x to [-蟺/2, 蟺/2] using x = x-round(x/蟺)*蟺
 __aicore__ inline void SinRound(
     const LocalTensor<float>& inputX, const LocalTensor<float>& srcTensor, const LocalTensor<float>& roundTensor,
     const LocalTensor<float>& kpi)
 {
     /*
-    k=round(x/π), x0=x-kπ, x0 belongs to [-π/2, π/2]
-    π=π_0+π_1+π_2+π_3 achieve final precision compensation.
+    k=round(x/蟺), x0=x-k蟺, x0 belongs to [-蟺/2, 蟺/2]
+    蟺=蟺_0+蟺_1+蟺_2+蟺_3 achieve final precision compensation.
     Final solution:
     k = round(x * invpi)
     x -= k * pi_0
@@ -176,7 +176,7 @@ __aicore__ inline void SinRound(
     const UnaryRepeatParams unaryParams;
     Muls<float, false>(roundTensor, srcTensor, SIN_PI_FOR_X_TODIV, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
     SinCastFullMask(roundTensor, roundTensor, RoundMode::CAST_ROUND);
 #else
     SinCast(roundTensor, roundTensor, RoundMode::CAST_ROUND);

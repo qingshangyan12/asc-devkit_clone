@@ -109,7 +109,7 @@ constexpr int32_t g_coreType = AscendC::MIX;
     __ASC_RESERVED_UBUF_PRAGMA__(GCC error \
         "unsupported chip architecture in __ASC_USE_RESERVED_UBUF__; supported architectures are 2201 and 3510")
 
-#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define __ASC_USE_RESERVED_UBUF_2201(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #else
 #define __ASC_USE_RESERVED_UBUF_2201(msg)

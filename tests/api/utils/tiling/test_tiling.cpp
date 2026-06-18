@@ -67,7 +67,6 @@ TEST_F(TestTiling, TestAddInputTdMallocFailed)
     GlobalMockObject::verify();
 }
 
-
 TEST_F(TestTiling, GetShapeSize)
 {
     EXPECT_EQ(ge::Shape().GetShapeSize(), 0);
@@ -129,7 +128,7 @@ TEST_F(TestTiling, TestPlatformAscendCReserveLocalMemory)
     plat.ReserveLocalMemory(static_cast<platform_ascendc::ReservedSize>(5));
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 TEST_F(TestTiling, TestPlatformAscendC)
 {
     fe::PlatFormInfos platform_info;
@@ -146,7 +145,7 @@ TEST_F(TestTiling, TestPlatformAscendC)
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 extern void platfrom_stub_set_num_aic(const char *num);
 extern void platfrom_stub_set_num_aiv(const char *num);
 extern void platfrom_stub_set_num_cub(const char *num);
@@ -229,7 +228,7 @@ TEST_F(TestTiling, TestPlatformAscendC)
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 extern void platfrom_stub_set_num_aic(const char *num);
 extern void platfrom_stub_set_num_aiv(const char *num);
 extern void platfrom_stub_set_num_cub(const char *num);
@@ -669,7 +668,7 @@ TEST_F(TestTiling, TestGetNpuArchFailed)
     EXPECT_EQ(ret, NpuArch::DAV_RESV);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 TEST_F(TestTiling, TestGetNpuArchInvalidValue)
 {
     fe::PlatFormInfos platform_info;
@@ -689,7 +688,6 @@ TEST_F(TestTiling, TestGetNpuArchNeg)
     platfrom_stub_set_npuarch("2201");
 }
 #endif
-
 
 TEST_F(TestTiling, TestCoreNum)
 {
@@ -774,14 +772,14 @@ TEST_F(TestTiling, TestGetVecRegLenWhenSizeExceed)
 {
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
-    
+
     std::string largeValue = "5000000000";
     MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,
         bool(fe::PlatFormInfos::*)(const std::string &, const std::string &, std::string &))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
-    
+
     uint32_t ret = plat.GetVecRegLen();
     EXPECT_EQ(ret, static_cast<uint32_t>(0));
 }
@@ -790,14 +788,14 @@ TEST_F(TestTiling, TestGetVecRegLenWhenSizeStrIllegal)
 {
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
-    
+
     std::string largeValue = "25x";
     MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,
         bool(fe::PlatFormInfos::*)(const std::string &, const std::string &, std::string &))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
-    
+
     uint32_t ret = plat.GetVecRegLen();
     EXPECT_EQ(ret, static_cast<uint32_t>(0));
 }
@@ -806,14 +804,14 @@ TEST_F(TestTiling, TestGetVecRegLenNormal)
 {
     fe::PlatFormInfos platform_info;
     auto plat = platform_ascendc::PlatformAscendC(&platform_info);
-    
+
     std::string largeValue = "256";
     MOCKER_CPP(&fe::PlatFormInfos::GetPlatformResWithLock,
         bool(fe::PlatFormInfos::*)(const std::string &, const std::string &, std::string &))
         .stubs()
         .with(outBound(std::string("AICoreSpec")), outBound(std::string("vector_reg_width")), outBound(largeValue))
         .will(returnValue(true));
-    
+
     uint32_t ret = plat.GetVecRegLen();
     EXPECT_EQ(ret, static_cast<uint32_t>(256));
 }
@@ -846,8 +844,7 @@ TEST_F(TestTiling, TestPlatformCustomSocVersion)
     EXPECT_EQ(nullptr, ret4);
 }
 
-
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__)
 extern void platfrom_stub_set_chip_version(const char *num);
 TEST_F(TestTiling, TestPlatformAscendCMC32DM11A)
 {
@@ -861,19 +858,19 @@ TEST_F(TestTiling, TestPlatformAscendCMC32DM11A)
 TEST_F(TestTiling, TestPlatformAscendCInitWithRuntimePlatformInfos)
 {
     const char* customSocVersion = "Ascend910B1";
-    
+
     MOCKER_CPP(&fe::PlatformInfoManager::InitRuntimePlatformInfos,
         uint32_t(fe::PlatformInfoManager::*)(const std::string &))
         .stubs()
         .will(returnValue(0));
-    
+
     MOCKER_CPP(&fe::PlatformInfoManager::GetRuntimePlatformInfosByDevice,
         uint32_t(fe::PlatformInfoManager::*)(const uint32_t&, fe::PlatFormInfos&, bool))
         .stubs()
         .will(returnValue(0));
-    
+
     auto ret = platform_ascendc::PlatformAscendCManager::PlatformAscendCInit(customSocVersion);
     EXPECT_NE(nullptr, ret);
-    
+
     GlobalMockObject::verify();
 }

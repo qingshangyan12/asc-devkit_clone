@@ -27,7 +27,7 @@ public:
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
         mSortRepeatTimes = mElementCount / 32;
         mExtractRepeatTimes = mElementCount / 32;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
         mSortRepeatTimes = mElementCount / 16;
         mExtractRepeatTimes = mElementCount / 16;
 #endif
@@ -80,7 +80,7 @@ private:
             sortedLocal.SetSize(mElementCount * 2);
             sortTmpLocal.SetSize(mElementCount * 2);
         }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
         sortedLocal.SetSize(mElementCount * 8);
         sortTmpLocal.SetSize(mElementCount * 8);
 #endif
@@ -88,13 +88,13 @@ private:
         
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
         uint32_t singleMergeTmpElementCount = 32;
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
         uint32_t singleMergeTmpElementCount = 16;
 #endif
         uint32_t baseOffset;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3002)
         baseOffset = singleMergeTmpElementCount * 8 / sizeof(T);
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
         if constexpr (sizeof(T) == sizeof(half)) {
             baseOffset = singleMergeTmpElementCount * 16 / sizeof(T);
         } else {
@@ -188,7 +188,7 @@ protected:
             SortParams { 2, 768, testSort<half, true, false>},
             SortParams { 4, 768, testSort<float, true, true>},
             SortParams { 4, 768, testSort<float, true, false>}));
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
     INSTANTIATE_TEST_CASE_P(TEST_OPEARATION_SORT, SortTestsuite,
         ::testing::Values(SortParams { 2, 128, testSort<half, true, true>},
             SortParams { 2, 128, testSort<half, true, false>},
