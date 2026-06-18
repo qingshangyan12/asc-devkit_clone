@@ -21,6 +21,7 @@
 
 #include "ascendc_tool_log.h"
 #include "mmpa/mmpa_api.h"
+#include "op_dtype_name_utils.h"
 #include "op_generator_factory.h"
 #include "register/op_def_factory.h"
 #include "register/op_def.h"
@@ -28,67 +29,7 @@
 namespace ops {
 enum class CPUType { AICPU = 0, HOSTCPU = 1 };
 
-namespace {
-struct DataTypeName {
-    ge::DataType type;
-    const char* name;
-};
-
-constexpr DataTypeName CPU_CFG_DTYPE_NAMES[] = {
-    {ge::DT_FLOAT, "DT_FLOAT"},
-    {ge::DT_FLOAT16, "DT_FLOAT16"},
-    {ge::DT_INT8, "DT_INT8"},
-    {ge::DT_INT16, "DT_INT16"},
-    {ge::DT_INT32, "DT_INT32"},
-    {ge::DT_INT64, "DT_INT64"},
-    {ge::DT_UINT1, "DT_UINT1"},
-    {ge::DT_UINT8, "DT_UINT8"},
-    {ge::DT_UINT16, "DT_UINT16"},
-    {ge::DT_UINT32, "DT_UINT32"},
-    {ge::DT_UINT64, "DT_UINT64"},
-    {ge::DT_BOOL, "DT_BOOL"},
-    {ge::DT_DOUBLE, "DT_DOUBLE"},
-    {ge::DT_DUAL, "DT_DUAL"},
-    {ge::DT_DUAL_SUB_INT8, "DT_DUAL_SUB_INT8"},
-    {ge::DT_DUAL_SUB_UINT8, "DT_DUAL_SUB_UINT8"},
-    {ge::DT_STRING, "DT_STRING"},
-    {ge::DT_COMPLEX64, "DT_COMPLEX64"},
-    {ge::DT_COMPLEX128, "DT_COMPLEX128"},
-    {ge::DT_QINT8, "DT_QINT8"},
-    {ge::DT_QINT16, "DT_QINT16"},
-    {ge::DT_QINT32, "DT_QINT32"},
-    {ge::DT_QUINT8, "DT_QUINT8"},
-    {ge::DT_QUINT16, "DT_QUINT16"},
-    {ge::DT_RESOURCE, "DT_RESOURCE"},
-    {ge::DT_STRING_REF, "DT_STRING_REF"},
-    {ge::DT_INT4, "DT_INT4"},
-    {ge::DT_BF16, "DT_BF16"},
-    {ge::DT_COMPLEX32, "DT_COMPLEX32"},
-    {ge::DT_HIFLOAT8, "DT_HIFLOAT8"},
-    {ge::DT_FLOAT8_E4M3FN, "DT_FLOAT8_E4M3FN"},
-    {ge::DT_FLOAT8_E5M2, "DT_FLOAT8_E5M2"},
-    {ge::DT_FLOAT8_E8M0, "DT_FLOAT8_E8M0"},
-    {ge::DT_FLOAT6_E3M2, "DT_FLOAT6_E3M2"},
-    {ge::DT_FLOAT6_E2M3, "DT_FLOAT6_E2M3"},
-    {ge::DT_FLOAT4_E2M1, "DT_FLOAT4_E2M1"},
-    {ge::DT_FLOAT4_E1M2, "DT_FLOAT4_E1M2"}};
-
-template <size_t N>
-const char* FindDataTypeName(const ge::DataType& type, const DataTypeName (&names)[N])
-{
-    for (const auto& item : names) {
-        if (item.type == type) {
-            return item.name;
-        }
-    }
-    return "unknow";
-}
-} // namespace
-
-std::string CPUCfgGenerator::GetDataTypeName(const ge::DataType& type) const
-{
-    return FindDataTypeName(type, CPU_CFG_DTYPE_NAMES);
-}
+std::string CPUCfgGenerator::GetDataTypeName(const ge::DataType& type) const { return FindCpuCfgDataTypeName(type); }
 
 void CPUCfgGenerator::GetParamFormats(std::vector<ge::Format>& formats, std::string& fmtstr) const
 {
