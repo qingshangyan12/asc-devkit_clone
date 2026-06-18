@@ -10,4 +10,4 @@ SIMT编程基于AI Core的硬件能力实现，当前，SIMT语言扩展层支�
 -   [地址空间谓词函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/地址空间谓词函数/地址空间谓词函数.md)：提供判断输入指针所属地址空间的函数接口集合。
 -   [地址空间转换函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/地址空间转换函数/地址空间转换函数.md)：提供不同地址空间地址值与指针之间相互转换的函数接口集合。
 -   [协作组](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMT-API/协作组/协作组.md)：提供更细粒度的线程间协作的API接口。
--   [调测接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/printf-290.md)：SIMT VF调试场景下使用的相关接口。
+-   [调测接口](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/Utils-API/调测接口/调测接口.md)：SIMT VF调试场景下使用的相关接口。
