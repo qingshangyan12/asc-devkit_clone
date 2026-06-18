@@ -36,4 +36,5 @@ exclude_private = true
 
 exclude_path = [
     "^LICENSES/",
+    "^docs/guide/编程指南/附录/基于样例工程完成Kernel直调\\.md$",
 ]
