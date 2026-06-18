@@ -2,7 +2,7 @@ ASC_ARCH=dav-2201
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$SCRIPT_DIR/profiling_result"
 
-for SCENARIO_NUM in $(seq 1 7); do
+for SCENARIO_NUM in $(seq 1 9); do
     echo ""
     echo "========================================="
     echo "Running scenario $SCENARIO_NUM with arch $ASC_ARCH"

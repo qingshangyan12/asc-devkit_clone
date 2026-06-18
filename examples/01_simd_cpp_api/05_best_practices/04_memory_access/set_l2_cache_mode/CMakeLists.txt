@@ -13,14 +13,14 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_ASC_RUN_MODE "npu" CACHE STRING "Run mode: npu, cpu, sim")
 set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
-set(SCENARIO_NUM "1" CACHE STRING "Scenario number: 1-5")
+set(SCENARIO_NUM "1" CACHE STRING "Scenario number: 1-9")
 
 find_package(ASC REQUIRED)
 
 project(kernel_samples LANGUAGES ASC CXX)
 
-if(NOT SCENARIO_NUM MATCHES "^[1-7]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1 to 7, but got ${SCENARIO_NUM}")
+if(NOT SCENARIO_NUM MATCHES "^[1-9]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1 to 9, but got ${SCENARIO_NUM}")
 endif()
 
 # 确定硬件架构 ID
