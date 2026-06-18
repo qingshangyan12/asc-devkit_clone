@@ -8,6 +8,7 @@ This directory contains API samples related to system variable access. The sampl
 
 | Directory Name | Description | Supported Products |
 | ------- | -------- | --- |
+| [ain_test](./ain_test) | This sample verifies that the adv_api/ain/ain.h header and the Ain device-side class can compile in an Ascend C project. | Ascend 950PR/Ascend 950DT |
 | [ctrl_spr](./ctrl_spr) |  This sample demonstrates setting, reading, and resetting specific bit fields of the CTRL register (control register) using SetCtrlSpr, GetCtrlSpr, and ResetCtrlSpr interfaces, and verifies whether non-saturation mode is working correctly. | Ascend 950PR/Ascend 950DT |
 | [get_ub_size](./get_ub_size) |  This sample demonstrates the usage of GetUBSizeInBytes and GetRuntimeUBSize interfaces to get the maximum user-available UB size. | Ascend 950PR/Ascend 950DT |
 | [gm_by_pass_dcache](./gm_by_pass_dcache) |  This sample demonstrates reading data from and writing data to GM without going through DCache, based on the ReadGmByPassDcache and WriteGmByPassDcache interfaces. | Ascend 950PR/Ascend 950DT<br>Atlas A3 Training Series Products/Atlas A3 Inference Series Products<br>Atlas A2 Training Series Products/Atlas A2 Inference Series Products |

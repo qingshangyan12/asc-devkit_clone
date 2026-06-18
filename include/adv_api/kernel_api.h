@@ -25,6 +25,7 @@
 #if (__NPU_ARCH__ != 5102)
 #include "hccl/hccl.h"
 #include "hcomm/hcomm.h"
+#include "ain/ain.h"
 #endif
 #include "index/arithprogression.h"
 #include "activation/sigmoid.h"
