@@ -164,14 +164,7 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 
 ### L1->L0B
 
-L1 到 L0B 的搬运，所有产品均使用 Load2D 完成 Nz 格式搬运，**无需兼容性适配**，相关代码如下：
-
-```cpp
-...
-for (uint32_t i = 0; i < kBlocks; ++i) {
-    AscendC::LoadData(b2[i * dstStride], b1[i * srcStride], loadDataParams);
-}
-```
+L1 到 L0B 的搬运，所有产品均为 Nz 格式搬运，**无需兼容性适配**
 
 ### Compute
 
