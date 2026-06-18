@@ -24,7 +24,7 @@
 
 #if (__NPU_ARCH__ == 3510) || \
     (__NPU_ARCH__ == 3003) || \
-    ((__NPU_ARCH__ == 3113)) || defined(__ASC_NPU_HOST__) || \
+    ((__NPU_ARCH__ == 3113)) || (__NPU_ARCH__ == 5161) || defined(__ASC_NPU_HOST__) || \
     (__NPU_ARCH__ == 5102)
 #include "kernel_reg_compute_maskreg_intf_impl.h"
 #include "kernel_reg_compute_addrreg_intf_impl.h"
@@ -52,4 +52,3 @@
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_INTF_IMPL__
 #endif
-

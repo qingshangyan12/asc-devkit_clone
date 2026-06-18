@@ -161,6 +161,7 @@ install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_c220 \${CMAKE_
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_3510 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_3510 SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_l300 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_l300 SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_l311 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_l311 SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_l516 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_l516 SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_m200 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_m200 SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_m300 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_m300 SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../../../asc/impl/basic_api/dav_m310 \${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/ascendc/include/basic_api/impl/dav_m310 SYMBOLIC)" COMPONENT asc-devkit)

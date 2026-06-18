@@ -42,6 +42,9 @@
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_createvecindex_impl.h"
 #include "dav_l311/kernel_operator_vec_cmpsel_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "dav_l516/kernel_operator_vec_createvecindex_impl.h"
+#include "dav_l516/kernel_operator_vec_cmpsel_impl.h"
 #endif
 
 namespace AscendC {

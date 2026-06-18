@@ -23,12 +23,14 @@
 #define ASCENDC_KERNEL_REG_COMPUTE_COMMON_INTERFACE_IMPL_H
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || defined(__ASC_NPU_HOST__)
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5161) || defined(__ASC_NPU_HOST__)
 #include "../../../include/basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"
 #if __NPU_ARCH__ == 3003
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_common_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_common_impl.h"
+#elif __NPU_ARCH__ == 5161
+#include "../../basic_api/reg_compute/dav_l516/kernel_reg_compute_common_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_common_impl.h"
 #else
@@ -42,4 +44,3 @@
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_COMMON_INTF_IMPL__
 #endif
-

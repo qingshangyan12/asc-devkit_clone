@@ -314,7 +314,7 @@ private:
 
     __aicore__ inline void DepthCheck()
     {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             ASCENDC_ASSERT((tiling_.GetDepthA1() % (tiling_.GetStepM() * tiling_.GetStepKa()) == 0), {
@@ -531,7 +531,7 @@ private:
     template <typename L0cT>
     __aicore__ inline void ConfigCommonStaticCheck()
     {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (ToMatmulConfig(MM_CFG).isEnableChannelSplit) {
             static_assert(

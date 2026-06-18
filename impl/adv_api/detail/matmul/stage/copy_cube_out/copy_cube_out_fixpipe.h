@@ -393,7 +393,7 @@ private:
                         GetOrgM<isIntraBlock>()) +
                     static_cast<int64_t>(curRow * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM()) *
                         DST_C0SIZE;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5161)
                 stride = static_cast<uint32_t>(GetOrgM<isIntraBlock>() * DST_C0SIZE);
 #else
                 stride = static_cast<uint32_t>(GetOrgM<isIntraBlock>() * DST_C0SIZE * sizeof(DstT) / ONE_BLK_SIZE);
