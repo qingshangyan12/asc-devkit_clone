@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 static const char *g_core_num_aic = "1";
 static const char *g_core_num_aiv = "1";
 static const char *g_core_num_cub = "1";
@@ -19,7 +19,7 @@ static const char *g_chip_version = "Ascend310B";
 static const char *g_npu_arch = "3002";
 static uint32_t g_core_num = 1;
 static const char* g_vector_len = "0";
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 static const char *g_core_num_aic = "24";
 static const char *g_core_num_aiv = "48";
 static const char *g_core_num_cub = "24";
@@ -28,7 +28,7 @@ static const char *g_chip_version = "Ascend910B";
 static const char *g_npu_arch = "2201";
 static uint32_t g_core_num = 48;
 static const char* g_vector_len = "0";
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 static const char *g_core_num_aic = "10";
 static const char *g_core_num_aiv = "8";
 static const char *g_core_num_cub = "10";
@@ -37,15 +37,6 @@ static const char *g_chip_version = "Ascend310P";
 static const char *g_npu_arch = "2202";
 static uint32_t g_core_num = 10;
 static const char* g_vector_len = "0";
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
-static const char *g_core_num_aic = "24";
-static const char *g_core_num_aiv = "48";
-static const char *g_core_num_cub = "24";
-static const char *g_core_type_list = "AICore,VectorCore";
-static const char *g_chip_version = "Ascend950";
-static const char *g_npu_arch = "3510";
-static uint32_t g_core_num = 48;
-static const char* g_vector_len = "256";
 #else
 static const char *g_core_num_aic = "32";
 static const char *g_core_num_aiv = "0";
@@ -56,7 +47,6 @@ static const char *g_npu_arch = "1001";
 static uint32_t g_core_num = 32;
 static const char* g_vector_len = "0";
 #endif
-
 
 void platfrom_stub_set_num_aic(const char *num)
 {
@@ -167,7 +157,7 @@ bool PlatFormInfos::GetPlatformResWithLock(const std::string &label, const std::
     return GetPlatformRes(label, key, val);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {
@@ -212,7 +202,7 @@ void PlatFormInfos::GetLocalMemBw(const LocalMemType &mem_type, uint64_t &bw_siz
     }
 
 }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {
@@ -257,7 +247,7 @@ void PlatFormInfos::GetLocalMemBw(const LocalMemType &mem_type, uint64_t &bw_siz
     }
 
 }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 void PlatFormInfos::GetLocalMemSize(const LocalMemType &mem_type, uint64_t &size)
 {
     switch(mem_type) {

@@ -16,7 +16,7 @@
 #ifndef INCLUDE_C_API_SCALAR_COMPUTE_H
 #define INCLUDE_C_API_SCALAR_COMPUTE_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 #include "instr_impl/npu_arch_2201/scalar_compute_impl.h"
 
@@ -34,7 +34,7 @@ __aicore__ inline int64_t asc_ffs(uint64_t value);
 
 __aicore__ inline int64_t asc_popc(uint64_t value);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 
 __aicore__ inline int64_t asc_clz(uint64_t value_in);
 

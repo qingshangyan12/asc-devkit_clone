@@ -40,7 +40,7 @@ INSTANTIATE_TEST_CASE_P(
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 1001)
                       PhyTypeParams{ TPosition::C1, Hardware::UB }, PhyTypeParams{ TPosition::C2, Hardware::L0C },
                       PhyTypeParams{ TPosition::CO2, Hardware::UB },
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
                       PhyTypeParams{ TPosition::C1, Hardware::L1 }, PhyTypeParams{ TPosition::C2, Hardware::BIAS },
                       PhyTypeParams{ TPosition::CO2, Hardware::L1 },
 #endif
@@ -1192,7 +1192,7 @@ TEST_F(TEST_TPIPE, TQueBindEnQueTest)
     EXPECT_EQ(retTensor5.GetPhyAddr(), tensor5.GetPhyAddr());
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 extern int32_t logLevel;
 /* ************************ TQueSync Test **************************** */
 struct TQueSyncParams {
@@ -1209,24 +1209,24 @@ protected:
     void TearDown() {}
     void OpenLog()
     {
-        logLevel = 0;  // 修改日志级别
+        logLevel = 0;  // 淇敼鏃ュ織绾у埆
         fileName = "tque_sync_test_" + std::to_string(getpid()) + ".txt";
-        setvbuf(stdout, nullptr, _IONBF, 0);  //定义流 stream 不使用何缓冲
-        save_fd = dup(STDOUT_FILENO);      //保存标准输出文件描述符
+        setvbuf(stdout, nullptr, _IONBF, 0);  //瀹氫箟娴?stream 涓嶄娇鐢ㄤ綍缂撳啿
+        save_fd = dup(STDOUT_FILENO);      //淇濆瓨鏍囧噯杈撳嚭鏂囦欢鎻忚堪绗?
         fd = open(fileName.c_str(), (O_RDWR | O_CREAT), 0644);
-        dup2(fd, STDOUT_FILENO);  //用fd替换标准输出
+        dup2(fd, STDOUT_FILENO);  //鐢╢d鏇挎崲鏍囧噯杈撳嚭
     }
 
     void CloseLog()
     {
-        logLevel = 3;  // 将日志级别改回
+        logLevel = 3;  // 灏嗘棩蹇楃骇鍒敼鍥?
         close(fd);
-        dup2(save_fd, STDOUT_FILENO);  //用完之后恢复标准输出到屏幕
+        dup2(save_fd, STDOUT_FILENO);  //鐢ㄥ畬涔嬪悗鎭㈠鏍囧噯杈撳嚭鍒板睆骞?
     }
 
     bool CheckGolden(std::vector<std::string>& goldenVec)
     {
-        // 在日志文件中寻找golden字符串并返回结果
+        // 鍦ㄦ棩蹇楁枃浠朵腑瀵绘壘golden瀛楃涓插苟杩斿洖缁撴灉
         std::ifstream resultFile;
         std::stringstream streambuffer;
         resultFile.open(fileName, std::ios::in);
@@ -1272,7 +1272,7 @@ TEST_P(TEST_TQUE_SYNC_PARAMS, TQueSyncTest)
     TQueSyncParams param = GetParam();
     OpenLog();
 
-    // 执行case
+    // 鎵цcase
     if (param.mode == 0) {
         TQueSync<srcPipe[0], dstPipe[0]>().SetFlag(3);
         TQueSync<srcPipe[0], dstPipe[0]>().WaitFlag(3);
@@ -1293,7 +1293,7 @@ TEST_P(TEST_TQUE_SYNC_PARAMS, TQueSyncTest)
         TQueSync<srcPipe[5], dstPipe[5]>().WaitFlag(3);
     }
 
-    // 输出并校验日志
+    // 杈撳嚭骞舵牎楠屾棩蹇?
     CloseLog();
     EXPECT_TRUE(CheckGolden(param.golden));
     RemoveLogFile();

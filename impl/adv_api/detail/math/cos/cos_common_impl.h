@@ -29,7 +29,7 @@
 #include "../../api_check/kernel_check/math/cos/cos_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "cos_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
@@ -112,9 +112,9 @@ __aicore__ inline void CosRound(
     const LocalTensor<float>& kpi)
 {
     /*
-    k=round(x/π + 1/2), x0=x-kπ, x0 belongs to [-π, 0], (x0 + π/2) belongs to [-π/2, π/2]
-    π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
-    Final solution�?
+    k=round(x/蟺 + 1/2), x0=x-k蟺, x0 belongs to [-蟺, 0], (x0 + 蟺/2) belongs to [-蟺/2, 蟺/2]
+    蟺=蟺_0+蟺_1+蟺_2+蟺_3+蟺_4 achieve final precision compensation.
+    Final solution?
     k = round(x * invpi + 1/2)
     x -= k * pi_0
     x -= k * pi_1
@@ -131,7 +131,7 @@ __aicore__ inline void CosRound(
     PipeBarrier<PIPE_V>();
     // tie to even
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(roundTensor, roundTensor, RoundMode::CAST_RINT);
 #else
     CosCast(roundTensor, roundTensor, RoundMode::CAST_RINT);
@@ -153,7 +153,7 @@ __aicore__ inline void SignCompute(
     PipeBarrier<PIPE_V>();
 
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
 #else
     CosCast(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
@@ -178,7 +178,7 @@ __aicore__ inline void CosPolynomialApproximation(
     const LocalTensor<float>& kpi)
 {
     /*
-    cos(x) = (-1)^k*sin(x0 + π/2)
+    cos(x) = (-1)^k*sin(x0 + 蟺/2)
     Finally, use sin(x) = xP(x) to calculate sin(x).
     P(x) = (((x^2 * R0 + R1) * x^2 + R2) * x^2 + R3) * x^2 + 1.0
     */
