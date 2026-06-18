@@ -111,7 +111,7 @@
 | --- | --- |
 | T | 源操作数数据类型。 |
 | U | 目的操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置Mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表2**  接口参数说明
 
@@ -175,7 +175,7 @@
 <cann-filter npu-type = "950">
 
 - 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
 
 </cann-filter>
@@ -199,7 +199,7 @@
 <cann-filter npu-type = "310b">
 
 - 针对Atlas 200I/500 A2 推理产品
-    - T支持的数据类型为：half、float。
+    - T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
     - U支持的数据类型为：uint8_t。
 
 </cann-filter>

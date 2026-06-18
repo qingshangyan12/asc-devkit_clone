@@ -48,7 +48,7 @@
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">uint8_t</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">uint8_t</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask_scenario_1</td></tr>
   </table>
 - 样例实现：  
 <p align="center">
@@ -58,7 +58,7 @@
   1. 在CopyVF函数里，调用LoadAlign接口从UB搬运256bit(32*uint8_t)数据到MaskReg，以实现mask的动态设置。本样例中，32个uint8_t数据设置为1,0,...,1，即第一个数和最后一个数为1(b'00000001)，因为芯片每次从低位读取数字，所以这32个数字最终填充到MaskReg中为b'1000...1...000。
   2. 调用Duplicate接口进行数据填充，MaskReg可以指示计算过程中参与计算的元素，由step1可知MaskReg中第1个bit和第249个bit为1，使用该掩码将只填充RegTensor第1个数和第249个数为2。
   3. 使用StoreAlign接口将RegTensor内的结果保存到UB。
-  4. 将MaskReg中的bit位全部置为1，通过StoreAlign接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFFFF..FF)。
+  4. 将MaskReg中的bit位全部置为1，通过StoreAlign接口将MaskReg中的数据保存到UB(地址=step3中的保存地址+256B)，实现MaskReg数据存储在UB上的功能。对应32个uint8_t数，每个数的每位比特位都为1，因此每个数的值都是255(0xFF)。
 
 ### 场景2：复合计算场景
 - 样例功能：  
@@ -71,7 +71,7 @@
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td align="center">mask</td><td align="center">[1, 32]</td><td align="center">uint8_t</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">select</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_mask_scenario_2</td></tr>
   </table>
 - 样例实现：  
    SelectVF函数内，调用LoadAlign接口将掩码数据从UB搬入MaskReg，再传入Select接口进行计算，结果写回UB。

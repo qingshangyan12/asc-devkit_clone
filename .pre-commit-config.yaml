@@ -13,11 +13,11 @@ repos:
     hooks:
       - id: clang-format
         files: \.(c|h|cpp|hpp|cc|hh|cxx|hxx|asc)$
+        exclude: ^(tests/python/aclrt_launch_kernel/stub_files/|impl/|include/|tools/)
         args:
           - "--style=file"
           - "--verbose"
           - "-i"
-        exclude: ^build/|tests/third_party/
 
   # OAT 合规性检查 (Open Source Audit Tool)
   - repo: local
