@@ -40,5 +40,5 @@ repos:
         name: Markdown link check
         files: ^(docs|examples)/
         pass_filenames: false
-        args: ["--no-progress", "--config", "markdown-link-check.toml", "docs", "examples"]
+        args: ["LYCHEE_VERSION=0.23.0", "--no-progress", "--config", "markdown-link-check.toml", "docs", "examples"]
         stages: [pre-commit, manual]
