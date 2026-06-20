@@ -39,7 +39,6 @@ repos:
         alias: markdown-link-check
         name: Markdown link check
         files: ^(docs|examples)/
-        exclude: ^docs/guide/编程指南/附录/基于样例工程完成Kernel直调\.md$
         pass_filenames: false
         args: ["--no-progress", "--config", "markdown-link-check.toml", "docs", "examples"]
         stages: [pre-commit, manual]
