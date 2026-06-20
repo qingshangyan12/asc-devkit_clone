@@ -32,13 +32,13 @@ repos:
         verbose: true
 
   # Markdown 链接有效性检查
-  - repo: https://gitcode.com/gh_mirrors/lych/lychee.git
-    rev: lychee-v0.23.0
+  - repo: local
     hooks:
-      - id: lychee
-        alias: markdown-link-check
-        name: Markdown link check
-        files: ^(docs|examples)/
-        pass_filenames: false
-        args: ["--no-progress", "--config", "markdown-link-check.toml", "docs", "examples"]
+      - id: markdown-check
+        name: Markdown check
+        entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
+        language: system
+        files: ^(docs|examples)/.*\.(md|markdown|mdx)$
+        pass_filenames: true
+        always_run: true
         stages: [pre-commit, manual]
