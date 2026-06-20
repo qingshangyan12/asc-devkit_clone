@@ -1,19 +1,24 @@
 # TCubeTiling结构体
+<a id="p139009583566"></a>
 
 TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递给Matmul Kernel侧，用于Matmul的切块、搬运和计算过程等。TCubeTiling结构体的参数说明见[表1](#table1563162142915)。
 
 **表1**  TCubeTiling结构说明
 
-<a name="table1563162142915"></a>
+<a id="table1563162142915"></a>
 | 参数名称 | 数据类型 | 说明 |
 | --- | --- | --- |
 | usedCoreNum | int | 使用的AI处理器核数，请根据实际情况设置。取值范围为：[1, AI处理器最大核数]。该参数与shape相关参数的关系为：usedCoreNum = (M / singleCoreM) * (N / singleCoreN)。 |
 | M, N, Ka, Kb | int | A、B、C矩阵原始输入的shape大小，以元素为单位。M, Ka为A矩阵原始输入的Shape，Kb, N为B矩阵原始输入的Shape。<br>大小约束：<br>除Ascend 950PR/Ascend 950DT外，下述场景需要开启MatmulConfig中的[intrinsicsCheck](../../Matmul-Kernel侧接口/MatmulConfig.md#p13786349422)参数，以完成Matmul计算。<br>若A矩阵为ND格式，不进行转置，Ka大于65535时需要开启intrinsicsCheck参数，M无大小限制；进行转置，M大于65535时需要开启intrinsicsCheck参数，Ka无大小限制。<br>若B矩阵为ND格式，不进行转置，N大于65535时需要开启intrinsicsCheck参数，Kb无大小限制；进行转置，Kb大于65535时需要开启intrinsicsCheck参数，N无大小限制。<br><br>对齐约束：<br>若A矩阵以NZ格式输入，则M需要以16个元素对齐，Ka需要以C0_size对齐；若B矩阵以NZ格式输入，Kb需要以C0_size对齐，N需要以16个元素对齐。<br>若A、B矩阵为ND格式，无对齐约束。<br><br>注意：NZ格式的输入，float数据类型的C0_size为8，half/bfloat16_t数据类型的C0_size为16，int8_t/fp8_e4m3fn_t/fp8_e5m2_t/hifloat8_t数据类型的C0_size为32，int4b_t/fp4x2_e2m1_t/fp4x2_e1m2_t数据类型的C0_size为64。 |
+<a id="p11899125875617"></a>
 | singleCoreM, singleCoreN, singleCoreK | int | A、B、C矩阵单核内shape大小，以元素为单位。该参数取值必须大于0。<br><br>singleCoreK = K，多核处理时不对K进行切分；singleCoreM <= M；singleCoreN <= N。<br><br>注意：若A矩阵以NZ格式输入，则singleCoreM需要以16个元素对齐，singleCoreK需要以C0_size对齐；若B矩阵以NZ格式输入，则singleCoreK需要以C0_size对齐，singleCoreN需要以16个元素对齐。 |
 | baseM, baseN, baseK | int | A、B、C矩阵参与一次矩阵乘指令的shape大小，以元素为单位。<br><br>A、B、C矩阵参与一次矩阵乘的shape大小需要按分形对齐，其含义请参考[Mmad](../../../../基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)中的数据格式说明。<br><br>注意：该参数取值必须大于0。MxMatmul场景，baseK必须为64的倍数。 |
+<a id="p490012584566"></a>
 | depthA1, depthB1 | int | A1、B1中全载基本块的份数，depthA1为A1中全载baseM * baseK的份数，depthB1为B1中全载baseN * baseK的份数。<br><br>注意：该参数取值必须大于0。 |
 | stepM， stepN，stepKa，stepKb | int | stepM为左矩阵在A1中缓存的buffer M方向上baseM的倍数。<br><br>stepN为右矩阵在B1中缓存的buffer N方向上baseN的倍数。<br><br>stepKa为左矩阵在A1中缓存的buffer Ka方向上baseK的倍数。<br><br>stepKb为右矩阵在B1中缓存的buffer Kb方向上baseK的倍数。<br><br>注意：该参数取值必须大于0。 |
+<a id="p2051215216314"></a>
 | isBias | int | 是否启用Bias，参数取值如下：<br>0：不启用Bias（默认值）。1：启用Bias。<br><br>注意：该参数不支持除上述外的其他取值，设置为其他值时参数行为未定义。 |
+<a id="p1620315053211"></a>
 | transLength | int | max(A1Length, B1Length, C1Length, BiasLength)。其中，A1Length, B1Length, C1Length, BiasLength分别表示A/B/C/Bias矩阵在计算过程中需要临时占用的UB空间大小。 |
 | iterateOrder | int | 一次Iterate计算出[baseM, baseN]大小的C矩阵分片，Iterate完成后，Matmul会自动偏移下一次Iterate输出的C矩阵位置，iterOrder表示自动偏移的顺序。参数取值如下：<br>0：先往M轴方向偏移再往N轴方向偏移。1：先往N轴方向偏移再往M轴方向偏移。<br><br>注意：该参数不支持除上述外的其他取值，设置为其他值时参数行为未定义。 |
 | dbL0A, dbL0B,<br><br>dbL0C | int | MTE1是否开启double buffer。<br><br>dbL0A：左矩阵MTE1是否开启double buffer；dbL0B：右矩阵MTE1是否开启double buffer；dbL0C：MMAD是否开启double buffer。参数取值如下：<br>1：不开启double buffer。2：开启double buffer。<br><br>注意：该参数不支持除上述外的其他取值，设置为其他值时参数行为未定义。 |
@@ -35,12 +40,13 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 
     **表2**  TCubeTiling约束条件
 
-    <a name="table1275812182115"></a>
+    <a id="table1275812182115"></a>
     | 约束条件 | 说明 |
     | --- | --- |
     | usedCoreNum <= aiCoreCnt | 使用核数小于等于当前AI处理器的最大核数 |
     | baseM * baseK * sizeof(A_type) * dbL0A< l0a_size | A矩阵base块不超过l0a buffer大小 |
     | baseN * baseK * sizeof(B_type) * dbL0B < l0b_size | B矩阵base块不超过l0b buffer大小 |
+<a id="p17899165811566"></a>
     | baseM * baseN * sizeof(l0c_type) * dbL0C < l0c_size，其中l0c_type为int32_t或者float数据类型。 | C矩阵base块不超过l0c buffer大小 |
     | baseN * sizeof(Bias_type) < biasT_size | Bias的base块不超过BiasTable buffer大小 |
     | stepM * stepKa * db = depthA1<br>    <br>db这里表示为左矩阵MTE2是否开启double buffer，即L1是否开启double buffer，取值1（不开启double buffer）或2（开启double buffer） | depthA1的取值与stepM * stepKa  * db相同 |
@@ -51,7 +57,7 @@ TCubeTiling结构体包含Matmul Tiling切分算法的相关参数，被传递�
 
     **表3**  MDL模板补充约束条件
 
-    <a name="table1094616401179"></a>
+    <a id="table1094616401179"></a>
     | 约束条件 | 说明 |
     | --- | --- |
     | Ka不全载时，即Ka / baseK > stepKa，stepM = 1 | K方向非全载时，M方向只能逐块搬运 |

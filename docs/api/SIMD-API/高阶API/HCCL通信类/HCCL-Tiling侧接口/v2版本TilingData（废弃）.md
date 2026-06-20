@@ -11,12 +11,14 @@ AI CPU启动下发通信任务前，需获取固定的通信配置，如[表1](#
 
 **表1**  v2版本HCCL TilingData参数说明
 
-<a name="table4835205712588"></a>
+<a id="table4835205712588"></a>
 | 参数名 | 描述 |
 | --- | --- |
 | version | uint32_t类型。用于区分TilingData版本。<br><br>v2版本的TilingData结构体中，version字段仅支持取值为2。<br><br>注意：该字段在v2版本TilingData中的位置，同v1版本的preparePosition字段。当该字段取值为2时，为v2版本的结构体，当取值为1时，为v1版本的结构体，请使用[Mc2Msg结构体](v1版本TilingData（废弃）.md#table4835205712588)。 |
 | mc2HcommCnt | uint32_t类型。表示各通信域中通信任务总个数。当前该参数支持的最大取值为3。 |
+<a id="table96371578575"></a>
 | serverCfg | [Mc2ServerCfg](#table96371578575)类型。集合通信server端通用参数配置。 |
+<a id="table13131010011"></a>
 | hcom | [Mc2HcommCfg](#table13131010011)类型。各通信域中每个通信任务的参数配置。在通信算子TilingData的定义中，根据各通信域中通信任务总个数，共需要定义mc2HcommCnt个Mc2HcommCfg结构体。例如：mc2HcommCnt=2，则需要依次定义2个[Mc2HcommCfg](#table13131010011)类型的参数，自定义参数名，比如hcom1、hcom2。 |
 
 **表2**  Mc2ServerCfg结构体说明

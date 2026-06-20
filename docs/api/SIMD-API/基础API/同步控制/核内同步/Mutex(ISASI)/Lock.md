@@ -2,7 +2,7 @@
 
 ## 产品支持情况<a name="section73648168211"></a>
 
-<a name="table38301303189"></a>
+<a id="table38301303189"></a>
 <table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><a name="p1883113061818"></a><a name="p1883113061818"></a><span id="ph20833205312295"><a name="ph20833205312295"></a><a name="ph20833205312295"></a>产品</span></p>
 </th>
 <th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持</p>
@@ -62,7 +62,7 @@ static __aicore__ inline void Lock(MutexID id)
 
 **表1**  模板参数说明
 
-<a name="table1965616488585"></a>
+<a id="table1965616488585"></a>
 <table><thead align="left"><tr id="row865644816588"><th class="cellrowborder" valign="top" width="18.29%" id="mcps1.2.3.1.1"><p id="p765612483583"><a name="p765612483583"></a><a name="p765612483583"></a>参数名</p>
 </th>
 <th class="cellrowborder" valign="top" width="81.71000000000001%" id="mcps1.2.3.1.2"><p id="p1657204895812"><a name="p1657204895812"></a><a name="p1657204895812"></a>描述</p>
@@ -80,7 +80,7 @@ static __aicore__ inline void Lock(MutexID id)
 
 **表2**  参数说明
 
-<a name="table103102222579"></a>
+<a id="table103102222579"></a>
 <table><thead align="left"><tr id="row631032216571"><th class="cellrowborder" valign="top" width="18.54%" id="mcps1.2.4.1.1"><p id="p231082295719"><a name="p231082295719"></a><a name="p231082295719"></a>参数名</p>
 </th>
 <th class="cellrowborder" valign="top" width="10.05%" id="mcps1.2.4.1.2"><p id="p2031014221576"><a name="p2031014221576"></a><a name="p2031014221576"></a>输入/输出</p>
@@ -112,7 +112,7 @@ static __aicore__ inline void Lock(MutexID id)
 
 ## 调用示例<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section320753512363"></a>
 
-完整算子样例参考：[Mutex样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
+完整算子样例参考：[Mutex样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex)。
 
 ```
 // 锁定MTE2 流水线互斥锁，确保当前线程独占MTE2 资源进行数据搬运

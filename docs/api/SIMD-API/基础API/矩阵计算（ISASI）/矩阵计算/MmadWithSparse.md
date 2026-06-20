@@ -13,6 +13,8 @@
 | Atlas 推理系列产品Vector Core               | x        |
 | Atlas 训练系列产品                          | x        |
 
+<a id="section19443175724215"></a>
+<a id="section618mcpsimp"></a>
 ## 功能说明
 
 头文件路径为：\#include "basic\_api/kernel\_operator\_mm\_intf.h"。

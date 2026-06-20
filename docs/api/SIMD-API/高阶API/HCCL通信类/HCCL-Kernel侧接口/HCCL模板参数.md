@@ -10,6 +10,7 @@
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
 
+<a id="section11493459173619"></a>
 ## 功能说明
 
 创建HCCL对象时需要传入模板参数。
@@ -27,7 +28,7 @@ class Hccl;
 
 **表1**  Hccl类模板参数说明
 
-<a name="table884518212555"></a>
+<a id="table884518212555"></a>
 | 参数名称 | 描述 |
 | --- | --- |
 | serverType | 支持的服务端类型。HcclServerType枚举类型，取值如下。<br>HCCL_SERVER_TYPE_AICPU：AI CPU服务端。<br>HCCL_SERVER_TYPE_CCU：CCU服务端。<br>HCCL_SERVER_TYPE_END：预留参数，不支持使用。<br><br>对于Ascend 950PR/Ascend 950DT，当前仅支持HCCL_SERVER_TYPE_CCU。<br><br>对于Atlas A3 训练系列产品/Atlas A3 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。<br><br>对于Atlas A2 训练系列产品/Atlas A2 推理系列产品，当前仅支持HCCL_SERVER_TYPE_AICPU。 |
@@ -62,6 +63,7 @@ enum class CoreType: uint8_t {
 
 ## 调用示例
 
+<a id="p150710476349"></a>
 通过如下传入模板参数config的方式创建Hccl类对象，指定HCCL客户端仅在AIV的10号核上发送通信消息给服务端，替代通过调用[GetBlockIdx](../../../基础API/工具接口/系统资源与变量/GetBlockIdx.md)接口的方式指定运行的核。
 
 ```

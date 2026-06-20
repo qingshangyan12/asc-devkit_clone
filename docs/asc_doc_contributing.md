@@ -717,7 +717,7 @@ API参考手册 ──前置概念──→ 编程指南
 ## 更多信息
 
 - 社区行为准则和CLA协议签署：[cann-community](https://gitcode.com/cann/community)
-- Issue和PR流程：参见[提交Issue/处理Issue任务](https://gitcode.com/cann/community#提交Issue/处理Issue任务)
+- Issue和PR流程：参见[提交Issue/处理Issue任务](https://gitcode.com/cann/community)
 - API代码贡献指南：
   - 高阶API：[asc_adv_api_contributing.md](./asc_adv_api_contributing.md)
   - 基础API：[asc_basic_api_contributing.md](./asc_basic_api_contributing.md)

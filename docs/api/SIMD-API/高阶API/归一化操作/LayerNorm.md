@@ -10,6 +10,7 @@
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
 
+<a id="section618mcpsimp"></a>
 ## 功能说明
 
 根据接口输出的不同，本节介绍如下两种LayerNorm接口。

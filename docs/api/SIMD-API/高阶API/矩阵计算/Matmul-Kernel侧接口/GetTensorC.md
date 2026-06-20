@@ -97,8 +97,10 @@ __aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic =
 | c/co2Local | 输出 | 取出C矩阵到VECIN。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。不同型号支持的数据格式请参考[支持的数据格式](#li12616155731721)。 |
 | gm | 输出 | 取出C矩阵到GM，数据格式可以为ND或NZ。不同型号支持的数据类型请参考[支持的数据类型](#li12616155731720)。 |
 | enAtomic | 输入 | 是否开启Atomic操作，默认值为0。<br><br>参数取值：<br><br>0：不开启Atomic操作<br><br>1：开启AtomicAdd累加操作<br><br>2：开启AtomicMax求最大值操作<br><br>3：开启AtomicMin求最小值操作<br><br>对于Atlas 推理系列产品AI Core，只有输出位置是GM才支持开启Atomic操作。<br><br>对于Atlas 200I/500 A2 推理产品，只有输出位置是GM才支持开启Atomic操作。 |
+<a id="fig322951853119"></a>
 | enSequentialWrite | 输入 | 是否开启连续写模式（连续写，写入[baseM, baseN]；非连续写，写入[singleCoreM, singleCoreN]中对应的位置），默认值false（非连续写模式）。<br><br>注意：非连续写模式，内部会按照迭代顺序算好偏移，开发者不需要关注；如果开发者需要决定排布顺序，可以选择连续写模式，自行按照设定的偏移进行搬运操作。<br><br>对于Atlas 200I/500 A2 推理产品，只支持非连续写模式。 |
 
+<a id="fig580415103338"></a>
 **图1**  非连续写模式示意图  
 ![](../../../../figures/非连续写模式示意图.png "非连续写模式示意图")
 

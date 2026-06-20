@@ -28,7 +28,7 @@ accept = ["200..=299", "429"]
 hidden = true
 include_verbatim = false
 include_mail = false
-# include_fragments = "anchor-only"
+include_fragments = "anchor-only"
 extensions = ["md", "markdown", "mdx"]
 
 exclude_loopback = true

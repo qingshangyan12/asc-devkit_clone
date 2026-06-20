@@ -1,4 +1,8 @@
 # Matmul最佳实践样例
+<a id="case-8-多核mdl--l1cache--l2cache--constants-tiling--unitflag-multi_core_mdl_l1cache_l2cache_constants_unitflag"></a>
+<a id="case-7-多核mdl--l1cache--l2cache--constants-tiling-multi_core_mdl_l1cache_l2cache_constants"></a>
+<a id="case-6-多核mdl--l1cache--l2cache-multi_core_mdl_l1cache_l2cache"></a>
+<a id="case-5-多核mdl--l1cache优化-multi_core_mdl_l1cache"></a>
 
 ## 概述
 

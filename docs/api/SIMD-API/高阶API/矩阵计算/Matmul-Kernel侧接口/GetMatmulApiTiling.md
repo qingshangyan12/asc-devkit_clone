@@ -13,6 +13,7 @@
 - Kirin X90：支持
 <!-- end id1 -->
 
+<a id="section618mcpsimp"></a>
 ## 功能说明
 
 本接口用于在编译期间获取常量化的Matmul Tiling参数。

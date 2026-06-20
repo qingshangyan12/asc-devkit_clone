@@ -1,4 +1,5 @@
 # MatmulPolicy
+<a id="li194081238103913"></a>
 
 ## 产品支持情况
 
@@ -91,6 +92,7 @@
 
     ![](../../../../figures/MatmulMx公式图示.png)
 
+<a id="li1329014255511"></a>
 -   SplitMMatmulPolicy（SplitM模板策略）
 
     Matmul一次[Iterate](Iterate.md)的计算结果从L0C Buffer搬到Unified Buffer时，采用双输出模式，即在分离模式下，AIC核与AIV核的核数比为1：2时，在调用[GetTensorC](GetTensorC.md)接口后，Matmul一次Iterate的计算结果在矩阵的M方向一分为二，将被切分后的两块结果数据分别搬运到两个AIV核的Unified Buffer。模板策略示意图如下所示。

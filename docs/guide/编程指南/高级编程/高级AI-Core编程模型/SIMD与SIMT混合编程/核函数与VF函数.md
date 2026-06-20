@@ -4,12 +4,13 @@ SIMD与SIMT混合编程涉及多种类型的函数，它们之间遵循严格的
 
 SIMD与SIMT混合编程中涉及的函数类型如下表所示：
 
-<a name="zh-cn_topic_0000002571578013_table1818191292017"></a>
+<a id="zh-cn_topic_0000002571578013_table1818191292017"></a>
 | 修饰符 | 函数功能 | 调用方式 |
 | --- | --- | --- |
 | `__global__ __aicore__` | 算子入口，协调VF执行。若只有在AIV核内执行的SIMD与SIMT混合编程场景，可使用__global__ __vector__来标识只启动AIV核。 | Host侧通过`<<<...>>>`调用 |
 | `__aicore__` | Device侧辅助函数 | 核函数或同级函数调用 |
 | `__simt_vf__` | 线程级并行计算任务 | 通过SIMT提供的`asc_vf_call`接口调用 |
+<a id="zh-cn_topic_0000002571578013_section2067153312577"></a>
 | `__simd_vf__` | 向量级并行计算任务 | 通过SIMD提供的`asc_vf_call`接口调用 |
 | `__simt_callee__` | SIMT VF的子函数 | SIMT VF内部调用 |
 | `__simd_callee__` | SIMD VF的子函数 | SIMD VF内部调用 |
@@ -36,7 +37,7 @@ __global__ __vector__ void kernel_name(__gm__ type* param1, __gm__ type* param2,
 
 关键修饰符说明如下：
 
-<a name="zh-cn_topic_0000002571578013_table4811406341"></a>
+<a id="zh-cn_topic_0000002571578013_table4811406341"></a>
 | 修饰符 | 作用 | 必需性 |
 | --- | --- | --- |
 | `__global__` | 标识核函数，表明可在Host侧通过`<<<...>>>`调用 | 必需 |
@@ -56,7 +57,7 @@ kernel_name<<<block_num, dyn_ub_size, stream>>>(args...);
 
 核函数调用符内的配置参数说明如下：
 
-<a name="zh-cn_topic_0000002571578013_table942016184315"></a>
+<a id="zh-cn_topic_0000002571578013_table942016184315"></a>
 | 参数 | 类型 | 说明 | 约束 |
 | --- | --- | --- | --- |
 | `block_num` | `uint32_t` | 设置核函数启用的核数 | 取值范围[1, 65536] |
@@ -76,7 +77,7 @@ __simt_vf__ __launch_bounds__(MAX_THREAD_COUNT) inline void function_name(
 
 SIMT VF函数定义中的关键修饰符说明如下：
 
-<a name="zh-cn_topic_0000002571578013_table7661145014492"></a>
+<a id="zh-cn_topic_0000002571578013_table7661145014492"></a>
 | 修饰符 | 作用 |
 | --- | --- |
 | `__simt_vf__` | 函数标识符，标识SIMT VF函数 |

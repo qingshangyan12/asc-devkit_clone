@@ -6,7 +6,11 @@ Choose the appropriate environment preparation method based on **whether you hav
 
 | Environment Preparation | Community Experience / Operator Development (CANN Commercial/Community Edition) | Ecosystem Developer Contribution (CANN master) |
 | :---: | :---: | :---: |
+<a id="1️⃣-cloud-development-environment"></a>
+<a id="📥-download-and-install-cann-package"></a>
 | **No NPU device** | [Cloud Development Environment](#1️⃣-cloud-development-environment) | [Manually Download and Install CANN master](#📥-download-and-install-cann-package) + [Cloud Development Environment](#1️⃣-cloud-development-environment) |
+<a id="2️⃣-cann-official-docker-image"></a>
+<a id="3️⃣-devcontainer"></a>
 | **Have NPU device** | [CANN Official Docker Image](#2️⃣-cann-official-docker-image) | [Manually Download and Install CANN master](#📥-download-and-install-cann-package) + [Dev Container](#3️⃣-devcontainer) |
 
 > [!TIP] Recommendations

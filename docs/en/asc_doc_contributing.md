@@ -636,7 +636,7 @@ The sample repository (`asc-devkit/examples/`) is not part of the documentation 
 ## More Information
 
 - Community code of conduct and CLA signing: [cann-community](https://gitcode.com/cann/community)
-- Issue and PR process: See [Submit Issue / Handle Issue Tasks](https://gitcode.com/cann/community#提交Issue/处理Issue任务)
+- Issue and PR process: See [Submit Issue / Handle Issue Tasks](https://gitcode.com/cann/community)
 - API code contribution guides:
   - Advanced API: [asc_adv_api_contributing.md](./asc_adv_api_contributing.md)
   - Basic API: [asc_basic_api_contributing.md](./asc_basic_api_contributing.md)

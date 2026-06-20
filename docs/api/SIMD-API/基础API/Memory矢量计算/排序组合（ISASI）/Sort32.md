@@ -2,7 +2,7 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-<a name="table38301303189"></a>
+<a id="table38301303189"></a>
 <table><thead align="left"><tr id="row20831180131817"><th class="cellrowborder" valign="top" width="57.99999999999999%" id="mcps1.1.3.1.1"><p id="p1883113061818"><a name="p1883113061818"></a><a name="p1883113061818"></a><span id="ph20833205312295"><a name="ph20833205312295"></a><a name="ph20833205312295"></a>产品</span></p>
 </th>
 <th class="cellrowborder" align="center" valign="top" width="42%" id="mcps1.1.3.1.2"><p id="p783113012187"><a name="p783113012187"></a><a name="p783113012187"></a>是否支持</p>
@@ -62,6 +62,7 @@ src1固定为uint32\_t类型，无论src0是float还是half类型，dst中的（
 
 **图1**  Sort32排序示意图
 
+<a id="图1-sort32排序示意图"></a>
 ![](../../../../figures/sort32.png)<a id="图1-Sort32排序示意图"></a>
 
 ## 函数原型<a name="section620mcpsimp"></a>

@@ -6,6 +6,7 @@
 
 ## 函数原型
 
+<a id="p2934103115919"></a>
 ```
 int32_t SetAType(TPosition pos, CubeFormat type, DataType dataType, bool isTrans = false)
 ```

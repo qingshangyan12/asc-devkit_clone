@@ -71,6 +71,7 @@ struct UnPadParams {
 
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
 
+<a id="section94691236101419"></a>
 ## 调用示例
 
 本样例：Tensor的width已32B对齐，以half为例，如16\*16，进行UnPad，变成16\*15。输入数据类型均为half。

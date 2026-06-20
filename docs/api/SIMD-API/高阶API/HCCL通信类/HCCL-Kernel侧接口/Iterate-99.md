@@ -14,6 +14,7 @@
 
 在某些算法下，一次完整的集合通信任务可以细分为多个步骤，对每个步骤的数据完成点对点的通信任务，称为细粒度通信。以通信算法"AlltoAll=level0:fullmesh;level1:pairwise"、通信步长为1的AlltoAllV通信任务为例，这里参数level0代表配置Server（昇腾AI Server，通常是8卡或16卡的昇腾NPU设备组成的服务器形态的统称）内通信算法，参数level1代表配置Server间通信算法，fullmesh为全连接通信算法，pairwise为逐对通信算法；如下图所示，该示例展示了AlltoAllV通信的所有待发送数据、每一步通信完成后各卡收到的数据。
 
+<a id="fig111591359143"></a>
 **图1**  使用pairwise算法的AlltoAllV通信步骤示意图  
 ![](../../../../figures/使用pairwise算法的AlltoAllV通信步骤示意图.png "使用pairwise算法的AlltoAllV通信步骤示意图")
 

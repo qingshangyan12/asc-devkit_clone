@@ -25,6 +25,7 @@ __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB)
 
 ## 参数说明
 
+<a id="table9646134355611"></a>
 **表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
@@ -41,6 +42,7 @@ __aicore__ inline void SetBatchNum(int32_t batchA, int32_t batchB)
 -   当开启MixDualMaster（双主模式）场景时，即模板参数[enableMixDualMaster](MatmulConfig.md#p9218181073719)设置为true，不支持使用该接口。
 -   本接口仅支持在纯Cube模式（只有矩阵计算）下调用。
 
+<a id="section1665082013318"></a>
 ## 调用示例
 
 ```

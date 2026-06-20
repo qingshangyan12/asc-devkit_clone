@@ -106,6 +106,7 @@ struct LayerNormGradShapeInfo {
 -   输入数据不满足对齐要求时，开发者需要进行补齐，补齐的数据应设置为0，防止出现异常值从而影响网络计算。
 -   不支持对尾轴H轴的切分。
 
+<a id="section642mcpsimp"></a>
 ## 调用示例
 
 本样例中，输入inputX和inputDy的shape为\[2, 32, 16\]，inputVariance和inputMean的shape为\[2, 32\]，inputGamma的shape为\[16\]。输出outputPdX和resForGamma的shape为\[2, 32, 16\]。数据排布均为ND格式，数据类型均为float，不复用源操作数的内存空间。

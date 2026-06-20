@@ -44,6 +44,7 @@ __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
+<a id="table158181847102411"></a>
 | dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>目的操作数的数据类型和源操作数保持一致，或者目的操作数的数据类型为bool类型。当前支持的数据类型组合请见[表3](#table158181847102411)。 |
 | src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | calCount | 输入 | 参与计算的元素个数。 |
@@ -70,7 +71,7 @@ __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 ## 调用示例
 
-完整算子样例请参考[isfinite算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/10_math/isfinite)。
+完整算子样例请参考[isfinite算子样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/10_math/isfinite)。
 
 ```
 // dstLocal: 存放IsFinite计算结果的Tensor

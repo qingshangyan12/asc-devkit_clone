@@ -6,7 +6,11 @@
 
 | 环境准备 | 社区体验 / 算子开发（CANN商用/社区版） | 生态开发者贡献（CANN master） |
 | :---: | :---: | :---: |
+<a id="1️⃣-云开发环境"></a>
+<a id="📥-下载安装cann包"></a>
 | **无NPU设备** | [云开发环境](#1️⃣-云开发环境) | [手动下载安装CANN master](#📥-下载安装cann包) + [云开发环境](#1️⃣-云开发环境) |
+<a id="2️⃣-cann官方docker镜像"></a>
+<a id="3️⃣-devcontainer"></a>
 | **有NPU设备** | [CANN官方Docker镜像](#2️⃣-cann官方docker镜像) | [手动下载安装CANN master](#📥-下载安装cann包) + [Dev Container](#3️⃣-devcontainer) |
 
 > [!TIP] 选择建议
