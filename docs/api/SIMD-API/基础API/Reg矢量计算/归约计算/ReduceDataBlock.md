@@ -92,8 +92,8 @@ __simd_callee__ inline void ReduceDataBlock(U& dstReg, U srcReg, MaskReg mask)
 
 - 对于归约求最大值，max\(-0, +0\) = +0。
 - 对于归约求最小值，min\(-0, +0\) = -0。
-- mask为空场景异常值处理参考[mask为空与srcReg异常值处理规则](Reduce.md#mask为空与srcReg异常值处理规则)。
-- 指令内累加顺序采用二叉树累加方式，规则参考[ReduceSum累加顺序](Reduce.md#ReduceSum累加顺序)。
+- mask为空场景异常值处理参考[mask为空与srcReg异常值处理规则](Reduce.md#mask为空与srcreg异常值处理规则)。
+- 指令内累加顺序采用二叉树累加方式，规则参考[ReduceSum累加顺序](Reduce.md#reducesum累加顺序)。
 
 ## 关键特性<a name="zh-cn_topic_0000002568852247_section18972943153217"></a>
 
