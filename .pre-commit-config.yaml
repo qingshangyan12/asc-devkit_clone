@@ -38,7 +38,8 @@ repos:
         name: Markdown check
         entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
         language: system
-        files: ^(docs|examples)/.*\.(md|markdown|mdx)$
+        files: \.(md|markdown|mdx)$
+        exclude: ^tests/
         pass_filenames: true
         always_run: true
         stages: [pre-commit, manual]

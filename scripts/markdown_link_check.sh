@@ -29,7 +29,7 @@ usage() {
 Usage: scripts/markdown_link_check.sh [--full|--all] [markdown-file...]
 
 By default, checks changed Markdown files and Markdown files that link to them.
-Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan docs/ and examples/.
+Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in the repository.
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
@@ -178,8 +178,8 @@ repo_root = Path(sys.argv[1])
 output_file = Path(sys.argv[2])
 input_files = sys.argv[3:]
 
-scan_roots = ("docs", "examples")
 markdown_exts = (".md", ".markdown", ".mdx")
+excluded_prefixes = ("tests/",)
 full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
 
@@ -197,19 +197,41 @@ def to_rel(path):
 def is_markdown_path(path):
     if path is None:
         return False
-    return path.startswith(scan_roots) and path.lower().endswith(markdown_exts)
+    return (
+        path.lower().endswith(markdown_exts)
+        and not path.startswith(excluded_prefixes)
+    )
 
 
 def existing_markdown_files():
-    result = []
-    for root in scan_roots:
-        root_path = repo_root / root
-        if not root_path.exists():
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-z", "*.md", "*.markdown", "*.mdx"],
+            cwd=repo_root,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        result = None
+
+    if result is not None and result.returncode == 0:
+        return sorted(
+            path.decode("utf-8", errors="ignore")
+            for path in result.stdout.split(b"\0")
+            if path and is_markdown_path(path.decode("utf-8", errors="ignore"))
+        )
+
+    files = []
+    for path in repo_root.rglob("*"):
+        if ".git" in path.parts:
             continue
-        for path in root_path.rglob("*"):
-            if path.is_file() and path.name.lower().endswith(markdown_exts):
-                result.append(path.relative_to(repo_root).as_posix())
-    return sorted(result)
+        if not path.is_file() or not path.name.lower().endswith(markdown_exts):
+            continue
+        rel_path = path.relative_to(repo_root).as_posix()
+        if is_markdown_path(rel_path):
+            files.append(rel_path)
+    return sorted(files)
 
 
 def staged_markdown_changes():
@@ -285,7 +307,7 @@ if not full_scan:
         full_reason = "staged Markdown rename/delete"
 
 if full_scan:
-    scan_set = [root for root in scan_roots if (repo_root / root).exists()]
+    scan_set = existing_markdown_files()
 else:
     changed = [to_rel(path) for path in input_files]
     changed = [path for path in changed if is_markdown_path(path)]
@@ -346,7 +368,7 @@ if [ "${#SCAN_FILES[@]}" -eq 0 ]; then
 fi
 
 if [ -n "$FULL_REASON" ]; then
-    echo "[Markdown check] Checking all Markdown files under docs/ and examples/ ($FULL_REASON)."
+    echo "[Markdown check] Checking all tracked Markdown files in the repository ($FULL_REASON)."
 else
     echo "[Markdown check] Checking ${#SCAN_FILES[@]} Markdown file(s) in the affected set."
 fi
