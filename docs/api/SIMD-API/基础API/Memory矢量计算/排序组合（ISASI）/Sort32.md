@@ -63,7 +63,7 @@ src1固定为uint32\_t类型，无论src0是float还是half类型，dst中的（
 **图1**  Sort32排序示意图
 
 <a id="图1-sort32排序示意图"></a>
-![](../../../../figures/sort32.png)<a id="图1-Sort32排序示意图"></a>
+![](../../../../figures/sort32.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
