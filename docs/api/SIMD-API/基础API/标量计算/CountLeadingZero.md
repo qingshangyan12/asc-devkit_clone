@@ -28,9 +28,9 @@ int64_t leadingZeros = AscendC::CountLeadingZero(0x0100000000000020ULL); // 返�
 
 其计算结果如下图所示：
 
-**图 1** CountLeadingZero计算示意图<a name="fig1"></a>
+**图1** CountLeadingZero计算示意图<a name="fig1"></a>
 
-![CountLeadingZero计算示意图](../../../figures/CountLeadingZero.png "CountLeadingZero计算示意图")
+![CountLeadingZero计算示意图](../../../figures/CountLeadingZero.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -40,7 +40,7 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1** 参数说明
+**表1** 参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | ------ | ------ | ------ |

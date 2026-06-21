@@ -53,7 +53,7 @@
 
 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序。
 
-MrgSort接口通常处理经过Sort32接口预处理的数据，队列结构参考[Sort32功能说明](Sort32.md#功能说明)。
+MrgSort接口通常处理经过Sort32接口预处理的数据，队列结构参考[Sort32功能说明](Sort32.md)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -76,7 +76,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 |:---|:---|:---|
 | dst | 输出 | 目的操作数。<br> 类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br> LocalTensor的起始地址需要32字节对齐。 |
 | src | 输入 | 源操作数，4个已经排序完成的队列，类型为MrgSortSrcList结构体，定义如下：<br><pre>template \<typename T\> struct MrgSortSrcList {<br>    \_\_aicore\_\_ MrgSortSrcList() {}<br>    \_\_aicore\_\_ MrgSortSrcList(const LocalTensor&lt;T&gt; src1In, const LocalTensor&lt;T&gt; src2In, const LocalTensor&lt;T&gt; src3In, const LocalTensor&lt;T&gt; src4In)<br>    {<br>        src1 = src1In[0];<br>        src2 = src2In[0];<br>        src3 = src3In[0];<br>        src4 = src4In[0];<br>    }<br>    LocalTensor&lt;T&gt; src1;<br>    LocalTensor&lt;T&gt; src2;<br>    LocalTensor&lt;T&gt; src3;<br>    LocalTensor&lt;T&gt; src4;<br>};</pre>src1、src2、src3、src4类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要8字节对齐。|
-| params | 输入 | 排序参数，类型为MrgSort4Info结构体。<br> MrgSort4Info参数说明请参考[表 MrgSort4Info结构体参数定义](MrgSort.md#参数说明)。|
+| params | 输入 | 排序参数，类型为MrgSort4Info结构体。<br> MrgSort4Info参数说明请参考[表MrgSort4Info结构体参数定义](MrgSort.md#参数说明)。|
 
 **表3**  MrgSort4Info结构体参数定义
 
@@ -84,7 +84,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 |---|---|
 | elementLengths | 长度为4的uint16\_t数组，用于存储4个源队列的长度，单位为8B。取值范围为[0, 4095]。 |
 | ifExhaustedSuspension | 某个队列耗尽时，控制指令是否停止执行。类型为bool，默认值为false。<br>&bull; false：某个队列耗尽时，指令不停止。<br>&bull; true：某个队列耗尽时，指令停止。|
-| validBit | 控制参与计算的队列，有效值为3、7、15。<br>&bull; 取值为3（0'b0011），表示前2个队列有效。<br>&bull; 取值为7（0'b0111），表示前3个队列有效。<br>&bull; 取值为15（0'b1111），表示前4个队列有效。|
+| validBit | 控制参与计算的队列，有效值为3、7、15。<br>&bull;取值为3（0'b0011），表示前2个队列有效。<br>&bull;取值为7（0'b0111），表示前3个队列有效。<br>&bull;取值为15（0'b1111），表示前4个队列有效。|
 | repeatTimes | 重复迭代次数。每次迭代完成4个队列的归并排序，源操作数和目的操作数跳过4个队列总长度。取值范围：repeatTimes∈[0, 255]。<br> repeatTimes参数生效需要满足4个条件： <br>&bull; src包含4个队列并且长度一致。<br>&bull; 4个队列连续存储。<br>&bull; ifExhaustedSuspension = false。<br>&bull; validBit = 15。<br> **注：repeatTimes = 0表示不执行排序，该接口将被视为NOP（空操作）。**|
 
 ## 数据类型
@@ -100,7 +100,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-完整示例请参考[MrgSort样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/mrg_sort)。
+完整示例请参考[MrgSort样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/mrg_sort)。
 
 ```cpp
 // 对8个已排好序的队列进行合并排序，repeatTimes = 2，数据连续存放

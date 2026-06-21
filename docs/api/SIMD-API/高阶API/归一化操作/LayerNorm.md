@@ -42,7 +42,7 @@
 
     以float类型，ND格式，输入为inputX\[B, S, H\]，gamma\[H\]和beta\[H\]为例，描述LayerNorm高阶API内部算法框图，如下图所示。
 
-    **图 1**  LayerNorm算法框图
+    **图1**  LayerNorm算法框图
     ![](../../../figures/LayerNorm算法框图.png "LayerNorm算法框图")
 
     计算过程分为如下几步，均在Vector上进行（下文中m指尾轴H的长度）：
@@ -56,7 +56,7 @@
 
     以float类型，ND格式，输入为inputX\[A, R\]，gamma\[R\] 和beta\[R\]为例，描述LayerNorm高阶API内部算法框架，如下图所示。
 
-    **图 2**  LayerNorm-Rstd版本算法框图
+    **图2**  LayerNorm-Rstd版本算法框图
 
     ![](../../../figures/layernorm.png)
 
@@ -114,30 +114,30 @@
 
 -   对shape为\[B，S，H\]的输入数据，输出归一化结果、均值和方差的接口
 
-    **表 1**  模板参数说明
+    **表1**  模板参数说明
 
     | 参数名 | 描述 |
     | --- | --- |
     | T | 操作数的数据类型。支持的数据类型为：half、float。 |
     | isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br>    <br>设置为true，则本接口内部计算时复用inputX的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用inputX的内存空间。<br>    <br>对于float数据类型输入支持开启该参数，half数据类型输入不支持开启该参数。<br>    <br>isReuseSource的使用样例请参考[更多样例](../数学计算/更多样例-83.md#section639165323915)。 |
 
-    **表 2**  接口参数说明
+    **表2**  接口参数说明
 
     | 参数名称 | 输入/输出 | 含义 |
     | --- | --- | --- |
-    | output | 输出 | 目的操作数，shape为[B, S, H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | outputMean | 输出 | 均值，shape为[B, S]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | outputVariance | 输出 | 方差，shape为[B, S]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | inputX | 输入 | 源操作数，shape为[B, S, H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | gamma | 输入 | 缩放系数，shape为[H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。gamma的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | beta | 输入 | 平移系数，shape为[H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。beta的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | output | 输出 | 目的操作数，shape为[B, S, H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | outputMean | 输出 | 均值，shape为[B, S]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | outputVariance | 输出 | 方差，shape为[B, S]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | inputX | 输入 | 源操作数，shape为[B, S, H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | gamma | 输入 | 缩放系数，shape为[H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。gamma的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | beta | 输入 | 平移系数，shape为[H]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。beta的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
     | epsilon | 输入 | 防除零的权重系数。 |
     | tiling | 输入 | LayerNorm计算所需Tiling信息，Tiling信息的获取请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。 |
 
 -   对shape为\[A，R\]的输入数据，输出归一化结果、均值、标准差的倒数或方差的接口
 
-    **表 3**  模板参数说明
+    **表3**  模板参数说明
 
     | 参数名 | 描述 |
     | --- | --- |
@@ -155,18 +155,18 @@
     };
     ```
 
-    **表 4**  接口参数说明
+    **表4**  接口参数说明
 
     | 参数名称 | 输入/输出 | 含义 |
     | --- | --- | --- |
-    | output | 输出 | 目的操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | outputMean | 输出 | 均值，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | outputRstd | 输出 | 当模板参数config中的isOutputRstd为true，outputRstd为标准差的倒数，否则isOutputRstd为false时，outputRstd为方差，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。<br>    <br>请注意，该接口仅在Ascend 950PR/Ascend 950DT上支持输出方差。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | inputX | 输入 | 源操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | gamma | 输入 | 缩放系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。gamma的数据类型精度不低于源操作数的数据类型精度。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-    | beta | 输入 | 平移系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)。beta的数据类型精度不低于源操作数的数据类型精度。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | output | 输出 | 目的操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | outputMean | 输出 | 均值，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | outputRstd | 输出 | 当模板参数config中的isOutputRstd为true，outputRstd为标准差的倒数，否则isOutputRstd为false时，outputRstd为方差，shape为[A]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。<br>    <br>请注意，该接口仅在Ascend 950PR/Ascend 950DT上支持输出方差。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | inputX | 输入 | 源操作数，shape为[A, R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。inputX的数据类型需要与目的操作数保持一致，尾轴长度需要32B对齐。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | gamma | 输入 | 缩放系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。gamma的数据类型精度不低于源操作数的数据类型精度。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | beta | 输入 | 平移系数，shape为[R]，LocalTensor数据结构的定义请参考[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)。beta的数据类型精度不低于源操作数的数据类型精度。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
     | epsilon | 输入 | 防除零的权重系数。 |
-    | sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。<br>    <br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+    | sharedTmpBuffer | 输入 | 共享缓冲区，用于存放API内部计算产生的临时数据。该方式开发者可以自行管理sharedTmpBuffer内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。共享缓冲区大小的获取方式请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。<br>    <br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
     | para | 输入 | LayerNorm计算所需的参数信息。LayerNormPara类型，定义如下方代码所示。<br>    aLength：指定输入inputX的A轴长度。<br>rLength：指定输入inputX的R轴实际需要处理的数据长度。<br>rLengthWithPadding：指定输入inputX的R轴对齐后的长度，该值是32B对齐的。 |
     | tiling | 输入 | LayerNorm计算所需的Tiling信息，Tiling信息的获取请参考[LayerNorm Tiling](LayerNorm-Tiling.md)。 |
 
@@ -214,14 +214,14 @@
 
     ```
     AscendC::LayerNorm<float, false>(
-        output,           // [输出] 归一化后的结果 y，shape [B, S, H]
-        mean,             // [输出] 每个 (B, S) 位置上 H 维度的均值，shape [B, S]
-        variance,         // [输出] 每个 (B, S) 位置上 H 维度的方差，shape [B, S]
-        inputX,           // [输入] 原始输入数据 x，shape [B, S, H]，将被归一化
+        output,           // [输出] 归一化后的结果y，shape [B, S, H]
+        mean,             // [输出] 每个(B, S)位置上H维度的均值，shape [B, S]
+        variance,         // [输出] 每个(B, S)位置上H维度的方差，shape [B, S]
+        inputX,           // [输入] 原始输入数据x，shape [B, S, H]，将被归一化
         gamma,            // [输入] 缩放系数 γ，shape [H]，用于缩放归一化后的数据
         beta,             // [输入] 平移系数 β，shape [H]，用于偏移归一化后的数据
         (float)epsilon,   // [输入] 防除零系数 ε，避免方差为0时除以0
-        tiling            // [输入] Tiling 信息，包含硬件计算分块策略（如 block、thread 等）
+        tiling            // [输入] Tiling信息，包含硬件计算分块策略（如block、thread等）
     );
     ```
 
@@ -259,21 +259,21 @@
 -   输入数据的shape为\[A，R\]，输出归一化结果、均值、标准差的倒数或方差的接口调用示例
 
     ```
-    // config：编译期常量，定义 LayerNorm 的行为配置
+    // config：编译期常量，定义LayerNorm的行为配置
     constexpr auto config = AscendC::LayerNormConfig{false, false, false, true};
     // para：运行时参数，描述输入张量的维度信息
     AscendC::LayerNormPara para = {aLength, rLength, rLengthWithPadding};
 
-    // LayerNorm 接口调用
+    // LayerNorm接口调用
     AscendC::LayerNorm<float, float, false, config>(
-        output,           // [输出] 归一化后的结果 y，shape [A, R]
-        mean,             // [输出] 每个 A 位置上 R 维度的均值，shape [A]
-        output1,          // [输出] 标准差的倒数 rstd（或方差），shape [A]
-        inputX,           // [输入] 原始输入数据 x，shape [A, R]
+        output,           // [输出] 归一化后的结果y，shape [A, R]
+        mean,             // [输出] 每个A位置上R维度的均值，shape [A]
+        output1,          // [输出] 标准差的倒数rstd（或方差），shape [A]
+        inputX,           // [输入] 原始输入数据x，shape [A, R]
         gamma,            // [输入] 缩放系数 γ，shape [R]
         beta,             // [输入] 平移系数 β，shape [R]
         (float)epsilon,   // [输入] 防除零系数 ε
-        para,             // [输入] 包含 A 和 R 轴长度等信息的结构体
-        tiling            // [输入] Tiling 策略信息
+        para,             // [输入] 包含A和R轴长度等信息的结构体
+        tiling            // [输入] Tiling策略信息
     );
     ```

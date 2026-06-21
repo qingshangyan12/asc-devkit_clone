@@ -19,10 +19,10 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
-#include "kernel_tensor.h"
+#include "../../include/basic_api/kernel_tensor.h"
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102
-#include "impl/utils/debug/asc_debug_utils.h"
-#include "impl/utils/debug/asc_aicore_printf_impl.h"
+#include "../utils/debug/asc_debug_utils.h"
+#include "../utils/debug/asc_aicore_printf_impl.h"
 #endif
 
 #if __NPU_ARCH__ == 1001
@@ -51,6 +51,14 @@
 #endif
 
 namespace AscendC {
+__aicore__ inline void PrintTimeStamp(uint32_t descId)
+{
+#ifdef ASCENDC_TIME_STAMP_ON  // 打点开关宏
+    DumpTimeStampImpl(descId);
+#endif
+}
+
+#if defined(__NPU_ARCH__)
 template <typename T>
 __aicore__ inline void DumpTensor(const LocalTensor<T> &input, uint32_t desc, uint32_t dumpSize)
 {
@@ -144,22 +152,6 @@ __aicore__ inline void DumpAccChkPoint(const GlobalTensor<T> &input, uint32_t in
 // only 51, 71, 82 supports printf/assert. the other code is left to avoid errors in test cases.
 #if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 5102
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    __asc_aicore::printf_impl(fmt, args...);
-#endif
-}
-
-template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    __asc_aicore::printf_impl(fmt, args...);
-#endif
-}
-
-template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
@@ -169,66 +161,6 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 #endif
 }
 #else
-#if defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
-template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-}
-template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-}
-
-#else // !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
-
-#ifdef ASCENDC_CPU_DEBUG
-using ::printf;
-
-template<typename... Args>
-inline auto PRINTF(Args&&... args) -> decltype(printf(std::forward<Args>(args)...))
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    return printf(std::forward<Args>(args)...);
-#else
-    return 0;
-#endif
-}
-
-#if defined(__NPU_HOST__) || defined(__ASCC_HOST__)
-template <class... Args>
-inline void PRINTF(const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-}
-#endif // defined(__NPU_HOST__) || defined(__ASCC_HOST__)
-
-#else
-template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-}
-
-template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
-{
-#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    PrintfImpl(DumpType::DUMP_SCALAR, fmt, args...);
-#endif
-}
-#endif // ASCENDC_CPU_DEBUG
-#endif // defined(__NPU_DEVICE__) || defined(__ASCC_DEVICE__)
-
 template <class... Args>
 __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 {
@@ -240,15 +172,10 @@ __aicore__ inline void AssertImpl(__gm__ const char* fmt, Args&&... args)
 }
 #endif // __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 2002
 
-__aicore__ inline void PrintTimeStamp(uint32_t descId)
-{
-#ifdef ASCENDC_TIME_STAMP_ON  // 打点开关宏
-    DumpTimeStampImpl(descId);
-#endif
-}
-
+#endif // defined(__NPU_ARCH__)
 }  // namespace AscendC
 #endif  // END OF ASCENDC_MODULE_OPERATOR_DUMP_TENSOR_INTERFACE_IMPL_H
+
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DUMP_TENSOR_INTF_IMPL_H__

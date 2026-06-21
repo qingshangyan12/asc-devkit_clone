@@ -17,7 +17,7 @@
 
 本案例的算子规格如下：
 
-**表 1**  算子规格
+**表1**  算子规格
 
 <a name="table101751125175213"></a>
 <table><thead align="left"><tr id="row8175525185219"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1417582516529"><a name="p1417582516529"></a><a name="p1417582516529"></a>输入</p>
@@ -69,7 +69,7 @@
 
 ## 设计优化方案<a name="section33901368431"></a>
 
-开启MTE2 Preload功能：在创建Matmul对象时，开启doMTE2Preload开关。开启MTE2 Preload的完整样例请参考[M方向预加载Matmul算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_preload)。具体步骤如下：
+开启MTE2 Preload功能：在创建Matmul对象时，开启doMTE2Preload开关。开启MTE2 Preload的完整样例请参考[M方向预加载Matmul算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_preload)。具体步骤如下：
 
 1.  配置MDL模板参数，将其中的doMTE2Preload参数设置为2，开启N方向Preload功能。
 

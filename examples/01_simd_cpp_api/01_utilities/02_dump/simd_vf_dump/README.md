@@ -19,7 +19,8 @@
 │   │   └── verify_result.py    // 验证输出数据和真值数据是否一致
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── simd_vf_dump.asc        // Ascend C样例实现&调用样例
+│   ├── simd_vf_dump.asc        // Ascend C样例实现&调用样例
+│   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
@@ -41,12 +42,10 @@
   | `asc_dump<T>` | `__ubuf__` / Reg | `asc_dump<float>(input, desc, dump_size);` |
 
   参数说明：
-   - 模板参数`T`：指定数据类型（float/half等）
+  - 模板参数`T`：指定数据类型（float/half等）
   - `input`：UB数据地址或Reg寄存器对象
   - `desc`：打印控制描述符
   - `dump_size`：单次dump的数据元素个数
-
-   
 
 - 调用实现
 
@@ -54,9 +53,10 @@
 
 ## 编译运行
 
+在本样例根目录下执行如下步骤，编译并执行样例。
+
 - 配置环境变量
-  在本样例根目录下执行如下步骤，编译并执行样例。
-  请根据当前环境上CANN开发套件包的[安装方式](https://gitcode.com/cann/asc-devkit/blob/master/docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

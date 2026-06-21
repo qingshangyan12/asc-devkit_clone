@@ -32,7 +32,7 @@ $$
 
 **说明**：GELU 是神经网络中常用的激活函数，用于替代 ReLU 以获得更平滑的梯度特性。
 
-本样例采用 RegBase 编程方式实现 GELU 计算——与 [01_vector/add 样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_vector/add/README.md) 使用的 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）方式相比，RegBase 允许中间计算结果暂存在寄存器而非 UB 中，减少了 UB 读写次数，适合多步骤融合计算场景。
+本样例采用 RegBase 编程方式实现 GELU 计算——与 [01_add/add 样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/01_add/add/README.md) 使用的 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) + Compute API）方式相比，RegBase 允许中间计算结果暂存在寄存器而非 UB 中，减少了 UB 读写次数，适合多步骤融合计算场景。
 
 完整的数据通路为：GM → UB → 寄存器（逐步计算）→ UB → GM。
 
@@ -55,7 +55,7 @@ $$
   - `MTE2_V`：表示 MTE2（内存搬运引擎）完成 GM→UB 搬运后，V（向量计算单元）再开始读取 UB 数据
   - `V_MTE3`：表示 V 完成计算后，MTE3（回写引擎）再将 UB 结果写回 GM
 - [PipeBarrier](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md) 用于等待本核所有流水阶段全部完成后再退出 kernel，确保数据写回完成。
-- **RegBase 编程范式**：与传统 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) + Compute API）不同，RegBase 通过 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，在函数内使用 [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md)（寄存器张量）完成计算。VF 函数以 `__simd_vf__` 声明，参数和局部变量通过 `__ubuf__` 标记 UB 地址空间。VF 函数内数据通过 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md)（UB→寄存器）和 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)（寄存器→UB）搬运，使用 [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)（掩码寄存器）控制每次计算的元素数量，通过 [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) 根据剩余元素数更新掩码。优势是中间结果可暂存在寄存器，减少 UB 读写次数。
+- **RegBase 编程范式**：与传统 MemBase（基于 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) + Compute API）不同，RegBase 通过 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 VF 函数，在函数内使用 [RegTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md)（寄存器张量）完成计算。VF 函数以 `__simd_vf__` 声明，参数和局部变量通过 `__ubuf__` 标记 UB 地址空间。VF 函数内数据通过 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md)（UB→寄存器）和 [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)（寄存器→UB）搬运，使用 [MaskReg](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)（掩码寄存器）控制每次计算的元素数量，通过 [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) 根据剩余元素数更新掩码。优势是中间结果可暂存在寄存器，减少 UB 读写次数。
 
 **核心代码示例**：
 
@@ -139,7 +139,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 | 初始化 | 调用 `InitSocState()` 初始化硬件状态 | 确保核运行前硬件状态正确复位 |
 | 分核 | 通过 [GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md) 获取当前核索引，计算 `xGm`/`yGm` 的偏移地址 | 每个核只处理自己对应的连续数据段，避免数据重叠 |
 | UB 分配 | 使用 [LocalMemAllocator](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/内存管理/LocalMemAllocator/LocalMemAllocator简介.md) 为当前核申请 UB 缓存 `xLocal`/`yLocal` | UB 是片上高速缓存，为后续寄存器计算提供数据暂存区 |
-| GM → UB 搬入 | 调用 [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory数据搬运/DataCopy/DataCopy简介.md) 将输入数据从 GM 搬运到 UB | 寄存器无法直接访问 GM，必须先将数据搬运到 UB |
+| GM → UB 搬入 | 调用 [DataCopy](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GM与UB数据搬运.md) 将输入数据从 GM 搬运到 UB | 寄存器无法直接访问 GM，必须先将数据搬运到 UB |
 | MTE2_V 同步 | `SetFlag<HardEvent::MTE2_V>` + `WaitFlag<HardEvent::MTE2_V>` | GM→UB 搬运由 MTE2 引擎异步执行，必须等待搬运完成后 V 单元才能读取 UB 中的数据，否则会读到未完成搬运的脏数据 |
 | 寄存器计算 | 通过 [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) 调用 `GeluVfMethod2`，在 VF 函数内完成 [LoadAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) → 多步 Reg 计算 → [StoreAlign](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md) | RegBase API 在寄存器级别执行计算，延迟最低；GELU 公式需分解为 Mul/Muls/Add/Exp/Adds/Div 共 8 步逐步完成 |
 | V_MTE3 同步 | `SetFlag<HardEvent::V_MTE3>` + `WaitFlag<HardEvent::V_MTE3>` | 寄存器计算由 V 流水异步执行，必须等待计算完成后 MTE3 引擎才能将 UB 结果写回 GM，否则会写出不完整的计算结果 |
@@ -150,8 +150,8 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 
 | 可优化方向 | 当前实现的问题 | 预期优化收益 |
 |-----------|--------------|------------|
-| VF融合双发优化 | 当前 VF 函数内 GELU 计算依赖路径较长，虽然已使用 `asc_vf_call` 调用 RegBase API，但 VF 融合的双发特性未充分利用，IPC（每 cycle 指令发射数量）较低 | 利用 VF 融合双发特性，常规计算指令（Mul/Muls/Add/Adds）并行度可达 512 bytes/cycle，向量化指令耗时可减少 **55%** 以上。详见[Gelu性能调优样例 Case 1](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_compute/gelu_high_performance/README.md) |
-| 循环展开优化 | VF 函数内循环为简单 for 循环，编译器无法充分调度指令级并行，执行队列中可双发的指令数受限 | 使用 `#pragma unroll N` 展开循环，提高指令发射并行度和 IPC，在 VF 融合基础上向量指令耗时可进一步减少约 **4.6%**。展开因子 N 需根据实际场景调优，过大会增加寄存器压力。详见[Gelu性能调优样例 Case 2](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/04_best_practices/02_reg_compute/gelu_high_performance/README.md) |
+| VF融合双发优化 | 当前 VF 函数内 GELU 计算依赖路径较长，虽然已使用 `asc_vf_call` 调用 RegBase API，但 VF 融合的双发特性未充分利用，IPC（每 cycle 指令发射数量）较低 | 利用 VF 融合双发特性，常规计算指令（Mul/Muls/Add/Adds）并行度可达 512 bytes/cycle，向量化指令耗时可减少 **55%** 以上。详见[Gelu性能调优样例 Case 1](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance/README.md) |
+| 循环展开优化 | VF 函数内循环为简单 for 循环，编译器无法充分调度指令级并行，执行队列中可双发的指令数受限 | 使用 `#pragma unroll N` 展开循环，提高指令发射并行度和 IPC，在 VF 融合基础上向量指令耗时可进一步减少约 **4.6%**。展开因子 N 需根据实际场景调优，过大会增加寄存器压力。详见[Gelu性能调优样例 Case 2](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance/README.md) |
 | 流水线串行执行 | 当前搬入、计算、搬出三个阶段严格串行执行，各硬件单元（MTE2/V/MTE3）无法同时工作，数据搬运占比超过 90%，性能瓶颈为 MTE2 bound | 采用多缓冲（Double Buffer/Triple Buffer）机制，使搬入、计算、搬出可并行执行，提升硬件利用率和吞吐 |
 | 核数固定 | 固定使用 2 个核，未根据实际可用核数动态分配 | 动态获取可用核数（[GetBlockNum](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockNum.md)），充分利用多核并行能力 |
 
@@ -173,7 +173,7 @@ AscendC::printf("gelu blockIdx=%d, singleCoreLength=%d\n", AscendC::GetBlockIdx(
 
 ### DumpTensor
 
-基于算子工程开发的算子，可以使用该接口 Dump 指定 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor简介.md) 的内容。同时支持打印自定义的附加信息（仅支持 uint32_t 数据类型的信息），比如打印当前行号等。
+基于算子工程开发的算子，可以使用该接口 Dump 指定 [LocalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md) 的内容。同时支持打印自定义的附加信息（仅支持 uint32_t 数据类型的信息），比如打印当前行号等。
 
 在算子 kernel 侧实现代码中需要打印 Tensor 数据的地方调用 DumpTensor 接口打印相关内容。样例如下：
 
@@ -225,7 +225,8 @@ cat ./PROF_*/mindstudio_profiler_output/op_summary_*.csv
 │   │   └── verify_result.py // 输出结果和真值数据校验脚本
 │   ├── CMakeLists.txt      // 编译工程文件
 │   ├── data_utils.h        // 数据读入写出函数
-│   └── gelu.asc            // Ascend C样例实现 & 调用样例
+│   ├── gelu.asc            // Ascend C样例实现 & 调用样例
+│   └── README.md           // 样例说明文档
 ```
 
 ## 编译运行

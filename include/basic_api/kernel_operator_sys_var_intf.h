@@ -21,9 +21,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
-#include "kernel_macros.h"
-#include "utils/kernel_utils_mode.h"
-#include "utils/kernel_utils_constants.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/utils/kernel_utils_mode.h"
+#include "../../impl/basic_api/utils/kernel_utils_constants.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -128,9 +128,7 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr(){
 }
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_sys_var_intf_impl.h"
-#endif
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_H__)

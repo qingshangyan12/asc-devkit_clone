@@ -34,18 +34,18 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | Rounds | Philox算法内部实现迭代次数，支持取值7或10。 |
 | T | 目的操作数数据类型，支持的数据类型为：uint32_t、int32_t、float。<br><br>其中uint32_t/int32_t为数据类型范围内的均匀分布，float为0-1范围内的均匀分布。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstLocal | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。 |
+| dstLocal | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>LocalTensor的起始地址需要32字节对齐。 |
 | philoxKey | 输入 | 随机数种子。两个32bit的key，定义如下：<br>using PhiloxKey = uint32_t[2]; |
 | philoxCounter | 输入 | 随机数种子。一个128bit的记数器C（由4个32bit组成），定义如下：<br>using PhiloxCounter = uint32_t[4]; |
 | count | 输入 | 生成目的操作数的元素个数。 |
@@ -59,7 +59,7 @@ struct PhiloxRandomParams {
 }
 ```
 
-**图 1**  PhiloxRandom示意图  
+**图1**  PhiloxRandom示意图  
 ![](../../../figures/PhiloxRandom示意图.png "PhiloxRandom示意图")
 
 上图是一个生成随机数的示意图。
@@ -77,7 +77,7 @@ struct PhiloxRandomParams {
 
 ## 调用示例
 
-完整算子样例请参考[philoxrandom样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/09_random/philoxrandom)。
+完整算子样例请参考[philoxrandom样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/09_random/philoxrandom)。
 
 ```
 // dstLocal：存放计算结果的Tensor

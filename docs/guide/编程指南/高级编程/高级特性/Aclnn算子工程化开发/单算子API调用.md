@@ -93,7 +93,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 
 ## 准备验证代码工程<a name="zh-cn_topic_0000001541959061_section2021523012501"></a>
 
-代码工程目录结构如下，您可以单击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_aclnn_op/01_aclnn_invocation/aclnn_invocation)，获取样例工程的完整样例：
+代码工程目录结构如下，您可以单击[LINK](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclnn_invocation)，获取样例工程的完整样例：
 
 ```
 ├── CMakeLists.txt    // 编译规则文件
@@ -104,7 +104,7 @@ aclnnStatus aclnnXxxTensorGetWorkspaceSize(const aclTensor *x0, const aclTensor 
 
 单算子API执行流程如下：
 
-**图 1**  单算子API执行接口调用流程<a name="fig10713450184013"></a>  
+**图1**  单算子API执行接口调用流程<a name="fig10713450184013"></a>  
 ![](../../../../figures/单算子API执行接口调用流程.png "单算子API执行接口调用流程")
 
 本节以**AddCustom自定义算子**调用为例，介绍如何编写单算子调用的代码逻辑。其他算子的调用逻辑与Add算子大致一样，请根据实际情况自行修改代码。
@@ -228,7 +228,7 @@ CHECK_ACL(aclnnFinalize());
 3.  执行单算子
     1.  以运行用户（例如HwHiAiUser）拷贝开发环境中样例工程output目录下的**execute\_add\_op**到运行环境任一目录。
 
-        说明： 若您的开发环境即为运行环境，此拷贝操作可跳过。
+        说明：若您的开发环境即为运行环境，此拷贝操作可跳过。
 
     2.  在运行环境中，执行**execute\_add\_op**文件：
 

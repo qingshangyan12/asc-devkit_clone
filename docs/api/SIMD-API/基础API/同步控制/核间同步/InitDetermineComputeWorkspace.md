@@ -61,7 +61,7 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1** 接口参数说明
+**表1** 接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :--- | :--- |
@@ -102,4 +102,4 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
     }
 ```
 
-完整样例请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/05_sync_control/sequential_block_sync)。
+完整样例请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/sequential_block_sync)。

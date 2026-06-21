@@ -20,14 +20,14 @@
 #ifndef KERNEL_TENSOR_H
 #define KERNEL_TENSOR_H
 
-#include "kernel_macros.h"
-#include "common_types.h"
-#include "kernel_event.h"
-#include "kernel_log.h"
-#include "kernel_operator_tensor_trait.h"
+#include "../../impl/basic_api/kernel_macros.h"
+#include "../../impl/basic_api/common_types.h"
+#include "../../impl/basic_api/kernel_event.h"
+#include "../../impl/basic_api/kernel_log.h"
+#include "../../impl/basic_api/kernel_operator_tensor_trait.h"
 #include "kernel_struct_data_copy.h"
-#include "kernel_tensor_base.h"
-#include "utils/kernel_utils_macros.h"
+#include "../../impl/basic_api/kernel_tensor_base.h"
+#include "../../impl/basic_api/utils/kernel_utils_macros.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -234,7 +234,11 @@ private:
 template <typename T> class GlobalTensor : public BaseGlobalTensor<T>, public BaseTensorTraitTensor<T> {
 public:
     using PrimType = PrimT<T>;
+#if defined(__NPU_ARCH__)
     __aicore__ inline GlobalTensor<T>();
+#else
+    __aicore__ inline GlobalTensor<T>(){}
+#endif
 #ifdef __ASCENDC_SUPER_KERNEL_ENABLE_GM_GET_SET_VALUE_DCCI__
     __aicore__ inline ~GlobalTensor<T>();
 #endif
@@ -297,9 +301,7 @@ private:
 };
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_tensor_impl.h"
-#endif
 #endif // KERNEL_TENSOR_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_TENSOR_H__)

@@ -16,7 +16,7 @@
 
 ![](../../../figures/zh-cn_formulaimage_0000002080754290.png)
 
-其中，i表示特征中的索引，![](../../../figures/zh-cn_formulaimage_0000002116393957.png)  和  ![](../../../figures/zh-cn_formulaimage_0000002080755382.png)  表示特征中每个值标准化前后的值，μ和σ表示特征的均值和标准差，计算公式如下所示：
+其中，i表示特征中的索引，![](../../../figures/zh-cn_formulaimage_0000002116393957.png)和![](../../../figures/zh-cn_formulaimage_0000002080755382.png)表示特征中每个值标准化前后的值，μ和σ表示特征的均值和标准差，计算公式如下所示：
 
 ![](../../../figures/zh-cn_formulaimage_0000002080756222.png)
 
@@ -48,24 +48,24 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数，默认值为false。如果开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后能够节省部分内存空间。<br><br>设置为true，则本接口内部计算时复用inputX的内存空间，节省内存空间；设置为false，则本接口内部计算时不复用inputX的内存空间。<br><br>对于float数据类型的输入支持开启该参数，half数据类型的输入不支持开启该参数。<br><br>isReuseSource的使用样例请参考[更多样例](../数学计算/更多样例-83.md#section639165323915)。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| output | 输出 | 目的操作数，对标准化后的输入进行缩放和平移计算的结果。shape为[N, C, H, W]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| outputMean | 输出 | 目的操作数，均值。shape为[N, groupNum]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| outputVariance | 输出 | 目的操作数，方差。shape为[N, groupNum]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputX | 输入 | 源操作数。shape为[N, C, H, W]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| gamma | 输入 | 源操作数，缩放参数。该参数支持的取值范围为[-100, 100]。shape为[C]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| beta | 输入 | 源操作数，平移参数。该参数支持的取值范围为[-100, 100]。shape为[C]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GroupNorm Tiling](GroupNorm-Tiling.md)。 |
+| output | 输出 | 目的操作数，对标准化后的输入进行缩放和平移计算的结果。shape为[N, C, H, W]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| outputMean | 输出 | 目的操作数，均值。shape为[N, groupNum]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| outputVariance | 输出 | 目的操作数，方差。shape为[N, groupNum]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputX | 输入 | 源操作数。shape为[N, C, H, W]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gamma | 输入 | 源操作数，缩放参数。该参数支持的取值范围为[-100, 100]。shape为[C]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| beta | 输入 | 源操作数，平移参数。该参数支持的取值范围为[-100, 100]。shape为[C]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GroupNorm Tiling](GroupNorm-Tiling.md)。 |
 | epsilon | 输入 | 防除0的权重系数。数据类型需要与inputX/output保持一致。 |
 | tiling | 输入 | 输入数据的切分信息，Tiling信息的获取请参考[GroupNorm Tiling](GroupNorm-Tiling.md)。 |
 
@@ -81,16 +81,16 @@
 ## 调用示例
 
 ```
-// output: 存放 GroupNorm 计算结果的 Tensor
-// outputMean: 输出每个 group 的均值
-// outputVariance: 输出每个 group 的方差
-// inputX: 输入数据X，shape 为 [N, C, H, W]
-// gamma: LayerNorm 的缩放参数 γ，shape 为 [C]
-// beta: LayerNorm 的偏置参数 β，shape 为 [C]
+// output: 存放GroupNorm计算结果的Tensor
+// outputMean: 输出每个group的均值
+// outputVariance: 输出每个group的方差
+// inputX: 输入数据X，shape为 [N, C, H, W]
+// gamma: LayerNorm的缩放参数 γ，shape为 [C]
+// beta: LayerNorm的偏置参数 β，shape为 [C]
 // epsilon: 防除零系数ε
-// tiling: 预计算的 Tiling 信息，包含分组数、维度等参数
+// tiling: 预计算的Tiling信息，包含分组数、维度等参数
 
-// 使用 GroupNorm 接口实现 Group Normalization
+// 使用GroupNorm接口实现Group Normalization
 // 若数据类型T为float且允许修改inputX，可设置isReuseSource = true复用inputX内存空间以节省内存
 AscendC::GroupNorm<T, isReuseSource>(
     output,           // 输出：归一化并缩放平移后的结果
@@ -100,7 +100,7 @@ AscendC::GroupNorm<T, isReuseSource>(
     gamma,            // 输入：缩放参数 γ
     beta,             // 输入：偏置参数 β
     epsilon,          // 输入：防止除零的系数 ε
-    tiling            // 输入：Tiling 调度信息
+    tiling            // 输入：Tiling调度信息
 );
 ```
 

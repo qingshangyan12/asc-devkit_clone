@@ -105,25 +105,25 @@
 
 ### 模板参数及接口参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 源操作数数据类型。 |
 | U | 目的操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置Mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。<br> |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1Scalar的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。<br> |
-| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。<br>dst用于存储比较结果，将dst中uint8_t类型的数据按照bit位展开，由左至右依次表征对应位置的src0和src1Scalar的比较结果，如果比较后的结果为真，则对应比特位为1，否则为0。<br> |
+| src0 | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。 |
 | src1Scalar | 输入 | 源操作数，Scalar标量。数据类型和src0保持一致。 |
 | cmpMode | 输入 | CMPMODE类型，表示比较模式，包括EQ，NE，GE，LE，GT，LT。<br>&bull; LT：src0小于（less than）src1Scalar <br>&bull; GT：src0大于（greater than）src1Scalar <br>&bull; GE：src0大于或等于（greater than or equal to）src1Scalar <br>&bull; EQ：src0等于（equal to）src1Scalar <br>&bull; NE：src0不等于（not equal to）src1Scalar <br>&bull; LE：src0小于或等于（less than or equal to）src1Scalar<br> |
 | mask/mask[] | 输入 | mask用于控制每次迭代内参与计算的元素。详细设置参考[掩码](../SIMD计算说明/掩码/掩码.md)。 |
 | repeatTime | 输入 | 重复迭代次数。矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。 |
-| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
+| repeatParams | 输入 | 控制操作数地址步长的参数。[UnaryRepeatParams](../../数据结构/辅助数据结构/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。 |
 | count | 输入 | 参与计算的元素个数。设置count时，需要保证count个元素所占空间256字节对齐。未对齐部分元素不参与计算，仅完整对齐块有效。 |
 
 ### mask/mask[]参数说明
@@ -175,7 +175,7 @@
 <cann-filter npu-type = "950">
 
 - 针对Ascend 950PR/Ascend 950DT
-    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double。
+    - T支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t、double（只支持CMPMODE::EQ）。
     - U支持的数据类型为：uint8_t。
 
 </cann-filter>
@@ -199,7 +199,7 @@
 <cann-filter npu-type = "310b">
 
 - 针对Atlas 200I/500 A2 推理产品
-    - T支持的数据类型为：half、float。
+    - T支持的数据类型为：int16_t、uint16_t、half、int32_t、uint32_t、float。
     - U支持的数据类型为：uint8_t。
 
 </cann-filter>
@@ -247,7 +247,7 @@
 
 本样例中，源操作数src0Local存储了256个float类型的数据。样例实现的功能为，对src0Local中的元素和src1Local.GetValue\(0\)中的数据进行比较，如果src0Local中的元素小于src1Local.GetValue\(0\)中的元素，dstLocal结果中对应的比特位置1；反之，则置0。dst结果使用uint8\_t类型数据存储。
 
-完整的调用样例可参考[Compare类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/compare)场景三。
+完整的调用样例可参考[Compare类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare)场景三。
 
 - tensor前n个数据计算接口样例
 

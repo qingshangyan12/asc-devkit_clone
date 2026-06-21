@@ -27,7 +27,7 @@ __aicore__ inline void SetAtomicMax()
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 |--------|------|
@@ -101,4 +101,4 @@ Src1: [2,2,2,2,2,...,2] // 256个2
 */
 ```
 
-完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/06_atomic/data_movement_with_atomic_operations)。
+完整样例请参考[DataMovementWithAtomicOperations样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations)。

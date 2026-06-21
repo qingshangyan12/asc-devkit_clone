@@ -91,13 +91,13 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 ## 参数说明<a name="section1619484392111"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名称 | 描述 |
 | ------ | ------ |
 | T | 操作数数据类型。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ------ | ------ | ------ |
@@ -106,7 +106,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 | repeatTime | 输入 | 指令迭代次数，每次迭代完成8个DataBlock的数据收集，取值范围：repeatTime∈[0,255]。|
 | repeatParams | 输入 | 用于控制指令迭代的相关参数，类型为BrcbRepeatParms。<br> BrcbRepeatParams参数说明请参考[表3 BrcbRepeatParams结构体参数说明](#table3)。|
 
-**表 3**  BrcbRepeatParams结构体参数说明<a id="table3"></a>
+**表3**  BrcbRepeatParams结构体参数说明<a id="table3"></a>
 
 | 参数名称 | 含义 |
 | ------ | ------ |
@@ -141,7 +141,7 @@ __aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 - 不支持源操作数与目的操作数使用同一块内存地址。
 <cann-filter npu-type="A3,910b">
-- repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为 NOP（空操作）。该约束适用于以下型号。
+- repeatTime = 0表示不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。该约束适用于以下型号。
 <cann-filter npu-type="A3">
 
   - Atlas A3 训练系列产品/Atlas A3 推理系列产品
@@ -171,7 +171,7 @@ dstBlkStride为1：说明同一迭代内目的操作数中相邻DataBlock地址�
 
 dstRepStride为8：说明相邻迭代间目的操作数中首尾DataBlock地址连续。 
 
-**图 1**  目的操作数连续
+**图1**  目的操作数连续
 
 ![目的操作数连续](../../../../figures/Brcb_1.png)
 
@@ -183,13 +183,13 @@ dstBlkStride为2：说明同一迭代内目的操作数中相邻DataBlock地址�
 
 dstRepStride为16：说明相邻迭代间目的操作数中首尾DataBlock地址非连续（间隔1个DataBlock）。
 
-**图 2**  目的操作数非连续
+**图2**  目的操作数非连续
 
 ![目的操作数非连续](../../../../figures/Brcb_2.png)
 
 ## 调用示例<a name="section11276201527"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Brcb样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/brcb)完整样例模板中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Brcb样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/brcb)完整样例模板中Compute函数的部分代码即可。
 
 ```cpp
 // repeatTime = 2, 128 elements one repeat, 256 elements total

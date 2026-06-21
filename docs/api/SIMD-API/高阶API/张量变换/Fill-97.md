@@ -23,17 +23,17 @@ __aicore__ inline void Fill(GlobalTensor<T>& gmWorkspaceAddr, const uint64_t siz
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 含义 |
 | --- | --- |
 | T | 操作数的数据类型。不同型号支持的数据类型请参考[支持的数据类型](#li194619420173)。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| gmWorkspaceAddr | 输入 | gmWorkspaceAddr为用户定义的全局空间，是需要被初始化的空间，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../基础数据结构/GlobalTensor/GlobalTensor.md)。 |
+| gmWorkspaceAddr | 输入 | gmWorkspaceAddr为用户定义的全局空间，是需要被初始化的空间，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。 |
 | size | 输入 | 需要初始化的空间大小，单位为元素个数。 |
 | value | 输入 | 初始化的值，数据类型与gmWorkspaceAddr保持一致。 |
 

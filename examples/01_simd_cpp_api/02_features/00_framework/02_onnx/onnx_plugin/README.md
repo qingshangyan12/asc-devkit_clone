@@ -1,4 +1,4 @@
-# 自定义样例工程+onnx模型调用样例
+# 自定义算子工程+ONNX模型调用样例
 
 ## 概述
 
@@ -18,7 +18,8 @@
 ├── onnx_plugin
 │   ├── CMakeLists.txt           // 编译工程文件
 │   ├── leaky_relu.py            // 生成LeakyRelu ONNX模型的脚本
-│   └── main.cpp                 // 算子调用主程序（加载om模型执行LeakyRelu推理）
+│   ├── main.cpp                 // 算子调用主程序（加载om模型执行LeakyRelu推理）
+│   └── README.md                // 样例说明文档
 ```
 
 ## 样例实现
@@ -35,7 +36,7 @@
   在本样例根目录下执行如下步骤，编译并执行样例。
   - 编译、打包和部署自定义样例工程
 
-    运行此样例前，需先进入[自定义样例工程样例](../../../99_aclnn_op/00_aclnn_compilation/custom_op)目录完成编译、打包和部署。
+    运行此样例前，需先进入[自定义算子工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
 - 安装onnx
 

@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -46,7 +58,7 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -55,7 +67,7 @@ inline bfloat16x2_t asc_atomic_sub(bfloat16x2_t *address, bfloat16x2_t val)
 
 不同数据类型支持的内存范围说明如下：
 
-**表 2**  不同数据类型支持的内存范围
+**表2**  不同数据类型支持的内存范围
 
 | 参数数据类型 | 支持的内存空间 |
 | --- | --- |
@@ -68,7 +80,7 @@ Unified Buffer或Global Memory上的初始数据。
 
 ## 约束说明
 
-无
+原子操作保证对同一地址的读改写过程具有原子性，但不保证多个线程之间的执行顺序。对于浮点累减或依赖返回值顺序敏感的场景，结果可能随线程调度变化而不同。
 
 ## 需要包含的头文件
 

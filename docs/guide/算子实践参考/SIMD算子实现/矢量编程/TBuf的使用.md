@@ -1,6 +1,6 @@
 # TBuf的使用<a name="ZH-CN_TOPIC_0000002500548088"></a>
 
-在大多数算子开发时，核函数计算过程需要使用临时内存来存储运算的中间结果，这些中间结果以临时变量表示，临时变量占用的内存可以使用TBuf数据结构来管理，具体介绍请参考[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TBuf/TBuf.md)。下文将以输入的数据类型为bfloat16\_t、在单核上运行的Add算子为例，介绍TBuf的使用方式。本样例中介绍的算子完整代码请参见[使用临时内存的Add算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/04_memory_management/tmp_buffer)。
+在大多数算子开发时，核函数计算过程需要使用临时内存来存储运算的中间结果，这些中间结果以临时变量表示，临时变量占用的内存可以使用TBuf数据结构来管理，具体介绍请参考[TBuf](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TBuf/TBuf.md)。下文将以输入的数据类型为bfloat16\_t、在单核上运行的Add算子为例，介绍TBuf的使用方式。本样例中介绍的算子完整代码请参见[使用临时内存的Add算子样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/04_memory_management/tmp_buffer)。
 
 在Atlas A2 训练系列产品/Atlas 800I A2 推理产品上，[Add](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/基础算术/Add.md)接口不支持对数据类型bfloat16\_t的源操作数进行求和计算。因此，需要先将算子输入的数据类型转换成Add接口支持的数据类型，再进行计算。为保证计算精度，调用[Cast](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/类型转换/Cast.md)接口将输入bfloat16\_t类型转换为float类型，再进行Add计算，并在计算结束后将float类型转换回bfloat16\_t类型。
 
@@ -9,7 +9,7 @@
 -   算子类型（OpType）：Add
 -   算子输入输出：
 
-    **表 1**  Add算子输入输出规格
+    **表1**  Add算子输入输出规格
 
     <a name="table4934296305"></a>
     <table><thead align="left"><tr id="row59358913304"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p5503181819300"><a name="p5503181819300"></a><a name="p5503181819300"></a><strong id="b1850331853010"><a name="b1850331853010"></a><a name="b1850331853010"></a>name</strong></p>
@@ -65,7 +65,7 @@
 
 该样例的CopyIn，CopyOut任务与[基础矢量算子](基础矢量算子.md)相同，Compute任务的具体流程如下图所示。
 
-**图 1**  输入为bfloat16\_t类型的Add计算流程<a name="zh-cn_topic_0000002201317266_fig816618211471"></a>  
+**图1**  输入为bfloat16\_t类型的Add计算流程<a name="zh-cn_topic_0000002201317266_fig816618211471"></a>  
 ![](../../../figures/输入为bfloat16_t类型的Add计算流程.png "输入为bfloat16_t类型的Add计算流程")
 
 在Compute任务中，表示Cast转换结果、Add计算结果的临时变量均需要使用临时内存存储。与[基础矢量算子实现](基础矢量算子.md#zh-cn_topic_0000002201157438_section10423482111)的KernelAdd算子类相比，本样例新增两个TBuf类型的成员变量tmpBuf0、tmpBuf1，用于管理计算过程中使用的临时内存，代码如下。
@@ -112,7 +112,7 @@ private:
 }
 ```
 
-基于矢量编程范式，核函数需要实现3个基本任务：CopyIn，Compute，CopyOut。与[基础矢量算子实现](基础矢量算子.md#zh-cn_topic_0000002201157438_section10423482111)相同，Process函数按顺序调用CopyIn函数，Compute函数，CopyOut函数。其中，CopyIn函数，CopyOut函数与[基础矢量算子的CopyIn函数](基础矢量算子.md#zh-cn_topic_0000002201157438_zh-cn_topic_0000001514531781_li10182173751518)、[基础矢量算子的CopyOut函数](基础矢量算子.md#zh-cn_topic_0000002201157438_zh-cn_topic_0000001514531781_li1134112320247)的实现没有差异，此处不过多赘述。Compute函数的实现步骤如下：
+基于矢量编程范式，核函数需要实现3个基本任务：CopyIn，Compute，CopyOut。与[基础矢量算子实现](基础矢量算子.md#zh-cn_topic_0000002201157438_section10423482111)相同，Process函数按顺序调用CopyIn函数，Compute函数，CopyOut函数。其中，CopyIn函数，CopyOut函数与[基础矢量算子的CopyIn函数](基础矢量算子.md#copyin-implementation)、[基础矢量算子的CopyOut函数](基础矢量算子.md#copyout-implementation)的实现没有差异，此处不过多赘述。Compute函数的实现步骤如下：
 
 1.  使用[DeQue](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TQue/DeQue.md)从VECIN的Queue中取出LocalTensor。
 2.  使用TBuf.[Get](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/资源管理/Pipe和Que框架/TBuf/Get.md)从TBuf上获取全部长度的Tensor作为临时内存。
@@ -143,4 +143,3 @@ __aicore__ inline void Compute()
     inQueueY.FreeTensor(yLocal);
 }
 ```
-

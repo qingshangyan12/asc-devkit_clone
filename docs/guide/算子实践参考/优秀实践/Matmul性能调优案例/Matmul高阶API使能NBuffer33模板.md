@@ -18,7 +18,7 @@
 
 本案例的算子规格如下：
 
-**表 1**  算子规格
+**表1**  算子规格
 
 <a name="table101751125175213"></a>
 <table><thead align="left"><tr id="row8175525185219"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p1417582516529"><a name="p1417582516529"></a><a name="p1417582516529"></a>输入</p>
@@ -73,7 +73,7 @@
 
 ## 设计优化方案<a name="section33901368431"></a>
 
-开启NBuffer33模板：在GetTiling接口前，调用SetMatmulConfigParams接口开启NBuffer33模式，使获取的Tiling满足要求；Kernel侧在创建Matmul对象时开启NBuffer33模板。开启NBuffer33模板的完整样例请参考[开启NBuffer33模板策略的样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_nbuffer33)。具体步骤如下：
+开启NBuffer33模板：在GetTiling接口前，调用SetMatmulConfigParams接口开启NBuffer33模式，使获取的Tiling满足要求；Kernel侧在创建Matmul对象时开启NBuffer33模板。开启NBuffer33模板的完整样例请参考[开启NBuffer33模板策略的样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_nbuffer33)。具体步骤如下：
 
 -   Tiling实现
 
@@ -114,4 +114,4 @@
 
 ## 总结<a name="section8281219125011"></a>
 
-MTE2 Bound的场景，Tiling参数满足stepM、stepKa、stepKb小于等于3的条件时，可以考虑开启NBuffer33模板，切分矩阵将搬运流水错开， 减少单次搬运的数据量，平衡MTE2和FixPipe的数据流量。
+MTE2 Bound的场景，Tiling参数满足stepM、stepKa、stepKb小于等于3的条件时，可以考虑开启NBuffer33模板，切分矩阵将搬运流水错开，减少单次搬运的数据量，平衡MTE2和FixPipe的数据流量。

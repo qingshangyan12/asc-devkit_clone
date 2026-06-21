@@ -13,7 +13,7 @@ bisheng可以通过-I \<path\>指定头文件路径、-L \<path\> 指定链接�
 ```
 
 AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMD代码分为Cube代码和Vector代码，需分别编译成Cube二进制和Vector二进制，先将Cube二进制和Vector二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_compilation.png "aicore 编译流程示意图")
+![aicore编译流程示意图](../../../figures/aicore_compilation.png)
 
 - 异构编译
   ```shell
@@ -37,18 +37,18 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
   单独编译的强制要求：
   - 在一个编译单元中定义的非常量设备变量，在其他编译单元中引用时，必须使用extern关键字声明；
   - 所有常量设备变量，定义和跨单元引用时都必须使用extern关键字；
-  - 所有Ascend C 源文件（.asc）都必须使用`-dc`选项编译。
+  - 所有Ascend C源文件（.asc）都必须使用`-dc`选项编译。
 
-  下方示例中，definition.asc 定义了变量和函数，example.asc 对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
+  下方示例中，definition.asc定义了变量和函数，example.asc对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
   ```c++
   // ------- definition.asc -------
-  extern __gm__ int dev_var = 5;
+  __gm__ int dev_var = 5;
   __aicore__ int device_function();
- 
+
   // ------- example.asc -------
-  extern __aicore__ int device_varibale;
+  extern __gm__ int dev_var;
   __aicore__  int device_function();
-  __global__  __aicore__ void kernel(int *var) {
+  __global__  __vector__ void kernel(int *var) {
     dev_var = 0;
     *var = device_function();
   }
@@ -79,7 +79,7 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 ```
 
 AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成Host二进制，AI Core SIMT代码编译成SIMT二进制，先将SIMT二进制链接成Fatbin文件，再与Host二进制合并生成可执行二进制。
-![ ](../../../figures/aicore_simt_comilation.png "aicore simt编译流程示意图")
+![aicore simt编译流程示意图](../../../figures/aicore_simt_comilation.png)
 
 ## 基本编译命令汇总
 |编译方式|AI Core SIMD编译命令| AI Core SIMT编译命令|
@@ -134,7 +134,7 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 </td>
 <td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p112810333405"><a name="p112810333405"></a><a name="p112810333405"></a>否</p>
 </td>
-<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1147317623814"><a name="p1147317623814"></a><a name="p1147317623814"></a>指定编译语言, 如：-x asc, 表示指定为Ascend C编程语言。</p>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p1147317623814"><a name="p1147317623814"></a><a name="p1147317623814"></a>指定编译语言,如：-x asc,表示指定为Ascend C编程语言。</p>
 </td>
 </tr>
 <tr id="row95881839113910"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p1752513455396"><a name="p1752513455396"></a><a name="p1752513455396"></a>-o &lt;file&gt;</p>
@@ -215,6 +215,25 @@ AI Core SIMT的基本编译流程如下：Host代码使用Host编译器编译成
 <td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>SIMT编程场景，指定SIMT方式编译。</p>
 </td>
 </tr>
+</tr>
+<tr id="row109271176132"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p1092701741311"><a name="p1092701741311"></a><a name="p1092701741311"></a>--cce-disable-asc-reserved-ubuf</p>
+</td>
+<td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p49274178137"><a name="p49274178137"></a><a name="p49274178137"></a>否</p>
+</td>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>禁用Ascend C接口使用预留UB空间。开启后，依赖预留UB空间的Ascend C接口在对应芯片架构下不可用，使用时编译报错。
+
+使用预留UB空间的API列表参考：
+[使用预留UB空间的API](../../../../../docs/guide/编程指南/编程模型/AI-Core-SIMD编程/基于Tensor的CPP编程/静态Tensor编程.md#使用预留ub空间的api范围)。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。
+</tr>
+<tr id="row109271176132"><td class="cellrowborder" valign="top" width="33.63636363636363%" headers="mcps1.1.4.1.1 "><p id="p1092701741311"><a name="p1092701741311"></a><a name="p1092701741311"></a>--cce-disable-vf-stack-reserved-ubuf</p>
+</td>
+<td class="cellrowborder" valign="top" width="9.676767676767676%" headers="mcps1.1.4.1.2 "><p id="p49274178137"><a name="p49274178137"></a><a name="p49274178137"></a>否</p>
+</td>
+<td class="cellrowborder" valign="top" width="56.686868686868685%" headers="mcps1.1.4.1.3 "><p id="p139275178134"><a name="p139275178134"></a><a name="p139275178134"></a>禁用SIMD VF栈预留的UB空间。开启后，编译器不再预留该部分UB空间，该空间可作为普通UB空间使用。
+
+针对 [NPU架构版本2201](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项无实际效果；针对 [NPU架构版本3510](../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，此编译选项生效，当用户使用此编译选项后，编译器将无法使用预留的UB空间进行寄存器溢出的缓存，需要用户保证寄存器不溢出。</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -248,7 +267,7 @@ add_executable(demo
 ```cmake
 # CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx覆盖默认值
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
-# 启用SIMT编译模式
+# CMAKE_ASC_ENABLE_SIMT：启用SIMT编译模式，需要在find_package(ASC)前设置
 set(CMAKE_ASC_ENABLE_SIMT ON)
 
 find_package(ASC)
@@ -282,7 +301,7 @@ add_executable(demo
           mix.asc
     )
     ```
-**表1 常用的CMAKE配置变量说明**
+**表1常用的CMAKE配置变量说明**
 | 变量名称 | 配置说明 |
 |--|--|
 | CMAKE_BUILD_TYPE | 编译模式选项，可配置为：Release或Debug。Release版本，不包含调试信息，编译最终发布的版本。Debug版本，包含调试信息，便于开发者开发和调试。配置其他值时CMake会发出警告，但不中止构建。 |
@@ -299,7 +318,13 @@ add_executable(demo
 | CMAKE_ASC_COMPILER_AR | 静态库归档工具，默认使用系统ar工具。设置后，静态库的归档命令将使用该工具替代默认ar。 |
 | CMAKE_ASC_COMPILER_LINKER | 链接驱动，默认使用bisheng编译器作为链接驱动，仅在有明确替换需求时设置。 |
 | CMAKE_ASC_ENABLE_SIMT | 是否启用SIMT编译模式，设置为ON时在编译命令中自动注入--enable-simt选项，默认为OFF。 |
-| CMAKE_INSTALL_PREFIX | 用于指定CMake执行install时，安装的路径前缀，执行install后编译产物（ascendc_library中指定的target以及对应的头文件）会安装在该路径下。默认路径为当前目录的out目录下。 |
+| CMAKE_INSTALL_PREFIX | 为CMake的内置变量，用于指定CMake执行install命令时，安装的路径前缀。|
+
+>[!CAUTION]注意
+> 在CMake工程中，影响Ascend C语言初始化、编译器探测和编译规则生成的变量，
+> 需要在`find_package(ASC)`前设置，或在执行`cmake`配置命令时通过`-D`指定。
+> 这些变量在Ascend C语言初始化过程中会被读取，若在`find_package(ASC)`之后再设置，
+> 可能不会影响已经生成的编译规则。
 
 ## 其他编译相关说明
 
@@ -389,9 +414,11 @@ add_executable(demo
 </tbody>
 </table>
 
-### 高阶API常用链接库 <a name="section57020345148"></a>
-
-| 使用场景 |名称  | 动态库路径 |
-|--|--|--|
-| 使用高阶API相关的Tiling接口时需要同时链接。 |libtiling_api.a</br> libregister.so</br> libgraph_base.so | ${ASCEND_HOME_PATH}/lib64  |
-| 使用PlatformAscendC相关硬件平台信息接口时需要链接。 | libplatform.so | ${ASCEND_HOME_PATH}/lib64 |
+### 高阶API常用链接库
+在使用高阶API时，必须链接以下库，因为这些库是高阶API功能所依赖的。在其他场景下，可以根据具体需求选择是否链接这些库。
+|链接库名称|作用描述|使用场景|动态库路径|
+|--|--|--|--|
+|libtiling_api.a|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libregister.so|Tiling函数相关库。|使用高阶API相关的Tiling接口时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libgraph_base.so|基础数据结构和接口库。|调用ge::Shape，ge::DataType等基础结构体时需要链接。|${ASCEND_HOME_PATH}/lib64|
+|libplatform.so|硬件平台信息库。|使用PlatformAscendC相关硬件平台信息接口时需要链接。|${ASCEND_HOME_PATH}/lib64|

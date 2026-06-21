@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -29,7 +41,7 @@ Warp Shfl类接口主要实现Warp级数据交换，能够实现直接读取某�
 
 例如，Warp内32个活跃线程调用asc\_shfl\(LaneId, 5, 16\)接口，每个线程的返回值为当前线程所在分组内线程编号为5的var值。
 
-**图 1**  asc\_shfl结果示意图
+**图1**  asc\_shfl结果示意图
 ![](../../../figures/asc_shfl结果示意图.png "asc_shfl结果示意图")
 
 ## 函数原型
@@ -62,9 +74,17 @@ inline half asc_shfl(half var, int32_t src_lane, int32_t width = warpSize)
 inline half2 asc_shfl(half2 var, int32_t src_lane, int32_t width = warpSize)
 ```
 
+```
+inline bfloat16_t asc_shfl(bfloat16_t var, int32_t src_lane, int32_t width = warpSize)
+```
+
+```
+inline bfloat16x2_t asc_shfl(bfloat16x2_t var, int32_t src_lane, int32_t width = warpSize)
+```
+
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -83,7 +103,7 @@ Warp内指定线程的var值。
 
 ## 需要包含的头文件
 
-使用除half、half2类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件。
+使用除half、half2、bfloat16\_t、bfloat16x2\_t类型之外的接口需要包含"simt\_api/device\_warp\_functions.h"头文件，使用half和half2类型接口需要包含"simt\_api/asc\_fp16.h"头文件，使用bfloat16\_t和bfloat16x2\_t类型接口需要包含"simt\_api/asc\_bf16.h"头文件。
 
 ```
 #include "simt_api/device_warp_functions.h"
@@ -91,6 +111,10 @@ Warp内指定线程的var值。
 
 ```
 #include "simt_api/asc_fp16.h"
+```
+
+```
+#include "simt_api/asc_bf16.h"
 ```
 
 ## 调用示例

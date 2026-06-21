@@ -19,9 +19,10 @@
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
 │   ├── matmul_leakyrelu_advanced_api.asc // Ascend C样例实现 & 调用样例
-│   └── scripts
-│       ├── gen_data.py         // 输入数据和真值数据生成脚本文件
-│       └── verify_result.py    // 真值对比文件
+│   ├── scripts
+│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本文件
+│   │   └── verify_result.py    // 真值对比文件
+│   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
@@ -55,7 +56,7 @@
     - 创建`matmul_tiling::MultiCoreMatmulTiling`对象`tilingApi`，用于生成多核Matmul所需的tiling参数。
     - `SetDim(2)`表示tiling侧配置2个AIV逻辑核参与Matmul计算发起。
     - `SetAType`、`SetBType`、`SetCType`、`SetBiasType`分别设置A、B、C、Bias的数据来源位置、数据格式和数据类型；其中C类型设置为`VECIN`，便于后续执行LeakyRelu激活。
-    - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`M, N, K方向的大小（单位为元素）`。
+    - `SetOrgShape(M, N, K)`设置原始完整矩阵形状，`SetShape(M, N, K)`设置本次实际参与Matmul计算的`M`、`N`、`K`方向的大小（单位为元素）。
     - `EnableBias(true)`表示Matmul计算带Bias输入。
     - `SetFixSplit(128, 64, 128)`固定Matmul基础分块大小。
     - `SetBufferSpace(-1, -1, ubSize - usedUb)`设置Matmul可使用的L1/L0C/UB空间大小。L1和L0C传入`-1`表示使用当前AI处理器对应buffer的默认大小；`usedUb = baseM * baseN * sizeof(float)`用于扣除LeakyRelu需要使用的一块UB缓存。
@@ -150,10 +151,12 @@
 
 - 编译选项说明
 
-| 选项 | 可选值 | 说明 |
-|------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+
+  > **说明：** 当 `CMAKE_ASC_ARCHITECTURES=dav-3510` 时，编译工程会自动为ASC编译添加 `-DENABLE_CV_COMM_VIA_SSBUF=true`，开启SSBUF通信；`dav-2201` 场景不会添加该编译宏。
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

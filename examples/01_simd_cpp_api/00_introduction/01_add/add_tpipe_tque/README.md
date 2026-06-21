@@ -21,7 +21,8 @@
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
-│   └── add_tpipe_tque.asc          // Ascend C样例实现，tque管理内存 & 调用样例
+│   ├── add_tpipe_tque.asc          // Ascend C样例实现，tque管理内存 & 调用样例
+│   └── README.md                   // 样例说明文档
 ```
 
 ## 样例描述
@@ -94,10 +95,10 @@
 
 - 编译选项说明
 
-| 选项 | 可选值 | 说明 |
-|------|--------|------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

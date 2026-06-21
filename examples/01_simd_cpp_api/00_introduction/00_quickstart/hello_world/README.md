@@ -17,7 +17,8 @@
 ```
 ├── hello_world
 │   ├── CMakeLists.txt      // 编译工程文件
-│   └── hello_world.asc     // Ascend C样例实现 & 调用样例
+│   ├── hello_world.asc     // Ascend C样例实现 & 调用样例
+│   └── README.md           // 样例说明文档
 ```
 
 ## 编译运行
@@ -53,6 +54,7 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
+
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |

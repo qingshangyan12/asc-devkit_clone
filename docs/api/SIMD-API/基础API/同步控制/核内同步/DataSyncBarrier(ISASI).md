@@ -62,7 +62,7 @@ __aicore__ inline void DataSyncBarrier()
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -103,4 +103,4 @@ __aicore__ inline void DataSyncBarrier()
     }
 ```
 
-完整样例请参考[DataSyncBarrier接口样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/05_sync_control/data_sync_barrier)。
+完整样例请参考[DataSyncBarrier接口样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/data_sync_barrier)。

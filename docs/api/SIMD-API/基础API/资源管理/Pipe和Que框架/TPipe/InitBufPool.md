@@ -78,7 +78,7 @@ __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 <a name="table4835205712588"></a>
 <table><thead align="left"><tr id="row118356578583"><th class="cellrowborder" valign="top" width="18.47%" id="mcps1.2.3.1.1"><p id="p48354572582"><a name="p48354572582"></a><a name="p48354572582"></a>参数名</p>
@@ -100,7 +100,7 @@ __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 </tbody>
 </table>
 
-**表 2**  参数说明
+**表2**  参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名</p>
@@ -147,7 +147,7 @@ __aicore__ inline bool InitBufPool(T& bufPool, uint32_t len, U& shareBuf)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-由于物理内存的大小有限，在计算过程没有数据依赖的场景或数据依赖串行的场景下，可以通过指定内存复用解决资源不足的问题。完整算子样例参考：[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/04_memory_management/tbufpool_management)。
+由于物理内存的大小有限，在计算过程没有数据依赖的场景或数据依赖串行的场景下，可以通过指定内存复用解决资源不足的问题。完整算子样例参考：[tbufpool\_management样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management)。
 
 ```
 // 声明一个指向TPipe管道对象的指针
@@ -175,4 +175,3 @@ Compute1();
 CopyOut1();
 tbufPool2.Reset();
 ```
-

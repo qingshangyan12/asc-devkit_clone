@@ -21,7 +21,8 @@
 │   │   └── verify_result.py    // 真值对比文件
 │   ├── CMakeLists.txt          // 编译工程文件
 │   ├── data_utils.h            // 数据读入写出函数
-│   └── matmul_advanced_api.asc  // Ascend C样例实现 & 调用样例
+│   ├── matmul_advanced_api.asc  // Ascend C样例实现 & 调用样例
+│   └── README.md               // 样例说明文档
 ```
 
 ## 样例描述
@@ -46,7 +47,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
-  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`，`singleCoreN = 512`，`singleCoreKa = singleCoreKb = 128`。
+  样例为纯Cube矩阵计算场景，固定按2个Cube核生成tiling。在本样例规格下，tiling结果会把`M = 512`按2个核均分，每个核处理`singleCoreM = 256`、`singleCoreN = 512`、`singleCoreK = 128`；原始K维对应`tiling.Ka = tiling.Kb = 128`。
 
 - 样例实现：
   - Tiling生成流程
@@ -114,6 +115,7 @@
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
 - 编译选项说明
+
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |

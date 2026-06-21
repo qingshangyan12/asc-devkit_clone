@@ -30,13 +30,13 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 |--------|------|
 | T | 操作数的数据类型。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 |--------|-----------|------|
@@ -65,4 +65,4 @@ AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();  // DDR，等待GM访问指�
 AscendC::WriteGmByPassDCache<int32_t>(reinterpret_cast<__gm__ int32_t *>(dstGm), value + ADD_VALUE);
 ```
 
-完整样例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。
+完整样例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。

@@ -63,7 +63,7 @@
 
 TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1HWC0格式](../../矩阵计算（ISASI）/矩阵计算分形介绍/关键分形格式详解.md#nc1hwc0格式)。特别的，也可以用于二维矩阵数据块的转置。完成转置功能时，相比于Transpose接口，Transpose仅支持16\*16大小的矩阵转置；本接口单次repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置，同时还可以支持多次repeat操作。
 
-为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/transpose/scripts/gen_data.py)。
+为方便开发者理解，真值计算请参考：[TransDataTo5HD真值计算](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose/scripts/gen_data.py)。
 
 ## 函数原型<a name="zh-cn_topic_0000001521260417_section620mcpsimp"></a>
 
@@ -90,23 +90,23 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 参数说明<a name="zh-cn_topic_0000001521260417_section622mcpsimp"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名称 | 含义 |
 | :------- | :--- |
 | T | 操作数数据类型。 |
 
-**表 2**  参数列表
+**表2**  参数列表
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |
-| dstList | 输出 | 目的操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
+| dstList | 输出 | 目的操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
 | srcList | 输入 | 源操作数地址序列。<br><br>NCHW_CONV_ADDR_LIST_SIZE固定长度为16。<br>类型为LocalTensor或者LocalTensor的地址值，支持的TPosition为VECIN/VECCALC/VECOUT（存储位置为Unified Buffer）。<br>LocalTensor的起始地址需要按照32字节对齐。 |
 | dst | 输出 | 目的操作数。<br><br>类型为LocalTensor，连续存储对应LocalTensor的地址值。LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。 |
 | src | 输入 | 源操作数。<br><br>类型为LocalTensor，连续存储对应LocalTensor的地址值。LocalTensor支持的TPosition为VECIN/VECCALC/VECOUT。LocalTensor的起始地址需要32字节对齐。 |
 | nchwconvParams | 输入 | 用于控制TransdataTo5HD的数据结构和指令迭代的相关参数。<br>nchwconvParams参数说明请参考[TransDataTo5HDParams参数说明](#table3)。 |
 
-**表 3**  TransDataTo5HDParams参数说明<a id="table3"></a>
+**表3**  TransDataTo5HDParams参数说明<a id="table3"></a>
 
 | 参数名称 | 类型 | 说明 |
 | :------- | :--- | :--- |
@@ -180,22 +180,22 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 - 当数据类型位宽为8位时，每个DataBlock包含32个数，从指定的16个DataBlock中的对应位置取值，组成半个DataBlock放入目的地址中，读取和存放是在DataBlock的高半部分还是低半部分由参数srcHighHalf和dstHighHalf决定。
 
-  **图 1** b8类型矩阵转置
+  **图1** b8类型矩阵转置
   ![b8](../../../../figures/trans_data_to_5hd_b8.png)
 
 - 当数据类型位宽为16位时，每个DataBlock包含16个数，从指定的16个DataBlock中的对应位置取值，组成1个新的DataBlock放入目的地址中。
 
-  **图 2** b16类型矩阵转置
+  **图2** b16类型矩阵转置
   ![b16](../../../../figures/trans_data_to_5hd_b16.png)
 
 - 当数据类型位宽为32位时，每个DataBlock包含8个数，从指定的16个DataBlock中的对应位置取值，组成2个新的DataBlock放入目的地址中。
 
-  **图 3** b32类型矩阵转置
+  **图3** b32类型矩阵转置
   ![b32](../../../../figures/trans_data_to_5hd_b32.png)
 
 - 16个DataBlock数据可以不连续，推荐通过GetPhyAddr获取LocalTensor的地址值存入地址数组。
 
-  **图 4**  单次repeat实现16个DataBlock数据转置<a name="zh-cn_topic_0000002557628265_fig12595141012208"></a>
+  **图4**  单次repeat实现16个DataBlock数据转置<a name="zh-cn_topic_0000002557628265_fig12595141012208"></a>
   ![单次repeat实现16个DataBlock数据转置](../../../../figures/trans_data_to_5hd.png)
 
 ### 将NCHW格式转换成NC1HWC0格式<a name="zh-cn_topic_0000002557628265_section3122131914516"></a>
@@ -224,7 +224,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
   constexpr uint32_t loopCount = N * C /NCHW_CONV_ADDR_LIST_SIZE; // 4
   // 设置转换参数：NCHW → NC1HWC0
   AscendC::TransDataTo5HDParams transParams;
-  transParams.repeatTimes = 16;  // hSize * wSize / elems_per_block 处理整个HW平面需要的repeat次数
+  transParams.repeatTimes = 16;  // hSize * wSize / elems_per_block处理整个HW平面需要的repeat次数
   transParams.dstRepStride = 16; // 循环间dstList间隔NCHW_CONV_ADDR_LIST_SIZE个DataBlock
   transParams.srcRepStride = 1;  // 循环间同一HW平面srcList连续
   // 循环处理数据
@@ -245,7 +245,7 @@ TransDataTo5HD接口数据格式转换，一般用于将NCHW格式转换成[NC1H
 
 ## 调用示例<a name="zh-cn_topic_0000001521260417_section19372434133520"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
+本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景三完整样例模板中Compute函数的部分代码即可。
 
 - 入参类型是LocalTensor的调用方式：
 

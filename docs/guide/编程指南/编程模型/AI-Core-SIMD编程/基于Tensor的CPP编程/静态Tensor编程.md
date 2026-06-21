@@ -10,7 +10,7 @@
 
 >[!NOTE]说明
 >- 静态Tensor编程的使用约束和限制请参考[使用约束和限制](#section19853161834615)。
->- 本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute/add_high_performance)。
+>- 本节涉及的完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)。
 
 ## 编程范式<a name="section1486516584319"></a>
 
@@ -29,7 +29,7 @@
 
     LocalMemAllocator是一种线性内存分配器，开发者可以调用Alloc方法进行内存分配，地址分配从0开始，根据调用次序依次向后进行线性分配，LocalMemAllocator只是一个简单的线性分配器，并不提供内存释放以及其它内存管理的能力。在不关注Bank冲突场景或者算子初始功能开发时，可以使用LocalMemAllocator简化算子编写，在后续性能优化时切换到使用LocalTensor进行地址分配的方式。
 
--   通过[LocalTensor构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础数据结构/LocalTensor/LocalTensor构造函数.md)创建Tensor，极致性能场景推荐使用此方式。
+-   通过[LocalTensor构造函数](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor构造函数.md)创建Tensor，极致性能场景推荐使用此方式。
 
     开发者可以使用LocalTensor构造函数直接指定内存地址，实现内存的完全自主管理（本质上无需申请和释放内存）。使用时，需根据需求合理指定地址（不超过物理存储上限），并在保证功能正确的前提下进行内存复用。如果需要通过规避Bank冲突或者复用内存来获得极致性能时，推荐使用该方式。
 
@@ -106,7 +106,7 @@
 
 ## 流水优化<a name="section121239188376"></a>
 
-在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
+在基于TPipe的编程范式中，开发者只需要在InitBuffer时指定buffer数量为2，即可自动开启Double Buffer。但是静态Tensor编程方式下，开发者需要手动开启Double Buffer，具体示例如下，完整样例请参考[静态Tensor编程样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance)中的Double Buffer示例。
 
 ```
     // ping
@@ -176,13 +176,14 @@
 
 -   开发者不能使用TPipe/TQue/TQueBind/TBufPool等框架接口，和上述框架接口混用可能会出现未定义行为。
 -   只能使用部分API。具体支持的API列表见[支持的API范围](#section2633193623711)。因为不在列表范围内的API内部依赖TPipe分配事件ID，可能会和开发者定义的事件ID产生冲突。
+-   对于支持的API，仍需关注其内部是否依赖Ascend C预留的UB空间（针对 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，Select等API内部使用了8KB的预留UB空间，用于存储中间数据；针对 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，Exp等API内部使用了2KB的预留UB空间，用于指令兼容或存储中间数据）。若开启[--cce-disable-asc-reserved-ubuf](../../../编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)编译选项，在对应产品版本下调用相关API会触发编译期报错。具体API范围见[使用预留UB空间的API列表](#section_reserved_ubuf_api)。
 -   同步事件需要由开发者使用[SetFlag/WaitFlag\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/SetFlag-WaitFlag(ISASI).md)和[PipeBarrier\(ISASI\)](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/同步控制/核内同步/PipeBarrier(ISASI).md)手动插入，事件的类型和事件ID由开发者自行管理，但需要注意事件ID不能使用6和7（可能与内部使用的事件ID出现冲突，进而出现未定义行为）。
 -   由于需要使用SetFlag/WaitFlag/PipeBarrier底层同步接口（属于ISASI硬件体系结构相关的接口），无法保证算子跨硬件版本兼容。
 -   Kernel入口处需要开发者手动调用[InitSocState](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统初始化/InitSocState.md)接口用来初始化全局状态寄存器。因为全局状态寄存器处于不确定状态，如果不调用该接口，可能导致算子执行过程中出现未定义行为。在TPipe框架编程中，初始化过程由TPipe完成，无需开发者关注。
 
 ## 支持的API范围<a name="section2633193623711"></a>
 
-**表 1**  针对Atlas 推理系列产品AI Core，支持的API范围
+**表1**  针对Atlas 推理系列产品AI Core，支持的API范围
 
 <a name="table56285428438"></a>
 <table><thead align="left"><tr id="row46697425436"><th class="cellrowborder" valign="top" width="30.28%" id="mcps1.2.3.1.1"><p id="p866911429430"><a name="p866911429430"></a><a name="p866911429430"></a>接口分类</p>
@@ -290,7 +291,7 @@
 </tbody>
 </table>
 
-**表 2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
+**表2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
 
 <a name="table1842818536431"></a>
 <table><thead align="left"><tr id="row104742531436"><th class="cellrowborder" valign="top" width="29.9%" id="mcps1.2.4.1.1"><p id="p10474205364319"><a name="p10474205364319"></a><a name="p10474205364319"></a>接口分类</p>
@@ -421,7 +422,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="44.25%" headers="mcps1.2.4.1.2 "><p id="p4476135364311"><a name="p4476135364311"></a><a name="p4476135364311"></a>Copy、DataCopyPad、SetPadValue</p>
 </td>
-<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p8476165374314"><a name="p8476165374314"></a><a name="p8476165374314"></a>DataCopyPad 不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
+<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p8476165374314"><a name="p8476165374314"></a><a name="p8476165374314"></a>DataCopyPad不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
 </td>
 </tr>
 <tr id="row114761053204315"><td class="cellrowborder" valign="top" width="29.9%" headers="mcps1.2.4.1.1 "><p id="p2047615394311"><a name="p2047615394311"></a><a name="p2047615394311"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
@@ -491,7 +492,7 @@
 </tbody>
 </table>
 
-**表 3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
+**表3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
 
 <a name="table167051848128"></a>
 <table><thead align="left"><tr id="row07054481922"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p135155581014"><a name="p135155581014"></a><a name="p135155581014"></a>接口分类</p>
@@ -621,7 +622,7 @@
 </tr>
 <tr id="row370817486213"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p103895521010"><a name="p103895521010"></a><a name="p103895521010"></a>Copy、DataCopyPad、SetPadValue</p>
 </td>
-<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1338185515107"><a name="p1338185515107"></a><a name="p1338185515107"></a>DataCopyPad 不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p1338185515107"><a name="p1338185515107"></a><a name="p1338185515107"></a>DataCopyPad不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
 </td>
 </tr>
 <tr id="row177081648422"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p113885518108"><a name="p113885518108"></a><a name="p113885518108"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
@@ -705,7 +706,7 @@
 </tbody>
 </table>
 
-**表 4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
+**表4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
 
 <a name="table1798673512413"></a>
 <table><thead align="left"><tr id="row109864353413"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p1098613524117"><a name="p1098613524117"></a><a name="p1098613524117"></a>接口分类</p>
@@ -850,7 +851,7 @@
 </td>
 <td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p16956102014187"><a name="p16956102014187"></a><a name="p16956102014187"></a>Copy、DataCopyPad、SetPadValue</p>
 </td>
-<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p2702434251"><a name="p2702434251"></a><a name="p2702434251"></a>DataCopyPad 不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
+<td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p2702434251"><a name="p2702434251"></a><a name="p2702434251"></a>DataCopyPad不支持VECIN/VECCALC/VECOUT -&gt; TSCM通路的数据搬运。</p>
 </td>
 </tr>
 <tr id="row6778713162710"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p20882139162713"><a name="p20882139162713"></a><a name="p20882139162713"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
@@ -918,3 +919,37 @@
 </tr>
 </tbody>
 </table>
+
+## 使用预留UB空间的API范围<a name="section_reserved_ubuf_api"></a>
+
+以下API内部会使用Ascend C预留的UB空间。当开启[--cce-disable-asc-reserved-ubuf](../../../编译与运行/算子编译/AI-Core算子编译基本用法.md#常用的编译选项)编译选项后，在对应产品版本下调用相关API会触发编译期报错。由于同一API使用预留UB空间的情况在不同NPU架构下有差异，开启该编译选项后，需要手动调整API调用方式或替换为不依赖预留UB空间的实现，才能完成兼容性迁移。
+
+>[!CAUTION]注意
+> 同一接口若提供多个重载原型，可能只有部分原型会使用UB预留空间。
+
+<!-- npu="A3,910b" id1 -->
+**表5**  针对 [NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用预留UB空间的API范围
+
+| API类别 | API名 |
+| --- | --- |
+| 基础API | AddDeqRelu、Select |
+| 高阶API | Digamma、Lgamma、Power、Sign、LayerNorm、DropOut、SelectWithBytesMask |
+<!-- end id1 -->
+
+<!-- npu="950" id2 -->
+**表6**  针对 [NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114)，使用预留UB空间的API范围
+
+| API类别 | API名 |
+| --- | --- |
+| 基础API > Memory数据搬运 | Copy |
+| 基础API > 基础算术 | Exp、Ln、Abs、Reciprocal、Sqrt、Rsqrt、Relu、Add、Sub、Mul、Div、Max、Min、Adds、Muls、Maxs、Mins、LeakyRelu、Subs、Divs |
+| 基础API > 逻辑计算 | Not、And、Or、ShiftLeft、ShiftRight、Ands、Ors |
+| 基础API > 复合计算 | Axpy、CastDequant、CastDeq、AddRelu、AddReluCast、AddDeqRelu、SubRelu、SubReluCast、MulAddDst、MulCast、FusedMulAdd、FusedMulAddRelu、MulAddRelu |
+| 基础API > 比较与选择 | Compare、Compares、CompareScalar、Select、GatherMask |
+| 基础API > 类型转换 | Cast |
+| 基础API > 归约计算 | ReduceRepeat、ReduceDataBlock、ReducePairElem、BlockReduceMax、BlockReduceMin、BlockReduceSum、PairReduceSum、RepeatReduceSum、WholeReduceMax、WholeReduceMin、WholeReduceSum |
+| 基础API > 数据填充 | Duplicate |
+| 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
+| Utils API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |
+| 高阶API | AscendAntiQuant、AdjustSoftMaxRes、TopK |
+<!-- end id2 -->

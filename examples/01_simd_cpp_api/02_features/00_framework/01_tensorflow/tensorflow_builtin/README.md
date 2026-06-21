@@ -16,14 +16,15 @@
 
 ```
 ├── tensorflow_builtin
-│   └── run_add_custom.py       // TensorFlow调用脚本（映射到内置AddV2算子）
+│   ├── run_add_custom.py       // TensorFlow调用脚本（映射到内置AddV2算子）
+│   └── README.md               // 样例说明文档
 ```
 
 ## 代码实现介绍
 
 完成样例工程创建后，会在样例工程目录下生成framework/tf_plugin目录，用于存放TensorFlow框架适配插件实现文件。
 
-本样例展示将Add计算映射到TensorFlow内置算子Add上，核心流程如下：
+本样例展示将Add计算映射到TensorFlow内置算子AddV2上，核心流程如下：
 1. 使用`np.random.uniform`生成随机输入数据，并通过`tf.compat.v1.placeholder`定义输入节点。
 2. 构建计算图：使用`tf.math.add`实现张量加法运算。
 3. 分别创建CPU和NPU会话，通过`session.run`执行计算图并传入输入数据。
@@ -34,10 +35,10 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 编译、打包和部署自定义样例工程
 
-  运行此样例前，需先进入[自定义样例工程样例](../../../99_aclnn_op/00_aclnn_compilation/custom_op)目录完成编译、打包和部署。
+  运行此样例前，需先进入[自定义样例工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
   > [!NOTE]注意
-  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddV2"，如下所示：
+  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddV2"，如下所示：
   >
   > ```cpp
   > REGISTER_CUSTOM_OP("AddCustom")

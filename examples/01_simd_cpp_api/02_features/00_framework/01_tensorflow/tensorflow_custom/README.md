@@ -18,7 +18,8 @@
 ├── tensorflow_custom
 │   ├── CMakeLists.txt                // 编译工程文件
 │   ├── custom_assign_add_custom.cc   // TensorFlow自定义算子实现
-│   └── run_add_custom_tf.py          // TensorFlow调用脚本（映射到自定义AddCustom算子）
+│   ├── run_add_custom_tf.py          // TensorFlow调用脚本（映射到自定义AddCustom算子）
+│   └── README.md                     // 样例说明文档
 ```
 
 ## 代码实现介绍
@@ -36,10 +37,10 @@
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 编译、打包和部署自定义算子工程
 
-  运行此样例前，需先进入[自定义算子工程样例](../../../99_aclnn_op/00_aclnn_compilation/custom_op)目录完成编译、打包和部署。
+  运行此样例前，需先进入[自定义算子工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
   > [!NOTE]注意
-  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
+  > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
   >
   > ```cpp
   > REGISTER_CUSTOM_OP("AddCustom")
@@ -47,10 +48,10 @@
   >   .OriginOpType("AddCustom")      // name in tf module
   >   .ParseParamsByOperatorFn(AutoMappingByOpFn);
   > ```
-    运行此样例前，需先进入[自定义算子工程样例](../../../99_aclnn_op/00_aclnn_compilation/custom_op)目录完成编译、打包和部署。
+    运行此样例前，需先进入[自定义算子工程样例](../../../99_acl_based/00_acl_compilation/custom_op)目录完成编译、打包和部署。
 
     > [!NOTE]注意
-    > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_aclnn_op/00_aclnn_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
+    > 需适配插件代码，路径为： `examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op/framework/tf_plugin/tensorflow_add_custom_plugin.cc`，需修改插件代码中的TensorFlow调用算子名称OriginOpType为"AddCustom"，如下所示：
     >
     > ```cc
     > REGISTER_CUSTOM_OP("AddCustom")

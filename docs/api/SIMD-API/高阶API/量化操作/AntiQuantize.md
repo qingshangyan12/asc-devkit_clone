@@ -18,7 +18,7 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
 
 本接口的伪量化策略包括PER\_TENSOR，PER\_CHANNEL，PER\_TOKEN，PER\_GROUP四种，反量化系数scale、offset在PER\_TENSOR场景下为标量，其余场景下为矢量，计算公式如下：
 
--   PER\_TENSOR场景 （按张量量化）：scale和offset的shape为\[1\]。
+-   PER\_TENSOR场景（按张量量化）：scale和offset的shape为\[1\]。
 
     ![](../../../figures/zh-cn_formulaimage_0000002268883076.png)
 
@@ -26,11 +26,11 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
 
     ![](../../../figures/zh-cn_formulaimage_0000002295275093.png)
 
--   PER\_TOKEN场景 （按token量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
+-   PER\_TOKEN场景（按token量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
 
     ![](../../../figures/zh-cn_formulaimage_0000002295277697.png)
 
--   PER\_GROUP场景 （按组量化）：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
+-   PER\_GROUP场景（按组量化）：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
 
     根据输入数据类型的不同，PER\_GROUP分为两种场景：fp4x2\_e2m1\_t/fp4x2\_e1m2\_t场景（后续内容中简称为float4场景）和int8\_t/hifloat8\_t/fp8\_e5m2\_t/fp8\_e4m3fn\_t场景（后续内容中简称为b8场景）。
 
@@ -78,7 +78,7 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -102,15 +102,15 @@ enum class AntiQuantizePolicy : int32_t {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dstTensor | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | scale | 输入 | 输入数据伪量化时的缩放因子。 |
 | offset | 输入 | 输入数据伪量化时的偏移量。对于PER_GROUP量化的float4场景，offset不生效。 |
-| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAntiQuantizeMaxMinTmpSize](GetAntiQuantizeMaxMinTmpSize.md)。 |
+| sharedTmpBuffer | 输入 | 临时缓存。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetAntiQuantizeMaxMinTmpSize](GetAntiQuantizeMaxMinTmpSize.md)。 |
 | params | 输入 | 量化接口的参数，AntiQuantizeParams类型，具体定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32字节对齐的要求，即shape最后一维为n的输入或输出均需要满足该维度上32字节对齐的要求。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale/offset。groupSize的取值必须大于0且是32的整倍数。 |
 
 ```
@@ -123,7 +123,7 @@ struct AntiQuantizeParams {
 
 输入输出支持的数据类型组合如下：
 
-**表 3**  PER_TENSOR/PER_CHANNEL量化策略支持的数据类型组合
+**表3**  PER_TENSOR/PER_CHANNEL量化策略支持的数据类型组合
 
 | SrcT | ScaleT/OffsetT |  DstT |
 | --- | --- | --- |
@@ -136,7 +136,7 @@ struct AntiQuantizeParams {
 | hifloat8_t | bfloat16_t | bfloat16_t |
 | int8_t | bfloat16_t | bfloat16_t |
 
-**表 4**  PER_TOKEN/PER_GROUP量化策略支持的数据类型组合
+**表4**  PER_TOKEN/PER_GROUP量化策略支持的数据类型组合
 
 | SrcT | ScaleT/OffsetT |  DstT |
 | --- | --- | --- |

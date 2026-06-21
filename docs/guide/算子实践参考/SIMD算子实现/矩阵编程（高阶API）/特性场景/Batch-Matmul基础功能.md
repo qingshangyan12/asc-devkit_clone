@@ -10,7 +10,7 @@ Batch Matmul当前支持4种Layout类型：BSNGD、SBNGD、BNGS1S2、NORMAL（BM
 
 下图为NORMAL数据排布格式的Batch Matmul计算。整个Matmul计算一共包含4个矩阵乘操作：mat\_a1\*mat\_b1、mat\_a2\*mat\_b2、mat\_a3\*mat\_b3、mat\_a4\*mat\_b4，需要单核上计算四个singleCoreM \*singleCoreN。在该场景下，如果shape较小，可以将其视为Batch Matmul场景进行批量处理，以提升性能。一次IterateBatch可同时计算出mat\_c1 = mat\_a1 \* mat\_b1、mat\_c2 = mat\_a2 \* mat\_b2、mat\_c3 = mat\_a3 \* mat\_b3、mat\_c4 = mat\_a4 \* mat\_b4。
 
-**图 1**  NORMAL数据排布格式的Batch Matmul示意图<a name="zh-cn_topic_0000001726346562_fig3876163755011"></a>  
+**图1**  NORMAL数据排布格式的Batch Matmul示意图<a name="zh-cn_topic_0000001726346562_fig3876163755011"></a>  
 ![](../../../../figures/NORMAL数据排布格式的Batch-Matmul示意图.png "NORMAL数据排布格式的Batch-Matmul示意图")
 
 ## 使用场景<a name="zh-cn_topic_0000001726346562_section1672510573541"></a>
@@ -23,7 +23,7 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 -   对于BSNGD、SBNGD、BNGS1S2 Layout格式，输入A、B矩阵按分形对齐后的多Batch数据总和应小于L1 Buffer的大小；对于NORMAL Layout格式没有这种限制，但需通过[MatmulConfig](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)配置[batchMode](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/MatmulConfig.md)参数，即输入A、B矩阵多Batch数据大小与L1 Buffer的大小关系；
 -   对于BSNGD、SBNGD、BNGS1S2 Layout格式，称左矩阵、右矩阵的G轴分别为ALayoutInfoG、BLayoutInfoG，则ALayoutInfoG / batchA = BLayoutInfoG / batchB；对于NORMAL Layout格式，batchA 、batchB必须满足倍数关系。Bias的shape\(batch, n\)中的batch必须与C矩阵的batch相等。
 -   如果接口输出到Unified Buffer上，输出C矩阵大小BaseM\*BaseN应小于分配的Unified Buffer内存大小。
--   对于BSNGD、SBNGD Layout格式，输入输出只支持ND格式数据。对于BNGS1S2、NORMAL Layout格式， 输入支持ND/NZ格式数据。
+-   对于BSNGD、SBNGD Layout格式，输入输出只支持ND格式数据。对于BNGS1S2、NORMAL Layout格式，输入支持ND/NZ格式数据。
 -   Batch Matmul不支持量化/反量化模式，即不支持[SetQuantScalar](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantScalar.md)、[SetQuantVector](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Kernel侧接口/SetQuantVector.md)接口。
 -   BSNGD场景，不支持一次计算多行SD，需要算子程序中循环计算。
 -   **异步模式**不支持IterateBatch搬运到Unified Buffer上。
@@ -32,7 +32,7 @@ Matmul计算需要计算出多个singleCoreM \* singleCoreN大小的C矩阵，�
 
 ## 调用示例<a name="zh-cn_topic_0000001726346562_section18018102212"></a>
 
-以下是NORMAL数据排布格式的Batch Matmul调用示例。BSNDG数据排布格式的Batch Matmul完整示例请参考[BatchMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/batch_matmul)。
+以下是NORMAL数据排布格式的Batch Matmul调用示例。BSNDG数据排布格式的Batch Matmul完整示例请参考[BatchMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/batch_matmul)。
 
 -   Tiling实现
 

@@ -11,7 +11,7 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_LOAD_H
 
-#include "instr_impl/npu_arch_3510/vector_datamove_impl.h"
+#include "../../../impl/c_api/instr_impl/npu_arch_3510/vector_datamove_impl.h"
 
 // ==========源操作数为起初地址，目的数为寄存器=========
 // ==========asc_gather(u8/s8/half/u16/s16/float/u32/s32/bf16/e4m3/e5m2/e8m0)=========
@@ -181,6 +181,9 @@ __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ 
     vector_uint32_t index);
 
 __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__  int64_t* src,
+    vector_uint32_t index);
+    
+__simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__  uint64_t* src,
     vector_uint32_t index);
 
 __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__  half* src,

@@ -58,7 +58,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 
 | 参数名称   | 输入/输出 | 含义                                                                                                                                                                                                                                                                      |
@@ -69,7 +69,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 | bias       | 输入      | 源操作数，bias矩阵，类型为LocalTensor，支持的物理存储位置为BT Buffer（TPosition:C2）。<br><br>LocalTensor的起始地址需要按照64字节对齐。                                                                                                                                   |
 | mmadParams | 输入      | 矩阵乘相关参数。该参数类型的具体定义请参考\${INSTALL_DIR}/include/ascendc/basic_api/interface/kernel_struct_mm.h，${INSTALL_DIR}请替换为CANN软件安装后文件存储路径。<br><br>MmadBitModeParams参数说明请参考下表。                                                         |
 
-**表 2**  MmadBitModeParams类参数说明
+**表2**  MmadBitModeParams类参数说明
 
 
 | 参数名称       | 含义                                                                                                                                                      |
@@ -77,7 +77,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 | config0        | uint64_t类型，与MmadBitModeConfig0位域（bit-field）结构体类型参数config0BitMode组成联合体（union），初始化为0，可以使用类对象的GetConfig0()函数获取其值。 |
 | config0BitMode | MmadBitModeConfig0位域（bit-field）结构体类型，参数参考[表3](#zh_cn_topic_mmadbitmode_section4_table3)，与config0组成联合体（union）。                    |
 
-**表 3**  MmadBitModeConfig0结构体参数说明<a id="zh_cn_topic_mmadbitmode_section4_table3"></a>
+**表3**  MmadBitModeConfig0结构体参数说明<a id="zh_cn_topic_mmadbitmode_section4_table3"></a>
 
 
 | 参数名称       | 含义                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -92,7 +92,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 ## 数据类型<a id="zh_cn_topic_mmadbitmode_section_datatype"></a>
 
-**表 4**  Mmad接口左矩阵、右矩阵、Bias矩阵、结果矩阵支持的精度类型组合
+**表4**  Mmad接口左矩阵、右矩阵、Bias矩阵、结果矩阵支持的精度类型组合
 
 
 | 左矩阵fm type | 右矩阵filter type | bias type | 结果矩阵dst type |
@@ -107,7 +107,7 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 | fp8_e5m2_t    | fp8_e5m2_t        | float     | float            |
 | hifloat8_t    | hifloat8_t        | float     | float            |
 
-**表 5**  MmadMx接口左矩阵、右矩阵、Scale矩阵、Bias矩阵、结果矩阵支持的精度类型组合
+**表5**  MmadMx接口左矩阵、右矩阵、Scale矩阵、Bias矩阵、结果矩阵支持的精度类型组合
 
 
 | 左矩阵fm     | 右矩阵filter | Scale矩阵  | 偏置Bias | 结果矩阵dst |
@@ -141,4 +141,61 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 
 ## 调用示例
 
-样例请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/03_basic_api/01_matrix_compute/mmad)。
+完整矩阵乘流程请参考[Mmad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad)。MmadBitMode的使用可以参考下面的调用示例。
+
+
+- 示例一：使用MmadParams构造MmadBitModeParams
+
+```cpp
+  constexpr uint32_t M = 32;
+  constexpr uint32_t K = 64;
+  constexpr uint32_t N = 32;
+
+  // A矩阵，L0A Buffer，元素个数为M*K=2048。
+  AscendC::LocalTensor<half> a2Local(AscendC::TPosition::A2, 0, M * K);
+  // B矩阵，L0B Buffer，元素个数为K*N=2048。
+  AscendC::LocalTensor<half> b2Local(AscendC::TPosition::B2, 0, K * N);
+  // C矩阵输出到L0C Buffer，元素个数为M*N=1024。
+  AscendC::LocalTensor<float> co1Local(AscendC::TPosition::CO1, 0, M * N);
+
+  AscendC::MmadParams mmParams;
+  mmParams.m = M;
+  mmParams.k = K;
+  mmParams.n = N;
+  mmParams.unitFlag = 0;
+  mmParams.disableGemv = false;
+  mmParams.cmatrixSource = false;
+  mmParams.cmatrixInitVal = true;
+
+  // 使用MmadParams构造MmadBitModeParams。
+  AscendC::MmadBitModeParams bitModeParams(mmParams);
+  AscendC::Mmad(co1Local, a2Local, b2Local, bitModeParams);
+```
+
+- 示例二：使用Set函数修改MmadBitModeParams
+
+```cpp
+
+  constexpr uint32_t M = 32;
+  constexpr uint32_t K = 64;
+  constexpr uint32_t N = 32;
+
+  // A矩阵，L0A Buffer，元素个数为M*K=2048。
+  AscendC::LocalTensor<half> a2Local(AscendC::TPosition::A2, 0, M * K);
+  // B矩阵，L0B Buffer，元素个数为K*N=2048。
+  AscendC::LocalTensor<half> b2Local(AscendC::TPosition::B2, 0, K * N);
+  // C矩阵输出到L0C Buffer，元素个数为M*N=1024。
+  AscendC::LocalTensor<float> co1Local(AscendC::TPosition::CO1, 0, M * N);
+
+  // 默认构造时config0清零，通过Set函数逐项写入矩阵乘参数。
+  AscendC::MmadBitModeParams bitModeParams;
+  bitModeParams.SetM(M);
+  bitModeParams.SetK(K);
+  bitModeParams.SetN(N);
+  bitModeParams.SetUnitFlag(0);
+  bitModeParams.SetDisableGemv(false);
+  bitModeParams.SetCmatrixSource(false);
+  bitModeParams.SetCmatrixInitVal(true);
+
+  AscendC::Mmad(co1Local, a2Local, b2Local, bitModeParams);
+```

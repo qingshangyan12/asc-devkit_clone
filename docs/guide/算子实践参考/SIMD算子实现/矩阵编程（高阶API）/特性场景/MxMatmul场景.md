@@ -14,12 +14,12 @@ MX格式是一种块数据格式，若干个数据可以组成一个块（或者
 
 下图为MX格式的浮点数的数据结构，S、E和M分别用于表示浮点数的符号、指数和尾数字段的值。其中，共享缩放因子X是一个用于整个数据块的缩放比例因子，它决定了数据块中所有元素的动态范围。通过引入共享缩放因子，MX格式的数据能够在保持低位宽的同时，灵活地表示不同范围的数据。块大小k指的是组成一个数据块（或组）的低比特数据的数量。私有元素P<sub>i</sub>是指数据块中的每个低比特数据元素。这些元素经过缩放因子X的调整后，共同表示了一个高精度的浮点数或整数。
 
-**图 1**  MX格式组成示意图<a name="zh-cn_topic_0000002270097206_fig11888194743220"></a>  
+**图1**  MX格式组成示意图<a name="zh-cn_topic_0000002270097206_fig11888194743220"></a>  
 ![](../../../../figures/MX格式组成示意图.png "MX格式组成示意图")
 
 MX格式的数据类型包含多种，例如MXFP8、MXFP4、MXFP16、MXINT4等。下表列举了[MxMatmul场景](#zh-cn_topic_0000002270097206_section310824820358)（全称Microscaling Matmul）支持的数据类型。
 
-**表 1**  MxMatmul支持MX格式的数据类型
+**表1**  MxMatmul支持MX格式的数据类型
 
 <a name="zh-cn_topic_0000002270097206_table5383144710452"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row193837473457"><th class="cellrowborder" valign="top" width="16.666666666666664%" id="mcps1.2.7.1.1"><p id="zh-cn_topic_0000002270097206_p410517278313"><a name="zh-cn_topic_0000002270097206_p410517278313"></a><a name="zh-cn_topic_0000002270097206_p410517278313"></a>数据类型</p>
@@ -101,28 +101,28 @@ MxMatmul的计算公式为：C = \(scaleA ⊗ A\) \* \(scaleB ⊗ B\) + Bias，�
 -   C为目的操作数，存放矩阵乘结果的矩阵，形状为\[M, N\]。
 -   Bias为矩阵乘偏置，形状为\[1, N\]。对\(scaleA ⊗ A\) \* \(scaleB ⊗ B\)结果矩阵的每一行都采用该Bias进行偏置。
 
-**图 2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>  
+**图2**  MxMatmul矩阵乘示意图<a name="zh-cn_topic_0000002270097206_fig1942919398330"></a>  
 ![](../../../../figures/MxMatmul矩阵乘示意图.png "MxMatmul矩阵乘示意图")
 
 矩阵A、scaleA、B、scaleB在不同位置中的排布格式分别如下图所示。
 
-**图 3**  A矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig384531413014"></a>  
+**图3**  A矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig384531413014"></a>  
 ![](../../../../figures/A矩阵在不同位置的排布格式.png "A矩阵在不同位置的排布格式")
 
-**图 4**  B矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig674419451902"></a>  
+**图4**  B矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig674419451902"></a>  
 ![](../../../../figures/B矩阵在不同位置的排布格式.png "B矩阵在不同位置的排布格式")
 
-**图 5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
+**图5**  scaleA矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig107863142019"></a>  
 ![](../../../../figures/scaleA矩阵在不同位置的排布格式.png "scaleA矩阵在不同位置的排布格式")
 
-**图 6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
+**图6**  scaleB矩阵在不同位置的排布格式<a name="zh-cn_topic_0000002270097206_fig76682054103416"></a>  
 ![](../../../../figures/scaleB矩阵在不同位置的排布格式.png "scaleB矩阵在不同位置的排布格式")
 
 ## 使用场景<a name="zh-cn_topic_0000002270097206_section118051016163613"></a>
 
 矩阵计算之前，需要对A、B矩阵进行量化操作的场景。当前该场景下，Matmul输入输出矩阵支持的数据类型如下表所示。
 
-**表 2**  MxMatmul支持的量化场景
+**表2**  MxMatmul支持的量化场景
 
 <a name="zh-cn_topic_0000002270097206_table2844113219191"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row4844732121915"><th class="cellrowborder" valign="top" width="10.41%" id="mcps1.2.7.1.1"><p id="zh-cn_topic_0000002270097206_p1084417322199"><a name="zh-cn_topic_0000002270097206_p1084417322199"></a><a name="zh-cn_topic_0000002270097206_p1084417322199"></a>A矩阵</p>
@@ -325,11 +325,11 @@ Kernel侧的关键步骤介绍如下：
     mm.End();
     ```
 
-更多完整的算子样例请参考[MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx)、[自定义输入来源的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_ub_tscm_nz)、[scale多倍缓存的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_libraries/00_matrix/matmul_mx_scale_cache)。
+更多完整的算子样例请参考[MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx)、[自定义输入来源的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_ub_tscm_nz)、[scale多倍缓存的MxMatmul样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_mx_scale_cache)。
 
 ## 参数说明<a name="zh-cn_topic_0000002270097206_section2756107144914"></a>
 
-**表 3**  MatmulTypeWithScale参数说明
+**表3**  MatmulTypeWithScale参数说明
 
 <a name="zh-cn_topic_0000002270097206_table14759942142014"></a>
 <table><thead align="left"><tr id="zh-cn_topic_0000002270097206_row07595429207"><th class="cellrowborder" valign="top" width="18.11%" id="mcps1.2.3.1.1"><p id="zh-cn_topic_0000002270097206_p1818821912211"><a name="zh-cn_topic_0000002270097206_p1818821912211"></a><a name="zh-cn_topic_0000002270097206_p1818821912211"></a>参数</p>
@@ -396,7 +396,7 @@ Kernel侧的关键步骤介绍如下：
 <p id="p15845121173011"><a name="p15845121173011"></a><a name="p15845121173011"></a>scaleA矩阵可设置为CubeFormat::ND，CubeFormat::NZ，CubeFormat::VECTOR</p>
 <p id="p884571116308"><a name="p884571116308"></a><a name="p884571116308"></a>scaleB矩阵可设置为CubeFormat::ND，CubeFormat::NZ</p>
 <p id="zh-cn_topic_0000002270097206_p7332111273413"><a name="zh-cn_topic_0000002270097206_p7332111273413"></a><a name="zh-cn_topic_0000002270097206_p7332111273413"></a>注意：</p>
-<p id="p15352181633019"><a name="p15352181633019"></a><a name="p15352181633019"></a>NZ排布格式请参考<a href="../../../../编程指南/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136">NZ</a>。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。</p>
+<p id="p15352181633019"><a name="p15352181633019"></a><a name="p15352181633019"></a>NZ排布格式请参考<a href="../../../../技术附录/概念原理和术语/神经网络和算子/数据排布格式.md#li19960204116136">NZ</a>。MxMatmul场景，scaleA、scaleB的数据类型为fp8_e8m0_t，分形大小H0=16，W0=2。</p>
 <p id="p43523162303"><a name="p43523162303"></a><a name="p43523162303"></a>在Scale矩阵为ND格式的场景中，当通过SetTensorScaleA接口设置scaleA矩阵转置时，scaleA内存排布格式必须按照(K/64, M，2)排布，通过SetTensorScaleB接口设置scaleB矩阵不转置时，scaleB内存排布格式必须按照(K/64，N， 2)排布，详细介绍请参考<a href="#zh-cn_topic_0000002270097206_fig76682054103416">数据格式</a>。</p>
 </td>
 </tr>

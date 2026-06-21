@@ -8,8 +8,8 @@
 | <cann-filter npu-type="A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品 AI Core | √ </cann-filter>|
-| <cann-filter npu-type="310p">Atlas 推理系列产品 Vector Core | x </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品AI Core | √ </cann-filter>|
+| <cann-filter npu-type="310p">Atlas 推理系列产品Vector Core | x </cann-filter>|
 | <cann-filter npu-type="910">Atlas 训练系列产品 | √ </cann-filter>|
 | <cann-filter npu-type="x90">Kirin X90 | √ </cann-filter>|
 | <cann-filter npu-type="9030">Kirin 9030 | √ </cann-filter>|
@@ -22,7 +22,7 @@
 
 `ReduceMin`计算过程如下图所示：首先，在每个repeat迭代中计算得到最小值和repeat内部索引，这些中间结果暂存于`sharedTmpBuffer`工作区中；然后，在中间结果的基础上继续按repeat迭代得到最终的最小值和最小值索引。需要注意的是，每次repeat迭代获取的最小值索引是repeat内部索引，返回最终结果时，需要根据迭代位置和repeat内部索引推导全量数据的最小值索引。
 
-**图 1**  `ReduceMin`计算示意图<a id="fig1"></a>
+**图1**  `ReduceMin`计算示意图<a id="fig1"></a>
 
 ![ReduceMin计算示意图](../../../../figures/ReduceMin_scale.png "ReduceMin计算示意图")
 
@@ -52,19 +52,19 @@
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
-| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
-| sharedTmpBuffer | 输入 | 指令执行期间存储中间结果，用于内部计算所需操作空间，需特别注意空间大小。详情请参考[关键特性说明](#关键特性说明)。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| dst | 输出 | 目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| src | 输入 | 源操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
+| sharedTmpBuffer | 输入 | 指令执行期间存储中间结果，用于内部计算所需操作空间，需特别注意空间大小。详情请参考[关键特性说明](#关键特性说明)。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN、VECCALC、VECOUT（存储位置为Unified Buffer）。 |
 | count | 输入 | 参与计算的元素个数。关于该参数的具体说明请参考[连续计算](../SIMD计算说明/连续计算.md)。最大处理的数据量不能超过UB大小限制。  |
 | mask/mask[] | 输入 | `mask`用于控制每次迭代内参与计算的源操作数。详细设置参考[掩码概述](../SIMD计算说明/掩码/概述.md)。 |
 | repeatTime | 输入 | 迭代次数。关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。**注：与高维切分中不同的是，`repeatTime`可以支持更大的取值范围，保证不超过int32_t的最大值即可。** |
@@ -81,7 +81,7 @@
 - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持half、float。</cann-filter>
 - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持half、float。</cann-filter>
 - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，支持half、float。</cann-filter>
-- <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core，支持half、float。</cann-filter>
+- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，支持half、float。</cann-filter>
 - <cann-filter npu-type = "910">Atlas 训练系列产品，支持half。</cann-filter>
 - <cann-filter npu-type = "x90">Kirin X90，支持half、float。</cann-filter>
 - <cann-filter npu-type = "9030">Kirin 9030，支持half、float。</cann-filter>
@@ -118,7 +118,7 @@
   - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
   - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
   - <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品</cann-filter>
-  - <cann-filter npu-type = "310p">Atlas 推理系列产品 AI Core</cann-filter>
+  - <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core</cann-filter>
   - <cann-filter npu-type = "910">Atlas 训练系列产品</cann-filter>
   - <cann-filter npu-type = "x90">Kirin X90</cann-filter>
   - <cann-filter npu-type = "9030">Kirin 9030</cann-filter>
@@ -133,7 +133,7 @@
 
 ## 调用示例
 
-更多样例请参考[ReduceMin样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/02_features/01_basic_api/01_memory_vector_compute/reduce_computation)。
+更多样例请参考[ReduceMin样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_computation)。
 
 - tensor高维切分计算样例-`mask`连续模式：
 

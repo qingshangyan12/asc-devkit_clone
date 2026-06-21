@@ -1,20 +1,16 @@
 /**
-* Copyright (c) 2026 Huawei Technologies Co., Ltd.
-* This program is free software, you can redistribute it and/or modify it under the terms and conditions of
-* CANN Open Software License Agreement Version 2.0 (the "License").
-* Please refer to the License for details. You may not use this file except in compliance with the License.
-* THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
-* See LICENSE in the root of the software repository for the full text of the License.
-*/
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
 
 #include <gtest/gtest.h>
 #include "tensor_api/stub/cce_stub.h"
 #include "include/tensor_api/tensor.h"
-
-#define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#include "impl/tensor_api/tensor/tensor_impl.h"
-#undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 
 namespace {
 
@@ -22,23 +18,21 @@ template <typename T>
 struct IsTensorApiGlobalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiGlobalTensor<AscendC::GlobalTensor<AscendC::Te::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiGlobalTensor<AscendC::GlobalTensor<AscendC::TensorAttribute<Engine, Layout>>>
     : AscendC::Std::true_type {};
 
 template <typename T>
-constexpr bool IsTensorApiGlobalTensorV =
-    IsTensorApiGlobalTensor<AscendC::Std::remove_cvref_t<T>>::value;
+constexpr bool IsTensorApiGlobalTensorV = IsTensorApiGlobalTensor<AscendC::Std::remove_cvref_t<T>>::value;
 
 template <typename T>
 struct IsTensorApiLocalTensor : AscendC::Std::false_type {};
 
 template <typename Engine, typename Layout>
-struct IsTensorApiLocalTensor<AscendC::LocalTensor<AscendC::Te::TensorAttribute<Engine, Layout>>>
+struct IsTensorApiLocalTensor<AscendC::LocalTensor<AscendC::TensorAttribute<Engine, Layout>>>
     : AscendC::Std::true_type {};
 
 template <typename T>
-constexpr bool IsTensorApiLocalTensorV =
-    IsTensorApiLocalTensor<AscendC::Std::remove_cvref_t<T>>::value;
+constexpr bool IsTensorApiLocalTensorV = IsTensorApiLocalTensor<AscendC::Std::remove_cvref_t<T>>::value;
 
 } // namespace
 
@@ -57,8 +51,9 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SetL2CacheHint)
     constexpr uint32_t TILE_LENGTH = 8;
     __gm__ float data[TILE_LENGTH] = {0, 1, 2, 3, 4, 5, 6, 7};
     auto ptr = MakeMemPtr<Location::GM>(data);
-    auto tensor = MakeTensor(ptr, MakeShape(_2{}, _2{}, _2{}),
-                             MakeStride(_4{}, _2{}, _1{}));
+    auto tensor = MakeTensor(
+        ptr, MakeShape(AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<2>{}),
+        MakeStride(AscendC::Std::Int<4>{}, AscendC::Std::Int<2>{}, AscendC::Std::Int<1>{}));
 
     tensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
     EXPECT_EQ(tensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
@@ -89,12 +84,10 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceCoordTensorCanSetL2CacheHint)
     static_assert(IsTensorApiGlobalTensorV<decltype(coordTensor)>);
 
     coordTensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
-    EXPECT_EQ(coordTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
+    EXPECT_EQ(coordTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
     coordTensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
-    EXPECT_EQ(coordTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_NORMAL));
+    EXPECT_EQ(coordTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_NORMAL));
 }
 
 TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorCanSetL2CacheHint)
@@ -113,12 +106,10 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorCanSetL2CacheHint)
     static_assert(IsTensorApiGlobalTensorV<decltype(sliceTensor)>);
 
     sliceTensor.SetL2CacheHint(CacheMode::CACHE_MODE_LAST);
-    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_LAST));
+    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_LAST));
 
     sliceTensor.SetL2CacheHint(CacheMode::CACHE_MODE_PERSISTENT);
-    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_PERSISTENT));
+    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_PERSISTENT));
 }
 
 TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorInheritsCacheMode)
@@ -133,23 +124,18 @@ TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorInheritsCacheMode)
     auto gmTensor = MakeTensor(MakeMemPtr(gmData), layout);
 
     gmTensor.SetL2CacheHint(CacheMode::CACHE_MODE_DISABLE);
-    EXPECT_EQ(gmTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
+    EXPECT_EQ(gmTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
     auto coordTensor = gmTensor(MakeCoord(2, 4));
-    EXPECT_EQ(coordTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
+    EXPECT_EQ(coordTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
     auto sliceTensor = gmTensor.Slice(MakeCoord(2, 4), MakeShape(4, 8));
-    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
+    EXPECT_EQ(sliceTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 
     coordTensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
-    EXPECT_EQ(coordTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_NORMAL));
+    EXPECT_EQ(coordTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_NORMAL));
 
-    EXPECT_EQ(gmTensor.Engine().GetCacheMode(),
-              static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
+    EXPECT_EQ(gmTensor.Engine().GetCacheMode(), static_cast<uint8_t>(CacheMode::CACHE_MODE_DISABLE));
 }
 
 TEST_F(Tensor_Api_Tensor_CacheMode, SliceTensorStillGlobalTensor)
