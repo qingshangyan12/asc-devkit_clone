@@ -90,12 +90,12 @@ find_lychee() {
         echo "[Markdown check] Installing cargo-binstall..." >&2
         curl -L --proto '=https' --tlsv1.2 -sSf \
             https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh \
-            | CARGO_HOME="$CARGO_HOME_DIR" BASH_XTRACEFD=7 bash 7>/dev/null
+            | CARGO_HOME="$CARGO_HOME_DIR" BASH_XTRACEFD=7 bash 7>/dev/null >&2
         BINSTALL=("$CARGO_BIN/cargo-binstall")
     fi
 
     echo "[Markdown check] Installing lychee@$LYCHEE_VERSION..." >&2
-    "${BINSTALL[@]}" -y "lychee@$LYCHEE_VERSION" --install-path "$CARGO_BIN"
+    "${BINSTALL[@]}" -y "lychee@$LYCHEE_VERSION" --install-path "$CARGO_BIN" >&2
     if [ ! -x "$CARGO_BIN/lychee" ]; then
         echo "[Markdown check] lychee binary was not installed." >&2
         exit 1
