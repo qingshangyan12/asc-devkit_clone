@@ -38,11 +38,7 @@ EOF
 }
 
 download_lychee_archive() {
-    local target archive_url tmp_dir
-
-    if [ -z "${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-}" ]; then
-        return 1
-    fi
+    local target archive_url tmp_dir version_placeholder target_placeholder
 
     case "$(uname -s):$(uname -m)" in
         Linux:x86_64|Linux:amd64)
@@ -56,8 +52,15 @@ download_lychee_archive() {
             ;;
     esac
 
-    archive_url="${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL//\{version\}/$LYCHEE_VERSION}"
-    archive_url="${archive_url//\{target\}/$target}"
+    if [ -n "${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-}" ]; then
+        archive_url="$MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL"
+    else
+        archive_url="https://gh.llkk.cc/https://github.com/lycheeverse/lychee/releases/download/lychee-v{version}/lychee-{target}.tar.gz"
+    fi
+    version_placeholder="{version}"
+    target_placeholder="{target}"
+    archive_url="${archive_url//$version_placeholder/$LYCHEE_VERSION}"
+    archive_url="${archive_url//$target_placeholder/$target}"
     tmp_dir=$(mktemp -d)
     echo "[Markdown check] Downloading lychee@$LYCHEE_VERSION from $archive_url..." >&2
     if ! curl -L --proto '=https' --tlsv1.2 -sSf "$archive_url" -o "$tmp_dir/lychee.tar.gz"; then
