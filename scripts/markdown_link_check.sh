@@ -32,8 +32,40 @@ By default, checks changed Markdown files and Markdown files that link to them.
 Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan docs/ and examples/.
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
-Set MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL or MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
+Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
+MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
+}
+
+download_lychee_archive() {
+    local target archive_url tmp_dir
+
+    case "$(uname -s):$(uname -m)" in
+        Linux:x86_64|Linux:amd64)
+            target="x86_64-unknown-linux-gnu"
+            ;;
+        Linux:aarch64|Linux:arm64)
+            target="aarch64-unknown-linux-gnu"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    archive_url="${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-https://gh.llkk.cc/https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/lychee-${target}.tar.gz}"
+    tmp_dir=$(mktemp -d)
+    echo "[Markdown check] Downloading lychee@$LYCHEE_VERSION from $archive_url..." >&2
+    if ! curl -L --proto '=https' --tlsv1.2 -sSf "$archive_url" -o "$tmp_dir/lychee.tar.gz"; then
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+    if ! tar -xzf "$tmp_dir/lychee.tar.gz" -C "$tmp_dir" lychee; then
+        rm -rf "$tmp_dir"
+        return 1
+    fi
+    install -m 0755 "$tmp_dir/lychee" "$LYCHEE_BIN"
+    rm -rf "$tmp_dir"
+    return 0
 }
 
 FULL_SCAN="$MARKDOWN_LINK_CHECK_FULL"
@@ -83,6 +115,11 @@ find_lychee() {
     mkdir -p "$CARGO_BIN"
     export CARGO_HOME="$CARGO_HOME_DIR"
     export PATH="$CARGO_BIN:$PATH"
+
+    if download_lychee_archive; then
+        printf '%s\n' "$LYCHEE_BIN"
+        return 0
+    fi
 
     if command -v cargo-binstall >/dev/null 2>&1; then
         BINSTALL=(cargo-binstall)
