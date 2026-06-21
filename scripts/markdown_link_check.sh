@@ -31,6 +31,8 @@ Usage: scripts/markdown_link_check.sh [--full|--all] [markdown-file...]
 By default, checks changed Markdown files and Markdown files that link to them.
 Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan docs/ and examples/.
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
+Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
+Set MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL or MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
 }
 
@@ -88,14 +90,20 @@ find_lychee() {
         BINSTALL=(cargo binstall)
     else
         echo "[Markdown check] Installing cargo-binstall..." >&2
+        CARGO_BINSTALL_INSTALLER_URL="${MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL:-https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh}"
         curl -L --proto '=https' --tlsv1.2 -sSf \
-            https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh \
+            "$CARGO_BINSTALL_INSTALLER_URL" \
             | CARGO_HOME="$CARGO_HOME_DIR" BASH_XTRACEFD=7 bash 7>/dev/null >&2
         BINSTALL=("$CARGO_BIN/cargo-binstall")
     fi
 
     echo "[Markdown check] Installing lychee@$LYCHEE_VERSION..." >&2
-    "${BINSTALL[@]}" -y "lychee@$LYCHEE_VERSION" --install-path "$CARGO_BIN" >&2
+    BINSTALL_ARGS=(-y --install-path "$CARGO_BIN")
+    if [ -n "${MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL:-}" ]; then
+        BINSTALL_ARGS+=(--pkg-url "$MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL")
+    fi
+    BINSTALL_ARGS+=("lychee@$LYCHEE_VERSION")
+    "${BINSTALL[@]}" "${BINSTALL_ARGS[@]}" >&2
     if [ ! -x "$CARGO_BIN/lychee" ]; then
         echo "[Markdown check] lychee binary was not installed." >&2
         exit 1
