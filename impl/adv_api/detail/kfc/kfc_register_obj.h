@@ -14,7 +14,7 @@
  */
 #ifndef LIB_KFC_REGISTER_OBJ_H
 #define LIB_KFC_REGISTER_OBJ_H
-#include "../../../../include/basic_api/kernel_basic_intf.h"
+#include "kernel_basic_intf.h"
 
 namespace AscendC {
 __aicore__ inline void ClearWorkspace(__gm__ uint8_t* workspace)

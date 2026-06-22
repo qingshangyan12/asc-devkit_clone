@@ -18,9 +18,9 @@
 #ifndef IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SCALAR_COMPUTE_IMPL_ASC_STORE_IMPL_H
 #define IMPL_CAPI_INSTR_IMPL_NPU_ARCH_3510_SCALAR_COMPUTE_IMPL_ASC_STORE_IMPL_H
 
-#include "../utils_impl.h"
+#include "instr_impl/npu_arch_3510/utils_impl.h"
 
-constexpr int16_t ASC_C_API_DEFAULIT_OFFSET = 0;
+constexpr int16_t ASC_C_API_DEFAULIT_OFFSET = 1;
 
 __aicore__ inline void asc_store_dev_impl(__gm__ int8_t* addr, int8_t value)
 {

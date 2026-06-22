@@ -16,9 +16,9 @@
 #ifndef ASCENDC_MODULE_OPERATOR_SCM_DATA_COPY_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SCM_DATA_COPY_IMPL_H
 #if KFC_C310_SSBUF == 1
-#include "kfc/kfc_comm_client.h"
+#include "dav_3510/kfc/kfc_comm_client.h"
 #else
-#include "kfc/kfc_comm_client_gm.h"
+#include "dav_3510/kfc/kfc_comm_client_gm.h"
 #endif
 
 namespace AscendC {

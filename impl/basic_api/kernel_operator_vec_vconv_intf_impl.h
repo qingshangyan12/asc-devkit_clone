@@ -19,11 +19,11 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
-#include "../../include/basic_api/kernel_tensor.h"
+#include "kernel_tensor.h"
 #include "kernel_check.h"
-#include "../../include/basic_api/kernel_struct_binary.h"
-#include "../../include/basic_api/kernel_struct_unary.h"
-#include "../../include/basic_api/kernel_struct_vdeq.h"
+#include "kernel_struct_binary.h"
+#include "kernel_struct_unary.h"
+#include "kernel_struct_vdeq.h"
 #include "kernel_npu_debug.h"
 #include "mstx_local_tensor_info.h"
 
@@ -48,13 +48,6 @@
 #endif
 
 namespace AscendC {
-template <bool castMode>
-__aicore__ inline void SetCastOverflowMode()
-{
-    SetCastOverflowModeImpl<castMode>();
-}
-
-#if defined(__NPU_ARCH__)
 #pragma begin_pipe(V)
 /* **************************************************************************************************
  * Cast                                             *
@@ -621,6 +614,12 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
     SetDeqScaleImpl<T>(vdeq, vdeqInfo);
 }
 
+template <bool castMode>
+__aicore__ inline void SetCastOverflowMode()
+{
+    SetCastOverflowModeImpl<castMode>();
+}
+
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 /*
  * @ingroup Truncate Level 2
@@ -643,10 +642,8 @@ __aicore__ inline void Truncate(const LocalTensor<T> &dst, const LocalTensor<T> 
     TruncateImpl<PrimType, roundMode>((__ubuf__ PrimType *)dst.GetPhyAddr(),(__ubuf__ PrimType *)src.GetPhyAddr(), count);
 }
 #endif
-#endif // defined(__NPU_ARCH__)
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_VCONV_INTERFACE_IMPL_H
-
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_VCONV_INTF_IMPL_H__

@@ -19,7 +19,7 @@
 #endif
 #ifndef ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
 #define ASCENDC_MODULE_UTILS_CEIL_OOM_QUE_H
-#include "kernel_utils_macros.h"
+#include "utils/kernel_utils_macros.h"
 namespace AscendC {
 #ifdef ASCENDC_CPU_DEBUG
 #define PRELOAD(len) \

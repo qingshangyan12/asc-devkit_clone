@@ -19,8 +19,8 @@
 #endif
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_REDUCEV2_IMPL_H
-#include "../../../include/basic_api/kernel_struct_gather.h"
-#include "../kernel_npu_debug.h"
+#include "kernel_struct_gather.h"
+#include "kernel_npu_debug.h"
 
 namespace AscendC {
 

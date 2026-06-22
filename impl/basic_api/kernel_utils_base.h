@@ -28,7 +28,7 @@
 #include "utils/kernel_utils_struct_norm_sort.h"
 #include "utils/kernel_utils_struct_param.h"
 
-#include "../../include/basic_api/kernel_struct_data_copy.h"
+#include "kernel_struct_data_copy.h"
 #include "kernel_scalar_convert.h"
 
 namespace AscendC {
@@ -101,6 +101,7 @@ public:
         #else
             InitSplitArchSpr();
         #endif
+        set_st_atomic_cfg(0b00100100);
     #elif __NPU_ARCH__ == 3002
         set_padding(static_cast<uint64_t>(0));
     #endif

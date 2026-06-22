@@ -72,12 +72,7 @@ struct SkSystemArgs {
 }
 
 namespace AscendC {
-__aicore__ inline int64_t GetTaskRation()
-{
-    return GetTaskRatio();
-}
 
-#if defined(__NPU_ARCH__)
 __aicore__ inline int64_t GetBlockIdx()
 {
     return GetBlockIdxImpl();
@@ -104,6 +99,10 @@ __aicore__ inline int64_t GetTaskRatio()
     return GetTaskRationImpl();
 }
 
+__aicore__ inline int64_t GetTaskRation()
+{
+    return GetTaskRatio();
+}
 
 __aicore__ inline void GetArchVersion(uint32_t& coreVersion)
 {
@@ -141,10 +140,8 @@ __aicore__ inline void ClearSpr(){
     ClearSprImpl<spr>();
 }
 #endif
-#endif // defined(__NPU_ARCH__)
 }  // namespace AscendC
 #endif  // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_IMPL_H
-
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #undef __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SYS_VAR_INTF_IMPL_H__

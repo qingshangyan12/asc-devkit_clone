@@ -44,14 +44,8 @@ public:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
-
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
-
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, params);
+        using Tensor2Tensor = typename CopyL0C2GMTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
+        Tensor2Tensor{}.template Run<trait>(dst, src, params);
     }
 
     template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
@@ -60,14 +54,8 @@ public:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
-
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
-
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        using Tensor2Tensor = typename CopyL0C2GMTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
+        Tensor2Tensor{}.template Run<trait>(dst, src, quant, params);
     }
 
     template <const CopyL0C2GMTrait& trait = DEFAULT_COPY_L0C2GM_TRAIT, typename T, typename U, typename S>
@@ -76,14 +64,8 @@ public:
     {
         using dstPos = GetMemLocation<T>;
         using srcPos = GetMemLocation<U>;
-        static_assert(Std::is_same_v<dstPos, Location::GM>, "When Copy tensor from L0C to GM, dst tensor must on GM");
-        static_assert(Std::is_same_v<srcPos, Location::L0C>, "When Copy tensor from L0C to GM, src tensor must on L0C");
-
-        using DstLayoutPtn = GetLayoutPattern<typename T::layoutType>;
-        using SrcLayoutPtn = GetLayoutPattern<typename U::layoutType>;
-
-        using CopyL0C2GMImpl = typename CopyL0C2GMRouting<CURRENT_ARCH_VERSION, DstLayoutPtn, SrcLayoutPtn>::type;
-        CopyL0C2GMImpl::template Run<trait>(dst, src, quant, params);
+        using Tensor2Tensor = typename CopyL0C2GMVectorQuantTensor2Tensor<dstPos, srcPos, CURRENT_ARCH_VERSION>::type;
+        Tensor2Tensor{}.template Run<trait>(dst, src, quant, params);
     }
 };
 

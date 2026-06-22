@@ -22,7 +22,7 @@
 #ifndef IMPL_PAD_PAD_PAD_V200_IMPL_H
 #define IMPL_PAD_PAD_PAD_V200_IMPL_H
 
-#include "../../../../../include/basic_api/kernel_basic_intf.h"
+#include "kernel_basic_intf.h"
 #include "pad_base_impl.h"
 
 namespace AscendC {

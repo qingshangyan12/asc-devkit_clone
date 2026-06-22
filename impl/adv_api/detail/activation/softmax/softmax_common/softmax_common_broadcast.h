@@ -22,7 +22,7 @@
 #ifndef IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_BROADCAST_H
 #define IMPL_ACTIVATION_SOFTMAX_SOFTMAX_COMMON_BROADCAST_H
 
-#include "../../../../../../include/basic_api/kernel_basic_intf.h"
+#include "kernel_basic_intf.h"
 #include "softmax_common_utils.h"
 
 namespace AscendC {

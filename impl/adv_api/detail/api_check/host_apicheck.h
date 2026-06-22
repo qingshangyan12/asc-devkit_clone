@@ -15,13 +15,12 @@
 #ifndef IMPL_HOST_APICHECK_H
 #define IMPL_HOST_APICHECK_H
 
-#include <cstddef>
-#include <cstdint>
 #include <set>
 #include <string>
 #include <vector>
 #include "../../detail/host_log.h"
 #include "graph/tensor.h"
+#include "tiling/platform/platform_ascendc.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {
