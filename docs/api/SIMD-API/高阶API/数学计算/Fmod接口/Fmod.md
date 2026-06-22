@@ -113,15 +113,15 @@ struct FmodConfig {
 
 ## 约束说明
 
-    <!-- npu="310p" id8 -->
-  - 针对Atlas 推理系列产品AI Core，输入数据限制在\[-2147483647.0, 2147483647.0\]范围内。
-    <!-- end id8 -->
+<!-- npu="310p" id8 -->
+-   针对Atlas 推理系列产品AI Core，输入数据限制在\[-2147483647.0, 2147483647.0\]范围内。
+<!-- end id8 -->
 -   源操作数src0Tensor与src1Tensor的数据长度必须保持一致。
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
-    <!-- npu="950" id10 -->
-  - 对于Ascend 950PR/Ascend 950DT，模板参数config中的algo为ITERATION\_COMPENSATION迭代补偿模式下，操作数的数据类型仅支持float。
-    <!-- end id10 -->
+<!-- npu="950" id10 -->
+-   对于Ascend 950PR/Ascend 950DT，模板参数config中的algo为ITERATION\_COMPENSATION迭代补偿模式下，操作数的数据类型仅支持float。
+<!-- end id10 -->
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../通用说明和约束.md#section796754519912)。
 
 ## 调用示例

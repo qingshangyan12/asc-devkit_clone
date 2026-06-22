@@ -83,7 +83,7 @@
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | 该参数仅支持<!-- npu="950" id9 -->Ascend 950PR/Ascend 950DT<!-- end id9 -->。<br><br>Atan算法的相关配置。此参数可选配，AtanConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Atan内部实现使用的算法。AtanAlgo类型，支持的取值如下：TAYLOR_EXPANSION：默认值。该算法使用6阶泰勒展开实现Atan，支持的数据类型为half、float。POLYNOMIAL_APPROXIMATION：该算法是17次多项式逼近算法，支持的数据类型为float。 |
+| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Atan算法的相关配置。此参数可选配，AtanConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Atan内部实现使用的算法。AtanAlgo类型，支持的取值如下：TAYLOR_EXPANSION：默认值。该算法使用6阶泰勒展开实现Atan，支持的数据类型为half、float。POLYNOMIAL_APPROXIMATION：该算法是17次多项式逼近算法，支持的数据类型为float。 |
 
 ```
 enum class AtanAlgo {

@@ -85,7 +85,7 @@ Cos\(x\)的泰勒展开式为：
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数，默认值为false。该参数仅在输入的数据类型为float时生效。<br>true：开发者允许源操作数被改写，可以设置该参数取值为true开启，开启后本接口内部计算时复用srcTensor的内存空间，节省部分内存空间；false：本接口内部计算时不复用srcTensor的内存空间。<br><br>isReuseSource的使用样例请参考[更多样例](../更多样例-83.md#section639165323915)。 |
-| config | <!-- npu="950" id13 -->该参数仅支持Ascend 950PR/Ascend 950DT。<!-- end id13 --><br><br>Cos算法的相关配置。此参数可选配，CosConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Cos内部实现使用的算法。CosAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Cos接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Cos接口，支持输入全值域，支持的数据类型为half、float。 |
+| config | <!-- npu="950" id13 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id13 -->Cos算法的相关配置。此参数可选配，CosConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Cos内部实现使用的算法。CosAlgo类型，支持的取值如下：POLYNOMIAL_APPROXIMATION：默认值。该算法通过简单的多项式逼近实现Cos接口，支持的输入值域范围为[-65504.0, 65504.0]，支持的数据类型为half、float。RADIAN_REDUCTION：该算法通过完整的周期约减实现Cos接口，支持输入全值域，支持的数据类型为half、float。 |
 
 ```
 struct CosConfig {
