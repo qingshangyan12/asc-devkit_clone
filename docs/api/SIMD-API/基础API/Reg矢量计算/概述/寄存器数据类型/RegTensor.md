@@ -82,9 +82,9 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
 
     下图为b64（uint64_t、int64_t）在RegTraitNumOne和RegTraitNumTwo场景下RegTensor存储情况：
 
-    **图3** b64存储情况<a id="fig3"></a>
+    **图3** RegTensor搬运b64<a id="fig3"></a>
 
-    ![](../../../../figures/ReduceSum_basic_api.png "b64存储情况")
+    ![](../../../../figures/ReduceSum_basic_api.png "RegTensor搬运b64")
 
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量。
     

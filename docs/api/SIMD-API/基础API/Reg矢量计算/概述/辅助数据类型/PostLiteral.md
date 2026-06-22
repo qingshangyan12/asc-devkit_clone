@@ -3,7 +3,3 @@
 | 参数名 | 描述 |
 | :-- | :-- | 
 | PostLiteral | 用于控制是否使能UB地址会自动更新功能（post update）。<br><pre>enum class PostLiteral { <br>    POST_MODE_NORMAL, <br>    POST_MODE_UPDATE <br>};</pre>&bull;&nbsp;&nbsp;POST_MODE_NORMAL：POST_MODE_NORMAL场景使用，UB操作数地址不更新。连续非对齐搬入（LoadUnAlign）不支持POST_MODE_NORMAL模式；<br>&bull;&nbsp;&nbsp;POST_MODE_UPDATE：POST_MODE_UPDATE场景使用，UB地址同时作为输入和输出，每次调用会更新。 |
-
-**图1** ZEROING/MERGING对比<a id="fig1"></a>
-
-![](../../../../figures/ReduceSum_basic_api.png "ZEROING/MERGING对比")
