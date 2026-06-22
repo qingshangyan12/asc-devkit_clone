@@ -7,25 +7,21 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
-#ifndef CCU_KERNEL_ARG_H
-#define CCU_KERNEL_ARG_H
 
-#include <vector>
+#ifndef HCCLV2_KFC_SERVER_AUTO_SELECTOR_H
+#define HCCLV2_KFC_SERVER_AUTO_SELECTOR_H
 
-#include "ccu_kernel_signature.h"
-#include "hcomm_primitives.h"
+#include "auto_selector_base.h"
 
-namespace hcomm {
+namespace mc2_ops_hccl {
 
-class CcuKernelArg {
-public:
-    explicit CcuKernelArg() = default;
-    virtual ~CcuKernelArg() = default;
-    virtual CcuKernelSignature GetKernelSignature() const = 0;
-
-    std::vector<ChannelHandle> channels{};
+class KfcServerAutoSelector : public AutoSelectorBase {
+private:
+    SelectorStatus SelectCcuScheduleAlgo(const TopoInfoWithNetLayerDetails* topoInfo, const OpParam &opParam,
+                                 const std::map<HcclCMDType, std::vector<HcclAlgoType>> &configAlgMap,
+                                 std::string &selectAlgName) const override;
 };
 
-}; // namespace hcomm
+}
 
-#endif // _CCU_KERNEL_ARG_H
+#endif
