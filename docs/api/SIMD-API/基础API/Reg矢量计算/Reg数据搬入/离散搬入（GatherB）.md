@@ -55,7 +55,7 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 |-----|-----|-----|
 | dstReg | 输出 | 目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。|
 | baseAddr | 输入 | 源操作数，UB中的基地址，需要32B字节对齐。 |
-| index | 输入 | 索引值，dstReg中的每个DataBlock在UB中相对于baseAddr的位置，单位：字节。类型为[RegTensor](../寄存器数据类型/RegTensor.md)。索引值必须32B对齐，即一个索引值对应1个DataBlock。index中的值可以重复。例如：<br>baseAddr: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock7, ... , DataBlock32, ...]<br>index: [0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 32*32] dstReg: [DataBlock0, DataBlock1, DataBlock2,DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock32] |
+| index | 输入 | 索引值，dstReg中的每个DataBlock在UB中相对于baseAddr的位置，单位：字节。类型为[RegTensor](../寄存器数据类型/RegTensor.md)。索引值必须32B对齐，即一个索引值对应1个DataBlock。index中的值可以重复。例如：<br>baseAddr: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock7, ... , DataBlock32, ...]<br>index: [0\*2, 1\*32, 2\*32, 3\*32, 4\*32, 5\*32, 6\*32, 32\*32] dstReg: [DataBlock0, DataBlock1, DataBlock2,DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock32] |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 数据类型

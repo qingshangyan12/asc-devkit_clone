@@ -34,16 +34,16 @@
 
 RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体支持情况如下：
 
-| RegTensor模板参数regTrait | PostUpdate扩展搬运接口 | 使用AddrReg寄存器存储偏移量接口 |
-|-----|-----|-----|
-| RegTraitNumOne | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 |
-| RegTraitNumTwo | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 |
+| RegTensor模板参数regTrait | PostUpdate扩展搬运接口 | 使用AddrReg寄存器存储偏移量接口 | 使用AR寄存器存储偏移量接口 |
+|-----|-----|-----|-----|
+| RegTraitNumOne | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 |
+| RegTraitNumTwo | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 | 不支持 |
 
 非对齐搬出原理请参考[关键特性说明](#关键特性说明)。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-非对齐寄存器UnalignRegForStore作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在写非对齐地址前，应该先调用StoreUnAlign，再调用UnalignRegForStore进行后处理，处理非32B对齐的尾块数据。
+非对齐寄存器UnalignRegForStore作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在写非对齐地址前，应该先调用StoreUnAlign，再调用UnalignRegForStore进行后处理，处理非32字节对齐的尾块数据。
 
 - PostUpdate扩展搬运接口
 
@@ -125,7 +125,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 将源寄存器srcReg中的非对齐数据写入UB地址dstAddr，根据ureg当前状态，分为两种场景：
 
-- **场景一：ureg为空**（第一次迭代）
+**场景一：ureg为空**（第一次迭代）
 
 如[图1](#fig-storeunalign-1)所示，从源寄存器srcReg（256B）读取数据，并将其搬运至目标UB地址（dstAddr ~ 304）。处理流程如下：
 
@@ -137,7 +137,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 ![](../../../../figures/reg_storeunalign_1.png)
 
-- **场景二：ureg不为空**（除第一次迭代）
+**场景二：ureg不为空**（除第一次迭代）
 
 如[图2](#fig-storeunalign-2)所示，从源寄存器srcReg（256B）读取数据，并将其搬运至目标UB地址（dstAddr ~ 304）。处理流程如下：
 

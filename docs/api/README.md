@@ -499,7 +499,6 @@
                 -   [离散搬出（Scatter）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/离散搬出（Scatter）.md)
 
             -   [MaskReg计算](SIMD-API/基础API/Reg矢量计算/MaskReg计算/MaskReg计算.md)
-                -   [概述](SIMD-API/基础API/Reg矢量计算/MaskReg计算/概述.md)
                 -   [Move](SIMD-API/基础API/Reg矢量计算/MaskReg计算/Move.md)
                 -   [Interleave](SIMD-API/基础API/Reg矢量计算/MaskReg计算/Interleave.md)
                 -   [DeInterleave](SIMD-API/基础API/Reg矢量计算/MaskReg计算/DeInterleave.md)

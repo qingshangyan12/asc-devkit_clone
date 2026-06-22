@@ -43,7 +43,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
-非对齐寄存器UnalignRegForLoad作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在读非对齐地址前，应该先通过LoadUnAlignPre进行初始化，保存非32B对齐的数据，然后再调用LoadUnAlign进行数据搬入。
+非对齐寄存器UnalignRegForLoad作为临时缓存区，用于暂存跨对齐边界的数据，从而实现高效的连续非对齐数据传输。在读非对齐地址前，应该先通过LoadUnAlignPre进行初始化，保存非32字节对齐的数据，然后再调用LoadUnAlign进行数据搬入。
 
 - 普通搬运接口：
 
@@ -90,7 +90,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
 | dstReg | 输出 | 目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
-| ureg | 输入/输出 | 非对齐寄存器，UnalignRegForLoad类型，用于存储非32B对齐的数据，寄存器大小为32字节。 |
+| ureg | 输入/输出 | 非对齐寄存器，UnalignRegForLoad类型，用于存储非32字节的数据，寄存器大小为32字节。 |
 | srcAddr | 输入/输出 | 源操作数，UB起始地址，不需要32字节对齐。 |
 | postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况。<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
 | areg | 输入 | 地址偏移寄存器，AddrReg类型，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。 |
