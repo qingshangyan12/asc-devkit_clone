@@ -24,6 +24,10 @@
 #define ASCENDC_SIMD_VF_DEBUG
 #endif
 
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#include "../../../impl/utils/debug/asc_vf_debug_impl.h"
+#endif
+
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #endif

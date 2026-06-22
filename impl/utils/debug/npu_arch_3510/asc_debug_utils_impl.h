@@ -66,23 +66,38 @@ __simd_callee__ inline void enable_asc_diagnostics()
 #endif
 }
 
+namespace detail {
+struct AscVFUbufDisabled {};
+
+template <int32_t id>
+struct AscVFUbufTag {};
+
+template <typename Tag>
+struct AscVFUbufState {
+    using Type = AscVFUbufDisabled;
+};
+
+template <typename State>
+struct AscVFUbufGetter {
+    __simd_callee__ __ubuf__ static inline BlockVFBufInfo* Get(uint64_t addr, uint16_t blockIdx)
+    {
+        (void)addr;
+        (void)blockIdx;
+        return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(0);
+    }
+};
+} // namespace detail
+
+template <int32_t id = 0>
+__simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr_impl(uint64_t addr, uint16_t blockIdx = 0)
+{
+    using AscVFUbufState = typename detail::AscVFUbufState<detail::AscVFUbufTag<id>>::Type;
+    return detail::AscVFUbufGetter<AscVFUbufState>::Get(addr, blockIdx);
+}
+
 __simd_callee__ __ubuf__ inline BlockVFBufInfo* get_printf_ubuf_addr(uint64_t addr, uint16_t blockIdx = 0)
 {
-#if defined(ASCENDC_SIMD_VF_DEBUG)
-    constexpr uint32_t safeStaticLen = 32;
-    static __ubuf__ uint64_t info[safeStaticLen];
-    if (addr != 0) {
-        info[0] = addr;
-        // clear data workspace when initializing
-        auto* bufInfo = reinterpret_cast<__ubuf__ BlockVFBufInfo*>(addr);
-        bufInfo->writeLen = 0;
-        bufInfo->pidx = 0;
-        bufInfo->blockIdx = blockIdx;
-    }
-    return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(info[0]);
-#else
-    return reinterpret_cast<__ubuf__ BlockVFBufInfo*>(0);
-#endif
+    return get_printf_ubuf_addr_impl(addr, blockIdx);
 }
 
 __simd_callee__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
