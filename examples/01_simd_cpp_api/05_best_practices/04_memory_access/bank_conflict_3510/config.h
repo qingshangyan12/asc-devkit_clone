@@ -67,16 +67,16 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 8
-// Case 8：离散读写，Gather数据索引[0..255]连续，跨bank分散
-constexpr uint32_t TOTAL_LENGTH = 256;
+// Case 8：二读一写，同Case6地址，计算bound（增加大量计算，观测LDU/STU变化）
+constexpr uint32_t TOTAL_LENGTH = 4096;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x0400;
-constexpr uint32_t zLocalAddr = 0x0400;
-using T1 = uint32_t;
+constexpr uint32_t yLocalAddr = 0x5000;
+constexpr uint32_t zLocalAddr = 0xA000;
+using T1 = float;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 9
-// Case 9：离散读写，Gather数据索引0、128交替重复，同subbank不同行冲突
+// Case 9：离散读写，Gather数据索引[0..255]连续，跨bank分散
 constexpr uint32_t TOTAL_LENGTH = 256;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0400;
@@ -85,16 +85,16 @@ using T1 = uint32_t;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 10
-// Case 10：一读一写，DataBlock stride=1 横着搬运（按行），repeat间间隔256B
-constexpr uint32_t TOTAL_LENGTH = 512;
+// Case 10：离散读写，Gather数据索引0、128交替重复，同subbank不同行冲突
+constexpr uint32_t TOTAL_LENGTH = 256;
 constexpr uint32_t xLocalAddr = 0x0000;
-constexpr uint32_t yLocalAddr = 0x0000;
-constexpr uint32_t zLocalAddr = 0x4100;
-using T1 = float;
+constexpr uint32_t yLocalAddr = 0x0400;
+constexpr uint32_t zLocalAddr = 0x0400;
+using T1 = uint32_t;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 11
-// Case 11：一读一写，DataBlock stride=8 竖着搬运（按列），repeat间间隔32B
+// Case 11：一读一写，DataBlock stride=1 横着搬运（按行），repeat间间隔256B
 constexpr uint32_t TOTAL_LENGTH = 512;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -103,7 +103,7 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 12
-// Case 12：一读一写，DataBlock srcBlockStride=0，同一repeat内同地址重复读取
+// Case 12：一读一写，DataBlock stride=8 竖着搬运（按列），repeat间间隔32B
 constexpr uint32_t TOTAL_LENGTH = 512;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -112,7 +112,16 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #elif SCENARIO_NUM == 13
-// Case 13：一读一写，DataBlock srcRepeatStride=0，repeat间从同一首地址读取
+// Case 13：一读一写，DataBlock srcBlockStride=0，同一repeat内同地址重复读取
+constexpr uint32_t TOTAL_LENGTH = 512;
+constexpr uint32_t xLocalAddr = 0x0000;
+constexpr uint32_t yLocalAddr = 0x0000;
+constexpr uint32_t zLocalAddr = 0x4100;
+using T1 = float;
+using T2 = float;
+using T3 = float;
+#elif SCENARIO_NUM == 14
+// Case 14：一读一写，DataBlock srcRepeatStride=0，repeat间从同一首地址读取
 constexpr uint32_t TOTAL_LENGTH = 512;
 constexpr uint32_t xLocalAddr = 0x0000;
 constexpr uint32_t yLocalAddr = 0x0000;
@@ -121,5 +130,4 @@ using T1 = float;
 using T2 = float;
 using T3 = float;
 #endif
-
 #endif // BANK_CONFLICT_CONFIG_H

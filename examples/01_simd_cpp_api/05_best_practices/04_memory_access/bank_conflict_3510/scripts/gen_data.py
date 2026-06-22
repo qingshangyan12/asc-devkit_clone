@@ -47,9 +47,9 @@ def gen_golden_case5(repeat=1):
 def gen_golden_gather(case, repeat=1):
     N = 256
     y = np.random.uniform(1, 100, [N]).astype(np.float32)
-    if case == 8:
+    if case == 9:
         indices = np.arange(N, dtype=np.uint32)
-    elif case == 9:
+    elif case == 10:
         indices = np.empty(N, dtype=np.uint32)
         indices[::2] = 0
         indices[1::2] = 128
@@ -81,6 +81,13 @@ def gen_golden_block_stride0():
     return x, y, golden
 
 
+def gen_golden_compute_bound():
+    N = 4096
+    x = np.random.uniform(1, 100, [N]).astype(np.float32)
+    y = np.random.uniform(1, 100, [N]).astype(np.float32)
+    return x, y, x + 1000.0 + y
+
+
 def gen_golden_repeat_stride0():
     N = 512
     x = np.random.uniform(1, 100, [N]).astype(np.float32)
@@ -97,13 +104,15 @@ def gen_golden_data(case=1, repeat=1):
         x, y, golden = gen_golden_case2(KERNEL_REPEAT)
     elif case == 5:
         x, y, golden = gen_golden_case5(KERNEL_REPEAT)
-    elif case in (8, 9):
+    elif case == 8:
+        x, y, golden = gen_golden_compute_bound()
+    elif case in (9, 10):
         x, y, golden = gen_golden_gather(case, KERNEL_REPEAT)
-    elif case in (10, 11):
+    elif case in (11, 12):
         x, y, golden = gen_golden_adds_512()
-    elif case == 12:
-        x, y, golden = gen_golden_block_stride0()
     elif case == 13:
+        x, y, golden = gen_golden_block_stride0()
+    elif case == 14:
         x, y, golden = gen_golden_repeat_stride0()
     else:
         raise ValueError(f"Unknown case: {case}")
