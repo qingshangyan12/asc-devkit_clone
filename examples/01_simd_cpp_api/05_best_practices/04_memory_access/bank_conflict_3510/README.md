@@ -379,9 +379,10 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 1. Ascend 950PR/Ascend 950DT采用低位编址，地址交替分配到不同的存储模块，bank冲突场景少于Atlas A2/A3系列产品。
 2. Ascend 950PR/Ascend 950DT的bank冲突的开销小于Atlas A2/A3系列产品，两条指令发生bank冲突可以与其它指令达成并行。
-2. 二读一写下必然存在bank冲突。由于Ascend 950PR/Ascend 950DT一条指令处理256B（8个DataBlock），覆盖全部的8个BG，因此二读一写会发生在一个bank group，超出单个bank group的能力。（在Atlas A2/A3中，由于bank group个数多一倍，冲突可消除），在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
-3. 由于架构发生变化，读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然触发了bank冲突。
-4. 双搬入指令搬运对性能劣化不明显。
+
+3. 二读一写下必然存在bank冲突。由于Ascend 950PR/Ascend 950DT一条指令处理256B（8个DataBlock），覆盖全部的8个BG，因此二读一写会发生在一个bank group，超出单个bank group的能力。（在Atlas A2/A3中，由于bank group个数多一倍，冲突可消除），在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
+4. 由于架构发生变化，读写地址重叠时，bank冲突依然会发生。case2的src0/dst地址重叠，依然触发了bank冲突。
+5. 双搬入指令搬运对性能劣化不明显。
 
 ### 非连续对齐搬运的bank冲突
 
