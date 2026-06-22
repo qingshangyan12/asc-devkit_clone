@@ -157,6 +157,7 @@ HcclResult HcclGetRemoteBuff(
 
 HcclResult LogHcclExit(const std::string& opName, const char* tag, HcclUs startut);
 
-} // namespace mc2_ops_hccl
+HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetails* topoInfo, bool &hostDPUOnly);
+}  // namespace mc2_ops_hccl
 
 #endif
