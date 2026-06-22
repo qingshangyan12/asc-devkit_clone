@@ -1075,8 +1075,28 @@
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p6689192111598"><a name="p6689192111598"></a><a name="p6689192111598"></a>设置DataCopyPad接口填充的数值。</p>
 </td>
 </tr>
-<tr id="row154051221164915"><td class="cellrowborder" rowspan="19" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p118921556154813"><a name="p118921556154813"></a><a name="p118921556154813"></a>矩阵计算</p>
+<tr id="row154051221164915"><td class="cellrowborder" rowspan="23" valign="top" width="12.379999999999999%" headers="mcps1.2.4.1.1 "><p id="p118921556154813"><a name="p118921556154813"></a><a name="p118921556154813"></a>矩阵计算</p>
 </td>
+<tr id="row_isasi_mmad_001"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p_isasi_mmad_001"><a name="p_isasi_mmad_001"></a><a name="p_isasi_mmad_001"></a><a href="基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md">Mmad</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p_isasi_mmad_desc_001"><a name="p_isasi_mmad_desc_001"></a><a name="p_isasi_mmad_desc_001"></a>完成矩阵乘加操作。</p>
+</td>
+</tr>
+<tr id="row_isasi_sethf32_001"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p_isasi_sethf32_001"><a name="p_isasi_sethf32_001"></a><a name="p_isasi_sethf32_001"></a><a href="基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32Mode.md">SetHF32Mode</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p_isasi_sethf32_desc_001"><a name="p_isasi_sethf32_desc_001"></a><a name="p_isasi_sethf32_desc_001"></a>设置MMAD的HF32模式。</p>
+</td>
+</tr>
+<tr id="row_isasi_sethf32trans_001"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p_isasi_sethf32trans_001"><a name="p_isasi_sethf32trans_001"></a><a name="p_isasi_sethf32trans_001"></a><a href="基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetHF32TransMode.md">SetHF32TransMode</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p_isasi_sethf32trans_desc_001"><a name="p_isasi_sethf32trans_desc_001"></a><a name="p_isasi_sethf32trans_desc_001"></a>设置MMAD的HF32取整模式，仅在MMAD的HF32模式生效时有效。</p>
+</td>
+</tr>
+<tr id="row_isasi_setmm_001"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p_isasi_setmm_001"><a name="p_isasi_setmm_001"></a><a name="p_isasi_setmm_001"></a><a href="基础API/矩阵计算（ISASI）/Mmad计算/寄存器配置说明/SetMMColumnMajor-SetMMRowMajor.md">SetMMColumnMajor/SetMMRowMajor</a></p>
+</td>
+<td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p_isasi_setmm_desc_001"><a name="p_isasi_setmm_desc_001"></a><a name="p_isasi_setmm_desc_001"></a>设置MMAD计算时优先通过M方向（SetMMColumnMajor）或N方向（SetMMRowMajor）。</p>
+</td>
+</tr>
 <tr id="row12765526165715"><td class="cellrowborder" valign="top" headers="mcps1.2.4.1.1 "><p id="p1176511267573"><a name="p1176511267573"></a><a name="p1176511267573"></a><a href="基础API/矩阵计算（ISASI）/矩阵计算/MmadWithSparse.md">MmadWithSparse</a></p>
 </td>
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p47651826105712"><a name="p47651826105712"></a><a name="p47651826105712"></a>完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。</p>
