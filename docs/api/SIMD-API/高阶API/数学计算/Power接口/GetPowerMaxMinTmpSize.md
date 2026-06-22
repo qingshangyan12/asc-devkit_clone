@@ -12,9 +12,7 @@ kernel侧Power接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetPowerMaxMinTmpSize(
-    const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize,
-    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

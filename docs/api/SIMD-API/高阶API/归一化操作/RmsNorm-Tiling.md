@@ -37,21 +37,15 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 ## 函数原型
 
 ```
-bool GetRmsNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue,
-    const bool isBasicBlock = false)
+bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
-    const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(
-    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
-    const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明

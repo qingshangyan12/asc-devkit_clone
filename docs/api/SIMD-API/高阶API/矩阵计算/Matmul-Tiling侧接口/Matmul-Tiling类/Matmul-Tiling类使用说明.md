@@ -21,8 +21,8 @@ Matmul Tiling API分为Matmul单核Tiling接口、多核Tiling接口和BatchMatm
     tiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
     tiling.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
     tiling.SetShape(1024, 1024, 1024);    // 设置单核计算的M、N、K大小
-    tiling.SetOrgShape(1024, 1024, 1024); // 设置原始输入M、N、K大小，单核Tiling与SetShape一致。若Ka,Kb不等长时，设置tiling.SetOrgShape(1024,
-                                          // 1024, 1024, 1280)
+    tiling.SetOrgShape(1024, 1024, 1024); // 设置原始输入M、N、K大小，单核Tiling与SetShape一致。
+                                          // 若Ka,Kb不等长时，设置tiling.SetOrgShape(1024,1024, 1024, 1280)
     tiling.EnableBias(true);              // 设置matmul计算包含bias
     tiling.SetBufferSpace(-1, -1, -1);    // 设定允许使用的空间，缺省使用该AI处理器所有空间
     optiling::TCubeTiling tilingData;

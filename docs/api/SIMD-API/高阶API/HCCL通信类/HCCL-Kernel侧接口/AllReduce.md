@@ -20,8 +20,7 @@
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle AllReduce(
-    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AllReduce(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t count, HcclDataType dataType, HcclReduceOp op, uint8_t repeat = 1)
 ```
 
 ## 参数说明

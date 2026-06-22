@@ -22,9 +22,7 @@ AlltoAllV的功能为：通信域内的卡互相发送和接收数据，并且�
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllV(
-    GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts,
-    void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
+__aicore__ inline HcclHandle AlltoAllV(GM_ADDR sendBuf, void* sendCounts, void* sdispls, HcclDataType sendType, GM_ADDR recvBuf, void* recvCounts, void* rdispls, HcclDataType recvType, uint8_t repeat = 1)
 ```
 
 ## 参数说明

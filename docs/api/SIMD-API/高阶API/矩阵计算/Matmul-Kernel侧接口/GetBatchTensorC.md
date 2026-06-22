@@ -23,8 +23,7 @@ __aicore__ inline GlobalTensor<DstT> GetBatchTensorC(uint32_t batchA, uint32_t b
 
 ```
 template <bool sync = true>
-__aicore__ inline void GetBatchTensorC(
-    const LocalTensor<DstT>& c, uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
+__aicore__ inline void GetBatchTensorC(const LocalTensor<DstT>& c, uint32_t batchA, uint32_t batchB, bool enSequentialWrite = false)
 ```
 
 ## 参数说明

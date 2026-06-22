@@ -53,21 +53,15 @@ GroupNorm Tiling API用于获取GroupNorm kernel计算时所需的Tiling参数�
 ## 函数原型
 
 ```
-void GetGroupNormMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum,
-    uint32_t& maxValue, uint32_t& minValue)
+void GetGroupNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-    const uint32_t groupNum, optiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, optiling::GroupNormTiling& tiling)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(
-    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-    const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
 ```
 
 ## 参数说明

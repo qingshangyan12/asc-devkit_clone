@@ -32,20 +32,14 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
     ```
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void BatchNorm(
-        const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
-        const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const T epsilon,
-        BatchNormTiling& tiling)
+    __aicore__ inline void BatchNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const T epsilon, BatchNormTiling& tiling)
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
     template <typename T, bool isReuseSource = false, bool isBasicBlock = false>
-    __aicore__ inline void BatchNorm(
-        const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
-        const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, BatchNormTiling& tiling)
+    __aicore__ inline void BatchNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamm, const LocalTensor<T>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, BatchNormTiling& tiling)
     ```
 
 ## 参数说明
