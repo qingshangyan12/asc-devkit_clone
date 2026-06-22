@@ -361,7 +361,7 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or CommonUtility.is_m510())
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not CommonUtility.is_c310()
     workspace_idx = 0
     if needs_ffts:
         func_params.append("GM_ADDR ffts_addr")
@@ -425,8 +425,7 @@ def _gen_kernel_func_declare_head(is_mix: bool, is_single_and_using_hard_sync: b
             called_func_params = "param, sargs"
             called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
             source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
-            source += "    g_super_kernel_early_start_config = sargs->SkGetTaskSyncCfg();\n"
-            source += "    uint32_t __asc_index = 0;\n"
+            source += " uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
 
@@ -704,7 +703,7 @@ def gen_kernel_fun(compile_info: CompileInfo, func_name: str, opinfo: OpInfo, \
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and \
-                    (CommonUtility.is_c310() or CommonUtility.is_m510()):
+                    CommonUtility.is_c310():
         check_custom_dcci_end_false(compile_option_tuple)
 
     source += "}\n\n"
@@ -1063,10 +1062,6 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
             _compile_ascendc_cce_v220_with_kernel_type(compile_info, compile_option_tuple, tiling_info)
-    elif CommonUtility.is_m510():
-        compile_info.code_channel = CORE_TYPE_CUBE
-        compile_info.hard_sync = False
-        _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -1113,63 +1108,18 @@ def link_kernel_obj(compile_info: CompileInfo, op_info: OpInfo, tiling_info: Til
     CommonUtility.print_compile_log(op_info.kernel_name, "link relocatable success", AscendCLogLevel.LOG_INFO)
 
 
-def _match_regex(pattern: str, op_name: str) -> bool:
-    """
-    Match regex pattern with op_name.
-    Supports '.' (matches any single char) and '*' (matches zero or more of preceding element).
-    """
-    if len(pattern) > 0 and pattern[0] == '*':
-        return False
-
-    m, n = len(op_name), len(pattern)
-
-    def matches(i: int, j: int) -> bool:
-        if i == 0 or j == 0:
-            return False
-        if pattern[j - 1] == '.':
-            return True
-        return op_name[i - 1] == pattern[j - 1]
-
-    dp = [[False] * (n + 1) for _ in range(m + 1)]
-    dp[0][0] = True
-    for i in range(m + 1):
-        for j in range(1, n + 1):
-            if pattern[j - 1] == '*':
-                if j >= 2:
-                    dp[i][j] |= dp[i][j - 2]
-                    if matches(i, j - 1):
-                        dp[i][j] |= dp[i - 1][j]
-            elif matches(i, j):
-                dp[i][j] |= dp[i - 1][j - 1]
-    return dp[m][n]
-
-
-def _get_dcci_disable_cap_bitmap(compile_info: CompileInfo, kernel_symbols: list) -> int:
-    """
-    Check if DCCI should be disabled for any kernel in kernel_symbols.
-    Returns 4 if matched, 0 otherwise.
-    """
-    sp_options = compile_info.super_kernel_info.get("sp_options", {})
-    patterns = sp_options.get("dcci-disable-on-kernel", [])
-    if isinstance(patterns, list) and patterns:
-        for kernel_name in kernel_symbols:
-            if any(_match_regex(p, kernel_name) for p in patterns):
-                return 4
-    return 0
-
-
 def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo, compile_option_tuple, kernel_meta_dir):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
     source = "#include \"kernel_operator.h\"\n"
 
-    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4), default:0
-    cap_bitmap = 0
+    # Calculate capability bitmap based on compile_info early start flags
+    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci(4), default:4
+    cap_bitmap = 4  # Default value
     if compile_info.super_kernel_early_start_wait_flag:
-        cap_bitmap |= 1
+        cap_bitmap |= 1  # Set bit 0 for wait flag
     if compile_info.super_kernel_early_start_set_flag:
-        cap_bitmap |= 2
-    cap_bitmap |= _get_dcci_disable_cap_bitmap(compile_info, compile_info_origin.global_kernel_symbols)
+        cap_bitmap |= 2  # Set bit 1 for set flag
 
     for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
         sk_syb = compile_info.global_kernel_symbols[idx]
@@ -1325,7 +1275,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
 
     # dump ktype handle
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
@@ -1347,7 +1296,6 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         # reset sk opt
         global_var_storage.set_variable("ascendc_enable_super_kernel", False)
         global_var_storage.set_variable("ascendc_sk_sub_combine_norm_workflow", True)
-        DFXSectionGenerator().dfx_info_reset(op_info)
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
@@ -1401,7 +1349,7 @@ def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_op
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
-    need_impl_mode_macro = (CommonUtility.is_c310() or CommonUtility.is_m510()) and \
+    need_impl_mode_macro = CommonUtility.is_c310() and \
         isinstance(op_info.impl_mode, str) and op_info.impl_mode != ""
     if need_impl_mode_macro:
         impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
@@ -1459,7 +1407,7 @@ def compile_op_with_customized_config(cce_file: str, origin_func_name: str, op_i
         raise Exception(f"input cce file is not exists, file name: " + cce_file)
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
-    need_impl_mode_macro = (CommonUtility.is_c310() or CommonUtility.is_m510()) and \
+    need_impl_mode_macro = CommonUtility.is_c310() and \
         isinstance(op_info.impl_mode, str) and op_info.impl_mode != ""
     if need_impl_mode_macro:
         impl_mode_def = f"-D{op_info.impl_mode.upper()}_"  # IMPL_MODE_IS
@@ -2094,26 +2042,6 @@ def get_core_info(compile_info: CompileInfo):
         raise Exception(f"invalid code_channel = {compile_info.code_channel}")
 
 
-def _compile_ascendc_cce_m510(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
-    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
-
-    Args:
-        compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
-        tiling_info (TilingInfo): tiling info
-    """
-    sub_core_type = "AIC"
-    optional_core = "AiCore"
-    arch = None
-    set_soc_spec(optional_core)
-    tiling_key_list = call_bisheng_v220(compile_info, compile_option_tuple, tiling_info, arch, \
-        compile_info.code_channel)
-    _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
-    if not tiling_info.static_shape_flag:
-        _dynamic_kernel_list_to_json(compile_info.kernel_name, tiling_key_list, \
-            compile_info.enable_deterministic, compile_info.tiling_key_deterministic)
-
-
 def _compile_ascendc_cce_regbase(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
     """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
 
@@ -2224,15 +2152,12 @@ def _mssanitizer_link(src_file, dst_file, compile_log_path=None):
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
     if short_soc_version not in global_var_storage.get_variable("ascendc_asan_obj_path"):
         raise Exception("asan config file not support asan.a path")
-    asan_obj_paths = global_var_storage.get_variable("ascendc_asan_obj_path")[short_soc_version]
-    if asan_obj_paths == []:
-        return
     if not isinstance(src_file, list):
         src_file = [src_file]
     cmd = [CCECInfo.get_exe("ld.lld"), "-m", "aicorelinux", "-r", "-Ttext=0"]
     cmd.extend(src_file)
     cmd.extend(['--dependent-libraries'])
-    cmd.extend(asan_obj_paths)
+    cmd.extend(global_var_storage.get_variable("ascendc_asan_obj_path")[short_soc_version])
     cmd.extend([
         "-r",
         "-o",
