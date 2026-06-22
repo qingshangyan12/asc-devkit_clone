@@ -1,4 +1,4 @@
-# SIMD API列表<a name="ZH-CN_TOPIC_0000002601569371"></a>
+# 高阶API列表<a name="ZH-CN_TOPIC_0000002601569371"></a>
 
 ## 基础数据结构<a name="section3119442205518"></a>
 
