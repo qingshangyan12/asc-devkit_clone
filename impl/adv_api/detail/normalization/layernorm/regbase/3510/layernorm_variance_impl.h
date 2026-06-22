@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_LAYERNORM_LAYERNORM_VARIANCE_IMPL_H
 
 #include "../../../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 namespace Internal {

@@ -45,7 +45,7 @@ __simd_callee__ inline void PairReduceElem(U& dstReg, U srcReg, MaskReg mask);
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_reduce_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_reduce_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_REDUCE_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_REDUCE_INTF_H__)

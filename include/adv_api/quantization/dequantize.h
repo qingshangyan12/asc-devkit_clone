@@ -20,7 +20,7 @@
 
 #ifndef LIB_QUANTIZATION_DEQUANTIZE_H
 #define LIB_QUANTIZATION_DEQUANTIZE_H
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/quantization/dequantize/dequantize_common.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/quantization/dequantize/dequantize_impl.h"

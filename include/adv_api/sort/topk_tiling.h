@@ -18,7 +18,7 @@
 #include "tiling/platform/platform_ascendc.h"
 #include "graph/types.h"
 #include "topk_utils_constants.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 

@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_LAYERNORMGRAD_REGBASE_C310_LAYERNORMGRAD_C310_IMPL_H
 
 #include "../../../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../../../basic_api/kernel_pop_stack_buffer.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../../../api_check/kernel_check/normalization/layernormgrad/layernormgrad_check.h"

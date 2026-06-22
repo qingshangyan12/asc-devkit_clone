@@ -25,7 +25,7 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../basic_api/kernel_pop_stack_buffer.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../../include/adv_api/normalization/welfordfinalize_utils.h"
 #include "../layernorm/layernorm_3510_utils.h"
 

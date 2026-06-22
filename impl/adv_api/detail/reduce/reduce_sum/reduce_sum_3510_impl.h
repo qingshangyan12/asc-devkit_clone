@@ -20,7 +20,7 @@
 
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../reduce_common_util_impl.h"
 #include "../reduce_common_util_3510_impl.h"
 #include "../reduce_common_ar_ra_reuse_unalign_3510_impl.h"

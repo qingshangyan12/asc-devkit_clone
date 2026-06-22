@@ -20,7 +20,7 @@
 
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../common/check.h"
 #include "../../api_check/kernel_api_check.h"
 #include "../reduce_common_util_impl.h"

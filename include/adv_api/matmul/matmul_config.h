@@ -15,7 +15,7 @@
 #ifndef LIB_MATMUL_MATMUL_CONFIG_H
 #define LIB_MATMUL_MATMUL_CONFIG_H
 
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 constexpr uint32_t SHARED_CO1_BUFFER_SIZE = 64 * 1024;
 

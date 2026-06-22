@@ -23,7 +23,7 @@
 #define IMPL_MATH_LGAMMA_LGAMMA_V200_IMPL_H
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 namespace AscendC {

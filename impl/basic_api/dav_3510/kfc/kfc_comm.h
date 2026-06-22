@@ -21,7 +21,7 @@
 #define __KERNEL_KFC_COMM_H__
 
 #include "../../../../include/basic_api/kernel_common.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../kernel_operator_common_impl.h"
 #include "kfc_log.h"
 

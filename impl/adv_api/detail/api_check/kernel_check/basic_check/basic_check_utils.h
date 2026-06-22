@@ -27,7 +27,7 @@
 #include "../../../../../../include/utils/std/algorithm.h"
 #include "../../../../../../include/utils/std/type_traits.h"
 #include "../../../../../../include/utils/std/utility.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../../basic_api/kernel_check_util.h"
 #include "../../../../../basic_api/kernel_check.h"
 
