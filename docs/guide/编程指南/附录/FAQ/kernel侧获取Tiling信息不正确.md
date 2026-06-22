@@ -37,7 +37,7 @@ kernel侧获取Tiling信息不正确的原因一般有以下两种：
 
     ```
     #include "kernel_operator.h"
-    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling) {
+    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
         GET_TILING_DATA(tiling_data, tiling);// 获取Tiling参数
         // TODO: user kernel impl
     }

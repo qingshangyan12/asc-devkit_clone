@@ -8,7 +8,7 @@
 
 ```
 #include "kernel_operator.h"
-extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling) {
+extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
     GET_TILING_DATA(tiling_data, tiling);// 获取Tiling参数，详见下文介绍
     // TODO: user kernel impl
 }
@@ -17,7 +17,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 >[!NOTE]说明 
 >算子原型定义中的输入和输出同名的情况下，自动生成的核函数中，输出参数增加ref后缀予以区分。示例如下：
 >```
->extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR x_ref, GM_ADDR workspace, GM_ADDR tiling) {
+>extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* x_ref, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
 >    ...
 >}
 >```
@@ -29,7 +29,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 核函数中调用[GET\_TILING\_DATA](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Kernel-Tiling/GET_TILING_DATA.md)获取TilingData的样例如下：
 
 ```
-extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
+extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
     GET_TILING_DATA(tilingData, tiling);
     KernelAdd op;
@@ -52,7 +52,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 
 ```
 template<class T> func() {}
-extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
+extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
 {
     DTYPE_X temp;
     func<DTYPE_Z>();
@@ -80,7 +80,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 -   如下示例中，算子中有一个输出依赖计算得出，输出tensor的数据类型为uint32\_t，计算完成后，得到输出的shape为（32, 64），出参shape\_out用于存放该shape信息，值为（2, 32, 64）。代码示例如下：
 
     ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
+    extern "C" __global__ __aicore__ void xxx_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* shape_out, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
     ...
         constexpr uint32_t SHAPEOUT_SIZE = 9;
         // 输出数据为2维([32, 64])，tensor类型为uint32_t
@@ -97,7 +97,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 -   如下示例中，算子中有一个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（1, 64, 128, 128），出参shape\_out用于存放该shape信息，值为（0x0000000080000000 | 4 , 1, 64, 128, 128）。代码示例如下：
 
     ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
+    extern "C" __global__ __aicore__ void xxx_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* shape_out, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
     ...
         constexpr uint32_t SHAPEOUT_SIZE = 9;
         // 输出数据为4维([1, 64, 128, 128])，tensor类型为uint64_t
@@ -116,7 +116,7 @@ extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z
 -   如下示例中，算子中有两个输出依赖计算得出，输出tensor的数据类型为uint64\_t，计算完成后，得到输出的shape为（16, 32）和（1, 16, 16, 32），出参shape\_out用于存放该shape信息。示例如下：
 
     ```
-    extern "C" __global__ __aicore__ void xxx_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR shape_out, GM_ADDR workspace, GM_ADDR tiling) {
+    extern "C" __global__ __aicore__ void xxx_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* shape_out, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling) {
         ...
         // 有两个输出需要刷新shape，一个维度为2维[16, 32]，一个维度为4维[1, 16, 16, 32]
         // 输出tensor类型为uint64_t

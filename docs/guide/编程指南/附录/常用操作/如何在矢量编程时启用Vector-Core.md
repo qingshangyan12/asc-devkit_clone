@@ -13,7 +13,7 @@
         if (workspace == nullptr) {
             return;
         }
-        GM_ADDR usr = AscendC::GetUserWorkspace(workspace);
+        __gm__ uint8_t* usr = AscendC::GetUserWorkspace(workspace);
         KernelAdd op;
         op.Init(x, y, z, tilingData.numBlocks, tilingData.totalLength, tilingData.tileNum);
         KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_VECTOR_CORE); // 启用VectorCore
