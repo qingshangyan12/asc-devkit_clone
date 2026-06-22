@@ -245,11 +245,11 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
 
-UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank group = bank % 8`）。在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。
+UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank_group_id = bank_id % 8`）。在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。
 
 <img src="./figures/Ascend950bank结构示意图.png">
 
-**地址采用低位交织：** 如下图所示，UB内连续地址以32B为单位在bank0~bank15间循环 —— 第1个32B块落到bank0、第2个落到bank1、……、第16个落到 bank15，第17个回到bank0的下一行，依次类推。
+**地址采用低位交织：** 如下图所示，UB内连续地址按32B粒度映射到bank0~bank15 —— 第1个32B地址段映射到bank0、第2个映射到bank1、……、第16个映射到bank15，第17个映射回bank0的下一行，依次类推。
 
 <img src="./figures/Ascend950bank内存排布示意图.png">
 
