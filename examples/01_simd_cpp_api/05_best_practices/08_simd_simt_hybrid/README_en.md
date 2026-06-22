@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory provides best-practice samples for SIMD and SIMT hybrid programming, covering flexible branch logic implementation using SIMT, memory coalescing optimization, UB-based discrete memory access optimization, and gridDim configuration optimization.
+This directory provides best-practice samples for SIMD and SIMT hybrid programming, covering flexible branch logic implementation using SIMT, memory coalescing optimization, UB-based scattered memory access optimization, and gridDim configuration optimization.
 
 ## Sample List
 
