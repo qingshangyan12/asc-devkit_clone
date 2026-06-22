@@ -167,8 +167,8 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
     Suppress:
       - "attributes_not_allowed"
       - "decomp_decl_template"
-      - "ignored_attributes"
-      - "unknown_type_name"
+      - "ignored-attributes"
+      - "unknown_typename"
       - "undeclared_var_use"
       - "invalid_token_after_toplevel_declarator"
       - "missing_type_specifier"

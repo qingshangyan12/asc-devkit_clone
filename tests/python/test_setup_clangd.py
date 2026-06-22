@@ -81,3 +81,18 @@ def test_does_not_overwrite_existing_output_without_force(tmp_path: Path) -> Non
     assert result.returncode != 0
     assert "already exists" in result.stderr
     assert output.read_text(encoding="utf-8") == "existing config\n"
+
+
+def test_force_overwrites_existing_output(tmp_path: Path) -> None:
+    cann_root = tmp_path / "cann"
+    output = tmp_path / ".clangd.local"
+    create_cann_root(cann_root)
+    output.write_text("existing config\n", encoding="utf-8")
+
+    result = run_setup_clangd("--cann-root", str(cann_root), "--npu-arch", "3510", "--output", str(output), "--force")
+
+    assert result.returncode == 0, result.stderr
+    generated = output.read_text(encoding="utf-8")
+    assert generated != "existing config\n"
+    assert f"-D__NPU_ARCH__=3510" in generated
+    assert str(cann_root / "asc/include") in generated

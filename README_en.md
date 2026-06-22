@@ -167,8 +167,8 @@ If you want to quickly experience project build and operator sample execution, a
     Suppress:
       - "attributes_not_allowed"
       - "decomp_decl_template"
-      - "ignored_attributes"
-      - "unknown_type_name"
+      - "ignored-attributes"
+      - "unknown_typename"
       - "undeclared_var_use"
       - "invalid_token_after_toplevel_declarant"
       - "missing_type_specifier"
