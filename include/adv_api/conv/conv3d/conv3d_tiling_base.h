@@ -18,7 +18,7 @@
 
 #include "conv3d_tilingdata.h"
 #include "../../../../impl/adv_api/tiling/conv/conv3d_tiling_util.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace Conv3dTilingApi {
 /**
