@@ -529,6 +529,7 @@ def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_ke
 
 
 def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
+    #aaa
     tiling_size = len(tiling_raw_data)
     tiling_format = {"tiling": [tiling_size, "uint8"]}
 
