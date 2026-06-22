@@ -10,9 +10,7 @@ kernel侧ReGlu接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetReGluMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
-    uint32_t& minValue)
+void GetReGluMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

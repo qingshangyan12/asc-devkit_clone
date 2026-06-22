@@ -7,8 +7,7 @@
 ## 函数原型
 
 ```
-void SetWeightType(
-    const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
+void SetWeightType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
 ```
 
 ## 参数说明

@@ -10,9 +10,7 @@
 ## 函数原型
 
 ```
-void GetSortMaxMinTmpSize(
-    const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource,
-    const SortConfig& config, uint32_t& maxValue, uint32_t& minValue)
+void GetSortMaxMinTmpSize(const ge::Shape& srcShape, ge::DataType valueType, ge::DataType indexType, bool isReuseSource, const SortConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

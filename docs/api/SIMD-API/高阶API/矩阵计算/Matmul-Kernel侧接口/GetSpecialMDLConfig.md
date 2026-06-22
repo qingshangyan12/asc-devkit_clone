@@ -23,9 +23,7 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetSpecialMDLConfig(
-    const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
-    const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false)
+__aicore__ constexpr MatmulConfig GetSpecialMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false)
 ```
 
 ## 参数说明

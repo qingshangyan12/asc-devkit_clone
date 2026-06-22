@@ -30,9 +30,7 @@ Rint\(3.5\) = 4
 
     ```
     template <const RintConfing& config = DEFAULT_RINT_CONFIG, typename T>
-    __aicore__ inline void Rint(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const uint32_t count)
+    __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间

@@ -204,9 +204,7 @@
 
     ```
     template <typename T>
-    __aicore__ inline void Transpose(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        TransposeType transposeType, ConfusionTransposeTiling& tiling)
+    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, TransposeType transposeType, ConfusionTransposeTiling& tiling)
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
@@ -215,8 +213,7 @@
 
     ```
     template <typename T>
-    __aicore__ inline void Transpose(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, TransposeType transposeType, ConfusionTransposeTiling& tiling)
+    __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src, TransposeType transposeType, ConfusionTransposeTiling& tiling)
     ```
 
     该方式下开发者无需申请，但是需要预留临时空间的大小。

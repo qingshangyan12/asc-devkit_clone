@@ -20,9 +20,7 @@
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle ReduceScatter(
-    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, uint64_t strideCount,
-    uint8_t repeat = 1)
+__aicore__ inline HcclHandle ReduceScatter(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t recvCount, HcclDataType dataType, HcclReduceOp op, uint64_t strideCount, uint8_t repeat = 1)
 ```
 
 ## 参数说明

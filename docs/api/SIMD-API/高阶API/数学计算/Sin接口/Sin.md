@@ -32,32 +32,29 @@ Sin\(x\)的泰勒展开式为：
     -   源操作数Tensor全部/部分参与计算
 
         ```
-        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
-        __aicore__ inline void Sin(
-            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-            const uint32_t calCount)
+        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
-        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
-        __aicore__ inline void Sin(
-            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
     -   源操作数Tensor全部/部分参与计算
 
         ```
-        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
         __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
-        template <typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
+        template<typename T, bool isReuseSource = false, const SinConfig& config = defaultSinConfig>
         __aicore__ inline void Sin(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
 
