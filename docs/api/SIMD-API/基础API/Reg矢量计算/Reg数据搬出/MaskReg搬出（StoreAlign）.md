@@ -32,7 +32,7 @@ StoreAlign能够实现数据从[MaskReg](../寄存器数据类型/MaskReg.md)搬
 
 - 普通搬运接口：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
 - PostUpdate扩展搬运接口：
-    - POSTMODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
+    - POSTMODE_NORMAL模式：不支持。
     - POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。
 
 - 使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量场景：在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。
@@ -76,7 +76,7 @@ StoreAlign能够实现数据从[MaskReg](../寄存器数据类型/MaskReg.md)搬
 |-----|-----|-----|
 | dstAddr | 输入/输出 | 目的操作数，UB起始地址，需要32B对齐。 |
 | mask | 输入 | 源操作数，类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
-| offset | 输入 | &bull; 当数据类型为AddrReg，为地址偏移寄存器，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。<br>&bull; 当数据类型为int32_t，为地址更新步长，单位：元素个数。根据postMode的取值有两种情况：POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + offset，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr += offset。 |
+| offset | 输入 | &bull; 当数据类型为AddrReg，为地址偏移寄存器，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。<br>&bull; 当数据类型为int32_t，为地址更新步长，单位：元素个数。根据postMode的取值有两种情况：<br>&nbsp;&nbsp;&bull; POST_MODE_NORMAL：不支持。<br>&nbsp;&nbsp;&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr += offset。 |
 
 <a id="表3-MaskDist参数说明"></a>
 **表 3**  MaskDist参数说明
@@ -88,7 +88,7 @@ StoreAlign能够实现数据从[MaskReg](../寄存器数据类型/MaskReg.md)搬
 
 ## 数据类型
 
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：b8、b16、b32、b64。
+目的操作数支持的数据类型为：b8、b16、b32、b64。
 
 ## 返回值说明<a name="section1575141714439"></a>
 

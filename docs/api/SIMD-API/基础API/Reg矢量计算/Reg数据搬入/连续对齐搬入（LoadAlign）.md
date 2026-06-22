@@ -106,7 +106,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
 | dist | 数据分布模式，LoadDist类型。具体参数说明请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明（单搬入模式）
 
@@ -145,7 +145,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
 | dist | 搬运模式，LoadDist类型。具体参数说明请参考[表3 LoadDist参数说明（双搬入模式）](#表3-LoadDist参数说明（双搬入模式）)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 5**  参数说明（双搬入模式）
 
@@ -191,19 +191,19 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **连续对齐搬入搬出三类搬运接口调用方式**
 
-[图2 regTrait为RegTraitNumOne时的三类搬运搬运接口调用方式](#fig-loadalign-regtrait)展示了连续对齐搬入/搬出的三类搬运模式在迭代内使用调用方式：
+[图2 regTrait为RegTraitNumOne时的三类搬运接口调用方式](#fig-loadalign-regtrait)展示了连续对齐搬入/搬出的三类搬运模式在迭代内使用调用方式：
 
 - 普通搬运接口：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
 - PostUpdate扩展搬运接口：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。
 - 使用AddrReg存储偏移量接口：在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。
 
 <a id="fig-loadalign-regtrait"></a>
-**图 2**  regTrait为RegTraitNumOne时的三类搬运搬运接口调用方式
+**图 2**  regTrait为RegTraitNumOne时的三类搬运接口调用方式
 ![](../../../../figures/reg_loadstorealign.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-- 单搬出/单搬出模式：普通搬运接口
+- 单搬入/单搬出模式：普通搬运接口
 
     ```cpp
     __simd_vf__ inline void ComputeMode01(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)
