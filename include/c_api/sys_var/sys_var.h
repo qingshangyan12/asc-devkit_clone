@@ -63,7 +63,7 @@ __aicore__ inline int64_t asc_get_program_counter();
 
 __aicore__ inline void asc_get_arch_ver(uint32_t& coreVersion);
 
-__aicore__ inline int64_t asc_get_ar_spr();
+__aicore__ inline int64_t asc_get_squeeze_status();
 
 __aicore__ inline void asc_set_ffts_base_addr(uint64_t config);
 

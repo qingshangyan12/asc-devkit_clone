@@ -326,7 +326,7 @@ Reg数据搬运类API，单独使用时可以引入reg_load.h，此类API列表�
 | [asc_loadalign](reg/reg_load/asc_loadalign/asc_loadalign.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，支持多种搬入模式。 |
 | [asc_loadalign](reg/reg_load/asc_loadalign_deintlv.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作。 |
 | [asc_loadalign](reg/reg_load/asc_loadalign_deintlv_postupdate.md) | 对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作，是能postupdate模式，自动更新UB地址参数。 |
-| [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入MaskReg，使能post mod。 |
+| [asc_loadalign_postupdate](reg/reg_load/asc_loadalign_postupdate.md) | 将数据从UB搬入掩码寄存器，使能post mod。 |
 | [asc_loadunalign_pre](reg/reg_load/asc_loadunalign_pre.md) | 用于在进行非对齐数据搬入前的初始化，需配合[asc_loadunalign](reg/reg_load/asc_loadunalign.md)接口使用。 |
 | [asc_loadunalign](reg/reg_load/asc_loadunalign.md) | reg计算数据搬运接口，适用于从UB非32B对齐的起始地址连续搬入矢量数据寄存器的场景。 |
 | [asc_gather](reg/reg_load/asc_gather.md) | 根据索引位置index将源操作数src按元素收集到目的操作数dst中。 |
