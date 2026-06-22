@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -21,12 +21,7 @@
 #define ASCENDC_MODULE_OPERATOR_ATOMIC_INTERFACE_IMPL_H
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3510))
-#if (__NPU_ARCH__ == 5102)
-    #include "dav_m510/kernel_operator_atomic_impl.h"
-#else 
-    #include "dav_3510/kernel_operator_atomic_impl.h"
-#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 
 namespace AscendC {
 template <typename T>

@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -17,7 +17,7 @@
 #include "stub_def.h"
 #include "kernel_simt_cpu.h"
 
-#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 void __sync_workitems()
 {
     AscendC::Simt::Sync();

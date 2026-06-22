@@ -329,17 +329,3 @@ extern "C" __global__ __aicore__ void KernelTestReduceSum3() {
 }
 #endif
 
-#if __NPU_ARCH__ != 5102
-// __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue, T &maxMinIndex);
-extern "C" __global__ __aicore__ void KernelTestGetReduceMaxMinCount1() {
-    int32_t maxMinValue = 0;
-    int32_t maxMinIndex = 0;
-    AscendC::GetReduceMaxMinCount(maxMinValue, maxMinIndex);
-}
-
-// __aicore__ inline __inout_pipe__(S) void GetReduceMaxMinCount(T &maxMinValue);
-extern "C" __global__ __aicore__ void KernelTestGetReduceMaxMinCount2() {
-    int32_t maxMinValue = 0;
-    AscendC::GetReduceMaxMinCount(maxMinValue);
-}
-#endif
