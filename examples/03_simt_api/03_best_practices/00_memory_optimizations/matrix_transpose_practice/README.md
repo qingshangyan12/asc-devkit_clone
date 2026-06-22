@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含1个矩阵复制基准版本以及3个逐步优化的转置kernel版本，从直接索引转置开始，逐步引入UB中转、全局访存合并以及通过padding避免UB bank冲突，展示SIMT编程方式下矩阵转置的调优路径。
+本样例以矩阵转置为例，介绍Ascend C SIMT编程方式下的访存优化思路。样例包含1个矩阵复制基准版本以及3个逐步优化的转置kernel版本，从直接索引转置开始，逐步引入UB中转、全局访存合并以及通过padding降低UB Bank冲突的优化方法，展示SIMT编程方式下矩阵转置的调优路径。
 
 ## 支持的产品
 
@@ -49,7 +49,7 @@
 | Case 0 | 按相同坐标读写，不执行转置，GM连续读、连续写       | copy_kernel                           | 矩阵复制版本（基准）                    |
 | Case 1 | 直接按照转置公式计算输出坐标                       | transpose_naive_kernel                | 直接索引转置版本                        |
 | Case 2 | 通过UB暂存tile并交换读写方向，GM读写更接近连续访问 | transpose_coalesced_kernel            | UB中转 + 全局访存合并实现转置           |
-| Case 3 | 在UB tile中增加padding避免bank冲突                 | transpose_avoid_bank_conflicts_kernel | UB中转 + 全局访存合并 + 避免UB bank冲突 |
+| Case 3 | 在UB tile中增加padding降低bank冲突                 | transpose_avoid_bank_conflicts_kernel | UB中转 + 全局访存合并 + 避免UB Bank冲突 |
 
 #### 线程块布局
 
@@ -232,7 +232,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 ---
 
-### Case 3: UB中转 + 全局访存合并 + 避免UB bank冲突的转置版本
+### Case 3: UB中转 + 全局访存合并 + 避免UB Bank冲突的转置版本
 
 **优化目标**：在全局访存合并版本的基础上，通过UB padding避免转置读阶段的bank冲突
 
@@ -243,7 +243,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 - 同步后，从UB写回到GM与Case 2完全一致
 - 该版本没有改变算法路径，也没有改变block和线程切分，只是调整了UB中的物理布局
 
-下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank conflict是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
+下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
 
 UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank group = bank % 8`）。在SIMT编程模式下，每个bank又会被划分为4个sub bank，每个sub bank的宽度为8B。
 
@@ -315,14 +315,14 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 | Case 0       | 21.751            | **1x**            | 矩阵复制基线，GM连续读、连续写        |
 | Case 1       | 61.508            | **2.83x耗时**     | 直接索引转置，GM连续读、非连续写      |
 | Case 2       | 31.926            | **1.47x耗时**     | UB中转，全局访存合并                  |
-| Case 3       | 23.483            | **1.08x耗时**     | UB中转，全局访存合并，避免UB bank冲突 |
+| Case 3       | 23.483            | **1.08x耗时**     | UB中转，全局访存合并，避免UB Bank冲突 |
 
 ## 调优建议
 
 1. **先建立copy基线**：在分析访存类算子性能时，建议先测量copy场景耗时，再用实际算子的性能与其做对比。
 2. **优先关注GM访存连续性**：矩阵转置计算量很小，端到端耗时主要受读写访存模式影响。
 3. **使用UB中转改善写回模式**：当直接转置导致GM非连续写时，可以将不连续访问转移到UB侧，换取GM侧连续读写。
-4. **继续分析UB bank冲突**：GM访存合并后，UB转置读阶段的bank冲突可能成为下一层瓶颈，可以通过padding等方式调整UB物理布局，避免同一Warp的并发线程集中访问相同bank资源。
+4. **继续分析UB Bank冲突**：GM访存合并后，UB转置读阶段的bank冲突可能成为下一层瓶颈，可以通过padding等方式调整UB物理布局，避免同一Warp的并发线程集中访问相同bank资源。
 
 ## 编译运行
 

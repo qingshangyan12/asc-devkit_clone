@@ -1,4 +1,4 @@
-# 避免UB的bank冲突
+# 避免UB的Bank冲突
 
 【优先级】高
 
@@ -52,7 +52,7 @@ __global__ void transpose_coalesced_kernel(float *output, const float *input, in
 
 下图展示了UB中的 `tile`数组前10行元素按照行优先存储的排布，其中蓝色标记表示每行的第一个元素。按照地址低位交织规则，tile数组的第1行覆盖bank0到bank3，第2行覆盖bank4到bank7，第3行覆盖bank8到bank11，其余行依次类推。在32 x 32的UB tile中，同一个Warp的32个线程读取同一列时，会集中访问两个bank group的subbank 0。
 
-<img src="../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice/figures/case2bank.png">
+<img src="../../../figures/避免Bank冲突反例.png">
 
 在1024 x 1024矩阵转置样例中，该实现的性能数据如下：
 
@@ -86,7 +86,7 @@ __global__ void transpose_avoid_bank_conflicts_kernel(float *output, const float
 
 上述实现将UB中的 `tile`数组从32 x 32调整为32 x 34。算法、ThreadBlock切分、线程映射和GM访问方式都不变，只改变UB中每行的物理跨度。增加2列padding后，每行包含34个 `float` 数据，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。下图为增加padding后的内存布局；从地址映射看，同一个Warp的32个线程的UB访问会分布到各个bank group的不同subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
-<img src="../../../../../examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice/figures/case3bank.png">
+<img src="../../../figures/避免Bank冲突正例.png">
 
 在1024 x 1024矩阵转置样例中，该实现的性能数据如下：
 
