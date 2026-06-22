@@ -34,13 +34,13 @@ public:
     }
 };
 
-template <typename dstTPos, typename srcTpos, uint32_t Version>
-struct CopyUB2GMTensor2Tensor {
+template <uint32_t Version>
+struct CopyUB2GMRouting {
     using type = CopyUB2GMIgnore;
 };
 
-template <>
-struct CopyUB2GMTensor2Tensor<Location::GM, Location::UB, ArchVersion::V3510> {
+template <uint32_t Version>
+struct CopyUB2GMRouting<Version> {
     using type = DataCopyUB2GM3510;
 };
 

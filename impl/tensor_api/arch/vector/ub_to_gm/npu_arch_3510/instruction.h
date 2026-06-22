@@ -43,10 +43,8 @@ public:
         if ASCEND_IS_AIC {
             return;
         }
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            asc_copy_ub2gm_align(dst, src, blockCount, blockLen, cacheMode,
-                                     dstStride, static_cast<uint32_t>(srcStride));
-        }
+        asc_copy_ub2gm_align(dst, src, blockCount, blockLen, cacheMode,
+                                    dstStride, static_cast<uint32_t>(srcStride));
     }
 };
 
