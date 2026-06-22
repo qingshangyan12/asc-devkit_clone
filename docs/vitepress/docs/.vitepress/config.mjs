@@ -306,6 +306,7 @@ function fixCannFilterTags(src) {
   if (!/<(cann-filter|term|ph|__gm__|__ubuf__)\b/i.test(src)) return src
 
   return src
+    .replace(/^[ \t]*<\/?cann-filter\b[^>]*>[ \t]*$\n?/gm, '')
     .replace(/<\/?cann-filter\b[^>]*>/gi, '')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)<\/\1>/gis, '$2')
     .replace(/<(term|ph|__gm__|__ubuf__)\b[^>]*>/gi, '')
@@ -472,10 +473,8 @@ export default defineConfig({
         if (src.includes('<!-- RAW_HTML -->')) {
           const htmlContent = src.replace(/^.*<!-- RAW_HTML -->\s*/s, '').replace(/\s*$/, '')
           let html = addHeadingAnchors(htmlContent)
-          html = replaceCannFilterTags(html, {
-            start(type) { return `<div data-filter="${type}">` },
-            end() { return '</div>' },
-          })
+          html = html.replace(/<a\s+name\s*=\s*"([^"]+)"\s*><\/a>/gi, '<span id="$1"></span>')
+          html = html.replace(/<\/?cann-filter\b[^>]*>/gi, '')
           html = escapeVueInterpolations(html)
 
           const renderMathTex = (tex, display) => {
@@ -563,8 +562,14 @@ export default defineConfig({
   vite: {
     sourcemap: false,
     build: {
+      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         external: ['/pagefind/pagefind.js'],
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) return 'vendor'
+          },
+        },
       },
     },
     resolve: {

@@ -54,6 +54,47 @@ _OPTIONS = cmarkgfm.Options.CMARK_OPT_UNSAFE
 
 _MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md(#[^"]*)?"')
 
+_CUSTOM_TAG_NAMES = r'cann-filter|term|ph|__gm__|__ubuf__'
+
+_CUSTOM_TAG_RE = re.compile(
+    r'<(cann-filter)\b[^>]*>([\s\S]*?)</\1>|'
+    r'<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)</\3>',
+    re.IGNORECASE,
+)
+
+_CUSTOM_TAG_OPEN_RE = re.compile(
+    r'<(cann-filter|term|ph|__gm__|__ubuf__)\b[^>]*>',
+    re.IGNORECASE,
+)
+
+_CUSTOM_TAG_CLOSE_RE = re.compile(
+    r'</(cann-filter|term|ph|__gm__|__ubuf__)>',
+    re.IGNORECASE,
+)
+
+
+def _strip_custom_tags(md_text: str) -> str:
+    """在 markdown 解析前清除 cann-filter / term / ph / __gm__ / __ubuf__ 等自定义标签
+
+    这些标签在源文件中出现时会被 cmarkgfm 视为 raw HTML block，
+    破坏列表、引用块等 markdown 结构。必须在解析前清除。
+    """
+    lines = md_text.split('\n')
+    result = []
+    for line in lines:
+        stripped = line.strip()
+        if _CUSTOM_TAG_OPEN_RE.fullmatch(stripped) or _CUSTOM_TAG_CLOSE_RE.fullmatch(stripped):
+            continue
+        result.append(line)
+    md_text = '\n'.join(result)
+    md_text = re.sub(
+        r'<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)</\1>',
+        r'\2', md_text, flags=re.IGNORECASE,
+    )
+    md_text = _CUSTOM_TAG_OPEN_RE.sub('', md_text)
+    md_text = _CUSTOM_TAG_CLOSE_RE.sub('', md_text)
+    return md_text
+
 _CALLOUT_RE = re.compile(
     r"<blockquote>\s*\n<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](.*?)</p>\s*\n(.*?)</blockquote>",
     re.DOTALL,
@@ -383,6 +424,7 @@ def _highlight_code(html: str) -> str:
 
 
 def parse_string(text: str, gfm: bool = True) -> str:
+    text = _strip_custom_tags(text)
     if gfm:
         html = gfm_to_html(text)
     else:
