@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-class TestAscSyncInterArriveCAPI : public testing::Test {
+class TestAscSyncSubBlockArriveCAPI : public testing::Test {
 protected:
     void SetUp() {}
     void TearDown() {}
@@ -34,12 +34,12 @@ void ffts_cross_core_sync_stub(pipe_t pipe, uint64_t config)
 }
 } // namespace
 
-TEST_F(TestAscSyncInterArriveCAPI, c_api_asc_sync_inter_arrive_succ)
+TEST_F(TestAscSyncSubBlockArriveCAPI, c_api_asc_sync_subblock_arrive_succ)
 {
     pipe_t pipe = pipe_t::PIPE_V;
     int64_t flag_id = 2;
     MOCKER_CPP(ffts_cross_core_sync, void(pipe_t, uint64_t)).times(1).will(invoke(ffts_cross_core_sync_stub));
 
-    asc_sync_inter_arrive(pipe, flag_id);
+    asc_sync_subblock_arrive(pipe, flag_id);
     GlobalMockObject::verify();
 }
