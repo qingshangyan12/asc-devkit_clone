@@ -23,12 +23,7 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetMDLConfig(
-    const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
-    const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false,
-    const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true,
-    const bool enableL1CacheUB = false, const bool enableMixDualMaster = false,
-    const bool enableKdimReorderLoad = false)
+__aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false)
 ```
 
 ## 参数说明

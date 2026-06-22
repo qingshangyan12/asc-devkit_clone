@@ -14,9 +14,7 @@ kernel侧Normalize接口的计算需要开发者预留/申请临时空间，GetN
 ## 函数原型
 
 ```
-void GetNormalizeMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
-    const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
+void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

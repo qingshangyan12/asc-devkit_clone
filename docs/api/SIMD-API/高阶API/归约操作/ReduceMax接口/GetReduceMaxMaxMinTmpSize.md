@@ -10,9 +10,7 @@ kernel侧ReduceMax接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-void GetReduceMaxMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
-    bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetReduceMaxMaxMinTmpSize(const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

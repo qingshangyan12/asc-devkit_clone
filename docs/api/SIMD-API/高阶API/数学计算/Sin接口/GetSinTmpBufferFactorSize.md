@@ -27,8 +27,7 @@ void GetSinTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
 ```
 
 ```
-void GetSinTmpBufferFactorSize(
-    const SinConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+void GetSinTmpBufferFactorSize(const SinConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明
