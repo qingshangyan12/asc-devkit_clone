@@ -59,12 +59,6 @@ public:
 
     __aicore__ inline void Init()
     {
-#if __NPU_ARCH__ == 5102
-        constexpr bool IS_KROW =
-            INPUT_TYPE::isTrans ? INPUT_TYPE::TAG == InputTypeTag::A : INPUT_TYPE::TAG == InputTypeTag::B;
-#else
-        constexpr bool IS_KROW = false;
-#endif
         MATMUL_MODULE(CubeInBuffer)
             ->Init(
                 MATMUL_MODULE(BatchCopyCubeInParams)->GetBatchNum() *
@@ -129,11 +123,6 @@ private:
         // Calculate src and dst stride of one step
         // if user input matrixStride, use matrixStride as srcStride
         auto srcStride = matrixStride != 0 ? matrixStride : GetSrcStride<IS_TRANS, false>();
-#if __NPU_ARCH__ == 5102
-        auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS, IS_KROW>();
-#else
-        auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS>();
-#endif
         int64_t srcOffset = batchNumIdx * splitIdx * srcStride;
         int64_t dstOffset = batchNumIdx * splitIdx * dstStride;
         // if odd ground, the first block is unequal with the second block
@@ -147,34 +136,6 @@ private:
         srcGlobal.SetGlobalBuffer(MATMUL_MODULE(MatmulTensorInfo)->GetGlobalTensor().address_);
         srcGlobal.SetAddr(batchOffset);
         for (int32_t idx = 0; idx < iterNum; ++idx) {
-#if __NPU_ARCH__ == 5102
-            constexpr bool iskRowDirec = IS_KROW && IsSupportB8<TransT>();
-            MATMUL_MODULE(DataCopyWrapper)
-                ->CopyND2NZ(
-                    dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                    MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                    MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue, batchBlock,
-                    srcStride, dstStride, iskRowDirec);
-#else
-            if (srcStride >= UINT16_MAX) {
-                for (int i = 0; i < batchBlock; ++i) {
-                    MATMUL_MODULE(DataCopyWrapper)
-                        ->CopyND2NZ(
-                            dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                            MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                            MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue);
-                    dstOffset += dstStride;
-                    srcOffset += srcStride;
-                }
-            } else {
-                MATMUL_MODULE(DataCopyWrapper)
-                    ->CopyND2NZ(
-                        dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                        MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                        MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue,
-                        batchBlock, srcStride, dstStride);
-            }
-#endif
             dstOffset += iterDstStride;
             srcOffset += iterSrcStride;
         }
@@ -200,11 +161,6 @@ private:
         // Calculate src and dst stride of one step
         // if user input matrixStride, use matrixStride as srcStride
         auto srcStride = matrixStride != 0 ? matrixStride : GetSrcStride<IS_TRANS, false>();
-#if __NPU_ARCH__ == 5102
-        auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS, IS_KROW>();
-#else
-        auto dstStride = MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleSizeAlign<IS_TRANS>();
-#endif
         int64_t srcOffset = 0;
         if (MATMUL_MODULE(BatchCopyCubeInParams)->GetBatchNum() > MATMUL_MODULE(BatchLoop)->GetSplitBatchNum()) {
             if (splitIdx == 1) {
@@ -222,34 +178,6 @@ private:
         srcGlobal.SetGlobalBuffer(MATMUL_MODULE(MatmulTensorInfo)->GetGlobalTensor().address_);
         srcGlobal.SetAddr(batchOffset);
         for (auto idx = 0; idx < iterNum; ++idx) {
-#if __NPU_ARCH__ == 5102
-            constexpr bool iskRowDirec = IS_KROW && IsSupportB8<TransT>();
-            MATMUL_MODULE(DataCopyWrapper)
-                ->CopyND2NZ(
-                    dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                    MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                    MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue, batchNum,
-                    srcStride, dstStride, iskRowDirec);
-#else
-            if (srcStride >= UINT16_MAX) {
-                for (auto i = 0; i < batchNum; ++i) {
-                    MATMUL_MODULE(DataCopyWrapper)
-                        ->CopyND2NZ(
-                            dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                            MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                            MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue);
-                    dstOffset += dstStride;
-                    srcOffset += srcStride;
-                }
-            } else {
-                MATMUL_MODULE(DataCopyWrapper)
-                    ->CopyND2NZ(
-                        dstTensor[dstOffset], srcGlobal[srcOffset], 0, 0,
-                        MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleHeight<IS_TRANS>(),
-                        MATMUL_MODULE(BatchCopyCubeInParams)->template GetSingleWidth<IS_TRANS>(), srcDValue, batchNum,
-                        srcStride, dstStride);
-            }
-#endif
             dstOffset += iterDstStride;
             srcOffset += iterSrcStride;
         }
