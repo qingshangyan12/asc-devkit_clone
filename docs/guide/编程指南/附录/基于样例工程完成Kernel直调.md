@@ -65,7 +65,7 @@ AddKernelInvocationNeo
     #include "aclrtlaunch_add_custom.h"
     #else
     #include "tikicpulib.h"
-    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z);
+    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z);
     #endif
     ```
 
