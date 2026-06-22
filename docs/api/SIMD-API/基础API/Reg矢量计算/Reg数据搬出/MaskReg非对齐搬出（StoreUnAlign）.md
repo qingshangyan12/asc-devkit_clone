@@ -59,7 +59,8 @@ __simd_callee__ inline void StoreUnAlignPost(__ubuf__ T*& dstAddr, UnalignRegFor
 | postUpdateStride | 输入 | &bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
 
 ## 数据类型
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：b16、b32。
+
+目的操作数支持的数据类型为：b16、b32。
 
 ## 返回值说明
 
