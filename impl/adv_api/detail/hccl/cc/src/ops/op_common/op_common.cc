@@ -1383,6 +1383,7 @@ HcclResult SetOpParamAlgTag(OpParam &param, const std::string &algName)
 
 HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam &param)
 {
+    (void)comm;
     // 第一步：当前只给AICPU使用
     HcclOpExpansionMode finalMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;
     HCCL_DEBUG("[DecideHcclOpExpansionMode] configOpExpansionMode: AI_CPU");
