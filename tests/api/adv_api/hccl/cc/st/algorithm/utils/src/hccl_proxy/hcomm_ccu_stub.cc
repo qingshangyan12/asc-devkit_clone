@@ -366,6 +366,26 @@ HcclResult HcclCcuKernelLaunch(
     return HCCL_SUCCESS;
 }
 
+HcclResult HcclCommQueryCcuIns(HcclComm comm, CcuInsHandle *insHandles, uint32_t *insNum) {
+    return HCCL_SUCCESS;
+}
+
+CcuResult HcommCcuKernelRegisterStart(CcuInsHandle insHandle) {
+    return CCU_SUCCESS;
+}
+
+CcuResult HcommCcuKernelRegister(CcuInsHandle insHandle, const char *kernelFuncName, const void *kernelFunc, const void *kernelArg, CcuKernelHandle *kernelHandle) {
+    return CCU_SUCCESS;
+}
+
+CcuResult HcommCcuKernelRegisterEnd(CcuInsHandle insHandle) {
+    return CCU_SUCCESS;
+}
+
+CcuResult HcommCcuKernelLaunch(ThreadHandle threadHandle, CcuKernelHandle kernelHandle, const void *taskArgs, uint32_t argSize) {
+    return CCU_SUCCESS;
+}
+
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif  // __cplusplus

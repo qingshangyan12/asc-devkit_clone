@@ -10,12 +10,17 @@
 #ifndef CCU_KERNEL_ARG_H
 #define CCU_KERNEL_ARG_H
 
-#include <vector>
+namespace mc2_ops_hccl {
 
-#include "ccu_kernel_signature.h"
-#include "hcomm_primitives.h"
+bool UseCannBridge(const OpParam &param)
+{
+    return false;
+}
 
-namespace hcomm {
+std::unique_ptr<InsCollAlgBase> GetAlgExecViaCann(HcclCMDType opType, const std::string &algName)
+{
+    return nullptr;
+}
 
 class CcuKernelArg {
 public:

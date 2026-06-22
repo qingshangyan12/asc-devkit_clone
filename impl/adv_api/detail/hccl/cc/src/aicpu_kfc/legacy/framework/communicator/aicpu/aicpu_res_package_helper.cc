@@ -8,7 +8,7 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include "aicpu_res_package_helper.h"
-#include "binary_stream.h"
+#include "../../../common/binary_stream.h"
 #include "log.h"
 namespace Hccl {
 
