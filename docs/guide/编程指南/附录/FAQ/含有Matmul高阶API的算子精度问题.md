@@ -77,7 +77,7 @@
 
 2.  **Matmul Tiling是否有修改，修改是否合理**
 
-    一般含有Matmul的算子Tiling实现中，通过调用[GetTiling](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md)接口获取Matmul Tiling，其数据类型为[TCubeTiling](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体，这时这组Tiling值是合法的。某些情况下，用户自定义了一组TCubeTiling参数值，或者，基于[GetTiling](../../../../api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md)接口返回的TCubeTiling，自行修改了其中的部分值，这样的修改需要满足参数间的制约条件。
+    一般含有Matmul的算子Tiling实现中，通过调用[GetTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md)接口获取Matmul Tiling，其数据类型为[TCubeTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/TCubeTiling结构体.md)结构体，这时这组Tiling值是合法的。某些情况下，用户自定义了一组TCubeTiling参数值，或者，基于[GetTiling](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/高阶API/矩阵计算/Matmul-Tiling侧接口/Matmul-Tiling类/GetTiling.md)接口返回的TCubeTiling，自行修改了其中的部分值，这样的修改需要满足参数间的制约条件。
 
     为获取所有Tiling参数值，需要打印Tiling参数相关的日志。设置日志环境变量，获取MatmulTiling参数值。设置环境变量的命令如下：
 
