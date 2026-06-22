@@ -13,7 +13,7 @@ log/
 .DS_Store
 !/examples/**/10_math/log/
 !/scripts/presmoke/cases/**/10_math/log/
-third_party/
+/third_party/
 openssl-device-src/
 openssl-host-src/
 build_device/
@@ -24,3 +24,6 @@ build_device/
 .agent/skills/gitcode-issue
 .agent/skills/api-doc-generator
 .agent/skills/gitcode-pipeline
+.agent/*
+.claude/*
+.opencode/*

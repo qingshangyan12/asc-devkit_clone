@@ -36,6 +36,10 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/include/basic_api
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
+    # asc-comm 迁出后，对外伞头(tiling_api.h/kernel_api.h)仍按 hccl/*、hcomm/* 引用相关头，
+    # 这些头随 asc-comm 源码发布。ASC_COMM_HEADER_INCLUDE_DIR 由 cmake/third_party/asc-comm.cmake
+    # 暴露(hccl->mc2, hcomm->hcomm 软链)，供 UT 编译期解析。
+    ${ASC_COMM_HEADER_INCLUDE_DIR}
 )
 
 # # ================ adv_api kernel ut ================
@@ -187,8 +191,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_l0c_buffer.cpp
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
-    hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
@@ -364,10 +366,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     sort/topk/test_operator_radix_topk.cpp
     # transpose
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
-    # hccl
-    hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_roce_950.cpp
-    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
@@ -442,7 +440,6 @@ endforeach()
 
 # ================ adv_api tiling ut ================
 file(GLOB ASCENDC_TILING_TEST_SRC_FILES
-    tiling/test_hccl_tiling.cpp
     tiling/test_matmul_api_tiling.cpp
     tiling/test_tiling_v310.cpp
     tiling/test_tiling.cpp
@@ -456,7 +453,6 @@ file(GLOB ASCENDC_TILING_SRC_FILES
     ${ASCENDC_ADV_API_IMPL}/tiling/index/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/math/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/matmul/*cpp
-    ${ASCENDC_ADV_API_IMPL}/tiling/hccl/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/normalization/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/pad/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/quantization/*.cpp
@@ -537,7 +533,5 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         TASK_NUM 1
     )
 endforeach()
-
-add_subdirectory(hccl/cc)
 
 add_subdirectory(api_host_check)
