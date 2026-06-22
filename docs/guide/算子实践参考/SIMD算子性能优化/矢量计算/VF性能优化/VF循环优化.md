@@ -1,10 +1,10 @@
 # VF循环优化<a name="ZH-CN_TOPIC_0000002498328772"></a>
 
-Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现高性能向量计算的核心载体。VF函数中可以包含最多四层嵌套循环，每层循环中还可以包含多个串行循环，同时支持非循环的向量操作和标量操作。VF循环对控制结构的支持有限，仅支持for循环和条件判断，不支持switch、do-while和 while-do等其他控制结构。VF循环通过尽可能优化为硬件级向量循环（Hardware Loop），从而实现性能优化。
+Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现高性能向量计算的核心载体。VF函数中可以包含最多四层嵌套循环，每层循环中还可以包含多个串行循环，同时支持非循环的向量操作和标量操作。VF对控制结构的支持有限，仅支持for循环和条件判断，不支持switch、do-while和while-do等其他控制结构。VF循环通过尽可能优化为硬件级向量循环（Hardware Loop），从而实现性能优化。
 
-当VF函数中的循环满足[Hardware Loop编码规范](#section11326136133217)时，会被编译器优化为Hardware Loop，提升整体的编码性能，否则它的循环逻辑会由迭代变量和条件判断语句构成Software Loop，无法开启VF循环优化。
+当VF函数中的循环满足[Hardware Loop编码规范](#section11326136133217)时，会被编译器优化为Hardware Loop，提升整体执行性能；否则循环逻辑会由迭代变量和条件判断语句构成Software Loop，无法开启VF循环优化。
 
-在遵循Hardware Loop编码规范，确保循环可被优化为Hardware Loop基础上，可以通过成员变量访问、指令分布优化和地址管理优化等方面进一步提升性能。
+在遵循Hardware Loop编码规范、确保循环可被优化为Hardware Loop的基础上，可以通过成员变量访问、指令分布优化和地址管理优化等方面进一步提升性能。
 
 ## Hardware Loop编码规范<a name="section11326136133217"></a>
 
@@ -12,7 +12,7 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 
 -   迭代变量类型
 
-    VF内所有Loop的迭代变量必须是uint16\_t 类型。
+    VF内所有Loop的迭代变量必须是uint16\_t类型。
 
 -   起始值与步长
 
@@ -20,13 +20,13 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 
     每次迭代的步长必须是递增1。
 
--   循环內不允许跳转指令，比如条件判断跳转, 如if/else，三元运算符?。
+-   循环内不允许跳转指令，比如if/else、三元运算符?:等条件判断跳转。
 
-    VF内if/else在Loop内会阻碍Hardware Loop的生成，编译器虽然会尽可能的做if/else消除优化，但是不做完全性保证。
+    VF内if/else在Loop内会阻碍Hardware Loop的生成，编译器虽然会尽可能做if/else消除优化，但是不做完全性保证。
 
-    if控制流可使用if constexpr或者for\(1\)替换。if constexpr在编译时已经完成，无运行时开销，但是需要传入的参数是编译时常量，不能依赖运行时变量；for\(1\)可以触发编译器的循环优化，在当前硬件条件下，Vector侧执行Loop的性能是远远优于条件分支跳转的。
+    if控制流可使用if constexpr或者for(1)替换。if constexpr在编译时已经完成，无运行时开销，但是需要传入的参数是编译时常量，不能依赖运行时变量；for(1)可以触发编译器的循环优化，在当前硬件条件下，Vector侧执行Loop的性能是远远优于条件分支跳转的。
 
-    本示例展示了尾块处理场景，当尾块大小不为0时，hasTail为1，通过for\(1\)来代替if\(hasTail\)的判断，提高了Loop的性能。
+     本示例展示了尾块处理场景，当尾块大小不为0时，hasTail为1，通过for(1)来代替if(hasTai)的判断，提高了Loop的性能。
 
     ```
     //【反例】使用if语句
@@ -34,7 +34,7 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
     uint16_t hasTail = 0;
     // 通过!!tailK ，对是否产生尾块进行判断，如果srcK % floatRepSize余数为0，则hasTail对应bool值为0（false）,否则为1（true）
     hasTail = !!tailK;
-    if(tailK > 0){
+    if(hasTail){
       // 尾块处理内容
     }
     ```
@@ -44,7 +44,7 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
     uint16_t tailK = srcK % floatRepSize;
     uint16_t hasTail = 0;
     hasTail = !!tailK;
-    for(uint16_t i = 0 ; i < hasTail ; i++){
+    for (uint16_t i = 0; i < hasTail; i++) {
       // 尾块处理内容
     }
     ```
@@ -71,7 +71,8 @@ for (uint16_t i = 0; i < LoopBound; i++) {
 ```
 //【反例】无法被编译器优化，构成Software Loop
 for (uint16_t i = 0; i < LoopBound; i++) {     // Software Loop，循环内包含了if判断
-    if(){
+    if(cond){
+        ...
     }
 }
  
@@ -82,10 +83,10 @@ for (uint16_t i = 2; i < LoopBound*3; i+=2){  // Software Loop，循环起始值
 
 ## 循环内成员变量访问优化<a name="section168682445382"></a>
 
-在一个VF内，不推荐直接访问类的成员变量。直接访问类的成员变量相当于从栈上把内容搬运到Tensor寄存器中，之后通过地址访问Tensor上的内容，该操作将导致VF融合失效，建议通过局部变量临时传参解决，示例如下：
+在一个VF内，不推荐直接访问结构体或类对象的成员变量。直接访问结构体或类对象的成员变量相当于从栈上把内容搬运到Tensor寄存器中，之后通过地址访问Tensor上的内容，该操作将导致VF融合失效，建议通过局部变量临时传参解决，示例如下：
 
 ```
-//【反例】直接读取成员变量
+//【反例】直接读取结构体或类对象的成员变量
 __aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr,
     __ubuf__ float* srcAddr, __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
 {
@@ -96,7 +97,7 @@ __aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ f
 ```
 
 ```
-//【正例】通过局部变量传递VF内访问的成员变量
+//【正例】通过局部变量传递VF内访问的结构体或类对象成员变量
 __aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ float* sumAddr, __ubuf__ float* maxAddr,
     __ubuf__ float* srcAddr, __ubuf__ float* workAddr, const LastAxisShapeND originalSrcShape, const SoftMaxTiling tiling)
 {
@@ -104,7 +105,7 @@ __aicore__ inline void SoftMaxGenericNDImpVF(__ubuf__ float* dstAddr, __ubuf__ f
     uint16_t srcM = tiling.srcM;
     uint16_t reduceK = FLOAT_NUM_PER_BLK;
     uint16_t originK = (uint16_t)originalSrcShape.k;
-    for (uint16_t i = 0; i < (uint16_t)srcM; i++) {
+    for (uint16_t i = 0; i < srcM; i++) {
         AscendC::ReduceMax(maxAddr + i * reduceK, srcAddr + i * srcK, workAddr, originK);
     }
 }
@@ -172,7 +173,7 @@ for(uint16_t i = 0;i < extent1; i++){
     for(uint16_t j = 0;j < extent2; j++){
         for(uint16_t k = 0;k < extent3; k++){
             for(uint16_t m = 0;m < extent4; m++){
-                aReg = AscendC::Reg::CreateAddrReg(i, const1, j, const2, k, const3, m, const4);
+                aReg = AscendC::Reg::CreateAddrReg<T>(i, const1, j, const2, k, const3, m, const4);
                 AscendC::Reg::LoadAlign(srcReg, srcAddr, aReg);
             }
         }
@@ -191,9 +192,8 @@ __simd_vf__ inline void ComputeModeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
     AscendC::Reg::RegTensor<T> dstReg;
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     for (uint16_t i = 0; i < repeatTimes; ++i) {
-        AscendC::Reg::LoadAlign(dstReg, srcAddr+ i * oneRepeatSize);
-        AscendC::Reg::StoreAlign(dstAddr, dstReg, i * oneRepeatSize, mask);
+        AscendC::Reg::LoadAlign(dstReg, srcAddr + i * oneRepeatSize);
+        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
     }
 }
 ```
-
