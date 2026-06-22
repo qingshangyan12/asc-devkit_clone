@@ -4,7 +4,7 @@
 
 【描述】SIMT编程模式下，一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB。对于使用UB中转做转置、重排等操作的算子，即使GM读写已经连续，仍需要分析UB访问模式，避免UB内部访问成为新的性能瓶颈。
 
-以Ascend 950PR/Ascend 950DT为例，下图为UB bank结构示意图。UB总大小为256KB，划分为16个bank，每个bank包含512行，每行32B，共16KB。这16个bank进一步组织为8个bank group，每个bank group包含2个bank，bank i与bank i+8同属bank group i，即 `bank group = bank % 8`。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
+以Ascend 950PR/Ascend 950DT为例，下图为UB bank结构示意图。UB总大小为256KB，划分为16个bank，每个bank包含512行，每行32B，共16KB。这16个bank进一步组织为8个bank group，每个bank group包含2个bank，bank i与bank i+8同属bank group i，即 `bank_group_id = bank_id % 8`。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
 
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据的起始地址属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；当这些访问数据的起始地址属于同一个subbank的同起始地址，此时硬件会将请求合并为一次，不会发生subbank冲突。
 
@@ -12,7 +12,7 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 
 ![img](../../../figures/Ascend950bank结构示意图.png "Ascend950 bank结构示意图")
 
-UB地址采用低位交织，如下图所示，连续地址以32B为单位在bank0到bank15之间循环：第1个32B块位于bank0，第2个32B块位于bank1，依次类推；第16个32B块位于bank15，第17个32B块回到bank0的下一行。
+UB地址采用低位交织，如下图所示，连续地址按32B粒度映射到bank0到bank15：第1个32B地址段映射到bank0，第2个映射到bank1，依次类推；第16个映射到bank15，第17个映射回bank0的下一行。
 
 **图 2**  Ascend950 bank内存排布示意图
 
@@ -48,9 +48,9 @@ __global__ void transpose_coalesced_kernel(float *output, const float *input, in
 }
 ```
 
-上述实现通过UB中转保证了GM读写连续，这里的UB中的 `tile`数组表示用于暂存32 x 32矩阵块的二维UB数组。 `tile`数组的数据在UB中的排布为32 x 32。每行32个 `float`，共128B，恰好跨越4个bank。转置写回时，同一个Warp的线程会读取UB中的一列元素，即访问 `tile[threadIdx.x][threadIdx.y]`。由于行跨度固定为32个 `float`，同一列的32个元素会集中访问两个bank group的subbank 0，属于读读冲突场景。
+上述实现通过UB中转保证了GM读写连续，这里的UB中的`tile`数组表示用于暂存32 x 32矩阵块的二维UB数组。`tile`数组的数据在UB中的排布为32 x 32。每行32个`float`，共128B，恰好跨越4个bank。转置写回时，同一个Warp的线程会读取UB中的一列元素，即访问`tile[threadIdx.x][threadIdx.y]`。由于行跨度固定为32个`float`，同一列的32个元素会集中访问两个bank group的subbank 0，属于读读冲突场景。
 
-下图展示了UB中的 `tile`数组前10行元素按照行优先存储的排布，其中蓝色标记表示每行的第一个元素。按照地址低位交织规则，tile数组的第1行覆盖bank0到bank3，第2行覆盖bank4到bank7，第3行覆盖bank8到bank11，其余行依次类推。在32 x 32的UB tile中，同一个Warp的32个线程读取同一列时，会集中访问两个bank group的subbank 0。
+下图展示了UB中的`tile`数组前10行元素按照行优先存储的排布，其中蓝色标记表示每行的第一个元素。按照地址低位交织规则，tile数组的第1行覆盖bank0到bank3，第2行覆盖bank4到bank7，第3行覆盖bank8到bank11，其余行依次类推。在32 x 32的UB tile中，同一个Warp的32个线程读取同一列时，会集中访问两个bank group的subbank 0。
 
 <img src="../../../figures/避免Bank冲突反例.png">
 
@@ -84,7 +84,7 @@ __global__ void transpose_avoid_bank_conflicts_kernel(float *output, const float
 }
 ```
 
-上述实现将UB中的 `tile`数组从32 x 32调整为32 x 34。算法、ThreadBlock切分、线程映射和GM访问方式都不变，只改变UB中每行的物理跨度。增加2列padding后，每行包含34个 `float` 数据，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。下图为增加padding后的内存布局；从地址映射看，同一个Warp的32个线程的UB访问会分布到各个bank group的不同subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
+上述实现将UB中的`tile`数组从32 x 32调整为32 x 34。算法、ThreadBlock切分、线程映射和GM访问方式都不变，只改变UB中每行的物理跨度。增加2列padding后，每行包含34个`float`数据，行跨度变为17个subbank，同一列元素会错开排布到不同的subbank。下图为增加padding后的内存布局；从地址映射看，同一个Warp的32个线程的UB访问会分布到各个bank group的不同subbank中，即同一条访问指令下每个subbank仅有一个线程访问，从而避免上述读读冲突。
 
 <img src="../../../figures/避免Bank冲突正例.png">
 
