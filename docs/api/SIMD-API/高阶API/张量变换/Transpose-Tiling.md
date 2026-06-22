@@ -12,53 +12,37 @@
 -   获取最小临时空间大小
 
     ```
-    void GetTransposeMaxMinTmpSize(
-        const ge::Shape& srcShape, const uint32_t typeSize, const uint32_t transposeTypeIn, uint32_t& maxValue,
-        uint32_t& minValue)
+    void GetTransposeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const uint32_t transposeTypeIn, uint32_t& maxValue, uint32_t& minValue)
     ```
 
     ```
-    void GetConfusionTransposeMaxMinTmpSize(
-        const ge::Shape& srcShape, const uint32_t typeSize, const uint32_t transposeTypeIn, uint32_t& maxValue,
-        uint32_t& minValue)
+    void GetConfusionTransposeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const uint32_t transposeTypeIn, uint32_t& maxValue, uint32_t& minValue)
     ```
 
 -   获取Transpose Tiling
 
     ```
-    void GetTransposeTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn,
-        optiling::ConfusionTransposeTiling& tiling)
+    void GetTransposeTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn, optiling::ConfusionTransposeTiling& tiling)
     ```
 
     ```
-    void GetTransposeTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn,
-        AscendC::tiling::ConfusionTransposeTiling& tiling)
+    void GetTransposeTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn, AscendC::tiling::ConfusionTransposeTiling& tiling)
     ```
 
     ```
-    void GetConfusionTransposeOnlyTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
-        optiling::ConfusionTransposeTiling& tiling)
+    void GetConfusionTransposeOnlyTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, optiling::ConfusionTransposeTiling& tiling)
     ```
 
     ```
-    void GetConfusionTransposeOnlyTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize,
-        AscendC::tiling::ConfusionTransposeTiling& tiling)
+    void GetConfusionTransposeOnlyTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, AscendC::tiling::ConfusionTransposeTiling& tiling)
     ```
 
     ```
-    void GetConfusionTransposeTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn,
-        optiling::ConfusionTransposeTiling& tiling)
+    void GetConfusionTransposeTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn, optiling::ConfusionTransposeTiling& tiling)
     ```
 
     ```
-    void GetConfusionTransposeTilingInfo(
-        const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn,
-        AscendC::tiling::ConfusionTransposeTiling& tiling)
+    void GetConfusionTransposeTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const uint32_t transposeTypeIn, AscendC::tiling::ConfusionTransposeTiling& tiling)
     ```
 
 ## 参数说明

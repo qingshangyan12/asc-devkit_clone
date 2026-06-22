@@ -7,10 +7,7 @@
 ## 函数原型
 
 ```
-void SetMatmulConfigParams(
-    int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false,
-    ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET,
-    bool enVecND2NZIn = false)
+void SetMatmulConfigParams(int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false, ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET, bool enVecND2NZIn = false)
 ```
 
 ```
@@ -86,8 +83,9 @@ tiling.SetOrgShape(1024, 1024, 1024);
 tiling.SetBias(true);
 tiling.SetBufferSpace(-1, -1, -1);
 tiling.SetMatmulConfigParams(0); // 额外设置
-// matmul_tiling::MatmulConfigParams configParams = {1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-// matmul_tiling::MatrixTraverse::FIRSTM}; tiling.SetMatmulConfigParams(configParams);
+// matmul_tiling::MatmulConfigParams configParams =
+//     {1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT, matmul_tiling::MatrixTraverse::FIRSTM};
+// tiling.SetMatmulConfigParams(configParams);
 optiling::TCubeTiling tilingData;
 int ret = tiling.GetTiling(tilingData);
 ```

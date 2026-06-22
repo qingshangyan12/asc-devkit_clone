@@ -23,9 +23,7 @@
 ## 函数原型
 
 ```
-void GetLogicalAndsTmpBufferFactorSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLivedNodeCount,
-    uint32_t& extraBuf)
+void GetLogicalAndsTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLivedNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明

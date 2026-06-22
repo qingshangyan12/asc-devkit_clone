@@ -61,18 +61,14 @@
 
     ```
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(
-        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
-        LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(
-        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
-        const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, const CumSumInfo& cumSumInfo)
     ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。

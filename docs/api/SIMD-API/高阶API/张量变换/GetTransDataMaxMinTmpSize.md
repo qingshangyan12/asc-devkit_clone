@@ -10,9 +10,7 @@ kernel侧TransData接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-bool GetTransDataMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,
-    const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
+bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

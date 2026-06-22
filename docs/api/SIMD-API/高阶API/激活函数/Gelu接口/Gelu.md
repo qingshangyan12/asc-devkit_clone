@@ -37,9 +37,7 @@
 
     ```
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void Gelu(
-        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const uint32_t dataSize)
+    __aicore__ inline void Gelu(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t dataSize)
     ```
 
 ## 参数说明

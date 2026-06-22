@@ -99,14 +99,13 @@ OP_ADD(AlltoallvDoubleCommCustom);
 ```
 // HCCL TilingData声明
 BEGIN_TILING_DATA_DEF(AlltoallvDoubleCommCustomTilingData)
-TILING_DATA_FIELD_DEF(uint32_t, version); // HCCL tiling结构体的版本，设为2
-TILING_DATA_FIELD_DEF(
-    uint32_t,
-    mc2HcommCnt); // 各通信域中的通信算子总个数，当前最多支持3个。AlltoallvDoubleCommCustom算子kernel实现中每个通信域中均用了1个AlltoAllV，因此设为2
-TILING_DATA_FIELD_DEF_STRUCT(Mc2ServerCfg, serverCfg); // server通用参数配置，融合算子级
-TILING_DATA_FIELD_DEF_STRUCT(
-    Mc2HcommCfg, hcom1); // 各通信域中的每个通信任务参数配置，算子级，共有mc2HcommCnt个Mc2HcommCfg
-TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom2);
+    TILING_DATA_FIELD_DEF(uint32_t, version); // HCCL tiling结构体的版本，设为2
+    // 各通信域中的通信算子总个数，当前最多支持3个。AlltoallvDoubleCommCustom算子kernel实现中每个通信域中均用了1个AlltoAllV，因此设为2
+    TILING_DATA_FIELD_DEF(uint32_t, mc2HcommCnt);
+    TILING_DATA_FIELD_DEF_STRUCT(Mc2ServerCfg, serverCfg); // server通用参数配置，融合算子级
+    // 各通信域中的每个通信任务参数配置，算子级，共有mc2HcommCnt个Mc2HcommCfg
+    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom1); 
+    TILING_DATA_FIELD_DEF_STRUCT(Mc2HcommCfg, hcom2);
 END_TILING_DATA_DEF;
 
 REGISTER_TILING_DATA_CLASS(AlltoallvDoubleCommCustom, AlltoallvDoubleCommCustomTilingData);

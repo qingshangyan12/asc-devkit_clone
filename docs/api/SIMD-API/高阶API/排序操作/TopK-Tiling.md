@@ -53,31 +53,19 @@ Ascend C提供TopK Tiling API，方便用户获取TopK kernel计算时所需的T
 ## 函数原型
 
 ```
-bool GetTopKMaxMinTmpSize(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter,
-    const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest,
-    const uint32_t dataTypeSize, uint32_t& maxValue, uint32_t& minValue)
+bool GetTopKMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest, const uint32_t dataTypeSize, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-bool GetTopKMaxMinTmpSize(
-    const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource, const bool isInitIndex,
-    enum TopKMode mode, const bool isLargest, ge::DataType dataType, const TopKConfig& config, uint32_t& maxValue,
-    uint32_t& minValue)
+bool GetTopKMaxMinTmpSize(const int32_t inner, const int32_t outter, const int32_t k, const bool isReuseSource, const bool isInitIndex, enum TopKMode mode, const bool isLargest, ge::DataType dataType, const TopKConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-bool TopKTilingFunc(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter,
-    const int32_t k, const uint32_t dataTypeSize, const bool isInitIndex, enum TopKMode mode, const bool isLargest,
-    optiling::TopkTiling& topKTiling)
+bool TopKTilingFunc(const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter, const int32_t k, const uint32_t dataTypeSize, const bool isInitIndex, enum TopKMode mode, const bool isLargest, optiling::TopkTiling& topKTiling)
 ```
 
 ```
-bool TopKTilingFunc(
-    const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter,
-    const int32_t k, const uint32_t dataTypeSize, const bool isInitIndex, enum TopKMode mode, const bool isLargest,
-    AscendC::tiling::TopkTiling& topKTiling)
+bool TopKTilingFunc(const platform_ascendc::PlatformAscendC& ascendcPlatform, const int32_t inner, const int32_t outter, const int32_t k, const uint32_t dataTypeSize, const bool isInitIndex, enum TopKMode mode, const bool isLargest, AscendC::tiling::TopkTiling& topKTiling)
 ```
 
 ## 参数说明
