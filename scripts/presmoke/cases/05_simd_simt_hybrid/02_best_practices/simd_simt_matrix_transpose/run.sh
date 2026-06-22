@@ -13,7 +13,7 @@ set -euo pipefail
 
 CASE_REL=05_simd_simt_hybrid/02_best_practices/simd_simt_matrix_transpose
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../../../_case_entry.sh"
+source "$SCRIPT_DIR/../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
 case_build() {
