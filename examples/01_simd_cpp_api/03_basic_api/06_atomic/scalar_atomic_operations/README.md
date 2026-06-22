@@ -30,10 +30,10 @@
 本样例通过编译参数 `SCENARIO_NUM` 来切换不同的场景：
 
 **场景1：AtomicAdd原子加操作**  
-  三个核依次调度，每个核对GM的首个元素（dst[0]）原子加1，返回值为原子操作前的旧值。最终dst[0]的值为初始值加3
+  三个核并行执行，每个核对GM的首个元素（dst[0]）原子加1。最终dst[0]的值为初始值加3
 
 **场景2：AtomicCas原子比较交换操作**  
-  三个核依次调度，每个核检查GM首个元素是否等于expected值1，若相等则替换为newValue值2，不相等则不修改。返回值为原子操作前的旧值
+  三个核并行执行，每个核检查GM首个元素是否等于expected值1，若相等则替换为newValue值2，不相等则不修改。
 
 <table border="2">
 <caption>表1：场景配置对照表</caption>
@@ -46,7 +46,7 @@
 
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

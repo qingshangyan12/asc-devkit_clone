@@ -83,7 +83,7 @@
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表 1**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\) 原型定义模板参数说明
+**表1**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\)原型定义模板参数说明
 
 <a name="table634418773417"></a>
 <table><thead align="left"><tr id="row1934537133415"><th class="cellrowborder" valign="top" width="12.13%" id="mcps1.2.3.1.1"><p id="p1934597103419"><a name="p1934597103419"></a><a name="p1934597103419"></a>参数名称</p>
@@ -100,7 +100,7 @@
 </tbody>
 </table>
 
-**表 2**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\) 原型定义参数说明
+**表2**  bool InitBuffer\(T& que, uint8\_t num, uint32\_t len\)原型定义参数说明
 
 <a name="table193329316393"></a>
 <table><thead align="left"><tr id="row123331131153919"><th class="cellrowborder" valign="top" width="11.940000000000001%" id="mcps1.2.4.1.1"><p id="p8333133153913"><a name="p8333133153913"></a><a name="p8333133153913"></a>参数名称</p>
@@ -135,7 +135,7 @@
 </tbody>
 </table>
 
-**表 3**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\) 原型定义模板参数说明
+**表3**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\)原型定义模板参数说明
 
 <a name="table115271653105120"></a>
 <table><thead align="left"><tr id="row8527185375112"><th class="cellrowborder" valign="top" width="12.13%" id="mcps1.2.3.1.1"><p id="p10527155312514"><a name="p10527155312514"></a><a name="p10527155312514"></a>参数名称</p>
@@ -167,7 +167,7 @@
 </tbody>
 </table>
 
-**表 4**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\) 原型定义参数说明
+**表4**  bool InitBuffer\(T& que, const Std::tuple<U, V\>& addr0, const Addrs&... addrs\)原型定义参数说明
 
 <a name="table2527125319516"></a>
 <table><thead align="left"><tr id="row10527553125118"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p95271153205115"><a name="p95271153205115"></a><a name="p95271153205115"></a>参数名称</p>
@@ -202,7 +202,7 @@
 </tbody>
 </table>
 
-**表 5**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义模板参数说明
+**表5**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义模板参数说明
 
 <a name="table873615294112"></a>
 <table><thead align="left"><tr id="row473742114115"><th class="cellrowborder" valign="top" width="12.34%" id="mcps1.2.3.1.1"><p id="p1073720204115"><a name="p1073720204115"></a><a name="p1073720204115"></a>参数名称</p>
@@ -213,13 +213,13 @@
 </thead>
 <tbody><tr id="row167376215416"><td class="cellrowborder" valign="top" width="12.34%" headers="mcps1.2.3.1.1 "><p id="p14568152324113"><a name="p14568152324113"></a><a name="p14568152324113"></a>bufPos</p>
 </td>
-<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="../../../../其他数据类型/TPosition.md">TPosition</a>类型。</p>
+<td class="cellrowborder" valign="top" width="87.66000000000001%" headers="mcps1.2.3.1.2 "><p id="p188271137124113"><a name="p188271137124113"></a><a name="p188271137124113"></a>TBuf所在的逻辑位置，<a href="../../../数据结构/辅助数据结构//TPosition.md">TPosition</a>类型。</p>
 </td>
 </tr>
 </tbody>
 </table>
 
-**表 6**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义参数说明
+**表6**  InitBuffer\(TBuf<bufPos\>& buf, uint32\_t len\)原型定义参数说明
 
 <a name="table5376122715308"></a>
 <table><thead align="left"><tr id="row1337716275309"><th class="cellrowborder" valign="top" width="12.36%" id="mcps1.2.4.1.1"><p id="p1537762711305"><a name="p1537762711305"></a><a name="p1537762711305"></a>参数名称</p>
@@ -282,4 +282,3 @@ AscendC::TBuf<AscendC::TPosition::A1> buf; // 输出数据管理对象，TPositi
 uint32_t len = 128;
 pipe.InitBuffer(buf, len);
 ```
-

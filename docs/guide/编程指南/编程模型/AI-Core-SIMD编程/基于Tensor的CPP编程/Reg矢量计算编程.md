@@ -137,7 +137,7 @@ __aicore__ inline void compute()
 }
 ```
 
-VF函数内部通常遵循如下骨架：
+VF函数内部通常遵循如下骨架，这种写法使基础API能够与`__aicore__`中`LocalTensor`流程衔接。
 
 ```text
 for (i = 0; i < repeat_times; ++i) {
@@ -398,7 +398,7 @@ Store(dst_addr, dst_reg, 10);
 
 #### 对齐搬运
 
-`LoadAlign` / `StoreAlign`要求UB地址满足32B对齐。相比通用搬运，对齐搬运的性能开销更低，是连续对齐场景下的首选接口。
+[`LoadAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) / [`StoreAlign`](../../../../../api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md)适用于UB地址满足对齐要求的连续搬入/搬出，是Reg矢量编程中最常见的搬运接口。在搬运时可以按照内置的功能随路进行数据排布等操作，具体功能以对应API章节为准。
 
 ```cpp
 using namespace AscendC::Reg;

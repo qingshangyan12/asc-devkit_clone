@@ -28,7 +28,8 @@
 ## 样例描述
 
 unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。
-本样例中，A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行Mmad指令时，沿着K轴进行8次迭代循环，每次迭代K长度为64。每次迭代中Mmad计算时，unitFlag的取值说明如表1所示：
+
+本样例中，A矩阵shape为[128, 512]，B矩阵shape为[512, 256]，执行Mmad指令时，沿着K轴进行8次迭代循环，每次迭代K长度为64。输入文件 `x1_gm.bin` 按 `[kRound, M, K/kRound]` 的连续K分块布局存储，便于每次迭代直接读取当前K分块。前7次Mmad仍需继续向L0C累加，unitFlag设置为2；最后1次Mmad累加完成后需允许Fixpipe读取L0C，Mmad和Fixpipe的unitFlag设置为3。每次迭代中Mmad计算时，unitFlag的取值说明如表1所示：
 
 <a name="表1"></a>
 <table border="2" align="center">
@@ -41,6 +42,11 @@ unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能�
   </tr>
   <tr>
     <td>0</td>
+    <td>不使能unitFlag</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>1</td>
     <td>保留值</td>
     <td>-</td>
   </tr>
@@ -52,7 +58,7 @@ unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能�
   <tr>
     <td>3</td>
     <td>使能unitFlag，硬件执行完指令之后，会将unitFlag功能关闭</td>
-    <td>最后1次Mmad和Fixpipe需设为3，保证Fixpipe可以读取L0C；</td>
+    <td>最后1次Mmad和Fixpipe需设为3，保证Fixpipe可以读取L0C</td>
   </tr>
 </table>
 
@@ -60,7 +66,7 @@ unitFlag用于控制Mmad指令和Fixpipe指令细粒度并行。使能该功能�
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

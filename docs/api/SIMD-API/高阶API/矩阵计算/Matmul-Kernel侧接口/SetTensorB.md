@@ -9,8 +9,12 @@
 - Atlas 推理系列产品AI Core：支持
 - Atlas 推理系列产品Vector Core：不支持
 - Atlas 训练系列产品：不支持
+<!-- npu="x90" id1 -->
 - Kirin X90：支持
+<!-- end id1 -->
+<!-- npu="9030" id2 -->
 - Kirin 9030：支持
+<!-- end id2 -->
 
 ## 功能说明
 
@@ -36,18 +40,18 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | SrcBT | 操作数的数据类型。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gm | 输入 | B矩阵。类型为[GlobalTensor](../../../基础数据结构/GlobalTensor/GlobalTensor.md)。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。 |
-| rightMatrix | 输入 | B矩阵。类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。<br><br>若设置TSCM首地址，默认矩阵可全载，已经位于TSCM，Iterate接口无需再进行GM->A1/B1搬运。 |
+| gm | 输入 | B矩阵。类型为[GlobalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。 |
+| rightMatrix | 输入 | B矩阵。类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为TSCM/VECOUT。SrcBT参数表示B矩阵的数据类型。<br><br>不同型号支持的数据类型请参考[gm和rightMatrix支持的数据类型](#li12616155731720)。<br><br>若设置TSCM首地址，默认矩阵可全载，已经位于TSCM，Iterate接口无需再进行GM->A1/B1搬运。 |
 | bScalar | 输入 | B矩阵中设置的值。支持传入标量数据，标量数据会被扩展为一个形状为[1, K]的tensor参与矩阵乘计算，tensor的数值均为该标量值。例如，开发者可以通过将bScalar设置为1来实现矩阵A在K方向的reduce sum操作。SrcBT参数表示B矩阵的数据类型。<br>不同型号支持的数据类型请参考[bScalar支持的数据类型](#li12616155731723)。 |
 | isTransposeB | 输入 | B矩阵是否需要转置。<br><br>注意：<br>若B矩阵MatmulType的ISTRANS参数设置为true，该参数可以为true也可以为false，即运行时可以转置和非转置交替使用；<br>若B矩阵MatmulType的ISTRANS参数设置为false，该参数只能设置为false，若强行设置为true，精度会有异常；<br>对于非half、非bfloat16_t输入类型的场景，为了确保Tiling侧与Kernel侧L1 Buffer空间计算大小保持一致及结果精度正确，该参数取值必须与Kernel侧定义B矩阵MatmulType的[ISTRANS](Matmul使用说明.md#p84551411817)参数以及Tiling侧SetBType()接口的[isTrans](../Matmul-Tiling侧接口/Matmul-Tiling类/SetBType.md#p47369411111)参数保持一致，即上述三个参数必须同时设置为true或同时设置为false。 |
 
@@ -70,9 +74,13 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
     Atlas 200I/500 A2 推理产品，支持的数据类型为：half、bfloat16_t、int8_t、float。
 
+    <!-- npu="x90" id3 -->
     Kirin X90，支持的数据类型为：half、int8_t。
+    <!-- end id3 -->
 
+    <!-- npu="9030" id4 -->
     Kirin 9030，支持的数据类型为：half。
+    <!-- end id4 -->
 
 -   bScalar支持的数据类型<a id="li12616155731723"></a>
 
@@ -86,9 +94,13 @@ Atlas 200I/500 A2 推理产品，不支持SetTensorB\(SrcBT bScalar\)接口原�
 
     Atlas 200I/500 A2 推理产品，不支持该参数。
 
+    <!-- npu="x90" id5 -->
     Kirin X90，支持的数据类型为：half。
+    <!-- end id5 -->
 
+    <!-- npu="9030" id6 -->
     Kirin 9030，支持的数据类型为：half。
+    <!-- end id6 -->
 
 ## 调用示例
 

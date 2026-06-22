@@ -22,11 +22,11 @@ __aicore__ inline void SetGradOutput(const AscendC::GlobalTensor<SrcT> &gradOutp
 
 ## 参数说明
 
-**表 1**  接口参数说明
+**表1**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gradOutput | 输入 | GradOutput矩阵在Global Memory上的首地址。类型为[GlobalTensor](../../../../基础数据结构/GlobalTensor/GlobalTensor.md)。SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。 |
+| gradOutput | 输入 | GradOutput矩阵在Global Memory上的首地址。类型为[GlobalTensor](../../../../基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md)。SrcT表示GradOutput矩阵的数据类型，当前支持的数据类型为：half、bfloat16_t。 |
 
 ## 返回值说明
 
@@ -45,4 +45,3 @@ GlobalTensor<gradOutputType> gradOutputGm_;
 gradOutputGm_.SetGlobalBuffer((__gm__ gradOutputType *)gradOutput);
 gradInput_.SetGradOutput(gradOutputGm_);
 ```
-

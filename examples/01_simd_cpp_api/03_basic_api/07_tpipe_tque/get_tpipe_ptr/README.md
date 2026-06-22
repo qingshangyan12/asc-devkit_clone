@@ -131,7 +131,7 @@
 
 - 配置环境变量
 
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -168,5 +168,5 @@
 
   执行结果如下，说明精度对比成功：
   ```bash
-  [Success] Case accuracy is verification passed.
+  [Success] Case accuracy verification passed.
   ```

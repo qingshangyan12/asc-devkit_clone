@@ -18,19 +18,19 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 
 本接口的反量化策略包括PER\_TENSOR，PER\_CHANNEL，PER\_TOKEN，PER\_GROUP四种，反量化系数scale在PER\_TENSOR场景下为标量，其余场景下为矢量，具体计算公式如下：
 
--   PER\_TENSOR场景 （按张量反量化）：scale和offset的shape为\[1\]。
+-   PER\_TENSOR场景（按张量反量化）：scale和offset的shape为\[1\]。
 
     ![](../../../figures/zh-cn_formulaimage_0000002295238441.png)
 
--   PER\_CHANNEL场景 （按通道反量化）：srcTensor的shape为\[m, n\]，每个channel维度对应一个量化参数，scale和offset的shape为\[1, n\]。
+-   PER\_CHANNEL场景（按通道反量化）：srcTensor的shape为\[m, n\]，每个channel维度对应一个量化参数，scale和offset的shape为\[1, n\]。
 
     ![](../../../figures/zh-cn_formulaimage_0000002260632216.png)
 
--   PER\_TOKEN场景 （按token反量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
+-   PER\_TOKEN场景（按token反量化）：srcTensor的每组token（token为n方向，共有m组token）中的元素共享一个量化参数，srcTensor的shape为\[m, n\]时，scale和offset的shape为\[m, 1\]。
 
     ![](../../../figures/zh-cn_formulaimage_0000002260737926.png)
 
--   PER\_GROUP场景 （按组反量化）：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
+-   PER\_GROUP场景（按组反量化）：定义group的计算方向为k方向，srcTensor在k方向上每groupSize个元素共享一组scale和offset。srcTensor的shape为\[m, n\]时，如果kDim=0，表示k是m方向，scale和offset的shape为\[\(m + groupSize - 1\) / groupSize, n\]；如果kDim=1，表示k是n方向，scale和offset的shape为\[m，\(n + groupSize - 1\) / groupSize\]。
     -   k为m方向，即公式中i轴为group的计算方向（kDim=0）：
 
         ![](../../../figures/zh-cn_formulaimage_0000002295268473.png)
@@ -65,7 +65,7 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -89,15 +89,15 @@ enum class DequantizePolicy : int32_t {
 };
 ```
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>假设srcTensor的shape为[m, n]，每行数据（即n个输入数据）所占字节数要求32字节对齐。 |
+| dstTensor | 输出 | 目的操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| srcTensor | 输入 | 源操作数。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>假设srcTensor的shape为[m, n]，每行数据（即n个输入数据）所占字节数要求32字节对齐。 |
 | scale | 输入 | 输入数据反量化时的缩放因子。 |
 | offset | 输入 | 输入数据反量化时的偏移量。当前为预留参数，可配置为0或空Tensor。 |
-| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetDequantizeMaxMinTmpSize](GetDequantizeMaxMinTmpSize.md)。 |
+| sharedTmpBuffer | 输入 | 临时缓存。类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[GetDequantizeMaxMinTmpSize](GetDequantizeMaxMinTmpSize.md)。 |
 | params | 输入 | 反量化接口的参数，DequantizeParams类型，定义如下方代码所示，其中参数的含义如下。<br>m：m方向元素个数。<br>n：n方向元素个数。n值对应的数据大小需满足32字节对齐的要求，即shape最后一维为n的输入或输出均需要满足该维度上32字节对齐的要求。<br>groupSize：PER_GROUP场景有效，表示groupSize行/列数据共用一个scale。groupSize的取值必须大于0且是32的整倍数。 |
 
 ```
@@ -108,7 +108,7 @@ struct DequantizeParams {
 };
 ```
 
-**表 3**  输入输出支持的数据类型组合
+**表3**  输入输出支持的数据类型组合
 
 | 量化策略 | dstTensor | srcTensor | scale/offset |
 | --- | --- | --- | --- |

@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -28,7 +40,7 @@ uint8_t byte1 = (tmp64 >> (selector1 * 8)) & 0xFF;
 uint8_t byte2 = (tmp64 >> (selector2 * 8)) & 0xFF;
 uint8_t byte3 = (tmp64 >> (selector3 * 8)) & 0xFF;
 
-// result 为BytePerm返回值，其结果由对应字节按照顺序拼接而成
+// result为BytePerm返回值，其结果由对应字节按照顺序拼接而成
 uint32_t result = byte0 | (byte1 << 8) | (byte2 << 16) | (byte3 << 24);
 ```
 
@@ -40,7 +52,7 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -88,4 +100,3 @@ unsigned int __byte_perm(unsigned int x, unsigned int y, unsigned int s)
         dst[idx] = __byte_perm(x[idx], y[idx], s[idx]);
     }
     ```
-

@@ -4,7 +4,7 @@
 
 本样例以Gelu计算为例，介绍RegBase的向量性能调优方法，样例展示使能VF融合和循环展开之后的性能收益情况。
 
-> **前置阅读**：[Gelu算子入门样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_vector_reg/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
+> **前置阅读**：[Gelu算子入门样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
 
 **优化路径**：
 - Case 0: Gelu未使能VF融合能力（基准）
@@ -86,7 +86,7 @@ $$
 | 方式2 | 8 | 3 |
 | 方式3 | 8 | 2 |
 
-令输入UB内存为xLoacal，输出UB内存为yLocal，临时UB内存统一用tmp0、tmp1、tmp2等表示
+令输入UB内存为xLocal，输出UB内存为yLocal，临时UB内存统一用tmp0、tmp1、tmp2等表示
 
 **方式1计算步骤分解**（共13条指令，需5份内存）：
 
@@ -135,7 +135,7 @@ $$
 **对比总结**：
 
 - **计算指令数**：方式2和方式3均比方式1减少 **5条指令**
-- **内存份数**：方式2比方式1减少 **1份内存**，方式3比方式1减少 **3份内存**
+- **内存份数**：方式2比方式1减少 **2份内存**，方式3比方式1减少 **3份内存**
 - **实现选择**：方式3是最优实现，计算指令数最少，内存占用最低，本样例采用方式3实现
 
 **样例规格**：
@@ -279,7 +279,7 @@ __aicore__ inline void GeluCompute(
 | `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬入.md) |
 | `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬运/连续对齐搬出.md) |
 | `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/asc_vf_call.md) |
-| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [MoveMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/MaskReg计算/MoveMask.md) |
+| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
 
 **原理解析**：
 
@@ -548,22 +548,7 @@ $$
 
 **Step 3: 计算VF融合场景下理论vector耗时**
 
-在VF融合场景下，vector指令具有双发特性，即常规计算指令并行度可以达到512 bytes/cycle，但是exp和div在双发场景下不能简单按照128 bytes/cycle进行估计。
-如下图所示，在time=0时刻，同时发射Exp和Mul指令，Mul只需要1个cycle执行完成，但是Exp需要4个cycle执行完成，在Exp执行期间，time=1时刻同时发射了Mul和Muls并行执行，并以此类推继续发射其它指令。
-
-```
-Time:     0     1     2     3     4     5     6     7
-          |-----|-----|-----|-----|-----|-----|-----|
-Exp:      |<=====================>|
-Mul:      |<--->|
-Mul:            |<--->|
-Muls:           |<--->|
-Add:                  |<--->|
-Adds:                 |<--->|
-Muls:                       |<--->|
-Adds:                       |<--->|
-```
-因此在VF融合场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。
+在VF融合场景下，vector指令具有双发特性，即常规计算指令并行度可以达到512 bytes/cycle，但是exp和div在双发场景下不能简单按照128 bytes/cycle进行估计。在VF融合场景下，更多采用IPC(Instructions Per Cycle，每cycle指令发射数量)来衡量性能。
 
 case 1场景，单核vector计算指令数量：
 

@@ -9,7 +9,7 @@
 
 【描述】为了提高数据访问的效率和吞吐量，Unified Buffer采用了bank（大小相等的内存模块）结构设计。Unified Buffer总大小为192K，划分为48个bank。每个bank由128行组成，每行长度为32B。这48个bank进一步组织为16个bank group，每个bank group包含3个bank，例如bank15、bank31和bank47组成一个bank group。
 
-**图 1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig1132542915196"></a>  
+**图1**  bank结构示意图（图中箭头方向表示内存排布的顺序）<a name="fig1132542915196"></a>  
 ![](../../../../figures/bank结构示意图（图中箭头方向表示内存排布的顺序）.png "bank结构示意图（图中箭头方向表示内存排布的顺序）")
 
 每个bank可以独立地进行数据的读写操作，允许多个数据请求同时进行。然而，当多个读写操作试图同时访问同一个bank或bank group时，由于硬件资源的限制，这些操作必须排队等待，会导致bank冲突，引起性能下降。
@@ -26,14 +26,14 @@ bank冲突主要可以分为以下三种场景：
 
 下文给出了一些具体的示例，假设，0x10000地址在bank16上，0x10020在bank17上，0x20020在bank33上，如下图所示：
 
-**图 2**  地址分配示意图<a name="fig129245311375"></a>  
+**图2**  地址分配示意图<a name="fig129245311375"></a>  
 ![](../../../../figures/地址分配示意图.png "地址分配示意图")
 
 -   读写冲突示例
 
     Vector指令的源操作数src和目的操作数dst同时读写到同一个bank时造成读写冲突，具体分析如下：
 
-    **表 1**  读写冲突示例
+    **表1**  读写冲突示例
 
     <a name="table06741342154717"></a>
     <table><thead align="left"><tr id="row1767434244710"><th class="cellrowborder" valign="top" width="5.9988002399520095%" id="mcps1.2.7.1.1"><p id="p17674144211470"><a name="p17674144211470"></a><a name="p17674144211470"></a>序号</p>
@@ -83,7 +83,7 @@ bank冲突主要可以分为以下三种场景：
 
     Vector指令目的操作数dst对应的8个DataBlock（block0-block7）同时写到一个bank group时造成写写冲突，具体分析如下：
 
-    **表 2**  写写冲突示例
+    **表2**  写写冲突示例
 
     <a name="table11121346153814"></a>
     <table><thead align="left"><tr id="row212044623812"><th class="cellrowborder" valign="top" width="5.789726356216995%" id="mcps1.2.9.1.1"><p id="p13120184619386"><a name="p13120184619386"></a><a name="p13120184619386"></a>序号</p>
@@ -144,7 +144,7 @@ bank冲突主要可以分为以下三种场景：
 -   读读冲突
     -   Vector指令多个源操作数同时读到同一个bank group时造成读读冲突，具体分析如下：
 
-        **表 3**  双src场景读读冲突示例
+        **表3**  双src场景读读冲突示例
 
         <a name="table1318881512255"></a>
         <table><thead align="left"><tr id="row8188715102517"><th class="cellrowborder" valign="top" width="6.5786842631473705%" id="mcps1.2.7.1.1"><p id="p111881154254"><a name="p111881154254"></a><a name="p111881154254"></a>序号</p>
@@ -192,7 +192,7 @@ bank冲突主要可以分为以下三种场景：
 
     -   Vector指令某一个源操作数对应的8个DataBlock（block0-block7）读到同一个bank group时造成读读冲突，具体分析如下：
 
-        **表 4**  单src场景读读冲突示例
+        **表4**  单src场景读读冲突示例
 
         <a name="table332972534717"></a>
         <table><thead align="left"><tr id="row832822516476"><th class="cellrowborder" valign="top" width="6.117919521374119%" id="mcps1.2.9.1.1"><p id="p157111614175011"><a name="p157111614175011"></a><a name="p157111614175011"></a>序号</p>
@@ -311,8 +311,7 @@ bank冲突主要可以分为以下三种场景：
 
 -   **优化地址分配**
 
-    实现连续4096个float元素的加法z = x + y，通过在内存分配时适当扩大内存，保证在一个Repeat内，x和y不会同时出现在同一个bank group内，x/y和z不会同时出现同一个bank内。完整样例可参考[避免bank冲突样例](https://gitee.com/ascend/samples/tree/master/operator/ascendc/4_best_practices/4_bank_conflict)。
-
+    实现`8192 × 8192` half ND矩阵到全局紧凑NZ布局的转换，切分后，每个Tile块完成`144 × 128` half数据的转换。通过在内存分配时适当扩大内存，调整单次搬运内相邻Datablock的地址步长，保证在同一个Copy搬运操作内，不同Datablock的写操作不会同时出现在一个bank group内。完整样例可参考[避免bank冲突样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz)。
     实现方案对比如下：
 
     <a name="table839512544411"></a>
@@ -326,17 +325,15 @@ bank冲突主要可以分为以下三种场景：
     </thead>
     <tbody><tr id="row143961754148"><td class="cellrowborder" valign="top" width="6.813978389954251%" headers="mcps1.1.4.1.1 "><p id="p43962544416"><a name="p43962544416"></a><a name="p43962544416"></a>实现方法</p>
     </td>
-    <td class="cellrowborder" valign="top" width="42.01304390148935%" headers="mcps1.1.4.1.2 "><p id="p33964541745"><a name="p33964541745"></a><a name="p33964541745"></a>不做地址优化，直接使用InitBuffer分配内存，各个Tensor的地址分别为：</p>
-    <p id="p17357131764"><a name="p17357131764"></a><a name="p17357131764"></a>x：起始地址0x0，tensor长度为4096 * sizeof(float)字节</p>
-    <p id="p15372720618"><a name="p15372720618"></a><a name="p15372720618"></a>y：起始地址0x4000，tensor长度为4096 * sizeof(float)字节</p>
-    <p id="p138635471667"><a name="p138635471667"></a><a name="p138635471667"></a>z：起始地址0x8000，tensor长度为4096 * sizeof(float)字节</p>
-    <p id="p1927691223819"><a name="p1927691223819"></a><a name="p1927691223819"></a>在一个Repeat内，x和y同时读同一个bank group，x/y和z同时读写同一个bank。</p>
+    <td class="cellrowborder" valign="top" width="42.01304390148935%" headers="mcps1.1.4.1.2 "><p id="p33964541745"><a name="p33964541745"></a><a name="p33964541745"></a>不做地址优化及搬运步长，Copy时步长为144，各个Tensor的地址分别为：</p>
+    <p id="p17357131764"><a name="p17357131764"></a><a name="p17357131764"></a>ND矩阵：起始地址0x0，tensor长度为144 * 128 * sizeof(half)字节</p>
+    <p id="p15372720618"><a name="p15372720618"></a><a name="p15372720618"></a>NZ矩阵：起始地址0x12000，tensor长度为144 * 128 * sizeof(half)字节</p>
+    <p id="p1927691223819"><a name="p1927691223819"></a><a name="p1927691223819"></a>在每个Copy搬运操作内，8个Datablock同时写一个bank group，单条Copy从一拍拉长为8拍。</p>
     </td>
-    <td class="cellrowborder" valign="top" width="51.17297770855641%" headers="mcps1.1.4.1.3 "><p id="p330914381671"><a name="p330914381671"></a><a name="p330914381671"></a>优化地址，使用InitBuffer分配内存时适当扩大内存申请，各个Tensor的地址分别为：</p>
-    <p id="p326294904420"><a name="p326294904420"></a><a name="p326294904420"></a>x：起始地址0x0，tensor长度为(4096 * sizeof(float) + 256)字节</p>
-    <p id="p153096389720"><a name="p153096389720"></a><a name="p153096389720"></a>y：起始地址0x4100，tensor长度为(64 * 1024 - (4096 * sizeof(float) + 256))字节</p>
-    <p id="p1130923814713"><a name="p1130923814713"></a><a name="p1130923814713"></a>z：起始地址0x10000，tensor长度为4096 * sizeof(float) 字节</p>
-    <p id="p9897551154415"><a name="p9897551154415"></a><a name="p9897551154415"></a>x多申请256字节，避免一个Repeat内x y同时读同一个bank group；y多申请空间，确保z不会和x/y落入同一个bank</p>
+    <td class="cellrowborder" valign="top" width="51.17297770855641%" headers="mcps1.1.4.1.3 "><p id="p330914381671"><a name="p330914381671"></a><a name="p330914381671"></a>优化地址及搬运步长，为NZ矩阵多申请256字节（即多申请一行UB内存空间），Copy时步长为145，各个Tensor的地址分别为：</p>
+    <p id="p326294904420"><a name="p326294904420"></a><a name="p326294904420"></a>ND矩阵：起始地址0x0，tensor长度为144 * 128 * sizeof(half)字节</p>
+    <p id="p153096389720"><a name="p153096389720"></a><a name="p153096389720"></a>NZ矩阵：起始地址0x12000，tensor长度为145 * 128 * sizeof(half)字节</p>
+    <p id="p9897551154415"><a name="p9897551154415"></a><a name="p9897551154415"></a>NZ矩阵多申请256字节，且将Copy时步长增大1，避免Copy搬运时8个Datablock同时写一个bank group，单条Copy在一拍内完成。</p>
     </td>
     </tr>
     <tr id="row83963547410"><td class="cellrowborder" valign="top" width="6.813978389954251%" headers="mcps1.1.4.1.1 "><p id="p103961544412"><a name="p103961544412"></a><a name="p103961544412"></a>示意图</p>
@@ -348,15 +345,29 @@ bank冲突主要可以分为以下三种场景：
     </tr>
     <tr id="row1539620548413"><td class="cellrowborder" valign="top" width="6.813978389954251%" headers="mcps1.1.4.1.1 "><p id="p43961554645"><a name="p43961554645"></a><a name="p43961554645"></a>示例代码</p>
     </td>
-    <td class="cellrowborder" valign="top" width="42.01304390148935%" headers="mcps1.1.4.1.2 "><a name="screen35066415507"></a><a name="screen35066415507"></a><pre class="screen" codetype="Cpp" id="screen35066415507">pipe.InitBuffer(inQueueX, 1, 4096 * sizeof(float));
-    pipe.InitBuffer(inQueueY, 1, 4096 * sizeof(float));
-    pipe.InitBuffer(outQueueZ, 1, 4096 * sizeof(float));</pre>
+    <td class="cellrowborder" valign="top" width="42.01304390148935%" headers="mcps1.1.4.1.2 "><a name="screen35066415507"></a><a name="screen35066415507"></a><pre class="screen" codetype="Cpp" id="screen35066415507">AscendC::LocalTensor<half> nd(AscendC::TPosition::VECIN, 0, 144 * 128);
+    AscendC::LocalTensor<half> nz(AscendC::TPosition::VECOUT, 2 * 144 * 128 * sizeof(half), 144 * 128);
+    AscendC::CopyRepeatParams copyParams;
+    copyParams.dstStride = 144;
+    copyParams.srcStride = 1;
+    copyParams.dstRepeatSize = 1;
+    copyParams.srcRepeatSize = 128 / 16;
+
+    AscendC::Copy(nz[0], nd[0],
+        static_cast<uint64_t>(128), static_cast<uint8_t>(144), copyParams);
+    </pre>
     </td>
-    <td class="cellrowborder" valign="top" width="51.17297770855641%" headers="mcps1.1.4.1.3 "><a name="screen51721010145115"></a><a name="screen51721010145115"></a><pre class="screen" codetype="Cpp" id="screen51721010145115">pipe.InitBuffer(inQueueX, 1, 4096 * sizeof(float) + 256); // 多申请256字节
-    pipe.InitBuffer(inQueueY, 1, 64 * 1024 - (4096 * sizeof(float) + 256)); //多申请空间，确保z不会和x/y落入同一个bank， 64 * 1024是16个bank的空间，4096 * sizeof(float) + 256是x所占的空间
-    pipe.InitBuffer(outQueueZ, 1, 4096 * sizeof(float));</pre>
+    <td class="cellrowborder" valign="top" width="51.17297770855641%" headers="mcps1.1.4.1.3 "><a name="screen51721010145115"></a><a name="screen51721010145115"></a><pre class="screen" codetype="Cpp" id="screen51721010145115">AscendC::LocalTensor<half> nd(AscendC::TPosition::VECIN, 0, 144 * 128);
+    AscendC::LocalTensor<half> nz(AscendC::TPosition::VECOUT, 2 * 144 * 128 * sizeof(half), 145 * 128); // 多申请256字节
+    AscendC::CopyRepeatParams copyParams;
+    copyParams.dstStride = 145;         // 搬运时地址步长增加1
+    copyParams.srcStride = 1;
+    copyParams.dstRepeatSize = 1;
+    copyParams.srcRepeatSize = 128 / 16;
+
+    AscendC::Copy(nz[0], nd[0],
+        static_cast<uint64_t>(128), static_cast<uint8_t>(144), copyParams);</pre>
     </td>
     </tr>
     </tbody>
     </table>
-

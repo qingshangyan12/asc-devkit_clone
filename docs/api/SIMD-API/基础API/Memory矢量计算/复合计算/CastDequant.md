@@ -109,20 +109,20 @@
 | :----- | :--- |
 |T|目的操作数数据类型。<br>当类型为b8时，和`SetDeqScale`接口的signMode入参配合使用，当signMode=true时输出数据类型int8_t；signMode=false时输出数据类型uint8_t。|
 |U|源操作数数据类型。<br> |
-|isSetMask|是否在接口内部设置mask，默认为true。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，本接口入参中的mask值必须设置为占位符MASK_PLACEHOLDER。|
+|isSetMask|是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。|
 |isVecDeq|控制是否选择向量量化模式。<br>和`SetDeqScale`接口配合使用，当`SetDeqScale`接口传入Tensor时，isVecDeq必须为true。|
-|halfBlock|输出数据类型为b8时有效，用于指示输出元素存放在上半还是下半DataBlock。<br>halfBlock=true时，结果存放在下半DataBlock；halfBlock=false时，结果存放在上半DataBlock。<br>如下图所示，一个DataBlock大小的输入得到8个b8类型输出，当halfBlock为false时，这8个输出数据存放在下半DataBlock。<br>![](../../../../figures/halfBlock说明.png)<br>若需要得到连续的目的操作数数据，可以通过将DataBlock分为奇偶块，调用两次接口分别处理奇偶块，奇数块的输出存放在下半DataBlock，偶数块输出存放在上半DataBlock。 |
+|halfBlock|输出数据类型为b8时有效，用于指示输出元素存放在上半还是下半DataBlock。<br>halfBlock=true时，结果存放在下半DataBlock；halfBlock=false时，结果存放在上半DataBlock。<br>如下图所示，一个DataBlock大小的输入得到8个b8类型输出，当halfBlock为false时，这8个输出数据存放在下半DataBlock。<br>![](../../../../figures/halfBlock说明.png)<br>若需要得到连续的目的操作数数据，可以通过将DataBlock分为奇偶块，调用两次接口分别处理奇偶块，奇数块的输出存放在下半DataBlock，偶数块输出存放在上半DataBlock。<br>![](../../../../figures/castdequant_continous.png) |
 
 **表**  参数说明
 
 |参数名称|输入/输出|说明|
 |---|---|---|
-|dst|输出|目的操作数。<br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。|
+|dst|输出|目的操作数。<br>类型为[LocalTensor](../../数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。|
 |src|输入|源操作数。<br>类型为LocalTensor，支持的TPosition为VECIN/VECCALC/VECOUT。<br>LocalTensor的起始地址需要32字节对齐。|
 |count|输入|参与计算的元素个数。<br>参数取值范围和操作数的数据类型有关，数据类型不同，能够处理的元素个数最大值不同，最大处理的数据量不能超过UB大小限制。|
 |mask/mask[]|输入|mask用于控制每次迭代内参与计算的元素。<br>注意：数据类型转换的mask会按照输入和输出类型中sizeof(dtype)较大的来筛选。<br>设置详见[掩码操作](../掩码操作/掩码操作.md)。|
 |repeatTime|输入|重复迭代次数。<br>矢量计算单元，每次读取连续的256Bytes数据进行计算，为完成对输入数据的处理，必须通过多次迭代（repeat）才能完成所有数据的读取与计算。repeatTime表示迭代的次数。<br>关于该参数的具体描述请参考[高维切分](../SIMD计算说明/高维切分.md)。|
-|repeatParams|输入|控制操作数地址步长的参数。[UnaryRepeatParams](../../../其他数据类型/UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。|
+|repeatParams|输入|控制操作数地址步长的参数。[UnaryRepeatParams](../../数据结构/辅助数据结构//UnaryRepeatParams.md)类型，包含操作数相邻迭代间相同DataBlock的地址步长，操作数同一迭代内不同DataBlock的地址步长等参数。<br>相邻迭代间的地址步长参数说明请参考[repeatStride](../SIMD计算说明/高维切分.md)；同一迭代内DataBlock的地址步长参数说明请参考[dataBlockStride](../SIMD计算说明/高维切分.md)。|
 
 ## 数据类型
 

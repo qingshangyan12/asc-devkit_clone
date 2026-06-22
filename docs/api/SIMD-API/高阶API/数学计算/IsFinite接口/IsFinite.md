@@ -33,22 +33,22 @@ __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>&
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 源操作数的数据类型。支持的数据类型为：half、bfloat16_t、float。 |
 | U | 目的操作数的数据类型。支持的数据类型为：bool、half、bfloat16_t、float。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>目的操作数的数据类型和源操作数保持一致，或者目的操作数的数据类型为bool类型。当前支持的数据类型组合请见[表3](#table158181847102411)。 |
-| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>目的操作数的数据类型和源操作数保持一致，或者目的操作数的数据类型为bool类型。当前支持的数据类型组合请见[表3](#table158181847102411)。 |
+| src | 输入 | 源操作数。<br><br>类型为[LocalTensor](../../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | calCount | 输入 | 参与计算的元素个数。 |
 
-**表 3**  输入输出支持的数据类型组合
+**表3**  输入输出支持的数据类型组合
 
 | srcDtype | dstDtype |
 | --- | --- |
@@ -88,4 +88,3 @@ AscendC::IsFinite(dstLocal, srcLocal, 8);
 输出数据(dst):
 [true,false,true,true,false,true,false,true]
 ```
-

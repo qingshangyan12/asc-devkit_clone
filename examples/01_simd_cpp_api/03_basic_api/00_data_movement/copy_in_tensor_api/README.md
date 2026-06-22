@@ -153,7 +153,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量
-  请根据当前环境上CANN开发套件包的[安装方式](./../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](./../../../../../../docs/quick_start.md#下载-cann-master)**。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。**当前仅支持使用[CANN master](../../../../../docs/quick_start.md#下载-cann-master)**。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -188,6 +188,7 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3` | 场景编号：0=AB不转置 half，1=AB不转置 float，2=AB转置 half，3=AB转置 float |
 
 - 执行结果
 

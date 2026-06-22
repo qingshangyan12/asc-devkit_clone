@@ -47,18 +47,18 @@ __aicore__ inline void MrgSort(const LocalTensor<T> &dst, const MrgSortSrcList<T
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isExhaustedSuspension | 某条队列耗尽（即该队列已经全部排序到目的操作数）后，是否需要停止合并。类型为bool，参数取值如下：<br>false：直到所有队列耗尽完才停止合并。<br>true：某条队列耗尽后，停止合并。<br><br>默认值为false。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输出 | 目的操作数，存储经过排序后的数据。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| dst | 输出 | 目的操作数，存储经过排序后的数据。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | sortList | 输入 | 源操作数，支持2-4个队列，并且每个队列都已经排好序，类型为MrgSortSrcList结构体，具体请参考下表。MrgSortSrcList中传入要合并的队列，定义如下方代码所示。 |
 | elementCountList | 输入 | 四个源队列的长度（排序方式一：8Bytes结构的数目，排序方式二：16*sizeof(T)Bytes结构的数目），类型为长度为4的uint16_t数据类型的数组，理论上每个元素取值范围[0, 4095]，但不能超出UB的存储空间。 |
 | sortedNum | 输出 | 耗尽模式下（即isExhaustedSuspension为true时），停止合并时每个队列已排序的元素个数。 |
@@ -75,14 +75,14 @@ struct MrgSortSrcList {
 };
 ```
 
-**表 3**  MrgSortSrcList参数说明
+**表3**  MrgSortSrcList参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | --- | --- | --- |
-| src1 | 输入 | 源操作数，第一个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
-| src2 | 输入 | 源操作数，第二个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
-| src3 | 输入 | 源操作数，第三个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
-| src4 | 输入 | 源操作数，第四个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
+| src1 | 输入 | 源操作数，第一个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
+| src2 | 输入 | 源操作数，第二个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
+| src3 | 输入 | 源操作数，第三个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
+| src4 | 输入 | 源操作数，第四个已经排好序的队列。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>数据类型与目的操作数保持一致。支持的数据类型为：half、float。 |
 
 ## 返回值说明
 
@@ -94,7 +94,7 @@ struct MrgSortSrcList {
 -   每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../通用说明和约束.md#section796754519912)。
 
-## 调用示例
+## 调用示例<a name="section642mcpsimp"></a>
 
 -   处理128个half类型数据。
 

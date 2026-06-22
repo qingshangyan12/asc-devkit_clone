@@ -66,7 +66,7 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
 其总体逻辑架构图如下所示：
 
-<img src="docs/figures/architecture.png" alt="架构图"  width="850px" height="580px">
+<img src="docs/guide/figures/architecture_ascendc.png" alt="架构图"  width="1000px">
 
 - **语言扩展层C API**：纯C接口，支持数组分配内存、基于指针的计算接口，提供与业界一致的C语言编程体验，并开放芯片完备编程能力。Atlas A2/A3支持SIMD的纯C接口；Ascend 950PR/Ascend 950DT将支持与业界类似的SIMT编程能力、SIMD/SIMT混合编程能力；
 - **基础API**：单指令抽象的C++类库API，一般基于Tensor编程；逐步基于Layout完善Tensor编程能力；
@@ -92,16 +92,16 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 │   ├── aicpu_api                       # Ascend C AI CPU API实现源代码
 │   ├── basic_api                       # Ascend C 基础API实现源代码
 │   ├── c_api                           # Ascend C 语言扩展层C API实现源代码
-│   ├── tensor_api                      # Ascend C TENSOR API实现源代码
 │   ├── simt_api                        # Ascend C SIMT API实现源代码
+│   ├── tensor_api                      # Ascend C TENSOR API实现源代码
 │   └── utils                           # Ascend C 工具类实现源代码
 ├── include                             # Ascend C API接口声明源代码
 │   ├── adv_api                         # Ascend C 高阶API声明源代码
 │   ├── aicpu_api                       # Ascend C AI CPU API声明源代码
 │   ├── basic_api                       # Ascend C 基础API声明源代码
 │   ├── c_api                           # Ascend C 语言扩展层C API声明源代码
-│   ├── tensor_api                      # Ascend C TENSOR API声明源代码
 │   ├── simt_api                        # Ascend C SIMT API声明源代码
+│   ├── tensor_api                      # Ascend C TENSOR API声明源代码
 │   └── utils                           # Ascend C 工具类声明源代码
 ├── scripts                             # 打包相关脚本
 ├── tests                               # Ascend C API的UT用例

@@ -1,4 +1,4 @@
-# Matmul Gemv样例
+# Matmul GEMV样例
 ## 概述
 实现矩阵向量乘GEMV（General Matrix-Vector multiplication）的Matmul样例。在Matmul计算中M=1，形状为（1，K）的左矩阵A与形状为（K, N）的右矩阵B进行矩阵乘运算的场景，通过在Tiling侧与Kernel侧设置A矩阵的数据格式为VECTOR，开启GEMV模式。
 
@@ -29,23 +29,22 @@
   本样例中：M = 1, N = 32, K = 256
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
-  <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">a</td><td align="center">[M, K]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">b</td><td align="center">[K, N]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">bias</td><td align="center">[1, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[M, N]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_format_gemv_custom</td></tr>
   </table>
 - 样例实现
   - Kernel关键步骤
     - 创建Matmul对象：A矩阵Format参数为CubeFormat::VECTOR。
-        ```cpp
-        AscendC::Matmul<
-          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
-          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-          AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
-        ```
+      ```cpp
+      AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+      ```
 
   - Tiling关键步骤
     - 创建一个Tiling对象：A矩阵Format参数为CubeFormat::VECTOR。

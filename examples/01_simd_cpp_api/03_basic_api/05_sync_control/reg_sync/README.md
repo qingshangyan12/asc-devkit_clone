@@ -76,7 +76,8 @@
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">reg_sync</td></tr>
 </table>
 
-- 样例实现  
+- 样例实现 
+ 
 1. 对全部输入数据 x 求最大值，将最大值填充满 maxReg
 2. 依次计算输入数据和最大值的差值，并对差值取自然指数，即 expReg = exp(srcReg - maxReg)
 3. 调用StoreAlign接口，将 exp 结果搬出至UB的临时缓冲区（tmpLocal）中
@@ -85,9 +86,10 @@
 6. 依次计算 exp 除 sumReg，结果搬出
 
 - 同步说明
-1. 上述样例实现的步骤3、步骤5中，StoreAlign和LoadAlign操作同一地址，存在读后写依赖（RAW），需要保证先写UB、后读UB的时序
+
+1. 上述样例实现的步骤3、步骤5中，StoreAlign和LoadAlign操作同一地址，存在写后读依赖（RAW），需要保证先写UB、后读UB的时序
 2. 手动调用LocalMemBar接口，插入 VEC_STORE 和 VEC_LOAD 之间的同步，以保证指令按代码顺序执行
-3. 若缺少LocalMemBar，步骤5可能先执行，从 tmpLoacl 读到未经步骤3更新的旧数据
+3. 若缺少LocalMemBar，步骤5可能先执行，从 tmpLocal 读到未经步骤3更新的旧数据
 
 - 调用实现  
   使用内核调用符`<<<>>>`调用核函数，启动1个核。
@@ -95,7 +97,7 @@
 ## 编译运行
 在本样例根目录下执行如下步骤，编译并执行算子。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -127,11 +129,11 @@
 
 - 编译选项说明
 
-| 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
-| ----------------| -----------------------------| ---------------------------------------------------|
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
-| `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=寄存器保序，2=LocalMemBar　　　　　　　|
+  | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　|
+  | ----------------| -----------------------------| ---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `SCENARIO_NUM` | `1`、`2`　　　　　　　　　　| 场景编号：1=寄存器保序，2=LocalMemBar　　　　　　　|
 
 - 执行结果  
   执行结果如下，说明精度对比成功。

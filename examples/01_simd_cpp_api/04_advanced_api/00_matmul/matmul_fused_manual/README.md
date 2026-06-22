@@ -54,27 +54,28 @@
           ```
       - 完成Matmul计算。
       - 设置核间同步。
-          ```cpp
-          if ASCEND_IS_AIC {
-            AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
-          }
-          ```
+        ```cpp
+        if ASCEND_IS_AIC {
+          AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
+        }
+        ```
     - AIV侧具体步骤：
       - 创建LeakyRelu对象并初始化。
       - 等待核间同步。
-          ```cpp
-          if ASCEND_IS_AIV {
-            AscendC::CrossCoreWaitFlag(3);
-          }
-          ```
+        ```cpp
+        if ASCEND_IS_AIV {
+          AscendC::CrossCoreWaitFlag(3);
+        }
+        ```
       - 完成LeakyRelu计算。
 
   - Tiling关键步骤
     - 设置自定义MatmulConfig参数，将Kernel侧配置的参数如scheduleType等，同步到Tiling侧。
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-          matmul_tiling::MatrixTraverse::FIRSTM, false);
-      cubeTiling.SetMatmulConfigParams(matmulConfigParams);
+      tilingApi.SetOrgShape(M, N, K);
+      tilingApi.SetShape(M, N, K);
+      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+      tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
   - 调用实现

@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtcAPI在运行时编译并执行。
+本样例展示了如何使用AscendC的 **Aclrtc（运行时编译）** 模式，在Host侧动态编译核函数源码并执行。核函数内部采用 **静态Tensor编程范式**（LocalMemAllocator+SetFlag/WaitFlag事件同步），将核函数源码以字符串形式嵌入Host代码中，通过aclrtc API在运行时编译并执行。
 
 与传统自定义算子工程不同，Aclrtc无需提前编译算子包（.run），适合快速验证和原型开发。
 
@@ -19,7 +19,7 @@
 ```
 ├── rtc_template_add
 │   ├── CMakeLists.txt                   // 编译工程文件
-│   ├── data_utils.h                     // 数据生成、精度校验工具函数+CHECK_ACL宏
+│   ├── data_utils.h                     // 数据生成、精度校验工具函数+ASCENDC_CHECK宏
 │   ├── rtc_template_add.cpp             // Host侧代码（含RTC核函数源码字符串）
 │   └── README.md                        // 样例说明文档
 ```
@@ -40,7 +40,7 @@
   <tr><td align="center">x</td><td align="center">[1024]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td align="center">y</td><td align="center">[1024]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1024]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">Kernel::add_custom&ltfloat&gt</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">Kernel::add_custom&lt;float&gt;</td></tr>
   </table>
 
 ### 样例实现
@@ -68,8 +68,7 @@
 - `aclrtMemcpy` — Host与Device间数据拷贝
 - `aclrtBinaryLoadFromData` — 将编译产物加载到设备
 - `aclrtBinaryGetFunction` — 通过编译阶段获取的mangled name查找核函数句柄
-- `aclrtKernelArgsInit` / `aclrtKernelArgsAppend` / `aclrtKernelArgsFinalize` — 配置核函数参数（依次追加三个Device内存指针：`x`、`y`、`z`）
-- `aclrtLaunchKernelWithConfig` — 在指定stream上启动核函数，指定1个block执行
+- `aclrtLaunchKernelWithArgsArray` — 通过Host侧参数数组传入三个Device内存指针参数（`x`、`y`、`z`），并在指定stream上启动核函数
 - `aclrtSynchronizeStream` — 等待stream上核函数执行完成
 
 Host侧C++内完成数据生成与精度校验，不依赖外部脚本。
@@ -92,14 +91,14 @@ Host侧C++内完成数据生成与精度校验，不依赖外部脚本。
   ```bash
   mkdir -p build && cd build;                                               # 创建并进入build目录
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程，支持dav-3510, dav-2201
-  ./main                                                                    # 执行编译生成的可执行程序，执行样例
+  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
   ```
 
 - 编译选项说明
 
-| 选项 | 可选值 | 说明 |
-|------|--------|------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | 选项 | 可选值 | 说明 |
+  |------|--------|------|
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
 
   > [!WARNING] 注意
   Aclrtc仅支持NPU运行模式，不支持cpu调试或sim仿真模式。

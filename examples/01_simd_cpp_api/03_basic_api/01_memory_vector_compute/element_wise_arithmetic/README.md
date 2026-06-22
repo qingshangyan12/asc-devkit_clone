@@ -28,7 +28,7 @@
 ## 样例描述
 
 - 样例功能：  
-  本样例实现了对输入tensor按元素执行Leaky Relu（Leaky Rectified Liner Unit）操作，返回计算结果的功能。
+  本样例实现了对输入tensor按元素执行Leaky Relu（Leaky Rectified Linear Unit）操作，返回计算结果的功能。
 
   对应的数学表达式为：  
   $$
@@ -63,7 +63,7 @@
 在本样例根目录下执行如下步骤，编译并执行样例。
 
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

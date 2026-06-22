@@ -2,17 +2,17 @@
 
 ## 产品支持情况<a id="zh-cn_topic_0000002516209232_section18204144912492"></a>
 
-|产品|是否支持|
-|----------|:----------:|
-|Ascend 950PR/Ascend 950DT|√|
-|Atlas A3 训练系列产品/Atlas A3 推理系列产品|√|
-|Atlas A2 训练系列产品/Atlas A2 推理系列产品|√|
-|Atlas 200I/500 A2 推理产品|√|
-|Atlas 推理系列产品AI Core|x|
-|Atlas 推理系列产品Vector Core|x|
-|Atlas 训练系列产品|x|
-|Kirin X90|√|
-|Kirin  9030|√|
+| 产品 | 是否支持 |
+| ---------- | :----------: |
+| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
+| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
+| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
+| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | x </cann-filter> |
+| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
+| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
+| <cann-filter npu-type = "x90">Kirin X90 | √ </cann-filter> |
+| <cann-filter npu-type = "9030">Kirin 9030 | √ </cann-filter> |
 
 ## 功能说明<a id="zh-cn_topic_0000002516209232_section618mcpsimp"></a>
 
@@ -24,87 +24,86 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）�
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
 ```
 
-<cann-filter npu_type = "950">
+<cann-filter npu-type = "950">
 
 ```cpp
 // 如下原型仅Ascend 950PR/Ascend 950DT支持
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
-</cann-filter>
 ```
 
 </cann-filter>
 
 ## 参数说明<a id="zh-cn_topic_0000002516209232_section622mcpsimp"></a>
 
-<cann-filter npu_type = "A3,910b,310b">
+<cann-filter npu-type = "A3,910b,310b">
 
 针对如下产品型号，参数说明见下表：
 
-<cann-filter npu_type = "A3">
+<cann-filter npu-type = "A3">
 
 Atlas A3 训练系列产品/Atlas A3 推理系列产品；
 
 </cann-filter>
 
-<cann-filter npu_type = "910b">
+<cann-filter npu-type = "910b">
 
 Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 
 </cann-filter>
 
-<cann-filter npu_type = "310b">
+<cann-filter npu-type = "310b">
 
 Atlas 200I/500 A2 推理产品；
 
 </cann-filter>
 
-**表 1**  参数说明
+**表1** 参数说明
 
-|参数名称|输入/输出|含义|
-|----------|----------|----------|
-|ndNum|输入|nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)）|
-|srcNdStride|输入|以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围 ∈[1, 512]， 单位102。|
-|dstNdStride|输入|目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 65535]，单位为element元素。|
+| 参数名称 | 输入/输出 | 含义 |
+| ---------- | ---------- | ---------- |
+| ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
+| srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[1, 512]，单位为1024B。 |
+| dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 65535]，单位为element元素。 |
 
 </cann-filter>
 
-<cann-filter npu_type = "950">
+<cann-filter npu-type = "950">
 
 针对Ascend 950PR/Ascend 950DT：
 
-**表 2**  参数说明
+**表2** 参数说明
 
-|参数名称|输入/输出|含义|
-|----------|----------|----------|
-|ndNum|输入|nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)）|
-|srcNdStride|输入|以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围 ∈[0, 65535]， 单位C0_SIZE。|
-|dstNdStride|输入|目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 2^32-1]，单位为element元素。|
+| 参数名称 | 输入/输出 | 含义 |
+| ---------- | ---------- | ---------- |
+| ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
+| srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[0, 65535]，单位为C0_SIZE。 |
+| dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 2^32-1]，单位为element元素。 |
 
 </cann-filter>
 
-<cann-filter npu_type = "x90,9030">
+<cann-filter npu-type = "x90,9030">
 
 针对如下产品型号，参数说明见下表：
 
-<cann-filter npu_type = "x90">
+<cann-filter npu-type = "x90">
 
 Kirin X90；
 
 </cann-filter>
 
-<cann-filter npu_type = "9030">
+<cann-filter npu-type = "9030">
 
 Kirin 9030；
 
 </cann-filter>
 
-**表 3**  参数说明
+**表3** 参数说明
 
-|参数名称|输入/输出|含义|
-|----------|----------|----------|
-|ndNum|输入|nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)）|
-|srcNdStride|输入|以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围 ∈[0, 65535]， 单位C0_SIZE。|
-|dstNdStride|输入|目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[0, 65535]，单位为element元素。|
+| 参数名称 | 输入/输出 | 含义 |
+| ---------- | ---------- | ---------- |
+| ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
+| srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[0, 65535]，单位为C0_SIZE。 |
+| dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[0, 65535]，单位为element元素。 |
 
 </cann-filter>
 

@@ -44,7 +44,7 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 
 ## 参数说明
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -52,17 +52,17 @@ BatchNorm是对于每一层的输入做规范化处理，使得每一层的分�
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
 | isBasicBlock | inputX、output的shape信息和Tiling切分策略满足基本块要求的情况下，可以设置该参数取值为true，开启该参数，用于提升性能，默认不开启。基本块要求如下：<br>originB是8的倍数；<br>S*H是64的倍数，但小于2048。 |
 
-**表 2**  接口参数说明
+**表2**  接口参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| output | 输出 | 目的操作数，shape为[B，S，H]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| outputMean | 输出 | 均值，目的操作数，shape为[S，H]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| outputVariance | 输出 | 方差，目的操作数，shape为[S，H]。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| inputX | 输入 | 源操作数，shape为[B，S，H]。inputX的数据类型需要与目的操作数保持一致，S*H需要32B对齐。支持inputX与output地址重叠。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| gamm | 输入 | 源操作数，shape为[B]。gamm的数据类型需要与目的操作数保持一致，长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| beta | 输入 | 源操作数，shape为[B]。beta的数据类型需要与目的操作数保持一致，长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>类型为[LocalTensor](../../基础数据结构/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[BatchNorm Tiling](BatchNorm-Tiling.md)。 |
+| output | 输出 | 目的操作数，shape为[B，S，H]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| outputMean | 输出 | 均值，目的操作数，shape为[S，H]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| outputVariance | 输出 | 方差，目的操作数，shape为[S，H]。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| inputX | 输入 | 源操作数，shape为[B，S，H]。inputX的数据类型需要与目的操作数保持一致，S*H需要32B对齐。支持inputX与output地址重叠。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| gamm | 输入 | 源操作数，shape为[B]。gamm的数据类型需要与目的操作数保持一致，长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| beta | 输入 | 源操作数，shape为[B]。beta的数据类型需要与目的操作数保持一致，长度需要32B对齐。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| sharedTmpBuffer | 输入 | 接口内部复杂计算时用于存储中间变量，由开发者提供。<br><br>类型为[LocalTensor](../../基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。<br><br>临时空间大小BufferSize的获取方式请参考[BatchNorm Tiling](BatchNorm-Tiling.md)。 |
 | epsilon | 输入 | 防除0的权重系数。数据类型需要与inputX/output保持一致。 |
 | tiling | 输入 | 输入数据的切分信息，Tiling信息的获取请参考[BatchNorm Tiling](BatchNorm-Tiling.md)。 |
 

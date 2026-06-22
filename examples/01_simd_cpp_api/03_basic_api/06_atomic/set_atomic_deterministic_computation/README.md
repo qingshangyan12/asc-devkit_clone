@@ -6,6 +6,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
@@ -244,13 +245,13 @@ Scalar单元访问GM上的信号量，存在两种访问方式：
     <td>2</td>
     <td>多个AIV核间的确定性计算</td>
     <td>set_atomic_add_multi_aiv_custom</td>
-    <td>SetFlag/WaitFlag AIV核间同步</td>
+    <td>IBSet/IBWait AIV核间同步</td>
   </tr>
   <tr>
     <td>3</td>
     <td>多个AIC核间的确定性计算</td>
     <td>set_atomic_add_multi_aic_custom</td>
-    <td>SetFlag/WaitFlag AIC核间同步</td>
+    <td>GM信号量核间同步</td>
   </tr>
 </table>
 
@@ -312,7 +313,7 @@ $$
 ## 编译运行  
 在本样例根目录下执行如下步骤，编译并执行样例。
 - 配置环境变量  
-  请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+  请根据当前环境上CANN开发套件包的[安装方式](../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
