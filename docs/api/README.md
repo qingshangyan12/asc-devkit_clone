@@ -488,6 +488,7 @@
                 -   [MaskReg搬入（MaskGenWithRegTensor）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/MaskReg搬入（MaskGenWithRegTensor）.md)
                 -   [离散搬入（Gather）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/离散搬入（Gather）.md)
                 -   [离散搬入（GatherB）](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/离散搬入（GatherB）.md)
+                -   [Load](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/Load.md)
                 -   [Move](SIMD-API/基础API/Reg矢量计算/Reg数据搬入/Move.md)
 
             -   [Reg数据搬出](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/Reg数据搬出.md)
@@ -497,6 +498,7 @@
                 -   [MaskReg搬出（StoreAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/MaskReg搬出（StoreAlign）.md)
                 -   [MaskReg非对齐搬出（StoreUnAlign）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/MaskReg非对齐搬出（StoreUnAlign）.md)
                 -   [离散搬出（Scatter）](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/离散搬出（Scatter）.md)
+                -   [Store](SIMD-API/基础API/Reg矢量计算/Reg数据搬出/Store.md)
 
             -   [MaskReg计算](SIMD-API/基础API/Reg矢量计算/MaskReg计算/MaskReg计算.md)
                 -   [Move](SIMD-API/基础API/Reg矢量计算/MaskReg计算/Move.md)

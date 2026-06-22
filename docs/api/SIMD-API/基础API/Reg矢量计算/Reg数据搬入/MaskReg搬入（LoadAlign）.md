@@ -37,6 +37,19 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 
 - 使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量场景：在每次迭代中，需要先调用[CreateAddrReg](../寄存器数据类型/AddrReg.md)手动设定地址偏移量，再调用搬运指令。
 
+数据搬入时，可以通过模板参数配置搬运的数据分布模式，能够实现上采样、下采样等功能，分布模式具体介绍请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
+
+[图1](#fig-loadalign-maskreg-norm)、[图2](#fig-loadalign-maskreg-us)、[图3](#fig-loadalign-maskreg-ds)展示了DIST_NORM、DIST_US、DIST_DS分布模式。
+
+**图1**  DIST_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
+![](../../../../figures/DIST_NORM模式搬入.png)
+
+**图2**  DIST_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
+![](../../../../figures/DIST_US模式搬入.png)
+
+**图3**  DIST_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
+![](../../../../figures/DIST_DS模式搬入.png)
+
 ## 函数原型<a name="section620mcpsimp"></a>
 
 - 普通搬运接口
@@ -86,15 +99,6 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 | DIST_NORM | 正常模式，搬运数据量为VL/8。 | VL/8 |
 | DIST_US | 上采样模式，每bit数据重复搬运两次，将VL/16数据扩充为VL/8搬入。 | VL/16 |
 | DIST_DS | 下采样模式，每间隔1bit舍弃数据，将VL/4数据压缩为VL/8搬入。 | min(32, VL/4) |
-
-**图1**  DIST\_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
-![](../../../../figures/DIST_NORM模式搬入.png "DIST_NORM模式搬入")
-
-**图2**  DIST\_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
-![](../../../../figures/DIST_US模式搬入.png "DIST_US模式搬入")
-
-**图3**  DIST\_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
-![](../../../../figures/DIST_DS模式搬入.png "DIST_DS模式搬入")
 
 ## 数据类型
 

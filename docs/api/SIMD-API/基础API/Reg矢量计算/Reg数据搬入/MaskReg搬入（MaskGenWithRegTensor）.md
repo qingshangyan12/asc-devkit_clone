@@ -50,7 +50,7 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg)
 |-----|-----|
 | T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | offset | offset决定了srcReg中需要搬运的数据块，具体描述请参考[关键特性说明](#关键特性说明)。<br>&bull; 当数据类型为b16，offset∈[0, 15]。<br>&bull; 当数据类型为b32，offset∈[0, 31]。 |
-| U | 源操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 源操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明
 

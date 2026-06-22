@@ -28,7 +28,7 @@
 
 头文件路径为：`"basic_api/reg_compute/kernel_reg_compute_datacopy_intf.h"`。
 
-对srcReg中的有效元素逐个复制写入dstReg中对应位置处。
+对srcReg中的有效元素逐个复制写入dstReg中对应位置处，无效位置保留dstReg原值。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -54,7 +54,7 @@
 | --- | --- |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | mode | [MaskMergeMode](../数据类型/MaskMergeMode.md)枚举类型，选择MERGING模式或ZEROING模式。<br>&bull; ZEROING模式当前不支持。<br>&bull; MERGING模式下，mask未筛选的元素在dstReg中保留dstReg原值。 |
-| U | 目的操作数的RegTensor类型，例如RegTensor&lt;half&gt;，由编译器自动推导，用户不需要填写。 |
+| U | 目的操作数的RegTensor类型，例如RegTensor\<half>，由编译器自动推导，用户不需要填写。 |
 
 **表2**  参数说明
 

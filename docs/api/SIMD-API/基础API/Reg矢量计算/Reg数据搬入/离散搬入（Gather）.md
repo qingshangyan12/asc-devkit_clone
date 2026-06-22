@@ -49,8 +49,8 @@ __simd_callee__ inline void Gather(T3& dstReg, __ubuf__ T1* baseAddr, T4& index,
 | T0 | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | T1 | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | T2 | 索引值的数据类型，支持的数据类型请参考[数据类型](#数据类型)。 |
-| T3 | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
-| T4 | 索引值的RegTensor类型，例如RegTensor<uint16_t>，由编译器自动推导，用户不需要手动填写。 |
+| T3 | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
+| T4 | 索引值的RegTensor类型，例如RegTensor\<uint16_t>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明
 

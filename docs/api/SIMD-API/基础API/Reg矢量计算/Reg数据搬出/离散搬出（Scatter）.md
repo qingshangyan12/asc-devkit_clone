@@ -49,7 +49,7 @@ __simd_callee__ inline void Scatter(__ubuf__ T* baseAddr, S& srcReg, V& index, M
 |-----|-----|
 | T | 目的操作数和源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | U | 索引值index的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| S | 源操作数操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| S | 源操作数操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 | V | 索引值的RegTensor类型，例如RegTensor<uint16_t>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明
