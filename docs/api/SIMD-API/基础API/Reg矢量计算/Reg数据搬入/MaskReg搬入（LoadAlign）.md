@@ -32,10 +32,23 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 
 - 普通搬运接口：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
 - PostUpdate扩展搬运接口：有两种模式选择，具体介绍请参考[参数说明](#参数说明)：
-    - POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
+    - POST_MODE_NORMAL模式：不支持。
     - POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。
 
 - 使用[AddrReg](../寄存器数据类型/AddrReg.md)寄存器存储偏移量场景：在每次迭代中，需要先调用[CreateAddrReg](../寄存器数据类型/AddrReg.md)手动设定地址偏移量，再调用搬运指令。
+
+数据搬入时，可以通过模板参数配置搬运的数据分布模式，能够实现上采样、下采样等功能，分布模式具体介绍请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
+
+[图1](#fig-loadalign-maskreg-norm)、[图2](#fig-loadalign-maskreg-us)、[图3](#fig-loadalign-maskreg-ds)展示了DIST_NORM、DIST_US、DIST_DS分布模式。
+
+**图1**  DIST_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
+![](../../../../figures/DIST_NORM模式搬入.png)
+
+**图2**  DIST_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
+![](../../../../figures/DIST_US模式搬入.png)
+
+**图3**  DIST_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
+![](../../../../figures/DIST_DS模式搬入.png)
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -76,7 +89,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 |-----|-----|-----|
 | mask | 输出 | 目的操作数，类型为[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 | srcAddr | 输入/输出 | 源操作数，UB起始地址。 |
-| offset | 输入 | &bull; 当数据类型为AddrReg，为地址偏移寄存器，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。<br>&bull; 当数据类型为int32_t，为地址更新步长，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + offset，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  offset。 |
+| offset | 输入 | &bull; 当数据类型为AddrReg，为地址偏移寄存器，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。<br>&bull; 当数据类型为int32_t，为地址更新步长，单位：字节。offset的对齐约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。根据postMode的取值有两种情况：<br>&nbsp;&nbsp;&bull; POST_MODE_NORMAL：不支持。<br>&nbsp;&nbsp;&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr += offset。 |
 
 <a id="表3-MaskDist参数说明"></a>
 **表 3**  MaskDist参数说明
@@ -87,18 +100,9 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 | DIST_US | 上采样模式，每bit数据重复搬运两次，将VL/16数据扩充为VL/8搬入。 | VL/16 |
 | DIST_DS | 下采样模式，每间隔1bit舍弃数据，将VL/4数据压缩为VL/8搬入。 | min(32, VL/4) |
 
-**图1**  DIST\_NORM模式搬入<a id="fig-loadalign-maskreg-norm"></a>  
-![](../../../../figures/DIST_NORM模式搬入.png "DIST_NORM模式搬入")
-
-**图2**  DIST\_US模式搬入<a id="fig-loadalign-maskreg-us"></a>  
-![](../../../../figures/DIST_US模式搬入.png "DIST_US模式搬入")
-
-**图3**  DIST\_DS模式搬入<a id="fig-loadalign-maskreg-ds"></a>  
-![](../../../../figures/DIST_DS模式搬入.png "DIST_DS模式搬入")
-
 ## 数据类型
 
-目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：b8、b16、b32、b64。
+源操作数支持的数据类型为：b8、b16、b32、b64。
 
 ## 返回值说明<a name="section1575141714439"></a>
 
@@ -106,7 +110,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../寄存
 
 ## 约束说明<a name="section11585101304320"></a>
 
-- 位于Unified Buffer的地址约束、postUpdateStride*sizeof(T)的对齐约束、AddrReg寄存器中存储的偏移量\*sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
+- 位于Unified Buffer的地址约束、offset的对齐约束、AddrReg寄存器中存储的偏移量 \* sizeof(T)的对齐约束与分布模式MaskDist有关，具体地址约束请参考[表3 MaskDist参数说明](#表3-MaskDist参数说明)。
 - MaskReg模板参数regTrait只支持RegTraitNumOne。
 
 ## 调用示例<a name="section642mcpsimp"></a>
