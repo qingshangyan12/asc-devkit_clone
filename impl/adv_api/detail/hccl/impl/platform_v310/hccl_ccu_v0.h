@@ -545,6 +545,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::Wait(HcclHandle handleId)
 {
+    AscendC::PRINTF("[WaitFunc]start Wait\n");
     ASCENDC_HCCL_API_ASSERT(
         isInited_, { return HCCL_FAILED; },
         "Call Wait failed, please ensure Hccl::Init func has been called successfully already!");
@@ -555,11 +556,13 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         handleId < curHandleId_, { return HCCL_FAILED; },
         "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
 
+    AscendC::PRINTF("[WaitFunc]Check handleId\n");
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
         KERNEL_LOG(KERNEL_ERROR, "Call Wait failed, handleId[%u] is invalid.", handleId);
         return HCCL_FAILED;
     }
 
+    AscendC::PRINTF("[WaitFunc]Check handleNeedCommitCnt_\n");
     if (unlikely(handleNeedCommitCnt_[handleId] <= 0)) {
         KERNEL_LOG(
             KERNEL_ERROR, "Call Wait failed, handleNeedCommitCnt_[%u] = %u is invalid.", handleId,
@@ -568,7 +571,9 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     }
     uint8_t reqId = handleReqId_[handleId] + handleFinishCnt_[handleId];
     reqId %= CCU_MAX_MSG_NUM;
+    AscendC::PRINTF("[WaitFunc]start GetWaitCkeAddr\n");
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
+    AscendC::PRINTF("[WaitFunc]end GetWaitCkeAddr\n");
 
 #ifndef ASCENDC_CPU_DEBUG
     while (true) {
@@ -600,16 +605,21 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     // 补发消息
     // 场景1:同一个handleId需要补发
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
+        AscendC::PRINTF("[WaitFunc]start CommitMsg\n");
         CommitMsg(handleId);
+        AscendC::PRINTF("[WaitFunc]finish CommitMsg\n");
     } else { // 场景2:下一个handleId需要补发
+        AscendC::PRINTF("[WaitFunc]start CommitMsg2\n");
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);
         }
+        AscendC::PRINTF("[WaitFunc]finish CommitMsg2\n");
     }
 
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
+    AscendC::PRINTF("[WaitFunc]end Wait\n");
     return HCCL_SUCCESS;
 }
 
