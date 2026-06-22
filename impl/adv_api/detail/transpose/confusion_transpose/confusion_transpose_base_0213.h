@@ -24,7 +24,7 @@
 #define IMPL_TRANSPOSE_CONFUSION_TRANSPOSE_CONFUSION_TRANSPOSE_BASE_0213_H
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../basic_api/kernel_pop_stack_buffer.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 const uint32_t CUBE_HALF_SIZE = CUBE_MAX_SIZE / 2;

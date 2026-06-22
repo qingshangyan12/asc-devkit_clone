@@ -172,7 +172,7 @@ __simd_callee__ inline void StoreUnAlign(__ubuf__ T*& dstAddr, MaskReg& mask, Un
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_datacopy_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_datacopy_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_DATACOPY_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_DATACOPY_INTF_H__)

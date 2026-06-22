@@ -10,31 +10,36 @@
 set(ASCENDC_ADV_API_IMPL_DIR ${ASCENDC_IMPL_DIR}/adv_api)
 set(ASCENDC_ADV_API_CMAKE_DIR ${ASCENDC_ADV_API_IMPL_DIR}/cmake)
 
-#generate kernel_tiling/kernel_tiling.h
+# Generate adv_api/kernel_tiling.h and keep kernel_tiling/kernel_tiling.h for compatibility.
 set(GEN_KERNEL_TILING_DATA_SCRIPT
     ${ASCENDC_ADV_API_CMAKE_DIR}/scripts/gen_kernel_tiling_data_def.py)
 set(GENERATE_INSTALL_SCRIPT ${ASCENDC_ADV_API_CMAKE_DIR}/scripts/generate_install_script.sh)
 set(TILING_DATA_DEF_DIR ${ASCENDC_INCLUDE_DIR}/adv_api)
 set(KERNEL_TILING_DIR ${PROJECT_BINARY_DIR})
-set(KERNEL_TILING_HEAD ${KERNEL_TILING_DIR}/kernel_tiling/kernel_tiling.h)
+set(KERNEL_TILING_HEAD ${KERNEL_TILING_DIR}/adv_api/kernel_tiling.h)
+set(KERNEL_TILING_COMPAT_HEAD ${KERNEL_TILING_DIR}/kernel_tiling/kernel_tiling.h)
 
 if(NOT BUILD_OPEN_PROJECT)
     add_custom_command(
-        OUTPUT ${KERNEL_TILING_HEAD}
+        OUTPUT ${KERNEL_TILING_HEAD} ${KERNEL_TILING_COMPAT_HEAD}
         COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR} ${KERNEL_TILING_HEAD}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${KERNEL_TILING_DIR}/kernel_tiling
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${KERNEL_TILING_HEAD} ${KERNEL_TILING_COMPAT_HEAD}
         COMMAND mkdir -p ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/kernel_tiling
         COMMAND cp ${KERNEL_TILING_HEAD} ${TOP_DIR}/atc/opcompiler/ascendc_compiler/api/kernel_tiling
         DEPENDS ${GEN_KERNEL_TILING_DATA_SCRIPT}
     )
 else()
     add_custom_command(
-        OUTPUT ${KERNEL_TILING_HEAD}
+        OUTPUT ${KERNEL_TILING_HEAD} ${KERNEL_TILING_COMPAT_HEAD}
         COMMAND ${HI_PYTHON} ${GEN_KERNEL_TILING_DATA_SCRIPT} ${TILING_DATA_DEF_DIR} ${KERNEL_TILING_HEAD}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${KERNEL_TILING_DIR}/kernel_tiling
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${KERNEL_TILING_HEAD} ${KERNEL_TILING_COMPAT_HEAD}
         DEPENDS ${GEN_KERNEL_TILING_DATA_SCRIPT}
     )
 endif()
 
-add_custom_target(gen_kernel_tiling ALL DEPENDS ${KERNEL_TILING_HEAD})
+add_custom_target(gen_kernel_tiling ALL DEPENDS ${KERNEL_TILING_HEAD} ${KERNEL_TILING_COMPAT_HEAD})
 
 add_library(kernel_tiling_headers INTERFACE)
 add_dependencies(kernel_tiling_headers gen_kernel_tiling)

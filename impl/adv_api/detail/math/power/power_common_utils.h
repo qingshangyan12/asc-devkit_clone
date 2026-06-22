@@ -23,7 +23,7 @@
 #define IMPL_MATH_POWER_POWER_COMMON_UTILS_H
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 

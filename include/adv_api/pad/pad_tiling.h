@@ -19,7 +19,7 @@
 #include "graph/tensor.h"
 #include "pad_tilingdata.h"
 #include "tiling/platform/platform_ascendc.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 /*!
  * \brief calculate max and min tmp buffer size for Pad interface.

@@ -18,7 +18,7 @@
 
 #include "../../../../../include/adv_api/conv_backprop/common/conv3d_bp_config_base.h"
 #include "../common/conv3d_bp_util.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 
 struct Out2L1ScalarParams {

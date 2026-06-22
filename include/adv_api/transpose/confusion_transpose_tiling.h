@@ -16,7 +16,7 @@
 #define LIB_TRANSPOSE_CONFUSION_TRANSPOSE_TILING_H
 #include "graph/tensor.h"
 #include "confusion_transpose_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 constexpr uint32_t TWO_TIMES = 2;
 #if !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)

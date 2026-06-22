@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_GROUPNORM_GROUPNORM_CHECK_AICORE_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_GROUPNORM_GROUPNORM_CHECK_AICORE_H_
 
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 namespace HighLevelApiCheck {

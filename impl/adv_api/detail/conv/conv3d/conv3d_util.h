@@ -17,7 +17,7 @@
 #define API_CONV3D_UTIL_H
 
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../basic_api/kernel_utils.h"
 #include "../common/conv_forward_util.h"
 

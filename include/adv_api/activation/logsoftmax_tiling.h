@@ -17,7 +17,7 @@
 #define LIB_ACTIVATION_LOGSOFTMAX_TILING_H
 #include "graph/tensor.h"
 #include "logsoftmax_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 /*
  * @ingroup GetLogSoftMaxMaxTmpSize

@@ -15,7 +15,6 @@ add_custom_target(hostapi_headers
  )
 
 add_library(tikcfw_headers INTERFACE)
-add_dependencies(tikcfw_headers hostapi_headers)
 target_include_directories(tikcfw_headers INTERFACE
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api/>

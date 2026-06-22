@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_310_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_NORMALIZATION_LAYERNORM_LAYERNORM_CHECK_310_H_
 
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../basic_check/datatype_check.h"
 #include "../../basic_check/reuse_source_check.h"
 #include "../../basic_check/single_tensor_check.h"

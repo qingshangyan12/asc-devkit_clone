@@ -21,7 +21,7 @@
 #ifndef LIB_DROPOUT_DROPOUT_H
 #define LIB_DROPOUT_DROPOUT_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/filter/dropout/dropout_impl.h"
 
 namespace AscendC {

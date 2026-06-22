@@ -23,7 +23,7 @@
 #define IMPL_MATH_POWER_POWER_C310_IMPL_H
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "power_common_utils.h"
 #include "../../common/check.h"
 

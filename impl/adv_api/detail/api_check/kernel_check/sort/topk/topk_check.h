@@ -22,7 +22,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_SORT_TOPK_TOPK_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_SORT_TOPK_TOPK_CHECK_H_
 
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../../../../../include/adv_api/sort/topk_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "topk_check_common.h"

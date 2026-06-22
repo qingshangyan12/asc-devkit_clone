@@ -24,7 +24,7 @@
 #define IMPL_REDUCE_REDUCE_XOR_SUM_REDUCE_XOR_SUM_V200_IMPL_H
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 __aicore__ inline void CastInt162Float(const LocalTensor<float>& dst, const LocalTensor<int16_t>& src)
