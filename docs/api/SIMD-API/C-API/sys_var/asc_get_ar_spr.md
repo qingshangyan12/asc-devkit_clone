@@ -1,4 +1,4 @@
-# asc_get_ar_spr
+# asc_get_squeeze_status
 
 ## 产品支持情况
 
@@ -13,7 +13,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline int64_t asc_get_ar_spr()
+__aicore__ inline int64_t asc_get_squeeze_status()
 ```
 
 ## 参数说明

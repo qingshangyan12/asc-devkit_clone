@@ -11,7 +11,7 @@
 #ifndef IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_H
 #define IMPL_C_API_INSTR_IMPL_NPU_ARCH_3510_SYS_VAR_IMPL_H
 
-#include "sys_var_impl/asc_get_ar_spr_impl.h"
+#include "sys_var_impl/asc_get_squeeze_status_impl.h"
 #include "sys_var_impl/asc_get_program_counter_impl.h"
 #include "sys_var_impl/asc_set_ctrl_impl.h"
 #include "sys_var_impl/asc_get_block_num_impl.h"
@@ -33,9 +33,9 @@
 #include "sys_var_impl/asc_get_status_impl.h"
 #include "sys_var_impl/asc_get_sys_virtual_base_impl.h"
 
-__aicore__ inline int64_t asc_get_ar_spr()
+__aicore__ inline int64_t asc_get_squeeze_status()
 {
-    return asc_get_ar_spr_impl();
+    return asc_get_squeeze_status_impl();
 }
 
 __aicore__ inline int64_t asc_get_program_counter()

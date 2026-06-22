@@ -1252,7 +1252,7 @@
             -   [asc_unlock](SIMD-API/C-API/同步控制/asc_unlock.md)
         -   [系统变量](SIMD-API/C-API/系统变量/系统变量.md)
             -   [asc_get_arch_ver](SIMD-API/C-API/系统变量/asc_get_arch_ver.md)
-            -   [asc_get_ar_spr](SIMD-API/C-API/系统变量/asc_get_ar_spr.md)
+            -   [asc_get_squeeze_status](SIMD-API/C-API/系统变量/asc_get_squeeze_status.md)
             -   [asc_get_block_idx](SIMD-API/C-API/系统变量/asc_get_block_idx.md)
             -   [asc_get_block_num](SIMD-API/C-API/系统变量/asc_get_block_num.md)
             -   [asc_get_core_id](SIMD-API/C-API/系统变量/asc_get_core_id.md)
