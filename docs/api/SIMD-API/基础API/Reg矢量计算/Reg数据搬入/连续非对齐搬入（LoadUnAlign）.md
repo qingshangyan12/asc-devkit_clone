@@ -137,7 +137,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **连续非对齐搬入时，LoadUnAlign会将后续未对齐的数据缓存至ureg，所以下一次搬入不需要再次调用LoadUnAlignPre，只需在迭代开始前调用一次LoadUnAlignPre，从而实现非对齐搬入的性能优化。**
 
-**连续非对齐搬出时，下次迭代的StoreUnAlign会将本次迭代StoreAUnlign缓存至ureg中的数据写入UB，所以本次迭代不需要调用StoreUnAlignPost将ureg数据写入UB，只需在迭代结束后调用一次StoreUnAlignPost，从而实现非对齐搬出的性能优化。**
+**连续非对齐搬出时，下次迭代的StoreUnAlign会将本次迭代StoreUnAlign缓存至ureg中的数据写入UB，所以本次迭代不需要调用StoreUnAlignPost将ureg数据写入UB，只需在迭代结束后调用一次StoreUnAlignPost，从而实现非对齐搬出的性能优化。**
 
 如[图2 连续非对齐搬入搬出示例](#fig-loadunalign-2)，将UB地址48 ~ 560的uint32_t数据[1, 2, 3, ..., 128]搬入至dstReg，再搬回UB，需要两次搬入搬出操作，即for循环执行两次，初始化和后处理移至for循环外。postUpdateStride = 256B / sizeof(T)  （即每次地址偏移256B），repeatTimes = dataSize / 256B（即迭代次数=总数据量/VL）。
 
