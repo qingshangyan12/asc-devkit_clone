@@ -3,7 +3,7 @@
 SIMT编程基于AI Core的硬件能力实现，当前，SIMT语言扩展层支持的C API类别如下：
 
 -   [同步与内存栅栏](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10314.html)：提供内存管理与同步接口，解决不同核内的线程间可能存在的数据竞争以及线程的同步问题。
--   [原子操作](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_0209.html)：提供对Unified Buffer或Global Memory上的数据与指定数据执行原子操作的一系列API接口。
+-   [原子操作](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10375.html)：提供对Unified Buffer或Global Memory上的数据与指定数据执行原子操作的一系列API接口。
 -   [Warp函数](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10386.html)：提供对单个Warp内32个线程的数据进行处理的相关操作的一系列API接口。
 -   [数学函数](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10309.html)：提供处理数学运算的函数接口集合。
 -   [访存函数](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta3/API/ascendcopapi/atlasascendc_api_07_10555.html)：提供开启Cache Hints的Load/Store函数。
