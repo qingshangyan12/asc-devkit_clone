@@ -15,6 +15,7 @@ LYCHEE_VERSION="${LYCHEE_VERSION:-0.23.0}"
 MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
 MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
+MARKDOWN_LINK_CHECK_START=$SECONDS
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$REPO_ROOT"
@@ -36,6 +37,10 @@ Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
+}
+
+markdown_check_duration() {
+    printf '%ss' "$((SECONDS - MARKDOWN_LINK_CHECK_START))"
 }
 
 download_lychee_archive() {
@@ -394,12 +399,13 @@ while IFS= read -r item; do
 done < "$SCAN_SET_FILE"
 
 if [ "${#SCAN_FILES[@]}" -eq 0 ]; then
-    [ "$MARKDOWN_LINK_CHECK_VERBOSE" = "1" ] && echo "[Markdown check] PASS: no Markdown files to check."
+    echo "[Markdown check] PASS: no Markdown files to check. duration=$(markdown_check_duration)"
     exit 0
 fi
 
 if [ "$MARKDOWN_LINK_CHECK_DRY_RUN" = "1" ]; then
     printf '%s\n' "${SCAN_FILES[@]}"
+    echo "[Markdown check] DRY-RUN: ${#SCAN_FILES[@]} file(s) selected. duration=$(markdown_check_duration)" >&2
     exit 0
 fi
 
@@ -409,7 +415,8 @@ set +e
 LYCHEE_RC=$?
 set -e
 
-python3 - "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$LYCHEE_RC" "${#SCAN_FILES[@]}" <<'PY'
+LYCHEE_DURATION=$(markdown_check_duration)
+python3 - "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$LYCHEE_RC" "${#SCAN_FILES[@]}" "$LYCHEE_DURATION" <<'PY'
 import re
 import sys
 from pathlib import Path
@@ -418,6 +425,7 @@ output_path = Path(sys.argv[1])
 filtered_path = Path(sys.argv[2])
 return_code = int(sys.argv[3])
 file_count = int(sys.argv[4])
+duration = sys.argv[5]
 
 lines = output_path.read_text(encoding="utf-8", errors="replace").splitlines()
 error_events = []
@@ -488,7 +496,8 @@ with filtered_path.open("w", encoding="utf-8") as handle:
     if return_code != 0:
         handle.write(
             f"[Markdown check] FAILED: {len(error_lines)} failed item(s), "
-            f"{len(warning_lines)} warning item(s), {file_count} file(s) checked.\n"
+            f"{len(warning_lines)} warning item(s), {file_count} file(s) checked, "
+            f"duration={duration}.\n"
         )
         if error_lines:
             handle.write("\nFailed:\n")
@@ -502,7 +511,7 @@ with filtered_path.open("w", encoding="utf-8") as handle:
     elif warning_lines:
         handle.write(
             f"[Markdown check] WARNING: {len(warning_lines)} warning item(s), "
-            f"{file_count} file(s) checked.\n\nWarnings:\n"
+            f"{file_count} file(s) checked, duration={duration}.\n\nWarnings:\n"
         )
 
     if warning_lines:
@@ -514,8 +523,8 @@ PY
 
 if [ -s "$FILTERED_OUTPUT_FILE" ]; then
     cat "$FILTERED_OUTPUT_FILE"
-elif [ "$MARKDOWN_LINK_CHECK_VERBOSE" = "1" ]; then
-    echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked."
+elif [ "$LYCHEE_RC" -eq 0 ]; then
+    echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked. duration=$(markdown_check_duration)"
 fi
 
 exit "$LYCHEE_RC"

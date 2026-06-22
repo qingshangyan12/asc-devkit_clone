@@ -39,5 +39,6 @@ repos:
         entry: env LYCHEE_VERSION=0.23.0 bash scripts/markdown_link_check.sh
         language: system
         files: \.(md|markdown|mdx)$
-        pass_filenames: false
+        pass_filenames: true
         stages: [pre-commit, manual]
+        verbose: true
