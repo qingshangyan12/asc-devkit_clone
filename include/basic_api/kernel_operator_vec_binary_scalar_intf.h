@@ -71,7 +71,7 @@ __ASC_USE_RESERVED_UBUF__(3510, "Adds is forbidden when compile option --cce-dis
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -103,7 +103,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Adds(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -148,7 +148,7 @@ __ASC_USE_RESERVED_UBUF__(3510, "Muls is forbidden when compile option --cce-dis
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -180,7 +180,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Muls(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -225,7 +225,7 @@ __ASC_USE_RESERVED_UBUF__(3510, "Maxs is forbidden when compile option --cce-dis
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -257,7 +257,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Maxs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -302,7 +302,7 @@ __ASC_USE_RESERVED_UBUF__(3510, "Mins is forbidden when compile option --cce-dis
 __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -334,7 +334,7 @@ template <typename T, typename U, bool isSetMask = true,
 __aicore__ inline void Mins(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& scalarValue,
     const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 // One of src0/src1 should be scalar or single point LocalTensor
 template <typename T = BinaryDefaultType, bool isSetMask = true, const BinaryConfig& config = DEFAULT_BINARY_CONFIG,
           typename U, typename S, typename V>
@@ -681,12 +681,12 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
+template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 
 // FusedMulsCast has been updated, please use MulsCast instead.
-template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType,
+template <typename T0 = BinaryDefaultType, typename T1 = BinaryDefaultType, 
     const BinaryConfig &config = DEFAULT_BINARY_CONFIG, typename T2, typename T3, typename T4>
 __aicore__ inline void FusedMulsCast(const T2 &dst, const T3 &src0, const T4 &src1, const uint32_t count);
 

@@ -35,7 +35,7 @@ protected:
 extern void platfrom_stub_set_chip_version(const char *num);
 extern void platfrom_stub_set_npuarch(const char *num);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 TEST_F(TestTiling, testTransDataTilingUnalignedHw)
 {
     uint32_t maxSize;
@@ -268,7 +268,7 @@ TEST_F(TestTiling, TestLogicalAndsTiling)
 }
 
 TEST_F(TestTiling, TestDigammaTilingFp32)
-{
+{   
     fe::PlatFormInfos platformInfo;
     auto plat = platform_ascendc::PlatformAscendC(&platformInfo);
     std::vector<int64_t> shapeDims = { 128, 128 };
@@ -1019,6 +1019,7 @@ TEST_F(TestTiling, TestLayerNormMaxMinTmpSize_ASCEND950_OutputRstd)
     EXPECT_EQ(minValue, totalLength * typeSize);
 }
 
+
 TEST_F(TestTiling, TestLayerNormRstdTiling)
 {
     const uint32_t stackBufferSize = 100 * 1024;
@@ -1045,7 +1046,7 @@ TEST_F(TestTiling, TestLayerNormRstdTiling)
     GetLayerNormNDTilingInfo(layernormShape, stackBufferSize, typeSize, isReuseSource, isComputeRstd, tilingNotOp);
     GetLayerNormNDTilingInfo(layernormShape, 0, typeSize, isReuseSource, isComputeRstd, tilingNotOp);
     EXPECT_EQ(tilingNotOp.rLength, 88);
-    EXPECT_EQ(tilingNotOp.rHeadLength, 64);
+    EXPECT_EQ(tilingNotOp.rHeadLength, 64); 
 }
 
 TEST_F(TestTiling, TestLayernormGradTiling1982)
@@ -1153,7 +1154,7 @@ TEST_F(TestTiling, TestDequantizeTiling)
     GetDequantizeMaxMinTmpSize(shape_1d, 2, maxValue, minValue);
     EXPECT_EQ(minValue, 4 * (64 + 1 * 320 + 328));
     EXPECT_EQ(maxValue, 4 * (64 + 1 * 320 + 328));
-
+        
     GetDequantizeTmpBufferFactorSize(shape_1d, maxLivedNodesCnt, extraBuf);
     EXPECT_EQ(maxLivedNodesCnt, 2);
     EXPECT_EQ(extraBuf, 72);
@@ -1177,7 +1178,7 @@ TEST_F(TestTiling, TestAntiquantizeTilingNoTransposePerChannelHalf)
     GetAntiQuantizeMaxMinTmpSize(srcShape, offsetShape, isTranspose, ge::DT_INT8, ge::DT_FLOAT16, maxValue, minValue);
     EXPECT_EQ(minValue, 0);
     EXPECT_EQ(maxValue, 0);
-
+    
     uint32_t maxLiveNodeCnt = 1;
     uint32_t extraBuf = 1;
     GetAntiQuantizeTmpBufferFactorSize(srcShape, offsetShape, ge::DT_INT8, ge::DT_FLOAT16, maxLiveNodeCnt, extraBuf);
@@ -1471,6 +1472,7 @@ TEST_F(TestTiling, testAdvanceSortTilingMergeSortFloat)
     EXPECT_EQ(maxValue, 32 * 32 * 8);
     EXPECT_EQ(minValue, 32 * 32 * 8);
 }
+
 
 TEST_F(TestTiling, TestTopkTiling_TopKModeNomal_isInitIndexTrue_Float_Inner64)
 {
@@ -2362,6 +2364,7 @@ TEST_F(TestTiling, MatmulApiTilingFP32OverFlow)
     EXPECT_GE(tilingData.get_shareL1Size(), 407040);
 }
 
+
 TEST_F(TestTiling, MatmulApiTilingFP32OverFlowND2NZ)
 {
     matmul_tiling::PlatformInfo plat {.socVersion = platform_ascendc::SocVersion::ASCEND910B, .l1Size = 524288,
@@ -2703,6 +2706,7 @@ TEST_F(TestTiling, Tiling_BatchMatmul)
     matmul_tiling::SysTilingTempBufSize bufSize;
     BatchMatmulGetTmpBufSize(tilingData, bufSize);
     EXPECT_EQ(ret, -1);
+
 
     bmm.bufferPool_.l1Size = 256;
     bmm.bufferPool_.l0CSize = 256;
@@ -4380,6 +4384,7 @@ TEST_F(TestTiling, TestAcosTmpBufferFacotrHalfWithoutBasicBlock) {
     EXPECT_EQ(extraBuffer, 0);
 }
 
+
 TEST_F(TestTiling, TestAcosTmpBufferFacotrFloatWithoutBasicBlock) {
     uint32_t maxLivedNodes = 0xffff;
     uint32_t extraBuffer = 0xffff;
@@ -5201,6 +5206,7 @@ TEST_F(TestTiling, TestMatmulApiTilngFactorSplit1)
     EXPECT_EQ(tilingData.get_baseM(), 128);
 }
 
+
 TEST_F(TestTiling, TestMatmulApiTilngFactorSplit2)
 {
     MatmulApiTiling tiling;
@@ -5239,6 +5245,7 @@ TEST_F(TestTiling, TestMatmulApiTilngDimfactors)
     EXPECT_GE(tilingData.get_transLength(), 0);
     EXPECT_EQ(tilingData.get_baseK(), 16);
 }
+
 
 // when A matrix or B matrix is in TSCM, then calculaye loadSize should ignore it;
 TEST_F(TestTiling, TestMatmulApiTilngBMatrixTSCM)
@@ -5571,6 +5578,7 @@ TEST_F(TestTiling, TestMatmulApiTilngMultiCoreBTSCM4)
     EXPECT_GE(tilingData.get_shareL1Size(), 32768);
     EXPECT_GE(tilingData.get_transLength(), 0);
 }
+
 
 TEST_F(TestTiling, TestMatmulApiTilngSingleCoreFullLoadCase)
 {
@@ -7498,7 +7506,7 @@ TEST_F(TestTiling, TestDigammaTilingHalf)
     EXPECT_EQ(extraBuf, 0);
 }
 #endif
-
+              
 TEST_F(TestTiling, TestAtanhTilingFloat)
 {
     std::vector<int64_t> shapeDims = { 128, 128 };
@@ -8567,6 +8575,7 @@ TEST_F(TestTiling, TestCumSum)
     GetCumSumMaxMinTmpSize(srcShape, halfSize, false, false, maxValue, minValue);
     EXPECT_EQ(minValue, minHalfSize);
     EXPECT_EQ(maxValue, maxHalfSize);
+
 
     GetCumSumMaxMinTmpSize(srcShape, floatSize, false, false, maxValue, minValue);
     EXPECT_EQ(minValue, 0);

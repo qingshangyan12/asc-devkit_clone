@@ -28,8 +28,10 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2002/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
-#elif __NPU_ARCH__ == 3510)
+#elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 5102
+#include "impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h"
 #else
 #include "impl/utils/debug/asc_debug_utils_impl_stub.h"
 #endif
@@ -51,8 +53,13 @@ __aicore__ inline void enable_asc_diagnostics()
 __aicore__ inline void enable_asc_assert()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
+#if (__NPU_ARCH__ == 5102)
+    static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
+    {4, 4, 1};
+#else
     static const struct AscTlv __asc_assert_meta_section__ __attribute__ ((used, section (".ascend.meta"))) =
     {4, 4, 5};
+#endif
 #endif // defined(ASCENDC_DUMP) || defined(ASCENDC_TIME_STAMP_ON)
 }
 
@@ -264,7 +271,7 @@ __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo,
             return false;
         }
     }
-
+    
     return true;
 }
 
@@ -303,7 +310,7 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         constexpr uint32_t RESERVED_UB_SIZE = 8 * 1024;
         uint64_t ascReservedAddr = get_shmem_sz() - RESERVED_UB_SIZE;
@@ -319,7 +326,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 
 __aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
 {
-#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(ASCENDC_SIMD_VF_DEBUG)
     if (g_sysPrintFifoSpace != nullptr) {
         pipe_barrier(PIPE_ALL);
         asc_vf_debug_ub2gm();

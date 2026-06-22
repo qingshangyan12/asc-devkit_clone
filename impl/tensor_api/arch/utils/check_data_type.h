@@ -37,7 +37,7 @@ public:
         using fmDataType = typename U::elementType;
         using filterDataType = typename S::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstDataType, fmDataType, filterDataType>,
                                        Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e2m1_t>,
                                        Std::tuple<__cc__ float, __ca__ fp4x2_e2m1_t, __cb__ fp4x2_e1m2_t>,
@@ -60,7 +60,7 @@ public:
         using fmDataType = typename U::elementType;
         using filterDataType = typename S::elementType;
         using biasPos = GetMemLocation<V>;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (Std::is_same_v<biasPos, Location::BIAS>) {
             static_assert(
                 Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
@@ -98,7 +98,7 @@ public:
         using fmDataType = typename U::elementType;
         using filterDataType = typename S::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<Std::tuple<dstDataType, fmDataType, filterDataType>,
                                        Std::tuple<__cc__ int32_t, __ca__ int8_t, __cb__ int8_t>,
                                        Std::tuple<__cc__ float, __ca__ half, __cb__ half>,
@@ -123,7 +123,7 @@ public:
         using biasDataType = typename V::elementType;
         using biasPos = GetMemLocation<V>;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (Std::is_same_v<biasPos, Location::BIAS>) {
             static_assert(
                 Std::is_one_of_v<Std::tuple<biasDataType, dstDataType, fmDataType, filterDataType>,
@@ -162,7 +162,7 @@ public:
         using dstDataType = typename T::elementType;
         using srcDataType = typename U::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<
                           Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                           Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
@@ -183,7 +183,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<
                           Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                           Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
@@ -206,7 +206,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ fp8_e8m0_t, __gm__ fp8_e8m0_t>>,
             "The data type is not supported.");
@@ -219,7 +219,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(Std::is_one_of_v<
                           Std::tuple<dstDataType, srcDataType>, Std::tuple<__cbuf__ half, __gm__ half>,
                           Std::tuple<__cbuf__ bfloat16_t, __gm__ bfloat16_t>, Std::tuple<__cbuf__ float, __gm__ float>,
@@ -252,7 +252,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>,
                              Std::tuple<__biasbuf__ float, __cbuf__ bfloat16_t>,
@@ -269,7 +269,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_same_v<
                 Std::tuple<dstDataType, srcDataType>,
@@ -283,7 +283,7 @@ public:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant
              && Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__gm__ float, __cc__ float>,
@@ -301,7 +301,7 @@ public:
     {
         using srcType = typename U::elementType;
         using dstType = typename T::elementType;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             (quantPre == QuantMode_t::NoQuant
              && Std::is_one_of_v<Std::tuple<dstType, srcType>, Std::tuple<__ubuf__ float, __cc__ float>,
@@ -320,7 +320,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__ca__ half, __cbuf__ half>,
@@ -344,7 +344,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<fp8_e8m0_t, __cbuf__ fp8_e8m0_t>>,
             "The data type is not supported.");
@@ -357,7 +357,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dstDataType, srcDataType>, Std::tuple<__cb__ half, __cbuf__ half>,
@@ -381,7 +381,7 @@ public:
         using srcDataType = typename U::elementType;
         using dstDataType = typename T::elementType;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<Std::tuple<dstDataType, srcDataType>, Std::tuple<fp8_e8m0_t, __cbuf__ fp8_e8m0_t>>,
             "The data type is not supported.");

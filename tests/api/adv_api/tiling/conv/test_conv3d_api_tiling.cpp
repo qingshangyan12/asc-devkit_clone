@@ -114,7 +114,7 @@ void TestTilingResult(int64_t ret, Conv3dTilingApi::Conv3dTiling &testTiling)
     EXPECT_EQ(testTiling.l0TilingInfo.nL0 % testTiling.cubeInfo.n0, 0);
 }
 
-#if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201))
 TEST_F(TestConv3dTiling, L0Range_cout_prime)
 {
     Conv3dTilingApi::Conv3dTiling* testTiling = new Conv3dTilingApi::Conv3dTiling(*ascendcPlatform);

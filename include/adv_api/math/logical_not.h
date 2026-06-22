@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_LOGICAL_NOT_H__
@@ -24,7 +25,7 @@
 #include "kernel_tensor.h"
 #include "include/adv_api/math/logical_not_utils.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/logical_not/logical_not_common_impl.h"
 #endif
 
@@ -39,7 +40,7 @@ namespace AscendC {
 template <const LogicalNotConfig& config = DEFAULT_LOGICAL_NOT_CONFIG, typename T, typename U>
 __aicore__ inline void LogicalNot(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LogicalNotImpl<config, T, U>(dst, src, count);
 #endif
 }

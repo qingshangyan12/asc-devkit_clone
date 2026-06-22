@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_HYPOT_H__
@@ -23,7 +24,7 @@
 
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/hypot/hypot_common_impl.h"
 #endif
 
@@ -77,7 +78,7 @@ template<typename T, bool isReuseSource = false>
 __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     HypotImpl(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
 #endif
 }
@@ -119,7 +120,7 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
     const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     HypotImpl(dstTensor, src0Tensor, src1Tensor, calCount);
 #endif
 }

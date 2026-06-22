@@ -52,7 +52,7 @@ __aicore__ inline void SoftmaxFlashNDImpl(
     uint32_t offset1 = 0;
     uint32_t offset2 = 0;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201 && ASCENDC_CPU_DEBUG == 0
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201) && ASCENDC_CPU_DEBUG == 0
     if constexpr (isBasicBlock) {
         SoftmaxFlashBasicBlock<T>(
             dst, sumTensor, maxTensor, src, expMaxTensor, inSumTensor, inMaxTensor, workLocal, tiling);
@@ -305,7 +305,7 @@ __aicore__ inline void SoftmaxFlashPostProcess(
         if (!isUpdate) {
             SoftMaxNDImpl<T, T>(dstTensor, sumTensor, maxTensor, srcTensor, workLocal, originalSrcShape, tiling);
         } else {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201 && ASCENDC_CPU_DEBUG == 0
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201) && ASCENDC_CPU_DEBUG == 0
             if constexpr (isBasicBlock) {
                 SoftmaxFlashBasicBlockFloat(
                     dstTensor, sumTensor, maxTensor, srcTensor, expMaxTensor, inSumTensor, inMaxTensor, workLocal,
@@ -343,7 +343,7 @@ __aicore__ inline void SoftmaxFlashNDImpl(
     uint32_t offset1 = 0;
     uint32_t offset2 = 0;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201 && ASCENDC_CPU_DEBUG == 0
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201) && ASCENDC_CPU_DEBUG == 0
     if constexpr (isBasicBlock) {
         SoftmaxFlashBasicBlock(
             dst, sumTensor, maxTensor, src, expMaxTensor, inSumTensor, inMaxTensor, workLocal, tiling);

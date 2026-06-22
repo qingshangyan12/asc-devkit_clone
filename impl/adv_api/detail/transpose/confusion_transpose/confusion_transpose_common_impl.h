@@ -32,14 +32,14 @@
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "confusion_transpose_v220_impl.h"
 #elif defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "confusion_transpose_v220_impl.h"
 #include "confusion_transpose_3510_impl.h"
 #endif
 
 namespace AscendC {
 #if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T>
 __aicore__ inline void CheckCompatibleTransposeTypeDataType()
 {
@@ -89,7 +89,7 @@ __aicore__ inline void ConfusionTransposeImpl(
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_ONLY) {
         CheckCompatibleTransposeTypeDataType<T>();
         ConfusionTransposeOnly(dstTensor, srcTensor, reinterpret_cast<ConfusionTransposeOnlyTiling&>(tiling));
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_021) {
         ConfusionTranspose021(dstTensor, srcTensor, reinterpret_cast<ConfusionTranspose021Tiling&>(tiling));
     } else if (transposeType == TransposeType::TRANSPOSE_ND2ND_102) {
@@ -113,7 +113,7 @@ __aicore__ inline void ConfusionTransposeImpl(
     CHECK_FUNC_HIGHLEVEL_API(ConfusionTranspose, (T), (dstTensor, srcTensor, sharedTmpBuffer, transposeType, tiling));
     /*
     scene 1:{ shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"} -->{ shape:[B, A2, A1, A3], ori_shape:[B, A2, A1,
-    A3], format:"ND"} scene 2锛歿 shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"}-->{ shape:[B, A2, A3 / 16, A1 /
+    A3], format:"ND"} scene 2：{ shape:[B, A1, A3 / 16, A2 / 16, 16, 16], format:"NZ"}-->{ shape:[B, A2, A3 / 16, A1 /
     16, 16, 16], origin_shape:[B, A2, A1, A3], format:"NZ"}
     */
     if (transposeType == TransposeType::TRANSPOSE_NZ2ND_0213 || transposeType == TransposeType::TRANSPOSE_NZ2NZ_0213) {
@@ -122,7 +122,7 @@ __aicore__ inline void ConfusionTransposeImpl(
             reinterpret_cast<ConfusionTranspose0213Tiling&>(tiling));
     }
     /*
-    scene 3锛歿 shape:[B, H / 16, S / 16, 16, 16], format:"NZ"}-->{ shape:[B, N, H/N/16, S / 16, 16, 16], ori_shape:[B,
+    scene 3：{ shape:[B, H / 16, S / 16, 16, 16], format:"NZ"}-->{ shape:[B, N, H/N/16, S / 16, 16, 16], ori_shape:[B,
     N, S, H/N], format:"NZ"}
     */
     else if (transposeType == TransposeType::TRANSPOSE_NZ2NZ_012_WITH_N) {
@@ -130,7 +130,7 @@ __aicore__ inline void ConfusionTransposeImpl(
             dstTensor, srcTensor, sharedTmpBuffer, reinterpret_cast<ConfusionTranspose2NZ012NTiling&>(tiling));
     }
     /*
-    scene 4锛歿 shape:[B, H / 16, S / 16, 16, 16], format:"NZ"}-->{ shape:[B, N, S, H/N], ori_shape:[B, N, S, H/N],
+    scene 4：{ shape:[B, H / 16, S / 16, 16, 16], format:"NZ"}-->{ shape:[B, N, S, H/N], ori_shape:[B, N, S, H/N],
     format:"ND"}
     */
     else if (transposeType == TransposeType::TRANSPOSE_NZ2ND_012_WITH_N) {
@@ -138,8 +138,8 @@ __aicore__ inline void ConfusionTransposeImpl(
             dstTensor, srcTensor, sharedTmpBuffer, reinterpret_cast<ConfusionTranspose2ND012NTiling&>(tiling));
     }
     /*
-    scene 5锛歿 shape:[B, N, H/N/16, S/16, 16, 16], format:"NZ"}-->{ shape:[B, S, H], ori_shape:[B, S, H], format:"ND"}
-    scene 6锛歿 shape:[B, N, H/N/16, S/16, 16, 16], format:"NZ"}-->{ shape:[B, H/16, S/16, 16, 16], ori_shape:[B, S, H],
+    scene 5：{ shape:[B, N, H/N/16, S/16, 16, 16], format:"NZ"}-->{ shape:[B, S, H], ori_shape:[B, S, H], format:"ND"}
+    scene 6：{ shape:[B, N, H/N/16, S/16, 16, 16], format:"NZ"}-->{ shape:[B, H/16, S/16, 16, 16], ori_shape:[B, S, H],
     format:"NZ"}
     */
     else if (
@@ -150,7 +150,7 @@ __aicore__ inline void ConfusionTransposeImpl(
             reinterpret_cast<ConfusionTranspose012Tiling&>(tiling));
     }
     /*
-    scene 7锛歿 shape:[H, W], format:"ND"} -->{ shape:[W, H], format:"ND"}
+    scene 7：{ shape:[H, W], format:"ND"} -->{ shape:[W, H], format:"ND"}
     */
     else if (transposeType == TransposeType::TRANSPOSE_ND2ND_ONLY) {
         ConfusionTransposeOnly(dstTensor, srcTensor, reinterpret_cast<ConfusionTransposeOnlyTiling&>(tiling));

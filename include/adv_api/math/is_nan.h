@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_IS_NAN_H__
@@ -24,7 +25,7 @@
 #include "kernel_tensor.h"
 #include "include/adv_api/math/is_nan_utils.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/isnan/is_nan_common_impl.h"
 #endif
 
@@ -43,7 +44,7 @@ namespace AscendC {
 template<const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename U>
 __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     IsNanImpl<config, T, U>(dst, src, count);
 #endif
 }
@@ -62,7 +63,7 @@ template<const IsNanConfig& config = DEFAULT_IS_NAN_CONFIG, typename T, typename
 __aicore__ inline void IsNan(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     IsNanImpl<config, T, U>(dst, src, sharedTmpBuffer, count);
 #endif
 }

@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
 #define INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "instr_impl/npu_arch_2201/cube_compute_impl.h"
 
@@ -29,7 +29,7 @@
 
 __aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre, uint64_t quant_pre, bool enable_unit_flag);
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t* a_matrix, __cb__ bfloat16_t* b_matrix,
     uint16_t left_height,  uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align,

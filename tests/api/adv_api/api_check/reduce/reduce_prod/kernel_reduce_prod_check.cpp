@@ -12,6 +12,7 @@
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 #include "../reduce_case_common.h"
 
+
 class ReduceProdAPICheck : public testing::Test {
 protected:
     static void SetUpTestCase() {}
@@ -28,59 +29,60 @@ protected:
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcShapeLastAxis)
 {
-    CheckReduceSrcShapeLastAxis<float,
+    CheckReduceSrcShapeLastAxis<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::AR>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcShapeArFirstAxis)
 {
-    CheckReduceSrcShapeArFirstAxis<float,
+    CheckReduceSrcShapeArFirstAxis<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::AR>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcShapeRaLastAxis)
 {
-    CheckReduceSrcShapeRaLastAxis<float,
+    CheckReduceSrcShapeRaLastAxis<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::AR>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcShapeSrcSize)
 {
-    CheckReduceSrcShapeSrcSize<float,
+    CheckReduceSrcShapeSrcSize<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcInnerPad)
 {
-    CheckReduceSrcInnerPad<float,
+    CheckReduceSrcInnerPad<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdSrcPos)
 {
-    CheckReduceSrcPos<float,
+    CheckReduceSrcPos<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckReduceProdDstPos)
 {
-    CheckReduceDstPos<float,
+    CheckReduceDstPos<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
+
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckTmpPos)
 {
-    CheckReduceTmpPos<float,
+    CheckReduceTmpPos<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckOverlap)
 {
-    CheckReduceOverlap<float,
+    CheckReduceOverlap<float, 
         HighLevelApiCheck::CheckFuncReduceProd<float, AscendC::Pattern::Reduce::RA>>("ReduceProd");
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 TEST_F(ReduceProdAPICheck, ReduceProdAPICheckWidth32B)
 {
     AscendC::TPipe pipe;

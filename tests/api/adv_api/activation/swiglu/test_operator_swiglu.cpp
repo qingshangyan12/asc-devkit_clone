@@ -14,7 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 constexpr uint32_t SWIGLU_HALF_BUFFER_SIZE = 8; // 1 half data needs 2 float tmpbuffer which is 8 uint8 size
 #endif
 using namespace std;
@@ -63,7 +63,7 @@ void main_vec_swiglu_level2_demo(__gm__ uint8_t* __restrict__ dstGm, __gm__ uint
     TBuf<TPosition::VECCALC> tbuf3;
     tpipe.InitBuffer(tbuf3, dataSize * sizeof(T));
     LocalTensor<T> outputLocal = tbuf3.Get<T>();
-
+    
     LocalTensor<uint8_t> tmpLocal;
 
     DataCopy(input0Local, input0Global, dataSize);

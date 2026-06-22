@@ -159,15 +159,15 @@ __aicore__ inline void KPI_4(
     PipeBarrier<PIPE_V>();
 }
 
-// normalized x to (-pi/2,pi/2) using x = x-round(x/蟺)*蟺
+// normalized x to (-pi/2,pi/2) using x = x-round(x/π)*π
 __aicore__ inline void TanRound(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, const LocalTensor<float>& roundTensor,
     const LocalTensor<float>& resTensor1, const LocalTensor<float>& resTensor2)
 {
     /*
-    k=round(x/蟺), x0=x-k蟺, x0鈭?-蟺/2, 蟺/2)
-    蟺=蟺_0+蟺_1+蟺_2+蟺_3+蟺_4 achieve final precision compensation.
-    Final solution锛?
+    k=round(x/π), x0=x-kπ, x0�?-π/2, π/2)
+    π=π_0+π_1+π_2+π_3+π_4 achieve final precision compensation.
+    Final solution�?
     k = round(x * invpi)
     x -= k * pi_0
     x -= k * pi_1
@@ -203,7 +203,7 @@ __aicore__ inline void TanPolynomialApproximation(
     const LocalTensor<float>& resTensor1, const LocalTensor<float>& resTensor2)
 {
     /*
-    tan(x) = xP(x) / ((蟺/2 - x)(蟺/2 + x)Q(x))
+    tan(x) = xP(x) / ((π/2 - x)(π/2 + x)Q(x))
     P(x) = (x^2 * R0 + R1) * x^2 + R2
     Q(x) = x^2 * R3
     R0 = 0.0698520831551998762793

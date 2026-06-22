@@ -24,7 +24,7 @@
 #include "kernel_tensor.h"
 #include "kernel_struct_binary.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "reg_compute/kernel_reg_compute_utils.h"
 #endif
 
@@ -179,7 +179,7 @@ __aicore__ inline void Mul(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] repeatParams.src0RepStride src0 repeat stride
  * @param [in] repeatParams.src1RepStride src1 repeat stride
  */
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Div is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
@@ -211,7 +211,7 @@ __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 template <typename T, const DivConfig& config = DEFAULT_DIV_CONFIG>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, const int32_t& count);
@@ -220,6 +220,7 @@ template <typename T>
 __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0,
                            const LocalTensor<T>& src1, const int32_t& count);
 #endif
+
 
 /* **************************************************************************************************
  * MulAddDst                                             *
@@ -722,7 +723,7 @@ __aicore__ inline void SubRelu(const LocalTensor<T>& dst, const LocalTensor<T>& 
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0,
+__aicore__ inline void Prelu(const LocalTensor<T>& dst, const LocalTensor<T> &src0, 
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************
@@ -754,12 +755,12 @@ __aicore__ inline void Mull(const LocalTensor<T>& dst0, const LocalTensor<T>& ds
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T>
-__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+__aicore__ inline void AbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
     const LocalTensor<T> &src1, const uint32_t count);
 
 // FusedAbsSub has been updated, please use AbsSub instead.
 template <typename T>
-__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+__aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<T> &src0, 
     const LocalTensor<T> &src1, const uint32_t count);
 
 /* **************************************************************************************************
@@ -774,12 +775,12 @@ __aicore__ inline void FusedAbsSub(const LocalTensor<T> &dst, const LocalTensor<
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+__aicore__ inline void ExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count);
 
 // FusedExpSub has been updated, please use ExpSub instead.
 template <typename T, typename U>
-__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+__aicore__ inline void FusedExpSub(const LocalTensor<T> &dst, const LocalTensor<U> &src0, 
     const LocalTensor<U> &src1, const uint32_t count);
 
 }  // namespace AscendC

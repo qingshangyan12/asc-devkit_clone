@@ -24,6 +24,8 @@
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 5102
+#include "impl/utils/debug/npu_arch_5102/asc_aicore_printf_utils.h"
 #endif
 
 namespace __asc_aicore {
@@ -32,6 +34,7 @@ __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t para
 {
     set_scalar_param_impl(paramAddr, paramIdx, scalar);
 }
+
 
 __aicore__ inline void set_string_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, __gm__ const char* s,
                                         uint32_t& offset)
@@ -53,6 +56,7 @@ __aicore__ inline void set_string_param(__gm__ uint8_t* paramAddr, uint32_t para
     asc_entire_dcci((__gm__ uint64_t*)d);
     offset += strLen;
 }
+
 
 __aicore__ inline void set_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, uint32_t& offset)
 {

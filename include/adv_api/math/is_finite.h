@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_IS_FINITE_H__
@@ -23,7 +24,7 @@
 
 #include "kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/isfinite/is_finite_common_impl.h"
 #endif
 
@@ -42,7 +43,7 @@ namespace AscendC {
 template<typename T, typename U>
 __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>& src, uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     IsFiniteImpl<T, U>(dst, src, calCount);
 #endif
 }

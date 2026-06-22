@@ -109,16 +109,16 @@ HcclResult AlltoAllVDirectFullMesh::Prepare(PrepareData &param)
 
     if (algOpContext_.mc2Handler.stepSize > 0) {
         sdmaConcurrentNum_ = (devNumInlocalPod_ > 1) ? 1 : (devNumInlocalPod_);
-        //MC2细粒度不需要本地并发处�?
+        //MC2细粒度不需要本地并发处理
         isBigCount_ = false;
     }
 
-    /* 考虑当group0 的rank �?group 1的所有rank通信时，每次都要收发，所以取sdmaConcurrentNum_块；
+    /* 考虑当group0 的rank 跟 group 1的所有rank通信时，每次都要收发，所以取sdmaConcurrentNum_块；
     跟group 0内的rank通信有一块儿浪费 */
     // 注意: 如果sdmaDataBlockSize_的计算逻辑发生变化, 需要同步修改framework下CalcMetadataForFirstAlltoallv()函数中的part 1
     u32 blockGroup = (isBigCount_ || opType_ == HcclCMDType::HCCL_CMD_ALLTOALLV || opType_ == HcclCMDType::HCCL_CMD_ALLTOALLVC) ? 2 : 1;
     sdmaDataBlockSize_= (cclInMem_.size() / std::max(1u, sdmaConcurrentNum_ * blockGroup));
-    // 向下对齐�?6k Byte
+    // 向下对齐到16k Byte
     if (sdmaDataBlockSize_> HCCL_MIN_SLICE_ALIGN_910B) {
         sdmaDataBlockSize_= (sdmaDataBlockSize_/ HCCL_MIN_SLICE_ALIGN_910B) * HCCL_MIN_SLICE_ALIGN_910B;
     }
@@ -128,7 +128,7 @@ HcclResult AlltoAllVDirectFullMesh::Prepare(PrepareData &param)
         "sdmaDataBlockSize_[%llu], BigCountFlag[%d], stepSize[%u]", userRank_, cclInMem_.size(), sdmaDataBlockSize_, isBigCount_,
         algOpContext_.mc2Handler.stepSize);
 
-    // 一半的CCLOut用来发送RDMA数据，另一半用来接收RDMA数据，因此需要除�?
+    // 一半的CCLOut用来发送RDMA数据，另一半用来接收RDMA数据，因此需要除以2
     rdmaDataBlockSize_ = cclOutMem_.size() / std::max(1u, rdmaConcurrentNum_) / 2;
 
     return HCCL_SUCCESS;
@@ -203,7 +203,7 @@ HcclResult AlltoAllVDirectFullMesh::UpdateCurrRankRecvInfo(u32 step, u32 roundId
         ReadDataBlock readBlock = {recvLen, scratchOffset, userOutOffset};
         subStreamZcopyReadInfo[destRank] = readBlock;
 
-        // sendCount�?, step和readInfo.size一定为0
+        // sendCount为0, step和readInfo.size一定为0
         CHK_PRT_RET(maxRecvStep > 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankRecvInfo] maxRecvStep[%u] != 0 for remainRecvLen[%llu]", maxRecvStep, remainRecvLen), HCCL_E_INTERNAL);
         CHK_PRT_RET(readInfo.size() != 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankRecvInfo] invalid readInfo.size[%u]", readInfo.size()), HCCL_E_INTERNAL);
     } else {
@@ -251,9 +251,9 @@ HcclResult AlltoAllVDirectFullMesh::UpdateCurrRankSendInfo(u32 step, u32 roundId
     }
     scratchOffset = bufferIdx * sdmaDataBlockSize_;
 
-    // 更新hcclOffset到dstRank的映�? 用于alltoallv算子aicpu展开的SQE缓存
+    // 更新hcclOffset到dstRank的映射, 用于alltoallv算子aicpu展开的SQE缓存
     if (needAlltoallvCache_) {
-        // alltoallv cache只针对小数据�? 至多只有1个step
+        // alltoallv cache只针对小数据量, 至多只有1个step
         CHK_PRT_RET(step != 0,
             HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankRecvInfo] needAlltoallvCache_[%u] step[%u]",
                 needAlltoallvCache_, step),
@@ -290,7 +290,7 @@ HcclResult AlltoAllVDirectFullMesh::UpdateCurrRankSendInfo(u32 step, u32 roundId
         SendDataBlock sendBlock = {sendLen, userInOffset, scratchOffset};
         subStreamZcopySendInfo[destRank] = sendBlock;
 
-        // sendCount�?, step和sendInfo.size一定为0
+        // sendCount为0, step和sendInfo.size一定为0
         CHK_PRT_RET(maxSendStep > 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankSendInfo] maxSendStep[%u] != 0 for remainSendLen[%llu]", maxSendStep, remainSendLen), HCCL_E_INTERNAL);
         CHK_PRT_RET(sendInfo.size() != 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankSendInfo] invalid sendInfo.size[%u]", sendInfo.size()), HCCL_E_INTERNAL);
     } else {
@@ -377,10 +377,10 @@ HcclResult AlltoAllVDirectFullMesh::PrepareIntraData(u32 step,
     for (auto& sdmaInfo : subStreamSendInfo) {
         const std::vector<SendDataBlock>& sendInfo = sdmaInfo.second;
 
-        // 对于alltoallv类算�? 零长拷贝需要调用MemcpyAsync保证aicpu cache使能时placeholder正确下发
-        // 注意: alltoallv aicpu cache只考虑小数据量 (即max step�?), 所以只需要在step 0时下发一个placeholder SQE即可
+        // 对于alltoallv类算子, 零长拷贝需要调用MemcpyAsync保证aicpu cache使能时placeholder正确下发
+        // 注意: alltoallv aicpu cache只考虑小数据量 (即max step为1), 所以只需要在step 0时下发一个placeholder SQE即可
         if (needAlltoallvCache_) {
-            // alltoallv cache只针对小数据�? 至多只有1个step
+            // alltoallv cache只针对小数据量, 至多只有1个step
             CHK_PRT_RET(step != 0,
                 HCCL_ERROR("[AlltoAllVDirectFullMesh][UpdateCurrRankRecvInfo] needAlltoallvCache_[%u] step[%u]",
                     needAlltoallvCache_, step),
@@ -388,16 +388,16 @@ HcclResult AlltoAllVDirectFullMesh::PrepareIntraData(u32 step,
 
             const u32 sendRank = sdmaInfo.first;
             std::unordered_map<u32, SendDataBlock>::const_iterator mapIter = subStreamZcopySendInfo.find(sendRank);
-            if (mapIter != subStreamZcopySendInfo.end()) { // sendRank的sendCount�?
-                // 零长拷贝�? sendRank对应的step和sendInfo.size一定为0
+            if (mapIter != subStreamZcopySendInfo.end()) { // sendRank的sendCount为0
+                // 零长拷贝下, sendRank对应的step和sendInfo.size一定为0
                 CHK_PRT_RET(sendNumSubStep_[sdmaInfo.first] > 0, HCCL_ERROR("invalid sendNumSubStep_[%u][%u] != 0", sdmaInfo.first, sendNumSubStep_[sdmaInfo.first]), HCCL_E_INTERNAL);
                 CHK_PRT_RET(sendInfo.size() > 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][PrepareIntraData] invalid sendInfo.size[%u] != 0", sendInfo.size()), HCCL_E_INTERNAL);
 
-                // 获取零长拷贝的发送偏�?
+                // 获取零长拷贝的发送偏移
                 const SendDataBlock& sendBlock = mapIter->second;
                 CHK_PRT_RET(sendBlock.sendLen != 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][PrepareIntraData] invalid sendBlock.sendLen[%llu] != 0", sendBlock.sendLen), HCCL_E_INTERNAL);
 
-                // 强制调用HcclD2DMemcpyAsync下发cache-memcpy placeholder (aicpu cache使能时才会生�? 未使能时会直接返�?
+                // 强制调用HcclD2DMemcpyAsync下发cache-memcpy placeholder (aicpu cache使能时才会生效, 未使能时会直接返回)
                 DeviceMem src = userInput_.range(sendBlock.userInOffset, sendBlock.sendLen);
                 DeviceMem dst = cclInMem_.range(sendBlock.scratchOffset, sendBlock.sendLen);
                 HCCL_DEBUG("[AlltoAllVDirectFullMesh][PrepareIntraData]userRank [%u] copy from userInOffset[%llu]"
@@ -574,15 +574,15 @@ HcclResult AlltoAllVDirectFullMesh::NotifyRemoteRankStart(u32 step)
             const LINK& sendTransport = links_[sendRank];
             
             if (needAlltoallvCache_) {
-                // alltoallv cache只针对小数据�? 至多只有1个step
+                // alltoallv cache只针对小数据量, 至多只有1个step
                 CHK_PRT_RET(step != 0,
                     HCCL_ERROR("[AlltoAllVDirectFullMesh][NotifyRemoteRankStart] needAlltoallvCache_[%u] step[%u]",
                         needAlltoallvCache_, step),
                     HCCL_E_INTERNAL);
 
                 std::unordered_map<u32, SendDataBlock>::const_iterator mapIter = subStreamZcopySendInfo_.find(sendRank);
-                if (mapIter != subStreamZcopySendInfo_.end()) { // sendRank的sendCount�?
-                    // 零长拷贝�? sendRank对应的sendInfo.size一定为0
+                if (mapIter != subStreamZcopySendInfo_.end()) { // sendRank的sendCount为0
+                    // 零长拷贝下, sendRank对应的sendInfo.size一定为0
                     CHK_PRT_RET(sendInfo.size() > 0,
                         HCCL_ERROR("[AlltoAllVDirectFullMesh][NotifyRemoteRankStart] invalid sendInfo.size[%u] != 0",
                             sendInfo.size()),
@@ -601,8 +601,8 @@ HcclResult AlltoAllVDirectFullMesh::NotifyRemoteRankStart(u32 step)
 
             if (needAlltoallvCache_) {
                 std::unordered_map<u32, ReadDataBlock>::const_iterator mapIter = subStreamZcopyReadInfo_.find(recvRank);
-                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount�?
-                    // 零长拷贝�? recvRank对应的readInfo.size一定为0
+                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount为0
+                    // 零长拷贝下, recvRank对应的readInfo.size一定为0
                     CHK_PRT_RET(readInfo.size() > 0,
                         HCCL_ERROR("[AlltoAllVDirectFullMesh][NotifyRemoteRankStart] invalid readInfo.size[%u] != 0",
                             readInfo.size()),
@@ -647,21 +647,21 @@ HcclResult AlltoAllVDirectFullMesh::SdmaMainStreamWait(u32 step, u32 roundIdx)
             const std::vector<ReadDataBlock>& readInfo = subStreamReadInfo_[recvRank];
 
             if (needAlltoallvCache_) {
-                // alltoallv cache只针对小数据�? 至多只有1个step
+                // alltoallv cache只针对小数据量, 至多只有1个step
                 CHK_PRT_RET(step != 0,
                     HCCL_ERROR("[AlltoAllVDirectFullMesh][SdmaMainStreamWait] needAlltoallvCache_[%u] step[%u]",
                         needAlltoallvCache_, step),
                     HCCL_E_INTERNAL);
 
                 std::unordered_map<u32, ReadDataBlock>::const_iterator mapIter = subStreamZcopyReadInfo_.find(recvRank);
-                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount�?
-                    // 零长拷贝�? recvRank对应的readInfo.size一定为0
+                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount为0
+                    // 零长拷贝下, recvRank对应的readInfo.size一定为0
                     CHK_PRT_RET(readInfo.size() > 0,
                         HCCL_ERROR("[AlltoAllVDirectFullMesh][SdmaMainStreamWait] invalid readInfo.size[%u] != 0",
                             readInfo.size()),
                         HCCL_E_INTERNAL);
                     
-                    // 正常下NotifyWait SQE (本地主从流同�? 由于从流不存在跨卡数据搬�? 主流wait后会立刻wake up)
+                    // 正常下NotifyWait SQE (本地主从流同步, 由于从流不存在跨卡数据搬运, 主流wait后会立刻wake up)
                     HCCL_DEBUG("[AlltoAllVDirectFullMesh][SdmaMainStreamWait] userRank [%u], recvRank[%u], "
                         "sendRank[%u], sdma stream [%u], "
                         "post sync info: step[%u], roundIdx[%u], lastStep_[%u], lastRoundIdx_[%u] main stream wait",
@@ -700,15 +700,15 @@ HcclResult AlltoAllVDirectFullMesh::SdmaMainStreamPost(u32 step, u32 roundIdx)
             const std::vector<ReadDataBlock>& readInfo = subStreamReadInfo_[recvRank];
 
             if (needAlltoallvCache_) {
-                // alltoallv cache只针对小数据�? 至多只有1个step
+                // alltoallv cache只针对小数据量, 至多只有1个step
                 CHK_PRT_RET(step != 0,
                     HCCL_ERROR("[AlltoAllVDirectFullMesh][SdmaMainStreamWait] needAlltoallvCache_[%u] step[%u]",
                         needAlltoallvCache_, step),
                     HCCL_E_INTERNAL);
 
                 std::unordered_map<u32, ReadDataBlock>::const_iterator mapIter = subStreamZcopyReadInfo_.find(recvRank);
-                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount�?
-                    // 零长拷贝�? recvRank对应的readInfo.size一定为0
+                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount为0
+                    // 零长拷贝下, recvRank对应的readInfo.size一定为0
                     CHK_PRT_RET(readInfo.size() > 0,
                         HCCL_ERROR("[AlltoAllVDirectFullMesh][SdmaMainStreamWait] invalid readInfo.size[%u] != 0",
                             readInfo.size()),
@@ -780,25 +780,25 @@ HcclResult AlltoAllVDirectFullMesh::SDMAwithRemoteRankAndNotifyEnd(u32 step, u32
             const LINK& readTransport = links_[recvRank];
             const LINK& sendTransport = links_[sendRank];
 
-            // 对于alltoallv类算�? 零长拷贝需要调用MemcpyAsync保证aicpu cache使能时placeholder正确下发
-            // 注意: alltoallv aicpu cache只考虑小数据量 (即max step�?), 所以只需要在step 0时下发一个placeholder SQE即可
+            // 对于alltoallv类算子, 零长拷贝需要调用MemcpyAsync保证aicpu cache使能时placeholder正确下发
+            // 注意: alltoallv aicpu cache只考虑小数据量 (即max step为1), 所以只需要在step 0时下发一个placeholder SQE即可
             if (needAlltoallvCache_) {
-                // alltoallv cache只针对小数据�? 至多只有1个step
+                // alltoallv cache只针对小数据量, 至多只有1个step
                 CHK_PRT_RET(step != 0,
                     HCCL_ERROR("[AlltoAllVDirectFullMesh][SDMAwithRemoteRankAndNotifyEnd] needAlltoallvCache_[%u] step[%u]",
                         needAlltoallvCache_, step),
                     HCCL_E_INTERNAL);
 
                 std::unordered_map<u32, ReadDataBlock>::const_iterator mapIter = subStreamZcopyReadInfo_.find(recvRank);
-                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount�?
-                    // 零长拷贝�? recvRank对应的readInfo.size一定为0
+                if (mapIter != subStreamZcopyReadInfo_.end()) { // recvRank的recvCount为0
+                    // 零长拷贝下, recvRank对应的readInfo.size一定为0
                     CHK_PRT_RET(readInfo.size() > 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][SDMAwithRemoteRankAndNotifyEnd] invalid readInfo.size[%u] != 0", readInfo.size()), HCCL_E_INTERNAL);
 
-                    // 获取零长拷贝的接收偏�?
+                    // 获取零长拷贝的接收偏移
                     const ReadDataBlock& readBlock = mapIter->second;
                     CHK_PRT_RET(readBlock.recvLen != 0, HCCL_ERROR("[AlltoAllVDirectFullMesh][SDMAwithRemoteRankAndNotifyEnd] invalid readBlock.recvLen[%llu] != 0", readBlock.recvLen), HCCL_E_INTERNAL);
 
-                    // 强制调用HcclD2DMemcpyAsync下发cache-memcpy/write placeholder (aicpu cache使能时才会下�? 未使能时会直接返�?
+                    // 强制调用HcclD2DMemcpyAsync下发cache-memcpy/write placeholder (aicpu cache使能时才会下发, 未使能时会直接返回)
                     const LINK& intraNeighboorTransport = links_[recvRank];
                     CHK_PTR_NULL(intraNeighboorTransport);
                     void* remDMAMemPtr = nullptr;
@@ -814,7 +814,7 @@ HcclResult AlltoAllVDirectFullMesh::SDMAwithRemoteRankAndNotifyEnd(u32 step, u32
                     CHK_RET(readTransport->TxDataSignal(currStream));
                     reinterpret_cast<DispatcherPub*>(dispatcher_)->SetPlaceholder(false);
 
-                    // 正常下NotifyRecord/Wait SQE (本地主从流同�? 从流不存在跨卡数据拷�? 下发placeholder后会立刻post主流并进入wait)
+                    // 正常下NotifyRecord/Wait SQE (本地主从流同步, 从流不存在跨卡数据拷贝, 下发placeholder后会立刻post主流并进入wait)
                     HCCL_DEBUG("[AlltoAllVDirectFullMesh][SDMAwithRemoteRankAndNotifyEnd] userRank [%u], recvRank[%u], sendRank[%u]," \
                         "sdma stream [%u] read data from remote offset [%llu] len [%llu] to local [%llu], "
                         "post sync info: step[%u], roundIdx[%u], lastStep_[%u], lastRoundIdx_[%u]",
@@ -857,8 +857,8 @@ HcclResult AlltoAllVDirectFullMesh::SDMAwithRemoteRankAndNotifyEnd(u32 step, u32
 
             if (needAlltoallvCache_) {
                 std::unordered_map<u32, SendDataBlock>::const_iterator mapIter = subStreamZcopySendInfo_.find(sendRank);
-                if (mapIter != subStreamZcopySendInfo_.end()) { // sendRank的sendCount�?
-                    // 零长拷贝�? sendRank对应的sendInfo.size一定为0
+                if (mapIter != subStreamZcopySendInfo_.end()) { // sendRank的sendCount为0
+                    // 零长拷贝下, sendRank对应的sendInfo.size一定为0
                     CHK_PRT_RET(sendInfo.size() > 0,
                         HCCL_ERROR("[AlltoAllVDirectFullMesh][SDMAwithRemoteRankAndNotifyEnd] invalid sendInfo.size[%u] != 0",
                             sendInfo.size()),
@@ -926,7 +926,7 @@ HcclResult AlltoAllVDirectFullMesh::RunGroupFullMeshAlltoall(u32 roundIdx, u32 s
 {
     UpdateOpBaseSubStreamInfo(step, roundIdx);
     CHK_RET(ExecEmptyTask(userInput_, userOutput_, mainStream_, dispatcher_));
-    if (isBigCount_ && (roundIdx == 0)) {
+    if (isBigCount_ && (roundIdx == 0) ) {
         CHK_RET(NotifyLocalSubStreamStart());
         CHK_RET(PrepareIntraData(step, subStreamSendInfo_, subStreamZcopySendInfo_));
         CHK_RET(WaitLocalSubStreamFinish());
@@ -950,7 +950,7 @@ HcclResult AlltoAllVDirectFullMesh::RunGroupFullMeshAlltoall(u32 roundIdx, u32 s
     return HCCL_SUCCESS;
 }
 
-// 主流通知RDMA控制流启�?
+// 主流通知RDMA控制流启动
 HcclResult AlltoAllVDirectFullMesh::MainNotifyRdmaControlStart()
 {
     CHK_RET(LocalNotify::Post(mainStream_, dispatcher_, rdmaControl2MainStreamNotify_, INVALID_VALUE_STAGE));
@@ -977,7 +977,7 @@ HcclResult AlltoAllVDirectFullMesh::RdmaControlNotifySubStart()
     return HCCL_SUCCESS;
 }
 
-// 从流通知RDMA控制流任务结�?
+// 从流通知RDMA控制流任务结束
 HcclResult AlltoAllVDirectFullMesh::SubNotifyRdmaControlFinish()
 {
     for (u32 i = 1; i < rdmaSubStreams_.size(); i++) {
@@ -1081,7 +1081,7 @@ HcclResult AlltoAllVDirectFullMesh::RdmaPostSync(Stream& stream)
     return HCCL_SUCCESS;
 }
 
-// 从流完成RDMA数据的收�?
+// 从流完成RDMA数据的收发
 HcclResult AlltoAllVDirectFullMesh::SendRecvRdmaData(u32 dstRank, u32 srcRank, std::vector<SendDataBlock>& sendInfo,
     std::vector<RecvDataBlock>& recvInfo, u32 round, u32 index, u32 curStep, Stream stream)
 {
@@ -1287,8 +1287,8 @@ HcclResult AlltoAllVDirectFullMesh::RunSDMAFineGrained(u32 totalStep, HcclOpMeta
             HCCL_INFO("[AlltoAllVDirectFullMesh][RunSDMAFineGrained] step is 0 finished.");
         }
     } else {
-        // totalStep == 1 细粒度修�?
-        u32 leftRankSize = devNumInlocalPod_; // leftRankSize中去掉本�?
+        // totalStep == 1 细粒度修改
+        u32 leftRankSize = devNumInlocalPod_; // leftRankSize中去掉本卡
         for (u32 roundIdx = 0; roundIdx < commRounds_ && leftRankSize > 0; roundIdx++) {
             CHK_RET(mc2HandlerPub.Mc2WaitValue(dispatcher_, mainStream_, &(algOpContext_.mc2Handler), roundIdx));
             CHK_RET(InitTask(dispatcher_, mainStream_, opMeta.isEnableCache, opMeta.GetCacheKey()));
@@ -1321,7 +1321,7 @@ HcclResult AlltoAllVDirectFullMesh::RunSDMA(HcclOpMetaInfoDef &opMeta)
     lastStep_ = totalStep - 1;
     // 计算每个rank分组fullmesh后需要通信的轮次，向上取整
     commRounds_ = (devNumInlocalPod_ + sdmaConcurrentNum_ - 1) / sdmaConcurrentNum_;
-    u32 leftRankSize = devNumInlocalPod_ - 1; // leftRankSize中去掉本�?
+    u32 leftRankSize = devNumInlocalPod_ - 1; // leftRankSize中去掉本卡
     lastRoundIdx_ = std::min((leftRankSize + sdmaConcurrentNum_ - 1) / sdmaConcurrentNum_, static_cast<u32>(commRounds_)) - 1;
     HCCL_DEBUG("[AlltoAllVDirectFullMesh][RunSDMA] userRank [%u] communication rounds[%llu] totalStep [%u] "
         "stepSize [%u], post sync info: lastStep_[%u] lastRoundIdx_[%u] devNumInlocalPod_[%u] sdmaConcurrentNum_[%u]",
@@ -1340,7 +1340,7 @@ HcclResult AlltoAllVDirectFullMesh::RunSDMA(HcclOpMetaInfoDef &opMeta)
         }
 
         for (u32 step = 0; step < totalStep; step++) {
-            u32 currentLeftRankSize = devNumInlocalPod_ - 1; // leftRankSize中去掉本�?
+            u32 currentLeftRankSize = devNumInlocalPod_ - 1; // leftRankSize中去掉本卡
             for (u32 roundIdx = 0; roundIdx < commRounds_ && currentLeftRankSize > 0; roundIdx++) {
                 CHK_RET(InitTask(dispatcher_, mainStream_, opMeta.isEnableCache, opMeta.GetCacheKey()));
                 u32 groupRankSize = (currentLeftRankSize > sdmaConcurrentNum_) ? sdmaConcurrentNum_ : currentLeftRankSize;

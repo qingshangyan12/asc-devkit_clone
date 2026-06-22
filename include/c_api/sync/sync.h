@@ -17,7 +17,7 @@
 #ifndef INCLUDE_C_API_SYNC_SYNC_H
 #define INCLUDE_C_API_SYNC_SYNC_H
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "instr_impl/npu_arch_2201/sync_impl.h"
 
@@ -45,7 +45,7 @@ __aicore__ inline void asc_sync();
 
 #define asc_sync_data_barrier(arg) asc_sync_data_barrier_impl((arg))
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #define asc_sync_block_wait(pipe, flagID) wait_flag_dev((flagID))
 

@@ -28,59 +28,60 @@ protected:
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcShapeLastAxis)
 {
-    CheckReduceSrcShapeLastAxis<uint8_t,
+    CheckReduceSrcShapeLastAxis<uint8_t, 
         HighLevelApiCheck::CheckFuncReduceAny<uint8_t, AscendC::Pattern::Reduce::AR>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcShapeArFirstAxis)
 {
-    CheckReduceSrcShapeArFirstAxis<float,
+    CheckReduceSrcShapeArFirstAxis<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::AR>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcShapeRaLastAxis)
 {
-    CheckReduceSrcShapeRaLastAxis<float,
+    CheckReduceSrcShapeRaLastAxis<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::AR>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcShapeSrcSize)
 {
-    CheckReduceSrcShapeSrcSize<float,
+    CheckReduceSrcShapeSrcSize<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcInnerPad)
 {
-    CheckReduceSrcInnerPad<float,
+    CheckReduceSrcInnerPad<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnySrcPos)
 {
-    CheckReduceSrcPos<float,
+    CheckReduceSrcPos<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckReduceAnyDstPos)
 {
-    CheckReduceDstPos<float,
+    CheckReduceDstPos<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
+
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckTmpPos)
 {
-    CheckReduceTmpPos<float,
+    CheckReduceTmpPos<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckOverlap)
 {
-    CheckReduceOverlap<float,
+    CheckReduceOverlap<float, 
         HighLevelApiCheck::CheckFuncReduceAny<float, AscendC::Pattern::Reduce::RA>>("ReduceAny");
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 TEST_F(ReduceAnyAPICheck, ReduceAnyAPICheckWidth32B)
 {
     AscendC::TPipe pipe;

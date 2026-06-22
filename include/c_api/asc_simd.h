@@ -19,7 +19,7 @@
 
 #include "instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "c_api/cache_ctrl/cache_ctrl.h"
 #include "c_api/atomic/atomic.h"

@@ -52,7 +52,7 @@ __aicore__ inline void FlushDataCacheAicpu(__gm__ void* gmAddr)
     FlushDataCacheAicpu(globalHcclMsgArea, gmAddr);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 
 template <typename T>
 __aicore__ inline T ReadHBMData(__gm__ T* addr)

@@ -258,7 +258,7 @@ private:
     template <typename SrcT, typename L0cT>
     __aicore__ inline void MxShapeValidCheck()
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         const auto l0ABUseSizeFactor = (tiling_.GetDbL0A() - 1) & (tiling_.GetDbL0B() - 1) ? Impl::DB_FACTOR : 1;
         const auto l0CUseSizeFactor = (tiling_.GetDbL0C() == Impl::DB_FACTOR) ? Impl::DB_FACTOR : 1;
         // A  < l0aSize;
@@ -315,7 +315,7 @@ private:
     __aicore__ inline void DepthCheck()
     {
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510)
+    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (DoMatmulMDL(MM_CFG) || DoMatmulSpecialMDL(MM_CFG)) {
             ASCENDC_ASSERT((tiling_.GetDepthA1() % (tiling_.GetStepM() * tiling_.GetStepKa()) == 0), {
                 KERNEL_LOG(
@@ -351,7 +351,7 @@ private:
 
     __aicore__ inline void MxTypeParaCheck()
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (DoMatmulMDL(MM_CFG)) {
             int32_t mxTypePara = tiling_.GetMxTypePara();
             // 0x01010101 is scaleFactorM, scaleFactorN, scaleFactorKa, scaleFactorKb min val
@@ -378,7 +378,7 @@ private:
                 });
             }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
             if constexpr (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
                 ASCENDC_ASSERT(tiling_.GetSingleCoreK() <= tiling_.GetBaseK(), {
                     KERNEL_LOG(
@@ -424,11 +424,13 @@ private:
             });
         }
 #endif
+#if (__NPU_ARCH__ != 2201) && (__NPU_ARCH__ != 3510) && (__NPU_ARCH__ != 5102)
         if constexpr (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             ASCENDC_ASSERT(
                 false, { KERNEL_LOG(KERNEL_ERROR, "ScheduleType is OUTER_PRODUCT only supported on A2/A3/A5."); });
         }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510
+#endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
         if constexpr (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             ASCENDC_ASSERT(tiling_.GetSingleCoreK() <= tiling_.GetBaseK(), {
                 KERNEL_LOG(
@@ -460,7 +462,7 @@ private:
 
     __aicore__ inline void MxConfigSpecificCheck()
     {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (ToMatmulConfig(MM_CFG).scheduleType == ScheduleType::OUTER_PRODUCT) {
             ASCENDC_ASSERT(DoMatmulMDL(MM_CFG), {
                 KERNEL_LOG(KERNEL_ERROR, "when scheduleType is OUTER_PRODUCT, MxMatmul only support mdl");
@@ -530,7 +532,7 @@ private:
     __aicore__ inline void ConfigCommonStaticCheck()
     {
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 3510)
+    (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         if constexpr (ToMatmulConfig(MM_CFG).isEnableChannelSplit) {
             static_assert(
                 (PhyPosIsGM(IMPL::CType::pos) && (IMPL::CType::format == CubeFormat::NZ) &&
@@ -555,7 +557,7 @@ private:
         }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         if constexpr (ToMatmulConfig(MM_CFG).enableL1BankConflictOptimise) {
             static_assert(DoMatmulMDL(MM_CFG), "L1BankConflictOptimise only support MDL config.");
 

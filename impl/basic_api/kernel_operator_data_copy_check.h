@@ -32,7 +32,7 @@ __aicore__ inline constexpr bool IsBasicDataCopySupportedType()
 {
     return SupportType<PrimT<T>, int4b_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t,
         half, float, double>()
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
 #endif
         ;
@@ -42,7 +42,7 @@ template <typename T>
 __aicore__ inline constexpr bool IsNd2NzSupportedType()
 {
     return SupportType<PrimT<T>, int4b_t, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, half, float>()
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         || SupportType<PrimT<T>, bfloat16_t>()
 #endif
         ;
@@ -127,7 +127,8 @@ __aicore__ inline void CheckDataCopyLocalAlignment(const LocalTensor<T>& dst, co
         CheckTensorAlignment(dst, 64, "dst", apiName);
         return;
     }
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 5102)
     if (dstHwPos == Hardware::FIXBUF) {
         CheckTensorAlignment(dst, 128, "dst", apiName);
         return;

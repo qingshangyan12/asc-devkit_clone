@@ -19,7 +19,7 @@
 #include "kernel_tensor.h"
 #include "kernel_basic_intf.h"
 #include "kernel_pop_stack_buffer.h"
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_v220_impl.h"
@@ -27,6 +27,14 @@
 #include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_v220_impl.h"
 #include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_v220_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#include "../../../impl/adv_api/detail/reduce/reduce_max/reduce_max_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_min/reduce_min_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_sum/reduce_sum_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_mean/reduce_mean_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_any/reduce_any_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_all/reduce_all_3510_impl.h"
+#include "../../../impl/adv_api/detail/reduce/reduce_prod/reduce_prod_3510_impl.h"
 #endif
 #if ASCENDC_CPU_DEBUG
 #include "kernel_log.h"
@@ -57,7 +65,7 @@ __aicore__ inline void ReduceMean(const LocalTensor<T>& dstTensor, const LocalTe
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceMeanImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -82,7 +90,7 @@ __aicore__ inline void ReduceMean(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -112,7 +120,7 @@ __aicore__ inline void ReduceMax(const LocalTensor<T>& dstTensor, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceMaxImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -137,7 +145,7 @@ __aicore__ inline void ReduceMax(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -167,7 +175,7 @@ __aicore__ inline void ReduceMin(const LocalTensor<T>& dstTensor, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceMinImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -192,13 +200,14 @@ __aicore__ inline void ReduceMin(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
     ReduceMin<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
+
 
 /* !
  * \brief This function calculates the sum of all elements in the input tensor based on the reduction pattern.
@@ -222,7 +231,7 @@ __aicore__ inline void ReduceSum(const LocalTensor<T>& dstTensor, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceSumImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -247,7 +256,7 @@ __aicore__ inline void ReduceSum(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -277,7 +286,7 @@ __aicore__ inline void ReduceProd(const LocalTensor<T>& dstTensor, const LocalTe
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceProdImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -302,7 +311,7 @@ __aicore__ inline void ReduceProd(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -332,7 +341,7 @@ __aicore__ inline void ReduceAny(const LocalTensor<T>& dstTensor, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceAnyImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -357,7 +366,7 @@ __aicore__ inline void ReduceAny(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });
@@ -387,7 +396,7 @@ __aicore__ inline void ReduceAll(const LocalTensor<T>& dstTensor, const LocalTen
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     Internal::ReduceAllImpl<T, pattern, isReuseSource>(dstTensor, srcTensor, sharedTmpBuffer, srcShape, srcInnerPad);
 #endif
 }
@@ -412,7 +421,7 @@ __aicore__ inline void ReduceAll(
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     LocalTensor<uint8_t> sharedTmpBuffer;
     bool ans = PopStackBuffer<uint8_t, TPosition::LCM>(sharedTmpBuffer);
     ASCENDC_ASSERT((ans), { KERNEL_LOG(KERNEL_ERROR, "PopStackBuffer Error!"); });

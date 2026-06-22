@@ -38,40 +38,43 @@ enum class CO2Layout : uint8_t {
 
 struct FixpipeConfig {
     CO2Layout format;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     bool isToUB;
 #endif
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     bool enableFixVal = false;
 #endif
 
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(false)
 #endif
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     , enableFixVal(false)
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(isToUB_)
 #endif
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     , enableFixVal(false)
 #endif
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_, bool enableFixVal_) : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     , isToUB(isToUB_)
 #endif
-#if defined(__NPU_ARCH__)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     , enableFixVal(enableFixVal_)
 #endif
     {}
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102)
+constexpr FixpipeConfig CFG_NZ_FIX = {CO2Layout::NZ, false, true};
+#endif
 constexpr FixpipeConfig CFG_NZ = {CO2Layout::NZ, false};
 constexpr FixpipeConfig CFG_ROW_MAJOR = {CO2Layout::ROW_MAJOR, false};
 constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR, false};
@@ -201,8 +204,8 @@ struct FixpipeParamsArch3510 {
 template <CO2Layout format = CO2Layout::ROW_MAJOR>
 struct FixpipeParamsC310 : FixpipeParamsArch3510<format> {
     __aicore__ FixpipeParamsC310() : FixpipeParamsArch3510<format>() {}
-
-    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn,
+    
+    __aicore__ FixpipeParamsC310(const uint16_t nSizeIn, const uint16_t mSizeIn, 
                                 const uint16_t srcStrideIn, const uint32_t dstStrideIn)
         : FixpipeParamsArch3510<format>(nSizeIn, mSizeIn, srcStrideIn, dstStrideIn) {}
 };

@@ -13,6 +13,7 @@
  * \brief
  */
 
+
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_IS_INF_H__
@@ -24,7 +25,7 @@
 #include "kernel_tensor.h"
 #include "include/adv_api/math/is_inf_utils.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/isinf/is_inf_common_impl.h"
 #endif
 
@@ -43,7 +44,7 @@ namespace AscendC {
 template<const IsInfConfig& config = DEFAULT_IS_INF_CONFIG, typename T, typename U>
 __aicore__ inline void IsInf(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     IsInfImpl<config, T, U>(dst, src, count);
 #endif
 }
@@ -62,7 +63,7 @@ template<const IsInfConfig& config = DEFAULT_IS_INF_CONFIG, typename T, typename
 __aicore__ inline void IsInf(const LocalTensor<T>& dst, const LocalTensor<U>& src,
     const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     IsInfImpl<config, T, U>(dst, src, sharedTmpBuffer, count);
 #endif
 }

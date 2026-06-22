@@ -19,28 +19,28 @@ namespace {
 
 TEST(TestSysConstants, PublicConstantsMatchArch)
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 1001
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001)
     EXPECT_EQ(ASC_UB_SIZE, 256 * 1024);
     EXPECT_EQ(ASC_L1_SIZE, 1024 * 1024);
     EXPECT_EQ(ASC_L0A_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0B_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0C_SIZE, 256 * 1024);
     EXPECT_EQ(ASC_BT_SIZE, 0);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002)
     EXPECT_EQ(ASC_UB_SIZE, 256 * 1024);
     EXPECT_EQ(ASC_L1_SIZE, 1024 * 1024);
     EXPECT_EQ(ASC_L0A_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0B_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0C_SIZE, 256 * 1024);
     EXPECT_EQ(ASC_BT_SIZE, 0);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
     EXPECT_EQ(ASC_UB_SIZE, 192 * 1024 - 256);
     EXPECT_EQ(ASC_L1_SIZE, 512 * 1024 - 256);
     EXPECT_EQ(ASC_L0A_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0B_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_L0C_SIZE, 128 * 1024);
     EXPECT_EQ(ASC_BT_SIZE, 1 * 1024);
-#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
     EXPECT_EQ(ASC_UB_SIZE, 248 * 1024);
     EXPECT_EQ(ASC_L1_SIZE, 1024 * 1024);
     EXPECT_EQ(ASC_L0A_SIZE, 64 * 1024);

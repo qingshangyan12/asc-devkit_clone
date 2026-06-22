@@ -16,7 +16,7 @@
 #ifndef INCLUDE_C_API_ATOMIC_ATOMIC_H
 #define INCLUDE_C_API_ATOMIC_ATOMIC_H
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 #include "instr_impl/npu_arch_2201/atomic_impl.h"
 
@@ -36,7 +36,7 @@ __aicore__ inline void asc_set_atomic_add_int8();
 
 __aicore__ inline void asc_set_atomic_add_int16();
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 __aicore__ inline void asc_set_atomic_none();
 

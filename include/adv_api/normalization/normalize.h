@@ -25,12 +25,14 @@
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_config.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "../../../impl/adv_api/detail/normalization/normalize/normalize_common_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#include "../../../impl/adv_api/detail/normalization/normalize/normalize_3510_impl.h"
 #endif
 namespace AscendC {
 #pragma begin_pipe(V)
 
 /*!
- * \brief Applies Layer Normalization over a mini-batch of inputs,
+ * \brief Applies Layer Normalization over a mini-batch of inputs, 
  *        performs the operation of taking the reciprocal of the standard deviation of the intermediate output results.
  *
  * \note support data type: half and float
@@ -55,14 +57,14 @@ __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     NormalizeImpl<U, T, isReuseSource, config>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta,
         sharedTmpBuffer, epsilon, para);
 #endif
 }
 
 /*!
- * \brief Applies Layer Normalization over a mini-batch of inputs,
+ * \brief Applies Layer Normalization over a mini-batch of inputs, 
  *        performs the operation of taking the reciprocal of the standard deviation of the intermediate output results.
  *
  * \note support data type: half and float
@@ -85,7 +87,7 @@ __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor
     if ASCEND_IS_AIC {
         return;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
     NormalizeImpl<U, T, isReuseSource, config>(output, outputRstd, inputMean, inputVariance, inputX, gamma, beta,
         epsilon, para);
 #endif

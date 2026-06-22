@@ -16,7 +16,7 @@
 #ifndef INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 #define INCLUDE_C_API_VECTOR_COMPUTE_VECTOR_COMPUTE_H
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "instr_impl/npu_arch_2201/vector_compute_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "instr_impl/npu_arch_3510/vector_compute_impl.h"
@@ -144,7 +144,7 @@ __aicore__ inline void asc_brcb(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,
 __aicore__ inline void asc_brcb_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src,
     uint16_t dst_block_stride, uint16_t dst_repeat_stride, uint8_t repeat);
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 
 // ==========asc_bitsort(half/float)==========
 __aicore__ inline void asc_bitsort(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ uint32_t* src1, int32_t repeat);
