@@ -301,10 +301,41 @@ def staged_markdown_changes():
     return changed, needs_full
 
 
+def markdown_inline_link_targets(text):
+    index = 0
+    while index < len(text):
+        marker = text.find("](", index)
+        if marker == -1:
+            break
+
+        start = marker + 2
+        cursor = start
+        depth = 0
+        escaped = False
+        while cursor < len(text):
+            char = text[cursor]
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                if depth == 0:
+                    raw_target = text[start:cursor].strip()
+                    if raw_target.startswith("<") and ">" in raw_target:
+                        yield raw_target[1:raw_target.find(">")]
+                    elif raw_target:
+                        yield raw_target.split()[0]
+                    break
+                depth -= 1
+            cursor += 1
+        index = cursor + 1 if cursor < len(text) else marker + 2
+
+
 def extract_link_targets(text):
     # Inline Markdown links/images: [text](target) or ![alt](target)
-    for match in re.finditer(r"!?\[[^\]]*\]\(([^)\s]+)(?:\s+[^)]*)?\)", text):
-        yield match.group(1)
+    yield from markdown_inline_link_targets(text)
 
     # Reference definitions: [label]: target
     for match in re.finditer(r"(?m)^\s*\[[^\]]+\]:\s*(\S+)", text):
@@ -422,11 +453,42 @@ repo_root = Path(sys.argv[1])
 scan_set_file = Path(sys.argv[2])
 output_file = Path(sys.argv[3])
 duration = sys.argv[4]
-base_url = "https://gitcode.com/cann/asc-devkit/blob/master/"
+repo_url = "https://gitcode.com/cann/asc-devkit"
 
-link_pattern = re.compile(r"(!?\[[^\]]*\]\()([^\s)]+)((?:\s+[^)]*)?\))")
 reference_pattern = re.compile(r"(?m)^(\s*\[[^\]]+\]:\s*)(\S+)")
 html_href_pattern = re.compile(r"""(?i)(\bhref\s*=\s*["'])([^"']+)(["'])""")
+
+
+def markdown_inline_link_targets(text):
+    index = 0
+    while index < len(text):
+        marker = text.find("](", index)
+        if marker == -1:
+            break
+
+        start = marker + 2
+        cursor = start
+        depth = 0
+        escaped = False
+        while cursor < len(text):
+            char = text[cursor]
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                if depth == 0:
+                    raw_target = text[start:cursor].strip()
+                    if raw_target.startswith("<") and ">" in raw_target:
+                        yield raw_target[1:raw_target.find(">")]
+                    elif raw_target:
+                        yield raw_target.split()[0]
+                    break
+                depth -= 1
+            cursor += 1
+        index = cursor + 1 if cursor < len(text) else marker + 2
 
 
 def source_area(path):
@@ -434,6 +496,8 @@ def source_area(path):
         return "api"
     if path.startswith("docs/guide/"):
         return "guide"
+    if path.startswith("examples/"):
+        return "examples"
     return None
 
 
@@ -470,9 +534,13 @@ def normalize_target(source_file, target):
     return normalized, suffix
 
 
+def gitcode_url(target_path, suffix):
+    view = "tree" if (repo_root / target_path).is_dir() else "blob"
+    return f"{repo_url}/{view}/master/{target_path}{suffix}"
+
+
 def iter_links(line):
-    for match in link_pattern.finditer(line):
-        yield match.group(2)
+    yield from markdown_inline_link_targets(line)
     for match in reference_pattern.finditer(line):
         yield match.group(2)
     for match in html_href_pattern.finditer(line):
@@ -511,14 +579,14 @@ for source in scan_files:
                 continue
 
             errors.append(
-                f"{source}:{line_number}: api/guide cross link must use HTTPS: "
-                f"{target} -> {base_url}{target_path}{suffix}"
+                f"{source}:{line_number}: docs/examples cross-area link must use HTTPS: "
+                f"{target} -> {gitcode_url(target_path, suffix)}"
             )
 
 with output_file.open("w", encoding="utf-8") as handle:
     if errors:
         handle.write(
-            f"[Markdown check] FAILED: {len(errors)} api/guide cross link item(s), "
+            f"[Markdown check] FAILED: {len(errors)} docs/examples cross-area link item(s), "
             f"{len(scan_files)} file(s) checked, duration={duration}.\n\nFailed:\n"
         )
         for error in errors:
