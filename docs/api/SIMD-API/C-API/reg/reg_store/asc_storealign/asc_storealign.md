@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-正常模式（NORM），从矢量数据寄存器或掩码寄存器连续对齐搬出到UB，搬运VL数据。支持多种偏移/地址变体：不传入偏移由用户自行更新目的地址、通过地址寄存器iter_reg传入偏移、通过int32_t传入偏移、repeat stride模式。Post Update模式请参见[asc_storealign_postupdate](asc_storealign_postupdate.md)。
+正常模式（NORM），将数据从矢量数据寄存器或掩码寄存器搬出到Unified Buffer（UB），搬运长度为Vector Length（VL）个元素，目的地址须32字节对齐。支持多种偏移/地址变体：不传入偏移由用户自行更新目的地址、通过地址寄存器iter_reg传入偏移、通过int32_t传入偏移、repeat stride模式。Post Update模式请参见[asc_storealign_postupdate](asc_storealign_postupdate.md)。
 
 ## 函数原型
 
@@ -119,7 +119,7 @@ __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst, vector_bool sr
 
   | 参数名  | 输入/输出 | 描述 |
   | :----- | :------- | :------- |
-  | dst | 输出 | 目的操作数（矢量）的起始地址。PostUpdate模式下为输入/输出。 |
+  | dst | 输出 | 目的操作数（矢量）的起始地址。 |
   | src | 输入 | 源操作数（掩码寄存器）。 |
   | offset | 输入 | 当输入为reg_iter类型时，用户通过地址寄存器传入偏移；当输入为int32_t类型时，用户直接以数值的方式传入偏移。 |
 
@@ -150,9 +150,8 @@ asc_storealign(dst_align32b, src, mask);
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-uint32_t offset = 128;
-iter_reg addr_reg = asc_create_iter_reg_b16(offset);
-asc_storealign(dst_align32b, src, addr_reg, mask);
+iter_reg offset = asc_create_iter_reg_b16(128);
+asc_storealign(dst_align32b, src, offset, mask);
 
 // 从矢量数据寄存器搬出 - 通过int32_t传入偏移
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
