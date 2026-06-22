@@ -134,8 +134,12 @@ PIPE_V
 - 不指定存储偏移量
 
     ```cpp
-    // dst地址为8，非32B对齐。范围为[8:520]。
+    // dst地址为8，非32B对齐。范围为[8:520]。在__aicore__上下文中获取地址。
     __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(8);
+    ```
+
+    ```cpp
+    // 在__simd_callee__上下文中调用reg接口。
     vector_store_unalign ureg;
     vector_uint32_t src;
     asc_storeunalign_postupdate(dst, ureg, src);
@@ -145,8 +149,12 @@ PIPE_V
 - 掩码寄存器连续非对齐搬出
 
 ```cpp
-// dst起始地址为8（非32B对齐）。UB上以uint16_t存储时，每次将32B压缩为16B写出。
+// dst起始地址为8（非32B对齐）。在__aicore__上下文中获取地址。
 __ubuf__ uint16_t* dst = (__ubuf__ uint16_t*)asc_get_phy_buf_addr(8);
+```
+
+```cpp
+// 在__simd_callee__上下文中调用reg接口。UB上以uint16_t存储时，每次将32B压缩为16B写出。
 vector_store_unalign ureg;
 vector_bool src;
 uint32_t remain_count = 128;
@@ -164,8 +172,12 @@ asc_storeunalign_post(dst, ureg, 0);
 - 使用uint32_t作为存储偏移量
 
     ```cpp
-    // dst地址为8，非32B对齐。范围为[8:520]。
+    // dst地址为8，非32B对齐。范围为[8:520]。在__aicore__上下文中获取地址。
     __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(8);
+    ```
+
+    ```cpp
+    // 在__simd_callee__上下文中调用reg接口。
     vector_store_unalign ureg;
     vector_uint32_t src;
     uint32_t count = 64;
@@ -184,8 +196,12 @@ asc_storeunalign_post(dst, ureg, 0);
 - 使用iter_reg作为存储偏移量
 
     ```cpp
-    // dst地址为8，非32B对齐。占用的地址为[8:520]。
+    // dst地址为8，非32B对齐。占用的地址为[8:520]。在__aicore__上下文中获取地址。
     __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(8);
+    ```
+
+    ```cpp
+    // 在__simd_callee__上下文中调用reg接口。
     vector_store_unalign ureg;
     vector_uint32_t src;
     iter_reg count = asc_create_iter_reg_b32(64);
