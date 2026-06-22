@@ -50,7 +50,6 @@ add_library(
   ${CMAKE_CURRENT_SOURCE_DIR}/matmul/matmul_tiling_base.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/matmul/matmul_tiling_algorithm.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/matmul/math_util.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/hccl/hccl_tiling.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/bitwise_and_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/logical_and_tiling_impl.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/math/logical_ands_tiling_impl.cpp

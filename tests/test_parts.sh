@@ -27,7 +27,6 @@ adv_test_targets=(
 
 adv_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend610
-    ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
 )
 
 basic_test_one_targets=(

@@ -31,7 +31,9 @@ CHANGED_FILES=""
 CI_MODE=FALSE
 ENABLE_SIGN="false"
 VERSION_INFO="8.5.0"
-CUSTOM_SIGN_SCRIPT="${CURRENT_DIR}/impl/adv_api/detail/hccl/cc/scripts/sign/community_sign_build.py"
+# 默认留空。asc-comm 迁出后 devkit 不再构建 mc2，签名流程已无用；保留该变量仅为兼容
+# device 子工程的参数透传，可通过 --sign-script 显式指定。
+CUSTOM_SIGN_SCRIPT=""
 
 dotted_line="----------------------------------------------------------------"
 
@@ -574,13 +576,8 @@ function build_test_part() {
   fi
 
   for tag in "${TEST_TARGET_LIST[@]}"; do
-    if [ "${tag}" == "hccl_checker_ops_stest" ]; then
-      local hccl_st_dir="${CURRENT_DIR}/tests/api/adv_api/hccl/cc/st/algorithm"
-      bash ${hccl_st_dir}/build.sh
-    else
-      TARGETS="${TARGETS} --target ${tag}"
-      TEST_MOD="${tag},${TEST_MOD}"
-    fi
+    TARGETS="${TARGETS} --target ${tag}"
+    TEST_MOD="${tag},${TEST_MOD}"
   done
 
   CUSTOM_OPTION="${CUSTOM_OPTION} -DTEST_MOD=${TEST_MOD}"
