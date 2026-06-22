@@ -20,6 +20,10 @@
 │   ├── figures                     // 图示
 │   ├── scripts
 │   │   ├── gen_data.py             // 输入数据和真值数据生成脚本
+│   │   ├── load2d.py               // Load2D辅助脚本
+│   │   ├── load3d.py               // Load3D辅助脚本
+│   │   ├── load_data_with_transpose.py // LoadDataWithTranspose辅助脚本
+│   │   ├── mmad.py                 // Mmad辅助脚本
 │   │   └── verify_result.py        // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt              // 编译工程文件
 │   ├── data_utils.h                // 数据读入写出函数
@@ -433,7 +437,7 @@ A / B矩阵在不同存储单元的数据排布格式见[表1](#表1)。其中L1
   </tr>
   <tr>
     <td colspan="3" align="center" >mAlignValue = fractalShape[0] * fractalNum</td>
-    <td align="center" >mAlignValue = fractalShape[1]</td>
+    <td align="center" >mAlignValue = fractalShape[0]</td>
   </tr>
     <tr>
     <td rowspan="2" align="center"><span style="font-weight: bold;">B矩阵不转置输入[k, n]，L1 -> L0B需要转置</span></td>
@@ -764,7 +768,7 @@ loadDataParams.fMatrixCtrl = false;
 
 ##### 6.1.2. A矩阵 L1 -> L0A 转置
 
-该场景同时发生小分形转置和大分形排布格式变化。Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品不支持B4数据类型；B8 / B16 / B32输入数据类型可用接口不同，下文分别以int8_t、half、float为例说明。
+该场景同时发生小分形转置和大分形排布格式变化。A矩阵转置输入场景不支持B4数据类型；B8 / B16 / B32输入数据类型可用接口不同，下文分别以int8_t、half、float为例说明。
 
 - **int8_t**：使用`LoadDataWithTranspose`。
 - **half**：可使用`Load2D`、`LoadDataWithTranspose`或`Load3Dv2`。
@@ -1083,7 +1087,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
   图18：half数据类型下，L1 -> L0B转置，调用Load2D数据排布示意图
 </div>
 
-根据[表2](#表2)可知，当B矩阵转置时，b矩阵也转置，当且仅当输入数据类型为half时，可以调用`LoadData`指令完成转置。
+根据[表2](#表2)可知，当B矩阵不转置输入且L1到L0B需要转置时，当且仅当输入数据类型为half时，可以调用`LoadData`指令完成转置。
 
 如上图18所示，以k轴方向作为外轴进行for循环，以n轴方向作为内轴来配置loadDataParams.repeatTimes。结合图示，并根据前述srcoffset和dstoffset的定义，可以得出如下配置信息。
 
@@ -1159,7 +1163,7 @@ AscendC::LoadData(b2Local, b1Local, loadDataParams);
 
 如图20所示，调用`Load3Dv2`指令时，在写入L0B之前会先分别将B矩阵高度和宽度轴向16、8对齐，在转置搬运过程中`Load3Dv2`指令会自动填充虚拟数据保证按照方型转置，在写入L0B时虚拟数据的空间会被跳过，如图白色部分，保证最终写入到L0B的B矩阵是Zn排布。
 
-对齐要求方面，在L1上B矩阵的k轴向`fractalShape[0] * fractalNum`对齐，n轴向`fractalShape[1]`对齐；在L0B上B矩阵的k轴向`fractalShape[0] * fractalNum`对齐，n轴向`fractalShape[1]`对齐。
+对齐要求方面，在L1上B矩阵的k轴向`fractalShape[0]`对齐，n轴向`fractalShape[1]`对齐；在L0B上B矩阵的k轴向`fractalShape[0]`对齐，n轴向`fractalShape[1]`对齐。
 
 <div align="center">
   <img src="figures/L1_L0B_FP32_B_trans_Load3DV2.png" width="800"><br>

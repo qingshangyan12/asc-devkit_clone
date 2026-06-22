@@ -741,13 +741,13 @@ dn2nzParams.dstNzMatrixStride = 0; // 相邻Nz矩阵间的起始地址偏移
 AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, dn2nzParams);
 ```
 
-##### 5.3.2. scaleA矩阵GM上输入为[scaleK, m, 2]（isAtranspose=true）
+##### 5.3.2. scaleA矩阵GM上输入为[scaleK/2, m, 2]（isAtranspose=true）
 
 使用`Nd2NzParams`结构体参数（B16视图）搬运。
 
 <div align="center">
   <img src="figures/GM2L1/scaleA_GM2L1_KM.png" width="1000"><br>
-  图22：scaleA矩阵[scaleK, m, 2]输入，GM -> L1，ND -> Zz
+  图22：scaleA矩阵[scaleK/2, m, 2]输入，GM -> L1，ND -> Zz
 </div>
 
 - **B16视图**：每2个`fp8_e8m0_t`元素按1个half元素搬运。
@@ -772,13 +772,13 @@ AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, nd2nzParams);
 
 scaleB矩阵的搬运方式与scaleA类似。按fp8_e8m0_t真实数据类型排布时，scaleB在L1上为Nn格式。由于硬件约束，scale矩阵需要k方向2byte连续，同样需按B16视图做`DataCopy`搬运，此时L1上表现为B16数据类型的Nz排布。搬运方式取决于isBtranspose的取值。
 
-##### 5.4.1. scaleB矩阵GM上输入为[scaleK, n, 2]（isBtranspose=false）
+##### 5.4.1. scaleB矩阵GM上输入为[scaleK/2, n, 2]（isBtranspose=false）
 
 使用`Nd2NzParams`结构体参数（B16视图）搬运。
 
 <div align="center">
   <img src="figures/GM2L1/scaleB_GM2L1_KN.png" width="1000"><br>
-  图23：scaleB矩阵[scaleK, n, 2]输入，GM -> L1，ND -> Nn
+  图23：scaleB矩阵[scaleK/2, n, 2]输入，GM -> L1，ND -> Nn
 </div>
 
 - **B16视图**：每2个`fp8_e8m0_t`元素按1个half元素搬运。

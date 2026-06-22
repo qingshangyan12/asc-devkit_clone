@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains samples for multiple APIs related to vector computation. Each sample is based on Ascend C's `<<<>>>` direct invocation method, supporting both main function and kernel function implementation in the same cpp file.
+This directory contains samples for multiple APIs related to vector computation. Each sample is based on Ascend C's `<<<>>>` direct invocation method, supporting both main function and kernel function implementation in the same .asc source file.
 
 ## Operator Development Samples
 

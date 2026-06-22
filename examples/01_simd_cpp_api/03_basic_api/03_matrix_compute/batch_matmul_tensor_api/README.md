@@ -159,7 +159,6 @@ Copy(copyL0C2GMAtom,
   ```
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
-
   示例如下：
 
   ```bash

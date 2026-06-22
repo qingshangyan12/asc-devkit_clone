@@ -65,7 +65,7 @@
 - 输入：[13, 57]个float元素（13行×57列，列数57×4字节=228字节，非32字节对齐）
 - 输出：[1, 13]个float元素（每行的求和结果）
 - 实现：使用 `DataCopyPad` 搬入非对齐数据，`ReduceRepeat<ReduceType::SUM, float>(dstLocal, srcLocal, mask=57, repeat=13, 1, 1, srcStride)` 对每行求和
-- 说明：演示非对齐数据场景下的归约操作。每行57个float元素（228字节），使用`DataCopyPad`搬运时按32字节对齐填充至232字节（58个float元素），`ReduceRepeat<SUM>`的srcRepeatStride按对齐后的block数计算
+- 说明：演示非对齐数据场景下的归约操作。每行57个float元素（228字节），使用`DataCopyPad`搬运时按32字节对齐填充至256字节（64个float元素），`ReduceRepeat<SUM>`的srcRepeatStride按对齐后的8个32字节block计算
 
 ## 样例规格
 

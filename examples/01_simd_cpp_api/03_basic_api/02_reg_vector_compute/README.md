@@ -2,7 +2,7 @@
 
 ## 概述
 
-本路径下包含了与向量计算相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个cpp文件中实现。
+本路径下包含了与向量计算相关的多个API的样例。每个样例均基于Ascend C的<<<>>>直调方法，支持main函数和kernel函数在同一个.asc源码文件中实现。
 
 ## 算子开发样例
 
@@ -25,5 +25,5 @@
 | [select](./select)　　　　　　 | 本样例基于Reg编程接口实现Select运算，根据掩码在两个向量之间选取元素　　　　                                     |
 | [squeeze](./squeeze)　　　　　　 | 本样例基于Reg编程接口实现Squeeze运算，将向量压缩为标量　　　　                                               |
 | [subnormal](./subnormal)　　　　　　 | 本样例基于Reg编程接口实现Div运算，演示支持subnormal与不支持subnormal计算结果差异                         |
-| [trait](./trait)　　　　　　 | 本样例基于Reg编程接口实现Div运算，使用int64_t类型数据，演示单核情况下RegTensor位2倍宽数据处理性能优势　　　　       |
+| [trait](./trait)　　　　　　 | 本样例基于Reg编程接口实现Div运算，使用int64_t类型数据，演示单核情况下RegTensor处理2倍位宽数据的性能优势　　　　       |
 | [truncate](./truncate)　　　　 | 本样例基于Reg编程接口实现Truncate运算，将浮点数截断到整数位                                                   |

@@ -112,12 +112,17 @@ for循环B次，每次从L1 -> L0A / L0B搬运每个batch的A、B矩阵，Mmad�
 
 ```cpp
 for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
-        SplitA(a1Local[batchIndex * aSizeAlignL0]);
-        SplitBTranspose(b1Local[batchIndex * bSizeAlignL0]);
+        SplitA(a1Local[batchIndex * aSizeAlignL0], a2Local);
+        SplitBTranspose(b1Local[batchIndex * bSizeAlignL0], b2Local);
         AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-        Compute(batchIndex, c1Local);
+        AscendC::MmadParams params;
+        params.m = m;
+        params.n = n;
+        params.k = k;
+        AscendC::Mmad(co1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])],
+                      a2Local, b2Local, params);
         AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
         AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
 }
@@ -132,7 +137,7 @@ AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cub
 
 ### 矩阵批量搬出
 
-L0C -> GM通路调用Fixpipe搬运接口，通过配置`fixpipeParams.ndNum = B`，实现一次性搬出B对C矩阵。需要注意的是，L0C中的C矩阵是对齐后的，搬出到GM的C矩阵是原始非对齐shape。
+L0C -> GM通路调用Fixpipe搬运接口，通过配置`fixpipeParams.ndNum = B`，实现一次性搬出B个C矩阵。需要注意的是，L0C中的C矩阵是对齐后的，搬出到GM的C矩阵是原始非对齐shape。
 
 对于Atlas A2 训练系列产品/Atlas A2 推理系列产品以及Atlas A3 训练系列产品/Atlas A3 推理系列产品，样例还额外演示了L0C -> L1搬出路径：Fixpipe将L0C上的float结果量化为half后写入L1，并通过DumpTensor打印L1上的NZ结果。
 
@@ -148,8 +153,12 @@ fixpipeParams.dstStride = n;
 // 源NZ矩阵的数目，也就是传输ND矩阵的数目
 fixpipeParams.ndNum = B;
 // 不同NZ矩阵起始地址之间的间隔，单位：1024B
-fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) 
+// dav-2201分支：
+fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0]))
                                 / (cubeShape[0] * cubeShape[0]);
+// dav-3510分支：
+fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0]))
+                                / cubeShape[0];
 // 目的相邻ND矩阵起始地址之间的偏移，单位：element
 ```
 

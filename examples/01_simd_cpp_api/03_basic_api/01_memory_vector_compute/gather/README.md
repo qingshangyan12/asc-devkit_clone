@@ -26,7 +26,7 @@
 ```
 
 ## 场景详细说明
-本样例通过编译参数`SCENARIO_NUM` 来切换不同的掩码生成场景：
+本样例通过编译参数`SCENARIO_NUM` 来切换不同的数据选择场景：
 
 **场景1：内置固定模式**
 - 说明：通过`src1Pattern`选择对应的二进制作为掩码，来获取数据
@@ -35,7 +35,7 @@
 - 数据类型：uint32_t
 - 实现：
     ```cpp
-    AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
+    AscendC::GatherMask(src0Local, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
     ```
 - 参数：dstLocal和src0Local采用地址复用，并使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 4, 8, 0}
 
@@ -54,12 +54,12 @@
 - 说明：根据用户输入的地址偏移张量`srcOffset`进行地址偏移，来获取数据
 - 输入：src0Local=[1, 128], srcOffset=[1, 128]
 - 输出：[1, 128]
-- 数据类型：输入输出uint16_t，srcOffset类型为uint32_t
+- 数据类型：源码按uint16_t视图读取输入输出，srcOffset类型为uint32_t；数据脚本生成的16-bit二进制数据按原始位宽参与验证
 - 实现：
     ```cpp
     AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseOffset, count);
     ```
-- 参数：使用用户提供的srcOffset按元素地址偏移，srcBaseOffset=0表示源操作数的起始地址，count=128表示执行处理的数据个数
+- 参数：使用用户提供的srcOffset按字节地址偏移，srcBaseOffset=0表示源操作数的起始地址，count=128表示执行处理的数据个数；uint16_t场景下偏移值0、2、4分别对应元素0、1、2
 
 **场景4：DataBlock偏移模式**
 - 说明：根据用户输入的地址偏移张量`srcOffset`（按照DataBlock的粒度）进行地址偏移，来获取数据

@@ -103,7 +103,7 @@
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0`（默认）、`1` | 场景：0 对应half转int4b_t，1 对应half转int32_t |
+  | `SCENARIO_NUM` | `0`、`1` | 必填。场景：0 对应half转int4b_t，1 对应half转int32_t |
 
 - 执行结果
 

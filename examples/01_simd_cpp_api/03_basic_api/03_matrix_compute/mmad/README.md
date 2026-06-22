@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例介绍了输入为ND格式，B4 / B8 / B16 / B32输入数据类型（具体以int4_t / int8_t / bfloat16 / float为例），四种输入数据类型下的矩阵乘法，说明如何通过Mmad指令实现矩阵乘法计算（C = A x B + Bias）。
+本样例介绍了输入为ND格式，B4 / B8 / B16 / B32输入数据类型（具体以int4b_t / int8_t / bfloat16 / float为例），四种输入数据类型下的矩阵乘法，说明如何通过Mmad指令实现矩阵乘法计算（C = A x B + Bias）。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -65,7 +65,7 @@
   </tr>
 </table>
 
-通常的矩阵乘法计算公式：C = A × B + Bias，其中A、B、Bias、C矩阵的需要满足的shape分别为[M,K]、[K,N]、[N]和[M,N]。Bias的数据类型与C矩阵数据类型的对应关系，如表2所示，其中Bias在GM/L1上使用 bfloat16 的组合仅支持Ascend 950PR/Ascend 950DT。
+通常的矩阵乘法计算公式：C = A × B + Bias，其中A、B、Bias、C矩阵的需要满足的shape分别为[M,K]、[K,N]、[N]和[M,N]。Bias的数据类型与C矩阵数据类型的对应关系如表2所示，其中Bias在GM/L1上使用bfloat16的组合仅支持Ascend 950PR/Ascend 950DT。
 <a name="表2"></a>
 <table border="2" align="center">
 <caption style="font-weight: normal;">

@@ -45,12 +45,12 @@
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 128]</td><td align="center">float</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">y</td><td align="center">[1, 1024]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">ld_st_reg_unalign_kernel</td></tr>
   <tr><td rowspan="1" align="center">核数</td><td colspan="4" align="center">1</td></tr>
   </table>
 - 样例实现：  
-   将UB上源操作数和目的操作数地址偏移一个元素（4 Byte）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB(Unified Buffer)。
+   将UB上源操作数和目的操作数地址偏移一个元素（4 Byte）长度，使得起始地址非32B对齐，调用CopyVF从该地址开始搬运128个float数，写回UB(Unified Buffer)。输出缓冲区按1024个float元素申请，其中搬运结果位于对应偏移位置，其余位置保持初始化值。
 
 ### 场景2：多核地址非对齐、数据量不对齐场景搬运
 - 样例功能：  
@@ -72,7 +72,7 @@
 
   2. **LoadUnAlign自然使用**：
      - 所有行统一使用LoadUnAlignPre + LoadUnAlign处理对齐地址（行0）和非对齐地址（行1-3）
-     - 对齐地址也可使用StoreAlign接口，当前仅为保证代码格式统一，用作样例演示，不作为极致性能参考
+     - 对齐地址也可使用LoadAlign接口，当前仅为保证代码格式统一，用作样例演示，不作为极致性能参考
 
   3. **ReduceDataBlock计算**：
      - 每行255元素分2个VL块处理（128 + 127）
