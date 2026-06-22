@@ -280,27 +280,27 @@ __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__  int4b_t* 
 }
 
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
+    vector_bool src1)
 {
     if ASC_IS_AIV {
-        pstu(src0, mask, dst);
+        pstu(src0, src1, dst);
     }
 }
 
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
+    vector_bool src1)
 {
     if ASC_IS_AIV {
-        pstu(src0, mask, dst);
+        pstu(src0, src1, dst);
     }
 }
 
 __simd_callee__ inline void asc_storeunalign_postupdate_impl(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
-    vector_bool mask)
+    vector_bool src1)
 {
     if ASC_IS_AIV {
         __ubuf__ uint32_t*& dst_tmp = reinterpret_cast<__ubuf__ uint32_t*&>(dst);
-        pstu(src0, mask, dst_tmp);
+        pstu(src0, src1, dst_tmp);
     }
 }
 

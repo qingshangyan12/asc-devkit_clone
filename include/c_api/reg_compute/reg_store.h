@@ -706,13 +706,13 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int4b_t*& dst,
     vector_int4x2_t src1, uint32_t count);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t*& dst, vector_store_unalign& src0,
-    vector_bool mask);
+    vector_bool src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst, vector_store_unalign& src0,
-    vector_bool mask);
+    vector_bool src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint32_t*& dst, vector_store_unalign& src0,
-    vector_bool mask);
+    vector_bool src1);
 
 __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__  int8_t* dst, vector_store_unalign& src0, vector_int8_t src1);
 
