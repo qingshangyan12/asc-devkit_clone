@@ -25,7 +25,7 @@ Matmul::GetSubBlockIdx\(\)与基础API接口[AscendC::GetSubBlockIdx\(\)](../../
 ## 函数原型
 
 ```
-__aicore__  inline uint8_t GetSubBlockIdx()
+__aicore__ inline uint8_t GetSubBlockIdx()
 ```
 
 ## 参数说明

@@ -51,14 +51,18 @@
 
     ```
     template <typename T, typename U, bool isReuseMask = true>
-    __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1, const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
+    __aicore__ inline void Select(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, T src1, const LocalTensor<U>& mask,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
     ```
 
 -   src0为srcScalar（scalar类型），src1为srcTensor（tensor类型）
 
     ```
     template <typename T, typename U, bool isReuseMask = true>
-    __aicore__ inline void Select(const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1, const LocalTensor<U>& mask, const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
+    __aicore__ inline void Select(
+        const LocalTensor<T>& dst, T src0, const LocalTensor<T>& src1, const LocalTensor<U>& mask,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SelectWithBytesMaskShapeInfo& info)
     ```
 
 该接口需要额外的临时空间来存储计算过程中的中间变量。临时空间需要开发者**申请并通过sharedTmpBuffer入参传入**。临时空间大小BufferSize的获取方式如下：通过[GetSelectMaxMinTmpSize](GetSelectMaxMinTmpSize.md)中提供的接口获取需要预留空间范围的大小。
@@ -86,9 +90,9 @@
 
 ```
 struct SelectWithBytesMaskShapeInfo {
-    __aicore__ SelectShapeInfo(){};
-    uint32_t firstAxis = 0;    
-    uint32_t srcLastAxis = 0; 
+    __aicore__ SelectShapeInfo() {};
+    uint32_t firstAxis = 0;
+    uint32_t srcLastAxis = 0;
     uint32_t maskLastAxis = 0;
 };
 ```

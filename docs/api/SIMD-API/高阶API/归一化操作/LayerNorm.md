@@ -77,7 +77,10 @@
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+            const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const T epsilon, LayerNormTiling& tiling)
         ```
 
         该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
@@ -86,7 +89,10 @@
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance, const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon, LayerNormTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<T>& outputMean, const LocalTensor<T>& outputVariance,
+            const LocalTensor<T>& inputX, const LocalTensor<T>& gamma, const LocalTensor<T>& beta, const T epsilon,
+            LayerNormTiling& tiling)
         ```
 
         该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -96,7 +102,10 @@
 
         ```
         template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+            const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
         ```
 
         该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
@@ -105,7 +114,10 @@
 
         ```
         template <typename U, typename T, bool isReuseSource = false, const LayerNormConfig& config = LNCFG_NORM>
-        __aicore__ inline void LayerNorm(const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
+        __aicore__ inline void LayerNorm(
+            const LocalTensor<T>& output, const LocalTensor<float>& outputMean, const LocalTensor<float>& outputRstd,
+            const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon,
+            const LayerNormPara& para, const LayerNormSeparateTiling& tiling)
         ```
 
         该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -206,7 +218,7 @@
 
         Atlas 推理系列产品AI Core，支持的数据类型为: half、float。
 
-        
+
 
 ## 调用示例
 
@@ -214,14 +226,14 @@
 
     ```
     AscendC::LayerNorm<float, false>(
-        output,           // [输出] 归一化后的结果y，shape [B, S, H]
-        mean,             // [输出] 每个(B, S)位置上H维度的均值，shape [B, S]
-        variance,         // [输出] 每个(B, S)位置上H维度的方差，shape [B, S]
-        inputX,           // [输入] 原始输入数据x，shape [B, S, H]，将被归一化
-        gamma,            // [输入] 缩放系数 γ，shape [H]，用于缩放归一化后的数据
-        beta,             // [输入] 平移系数 β，shape [H]，用于偏移归一化后的数据
-        (float)epsilon,   // [输入] 防除零系数 ε，避免方差为0时除以0
-        tiling            // [输入] Tiling信息，包含硬件计算分块策略（如block、thread等）
+        output,         // [输出] 归一化后的结果y，shape [B, S, H]
+        mean,           // [输出] 每个(B, S)位置上H维度的均值，shape [B, S]
+        variance,       // [输出] 每个(B, S)位置上H维度的方差，shape [B, S]
+        inputX,         // [输入] 原始输入数据x，shape [B, S, H]，将被归一化
+        gamma,          // [输入] 缩放系数 γ，shape [H]，用于缩放归一化后的数据
+        beta,           // [输入] 平移系数 β，shape [H]，用于偏移归一化后的数据
+        (float)epsilon, // [输入] 防除零系数 ε，避免方差为0时除以0
+        tiling          // [输入] Tiling信息，包含硬件计算分块策略（如block、thread等）
     );
     ```
 
@@ -266,14 +278,14 @@
 
     // LayerNorm接口调用
     AscendC::LayerNorm<float, float, false, config>(
-        output,           // [输出] 归一化后的结果y，shape [A, R]
-        mean,             // [输出] 每个A位置上R维度的均值，shape [A]
-        output1,          // [输出] 标准差的倒数rstd（或方差），shape [A]
-        inputX,           // [输入] 原始输入数据x，shape [A, R]
-        gamma,            // [输入] 缩放系数 γ，shape [R]
-        beta,             // [输入] 平移系数 β，shape [R]
-        (float)epsilon,   // [输入] 防除零系数 ε
-        para,             // [输入] 包含A和R轴长度等信息的结构体
-        tiling            // [输入] Tiling策略信息
+        output,         // [输出] 归一化后的结果y，shape [A, R]
+        mean,           // [输出] 每个A位置上R维度的均值，shape [A]
+        output1,        // [输出] 标准差的倒数rstd（或方差），shape [A]
+        inputX,         // [输入] 原始输入数据x，shape [A, R]
+        gamma,          // [输入] 缩放系数 γ，shape [R]
+        beta,           // [输入] 平移系数 β，shape [R]
+        (float)epsilon, // [输入] 防除零系数 ε
+        para,           // [输入] 包含A和R轴长度等信息的结构体
+        tiling          // [输入] Tiling策略信息
     );
     ```

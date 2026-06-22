@@ -7,7 +7,9 @@
 ## 函数原型
 
 ```
-inline void GetSwishTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+inline void GetSwishTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明

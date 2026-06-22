@@ -30,13 +30,15 @@
 -   <a name="li135771283591"></a>接口内部管理CO1
 
     ```
-    template <bool sync = true> __aicore__ inline bool Iterate(bool enPartialSum = false)
+    template <bool sync = true>
+    __aicore__ inline bool Iterate(bool enPartialSum = false)
     ```
 
 -   <a name="li4843165185812"></a>用户自主管理CO1
 
     ```
-    template <bool sync = true, typename T> __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T>& localCmatrix)
+    template <bool sync = true, typename T>
+    __aicore__ inline bool Iterate(bool enPartialSum, const LocalTensor<T>& localCmatrix)
     ```
 
     -   Atlas 推理系列产品AI Core暂不支持用户自主管理CO1。

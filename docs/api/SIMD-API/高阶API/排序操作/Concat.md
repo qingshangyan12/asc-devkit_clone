@@ -18,7 +18,8 @@
 
 ```
 template <typename T>
-__aicore__ inline void Concat(LocalTensor<T> &concat, const LocalTensor<T> &src, const LocalTensor<T> &tmp, const int32_t repeatTime)
+__aicore__ inline void Concat(
+    LocalTensor<T>& concat, const LocalTensor<T>& src, const LocalTensor<T>& tmp, const int32_t repeatTime)
 ```
 
 ## 参数说明

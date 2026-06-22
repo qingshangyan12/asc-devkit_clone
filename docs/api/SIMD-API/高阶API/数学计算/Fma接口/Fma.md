@@ -24,14 +24,18 @@
 
     ```
     template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
-    __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1,const LocalTensor<T>& src2, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void Fma(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const LocalTensor<T>& src2,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const FmaConfig& config = DEFAULT_FMA_CONFIG, typename T>
-    __aicore__ inline void Fma(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const LocalTensor<T>& src2, const uint32_t count)
+    __aicore__ inline void Fma(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const LocalTensor<T>& src2,
+        const uint32_t count)
     ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -82,10 +86,10 @@ struct FmaConfig {
     ```
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
-    pipe.InitBuffer(tmpQue, 1, bufferSize);  // bufferSize通过Host侧tiling参数获取
+    pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer = tmpQue.AllocTensor<uint8_t>();
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::FmaConfig fmaConfig = { false }; // 不修改源操作数
+    static constexpr AscendC::FmaConfig fmaConfig = {false}; // 不修改源操作数
     // dst、src0、src1、src2为half类型的LocalTensor
     AscendC::Fma<fmaConfig, half>(dst, src0, src1, src2, sharedTmpBuffer, 512);
     ```
@@ -95,9 +99,9 @@ struct FmaConfig {
     ```
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
-    pipe.InitBuffer(tmpQue, 1, bufferSize);  // bufferSize通过Host侧tiling参数获取
+    pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::FmaConfig fmaConfig = { false }; // 不修改源操作数
+    static constexpr AscendC::FmaConfig fmaConfig = {false}; // 不修改源操作数
     // dst、src0、src1、src2为half类型的LocalTensor
     AscendC::Fma<fmaConfig, half>(dst, src0, src1, src2, 512);
     ```

@@ -29,14 +29,18 @@ Hypot\(3.0, 4.0\) = 5.0
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Hypot(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Hypot(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
@@ -44,14 +48,17 @@ Hypot\(3.0, 4.0\) = 5.0
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount)
+        __aicore__ inline void Hypot(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Hypot(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+        __aicore__ inline void Hypot(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
         ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -97,10 +104,11 @@ Hypot\(3.0, 4.0\) = 5.0
 ```
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
-pipe.InitBuffer(tmpQue, 1, bufferSize);  // bufferSize通过Host侧tiling参数获取
+pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
 AscendC::LocalTensor<uint8_t> sharedTmpBuffer = tmpQue.AllocTensor<uint8_t>();
 // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-AscendC::Hypot(dstLocal, src0Local, src1Local, sharedTmpBuffer, 512); // sharedTmpBuffer入参传入，使用该tensor作为临时空间进行处理
+AscendC::Hypot(
+    dstLocal, src0Local, src1Local, sharedTmpBuffer, 512); // sharedTmpBuffer入参传入，使用该tensor作为临时空间进行处理
 ```
 
 结果示例如下：

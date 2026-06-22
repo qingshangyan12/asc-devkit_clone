@@ -20,13 +20,17 @@
     -   AscendC::optiling命名空间下的计算接口
 
         ```
-        void SoftMaxTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxTiling)
+        void SoftMaxTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            optiling::SoftMaxTiling& softmaxTiling)
         ```
 
     -   AscendC命名空间下的计算接口
 
         ```
-        void SoftMaxTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxTiling)
+        void SoftMaxTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            AscendC::tiling::SoftMaxTiling& softmaxTiling)
         ```
 
 ## 参数说明

@@ -10,11 +10,15 @@ kernel侧Sin接口的计算需要开发者预留/申请临时空间，本接口�
 ## 函数原型
 
 ```
-void GetSinMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetSinMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ```
-void GetSinMaxMinTmpSize(const SinConfig& config, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetSinMaxMinTmpSize(
+    const SinConfig& config, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
+    uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

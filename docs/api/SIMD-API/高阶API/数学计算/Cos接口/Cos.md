@@ -33,14 +33,17 @@ Cos\(x\)的泰勒展开式为：
 
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
-        __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Cos(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
         template <typename T, bool isReuseSource = false, const CosConfig& config = defaultCosConfig>
-        __aicore__ inline void Cos(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Cos(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
@@ -77,11 +80,11 @@ Cos\(x\)的泰勒展开式为：
 
 ```
 struct CosConfig {
-  CosAlgo algo = CosAlgo::POLYNOMIAL_APPROXIMATION;
+    CosAlgo algo = CosAlgo::POLYNOMIAL_APPROXIMATION;
 };
 enum class CosAlgo {
-  POLYNOMIAL_APPROXIMATION = 0,
-  RADIAN_REDUCTION,
+    POLYNOMIAL_APPROXIMATION = 0,
+    RADIAN_REDUCTION,
 };
 ```
 
@@ -119,7 +122,7 @@ enum class CosAlgo {
 // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
 AscendC::Cos(dstLocal, srcLocal, sharedTmpBuffer, 512);
 constexpr AscendC::CosAlgo algo = AscendC::CosAlgo::RADIAN_REDUCTION;
-constexpr AscendC::CosConfig config = { algo };
+constexpr AscendC::CosConfig config = {algo};
 AscendC::Cos<half, false, config>(dstLocal, srcLocal, sharedTmpBuffer, 512);
 ```
 

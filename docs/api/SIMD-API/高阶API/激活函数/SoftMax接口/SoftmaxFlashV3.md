@@ -74,15 +74,27 @@ def softmax_flash_3(src, height, width, loopCnt, alpha, baseK, inmax=None, insum
 -   接口框架申请临时空间
 
     ```
-    template <typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-    __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor, const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor, const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor, const SoftMaxTiling& tiling, const SoftMaxParams& params)
+    template <
+        typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
+        bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+    __aicore__ inline void SoftmaxFlashV3(
+        const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor,
+        const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor,
+        const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor,
+        const SoftMaxTiling& tiling, const SoftMaxParams& params)
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
-    template <typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-    __aicore__ inline void SoftmaxFlashV3(const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor,const LocalTensor<U>& expSumTensor, const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor,const LocalTensor<T>& expMaxTensor, const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxParams& params)
+    template <
+        typename T, typename U, bool isUpdate = false, bool isReuseSource = false, bool isBasicBlock = false,
+        bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+    __aicore__ inline void SoftmaxFlashV3(
+        const LocalTensor<T>& dstTensor, const LocalTensor<U>& meanTensor, const LocalTensor<U>& expSumTensor,
+        const LocalTensor<U>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& expMaxTensor,
+        const LocalTensor<U>& inMeanTensor, const LocalTensor<U>& inExpSumTensor, const LocalTensor<U>& inMaxTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxParams& params)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -172,13 +184,16 @@ AscendC::SoftMaxParams params(
     /* 原始尾轴长度              */ oriSrcK,
     /* 循环次数，update为true时大于等于1    */ loopCn,
     /* 每一行平均值时的分块个数，仅支持为8  */ splitMeanCnt,
-    /* 计算参数，推荐取值0.9375、0.96889、0.984497 */ alpha
-);
+    /* 计算参数，推荐取值0.9375、0.96889、0.984497 */ alpha);
 
 // 通过sharedTmpBuffer入参传入临时空间
-AscendC::SoftmaxFlashV3<T, U, true>(dstLocal, meanLocal, expSumLocal, maxLocal, srcLocal, expMaxLocal, inMeanLocal, inExpSumLocal, inMaxLocal, sharedTmpBuffer, tiling, params);
+AscendC::SoftmaxFlashV3<T, U, true>(
+    dstLocal, meanLocal, expSumLocal, maxLocal, srcLocal, expMaxLocal, inMeanLocal, inExpSumLocal, inMaxLocal,
+    sharedTmpBuffer, tiling, params);
 // 接口框架申请临时空间
-AscendC::SoftmaxFlashV3<T, U, true>(dstLocal, meanLocal, expSumLocal, maxLocal, srcLocal, expMaxLocal, inMeanLocal, inExpSumLocal, inMaxLocal, tiling, params);
+AscendC::SoftmaxFlashV3<T, U, true>(
+    dstLocal, meanLocal, expSumLocal, maxLocal, srcLocal, expMaxLocal, inMeanLocal, inExpSumLocal, inMaxLocal, tiling,
+    params);
 ```
 
 结果示例如下：

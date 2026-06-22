@@ -37,15 +37,21 @@ Ascend C提供RmsNorm Tiling API，方便用户获取RmsNorm kernel计算时所�
 ## 函数原型
 
 ```
-bool GetRmsNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isBasicBlock = false)
+bool GetRmsNormMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue,
+    const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, optiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ```
-bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize, const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
+bool GetRmsNormTilingInfo(
+    const ge::Shape& srcShape, const ge::Shape& originSrcShape, const uint32_t stackBufferByteSize,
+    const uint32_t typeSize, AscendC::tiling::RmsNormTiling& tiling, const bool isBasicBlock = false)
 ```
 
 ## 参数说明
@@ -85,12 +91,12 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
 1.  将RmsNorm Tiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
     ```
-    BEGIN_TILING_DATA_DEF(RmsnormCustomTilingData)  // 注册一个tiling的类，以tiling的名字作为入参
-      TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
-      TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
-      TILING_DATA_FIELD_DEF(uint32_t, tmpBufSize);  // 添加tiling字段，临时空间大小
-      ...                                           // 添加其他tiling字段
-      TILING_DATA_FIELD_DEF_STRUCT(RmsNormTiling, rmsnormTilingData); // 将RmsNormTiling结构体参数增加至TilingData结构体
+    BEGIN_TILING_DATA_DEF(RmsnormCustomTilingData) // 注册一个tiling的类，以tiling的名字作为入参
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength);  // 添加tiling字段，总计算数据量
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);      // 添加tiling字段，每个核上总计算数据分块个数
+    TILING_DATA_FIELD_DEF(uint32_t, tmpBufSize);   // 添加tiling字段，临时空间大小
+    ...                                            // 添加其他tiling字段
+        TILING_DATA_FIELD_DEF_STRUCT(RmsNormTiling, rmsnormTilingData); // 将RmsNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
 
@@ -108,8 +114,7 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ...
-        std::vector<int64_t> shapeVec = {2, 16, 64};
+        ... std::vector<int64_t> shapeVec = {2, 16, 64};
         ge::Shape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {2, 16, 64};
         ge::Shape oriSrcShape(oriShapeVec);
@@ -119,10 +124,10 @@ bool GetRmsNormTilingInfo(const ge::Shape& srcShape, const ge::Shape& originSrcS
         AscendC::GetRmsNormMaxMinTmpSize(srcShape, sizeof(half), maxValue, minValue, isBasicBlock);
         tiling.set_tmpBufSize(minValue);
         // 获取RmsNorm Tiling参数
-        AscendC::GetRmsNormTilingInfo(srcShape, oriSrcShape, minValue , sizeof(half), tiling.rmsnormTilingData, false);
+        AscendC::GetRmsNormTilingInfo(srcShape, oriSrcShape, minValue, sizeof(half), tiling.rmsnormTilingData, false);
 
-         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        ... // 其他逻辑
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;

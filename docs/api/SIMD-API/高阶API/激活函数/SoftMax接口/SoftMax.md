@@ -67,44 +67,70 @@ def softmax(src):
     -   LocalTensor的数据类型相同
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+            const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
     -   LocalTensor的数据类型不同
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+            const LocalTensor<half>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
     -   不带sumTensor和maxTensor参数
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling,
+            const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
 -   通过sharedTmpBuffer入参传入临时空间
     -   LocalTensor的数据类型相同
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& sumTensor, const LocalTensor<T>& maxTensor,
+            const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+            const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
     -   LocalTensor的数据类型不同
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor, const LocalTensor<half>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false, bool isDataFormatNZ = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<half>& dstTensor, const LocalTensor<float>& sumTensor, const LocalTensor<float>& maxTensor,
+            const LocalTensor<half>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+            const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
     -   不带sumTensor和maxTensor参数
 
         ```
-        template <typename T, bool isReuseSource = false, bool isBasicBlock = false, const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
-        __aicore__ inline void SoftMax(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+        template <
+            typename T, bool isReuseSource = false, bool isBasicBlock = false,
+            const SoftmaxConfig& config = SOFTMAX_DEFAULT_CFG>
+        __aicore__ inline void SoftMax(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
         ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -132,7 +158,7 @@ enum class SoftmaxMode {
     SOFTMAX_NORMAL = 0,
     SOFTMAX_OUTPUT_WITHOUT_BRC = 1,
 };
-struct SoftmaxConfig{
+struct SoftmaxConfig {
     bool isCheckTiling = true;
     uint32_t oriSrcM = 0;
     uint32_t oriSrcK = 0;
@@ -160,10 +186,10 @@ constexpr SoftmaxConfig SOFTMAX_DEFAULT_CFG = {true, 0, 0, SoftmaxMode::SOFTMAX_
 
 ```
 struct SoftMaxShapeInfo {
-  uint32_t srcM;
-  uint32_t srcK;
-  uint32_t oriSrcM;
-  uint32_t oriSrcK;
+    uint32_t srcM;
+    uint32_t srcK;
+    uint32_t oriSrcM;
+    uint32_t oriSrcK;
 };
 ```
 
@@ -195,11 +221,11 @@ AscendC::SoftMaxShapeInfo softmaxInfo(
     /* 非尾轴长度的乘积          */ srcM,
     /* 尾轴长度，必须32Bytes对齐 */ srcK,
     /* 原始非尾轴长度的乘积      */ oriSrcM,
-    /* 原始尾轴长度              */ oriSrcK
-);
+    /* 原始尾轴长度              */ oriSrcK);
 
 // 通过sharedTmpBuffer入参传入临时空间，带sumTensor和maxTensor参数，传入模板参数将shape常量化
-AscendC::SoftMax<T, false, false, false, static_config>(dstLocal, sumTempLocal, maxTempLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);
+AscendC::SoftMax<T, false, false, false, static_config>(
+    dstLocal, sumTempLocal, maxTempLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);
 // 通过sharedTmpBuffer入参传入临时空间，带sumTensor和maxTensor参数
 AscendC::SoftMax<T>(dstLocal, sumTempLocal, maxTempLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);
 // 通过sharedTmpBuffer入参传入临时空间，不带sumTensor和maxTensor参数

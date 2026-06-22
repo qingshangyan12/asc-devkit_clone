@@ -49,14 +49,18 @@
 
     ```
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(
+        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
+        LocalTensor<uint8_t>& sharedTmpBuffer, const CumSumInfo& cumSumInfo)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, const CumSumConfig& config = defaultCumSumConfig>
-    __aicore__ inline void CumSum(LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor, const CumSumInfo& cumSumInfo)
+    __aicore__ inline void CumSum(
+        LocalTensor<T>& dstTensor, LocalTensor<T>& lastRowTensor, const LocalTensor<T>& srcTensor,
+        const CumSumInfo& cumSumInfo)
     ```
 
 由于该接口的内部实现中涉及精度转换。需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -83,10 +87,7 @@ struct CumSumConfig {
     bool outputLastRow{false};
     CumSumAlgorithm algorithm{CumSumAlgorithm::CUMSUM_ALGORITHM_LINEBYLINE};
 };
-enum class CumSumAlgorithm {
-    CUMSUM_ALGORITHM_LINEBYLINE = 0,
-    CUMSUM_ALGORITHM_SKLANSKY = 1
-};
+enum class CumSumAlgorithm { CUMSUM_ALGORITHM_LINEBYLINE = 0, CUMSUM_ALGORITHM_SKLANSKY = 1 };
 ```
 
 **表2**  接口参数说明
@@ -100,8 +101,7 @@ enum class CumSumAlgorithm {
 | cumSumInfo | 输入 | srcTensor的shape信息。CumSumInfo类型，具体定义如下方代码所示，其中参数的含义为：<br><br>outter：表示输入数据的外轴长度。<br><br>inner：表示输入数据的内轴长度。<br><br>请注意：<br><br>cumSumInfo.outter和cumSumInfo.inner都应大于0。<br><br>cumSumInfo.outter * cumSumInfo.inner不能大于dstTensor或srcTensor的大小。<br><br>cumSumInfo.inner * sizeof(T)必须是32字节的整数倍。<br><br>当模板参数config中的outputLastRow取值为true时，cumSumInfo.inner不能大于lastRowTensor输出的最后一行数据的大小。 |
 
 ```
-struct CumSumInfo
-{
+struct CumSumInfo {
     uint32_t outter{0};
     uint32_t inner{0};
 };

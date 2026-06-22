@@ -83,12 +83,16 @@
 
 ```
 template <typename T, bool isInitBitMode = false, uint32_t dropOutMode = 0>
-__aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal, const float keepProb, const DropOutShapeInfo& info)
+__aicore__ inline void DropOut(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal,
+    const float keepProb, const DropOutShapeInfo& info)
 ```
 
 ```
 template <typename T, bool isInitBitMode = false, uint32_t dropOutMode = 0>
-__aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const float keepProb, const DropOutShapeInfo& info)
+__aicore__ inline void DropOut(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& maskLocal,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const float keepProb, const DropOutShapeInfo& info)
 ```
 
 ## 参数说明
@@ -114,10 +118,10 @@ __aicore__ inline void DropOut(const LocalTensor<T>& dstLocal, const LocalTensor
 
 ```
 struct DropOutShapeInfo {
-    __aicore__ DropOutShapeInfo(){};
-    uint32_t firstAxis = 0; 
-    uint32_t srcLastAxis = 0; 
-    uint32_t maskLastAxis = 0; 
+    __aicore__ DropOutShapeInfo() {};
+    uint32_t firstAxis = 0;
+    uint32_t srcLastAxis = 0;
+    uint32_t maskLastAxis = 0;
 };
 ```
 

@@ -9,24 +9,30 @@
 -   获取Kernel接口计算所需最小/最大临时空间的接口
 
     ```
-    uint32_t GetSoftMaxGradMaxTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource)
+    uint32_t GetSoftMaxGradMaxTmpSize(
+        const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource)
     ```
 
     ```
-    uint32_t GetSoftMaxGradMinTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource)
+    uint32_t GetSoftMaxGradMinTmpSize(
+        const ge::Shape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource)
     ```
 
 -   Tiling计算接口
     -   AscendC::optiling命名空间下的计算接口
 
         ```
-        void SoftMaxGradTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxGradTiling, const bool isFront = false)
+        void SoftMaxGradTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            optiling::SoftMaxTiling& softmaxGradTiling, const bool isFront = false)
         ```
 
     -   AscendC命名空间下的计算接口
 
         ```
-        void SoftMaxGradTilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxGradTiling, const bool isFront = false)
+        void SoftMaxGradTilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+            AscendC::tiling::SoftMaxTiling& softmaxGradTiling, const bool isFront = false)
         ```
 
 ## 参数说明

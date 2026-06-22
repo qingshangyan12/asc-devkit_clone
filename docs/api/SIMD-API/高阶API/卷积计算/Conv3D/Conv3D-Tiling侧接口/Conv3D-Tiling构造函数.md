@@ -67,6 +67,5 @@ auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInf
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
 conv3dApiTiling.SetGroups(groups);
 conv3dApiTiling.SetOrgWeightShape(cout, kd, kh, kw);
-...
-conv3dApiTiling.GetTiling(conv3dCustomTilingData.conv3dApiTilingData);
+... conv3dApiTiling.GetTiling(conv3dCustomTilingData.conv3dApiTilingData);
 ```

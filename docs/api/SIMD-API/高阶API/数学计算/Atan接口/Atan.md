@@ -31,14 +31,17 @@
 
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
-        __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Atan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
         template <typename T, bool isReuseSource = false, const AtanConfig& config = defaultAtanConfig>
-        __aicore__ inline void Atan(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Atan(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间
@@ -121,7 +124,7 @@ AscendC::Atan(dstLocal, srcLocal, sharedTmpBuffer);
 AscendC::Atan(dstLocal, srcLocal, sharedTmpBuffer, 512);
 
 // 指定输入算法为POLYNOMIAL_APPROXIMATION,输入的数据类型为float,实际计算个数为512
-static constexpr AscendC::AtanConfig atanConfig = { AscendC::AtanAlgo::POLYNOMIAL_APPROXIMATION};
+static constexpr AscendC::AtanConfig atanConfig = {AscendC::AtanAlgo::POLYNOMIAL_APPROXIMATION};
 AscendC::Atan<float, false, atanConfig>(dstLocal, srcLocal, sharedTmpBuffer, 512);
 ```
 

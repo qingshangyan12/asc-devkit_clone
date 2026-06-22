@@ -27,7 +27,8 @@ void GetCosTmpBufferFactorSize(const uint32_t typeSize, uint32_t& maxLiveNodeCou
 ```
 
 ```
-void GetCosTmpBufferFactorSize(const CosConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+void GetCosTmpBufferFactorSize(
+    const CosConfig& config, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明

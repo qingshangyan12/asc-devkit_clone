@@ -9,20 +9,28 @@
 -   获取Kernel接口计算所需最小/最大临时空间的接口
 
     ```
-    void GetSoftMaxFlashV3MaxMinTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, uint32_t& maxValue, uint32_t& minValue, const bool isUpdate, const bool isBasicBlock = false)
+    void GetSoftMaxFlashV3MaxMinTmpSize(
+        const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, uint32_t& maxValue,
+        uint32_t& minValue, const bool isUpdate, const bool isBasicBlock = false)
     ```
 
 -   Tiling计算接口
     -   AscendC::optiling命名空间下的计算接口
 
         ```
-        void SoftMaxFlashV3TilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxFlashV3Tiling, const bool isUpdate,const bool isBasicBlock = false)
+        void SoftMaxFlashV3TilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
+            const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxFlashV3Tiling, const bool isUpdate,
+            const bool isBasicBlock = false)
         ```
 
     -   AscendC命名空间下的计算接口
 
         ```
-        void SoftMaxFlashV3TilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxFlashV3Tiling, const bool isUpdate,const bool isBasicBlock = false)
+        void SoftMaxFlashV3TilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
+            const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxFlashV3Tiling, const bool isUpdate,
+            const bool isBasicBlock = false)
         ```
 
 ## 参数说明

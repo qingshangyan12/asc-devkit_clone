@@ -54,14 +54,17 @@
 
     ```
     template <const TransDataConfig& config, typename T, typename U, typename S>
-    __aicore__ inline void TransData(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const TransDataParams<U, S>& params)
+    __aicore__ inline void TransData(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const TransDataParams<U, S>& params)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const TransDataConfig& config, typename T, typename U, typename S>
-    __aicore__ inline void TransData(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const TransDataParams<U, S>& params)
+    __aicore__ inline void TransData(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const TransDataParams<U, S>& params)
     ```
 
 由于该接口的内部实现中，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -117,8 +120,11 @@ struct TransDataParams {
 };
 
 AscendC::Layout ncdhwLayout = AscendC::MakeLayout(AscendC::MakeShape(n, c, d, h, w), AscendC::MakeStride());
-AscendC::Layout fractalzLayout = AscendC::MakeLayout(AscendC::MakeShape(d, c1, h, w, n1, n0, c0), AscendC::MakeStride());
-AscendC::TransDataParams&lt;decltype(ncdhwLayout), decltype(fractalzLayout)&gt; params = {ncdhwLayout, fractalzLayout};
+AscendC::Layout fractalzLayout =
+    AscendC::MakeLayout(AscendC::MakeShape(d, c1, h, w, n1, n0, c0), AscendC::MakeStride());
+AscendC::TransDataParams& lt;
+decltype(ncdhwLayout), decltype(fractalzLayout)& gt;
+params = {ncdhwLayout, fractalzLayout};
 ```
 
 ## 返回值说明

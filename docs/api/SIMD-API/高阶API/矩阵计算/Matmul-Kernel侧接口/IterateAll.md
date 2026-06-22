@@ -20,11 +20,15 @@
 ## 函数原型
 
 ```
-template <bool sync = true> __aicore__ inline void IterateAll(const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false, bool waitIterateAll = false, bool fakeMsg = false)
+template <bool sync = true>
+__aicore__ inline void IterateAll(
+    const GlobalTensor<DstT>& gm, uint8_t enAtomic = 0, bool enSequentialWrite = false, bool waitIterateAll = false,
+    bool fakeMsg = false)
 ```
 
 ```
-template <bool sync = true> __aicore__ inline void IterateAll(const LocalTensor<DstT>& ubCmatrix, uint8_t enAtomic = 0)
+template <bool sync = true>
+__aicore__ inline void IterateAll(const LocalTensor<DstT>& ubCmatrix, uint8_t enAtomic = 0)
 ```
 
 ## 参数说明

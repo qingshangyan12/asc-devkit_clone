@@ -22,7 +22,8 @@
 
 ```
 template <typename T, bool isReuseSource = false>
-__aicore__ inline void Swish(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t dataSize, const T scalarValue)
+__aicore__ inline void Swish(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, uint32_t dataSize, const T scalarValue)
 ```
 
 ## 参数说明

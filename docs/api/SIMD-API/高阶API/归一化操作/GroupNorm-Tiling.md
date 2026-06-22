@@ -53,15 +53,21 @@ GroupNorm Tiling API用于获取GroupNorm kernel计算时所需的Tiling参数�
 ## 函数原型
 
 ```
-void GetGroupNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, uint32_t& maxValue, uint32_t& minValue)
+void GetGroupNormMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum,
+    uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, optiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(
+    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const uint32_t groupNum, optiling::GroupNormTiling& tiling)
 ```
 
 ```
-void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
+void GetGroupNormNDTilingInfo(
+    const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    const uint32_t groupNum, AscendC::tiling::GroupNormTiling& tiling)
 ```
 
 ## 参数说明
@@ -103,15 +109,15 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
 1.  将GroupNormTiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
     ```
-    BEGIN_TILING_DATA_DEF(TilingData)  // 注册一个tiling的类，以tiling的名字作为入参
-      TILING_DATA_FIELD_DEF(uint32_t, n);
-      TILING_DATA_FIELD_DEF(uint32_t, c);
-      TILING_DATA_FIELD_DEF(uint32_t, h);
-      TILING_DATA_FIELD_DEF(uint32_t, w);
-      TILING_DATA_FIELD_DEF(uint32_t, group);
-      // 添加其他tiling字段
-      ...
-      TILING_DATA_FIELD_DEF_STRUCT(GroupNormTiling, GroupNormTilingData); // 将GroupNormTiling结构体参数增加至TilingData结构体
+    BEGIN_TILING_DATA_DEF(TilingData) // 注册一个tiling的类，以tiling的名字作为入参
+    TILING_DATA_FIELD_DEF(uint32_t, n);
+    TILING_DATA_FIELD_DEF(uint32_t, c);
+    TILING_DATA_FIELD_DEF(uint32_t, h);
+    TILING_DATA_FIELD_DEF(uint32_t, w);
+    TILING_DATA_FIELD_DEF(uint32_t, group);
+    // 添加其他tiling字段
+    ... TILING_DATA_FIELD_DEF_STRUCT(
+        GroupNormTiling, GroupNormTilingData); // 将GroupNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
 
@@ -128,18 +134,17 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
         context->SetBlockDim(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ...
-        std::vector<int64_t> shapeVec = {2, 16, 8, 8}; // {n, c, h, w}
+        ... std::vector<int64_t> shapeVec = {2, 16, 8, 8}; // {n, c, h, w}
         ge::Shape srcShape(shapeVec);
-        uint32_t groupNum=4;
+        uint32_t groupNum = 4;
         uint32_t minSize = 0;
         uint32_t maxSize = 0;
         // 本样例中仅作为样例说明，通过GetGroupNormMaxMinTmpSize接口获取GroupNorm接口能完成计算所需最大/最小临时空间大小，开发者可以根据该范围结合实际的内存使用情况设置合适的空间大小
         AscendC::GetGroupNormMaxMinTmpSize(srcShape, sizeof(half), false, groupNum, maxSize, minSize);
         // 获取GroupNorm Tiling参数
         AscendC::GetGroupNormNDTilingInfo(srcShape, maxSize, sizeof(half), false, groupNum, tiling.groupNormTilingData);
-         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        ... // 其他逻辑
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -150,7 +155,9 @@ void GetGroupNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBuf
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的GroupNorm Tiling信息传入GroupNorm接口参与计算。
 
     ```
-    extern "C" __global__ __aicore__ void groupnorm_custom(GM_ADDR inputX_gm, GM_ADDR gamm_gm, GM_ADDR beta_gm, GM_ADDR output_gm, GM_ADDR outputMean_gm, GM_ADDR outputVariance_gm, GM_ADDR tiling)
+    extern "C" __global__ __aicore__ void groupnorm_custom(
+        GM_ADDR inputX_gm, GM_ADDR gamm_gm, GM_ADDR beta_gm, GM_ADDR output_gm, GM_ADDR outputMean_gm,
+        GM_ADDR outputVariance_gm, GM_ADDR tiling)
     {
         GET_TILING_DATA(tilingData, tiling);
         KernelGroupNorm<half, false> op;

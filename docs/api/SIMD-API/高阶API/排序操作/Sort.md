@@ -90,7 +90,9 @@
 
     ```
     template <typename T, bool isFullSort>
-    __aicore__ inline void Sort(const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp, const int32_t repeatTime)
+    __aicore__ inline void Sort(
+        const LocalTensor<T>& dst, const LocalTensor<T>& concat, const LocalTensor<uint32_t>& index, LocalTensor<T>& tmp,
+        const int32_t repeatTime)
     ```
 
 -   带SortConfig
@@ -109,14 +111,18 @@
 
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
 
             ```
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                const LocalTensor<T>& dstTensor, const LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<U>& srcIndexTensor, const uint32_t calCount)
             ```
 
     -   通过sharedTmpBuffer入参传入临时空间
@@ -124,21 +130,27 @@
 
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                const uint32_t calCount)
             ```
 
         -   不带srcIndexTensor参数，带有dstIndexTensor参数
 
             ```
             template <typename T, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<uint32_t>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
             ```
 
         -   带有srcIndexTensor和dstIndexTensor参数
 
             ```
             template <typename T, typename U, bool isReuseSource = false, const SortConfig& config = DEFAULT_SORT_CONFIG>
-            __aicore__ inline void Sort(LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor, const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+            __aicore__ inline void Sort(
+                LocalTensor<T>& dstTensor, LocalTensor<U>& dstIndexTensor, const LocalTensor<T>& srcTensor,
+                const LocalTensor<U>& srcIndexTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
             ```
 
     由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -182,12 +194,12 @@
 
     ```
     enum class SortType {
-        RADIX_SORT,  // 使用基排序算法实现
-        MERGE_SORT   // 使用归并排序算法实现
+        RADIX_SORT, // 使用基排序算法实现
+        MERGE_SORT  // 使用归并排序算法实现
     };
     struct SortConfig {
         SortType type = SortType::RADIX_SORT; // 排序算法
-        bool isDescend = false; // 是否降序排序，默认值为false，输出结果升序排序
+        bool isDescend = false;               // 是否降序排序，默认值为false，输出结果升序排序
     };
     ```
 

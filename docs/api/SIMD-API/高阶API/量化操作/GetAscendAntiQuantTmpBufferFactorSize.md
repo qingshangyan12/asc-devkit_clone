@@ -23,7 +23,9 @@
 ## 函数原型
 
 ```
-void GetAscendAntiQuantTmpBufferFactorSize(const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+void GetAscendAntiQuantTmpBufferFactorSize(
+    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
+    ge::DataType outputDataType, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
 ```
 
 ## 参数说明
@@ -51,12 +53,13 @@ void GetAscendAntiQuantTmpBufferFactorSize(const ge::Shape& srcShape, const ge::
 ## 调用示例
 
 ```
-std::vector<int64_t> srcDims = { 64, 512 };
+std::vector<int64_t> srcDims = {64, 512};
 auto srcShape = ge::Shape(srcDims);
-std::vector<int64_t> scaleDims = { 1, 512 };
+std::vector<int64_t> scaleDims = {1, 512};
 auto scaleShape = ge::Shape(scaleDims);
 bool isTranspose = false;
 uint32_t maxLiveNodeCount = 0;
 uint32_t extraBuf = 0;
-AscendC::GetAscendAntiQuantTmpBufferFactorSize(srcShape, scaleShape, isTranspose, ge::DT_INT8, ge::DT_BF16, maxLiveNodeCount, extraBuf);
+AscendC::GetAscendAntiQuantTmpBufferFactorSize(
+    srcShape, scaleShape, isTranspose, ge::DT_INT8, ge::DT_BF16, maxLiveNodeCount, extraBuf);
 ```

@@ -7,7 +7,9 @@
 ## 函数原型
 
 ```
-int32_t SetSplitRange(int32_t maxBaseM = -1, int32_t maxBaseN = -1, int32_t maxBaseK = -1, int32_t minBaseM = -1, int32_t minBaseN = -1, int32_t minBaseK = -1)
+int32_t SetSplitRange(
+    int32_t maxBaseM = -1, int32_t maxBaseN = -1, int32_t maxBaseK = -1, int32_t minBaseM = -1, int32_t minBaseN = -1,
+    int32_t minBaseK = -1)
 ```
 
 ## 参数说明

@@ -10,7 +10,9 @@ Kernel侧BitwiseAnd接口的计算需要开发者预留/申请临时空间，本
 ## 函数原型
 
 ```
-void GetBitwiseAndMaxMinTmpSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetBitwiseAndMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const ge::Shape& srcShape, const uint32_t typeSize,
+    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

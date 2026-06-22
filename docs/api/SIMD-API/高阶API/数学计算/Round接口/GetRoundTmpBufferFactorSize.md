@@ -23,7 +23,9 @@
 ## 函数原型
 
 ```
-void GetRoundTmpBufferFactorSize(const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuf)
+void GetRoundTmpBufferFactorSize(
+    const platform_ascendc::PlatformAscendC& ascendcPlatform, const uint32_t typeSize, uint32_t& maxLiveNodeCount,
+    uint32_t& extraBuf)
 ```
 
 ## 参数说明

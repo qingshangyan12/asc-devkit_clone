@@ -28,14 +28,17 @@
 
     ```
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceAll(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t> &sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceAll(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceAll(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceAll(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -84,7 +87,7 @@
 // srcLocal：输入数据
 // tmp：存储中间结果的临时空间
 // shape：输入数据的shape信息，当前仅支持2维
-uint32_t shape[] = { 2, 8 };
+uint32_t shape[] = {2, 8};
 // isReuse：是否允许修改源操作数srcLocal，true-允许，false-不允许
 constexpr bool isReuse = true;
 // 按尾轴求逻辑与

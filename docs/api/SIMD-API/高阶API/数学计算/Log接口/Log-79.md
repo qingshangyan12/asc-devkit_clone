@@ -39,14 +39,14 @@
     -   源操作数Tensor全部/部分参与计算
 
     ```
-    template<typename T, bool isReuseSource = false>
+    template <typename T, bool isReuseSource = false>
     __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
     ```
 
     -   源操作数Tensor全部参与计算
 
     ```
-    template<typename T, bool isReuseSource = false>
+    template <typename T, bool isReuseSource = false>
     __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
     ```
 
@@ -55,22 +55,25 @@
         -   源操作数Tensor全部/部分参与计算
 
             ```
-            template<typename T, bool isReuseSource = false>
-            __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            template <typename T, bool isReuseSource = false>
+            __aicore__ inline void Log2(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
             ```
             template <typename T, bool isReuseSource = false>
-            __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Log2(
+                const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
         -   源操作数Tensor全部/部分参与计算
 
             ```
-            template<typename T, bool isReuseSource = false>
+            template <typename T, bool isReuseSource = false>
             __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
             ```
 
@@ -85,14 +88,14 @@
     -   源操作数Tensor全部/部分参与计算
 
         ```
-        template<typename T, bool isReuseSource = false>
+        template <typename T, bool isReuseSource = false>
         __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
-        template<typename T, bool isReuseSource = false>
+        template <typename T, bool isReuseSource = false>
         __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor)
         ```
 

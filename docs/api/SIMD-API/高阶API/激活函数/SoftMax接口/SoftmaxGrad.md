@@ -53,14 +53,19 @@ def softmax_grad(grad, src, isFront = None):
 
     ```
     template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGrad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGrad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
     template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGrad(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isFront = false, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGrad(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, bool isFront = false,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -95,10 +100,10 @@ def softmax_grad(grad, src, isFront = None):
 
 ```
 struct SoftMaxShapeInfo {
-  uint32_t srcM;
-  uint32_t srcK;
-  uint32_t oriSrcM;
-  uint32_t oriSrcK;
+    uint32_t srcM;
+    uint32_t srcK;
+    uint32_t oriSrcM;
+    uint32_t oriSrcK;
 };
 ```
 
@@ -126,9 +131,8 @@ AscendC::SoftMaxShapeInfo softmaxInfo(
     /* 非尾轴长度的乘积          */ srcM,
     /* 尾轴长度，必须32Bytes对齐 */ srcK,
     /* 原始非尾轴长度的乘积      */ oriSrcM,
-    /* 原始尾轴长度              */ oriSrcK
-);
-bool isFront = false;  // 不开启isFront计算
+    /* 原始尾轴长度              */ oriSrcK);
+bool isFront = false; // 不开启isFront计算
 
 // 通过sharedTmpBuffer入参传入临时空间
 AscendC::SoftmaxGrad<T>(dstLocal, gradLocal, srcLocal, sharedTmpBuffer, softmaxTiling, isFront, softmaxInfo);

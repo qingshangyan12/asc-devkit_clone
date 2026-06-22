@@ -42,7 +42,9 @@ Atlas 推理系列产品AI Core采用方式二。
 
 ```
 template <typename T, bool isExhaustedSuspension = false>
-__aicore__ inline void MrgSort(const LocalTensor<T> &dst, const MrgSortSrcList<T> &sortList, const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+__aicore__ inline void MrgSort(
+    const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4],
+    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 ```
 
 ## 参数说明
@@ -107,7 +109,7 @@ struct MrgSortSrcList {
     Atlas A3 训练系列产品/Atlas A3 推理系列产品
 
     ```
-    uint32_t elementCount = 128; // 元素个数
+    uint32_t elementCount = 128;                // 元素个数
     uint32_t calcBufferSize = elementCount * 8; // 每个元素占据8字节
     uint32_t tmpBufferSize = elementCount * 8;
     uint32_t sortedLocalSize = elementCount * 4;
@@ -117,7 +119,9 @@ struct MrgSortSrcList {
 
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
-    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]); // sortList：待合并的有序队列列表
+    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset],
+        sortedLocal[3 * baseOffset]);           // sortList：待合并的有序队列列表
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];
@@ -154,7 +158,9 @@ struct MrgSortSrcList {
     // 单条队列元素个数
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
-    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]); // sortList：待合并的有序队列列表
+    AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset],
+        sortedLocal[3 * baseOffset]);           // sortList：待合并的有序队列列表
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];

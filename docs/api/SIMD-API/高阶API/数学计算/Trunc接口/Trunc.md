@@ -29,14 +29,17 @@ Trunc\(-3.9\) = -3
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+        __aicore__ inline void Trunc(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+            const uint32_t calCount)
         ```
 
     -   源操作数Tensor全部参与计算
 
         ```
         template <typename T, bool isReuseSource = false>
-        __aicore__ inline void Trunc(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
+        __aicore__ inline void Trunc(
+            const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
         ```
 
 -   接口框架申请临时空间

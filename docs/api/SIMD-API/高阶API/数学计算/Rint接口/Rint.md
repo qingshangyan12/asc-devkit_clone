@@ -30,7 +30,9 @@ Rint\(3.5\) = 4
 
     ```
     template <const RintConfing& config = DEFAULT_RINT_CONFIG, typename T>
-    __aicore__ inline void Rint(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void Rint(
+        const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t count)
     ```
 
 -   接口框架申请临时空间
@@ -90,10 +92,10 @@ struct RintConfig {
     ```
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
-    pipe.InitBuffer(tmpQue, 1, bufferSize);  // bufferSize通过Host侧tiling参数获取
+    pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     AscendC::LocalTensor<uint8_t> sharedTmpBuffer = tmpQue.AllocTensor<uint8_t>();
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::RintConfig rintConfig = { false }; // 不修改源操作数
+    static constexpr AscendC::RintConfig rintConfig = {false}; // 不修改源操作数
     // dst、src为half类型的LocalTensor
     AscendC::Rint<rintConfig, half>(dst, src, sharedTmpBuffer, 512);
     ```
@@ -103,9 +105,9 @@ struct RintConfig {
     ```
     AscendC::TPipe pipe;
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
-    pipe.InitBuffer(tmpQue, 1, bufferSize);  // bufferSize通过Host侧tiling参数获取
+    pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::RintConfig rintConfig = { false }; // 不修改源操作数
+    static constexpr AscendC::RintConfig rintConfig = {false}; // 不修改源操作数
     // dst、src为half类型的LocalTensor
     AscendC::Rint<rintConfig, half>(dst, src, 512);
     ```

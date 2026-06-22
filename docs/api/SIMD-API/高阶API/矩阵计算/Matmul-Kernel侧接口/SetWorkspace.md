@@ -24,11 +24,13 @@
 建议用户使用GlobalTensor类型传入：
 
 ```
-template <class T> __aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
+template <class T>
+__aicore__ inline void SetWorkspace(GlobalTensor<T>& addr)
 ```
 
 ```
-template <class T> __aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
+template <class T>
+__aicore__ inline void SetWorkspace(__gm__ const T* addr, int size)
 ```
 
 ## 参数说明

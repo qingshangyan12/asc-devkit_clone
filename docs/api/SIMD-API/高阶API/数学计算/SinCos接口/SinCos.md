@@ -24,14 +24,17 @@
 
     ```
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
-    __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+    __aicore__ inline void SinCos(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const SinCosConfig& config = DEFAULT_SINCOS_CONFIG, typename T>
-    __aicore__ inline void SinCos(const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
+    __aicore__ inline void SinCos(
+        const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -85,7 +88,7 @@ struct SinCosConfig {
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     LocalTensor<uint8_t> sharedTmpBuffer = tmpQue.AllocTensor<uint8_t>();
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::SinCosConfig sincosConfig = { false };  // 不修改源操作数
+    static constexpr AscendC::SinCosConfig sincosConfig = {false}; // 不修改源操作数
     // dst0、dst1、src为half类型的LocalTensor
     AscendC::SinCos<sincosConfig, half>(dst0, dst1, src, sharedTmpBuffer, 512);
     ```
@@ -97,7 +100,7 @@ struct SinCosConfig {
     AscendC::TQue<AscendC::TPosition::VECCALC, 1> tmpQue;
     pipe.InitBuffer(tmpQue, 1, bufferSize); // bufferSize通过Host侧tiling参数获取
     // 输入tensor长度为1024,算子输入的数据类型为half,实际计算个数为512
-    static constexpr AscendC::SinCosConfig sincosConfig = { false };  // 不修改源操作数
+    static constexpr AscendC::SinCosConfig sincosConfig = {false}; // 不修改源操作数
     // dst0、dst1、src为half类型的LocalTensor
     AscendC::SinCos<sincosConfig, half>(dst0, dst1, src, 512);
     ```

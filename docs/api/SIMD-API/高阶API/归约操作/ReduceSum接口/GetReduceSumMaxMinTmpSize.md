@@ -10,7 +10,9 @@ kernel侧ReduceSum接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-void GetReduceSumMaxMinTmpSize(const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetReduceSumMaxMinTmpSize(
+    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -62,10 +64,11 @@ enum class ReducePattern : uint32_t {
 
 ```
 // 输入shape信息为1024;算子输入的数据类型为float;不允许修改源操作数
-auto shape = ge::Shape({ 16, 32 });
+auto shape = ge::Shape({16, 32});
 uint32_t maxValue = 0;
 uint32_t minValue = 0;
 bool isSrcInnerPad = true;
 bool isReuseSource = false;
-AscendC::GetReduceSumMaxMinTmpSize(shape, ge::DataType::DT_FLOAT, AscendC::ReducePattern::AR, isSrcInnerPad, isReuseSource, maxValue, minValue);
+AscendC::GetReduceSumMaxMinTmpSize(
+    shape, ge::DataType::DT_FLOAT, AscendC::ReducePattern::AR, isSrcInnerPad, isReuseSource, maxValue, minValue);
 ```

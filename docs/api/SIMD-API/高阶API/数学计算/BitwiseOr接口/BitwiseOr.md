@@ -20,7 +20,8 @@
 
 ```
 template <const BitwiseOrConfig& config = DEFAULT_BITWISE_OR_CONFIG, typename T>
-__aicore__ inline void BitwiseOr(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void BitwiseOr(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 ```
 
 ## 参数说明

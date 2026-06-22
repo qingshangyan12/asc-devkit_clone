@@ -28,7 +28,9 @@ Round\(-3.4\) = -3.0
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void Round(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void Round(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间

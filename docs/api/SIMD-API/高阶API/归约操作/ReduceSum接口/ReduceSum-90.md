@@ -28,14 +28,17 @@
 
     ```
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceSum(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceSum(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <class T, class pattern, bool isReuseSource = false>
-    __aicore__ inline void ReduceSum(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
+    __aicore__ inline void ReduceSum(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t srcShape[], bool srcInnerPad)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -87,9 +90,11 @@
 ## 调用示例
 
 ```
-uint32_t shape[] = { 2, 8 };
+uint32_t shape[] = {2, 8};
 constexpr bool isReuse = true;
-AscendC::ReduceSum<float, AscendC::Pattern::Reduce::AR, isReuse>(dstLocal, srcLocal, tmp, shape, true); // tmp为传入的临时空间大小，shape为srcLocal输入的shape， true表示地址是否32B对齐
+AscendC::ReduceSum<float, AscendC::Pattern::Reduce::AR, isReuse>(
+    dstLocal, srcLocal, tmp, shape,
+    true); // tmp为传入的临时空间大小，shape为srcLocal输入的shape， true表示地址是否32B对齐
 ```
 
 结果示例如下：

@@ -39,15 +39,20 @@ Meant<sub>n</sub>的计算过程示意如下图，调用n次本接口后，得�
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
-    template <typename T, typename U,bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
-    __aicore__ inline void WelfordUpdate(const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean, const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer, const WelfordUpdateParam& para)
+    template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+    __aicore__ inline void WelfordUpdate(
+        const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+        const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const WelfordUpdateParam& para)
     ```
 
 -   接口框架申请临时空间
 
     ```
-    template <typename T, typename U,bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
-    __aicore__ inline void WelfordUpdate(const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean, const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const WelfordUpdateParam& para)
+    template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
+    __aicore__ inline void WelfordUpdate(
+        const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance, const LocalTensor<U>& inputMean,
+        const LocalTensor<U>& inputVariance, const LocalTensor<T>& inputX, const WelfordUpdateParam& para)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -135,15 +140,15 @@ struct WelfordUpdateParam {
 // para: 包含Reduce轴分块信息和归一化系数的参数结构
 
 // 使用WelfordUpdate接口执行Welford在线算法更新
-struct AscendC::WelfordUpdateParam para = { nLength, rLength, abComputeLength, 0.3 };
+struct AscendC::WelfordUpdateParam para = {nLength, rLength, abComputeLength, 0.3};
 AscendC::WelfordUpdate<T, U, false, WELFORD_UPDATE_ENABLE_INPLACE_CFG>(
-    outputMean,        // 输出：更新后的均值
-    outputVariance,    // 输出：更新后的方差中间结果
-    inputMean,         // 输入：上一时刻均值
-    inputVariance,     // 输入：上一时刻方差中间结果
-    inputX,            // 输入：当前输入xi
-    sharedTmpBuffer,   // 输入：临时缓冲区（由开发者提供）
-    para               // 输入：Welford更新参数
+    outputMean,      // 输出：更新后的均值
+    outputVariance,  // 输出：更新后的方差中间结果
+    inputMean,       // 输入：上一时刻均值
+    inputVariance,   // 输入：上一时刻方差中间结果
+    inputX,          // 输入：当前输入xi
+    sharedTmpBuffer, // 输入：临时缓冲区（由开发者提供）
+    para             // 输入：Welford更新参数
 );
 ```
 

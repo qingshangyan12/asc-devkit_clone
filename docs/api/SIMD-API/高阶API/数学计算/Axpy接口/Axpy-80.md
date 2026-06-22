@@ -24,7 +24,9 @@
 
 ```
 template <typename T, typename U, bool isReuseSource = false>
-__aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+__aicore__ inline void Axpy(
+    const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
 ```
 
 ## 参数说明

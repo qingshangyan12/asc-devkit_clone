@@ -22,7 +22,8 @@
 
 ```
 template <const ClampConfig& config = DEFAULT_CLAMP_CONFIG, typename T, typename U, typename S>
-__aicore__ inline void Clamp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count)
+__aicore__ inline void Clamp(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src, const U& min, const S& max, const uint32_t count)
 ```
 
 ## 参数说明

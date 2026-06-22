@@ -23,14 +23,18 @@
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+    __aicore__ inline void ReduceXorSum(
+        LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+        LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void ReduceXorSum(LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const uint32_t calCount);
+    __aicore__ inline void ReduceXorSum(
+        LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
+        const uint32_t calCount);
     ```
 
 由于该接口的内部实现中需要保存异或结果以及进行其他运算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。

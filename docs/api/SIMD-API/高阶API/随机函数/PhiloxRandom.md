@@ -22,14 +22,17 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
     ```
     template <uint16_t Rounds = 7, typename T>
-    __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
+    __aicore__ inline void PhiloxRandom(
+        const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, uint16_t count)
     ```
 
 -   stride模式
 
     ```
     template <uint16_t Rounds = 7, typename T>
-    __aicore__ inline void PhiloxRandom(const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter, const PhiloxRandomParams& params)
+    __aicore__ inline void PhiloxRandom(
+        const LocalTensor<T>& dstLocal, const PhiloxKey& philoxKey, const PhiloxCounter& philoxCounter,
+        const PhiloxRandomParams& params)
     ```
 
 ## 参数说明
@@ -53,9 +56,9 @@ Philox随机数生成的核心算法是一个基于记数的伪随机数生成�
 
 ```
 struct PhiloxRandomParams {
-   uint32_t stride; 
-   uint32_t row; 
-   uint32_t column; 
+    uint32_t stride;
+    uint32_t row;
+    uint32_t column;
 }
 ```
 

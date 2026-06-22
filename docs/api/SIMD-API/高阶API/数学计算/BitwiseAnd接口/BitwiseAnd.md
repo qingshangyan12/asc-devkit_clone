@@ -20,7 +20,8 @@
 
 ```
 template <const BitwiseAndConfig& config = DEFAULT_BITWISE_AND_CONFIG, typename T>
-__aicore__ inline void BitwiseAnd(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
+__aicore__ inline void BitwiseAnd(
+    const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const uint32_t count)
 ```
 
 ## 参数说明

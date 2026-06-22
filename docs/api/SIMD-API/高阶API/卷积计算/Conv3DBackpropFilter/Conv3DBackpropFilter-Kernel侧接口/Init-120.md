@@ -17,7 +17,7 @@ Init主要用于对Conv3DBackpropFilter对象中的Tiling数据进行初始化�
 ## 函数原型
 
 ```
-__aicore__ inline void Init(const TConv3DBpFilterTiling *__restrict tiling)
+__aicore__ inline void Init(const TConv3DBpFilterTiling* __restrict tiling)
 ```
 
 ## 参数说明

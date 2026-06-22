@@ -7,7 +7,8 @@
 ## 函数原型
 
 ```
-int32_t SetSingleRange(int32_t maxM = -1, int32_t maxN = -1, int32_t maxK = -1, int32_t minM = -1, int32_t minN = -1, int32_t minK = -1)
+int32_t SetSingleRange(
+    int32_t maxM = -1, int32_t maxN = -1, int32_t maxK = -1, int32_t minM = -1, int32_t minN = -1, int32_t minK = -1)
 ```
 
 ## 参数说明
@@ -42,7 +43,7 @@ tiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, mat
 tiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
 tiling.SetBiasType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, matmul_tiling::DataType::DT_FLOAT);
 tiling.SetShape(1024, 1024, 1024);
-tiling.SetSingleRange(1024, 1024, 1024, 1024, 1024, 1024);  // 设置singleCoreM/singleCoreN/singleCoreK的最大值与最小值
+tiling.SetSingleRange(1024, 1024, 1024, 1024, 1024, 1024); // 设置singleCoreM/singleCoreN/singleCoreK的最大值与最小值
 tiling.SetOrgShape(1024, 1024, 1024);
 tiling.SetBias(true);
 tiling.SetBufferSpace(-1, -1, -1);
