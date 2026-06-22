@@ -48,15 +48,15 @@ void GetNormalizeMaxMinTmpSize(
 
     ```
     BEGIN_TILING_DATA_DEF(NormalizeCustomTilingData)
-    TILING_DATA_FIELD_DEF(float, epsilon);
-    TILING_DATA_FIELD_DEF(uint32_t, isNoBeta);
-    TILING_DATA_FIELD_DEF(uint32_t, isNoGamma);
-    TILING_DATA_FIELD_DEF(uint32_t, isOnlyOutput);
-    TILING_DATA_FIELD_DEF(uint32_t, aLength);
-    TILING_DATA_FIELD_DEF(uint32_t, rLength);
-    TILING_DATA_FIELD_DEF(uint32_t, rLengthWithPadding);
-    ... // 添加其他tiling字段
-        END_TILING_DATA_DEF;
+        TILING_DATA_FIELD_DEF(float, epsilon);
+        TILING_DATA_FIELD_DEF(uint32_t, isNoBeta);
+        TILING_DATA_FIELD_DEF(uint32_t, isNoGamma);
+        TILING_DATA_FIELD_DEF(uint32_t, isOnlyOutput);
+        TILING_DATA_FIELD_DEF(uint32_t, aLength);
+        TILING_DATA_FIELD_DEF(uint32_t, rLength);
+        TILING_DATA_FIELD_DEF(uint32_t, rLengthWithPadding);
+        ... // 添加其他tiling字段
+    END_TILING_DATA_DEF;
     ```
 
 2.  Tiling实现函数中，首先调用**GetNormalizeMaxMinTmpSize**接口获取Normalize接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取Normalize kernel侧接口所需tiling参数。
@@ -73,7 +73,7 @@ void GetNormalizeMaxMinTmpSize(
         const uint32_t isOnlyOutput = *(attrs->GetAttrPointer<uint32_t>(3));
         const gert::StorageShape* x1_shape = context->GetInputShape(0);
         ... // 其他逻辑
-            const gert::Shape shape = x1_shape->GetStorageShape();
+        const gert::Shape shape = x1_shape->GetStorageShape();
         uint32_t aLength = shape.GetDim(0);
         uint32_t rLength = shape.GetDim(1);
         uint32_t rLengthWithPadding = (rLength + alignNum - 1) / alignNum * alignNum;
@@ -90,7 +90,7 @@ void GetNormalizeMaxMinTmpSize(
         // maxTmpsize, minTmpsize);
 
         ... // 其他逻辑
-            context->SetTilingKey(1);
+        context->SetTilingKey(1);
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         size_t* currentWorkspace = context->GetWorkspaceSizes(1);

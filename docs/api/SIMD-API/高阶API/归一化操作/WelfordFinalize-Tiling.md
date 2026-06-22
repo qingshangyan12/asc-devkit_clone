@@ -47,14 +47,14 @@ void GetWelfordFinalizeMaxMinTmpSize(
 
     ```
     BEGIN_TILING_DATA_DEF(WelfordFinalizeCustomTilingData) // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, isCounts);             // 添加tiling字段
-    TILING_DATA_FIELD_DEF(uint32_t, rnLength);
-    TILING_DATA_FIELD_DEF(uint32_t, abLength);
-    TILING_DATA_FIELD_DEF(uint32_t, rLength);
-    TILING_DATA_FIELD_DEF(uint32_t, head);
-    TILING_DATA_FIELD_DEF(uint32_t, headLength);
-    TILING_DATA_FIELD_DEF(uint32_t, tail);
-    TILING_DATA_FIELD_DEF(uint32_t, tailLength);
+        TILING_DATA_FIELD_DEF(uint32_t, isCounts);             // 添加tiling字段
+        TILING_DATA_FIELD_DEF(uint32_t, rnLength);
+        TILING_DATA_FIELD_DEF(uint32_t, abLength);
+        TILING_DATA_FIELD_DEF(uint32_t, rLength);
+        TILING_DATA_FIELD_DEF(uint32_t, head);
+        TILING_DATA_FIELD_DEF(uint32_t, headLength);
+        TILING_DATA_FIELD_DEF(uint32_t, tail);
+        TILING_DATA_FIELD_DEF(uint32_t, tailLength);
     END_TILING_DATA_DEF;
     REGISTER_TILING_DATA_CLASS(
         WelfordFinalizeCustom,
@@ -89,7 +89,7 @@ void GetWelfordFinalizeMaxMinTmpSize(
         // auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         // AscendC::GetWelfordFinalizeMaxMinTmpSize(srcShape, 4, false, ascendcPlatform, maxTmpsize, minTmpsize);
         ... // 其他逻辑
-            context->SetTilingKey(1);
+        context->SetTilingKey(1);
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         size_t* currentWorkspace = context->GetWorkspaceSizes(1);

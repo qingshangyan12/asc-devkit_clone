@@ -99,8 +99,8 @@
 
     ```
     BEGIN_TILING_DATA_DEF(TilingData)         // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, tileNum); // 添加tiling字段，每个核上总计算数据分块个数
-    ...                                       // 添加其他tiling字段
+        TILING_DATA_FIELD_DEF(uint32_t, tileNum); // 添加tiling字段，每个核上总计算数据分块个数
+        ...                                       // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(
             ConfusionTransposeTiling,
             confusionTransposeTilingData); // 将ConfusionTransposeTiling结构体参数增加至TilingData结构体
@@ -120,7 +120,8 @@
         context->SetBlockDim(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ... std::vector<int64_t> shapeVec = {1, 2, 64, 32};
+        ...
+        std::vector<int64_t> shapeVec = {1, 2, 64, 32};
         ge::Shape srcShape(shapeVec);
 
         uint32_t transposeTypeIn = 1;
@@ -132,8 +133,9 @@
         // 获取Transpose Tiling参数
         AscendC::GetTransposeTilingInfo(
             srcShape, stackBufferSize, sizeof(half), transposeTypeIn, tiling.confusionTransposeTilingData);
-        ... // 其他逻辑
-            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        ...
+        // 其他逻辑
+        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;

@@ -110,14 +110,15 @@ void GetGroupNormNDTilingInfo(
 
     ```
     BEGIN_TILING_DATA_DEF(TilingData) // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, n);
-    TILING_DATA_FIELD_DEF(uint32_t, c);
-    TILING_DATA_FIELD_DEF(uint32_t, h);
-    TILING_DATA_FIELD_DEF(uint32_t, w);
-    TILING_DATA_FIELD_DEF(uint32_t, group);
-    // 添加其他tiling字段
-    ... TILING_DATA_FIELD_DEF_STRUCT(
-        GroupNormTiling, GroupNormTilingData); // 将GroupNormTiling结构体参数增加至TilingData结构体
+        TILING_DATA_FIELD_DEF(uint32_t, n);
+        TILING_DATA_FIELD_DEF(uint32_t, c);
+        TILING_DATA_FIELD_DEF(uint32_t, h);
+        TILING_DATA_FIELD_DEF(uint32_t, w);
+        TILING_DATA_FIELD_DEF(uint32_t, group);
+        // 添加其他tiling字段
+        ...
+        TILING_DATA_FIELD_DEF_STRUCT(
+            GroupNormTiling, GroupNormTilingData); // 将GroupNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
 
@@ -134,7 +135,8 @@ void GetGroupNormNDTilingInfo(
         context->SetBlockDim(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ... std::vector<int64_t> shapeVec = {2, 16, 8, 8}; // {n, c, h, w}
+        ...
+        std::vector<int64_t> shapeVec = {2, 16, 8, 8}; // {n, c, h, w}
         ge::Shape srcShape(shapeVec);
         uint32_t groupNum = 4;
         uint32_t minSize = 0;
@@ -144,7 +146,7 @@ void GetGroupNormNDTilingInfo(
         // 获取GroupNorm Tiling参数
         AscendC::GetGroupNormNDTilingInfo(srcShape, maxSize, sizeof(half), false, groupNum, tiling.groupNormTilingData);
         ... // 其他逻辑
-            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;

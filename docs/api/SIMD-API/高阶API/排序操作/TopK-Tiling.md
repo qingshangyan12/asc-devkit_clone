@@ -143,20 +143,21 @@ TopKTilingFunc返回值为true/false，true表示成功拿到TopK的Tiling各项
     ```
     namespace optiling {
     BEGIN_TILING_DATA_DEF(TilingData)
-    TILING_DATA_FIELD_DEF(uint32_t, totalLength);
-    TILING_DATA_FIELD_DEF(uint32_t, tilenum);
-    // 添加其他tiling字段
-    ... TILING_DATA_FIELD_DEF(int32_t, k);
-    TILING_DATA_FIELD_DEF(bool, islargest);
-    TILING_DATA_FIELD_DEF(bool, isinitindex);
-    TILING_DATA_FIELD_DEF(bool, ishasfinish);
-    TILING_DATA_FIELD_DEF(uint32_t, tmpsize);
-    TILING_DATA_FIELD_DEF(int32_t, outter);
-    TILING_DATA_FIELD_DEF(int32_t, inner);
-    TILING_DATA_FIELD_DEF(int32_t, n);
-    TILING_DATA_FIELD_DEF(int32_t, order);
-    TILING_DATA_FIELD_DEF(int32_t, sorted);
-    TILING_DATA_FIELD_DEF_STRUCT(TopkTiling, topkTilingData);
+        TILING_DATA_FIELD_DEF(uint32_t, totalLength);
+        TILING_DATA_FIELD_DEF(uint32_t, tilenum);
+        // 添加其他tiling字段
+        ...
+        TILING_DATA_FIELD_DEF(int32_t, k);
+        TILING_DATA_FIELD_DEF(bool, islargest);
+        TILING_DATA_FIELD_DEF(bool, isinitindex);
+        TILING_DATA_FIELD_DEF(bool, ishasfinish);
+        TILING_DATA_FIELD_DEF(uint32_t, tmpsize);
+        TILING_DATA_FIELD_DEF(int32_t, outter);
+        TILING_DATA_FIELD_DEF(int32_t, inner);
+        TILING_DATA_FIELD_DEF(int32_t, n);
+        TILING_DATA_FIELD_DEF(int32_t, order);
+        TILING_DATA_FIELD_DEF(int32_t, sorted);
+        TILING_DATA_FIELD_DEF_STRUCT(TopkTiling, topkTilingData);
     END_TILING_DATA_DEF;
     REGISTER_TILING_DATA_CLASS(TopkCustom, TilingData)
     } // namespace optiling
@@ -190,8 +191,8 @@ TopKTilingFunc返回值为true/false，true表示成功拿到TopK的Tiling各项
         tiling.set_isinitindex(IS_INITINDEX);
         // 设置其他Tiling参数
         ...
-            // 本样例中仅作为样例说明，通过GetTopKMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小。
-            uint32_t maxsize = 0;
+        // 本样例中仅作为样例说明，通过GetTopKMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小。
+        uint32_t maxsize = 0;
         uint32_t minsize = 0;
         uint32_t dtypesize = 4; // float类型
         auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
@@ -203,7 +204,7 @@ TopKTilingFunc返回值为true/false，true表示成功拿到TopK的Tiling各项
             AscendC::TopKMode::TOPK_NSMALL, tiling.islargest, dtypesize, maxsize, minsize);
         tiling.set_tmpsize(minsize);
         ... // 其他逻辑
-            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         size_t* currentWorkspace = context->GetWorkspaceSizes(1);
         currentWorkspace[0] = 0;
