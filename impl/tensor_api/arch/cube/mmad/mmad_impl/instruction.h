@@ -52,12 +52,19 @@ private:
         }
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             SetCtrlForhifloat8();
-            asc_mmad(dst, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
+            mad(dst, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
                 reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k, n, unitFlag, disableGemv, cmatrixSource,
                 cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, int8_t> && Std::is_same_v<S, int4b_t>) {
+            mad_s8s4(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, half> && Std::is_same_v<S, int4b_t>) {
+            mad_f16s4(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, bfloat16_t> && Std::is_same_v<S, int4b_t>) {
+            mad_bf16s4(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
-            asc_mmad(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+            mad(dst, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
         }
+        
     }
 };
 
@@ -81,12 +88,18 @@ private:
         uint64_t xd = ((uint64_t)dst) & 0xffffffffULL | ((bias & 0xffffffffULL) << 32);
         if constexpr (Std::is_same_v<U, hifloat8_t> && Std::is_same_v<S, hifloat8_t>) {
             SetCtrlForhifloat8();
-            asc_mmad((__cc__ T*)xd, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
+            mmad((__cc__ T*)xd, reinterpret_cast<__ca__ fp8_e4m3fn_t*>(fm),
                 reinterpret_cast<__cb__ fp8_e4m3fn_t*>(filter), m, k, n, unitFlag, disableGemv, cmatrixSource,
                 cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, int8_t> && Std::is_same_v<S, int4b_t>) {
+            mad_s8s4((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, half> && Std::is_same_v<S, int4b_t>) {
+            mad_f16s4((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+        } else if constexpr (Std::is_same_v<U, bfloat16_t> && Std::is_same_v<S, int4b_t>) {
+            mad_bf16s4((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
         } else {
-            asc_mmad((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
-        }
+            mad((__cc__ T*)xd, fm, filter, m, k, n, unitFlag, disableGemv, cmatrixSource, cmatrixInitVal);
+        } 
     }
 };
 
