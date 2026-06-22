@@ -103,6 +103,7 @@ endif()
 
 if (BUILD_OPEN_PROJECT)
     add_subdirectory(detail/hccl/cc)
+    add_subdirectory(detail/ain/cc)
 endif()
 
 if(NOT BUILD_OPEN_PROJECT)
