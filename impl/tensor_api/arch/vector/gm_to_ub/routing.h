@@ -39,8 +39,8 @@ struct CopyGM2UBTensor2Tensor {
     using type = CopyGM2UBIgnore;
 };
 
-template <>
-struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, ArchVersion::V3510> {
+template <uint32_t Version>
+struct CopyGM2UBTensor2Tensor<Location::UB, Location::GM, Version> {
     using type = DataCopyGM2UB3510;
 };
 

@@ -63,10 +63,8 @@ private:
             return;
         }
 
-        if constexpr (CURRENT_ARCH_VERSION == ArchVersion::V3510) {
-            asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
-                                     cacheMode, srcStride, dstStride);
-        }
+        asc_copy_gm2ub_align(dst, src, blockCount, blockLen, leftPaddingCount, rightPaddingCount, isPad,
+                                    cacheMode, srcStride, dstStride);
     }
 };
 
