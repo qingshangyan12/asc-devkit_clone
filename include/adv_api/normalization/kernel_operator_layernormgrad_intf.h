@@ -21,7 +21,7 @@
 #ifndef LIB_NORMALIZATION_KERNEL_OPERATOR_LAYERNORMGRAD_INTF_H
 #define LIB_NORMALIZATION_KERNEL_OPERATOR_LAYERNORMGRAD_INTF_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 
 namespace AscendC {
 [[deprecated(__FILE__ " is deprecated, please use layernormgrad.h instead!")]] typedef void using_deprecated_header_h;

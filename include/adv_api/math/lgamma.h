@@ -20,7 +20,7 @@
 
 #ifndef LIB_MATH_LGAMMA_H
 #define LIB_MATH_LGAMMA_H
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/math/lgamma/lgamma_3510_impl.h"
 #else

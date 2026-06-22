@@ -49,7 +49,7 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_binary_scalar_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_BINARY_SCALAR_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_BINARY_SCALAR_INTF_H__)
