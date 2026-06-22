@@ -1,4 +1,3 @@
-#!/bin/bash
 # ----------------------------------------------------------------------------------------------------------
 # Copyright (c) 2026 Huawei Technologies Co., Ltd.
 # This program is free software, you can redistribute it and/or modify it under the terms and conditions of
@@ -9,32 +8,27 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-set -euo pipefail
 
-CASE_REL=04_aicpu/02_features/00_framwork/00_pytorch/tiling_sink_programming
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../../../../../_case_entry.sh"
-presmoke_case_init "$CASE_REL"
+cmake_minimum_required(VERSION 3.16)
 
-case_build() {
-    mkdir -p "$BUILD_DIR"
-    presmoke_ensure_custom_op_package
-}
+set(CMAKE_ASC_ARCHITECTURES "dav-2201" CACHE STRING "NPU architecture: dav-2201, dav-3510")
 
-case_run() {
-    mkdir -p "$BUILD_DIR"
-    presmoke_clear_plog
-    (cd "$CASE_DIR" && ASCEND_GLOBAL_LOG_LEVEL=1 soc_version=$SOC_VERSION bash -lc 'python3 test_add_custom_tiling_sink.py')
-    presmoke_verify_tiling_sink_task_log 'GenerateTaskForSinkOp:Node [AddCustomTilingSink, AddCustomTilingSink] starts to generate tasks for the tiling sink, sk_flag [0].'
-}
+find_package(ASC REQUIRED)
 
-case_verify() {
-    mkdir -p "$BUILD_DIR"
-    :
-}
+project(matmul_aot_example LANGUAGES ASC CXX)
 
-case_clean() {
-    presmoke_default_clean
-}
+add_executable(matmul_aot_example
+    matmul_aot_example.asc
+)
 
-presmoke_case_main "$@"
+target_link_libraries(matmul_aot_example PRIVATE
+    tiling_api
+    register
+    platform
+    m
+    dl
+)
+
+target_compile_options(matmul_aot_example PRIVATE
+    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES}>
+)
