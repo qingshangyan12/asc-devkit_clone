@@ -182,8 +182,8 @@ AscendC::WelfordFinalize<false>(
 
 // 计算方差时不使用修正系数
 static constexpr AscendC::WelfordFinalizeConfig CONFIG = {false};
-AscendC::WelfordFinalizePara para = {rnLength,   abLength, head, headLength,        tail,
-                                     tailLength, abRec,    rRec, rRecWithCorrection};
+AscendC::WelfordFinalizePara para = {rnLength, abLength, head, headLength, tail,
+                                     tailLength, abRec, rRec, rRecWithCorrection};
 AscendC::WelfordFinalize<false, CONFIG>(meanLocal, varianceLocal, inmeanLocal, invarLocal, inputXLocal, para);
 ```
 

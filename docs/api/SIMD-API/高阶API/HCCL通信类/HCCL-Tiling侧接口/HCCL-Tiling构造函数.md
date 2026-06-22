@@ -7,7 +7,7 @@
 ## 函数原型
 
 ```
-Mc2CcTilingConfig(const std::string &groupName, uint32_t opType, const std::string &algConfig, uint32_t reduceType = 0, uint8_t dstDataType = 0, uint8_t srcDataType = 0, uint8_t commEngine = 0)
+Mc2CcTilingConfig(const std::string& groupName, uint32_t opType, const std::string& algConfig, uint32_t reduceType = 0, uint8_t dstDataType = 0, uint8_t srcDataType = 0, uint8_t commEngine = 0)
 ```
 
 ## 参数说明

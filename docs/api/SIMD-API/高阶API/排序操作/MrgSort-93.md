@@ -145,9 +145,9 @@ struct MrgSortSrcList {
 
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
+    // sortList：待合并的有序队列列表
     AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
-        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset],
-        sortedLocal[3 * baseOffset]);           // sortList：待合并的有序队列列表
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];
@@ -186,9 +186,9 @@ struct MrgSortSrcList {
     // 单条队列元素个数
     uint32_t singleMergeTmpElementCount = elementCount / 4;
     uint32_t baseOffset = AscendC::GetSortOffset<half>(singleMergeTmpElementCount);
+    // sortList：待合并的有序队列列表
     AscendC::MrgSortSrcList sortList = AscendC::MrgSortSrcList(
-        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset],
-        sortedLocal[3 * baseOffset]);           // sortList：待合并的有序队列列表
+        sortedLocal[0], sortedLocal[baseOffset], sortedLocal[2 * baseOffset], sortedLocal[3 * baseOffset]);
     uint16_t singleDataSize = elementCount / 4; // 队列长度
     const uint16_t elementCountList[4] = {singleDataSize, singleDataSize, singleDataSize, singleDataSize}; // 4个队列的长度
     uint32_t sortedNum[4];

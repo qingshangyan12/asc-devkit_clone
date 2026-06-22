@@ -59,9 +59,9 @@ void PadTilingFunc(
 
     ```
     BEGIN_TILING_DATA_DEF(TilingData)             // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
-    TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
-    ...                                           // 添加其他tiling字段
+        TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
+        TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
+        ...                                           // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(PadTiling, padTilingData); // 将PadTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
@@ -80,7 +80,8 @@ void PadTilingFunc(
         tiling.set_totalLength(totalLength);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ... std::vector<int64_t> shapeVec = {320, 63};
+        ...
+        std::vector<int64_t> shapeVec = {320, 63};
         ge::Shape srcShape(shapeVec);
         std::vector<int64_t> oriShapeVec = {320, 63};
         ge::Shape oriSrcShape(oriShapeVec);
@@ -92,7 +93,8 @@ void PadTilingFunc(
         const uint32_t localWorkSpaceSize = minValue;
         AscendC::PadTilingFunc(srcShape, oriSrcShape, localWorkSpaceSize, sizeof(half), tiling.padTilingData);
         // 其他逻辑
-        ... tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        ...
+        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;

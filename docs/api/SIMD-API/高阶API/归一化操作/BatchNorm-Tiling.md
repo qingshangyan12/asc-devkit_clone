@@ -105,12 +105,12 @@ bool GetBatchNormNDTilingInfo(
 
     ```
     BEGIN_TILING_DATA_DEF(TilingData)                 // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, tileNum);         // 添加tiling字段，每个核上总计算数据分块个数
-    TILING_DATA_FIELD_DEF(uint32_t, bLength);         // 添加tiling字段，输入shape的b维度长度
-    TILING_DATA_FIELD_DEF(uint32_t, sLength);         // 添加tiling字段，输入shape的s维度长度
-    TILING_DATA_FIELD_DEF(uint32_t, hLength);         // 添加tiling字段，输入shape的h维度长度
-    TILING_DATA_FIELD_DEF(uint32_t, originalBLength); // 添加tiling字段，输入shape原始b维度长度
-    ...                                               // 添加其他tiling字段
+        TILING_DATA_FIELD_DEF(uint32_t, tileNum);         // 添加tiling字段，每个核上总计算数据分块个数
+        TILING_DATA_FIELD_DEF(uint32_t, bLength);         // 添加tiling字段，输入shape的b维度长度
+        TILING_DATA_FIELD_DEF(uint32_t, sLength);         // 添加tiling字段，输入shape的s维度长度
+        TILING_DATA_FIELD_DEF(uint32_t, hLength);         // 添加tiling字段，输入shape的h维度长度
+        TILING_DATA_FIELD_DEF(uint32_t, originalBLength); // 添加tiling字段，输入shape原始b维度长度
+        ...                                               // 添加其他tiling字段
         TILING_DATA_FIELD_DEF_STRUCT(
             BatchNormTiling, batchNormTilingData); // 将BatchNormTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
@@ -129,7 +129,8 @@ bool GetBatchNormNDTilingInfo(
         context->SetBlockDim(NUM_BLOCKS);
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
-        ... std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
+        ...
+        std::vector<int64_t> shapeVec = {16, 16, 16};   //{b,s,h}
         std::vector<int64_t> originShapeVec = {15, 16, 16}; //{originB,originS,originH}
         ge::Shape srcShape(shapeVec);
         ge::Shape originSrcShape(originShapeVec);
@@ -141,7 +142,7 @@ bool GetBatchNormNDTilingInfo(
         AscendC::GetBatchNormNDTilingInfo(
             srcShape, originSrcShape, minSize, sizeof(half), false, tiling.batchNormTilingData, false);
         ... // 其他逻辑
-            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;

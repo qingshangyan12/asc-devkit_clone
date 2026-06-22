@@ -49,11 +49,11 @@ void GetWelfordUpdateMaxMinTmpSize(
 
     ```
     BEGIN_TILING_DATA_DEF(WelfordUpdateCustomTilingData) // 注册一个tiling的类，以tiling的名字作为入参
-    TILING_DATA_FIELD_DEF(uint32_t, inplace);            // 添加tiling字段，output是否复用input
-    TILING_DATA_FIELD_DEF(uint32_t, nLength);
-    TILING_DATA_FIELD_DEF(uint32_t, rLength);
-    TILING_DATA_FIELD_DEF(uint32_t, abComputeLength);
-    TILING_DATA_FIELD_DEF(uint32_t, nRec);
+        TILING_DATA_FIELD_DEF(uint32_t, inplace);            // 添加tiling字段，output是否复用input
+        TILING_DATA_FIELD_DEF(uint32_t, nLength);
+        TILING_DATA_FIELD_DEF(uint32_t, rLength);
+        TILING_DATA_FIELD_DEF(uint32_t, abComputeLength);
+        TILING_DATA_FIELD_DEF(uint32_t, nRec);
     END_TILING_DATA_DEF;
     REGISTER_TILING_DATA_CLASS(
         WelfordUpdateCustom,
@@ -87,7 +87,7 @@ void GetWelfordUpdateMaxMinTmpSize(
         // auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
         // AscendC::GetWelfordUpdateMaxMinTmpSize(srcShape, 4, 4, false, false, ascendcPlatform, maxTmpsize, minTmpsize);
         ... // 其他逻辑
-            context->SetTilingKey(1);
+        context->SetTilingKey(1);
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         size_t* currentWorkspace = context->GetWorkspaceSizes(1);
