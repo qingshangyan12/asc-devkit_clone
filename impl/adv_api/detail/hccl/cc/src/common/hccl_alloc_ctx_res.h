@@ -151,16 +151,7 @@ HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string &ctxTag, u32 rankSi
 HcclResult HcclAllocOpResCtx(HcclComm comm, const std::string &ctxTag, const std::vector<OpParam> &opParamVec, void* mc2Tiling, const void *ccTilingList[], void** opResCtxPtr);
 
 //AllToAll适配AllToAllV
-HcclResult ConvertAlltoAllParam(const u64 recvCount, const u32 rankSize, std::vector<u64> &sdispls, std::vector<u64> &rdispls)
-{
-    u64 dataCountOffset = 0;
-    for (u64 i = 0; i < rankSize; i++) {
-        sdispls[i] = dataCountOffset;
-        rdispls[i] = dataCountOffset;
-        dataCountOffset += recvCount;
-    }
-    return HCCL_SUCCESS;
-}
+HcclResult ConvertAlltoAllParam(const u64 recvCount, const u32 rankSize, std::vector<u64> &sdispls, std::vector<u64> &rdispls);
 
 HcclResult PrepareOpsCommParam(const std::string &tag, OpParam &param);
 
