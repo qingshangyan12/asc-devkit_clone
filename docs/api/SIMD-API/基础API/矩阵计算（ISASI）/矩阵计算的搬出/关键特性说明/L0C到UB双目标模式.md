@@ -1,18 +1,18 @@
 # L0C到UB双目标模式<a name="ZH-CN_TOPIC_0000002550720160"></a>
-
+<!-- npu="950" id1 -->
 **特性说明：**
 
-同一AI Core内有一个Cube Core和两个Vector Core，当启用双目标模式控制时，L0C中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。
+同一AI Core内有一个Cube Core和两个Vector Core，当启用双目标模式控制时，L0C Buffer中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的UB中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。
 
-- 单目标模式：将整个矩阵写入通过subBlockId参数配置的目标UB中；
-- 双目标模式（M维度）：按M维度拆分成形状为M / 2 \* N的两个矩阵，分别写入两个UB；
-- 双目标模式（N维度）：按N维度拆分成形状为M \* N / 2的两个矩阵，分别写入两个UB；
+- 单目标模式：将整个矩阵写入通过subBlockId参数配置的目标UB中。
+- 双目标模式（M维度）：按M维度拆分成形状为M / 2 \* N的两个矩阵，分别写入两个UB。
+- 双目标模式（N维度）：按N维度拆分成形状为M \* N / 2的两个矩阵，分别写入两个UB。
 
 **特性约束：**
 
-- 双目标模式仅支持在L0C到UB通路，普通搬运模式（NZ2NZ）或NZ2ND搬运场景下使用，不支持随路功能场景。
-- 按M维度拆分时M必须为2的倍数；
-- 按N维度拆分时N须为32的倍数；
+- 双目标模式仅支持在L0C Buffer到UB通路，普通搬运模式（NZ2NZ）或NZ2ND搬运场景下使用，不支持随路功能场景。
+- 按M维度拆分时M必须为2的倍数。
+- 按N维度拆分时N须为32的倍数。
 
 **使用示例：**
 
@@ -41,7 +41,6 @@ M方向切分：
 在NZ2ND模式下启用双目标模式如下图所示，分为按M维度拆分和按N维度拆分，按M维度拆分M必须为2的倍数，按N维度拆分N必须为2的倍数：
 
 - ndNum = 2，表示源NZ矩阵的数目为2。图中红框区域为矩阵1，蓝框区域为矩阵2。
-
 - nSize = 32，表示源NZ矩阵（图中红框区域或蓝框区域）在N方向上的大小为32个元素。
 - mSize = 48，表示源NZ矩阵在M方向上的大小为48个元素。
 - srcStride = 64，表示源NZ矩阵中相邻Z排布的起始地址偏移，即下图红框区域中左侧浅色Z排布矩阵的起始地址与右侧深色Z排布矩阵的起始地址之间的间隔为64 \* C0\_Size。
@@ -55,3 +54,4 @@ M方向切分：
 ![](../../../../../figures/nz2nd_l0c2ub_dual_dst.png)
 
 完整样例可参考[fixpipe\_l0c2ub](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)
+<!-- end id1 -->
