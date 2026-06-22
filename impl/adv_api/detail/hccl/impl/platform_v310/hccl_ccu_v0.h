@@ -386,17 +386,20 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CommonPrepareImpl(
     const CommonPrepareParam& commonPrepareParam)
 {
+    AscendC::printf("Start CommonPrepareImpl!\n");
     if (unlikely(commonPrepareParam.repeat == 0U)) {
         return INVALID_HANDLE_ID;
     }
 
     HcclHandle handleId = curHandleId_;
 
+    AscendC::printf("Start ASCENDC_HCCL_API_ASSERT!\n");
     ASCENDC_HCCL_API_ASSERT(
         handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
         "Call Prepare[%d] failed, Prepare interface call num is[%d], expected less than[%d].",
         static_cast<int32_t>(commonPrepareParam.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
 
+    AscendC::printf("Start InitHandleInfo!\n");
     InitHandleInfo(handleId);
     uint64_t reqId = handleId == 0 ? 0 : handleReqId_[handleId - 1] + handleRepeatCnt_[handleId - 1];
     handleReqId_[handleId] = (uint8_t)(reqId % CCU_MAX_MSG_NUM);
@@ -404,6 +407,7 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     handleRepeatCnt_[handleId] = commonPrepareParam.repeat;
 
     if (workingFlag_) {
+        AscendC::printf("Start setting handleParamGM_!\n");
         handleParamGM_[handleId].commType.prepareType = commonPrepareParam.commType.prepareType;
         handleParamGM_[handleId].sendBuf = commonPrepareParam.sendBuf;
         handleParamGM_[handleId].recvBuf = commonPrepareParam.recvBuf;
@@ -412,19 +416,23 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].dstDataType = commonPrepareParam.dstDataType;
         handleParamGM_[handleId].op = commonPrepareParam.op;
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
+        AscendC::printf("Start InitCcuParam!\n");
         InitCcuParam(handleId);
+        AscendC::printf("Start FlushDataCache!\n");
         FlushDataCache(&handleParamGM_[handleId]);
         uint64_t dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commonPrepareParam.dataType)];
         uint32_t rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
 
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
+            AscendC::printf("Start setting allToAllVParam_!\n");
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
                 allToAllVParam_[handleId].sdispls[i] = commonPrepareParam.paramExt.sdispls[i];
                 allToAllVParam_[handleId].recvCounts[i] = commonPrepareParam.paramExt.recvCounts[i];
                 allToAllVParam_[handleId].rdispls[i] = commonPrepareParam.paramExt.rdispls[i];
             }
-
+            
+            AscendC::printf("Start FlushDataCache2!\n");
             for (uint32_t j = 0; j < rankNum; j += MAX_DCCI_CNT / sizeof(uint64_t)) {
                 FlushDataCache(&allToAllVParam_[handleId].sendCounts + j);
                 FlushDataCache(&allToAllVParam_[handleId].sdispls + j);
@@ -432,17 +440,21 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
                 FlushDataCache(&allToAllVParam_[handleId].rdispls + j);
             }
         } else if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
+            AscendC::printf("[HCCL_CMD_HALF_ALLTOALLV]Start setting handleParamGM_!\n");
             handleParamGM_[handleId].wParamExt.sendOffsets = commonPrepareParam.wParamExt.sendOffsets;
             handleParamGM_[handleId].wParamExt.sendSizes = commonPrepareParam.wParamExt.sendSizes;
             handleParamGM_[handleId].wParamExt.remoteWinOffset = commonPrepareParam.wParamExt.remoteWinOffset;
+            AscendC::printf("[HCCL_CMD_HALF_ALLTOALLV]Start FlushDataCache!\n");
             FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         }
     }
 
     if constexpr (commit) {
+        AscendC::printf("Start CommitMsgInner!\n");
         CommitMsgInner(handleId);
     }
     curHandleId_++;
+    AscendC::printf("Finish CommonPrepareImpl!\n");
     return handleId;
 }
 
