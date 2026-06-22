@@ -36,11 +36,11 @@
     </table>
   - 样例实现：
     HistogramsVF函数内：
-    1. 使用Duplicate初始化dstReg为0
+    1. 使用Duplicate分别初始化dst0Reg和dst1Reg为0
     2. 使用LoadAlign的postUpdate模式加载输入数据
     3. 调用Histograms接口进行统计计算，dst0统计[0-127]区间、dst1统计[128-255]区间
     4. 循环累加所有输入数据块的统计结果
-    5. 使用StoreAlign的postUpdate模式一次性输出统计结果到UB
+    5. 分别使用StoreAlign的postUpdate模式输出dst0Reg和dst1Reg统计结果到UB
     - 调用实现
       使用内核调用符`<<<>>>`调用核函数，启动1个核。
 

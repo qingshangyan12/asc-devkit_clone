@@ -51,7 +51,7 @@
     <tr><td align="center">y</td><td align="center">[1, 128]</td><td align="center">uint16_t</td></tr>
     <tr><td rowspan="2" align="center">样例输出</td><td align="center">dst0</td><td align="center">[1, 128]</td><td align="center">uint16_t</td></tr>
     <tr><td align="center">dst1</td><td align="center">[1, 128]</td><td align="center">uint16_t</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_relayout</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">data_relayout</td></tr>
     </table>
   - 样例实现：
     InterleaveVF函数内调用Interleave接口进行数据交织。
@@ -60,14 +60,14 @@
 
   **场景2：Pack模式**
   - 从1个uint32_t向量（128个元素）中提取低16位到1个uint16_t向量
-  - Pack<uint16_t, uint32_t, LOWEST>：提取每个uint32_t的低16位
+  - `Pack<uint16_t, uint32_t, LOWEST>`：提取每个uint32_t的低16位
   - 样例规格：
     <table>
     <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
     <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
     <tr><td align="center">x</td><td align="center">[1, 128]</td><td align="center">uint32_t</td></tr>
     <tr><td rowspan="1" align="center">样例输出</td><td align="center">dst</td><td align="center">[1, 128]</td><td align="center">uint16_t</td></tr>
-    <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">data_relayout</td></tr>
+    <tr><td rowspan="1" align="center">核函数名</td><td colspan="3" align="center">data_relayout</td></tr>
     </table>
   - 样例实现：
     PackVF函数内调用Pack接口提取低16位。

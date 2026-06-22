@@ -8,7 +8,7 @@
 
 | 目录名称 | 功能描述 | 支持的产品 |
 |----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------| --- |
-| [brcb](./brcb) |  本样例基于Brcb实现数据填充，可用于每次取输入张量中的8个数填充到结果张量的8个datablock中 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
+| [brcb](./brcb) |  本样例基于Brcb实现数据填充，可用于每次取输入张量中的8个数填充到结果张量的8个DataBlock中 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [cast](./cast) |  本样例基于Cast实现源操作数和目的操作数Tensor的数据类型及精度转换 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [compare](./compare) |  本样例基于Compare、Compares接口完成多场景下的数据比较功能，实现逐元素大小比较。 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |
 | [create_vec_index](./create_vec_index) |  本样例介绍了调用CreateVecIndex实现创建指定起始值的向量索引的方法 | Ascend 950PR/Ascend 950DT<br>Atlas A3 训练系列产品/Atlas A3 推理系列产品<br>Atlas A2 训练系列产品/Atlas A2 推理系列产品 |

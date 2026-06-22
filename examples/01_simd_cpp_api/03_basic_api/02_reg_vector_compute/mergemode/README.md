@@ -22,13 +22,13 @@
 
 ## 样例描述
 - 样例功能：  
-  验证`MERGING`模式：当mask未激活时，dstReg的对应位保留原值而非参与计算。输入为200个负数（非VL整数倍），输出为2（未激活位保留的dstReg原值）。
+  验证`MERGING`模式：当mask未激活时，dstReg的对应位保留原值而非参与计算。输入为200个负数（非VL整数倍），输出缓冲区为8个float，首元素ReduceMax结果预期为2（未激活位保留的dstReg原值）。
 
   **验证原理**
   - 输入：200个float负数（-100到-1），VL=256Byte，共4个repeat
   - repeat 0-3：每个repeat前，Duplicate初始化dstReg=2
   - Max MERGING：激活位=max(负数,负数)=负数，未激活位=保留dstReg原值=2
-  - Repeat 3（200个元素，最后一个repeat只有8个激活位）：
+  - 总输入为200个float，最后一个repeat覆盖yAddr[192:256]，其中只有8个激活位：
     - yAddr[192:200] = 负数（8个激活位）
     - yAddr[200:256] = 2（56个未激活位，MERGING保留dstReg原值）
   - ReduceMax(yAddr[0:256]) = 2，验证MERGING模式确实保留了未激活位的dstReg原值

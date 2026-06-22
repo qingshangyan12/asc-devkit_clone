@@ -34,7 +34,7 @@
 <tr><th>scenarioNum</th><th>接口</th><th>输入Shape</th><th>输出Shape</th><th>数据类型</th><th>说明</th></tr>
 <tr><td>1</td><td>And</td><td>[1, 512], [1, 512]</td><td>[1, 512]</td><td>uint16</td><td>对两个源操作数进行按位与运算</td></tr>
 <tr><td>2</td><td>Ors</td><td>[1, 512], [1, 512]</td><td>[1, 512]</td><td>uint16</td><td>标量在前，src0[0]作为标量与src1矢量做或操作（仅支持 dav-3510）</td></tr>
-<tr><td>3</td><td>ShiftLeft</td><td>[1, 512], [1, 512]</td><td>[1, 512]</td><td>uint16</td><td>对源操作数进行左移操作，左移位数由tensor指定（仅支持 dav-3510）</td></tr>
+<tr><td>3</td><td>ShiftLeft</td><td>[1, 512], [1, 512]</td><td>[1, 512]</td><td>src0和dst为uint16，src1为int16</td><td>对源操作数进行左移操作，左移位数由tensor指定（仅支持 dav-3510）</td></tr>
 <tr><td>4</td><td>ShiftRight</td><td>[1, 512]</td><td>[1, 512]</td><td>uint16</td><td>对源操作数进行右移操作，右移位数由常量SHIFT_BITS=2指定</td></tr>
 </table>
 
@@ -53,7 +53,7 @@
 - 示例：
   - 输入src0: [1 2 3 ... 512]
   - 输入src1: [512 511 510 ... 1]
-  - 输出dst: [1 0 3 ... 0]
+  - 输出dst: [0 2 2 4 4 2 2 8 ... 0]
 
 **场景2：Ors矢量与标量或操作（标量在前）** ----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
 - 输入shape：src0=[1, 512]（取src0Local[0]作为标量），src1=[1, 512]（矢量）
@@ -81,7 +81,8 @@
 - 实现：
 
     ```cpp
-    AscendC::ShiftLeft(dstLocal, src0Local, src1Local, COUNT);
+    AscendC::LocalTensor<int16_t> src1S16 = src1Local.ReinterpretCast<int16_t>();
+    AscendC::ShiftLeft(dstLocal, src0Local, src1S16, COUNT);
     ```
 
 - 说明：对src0中的每个元素按照src1中对应的左移位数进行左移操作，结果存入dst。src1存放左移位数，不支持设置为负数

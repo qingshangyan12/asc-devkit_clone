@@ -19,6 +19,9 @@
 │   ├── figures                        // 图示
 │   ├── scripts
 │   │   ├── gen_data.py                // 输入数据和真值数据生成脚本
+│   │   ├── gen_data_f322s8.py         // float32到int8量化场景输入数据和真值数据生成脚本
+│   │   ├── gen_data_s322f16.py        // int32到float16量化场景输入数据和真值数据生成脚本
+│   │   ├── gen_data_s322s8.py         // int32到int8量化场景输入数据和真值数据生成脚本
 │   │   └── verify_result.py           // 验证输出数据和真值数据是否一致的验证脚本
 │   ├── CMakeLists.txt                 // 编译工程文件
 │   ├── data_utils.h                   // 数据读入写出函数
@@ -122,7 +125,7 @@
 
 **场景7：输出格式Nz，输出数据类型float，使能ChannelSplit**
 - 输入：A [128, 128] half类型，ND格式；B [128, 256] half类型，ND格式
-- 输出：C [128, 512] float类型，Nz格式（使能通道拆分）
+- 输出：C为float类型，Nz格式（使能通道拆分），元素总数仍对应M×N，即128×256个float元素
 - 实现：设置 `fixpipeParams.isChannelSplit = true` 开启ChannelSplit功能
 - 说明：在数据从L0C搬出到GM的过程中开启通道拆分功能，即将16x16小z分形矩阵拆分成两个独立的16x8小z分形矩阵输出到GM，Fixpipe接口的输入输出必须均为float类型，且仅支持Nz格式
 
@@ -147,6 +150,8 @@
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py output/output.bin ./output/golden.bin  # 验证输出结果是否正确
   ```
+
+  > **说明：** 上述固定验证命令按float32读取结果，适用于float32输出场景。场景4和场景5输出为int8_t时，需要按int8_t读取和比较输出与真值数据。
 
   使用 CPU调试 或 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=cpu` 或 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
   
