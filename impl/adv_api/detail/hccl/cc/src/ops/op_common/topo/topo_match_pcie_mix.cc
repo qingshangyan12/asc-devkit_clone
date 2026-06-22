@@ -35,25 +35,28 @@ HcclResult TopoMatchPcieMix::MatchTopo(
         HCCL_ERROR("[TopoMatchPcieMix] Rank [%d], deviceType not supported yet.", myRank), HcclResult::HCCL_E_PARA);
 #endif
 
-    uint32_t* netLayers;
+    // 获取通信网络层数
+    uint32_t *netLayers;
     uint32_t layerNum = 0;
     CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &layerNum));
 
-    HCCL_DEBUG(
-        "[TopoMatchPcieMix] Rank [%d], netLayers[%u][%s]", myRank, layerNum,
-        PrintCArray<uint32_t>(netLayers, layerNum).c_str());
+    HCCL_DEBUG("[TopoMatchPcieMix] Rank [%d], netLayers[%u][%s]",
+                myRank, layerNum, PrintCArray<uint32_t>(netLayers, layerNum).c_str());
 
-    uint32_t* instSizeList;
+    // 获取layer0的topo
+    uint32_t *instSizeList;
     uint32_t listSize = 0;
     CHK_RET(HcclRankGraphGetInstSizeListByLayer(comm, 0, &instSizeList, &listSize));
     HCCL_INFO(
         "[TopoMatchPcieMix] Rank:[%d], inst num:[%u], rank on each inst:[%s]", myRank, listSize,
         PrintCArray<uint32_t>(instSizeList, listSize).c_str());
     CHK_RET(CheckVecElementAllSame(instSizeList, listSize));
-
+    
+    // 计算layer0的topo
     algHierarchyInfo.infos.resize(COMM_LAYER_SIZE_2);
     CHK_RET(TopoForLayer0(comm, myRank, algHierarchyInfo));
-
+    
+    // 暂不支持大于1层的PCIE混合topo
     if (layerNum >= COMM_LAYER_SIZE_2) {
         HCCL_WARNING("[TopoMatchPcieMix] layerNum > 1 is not supported yet for PCIE mix topo, and is ignored");
     }
@@ -67,8 +70,8 @@ HcclResult TopoMatchPcieMix::CheckVecElementAllSame(const uint32_t* instSizeList
     uint32_t firstSize = instSizeList[0];
     for (uint32_t i = 1; i < listSize; i++) {
         if (firstSize != instSizeList[i]) {
-            HCCL_ERROR(
-                "[TopoMatchPcieMix] instSizeList [%u] [%u] not equal, Invalid topo.", firstSize, instSizeList[i]);
+            HCCL_ERROR("[TopoMatchPcieMix] instSizeList [%u] [%u] not equal, Invalid topo.",
+                      firstSize, instSizeList[i]);
             return HcclResult::HCCL_E_PARA;
         }
     }
@@ -84,7 +87,7 @@ HcclResult TopoMatchPcieMix::TopoForLayer0(
     uint32_t* topoInsts;
     uint32_t topoInstNum = 0;
     CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, netLayer, &topoInsts, &topoInstNum));
-
+    
     std::vector<uint32_t> ranksInMeshTopo = {};
     std::vector<uint32_t> ranksInClosTopo = {};
     CommTopo topoType = CommTopo::COMM_TOPO_RESERVED;
@@ -134,10 +137,11 @@ HcclResult TopoMatchPcieMix::DeduplicateLevelRanks(
     const uint32_t myRank, std::vector<uint32_t>& level0Ranks, std::vector<uint32_t>& level1Ranks) const
 {
     u32 level0RankSize = level0Ranks.size();
-    auto level1End = std::remove_if(level1Ranks.begin(), level1Ranks.end(), [this, level0RankSize, myRank](int val) {
-        return val % level0RankSize != myRank % level0RankSize;
-    });
+    auto level1End = std::remove_if(level1Ranks.begin(), level1Ranks.end(),
+        [this, level0RankSize, myRank](int val) {return val % level0RankSize != myRank % level0RankSize;}
+    );
     level1Ranks.erase(level1End, level1Ranks.end());
     return HCCL_SUCCESS;
 }
-} // namespace mc2_ops_hccl
+
+}  // namespace ops_hccl
