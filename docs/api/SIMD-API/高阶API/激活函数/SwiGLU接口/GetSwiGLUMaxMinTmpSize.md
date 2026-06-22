@@ -10,7 +10,9 @@ kernel侧SwiGLU接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetSwiGLUMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue, const bool isReuseSource)
+void GetSwiGLUMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, uint32_t& maxValue, uint32_t& minValue,
+    const bool isReuseSource)
 ```
 
 ## 参数说明

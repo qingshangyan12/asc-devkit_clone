@@ -25,15 +25,22 @@
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
-    template < typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
-    __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon, const NormalizePara& para)
+    template <typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
+    __aicore__ inline void Normalize(
+        const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean,
+        const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma,
+        const LocalTensor<U>& beta, const LocalTensor<uint8_t>& sharedTmpBuffer, const float epsilon,
+        const NormalizePara& para)
     ```
 
 -   接口框架申请临时空间
 
     ```
-    template < typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
-    __aicore__ inline void Normalize(const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean, const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma, const LocalTensor<U>& beta, const float epsilon, const NormalizePara& para)
+    template <typename U, typename T, bool isReuseSource = false, const NormalizeConfig& config = NLCFG_NORM>
+    __aicore__ inline void Normalize(
+        const LocalTensor<T>& output, const LocalTensor<float>& outputRstd, const LocalTensor<float>& inputMean,
+        const LocalTensor<float>& inputVariance, const LocalTensor<T>& inputX, const LocalTensor<U>& gamma,
+        const LocalTensor<U>& beta, const float epsilon, const NormalizePara& para)
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -123,25 +130,24 @@ struct NormalizePara {
 // para: 包含A、R维度信息的NormalizePara结构体
 // config: Normalize配置参数，指定是否跳过gamma/beta、reduce模式等
 
-constexpr AscendC::NormalizeConfig CONFIG {
+constexpr AscendC::NormalizeConfig CONFIG{
     .reducePattern = AscendC::ReducePattern::AR,
     .aLength = -1,
     .isNoBeta = isNoBeta,
     .isNoGamma = isNoGamma,
-    .isOnlyOutput = false
-};
+    .isOnlyOutput = false};
 
 // 使用Normalize接口执行层归一化计算
 AscendC::Normalize<DTYPE_Y, DTYPE_X, false, CONFIG>(
-    yLocal,          // 输出：归一化结果y，shape [A, R]
-    rstdLocal,       // 输出：标准差倒数rstd，shape [A]
-    meanLocal,       // 输入：均值mean，shape [A]
-    varianceLocal,   // 输入：方差variance，shape [A]
-    xLocal,          // 输入：原始数据X，shape [A, R]
-    gammaLocal,      // 输入：缩放系数γ，shape [R]
-    betaLocal,       // 输入：平移系数β，shape [R]
-    epsilon,         // 输入：防除零系数ε
-    para             // 输入：Tiling参数，包含aLength、rLength、rLengthWithPadding
+    yLocal,        // 输出：归一化结果y，shape [A, R]
+    rstdLocal,     // 输出：标准差倒数rstd，shape [A]
+    meanLocal,     // 输入：均值mean，shape [A]
+    varianceLocal, // 输入：方差variance，shape [A]
+    xLocal,        // 输入：原始数据X，shape [A, R]
+    gammaLocal,    // 输入：缩放系数γ，shape [R]
+    betaLocal,     // 输入：平移系数β，shape [R]
+    epsilon,       // 输入：防除零系数ε
+    para           // 输入：Tiling参数，包含aLength、rLength、rLengthWithPadding
 );
 ```
 

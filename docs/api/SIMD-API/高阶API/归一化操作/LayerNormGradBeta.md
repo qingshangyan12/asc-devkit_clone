@@ -30,7 +30,9 @@ LayerNormGradBeta接口用于获取反向beta/gamma的数值，和LayerNormGrad�
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void LayerNormGradBeta(const LocalTensor<T>& outputPdGamma, const LocalTensor<T>& outputPdBeta, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy, const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormGradBetaTiling& tiling)
+    __aicore__ inline void LayerNormGradBeta(
+        const LocalTensor<T>& outputPdGamma, const LocalTensor<T>& outputPdBeta, const LocalTensor<T>& resForGamma,
+        const LocalTensor<T>& inputDy, const LocalTensor<uint8_t>& sharedTmpBuffer, const LayerNormGradBetaTiling& tiling)
     ```
 
     该方式下开发者需自行申请并管理临时内存空间，并在接口调用完成后，复用该部分内存，内存不会反复申请释放，灵活性较高，内存利用率也较高。
@@ -39,7 +41,9 @@ LayerNormGradBeta接口用于获取反向beta/gamma的数值，和LayerNormGrad�
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void LayerNormGradBeta(const LocalTensor<T>& outputPdGamma, const LocalTensor<T>& outputPdBeta, const LocalTensor<T>& resForGamma, const LocalTensor<T>& inputDy, LayerNormGradBetaTiling& tiling)
+    __aicore__ inline void LayerNormGradBeta(
+        const LocalTensor<T>& outputPdGamma, const LocalTensor<T>& outputPdBeta, const LocalTensor<T>& resForGamma,
+        const LocalTensor<T>& inputDy, LayerNormGradBetaTiling& tiling)
     ```
 
     该方式下开发者无需申请，但是需要预留临时空间的大小。
@@ -87,11 +91,11 @@ LayerNormGradBeta接口用于获取反向beta/gamma的数值，和LayerNormGrad�
 
 // 使用LayerNormGradBeta接口计算gamma和beta的梯度
 AscendC::LayerNormGradBeta<T, isReuseSource>(
-    outputPdGamma,   // 输出：gamma的梯度，shape [H]
-    outputPdBeta,    // 输出：beta的梯度，shape [H]
-    resForGamma,     // 输入：中间结果normalizedX * inputDy，来自LayerNormGrad
-    inputDy,         // 输入：上游梯度dy，shape [B, S, H]
-    tiling           // 输入：Tiling信息
+    outputPdGamma, // 输出：gamma的梯度，shape [H]
+    outputPdBeta,  // 输出：beta的梯度，shape [H]
+    resForGamma,   // 输入：中间结果normalizedX * inputDy，来自LayerNormGrad
+    inputDy,       // 输入：上游梯度dy，shape [B, S, H]
+    tiling         // 输入：Tiling信息
 );
 ```
 

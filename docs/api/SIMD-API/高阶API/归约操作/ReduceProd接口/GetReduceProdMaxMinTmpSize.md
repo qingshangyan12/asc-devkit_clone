@@ -10,7 +10,9 @@ kernel侧ReduceProd接口的计算需要开发者预留/申请临时空间，本
 ## 函数原型
 
 ```
-void GetReduceProdMaxMinTmpSize(const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad, bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetReduceProdMaxMinTmpSize(
+    const ge::Shape& srcShape, const ge::DataType dataType, ReducePattern pattern, bool isSrcInnerPad,
+    bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -64,6 +66,7 @@ enum class ReducePattern : uint32_t {
 // 输入shape为16*32的矩阵;算子输入的数据类型为float;isReuseSource传入默认值false
 uint32_t maxSize;
 uint32_t minSize;
-auto shape = ge::Shape({ 16, 32 });
-AscendC::GetReduceProdMaxMinTmpSize(shape, ge::DataType::DT_FLOAT, AscendC::ReducePattern::AR, true, false, maxSize, minSize);
+auto shape = ge::Shape({16, 32});
+AscendC::GetReduceProdMaxMinTmpSize(
+    shape, ge::DataType::DT_FLOAT, AscendC::ReducePattern::AR, true, false, maxSize, minSize);
 ```

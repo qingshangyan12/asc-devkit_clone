@@ -28,14 +28,21 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 
     ```
     template <typename T, bool isReuseSrc = false, bool isBasicBlock = false>
-    __aicore__ inline void DeepNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal, const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T alpha, const T epsilon, DeepNormTiling& tiling)
+    __aicore__ inline void DeepNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal,
+        const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal,
+        const LocalTensor<T>& gammaLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const T alpha, const T epsilon,
+        DeepNormTiling& tiling)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, bool isReuseSrc = false, bool isBasicBlock = false>
-    __aicore__ inline void DeepNorm(const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal, const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal, const LocalTensor<T>& gammaLocal, const T alpha, const T epsilon, DeepNormTiling& tiling)
+    __aicore__ inline void DeepNorm(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& meanLocal, const LocalTensor<T>& rstdLocal,
+        const LocalTensor<T>& srcLocal, const LocalTensor<T>& gxLocal, const LocalTensor<T>& betaLocal,
+        const LocalTensor<T>& gammaLocal, const T alpha, const T epsilon, DeepNormTiling& tiling)
     ```
 
 ## 参数说明
@@ -94,16 +101,16 @@ SubLayer\(X\)通常是指在DeepNorm模型中的一个子层（sub-layer），�
 // 若尾轴的长度（H）不超过2040且为64的倍数，同时非尾轴长度（B*S）为8的倍数，可设置isBasicBlock = true提升性能
 // 若数据类型T为float且允许修改srcLocal，可设置isReuseSrc = true复用srcLocal内存空间以节省内存
 AscendC::DeepNorm<T, isReuseSrc, isBasicBlock>(
-    dstLocal,     // 输出：归一化后的结果
-    meanLocal,    // 输出：均值mean
-    rstdLocal,    // 输出：倒数标准差rstd
-    srcLocal,     // 输入：原始输入X
-    gxLocal,      // 输入：子层输出SubLayer(X)
-    betaLocal,    // 输入：LayerNorm偏置系数β
-    gammaLocal,   // 输入：LayerNorm缩放系数γ
-    alpha,        // 输入：残差路径缩放系数 α
-    epsilon,      // 输入：防除零系数 ε
-    tiling        // 输入：Tiling信息
+    dstLocal,   // 输出：归一化后的结果
+    meanLocal,  // 输出：均值mean
+    rstdLocal,  // 输出：倒数标准差rstd
+    srcLocal,   // 输入：原始输入X
+    gxLocal,    // 输入：子层输出SubLayer(X)
+    betaLocal,  // 输入：LayerNorm偏置系数β
+    gammaLocal, // 输入：LayerNorm缩放系数γ
+    alpha,      // 输入：残差路径缩放系数 α
+    epsilon,    // 输入：防除零系数 ε
+    tiling      // 输入：Tiling信息
 );
 ```
 

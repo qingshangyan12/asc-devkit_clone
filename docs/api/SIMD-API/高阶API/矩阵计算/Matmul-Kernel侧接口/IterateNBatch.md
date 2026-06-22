@@ -26,7 +26,9 @@
 
 ```
 template <bool sync = true, bool waitIterateBatch = false>
-__aicore__ inline void IterateNBatch(const uint32_t batchLoop, uint32_t batchA, uint32_t batchB, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
+__aicore__ inline void IterateNBatch(
+    const uint32_t batchLoop, uint32_t batchA, uint32_t batchB, bool enSequentialWrite,
+    const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
 ```
 
 ## 参数说明

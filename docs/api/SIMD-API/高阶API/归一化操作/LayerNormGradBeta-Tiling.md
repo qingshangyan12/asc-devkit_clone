@@ -43,15 +43,21 @@ LayerNormGradBeta Tiling的功能如下：
 ## 函数原型
 
 ```
-void GetLayerNormGradBetaMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetLayerNormGradBetaMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ```
-void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormGradBetaTiling& tiling)
+void GetLayerNormGradBetaNDTilingInfo(
+    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    optiling::LayerNormGradBetaTiling& tiling)
 ```
 
 ```
-void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormGradBetaTiling& tiling)
+void GetLayerNormGradBetaNDTilingInfo(
+    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
+    AscendC::tiling::LayerNormGradBetaTiling& tiling)
 ```
 
 ## 参数说明
@@ -91,11 +97,13 @@ void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t s
 1.  将LayerNormGradBetaTiling结构体参数增加至TilingData结构体，作为TilingData结构体的一个字段。
 
     ```
-    BEGIN_TILING_DATA_DEF(TilingData)               // 注册一个tiling的类，以tiling的名字作为入参
-      TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
-      TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
-      ...                                           // 添加其他tiling字段
-      TILING_DATA_FIELD_DEF_STRUCT(LayerNormGradBetaTiling, layernormGradBetaTilingData); // 将LayerNormGradBetaTiling结构体参数增加至TilingData结构体
+    BEGIN_TILING_DATA_DEF(TilingData)             // 注册一个tiling的类，以tiling的名字作为入参
+    TILING_DATA_FIELD_DEF(uint32_t, totalLength); // 添加tiling字段，总计算数据量
+    TILING_DATA_FIELD_DEF(uint32_t, tileNum);     // 添加tiling字段，每个核上总计算数据分块个数
+    ...                                           // 添加其他tiling字段
+        TILING_DATA_FIELD_DEF_STRUCT(
+            LayerNormGradBetaTiling,
+            layernormGradBetaTilingData); // 将LayerNormGradBetaTiling结构体参数增加至TilingData结构体
     END_TILING_DATA_DEF;
     ```
 
@@ -114,8 +122,9 @@ void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t s
         tiling.set_tileNum(TILE_NUM);
         // 设置其他Tiling参数
         ...
-        // {B, S, storageHLength, originHLength}
-        std::vector<int64_t> shapeVec = {2, 16, 64, 64};
+            // {B, S, storageHLength, originHLength}
+            std::vector<int64_t>
+                shapeVec = {2, 16, 64, 64};
         ge::Shape srcShape(shapeVec);
         // 本样例中仅作为样例说明，通过GetLayerNormGradBetaMaxMinTmpSize获取最小值并传入，来保证功能正确，开发者可以根据需要传入合适的空间大小
         uint32_t max;
@@ -123,8 +132,8 @@ void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t s
         AscendC::GetLayerNormGradBetaMaxMinTmpSize(srcShape, sizeof(half), false, max, min);
         // 获取LayerNormGradBeta Tiling参数
         AscendC::GetLayerNormGradBetaNDTilingInfo(srcShape, min, sizeof(half), false, tiling.layernormGradBetaTilingData);
-         ... // 其他逻辑
-        tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
+        ... // 其他逻辑
+            tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
         context->SetTilingKey(1);
         return ge::GRAPH_SUCCESS;
@@ -139,7 +148,7 @@ void GetLayerNormGradBetaNDTilingInfo(const ge::Shape srcShape, const uint32_t s
     {
         GET_TILING_DATA(tilingData, tiling);
         KernelFunc op;
-        op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum,tilingData.layernormGradBetaTilingData);
+        op.Init(x, y, z, tilingData.totalLength, tilingData.tileNum, tilingData.layernormGradBetaTilingData);
         if (TILING_KEY_IS(1)) {
             op.Process();
         }

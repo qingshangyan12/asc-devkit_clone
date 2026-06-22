@@ -55,7 +55,10 @@ def log_softmax(src):
 
 ```
 template <typename T, bool isReuseSource = false, bool isDataFormatNZ = false>
-__aicore__ inline void LogSoftMax(const LocalTensor<T>& dst, const LocalTensor<T>& sum, const LocalTensor<T>& max, const LocalTensor<T>& src, const LocalTensor<uint8_t>& sharedTmpBuffer, const LogSoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+__aicore__ inline void LogSoftMax(
+    const LocalTensor<T>& dst, const LocalTensor<T>& sum, const LocalTensor<T>& max, const LocalTensor<T>& src,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const LogSoftMaxTiling& tiling,
+    const SoftMaxShapeInfo& softmaxShapeInfo = {})
 ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者通过sharedTmpBuffer入参传入。临时空间大小BufferSize的获取方式如下：通过[LogSoftMax Tiling](LogSoftMax-Tiling.md)中提供的接口获取空间范围的大小。
@@ -117,9 +120,9 @@ AscendC::SoftMaxShapeInfo softmaxInfo(
     /* 非尾轴长度的乘积          */ srcM,
     /* 尾轴长度，必须32Bytes对齐 */ srcK,
     /* 原始非尾轴长度的乘积      */ oriSrcM,
-    /* 原始尾轴长度              */ oriSrcK
-);
-AscendC::LogSoftMax<DTYPE_X, false>(dstLocal, sumLocal, maxLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);
+    /* 原始尾轴长度              */ oriSrcK);
+AscendC::LogSoftMax<DTYPE_X, false>(
+    dstLocal, sumLocal, maxLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);
 ```
 
 结果示例如下：

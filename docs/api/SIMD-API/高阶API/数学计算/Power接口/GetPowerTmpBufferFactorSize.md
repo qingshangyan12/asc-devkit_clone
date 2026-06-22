@@ -15,7 +15,9 @@
 ## 函数原型
 
 ```
-void GetPowerTmpBufferFactorSize(const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt, const uint32_t typeSize, uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
+void GetPowerTmpBufferFactorSize(
+    const bool baseIsTensor, const bool expIsTensor, const bool typeIsInt, const uint32_t typeSize,
+    uint32_t& maxLiveNodeCount, uint32_t& extraBuffer)
 ```
 
 ## 参数说明

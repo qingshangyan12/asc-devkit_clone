@@ -23,7 +23,9 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetSpecialMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false)
+__aicore__ constexpr MatmulConfig GetSpecialMDLConfig(
+    const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
+    const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false)
 ```
 
 ## 参数说明
@@ -59,8 +61,7 @@ constexpr MatmulConfig MM_CFG = GetSpecialMDLConfig(
     /* doMTE2Preload        */ 0,
     /* isVecND2NZ           */ false,
     /* isPerTensor          */ false,
-    /* hasAntiQuantOffset   */ false
-);
+    /* hasAntiQuantOffset   */ false);
 // 常规Matmul计算，最后输出使用自定义SpecialMDL模板的计算结果
 AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> mm;
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);

@@ -10,7 +10,9 @@ kernel侧Axpy接口的计算需要开发者申请临时空间，本接口用于�
 ## 函数原型
 
 ```
-void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetAxpyMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明

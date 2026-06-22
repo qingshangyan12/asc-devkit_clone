@@ -10,7 +10,9 @@ kernel侧TransData接口的计算需要开发者预留/申请临时空间，本�
 ## 函数原型
 
 ```
-bool GetTransDataMaxMinTmpSize(const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,const ge::DataType dataType, const TransDataConfig &config, uint32_t& maxValue, uint32_t& minValue)
+bool GetTransDataMaxMinTmpSize(
+    const platform_ascendc::PlatformAscendC& platform, const ge::Shape& srcShape, const ge::Shape& dstShape,
+    const ge::DataType dataType, const TransDataConfig& config, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -62,9 +64,10 @@ GetTransDataMaxMinTmpSize返回值为true/false，true表示成功获取TransDat
 uint32_t maxSize;
 uint32_t minSize;
 int32_t n = 1, c = 16, d = 2, h = 4, w = 4, c1 = 1, c0 = 16;
-auto ncdhwShape = ge::Shape({ n, c, d, h, w });
-auto ndc1hwc0Shape = ge::Shape({ n, d, c1, h, w, c0});
+auto ncdhwShape = ge::Shape({n, c, d, h, w});
+auto ndc1hwc0Shape = ge::Shape({n, d, c1, h, w, c0});
 auto plat = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 TransDataConfig config = {DataFormat::NCDHW, DataFormat::NDC1HWC0};
-bool ret = GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, ge::DataType::DT_FLOAT16, config, maxSize, minSize);
+bool ret =
+    GetTransDataMaxMinTmpSize(plat, ncdhwShape, ndc1hwc0Shape, ge::DataType::DT_FLOAT16, config, maxSize, minSize);
 ```

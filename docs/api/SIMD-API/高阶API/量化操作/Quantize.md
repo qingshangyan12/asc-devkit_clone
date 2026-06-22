@@ -56,14 +56,18 @@ Quantize与[AscendQuant](AscendQuant.md)的功能类似，Quantize在PER\_TENSOR
 
     ```
     template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+    __aicore__ inline void Quantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const QuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Quantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor,const ScaleT& scale, const OffsetT& offset, const QuantizeParams& params)
+    __aicore__ inline void Quantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const QuantizeParams& params)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -93,12 +97,7 @@ struct QuantizeConfig {
     RoundMode roundMode = RoundMode::CAST_RINT;
     int32_t kDim = 1;
 };
-enum class QuantizePolicy : int32_t {
-    PER_TENSOR,
-    PER_CHANNEL,
-    PER_TOKEN,
-    PER_GROUP
-};
+enum class QuantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_GROUP };
 ```
 
 **表2**  接口参数说明

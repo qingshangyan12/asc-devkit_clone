@@ -89,8 +89,8 @@ struct PlatformInfo {
     ```
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
     ConvBackpropApi::Conv3DBpInputTiling tiling(ascendcPlatform);
-    tiling.SetWeightType(ConvCommonApi::TPosition::GM,ConvCommonApi::ConvFormat::FRACTAL_Z_3D,ConvCommonApi::ConvDtype::FLOAT16);
-    ...
-    optiling::Conv3DBackpropInputTilingData tilingData;
-    int ret = tiling.GetTiling(tilingData);    // if ret = -1, gen tiling failed
+    tiling.SetWeightType(
+        ConvCommonApi::TPosition::GM, ConvCommonApi::ConvFormat::FRACTAL_Z_3D, ConvCommonApi::ConvDtype::FLOAT16);
+    ... optiling::Conv3DBackpropInputTilingData tilingData;
+    int ret = tiling.GetTiling(tilingData); // if ret = -1, gen tiling failed
     ```

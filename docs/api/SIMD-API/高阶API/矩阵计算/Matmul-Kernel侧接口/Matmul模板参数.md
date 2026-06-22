@@ -56,7 +56,9 @@
 ## 函数原型
 
 ```
-template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM, class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
+template <
+    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM,
+    class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 ```
 
@@ -78,9 +80,9 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
     MATMUL\_POLICY\_DEFAULT\_OF定义如下，用于简化MATMUL\_POLICY的类型声明。该模板参数的详细使用方式请参考[MatmulPolicy](MatmulPolicy.md)。
 
     ```
-    #define MATMUL_POLICY_DEFAULT_OF(DEFAULT)      \
-    template <const auto& = MM_CFG, typename ...>  \
-            class MATMUL_POLICY = AscendC::Impl::Detail::DEFAULT
+    #define MATMUL_POLICY_DEFAULT_OF(DEFAULT)        \
+        template <const auto& = MM_CFG, typename...> \
+        class MATMUL_POLICY = AscendC::Impl::Detail::DEFAULT
     ```
 
 ## 参数说明
@@ -105,9 +107,15 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
 
 ```
 // 用户自定义回调函数
-void DataCopyOut(const __gm__ void *gm, const LocalTensor<int8_t> &co1Local, const void *dataCopyOutParams, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyA1(const AscendC::LocalTensor<int8_t> &aMatrix, const __gm__ void *gm, int row, int col, int useM, int useK, const uint64_t tilingPtr, const uint64_t dataPtr);
-void CopyB1(const AscendC::LocalTensor<int8_t> &bMatrix, const __gm__ void *gm, int row, int col, int useK, int useN, const uint64_t tilingPtr, const uint64_t dataPtr);
+void DataCopyOut(
+    const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr,
+    const uint64_t dataPtr);
+void CopyA1(
+    const AscendC::LocalTensor<int8_t>& aMatrix, const __gm__ void* gm, int row, int col, int useM, int useK,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
+void CopyB1(
+    const AscendC::LocalTensor<int8_t>& bMatrix, const __gm__ void* gm, int row, int col, int useK, int useN,
+    const uint64_t tilingPtr, const uint64_t dataPtr);
 
 // 定义创建对象时需要传入的A、B、C、Bias参数类型信息
 typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
@@ -118,7 +126,9 @@ typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasT
 // 使用MDL模板，创建Matmul实例
 AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL> mm1;
 
-AscendC::MatmulConfig mmConfig{false/*不使用Norm模板*/, true/*使用BasicBlock模板*/, false/*不使用MDL模板*/, 128/*Matmul计算时base块M轴长度*/, 128/*Matmul计算时base块N轴长度*/, 64/*Matmul计算时base块K轴长度*/};
+AscendC::MatmulConfig mmConfig{false /*不使用Norm模板*/,          true /*使用BasicBlock模板*/,
+                               false /*不使用MDL模板*/,           128 /*Matmul计算时base块M轴长度*/,
+                               128 /*Matmul计算时base块N轴长度*/, 64 /*Matmul计算时base块K轴长度*/};
 mmConfig.enUnitFlag = false; // 不开启UnitFlag功能
 // 使用自定义的mmConfig，创建Matmul实例
 AscendC::Matmul<aType, bType, cType, biasType, mmConfig> mm2;

@@ -12,7 +12,9 @@ kernel侧Power接口的计算需要开发者预留/申请临时空间，本接�
 ## 函数原型
 
 ```
-void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetPowerMaxMinTmpSize(
+    const ge::Shape& srcShape1, const ge::Shape& srcShape2, const bool typeIsInt, const uint32_t typeSize,
+    const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -56,7 +58,7 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
 
     ```
     // srcTensor1输入shape信息为128*128，scalarValue的shape为1;算子输入的数据类型为half;不允许修改源操作数
-    std::vector<int64_t> shape1_vec = {128,128};
+    std::vector<int64_t> shape1_vec = {128, 128};
     std::vector<int64_t> shape2_vec = {1};
     ge::Shape shape1(shape1_vec);
     ge::Shape shape2(shape2_vec);
@@ -68,9 +70,9 @@ void GetPowerMaxMinTmpSize(const ge::Shape& srcShape1, const ge::Shape& srcShape
 -   Power\(dstTensor, scalarValue, srcTensor2\)样例
 
     ```
-    //scalarValue的shape为1，srcTensor2输入shape信息为128*128;算子输入的数据类型为float;不允许修改源操作数
+    // scalarValue的shape为1，srcTensor2输入shape信息为128*128;算子输入的数据类型为float;不允许修改源操作数
     std::vector<int64_t> shape1_vec = {1};
-    std::vector<int64_t> shape2_vec = {128,128};
+    std::vector<int64_t> shape2_vec = {128, 128};
     ge::Shape shape1(shape1_vec);
     ge::Shape shape2(shape2_vec);
     uint32_t maxValue = 0;

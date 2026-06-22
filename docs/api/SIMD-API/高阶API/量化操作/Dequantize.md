@@ -45,14 +45,18 @@ Dequantize与[AscendDequant](AscendDequant.md)的功能类似，本接口在不�
 
     ```
     template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer, const DequantizeParams& params)
+    __aicore__ inline void Dequantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const DequantizeParams& params)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const DequantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void Dequantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const DequantizeParams& params)
+    __aicore__ inline void Dequantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const DequantizeParams& params)
     ```
 
     由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -81,12 +85,7 @@ struct DequantizeConfig {
     bool hasOffset = false;
     int32_t kDim = 1;
 };
-enum class DequantizePolicy : int32_t {
-    PER_TENSOR,
-    PER_CHANNEL,
-    PER_TOKEN,
-    PER_GROUP
-};
+enum class DequantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_GROUP };
 ```
 
 **表2**  接口参数说明
@@ -102,9 +101,9 @@ enum class DequantizePolicy : int32_t {
 
 ```
 struct DequantizeParams {
-        uint32_t m;
-        uint32_t n;
-        uint32_t groupSize = 0;
+    uint32_t m;
+    uint32_t n;
+    uint32_t groupSize = 0;
 };
 ```
 
@@ -156,9 +155,9 @@ struct DequantizeParams {
     // m,n为外部传入参数，表示srcLocal实际参与的m、n方向的元素个数
     params.m = m;
     params.n = n;
-    params.groupSize = n;  // 仅PER_GROUP场景下生效，此处表示n方向所有元素共享一组scale和offset
+    params.groupSize = n; // 仅PER_GROUP场景下生效，此处表示n方向所有元素共享一组scale和offset
     // srcLocal为int32_t类型的LocalTensor，dstLocal、scaleLocal、offsetLocal为float类型的LocalTensor
-    Dequantize<config>(dstLocal, srcLocal, scaleLocal, offsetLocal, params);  // offsetLocal为预留参数，可配置为空Tensor;
+    Dequantize<config>(dstLocal, srcLocal, scaleLocal, offsetLocal, params); // offsetLocal为预留参数，可配置为空Tensor;
     ```
 
 -   PER\_TENSOR模式
@@ -171,9 +170,9 @@ struct DequantizeParams {
     // m,n为外部传入参数，表示srcLocal实际参与的m、n方向的元素个数
     params.m = m;
     params.n = n;
-    params.groupSize = 0;  // 仅PER_GROUP场景下生效
+    params.groupSize = 0; // 仅PER_GROUP场景下生效
     // srcLocal为int32_t类型的LocalTensor，dstLocal为float类型的LocalTensor，scale、offset为float类型的标量
-    Dequantize<config>(dstLocal, srcLocal, scale, offset, params);  // offset为预留参数，可配置为0;
+    Dequantize<config>(dstLocal, srcLocal, scale, offset, params); // offset为预留参数，可配置为0;
     ```
 
 结果示例如下：

@@ -22,11 +22,15 @@ kernel侧LogSoftMax接口的计算需要开发者预留/申请临时空间，以
 -   Tiling计算接口
 
     ```
-    void LogSoftMaxTilingFunc(const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, optiling::LogSoftMaxTiling& softmaxTiling)
+    void LogSoftMaxTilingFunc(
+        const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+        optiling::LogSoftMaxTiling& softmaxTiling)
     ```
 
     ```
-    void LogSoftMaxTilingFunc(const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize, AscendC::tiling::LogSoftMaxTiling& softmaxTiling)
+    void LogSoftMaxTilingFunc(
+        const ge::Shape srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
+        AscendC::tiling::LogSoftMaxTiling& softmaxTiling)
     ```
 
 ## 参数说明

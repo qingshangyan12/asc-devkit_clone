@@ -9,24 +9,34 @@
 -   获取Kernel接口计算所需最小/最大临时空间的接口
 
     ```
-    uint32_t GetSoftMaxFlashV2MinTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
+    uint32_t GetSoftMaxFlashV2MinTmpSize(
+        const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const bool isUpdate,
+        const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
     ```
 
     ```
-    uint32_t GetSoftMaxFlashV2MaxTmpSize(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
+    uint32_t GetSoftMaxFlashV2MaxTmpSize(
+        const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const bool isUpdate,
+        const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
     ```
 
 -   Tiling计算接口
     -   AscendC::optiling命名空间下的计算接口
 
         ```
-        void SoftMaxFlashV2TilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxFlashTiling, const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
+        void SoftMaxFlashV2TilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
+            const uint32_t localWorkSpaceSize, optiling::SoftMaxTiling& softmaxFlashTiling, const bool isUpdate,
+            const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
         ```
 
     -   AscendC命名空间下的计算接口
 
         ```
-        void SoftMaxFlashV2TilingFunc(const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2, const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxFlashTiling, const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
+        void SoftMaxFlashV2TilingFunc(
+            const ge::Shape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
+            const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxFlashTiling, const bool isUpdate,
+            const bool isBasicBlock = false, const bool isFlashOutputBrc = false)
         ```
 
 ## 参数说明

@@ -7,7 +7,8 @@
 ## 函数原型
 
 ```
-void SetWeightType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
+void SetWeightType(
+    const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
 ```
 
 ## 参数说明
@@ -32,6 +33,7 @@ void SetWeightType(const ConvCommonApi::TPosition pos, const ConvCommonApi::Conv
 // 实例化Conv3D Api
 auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
 Conv3dTilingApi::Conv3dTiling conv3dApiTiling(ascendcPlatform);
-conv3dApiTiling.SetWeightType(ConvCommonApi::TPosition::GM, ConvCommonApi::ConvFormat::FRACTAL_Z_3D, ConvCommonApi::ConvDtype::BF16);
+conv3dApiTiling.SetWeightType(
+    ConvCommonApi::TPosition::GM, ConvCommonApi::ConvFormat::FRACTAL_Z_3D, ConvCommonApi::ConvDtype::BF16);
 ```
 

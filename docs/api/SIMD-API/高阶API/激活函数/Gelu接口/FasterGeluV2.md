@@ -26,14 +26,17 @@
 
     ```
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t dataSize)
+    __aicore__ inline void FasterGeluV2(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const LocalTensor<uint8_t>& sharedTmpBuffer,
+        const uint32_t dataSize)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, bool highPrecision = false, bool highPerformance = false>
-    __aicore__ inline void FasterGeluV2(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
+    __aicore__ inline void FasterGeluV2(
+        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dataSize)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。

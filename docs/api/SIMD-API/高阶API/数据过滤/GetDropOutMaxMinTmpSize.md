@@ -15,7 +15,9 @@ uint32_t GetDropOutMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize
 ```
 
 ```
-void GetDropOutMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
+void GetDropOutMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
+    uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -56,10 +58,10 @@ GetDropOutMaxMinTmpSize无返回值。
 namespace optiling {
 
 BEGIN_TILING_DATA_DEF(DropoutCustomTilingData)
-    TILING_DATA_FIELD_DEF(uint32_t, firstAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, srcLastAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, maskLastAxis);
-    TILING_DATA_FIELD_DEF(uint32_t, tmpBufferSize);
+TILING_DATA_FIELD_DEF(uint32_t, firstAxis);
+TILING_DATA_FIELD_DEF(uint32_t, srcLastAxis);
+TILING_DATA_FIELD_DEF(uint32_t, maskLastAxis);
+TILING_DATA_FIELD_DEF(uint32_t, tmpBufferSize);
 END_TILING_DATA_DEF;
 
 static ge::graphStatus TilingFunc(gert::TilingContext* context)
@@ -80,7 +82,9 @@ static ge::graphStatus TilingFunc(gert::TilingContext* context)
     auto platformInfo = context->GetPlatformInfo();
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfo);
     uint64_t tailSize = 0; // ub剩余空间大小
-    ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, tailSize); // 本样例中使用完整的ub空间，实际情况下tailSize需要减掉用户已使用的ub空间
+    ascendcPlatform.GetCoreMemSize(
+        platform_ascendc::CoreMemType::UB,
+        tailSize); // 本样例中使用完整的ub空间，实际情况下tailSize需要减掉用户已使用的ub空间
     auto tmpSize = tailSize >= maxValue ? maxValue : tailSize;
 
     DropoutCustomTilingData tiling;

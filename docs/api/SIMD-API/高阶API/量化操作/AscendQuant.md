@@ -94,14 +94,18 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const float scale, const float offset, const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const float scale, const float offset)
                 ```
 
         -   接口框架申请临时空间
@@ -109,14 +113,17 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const float scale, const float offset, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const float scale, const float offset,
+                    const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const float scale, const float offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const float scale, const float offset)
                 ```
 
     -   PER\_CHANNEL量化：
@@ -125,24 +132,33 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<T>& scaleTensor, const T offset, const uint32_t scaleCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<T>& scaleTensor, const T offset, const uint32_t scaleCount, const uint32_t calCount)
                 ```
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor, const uint32_t scaleCount,
+                    const uint32_t offsetCount, const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<T>& scaleTensor, const T offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<T>& scaleTensor, const T offset)
                 ```
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor)
                 ```
 
         -   接口框架申请临时空间
@@ -150,24 +166,32 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor, const T offset, const uint32_t scaleCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor,
+                    const T offset, const uint32_t scaleCount, const uint32_t calCount)
                 ```
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor,
+                    const LocalTensor<T>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount, const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor, const T offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor,
+                    const T offset)
                 ```
 
                 ```
                 template <typename T, bool isReuseSource = false, const AscendQuantConfig& config = ASCEND_QUANT_DEFAULT_CFG>
-                __aicore__ inline void AscendQuant(const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor, const LocalTensor<T>& offsetTensor)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<int8_t>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<T>& scaleTensor,
+                    const LocalTensor<T>& offsetTensor)
                 ```
 
 -   dstTensor非固定数据类型
@@ -180,14 +204,18 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const float scale, const float offset, const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const float scale, const float offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const float scale, const float offset)
                 ```
 
         -   接口框架申请临时空间
@@ -195,14 +223,17 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset,
+                    const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const float scale, const float offset)
                 ```
 
     -   PER\_CHANNEL量化：
@@ -211,24 +242,33 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const srcT offset, const uint32_t scaleCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<srcT>& scaleTensor, const srcT offset, const uint32_t scaleCount, const uint32_t calCount)
                 ```
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount,
+                    const uint32_t offsetCount, const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const srcT offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<srcT>& scaleTensor, const srcT offset)
                 ```
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor)
                 ```
 
         -   接口框架申请临时空间
@@ -236,24 +276,33 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor, const srcT offset, const uint32_t scaleCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor,
+                    const srcT offset, const uint32_t scaleCount, const uint32_t calCount)
                 ```
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount, const uint32_t calCount)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor,
+                    const LocalTensor<srcT>& offsetTensor, const uint32_t scaleCount, const uint32_t offsetCount,
+                    const uint32_t calCount)
                 ```
 
             -   源操作数Tensor全部参与计算
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor, const srcT offset)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor,
+                    const srcT offset)
                 ```
 
                 ```
                 template <typename dstT, typename srcT, bool isReuseSource = false>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor, const LocalTensor<srcT>& offsetTensor)
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<srcT>& scaleTensor,
+                    const LocalTensor<srcT>& offsetTensor)
                 ```
 
     -   PER\_TOKEN/PER\_GROUP量化：
@@ -261,30 +310,46 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
             -   offset操作数类型为Tensor
 
                 ```
-                template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config, const AscendQuantPolicy& policy>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
+                template <
+                    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
+                    const AscendQuantPolicy& policy>
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
                 ```
 
             -   offset操作数类型为scalar
 
                 ```
-                template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config, const AscendQuantPolicy& policy>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const LocalTensor<scaleT>& scaleTensor,const scaleT offset, const AscendQuantParam& para)
+                template <
+                    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
+                    const AscendQuantPolicy& policy>
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
+                    const LocalTensor<scaleT>& scaleTensor, const scaleT offset, const AscendQuantParam& para)
                 ```
 
         -   接口框架申请临时空间
             -   offset操作数类型为Tensor
 
                 ```
-                template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config, const AscendQuantPolicy& policy>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
+                template <
+                    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
+                    const AscendQuantPolicy& policy>
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
+                    const LocalTensor<scaleT>& offsetTensor, const AscendQuantParam& para)
                 ```
 
             -   offset操作数类型为scalar
 
                 ```
-                template <typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config, const AscendQuantPolicy& policy>
-                __aicore__ inline void AscendQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const scaleT offset, const AscendQuantParam& para)
+                template <
+                    typename dstT, typename srcT, typename scaleT, bool isReuseSource = false, const AscendQuantConfig& config,
+                    const AscendQuantPolicy& policy>
+                __aicore__ inline void AscendQuant(
+                    const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
+                    const scaleT offset, const AscendQuantParam& para)
                 ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -308,11 +373,11 @@ PER\_TOKEN/PER\_GROUP场景的计算逻辑如下：
 | config | 结构体模板参数，此参数可选配，AscendQuantConfig类型，定义如下方代码所示，其中参数的含义如下。<br>calcCount：实际计算数据元素个数。calcCount∈[0, srcTensor.GetSize()]，在调用带有scaleCount入参的接口时，calcCount若取非零值则必须是scaleCount的整数倍。<br>offsetCount：实际量化参数元素个数。offsetCount∈[0, offsetTensor.GetSize()]，offsetCount与scaleCount的取值必须相等，要求是32的整数倍。若调用的接口不含offsetCount入参，取值为0即可。<br>scaleCount：实际量化参数元素个数。scaleCount∈[0, scaleTensor.GetSize()]，要求是32的整数倍。若调用的接口不含scaleCount入参，取值为0即可。<br>workLocalSize：临时缓存sharedTmpBuffer的大小，sharedTmpBuffer的大小/workLocalSize的获取方式请参考[GetAscendQuantMaxMinTmpSize](GetAscendQuantMaxMinTmpSize.md)。该参数取值不能大于sharedTmpBuffer的大小。若调用的接口不含sharedTmpBuffer入参，取值为0即可。<br><br>当上述参数的取值满足如下任一种场景，将开启参数常量化，即编译过程中使用常量化的相关参数，从而减少Scalar计算。<br>若调用的接口不含scaleCount入参，calcCount和workLocalSize取值为非0时，开启参数常量化。<br>若调用的接口带有scaleCount入参，scaleCount、calcCount和workLocalSize取值为非0时，开启参数常量化。 |
 
 ```
-struct AscendQuantConfig{
-uint32_t calcCount = 0;
-uint32_t offsetCount = 0;
-uint32_t scaleCount = 0;
-uint32_t workLocalSize = 0;
+struct AscendQuantConfig {
+    uint32_t calcCount = 0;
+    uint32_t offsetCount = 0;
+    uint32_t scaleCount = 0;
+    uint32_t workLocalSize = 0;
 };
 ```
 
@@ -340,9 +405,9 @@ constexpr AscendQuantConfig ASCEND_QUANT_DEFAULT_CFG = {0, 0, 0, 0};
 
 ```
 struct AscendQuantConfig {
-        bool hasOffset;
-        int32_t kDim = 1;
-        RoundMode roundMode = RoundMode::CAST_RINT;
+    bool hasOffset;
+    int32_t kDim = 1;
+    RoundMode roundMode = RoundMode::CAST_RINT;
 }
 ```
 
@@ -407,10 +472,10 @@ struct AscendQuantConfig {
 
 ```
 struct AscendQuantParam {
-        uint32_t m;
-        uint32_t n;
-        uint32_t calCount;
-        uint32_t groupSize = 0;
+    uint32_t m;
+    uint32_t n;
+    uint32_t calCount;
+    uint32_t groupSize = 0;
 }
 ```
 
@@ -437,9 +502,9 @@ struct AscendQuantParam {
     // srcLocal: 存放量化计算的输入Tensor，shape为1024，类型为float/half
     // sharedTmpBuffer: 存放量化计算过程中临时缓存的Tensor
 
-    const float scale = 0.02;  // 量化参数
+    const float scale = 0.02; // 量化参数
     const float offset = 0.9; // 量化参数，dstLocal[i] = srcLocal[i] * scale + offset
-    uint32_t calCount = 1022;  // srcTensor的前calCount个于元素参与计算
+    uint32_t calCount = 1022; // srcTensor的前calCount个于元素参与计算
 
     // dstTensor为int8_t数据类型，通过sharedTmpBuffer入参传入临时空间
     AscendC::AscendQuant<srcType>(dstLocal, srcLocal, sharedTmpBuffer, scale, offset, calCount);
@@ -467,11 +532,12 @@ struct AscendQuantParam {
     // sharedTmpBuffer: 存放量化计算过程中临时缓存的Tensor
 
     uint32_t scaleCount = 64;  // 量化参数，要求是32的整数倍
-    uint32_t offsetCount = 64;  // 量化参数，要求与scaleCount相等
+    uint32_t offsetCount = 64; // 量化参数，要求与scaleCount相等
     uint32_t calCount = 1022;  // srcTensor的前calCount个于元素参与计算
 
     // dstTensor为int8_t数据类型，通过sharedTmpBuffer入参传入临时空间
-    AscendC::AscendQuant<srcType>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
+    AscendC::AscendQuant<srcType>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
 
     // dstTensor非固定数据类型
     AscendC::AscendQuant<dstType, srcType>(dstLocal, srcLocal, scaleLocal, offsetLocal, scaleCount, offsetCount, calCount);
@@ -500,7 +566,8 @@ PER\_TOKEN/PER\_GROUP场景调用示例如下。
     para.m = m;
     para.n = n;
     para.calCount = calCount;
-    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
+    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
     ```
 
 -   主动配置参数AscendQuantConfig的舍入模式roundMode。
@@ -515,5 +582,6 @@ PER\_TOKEN/PER\_GROUP场景调用示例如下。
     para.m = m;
     para.n = n;
     para.calCount = calCount;
-    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
+    AscendQuant<dstType, srcType, scaleType, isReuseSource, config, policy>(
+        dstLocal, srcLocal, sharedTmpBuffer, scaleLocal, offsetLocal, para);
     ```

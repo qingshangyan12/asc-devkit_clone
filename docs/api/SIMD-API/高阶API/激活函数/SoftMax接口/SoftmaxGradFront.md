@@ -50,14 +50,19 @@ def softmax_grad_front(dx, y, is_fp16=False):
 
     ```
     template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGradFront(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGradFront(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 -   通过sharedTmpBuffer入参传入临时空间
 
     ```
     template <typename T, bool isBasicBlock = false, bool isDataFormatNZ = false>
-    __aicore__ inline void SoftmaxGradFront(const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling, const SoftMaxShapeInfo& softmaxShapeInfo = {})
+    __aicore__ inline void SoftmaxGradFront(
+        const LocalTensor<T>& dstTensor, const LocalTensor<T>& gradTensor, const LocalTensor<T>& srcTensor,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const SoftMaxTiling& tiling,
+        const SoftMaxShapeInfo& softmaxShapeInfo = {})
     ```
 
 由于该接口的内部实现中涉及复杂的计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -91,10 +96,10 @@ def softmax_grad_front(dx, y, is_fp16=False):
 
 ```
 struct SoftMaxShapeInfo {
-  uint32_t srcM;
-  uint32_t srcK;
-  uint32_t oriSrcM;
-  uint32_t oriSrcK;
+    uint32_t srcM;
+    uint32_t srcK;
+    uint32_t oriSrcM;
+    uint32_t oriSrcK;
 };
 ```
 
@@ -121,8 +126,7 @@ AscendC::SoftMaxShapeInfo softmaxInfo(
     /* 非尾轴长度的乘积          */ srcM,
     /* 尾轴长度，必须32Bytes对齐 */ srcK,
     /* 原始非尾轴长度的乘积      */ oriSrcM,
-    /* 原始尾轴长度              */ oriSrcK
-);
+    /* 原始尾轴长度              */ oriSrcK);
 
 // 通过sharedTmpBuffer入参传入临时空间
 AscendC::SoftmaxGradFront<T>(dstLocal, gradLocal, srcLocal, sharedTmpBuffer, softmaxTiling, softmaxInfo);

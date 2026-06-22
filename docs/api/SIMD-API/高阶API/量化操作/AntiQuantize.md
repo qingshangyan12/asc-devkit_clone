@@ -58,14 +58,18 @@ AntiQuantize与[AscendAntiQuant](AscendAntiQuant.md)的功能类似，本接口�
 
     ```
     template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void AntiQuantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const LocalTensor<uint8_t>& sharedTmpBuffer, const AntiQuantizeParams& params)
+    __aicore__ inline void AntiQuantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const LocalTensor<uint8_t>& sharedTmpBuffer, const AntiQuantizeParams& params)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <const AntiQuantizeConfig& config, typename DstT, typename SrcT, typename ScaleT, typename OffsetT>
-    __aicore__ inline void AntiQuantize(const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset, const AntiQuantizeParams& params)
+    __aicore__ inline void AntiQuantize(
+        const LocalTensor<DstT>& dstTensor, const LocalTensor<SrcT>& srcTensor, const ScaleT& scale, const OffsetT& offset,
+        const AntiQuantizeParams& params)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。
@@ -94,12 +98,7 @@ struct AntiQuantizeConfig {
     bool hasOffset;
     int32_t kDim = 1;
 };
-enum class AntiQuantizePolicy : int32_t {
-    PER_TENSOR,
-    PER_CHANNEL,
-    PER_TOKEN,
-    PER_GROUP
-};
+enum class AntiQuantizePolicy : int32_t { PER_TENSOR, PER_CHANNEL, PER_TOKEN, PER_GROUP };
 ```
 
 **表2**  接口参数说明

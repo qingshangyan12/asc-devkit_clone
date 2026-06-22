@@ -14,7 +14,9 @@ kernel侧Normalize接口的计算需要开发者预留/申请临时空间，GetN
 ## 函数原型
 
 ```
-void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
+void GetNormalizeMaxMinTmpSize(
+    const ge::Shape& srcShape, const uint32_t typeSizeU, const uint32_t typeSizeT, const bool isReuseSource,
+    const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明
@@ -46,32 +48,32 @@ void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
 
     ```
     BEGIN_TILING_DATA_DEF(NormalizeCustomTilingData)
-      TILING_DATA_FIELD_DEF(float, epsilon);
-      TILING_DATA_FIELD_DEF(uint32_t, isNoBeta);
-      TILING_DATA_FIELD_DEF(uint32_t, isNoGamma);
-      TILING_DATA_FIELD_DEF(uint32_t, isOnlyOutput);
-      TILING_DATA_FIELD_DEF(uint32_t, aLength);
-      TILING_DATA_FIELD_DEF(uint32_t, rLength);
-      TILING_DATA_FIELD_DEF(uint32_t, rLengthWithPadding);
-      ...                                           // 添加其他tiling字段
-    END_TILING_DATA_DEF;
+    TILING_DATA_FIELD_DEF(float, epsilon);
+    TILING_DATA_FIELD_DEF(uint32_t, isNoBeta);
+    TILING_DATA_FIELD_DEF(uint32_t, isNoGamma);
+    TILING_DATA_FIELD_DEF(uint32_t, isOnlyOutput);
+    TILING_DATA_FIELD_DEF(uint32_t, aLength);
+    TILING_DATA_FIELD_DEF(uint32_t, rLength);
+    TILING_DATA_FIELD_DEF(uint32_t, rLengthWithPadding);
+    ... // 添加其他tiling字段
+        END_TILING_DATA_DEF;
     ```
 
 2.  Tiling实现函数中，首先调用**GetNormalizeMaxMinTmpSize**接口获取Normalize接口能完成计算所需最大/最小临时空间大小，根据该范围结合实际的内存使用情况设置合适的空间大小，然后根据输入shape、剩余的可供计算的空间大小等信息获取Normalize kernel侧接口所需tiling参数。
 
     ```
     namespace optiling {
-    static ge::graphStatus TilingFunc(gert::TilingContext *context)
+    static ge::graphStatus TilingFunc(gert::TilingContext* context)
     {
         NormalizeCustomTilingData tiling;
-        const gert::RuntimeAttrs *attrs = context->GetAttrs();
+        const gert::RuntimeAttrs* attrs = context->GetAttrs();
         const float epsilon = *(attrs->GetAttrPointer<float>(0));
         const uint32_t isNoBeta = *(attrs->GetAttrPointer<uint32_t>(1));
         const uint32_t isNoGamma = *(attrs->GetAttrPointer<uint32_t>(2));
         const uint32_t isOnlyOutput = *(attrs->GetAttrPointer<uint32_t>(3));
         const gert::StorageShape* x1_shape = context->GetInputShape(0);
-        ...// 其他逻辑
-        const gert::Shape shape = x1_shape->GetStorageShape();
+        ... // 其他逻辑
+            const gert::Shape shape = x1_shape->GetStorageShape();
         uint32_t aLength = shape.GetDim(0);
         uint32_t rLength = shape.GetDim(1);
         uint32_t rLengthWithPadding = (rLength + alignNum - 1) / alignNum * alignNum;
@@ -81,15 +83,17 @@ void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
         uint32_t maxTmpsize = 0;
         uint32_t minTmpsize = 0;
 
-        AscendC::GetNormalizeMaxMinTmpSize(srcShape, typeSizeU, typeSizeT, false, true, isOnlyOutput, maxTmpsize, minTmpsize);
+        AscendC::GetNormalizeMaxMinTmpSize(
+            srcShape, typeSizeU, typeSizeT, false, true, isOnlyOutput, maxTmpsize, minTmpsize);
         // auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-        // AscendC::GetNormalizeMaxMinTmpSize(srcShape, typeSizeU, typeSizeT, false, true, isOnlyOutput, ascendcPlatform, maxTmpsize, minTmpsize);
+        // AscendC::GetNormalizeMaxMinTmpSize(srcShape, typeSizeU, typeSizeT, false, true, isOnlyOutput, ascendcPlatform,
+        // maxTmpsize, minTmpsize);
 
         ... // 其他逻辑
-        context->SetTilingKey(1);
+            context->SetTilingKey(1);
         tiling.SaveToBuffer(context->GetRawTilingData()->GetData(), context->GetRawTilingData()->GetCapacity());
         context->GetRawTilingData()->SetDataSize(tiling.GetDataSize());
-        size_t *currentWorkspace = context->GetWorkspaceSizes(1);
+        size_t* currentWorkspace = context->GetWorkspaceSizes(1);
         currentWorkspace[0] = 0;
         return ge::GRAPH_SUCCESS;
     }
@@ -99,28 +103,31 @@ void GetNormalizeMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSiz
 3.  对应的kernel侧通过在核函数中调用GET\_TILING\_DATA获取TilingData，继而将TilingData中的Normalize Tiling信息传入Normalize接口参与计算。完整的kernel侧样例请参考[Normalize](Normalize.md)。
 
     ```
-    extern "C" __global__ __aicore__ void normalize_custom(GM_ADDR x, GM_ADDR mean, GM_ADDR variance, GM_ADDR gamma, GM_ADDR beta, GM_ADDR rstd, GM_ADDR y, GM_ADDR workspace, GM_ADDR tiling) {
+    extern "C" __global__ __aicore__ void normalize_custom(
+        GM_ADDR x, GM_ADDR mean, GM_ADDR variance, GM_ADDR gamma, GM_ADDR beta, GM_ADDR rstd, GM_ADDR y, GM_ADDR workspace,
+        GM_ADDR tiling)
+    {
         GET_TILING_DATA(tilingData, tiling);
         float epsilon = tilingData.epsilon;
         NormalizePara para(tilingData.aLength, tilingData.rLength, tilingData.rLengthWithPadding);
         if (TILING_KEY_IS(1)) {
-          if (!tilingData.isNoBeta && !tilingData.isNoGamma) {
-              KernelNormalize<NLCFG_NORM> op;
-              op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
-              op.Process();
-          } else if (!tilingData.isNoBeta && tilingData.isNoGamma) {
-              KernelNormalize<NLCFG_NOGAMMA> op;
-              op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
-              op.Process();
-          } else if (tilingData.isNoBeta && !tilingData.isNoGamma) {
-              KernelNormalize<NLCFG_NOBETA> op;
-              op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
-              op.Process();
-          } else if (tilingData.isNoBeta && tilingData.isNoGamma) {
-              KernelNormalize<NLCFG_NOOPT> op;
-              op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
-              op.Process();
-          }
+            if (!tilingData.isNoBeta && !tilingData.isNoGamma) {
+                KernelNormalize<NLCFG_NORM> op;
+                op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
+                op.Process();
+            } else if (!tilingData.isNoBeta && tilingData.isNoGamma) {
+                KernelNormalize<NLCFG_NOGAMMA> op;
+                op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
+                op.Process();
+            } else if (tilingData.isNoBeta && !tilingData.isNoGamma) {
+                KernelNormalize<NLCFG_NOBETA> op;
+                op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
+                op.Process();
+            } else if (tilingData.isNoBeta && tilingData.isNoGamma) {
+                KernelNormalize<NLCFG_NOOPT> op;
+                op.Init(x, mean, variance, gamma, beta, rstd, y, epsilon, para);
+                op.Process();
+            }
         }
-      }
+    }
     ```

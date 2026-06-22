@@ -23,7 +23,12 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetMDLConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0, const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false, const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true, const bool enableL1CacheUB = false, const bool enableMixDualMaster = false, const bool enableKdimReorderLoad = false)
+__aicore__ constexpr MatmulConfig GetMDLConfig(
+    const bool intrinsicsLimit = false, const bool batchLoop = false, const uint32_t doMTE2Preload = 0,
+    const bool isVecND2NZ = false, bool isPerTensor = false, bool hasAntiQuantOffset = false,
+    const bool enUnitFlag = false, const bool isMsgReuse = true, const bool enableUBReuse = true,
+    const bool enableL1CacheUB = false, const bool enableMixDualMaster = false,
+    const bool enableKdimReorderLoad = false)
 ```
 
 ## 参数说明
@@ -71,8 +76,7 @@ constexpr MatmulConfig MM_CFG = GetMDLConfig(
     /* enableUBReuse        */ true,
     /* enableL1CacheUB      */ false,
     /* enableMixDualMaster  */ false,
-    /* enableKdimReorderLoad*/ false
-);
+    /* enableKdimReorderLoad*/ false);
 // 常规Matmul计算，最后输出使用自定义MDL模板的计算结果
 AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG> mm;
 REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);

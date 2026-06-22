@@ -57,14 +57,20 @@
 
         ```
         template <bool sync = true, bool waitIterateBatch = false>
-        __aicore__ inline void IterateBatch(const GlobalTensor<DstT>& gm, uint32_t batchA, uint32_t batchB, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
+        __aicore__ inline void IterateBatch(
+            const GlobalTensor<DstT>& gm, uint32_t batchA, uint32_t batchB, bool enSequentialWrite,
+            const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0,
+            const bool enPartialSum = false, const uint8_t enAtomic = 0)
         ```
 
     -   输出至VECIN
 
         ```
         template <bool sync = true>
-        __aicore__ inline void IterateBatch(const LocalTensor<DstT>& ubCmatrix, uint32_t batchA, uint32_t batchB, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0, const bool enPartialSum = false, const uint8_t enAtomic = 0)
+        __aicore__ inline void IterateBatch(
+            const LocalTensor<DstT>& ubCmatrix, uint32_t batchA, uint32_t batchB, bool enSequentialWrite,
+            const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0,
+            const bool enPartialSum = false, const uint8_t enAtomic = 0)
         ```
 
 -   纯cube模式
@@ -74,13 +80,17 @@
     -   输出至GM
 
         ```
-        __aicore__ inline void IterateBatch(const GlobalTensor<DstT>& gm, bool enPartialSum, uint8_t enAtomic, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
+        __aicore__ inline void IterateBatch(
+            const GlobalTensor<DstT>& gm, bool enPartialSum, uint8_t enAtomic, bool enSequentialWrite,
+            const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
         ```
 
     -   输出至VECIN
 
         ```
-        __aicore__ inline void IterateBatch(const LocalTensor<DstT>& ubCmatrix, bool enPartialSum, uint8_t enAtomic, bool enSequentialWrite, const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
+        __aicore__ inline void IterateBatch(
+            const LocalTensor<DstT>& ubCmatrix, bool enPartialSum, uint8_t enAtomic, bool enSequentialWrite,
+            const uint32_t matrixStrideA = 0, const uint32_t matrixStrideB = 0, const uint32_t matrixStrideC = 0)
         ```
 
 ## 参数说明
@@ -152,10 +162,10 @@
 
     ```
     // 定义matmul type
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::NORMAL> aType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::NORMAL> bType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::NORMAL> cType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::NORMAL> aType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::NORMAL> bType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::NORMAL> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // 创建Matmul实例
     constexpr static MatmulConfig MM_CFG = GetNormalConfig(false, false, false, BatchMode::BATCH_LESS_THAN_L1);
     AscendC::Matmul<aType, bType, cType, biasType, MM_CFG> mm1;
@@ -163,7 +173,7 @@
     mm1.Init(&tiling);
     mm1.SetTensorA(gm_a, isTransposeAIn);
     mm1.SetTensorB(gm_b, isTransposeBIn);
-    if(tiling.isBias) {
+    if (tiling.isBias) {
         mm1.SetBias(gm_bias);
     }
     // 多batch Matmul计算
@@ -174,10 +184,10 @@
 
     ```
     // 定义matmul type
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::BSNGD> aType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::BSNGD> bType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::BNGS1S2> cType;
-    typedef AscendC::MatmulType <AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, false, LayoutMode::BSNGD> aType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, true, LayoutMode::BSNGD> bType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float, false, LayoutMode::BNGS1S2> cType;
+    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
     // 创建Matmul实例
     AscendC::Matmul<aType, bType, cType, biasType> mm1;
     REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm1);
@@ -186,7 +196,7 @@
     int g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG : tiling.BLayoutInfoG;
     // 计算需要多Batch计算循环次数
     int for_exent = tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
-    for(int i=0; i<for_exent; ++i) {
+    for (int i = 0; i < for_exent; ++i) {
         // 计算每次多batch计算A/B矩阵的起始地址
         int batchOffsetA = i * tiling.ALayoutInfoD * batchA;
         int batchOffsetB = i * tiling.BLayoutInfoD * batchB;
@@ -196,7 +206,7 @@
         if (tiling.CLayoutInfoG == 1 && (tiling.BLayoutInfoG != 1 || tiling.ALayoutInfoG != 1)) {
             idx_c = idx_c / (tiling.BLayoutInfoG > tiling.ALayoutInfoG ? tiling.BLayoutInfoG : tiling.ALayoutInfoG);
         }
-        if(tiling.isBias) {
+        if (tiling.isBias) {
             int batchOffsetBias = idx_c * tiling.CLayoutInfoS2;
             mm1.SetBias(gm_bias[batchOffsetBias]);
         }
