@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -22,7 +22,7 @@
 
 #include "kernel_operator_data_copy_intf_impl.h"
 #include "kernel_operator_dump_tensor_intf_impl.h"
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 #include "kernel_operator_mm_bitmode_intf_impl.h"
 #endif
 #include "kernel_operator_mm_intf_impl.h"

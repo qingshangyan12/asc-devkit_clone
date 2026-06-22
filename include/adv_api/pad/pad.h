@@ -26,6 +26,7 @@
 #include "kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/detail/pad/pad/pad_common_impl.h"
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510)
 namespace AscendC {
 /* **************************************************************************************************
  * Pad                                             *
@@ -115,6 +116,7 @@ __aicore__ inline void UnPad(
 }
 #pragma end_pipe
 } // namespace AscendC
+#endif
 #endif // LIB_PAD_PAD_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_PAD_H__)
