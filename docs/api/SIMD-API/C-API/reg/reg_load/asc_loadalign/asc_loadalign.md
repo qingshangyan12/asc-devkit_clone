@@ -190,3 +190,11 @@ PIPE_V
  - **[asc_loadalign_brc_elem2datablock](asc_loadalign_brc_elem2datablock.md)** - BRC_ELEM2DATABLOCK搬入模式
 - **[asc_loadalign_deintlv](asc_loadalign_deintlv.md)** - DEINTLV搬入模式
 - **[asc_loadalign_postupdate](asc_loadalign_postupdate.md)** - PostUpdate搬入模式
+ - **[asc_loadalign_brc_elem_postupdate](asc_loadalign_brc_elem_postupdate.md)** - BRC_ELEM_PostUpdate搬入模式
+ - **[asc_loadalign_brc_datablock_postupdate](asc_loadalign_brc_datablock_postupdate.md)** - BRC_DATABLOCK_PostUpdate搬入模式
+ - **[asc_loadalign_brc_elem2datablock_postupdate](asc_loadalign_brc_elem2datablock_postupdate.md)** - BRC_ELEM2DATABLOCK_PostUpdate搬入模式
+ - **[asc_loadalign_deintlv_postupdate](asc_loadalign_deintlv_postupdate.md)** - DEINTLV_PostUpdate搬入模式
+ - **[asc_loadalign_downsample_postupdate](asc_loadalign_downsample_postupdate.md)** - DOWN2X_PostUpdate搬入模式
+ - **[asc_loadalign_upsample_postupdate](asc_loadalign_upsample_postupdate.md)** - UP2X_PostUpdate搬入模式
+ - **[asc_loadalign_unpack_postupdate](asc_loadalign_unpack_postupdate.md)** - UNPACK_PostUpdate搬入模式
+ - **[asc_loadalign_unpack4_postupdate](asc_loadalign_unpack4_postupdate.md)** - UNPACK4_PostUpdate搬入模式
