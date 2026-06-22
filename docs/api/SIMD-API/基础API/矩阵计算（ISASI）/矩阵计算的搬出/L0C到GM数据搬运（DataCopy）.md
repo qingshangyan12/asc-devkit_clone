@@ -40,7 +40,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- end id10 -->
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图 1** L0C2GM流程图（Atlas A3/A2）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图（Atlas A3/A2）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id8 -->
@@ -48,7 +48,7 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 <!-- npu="950" id11 -->
 以Ascend 950PR/Ascend 950DT为例，下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
-**图 2** L0C2GM流程图（Ascend 950PR/DT）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
+**图2** L0C2GM流程图（Ascend 950PR/DT）<a id="zh-cn_topic_0000002542828493_fig1828513492475"></a>  
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id11 -->
@@ -92,7 +92,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
 | dst | 输出 | 目的操作数，类型为GlobalTensor，数据格式为NZ、ND格式，ND地址要求满足1字节对齐，NZ地址需要满足32字节对齐。 |
-| src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足6对齐。 |
+| src | 输入 | 源操作数，类型为LocalTensor，支持的物理地址为L0C Buffer（TPosition为CO1），为Mmad接口计算的结果。数据格式为NZ格式，地址需要满足64字节对齐。 |
 | intriParams | 输入 | 搬运参数，类型为[DataCopyCO12DstParams](#zh-cn_topic_0000002542828493_table35908519282)。 <br>具体定义请参考\$\{INSTALL\_DIR\}/include/ascendc/basic\_api/interface/kernel\_struct\_data_copy.h，\$\{INSTALL\_DIR\}请替换为CANN软件安装后文件存储路径。 |
 
 **表3** DataCopyCO12DstParams结构体参数定义<a id="zh-cn_topic_0000002542828493_table35908519282"></a>
@@ -130,7 +130,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 - 对于量化输入为float32数据类型的说明如下：
     - 标准的IEEE 754 float32格式为：1bit符号位，8bits指数位，23bits尾数位；当前AI处理器支持的float32格式为：1bit符号位，8bits指数位，10bits尾数位。
     - 如果用户提供的是标准的IEEE 754 float32输入，API内部会处理成处理器支持的float32格式进行计算，此时如果golden数据生成过程中使用的是标准的IEEE 754 float32数据，则可能引入精度不匹配问题，需要修正golden数据的生成，将量化参数的23bits尾数位的低13bits数据位清零再参与量化计算。
-- 源矩阵NZ格式地址要求6对齐，目的矩阵ND格式地址要求满足1字节对齐，NZ格式地址需要满足32字节对齐。
+- 源矩阵NZ格式地址要求64字节对齐，目的矩阵ND格式地址要求满足1字节对齐，NZ格式地址需要满足32字节对齐。
 - 当搬出的mSize或nSize中的任意一个值为0时，该指令不会被执行。
 - 量化和ReLU参数不能为INF/NAN和非规格化数。
 - 目标数据不能有重叠。如果对目的地址有重叠写入，硬件不会报告任何警告和错误，也不保证重叠数据的写入顺序。
@@ -166,7 +166,7 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX， NaN输出会被饱和为0。对于fp8\_e4m3fn\_t类型，当CTRL\[50\]设置成1'b0时，NaN被转换为零，当CTRL\[50\]设置成1'b1时，NaN保持不变，若结果的绝对值为INF或大于fp8\_e4m3fn\_t的最大规格化值，则结果为最大规格化值。
 
         ```cpp
-        // 设置CTRL[48]为0，使能浮点数饱和模式
+        // 设置CTRL[48]为0，开启浮点数饱和模式
         AscendC::AscendCUtils::SetOverflow(0);
         ```
 

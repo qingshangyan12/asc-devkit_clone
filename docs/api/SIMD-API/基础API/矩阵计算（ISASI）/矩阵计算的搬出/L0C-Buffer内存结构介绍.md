@@ -33,12 +33,12 @@ L0C Buffer的内存结构如[图2](#fig179810301543)所示，L0C Buffer的地址
 
 ```text
 L0C_ADDR[17:0] = { BANK_DEPTH[7:0], BANK[3:0], BANK_WIDTH[5:0] }    // bit位顺序为从高位到低位，共18位
-// BANK_DEPTH 表示地址在 Bank 中的行数，占用8位bit位，取值范围为[0, 255]
-// BANK 表示地址所在 Bank 的编号，占用4位bit位，取值范围为[0, 15]
-// BANK_WIDTH 表示地址在 Bank 一行上的偏移量，占用6位bit位，取值范围为[0, 63]
+// BANK_DEPTH表示地址在Bank中的行数，占用8位bit位，取值范围为[0, 255]
+// BANK表示地址所在Bank的编号，占用4位bit位，取值范围为[0, 15]
+// BANK_WIDTH表示地址在Bank一行上的偏移量，占用6位bit位，取值范围为[0, 63]
 ```
 
-**图 2**  L0C内存结构图<a id="fig179810301543"></a>  
+**图2** L0C内存结构图<a id="fig179810301543"></a>  
 
 ![](../../../../figures/L0C_Memory_Structure_950.png)
 <!-- end id1 -->
