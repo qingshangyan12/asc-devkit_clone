@@ -28,20 +28,20 @@
 
 头文件引用路径为"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"。
 
-MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href="./寄存器数据类型/RegTensor.md">RegTensor</a>的八分之一（VL/8）。如下图所示，当操作数类型为b8时，每一个element对应1bitMaskReg；当操作数类型为b16时，每一个element对应2bitMaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bitMaskReg，且仅4bit中的最低位是有效的。
+MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href="./寄存器数据类型/RegTensor.md">RegTensor</a>的八分之一（VL/8）。如下图所示，当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
 
 **图1** MaskReg计算过程<a id="fig1"></a>
 
 ![](../../../../figures/ReduceSum_basic_api.png "MaskReg计算过程")
 
-在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同迭代计算的需求。具体设置方式如下表所示：
+在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
 **表1**  Mask设置方式
 
 | 编号 | 设置方式 | 涉及接口 | 说明 |
 | :-- | :------------ | :------------ | :------------ |
-| 1 | 调用接口设置 | CreateMask | 调用CreateMask接口以固定的Pattern设置Mask，每次以迭代计算均使用此Mask。详见方式1。 |
-| 2 | 调用接口设置 | UpdateMask | 调用UpdateMask设置Mask。详见方式2。<br>&bull; 在循环迭代外调用UpdateMask设置固定的Mask，Mask表示在一次迭代计算中前count个元素参与计算，每次以迭代计算均使用此Mask。<br>&bull; 在循环迭代内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次迭代Mask会自动更新。 |
+| 1 | 调用接口设置 | CreateMask | 调用CreateMask接口以固定的Pattern设置Mask，每次以循环计算均使用此Mask。详见方式1。 |
+| 2 | 调用接口设置 | UpdateMask | 调用UpdateMask设置Mask。详见方式2。<br>&bull; 在循环外调用UpdateMask设置固定的Mask，Mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此Mask。<br>&bull; 在循环内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次循环Mask会自动更新。 |
 | 3 | 从UB搬运 | LoadAlign | 从UB搬运Mask到MaskReg。详见方式3。 |
 | 4 | 从RegTensor搬运 | MaskGenWithRegTensor | 从RegTensor搬运Mask到MaskReg。详见方式4。 |
 | 5 | 从掩码寄存器中读取 | MoveMask | 从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值。详见方式5。 |
@@ -102,7 +102,7 @@ MaskReg
 
 不同数据类型下元素对应的mask位宽不一致，在cast进行类型转换时，maskReg根据输入的源操作数进行有效元素筛选。
 
-[b16到b32类型转换过程](#fig4)和[b32到b16类型转换过程](#fig5)展示了MaskReg和RegLayout同时作用时b16和b32进行类型转换的过程。
+图[b16到b32类型转换过程](#fig4)和图[b32到b16类型转换过程](#fig5)展示了MaskReg和RegLayout同时作用时b16和b32进行类型转换的过程。
 
 **图4** b16到b32类型转换过程<a id="fig4"></a>
 
@@ -114,7 +114,7 @@ MaskReg
 
 特别的，int4x2_t/fp4x2_e2m1_t/fp4x2_e1m2_t和b16之间的转换，指令会以每2个元素为一对进行读写，大转小时mask有效位以偶数位为准。
 
-图2-72和图2-73展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
+图[fp4x2_e2m1_t到bfloat16_t类型转换过程](#fig6)和图[bfloat16_t到fp4x2_e2m1_t类型转换过程](#fig7)展示了MaskReg和RegLayout同时作用时fp4x2_e2m1_t和bfloat16_t之间的转换。
 
 **图6** fp4x2_e2m1_t到bfloat16_t类型转换过程<a id="fig6"></a>
 
@@ -126,17 +126,17 @@ MaskReg
 
 ## Mask设置方式
 
-在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同迭代计算的需求。具体设置方式如下表所示：
+在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
 **表1**  Mask设置方式
 
 | 编号 | 设置方式 | 涉及接口 | 说明 |
 | :-- | :------------ | :------------ | :------------ |
-| 1 | 调用接口设置 | CreateMask | 调用CreateMask接口以固定的Pattern设置Mask，每次以迭代计算均使用此Mask。详见方式1。 |
-| 2 | 调用接口设置 | UpdateMask | 调用UpdateMask设置Mask。详见方式2。<br>&bull; 在循环迭代外调用UpdateMask设置固定的Mask，Mask表示在一次迭代计算中前count个元素参与计算，每次以迭代计算均使用此Mask。<br>&bull; 在循环迭代内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次迭代Mask会自动更新。 |
-| 3 | 从UB搬运 | LoadAlign | 从UB搬运Mask到MaskReg。详见方式3。 |
-| 4 | 从RegTensor搬运 | MaskGenWithRegTensor | 从RegTensor搬运Mask到MaskReg。详见方式4。 |
-| 5 | 从掩码寄存器中读取 | MoveMask | 从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值。详见方式5。 |
+| [1](#method1) | 调用接口设置 | CreateMask | 调用CreateMask接口以固定的Pattern设置Mask，每次以循环计算均使用此Mask。详见方式1。 |
+| [2](#method2) | 调用接口设置 | UpdateMask | 调用UpdateMask设置Mask。详见方式2。<br>&bull; 在循环外调用UpdateMask设置固定的Mask，Mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此Mask。<br>&bull; 在循环内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次循环Mask会自动更新。 |
+| [3](#method3) | 从UB搬运 | LoadAlign | 从UB搬运Mask到MaskReg。详见方式3。 |
+| [4](#method4) | 从RegTensor搬运 | MaskGenWithRegTensor | 从RegTensor搬运Mask到MaskReg。详见方式4。 |
+| [5](#method5) | 从掩码寄存器中读取 | MoveMask | 从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值。详见方式5。 |
 
 Reg矢量计算中，掩码的配置方式由MaskReg寄存器决定，仅支持接口内设置Mask。Mask值可通过MaskReg类型参数，直接作为入参传递给矢量计算API。
 
@@ -147,12 +147,12 @@ template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
 __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
 ```
 
-- 方式一
-  采用CreateMask接口以固定的Pattern设置Mask，Pattern详见[UpdateMask参数说明](#update-mask-params)。在循环迭代外调用CreateMask设置固定的Mask，每次以迭代计算均使用此Mask。
+- 方式1<a id="method1"></a>
+  采用CreateMask接口以固定的Pattern设置Mask，Pattern详见[UpdateMask参数说明](#update-mask-params)。在循环外调用CreateMask设置固定的Mask，每次以循环计算均使用此Mask。
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void SetMaskFixedPatternVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void SetMaskFixedPatternVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
   {
     AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg;
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
@@ -165,15 +165,15 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   }
   ```
 
-- 方式2
+- 方式2<a id="method2"></a>
 
   调用UpdateMask接口设置Mask。
 
-  - 在循环迭代外调用UpdateMask设置固定的Mask，Mask表示在一次迭代计算中前count个元素参与计算，每次以迭代计算均使用此Mask。
+  - 在循环外调用UpdateMask设置固定的Mask，Mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此Mask。
 
     ```cpp
     template <typename T>
-    __simd_vf__ inline void SetMaskUpdateFixedVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+    __simd_vf__ inline void SetMaskUpdateFixedVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
       AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg;
       AscendC::Reg::MaskReg mask;
@@ -187,10 +187,10 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
     }
     ```
   >[!NOTE]说明
+  >
+  >当数据类型为int16_t（操作数为16位）时，每次循环内能够处理的元素个数Mask∈[1, 128]。当count>128时，仍按一次repeat（128元素）执行，不支持超过128元素的Mask控制。
 
-  > 当数据类型为int16_t（操作数为16位）时，每次迭代内能够处理的元素个数Mask∈[1, 128]。当count>128时，仍按一次repeat（128元素）执行，不支持超过128元素的Mask控制。
-
-  - 在循环迭代内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次迭代Mask会自动更新。
+  - 在循环内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次循环Mask会自动更新。
 
     ```cpp
     template <typename T>
@@ -199,8 +199,8 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
       AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg;
       AscendC::Reg::MaskReg mask;
       // 一次repeat计算的数据个数
-      constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-      // 总迭代次数
+      constexpr uint16_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
+      // 总循环次数
       uint16_t repeatTimes = AscendC::CeilDivision(count, oneRepeatSize);
       for (uint16_t i = 0; i < repeatTimes; i++) {
         mask = AscendC::Reg::UpdateMask<T, AscendC::Reg::RegTraitNumOne>(count);
@@ -212,13 +212,13 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
     }
     ```
 
-- 方式3
+- 方式3<a id="method3"></a>
   
   采用LoadAlign从UB搬运Mask到MaskReg。在UB中设置Mask。
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void SetMaskFromUBVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, __ubuf__ T* maskAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void SetMaskFromUBVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, __ubuf__ T* maskAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg;
       AscendC::Reg::MaskReg mask;
@@ -232,13 +232,13 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   }
   ```
 
-- 方式4
+- 方式4<a id="method4"></a>
   
   采用MaskGenWithRegTensor从RegTensor搬运Mask到MaskReg。在RegTensor中设置Mask。
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void SetMaskFromRegTensorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void SetMaskFromRegTensorVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg, maskReg;
       AscendC::Reg::MaskReg mask;
@@ -255,13 +255,13 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   }
   ```
 
-- 方式5
+- 方式5<a id="method5"></a>
   
   采用MoveMask，从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。b16类型读取完整128bit的{MASK1,MASK0}，将每个bit复制为2bit；b32类型读取64bit的MASK0，并将每个bit复制为4bit。
 
   ```cpp
   template <typename T>
-  __simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+  __simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
   {
       AscendC::Reg::RegTensor<T, AscendC::Reg::RegTraitNumOne> srcReg0, srcReg1, dstReg;
       AscendC::Reg::MaskReg mask = AscendC::Reg::MoveMask<T>();
@@ -282,7 +282,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
   - Mask寄存器长度为256bit。
 
-  - 每一个element对应1bit的Mask，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数类型为b16时，一次迭代中最多有128个元素参与计算；当操作数类型为b32时，一次迭代中最多有64个元素参与计算；当操作数类型为b64时，一次迭代中最多有32个元素参与计算。详细见[掩码相关参数](../../../Memory矢量计算/SIMD计算说明/掩码/通用说明.md#掩码相关参数)。
+  - 每一个element对应1bit的Mask，数据类型不同，每次循环内能够处理的元素个数最大值不同。当操作数类型为b16时，一次循环中最多有128个元素参与计算；当操作数类型为b32时，一次循环中最多有64个元素参与计算；当操作数类型为b64时，一次循环中最多有32个元素参与计算。详细见[掩码相关参数](../../../Memory矢量计算/SIMD计算说明/掩码/通用说明.md#掩码相关参数)。
 
 - 针对Ascend950PR/Ascend950DT
 

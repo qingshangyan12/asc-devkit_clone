@@ -117,7 +117,7 @@ Ascend 950PR/Ascend 950DT
 ## 调用示例<a name="section633mcpsimp"></a>
 
 ```cpp
-__simd_vf__ inline void CreateAddrRegVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
+__simd_vf__ inline void CreateAddrRegVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
     AscendC::Reg::AddrReg aReg;

@@ -107,7 +107,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
     ```cpp
     // 针对B64,可以传入RegTraitNumTwo
     template<typename T, const AscendC::Reg::RegTrait& Trait = AscendC::Reg::RegTraitNumOne>
-    __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
+    __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
     {
         AscendC::Reg::RegTensor<T,Trait> srcReg0;
         AscendC::Reg::RegTensor<T,Trait> srcReg1;
