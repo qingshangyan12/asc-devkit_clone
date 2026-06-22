@@ -15,12 +15,12 @@
 #ifndef ASCENDC_MODULE_SIMT_INTERFACE_H
 #define ASCENDC_MODULE_SIMT_INTERFACE_H
 
-#include "kernel_tensor.h"
-#include "kernel_tpipe.h"
+#include "basic_api/kernel_tensor.h"
+#include "basic_api/kernel_tpipe.h"
 #include "../../../impl/basic_api/kernel_utils.h"
-#include "kernel_common.h"
-#include "kernel_operator_data_copy_intf.h"
-#include "kernel_operator_vec_binary_scalar_intf.h"
+#include "basic_api/kernel_common.h"
+#include "basic_api/kernel_operator_data_copy_intf.h"
+#include "basic_api/kernel_operator_vec_binary_scalar_intf.h"
 #if (__NPU_ARCH__ == 5102)
 #include "../../../impl/basic_api/dav_m510/kernel_operator_common_impl.h"
 #else

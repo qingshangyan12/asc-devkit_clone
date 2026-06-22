@@ -15,7 +15,8 @@ add_custom_target(hostapi_headers
  )
 
 add_library(tikcfw_headers INTERFACE)
-add_dependencies(tikcfw_headers hostapi_headers)
+add_dependencies(tikcfw_headers hostapi_headers kernel_tiling_headers)
+target_link_libraries(tikcfw_headers INTERFACE kernel_tiling_headers)
 target_include_directories(tikcfw_headers INTERFACE
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/basic_api/>
@@ -28,6 +29,7 @@ target_include_directories(tikcfw_headers INTERFACE
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/simt_api/cpp/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/basic_api/reg_compute/>
   $<BUILD_INTERFACE:${ASCENDC_DIR}/include/c_api/>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>
   $<INSTALL_INTERFACE:include/ascendc>

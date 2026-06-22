@@ -25,7 +25,7 @@
 
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/reduce/reduce_xor_sum/reduce_xor_sum_check.h"
 #endif // ASCENDC_CPU_DEBUG

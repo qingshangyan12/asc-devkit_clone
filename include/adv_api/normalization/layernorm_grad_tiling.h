@@ -17,7 +17,7 @@
 
 #include "graph/tensor.h"
 #include "layernorm_grad_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 constexpr uint32_t LAYERNORM_GRAD_ONE_BLOCK_SIZE_OF_FLOAT = 8;
 constexpr uint32_t LAYERNORM_GRAD_B32_BYTE_SIZE = 4;

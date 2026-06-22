@@ -11,7 +11,7 @@
 #define __MC2_TILING_UTILS_INTERFACE_H__
 
 #include "hccl/base.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 #ifdef __cplusplus
 extern "C" {

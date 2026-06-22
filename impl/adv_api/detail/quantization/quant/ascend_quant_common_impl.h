@@ -25,7 +25,7 @@
 
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../basic_api/kernel_pop_stack_buffer.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 #ifdef ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_check/quantization/quant/quant_check.h"

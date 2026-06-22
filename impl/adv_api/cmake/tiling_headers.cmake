@@ -20,6 +20,13 @@ file(
      SYMBOLIC)
 
 file(MAKE_DIRECTORY
+     ${ASCENDC_INSTALL_BASE_PATH}/asc/include/kernel_tiling)
+file(
+  CREATE_LINK ../adv_api/kernel_tiling.h
+  ${ASCENDC_INSTALL_BASE_PATH}/asc/include/kernel_tiling/kernel_tiling.h
+  SYMBOLIC)
+
+file(MAKE_DIRECTORY
      ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling)
 
 file(

@@ -21,10 +21,10 @@
 #ifndef LIB_PAD_PAD_H
 #define LIB_PAD_PAD_H
 
-#include "kernel_basic_intf.h"
-#include "kernel_tensor.h"
+#include "basic_api/kernel_basic_intf.h"
+#include "basic_api/kernel_tensor.h"
 #include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../../impl/adv_api/detail/pad/pad/pad_common_impl.h"
 namespace AscendC {
 /* **************************************************************************************************

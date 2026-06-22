@@ -21,7 +21,7 @@
 #ifndef LIB_NORMALIZATION_LAYERNORMGRAD_UTILS_H
 #define LIB_NORMALIZATION_LAYERNORMGRAD_UTILS_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 
 namespace AscendC {
 

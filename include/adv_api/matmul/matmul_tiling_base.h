@@ -17,7 +17,7 @@
 #define LIB_MATMUL_MATMUL_TILING_BASE_H
 
 #include "matmul_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "tiling/platform/platform_ascendc.h"
 
 namespace matmul_tiling {

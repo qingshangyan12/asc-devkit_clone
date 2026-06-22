@@ -19,7 +19,7 @@
 
 #include "graph/tensor.h"
 #include "softmax_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 /*
  * @ingroup GetSoftMaxMaxTmpSize

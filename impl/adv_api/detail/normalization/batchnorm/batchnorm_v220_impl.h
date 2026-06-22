@@ -23,7 +23,7 @@
 #define IMPL_NORMALIZATION_BATCHNORM_BATCHNORM_V220_IMPL_H
 
 #include "../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 namespace BatchNormAPI {

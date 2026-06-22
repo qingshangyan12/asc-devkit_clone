@@ -19,10 +19,10 @@
 #ifndef ASCENDC_MODULE_OPERATOR_H
 #define ASCENDC_MODULE_OPERATOR_H
 
-#include "kernel_tpipe.h"
-#include "kernel_tensor.h"
-#include "kernel_type.h"
-#include "kernel_operator_intf.h"
+#include "basic_api/kernel_tpipe.h"
+#include "basic_api/kernel_tensor.h"
+#include "basic_api/kernel_type.h"
+#include "basic_api/kernel_operator_intf.h"
 
 #endif // ASCENDC_MODULE_OPERATOR_H
 #if defined(UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_H)

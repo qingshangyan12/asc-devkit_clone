@@ -18,7 +18,7 @@
 
 #include "graph/tensor.h"
 #include "layernorm_tilingdata.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 namespace AscendC {
 /*!
  * \brief calculate max and min tmp buffer size for LayerNorm interface.

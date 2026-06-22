@@ -23,7 +23,7 @@
 #define IMPL_MATH_DIGAMMA_DIGAMMA_V200_IMPL_H
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 __aicore__ inline void DigammaCast(const LocalTensor<float>& dst, const LocalTensor<float>& src, RoundMode castType)

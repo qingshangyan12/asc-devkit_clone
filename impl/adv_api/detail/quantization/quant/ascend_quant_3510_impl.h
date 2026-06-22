@@ -24,7 +24,7 @@
 #define LIB_ASCEND_QUANT_ASCEND_QUANT_C310_IMPL_H
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 #include "../../common/check.h"
 #include "../../../../../include/adv_api/quantization/ascend_quant_utils.h"
 

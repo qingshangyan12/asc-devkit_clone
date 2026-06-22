@@ -23,7 +23,7 @@
 #ifndef IMPL_ACTIVATION_SIGMOID_SIGMOID_V100_IMPL_H
 #define IMPL_ACTIVATION_SIGMOID_SIGMOID_V100_IMPL_H
 #include "../../../../../include/basic_api/kernel_tensor.h"
-#include "kernel_tiling/kernel_tiling.h"
+#include "adv_api/kernel_tiling.h"
 
 namespace AscendC {
 template <typename T>
