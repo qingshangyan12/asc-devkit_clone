@@ -14,6 +14,7 @@ set -euo pipefail
 LYCHEE_VERSION="${LYCHEE_VERSION:-0.23.0}"
 MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
+MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$REPO_ROOT"
@@ -158,7 +159,9 @@ find_lychee() {
 }
 
 SCAN_SET_FILE=$(mktemp)
-trap 'rm -f "$SCAN_SET_FILE"' EXIT
+LYCHEE_OUTPUT_FILE=$(mktemp)
+FILTERED_OUTPUT_FILE=$(mktemp)
+trap 'rm -f "$SCAN_SET_FILE" "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE"' EXIT
 
 PY_ARGS=("$REPO_ROOT" "$SCAN_SET_FILE")
 if [ "${#INPUT_FILES[@]}" -gt 0 ]; then
@@ -179,9 +182,33 @@ output_file = Path(sys.argv[2])
 input_files = sys.argv[3:]
 
 markdown_exts = (".md", ".markdown", ".mdx")
-excluded_prefixes = ("tests/",)
+excluded_prefixes = ()
+config_file = repo_root / "markdown-link-check.toml"
 full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
+
+
+def config_exclude_path_patterns():
+    try:
+        text = config_file.read_text(encoding="utf-8")
+    except OSError:
+        return []
+
+    match = re.search(r"(?ms)^exclude_path\s*=\s*\[(.*?)\]", text)
+    if not match:
+        return []
+
+    patterns = []
+    for raw_match in re.finditer(r'"((?:\\.|[^"\\])*)"', match.group(1)):
+        pattern = raw_match.group(1).replace(r"\\", "\\").replace(r"\"", '"')
+        try:
+            patterns.append(re.compile(pattern))
+        except re.error:
+            continue
+    return patterns
+
+
+exclude_path_patterns = config_exclude_path_patterns()
 
 
 def to_rel(path):
@@ -200,6 +227,7 @@ def is_markdown_path(path):
     return (
         path.lower().endswith(markdown_exts)
         and not path.startswith(excluded_prefixes)
+        and not any(pattern.search(path) for pattern in exclude_path_patterns)
     )
 
 
@@ -305,6 +333,9 @@ if not full_scan:
     if needs_full_for_staged:
         full_scan = True
         full_reason = "staged Markdown rename/delete"
+    elif not input_files and not staged_changes and os.environ.get("PRE_COMMIT") == "1":
+        full_scan = True
+        full_reason = "pre-commit file selection"
 
 if full_scan:
     scan_set = existing_markdown_files()
@@ -363,14 +394,8 @@ while IFS= read -r item; do
 done < "$SCAN_SET_FILE"
 
 if [ "${#SCAN_FILES[@]}" -eq 0 ]; then
-    echo "[Markdown check] PASS: no Markdown files to check."
+    [ "$MARKDOWN_LINK_CHECK_VERBOSE" = "1" ] && echo "[Markdown check] PASS: no Markdown files to check."
     exit 0
-fi
-
-if [ -n "$FULL_REASON" ]; then
-    echo "[Markdown check] Checking all tracked Markdown files in the repository ($FULL_REASON)."
-else
-    echo "[Markdown check] Checking ${#SCAN_FILES[@]} Markdown file(s) in the affected set."
 fi
 
 if [ "$MARKDOWN_LINK_CHECK_DRY_RUN" = "1" ]; then
@@ -379,4 +404,118 @@ if [ "$MARKDOWN_LINK_CHECK_DRY_RUN" = "1" ]; then
 fi
 
 LYCHEE_BIN=$(find_lychee)
-exec "$LYCHEE_BIN" --no-progress --config "$CONFIG_FILE" "${SCAN_FILES[@]}"
+set +e
+"$LYCHEE_BIN" --no-progress --config "$CONFIG_FILE" "${SCAN_FILES[@]}" >"$LYCHEE_OUTPUT_FILE" 2>&1
+LYCHEE_RC=$?
+set -e
+
+python3 - "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$LYCHEE_RC" "${#SCAN_FILES[@]}" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+output_path = Path(sys.argv[1])
+filtered_path = Path(sys.argv[2])
+return_code = int(sys.argv[3])
+file_count = int(sys.argv[4])
+
+lines = output_path.read_text(encoding="utf-8", errors="replace").splitlines()
+error_events = []
+warning_events = []
+current_source = None
+
+
+def classify(line):
+    if re.search(r"\[(WARN|WARNING)\]", line, re.IGNORECASE):
+        return "warning"
+    if re.search(r"\[(ERROR|FAIL|FAILED)\]", line, re.IGNORECASE):
+        return "error"
+
+    status_match = re.match(r"^\[(\d{3})\]\s+.+\s\|", line)
+    if status_match and int(status_match.group(1)) >= 400:
+        return "error"
+    return None
+
+
+def format_event(line, source):
+    location_match = re.search(r"\(at (\d+):(\d+)\)", line)
+    if source and location_match:
+        clean_line = re.sub(r"\s+\(at \d+:\d+\)", "", line)
+        return f"{source}:{location_match.group(1)}:{location_match.group(2)}: {clean_line}", True
+    if source:
+        return f"{source}: {line}", True
+    return line, False
+
+
+for line in lines:
+    stripped = line.strip()
+    if not stripped:
+        continue
+
+    source_match = re.match(r"^\[([^\]]+)\]:$", stripped)
+    if source_match and not re.match(r"^\[\d{3}\]", stripped):
+        current_source = source_match.group(1)
+        continue
+
+    event_type = classify(stripped)
+    if event_type == "error":
+        error_events.append(format_event(stripped, current_source))
+    elif event_type == "warning":
+        warning_events.append(format_event(stripped, current_source))
+
+
+def unique_events(events):
+    seen = set()
+    result = []
+    for text, has_source in events:
+        if text in seen:
+            continue
+        result.append((text, has_source))
+        seen.add(text)
+    return result
+
+
+def prefer_sourced(events):
+    events = unique_events(events)
+    sourced = [event for event in events if event[1]]
+    return [text for text, _ in (sourced if sourced else events)]
+
+
+error_lines = prefer_sourced(error_events)
+warning_lines = prefer_sourced(warning_events)
+
+with filtered_path.open("w", encoding="utf-8") as handle:
+    if return_code != 0:
+        handle.write(
+            f"[Markdown check] FAILED: {len(error_lines)} failed item(s), "
+            f"{len(warning_lines)} warning item(s), {file_count} file(s) checked.\n"
+        )
+        if error_lines:
+            handle.write("\nFailed:\n")
+            for line in error_lines:
+                handle.write(f"{line}\n")
+        else:
+            handle.write("\nFailed:\n")
+            for line in lines:
+                if line.strip():
+                    handle.write(f"{line.strip()}\n")
+    elif warning_lines:
+        handle.write(
+            f"[Markdown check] WARNING: {len(warning_lines)} warning item(s), "
+            f"{file_count} file(s) checked.\n\nWarnings:\n"
+        )
+
+    if warning_lines:
+        if return_code != 0:
+            handle.write("\nWarnings:\n")
+        for line in warning_lines:
+            handle.write(f"{line}\n")
+PY
+
+if [ -s "$FILTERED_OUTPUT_FILE" ]; then
+    cat "$FILTERED_OUTPUT_FILE"
+elif [ "$MARKDOWN_LINK_CHECK_VERBOSE" = "1" ]; then
+    echo "[Markdown check] PASS: ${#SCAN_FILES[@]} file(s) checked."
+fi
+
+exit "$LYCHEE_RC"
