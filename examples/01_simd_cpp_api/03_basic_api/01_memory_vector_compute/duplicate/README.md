@@ -44,7 +44,7 @@
   </table>
 
 - 样例实现：  
-  本样例中实现的是固定shape为输入x[1,256]，输出y[1,256]的Duplicate数据填充样例。
+  本样例中实现的是固定shape为输出y[1,256]的Duplicate数据填充样例。输入x[1,256]仅用于演示GM到UB的数据搬入流程，不参与Duplicate输出结果计算。
   
   Duplicate API参数说明：
   - dst：目的操作数，用于存储填充结果
@@ -52,7 +52,7 @@
   - count：填充的元素个数，本样例中为256
 
   - Kernel实现  
-    - 调用DataCopy基础API，将数据从GM（Global Memory）搬运到UB（Unified Buffer）
+    - 调用DataCopy基础API，将输入数据从GM（Global Memory）搬运到UB（Unified Buffer），该输入数据不参与Duplicate计算
     - 调用Duplicate接口，将标量值填充到输出Tensor的所有元素中
     - 调用DataCopy基础API，将结果从UB（Unified Buffer）搬运至GM（Global Memory）
 

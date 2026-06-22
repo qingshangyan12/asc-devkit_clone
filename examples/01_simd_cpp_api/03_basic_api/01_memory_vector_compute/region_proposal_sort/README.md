@@ -44,7 +44,7 @@
   1. **ProposalConcat**：将连续的16个score值合入16个Region Proposal的score域位置（offset=4），共4组，每组1次repeat
   2. **RpSort16**：对每组16个Region Proposal按score域从大到小排序，共4组
   3. **MrgSort4**：将4组已排序的Region Proposal合并为1组，结果按score降序排列
-  4. **ProposalExtract**：从合并后的64个Region Proposal中提取score域，得到64个降序排列的连续score值
+  4. **ProposalExtract**：从合并后的Region Proposal排序结果中按源码配置的extractRepeat提取score域，得到降序排列的连续score值
 
 ## 编译运行
 

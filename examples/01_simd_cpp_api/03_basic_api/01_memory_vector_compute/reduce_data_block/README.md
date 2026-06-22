@@ -40,8 +40,8 @@
 
 **场景2：`ReduceDataBlock<MIN, half>`**
 
-- 输入：[4, 128]个half元素，mask=128（256/sizeof(half)），repeat=4
-- 输出：[4, 8]个half元素（对应32个datablock各自的最小值）
+- 输入：[1, 512]个half元素，mask=128（256/sizeof(half)），repeat=4
+- 输出：[1, 32]个half元素（对应32个datablock各自的最小值）
 - 实现：`ReduceDataBlock<ReduceType::MIN, half>(dstLocal, srcLocal, mask=128, repeat=4, dstRepStride=1, srcBlkStride=1, srcRepStride=8)`
 - 说明：对每个datablock内所有元素求最小值，一个datablock处理32字节即16个half元素，512个元素共32个datablock，输出32个最小值
 
@@ -66,9 +66,9 @@
 <table border="2">
 <caption>表2：样例输入输出规格（场景2：ReduceDataBlock&lt;MIN&gt;）</caption>
 <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">x</td><td align="center">[4, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">x</td><td align="center">[1, 512]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="2" align="center">样例输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-<tr><td align="center">y</td><td align="center">[4, 8]</td><td align="center">half</td><td align="center">ND</td></tr>
+<tr><td align="center">y</td><td align="center">[1, 32]</td><td align="center">half</td><td align="center">ND</td></tr>
 <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">reduce_data_block_custom</td></tr>
 </table>
 
