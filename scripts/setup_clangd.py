@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
 from pathlib import Path
 
@@ -57,7 +58,12 @@ def render_template(cann_root: Path, npu_arch: str) -> str:
     return template.replace("@CANN_ROOT@", cann_root.as_posix()).replace("@NPU_ARCH@", npu_arch)
 
 
+def configure_logging() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+
 def main() -> int:
+    configure_logging()
     args = parse_args()
     cann_root = Path(args.cann_root).expanduser().resolve()
     output = Path(args.output).expanduser()
@@ -67,19 +73,19 @@ def main() -> int:
 
     missing = missing_required_dirs(cann_root)
     if missing:
-        print("Missing required CANN directories:", file=sys.stderr)
+        logging.error("Missing required CANN directories:")
         for rel_path in missing:
-            print(f"  - {cann_root / rel_path}", file=sys.stderr)
+            logging.error("  - %s", cann_root / rel_path)
         return 1
 
     if output.exists() and not args.force:
-        print(f"{output} already exists. Use --force to overwrite it.", file=sys.stderr)
+        logging.error("%s already exists. Use --force to overwrite it.", output)
         return 1
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(render_template(cann_root, args.npu_arch), encoding="utf-8")
-    print(f"Generated {output}")
-    print("Copy it to .clangd or point clangd user config to these flags if you want clangd to load it.")
+    logging.info("Generated %s", output)
+    logging.info("Copy it to .clangd or point clangd user config to these flags if you want clangd to load it.")
     return 0
 
 
