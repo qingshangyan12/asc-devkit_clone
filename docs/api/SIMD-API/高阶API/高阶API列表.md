@@ -77,8 +77,11 @@
 | [DeepNorm](高阶API/归一化操作/DeepNorm.md) | 在深层神经网络训练过程中，可以替代LayerNorm的一种归一化方法。 |
 | [GroupNorm](高阶API/归一化操作/GroupNorm.md) | 将输入的C维度分为groupNum组，对每一组数据进行标准化。 |
 | [LayerNorm](高阶API/归一化操作/LayerNorm.md) | 将输入数据收敛到[0, 1]之间，可以规范网络层输入输出数据分布的一种归一化方法。 |
-| [LayerNormGrad](高阶API/归一化操作/LayerNorm.md) | 用于计算LayerNorm的反向传播梯度。 |
+| [LayerNorm-Tiling](高阶API/归一化操作/LayerNorm-Tiling.md) | LayerNorm的Tiling参数配置接口，用于获取LayerNorm kernel计算时所需的Tiling参数。 |
+| [LayerNormGrad](高阶API/归一化操作/LayerNormGrad.md) | 用于计算LayerNorm的反向传播梯度。 |
+| [LayerNormGrad-Tiling](高阶API/归一化操作/LayerNormGrad-Tiling.md) | LayerNormGrad的Tiling参数配置接口，用于设置反向传播梯度计算所需的分片参数。 |
 | [LayerNormGradBeta](高阶API/归一化操作/LayerNormGradBeta.md) | 用于获取反向beta/gmma的数值，和LayerNormGrad共同输出pdx, gmma和beta。 |
+| [LayerNormGradBeta-Tiling](高阶API/归一化操作/LayerNormGradBeta-Tiling.md) | LayerNormGradBeta的Tiling参数配置接口。 |
 | [Normalize](高阶API/归一化操作/Normalize.md) | [LayerNorm](高阶API/归一化操作/LayerNorm.md)中，已知均值和方差，计算shape为[A，R]的输入数据的标准差的倒数rstd和归一化输出y。 |
 | [RmsNorm](高阶API/归一化操作/RmsNorm.md) | 实现对shape大小为[B，S，H]的输入数据的RmsNorm归一化。 |
 | [WelfordUpdate](高阶API/归一化操作/WelfordUpdate.md) | 实现Welford算法的前处理。 |
