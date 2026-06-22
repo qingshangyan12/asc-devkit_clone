@@ -44,5 +44,3 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品
 - QF322B8\_PRE与VQF322B8\_PRE量化与随路ReLU组合
 
     将L0C Buffer上float数据搬出过程中转换成int8\_t/uint8\_t，具体随路量化与ReLU算法的完整Python示例代码请参考[\(V\)QF322B8\_PRE算法](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_f322s8.py)。
-
-
