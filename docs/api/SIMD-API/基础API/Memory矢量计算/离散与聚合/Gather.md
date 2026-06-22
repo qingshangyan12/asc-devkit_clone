@@ -58,9 +58,9 @@ Gather接口接受输入张量（src）、地址偏移张量（srcOffset）和�
 ```python
 import numpy as np
 
-def Gather(src, dst, count, srcOffset, srcBaseAddr):
+def Gather(dst, src, count, srcOffset, srcBaseAddr):
     inputType = np.dtype("uint16")
-    for i in range(count):     
+    for i in range(count):
         dst[i] = src[(srcBaseAddr + srcOffset[i]) // inputType.itemsize]
 ```
 
@@ -92,13 +92,13 @@ def Gather(src, dst, count, srcOffset, srcBaseAddr):
 
 ## 参数说明<a name="section1619484392111"></a>
 
-**表 1**  模板参数说明
+**表1**  模板参数说明
 
 | 参数名 | 描述 |
 | :----- | :--- |
 | T | 操作数数据类型。 |
 
-**表 2**  参数说明
+**表2**  参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | :------- | :-------- | :--- |

@@ -20,12 +20,12 @@
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_VEC_CMPSEL_IMPL_H
 
-#include "kernel_utils.h"
-#include "kernel_tpipe.h"
-#include "kernel_common.h"
-#include "kernel_struct_binary.h"
-#include "kernel_struct_unary.h"
-#include "kernel_operator_block_sync_intf.h"
+#include "../kernel_utils.h"
+#include "../../../include/basic_api/kernel_tpipe.h"
+#include "../../../include/basic_api/kernel_common.h"
+#include "../../../include/basic_api/kernel_struct_binary.h"
+#include "../../../include/basic_api/kernel_struct_unary.h"
+#include "../../../include/basic_api/kernel_operator_block_sync_intf.h"
 
 namespace AscendC {
 /* ***************************************************************************************
@@ -394,7 +394,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ half* src0, __ubuf__ 
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     switch (cmpMode) {
@@ -437,7 +437,7 @@ __aicore__ inline void VcmpvImpl(__ubuf__ U* dst, __ubuf__ float* src0, __ubuf__
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
     switch (cmpMode) {
@@ -968,7 +968,7 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 
@@ -1026,7 +1026,7 @@ __aicore__ inline void VselImpl(__ubuf__ float* dst, __ubuf__ T* sel, __ubuf__ f
     __ubuf__ uint8_t* tempBuf = AscendCUtils::GetTemporaryBufferAddr<uint8_t>(TMP_UB_OFFSET, 16);
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 
@@ -1127,7 +1127,7 @@ __aicore__ inline void VselImpl(__ubuf__ half* dst, __ubuf__ T* sel, __ubuf__ ha
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 
@@ -1164,7 +1164,7 @@ __aicore__ inline void VselImpl(__ubuf__ float* dst, __ubuf__ T* sel, __ubuf__ f
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf)) = (static_cast<uint64_t>(mask[0]));
     (*(__ubuf__ uint64_t*)((__ubuf__ uint64_t*)tempBuf + 1)) = (static_cast<uint64_t>(mask[1]));
 
-    event_t eventIdSToV = static_cast<event_t>(FetchEventID<HardEvent::S_V>());
+    event_t eventIdSToV = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::S_V));
     SetFlag<HardEvent::S_V>(eventIdSToV);
     WaitFlag<HardEvent::S_V>(eventIdSToV);
 

@@ -2,13 +2,25 @@
 
 ## 产品支持情况
 
+<!-- npu="950" id1 -->
 - Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
 - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
 - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 推理产品：不支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
 - Atlas 推理系列产品AI Core：不支持
 - Atlas 推理系列产品Vector Core：不支持
+<!-- end id5 -->
+<!-- npu="910" id6 -->
 - Atlas 训练系列产品：不支持
+<!-- end id6 -->
 
 ## 功能说明
 
@@ -22,7 +34,7 @@ size_t __cvta_generic_to_local(const void* ptr)
 
 ## 参数说明
 
-**表 1**  参数说明
+**表1**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
@@ -30,7 +42,13 @@ size_t __cvta_generic_to_local(const void* ptr)
 
 ## 返回值说明
 
-输入指针指向栈空间的地址值。
+输入指针指向栈空间的地址值。  
+该接口不校验输入地址是否为可安全访问的有效地址。只有当`ptr`实际指向栈空间时，返回值才是有效的栈空间地址值，特殊场景说明如下：  
+| 输入场景 | 返回值 |
+| --- | --- |
+| `ptr`为Global Memory指针 | 未定义行为，返回值不是有效栈空间地址。 |
+| `ptr`为`nullptr` | 返回`0x00000000fff00000`。 |
+| `ptr`为Unified Buffer指针 | 编译阶段报错。 |
 
 ## 约束说明
 
@@ -56,4 +74,3 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* 
     dst[idx] = __cvta_generic_to_local(ptr + idx);
 }
 ```
-

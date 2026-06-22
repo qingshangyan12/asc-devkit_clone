@@ -200,7 +200,7 @@ $$
 图3：分块矩阵乘与原子累加阶段，模式0示意图
 </p>
 
-#### 1.4 LeakyRelu与结果回写阶段(模式 2，AIC等AIV)
+#### 1.4 LeakyRelu与结果回写阶段(模式 2，2个AIV等AIC)
 每个 AI Core 内部，2 个 AIV 需等待 AIC 完成分块矩阵乘及原子累加操作后，才能对C矩阵分块执行LeakyRelu运算。
 具体来说是对累加得到的C矩阵，沿 M 轴切分 16 份，分配至 16 个 AIV 中分别执行 LeakyRelu 运算。如图4所示，根据以上描述，需要使用核间同步模式2（单个AI Core内部2个AIV等一个AIC）。上述描述对应的代码段如下：
 
@@ -222,13 +222,13 @@ $$
 
 ### 2. 纯Vector计算场景
 #### 2.1 模式0和模式1的对比
-本样例设置NUM\_BLOCKS为8(8个AI Core)，每一个AI Core内AIC:AIV配比为2，即本样例总共起了8个AIC和16个AIV，AIV的BlockIdx范围为0\~15。
+本样例设置NUM\_BLOCKS为8(8个AI Core)，每一个AI Core内AIC与AIV配比为1:2，即本样例总共起了8个AIC和16个AIV，AIV的BlockIdx范围为0\~15。
 如下图5所示，本样例中模式0和模式1计算逻辑几乎相同，区别仅在于参与同步的AIV数目：模式0时，全部的16个AIV参与同步；模式1时，仅有第二个AI Core中的2个AIV(BlockIdx=2和3)参与同步。因此，下一节将详细介绍模式0的整体逻辑，模式1就不再详细介绍。
 <p align="center">
   <img src="figures/纯aiv_模式1和模式0的区别.png" width="100%">
 </p>
 <p align="center">
-图5：纯AIV场景，模式0计算逻辑示意图
+图5：纯AIV场景，模式0与模式1的区别示意图
 </p>
 
 #### 2.2 模式0的整体逻辑
@@ -249,14 +249,11 @@ $$
         // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
         AscendC::CrossCoreWaitFlag(0); 
 
-上述同步完成之后，此时atomicResultGm已经是16个AIV中矢量计算结果的累加值。此时从atomicResultGm搬运到某一个AIV上，用DumpTensor进行打印数据，检查累加结果是否符合预期，最终将该AIV上的结果搬出到atomicResultGm。
-如果上一步骤的同步插入不正确，那么从atomicResultGm往AIV的搬运的数据可能是部分AIV中矢量计算结果的累加值，导致打印和结果以及写回atomicResultGm的结果不准确。
+上述同步完成之后，此时atomicResultGm已经是16个AIV中矢量计算结果的累加值。
+如果上一步骤的同步插入不正确，那么从atomicResultGm往AIV搬运的数据可能是部分AIV中矢量计算结果的累加值，导致结果不准确。
 
         if (AscendC::GetBlockIdx() == 0) {
             AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
-            AscendC::printf("============== In PrintTensor Process AIV %d ==============", AscendC::GetBlockIdx());
-            AscendC::DumpTensor(yLocal, AscendC::GetBlockIdx(), this->blockLength);
-            AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
             return;
         }
 <p align="center">

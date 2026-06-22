@@ -35,13 +35,13 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a id="zh-cn_topic_0000002566658905_section16128134420472"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002566658905_section4219135304818)。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -49,7 +49,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 | src | 输入 | 源操作数，类型为GlobalTensor，存储位置为Global Memory，源地址需要1字节对齐。 |
 | repeatParams | 输入 | 搬运参数，类型为DataCopyParams。通过该参数可以配置搬运的数据块个数、长度、地址间隔等信息，同时支持非连续和连续搬运。<br>DataCopyParams参数说明请参考[表3](#zh-cn_topic_0000002566658905_table144203616291)。 |
 
-**表 3** DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566658905_table144203616291"></a>
+**表3** DataCopyParams结构体参数定义<a id="zh-cn_topic_0000002566658905_table144203616291"></a>
 
 | 参数名称 | 含义 |
 | ---------- | ---------- |
@@ -114,7 +114,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 - 当DataCopyParams结构体参数blockCount、blockLen任意一个值为0时，表示指令不会执行，该接口将被视为NOP（空操作）。
 - DataCopyParams结构体参数的值需在取值范围内：
 
-    **表 4** DataCopyParams结构体参数取值范围
+    **表4** DataCopyParams结构体参数取值范围
 
     | 参数名称 | 取值范围 |
     | ---------- | ---------- |
@@ -162,7 +162,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 - srcGap = 0，源操作数相邻数据块之间的间隔为0。
 - dstGap = 0，目的操作数相邻数据块之间的间隔为0。
 
-**图 1** 连续搬运示意图<a id="zh-cn_topic_0000002566658905_fig769164701717"></a>
+**图1** 连续搬运示意图<a id="zh-cn_topic_0000002566658905_fig769164701717"></a>
 
 ![](../../../../../figures/datacopy_gm2l1_continuous_copy_highdim.png)
 
@@ -177,20 +177,48 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 - srcGap= 1，源操作数相邻数据块之间的间隔为1。
 - dstGap= 2，目的操作数相邻数据块之间的间隔为2。
 
-**图 2** 非连续搬运示意图<a id="zh-cn_topic_0000002566658905_fig12371910189"></a>
+**图2** 非连续搬运示意图<a id="zh-cn_topic_0000002566658905_fig12371910189"></a>
 
 ![](../../../../../figures/datacopy_gm2l1_noncontinuous_copy_highdim.png)
 
 ## 调用示例<a id="zh-cn_topic_0000002566658905_section088124295117"></a>
 
-示例代码片段如下：
+连续搬运以[图1 连续搬运示意图](#zh-cn_topic_0000002566658905_fig769164701717)所示场景为例：
 
 ```cpp
-// 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
-DataCopyParams intriParams;
-intriParams.blockCount = 1; // 连续数据块个数为1
-intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock
-intriParams.srcGap = 0; // 源操作数做连续搬运
-intriParams.dstGap = 0; // 目的操作数连续排布
-AscendC::DataCopy(srcLocal, srcGlobal, intriParams);
+constexpr uint32_t copyCount = 128;
+// 源操作数：GM上连续存放128个half。
+AscendC::GlobalTensor<half> srcGm;
+srcGm.SetGlobalBuffer((__gm__ half *)src, copyCount);
+// 目的操作数：L1 Buffer。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, copyCount);
+
+AscendC::DataCopyParams repeatParams;
+repeatParams.blockCount = 1; // 搬运1个数据块，表示连续搬运。
+repeatParams.blockLen = 8;   // 每个数据块长度为8个DataBlock，即256B，等于128个half。
+repeatParams.srcGap = 0;     // blockCount = 1时，源端间隔无意义，设置为0。
+repeatParams.dstGap = 0;     // blockCount = 1时，目的端间隔无意义，设置为0。
+
+AscendC::DataCopy(dstLocal, srcGm, repeatParams);
+```
+
+非连续搬运以[图2 非连续搬运示意图](#zh-cn_topic_0000002566658905_fig12371910189)所示场景为例：
+
+```cpp
+constexpr uint32_t srcCount = 112;
+constexpr uint32_t dstCount = 128;
+// 源操作数：GM上有112个half，按“48个有效元素+16个跳过元素+48个有效元素”排布。
+AscendC::GlobalTensor<half> srcGm;
+srcGm.SetGlobalBuffer((__gm__ half *)src, srcCount);
+
+// 目的操作数：L1 Buffer，两个数据块之间预留32个half的间隔。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, dstCount);
+
+AscendC::DataCopyParams repeatParams;
+repeatParams.blockCount = 2; // 搬运2个数据块。
+repeatParams.blockLen = 3;   // 每个数据块长度为3个DataBlock，即96B，等于48个half。
+repeatParams.srcGap = 1;     // 源端两个数据块之间跳过1个DataBlock，即16个half。
+repeatParams.dstGap = 2;     // 目的端两个数据块之间间隔2个DataBlock，即32个half。
+
+AscendC::DataCopy(dstLocal, srcGm, repeatParams);
 ```

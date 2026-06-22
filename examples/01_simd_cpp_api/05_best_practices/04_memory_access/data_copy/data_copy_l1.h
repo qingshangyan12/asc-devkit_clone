@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This program is free software, you can redistribute it and/or modify it under terms and conditions of
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
@@ -153,10 +153,7 @@ private:
         AscendC::PipeBarrier<PIPE_ALL>();
     }
 
-    static constexpr uint32_t AlignUp(uint32_t value, uint32_t align)
-    {
-        return (value + align - 1) / align * align;
-    }
+    static constexpr uint32_t AlignUp(uint32_t value, uint32_t align) { return (value + align - 1) / align * align; }
 
     static constexpr uint32_t blockCube = 16;
     static constexpr uint32_t c0Size = 32 / sizeof(half);

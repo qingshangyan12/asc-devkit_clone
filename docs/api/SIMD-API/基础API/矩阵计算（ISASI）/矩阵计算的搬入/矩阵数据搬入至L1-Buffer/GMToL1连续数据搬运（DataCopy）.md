@@ -29,13 +29,13 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 参数说明<a id="zh-cn_topic_0000002535739034_section16128134420472"></a>
 
-**表 1** 模板参数说明
+**表1** 模板参数说明
 
 | 参数名 | 描述 |
 | ---------- | ---------- |
 | T | 源操作数或者目的操作数的数据类型。支持的数据类型请参考[数据类型](#zh-cn_topic_0000002535739034_section4219135304818)。 |
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ---------- | ---------- |
@@ -45,7 +45,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 以half数据类型为例，源操作数的shape为1 * 128。当count = 128时，[图1](#zh-cn_topic_0000002535739034_fig79455329161)将源操作数中128个元素连续搬运至目的操作数。
 
-**图 1** 连续搬运示意图<a id="zh-cn_topic_0000002535739034_fig79455329161"></a>
+**图1** 连续搬运示意图<a id="zh-cn_topic_0000002535739034_fig79455329161"></a>
 
 ![](../../../../../figures/datacopy_gm2l1_continuous_copy.png)
 
@@ -129,10 +129,15 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ## 调用示例<a id="zh-cn_topic_0000002535739034_section088124295117"></a>
 
-示例代码片段如下：
+以[图1 连续搬运示意图](#zh-cn_topic_0000002535739034_fig79455329161)所示场景为例：
 
 ```cpp
-// srcLocal为half类型的LocalTensor，srcGlobal为half类型的GlobalTensor
-// 使用传入count参数的搬运接口，完成连续搬运
-AscendC::DataCopy(srcLocal, srcGlobal, 512);
+constexpr uint32_t copyCount = 128;
+// 源操作数：GM上连续存放的128个half。
+AscendC::GlobalTensor<half> srcGm;
+srcGm.SetGlobalBuffer((__gm__ half *)src, copyCount);
+// 目的操作数：L1 Buffer。
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, copyCount);
+// count = 128，表示搬运128个half元素，实际搬运字节数256B满足32B对齐约束。
+AscendC::DataCopy(dstLocal, srcGm, copyCount);
 ```
