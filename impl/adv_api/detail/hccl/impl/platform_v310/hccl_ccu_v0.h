@@ -454,7 +454,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+    AscendC::PRINTF("[CcuSendMsg]start GetCommitCkeAddr\n");
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
+    AscendC::PRINTF("[CcuSendMsg]start GetCommitCkeAddr\n");
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
@@ -485,7 +487,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
+    AscendC::PRINTF("[CcuSendMsg]start WriteHBMData commitCKEAddr\n");
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+    AscendC::PRINTF("[CcuSendMsg]finish WriteHBMData commitCKEAddr\n");
 }
 
 template <const auto& config>
@@ -578,18 +582,24 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
 #ifndef ASCENDC_CPU_DEBUG
     AscendC::PRINTF("[WaitFunc]start ASCENDC_CPU_DEBUG\n");
     while (true) {
+        AscendC::PRINTF("[WaitFunc]start read waitCke\n");
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
+        AscendC::PRINTF("[WaitFunc]finish read waitCke\n");
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
 
+                AscendC::PRINTF("[WaitFunc]start WriteHBMData\n");
                 WriteHBMData(finishCntGM_, finishNumTemp_);
                 WriteHBMData(waitCKEAddr, CCU_MSG_CKE_INIT_VALUE);
+                AscendC::PRINTF("[WaitFunc]finish WriteHBMData\n");
             }
             break;
         }
         if (!workingFlag_) {
+            AscendC::PRINTF("[WaitFunc]start read finshCnt\n");
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
+            AscendC::PRINTF("[WaitFunc]finish read finshCnt\n");
             if (finshCnt > finishNum_) {
                 break;
             }
