@@ -84,7 +84,7 @@
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<!-- end id9 --><br><br>Tanh算法的相关配置。此参数可选配，TanhConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Tanh内部实现使用的算法。TanhAlgo类型，支持的取值如下：INTRINSIC：默认值。该算法直接计算公式y = (e^(2x)-1)/(e^(2x)+1)，性能更好。SUBSECTION_COMPENSATION：该算法通过误差补偿实现Tanh，精度更高。 |
+| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR/Ascend 950DT。<br><br><!-- end id9 -->Tanh算法的相关配置。此参数可选配，TanhConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：Tanh内部实现使用的算法。TanhAlgo类型，支持的取值如下：INTRINSIC：默认值。该算法直接计算公式y = (e^(2x)-1)/(e^(2x)+1)，性能更好。SUBSECTION_COMPENSATION：该算法通过误差补偿实现Tanh，精度更高。 |
 
 ```
 enum class TanhAlgo {
