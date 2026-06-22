@@ -166,7 +166,8 @@ find_lychee() {
 SCAN_SET_FILE=$(mktemp)
 LYCHEE_OUTPUT_FILE=$(mktemp)
 FILTERED_OUTPUT_FILE=$(mktemp)
-trap 'rm -f "$SCAN_SET_FILE" "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE"' EXIT
+CROSS_LINK_OUTPUT_FILE=$(mktemp)
+trap 'rm -f "$SCAN_SET_FILE" "$LYCHEE_OUTPUT_FILE" "$FILTERED_OUTPUT_FILE" "$CROSS_LINK_OUTPUT_FILE"' EXIT
 
 PY_ARGS=("$REPO_ROOT" "$SCAN_SET_FILE")
 if [ "${#INPUT_FILES[@]}" -gt 0 ]; then
@@ -407,6 +408,129 @@ if [ "$MARKDOWN_LINK_CHECK_DRY_RUN" = "1" ]; then
     printf '%s\n' "${SCAN_FILES[@]}"
     echo "[Markdown check] DRY-RUN: ${#SCAN_FILES[@]} file(s) selected. duration=$(markdown_check_duration)" >&2
     exit 0
+fi
+
+set +e
+python3 - "$REPO_ROOT" "$SCAN_SET_FILE" "$CROSS_LINK_OUTPUT_FILE" "$(markdown_check_duration)" <<'PY'
+import posixpath
+import re
+import sys
+from pathlib import Path
+from urllib.parse import unquote
+
+repo_root = Path(sys.argv[1])
+scan_set_file = Path(sys.argv[2])
+output_file = Path(sys.argv[3])
+duration = sys.argv[4]
+base_url = "https://gitcode.com/cann/asc-devkit/blob/master/"
+
+link_pattern = re.compile(r"(!?\[[^\]]*\]\()([^\s)]+)((?:\s+[^)]*)?\))")
+reference_pattern = re.compile(r"(?m)^(\s*\[[^\]]+\]:\s*)(\S+)")
+html_href_pattern = re.compile(r"""(?i)(\bhref\s*=\s*["'])([^"']+)(["'])""")
+
+
+def source_area(path):
+    if path.startswith("docs/api/"):
+        return "api"
+    if path.startswith("docs/guide/"):
+        return "guide"
+    return None
+
+
+def split_target(target):
+    target = target.strip().strip("<>").strip("\"'")
+    if not target or target.startswith("#"):
+        return None
+    if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+        return None
+
+    suffix_index = len(target)
+    for sep in ("#", "?"):
+        index = target.find(sep)
+        if index != -1:
+            suffix_index = min(suffix_index, index)
+    path_part = target[:suffix_index]
+    suffix = target[suffix_index:]
+    if not path_part:
+        return None
+    return path_part, suffix
+
+
+def normalize_target(source_file, target):
+    parts = split_target(target)
+    if parts is None:
+        return None
+
+    path_part, suffix = parts
+    decoded = unquote(path_part)
+    if decoded.startswith("/"):
+        normalized = posixpath.normpath(decoded.lstrip("/"))
+    else:
+        normalized = posixpath.normpath(posixpath.join(posixpath.dirname(source_file), decoded))
+    return normalized, suffix
+
+
+def iter_links(line):
+    for match in link_pattern.finditer(line):
+        yield match.group(2)
+    for match in reference_pattern.finditer(line):
+        yield match.group(2)
+    for match in html_href_pattern.finditer(line):
+        yield match.group(2)
+
+
+scan_files = []
+for raw_line in scan_set_file.read_text(encoding="utf-8").splitlines():
+    if not raw_line or raw_line.startswith("# full scan:"):
+        continue
+    scan_files.append(raw_line)
+
+errors = []
+for source in scan_files:
+    source_kind = source_area(source)
+    if source_kind is None:
+        continue
+
+    source_path = repo_root / source
+    try:
+        lines = source_path.read_text(encoding="utf-8").splitlines()
+    except UnicodeDecodeError:
+        lines = source_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except OSError:
+        continue
+
+    for line_number, line in enumerate(lines, 1):
+        for target in iter_links(line):
+            normalized = normalize_target(source, target)
+            if normalized is None:
+                continue
+
+            target_path, suffix = normalized
+            target_kind = source_area(target_path)
+            if target_kind is None or target_kind == source_kind:
+                continue
+
+            errors.append(
+                f"{source}:{line_number}: api/guide cross link must use HTTPS: "
+                f"{target} -> {base_url}{target_path}{suffix}"
+            )
+
+with output_file.open("w", encoding="utf-8") as handle:
+    if errors:
+        handle.write(
+            f"[Markdown check] FAILED: {len(errors)} api/guide cross link item(s), "
+            f"{len(scan_files)} file(s) checked, duration={duration}.\n\nFailed:\n"
+        )
+        for error in errors:
+            handle.write(error + "\n")
+
+sys.exit(1 if errors else 0)
+PY
+CROSS_LINK_RC=$?
+set -e
+if [ "$CROSS_LINK_RC" -ne 0 ]; then
+    cat "$CROSS_LINK_OUTPUT_FILE"
+    exit "$CROSS_LINK_RC"
 fi
 
 LYCHEE_BIN=$(find_lychee)

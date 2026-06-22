@@ -39,6 +39,7 @@ exclude = [
     "^https://gitee\\.com/ascend/samples/tree/master/operator/ascendc$",
     "^https://gitee\\.com/ascend/samples/tree/master/operator/ascendc/0_introduction/3_add_kernellaunch/AddKernelInvocationNeo$",
     "^https://gitee\\.com/ascend/ascendc-api-adv/tree/master/examples$",
+    "^https://github\\.com/ImageMagick/ImageMagick-Windows/releases$",
 ]
 
 exclude_path = [
