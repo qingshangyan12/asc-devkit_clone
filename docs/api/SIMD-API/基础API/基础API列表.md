@@ -2,9 +2,46 @@
 
 ## 基础数据结构<a name="section3119442205518"></a>
 
+**表1**  基础数据结构列表
+
+<a name="table16268175715515"></a>
+<table><thead align="left"><tr id="row11268657105518"><th class="cellrowborder" valign="top" width="40.37%" id="mcps1.2.3.1.1"><p id="p1026810577553"><a name="p1026810577553"></a><a name="p1026810577553"></a>接口名</p>
+</th>
+<th class="cellrowborder" valign="top" width="59.63%" id="mcps1.2.3.1.2"><p id="p226835735518"><a name="p226835735518"></a><a name="p226835735518"></a>功能描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row102681557105520"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p12251181311560"><a name="p12251181311560"></a><a name="p12251181311560"></a><a href="基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md">LocalTensor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p2025215484579"><a name="p2025215484579"></a><a name="p2025215484579"></a><span id="ph4396131516585"><a name="ph4396131516585"></a><a name="ph4396131516585"></a>LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置<a href="基础API/数据结构/辅助数据结构/TPosition.md">TPosition</a>为<span>VECIN、VECOUT、VECCALC、</span>A1<span>、</span>A2<span>、</span>B1<span>、</span>B2<span>、</span>CO1<span>、</span>CO2。</span></p>
+</td>
+</tr>
+<tr id="row026925718557"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p142691057115518"><a name="p142691057115518"></a><a name="p142691057115518"></a><a href="基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md">GlobalTensor</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p625254835716"><a name="p625254835716"></a><a name="p625254835716"></a><span id="ph698815359590"><a name="ph698815359590"></a><a name="ph698815359590"></a>GlobalTensor用来存放Global Memory（外部存储）的全局数据。</span></p>
+</td>
+</tr>
+<tr id="row32691573557"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p8269195705514"><a name="p8269195705514"></a><a name="p8269195705514"></a><a href="基础API/数据结构/辅助数据结构/Coordinate/Coordinate.md">Coordinate</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p1825015488573"><a name="p1825015488573"></a><a name="p1825015488573"></a>Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。</p>
+</td>
+</tr>
+<tr id="row926915745510"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p192691757185519"><a name="p192691757185519"></a><a name="p192691757185519"></a><a href="基础API/数据结构/辅助数据结构/Layout/Layout.md">Layout</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p1724954818576"><a name="p1724954818576"></a><a name="p1724954818576"></a><span id="ph198761643125913"><a name="ph198761643125913"></a><a name="ph198761643125913"></a>Layout&lt;Shape, Stride&gt;数据结构是描述多维张量内存布局的基础模板类，通过编译时的形状（Shape）和步长（Stride）信息，实现逻辑坐标空间到一维内存地址空间的映射，为复杂张量操作和硬件优化提供基础支持。</span></p>
+</td>
+</tr>
+<tr id="row97101411165713"><td class="cellrowborder" valign="top" width="40.37%" headers="mcps1.2.3.1.1 "><p id="p5710711115712"><a name="p5710711115712"></a><a name="p5710711115712"></a><a href="基础API/数据结构/辅助数据结构/TensorTrait/TensorTrait.md">TensorTrait</a></p>
+</td>
+<td class="cellrowborder" valign="top" width="59.63%" headers="mcps1.2.3.1.2 "><p id="p167101111155717"><a name="p167101111155717"></a><a name="p167101111155717"></a><span id="ph287618459597"><a name="ph287618459597"></a><a name="ph287618459597"></a>TensorTrait数据结构是描述Tensor相关信息的基础模板类，包含Tensor的数据类型、逻辑位置和Layout内存布局。</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+
 ## 基础API<a name="section117632211201"></a>
 
-**表1**  Memory矢量计算API列表
+**表2**  Memory矢量计算API列表
 
 <a name="table107281858237"></a>
 <table><thead align="left"><tr id="row1372812592319"><th class="cellrowborder" valign="top" width="15.590000000000002%" id="mcps1.2.4.1.1"><p id="p28543193914"><a name="p28543193914"></a><a name="p28543193914"></a>分类</p>
@@ -406,7 +443,7 @@
 </tbody>
 </table>
 
-**表2**  标量计算API列表
+**表3**  标量计算API列表
 
 <a name="table339023582010"></a>
 <table><thead align="left"><tr id="row1539063572010"><th class="cellrowborder" valign="top" width="40.37%" id="mcps1.2.3.1.1"><p id="p13390235192015"><a name="p13390235192015"></a><a name="p13390235192015"></a>接口名</p>
@@ -453,7 +490,7 @@
 </tbody>
 </table>
 
-**表3**  资源管理API列表
+**表4**  资源管理API列表
 
 <a name="table1267664316264"></a>
 <table><thead align="left"><tr id="row15676154310267"><th class="cellrowborder" valign="top" width="40.37%" id="mcps1.2.3.1.1"><p id="p6676543192617"><a name="p6676543192617"></a><a name="p6676543192617"></a>接口名</p>
@@ -525,7 +562,7 @@
 </tbody>
 </table>
 
-**表4**  同步控制API列表
+**表5**  同步控制API列表
 
 <a name="table921112251162"></a>
 <table><thead align="left"><tr id="row975619311161"><th class="cellrowborder" valign="top" width="40.37%" id="mcps1.2.3.1.1"><p id="p8307249121617"><a name="p8307249121617"></a><a name="p8307249121617"></a>接口名</p>
@@ -582,7 +619,7 @@
 </tbody>
 </table>
 
-**表5**  缓存处理API列表
+**表6**  缓存处理API列表
 
 <a name="table5254131810573"></a>
 <table><thead align="left"><tr id="row32541018135711"><th class="cellrowborder" valign="top" width="40.27%" id="mcps1.2.3.1.1"><p id="p17682103125810"><a name="p17682103125810"></a><a name="p17682103125810"></a>接口名</p>
@@ -604,7 +641,7 @@
 </tbody>
 </table>
 
-**表6**  系统变量访问API列表
+**表7**  系统变量访问API列表
 
 <a name="table26716458301"></a>
 <table><thead align="left"><tr id="row15672134518304"><th class="cellrowborder" valign="top" width="40.37%" id="mcps1.2.3.1.1"><p id="p18672144511306"><a name="p18672144511306"></a><a name="p18672144511306"></a>接口名</p>
@@ -641,7 +678,7 @@
 </tbody>
 </table>
 
-**表7**  原子操作接口列表
+**表8**  原子操作接口列表
 
 <a name="table1395854383210"></a>
 <table><thead align="left"><tr id="row12958043173211"><th class="cellrowborder" valign="top" width="40.089999999999996%" id="mcps1.2.3.1.1"><p id="p2958104363212"><a name="p2958104363212"></a><a name="p2958104363212"></a>接口名</p>
@@ -693,7 +730,7 @@
 </tbody>
 </table>
 
-**表8**  调试接口列表
+**表9**  调试接口列表
 
 <a name="table18295429109"></a>
 <table><thead align="left"><tr id="row530154201012"><th class="cellrowborder" valign="top" width="37.71%" id="mcps1.2.3.1.1"><p id="p113014281016"><a name="p113014281016"></a><a name="p113014281016"></a>接口名</p>
@@ -787,7 +824,7 @@
 </tbody>
 </table>
 
-**表9**  工具函数接口列表
+**表10**  工具函数接口列表
 
 <a name="table9496143191816"></a>
 <table><thead align="left"><tr id="row14962043181812"><th class="cellrowborder" valign="top" width="40.089999999999996%" id="mcps1.2.3.1.1"><p id="p449784310180"><a name="p449784310180"></a><a name="p449784310180"></a>接口名</p>
@@ -824,7 +861,7 @@
 </tbody>
 </table>
 
-**表10**  Kernel Tiling接口列表
+**表11**  Kernel Tiling接口列表
 
 <a name="table2017815711517"></a>
 <table><thead align="left"><tr id="row11179357358"><th class="cellrowborder" valign="top" width="39.900000000000006%" id="mcps1.2.3.1.1"><p id="p417975719517"><a name="p417975719517"></a><a name="p417975719517"></a>接口名</p>
@@ -881,7 +918,7 @@
 </tbody>
 </table>
 
-**表11**  ISASI接口列表
+**表12**  ISASI接口列表
 
 <a name="table19526741203211"></a>
 <table><thead align="left"><tr id="row352624118322"><th class="cellrowborder" valign="top" width="12.379999999999999%" id="mcps1.2.4.1.1"><p id="p88065174816"><a name="p88065174816"></a><a name="p88065174816"></a>分类</p>
