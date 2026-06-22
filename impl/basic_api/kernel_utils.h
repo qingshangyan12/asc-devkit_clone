@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2025 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -41,7 +41,7 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 }
@@ -53,7 +53,7 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
