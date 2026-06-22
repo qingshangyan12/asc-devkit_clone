@@ -32,7 +32,7 @@
 
 ## 功能说明<a name="zh-cn_topic_0000002516049318_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L0C-\>L1](../L0C到L1数据搬运（DataCopy）.md)）过程中进行随路量化时，通过调用该接口设置scalar量化参数。
+DataCopy数据搬运（[L0C Buffer-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L0C Buffer-\>L1 Buffer](../L0C到L1数据搬运（DataCopy）.md)）过程中进行随路量化时，通过调用该接口设置scalar量化参数。
 
 ## 函数原型<a name="zh-cn_topic_0000002516049318_section620mcpsimp"></a>
 

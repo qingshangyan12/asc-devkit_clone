@@ -32,7 +32,7 @@
 
 ## 功能说明<a id="zh-cn_topic_0000002516209232_section618mcpsimp"></a>
 
-DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
+DataCopy数据搬运（[L0C Buffer-\>GM](../L0C到GM数据搬运（DataCopy）.md)）过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
 ## 函数原型<a id="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
 
@@ -40,39 +40,26 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）�
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
 ```
 
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id10 -->
 ```cpp
 // 如下原型仅Ascend 950PR/Ascend 950DT支持
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 ```
-
-</cann-filter>
+<!-- end id10 -->
 
 ## 参数说明<a id="zh-cn_topic_0000002516209232_section622mcpsimp"></a>
 
-<cann-filter npu-type = "A3,910b,310b">
-
+<!-- npu="A3,910b,310b" id11 -->
 针对如下产品型号，参数说明见下表：
-
-<cann-filter npu-type = "A3">
-
-Atlas A3 训练系列产品/Atlas A3 推理系列产品；
-
-</cann-filter>
-
-<cann-filter npu-type = "910b">
-
-Atlas A2 训练系列产品/Atlas A2 推理系列产品；
-
-</cann-filter>
-
-<cann-filter npu-type = "310b">
-
-Atlas 200I/500 A2 推理产品；
-
-</cann-filter>
-
+<!-- npu="A3" id12 -->
+Atlas A3 训练系列产品/Atlas A3 推理系列产品
+<!-- end id12 -->
+<!-- npu="910b" id13 -->
+Atlas A2 训练系列产品/Atlas A2 推理系列产品
+<!-- end id13 -->
+<!-- npu="310b" id14 -->
+Atlas 200I/500 A2 推理产品
+<!-- end id14 -->
 **表1** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
@@ -80,11 +67,9 @@ Atlas 200I/500 A2 推理产品；
 | ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
 | srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[1, 512]，单位为1024B。 |
 | dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 65535]，单位为element元素。 |
+<!-- end id11 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "950">
-
+<!-- npu="950" id15 -->
 针对Ascend 950PR/Ascend 950DT：
 
 **表2** 参数说明
@@ -94,25 +79,16 @@ Atlas 200I/500 A2 推理产品；
 | ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
 | srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[0, 65535]，单位为C0_SIZE。 |
 | dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[1, 2^32-1]，单位为element元素。 |
+<!-- end id15 -->
 
-</cann-filter>
-
-<cann-filter npu-type = "x90,9030">
-
+<!-- npu="x90,9030" id16 -->
 针对如下产品型号，参数说明见下表：
-
-<cann-filter npu-type = "x90">
-
-Kirin X90；
-
-</cann-filter>
-
-<cann-filter npu-type = "9030">
-
-Kirin 9030；
-
-</cann-filter>
-
+<!-- npu="x90" id17 -->
+Kirin X90 处理器系列产品
+<!-- end id17 -->
+<!-- npu="9030" id18 -->
+Kirin 9030 处理器系列产品
+<!-- end id18 -->
 **表3** 参数说明
 
 | 参数名称 | 输入/输出 | 含义 |
@@ -120,8 +96,7 @@ Kirin 9030；
 | ndNum | 输入 | nd矩阵的数量，取值范围∈[1, 65535]。（[具体含义图示参见NZ2ND介绍特性章节](../关键特性说明/NZ2ND.md)） |
 | srcNdStride | 输入 | 以分形大小为单位的源步长，源相邻nz矩阵的偏移（头与头）。当ndNum配置为1时，srcNdStride配置为0即可，不生效。取值范围∈[0, 65535]，单位为C0_SIZE。 |
 | dstNdStride | 输入 | 目的相邻nd矩阵的偏移（头与头）。取值范围dstNdStride∈[0, 65535]，单位为element元素。 |
-
-</cann-filter>
+<!-- end id16 -->
 
 ## 数据类型
 
@@ -133,7 +108,7 @@ Kirin 9030；
 
 ## 约束说明<a id="zh-cn_topic_0000002516209232_section633mcpsimp"></a>
 
-无
+- 调用DataCopy接口并且需要进行随路NZ格式转换为ND格式之前，必须先调用SetFixpipeNz2ndFlag设置格式转换配置。
 
 ## 调用示例<a id="section6461234123118"></a>
 
