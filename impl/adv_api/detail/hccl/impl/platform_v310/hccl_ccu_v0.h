@@ -278,15 +278,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
-    uint8_t algorithmType = 0;
-    for (uint32_t i = 0; i < MAX_CC_TILING_NUM; ++i) {
-        uint32_t opType = newCcuFlag_ ? hcclNewContext_->opType[i] : hcclContext_->opType[i];
-        if (opType == static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)) {
-            algorithmType = newCcuFlag_ ? hcclNewContext_->algorithmType[i] : hcclContext_->algorithmType[i];
-            break;
-        }
-    }
-    KERNEL_LOG(KERNEL_INFO, "ApiClient CcuPrepareForOp algorithmType:%u", algorithmType);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         ccuUsedXnNum_ = 9;
         CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
