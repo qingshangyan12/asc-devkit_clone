@@ -32,8 +32,7 @@
 
 ```
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Where(
-    const LocalTensor<T>& dst, const U& src0, const S& src1, const LocalTensor<V>& condition, const uint32_t count)
+__aicore__ inline void Where(const LocalTensor<T>& dst, const U& src0, const S& src1, const LocalTensor<V>& condition, const uint32_t count)
 ```
 
 ## 参数说明

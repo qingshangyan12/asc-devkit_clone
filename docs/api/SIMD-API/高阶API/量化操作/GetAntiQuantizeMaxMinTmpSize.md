@@ -10,9 +10,7 @@ kernel侧AntiQuantize接口的计算需要开发者预留/申请临时空间，�
 ## 函数原型
 
 ```
-void GetAntiQuantizeMaxMinTmpSize(
-    const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType,
-    ge::DataType outputDataType, uint32_t& maxValue, uint32_t& minValue)
+void GetAntiQuantizeMaxMinTmpSize(const ge::Shape& srcShape, const ge::Shape& scaleShape, bool isTranspose, ge::DataType inputDataType, ge::DataType outputDataType, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

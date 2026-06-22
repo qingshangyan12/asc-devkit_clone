@@ -53,21 +53,15 @@ LayerNormGrad Tiling的功能如下：
 ## 函数原型
 
 ```
-void GetLayerNormGradMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
-    uint32_t& minValue)
+void GetLayerNormGradMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ```
-void GetLayerNormGradNDTilingInfo(
-    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-    optiling::LayerNormGradTiling& tiling)
+void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormGradTiling& tiling)
 ```
 
 ```
-void GetLayerNormGradNDTilingInfo(
-    const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-    AscendC::tiling::LayerNormGradTiling& tiling)
+void GetLayerNormGradNDTilingInfo(const ge::Shape srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormGradTiling& tiling)
 ```
 
 ## 参数说明

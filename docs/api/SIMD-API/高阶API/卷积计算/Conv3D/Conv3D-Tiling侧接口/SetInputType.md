@@ -7,8 +7,7 @@
 ## 函数原型
 
 ```
-void SetInputType(
-    const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
+void SetInputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
 ```
 
 ## 参数说明

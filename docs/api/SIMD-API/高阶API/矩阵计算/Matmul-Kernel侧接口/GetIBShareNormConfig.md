@@ -23,10 +23,7 @@
 ## 函数原型
 
 ```
-__aicore__ constexpr MatmulConfig GetIBShareNormConfig(
-    const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false,
-    const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isDoubleCache = false,
-    const bool enUnitFlag = true)
+__aicore__ constexpr MatmulConfig GetIBShareNormConfig(const bool intrinsicsLimit = false, const bool batchLoop = false, const bool isVecND2NZ = false, const BatchMode bmmMode = BatchMode::BATCH_LESS_THAN_L1, const bool isDoubleCache = false, const bool enUnitFlag = true)
 ```
 
 ## 参数说明

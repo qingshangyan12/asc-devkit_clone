@@ -41,20 +41,15 @@
 - 通过sharedTmpBuffer入参传入临时空间
 
     ```
-    template <
-        typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
-    __aicore__ inline void Mean(
-        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const MeanParams& meanParams)
+    template <typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
+    __aicore__ inline void Mean(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const MeanParams& meanParams)
     ```
 
 - 接口框架申请临时空间
 
     ```
-    template <
-        typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
-    __aicore__ inline void Mean(
-        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const MeanParams& meanParams)
+    template <typename T, typename accType = T, bool isReuseSource = false, bool isBasicBlock = false, int32_t reduceDim = -1>
+    __aicore__ inline void Mean(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const MeanParams& meanParams)
     ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -117,10 +112,11 @@ meanParams.outter = outter;
 meanParams.n = n;
 // inner = (n * sizeof(half) + 32 - 1)/32 * 32 / sizeof(half) = 16
 meanParams.inner = inner;
-// T为half，accTypes为实际计算的类型这里是half
-// dstLocal输出数据，srcLocal输入数据，tmplocalTensor用户传入的临时缓存AscendC::Mean<T, accType>(dstLocal, srcLocal,
-// tmplocalTensor, meanParams) 也可不使用tmplocalTensor。调用如下 AscendC::Mean<T, accType>(dstLocal, srcLocal,
-// meanParams);
+// T为half，accTypes为实际计算的类型，这里是half
+// dstLocal输出数据，srcLocal输入数据，tmplocalTensor用户传入的临时缓存
+// AscendC::Mean<T, accType>(dstLocal, srcLocal,tmplocalTensor, meanParams)
+// 也可不使用tmplocalTensor。
+// 调用如下 AscendC::Mean<T, accType>(dstLocal, srcLocal, meanParams);
 ```
 
 结果示例如下：

@@ -7,8 +7,7 @@
 ## 函数原型
 
 ```
-void SetOutputType(
-    const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
+void SetOutputType(const ConvCommonApi::TPosition pos, const ConvCommonApi::ConvFormat format, const ConvCommonApi::ConvDtype dtype)
 ```
 
 ## 参数说明

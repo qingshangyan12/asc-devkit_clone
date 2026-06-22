@@ -56,9 +56,7 @@
 ## 函数原型
 
 ```
-template <
-    class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM,
-    class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
+template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE = C_TYPE, const auto& MM_CFG = CFG_NORM, class MM_CB = MatmulCallBackFunc<nullptr, nullptr, nullptr>, MATMUL_POLICY_DEFAULT_OF(MatmulPolicy)>
 using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>;
 ```
 
@@ -80,9 +78,9 @@ using Matmul = AscendC::MatmulImpl<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM
     MATMUL\_POLICY\_DEFAULT\_OF定义如下，用于简化MATMUL\_POLICY的类型声明。该模板参数的详细使用方式请参考[MatmulPolicy](MatmulPolicy.md)。
 
     ```
-    #define MATMUL_POLICY_DEFAULT_OF(DEFAULT)        \
-        template <const auto& = MM_CFG, typename...> \
-        class MATMUL_POLICY = AscendC::Impl::Detail::DEFAULT
+    #define MATMUL_POLICY_DEFAULT_OF(DEFAULT)      \
+    template <const auto& = MM_CFG, typename ...>  \
+            class MATMUL_POLICY = AscendC::Impl::Detail::DEFAULT
     ```
 
 ## 参数说明

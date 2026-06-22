@@ -41,7 +41,7 @@
 ## 函数原型
 
 ```
-template <typename T, typename U>
+template<typename T, typename U>
 __aicore__ inline void IsFinite(const LocalTensor<U>& dst, const LocalTensor<T>& src, uint32_t calCount)
 ```
 

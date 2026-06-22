@@ -7,8 +7,7 @@
 ## 函数原型
 
 ```
-int32_t MultiCoreMatmulGetTmpBufSizeV2(
-    AscendC::tiling::TCubeTiling& tiling, matmul_tiling::SysTilingTempBufSize& bufSize)
+int32_t MultiCoreMatmulGetTmpBufSizeV2(AscendC::tiling::TCubeTiling& tiling, matmul_tiling::SysTilingTempBufSize& bufSize)
 ```
 
 ## 参数说明
