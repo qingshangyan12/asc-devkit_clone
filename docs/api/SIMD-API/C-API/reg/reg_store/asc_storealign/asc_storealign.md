@@ -182,8 +182,11 @@ asc_storealign(dst, src, offset);
 
 ## 其他搬出模式
 
-- **[asc_storealign_first](asc_storealign_first.md)** - FIRST搬出模式
+- **[asc_storealign_1st](asc_storealign_1st.md)** - FIRST搬出模式
 - **[asc_storealign_pack](asc_storealign_pack.md)** - PACK搬出模式
 - **[asc_storealign_pack_quarter](asc_storealign_pack_quarter.md)** - PACK_QUARTER搬出模式
 - **[asc_storealign_intlv](asc_storealign_intlv.md)** - INTLV搬出模式
 - **[asc_storealign_postupdate](asc_storealign_postupdate.md)** - PostUpdate搬出模式
+ - **[asc_storealign_1st_postupdate](asc_storealign_1st_postupdate.md)** - FIRST_PostUpdate搬出模式
+ - **[asc_storealign_pack_postupdate](asc_storealign_pack_postupdate.md)** - PACK_PostUpdate搬出模式
+ - **[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)** - PACK_QUARTER_PostUpdate搬出模式

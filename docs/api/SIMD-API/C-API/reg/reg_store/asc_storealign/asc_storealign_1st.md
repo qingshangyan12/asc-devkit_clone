@@ -1,4 +1,4 @@
-# asc_storealign_first
+# asc_storealign_1st
 
 ## 产品支持情况
 
@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-FIRST搬出模式，忽略mask，向dst_align32b中搬运src第一个元素，支持数据类型为b8、b16、b32。支持多种偏移/地址变体。
+FIRST搬出模式，忽略mask，向dst_align32b中搬运src第一个元素，支持数据类型为b8、b16、b32。支持多种偏移/地址变体。Post Update模式请参见[asc_storealign_1st_postupdate](asc_storealign_1st_postupdate.md)。
 
 ## 函数原型
 
@@ -68,15 +68,6 @@ __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align
 __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, int32_t offset)
 
 // 硬件自动Post Update模式
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int8_t* dst_align32b, vector_int8_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int16_t* dst_align32b, vector_int16_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  int32_t* dst_align32b, vector_int32_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  half* dst_align32b, vector_half src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  float* dst_align32b, vector_float src, int32_t offset)
-__simd_callee__ inline void asc_storealign_1st_postupdate(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, int32_t offset)
 ```
 
 ## 参数说明
@@ -113,5 +104,4 @@ asc_storealign_1st(dst_align32b, src);
 __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
 vector_half src;
 int32_t offset = 128;
-asc_storealign_1st_postupdate(dst_align32b, src, offset);
 ```
