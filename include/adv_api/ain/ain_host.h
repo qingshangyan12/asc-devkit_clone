@@ -22,7 +22,6 @@
 #include "hccl/hccl_types.h"
 #include "hccl/hccl_res.h"
 #include "hcomm/hcomm_res.h"
-#include "hcomm/hcomm_res_entity_defs.h"
 
 /*!
  * @brief Opaque handle to a registered symmetric communication window.
