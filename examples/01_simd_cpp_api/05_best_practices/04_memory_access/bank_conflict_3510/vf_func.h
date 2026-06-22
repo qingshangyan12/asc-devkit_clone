@@ -40,18 +40,18 @@ __simd_vf__ inline void AddWithoutUnRollVF(__ubuf__ T* src0, __ubuf__ T* src1, _
 }
 
 template <typename T>
-__simd_vf__ inline void AddWithInstrLoadVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
+__simd_vf__ inline void ComputeBoundVF(__ubuf__ T* src0, __ubuf__ T* src1, __ubuf__ T* dst)
 {
     AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    AscendC::Reg::RegTensor<T> reg0, reg1, reg2, reg3, reg4, reg5;
-    constexpr uint16_t mainRepeatTimes = repeatTimes / 2;
-    for (uint16_t i = 0; i < mainRepeatTimes; ++i) {
-        AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B32>(reg0, reg1, src0 + oneRepSize * 2 * i);
-        AscendC::Reg::LoadAlign<T, AscendC::Reg::LoadDist::DIST_DINTLV_B32>(reg3, reg4, src1 + oneRepSize * 2 * i);
+    AscendC::Reg::RegTensor<T> reg0, reg1, reg2;
+    for (uint16_t i = 0; i < repeatTimes; ++i) {
+        AscendC::Reg::LoadAlign(reg0, src0 + oneRepSize * i);
+        AscendC::Reg::LoadAlign(reg1, src1 + oneRepSize * i);
+        for (uint16_t j = 0; j < 1000; ++j) {
+            AscendC::Reg::Adds(reg0, reg0, (T)1.0, mask);
+        }
         AscendC::Reg::Add(reg2, reg0, reg1, mask);
-        AscendC::Reg::Add(reg5, reg3, reg4, mask);
         AscendC::Reg::StoreAlign(dst + oneRepSize * i, reg2, mask);
-        AscendC::Reg::StoreAlign(dst + oneRepSize * (mainRepeatTimes + i), reg5, mask);
     }
 }
 
