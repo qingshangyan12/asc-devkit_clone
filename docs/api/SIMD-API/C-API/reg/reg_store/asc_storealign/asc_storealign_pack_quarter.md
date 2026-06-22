@@ -8,7 +8,7 @@
 
 ## 功能说明
 
-四分之一压缩模式，根据mask将src中有效元素的低8bits数据连续存储于dst_align32b中，支持数据类型为b32。支持多种偏移/地址变体。
+四分之一压缩模式，根据mask将src中有效元素的低8bits数据连续存储于dst_align32b中，支持数据类型为b32。支持多种偏移/地址变体。Post Update模式请参见[asc_storealign_pack_quarter_postupdate](asc_storealign_pack_quarter_postupdate.md)。
 
 ## 函数原型
 
@@ -28,10 +28,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  int32_t* dst_a
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
 __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__  float* dst_align32b, vector_float src, int32_t offset, vector_bool mask)
 
-// 硬件自动Post Update模式
-__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__  int32_t* dst_align32b, vector_int32_t src, int32_t offset, vector_bool mask)
-__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, int32_t offset, vector_bool mask)
-__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__  float* dst_align32b, vector_float src, int32_t offset, vector_bool mask)
 ```
 
 ## 参数说明
@@ -66,10 +62,4 @@ vector_int32_t src;
 vector_bool mask = asc_create_mask_b32(PAT_ALL);
 asc_storealign_pack_quarter(dst_align32b, src, mask);
 
-// 硬件自动Post Update
-__ubuf__ int32_t* dst_align32b = (__ubuf__ int32_t*)asc_get_phy_buf_addr(0);
-vector_int32_t src;
-vector_bool mask = asc_create_mask_b32(PAT_ALL);
-int32_t offset = 128;
-asc_storealign_pack_quarter_postupdate(dst_align32b, src, offset, mask);
 ```
