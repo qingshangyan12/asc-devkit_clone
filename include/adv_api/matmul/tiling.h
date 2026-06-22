@@ -14,7 +14,7 @@
  */
 #ifndef LIB_MATMUL_TILING_H
 #define LIB_MATMUL_TILING_H
-#include "kernel_basic_intf.h"
+#include "basic_api/kernel_basic_intf.h"
 #include "../../../impl/adv_api/detail/matmul/utils/matmul_config_impl.h"
 
 /**
