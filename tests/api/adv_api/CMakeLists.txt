@@ -23,7 +23,6 @@ set(ASCENDC_DEP_HEADER_DIR
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/base
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base
-    ${ASCEND_CANN_PACKAGE_PATH}/toolkit/tools/tikicpulib/lib/include
     ${CMAKE_BINARY_DIR}
     ${ASCENDC_UTILS_INCLUDE}
 )
@@ -38,7 +37,34 @@ set(ASCENDC_TEST_HEADER_FILES
     ${ASCENDC_DIR}/impl
     ${ASCENDC_DIR}/impl/basic_api
 )
+# 假设这些路径存储在变量中
+set(INCLUDE_PATHS
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/lib/include
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../include
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/impl
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/tikcpp/tikcfw/interface
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/impl/
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../compiler/ascendc/include/highlevel_api/lib/matmul
+    /home/jenkins/Ascend/cann-9.1.0/toolkit/tools/tikicpulib/../../include/base
+)
 
+foreach(include_path ${INCLUDE_PATHS})
+    message(STATUS "===================== ${include_path} =====================")
+    
+    # 列出该路径下的所有文件（递归）
+    file(GLOB_RECURSE files "${include_path}/*")
+    
+    if(files)
+        message(STATUS "Found ${files} files:")
+        foreach(file ${files})
+            message(STATUS "  ${file}")
+        endforeach()
+    else()
+        message(STATUS "No files found or path does not exist")
+    endif()
+endforeach()
 # # ================ adv_api kernel ut ================
 # ascend610 test cases
 file(GLOB ASCENDC_TEST_ascend610_CASE_SRC_FILES
