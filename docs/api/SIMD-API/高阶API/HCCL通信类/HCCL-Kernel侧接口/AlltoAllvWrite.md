@@ -84,8 +84,8 @@ extern "C" __global__ __aicore__ void alltoallvwrite_custom(
     GM_ADDR sendOffsetGM_ = sendSizeGM_ + rankDim * sizeof(uint64_t) * 2;
     __gm__ uint64_t* sendSizes = reinterpret_cast<__gm__ uint64_t*>(sendSizeGM_);
     __gm__ uint64_t* sendOffsets = reinterpret_cast<__gm__ uint64_t*>(sendOffsetGM_);
-    for (uint32_t i = 0U; i < rankDim;
-         i++) { // 当前ccu通信都是双die，所以sendSize和sendOffset需要等分切成die0和die1的数据
+    // 当前ccu通信都是双die，所以sendSize和sendOffset需要等分切成die0和die1的数据
+    for (uint32_t i = 0U; i < rankDim; i++) { 
         sendSizes[i] = perRankDataSize_ / 2;
         sendSizes[i + rankDim] = perRankDataSize_ - perRankDataSize_ / 2;
         sendOffsets[i] = i * perRankDataSize_;

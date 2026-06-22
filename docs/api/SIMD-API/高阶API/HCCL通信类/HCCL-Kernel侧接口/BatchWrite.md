@@ -104,41 +104,39 @@ struct BatchWriteItem {
         GET_TILING_DATA_WITH_STRUCT(BatchWriteCustomTilingData, tilingData, tilingGM);
         GM_ADDR contextGM = AscendC::GetHcclContext<0>();
 
-        if constexpr (g_coreType == AscendC::AIV)
-             
-            {
-                Hccl hccl;
-                hccl.InitV2(contextGM, &tilingData);
-                hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
+        if constexpr (g_coreType == AscendC::AIV) {
+            Hccl hccl;
+            hccl.InitV2(contextGM, &tilingData);
+            hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
 
-                __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(workspace);
+            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(workspace);
 
-                // 需要提前将待发送的数据从inputGM搬运到localBuf所填的window地址上
-                sendInfo->localBuf = hccl.GetWindowsOutAddr(hccl.GetRankId());
-                // 对端的接收地址也要是window地址，接收端需要考虑是否搬运到输出或者workspace上
-                sendInfo->remoteBuf = hccl.GetWindowsInAddr(2U);
-                sendInfo->count = 16U;
-                sendInfo->dataType = HcclDataType::HCCL_DATA_TYPE_FP16;
-                sendInfo->remoteRankId = 2U;
+            // 需要提前将待发送的数据从inputGM搬运到localBuf所填的window地址上
+            sendInfo->localBuf = hccl.GetWindowsOutAddr(hccl.GetRankId());
+            // 对端的接收地址也要是window地址，接收端需要考虑是否搬运到输出或者workspace上
+            sendInfo->remoteBuf = hccl.GetWindowsInAddr(2U);
+            sendInfo->count = 16U;
+            sendInfo->dataType = HcclDataType::HCCL_DATA_TYPE_FP16;
+            sendInfo->remoteRankId = 2U;
 
-                // 可以组装多个通信任务，实现批量发送
-                (sendInfo + 1)->localBuf = hccl.GetWindowsOutAddr(hccl.GetRankId());
-                (sendInfo + 1)->remoteBuf = hccl.GetWindowsInAddr(3U);
-                (sendInfo + 1)->count = 32U;
-                (sendInfo + 1)->dataType = HcclDataType::HCCL_DATA_TYPE_BFP16;
-                (sendInfo + 1)->remoteRankId = 3U;
+            // 可以组装多个通信任务，实现批量发送
+            (sendInfo + 1)->localBuf = hccl.GetWindowsOutAddr(hccl.GetRankId());
+            (sendInfo + 1)->remoteBuf = hccl.GetWindowsInAddr(3U);
+            (sendInfo + 1)->count = 32U;
+            (sendInfo + 1)->dataType = HcclDataType::HCCL_DATA_TYPE_BFP16;
+            (sendInfo + 1)->remoteRankId = 3U;
 
-                // 确保cache中的数据已刷新到GM地址上
-                GlobalTensor<int64_t> tempTensor;
-                tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
-                DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            // 确保cache中的数据已刷新到GM地址上
+            GlobalTensor<int64_t> tempTensor;
+            tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
+            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
 
-                auto handleId = hccl.BatchWrite<true>(sendInfo, 2U);
-                // wait仅表示本端发送完毕，对端是否接收到数据需要在对端判断
-                hccl.Wait(handleId);
-                AscendC::SyncAll();
-                hccl.Finalize();
-            }
+            auto handleId = hccl.BatchWrite<true>(sendInfo, 2U);
+            // wait仅表示本端发送完毕，对端是否接收到数据需要在对端判断
+            hccl.Wait(handleId);
+            AscendC::SyncAll();
+            hccl.Finalize();
+        }
     }
     ```
 
@@ -191,49 +189,47 @@ struct BatchWriteItem {
         GET_TILING_DATA_WITH_STRUCT(BatchWriteCustomTilingData, tilingData, tilingGM);
         GM_ADDR contextGM = AscendC::GetHcclContext<0>();
 
-        if constexpr (g_coreType == AscendC::AIV)
-             
-            {
-                Hccl hccl;
-                hccl.InitV2(contextGM, &tilingData);
-                hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
+        if constexpr (g_coreType == AscendC::AIV) {
+            Hccl hccl;
+            hccl.InitV2(contextGM, &tilingData);
+            hccl.SetCcTilingV2(offsetof(BatchWriteCustomTilingData, mc2CcTiling));
 
-                __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(inputGM);
+            __gm__ BatchWriteItem* sendInfo = reinterpret_cast<__gm__ BatchWriteItem*>(inputGM);
 
-                sendInfo->type = 0UL;
-                sendInfo->length = 64U;
-                sendInfo->srcAddrLow = static_cast<uint32_t>((uint64_t)(inputGM) & 0xFFFFFFFF);
-                sendInfo->srcAddrHigh = static_cast<uint32_t>(((uint64_t)(inputGM) >> 32) & 0xFFFFFFFF);
-                sendInfo->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM1) & 0xFFFFFFFF);
-                sendInfo->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM1) >> 32) & 0xFFFFFFFF);
+            sendInfo->type = 0UL;
+            sendInfo->length = 64U;
+            sendInfo->srcAddrLow = static_cast<uint32_t>((uint64_t)(inputGM) & 0xFFFFFFFF);
+            sendInfo->srcAddrHigh = static_cast<uint32_t>(((uint64_t)(inputGM) >> 32) & 0xFFFFFFFF);
+            sendInfo->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM1) & 0xFFFFFFFF);
+            sendInfo->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM1) >> 32) & 0xFFFFFFFF);
 
-                // 可以组装多个通信任务，实现批量发送
-                (sendInfo + 1)->type = 0UL;
-                (sendInfo + 1)->length = 64U;
-                (sendInfo + 1)->srcAddrLow = static_cast<uint32_t>((uint64_t)(inputGM) & 0xFFFFFFFF);
-                (sendInfo + 1)->srcAddrHigh = static_cast<uint32_t>(((uint64_t)(inputGM) >> 32) & 0xFFFFFFFF);
-                (sendInfo + 1)->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM2) & 0xFFFFFFFF);
-                (sendInfo + 1)->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM2) >> 32) & 0xFFFFFFFF);
+            // 可以组装多个通信任务，实现批量发送
+            (sendInfo + 1)->type = 0UL;
+            (sendInfo + 1)->length = 64U;
+            (sendInfo + 1)->srcAddrLow = static_cast<uint32_t>((uint64_t)(inputGM) & 0xFFFFFFFF);
+            (sendInfo + 1)->srcAddrHigh = static_cast<uint32_t>(((uint64_t)(inputGM) >> 32) & 0xFFFFFFFF);
+            (sendInfo + 1)->dstAddrLow = static_cast<uint32_t>((uint64_t)(outputGM2) & 0xFFFFFFFF);
+            (sendInfo + 1)->dstAddrHigh = static_cast<uint32_t>(((uint64_t)(outputGM2) >> 32) & 0xFFFFFFFF);
 
-                // 确保cache中的数据已刷新到GM地址上
-                GlobalTensor<int64_t> tempTensor;
-                tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
-                DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
+            // 确保cache中的数据已刷新到GM地址上
+            GlobalTensor<int64_t> tempTensor;
+            tempTensor.SetGlobalBuffer((__gm__ int64_t*)sendInfo);
+            DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(tempTensor);
 
-                // 分别将两次拷贝部署在队列0、队列1上
-                auto handleId0 = hccl.BatchWrite<true>(sendInfo, 1U, 0U);
-                auto handleId1 = hccl.BatchWrite<true>(sendInfo, 1U, 1U);
+            // 分别将两次拷贝部署在队列0、队列1上
+            auto handleId0 = hccl.BatchWrite<true>(sendInfo, 1U, 0U);
+            auto handleId1 = hccl.BatchWrite<true>(sendInfo, 1U, 1U);
 
-                // 在所有队列上阻塞BatchWrite通信任务，所有队列将等到通信任务全部完成后再继续往下执行，实现所有队列的同步
-                const uint16_t queueNum = hccl.GetQueueNum();
-                for (uint16_t i = 0U; i < queueNum; ++i) {
-                    hccl.QueueBarrier<ScopeType::ALL>(i);
-                }
-
-                // Finalize可以无需等待服务端的通信任务全部完成即可退出，尽早释放AIV核心资源
-                hccl.Finalize<false>();
-                AscendC::SyncAll();
+            // 在所有队列上阻塞BatchWrite通信任务，所有队列将等到通信任务全部完成后再继续往下执行，实现所有队列的同步
+            const uint16_t queueNum = hccl.GetQueueNum();
+            for (uint16_t i = 0U; i < queueNum; ++i) {
+                hccl.QueueBarrier<ScopeType::ALL>(i);
             }
+
+            // Finalize可以无需等待服务端的通信任务全部完成即可退出，尽早释放AIV核心资源
+            hccl.Finalize<false>();
+            AscendC::SyncAll();
+        }
     }
     ```
 

@@ -38,6 +38,6 @@ conv3dApiTiling.SetOrgInputShape(orgCi, orgDi, orgHi, orgWi);
 conv3dApiTiling.SetOrgWeightShape(cout, kd, kh, kw);
 conv3dApiTiling.SetSingleWeightShape(singleCi, singleKd, singleKh, singleKw);
 conv3dApiTiling.SetSingleOutputShape(singleCo, singleDo, singleM);
-... conv3dApiTiling.GetTiling(tilingData.conv3ApiTilingData);
+...
+conv3dApiTiling.GetTiling(tilingData.conv3ApiTilingData);
 ```
-
