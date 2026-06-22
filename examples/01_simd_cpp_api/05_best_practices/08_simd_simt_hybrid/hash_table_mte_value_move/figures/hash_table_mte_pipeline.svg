@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1040" viewBox="0 0 1800 1040">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#1f2937"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#059669"/>
+    </marker>
+    <filter id="softShadow" x="-5%" y="-10%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .title { font-family: Lato, Arial, sans-serif; font-size: 36px; font-weight: 800; fill: #111827; }
+      .subtitle { font-family: Lato, Arial, sans-serif; font-size: 20px; font-weight: 500; fill: #4b5563; }
+      .caseTitle { font-family: Lato, Arial, sans-serif; font-size: 24px; font-weight: 800; fill: #111827; }
+      .caseNote { font-family: Lato, Arial, sans-serif; font-size: 16px; font-weight: 500; fill: #4b5563; }
+      .boxText { font-family: Lato, Arial, sans-serif; font-size: 17px; font-weight: 700; fill: #111827; }
+      .smallText { font-family: Lato, Arial, sans-serif; font-size: 14px; font-weight: 600; fill: #374151; }
+      .tinyText { font-family: Lato, Arial, sans-serif; font-size: 12px; font-weight: 600; fill: #4b5563; }
+      .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 13px; font-weight: 700; fill: #1f2937; }
+      .lane { stroke: #d1d5db; stroke-width: 1.2; stroke-dasharray: 5 6; }
+      .axis { stroke: #9ca3af; stroke-width: 1.4; marker-end: url(#arrow); }
+      .flow { stroke: #1f2937; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .flowBlue { stroke: #2563eb; stroke-width: 2.4; fill: none; marker-end: url(#arrowBlue); }
+      .flowGreen { stroke: #059669; stroke-width: 2.4; fill: none; marker-end: url(#arrowGreen); }
+      .copy { fill: #dbeafe; stroke: #2563eb; stroke-width: 1.8; filter: url(#softShadow); }
+      .simt { fill: #fef3c7; stroke: #d97706; stroke-width: 1.8; filter: url(#softShadow); }
+      .mte { fill: #dcfce7; stroke: #059669; stroke-width: 1.8; filter: url(#softShadow); }
+      .publish { fill: #fee2e2; stroke: #dc2626; stroke-width: 1.8; filter: url(#softShadow); }
+      .buffer { fill: #ede9fe; stroke: #7c3aed; stroke-width: 1.8; filter: url(#softShadow); }
+      .gm { fill: #f3f4f6; stroke: #6b7280; stroke-width: 1.6; filter: url(#softShadow); }
+      .panel { fill: #ffffff; stroke: #d1d5db; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1800" height="1040" fill="#ffffff"/>
+  <text x="70" y="62" class="title">HashTable insert_or_assign: value movement optimization paths</text>
+  <text x="70" y="96" class="subtitle">SIMT handles hash/probe/CAS control flow; MTE accelerates contiguous value-vector movement and key publication order is preserved.</text>
+
+  <line x1="255" y1="140" x2="1695" y2="140" class="axis"/>
+  <text x="1660" y="124" class="smallText">time</text>
+
+  <g transform="translate(70,165)">
+    <rect x="0" y="0" width="1660" height="215" rx="8" class="panel"/>
+    <text x="24" y="38" class="caseTitle">Case 0: SIMT group direct value store</text>
+    <text x="24" y="66" class="caseNote">Baseline: one SIMT group owns one key; lanes directly read/write GM value elements.</text>
+    <line x1="235" y1="100" x2="1615" y2="100" class="lane"/>
+    <text x="24" y="107" class="smallText">SIMT lanes</text>
+    <rect x="250" y="70" width="210" height="62" rx="7" class="simt"/>
+    <text x="275" y="96" class="boxText">hash / probe / CAS</text>
+    <text x="295" y="118" class="tinyText">lane 0 locks bucket</text>
+    <path d="M460 101 H525" class="flow"/>
+    <rect x="525" y="70" width="310" height="62" rx="7" class="simt"/>
+    <text x="562" y="96" class="boxText">SIMT GM value store</text>
+    <text x="575" y="118" class="tinyText">32 lanes shard value[dim]</text>
+    <path d="M835 101 H900" class="flow"/>
+    <rect x="900" y="70" width="175" height="62" rx="7" class="publish"/>
+    <text x="933" y="96" class="boxText">publish key</text>
+    <text x="930" y="118" class="tinyText">after value write</text>
+    <rect x="1135" y="58" width="410" height="86" rx="7" class="gm"/>
+    <text x="1170" y="91" class="boxText">GM hash table</text>
+    <text x="1170" y="115" class="smallText">bucket key + values[capacity, dim]</text>
+    <path d="M1075 101 H1135" class="flow"/>
+    <text x="250" y="173" class="smallText">Optimization limit: value movement is mixed into SIMT control flow.</text>
+  </g>
+
+  <g transform="translate(70,420)">
+    <rect x="0" y="0" width="1660" height="250" rx="8" class="panel"/>
+    <text x="24" y="38" class="caseTitle">Case 1: two-stage MTE value movement</text>
+    <text x="24" y="66" class="caseNote">SIMT first locks buckets and writes a GM task list; a second kernel uses MTE for GM -> UB -> GM movement.</text>
+    <line x1="235" y1="102" x2="1615" y2="102" class="lane"/>
+    <line x1="235" y1="175" x2="1615" y2="175" class="lane"/>
+    <text x="24" y="109" class="smallText">Kernel 1</text>
+    <text x="24" y="182" class="smallText">Kernel 2</text>
+    <rect x="250" y="72" width="225" height="62" rx="7" class="simt"/>
+    <text x="283" y="98" class="boxText">SIMT probe/CAS</text>
+    <text x="290" y="120" class="tinyText">lock destination bucket</text>
+    <path d="M475 103 H548" class="flow"/>
+    <rect x="548" y="72" width="230" height="62" rx="7" class="buffer"/>
+    <text x="582" y="98" class="boxText">GM bucketIndices</text>
+    <text x="595" y="120" class="tinyText">inter-kernel handoff</text>
+    <path d="M663 134 V145 H305 V162" class="flowBlue"/>
+    <rect x="250" y="145" width="220" height="62" rx="7" class="mte"/>
+    <text x="300" y="171" class="boxText">MTE2 copy in</text>
+    <text x="292" y="193" class="tinyText">values GM -> UB</text>
+    <path d="M470 176 H535" class="flowGreen"/>
+    <rect x="535" y="145" width="255" height="62" rx="7" class="mte"/>
+    <text x="585" y="171" class="boxText">MTE3 copy out</text>
+    <text x="570" y="193" class="tinyText">UB -> scattered value slots</text>
+    <path d="M790 176 H855" class="flowGreen"/>
+    <rect x="855" y="145" width="175" height="62" rx="7" class="publish"/>
+    <text x="888" y="171" class="boxText">publish key</text>
+    <text x="885" y="193" class="tinyText">after MTE3 wait</text>
+    <rect x="1095" y="132" width="410" height="86" rx="7" class="gm"/>
+    <text x="1130" y="165" class="boxText">GM hash table</text>
+    <text x="1130" y="189" class="smallText">same publication semantics as Case 0</text>
+    <path d="M1030 176 H1095" class="flow"/>
+    <text x="250" y="230" class="smallText">Optimization: value copy moves to MTE, but kernel boundary and GM task handoff remain.</text>
+  </g>
+
+  <g transform="translate(70,715)">
+    <rect x="0" y="0" width="1660" height="255" rx="8" class="panel"/>
+    <text x="24" y="38" class="caseTitle">Case 2: in-kernel MTETaskQueue with task-id ring</text>
+    <text x="24" y="66" class="caseNote">SIMT producer and MTE consumer run in one kernel; assignId/finishId drive a UB task ring and value-buffer pipeline.</text>
+    <line x1="235" y1="106" x2="1615" y2="106" class="lane"/>
+    <line x1="235" y1="178" x2="1615" y2="178" class="lane"/>
+    <text x="24" y="113" class="smallText">SIMT producer</text>
+    <text x="24" y="185" class="smallText">MTE consumer</text>
+    <rect x="250" y="76" width="215" height="62" rx="7" class="simt"/>
+    <text x="286" y="102" class="boxText">probe/CAS tasks</text>
+    <text x="282" y="124" class="tinyText">lock bucket, assignId++</text>
+    <path d="M465 107 H535" class="flow"/>
+    <rect x="535" y="70" width="310" height="74" rx="7" class="buffer"/>
+    <text x="575" y="98" class="boxText">UB task-id ring queue</text>
+    <text x="576" y="121" class="mono">keyIdx | bucketIdx | key</text>
+    <path d="M690 144 V153" class="flowBlue"/>
+    <rect x="535" y="153" width="210" height="62" rx="7" class="mte"/>
+    <text x="582" y="179" class="boxText">MTE2 copy in</text>
+    <text x="572" y="201" class="tinyText">next task batch</text>
+    <path d="M745 184 H815" class="flowGreen"/>
+    <rect x="815" y="153" width="235" height="62" rx="7" class="mte"/>
+    <text x="865" y="179" class="boxText">MTE3 copy out</text>
+    <text x="852" y="201" class="tinyText">current task batch</text>
+    <path d="M1050 184 H1118" class="flowGreen"/>
+    <rect x="1118" y="153" width="178" height="62" rx="7" class="publish"/>
+    <text x="1150" y="179" class="boxText">publish key</text>
+    <text x="1146" y="201" class="tinyText">finishId advances</text>
+    <path d="M845 107 C925 77, 1050 77, 1118 106" class="flowBlue"/>
+    <text x="930" y="91" class="tinyText">producer fills free ring slots while MTE3 is in flight</text>
+    <rect x="1345" y="141" width="220" height="86" rx="7" class="gm"/>
+    <text x="1380" y="174" class="boxText">GM hash table</text>
+    <text x="1370" y="198" class="smallText">values complete before key</text>
+    <path d="M1296 184 H1345" class="flow"/>
+    <text x="250" y="235" class="smallText">Optimization: removes GM task handoff and overlaps SIMT task production with MTE2/MTE3 movement.</text>
+  </g>
+
+  <g transform="translate(1250,34)">
+    <rect x="0" y="0" width="460" height="90" rx="8" fill="#ffffff" stroke="#d1d5db"/>
+    <rect x="18" y="19" width="28" height="18" rx="4" class="simt"/>
+    <text x="56" y="34" class="tinyText">SIMT hash / probe / CAS</text>
+    <rect x="18" y="52" width="28" height="18" rx="4" class="mte"/>
+    <text x="56" y="67" class="tinyText">MTE GM -> UB -> GM value movement</text>
+    <rect x="245" y="19" width="28" height="18" rx="4" class="buffer"/>
+    <text x="283" y="34" class="tinyText">task buffer / ring</text>
+    <rect x="245" y="52" width="28" height="18" rx="4" class="publish"/>
+    <text x="283" y="67" class="tinyText">key publication</text>
+  </g>
+</svg>
