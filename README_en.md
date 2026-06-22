@@ -127,7 +127,7 @@ If you want to quickly experience project build and operator sample execution, a
 
   ```json
   {
-    "clangd.path": "/usr/bin/clangd",
+    "clangd.path": "/usr/bin/clangd-15",
     "clangd.arguments": [
         "--background-index=0",
         "--clang-tidy=0"
@@ -137,6 +137,14 @@ If you want to quickly experience project build and operator sample execution, a
   ```
 
 - Configure `.clangd` in the project root directory (example). The complete `.clangd` file is provided in this directory. CANN header file directories need to be replaced with actual installation locations. The default in `.clangd` is `/usr/local/Ascend`.
+
+  If CANN is installed in a non-default path, or if you need to switch the NPU architecture macro, generate a local config from `.clangd.in`:
+
+  ```bash
+  python3 scripts/setup_clangd.py --cann-root /path/to/cann --npu-arch 2201 --output .clangd.local
+  ```
+
+  The generated file defaults to `.clangd.local` and does not overwrite the built-in `.clangd`. To make project-level clangd config take effect, copy it to `.clangd` as needed and restart clangd.
 
   ```yaml
   CompileFlags:
