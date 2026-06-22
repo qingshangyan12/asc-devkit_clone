@@ -275,15 +275,11 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 
 ### 地址解码
 
-| 操作数 | 首地址 | 18位二进制（DEPTH BANK BG WIDTH） | bank_id | bank_group_id
-| --- | --- | --- | --- | --- |
-| src0 | `0x0000` | `000000000 0 000 00000` | 0 | 0 |
-| src1 | `0x5000` | `000101000 0 000 00000` | 0 | 0 |
-| dst | `0xA000` | `001010000 0 000 00000` | 0 | 0 |
+与Case 6一致。
 
 ### UB读写示意
 
-![case6——7](./figures/case6_7.png)
+与Case 6一致。
 
 ### 分析结论
 
@@ -407,15 +403,19 @@ Ascend 950PR/Ascend 950DT的UB 18位地址采用**低位交织**编码规则：
 1. Ascend 950PR/Ascend 950DT采用低位编址，地址交替分配到不同的存储模块，bank冲突场景少于Atlas A2/A3系列产品。
 2. Ascend 950PR/Ascend 950DT的bank冲突的开销小于Atlas A2/A3系列产品，两条指令发生bank冲突可以与其它指令达成并行。
 3. Ascend 950PR/Ascend 950DT上二读一写必然存在bank冲突，而在实际场景中，由于采用Regbase架构，UB读写频率降低，bank冲突往往为非瓶颈点。
-5. Case2对比Case3 -> 地址重叠无法消除bank冲突。
-6. Case11对比Case12 -> 使用非连续搬运接口时，DataBlock间隔256B时，全部落入同一bank group的不同depth行，性能劣化严重。**建议使用非连续对齐搬入/搬出接口时，DataBlock落在不同bank group**。
-7. Case13/Case14对比Case11 -> 使用非连续搬运接口时，repeat重叠或同一repeat内DataBlock重叠会被硬件优化，性能不劣化。
-8. Case10对比Case9 -> 使用离散与聚合API时，连续index跨subbank分散可减少冲突。**建议使用离散与聚合API时，数据跨bank分散**。
-4. Case6对比Case7 -> 使用循环展开能够提升性能。**使用连续对齐搬入/搬出接口时，可以通过循环展开可缓解读写冲突瓶颈**。
+4. Case2对比Case3 -> 地址重叠无法消除bank冲突。
+5. Case11对比Case12 -> 使用非连续搬运接口时，DataBlock间隔256B时，全部落入同一bank group的不同depth行，性能劣化严重。**建议使用非连续对齐搬入/搬出接口时，DataBlock落在不同bank group**。
+6. Case13/Case14对比Case11 -> 使用非连续搬运接口时，repeat重叠或同一repeat内DataBlock重叠会被硬件优化，性能不劣化。
+7. Case10对比Case9 -> 使用离散与聚合API时，连续index跨subbank分散可减少冲突。**建议使用离散与聚合API时，数据跨bank分散**。
+8. Case6对比Case7 -> 使用循环展开能够提升性能。**建议使用连续对齐搬入/搬出接口时，可以通过循环展开可缓解读写冲突瓶颈**。
     | case6流水 | case7流水 |
     | ---   | --- |
     | ![case6_trace](./figures/case6_trace.png) | ![case7_trace](./figures/case7_trace.png) |
-10. Case3对比Case1 -> 打点性能结合流水排布，二读一写场景下，bank冲突对读写的影响大于对读读的影响，结合trace流水加以证明。**使用连续对齐搬入/搬出接口进行二读一写时，尽量避免读写冲突**。
+9. Case8对比Case6 -> 当读写指令之间存在大量Reg计算指令时，读写指令冲突消失。**计算bound场景下，读写冲突率降低**。
+    | case6流水 | case8流水 |
+    | ---   | --- |
+    | ![case6_trace](./figures/case6_trace.png) | ![case8_trace](./figures/case8_trace.png) |
+10. Case3对比Case1 -> 打点性能结合流水排布，二读一写场景下，bank冲突对读写的影响大于对读读的影响，结合trace流水加以证明。**建议使用连续对齐搬入/搬出接口进行二读一写时，尽量避免读写冲突**。
     | case1流水 | case3流水 |
     | ---   | --- |
     | ![case1_trace](./figures/case1_trace.png) | ![rw_conflict](./figures/case3_trace.png) |
