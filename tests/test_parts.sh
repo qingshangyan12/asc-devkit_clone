@@ -23,6 +23,7 @@ adv_test_targets=(
     ascendc_ut_adv_api_tiling_ascend910B1_AIV
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIC
     ascendc_ut_adv_api_tiling_ascend950pr_9599_AIV
+    ascendc_ut_adv_api_kernel_ascend950pr_9599_AIV
 )
 
 adv_test_two_targets=(
