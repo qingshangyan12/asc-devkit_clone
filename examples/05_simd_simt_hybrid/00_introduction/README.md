@@ -8,4 +8,4 @@
 
 | 目录名称 | 功能描述 | 支持的产品 |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
-| [simt_simd_gather_and_adds](./simt_simd_gather_and_adds) |  基于SIMD和SIMT实现Gather和Adds融合计算 | Ascend 950PR/Ascend 950DT |
+| [simd_simt_gather_and_adds](./simd_simt_gather_and_adds) |  基于SIMD和SIMT实现Gather和Adds融合计算 | Ascend 950PR/Ascend 950DT |

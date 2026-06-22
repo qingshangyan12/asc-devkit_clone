@@ -13,7 +13,7 @@ This sample implements gather and adds computation based on SIMD and SIMT hybrid
 ## Directory Structure
 
 ```text
-├── simt_simd_gather_and_adds
+├── simd_simt_gather_and_adds
 │   ├── scripts
 │   │   ├── gen_data.py         // Input data and golden data generation script
 │   │   └── verify_result.py    // Golden data comparison file

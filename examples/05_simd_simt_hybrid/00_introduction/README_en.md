@@ -8,4 +8,4 @@ This directory provides introductory samples for Ascend C vector computation bas
 
 | Directory Name | Function Description | Supported Products |
 | ---------------| -------------------- | --- |
-| [simt_simd_gather_and_adds](./simt_simd_gather_and_adds) | Hybrid SIMD/SIMT implementation of gather and adds computation | Ascend 950PR/Ascend 950DT |
+| [simd_simt_gather_and_adds](./simd_simt_gather_and_adds) | Hybrid SIMD/SIMT implementation of gather and adds computation | Ascend 950PR/Ascend 950DT |

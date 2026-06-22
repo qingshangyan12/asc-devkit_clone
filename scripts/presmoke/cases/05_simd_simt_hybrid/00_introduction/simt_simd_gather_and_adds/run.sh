@@ -11,7 +11,7 @@
 
 set -euo pipefail
 
-CASE_REL=05_simd_simt_hybrid/00_introduction/simt_simd_gather_and_adds
+CASE_REL=05_simd_simt_hybrid/00_introduction/simd_simt_gather_and_adds
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"

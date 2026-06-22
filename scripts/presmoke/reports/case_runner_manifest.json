@@ -255,8 +255,8 @@
     ]
   },
   {
-    "case": "05_simd_simt_hybrid/00_introduction/simt_simd_gather_and_adds",
-    "runner": "scripts/presmoke/cases/05_simd_simt_hybrid/00_introduction/simt_simd_gather_and_adds/run.sh",
+    "case": "05_simd_simt_hybrid/00_introduction/simd_simt_gather_and_adds",
+    "runner": "scripts/presmoke/cases/05_simd_simt_hybrid/00_introduction/simd_simt_gather_and_adds/run.sh",
     "source": "readme",
     "confidence": "medium",
     "supported_archs": [

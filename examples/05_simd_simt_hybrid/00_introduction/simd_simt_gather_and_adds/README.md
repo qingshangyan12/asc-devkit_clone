@@ -13,7 +13,7 @@
 ## 目录结构介绍
 
 ```text
-├── simt_simd_gather_and_adds
+├── simd_simt_gather_and_adds
 │   ├── scripts
 │   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
 │   │   └── verify_result.py    // 真值对比文件
