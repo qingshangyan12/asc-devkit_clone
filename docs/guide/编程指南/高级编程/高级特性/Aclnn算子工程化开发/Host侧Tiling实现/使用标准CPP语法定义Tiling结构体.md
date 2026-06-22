@@ -258,7 +258,7 @@
     // kernel侧代码
     #include "kernel_operator.h"
     #include "add_custom_tiling.h"  // 包含Tiling结构体定义头文件
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         using aa = A<3,5>;
         REGISTER_TILING_DEFAULT(aa);                                // 模板参数个数大于1时，一定要用using来指定

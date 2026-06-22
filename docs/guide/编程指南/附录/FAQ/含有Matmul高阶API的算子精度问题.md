@@ -22,7 +22,7 @@
         以下为matmul算子核函数的代码片段。该段代码实现了根据Global Memory上的A、B矩阵和Tiling信息，计算每个核要使用数据的地址偏移、创建Matmul对象，计算得到Matmul结果。
 
         ```
-        extern "C" __global__ __aicore__ void matmul_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace, __gm__ uint8_t* tilingGm)
+        extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace, GM_ADDR tilingGm)
         {
             using A_T = half;
             using B_T = half;
@@ -317,8 +317,8 @@
             tailN = tailN < tiling.singleCoreN ? tailN : tiling.singleCoreN;
         }
          
-        extern "C" __global__ __aicore__ void matmul_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
-                                                            __gm__ uint8_t* tilingGm)
+        extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
+                                                            GM_ADDR tilingGm)
         {
             using A_T = half;
             using B_T = half;
@@ -412,8 +412,8 @@
             以下为算子核函数的代码片段。
 
             ```
-            extern "C" __global__ __aicore__ void matmul_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
-                                                                __gm__ uint8_t* tilingGm)
+            extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
+                                                                GM_ADDR tilingGm)
             {
                 using A_T = half;
                 using B_T = half;
@@ -517,8 +517,8 @@
             tailN = tailN < tiling.singleCoreN ? tailN : tiling.singleCoreN;
         }
          
-        extern "C" __global__ __aicore__ void matmul_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __gm__ uint8_t* workspace,
-                                                            __gm__ uint8_t* tilingGm)
+        extern "C" __global__ __aicore__ void matmul_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR workspace,
+                                                            GM_ADDR tilingGm)
         {
             using A_T = half;
             using B_T = half;

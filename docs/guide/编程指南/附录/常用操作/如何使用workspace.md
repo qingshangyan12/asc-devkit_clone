@@ -39,8 +39,8 @@ workspace是设备侧Global Memory上的一块内存。workspace内存分为两�
     在device侧kernel入口处的workspace为用户的workspace指针：
 
     ```
-    // 用户写的Kernel函数，核函数必须包括__gm__ uint8_t* workspace入参，位置需要放在tiling之前
-    extern "C" __global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, __gm__ uint8_t* workspace, __gm__ uint8_t* tiling)
+    // 用户写的Kernel函数，核函数必须包括GM_ADDR workspace入参，位置需要放在tiling之前
+    extern "C" __global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, GM_ADDR workspace, GM_ADDR tiling)
     {
         ...
         

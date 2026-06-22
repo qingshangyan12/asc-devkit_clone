@@ -234,7 +234,7 @@
     标识该核函数仅在Cube核执行。针对耦合模式的硬件架构，该修饰符不生效。
 
     ```
-    extern "C" __global__ __cube__ void mmad_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c)
+    extern "C" __global__ __cube__ void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR c)
     {
         KernelMmad op;
         op.Init(a, b, c);
