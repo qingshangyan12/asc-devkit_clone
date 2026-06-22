@@ -576,6 +576,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     AscendC::PRINTF("[WaitFunc]end GetWaitCkeAddr\n");
 
 #ifndef ASCENDC_CPU_DEBUG
+    AscendC::PRINTF("[WaitFunc]start ASCENDC_CPU_DEBUG\n");
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
         if (waitCke != 0) {
@@ -594,13 +595,20 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
             }
         }
     }
+    AscendC::PRINTF("[WaitFunc]end ASCENDC_CPU_DEBUG\n");
 #endif
 
+    AscendC::PRINTF("[WaitFunc]setting msgQueueIsAvailable_\n");
     msgQueueIsAvailable_[reqId] = true;
+    AscendC::PRINTF("[WaitFunc]setting handleFinishCnt_\n");
     handleFinishCnt_[handleId]++;
+    AscendC::PRINTF("[WaitFunc]setting finishNum_\n");
     finishNum_++;
+    AscendC::PRINTF("[WaitFunc]setting globalCurWaitId_\n");
     globalCurWaitId_++;
+    AscendC::PRINTF("[WaitFunc]setting globalCurWaitId_2\n");
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
+    AscendC::PRINTF("[WaitFunc]end setVal\n");
 
     // 补发消息
     // 场景1:同一个handleId需要补发
