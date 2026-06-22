@@ -456,7 +456,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
     AscendC::PRINTF("[CcuSendMsg]start GetCommitCkeAddr\n");
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
-    AscendC::PRINTF("[CcuSendMsg]start GetCommitCkeAddr\n");
+    AscendC::PRINTF("[CcuSendMsg]finish GetCommitCkeAddr\n");
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
@@ -489,7 +489,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     AscendC::PRINTF("[CcuSendMsg]start WriteHBMData commitCKEAddr\n");
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
-    AscendC::PRINTF("[CcuSendMsg]finish WriteHBMData commitCKEAddr\n");
+    AscendC::PRINTF("[CcuSendMsg]finish WriteHBMData commitCKEAddr, commitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(ccuMsg_.commitCKEAddr));
 }
 
 template <const auto& config>
@@ -577,7 +577,7 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     reqId %= CCU_MAX_MSG_NUM;
     AscendC::PRINTF("[WaitFunc]start GetWaitCkeAddr\n");
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
-    AscendC::PRINTF("[WaitFunc]end GetWaitCkeAddr\n");
+    AscendC::PRINTF("[WaitFunc]end GetWaitCkeAddr, waitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(waitCKEAddr));
 
 #ifndef ASCENDC_CPU_DEBUG
     AscendC::PRINTF("[WaitFunc]start ASCENDC_CPU_DEBUG\n");
