@@ -50,7 +50,7 @@ __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& conf
     asc_get_store_atomic_config_impl(config);
 }
 
-__aicore__ inline void asc_set_store_atomic_config(uint16_t type, uint16_t op)
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
 {
     asc_set_store_atomic_config_v1_impl(type, op);
 }
@@ -143,18 +143,6 @@ __aicore__ inline void asc_set_atomic_min_int8()
 __aicore__ inline void asc_set_atomic_min_int16()
 {
     asc_set_atomic_min_int16_impl();
-}
-
-/*
- * @ingroup AtomicOperations
- * @brief Architecture-specific atomic configuration functions (deprecated)
- * @details These functions are deprecated and will be moved to lower-level implementation files.
- *          Users should use the unified asc_set_store_atomic_config() function instead.
- * @deprecated Use asc_set_store_atomic_config() for all architectures
- */
-__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op)
-{
-    asc_set_store_atomic_config_v1_impl(type, op);
 }
 
 #endif
