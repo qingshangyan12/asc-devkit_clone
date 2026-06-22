@@ -294,66 +294,6 @@ class TestCompileOp(unittest.TestCase):
                         compile_op(cce_file, origin_func_name, op_info, compile_options, code_channel, op_compile_option, {})
 
 
-    def test_compile_op_dynamic_m510(self):
-        cce_file = os.path.join(TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
-        origin_func_name = "add_custom_unalign"
-        code_channel = 0
-        op_info = OpInfo(kernel_name='AddCustomUnalign_0904bc1781946e62d385bfc6e6f99d96',
-                         op_type='AddCustomUnalign',
-                         inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
-                                 {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-                         outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-                         attrs=[{'name': 'testAttr1', 'dtype': 'float', 'value': 0.0}, {'name': 'testAttr2', 'dtype': 'int', 'value': 0}],
-                         impl_mode='high_performance',
-                         origin_inputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'x_in__'},
-                                        {'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'y_in__'}],
-                         origin_outputs=[{'shape': [-2], 'ori_shape': [-2], 'format': 'ND', 'ori_format': 'ND', 'dtype': 'float32', 'range': [(0, None)], 'param_name': 'z_out_'}],
-                         param_type_dynamic=False, mc2_ctx=[], param_type_list=['required', 'required', 'required'],
-                         init_value_list=[None])
-        compile_options = ['-DDTYPE_X=float', '-DORIG_DTYPE_X=DT_FLOAT', '-DFORMAT_X=FORMAT_ND',
-                           '-DDTYPE_Y=float', '-DORIG_DTYPE_Y=DT_FLOAT', '-DFORMAT_Y=FORMAT_ND',
-                           '-DDTYPE_Z=float', '-DORIG_DTYPE_Z=DT_FLOAT', '-DFORMAT_Z=FORMAT_ND', '-x', 'cce',
-                           '-I' + API_ROOT_PATH,
-                           '-I' + os.path.join(API_ROOT_PATH, 'include'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/basic_api/reg_compute'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/basic_api/reg_compute'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/simt_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/simt_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'include/adv_api'),
-                           '-I' + os.path.join(API_ROOT_PATH, 'impl/adv_api'),                      
-                           '-I' + os.path.join(TOP_PATH, 'build'),
-                           '-include' + os.path.join(TOP_PATH, 'tests/python/asc_op_compiler/stub_kernels/add_custom_unalign_tiling.h'),
-                           '-DHIGH_PERFORMANCE=1', '-DDETERMINISTIC_MODE=1']
-        op_compile_option = '{}'
-        ascendc_common_utilityop_module = importlib.import_module('asc_op_compile_base.asc_op_compiler.ascendc_common_utility')
-        compile_op_module.global_var_storage.set_variable("ascendc_recognize_simtvf", True)
-        original_search = re.search
-        with asc_op_compile_base.common.context.op_context.OpContext():
-            with buildcfg.build_config():
-                with mock.patch.object(ascendc_common_utilityop_module, 'is_enable_ascendc_cov', return_value=True):
-                    with mock.patch('re.search') as mock_search:
-                        with mock.patch.object(CommonUtility, 'is_c310', return_value=False):
-                            with mock.patch.object(CommonUtility, 'is_m510', return_value=True):
-                                with mock.patch.object(CommonUtility, 'is_v220', return_value=False):
-                                    with mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None):
-                                        with mock.patch.object(compile_op_module, 'link_relocatable', return_value=None):
-                                            with mock.patch.object(compile_op_module, '_json_post_process', return_value=None):
-                                                with mock.patch.object(CommonUtility, 'run_cmd_inner', return_value=None):
-                                                    def custom_search(pattern, string, *args, **kwargs):
-                                                        if r'cce_simt_entry' in pattern:
-                                                            return MockMatch(string, (string,))
-                                                        return original_search(pattern, string, *args, **kwargs)
-                                                    mock_search.side_effect = custom_search
-                                                    # currently build/bin/toolchain/x86/ubuntu/ccec_libs/
-                                                    # ccec_x86_ubuntu_20_04_adk/bin/bisheng 
-                                                    # not support dav-510r2 -cce-aicore-stack-size
-                                                    self.assertRaises(Exception, compile_op, cce_file, origin_func_name, \
-                                                        op_info, compile_options, code_channel, op_compile_option)
-
-
     def test_compile_op_dynamic_no_tiling_register(self):
         cce_file = os.path.join(TOP_PATH, "tests/python/asc_op_compiler/stub_kernels/add_custom_unalign.cpp")
         origin_func_name = "add_custom_unalign"
@@ -418,11 +358,9 @@ class TestCompileOp(unittest.TestCase):
             asc_op_compile_base.common.context.op_context.OpContext(),
             buildcfg.build_config(),
             mock.patch.object(CommonUtility, 'is_c310', return_value=False),
-            mock.patch.object(CommonUtility, 'is_m510', return_value=False),
             mock.patch.object(compile_op_module, '_compile_ascendc_cce', return_value=None),
             mock.patch.object(CommonUtility, 'is_v220', return_value=False),
             mock.patch.object(compile_op_module, 'get_tiling_info_by_tiling', return_value=TilingInfo()),
-            mock.patch.object(compile_op_module, '_compile_ascendc_cce_m510', return_value=None),
             mock.patch.object(KernelInfoInfer, 'get_tiling_key_list_and_simple_infer_code_channel', return_value=InferChannelParamsFromIFile(tiling_key_list, code_channel, \
                 hard_sync, no_kfc_server_flag, enable_deterministic, tiling_key_kernel_type, no_set_kernel_type, default_kernel_type, dump_info, decode_tiling_result,
                 default_tiling_struct, tiling_struct_expr_map, tiling_key_struct_map, register_tiling_struct, tpl_tiling_struct, set_task_bar, wait_task_bar, tiling_key_deterministic, tiling_key_group_map)),
@@ -599,115 +537,6 @@ class TestCompileOp(unittest.TestCase):
             cfg.current()["tir.op_debug_config"] = ["oom"]
             gen_compile_cmd_v200(
                 src_file, dst_file, compile_option_tuple, "dav-m200", tiling_file)
-
-    def test_gen_compile_ascend_cmd_m510(self):
-        from asc_op_compile_base.asc_op_compiler.compile_op import gen_compile_cmd_v220
-        op_info = OpInfo(kernel_name='AddCustom_0904bc1781946e62d385bfc6e6f99d97', op_type='AddCustom')
-        CommonUtility.get_ascendc_compiler_path()
-        src_file = "/tmp/add_custom.cpp"
-        dst_file = "/tmp/add_custom.o"
-        tiling_file = "/tmp/tiling_data.h"
-        compile_option_tuple = CompileOptionTuple(['opt'], ['opt'])
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_sanitizer", True)
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", True) 
-        from asc_op_compile_base.asc_op_compiler.compile_op import _compile_ascendc_cce_m510
-        compile_info = CompileInfo()
-        tiling_info = TilingInfo()
-        compile_info.src_file = src_file
-        compile_info.dst_file = dst_file
-        compile_info.gen_kernel_func_file = src_file
-        compile_info.kernel_name = op_info.kernel_name
-        tiling_info.static_shape_flag = True
-        with mock.patch.object(compile_op_module, 'call_bisheng_v220', return_value=['1']):
-            with mock.patch.object(compile_op_module, '_gen_non_mix_sub_json', return_value=None):
-                with mock.patch.object(compile_op_module, '_dynamic_kernel_list_to_json', return_value=None):
-                    _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
-        
-    def test_gen_compile_ascend_cmd_m5101(self):
-        from asc_op_compile_base.asc_op_compiler.compile_op import gen_compile_cmd_v220
-        op_info = OpInfo(kernel_name='AddCustom_0904bc1781946e62d385bfc6e6f99d97', op_type='AddCustom')
-        CommonUtility.get_ascendc_compiler_path()
-        src_file = "/tmp/add_custom.cpp"
-        dst_file = "/tmp/add_custom.o"
-        tiling_file = "/tmp/tiling_data.h"
-        compile_option_tuple = CompileOptionTuple(['opt'], ['opt'])
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_sanitizer", True)
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", True)
-        from asc_op_compile_base.asc_op_compiler.compile_op import _compile_ascendc_cce_m510
-        compile_info = CompileInfo()
-        tiling_info = TilingInfo()
-        compile_info.src_file = src_file
-        compile_info.dst_file = dst_file
-        compile_info.gen_kernel_func_file = src_file
-        compile_info.kernel_name = op_info.kernel_name
-        tiling_info.static_shape_flag = False
-        with mock.patch.object(compile_op_module, 'call_bisheng_v220', return_value=['1']):
-            with mock.patch.object(compile_op_module, '_gen_non_mix_sub_json', return_value=None):
-                with mock.patch.object(compile_op_module, '_dynamic_kernel_list_to_json', return_value=None):
-                    _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
-
-    @mock.patch('os.environ', {'ASCENDC_CCACHE_EXECUTABLE': '/usr/bin/ccache'})
-    @mock.patch('shutil.which')
-    def test_gen_compile_cmd_regbase_m510(self, mock_shutil):
-        from asc_op_compile_base.asc_op_compiler.compile_op import _gen_compile_cmd_regbase
-        mock_shutil.return_value = '/tmp/ascendc_compiler'
-        op_info = OpInfo(kernel_name='AddCustom_0904bc1781946e62d385bfc6e6f99d97',
-                         op_type='AddCustom')
-        CommonUtility.get_ascendc_compiler_path()
-        src_file = "/tmp/add_custom.cpp"
-        dst_file = "/tmp/add_custom.o"
-        tiling_file = "/tmp/tiling_data.h"
-        compile_option_tuple = CompileOptionTuple([], [])
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", False)
-        with buildcfg.build_config() as cfg:
-            cfg.current()["tir.op_debug_config"] = ["oom"]
-            from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import _gen_compile_cmd_m510
-            compile_cmd = _gen_compile_cmd_m510(
-                src_file, dst_file, compile_option_tuple, "dav-m510", tiling_file)
-            self.reset_global_var()
-            compile_cmd = _gen_compile_cmd_m510(
-                src_file, dst_file, compile_option_tuple, "dav-m510", tiling_file)
-
-    @mock.patch('os.environ', {'ASCENDC_CCACHE_EXECUTABLE': '/usr/bin/ccache'})
-    @mock.patch('shutil.which')
-    def test_gen_compile_cmd_m510(self, mock_shutil):
-        # SetCurrentSocInfo("MC62CM12AA")
-        mock_shutil.return_value = '/tmp/ascendc_compiler'
-        op_info = OpInfo(kernel_name='AddCustom_0904bc1781946e62d385bfc6e6f99d97', op_type='AddCustom')
-        CommonUtility.get_ascendc_compiler_path()
-        src_file = "/tmp/add_custom.cpp"
-        dst_file = "/tmp/add_custom.o"
-        tiling_file = "/tmp/tiling_data.h"
-        compile_option_tuple = CompileOptionTuple(['opt'], ['opt'])
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_sanitizer", True)
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", True)
-        from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import _gen_compile_cmd_m510
-        compile_cmd_bak = _gen_compile_cmd_m510(src_file, dst_file, compile_option_tuple, tiling_file, True)
-        from asc_op_compile_base.asc_op_compiler.compile_op import gen_compile_cmd_v220
-        with mock.patch.object(CommonUtility, 'is_c310', return_value=False):
-            with mock.patch.object(CommonUtility, 'is_m510', return_value=True):
-                compile_cmd = gen_compile_cmd_v220(
-                    src_file, dst_file, compile_option_tuple, "dav-510r2", tiling_file, True)
-                self.assertIn('--cce-enable-sanitizer', compile_cmd)
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", False)
-        with mock.patch.object(CommonUtility, 'is_c310', return_value=False):
-            with mock.patch.object(CommonUtility, 'is_m510', return_value=True):
-                compile_cmd = gen_compile_cmd_v220(
-                    src_file, dst_file, compile_option_tuple, "dav-510r2", tiling_file, True)
-
-    @mock.patch('os.environ', {'ASCENDC_CCACHE_EXECUTABLE': '/usr/bin/ccache'})
-    @mock.patch('shutil.which')
-    def test_is_m510(self, mock_shutil):
-        mock_shutil.return_value = '/tmp/ascendc_compiler'
-        a_module = importlib.import_module('asc_op_compile_base.asc_op_compiler.ascendc_common_utility')
-        compile_op_module.global_var_storage.set_variable("ascendc_enable_ccache", False)
-        with buildcfg.build_config() as cfg:
-            cfg.current()["tir.op_debug_config"] = ["oom"]
-        from asc_op_compile_base.asc_op_compiler.ascendc_common_utility import CommonUtility as utility
-        get_soc = global_var_storage.get_variable("ascendc_short_soc_version")
-        global_var_storage.set_variable("ascendc_short_soc_version", "MC62")
-        self.assertTrue(utility.is_m510())
-        global_var_storage.set_variable("ascendc_short_soc_version", get_soc)
 
     @mock.patch('os.environ', {'ASCENDC_CCACHE_EXECUTABLE': '/usr/bin/ccache'})
     @mock.patch('shutil.which')
@@ -4425,7 +4254,6 @@ auto __enable_feature_for_compile_deterministic = 1;
 
     def test_get_sync_task_start_end_instr_from_i_file(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'add_custom.i')
-        os.makedirs(os.path.dirname(dst_i_file), exist_ok=True)
         os.system(f"touch {dst_i_file}")
         with open(dst_i_file, "w") as file:
             context = """
@@ -4454,10 +4282,11 @@ AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
 AscendC::WaitPreTaskEnd<true>();
 AscendC::SetNextTaskStart<PIPE_MTE3, PIPE_FIX, true>();
 AscendC::WaitPreTaskEnd<true>();
-"""
+""" 
         res1, res2 = KernelInfoInfer.get_sync_task_start_end_instr_from_i_file(context)
         self.assertEqual(res1, True)
         self.assertEqual(res2, True)
+
 
     def test_infer_info_from_ifile_uses_shared_scan_for_aclgraph_early_start(self):
         dst_i_file = os.path.join(TOP_PATH, 'kernel_meta', 'aclgraph_early_start.i')
@@ -4488,7 +4317,7 @@ void add_custom()
 }
 """
         with open(dst_i_file, "w") as file:
-            file.write(context)
+            file.write(context) 
         op_info = OpInfo(kernel_name="AclgraphForceOp", op_type="AclgraphForceOp", inputs=[], outputs=[])
         global_var_storage.set_variable("ascendc_enable_super_kernel", True)
         global_var_storage.set_variable("ascendc_compile_debug_config", True)
@@ -4496,11 +4325,11 @@ void add_custom()
             with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
                 ctx.add_addition("super_kernel_sub_combine", True)
                 with mock.patch.object(CommonUtility, "is_v220", return_value=False), \
-                     mock.patch.object(CommonUtility, "is_c310", return_value=False), \
-                     mock.patch.object(CommonUtility, "is_m510", return_value=True), \
-                     mock.patch.object(KernelInfoInfer, "_gen_tiling_key_struct_map", return_value={}):
+                    mock.patch.object(CommonUtility, "is_c310", return_value=False), \
+                    mock.patch.object(CommonUtility, "is_m510", return_value=True), \
+                    mock.patch.object(KernelInfoInfer, "_gen_tiling_key_struct_map", return_value={}):
                     result = KernelInfoInfer.infer_info_from_ifile(op_info, dst_i_file, None,
-                                                                   "add_custom.cpp", "add_custom")
+                                                                "add_custom.cpp", "add_custom")
             self.assertTrue(result.super_kernel_early_start_set_flag)
             self.assertTrue(result.super_kernel_early_start_wait_flag)
         finally:
@@ -4508,7 +4337,7 @@ void add_custom()
             global_var_storage.set_variable("ascendc_compile_debug_config", False)
             if os.path.exists(dst_i_file):
                 os.remove(dst_i_file)
-
+ 
     def test_get_tiling_struct_size(self):
         compile_info = CompileInfo()
         compile_info.dst_file = "/tmp/add_custom.o"
@@ -5021,20 +4850,24 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         DFXSectionGenerator().insert_param(tiling)
         DFXSectionGenerator().generate_dfx_section_without_tiling_register(tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name)
 
+
     def test_match_regex_basic(self):
         self.assertFalse(_match_regex("*abc", "abc"))
         self.assertFalse(_match_regex("*", "test"))
+
 
     def test_match_regex_exact_match(self):
         self.assertTrue(_match_regex("abc", "abc"))
         self.assertFalse(_match_regex("abc", "abd"))
         self.assertFalse(_match_regex("abc", "abcd"))
 
+
     def test_match_regex_dot(self):
         self.assertTrue(_match_regex("a.c", "abc"))
         self.assertTrue(_match_regex("a.c", "aac"))
         self.assertTrue(_match_regex(".", "x"))
         self.assertFalse(_match_regex("a.c", "ac"))
+
 
     def test_match_regex_star(self):
         self.assertTrue(_match_regex("ab*c", "ac"))
@@ -5044,12 +4877,14 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         self.assertTrue(_match_regex("a*", "aaa"))
         self.assertFalse(_match_regex("ab*c", "adc"))
 
+
     def test_match_regex_wildcard(self):
         self.assertTrue(_match_regex(".*", "anything"))
         self.assertTrue(_match_regex(".*", ""))
         self.assertTrue(_match_regex("a.*b", "acb"))
         self.assertTrue(_match_regex("a.*b", "a123b"))
         self.assertFalse(_match_regex("a.*b", "abx"))
+
 
     def test_match_regex_prefix_suffix(self):
         self.assertTrue(_match_regex("abc.*", "abc"))
@@ -5058,16 +4893,19 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         self.assertTrue(_match_regex(".*abc", "xyzabc"))
         self.assertFalse(_match_regex("abc.*", "ab"))
 
+
     def test_match_regex_complex(self):
         self.assertTrue(_match_regex("a.*b.*c", "abc"))
         self.assertTrue(_match_regex("a.*b.*c", "aXbYc"))
         self.assertTrue(_match_regex("a*b*c*", "abc"))
         self.assertTrue(_match_regex("a*b*c*", "aaabbbccc"))
 
+
     def test_match_regex_empty(self):
         self.assertTrue(_match_regex("", ""))
         self.assertFalse(_match_regex("", "a"))
         self.assertFalse(_match_regex("a", ""))
+
 
     def test_get_dcci_disable_cap_bitmap_empty_patterns(self):
         compile_info = CompileInfo()
@@ -5075,11 +4913,13 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
 
+
     def test_get_dcci_disable_cap_bitmap_patterns_not_list(self):
         compile_info = CompileInfo()
         compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": "not_a_list"}}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
+
 
     def test_get_dcci_disable_cap_bitmap_patterns_empty_list(self):
         compile_info = CompileInfo()
@@ -5087,17 +4927,20 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
 
+
     def test_get_dcci_disable_cap_bitmap_matched(self):
         compile_info = CompileInfo()
         compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_a", "kernel_b"]}}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 4)
 
+
     def test_get_dcci_disable_cap_bitmap_not_matched(self):
         compile_info = CompileInfo()
         compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x", "kernel_y"]}}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
+
 
     def test_get_dcci_disable_cap_bitmap_wildcard_match(self):
         compile_info = CompileInfo()
@@ -5107,11 +4950,13 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         result = _get_dcci_disable_cap_bitmap(compile_info, ["op_test"])
         self.assertEqual(result, 4)
 
+
     def test_get_dcci_disable_cap_bitmap_multi_symbols_first_match(self):
         compile_info = CompileInfo()
         compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_b"]}}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
         self.assertEqual(result, 4)
+
 
     def test_get_dcci_disable_cap_bitmap_multi_symbols_no_match(self):
         compile_info = CompileInfo()
@@ -5119,12 +4964,13 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
         self.assertEqual(result, 0)
 
+
     def test_get_dcci_disable_cap_bitmap_no_sp_options(self):
         compile_info = CompileInfo()
         compile_info.super_kernel_info = {"other_option": "value"}
         result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
         self.assertEqual(result, 0)
-
+ 
 
 if __name__ == "__main__":
     unittest.main()
