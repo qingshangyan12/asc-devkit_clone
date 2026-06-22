@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Copyright (c) 2026 Huawei Technologies Co., Ltd.
 * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
 * CANN Open Software License Agreement Version 2.0 (the "License").
@@ -22,7 +22,7 @@ constexpr uint32_t half_neg_inf = 0xFC00;
 constexpr int32_t MAX_SHLF_OFFSET = 31;
 constexpr int32_t WARP_SIZE = 32;
 
-#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined (__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
 bool __isnan(half x)
 {
     uint16_t* intX = (uint16_t*)&x;
