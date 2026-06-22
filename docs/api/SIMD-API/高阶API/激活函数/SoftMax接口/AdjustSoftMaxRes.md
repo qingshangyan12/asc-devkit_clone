@@ -35,9 +35,7 @@ def adjust_softmax_res(res, max, from, to, res_shape):
 
 ```
 template <typename T1, typename T2, bool isDataFormatNZ = false, uint8_t stepSizeMode = 0>
-__aicore__ inline bool AdjustSoftMaxRes(
-    const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to,
-    const SoftMaxShapeInfo& softmaxShapeInfo)
+__aicore__ inline bool AdjustSoftMaxRes(const LocalTensor<T1>& softMaxRes, const LocalTensor<T2>& maxTensor, const uint32_t from, const T1 to, const SoftMaxShapeInfo& softmaxShapeInfo)
 ```
 
 ## 参数说明

@@ -22,8 +22,7 @@ AlltoAllvWrite的功能为：通信域内的卡互相发送和接收数据，并
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle AlltoAllvWrite(
-    GM_ADDR usrIn, GM_ADDR sendOffsets, GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
+__aicore__ inline HcclHandle AlltoAllvWrite(GM_ADDR usrIn, GM_ADDR sendOffsets, GM_ADDR sendSizes, uint64_t remoteWinOffset, uint64_t localDataSize)
 ```
 
 ## 参数说明

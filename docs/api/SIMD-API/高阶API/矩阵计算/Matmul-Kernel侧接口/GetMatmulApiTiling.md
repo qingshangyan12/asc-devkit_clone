@@ -26,7 +26,7 @@ Matmul Tiling常量化功能为在编译期期间获取常量化的Matmul Tiling
 ## 函数原型
 
 ```
-template <class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
+template<class A_TYPE, class B_TYPE, class C_TYPE, class BIAS_TYPE>
 __aicore__ constexpr MatmulApiStaticTiling GetMatmulApiTiling(const MatmulConfig& mmCFG, int32_t l1Size = Impl::L1_SIZE)
 ```
 

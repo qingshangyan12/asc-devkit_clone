@@ -50,18 +50,14 @@
 
     ```
     template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-    __aicore__ inline void Broadcast(
-        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-        const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
+    __aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim], const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer)
     ```
 
 -   接口框架申请临时空间
 
     ```
     template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
-    __aicore__ inline void Broadcast(
-        const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
-        const uint32_t srcShape[dim])
+    __aicore__ inline void Broadcast(const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim], const uint32_t srcShape[dim])
     ```
 
 -   支持动态shape
@@ -69,12 +65,8 @@
     仅在Ascend 950PR/Ascend 950DT上支持。
 
     ```
-    template <
-        class T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr,
-        bool constSrcInnerPad = false>
-    __aicore__ inline void Broadcast(
-        const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* srcShape,
-        BroadcastTiling* tiling)
+    template<class T, int constRank=-1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr, bool constSrcInnerPad = false>
+    __aicore__ inline void Broadcast(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* srcShape, BroadcastTiling* tiling)
     ```
 
 该接口需要额外的临时空间来存储计算过程中的中间变量。临时空间支持开发者**通过sharedTmpBuffer入参传入**和**接口框架申请**两种方式。
@@ -91,9 +83,8 @@
     仅在Ascend 950PR/Ascend 950DT上支持。
 
     ```
-    template <class T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
-    __aicore__ inline void GetBroadcastTilingInfo(
-        uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
+    template<class T, int constRank=-1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
+    __aicore__ inline void GetBroadcastTilingInfo(uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
     ```
 
 ## 参数说明

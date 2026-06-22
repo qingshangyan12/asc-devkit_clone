@@ -7,10 +7,7 @@
 ## 函数原型
 
 ```
-void SetMatmulConfigParams(
-    int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false,
-    ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET,
-    bool enVecND2NZIn = false)
+void SetMatmulConfigParams(int32_t mmConfigTypeIn = 1, bool enableL1CacheUBIn = false, ScheduleType scheduleTypeIn = ScheduleType::INNER_PRODUCT, MatrixTraverse traverseIn = MatrixTraverse::NOSET, bool enVecND2NZIn = false)
 ```
 
 ```

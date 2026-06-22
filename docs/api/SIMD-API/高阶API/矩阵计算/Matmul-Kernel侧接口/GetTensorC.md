@@ -34,8 +34,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
     ```
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(
-        const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
+    __aicore__ inline void GetTensorC(const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     ```
 
     -   支持同步模式
@@ -55,9 +54,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
     ```
     template <bool sync = true>
-    __aicore__ inline void GetTensorC(
-        const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0,
-        bool enSequentialWrite = false)
+    __aicore__ inline void GetTensorC(const GlobalTensor<DstT>& gm, const LocalTensor<DstT>& co2Local, uint8_t enAtomic = 0, bool enSequentialWrite = false)
     ```
 
     -   支持同步模式
@@ -82,9 +79,7 @@ Iterate后，获取一块或者两块C矩阵片，可以直接输出到GM tensor
 
 ```
 template <bool sync = true, bool doPad = false>
-__aicore__ inline void GetTensorC(
-    const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0,
-    uint32_t width = 0, uint32_t srcGap = 0, uint32_t dstGap = 0)
+__aicore__ inline void GetTensorC(const LocalTensor<DstT>& c, uint8_t enAtomic = 0, bool enSequentialWrite = false, uint32_t height = 0, uint32_t width = 0, uint32_t srcGap = 0, uint32_t dstGap = 0)
 ```
 
 ## 参数说明

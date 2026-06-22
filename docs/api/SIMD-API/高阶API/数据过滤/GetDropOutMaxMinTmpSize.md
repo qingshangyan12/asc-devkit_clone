@@ -15,9 +15,7 @@ uint32_t GetDropOutMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize
 ```
 
 ```
-void GetDropOutMaxMinTmpSize(
-    const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
-    uint32_t& minValue)
+void GetDropOutMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
 ```
 
 ## 参数说明

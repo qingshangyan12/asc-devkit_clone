@@ -42,9 +42,7 @@ Atlas 推理系列产品AI Core采用方式二。
 
 ```
 template <typename T, bool isExhaustedSuspension = false>
-__aicore__ inline void MrgSort(
-    const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4],
-    uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
+__aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T>& sortList, const uint16_t elementCountList[4], uint32_t sortedNum[4], uint16_t validBit, const int32_t repeatTime)
 ```
 
 ## 参数说明

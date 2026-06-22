@@ -20,9 +20,7 @@
 
 ```
 template <bool commit = false>
-__aicore__ inline HcclHandle AllGather(
-    GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t sendCount, HcclDataType dataType, uint64_t strideCount,
-    uint8_t repeat = 1)
+__aicore__ inline HcclHandle AllGather(GM_ADDR sendBuf, GM_ADDR recvBuf, uint64_t sendCount, HcclDataType dataType, uint64_t strideCount, uint8_t repeat = 1)
 ```
 
 ## 参数说明

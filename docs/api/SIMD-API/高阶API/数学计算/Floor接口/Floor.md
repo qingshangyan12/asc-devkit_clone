@@ -34,9 +34,7 @@ Floor\(-3.9\) = -4.0
 
     ```
     template <typename T, bool isReuseSource = false>
-    __aicore__ inline void Floor(
-        const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-        const uint32_t calCount)
+    __aicore__ inline void Floor(const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
     ```
 
 -   接口框架申请临时空间

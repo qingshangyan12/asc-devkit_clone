@@ -122,39 +122,28 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src,
-            const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale,
-            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_CHANNEL场景（按通道量化，不带offset）
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src,
-            const LocalTensor<OutputDataType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k,
-            const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<OutputDataType>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_TENSOR场景（按张量量化）
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType offset,
-            const OutputDataType scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k,
-            const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType offset, const OutputDataType scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_TENSOR场景（按张量量化，不带offset）
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType scale,
-            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_GROUP float4场景（按组量化）
@@ -163,9 +152,7 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<fp8_e8m0_t>& scale,
-            const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<fp8_e8m0_t>& scale, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_TOKEN/PER\_GROUP b8/float4场景（按token量化）/（按组量化）
@@ -173,13 +160,8 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
         仅支持Ascend 950PR/Ascend 950DT
 
         ```
-        template <
-            typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config,
-            const AscendAntiQuantPolicy& policy>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
-            const LocalTensor<scaleT>& offsetTensor, const LocalTensor<uint8_t>& sharedTmpBuffer,
-            const AscendAntiQuantParam& para)
+        template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config, const AscendAntiQuantPolicy& policy>
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor,const LocalTensor<uint8_t>& sharedTmpBuffer, const AscendAntiQuantParam& para)
         ```
 
 -   接口框架申请临时空间
@@ -187,19 +169,14 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src,
-            const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale, const uint32_t k,
-            const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<OutputDataType>& offset, const LocalTensor<OutputDataType>& scale, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_TENSOR场景
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType offset,
-            const OutputDataType scale, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const OutputDataType offset, const OutputDataType scale, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_GROUP float4场景（groupSize固定为32）
@@ -208,9 +185,7 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
 
         ```
         template <typename InputDataType, typename OutputDataType, bool isTranspose>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<fp8_e8m0_t>& scale,
-            const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<OutputDataType>& dst, const LocalTensor<InputDataType>& src, const LocalTensor<fp8_e8m0_t>& scale, const uint32_t k, const AntiQuantShapeInfo& shapeInfo = {})
         ```
 
     -   PER\_TOKEN/PER\_GROUP b8/float4场景（groupSize可配置）
@@ -218,12 +193,8 @@ PER\_TOKEN/PER\_GROUP b8/float4场景的计算逻辑如下：
         仅支持Ascend 950PR/Ascend 950DT
 
         ```
-        template <
-            typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config,
-            const AscendAntiQuantPolicy& policy>
-        __aicore__ inline void AscendAntiQuant(
-            const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor,
-            const LocalTensor<scaleT>& offsetTensor, const AscendAntiQuantParam& para)
+        template <typename dstT, typename srcT, typename scaleT, const AscendAntiQuantConfig& config, const AscendAntiQuantPolicy& policy>
+        __aicore__ inline void AscendAntiQuant(const LocalTensor<dstT>& dstTensor, const LocalTensor<srcT>& srcTensor, const LocalTensor<scaleT>& scaleTensor, const LocalTensor<scaleT>& offsetTensor,const AscendAntiQuantParam& para)
         ```
 
 由于该接口的内部实现中涉及复杂的数学计算，需要额外的临时空间来存储计算过程中的中间变量。临时空间支持**接口框架申请**和开发者**通过sharedTmpBuffer入参传入**两种方式。

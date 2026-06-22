@@ -26,18 +26,14 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
-                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
-                const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
@@ -45,17 +41,14 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor,
-                uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const LocalTensor<T>& src1Tensor)
             ```
 
 -   Power\(dstTensor, src0Tensor, src1Scalar\)
@@ -64,18 +57,14 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
-                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar,
-                const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
@@ -83,8 +72,7 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const LocalTensor<T>& src0Tensor, const T& src1Scalar, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
@@ -100,18 +88,14 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
-                const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor,
-                const LocalTensor<uint8_t>& sharedTmpBuffer)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, const LocalTensor<uint8_t>& sharedTmpBuffer)
             ```
 
     -   接口框架申请临时空间
@@ -119,8 +103,7 @@
 
             ```
             template <typename T, bool isReuseSource = false, const PowerConfig& config = defaultPowerConfig>
-            __aicore__ inline void Power(
-                const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
+            __aicore__ inline void Power(const LocalTensor<T>& dstTensor, const T& src0Scalar, const LocalTensor<T>& src1Tensor, uint32_t calCount)
             ```
 
         -   源操作数Tensor全部参与计算

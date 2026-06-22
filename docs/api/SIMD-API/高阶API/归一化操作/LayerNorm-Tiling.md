@@ -92,54 +92,40 @@ Ascend C提供一组LayerNorm Tiling API，方便用户获取LayerNorm kernel计
     -   输出归一化结果、均值和方差的LayerNorm接口所需的临时空间
 
         ```
-        void GetLayerNormMaxMinTmpSize(
-            const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue,
-            uint32_t& minValue)
+        void GetLayerNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue)
         ```
 
     -   输出归一化结果、均值和标准差的倒数的LayerNorm接口所需的临时空间
 
         ```
-        void GetLayerNormMaxMinTmpSize(
-            const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd,
-            const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
+        void GetLayerNormMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, const bool isOnlyOutput, uint32_t& maxValue, uint32_t& minValue)
         ```
 
 -   GetLayerNormNDTilingInfo/GetLayerNormNDTillingInfo接口
     -   输出归一化结果、均值和方差的LayerNorm接口所需的tiling参数
 
         ```
-        void GetLayerNormNDTilingInfo(
-            const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-            optiling::LayerNormTiling& tiling)
+        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tiling)
         ```
 
         ```
-        void GetLayerNormNDTilingInfo(
-            const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-            AscendC::tiling::LayerNormTiling& tiling)
+        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, AscendC::tiling::LayerNormTiling& tiling)
         ```
 
     -   输出归一化结果、均值和方差的LayerNorm接口所需的tiling参数（不推荐使用）
 
         ```
-        void GetLayerNormNDTillingInfo(
-            const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-            optiling::LayerNormTiling& tilling)
+        void GetLayerNormNDTillingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, optiling::LayerNormTiling& tilling)
         ```
 
     -   输出归一化结果、均值和标准差的倒数的LayerNorm接口所需的tiling参数
 
         ```
-        void GetLayerNormNDTilingInfo(
-            const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-            const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling)
+        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, optiling::LayerNormSeparateTiling& tiling)
         ```
 
         ```
-        void GetLayerNormNDTilingInfo(
-            const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource,
-            const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling)
+        void GetLayerNormNDTilingInfo(const ge::Shape& srcShape, const uint32_t stackBufferSize, const uint32_t typeSize, const bool isReuseSource, const bool isComputeRstd, AscendC::tiling::LayerNormSeparateTiling& tiling)
         ```
 
 ## 参数说明
