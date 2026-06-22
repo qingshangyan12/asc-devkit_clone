@@ -299,7 +299,6 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PostSend(
     AscendC::GlobalTensor<uint32_t> sqeGlobal;
     sqeGlobal.SetGlobalBuffer((__gm__ uint32_t*)sqeAddr);
     constexpr uint32_t wqeBbCnt = opCode == HcommUrmaOpCode::WRITE_WITH_NOTIFY ? 2U : 1U;
-    SyncAction<HardEvent::S_MTE3>();
     DataCopy(sqeGlobal, wqeItem_, wqeSize * wqeBbCnt / sizeof(uint32_t));
     SyncAction<HardEvent::MTE3_S>();
 
@@ -339,7 +338,6 @@ __aicore__ inline uint32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::PollCq(
         bool validOwner = (curTail / cqDepth) & 1;
         uint32_t times = 0;
         while ((validOwner ^ cqeUb->owner) == 0 && times < HCOMM_URMA_MAX_RETRY_TIMES) {
-            SyncAction<HardEvent::S_MTE2>();
             DataCopy(cqeItem_, cqeGlobal, cqeSize / sizeof(uint32_t));
             SyncAction<HardEvent::MTE2_S>();
             times++;
