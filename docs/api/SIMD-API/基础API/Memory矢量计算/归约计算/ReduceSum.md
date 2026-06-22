@@ -55,7 +55,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。 |
-| isSetMask | 保留参数，设置无效。 |
+| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表2**  参数说明
 
@@ -132,14 +132,14 @@
 
 **不同硬件形态对应的`ReduceSum`相加方式如下：**
 
-- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，采用方式一。</cann-filter>
-- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式二，tensor高维切分计算接口采用方式一。</cann-filter>
-- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，tensor前n个数据计算接口采用方式二，tensor高维切分计算接口采用方式一。</cann-filter>
-- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，采用方式一。</cann-filter>
-- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，采用方式一。</cann-filter>
-- <cann-filter npu-type = "910">Atlas 训练系列产品，采用方式一。</cann-filter>
-- <cann-filter npu-type = "x90">Kirin X90，采用方式一。</cann-filter>
-- <cann-filter npu-type = "9030">Kirin 9030，采用方式一。</cann-filter>
+- <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT，采用方式二。</cann-filter>
+- <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。</cann-filter>
+- <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品，tensor前n个数据计算接口采用方式一，tensor高维切分计算接口采用方式二。</cann-filter>
+- <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品，采用方式二。</cann-filter>
+- <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core，采用方式二。</cann-filter>
+- <cann-filter npu-type = "910">Atlas 训练系列产品，采用方式二。</cann-filter>
+- <cann-filter npu-type = "x90">Kirin X90，采用方式二。</cann-filter>
+- <cann-filter npu-type = "9030">Kirin 9030，采用方式二。</cann-filter>
 
 ## 调用示例
 
