@@ -16,8 +16,8 @@
 #ifndef LIB_TRANSPOSE_TRANSDATA_H
 #define LIB_TRANSPOSE_TRANSDATA_H
 #include "transdata_common.h"
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+#include "basic_api/kernel_tensor.h"
+#include "basic_api/kernel_basic_intf.h"
 #include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/transpose/transdata/transdata_impl.h"

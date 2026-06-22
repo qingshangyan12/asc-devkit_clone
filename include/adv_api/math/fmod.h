@@ -22,7 +22,7 @@
 #ifndef LIB_MATH_FMOD_H
 #define LIB_MATH_FMOD_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #include "include/adv_api/math/fmod_utils.h"
 #include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 

@@ -20,7 +20,7 @@
 
 #ifndef LIB_MATH_LOG_H
 #define LIB_MATH_LOG_H
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #include "../../../impl/adv_api/detail/math/log/log_common_impl.h"
 
 namespace AscendC {

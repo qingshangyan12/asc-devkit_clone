@@ -21,7 +21,7 @@
 
 #include <cstdint>
 #if defined(ASCENDC_TPL_KERNEL) && !defined(ASCENDC_TPL_PRE)
-#include "kernel_type.h"
+#include "basic_api/kernel_type.h"
 #include "../../../impl/basic_api/utils/kernel_utils_constants.h"
 #endif
 #ifndef ASCENDC_TPL_KERNEL

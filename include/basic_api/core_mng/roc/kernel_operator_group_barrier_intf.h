@@ -20,7 +20,7 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_GROUP_BARRIER_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_GROUP_BARRIER_INTERFACE_H
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #if __NPU_ARCH__ == 2201
 #include "../../../../impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
 #elif __NPU_ARCH__ == 3510

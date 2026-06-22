@@ -22,7 +22,7 @@
 #define LIB_ACTIVATION_SOFTMAX_UTILS_H
 
 #include <cstdint>
-#include "kernel_basic_intf.h"
+#include "basic_api/kernel_basic_intf.h"
 
 namespace AscendC {
 

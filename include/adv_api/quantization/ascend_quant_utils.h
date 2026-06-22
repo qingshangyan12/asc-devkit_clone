@@ -21,7 +21,7 @@
 #ifndef LIB_QUANTIZATION_ASCEND_QUANT_UTILS_H
 #define LIB_QUANTIZATION_ASCEND_QUANT_UTILS_H
 
-#include "kernel_basic_intf.h"
+#include "basic_api/kernel_basic_intf.h"
 
 namespace AscendC {
 struct AscendQuantConfig {

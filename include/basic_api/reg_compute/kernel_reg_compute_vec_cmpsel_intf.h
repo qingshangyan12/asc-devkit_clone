@@ -37,7 +37,7 @@ __simd_callee__ inline void Select(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& m
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_vec_cmpsel_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_cmpsel_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_VEC_CMPSEL_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_VEC_CMPSEL_INTF_H__)

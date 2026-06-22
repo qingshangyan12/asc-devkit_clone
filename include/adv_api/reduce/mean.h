@@ -21,8 +21,8 @@
 #ifndef LIB_REDUCE_MEAN_H
 #define LIB_REDUCE_MEAN_H
 
-#include "kernel_tensor.h"
-#include "kernel_basic_intf.h"
+#include "basic_api/kernel_tensor.h"
+#include "basic_api/kernel_basic_intf.h"
 #include "include/adv_api/reduce/mean_utils.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 #include "../../../impl/adv_api/detail/reduce/mean/mean_3510_impl.h"

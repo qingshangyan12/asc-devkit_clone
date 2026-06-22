@@ -32,7 +32,7 @@ __simd_callee__ inline void Histograms(V& dstReg, S& srcReg, MaskReg& mask);
 } // namespace Reg
 } // namespace AscendC
 
-#include "../../impl/basic_api/reg_compute/kernel_reg_compute_histograms_intf_impl.h"
+#include "../../../impl/basic_api/reg_compute/kernel_reg_compute_histograms_intf_impl.h"
 #endif // ASCENDC_MODULE_REG_COMPUTE_HISTOGRAMS_INTERFACE_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_REG_COMPUTE_HISTOGRAMS_INTF_H__)

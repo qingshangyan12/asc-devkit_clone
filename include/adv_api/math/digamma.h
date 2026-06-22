@@ -21,7 +21,7 @@
 #ifndef LIB_MATH_DIGAMMA_H
 #define LIB_MATH_DIGAMMA_H
 
-#include "kernel_tensor.h"
+#include "basic_api/kernel_tensor.h"
 #include "../../../impl/basic_api/kernel_pop_stack_buffer.h"
 #include "kernel_tiling/kernel_tiling.h"
 
