@@ -40,7 +40,7 @@
 
 ### 场景1：下采样场景
 - 样例功能：  
-  演示验证从regTensor中搬运数据到maskReg。输入64个int32类型的cond数据，使用MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式（每4个mask bit对应1个src bit）填充到256bit的MaskReg，输出32字节（256bit）的mask数据到UB(Unified Buffer)。
+  演示验证从RegTensor中搬运数据到MaskReg。输入64个int32类型的cond数据，使用MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式（每4个mask bit对应1个src bit）填充到256bit的MaskReg，输出32字节（256bit）的mask数据到UB(Unified Buffer)。
 
   - 样例规格：
     <table>
@@ -52,7 +52,7 @@
     </table>
 - 样例实现：
   1. 使用LoadAlign对齐加载cond数据到RegTensor
-  2. 通过MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，float元素处理示意如图：  
+  2. 通过MaskGenWithRegTensor&lt;int32, 0&gt;从condReg的前8字节提取64bit数据，按下采样模式填充到256bit MaskReg：每4个mask bit对应1个src bit，int32元素处理示意如图：
   <img src="figures/move_reg_1.png">
   3. 使用StoreAlign将mask数据写回UB
 - 调用实现
@@ -60,14 +60,14 @@
 
 ### 场景2：复合计算场景
 - 样例功能：  
-  对根据mask中的比特位，选择对应位置的x或y中的值，当mask的比特位为1时，选取x中对应的元素；当mask的比特位为0时，选取y中对应的元素。
+  根据mask中的比特位，选择对应位置的x或y中的值，当mask的比特位为1时，选取x中对应的元素；当mask的比特位为0时，选取y中对应的元素。
 - 样例规格：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="3" align="center">AIV样例</td></tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td></tr>
   <tr><td align="center">x</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td align="center">y</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
-  <tr><td align="center">mask</td><td align="center">[1, 8]</td><td align="center">float</td></tr>
+  <tr><td align="center">mask</td><td align="center">[1, 32]</td><td align="center">uint8</td></tr>
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[1, 256]</td><td align="center">float</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">move_reg_scenario_2</td></tr>
   </table>

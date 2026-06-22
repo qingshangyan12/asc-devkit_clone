@@ -1,7 +1,7 @@
 # truncate样例
 
 ## 概述
-本样例基于Reg编程接口实现Truncate运算，用于将RegTensor（Reg矢量计算基本单元）的浮点数截断到整数位，主要调用Truncate接口。
+本样例基于Reg编程接口实现Truncate运算，用于将RegTensor（Reg矢量计算基本单元）的浮点数截断到整数位，主要调用Reg::Truncate接口，并通过RoundMode::CAST_FLOOR实现向下取整。
 
 ## 本样例支持的产品及CANN软件版本
 

@@ -63,7 +63,7 @@
     AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, count);
     ```
 
-- 说明：将src0和src1中的元素解交织存入dst0和dst1。dst0存放src0和src1奇数索引位置的元素，dst1存放src0和src1偶数索引位置的元素
+- 说明：将src0和src1中的元素解交织存入dst0和dst1。按0基下标描述，dst0存放src0和src1中偶数下标位置的元素，dst1存放src0和src1中奇数下标位置的元素
 - 示例：
   - 输入src0: [1 2 3 ... 512]
   - 输入src1: [513 514 515 ... 1024]
