@@ -46,23 +46,23 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 | 参数名 | 描述 |
 |-----|-----|
 | T | 目的操作数和源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
-| S | 索引值的RegTensor类型，例如RegTensor<uint32_t>，由编译器自动推导，用户不需要手动填写。 |
+| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
+| S | 索引值的RegTensor类型，例如RegTensor\<uint32_t>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
 | dstReg | 输出 | 目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。|
-| baseAddr | 输入 | 源操作数，UB中的基地址，需要32B字节对齐。 |
-| index | 输入 | 索引值，dstReg中的每个DataBlock在UB中相对于baseAddr的位置，单位：字节。类型为[RegTensor](../寄存器数据类型/RegTensor.md)。索引值必须32B对齐，即一个索引值对应1个DataBlock。index中的值可以重复。例如：<br>baseAddr: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock7, ... , DataBlock32, ...]<br>index: [0\*2, 1\*32, 2\*32, 3\*32, 4\*32, 5\*32, 6\*32, 32\*32] dstReg: [DataBlock0, DataBlock1, DataBlock2,DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock32] |
+| baseAddr | 输入 | 源操作数，UB中的基地址，需要32字节对齐。 |
+| index | 输入 | 索引值，dstReg中的每个DataBlock在UB中相对于baseAddr的位置，单位：字节。类型为[RegTensor](../寄存器数据类型/RegTensor.md)。索引值必须32B对齐，即一个索引值对应1个DataBlock。index中的值可以重复。例如：<br>baseAddr: [DataBlock0, DataBlock1, DataBlock2, DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock7, ... , DataBlock32, ...]。<br>index: [0\*2, 1\*32, 2\*32, 3\*32, 4\*32, 5\*32, 6\*32, 32\*32] dstReg: [DataBlock0, DataBlock1, DataBlock2,DataBlock3, DataBlock4, DataBlock5, DataBlock6, DataBlock32]。 |
 | mask | 输入 | 源操作数元素操作的有效指示，详细说明请参考[MaskReg](../寄存器数据类型/MaskReg.md)。 |
 
 ## 数据类型
 
 目的操作数与源操作数的数据类型需要保持一致。支持的数据类型为：b8、b16、b32、b64。
 
-索引值支持的数据类型为：uint32_t
+索引值支持的数据类型为：uint32_t。
 
 ## 返回值说明
 
@@ -72,7 +72,7 @@ __simd_callee__ inline void GatherB(U& dstReg, __ubuf__ T* baseAddr, S& index, M
 
 - 位于UB的地址必须32字节对齐。
 - 源操作数和目的操作数数据类型必须相同。
-- index索引值必须32B对齐，即一个索引值对应1个DataBlock。
+- index索引值必须32字节对齐，即一个索引值对应1个DataBlock。
 - index索引值对应的数据必须在UB有效地址范围内。
 - RegTensor模板参数regTrait只支持RegTraitNumOne。
 

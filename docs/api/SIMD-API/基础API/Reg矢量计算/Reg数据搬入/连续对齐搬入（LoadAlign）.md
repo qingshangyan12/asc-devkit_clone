@@ -106,7 +106,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
 | dist | 数据分布模式，LoadDist类型。具体参数说明请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明（单搬入模式）
 
@@ -114,7 +114,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 |-----|-----|-----|
 | dstReg | 输出 | 目的操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | srcAddr | 输入/输出 | 源操作数，UB起始地址。 |
-| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
+| postUpdateStride | 输入 | 地址更新步长，int32_t类型，单位：元素个数。postUpdateStride * sizeof(T)的对齐约束请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新 srcAddr +=  postUpdateStride。 |
 | offset | 输入 | 地址偏移寄存器，AddrReg类型。需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为srcAddr + 寄存器中存储的偏移量。AddrReg寄存器中存储的偏移量 * sizeof(T)的对齐约束请参考[表3 LoadDist参数说明（单搬入模式）](#表3-LoadDist参数说明（单搬入模式）)。 |
 
 <a id="表3-LoadDist参数说明（单搬入模式）"></a>
@@ -130,13 +130,13 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 | DIST_US_B16 | 数据2倍上采样，加载数据量为VL/2，每个输入元素重复两次，数据类型为b16。 | min(32, VL/2) |
 | DIST_DS_B8 | 数据2倍下采样，加载数据量为2*VL，数据每隔一个保留，数据类型为b8。 | 32 |
 | DIST_DS_B16 | 数据2倍下采样，加载数据量为2*VL，数据每隔一个保留，数据类型为b16。 | 32 |
-| DIST_UNPACK_B8 | 解压缩模式，按无符号整型u8加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00, 0x01, 0x02, 0x03, ..., 0xFF, ...]<br>dst: [0x00, 0x00, 0x01, 0x00, 0x02, 0x00, ..., 0x7F, 0x00] | min(32, VL/2) |
-| DIST_UNPACK_B16 | 解压缩模式，按无符号整型u16加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。可参考[图1 连续对齐搬入分布模式图示](#fig-loadalign-dist)。<br>例如VL=256B：<br>src: [0x0000, 0x0001, 0x0002, 0x0003, ..., 0x007F, ...]<br>dst: [0x0000, 0x0000, 0x0001, 0x0000, 0x0002, 0x0000, ..., 0x003F, 0x0000] | min(32, VL/2) |
+| DIST_UNPACK_B8 | 解压缩模式，按无符号整型u8加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00, 0x01, 0x02, 0x03, ..., 0xFF, ...]。<br>dst: [0x00, 0x00, 0x01, 0x00, 0x02, 0x00, ..., 0x7F, 0x00]。 | min(32, VL/2) |
+| DIST_UNPACK_B16 | 解压缩模式，按无符号整型u16加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。可参考[图1 连续对齐搬入分布模式图示](#fig-loadalign-dist)。<br>例如VL=256B：<br>src: [0x0000, 0x0001, 0x0002, 0x0003, ..., 0x007F, ...]。<br>dst: [0x0000, 0x0000, 0x0001, 0x0000, 0x0002, 0x0000, ..., 0x003F, 0x0000]。 | min(32, VL/2) |
 | DIST_BLK | 读取一个DataBlock（32B），并广播到VL。 | 32 |
 | DIST_E2B_B16 | 加载(VL/DataBlock)个B16的数据，并将每个元素（16bit）广播到一个DataBlock（32B）中。 | VL/16 |
 | DIST_E2B_B32 | 加载(VL/DataBlock)个B32的数据，并将每个元素（32bit）广播到一个DataBlock（32B）中。 | VL/8 |
-| DIST_UNPACK_B32 | 解压缩模式，按无符号整型u32加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00000000, 0x00000001, 0x00000002, ..., 0x000003F, ...]<br>dst: [0x00000000, 0x00000000, 0x00000001, 0x00000000, ..., 0x0000003F, 0x00000000] | min(32, VL/2) |
-| DIST_UNPACK4_B8 | 解压缩模式，按无符号整型u8加载VL/4数据量，unpack到VL，每个元素后会补3个值为0的元素。<br>例如VL=256B：<br>src: [0x00, 0x01, 0x02, 0x03, ..., 0xFF, ...]<br>dst: [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,..., 0x3F, 0x00, 0x00, 0x00] | min(32, VL/4) |
+| DIST_UNPACK_B32 | 解压缩模式，按无符号整型u32加载VL/2数据量，每个元素后会补1个值为0元素，即unpack到VL。<br>例如VL=256B：<br>src: [0x00000000, 0x00000001, 0x00000002, ..., 0x000003F, ...]。<br>dst: [0x00000000, 0x00000000, 0x00000001, 0x00000000, ..., 0x0000003F, 0x00000000]。 | min(32, VL/2) |
+| DIST_UNPACK4_B8 | 解压缩模式，按无符号整型u8加载VL/4数据量，unpack到VL，每个元素后会补3个值为0的元素。<br>例如VL=256B：<br>src: [0x00, 0x01, 0x02, 0x03, ..., 0xFF, ...]。<br>dst: [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,..., 0x3F, 0x00, 0x00, 0x00]。 | min(32, VL/4) |
 
 **表 4**  模板参数说明（双搬入模式）
 
@@ -144,8 +144,8 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 |-----|-----|
 | T | 源操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
-| dist | 搬运模式，LoadDist类型。具体参数说明请参考[表3 LoadDist参数说明（双搬入模式）](#表3-LoadDist参数说明（双搬入模式）)。 |
-| U | 目的操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| dist | 搬运模式，LoadDist类型。具体参数说明请参考[表6 LoadDist参数说明（双搬入模式）](#表6-LoadDist参数说明（双搬入模式）)。 |
+| U | 目的操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 5**  参数说明（双搬入模式）
 
@@ -191,19 +191,19 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **连续对齐搬入搬出三类搬运接口调用方式**
 
-[图2 regTrait为RegTraitNumOne时的三类搬运搬运接口调用方式](#fig-loadalign-regtrait)展示了连续对齐搬入/搬出的三类搬运模式在迭代内使用调用方式：
+[图2 regTrait为RegTraitNumOne时的三类搬运接口调用方式](#fig-loadalign-regtrait)展示了连续对齐搬入/搬出的三类搬运模式在迭代内使用调用方式：
 
 - 普通搬运接口：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。
 - PostUpdate扩展搬运接口：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。
 - 使用AddrReg存储偏移量接口：在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。
 
 <a id="fig-loadalign-regtrait"></a>
-**图 2**  regTrait为RegTraitNumOne时的三类搬运搬运接口调用方式
+**图 2**  regTrait为RegTraitNumOne时的三类搬运接口调用方式  
 ![](../../../../figures/reg_loadstorealign.png)
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
-- 单搬出/单搬出模式：普通搬运接口
+- 单搬入/单搬出模式：普通搬运接口
 
     ```cpp
     __simd_vf__ inline void ComputeMode01(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t dstSize, uint16_t oneRepeatSize, uint16_t repeatTimes)

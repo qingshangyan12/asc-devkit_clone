@@ -36,8 +36,8 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 | RegTensor模板参数regTrait | PostUpdate扩展搬运接口 | 使用AddrReg寄存器存储偏移量接口 | 使用AR寄存器存储偏移量接口 |
 |-----|-----|-----|-----|
-| RegTraitNumOne | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 |
-| RegTraitNumTwo | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 | 不支持 |
+| RegTraitNumOne | &bull; POST_MODE_NORMAL模式：不支持。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 在每次迭代中，需要先调用CreateAddrReg手动设定地址偏移量，再调用搬运指令。 | &bull; POST_MODE_NORMAL模式：完成一次搬运后，UB地址不会自动更新，每次迭代需要手动更新地址。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 |
+| RegTraitNumTwo | &bull; POST_MODE_NORMAL模式：不支持。<br>&bull; POST_MODE_UPDATE模式：完成一次搬运后，UB地址会自动更新，每次迭代不需要手动更新地址。 | 不支持 | 不支持 |
 
 非对齐搬出原理请参考[关键特性说明](#关键特性说明)。
 
@@ -83,16 +83,16 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 |-----|-----|
 | T | 目的操作数的数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | postMode | 用于控制是否使能UB地址会自动更新功能（post update），PostLiteral类型。具体参数说明请参考[PostLiteral](../数据类型/PostLiteral.md)。 |
-| U | 源操作数的RegTensor类型。例如RegTensor<half>，由编译器自动推导，用户不需要手动填写。 |
+| U | 源操作数的RegTensor类型。例如RegTensor\<half>，由编译器自动推导，用户不需要手动填写。 |
 
 **表 2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |-----|-----|-----|
-| dstAddr | 输入/输出 | 目的操作数，UB起始地址，不需要32B对齐。 |
+| dstAddr | 输入/输出 | 目的操作数，UB起始地址，不需要32字节对齐。 |
 | srcReg | 输入 | 源操作数，类型为[RegTensor](../寄存器数据类型/RegTensor.md)。 |
 | ureg | 输入/输出 | 非对齐寄存器，UnalignRegForStore类型，用于存储非32字节对齐的数据，寄存器大小为32字节。 |
-| postUpdateStride | 输入 | &bull; POST_MODE_NORMAL：实际搬运UB起始地址为srcAddr + postUpdateStride，搬运后地址不会更新。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr +=  postUpdateStride。 |
+| postUpdateStride | 输入 | 地址更新步长，uint32_t类型，单位：元素个数。根据postMode的取值有两种情况：<br>&bull; POST_MODE_NORMAL：不支持。<br>&bull; POST_MODE_UPDATE：实际搬运UB起始地址为srcAddr，搬运后执行地址更新srcAddr +=  postUpdateStride。 |
 | areg | 输入 | 地址偏移寄存器，AddrReg类型，需要在搬运前调用CreateAddrReg设定地址偏移量，实际搬运UB地址为dstAddr+ 寄存器中存储的偏移量。 |
 
 ## 数据类型
@@ -121,7 +121,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 ## 关键特性说明
 
-**非对齐数据搬出原理**
+**1、非对齐数据搬出原理**
 
 将源寄存器srcReg中的非对齐数据写入UB地址dstAddr，根据ureg当前状态，分为两种场景：
 
@@ -158,7 +158,7 @@ RegTensor的模板参数regTrait支持RegTraitNumOne及RegTraitNumTwo，具体�
 
 **连续非对齐搬入时，LoadUnAlign会将后续未对齐的数据缓存至ureg，所以下一次搬入不需要再次调用LoadUnAlignPre，只需在迭代开始前调用一次LoadUnAlignPre，从而实现非对齐搬入的性能优化。**
 
-**连续非对齐搬出时，下次迭代的StoreUnAlign会将本次迭代StoreAUnlign缓存至ureg中的数据写入UB，所以本次迭代不需要调用StoreUnAlignPost将ureg数据写入UB，只需在迭代结束后调用一次StoreUnAlignPost，从而实现非对齐搬出的性能优化。**
+**连续非对齐搬出时，下次迭代的StoreUnAlign会将本次迭代StoreUnAlign缓存至ureg中的数据写入UB，所以本次迭代不需要调用StoreUnAlignPost将ureg数据写入UB，只需在迭代结束后调用一次StoreUnAlignPost，从而实现非对齐搬出的性能优化。**
 
 如[图3 连续非对齐搬入搬出示例](#fig-storeunalign-3)，将UB地址48 \~ 560的uint32\_t数据\[1, 2, 3, ... , 128\]搬入至dstReg，再搬回UB，需要两次搬入搬出操作，即for循环执行两次，初始化和后处理移至for循环外。
 
@@ -186,11 +186,11 @@ __simd_vf__ inline void LoadUnAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, 
 
 具体的搬运步骤如下：
 
-1.  非对齐搬入初始化：更新ureg1 = [1, 2, 3, 4]；
-2.  非对齐搬入：tmpReg =[5, 6, 7, ... , 68]，tmpReg部分数据和ureg1数据写入dstReg = [1, 2, 3, ... , 64]，更新ureg1 = [61, 62, 63, ... , 68];
-3.  非对齐搬出：dstReg部分数据[1, 2, 3, ... , 60]写入UB地址48 ~ 288，更新ureg2 = [61, 62, 63, 64]；
-4.  非对齐搬入：tmpReg = [69, 70, 71, ... ,128]，tmpReg数据和ureg1部分数据写入dstReg = [65, 66 67, ... , 128]；
-5.  非对齐搬出：ureg2数据[61, 62, 63, 64]和dstReg部分数据[65, 66, 67, ... ,124]写入UB地址288 ~ 544，更新ureg2 = [125, 126, 127, 128]；
+1.  非对齐搬入初始化：更新ureg1 = [1, 2, 3, 4]。
+2.  非对齐搬入：tmpReg =[5, 6, 7, ... , 68]，tmpReg部分数据和ureg1数据写入dstReg = [1, 2, 3, ... , 64]，更新ureg1 = [61, 62, 63, ... , 68]。
+3.  非对齐搬出：dstReg部分数据[1, 2, 3, ... , 60]写入UB地址48 ~ 288，更新ureg2 = [61, 62, 63, 64]。
+4.  非对齐搬入：tmpReg = [69, 70, 71, ... ,128]，tmpReg数据和ureg1部分数据写入dstReg = [65, 66 67, ... , 128]。
+5.  非对齐搬出：ureg2数据[61, 62, 63, 64]和dstReg部分数据[65, 66, 67, ... ,124]写入UB地址288 ~ 544，更新ureg2 = [125, 126, 127, 128]。
 6.  非对齐搬出后处理：将ureg2中缓存的数据[125, 126, 127, 128]写入UB地址544 ~ 560。
 
 ## 调用示例<a name="section642mcpsimp"></a>
