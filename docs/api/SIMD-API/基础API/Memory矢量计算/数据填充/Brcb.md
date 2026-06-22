@@ -189,23 +189,23 @@ dstRepStride为16：说明相邻迭代间目的操作数中首尾DataBlock地址
 
 ## 调用示例<a name="section11276201527"></a>
 
-本样例中只展示Compute流程中的部分代码。如果您需要运行样例代码，请将该代码段拷贝并替换[Brcb样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/brcb)完整样例模板中Compute函数的部分代码即可。
+本调用示例中只展示完整样例中的接口部分代码。如果您需要运行示例代码，请直接参考完整样例[Brcb样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/brcb)进行编译执行。
 
 ```cpp
 // repeatTime = 2, 128 elements one repeat, 256 elements total
 // srcLocal数据类型为half，dstLocal数据类型为half
 // dstBlkStride = 1, no gap between blocks in one repeat
 // dstRepStride = 8, no gap between repeats 
-AscendC::Brcb(dstLocal, srcLocal, 2, {1,8});
+AscendC::Brcb(yLocal, xLocal, 2, {1, 8});
 ```
 
 结果示例如下：
 
 ```plain
-输入数据(srcLocal):
+输入数据(xLocal):
 [1 2 3 ... 16]
-输出数据(dstLocal)初始值:
+输出数据(yLocal)初始值:
 [0. 0. 0. 0. 0. 0. ... 0.]
-进行Brcb计算后，输出数据(dstLocal):
+进行Brcb计算后，输出数据(yLocal):
 [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 ... 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16 16]
 ```
