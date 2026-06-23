@@ -539,6 +539,18 @@ def gitcode_url(target_path, suffix):
     return f"{repo_url}/{view}/master/{target_path}{suffix}"
 
 
+def file_url(target_path, suffix):
+    readme_path = (repo_root / target_path / "README.md")
+    if readme_path.is_file():
+        return f"{target_path.rstrip('/')}/README.md{suffix}"
+    return f"{target_path}{suffix}"
+
+
+def directory_url(target, suffix):
+    path_part = split_target(target)[0]
+    return f"{path_part.rstrip('/')}/{suffix}"
+
+
 def iter_links(line):
     yield from markdown_inline_link_targets(line)
     for match in reference_pattern.finditer(line):
@@ -574,6 +586,21 @@ for source in scan_files:
                 continue
 
             target_path, suffix = normalized
+            if (repo_root / target_path).is_dir():
+                if source_kind == "examples":
+                    path_part = split_target(target)[0]
+                    if not path_part.endswith("/"):
+                        errors.append(
+                            f"{source}:{line_number}: examples directory link must end with '/': "
+                            f"{target} -> {directory_url(target, suffix)}"
+                        )
+                else:
+                    errors.append(
+                        f"{source}:{line_number}: docs Markdown link must target a file, "
+                        f"not a directory: {target} -> {file_url(target_path, suffix)}"
+                    )
+                continue
+
             target_kind = source_area(target_path)
             if target_kind is None or target_kind == source_kind:
                 continue
@@ -586,7 +613,7 @@ for source in scan_files:
 with output_file.open("w", encoding="utf-8") as handle:
     if errors:
         handle.write(
-            f"[Markdown check] FAILED: {len(errors)} docs/examples cross-area link item(s), "
+            f"[Markdown check] FAILED: {len(errors)} Markdown link policy item(s), "
             f"{len(scan_files)} file(s) checked, duration={duration}.\n\nFailed:\n"
         )
         for error in errors:

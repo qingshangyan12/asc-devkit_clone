@@ -8,5 +8,5 @@ This sample introduces the implementation methods for custom operator compilatio
 
 | Directory Name | Description |
 | -------------- | ----------- |
-| [00_acl_compilation](./00_acl_compilation) | This sample introduces the implementation of custom operator compilation, packaging, and deployment |
-| [01_acl_invocation](./01_acl_invocation) | This sample introduces the implementation of Aclnn and Aclop operator invocation |
+| [00_acl_compilation](./00_acl_compilation/) | This sample introduces the implementation of custom operator compilation, packaging, and deployment |
+| [01_acl_invocation](./01_acl_invocation/) | This sample introduces the implementation of Aclnn and Aclop operator invocation |

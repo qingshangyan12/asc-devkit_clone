@@ -8,4 +8,4 @@ This document presents PyTorch framework integration samples based on Ascend C S
 
 | Directory Name | Description |
 |-----------------------------------------------------|------------------------|
-| [torch_library_roll](./torch_library_roll) | A sample demonstrating how to register and invoke the Roll operator via torch.library in PyTorch. |
+| [torch_library_roll](./torch_library_roll/) | A sample demonstrating how to register and invoke the Roll operator via torch.library in PyTorch. |

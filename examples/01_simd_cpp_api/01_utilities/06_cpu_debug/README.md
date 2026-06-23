@@ -27,7 +27,7 @@
   CPU Debug功能支持对CPU执行过程中的运行状态进行调试，主要通过GDB工具实现。GDB调试支持设置断点、查看寄存器和内存状态、单步执行、查看调用栈等常用调试操作。
 
 - 样例介绍：  
-  本样例的Add实现与[Add基础样例](../../00_introduction/01_add/add/README.md)保持一致，默认使用`float`类型。每个block处理`2048`个数据，流程为`DataCopy`输入到UB、执行`Add`、再将结果`DataCopy`回GM。
+  本样例的Add实现与[Add基础样例](../../00_introduction/01_add/add/)保持一致，默认使用`float`类型。每个block处理`2048`个数据，流程为`DataCopy`输入到UB、执行`Add`、再将结果`DataCopy`回GM。
 
   为了使能CPU Debug，本样例在定义`ASCENDC_CPU_DEBUG`宏时包含`cpu_debug_launch.h`头文件。
 
