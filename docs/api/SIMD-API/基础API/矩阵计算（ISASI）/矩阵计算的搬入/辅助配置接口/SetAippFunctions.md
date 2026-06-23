@@ -2,15 +2,27 @@
 
 ## 产品支持情况<a name="section1550532418810"></a>
 
-| 产品 | 是否支持 |
-| --- | :---: |
-| <cann-filter npu-type = "950">Ascend 950PR/Ascend 950DT | √ </cann-filter> |
-| <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310b">Atlas 200I/500 A2 推理产品 | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品AI Core | √ </cann-filter> |
-| <cann-filter npu-type = "310p">Atlas 推理系列产品Vector Core | x </cann-filter> |
-| <cann-filter npu-type = "910">Atlas 训练系列产品 | x </cann-filter> |
+<!-- npu="950" id1 -->
+- Ascend 950PR/Ascend 950DT：支持
+<!-- end id1 -->
+<!-- npu="A3" id2 -->
+- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+<!-- end id2 -->
+<!-- npu="910b" id3 -->
+- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+<!-- end id3 -->
+<!-- npu="310b" id4 -->
+- Atlas 200I/500 A2 推理产品：支持
+<!-- end id4 -->
+<!-- npu="310p" id5 -->
+- Atlas 推理系列产品AI Core：支持
+<!-- end id5 -->
+<!-- npu="310p" id6 -->
+- Atlas 推理系列产品Vector Core：不支持
+<!-- end id6 -->
+<!-- npu="910" id7 -->
+- Atlas 训练系列产品：不支持
+<!-- end id7 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
 
@@ -197,10 +209,8 @@
 
 - 对于XRGB输入格式的数据，芯片会默认丢弃第四个通道的数据输出RGB格式的数据。如果X在channel0的场景下，X通道后移功能必须使能，将输入通道转换为RGBX；反之如果X在channel3的场景下，X通道后移功能必须不使能，以输出RGB格式的数据。
 
-<cann-filter npu-type = "310p">
-
+<!-- npu="310p" id8 -->
 ## 调用示例<a name="section6461234123118"></a>
 
 SetAippFunctions需与[LoadImageToLocal](LoadImageToLocal.md)接口配合使用，完整调用示例（含搬运过程）请参考[LoadImageToLocal的调用示例](LoadImageToLocal.md#section22811728184217)。
-
-</cann-filter>
+<!-- end id8 -->
