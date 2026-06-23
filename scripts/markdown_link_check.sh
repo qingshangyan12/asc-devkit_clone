@@ -15,6 +15,7 @@ LYCHEE_VERSION="${LYCHEE_VERSION:-0.23.0}"
 MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
 MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
+MARKDOWN_LINK_CHECK_ONLINE="${MARKDOWN_LINK_CHECK_ONLINE:-0}"
 MARKDOWN_LINK_CHECK_START=$SECONDS
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
@@ -34,6 +35,7 @@ By default, checks changed Markdown files and Markdown files that link to them.
 Set MARKDOWN_LINK_CHECK_FULL=1 or pass --full to scan tracked Markdown files in the repository.
 Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
+Set MARKDOWN_LINK_CHECK_ONLINE=1 to check remote HTTP(S) links; remote links are skipped by default.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
 MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
 EOF
@@ -634,8 +636,12 @@ if [ "$CROSS_LINK_RC" -ne 0 ]; then
 fi
 
 LYCHEE_BIN=$(find_lychee)
+LYCHEE_ARGS=(--no-progress --config "$CONFIG_FILE")
+if [ "$MARKDOWN_LINK_CHECK_ONLINE" != "1" ]; then
+    LYCHEE_ARGS+=(--offline)
+fi
 set +e
-"$LYCHEE_BIN" --no-progress --config "$CONFIG_FILE" "${SCAN_FILES[@]}" >"$LYCHEE_OUTPUT_FILE" 2>&1
+"$LYCHEE_BIN" "${LYCHEE_ARGS[@]}" "${SCAN_FILES[@]}" >"$LYCHEE_OUTPUT_FILE" 2>&1
 LYCHEE_RC=$?
 set -e
 
