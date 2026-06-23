@@ -80,7 +80,7 @@ __simd_callee__ inline void MulsCast(T3& dstReg, T4& srcReg, T2 scalarValue, Mas
 - 本接口不支持源操作数寄存器和目的操作数寄存器重叠，支持源操作数寄存器之间重叠。
 - 本接口操作数为寄存器，不涉及地址对齐。
 - 本接口不修改全局寄存器的值。
-- [Cast](../类型转换/Cast-45.md)计算按照CAST\_ROUND模式舍入。
+- [Cast](../类型转换/Cast.md)计算按照CAST\_ROUND模式舍入。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 

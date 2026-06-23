@@ -82,7 +82,7 @@ __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg
 
 ## 关键特性说明
 
-在硬件层面单条指令完成乘加融合计算，精度高于分开执行[Mul](../基础算术/Mul-22.md)和[Add](../基础算术/Add-20.md)。
+在硬件层面单条指令完成乘加融合计算，精度高于分开执行[Mul](../基础算术/Mul.md)和[Add](../基础算术/Add.md)。
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
