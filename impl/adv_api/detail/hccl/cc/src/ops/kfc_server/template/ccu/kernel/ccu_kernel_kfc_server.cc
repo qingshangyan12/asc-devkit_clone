@@ -150,17 +150,10 @@ void WaitTurnStartSig(const ccu::Variable &hbmSigAddr, ccu::Variable &turnStartS
     ccu::Variable dbgMagic;
     dbgMagic = 0xDEAD;
     ccu::Store(dbgMagic, ctx.recordAddr);        // CCU 已进入轮询的标记
-    ccu::Variable dbgCnt;
-    dbgCnt = 0;
-    ccu::Variable dbgMax;
-    dbgMax = 3;
     CCU_WHILE(turnStartSig != 1)
     {
         ccu::Load(hbmSigAddr, turnStartSig);     // 循环读HBM对应地址的信号到Xn，直到Xn中的信号值为1
-        CCU_IF(dbgCnt != dbgMax) {
-            ccu::Store(turnStartSig, ctx.recordAddr);  // 把读到的值写到完成信号区供 AICore 读取
-            dbgCnt = dbgCnt + 1;
-        }
+        ccu::Store(turnStartSig, ctx.recordAddr);  // 把读到的值写到完成信号区供 AICore 读取
     }
     turnStartSig = 0;                       // reset Xn
     ccu::Store(turnStartSig, hbmSigAddr);        // reset HBM
