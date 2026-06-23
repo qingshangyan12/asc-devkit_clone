@@ -47,6 +47,26 @@ AIN_DEVICE void Ain::flush()
     pendingChannelCount_ = 0;
 }
 
+template <typename T>
+AIN_DEVICE AinSignalDescriptor GetSignalDescriptor(const Ain &ain, T action)
+{
+    (void)ain;
+    AinSignalDescriptor desc{};
+    desc.type = AIN_SIGNAL_TYPE_INDEXED;
+    desc.indexedSignal.signalId = action.signalId;
+    return desc;
+}
+
+template <typename T>
+AIN_DEVICE uint64_t GetSignalOpArg(T action)
+{
+    if constexpr (AinIsSame<T, AinSignalInc>::value) {
+        return 1;
+    } else {
+        return action.value;
+    }
+}
+
 template <typename RemoteAction, typename LocalAction, typename DescriptorUbuf>
 AIN_DEVICE void Ain::put(void *team, uint32_t peer, __gm__ void *dstWin, uint64_t dstOffset,
     __gm__ void *srcWin, uint64_t srcOffset, uint64_t bytes, const DescriptorUbuf &ubuf,
@@ -105,6 +125,76 @@ AIN_DEVICE void Ain::get(void *team, uint32_t peer, __gm__ void *dstWin, uint64_
         RecordChannel(channel);
     } else {
         hcomm_.ReadNbi(channel, localAddr, remoteAddr, bytes);
+    }
+}
+
+template <typename RemoteAction, typename DescriptorUbuf>
+AIN_DEVICE void Ain::signal(HcclTeam team, uint32_t peer, RemoteAction action, const DescriptorUbuf &ubuf,
+    AinCommitFlags commitFlags)
+{
+    static_assert(!AinIsSame<DescriptorUbuf, AinDescriptorUbufNone>::value,
+        "signal requires a valid DescriptorUbuf; AinDescriptorUbufNone is not allowed");
+    (void)team;
+    hcomm_.Init(ubuf.addr, ubuf.bytes);
+
+    AinSignalDescriptor signalDesc = GetSignalDescriptor(*this, action);
+    uint64_t signalValue = GetSignalOpArg(action);
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    uint32_t signalWindowIdx = static_cast<uint32_t>(devCommTable[2]);
+    AscendC::ChannelHandle channel = devCommTable[4 + peer];
+    auto channelEntity = reinterpret_cast<__gm__ AscendC::ChannelEntity *>(channel);
+    auto remoteSignal = reinterpret_cast<__gm__ uint64_t *>(
+        channelEntity->remoteBufferAddr[signalWindowIdx].bufferInfo.rma.addr) + signalDesc.indexedSignal.signalId;
+
+    GM_ADDR signalAddr = reinterpret_cast<GM_ADDR>(remoteSignal);
+    if (commitFlags == AIN_COMMIT_DELAYED) {
+        hcomm_.WriteWithNotifyNbi<false>(channel, signalAddr, signalAddr, 0, signalAddr, signalValue);
+        RecordChannel(channel);
+    } else {
+        hcomm_.WriteWithNotifyNbi(channel, signalAddr, signalAddr, 0, signalAddr, signalValue);
+    }
+}
+
+AIN_DEVICE uint64_t Ain::readSignal(HcclAinSignal_t signalId, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    uint32_t myRank = static_cast<uint32_t>(devCommTable[0]);
+    uint32_t rankSize = static_cast<uint32_t>(devCommTable[1]);
+    uint32_t signalWindowIdx = static_cast<uint32_t>(devCommTable[2]);
+    __gm__ uint64_t *signal = nullptr;
+    for (uint32_t peer = 0; peer < rankSize; ++peer) {
+        if (peer == myRank || devCommTable[4 + peer] == 0) {
+            continue;
+        }
+        auto channelEntity = reinterpret_cast<__gm__ AscendC::ChannelEntity *>(devCommTable[4 + peer]);
+        signal = reinterpret_cast<__gm__ uint64_t *>(
+            channelEntity->localBufferAddr[signalWindowIdx].bufferInfo.rma.addr) + signalId;
+        break;
+    }
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    return (*signal) & mask;
+}
+
+AIN_DEVICE void Ain::waitSignal(HcclAinSignal_t signalId, uint64_t least, uint32_t bits, AinMemoryOrder order) const
+{
+    (void)order;
+    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
+    uint32_t myRank = static_cast<uint32_t>(devCommTable[0]);
+    uint32_t rankSize = static_cast<uint32_t>(devCommTable[1]);
+    uint32_t signalWindowIdx = static_cast<uint32_t>(devCommTable[2]);
+    __gm__ uint64_t *signal = nullptr;
+    for (uint32_t peer = 0; peer < rankSize; ++peer) {
+        if (peer == myRank || devCommTable[4 + peer] == 0) {
+            continue;
+        }
+        auto channelEntity = reinterpret_cast<__gm__ AscendC::ChannelEntity *>(devCommTable[4 + peer]);
+        signal = reinterpret_cast<__gm__ uint64_t *>(
+            channelEntity->localBufferAddr[signalWindowIdx].bufferInfo.rma.addr) + signalId;
+        break;
+    }
+    uint64_t mask = bits >= 64U ? UINT64_MAX : ((1ULL << bits) - 1ULL);
+    while (((*signal) & mask) < (least & mask)) {
     }
 }
 
