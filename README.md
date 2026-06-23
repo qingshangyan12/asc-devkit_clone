@@ -137,15 +137,16 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
   }
   ```
 
-- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出，其中涉及 CANN 头文件目录需自行替换实际安装位置，`.clangd`中默认为`/usr/local/Ascend`.
+- 在项目根目录下配置 `.clangd`（示例）完整 `.clangd`文件在本目录下给出，其中涉及 CANN 头文件目录需对应实际安装位置，`.clangd`中默认为`/usr/local/Ascend`.
 
-  如果 CANN 安装在非默认路径，或需要切换 NPU 架构宏，可通过脚本基于 `.clangd.in` 生成本地配置：
+  如果 CANN 安装在非默认路径，或需要切换 NPU 架构宏，可先 source CANN `set_env.sh`，再通过脚本基于 `.clangd.in` 生成本地配置：
 
   ```bash
-  python3 scripts/setup_clangd.py --cann-root /path/to/cann --npu-arch 2201 --output .clangd.local
+  source /path/to/cann/set_env.sh
+  python3 scripts/setup_clangd.py --npu-arch 2201 --output .clangd.local
   ```
 
-  生成文件默认为 `.clangd.local`，不会覆盖仓库内置 `.clangd`；如需让项目级 clangd 配置生效，可按需复制为 `.clangd` 后重启 clangd。
+  `ASCEND_HOME_PATH` 由 `set_env.sh` 设置，脚本会使用该环境变量生成真实 CANN 路径；如果未设置，脚本会提示 source `set_env.sh` 后重试。生成文件默认为 `.clangd.local`，不会覆盖仓库内置 `.clangd`；如需让项目级 clangd 配置生效，可按需复制为 `.clangd` 后重启 clangd。
 
   ```yaml
   CompileFlags:

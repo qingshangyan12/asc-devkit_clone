@@ -137,15 +137,16 @@ If you want to quickly experience project build and operator sample execution, a
   }
   ```
 
-- Configure `.clangd` in the project root directory (example). The complete `.clangd` file is provided in this directory. CANN header file directories need to be replaced with actual installation locations. The default in `.clangd` is `/usr/local/Ascend`.
+- Configure `.clangd` in the project root directory (example). The complete `.clangd` file is provided in this directory. CANN header file directories need to match actual installation locations. The default in `.clangd` is `/usr/local/Ascend`.
 
-  If CANN is installed in a non-default path, or if you need to switch the NPU architecture macro, generate a local config from `.clangd.in`:
+  If CANN is installed in a non-default path, or if you need to switch the NPU architecture macro, source CANN `set_env.sh` first, then generate a local config from `.clangd.in`:
 
   ```bash
-  python3 scripts/setup_clangd.py --cann-root /path/to/cann --npu-arch 2201 --output .clangd.local
+  source /path/to/cann/set_env.sh
+  python3 scripts/setup_clangd.py --npu-arch 2201 --output .clangd.local
   ```
 
-  The generated file defaults to `.clangd.local` and does not overwrite the built-in `.clangd`. To make project-level clangd config take effect, copy it to `.clangd` as needed and restart clangd.
+  `ASCEND_HOME_PATH` is set by `set_env.sh`, and the script uses this environment variable to generate the real CANN path. If it is not set, the script prompts you to source `set_env.sh` and retry. The generated file defaults to `.clangd.local` and does not overwrite the built-in `.clangd`. To make project-level clangd config take effect, copy it to `.clangd` as needed and restart clangd.
 
   ```yaml
   CompileFlags:
