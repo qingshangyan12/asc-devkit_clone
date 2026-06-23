@@ -133,10 +133,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ASCENDC_HCCL_API_ASSERT(
         context != nullptr, { return; }, "Init Hccl failed, context addr is nullptr.");
     // 只有 alltoall 且 ccu的会走到这里，并设为true
-    AscendC::PRINTF("start setting hcclNewContext_, newCcuFlag_:[%u]\n", newCcuFlag_);
-    AscendC::PRINTF("[CCU_DEBUG]context=0x%llx, newCcuFlag_=%u\n",
-                reinterpret_cast<uint64_t>(context), newCcuFlag_);
-    
     if (newCcuFlag_) {
         hcclNewContext_ = (__gm__ HcclApi::OpResCtx*)context;
     } else {
@@ -144,18 +140,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
 
     // ensure hcclMsgArea 512B aligned
-    AscendC::PRINTF("obtain workspace info\n");
     uint64_t msgAddr = newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace;
-    AscendC::PRINTF("obtain msgAddr\n");
     if (msgAddr & 0x1ff) {
         msgAddr = (msgAddr & (~((uint64_t)0x1ff))) + 0x200;
     }
-    AscendC::PRINTF("ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx\n", msgAddr, newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace);
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner msgAddr:0x%llx, workSpaceSize:0x%llx", msgAddr, newCcuFlag_ ? hcclNewContext_->workspace : hcclContext_->workSpace);
 
     uint64_t xnAddr = newCcuFlag_ ? hcclNewContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
-    AscendC::PRINTF("xnAddr:0x%llx\n", xnAddr);
     uint64_t ckeAddr = newCcuFlag_ ? hcclNewContext_->ckeAddr : reinterpret_cast<uint64_t>(hcclContext_->ckeOffset);
     AscendC::PRINTF("ckeAddr:0x%llx\n", ckeAddr);
 #ifndef ASCENDC_CPU_DEBUG
@@ -172,10 +164,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     uint64_t allToAllVParamGMOffset = handleParamGMOffset + (uint64_t)sizeof(AlltoAllVParamCcu) * HCCL_MAX_HANDLE_ID;
     ccuParam_.ccuMsgExt = reinterpret_cast<__gm__ CCUMsgExt*>(allToAllVParamGMOffset);
     
-    AscendC::PRINTF("start InitWorkingFlag.\n");
     InitWorkingFlag();
     if (workingFlag_) {
-        AscendC::PRINTF("start WriteHBMData.\n");
         WriteHBMData(finishCntGM_, uint64_t(0));
     }
     curVersion_ = version;
@@ -191,9 +181,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     }
 
     isInited_ = true;
-    AscendC::PRINTF("ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx\n",
-        newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId, newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum,
-        xnAddr, ckeAddr, reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt));
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient InitInner rankId:%d, rankNum:%d, xnAddr:0x%llx, ckeAddr:0x%llx, ccuMsgExt:0x%llx/n",
         newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId, newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum,
@@ -213,28 +200,15 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitV2(
     GM_ADDR context, const void* initTiling)
 {
-    AscendC::PRINTF("enter InitV2.\n");
-    AscendC::PRINTF("[CCU_DEBUG] initTiling addr=0x%llx\n", reinterpret_cast<uint64_t>(initTiling));
-    
     HcclTilingVersion version =
         (initTiling != nullptr ? HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION :
                                  HcclTilingVersion::DEPRECATED_TILING_VERSION);
     if (initTiling != nullptr) {
         const Mc2InitTilingInner *tilingInner = static_cast<const Mc2InitTilingInner *>(initTiling);
-        AscendC::PRINTF("[CCU_DEBUG] tilingInner->version=%u (INIT_TILING_CCU_NEW_VERSION=%u)\n",
-                    tilingInner->version, INIT_TILING_CCU_NEW_VERSION);
-        AscendC::PRINTF("[CCU_DEBUG] tilingInner->mc2HcommCnt=%u\n", tilingInner->mc2HcommCnt);
-        
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
-            AscendC::PRINTF("[CCU_DEBUG] newCcuFlag_ set to TRUE (version matches)\n");
-        } else {
-            AscendC::PRINTF("[CCU_DEBUG] newCcuFlag_ remains FALSE (version mismatch)\n");
         }
-    } else {
-        AscendC::PRINTF("[CCU_DEBUG] initTiling is nullptr, newCcuFlag_ remains FALSE\n");
     }
-    AscendC::PRINTF("start InitInner\n");
     InitInner(context, version);
     tilingBaseAddr_ = reinterpret_cast<uint64_t>(initTiling);
 }
@@ -365,20 +339,17 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CommonPrepareImpl(
     const CommonPrepareParam& commonPrepareParam)
 {
-    AscendC::printf("Start CommonPrepareImpl!\n");
     if (unlikely(commonPrepareParam.repeat == 0U)) {
         return INVALID_HANDLE_ID;
     }
 
     HcclHandle handleId = curHandleId_;
 
-    AscendC::printf("Start ASCENDC_HCCL_API_ASSERT!\n");
     ASCENDC_HCCL_API_ASSERT(
         handleId < HCCL_MAX_HANDLE_ID, { return INVALID_HANDLE_ID; },
         "Call Prepare[%d] failed, Prepare interface call num is[%d], expected less than[%d].",
         static_cast<int32_t>(commonPrepareParam.commType.prepareType), handleId + 1, HCCL_MAX_HANDLE_ID);
 
-    AscendC::printf("Start InitHandleInfo!\n");
     InitHandleInfo(handleId);
     uint64_t reqId = handleId == 0 ? 0 : handleReqId_[handleId - 1] + handleRepeatCnt_[handleId - 1];
     handleReqId_[handleId] = (uint8_t)(reqId % CCU_MAX_MSG_NUM);
@@ -386,7 +357,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     handleRepeatCnt_[handleId] = commonPrepareParam.repeat;
 
     if (workingFlag_) {
-        AscendC::printf("Start setting handleParamGM_!\n");
         handleParamGM_[handleId].commType.prepareType = commonPrepareParam.commType.prepareType;
         handleParamGM_[handleId].sendBuf = commonPrepareParam.sendBuf;
         handleParamGM_[handleId].recvBuf = commonPrepareParam.recvBuf;
@@ -395,15 +365,12 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].dstDataType = commonPrepareParam.dstDataType;
         handleParamGM_[handleId].op = commonPrepareParam.op;
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
-        AscendC::printf("Start InitCcuParam!\n");
         InitCcuParam(handleId);
-        AscendC::printf("Start FlushDataCache!\n");
         FlushDataCache(&handleParamGM_[handleId]);
         uint64_t dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commonPrepareParam.dataType)];
         uint32_t rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
 
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
-            AscendC::printf("Start setting allToAllVParam_!\n");
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
                 allToAllVParam_[handleId].sdispls[i] = commonPrepareParam.paramExt.sdispls[i];
@@ -411,7 +378,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
                 allToAllVParam_[handleId].rdispls[i] = commonPrepareParam.paramExt.rdispls[i];
             }
             
-            AscendC::printf("Start FlushDataCache2!\n");
             for (uint32_t j = 0; j < rankNum; j += MAX_DCCI_CNT / sizeof(uint64_t)) {
                 FlushDataCache(&allToAllVParam_[handleId].sendCounts + j);
                 FlushDataCache(&allToAllVParam_[handleId].sdispls + j);
@@ -419,21 +385,17 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
                 FlushDataCache(&allToAllVParam_[handleId].rdispls + j);
             }
         } else if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_HALF_ALLTOALLV) {
-            AscendC::printf("[HCCL_CMD_HALF_ALLTOALLV]Start setting handleParamGM_!\n");
             handleParamGM_[handleId].wParamExt.sendOffsets = commonPrepareParam.wParamExt.sendOffsets;
             handleParamGM_[handleId].wParamExt.sendSizes = commonPrepareParam.wParamExt.sendSizes;
             handleParamGM_[handleId].wParamExt.remoteWinOffset = commonPrepareParam.wParamExt.remoteWinOffset;
-            AscendC::printf("[HCCL_CMD_HALF_ALLTOALLV]Start FlushDataCache!\n");
             FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         }
     }
 
     if constexpr (commit) {
-        AscendC::printf("Start CommitMsgInner!\n");
         CommitMsgInner(handleId);
     }
     curHandleId_++;
-    AscendC::printf("Finish CommonPrepareImpl!\n");
     return handleId;
 }
 
@@ -445,9 +407,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
-    AscendC::PRINTF("[CcuSendMsg]start GetCommitCkeAddr\n");
     ccuMsg_.commitCKEAddr = GetCommitCkeAddr(resourceId);
-    AscendC::PRINTF("[CcuSendMsg]finish GetCommitCkeAddr\n");
 
     for (int i = 0; i < ccuUsedXnNum_; i++) {
         *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
@@ -478,9 +438,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
-    AscendC::PRINTF("[CcuSendMsg]start WriteHBMData commitCKEAddr\n");
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
-    AscendC::PRINTF("[CcuSendMsg]finish WriteHBMData commitCKEAddr, commitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(ccuMsg_.commitCKEAddr));
+    AscendC::PRINTF("commitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(ccuMsg_.commitCKEAddr));
 }
 
 template <const auto& config>
@@ -540,7 +499,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::Wait(HcclHandle handleId)
 {
-    AscendC::PRINTF("[WaitFunc]start Wait\n");
     ASCENDC_HCCL_API_ASSERT(
         isInited_, { return HCCL_FAILED; },
         "Call Wait failed, please ensure Hccl::Init func has been called successfully already!");
@@ -551,13 +509,11 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         handleId < curHandleId_, { return HCCL_FAILED; },
         "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
 
-    AscendC::PRINTF("[WaitFunc]Check handleId\n");
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
         KERNEL_LOG(KERNEL_ERROR, "Call Wait failed, handleId[%u] is invalid.", handleId);
         return HCCL_FAILED;
     }
 
-    AscendC::PRINTF("[WaitFunc]Check handleNeedCommitCnt_\n");
     if (unlikely(handleNeedCommitCnt_[handleId] <= 0)) {
         KERNEL_LOG(
             KERNEL_ERROR, "Call Wait failed, handleNeedCommitCnt_[%u] = %u is invalid.", handleId,
@@ -566,9 +522,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     }
     uint8_t reqId = handleReqId_[handleId] + handleFinishCnt_[handleId];
     reqId %= CCU_MAX_MSG_NUM;
-    AscendC::PRINTF("[WaitFunc]start GetWaitCkeAddr\n");
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
-    AscendC::PRINTF("[WaitFunc]end GetWaitCkeAddr, waitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(waitCKEAddr));
+    AscendC::PRINTF("waitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(waitCKEAddr));
 
 #ifndef ASCENDC_CPU_DEBUG
     AscendC::PRINTF("[WaitFunc]start ASCENDC_CPU_DEBUG\n");
@@ -599,36 +554,25 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     AscendC::PRINTF("[WaitFunc]end ASCENDC_CPU_DEBUG\n");
 #endif
 
-    AscendC::PRINTF("[WaitFunc]setting msgQueueIsAvailable_\n");
     msgQueueIsAvailable_[reqId] = true;
-    AscendC::PRINTF("[WaitFunc]setting handleFinishCnt_\n");
     handleFinishCnt_[handleId]++;
-    AscendC::PRINTF("[WaitFunc]setting finishNum_\n");
     finishNum_++;
-    AscendC::PRINTF("[WaitFunc]setting globalCurWaitId_\n");
     globalCurWaitId_++;
-    AscendC::PRINTF("[WaitFunc]setting globalCurWaitId_2\n");
     globalCurWaitId_ %= CCU_MAX_MSG_NUM;
-    AscendC::PRINTF("[WaitFunc]end setVal\n");
 
     // 补发消息
     // 场景1:同一个handleId需要补发
     if (handleCommitCnt_[handleId] < handleNeedCommitCnt_[handleId]) {
-        AscendC::PRINTF("[WaitFunc]start CommitMsg\n");
         CommitMsg(handleId);
-        AscendC::PRINTF("[WaitFunc]finish CommitMsg\n");
     } else { // 场景2:下一个handleId需要补发
-        AscendC::PRINTF("[WaitFunc]start CommitMsg2\n");
         uint32_t nextHandleId = handleId + 1;
         if (nextHandleId < curHandleId_ && (handleCommitCnt_[nextHandleId] < handleNeedCommitCnt_[nextHandleId])) {
             CommitMsg(nextHandleId);
         }
-        AscendC::PRINTF("[WaitFunc]finish CommitMsg2\n");
     }
 
     KERNEL_LOG(
         KERNEL_INFO, "ApiClient Wait finish finishCntGM_:%d, finishCnt_:%d", *finishCntGM_, handleFinishCnt_[handleId]);
-    AscendC::PRINTF("[WaitFunc]end Wait\n");
     return HCCL_SUCCESS;
 }
 
