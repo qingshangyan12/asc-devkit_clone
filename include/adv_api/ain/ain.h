@@ -26,8 +26,7 @@
 #include "adv_api/hcomm/hcomm.h"
 #include "../../../impl/adv_api/detail/ain/impl/ain_impl_def.h"
 
-namespace ain {
-namespace device {
+namespace AscendC {
 
 enum AinMemoryOrder {
     AIN_MEMORY_ORDER_RELAXED,
@@ -58,8 +57,9 @@ public:
 private:
     static constexpr uint32_t MAX_PENDING_CHANNELS = 64;
 
-    AIN_DEVICE uint32_t DecodeWindow(__gm__ void *window) const;
     AIN_DEVICE void RecordChannel(AscendC::ChannelHandle channel);
+
+    AIN_DEVICE uint64_t DecodeWindow(__gm__ void *window) const;
 
 private:
     uint64_t devComm_ = 0;
@@ -69,8 +69,7 @@ private:
     uint32_t pendingChannelCount_ = 0;
 };
 
-}  // namespace device
-}  // namespace ain
+}  // namespace AscendC
 
 #include "../../../impl/adv_api/detail/ain/impl/ain_impl.h"
 

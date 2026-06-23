@@ -26,8 +26,7 @@
 
 #include "ain_impl_def.h"
 
-namespace ain {
-namespace device {
+namespace AscendC {
 
 AIN_DEVICE Ain::Ain(__gm__ void *devComm, int contextIndex)
     : devComm_(reinterpret_cast<uint64_t>(devComm)), contextIndex_(contextIndex)
@@ -59,23 +58,21 @@ AIN_DEVICE void Ain::put(void *team, uint32_t peer, __gm__ void *dstWin, uint64_
     (void)localAction;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
-    uint32_t dstWinIdx = DecodeWindow(dstWin);
-    uint32_t srcWinIdx = DecodeWindow(srcWin);
-    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
-    size_t actualPos = 4 + peer;
-    AscendC::ChannelHandle channel = devCommTable[actualPos];
-    auto channelEntity = reinterpret_cast<__gm__ AscendC::ChannelEntity *>(channel);
+    auto dstSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(dstWin));
+    auto srcSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(srcWin));
+    auto hcclDevComm = reinterpret_cast<HcclDevComm *>(devComm_);
+    auto channel = hcclDevComm->AivRes->entity[peer][0];
 
     auto remoteAddr = reinterpret_cast<__gm__ uint8_t *>(
-        channelEntity->remoteBufferAddr[dstWinIdx].bufferInfo.rma.addr + dstOffset);
+        reinterpret_cast<uintptr_t>(dstSymWin->remoteMems[peer].addr) + dstOffset);
     auto localAddr = reinterpret_cast<__gm__ uint8_t *>(
-        channelEntity->localBufferAddr[srcWinIdx].bufferInfo.rma.addr + srcOffset);
+        reinterpret_cast<uintptr_t>(srcSymWin->userVa) + srcOffset);
 
     if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.WriteNbi<false>(channel, remoteAddr, localAddr, bytes);
-        RecordChannel(channel);
+        hcomm_.WriteNbi<false>(reinterpret_cast<AscendC::ChannelHandle>(&channel), remoteAddr, localAddr, bytes);
+        RecordChannel(reinterpret_cast<AscendC::ChannelHandle>(&channel));
     } else {
-        hcomm_.WriteNbi(channel, remoteAddr, localAddr, bytes);
+        hcomm_.WriteNbi(reinterpret_cast<AscendC::ChannelHandle>(&channel), remoteAddr, localAddr, bytes);
     }
 }
 
@@ -89,28 +86,21 @@ AIN_DEVICE void Ain::get(void *team, uint32_t peer, __gm__ void *dstWin, uint64_
     (void)team;
     hcomm_.Init(ubuf.addr, ubuf.bytes);
 
-    uint32_t dstWinIdx = DecodeWindow(dstWin);
-    uint32_t srcWinIdx = DecodeWindow(srcWin);
-    auto devCommTable = reinterpret_cast<__gm__ uint64_t *>(devComm_);
-    size_t actualPos = 4 + peer;
-    AscendC::ChannelHandle channel = devCommTable[actualPos];
-    auto channelEntity = reinterpret_cast<__gm__ AscendC::ChannelEntity *>(channel);
+    auto dstSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(dstWin));
+    auto srcSymWin = reinterpret_cast<SymmetricWindow *>(DecodeWindow(srcWin));
+    auto hcclDevComm = reinterpret_cast<HcclDevComm *>(devComm_);
+    auto channel = hcclDevComm->AivRes->entity[peer][0];
 
     auto localAddr = reinterpret_cast<__gm__ uint8_t *>(
-        channelEntity->localBufferAddr[dstWinIdx].bufferInfo.rma.addr + dstOffset);
+        reinterpret_cast<uintptr_t>(dstSymWin->userVa) + dstOffset);
     auto remoteAddr = reinterpret_cast<__gm__ uint8_t *>(
-        channelEntity->remoteBufferAddr[srcWinIdx].bufferInfo.rma.addr + srcOffset);
+        reinterpret_cast<uintptr_t>(srcSymWin->remoteMems[peer].addr) + srcOffset);
     if (commitFlags == AIN_COMMIT_DELAYED) {
-        hcomm_.ReadNbi<false>(channel, localAddr, remoteAddr, bytes);
-        RecordChannel(channel);
+        hcomm_.ReadNbi<false>(reinterpret_cast<AscendC::ChannelHandle>(&channel), localAddr, remoteAddr, bytes);
+        RecordChannel(reinterpret_cast<AscendC::ChannelHandle>(&channel));
     } else {
-        hcomm_.ReadNbi(channel, localAddr, remoteAddr, bytes);
+        hcomm_.ReadNbi(reinterpret_cast<AscendC::ChannelHandle>(&channel), localAddr, remoteAddr, bytes);
     }
-}
-
-AIN_DEVICE uint32_t Ain::DecodeWindow(__gm__ void *window) const
-{
-    return static_cast<uint32_t>(reinterpret_cast<uintptr_t>(window));
 }
 
 AIN_DEVICE void Ain::RecordChannel(AscendC::ChannelHandle channel)
@@ -127,8 +117,12 @@ AIN_DEVICE void Ain::RecordChannel(AscendC::ChannelHandle channel)
     pendingChannels_[pendingChannelCount_++] = channel;
 }
 
-}  // namespace device
-}  // namespace ain
+AIN_DEVICE uint64_t Ain::DecodeWindow(__gm__ void *window) const
+{
+    return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(window));
+}
+
+}  // namespace AscendC
 
 #endif  // IMPL_ADV_API_DETAIL_AIN_IMPL_AIN_IMPL_H
 
