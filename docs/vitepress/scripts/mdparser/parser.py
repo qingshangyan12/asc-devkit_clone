@@ -54,45 +54,60 @@ _OPTIONS = cmarkgfm.Options.CMARK_OPT_UNSAFE
 
 _MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md(#[^"]*)?"')
 
-_CUSTOM_TAG_NAMES = r'cann-filter|term|ph|__gm__|__ubuf__'
-
-_CUSTOM_TAG_RE = re.compile(
-    r'<(cann-filter)\b[^>]*>([\s\S]*?)</\1>|'
-    r'<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)</\3>',
+_CANN_OPEN_RE = re.compile(
+    r'<cann-filter\b[^>]*npu[_-]type\s*=\s*"([^"]+)"[^>]*>',
     re.IGNORECASE,
 )
 
-_CUSTOM_TAG_OPEN_RE = re.compile(
-    r'<(cann-filter|term|ph|__gm__|__ubuf__)\b[^>]*>',
+_CANN_CLOSE_RE = re.compile(
+    r'</cann-filter\b[^>]*>',
     re.IGNORECASE,
 )
 
-_CUSTOM_TAG_CLOSE_RE = re.compile(
-    r'</(cann-filter|term|ph|__gm__|__ubuf__)>',
+_OTHER_TAG_NAMES = r'term|ph|__gm__|__ubuf__'
+
+_OTHER_TAG_LINE_RE = re.compile(
+    r'^[ \t]*</?(' + _OTHER_TAG_NAMES + r')\b[^>]*>[ \t]*$',
+    re.IGNORECASE,
+)
+
+_OTHER_TAG_WRAP_RE = re.compile(
+    r'<(' + _OTHER_TAG_NAMES + r')\b[^>]*>([\s\S]*?)</\1>',
+    re.IGNORECASE,
+)
+
+_OTHER_TAG_ANY_RE = re.compile(
+    r'</?(' + _OTHER_TAG_NAMES + r')\b[^>]*>',
     re.IGNORECASE,
 )
 
 
-def _strip_custom_tags(md_text: str) -> str:
-    """在 markdown 解析前清除 cann-filter / term / ph / __gm__ / __ubuf__ 等自定义标签
+def _convert_cann_filter(md_text: str) -> str:
+    """将所有 cann-filter 标签转为 HTML 注释，保留筛选信息。
 
-    这些标签在源文件中出现时会被 cmarkgfm 视为 raw HTML block，
-    破坏列表、引用块等 markdown 结构。必须在解析前清除。
+    <cann-filter> 标签（无论独立行还是行内）会被 cmarkgfm 视为 raw HTML，
+    若跨表格单元格/列表项边界则产生非法 HTML 结构。转为注释后 cmarkgfm
+    透传为无害注释，不破坏结构。后续由 config.mjs 将注释还原为 div[data-filter]。
+    """
+    md_text = _CANN_OPEN_RE.sub(r'<!--cann-filter:\1-->', md_text)
+    md_text = _CANN_CLOSE_RE.sub(r'<!--/cann-filter-->', md_text)
+    return md_text
+
+
+def _strip_other_tags(md_text: str) -> str:
+    """清除 term / ph / __gm__ / __ubuf__ 等不参与筛选的标签。
+
+    这些标签同样会被 cmarkgfm 视为 raw HTML block，破坏 markdown 结构。
     """
     lines = md_text.split('\n')
     result = []
     for line in lines:
-        stripped = line.strip()
-        if _CUSTOM_TAG_OPEN_RE.fullmatch(stripped) or _CUSTOM_TAG_CLOSE_RE.fullmatch(stripped):
+        if _OTHER_TAG_LINE_RE.match(line):
             continue
         result.append(line)
     md_text = '\n'.join(result)
-    md_text = re.sub(
-        r'<(term|ph|__gm__|__ubuf__)\b[^>]*>([\s\S]*?)</\1>',
-        r'\2', md_text, flags=re.IGNORECASE,
-    )
-    md_text = _CUSTOM_TAG_OPEN_RE.sub('', md_text)
-    md_text = _CUSTOM_TAG_CLOSE_RE.sub('', md_text)
+    md_text = _OTHER_TAG_WRAP_RE.sub(r'\2', md_text)
+    md_text = _OTHER_TAG_ANY_RE.sub('', md_text)
     return md_text
 
 _CALLOUT_RE = re.compile(
@@ -424,7 +439,7 @@ def _highlight_code(html: str) -> str:
 
 
 def parse_string(text: str, gfm: bool = True) -> str:
-    text = _strip_custom_tags(text)
+    text = _convert_cann_filter(text)
     if gfm:
         html = gfm_to_html(text)
     else:
