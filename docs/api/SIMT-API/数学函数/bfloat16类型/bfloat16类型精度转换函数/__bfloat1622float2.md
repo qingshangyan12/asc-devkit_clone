@@ -32,6 +32,16 @@ inline float2 __bfloat1622float2(const bfloat16x2_t x)
 
 将bfloat16x2的两个分量分别转换为float，并填充到float2的结果。
 
+| x分量值 | 对应分量返回值 |
+|---|---|
+| ±0 | ±0 |
+| nan | nan |
+| inf | inf |
+| -inf | -inf |
+| ASCRT_MAX_NORMAL_BF16 | 3.38953e+38 |
+| -ASCRT_MAX_NORMAL_BF16 | -3.38953e+38 |
+| ASCRT_MIN_DENORM_BF16 | 9.18355e-41 |
+
 ## 约束说明
 
 无

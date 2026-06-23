@@ -32,9 +32,12 @@ inline bfloat16x2_t h2ceil(bfloat16x2_t x)
 
 大于或等于输入数据各元素的最小整数值。特别场景说明如下：
 
--   当输入元素为nan时，返回值为nan。
--   当输入元素为inf时，返回值为inf。
--   当输入元素为-inf时，返回值为-inf。
+| 输入 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| ±0 | ±0 | ±0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT_MAX_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 

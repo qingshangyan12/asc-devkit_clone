@@ -34,10 +34,14 @@ inline bfloat16x2_t h2rsqrt(bfloat16x2_t x)
 
 输入数据各元素的平方根的倒数。
 
--   当输入元素为0时，返回值为inf。
--   当输入元素为inf时，返回值为0。
--   当输入元素为-inf时，返回值为nan。
--   当输入元素为nan时，返回值为nan。
+| 输入 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| 0 | inf | ASCRT_MAX_NORMAL_BF16 |
+| -0 | inf | ASCRT_MAX_NORMAL_BF16 |
+| nan | nan | 0 |
+| inf | 0 | 0 |
+| -inf | nan | 0 |
+| x＜0 | nan | 0 |
 
 ## 约束说明
 

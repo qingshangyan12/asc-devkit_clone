@@ -36,6 +36,15 @@ bool __hblex2(bfloat16x2_t x, bfloat16x2_t y)
 -   true：各分量均满足第一个数小于或等于第二个数。
 -   false：任一分量不满足第一个数小于或等于第二个数。任一输入的分量为nan，该分量的比较结果为false。
 
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| 任一分量含nan || false |
+| inf | inf | true |
+| -inf | -inf | true |
+| -inf |正常值 | true |
+| 正常值 | inf | true |
+| 0 | 0 | true |
+
 ## 约束说明
 
 无
