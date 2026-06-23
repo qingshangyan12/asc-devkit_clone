@@ -248,7 +248,7 @@ mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
 
 L2Cache 是 AI Core 共享的外部缓存，纯读带宽约为 GM 的 3 到 4 倍。若数据无法命中 L2Cache，需要访问 GM，带宽利用效率较低，导致 MTE2 成为性能瓶颈。
 
-L2Cache 切分的具体实现与[高阶 API Matmul 样例](../matmul_high_performance/README.md)中的 Case 6 一致，核心思路均为将 A 矩阵 M 轴切分，使 B 矩阵跨轮驻留 L2Cache。本样例通过 `ProcessL2Cache()` 方法实现双重外层循环，按 `outerMIdx` 分轮调度，每轮内 24 核并行计算各自的子块：
+L2Cache 切分的具体实现与[高阶 API Matmul 样例](../matmul_high_performance/)中的 Case 6 一致，核心思路均为将 A 矩阵 M 轴切分，使 B 矩阵跨轮驻留 L2Cache。本样例通过 `ProcessL2Cache()` 方法实现双重外层循环，按 `outerMIdx` 分轮调度，每轮内 24 核并行计算各自的子块：
 
 ```cpp
 // ProcessL2Cache: 按 M 方向分轮，每轮 24 核覆盖 mIterPerRound 份 M 子块
