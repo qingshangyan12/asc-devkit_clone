@@ -23,6 +23,7 @@
 // HCCL
 #include "hccl/base.h"
 #include "hccl_comm.h"
+#include "hccl/hccl_res.h"
 #include "adapter_rts_common.h"
 #include "hccl_inner.h"
 
@@ -30,6 +31,11 @@
 #include "acl/acl_rt.h"
 
 namespace hccl {
+
+enum class SymmetricMemoryMode {
+    HCCS = 0,
+    URMA = 1
+};
 
 struct FreeBlock {
     size_t offset;
@@ -53,7 +59,9 @@ struct SymmetricWindow {
     u32 rankSize;
     size_t stride;
     aclrtDrvMemHandle paHandle;
-
+    SymmetricMemoryMode mode;
+    CommMem* remoteMems;
+    u32 remoteMemNum;
     void* devWin; // device端结构体
 };
 
