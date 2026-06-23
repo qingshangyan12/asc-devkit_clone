@@ -2,10 +2,9 @@
 
 -   [Ascend C API列表](Ascend-C-API列表.md)
 -   [SIMD API](SIMD-API/SIMD-API.md)
-    -   [基础API列表](SIMD-API/基础API/基础API列表.md)
-    -   [高阶API列表](SIMD-API/高阶API/高阶API列表.md)
     -   [通用说明和约束](SIMD-API/通用说明和约束.md)
     -   [基础API](SIMD-API/基础API/基础API.md)
+        -   [基础API列表](SIMD-API/基础API/基础API列表.md)
         -   [数据结构](SIMD-API/基础API/数据结构/数据结构.md)
             -   [内置数据类型](SIMD-API/基础API/数据结构/内置数据类型.md)
             -   [精度转换](SIMD-API/基础API/数据结构/precision_conversion.md)
@@ -1279,6 +1278,7 @@
             -   [asc_init](SIMD-API/C-API/misc/asc_init.md)
 
     -   [高阶API](SIMD-API/高阶API/高阶API.md)
+        -   [高阶API列表](SIMD-API/高阶API/高阶API列表.md)
         -   [数学计算](SIMD-API/高阶API/数学计算/数学计算.md)
             -   [Tanh接口](SIMD-API/高阶API/数学计算/Tanh接口/Tanh接口.md)
                 -   [Tanh](SIMD-API/高阶API/数学计算/Tanh接口/Tanh.md)
