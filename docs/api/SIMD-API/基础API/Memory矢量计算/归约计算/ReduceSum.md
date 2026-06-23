@@ -55,7 +55,7 @@
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。 |
-| isSetMask | 是否在接口内部设置mask。<br>&bull; true，表示在接口内部设置mask。<br>&bull; false，表示在接口外部设置mask，开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
+| isSetMask | 是否在接口内部设置mask模式和mask值。<br>&bull; true，表示在接口内部设置。<br>&nbsp; tensor前n个数据计算API内部使用了mask的[Counter模式](../SIMD计算说明/掩码/概述.md#mask-mode)，一般情况下保持isSetMask默认值即可，表示在API内部根据开发者传入的count参数进行mask模式和mask值的设置。<br>&bull; false，表示在接口外部设置。<br>&nbsp; 开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。此时，接口入参中的count不生效，建议设置成1。<br>&bull; false，表示在接口外部设置。<br>&nbsp; 开发者需要使用[SetVectorMask](../掩码操作/SetVectorMask.md)接口设置mask值。此时，接口入参中的count不生效，建议设置成1。<br>部分产品型号该参数不生效，详情请参考[约束说明](#约束说明)。 |
 
 **表2**  参数说明
 
@@ -104,8 +104,7 @@
 
 - <cann-filter npu-type = "950">针对Ascend 950PR/Ascend 950DT，`int64_t`/`uint64_t`数据类型仅支持tensor前n个数据计算接口。</cann-filter>
 - `srcRepStride`取值范围为[0, $2^{16}-1$]，需要结合UB的实际大小避免出现越界。
-
-  <!-- npu="950,910,310p,310b,x90,9030" id1 -->
+<!-- npu="950,910,310p,310b,x90,9030" id1 -->
 - 针对以下型号，模板参数`isSetMask`参数不生效，保持默认值即可：
   <!-- npu="950" id2 -->
   - Ascend 950PR/Ascend 950DT
