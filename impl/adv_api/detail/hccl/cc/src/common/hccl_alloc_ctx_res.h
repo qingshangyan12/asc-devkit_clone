@@ -19,6 +19,8 @@
 #include "load_kernel.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_host_bridge.h"
+#include "mc2_type.h"
+#include "ccu_assist_pub.h"
 
 #include <vector>
 #include <memory>
@@ -40,6 +42,8 @@ constexpr uint32_t MC2_TILING_VERSION = 2U;
 constexpr uint32_t MAX_HCOM_NUM = 3U;
 
 constexpr uint32_t INIT_TILING_VERSION = 100U;
+constexpr uint32_t MAX_OP_NUM = 8U;
+constexpr uint32_t INIT_TILING_CCU_NEW_VERSION = 101U;
 constexpr uint32_t MAX_CC_TILING_NUM = 8U;
 
 struct Mc2ServerCfg {
@@ -52,7 +56,7 @@ struct Mc2ServerCfg {
 };
 
 struct Mc2InitTilingInner {
-    uint32_t version;
+    uint32_t version;   // ccu & alltoall (暂定version 为 原本的version + 1)
     uint32_t mc2HcommCnt;
     uint32_t offset[MAX_CC_TILING_NUM];
     uint8_t debugMode;
@@ -92,7 +96,57 @@ struct OpResCtx {
     uint64_t rankId;
     uint64_t rankSize;
     AlgInfo algInfo[MAX_CC_TILING_NUM];
+
+    // for ccu
+    uint64_t xnAddr;  // xn寄存器起始地址
+    uint64_t ckeAddr;  // cke寄存器起始地址
+    uint64_t sprAddr;  // spr寄存器起始地址
+    uint64_t res[MAX_OP_NUM];  // MS地址，预留
+    uint64_t resCtx;  // 资源地址，用于资源下发时的处理
+    uint32_t opType[MAX_OP_NUM];
+    uint32_t algorithmType[MAX_OP_NUM];
+    bool isKfc[MAX_OP_NUM]; // 用于标记是否走kfcServer
 };
+
+enum AlgorithmType {
+    CcuAllGatherMesh1D = 0,
+    CcuAllGatherMeshMem2Mem1D,
+    CcuAllGatherMesh2D,
+    CcuReduceScatterMesh1D = 50,
+    CcuReduceScatterMeshMem2Mem1D,
+    CcuReduceScatterMesh2D,
+    CcuAllReduceMesh1D = 100,
+    CcuAllReduceMeshMem2Mem1D,
+    CcuAllReduceMesh2DOneShot,
+    CcuAlltoAllMesh1D = 150,
+    CcuAlltoAllVMesh1D,
+    CcuHalfAll2AllVMesh1D
+};
+
+static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
+    {"CcuAllGatherMesh1D", CcuAllGatherMesh1D},
+    {"CcuAllGatherMeshMem2Mem1D", CcuAllGatherMeshMem2Mem1D},
+    {"CcuAllGatherMesh2D", CcuAllGatherMesh2D},
+    {"CcuReduceScatterMesh1D", CcuReduceScatterMesh1D},
+    {"CcuReduceScatterMeshMem2Mem1D", CcuReduceScatterMeshMem2Mem1D},
+    {"CcuReduceScatterMesh2D", CcuReduceScatterMesh2D},
+    {"CcuAllReduceMesh1D", CcuAllReduceMesh1D},
+    {"CcuAllReduceMeshMem2Mem1D", CcuAllReduceMeshMem2Mem1D},
+    {"CcuAllReduceMesh2DOneShot", CcuAllReduceMesh2DOneShot},
+    {"CcuAlltoAllMesh1D", CcuAlltoAllMesh1D},
+    {"CcuAlltoAllVMesh1D", CcuAlltoAllVMesh1D},
+    {"CcuHalfAll2AllVMesh1D", CcuHalfAll2AllVMesh1D}
+};
+
+CommEngine OpExecuteConfigToCommEngine(uint8_t commEngine)
+{
+    if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::AICPU_TS) {
+        return COMM_ENGINE_AICPU;
+    } else if (static_cast<OpExecuteConfig>(commEngine) == OpExecuteConfig::CCU_SCHED) {
+        return COMM_ENGINE_CCU;
+    }
+    return COMM_ENGINE_RESERVED;
+}
 
 HcclResult CheckInputParam(const HcclComm comm, const void* mc2Tiling, const aclrtStream stream)
 {
@@ -157,6 +211,60 @@ HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum)
     return HCCL_SUCCESS;
 }
 
+HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint8_t& commEngine)
+{
+    commEngine = static_cast<uint8_t>(OpExecuteConfig::DEFAULT);
+    for (uint32_t i = 0U; i < tilingNum; ++i) {
+        const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        if (commEngine == static_cast<uint8_t>(OpExecuteConfig::DEFAULT)) {
+            commEngine = ccTiling->commEngine;
+        }
+        if (ccTiling->commEngine != commEngine) {
+            HCCL_ERROR("Invalid commEngine %u.", ccTiling->commEngine);
+            return HCCL_E_NOT_SUPPORT;
+        }
+    }
+
+    if (commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU_TS) &&
+        commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
+        HCCL_ERROR("Invalid commEngine %u.", commEngine);
+        return HCCL_E_NOT_SUPPORT;
+    }
+    return HCCL_SUCCESS;
+}
+
+// 构建 opResCtx 基础字段
+HcclResult AllocCcuOpResCtx(HcclComm comm, const std::string& ctxTag, u32 rankSize, u32 userRank, OpResCtx& opResCtx)
+{
+    // 1. 分配workspace、comParam（XN）、comSync（CKE）
+    constexpr uint32_t comSyncNum = 2;
+    uint64_t comParamBufSize = Hccl::CCU_TASK_NUM_MAX * Hccl::CCU_PARAM_NUM_MAX * Hccl::CCU_ONE_PARAM_SIZE;
+    uint64_t comSyncBufSize = Hccl::CCU_TASK_NUM_MAX * comSyncNum * Hccl::CCU_ONE_PARAM_SIZE;
+
+    std::string tagWorkspace = ctxTag + "_ccu_workspace";
+    std::string tagComParam = ctxTag + "_ccu_comParam";
+    std::string tagComSync = ctxTag + "_ccu_comSync";
+
+    void* workspacePtr = nullptr;
+    void* comParamPtr = nullptr;
+    void* comSyncPtr = nullptr;
+
+    CHK_RET(HcclEngineCtxCreate(comm, tagWorkspace.c_str(), COMM_ENGINE_AIV, Hccl::MC2_WORKSPACE_SIZE, &workspacePtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagComParam.c_str(), COMM_ENGINE_AIV, comParamBufSize, &comParamPtr));
+    CHK_RET(HcclEngineCtxCreate(comm, tagComSync.c_str(), COMM_ENGINE_AIV, comSyncBufSize, &comSyncPtr));
+
+    opResCtx.workSpace = reinterpret_cast<uint64_t>(workspacePtr);
+    opResCtx.workSpaceSize = Hccl::MC2_WORKSPACE_SIZE;
+    opResCtx.rankId = userRank;
+    opResCtx.rankSize = rankSize;
+    opResCtx.xnAddr = reinterpret_cast<uint64_t>(comParamPtr);
+    opResCtx.ckeAddr = reinterpret_cast<uint64_t>(comSyncPtr);
+
+    HCCL_INFO("[AllocCcuOpResCtx]workspace[%p], comParam[%p], comSync[%p]", workspacePtr, comParamPtr, comSyncPtr);
+
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclAllocOpResCtx(
     HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr)
@@ -174,7 +282,7 @@ HcclResult HcclAllocOpResCtx(
         void* opParamPtr = nullptr;
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         if (HcclEngineCtxGet(
-                comm, tagParam.c_str(), static_cast<CommEngine>(ccTiling->commEngine), &opParamPtr, &opParamSize) ==
+                comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), &opParamPtr, &opParamSize) ==
             HCCL_SUCCESS) {
             HCCL_INFO(
                 "HcclEngineCtxGet success, tagParam[%s], opParamAddr[%p], opParamSize[%u]", tagParam.c_str(),
@@ -182,7 +290,7 @@ HcclResult HcclAllocOpResCtx(
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         } else {
             CHK_RET(HcclEngineCtxCreate(
-                comm, tagParam.c_str(), static_cast<CommEngine>(ccTiling->commEngine), opParamSize, &opParamPtr));
+                comm, tagParam.c_str(), OpExecuteConfigToCommEngine(ccTiling->commEngine), opParamSize, &opParamPtr));
             opParamAddr[i] = reinterpret_cast<uint64_t>(opParamPtr);
         }
         HCCL_INFO(
@@ -206,7 +314,7 @@ HcclResult HcclAllocOpResCtx(
     void* workSpacePtr = nullptr;
     const Mc2CcTilingInner* ccTiling0 = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
     if (HcclEngineCtxGet(
-            comm, tagWorkSpace.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), &workSpacePtr, &memSize) ==
+            comm, tagWorkSpace.c_str(), HcclAllocOpResCtx(ccTiling0->commEngine), &workSpacePtr, &memSize) ==
         HCCL_SUCCESS) {
         HCCL_INFO(
             "HcclEngineCtxGet success, tagWorkSpace[%s], workSpaceAddr[%p], workSpaceSize[%u]", tagWorkSpace.c_str(),
@@ -214,7 +322,7 @@ HcclResult HcclAllocOpResCtx(
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     } else {
         CHK_RET(HcclEngineCtxCreate(
-            comm, tagWorkSpace.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), memSize, &workSpacePtr));
+            comm, tagWorkSpace.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), memSize, &workSpacePtr));
         resCtx.workSpace = reinterpret_cast<uint64_t>(workSpacePtr);
     }
     HCCL_INFO("HcclAllocOpResCtx the workSpace: workSpaceAddr[%u], workSpaceSize[%u]", resCtx.workSpace, memSize);
@@ -231,14 +339,14 @@ HcclResult HcclAllocOpResCtx(
     std::string tagOpResCtx = ctxTag + "_opResCtx";
     uint64_t opResCtxSize = sizeof(OpResCtx);
     if (HcclEngineCtxGet(
-            comm, tagOpResCtx.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), opResCtxPtr, &opResCtxSize) ==
+            comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxPtr, &opResCtxSize) ==
         HCCL_SUCCESS) {
         HCCL_INFO(
             "HcclEngineCtxGet success, tagOpResCtx[%s], opResCtxAddr[%p], opResCtxSize[%u]", tagOpResCtx.c_str(),
             opResCtxPtr, opResCtxSize);
     } else {
         CHK_RET(HcclEngineCtxCreate(
-            comm, tagOpResCtx.c_str(), static_cast<CommEngine>(ccTiling0->commEngine), opResCtxSize, opResCtxPtr));
+            comm, tagOpResCtx.c_str(), OpExecuteConfigToCommEngine(ccTiling0->commEngine), opResCtxSize, opResCtxPtr));
     }
 
     HCCL_INFO("HcclAllocOpResCtx the opResCtx: opResCtxAddr[%u], opResCtxSize[%u]", opResCtxPtr, opResCtxSize);
@@ -448,7 +556,7 @@ typedef HcclResult (*OpParamPrepareFunc)(
 std::unordered_map<HcclCMDType, OpParamPrepareFunc> opParamPrepareFuncMap = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, PrepareParamForAllGather},
     {HcclCMDType::HCCL_CMD_ALLREDUCE, PrepareParamForAllReduce},
-    {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PrepareParamForReduceScatter},
+    {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, PreparePOpExecuteConfigToCommEnginearamForReduceScatter},
     {HcclCMDType::HCCL_CMD_ALLTOALL, PrepareParamForAlltoAll},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, PrepareParamForAlltoAllV},
 };
@@ -468,7 +576,7 @@ HcclResult InitOpParamByTiling(
 {
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
-    opParam.engine = static_cast<CommEngine>(ccTiling->commEngine);
+    opParam.engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
     CHK_RET(HcclGetCommName(comm, opParam.commName));
     CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
@@ -482,12 +590,9 @@ HcclResult InitOpParamByTiling(
 HcclResult PrepareTopoInfoForOp(
     HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
-    HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
     CHK_RET(HcclGetOpExpansionMode(comm, opParam));
-    HCCL_INFO("[SelectAlgAndPrepareEngine]  successfully!");
     CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
-    HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
     CHK_RET(CheckAsymmetricTopoSupport(opParam.opType, topoInfo.get()));
     return HCCL_SUCCESS;
 }
@@ -620,7 +725,6 @@ HcclResult SelectAlgAndPrepareEngine(
     return HCCL_SUCCESS;
 }
 
-
 HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName)
 {
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
@@ -653,44 +757,12 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& sk
     return HCCL_SUCCESS;
 }
 
-static HcclResult AcquireAlgResources(
-    HcclComm comm, OpParam& opParam, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, OpResCtx& opResCtx, void** resCtxOut)
-{
-    HCCL_INFO("[AcquireAlgResources]start AcquireAlgResources!");
-    bool isResourceReused = false;
-    ThreadHandle cpuTsThread{0};
-    ThreadHandle exportedAicpuTsThread{0};
-    if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
-    }
-    if (opParam.engine == COMM_ENGINE_CCU) {
-        // 填充 kfcServerArgs 的所有6个字段（最后一个为 token 占位符，后续更新）
-        resCtxHost->kfcServerArgs = {
-            opResCtx.xnAddr,          opResCtx.ckeAddr,
-            static_cast<uint64_t>(1), // dieNum
-            static_cast<uint64_t>(1), // missionNum
-            static_cast<uint64_t>(0), // missionIndex
-            static_cast<uint64_t>(0), // token 占位符，后续在 GetAlgResCcu 中更新
-        };
-        resCtxHost->kfcServerArgSize = 6;
-
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
-        opParam.resCtx = *resCtxOut;
-    } else {
-        CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
-        opParam.resCtx = *resCtxOut;
-    }
-    HCCL_INFO("[AcquireAlgResources]end AcquireAlgResources!");
-    return HCCL_SUCCESS;
-}
-
 HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
     void** resCtxOut)
 {
     bool useCannResCtx = UseCannBridge(opParam);
+
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
     if (useCannResCtx) {
         executor = GetAlgExecViaCann(opParam.opType, algName);
@@ -699,6 +771,7 @@ HcclResult GetOpParamResCtx(
     }
     CHK_PRT_RET(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
+
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     bool isResourceReused = false;
 
@@ -711,21 +784,6 @@ HcclResult GetOpParamResCtx(
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
-}
-
-HcclResult GetCcuOpParamResCtx(
-    HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
-    OpResCtx& opResCtx, void** resCtxOut)
-{
-    HCCL_INFO("[GetCcuOpParamResCtx]start GetCcuOpParamResCtx!");
-    HCCL_INFO(
-        "[GetCcuOpParamResCtx]received: workspace[%p], size[%llu]", (void*)opResCtx.workSpace, opResCtx.workSpaceSize);
-    std::unique_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
-    HCCL_INFO("[GetCcuOpParamResCtx]Generate executor successfully!");
-    CHK_PRT_RET(
-        executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
-    std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
-    return AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, opResCtx, resCtxOut);
 }
 
 HcclResult GetOpParam(
@@ -885,3 +943,5 @@ HcclResult CcuSelectAlgCheck(const Mc2CcTilingInner* ccTiling, uint32_t tilingIn
     HCCL_DEBUG("[CcuSelectAlgCheck] Default function.");
     return HCCL_SUCCESS;
 }
+
+#endif
