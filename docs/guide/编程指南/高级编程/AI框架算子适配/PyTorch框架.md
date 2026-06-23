@@ -7,7 +7,7 @@
 -   图模式调用：自定义算子在Pytorch图模式下的适配开发指导请参见 [《Ascend Extension for PyTorch》](https://www.hiascend.com/document/redirect/pytorchuserguide) 中的“《Pytorch图模式使用(TorchAir)》 >  自定义算子入图”章节。
 
 **图 1**  Pytorch框架部署方式<a name="fig1969201074516"></a>  
-![](../../../../figures/Pytorch框架部署方式.png "Pytorch框架部署方式")
+![](../../../figures/Pytorch框架部署方式.png "Pytorch框架部署方式")
 
 **本节主要提供通过torch.library与Pybind注册自定义算子并实现PyTorch框架调用算子Kernel程序的指导。**
 
