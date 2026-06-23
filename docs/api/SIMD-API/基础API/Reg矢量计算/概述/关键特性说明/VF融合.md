@@ -81,7 +81,7 @@ class Kernel {
         AscendC::DataCopy(yLocal, xLocal, count); 
         __ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(xLocal.GetPhyAddr()); 
         __ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(yLocal.GetPhyAddr()); 
-        constexpr uint32_t oneRepNum = 256 / sizeof(T); 
+        constexpr uint32_t oneRepNum = AscendC::GetVecLen() / sizeof(T); 
         uint32_t repeatTime =  count / oneRepNum; 
         DivVF(dstAddr, srcAddr, count, repeatTime, oneRepNum); 
         AddVF(dstAddr, dstAddr, count, repeatTime, oneRepNum); 

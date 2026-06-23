@@ -28,7 +28,7 @@
 
 头文件引用路径为"basic_api/reg_compute/kernel_reg_compute_maskreg_intf.h"。
 
-MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href="./寄存器数据类型/RegTensor.md">RegTensor</a>的八分之一（VL/8）。如下图所示，当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
+MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href="./RegTensor.md">RegTensor</a>的八分之一（VL/8）。如下图所示，当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
 
 **图1** MaskReg计算过程<a id="fig1"></a>
 
