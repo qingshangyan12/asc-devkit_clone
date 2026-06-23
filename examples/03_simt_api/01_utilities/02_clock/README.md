@@ -106,5 +106,5 @@
 
   ```text
   simt_gather execute cycle : 3479
-  test pass!
+  [Success] Case accuracy is verification passed.
   ```
