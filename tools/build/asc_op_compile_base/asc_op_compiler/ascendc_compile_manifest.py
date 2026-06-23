@@ -79,6 +79,7 @@ class OpCompileManifestRecorder:
         self.manifest_path = os.path.join(kernel_meta_dir, manifest_name)
         self.kernel_meta_dir = kernel_meta_dir
         self.manifest["basic_info"].update({
+            "cce_file": self._get_cce_filename(cce_file),
             "op_type": op_info.op_type,
             "op_name": op_name,
             "kernel_name": op_info.kernel_name,
@@ -391,6 +392,12 @@ class OpCompileManifestRecorder:
     @staticmethod
     def _safe_filename_part(value):
         return re.sub(r"[^0-9A-Za-z_.-]", "_", str(value))
+
+    @staticmethod
+    def _get_cce_filename(cce_file):
+        if not cce_file:
+            return ""
+        return os.path.basename(os.path.normpath(str(cce_file)))
 
     def _get_wrapper_body_filename(self):
         op_name = self.manifest.get("basic_info", {}).get("op_name")
