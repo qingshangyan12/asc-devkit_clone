@@ -12,28 +12,57 @@
 set -euo pipefail
 
 CASE_REL=01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance
+SKIP_REASON='The execution time in CPU mode is too long and needs to be skipped'
+
+SKIP_MODES=(cpu)
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
+
+get_scenario_list() {
+    echo "0 1 2 3 4 5 6"
+}
+
+get_build_subdir() {
+    local scenario=$1
+    echo "${BUILD_DIR}_scenario${scenario}"
+}
+
 case_build() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=6 .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'make -j')
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py')
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'make -j')
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py')
+    done
 }
 
 case_run() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc ./demo)
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc ./demo)
+    done
 }
 
 case_verify() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/verify_result.py output/output.bin output/golden.bin')
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/verify_result.py output/output.bin output/golden.bin')
+    done
 }
 
 case_clean() {
+    for scenario in $(get_scenario_list); do
+        rm -rf "$(get_build_subdir "$scenario")"
+    done
     presmoke_default_clean
 }
 
