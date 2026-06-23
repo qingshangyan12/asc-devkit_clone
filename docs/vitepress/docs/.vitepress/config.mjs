@@ -9,7 +9,7 @@
  */
 
 import { defineConfig } from 'vitepress'
-import { existsSync, readFileSync, copyFileSync } from 'node:fs'
+import { existsSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
@@ -610,6 +610,7 @@ function balanceDivTags(html) {
   buildConcurrency: 1,
 
   transformHtml(code) {
+    code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
     code = code.replace(/<body\b/, '<body data-pagefind-body')
     return code.replace(
       /<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<[^>]+>|[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]+/g,
@@ -640,6 +641,13 @@ function balanceDivTags(html) {
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'en',
     }), {
+      name: 'copy-figures-to-dist',
+      closeBundle() {
+        const src = resolve(docsRoot, 'figures')
+        const dst = resolve(docsRoot, '.vitepress', 'dist', 'figures')
+        if (existsSync(src)) cpSync(src, dst, { recursive: true })
+      },
+    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
