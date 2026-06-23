@@ -437,13 +437,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
-    // CKE commit 写：cached GM 写 + 全量 DataCacheCleanAndInvalid。
-    // 单行 FlushDataCache（XN 式写法）已验证无法让 CCU 可见，改用全量 cache clean
-    // 确保跨引擎缓存一致性。
-    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
-    GlobalTensor<int64_t> ckeGlobal;
-    ckeGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(ccuMsg_.commitCKEAddr));
-    DataCacheCleanAndInvalid<int64_t, CacheLine::ENTIRE_DATA_CACHE>(ckeGlobal);
+    WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
 }
 
 template <const auto& config>
@@ -529,8 +523,16 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef ASCENDC_CPU_DEBUG
+    uint32_t dbgPollCnt = 0;
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
+        // DEBUG: 前3次轮询打印 waitCke 值，验证 CCU 是否读到 commit CKE
+        // 0xDEAD = CCU 已进入轮询但读到 commit=0；0x1 = CCU 读到 commit=1 并完成；0 = CCU 未进入轮询
+        if (dbgPollCnt < 3U) {
+            AscendC::PRINTF("dbgPoll[%u] waitCke=0x%llx addr=0x%llx\n",
+                dbgPollCnt, waitCke, reinterpret_cast<uint64_t>(waitCKEAddr));
+            dbgPollCnt++;
+        }
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
@@ -592,13 +594,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
-        // CKE commit 写：cached GM 写 + 全量 DataCacheCleanAndInvalid。
-    // 单行 FlushDataCache（XN 式写法）已验证无法让 CCU 可见，改用全量 cache clean
-    // 确保跨引擎缓存一致性。
-    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
-    GlobalTensor<int64_t> ckeGlobal;
-    ckeGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(ccuMsg_.commitCKEAddr));
-    DataCacheCleanAndInvalid<int64_t, CacheLine::ENTIRE_DATA_CACHE>(ckeGlobal);
+        WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
     }
