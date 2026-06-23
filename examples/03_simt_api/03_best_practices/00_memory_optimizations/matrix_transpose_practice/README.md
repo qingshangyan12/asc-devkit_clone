@@ -245,7 +245,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
 下面以Ascend 950PR/Ascend 950DT的UB划分规则为例，说明本样例中bank冲突是如何产生的，以及Case 2和Case 3理论上的冲突强度差异。
 
-UB中的bank划分如下图所示。UB总大小 256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank_group_id = bank_id % 8`）。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
+UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank（每个bank512行 × 32B = 16KB）；这16个bank进一步组织为8个bank group，每个bank group包含2个bank（bank i与bank i+8同属bank group i，即 `bank_group_id = bank_id % 8`）。在SIMT编程模式下，每个bank又会被划分为4个subbank，每个subbank的宽度为8B。
 
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
@@ -257,7 +257,7 @@ SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令�
 
 SIMT编程方式下bank冲突主要有以下几种：
 
-- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subank
+- **写写冲突**：多个写操作同时尝试访问同一个bank group的相同编号的subbank
 - **读读冲突**：多个读操作同时尝试访问同一个bank group的相同编号的subbank。
 
 Case 2中UB的tile数组前10行元素按照行优先存储的排布图如下，按照地址低位交织的规则，tile数组的第一行row 1刚好覆盖bank 0～bank 3，row 2覆盖bank 4～bank 7，row 3则覆盖bank 8～bank 11，为了展示方便这里只展示前10行元素排布，其余行依次类推。每行32个float数据会恰好跨越4个bank存储，其中每行第一个元素用了蓝色标记。在Case 2中，一个Warp的线程会读取tile的一列元素写回到GM输出；访问UB时，32个线程会集中访问两个bank group的subbank 0，属于读读冲突场景。
@@ -354,7 +354,7 @@ output[index_out] = tile[threadIdx.x][threadIdx.y];
 
   | 选项                        | 可选值       | 说明                                                         |
   | --------------------------- | ------------ | ------------------------------------------------------------ |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`3`  | 样例类型，默认为3                                            |
 
   执行结果如下，说明精度对比成功。
