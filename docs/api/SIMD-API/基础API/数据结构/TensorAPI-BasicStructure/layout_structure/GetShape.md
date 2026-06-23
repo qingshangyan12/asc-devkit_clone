@@ -42,7 +42,7 @@ __aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
 
 ## 返回值说明
 
-返回描述张量形状的Shape对象（或其子结构）。类型与模板参数`Is...`的指定方式相关。
+返回描述张量形状的Shape对象（或其子结构）。
 
 ## 约束说明
 
