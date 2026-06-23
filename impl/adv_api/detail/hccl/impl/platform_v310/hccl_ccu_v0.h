@@ -437,12 +437,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
-    // CKE commit 改用 cached GM 写 + FlushDataCache（与 XN 缓冲区写法一致）。
-    // 原因：当 ckeAddr 内存用 COMM_ENGINE_AICPU 申请时，WriteGmByPassDCache 的跨引擎
-    // 缓存可见性无法保证，CCU kernel 的 ccu::Load 会一直读到 0 导致同步卡死；
-    // cached 写 + FlushDataCache 走 cache line 维护协议，确保 CCU 可见。
-    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
-    FlushDataCache(ccuMsg_.commitCKEAddr);
+    WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
 }
 
 template <const auto& config>
@@ -528,8 +523,15 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef ASCENDC_CPU_DEBUG
+    uint32_t waitPollCnt = 0;
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
+        // 验证日志：每 1000 次轮询打一条，避免 printf 环形缓冲区撑满
+        if ((waitPollCnt % 1000U) == 0U) {
+            AscendC::PRINTF("waitPoll waitCke=%llu finishCnt=%llu addr=0x%llx\n",
+                waitCke, ReadHBMData(finishCntGM_), reinterpret_cast<uint64_t>(waitCKEAddr));
+        }
+        waitPollCnt++;
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
@@ -591,12 +593,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
-        // CKE commit 改用 cached GM 写 + FlushDataCache（与 XN 缓冲区写法一致）。
-    // 原因：当 ckeAddr 内存用 COMM_ENGINE_AICPU 申请时，WriteGmByPassDCache 的跨引擎
-    // 缓存可见性无法保证，CCU kernel 的 ccu::Load 会一直读到 0 导致同步卡死；
-    // cached 写 + FlushDataCache 走 cache line 维护协议，确保 CCU 可见。
-    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
-    FlushDataCache(ccuMsg_.commitCKEAddr);
+        WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
     }
