@@ -35,7 +35,7 @@ totalLength对齐有好处，但是也不是必须的，
 
    ```cpp
    mainTileNum = totalLengthAligned / (numBlocks * tileLength);
-   remainder1 = totalLengthAligned % (numBlocks * tileLength);
+   mainTileRemainder = totalLengthAligned % (numBlocks * tileLength);
    ```
 
    此时每个核至少处理`mainTileNum * tileLength`个元素。
@@ -43,8 +43,8 @@ totalLength对齐有好处，但是也不是必须的，
 3. 主块剩余长度再按DataBlock给所有核补齐等长尾块。
 
    ```cpp
-   tailBlockNumEachCore = remainder1 / (numBlocks * alignNum);
-   remainder2 = remainder1 % (numBlocks * alignNum);
+   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
+   formerCoreRemainder = mainTileRemainder % (numBlocks * alignNum);
    baseLength = mainTileNum * tileLength + tailBlockNumEachCore * alignNum;
    ```
 
@@ -53,20 +53,20 @@ totalLength对齐有好处，但是也不是必须的，
 4. 最后剩余的DataBlock分给前若干个整核。
 
    ```cpp
-   if (remainder2 == 0) {
+   if (formerCoreRemainder == 0) {
        formerNum = numBlocks;
        formerLength = baseLength;
        tailNum = 0;
        tailLength = 0;
    } else {
-       formerNum = remainder2 / alignNum;
+       formerNum = formerCoreRemainder / alignNum;
        formerLength = baseLength + alignNum;
        tailNum = numBlocks - formerNum;
        tailLength = baseLength;
    }
    ```
 
-   `remainder2 == 0`时不存在尾核，所有核都处理`baseLength`个元素。`remainder2 != 0`时，`formerNum`表示整核数量，前`formerNum`个核处理`formerLength`个元素；`tailNum`表示尾核数量，剩余核处理`tailLength`个元素。
+   `formerCoreRemainder == 0`时不存在尾核，所有核都处理`baseLength`个元素。`formerCoreRemainder != 0`时，`formerNum`表示整核数量，前`formerNum`个核处理`formerLength`个元素；`tailNum`表示尾核数量，剩余核处理`tailLength`个元素。
 
 ## 场景归类
 
@@ -74,16 +74,16 @@ totalLength对齐有好处，但是也不是必须的，
 
 | 条件 | 场景 | 含义 |
 |------|------|------|
-| `tailBlockNumEachCore == 0 && remainder2 == 0` | 均分+均分 | 每个核只有主块，无尾核、无尾块。 |
-| `tailBlockNumEachCore != 0 && remainder2 == 0` | 均分+尾块 | 每个核有相同长度的尾块，无尾核。 |
-| `tailBlockNumEachCore == 0 && remainder2 != 0` | 尾核+均分 | 前若干个整核比尾核多一个DataBlock，尾核只有主块。 |
-| `tailBlockNumEachCore != 0 && remainder2 != 0` | 尾核+尾块 | 所有核都有尾块，前若干个整核再多一个DataBlock。 |
+| `tailBlockNumEachCore == 0 && formerCoreRemainder == 0` | 均分+均分 | 每个核只有主块，无尾核、无尾块。 |
+| `tailBlockNumEachCore != 0 && formerCoreRemainder == 0` | 均分+尾块 | 每个核有相同长度的尾块，无尾核。 |
+| `tailBlockNumEachCore == 0 && formerCoreRemainder != 0` | 尾核+均分 | 前若干个整核比尾核多一个DataBlock，尾核只有主块。 |
+| `tailBlockNumEachCore != 0 && formerCoreRemainder != 0` | 尾核+尾块 | 所有核都有尾块，前若干个整核再多一个DataBlock。 |
 
 ## 本样例参数结果
 
 本样例使用`numBlocks = 8`、`tileLength = 3200`、`alignNum = 16`。
 
-| `SCENARIO_NUM` | `totalLength` | `mainTileNum` | `tailBlockNumEachCore * alignNum` | `remainder2` | 核间结果 |
+| `SCENARIO_NUM` | `totalLength` | `mainTileNum` | `tailBlockNumEachCore * alignNum` | `formerCoreRemainder` | 核间结果 |
 |----------------|---------------|---------------|-----------------------------------|--------------|----------|
 | `0` | `256000` | `10` | `0` | `0` | 8核均为32000。 |
 | `1` | `260096` | `10` | `512` | `0` | 8核均为32512。 |

@@ -52,10 +52,57 @@ Host侧先将`totalLength`按`alignNum`向上对齐，再按以下顺序消费�
 | `2` | 尾核+均分 | `256064` | 4整核 * 32016 + 4尾核 * 32000 | 整核：10tile * 3200 + 16尾块；尾核：10tile * 3200 | 前4个整核多处理一个DataBlock，尾核按主块均分。 |
 | `3` | 尾核+尾块 | `258112` | 4整核 * 32272 + 4尾核 * 32256 | 整核尾块272；尾核尾块256 | 存在尾核与尾块。 |
 
+## Host侧Tiling计算过程
+
+Host侧输入为`totalLength`，输出为每个核需要处理的元素长度。计算过程按“主块、等长尾块、尾核”逐层消费剩余长度。
+
+1. 将总长度按DataBlock对齐。
+
+   ```cpp
+   totalLengthAligned = AlignUp(totalLength, alignNum);
+   ```
+
+2. 所有核先均分`tileLength`整数倍主块。
+
+   ```cpp
+   mainTileNum = totalLengthAligned / (numBlocks * tileLength);
+   mainTileRemainder = totalLengthAligned % (numBlocks * tileLength);
+   ```
+
+   此时每个核至少处理`mainTileNum * tileLength`个元素，`mainTileRemainder`表示所有核均分主块后的剩余长度。
+
+3. 主块剩余长度再按DataBlock给所有核补齐等长尾块。
+
+   ```cpp
+   tailBlockNumEachCore = mainTileRemainder / (numBlocks * alignNum);
+   formerCoreRemainder = mainTileRemainder % (numBlocks * alignNum);
+   baseLength = mainTileNum * tileLength + tailBlockNumEachCore * alignNum;
+   ```
+
+   `baseLength`表示每个核的基础处理长度。`formerCoreRemainder`表示每核补齐等长DataBlock尾块后，剩余需要分给前若干个核的长度。
+
+4. 最后剩余的DataBlock分给前若干个整核。
+
+   ```cpp
+   if (formerCoreRemainder == 0) {
+       formerNum = numBlocks;
+       formerLength = baseLength;
+       tailNum = 0;
+       tailLength = 0;
+   } else {
+       formerNum = formerCoreRemainder / alignNum;
+       formerLength = baseLength + alignNum;
+       tailNum = numBlocks - formerNum;
+       tailLength = baseLength;
+   }
+   ```
+
+   `formerCoreRemainder == 0`时不存在尾核，所有核都处理`baseLength`个元素。`formerCoreRemainder != 0`时，`formerNum`表示整核数量，前`formerNum`个核处理`formerLength`个元素；`tailNum`表示尾核数量，剩余核处理`tailLength`个元素。
+
 ## 实现要点
 
 - Host侧根据`SCENARIO_NUM`只选择总长度，Tiling模式由`LaunchAddByTiling`根据总长度自动推导。
-- `LaunchAddByTiling`先计算`mainTileNum`、`tailBlockNumEachCore`、`remainder2`和`baseLength`，再根据`tailBlockNumEachCore`与`remainder2`得到四类场景。
+- `LaunchAddByTiling`先计算`mainTileNum`、`tailBlockNumEachCore`、`formerCoreRemainder`和`baseLength`，再根据`tailBlockNumEachCore`与`formerCoreRemainder`得到四类场景。
 - `add.asc`按四类场景使用不同的轻量Tiling结构体，避免向`Kernel`传入旧样例中的17字段大结构体。
 - `add_unified_tiling.asc`提供对照实现：Host侧使用`BuildUnifiedTilingData`统一计算Tiling并只传入一个`UnifiedTilingData`结构体，函数调用更简单，但`Kernel`入参字段数多于`add.asc`中的分模式轻量结构体。
 - `Kernel`侧通过`GetBlockIdx()`确定当前核处理的数据区间。
