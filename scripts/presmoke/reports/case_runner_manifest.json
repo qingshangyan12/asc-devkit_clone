@@ -3300,10 +3300,10 @@
       "dav-2201",
       "dav-3510"
     ],
-    "supported_modes": [
-      "cpu",
-      "npu",
-      "sim"
+    "supported_modes": [	 
+      "cpu",	 
+      "npu",	 
+      "sim" 
     ],
     "target_runnable": true,
     "skip": false,
@@ -3431,8 +3431,7 @@
     ],
     "supported_modes": [
       "cpu",
-      "npu",
-      "sim"
+      "npu"
     ],
     "target_runnable": true,
     "skip": false,
