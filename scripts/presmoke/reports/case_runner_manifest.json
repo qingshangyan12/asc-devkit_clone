@@ -3432,7 +3432,7 @@
     "supported_modes": [
       "cpu",
       "npu",
-      "sim"
+      "npu"
     ],
     "target_runnable": true,
     "skip": false,
