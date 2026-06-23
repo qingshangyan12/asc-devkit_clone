@@ -121,13 +121,14 @@ If you want to quickly experience project build and operator sample execution, a
 
   ```bash
   sudo apt install -y clangd-15
+  sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-15 100
   ```
 
 - Configure local VSCode `settings.json` (example)
 
   ```json
   {
-    "clangd.path": "/usr/bin/clangd-15",
+    "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [
         "--background-index=0",
         "--clang-tidy=0"

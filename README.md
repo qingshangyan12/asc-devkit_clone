@@ -121,13 +121,14 @@ Ascend C提供三类接口，均可实现底层的完备编程能力：
 
   ```bash
   sudo apt install -y clangd-15
+  sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-15 100
   ```
 
 - 配置本地VSCode的`settings.json`（示例）
 
   ```json
   {
-    "clangd.path": "/usr/bin/clangd-15",
+    "clangd.path": "/usr/bin/clangd",
     "clangd.arguments": [
         "--background-index=0",
         "--clang-tidy=0"
