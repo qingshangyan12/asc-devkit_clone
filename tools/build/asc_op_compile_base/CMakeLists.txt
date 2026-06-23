@@ -17,15 +17,15 @@ set(ASC_OP_COMPILE_BASE_WHL_NAME "asc_op_compile_base-0.1.0-py3-none-any.whl")
 set(ASC_OP_COMPILE_BASE_DIR "./asc_op_compile_base_python")
 set(ASC_OP_COMPILE_BASE_SRC "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_library(asc_platform SHARED ${CMAKE_CURRENT_SOURCE_DIR}/c_api/asc_platform.cc ${CMAKE_CURRENT_SOURCE_DIR}/c_api/asc_platform_api.cpp)
+add_library(asc_platform SHARED ${CMAKE_CURRENT_SOURCE_DIR}/asc_platform/asc_platform.cc ${CMAKE_CURRENT_SOURCE_DIR}/asc_platform/asc_platform_api.cpp)
 if(BUILD_OPEN_PROJECT)
   target_include_directories(asc_platform PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/c_api
+    ${CMAKE_CURRENT_SOURCE_DIR}/asc_platform
     ${CMAKE_CURRENT_SOURCE_DIR}/../common
   )
 else()
   target_include_directories(asc_platform PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/c_api
+    ${CMAKE_CURRENT_SOURCE_DIR}/asc_platform
     ${TOP_DIR}/asc/asc-devkit/tools/build/common
     ${TOP_DIR}/abl/libc_sec/include
     ${TOP_DIR}/abl/mmpa/inc
@@ -60,18 +60,18 @@ target_link_options(asc_platform PRIVATE
 add_custom_command(
   TARGET asc_platform POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E echo "Source file: $<TARGET_FILE:asc_platform>"
-  COMMAND ${CMAKE_COMMAND} -E echo "Destination file: ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api/libasc_platform.so"
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:asc_platform> ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api/libasc_platform.so
-  COMMAND ${CMAKE_STRIP} -s ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api/libasc_platform.so
-  COMMAND ${CMAKE_COMMAND} -E echo "Copied libasc_platform.so to ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api/libasc_platform.so"
+  COMMAND ${CMAKE_COMMAND} -E echo "Destination file: ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform/libasc_platform.so"
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:asc_platform> ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform/libasc_platform.so
+  COMMAND ${CMAKE_STRIP} -s ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform/libasc_platform.so
+  COMMAND ${CMAKE_COMMAND} -E echo "Copied libasc_platform.so to ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform/libasc_platform.so"
 )
 
-# 将.so复制回c_api，便于测试
+# 将.so复制回asc_platform，便于测试
 add_custom_target(asc_platform_test
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:asc_platform> ${ASC_OP_COMPILE_BASE_SRC}/c_api/libasc_platform.so
-  COMMAND ${CMAKE_STRIP} -s ${ASC_OP_COMPILE_BASE_SRC}/c_api/libasc_platform.so
-  COMMAND ${CMAKE_COMMAND} -E echo "Copied libasc_platform.so to ${ASC_OP_COMPILE_BASE_SRC}/c_api/libasc_platform.so"
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:asc_platform> ${ASC_OP_COMPILE_BASE_SRC}/asc_platform/libasc_platform.so
+  COMMAND ${CMAKE_STRIP} -s ${ASC_OP_COMPILE_BASE_SRC}/asc_platform/libasc_platform.so
+  COMMAND ${CMAKE_COMMAND} -E echo "Copied libasc_platform.so to ${ASC_OP_COMPILE_BASE_SRC}/asc_platform/libasc_platform.so"
 )
 
 # 生成 Python whl pkg
@@ -79,7 +79,7 @@ add_custom_target(${ASC_OP_COMPILE_BASE_WHL_NAME} ALL
   COMMAND echo "[ASC_OP_COMPILE_BASE] Build target ${ASC_OP_COMPILE_BASE_WHL_NAME}" && pwd &&
     mkdir -p ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_op_compiler &&
     cp -rf ${ASC_OP_COMPILE_BASE_SRC}/asc_op_compiler/* ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_op_compiler/ &&
-    cp -rf ${ASC_OP_COMPILE_BASE_SRC}/c_api/*.py ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/c_api/ &&
+    cp -rf ${ASC_OP_COMPILE_BASE_SRC}/asc_platform/*.py ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/asc_platform/ &&
     mkdir -p ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/common &&
     cp -rf ${ASC_OP_COMPILE_BASE_SRC}/common/* ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base/common/ &&
     cp ${ASC_OP_COMPILE_BASE_SRC}/__init__.py ${ASC_OP_COMPILE_BASE_DIR}/asc_op_compile_base &&

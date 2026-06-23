@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 import functools
 
-from asc_op_compile_base.c_api import (
+from asc_op_compile_base.asc_platform import (
     _get_soc_spec,
     _set_soc_spec,
     _init_soc_spec,
