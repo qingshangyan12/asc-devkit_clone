@@ -17,9 +17,9 @@ find_package(ASC REQUIRED)
 project(separate_compile LANGUAGES ASC CXX)
 
 add_executable(demo
-    func.asc
-    kernel.asc
-    host.cpp
+    gather_compute.asc
+    gather_kernel.asc
+    main.cpp
 )
 
 set_target_properties(demo PROPERTIES
