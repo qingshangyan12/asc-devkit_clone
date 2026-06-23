@@ -302,9 +302,9 @@
 | 接口名 | 功能描述 |
 | --- | --- |
 | [AbsSub](Reg矢量计算/复合计算/AbsSub.md) | srcReg0与srcReg1相减再求绝对值，根据mask将计算结果写入dstReg。 |
-| [Axpy](基础API/Reg矢量计算/复合计算/Axpy-38.md) | 根据mask对输入数据dstReg、srcReg、scalarValue按元素做乘加操作，将结果写入dstReg。 |
+| [Axpy](Reg矢量计算/复合计算/Axpy-38.md) | 根据mask对输入数据dstReg、srcReg、scalarValue按元素做乘加操作，将结果写入dstReg。 |
 | [ExpSub](Reg矢量计算/复合计算/ExpSub.md) | srcReg0与srcReg1相减，差值作为e的指数计算，根据mask将计算结果写入dstReg。 |
-| [MulAddDst](基础API/Reg矢量计算/复合计算/MulAddDst-39.md) | srcReg0与srcReg1相乘再加上dstReg的值，根据mask将计算结果写入dstReg。 |
+| [MulAddDst](Reg矢量计算/复合计算/MulAddDst-39.md) | srcReg0与srcReg1相乘再加上dstReg的值，根据mask将计算结果写入dstReg。 |
 | [MulDstAdd](Reg矢量计算/复合计算/MulDstAdd.md) | dstReg与srcReg0相乘后与srcReg1相加，根据mask将计算结果写入dstReg。 |
 | [MulsCast](Reg矢量计算/复合计算/MulsCast.md) | src与scalar相乘的结果再按照CAST_ROUND模式转换成half类型，根据mask将计算结果写入dst。 |
 
@@ -354,9 +354,9 @@
 ### 比较与选择
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Compare](基础API/Reg矢量计算/比较与选择/Compare-41.md) | 逐元素比较两个RegTensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
-| [Compares](基础API/Reg矢量计算/比较与选择/Compares-42.md) | 逐元素比较一个Tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
-| [Select](基础API/Reg矢量计算/比较与选择/Select-43.md) | 给定两个源操作数srcReg0和srcReg1，根据mask的比特位值选取元素，得到目的操作数dstReg。选择的规则为：当mask的比特位是1时，从srcReg0中选取对应位置的数，比特位是0时从srcReg1选取对应位置的数。 |
+| [Compare](Reg矢量计算/比较与选择/Compare-41.md) | 逐元素比较两个RegTensor大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [Compares](Reg矢量计算/比较与选择/Compares-42.md) | 逐元素比较一个Tensor中的元素和另一个scalar的大小，如果比较后的结果为真，则输出结果的对应比特位为1，否则为0。 |
+| [Select](Reg矢量计算/比较与选择/Select-43.md) | 给定两个源操作数srcReg0和srcReg1，根据mask的比特位值选取元素，得到目的操作数dstReg。选择的规则为：当mask的比特位是1时，从srcReg0中选取对应位置的数，比特位是0时从srcReg1选取对应位置的数。 |
 | [Squeeze](Reg矢量计算/比较与选择/Squeeze.md) | 将传入的srcReg中被mask选择的有效元素依次复制到dstReg中，有效元素在dstReg中从低到高连续排列。dstReg中剩余位置元素置为0。 |
 
 ### 直方图计算
@@ -389,12 +389,12 @@
 ### 逻辑计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [And](基础API/Reg矢量计算/逻辑计算/And-33.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
-| [Not](基础API/Reg矢量计算/逻辑计算/Not-32.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
-| [Or](基础API/Reg矢量计算/逻辑计算/Or-34.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
-| [ShiftLeft](基础API/Reg矢量计算/逻辑计算/ShiftLeft-35.md) | 根据mask，对输入数据srcReg0，按照srcReg1对应元素进行左移操作，并将结果写入dstReg。 |
+| [And](Reg矢量计算/逻辑计算/And-33.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
+| [Not](Reg矢量计算/逻辑计算/Not-32.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
+| [Or](Reg矢量计算/逻辑计算/Or-34.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
+| [ShiftLeft](Reg矢量计算/逻辑计算/ShiftLeft-35.md) | 根据mask，对输入数据srcReg0，按照srcReg1对应元素进行左移操作，并将结果写入dstReg。 |
 | [ShiftLefts](Reg矢量计算/逻辑计算/ShiftLefts.md) | 源操作数内每个元素做逻辑左移，逻辑左移的位数由输入参数scalarValue决定。 |
-| [ShiftRight](基础API/Reg矢量计算/逻辑计算/ShiftRight-36.md) | 根据mask，对输入数据srcReg0按照srcReg1对应元素进行右移操作，将结果写入dstReg。 |
+| [ShiftRight](Reg矢量计算/逻辑计算/ShiftRight-36.md) | 根据mask，对输入数据srcReg0按照srcReg1对应元素进行右移操作，将结果写入dstReg。 |
 | [ShiftRights](Reg矢量计算/逻辑计算/ShiftRights.md) | 源操作数内每个元素做右移，右移的位数由输入参数scalarValue决定。 |
 | [Xor](Reg矢量计算/逻辑计算/Xor.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
 
