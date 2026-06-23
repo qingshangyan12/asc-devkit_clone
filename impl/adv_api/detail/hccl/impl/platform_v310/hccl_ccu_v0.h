@@ -437,7 +437,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
-    WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+    // CKE commit 写：cached GM 写 + 全量 DataCacheCleanAndInvalid。
+    // 单行 FlushDataCache（XN 式写法）已验证无法让 CCU 可见，改用全量 cache clean
+    // 确保跨引擎缓存一致性。
+    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
+    GlobalTensor<int64_t> ckeGlobal;
+    ckeGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(ccuMsg_.commitCKEAddr));
+    DataCacheCleanAndInvalid<int64_t, CacheLine::ENTIRE_DATA_CACHE>(ckeGlobal);
 }
 
 template <const auto& config>
@@ -523,15 +529,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
 
 #ifndef ASCENDC_CPU_DEBUG
-    uint32_t waitPollCnt = 0;
     while (true) {
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
-        // 验证日志：每 1000 次轮询打一条，避免 printf 环形缓冲区撑满
-        if ((waitPollCnt % 1000U) == 0U) {
-            AscendC::PRINTF("waitPoll waitCke=%llu finishCnt=%llu addr=0x%llx\n",
-                waitCke, ReadHBMData(finishCntGM_), reinterpret_cast<uint64_t>(waitCKEAddr));
-        }
-        waitPollCnt++;
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
@@ -593,7 +592,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::F
         ccuMsg_.xnAddr = xnAddr + CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE * globalCurWaitId_;
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr) = 0xffffffffffffffff;
         FlushDataCache(ccuMsg_.xnAddr);
-        WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
+        // CKE commit 写：cached GM 写 + 全量 DataCacheCleanAndInvalid。
+    // 单行 FlushDataCache（XN 式写法）已验证无法让 CCU 可见，改用全量 cache clean
+    // 确保跨引擎缓存一致性。
+    *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr) = CCU_MSG_CKE_SET_VALUE;
+    GlobalTensor<int64_t> ckeGlobal;
+    ckeGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(ccuMsg_.commitCKEAddr));
+    DataCacheCleanAndInvalid<int64_t, CacheLine::ENTIRE_DATA_CACHE>(ckeGlobal);
         KERNEL_LOG(
             KERNEL_INFO, "ApiClient Finalize success handleId:%d, globalCurWaitId_:%d", handleId, globalCurWaitId_);
     }
