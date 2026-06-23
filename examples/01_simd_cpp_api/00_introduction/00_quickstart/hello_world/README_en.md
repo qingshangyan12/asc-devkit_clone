@@ -51,7 +51,7 @@ Execute the following steps in the root directory of this sample to build and ru
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
   ```
 
-  For detailed information about CPU debugging, refer to [06_cpu_debug sample](../../../01_utilities/06_cpu_debug).
+  For detailed information about CPU debugging, refer to [06_cpu_debug sample](../../../01_utilities/06_cpu_debug/).
 
   > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 

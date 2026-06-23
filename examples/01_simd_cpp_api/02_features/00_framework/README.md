@@ -8,7 +8,7 @@
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
-| [00_pytorch](./00_pytorch) | 样例介绍PyTorch框架的自定义算子实现方法 |
-| [01_tensorflow](./01_tensorflow) | 样例介绍TensorFlow框架的自定义算子实现方法 |
-| [02_onnx](./02_onnx) | 样例介绍ONNX模型调用相关的自定义算子实现方法 |
-| [03_ge](./03_ge) | 样例介绍Ascend C算子接入GE实现方法 |
+| [00_pytorch](./00_pytorch/) | 样例介绍PyTorch框架的自定义算子实现方法 |
+| [01_tensorflow](./01_tensorflow/) | 样例介绍TensorFlow框架的自定义算子实现方法 |
+| [02_onnx](./02_onnx/) | 样例介绍ONNX模型调用相关的自定义算子实现方法 |
+| [03_ge](./03_ge/) | 样例介绍Ascend C算子接入GE实现方法 |
