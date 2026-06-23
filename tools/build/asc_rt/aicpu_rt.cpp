@@ -132,8 +132,8 @@ int AicpuGetDumpConfig(void** addr, size_t* size)
         CHECK_ACL_ERR(aclrtMalloc(reinterpret_cast<void**>(&deviceAddr), DUMP_SIZE, ACL_MEM_MALLOC_HUGE_FIRST));
         dumpAddr[deviceId] = deviceAddr;
         uint64_t bufferOffSet = 8;
-        aclmdlRICaptureMode mode =
-            ACL_MODEL_RI_CAPTURE_MODE_RELAXED; // support CAPTURE MODE GLOBAL on host, when using device printf
+        // support CAPTURE MODE GLOBAL on host, when using device printf
+        aclmdlRICaptureMode mode = ACL_MODEL_RI_CAPTURE_MODE_RELAXED;
         CHECK_ACL_ERR(aclmdlRICaptureThreadExchangeMode(&mode));
         CHECK_ACL_ERR(aclrtMemcpy(deviceAddr, 8, &bufferOffSet, 8, ACL_MEMCPY_HOST_TO_DEVICE));
         CHECK_ACL_ERR(aclmdlRICaptureThreadExchangeMode(&mode));
