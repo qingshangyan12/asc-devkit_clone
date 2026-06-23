@@ -223,7 +223,7 @@ __aicore__ static inline void ResetCtrlSpr(){
 #endif
 #endif
 
-#if (__NPU_ARCH__ == 2201)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
 template <SaturationMode mode>
 __aicore__ inline void SetSaturationFlag(bool enableSat)
 {

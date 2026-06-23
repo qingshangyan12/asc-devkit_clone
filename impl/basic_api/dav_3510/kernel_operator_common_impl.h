@@ -139,6 +139,42 @@ __aicore__ static inline void ResetCtrlSprImpl()
     value = value | defaultCtrl;
     set_ctrl(value);
 }
+
+namespace Internal {
+template <SaturationMode mode>
+__aicore__ inline constexpr int8_t GetSaturationModeBit()
+{
+    // FLOAT => bit 48; FLOAT8 => bit 50; INT => bit 53; CAST => bit 59; SAT_GLOBAL => bit 60
+    if constexpr(mode == SaturationMode::FLOAT) {
+        return 48; // 0 => sat, 1 => no sat
+    } else if constexpr(mode == SaturationMode::INT) {
+        return 53; // 0 => trunk, 1 => sat
+    } else if constexpr(mode == SaturationMode::CAST) {
+        return 59; // 0 => sat, 1 => trunk
+    } else {
+        // not support
+        
+    } 
+}
+
+template <SaturationMode mode>
+__aicore__ static inline void SetSaturationFlagImpl(bool enableSat)
+{
+    constexpr int8_t sprBit = GetSaturationModeBit<mode>();
+    int64_t ctrlValue = get_ctrl();
+    uint64_t value = enableSat ? (sbitset0(ctrlValue, sprBit)) : sbitset1(ctrlValue, sprBit);  // bit=0 means saturate
+    set_ctrl(value);
+}
+
+template <SaturationMode mode>
+__aicore__ static inline bool GetSaturationFlagImpl()
+{
+    constexpr int8_t sprBit = GetSaturationModeBit<mode>();
+    int64_t value = (get_ctrl() >> sprBit) & 1;   // current value is bit value. value=0 means saturate=true
+    return !value;
+}
+} // namespace Internal
+
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_COMMON_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__)
