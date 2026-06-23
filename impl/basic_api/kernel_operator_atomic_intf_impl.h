@@ -23,7 +23,6 @@
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510))
     #include "dav_3510/kernel_operator_atomic_impl.h"
-#endif
 
 namespace AscendC {
 template <typename T>
