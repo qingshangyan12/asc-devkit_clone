@@ -34,13 +34,18 @@ bfloat16x2_t __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfl
 
 输入数据各分量乘加的结果。计算的分量a、b、c满足：
 
--   a为±inf，b为±0，返回nan。
--   a为±0，b为±inf，返回nan。
--   a\*b为+inf，c为-inf，返回nan。
--   a\*b为-inf，c为+inf，返回nan。
--   a\*b+c超出对应类型范围的最大值，返回+inf。
--   a\*b+c小于对应类型范围的最小值，返回0。
--   a、b、c任意一个为nan，返回nan。
+| x分量值 | y分量值 | z分量值 | 返回值 |
+|---|---|---|---|
+| x、y、z任意一个为nan ||| nan |
+| inf | 0 | 任意值 | nan |
+| 0 | inf | 任意值 | nan |
+| inf | inf | -inf | nan |
+| -inf | -inf | inf | inf |
+| inf | 正数 | 任意值 | inf |
+| -inf | 正数 | 任意值 | 0 |
+| inf | inf | 0 | inf |
+| -inf | -inf | 0 | inf |
+| x、y、z为正常值, 结果<0 ||| 0 |
 
 ## 约束说明
 
