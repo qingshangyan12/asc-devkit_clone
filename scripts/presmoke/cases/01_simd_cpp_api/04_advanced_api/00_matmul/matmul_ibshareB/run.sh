@@ -16,24 +16,60 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
+get_scenario_list() {
+    echo "1 2"
+}
+
+get_build_subdir() {
+    local scenario=$1
+    echo "${BUILD_DIR}_scenario${scenario}"
+}
+
 case_build() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'make -j')
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py')
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "$scenario_build_dir" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO_NUM=$SCENARIO_NUM .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+        (cd "$scenario_build_dir" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'make -j')
+        (cd "$scenario_build_dir" && soc_version=$SOC_VERSION bash -lc 'python3 -c "
+import os, numpy as np
+m, n, k = 64, 256, 384
+os.makedirs(\"input\", exist_ok=True)
+os.makedirs(\"output\", exist_ok=True)
+x1 = np.random.uniform(-1, 1, (m, k)).astype(np.float16)
+x2 = np.random.uniform(-1, 1, (k, n)).astype(np.float16)
+golden = (x1.astype(np.float32) @ x2.astype(np.float32)).astype(np.float32)
+x1.tofile(\"input/x1_gm.bin\")
+x2.tofile(\"input/x2_gm.bin\")
+golden.tofile(\"output/golden.bin\")
+print(\"Data generated\")
+"')
+    done
 }
 
 case_run() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc ./demo)
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "$scenario_build_dir" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc ./demo)
+    done
 }
 
 case_verify() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO_NUM=1 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/verify_result.py output/output.bin output/golden.bin')
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "$scenario_build_dir" && SCENARIO_NUM=$scenario soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/verify_result.py output/output.bin output/golden.bin')
+    done
 }
 
 case_clean() {
+    for scenario in $(get_scenario_list); do
+        rm -rf "$(get_build_subdir "$scenario")"
+    done
     presmoke_default_clean
 }
 
