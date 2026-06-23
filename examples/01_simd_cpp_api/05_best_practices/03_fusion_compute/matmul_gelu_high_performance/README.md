@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
+本样例基于静态Tensor编程范式，展示了Cube-Vector（CV）融合的实现方法，将Matmul矩阵乘法与GELU激活函数融合到同一AI Core中并行执行。AIC侧完成Matmul计算后通过Fixpipe将结果输出到GM或UB，AIV侧从GM或UB读取数据完成GELU向量计算。其中Matmul部分的优化细节参考[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/)，GELU部分的优化细节参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/)。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -99,22 +99,22 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### 中级性能优化
 
-本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/README.md)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/README.md)。
+本样例的Matmul部分采用与[Matmul基础API最佳实践样例](../../01_matrix_compute/matmul_basic_api_high_performance/)相同的优化手段（L1/L0双缓冲、大包搬运、细粒度流水同步、UnitFlag等），GELU部分在Ascend 950PR架构上采用RegBase方式，在A2/A3架构上采用MemBase方式。GELU公式的化简、RegBase API与VF融合的详细优化分析请参考[Gelu性能调优样例](../../02_reg_compute/gelu_high_performance/)。
 
 #### Matmul优化手段
 
 | Case | 优化手段 | 说明 |
 |------|---------|------|
-| [Case 1](../../01_matrix_compute/matmul_high_performance/README.md#case-1-单核tiling优化-single_core_tiling) | 单核Tiling优化 | 优化base块参数，降低访存计算比 |
-| [Case 2](../../01_matrix_compute/matmul_high_performance/README.md#case-2-多核切分-2x12-multi_core_split_2_12) | 多核切分 2x12 | 引入多核并行计算，均衡负载分配 |
-| [Case 3](../../01_matrix_compute/matmul_high_performance/README.md#case-3-多核切分-4x6-multi_core_split_4_6) | 多核切分 4x6 | 优化多核切分策略，地址512B对齐，减少同地址访问 |
-| [Case 4](../../01_matrix_compute/matmul_high_performance/README.md#case-4-多核使用mdl模板-multi_core_mdl) | 多核使用MDL模板 | 启用L1多块缓存，大包搬运，减少MTE2循环搬运次数 |
+| [Case 1](../../01_matrix_compute/matmul_high_performance/#case-1-单核tiling优化-single_core_tiling) | 单核Tiling优化 | 优化base块参数，降低访存计算比 |
+| [Case 2](../../01_matrix_compute/matmul_high_performance/#case-2-多核切分-2x12-multi_core_split_2_12) | 多核切分 2x12 | 引入多核并行计算，均衡负载分配 |
+| [Case 3](../../01_matrix_compute/matmul_high_performance/#case-3-多核切分-4x6-multi_core_split_4_6) | 多核切分 4x6 | 优化多核切分策略，地址512B对齐，减少同地址访问 |
+| [Case 4](../../01_matrix_compute/matmul_high_performance/#case-4-多核使用mdl模板-multi_core_mdl) | 多核使用MDL模板 | 启用L1多块缓存，大包搬运，减少MTE2循环搬运次数 |
 
 #### Gelu优化手段
 
 | Case | 优化手段 | 说明 |
 |------|---------|------|
-| [Case 1](../../02_reg_compute/gelu_high_performance/README.md#case-1-启用regbase-api和vf融合能力) | RegBase API + VF融合 | 寄存器级计算减少中间Load/Store，利用双发特性提升IPC |
+| [Case 1](../../02_reg_compute/gelu_high_performance/#case-1-启用regbase-api和vf融合能力) | RegBase API + VF融合 | 寄存器级计算减少中间Load/Store，利用双发特性提升IPC |
 
 #### GELU计算实现
 
@@ -216,16 +216,16 @@ Matmul和Gelu相关高阶极限打磨手段请参考下方列表。
 
 | Case | 优化手段 | 说明 |
 |------|---------|------|
-| [Case 5](../../01_matrix_compute/matmul_high_performance/README.md#case-5-多核mdl--l1cache优化-multi_core_mdl_l1cache) | MDL + L1Cache优化 | 手动调整Tiling参数，充分利用L1缓存 |
-| [Case 6](../../01_matrix_compute/matmul_high_performance/README.md#case-6-多核mdl--l1cache--l2cache-multi_core_mdl_l1cache_l2cache) | MDL + L1Cache + L2Cache | 分块计算适配L2Cache，提高缓存命中率 |
-| [Case 7](../../01_matrix_compute/matmul_high_performance/README.md#case-7-多核mdl--l1cache--l2cache--constants-tiling-multi_core_mdl_l1cache_l2cache_constants) | + Constants Tiling | Tiling常量化，减少运行时Scalar计算开销 |
-| [Case 8](../../01_matrix_compute/matmul_high_performance/README.md#case-8-多核mdl--l1cache--l2cache--constants-tiling--unitflag-multi_core_mdl_l1cache_l2cache_constants_unitflag) | + UnitFlag | 细粒度流水同步，MMAD与FIXPIPE流水并行 |
+| [Case 5](../../01_matrix_compute/matmul_high_performance/#case-5-多核mdl--l1cache优化-multi_core_mdl_l1cache) | MDL + L1Cache优化 | 手动调整Tiling参数，充分利用L1缓存 |
+| [Case 6](../../01_matrix_compute/matmul_high_performance/#case-6-多核mdl--l1cache--l2cache-multi_core_mdl_l1cache_l2cache) | MDL + L1Cache + L2Cache | 分块计算适配L2Cache，提高缓存命中率 |
+| [Case 7](../../01_matrix_compute/matmul_high_performance/#case-7-多核mdl--l1cache--l2cache--constants-tiling-multi_core_mdl_l1cache_l2cache_constants) | + Constants Tiling | Tiling常量化，减少运行时Scalar计算开销 |
+| [Case 8](../../01_matrix_compute/matmul_high_performance/#case-8-多核mdl--l1cache--l2cache--constants-tiling--unitflag-multi_core_mdl_l1cache_l2cache_constants_unitflag) | + UnitFlag | 细粒度流水同步，MMAD与FIXPIPE流水并行 |
 
 #### Gelu优化手段
 
 | Case | 优化手段 | 说明 |
 |------|---------|------|
-| [Case 2](../../02_reg_compute/gelu_high_performance/README.md#case-2-启用regbase-apivf融合能力和循环展开优化) | VF融合 + 循环展开 | #pragma unroll展开循环，提高指令级并行度 |
+| [Case 2](../../02_reg_compute/gelu_high_performance/#case-2-启用regbase-apivf融合能力和循环展开优化) | VF融合 + 循环展开 | #pragma unroll展开循环，提高指令级并行度 |
 
 #### CV融合-GM中转
 

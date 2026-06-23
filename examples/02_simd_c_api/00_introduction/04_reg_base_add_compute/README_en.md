@@ -8,4 +8,4 @@ This sample demonstrates the kernel function direct call method for the Add oper
 
 |  Directory Name                                                   |  Description                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [c_api_simd_add](./c_api_simd_add) | This sample uses C_API interfaces to implement the Add operator sample, based on synchronous data movement and computation interfaces |
+| [c_api_simd_add](./c_api_simd_add/) | This sample uses C_API interfaces to implement the Add operator sample, based on synchronous data movement and computation interfaces |

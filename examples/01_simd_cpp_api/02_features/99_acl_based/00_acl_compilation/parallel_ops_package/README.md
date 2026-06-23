@@ -40,19 +40,19 @@
 
 `parallel_ops_package` 与 `custom_op` 使用相同的 Add/LeakyRelu 样例描述，请参考：
 
-- [custom_op/README.md 的“样例描述”章节](../custom_op/README.md#样例描述)
+- [custom_op/README.md 的“样例描述”章节](../custom_op/#样例描述)
 
 ## 样例规格描述
 
 `parallel_ops_package` 与 `custom_op` 使用相同的 Add/LeakyRelu 规格描述，请参考：
 
-- [custom_op/README.md 的“样例规格描述”章节](../custom_op/README.md#样例规格描述)
+- [custom_op/README.md 的“样例规格描述”章节](../custom_op/#样例规格描述)
 
 ## 代码实现介绍
 
 `parallel_ops_package` 的 Add/LeakyRelu 代码实现可参考 `custom_op` 文档说明。
 
-- [custom_op/README.md 的“代码实现介绍”章节](../custom_op/README.md#代码实现介绍)
+- [custom_op/README.md 的“代码实现介绍”章节](../custom_op/#代码实现介绍)
 
 ## 编译运行
 

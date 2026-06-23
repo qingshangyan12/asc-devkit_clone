@@ -45,7 +45,7 @@
   3. ENABLE_UNITFLAG
 
      样例通过`ENABLE_UNITFLAG`模板参数控制unitFlag功能的开关，默认值为true。
-     unitFlag具体介绍可见[Mmad unitFlag特性样例](../mmad_unitflag/README.md)
+     unitFlag具体介绍可见[Mmad unitFlag特性样例](../mmad_unitflag/)
 
 - 样例规格：
 
