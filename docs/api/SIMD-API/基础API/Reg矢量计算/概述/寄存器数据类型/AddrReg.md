@@ -28,7 +28,7 @@
 
 头文件引用路径为 "basic_api/reg_compute/kernel_reg_compute_addrreg_intf.h"。
 
-AddrReg 是用于Reg矢量计算接口管理地址偏移量的专用寄存器。在循环外定义后，在循环内调用模板函数 CreateAddrReg<T> 接口赋值并绑定每层循环轴索引（index）与步长（stride），能够在多维循环中逐层累加地址偏移。CreateAddrReg接口支持绑定1-4层for循环，返回的地址偏移由 index * stride 的决定，在循环中，index 每次递增 1，AddrReg 的偏移量就自动增加对应的 stride，具体的偏移量满足如下伪代码所示：
+AddrReg是用于Reg矢量计算接口管理地址偏移量的专用寄存器。在循环外定义后，在循环内调用模板函数CreateAddrReg<T>接口赋值并绑定每层循环轴索引（index）与步长（stride），能够在多维循环中逐层累加地址偏移。CreateAddrReg接口支持绑定1-4层for循环，返回的地址偏移由index*stride的决定，在循环中，index每次递增1，AddrReg的偏移量就自动增加对应的stride，具体的偏移量满足如下伪代码所示：
 
 ```cpp
 // 1层循环: 

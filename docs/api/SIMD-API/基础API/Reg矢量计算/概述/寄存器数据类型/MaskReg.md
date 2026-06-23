@@ -98,7 +98,9 @@ MaskReg
 
 - MaskReg寄存器数量上限为8。超出限制上限的寄存器数据会写入预留的8KUB内存中，可能会引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若寄存器与预留内存均存在可用空间，将优先复用寄存器。
 
-## Cast精度转换中的MaskReg
+## 关键特性
+
+### Cast精度转换中的MaskReg
 
 不同数据类型下元素对应的mask位宽不一致，在cast进行类型转换时，maskReg根据输入的源操作数进行有效元素筛选。
 
@@ -124,7 +126,7 @@ MaskReg
 
 ![](../../../../../figures/bfloat16_t到fp4x2_e2m1_t转换过程.png "bfloat16_t到fp4x2_e2m1_t类型转换过程")
 
-## Mask设置方式
+### Mask设置方式
 
 在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
@@ -274,9 +276,9 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   }
   ```
 
-## A2/A3 与 950 Mask机制对比
+### NPU架构版本2201与NPU架构版本3510之间Mask机制对比
 
-本节对比Atlas A2/A3在Normal模式的逐bit计算中Mask机制，与Ascend950基于Reg矢量计算中Mask机制的差异。
+本节对比[NPU架构版本2201](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md)基于Reg矢量计算中Mask机制的差异。
 
 - 针对AtlasA2训练系列产品/AtlasA2推理系列产品和AtlasA3训练系列产品/AtlasA3推理系列产品
 
@@ -290,9 +292,9 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
   - 当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
 
-**图6** AtlasA2/A3Memory矢量计算与Ascend950Reg矢量计算Mask机制对比<a id="fig6"></a>
+**图6** NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比<a id="fig6"></a>
 
-![](../../../../../figures/Memory矢量计算与Reg矢量计算Mask机制对比.png "AtlasA2/A3Memory矢量计算与Ascend950Reg矢量计算Mask机制对比")
+![](../../../../../figures/Memory矢量计算与Reg矢量计算Mask机制对比.png "NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比")
 
 ## 调用示例<a name="section642mcpsimp"></a>
 
