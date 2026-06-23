@@ -66,7 +66,7 @@
 | [L1 Buffer到L0B Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0B数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵数据搬运到L0B Buffer。 |
 | [L1 Buffer到L0ScaleA Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleA数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的左矩阵缩放数据搬运到L0ScaleA Buffer。左矩阵缩放数据在L0ScaleA Buffer上的首地址由左矩阵在L0A Buffer的首地址的1/16推导出来。 |
 | [L1 Buffer到L0ScaleB Buffer数据搬运](矩阵计算（TensorAPI）/矩阵计算的搬入/矩阵数据搬入至L0/L1到L0ScaleB数据搬运（Copy）.md) | Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用于将L1 Buffer中的右矩阵缩放数据搬运到L0ScaleB Buffer。右矩阵缩放数据在L0ScaleB Buffer上的首地址由右矩阵在L0B Buffer的首地址的1/16推导出来。 |
-| [Mmad](矩阵计算（TensorAPI）/Mmad计算/Mmad.md) | `Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。数学表达式为： |
+| [Mmad](矩阵计算（TensorAPI）/Mmad计算/Mmad.md) | `Mmad`接口用于完成L0A Buffer上左矩阵A和L0B Buffer上右矩阵B的矩阵乘加，结果写入L0C Buffer上结果矩阵C。默认模式为普通矩阵计算。 |
 
 ## Memory矢量计算
 
@@ -110,9 +110,9 @@
 | [Not](Memory矢量计算/逻辑计算/Not.md) | 对元素做按位取反。 |
 | [Or](Memory矢量计算/逻辑计算/Or.md) | 每对元素做按位或运算。 |
 | [Ors](Memory矢量计算/逻辑计算/Ors.md) | 矢量内每个元素和标量间做或操作，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
-| [ShiftLeft](Memory矢量计算/逻辑计算/ShiftLeft.md) | 对源操作数中的每个元素进行左移操作，左移的位数由标量scalarValue决定。根据源操作数的数据类型，左移操作分为以下两种情况： |
-| [ShiftLeft（左移位数为Tensor）](Memory矢量计算/逻辑计算/ShiftLeft（左移位数为Tensor）.md) | 对源操作数中的每个元素进行左移操作。根据源操作数的数据类型，左移操作分为以下两种情况： |
-| [ShiftRight](Memory矢量计算/逻辑计算/ShiftRight.md) | 对源操作数中的每个元素进行右移操作，右移的位数由标量scalarValue决定。根据源操作数的数据类型，右移操作分为以下两种情况： |
+| [ShiftLeft](Memory矢量计算/逻辑计算/ShiftLeft.md) | 对源操作数中的每个元素进行左移操作，左移的位数由标量scalarValue决定。 |
+| [ShiftLeft（左移位数为Tensor）](Memory矢量计算/逻辑计算/ShiftLeft（左移位数为Tensor）.md) | 对源操作数中的每个元素进行左移操作。 |
+| [ShiftRight](Memory矢量计算/逻辑计算/ShiftRight.md) | 对源操作数中的每个元素进行右移操作，右移的位数由标量scalarValue决定。 |
 | [ShiftRight（右移位数为Tensor）](Memory矢量计算/逻辑计算/ShiftRight（右移位数为Tensor）.md) | 源操作数内每个元素做右移。 |
 
 ### 复合计算
@@ -265,7 +265,7 @@
 | [DataSyncBarrier(ISASI)](同步控制/核内同步/DataSyncBarrier(ISASI).md) | 阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束，用于解决Scalar的内存依赖。 |
 | [PipeBarrier(ISASI)](同步控制/核内同步/PipeBarrier(ISASI).md) | 完成同一流水线内的同步控制，用于在同一流水线内部约束执行顺序。其作用是，保证前序指令中所有数据的读写工作全部完成，后序指令才能执行。 |
 | [ReleaseMutexID (ISASI)](同步控制/核内同步/ReleaseMutexID-(ISASI).md) | 从框架释放一个MutexID，与AllocMutexID.md配合使用。 |
-| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | SetFlag/WaitFlag接口用于核内多流水间的同步： |
+| [SetFlag/WaitFlag(ISASI)](同步控制/核内同步/SetFlag-WaitFlag(ISASI).md) | SetFlag/WaitFlag接口用于核内多流水间的同步。 |
 | [CrossCoreSetFlag(ISASI)](同步控制/核间同步/CrossCoreSetFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag.md接口配对工作，使用时需传入核间同步的标记ID（flagId），每个ID对应一个用于控制同步的计数器。CrossCoreSetFlag接口用于通知调度模块“本核的pipe流水任务已经完成”，CrossCoreWaitFlag接口用于阻塞后续指令下发，直到所有相关核均完成同步后方可解除阻塞。 |
 | [CrossCoreWaitFlag(ISASI)](同步控制/核间同步/CrossCoreWaitFlag(ISASI).md) | 在核间同步场景中，CrossCoreSetFlag接口和CrossCoreWaitFlag接口配对工作，具体功能请参考CrossCoreSetFlag.md。 |
 | [LocalMemBar](Reg矢量计算/同步控制/LocalMemBar.md) | Reg矢量计算宏函数内不同流水线之间的同步指令。该同步指令指定src源流水线和dst目的流水线，目的流水线将等待源流水线上所有指令完成才进行执行。读写场景下，当读指令使用的寄存器和写指令使用的寄存器相同时，可以触发寄存器保序，指令将会按照代码顺序执行，不需要插入同步指令，而当使用的寄存器不同时，如果要确保读写指令顺序执行，则需要插入同步指令，写写场景同理。 |
@@ -333,7 +333,7 @@
 ### 数据填充
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Duplicate](Reg矢量计算/数据填充/Duplicate.md) | 支持Scalar和Tensor两种模式： |
+| [Duplicate](Reg矢量计算/数据填充/Duplicate.md) | 支持Scalar和Tensor两种模式。 |
 
 ### 数据类型
 | 接口名 | 功能描述 |
@@ -342,7 +342,7 @@
 | [MaskMergeMode](Reg矢量计算/数据类型/MaskMergeMode.md) | 决定mask未选择元素对于dst元素是否置0。 |
 | [PostLiteral](Reg矢量计算/数据类型/PostLiteral.md) | enum class PostLiteral  |
 | [RegLayout](Reg矢量计算/数据类型/RegLayout.md) | enum class RegLayout  |
-| [RoundMode](Reg矢量计算/数据类型/RoundMode.md) | 控制舍入模式，可输入值： |
+| [RoundMode](Reg矢量计算/数据类型/RoundMode.md) | 控制舍入模式。 |
 | [SatMode](Reg矢量计算/数据类型/SatMode.md) | 设置Cast类型转换饱和与不饱和模式。 |
 
 ### 数据重排
@@ -389,20 +389,20 @@
 ### 逻辑计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [And](Reg矢量计算/逻辑计算/And-33.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
-| [Not](Reg矢量计算/逻辑计算/Not-32.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
-| [Or](Reg矢量计算/逻辑计算/Or-34.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
+| [And](Reg矢量计算/逻辑计算/And-33.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑与运算得到结果并保存。 |
+| [Not](Reg矢量计算/逻辑计算/Not-32.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行取反运算得到结果并保存。 |
+| [Or](Reg矢量计算/逻辑计算/Or-34.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行逻辑或运算得到结果并保存。 |
 | [ShiftLeft](Reg矢量计算/逻辑计算/ShiftLeft-35.md) | 根据mask，对输入数据srcReg0，按照srcReg1对应元素进行左移操作，并将结果写入dstReg。 |
 | [ShiftLefts](Reg矢量计算/逻辑计算/ShiftLefts.md) | 源操作数内每个元素做逻辑左移，逻辑左移的位数由输入参数scalarValue决定。 |
 | [ShiftRight](Reg矢量计算/逻辑计算/ShiftRight-36.md) | 根据mask，对输入数据srcReg0按照srcReg1对应元素进行右移操作，将结果写入dstReg。 |
 | [ShiftRights](Reg矢量计算/逻辑计算/ShiftRights.md) | 源操作数内每个元素做右移，右移的位数由输入参数scalarValue决定。 |
-| [Xor](Reg矢量计算/逻辑计算/Xor.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行操作： |
+| [Xor](Reg矢量计算/逻辑计算/Xor.md) | 本节介绍两种接口，分别用于对RegTensor和MaskReg进行有效bit进行按位异或运算得到结果并保存。 |
 
 ## 标量计算
 | 接口名 | 功能描述 |
 | --- | --- |
-| [ReadGmByPassDCache(ISASI)](标量计算/ReadGmByPassDCache(ISASI).md) | 不经过DCache从GM地址上读数据。使用场景： |
-| [WriteGmByPassDCache(ISASI)](标量计算/WriteGmByPassDCache(ISASI).md) | 不经过DCache向GM地址上写数据。使用场景： |
+| [ReadGmByPassDCache(ISASI)](标量计算/ReadGmByPassDCache(ISASI).md) | 不经过DCache从GM地址上读数据。 |
+| [WriteGmByPassDCache(ISASI)](标量计算/WriteGmByPassDCache(ISASI).md) | 不经过DCache向GM地址上写数据。 |
 | [Cast（float转bfloat16_t）](标量计算/Cast（float转bfloat16_t）.md) | float类型标量数据转换成bfloat16_t类型标量数据。 |
 | [Cast（float转half/int32_t）](标量计算/Cast（float转half-int32_t）.md) | 对标量的数据类型进行转换。 |
 | [Cast（多类型转float）](标量计算/Cast（多类型转float）.md) | 该接口将输入数据转换为float类型。 |
@@ -421,13 +421,13 @@
 ## 同步控制
 | 接口名 | 功能描述 |
 | --- | --- |
-| [IBSet](同步控制/核间同步/IBSet.md) | 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。 |
-| [IBWait](同步控制/核间同步/IBWait.md) | 当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。 |
+| [IBSet](同步控制/核间同步/IBSet.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
+| [IBWait](同步控制/核间同步/IBWait.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
 | [InitDetermineComputeWorkspace](同步控制/核间同步/InitDetermineComputeWorkspace.md) | InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初始化配置接口，能够初始化GM共享内存的值，完成初始化后才可以调用WaitPreBlock和NotifyNextBlock。以上三个接口共同完成基于核间顺序执行的确定性计算，确定性计算的具体含义请参考确定性计算。 |
 | [Lock](同步控制/核内同步/Mutex(ISASI)/Lock.md) | 根据MutexID获取Mutex，并阻塞当前流水指令队列，直到对应的MutexID被Unlock。 |
 | [NotifyNextBlock](同步控制/核间同步/NotifyNextBlock.md) | WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。 |
 | [SetNextTaskStart](同步控制/任务间同步/SetNextTaskStart.md) | 在SuperKernel的子Kernel中调用，调用后的指令可以和后续其他的子Kernel实现并行，提升整体性能。SuperKernel按序调用子Kernel，为保证子Kernel之间数据互不干扰，会在子Kernel间插入算子间同步进行保序，子KernelN-1调用该接口后，之后的指令会和后续子KernelN实现并行。 |
-| [SyncAll](同步控制/核间同步/SyncAll.md) | SyncAll是核间同步控制接口，根据不同的函数原型介绍其功能： |
+| [SyncAll](同步控制/核间同步/SyncAll.md) | SyncAll是核间同步控制接口。 |
 | [Unlock](同步控制/核内同步/Mutex(ISASI)/Unlock.md) | 直到前置当前流水指令退出后，根据MutexID释放对应Mutex。 |
 | [WaitPreBlock](同步控制/核间同步/WaitPreBlock.md) | WaitPreBlock和NotifyNextBlock是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。 |
 | [WaitPreTaskEnd](同步控制/任务间同步/WaitPreTaskEnd.md) | 在SuperKernel的子Kernel中调用，调用前的指令可以和前序其他的子Kernel实现并行，提升整体性能。SuperKernel按序调用子Kernel，为保证子Kernel之间数据互不干扰，会在子Kernel间插入算子间同步进行保序，子KernelN+1调用该接口之前的指令会和前序子KernelN实现并行。 |
@@ -437,7 +437,7 @@
 | --- | --- |
 | [GetICachePreloadStatus(ISASI)](缓存控制/GetICachePreloadStatus(ISASI).md) | GetICachePreloadStatus为调试接口，在ICachePreLoad后调用，用于获取ICache的PreLoad的状态：当返回值为0时，说明ICache的PreLoad已完成；当返回值为1时，说明ICache的PreLoad未完成。 |
 | [ICachePreLoad(ISASI)](缓存控制/ICachePreLoad(ISASI).md) | 开发者手动调用ICachePreLoad接口，能够从指令所在GM地址预加载指令到ICache中。 |
-| [DataCacheCleanAndInvalid](缓存控制/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问： |
+| [DataCacheCleanAndInvalid](缓存控制/DataCacheCleanAndInvalid.md) | 在AI Core内部，Scalar单元和DMA单元都可能对GM进行访问。 |
 | [DataCachePreload](缓存控制/DataCachePreload.md) | 从源地址所在的特定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。 |
 
 ## 原子操作
@@ -468,9 +468,9 @@
 | [GmFree](调试接口/CPU孪生调试/GmFree.md) | 进行核函数的CPU侧运行验证时，用于释放通过GmAlloc申请的共享内存。 |
 | [ICPU_RUN_KF](调试接口/CPU孪生调试/ICPU_RUN_KF.md) | 进行核函数的CPU侧运行验证时，CPU调测总入口，完成CPU侧的算子程序调用。 |
 | [ICPU_SET_TILING_KEY](调试接口/CPU孪生调试/ICPU_SET_TILING_KEY.md) | 用于指定本次CPU调测使用的tilingKey。调测执行时，将只执行算子核函数中该tilingKey对应的分支。 |
-| [MarkStamp](调试接口/性能统计/MarkStamp.md) | 推荐使用asc_mark_stamp接口进行特定位置的标记，该接口同时适用于C语言和C++语言编程。 |
-| [MetricsProfStart](调试接口/性能统计/MetricsProfStart.md) | 推荐使用asc_prof_start接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。 |
-| [MetricsProfStop](调试接口/性能统计/MetricsProfStop.md) | 推荐使用asc_prof_stop接口进行性能数据采集信号启动的设置，该接口同时适用于C语言和C++语言编程。 |
+| [MarkStamp](调试接口/性能统计/MarkStamp.md) | 用户通过调用接口，用于在算子执行过程中标记特定位置，便于后期通过流水图分析代码执行路径与性能热点。 |
+| [MetricsProfStart](调试接口/性能统计/MetricsProfStart.md) | 用于设置性能数据采集信号启动，和MetricsProfStop配合使用。使用msProf工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。 |
+| [MetricsProfStop](调试接口/性能统计/MetricsProfStop.md) | 设置性能数据采集信号停止，和MetricsProfStart配合使用。使用msProf工具进行算子上板调优时，可在kernel侧代码段前后分别调用MetricsProfStart和MetricsProfStop来指定需要调优的代码段范围。 |
 | [printf](调试接口/上板打印/printf.md) | 该接口提供CPU域/NPU域调试场景下的格式化输出功能。 |
 | [PrintTimeStamp](调试接口/上板打印/PrintTimeStamp.md) | 提供时间戳打点功能，用于在算子Kernel代码中标记关键执行点。 |
 | [SetKernelMode](调试接口/CPU孪生调试/SetKernelMode.md) | 针对分离模式，CPU调测时，设置内核模式为单AIV模式，单AIC模式或者MIX模式，以分别支持单AIV矢量算子，单AIC矩阵算子，MIX混合算子的CPU调试。不调用该接口的情况下，默认为MIX模式。为保证算子代码在多个硬件平台兼容，耦合模式下也可以调用，该场景下接口不会生效，不影响正常调试。 |
@@ -483,7 +483,7 @@
 | [GetSubBlockIdx(ISASI)](工具接口/系统资源与变量/GetSubBlockIdx(ISASI).md) | 在分离模式架构下，获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。 |
 | [GetSubBlockNum(ISASI)](工具接口/系统资源与变量/GetSubBlockNum(ISASI).md) | 在分离模式架构下，获取当前配置中，一个逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的数量。 |
 | [GetSystemCycle(ISASI)](工具接口/系统资源与变量/GetSystemCycle(ISASI).md) | 获取系统计数器当前的cycle值。通过计算代码段前后cycle值的差值，可得到代码段消耗的系统cycle数，再通过换算即可获得代码段的执行时间。 |
-| [Async](工具接口/执行模式/Async.md) | 基于分离模式（AIC和AIV分离）开发融合算子时，算子逻辑中通常同时包含AIV和AIC的处理逻辑，此时需要使用Ascend C提供的宏`ASCEND_IS_AIV`/`ASCEND_IS_AIC`实现硬件条件分支来对AIV和AIC的代码进行隔离： |
+| [Async](工具接口/执行模式/Async.md) | Async通过模板函数的方式对这种隔离模式进行了封装，提供了一个统一的接口，用于在不同执行单元（AIC或AIV）下执行特定函数，从而避免在代码中使用硬件条件分支。 |
 | [CeilDivision](工具接口/数学计算/CeilDivision.md) | 计算两个整数num1和num2相除后向上取整结果。 |
 | [DeNormMin](工具接口/数学计算/NumericLimits/DeNormMin.md) | 返回指定数据类型的最小正的非正规值。 |
 | [GetArchVersion](工具接口/系统资源与变量/GetArchVersion.md) | 获取当前AI处理器架构版本号。 |
