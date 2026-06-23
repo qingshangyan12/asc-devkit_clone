@@ -150,18 +150,18 @@ run_llt_test(
 # ================ asc_op_compile_base ================
 set(ASC_COMPILE_BASE_TEST_HEADERS_FILES
     ${ASCENDC_DIR}/tools/build/common/
-    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/asc_platform/
     ${ASCEND_CANN_PACKAGE_PATH}/pkg_inc/base/
 )
 
 file(GLOB ASC_COMPILE_BASE_SRC_FILES
-    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/*.cpp
-    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/c_api/*.cc
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/asc_platform/*.cpp
+    ${ASCENDC_DIR}/tools/build/asc_op_compile_base/asc_platform/*.cc
 )
 
 file(GLOB TEST_ASC_COMPILE_BASE_SRC_FILES
     ${ASCENDC_DIR}/tests/main.cpp
-    asc_op_compile_base/test_c_api.cpp
+    asc_op_compile_base/test_asc_platform.cpp
 )
 
 add_executable(ascendc_ut_asc_compile_base

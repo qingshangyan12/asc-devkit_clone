@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 import functools
 
-from asc_op_compile_base.c_api import _get_soc_spec, _set_soc_spec, _init_soc_spec, _te_update_version, \
+from asc_op_compile_base.asc_platform import _get_soc_spec, _set_soc_spec, _init_soc_spec, _te_update_version, \
     _set_platform_info_res, _set_core_num_by_core_type
 
 # def the cce vector intrinsic params
