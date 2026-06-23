@@ -37,6 +37,22 @@ typedef struct {} AinRemoteNone;
 typedef struct {} AinLocalNone;
 typedef struct {} AinDescriptorUbufNone;
 
+typedef uint32_t HcclAinSignal_t;
+
+typedef struct {
+    uint32_t nRanks;
+    uint32_t rank;
+    uint32_t stride;
+    void *ranks;
+} HcclTeam;
+
+typedef struct {
+    HcclAinSignal_t signal0;
+    uint32_t reserved;
+} HcclAinBarrierHandle;
+
+typedef uint64_t HcclDevComm;
+
 template <typename T, typename U>
 struct AinIsSame {
     static constexpr bool value = false;
@@ -52,6 +68,40 @@ typedef struct {
     uint32_t bytes;
     uint32_t eventId;
 } AinDescriptorUbuf;
+
+typedef struct {
+    HcclAinSignal_t signalId;
+    uint64_t value;
+} AinSignalAdd;
+
+typedef struct {
+    HcclAinSignal_t signalId;
+} AinSignalInc;
+
+enum AinSignalType {
+    AIN_SIGNAL_TYPE_NONE,
+    AIN_SIGNAL_TYPE_VA,
+    AIN_SIGNAL_TYPE_INDEXED,
+};
+
+typedef struct {
+    AinSignalType type;
+    union {
+        struct {
+        } vaSignal;
+
+        struct {
+            HcclAinSignal_t signalId;
+        } indexedSignal;
+    };
+} AinSignalDescriptor;
+
+enum AinMemoryOrder {
+    AIN_MEMORY_ORDER_RELAXED,
+    AIN_MEMORY_ORDER_ACQUIRE,
+    AIN_MEMORY_ORDER_RELEASE,
+    AIN_MEMORY_ORDER_ACQ_REL
+};
 
 enum AinCommitFlags {
     AIN_COMMIT_IMMED = 0,
