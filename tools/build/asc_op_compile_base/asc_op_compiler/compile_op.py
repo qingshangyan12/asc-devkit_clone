@@ -64,6 +64,7 @@ from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
 from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
+from .ascendc_compile_manifest import OpCompileManifestRecorder
 
 DEFAULT_TILING_KEY = '0'
 COMPILE_INFO_KEY = 'compileInfo'
@@ -999,6 +1000,7 @@ def gen_op_stub_kernel_func(compile_info: CompileInfo, op_info: OpInfo, compile_
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(compile_info, compile_info.origin_func_name, op_info, tiling_info,
         compile_option_tuple)
+    OpCompileManifestRecorder().record_wrapper_body(compile_info)
 
     msg_info = "<{}> <{}> generate kernel stub end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
@@ -1056,6 +1058,10 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
     # get tiling struct and size in .asendc.tiling section and generate meta_info.o when using REGISTER_NONE_TILING
     if global_var_storage.get_variable("ascendc_tiling_no_register"):
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
+        OpCompileManifestRecorder().record_tiling_struct_info(
+            tiling_key_struct_size_map, source="_get_tiling_struct_without_register_size",
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
         gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
         chip_version = CommonUtility.get_chip_version()
         if CommonUtility.is_c310() or CommonUtility.is_v220():
@@ -1195,6 +1201,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
                            infered_info_from_ifile: InferChannelParamsFromIFile, extend_options: dict):
     value_depend_dict = extend_options.get("valueDepend")
     kernel_meta_dir = CommonUtility.get_kernel_meta_dir()
+    manifest_recorder = OpCompileManifestRecorder()
+    manifest_recorder.start(op_info, origin_func_name, cce_file, kernel_meta_dir)
     distinct_tag = CommonUtility.get_distinct_filename_tag()
     compile_log_path = None
     if global_var_storage.get_variable("ascendc_compile_debug_config"):
@@ -1220,6 +1228,16 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     file_name_tag = distinct_tag + "_tiling_data.h"
     tiling_data_file_path = os.path.join(kernel_meta_dir, op_info.kernel_name + file_name_tag)
     tiling_info.save_file(tiling_data_file_path)
+    manifest_recorder.record_tiling_struct(tiling_data_file_path)
+    tiling_key_struct_map_from_tiling = getattr(tiling_info, "tiling_key_struct_map", {})
+    default_tiling_struct_from_tiling = getattr(tiling_info, "default_tiling_struct", "")
+    if tiling_key_struct_map_from_tiling or default_tiling_struct_from_tiling:
+        manifest_recorder.record_tiling_struct_info(
+            tiling_key_struct_map_from_tiling,
+            default_tiling_struct_from_tiling,
+            "generate_dynamic_tiling_struct_file",
+            tiling_key_list=getattr(tiling_info, "tiling_key_list", None),
+            tiling_key_group_map=infered_info_from_ifile.tiling_key_group_map)
     global_var_storage.set_variable("ascendc_is_static_op", tiling_info.static_shape_flag)
     # replace tiling key when tiling_key is set in compile params
     tiling_key_list = infered_info_from_ifile.tiling_key_list
@@ -1278,6 +1296,12 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_kernel_type = infered_info_from_ifile.tiling_key_kernel_type
     compile_info.no_set_kernel_type = infered_info_from_ifile.no_set_kernel_type
     compile_info.default_kernel_type = infered_info_from_ifile.default_kernel_type
+    if compile_info.no_set_kernel_type is False:
+        manifest_recorder.record_kernel_type_info(
+            compile_info.tiling_key_kernel_type,
+            compile_info.default_kernel_type,
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
     compile_info.dump_info = {'dump_type': '', 'dump_size': 1024}
 
     # generate tiling struct size, dfx section
@@ -1292,6 +1316,14 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
     compile_info.tiling_key_struct_map = infered_info_from_ifile.tiling_key_struct_map
     compile_info.register_tiling_struct = infered_info_from_ifile.register_tiling_struct
     compile_info.tpl_tiling_struct = infered_info_from_ifile.tpl_tiling_struct
+    default_tiling_struct_from_compile_info = getattr(infered_info_from_ifile, "default_tiling_struct", "")
+    if compile_info.tiling_key_struct_map or default_tiling_struct_from_compile_info:
+        manifest_recorder.record_tiling_struct_info(
+            compile_info.tiling_key_struct_map,
+            default_tiling_struct_from_compile_info,
+            "compile_info.tiling_key_struct_map",
+            tiling_key_list=compile_info.tiling_key_list,
+            tiling_key_group_map=compile_info.tiling_key_group_map)
 
     compile_info_origin = CompileInfo()
     compile_option_tuple_origin = None
@@ -1301,9 +1333,8 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         compile_info_origin = copy.deepcopy(compile_info)
         compile_option_tuple_origin = copy.deepcopy(compile_option_tuple)
 
-    # dump ktype handle
+    # dump ktype handle 
     compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info.tiling_key_kernel_type)
-    
     # get super kernel option to compile info when enable super kernel
     handle_sk_codegen_options(compile_info, infered_info_from_ifile)
 
@@ -1329,7 +1360,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         DFXSectionGenerator().update_is_support(op_info)
         compile_info_origin.dst_file = os.path.join(kernel_meta_dir, op_info.kernel_name + "_norm.o")
 
-        # dump ktype handle
+        # dump ktype handle 
         compile_info.raw_tiling_key_kernel_type = copy.deepcopy(compile_info_origin.tiling_key_kernel_type)
         handle_sk_codegen_options(compile_info_origin, infered_info_from_ifile)
         workspace_idx = gen_op_stub_kernel_func(compile_info_origin, op_info, compile_option_tuple_origin, tiling_info,
@@ -1359,6 +1390,7 @@ def compile_op_common_part(cce_file: str, origin_func_name: str, op_info: OpInfo
         "compile Ascend C operator {} success".format(op_info.op_type), AscendCLogLevel.LOG_INFO)
     msg_info = "<{}> <{}> compile op end".format(compile_info.op_type, compile_info.tiling_key_list)
     LogUtil.detail_log_print(op_info.kernel_name, msg_info, AscendCLogLevel.LOG_INFO)
+    manifest_recorder.write(compile_info, tiling_info, compile_option_tuple)
 
 
 def compile_op(cce_file: str, origin_func_name: str, op_info: OpInfo, compile_options: list = None,
