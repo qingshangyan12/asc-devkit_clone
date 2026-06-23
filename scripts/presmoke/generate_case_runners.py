@@ -73,6 +73,7 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
 MATMUL_L2CACHE_SKIP_REASON = "data size (~308M) causes overtime in cpu mode; cpu mode skipped by presmoke"
+LONG_TIME_REASON = "The execution time in CPU mode is too long and needs to be skipped"
 
 
 @dataclass
@@ -94,6 +95,26 @@ SKIP_CONFIG = {
         reason=MATMUL_L2CACHE_SKIP_REASON,
         modes=["cpu"],
     ),
+        "01_simd_cpp_api/03_basic_api/05_sync_control/mutex": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
+        "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": SkipConfig(
+        reason=LONG_TIME_REASON,
+        modes=["cpu"],
+    ),
 }
 
 ARCH_OVERRIDES = {
@@ -109,6 +130,97 @@ ARCH_OVERRIDES = {
     # README "支持的产品" only lists Ascend 950PR/950DT. The option table also
     # mentions dav-2201, but the sample uses FP8/hifloat8 types unavailable on 910B.
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
+}
+
+SCENARIO_NUM_MAP: dict[str, str] = {
+    "01_simd_cpp_api/02_features/02_tiling_selector/vector_tiling_strategy": "0 1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_in_tensor_api": "0 1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_out_tensor_api": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_mask": "1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_unalign": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/cast": "0 1",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_compound_compute": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/interleave_pair": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/mrg_sort": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_computation": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_data_block": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_repeat": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/cast": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/compare": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/data_relayout": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/subnormal": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/trait": "1 2",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dmx_l12l0": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0": "1 2 3 4 5 6 7",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0": "1 2 3 4 5 6 7 8 9 10 11 12 13 14",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_load3dv2": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_mx": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/reg_sync": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/09_utils/get_ub_size": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": "0 1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareAB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/08_transpose/transdata": "1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/10_math/clampmin": "0 1",
+    "01_simd_cpp_api/04_advanced_api/10_math/power": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": "0 1 2 3 4 5 6",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_basic_api_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_high_performance": "0 1 2 3 4 5 6 7 8",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_mxfp4_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": "0 1 2 3",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/quant_group_matmul_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": "1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/data_copy": "1 2 3 4 5 6 7 8",
+    "03_simt_api/03_best_practices/00_memory_optimizations/cache_hint": "0 1",
+    "03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice": "0 1 2 3",
+    "03_simt_api/03_best_practices/00_memory_optimizations/short_vector_add": "1 2",
+    "03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config": "1 2 3 4 5 6 7 8 9 10 11 12 13",
+}
+
+SCENARIO_NUM_ARCH_MAP: dict[str, dict[str, str]] = {
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1": {
+        "dav-3510": "1 2 3 4 5",
+        "default": "1 2 4 5",
+    },
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm": {
+        "dav-3510": "1 2 3 4 5 6",
+        "default": "1 2",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_logic": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 4",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/select": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm": {
+        "dav-3510": "1 2 3 4 5 6 7",
+        "default": "1 2 4 5 6 7",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad": {
+        "dav-2201": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/matmul_gelu_high_performance": {
+        "dav-3510": "1 2",
+        "default": "1",
+    },
 }
 
 ARCH_ENV_KEYS = {
@@ -159,6 +271,9 @@ class RunnerRenderSpec:
     custom_op_package_case: bool = False
     skip_reason: str = ""
     skip_modes: List[str] = field(default_factory=list)
+    arch: str = ""
+    scenarios: str = ""
+
 
 
 def main() -> int:
@@ -251,6 +366,40 @@ def runner_confidence(cell, runnable_on_target: bool) -> tuple[str, List[str]]:
     return confidence, reasons
 
 
+def _resolve_skip_strategy(
+    rel: str, modes: List[str], reasons: List[str], confidence: str
+) -> tuple[str, str, List[str], bool, bool, bool]:
+    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
+    custom_op_dependency = requires_custom_op_package(rel)
+    skip_reason, skip_modes = explicit_skip_config(rel)
+    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in modes)
+    noop_needed = all_modes_skipped or custom_op_package_case
+    if all_modes_skipped:
+        reasons.append("explicit_skip")
+        confidence = "high"
+    elif skip_reason:
+        reasons.append("partial_mode_skip")
+        confidence = "high"
+    elif custom_op_package_case:
+        reasons.append("custom_op_package_provider")
+    elif custom_op_dependency:
+        reasons.append("requires_custom_op_package")
+    return confidence, skip_reason, skip_modes, noop_needed, custom_op_package_case, custom_op_dependency
+
+
+def _auto_append_scripts(cell, build_cmds: List[Command], verify_cmds: List[Command]) -> List[Command]:
+    scripts_dir = cell.example.path / "scripts"
+    has_gen_data = any(c.kind == "gen_data" for c in build_cmds)
+    if (scripts_dir / "gen_data.py").exists() and not has_gen_data:
+        build_cmds.append(Command("python3 ../scripts/gen_data.py", "gen_data"))
+    has_verify = any(c.kind == "verify" for c in verify_cmds)
+    if (scripts_dir / "verify_result.py").exists() and not has_verify:
+        verify_cmds.append(Command("python3 ../scripts/verify_result.py output/output.bin output/golden.bin", "verify"))
+    elif not has_verify:
+        verify_cmds[:] = [Command(":", "verify")]
+    return verify_cmds
+
+
 def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple[RunnerRenderSpec, str]:
     rel = cell.example.rel_path
     build_cmds = build_commands_for_runner(cell.commands)
@@ -264,22 +413,16 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             confidence = downgrade(confidence)
     if not verify_cmds:
         verify_cmds = [Command(":", "verify")]
-    custom_op_package_case = rel == CUSTOM_OP_PACKAGE_CASE
-    custom_op_dependency = requires_custom_op_package(rel)
-    skip_reason, skip_modes = explicit_skip_config(rel)
-    all_modes_skipped = skip_reason and all(mode in skip_modes for mode in cell.example.modes)
-    if all_modes_skipped:
-        reasons.append("explicit_skip")
-        confidence = "high"
-        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
-    elif skip_reason:
-        reasons.append("partial_mode_skip")
-        confidence = "high"
-    elif custom_op_package_case:
-        reasons.append("custom_op_package_provider")
-        build_cmds, run_cmds, verify_cmds = noop_stage_commands()
-    elif custom_op_dependency:
-        reasons.append("requires_custom_op_package")
+    noop_cmds: tuple = ([Command(":", "build")], [Command(":", "run")], [Command(":", "verify")])
+    confidence, skip_reason, skip_modes, noop_needed, custom_op_package_case, custom_op_dependency = (
+        _resolve_skip_strategy(rel, cell.example.modes, reasons, confidence)
+    )
+    if noop_needed:
+        build_cmds, run_cmds, verify_cmds = noop_cmds
+    else:
+        verify_cmds = _auto_append_scripts(cell, build_cmds, verify_cmds)
+    arch = cell.arch
+    scenarios = get_scenario_values(rel, arch)
     return (
         RunnerRenderSpec(
             rel=rel,
@@ -290,6 +433,8 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             custom_op_package_case=custom_op_package_case,
             skip_reason=skip_reason,
             skip_modes=skip_modes,
+            arch=arch,
+            scenarios=scenarios,
         ),
         confidence,
     )
@@ -414,6 +559,19 @@ def explicit_skip_config(rel: str) -> tuple[str, List[str]]:
     return config.reason, config.modes
 
 
+def has_scenario(rel: str) -> bool:
+    return rel in SCENARIO_NUM_MAP or rel in SCENARIO_NUM_ARCH_MAP
+
+
+def get_scenario_values(rel: str, arch: str) -> str:
+    if rel in SCENARIO_NUM_ARCH_MAP:
+        arch_map = SCENARIO_NUM_ARCH_MAP[rel]
+        return arch_map.get(arch, arch_map.get("default", "1"))
+    if rel in SCENARIO_NUM_MAP:
+        return SCENARIO_NUM_MAP[rel]
+    return ""
+
+
 def render_runner(
     spec: RunnerRenderSpec,
 ) -> str:
@@ -421,6 +579,8 @@ def render_runner(
         return render_parallel_ops_package_runner(spec)
     if spec.rel == TILING_SINK_PROGRAMMING_CASE:
         return render_tiling_sink_programming_runner(spec)
+    if spec.scenarios:
+        return render_scenario_runner(spec)
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
     inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
@@ -440,6 +600,156 @@ def render_runner(
         "",
     ]
     return "\n".join(lines)
+
+
+def _scenario_get_scenario_block(spec: RunnerRenderSpec) -> str:
+    scenario_values = " ".join(spec.scenarios.split())
+    if spec.rel not in SCENARIO_NUM_ARCH_MAP:
+        return f'get_scenario_list() {{\n    echo "{scenario_values}"\n}}'
+    arch_map = SCENARIO_NUM_ARCH_MAP[spec.rel]
+    default_val = arch_map.get("default", spec.scenarios.split()[0])
+    arch_conditions = [(k, v) for k, v in arch_map.items() if k != "default"]
+    if not arch_conditions:
+        return f'get_scenario_list() {{\n    echo "{default_val}"\n}}'
+    lines = ["get_scenario_list() {"]
+    first = True
+    for arch_name, arch_vals in arch_conditions:
+        cond = "else" if not first else f'if [[ "$ARCH" == "{arch_name}" ]]'
+        lines.append(f'    {cond}; then echo "{arch_vals}"')
+        first = False
+    lines.append(f'    else echo "{default_val}"')
+    lines.append("    fi")
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def _scenario_get_build_subdir_block() -> str:
+    return (
+        "get_build_subdir() {\n"
+        "    local scenario=$1\n"
+        '    echo "${BUILD_DIR}_scenario${scenario}"\n'
+        "}"
+    )
+
+
+def _scenario_clean_block() -> str:
+    return (
+        "case_clean() {\n"
+        "    for scenario in $(get_scenario_list); do\n"
+        '        rm -rf "$(get_build_subdir "$scenario")"\n'
+        "    done\n"
+        "    presmoke_default_clean\n"
+        "}"
+    )
+
+
+def render_scenario_runner(spec: RunnerRenderSpec) -> str:
+    build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
+    run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
+    inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
+
+    lines = [
+        *runner_header(spec),
+        "",
+        _scenario_get_scenario_block(spec),
+        "",
+        _scenario_get_build_subdir_block(),
+        "",
+        *_scenario_stage("case_build", _indent_scenario_commands(
+            build_prefix, spec.build_cmds, inject_cmake_arch
+        )),
+        *_scenario_stage("case_run", _indent_scenario_commands(
+            run_prefix, spec.run_cmds, default_cd_build=True
+        )),
+        *_scenario_stage("case_verify", _indent_scenario_commands(
+            [], spec.verify_cmds, default_cd_build=True
+        )),
+        _scenario_clean_block(),
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _scenario_stage(name: str, body: List[str]) -> List[str]:
+    lines = [
+        f"{name}() {{",
+        "    local scenario_failed=0",
+    ]
+    if name == "case_build":
+        # Group all build commands in a subshell so failure doesn't abort the loop
+        inner = "\n".join("            " + cmd.strip() for cmd in body)
+        body = [
+            "        (",
+            "            set -e",
+            inner,
+            f"        ) && echo \"场景${{scenario}}编译成功\" || {{ echo \"场景${{scenario}}编译失败\" >&2; scenario_failed=1; }}",
+        ]
+    elif name == "case_run":
+        # suppress error so verify can still run for subsequent scenarios; no status output
+        body = [
+            f'{cmd} || scenario_failed=1'
+            for cmd in body
+        ]
+    elif name == "case_verify":
+        body = [
+            f'{cmd} && echo "场景${{scenario}}精度比对成功" || {{ echo "场景${{scenario}}精度比对失败" >&2; scenario_failed=1; }}'
+            for cmd in body
+        ]
+    lines.extend([
+        "    for scenario in $(get_scenario_list); do",
+        "        local scenario_build_dir",
+        '        scenario_build_dir="$(get_build_subdir "$scenario")"',
+        '        mkdir -p "$scenario_build_dir"',
+        *body,
+        "    done",
+        "    return $scenario_failed",
+        "}",
+        "",
+    ])
+    return lines
+
+
+def _indent_scenario_commands(
+    prefixes: List[str], commands: Iterable[Command], default_cd_build: bool = False, inject_cmake_arch: bool = True
+) -> List[str]:
+    lines: List[str] = []
+    for command in commands:
+        if isinstance(command, str):
+            command = Command(command, "shell")
+        raw = command.raw
+        if not raw or raw == ":":
+            lines.append("        :")
+            continue
+        raw = rewrite_runtime_arch_options(raw)
+        raw = rewrite_runtime_cmake_options(raw, inject_cmake_arch)
+        raw = rewrite_runtime_scenario_options(raw)
+        quoted = shlex.quote(raw)
+        env_prefix = command_env_prefix(command)
+        # In scenario mode, strip SCENARIO_NUM from env to let loop variable win
+        env_prefix = re.sub(r'\bSCENARIO_NUM=\S+\s*', '', env_prefix).strip()
+        if env_prefix:
+            env_prefix += " "
+        runner = f"SCENARIO_NUM=$scenario {env_prefix}bash -lc {quoted}"
+        lines.append(f'        (cd "${{scenario_build_dir}}" && {runner})')
+    return lines
+
+
+def rewrite_runtime_scenario_options(command: str) -> str:
+    if "SCENARIO_NUM=" not in command and "scenarioNum=" not in command:
+        return command
+    command = re.sub(
+        r"-DSCENARIO_NUM=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        "-DSCENARIO_NUM=$SCENARIO_NUM",
+        command,
+    )
+    command = re.sub(
+        r"-scenarioNum=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        "-scenarioNum=$SCENARIO_NUM",
+        command,
+    )
+    return command
 
 
 def render_tiling_sink_programming_runner(spec: RunnerRenderSpec) -> str:
