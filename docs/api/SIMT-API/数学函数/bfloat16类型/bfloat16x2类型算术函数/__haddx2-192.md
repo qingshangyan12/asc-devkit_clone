@@ -45,12 +45,16 @@ bfloat16x2_t __haddx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相加的结果。相加的分量x和y满足：
 
--   x为有限值，y为±inf时，返回值为±inf。
--   x为±inf，y为±inf时，返回值为±inf。
--   x为±inf，y为∓inf时，返回值为nan。
--   x为±0，y为±0时，返回值为±0。
--   对有限值x（包括±0），x=-y时，返回值为+0。
--   x，y任意一个为nan时，返回值为nan。
+| x分量值 | y分量值| 返回值 |
+|---|---|---|
+| ±0 |  ±0 |  ±0 |
+| inf | inf | inf |
+| -inf | -inf | -inf |
+| inf | -inf | nan |
+| -inf | inf | nan |
+| x值或y值任意一个为nan || nan |
+| 对有限值x（包括±0），x=-y || 0 |
+| ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 | inf |
 
 ## 约束说明
 

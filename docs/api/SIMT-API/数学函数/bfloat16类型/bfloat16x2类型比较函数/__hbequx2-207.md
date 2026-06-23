@@ -45,8 +45,19 @@ bool __hbequx2(bfloat16x2_t x, bfloat16x2_t y)
 
 比较输入数据各分量是否均相等的结果。
 
--   true：各分量均相等。任一输入的分量为nan，该分量的比较结果为true。
+-   true：各分量均相等。
 -   false：任一分量不相等。
+-   特殊值如下：
+
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| 任意分量含nan || true |
+| 0 | -0 | true |
+| -0 | 0 | true |
+| inf | inf | true |
+| -inf | -inf | true |
+| inf | -inf | false |
+| -inf | inf | false |
 
 ## 约束说明
 
