@@ -21,13 +21,13 @@ VF浅度融合：编译器首先会分析两个VF的控制流是否等价，构�
 
 <a id="fig1"></a>
 
-![](../../../../figures/ReduceSum_basic_api.png "VF浅度融合")
+![](../../../../../figures/VF浅度融合.png "VF浅度融合")
 
 VF深度融合：VF深度融合会继续对VF内的Hardware Loop进行融合，从而减少Hardware Loop的启动开销，并且极大地减少冗余的Load/Store操作，充分复用寄存器。
 
 <a id="fig2"></a>
 
-![](../../../../figures/ReduceSum_basic_api.png "VF深度融合")
+![](../../../../../figures/VF深度融合.png "VF深度融合")
 
 VF内自动同步：编译器会精准地插入必要的同步指令，删除冗余的同步指令，极大地释放了硬件OOO（Out of Order）能力。用户无需手动插入同步指令，极大地降低了用户的编码难度。
 
