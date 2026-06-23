@@ -23,6 +23,10 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllV(
     __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAllV] enter repeatIndex=%u, rankId=%u, rankNum=%u, count=%llu, dataType=%u\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint32_t>(ccuParam_.rankId),
+        static_cast<uint32_t>(ccuParam_.rankNum), commParam->count, static_cast<uint32_t>(commParam->dataType));
     xnData_[0] = GetOpId(commParam); // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
@@ -38,6 +42,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         CCU_MAX_COMM_DATA;
     CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt++;
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAllV] offset=%llu, dataSlice=%llu, xn1=0x%llx, xn2=0x%llx, xn9=0x%llx\n", offset,
+        dataSlice, xnData_[1], xnData_[2], xnData_[9]);
     return;
 }
 
@@ -45,6 +52,10 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAll] enter repeatIndex=%u, rankId=%u, count=%llu, strideCount=%llu, dataType=%u\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint32_t>(ccuParam_.rankId), commParam->count,
+        commParam->strideCount, static_cast<uint32_t>(commParam->dataType));
     uint64_t dataSize = DATA_TYPE_MAP[commParam->dataType];
     xnData_[0] = GetOpId(commParam); // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
@@ -58,6 +69,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[6] = strideSize * ccuParam_.rankId;
     uint64_t loopCount = 8;
     CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAll] offset=%llu, sliceSize=%llu, strideSize=%llu, xn1=0x%llx, xn2=0x%llx, xn6=%llu\n",
+        offset, sliceSizeAlltoall, strideSize, xnData_[1], xnData_[2], xnData_[6]);
     return;
 }
 
@@ -65,6 +79,11 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllToAllVWrite(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAllVWrite] enter repeatIndex=%u, count=%llu, sendOffsets=0x%llx, sendSizes=0x%llx, "
+        "remoteWinOffset=%llu\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), commParam->count, commParam->wParamExt.sendOffsets,
+        commParam->wParamExt.sendSizes, commParam->wParamExt.remoteWinOffset);
     xnData_[0] = GetOpId(commParam); // ccu xn0
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * DATA_TYPE_MAP[commParam->dataType];
     xnData_[1] = (uint64_t)commParam->sendBuf + offset; // ccu xn1
@@ -88,6 +107,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[4] = loopSize * m;                     // 4 is index of xnData
     xnData_[5] = m;                                // 5 is index of xnData
     CalcLoopGroupParam(xnData_, m, n, p);
+    AscendC::PRINTF(
+        "[CcuPrepareForAllToAllVWrite] sliceSize=%llu, loopSize=%llu, m=%llu, n=%llu, p=%llu, xn8=%llu\n",
+        sliceSize, loopSize, m, n, p, xnData_[8]);
 }
 
 template <const auto& config>
@@ -160,6 +182,12 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllReduceM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForAllReduceM2M] enter repeatIndex=%u, rankId=%u, rankNum=%u, count=%llu, strideCount=%llu, "
+        "dataType=%u\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint32_t>(ccuParam_.rankId),
+        static_cast<uint32_t>(ccuParam_.rankNum), commParam->count, commParam->strideCount,
+        static_cast<uint32_t>(commParam->dataType));
     xnData_[0] = GetOpId(commParam); // ccu xn0
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
@@ -206,12 +234,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     } else {
         CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
     }
+    AscendC::PRINTF(
+        "[CcuPrepareForAllReduceM2M] offset=%llu, sliceCount=%llu, sliceSize=%llu, normalSliceSize=%llu, "
+        "lastSliceSize=%llu, xn3=0x%llx, xn4=%llu, xn5=%llu\n",
+        offset, sliceCount, sliceSize, normalSliceSize, lastSliceSize, xnData_[3], xnData_[4], xnData_[5]);
 }
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForAllGatherM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForAllGatherM2M] enter repeatIndex=%u, rankId=%u, count=%llu, strideCount=%llu, dataType=%u\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint32_t>(ccuParam_.rankId), commParam->count,
+        commParam->strideCount, static_cast<uint32_t>(commParam->dataType));
     xnData_[0] = GetOpId(commParam); // ccu xn0
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
@@ -225,12 +261,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[3] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[4] = sliceSize;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    AscendC::PRINTF(
+        "[CcuPrepareForAllGatherM2M] offset=%llu, sliceSize=%llu, xn1=0x%llx, xn2=0x%llx, xn3=%llu, xn4=%llu\n",
+        offset, sliceSize, xnData_[1], xnData_[2], xnData_[3], xnData_[4]);
 }
 
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatterM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    AscendC::PRINTF(
+        "[CcuPrepareForReduceScatterM2M] enter repeatIndex=%u, rankId=%u, count=%llu, strideCount=%llu, "
+        "dataType=%u\n",
+        static_cast<uint32_t>(ccuParam_.repeatIndex), static_cast<uint32_t>(ccuParam_.rankId), commParam->count,
+        commParam->strideCount, static_cast<uint32_t>(commParam->dataType));
     xnData_[0] = GetOpId(commParam); // ccu xn0
     auto dataSize = DATA_TYPE_MAP[static_cast<uint64_t>(commParam->dataType)];
     uint64_t offset = commParam->count * ccuParam_.repeatIndex * dataSize;
@@ -251,6 +295,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
     CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    AscendC::PRINTF(
+        "[CcuPrepareForReduceScatterM2M] offset=%llu, sliceSize=%llu, xn3=0x%llx, xn4=%llu, xn7=%llu, xn8=0x%llx\n",
+        offset, sliceSize, xnData_[3], xnData_[4], xnData_[7], xnData_[8]);
 }
 } // namespace AscendC
 
