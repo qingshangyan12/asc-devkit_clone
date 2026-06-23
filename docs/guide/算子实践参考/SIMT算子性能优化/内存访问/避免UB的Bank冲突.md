@@ -6,7 +6,7 @@
 
 以Ascend 950PR/Ascend 950DT为例，下图为UB bank结构示意图，图中箭头方向表示内存排布的顺序。UB总大小为256KB，可以划分为16个bank，并组织为8个bank group。bank0和bank8属于同一个bank group，bank1和bank9属于同一个bank group，依次类推。SIMT场景下需要重点关注同一个Warp内的并发线程是否集中访问UB的少数bank。
 
-**图 1**  bank结构示意图
+**图1**  bank结构示意图
 
 ![bank结构示意图（图中箭头方向表示内存排布的顺序）-71](../../../figures/bank结构示意图（图中箭头方向表示内存排布的顺序）-71.png)
 
