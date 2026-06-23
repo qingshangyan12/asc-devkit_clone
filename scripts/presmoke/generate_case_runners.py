@@ -87,6 +87,96 @@ ARCH_OVERRIDES = {
     "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": ["dav-3510"],
 }
 
+SCENARIO_NUM_MAP: dict[str, str] = {
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_in_tensor_api": "0 1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_out_tensor_api": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/copy_ub2ub": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2ub_nddma": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_mask": "1 2",
+    "01_simd_cpp_api/03_basic_api/00_data_movement/reg_load_store_unalign": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/cast": "0 1",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_compound_compute": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/interleave_pair": "1 2",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/mrg_sort": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_computation": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_data_block": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/reduce_repeat": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/cast": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/compare": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/data_relayout": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/subnormal": "1 2",
+    "01_simd_cpp_api/03_basic_api/02_reg_vector_compute/trait": "1 2",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2l1": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dmx_l12l0": "1 2 3 4 5 6",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_2dv2_l12l0": "1 2 3 4 5 6 7",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0": "1 2 3 4 5 6 7 8 9 10 11 12 13 14",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_load3dv2": "1 2 3 4 5",
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad_mx": "1 2 3 4",
+    "01_simd_cpp_api/03_basic_api/04_memory_management/tbufpool_management": "1 2 3",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag": "0 1 2",
+    "01_simd_cpp_api/03_basic_api/05_sync_control/reg_sync": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/data_movement_with_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/06_atomic/scalar_atomic_operations": "1 2",
+    "01_simd_cpp_api/03_basic_api/09_utils/get_ub_size": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8": "0 1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareAB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/00_matmul/matmul_ibshareB": "1 2",
+    "01_simd_cpp_api/04_advanced_api/08_transpose/transdata": "1 2 3 4",
+    "01_simd_cpp_api/04_advanced_api/10_math/clampmin": "0 1",
+    "01_simd_cpp_api/04_advanced_api/10_math/power": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/00_vector_compute/add_high_performance": "0 1 2 3 4 5 6",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_basic_api_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_high_performance": "0 1 2 3 4 5 6 7 8",
+    "01_simd_cpp_api/05_best_practices/01_matrix_compute/matmul_mxfp4_high_performance": "1 2",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_eltwise_high_performance": "0 1 2 3",
+    "01_simd_cpp_api/05_best_practices/02_reg_compute/gelu_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/quant_group_matmul_high_performance": "0 1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/bank_conflict_nd2nz": "1 2",
+    "01_simd_cpp_api/05_best_practices/04_memory_access/data_copy": "1 2 3 4 5 6 7 8",
+    "03_simt_api/03_best_practices/00_memory_optimizations/cache_hint": "0 1",
+    "03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice": "0 1 2 3",
+    "03_simt_api/03_best_practices/00_memory_optimizations/short_vector_add": "1 2",
+    "03_simt_api/03_best_practices/01_execution_conf_optimizations/grid_dim_config": "1 2 3 4 5 6 7 8 9 10 11 12 13",
+}
+
+SCENARIO_NUM_ARCH_MAP: dict[str, dict[str, str]] = {
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1": {
+        "dav-3510": "1 2 3 4 5",
+        "default": "1 2 4 5",
+    },
+    "01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm": {
+        "dav-3510": "1 2 3 4 5 6",
+        "default": "1 2",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/compare": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/element_wise_logic": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 4",
+    },
+    "01_simd_cpp_api/03_basic_api/01_memory_vector_compute/select": {
+        "dav-3510": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm": {
+        "dav-3510": "1 2 3 4 5 6 7",
+        "default": "1 2 4 5 6 7",
+    },
+    "01_simd_cpp_api/03_basic_api/03_matrix_compute/mmad": {
+        "dav-2201": "1 2 3 4",
+        "default": "1 2 3",
+    },
+    "01_simd_cpp_api/05_best_practices/03_fusion_compute/matmul_gelu_high_performance": {
+        "dav-3510": "1 2",
+        "default": "1",
+    },
+}
+
 ARCH_ENV_KEYS = {
     "ARCH",
     "ASC_ARCH",
@@ -133,6 +223,8 @@ class RunnerRenderSpec:
     custom_op_dependency: bool = False
     custom_op_package_case: bool = False
     skip_reason: str = ""
+    arch: str = ""
+    scenarios: str = ""
 
 
 def main() -> int:
@@ -247,6 +339,22 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
         build_cmds, run_cmds, verify_cmds = noop_stage_commands()
     elif custom_op_dependency:
         reasons.append("requires_custom_op_package")
+
+    # Auto-append gen_data.py by convention if script exists and no gen_data command
+    scripts_dir = cell.example.path / "scripts"
+    has_gen_data_cmd = any(c.kind == "gen_data" for c in build_cmds)
+    if (scripts_dir / "gen_data.py").exists() and not has_gen_data_cmd:
+        build_cmds.append(Command("python3 ../scripts/gen_data.py", "gen_data"))
+
+    # Auto-append verify_result.py by convention if script exists and no verify command
+    has_verify_cmd = any(c.kind == "verify" for c in verify_cmds)
+    if (scripts_dir / "verify_result.py").exists() and not has_verify_cmd:
+        verify_cmds.append(Command("python3 ../scripts/verify_result.py output/output.bin output/golden.bin", "verify"))
+    elif not has_verify_cmd:
+        verify_cmds = [Command(":", "verify")]
+
+    arch = cell.arch
+    scenarios = get_scenario_values(rel, arch)
     return (
         RunnerRenderSpec(
             rel=rel,
@@ -256,6 +364,8 @@ def build_runner_render_spec(cell, confidence: str, reasons: List[str]) -> tuple
             custom_op_dependency=custom_op_dependency,
             custom_op_package_case=custom_op_package_case,
             skip_reason=skip_reason,
+            arch=arch,
+            scenarios=scenarios,
         ),
         confidence,
     )
@@ -381,6 +491,19 @@ def explicit_skip_reason(rel: str) -> str:
     return ""
 
 
+def has_scenario(rel: str) -> bool:
+    return rel in SCENARIO_NUM_MAP or rel in SCENARIO_NUM_ARCH_MAP
+
+
+def get_scenario_values(rel: str, arch: str) -> str:
+    if rel in SCENARIO_NUM_ARCH_MAP:
+        arch_map = SCENARIO_NUM_ARCH_MAP[rel]
+        return arch_map.get(arch, arch_map.get("default", "1"))
+    if rel in SCENARIO_NUM_MAP:
+        return SCENARIO_NUM_MAP[rel]
+    return ""
+
+
 def render_runner(
     spec: RunnerRenderSpec,
 ) -> str:
@@ -388,6 +511,8 @@ def render_runner(
         return render_parallel_ops_package_runner(spec)
     if spec.rel == TILING_SINK_PROGRAMMING_CASE:
         return render_tiling_sink_programming_runner(spec)
+    if spec.scenarios:
+        return render_scenario_runner(spec)
     build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
     run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
     inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
@@ -407,6 +532,129 @@ def render_runner(
         "",
     ]
     return "\n".join(lines)
+
+
+def render_scenario_runner(spec: RunnerRenderSpec) -> str:
+    build_prefix = custom_op_guard(spec.custom_op_dependency, spec.skip_reason)
+    run_prefix = custom_op_guard(spec.custom_op_package_case, spec.skip_reason)
+    inject_cmake_arch = spec.rel not in NO_CMAKE_ARCH_INJECTION_CASES
+
+    scenario_list = spec.scenarios.split()
+    scenario_values = " ".join(scenario_list)
+
+    # Determine if we need arch-conditional scenario list
+    if spec.rel in SCENARIO_NUM_ARCH_MAP:
+        arch_map = SCENARIO_NUM_ARCH_MAP[spec.rel]
+        default_val = arch_map.get("default", scenario_list[0])
+        arch_conditions = [(k, v) for k, v in arch_map.items() if k != "default"]
+        if arch_conditions:
+            get_scenario_lines = ["get_scenario_list() {"]
+            first = True
+            for arch_name, arch_vals in arch_conditions:
+                cond = "else" if not first else f'if [[ "$ARCH" == "{arch_name}" ]]'
+                get_scenario_lines.append(f'    {cond}; then echo "{arch_vals}"')
+                first = False
+            get_scenario_lines.append(f'    else echo "{default_val}"')
+            get_scenario_lines.append("    fi")
+            get_scenario_lines.append("}")
+            get_scenario_block = "\n".join(get_scenario_lines)
+        else:
+            get_scenario_block = f'get_scenario_list() {{\n    echo "{default_val}"\n}}'
+    else:
+        get_scenario_block = f'get_scenario_list() {{\n    echo "{scenario_values}"\n}}'
+
+    get_build_subdir_block = (
+        "get_build_subdir() {\n"
+        "    local scenario=$1\n"
+        '    echo "${BUILD_DIR}_scenario${scenario}"\n'
+        "}"
+    )
+
+    indent_scenario_cmds = _indent_scenario_commands(
+        build_prefix, spec.build_cmds, inject_cmake_arch
+    )
+    indent_scenario_run = _indent_scenario_commands(
+        run_prefix, spec.run_cmds, default_cd_build=True
+    )
+    indent_scenario_verify = _indent_scenario_commands(
+        [], spec.verify_cmds, default_cd_build=True
+    )
+
+    case_build_lines = _scenario_stage("case_build", indent_scenario_cmds)
+    case_run_lines = _scenario_stage("case_run", indent_scenario_run)
+    case_verify_lines = _scenario_stage("case_verify", indent_scenario_verify)
+
+    lines = [
+        *runner_header(spec),
+        "",
+        get_scenario_block,
+        "",
+        get_build_subdir_block,
+        "",
+        *case_build_lines,
+        *case_run_lines,
+        *case_verify_lines,
+        "case_clean() {",
+        "    for scenario in $(get_scenario_list); do",
+        '        rm -rf "$(get_build_subdir "$scenario")"',
+        "    done",
+        "    presmoke_default_clean",
+        "}",
+        "",
+        'presmoke_case_main "$@"',
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _scenario_stage(name: str, body: List[str]) -> List[str]:
+    return [
+        f"{name}() {{",
+        "    for scenario in $(get_scenario_list); do",
+        "        local scenario_build_dir",
+        '        scenario_build_dir="$(get_build_subdir "$scenario")"',
+        '        mkdir -p "$scenario_build_dir"',
+        *body,
+        "    done",
+        "}",
+        "",
+    ]
+
+
+def _indent_scenario_commands(
+    prefixes: List[str], commands: Iterable[Command], default_cd_build: bool = False, inject_cmake_arch: bool = True
+) -> List[str]:
+    lines: List[str] = []
+    for command in commands:
+        if isinstance(command, str):
+            command = Command(command, "shell")
+        raw = command.raw
+        if not raw or raw == ":":
+            lines.append("        :")
+            continue
+        raw = rewrite_runtime_arch_options(raw)
+        raw = rewrite_runtime_cmake_options(raw, inject_cmake_arch)
+        raw = rewrite_runtime_scenario_options(raw)
+        quoted = shlex.quote(raw)
+        env_prefix = command_env_prefix(command)
+        # In scenario mode, strip SCENARIO_NUM from env to let loop variable win
+        env_prefix = re.sub(r'\bSCENARIO_NUM=\S+\s*', '', env_prefix).strip()
+        if env_prefix:
+            env_prefix += " "
+        runner = f"SCENARIO_NUM=$scenario {env_prefix}bash -lc {quoted}"
+        lines.append(f'        (cd "${{scenario_build_dir}}" && {runner})')
+    return lines
+
+
+def rewrite_runtime_scenario_options(command: str) -> str:
+    if "SCENARIO_NUM=" not in command:
+        return command
+    command = re.sub(
+        r"-DSCENARIO_NUM=(?:'[^']*'|\"[^\"]*\"|\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+}|[^ \t;]+)",
+        "-DSCENARIO_NUM=$SCENARIO_NUM",
+        command,
+    )
+    return command
 
 
 def render_tiling_sink_programming_runner(spec: RunnerRenderSpec) -> str:
