@@ -83,7 +83,7 @@
 | [Div](Memory矢量计算/基础算术/Div.md) | Div属于双目矢量类计算接口，负责将输入的两个tensor按元素求商。 |
 | [Divs](Memory矢量计算/基础算术/Divs.md) | 矢量内每个元素和标量间做除法，支持标量在前和标量在后两种场景，其中标量输入支持配置LocalTensor单点元素。 |
 | [Exp](Memory矢量计算/基础算术/Exp.md) | Exp属于单目矢量类计算接口，负责将输入的tensor按元素取自然指数。 |
-| [LeakyRelu](Memory矢量计算/基础算术/LeakyRelu.md) | 按元素做带泄露线性整流Leaky ReLU。 |
+| [LeakyRelu](Memory矢量计算/基础算术/LeakyRelu.md) | LeakyRelu属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，LeakyRelu负责将矢量tensor内的每个元素执行Leaky ReLu（Leaky Rectified Linear Unit）操作。 |
 | [Ln](Memory矢量计算/基础算术/Ln.md) | Ln属于单目矢量类计算接口，负责将输入的tensor按元素取自然对数。 |
 | [Max](Memory矢量计算/基础算术/Max.md) | Max属于双目矢量类计算接口，负责将输入的两个tensor按元素求最大值。 |
 | [Maxs](Memory矢量计算/基础算术/Maxs.md) | Maxs属于双目标量类计算接口，输入为一个矢量tensor和一个标量scalar，Maxs负责将矢量tensor内的每个元素与标量进行求最大值。 |
