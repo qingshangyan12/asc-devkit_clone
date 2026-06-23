@@ -8,4 +8,4 @@ This sample demonstrates the kernel function direct call method for the HelloWor
 
 |  Directory Name                                                   |  Description                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [hello_world_npu](./hello_world_npu/) | This sample demonstrates the basic flow of verifying operator kernel function execution on the NPU side using the <<<>>> kernel call operator, with printf output inside the kernel function |
+| [hello_world_npu](./hello_world_npu) | This sample demonstrates the basic flow of verifying operator kernel function execution on the NPU side using the <<<>>> kernel call operator, with printf output inside the kernel function |

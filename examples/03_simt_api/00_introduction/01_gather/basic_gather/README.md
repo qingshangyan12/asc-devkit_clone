@@ -8,5 +8,5 @@
 
 | 目录名称  | 功能描述 |
 | --------- | --------- |
-| [gather_1d](./gather_1d/) | 样例基于Ascend C SIMT编程方式实现固定shape的一维Gather算子。 |
-| [gather_2d](./gather_2d/) | 样例基于Ascend C SIMT编程方式实现固定shape的二维Gather算子。 |
+| [gather_1d](./gather_1d) | 样例基于Ascend C SIMT编程方式实现固定shape的一维Gather算子。 |
+| [gather_2d](./gather_2d) | 样例基于Ascend C SIMT编程方式实现固定shape的二维Gather算子。 |

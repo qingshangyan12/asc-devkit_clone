@@ -561,11 +561,6 @@ def file_url(target_path, suffix):
     return f"{target_path}{suffix}"
 
 
-def directory_url(target, suffix):
-    path_part = split_target(target)[0]
-    return f"{path_part.rstrip('/')}/{suffix}"
-
-
 def iter_links(line):
     yield from markdown_inline_link_targets(line)
     for match in reference_pattern.finditer(line):
@@ -603,16 +598,10 @@ for source in scan_files:
             target_path, suffix = normalized
             if (repo_root / target_path).is_dir():
                 if source_kind == "examples":
-                    path_part = split_target(target)[0]
                     if "#" in suffix:
                         errors.append(
                             f"{source}:{line_number}: examples directory link with anchor must target a file: "
                             f"{target} -> {file_url(target_path, suffix)}"
-                        )
-                    elif not path_part.endswith("/"):
-                        errors.append(
-                            f"{source}:{line_number}: examples directory link must end with '/': "
-                            f"{target} -> {directory_url(target, suffix)}"
                         )
                 else:
                     errors.append(

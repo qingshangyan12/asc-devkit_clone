@@ -2,5 +2,5 @@
 
 |  目录名称                                                   |  功能描述                                              |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
-| [00_introduction](./00_introduction/) | SIMD与SIMT混合编程示例 |
-| [02_best_practices](./02_best_practices/) | SIMD与SIMT混合编程高性能优化样例 |
+| [00_introduction](./00_introduction) | SIMD与SIMT混合编程示例 |
+| [02_best_practices](./02_best_practices) | SIMD与SIMT混合编程高性能优化样例 |

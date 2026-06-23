@@ -8,4 +8,4 @@
 
 | 目录名称 | 功能描述 |
 | --- | --- |
-| [triple_chevron_notation](./triple_chevron_notation/) | 样例介绍如何在GE `EagerExecuteOp::Execute`中直接通过`<<<>>>`调用Ascend C算子，并通过GE在线构图执行`AddCustom` |
+| [triple_chevron_notation](./triple_chevron_notation) | 样例介绍如何在GE `EagerExecuteOp::Execute`中直接通过`<<<>>>`调用Ascend C算子，并通过GE在线构图执行`AddCustom` |

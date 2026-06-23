@@ -8,4 +8,4 @@ This directory introduces how to connect Ascend C custom operators to GE native 
 
 | Directory Name | Description |
 | --- | --- |
-| [triple_chevron_notation](./triple_chevron_notation/) | Example showing how to call an Ascend C kernel with `<<<>>>` directly in GE `EagerExecuteOp::Execute` and execute `AddCustom` through GE native graph construction |
+| [triple_chevron_notation](./triple_chevron_notation) | Example showing how to call an Ascend C kernel with `<<<>>>` directly in GE `EagerExecuteOp::Execute` and execute `AddCustom` through GE native graph construction |
