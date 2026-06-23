@@ -22,7 +22,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 1.  环境准备。
 
-    除了按照[环境准备](../../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
+    除了按照[环境准备](../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
 
     -   [安装PyTorch框架](https://www.hiascend.com/document/detail/zh/Pytorch/60RC3/configandinstg/instg/insg_0005.html)
     -   [安装torch\_npu插件](https://www.hiascend.com/document/detail/zh/Pytorch/60RC3/configandinstg/instg/insg_0006.html)
@@ -83,7 +83,7 @@ Pybind适用于快速将C++函数暴露给Python，实现高效接口绑定。�
 
 1.  环境准备。
 
-    除了按照[环境准备](../../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
+    除了按照[环境准备](../../../入门教程/环境准备.md)进行CANN软件包的安装，还需要安装以下依赖：
 
     -   [安装PyTorch框架](https://www.hiascend.com/document/detail/zh/Pytorch/60RC3/configandinstg/instg/insg_0005.html)
     -   [安装torch\_npu插件](https://www.hiascend.com/document/detail/zh/Pytorch/60RC3/configandinstg/instg/insg_0006.html)
