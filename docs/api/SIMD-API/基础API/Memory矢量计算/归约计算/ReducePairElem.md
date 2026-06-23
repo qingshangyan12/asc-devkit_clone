@@ -96,7 +96,7 @@
 
 </cann-filter>
 
-<cann-filter npu-type = "A3,910b,310b,310p,910">
+<cann-filter npu-type = "A3,910b">
 
   - 针对如下型号，当一对相邻元素的掩码均为0，对应的目的元素将跳过写入，保持不变。
     - <cann-filter npu-type = "A3">Atlas A3 训练系列产品/Atlas A3 推理系列产品</cann-filter>
