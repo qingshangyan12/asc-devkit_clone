@@ -421,7 +421,7 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 
 // 优化后的地址布局（避免Bank Conflict）
 static constexpr uint32_t xAddrPingBC = 0;
-static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);  // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
 static constexpr uint32_t xAddrPongBC = MAX_DATA_COPY_LEN * sizeof(half) * 2;
 static constexpr uint32_t yAddrPongBC = xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t zAddrPingBC = MAX_DATA_COPY_LEN * sizeof(half) * 4;
@@ -514,7 +514,7 @@ $$
 T_{\text{theory}} = \frac{8192 \times 8192}{128 \times 1.85 \times 10^9 \times 48} = \frac{67108864}{1.13664 \times 10^{13}} \approx 5.904 \times 10^{-6} \text{ s} = 5.904 \text{ μs}
 $$
 
-可以看到 Case 6 的 aiv_vec_time 为 6.954 μs，已经很接近 48 核场景下的理论耗时。
+可以看到 Case 6 的 aiv_vec_time 为 6.954 μs，已经很接近 Atlas A2训练系列48核场景下的理论耗时。
 
 Case 0-3 未开启双缓冲，数据搬运串行执行，使用读带宽衡量性能。从 Case 4 开始开启双缓冲，此时 mte2 利用率较高，读写行为并行发生，因此读写混合带宽按总读写数据量除以 $T_{mte2}$ 进行估算。其中，读带宽的计算公式为：
 $$
