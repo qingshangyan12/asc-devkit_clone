@@ -32,6 +32,12 @@ inline bfloat16_t __ll2bfloat16_rz(const long long int x)
 
 输入遵循CAST\_TRUNC模式转换成的bfloat16类型数据。
 
+| 输入 | 返回值 |
+|---|---|
+| 0 | 0 |
+| 9223372036854775807（INT64_MAX） | 9.18734e+18 |
+| -9223372036854775808（INT64_MIN） | -9.22337e+18 |
+
 ## 约束说明
 
 无

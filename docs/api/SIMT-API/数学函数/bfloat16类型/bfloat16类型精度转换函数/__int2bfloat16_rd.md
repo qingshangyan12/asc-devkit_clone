@@ -32,6 +32,12 @@ inline bfloat16_t __int2bfloat16_rd(const int x)
 
 输入遵循CAST\_FLOOR模式转换成的bfloat16类型数据。
 
+| 输入 | 返回值 |
+|---|---|
+| 0 | 0 |
+| 2147483647（INT32_MAX） | 2139095040 |
+| -2147483648（INT32_MIN） | -2147483648（INT32_MIN） |
+
 ## 约束说明
 
 无

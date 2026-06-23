@@ -32,6 +32,16 @@ inline float __high2float(const bfloat16x2_t x)
 
 输入数据的高16位转换为float类型的结果。
 
+| x值高16位 | 返回值 |
+|---|---|
+| 0 | 0 |
+| -0 | -0 |
+| nan | nan |
+| inf | inf |
+| -inf | -inf |
+| ASCRT_MAX_NORMAL_BF16 | 3.38953e+38 |
+| -ASCRT_MAX_NORMAL_BF16 | -3.38953e+38 |
+
 ## 约束说明
 
 无

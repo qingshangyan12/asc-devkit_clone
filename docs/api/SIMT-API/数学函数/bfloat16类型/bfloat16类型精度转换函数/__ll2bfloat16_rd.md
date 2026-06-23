@@ -32,6 +32,14 @@ inline bfloat16_t __ll2bfloat16_rd(const long long int x)
 
 输入遵循CAST\_FLOOR模式转换成的bfloat16类型数据。
 
+| x值 | 返回值 |
+|---|---|
+| 0 | ASC0RT_ZERO_BF16 |
+| 257 | 256 |
+| -257 | -258 |
+| 9223372036854775807（INT64_MAX） | 9.18734e+18 |
+| -9223372036854775808（INT64_MIN） | -9.22337e+18 |
+
 ## 约束说明
 
 无

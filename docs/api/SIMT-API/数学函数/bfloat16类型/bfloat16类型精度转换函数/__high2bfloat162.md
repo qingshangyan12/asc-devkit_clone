@@ -32,6 +32,14 @@ inline bfloat16x2_t __high2bfloat162(const bfloat16x2_t x)
 
 输入数据的的高16位填充到bfloat16x2的结果。
 
+| x值高16位 | 返回值 |
+|---|---|
+| 0 | (0, 0) |
+| -0 | (-0, -0) |
+| nan | (nan, nan) |
+| inf | (inf, inf) |
+| -inf | (-inf, -inf) |
+
 ## 约束说明
 
 无

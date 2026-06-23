@@ -32,6 +32,18 @@ inline bfloat16_t __bfloat162bfloat16_rna(const bfloat16_t x)
 
 输入遵循CAST\_ROUND模式取整后的bfloat16\_t类型数据。
 
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| ±0 | 0 | 0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT_MAX_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
+| ASCRT_MIN_DENORM_BF16 | 0 | 0 |
+| 0.5 | 1.0 | 1.0 |
+| 1.5 | 2.0 | 2.0 |
+| 2.5 | 3.0 | 3.0 |
+| -1.5 | -2.0 | -2.0 |
+
 ## 约束说明
 
 无

@@ -36,6 +36,17 @@ bool __hbgtux2(bfloat16x2_t x, bfloat16x2_t y)
 -   true：各分量均满足第一个数大于第二个数。任一输入的分量为nan，该分量的比较结果为true。
 -   false：任一分量不满足第一个数大于第二个数。
 
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| nan | 正常值 | true |
+| 正常值 | nan | true |
+| nan | nan | true |
+| inf | 有限值 | true |
+| -inf | 有限值 | false |
+| inf | inf | false |
+| 0 | -0 | false |
+| ±0 | ±0 | false |
+
 ## 约束说明
 
 无

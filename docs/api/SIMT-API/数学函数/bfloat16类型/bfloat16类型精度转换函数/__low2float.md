@@ -32,6 +32,15 @@ inline float __low2float(const bfloat16x2_t x)
 
 输入数据的低16位转换为浮点数的结果。
 
+| x低16位值 | 返回值 |
+|---|---|
+| ±0 | ±0 |
+| nan | nan |
+| +inf | inf |
+| -inf | -inf |
+| ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 |
+| -ASCRT_MAX_NORMAL_BF16 | -ASCRT_MAX_NORMAL_BF16 |
+
 ## 约束说明
 
 无

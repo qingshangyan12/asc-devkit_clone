@@ -32,6 +32,16 @@ inline bfloat16x2_t __low2bfloat162(const bfloat16x2_t x)
 
 输入数据的低16位填充到bfloat16x2的结果。
 
+| x低16位值 | 返回值 |
+|---|---|
+| 0 | (0, 0) |
+| -0 | (-0, -0) |
+| nan | (nan, nan) |
+| inf | (inf, inf) |
+| -inf | (-inf, -inf) |
+| ASCRT_MAX_NORMAL_BF16 | (ASCRT_MAX_NORMAL_BF16, ASCRT_MAX_NORMAL_BF16) |
+| -ASCRT_MAX_NORMAL_BF16 | (-ASCRT_MAX_NORMAL_BF16, -ASCRT_MAX_NORMAL_BF16) |
+
 ## 约束说明
 
 无

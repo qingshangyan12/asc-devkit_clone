@@ -32,6 +32,23 @@ inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
 
 分别提取两个bfloat162输入的低16位，并填充到bfloat162的结果。
 
+| x低16位值 | y低16位值 | 返回值 |
+|---|---|---|
+| 0 | 0 | (0, 0) |
+| -0 | -0 | (-0, -0) |
+| 0 | -0 | (0, -0) |
+| -0 | 0 | (-0, 0) |
+| nan | 正常值 | (nan, 正常值) |
+| 正常值 | nan | (正常值, nan) |
+| nan | nan | (nan, nan) |
+| inf | 正常值 | (inf, 正常值) |
+| -inf | 正常值 | (-inf, 正常值) |
+| inf | inf | (inf, inf) |
+| -inf | -inf | (-inf, -inf) |
+| ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 | (ASCRT_MAX_NORMAL_BF16, ASCRT_MAX_NORMAL_BF16) |
+| -ASCRT_MAX_NORMAL_BF16 | -ASCRT_MAX_NORMAL_BF16 | (-ASCRT_MAX_NORMAL_BF16, -ASCRT_MAX_NORMAL_BF16) |
+| ASCRT_MIN_DENORM_BF16 | ASCRT_MIN_DENORM_BF16 | (ASCRT_MIN_DENORM_BF16, ASCRT_MIN_DENORM_BF16) |
+
 ## 约束说明
 
 无

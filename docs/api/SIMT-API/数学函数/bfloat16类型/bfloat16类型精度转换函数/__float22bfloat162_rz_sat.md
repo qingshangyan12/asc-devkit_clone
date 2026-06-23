@@ -32,6 +32,15 @@ inline bfloat16x2_t __float22bfloat162_rz_sat(const float2 x)
 
 饱和模式下将输入的两个分量遵循CAST\_TRUNC模式转换成的bfloat16x2\_t类型数据。
 
+| x分量值 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| ±0 | ±0 | ±0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT_MAX_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
+| ASCRT_MAX_NORMAL_F | ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 |
+| -ASCRT_MAX_NORMAL_F | -ASCRT_MAX_NORMAL_BF16 | -ASCRT_MAX_NORMAL_BF16 |
+
 ## 约束说明
 
 使用此接口前需将CTRL\[60\]寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../数据类型转换/概述-258.md#section1194916101549)。

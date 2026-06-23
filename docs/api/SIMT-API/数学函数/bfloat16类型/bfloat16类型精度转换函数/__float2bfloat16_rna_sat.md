@@ -32,6 +32,16 @@ inline bfloat16_t __float2bfloat16_rna_sat(const float x)
 
 饱和模式下将输入遵循CAST\_ROUND模式转换成的bfloat16类型数据。
 
+| x值 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|
+| 0 | 0 | 0 |
+| -0 | -0 | -0 |
+| nan | nan | 0 |
+| inf | inf | ASCRT_MAX_NORMAL_BF16 |
+| -inf | -inf | -ASCRT_MAX_NORMAL_BF16 |
+| ASCRT_MAX_NORMAL_F | inf | ASCRT_MAX_NORMAL_BF16 |
+| -ASCRT_MAX_NORMAL_F | -inf | -ASCRT_MAX_NORMAL_BF16 |
+
 ## 约束说明
 
 使用此接口前需将CTRL\[60\]寄存器设置为0，否则饱和模式不生效。设置方式请参见[控制饱和行为的方式](../../数据类型转换/概述-258.md#section1194916101549)。

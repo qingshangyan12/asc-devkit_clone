@@ -32,6 +32,15 @@ bfloat16x2_t __isnanx2(bfloat16x2_t x)
 
 判断输入数据各分量是否为nan，为nan时对应分量结果为1.0，否则为0.0。
 
+| x分量值 | 返回值 |
+|---|---|
+| nan | 1.0 |
+| ±0 | 0 |
+| ±inf | 0 |
+| ±ASCRT_MAX_NORMAL_BF16 | 0 |
+| ASCRT_MIN_DENORM_BF16 | 0 |
+| 正常值 | 0 |
+
 ## 约束说明
 
 无

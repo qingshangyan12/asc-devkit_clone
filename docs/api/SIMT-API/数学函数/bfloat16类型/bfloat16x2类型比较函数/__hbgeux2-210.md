@@ -36,6 +36,14 @@ bool __hbgeux2(bfloat16x2_t x, bfloat16x2_t y)
 -   true：各分量均满足第一个数大于或等于第二个数。任一输入的分量为nan，该分量的比较结果为true。
 -   false：任一分量不满足第一个数大于或等于第二个数。
 
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| 任一分量为 nan || true |
+| inf | inf | true |
+| -inf | inf | false |
+| inf | -inf | true |
+| ±0 | ±0 | true |
+
 ## 约束说明
 
 无

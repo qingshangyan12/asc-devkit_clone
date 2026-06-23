@@ -32,6 +32,16 @@ inline bfloat16x2_t __bfloat162bfloat162(const bfloat16_t x)
 
 输入的数据填充为bfloat16x2的数据。
 
+| x值 | 返回值 |
+|---|---|
+| 0 | (0, 0) |
+| -0 | (-0, -0) |
+| nan | (nan, nan) |
+| inf | (inf, inf) |
+| -inf | (-inf, -inf) |
+| ASCRT_MAX_NORMAL_BF16 | (ASCRT_MAX_NORMAL_BF16, ASCRT_MAX_NORMAL_BF16) |
+| -ASCRT_MAX_NORMAL_BF16 | (-ASCRT_MAX_NORMAL_BF16, -ASCRT_MAX_NORMAL_BF16) |
+
 ## 约束说明
 
 无
