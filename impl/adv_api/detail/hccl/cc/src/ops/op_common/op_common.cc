@@ -1299,7 +1299,7 @@ HcclResult GetAlgResCcu(
     uint64_t size = seq.size();
 
     void *ctx = nullptr;
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AICPU, size, &ctx));
+    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AIV, size, &ctx));
     HCCL_INFO("[GetAlgResCCU]HcclEngineCtxCreate successfully!");
     aclError aclRet = aclrtMemcpy(ctx, size, seq.data(), size, ACL_MEMCPY_HOST_TO_DEVICE);
     if (aclRet != ACL_SUCCESS) {

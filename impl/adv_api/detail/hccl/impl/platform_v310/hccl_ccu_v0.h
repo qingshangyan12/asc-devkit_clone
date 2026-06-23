@@ -149,7 +149,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
 
     uint64_t xnAddr = newCcuFlag_ ? hcclNewContext_->xnAddr : reinterpret_cast<uint64_t>(hcclContext_->xnOffset);
     uint64_t ckeAddr = newCcuFlag_ ? hcclNewContext_->ckeAddr : reinterpret_cast<uint64_t>(hcclContext_->ckeOffset);
-    AscendC::PRINTF("ckeAddr:0x%llx\n", ckeAddr);
 #ifndef ASCENDC_CPU_DEBUG
     ASCENDC_ASSERT((reinterpret_cast<uintptr_t>(xnAddr) % ALIGN_64_BYTE == 0), {
         KERNEL_LOG(KERNEL_ERROR, "xnAddr is not 64-byte aligned!");
@@ -439,7 +438,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112));
 
     WriteHBMData(ccuMsg_.commitCKEAddr, CCU_MSG_CKE_SET_VALUE);
-    AscendC::PRINTF("commitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(ccuMsg_.commitCKEAddr));
 }
 
 template <const auto& config>
@@ -523,35 +521,25 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     uint8_t reqId = handleReqId_[handleId] + handleFinishCnt_[handleId];
     reqId %= CCU_MAX_MSG_NUM;
     GM_ADDR waitCKEAddr = GetWaitCkeAddr(reqId);
-    AscendC::PRINTF("waitCKEAddr=0x%llx\n", reinterpret_cast<uint64_t>(waitCKEAddr));
 
 #ifndef ASCENDC_CPU_DEBUG
-    AscendC::PRINTF("[WaitFunc]start ASCENDC_CPU_DEBUG\n");
     while (true) {
-        AscendC::PRINTF("[WaitFunc]start read waitCke\n");
         uint64_t waitCke = ReadHBMData(waitCKEAddr);
-        AscendC::PRINTF("[WaitFunc]finish read waitCke\n");
         if (waitCke != 0) {
             if (workingFlag_) {
                 finishNumTemp_++;
-
-                AscendC::PRINTF("[WaitFunc]start WriteHBMData\n");
                 WriteHBMData(finishCntGM_, finishNumTemp_);
                 WriteHBMData(waitCKEAddr, CCU_MSG_CKE_INIT_VALUE);
-                AscendC::PRINTF("[WaitFunc]finish WriteHBMData\n");
             }
             break;
         }
         if (!workingFlag_) {
-            AscendC::PRINTF("[WaitFunc]start read finshCnt\n");
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
-            AscendC::PRINTF("[WaitFunc]finish read finshCnt\n");
             if (finshCnt > finishNum_) {
                 break;
             }
         }
     }
-    AscendC::PRINTF("[WaitFunc]end ASCENDC_CPU_DEBUG\n");
 #endif
 
     msgQueueIsAvailable_[reqId] = true;
