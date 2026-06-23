@@ -45,13 +45,22 @@ bfloat16x2_t __hsubx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相减的结果。相减的分量x和y满足：
 
--   x为±inf，y为有限值时，返回值为±inf。
--   x为有限值，y为±inf时，返回值为∓inf。
--   x为±inf，y为±inf时，返回值为nan。
--   x为±inf，y为∓inf时，返回值为±inf。
--   x为±0，y为∓0时，返回值为±0。
--   对有限值x（包括±0），x=y时，返回值为+0。
--   x，y任意一个为nan时，返回值为nan。
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| x，y任意一个为nan || nan |
+| inf | inf | nan |
+| -inf | -inf | nan |
+| inf | -inf | inf |
+| -inf | inf | -inf |
+| inf |有限值 | inf |
+| -inf | 有限值 | -inf |
+| 有限值 | inf | -inf |
+| 有限值 | -inf | inf |
+| 0 | 0 | 0 |
+| -0 | -0 | 0 |
+| 0 | -0 | 0 |
+| -0 | 0 | -0 |
+| 对有限值x（包括±0），x=y || 0 |
 
 ## 约束说明
 

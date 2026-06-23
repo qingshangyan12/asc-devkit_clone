@@ -45,11 +45,16 @@ bfloat16x2_t __hmulx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相乘的结果。相乘的分量x和y满足：
 
--   当输入和结果都不为nan时，x\*y的符号为x和y符号的异或。
--   x为非0值，y为±inf时，返回值符号由x和y的符号异或决定，值为inf。
--   x为±0，y为±inf时，返回值为nan。
--   x为±0，y为有限值时，返回值符号由x和y的符号异或决定，值为0。
--   x，y任意一个为nan时，返回值为nan。
+| x分量值 | y分量值 | 返回值 |
+|---|---|---|
+| ±0 | ±0 | ±0（符号由x和y符号异或决定） |
+| ±0 | ±inf | nan |
+| ±inf | ±0 | nan |
+| ±inf | ±inf | ±inf（符号由x和y符号异或决定） |
+| x，y任意一个为nan || nan |
+| ASCRT_MAX_NORMAL_BF16 | 大于1的正数 | inf |
+| -ASCRT_MAX_NORMAL_BF16 | 大于1的正数 | -inf |
+
 
 ## 约束说明
 
