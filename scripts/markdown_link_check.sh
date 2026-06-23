@@ -196,6 +196,21 @@ full_scan = os.environ.get("FULL_SCAN") == "1"
 full_reason = ""
 
 
+def ci_filelist_inputs():
+    filelist = repo_root / "pr_filelist_precommit.txt"
+    try:
+        return [
+            line.strip()
+            for line in filelist.read_text(encoding="utf-8", errors="ignore").splitlines()
+            if line.strip()
+        ]
+    except OSError:
+        return []
+
+
+input_files = list(dict.fromkeys(input_files + ci_filelist_inputs()))
+
+
 def config_exclude_path_patterns():
     try:
         text = config_file.read_text(encoding="utf-8")
@@ -372,9 +387,6 @@ if not full_scan:
     if needs_full_for_staged:
         full_scan = True
         full_reason = "staged Markdown rename/delete"
-    elif not input_files and not staged_changes and os.environ.get("PRE_COMMIT") == "1":
-        full_scan = True
-        full_reason = "pre-commit file selection"
 
 if full_scan:
     scan_set = existing_markdown_files()
@@ -385,9 +397,10 @@ else:
         staged_changes, _ = staged_markdown_changes()
         changed = staged_changes
 
+    changed_targets = {path for path in changed if path}
     changed_existing = {
-        path for path in changed
-        if path and (repo_root / path).is_file()
+        path for path in changed_targets
+        if (repo_root / path).is_file()
     }
 
     all_markdown = existing_markdown_files()
@@ -403,7 +416,7 @@ else:
 
         for target in extract_link_targets(text):
             normalized = normalize_target(source, target)
-            if normalized in changed_existing:
+            if normalized in changed_targets:
                 scan_set.add(source)
                 break
 

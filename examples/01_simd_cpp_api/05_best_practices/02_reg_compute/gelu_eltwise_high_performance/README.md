@@ -4,7 +4,7 @@
 
 本样例以Gelu+Element-wise计算为例（在Gelu后面再引入一系列的Element-wise计算操作，增加计算深度），介绍RegBase的向量性能调优方法，样例展示并行度调整、循环拆分和循环展开之后的性能收益情况。
 
-> **建议**：在阅读本样例之前，建议先阅读 [Gelu性能优化样例](../gelu_high_performance/)，了解VF融合的基本优化原理，再学习本样例中更复杂的Loop拆分优化方法。
+> **建议**：在阅读本样例之前，建议先阅读 [Gelu性能优化样例](../gelu_high_performance/README.md)，了解VF融合的基本优化原理，再学习本样例中更复杂的Loop拆分优化方法。
 
 **优化路径**：
 - Case 0: 使用单loop计算，并行度调整为128 bytes
