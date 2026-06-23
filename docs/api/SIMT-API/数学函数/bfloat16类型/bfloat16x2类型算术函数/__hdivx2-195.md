@@ -33,14 +33,16 @@ bfloat16x2_t __hdivx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相除的结果。相除的分量x和y满足：
 
--   当输入和结果都不为nan时，x/y的符号为x和y符号的异或。
--   x为±0，y为±0时，返回值为nan。
--   x为±inf，y为±inf时，返回值为nan。
--   x为有限值，y为±inf时，返回值符号由x和y的符号异或决定，值为0。
--   x为±inf，y为有限值时，返回值符号由x和y的符号异或决定，值为inf。
--   x不为0，y为±0时，返回值符号由x和y的符号异或决定，值为inf。
--   x为±0，y不为0时，返回值符号由x和y的符号异或决定，值为0。
--   x，y任意一个为nan时，返回值为nan。
+| x分量值 | y分量值 | 非饱和模式返回值 | 饱和模式返回值 |
+|---|---|---|---|
+| ±0 | ±0 | nan | 0 |
+| 有限值 | ±0 | ±inf（符号由x和y的符号异或决定） | ±ASCRT_MAX_NORMAL_BF16 |
+| ±inf | ±inf | nan | 0 |
+| x，y任意一个为nan || nan | 0 |
+| ±inf | ±0 | ±inf | ±ASCRT_MAX_NORMAL_BF16 |
+| ±inf | 有限值 | ±inf（符号由x和y的符号异或决定） | ±ASCRT_MAX_NORMAL_BF16 |
+| 有限值 | ±inf | ±0（符号由x和y的符号异或决定） | ±0 |
+| ASCRT_MAX_NORMAL_BF16 | <1.0 | inf | ASCRT_MAX_NORMAL_BF16 |
 
 ## 约束说明
 

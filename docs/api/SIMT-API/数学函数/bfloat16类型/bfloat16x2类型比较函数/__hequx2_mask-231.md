@@ -31,8 +31,16 @@ unsigned int __hequx2_mask(bfloat16x2_t x, bfloat16x2_t y)
 
 ## 返回值说明
 
--   比较输入数据各分量是否相等的结果：满足时对应16位掩码结果为0xFFFF，不满足时对应16位掩码结果为0x0。
--   任一输入的分量为nan时，该分量的16位掩码结果为0xFFFF。
+-   比较输入数据各分量是否相等的结果：满足时对应16位掩码结果为0xFFFF，不满足时对应16位掩码结果为0x0。特殊值如下：
+
+| x分量值 | y分量值 | 对应分量返回值 |
+|---|---|---|
+| ±0 | ±0 | 0xFFFF |
+| inf | inf | 0xFFFF |
+| -inf | -inf | 0xFFFF |
+| 任一分量含nan || 0xFFFF |
+| ASCRT_MAX_NORMAL_BF16 | ASCRT_MAX_NORMAL_BF16 | 0xFFFF |
+| -ASCRT_MAX_NORMAL_BF16 | -ASCRT_MAX_NORMAL_BF16 | 0xFFFF |
 
 ## 约束说明
 
