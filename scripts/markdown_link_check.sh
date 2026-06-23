@@ -589,7 +589,12 @@ for source in scan_files:
             if (repo_root / target_path).is_dir():
                 if source_kind == "examples":
                     path_part = split_target(target)[0]
-                    if not path_part.endswith("/"):
+                    if "#" in suffix:
+                        errors.append(
+                            f"{source}:{line_number}: examples directory link with anchor must target a file: "
+                            f"{target} -> {file_url(target_path, suffix)}"
+                        )
+                    elif not path_part.endswith("/"):
                         errors.append(
                             f"{source}:{line_number}: examples directory link must end with '/': "
                             f"{target} -> {directory_url(target, suffix)}"

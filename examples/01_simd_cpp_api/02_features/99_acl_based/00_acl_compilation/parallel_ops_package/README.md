@@ -3,6 +3,7 @@
 ## 概述
 
 本样例展示如何在一个顶层 CMake 工程中，使用 `ExternalProject_Add` 并行编译两个独立自定义算子工程：
+
 - `add_custom`（AddCustom）
 - `leaky_relu_custom`（LeakyReluCustom）
 
@@ -12,13 +13,13 @@
 
 ## 本样例支持的产品及CANN软件版本
 
-| 产品 | CANN软件版本 |
-|------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| 产品                                        | CANN软件版本  |
+| ------------------------------------------- | ------------- |
+| Ascend 950PR/Ascend 950DT                   | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
-| Atlas 200I/500 A2 推理产品 | >= CANN 9.0.0 |
-| Atlas 推理系列产品 | >= CANN 9.0.0 |
+| Atlas 200I/500 A2 推理产品                  | >= CANN 9.0.0 |
+| Atlas 推理系列产品                          | >= CANN 9.0.0 |
 
 > 注意: 本样例中涉及多个算子示例，请以各个算子示例实际支持的产品型号为准。
 
@@ -40,19 +41,19 @@
 
 `parallel_ops_package` 与 `custom_op` 使用相同的 Add/LeakyRelu 样例描述，请参考：
 
-- [custom_op/README.md 的“样例描述”章节](../custom_op/#样例描述)
+- [custom_op/README.md 的“样例描述”章节](../custom_op/README.md#样例描述)
 
 ## 样例规格描述
 
 `parallel_ops_package` 与 `custom_op` 使用相同的 Add/LeakyRelu 规格描述，请参考：
 
-- [custom_op/README.md 的“样例规格描述”章节](../custom_op/#样例规格描述)
+- [custom_op/README.md 的“样例规格描述”章节](../custom_op/README.md#样例规格描述)
 
 ## 代码实现介绍
 
 `parallel_ops_package` 的 Add/LeakyRelu 代码实现可参考 `custom_op` 文档说明。
 
-- [custom_op/README.md 的“代码实现介绍”章节](../custom_op/#代码实现介绍)
+- [custom_op/README.md 的“代码实现介绍”章节](../custom_op/README.md#代码实现介绍)
 
 ## 编译运行
 
@@ -61,6 +62,7 @@
 - 配置环境变量
 
   请根据当前环境上CANN开发套件包的[安装方式](../../../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -88,6 +90,7 @@
 ## 构建结果说明
 
 顶层工程会在 `build/` 下生成两个子目录：
+
 - `build/add_custom/`：AddCustom 的中间产物与安装包
 - `build/leaky_relu_custom/`：LeakyReluCustom 的中间产物与安装包
 

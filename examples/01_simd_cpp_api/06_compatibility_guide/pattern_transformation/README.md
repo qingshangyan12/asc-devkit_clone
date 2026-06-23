@@ -12,14 +12,14 @@
 1. L0A不复用。对一整块A矩阵进行一次mmad计算。
 2. L0A复用。切分M轴，A矩阵分为两块子矩阵，进行两次mmad计算。
 
-**对于场景1**，需要修改L1>L0A搬运过程的逻辑，由Nz->Zz分形转换变为Nz->Nz。具体可参考[样例实现](./#样例实现)。  
-**对于场景2**，在Atlas A2/A3 系列产品上，由于Zz分形本身在M轴上连续，所以L1->L0A搬运逻辑和场景1相同，而对于Ascend 950PR/Ascend 950DT 系列产品，切分M轴会导致矩阵不连续，需要拆分为两个Nz矩阵。具体可参考[样例实现](./#样例实现)。
+**对于场景1**，需要修改L1>L0A搬运过程的逻辑，由Nz->Zz分形转换变为Nz->Nz。具体可参考[样例实现](./README.md#样例实现)。<br>
+**对于场景2**，在Atlas A2/A3 系列产品上，由于Zz分形本身在M轴上连续，所以L1->L0A搬运逻辑和场景1相同，而对于Ascend 950PR/Ascend 950DT 系列产品，切分M轴会导致矩阵不连续，需要拆分为两个Nz矩阵。具体可参考[样例实现](./README.md#样例实现)。
 
 ## 本样例支持的产品及CANN软件版本
 
-| 产品 | CANN软件版本 |
-| ------ | ------------- |
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| 产品                                        | CANN软件版本  |
+| ------------------------------------------- | ------------- |
+| Ascend 950PR/Ascend 950DT                   | >= CANN 9.1.0 |
 | Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
 | Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
 
@@ -51,19 +51,21 @@
 
 ## 样例实现
 
-***图1 L0A不复用场景概览***
+**_图1 L0A不复用场景概览_**
 
 ![L0A不复用场景](./figures/普通兼容场景.png)
 
 图1 展示了 L0A 不复用场景下两种芯片的 L1→L0A 数据搬运差异：
+
 - Atlas A2/A3 系列：L0A 为 Zz 分形，需通过 Load2D 完成 Nz→Zz 分形转换。
 - Ascend 950PR/Ascend 950DT：L0A 为 Nz 分形，与 L1 一致，无需分形转换，Load2D 参数更简洁。
 
-***图2 L0A复用场景概览***
+**_图2 L0A复用场景概览_**
 
 ![L0A切分兼容场景](./figures/L0A切分兼容场景.png)
 
 图2 展示了 L0A 复用（M 轴切分）场景下两种芯片的适配逻辑：
+
 - Atlas A2/A3 系列：Zz 分形下，M 轴切分后 A1 和 A2 在 L0A 中依然连续，仅需调整第二次 Mmad 的偏移量即可。
 - Ascend 950PR/Ascend 950DT：Nz 分形下，M 轴切分后 A1 和 A2 不连续，需通过两次 Load2D 分别搬运上半和下半 Nz 子矩阵，不改变 Mmad 计算逻辑及流水排布。
 
@@ -128,7 +130,6 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 }
 ```
 
-
 #### L0A复用场景
 
 在分析前，先介绍数学背景。对于矩阵乘法 C = A × B，当 A 可拆分为上下两块时：
@@ -160,7 +161,6 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
     ...
 }
 ```
-
 
 ### L1->L0B
 
@@ -229,6 +229,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
 - 配置环境变量
 
   请根据当前环境上 CANN 开发套件包的[安装方式](../../../../docs/quick_start.md#prepare&install)，配置环境变量。
+
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -238,6 +239,7 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
 - 样例执行
 
   在本样例目录下执行如下命令。
+
   ```bash
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=1 .. && make -j       # 编译（默认 NPU 模式）
@@ -257,11 +259,11 @@ AscendC::Fixpipe(cGM[M * N / 2], co1Local[M * N / 2], fixpipeParams);
 
 - 编译选项说明
 
-  | 选项 | 可选值 | 说明 |
-  |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU 调试、NPU 仿真 |
+  | 选项                      | 可选值                         | 说明                                                                                  |
+  | ------------------------- | ------------------------------ | ------------------------------------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`cpu`、`sim`    | 运行模式：NPU 运行、CPU 调试、NPU 仿真                                                |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2/A3 系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `1`、`2` | 场景编号：1 表示 L0A 不复用场景，2 表示 L0A 复用场景（M 轴切分） |
+  | `SCENARIO_NUM`            | `1`、`2`                       | 场景编号：1 表示 L0A 不复用场景，2 表示 L0A 复用场景（M 轴切分）                      |
 
 - 执行结果
 
