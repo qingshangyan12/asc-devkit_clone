@@ -26,7 +26,7 @@ Ascend 950PR/Ascend 950DT对应的架构中，Vector Function（VF）是实现�
 
     if控制流可使用if constexpr或者for(1)替换。if constexpr在编译时已经完成，无运行时开销，但是需要传入的参数是编译时常量，不能依赖运行时变量；for(1)可以触发编译器的循环优化，在当前硬件条件下，Vector侧执行Loop的性能是远远优于条件分支跳转的。
 
-     本示例展示了尾块处理场景，当尾块大小不为0时，hasTail为1，通过for(1)来代替if(hasTai)的判断，提高了Loop的性能。
+     本示例展示了尾块处理场景，当尾块大小不为0时，hasTail为1，通过for(1)来代替if(hasTail)的判断，提高了Loop的性能。
 
     ```
     //【反例】使用if语句
