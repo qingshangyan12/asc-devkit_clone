@@ -16,24 +16,49 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../../../_case_entry.sh"
 presmoke_case_init "$CASE_REL"
 
+
+get_scenario_list() {
+    echo "0 1 2"
+}
+
+get_build_subdir() {
+    local scenario=$1
+    echo "${BUILD_DIR}_scenario${scenario}"
+}
+
 case_build() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
-    (cd "$BUILD_DIR" && SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'make -j')
-    (cd "$BUILD_DIR" && SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py --scenario $SCENARIO')
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'cmake -DSCENARIO=$SCENARIO .. -DCMAKE_ASC_ARCHITECTURES="$ARCH" $RUN_MODE_ARG')
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'make -j')
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario SCENARIO=0 soc_version=$SOC_VERSION bash -lc 'python3 ../scripts/gen_data.py --scenario $SCENARIO')
+    done
 }
 
 case_run() {
-    mkdir -p "$BUILD_DIR"
-    (cd "$BUILD_DIR" && SCENARIO=0 soc_version=$SOC_VERSION bash -lc ./demo)
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        (cd "${scenario_build_dir}" && SCENARIO_NUM=$scenario SCENARIO=0 soc_version=$SOC_VERSION bash -lc ./demo)
+    done
 }
 
 case_verify() {
-    mkdir -p "$BUILD_DIR"
-    :
+    for scenario in $(get_scenario_list); do
+        local scenario_build_dir
+        scenario_build_dir="$(get_build_subdir "$scenario")"
+        mkdir -p "$scenario_build_dir"
+        :
+    done
 }
 
 case_clean() {
+    for scenario in $(get_scenario_list); do
+        rm -rf "$(get_build_subdir "$scenario")"
+    done
     presmoke_default_clean
 }
 
