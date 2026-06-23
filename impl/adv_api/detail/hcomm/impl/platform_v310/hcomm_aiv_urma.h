@@ -54,15 +54,9 @@ __aicore__ inline void HcommUrmaFillSqeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __g
     sqeCtx->opcode = static_cast<uint32_t>(opCode);
     sqeCtx->flag = (config.odr & 0x7U) | ((config.fence & 0x1U) << 3U) | ((config.se & 0x1U) << 4U) |
         ((config.cqe & 0x1U) << 5U) | ((config.inlineEn & 0x1U) << 6U) | (0 & 0x1U << 7U);
-    sqeCtx->nf = 0;
-    sqeCtx->tokenEn = 1;
-    sqeCtx->rmtJettyType = 1;
     uint32_t baseBlockCount = sqCtx.contextInfo.ubJfs.sqDepth;
     sqeCtx->owner = (curHead & baseBlockCount) == 0 ? 1 : 0;
-    sqeCtx->targetHint = 0;
-    sqeCtx->inlineMsgLen = 0;
     sqeCtx->tpId = sqCtx.contextInfo.ubJfs.tpID;
-    sqeCtx->sgeNum = 1;
     sqeCtx->rmtJettyOrSegId = remoteMemInfo.bufferInfo.rma.protectionInfo.memInfo.ub.tokenId;
     sqeCtx->rmtTokenValue = remoteMemInfo.bufferInfo.rma.protectionInfo.memInfo.ub.tokenValue;
     uint64_t remoteAddrValue = reinterpret_cast<uint64_t>(remoteAddr);
@@ -83,6 +77,21 @@ __aicore__ inline void HcommUrmaFillSgeCtx(
 {
     sgeCtx->len = static_cast<uint32_t>(messageLen);
     sgeCtx->va = reinterpret_cast<uint64_t>(localAddr);
+}
+
+// Pre-fill the channel/opcode/config-independent constant SQE fields once at Init time.
+// The WQE staging buffer (wqeItem_) persists across PostSend calls, and these constants
+// share 32-bit words with the per-call variable fields (owner/flag/opcode/tpId), whose
+// read-modify-write bitfield assignments preserve the constants set here. This avoids
+// redundant per-call writes of these fixed fields.
+__aicore__ inline void HcommUrmaInitSqeConstFields(__ubuf__ HcommUrmaSqeCtx* sqeCtx)
+{
+    sqeCtx->nf = 0;
+    sqeCtx->tokenEn = 1;
+    sqeCtx->rmtJettyType = 1;
+    sqeCtx->targetHint = 0;
+    sqeCtx->inlineMsgLen = 0;
+    sqeCtx->sgeNum = 1;
 }
 
 __aicore__ inline void HcommUrmaDumpSgeCtx(__ubuf__ HcommUrmaSqeCtx* sqeCtx, __ubuf__ uint8_t* sgeAddr)
@@ -221,6 +230,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(__ubuf__ uint8_
 #endif
     wqeItem_.SetAddr(addr);
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
+    HcommUrmaInitSqeConstFields((__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr());
     return HCOMM_SUCCESS;
 }
 
@@ -233,6 +243,7 @@ __aicore__ inline int32_t HcommImpl<COMM_PROTOCOL_UBC_CTP>::Init(const LocalTens
 
     wqeItem_ = buff.template ReinterpretCast<uint32_t>();
     cqeItem_ = wqeItem_[HCOMM_URMA_WQE_U32_NUM];
+    HcommUrmaInitSqeConstFields((__ubuf__ HcommUrmaSqeCtx*)wqeItem_.GetPhyAddr());
     return HCOMM_SUCCESS;
 }
 
