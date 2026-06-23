@@ -39,7 +39,7 @@ protected:
     {                                                                                                             \
         mem_pos data_type* dst = reinterpret_cast<mem_pos data_type*>(11);                                        \
         __cbuf__ data_type* src = reinterpret_cast<__cbuf__ data_type*>(22);                                      \
-                                                                                                                   \
+                                                                                                                  \
         uint16_t index_id = 1;                                                                                    \
         uint16_t src_stride = 1;                                                                                  \
         uint16_t dst_gap = 8;                                                                                     \
@@ -52,7 +52,7 @@ protected:
             void(mem_pos data_type*, __cbuf__ data_type*, uint16_t, uint8_t, uint16_t, uint16_t, bool, uint16_t)) \
             .times(1)                                                                                             \
             .will(invoke(cce_name##_##data_type##_##sync_time##_stub));                                           \
-                                                                                                                   \
+                                                                                                                  \
         c_api_name(dst, src, index_id, repeat, src_stride, dst_gap, enable_addr_decrement, frac_gap);             \
         GlobalMockObject::verify();                                                                               \
     }
