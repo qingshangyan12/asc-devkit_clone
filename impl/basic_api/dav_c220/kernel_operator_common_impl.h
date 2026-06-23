@@ -155,11 +155,16 @@ namespace Internal {
 template <SaturationMode mode>
 __aicore__ inline constexpr int8_t GetSaturationModeBit()
 {
-    // FLOAT => bit 48; CAST => bit 59
+    // FLOAT => bit 48; FLOAT8 => bit 50; INT => bit 53; CAST => bit 59; SAT_GLOBAL => bit 60
     if constexpr(mode == SaturationMode::FLOAT) {
-        return 48;
+        return 48; // 0 => sat, 1 => no sat
+    } else if constexpr(mode == SaturationMode::INT) {
+        return 53; // 0 => trunk, 1 => sat (正常)
+    } else if constexpr(mode == SaturationMode::CAST) {
+        return 59; // 0 => sat, 1 => trunk (正常)
     } else {
-        return 59;
+        // not support
+        
     }
 }
 
