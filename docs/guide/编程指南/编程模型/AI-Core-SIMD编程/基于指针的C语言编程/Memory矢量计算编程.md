@@ -17,31 +17,30 @@ Memory矢量计算依托本地内存中的UB完成运算，开发者需先将输
 - 静态申请：分配固定大小的内存空间，空间尺寸在编译阶段确定，运行时无法修改。
 
     ```c
-    __global__ __vector__ void add_custom(...)
-    {
-        constexpr uint32_t ub_size = 256;
-        __ubuf__ half static_buffer[ub_size];  // Compiler automatically aligns to 32 bytes
-    }
+__global__ __vector__ void add_custom(...) {
+  constexpr uint32_t ub_size = 256;
+  __ubuf__ half
+      static_buffer[ub_size]; // Compiler automatically aligns to 32 bytes
+}
     ```
 
 - 动态申请：用户需要通过<<<>>>中参数dynamic_ub_size指定动态内存的空间大小，其大小在运行期确定。
 
     ```c
-    // Device-side: declare dynamic shared memory
-    __global__ __vector__ void add_custom(...)
-    {
-        extern __ubuf__ half dynamic_buf[];
-        // ...
-    }
+// Device-side: declare dynamic shared memory
+__global__ __vector__ void add_custom(...) {
+  extern __ubuf__ half dynamic_buf[];
+  // ...
+}
 
-    // Host-side: specify dynamic shared memory size via third parameter in <<<>>>
-    int32_t main(int argc, char const *argv[])
-    {
-        // ...
-        uint32_t dyn_ubuf_size = 1024 * sizeof(char);
-        add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(...);
-        // ...
-    }
+// Host-side: specify dynamic shared memory size via third parameter in <<<>>>
+int32_t main(int argc, char const *argv[]) {
+  // ...
+  uint32_t dyn_ubuf_size = 1024 * sizeof(char);
+  add_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(
+      ...);
+  // ...
+}
     ```
 
 ## Memory数据搬运
@@ -108,13 +107,16 @@ asc_copy_gm2ub(dst_ub, src_gm, size);
 <img src="../../../../figures/非连续搬运.png" alt="非连续搬运" width="800" />
 
 ```c
-// Number of consecutive data blocks: 16 rows of data, transfer every alternate row to UB, need to transfer 8 rows
+// Number of consecutive data blocks: 16 rows of data, transfer every alternate
+// row to UB, need to transfer 8 rows
 uint16_t burst_count = 2;
 // Length of single data block (in 32B units): value is 8
 uint16_t burst_len = 8;
-// Stride from previous block to next block in source data (in 32B units): interval of two rows between blocks, value is 1
+// Stride from previous block to next block in source data (in 32B units):
+// interval of two rows between blocks, value is 1
 uint16_t src_stride = 1;
-// Stride from previous block to next block in destination data (in 32B units): data blocks are consecutive, value is 2
+// Stride from previous block to next block in destination data (in 32B units):
+// data blocks are consecutive, value is 2
 uint16_t dst_stride = 2;
 
 asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
@@ -133,16 +135,21 @@ asc_copy_gm2ub(dst_ub, src_gm, burst_count, burst_len, src_stride, dst_stride);
 uint16_t burst_count = 2;
 // Length of single data block (in bytes): value is 8
 uint16_t burst_len = 8;
-// Stride from previous block to next block in source data: source data stride unit is 1B
+// Stride from previous block to next block in source data: source data stride
+// unit is 1B
 uint16_t src_stride = 1;
-// Stride from previous block to next block in destination data: UB operation constraint address must be 32B aligned, value is 32 / 32
+// Stride from previous block to next block in destination data: UB operation
+// constraint address must be 32B aligned, value is 32 / 32
 uint16_t dst_stride = 32 / 32;
-// Left padding of transfer result (element count): value is 4 / sizeof(half) = 2
+// Left padding of transfer result (element count): value is 4 / sizeof(half) =
+// 2
 uint8_t left_padding_num = 2;
-// Right padding of transfer result (element count): value is 6 / sizeof(half) = 3
+// Right padding of transfer result (element count): value is 6 / sizeof(half) =
+// 3
 uint8_t right_padding_num = 3;
 
-asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num, right_padding_num, false, 0, src_stride, dst_stride);
+asc_copy_gm2ub_align(dst, src, burst_count, burst_len, left_padding_num,
+                     right_padding_num, false, 0, src_stride, dst_stride);
 ```
 > 📌 stride（前一块数据头到后一块数据头的间隔）为该接口从[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)引入，[NPU架构版本2201](../../../语言扩展层/SIMD-BuiltIn关键字.md)使用gap（前一个数据块结束地址与后一个数据块起始地址的差值）。
 
@@ -200,7 +207,8 @@ Memory矢量计算包含连续计算和高维切分计算两种模式，同时�
 
 通过C风格接口配置`repeat_stride`和`data_block_stride`实现上述多次迭代功能。
 ```c
-// In the above example with repeat interval of 9, the following configuration achieves the corresponding operation
+// In the above example with repeat interval of 9, the following configuration
+// achieves the corresponding operation
 uint8_t repeat_time = 1;
 uint8_t dst_block_stride = 1;
 uint8_t src0_block_stride = 1;
@@ -209,7 +217,9 @@ uint8_t dst_repeat_stride = 9;
 uint8_t src0_repeat_stride = 9;
 uint8_t src1_repeat_stride = 9;
 
-asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride, src1_block_stride, dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(z, x, y, repeat_time, dst_block_stride, src0_block_stride,
+        src1_block_stride, dst_repeat_stride, src0_repeat_stride,
+        src1_repeat_stride);
 ```
 #### 掩码设置
 
@@ -235,10 +245,11 @@ half scalar_value = 1.0;
 // 2.1 Set mask counter mode
 asc_set_mask_count();
 // 2.2 Set Mask value to 200, indicating this computation processes 200 elements
-asc_set_vector_mask(0, static_cast<uint64_t>(200)); 
+asc_set_vector_mask(0, static_cast<uint64_t>(200));
 asc_add_scalar(dst_ub, src0_ub, scalar_value, 1, 1, 1, 1, 8, 8, 8);
 
-// 3. Default needs to reset to Normal mode, if subsequent still requires Counter mode then no need to reset to Normal mode
+// 3. Default needs to reset to Normal mode, if subsequent still requires
+// Counter mode then no need to reset to Normal mode
 asc_set_mask_normal();
 ```
 
@@ -255,18 +266,19 @@ asc_set_mask_normal();
     <img src="../../../../figures/单次迭代内连续计算.png" alt="单次迭代内连续计算" width="600" />
 
     ```c
-    __ubuf__ half dst_ub[256];
-    __ubuf__ half src0_ub[256];
-    __ubuf__ half src1_ub[256];
-    half scalar_value = 1.0;
+__ubuf__ half dst_ub[256];
+__ubuf__ half src0_ub[256];
+__ubuf__ half src1_ub[256];
+half scalar_value = 1.0;
 
-    // 1. Data transfer (temporarily omitted)
-    // 2. Use high-dimensional segmentation API for computation
-    // 2.1 Set mask Normal mode
-    asc_set_mask_normal();
-    // 2.2 Set Mask value to 100, indicating single iteration computes first 100 elements
-    asc_set_vector_mask(0, static_cast<uint64_t>(100)); 
-    asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
+// 1. Data transfer (temporarily omitted)
+// 2. Use high-dimensional segmentation API for computation
+// 2.1 Set mask Normal mode
+asc_set_mask_normal();
+// 2.2 Set Mask value to 100, indicating single iteration computes first 100
+// elements
+asc_set_vector_mask(0, static_cast<uint64_t>(100));
+asc_adds(dst_ub, src0_ub, scalar_value, 2, 1, 1, 1, 8, 8, 8);
     ```
 
 - 单次迭代内逐比特模式：可以按位控制哪些元素参与计算，bit位的值为1表示参与计算，0表示不参与。分为maskHigh（高位mask）和maskLow（低位mask）。参数取值范围和操作数的数据类型有关，数据类型不同，每次迭代内能够处理的元素个数最大值不同。当操作数为16位时，maskLow、maskHigh∈[0, 264-1]，并且不同时为0；当操作数为32位时，maskHigh为0，maskLow∈(0, 264-1]；当操作数为64位时，maskHigh为0，maskLow∈(0, 232-1]。
@@ -277,17 +289,17 @@ asc_set_mask_normal();
     <img src="../../../../figures/单次迭代内逐bit计算.png" alt="单次迭代内逐bit计算" width="600" />
 
     ```c
-    __ubuf__ half dst_ub[256];
-    __ubuf__ half src0_ub[256];
-    __ubuf__ half src1_ub[256];
+__ubuf__ half dst_ub[256];
+__ubuf__ half src0_ub[256];
+__ubuf__ half src1_ub[256];
 
-    // 1. Data transfer (temporarily omitted)
-    // 2. Use high-dimensional segmentation API for computation
-    // 2.1 Set mask Normal mode
-    asc_set_mask_normal();
-    // 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
-    asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000); 
-    asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
+// 1. Data transfer (temporarily omitted)
+// 2. Use high-dimensional segmentation API for computation
+// 2.1 Set mask Normal mode
+asc_set_mask_normal();
+// 2.2 Set Mask to bit-wise mode (0101...), implement interleaved computation
+asc_set_vector_mask(0x000000000000AAAA, 0x0000000000000000);
+asc_add(dst_ub, src0_ub, src1_ub, 2, 1, 1, 1, 8, 8, 8);
     ```
 
 ### 连续计算
@@ -295,7 +307,8 @@ asc_set_mask_normal();
 连续计算是软件层提供的简化接口，使用时无需配置掩码，可直接对源操作数中连续的N个数据执行运算，并将结果连续写入目的操作数，主要用于一维数据的批量计算。
 以加法运算为例，如需对长度为4096的矢量执行加法，调用方式如下：
 ```c
-asc_add(z, x, y, 4096); // 4096: number of consecutive elements involved in addition.
+asc_add(z, x, y,
+        4096); // 4096: number of consecutive elements involved in addition.
 ```
 
 ## Memory矢量计算同步控制
@@ -303,25 +316,27 @@ asc_add(z, x, y, 4096); // 4096: number of consecutive elements involved in addi
 AI Core内部的MTE2搬运单元、矢量计算单元等均为异步并行运行，多个单元读写同一块存储资源时会产生数据依赖。因此Memory矢量计算必须借助流水同步接口，保障流程正常执行。Memory矢量计算流程比矩阵计算更简洁，分为数据搬入、计算、数据搬出三个阶段，分别对应流水线PIPE_MTE2、PIPE_V、PIPE_MTE3，需通过核内同步接口约束执行顺序，保证流程串行执行。在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品中，可使用`asc_lock`与`asc_unlock`接口实现三阶段的同步控制。以下为矢量加法的完整示例：
 
 ```c
-__global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    uint8_t mutex_id = 1;
-    // ...
-    // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
-    asc_lock(PIPE_MTE2, mutex_id);
-    asc_copy_gm2ub_align(x_local, x_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
-    asc_copy_gm2ub_align(y_local, y_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0, 0);
-    asc_unlock(PIPE_MTE2, mutex_id);
+__global__ __vector__ void add_kernel(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  uint8_t mutex_id = 1;
+  // ...
+  // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
+  asc_lock(PIPE_MTE2, mutex_id);
+  asc_copy_gm2ub_align(x_local, x_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0,
+                       0);
+  asc_copy_gm2ub_align(y_local, y_gm, 1, 48 * sizeof(half), 0, 0, false, 0, 0,
+                       0);
+  asc_unlock(PIPE_MTE2, mutex_id);
 
-    // 2. Step 2: Compute, execution pipeline is PIPE_V
-    asc_lock(PIPE_V, mutex_id);
-    asc_add(z, x, y, 4096);
-    asc_unlock(PIPE_V, mutex_id);
-    
-    // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
-    asc_lock(PIPE_MTE3, mutex_id);
-    asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);
-    asc_unlock(PIPE_MTE3, mutex_id);
+  // 2. Step 2: Compute, execution pipeline is PIPE_V
+  asc_lock(PIPE_V, mutex_id);
+  asc_add(z, x, y, 4096);
+  asc_unlock(PIPE_V, mutex_id);
+
+  // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
+  asc_lock(PIPE_MTE3, mutex_id);
+  asc_copy_ub2gm_align(z_gm, z_local, 1, 48 * sizeof(int8_t), 0, 0, 0);
+  asc_unlock(PIPE_MTE3, mutex_id);
 }
 ```
 

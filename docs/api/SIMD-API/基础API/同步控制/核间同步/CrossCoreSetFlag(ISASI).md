@@ -154,28 +154,28 @@ __aicore__ inline void CrossCoreSetFlag(uint16_t flagId)
 如上表所示，当SCENARIO_NUM取不同值时，会分别演示纯Vector计算场景和Cube与Vector融合计算场景下三种同步模式的具体使用方法，下面展示了纯Vector计算场景的部分调用代码：
 
 ```cpp
-    AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::Muls(xLocal, xLocal, float(AscendC::GetBlockIdx()), this->blockLength);
+AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // UB到GM搬运启用原子累加。
-    AscendC::SetAtomicAdd<float>();
-    // DataCopy属于PIPE_MTE3流水操作。
-    AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
-    // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
-    AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
-    // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-    AscendC::CrossCoreWaitFlag(0);
-    // 关闭原子累加。
-    AscendC::DisableDmaAtomic();
+// UB到GM搬运启用原子累加。
+AscendC::SetAtomicAdd<float>();
+// DataCopy属于PIPE_MTE3流水操作。
+AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
+// 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成。
+AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
+// 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
+AscendC::CrossCoreWaitFlag(0);
+// 关闭原子累加。
+AscendC::DisableDmaAtomic();
 
-    if (AscendC::GetBlockIdx() == 0) {
-        AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);
-        AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
-        AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
-        return;
-    }
+if (AscendC::GetBlockIdx() == 0) {
+  AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);
+  AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+  AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
+  return;
+}
 ```
 
 完整样例请参考[CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/cross_core_set_wait_flag)。

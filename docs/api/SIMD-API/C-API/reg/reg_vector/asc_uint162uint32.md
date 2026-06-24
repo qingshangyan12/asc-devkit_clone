@@ -16,9 +16,12 @@
 
 ```cpp
 // 数据读取索引为偶数的位置
-__simd_callee__ inline void asc_uint162uint32(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)    
-// 数据读取索引为奇数的位置
-__simd_callee__ inline void asc_uint162uint32_v2(vector_uint32_t& dst, vector_uint16_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_uint162uint32(vector_uint32_t &dst, vector_uint16_t src, vector_bool mask)
+    // 数据读取索引为奇数的位置
+    __simd_callee__
+    inline void asc_uint162uint32_v2(vector_uint32_t &dst, vector_uint16_t src,
+                                     vector_bool mask)
 ```
 
 ## 参数说明

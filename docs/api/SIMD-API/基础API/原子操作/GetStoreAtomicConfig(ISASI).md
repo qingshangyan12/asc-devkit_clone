@@ -21,7 +21,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atomicOp)
+__aicore__ inline void GetStoreAtomicConfig(uint16_t &atomicType,
+                                            uint16_t &atomicOp)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -44,8 +45,9 @@ __aicore__ inline void GetStoreAtomicConfig(uint16_t& atomicType, uint16_t& atom
 ## 调用示例<a name="section837496171220"></a>
 
 ```cpp
-AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
-uint16_t type = 0;       // 原子操作开启位
-uint16_t op = 0;         // 原子操作类型
+AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16,
+                              AscendC::AtomicOp::ATOMIC_SUM>();
+uint16_t type = 0; // 原子操作开启位
+uint16_t op = 0;   // 原子操作类型
 AscendC::GetStoreAtomicConfig(type, op);
 ```

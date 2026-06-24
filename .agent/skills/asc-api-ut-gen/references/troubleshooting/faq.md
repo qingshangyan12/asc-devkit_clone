@@ -73,13 +73,13 @@ UT 框架中的 mock/stub 函数签名与实际 impl 调用不一致，例如参
 // 确保 Cube 核心 API 在 SetUp 中切换类型
 class TEST_FIXPIPE : public testing::Test {
 protected:
-    void SetUp() {
-        g_coreType = AscendC::AIC_TYPE;  // 必须设置
-    }
-    void TearDown() {
-        AscendC::CheckSyncState();       // 检查同步状态
-        g_coreType = AscendC::MIX_TYPE;  // 恢复混合模式
-    }
+  void SetUp() {
+    g_coreType = AscendC::AIC_TYPE; // 必须设置
+  }
+  void TearDown() {
+    AscendC::CheckSyncState();      // 检查同步状态
+    g_coreType = AscendC::MIX_TYPE; // 恢复混合模式
+  }
 };
 ```
 
@@ -293,16 +293,18 @@ UT 执行明显变慢，影响本地回归或 CI。
 
 ```cpp
 // 1. 使用类封装，结构清晰
-class KernelFixpipe { ... };
+class KernelFixpipe {
+  ...
+};
 
 // 2. 简单的测试断言
 for (int32_t i = 0; i < size; i++) {
-    EXPECT_EQ(output[i], expected_value);
+  EXPECT_EQ(output[i], expected_value);
 }
 
 // 3. 使用 ASCEND_IS_AIV 宏跳过非目标核心
 if ASCEND_IS_AIV {
-    return;
+  return;
 }
 ```
 

@@ -20,32 +20,58 @@ $$
 - 前n个数据连续计算
 
 ```c++
-__aicore__ inline void asc_sub_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-__aicore__ inline void asc_sub_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-__aicore__ inline void asc_sub_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-__aicore__ inline void asc_sub_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+__aicore__ inline void asc_sub_scalar(__ubuf__ int16_t *dst,
+                                      __ubuf__ int16_t *src, int16_t value,
+                                      uint32_t count) __aicore__
+    inline void asc_sub_scalar(__ubuf__ half *dst, __ubuf__ half *src,
+                               half value, uint32_t count) __aicore__
+    inline void asc_sub_scalar(__ubuf__ int32_t *dst, __ubuf__ int32_t *src,
+                               int32_t value, uint32_t count) __aicore__
+    inline void asc_sub_scalar(__ubuf__ float *dst, __ubuf__ float *src,
+                               float value, uint32_t count)
 ```
 
 - 非连续数据计算
 
 ```c++
-__aicore__ inline void asc_sub_scalar(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint8_t repeat, 
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-__aicore__ inline void asc_sub_scalar(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat, 
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-__aicore__ inline void asc_sub_scalar(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, 
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-__aicore__ inline void asc_sub_scalar(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat, 
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+__aicore__ inline void
+asc_sub_scalar(__ubuf__ int16_t *dst, __ubuf__ int16_t *src, int16_t value,
+               uint8_t repeat, uint16_t dst_block_stride,
+               uint16_t src_block_stride, uint16_t dst_repeat_stride,
+               uint16_t src_repeat_stride) __aicore__
+    inline void asc_sub_scalar(__ubuf__ half *dst, __ubuf__ half *src,
+                               half value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride) __aicore__
+    inline void asc_sub_scalar(__ubuf__ int32_t *dst, __ubuf__ int32_t *src,
+                               int32_t value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride) __aicore__
+    inline void asc_sub_scalar(__ubuf__ float *dst, __ubuf__ float *src,
+                               float value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride)
 ```
 
 - 数据同步计算
 
 ```c++
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int16_t value, uint32_t count)
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ half* dst, __ubuf__ half* src, half value, uint32_t count)
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-__aicore__ inline void asc_sub_scalar_sync(__ubuf__ float* dst, __ubuf__ float* src, float value, uint32_t count)
+__aicore__ inline void asc_sub_scalar_sync(__ubuf__ int16_t *dst,
+                                           __ubuf__ int16_t *src, int16_t value,
+                                           uint32_t count) __aicore__
+    inline void asc_sub_scalar_sync(__ubuf__ half *dst, __ubuf__ half *src,
+                                    half value, uint32_t count) __aicore__
+    inline void asc_sub_scalar_sync(__ubuf__ int32_t *dst,
+                                    __ubuf__ int32_t *src, int32_t value,
+                                    uint32_t count) __aicore__
+    inline void asc_sub_scalar_sync(__ubuf__ float *dst, __ubuf__ float *src,
+                                    float value, uint32_t count)
 ```
 
 ## 参数说明

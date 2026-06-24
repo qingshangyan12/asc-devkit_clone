@@ -59,8 +59,9 @@ subnormal
           - 实现函数：SubnormalFTZFalseVF<T>
           - 实现：
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
+static constexpr AscendC::Reg::DivSpecificMode mode = {
+    ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
+AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
           - 说明：支持Subnormal数据计算，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，保留该值。
           - 应用场景：需要精确处理Subnormal浮点数的科学计算、数值模拟、高精度计算等场景。
@@ -69,8 +70,9 @@ subnormal
           - 实现函数：SubnormalFTZTrueVF<T>
           - 实现：
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_TRUE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
+static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false,
+                                                       PRECISION_1ULP_FTZ_TRUE};
+AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
           - 说明：不支持Subnormal数据计算，FTZ模式，使用单指令计算得出结果，最大精度误差为1 ulp。除法结果为Subnormal数时，被强制置为0。
           - 应用场景：对Subnormal处理精度要求不高的深度学习、图像处理、实时推理等场景，可简化硬件实现，提高计算性能。

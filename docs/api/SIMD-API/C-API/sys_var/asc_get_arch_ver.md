@@ -16,7 +16,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_get_arch_ver(uint32_t& core_version)
+__aicore__ inline void asc_get_arch_ver(uint32_t &core_version)
 ```
 
 ## 参数说明
@@ -41,7 +41,7 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-uint32_t core_version = 0;// 定义AI处理器版本
+uint32_t core_version = 0; // 定义AI处理器版本
 asc_get_arch_ver(core_version);
-printf("core version is %x", core_version);// 需用%x将其打印成十六进制的数
+printf("core version is %x", core_version); // 需用%x将其打印成十六进制的数
 ```

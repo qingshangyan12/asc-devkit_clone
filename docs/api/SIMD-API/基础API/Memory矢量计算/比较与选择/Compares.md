@@ -82,23 +82,31 @@
 - tensor前n个数据计算
 
     ```cpp
-    template <typename T, typename U>
-    __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar, CMPMODE cmpMode, uint32_t count)
+template <typename T, typename U>
+__aicore__ inline void Compares(const LocalTensor<U> &dst,
+                                const LocalTensor<T> &src0, const T src1Scalar,
+                                CMPMODE cmpMode, uint32_t count)
     ```
 
 - tensor高维切分计算
     - mask逐bit模式
 
         ```cpp
-        template <typename T, typename U, bool isSetMask = true>
-        __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[], uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Compares(const LocalTensor<U> &dst, const LocalTensor<T> &src0,
+         const T src1Scalar, CMPMODE cmpMode, const uint64_t mask[],
+         uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T, typename U, bool isSetMask = true>
-        __aicore__ inline void Compares(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar, CMPMODE cmpMode, const uint64_t mask, uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Compares(const LocalTensor<U> &dst, const LocalTensor<T> &src0,
+         const T src1Scalar, CMPMODE cmpMode, const uint64_t mask,
+         uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -252,31 +260,34 @@
 - tensor前n个数据计算接口样例
 
     ```cpp
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT, srcDataSize);
+AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT,
+                  srcDataSize);
     ```
 
 - tensor高维切分计算-mask连续模式
 
     ```cpp
-    uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数
-    int repeat = 4;
-    AscendC::UnaryRepeatParams repeatParams = { 1, 1, 8, 8 };
-    // repeat = 4, 64 elements one repeat, 256 elements total
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
+uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数
+int repeat = 4;
+AscendC::UnaryRepeatParams repeatParams = {1, 1, 8, 8};
+// repeat = 4, 64 elements one repeat, 256 elements total
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride, srcRepStride = 8, no gap between repeats
+AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT, mask,
+                  repeat, repeatParams);
     ```
 
 - tensor高维切分计算-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, 0};
-    int repeat = 4;
-    AscendC::UnaryRepeatParams repeatParams = { 1, 1, 8, 8 };
-    // repeat = 4, 64 elements one repeat, 256 elements total
-    // srcBlkStride, = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT, mask, repeat, repeatParams);
+uint64_t mask[2] = {UINT64_MAX, 0};
+int repeat = 4;
+AscendC::UnaryRepeatParams repeatParams = {1, 1, 8, 8};
+// repeat = 4, 64 elements one repeat, 256 elements total
+// srcBlkStride, = 1, no gap between blocks in one repeat
+// dstRepStride, srcRepStride = 8, no gap between repeats
+AscendC::Compares(dstLocal, src0Local, src1Scalar, AscendC::CMPMODE::LT, mask,
+                  repeat, repeatParams);
     ```
 
 结果示例如下：

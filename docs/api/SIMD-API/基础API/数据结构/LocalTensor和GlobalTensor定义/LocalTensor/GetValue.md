@@ -56,7 +56,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline __inout_pipe__(S) PrimType GetValue(const uint32_t index) const
+__aicore__ inline __inout_pipe__(S) PrimType
+    GetValue(const uint32_t index) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -106,7 +107,6 @@ auto element = inputLocal.GetValue(2); // 获取inputLocal中第i个位置的数
 
 // 示例1结果如下：
 // element为200
-
 
 // 示例2
 // 数据(inputLocal): [0 100 200  ... ]

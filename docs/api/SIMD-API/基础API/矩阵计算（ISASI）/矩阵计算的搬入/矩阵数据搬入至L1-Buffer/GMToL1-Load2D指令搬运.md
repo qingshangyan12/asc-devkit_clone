@@ -24,7 +24,9 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 ```
 
 ## 参数说明<a id="zh-cn_topic_0000002567745223_section16128134420472"></a>
@@ -132,6 +134,6 @@ loadDataParams.repeatTimes = CeilDivision(k, fractalShape[1]);
 loadDataParams.srcStride = CeilDivision(m, fractalShape[0]);
 loadDataParams.dstGap = CeilDivision(m, fractalShape[0]) - 1;
 for (uint16_t i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
-    AscendC::LoadData(a1Local[i * dstOffset], aGM[i * srcOffset], loadDataParams);
+  AscendC::LoadData(a1Local[i * dstOffset], aGM[i * srcOffset], loadDataParams);
 }
 ```

@@ -23,13 +23,14 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T SignalingNaN()
+constexpr __aicore__ static inline T SignalingNaN()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋发信NaN值：
 
     ```cpp
-    __aicore__ static inline void SignalingNaN(const LocalTensor<T>& dstLocal, uint32_t count)
+__aicore__ static inline void SignalingNaN(const LocalTensor<T> &dstLocal,
+                                           uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +61,12 @@
 - 标量接口：
 
     ```cpp
-    float value = AscendC::NumericLimits<float>::SignalingNaN();
+float value = AscendC::NumericLimits<float>::SignalingNaN();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<float>::SignalingNaN(dstLocal, 256); // 返回256个float类型的NaN值
+AscendC::NumericLimits<float>::SignalingNaN(dstLocal,
+                                            256); // 返回256个float类型的NaN值
     ```

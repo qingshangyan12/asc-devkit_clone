@@ -39,8 +39,7 @@ Mask与MaskReg的机制对比，具体请参考[A2/A3与950 Mask机制对比](..
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T> 
-__simd_callee__ inline MaskReg MoveMask()
+template <typename T> __simd_callee__ inline MaskReg MoveMask()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -68,16 +67,17 @@ __simd_callee__ inline MaskReg MoveMask()
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void MoveMaskVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::MaskReg addMask = AscendC::Reg::MoveMask<T>();
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(srcReg, srcReg, 0, addMask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-    }
+__simd_vf__ inline void MoveMaskVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                                   uint32_t count, uint32_t oneRepeatSize,
+                                   uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::MaskReg addMask = AscendC::Reg::MoveMask<T>();
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, addMask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+  }
 }
 ```

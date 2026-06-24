@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
 
 ```cpp
-T* GetDataPtr()
+T *GetDataPtr()
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section75395119104"></a>
@@ -76,22 +76,23 @@ T* GetDataPtr()
 ![](../../../../../figures/zh-cn_image_0000002340320301.png)
 
 ```cpp
-AscendC::ListTensorDesc listTensorDesc(reinterpret_cast<__gm__ void *>(srcGm)); // srcGm为待解析的gm地址
-uint32_t size = listTensorDesc.GetSize();                                       // size = 2
-auto dataPtr0 = listTensorDesc.GetDataPtr<int32_t>(0);                          // 获取ptr0
-auto dataPtr1 = listTensorDesc.GetDataPtr<int32_t>(1);                          // 获取ptr1
+AscendC::ListTensorDesc listTensorDesc(
+    reinterpret_cast<__gm__ void *>(srcGm)); // srcGm为待解析的gm地址
+uint32_t size = listTensorDesc.GetSize();    // size = 2
+auto dataPtr0 = listTensorDesc.GetDataPtr<int32_t>(0); // 获取ptr0
+auto dataPtr1 = listTensorDesc.GetDataPtr<int32_t>(1); // 获取ptr1
 
 uint64_t buf[100] = {0}; // 示例中Tensor的dim为3,此处的100表示预留足够大的空间
 AscendC::TensorDesc<int32_t> desc;
-desc.SetShapeAddr(buf);          // 为desc指定用于储存shape信息的地址
+desc.SetShapeAddr(buf); // 为desc指定用于储存shape信息的地址
 listTensorDesc.GetDesc(desc, 0); // 获取索引0的shape信息
 
 uint64_t dim = desc.GetDim();   // dim = 3
 uint64_t idx = desc.GetIndex(); // idx = 0
 uint64_t shape[3] = {0};
-for (uint32_t i = 0; i < desc.GetDim(); i++)
-{
-    shape[i] = desc.GetShape(i); // GetShape(0) = 1, GetShape(1) = 2, GetShape(2) = 3
+for (uint32_t i = 0; i < desc.GetDim(); i++) {
+  shape[i] =
+      desc.GetShape(i); // GetShape(0) = 1, GetShape(1) = 2, GetShape(2) = 3
 }
 auto ptr = desc.GetDataPtr();
 ```

@@ -45,23 +45,26 @@
       当编译选项QUANT_MODE的值为1时，设置编译宏：CUSTOM_QUANT_VECTOR，编译执行向量的反量化模式。    
       根据是否定义宏：CUSTOM_QUANT_VECTOR，设置对应的反量化参数。
       ```cpp
-      #if defined(CUSTOM_QUANT_VECTOR)
-          matmulObj.SetQuantVector(quantGlobal);
-      #else
-          float quantFloat = 0.1f;
-          uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
-          matmulObj.SetQuantScalar(quantValue);
-      #endif
+#if defined(CUSTOM_QUANT_VECTOR)
+matmulObj.SetQuantVector(quantGlobal);
+#else
+float quantFloat = 0.1f;
+uint64_t quantValue =
+    static_cast<uint64_t>(*reinterpret_cast<int32_t *>(&quantFloat));
+matmulObj.SetQuantScalar(quantValue);
+#endif
       ```
 
   - Tiling关键步骤
     - 设置Matmul反量化模式。
       ``` cpp
-      #if defined(CUSTOM_QUANT_VECTOR)
-          tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
-      #else
-          tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
-      #endif
+#if defined(CUSTOM_QUANT_VECTOR)
+tilingApi.SetDequantType(
+    matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
+#else
+tilingApi.SetDequantType(
+    matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
+#endif
       ```
 
   - 调用实现  

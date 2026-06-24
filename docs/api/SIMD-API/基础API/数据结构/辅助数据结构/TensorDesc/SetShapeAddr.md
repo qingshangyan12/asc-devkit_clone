@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section13230182415108"></a>
 
 ```cpp
-void SetShapeAddr(uint64_t* shapePtr)
+void SetShapeAddr(uint64_t *shapePtr)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section75395119104"></a>

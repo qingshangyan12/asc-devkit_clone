@@ -23,23 +23,25 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 执行L1 Buffer到L0ScaleA Buffer的数据搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 构造默认搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 构造指定Trait的搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(
-        const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 ## 参数说明
@@ -79,24 +81,26 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 ```cpp
 #include "tensor_api/tensor.h"
 
- using namespace AscendC::Te;
+using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToL0ScaleAExample()
-{
-    constexpr uint32_t m = 16;
-    constexpr uint32_t k = 32;
-    constexpr uint32_t scaleK = k / 16;
+__aicore__ inline void CopyL1ToL0ScaleAExample() {
+  constexpr uint32_t m = 16;
+  constexpr uint32_t k = 32;
+  constexpr uint32_t scaleK = k / 16;
 
-    __cbuf__ fp8_e8m0_t l1Buf[m * scaleK];
-    __ca__ fp8_e5m2_t l0ABuf[m * k];
+  __cbuf__ fp8_e8m0_t l1Buf[m * scaleK];
+  __ca__ fp8_e5m2_t l0ABuf[m * k];
 
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<ZZLayoutPtn, _2>(m, scaleK));
+  auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf),
+                             MakeFrameLayout<ZZLayoutPtn, _2>(m, scaleK));
 
-    // ScaleA地址由左矩阵的L0A Buffer地址按1/16地址编码换算得到。
-    auto l0ScaleAPtr = MakeMemPtr<Location::L0ScaleA, fp8_e8m0_t>(reinterpret_cast<uint64_t>(l0ABuf) / 16);
-    auto l0ScaleATensor = MakeTensor(l0ScaleAPtr, MakeFrameLayout<ZZLayoutPtn, _2>(m, scaleK));
+  // ScaleA地址由左矩阵的L0A Buffer地址按1/16地址编码换算得到。
+  auto l0ScaleAPtr = MakeMemPtr<Location::L0ScaleA, fp8_e8m0_t>(
+      reinterpret_cast<uint64_t>(l0ABuf) / 16);
+  auto l0ScaleATensor =
+      MakeTensor(l0ScaleAPtr, MakeFrameLayout<ZZLayoutPtn, _2>(m, scaleK));
 
-    auto copyAtom = MakeCopy(CopyL12L0ScaleA{}, CopyL12L0ScaleATraitDefault{});
-    Copy(copyAtom, l0ScaleATensor, l1Tensor);
+  auto copyAtom = MakeCopy(CopyL12L0ScaleA{}, CopyL12L0ScaleATraitDefault{});
+  Copy(copyAtom, l0ScaleATensor, l1Tensor);
 }
 ```

@@ -41,50 +41,56 @@ Tiling常量化的Matmul样例。Tiling常量化即在编译期期间将部分�
     - 具体步骤：
       - 配置常量化的MatmulShapeParams，获取自定义MatmulConfig。
         ```cpp
-        constexpr int32_t MAX_M = 10000; // custom matmul kernel support max value of M Dim shape
-        constexpr int32_t MAX_N = 10000; // custom matmul kernel support max value of N Dim shape
-        constexpr int32_t MAX_K = 10000; // custom matmul kernel support max value of K Dim shape
-        constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeA) <=L0A size
-        constexpr int32_t BASE_N = 256;  // BASEN * BASE_K * sizeof(typeB) <=L0B size
-        constexpr int32_t BASE_K = 64;   // BASEM * BASE_N * sizeof(typeC) <=L0C size
-        constexpr MatmulShapeParams shapeParams = { MAX_M,
-                                                      MAX_N,
-                                                      MAX_K,
-                                                      BASE_M,
-                                                      BASE_N,
-                                                      BASE_K };
-        constexpr MatmulConfig CUSTOM_CFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
+constexpr int32_t MAX_M =
+    10000; // custom matmul kernel support max value of M Dim shape
+constexpr int32_t MAX_N =
+    10000; // custom matmul kernel support max value of N Dim shape
+constexpr int32_t MAX_K =
+    10000; // custom matmul kernel support max value of K Dim shape
+constexpr int32_t BASE_M = 128; // BASEM * BASE_K * sizeof(typeA) <=L0A size
+constexpr int32_t BASE_N = 256; // BASEN * BASE_K * sizeof(typeB) <=L0B size
+constexpr int32_t BASE_K = 64;  // BASEM * BASE_N * sizeof(typeC) <=L0C size
+constexpr MatmulShapeParams shapeParams = {MAX_M,  MAX_N,  MAX_K,
+                                           BASE_M, BASE_N, BASE_K};
+constexpr MatmulConfig CUSTOM_CFG =
+    GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
         ```
       - 通过GetMatmulApiTiling接口获取常量化Tiling信息。
         ```cpp
-        auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
+auto constantCFG =
+    AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
         ```
       - 使用自定义MatmulConfig模板创建Matmul对象。
         ```cpp
-        using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>;
-        using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>;
-        using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>;
-        using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>;
-        constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>();
-        AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>;
+constexpr static auto CONSTANT_CFG =
+    GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>();
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
         ```
       - 初始化操作，传入常量化Tiling信息。
       - 设置左矩阵A、右矩阵B、Bias。
         ```cpp
-        matmulObj.SetTail(tailM, tailN, shapes.k);
-        matmulObj.SetTensorA(aGlobal, false);
-        matmulObj.SetTensorB(bGlobal, false);
-        if (shapes.isBias) {
-            matmulObj.SetBias(biasGlobal);
-        }
+matmulObj.SetTail(tailM, tailN, shapes.k);
+matmulObj.SetTensorA(aGlobal, false);
+matmulObj.SetTensorB(bGlobal, false);
+if (shapes.isBias) {
+  matmulObj.SetBias(biasGlobal);
+}
         ```
       - 完成矩阵乘操作。
         ```cpp
-        matmulObj.IterateAll(cGlobal);
+matmulObj.IterateAll(cGlobal);
         ```
       - 结束矩阵乘操作。
         ```cpp
-        matmulObj.End();
+matmulObj.End();
         ```
 
   - Tiling关键步骤

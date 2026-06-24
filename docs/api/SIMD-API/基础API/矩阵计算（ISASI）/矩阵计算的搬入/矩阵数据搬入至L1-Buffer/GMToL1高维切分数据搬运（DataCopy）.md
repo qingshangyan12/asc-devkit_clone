@@ -28,7 +28,9 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
 ```
 
 注：对于连续搬运场景，推荐使用[GMToL1连续数据搬运（DataCopy）](GMToL1连续数据搬运（DataCopy）.md)。
@@ -195,9 +197,10 @@ AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, copyCount);
 
 AscendC::DataCopyParams repeatParams;
 repeatParams.blockCount = 1; // 搬运1个数据块，表示连续搬运。
-repeatParams.blockLen = 8;   // 每个数据块长度为8个DataBlock，即256B，等于128个half。
-repeatParams.srcGap = 0;     // blockCount = 1时，源端间隔无意义，设置为0。
-repeatParams.dstGap = 0;     // blockCount = 1时，目的端间隔无意义，设置为0。
+repeatParams.blockLen =
+    8; // 每个数据块长度为8个DataBlock，即256B，等于128个half。
+repeatParams.srcGap = 0; // blockCount = 1时，源端间隔无意义，设置为0。
+repeatParams.dstGap = 0; // blockCount = 1时，目的端间隔无意义，设置为0。
 
 AscendC::DataCopy(dstLocal, srcGm, repeatParams);
 ```
@@ -216,9 +219,10 @@ AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A1, 0, dstCount);
 
 AscendC::DataCopyParams repeatParams;
 repeatParams.blockCount = 2; // 搬运2个数据块。
-repeatParams.blockLen = 3;   // 每个数据块长度为3个DataBlock，即96B，等于48个half。
-repeatParams.srcGap = 1;     // 源端两个数据块之间跳过1个DataBlock，即16个half。
-repeatParams.dstGap = 2;     // 目的端两个数据块之间间隔2个DataBlock，即32个half。
+repeatParams.blockLen =
+    3; // 每个数据块长度为3个DataBlock，即96B，等于48个half。
+repeatParams.srcGap = 1; // 源端两个数据块之间跳过1个DataBlock，即16个half。
+repeatParams.dstGap = 2; // 目的端两个数据块之间间隔2个DataBlock，即32个half。
 
 AscendC::DataCopy(dstLocal, srcGm, repeatParams);
 ```

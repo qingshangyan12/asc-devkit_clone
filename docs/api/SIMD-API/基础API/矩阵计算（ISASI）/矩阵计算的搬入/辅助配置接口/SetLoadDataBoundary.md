@@ -53,14 +53,18 @@ __aicore__ inline void SetLoadDataBoundary(uint32_t boundaryValue)
 本接口用于配合[Load3D](../矩阵数据搬入至L0-Buffer/Load3D.md)接口使用，展示代码示例片段：
 
 ```cpp
-// Load3D指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用load3d接口，实现NZ2ZZ
+// Load3D指令完成img2col的过程，可知img2col后A矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k,
+// fractalShape[0])；img2col后A矩阵宽度为ci * kh *
+// kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m,
+// fractalShape[1])。最后，配置loadDataParams.enTranspose =
+// true，将整个A矩阵转置并且将其中每一个分形转置 使用load3d接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 // 设置loadDataParams相关参数
 ...
 
-// SetLoadDataBoundary设置为0，可使用整个L1 Buffer
-AscendC::SetLoadDataBoundary(0);
+    // SetLoadDataBoundary设置为0，可使用整个L1 Buffer
+    AscendC::SetLoadDataBoundary(0);
 
 AscendC::LoadData(a2Local, a1Local, loadDataParams);
 ```

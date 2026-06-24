@@ -72,14 +72,15 @@ LocalTensor构造函数。
 -   适用于[Pipe编程框架](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/基于TPipe和TQue编程.md)，通常情况下开发者不直接调用，该函数不会对LocaTensor成员变量赋初值，均为随机值。
 
     ```cpp
-    __aicore__ inline LocalTensor<T>() {}
+__aicore__ inline LocalTensor<T>() {}
     ```
 
 -   适用于[静态Tensor编程](https://gitcode.com/cann/asc-devkit/blob/master/docs/guide/编程指南/编程模型/AI-Core-SIMD编程/SIMD编程/静态Tensor编程.md)，根据指定的逻辑位置/地址/长度，返回Tensor对象。
 
     ```cpp
-    __aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr, uint32_t tileSize)
-    __aicore__ inline LocalTensor<T>(uint32_t addr)
+__aicore__ inline LocalTensor<T>(TPosition pos, uint32_t addr,
+                                 uint32_t tileSize) __aicore__
+    inline LocalTensor<T>(uint32_t addr)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -156,34 +157,36 @@ __aicore__ inline LocalTensor&lt;T&gt;(uint32_t addr)</pre>
 // srcLen = 256, num = 100, M=50
 // 示例1
 for (int32_t i = 0; i < srcLen; ++i) {
-    inputLocal.SetValue(i, num); // 对inputLocal中第i个位置进行赋值为num
+  inputLocal.SetValue(i, num); // 对inputLocal中第i个位置进行赋值为num
 }
 // 示例1结果如下：
 // 数据(inputLocal): [100 100 100  ... 100]
 
 // 示例2
 for (int32_t i = 0; i < srcLen; ++i) {
-    auto element = inputLocal.GetValue(i); // 获取inputLocal中第i个位置的数值
+  auto element = inputLocal.GetValue(i); // 获取inputLocal中第i个位置的数值
 }
 // 示例2结果如下：
 // element为100
 
 // 示例3
 for (int32_t i = 0; i < srcLen; ++i) {
-    inputLocal(i) = num; // 对inputLocal中第i个位置进行赋值为num
+  inputLocal(i) = num; // 对inputLocal中第i个位置进行赋值为num
 }
 // 示例3结果如下：
 // 数据(inputLocal): [100 100 100  ... 100]
 
 // 示例4
 for (int32_t i = 0; i < srcLen; ++i) {
-    auto element = inputLocal(i); // 获取inputLocal中第i个位置的数值
+  auto element = inputLocal(i); // 获取inputLocal中第i个位置的数值
 }
 // 示例4结果如下：
 // element为100
 
 // 示例5
-auto size = inputLocal.GetSize(); // 获取inputLocal的长度，size大小为inputLocal有多少个元素
+auto size =
+    inputLocal
+        .GetSize(); // 获取inputLocal的长度，size大小为inputLocal有多少个元素
 // 示例5结果如下：
 // size大小为srcLen，256。
 
@@ -207,25 +210,31 @@ AscendC::TTagType tag2 = tensor2.GetUserTag();
 AscendC::LocalTensor<half> tensor3 = que3.AllocTensor<half>();
 /* 使用Tag控制条件语句执行*/
 if ((tag1 <= 10) && (tag2 >= 9)) {
-    AscendC::Add(tensor3, tensor1, tensor2, TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
+  AscendC::Add(
+      tensor3, tensor1, tensor2,
+      TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
 }
 // 示例9
 // input_local为int32_t类型，包含16个元素(64字节)
 for (int32_t i = 0; i < 16; ++i) {
-    inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
+  inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
 }
 
 // 调用ReinterpretCast将input_local重解释为int16_t类型
-AscendC::LocalTensor<int16_t> interpreTensor = inputLocal.ReinterpretCast<int16_t>();
+AscendC::LocalTensor<int16_t> interpreTensor =
+    inputLocal.ReinterpretCast<int16_t>();
 // 示例9结果如下，二者数据完全一致，在物理内存上也是同一地址，仅根据不同类型进行了重解释
 // inputLocal:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0
+// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14
+// 0 15 0
 
 // 示例10
 // 调用GetPhyAddr()返回LocalTensor地址，CPU上返回的是指针类型(T*)，NPU上返回的是物理存储的地址(uint64_t)
 #ifdef ASCENDC_CPU_DEBUG
 float *inputLocalCpuPtr = inputLocal.GetPhyAddr();
-uint64_t realAddr = (uint64_t)inputLocalCpuPtr - (uint64_t)(GetTPipePtr()->GetBaseAddr(static_cast<int8_t>(AscendC::TPosition::VECCALC)));
+uint64_t realAddr = (uint64_t)inputLocalCpuPtr -
+                    (uint64_t)(GetTPipePtr()->GetBaseAddr(
+                        static_cast<int8_t>(AscendC::TPosition::VECCALC)));
 #else
 uint64_t realAddr = inputLocal.GetPhyAddr();
 #endif
@@ -233,11 +242,11 @@ uint64_t realAddr = inputLocal.GetPhyAddr();
 // 示例11
 AscendC::TPosition srcPos = (AscendC::TPosition)inputLocal.GetPosition();
 if (srcPos == AscendC::TPosition::VECCALC) {
-    // 处理逻辑1
+  // 处理逻辑1
 } else if (srcPos == AscendC::TPosition::A1) {
-    // 处理逻辑2
+  // 处理逻辑2
 } else {
-    // 处理逻辑3
+  // 处理逻辑3
 }
 
 // 示例12
@@ -259,7 +268,8 @@ uint32_t orgShape2 = maxShapeInfo.originalShape[2];
 uint32_t orgShape3 = maxShapeInfo.originalShape[3];
 uint32_t shape2 = maxShapeInfo.shape[2];
 
-// 示例15 SetAddrWithOffset，用于快速获取定义一个Tensor，同时指定新Tensor相对于旧Tensor首地址的偏移
+// 示例15
+// SetAddrWithOffset，用于快速获取定义一个Tensor，同时指定新Tensor相对于旧Tensor首地址的偏移
 // 需要注意，偏移的长度为旧Tensor的元素个数
 AscendC::LocalTensor<float> tmpBuffer1 = tempBmm2Queue.AllocTensor<float>();
 AscendC::LocalTensor<half> tmpHalfBuffer;
@@ -279,9 +289,10 @@ AscendC::LocalTensor<float> tmpTensor = softmaxMaxBuf.template Get<float>();
 tmpTensor.ToFile("tmpTensor.bin");
 
 // 示例19只限于CPU调试，在调试窗口中打印LocalTensor数据用于精度调试，每一行打印一个datablock(32Bytes)的数据
-AscendC::LocalTensor<int32_t> inputLocal = softmaxMaxBuf.template Get<int32_t>();
+AscendC::LocalTensor<int32_t> inputLocal =
+    softmaxMaxBuf.template Get<int32_t>();
 for (int32_t i = 0; i < 16; ++i) {
-    inputLocal.SetValue(i, i); // 对input_local中第i个位置进行赋值为i
+  inputLocal.SetValue(i, i); // 对input_local中第i个位置进行赋值为i
 }
 inputLocal.Print();
 // 0000: 0 1 2 3 4 5 6 7 8
@@ -291,16 +302,17 @@ inputLocal.Print();
 // 示例20在静态Tensor编程场景使用，根据传入的逻辑位置VECIN、起始地址128、元素个数32、数据类型float，构造出Tensor对象
 uint32_t addr = 128;
 uint32_t tileSize = 32;
-AscendC::LocalTensor<float> tensor1 = AscendC::LocalTensor<float>(AscendC::TPosition::VECIN, addr, tileSize);
+AscendC::LocalTensor<float> tensor1 =
+    AscendC::LocalTensor<float>(AscendC::TPosition::VECIN, addr, tileSize);
 // 根据传入的TensorTrait信息、起始地址128构造出Tensor对象
 // 其逻辑位置为VECIN，数据类型为float，Tensor元素个数为16*16*16
-template <uint32_t v>
-using UIntImm = Std::integral_constant<uint32_t, v>;
-...
-auto shape = AscendC::MakeShape(UIntImm<16>{}, UIntImm<16>{}, UIntImm<16>{});
+template <uint32_t v> using UIntImm = Std::integral_constant<uint32_t, v>;
+... auto shape =
+    AscendC::MakeShape(UIntImm<16>{}, UIntImm<16>{}, UIntImm<16>{});
 auto stride = AscendC::MakeStride(UIntImm<0>{}, UIntImm<0>{}, UIntImm<0>{});
 auto layoutMake = AscendC::MakeLayout(shape, stride);
-auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
+auto tensorTraitMake =
+    AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
 uint32_t addr = 128;
 auto tensor1 = AscendC::LocalTensor<decltype(tensorTraitMake)>(addr);
 ```

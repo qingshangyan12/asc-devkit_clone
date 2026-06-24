@@ -20,10 +20,10 @@
 
 ```cpp
 if ASCEND_IS_AIV {
-// AIV处理逻辑
+  // AIV处理逻辑
 }
 if ASCEND_IS_AIC {
-// AIC处理逻辑
+  // AIC处理逻辑
 }
 ```
 
@@ -63,21 +63,21 @@ __aicore__ void Async(Args... args)
 ## 调用示例
 
 ```cpp
-__aicore__ inline void cubeProcess(KernelMmad &op, GM_ADDR A, GM_ADDR B, GM_ADDR c)
-{
-    op.InitAIC(A, B, c);
-    op.ProcessAIC();
+__aicore__ inline void cubeProcess(KernelMmad &op, GM_ADDR A, GM_ADDR B,
+                                   GM_ADDR c) {
+  op.InitAIC(A, B, c);
+  op.ProcessAIC();
 }
-__aicore__ inline void vectorProcess(KernelMmad &op, GM_ADDR a, GM_ADDR b, GM_ADDR A, GM_ADDR B, GM_ADDR c)
-{
-    op.InitAIV(a, b, A, B, c);
-    op.ProcessAIV();
+__aicore__ inline void vectorProcess(KernelMmad &op, GM_ADDR a, GM_ADDR b,
+                                     GM_ADDR A, GM_ADDR B, GM_ADDR c) {
+  op.InitAIV(a, b, A, B, c);
+  op.ProcessAIV();
 }
-__global__ __mix__(1,2) void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR A, GM_ADDR B, GM_ADDR c)
-{
-    AscendC::InitSocState();
-    KernelMmad op;
-    AscendC::Async<AscendC::EngineType::AIC, cubeProcess>(op, A, B, c);
-    AscendC::Async<AscendC::EngineType::AIV, vectorProcess>(op, a, b, A, B, c);
+__global__ __mix__(1, 2) void mmad_custom(GM_ADDR a, GM_ADDR b, GM_ADDR A,
+                                          GM_ADDR B, GM_ADDR c) {
+  AscendC::InitSocState();
+  KernelMmad op;
+  AscendC::Async<AscendC::EngineType::AIC, cubeProcess>(op, A, B, c);
+  AscendC::Async<AscendC::EngineType::AIV, vectorProcess>(op, a, b, A, B, c);
 }
 ```

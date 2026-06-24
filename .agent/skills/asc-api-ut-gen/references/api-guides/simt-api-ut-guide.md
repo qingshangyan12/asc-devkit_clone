@@ -41,14 +41,14 @@ SIMT API 提供类似 CUDA 的编程范式：
 
 ```cpp
 // 设备函数声明
-__device__ void vector_add(float* dst, float* src0, float* src1, int n);
+__device__ void vector_add(float *dst, float *src0, float *src1, int n);
 
 // 线程索引
 int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
 // 并行执行
 for (int i = tid; i < n; i += blockDim.x * gridDim.x) {
-    dst[i] = src0[i] + src1[i];
+  dst[i] = src0[i] + src1[i];
 }
 ```
 
@@ -64,7 +64,7 @@ SIMT API 通常声明为 `__device__` 函数：
 
 ```cpp
 __device__ inline void simt_function(...) {
-    // 设备端执行代码
+  // 设备端执行代码
 }
 ```
 
@@ -107,8 +107,8 @@ SIMT API 测试通常需要特殊的 Kernel 声明：
 ```cpp
 // Kernel 声明
 extern "C" __global__ __aicore__ void kernel_simt_function(...) {
-    // Kernel 实现
-    // 调用 SIMT API
+  // Kernel 实现
+  // 调用 SIMT API
 }
 ```
 
@@ -150,7 +150,7 @@ SIMT API 仅支持 3510 架构：
 ```cpp
 // impl 文件中
 #if __NPU_ARCH__ == 3510
-    // ascend950pr_9599 SIMT 实现
+// ascend950pr_9599 SIMT 实现
 #endif
 ```
 

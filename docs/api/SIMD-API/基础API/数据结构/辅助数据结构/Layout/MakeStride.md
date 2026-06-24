@@ -55,7 +55,7 @@
 
 ```cpp
 template <typename... Ts>
-__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
+__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts &...t)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section75395119104"></a>
@@ -84,8 +84,7 @@ __aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
 Stride结构类型（[Std::tuple](../../../../../Utils-API/CPP标准库/容器函数/容器函数.md)类型的别名），用于定义各维度在内存中的步长，即同维度相邻元素在内存中的间隔，与Shape的维度信息一一对应。定义如下：
 
 ```cpp
-template <typename... Strides>
-using Stride = Std::tuple<Strides...>;
+template <typename... Strides> using Stride = Std::tuple<Strides...>;
 ```
 
 ## 约束说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section19165124931511"></a>

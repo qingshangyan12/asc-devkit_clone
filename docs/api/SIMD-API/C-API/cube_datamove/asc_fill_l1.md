@@ -17,41 +17,73 @@
 - 常规计算
 
     ```cpp
-    __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config)
+__aicore__ inline void
+asc_fill_l1(__cbuf__ int16_t *dst, half value,
+            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ int16_t *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ uint16_t *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ uint16_t *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ half *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ half *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ bfloat16_t *dst, bfloat16_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ int32_t *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ int32_t *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ uint32_t *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ uint32_t *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ float *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ float *dst, uint32_t value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ bfloat16_t *dst, half value,
+                            const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1(__cbuf__ bfloat16_t *dst, uint32_t value,
+                            const asc_fill_value_config &config)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ int16_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint16_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ half* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, bfloat16_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ int32_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ uint32_t* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, half value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ float* dst, uint32_t value, const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, half value,const asc_fill_value_config& config)
-    __aicore__ inline void asc_fill_l1_sync(__cbuf__ bfloat16_t* dst, uint32_t value, const asc_fill_value_config& config)
+__aicore__ inline void
+asc_fill_l1_sync(__cbuf__ int16_t *dst, half value,
+                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ int16_t *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ uint16_t *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ uint16_t *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ half *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ half *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ bfloat16_t *dst, bfloat16_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ int32_t *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ int32_t *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ uint32_t *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ uint32_t *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ float *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ float *dst, uint32_t value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ bfloat16_t *dst, half value,
+                                 const asc_fill_value_config &config) __aicore__
+    inline void asc_fill_l1_sync(__cbuf__ bfloat16_t *dst, uint32_t value,
+                                 const asc_fill_value_config &config)
     ```
 
 ## 参数说明
@@ -79,22 +111,22 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
+constexpr uint64_t total_length = 128; // total_length指参与搬运的数据总长度
 asc_fill_value_config config;
 
 // dst和value数据类型不相同
 __cbuf__ float dst0[total_length];
-uint32_t value0 = 0x3F800000;  // float类型的1的二进制表示为0x3F800000
+uint32_t value0 = 0x3F800000; // float类型的1的二进制表示为0x3F800000
 config.repeat = 1;
 config.blk_num = total_length * sizeof(float) / 32;
 config.dst_gap = 0;
-asc_fill_l1(dst0, value0, config);    // 将dst0中128个float类型的元素初始化为1
+asc_fill_l1(dst0, value0, config); // 将dst0中128个float类型的元素初始化为1
 
 // dst和value数据类型相同
 __cbuf__ half dst1[total_length];
-half value1 = 1;  // 不用做二进制转换，直接填1即可
+half value1 = 1; // 不用做二进制转换，直接填1即可
 config.repeat = 1;
 config.blk_num = total_length * sizeof(half) / 32;
 config.dst_gap = 0;
-asc_fill_l1(dst1, value1, config);    // 将dst1中128个half类型的元素初始化为1
+asc_fill_l1(dst1, value1, config); // 将dst1中128个half类型的元素初始化为1
 ```

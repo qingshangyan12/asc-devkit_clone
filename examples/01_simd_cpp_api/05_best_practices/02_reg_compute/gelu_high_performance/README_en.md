@@ -175,32 +175,32 @@ The baseline program uses Ascend C basic API to implement Gelu computation, incl
 
 **Key Code**:
 ```cpp
-__aicore__ inline void GeluCompute(
-        const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    // yLocal = x * x = x²
-    AscendC::Mul(yLocal, xLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x² * x = x³
-    AscendC::Mul(yLocal, yLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x³ * 0.044715 = 0.044715 * x³
-    AscendC::Muls(yLocal, yLocal, COEFF_A, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x + 0.044715 * x³
-    AscendC::Add(yLocal, xLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = -1.595769 * (x + 0.044715 * x³)
-    AscendC::Muls(yLocal, yLocal, COEFF_B, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Exp(yLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = 1 + e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Adds(yLocal, yLocal, (float)1.0, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x / (1 + e^(-1.595769 * (x + 0.044715 * x³)))
-    AscendC::Div(yLocal, xLocal, yLocal, n);
+__aicore__ inline void GeluCompute(const AscendC::LocalTensor<float> &xLocal,
+                                   const AscendC::LocalTensor<float> &yLocal,
+                                   uint32_t n) {
+  // yLocal = x * x = x²
+  AscendC::Mul(yLocal, xLocal, xLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x² * x = x³
+  AscendC::Mul(yLocal, yLocal, xLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x³ * 0.044715 = 0.044715 * x³
+  AscendC::Muls(yLocal, yLocal, COEFF_A, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x + 0.044715 * x³
+  AscendC::Add(yLocal, xLocal, yLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = -1.595769 * (x + 0.044715 * x³)
+  AscendC::Muls(yLocal, yLocal, COEFF_B, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = e^(-1.595769 * (x + 0.044715 * x³))
+  AscendC::Exp(yLocal, yLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = 1 + e^(-1.595769 * (x + 0.044715 * x³))
+  AscendC::Adds(yLocal, yLocal, (float)1.0, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x / (1 + e^(-1.595769 * (x + 0.044715 * x³)))
+  AscendC::Div(yLocal, xLocal, yLocal, n);
 }
 ```
 
@@ -295,7 +295,8 @@ Compared to the introductory Case 0 code, key modifications are:
 - Remove `PipeBarrier<PIPE_V>()` synchronization; no explicit synchronization needed within VF function
 
 ```cpp
-// Case 0: Basic API, each computation requires Load/Store + PipeBarrier synchronization
+// Case 0: Basic API, each computation requires Load/Store + PipeBarrier
+// synchronization
 AscendC::Mul(yLocal, xLocal, xLocal, n);
 AscendC::PipeBarrier<PIPE_V>();
 AscendC::Mul(yLocal, yLocal, xLocal, n);
@@ -303,25 +304,27 @@ AscendC::PipeBarrier<PIPE_V>();
 // ... 8 computations total, 8 synchronizations
 
 // Case 1: RegBase API + VF fusion, all computation completed within registers
-__simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
+__simd_vf__ inline void GeluVfBasic(__ubuf__ float *xAddr,
+                                    __ubuf__ float *yAddr, uint32_t n,
+                                    uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
 
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);  // Only one Load
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // Only one Store
-    }
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // Only one Load
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                             mask); // Only one Store
+  }
 }
 ```
 
@@ -388,25 +391,27 @@ Iter2: Load→Mul→...→Store       ...(no loop control overhead, instructions
 Add `#pragma unroll 6` before the for loop in the VF function. Unroll factor 6 is an empirical value that needs tuning based on actual scenarios:
 
 ```cpp
-__simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-    #pragma unroll 6  // Loop unrolling optimization, improve instruction-level parallelism
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+__simd_vf__ inline static void GeluVfBasic(__ubuf__ float *xAddr,
+                                           __ubuf__ float *yAddr, uint32_t n,
+                                           uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
+#pragma unroll 6 // Loop unrolling optimization, improve instruction-level
+                 // parallelism
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 

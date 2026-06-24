@@ -71,20 +71,21 @@
 - 用于AddDeqRelu、Cast、CastDequant的s322fp16场景。<a id="func1"></a>
 
   ```cpp
-  __aicore__ inline void SetDeqScale(half scale)
+__aicore__ inline void SetDeqScale(half scale)
   ```
 
 - 用于CastDequant不开启向量量化的s162b8场景。
 
   ```cpp
-  __aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode)
+__aicore__ inline void SetDeqScale(float scale, int16_t offset, bool signMode)
   ```
 
 - 用于CastDequant开启向量量化的s162b8场景。
 
   ```cpp
-  template <typename T>
-  __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo)
+template <typename T>
+__aicore__ inline void SetDeqScale(const LocalTensor<T> &vdeq,
+                                   const VdeqInfo &vdeqInfo)
   ```
 
 ## 参数说明<a name="zh-cn_topic_0000002563051145_section138547361666"></a>
@@ -123,45 +124,46 @@
 - SetDeqScale(half scale)。
 
   ```cpp
-  // 配合Cast的s322fp16场景使用
-  // dstLocal为half类型的LocalTensor，srcLocal为int32_t类型的LocalTensor
-  uint32_t srcSize = 256; // 参与计算的元素个数
-  half scale = 1.0; // 量化参数为1
-  AscendC::SetDeqScale(scale);
-  // dst = src
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_NONE, srcSize);
+// 配合Cast的s322fp16场景使用
+// dstLocal为half类型的LocalTensor，srcLocal为int32_t类型的LocalTensor
+uint32_t srcSize = 256; // 参与计算的元素个数
+half scale = 1.0;       // 量化参数为1
+AscendC::SetDeqScale(scale);
+// dst = src
+AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_NONE, srcSize);
   ```
 
 - SetDeqScale\(float scale, int16\_t offset, bool signMode\)。
 
   ```cpp
-  // 配合CastDequant（isVecDeq=false）场景使用
-  // dstLocal为int8_t类型的LocalTensor，srcLocal为int16_t类型的LocalTensor
-  uint32_t srcSize = 256; // 参与计算的元素个数
-  float scale = 1.0; // 量化参数为1
-  int16_t offset = 0; // 不带偏移
-  bool signMode = true; // dstLocal为int8_t类型，为有符号数
-  AscendC::SetDeqScale(scale, offset, signMode);
-  // dst = src
-  AscendC::CastDequant<int8_t, int16_t, false, false>(dstLocal, srcLocal, srcSize);
+// 配合CastDequant（isVecDeq=false）场景使用
+// dstLocal为int8_t类型的LocalTensor，srcLocal为int16_t类型的LocalTensor
+uint32_t srcSize = 256; // 参与计算的元素个数
+float scale = 1.0;      // 量化参数为1
+int16_t offset = 0;     // 不带偏移
+bool signMode = true;   // dstLocal为int8_t类型，为有符号数
+AscendC::SetDeqScale(scale, offset, signMode);
+// dst = src
+AscendC::CastDequant<int8_t, int16_t, false, false>(dstLocal, srcLocal,
+                                                    srcSize);
   ```
 
 - SetDeqScale\(const LocalTensor<T\>& vdeq, const VdeqInfo& vdeqInfo\)。
 
   ```cpp
-  // 配合CastDequant（isVecDeq=true）场景使用
-  // dstLocal为int8_t类型的LocalTensor，srcLocal为int16_t类型的LocalTensor
-  uint32_t srcSize = 256; // 参与计算的元素个数
-  float vdeqScale[16] = { 0 };
-  int16_t vdeqOffset[16] = { 0 };
-  bool vdeqSignMode[16] = { 0 };
-  for (int i = 0; i < 16; i++) {
-      vdeqScale[i] = 1.0; // 量化参数为1
-      vdeqOffset[i] = 0; // 不带偏移
-      vdeqSignMode[i] = true; // dstLocal为int8_t类型，为有符号数
-  }
-  AscendC::VdeqInfo vdeqInfo(vdeqScale, vdeqOffset, vdeqSignMode);
-  AscendC::SetDeqScale<uint64_t>(tmpBuffer, vdeqInfo);
-  // dst = src
-  AscendC::CastDequant<int8_t, int16_t, true, true>(dstLocal, srcLocal, srcSize);
+// 配合CastDequant（isVecDeq=true）场景使用
+// dstLocal为int8_t类型的LocalTensor，srcLocal为int16_t类型的LocalTensor
+uint32_t srcSize = 256; // 参与计算的元素个数
+float vdeqScale[16] = {0};
+int16_t vdeqOffset[16] = {0};
+bool vdeqSignMode[16] = {0};
+for (int i = 0; i < 16; i++) {
+  vdeqScale[i] = 1.0;     // 量化参数为1
+  vdeqOffset[i] = 0;      // 不带偏移
+  vdeqSignMode[i] = true; // dstLocal为int8_t类型，为有符号数
+}
+AscendC::VdeqInfo vdeqInfo(vdeqScale, vdeqOffset, vdeqSignMode);
+AscendC::SetDeqScale<uint64_t>(tmpBuffer, vdeqInfo);
+// dst = src
+AscendC::CastDequant<int8_t, int16_t, true, true>(dstLocal, srcLocal, srcSize);
   ```

@@ -54,7 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetShapeInfo(const ShapeInfo& shapeInfo)
+__aicore__ inline void SetShapeInfo(const ShapeInfo &shapeInfo)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

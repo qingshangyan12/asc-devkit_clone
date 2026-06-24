@@ -46,7 +46,7 @@
 - 实现：
 
     ```cpp
-    AscendC::And(dstLocal, src0Local, src1Local, COUNT);
+AscendC::And(dstLocal, src0Local, src1Local, COUNT);
     ```
 
 - 说明：对src0和src1中的每个元素进行按位与运算，结果存入dst
@@ -63,8 +63,9 @@
 - 实现：
 
     ```cpp
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, COUNT);
+static constexpr AscendC::BinaryConfig config = {0};
+AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0],
+                                                       src1Local, COUNT);
     ```
 
 - 说明：标量在前，src0Local[0]作为标量（左操作数），src1Local作为矢量（右操作数），对src1中的每个元素与src0Local[0]进行按位或运算，结果存入dst
@@ -81,7 +82,7 @@
 - 实现：
 
     ```cpp
-    AscendC::ShiftLeft(dstLocal, src0Local, src1Local, COUNT);
+AscendC::ShiftLeft(dstLocal, src0Local, src1Local, COUNT);
     ```
 
 - 说明：对src0中的每个元素按照src1中对应的左移位数进行左移操作，结果存入dst。src1存放左移位数，不支持设置为负数
@@ -98,7 +99,7 @@
 - 实现：
 
     ```cpp
-    AscendC::ShiftRight(dstLocal, src0Local, SHIFT_BITS, COUNT);
+AscendC::ShiftRight(dstLocal, src0Local, SHIFT_BITS, COUNT);
     ```
 
 - 说明：对src0中的每个元素右移SHIFT_BITS位，结果存入dst。无符号数据类型执行逻辑右移，有符号数据类型执行算术右移

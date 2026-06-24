@@ -20,7 +20,8 @@ MakeTensor会根据内存指针的物理位置标记，自动推导返回GlobalT
 
 ```cpp
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&... args)
+__aicore__ inline constexpr auto MakeTensor(const Iterator &iter,
+                                            const Args &...args)
 ```
 
 ## 参数说明
@@ -37,18 +38,18 @@ __aicore__ inline constexpr auto MakeTensor(const Iterator& iter, const Args&...
 ## 调用示例
 
   ```cpp
-  // 示例1：使用GM指针和Layout创建GlobalTensor
-  auto gmPtr = MakeMemPtr<Location::GM, half>(gmAddr);
-  auto gmLayout = MakeLayout(MakeShape(32, 32), MakeStride(32, 1));
-  auto gmTensor = MakeTensor(gmPtr, gmLayout);
+// 示例1：使用GM指针和Layout创建GlobalTensor
+auto gmPtr = MakeMemPtr<Location::GM, half>(gmAddr);
+auto gmLayout = MakeLayout(MakeShape(32, 32), MakeStride(32, 1));
+auto gmTensor = MakeTensor(gmPtr, gmLayout);
 
-  // 示例2：使用Local Memory指针和Layout创建LocalTensor
-  constexpr int tileNum = 4;
-  __cbuf__ half dataPtr[tileNum]; // 初始化
-  auto ptr = MakeMemPtr(dataPtr);
-  auto layout = MakeFrameLayout<NZLayoutPtn, half>(32, 32);
-  auto tensor = MakeTensor(ptr, layout);
-  
-  // 示例3：使用指针和形状创建张量（自动计算步幅）
-  auto tensor2 = MakeTensor(ptr, MakeShape(32, 32), MakeStride(32, 32));
+// 示例2：使用Local Memory指针和Layout创建LocalTensor
+constexpr int tileNum = 4;
+__cbuf__ half dataPtr[tileNum]; // 初始化
+auto ptr = MakeMemPtr(dataPtr);
+auto layout = MakeFrameLayout<NZLayoutPtn, half>(32, 32);
+auto tensor = MakeTensor(ptr, layout);
+
+// 示例3：使用指针和形状创建张量（自动计算步幅）
+auto tensor2 = MakeTensor(ptr, MakeShape(32, 32), MakeStride(32, 32));
   ```

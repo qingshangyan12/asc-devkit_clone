@@ -147,17 +147,16 @@ The code takes up to `144×128` `Tile` for ND→NZ rearrangement each time. The 
 
 ```cpp
 AscendC::CopyRepeatParams copyParams;
-copyParams.dstStride     = dstNzC0Stride;    // = 144, spacing between adjacent C0 column start positions
-copyParams.srcStride     = 1;
+copyParams.dstStride =
+    dstNzC0Stride; // = 144, spacing between adjacent C0 column start positions
+copyParams.srcStride = 1;
 copyParams.dstRepeatSize = 1;
 copyParams.srcRepeatSize = tileW / C0_ELEMS;
 
 for (uint32_t k = 0; k < tileW / vecLenHalf; ++k) {
-    AscendC::Copy(nzBuf[k * vecLenDbs * dstNzC0Stride * C0_ELEMS],
-                  ndBuf[k * vecLenHalf],
-                  static_cast<uint64_t>(vecLenHalf),
-                  static_cast<uint8_t>(actualTileH),
-                  copyParams);
+  AscendC::Copy(nzBuf[k * vecLenDbs * dstNzC0Stride * C0_ELEMS],
+                ndBuf[k * vecLenHalf], static_cast<uint64_t>(vecLenHalf),
+                static_cast<uint8_t>(actualTileH), copyParams);
 }
 ```
 
@@ -325,15 +324,15 @@ Ascend 950PR/Ascend 950DT implements Nd2Nz rearrangement based on Reg programmin
 
 ```cpp
 for (uint16_t k = 0; k < vecsPerRow; ++k) {
-    const uint32_t dstColGroupOffset = k * vecLenDbs * dstNzC0Stride * C0_ELEMS;
+  const uint32_t dstColGroupOffset = k * vecLenDbs * dstNzC0Stride * C0_ELEMS;
 
-    for (uint16_t r = 0; r < actualTileH; ++r) {
-        AscendC::Reg::LoadAlign<half>(reg, srcAddr + r * tileW + k * vecLenHalf);
+  for (uint16_t r = 0; r < actualTileH; ++r) {
+    AscendC::Reg::LoadAlign<half>(reg, srcAddr + r * tileW + k * vecLenHalf);
 
-        __ubuf__ half* dstRowAddr = dstAddr + dstColGroupOffset + r * C0_ELEMS;
-        AscendC::Reg::StoreAlign<half, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(
-            dstRowAddr, reg, dstNzC0Stride, mask);
-    }
+    __ubuf__ half *dstRowAddr = dstAddr + dstColGroupOffset + r * C0_ELEMS;
+    AscendC::Reg::StoreAlign<half, AscendC::Reg::DataCopyMode::DATA_BLOCK_COPY>(
+        dstRowAddr, reg, dstNzC0Stride, mask);
+  }
 }
 ```
 

@@ -73,7 +73,8 @@ The third step is to create `ge::op::AddCustom` nodes in `graph.cpp` based on th
 At runtime, `Session::RunGraph` triggers execution of the entire GE graph.
 
 ```cpp
-std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE), BuildInputTensor(Y_SCALE)};
+std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE),
+                               BuildInputTensor(Y_SCALE)};
 std::vector<ge::Tensor> outputs;
 const auto runRet = session.RunGraph(GRAPH_ID, inputs, outputs);
 ```

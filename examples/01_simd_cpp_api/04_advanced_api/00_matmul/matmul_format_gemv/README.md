@@ -39,18 +39,20 @@
   - Kernel关键步骤
     - 创建Matmul对象：A矩阵Format参数为CubeFormat::VECTOR。
       ```cpp
-      AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>>
+    matmulObj;
       ```
 
   - Tiling关键步骤
     - 创建一个Tiling对象：A矩阵Format参数为CubeFormat::VECTOR。
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::VECTOR,
-      matmul_tiling::DataType::DT_FLOAT16, isAtrans);
+cubeTiling.SetAType(matmul_tiling::TPosition::GM,
+                    matmul_tiling::CubeFormat::VECTOR,
+                    matmul_tiling::DataType::DT_FLOAT16, isAtrans);
       ```
 
 - 调用实现  

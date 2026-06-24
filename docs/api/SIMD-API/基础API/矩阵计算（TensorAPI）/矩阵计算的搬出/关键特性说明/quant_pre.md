@@ -22,8 +22,8 @@ Copy(atom, dst, src, quant);
 传入Tensor API张量作为`quant`参数时，表示tensor量化。量化参数通常位于L1 Buffer，元素类型为`uint64_t`，每个channel维度对应一个量化参数：
 
 ```cpp
-auto quant = MakeTensor(MakeMemPtr(quantAddr),
-    MakeFrameLayout<NDExtLayoutPtn>(1, n));
+auto quant =
+    MakeTensor(MakeMemPtr(quantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 auto atom = MakeCopy(CopyL0C2GM{}).with(fixpipeParams);
 Copy(atom, dst, src, quant);
 ```

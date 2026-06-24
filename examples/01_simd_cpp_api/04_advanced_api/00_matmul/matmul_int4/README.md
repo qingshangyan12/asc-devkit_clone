@@ -48,11 +48,15 @@ A、B矩阵为int4b_t数据类型输入的Matmul样例。
   - Kernel关键步骤
     - 创建Matmul对象，数据类型为int4b_t。
       ```cpp
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AscendC::int4b_t>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AscendC::int4b_t>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
-      using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
+using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   AscendC::int4b_t>;
+using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   AscendC::int4b_t>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
   
   - 调用实现  

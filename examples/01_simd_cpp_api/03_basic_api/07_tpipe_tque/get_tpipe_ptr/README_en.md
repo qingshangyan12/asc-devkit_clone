@@ -32,43 +32,43 @@ This example obtains the global TPipe pointer based on the GetTPipePtr interface
   **Calling the GetTPipePtr Interface**
 
   ```cpp
-  template <uint32_t totalLength, uint32_t tileNum>
-  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-  {
-      // No TPipe variable
-      // ...
-      // Call GetTPipePtr to obtain the TPipe pointer and use it
-      GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
-  }
+template <uint32_t totalLength, uint32_t tileNum>
+__aicore__ inline void Process(__gm__ uint8_t *x, __gm__ uint8_t *y,
+                               __gm__ uint8_t *z) {
+  // No TPipe variable
+  // ...
+  // Call GetTPipePtr to obtain the TPipe pointer and use it
+  GetTPipePtr()->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+}
 
-  template <uint32_t totalLength, uint32_t tileNum>
-  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-  {
-      AscendC::TPipe pipe;
-      // No need to explicitly pass the TPipe pointer
-      Process<totalLength, tileNum>(x, y, z);
-  }
+template <uint32_t totalLength, uint32_t tileNum>
+__global__ __vector__ void
+get_tpipe_ptr_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z) {
+  AscendC::TPipe pipe;
+  // No need to explicitly pass the TPipe pointer
+  Process<totalLength, tileNum>(x, y, z);
+}
   ```
 
   **Not Calling the GetTPipePtr Interface (Kernel Function Explicitly Passes TPipe Pointer)**
 
   ```cpp
-  template <uint32_t totalLength, uint32_t tileNum>
-  __aicore__ inline void Process(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z, AscendC::TPipe* pipe)
-  {
-      // TPipe pointer parameter required
-      // ...
-      // Use the passed TPipe pointer
-      pipe->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
-  }
+template <uint32_t totalLength, uint32_t tileNum>
+__aicore__ inline void Process(__gm__ uint8_t *x, __gm__ uint8_t *y,
+                               __gm__ uint8_t *z, AscendC::TPipe *pipe) {
+  // TPipe pointer parameter required
+  // ...
+  // Use the passed TPipe pointer
+  pipe->InitBuffer(inQueueX, BUFFER_NUM, tileLength * sizeof(float));
+}
 
-  template <uint32_t totalLength, uint32_t tileNum>
-  __global__ __vector__ void get_tpipe_ptr_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-  {
-      AscendC::TPipe pipe;
-      // Need to explicitly pass the TPipe pointer
-      Process<totalLength, tileNum>(x, y, z, &pipe);
-  }
+template <uint32_t totalLength, uint32_t tileNum>
+__global__ __vector__ void
+get_tpipe_ptr_custom(__gm__ uint8_t *x, __gm__ uint8_t *y, __gm__ uint8_t *z) {
+  AscendC::TPipe pipe;
+  // Need to explicitly pass the TPipe pointer
+  Process<totalLength, tileNum>(x, y, z, &pipe);
+}
   ```
 
 - Example specifications

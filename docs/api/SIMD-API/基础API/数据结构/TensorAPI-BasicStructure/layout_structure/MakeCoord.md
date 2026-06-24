@@ -16,7 +16,7 @@
 
 ```cpp
 template <typename... Ts>
-__aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts&... t)
+__aicore__ inline constexpr Coord<Ts...> MakeCoord(const Ts &...t)
 ```
 
 ## 参数说明
@@ -55,9 +55,7 @@ auto coord2 = AscendC::Std::get<2>(coord); // coord2 = 15
 
 // 使用Std::Int类型创建一个3维张量的坐标
 auto coordInt = AscendC::Te::MakeCoord(
-    AscendC::Std::Int<5>{},
-    AscendC::Std::Int<10>{},
-    AscendC::Std::Int<15>{});
+    AscendC::Std::Int<5>{}, AscendC::Std::Int<10>{}, AscendC::Std::Int<15>{});
 
 // 获取各维度的坐标
 auto coordInt0 = AscendC::Std::get<0>(coordInt); // coordInt0 = 5

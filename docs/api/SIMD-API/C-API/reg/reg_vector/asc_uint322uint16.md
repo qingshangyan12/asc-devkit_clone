@@ -20,13 +20,20 @@
 
 ```cpp
 // 非饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_uint322uint16(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
-// 饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_uint322uint16_sat(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
-// 非饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_uint322uint16_v2(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
-// 饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_uint322uint16_sat_v2(vector_uint16_t& dst, vector_uint32_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_uint322uint16(vector_uint16_t &dst, vector_uint32_t src, vector_bool mask)
+    // 饱和模式，数据写入索引为0的位置
+    __simd_callee__
+    inline void asc_uint322uint16_sat(vector_uint16_t &dst, vector_uint32_t src,
+                                      vector_bool mask)
+    // 非饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_uint322uint16_v2(vector_uint16_t &dst, vector_uint32_t src,
+                                     vector_bool mask)
+    // 饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_uint322uint16_sat_v2(vector_uint16_t &dst,
+                                         vector_uint32_t src, vector_bool mask)
 ```
 
 ## 参数说明

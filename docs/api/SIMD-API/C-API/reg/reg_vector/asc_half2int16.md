@@ -31,25 +31,44 @@
 
 ```cpp
 // RINT舍入模式，非饱和模式
-__simd_callee__ inline void asc_half2int16_rn(vector_int16_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式
-__simd_callee__ inline void asc_half2int16_rn_sat(vector_int16_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，非饱和模式
-__simd_callee__ inline void asc_half2int16_rna(vector_int16_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式
-__simd_callee__ inline void asc_half2int16_rna_sat(vector_int16_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式
-__simd_callee__ inline void asc_half2int16_rd(vector_int16_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式
-__simd_callee__ inline void asc_half2int16_rd_sat(vector_int16_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，非饱和模式
-__simd_callee__ inline void asc_half2int16_ru(vector_int16_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式
-__simd_callee__ inline void asc_half2int16_ru_sat(vector_int16_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式
-__simd_callee__ inline void asc_half2int16_rz(vector_int16_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式
-__simd_callee__ inline void asc_half2int16_rz_sat(vector_int16_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int16_rn(vector_int16_t &dst,
+                                              vector_half src, vector_bool mask)
+    // RINT舍入模式，饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rn_sat(vector_int16_t &dst, vector_half src,
+                                      vector_bool mask)
+    // ROUND舍入模式，非饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rna(vector_int16_t &dst, vector_half src,
+                                   vector_bool mask)
+    // ROUND舍入模式，饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rna_sat(vector_int16_t &dst, vector_half src,
+                                       vector_bool mask)
+    // FLOOR舍入模式，非饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rd(vector_int16_t &dst, vector_half src,
+                                  vector_bool mask)
+    // FLOOR舍入模式，饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rd_sat(vector_int16_t &dst, vector_half src,
+                                      vector_bool mask)
+    // CEIL舍入模式，非饱和模式
+    __simd_callee__
+    inline void asc_half2int16_ru(vector_int16_t &dst, vector_half src,
+                                  vector_bool mask)
+    // CEIL舍入模式，饱和模式
+    __simd_callee__
+    inline void asc_half2int16_ru_sat(vector_int16_t &dst, vector_half src,
+                                      vector_bool mask)
+    // TRUNC舍入模式，非饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rz(vector_int16_t &dst, vector_half src,
+                                  vector_bool mask)
+    // TRUNC舍入模式，饱和模式
+    __simd_callee__
+    inline void asc_half2int16_rz_sat(vector_int16_t &dst, vector_half src,
+                                      vector_bool mask)
 ```
 
 ## 参数说明

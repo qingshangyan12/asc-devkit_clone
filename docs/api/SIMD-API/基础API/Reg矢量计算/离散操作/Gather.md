@@ -36,8 +36,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>
-__simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
+template <typename T = DefaultType, typename U = DefaultType, typename S,
+          typename V>
+__simd_callee__ inline void Gather(S &dstReg, S &srcReg, V &indexReg)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -78,17 +79,22 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 ```cpp
 // 根据索引从源向量中收集元素，dstReg[i] = srcReg[indexReg[i]]
 template <typename T, typename U>
-__simd_vf__ inline void GatherVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, __ubuf__ U* indexAddr, uint32_t count, uint16_t oneRepeatSize)
-{
-    AscendC::Reg::RegTensor<T> srcReg, dstReg;
-    AscendC::Reg::RegTensor<U> indexReg;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    uint16_t repeatTimes = AscendC::CeilDivision(count, oneRepeatSize);
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg, srcAddr, oneRepeatSize);
-        AscendC::Reg::LoadAlign<U, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(indexReg, indexAddr, oneRepeatSize);
-        AscendC::Reg::Gather<T, U>(dstReg, srcReg, indexReg);
-        AscendC::Reg::StoreAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, dstReg, oneRepeatSize, mask);
-    }
+__simd_vf__ inline void GatherVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                                 __ubuf__ U *indexAddr, uint32_t count,
+                                 uint16_t oneRepeatSize) {
+  AscendC::Reg::RegTensor<T> srcReg, dstReg;
+  AscendC::Reg::RegTensor<U> indexReg;
+  AscendC::Reg::MaskReg mask =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+  uint16_t repeatTimes = AscendC::CeilDivision(count, oneRepeatSize);
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+        srcReg, srcAddr, oneRepeatSize);
+    AscendC::Reg::LoadAlign<U, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+        indexReg, indexAddr, oneRepeatSize);
+    AscendC::Reg::Gather<T, U>(dstReg, srcReg, indexReg);
+    AscendC::Reg::StoreAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+        dstAddr, dstReg, oneRepeatSize, mask);
+  }
 }
 ```

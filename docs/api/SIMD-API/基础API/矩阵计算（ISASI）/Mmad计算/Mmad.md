@@ -87,15 +87,20 @@ $$C = A \times B + C$$
 - 不传入bias
 
     ```cpp
-    template <typename T, typename U, typename S>
-    __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                            const LocalTensor<S> &filter,
+                            const MmadParams &mmadParams)
     ```
 
 - 传入bias
 
     ```cpp
-    template <typename T, typename U, typename S, typename V>
-    __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                            const LocalTensor<S> &filter,
+                            const LocalTensor<V> &bias,
+                            const MmadParams &mmadParams)
     ```
 
 ## 参数说明
@@ -261,9 +266,9 @@ $$C = A \times B + C$$
     当计算量小于阈值时，需要插入PipeBarrier\(PIPE\_M\)。
 
     ```cpp
-    if ((m / 16) * (n / 16) < 10) {
-        AscendC::PipeBarrier<PIPE_M>();
-    }
+if ((m / 16) * (n / 16) < 10) {
+  AscendC::PipeBarrier<PIPE_M>();
+}
     ```
 
     当计算量大于阈值时，不需要插入PipeBarrier\(PIPE\_M\)。
@@ -284,8 +289,8 @@ $$C = A \times B + C$$
   - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
 
     ```cpp
-    // 设置CTRL[48]为0，使能浮点数计算饱和模式
-    AscendC::AscendCUtils::SetOverflow(0);
+// 设置CTRL[48]为0，使能浮点数计算饱和模式
+AscendC::AscendCUtils::SetOverflow(0);
     ```
 
     注：Mmad指令应避免NaN输入，否则可能会产生执行报错。

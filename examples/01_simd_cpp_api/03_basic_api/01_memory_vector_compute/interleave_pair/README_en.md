@@ -42,7 +42,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, count);
+AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, count);
     ```
 
 - Description: Interleave elements from src0 and src1 into dst0 and dst1. dst0 stores the interleaved result of the first half of src0 and the first half of src1; dst1 stores the interleaved result of the second half of src0 and the second half of src1
@@ -60,7 +60,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, count);
+AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, count);
     ```
 
 - Description: De-interleave elements from src0 and src1 into dst0 and dst1. dst0 stores elements at odd index positions from src0 and src1; dst1 stores elements at even index positions from src0 and src1

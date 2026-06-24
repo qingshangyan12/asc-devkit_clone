@@ -16,19 +16,25 @@
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count)
+__aicore__ inline void asc_int42half(__ubuf__ half *dst, __ubuf__ int4b_t *src,
+                                     uint32_t count)
     ```
 
 - 高维切分计算
 
     ```c++
-    __aicore__ inline void asc_int42half(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+__aicore__ inline void asc_int42half(__ubuf__ half *dst, __ubuf__ int4b_t *src,
+                                     uint8_t repeat, uint16_t dst_block_stride,
+                                     uint16_t src_block_stride,
+                                     uint8_t dst_repeat_stride,
+                                     uint8_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```c++
-    __aicore__ inline void asc_int42half_sync(__ubuf__ half* dst, __ubuf__ int4b_t* src, uint32_t count)
+__aicore__ inline void asc_int42half_sync(__ubuf__ half *dst,
+                                          __ubuf__ int4b_t *src, uint32_t count)
     ```
 
 ## 参数说明
@@ -61,10 +67,10 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+constexpr uint64_t total_length = 128; // total_length指参与计算的数据长度
 uint64_t offset = 0;
-__ubuf__ int4b_t* src = (__ubuf__ int4b_t*)asc_get_phy_buf_addr(offset);
-offset += total_length / 2;    // int4b_t的一个元素占半个字节
-__ubuf__ half* dst = (__ubuf__ half*)asc_get_phy_buf_addr(offset);
-asc_int42half(dst, src, total_length);    // 将src转换为half类型并存放到dst中
+__ubuf__ int4b_t *src = (__ubuf__ int4b_t *)asc_get_phy_buf_addr(offset);
+offset += total_length / 2; // int4b_t的一个元素占半个字节
+__ubuf__ half *dst = (__ubuf__ half *)asc_get_phy_buf_addr(offset);
+asc_int42half(dst, src, total_length); // 将src转换为half类型并存放到dst中
 ```

@@ -33,8 +33,11 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     After defining the function prototype, analyze and determine the basic APIs used in API implementation. The multiplication operation between Tensor and Scalar in `Axpy` formula can be implemented using Ascend C provided basic API `Muls`. The addition operation between two Tensors can be implemented using Ascend C provided basic API `Add`.
 
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+Axpy(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+     const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+     const uint32_t calCount)
     ```
     Template parameter description
     | Parameter Name | Description |
@@ -55,7 +58,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     Kernel side interface computation requires developer to reserve/apply for temporary space. The size of this temporary space needs to be calculated on Tiling side based on obtained source operand shape size, computing high-level API required maximum (maxValue) temporary space and minimum temporary space (minValue) sizes. Therefore, Tiling side provides an interface for computing maxValue and minValue. Interface input parameters include source operand Tensor shape size and source operand data type byte size. Shape size parameter uses ge::Shape type, data type byte size uses `uint32_t` type. Output parameters include minValue and maxValue. Similar to isReuseSource parameter in Axpy interface, isReuseSource in Tiling interface is a reserved parameter.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue);
     ```
     Interface parameter description
     | Parameter Name | Input/Output | Description |
@@ -71,33 +76,38 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     
     In the corresponding category directory under `include/adv_api/`, add new file [axpy.h](../../include/adv_api/math/axpy.h). Based on the above analyzed and designed API function prototype, write external interface code. Function implementation calls AxpyImpl implementation.
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        AxpyImpl<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount);
-    }
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+Axpy(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+     const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+     const uint32_t calCount) {
+  AxpyImpl<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue,
+                                sharedTmpBuffer, calCount);
+}
     ```
 - Tiling Side Interface
     
     In the corresponding category directory under `include/adv_api/`, add new file [axpy_tiling.h](../../include/adv_api/math/axpy_tiling.h). Based on the above analyzed and designed Tiling side interface, write function declaration.
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue);
     ```
 - Include header files in common files.
 
     [include/adv_api/kernel_api.h](../../include/adv_api/kernel_api.h) file includes all high-level API header files. Recommend including new API header files in this file, so when calling high-level APIs, only need to include `"kernel_api.h"`.
     ```c++
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    // ...
-    #include "math/axpy.h"
-    // ...
-    #endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) &&                                                   \
+    (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+// ...
+#include "math/axpy.h"
+// ...
+#endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
     ```
     
     [include/adv_api/tiling_api.h](../../include/adv_api/tiling_api.h) file includes all high-level API Tiling interface header files. Recommend including new Tiling interface header files in this file, so when calling high-level API Tiling functions, only need to include `"tiling_api.h"`.
     ```c++
-    #include "math/axpy_tiling.h"
+#include "math/axpy_tiling.h"
     ```
 
 #### Write API Internal Implementation
@@ -107,23 +117,26 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     First, include necessary header files.
     ```c++
-    #include "kernel_tensor.h"
+#include "kernel_tensor.h"
     ```
     Write AxpyImpl function implementation code. If source operand data type is float, call basic API Axpy interface. Otherwise, call custom function `AxpySub`, using Muls and Add combination computation to provide better computation precision.
     ```c++
-    template <typename T, typename U, bool isReuseSource>
-    __aicore__ inline void AxpyImpl(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        CHECK_FUNC_HIGHLEVEL_API(
-            Axpy, (T, U, isReuseSource), (dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount));
+template <typename T, typename U, bool isReuseSource>
+__aicore__ inline void
+AxpyImpl(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+         const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+         const uint32_t calCount) {
+  CHECK_FUNC_HIGHLEVEL_API(
+      Axpy, (T, U, isReuseSource),
+      (dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount));
 
-        if constexpr (sizeof(U) == sizeof(float)) {
-            Axpy<T, U>(dstTensor, srcTensor, scalarValue, calCount);
-        } else {
-            AxpySub<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount);
-        }
-    }
+  if constexpr (sizeof(U) == sizeof(float)) {
+    Axpy<T, U>(dstTensor, srcTensor, scalarValue, calCount);
+  } else {
+    AxpySub<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue,
+                                 sharedTmpBuffer, calCount);
+  }
+}
     ```
     `AxpySub` function determines computation strategy based on temporary space size, mainly includes determining computation loop count round, full block computation amount stackSize, tail block computation amount tail. Specific code is as follows. Since sharedTmpBuffer passed to interface is uint8 type while source operand elements are float type, need to convert sharedTmpBuffer element type to float to get element count. Based on hardware architecture characteristics, minimum computation unit is one Block, that is 32 bytes. `axpyTmpCalc` function aligns down the element count that temporary space can store to 32 bytes, getting full block computation amount stackSize for one computation. Meanwhile, when destination operand element type is half, to improve precision, Cast precision conversion is done for source operand and destination operand respectively during computation. Half of temporary space is occupied by Cast results. So in this scenario, computation data amount is half of the element count that temporary space can store after aligning down to 32 bytes. Given total computation amount calCount, single full block computation amount stackSize, compute loop count round and tail block computation amount tail. Calculation formula is as follows:
     $$stackSize = \begin{cases}
@@ -135,69 +148,77 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     $$tail = calCount%stackSize$$
     If tail is not 0, that is tail block exists, need extra processing for tail block data. Before tail block data computation, set compute unit working mode to Count mode through setMaskCount interface.
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void AxpySub(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U& scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        uint32_t bufferSize = sharedTmpBuffer.GetSize();
-        CheckTmpBufferSize(bufferSize, 0, bufferSize);
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+AxpySub(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+        const U &scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+        const uint32_t calCount) {
+  uint32_t bufferSize = sharedTmpBuffer.GetSize();
+  CheckTmpBufferSize(bufferSize, 0, bufferSize);
 
-        LocalTensor<float> tmpBuffer = sharedTmpBuffer.ReinterpretCast<float>();
-        uint32_t tmpBufferSize = tmpBuffer.GetSize();
+  LocalTensor<float> tmpBuffer = sharedTmpBuffer.ReinterpretCast<float>();
+  uint32_t tmpBufferSize = tmpBuffer.GetSize();
 
-        uint32_t stackSize = axpyTmpCalc<T>(tmpBufferSize);
+  uint32_t stackSize = axpyTmpCalc<T>(tmpBufferSize);
 
-        const uint32_t round = calCount / stackSize;
-        const uint32_t tail = calCount % stackSize;
+  const uint32_t round = calCount / stackSize;
+  const uint32_t tail = calCount % stackSize;
 
-        SetMaskCount();
-        SetVectorMask<T, MaskMode::COUNTER>(0, stackSize);
+  SetMaskCount();
+  SetVectorMask<T, MaskMode::COUNTER>(0, stackSize);
 
-        uint32_t offset = 0;
-        for (uint32_t i = 0; i < round; i++) {
-            AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue, tmpBuffer, stackSize);
-            offset = offset + stackSize;
-        }
+  uint32_t offset = 0;
+  for (uint32_t i = 0; i < round; i++) {
+    AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue,
+                       tmpBuffer, stackSize);
+    offset = offset + stackSize;
+  }
 
-        if (tail != 0) {
-            SetVectorMask<T, MaskMode::COUNTER>(0, tail);
-            AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue, tmpBuffer, stackSize);
-        }
+  if (tail != 0) {
+    SetVectorMask<T, MaskMode::COUNTER>(0, tail);
+    AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue,
+                       tmpBuffer, stackSize);
+  }
 
-        SetMaskNorm();
-        ResetMask();
-    }
+  SetMaskNorm();
+  ResetMask();
+}
     ```
     `AxpyIntrinsicsImpl` function calls basic API to implement Axpy specific algorithm. For different destination operand data types, overload implement `AxpyIntrinsicsImpl` function. The following function implementation code is for source operand and destination operand element type both being half scenario. As described above, temporary space stackBuffer can hold $2 * stackSize$ elements, half of temporary space is used to save source operand and destination operand Cast results. Therefore, Tensor `tmpDst` saving destination operand Cast result has starting offset stackSize. During algorithm implementation, Cast conversion from half to float type is done for source operand and destination operand respectively, then call Muls, Add interfaces for computation, finally Cast conversion from float to half type for computation results.
     ```c++
-    template <>
-    __aicore__ inline void AxpyIntrinsicsImpl(const LocalTensor<half>& dstTensor, const LocalTensor<half>& srcTensor,
-        const half& scalarValue, LocalTensor<float> stackBuffer, uint32_t stackSize)
-    {
-        LocalTensor<float> tmpSrc = stackBuffer[0];
-        LocalTensor<float> tmpDst = stackBuffer[stackSize];
+template <>
+__aicore__ inline void
+AxpyIntrinsicsImpl(const LocalTensor<half> &dstTensor,
+                   const LocalTensor<half> &srcTensor, const half &scalarValue,
+                   LocalTensor<float> stackBuffer, uint32_t stackSize) {
+  LocalTensor<float> tmpSrc = stackBuffer[0];
+  LocalTensor<float> tmpDst = stackBuffer[stackSize];
 
-        const UnaryRepeatParams unaryParams;
-        const BinaryRepeatParams binaryParams;
+  const UnaryRepeatParams unaryParams;
+  const BinaryRepeatParams binaryParams;
 
-        Cast<float, half, false>(tmpSrc, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      tmpSrc, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-        Cast<float, half, false>(tmpDst, dstTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      tmpDst, dstTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-        Muls<float, false>(tmpSrc, tmpSrc, (float)scalarValue, MASK_PLACEHOLDER, 1, unaryParams);
-        PipeBarrier<PIPE_V>();
+  Muls<float, false>(tmpSrc, tmpSrc, (float)scalarValue, MASK_PLACEHOLDER, 1,
+                     unaryParams);
+  PipeBarrier<PIPE_V>();
 
-        Add<float, false>(tmpDst, tmpSrc, tmpDst, MASK_PLACEHOLDER, 1, binaryParams);
-        PipeBarrier<PIPE_V>();
+  Add<float, false>(tmpDst, tmpSrc, tmpDst, MASK_PLACEHOLDER, 1, binaryParams);
+  PipeBarrier<PIPE_V>();
 
-        Cast<half, float, false>(dstTensor, tmpDst, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
-    }
+  Cast<half, float, false>(
+      dstTensor, tmpDst, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
+}
     ```
 - Tiling Side Implementation
 
@@ -205,34 +226,35 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     First, include necessary header files.
     ```c++
-    #include "lib/math/axpy_tiling.h"  // Tiling interface header file
-    #include <cstdint>  // Type library
-    #include "graph/tensor.h" // ge::Shape uses this library
-    #include "impl/host_log.h" // Log library
+#include "graph/tensor.h"         // ge::Shape uses this library
+#include "impl/host_log.h"        // Log library
+#include "lib/math/axpy_tiling.h" // Tiling interface header file
+#include <cstdint>                // Type library
     ```
     Define constants used in Tiling computation.
     ```c++
-    constexpr uint32_t AXPY_HALF_CALC_PROC = 4;
-    constexpr uint32_t AXPY_FLOAT_CALC_PROC = 1;
-    constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
+constexpr uint32_t AXPY_HALF_CALC_PROC = 4;
+constexpr uint32_t AXPY_FLOAT_CALC_PROC = 1;
+constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
     ```
     In `GetAxpyMaxMinTmpSize` interface, call `GetAxpyMaxTmpSize` interface to get required temporary space maximum value, call `GetAxpyMinTmpSize` interface to get required temporary space minimum value.
    
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
-    uint32_t& maxValue, uint32_t& minValue)
-    {
-        (void)isReuseSource;
-        const uint32_t inputSize = srcShape.GetShapeSize();
-        ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater than 0.");
-        if (typeSize == sizeof(float)) {
-            minValue = 0;
-            maxValue = 0;
-            return;
-        }
-        minValue = GetAxpyMinTmpSize(typeSize);
-        maxValue = GetAxpyMaxTmpSize(inputSize, typeSize);
-    }
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue) {
+  (void)isReuseSource;
+  const uint32_t inputSize = srcShape.GetShapeSize();
+  ASCENDC_HOST_ASSERT(inputSize > 0, return,
+                      "Input Shape size must be greater than 0.");
+  if (typeSize == sizeof(float)) {
+    minValue = 0;
+    maxValue = 0;
+    return;
+  }
+  minValue = GetAxpyMinTmpSize(typeSize);
+  maxValue = GetAxpyMaxTmpSize(inputSize, typeSize);
+}
     ```
     Analyze the computation of required temporary space maximum value. When destination operand data type is float, only source operand needs Cast conversion. `Axpy` pseudo code is as follows, using one times element count inputSize of temporary space.
     ```
@@ -251,42 +273,49 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     Considering Vector compute unit single Repeat computes 256 bytes of data, the maximum temporary space calculation formula is as follows:
     $$MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
     ```c++
-    inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)
-    {
-        const uint8_t calcPro = typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC;
-        return inputSize * typeSize > AXPY_ONE_REPEAT_BYTE_SIZE ?
-                calcPro * inputSize * typeSize :
-                calcPro * AXPY_ONE_REPEAT_BYTE_SIZE; // All temporary variables are float.
-    }
+inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize,
+                                  const uint32_t typeSize) {
+  const uint8_t calcPro =
+      typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC;
+  return inputSize * typeSize > AXPY_ONE_REPEAT_BYTE_SIZE
+             ? calcPro * inputSize * typeSize
+             : calcPro * AXPY_ONE_REPEAT_BYTE_SIZE; // All temporary variables
+                                                    // are float.
+}
     ```
     Analyze the computation of required temporary space minimum value. If temporary space is minimum, single computation data amount is minimum, that is each computation data amount is fixed as single Repeat processed data size, 256 bytes. The minimum temporary space calculation formula is as follows:
     $$MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
     ```c++
-    inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize)
-    {
-        return AXPY_ONE_REPEAT_BYTE_SIZE * (typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC);
-    }
+inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize) {
+  return AXPY_ONE_REPEAT_BYTE_SIZE * (typeSize == sizeof(float)
+                                          ? AXPY_FLOAT_CALC_PROC
+                                          : AXPY_HALF_CALC_PROC);
+}
     ```
     After writing Tiling side implementation file, need to include this file in [impl/adv_api/tiling/CMakeLists.txt](../../impl/adv_api/tiling/CMakeLists.txt). Specifically: add file path `${CMAKE_CURRENT_SOURCE_DIR}/math/axpy_tiling_impl.cpp` in `add_library(tiling_api STATIC ...)` statement.
 ## Advanced Development Based on Existing API
 If developers perform advanced feature development based on existing APIs in current repository, the design API process is the same as described above. When developing code, consider reloading existing function implementations or adding new code branches. Based on advanced feature algorithm function, determine needed basic APIs and complete coding. For example, if existing API does not support some data types, suppose Axpy does not support destination operand element as float type, then need to overload `AxpyIntrinsicsImpl` function to implement dstTensor data type as float function.
 ```c++
 template <>
-__aicore__ inline void AxpyIntrinsicsImpl(const LocalTensor<float>& dstTensor, const LocalTensor<half>& srcTensor,
-    const half& scalarValue, LocalTensor<float> stackBuffer, uint32_t stackSize)
-{
-    const UnaryRepeatParams unaryParams;
-    const BinaryRepeatParams binaryParams;
+__aicore__ inline void
+AxpyIntrinsicsImpl(const LocalTensor<float> &dstTensor,
+                   const LocalTensor<half> &srcTensor, const half &scalarValue,
+                   LocalTensor<float> stackBuffer, uint32_t stackSize) {
+  const UnaryRepeatParams unaryParams;
+  const BinaryRepeatParams binaryParams;
 
-    Cast<float, half, false>(stackBuffer, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-        {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-    PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      stackBuffer, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-    Muls<float, false>(stackBuffer, stackBuffer, (float)scalarValue, MASK_PLACEHOLDER, 1, unaryParams);
-    PipeBarrier<PIPE_V>();
+  Muls<float, false>(stackBuffer, stackBuffer, (float)scalarValue,
+                     MASK_PLACEHOLDER, 1, unaryParams);
+  PipeBarrier<PIPE_V>();
 
-    Add<float, false>(dstTensor, stackBuffer, dstTensor, MASK_PLACEHOLDER, 1, binaryParams);
-    PipeBarrier<PIPE_V>();
+  Add<float, false>(dstTensor, stackBuffer, dstTensor, MASK_PLACEHOLDER, 1,
+                    binaryParams);
+  PipeBarrier<PIPE_V>();
 }
 ```
 
@@ -300,109 +329,111 @@ UT testing uses gTest as testing framework, generally verifies interface compila
 In UT directory [tests/api/adv_api/math](../../tests/api/adv_api/math), add new directory `axpy`, file [test_operator_axpy.cpp](../../tests/api/adv_api/math/axpy/test_operator_axpy.cpp). UT implementation mainly includes the following three parts:
 1. Include header files
     ```c++
-    #include <gtest/gtest.h>
-    #include "kernel_operator.h"
+#include "kernel_operator.h"
+#include <gtest/gtest.h>
     ``` 
 2. Implement operator
     - Initialize variables.
         ```c++
-        TPipe tpipe;
-        TQue<TPosition::VECIN, 1> vecInQue;
-        TQue<TPosition::VECIN, 1> vecOutQue;
-        TQue<TPosition::VECIN, 1> vecTmpQue;
-        GlobalTensor<U> inputGlobal;
-        GlobalTensor<T> outputGlobal;
-        inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ U*>(srcGm), dataSize);
-        outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
-        tpipe.InitBuffer(vecInQue, 1, dataSize * sizeof(U));
-        tpipe.InitBuffer(vecOutQue, 1, dataSize * sizeof(T));
-        if (sizeof(U) == sizeof(float)) {
-            tpipe.InitBuffer(vecTmpQue, 1, dataSize * sizeof(float));
-        } else {
-            tpipe.InitBuffer(vecTmpQue, 1, dataSize * 4 * sizeof(half));
-        }
+TPipe tpipe;
+TQue<TPosition::VECIN, 1> vecInQue;
+TQue<TPosition::VECIN, 1> vecOutQue;
+TQue<TPosition::VECIN, 1> vecTmpQue;
+GlobalTensor<U> inputGlobal;
+GlobalTensor<T> outputGlobal;
+inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ U *>(srcGm), dataSize);
+outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dataSize);
+tpipe.InitBuffer(vecInQue, 1, dataSize * sizeof(U));
+tpipe.InitBuffer(vecOutQue, 1, dataSize * sizeof(T));
+if (sizeof(U) == sizeof(float)) {
+  tpipe.InitBuffer(vecTmpQue, 1, dataSize * sizeof(float));
+} else {
+  tpipe.InitBuffer(vecTmpQue, 1, dataSize * 4 * sizeof(half));
+}
         ```
     - Copy data from GlobalMemory to LocalMemory.
         ```c++
-        LocalTensor<U> inputLocal = vecInQue.AllocTensor<U>();
-        LocalTensor<T> outputLocal = vecOutQue.AllocTensor<T>();
-        LocalTensor<uint8_t> tmpLocal = vecTmpQue.AllocTensor<uint8_t>();
+LocalTensor<U> inputLocal = vecInQue.AllocTensor<U>();
+LocalTensor<T> outputLocal = vecOutQue.AllocTensor<T>();
+LocalTensor<uint8_t> tmpLocal = vecTmpQue.AllocTensor<uint8_t>();
 
-        SetVectorMask<uint8_t, MaskMode::NORMAL>(256);
-        DataCopy(inputLocal, inputGlobal, dataSize);
+SetVectorMask<uint8_t, MaskMode::NORMAL>(256);
+DataCopy(inputLocal, inputGlobal, dataSize);
         ```
     - Call high-level API for computation.
         ```c++
-        SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
-        SetVectorMask<uint8_t, MaskMode::NORMAL>(128);
-        WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
-        U scalar = 4;
+SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
+SetVectorMask<uint8_t, MaskMode::NORMAL>(128);
+WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
+U scalar = 4;
 
-        Axpy<T, U, false>(outputLocal, inputLocal, scalar, tmpLocal, dataSize);
+Axpy<T, U, false>(outputLocal, inputLocal, scalar, tmpLocal, dataSize);
         ```
     - Copy data from LocalMemory to GlobalMemory.
         ```c++
-        SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
-        WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
+SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
+WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
 
-        DataCopy(outputGlobal, outputLocal, dataSize);
-        PipeBarrier<PIPE_ALL>();
+DataCopy(outputGlobal, outputLocal, dataSize);
+PipeBarrier<PIPE_ALL>();
         ```
     - Free LocalMemory space.
         ```c++
-        vecInQue.FreeTensor(inputLocal);
-        vecOutQue.FreeTensor(outputLocal);
-        vecTmpQue.FreeTensor(tmpLocal);
+vecInQue.FreeTensor(inputLocal);
+vecOutQue.FreeTensor(outputLocal);
+vecTmpQue.FreeTensor(tmpLocal);
         ```
 3. Write test code
     - Define input parameter data structure.
         ```c++
-        struct AxpyTestParams {
-        int32_t dataSize;
-        int32_t dataBitSize;
-        void (*calFunc)(uint8_t*, uint8_t*, int32_t);
-        };
+struct AxpyTestParams {
+  int32_t dataSize;
+  int32_t dataBitSize;
+  void (*calFunc)(uint8_t *, uint8_t *, int32_t);
+};
         ```
     - Write test class.
         ```c++
-        class AxpyTestsuite : public testing::Test, public testing::WithParamInterface<AxpyTestParams> {
-        protected:
-            void SetUp() {}
-            void TearDown() {}
-        };
+class AxpyTestsuite : public testing::Test,
+                      public testing::WithParamInterface<AxpyTestParams> {
+protected:
+  void SetUp() {}
+  void TearDown() {}
+};
         ``` 
     - Inject case data.
         ```c++
-        INSTANTIATE_TEST_CASE_P(TEST_AXPY, AxpyTestsuite,
-            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>}, 
-                AxpyTestParams{256, 4, AxpyKernel<float, float>}));
+INSTANTIATE_TEST_CASE_P(
+    TEST_AXPY, AxpyTestsuite,
+    ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>},
+                      AxpyTestParams{256, 4, AxpyKernel<float, float>}));
         ```
     - Write `TEST_P`.
         ```c++
-        TEST_P(AxpyTestsuite, AxpyTestCase)
-        {
-            auto param = GetParam();
-            uint8_t srcGm[param.dataSize * param.dataBitSize] = {0};
-            uint8_t dstGm[param.dataSize * param.dataBitSize] = {0};
+TEST_P(AxpyTestsuite, AxpyTestCase) {
+  auto param = GetParam();
+  uint8_t srcGm[param.dataSize * param.dataBitSize] = {0};
+  uint8_t dstGm[param.dataSize * param.dataBitSize] = {0};
 
-            param.calFunc(srcGm, dstGm, param.dataSize);
-            for (int32_t i = 0; i < param.dataSize; i++) { EXPECT_EQ(dstGm[i], 0x00); }
-        }
+  param.calFunc(srcGm, dstGm, param.dataSize);
+  for (int32_t i = 0; i < param.dataSize; i++) {
+    EXPECT_EQ(dstGm[i], 0x00);
+  }
+}
         ```
 ###### Tiling Side
 
 Tiling interface UT is currently unified in [tests/api/adv_api/tiling/test_tiling.cpp](../../tests/api/adv_api/tiling/test_tiling.cpp) file. Add corresponding test function in this file.
 ```c++
-TEST_F(TestTiling, TestAxpyTiling)
-{
-    uint32_t maxVal = 0;
-    uint32_t minVal = 0;
-    GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 0);
-    EXPECT_EQ(minVal, 0);
-    GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 256 * 4 * 2);
-    EXPECT_EQ(minVal, 256 * 4);
+TEST_F(TestTiling, TestAxpyTiling) {
+  uint32_t maxVal = 0;
+  uint32_t minVal = 0;
+  GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
+  EXPECT_EQ(maxVal, 0);
+  EXPECT_EQ(minVal, 0);
+  GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
+  EXPECT_EQ(maxVal, 256 * 4 * 2);
+  EXPECT_EQ(minVal, 256 * 4);
 }
 ```
 ##### Modify cmake file
@@ -418,7 +449,7 @@ Before executing UT cases, need to modify [CMakeLists.txt](../../tests/api/adv_a
 
   Open [tests/main_global.cpp](../../tests/main_global.cpp) file, add the following code in the last line before return in main function. Use gTest filter to filter test cases based on unit test unit name.
     ```c++
-    ::testing::GTEST_FLAG(filter) = "*Axpy*";
+::testing::GTEST_FLAG(filter) = "*Axpy*";
     ```
   Modify [build.sh](../../build.sh), change all to needed UT target. Using Kernel side Ascend 910B1 UT as example, target is ascendc_utest_ascend910B1_AIV.
   ```

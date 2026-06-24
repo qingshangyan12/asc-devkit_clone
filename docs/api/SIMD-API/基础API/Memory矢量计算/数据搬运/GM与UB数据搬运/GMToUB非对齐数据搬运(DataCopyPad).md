@@ -39,8 +39,11 @@
 - 不支持配置设置数据搬运模式mode
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+template <typename T>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
     ```
 
 <cann-filter npu-type="950">
@@ -48,9 +51,12 @@
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+// 该函数原型仅支持Ascend 950PR/Ascend 950DT
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
     ```
 
 </cann-filter>
@@ -229,120 +235,132 @@
 - 场景1：使用SetPadValue进行自定义填充
 
     ```cpp
-    // DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
-    // DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12
-    // SetPadValue设置填充值为1，配合isPad=false使用。
-    AscendC::DataCopyExtParams copyParams{1, srcCols * sizeof(T), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams;
-    padParams.isPad = false;
-    padParams.leftPadding = 0;
-    padParams.rightPadding = dstCols - srcCols;
+// DataCopyExtParams参数：blockCount=1, blockLen=20*sizeof(half),
+// srcBlkStride=0, srcRepStride=0, reserved=0
+// DataCopyPadExtParams参数：isPad=false, leftPadding=0, rightPadding=12
+// SetPadValue设置填充值为1，配合isPad=false使用。
+AscendC::DataCopyExtParams copyParams{1, srcCols * sizeof(T), 0, 0, 0};
+AscendC::DataCopyPadExtParams<T> padParams;
+padParams.isPad = false;
+padParams.leftPadding = 0;
+padParams.rightPadding = dstCols - srcCols;
 
-    AscendC::SetPadValue((T)1);
-    AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
+AscendC::SetPadValue((T)1);
+AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
 - 场景2：使用rightPadding进行默认填充
 
     ```cpp
-    // DataCopyExtParams参数：blockCount=32, blockLen=59*sizeof(float), srcBlkStride=0, srcRepStride=0, reserved=0
-    // DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=5
-    // isPad=true时填充值为0，不使用SetPadValue。
-    AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(float), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams;
-    padParams.isPad = true;
-    padParams.leftPadding = 0;
-    padParams.rightPadding = dstCols - srcCols;
+// DataCopyExtParams参数：blockCount=32, blockLen=59*sizeof(float),
+// srcBlkStride=0, srcRepStride=0, reserved=0
+// DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=5
+// isPad=true时填充值为0，不使用SetPadValue。
+AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(float), 0, 0,
+                                      0};
+AscendC::DataCopyPadExtParams<T> padParams;
+padParams.isPad = true;
+padParams.leftPadding = 0;
+padParams.rightPadding = dstCols - srcCols;
 
-    AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
+AscendC::DataCopyPad(srcLocal, srcGlobal, copyParams, padParams);
     ```
 
 - 场景3：使用Compact模式进行紧凑填充（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // DataCopyExtParams参数：blockCount=3, blockLen=24*sizeof(half), srcBlkStride=0, srcRepStride=0, reserved=0
-    // DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=16
-    // PaddingMode::Compact：将多行数据紧凑排列到一行，填充区域紧凑放置在数据之后。
-    // 输入[3, 24]紧凑排列为[1, 80]，前72个元素为3行数据，后8个元素为填充区域。
-    AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(T), 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams;
-    padParams.isPad = true;
-    padParams.leftPadding = 0;
-    padParams.rightPadding = dstCols - srcCols * srcRows;
+// DataCopyExtParams参数：blockCount=3, blockLen=24*sizeof(half),
+// srcBlkStride=0, srcRepStride=0, reserved=0
+// DataCopyPadExtParams参数：isPad=true, leftPadding=0, rightPadding=16
+// PaddingMode::Compact：将多行数据紧凑排列到一行，填充区域紧凑放置在数据之后。
+// 输入[3, 24]紧凑排列为[1, 80]，前72个元素为3行数据，后8个元素为填充区域。
+AscendC::DataCopyExtParams copyParams{srcRows, srcCols * sizeof(T), 0, 0, 0};
+AscendC::DataCopyPadExtParams<T> padParams;
+padParams.isPad = true;
+padParams.leftPadding = 0;
+padParams.rightPadding = dstCols - srcCols * srcRows;
 
-    AscendC::DataCopyPad<T, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
+AscendC::DataCopyPad<T, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal,
+                                                       copyParams, padParams);
     ```
 
 - 场景4：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
-    // padding值设为-1
-    AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
+// Compact模式：每次内层循环搬运80B后填充16B使其96字节对齐。
+// padding值设为-1
+AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
+AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
-    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
-    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
-    AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal, copyParams, padParams);
-    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::LoopModeParams loopParam2Ub{LOOP1_SIZE,       LOOP2_SIZE,
+                                     LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE,
+                                     LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(srcLocal, srcGlobal,
+                                                            copyParams,
+                                                            padParams);
+AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
 - 场景5：使用SetLoopModePara使能loop mode进行数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // Normal模式：每个block搬运40B后填充24B使其64字节对齐。
-    // padding值设为-1
-    AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
-    AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
+// Normal模式：每个block搬运40B后填充24B使其64字节对齐。
+// padding值设为-1
+AscendC::DataCopyExtParams copyParams{BLOCK_COUNT, BLOCK_LEN, 0, 0, 0};
+AscendC::DataCopyPadExtParams<T> padParams{true, 0, 0, -1};
 
-    AscendC::LoopModeParams loopParam2Ub {LOOP1_SIZE, LOOP2_SIZE, LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE, LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
-    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
-    AscendC::DataCopyPad<int8_t>(srcLocal, srcGlobal, copyParams, padParams);
-    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::LoopModeParams loopParam2Ub{LOOP1_SIZE,       LOOP2_SIZE,
+                                     LOOP1_SRC_STRIDE, LOOP1_DST_STRIDE,
+                                     LOOP2_SRC_STRIDE, LOOP2_DST_STRIDE};
+AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::DataCopyPad<int8_t>(srcLocal, srcGlobal, copyParams, padParams);
+AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
 - 场景6：五维数据搬运（仅支持Ascend 950PR/Ascend 950DT）
 
     ```cpp
-    // Global Memory[2, 4, 3, 128, 126]int8 -> Unified Buffer[512, 128]int8
-    // Normal模式，使用loop mode
-    // 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节。
-    // 最终UB连续存放为[512, 128]。
+// Global Memory[2, 4, 3, 128, 126]int8 -> Unified Buffer[512, 128]int8
+// Normal模式，使用loop mode
+// 搬运规格：[2, 2, 2, 64, 126]，每个126字节补2字节padding到128字节。
+// 最终UB连续存放为[512, 128]。
 
-    // Stride参数说明：
-    // - loop1SrcStride=128*126：第2维stride，每次loop1源地址跳过128*126字节。
-    // - loop1DstStride=64*128：每次loop1目的地址跳过64*128字节（64行×128字节/行）。
-    // - loop2SrcStride=3*128*126：第1维stride，每次loop2源地址跳过3*128*126字节。
-    // - loop2DstStride=2*64*128：每次loop2目的地址跳过2*64*128字节。
+// Stride参数说明：
+// - loop1SrcStride=128*126：第2维stride，每次loop1源地址跳过128*126字节。
+// - loop1DstStride=64*128：每次loop1目的地址跳过64*128字节（64行×128字节/行）。
+// - loop2SrcStride=3*128*126：第1维stride，每次loop2源地址跳过3*128*126字节。
+// - loop2DstStride=2*64*128：每次loop2目的地址跳过2*64*128字节。
 
-    AscendC::LoopModeParams loopParam2Ub {
-        2,  // loop1Size=2（第2维搬运2次）
-        2,  // loop2Size=2（第1维搬运2次）
-        128 * 126,  // loop1SrcStride（第2维stride）
-        64 * 128,   // loop1DstStride
-        3 * 128 * 126,  // loop2SrcStride（第1维stride）
-        2 * 64 * 128    // loop2DstStride
-    };
-    AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::LoopModeParams loopParam2Ub{
+    2,             // loop1Size=2（第2维搬运2次）
+    2,             // loop2Size=2（第1维搬运2次）
+    128 * 126,     // loop1SrcStride（第2维stride）
+    64 * 128,      // loop1DstStride
+    3 * 128 * 126, // loop2SrcStride（第1维stride）
+    2 * 64 * 128   // loop2DstStride
+};
+AscendC::SetLoopModePara(loopParam2Ub, AscendC::DataCopyMVType::OUT_TO_UB);
 
-    AscendC::DataCopyExtParams copyParams{
-        64,  // blockCount=64（第3维搬运64次）
-        126,  // blockLen=126（第4维搬运126字节，padding到128）
-        0, 0, 0  // srcStride/dstStride=0
-    };
-    AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
+AscendC::DataCopyExtParams copyParams{
+    64,     // blockCount=64（第3维搬运64次）
+    126,    // blockLen=126（第4维搬运126字节，padding到128）
+    0, 0, 0 // srcStride/dstStride=0
+};
+AscendC::DataCopyPadExtParams<int8_t> padParams{true, 0, 0, 0};
 
-    // 第0维for循环搬运2次。
-    for (uint32_t dim0 = 0; dim0 < 2; dim0++) {
-        constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126;  // 第0维源stride
-        constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;   // 第0维目的stride
-        uint32_t srcOffset = dim0 * dim0SrcStride;
-        uint32_t dstOffset = dim0 * dim0DstStride;
+// 第0维for循环搬运2次。
+for (uint32_t dim0 = 0; dim0 < 2; dim0++) {
+  constexpr uint32_t dim0SrcStride = 4 * 3 * 128 * 126; // 第0维源stride
+  constexpr uint32_t dim0DstStride = 2 * 2 * 64 * 128;  // 第0维目的stride
+  uint32_t srcOffset = dim0 * dim0SrcStride;
+  uint32_t dstOffset = dim0 * dim0DstStride;
 
-        AscendC::DataCopyPad<int8_t>(srcLocal[dstOffset], srcGlobal[srcOffset], copyParams, padParams);
-    }
+  AscendC::DataCopyPad<int8_t>(srcLocal[dstOffset], srcGlobal[srcOffset],
+                               copyParams, padParams);
+}
 
-    AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
+AscendC::ResetLoopModePara(AscendC::DataCopyMVType::OUT_TO_UB);
     ```
 
 完整样例请参考[DataCopyPad样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_pad_gm2ub_ub2gm)。

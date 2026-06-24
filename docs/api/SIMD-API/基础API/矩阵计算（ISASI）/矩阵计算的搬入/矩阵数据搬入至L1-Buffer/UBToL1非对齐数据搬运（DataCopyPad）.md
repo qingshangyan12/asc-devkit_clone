@@ -24,8 +24,11 @@
 - 通路：Local Memory-\>Local Memory，实际搬运过程是UB-\>GM-\>L1 Buffer（TSCM）。
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
+template <typename T>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const Nd2NzParams &nd2nzParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -134,10 +137,12 @@ constexpr uint32_t dstElemCount = (7 * 6) * dataBlockElemCount;
 constexpr uint32_t tscmAddr = 0;
 
 // 源操作数：UB。
-AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECIN, ubAddr, srcElemCount);
+AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::VECIN, ubAddr,
+                                    srcElemCount);
 
 // 目的操作数：L1 Buffer。
-AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::TSCM, tscmAddr, dstElemCount);
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::TSCM, tscmAddr,
+                                    dstElemCount);
 
 AscendC::DataCopyExtParams copyParams;
 // VECIN->GM阶段搬运3个连续传输数据块。

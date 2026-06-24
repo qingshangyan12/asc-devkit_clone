@@ -53,10 +53,9 @@
 
 ```cpp
 namespace AscendC {
-template<class T>
-struct Complex {
-    T real;
-    T imag;
+template <class T> struct Complex {
+  T real;
+  T imag;
 };
 } // namespace AscendC
 using complex32 = AscendC::Complex<half>;

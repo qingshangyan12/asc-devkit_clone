@@ -16,15 +16,31 @@
 - 高维切分计算
 
   ```cpp
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
-  __aicore__ inline void asc_gather_datablock(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+__aicore__ inline void
+asc_gather_datablock(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src,
+                     __ubuf__ uint32_t *src_offset, uint16_t dst_repeat_stride,
+                     uint8_t dst_block_stride, uint8_t repeat) __aicore__
+    inline void asc_gather_datablock(__ubuf__ uint32_t *dst,
+                                     __ubuf__ uint32_t *src,
+                                     __ubuf__ uint32_t *src_offset,
+                                     uint16_t dst_repeat_stride,
+                                     uint8_t dst_block_stride, uint8_t repeat)
   ```
 
 - 同步计算
 
   ```cpp
-  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
-  __aicore__ inline void asc_gather_datablock_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, __ubuf__ uint32_t* src_offset, uint16_t dst_repeat_stride, uint8_t dst_block_stride, uint8_t repeat)
+__aicore__ inline void
+asc_gather_datablock_sync(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src,
+                          __ubuf__ uint32_t *src_offset,
+                          uint16_t dst_repeat_stride, uint8_t dst_block_stride,
+                          uint8_t repeat) __aicore__
+    inline void asc_gather_datablock_sync(__ubuf__ uint32_t *dst,
+                                          __ubuf__ uint32_t *src,
+                                          __ubuf__ uint32_t *src_offset,
+                                          uint16_t dst_repeat_stride,
+                                          uint8_t dst_block_stride,
+                                          uint8_t repeat)
   ```
 
 ## 参数说明
@@ -55,12 +71,12 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+constexpr uint64_t total_length = 128; // total_length指参与计算的数据长度
 __ubuf__ uint32_t src_offset[total_length * sizeof(uint32_t) / 32];
 __ubuf__ uint32_t dst[total_length];
 __ubuf__ uint32_t src[total_length];
 asc_gather_datablock(dst, src, src_offset, 8, 1, 2);
 // src [1, 2, 3, ..., 126, 127, 128] 128个uint32_t类型数据
-// src_offset [0, 32, 64, ..., 416, 448, 480] 
+// src_offset [0, 32, 64, ..., 416, 448, 480]
 // dst [1, 2, 3, ..., 126, 127, 128]
 ```

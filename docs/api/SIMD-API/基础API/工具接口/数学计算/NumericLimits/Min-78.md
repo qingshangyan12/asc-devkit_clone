@@ -23,13 +23,13 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Min()
+constexpr __aicore__ static inline T Min()
     ```
 
 - 矢量接口，为dst前count个元素赋最小有限值：
 
     ```cpp
-    __aicore__ static inline void Min(const LocalTensor<T>& dst, uint32_t count)
+__aicore__ static inline void Min(const LocalTensor<T> &dst, uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +60,12 @@
 - 标量接口：
 
     ```cpp
-    int32_t value = AscendC::NumericLimits<int32_t>::Min();
+int32_t value = AscendC::NumericLimits<int32_t>::Min();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Min(dstLocal, 256); // 返回256个int32_t类型的最小有限值
+AscendC::NumericLimits<int32_t>::Min(dstLocal,
+                                     256); // 返回256个int32_t类型的最小有限值
     ```

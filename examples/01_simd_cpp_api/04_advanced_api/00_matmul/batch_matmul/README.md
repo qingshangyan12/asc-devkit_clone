@@ -47,16 +47,16 @@
   - Kernel关键步骤
     - 完成多batch矩阵乘操作。
       ```cpp
-      matmulObj.IterateBatch(cGlobal[batchOffsetC], batchA, batchB, false);
+matmulObj.IterateBatch(cGlobal[batchOffsetC], batchA, batchB, false);
       ```
 
   - Tiling关键步骤
     - 调用SetALayout、SetBLayout、SetCLayout、SetBatchNum设置A/B/C的Layout轴信息和最大BatchNum数。
       ```cpp
-      cubeTiling->SetALayout(A_BNUM, A_SNUM, 1, A_GNUM, A_DNUM);
-      cubeTiling->SetBLayout(B_BNUM, B_SNUM, 1, B_GNUM, B_DNUM);
-      cubeTiling->SetCLayout(C_BNUM, C_SNUM, 1, C_GNUM, C_DNUM);
-      cubeTiling->SetBatchNum(BATCH_NUM);
+cubeTiling->SetALayout(A_BNUM, A_SNUM, 1, A_GNUM, A_DNUM);
+cubeTiling->SetBLayout(B_BNUM, B_SNUM, 1, B_GNUM, B_DNUM);
+cubeTiling->SetCLayout(C_BNUM, C_SNUM, 1, C_GNUM, C_DNUM);
+cubeTiling->SetBatchNum(BATCH_NUM);
       ```
 
   - 调用实现  

@@ -20,34 +20,84 @@
 - 前n个数据计算
 
     ```cpp
-    __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+__aicore__ inline void asc_shiftright(__ubuf__ int16_t *dst,
+                                      __ubuf__ int16_t *src, int32_t value,
+                                      uint32_t count) __aicore__
+    inline void asc_shiftright(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src,
+                               uint32_t value, uint32_t count) __aicore__
+    inline void asc_shiftright(__ubuf__ int32_t *dst, __ubuf__ int32_t *src,
+                               int32_t value, uint32_t count) __aicore__
+    inline void asc_shiftright(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src,
+                               uint32_t value, uint32_t count) __aicore__
+    inline void asc_shiftright_round(__ubuf__ int16_t *dst,
+                                     __ubuf__ int16_t *src, int32_t value,
+                                     uint32_t count) __aicore__
+    inline void asc_shiftright_round(__ubuf__ int32_t *dst,
+                                     __ubuf__ int32_t *src, int32_t value,
+                                     uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_shiftright(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_shiftright(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_shiftright(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_shiftright(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_shiftright_round(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_shiftright_round(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+__aicore__ inline void
+asc_shiftright(__ubuf__ int16_t *dst, __ubuf__ int16_t *src, int32_t value,
+               uint8_t repeat, uint16_t dst_block_stride,
+               uint16_t src_block_stride, uint16_t dst_repeat_stride,
+               uint16_t src_repeat_stride) __aicore__
+    inline void asc_shiftright(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src,
+                               uint32_t value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride) __aicore__
+    inline void asc_shiftright(__ubuf__ int32_t *dst, __ubuf__ int32_t *src,
+                               int32_t value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride) __aicore__
+    inline void asc_shiftright(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src,
+                               uint32_t value, uint8_t repeat,
+                               uint16_t dst_block_stride,
+                               uint16_t src_block_stride,
+                               uint16_t dst_repeat_stride,
+                               uint16_t src_repeat_stride) __aicore__
+    inline void asc_shiftright_round(__ubuf__ int16_t *dst,
+                                     __ubuf__ int16_t *src, int32_t value,
+                                     uint8_t repeat, uint16_t dst_block_stride,
+                                     uint16_t src_block_stride,
+                                     uint16_t dst_repeat_stride,
+                                     uint16_t src_repeat_stride) __aicore__
+    inline void asc_shiftright_round(__ubuf__ int32_t *dst,
+                                     __ubuf__ int32_t *src, int32_t value,
+                                     uint8_t repeat, uint16_t dst_block_stride,
+                                     uint16_t src_block_stride,
+                                     uint16_t dst_repeat_stride,
+                                     uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_shiftright_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src, uint32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, uint32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_round_sync(__ubuf__ int16_t* dst, __ubuf__ int16_t* src, int32_t value, uint32_t count)
-    __aicore__ inline void asc_shiftright_round_sync(__ubuf__ int32_t* dst, __ubuf__ int32_t* src, int32_t value, uint32_t count)
+__aicore__ inline void asc_shiftright_sync(__ubuf__ int16_t *dst,
+                                           __ubuf__ int16_t *src, int32_t value,
+                                           uint32_t count) __aicore__
+    inline void asc_shiftright_sync(__ubuf__ uint16_t *dst,
+                                    __ubuf__ uint16_t *src, uint32_t value,
+                                    uint32_t count) __aicore__
+    inline void asc_shiftright_sync(__ubuf__ int32_t *dst,
+                                    __ubuf__ int32_t *src, int32_t value,
+                                    uint32_t count) __aicore__
+    inline void asc_shiftright_sync(__ubuf__ uint32_t *dst,
+                                    __ubuf__ uint32_t *src, uint32_t value,
+                                    uint32_t count) __aicore__
+    inline void asc_shiftright_round_sync(__ubuf__ int16_t *dst,
+                                          __ubuf__ int16_t *src, int32_t value,
+                                          uint32_t count) __aicore__
+    inline void asc_shiftright_round_sync(__ubuf__ int32_t *dst,
+                                          __ubuf__ int32_t *src, int32_t value,
+                                          uint32_t count)
     ```
 
 ## 参数说明
@@ -82,14 +132,17 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+constexpr uint64_t total_length = 128; // total_length指参与计算的数据长度
 int32_t value = 1;
 __ubuf__ int16_t src[total_length];
 __ubuf__ int16_t dst[total_length];
-asc_shiftright(dst, src, value, total_length);    // 对src中的每个元素做算术右移一位，并存放到dst中
+asc_shiftright(dst, src, value,
+               total_length); // 对src中的每个元素做算术右移一位，并存放到dst中
 // src[0] = 0b1010, dst[0] = 0b0101
 
-asc_shiftright_round(dst, src, value, total_length);    // 对src中的每个元素做算术右移一位并进行舍入，将结果存放到dst中
+asc_shiftright_round(
+    dst, src, value,
+    total_length); // 对src中的每个元素做算术右移一位并进行舍入，将结果存放到dst中
 // src[0] = 0b1010, dst[0] = 0b0101被舍入最后一位为0，不进1
 // src[0] = 0b1001, dst[0] = 0b0101被舍入最后一位为1，进1
 ```

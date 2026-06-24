@@ -13,9 +13,8 @@
 ## 函数原型
 
   ```cpp
-  asc_create_mask_b8(pat_mode)
-  asc_create_mask_b16(pat_mode)
-  asc_create_mask_b32(pat_mode)
+asc_create_mask_b8(pat_mode) asc_create_mask_b16(pat_mode)
+    asc_create_mask_b32(pat_mode)
   ```
 
 ## 参数说明

@@ -66,23 +66,31 @@
 - tensor前n个数据计算。
 
   ```cpp
-  template <typename T, typename U>
-  __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count)
+template <typename T, typename U>
+__aicore__ inline void Cast(const LocalTensor<T> &dst,
+                            const LocalTensor<U> &src,
+                            const RoundMode &roundMode, const uint32_t count)
   ```
 
 - tensor高维切分计算。
   - mask逐bit模式。
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Cast(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+     const RoundMode &roundMode, const uint64_t mask[],
+     const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
     ```
 
   - mask连续模式。
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void Cast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Cast(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+     const RoundMode &roundMode, const uint64_t mask, const uint8_t repeatTime,
+     const UnaryRepeatParams &repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -113,14 +121,15 @@
 
 ```cpp
 enum class RoundMode {
-  CAST_NONE = 0,  // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
-  CAST_RINT,      // rint，四舍六入五成双舍入
-  CAST_FLOOR,     // floor，向负无穷舍入
-  CAST_CEIL,      // ceil，向正无穷舍入
-  CAST_ROUND,     // round，四舍五入舍入
-  CAST_TRUNC,     // trunc，向零舍入
-  CAST_ODD,       // Von Neumann rounding，最近邻奇数舍入
-  CAST_HYBRID,    // hybrid，目前特指输出结果是hifloat8_t数据时，会用到的一种随机舍入
+  CAST_NONE =
+      0, // 在转换有精度损失时表示CAST_RINT模式，不涉及精度损失时表示不舍入
+  CAST_RINT,   // rint，四舍六入五成双舍入
+  CAST_FLOOR,  // floor，向负无穷舍入
+  CAST_CEIL,   // ceil，向正无穷舍入
+  CAST_ROUND,  // round，四舍五入舍入
+  CAST_TRUNC,  // trunc，向零舍入
+  CAST_ODD,    // Von Neumann rounding，最近邻奇数舍入
+  CAST_HYBRID, // hybrid，目前特指输出结果是hifloat8_t数据时，会用到的一种随机舍入
 };
 ```
 
@@ -397,28 +406,30 @@ enum class RoundMode {
 - tensor高维切分计算样例-mask连续模式。
 
   ```cpp
-  uint64_t mask = 256 / sizeof(int32_t);
-  // repeatTime = 8, 64 elements one repeat, 512 elements total
-  // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-  // dstRepStride = 8, srcRepStride = 4, no gap between repeats
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1, 8, 4 });
+uint64_t mask = 256 / sizeof(int32_t);
+// repeatTime = 8, 64 elements one repeat, 512 elements total
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride = 8, srcRepStride = 4, no gap between repeats
+AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8,
+              {1, 1, 8, 4});
   ```
 
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { 0, UINT64_MAX };
-  // repeatTime = 8, 64 elements one repeat, 512 elements total
-  // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-  // dstRepStride = 8, srcRepStride = 4, no gap between repeats
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8, { 1, 1, 8, 4 });
+uint64_t mask[2] = {0, UINT64_MAX};
+// repeatTime = 8, 64 elements one repeat, 512 elements total
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride = 8, srcRepStride = 4, no gap between repeats
+AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 8,
+              {1, 1, 8, 4});
   ```
 
 - tensor前n个数据计算样例。
 
   ```cpp
-  uint32_t count = 512; // 参与计算的元素个数
-  AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, count);
+uint32_t count = 512; // 参与计算的元素个数
+AscendC::Cast(dstLocal, srcLocal, AscendC::RoundMode::CAST_CEIL, count);
   ```
 
 根据不同的RoundMode取值，输出结果会有差异，下面样例以RoundMode::CAST\_CEIL（向正无穷舍入）为例。
@@ -473,18 +484,21 @@ enum class RoundMode {
   dstLocal为int8\_t类型，srcLocal为half类型。
 
   ```cpp
-  inBufferSize_ = srcSize;  // src buffer size
-  outBufferSize_ = srcSize / 2;   //dst buffer size
-  uint64_t mask = 128;
-  AscendC::LocalTensor<half> srcLocal;
-  srcLocal.SetSize(inBufferSize_);
-  AscendC::LocalTensor<int8_t> dstLocal;
-  dstLocal.SetSize(outBufferSize_);
-  AscendC::LocalTensor<AscendC::int4b_t> dstLocalTmp = dstLocal.ReinterpretCast<AscendC::int4b_t>();
-  // repeatTime = 1, 128 elements one repeat, 128 elements total
-  // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
-  // dstRepStride = 2, srcRepStride = 8, no gap between repeats
-  AscendC::Cast<AscendC::int4b_t, half>(dstLocalTmp, srcLocal, AscendC::RoundMode::CAST_CEIL, mask, 1, {1, 1, 2, 8});
+inBufferSize_ = srcSize;      // src buffer size
+outBufferSize_ = srcSize / 2; // dst buffer size
+uint64_t mask = 128;
+AscendC::LocalTensor<half> srcLocal;
+srcLocal.SetSize(inBufferSize_);
+AscendC::LocalTensor<int8_t> dstLocal;
+dstLocal.SetSize(outBufferSize_);
+AscendC::LocalTensor<AscendC::int4b_t> dstLocalTmp =
+    dstLocal.ReinterpretCast<AscendC::int4b_t>();
+// repeatTime = 1, 128 elements one repeat, 128 elements total
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride = 2, srcRepStride = 8, no gap between repeats
+AscendC::Cast<AscendC::int4b_t, half>(dstLocalTmp, srcLocal,
+                                      AscendC::RoundMode::CAST_CEIL, mask, 1,
+                                      {1, 1, 2, 8});
   ```
 
 ## 更多样例

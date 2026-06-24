@@ -44,27 +44,29 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
   - Kernel关键步骤
     - 设置左矩阵A、右矩阵B、Bias。根据L2CacheOptimizer类的GetTileNum接口获取左右矩阵总L2切分份数，循环多次计算。
       ```cpp
-      L2CacheOpt l2Opt(shapes, blockNum);
-      matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
-      for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) {
-          auto blockShape = l2Opt.GetBlockShape(tileIdx);  // 获取单次计算L2切分块大小
-          if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
-              return;
-          }
-          auto blockCoord = l2Opt.GetBlockCoord(tileIdx);  // 获取当前计算下标blockCoord
-          matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
-          const auto& offsetCoord = CalcOffset(shapes, blockCoord); // 基于下标计算矩阵偏移
-          int64_t offsetA = Get<0>(offsetCoord);
-          int64_t offsetB = Get<1>(offsetCoord);
-          int64_t offsetC = Get<2>(offsetCoord);
-          matmulObj.SetTensorA(aGlobal[offsetA], false);
-          matmulObj.SetTensorB(bGlobal[offsetB], false);
-          if (shapes.isBias) {
-              matmulObj.SetBias(biasGlobal);
-          }
-          matmulObj.IterateAll(cGlobal[offsetC]);  // 计算L2切分块
-      }
-      matmulObj.End();
+L2CacheOpt l2Opt(shapes, blockNum);
+matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
+for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum();
+     tileIdx += blockNum) {
+  auto blockShape = l2Opt.GetBlockShape(tileIdx); // 获取单次计算L2切分块大小
+  if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
+    return;
+  }
+  auto blockCoord = l2Opt.GetBlockCoord(tileIdx); // 获取当前计算下标blockCoord
+  matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
+  const auto &offsetCoord =
+      CalcOffset(shapes, blockCoord); // 基于下标计算矩阵偏移
+  int64_t offsetA = Get<0>(offsetCoord);
+  int64_t offsetB = Get<1>(offsetCoord);
+  int64_t offsetC = Get<2>(offsetCoord);
+  matmulObj.SetTensorA(aGlobal[offsetA], false);
+  matmulObj.SetTensorB(bGlobal[offsetB], false);
+  if (shapes.isBias) {
+    matmulObj.SetBias(biasGlobal);
+  }
+  matmulObj.IterateAll(cGlobal[offsetC]); // 计算L2切分块
+}
+matmulObj.End();
       ```
 
   - Tiling关键步骤
@@ -72,35 +74,38 @@ Matmul样例M方向或者N方向切分输入的矩阵，将矩阵切分成多块
     - L2CacheOptimizer具体计算步骤：
       - 判断是否需要进行L2分块
         ```cpp
-        bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
-        if (smallDim || (!EnableL2Tile())) { // 判断计算数据总量是否小于L2Cache阈值
-            mL2TileNum_ = mTileNum_;
-            nL2TileNum_ = nTileNum_;
-            mL2BlockNum_ = 1;
-            nL2BlockNum_ = 1;
-            return; // 不需要切分，提前返回
-        }
-        InitL2TileTail(); // 计算L2切分
+bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
+if (smallDim || (!EnableL2Tile())) { // 判断计算数据总量是否小于L2Cache阈值
+  mL2TileNum_ = mTileNum_;
+  nL2TileNum_ = nTileNum_;
+  mL2BlockNum_ = 1;
+  nL2BlockNum_ = 1;
+  return; // 不需要切分，提前返回
+}
+InitL2TileTail(); // 计算L2切分
         ```
       - 基于负载均衡，计算L2最优分块
         ```cpp
-        int64_t mConflict = INT64_MAX;
-        int64_t nConflict = INT64_MAX;
-        constexpr bool isNMajor = l1N > l1M; // 根据shape大小，判断主维度
-        for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
-            for (int64_t j = maxMinor; j >= minMinor; j--) {
-                if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // 确保分块小于L2Cache阈值
-                    uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // 计算负载冲突值
-                    uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
-                    if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // 若冲突值更小，更新分块数量
-                        mConflict = mConflictTmp;
-                        nConflict = nConflictTmp;
-                        mL2TileNum_ = curMajorDim;
-                        nL2TileNum_ = curMinorDim;
-                    }
-                }
-            }
-        }
+int64_t mConflict = INT64_MAX;
+int64_t nConflict = INT64_MAX;
+constexpr bool isNMajor = l1N > l1M; // 根据shape大小，判断主维度
+for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
+  for (int64_t j = maxMinor; j >= minMinor; j--) {
+    if (GetTotalSize(j * l1M, i * l1N, k_) <=
+        L2_TILE_THRESHOLD) { // 确保分块小于L2Cache阈值
+      uint64_t mConflictTmp =
+          AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // 计算负载冲突值
+      uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
+      if (mConflict >= mConflictTmp &&
+          nConflict >= nConflictTmp) { // 若冲突值更小，更新分块数量
+        mConflict = mConflictTmp;
+        nConflict = nConflictTmp;
+        mL2TileNum_ = curMajorDim;
+        nL2TileNum_ = curMinorDim;
+      }
+    }
+  }
+}
         ```
 
   - 调用实现  

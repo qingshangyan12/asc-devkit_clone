@@ -29,23 +29,31 @@
 - tensor前n个数据计算：
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+ReduceSum(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+          const LocalTensor<T> &sharedTmpBuffer, const int32_t count)
     ```
 
 - tensor高维切分计算：
     - `mask`逐bit模式：
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride)
+template <typename T>
+__aicore__ inline void
+ReduceSum(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+          const LocalTensor<T> &sharedTmpBuffer, const uint64_t mask[],
+          const int32_t repeatTime, const int32_t srcRepStride)
         ```
 
     - `mask`连续模式：
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void ReduceSum(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime, const int32_t srcRepStride)
+template <typename T>
+__aicore__ inline void
+ReduceSum(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+          const LocalTensor<T> &sharedTmpBuffer, const int32_t mask,
+          const int32_t repeatTime, const int32_t srcRepStride)
         ```
 
 ## 参数说明
@@ -120,14 +128,16 @@
 - 方式二：按照如下计算公式计算所需空间：
 
     ```cpp
-    int typeSize = 2;                           // half类型为2Bytes，float类型为4Bytes
-    int elementsPerBlock = 32 / typeSize;       // 1个datablock存放的元素个数
-    int elementsPerRepeat = 256 / typeSize;     // 1次repeat可以处理的元素个数
-    int firstMaxRepeat = repeatTime;            // 最后确定首次最大repeat值
-    // 注：对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat，对于count小于elementsPerRepeat的场景，firstMaxRepeat为1
-    int iter1OutputCount = firstMaxRepeat;                                              // 第一轮操作产生的元素个数
-    int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) * elementsPerBlock; // 第一轮产生的元素个数做向上取整
-    int finalWorkLocalNeedSize = iter1AlignEnd; // 最终sharedTmpBuffer所需的elements空间大小就是第一轮操作产生元素做向上取整后的结果
+int typeSize = 2; // half类型为2Bytes，float类型为4Bytes
+int elementsPerBlock = 32 / typeSize;   // 1个datablock存放的元素个数
+int elementsPerRepeat = 256 / typeSize; // 1次repeat可以处理的元素个数
+int firstMaxRepeat = repeatTime;        // 最后确定首次最大repeat值
+// 注：对于tensor高维切分计算接口，firstMaxRepeat就是repeatTime；对于tensor前n个数据计算接口，firstMaxRepeat为count/elementsPerRepeat，对于count小于elementsPerRepeat的场景，firstMaxRepeat为1
+int iter1OutputCount = firstMaxRepeat; // 第一轮操作产生的元素个数
+int iter1AlignEnd = DivCeil(iter1OutputCount, elementsPerBlock) *
+                    elementsPerBlock; // 第一轮产生的元素个数做向上取整
+int finalWorkLocalNeedSize =
+    iter1AlignEnd; // 最终sharedTmpBuffer所需的elements空间大小就是第一轮操作产生元素做向上取整后的结果
     ```
 
 **不同硬件形态对应的`ReduceSum`相加方式如下：**
@@ -148,46 +158,47 @@
 - tensor高维切分计算样例-`mask`连续模式：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
-    int32_t mask = 128;
-    AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
+int32_t mask = 128;
+AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
     ```
 
 - tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
+uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
+AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8);
     ```
 
 - tensor前n个数据计算样例：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor前n个数据计算接口
-    AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，使用tensor前n个数据计算接口
+AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320);
     ```
 
 - tensor高维切分计算接口示例：
 
     ```cpp
-    #include "kernel_operator.h"
-    int srcDataSize = 8320;
-    int dstDataSize = 16;
-    int mask = 128;
-    int repStride = 8;
-    int repeat = srcDataSize / mask; // 这里是65
+#include "kernel_operator.h"
+int srcDataSize = 8320;
+int dstDataSize = 16;
+int mask = 128;
+int repStride = 8;
+int repeat = srcDataSize / mask; // 这里是65
 
-    // 初始化srcLocal 、dstLocal 、sharedTmpBuffer
-    AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
-    AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-    AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
-    // mask为128一次计算128个元素,65次repeat计算完8320个数
-    AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, repeat, repStride);
-    // 释放Tensor
-    outQueueDst.EnQue<half>(dstLocal);
-    inQueueSrc.FreeTensor(srcLocal);
-    workQueue.FreeTensor(sharedTmpBuffer);
+// 初始化srcLocal 、dstLocal 、sharedTmpBuffer
+AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
+AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
+AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
+// mask为128一次计算128个元素,65次repeat计算完8320个数
+AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, repeat,
+                         repStride);
+// 释放Tensor
+outQueueDst.EnQue<half>(dstLocal);
+inQueueSrc.FreeTensor(srcLocal);
+workQueue.FreeTensor(sharedTmpBuffer);
     ```
 
     示例结果如下：
@@ -202,20 +213,20 @@
 - tensor前n个数据计算接口示例：
 
     ```cpp
-    #include "kernel_operator.h"
+#include "kernel_operator.h"
 
-    int srcDataSize = 288;
-    // 初始化srcLocal 、dstLocal 、sharedTmpBuffer
-    AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
-    AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-    AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
+int srcDataSize = 288;
+// 初始化srcLocal 、dstLocal 、sharedTmpBuffer
+AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
+AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
+AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
 
-    // level2接口计算前288个数，计算前288个数的和
-    AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, srcDataSize);
-    // 释放Tensor
-    outQueueDst.EnQue<half>(dstLocal);
-    inQueueSrc.FreeTensor(srcLocal);
-    workQueue.FreeTensor(sharedTmpBuffer);
+// level2接口计算前288个数，计算前288个数的和
+AscendC::ReduceSum<half>(dstLocal, srcLocal, sharedTmpBuffer, srcDataSize);
+// 释放Tensor
+outQueueDst.EnQue<half>(dstLocal);
+inQueueSrc.FreeTensor(srcLocal);
+workQueue.FreeTensor(sharedTmpBuffer);
     ```
 
     示例结果如下：

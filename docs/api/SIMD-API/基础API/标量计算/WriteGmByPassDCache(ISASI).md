@@ -25,7 +25,7 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
+__aicore__ inline void WriteGmByPassDCache(__gm__ T *addr, T value)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -61,8 +61,9 @@ __aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value)
 __gm__ int32_t *addr = const_cast<__gm__ int32_t *>(srcGlobal.GetPhyAddr());
 int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
 // 同步指令：用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可通过参数控制）执行结束。
-AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();  // DDR，等待GM访问指令。
-AscendC::WriteGmByPassDCache<int32_t>(reinterpret_cast<__gm__ int32_t *>(dstGm), value + ADD_VALUE);
+AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>(); // DDR，等待GM访问指令。
+AscendC::WriteGmByPassDCache<int32_t>(reinterpret_cast<__gm__ int32_t *>(dstGm),
+                                      value + ADD_VALUE);
 ```
 
 完整样例请参考[GmByPassDCache类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/09_scalar_computation/gm_by_pass_dcache)。

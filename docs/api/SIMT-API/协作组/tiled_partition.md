@@ -30,19 +30,20 @@
 
 ```c++
 template <unsigned int Size, typename ParentT>
-thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
+thread_block_tile<Size, ParentT> tiled_partition(const ParentT &g)
 ```
 
 ```c++
-thread_group tiled_partition(const thread_group& parent, unsigned int tilesz)
+thread_group tiled_partition(const thread_group &parent, unsigned int tilesz)
 ```
 
 ```c++
-thread_group tiled_partition(const thread_block& parent, unsigned int tilesz)
+thread_group tiled_partition(const thread_block &parent, unsigned int tilesz)
 ```
 
 ```c++
-coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tilesz)
+coalesced_group tiled_partition(const coalesced_group &parent,
+                                unsigned int tilesz)
 ```
 
 ## 参数说明
@@ -75,25 +76,21 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  ...
+}
     ```

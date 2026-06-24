@@ -215,29 +215,33 @@ C = A × B + Bias
 ```cpp
 // 不支持bias：基础矩阵乘加原型
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b,
+                            const MmadParams &mmadParams)
 ```
 
 ```cpp
 // 支持bias：带偏置矩阵乘加原型
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b, const LocalTensor<V> &bias,
+                            const MmadParams &mmadParams)
 ```
 
 ```cpp
 // 不传入bias（BitMode版本）：位域联合体参数原型
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b,
+                            const MmadBitModeParams &mmadParams)
 ```
 
 ```cpp
 // 传入bias（BitMode版本）：位域联合体+偏置原型
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b, const LocalTensor<V> &bias,
+                            const MmadBitModeParams &mmadParams)
 ```
 
 **编写要求**：

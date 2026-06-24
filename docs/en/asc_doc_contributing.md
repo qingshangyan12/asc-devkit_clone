@@ -217,29 +217,33 @@ For Ascend 950PR/Ascend 950DT products:
 ```cpp
 // No bias: basic matrix multiply-accumulate prototype
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b,
+                            const MmadParams &mmadParams)
 ```
 
 ```cpp
 // With bias: matrix multiply-accumulate with bias prototype
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b, const LocalTensor<V> &bias,
+                            const MmadParams &mmadParams)
 ```
 
 ```cpp
 // No bias (BitMode version): bit-field union parameter prototype
 template <typename T, typename U, typename S>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b,
+                            const MmadBitModeParams &mmadParams)
 ```
 
 ```cpp
 // With bias (BitMode version): bit-field union + bias prototype
 template <typename T, typename U, typename S, typename V>
-__aicore__ inline void Mmad(const LocalTensor<T>& c, const LocalTensor<U>& a,
-    const LocalTensor<S>& b, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+__aicore__ inline void Mmad(const LocalTensor<T> &c, const LocalTensor<U> &a,
+                            const LocalTensor<S> &b, const LocalTensor<V> &bias,
+                            const MmadBitModeParams &mmadParams)
 ```
 
 **Requirements**:
@@ -531,8 +535,10 @@ The Cross-generation Migration Guide is the **compatibility authority source**, 
 ### Keyword Annotation in Examples
 
 ```cpp
-__aicore__ inline void ExampleKernel(__gm__ uint8_t* x) {  // __aicore__=kernel function modifier, __gm__=Global Memory address space
-    // ...
+__aicore__ inline void
+ExampleKernel(__gm__ uint8_t *x) { // __aicore__=kernel function modifier,
+                                   // __gm__=Global Memory address space
+                                   // ...
 }
 ```
 

@@ -103,19 +103,18 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void compute_hit_parity(uint32_t *parity,
-                                                             uint32_t *hit,
-                                                             uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void compute_hit_parity(uint32_t *parity,
+                                                          uint32_t *hit,
+                                                          uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (hit[idx] != 0U) {
-            asc_atomic_xor(parity, 1U);
-        }
-    }
+  if (hit[idx] != 0U) {
+    asc_atomic_xor(parity, 1U);
+  }
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -123,19 +122,17 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void compute_hit_parity(__gm__ uint32_t *parity,
-                                                                      __gm__ uint32_t *hit,
-                                                                      uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void compute_hit_parity(
+    __gm__ uint32_t *parity, __gm__ uint32_t *hit, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (hit[idx] != 0U) {
-            asc_atomic_xor(parity, 1U);
-        }
-    }
+  if (hit[idx] != 0U) {
+    asc_atomic_xor(parity, 1U);
+  }
+}
     ```
 
 输出结果示例如下：

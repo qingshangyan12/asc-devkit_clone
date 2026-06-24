@@ -20,13 +20,20 @@
 
 ```cpp
 // 非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_int162uint8(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
-// 饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_int162uint8_sat(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
-// 非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_int162uint8_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
-// 饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_int162uint8_sat_v2(vector_uint8_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_int162uint8(vector_uint8_t &dst, vector_int16_t src, vector_bool mask)
+    // 饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_int162uint8_sat(vector_uint8_t &dst, vector_int16_t src,
+                                    vector_bool mask)
+    // 非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_int162uint8_v2(vector_uint8_t &dst, vector_int16_t src,
+                                   vector_bool mask)
+    // 饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_int162uint8_sat_v2(vector_uint8_t &dst, vector_int16_t src,
+                                       vector_bool mask)
 ```
 
 ## 参数说明

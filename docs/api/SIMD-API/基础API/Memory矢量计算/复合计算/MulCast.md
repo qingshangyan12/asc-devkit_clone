@@ -62,23 +62,31 @@ $$
 - tensor前n个数据计算
 
   ```cpp
-  template <typename T, typename U>
-  __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0, const LocalTensor<U> &src1, uint32_t count)
+template <typename T, typename U>
+__aicore__ inline void MulCast(const LocalTensor<T> &dst,
+                               const LocalTensor<U> &src0,
+                               const LocalTensor<U> &src1, uint32_t count)
   ```
 
 - tensor高维切分计算
   - mask逐bit模式
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0, const LocalTensor<U> src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+        const LocalTensor<U> src1, uint64_t mask[], const uint8_t repeatTime,
+        const BinaryRepeatParams &repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0, const LocalTensor<U> src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+MulCast(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+        const LocalTensor<U> src1, uint64_t mask, const uint8_t repeatTime,
+        const BinaryRepeatParams &repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -178,29 +186,29 @@ $$
 - tensor高维切分计算样例-mask连续模式。
 
   ```cpp
-  uint64_t mask = 128;
-  // repeatTime = 4，一次迭代计算128个数，共计算512个数
-  // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 4，相邻迭代间数据连续写入
-  // src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取
-  AscendC::MulCast(dstLocal, src0, src1Local, mask, repeatTime, repeatParams);
+uint64_t mask = 128;
+// repeatTime = 4，一次迭代计算128个数，共计算512个数
+// dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
+// dstRepStride = 4，相邻迭代间数据连续写入
+// src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取
+AscendC::MulCast(dstLocal, src0, src1Local, mask, repeatTime, repeatParams);
   ```
 
 - tensor高维切分计算样例-mask逐bit模式。
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, UINT64_MAX }; 
-  // repeatTime = 4，一次迭代计算128个数，共计算512个数
-  // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 4，相邻迭代间数据连续写入
-  // src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取
-  AscendC::MulCast(dstLocal, src0, src1Local, mask, repeatTime, repeatParams);
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// repeatTime = 4，一次迭代计算128个数，共计算512个数
+// dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
+// dstRepStride = 4，相邻迭代间数据连续写入
+// src0RepStride, src1RepStride = 8，相邻迭代间数据连续读取
+AscendC::MulCast(dstLocal, src0, src1Local, mask, repeatTime, repeatParams);
   ```
 
 - tensor前n个数据计算样例。
 
   ```cpp
-  AscendC::MulCast(dstLocal, src0, src1Local, 512);
+AscendC::MulCast(dstLocal, src0, src1Local, 512);
   ```
 
 结果示例如下：

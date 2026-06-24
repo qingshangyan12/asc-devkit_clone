@@ -21,19 +21,25 @@ $$
 - 前n个数据计算
 
     ```cpp
-    __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_deq_int322half(__ubuf__ half *dst,
+                                          __ubuf__ int32_t *src, uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_deq_int322half(__ubuf__ half* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
+__aicore__ inline void
+asc_deq_int322half(__ubuf__ half *dst, __ubuf__ int32_t *src, uint8_t repeat,
+                   uint16_t dst_block_stride, uint16_t src_block_stride,
+                   uint8_t dst_repeat_stride, uint8_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_deq_int322half_sync(__ubuf__ half* dst, __ubuf__ int32_t* src, uint32_t count)
+__aicore__ inline void asc_deq_int322half_sync(__ubuf__ half *dst,
+                                               __ubuf__ int32_t *src,
+                                               uint32_t count)
     ```
 
 ### 参数说明
@@ -66,9 +72,9 @@ PIPE_V
 ### 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与计算的数据长度
+constexpr uint64_t total_length = 128; // total_length指参与计算的数据长度
 __ubuf__ int32_t src[total_length];
 __ubuf__ half dst[total_length];
 asc_set_deq_scale(2.0);
 …… // 数据搬运及同步操作
-asc_deq_int322half(dst, src, total_length);
+    asc_deq_int322half(dst, src, total_length);

@@ -56,37 +56,51 @@
   - Kernel关键步骤
       - 创建Matmul对象：使用MatmulTypeWithScale定义A、scaleA、B、scaleB的参数类型信息，包括：内存逻辑位置、数据格式、数据类型、转置信息。
         ```cpp
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, false> aType;
-        typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false, AscendC::TPosition::GM, CubeFormat::ND, true> bType;
-        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-        typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-        // 定义matmul对象时， 传入MatmulWithScalePolicy表明使能MxMatmul模板策略
-        AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+typedef AscendC::MatmulTypeWithScale<
+    AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t,
+    false, AscendC::TPosition::GM, CubeFormat::ND, false>
+    aType;
+typedef AscendC::MatmulTypeWithScale<
+    AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t,
+    false, AscendC::TPosition::GM, CubeFormat::ND, true>
+    bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// 定义matmul对象时， 传入MatmulWithScalePolicy表明使能MxMatmul模板策略
+AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL,
+                AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::MatmulWithScalePolicy>
+    matmulObj;
         ```
       - 设置左矩阵A与左量化系数矩阵scaleA、右矩阵B与右量化系数矩阵scaleB、Bias。
         ```cpp
-        matmulObj.SetTensorA(aGlobal, isTransA);
-        matmulObj.SetTensorB(bGlobal, isTransB);
-        matmulObj.SetTensorScaleA(asGlobal, isTransScaleA);
-        matmulObj.SetTensorScaleB(bsGlobal, isTransScaleB);
+matmulObj.SetTensorA(aGlobal, isTransA);
+matmulObj.SetTensorB(bGlobal, isTransB);
+matmulObj.SetTensorScaleA(asGlobal, isTransScaleA);
+matmulObj.SetTensorScaleB(bsGlobal, isTransScaleB);
 
-        if (tiling.isBias) {
-            matmulObj.SetBias(biasGlobal);
-        }
+if (tiling.isBias) {
+  matmulObj.SetBias(biasGlobal);
+}
         ```
 
   - Tiling关键步骤
     - 创建一个Tiling对象：使用SetMadType使能Mx特性，使用SetScaleAType设置ScaleA的信息、使用SetScaleBType设置scaleB的信息。
       ```cpp
-      cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);
-      cubeTiling.SetScaleAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, false);
-      cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, true);
-      if (cubeTiling.GetTiling(tilingData) == -1) {
-          std::cout << "Generate tiling failed." << std::endl;
-          return {};
-      }
-      // 0-6bit表示scaleA与A矩阵在K方向载入数据量的比例系数，8-14bit表示scaleB与B矩阵在K方向载入数据量的比例系数, 260代表二进制0000 0001 0000 0100，0-6bit中使用100，开启4倍缓存。
-      tilingData.mxTypePara = 16843012;
+cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);
+cubeTiling.SetScaleAType(matmul_tiling::TPosition::GM,
+                         matmul_tiling::CubeFormat::ND, false);
+cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM,
+                         matmul_tiling::CubeFormat::ND, true);
+if (cubeTiling.GetTiling(tilingData) == -1) {
+  std::cout << "Generate tiling failed." << std::endl;
+  return {};
+}
+// 0-6bit表示scaleA与A矩阵在K方向载入数据量的比例系数，8-14bit表示scaleB与B矩阵在K方向载入数据量的比例系数,
+// 260代表二进制0000 0001 0000 0100，0-6bit中使用100，开启4倍缓存。
+tilingData.mxTypePara = 16843012;
       ```
 
   - 调用实现  

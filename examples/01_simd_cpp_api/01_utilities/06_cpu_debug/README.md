@@ -32,9 +32,9 @@
   为了使能CPU Debug，本样例在定义`ASCENDC_CPU_DEBUG`宏时包含`cpu_debug_launch.h`头文件。
 
   ```cpp
-  #ifdef ASCENDC_CPU_DEBUG
-  #include "cpu_debug_launch.h"
-  #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "cpu_debug_launch.h"
+#endif
   ```
 
   `cpu_debug_launch.h`提供CPU域下的核函数启动支持，使样例可以通过CPU Debug方式运行并配合GDB调试。

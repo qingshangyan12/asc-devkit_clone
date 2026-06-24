@@ -43,24 +43,27 @@ A Matmul example with A and B matrices as hifloat8, fp8_e4m3fn, or fp8_e5m2 data
   - Key Kernel Steps
     - Create the Matmul object, setting the data type to hifloat8 or various fp8 data types based on SCENARIO_NUM.
       ```cpp
-      #if SCENARIO_NUM == 1
-      MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 2
-      MatmulFp8Kernel<fp8_e5m2_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 3
-      MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 4
-      MatmulFp8Kernel<fp8_e5m2_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
-      #else
-      MatmulFp8Kernel<hifloat8_t, hifloat8_t, float, float> MatmulFp8Kernel;
-      #endif
+#if SCENARIO_NUM == 1
+MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 2
+MatmulFp8Kernel<fp8_e5m2_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 3
+MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 4
+MatmulFp8Kernel<fp8_e5m2_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
+#else
+MatmulFp8Kernel<hifloat8_t, hifloat8_t, float, float> MatmulFp8Kernel;
+#endif
 
-      ...
+...
 
-      AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+    AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>,
+        mmCfg>
+        matmulObj;
       ```
   - Invocation Implementation  
     Use the kernel invocation operator <<<>>> to call the kernel function.

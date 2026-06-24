@@ -93,18 +93,17 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void clear_status_bits(uint32_t *flags,
-                                                            uint32_t *clear_bits,
-                                                            uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void clear_status_bits(uint32_t *flags,
+                                                         uint32_t *clear_bits,
+                                                         uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        uint32_t mask = ~clear_bits[idx];
-        asc_atomic_and(flags, mask);
-    }
+  uint32_t mask = ~clear_bits[idx];
+  asc_atomic_and(flags, mask);
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -112,24 +111,21 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void clear_status_bits(__gm__ uint32_t *flags,
-                                                                     __gm__ uint32_t *clear_bits,
-                                                                     uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void clear_status_bits(
+    __gm__ uint32_t *flags, __gm__ uint32_t *clear_bits, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        uint32_t mask = ~clear_bits[idx];
-        asc_atomic_and(flags, mask);
-    }
+  uint32_t mask = ~clear_bits[idx];
+  asc_atomic_and(flags, mask);
+}
     ```
 
 输出结果示例如下：
 
 ```cpp
-flags before: 0xF
-clear_bits: 0x2, 0x4
-flags after: 0x9 // 表明bit1和bit2被并发清除
+flags before : 0xF clear_bits : 0x2,
+    0x4 flags after : 0x9 // 表明bit1和bit2被并发清除
 ```

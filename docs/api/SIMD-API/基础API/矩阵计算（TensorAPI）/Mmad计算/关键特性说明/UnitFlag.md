@@ -48,22 +48,22 @@ using namespace AscendC::Te;
 
 // 调用kRound次Mmad
 for (auto kIndex = 0; kIndex = kRound; ++kIndex) {
-    if (kIndex != kRound - 1) {
-        // 前kRound-1次迭代设置为2，保证Mmad在K迭代循环中可以一直写入L0C Buffer
-        mmadParams.unitFlag = 2;
-    } else {
-        // 最后一次迭代设置为3，将单元标志位设成1,保证Fixpipe可以读L0C Buffer
-        mmadParams.unitFlag = 3;
-    }
-    auto mmadAtom = MakeMmad(MmadOperation{}).with(mmadParams);
-    Mmad(mmadAtom, l0C, l0A, l0B);
+  if (kIndex != kRound - 1) {
+    // 前kRound-1次迭代设置为2，保证Mmad在K迭代循环中可以一直写入L0C Buffer
+    mmadParams.unitFlag = 2;
+  } else {
+    // 最后一次迭代设置为3，将单元标志位设成1,保证Fixpipe可以读L0C Buffer
+    mmadParams.unitFlag = 3;
+  }
+  auto mmadAtom = MakeMmad(MmadOperation{}).with(mmadParams);
+  Mmad(mmadAtom, l0C, l0A, l0B);
 }
 // Fixpipe一次搬出
-// Fixpipe的unitFlag设置为3，读取后将单元标记位设置为0，保证后续Mmad接口可以顺利写入L0C Buffer数据
+// Fixpipe的unitFlag设置为3，读取后将单元标记位设置为0，保证后续Mmad接口可以顺利写入L0C
+// Buffer数据
 fixpipeParams.unitFlag = 3;
 auto fixpipeAtom = MakeCopy(CopyL0C2GM{}).with(fixpipeParams);
 Copy(fixpipeAtom, gm, l0C);
-
 ```
 
 **表1**  性能示例说明（以输入数据类型half为例，无业务实测表示忽略指令的前后序操作，只考虑单指令性能，包含带宽延迟等开销）

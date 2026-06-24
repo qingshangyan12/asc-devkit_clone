@@ -17,7 +17,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride)
+__aicore__ inline void asc_set_gm2l1_loop2_stride(uint64_t loop2_src_stride,
+                                                  uint64_t loop2_dst_stride)
 ```
 
 ## 参数说明
@@ -55,6 +56,8 @@ constexpr uint64_t burst_src_stride = 0;
 constexpr uint32_t burst_dst_stride = 0;
 __gm__ half src[256];
 __cbuf__ half dst[256];
-asc_copy_gm2l1_align(dst, src, n_burst, len_burst,  left_padding_count, right_padding_count, data_select_bit, l2_cache_ctl, burst_src_stride, burst_dst_stride);
+asc_copy_gm2l1_align(dst, src, n_burst, len_burst, left_padding_count,
+                     right_padding_count, data_select_bit, l2_cache_ctl,
+                     burst_src_stride, burst_dst_stride);
 asc_set_gm2l1_loop_size(1, 1);
 ```

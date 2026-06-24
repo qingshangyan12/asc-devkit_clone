@@ -23,13 +23,13 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Max()
+constexpr __aicore__ static inline T Max()
     ```
 
 - 矢量接口，为dst前count个元素赋最大有限值：
 
     ```cpp
-    __aicore__ static inline void Max(const LocalTensor<T>& dst, uint32_t count)
+__aicore__ static inline void Max(const LocalTensor<T> &dst, uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +60,12 @@
 - 标量接口：
 
     ```cpp
-    int32_t value = AscendC::NumericLimits<int32_t>::Max();
+int32_t value = AscendC::NumericLimits<int32_t>::Max();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Max(dstLocal, 256); // 返回256个int32_t类型的最大值
+AscendC::NumericLimits<int32_t>::Max(dstLocal,
+                                     256); // 返回256个int32_t类型的最大值
     ```

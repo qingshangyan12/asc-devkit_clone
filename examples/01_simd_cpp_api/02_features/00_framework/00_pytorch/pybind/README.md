@@ -52,11 +52,10 @@
   `add_custom.asc`使用`pybind11`库将C++代码封装成Python模块。`PYBIND11_MODULE(ascendc_ops, m)`中的`ascendc_ops`是导出的Python模块名，`m`是pybind11模块对象；`m.def`将C++函数`ascendc_ops::ascendc_add`绑定为Python侧可调用的`ascendc_add`函数，例如：
 
   ```cpp
-  PYBIND11_MODULE(ascendc_ops, m)
-  {
-      m.doc() = "add_custom pybind11 interfaces";
-      m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
-  }
+PYBIND11_MODULE(ascendc_ops, m) {
+  m.doc() = "add_custom pybind11 interfaces";
+  m.def("ascendc_add", &ascendc_ops::ascendc_add, "");
+}
   ```
 
   在`ascendc_add`函数中通过`c10_npu::getCurrentNPUStream()`函数获取当前NPU上的流，并通过内核调用符`<<<>>>`调用自定义的Kernel函数`add_custom`，在NPU上执行样例。

@@ -33,8 +33,11 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     定义出函数原型后，分析并确定API实现中使用的基础API。`Axpy`公式中Tensor与Scalar的相乘运算，可以使用Ascend C提供的基础API `Muls`实现；两个Tensor的加法运算，可以使用Ascend C提供的基础API `Add`实现。
 
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue, const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+Axpy(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+     const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+     const uint32_t calCount)
     ```
     模板参数说明
     | 参数名      | 描述 |
@@ -55,7 +58,9 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     Kernel侧接口的计算需要开发者预留/申请临时空间，该临时空间的大小需要在Tiling侧根据获取到的源操作数shape大小，计算高阶API所需的最大(maxValue)临时空间和最小临时空间(minValue)的大小。因此在Tiling侧提供一个用于计算maxValue和minValue的接口。接口的输入参数包括源操作数Tensor的shape大小和源操作数数据类型所占字节数，shape大小的参数使用ge::Shape类型，数据类型所占的字节数使用`uint32_t`类型，输出参数包括minValue和maxValue。与Axpy接口中的isReuseSource参数系统，Tiling接口中的isReuseSource为预留参数。
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue);
     ```
     接口参数说明
     | 参数名      | 输入/输出 |  描述   |
@@ -71,33 +76,38 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     
     在`include/adv_api/`对应分类的目录下，新增[axpy.h](../include/adv_api/math/axpy.h)文件。根据上述分析设计的API函数原型，编写对外接口的代码，函数实现中调用AxpyImpl的实现。
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void Axpy(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        AxpyImpl<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount);
-    }
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+Axpy(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+     const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+     const uint32_t calCount) {
+  AxpyImpl<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue,
+                                sharedTmpBuffer, calCount);
+}
     ```
 - Tiling侧接口
     
     在`include/adv_api/`对应分类的目录下，新增[axpy_tiling.h](../include/adv_api/math/axpy_tiling.h)文件。根据上述分析设计的Tiling侧接口，编写函数声明。
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue);
     ```
 - 在公共文件中引入头文件。
 
     [include/adv_api/kernel_api.h](../include/adv_api/kernel_api.h)文件中包含了所有高阶API头文件，建议在该文件中引入新增API的头文件，这样在调用高阶API时，只需要引入`"kernel_api.h"`。
     ```c++
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
-    // ...
-    #include "math/axpy.h"
-    // ...
-    #endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
+#if defined(__NPU_ARCH__) &&                                                   \
+    (__NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+// ...
+#include "math/axpy.h"
+// ...
+#endif // __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201
     ```
     
     [include/adv_api/tiling_api.h](../include/adv_api/tiling_api.h)文件中包含了所有高阶API的TIling接口头文件，建议在该文件中引入新增的Tiling接口头文件，这样在调用高阶API的Tiling函数时，只需要引入`"tiling_api.h"`。
     ```c++
-    #include "math/axpy_tiling.h"
+#include "math/axpy_tiling.h"
     ```
 
 #### 编写API内部实现
@@ -107,23 +117,26 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     首先，引入必要的头文件。
     ```c++
-    #include "kernel_tensor.h"
+#include "kernel_tensor.h"
     ```
     编写AxpyImpl函数实现代码。如果源操作数的数据类型为float，则调用基础API的Axpy接口，否则，调用自定义函数`AxpySub`，通过Muls和Add组合计算，提供更优的计算精度。
     ```c++
-    template <typename T, typename U, bool isReuseSource>
-    __aicore__ inline void AxpyImpl(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        CHECK_FUNC_HIGHLEVEL_API(
-            Axpy, (T, U, isReuseSource), (dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount));
+template <typename T, typename U, bool isReuseSource>
+__aicore__ inline void
+AxpyImpl(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+         const U scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+         const uint32_t calCount) {
+  CHECK_FUNC_HIGHLEVEL_API(
+      Axpy, (T, U, isReuseSource),
+      (dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount));
 
-        if constexpr (sizeof(U) == sizeof(float)) {
-            Axpy<T, U>(dstTensor, srcTensor, scalarValue, calCount);
-        } else {
-            AxpySub<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue, sharedTmpBuffer, calCount);
-        }
-    }
+  if constexpr (sizeof(U) == sizeof(float)) {
+    Axpy<T, U>(dstTensor, srcTensor, scalarValue, calCount);
+  } else {
+    AxpySub<T, U, isReuseSource>(dstTensor, srcTensor, scalarValue,
+                                 sharedTmpBuffer, calCount);
+  }
+}
     ```
     `AxpySub`函数根据临时空间大小制定计算策略，主要包括确定计算循环次数round、整块计算量stackSize、尾块计算量tail，具体代码如下。由于传入接口的sharedTmpBuffer是uint8类型，而源操作数元素是float类型，因此需要将sharedTmpBuffer的元素类型转化为float，获取其中的元素个数。根据硬件架构的特点，一次计算的最小单元为一个Block，即32字节，`axpyTmpCalc`函数将获取的临时空间能够存储的元素个数向下32字节对齐，得到一次计算的整块计算量stackSize。同时，当目的操作数元素类型为half时，为了提升精度，计算过程中会对源操作数和目的操作数分别做一次Cast精度转换，二分之一的临时空间被Cast结果占用，所以该场景下，计算的数据量为临时空间能够存储的元素个数向下32字节对齐后的大小的一半。已知总计算量calCount、单次整块计算量stackSize，计算出循环次数round和尾块计算量tail。计算公式如下：
    $$stackSize = \begin{cases}
@@ -135,69 +148,77 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     $$tail = calCount%stackSize$$
     如果tail不为0，即存在尾块，则需要额外处理尾块数据。在尾块数据计算前，通过setMaskCount接口设置计算单元的工作方式为Count模式。
     ```c++
-    template <typename T, typename U, bool isReuseSource = false>
-    __aicore__ inline void AxpySub(const LocalTensor<T>& dstTensor, const LocalTensor<U>& srcTensor, const U& scalarValue,
-        const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t calCount)
-    {
-        uint32_t bufferSize = sharedTmpBuffer.GetSize();
-        CheckTmpBufferSize(bufferSize, 0, bufferSize);
+template <typename T, typename U, bool isReuseSource = false>
+__aicore__ inline void
+AxpySub(const LocalTensor<T> &dstTensor, const LocalTensor<U> &srcTensor,
+        const U &scalarValue, const LocalTensor<uint8_t> &sharedTmpBuffer,
+        const uint32_t calCount) {
+  uint32_t bufferSize = sharedTmpBuffer.GetSize();
+  CheckTmpBufferSize(bufferSize, 0, bufferSize);
 
-        LocalTensor<float> tmpBuffer = sharedTmpBuffer.ReinterpretCast<float>();
-        uint32_t tmpBufferSize = tmpBuffer.GetSize();
+  LocalTensor<float> tmpBuffer = sharedTmpBuffer.ReinterpretCast<float>();
+  uint32_t tmpBufferSize = tmpBuffer.GetSize();
 
-        uint32_t stackSize = axpyTmpCalc<T>(tmpBufferSize);
+  uint32_t stackSize = axpyTmpCalc<T>(tmpBufferSize);
 
-        const uint32_t round = calCount / stackSize;
-        const uint32_t tail = calCount % stackSize;
+  const uint32_t round = calCount / stackSize;
+  const uint32_t tail = calCount % stackSize;
 
-        SetMaskCount();
-        SetVectorMask<T, MaskMode::COUNTER>(0, stackSize);
+  SetMaskCount();
+  SetVectorMask<T, MaskMode::COUNTER>(0, stackSize);
 
-        uint32_t offset = 0;
-        for (uint32_t i = 0; i < round; i++) {
-            AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue, tmpBuffer, stackSize);
-            offset = offset + stackSize;
-        }
+  uint32_t offset = 0;
+  for (uint32_t i = 0; i < round; i++) {
+    AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue,
+                       tmpBuffer, stackSize);
+    offset = offset + stackSize;
+  }
 
-        if (tail != 0) {
-            SetVectorMask<T, MaskMode::COUNTER>(0, tail);
-            AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue, tmpBuffer, stackSize);
-        }
+  if (tail != 0) {
+    SetVectorMask<T, MaskMode::COUNTER>(0, tail);
+    AxpyIntrinsicsImpl(dstTensor[offset], srcTensor[offset], scalarValue,
+                       tmpBuffer, stackSize);
+  }
 
-        SetMaskNorm();
-        ResetMask();
-    }
+  SetMaskNorm();
+  ResetMask();
+}
     ```
     `AxpyIntrinsicsImpl`函数调用基础API实现Axpy具体的算法。对于不同数据类型的目的操作数，重载实现`AxpyIntrinsicsImpl`函数。如下函数实现代码为源操作数和目的操作数的元素类型均为half的场景，如上文所述，此时临时空间stackBuffer能容纳$2 * stackSize$个元素，二分之一的临时空间用于保存源操作数和目的操作数的Cast结果。因此保存目的操作数Cast结果的Tensor `tmpDst`的起始偏移量为stackSize。在算法实现时，对源操作数和目的操作数分别做一次half到float类型的Cast转换，然后调用Muls、Add接口进行计算，最后将计算结果做一次float到half类型的Cast转换。
     ```c++
-    template <>
-    __aicore__ inline void AxpyIntrinsicsImpl(const LocalTensor<half>& dstTensor, const LocalTensor<half>& srcTensor,
-        const half& scalarValue, LocalTensor<float> stackBuffer, uint32_t stackSize)
-    {
-        LocalTensor<float> tmpSrc = stackBuffer[0];
-        LocalTensor<float> tmpDst = stackBuffer[stackSize];
+template <>
+__aicore__ inline void
+AxpyIntrinsicsImpl(const LocalTensor<half> &dstTensor,
+                   const LocalTensor<half> &srcTensor, const half &scalarValue,
+                   LocalTensor<float> stackBuffer, uint32_t stackSize) {
+  LocalTensor<float> tmpSrc = stackBuffer[0];
+  LocalTensor<float> tmpDst = stackBuffer[stackSize];
 
-        const UnaryRepeatParams unaryParams;
-        const BinaryRepeatParams binaryParams;
+  const UnaryRepeatParams unaryParams;
+  const BinaryRepeatParams binaryParams;
 
-        Cast<float, half, false>(tmpSrc, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      tmpSrc, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-        Cast<float, half, false>(tmpDst, dstTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      tmpDst, dstTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-        Muls<float, false>(tmpSrc, tmpSrc, (float)scalarValue, MASK_PLACEHOLDER, 1, unaryParams);
-        PipeBarrier<PIPE_V>();
+  Muls<float, false>(tmpSrc, tmpSrc, (float)scalarValue, MASK_PLACEHOLDER, 1,
+                     unaryParams);
+  PipeBarrier<PIPE_V>();
 
-        Add<float, false>(tmpDst, tmpSrc, tmpDst, MASK_PLACEHOLDER, 1, binaryParams);
-        PipeBarrier<PIPE_V>();
+  Add<float, false>(tmpDst, tmpSrc, tmpDst, MASK_PLACEHOLDER, 1, binaryParams);
+  PipeBarrier<PIPE_V>();
 
-        Cast<half, float, false>(dstTensor, tmpDst, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-            {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
-        PipeBarrier<PIPE_V>();
-    }
+  Cast<half, float, false>(
+      dstTensor, tmpDst, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, HALF_DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
+}
     ```
 - Tiling侧实现
 
@@ -205,34 +226,35 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
 
     首先，引入必要的头文件。
     ```c++
-    #include "lib/math/axpy_tiling.h"  // Tiling接口头文件
-    #include <cstdint>  // 类型库
-    #include "graph/tensor.h" // ge::Shape使用此库
-    #include "impl/host_log.h" // 日志库
+#include "graph/tensor.h"         // ge::Shape使用此库
+#include "impl/host_log.h"        // 日志库
+#include "lib/math/axpy_tiling.h" // Tiling接口头文件
+#include <cstdint>                // 类型库
     ```
     定义Tiling计算中需要使用的常量。
     ```c++
-    constexpr uint32_t AXPY_HALF_CALC_PROC = 4;
-    constexpr uint32_t AXPY_FLOAT_CALC_PROC = 1;
-    constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
+constexpr uint32_t AXPY_HALF_CALC_PROC = 4;
+constexpr uint32_t AXPY_FLOAT_CALC_PROC = 1;
+constexpr uint32_t AXPY_ONE_REPEAT_BYTE_SIZE = 256;
     ```
     在`GetAxpyMaxMinTmpSize`接口中，调用`GetAxpyMaxTmpSize`接口获取所需临时空间最大值，调用`GetAxpyMinTmpSize`接口获取所需临时空间最小值。
    
     ```c++
-    void GetAxpyMaxMinTmpSize(const ge::Shape& srcShape, const uint32_t typeSize, const bool isReuseSource,
-    uint32_t& maxValue, uint32_t& minValue)
-    {
-        (void)isReuseSource;
-        const uint32_t inputSize = srcShape.GetShapeSize();
-        ASCENDC_HOST_ASSERT(inputSize > 0, return, "Input Shape size must be greater than 0.");
-        if (typeSize == sizeof(float)) {
-            minValue = 0;
-            maxValue = 0;
-            return;
-        }
-        minValue = GetAxpyMinTmpSize(typeSize);
-        maxValue = GetAxpyMaxTmpSize(inputSize, typeSize);
-    }
+void GetAxpyMaxMinTmpSize(const ge::Shape &srcShape, const uint32_t typeSize,
+                          const bool isReuseSource, uint32_t &maxValue,
+                          uint32_t &minValue) {
+  (void)isReuseSource;
+  const uint32_t inputSize = srcShape.GetShapeSize();
+  ASCENDC_HOST_ASSERT(inputSize > 0, return,
+                      "Input Shape size must be greater than 0.");
+  if (typeSize == sizeof(float)) {
+    minValue = 0;
+    maxValue = 0;
+    return;
+  }
+  minValue = GetAxpyMinTmpSize(typeSize);
+  maxValue = GetAxpyMaxTmpSize(inputSize, typeSize);
+}
     ```
     分析所需临时空间最大值的计算，当目的操作数的数据类型为float时，只有源操作数需要Cast转换，`Axpy`伪代码如下所示，此时使用了一倍元素个数inputSize的临时空间。
     ```
@@ -251,42 +273,49 @@ $$dstTensor_i = srcTensor_i \times scalarValue+dstTensor_i$$
     考虑到Vector计算单元单次Repeat计算256字节的数据，那么最大临时空间的计算公式如下：
     $$MaxValue=\begin{cases}\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_HALF\_CALC\_PROC &dstType = half\\\max(inputSize*typeSize,\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE \normalsize)*\tiny AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
     ```c++
-   inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize, const uint32_t typeSize)
-    {
-        const uint8_t calcPro = typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC;
-        return inputSize * typeSize > AXPY_ONE_REPEAT_BYTE_SIZE ?
-                calcPro * inputSize * typeSize :
-                calcPro * AXPY_ONE_REPEAT_BYTE_SIZE; // All temporary variables are float.
-    }
+inline uint32_t GetAxpyMaxTmpSize(const uint32_t inputSize,
+                                  const uint32_t typeSize) {
+  const uint8_t calcPro =
+      typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC;
+  return inputSize * typeSize > AXPY_ONE_REPEAT_BYTE_SIZE
+             ? calcPro * inputSize * typeSize
+             : calcPro * AXPY_ONE_REPEAT_BYTE_SIZE; // All temporary variables
+                                                    // are float.
+}
     ```
     分析所需临时空间最小值的计算，若临时空间最小，则单次计算数据量最小，即每次计算数据量固定为单次Repeat处理的数据大小，256字节，那么临时空间最小值的计算公式如下:
     $$MinValue=\begin{cases}\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_HALF\_CALC\_PROC &dstType = half\\\tiny AXPY\_ONE\_REPEAT\_BYTE\_SIZE*AXPY\_FLOAT\_CALC\_PROC &dstType = float\end{cases}$$
     ```c++
-    inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize)
-    {
-        return AXPY_ONE_REPEAT_BYTE_SIZE * (typeSize == sizeof(float) ? AXPY_FLOAT_CALC_PROC : AXPY_HALF_CALC_PROC);
-    }
+inline uint32_t GetAxpyMinTmpSize(const uint32_t typeSize) {
+  return AXPY_ONE_REPEAT_BYTE_SIZE * (typeSize == sizeof(float)
+                                          ? AXPY_FLOAT_CALC_PROC
+                                          : AXPY_HALF_CALC_PROC);
+}
     ```
     编写完Tiling侧实现文件后，需要在[impl/adv_api/tiling/CMakeLists.txt](../impl/adv_api/tiling/CMakeLists.txt)中引入该文件。具体方式为：在`add_library(tiling_api STATIC ...)`语句中新增文件路径`${CMAKE_CURRENT_SOURCE_DIR}/math/axpy_tiling_impl.cpp`。
 ## 基于原有API进阶开发
 若开发者基于当前仓库已有的API进行进阶特性开发，设计API的过程与前述内容相同。开发代码时，考虑对原有函数实现重载或新增代码分支，根据进阶特性的算法功能，确定需要使用的基础API，并完成编码。例如，原有API对部分数据类型不支持，假设Axpy不支持目的操作数元素为float类型，那么就需要对`AxpyIntrinsicsImpl`函数进行重载，实现dstTensor数据类型为float的函数功能。
 ```c++
 template <>
-__aicore__ inline void AxpyIntrinsicsImpl(const LocalTensor<float>& dstTensor, const LocalTensor<half>& srcTensor,
-    const half& scalarValue, LocalTensor<float> stackBuffer, uint32_t stackSize)
-{
-    const UnaryRepeatParams unaryParams;
-    const BinaryRepeatParams binaryParams;
+__aicore__ inline void
+AxpyIntrinsicsImpl(const LocalTensor<float> &dstTensor,
+                   const LocalTensor<half> &srcTensor, const half &scalarValue,
+                   LocalTensor<float> stackBuffer, uint32_t stackSize) {
+  const UnaryRepeatParams unaryParams;
+  const BinaryRepeatParams binaryParams;
 
-    Cast<float, half, false>(stackBuffer, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
-        {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
-    PipeBarrier<PIPE_V>();
+  Cast<float, half, false>(
+      stackBuffer, srcTensor, RoundMode::CAST_NONE, MASK_PLACEHOLDER, 1,
+      {1, 1, DEFAULT_REPEAT_STRIDE, HALF_DEFAULT_REPEAT_STRIDE});
+  PipeBarrier<PIPE_V>();
 
-    Muls<float, false>(stackBuffer, stackBuffer, (float)scalarValue, MASK_PLACEHOLDER, 1, unaryParams);
-    PipeBarrier<PIPE_V>();
+  Muls<float, false>(stackBuffer, stackBuffer, (float)scalarValue,
+                     MASK_PLACEHOLDER, 1, unaryParams);
+  PipeBarrier<PIPE_V>();
 
-    Add<float, false>(dstTensor, stackBuffer, dstTensor, MASK_PLACEHOLDER, 1, binaryParams);
-    PipeBarrier<PIPE_V>();
+  Add<float, false>(dstTensor, stackBuffer, dstTensor, MASK_PLACEHOLDER, 1,
+                    binaryParams);
+  PipeBarrier<PIPE_V>();
 }
 ```
 
@@ -300,109 +329,111 @@ UT测试使用gTest作为测试框架，一般验证接口编译是否正常，�
 在UT目录[tests/api/adv_api/math](../tests/api/adv_api/math)下新增目录`axpy`、文件[test_operator_axpy.cpp](../tests/api/adv_api/math/axpy/test_operator_axpy.cpp)。UT实现主要包括如下三部分：
 1. 引入头文件
     ```c++
-    #include <gtest/gtest.h>
-    #include "kernel_operator.h"
+#include "kernel_operator.h"
+#include <gtest/gtest.h>
     ``` 
 2. 实现算子
     - 初始化变量。
         ```c++
-        TPipe tpipe;
-        TQue<TPosition::VECIN, 1> vecInQue;
-        TQue<TPosition::VECIN, 1> vecOutQue;
-        TQue<TPosition::VECIN, 1> vecTmpQue;
-        GlobalTensor<U> inputGlobal;
-        GlobalTensor<T> outputGlobal;
-        inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ U*>(srcGm), dataSize);
-        outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
-        tpipe.InitBuffer(vecInQue, 1, dataSize * sizeof(U));
-        tpipe.InitBuffer(vecOutQue, 1, dataSize * sizeof(T));
-        if (sizeof(U) == sizeof(float)) {
-            tpipe.InitBuffer(vecTmpQue, 1, dataSize * sizeof(float));
-        } else {
-            tpipe.InitBuffer(vecTmpQue, 1, dataSize * 4 * sizeof(half));
-        }
+TPipe tpipe;
+TQue<TPosition::VECIN, 1> vecInQue;
+TQue<TPosition::VECIN, 1> vecOutQue;
+TQue<TPosition::VECIN, 1> vecTmpQue;
+GlobalTensor<U> inputGlobal;
+GlobalTensor<T> outputGlobal;
+inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ U *>(srcGm), dataSize);
+outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T *>(dstGm), dataSize);
+tpipe.InitBuffer(vecInQue, 1, dataSize * sizeof(U));
+tpipe.InitBuffer(vecOutQue, 1, dataSize * sizeof(T));
+if (sizeof(U) == sizeof(float)) {
+  tpipe.InitBuffer(vecTmpQue, 1, dataSize * sizeof(float));
+} else {
+  tpipe.InitBuffer(vecTmpQue, 1, dataSize * 4 * sizeof(half));
+}
         ```
     - 数据从GlobalMemory拷贝到LocalMemory。
         ```c++
-        LocalTensor<U> inputLocal = vecInQue.AllocTensor<U>();
-        LocalTensor<T> outputLocal = vecOutQue.AllocTensor<T>();
-        LocalTensor<uint8_t> tmpLocal = vecTmpQue.AllocTensor<uint8_t>();
+LocalTensor<U> inputLocal = vecInQue.AllocTensor<U>();
+LocalTensor<T> outputLocal = vecOutQue.AllocTensor<T>();
+LocalTensor<uint8_t> tmpLocal = vecTmpQue.AllocTensor<uint8_t>();
 
-        SetVectorMask<uint8_t, MaskMode::NORMAL>(256);
-        DataCopy(inputLocal, inputGlobal, dataSize);
+SetVectorMask<uint8_t, MaskMode::NORMAL>(256);
+DataCopy(inputLocal, inputGlobal, dataSize);
         ```
     - 调用高阶API进行计算。
         ```c++
-        SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
-        SetVectorMask<uint8_t, MaskMode::NORMAL>(128);
-        WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
-        U scalar = 4;
+SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
+SetVectorMask<uint8_t, MaskMode::NORMAL>(128);
+WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
+U scalar = 4;
 
-        Axpy<T, U, false>(outputLocal, inputLocal, scalar, tmpLocal, dataSize);
+Axpy<T, U, false>(outputLocal, inputLocal, scalar, tmpLocal, dataSize);
         ```
     - 数据从LocalMemory拷贝到GlobalMemory。
         ```c++
-        SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
-        WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
+SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
+WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
 
-        DataCopy(outputGlobal, outputLocal, dataSize);
-        PipeBarrier<PIPE_ALL>();
+DataCopy(outputGlobal, outputLocal, dataSize);
+PipeBarrier<PIPE_ALL>();
         ```
     - 释放LocalMemory空间。
         ```c++
-        vecInQue.FreeTensor(inputLocal);
-        vecOutQue.FreeTensor(outputLocal);
-        vecTmpQue.FreeTensor(tmpLocal);
+vecInQue.FreeTensor(inputLocal);
+vecOutQue.FreeTensor(outputLocal);
+vecTmpQue.FreeTensor(tmpLocal);
         ```
 3. 编写测试代码
     - 定义入参的数据结构。
         ```c++
-        struct AxpyTestParams {
-        int32_t dataSize;
-        int32_t dataBitSize;
-        void (*calFunc)(uint8_t*, uint8_t*, int32_t);
-        };
+struct AxpyTestParams {
+  int32_t dataSize;
+  int32_t dataBitSize;
+  void (*calFunc)(uint8_t *, uint8_t *, int32_t);
+};
         ```
     - 编写测试类。
         ```c++
-        class AxpyTestsuite : public testing::Test, public testing::WithParamInterface<AxpyTestParams> {
-        protected:
-            void SetUp() {}
-            void TearDown() {}
-        };
+class AxpyTestsuite : public testing::Test,
+                      public testing::WithParamInterface<AxpyTestParams> {
+protected:
+  void SetUp() {}
+  void TearDown() {}
+};
         ``` 
     - 注入用例数据。
         ```c++
-        INSTANTIATE_TEST_CASE_P(TEST_AXPY, AxpyTestsuite,
-            ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>}, 
-                AxpyTestParams{256, 4, AxpyKernel<float, float>}));
+INSTANTIATE_TEST_CASE_P(
+    TEST_AXPY, AxpyTestsuite,
+    ::testing::Values(AxpyTestParams{256, 2, AxpyKernel<half, half>},
+                      AxpyTestParams{256, 4, AxpyKernel<float, float>}));
         ```
     - 编写`TEST_P`。
         ```c++
-        TEST_P(AxpyTestsuite, AxpyTestCase)
-        {
-            auto param = GetParam();
-            uint8_t srcGm[param.dataSize * param.dataBitSize] = {0};
-            uint8_t dstGm[param.dataSize * param.dataBitSize] = {0};
+TEST_P(AxpyTestsuite, AxpyTestCase) {
+  auto param = GetParam();
+  uint8_t srcGm[param.dataSize * param.dataBitSize] = {0};
+  uint8_t dstGm[param.dataSize * param.dataBitSize] = {0};
 
-            param.calFunc(srcGm, dstGm, param.dataSize);
-            for (int32_t i = 0; i < param.dataSize; i++) { EXPECT_EQ(dstGm[i], 0x00); }
-        }
+  param.calFunc(srcGm, dstGm, param.dataSize);
+  for (int32_t i = 0; i < param.dataSize; i++) {
+    EXPECT_EQ(dstGm[i], 0x00);
+  }
+}
         ```
 ###### Tiling侧
 
 Tiling接口的UT目前统一在[tests/api/adv_api/tiling/test_tiling.cpp](../tests/api/adv_api/tiling/test_tiling.cpp)文件中，在该文件中添加相应测试函数即可。
 ```c++
-TEST_F(TestTiling, TestAxpyTiling)
-{
-    uint32_t maxVal = 0;
-    uint32_t minVal = 0;
-    GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 0);
-    EXPECT_EQ(minVal, 0);
-    GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
-    EXPECT_EQ(maxVal, 256 * 4 * 2);
-    EXPECT_EQ(minVal, 256 * 4);
+TEST_F(TestTiling, TestAxpyTiling) {
+  uint32_t maxVal = 0;
+  uint32_t minVal = 0;
+  GetAxpyMaxMinTmpSize(ge::Shape({128}), 4, false, maxVal, minVal);
+  EXPECT_EQ(maxVal, 0);
+  EXPECT_EQ(minVal, 0);
+  GetAxpyMaxMinTmpSize(ge::Shape({256}), 2, false, maxVal, minVal);
+  EXPECT_EQ(maxVal, 256 * 4 * 2);
+  EXPECT_EQ(minVal, 256 * 4);
 }
 ```
 ##### 修改cmake文件
@@ -418,7 +449,7 @@ TEST_F(TestTiling, TestAxpyTiling)
 
   打开[tests/main_global.cpp](../tests/main_global.cpp)文件，在main函数中return前的最后一行添加下面的代码，利用gTest的过滤器根据单元测试的单元名字过滤测试用例。
     ```c++
-    ::testing::GTEST_FLAG(filter) = "*Axpy*";
+::testing::GTEST_FLAG(filter) = "*Axpy*";
     ```
   修改[build.sh](../build.sh)，将all修改为需要执行的UT target，以执行Kernel侧Ascend 910B1的UT为例，target即为ascendc_utest_ascend910B1_AIV。
   ```

@@ -162,15 +162,23 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 - 用户自定义模式
 
     ```cpp
-    template <typename T, typename U, GatherMaskMode mode = defaultGatherMaskMode>
-    __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<U>& src1Pattern, const bool reduceMode, const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
+template <typename T, typename U, GatherMaskMode mode = defaultGatherMaskMode>
+__aicore__ inline void
+GatherMask(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+           const LocalTensor<U> &src1Pattern, const bool reduceMode,
+           const uint32_t mask, const GatherMaskParams &gatherMaskParams,
+           uint64_t &rsvdCnt)
     ```
 
 - 内置固定模式
 
     ```cpp
-    template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
-    __aicore__ inline void GatherMask(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const uint8_t src1Pattern, const bool reduceMode, const uint32_t mask, const GatherMaskParams& gatherMaskParams, uint64_t& rsvdCnt)
+template <typename T, GatherMaskMode mode = defaultGatherMaskMode>
+__aicore__ inline void
+GatherMask(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+           const uint8_t src1Pattern, const bool reduceMode,
+           const uint32_t mask, const GatherMaskParams &gatherMaskParams,
+           uint64_t &rsvdCnt)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -239,38 +247,40 @@ repeatTimes值不生效，指令的迭代次数由源操作数和mask共同决�
 -   用户自定义Tensor示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景二。
 
     ```cpp
-    uint32_t mask = 70; // 每次迭代内参与计算的元素
-    uint64_t rsvdCnt = 0; // 保留下来的元素个数
+uint32_t mask = 70;   // 每次迭代内参与计算的元素
+uint64_t rsvdCnt = 0; // 保留下来的元素个数
 
-    // src0Local：源操作数
-    // src1Local：存放数据收集的掩码的Tensor
-    // dstLocal：目的操作数
-    // reduceMode = true;使用Counter模式
-    // {}中的参数为：
-    // src0BlockStride = 1;单次迭代内数据间隔1个DataBlock，即数据连续读取和写入
-    // repeatTimes = 2;      Counter模式时，仅在部分产品型号下会生效
-    // src0RepeatStride = 4;源操作数迭代间数据间隔4个DataBlock
-    // src1RepeatStride = 0; src1迭代间数据间隔0个DataBlock，即原位置读取
-    AscendC::GatherMask (dstLocal, src0Local, src1Local, true, mask, { 1, 2, 4, 0 }, rsvdCnt);
+// src0Local：源操作数
+// src1Local：存放数据收集的掩码的Tensor
+// dstLocal：目的操作数
+// reduceMode = true;使用Counter模式
+// {}中的参数为：
+// src0BlockStride = 1;单次迭代内数据间隔1个DataBlock，即数据连续读取和写入
+// repeatTimes = 2;      Counter模式时，仅在部分产品型号下会生效
+// src0RepeatStride = 4;源操作数迭代间数据间隔4个DataBlock
+// src1RepeatStride = 0; src1迭代间数据间隔0个DataBlock，即原位置读取
+AscendC::GatherMask(dstLocal, src0Local, src1Local, true, mask, {1, 2, 4, 0},
+                    rsvdCnt);
     ```
 
 - 内置固定模式示例，完整的调用样例可参考[Gather类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/gather)场景一。
 
     ```cpp
-    uint32_t mask = 0; // 每次迭代内参与计算的元素，normal模式下mask建议设置为0
-    uint64_t rsvdCnt = 0; // 用于保存筛选后保留下来的元素个数
-    uint8_t src1Pattern = 2; // 内置固定模式
+uint32_t mask = 0; // 每次迭代内参与计算的元素，normal模式下mask建议设置为0
+uint64_t rsvdCnt = 0;    // 用于保存筛选后保留下来的元素个数
+uint8_t src1Pattern = 2; // 内置固定模式
 
-    // src0Local：源操作数
-    // src1Pattern：内置固定模式取值
-    // src0Local：目的地址与源地址复用
-    // reduceMode = false;使用normal模式
-    // {}中的参数为：
-    // src0BlockStride = 1;单次迭代内数据间隔1个Block，即数据连续读取和写入
-    // repeatTimes = 4;重复迭代4次
-    // src0RepeatStride = 8;源操作数迭代数据间隔8个DataBlock
-    // src1RepeatStride = 0;重复一次，故设置为0
-    AscendC::GatherMask(src0Local, src0Local, src1Pattern, false, mask, { 1, 4, 8, 0 }, rsvdCnt);
+// src0Local：源操作数
+// src1Pattern：内置固定模式取值
+// src0Local：目的地址与源地址复用
+// reduceMode = false;使用normal模式
+// {}中的参数为：
+// src0BlockStride = 1;单次迭代内数据间隔1个Block，即数据连续读取和写入
+// repeatTimes = 4;重复迭代4次
+// src0RepeatStride = 8;源操作数迭代数据间隔8个DataBlock
+// src1RepeatStride = 0;重复一次，故设置为0
+AscendC::GatherMask(src0Local, src0Local, src1Pattern, false, mask,
+                    {1, 4, 8, 0}, rsvdCnt);
     ```
 
     结果示例如下：

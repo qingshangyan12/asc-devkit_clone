@@ -122,15 +122,17 @@ __aicore__ static inline void SetCtrlSpr(int64_t value)
 - 如下示例中开启非饱和模式，数据类型为half。
 
     ```cpp
-    AscendC::SetCtrlSpr<48, 48>(1);
+AscendC::SetCtrlSpr<48, 48>(1);
     ```
 
 - <a name="example2"></a>原子操作中，half类型配置全局非饱和模式示例。
 
     ```cpp
-    AscendC::SetCtrlSpr<6, 8>(2);
-    AscendC::SetAtomicAdd<half>();
-    AscendC::DataCacheCleanAndInvalid<half, AscendC::CacheLine::ENTIRE_DATA_CACHE, AscendC::DcciDst::CACHELINE_ATOMIC>(dstTensor);
-    AscendC::SetCtrlSpr<48, 48>(1);
-    ...
+AscendC::SetCtrlSpr<6, 8>(2);
+AscendC::SetAtomicAdd<half>();
+AscendC::DataCacheCleanAndInvalid<half, AscendC::CacheLine::ENTIRE_DATA_CACHE,
+                                  AscendC::DcciDst::CACHELINE_ATOMIC>(
+    dstTensor);
+AscendC::SetCtrlSpr<48, 48>(1);
+...
     ```

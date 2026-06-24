@@ -32,7 +32,7 @@ Note: `ReduceRepeat` and `ReduceDataBlock` are APIs renamed in CANN 9.1.0. For C
   The ReduceCustom operator accumulates data elements in contiguous memory and returns the accumulation result. The corresponding mathematical expression is:
 
   ```cpp
-  z = sum(x)
+z = sum(x)
   ```
 
 - Operator specifications:  

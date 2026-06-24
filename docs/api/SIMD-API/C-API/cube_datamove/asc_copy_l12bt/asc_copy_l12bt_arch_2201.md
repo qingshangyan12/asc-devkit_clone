@@ -15,17 +15,22 @@
 
 - 前n个数据搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint32_t size)
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void *src,
+                                      uint32_t size)
     ```
 
 - 高维切分搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void* src, uint16_t conv_control, uint16_t n_burst, uint16_t len_burst, uint16_t source_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12bt(uint64_t dst, __cbuf__ void *src,
+                                      uint16_t conv_control, uint16_t n_burst,
+                                      uint16_t len_burst, uint16_t source_gap,
+                                      uint16_t dst_gap)
     ```
 
 - 同步搬运
     ```cpp
-    __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void* src, uint32_t size)
+__aicore__ inline void asc_copy_l12bt_sync(uint64_t dst, __cbuf__ void *src,
+                                           uint32_t size)
     ```
 
 ## 参数说明
@@ -64,6 +69,8 @@ constexpr uint16_t dst_gap = 1;
 constexpr uint16_t conv_control = 0;
 __cbuf__ half src[256];
 __biasbuf__ half dst[256];
-uint64_t dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
-asc_copy_l12bt(dst_addr, src, conv_control, n_burst, len_burst, source_gap, dst_gap);
+uint64_t dst_addr =
+    static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
+asc_copy_l12bt(dst_addr, src, conv_control, n_burst, len_burst, source_gap,
+               dst_gap);
 ```

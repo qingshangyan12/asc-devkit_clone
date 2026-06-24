@@ -15,8 +15,12 @@
 ## 函数原型
 
   ```cpp
-  __simd_callee__ inline void asc_mull(vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-  __simd_callee__ inline void asc_mull(vector_uint32_t& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_mull(vector_int32_t &dst0, vector_int32_t &dst1,
+                                     vector_int32_t src0, vector_int32_t src1,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_mull(vector_uint32_t &dst0, vector_uint32_t &dst1,
+                         vector_uint32_t src0, vector_uint32_t src1,
+                         vector_bool mask)
   ```
 
 ## 参数说明

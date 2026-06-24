@@ -38,7 +38,7 @@
 - 输出数据类型：uint8_t
 - 实现：
   ```cpp
-  AscendC::Compare(dstLocal, src0Local, src1Local, cmpMode, srcDataSize);
+AscendC::Compare(dstLocal, src0Local, src1Local, cmpMode, srcDataSize);
   ```
 - 参数：cmpMode=AscendC::CMPMODE::LT，srcDataSize=256
 
@@ -50,9 +50,12 @@
 - 输出数据类型：uint8_t
 - 实现：
   ```cpp
-    AscendC::Compare(src0Local, src1Local, cmpMode, mask, repeatParams);  // Compare接口无repeat输入，repeat默认为1，即支持一条指令计算256字节的数据
-    AscendC::PipeBarrier<PIPE_V>();
-    AscendC::GetCmpMask(dstLocal);  // 通过GetCmpMask接口获取寄存器中保存的数据，dstLocal要求不少于128字节，但实际结果数据只占了8字节
+AscendC::Compare(
+    src0Local, src1Local, cmpMode, mask,
+    repeatParams); // Compare接口无repeat输入，repeat默认为1，即支持一条指令计算256字节的数据
+AscendC::PipeBarrier<PIPE_V>();
+AscendC::GetCmpMask(
+    dstLocal); // 通过GetCmpMask接口获取寄存器中保存的数据，dstLocal要求不少于128字节，但实际结果数据只占了8字节
   ```
 - 参数：cmpMode=AscendC::CMPMODE::LT；repeatParams为默认值，控制操作数地址步长
 
@@ -65,7 +68,7 @@
 - 数据类型：float
 - 实现：
     ```cpp
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode, srcDataSize);
+AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode, srcDataSize);
     ```
 - 参数：src1Scalar=src1Local.GetValue(0), cmpMode=AscendC::CMPMODE::LT，srcDataSize=256
 
@@ -77,8 +80,10 @@
 - 输出数据类型：uint8_t
 - 实现：
     ```cpp
-    AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode, srcDataSize);  // 标量在后
-    AscendC::Compares(dstLocal, src1Scalar, src0Local, cmpMode, srcDataSize);  // 标量在前
+AscendC::Compares(dstLocal, src0Local, src1Scalar, cmpMode,
+                  srcDataSize); // 标量在后
+AscendC::Compares(dstLocal, src1Scalar, src0Local, cmpMode,
+                  srcDataSize); // 标量在前
     ```
 - 参数：src1Scalar=src1Local[0], cmpMode=AscendC::CMPMODE::LT，srcDataSize=256
 

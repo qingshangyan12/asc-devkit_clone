@@ -56,7 +56,9 @@ InitDetermineComputeWorkspace是基于核间顺序执行的确定性计算的初
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace)
+__aicore__ inline void
+InitDetermineComputeWorkspace(GlobalTensor<int32_t> &gmWorkspace,
+                              LocalTensor<int32_t> &ubWorkspace)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -81,25 +83,25 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 ## 调用示例<a name="section177231425115410"></a>
 
 ```cpp
-    // 初始化GM共享内存的同步状态，必须在核函数开始时首先调用。
-    AscendC::InitDetermineComputeWorkspace(gmWorkspace, ubWorkspace);
+// 初始化GM共享内存的同步状态，必须在核函数开始时首先调用。
+AscendC::InitDetermineComputeWorkspace(gmWorkspace, ubWorkspace);
 
-    for(int64_t i = 0; i < tileNum; i++) {
-        AscendC::LocalTensor<T> srcLocal = que.AllocTensor<T>();
-        AscendC::DataCopy(srcLocal, srcGlobal[i * tileCount], tileCount);
+for (int64_t i = 0; i < tileNum; i++) {
+  AscendC::LocalTensor<T> srcLocal = que.AllocTensor<T>();
+  AscendC::DataCopy(srcLocal, srcGlobal[i * tileCount], tileCount);
 
-        // 等待前序核（blockIdx-1）完成操作。
-        AscendC::WaitPreBlock(gmWorkspace, ubWorkspace);
-        
-        // 开启原子累加。
-        AscendC::SetAtomicAdd<T>();
-        AscendC::DataCopy(dstGlobal[i * tileCount], srcLocal, tileCount);
-        AscendC::DisableDmaAtomic();
-        
-        // 通知后序核（blockIdx+1）当前核已完成。
-        AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
-        que.FreeTensor(srcLocal);
-    }
+  // 等待前序核（blockIdx-1）完成操作。
+  AscendC::WaitPreBlock(gmWorkspace, ubWorkspace);
+
+  // 开启原子累加。
+  AscendC::SetAtomicAdd<T>();
+  AscendC::DataCopy(dstGlobal[i * tileCount], srcLocal, tileCount);
+  AscendC::DisableDmaAtomic();
+
+  // 通知后序核（blockIdx+1）当前核已完成。
+  AscendC::NotifyNextBlock(gmWorkspace, ubWorkspace);
+  que.FreeTensor(srcLocal);
+}
 ```
 
 完整样例请参考[sequential\_block\_sync示例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/05_sync_control/sequential_block_sync)。

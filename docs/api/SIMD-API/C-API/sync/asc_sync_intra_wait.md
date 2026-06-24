@@ -13,8 +13,9 @@ block内同步指令，与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配�
 ## 函数原型
 
     ```cpp
-    __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint8_t sync_id)
-    __aicore__ inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
+__aicore__ inline void asc_sync_intra_wait(pipe_t pipe,
+                                           uint8_t sync_id) __aicore__
+    inline void asc_sync_intra_wait(pipe_t pipe, uint64_t sync_id)
     ```
 
 ## 参数说明
@@ -46,8 +47,8 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-//设置同步指令事件标号为1
+// 设置同步指令事件标号为1
 uint64_t sync_id = 1;
 asc_sync_intra_arrive(PIPE_S, sync_id);
-asc_sync_intra_wait(PIPE_S, sync_id);  
+asc_sync_intra_wait(PIPE_S, sync_id);
 ```

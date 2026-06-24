@@ -24,7 +24,9 @@ Load3DBitMode用于完成image to column操作，将多维feature map转为二�
 
 ```cpp
 template <TPosition Dst, TPosition Src, typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const Load3DBitModeParam &loadDataParams)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -68,7 +70,8 @@ Load3DBitModeParam类可以直接使用LoadData3DParamsV2结构体类型对象�
 
 ```cpp
 template <typename T>
-__aicore__ inline Load3DBitModeParam(const LoadData3DParamsV2<T> &loadData3DParams_);
+__aicore__ inline Load3DBitModeParam(
+    const LoadData3DParamsV2<T> &loadData3DParams_);
 ```
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
@@ -125,13 +128,20 @@ uint8_t strideH = 1, strideW = 1;
 uint8_t padList[4] = {padLeft, padRight, padTop, padBottom};
 
 // 使用LoadData3DParamsV2结构体对象初始化Load3DBitModeParam
-// 构造参数顺序：padList, l1H, l1W, channelSize, kExtension, mExtension, kStartPt, mStartPt,
-//             strideW, strideH, filterW, filterH, dilationFilterW, dilationFilterH,
-//             enTranspose, enSmallK, padValue, filterSizeW, filterSizeH, fMatrixCtrl
+// 构造参数顺序：padList, l1H, l1W, channelSize, kExtension, mExtension,
+// kStartPt, mStartPt,
+//             strideW, strideH, filterW, filterH, dilationFilterW,
+//             dilationFilterH, enTranspose, enSmallK, padValue, filterSizeW,
+//             filterSizeH, fMatrixCtrl
 AscendC::LoadData3DParamsV2<half> param = {
-    padList, H, W, C0, C0, static_cast<uint16_t>(H * W), 0, 0,
-    strideW, strideH, Kw, Kh, dilationW, dilationH,
-    false, false, (half)0, false, false, false};
+    padList,   H,         W,
+    C0,        C0,        static_cast<uint16_t>(H *W),
+    0,         0,         strideW,
+    strideH,   Kw,        Kh,
+    dilationW, dilationH, false,
+    false,     (half)0,   false,
+    false,     false};
 AscendC::Load3DBitModeParam paramBitMode(param);
-AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(featureMapA2, featureMapA1, paramBitMode);
+AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(
+    featureMapA2, featureMapA1, paramBitMode);
 ```

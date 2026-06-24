@@ -21,10 +21,15 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_int642int32(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
-__simd_callee__ inline void asc_int642int32_sat(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
-__simd_callee__ inline void asc_int642int32_v2(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
-__simd_callee__ inline void asc_int642int32_sat_v2(vector_int32_t& dst, vector_int64_t src, vector_bool mask)
+__simd_callee__ inline void asc_int642int32(vector_int32_t &dst,
+                                            vector_int64_t src,
+                                            vector_bool mask) __simd_callee__
+    inline void asc_int642int32_sat(vector_int32_t &dst, vector_int64_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_int642int32_v2(vector_int32_t &dst, vector_int64_t src,
+                                   vector_bool mask) __simd_callee__
+    inline void asc_int642int32_sat_v2(vector_int32_t &dst, vector_int64_t src,
+                                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -55,8 +60,16 @@ PIPE_V
 vector_int32_t dst;
 vector_int64_t src;
 vector_bool mask;
-asc_int642int32(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
-asc_int642int32_sat(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
-asc_int642int32_v2(dst, src, mask);    // 不饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
-asc_int642int32_sat_v2(dst, src, mask);    // 饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
+asc_int642int32(
+    dst, src,
+    mask); // 不饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
+asc_int642int32_sat(
+    dst, src,
+    mask); // 饱和模式，将src转换成vector_int32_t类型并写入dst的上半部分
+asc_int642int32_v2(
+    dst, src,
+    mask); // 不饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
+asc_int642int32_sat_v2(
+    dst, src,
+    mask); // 饱和模式，将src转换成vector_int32_t类型并写入dst的下半部分
 ```

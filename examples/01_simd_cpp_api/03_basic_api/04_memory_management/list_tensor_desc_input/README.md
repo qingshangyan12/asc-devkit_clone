@@ -47,32 +47,34 @@
 
     动态输入特性是指，核函数的入参采用ListTensorDesc的结构存储输入数据信息。构造ListTensorDesc数据结构，示例如下。
     ```cpp
-    constexpr uint32_t SHAPE_DIM = 2;
-    struct TensorDesc {
-      uint32_t dim{SHAPE_DIM};
-      uint32_t index;
-      uint64_t shape[SHAPE_DIM] = {8, 2048};
-    };
+constexpr uint32_t SHAPE_DIM = 2;
+struct TensorDesc {
+  uint32_t dim{SHAPE_DIM};
+  uint32_t index;
+  uint64_t shape[SHAPE_DIM] = {8, 2048};
+};
 
-    constexpr uint32_t TENSOR_DESC_NUM = 2;
-    struct ListTensorDesc {
-      uint64_t ptrOffset;
-      TensorDesc tensorDesc[TENSOR_DESC_NUM];
-      uintptr_t dataPtr[TENSOR_DESC_NUM];
-    } inputDesc;
+constexpr uint32_t TENSOR_DESC_NUM = 2;
+struct ListTensorDesc {
+  uint64_t ptrOffset;
+  TensorDesc tensorDesc[TENSOR_DESC_NUM];
+  uintptr_t dataPtr[TENSOR_DESC_NUM];
+} inputDesc;
     ```
     将申请分配的Tensor入参组合成ListTensorDesc的数据结构，示例如下。
     ```cpp
-    inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
-                {xDesc, yDesc},
-                {(uintptr_t)xDevice, (uintptr_t)yDevice}};
+inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
+             {xDesc, yDesc},
+             {(uintptr_t)xDevice, (uintptr_t)yDevice}};
     ``` 
     按照传入的数据格式，解析出对应的各入参，示例如下。
 
     ```cpp
-    AscendC::ListTensorDesc keyListTensorDescInit((__gm__ void*)srcList);
-    __gm__ uint8_t* x = (__gm__ uint8_t*)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(0);
-    __gm__ uint8_t* y = (__gm__ uint8_t*)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(1);
+AscendC::ListTensorDesc keyListTensorDescInit((__gm__ void *)srcList);
+__gm__ uint8_t *x =
+    (__gm__ uint8_t *)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(0);
+__gm__ uint8_t *y =
+    (__gm__ uint8_t *)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(1);
     ```
 
   - 调用实现

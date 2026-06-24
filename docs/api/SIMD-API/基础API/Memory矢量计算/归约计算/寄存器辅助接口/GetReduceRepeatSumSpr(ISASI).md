@@ -21,8 +21,7 @@
 ## 函数原型
 
 ```cpp
-template <typename T>
-__aicore__ inline T GetReduceRepeatSumSpr()
+template <typename T> __aicore__ inline T GetReduceRepeatSumSpr()
 ```
 
 ## 参数说明

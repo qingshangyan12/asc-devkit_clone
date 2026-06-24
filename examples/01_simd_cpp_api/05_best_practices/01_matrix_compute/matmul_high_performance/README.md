@@ -217,10 +217,12 @@ SetL1(tilingData);
 
 **关键代码**：
 ```cpp
-AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
+    CFG_MDL>
     matmulObj;
 // MDL模板自动优化，启用大包搬运功能
 ```
@@ -260,12 +262,14 @@ AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATyp
 
 **关键代码**：
 ```cpp
-AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL>
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
+    CFG_MDL>
     matmulObj;
-tilingData.set_depthA1(16);  // 增大depthA1，增加L1缓存中A矩阵的块数
+tilingData.set_depthA1(16); // 增大depthA1，增加L1缓存中A矩阵的块数
 tilingData.set_stepKa(8);
 ```
 
@@ -305,12 +309,12 @@ tilingData.set_stepKa(8);
 **关键代码**：
 ```cpp
 for (int i = 0; i < 2; i++) {
-    matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
-    matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
-    if (shapes.isBias) {
-        matmulObj.SetBias(biasGlobal);
-    }
-    matmulObj.IterateAll(cGlobal[offsetC + i * (M >> 1) * N]);
+  matmulObj.SetTensorA(aGlobal[offsetA + i * (M >> 1) * K], IS_TRANS_A);
+  matmulObj.SetTensorB(bGlobal[offsetB], IS_TRANS_B);
+  if (shapes.isBias) {
+    matmulObj.SetBias(biasGlobal);
+  }
+  matmulObj.IterateAll(cGlobal[offsetC + i * (M >> 1) * N]);
 }
 ```
 
@@ -358,9 +362,11 @@ L2Cache利用：
 
 **关键代码**：
 ```cpp
-constexpr MatmulShapeParams shapeParams = {SINGLE_M_L2CACHE, SINGLE_N, SINGLE_K, BASE_M, BASE_N, BASE_K};
+constexpr MatmulShapeParams shapeParams = {SINGLE_M_L2CACHE, SINGLE_N, SINGLE_K,
+                                           BASE_M,           BASE_N,   BASE_K};
 
-constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, true, true>();
+constexpr static auto CONSTANT_CFG =
+    GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, true, true>();
 AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
 // CONSTANT_CFG在编译期计算，减少运行时Scalar计算
 ```

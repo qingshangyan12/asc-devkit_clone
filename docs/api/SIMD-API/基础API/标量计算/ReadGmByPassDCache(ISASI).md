@@ -24,8 +24,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline T ReadGmByPassDCache(__gm__ T* addr)
+template <typename T> __aicore__ inline T ReadGmByPassDCache(__gm__ T *addr)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -63,8 +62,8 @@ int32_t value = AscendC::ReadGmByPassDCache<int32_t>(addr);
 // 通过Scalar读写相同GM时，需要让读操作，空出总线，避免长时占用。
 int target = -1;
 while (target != 0) {
-     target = ReadGmByPassDCache(addr);
-     Nop<800>();
+  target = ReadGmByPassDCache(addr);
+  Nop<800>();
 }
 ```
 

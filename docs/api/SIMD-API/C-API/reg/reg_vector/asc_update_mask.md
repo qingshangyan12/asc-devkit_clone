@@ -10,15 +10,16 @@
 
 根据value大小生成对应的掩码寄存器中的值。掩码寄存器的元素有效范围从0到VL_T（位宽为Vector Length的对应数据类型的元素个数）。执行完该函数后，value会减去VL_T。算法逻辑表示如下：
   ```cpp
-  value = (value < VL_T) ? 0 : (value - VL_T);
+value = (value < VL_T) ? 0 : (value - VL_T);
   ```
 
 ## 函数原型
 
   ```cpp
-  __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value)
-  __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value)
-  __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value)
+__simd_callee__ inline vector_bool
+asc_update_mask_b8(uint32_t &value) __simd_callee__ inline vector_bool
+    asc_update_mask_b16(uint32_t &value) __simd_callee__ inline vector_bool
+    asc_update_mask_b32(uint32_t &value)
   ```
 
 ## 参数说明

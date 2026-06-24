@@ -41,5 +41,6 @@ __aicore__ inline void SetHF32Mode(HF32Mode mode)
 ## 调用示例
 
 ```cpp
-AscendC::SetHF32Mode(HF32Mode::ENABLE); // 控制mmad计算时是否使用HF32精度进行计算。
+AscendC::SetHF32Mode(
+    HF32Mode::ENABLE); // 控制mmad计算时是否使用HF32精度进行计算。
 ```

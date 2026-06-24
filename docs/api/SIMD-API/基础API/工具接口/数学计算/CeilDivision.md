@@ -46,21 +46,21 @@ __aicore__ constexpr inline int32_t CeilDivision(int32_t num1, int32_t num2)
 
 ```cpp
 template <typename T>
-__aicore__ inline void AddCustomImpl(__local_mem__ T *dst, __local_mem__ T *src0, __local_mem__ T *src1,
-    uint32_t count)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-    uint16_t repeatTime = AscendC::CeilDivision(count, oneRepeatSize);
-    for (uint16_t i = 0; i < repeatTime; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(calCount);
-        AscendC::Reg::LoadAlign(srcReg0, src0 + i * oneRepeatSize );
-        AscendC::Reg::LoadAlign(srcReg1, src1 + i * oneRepeatSize );
-        AscendC::Reg::Add(dstReg, srcReg0, srcReg1, mask);
-        AscendC::Reg::StoreAlign(dst + i * repeatElm, reg2, mask);
-    }
+__aicore__ inline void AddCustomImpl(__local_mem__ T *dst,
+                                     __local_mem__ T *src0,
+                                     __local_mem__ T *src1, uint32_t count) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
+  uint16_t repeatTime = AscendC::CeilDivision(count, oneRepeatSize);
+  for (uint16_t i = 0; i < repeatTime; ++i) {
+    mask = AscendC::Reg::UpdateMask<T>(calCount);
+    AscendC::Reg::LoadAlign(srcReg0, src0 + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1 + i * oneRepeatSize);
+    AscendC::Reg::Add(dstReg, srcReg0, srcReg1, mask);
+    AscendC::Reg::StoreAlign(dst + i * repeatElm, reg2, mask);
+  }
 }
 ```

@@ -67,16 +67,18 @@ An example that calls the Matmul high-level API to enable the IBShare feature, r
     - Create the Matmul object:  
         Configure the A and B matrix IBShare parameters as true or false based on the SCENARIO_NUM build option in CMakeLists.
         ```cpp
-        #if SCENARIO_NUM == 1
-        constexpr bool isABshare = true;
-        #else
-        constexpr bool isABshare = false;
-        #endif
+#if SCENARIO_NUM == 1
+constexpr bool isABshare = true;
+#else
+constexpr bool isABshare = false;
+#endif
 
-        Matmul<
-            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+Matmul<MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false,
+                  LayoutMode::NONE, isABshare>,
+       MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false,
+                  LayoutMode::NONE, isABshare>,
+       MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>>
+    matmulObj;
         ```
 
 

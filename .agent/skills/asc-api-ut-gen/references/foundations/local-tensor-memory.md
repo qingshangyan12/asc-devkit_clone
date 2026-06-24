@@ -59,7 +59,7 @@ pipe.InitBuffer(que, addr0, addr1, addr2);
 ```cpp
 // TBufPool 分配
 // bufIDSize 默认上限为 4，最大为 16
-TBufPool<TPosition::VECIN, 8> bufPool;  // 最多 8 个 Buffer
+TBufPool<TPosition::VECIN, 8> bufPool; // 最多 8 个 Buffer
 bufPool.InitBuffer(que, num, len);
 bufPool.InitBuffer(buf, len);
 ```
@@ -75,9 +75,9 @@ bufPool.InitBuffer(buf, len);
 LocalTensor<T> tensor = que.AllocTensor<T>();
 
 // 使用后释放
-que.EnQue(tensor);  // 先入队
-que.DeQue<T>();     // 再出队使用
-que.FreeTensor(tensor);  // 最后释放
+que.EnQue(tensor);      // 先入队
+que.DeQue<T>();         // 再出队使用
+que.FreeTensor(tensor); // 最后释放
 ```
 
 ### 3.2 从 TBuf 获取
@@ -127,10 +127,10 @@ pipe.InitBuffer(que, 2, len);
 // InitBuffer 申请的内存会在 TPipe 对象销毁时自动释放
 // 无需手动释放
 {
-    TPipe pipe;
-    pipe.InitBuffer(que, num, len);
-    // ... 使用 que
-}  // pipe 析构时自动释放内存
+  TPipe pipe;
+  pipe.InitBuffer(que, num, len);
+  // ... 使用 que
+} // pipe 析构时自动释放内存
 ```
 
 ### 5.2 重新分配
@@ -168,46 +168,45 @@ pipe.InitBuffer(que, newNum, newLen);
 ### 7.1 TmpBuffer 申请示例
 
 ```cpp
-template <typename T>
-class KernelAdd {
+template <typename T> class KernelAdd {
 public:
-    __aicore__ KernelAdd() {}
-    __aicore__ void Process(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t dataSize) {
-        // 初始化内存管理
-        pipe.InitBuffer(inQueueX, 1, dataSize * sizeof(T));
-        pipe.InitBuffer(inQueueY, 1, dataSize * sizeof(T));
-        pipe.InitBuffer(outQueue, 1, dataSize * sizeof(T));
+  __aicore__ KernelAdd() {}
+  __aicore__ void Process(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t dataSize) {
+    // 初始化内存管理
+    pipe.InitBuffer(inQueueX, 1, dataSize * sizeof(T));
+    pipe.InitBuffer(inQueueY, 1, dataSize * sizeof(T));
+    pipe.InitBuffer(outQueue, 1, dataSize * sizeof(T));
 
-        // 获取 Global Tensor
-        GlobalTensor<T> gmX = GM_ADDR_TO_TENSOR(x, T);
-        GlobalTensor<T> gmY = GM_ADDR_TO_TENSOR(y, T);
-        GlobalTensor<T> gmZ = GM_ADDR_TO_TENSOR(z, T);
+    // 获取 Global Tensor
+    GlobalTensor<T> gmX = GM_ADDR_TO_TENSOR(x, T);
+    GlobalTensor<T> gmY = GM_ADDR_TO_TENSOR(y, T);
+    GlobalTensor<T> gmZ = GM_ADDR_TO_TENSOR(z, T);
 
-        // 分配 Local Tensor
-        LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
-        LocalTensor<T> yLocal = inQueueY.AllocTensor<T>();
-        LocalTensor<T> zLocal = outQueue.AllocTensor<T>();
+    // 分配 Local Tensor
+    LocalTensor<T> xLocal = inQueueX.AllocTensor<T>();
+    LocalTensor<T> yLocal = inQueueY.AllocTensor<T>();
+    LocalTensor<T> zLocal = outQueue.AllocTensor<T>();
 
-        // 拷入数据
-        DataCopy(xLocal, gmX, dataSize);
-        DataCopy(yLocal, gmY, dataSize);
+    // 拷入数据
+    DataCopy(xLocal, gmX, dataSize);
+    DataCopy(yLocal, gmY, dataSize);
 
-        // 计算
-        Add(zLocal, xLocal, yLocal, dataSize);
+    // 计算
+    Add(zLocal, xLocal, yLocal, dataSize);
 
-        // 拷出数据
-        DataCopy(gmZ, zLocal, dataSize);
+    // 拷出数据
+    DataCopy(gmZ, zLocal, dataSize);
 
-        // 释放
-        inQueueX.FreeTensor(xLocal);
-        inQueueY.FreeTensor(yLocal);
-        outQueue.FreeTensor(zLocal);
-    }
+    // 释放
+    inQueueX.FreeTensor(xLocal);
+    inQueueY.FreeTensor(yLocal);
+    outQueue.FreeTensor(zLocal);
+  }
 
 private:
-    TPipe pipe;
-    TQue<TPosition::VECIN, 1> inQueueX, inQueueY;
-    TQue<TPosition::VECOUT, 1> outQueue;
+  TPipe pipe;
+  TQue<TPosition::VECIN, 1> inQueueX, inQueueY;
+  TQue<TPosition::VECOUT, 1> outQueue;
 };
 ```
 
@@ -216,31 +215,31 @@ private:
 ```cpp
 template <typename T>
 __aicore__ void ProcessWithTmpBuffer(GM_ADDR x, GM_ADDR y, uint32_t dataSize) {
-    TPipe pipe;
+  TPipe pipe;
 
-    // 主数据队列
-    TQue<TPosition::VECIN, 1> inQueue;
-    TQue<TPosition::VECOUT, 1> outQueue;
+  // 主数据队列
+  TQue<TPosition::VECIN, 1> inQueue;
+  TQue<TPosition::VECOUT, 1> outQueue;
 
-    // 临时缓冲区
-    TBuf<TPosition::VECCALC> tmpBuf;
+  // 临时缓冲区
+  TBuf<TPosition::VECCALC> tmpBuf;
 
-    // 根据数据类型确定临时空间大小
-    uint32_t tmpSize;
-    if constexpr (sizeof(T) == sizeof(half)) {
-        tmpSize = dataSize * 8;  // half 类型需要更大临时空间
-    } else {
-        tmpSize = dataSize * 4;  // float 类型
-    }
+  // 根据数据类型确定临时空间大小
+  uint32_t tmpSize;
+  if constexpr (sizeof(T) == sizeof(half)) {
+    tmpSize = dataSize * 8; // half 类型需要更大临时空间
+  } else {
+    tmpSize = dataSize * 4; // float 类型
+  }
 
-    pipe.InitBuffer(inQueue, 1, dataSize * sizeof(T));
-    pipe.InitBuffer(outQueue, 1, dataSize * sizeof(T));
-    pipe.InitBuffer(tmpBuf, tmpSize);
+  pipe.InitBuffer(inQueue, 1, dataSize * sizeof(T));
+  pipe.InitBuffer(outQueue, 1, dataSize * sizeof(T));
+  pipe.InitBuffer(tmpBuf, tmpSize);
 
-    // 获取临时 LocalTensor
-    LocalTensor<uint8_t> tmpLocal = tmpBuf.Get<uint8_t>();
+  // 获取临时 LocalTensor
+  LocalTensor<uint8_t> tmpLocal = tmpBuf.Get<uint8_t>();
 
-    // 使用 tmpLocal 进行计算...
+  // 使用 tmpLocal 进行计算...
 }
 ```
 

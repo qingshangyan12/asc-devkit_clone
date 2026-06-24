@@ -36,7 +36,8 @@
 
 ```cpp
 template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename U>
-__simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskReg& mask)
+__simd_callee__ inline void Compare(MaskReg &dst, U &srcReg0, U &srcReg1,
+                                    MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -87,21 +88,23 @@ __simd_callee__ inline void Compare(MaskReg& dst, U& srcReg0, U& srcReg1, MaskRe
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void CompareVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::MaskReg dstMask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);        
-        AscendC::Reg::Compare<T, AscendC::CMPMODE::EQ>(dstMask, srcReg0, srcReg1, mask);
-        AscendC::Reg::Select(dstReg, srcReg0, srcReg1, dstMask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+template <typename T>
+__simd_vf__ inline void
+CompareVF(__ubuf__ T *dstAddr, __ubuf__ T *src0Addr, __ubuf__ T *src1Addr,
+          uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::MaskReg dstMask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+    AscendC::Reg::Compare<T, AscendC::CMPMODE::EQ>(dstMask, srcReg0, srcReg1,
+                                                   mask);
+    AscendC::Reg::Select(dstReg, srcReg0, srcReg1, dstMask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```

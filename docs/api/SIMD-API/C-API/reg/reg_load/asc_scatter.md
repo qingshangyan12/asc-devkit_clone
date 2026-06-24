@@ -13,15 +13,32 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_scatter(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_half& dst, __ubuf__ half* src, vector_uint16_t index, vector_bool mask)
-__simd_callee__ inline void asc_scatter(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
+__simd_callee__ inline void
+asc_scatter(vector_int8_t &dst, __ubuf__ int8_t *src, vector_uint16_t index,
+            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_uint8_t &dst, __ubuf__ uint8_t *src,
+                            vector_uint16_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_int16_t &dst, __ubuf__ int16_t *src,
+                            vector_uint16_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_uint16_t &dst, __ubuf__ uint16_t *src,
+                            vector_uint16_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_int32_t &dst, __ubuf__ int32_t *src,
+                            vector_uint32_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_uint32_t &dst, __ubuf__ uint32_t *src,
+                            vector_uint32_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_bfloat16_t &dst, __ubuf__ bfloat16_t *src,
+                            vector_uint16_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_half &dst, __ubuf__ half *src,
+                            vector_uint16_t index,
+                            vector_bool mask) __simd_callee__
+    inline void asc_scatter(vector_float &dst, __ubuf__ float *src,
+                            vector_uint32_t index, vector_bool mask)
 ```
 
 ## 参数说明
@@ -51,7 +68,7 @@ PIPE_V
 
 ```cpp
 vector_half dst;
-__ubuf__ half* src = (__ubuf__ half*)asc_get_phy_buf_addr(0);
+__ubuf__ half *src = (__ubuf__ half *)asc_get_phy_buf_addr(0);
 vector_uint16_t index;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
 asc_scatter(dst, src, index, mask);

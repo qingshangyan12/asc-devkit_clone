@@ -80,10 +80,10 @@ The baseline program implements addition of two sets of `half` type input data, 
 **Key Code**:
 ```cpp
 for (uint32_t i = 0; i < curLen; i++) {
-      float xVal = (float)xLocal.GetValue(i);
-      float yVal = (float)yLocal.GetValue(i);
-      zLocal.SetValue(i, (half)(xVal + yVal));
-    }
+  float xVal = (float)xLocal.GetValue(i);
+  float yVal = (float)yLocal.GetValue(i);
+  zLocal.SetValue(i, (half)(xVal + yVal));
+}
 ```
 
 **Example Configuration**:
@@ -181,11 +181,11 @@ Enable multi-core parallel computation, splitting the 8192×8192 matrix across m
 uint32_t baseCoreM = totalM / splitM;
 uint32_t remainderM = totalM % splitM;
 if (blockIdxM < remainderM) {
-    actualCoreM = baseCoreM + 1;  // Evenly distribute remainder
-    startM = blockIdxM * actualCoreM;
+  actualCoreM = baseCoreM + 1; // Evenly distribute remainder
+  startM = blockIdxM * actualCoreM;
 } else {
-    actualCoreM = baseCoreM;
-    startM = remainderM * (baseCoreM + 1) + (blockIdxM - remainderM) * baseCoreM;
+  actualCoreM = baseCoreM;
+  startM = remainderM * (baseCoreM + 1) + (blockIdxM - remainderM) * baseCoreM;
 }
 ```
 
@@ -275,17 +275,22 @@ Adopt Double Buffer technology to implement pipeline parallelism of data transfe
 // Ping-Pong double buffer addresses
 static constexpr uint32_t xAddrPing = 0;
 static constexpr uint32_t yAddrPing = MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t zAddrPing = yAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t xAddrPong = zAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t yAddrPong = xAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPing =
+    yAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t xAddrPong =
+    zAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPong =
+    xAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPong =
+    yAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
 
 // Double buffer pipeline: Alternate between two event IDs and two buffer groups
 for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-    int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-    AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
-    // ... Data transfer and computation, using corresponding eventID for synchronization
-    AscendC::Add(zLocal, xLocal, yLocal, curLen);
+  int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
+  AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
+  // ... Data transfer and computation, using corresponding eventID for
+  // synchronization
+  AscendC::Add(zLocal, xLocal, yLocal, curLen);
 }
 ```
 
@@ -358,8 +363,8 @@ Building on double buffer, for data that only needs to be loaded once, L2 Cache 
 
 **Key Code**:
 ```cpp
-  xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
-  yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 ```
 
 **Example Configuration**:
@@ -417,11 +422,14 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 
 // Optimized address layout (Bank Conflict avoidance)
 static constexpr uint32_t xAddrPingBC = 0;
-static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPingBC =
+    BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t xAddrPongBC = MAX_DATA_COPY_LEN * sizeof(half) * 2;
-static constexpr uint32_t yAddrPongBC = xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPongBC =
+    xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t zAddrPingBC = MAX_DATA_COPY_LEN * sizeof(half) * 4;
-static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPongBC =
+    zAddrPingBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 ```
 
 **Example Configuration**:

@@ -7,15 +7,15 @@ asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_
 ```cpp
 constexpr uint64_t ASC_FILL_VALUE_DEFAULT_VALUE = 0x0000000000000000;
 union asc_fill_value_config {
-    uint64_t config = ASC_FILL_VALUE_DEFAULT_VALUE;
-    struct {
-        uint64_t repeat : 15;
-        uint64_t reserved1 : 1;
-        uint64_t blk_num : 15;
-        uint64_t reserved2 : 1;
-        uint64_t dst_gap : 15;
-        uint64_t reserved3 : 17;
-    };
+  uint64_t config = ASC_FILL_VALUE_DEFAULT_VALUE;
+  struct {
+    uint64_t repeat : 15;
+    uint64_t reserved1 : 1;
+    uint64_t blk_num : 15;
+    uint64_t reserved2 : 1;
+    uint64_t dst_gap : 15;
+    uint64_t reserved3 : 17;
+  };
 };
 ```
 

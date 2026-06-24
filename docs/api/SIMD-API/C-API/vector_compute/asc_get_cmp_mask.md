@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_get_cmp_mask(__ubuf__ void* dst)
+__aicore__ inline void asc_get_cmp_mask(__ubuf__ void *dst)
 ```
 
 ## 参数说明
@@ -40,6 +40,6 @@ PIPE_V
 ```cpp
 constexpr uint32_t total_length = 128;
 __ubuf__ int8_t dst[total_length];
-...     // 进行Compare操作
-asc_get_cmp_mask(dst);
+... // 进行Compare操作
+    asc_get_cmp_mask(dst);
 ```

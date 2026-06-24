@@ -55,12 +55,14 @@
 
     SoftmaxGrad 模式调用方式：
     ```cpp
-    AscendC::SoftmaxGrad<float, true>(yLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, false, srcShape);
+AscendC::SoftmaxGrad<float, true>(yLocal, xLocal, yLocal, tmpBuffer,
+                                  softmaxTiling, false, srcShape);
     ```
 
     SoftmaxGradFront 模式调用方式：
     ```cpp
-    AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, srcShape);
+AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer,
+                                 softmaxTiling, srcShape);
     ```
 
 - 调用实现  

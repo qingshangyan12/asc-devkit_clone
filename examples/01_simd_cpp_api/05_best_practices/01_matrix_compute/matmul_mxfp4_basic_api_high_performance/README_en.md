@@ -174,13 +174,15 @@ nd2nzA1Params.dValue = packedStepK;
 nd2nzA1Params.srcDValue = PACKED_K;
 nd2nzA1Params.dstNzC0Stride = baseM;
 nd2nzA1Params.dstNzNStride = 1;
-AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM], nd2nzA1Params);
+AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM],
+                  nd2nzA1Params);
 ```
 
 Scale side transfers as b16. Since `Mmad` requires K direction continuity for minimum fractal data reading, correspondingly scale data must satisfy 2Byte continuity along K direction, so b16 type transfer is used to ensure correct data layout:
 
 ```cpp
-constexpr uint32_t stepScaleK = AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
+constexpr uint32_t stepScaleK =
+    AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
 AscendC::Dn2NzParams dn2nzParams;
 dn2nzParams.dValue = curM;
 dn2nzParams.nValue = stepScaleK / 2;
@@ -206,13 +208,11 @@ The key code is `LoadData` receiving both matrix LocalTensor and scale LocalTens
 
 ```cpp
 uint32_t srcAddr = kOffsetInChunkA * baseK * baseM;
-uint32_t scaleSrcAddr = (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
+uint32_t scaleSrcAddr =
+    (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
 
-AscendC::LoadData(a2Local,
-                  a1Local[srcAddr],
-                  as1Local[scaleSrcAddr],
-                  loadDataParams,
-                  loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local[srcAddr], as1Local[scaleSrcAddr],
+                  loadDataParams, loadMxDataParams);
 ```
 
 #### 4. L0 Double Buffering: Overlapping Loading and Computation
@@ -297,7 +297,8 @@ fixpipeParams.mSize = curM;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
 fixpipeParams.quantPre = QuantMode_t::F322BF16;
-AscendC::Fixpipe(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN], cLocal, fixpipeParams);
+AscendC::Fixpipe(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN], cLocal,
+                 fixpipeParams);
 ```
 
 ### Event Synchronization: Pipelining the Flow
@@ -328,16 +329,20 @@ Large packet granularity synchronization only waits for data readiness at the fi
 
 ```cpp
 if (kOffsetInDataChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
 }
-if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
+if (((kOffsetInDataChunk + 1) == dataChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
 }
 if (kOffsetInScaleChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetScaleEventId(scaleReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(
+      GetScaleEventId(scaleReadIdx));
 }
-if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetScaleEventId(scaleReadIdx));
+if (((kOffsetInScaleChunk + 1) == scaleChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(
+      GetScaleEventId(scaleReadIdx));
 }
 ```
 

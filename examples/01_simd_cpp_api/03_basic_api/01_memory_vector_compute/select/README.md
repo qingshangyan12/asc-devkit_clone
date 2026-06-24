@@ -36,9 +36,9 @@
   - 说明：根据selMask在两个tensor中选取元素。每轮迭代中，根据selMask的有效位数据（限制为256/sizeof(T)个有效位数，T为输入数据类型，本样例中T为float）进行选择操作。
   - 实现：
     ```cpp
-    // cmpMode = AscendC::SELMODE::VSEL_CMPMASK_SPR
-    // src0和src1都是tensor。当selMask的比特位是1时，从src0中选取；比特位是0时,从src1选取
-    AscendC::Select(dstl, selMask, src0, src1, cmpMode, count);
+// cmpMode = AscendC::SELMODE::VSEL_CMPMASK_SPR
+// src0和src1都是tensor。当selMask的比特位是1时，从src0中选取；比特位是0时,从src1选取
+AscendC::Select(dstl, selMask, src0, src1, cmpMode, count);
     ```
   
   **场景2：Select（标量）**
@@ -46,9 +46,9 @@
   - 说明：根据selMask在1个tensor和1个scalar标量中选取元素，selMask无有效数据限制。多轮迭代时，每轮迭代连续使用selMask的不同部分。
   - 实现：
     ```cpp
-    // cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
-    // src0是tensor，src1是标量。当selMask的比特位是1时，从src0中选取；比特位是0时，等于src1
-    AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
+// cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
+// src0是tensor，src1是标量。当selMask的比特位是1时，从src0中选取；比特位是0时，等于src1
+AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
     ```
 
   **场景3：Select（selMask无有效位数据限制）**
@@ -56,9 +56,9 @@
   - 说明：根据selMask在两个tensor中选取元素，selMask无有效数据限制。多轮迭代时，每轮迭代连续使用selMask的不同部分。
   - 实现：
     ```cpp
-    // cmpMode = AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE
-    // src0和src1都是tensor。当selMask的比特位是1时，从src0中选取；比特位是0时,从src1选取
-    AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
+// cmpMode = AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE
+// src0和src1都是tensor。当selMask的比特位是1时，从src0中选取；比特位是0时,从src1选取
+AscendC::Select(dst, selMask, src0, src1, cmpMode, count);
     ```
 
 **场景4：Select（灵活标量位置）----此场景仅在 Ascend 950PR/Ascend 950DT产品支持**
@@ -66,14 +66,18 @@
   - 说明：与场景2功能类似，只是标量位置更灵活。
   - 实现：
     ```cpp
-    // cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
-    // 标量在后。src0是tensor，src1是标量。当selMask的比特位是1时，从src0中选取；比特位是0时，等于src1
-    static constexpr AscendC::BinaryConfig config = { 1 };
-    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count);
+// cmpMode = AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE
+// 标量在后。src0是tensor，src1是标量。当selMask的比特位是1时，从src0中选取；比特位是0时，等于src1
+static constexpr AscendC::BinaryConfig config = {1};
+AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0,
+                                                             src1, cmpMode,
+                                                             count);
 
-    // 标量在前。src0是标量，src1是tensor。当selMask的比特位是1时，等于src0；比特位是0时，从src1中选取
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0, src1, cmpMode, count); 
+// 标量在前。src0是标量，src1是tensor。当selMask的比特位是1时，等于src0；比特位是0时，从src1中选取
+static constexpr AscendC::BinaryConfig config = {0};
+AscendC::Select<AscendC::BinaryDefaultType, uint8_t, config>(dst, selMask, src0,
+                                                             src1, cmpMode,
+                                                             count);
     ```
 
 - 场景规格

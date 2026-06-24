@@ -11,8 +11,7 @@ Coord用于定义张量的坐标，用于访问张量中特定位置的元素。
 ## 原型定义
 
 ```cpp
-template <typename... Coords>
-using Coord = Std::tuple<Coords...>;
+template <typename... Coords> using Coord = Std::tuple<Coords...>;
 ```
 
 ## 参数说明

@@ -93,24 +93,23 @@ $$
 **关键代码**：
 
 ```cpp
-__aicore__ inline void ProcessGmSimt()
-{
-    asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
-        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()),
-        const_cast<__gm__ T*>(yGm.GetPhyAddr()), const_cast<__gm__ T*>(zGm.GetPhyAddr()),
-        DataLenPerCore);
+__aicore__ inline void ProcessGmSimt() {
+  asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
+      dim3(THREAD_COUNT), const_cast<__gm__ T *>(xGm.GetPhyAddr()),
+      const_cast<__gm__ T *>(yGm.GetPhyAddr()),
+      const_cast<__gm__ T *>(zGm.GetPhyAddr()), DataLenPerCore);
 }
 
-__simt_vf__ inline void floor_mod_simt_gm_contiguous(
-    __gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
-{
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
-        const auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        z[index] = (signsDiffer && (rem != 0)) ? rem + yValue : rem;
-    }
+__simt_vf__ inline void
+floor_mod_simt_gm_contiguous(__gm__ T *x, __gm__ T *y, __gm__ T *z,
+                             uint32_t inputTotalLength) {
+  for (uint32_t index = static_cast<uint32_t>(threadIdx.x);
+       index < inputTotalLength; index += static_cast<uint32_t>(blockDim.x)) {
+    T yValue = y[index];
+    const auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    z[index] = (signsDiffer && (rem != 0)) ? rem + yValue : rem;
+  }
 }
 ```
 
@@ -144,51 +143,55 @@ SIMT线程直接访问GM时，每个线程在计算过程中都需要从GM读取
 **关键代码**：
 
 ```cpp
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+__aicore__ inline void CopyIn(uint32_t tileIdx, uint32_t count,
+                              AscendC::LocalTensor<T> &xLocal,
+                              AscendC::LocalTensor<T> &yLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(xLocal, xGm[tileOffset], count);
+  AscendC::DataCopy(yLocal, yGm[tileOffset], count);
 }
 // SIMD Compute(UB)
 template <typename T>
-__simd_vf__ inline void floor_mod_simd(
-    __ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-    uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);
-    AscendC::Reg::RegTensor<T> xValue, yValue, modValue, tempValue, defaultValue, signValue;
-    AscendC::Reg::MaskReg mask, selectMask, adjustMask;
-    uint32_t maskCount = count;
+__simd_vf__ inline void floor_mod_simd(__ubuf__ T *zAddr, __ubuf__ T *xAddr,
+                                       __ubuf__ T *yAddr,
+                                       const uint32_t count) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
+  uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);
+  AscendC::Reg::RegTensor<T> xValue, yValue, modValue, tempValue, defaultValue,
+      signValue;
+  AscendC::Reg::MaskReg mask, selectMask, adjustMask;
+  uint32_t maskCount = count;
 
-    AscendC::Reg::Duplicate(defaultValue, T(-1));
-    AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
+  AscendC::Reg::Duplicate(defaultValue, T(-1));
+  AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
 
-    for (uint16_t i = 0; i < loopTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(maskCount);
-        AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
-        AscendC::Reg::Div(tempValue, xValue, yValue, mask);
-        AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
-        AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0), mask);
-        AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
-        AscendC::Reg::Add(modValue, tempValue, yValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0), mask);
-        AscendC::Reg::And(xValue, tempValue, signValue, mask);
-        AscendC::Reg::And(yValue, yValue, signValue, mask);
-        AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue, mask);
-        AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
-        AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
-        AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
-    }
+  for (uint16_t i = 0; i < loopTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(maskCount);
+    AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
+    AscendC::Reg::Div(tempValue, xValue, yValue, mask);
+    AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
+    AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
+    AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0),
+                                                    mask);
+    AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
+    AscendC::Reg::Add(modValue, tempValue, yValue, mask);
+    AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0),
+                                                    mask);
+    AscendC::Reg::And(xValue, tempValue, signValue, mask);
+    AscendC::Reg::And(yValue, yValue, signValue, mask);
+    AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue,
+                                                   mask);
+    AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
+    AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
+    AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
+  }
 }
 
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
+__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count,
+                               AscendC::LocalTensor<T> &zLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(zGm[tileOffset], zLocal, count);
 }
 ```
 
@@ -224,41 +227,41 @@ FloorMod 计算不仅包含取余，还需要根据余数和除数的符号关�
 
 ```cpp
 // 单tile核心流程：CopyIn(GM->UB) -> SIMT Compute(UB) -> CopyOut(UB->GM)
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+__aicore__ inline void CopyIn(uint32_t tileIdx, uint32_t count,
+                              AscendC::LocalTensor<T> &xLocal,
+                              AscendC::LocalTensor<T> &yLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(xLocal, xGm[tileOffset], count);
+  AscendC::DataCopy(yLocal, yGm[tileOffset], count);
 }
 
 // SIMT Compute(UB)
 template <typename T, uint32_t TileLength>
-__simt_vf__ inline void floor_mod_simt_non_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
-{
-    constexpr uint32_t elems_per_thread = TileLength / THREAD_COUNT;
-    uint32_t tid = threadIdx.x;
-    for (uint32_t i = 0; i < elems_per_thread; i++) {
-        uint32_t index = tid * elems_per_thread + i;
-        if (index >= inputTotalLength) {
-            break;
-        }
-        T yValue = y[index];
-        auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        if (signsDiffer && (rem != 0)) {
-            z[index] = rem + yValue;
-        } else {
-            z[index] = rem;
-        }
+__simt_vf__ inline void
+floor_mod_simt_non_contiguous(__ubuf__ T *x, __ubuf__ T *y, __ubuf__ T *z,
+                              uint32_t inputTotalLength) {
+  constexpr uint32_t elems_per_thread = TileLength / THREAD_COUNT;
+  uint32_t tid = threadIdx.x;
+  for (uint32_t i = 0; i < elems_per_thread; i++) {
+    uint32_t index = tid * elems_per_thread + i;
+    if (index >= inputTotalLength) {
+      break;
     }
+    T yValue = y[index];
+    auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    if (signsDiffer && (rem != 0)) {
+      z[index] = rem + yValue;
+    } else {
+      z[index] = rem;
+    }
+  }
 }
 
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
+__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count,
+                               AscendC::LocalTensor<T> &zLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(zGm[tileOffset], zLocal, count);
 }
 ```
 
@@ -300,35 +303,35 @@ Case 2虽然用SIMT改善了FloorMod的计算表达，但非连续UB访问把MTE
 
 ```cpp
 // 单tile核心流程：CopyIn(GM->UB) -> SIMT Compute(UB) -> CopyOut(UB->GM)
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+__aicore__ inline void CopyIn(uint32_t tileIdx, uint32_t count,
+                              AscendC::LocalTensor<T> &xLocal,
+                              AscendC::LocalTensor<T> &yLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(xLocal, xGm[tileOffset], count);
+  AscendC::DataCopy(yLocal, yGm[tileOffset], count);
 }
 // SIMT Compute(UB)
 template <typename T>
-__simt_vf__ inline void floor_mod_simt_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
-{
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
-        const auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        if (signsDiffer && (rem != 0)) {
-            z[index] = rem + yValue;
-        } else {
-            z[index] = rem;
-        }
+__simt_vf__ inline void floor_mod_simt_contiguous(__ubuf__ T *x, __ubuf__ T *y,
+                                                  __ubuf__ T *z,
+                                                  uint32_t inputTotalLength) {
+  for (uint32_t index = static_cast<uint32_t>(threadIdx.x);
+       index < inputTotalLength; index += static_cast<uint32_t>(blockDim.x)) {
+    T yValue = y[index];
+    const auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    if (signsDiffer && (rem != 0)) {
+      z[index] = rem + yValue;
+    } else {
+      z[index] = rem;
     }
+  }
 }
 
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
+__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count,
+                               AscendC::LocalTensor<T> &zLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(zGm[tileOffset], zLocal, count);
 }
 ```
 

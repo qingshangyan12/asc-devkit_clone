@@ -125,19 +125,18 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void count_error_status(uint32_t *error_count,
-                                                         uint32_t *status,
-                                                         uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void count_error_status(uint32_t *error_count,
+                                                          uint32_t *status,
+                                                          uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (status[idx] != 0U) {
-            asc_atomic_add(error_count, 1U);
-        }
-    }
+  if (status[idx] != 0U) {
+    asc_atomic_add(error_count, 1U);
+  }
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -145,24 +144,21 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void count_error_status(__gm__ uint32_t *error_count,
-                                                         __gm__ uint32_t *status,
-                                                         uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void count_error_status(
+    __gm__ uint32_t *error_count, __gm__ uint32_t *status, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (status[idx] != 0U) {
-            asc_atomic_add(error_count, 1U);
-        }
-    }
+  if (status[idx] != 0U) {
+    asc_atomic_add(error_count, 1U);
+  }
+}
     ```
 
 输出结果示例如下：
 
 ```cpp
-status: 0, 2, 0, 1, 3
-error_count: 3 // 表明status中有3个数据是非0的
+status : 0, 2, 0, 1, 3 error_count : 3 // 表明status中有3个数据是非0的
 ```

@@ -23,13 +23,14 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Lowest()
+constexpr __aicore__ static inline T Lowest()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋最低有限值：
 
     ```cpp
-    __aicore__ static inline void Lowest(const LocalTensor<T>& dstLocal, uint32_t count)
+__aicore__ static inline void Lowest(const LocalTensor<T> &dstLocal,
+                                     uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +61,12 @@
 - 标量接口：
 
     ```cpp
-    int32_t value = AscendC::NumericLimits<int32_t>::Lowest();
+int32_t value = AscendC::NumericLimits<int32_t>::Lowest();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<int32_t>::Lowest(dstLocal, 256);// 返回256个int32_t类型的最低有限值
+AscendC::NumericLimits<int32_t>::Lowest(
+    dstLocal, 256); // 返回256个int32_t类型的最低有限值
     ```

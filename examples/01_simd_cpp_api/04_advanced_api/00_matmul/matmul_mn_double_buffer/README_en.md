@@ -40,23 +40,39 @@ A Matmul example with M/N-axis pipeline parallelism. This feature applies to sce
   - Key Kernel Steps
     - When creating the Matmul object, customize the MatmulConfig parameters, set MatmulConfigMode to CONFIG_MDL, set the scheduleType parameter to ScheduleType::OUTER_PRODUCT, and set the iterateOrder parameter to IterateOrder::ORDER_M to enable N-direction pipeline parallelism with the MDL template, obtaining a custom Matmul object using the MDL template.
       ```cpp
-      constexpr static MatmulConfigMode configModeMDL = MatmulConfigMode::CONFIG_MDL;
-      constexpr static MatmulFuncParams funcParamsOrderM{false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::OUTER_PRODUCT, true, true};
-      constexpr static MatmulConfig CFG_MDL_OUTER_PRODUCT_ORDER_M = GetMMConfig<configModeMDL>(funcParamsOrderM);
+constexpr static MatmulConfigMode configModeMDL = MatmulConfigMode::CONFIG_MDL;
+constexpr static MatmulFuncParams funcParamsOrderM{false,
+                                                   false,
+                                                   false,
+                                                   false,
+                                                   0,
+                                                   IterateOrder::ORDER_M,
+                                                   ScheduleType::OUTER_PRODUCT,
+                                                   true,
+                                                   true};
+constexpr static MatmulConfig CFG_MDL_OUTER_PRODUCT_ORDER_M =
+    GetMMConfig<configModeMDL>(funcParamsOrderM);
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_OUTER_PRODUCT_ORDER_M> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE,
+                CFG_MDL_OUTER_PRODUCT_ORDER_M>
+    matmulObj;
       ```
 
   - Key Tiling Steps
     - Set custom MatmulConfig parameters to synchronize Kernel-side configured parameters such as scheduleType to the Tiling side.
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-          matmul_tiling::MatrixTraverse::FIRSTM, false);
-      cubeTiling.SetMatmulConfigParams(matmulConfigParams);
+matmul_tiling::MatmulConfigParams
+    matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
+                       matmul_tiling::MatrixTraverse::FIRSTM, false);
+cubeTiling.SetMatmulConfigParams(matmulConfigParams);
       ```
 
 - Invocation Implementation  

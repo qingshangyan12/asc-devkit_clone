@@ -13,16 +13,25 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_uint16_t& dst, vector_uint8_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_int16_t& dst, vector_int8_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_int16_t& dst, vector_int8_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_uint32_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_uint32_t& dst, vector_uint16_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_int32_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_unpack_lower(vector_int32_t& dst, vector_int16_t src)
-__simd_callee__ inline void asc_unpack_upper(vector_bool& dst, vector_bool src)
-__simd_callee__ inline void asc_unpack_lower(vector_bool& dst, vector_bool src)
+__simd_callee__ inline void asc_unpack_upper(vector_uint16_t &dst,
+                                             vector_uint8_t src) __simd_callee__
+    inline void asc_unpack_lower(vector_uint16_t &dst,
+                                 vector_uint8_t src) __simd_callee__
+    inline void asc_unpack_upper(vector_int16_t &dst,
+                                 vector_int8_t src) __simd_callee__
+    inline void asc_unpack_lower(vector_int16_t &dst,
+                                 vector_int8_t src) __simd_callee__
+    inline void asc_unpack_upper(vector_uint32_t &dst,
+                                 vector_uint16_t src) __simd_callee__
+    inline void asc_unpack_lower(vector_uint32_t &dst,
+                                 vector_uint16_t src) __simd_callee__
+    inline void asc_unpack_upper(vector_int32_t &dst,
+                                 vector_int16_t src) __simd_callee__
+    inline void asc_unpack_lower(vector_int32_t &dst,
+                                 vector_int16_t src) __simd_callee__
+    inline void asc_unpack_upper(vector_bool &dst,
+                                 vector_bool src) __simd_callee__
+    inline void asc_unpack_lower(vector_bool &dst, vector_bool src)
 ```
 
 ## 参数说明

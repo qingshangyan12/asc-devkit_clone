@@ -9,9 +9,9 @@
     调用示例：
 
     ```cpp
-    uint64_t count = 128;
-    half addsValue = 1.0;
-    AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, count);
+uint64_t count = 128;
+half addsValue = 1.0;
+AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, count);
     ```
 
     如图1所示，采用Counter模式进行前n个数据计算，通过count参数指定参与计算的元素数量为128，接口内部会自动完成Mask的设置。
@@ -26,13 +26,14 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    uint8_t repeatTimes = 1;
-    AscendC::UnaryRepeatParams repeatParams{2, 2, 16, 16};
-    AscendC::SetMaskCount();
-    uint64_t mask[2] = {130, 0};
-    AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
-    AscendC::SetMaskNorm();
+half addsValue = 1.0;
+uint8_t repeatTimes = 1;
+AscendC::UnaryRepeatParams repeatParams{2, 2, 16, 16};
+AscendC::SetMaskCount();
+uint64_t mask[2] = {130, 0};
+AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes,
+                          repeatParams);
+AscendC::SetMaskNorm();
     ```
 
     如图2所示，采用Counter模式下的高维切分连续计算接口，mask数组中仅低64bit有效，表示参与计算的元素总数为130。该模式接口内部的repeatTimes参数无效，系统根据mask值自动计算迭代次数。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
@@ -51,11 +52,12 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams {2, 2, 16, 16};
-    uint64_t mask[2] = {0x69A569A569A569A5, 0x69A569A569A569A5};
-    AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
+half addsValue = 1.0;
+int8_t repeatTimes = 1;
+UnaryRepeatParams repeatParams{2, 2, 16, 16};
+uint64_t mask[2] = {0x69A569A569A569A5, 0x69A569A569A569A5};
+AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes,
+                          repeatParams);
     ```
 
     如图3所示，采用Normal模式进行逐bit计算时，mask参数以位数组形式控制每个元素是否参与计算，详细展示了第一个DataBlock中元素的计算过程。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。
@@ -68,11 +70,12 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams{2, 2, 16, 16};
-    uint64_t mask = 128;
-    AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes, repeatParams);
+half addsValue = 1.0;
+int8_t repeatTimes = 1;
+UnaryRepeatParams repeatParams{2, 2, 16, 16};
+uint64_t mask = 128;
+AscendC::Adds<half, true>(dstLocal, srcLocal, addsValue, mask, repeatTimes,
+                          repeatParams);
     ```
 
     如图4所示，采用Normal模式进行连续计算时，mask参数表示迭代内连续参与计算的元素数量为128。repeatParams参数配置表示DataBlock间存在间隔，迭代间连续。

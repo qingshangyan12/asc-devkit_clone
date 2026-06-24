@@ -13,8 +13,11 @@ PairReduceSum: 相邻两个（奇偶）元素求和，结果写入dst。例如�
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_pair_reduce_sum(vector_float& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void
+asc_pair_reduce_sum(vector_half &dst, vector_half src,
+                    vector_bool mask) __simd_callee__
+    inline void asc_pair_reduce_sum(vector_float &dst, vector_float src,
+                                    vector_bool mask)
 ```
 
 ## 参数说明

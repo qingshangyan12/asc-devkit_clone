@@ -53,15 +53,20 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 - 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 - 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+        const LocalTensor<uint64_t> &cbufWorkspace,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 **传入FixpipeParamsV220参数的接口：**
@@ -69,15 +74,23 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 - 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(const GlobalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const FixpipeParamsV220 &intriParams)
     ```
 
 - 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsV220& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR,
+          typename S = uint64_t,
+          typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value,
+                                  bool>::type = true>
+__aicore__ inline void Fixpipe(const GlobalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const LocalTensor<S> &cbufWorkspace,
+                               const FixpipeParamsV220 &intriParams)
     ```
 
 **传入FixpipeParamsM300参数的接口：**
@@ -85,15 +98,23 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
 - 通路L0C Buffer（CO1）-\>GM，不开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(const GlobalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const FixpipeParamsM300 &intriParams)
     ```
 
 - 通路L0C Buffer（CO1）-\>GM，开启随路[tensor量化](./关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR,
+          typename S = uint64_t,
+          typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value,
+                                  bool>::type = true>
+__aicore__ inline void Fixpipe(const GlobalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const LocalTensor<S> &cbufWorkspace,
+                               const FixpipeParamsM300 &intriParams)
     ```
 
 ## 参数说明<a id="zh-cn_topic_0000002542828493_section16128134420472"></a>
@@ -274,8 +295,8 @@ Atlas A2 训练系列产品/Atlas A2 推理系列产品；
     - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+// 设置CTRL[48]为0，开启浮点数饱和模式
+AscendC::AscendCUtils::SetOverflow(0);
         ```
 
     对于整数类型只有饱和模式。
@@ -291,22 +312,23 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](https://gitcode.com/cann/asc
 - 示例：通路L0C Buffer-\>GM。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，配置开启NZ2ND的格式转换。
 
     ```cpp
-        AscendC::GlobalTensor<outputType> cGM;
-        cGM.SetGlobalBuffer((__gm__ outputType *)c);
-    
-    #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        AscendC::FixpipeParamsV220 fixpipeParams;
-        fixpipeParams.ndNum = 1;
-        fixpipeParams.srcNdStride = 0;
-        fixpipeParams.dstNdStride = 0;
-    #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-        AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-    #endif
-        fixpipeParams.mSize = baseM;
-        fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
-        fixpipeParams.nSize = baseN;
-        fixpipeParams.dstStride = baseN;
-        AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c, fixpipeParams);
+AscendC::GlobalTensor<outputType> cGM;
+cGM.SetGlobalBuffer((__gm__ outputType *)c);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+AscendC::FixpipeParamsV220 fixpipeParams;
+fixpipeParams.ndNum = 1;
+fixpipeParams.srcNdStride = 0;
+fixpipeParams.dstNdStride = 0;
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+#endif
+fixpipeParams.mSize = baseM;
+fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+fixpipeParams.nSize = baseN;
+fixpipeParams.dstStride = baseN;
+AscendC::Fixpipe<outputType, l0cType, AscendC::CFG_ROW_MAJOR>(cGM, c,
+                                                              fixpipeParams);
     ```
 
 </cann-filter>

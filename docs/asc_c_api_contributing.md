@@ -54,10 +54,9 @@ C API采用**指针式编程模型**：
 ```cpp
 // C API编程示例
 constexpr uint32_t count = 64;
-__ubuf__ half dst[count];   // Unified Buffer内存
+__ubuf__ half dst[count]; // Unified Buffer内存
 __ubuf__ half src0[count];
 __ubuf__ half src1[count];
-
 
 // 直接调用C API
 asc_add(dst, src0, src1, count);
@@ -80,9 +79,9 @@ asc_add(dst, src0, src1, count);
 模式2：高维切分计算
 
 ```cpp
-asc_add(dst, src0, src1, repeat,
-        dst_block_stride, src0_block_stride, src1_block_stride,
-        dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(dst, src0, src1, repeat, dst_block_stride, src0_block_stride,
+        src1_block_stride, dst_repeat_stride, src0_repeat_stride,
+        src1_repeat_stride);
 ```
 
 - 非连续内存访问
@@ -260,21 +259,29 @@ asc-devkit/
 ```cpp
 // ==========asc_axpy(half/float)==========
 // 连续模式
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count);
+__aicore__ inline void asc_axpy(__ubuf__ half *dst, __ubuf__ half *src,
+                                half scalar, uint32_t count);
 
-__aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
+__aicore__ inline void asc_axpy(__ubuf__ float *dst, __ubuf__ float *src,
+                                float scalar, uint32_t count);
 
 // 配置模式
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void
+asc_axpy(__ubuf__ half *dst, __ubuf__ half *src, half value, uint8_t repeat,
+         uint16_t dst_block_stride, uint16_t src_block_stride,
+         uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
-__aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void
+asc_axpy(__ubuf__ float *dst, __ubuf__ float *src, float value, uint8_t repeat,
+         uint16_t dst_block_stride, uint16_t src_block_stride,
+         uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 // 同步模式
-__aicore__ inline void asc_axpy_sync(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count);
+__aicore__ inline void asc_axpy_sync(__ubuf__ half *dst, __ubuf__ half *src,
+                                     half scalar, uint32_t count);
 
-__aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
+__aicore__ inline void asc_axpy_sync(__ubuf__ float *dst, __ubuf__ float *src,
+                                     float scalar, uint32_t count);
 ```
 
 ### 实现代码
@@ -290,10 +297,10 @@ __aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ float* src, f
 C API测试使用 **gTest + MockCPP** 框架：
 
 ```cpp
+#include "c_api/asc_simd.h"
+#include "c_api/stub/cce_stub.h"
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
-#include "c_api/asc_simd.h"
 ```
 
 ### 测试类型
@@ -318,7 +325,7 @@ void asc_add(...);
 void asc_axpy(...);
 
 // 参数名：小驼峰或下划线
-__ubuf__ half* dstTensor;
+__ubuf__ half *dstTensor;
 uint32_t elementCount;
 
 // 宏定义：全大写+下划线
@@ -344,27 +351,27 @@ struct AscUnaryConfig;
  * @param tmp 临时buffer
  * @param count 元素个数
  */
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count)
-{
-    // 参数验证
-    ASCENDC_ASSERT(count > 0, "count must be positive");
-    ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr,
-                   "pointers cannot be null");
+__aicore__ inline void asc_axpy(__ubuf__ half *dst, __ubuf__ half *src,
+                                half scalar, uint32_t count) {
+  // 参数验证
+  ASCENDC_ASSERT(count > 0, "count must be positive");
+  ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr,
+                 "pointers cannot be null");
 
-    // 计算逻辑
-    uint8_t repeat = (count + 127) / 128;
-    uint64_t mask0 = static_cast<uint64_t>(-1);
-    uint64_t mask1 = static_cast<uint64_t>(-1);
+  // 计算逻辑
+  uint8_t repeat = (count + 127) / 128;
+  uint64_t mask0 = static_cast<uint64_t>(-1);
+  uint64_t mask1 = static_cast<uint64_t>(-1);
 
-    // 设置mask
-    set_vector_mask(mask1, mask0);
+  // 设置mask
+  set_vector_mask(mask1, mask0);
 
-    // 执行指令
-    vmuls(tmp, src, scalar, repeat, 1, 1, 8, 8);
-    pipe_barrier(PIPE_V);
+  // 执行指令
+  vmuls(tmp, src, scalar, repeat, 1, 1, 8, 8);
+  pipe_barrier(PIPE_V);
 
-    vadd(dst, dst, tmp, repeat, 1, 1, 1, 8, 8, 8);
-    pipe_barrier(PIPE_V);
+  vadd(dst, dst, tmp, repeat, 1, 1, 1, 8, 8, 8);
+  pipe_barrier(PIPE_V);
 }
 ```
 
@@ -389,7 +396,7 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 // 4. 架构检查
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201 && __NPU_ARCH__ != 3510)
-    #error "Unsupported NPU architecture"
+#error "Unsupported NPU architecture"
 #endif
 ```
 
@@ -402,9 +409,9 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 // 条件编译
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    // NPU ARCH 2201架构特定代码
+// NPU ARCH 2201架构特定代码
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    // NPU ARCH 3510架构特定代码
+// NPU ARCH 3510架构特定代码
 #endif
 
 #endif

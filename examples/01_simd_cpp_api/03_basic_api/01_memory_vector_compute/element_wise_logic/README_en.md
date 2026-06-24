@@ -46,7 +46,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    AscendC::And(dstLocal, src0Local, src1Local, COUNT);
+AscendC::And(dstLocal, src0Local, src1Local, COUNT);
     ```
 
 - Description: Perform bitwise AND on each element of src0 and src1, result stored in dst
@@ -63,8 +63,9 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    static constexpr AscendC::BinaryConfig config = { 0 };
-    AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0], src1Local, COUNT);
+static constexpr AscendC::BinaryConfig config = {0};
+AscendC::Ors<AscendC::BinaryDefaultType, true, config>(dstLocal, src0Local[0],
+                                                       src1Local, COUNT);
     ```
 
 - Description: Scalar at front, src0Local[0] as scalar (left operand), src1Local as vector (right operand), perform bitwise OR on each element of src1 with src0Local[0], result stored in dst
@@ -81,7 +82,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    AscendC::ShiftLeft(dstLocal, src0Local, src1Local, COUNT);
+AscendC::ShiftLeft(dstLocal, src0Local, src1Local, COUNT);
     ```
 
 - Description: Left shift each element of src0 by the corresponding shift amount in src1, result stored in dst. src1 stores left shift amounts and does not support negative values
@@ -98,7 +99,7 @@ This example switches between different scenarios through the compilation parame
 - Implementation:
 
     ```cpp
-    AscendC::ShiftRight(dstLocal, src0Local, SHIFT_BITS, COUNT);
+AscendC::ShiftRight(dstLocal, src0Local, SHIFT_BITS, COUNT);
     ```
 
 - Description: Right shift each element of src0 by SHIFT_BITS bits, result stored in dst. Unsigned data types perform logical right shift, signed data types perform arithmetic right shift

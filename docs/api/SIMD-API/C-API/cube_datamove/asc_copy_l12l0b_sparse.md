@@ -17,12 +17,20 @@
 
 - 高维切分搬运
   ```cpp
-  __aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
+__aicore__ inline void asc_copy_l12l0b_sparse(__cb__ int8_t *dst,
+                                              __cbuf__ int8_t *src,
+                                              __cbuf__ int8_t *index,
+                                              uint16_t start_index,
+                                              uint8_t repeat)
   ```
 
 - 同步搬运
   ```cpp
-  __aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ int8_t* index, uint16_t start_index, uint8_t repeat)
+__aicore__ inline void asc_copy_l12l0b_sparse_sync(__cb__ int8_t *dst,
+                                                   __cbuf__ int8_t *src,
+                                                   __cbuf__ int8_t *index,
+                                                   uint16_t start_index,
+                                                   uint8_t repeat)
   ```
 
 ## 参数说明

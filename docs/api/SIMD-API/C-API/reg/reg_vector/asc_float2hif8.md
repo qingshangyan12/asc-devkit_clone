@@ -31,37 +31,68 @@
 
 ```cpp
 // ROUND舍入模式，非饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2hif8_rna(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2hif8_rna_sat(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2hif8_rna_v2(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2hif8_rna_sat_v2(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2hif8_rna_v3(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2hif8_rna_sat_v3(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2hif8_rna_v4(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2hif8_rna_sat_v4(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，非饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2hif8_rh(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，饱和模式，数据写入索引为0的位置
-__simd_callee__ inline void asc_float2hif8_rh_sat(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，非饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2hif8_rh_v2(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，饱和模式，数据写入索引为1的位置
-__simd_callee__ inline void asc_float2hif8_rh_sat_v2(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，非饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2hif8_rh_v3(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，饱和模式，数据写入索引为2的位置
-__simd_callee__ inline void asc_float2hif8_rh_sat_v3(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，非饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2hif8_rh_v4(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
-// HYBRID舍入模式，饱和模式，数据写入索引为3的位置
-__simd_callee__ inline void asc_float2hif8_rh_sat_v4(vector_hifloat8_t& dst, vector_float src, vector_bool mask)
+__simd_callee__ inline void
+asc_float2hif8_rna(vector_hifloat8_t &dst, vector_float src, vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为0的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_sat(vector_hifloat8_t &dst, vector_float src,
+                                       vector_bool mask)
+    // ROUND舍入模式，非饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_v2(vector_hifloat8_t &dst, vector_float src,
+                                      vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_sat_v2(vector_hifloat8_t &dst,
+                                          vector_float src, vector_bool mask)
+    // ROUND舍入模式，非饱和模式，数据写入索引为2的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_v3(vector_hifloat8_t &dst, vector_float src,
+                                      vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为2的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_sat_v3(vector_hifloat8_t &dst,
+                                          vector_float src, vector_bool mask)
+    // ROUND舍入模式，非饱和模式，数据写入索引为3的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_v4(vector_hifloat8_t &dst, vector_float src,
+                                      vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为3的位置
+    __simd_callee__
+    inline void asc_float2hif8_rna_sat_v4(vector_hifloat8_t &dst,
+                                          vector_float src, vector_bool mask)
+    // HYBRID舍入模式，非饱和模式，数据写入索引为0的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh(vector_hifloat8_t &dst, vector_float src,
+                                  vector_bool mask)
+    // HYBRID舍入模式，饱和模式，数据写入索引为0的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_sat(vector_hifloat8_t &dst, vector_float src,
+                                      vector_bool mask)
+    // HYBRID舍入模式，非饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_v2(vector_hifloat8_t &dst, vector_float src,
+                                     vector_bool mask)
+    // HYBRID舍入模式，饱和模式，数据写入索引为1的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_sat_v2(vector_hifloat8_t &dst,
+                                         vector_float src, vector_bool mask)
+    // HYBRID舍入模式，非饱和模式，数据写入索引为2的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_v3(vector_hifloat8_t &dst, vector_float src,
+                                     vector_bool mask)
+    // HYBRID舍入模式，饱和模式，数据写入索引为2的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_sat_v3(vector_hifloat8_t &dst,
+                                         vector_float src, vector_bool mask)
+    // HYBRID舍入模式，非饱和模式，数据写入索引为3的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_v4(vector_hifloat8_t &dst, vector_float src,
+                                     vector_bool mask)
+    // HYBRID舍入模式，饱和模式，数据写入索引为3的位置
+    __simd_callee__
+    inline void asc_float2hif8_rh_sat_v4(vector_hifloat8_t &dst,
+                                         vector_float src, vector_bool mask)
 ```
 
 ## 参数说明

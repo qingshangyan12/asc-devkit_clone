@@ -25,15 +25,23 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer
 - Load2DMX接口
 
     ```cpp
-    template <typename T, typename U = T>
-    __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+template <typename T, typename U = T>
+__aicore__ inline void LoadData(const LocalTensor<U> &dst,
+                                const LocalTensor<T> &src,
+                                const LocalTensor<fp8_e8m0_t> &srcMx,
+                                const LoadData2DParamsV2 &loadDataParams,
+                                const LoadData2DMxParams &loadMxDataParams)
     ```
 
 - Load2Dv2MX接口，支持源操作数和目的操作数数据类型不一致。
 
     ```cpp
-    template <typename T, typename U>
-    __aicore__ inline void LoadData(const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<fp8_e8m0_t>& srcMx, const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
+template <typename T, typename U>
+__aicore__ inline void LoadData(const LocalTensor<U> &dst,
+                                const LocalTensor<T> &src0,
+                                const LocalTensor<fp8_e8m0_t> &srcMx,
+                                const LoadData2DParamsV2 &loadDataParams,
+                                const LoadData2DMxParams &loadMxDataParams)
     ```
 
 ## 参数说明<a id="section622mcpsimp"></a>

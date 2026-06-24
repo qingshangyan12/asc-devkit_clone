@@ -62,7 +62,7 @@
     - 当outputLength<128时，mask处理outputLength个元素
     - UpdateMask执行完后，outputLength自减mask处理的元素个数。  
     ```cpp
-    mask = AscendC::Reg::UpdateMask<T>(outputLength);
+mask = AscendC::Reg::UpdateMask<T>(outputLength);
     ```
 - 样例规格：
   <table>
@@ -98,8 +98,8 @@
 - 样例实现：  
   - 初始化地址寄存器，表示i轴每次循环完成时aReg自增stride0  
     ```cpp
-    uint32_t stride0 = AscendC::GetVecLen() / sizeof(T);
-    AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, stride0);
+uint32_t stride0 = AscendC::GetVecLen() / sizeof(T);
+AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, stride0);
     ```
   - LoadAlign/StoreAlign入参 offset = aReg。以LoadAlign搬入为例：  
     - 每次迭代的UB起始地址为srcAddr + aReg

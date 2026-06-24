@@ -16,13 +16,21 @@
 
 ```cpp
 // 数据读取索引0的位置
-__simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
-// 数据读取索引1的位置
-__simd_callee__ inline void asc_e1m2x22bfloat16_v2(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
-// 数据读取索引2的位置
-__simd_callee__ inline void asc_e1m2x22bfloat16_v3(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
-// 数据读取索引3的位置
-__simd_callee__ inline void asc_e1m2x22bfloat16_v4(vector_bfloat16_t& dst, vector_fp4x2_e1m2_t src, vector_bool mask)
+__simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t &dst,
+                                                vector_fp4x2_e1m2_t src,
+                                                vector_bool mask)
+    // 数据读取索引1的位置
+    __simd_callee__ inline void asc_e1m2x22bfloat16_v2(vector_bfloat16_t &dst,
+                                                       vector_fp4x2_e1m2_t src,
+                                                       vector_bool mask)
+    // 数据读取索引2的位置
+    __simd_callee__ inline void asc_e1m2x22bfloat16_v3(vector_bfloat16_t &dst,
+                                                       vector_fp4x2_e1m2_t src,
+                                                       vector_bool mask)
+    // 数据读取索引3的位置
+    __simd_callee__ inline void asc_e1m2x22bfloat16_v4(vector_bfloat16_t &dst,
+                                                       vector_fp4x2_e1m2_t src,
+                                                       vector_bool mask)
 ```
 
 ## 参数说明

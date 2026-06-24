@@ -31,15 +31,21 @@
 - Global Memory -> Unified Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
+template <typename T>
+__aicore__ inline void
+DataCopy(const LocalTensor<T> &dst, const GlobalTensor<T> &src,
+         const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+         const uint32_t dimValue = 1)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
+template <typename T>
+__aicore__ inline void
+DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src,
+         const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+         const uint32_t dimValue = 1)
     ```
 
 > [!NOTE]说明 
@@ -184,16 +190,16 @@ AscendC::SliceInfo dstSliceInfoIn[] = {{0, 47, 0, 3, 48}, {0, 1, 0, 1, 2}};
 uint32_t dimValueIn = 2;
 dimValue = dimValueIn;
 for (uint32_t i = 0; i < dimValueIn; i++) {
-    srcSliceInfo[i].startIndex = srcSliceInfoIn[i].startIndex;
-    srcSliceInfo[i].endIndex = srcSliceInfoIn[i].endIndex;
-    srcSliceInfo[i].stride = srcSliceInfoIn[i].stride;
-    srcSliceInfo[i].burstLen = srcSliceInfoIn[i].burstLen;
-    srcSliceInfo[i].shapeValue = srcSliceInfoIn[i].shapeValue;
-    dstSliceInfo[i].startIndex = dstSliceInfoIn[i].startIndex;
-    dstSliceInfo[i].endIndex = dstSliceInfoIn[i].endIndex;
-    dstSliceInfo[i].stride = dstSliceInfoIn[i].stride;
-    dstSliceInfo[i].burstLen = dstSliceInfoIn[i].burstLen;
-    dstSliceInfo[i].shapeValue = dstSliceInfoIn[i].shapeValue;
+  srcSliceInfo[i].startIndex = srcSliceInfoIn[i].startIndex;
+  srcSliceInfo[i].endIndex = srcSliceInfoIn[i].endIndex;
+  srcSliceInfo[i].stride = srcSliceInfoIn[i].stride;
+  srcSliceInfo[i].burstLen = srcSliceInfoIn[i].burstLen;
+  srcSliceInfo[i].shapeValue = srcSliceInfoIn[i].shapeValue;
+  dstSliceInfo[i].startIndex = dstSliceInfoIn[i].startIndex;
+  dstSliceInfo[i].endIndex = dstSliceInfoIn[i].endIndex;
+  dstSliceInfo[i].stride = dstSliceInfoIn[i].stride;
+  dstSliceInfo[i].burstLen = dstSliceInfoIn[i].burstLen;
+  dstSliceInfo[i].shapeValue = dstSliceInfoIn[i].shapeValue;
 }
 
 // 先后进行两个数据通路的切片搬运。

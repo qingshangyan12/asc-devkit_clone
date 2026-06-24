@@ -37,8 +37,8 @@
     </cann-filter>
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
+template <typename T>
+__aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue, T &maxMinIndex)
     ```
     
 </cann-filter>
@@ -48,8 +48,8 @@
 - 获取调用[ReduceRepeat<MAX/MIN>](../ReduceRepeat.md)时所有repeat内的最值，或获取调用[ReduceMax](../ReduceMax.md)/[ReduceMin](../ReduceMin.md)得到的最值。该函数原型仅支持Atlas 推理系列产品AI Core。
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue)
+template <typename T>
+__aicore__ inline void GetReduceRepeatMaxMinSpr(T &maxMinValue)
     ```
 
 </cann-filter>
@@ -98,13 +98,14 @@
       - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 
       ```cpp
-      AscendC::LocalTensor<float> src;
-      AscendC::LocalTensor<float> dst;
-      int32_t mask = 64;
-      float val = 0;   // 最大值
-      float idx = 0;   // 最大值索引
-      AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-      AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceRepeat的调用次序，而且要配对调用
+AscendC::LocalTensor<float> src;
+AscendC::LocalTensor<float> dst;
+int32_t mask = 64;
+float val = 0; // 最大值
+float idx = 0; // 最大值索引
+AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
+AscendC::GetReduceRepeatMaxMinSpr<float>(
+    val, idx); // 保证和ReduceRepeat的调用次序，而且要配对调用
       ```
 
     </cann-filter>
@@ -114,12 +115,13 @@
     - 针对Atlas 推理系列产品AI Core：
 
         ```cpp
-        AscendC::LocalTensor<float> src;
-        AscendC::LocalTensor<float> dst;
-        int32_t mask = 64;
-        AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
-        float val = 0;   // 最大值
-        AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceRepeat的调用次序，而且要配对调用
+AscendC::LocalTensor<float> src;
+AscendC::LocalTensor<float> dst;
+int32_t mask = 64;
+AscendC::ReduceRepeat<AscendC::ReduceType::MAX>(dst, src, mask, 1, 1, 1, 8);
+float val = 0; // 最大值
+AscendC::GetReduceRepeatMaxMinSpr<float>(
+    val); // 保证和ReduceRepeat的调用次序，而且要配对调用
         ```
 
     </cann-filter>
@@ -133,14 +135,16 @@
       - <cann-filter npu-type = "910b">Atlas A2 训练系列产品/Atlas A2 推理系列产品</cann-filter>
 
       ```cpp
-      AscendC::LocalTensor<float> src;
-      AscendC::LocalTensor<float> work;
-      AscendC::LocalTensor<float> dst;
-      int32_t mask = 64;
-      AscendC::ReduceMax(dst, src, work, mask, 1, 8, true); // 连续场景，srcRepStride = 8，且calIndex = true
-      float val = 0;   // 最大值
-      float idx = 0;   // 不用于获取ReduceMax对应的准确索引
-      AscendC::GetReduceRepeatMaxMinSpr<float>(val, idx); // 保证和ReduceMax的调用次序，而且要配对调用
+AscendC::LocalTensor<float> src;
+AscendC::LocalTensor<float> work;
+AscendC::LocalTensor<float> dst;
+int32_t mask = 64;
+AscendC::ReduceMax(dst, src, work, mask, 1, 8,
+                   true); // 连续场景，srcRepStride = 8，且calIndex = true
+float val = 0;            // 最大值
+float idx = 0;            // 不用于获取ReduceMax对应的准确索引
+AscendC::GetReduceRepeatMaxMinSpr<float>(
+    val, idx); // 保证和ReduceMax的调用次序，而且要配对调用
       ```
 
     </cann-filter>
@@ -150,13 +154,14 @@
     - 针对Atlas 推理系列产品AI Core版本，可在调用`ReduceMax`后直接调用`GetReduceRepeatMaxMinSpr`指令获取最大值。
 
         ```cpp
-        AscendC::LocalTensor<float> src;
-        AscendC::LocalTensor<float> work;
-        AscendC::LocalTensor<float> dst;
-        int32_t mask = 64;
-        AscendC::ReduceMax(dst, src, work, mask, 1, 8, true);
-        float val = 0;   // 最大值
-        AscendC::GetReduceRepeatMaxMinSpr<float>(val); // 保证和ReduceMax的调用次序，而且要配对调用
+AscendC::LocalTensor<float> src;
+AscendC::LocalTensor<float> work;
+AscendC::LocalTensor<float> dst;
+int32_t mask = 64;
+AscendC::ReduceMax(dst, src, work, mask, 1, 8, true);
+float val = 0; // 最大值
+AscendC::GetReduceRepeatMaxMinSpr<float>(
+    val); // 保证和ReduceMax的调用次序，而且要配对调用
         ```
 
     </cann-filter>

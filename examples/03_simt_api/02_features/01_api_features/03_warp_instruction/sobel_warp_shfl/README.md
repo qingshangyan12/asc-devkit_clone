@@ -68,9 +68,12 @@ strength = |Gx| + |Gy|
 为保证同一个Warp内的32个线程始终处理同一行像素，采用如下坐标映射方式：
 
 ```cpp
-int tiles_x = (width + warpSize - 1) / warpSize;    // 图像宽度方向按Warp分块的块数（每块32列）
-int x = (warp_id % tiles_x) * warpSize + lane_id;   // 像素列号：当前Warp在横向的起始位置 + Warp内偏移，保证同Warp同行
-int y = warp_id / tiles_x;                          // 像素行号：第几行Warp
+int tiles_x = (width + warpSize - 1) /
+              warpSize; // 图像宽度方向按Warp分块的块数（每块32列）
+int x =
+    (warp_id % tiles_x) * warpSize +
+    lane_id; // 像素列号：当前Warp在横向的起始位置 + Warp内偏移，保证同Warp同行
+int y = warp_id / tiles_x; // 像素行号：第几行Warp
 ```
 
 <p align="center">
@@ -102,12 +105,16 @@ int shfl_bot_right = asc_shfl_down(bot, 1, warpSize);
 
 ```cpp
 // Warp边界处无法通过shuffle获取相邻像素，需要从Global Memory读取。
-int top_left = (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
-int top_right = (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
+int top_left =
+    (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
+int top_right =
+    (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
 int mid_left = (lane_id == 0) ? input[y * width + (x - 1)] : shfl_mid_left;
 int mid_right = (lane_id == 31) ? input[y * width + (x + 1)] : shfl_mid_right;
-int bot_left = (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
-int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
+int bot_left =
+    (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
+int bot_right =
+    (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
 ```
 
 获取3×3邻域的全部9个像素后，按照Sobel公式计算水平梯度`Gx`和垂直梯度`Gy`，即可得到边缘幅值。
@@ -132,8 +139,9 @@ edge_mask用于完成两个操作：
 ```cpp
 uint32_t warp_base = 0;
 if (lane_id == 0) {
-    // 第0号线程为本Warp中的所有边缘线程一次性申请输出位置。
-    warp_base = asc_atomic_add(edge_count, static_cast<uint32_t>(__popc(edge_mask)));
+  // 第0号线程为本Warp中的所有边缘线程一次性申请输出位置。
+  warp_base =
+      asc_atomic_add(edge_count, static_cast<uint32_t>(__popc(edge_mask)));
 }
 warp_base = asc_shfl(warp_base, 0, warpSize);
 ```
@@ -142,14 +150,11 @@ warp_base = asc_shfl(warp_base, 0, warpSize);
 
 ```cpp
 if (edge_mask & lanemask_eq()) {
-    // 统计当前线程之前有多少个边缘线程，得到本Warp内的紧凑写入偏移。
-    uint32_t lower_mask = edge_mask & lanemask_lt();
-    int local_idx = __popc(lower_mask);
-    edge_list[warp_base + local_idx] = {
-        static_cast<uint16_t>(x),
-        static_cast<uint16_t>(y),
-        strength
-    };
+  // 统计当前线程之前有多少个边缘线程，得到本Warp内的紧凑写入偏移。
+  uint32_t lower_mask = edge_mask & lanemask_lt();
+  int local_idx = __popc(lower_mask);
+  edge_list[warp_base + local_idx] = {static_cast<uint16_t>(x),
+                                      static_cast<uint16_t>(y), strength};
 }
 ```
 

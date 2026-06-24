@@ -16,7 +16,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config& config)
+__aicore__ inline void asc_set_l13d_fmatrix_b(asc_l13d_fmatrix_config &config)
 ```
 
 ## 参数说明

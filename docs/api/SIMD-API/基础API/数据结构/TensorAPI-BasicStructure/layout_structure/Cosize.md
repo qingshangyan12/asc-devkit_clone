@@ -16,7 +16,7 @@ Cosize表示Layout陪域（codomain）的跨度大小，即逻辑坐标经Layout
 
 ```cpp
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Cosize(const Layout<Shape, Stride>& layout)
+__aicore__ inline constexpr auto Cosize(const Layout<Shape, Stride> &layout)
 ```
 
 ## 参数说明

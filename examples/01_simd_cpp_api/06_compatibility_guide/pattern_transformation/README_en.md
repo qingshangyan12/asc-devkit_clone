@@ -72,12 +72,10 @@ Figure 2 shows the adaptation logic for the two chip types in the L0A reuse (M a
 The GM to L1 transfer process **requires no compatibility adaptation**. The DataCopy interface is used to load the ND matrix from GM into L1. The relevant code snippet is as follows:
 
 ```cpp
-__aicore__ inline void CopyIn(AscendC::LocalTensor<T> a1Local, AscendC::LocalTensor<U> b1Local)
-{
-    ...
-    AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
-    ...
-    AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
+__aicore__ inline void CopyIn(AscendC::LocalTensor<T> a1Local,
+                              AscendC::LocalTensor<U> b1Local) {
+  ... AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
+  ... AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 }
 ```
 
@@ -92,21 +90,20 @@ In Atlas A2/A3 Series Products, the L0A data layout is Zz fractal, while in Asce
 In Atlas A2/A3 Series Products, L1->L0A requires transformation from Nz fractal to Zz fractal, implemented through the Load2D interface. The relevant code is as follows:
 
 ```cpp
-...
-for (uint32_t i = 0; i < mBlocks; ++i) {
-    constexpr uint32_t mBlocks = M / CUBE_BLOCK;
-    constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
-    int srcOffset = 0;
-    int dstOffset = 0;
-    for (uint32_t i = 0; i < mBlocks; ++i) {
-        AscendC::Load2DParams loadDataParams;
-        loadDataParams.repeatTimes = kBlocks;
-        loadDataParams.srcStride = mBlocks;
-        loadDataParams.ifTranspose = false;
-        AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-        srcOffset += CUBE_BLOCK * CUBE_BLOCK;
-        dstOffset += K * CUBE_BLOCK;
-    }
+... for (uint32_t i = 0; i < mBlocks; ++i) {
+  constexpr uint32_t mBlocks = M / CUBE_BLOCK;
+  constexpr uint32_t kBlocks = K * sizeof(T) / C0_SIZE;
+  int srcOffset = 0;
+  int dstOffset = 0;
+  for (uint32_t i = 0; i < mBlocks; ++i) {
+    AscendC::Load2DParams loadDataParams;
+    loadDataParams.repeatTimes = kBlocks;
+    loadDataParams.srcStride = mBlocks;
+    loadDataParams.ifTranspose = false;
+    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+    srcOffset += CUBE_BLOCK * CUBE_BLOCK;
+    dstOffset += K * CUBE_BLOCK;
+  }
 }
 ```
 
@@ -118,13 +115,13 @@ constexpr uint32_t kBlocks = K / CUBE_BLOCK;
 int srcOffset = 0;
 int dstOffset = 0;
 for (uint32_t i = 0; i < kBlocks; ++i) {
-    AscendC::Load2DParams loadDataParams;
-    loadDataParams.repeatTimes = mBlocks;
-    loadDataParams.srcStride = 1;
-    loadDataParams.ifTranspose = false;
-    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-    srcOffset += CUBE_BLOCK * CUBE_BLOCK * mBlocks;
-    dstOffset += CUBE_BLOCK * CUBE_BLOCK * mBlocks;
+  AscendC::Load2DParams loadDataParams;
+  loadDataParams.repeatTimes = mBlocks;
+  loadDataParams.srcStride = 1;
+  loadDataParams.ifTranspose = false;
+  AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+  srcOffset += CUBE_BLOCK * CUBE_BLOCK * mBlocks;
+  dstOffset += CUBE_BLOCK * CUBE_BLOCK * mBlocks;
 }
 ```
 
@@ -146,18 +143,15 @@ In Ascend 950PR/Ascend 950DT, since L0A uses Nz fractal, A1 and A2 are not conti
 
 ```cpp
 // Transfer the upper Nz fractal
-...
-for (uint32_t i = 0; i < kBlocks; ++i) {
-    ...
-    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-    ...
+... for (uint32_t i = 0; i < kBlocks; ++i) {
+  ... AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+  ...
 }
 // Transfer the lower Nz fractal
-srcOffset = CUBE_BLOCK * CUBE_BLOCK * mBlocks / 2;  // Start from the lower half
+srcOffset = CUBE_BLOCK * CUBE_BLOCK * mBlocks / 2; // Start from the lower half
 for (uint32_t i = 0; i < kBlocks; ++i) {
-    ...
-    AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
-    ...
+  ... AscendC::LoadData(a2[dstOffset], a1[srcOffset], loadDataParams);
+  ...
 }
 ```
 
@@ -167,9 +161,8 @@ for (uint32_t i = 0; i < kBlocks; ++i) {
 The L1 to L0B transfer uses Load2D for Nz format transfer on all products and **requires no compatibility adaptation**. The relevant code is as follows:
 
 ```cpp
-...
-for (uint32_t i = 0; i < kBlocks; ++i) {
-    AscendC::LoadData(b2[i * dstStride], b1[i * srcStride], loadDataParams);
+... for (uint32_t i = 0; i < kBlocks; ++i) {
+  AscendC::LoadData(b2[i * dstStride], b1[i * srcStride], loadDataParams);
 }
 ```
 
@@ -191,7 +184,8 @@ AscendC::Mmad(co1Local, a2, b2, mmadParams);
 
 ```cpp
 AscendC::Mmad(co1Local, a2, b2, mmadParams);
-AscendC::Mmad(co1Local[M * N / 2], a2[M * K / 2], b2, mmadParams);  // Lower half A2[32, 64]
+AscendC::Mmad(co1Local[M * N / 2], a2[M * K / 2], b2,
+              mmadParams); // Lower half A2[32, 64]
 ```
 
 ### L0C->GM

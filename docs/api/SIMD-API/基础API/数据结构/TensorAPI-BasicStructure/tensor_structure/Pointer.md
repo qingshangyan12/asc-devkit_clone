@@ -7,10 +7,9 @@ Pointer定义指针迭代器，用于遍历和访问张量数据。
 ## 结构体定义
 
 ```cpp
-template <typename T, typename P>
-struct Pointer {
-    T* ptr;
-    P position;
+template <typename T, typename P> struct Pointer {
+  T *ptr;
+  P position;
 };
 ```
 

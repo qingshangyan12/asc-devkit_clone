@@ -28,7 +28,8 @@
 ```cpp
 // 连续搬运
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
 ```
 
 ## 参数说明

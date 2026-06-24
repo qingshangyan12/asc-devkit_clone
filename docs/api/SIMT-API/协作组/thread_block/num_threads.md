@@ -49,25 +49,21 @@ static unsigned int num_threads()
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        thread_block g = this_thread_block();
-        unsigned int thread_num = g.num_threads();
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... thread_block g = this_thread_block();
+  unsigned int thread_num = g.num_threads();
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        thread_block g = this_thread_block();
-        unsigned int thread_num = g.num_threads();
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... thread_block g = this_thread_block();
+  unsigned int thread_num = g.num_threads();
+  ...
+}
     ```

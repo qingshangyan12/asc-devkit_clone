@@ -32,8 +32,14 @@
   编译期运算符，返回对象的对齐要求，即该对象的起始地址必须是多少字节的倍数。结构体的默认`alignof`等于其所有字段`alignof`的最大值，可通过关键字`alignas`强制加大。例如下面的`struct T`和`struct T2`，`T`的`alignof`是4B，`T2`的`alignof`是8B。
 
   ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas 放大)
+struct T {
+  uint8_t a;
+  uint32_t b;
+}; // alignof = max(1, 4) = 4
+struct alignas(8) T2 {
+  uint8_t a;
+  uint32_t b;
+}; // alignof = 8 (alignas 放大)
   ```
 
   **2、alignas**
@@ -47,8 +53,12 @@
   - **会同步抬升sizeof**：`sizeof`必须是`alignof`的整数倍，所以放大`alignof`时，`sizeof`会向上进位。
 
   ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (随alignas抬升)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (默认)
+struct alignas(4) Align3 {
+  unsigned char r, g, b;
+}; // alignof=4 sizeof=4 (随alignas抬升)
+struct Misalign3 {
+  unsigned char r, g, b;
+}; // alignof=1 sizeof=3 (默认)
   ```
 
 - 关键参数

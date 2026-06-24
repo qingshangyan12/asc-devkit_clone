@@ -22,25 +22,44 @@
 
 ```cpp
 // RINT舍入模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int642float_rn(vector_float& dst, vector_int64_t src, vector_bool mask)
-// RINT舍入模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int642float_rn_v2(vector_float& dst, vector_int64_t src, vector_bool mask)
-// ROUND舍入模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int642float_rna(vector_float& dst, vector_int64_t src, vector_bool mask)
-// ROUND舍入模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int642float_rna_v2(vector_float& dst, vector_int64_t src, vector_bool mask)
-// FLOOR舍入模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int642float_rd(vector_float& dst, vector_int64_t src, vector_bool mask)
-// FLOOR舍入模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int642float_rd_v2(vector_float& dst, vector_int64_t src, vector_bool mask)
-// CEIL舍入模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int642float_ru(vector_float& dst, vector_int64_t src, vector_bool mask)
-// CEIL舍入模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int642float_ru_v2(vector_float& dst, vector_int64_t src, vector_bool mask)
-// TRUNC舍入模式，数据写入索引0的位置
-__simd_callee__ inline void asc_int642float_rz(vector_float& dst, vector_int64_t src, vector_bool mask)
-// TRUNC舍入模式，数据写入索引1的位置
-__simd_callee__ inline void asc_int642float_rz_v2(vector_float& dst, vector_int64_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_int642float_rn(vector_float &dst, vector_int64_t src, vector_bool mask)
+    // RINT舍入模式，数据写入索引1的位置
+    __simd_callee__
+    inline void asc_int642float_rn_v2(vector_float &dst, vector_int64_t src,
+                                      vector_bool mask)
+    // ROUND舍入模式，数据写入索引0的位置
+    __simd_callee__
+    inline void asc_int642float_rna(vector_float &dst, vector_int64_t src,
+                                    vector_bool mask)
+    // ROUND舍入模式，数据写入索引1的位置
+    __simd_callee__
+    inline void asc_int642float_rna_v2(vector_float &dst, vector_int64_t src,
+                                       vector_bool mask)
+    // FLOOR舍入模式，数据写入索引0的位置
+    __simd_callee__
+    inline void asc_int642float_rd(vector_float &dst, vector_int64_t src,
+                                   vector_bool mask)
+    // FLOOR舍入模式，数据写入索引1的位置
+    __simd_callee__
+    inline void asc_int642float_rd_v2(vector_float &dst, vector_int64_t src,
+                                      vector_bool mask)
+    // CEIL舍入模式，数据写入索引0的位置
+    __simd_callee__
+    inline void asc_int642float_ru(vector_float &dst, vector_int64_t src,
+                                   vector_bool mask)
+    // CEIL舍入模式，数据写入索引1的位置
+    __simd_callee__
+    inline void asc_int642float_ru_v2(vector_float &dst, vector_int64_t src,
+                                      vector_bool mask)
+    // TRUNC舍入模式，数据写入索引0的位置
+    __simd_callee__
+    inline void asc_int642float_rz(vector_float &dst, vector_int64_t src,
+                                   vector_bool mask)
+    // TRUNC舍入模式，数据写入索引1的位置
+    __simd_callee__
+    inline void asc_int642float_rz_v2(vector_float &dst, vector_int64_t src,
+                                      vector_bool mask)
 ```
 
 ## 参数说明

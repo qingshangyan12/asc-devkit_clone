@@ -12,30 +12,28 @@ const int32_t DEFAULT_BLK_STRIDE = 1;
 const uint8_t DEFAULT_REPEAT_STRIDE = 8;
 
 struct UnaryRepeatParams {
-    __aicore__ UnaryRepeatParams() {}
-    __aicore__ UnaryRepeatParams(const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn,
-        const uint8_t dstRepStrideIn, const uint8_t srcRepStrideIn)
-        : dstBlkStride(dstBlkStrideIn),
-          srcBlkStride(srcBlkStrideIn),
-          dstRepStride(dstRepStrideIn),
-          srcRepStride(srcRepStrideIn)
-    {}
-    __aicore__ UnaryRepeatParams(const uint16_t dstBlkStrideIn, const uint16_t srcBlkStrideIn,
-        const uint8_t dstRepStrideIn, const uint8_t srcRepStrideIn, const bool halfBlockIn)
-        : dstBlkStride(dstBlkStrideIn),
-          srcBlkStride(srcBlkStrideIn),
-          dstRepStride(dstRepStrideIn),
-          srcRepStride(srcRepStrideIn),
-          halfBlock(halfBlockIn)
-    {}
-    uint32_t blockNumber = DEFAULT_BLK_NUM;
-    uint16_t dstBlkStride = DEFAULT_BLK_STRIDE;
-    uint16_t srcBlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
-    uint8_t srcRepStride = DEFAULT_REPEAT_STRIDE;
-    bool repeatStrideMode = false;
-    bool strideSizeMode = false;
-    bool halfBlock = false;
+  __aicore__ UnaryRepeatParams() {}
+  __aicore__ UnaryRepeatParams(const uint16_t dstBlkStrideIn,
+                               const uint16_t srcBlkStrideIn,
+                               const uint8_t dstRepStrideIn,
+                               const uint8_t srcRepStrideIn)
+      : dstBlkStride(dstBlkStrideIn), srcBlkStride(srcBlkStrideIn),
+        dstRepStride(dstRepStrideIn), srcRepStride(srcRepStrideIn) {}
+  __aicore__
+  UnaryRepeatParams(const uint16_t dstBlkStrideIn,
+                    const uint16_t srcBlkStrideIn, const uint8_t dstRepStrideIn,
+                    const uint8_t srcRepStrideIn, const bool halfBlockIn)
+      : dstBlkStride(dstBlkStrideIn), srcBlkStride(srcBlkStrideIn),
+        dstRepStride(dstRepStrideIn), srcRepStride(srcRepStrideIn),
+        halfBlock(halfBlockIn) {}
+  uint32_t blockNumber = DEFAULT_BLK_NUM;
+  uint16_t dstBlkStride = DEFAULT_BLK_STRIDE;
+  uint16_t srcBlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
+  uint8_t srcRepStride = DEFAULT_REPEAT_STRIDE;
+  bool repeatStrideMode = false;
+  bool strideSizeMode = false;
+  bool halfBlock = false;
 };
 ```
 

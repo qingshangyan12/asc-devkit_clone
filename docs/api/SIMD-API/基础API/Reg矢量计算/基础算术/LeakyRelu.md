@@ -35,8 +35,10 @@ $$dstReg_i = \begin{cases} srcReg_i & srcReg_i > 0 \\ srcReg_i \times scalarValu
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-__simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
+template <typename T = DefaultType, typename U,
+          MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
+__simd_callee__ inline void LeakyRelu(S &dstReg, S &srcReg, U scalarValue,
+                                      MaskReg &mask)
 ```
 
 ## 参数说明<a name="section389364115374"></a>
@@ -74,17 +76,18 @@ __simd_callee__ inline void LeakyRelu(S& dstReg, S& srcReg, U scalarValue, MaskR
 ## 调用示例<a name="section232816306478"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void LeakyReluVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::LeakyRelu(dstReg, srcReg, scalarValue, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+template <typename T>
+__simd_vf__ inline void
+LeakyReluVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr, T scalarValue,
+            uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::LeakyRelu(dstReg, srcReg, scalarValue, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```

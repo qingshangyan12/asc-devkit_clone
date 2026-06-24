@@ -14,7 +14,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_cmp_mask(__ubuf__ void* sel_mask)
+__aicore__ inline void asc_set_cmp_mask(__ubuf__ void *sel_mask)
 ```
 
 ## 参数说明

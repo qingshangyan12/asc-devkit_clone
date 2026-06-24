@@ -44,39 +44,42 @@
   - Kernel关键步骤
     - 创建Matmul对象时，自定义MatmulConfig参数，将其中的isNBatch参数设置为true，使能多Batch输入和多Batch输出；将其中的isBiasBatch参数设置为false，使能BatchMatmul的Bias复用功能，获得自定义的使用NORM模板的Matmul对象。
       ```cpp
-      constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
-      constexpr MatmulBatchParams batchParams = {
-        true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
-      };
-      constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
+constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
+constexpr MatmulBatchParams batchParams = {
+    true, BatchMode::BATCH_LESS_THAN_L1,
+    false /* isNBatch, batchMode, isBiasBatch */
+};
+constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
       ```
     - 计算nNum大小，根据A、B矩阵的Layout信息和BatchNum计算nNum大小。
       ```cpp
-      int32_t g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG : tiling.BLayoutInfoG;
-      int32_t nNum = tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
+int32_t g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG
+                                                          : tiling.BLayoutInfoG;
+int32_t nNum =
+    tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
       ```
     - 当前源码默认 `IS_SYNCH=true`，计算结果先写入 `gm_workspace`，再搬运到输出GM。
       ```cpp
-      matmulObj.SetWorkspace(gm_workspace);
-      matmulObj.IterateNBatch(nNum, batchA, batchB, false);
-      DataCopy(bufferC, gm_workspace, sizeC / sizeof(cType));
+matmulObj.SetWorkspace(gm_workspace);
+matmulObj.IterateNBatch(nNum, batchA, batchB, false);
+DataCopy(bufferC, gm_workspace, sizeC / sizeof(cType));
       ```
     - `IS_SYNCH=false` 时，完成多batch矩阵乘操作，并调用GetBatchTensorC接口获取结果。
       ```cpp
-      matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
-      for(int32_t j = 0; j < nNum; ++j){
-          matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
-      }
+matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
+for (int32_t j = 0; j < nNum; ++j) {
+  matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
+}
       ```
 
   - Tiling关键步骤
     - 调用SetALayout、SetBLayout、SetCLayout、SetBatchNum设置A/B/C的Layout轴信息和最大BatchNum数。
       ```cpp
-      cubeTiling.SetALayout(1, M, 1, batchNum, K);
-      cubeTiling.SetBLayout(1, N, 1, batchNum, K);
-      cubeTiling.SetCLayout(1, M, 1, batchNum, N);
-      cubeTiling.SetBatchNum(batchNum);
+cubeTiling.SetALayout(1, M, 1, batchNum, K);
+cubeTiling.SetBLayout(1, N, 1, batchNum, K);
+cubeTiling.SetCLayout(1, M, 1, batchNum, N);
+cubeTiling.SetBatchNum(batchNum);
       ```
 
 ## 编译运行

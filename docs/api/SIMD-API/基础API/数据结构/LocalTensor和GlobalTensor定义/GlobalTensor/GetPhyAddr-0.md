@@ -56,13 +56,13 @@
 -   获取全局数据的地址
 
     ```cpp
-    __aicore__ inline const __gm__ PrimType* GetPhyAddr() const
+__aicore__ inline const __gm__ PrimType *GetPhyAddr() const
     ```
 
 -   获取全局数据（指定偏移offset个元素）的地址
 
     ```cpp
-    __aicore__ inline __gm__ PrimType* GetPhyAddr(const uint64_t offset) const
+__aicore__ inline __gm__ PrimType *GetPhyAddr(const uint64_t offset) const
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -102,6 +102,6 @@
 AscendC::LocalTensor<T> xLocal = inQueueX.DeQue<T>();
 AscendC::LocalTensor<T> yLocal = outQueueY.AllocTensor<T>();
 // 调用GetPhyAddr()返回LocalTensor地址，CPU上返回的是指针类型(T*)，NPU上返回的是物理存储的地址(uint64_t)
-__ubuf__ T* srcAddr = reinterpret_cast<__ubuf__ T*>(xLocal.GetPhyAddr());
-__ubuf__ T* dstAddr = reinterpret_cast<__ubuf__ T*>(yLocal.GetPhyAddr());
+__ubuf__ T *srcAddr = reinterpret_cast<__ubuf__ T *>(xLocal.GetPhyAddr());
+__ubuf__ T *dstAddr = reinterpret_cast<__ubuf__ T *>(yLocal.GetPhyAddr());
 ```

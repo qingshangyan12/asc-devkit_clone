@@ -57,14 +57,14 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   4. MatmulTiling Structure Definition
 
   ```cpp
-  struct MatmulTiling {
-      int32_t m;            // Number of rows of matrix A
-      int32_t n;            // Number of columns of matrix B
-      int32_t k;            // Number of columns of matrix A / number of rows of matrix B
-      int32_t singleCoreM;  // M dimension size processed per core
-      int32_t singleCoreN;  // N dimension size processed per core
-      int32_t singleCoreK;  // K dimension size processed per core
-  };
+struct MatmulTiling {
+  int32_t m; // Number of rows of matrix A
+  int32_t n; // Number of columns of matrix B
+  int32_t k; // Number of columns of matrix A / number of rows of matrix B
+  int32_t singleCoreM; // M dimension size processed per core
+  int32_t singleCoreN; // N dimension size processed per core
+  int32_t singleCoreK; // K dimension size processed per core
+};
   ```
 
 - Example specifications:

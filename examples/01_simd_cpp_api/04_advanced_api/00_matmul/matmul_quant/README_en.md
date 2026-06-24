@@ -45,23 +45,26 @@ A Matmul example with output dequantization, supporting both uniform coefficient
       When the build option QUANT_MODE is 1, set the build macro CUSTOM_QUANT_VECTOR and compile to execute the vector dequantization mode.    
       Based on whether the macro CUSTOM_QUANT_VECTOR is defined, set the corresponding dequantization parameters.
       ```cpp
-      #if defined(CUSTOM_QUANT_VECTOR)
-          matmulObj.SetQuantVector(quantGlobal);
-      #else
-          float quantFloat = 0.1f;
-          uint64_t quantValue = static_cast<uint64_t>(*reinterpret_cast<int32_t*>(&quantFloat));
-          matmulObj.SetQuantScalar(quantValue);
-      #endif
+#if defined(CUSTOM_QUANT_VECTOR)
+matmulObj.SetQuantVector(quantGlobal);
+#else
+float quantFloat = 0.1f;
+uint64_t quantValue =
+    static_cast<uint64_t>(*reinterpret_cast<int32_t *>(&quantFloat));
+matmulObj.SetQuantScalar(quantValue);
+#endif
       ```
 
   - Key Tiling Steps
     - Set the Matmul dequantization mode.
       ``` cpp
-      #if defined(CUSTOM_QUANT_VECTOR)
-          tilingApi.SetDequantType(matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
-      #else
-          tilingApi.SetDequantType(matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
-      #endif
+#if defined(CUSTOM_QUANT_VECTOR)
+tilingApi.SetDequantType(
+    matmul_tiling::DequantType::TENSOR); // set TENSOR quant mode
+#else
+tilingApi.SetDequantType(
+    matmul_tiling::DequantType::SCALAR); // set SCALAR quant mode
+#endif
       ```
 
   - Invocation Implementation  

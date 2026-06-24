@@ -36,7 +36,8 @@ using GetLayoutPattern = typename GetPattern<Std::remove_cvref_t<T>>::type;
 ```cpp
 using namespace AscendC::Te;
 
-using LayoutType = decltype(MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(16, 16));
+using LayoutType =
+    decltype(MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(16, 16));
 using Pattern = GetLayoutPattern<LayoutType>;
 // Pattern = NZLayoutPtn
 

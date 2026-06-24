@@ -77,23 +77,33 @@ $dst_i = \frac{1}{src_i}$
     - tensor前n个数据连续计算
 
         ```cpp
-        template <typename T, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
-        __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+template <typename T,
+          const ReciprocalConfig &config = DEFAULT_RECIPROCAL_CONFIG>
+__aicore__ inline void Reciprocal(const LocalTensor<T> &dst,
+                                  const LocalTensor<T> &src,
+                                  const int32_t &count)
         ```
 
     - tensor高维切分计算
         - mask逐bit模式
 
             ```cpp
-            template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
-            __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true,
+          const ReciprocalConfig &config = DEFAULT_RECIPROCAL_CONFIG>
+__aicore__ inline void Reciprocal(const LocalTensor<T> &dst,
+                                  const LocalTensor<T> &src, uint64_t mask[],
+                                  const uint8_t repeatTime,
+                                  const UnaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
-            __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true,
+          const ReciprocalConfig &config = DEFAULT_RECIPROCAL_CONFIG>
+__aicore__ inline void
+Reciprocal(const LocalTensor<T> &dst, const LocalTensor<T> &src, uint64_t mask,
+           const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
             ```
 
 - 不传入config的原型
@@ -101,23 +111,30 @@ $dst_i = \frac{1}{src_i}$
     - tensor前n个数据连续计算
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+template <typename T>
+__aicore__ inline void Reciprocal(const LocalTensor<T> &dst,
+                                  const LocalTensor<T> &src,
+                                  const int32_t &count)
         ```
 
     - tensor高维切分计算
         - mask逐bit模式
 
             ```cpp
-            template <typename T, bool isSetMask = true>
-            __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Reciprocal(const LocalTensor<T> &dst,
+                                  const LocalTensor<T> &src, uint64_t mask[],
+                                  const uint8_t repeatTime,
+                                  const UnaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, bool isSetMask = true>
-            __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Reciprocal(const LocalTensor<T> &dst, const LocalTensor<T> &src, uint64_t mask,
+           const uint8_t repeatTime, const UnaryRepeatParams &repeatParams)
             ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -195,27 +212,27 @@ $dst_i = \frac{1}{src_i}$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    uint64_t mask = 256 / sizeof(half);
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Reciprocal(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+uint64_t mask = 256 / sizeof(half);
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+// dstRepStride, srcRepStride = 8, no gap between repeats.
+AscendC::Reciprocal(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Reciprocal(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+// dstRepStride, srcRepStride = 8, no gap between repeats.
+AscendC::Reciprocal(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
 - tensor前n个数据计算接口样例
 
     ```cpp
-    AscendC::Reciprocal(dstLocal, srcLocal, 512);
+AscendC::Reciprocal(dstLocal, srcLocal, 512);
     ```
 
 
@@ -223,8 +240,9 @@ $dst_i = \frac{1}{src_i}$
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
-    static constexpr ReciprocalConfig config = { ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE };
-    AscendC::Reciprocal<T, config>(dstLocal, srcLocal, 512);
+static constexpr ReciprocalConfig config = {
+    ReciprocalAlgo::PRECISION_1ULP_FTZ_FALSE};
+AscendC::Reciprocal<T, config>(dstLocal, srcLocal, 512);
     ```
 <!-- end id31 -->
 

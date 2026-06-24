@@ -21,7 +21,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
+__aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams &param,
+                                  const FmatrixMode &fmatrixMode)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -53,7 +54,8 @@ SetFMatrixBitMode类可以直接使用[LoadData3DParamsV2结构体](../矩阵数
 
 ```cpp
 template <typename T>
-__aicore__ inline SetFMatrixBitModeParams(const LoadData3DParamsV2<T> &loadData3DParams_);
+__aicore__ inline SetFMatrixBitModeParams(
+    const LoadData3DParamsV2<T> &loadData3DParams_);
 ```
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0直接进行逐bit位修改来修改参数。
@@ -108,20 +110,23 @@ uint8_t dilationH = 2, dilationW = 2;
 
 uint8_t padList[PAD_SIZE] = {0, 0, 0, 0};
 AscendC::SetFmatrix(H, W, padList, FmatrixMode::FMATRIX_LEFT);
-/*  
+/*
 SetFMatrixBitModeParams param;
 param.SetL1H(H);
 param.SetL1W(W);
 param.SetPadList(padList);
 AscendC::SetFmatrix(param, FmatrixMode::FMATRIX_LEFT);
-*/ 
+*/
 AscendC::SetLoadDataPaddingValue(0);
 AscendC::SetLoadDataRepeat({0, 1, 0});
 AscendC::SetLoadDataBoundary((uint32_t)0);
-static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false,false};
+static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
 AscendC::LoadData<fmap_T, LOAD3D_CONFIG>(featureMapA2, featureMapA1,
-    { padList, H, W, channelSize, k, howoRound, 0, 0, 1, 1, Kw, Kh, dilationW, dilationH, false, false, 0 });
-AscendC::LoadData(weightB2, weightB1, { 0, weRepeat, 1, 0, 0, false, 0 });
+                                         {padList, H, W, channelSize, k,
+                                          howoRound, 0, 0, 1, 1, Kw, Kh,
+                                          dilationW, dilationH, false, false,
+                                          0});
+AscendC::LoadData(weightB2, weightB1, {0, weRepeat, 1, 0, 0, false, 0});
 
 inQueueFmA2.EnQue<fmap_T>(featureMapA2);
 inQueueWeB2.EnQue<weight_T>(weightB2);

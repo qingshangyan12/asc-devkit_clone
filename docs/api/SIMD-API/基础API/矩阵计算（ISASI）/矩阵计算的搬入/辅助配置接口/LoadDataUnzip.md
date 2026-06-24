@@ -20,7 +20,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTensor<T>& src)
+__aicore__ inline void LoadDataUnzip(const LocalTensor<T> &dst,
+                                     const GlobalTensor<T> &src)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -51,6 +52,8 @@ __aicore__ inline void LoadDataUnzip(const LocalTensor<T>& dst, const GlobalTens
 ```cpp
 uint32_t srcLen = 896, dstLen = 1024, numOfIndexTabEntry = 1;
 AscendC::LocalTensor<int8_t> weightB1 = inQueueB1.AllocTensor<int8_t>();
-AscendC::LoadUnzipIndex(indexGlobal, numOfIndexTabEntry); // 加载索引数据，加载GM上的压缩索引表到内部寄存器
+AscendC::LoadUnzipIndex(
+    indexGlobal,
+    numOfIndexTabEntry); // 加载索引数据，加载GM上的压缩索引表到内部寄存器
 AscendC::LoadDataUnzip(weightB1, weGlobal); // 根据内部寄存器里的索引表加载数据
 ```

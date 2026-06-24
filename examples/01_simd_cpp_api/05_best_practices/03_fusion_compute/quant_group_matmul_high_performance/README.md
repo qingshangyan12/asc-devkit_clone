@@ -95,7 +95,7 @@ __global__ __mix__(1, 1)
 #else
 __global__ __mix__(1, 2)
 #endif
-void quant_group_matmul_custom(...)
+    void quant_group_matmul_custom(...)
 ```
 
 ### 性能指标说明
@@ -168,13 +168,13 @@ Case 0是本样例中的基础场景，采用`__mix__(1, 1)`模式（1个AIC + 1
 // AIC执行路径: MMCompute → Iterate循环 → SetFlag(SYNC_AIC_TO_AIV)
 // AIV执行路径: 跳过MMCompute → VectorCompute → WaitFlag(SYNC_AIC_TO_AIV)
 if ASCEND_IS_AIC {
-    matmulObj.Iterate();    // Cube计算
-    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // 通知Vector
+  matmulObj.Iterate();                            // Cube计算
+  CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV); // 通知Vector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // 等待Cube完成
-    // 处理数据...
-    CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
+  CrossCoreWaitFlag(SYNC_AIC_TO_AIV); // 等待Cube完成
+  // 处理数据...
+  CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
 ```
 
@@ -194,23 +194,23 @@ Process函数采用**跨Group连续轮询**策略分配子块给多个Core。核
 
 ```cpp
 for (groupIdx = 0, preCount = 0; groupIdx < GROUP_NUM; ++groupIdx) {
-    groupM = groupListGlobal.GetValue(groupIdx);          // 本组行数, 本例=1024
-    numBlocksM = Ceil(groupM, SINGLE_M);                   // M方向分块数
-    numBlocksN = Ceil(N, SINGLE_N);                         // N方向分块数, 所有组相同=8
-    curCount = preCount + numBlocksM * numBlocksN;          // 含上组余数的连续编号上界
+  groupM = groupListGlobal.GetValue(groupIdx); // 本组行数, 本例=1024
+  numBlocksM = Ceil(groupM, SINGLE_M);         // M方向分块数
+  numBlocksN = Ceil(N, SINGLE_N); // N方向分块数, 所有组相同=8
+  curCount = preCount + numBlocksM * numBlocksN; // 含上组余数的连续编号上界
 
-    // 核心分配公式：确定当前Core在本Group中的第一个块编号
-    curBlock = coreIdx >= preCount ? coreIdx : coreIdx + CORE_NUM;
+  // 核心分配公式：确定当前Core在本Group中的第一个块编号
+  curBlock = coreIdx >= preCount ? coreIdx : coreIdx + CORE_NUM;
 
-    while (curBlock < curCount) {
-        mIdx = (curBlock - preCount) / numBlocksN;          // 组内M方向块索引
-        nIdx = (curBlock - preCount) % numBlocksN;          // 组内N方向块索引
-        MMCompute(groupIdx, groupConfig);                    // Cube计算
-        VectorCompute(groupIdx, groupConfig);                // Vector计算
-        curBlock += CORE_NUM;                                // 轮询步进，步长为CORE_NUM
-    }
-    preCount = curCount % CORE_NUM;                          // 余数传递给下一组
-    globalRowOffset += groupM;                               // 全局行偏移累积
+  while (curBlock < curCount) {
+    mIdx = (curBlock - preCount) / numBlocksN; // 组内M方向块索引
+    nIdx = (curBlock - preCount) % numBlocksN; // 组内N方向块索引
+    MMCompute(groupIdx, groupConfig);          // Cube计算
+    VectorCompute(groupIdx, groupConfig);      // Vector计算
+    curBlock += CORE_NUM; // 轮询步进，步长为CORE_NUM
+  }
+  preCount = curCount % CORE_NUM; // 余数传递给下一组
+  globalRowOffset += groupM;      // 全局行偏移累积
 }
 ```
 
@@ -242,10 +242,12 @@ matmul::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
 本样例通过`mmCFG.enUnitFlag = true`开启Matmul的UnitFlag优化，实现Cube计算与搬运的512B细粒度流水同步：
 
 ```cpp
-static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K, BASE_M, BASE_N, BASE_K};
+static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K,
+                                                  BASE_M,   BASE_N,   BASE_K};
 MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
-mmCFG.enUnitFlag = true;  // 开启UnitFlag
-auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
+mmCFG.enUnitFlag = true; // 开启UnitFlag
+auto constantCFG =
+    AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
 ```
 
 默认情况下，Cube的MMAD计算和FixPipe搬运是粗粒度同步的——必须等待整个`[BASE_M, BASE_N]`块的计算完成后，FixPipe才能开始搬出数据。开启UnitFlag后，MMAD和FixPipe实现细粒度（512B）流水并行：每当Cube完成一个512B数据结果的计算，FixPipe立即搬出该数据，Cube计算与结果写回流水重叠。
@@ -257,10 +259,15 @@ auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE
 ```cpp
 constexpr uint32_t BUFFER_NUM = 2; // UB队列Buffer数, 设为2开启double buffer
 
-pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float));          // 2 × 1024B
-pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM, BASE_M * sizeof(float));   // DAV_2201(BASE_M=128): 2 × 512B；DAV_3510(BASE_M=256): 2 × 1024B
-pipe->InitBuffer(vecInQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(int32_t));      // 2 × 24,576B
-pipe->InitBuffer(vecOutQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(half));        // 2 × 12,288B
+pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float)); // 2 × 1024B
+pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM,
+                 BASE_M *
+                     sizeof(float)); // DAV_2201(BASE_M=128): 2 ×
+                                     // 512B；DAV_3510(BASE_M=256): 2 × 1024B
+pipe->InitBuffer(vecInQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(int32_t)); // 2 × 24,576B
+pipe->InitBuffer(vecOutQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(half)); // 2 × 12,288B
 ```
 
 double buffer的工作原理是：当Vector在处理Buffer A的数据时，MTE2/MTE3可以同时搬运Buffer B的数据，反之亦然。
@@ -298,9 +305,9 @@ Case 1在Case 0基础上将核函数模式从`__mix__(1, 1)`升级为`__mix__(1,
 `__mix__(1, 2)`模式下，每个物理核包含1个AIC和2个AIV。两个AIV通过`taskRation`轮询机制分摊Vector侧的offsetM迭代任务：
 
 ```cpp
-uint32_t taskRation = AscendC::GetTaskRation();  // __mix__(1,2)下为2
+uint32_t taskRation = AscendC::GetTaskRation(); // __mix__(1,2)下为2
 if (taskRation != 0 && vecCount % taskRation != subBlockIdx) {
-    continue;  // 跳过不属于当前AIV的任务
+  continue; // 跳过不属于当前AIV的任务
 }
 ```
 

@@ -163,13 +163,20 @@ Scale transfer granularity is controlled by `scaleFactorK=4`, transferring `scal
 Taking A matrix data transfer as example, `Copy` transfers `stepK` K direction base blocks at once, each base block being `baseM * baseK`:
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAPing, a.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), AscendC::Te::MakeShape(curM, stepCurK)));
+AscendC::Te::Copy(gm2L1Atom, l1TensorAPing,
+                  a.Slice(AscendC::Te::MakeCoord(mBlockIdx *baseM,
+                                                 dataNextKChunkIdx *baseK),
+                          AscendC::Te::MakeShape(curM, stepCurK)));
 ```
 
 Taking ScaleA matrix data transfer as example, `Copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseK`:
 
 ```cpp
-AscendC::Te::Copy(gm2L1Atom, l1TensorAsPing, as.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), AscendC::Te::MakeShape(curM, stepCurScaleK)));
+AscendC::Te::Copy(
+    gm2L1Atom, l1TensorAsPing,
+    as.Slice(AscendC::Te::MakeCoord(mBlockIdx *baseM,
+                                    scaleNextKChunkIdx *baseScaleK),
+             AscendC::Te::MakeShape(curM, stepCurScaleK)));
 ```
 
 #### 3. L1 to L0 Entering MX Computation Path
@@ -181,13 +188,19 @@ After A/B and ScaleA/ScaleB enter L0, the Cube computation unit can complete sca
 Taking A matrix data transfer as example, `Copy` transfers 1 base block of `baseM * baseK` size at once:
 
 ```cpp
-AscendC::Te::Copy(l12l0AAtom, l0TensorA, l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk * baseK), AscendC::Te::MakeShape(curM, curK)));
+AscendC::Te::Copy(
+    l12l0AAtom, l0TensorA,
+    l1ReadBufA.Slice(AscendC::Te::MakeCoord(0, kOffsetInDataChunk *baseK),
+                     AscendC::Te::MakeShape(curM, curK)));
 ```
 
 Taking ScaleA matrix data transfer as example, `Copy` transfers 1 base block of `baseM * baseSK` size at once:
 
 ```cpp
-AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.Slice(AscendC::Te::MakeCoord(0, kOffsetInScaleChunk * baseScaleK), AscendC::Te::MakeShape(curM, curScaleK)));
+AscendC::Te::Copy(l12l0ScaleAAtom, l0TensorAs,
+                  l1ReadBufAs.Slice(AscendC::Te::MakeCoord(
+                                        0, kOffsetInScaleChunk *baseScaleK),
+                                    AscendC::Te::MakeShape(curM, curScaleK)));
 ```
 
 #### 4. L0 Double Buffering: Overlapping Loading and Computation
@@ -260,7 +273,11 @@ GM C [M, N]
 
 ```cpp
 AscendC::Te::FixpipeParams fixpipeParams;
-AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams), c.Slice(AscendC::Te::MakeCoord(mBlockIdx * baseM, nBlockIdx * baseN), AscendC::Te::MakeShape(curM, curN)), l0TensorC);
+AscendC::Te::Copy(l0c2GmAtom.with(fixpipeParams),
+                  c.Slice(AscendC::Te::MakeCoord(mBlockIdx *baseM,
+                                                 nBlockIdx *baseN),
+                          AscendC::Te::MakeShape(curM, curN)),
+                  l0TensorC);
 ```
 
 ### Event Synchronization: Pipelining the Flow
@@ -291,16 +308,20 @@ Large packet granularity synchronization only waits for data readiness at the fi
 
 ```cpp
 if (kOffsetInDataChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
 }
-if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
+if (((kOffsetInDataChunk + 1) == dataChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
 }
 if (kOffsetInScaleChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetScaleEventId(scaleReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(
+      GetScaleEventId(scaleReadIdx));
 }
-if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetScaleEventId(scaleReadIdx));
+if (((kOffsetInScaleChunk + 1) == scaleChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(
+      GetScaleEventId(scaleReadIdx));
 }
 ```
 

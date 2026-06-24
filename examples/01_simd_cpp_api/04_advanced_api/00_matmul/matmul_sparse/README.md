@@ -44,24 +44,31 @@
   - Kernel关键步骤
     - 创建Matmul对象时，通过SparseMatmulType定义矩阵B的参数类型信息。
       ```cpp
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
-      // 使用SparseMatmulType定义矩阵B的参数类型信息
-      using B_TYPE = AscendC::SparseMatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, BType, true>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
+// 使用SparseMatmulType定义矩阵B的参数类型信息
+using B_TYPE =
+    AscendC::SparseMatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM,
+                              CubeFormat::ND, BType, true>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
     - 设置索引矩阵。
       ```cpp
-      matmulObj.SetSparseIndex(gm_index); // 设置B矩阵稠密化过程中生成的索引矩阵gm_index
+matmulObj.SetSparseIndex(
+    gm_index); // 设置B矩阵稠密化过程中生成的索引矩阵gm_index
       ```
 
   - Tiling关键步骤
     - 使能Sparse Matmul稀疏矩阵计算场景。
       ```cpp
-      auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-      matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
-      tiling.SetSparse(true); // 设置使能Sparse Matmul稀疏矩阵计算场景
+auto ascendcPlatform =
+    platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
+matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
+tiling.SetSparse(true); // 设置使能Sparse Matmul稀疏矩阵计算场景
       ```
 
   - 调用实现  

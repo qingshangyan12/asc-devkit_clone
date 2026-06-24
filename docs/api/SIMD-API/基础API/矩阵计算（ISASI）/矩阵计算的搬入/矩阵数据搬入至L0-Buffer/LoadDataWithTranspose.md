@@ -28,7 +28,9 @@ L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams)
+__aicore__ inline void
+LoadDataWithTranspose(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+                      const LoadData2dTransposeParams &loadDataParams)
 ```
 
 <cann-filter npu-type = "950">
@@ -37,7 +39,9 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
+__aicore__ inline void
+LoadDataWithTranspose(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+                      const LoadData2dTransposeParamsV2 &loadDataParams)
 ```
 
 </cann-filter>
@@ -377,9 +381,11 @@ Kirin X90，支持数据类型：int8_t、half。
 
 ```cpp
 // dstoffset要根据A矩阵在L0 Buffer上，宽度方向的对齐来求解
-uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
+uint32_t dstOffset =
+    CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
 // srcoffset要根据A矩阵在L1 Buffer上，高度方向的对齐来求解
-uint32_t srcOffset = CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t srcOffset =
+    CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
 
 // Nz -> Zz
 AscendC::LoadData2dTransposeParams loadDataParams;
@@ -390,7 +396,8 @@ loadDataParams.dstGap = 0;
 // 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节
 loadDataParams.dstFracGap = CeilDivision(k, fractalShape[1]) - 1;
 for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
-    AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                                 loadDataParams);
 }
 ```
 
@@ -405,8 +412,10 @@ uint32_t fractalNum = 2;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
 
 // A矩阵LoadDataWithTranspose: Nz -> Zz
-uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
-uint32_t srcOffset = CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffset =
+    CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
+uint32_t srcOffset =
+    CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParams;
 loadDataParams.startIndex = 0;
 loadDataParams.repeatTimes = CeilDivision(k, fractalShape[0] * fractalNum);
@@ -414,11 +423,13 @@ loadDataParams.srcStride = 1;
 loadDataParams.dstGap = 0;
 loadDataParams.dstFracGap = CeilDivision(k, fractalShape[1]) - 1;
 for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
-    AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                                 loadDataParams);
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffsetB = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffsetB =
+    CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
 uint32_t srcOffsetB = fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParamsB;
 loadDataParamsB.startIndex = 0;
@@ -427,7 +438,8 @@ loadDataParamsB.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
 loadDataParamsB.dstGap = 1;
 loadDataParamsB.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
-    AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
+  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB],
+                                 b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
@@ -442,8 +454,10 @@ uint32_t fractalNum = 1;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
 
 // A矩阵LoadDataWithTranspose: Nz -> Zz
-uint32_t dstOffset = CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
-uint32_t srcOffset = CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffset =
+    CeilDivision(k, fractalShape[1]) * fractalSize * fractalNum;
+uint32_t srcOffset =
+    CeilDivision(k, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParams;
 loadDataParams.startIndex = 0;
 loadDataParams.repeatTimes = CeilDivision(k, fractalShape[0] * fractalNum);
@@ -451,11 +465,13 @@ loadDataParams.srcStride = 1;
 loadDataParams.dstGap = 0;
 loadDataParams.dstFracGap = CeilDivision(k, fractalShape[1]) - 1;
 for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
-  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                                 loadDataParams);
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffsetB = CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffsetB =
+    CeilDivision(n, fractalShape[0] * fractalNum) * fractalSize * fractalNum;
 uint32_t srcOffsetB = fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParamsB;
 loadDataParamsB.startIndex = 0;
@@ -464,7 +480,8 @@ loadDataParamsB.srcStride = CeilDivision(k, fractalShape[0] * fractalNum);
 loadDataParamsB.dstGap = 0;
 loadDataParamsB.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(k, fractalShape[0] * fractalNum); ++i) {
-  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
+  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB],
+                                 b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
@@ -479,7 +496,8 @@ uint32_t fractalNum = 2;
 uint32_t fractalSize = fractalShape[0] * fractalShape[1];
 
 // A矩阵LoadDataWithTranspose: Zz -> Zz
-uint32_t dstOffset = CeilDivision(k, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffset =
+    CeilDivision(k, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
 uint32_t srcOffset = fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParams;
 loadDataParams.startIndex = 0;
@@ -488,12 +506,15 @@ loadDataParams.srcStride = CeilDivision(m, fractalShape[1] * fractalNum);
 loadDataParams.dstGap = 1;
 loadDataParams.dstFracGap = 0;
 for (int i = 0; i < CeilDivision(m, fractalShape[1] * fractalNum); ++i) {
-  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadDataWithTranspose(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                                 loadDataParams);
 }
 
 // B矩阵LoadDataWithTranspose: Nz -> Zn
-uint32_t dstOffsetB = CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
-uint32_t srcOffsetB = CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
+uint32_t dstOffsetB =
+    CeilDivision(n, fractalShape[0]) * fractalSize * fractalNum;
+uint32_t srcOffsetB =
+    CeilDivision(n, fractalShape[1] * fractalNum) * fractalSize * fractalNum;
 AscendC::LoadData2dTransposeParams loadDataParamsB;
 loadDataParamsB.startIndex = 0;
 loadDataParamsB.repeatTimes = CeilDivision(n, fractalShape[1] * fractalNum);
@@ -501,7 +522,8 @@ loadDataParamsB.srcStride = 1;
 loadDataParamsB.dstGap = 0;
 loadDataParamsB.dstFracGap = CeilDivision(n, fractalShape[0]) - 1;
 for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
-    AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB], b1Local[i * srcOffsetB], loadDataParamsB);
+  AscendC::LoadDataWithTranspose(b2Local[i * dstOffsetB],
+                                 b1Local[i * srcOffsetB], loadDataParamsB);
 }
 ```
 
@@ -518,20 +540,20 @@ uint32 k = 128;
 pipe = tpipe;
 TQue<TPosition::B1, 1> qidB1_;
 TQue<TPosition::B2, 1> qidB2_;
-pipe->InitBuffer(qidB1_, 1, n * k * sizeof(int8_t));
-pipe->InitBuffer(qidB2_, 1, n * k * sizeof(int8_t));
+pipe->InitBuffer(qidB1_, 1, n *k * sizeof(int8_t));
+pipe->InitBuffer(qidB2_, 1, n *k * sizeof(int8_t));
 auto rightMatrix = qidB1_.template DeQue<int8_t>();
 LocalTensor<int8_t> b2 = qidB2_.AllocTensor<int8_t>();
 uint16_t fracNum = 2;
 uint16_t kStep = CeilDiv(kLength, 16);
 uint16_t nStep = CeilDiv(nLength, 32);
-for (uint16_t i = 0; i < nStep; i ++) {
-    LoadData2dTransposeParamsV2 loadDataParams;
-    loadDataParams.startIndex = i * kStep;
-    loadDataParams.repeatTimes = kStep / 2;
-    loadDataParams.srcStride = 2;
-    loadDataParams.dstGap = nStep*2 - 1;
-    LoadDataWithTranspose(b2[1024*i], rightMatrix, loadDataParams);
+for (uint16_t i = 0; i < nStep; i++) {
+  LoadData2dTransposeParamsV2 loadDataParams;
+  loadDataParams.startIndex = i * kStep;
+  loadDataParams.repeatTimes = kStep / 2;
+  loadDataParams.srcStride = 2;
+  loadDataParams.dstGap = nStep * 2 - 1;
+  LoadDataWithTranspose(b2[1024 * i], rightMatrix, loadDataParams);
 }
 qidB2_.EnQue(b2);
 qidB1_.FreeTensor(rightMatrix);

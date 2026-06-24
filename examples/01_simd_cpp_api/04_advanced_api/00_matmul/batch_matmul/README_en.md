@@ -47,16 +47,16 @@ By transferring multiple Matmul input data in a single transfer, the number of t
   - Key Kernel Steps
     - Complete the multi-batch matrix multiplication operation.
       ```cpp
-      matmulObj.IterateBatch(cGlobal[batchOffsetC], batchA, batchB, false);
+matmulObj.IterateBatch(cGlobal[batchOffsetC], batchA, batchB, false);
       ```
 
   - Key Tiling Steps
     - Call SetALayout, SetBLayout, SetCLayout, and SetBatchNum to set the Layout axis information and maximum BatchNum for A/B/C.
       ```cpp
-      cubeTiling->SetALayout(A_BNUM, A_SNUM, 1, A_GNUM, A_DNUM);
-      cubeTiling->SetBLayout(B_BNUM, B_SNUM, 1, B_GNUM, B_DNUM);
-      cubeTiling->SetCLayout(C_BNUM, C_SNUM, 1, C_GNUM, C_DNUM);
-      cubeTiling->SetBatchNum(BATCH_NUM);
+cubeTiling->SetALayout(A_BNUM, A_SNUM, 1, A_GNUM, A_DNUM);
+cubeTiling->SetBLayout(B_BNUM, B_SNUM, 1, B_GNUM, B_DNUM);
+cubeTiling->SetCLayout(C_BNUM, C_SNUM, 1, C_GNUM, C_DNUM);
+cubeTiling->SetBatchNum(BATCH_NUM);
       ```
 
   - Invocation Implementation  

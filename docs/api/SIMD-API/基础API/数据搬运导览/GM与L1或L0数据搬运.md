@@ -38,15 +38,18 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 - Global Memory -> L1 Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const uint32_t count)
     ```
 
 - L1 Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+template <typename T>
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
     ```
 
 ## GM与L1高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002543262916"></a>
@@ -69,15 +72,19 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 - Global Memory -> L1 Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
     ```
 
 - L1 Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const  LocalTensor<T>& src, const DataCopyParams& repeatParams)
+template <typename T>
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
     ```
 
 ## GMToL1随路转换-ND2NZ搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002573902841"></a>
@@ -96,8 +103,10 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 - 不支持enableSmallC0模式
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 <cann-filter npu-type="950">
@@ -105,8 +114,10 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 </cann-filter>
@@ -129,8 +140,10 @@ src和dst分别为源操作数和目的操作数；intriParams为DN2NZ搬运配�
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Dn2NzParams &intriParams);
     ```
 
 </cann-filter>
@@ -153,8 +166,11 @@ src和dst分别为源操作数和目的操作数；dataCopyParams和padParams为
 - 仅Ascend 950PR/Ascend 950DT支持
 
     ```cpp
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
     ```
 
 </cann-filter>
@@ -174,7 +190,9 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 ```
 
 <cann-filter npu-type="950">
@@ -195,8 +213,10 @@ src和dst分别为源操作数和目的操作数；loadDataParam为搬运参数�
 - 仅Ascend 950PR/Ascend 950DT支持
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
+template <typename T>
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const LoadData2DParamsV2 &loadDataParam)
     ```
 
 </cann-filter>
@@ -216,7 +236,9 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 ```
 
 ## GMToL0B 2D格式分形矩阵搬运(Load2D)<a name="ZH-CN_TOPIC_0000002543262918"></a>
@@ -234,7 +256,9 @@ src和dst分别为源操作数和目的操作数；loadDataParams为搬运参数
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 ```
 
 ## L0CToGM随路量化激活搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002573902843"></a>
@@ -252,7 +276,9 @@ src和dst分别为源操作数和目的操作数；intriParams为搬运参数。
 
 ```cpp
 template <typename T, typename U>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<U> &src,
+                                const DataCopyCO12DstParams &intriParams)
 ```
 
 ## L0CToGM随路量化激活搬运(FixPipe)<a name="ZH-CN_TOPIC_0000002543422576"></a>
@@ -273,13 +299,18 @@ src和dst分别为源操作数和目的操作数；intriParams为搬运参数，
 - 不开启随路[tensor量化](../矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 - 开启随路[tensor量化](../矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+        const LocalTensor<uint64_t> &cbufWorkspace,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```

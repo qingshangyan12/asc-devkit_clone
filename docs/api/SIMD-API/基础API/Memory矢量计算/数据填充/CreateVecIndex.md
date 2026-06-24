@@ -67,23 +67,28 @@ def CreateVecIndex(dst, firstValue, count):
 - tensor前n个数据计算
 
     ```cpp
-    template <typename T> 
-    __aicore__ inline void CreateVecIndex(LocalTensor<T> dst, const T &firstValue, uint32_t count) 
+template <typename T>
+__aicore__ inline void CreateVecIndex(LocalTensor<T> dst, const T &firstValue,
+                                      uint32_t count)
     ```
 
 - tensor高维切分计算
     - mask逐bit模式
 
         ```cpp
-        template <typename T> 
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask[], uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)  
+template <typename T>
+__aicore__ inline void
+CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask[],
+               uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T> 
-        __aicore__ inline void CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask, uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride) 
+template <typename T>
+__aicore__ inline void
+CreateVecIndex(LocalTensor<T> &dst, const T &firstValue, uint64_t mask,
+               uint8_t repeatTime, uint16_t dstBlkStride, uint8_t dstRepStride)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -149,29 +154,31 @@ def CreateVecIndex(dst, firstValue, count):
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    // repeatTime = 1, mask = 128, 128 elements one repeat, 128 elements total
-    // firstValue数据类型为int16_t，dstLocal数据类型为int16_t
-    // dstBlkStride = 1,单次迭代内数据连续写入
-    // dstRepStride = 8,相邻迭代内数据连续写入
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride, dstRepStride);
+// repeatTime = 1, mask = 128, 128 elements one repeat, 128 elements total
+// firstValue数据类型为int16_t，dstLocal数据类型为int16_t
+// dstBlkStride = 1,单次迭代内数据连续写入
+// dstRepStride = 8,相邻迭代内数据连续写入
+AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride,
+                        dstRepStride);
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 1, 128 elements one repeat, 128 elements total
-    // firstValue数据类型为int16_t，dstLocal数据类型为int16_t
-    // dstBlkStride = 1,单次迭代内数据连续写入
-    // dstRepStride = 8,相邻迭代内数据连续写入
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride, dstRepStride);
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// repeatTime = 1, 128 elements one repeat, 128 elements total
+// firstValue数据类型为int16_t，dstLocal数据类型为int16_t
+// dstBlkStride = 1,单次迭代内数据连续写入
+// dstRepStride = 8,相邻迭代内数据连续写入
+AscendC::CreateVecIndex(dstLocal, (int16_t)0, mask, repeatTime, dstBlkStride,
+                        dstRepStride);
     ```
 
 - tensor前n个数据计算样例
 
     ```cpp
-    uint32_t count = 128;    // 参与计算的元素个数
-    AscendC::CreateVecIndex(dstLocal, (int16_t)0, count);
+uint32_t count = 128; // 参与计算的元素个数
+AscendC::CreateVecIndex(dstLocal, (int16_t)0, count);
     ```
 
 结果示例如下：

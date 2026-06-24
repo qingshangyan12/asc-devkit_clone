@@ -62,18 +62,16 @@ $$
 接口签名用于让Python侧能够通过 `torch.ops.ascendc_ops.ascendc_add(x, y)` 找到该接口：
 
 ```cpp
-TORCH_LIBRARY_FRAGMENT(ascendc_ops, m)
-{
-    m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
+TORCH_LIBRARY_FRAGMENT(ascendc_ops, m) {
+  m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
 }
 ```
 
 `torch.compile` 捕获图时不会执行真实NPU计算，但需要推导输出Tensor信息，因此还需要注册Meta实现：
 
 ```cpp
-TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m)
-{
-    m.impl("ascendc_add", TORCH_FN(AscendcAddMeta));
+TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m) {
+  m.impl("ascendc_add", TORCH_FN(AscendcAddMeta));
 }
 ```
 

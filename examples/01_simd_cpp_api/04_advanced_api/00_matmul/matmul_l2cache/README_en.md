@@ -44,27 +44,31 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
   - Key Kernel Steps
     - Set the left matrix A, right matrix B, and Bias. Obtain the total L2 split count from the L2CacheOptimizer class GetTileNum interface and loop through multiple computations.
       ```cpp
-      L2CacheOpt l2Opt(shapes, blockNum);
-      matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
-      for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum(); tileIdx += blockNum) {
-          auto blockShape = l2Opt.GetBlockShape(tileIdx);  // Get the L2 split block size for single computation
-          if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
-              return;
-          }
-          auto blockCoord = l2Opt.GetBlockCoord(tileIdx);  // Get the current computation index blockCoord
-          matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
-          const auto& offsetCoord = CalcOffset(shapes, blockCoord); // Calculate matrix offset based on index
-          int64_t offsetA = Get<0>(offsetCoord);
-          int64_t offsetB = Get<1>(offsetCoord);
-          int64_t offsetC = Get<2>(offsetCoord);
-          matmulObj.SetTensorA(aGlobal[offsetA], false);
-          matmulObj.SetTensorB(bGlobal[offsetB], false);
-          if (shapes.isBias) {
-              matmulObj.SetBias(biasGlobal);
-          }
-          matmulObj.IterateAll(cGlobal[offsetC]);  // Compute L2 split block
-      }
-      matmulObj.End();
+L2CacheOpt l2Opt(shapes, blockNum);
+matmulObj.SetOrgShape(shapes.m, shapes.n, shapes.k);
+for (int64_t tileIdx = curBlockIdx; tileIdx < l2Opt.GetTileNum();
+     tileIdx += blockNum) {
+  auto blockShape = l2Opt.GetBlockShape(
+      tileIdx); // Get the L2 split block size for single computation
+  if (Get<0>(blockShape) <= 0 || Get<1>(blockShape) <= 0) {
+    return;
+  }
+  auto blockCoord = l2Opt.GetBlockCoord(
+      tileIdx); // Get the current computation index blockCoord
+  matmulObj.SetTail(Get<0>(blockShape), Get<1>(blockShape), Get<2>(blockShape));
+  const auto &offsetCoord =
+      CalcOffset(shapes, blockCoord); // Calculate matrix offset based on index
+  int64_t offsetA = Get<0>(offsetCoord);
+  int64_t offsetB = Get<1>(offsetCoord);
+  int64_t offsetC = Get<2>(offsetCoord);
+  matmulObj.SetTensorA(aGlobal[offsetA], false);
+  matmulObj.SetTensorB(bGlobal[offsetB], false);
+  if (shapes.isBias) {
+    matmulObj.SetBias(biasGlobal);
+  }
+  matmulObj.IterateAll(cGlobal[offsetC]); // Compute L2 split block
+}
+matmulObj.End();
       ```
 
   - Key Tiling Steps
@@ -72,35 +76,41 @@ The Matmul example splits the input matrix along the M or N direction, dividing 
     - L2CacheOptimizer specific computation steps:
       - Determine whether L2 splitting is needed
         ```cpp
-        bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
-        if (smallDim || (!EnableL2Tile())) { // Check if total computation data is below L2 Cache threshold
-            mL2TileNum_ = mTileNum_;
-            nL2TileNum_ = nTileNum_;
-            mL2BlockNum_ = 1;
-            nL2BlockNum_ = 1;
-            return; // No splitting needed, return early
-        }
-        InitL2TileTail(); // Compute L2 split
+bool smallDim = mTileNum_ < L1_MIN_UST_DIM && nTileNum_ < L1_MIN_UST_DIM;
+if (smallDim || (!EnableL2Tile())) { // Check if total computation data is below
+                                     // L2 Cache threshold
+  mL2TileNum_ = mTileNum_;
+  nL2TileNum_ = nTileNum_;
+  mL2BlockNum_ = 1;
+  nL2BlockNum_ = 1;
+  return; // No splitting needed, return early
+}
+InitL2TileTail(); // Compute L2 split
         ```
       - Calculate optimal L2 blocking based on load balancing
         ```cpp
-        int64_t mConflict = INT64_MAX;
-        int64_t nConflict = INT64_MAX;
-        constexpr bool isNMajor = l1N > l1M; // Determine the major dimension based on shape size
-        for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
-            for (int64_t j = maxMinor; j >= minMinor; j--) {
-                if (GetTotalSize(j * l1M, i * l1N, k_) <= L2_TILE_THRESHOLD) { // Ensure block is below L2 Cache threshold
-                    uint64_t mConflictTmp = AscendC::Ceil(blockNum_, mL2TileNumTailTmp); // Calculate load conflict value
-                    uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
-                    if (mConflict >= mConflictTmp && nConflict >= nConflictTmp) { // If conflict value is smaller, update block count
-                        mConflict = mConflictTmp;
-                        nConflict = nConflictTmp;
-                        mL2TileNum_ = curMajorDim;
-                        nL2TileNum_ = curMinorDim;
-                    }
-                }
-            }
-        }
+int64_t mConflict = INT64_MAX;
+int64_t nConflict = INT64_MAX;
+constexpr bool isNMajor =
+    l1N > l1M; // Determine the major dimension based on shape size
+for (int64_t i = maxMajor; i >= L1_MIN_UST_DIM; i--) {
+  for (int64_t j = maxMinor; j >= minMinor; j--) {
+    if (GetTotalSize(j * l1M, i * l1N, k_) <=
+        L2_TILE_THRESHOLD) { // Ensure block is below L2 Cache threshold
+      uint64_t mConflictTmp = AscendC::Ceil(
+          blockNum_, mL2TileNumTailTmp); // Calculate load conflict value
+      uint64_t nConflictTmp = AscendC::Ceil(blockNum_, nL2TileNumTailTmp);
+      if (mConflict >= mConflictTmp &&
+          nConflict >= nConflictTmp) { // If conflict value is smaller, update
+                                       // block count
+        mConflict = mConflictTmp;
+        nConflict = nConflictTmp;
+        mL2TileNum_ = curMajorDim;
+        nL2TileNum_ = curMinorDim;
+      }
+    }
+  }
+}
         ```
 
   - Invocation Implementation  

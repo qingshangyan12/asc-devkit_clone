@@ -35,8 +35,10 @@ $$dstReg_i = srcReg_i + scalarValue$$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-__simd_callee__ inline void Adds(S& dstReg, S& srcReg, U scalarValue, MaskReg& mask)
+template <typename T = DefaultType, typename U,
+          MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
+__simd_callee__ inline void Adds(S &dstReg, S &srcReg, U scalarValue,
+                                 MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -75,18 +77,19 @@ __simd_callee__ inline void Adds(S& dstReg, S& srcReg, U scalarValue, MaskReg& m
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void AddsVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;    
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(dstReg, srcReg, scalarValue, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+template <typename T>
+__simd_vf__ inline void AddsVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                               T scalarValue, uint32_t count,
+                               uint16_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(dstReg, srcReg, scalarValue, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```
 

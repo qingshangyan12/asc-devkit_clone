@@ -114,20 +114,17 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void publish_fault_status(uint32_t *status,
-                                                               uint32_t *old_status,
-                                                               uint32_t *fault_flags,
-                                                               uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void publish_fault_status(
+    uint32_t *status, uint32_t *old_status, uint32_t *fault_flags, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (fault_flags[idx] != 0U) {
-            old_status[idx] = asc_atomic_exch(status, 1U);
-        }
-    }
+  if (fault_flags[idx] != 0U) {
+    old_status[idx] = asc_atomic_exch(status, 1U);
+  }
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -135,26 +132,24 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void publish_fault_status(__gm__ uint32_t *status,
-                                                                        __gm__ uint32_t *old_status,
-                                                                        __gm__ uint32_t *fault_flags,
-                                                                        uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void publish_fault_status(
+    __gm__ uint32_t *status, __gm__ uint32_t *old_status,
+    __gm__ uint32_t *fault_flags, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        if (fault_flags[idx] != 0U) {
-            old_status[idx] = asc_atomic_exch(status, 1U);
-        }
-    }
+  if (fault_flags[idx] != 0U) {
+    old_status[idx] = asc_atomic_exch(status, 1U);
+  }
+}
     ```
 
 输出结果示例如下：
 
 ```cpp
-fault_flags: 0, 1, 0, 1
-status before: 0
-status after: 1 // 表明至少有一个线程检测到故障并发布故障状态
+fault_flags : 0, 1, 0,
+    1 status before : 0 status
+        after : 1 // 表明至少有一个线程检测到故障并发布故障状态
 ```

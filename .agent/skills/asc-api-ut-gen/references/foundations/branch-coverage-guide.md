@@ -15,11 +15,11 @@
 ```cpp
 // 示例：架构条件编译
 #if __NPU_ARCH__ == 2201
-    // 分支 1: ascend910B1 架构
-    #include "dav_c220/kernel_operator_fixpipe_impl.h"
+// 分支 1: ascend910B1 架构
+#include "dav_c220/kernel_operator_fixpipe_impl.h"
 #elif __NPU_ARCH__ == 3510
-    // 分支 2: ascend950pr_9599 架构
-    #include "dav_3510/kernel_operator_fixpipe_impl.h"
+// 分支 2: ascend950pr_9599 架构
+#include "dav_3510/kernel_operator_fixpipe_impl.h"
 #endif
 ```
 
@@ -31,15 +31,15 @@
 
 ```cpp
 // 示例：模板参数分支
-template <typename T, typename U, const FixpipeConfig& config>
+template <typename T, typename U, const FixpipeConfig &config>
 void Fixpipe(...) {
-    if constexpr (config.isToUB) {
-        // 分支 1: 输出到 UB
-        FixpipeL0C2UBImpl(...);
-    } else {
-        // 分支 2: 输出到 L1
-        FixpipeL0C2L1Impl(...);
-    }
+  if constexpr (config.isToUB) {
+    // 分支 1: 输出到 UB
+    FixpipeL0C2UBImpl(...);
+  } else {
+    // 分支 2: 输出到 L1
+    FixpipeL0C2L1Impl(...);
+  }
 }
 ```
 
@@ -52,9 +52,9 @@ void Fixpipe(...) {
 ```cpp
 // 示例：运行时条件分支
 if ((GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1)) {
-    // 分支 1: 目标在 L1
+  // 分支 1: 目标在 L1
 } else if ((GetPhyType((TPosition)dst.GetPosition()) == Hardware::UB)) {
-    // 分支 2: 目标在 UB
+  // 分支 2: 目标在 UB
 }
 ```
 
@@ -69,11 +69,11 @@ if ((GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1)) {
 if (intriParams.quantPre == QuantMode_t::VDEQF16 ||
     intriParams.quantPre == QuantMode_t::VQF322B8_PRE ||
     intriParams.quantPre == QuantMode_t::VREQ8) {
-    // 分支：需要 workspace
-    Fixpipe(..., cbufWorkspace, ...);
+  // 分支：需要 workspace
+  Fixpipe(..., cbufWorkspace, ...);
 } else {
-    // 分支：不需要 workspace
-    Fixpipe(...);
+  // 分支：不需要 workspace
+  Fixpipe(...);
 }
 ```
 
@@ -85,14 +85,15 @@ if (intriParams.quantPre == QuantMode_t::VDEQF16 ||
 
 ```cpp
 // 重载 1: 无 workspace
-template <typename T, typename U, const FixpipeConfig& config>
-void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsV220& intriParams);
+template <typename T, typename U, const FixpipeConfig &config>
+void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+             const FixpipeParamsV220 &intriParams);
 
 // 重载 2: 有 workspace
-template <typename T, typename U, const FixpipeConfig& config>
-void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsV220& intriParams);
+template <typename T, typename U, const FixpipeConfig &config>
+void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+             const LocalTensor<uint64_t> &cbufWorkspace,
+             const FixpipeParamsV220 &intriParams);
 ```
 
 **覆盖策略**：每个重载版本独立测试。

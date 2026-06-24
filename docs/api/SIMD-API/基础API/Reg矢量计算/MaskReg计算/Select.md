@@ -33,7 +33,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+__simd_callee__ inline void Select(MaskReg &dst, MaskReg &src0, MaskReg &src1,
+                                   MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -58,21 +59,24 @@ __simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, M
 ## 调用示例<a name="section932512912207"></a>
 
 ```cpp
-template
-simd_vf inline void SelectVF(ubuf T* dstAddr, ubuf T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor srcReg;
-    AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    AscendC::Reg::MaskReg maskNone = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-    AscendC::Reg::MaskReg maskVL1 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::VL1>();
-    AscendC::Reg::MaskReg newMask;
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::Select(newMask, maskFull, maskNone, maskVL1);
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::Reg::UpdateMask(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(srcReg, srcReg, 0, newMask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-    }
+template simd_vf inline void SelectVF(ubuf T *dstAddr, ubuf T *srcAddr,
+                                      uint32_t count, uint32_t oneRepeatSize,
+                                      uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor srcReg;
+  AscendC::Reg::MaskReg maskFull =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+  AscendC::Reg::MaskReg maskNone =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+  AscendC::Reg::MaskReg maskVL1 =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::VL1>();
+  AscendC::Reg::MaskReg newMask;
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::Select(newMask, maskFull, maskNone, maskVL1);
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask = AscendC::Reg::UpdateMask(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, newMask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+  }
 }
 ```

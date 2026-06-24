@@ -49,27 +49,23 @@ unsigned long long meta_group_rank() const
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        unsigned long long group_rank = tile4.meta_group_rank();
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  unsigned long long group_rank = tile4.meta_group_rank();
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        unsigned long long group_rank = tile4.meta_group_rank();
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  unsigned long long group_rank = tile4.meta_group_rank();
+  ...
+}
     ```

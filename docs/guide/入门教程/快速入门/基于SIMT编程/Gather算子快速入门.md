@@ -38,17 +38,17 @@
         Device端部分示例如下：
 
         ```cpp
-        __global__ void gather_1d_custom(float* input, int32_t* index, float* output, uint64_t index_total_length)
-        {
-            // Calculate global thread ID
-            int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void gather_1d_custom(float *input, int32_t *index, float *output,
+                                 uint64_t index_total_length) {
+  // Calculate global thread ID
+  int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-            // Maps to the index of output tensor
-            if (idx >= index_total_length) {
-                return;
-            }
-            output[idx] = input[index[idx]];
-        }
+  // Maps to the index of output tensor
+  if (idx >= index_total_length) {
+    return;
+  }
+  output[idx] = input[index[idx]];
+}
         ```
 
     - **Host端代码实现**：
@@ -56,38 +56,46 @@
         Host端通过<<<>>>语法糖调用Device端代码。
 
         ```cpp
-        std::vector<float> gather_1d(std::vector<float>& input, std::vector<int32_t>& index)
-        {
-            ...
-            aclrtCreateStream(&stream);
-            // Allocate host and device memory, and copy input data from host to device
-            aclrtMallocHost((void **)(&output_host), output_total_byte_size);
-            aclrtMalloc((void **)&input_device, input_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-            aclrtMalloc((void **)&index_device, index_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-            aclrtMalloc((void **)&output_device, output_total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-            aclrtMemcpy(input_device, input_total_byte_size, input_host, input_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
-            aclrtMemcpy(index_device, index_total_byte_size, index_host, index_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+std::vector<float> gather_1d(std::vector<float> &input,
+                             std::vector<int32_t> &index) {
+  ... aclrtCreateStream(&stream);
+  // Allocate host and device memory, and copy input data from host to device
+  aclrtMallocHost((void **)(&output_host), output_total_byte_size);
+  aclrtMalloc((void **)&input_device, input_total_byte_size,
+              ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&index_device, index_total_byte_size,
+              ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&output_device, output_total_byte_size,
+              ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMemcpy(input_device, input_total_byte_size, input_host,
+              input_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+  aclrtMemcpy(index_device, index_total_byte_size, index_host,
+              index_total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
 
-            // Configure kernel launch parameters.
-            // In this sample, index.size() is 48 * 256, so 48 blocks and 256 threads per block
-            // cover one output element per thread. For general input lengths, use
-            // blocks_per_grid = (index.size() + threads_per_block - 1) / threads_per_block.
-            uint32_t blocks_per_grid = 48; // Number of thread blocks (Grid size)
-            uint32_t threads_per_block = 256; // Number of threads per block (Block size)
-            uint32_t dyn_ubuf_size = 0;  // No dynamic memory required in this sample
+  // Configure kernel launch parameters.
+  // In this sample, index.size() is 48 * 256, so 48 blocks and 256 threads per
+  // block cover one output element per thread. For general input lengths, use
+  // blocks_per_grid = (index.size() + threads_per_block - 1) /
+  // threads_per_block.
+  uint32_t blocks_per_grid = 48;    // Number of thread blocks (Grid size)
+  uint32_t threads_per_block = 256; // Number of threads per block (Block size)
+  uint32_t dyn_ubuf_size = 0;       // No dynamic memory required in this sample
 
-            // Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
-            gather_1d_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size, stream>>>(
-                input_device, index_device, output_device, index.size());
+  // Launch kernel <<<grid_dim, block_dim, dynamic_memory_size, stream>>>
+  gather_1d_custom<<<blocks_per_grid, threads_per_block, dyn_ubuf_size,
+                     stream>>>(input_device, index_device, output_device,
+                               index.size());
 
-            // Wait for the gather_1d_custom kernel to complete
-            aclrtSynchronizeStream(stream);
+  // Wait for the gather_1d_custom kernel to complete
+  aclrtSynchronizeStream(stream);
 
-            // Copy the result from device memory to host memory
-            aclrtMemcpy(output_host, output_total_byte_size, output_device, output_total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
-            std::vector<float> output((float *)output_host, (float *)(output_host + output_total_byte_size));
-            ...
-        }
+  // Copy the result from device memory to host memory
+  aclrtMemcpy(output_host, output_total_byte_size, output_device,
+              output_total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
+  std::vector<float> output((float *)output_host,
+                            (float *)(output_host + output_total_byte_size));
+  ...
+}
         ```
 
 - **算子编译与运行**：

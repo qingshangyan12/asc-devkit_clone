@@ -72,23 +72,31 @@ $$
 - tensor前n个数据计算
 
   ```cpp
-  template <typename T, typename U>
-  __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, const int32_t& count)
+template <typename T, typename U>
+__aicore__ inline void
+MulAddDst(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+          const LocalTensor<U> &src1, const int32_t &count)
   ```
 
 - tensor高维切分计算
   - mask逐bit模式
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>& src0,const LocalTensor<U>& src1, const uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+MulAddDst(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+          const LocalTensor<U> &src1, const uint64_t mask[],
+          const uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
     ```
 
   - mask连续模式
 
     ```cpp
-    template <typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void MulAddDst(const LocalTensor<T>& dst, const LocalTensor<U>& src0,const LocalTensor<U>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+MulAddDst(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+          const LocalTensor<U> &src1, uint64_t mask, const uint8_t repeatTime,
+          const BinaryRepeatParams &repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -224,27 +232,29 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 - 高维切分计算接口样例-mask连续模式（源操作数的数据类型为half、目的操作数的数据类型为float）
 
   ```cpp
-  uint64_t mask = 64;
-  // repeatTime = 4，一次迭代计算64个数，共计算256个数
-  // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 8，src0RepStride, src1RepStride = 4，相邻迭代间数据连续读取和写入
-  AscendC::MulAddDst(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 4, 4 });
+uint64_t mask = 64;
+// repeatTime = 4，一次迭代计算64个数，共计算256个数
+// dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
+// dstRepStride = 8，src0RepStride, src1RepStride =
+// 4，相邻迭代间数据连续读取和写入
+AscendC::MulAddDst(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 8, 4, 4});
   ```
 
 - 高维切分计算接口样例-mask逐bit模式（源操作数的数据类型为half、目的操作数的数据类型为float）
 
   ```cpp
-  uint64_t mask[2] = { UINT64_MAX, 0 };
-  // repeatTime = 4，一次迭代计算64个数，共计算256个数
-  // dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
-  // dstRepStride = 8，src0RepStride, src1RepStride = 4，相邻迭代间数据连续读取和写入
-  AscendC::MulAddDst(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 4, 4 });
+uint64_t mask[2] = {UINT64_MAX, 0};
+// repeatTime = 4，一次迭代计算64个数，共计算256个数
+// dstBlkStride, src0BlkStride, src1BlkStride = 1，单次迭代内数据连续读取和写入
+// dstRepStride = 8，src0RepStride, src1RepStride =
+// 4，相邻迭代间数据连续读取和写入
+AscendC::MulAddDst(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 8, 4, 4});
   ```
 
 - tensor前n个数据计算样例（源操作数的数据类型为half、目的操作数的数据类型为float）
 
   ```cpp
-  AscendC::MulAddDst(dstLocal, src0Local, src1Local, 256);
+AscendC::MulAddDst(dstLocal, src0Local, src1Local, 256);
   ```
 
 结果示例如下：

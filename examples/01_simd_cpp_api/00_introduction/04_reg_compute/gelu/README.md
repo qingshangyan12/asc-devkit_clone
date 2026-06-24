@@ -65,28 +65,29 @@ constexpr float COEFF_LINEAR = -1.595769f;
 constexpr float COEFF_CUBIC = -0.071405f;
 
 // VF 函数：在寄存器中完成 GELU 逐步计算
-__simd_vf__ inline static void GeluVfMethod2(
-    __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t count, uint32_t loopNum)
-{
-    // 一次向量计算repeat可处理的float元素数（如dav-3510为256字节/4字节=64个元素）
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg;
-    AscendC::Reg::RegTensor<float> yReg;
-    AscendC::Reg::RegTensor<float> tmpReg;
-    for (uint32_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(count);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);   // UB → 寄存器
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                  // x²
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                  // x³
-        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);          // -0.071405 * x³
-        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);       // -1.595769 * x
-        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);                // -1.595769x - 0.071405x³
-        AscendC::Reg::Exp(yReg, yReg, mask);                        // exp(...)
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);                 // 1 + exp(...)
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);                  // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask); // 寄存器 → UB
-    }
+__simd_vf__ inline static void GeluVfMethod2(__ubuf__ float *xAddr,
+                                             __ubuf__ float *yAddr,
+                                             uint32_t count, uint32_t loopNum) {
+  // 一次向量计算repeat可处理的float元素数（如dav-3510为256字节/4字节=64个元素）
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg;
+  AscendC::Reg::RegTensor<float> yReg;
+  AscendC::Reg::RegTensor<float> tmpReg;
+  for (uint32_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(count);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // UB → 寄存器
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);                // x²
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);                // x³
+    AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);        // -0.071405 * x³
+    AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);     // -1.595769 * x
+    AscendC::Reg::Add(yReg, tmpReg, yReg, mask); // -1.595769x - 0.071405x³
+    AscendC::Reg::Exp(yReg, yReg, mask);         // exp(...)
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);  // 1 + exp(...)
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);   // x / (1 + exp(...))
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                             mask); // 寄存器 → UB
+  }
 }
 ```
 
@@ -95,40 +96,47 @@ __simd_vf__ inline static void GeluVfMethod2(
 ```cpp
 // 核函数：分核逻辑 + 搬入/计算/搬出
 template <uint32_t singleCoreLength>
-__global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
-{
-    AscendC::InitSocState();
-    // 分核：通过 GetBlockIdx 获取当前核索引，计算数据偏移
-    AscendC::GlobalTensor<float> xGm;
-    AscendC::GlobalTensor<float> yGm;
-    xGm.SetGlobalBuffer((__gm__ float*)x + AscendC::GetBlockIdx() * singleCoreLength);
-    yGm.SetGlobalBuffer((__gm__ float*)y + AscendC::GetBlockIdx() * singleCoreLength);
+__global__ __vector__ void gelu_custom(__gm__ uint8_t *x, __gm__ uint8_t *y) {
+  AscendC::InitSocState();
+  // 分核：通过 GetBlockIdx 获取当前核索引，计算数据偏移
+  AscendC::GlobalTensor<float> xGm;
+  AscendC::GlobalTensor<float> yGm;
+  xGm.SetGlobalBuffer((__gm__ float *)x +
+                      AscendC::GetBlockIdx() * singleCoreLength);
+  yGm.SetGlobalBuffer((__gm__ float *)y +
+                      AscendC::GetBlockIdx() * singleCoreLength);
 
-    // 分配 UB 缓存
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-    AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, singleCoreLength>();
-    AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, singleCoreLength>();
+  // 分配 UB 缓存
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<float> xLocal =
+      ubAllocator.Alloc<float, singleCoreLength>();
+  AscendC::LocalTensor<float> yLocal =
+      ubAllocator.Alloc<float, singleCoreLength>();
 
-    // Stage 1: GM → UB 搬入
-    AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
-    // 同步：等待 GM→UB 搬运完成
-    // EVENT_ID0 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用 0
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  // Stage 1: GM → UB 搬入
+  AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
+  // 同步：等待 GM→UB 搬运完成
+  // EVENT_ID0
+  // 是硬件事件通道编号（0-7），每个事件通道独立计数，本样例仅使用一个通道故固定使用
+  // 0
+  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-    // Stage 2: 寄存器计算
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
-    __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
-    __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
-    asc_vf_call<GeluVfMethod2>(xAddr, yAddr, singleCoreLength, loopNum);
-    // 同步：等待寄存器计算完成
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  // Stage 2: 寄存器计算
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
+  __ubuf__ float *xAddr =
+      reinterpret_cast<__ubuf__ float *>(xLocal.GetPhyAddr());
+  __ubuf__ float *yAddr =
+      reinterpret_cast<__ubuf__ float *>(yLocal.GetPhyAddr());
+  asc_vf_call<GeluVfMethod2>(xAddr, yAddr, singleCoreLength, loopNum);
+  // 同步：等待寄存器计算完成
+  AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // Stage 3: UB → GM 搬出
-    AscendC::DataCopy(yGm[0], yLocal, singleCoreLength);
-    AscendC::PipeBarrier<PIPE_ALL>();
+  // Stage 3: UB → GM 搬出
+  AscendC::DataCopy(yGm[0], yLocal, singleCoreLength);
+  AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
@@ -166,7 +174,8 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 示例如下：
 
 ```cpp
-AscendC::printf("gelu blockIdx=%d, singleCoreLength=%d\n", AscendC::GetBlockIdx(), singleCoreLength);
+AscendC::printf("gelu blockIdx=%d, singleCoreLength=%d\n",
+                AscendC::GetBlockIdx(), singleCoreLength);
 ```
 
 > **注意：** printf（PRINTF）接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置 `ASCENDC_DUMP=0` 的方式关闭打印功能。

@@ -48,22 +48,25 @@ A Matmul example that enables the UnitFlag feature to parallelize the CUBE compu
   - Key Kernel Steps
     - When creating the Matmul object, customize the MatmulConfig parameters and set the enUnitFlag parameter to true to enable the UnitFlag feature, obtaining a custom Matmul object using the MDL template.
       ```cpp
-      __aicore__ inline constexpr MatmulConfig GetUnitFlagCfg()
-      {
-          auto mmCfg = CFG_MDL;
-      #ifdef ENABLE_UNITFLAG_FEATURE
-          // enable UnitFlag feature
-          mmCfg.enUnitFlag = true;
-      #endif
-          return mmCfg;
-      }
-      constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
+__aicore__ inline constexpr MatmulConfig GetUnitFlagCfg() {
+  auto mmCfg = CFG_MDL;
+#ifdef ENABLE_UNITFLAG_FEATURE
+  // enable UnitFlag feature
+  mmCfg.enUnitFlag = true;
+#endif
+  return mmCfg;
+}
+constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
       ```
 
   - Invocation Implementation  

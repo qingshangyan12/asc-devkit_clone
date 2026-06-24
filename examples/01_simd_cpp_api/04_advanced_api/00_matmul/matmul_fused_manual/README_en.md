@@ -49,33 +49,33 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
       - Create the Matmul object and initialize.
         Configure the ASCENDC_CUBE_ONLY macro before #include "lib/matmul_intf.h" to create a pure Cube mode Matmul object
           ```cpp
-          #define ASCENDC_CUBE_ONLY
-          #include "lib/matmul_intf.h"
+#define ASCENDC_CUBE_ONLY
+#include "lib/matmul_intf.h"
           ```
       - Complete the Matmul computation.
       - Set inter-core synchronization.
         ```cpp
-        if ASCEND_IS_AIC {
-          AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
-        }
+if ASCEND_IS_AIC {
+  AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
+}
         ```
     - AIV side specific steps:
       - Create the LeakyRelu object and initialize.
       - Wait for inter-core synchronization.
         ```cpp
-        if ASCEND_IS_AIV {
-          AscendC::CrossCoreWaitFlag(3);
-        }
+if ASCEND_IS_AIV {
+  AscendC::CrossCoreWaitFlag(3);
+}
         ```
       - Complete the LeakyRelu computation.
 
   - Key Tiling Steps
     - Set custom MatmulConfig parameters to synchronize Kernel-side configured parameters such as scheduleType to the Tiling side.
       ```cpp
-      tilingApi.SetOrgShape(M, N, K);
-      tilingApi.SetShape(M, N, K);
-      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
-      tilingApi.SetFixSplit(baseM, baseN, -1);
+tilingApi.SetOrgShape(M, N, K);
+tilingApi.SetShape(M, N, K);
+tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
   - Invocation Implementation

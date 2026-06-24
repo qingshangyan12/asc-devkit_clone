@@ -34,8 +34,10 @@ asc_arange(dst, index);
 
 ```cpp
 uint32_t length = 255;
-vector_bool mask = asc_create_mask_b16(PAT_ALL); // 创建一个所有元素为True的掩码寄存器
-vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操作的元素的具体数量，生成对应的掩码寄存器
+vector_bool mask =
+    asc_create_mask_b16(PAT_ALL); // 创建一个所有元素为True的掩码寄存器
+vector_bool mask = asc_update_mask_b16(
+    length); // 根据矢量计算需要操作的元素的具体数量，生成对应的掩码寄存器
 ```
 
 ## 非对齐寄存器
@@ -50,22 +52,29 @@ vector_bool mask = asc_update_mask_b16(length); // 根据矢量计算需要操�
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
 uint32_t total_length = 255;
 uint32_t repeat_time = (total_length + one_repeat_size - 1) / one_repeat_size;
-__simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr, uint32_t count,
-    uint32_t one_repeat_size, uint16_t repeat_time)
-{
-    vector_int8_t src;
-    vector_int8_t dst;
-    vector_load_unalign ureg0;
-    vector_store_unalign ureg1;
-    vector_bool mask;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        mask = asc_update_mask_b8(count);
-        asc_loadunalign_pre(ureg0, src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
-        asc_loadunalign(src, ureg0, src_addr + i * one_repeat_size); // 配合vector_load_unalign的使用，非对齐搬入源数据
-        asc_neg(dst, src, mask);
-        asc_storeunalign(dst_addr + i * one_repeat_size, ureg1, dst, one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数据
-        asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1, 0); // 处理非对齐搬出的尾块
-    }
+__simd_vf__ inline void neg_vf(__ubuf__ int8_t *dst_addr,
+                               __ubuf__ int8_t *src_addr, uint32_t count,
+                               uint32_t one_repeat_size, uint16_t repeat_time) {
+  vector_int8_t src;
+  vector_int8_t dst;
+  vector_load_unalign ureg0;
+  vector_store_unalign ureg1;
+  vector_bool mask;
+  for (uint16_t i = 0; i < repeat_time; ++i) {
+    mask = asc_update_mask_b8(count);
+    asc_loadunalign_pre(ureg0,
+                        src_addr + i * one_repeat_size); // 非对齐搬入前的初始化
+    asc_loadunalign(
+        src, ureg0,
+        src_addr +
+            i * one_repeat_size); // 配合vector_load_unalign的使用，非对齐搬入源数据
+    asc_neg(dst, src, mask);
+    asc_storeunalign(
+        dst_addr + i * one_repeat_size, ureg1, dst,
+        one_repeat_size); // 配合vector_store_unalign的使用，非对齐搬出目的数据
+    asc_storeunalign_post(dst_addr + i * one_repeat_size, ureg1,
+                          0); // 处理非对齐搬出的尾块
+  }
 }
 ```
 
@@ -79,21 +88,23 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 constexpr uint32_t one_repeat_size = 256 / sizeof(int8_t); // VL / sizeof(T)
 uint32_t total_length = 256;
 uint32_t repeat_time = total_length / one_repeat_size;
-__simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr, __ubuf__ int8_t* src1_addr, uint32_t count,
-    uint32_t one_repeat_size, uint16_t repeat_time)
-{
-    vector_int8_t src0;
-    vector_int8_t src1;
-    vector_int8_t dst;
-    vector_bool mask;
-    iter_reg addr_reg;
-    for (uint16_t i = 0; i < repeat_time; ++i) {
-        addr_reg = asc_create_iter_reg_b8(one_repeat_size); // 通过初始化iter_reg，每一次循环，地址偏移one_repeat_size
-        mask = asc_update_mask_b8(count);
-        asc_loadalign(src0, src0_addr, addr_reg);
-        asc_loadalign(src1, src1_addr, addr_reg);
-        asc_add(dst, src0, src1, mask);
-        asc_storealign(dst_addr, dst, addr_reg, mask);
-    }
+__simd_vf__ inline void add_vf(__ubuf__ int8_t *dst_addr,
+                               __ubuf__ int8_t *src0_addr,
+                               __ubuf__ int8_t *src1_addr, uint32_t count,
+                               uint32_t one_repeat_size, uint16_t repeat_time) {
+  vector_int8_t src0;
+  vector_int8_t src1;
+  vector_int8_t dst;
+  vector_bool mask;
+  iter_reg addr_reg;
+  for (uint16_t i = 0; i < repeat_time; ++i) {
+    addr_reg = asc_create_iter_reg_b8(
+        one_repeat_size); // 通过初始化iter_reg，每一次循环，地址偏移one_repeat_size
+    mask = asc_update_mask_b8(count);
+    asc_loadalign(src0, src0_addr, addr_reg);
+    asc_loadalign(src1, src1_addr, addr_reg);
+    asc_add(dst, src0, src1, mask);
+    asc_storealign(dst_addr, dst, addr_reg, mask);
+  }
 }
 ```

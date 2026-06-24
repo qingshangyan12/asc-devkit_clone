@@ -8,8 +8,7 @@ Coordinate本质上是一个元组（tuple），用于表示张量在不同维�
 ## 原型定义<a name="section10580930144614"></a>
 
 ```cpp
-template <typename... Coords>
-using Coord = Std::tuple<Coords...>
+template <typename... Coords> using Coord = Std::tuple<Coords...>
 ```
 
 ## 模板参数<a name="section116801320102618"></a>
@@ -37,13 +36,17 @@ using Coord = Std::tuple<Coords...>
 ```cpp
 // Coord结构构造方法
 template <typename... Ts>
-__aicore__ inline constexpr Coord<Ts...> MakeCoord(Ts const&... t)
+__aicore__ inline constexpr Coord<Ts...> MakeCoord(Ts const &...t)
 
-// Layout输入，Coordinate转换为内存位置索引Index
-template <typename CoordType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const Layout<ShapeType, StrideType>& layout)
+    // Layout输入，Coordinate转换为内存位置索引Index
+    template <typename CoordType, typename ShapeType, typename StrideType>
+    __aicore__
+    inline constexpr auto Crd2Idx(const CoordType &coord,
+                                  const Layout<ShapeType, StrideType> &layout)
 
-// Shape和Stride输入，Coordinate转换为内存位置索引Index
-template <typename CoordType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto Crd2Idx(const CoordType& coord, const ShapeType& shape, const StrideType& stride)
+    // Shape和Stride输入，Coordinate转换为内存位置索引Index
+    template <typename CoordType, typename ShapeType, typename StrideType>
+    __aicore__ inline constexpr auto Crd2Idx(const CoordType &coord,
+                                             const ShapeType &shape,
+                                             const StrideType &stride)
 ```

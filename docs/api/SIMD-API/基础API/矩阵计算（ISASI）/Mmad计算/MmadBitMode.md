@@ -39,21 +39,32 @@ __aicore__ inline MmadBitModeParams(const MmadBitModeParams &mmadParams_);
 - 不传入bias
 
   ```cpp
-  template <typename T, typename U, typename S>
-  __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                            const LocalTensor<S> &filter,
+                            const MmadBitModeParams &mmadParams)
 
-  template <typename T, typename U, typename S>
-  __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadBitModeParams& mmadParams)
+    template <typename T, typename U, typename S>
+    __aicore__
+    inline void MmadMx(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                       const LocalTensor<S> &filter,
+                       const MmadBitModeParams &mmadParams)
   ```
 
 - 传入bias
 
   ```cpp
-  template <typename T, typename U, typename S, typename V>
-  __aicore__ inline void Mmad(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                            const LocalTensor<S> &filter,
+                            const LocalTensor<V> &bias,
+                            const MmadBitModeParams &mmadParams)
 
-  template <typename T, typename U, typename S, typename V>
-  __aicore__ inline void MmadMx(const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias, const MmadBitModeParams& mmadParams)
+    template <typename T, typename U, typename S, typename V>
+    __aicore__
+    inline void MmadMx(const LocalTensor<T> &dst, const LocalTensor<U> &fm,
+                       const LocalTensor<S> &filter, const LocalTensor<V> &bias,
+                       const MmadBitModeParams &mmadParams)
   ```
 
 ## 参数说明

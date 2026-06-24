@@ -23,24 +23,24 @@ MakeMemPtr提供三种调用形式：
     - 指定物理位置和数据类型，根据原始地址构造：
 
     ```cpp
-    template <typename Hardware, typename DataType, typename Addr,
-        EnableMakePtrByTrait<Hardware, Addr> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Addr addr)
+template <typename Hardware, typename DataType, typename Addr,
+          EnableMakePtrByTrait<Hardware, Addr> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Addr addr)
     ```
 
     - 指定物理位置，从已有迭代器构造：
 
     ```cpp
-    template <typename Hardware, typename Iterator,
-        EnableMakeHardwarePtr<Hardware, Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+template <typename Hardware, typename Iterator,
+          EnableMakeHardwarePtr<Hardware, Iterator> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
     ```
 
     - 从已有迭代器中自动推导物理位置：
 
     ```cpp
-    template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
-    __aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
+template <typename Iterator, EnableMakePtrByIter<Iterator> Enable>
+__aicore__ inline constexpr auto MakeMemPtr(Iterator iterator)
     ```
 
 ## 参数说明
@@ -104,8 +104,10 @@ auto l0aPtr = MakeMemPtr<Location::L0A, half>(l0aOffset);
 auto ubPtr = MakeMemPtr<Location::UB, bfloat16_t>(ubOffset);
 
 // 2. 配合MakeTensor构造张量
-auto gmA = MakeTensor(gmPtr, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
-auto l1A = MakeTensor(l1Ptr, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
+auto gmA = MakeTensor(
+    gmPtr, MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n));
+auto l1A = MakeTensor(
+    l1Ptr, MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n));
 
 // 3. 从已有指针适配器继承位置（自动推导）
 auto anotherPtr = MakeMemPtr(gmPtr);

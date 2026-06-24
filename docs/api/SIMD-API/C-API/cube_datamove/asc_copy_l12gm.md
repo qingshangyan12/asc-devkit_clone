@@ -16,12 +16,16 @@
 - 常规搬运
 
     ```cpp
-    __aicore__ inline void asc_copy_l12gm(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12gm(__gm__ void *dst, __cbuf__ void *src,
+                                      uint16_t n_burst, uint16_t len_burst,
+                                      uint16_t src_gap, uint16_t dst_gap)
     ```
 - 同步搬运
 
     ```cpp
-    __aicore__ inline void asc_copy_l12gm_sync(__gm__ void* dst, __cbuf__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_l12gm_sync(__gm__ void *dst, __cbuf__ void *src,
+                                           uint16_t n_burst, uint16_t len_burst,
+                                           uint16_t src_gap, uint16_t dst_gap)
     ```
 
 ## 参数说明
@@ -53,13 +57,13 @@ PIPE_MTE1
 ## 调用示例
 
 ```cpp
-//待搬运的连续传输数据块为1
+// 待搬运的连续传输数据块为1
 constexpr uint16_t n_burst = 1;
-//待搬运的每个连续传输数据块的长度为32个字节
+// 待搬运的每个连续传输数据块的长度为32个字节
 constexpr uint16_t len_burst = 1;
-//相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
+// 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔为32个字节
 constexpr uint16_t src_gap = 0;
-//相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
+// 相邻迭代间，目标操作数前一个分形与后一个分形起始地址的间隔为64个字节
 constexpr uint16_t dst_gap = 1;
 __cbuf__ half src[256];
 __gm__ half dst[256];

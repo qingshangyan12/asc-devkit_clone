@@ -14,7 +14,7 @@
 
 ```cpp
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Select(const Layout<Shape, Stride>& layout)
+__aicore__ inline constexpr auto Select(const Layout<Shape, Stride> &layout)
 ```
 
 ## 参数说明

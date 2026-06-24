@@ -41,15 +41,18 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 - Global Memory -> Unified Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const uint32_t count)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+template <typename T>
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
     ```
 
 ## GM与UB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_00000023829080211"></a>
@@ -73,15 +76,19 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
 - Global Memory -> Unified Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+template <typename T>
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
     ```
 
 ## GM与UB切片数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002568770166"></a>
@@ -103,15 +110,21 @@ src和dst分别为源操作数和目的操作数；dstSliceInfo和srcSliceInfo�
 - Global Memory -> Unified Buffer
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
+template <typename T>
+__aicore__ inline void
+DataCopy(const LocalTensor<T> &dst, const GlobalTensor<T> &src,
+         const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+         const uint32_t dimValue = 1)
     ```
 
 - Unified Buffer -> Global Memory
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1)
+template <typename T>
+__aicore__ inline void
+DataCopy(const GlobalTensor<T> &dst, const LocalTensor<T> &src,
+         const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
+         const uint32_t dimValue = 1)
     ```
 
 ## GM -> UB随路转换ND2NZ搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002349187356"></a>
@@ -130,8 +143,10 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 - 不支持enableSmallC0模式
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 <cann-filter npu-type="950">
@@ -139,8 +154,10 @@ src和dst分别为源操作数和目的操作数；intriParams为Nd2NzParams类�
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 </cann-filter>
@@ -161,7 +178,9 @@ src和dst分别为源操作数和目的操作数；intriParams为Nz2NdParamsFull
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams)
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const Nz2NdParamsFull &intriParams)
 ```
 
 ## GM -> UB多维数据搬运NDDMA(DataCopy)<a name="ZH-CN_TOPIC_0000002544407954"></a>
@@ -180,14 +199,17 @@ src和dst分别为源操作数和目的操作数；params为NdDmaParams类型的
 - Global Memory -> Unified Buffer，支持多维度搬运
 
     ```cpp
-    template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const NdDmaParams<T, dim>& params)
+template <typename T, uint8_t dim,
+          const NdDmaConfig &config = kDefaultNdDmaConfig>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const NdDmaParams<T, dim> &params)
     ```
 
 - NDDMA Cache刷新
 
     ```cpp
-    __aicore__ inline void NdDmaDci()
+__aicore__ inline void NdDmaDci()
     ```
 
 ## GM -> UB非对齐数据搬运(DataCopyPad)<a name="ZH-CN_TOPIC_0000001894460401"></a>
@@ -210,8 +232,11 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 - 不支持配置设置数据搬运模式mode
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+template <typename T>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
     ```
 
 <cann-filter npu-type="950">
@@ -219,8 +244,11 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
     ```
 
 </cann-filter>
@@ -244,8 +272,10 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 - 不支持配置设置数据搬运模式mode
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+template <typename T>
+__aicore__ inline void DataCopyPad(const GlobalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams)
     ```
 
 <cann-filter npu-type="950">
@@ -253,8 +283,10 @@ src和dst分别为源操作数和目的操作数；dataCopyParams为DataCopyExtP
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPad(const GlobalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams)
     ```
 
 </cann-filter>

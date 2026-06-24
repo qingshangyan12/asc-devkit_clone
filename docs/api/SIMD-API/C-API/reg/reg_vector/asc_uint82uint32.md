@@ -17,13 +17,20 @@
 
 ```cpp
 // 读取索引0的位置
-__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
-// 读取索引1的位置
-__simd_callee__ inline void asc_uint82uint32_v2(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
-// 读取索引2的位置
-__simd_callee__ inline void asc_uint82uint32_v3(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
-// 读取索引3的位置
-__simd_callee__ inline void asc_uint82uint32_v4(vector_uint32_t& dst, vector_uint8_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_uint82uint32(vector_uint32_t &dst, vector_uint8_t src, vector_bool mask)
+    // 读取索引1的位置
+    __simd_callee__
+    inline void asc_uint82uint32_v2(vector_uint32_t &dst, vector_uint8_t src,
+                                    vector_bool mask)
+    // 读取索引2的位置
+    __simd_callee__
+    inline void asc_uint82uint32_v3(vector_uint32_t &dst, vector_uint8_t src,
+                                    vector_bool mask)
+    // 读取索引3的位置
+    __simd_callee__
+    inline void asc_uint82uint32_v4(vector_uint32_t &dst, vector_uint8_t src,
+                                    vector_bool mask)
 ```
 
 ## 参数说明

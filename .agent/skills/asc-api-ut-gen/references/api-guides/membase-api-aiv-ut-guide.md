@@ -72,12 +72,10 @@ using SupportType = std::tuple<half, float>;
 ```cpp
 class TEST_Add : public testing::Test {
 protected:
-    void SetUp() {
-        AscendC::SetGCoreType(2);  // AIV 使用 2
-    }
-    void TearDown() {
-        AscendC::SetGCoreType(0);
-    }
+  void SetUp() {
+    AscendC::SetGCoreType(2); // AIV 使用 2
+  }
+  void TearDown() { AscendC::SetGCoreType(0); }
 };
 ```
 
@@ -95,10 +93,12 @@ protected:
 `Duplicate` 是典型的非 binary API：
 
 ```cpp
-Duplicate(dstLocal, scalar, maskBit, repeatTimes, dstBlockStride, dstRepeatStride);
-Duplicate(dstLocal, scalar, maskCounter, repeatTimes, dstBlockStride, dstRepeatStride);
+Duplicate(dstLocal, scalar, maskBit, repeatTimes, dstBlockStride,
+          dstRepeatStride);
+Duplicate(dstLocal, scalar, maskCounter, repeatTimes, dstBlockStride,
+          dstRepeatStride);
 Duplicate(dstLocal, scalar, dataSize);
-Duplicate(dstLocal, srcLocal, dataSize);  // TensorTrait 分支
+Duplicate(dstLocal, srcLocal, dataSize); // TensorTrait 分支
 ```
 
 因此不能直接使用 binary 模板骨架。raw dtype 用例应覆盖 scalar overload，`TensorTrait<T>` 用例应覆盖 tensor overload 分支。
@@ -174,10 +174,10 @@ TmpBuffer 大小必须从目标 API 注释、impl 内部临时空间计算和已
 
 ```cpp
 struct DataCopyParams {
-    uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;  // 块数量
-    uint16_t blockLen = 0;           // 块长度
-    uint16_t srcGap = 0;             // 源间隙
-    uint16_t dstGap = 0;             // 目的间隙
+  uint16_t blockCount = DEFAULT_DATA_COPY_NBURST; // 块数量
+  uint16_t blockLen = 0;                          // 块长度
+  uint16_t srcGap = 0;                            // 源间隙
+  uint16_t dstGap = 0;                            // 目的间隙
 };
 ```
 
@@ -187,14 +187,14 @@ struct DataCopyParams {
 
 ```cpp
 struct DataCopyEnhancedParams {
-    BlockMode blockMode = BlockMode::BLOCK_MODE_NORMAL;
-    DeqScale deqScale = DeqScale::DEQ_NONE;
-    uint64_t deqValue = 0;
-    uint8_t sidStoreMode = 0;
-    bool isRelu = false;
-    pad_t padMode = pad_t::PAD_NONE;
-    uint64_t padValue = 0;
-    uint64_t deqTensorAddr = 0;
+  BlockMode blockMode = BlockMode::BLOCK_MODE_NORMAL;
+  DeqScale deqScale = DeqScale::DEQ_NONE;
+  uint64_t deqValue = 0;
+  uint8_t sidStoreMode = 0;
+  bool isRelu = false;
+  pad_t padMode = pad_t::PAD_NONE;
+  uint64_t padValue = 0;
+  uint64_t deqTensorAddr = 0;
 };
 ```
 
@@ -204,15 +204,15 @@ struct DataCopyEnhancedParams {
 
 ```cpp
 struct BinaryRepeatParams {
-    uint32_t blockNumber = DEFAULT_BLK_NUM;
-    uint8_t dstBlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t src0BlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t src1BlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
-    uint8_t src0RepStride = DEFAULT_REPEAT_STRIDE;
-    uint8_t src1RepStride = DEFAULT_REPEAT_STRIDE;
-    bool repeatStrideMode = false;
-    bool strideSizeMode = false;
+  uint32_t blockNumber = DEFAULT_BLK_NUM;
+  uint8_t dstBlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t src0BlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t src1BlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
+  uint8_t src0RepStride = DEFAULT_REPEAT_STRIDE;
+  uint8_t src1RepStride = DEFAULT_REPEAT_STRIDE;
+  bool repeatStrideMode = false;
+  bool strideSizeMode = false;
 };
 ```
 
@@ -222,14 +222,14 @@ struct BinaryRepeatParams {
 
 ```cpp
 struct Nd2NzParams {
-    uint16_t ndNum = 0;              // ND数量
-    uint16_t nValue = 0;             // N值
-    uint16_t dValue = 0;             // D值
-    uint16_t srcNdMatrixStride = 0;  // 源ND矩阵stride
-    uint16_t srcDValue = 0;          // 源D值
-    uint16_t dstNzC0Stride = 0;      // 目的NZ C0 stride
-    uint16_t dstNzNStride = 0;       // 目的NZ N stride
-    uint16_t dstNzMatrixStride = 0;  // 目的NZ矩阵stride
+  uint16_t ndNum = 0;             // ND数量
+  uint16_t nValue = 0;            // N值
+  uint16_t dValue = 0;            // D值
+  uint16_t srcNdMatrixStride = 0; // 源ND矩阵stride
+  uint16_t srcDValue = 0;         // 源D值
+  uint16_t dstNzC0Stride = 0;     // 目的NZ C0 stride
+  uint16_t dstNzNStride = 0;      // 目的NZ N stride
+  uint16_t dstNzMatrixStride = 0; // 目的NZ矩阵stride
 };
 ```
 
@@ -243,14 +243,14 @@ struct Nd2NzParams {
 
 ```cpp
 enum class DataFormat : uint8_t {
-    ND = 0,
-    NZ,
-    NCHW,
-    NC1HWC0,
-    NHWC,
-    NCDHW,
-    NDC1HWC0,
-    FRACTAL_Z_3D,
+  ND = 0,
+  NZ,
+  NCHW,
+  NC1HWC0,
+  NHWC,
+  NCDHW,
+  NDC1HWC0,
+  FRACTAL_Z_3D,
 };
 ```
 
@@ -260,8 +260,8 @@ enum class DataFormat : uint8_t {
 
 ```cpp
 enum class DataCopyMVType : uint8_t {
-    UB_TO_OUT = 0,   // UB到外部
-    OUT_TO_UB = 1,   // 外部到UB
+  UB_TO_OUT = 0, // UB到外部
+  OUT_TO_UB = 1, // 外部到UB
 };
 ```
 
@@ -271,17 +271,17 @@ enum class DataCopyMVType : uint8_t {
 
 ```cpp
 enum class RoundMode : uint8_t {
-    CAST_NONE = 0,   // 无舍入
-    CAST_RINT,       // round to nearest integer
-    CAST_FLOOR,      // 向下取整
-    CAST_CEIL,       // 向上取整
-    CAST_ROUND,      // away-zero rounding
-    CAST_TRUNC,      // to-zero rounding
-    CAST_ODD,        // Von Neumann rounding
-    CAST_HYBRID,     // hybrid round (特定架构支持)
-    CAST_EVEN,       // 特定架构支持
-    CAST_ZERO,       // 特定架构支持
-    UNKNOWN = 0xFF,
+  CAST_NONE = 0, // 无舍入
+  CAST_RINT,     // round to nearest integer
+  CAST_FLOOR,    // 向下取整
+  CAST_CEIL,     // 向上取整
+  CAST_ROUND,    // away-zero rounding
+  CAST_TRUNC,    // to-zero rounding
+  CAST_ODD,      // Von Neumann rounding
+  CAST_HYBRID,   // hybrid round (特定架构支持)
+  CAST_EVEN,     // 特定架构支持
+  CAST_ZERO,     // 特定架构支持
+  UNKNOWN = 0xFF,
 };
 ```
 
@@ -291,12 +291,12 @@ enum class RoundMode : uint8_t {
 
 ```cpp
 enum class CMPMODE : uint8_t {
-    LT = 0,   // 小于
-    GT,       // 大于
-    EQ,       // 等于
-    LE,       // 小于等于
-    GE,       // 大于等于
-    NE,       // 不等于
+  LT = 0, // 小于
+  GT,     // 大于
+  EQ,     // 等于
+  LE,     // 小于等于
+  GE,     // 大于等于
+  NE,     // 不等于
 };
 ```
 
@@ -306,9 +306,9 @@ enum class CMPMODE : uint8_t {
 
 ```cpp
 enum class SELMODE : uint8_t {
-    VSEL_CMPMASK_SPR = 0,
-    VSEL_TENSOR_SCALAR_MODE,
-    VSEL_TENSOR_TENSOR_MODE,
+  VSEL_CMPMASK_SPR = 0,
+  VSEL_TENSOR_SCALAR_MODE,
+  VSEL_TENSOR_TENSOR_MODE,
 };
 ```
 
@@ -318,13 +318,13 @@ enum class SELMODE : uint8_t {
 
 ```cpp
 enum class DeqScale : uint8_t {
-    DEQ_NONE = 0,   // 无反量化
-    DEQ,            // 普通反量化
-    VDEQ,           // 向量反量化
-    DEQ8,           // 8位反量化
-    VDEQ8,          // 向量8位反量化
-    DEQ16,          // 16位反量化
-    VDEQ16,         // 向量16位反量化
+  DEQ_NONE = 0, // 无反量化
+  DEQ,          // 普通反量化
+  VDEQ,         // 向量反量化
+  DEQ8,         // 8位反量化
+  VDEQ8,        // 向量8位反量化
+  DEQ16,        // 16位反量化
+  VDEQ16,       // 向量16位反量化
 };
 ```
 
@@ -334,9 +334,9 @@ enum class DeqScale : uint8_t {
 
 ```cpp
 enum class ReduceMode : uint8_t {
-    REDUCE_MAX = 0,  // 最大值归约
-    REDUCE_MIN,      // 最小值归约
-    REDUCE_SUM,      // 求和归约
+  REDUCE_MAX = 0, // 最大值归约
+  REDUCE_MIN,     // 最小值归约
+  REDUCE_SUM,     // 求和归约
 };
 ```
 
@@ -346,10 +346,10 @@ enum class ReduceMode : uint8_t {
 
 ```cpp
 enum class ReduceOrder : uint8_t {
-    ORDER_VALUE_INDEX = 0,  // 值-索引顺序
-    ORDER_INDEX_VALUE,      // 索引-值顺序
-    ORDER_ONLY_VALUE,       // 仅值
-    ORDER_ONLY_INDEX,       // 仅索引
+  ORDER_VALUE_INDEX = 0, // 值-索引顺序
+  ORDER_INDEX_VALUE,     // 索引-值顺序
+  ORDER_ONLY_VALUE,      // 仅值
+  ORDER_ONLY_INDEX,      // 仅索引
 };
 ```
 
@@ -359,11 +359,11 @@ enum class ReduceOrder : uint8_t {
 
 ```cpp
 enum class BlockMode : uint8_t {
-    BLOCK_MODE_NORMAL = 0,       // 普通模式
-    BLOCK_MODE_MATRIX,           // 矩阵模式
-    BLOCK_MODE_VECTOR,           // 向量模式
-    BLOCK_MODE_SMALL_CHANNEL,    // 小通道模式
-    BLOCK_MODE_DEPTHWISE,        // 深度卷积模式
+  BLOCK_MODE_NORMAL = 0,    // 普通模式
+  BLOCK_MODE_MATRIX,        // 矩阵模式
+  BLOCK_MODE_VECTOR,        // 向量模式
+  BLOCK_MODE_SMALL_CHANNEL, // 小通道模式
+  BLOCK_MODE_DEPTHWISE,     // 深度卷积模式
 };
 ```
 

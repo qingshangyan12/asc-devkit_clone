@@ -35,8 +35,9 @@ $$dstReg_i = \max(0, srcReg_i)$$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void Relu(U& dstReg, U& srcReg, MaskReg& mask)
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
+          typename U>
+__simd_callee__ inline void Relu(U &dstReg, U &srcReg, MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -72,18 +73,19 @@ __simd_callee__ inline void Relu(U& dstReg, U& srcReg, MaskReg& mask)
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void ReluVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Relu(dstReg, srcReg, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+template <typename T>
+__simd_vf__ inline void ReluVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                               uint32_t count, uint16_t oneRepeatSize,
+                               uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Relu(dstReg, srcReg, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```
 

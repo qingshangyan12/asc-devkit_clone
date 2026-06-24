@@ -63,24 +63,32 @@
     - 创建Matmul对象，设置B矩阵的IBShare参数为true。
       - 方式一：默认实现，使用默认的IBShare模板CFG_IBSHARE_NORM创建Matmul对象。
         ```cpp
-        #include "lib/matmul_intf.h"
-    
-        using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-        using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
-        using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-        using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-        AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM> matmulObj;
+#include "lib/matmul_intf.h"
+
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   BType, false, LayoutMode::NONE, true>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_IBSHARE_NORM> matmulObj;
         ```
       - 方式二：使能纯Cube模式实现，在定义Matmul对象的代码中，设置ASCENDC_CUBE_ONLY宏，且必须在#include "lib/matmul_intf.h"之前设置。
         ```cpp
-        #define ASCENDC_CUBE_ONLY // 设置ASCENDC_CUBE_ONLY宏
-        #include "lib/matmul_intf.h"
+#define ASCENDC_CUBE_ONLY // 设置ASCENDC_CUBE_ONLY宏
+#include "lib/matmul_intf.h"
 
-        using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-        using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, true>;
-        using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-        using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-        AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   BType, false, LayoutMode::NONE, true>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_NORM> matmulObj;
         ```
 
   - 核函数  
@@ -89,10 +97,12 @@
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。
     ```cpp
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
-    matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(x1, x2, bias, y, workspaceDevice,
-                          tilingDevice);       // 方式二：纯Cube模式，SetDim设置为AIC的核数                          
+matmul_ibshareb_custom<<<tilingData.usedCoreNum / MIX_RATIO, nullptr, stream>>>(
+    x1, x2, bias, y, workspaceDevice,
+    tilingDevice); // 方式一：非纯Cube模式，SetDim设置为AIV:AIC组合的核数
+matmul_ibshareb_custom<<<tilingData.usedCoreNum, nullptr, stream>>>(
+    x1, x2, bias, y, workspaceDevice,
+    tilingDevice); // 方式二：纯Cube模式，SetDim设置为AIC的核数
     ```
 
 ## 编译运行

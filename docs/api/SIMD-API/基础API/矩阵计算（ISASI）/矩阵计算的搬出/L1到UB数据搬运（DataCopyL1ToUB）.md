@@ -23,11 +23,15 @@
 ```cpp
 // 连续搬运
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T> &dst,
+                                      const LocalTensor<T> &src,
+                                      const uint32_t count)
 
-// 同时支持非连续搬运和连续搬运
-template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+    // 同时支持非连续搬运和连续搬运
+    template <typename T, uint8_t subBlockId = 0>
+    __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T> &dst,
+                                          const LocalTensor<T> &src,
+                                          const DataCopyParams &repeatParams)
 ```
 
 ## 参数说明
@@ -80,7 +84,9 @@ AscendC::DataCopyL1ToUB(dstLocal, srcLocal, 512);
 // 使用传入DataCopyParams参数的搬运接口，支持连续和非连续搬运
 DataCopyParams intriParams;
 intriParams.blockCount = 1; // 连续数据块个数为1
-intriParams.blockLen = 512 * sizeof(half) / 32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
+intriParams.blockLen =
+    512 * sizeof(half) /
+    32; // 连续数据块长度，单位为DataBlock，此处长度为512个half元素
 intriParams.srcGap = 0; // 源操作数做连续搬运
 intriParams.dstGap = 0; // 目的操作数连续排布
 AscendC::DataCopyL1ToUB(dstLocal, srcLocal, intriParams);

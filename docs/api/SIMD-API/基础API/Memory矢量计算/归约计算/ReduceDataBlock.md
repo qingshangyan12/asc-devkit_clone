@@ -31,15 +31,23 @@
 - `mask`逐bit模式：
 
     ```cpp
-    template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+ReduceDataBlock(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+                const uint64_t mask[], const int32_t repeatTime,
+                const int32_t dstRepStride, const int32_t srcBlkStride,
+                const int32_t srcRepStride)
     ```
 
 - `mask`连续模式：
 
     ```cpp
-    template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
-    __aicore__ inline void ReduceDataBlock(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime, const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+template <ReduceType reduceType, typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+ReduceDataBlock(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+                const int32_t mask, const int32_t repeatTime,
+                const int32_t dstRepStride, const int32_t srcBlkStride,
+                const int32_t srcRepStride)
     ```
 
 ## 参数说明
@@ -141,15 +149,16 @@
 - `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-`mask`连续模式：
 
     ```cpp
-    // 设定mask为最多的128个全部元素参与计算
-    int32_t mask = 256/sizeof(half);
-    // 每个repeat128个元素，一共128个元素。
-    int repeat = 1;
-    // dstLocal: 目的操作数tensor
-    // srcLocal: 源操作数tensor
-    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
-    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
-    AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+// 设定mask为最多的128个全部元素参与计算
+int32_t mask = 256 / sizeof(half);
+// 每个repeat128个元素，一共128个元素。
+int repeat = 1;
+// dstLocal: 目的操作数tensor
+// srcLocal: 源操作数tensor
+// srcBlkStride = 1，在一个repeat中，block间没有空隙。
+// dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
+AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal,
+                                                         mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
@@ -171,15 +180,16 @@
 - `ReduceDataBlock<ReduceType::MAX>`-tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
-    // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // 每个repeat128个元素，一共128个元素。
-    int repeat = 1;
-    // dstLocal: 目的操作数tensor
-    // srcLocal: 源操作数tensor
-    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
-    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
-    AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+// 设定mask为最多的128个全部元素参与计算
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// 每个repeat128个元素，一共128个元素。
+int repeat = 1;
+// dstLocal: 目的操作数tensor
+// srcLocal: 源操作数tensor
+// srcBlkStride = 1，在一个repeat中，block间没有空隙。
+// dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
+AscendC::ReduceDataBlock<AscendC::ReduceType::MAX, half>(dstLocal, srcLocal,
+                                                         mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
@@ -200,15 +210,16 @@
 - `ReduceDataBlock<ReduceType::MIN>`-tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
-    // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // 每个repeat128个元素，一共128个元素。
-    int repeat = 1;
-    // dstLocal: 目的操作数tensor
-    // srcLocal: 源操作数tensor
-    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
-    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
-    AscendC::ReduceDataBlock<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+// 设定mask为最多的128个全部元素参与计算
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// 每个repeat128个元素，一共128个元素。
+int repeat = 1;
+// dstLocal: 目的操作数tensor
+// srcLocal: 源操作数tensor
+// srcBlkStride = 1，在一个repeat中，block间没有空隙。
+// dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
+AscendC::ReduceDataBlock<AscendC::ReduceType::MIN, half>(dstLocal, srcLocal,
+                                                         mask, repeat, 1, 1, 8);
     ```
 
     结果示例如下：
@@ -230,15 +241,16 @@
 - `ReduceDataBlock<ReduceType::SUM>`-tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
-    // 设定mask为最多的128个全部元素参与计算
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // 每个repeat128个元素，一共128个元素。
-    int repeat = 1;
-    // dstLocal: 目的操作数tensor
-    // srcLocal: 源操作数tensor
-    // srcBlkStride = 1，在一个repeat中，block间没有空隙。
-    // dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
-    ReduceDataBlock<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask, repeat, 1, 1, 8);
+// 设定mask为最多的128个全部元素参与计算
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// 每个repeat128个元素，一共128个元素。
+int repeat = 1;
+// dstLocal: 目的操作数tensor
+// srcLocal: 源操作数tensor
+// srcBlkStride = 1，在一个repeat中，block间没有空隙。
+// dstRepStride = 1，srcRepStride = 8，repeat间没有空隙。
+ReduceDataBlock<AscendC::ReduceType::SUM, half>(dstLocal, srcLocal, mask,
+                                                repeat, 1, 1, 8);
     ```
 
     结果示例如下：

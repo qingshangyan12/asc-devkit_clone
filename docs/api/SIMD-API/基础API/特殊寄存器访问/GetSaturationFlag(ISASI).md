@@ -23,8 +23,7 @@
 ## 函数原型
 
 ```cpp
-template <SaturationMode mode>
-__aicore__ inline bool GetSaturationFlag()
+template <SaturationMode mode> __aicore__ inline bool GetSaturationFlag()
 ```
 
 ## 参数说明

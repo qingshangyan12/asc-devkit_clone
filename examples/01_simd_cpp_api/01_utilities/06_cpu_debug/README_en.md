@@ -32,9 +32,9 @@ This example uses Add computation as the carrier to demonstrate the Ascend C CPU
   To enable CPU Debug, this example includes the `cpu_debug_launch.h` header file when the `ASCENDC_CPU_DEBUG` macro is defined.
 
   ```cpp
-  #ifdef ASCENDC_CPU_DEBUG
-  #include "cpu_debug_launch.h"
-  #endif
+#ifdef ASCENDC_CPU_DEBUG
+#include "cpu_debug_launch.h"
+#endif
   ```
 
   `cpu_debug_launch.h` provides kernel function launch support in the CPU domain, enabling the example to run in CPU Debug mode and work with GDB debugging.

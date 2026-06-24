@@ -54,7 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename CAST_T> 
+template <typename CAST_T>
 __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const
 ```
 
@@ -91,13 +91,14 @@ __aicore__ inline LocalTensor<CAST_T> ReinterpretCast() const
 // 示例
 // input_local为int32_t类型，包含16个元素(64字节)
 for (int32_t i = 0; i < 16; ++i) {
-    inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
+  inputLocal.SetValue(i, i); // 对inputLocal中第i个位置进行赋值为i
 }
 
-
 // 调用ReinterpretCast将input_local重解释为int16_t类型
-AscendC::LocalTensor<int16_t> interpreTensor = inputLocal.ReinterpretCast<int16_t>();
+AscendC::LocalTensor<int16_t> interpreTensor =
+    inputLocal.ReinterpretCast<int16_t>();
 // 示例结果如下，二者数据完全一致，在物理内存上也是同一地址，仅根据不同类型进行了重解释
 // inputLocal:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0
+// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14
+// 0 15 0
 ```

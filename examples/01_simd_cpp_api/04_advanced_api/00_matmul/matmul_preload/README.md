@@ -49,13 +49,14 @@ M/N方向预加载的Matmul样例，可以减少MTE2间隙。在MTE2流水间隙
   - Kernel关键步骤
     - 配置MatmulConfig模板参数，开启doMTE2Preload开关，1（M方向）或 2（N方向），创建Matmul对象。
       ```cpp
-      static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2); 
-      AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
-        MM_CFG_PRELOAD> matmulObj;
+static constexpr MatmulConfig MM_CFG_PRELOAD = GetMDLConfig(false, false, 2);
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
+    MM_CFG_PRELOAD>
+    matmulObj;
       ```
 
 - 调用实现  

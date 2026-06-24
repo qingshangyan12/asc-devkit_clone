@@ -31,7 +31,8 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
 ```
 
 ## UB -> UB高维切分数据搬运(DataCopy)<a name="ZH-CN_TOPIC_0000002382908321"></a>
@@ -52,7 +53,9 @@ src和dst分别为源操作数和目的操作数；repeatParams为DataCopyParams
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
 ```
 
 ## UB -> UB连续数据搬运(Copy)<a name="ZH-CN_TOPIC_0000002575088175"></a>
@@ -75,7 +78,8 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 
 ```cpp
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void Copy(const LocalTensor<T> &dst,
+                            const LocalTensor<T> &src, const uint32_t count)
 ```
 
 ## UB -> UB掩码式高维数据搬运(Copy)<a name="ZH-CN_TOPIC_0000002575088676"></a>
@@ -99,13 +103,18 @@ src和dst分别为源操作数和目的操作数；mask用于控制每次迭代�
 - mask逐bit模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask[], const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Copy(const LocalTensor<T> &dst,
+                            const LocalTensor<T> &src, const uint64_t mask[],
+                            const uint8_t repeatTime,
+                            const CopyRepeatParams &repeatParams)
     ```
 
 - mask连续模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Copy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime, const CopyRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Copy(const LocalTensor<T> &dst, const LocalTensor<T> &src, const uint64_t mask,
+     const uint8_t repeatTime, const CopyRepeatParams &repeatParams)
     ```

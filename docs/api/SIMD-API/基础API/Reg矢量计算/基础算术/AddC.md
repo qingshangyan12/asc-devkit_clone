@@ -44,7 +44,8 @@ Carry flag（进位标志）用于表示加法进位或者减法无借位，若s
 
 ```cpp
 template <typename T = DefaultType, typename U>
-__simd_callee__ inline void AddC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcReg1, MaskReg& carrySrc, MaskReg& mask)
+__simd_callee__ inline void AddC(MaskReg &carry, U &dstReg, U &srcReg0,
+                                 U &srcReg1, MaskReg &carrySrc, MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -83,22 +84,27 @@ __simd_callee__ inline void AddC(MaskReg& carry, U& dstReg, U& srcReg0, U& srcRe
 
 ```cpp
 template <typename T>
-static __simd_vf__ inline void AddVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t repeatTimes, uint16_t oneRepeatSize){
-    
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg0;
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::MaskReg maskZero = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-    AscendC::Reg::MaskReg carry = AscendC::Reg::CreateMask<uint8_t>();
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
-        AscendC::Reg::AddC(carry, dstReg0, srcReg0, srcReg1, maskZero, mask);
-        // 8*4B=32B align
-        AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>((__ubuf__ uint32_t*)dst1Addr + i * 8, carry);
-        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
-    }
+static __simd_vf__ inline void AddVF(__ubuf__ T *dst0Addr, __ubuf__ T *dst1Addr,
+                                     __ubuf__ T *src0Addr, __ubuf__ T *src1Addr,
+                                     uint32_t count, uint16_t repeatTimes,
+                                     uint16_t oneRepeatSize) {
+
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg0;
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::MaskReg maskZero =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+  AscendC::Reg::MaskReg carry = AscendC::Reg::CreateMask<uint8_t>();
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+    AscendC::Reg::AddC(carry, dstReg0, srcReg0, srcReg1, maskZero, mask);
+    // 8*4B=32B align
+    AscendC::Reg::StoreAlign<uint32_t, AscendC::Reg::MaskDist::DIST_NORM>(
+        (__ubuf__ uint32_t *)dst1Addr + i * 8, carry);
+    AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+  }
 }
 ```

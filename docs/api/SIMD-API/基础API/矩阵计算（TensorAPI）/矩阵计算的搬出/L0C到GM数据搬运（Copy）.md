@@ -29,31 +29,36 @@ L0C Buffer到Global Memory搬运支持不量化输出、float到half或bfloat16_
 - 执行L0C Buffer到Global Memory的非量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 执行L0C Buffer到Global Memory的量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
-        Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
-        const QuantParam& quant)
+template <typename AtomType, typename DstTensor, typename SrcTensor,
+          typename QuantParam,
+          Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src,
+                            const QuantParam &quant)
     ```
 
 - 使用默认trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 使用指定trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 ## 参数说明
@@ -81,9 +86,9 @@ L0C Buffer到Global Memory搬运支持不量化输出、float到half或bfloat16_
 
 ```cpp
 struct CopyL0C2GMTrait {
-    RoundMode roundMode = RoundMode::DEFAULT;
-    bool enableRelu = false;
-    bool enableChannelSplit = false;
+  RoundMode roundMode = RoundMode::DEFAULT;
+  bool enableRelu = false;
+  bool enableChannelSplit = false;
 };
 ```
 
@@ -96,15 +101,11 @@ struct CopyL0C2GMTrait {
 使用自定义trait的示例：
 
 ```cpp
-constexpr CopyL0C2GMTrait l0c2gmTrait = {
-    RoundMode::DEFAULT,
-    false,
-    true
-};
+constexpr CopyL0C2GMTrait l0c2gmTrait = {RoundMode::DEFAULT, false, true};
 
 struct CopyL0C2GMTraitCustom {
-    using TraitType = CopyL0C2GMTrait;
-    static constexpr const TraitType value = l0c2gmTrait;
+  using TraitType = CopyL0C2GMTrait;
+  static constexpr const TraitType value = l0c2gmTrait;
 };
 ```
 
@@ -114,8 +115,8 @@ struct CopyL0C2GMTraitCustom {
 
 ```cpp
 struct FixpipeParams {
-    uint8_t unitFlag = 0;
-    bool subBlockId = false;
+  uint8_t unitFlag = 0;
+  bool subBlockId = false;
 };
 ```
 
@@ -171,14 +172,15 @@ L0C Buffer到Global Memory搬运涉及[随路量化](关键特性说明/quant_pr
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL0CToGM()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+__aicore__ inline void CopyL0CToGM() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto gm =
+      MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
 
-    FixpipeParams params;
-    auto atom = MakeCopy(CopyL0C2GM{}).with(params);
-    Copy(atom, gm, l0c);
+  FixpipeParams params;
+  auto atom = MakeCopy(CopyL0C2GM{}).with(params);
+  Copy(atom, gm, l0c);
 }
 ```
 
@@ -188,14 +190,15 @@ __aicore__ inline void CopyL0CToGM()
 #include "tensor_api/tensor.h"
 
 using namespace AscendC::Te;
-__aicore__ inline void CopyL0CToGM()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+__aicore__ inline void CopyL0CToGM() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto gm =
+      MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
 
-    uint64_t quant = 1;
-    auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
-    Copy(atom, gm, l0c, quant);
+  uint64_t quant = 1;
+  auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
+  Copy(atom, gm, l0c, quant);
 }
 ```
 
@@ -206,14 +209,16 @@ __aicore__ inline void CopyL0CToGM()
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL0CToGM()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
-    auto quant = MakeTensor(MakeMemPtr(l1QuantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+__aicore__ inline void CopyL0CToGM() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto gm =
+      MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+  auto quant = MakeTensor(MakeMemPtr(l1QuantAddr),
+                          MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
-    auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
-    Copy(atom, gm, l0c, quant);
+  auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
+  Copy(atom, gm, l0c, quant);
 }
 ```
 
@@ -224,23 +229,25 @@ __aicore__ inline void CopyL0CToGM()
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyBatchL0CToGM()
-{
-    constexpr uint32_t srcBatch = 3;
-    constexpr uint32_t dstBatch = 9;
-    constexpr uint32_t m = 32;
-    constexpr uint32_t n = 64;
+__aicore__ inline void CopyBatchL0CToGM() {
+  constexpr uint32_t srcBatch = 3;
+  constexpr uint32_t dstBatch = 9;
+  constexpr uint32_t m = 32;
+  constexpr uint32_t n = 64;
 
-    __cc__ float l0cBuf[srcBatch * m * n];
-    __gm__ half gmBuf[dstBatch * m * n];
+  __cc__ float l0cBuf[srcBatch * m * n];
+  __gm__ half gmBuf[dstBatch * m * n];
 
-    auto l0c = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn>(srcBatch, m, n));
-    auto gm = MakeTensor(MakeMemPtr(gmBuf), MakeFrameLayout<NDExtLayoutPtn>(dstBatch, m, n));
+  auto l0c = MakeTensor(MakeMemPtr(l0cBuf),
+                        MakeFrameLayout<NZLayoutPtn>(srcBatch, m, n));
+  auto gm = MakeTensor(MakeMemPtr(gmBuf),
+                       MakeFrameLayout<NDExtLayoutPtn>(dstBatch, m, n));
 
-    auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
-    for (uint32_t i = 0; i < dstBatch / srcBatch; ++i) {
-        auto gmSlice = gm.Slice(MakeCoord(i * srcBatch, MakeCoord(0, 0)), MakeShape(srcBatch, MakeShape(m, n)));
-        Copy(atom, gmSlice, l0c);
-    }
+  auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
+  for (uint32_t i = 0; i < dstBatch / srcBatch; ++i) {
+    auto gmSlice = gm.Slice(MakeCoord(i * srcBatch, MakeCoord(0, 0)),
+                            MakeShape(srcBatch, MakeShape(m, n)));
+    Copy(atom, gmSlice, l0c);
+  }
 }
 ```

@@ -72,15 +72,19 @@
 - mask逐bit模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask[], const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Compare(const LocalTensor<T> &src0, const LocalTensor<T> &src1, CMPMODE cmpMode,
+        const uint64_t mask[], const BinaryRepeatParams &repeatParams)
     ```
 
 - mask连续模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Compare(const LocalTensor<T>& src0, const LocalTensor<T>& src1, CMPMODE cmpMode, const uint64_t mask, const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Compare(const LocalTensor<T> &src0, const LocalTensor<T> &src1, CMPMODE cmpMode,
+        const uint64_t mask, const BinaryRepeatParams &repeatParams)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -124,21 +128,23 @@
 - mask连续模式
 
     ```cpp
-    uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
-    AscendC::Compare(src0Local, src1Local, AscendC::CMPMODE::LT, mask, repeatParams);
+uint64_t mask = 256 / sizeof(float); // 256为每个迭代处理的字节数
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
+// dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+// repeat dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+AscendC::Compare(src0Local, src1Local, AscendC::CMPMODE::LT, mask,
+                 repeatParams);
     ```
 
 - mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, 0};
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
-    // srcBlkStride, = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::Compare(src0Local, src1Local, AscendC::CMPMODE::LT, mask, repeatParams);
+uint64_t mask[2] = {UINT64_MAX, 0};
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
+// srcBlkStride, = 1, no gap between blocks in one repeat
+// dstRepStride, srcRepStride = 8, no gap between repeats
+AscendC::Compare(src0Local, src1Local, AscendC::CMPMODE::LT, mask,
+                 repeatParams);
     ```
 
 结果示例如下：

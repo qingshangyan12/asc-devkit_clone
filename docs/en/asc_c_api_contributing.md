@@ -54,10 +54,9 @@ C API uses a **pointer-based programming model**:
 ```cpp
 // C API programming example
 constexpr uint32_t count = 64;
-__ubuf__ half dst[count];   // Unified Buffer memory
+__ubuf__ half dst[count]; // Unified Buffer memory
 __ubuf__ half src0[count];
 __ubuf__ half src1[count];
-
 
 // Directly call C API
 asc_add(dst, src0, src1, count);
@@ -80,9 +79,9 @@ asc_add(dst, src0, src1, count);
 Mode 2: High-dimensional tiling computation
 
 ```cpp
-asc_add(dst, src0, src1, repeat,
-        dst_block_stride, src0_block_stride, src1_block_stride,
-        dst_repeat_stride, src0_repeat_stride, src1_repeat_stride);
+asc_add(dst, src0, src1, repeat, dst_block_stride, src0_block_stride,
+        src1_block_stride, dst_repeat_stride, src0_repeat_stride,
+        src1_repeat_stride);
 ```
 
 - Non-contiguous memory access.
@@ -260,21 +259,29 @@ Add in `include/c_api/vector_compute/vector_compute.h`:
 ```cpp
 // ==========asc_axpy(half/float)==========
 // Continuous mode
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count);
+__aicore__ inline void asc_axpy(__ubuf__ half *dst, __ubuf__ half *src,
+                                half scalar, uint32_t count);
 
-__aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
+__aicore__ inline void asc_axpy(__ubuf__ float *dst, __ubuf__ float *src,
+                                float scalar, uint32_t count);
 
 // Configuration mode
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void
+asc_axpy(__ubuf__ half *dst, __ubuf__ half *src, half value, uint8_t repeat,
+         uint16_t dst_block_stride, uint16_t src_block_stride,
+         uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
-__aicore__ inline void asc_axpy(__ubuf__ float* dst, __ubuf__ float* src, float value, uint8_t repeat,
-    uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
+__aicore__ inline void
+asc_axpy(__ubuf__ float *dst, __ubuf__ float *src, float value, uint8_t repeat,
+         uint16_t dst_block_stride, uint16_t src_block_stride,
+         uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 // Synchronous mode
-__aicore__ inline void asc_axpy_sync(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count);
+__aicore__ inline void asc_axpy_sync(__ubuf__ half *dst, __ubuf__ half *src,
+                                     half scalar, uint32_t count);
 
-__aicore__ inline void asc_axpy_sync(__ubuf__ float* dst, __ubuf__ float* src, float scalar, uint32_t count);
+__aicore__ inline void asc_axpy_sync(__ubuf__ float *dst, __ubuf__ float *src,
+                                     float scalar, uint32_t count);
 ```
 
 ### Implementation Code
@@ -290,10 +297,10 @@ Reference other interface implementations.
 C API testing uses the **gTest + MockCPP** framework:
 
 ```cpp
+#include "c_api/asc_simd.h"
+#include "c_api/stub/cce_stub.h"
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
-#include "c_api/stub/cce_stub.h"
-#include "c_api/asc_simd.h"
 ```
 
 ### Test Types
@@ -318,7 +325,7 @@ void asc_add(...);
 void asc_axpy(...);
 
 // Parameter name: camelCase or snake_case
-__ubuf__ half* dstTensor;
+__ubuf__ half *dstTensor;
 uint32_t elementCount;
 
 // Macro definition: UPPERCASE_WITH_UNDERSCORES
@@ -344,27 +351,27 @@ struct AscUnaryConfig;
  * @param tmp Temporary buffer
  * @param count Element count
  */
-__aicore__ inline void asc_axpy(__ubuf__ half* dst, __ubuf__ half* src, half scalar, uint32_t count)
-{
-    // Parameter validation
-    ASCENDC_ASSERT(count > 0, "count must be positive");
-    ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr,
-                   "pointers cannot be null");
+__aicore__ inline void asc_axpy(__ubuf__ half *dst, __ubuf__ half *src,
+                                half scalar, uint32_t count) {
+  // Parameter validation
+  ASCENDC_ASSERT(count > 0, "count must be positive");
+  ASCENDC_ASSERT(dst != nullptr && src != nullptr && tmp != nullptr,
+                 "pointers cannot be null");
 
-    // Computation logic
-    uint8_t repeat = (count + 127) / 128;
-    uint64_t mask0 = static_cast<uint64_t>(-1);
-    uint64_t mask1 = static_cast<uint64_t>(-1);
+  // Computation logic
+  uint8_t repeat = (count + 127) / 128;
+  uint64_t mask0 = static_cast<uint64_t>(-1);
+  uint64_t mask1 = static_cast<uint64_t>(-1);
 
-    // Set mask
-    set_vector_mask(mask1, mask0);
+  // Set mask
+  set_vector_mask(mask1, mask0);
 
-    // Execute instruction
-    vmuls(tmp, src, scalar, repeat, 1, 1, 8, 8);
-    pipe_barrier(PIPE_V);
+  // Execute instruction
+  vmuls(tmp, src, scalar, repeat, 1, 1, 8, 8);
+  pipe_barrier(PIPE_V);
 
-    vadd(dst, dst, tmp, repeat, 1, 1, 1, 8, 8, 8);
-    pipe_barrier(PIPE_V);
+  vadd(dst, dst, tmp, repeat, 1, 1, 1, 8, 8, 8);
+  pipe_barrier(PIPE_V);
 }
 ```
 
@@ -389,7 +396,7 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 // 4. Architecture check
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201 && __NPU_ARCH__ != 3510)
-    #error "Unsupported NPU architecture"
+#error "Unsupported NPU architecture"
 #endif
 ```
 
@@ -402,9 +409,9 @@ ASCENDC_ASSERT(count <= ASC_CAPI_MAX_COUNT,
 
 // Conditional compilation
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-    // NPU ARCH 2201 architecture specific code
+// NPU ARCH 2201 architecture specific code
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-    // NPU ARCH 3510 architecture specific code
+// NPU ARCH 3510 architecture specific code
 #endif
 
 #endif

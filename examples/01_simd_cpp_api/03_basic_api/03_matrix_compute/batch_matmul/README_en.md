@@ -90,18 +90,24 @@ nd2nzA1Params.ndNum = B;
 nd2nzA1Params.nValue = m;
 // Number of columns in ND matrix
 nd2nzA1Params.dValue = k;
-// Offset between start addresses of adjacent ND matrices in source operand, in elements
+// Offset between start addresses of adjacent ND matrices in source operand, in
+// elements
 nd2nzA1Params.srcNdMatrixStride = m * k;
-// Offset between start addresses of adjacent rows within the same ND matrix in source operand, in elements
+// Offset between start addresses of adjacent rows within the same ND matrix in
+// source operand, in elements
 nd2nzA1Params.srcDValue = k;
 
-// After ND to NZ format conversion, one row in the source operand converts to multiple rows in the destination operand.
-// This parameter represents the offset between start addresses of adjacent rows from the same source row in the destination NZ matrix, unit: C0_SIZE (32B).
-// Data is aligned when transferred to L1
+// After ND to NZ format conversion, one row in the source operand converts to
+// multiple rows in the destination operand. This parameter represents the
+// offset between start addresses of adjacent rows from the same source row in
+// the destination NZ matrix, unit: C0_SIZE (32B). Data is aligned when
+// transferred to L1
 nd2nzA1Params.dstNzC0Stride = CeilAlign(m, cubeShape[0]);
-// Offset between start addresses of adjacent Z-type matrix rows in the destination NZ matrix. Unit: C0_SIZE (32B).
+// Offset between start addresses of adjacent Z-type matrix rows in the
+// destination NZ matrix. Unit: C0_SIZE (32B).
 nd2nzA1Params.dstNzNStride = 1;
-// Offset between start addresses of adjacent NZ matrices in the destination NZ matrix, in elements
+// Offset between start addresses of adjacent NZ matrices in the destination NZ
+// matrix, in elements
 nd2nzA1Params.dstNzMatrixStride = aSizeAlignL0;
 ```
 
@@ -111,21 +117,22 @@ For loop B times, transferring A and B matrices for each batch from L1 -> L0A / 
 
 ```cpp
 for (int32_t batchIndex = 0; batchIndex < B; batchIndex++) {
-        SplitA(a1Local[batchIndex * aSizeAlignL0]);
-        SplitBTranspose(b1Local[batchIndex * bSizeAlignL0]);
-        AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+  SplitA(a1Local[batchIndex * aSizeAlignL0]);
+  SplitBTranspose(b1Local[batchIndex * bSizeAlignL0]);
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-        Compute(batchIndex, c1Local);
-        AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
-        AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+  Compute(batchIndex, c1Local);
+  AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);
 }
 ```
 
 The for loop computes matrix results for each batch, storing them at corresponding positions in L0C. After the loop completes, the full results on L0C are transferred out to GM.
 
 ```cpp
-AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])],
+AscendC::Mmad(c1Local[batchIndex * CeilAlign(m, cubeShape[0]) *
+                      CeilAlign(n, cubeShape[0])],
               a2Local, b2Local, mmadParams);
 ```
 
@@ -140,16 +147,20 @@ For Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atl
 fixpipeParams.nSize = n;
 // Size of source NZ matrix in M direction.
 fixpipeParams.mSize = m;
-// Start address offset of adjacent Z layouts in source NZ matrix, unit: C0_Size(16*sizeof(T), where T is src data type)
+// Start address offset of adjacent Z layouts in source NZ matrix, unit:
+// C0_Size(16*sizeof(T), where T is src data type)
 fixpipeParams.srcStride = CeilAlign(m, cubeShape[0]);
-// When NZ2ND feature is enabled, represents number of elements in each row of destination ND matrix, non-zero value, unit: elements
+// When NZ2ND feature is enabled, represents number of elements in each row of
+// destination ND matrix, non-zero value, unit: elements
 fixpipeParams.dstStride = n;
 // Number of source NZ matrices, that is, number of ND matrices to transfer
 fixpipeParams.ndNum = B;
 // Interval between start addresses of different NZ matrices, unit: 1024B
-fixpipeParams.srcNdStride = (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) 
-                                / (cubeShape[0] * cubeShape[0]);
-// Offset between start addresses of adjacent destination ND matrices, unit: elements
+fixpipeParams.srcNdStride =
+    (CeilAlign(m, cubeShape[0]) * CeilAlign(n, cubeShape[0])) /
+    (cubeShape[0] * cubeShape[0]);
+// Offset between start addresses of adjacent destination ND matrices, unit:
+// elements
 ```
 
 ### Avoiding Data Memory Exceeding Storage Limits

@@ -65,12 +65,12 @@
 
     Swish模式调用方式：
     ```cpp
-    AscendC::Swish(dstLocal, srcLocal, dataSize, scalarValue);
+AscendC::Swish(dstLocal, srcLocal, dataSize, scalarValue);
     ```
 
     Silu模式调用方式：
     ```cpp
-    AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
+AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
     ```
 
   - Tiling实现  

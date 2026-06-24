@@ -29,15 +29,16 @@
 
 - 算子实现:
   ```cpp
-  __global__ void  simt_printf(float* input, uint32_t in_shape)
-  {
-      // Calculate global thread ID
-      int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-      if (threadIdx.x < 3) {
-      printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx, in_shape);
-      printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2",  input, idx, input[idx]);
-      }
+__global__ void simt_printf(float *input, uint32_t in_shape) {
+  // Calculate global thread ID
+  int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (threadIdx.x < 3) {
+    printf("[SIMT %s] thread index[%u], input data shape: %u\n", "print 1", idx,
+           in_shape);
+    printf("[SIMT %s] input addr: %p value[%u]: %f\n", "print 2", input, idx,
+           input[idx]);
   }
+}
   ```
 
 ## 编译运行

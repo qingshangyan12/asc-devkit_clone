@@ -30,8 +30,10 @@
 - 不支持enableSmallC0模式
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 <cann-filter npu-type="950">
@@ -39,9 +41,11 @@
 - 支持enableSmallC0模式（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
-    template <typename T, bool enableSmallC0 = false>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+// 该函数原型仅支持Ascend 950PR/Ascend 950DT
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
     ```
 
 </cann-filter>
@@ -154,7 +158,8 @@ enableSmallC0开启模式下的ND2NZ转换示意图如下：
 intriParams参数解析请参考[图1](#fig128961542184620)。
 
 ```cpp
-// srcLocal为half类型的L1 Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
+// srcLocal为half类型的L1
+// Buffer空间上的LocalTensor，srcGlobal为half类型的GlobalTensor。
 AscendC::Nd2NzParams intriParams{1, 32, 32, 0, 32, 32, 1, 0};
 // Global Memory -> Local Memory
 AscendC::DataCopy(srcLocal, srcGlobal, intriParams);

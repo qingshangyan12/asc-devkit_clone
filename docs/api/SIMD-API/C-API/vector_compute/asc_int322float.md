@@ -22,52 +22,102 @@
 - 前n个数据计算
 
   ```cpp
-  // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
-  __aicore__ inline void asc_int322float(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // RINT舍入模式
-  __aicore__ inline void asc_int322float_rn(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // ROUND舍入模式
-  __aicore__ inline void asc_int322float_rna(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // FLOOR舍入模式
-  __aicore__ inline void asc_int322float_rd(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // CEIL舍入模式
-  __aicore__ inline void asc_int322float_ru(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // TRUNC舍入模式
-  __aicore__ inline void asc_int322float_rz(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
+// 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
+__aicore__ inline void asc_int322float(__ubuf__ float *dst,
+                                       __ubuf__ int32_t *src, uint32_t count)
+    // RINT舍入模式
+    __aicore__
+    inline void asc_int322float_rn(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint32_t count)
+    // ROUND舍入模式
+    __aicore__
+    inline void asc_int322float_rna(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                    uint32_t count)
+    // FLOOR舍入模式
+    __aicore__
+    inline void asc_int322float_rd(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint32_t count)
+    // CEIL舍入模式
+    __aicore__
+    inline void asc_int322float_ru(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint32_t count)
+    // TRUNC舍入模式
+    __aicore__
+    inline void asc_int322float_rz(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint32_t count)
   ```
 
 - 高维切分计算
 
   ```cpp
-  // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
-  __aicore__ inline void asc_int322float(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  // RINT舍入模式
-  __aicore__ inline void asc_int322float_rn(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  // ROUND舍入模式
-  __aicore__ inline void asc_int322float_rna(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  // FLOOR舍入模式
-  __aicore__ inline void asc_int322float_rd(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  // CEIL舍入模式
-  __aicore__ inline void asc_int322float_ru(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
-  // TRUNC舍入模式
-  __aicore__ inline void asc_int322float_rz(__ubuf__ float* dst, __ubuf__ int32_t* src, uint8_t repeat, uint16_t dst_block_stride, uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+// 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
+__aicore__ inline void
+asc_int322float(__ubuf__ float *dst, __ubuf__ int32_t *src, uint8_t repeat,
+                uint16_t dst_block_stride, uint16_t src_block_stride,
+                uint16_t dst_repeat_stride, uint16_t src_repeat_stride)
+    // RINT舍入模式
+    __aicore__
+    inline void asc_int322float_rn(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint8_t repeat, uint16_t dst_block_stride,
+                                   uint16_t src_block_stride,
+                                   uint16_t dst_repeat_stride,
+                                   uint16_t src_repeat_stride)
+    // ROUND舍入模式
+    __aicore__
+    inline void asc_int322float_rna(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                    uint8_t repeat, uint16_t dst_block_stride,
+                                    uint16_t src_block_stride,
+                                    uint16_t dst_repeat_stride,
+                                    uint16_t src_repeat_stride)
+    // FLOOR舍入模式
+    __aicore__
+    inline void asc_int322float_rd(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint8_t repeat, uint16_t dst_block_stride,
+                                   uint16_t src_block_stride,
+                                   uint16_t dst_repeat_stride,
+                                   uint16_t src_repeat_stride)
+    // CEIL舍入模式
+    __aicore__
+    inline void asc_int322float_ru(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint8_t repeat, uint16_t dst_block_stride,
+                                   uint16_t src_block_stride,
+                                   uint16_t dst_repeat_stride,
+                                   uint16_t src_repeat_stride)
+    // TRUNC舍入模式
+    __aicore__
+    inline void asc_int322float_rz(__ubuf__ float *dst, __ubuf__ int32_t *src,
+                                   uint8_t repeat, uint16_t dst_block_stride,
+                                   uint16_t src_block_stride,
+                                   uint16_t dst_repeat_stride,
+                                   uint16_t src_repeat_stride)
   ```
 
 - 同步计算
 
     ```cpp
-  // 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
-  __aicore__ inline void asc_int322float_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // RINT舍入模式
-  __aicore__ inline void asc_int322float_rn_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // ROUND舍入模式
-  __aicore__ inline void asc_int322float_rna_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // FLOOR舍入模式
-  __aicore__ inline void asc_int322float_rd_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // CEIL舍入模式
-  __aicore__ inline void asc_int322float_ru_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
-  // TRUNC舍入模式
-  __aicore__ inline void asc_int322float_rz_sync(__ubuf__ float* dst, __ubuf__ int32_t* src, uint32_t count)
+// 在转换有精度损失时表示RINT舍入模式，不涉及精度损失时表示不舍入
+__aicore__ inline void
+asc_int322float_sync(__ubuf__ float *dst, __ubuf__ int32_t *src, uint32_t count)
+    // RINT舍入模式
+    __aicore__
+    inline void asc_int322float_rn_sync(__ubuf__ float *dst,
+                                        __ubuf__ int32_t *src, uint32_t count)
+    // ROUND舍入模式
+    __aicore__
+    inline void asc_int322float_rna_sync(__ubuf__ float *dst,
+                                         __ubuf__ int32_t *src, uint32_t count)
+    // FLOOR舍入模式
+    __aicore__
+    inline void asc_int322float_rd_sync(__ubuf__ float *dst,
+                                        __ubuf__ int32_t *src, uint32_t count)
+    // CEIL舍入模式
+    __aicore__
+    inline void asc_int322float_ru_sync(__ubuf__ float *dst,
+                                        __ubuf__ int32_t *src, uint32_t count)
+    // TRUNC舍入模式
+    __aicore__
+    inline void asc_int322float_rz_sync(__ubuf__ float *dst,
+                                        __ubuf__ int32_t *src, uint32_t count)
   ```
 
 ## 参数说明

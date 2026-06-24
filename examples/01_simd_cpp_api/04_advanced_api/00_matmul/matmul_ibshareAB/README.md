@@ -67,16 +67,18 @@
     - 创建Matmul对象：  
         根据CMakeLists里的SCENARIO_NUM编译选项，配置A、B矩阵IBShare参数为true或者false。
         ```cpp
-        #if SCENARIO_NUM == 1
-        constexpr bool isABshare = true;
-        #else
-        constexpr bool isABshare = false;
-        #endif
+#if SCENARIO_NUM == 1
+constexpr bool isABshare = true;
+#else
+constexpr bool isABshare = false;
+#endif
 
-        Matmul<
-            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false, LayoutMode::NONE, isABshare>,
-            MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>> matmulObj;
+Matmul<MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, false,
+                  LayoutMode::NONE, isABshare>,
+       MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false,
+                  LayoutMode::NONE, isABshare>,
+       MatmulType<AscendC::TPosition::VECIN, CubeFormat::ND, CType>>
+    matmulObj;
         ```
 
 

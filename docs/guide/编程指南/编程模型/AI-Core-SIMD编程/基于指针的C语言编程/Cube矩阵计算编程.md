@@ -19,21 +19,20 @@ Cube矩阵计算整体分为数据搬入、数据加载、矩阵计算、数据�
 - 静态申请：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
 
   ```c
-  __global__ __cube__ void add_custom(...)
-  {
-      constexpr uint32_t m_size = 128;
-      constexpr uint32_t n_size = 128;
-      constexpr uint32_t k_size = 256;
-      // Allocate L1A/B Buffer
-      __cbuf__ half static_l1a_buffer[m_size * k_size];
-      __cbuf__ half static_l1b_buffer[n_size * k_size];
-      // Allocate L0A/B/C Buffer
-      __ca__ half static_l0a_buffer[m_size * k_size];
-      __cb__ half static_l0b_buffer[n_size * k_size];
-      __cc__ half static_l0c_buffer[m_size * n_size];
+__global__ __cube__ void add_custom(...) {
+  constexpr uint32_t m_size = 128;
+  constexpr uint32_t n_size = 128;
+  constexpr uint32_t k_size = 256;
+  // Allocate L1A/B Buffer
+  __cbuf__ half static_l1a_buffer[m_size * k_size];
+  __cbuf__ half static_l1b_buffer[n_size * k_size];
+  // Allocate L0A/B/C Buffer
+  __ca__ half static_l0a_buffer[m_size * k_size];
+  __cb__ half static_l0b_buffer[n_size * k_size];
+  __cc__ half static_l0c_buffer[m_size * n_size];
 
-      // ... Use Buffer for matrix computation
-  }
+  // ... Use Buffer for matrix computation
+}
   ```
 
 ### 矩阵计算内存布局
@@ -147,10 +146,14 @@ constexpr uint64_t k = 32;
 __cbuf__ half dst[m * k];
 
 // Set parameters for dst matrix (L1 Buffer) via asc_set_gm2l1_nz_para interface
-constexpr uint64_t dst_nz_matrix_stride = 0, dst_nz_c0_stride = 16, dst_nz_n_stride = 1, dst_nd_num = 1;
-// Offset between starting addresses of adjacent Nz matrices in destination matrix
-constexpr uint64_t nz_config = static_cast<uint64_t>(dst_nz_matrix_stride) << 48;
-// After ND conversion to Nz format, offset between starting addresses of adjacent Z matrices in destination Nz matrix
+constexpr uint64_t dst_nz_matrix_stride = 0, dst_nz_c0_stride = 16,
+                   dst_nz_n_stride = 1, dst_nd_num = 1;
+// Offset between starting addresses of adjacent Nz matrices in destination
+// matrix
+constexpr uint64_t nz_config = static_cast<uint64_t>(dst_nz_matrix_stride)
+                               << 48;
+// After ND conversion to Nz format, offset between starting addresses of
+// adjacent Z matrices in destination Nz matrix
 nz_config |= static_cast<uint64_t>(dst_nz_c0_stride) << 32;
 nz_config |= static_cast<uint64_t>(dst_nz_n_stride) << 16;
 nz_config |= static_cast<uint64_t>(dst_nd_num);
@@ -166,9 +169,12 @@ constexpr uint8_t l2_cache_ctrl = 1;
 constexpr uint16_t n_value = 16;
 // Number of columns in ND matrix of source matrix
 constexpr uint32_t d_value = 23;
-// When dValue is less than or equal to 4, can enable SmallC0 mode, C0_SIZE will pad to 4 * sizeof(T) Bytes. In this mode, dst_n_stride parameter and dst_c0_stride parameter are invalid, no need to configure.
+// When dValue is less than or equal to 4, can enable SmallC0 mode, C0_SIZE will
+// pad to 4 * sizeof(T) Bytes. In this mode, dst_n_stride parameter and
+// dst_c0_stride parameter are invalid, no need to configure.
 constexpr bool enable_small_c0 = false;
-asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value, src_nd_matrix_stride, enable_small_c0);
+asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value,
+                     src_nd_matrix_stride, enable_small_c0);
 ```
 
 #### L12L0 数据搬运
@@ -184,15 +190,20 @@ __ca__ half l0a_buffer[2304];
 // m_step is 2, k_step is 3, indicating transfer of 6 data blocks
 uint8_t m_step = 2;
 uint8_t k_step = 3;
-// mStartPosition is 2, indicates M direction transfer starting position is at M axis direction 16*2=64 elements away from source operand starting position
+// mStartPosition is 2, indicates M direction transfer starting position is at M
+// axis direction 16*2=64 elements away from source operand starting position
 uint16_t m_start_position = 2;
-// kStartPosition is 2, indicates K direction transfer starting position is at K axis direction 32B*2=64B position away from source operand starting position
+// kStartPosition is 2, indicates K direction transfer starting position is at K
+// axis direction 32B*2=64B position away from source operand starting position
 uint16_t k_start_position = 2;
-// srcStride is 5, indicates in source operand, interval between starting addresses of previous fractal and next fractal in K direction is 5
+// srcStride is 5, indicates in source operand, interval between starting
+// addresses of previous fractal and next fractal in K direction is 5
 int16_t src_stride = 5;
-// dstStride is 3: indicates in destination operand, interval between starting addresses of previous fractal and next fractal in K direction is 3
+// dstStride is 3: indicates in destination operand, interval between starting
+// addresses of previous fractal and next fractal in K direction is 3
 int16_t dst_stride = 3;
-asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position,
+                m_step, k_step, src_stride, dst_stride);
 ```
 
 搬运到`L0B Buffer`采用`asc_copy_l12l0b`实现，接口参数及实现功能同L12L0A，可参考[cube_datamove](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矩阵数据搬运/)查看更多内容。
@@ -203,7 +214,9 @@ asc_copy_l12l0a(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_ste
 
 ```c
 // Use transpose interface to complete processing
-asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position,
+                          k_start_position, m_step, k_step, src_stride,
+                          dst_stride);
 ```
 
 ### 矩阵数据搬出
@@ -230,25 +243,33 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 
 C语言编程提供了`asc_copy_l0c2gm`来使能发挥芯片的各种随路能力，通过直接传入配置参数可完成随路搬运的操作。
 ```c
-__aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t *dst_addr, __cc__ float *src_addr,
-                        uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl,
-                        uint8_t clip_relu_pre, uint8_t unit_flag_ctrl, uint64_t quant_pre, uint8_t relu_pre, 
-                        bool enable_split, bool enable_nz2nd, uint64_t quant_post, uint8_t relu_post, 
-                        bool enable_clip_relu_post, uint8_t eltwise_op, bool enable_eltwise_antq, bool enable_c0_pad,
-                        bool enable_broadcast, bool enable_nz2dn);
-
+__aicore__ inline void asc_copy_l0c2gm(
+    __gm__ bfloat16_t *dst_addr, __cc__ float *src_addr, uint16_t n_size,
+    uint16_t m_size, uint32_t loop_dst_stride, uint16_t loop_src_stride,
+    uint8_t l2_cache_ctl, uint8_t clip_relu_pre, uint8_t unit_flag_ctrl,
+    uint64_t quant_pre, uint8_t relu_pre, bool enable_split, bool enable_nz2nd,
+    uint64_t quant_post, uint8_t relu_post, bool enable_clip_relu_post,
+    uint8_t eltwise_op, bool enable_eltwise_antq, bool enable_c0_pad,
+    bool enable_broadcast, bool enable_nz2dn);
 ```
 
 另外，对于是否开启unit_flag，nz2nd信息的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
 ```c
-// 1.0 When performing inline quantization during data movement, call this interface to set vector quantization parameters in the quantization flow.
-__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr, uint64_t quant_pre_addr, bool enable_unit_flag);
+// 1.0 When performing inline quantization during data movement, call this
+// interface to set vector quantization parameters in the quantization flow.
+__aicore__ inline void asc_set_l0c2gm_config(uint64_t relu_pre_addr,
+                                             uint64_t quant_pre_addr,
+                                             bool enable_unit_flag);
 
-// 2.0 When performing inline format conversion (NZ to ND) during data movement, call this interface to set format conversion configuration.
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride);
+// 2.0 When performing inline format conversion (NZ to ND) during data movement,
+// call this interface to set format conversion configuration.
+__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,
+                                            uint64_t src_nd_stride,
+                                            uint64_t dst_nd_stride);
 
-// 3.0 Set the value in RELU_ALPHA register. This is a 64-bit register storing the alpha value used in Scalar ReLU during fixpipe or cube instructions.
-__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half& config);
+// 3.0 Set the value in RELU_ALPHA register. This is a 64-bit register storing
+// the alpha value used in Scalar ReLU during fixpipe or cube instructions.
+__aicore__ inline void asc_set_l0c2gm_lrelu_alpha(half &config);
 ```
 
 详细说明可参考接口说明文档[Cube接口说明](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/C-API/矩阵数据搬运/asc_copy_l0c2gm/)。
@@ -288,16 +309,22 @@ constexpr uint16_t n = 48;
 constexpr uint16_t k = 64;
 
 // 2.2 Feature parameters
-// unit_flag: Controls fine-grained parallelism of Mmad and Fixpipe instructions. When enabled, results are transferred out immediately after computing each fractal.
+// unit_flag: Controls fine-grained parallelism of Mmad and Fixpipe
+// instructions. When enabled, results are transferred out immediately after
+// computing each fractal.
 uint8_t unit_flag = 0;
 // disable_gemv: Configures whether to enable GEMV mode when M=1
 bool disable_gemv = false;
-// enable_cube_init: Enables C matrix initial value loading. false: do not initialize L0C; true: load initial value from BT Buffer.
+// enable_cube_init: Enables C matrix initial value loading. false: do not
+// initialize L0C; true: load initial value from BT Buffer.
 bool enable_cube_init = false;
-// enable_cube_zero_init: Enables C matrix default zero initialization. true: initialize to 0; false: control initialization via enable_cube_init parameter.
+// enable_cube_zero_init: Enables C matrix default zero initialization. true:
+// initialize to 0; false: control initialization via enable_cube_init
+// parameter.
 bool enable_cube_zero_init = true;
 
-asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv, enable_cube_init, enable_cube_zero_init);
+asc_mmad(c_matrix, a_matrix, b_matrix, m, n, k, unit_flag, disable_gemv,
+         enable_cube_init, enable_cube_zero_init);
 ```
 
 ## 矩阵计算的同步
@@ -306,32 +333,38 @@ AI Core内部的搬运、计算单元均为异步并行工作，多个单元访�
 矩阵计算的四个阶段分别对应PIPE_MTE2、PIPE_MTE1、PIPE_M、PIPE_MTE3四条流水线，需要使用核内同步接口保证流程串行执行。在[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)产品中，可使用`asc_lock`与`asc_unlock`接口实现全流程同步控制。
 
 ```c
-__global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    uint8_t mutex_id = 1;
-    ...
-    // 1. Step 1: Data transfer in (Global Memory → L1 Buffer), execution pipeline is PIPE_MTE2
-    asc_lock(PIPE_MTE2, mutex_id);
-    asc_copy_gm2l1_nd2nz(a_l1_buf, a_gm, 128, 1, BLOCK_M, BLOCK_K, 0, false);
-    asc_copy_gm2l1_nd2nz(b_l1_buf, b_gm, 64, 1, BLOCK_K, BLOCK_N, 0, false);
-    asc_unlock(PIPE_MTE2, mutex_id);
-    ...
-    // 2. Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), execution pipeline is PIPE_MTE1
-    asc_lock(PIPE_MTE1, mutex_id);
-    asc_copy_l12l0a(l0a_buf, a_l1_buf, 0, 0, 4, 8, 1, 1);
-    asc_copy_l12l0b_transpose(l0b_buf, b_l1_buf, 0, 0, 4, 8, 1, 1);
-    asc_unlock(PIPE_MTE1, mutex_id);
-    ...
-    // 3. Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), execution pipeline is PIPE_M
-    asc_lock(PIPE_M, mutex_id);
-    asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
-    asc_unlock(PIPE_M, mutex_id);
-    ...
-    // 4. Step 4: Data transfer out (L0C Buffer → Global Memory), execution pipeline is PIPE_MTE3
-    asc_lock(PIPE_MTE3, mutex_id);
-    asc_copy_l0c2gm(c_gm, l0c_buf, BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0,
-        0, QuantMode_t::NoQuant, 0, false, true, 0, 0, false, false, 0, false, false, false, false, false, false);
-    asc_unlock(PIPE_MTE3, mutex_id);
+__global__ __vector__ void add_kernel(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  uint8_t mutex_id = 1;
+  ...
+      // 1. Step 1: Data transfer in (Global Memory → L1 Buffer), execution
+      // pipeline is PIPE_MTE2
+      asc_lock(PIPE_MTE2, mutex_id);
+  asc_copy_gm2l1_nd2nz(a_l1_buf, a_gm, 128, 1, BLOCK_M, BLOCK_K, 0, false);
+  asc_copy_gm2l1_nd2nz(b_l1_buf, b_gm, 64, 1, BLOCK_K, BLOCK_N, 0, false);
+  asc_unlock(PIPE_MTE2, mutex_id);
+  ...
+      // 2. Step 2: Data transfer in (L1 Buffer → L0A/B Buffer), execution
+      // pipeline is PIPE_MTE1
+      asc_lock(PIPE_MTE1, mutex_id);
+  asc_copy_l12l0a(l0a_buf, a_l1_buf, 0, 0, 4, 8, 1, 1);
+  asc_copy_l12l0b_transpose(l0b_buf, b_l1_buf, 0, 0, 4, 8, 1, 1);
+  asc_unlock(PIPE_MTE1, mutex_id);
+  ...
+      // 3. Step 3: Matrix computation (L0A/B Buffer → L0C Buffer), execution
+      // pipeline is PIPE_M
+      asc_lock(PIPE_M, mutex_id);
+  asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false,
+           false, false);
+  asc_unlock(PIPE_M, mutex_id);
+  ...
+      // 4. Step 4: Data transfer out (L0C Buffer → Global Memory), execution
+      // pipeline is PIPE_MTE3
+      asc_lock(PIPE_MTE3, mutex_id);
+  asc_copy_l0c2gm(c_gm, l0c_buf, BLOCK_N, BLOCK_M, BLOCK_N, 16, 1, 0, 0,
+                  QuantMode_t::NoQuant, 0, false, true, 0, 0, false, false, 0,
+                  false, false, false, false, false, false);
+  asc_unlock(PIPE_MTE3, mutex_id);
 }
 ```
 

@@ -121,32 +121,31 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 **A2/A3架构**：使用MemBase方式（向量基础API + PipeBarrier），无需额外中间缓冲区，直接复用输出缓冲区：
 
 ```cpp
-__aicore__ inline void GeluMemBaseCompute(
-    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
-    AscendC::PipeBarrier<PIPE_V>();
-    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
-    ……
+__aicore__ inline void
+GeluMemBaseCompute(const AscendC::LocalTensor<float> &xLocal,
+                   const AscendC::LocalTensor<float> &yLocal, uint32_t n) {
+  AscendC::Mul(yLocal, xLocal, xLocal, n); // x²
+  AscendC::PipeBarrier<PIPE_V>();
+  AscendC::Mul(yLocal, yLocal, xLocal, n); // x³
+  ……
 }
 ```
 
 **Ascend 950PR架构**：使用RegBase方式（VF函数），中间计算在寄存器内完成，无需额外UB缓冲区，减少数据在UB和Reg之间的交互：
 
 ```cpp
-__simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
+__simd_vf__ inline void GeluVf(__ubuf__ float *xAddr, __ubuf__ float *yAddr,
+                               uint32_t n, uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
 
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
-        ……
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask); // x²
+    …… AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 
@@ -157,13 +156,14 @@ __simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uin
 本样例使用 `__global__ __mix__(1, 2)` 声明核函数，表示每个逻辑核由1个AIC和2个AIV组成。AIC侧负责Matmul计算，AIV侧负责GELU向量计算，两者在同一AI Core内按(baseM × baseN)块粒度流水并行。
 
 ```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
-{
-    AscendC::InitSocState();
-    KernelMmadVector<...> op;
-    op.Init(xMatrix, yMatrix, zMatrix);
-    op.Process();
-    AscendC::PipeBarrier<PIPE_ALL>();
+__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t *xMatrix,
+                                                 __gm__ uint8_t *yMatrix,
+                                                 __gm__ uint8_t *zMatrix) {
+  AscendC::InitSocState();
+  KernelMmadVector<...> op;
+  op.Init(xMatrix, yMatrix, zMatrix);
+  op.Process();
+  AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
@@ -171,12 +171,12 @@ __global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__
 
 ```cpp
 if ASCEND_IS_AIC {
-    // AIC侧：Buffer分配 + 计算循环 + Fixpipe搬出
-    ProcessLoopAic(...);
+  // AIC侧：Buffer分配 + 计算循环 + Fixpipe搬出
+  ProcessLoopAic(...);
 }
 if ASCEND_IS_AIV {
-    // AIV侧：GELU向量计算 + 搬出至GM
-    ProcessLoopAiv();
+  // AIV侧：GELU向量计算 + 搬出至GM
+  ProcessLoopAiv();
 }
 ```
 
@@ -186,10 +186,10 @@ AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `
 
 ```cpp
 // AIC侧 CopyOutAic():
-AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
+AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8); // 通知AIV数据就绪
 
 // AIV侧 GeluFromGM() / GeluFromUB():
-AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
+AscendC::CrossCoreWaitFlag(0x8); // 等待AIC侧Fixpipe完成
 ```
 
 #### 3. `__mix__(1,2)` 模式下的多核切分
@@ -199,9 +199,10 @@ AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
 ```cpp
 uint32_t logicCoreId;
 if ASCEND_IS_AIC {
-    logicCoreId = AscendC::GetBlockIdx();
+  logicCoreId = AscendC::GetBlockIdx();
 } else {
-    logicCoreId = AscendC::GetBlockIdx() / 2;  // __mix__(1,2): 每个逻辑核对应2个AIV
+  logicCoreId =
+      AscendC::GetBlockIdx() / 2; // __mix__(1,2): 每个逻辑核对应2个AIV
 }
 uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
@@ -250,7 +251,8 @@ fixpipeParams.nSize = curN;
 fixpipeParams.mSize = curM;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal,
+                                                 fixpipeParams);
 
 // Ascend 950PR架构
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
@@ -258,7 +260,8 @@ fixpipeParams.mSize = curM;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal,
+                                                 fixpipeParams);
 ```
 
 **AIV侧实现**
@@ -269,7 +272,8 @@ GM → xUB → GELU → geluOutUB → GM
 
 ```cpp
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
+uint32_t gmOffset =
+    mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
 
 // Step 1: DataCopy GM → xUB
 AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
@@ -354,7 +358,7 @@ fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // 按M维度拆分到2个AIV的UB
+fixpipeParams.dualDstCtl = 0b01; // 按M维度拆分到2个AIV的UB
 AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
 ```
 
@@ -371,7 +375,9 @@ GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 // DataCopy: geluOutUB → GM
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
+AscendC::DataCopyPad<float>(
+    cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset],
+    geluOutUB, copyParams);
 ```
 
 **性能数据**

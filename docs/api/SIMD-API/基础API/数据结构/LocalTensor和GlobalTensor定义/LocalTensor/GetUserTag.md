@@ -84,7 +84,9 @@ AscendC::TTagType tag2 = tensor2.GetUserTag();
 AscendC::LocalTensor<half> tensor3 = que3.AllocTensor<half>();
 /* 使用Tag控制条件语句执行*/
 if ((tag1 <= 10) && (tag2 >= 9)) {
-    AscendC::Add(tensor3, tensor1, tensor2, TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
+  AscendC::Add(
+      tensor3, tensor1, tensor2,
+      TILE_LENGTH); // 当tag1小于等于10，tag2大于等于9的时候，才能进行相加操作。
 }
 ```
 

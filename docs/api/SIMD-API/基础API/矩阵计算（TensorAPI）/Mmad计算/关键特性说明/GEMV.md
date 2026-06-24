@@ -62,14 +62,14 @@ C矩阵为1\* 256的向量，共可以划分为16个1 \* 16的子向量，占用
 using namespace AscendC::Te;
 
 struct MmadTraitCustom {
-    using TraitType = MmadTrait;
-    // 设置MmadTrait::disableGemv参数为false，开启GEMV
-    static constexpr const TraitType value = MmadTrait(0, false, false, false, MmadType::NORMAL);
+  using TraitType = MmadTrait;
+  // 设置MmadTrait::disableGemv参数为false，开启GEMV
+  static constexpr const TraitType value =
+      MmadTrait(0, false, false, false, MmadType::NORMAL);
 };
 
 // Mmad计算代码
 MmadParams params(1, n, k, 0, true);
 auto atom = MakeMmad(MmadOperation{}, MmadTraitCustom{}).with(params);
 Mmad(atom, l0C, l0A, l0B);
-
 ```

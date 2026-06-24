@@ -84,13 +84,17 @@ AscendC::Reg::Add(dstReg, srcReg, srcReg, mask);
 
 ```cpp
 // 对齐搬入，使用LoadDist模板参数
-AscendC::Reg::LoadAlign<float, AscendC::Reg::LoadDist::DIST_BRC_B32>(srcReg, srcAddr);
+AscendC::Reg::LoadAlign<float, AscendC::Reg::LoadDist::DIST_BRC_B32>(srcReg,
+                                                                     srcAddr);
 
 // PostUpdate对齐搬入，接口执行后更新srcAddr。
-AscendC::Reg::LoadAlign<float, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg, srcAddr, stride);
+AscendC::Reg::LoadAlign<float, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+    srcReg, srcAddr, stride);
 
 // 对齐搬出，使用StoreDist模板参数
-AscendC::Reg::StoreAlign<float, AscendC::Reg::StoreDist::DIST_FIRST_ELEMENT_B32>(dstAddr, dstReg, mask);
+AscendC::Reg::StoreAlign<
+    float, AscendC::Reg::StoreDist::DIST_FIRST_ELEMENT_B32>(dstAddr, dstReg,
+                                                            mask);
 ```
 
 ### MaskMergeMode模板参数
@@ -101,9 +105,11 @@ AscendC::Reg::StoreAlign<float, AscendC::Reg::StoreDist::DIST_FIRST_ELEMENT_B32>
 - `MaskMergeMode::MERGING`：mask未选中的元素保留`dstReg`原值。
 
 ```cpp
-AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::ZEROING>(dstReg, src0Reg, src1Reg, mask);
+AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::ZEROING>(dstReg, src0Reg,
+                                                           src1Reg, mask);
 
-AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::MERGING>(dstReg, src0Reg, src1Reg, mask);
+AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::MERGING>(dstReg, src0Reg,
+                                                           src1Reg, mask);
 ```
 
 > 📌 **提示**：`MaskMergeMode`只有部分接口形态支持，由软件仿真实现。实际使用时应以单个API文档中的函数原型和参数说明为准。对于不需要保留未选中元素旧值的场景，使用默认的`ZEROING`语义。
@@ -127,15 +133,12 @@ AscendC::Reg::Add<T, AscendC::Reg::MaskMergeMode::MERGING>(dstReg, src0Reg, src1
 Reg矢量搬运接口实际访问的是UB地址。基于Tensor的Cpp编程中，外层通常使用`LocalTensor`管理UB数据。
 
 ```cpp
-template <typename T>
-__aicore__ inline void Compute()
-{
-    AscendC::LocalTensor<T> dst = ubAllocator.Alloc<T, TILE_LENGTH>();
-    // 参数计算等
-    ......
-    asc_vf_call<AddVF<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
-    // 尾处理
-    ......
+template <typename T> __aicore__ inline void Compute() {
+  AscendC::LocalTensor<T> dst = ubAllocator.Alloc<T, TILE_LENGTH>();
+  // 参数计算等
+  ...... asc_vf_call<AddVF<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
+  // 尾处理
+  ......
 }
 ```
 
@@ -152,7 +155,8 @@ __aicore__ inline void Compute()
 [`CreateMask`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于创建固定模式的`MaskReg`，[`UpdateMask`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md)用于根据剩余元素数生成尾块mask。
 
 ```cpp
-AscendC::Reg::MaskReg fullMask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+AscendC::Reg::MaskReg fullMask =
+    AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
 
 AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 ```
@@ -165,15 +169,16 @@ AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
 
 ```cpp
 AscendC::Reg::AddrReg aReg;
-for(uint16_t i = 0;i < extent1; i++){
-    for(uint16_t j = 0;j < extent2; j++){
-        for(uint16_t k = 0;k < extent3; k++){
-            for(uint16_t m = 0;m < extent4; m++){
-                aReg = AscendC::Reg::CreateAddrReg(i, const1, j, const2, k, const3, m, const4);
-                AscendC::Reg::LoadAlign(srcReg, srcAddr, aReg);
-            }
-        }
+for (uint16_t i = 0; i < extent1; i++) {
+  for (uint16_t j = 0; j < extent2; j++) {
+    for (uint16_t k = 0; k < extent3; k++) {
+      for (uint16_t m = 0; m < extent4; m++) {
+        aReg = AscendC::Reg::CreateAddrReg(i, const1, j, const2, k, const3, m,
+                                           const4);
+        AscendC::Reg::LoadAlign(srcReg, srcAddr, aReg);
+      }
     }
+  }
 }
 ```
 
@@ -210,10 +215,9 @@ AscendC::Reg::UnalignRegForStore storeUreg;
 
 AscendC::Reg::LoadUnAlignPre(loadUreg, srcAddr);
 for (uint16_t i = 0; i < repeatTimes; ++i) {
-    AscendC::Reg::LoadUnAlign(srcReg, loadUreg, srcAddr, postUpdateStride);
-    // Reg计算
-    ...
-    AscendC::Reg::StoreUnAlign(dstAddr, dstReg, storeUreg, postUpdateStride);
+  AscendC::Reg::LoadUnAlign(srcReg, loadUreg, srcAddr, postUpdateStride);
+  // Reg计算
+  ... AscendC::Reg::StoreUnAlign(dstAddr, dstReg, storeUreg, postUpdateStride);
 }
 AscendC::Reg::StoreUnAlignPost(dstAddr, storeUreg, 0);
 ```
@@ -265,63 +269,58 @@ AscendC::Reg::Load(srcReg, dstAddr);
 ```cpp
 template <typename T>
 __simd_vf__ inline void AddVFv1(AscendC::LocalTensor<T> dst,
-                              AscendC::LocalTensor<T> src0,
-                              AscendC::LocalTensor<T> src1,
-                              uint32_t oneRepeatSize,
-                              uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> src0Reg;
-    AscendC::Reg::RegTensor<T> src1Reg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask =
-        AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+                                AscendC::LocalTensor<T> src0,
+                                AscendC::LocalTensor<T> src1,
+                                uint32_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> src0Reg;
+  AscendC::Reg::RegTensor<T> src1Reg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
 
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        uint32_t offset = i * oneRepeatSize;
-        AscendC::Reg::LoadAlign(src0Reg, src0 + offset);
-        AscendC::Reg::LoadAlign(src1Reg, src1 + offset);
-        AscendC::Reg::Add(dstReg, src0Reg, src1Reg, mask);
-        AscendC::Reg::StoreAlign(dst + offset, dstReg, mask);
-    }
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    uint32_t offset = i * oneRepeatSize;
+    AscendC::Reg::LoadAlign(src0Reg, src0 + offset);
+    AscendC::Reg::LoadAlign(src1Reg, src1 + offset);
+    AscendC::Reg::Add(dstReg, src0Reg, src1Reg, mask);
+    AscendC::Reg::StoreAlign(dst + offset, dstReg, mask);
+  }
 }
 
 template <typename T>
-__simd_vf__ inline void AddVFv2(__ubuf__ float* dstAddr,
-                                __ubuf__ float* src0Addr,
-                                __ubuf__ float* src1Addr,
-                                uint32_t oneRepeatSize,
-                                uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> src0Reg;
-    AscendC::Reg::RegTensor<T> src1Reg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask =
-        AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+__simd_vf__ inline void AddVFv2(__ubuf__ float *dstAddr,
+                                __ubuf__ float *src0Addr,
+                                __ubuf__ float *src1Addr,
+                                uint32_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> src0Reg;
+  AscendC::Reg::RegTensor<T> src1Reg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
 
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        uint32_t offset = i * oneRepeatSize;
-        AscendC::Reg::LoadAlign(src0Reg, src0Addr + offset);
-        AscendC::Reg::LoadAlign(src1Reg, src1Addr + offset);
-        AscendC::Reg::Add(dstReg, src0Reg, src1Reg, mask);
-        AscendC::Reg::StoreAlign(dstAddr + offset, dstReg, mask);
-    }
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    uint32_t offset = i * oneRepeatSize;
+    AscendC::Reg::LoadAlign(src0Reg, src0Addr + offset);
+    AscendC::Reg::LoadAlign(src1Reg, src1Addr + offset);
+    AscendC::Reg::Add(dstReg, src0Reg, src1Reg, mask);
+    AscendC::Reg::StoreAlign(dstAddr + offset, dstReg, mask);
+  }
 }
 
-template <typename T>
-__aicore__ inline void Compute()
-{
-    AscendC::LocalTensor<T> dst = ubAllocator.Alloc<T, TILE_LENGTH>();
+template <typename T> __aicore__ inline void Compute() {
+  AscendC::LocalTensor<T> dst = ubAllocator.Alloc<T, TILE_LENGTH>();
 
-    constexpr uint32_t oneRepeatSize = 256 / sizeof(T);
-    uint16_t repeatTimes = TILE_LENGTH / oneRepeatSize;
-	// 使用LocalTensor作为参数
-    asc_vf_call<AddVFv1<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
-    
-    __ubuf__ T* dstAddr = (__ubuf__ T*)dst.GetPhyAddr();
-    __ubuf__ T* src0Addr = (__ubuf__ T*)src0.GetPhyAddr();
-    __ubuf__ T* src1Addr = (__ubuf__ T*)src1.GetPhyAddr();
-    // 使用UB地址作为参数
-    asc_vf_call<AddVFv2<T>>(dstAddr, src0Addr, src1Addr, oneRepeatSize, repeatTimes);
+  constexpr uint32_t oneRepeatSize = 256 / sizeof(T);
+  uint16_t repeatTimes = TILE_LENGTH / oneRepeatSize;
+  // 使用LocalTensor作为参数
+  asc_vf_call<AddVFv1<T>>(dst, src0, src1, oneRepeatSize, repeatTimes);
+
+  __ubuf__ T *dstAddr = (__ubuf__ T *)dst.GetPhyAddr();
+  __ubuf__ T *src0Addr = (__ubuf__ T *)src0.GetPhyAddr();
+  __ubuf__ T *src1Addr = (__ubuf__ T *)src1.GetPhyAddr();
+  // 使用UB地址作为参数
+  asc_vf_call<AddVFv2<T>>(dstAddr, src0Addr, src1Addr, oneRepeatSize,
+                          repeatTimes);
 }
 ```
 
@@ -330,8 +329,8 @@ __aicore__ inline void Compute()
 ```cpp
 uint32_t remainCount = count;
 for (uint16_t i = 0; i < repeatTimes; ++i) {
-    AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
-    // Load / Compute / Store
+  AscendC::Reg::MaskReg mask = AscendC::Reg::UpdateMask<T>(remainCount);
+  // Load / Compute / Store
 }
 ```
 

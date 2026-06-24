@@ -47,20 +47,97 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int8_t* dst, __gm__ int8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t* dst, __gm__ fp4x2_e2m1_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t* dst, __gm__ fp4x2_e1m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t* dst, __gm__ fp8_e8m0_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t* dst, __gm__ fp8_e5m2_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t* dst, __gm__ fp8_e4m3fn_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t* dst, __gm__ int16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ half* dst, __gm__ half* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t* dst, __gm__ int32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
-__aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ float* dst, __gm__ float* src, uint32_t loop0_size, uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size, uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count, bool padding_mode, uint8_t cache_mode)
+__aicore__ inline void asc_ndim_copy_gm2ub(
+    __ubuf__ int8_t *dst, __gm__ int8_t *src, uint32_t loop0_size,
+    uint32_t loop1_size, uint32_t loop2_size, uint32_t loop3_size,
+    uint32_t loop4_size, uint8_t loop0_lp_count, uint8_t loop0_rp_count,
+    bool padding_mode, uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ uint8_t *dst, __gm__ uint8_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e2m1_t *dst,
+                                    __gm__ fp4x2_e2m1_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ fp4x2_e1m2_t *dst,
+                                    __gm__ fp4x2_e1m2_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e8m0_t *dst,
+                                    __gm__ fp8_e8m0_t *src, uint32_t loop0_size,
+                                    uint32_t loop1_size, uint32_t loop2_size,
+                                    uint32_t loop3_size, uint32_t loop4_size,
+                                    uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e5m2_t *dst,
+                                    __gm__ fp8_e5m2_t *src, uint32_t loop0_size,
+                                    uint32_t loop1_size, uint32_t loop2_size,
+                                    uint32_t loop3_size, uint32_t loop4_size,
+                                    uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ fp8_e4m3fn_t *dst,
+                                    __gm__ fp8_e4m3fn_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ int16_t *dst, __gm__ int16_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ uint16_t *dst,
+                                    __gm__ uint16_t *src, uint32_t loop0_size,
+                                    uint32_t loop1_size, uint32_t loop2_size,
+                                    uint32_t loop3_size, uint32_t loop4_size,
+                                    uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ half *dst, __gm__ half *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ bfloat16_t *dst,
+                                    __gm__ bfloat16_t *src, uint32_t loop0_size,
+                                    uint32_t loop1_size, uint32_t loop2_size,
+                                    uint32_t loop3_size, uint32_t loop4_size,
+                                    uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ int32_t *dst, __gm__ int32_t *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ uint32_t *dst,
+                                    __gm__ uint32_t *src, uint32_t loop0_size,
+                                    uint32_t loop1_size, uint32_t loop2_size,
+                                    uint32_t loop3_size, uint32_t loop4_size,
+                                    uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode) __aicore__
+    inline void asc_ndim_copy_gm2ub(__ubuf__ float *dst, __gm__ float *src,
+                                    uint32_t loop0_size, uint32_t loop1_size,
+                                    uint32_t loop2_size, uint32_t loop3_size,
+                                    uint32_t loop4_size, uint8_t loop0_lp_count,
+                                    uint8_t loop0_rp_count, bool padding_mode,
+                                    uint8_t cache_mode)
 ```
 
 ## 参数说明
@@ -142,6 +219,7 @@ pad_count_config.loop1_lp_count = loop1_lp_count;
 pad_count_config.loop1_rp_count = loop1_rp_count;
 asc_set_ndim_pad_count(pad_count_config);
 
-asc_ndim_copy_gm2ub(dst, src, loop0_size, loop1_size, loop2_size, loop3_size, loop4_size,
-    loop0_lp_count, loop0_rp_count, padding_mode, 0);
+asc_ndim_copy_gm2ub(dst, src, loop0_size, loop1_size, loop2_size, loop3_size,
+                    loop4_size, loop0_lp_count, loop0_rp_count, padding_mode,
+                    0);
 ```

@@ -41,50 +41,56 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
     - Specific steps:
       - Configure the constant MatmulShapeParams to obtain the custom MatmulConfig.
         ```cpp
-        constexpr int32_t MAX_M = 10000; // custom matmul kernel support max value of M Dim shape
-        constexpr int32_t MAX_N = 10000; // custom matmul kernel support max value of N Dim shape
-        constexpr int32_t MAX_K = 10000; // custom matmul kernel support max value of K Dim shape
-        constexpr int32_t BASE_M = 128;  // BASEM * BASE_K * sizeof(typeA) <=L0A size
-        constexpr int32_t BASE_N = 256;  // BASEN * BASE_K * sizeof(typeB) <=L0B size
-        constexpr int32_t BASE_K = 64;   // BASEM * BASE_N * sizeof(typeC) <=L0C size
-        constexpr MatmulShapeParams shapeParams = { MAX_M,
-                                                      MAX_N,
-                                                      MAX_K,
-                                                      BASE_M,
-                                                      BASE_N,
-                                                      BASE_K };
-        constexpr MatmulConfig CUSTOM_CFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
+constexpr int32_t MAX_M =
+    10000; // custom matmul kernel support max value of M Dim shape
+constexpr int32_t MAX_N =
+    10000; // custom matmul kernel support max value of N Dim shape
+constexpr int32_t MAX_K =
+    10000; // custom matmul kernel support max value of K Dim shape
+constexpr int32_t BASE_M = 128; // BASEM * BASE_K * sizeof(typeA) <=L0A size
+constexpr int32_t BASE_N = 256; // BASEN * BASE_K * sizeof(typeB) <=L0B size
+constexpr int32_t BASE_K = 64;  // BASEM * BASE_N * sizeof(typeC) <=L0C size
+constexpr MatmulShapeParams shapeParams = {MAX_M,  MAX_N,  MAX_K,
+                                           BASE_M, BASE_N, BASE_K};
+constexpr MatmulConfig CUSTOM_CFG =
+    GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
         ```
       - Obtain the constant Tiling information through the GetMatmulApiTiling interface.
         ```cpp
-        auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
+auto constantCFG =
+    AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
         ```
       - Create the Matmul object using the custom MatmulConfig template.
         ```cpp
-        using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>;
-        using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>;
-        using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>;
-        using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>;
-        constexpr static auto CONSTANT_CFG = GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>();
-        AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>;
+constexpr static auto CONSTANT_CFG =
+    GetCustomConstantCFG<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>();
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
         ```
       - Initialize and pass in the constant Tiling information.
       - Set the left matrix A, right matrix B, and Bias.
         ```cpp
-        matmulObj.SetTail(tailM, tailN, shapes.k);
-        matmulObj.SetTensorA(aGlobal, false);
-        matmulObj.SetTensorB(bGlobal, false);
-        if (shapes.isBias) {
-            matmulObj.SetBias(biasGlobal);
-        }
+matmulObj.SetTail(tailM, tailN, shapes.k);
+matmulObj.SetTensorA(aGlobal, false);
+matmulObj.SetTensorB(bGlobal, false);
+if (shapes.isBias) {
+  matmulObj.SetBias(biasGlobal);
+}
         ```
       - Complete the matrix multiplication operation.
         ```cpp
-        matmulObj.IterateAll(cGlobal);
+matmulObj.IterateAll(cGlobal);
         ```
       - End the matrix multiplication operation.
         ```cpp
-        matmulObj.End();
+matmulObj.End();
         ```
 
   - Key Tiling Steps

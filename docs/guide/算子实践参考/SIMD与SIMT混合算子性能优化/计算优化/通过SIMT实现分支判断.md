@@ -57,46 +57,50 @@ SIMT线程层次结构为：
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void floor_mod_simd(__ubuf__ T* zAddr, __ubuf__ T* xAddr, __ubuf__ T* yAddr, const uint32_t count)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
-    uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);
-    AscendC::Reg::RegTensor<T> xValue;
-    AscendC::Reg::RegTensor<T> yValue;
-    AscendC::Reg::RegTensor<T> modValue;
-    AscendC::Reg::RegTensor<T> tempValue;
-    AscendC::Reg::RegTensor<T> defaultValue;
-    AscendC::Reg::RegTensor<T> signValue;
+__simd_vf__ inline void floor_mod_simd(__ubuf__ T *zAddr, __ubuf__ T *xAddr,
+                                       __ubuf__ T *yAddr,
+                                       const uint32_t count) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(T);
+  uint16_t loopTimes = AscendC::CeilDivision(count, oneRepeatSize);
+  AscendC::Reg::RegTensor<T> xValue;
+  AscendC::Reg::RegTensor<T> yValue;
+  AscendC::Reg::RegTensor<T> modValue;
+  AscendC::Reg::RegTensor<T> tempValue;
+  AscendC::Reg::RegTensor<T> defaultValue;
+  AscendC::Reg::RegTensor<T> signValue;
 
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::MaskReg selectMask;
-    AscendC::Reg::MaskReg adjustMask;
-    uint32_t maskCount = count;
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::MaskReg selectMask;
+  AscendC::Reg::MaskReg adjustMask;
+  uint32_t maskCount = count;
 
-    AscendC::Reg::Duplicate(defaultValue, T(-1));
-    AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
+  AscendC::Reg::Duplicate(defaultValue, T(-1));
+  AscendC::Reg::Duplicate(signValue, FMOD_B32_SIGN);
 
-    for (uint16_t i = 0; i < loopTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(maskCount);
-        AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
+  for (uint16_t i = 0; i < loopTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(maskCount);
+    AscendC::Reg::LoadAlign(xValue, xAddr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(yValue, yAddr + i * oneRepeatSize);
 
-        AscendC::Reg::Div(tempValue, xValue, yValue, mask);
-        AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
-        AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
+    AscendC::Reg::Div(tempValue, xValue, yValue, mask);
+    AscendC::Reg::Mul(tempValue, yValue, tempValue, mask);
+    AscendC::Reg::Sub(modValue, xValue, tempValue, mask);
 
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0), mask);
-        AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
+    AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(selectMask, yValue, T(0),
+                                                    mask);
+    AscendC::Reg::Select(tempValue, modValue, defaultValue, selectMask);
 
-        AscendC::Reg::Add(modValue, tempValue, yValue, mask);
-        AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0), mask);
-        AscendC::Reg::And(xValue, tempValue, signValue, mask);
-        AscendC::Reg::And(yValue, yValue, signValue, mask);
-        AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue, mask);
-        AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
-        AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
-        AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
-    }
+    AscendC::Reg::Add(modValue, tempValue, yValue, mask);
+    AscendC::Reg::Compares<T, AscendC::CMPMODE::NE>(adjustMask, tempValue, T(0),
+                                                    mask);
+    AscendC::Reg::And(xValue, tempValue, signValue, mask);
+    AscendC::Reg::And(yValue, yValue, signValue, mask);
+    AscendC::Reg::Compare<T, AscendC::CMPMODE::NE>(selectMask, xValue, yValue,
+                                                   mask);
+    AscendC::Reg::MaskAnd(adjustMask, selectMask, adjustMask, mask);
+    AscendC::Reg::Select(modValue, modValue, tempValue, adjustMask);
+    AscendC::Reg::StoreAlign(zAddr + i * oneRepeatSize, modValue, mask);
+  }
 }
 ```
 
@@ -106,20 +110,20 @@ __simd_vf__ inline void floor_mod_simd(__ubuf__ T* zAddr, __ubuf__ T* xAddr, __u
 
 ```cpp
 template <typename T>
-__simt_vf__ inline void floor_mod_simt_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
-{
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
-        const auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        if (signsDiffer && (rem != 0)) {
-            z[index] = rem + yValue;
-        } else {
-            z[index] = rem;
-        }
+__simt_vf__ inline void floor_mod_simt_contiguous(__ubuf__ T *x, __ubuf__ T *y,
+                                                  __ubuf__ T *z,
+                                                  uint32_t inputTotalLength) {
+  for (uint32_t index = static_cast<uint32_t>(threadIdx.x);
+       index < inputTotalLength; index += static_cast<uint32_t>(blockDim.x)) {
+    T yValue = y[index];
+    const auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    if (signsDiffer && (rem != 0)) {
+      z[index] = rem + yValue;
+    } else {
+      z[index] = rem;
     }
+  }
 }
 ```
 

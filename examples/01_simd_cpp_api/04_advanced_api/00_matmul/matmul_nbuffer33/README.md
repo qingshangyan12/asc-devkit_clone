@@ -49,21 +49,25 @@ NBuffer33算法的Matmul样例，实现搬入搬出带宽平衡从而提升效�
     - 具体步骤：
       - 创建Matmul对象，配置MDL模板和NBuffer33MatmulPolicy。
         ```cpp
-        AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType, IS_TRANS_A>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, IS_TRANS_B>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-                        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>, CFG_MDL,
-                        AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-                        AscendC::Impl::Detail::NBuffer33MatmulPolicy>
-            matmulObj;
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType,
+                        IS_TRANS_A>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType,
+                        IS_TRANS_B>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>,
+    CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+    AscendC::Impl::Detail::NBuffer33MatmulPolicy>
+    matmulObj;
         ```
 
   - Tiling关键步骤
     - 设置A、B、C、Bias的参数类型信息；M、N、Ka、Kb形状信息等，开启NBuffer33模式。
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::N_BUFFER_33,
-                                                            matmul_tiling::MatrixTraverse::NOSET, false);
-      tilingApi.SetMatmulConfigParams(matmulConfigParams);
+matmul_tiling::MatmulConfigParams
+    matmulConfigParams(1, false, matmul_tiling::ScheduleType::N_BUFFER_33,
+                       matmul_tiling::MatrixTraverse::NOSET, false);
+tilingApi.SetMatmulConfigParams(matmulConfigParams);
       ```
 
   - 调用实现  

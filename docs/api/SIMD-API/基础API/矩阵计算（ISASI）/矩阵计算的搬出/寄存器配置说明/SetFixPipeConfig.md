@@ -22,10 +22,13 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)、[L
 
 ```cpp
 template <typename T>
-__aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& reluPre, const LocalTensor<T>& quantPre, bool isUnitFlag = false)
+__aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &reluPre,
+                                        const LocalTensor<T> &quantPre,
+                                        bool isUnitFlag = false)
 
-template <typename T, bool setRelu = false>
-__aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUnitFlag = false)
+    template <typename T, bool setRelu = false>
+    __aicore__ inline void SetFixPipeConfig(const LocalTensor<T> &preData,
+                                            bool isUnitFlag = false)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002547729135_section622mcpsimp"></a>
@@ -63,17 +66,19 @@ quantPre和reluPre必须是Fixpipe Buffer上的Tensor。
 完整示例可参考[data_copy_l0c2gm](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_l0c2gm)。
 
 ```cpp
-__aicore__ inline void SetFPC(const LocalTensor <int32_t>& reluPreTensor, const LocalTensor <int32_t>& quantPreTensor)
-{
- 
-    AscendC::LocalTensor<uint64_t> workA1 = inQueueDeqA1.AllocTensor<uint64_t>();
-    uint16_t deqSize = 128; // deq tensor的size
-    AscendC::DataCopy(workA1, deqGlobal, deqSize); // deqGlobal为量化系数的gm地址
-    AscendC::LocalTensor<uint64_t> deqFB = inQueueDeqFB.AllocTensor<uint64_t>(); // deq tensor在Fix上的地址
-    uint16_t fbufBurstLen = deqSize / 128;  // l1->fix, burst_len unit is 128Bytes
-    AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
-    AscendC::DataCopy(deqFB, workA1, dataCopyParams); // 通过DataCopy搬入C2PIPE2GM。
-    AscendC::SetFixPipeConfig(deqFB); // 设置量化tensor
-    AscendC::PipeBarrier<PIPE_FIX>();
+__aicore__ inline void SetFPC(const LocalTensor<int32_t> &reluPreTensor,
+                              const LocalTensor<int32_t> &quantPreTensor) {
+
+  AscendC::LocalTensor<uint64_t> workA1 = inQueueDeqA1.AllocTensor<uint64_t>();
+  uint16_t deqSize = 128;                        // deq tensor的size
+  AscendC::DataCopy(workA1, deqGlobal, deqSize); // deqGlobal为量化系数的gm地址
+  AscendC::LocalTensor<uint64_t> deqFB =
+      inQueueDeqFB.AllocTensor<uint64_t>(); // deq tensor在Fix上的地址
+  uint16_t fbufBurstLen = deqSize / 128; // l1->fix, burst_len unit is 128Bytes
+  AscendC::DataCopyParams dataCopyParams(1, fbufBurstLen, 0, 0);
+  AscendC::DataCopy(deqFB, workA1,
+                    dataCopyParams); // 通过DataCopy搬入C2PIPE2GM。
+  AscendC::SetFixPipeConfig(deqFB);  // 设置量化tensor
+  AscendC::PipeBarrier<PIPE_FIX>();
 }
 ```

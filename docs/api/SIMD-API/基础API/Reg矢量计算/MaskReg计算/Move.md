@@ -35,13 +35,13 @@
 - 有输入mask
 
     ```cpp
-    __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src, MaskReg& mask)
+__simd_callee__ inline void Move(MaskReg &dst, MaskReg &src, MaskReg &mask)
     ```
 
 - 无输入mask
 
     ```cpp
-    __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src)
+__simd_callee__ inline void Move(MaskReg &dst, MaskReg &src)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -66,18 +66,20 @@
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void MoveVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::MaskReg src = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-    AscendC::Reg::MaskReg dst;
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Move(dst, src, mask);
-        AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-    }
+__simd_vf__ inline void MoveVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                               uint32_t count, uint32_t oneRepeatSize,
+                               uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::MaskReg src =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+  AscendC::Reg::MaskReg dst;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Move(dst, src, mask);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+  }
 }
 ```

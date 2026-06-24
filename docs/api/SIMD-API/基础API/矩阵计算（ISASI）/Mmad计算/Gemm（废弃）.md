@@ -23,15 +23,19 @@
 - 功能接口：
 
     ```cpp
-    template <typename T, typename U, typename S>
-    __aicore__ inline void Gemm(const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<S>& src1, const uint32_t m, const uint32_t k, const uint32_t n, GemmTiling tilling, bool partialsum = true, int32_t initValue = 0)
+template <typename T, typename U, typename S>
+__aicore__ inline void
+Gemm(const LocalTensor<T> &dst, const LocalTensor<U> &src0,
+     const LocalTensor<S> &src1, const uint32_t m, const uint32_t k,
+     const uint32_t n, GemmTiling tilling, bool partialsum = true,
+     int32_t initValue = 0)
     ```
 
 - 切分方案计算接口：
 
     ```cpp
-    template <typename T>
-    __aicore__ inline GemmTiling GetGemmTiling(uint32_t m, uint32_t k, uint32_t n)
+template <typename T>
+__aicore__ inline GemmTiling GetGemmTiling(uint32_t m, uint32_t k, uint32_t n)
     ```
 
 ## 参数说明

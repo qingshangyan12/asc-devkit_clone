@@ -24,12 +24,12 @@ NZ2NZ转化过程可以参考以下伪代码：
 
 ```cpp
 for (j = 0; j < mSize; j++) {
-    src_temp_n_addr = src + j * sizeof(L0C_element) * 16;
-    dst_temp_n_addr = dst + j * 16 * sizeof(DST_element);
-    for (k = 0; k < ceil(nSize / 16); k++) {
-        src_block_addr = src_temp_n_addr + k * srcStride * sizeof(L0C_element) * 16;
-        dst_block_addr = dst_temp_n_addr + k * dstStride * 32;
-    }
+  src_temp_n_addr = src + j * sizeof(L0C_element) * 16;
+  dst_temp_n_addr = dst + j * 16 * sizeof(DST_element);
+  for (k = 0; k < ceil(nSize / 16); k++) {
+    src_block_addr = src_temp_n_addr + k * srcStride * sizeof(L0C_element) * 16;
+    dst_block_addr = dst_temp_n_addr + k * dstStride * 32;
+  }
 }
 ```
 

@@ -116,9 +116,9 @@ float frac = index_float - static_cast<float>(n);
 float low_val = sin_table[n];
 float high_val = 0.0f;
 if (n + 1 >= table_length) {
-    high_val = sin_table[0];
+  high_val = sin_table[0];
 } else {
-    high_val = sin_table[n + 1];
+  high_val = sin_table[n + 1];
 }
 output[idx] = sign * (low_val + frac * (high_val - low_val));
 ```
@@ -160,9 +160,9 @@ float frac = index_float - static_cast<float>(n);
 float low_val = asc_ldca(&sin_table[n]);
 float high_val = 0.0f;
 if (n + 1 >= table_length) {
-    high_val = asc_ldca(&sin_table[0]);
+  high_val = asc_ldca(&sin_table[0]);
 } else {
-    high_val = asc_ldca(&sin_table[n + 1]);
+  high_val = asc_ldca(&sin_table[n + 1]);
 }
 float y = sign * (low_val + frac * (high_val - low_val));
 asc_stcg(&output[idx], y);

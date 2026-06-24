@@ -50,21 +50,22 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
     After Kernel execution, the Host side uses the `ASCENDC_CHECK` macro to catch and print error information. `ASCENDC_CHECK` is a utility macro for catching and printing ACL errors, defined as follows:
 
     ```c
-    #define ASCENDC_CHECK(expr) do { \
-        aclError ret = (expr); \
-        if (ret != ACL_SUCCESS) { \
-            fprintf(stderr, "Ascend Error: %s:%d code=%d %s\n", \
-                __FILE__, __LINE__, ret, aclGetRecentErrMsg()); \
-        } \
-    } while(0)
+#define ASCENDC_CHECK(expr)                                                    \
+  do {                                                                         \
+    aclError ret = (expr);                                                     \
+    if (ret != ACL_SUCCESS) {                                                  \
+      fprintf(stderr, "Ascend Error: %s:%d code=%d %s\n", __FILE__, __LINE__,  \
+              ret, aclGetRecentErrMsg());                                      \
+    }                                                                          \
+  } while (0)
     ```
 
     Pass ACL interface calls as parameters. The macro automatically checks the return value and prints error information on failure.
 
     ```c
-    // Catch Kernel execution errors (including errors triggered by assert)
-    ASCENDC_CHECK(aclrtGetLastError(ACL_RT_THREAD_LEVEL));
-    ASCENDC_CHECK(aclrtSynchronizeDevice());
+// Catch Kernel execution errors (including errors triggered by assert)
+ASCENDC_CHECK(aclrtGetLastError(ACL_RT_THREAD_LEVEL));
+ASCENDC_CHECK(aclrtSynchronizeDevice());
     ```
 
 ## Build and Run

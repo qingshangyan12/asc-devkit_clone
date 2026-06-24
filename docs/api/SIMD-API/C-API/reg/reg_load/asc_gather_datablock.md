@@ -14,45 +14,121 @@
 - 支持掩码控制，允许选择性收集数据
 
     ```cpp
-    __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index, vector_bool mask)
-    __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index, vector_bool mask)
+__simd_callee__ inline void
+asc_gather_datablock(vector_int8_t &dst, __ubuf__ int8_t *src,
+                     vector_uint32_t index, vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_uint8_t &dst, __ubuf__ uint8_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_int16_t &dst, __ubuf__ int16_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_uint16_t &dst,
+                                     __ubuf__ uint16_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_int32_t &dst, __ubuf__ int32_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_uint32_t &dst,
+                                     __ubuf__ uint32_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_int64_t &dst, __ubuf__ int64_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_uint64_t &dst,
+                                     __ubuf__ uint64_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_half &dst, __ubuf__ half *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_float &dst, __ubuf__ float *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_bfloat16_t &dst,
+                                     __ubuf__ bfloat16_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e4m3fn_t &dst,
+                                     __ubuf__ fp8_e4m3fn_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e5m2_t &dst,
+                                     __ubuf__ fp8_e5m2_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_fp4x2_e2m1_t &dst,
+                                     __ubuf__ fp4x2_e2m1_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_fp4x2_e1m2_t &dst,
+                                     __ubuf__ fp4x2_e1m2_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e8m0_t &dst,
+                                     __ubuf__ fp8_e8m0_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_hifloat8_t &dst,
+                                     __ubuf__ hifloat8_t *src,
+                                     vector_uint32_t index,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_gather_datablock(vector_int4x2_t &dst,
+                                     __ubuf__ int4b_t *src,
+                                     vector_uint32_t index, vector_bool mask)
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
-    __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint16_t& dst, __ubuf__ uint16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int32_t& dst, __ubuf__ int32_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint32_t& dst, __ubuf__ uint32_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int64_t& dst, __ubuf__ int64_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_uint64_t& dst, __ubuf__ uint64_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_half& dst, __ubuf__ half* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_float& dst, __ubuf__ float* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, vector_uint32_t index)
-    __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ int4b_t* src, vector_uint32_t index)
+__simd_callee__ inline void
+asc_gather_datablock(vector_int8_t &dst, __ubuf__ int8_t *src,
+                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_uint8_t &dst, __ubuf__ uint8_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_int16_t &dst, __ubuf__ int16_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_uint16_t &dst,
+                                     __ubuf__ uint16_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_int32_t &dst, __ubuf__ int32_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_uint32_t &dst,
+                                     __ubuf__ uint32_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_int64_t &dst, __ubuf__ int64_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_uint64_t &dst,
+                                     __ubuf__ uint64_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_half &dst, __ubuf__ half *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_float &dst, __ubuf__ float *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_bfloat16_t &dst,
+                                     __ubuf__ bfloat16_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e4m3fn_t &dst,
+                                     __ubuf__ fp8_e4m3fn_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e5m2_t &dst,
+                                     __ubuf__ fp8_e5m2_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_fp4x2_e2m1_t &dst,
+                                     __ubuf__ fp4x2_e2m1_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_fp4x2_e1m2_t &dst,
+                                     __ubuf__ fp4x2_e1m2_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_fp8_e8m0_t &dst,
+                                     __ubuf__ fp8_e8m0_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_hifloat8_t &dst,
+                                     __ubuf__ hifloat8_t *src,
+                                     vector_uint32_t index) __simd_callee__
+    inline void asc_gather_datablock(vector_int4x2_t &dst,
+                                     __ubuf__ int4b_t *src,
+                                     vector_uint32_t index)
     ```
 
 ## 参数说明
@@ -84,18 +160,18 @@ PIPE_V
 
 - 支持掩码控制，允许选择性收集数据
     ```cpp
-    vector_int8_t dst;
-    __ubuf__ int8_t* src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
-    vector_uint32_t index;
-    vector_bool mask = asc_create_mask_b8(PAT_ALL);
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather_datablock(dst, src, index, mask);
+vector_int8_t dst;
+__ubuf__ int8_t *src = (__ubuf__ int8_t *)asc_get_phy_buf_addr(0);
+vector_uint32_t index;
+vector_bool mask = asc_create_mask_b8(PAT_ALL);
+asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
+asc_gather_datablock(dst, src, index, mask);
     ```
 - 无掩码控制，默认收集所有索引对应的数据块
     ```cpp
-    vector_int8_t dst;
-    __ubuf__ int8_t* src = (__ubuf__ int8_t*)asc_get_phy_buf_addr(0);
-    vector_uint32_t index;
-    asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
-    asc_gather_datablock(dst, src, index);
+vector_int8_t dst;
+__ubuf__ int8_t *src = (__ubuf__ int8_t *)asc_get_phy_buf_addr(0);
+vector_uint32_t index;
+asc_loadalign(index, index_addr); // index_addr是外部输入的UB内存空间地址。
+asc_gather_datablock(dst, src, index);
     ```

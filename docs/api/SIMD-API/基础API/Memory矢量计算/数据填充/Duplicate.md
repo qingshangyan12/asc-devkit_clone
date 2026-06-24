@@ -78,8 +78,9 @@ def Duplicate(scalarValue, dst, count):
 - tensor前n个数据计算，源操作数为标量
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, const int32_t& count)
+template <typename T>
+__aicore__ inline void Duplicate(const LocalTensor<T> &dst,
+                                 const T &scalarValue, const int32_t &count)
     ```
 
 <cann-filter npu-type="950"> 
@@ -87,24 +88,32 @@ def Duplicate(scalarValue, dst, count):
 - tensor前n个数据计算，源操作数为Tensor
 
     ```cpp
-    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
-    template <typename T>
-    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+// 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
+template <typename T>
+__aicore__ inline void Duplicate(const LocalTensor<T> &dst,
+                                 const LocalTensor<T> &src,
+                                 const int32_t &count)
     ```
 </cann-filter>
 
 - tensor高维切分计算，mask逐比特模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask[], const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Duplicate(const LocalTensor<T> &dst, const T &scalarValue, uint64_t mask[],
+          const uint8_t repeatTime, const uint16_t dstBlockStride,
+          const uint8_t dstRepeatStride)
     ```
 
 - tensor高维切分计算，mask连续模式
 
     ```cpp
-    template <typename T, bool isSetMask = true>
-    __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue, uint64_t mask, const uint8_t repeatTime, const uint16_t dstBlockStride, const uint8_t dstRepeatStride)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Duplicate(const LocalTensor<T> &dst, const T &scalarValue, uint64_t mask,
+          const uint8_t repeatTime, const uint16_t dstBlockStride,
+          const uint8_t dstRepeatStride)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -179,38 +188,38 @@ def Duplicate(scalarValue, dst, count):
 - tensor高维切分计算样例，mask连续模式
 
     ```cpp
-    uint64_t mask = 128;
-    half scalar = 18.0;
-    // repeatTime = 2, 128 elements one repeat, 256 elements total
-    // dstBlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride = 8, no gap between repeats
-    AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8 );
+uint64_t mask = 128;
+half scalar = 18.0;
+// repeatTime = 2, 128 elements one repeat, 256 elements total
+// dstBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride = 8, no gap between repeats
+AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8);
     ```
 
 - tensor高维切分计算样例，mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    half scalar = 18.0;
-    // repeatTime = 2, 128 elements one repeat, 256 elements total
-    // dstBlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride = 8, no gap between repeats
-    AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8 );
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+half scalar = 18.0;
+// repeatTime = 2, 128 elements one repeat, 256 elements total
+// dstBlkStride = 1, no gap between blocks in one repeat
+// dstRepStride = 8, no gap between repeats
+AscendC::Duplicate(dstLocal, scalar, mask, 2, 1, 8);
     ```
 
 - tensor前n个数据计算样例，源操作数为标量
 
     ```cpp
-    half inputVal(18.0);
-    int32_t srcDataSize = 256; // 参与计算的元素个数
-    AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
+half inputVal(18.0);
+int32_t srcDataSize = 256; // 参与计算的元素个数
+AscendC::Duplicate<half>(dstLocal, inputVal, srcDataSize);
     ```
 
 <cann-filter npu-type="950"> 
 
 - tensor前n个数据计算样例，源操作数为Tensor
     ```cpp
-    AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);	 
+AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
     ```
 </cann-filter>
 结果示例如下：

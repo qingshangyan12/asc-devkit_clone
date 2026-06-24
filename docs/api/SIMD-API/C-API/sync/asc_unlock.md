@@ -13,13 +13,11 @@
 ## 函数原型
 
     ```cpp
-    enum ascMutexExecuteMode {
-        ASC_LOCK_BLOCK = 0,
-        ASC_LOCK_NON_BLOCK = 1
-    };
-    
-    __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id)
-    __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const ascMutexExecuteMode mode)
+enum ascMutexExecuteMode { ASC_LOCK_BLOCK = 0, ASC_LOCK_NON_BLOCK = 1 };
+
+__aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id) __aicore__
+    inline void asc_unlock(pipe_t pipe, uint8_t mutex_id,
+                           const ascMutexExecuteMode mode)
     ```
 
 ## 参数说明
@@ -47,9 +45,9 @@ PIPE_S
 ## 调用示例
 
 ```cpp
-//buffer标号为1
+// buffer标号为1
 uint8_t mutex_id = 1;
-//等待PIPE_S中所有前置指令完成后释放标号为1的缓存
+// 等待PIPE_S中所有前置指令完成后释放标号为1的缓存
 asc_lock(PIPE_S, mutex_id);
-asc_unlock(PIPE_S, mutex_id); 
+asc_unlock(PIPE_S, mutex_id);
 ```

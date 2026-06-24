@@ -18,10 +18,12 @@
 
 ```cpp
 template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(const Layout<ShapeType, StrideType>& layout)
+__aicore__ inline constexpr auto
+GetShape(const Layout<ShapeType, StrideType> &layout)
 
-template <size_t... Is, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto GetShape(Layout<ShapeType, StrideType>& layout)
+    template <size_t... Is, typename ShapeType, typename StrideType>
+    __aicore__
+    inline constexpr auto GetShape(Layout<ShapeType, StrideType> &layout)
 ```
 
 ## 参数说明
@@ -56,11 +58,11 @@ using namespace AscendC::Te;
 auto layout = MakeLayout(MakeShape(10, 20, 30));
 
 // 不指定Is... → 返回完整shape元组
-auto fullShape = GetShape(layout);           // (10, 20, 30)
+auto fullShape = GetShape(layout); // (10, 20, 30)
 
 // 指定单个索引 → 返回对应元素
-auto s0 = GetShape<0>(layout);              // 10
+auto s0 = GetShape<0>(layout); // 10
 
 // 指定多个索引 → 组成新tuple
-auto s01 = GetShape<0, 1>(layout);          // (10, 20)
+auto s01 = GetShape<0, 1>(layout); // (10, 20)
 ```

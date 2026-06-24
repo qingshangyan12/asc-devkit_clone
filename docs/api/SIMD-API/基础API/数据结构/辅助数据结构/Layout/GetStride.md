@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002042526794_zh-cn_topic_0000001602767550_zh-cn_topic_0000001600123102_section13230182415108"></a>
 
 ```cpp
-__aicore__ inline constexpr decltype(auto) GetStride() {}    
+__aicore__ inline constexpr decltype(auto) GetStride() {}
 __aicore__ inline constexpr decltype(auto) GetStride() const {}
 ```
 
@@ -67,8 +67,7 @@ __aicore__ inline constexpr decltype(auto) GetStride() const {}
 描述内存访问步长的Stride对象，Stride结构类型（[Std::tuple](../../../../../Utils-API/CPP标准库/容器函数/容器函数.md)类型的别名），定义如下：
 
 ```cpp
-template <typename... Strides>
-using Stride = Std::tuple<Strides...>;
+template <typename... Strides> using Stride = Std::tuple<Strides...>;
 ```
 
 ## 约束说明<a name="zh-cn_topic_0000002042526794_zh-cn_topic_0000001602767550_zh-cn_topic_0000001600123102_section19165124931511"></a>
@@ -79,13 +78,14 @@ using Stride = Std::tuple<Strides...>;
 
 ```cpp
 // 初始化Layout数据结构，获取对应数值
-AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
+AscendC::Shape<int, int, int> shape = AscendC::MakeShape(10, 20, 30);
+AscendC::Stride<int, int, int> stride = AscendC::MakeStride(1, 100, 200);
 
 auto layoutMake = AscendC::MakeLayout(shape, stride);
-AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>> layoutInit(shape, stride);
+AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>>
+    layoutInit(shape, stride);
 
 int value = AscendC::Std::get<0>(layoutInit.GetStride()); // value = 1
-value = AscendC::Std::get<1>(layoutInit.GetStride()); // value = 100
-value = AscendC::Std::get<2>(layoutInit.GetStride()); // value = 200
+value = AscendC::Std::get<1>(layoutInit.GetStride());     // value = 100
+value = AscendC::Std::get<2>(layoutInit.GetStride());     // value = 200
 ```

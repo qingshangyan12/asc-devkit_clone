@@ -55,34 +55,36 @@ The core code is as follows:
 
 ```cpp
 template <uint32_t blockLength>
-__vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    AscendC::InitSocState();
+__vector__ __global__ void add_custom(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  AscendC::InitSocState();
 
-    // Global Tensor: Allocate input/output buffers on GM
-    AscendC::GlobalTensor<float> xGm, yGm, zGm;
-    xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);  // Each core processes its own data segment by block_idx offset
-    yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
-    zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+  // Global Tensor: Allocate input/output buffers on GM
+  AscendC::GlobalTensor<float> xGm, yGm, zGm;
+  xGm.SetGlobalBuffer(x + block_idx * blockLength,
+                      blockLength); // Each core processes its own data segment
+                                    // by block_idx offset
+  yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
+  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
 
-    // Local Tensor: Allocate computation buffers on UB
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-    AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
-    AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
-    AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
+  // Local Tensor: Allocate computation buffers on UB
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
 
-    // GM -> UB: Load input data
-    AscendC::DataCopy(xLocal, xGm, blockLength);
-    AscendC::DataCopy(yLocal, yGm, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure load completes before computation
+  // GM -> UB: Load input data
+  AscendC::DataCopy(xLocal, xGm, blockLength);
+  AscendC::DataCopy(yLocal, yGm, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>(); // Ensure load completes before computation
 
-    // Vector computation: z = x + y
-    AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure computation completes before store
+  // Vector computation: z = x + y
+  AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>(); // Ensure computation completes before store
 
-    // UB -> GM: Store computation result
-    AscendC::DataCopy(zGm, zLocal, blockLength);
-    AscendC::PipeBarrier<PIPE_ALL>();  // Ensure store completes
+  // UB -> GM: Store computation result
+  AscendC::DataCopy(zGm, zLocal, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>(); // Ensure store completes
 }
 ```
 

@@ -29,8 +29,7 @@
 ## 函数原型
 
 ```c++
-template <typename T>
-T shfl(T var, int src_rank) const
+template <typename T> T shfl(T var, int src_rank) const
 ```
 
 ## 参数说明
@@ -60,29 +59,25 @@ T shfl(T var, int src_rank) const
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl(threadIdx.x + 100, 3);
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    uint32_t result = active.shfl(threadIdx.x + 100, 3);
+  }
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl(threadIdx.x + 100, 3);
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    uint32_t result = active.shfl(threadIdx.x + 100, 3);
+  }
+  ...
+}
     ```

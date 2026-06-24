@@ -57,12 +57,12 @@
 ```cpp
 // 需要手动设置mask和repeat参数
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],           // mask数组
-                           const uint8_t repeatTime,  // repeat次数
-                           const BinaryRepeatParams& repeatParams);  // stride参数
+__aicore__ inline void
+Add(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1,
+    uint64_t mask[],                         // mask数组
+    const uint8_t repeatTime,                // repeat次数
+    const BinaryRepeatParams &repeatParams); // stride参数
 ```
 
 **适用场景**：
@@ -76,10 +76,10 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ```cpp
 // 自动处理mask和repeat
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);  // 仅需元素个数
+__aicore__ inline void Add(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1,
+                           const int32_t &count); // 仅需元素个数
 ```
 
 **适用场景**：
@@ -171,28 +171,25 @@ asc-devkit/
 #ifndef ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_VEC_BINARY_INTERFACE_H
 
-#include "kernel_tensor.h"
 #include "kernel_struct_binary.h"
+#include "kernel_tensor.h"
 
 namespace AscendC {
 
 // Add - 高维切分计算
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],
-                           const uint8_t repeatTime,
-                           const BinaryRepeatParams& repeatParams);
+__aicore__ inline void
+Add(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams);
 
 // Add - 前n个数据计算
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);
+__aicore__ inline void Add(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count);
 
-}  // namespace AscendC
+} // namespace AscendC
 
 #include "impl/basic_api/kernel_operator_vec_binary_intf_impl.h"
 #endif
@@ -209,44 +206,45 @@ namespace AscendC {
 
 // Add实现 - 前n个数据计算
 template <typename T>
-__aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
-                               __ubuf__ T* src1, const int32_t& count) {
-    if ASCEND_IS_AIV {
-        // 1. 设置mask
-        set_mask_count();
-        set_vector_mask(0, count);
+__aicore__ inline void AddImpl(__ubuf__ T *dst, __ubuf__ T *src0,
+                               __ubuf__ T *src1, const int32_t &count) {
+  if ASCEND_IS_AIV {
+    // 1. 设置mask
+    set_mask_count();
+    set_vector_mask(0, count);
 
-        // 2. 调用底层指令
-        vadd(dst, src0, src1, 1,
-             DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
-             DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE);
+    // 2. 调用底层指令
+    vadd(dst, src0, src1, 1, DEFAULT_BLK_STRIDE, DEFAULT_BLK_STRIDE,
+         DEFAULT_BLK_STRIDE, DEFAULT_REPEAT_STRIDE, DEFAULT_REPEAT_STRIDE,
+         DEFAULT_REPEAT_STRIDE);
 
-        // 3. 恢复mask
-        set_mask_norm();
-        set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
-    }
+    // 3. 恢复mask
+    set_mask_norm();
+    set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
+  }
 }
 
 // Add实现 - 高维切分计算
 template <typename T, bool isSetMask = true>
-__aicore__ inline void AddImpl(__ubuf__ T* dst, __ubuf__ T* src0,
-                               __ubuf__ T* src1, const uint64_t mask[],
+__aicore__ inline void AddImpl(__ubuf__ T *dst, __ubuf__ T *src0,
+                               __ubuf__ T *src1, const uint64_t mask[],
                                const uint8_t repeatTime,
-                               const BinaryRepeatParams& repeatParams) {
-    if ASCEND_IS_AIV {
-        // 设置mask（如果需要）
-        if (isSetMask) {
-            AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
-        }
-
-        // 调用底层指令
-        vadd(dst, src0, src1, repeatTime,
-             repeatParams.dstBlkStride, repeatParams.src0BlkStride, repeatParams.src1BlkStride,
-             repeatParams.dstRepStride, repeatParams.src0RepStride, repeatParams.src1RepStride);
+                               const BinaryRepeatParams &repeatParams) {
+  if ASCEND_IS_AIV {
+    // 设置mask（如果需要）
+    if (isSetMask) {
+      AscendCUtils::SetMask<T, isSetMask>(mask[1], mask[0]);
     }
+
+    // 调用底层指令
+    vadd(dst, src0, src1, repeatTime, repeatParams.dstBlkStride,
+         repeatParams.src0BlkStride, repeatParams.src1BlkStride,
+         repeatParams.dstRepStride, repeatParams.src0RepStride,
+         repeatParams.src1RepStride);
+  }
 }
 
-}  // namespace AscendC
+} // namespace AscendC
 
 #endif
 ```
@@ -259,26 +257,23 @@ namespace AscendC {
 
 // 前n个数据计算接口封装
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count) {
-    AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
+__aicore__ inline void Add(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count) {
+  AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
 }
 
 // 高维切分计算接口封装
 template <typename T, bool isSetMask = true>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           uint64_t mask[],
-                           const uint8_t repeatTime,
-                           const BinaryRepeatParams& repeatParams) {
-    AddImpl<T, isSetMask>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(),
-                          mask, repeatTime, repeatParams);
+__aicore__ inline void
+Add(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams) {
+  AddImpl<T, isSetMask>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), mask,
+                        repeatTime, repeatParams);
 }
 
-}  // namespace AscendC
+} // namespace AscendC
 ```
 
 ### 架构适配
@@ -304,10 +299,9 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ```cpp
 // 参考现有Add接口
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count);
+__aicore__ inline void Add(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count);
 ```
 
 ### 接口设计
@@ -317,7 +311,8 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
 ```cpp
 /* **************************************************************************************************
  * Axpy                                             *
- * ************************************************************************************************* */
+ * *************************************************************************************************
+ */
 /*
  * @ingroup Axpy
  * @brief dst = dst + src * scalar
@@ -327,10 +322,9 @@ __aicore__ inline void Add(const LocalTensor<T>& dst,
  * @param [in] count number Number of data involved in calculation
  */
 template <typename T, typename U>
-__aicore__ inline void Axpy(const LocalTensor<T>& dst,
-                           const LocalTensor<U>& src,
-                           const U scalar,
-                           const int32_t& count);
+__aicore__ inline void Axpy(const LocalTensor<T> &dst,
+                            const LocalTensor<U> &src, const U scalar,
+                            const int32_t &count);
 ```
 
 ### 实现代码
@@ -343,11 +337,10 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst,
 
 ```cpp
 template <typename T, typename U>
-__aicore__ inline void Axpy(const LocalTensor<T>& dst,
-                           const LocalTensor<U>& src,
-                           const U scalar,
-                           const int32_t& count) {
-    AxpyImpl<T, U>(dst.GetPtr(), src.GetPtr(), scalar, count);
+__aicore__ inline void Axpy(const LocalTensor<T> &dst,
+                            const LocalTensor<U> &src, const U scalar,
+                            const int32_t &count) {
+  AxpyImpl<T, U>(dst.GetPtr(), src.GetPtr(), scalar, count);
 }
 ```
 
@@ -367,22 +360,20 @@ __aicore__ inline void Axpy(const LocalTensor<T>& dst,
 
 ```cpp
 TEST_F(TestAxpy, BoundaryTest) {
-    // 测试count=0, 1, 256, 257等边界值
-    // 测试不同数据类型组合
-    // 测试特殊值（NaN, Inf）
+  // 测试count=0, 1, 256, 257等边界值
+  // 测试不同数据类型组合
+  // 测试特殊值（NaN, Inf）
 }
 ```
 
 ### 数据类型测试
 
 ```cpp
-INSTANTIATE_TEST_CASE_P(TEST_AXPY_TYPES, AxpyTestsuite,
-    ::testing::Values(
-        BinaryTestParams { 256, 2, 2, main_axpy<half, half> },
-        BinaryTestParams { 256, 4, 2, main_axpy<float, half> },
-        BinaryTestParams { 256, 4, 4, main_axpy<float, float> }
-    )
-);
+INSTANTIATE_TEST_CASE_P(
+    TEST_AXPY_TYPES, AxpyTestsuite,
+    ::testing::Values(BinaryTestParams{256, 2, 2, main_axpy<half, half>},
+                      BinaryTestParams{256, 4, 2, main_axpy<float, half>},
+                      BinaryTestParams{256, 4, 4, main_axpy<float, float>}));
 ```
 
 ---
@@ -425,15 +416,14 @@ class LocalTensor;
  * @param count 元素个数
  */
 template <typename T>
-__aicore__ inline void Add(const LocalTensor<T>& dst,
-                           const LocalTensor<T>& src0,
-                           const LocalTensor<T>& src1,
-                           const int32_t& count) {
-    // 参数验证
-    ASCENDC_ASSERT(count > 0, "count must be positive");
+__aicore__ inline void Add(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count) {
+  // 参数验证
+  ASCENDC_ASSERT(count > 0, "count must be positive");
 
-    // 调用实现
-    AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
+  // 调用实现
+  AddImpl<T>(dst.GetPtr(), src0.GetPtr(), src1.GetPtr(), count);
 }
 ```
 
@@ -451,7 +441,7 @@ static_assert(SupportType<T, half, float, int16_t, int32_t>(),
 
 // 3. 架构检查
 #if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 2201 && __NPU_ARCH__ != 3510)
-    #error "Unsupported NPU architecture"
+#error "Unsupported NPU architecture"
 #endif
 ```
 

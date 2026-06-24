@@ -95,7 +95,7 @@ __global__ __mix__(1, 1)
 #else
 __global__ __mix__(1, 2)
 #endif
-void quant_group_matmul_custom(...)
+    void quant_group_matmul_custom(...)
 ```
 
 ### Performance Metric Description
@@ -166,15 +166,16 @@ This example uses `__mix__` kernel function mode, with AIC (Cube core) and AIV (
 
 ```cpp
 // AIC execution path: MMCompute → Iterate loop → SetFlag(SYNC_AIC_TO_AIV)
-// AIV execution path: Skip MMCompute → VectorCompute → WaitFlag(SYNC_AIC_TO_AIV)
+// AIV execution path: Skip MMCompute → VectorCompute →
+// WaitFlag(SYNC_AIC_TO_AIV)
 if ASCEND_IS_AIC {
-    matmulObj.Iterate();    // Cube computation
-    CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV);  // Notify Vector
+  matmulObj.Iterate();                            // Cube computation
+  CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_TO_AIV); // Notify Vector
 }
 if ASCEND_IS_AIV {
-    CrossCoreWaitFlag(SYNC_AIC_TO_AIV);  // Wait for Cube completion
-    // Process data...
-    CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
+  CrossCoreWaitFlag(SYNC_AIC_TO_AIV); // Wait for Cube completion
+  // Process data...
+  CrossCoreSetFlag<2, PIPE_MTE2>(SYNC_AIV_TO_AIC);
 }
 ```
 
@@ -198,10 +199,12 @@ matmul::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CONSTANT_CFG> matmulObj;
 This example enables Matmul UnitFlag optimization through `mmCFG.enUnitFlag = true`, achieving 512B fine-grained pipeline synchronization between Cube computation and transfer:
 
 ```cpp
-static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K, BASE_M, BASE_N, BASE_K};
+static constexpr MatmulShapeParams shapeParams = {SINGLE_M, SINGLE_N, K,
+                                                  BASE_M,   BASE_N,   BASE_K};
 MatmulConfig mmCFG = GetMMConfig<MatmulConfigMode::CONFIG_MDL>(shapeParams);
-mmCFG.enUnitFlag = true;  // Enable UnitFlag
-auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
+mmCFG.enUnitFlag = true; // Enable UnitFlag
+auto constantCFG =
+    AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE>(mmCFG);
 ```
 
 **⑤ UB Double Buffer**
@@ -209,12 +212,16 @@ auto constantCFG = AscendC::GetMatmulApiTiling<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE
 All TQue queues in this example set `BUFFER_NUM=2` to enable double buffer, achieving pipeline parallelism between Vector side data transfer and computation:
 
 ```cpp
-constexpr uint32_t BUFFER_NUM = 2; // UB queue Buffer count, set to 2 to enable double buffer
+constexpr uint32_t BUFFER_NUM =
+    2; // UB queue Buffer count, set to 2 to enable double buffer
 
-pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float));          // 2 × 1024B
-pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM, BASE_M * sizeof(float));   // 2 × 512B
-pipe->InitBuffer(vecInQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(int32_t));      // 2 × 24,576B
-pipe->InitBuffer(vecOutQueue, BUFFER_NUM, UB_CAL_SIZE * sizeof(half));        // 2 × 12,288B
+pipe->InitBuffer(scaleInQueue, BUFFER_NUM, BASE_N * sizeof(float)); // 2 × 1024B
+pipe->InitBuffer(perTokenScaleInQueue, BUFFER_NUM,
+                 BASE_M * sizeof(float)); // 2 × 512B
+pipe->InitBuffer(vecInQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(int32_t)); // 2 × 24,576B
+pipe->InitBuffer(vecOutQueue, BUFFER_NUM,
+                 UB_CAL_SIZE * sizeof(half)); // 2 × 12,288B
 ```
 
 **Performance Data**

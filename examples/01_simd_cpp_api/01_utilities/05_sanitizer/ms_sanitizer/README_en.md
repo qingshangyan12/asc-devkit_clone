@@ -45,10 +45,10 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
     Users can comment out the correct `DataCopy` and use the incorrect `DataCopy` to reproduce this scenario. `xLocal` is allocated with size `blockLength`, but the transfer length is incorrectly written as `blockLength * 2`, which exceeds the allocated size of `xLocal`, thus triggering an illegal read/write.
 
     ```cpp
-    // 1. Correct DataCopy.
-    AscendC::DataCopy(xLocal, xGm, blockLength);
-    // 2. Incorrect example: Transfer length written as blockLength * 2 triggers illegal read/write.
-    // AscendC::DataCopy(xLocal, xGm, blockLength * 2);
+// 1. Correct DataCopy.
+AscendC::DataCopy(xLocal, xGm, blockLength);
+// 2. Incorrect example: Transfer length written as blockLength * 2 triggers
+// illegal read/write. AscendC::DataCopy(xLocal, xGm, blockLength * 2);
     ```
 
     Rebuild and run detection:
@@ -63,10 +63,10 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
     Users can comment out the correct `DataCopy` and use the incorrect `DataCopy` to reproduce this scenario. During `DataCopy` transfer from GM to UB, the UB-side address must meet 32-byte alignment requirements. `xLocal[5]` does not meet the 32-byte alignment requirement, thus triggering unaligned access.
 
     ```cpp
-    // 1. Correct DataCopy.
-    AscendC::DataCopy(xLocal, xGm, blockLength);
-    // 3. Incorrect example: xLocal[5] does not meet 32-byte alignment, triggering unaligned access.
-    // AscendC::DataCopy(xLocal[5], xGm, blockLength);
+// 1. Correct DataCopy.
+AscendC::DataCopy(xLocal, xGm, blockLength);
+// 3. Incorrect example: xLocal[5] does not meet 32-byte alignment, triggering
+// unaligned access. AscendC::DataCopy(xLocal[5], xGm, blockLength);
     ```
 
     Rebuild and run detection:
@@ -83,8 +83,9 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
     Notice: Pass `--leak-check=yes` when calling `mssanitizer` to enable memory leak detection.
 
     ```cpp
-    // Correctly free device-side output memory. Remove this line to trigger memory leak detection.
-    aclrtFree(zDevice);
+// Correctly free device-side output memory. Remove this line to trigger memory
+// leak detection.
+aclrtFree(zDevice);
     ```
 
     Rebuild and run detection:
@@ -101,10 +102,11 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
     Notice: Pass `--check-unused-memory=yes` when calling `mssanitizer` to enable unused allocated memory detection.
 
     ```cpp
-    // 1. Correct device-side input memory allocation.
-    aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    // 2. Incorrect example: Only totalByteSize is used, but 5 times the size is allocated, triggering unused memory detection.
-    // aclrtMalloc((void**)&xDevice, totalByteSize * 5, ACL_MEM_MALLOC_HUGE_FIRST);
+// 1. Correct device-side input memory allocation.
+aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+// 2. Incorrect example: Only totalByteSize is used, but 5 times the size is
+// allocated, triggering unused memory detection. aclrtMalloc((void**)&xDevice,
+// totalByteSize * 5, ACL_MEM_MALLOC_HUGE_FIRST);
     ```
 
     Rebuild and run detection:
@@ -121,9 +123,10 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
   Notice: Pass `--tool=racecheck` when calling `mssanitizer` to enable race condition detection.
 
   ```cpp
-  // Before Add reads xLocal/yLocal, it must wait for MTE2 transfer to complete; removal triggers RAW race.
-  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+// Before Add reads xLocal/yLocal, it must wait for MTE2 transfer to complete;
+// removal triggers RAW race.
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
   ```
 
   Rebuild and run detection:
@@ -140,8 +143,9 @@ When reproducing anomaly scenarios, modify the code in `ms_sanitizer.asc` accord
   Notice: Pass `--tool=initcheck` when calling `mssanitizer` to enable uninitialized access detection.
 
   ```cpp
-  // Correctly initialize zGm. Remove this line to trigger uninitialized access detection.
-  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+// Correctly initialize zGm. Remove this line to trigger uninitialized access
+// detection.
+zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
   ```
 
   Rebuild and run detection:

@@ -46,5 +46,6 @@ PIPE_S
 
 ```cpp
 int64_t smmu_tag_version = asc_get_smmu_tag_version();
-printf("smmu tag version is %x", smmu_tag_version);// 需用%x将其打印成十六进制的数
+printf("smmu tag version is %x",
+       smmu_tag_version); // 需用%x将其打印成十六进制的数
 ```

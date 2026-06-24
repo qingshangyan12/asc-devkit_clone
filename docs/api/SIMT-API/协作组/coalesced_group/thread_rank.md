@@ -54,29 +54,25 @@ unsigned long long thread_rank() const
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            unsigned long long rank = active.thread_rank();
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    unsigned long long rank = active.thread_rank();
+  }
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            unsigned long long rank = active.thread_rank();
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    unsigned long long rank = active.thread_rank();
+  }
+  ...
+}
     ```

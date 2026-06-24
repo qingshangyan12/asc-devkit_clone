@@ -14,7 +14,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_get_vms4_sr(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])
+__aicore__ inline void
+asc_get_vms4_sr(uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN])
 ```
 
 ## 参数说明
@@ -46,7 +47,7 @@ constexpr uint16_t array_length = element_length * 2;
 // 每个元素包含float32的score和4字节的index，占8字节，相当于2个sizeof(float)。
 __ubuf__ float src_workspace[array_length * 4];
 
-__ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN];
+__ubuf__ float *src[ASC_C_API_MRGSORT_ELEMENT_LEN];
 __ubuf__ float dst[array_length * 4];
 
 uint8_t repeat = 1;
@@ -57,7 +58,8 @@ src[1] = &src_workspace[1 * array_length];
 src[2] = &src_workspace[2 * array_length];
 src[3] = &src_workspace[3 * array_length];
 
-asc_mrgsort4(dst, src, repeat, element_length, element_length, element_length, element_length, if_exhausted_suspension, valid_bit);
+asc_mrgsort4(dst, src, repeat, element_length, element_length, element_length,
+             element_length, if_exhausted_suspension, valid_bit);
 asc_sync();
 
 uint16_t sorted_num[ASC_C_API_MRGSORT_ELEMENT_LEN];

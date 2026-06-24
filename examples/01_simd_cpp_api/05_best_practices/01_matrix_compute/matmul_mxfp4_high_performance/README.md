@@ -78,12 +78,14 @@ $$
 本样例将 tiling 参数统一在 `matmul_mx.h` 中编译期确定，通过模板常量 `CONSTANT_CFG` 传给 `MatmulImpl`：
 
 ```cpp
-constexpr static auto CONSTANT_CFG = GetMxConstantCFG<aType, bType, cType, EnableScaleCache>();
+constexpr static auto CONSTANT_CFG =
+    GetMxConstantCFG<aType, bType, cType, EnableScaleCache>();
 AscendC::Matmul<aType, bType, cType, cType, CONSTANT_CFG,
-                    AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-                    AscendC::Impl::Detail::MatmulWithScalePolicy>
+                AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::MatmulWithScalePolicy>
     matmulObj;
-REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj, (TCubeTiling*)nullptr);
+REGIST_MATMUL_OBJ(pipe, GetSysWorkSpacePtr(), matmulObj,
+                  (TCubeTiling *)nullptr);
 ```
 
 说明：

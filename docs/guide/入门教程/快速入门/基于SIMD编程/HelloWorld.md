@@ -12,10 +12,7 @@
 
     后缀名为`*.asc`的代码文件包含Host端与Device端代码，其Device端部分示例如下：
     ```cpp
-    __global__ __vector__ void hello_world()
-    {
-        printf("Hello World!!!\n");
-    }
+__global__ __vector__ void hello_world() { printf("Hello World!!!\n"); }
     ```
     > [!NOTE] 说明
     > - SIMD算子的Kernel函数需要额外的修饰符，如[`__vector__`](../../../编程指南/语言扩展层/SIMD-BuiltIn关键字.md)修饰符说明该算子仅在向量计算单元上执行。
@@ -24,17 +21,16 @@
  
     Host端通过<<<>>>语法糖调用Device端代码。
     ```cpp
-    int main(int argc, char const* argv[])
-    {
-        aclrtSetDevice(0); 
-        // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
-        // numBlocks : Number of blocks. Default to 8 in this example.
-        // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
-        // nullptr : Runtime stream. Uses default stream in this example.
-        hello_world<<<8, 0, nullptr>>>();
-        aclrtSynchronizeDevice(); 
-        return 0;
-    }
+int main(int argc, char const *argv[]) {
+  aclrtSetDevice(0);
+  // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
+  // numBlocks : Number of blocks. Default to 8 in this example.
+  // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
+  // nullptr : Runtime stream. Uses default stream in this example.
+  hello_world<<<8, 0, nullptr>>>();
+  aclrtSynchronizeDevice();
+  return 0;
+}
     ```
 
 - **算子编译与运行**：

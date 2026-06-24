@@ -29,12 +29,13 @@
 ## 函数原型
 
 ```c++
-coalesced_group binary_partition(const coalesced_group& g, bool pred)
+coalesced_group binary_partition(const coalesced_group &g, bool pred)
 ```
 
 ```c++
 template <unsigned int Size, typename ParentT>
-coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool pred)
+coalesced_group binary_partition(const thread_block_tile<Size, ParentT> &g,
+                                 bool pred)
 ```
 
 ## 参数说明
@@ -59,34 +60,31 @@ coalesced_group binary_partition(const thread_block_tile<Size, ParentT>& g, bool
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(int *inputArr)
-    {
-        auto block = this_thread_block();
-        auto tile32 = tiled_partition<32>(block);
+using namespace cooperative_groups;
+__global__ void simt_kernel(int *inputArr) {
+  auto block = this_thread_block();
+  auto tile32 = tiled_partition<32>(block);
 
-        // inputArr中是随机的整数
-        int elem = inputArr[block.thread_rank()];
-        // 根据elem&1是否为true将tile32划分为两个子组
-        auto subtile = binary_partition(tile32, (elem & 1));
-        ...
-    }
+  // inputArr中是随机的整数
+  int elem = inputArr[block.thread_rank()];
+  // 根据elem&1是否为true将tile32划分为两个子组
+  auto subtile = binary_partition(tile32, (elem & 1));
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        auto block = this_thread_block();
-        auto tile32 = tiled_partition<32>(block);
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... auto block = this_thread_block();
+  auto tile32 = tiled_partition<32>(block);
 
-        // inputArr中是随机的整数
-        int elem = inputArr[block.thread_rank()];
-        // 根据elem&1是否为true将tile32划分为两个子组
-        auto subtile = binary_partition(tile32, (elem & 1));
-        ...
-    }
+  // inputArr中是随机的整数
+  int elem = inputArr[block.thread_rank()];
+  // 根据elem&1是否为true将tile32划分为两个子组
+  auto subtile = binary_partition(tile32, (elem & 1));
+  ...
+}
     ```

@@ -38,22 +38,24 @@
 - 将scalarValue广播到寄存器，不支持mask
 
     ```cpp
-    template <typename T = DefaultType, typename U, typename S>
-    __simd_callee__ inline void Duplicate(S& dstReg, U scalarValue);
+template <typename T = DefaultType, typename U, typename S>
+__simd_callee__ inline void Duplicate(S &dstReg, U scalarValue);
     ```
 
 - 将scalarValue广播到寄存器，支持mask
 
     ```cpp
-    template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U, typename S>
-    __simd_callee__ inline void Duplicate(S& dstReg, U scalarValue, MaskReg& mask);
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
+          typename U, typename S>
+__simd_callee__ inline void Duplicate(S &dstReg, U scalarValue, MaskReg &mask);
     ```
 
 - 将srcReg的最低位元素广播到寄存器
 
     ```cpp
-    template <typename T = DefaultType, HighLowPart pos = HighLowPart::LOWEST, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
-    __simd_callee__ inline void Duplicate(S& dstReg, S& srcReg, MaskReg& mask)
+template <typename T = DefaultType, HighLowPart pos = HighLowPart::LOWEST,
+          MaskMergeMode mode = MaskMergeMode::ZEROING, typename S>
+__simd_callee__ inline void Duplicate(S &dstReg, S &srcReg, MaskReg &mask)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -95,49 +97,52 @@
 - 示例一
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint16_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();    
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            AscendC::Reg::Duplicate(dstReg, scalarValue);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-        }
-    }
+template <typename T>
+__simd_vf__ inline void DuplicateVF(__ubuf__ T *dstAddr, T scalarValue,
+                                    uint16_t oneRepeatSize,
+                                    uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T>();
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    AscendC::Reg::Duplicate(dstReg, scalarValue);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
+}
     ```
 
 - 示例二
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, T scalarValue, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;    
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
-            AscendC::Reg::Duplicate(dstReg, scalarValue, mask);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-        }
-    }
+template <typename T>
+__simd_vf__ inline void DuplicateVF(__ubuf__ T *dstAddr, T scalarValue,
+                                    uint32_t count, uint16_t oneRepeatSize,
+                                    uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::Duplicate(dstReg, scalarValue, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
+}
     ```
 
 - 示例三
 
     ```cpp
-    template<typename T>
-    __simd_vf__ inline void DuplicateVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-    {
-        AscendC::Reg::RegTensor<T> srcReg;
-        AscendC::Reg::RegTensor<T> dstReg;
-        AscendC::Reg::MaskReg mask;
-        for (uint16_t i = 0; i < repeatTimes; i++) {
-            mask = AscendC::Reg::UpdateMask<T>(count);
-            AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
-            AscendC::Reg::Duplicate(dstReg, srcReg, mask);
-            AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-        }
-    }
+template <typename T>
+__simd_vf__ inline void DuplicateVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                                    uint32_t count, uint16_t oneRepeatSize,
+                                    uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::Duplicate(dstReg, srcReg, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
+}
     ```

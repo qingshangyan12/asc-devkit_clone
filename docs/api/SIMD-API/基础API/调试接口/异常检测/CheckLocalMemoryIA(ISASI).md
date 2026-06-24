@@ -55,7 +55,8 @@ check设定范围内的UB读写行为，如果有设定范围的读写行为则�
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void CheckLocalMemoryIA(const CheckLocalMemoryIAParam& checkParams)
+__aicore__ inline void
+CheckLocalMemoryIA(const CheckLocalMemoryIAParam &checkParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -102,6 +103,8 @@ pipe.InitBuffer(outQueueDst, 1, 512 * sizeof(half));
 AscendC::LocalTensor<half> src0Local = inQueueSrc0.DeQue<half>();
 AscendC::LocalTensor<half> src1Local = inQueueSrc1.DeQue<half>();
 AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-AscendC::CheckLocalMemoryIA({ 0, (uint32_t)(dstLocal.GetPhyAddr() / 32),(uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false, false, false, true, false, false,
-true });
+AscendC::CheckLocalMemoryIA(
+    {0, (uint32_t)(dstLocal.GetPhyAddr() / 32),
+     (uint32_t)((dstLocal.GetPhyAddr() + 512 * sizeof(half)) / 32), false,
+     false, false, true, false, false, true});
 ```

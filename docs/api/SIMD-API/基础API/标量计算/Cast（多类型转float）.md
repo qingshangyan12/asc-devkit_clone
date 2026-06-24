@@ -38,7 +38,7 @@
 bfloat16\_t类型转换为float类型：
 
 ```cpp
-__aicore__ inline float Cast(const bfloat16_t& bVal)
+__aicore__ inline float Cast(const bfloat16_t &bVal)
 ```
 
 </cann-filter>
@@ -50,11 +50,13 @@ __aicore__ inline float Cast(const bfloat16_t& bVal)
 
 ```cpp
 template <typename T, typename U = float,
-        typename = Std::enable_if_t<
-        (Std::is_same<T, bfloat16_t>::value || Std::is_same<T, hifloat8_t>::value ||
-            Std::is_same<T, fp8_e5m2_t>::value || Std::is_same<T, fp8_e4m3fn_t>::value ||
-            Std::is_same<T, fp4x2_e1m2_t>::value || Std::is_same<T, fp4x2_e2m1_t>::value), 
-        void>>
+          typename = Std::enable_if_t<(Std::is_same<T, bfloat16_t>::value ||
+                                       Std::is_same<T, hifloat8_t>::value ||
+                                       Std::is_same<T, fp8_e5m2_t>::value ||
+                                       Std::is_same<T, fp8_e4m3fn_t>::value ||
+                                       Std::is_same<T, fp4x2_e1m2_t>::value ||
+                                       Std::is_same<T, fp4x2_e2m1_t>::value),
+                                      void>>
 __aicore__ constexpr inline U Cast(T bVal)
 ```
 

@@ -48,22 +48,25 @@
   - Kernel关键步骤
     - 创建Matmul对象时，自定义MatmulConfig参数，将其中的enUnitFlag参数设置为true，使能UnitFlag功能，获得自定义的使用MDL模板的Matmul对象。
       ```cpp
-      __aicore__ inline constexpr MatmulConfig GetUnitFlagCfg()
-      {
-          auto mmCfg = CFG_MDL;
-      #ifdef ENABLE_UNITFLAG_FEATURE
-          // enable UnitFlag feature
-          mmCfg.enUnitFlag = true;
-      #endif
-          return mmCfg;
-      }
-      constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
+__aicore__ inline constexpr MatmulConfig GetUnitFlagCfg() {
+  auto mmCfg = CFG_MDL;
+#ifdef ENABLE_UNITFLAG_FEATURE
+  // enable UnitFlag feature
+  mmCfg.enUnitFlag = true;
+#endif
+  return mmCfg;
+}
+constexpr static MatmulConfig CFG_MDL_UNITFLAG = GetUnitFlagCfg();
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AType>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_UNITFLAG> matmulObj;
       ```
 
   - 调用实现  

@@ -43,14 +43,15 @@
 - 对`RegTensor`进行操作
 
   ```cpp
-  template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-  __simd_callee__ inline void Not(U& dstReg, U& srcReg, MaskReg& mask)
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
+          typename U>
+__simd_callee__ inline void Not(U &dstReg, U &srcReg, MaskReg &mask)
   ```
 
 - 对`MaskReg`进行操作
 
   ```cpp
-  __simd_callee__ inline void Not(MaskReg& dst, MaskReg& src, MaskReg& mask)
+__simd_callee__ inline void Not(MaskReg &dst, MaskReg &src, MaskReg &mask)
   ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -100,38 +101,40 @@
 - 对`RegTensor`进行操作
 
   ```cpp
-  template <typename T>
-  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, 
-   uint32_t oneRepeatSize, uint16_t repeatTimes)
-  {
-      AscendC::Reg::RegTensor<T> srcReg;
-      AscendC::Reg::RegTensor<T> dstReg;
-      AscendC::Reg::MaskReg mask;
-      for (uint16_t i = 0; i < repeatTimes; i++) {
-          mask = AscendC::Reg::UpdateMask<T>(count);
-          AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-          AscendC::Reg::Not(dstReg, srcReg, mask);
-          AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-      }
+template <typename T>
+__simd_vf__ inline void NotVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                              uint32_t count, uint32_t oneRepeatSize,
+                              uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Not(dstReg, srcReg, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
   }
+}
   ```
 
 - 对`MaskReg`进行操作
 
   ```cpp
-  template <typename T>
-  __simd_vf__ inline void NotVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-  {
-      AscendC::Reg::RegTensor<T> srcReg;
-      AscendC::Reg::MaskReg src = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
-      AscendC::Reg::MaskReg dst;
-      AscendC::Reg::MaskReg mask;
-      for (uint16_t i = 0; i < repeatTimes; ++i) {
-          mask = AscendC::Reg::UpdateMask<T>(count);
-          AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-          AscendC::Reg::Not(dst, src, mask);
-          AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
-          AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-      }
+template <typename T>
+__simd_vf__ inline void NotVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                              uint32_t count, uint32_t oneRepeatSize,
+                              uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::MaskReg src =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALLF>();
+  AscendC::Reg::MaskReg dst;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Not(dst, src, mask);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, dst);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
   }
+}
   ```

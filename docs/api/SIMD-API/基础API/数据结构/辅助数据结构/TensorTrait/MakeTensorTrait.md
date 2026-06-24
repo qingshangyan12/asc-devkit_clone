@@ -55,7 +55,7 @@
 
 ```cpp
 template <typename T, TPosition pos, typename LayoutType>
-__aicore__ inline constexpr auto MakeTensorTrait(const LayoutType& t)
+__aicore__ inline constexpr auto MakeTensorTrait(const LayoutType &t)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section75395119104"></a>

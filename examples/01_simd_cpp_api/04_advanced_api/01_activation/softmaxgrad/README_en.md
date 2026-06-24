@@ -55,12 +55,14 @@ This example implements a fixed-shape example with input x `[960, 960]` and y `[
 
     SoftmaxGrad mode invocation:
     ```cpp
-    AscendC::SoftmaxGrad<float, true>(yLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, false, srcShape);
+AscendC::SoftmaxGrad<float, true>(yLocal, xLocal, yLocal, tmpBuffer,
+                                  softmaxTiling, false, srcShape);
     ```
 
     SoftmaxGradFront mode invocation:
     ```cpp
-    AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer, softmaxTiling, srcShape);
+AscendC::SoftmaxGradFront<float>(zLocal, xLocal, yLocal, tmpBuffer,
+                                 softmaxTiling, srcShape);
     ```
 
 - Invocation implementation  

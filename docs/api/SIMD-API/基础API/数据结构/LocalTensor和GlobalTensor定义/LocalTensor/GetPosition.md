@@ -75,10 +75,10 @@ LocalTensor所在的[TPosition](../../辅助数据结构/TPosition.md)逻辑位�
 // 示例
 AscendC::TPosition srcPos = (AscendC::TPosition)inputLocal.GetPosition();
 if (srcPos == AscendC::TPosition::VECCALC) {
-    // 处理逻辑1
+  // 处理逻辑1
 } else if (srcPos == AscendC::TPosition::A1) {
-    // 处理逻辑2
+  // 处理逻辑2
 } else {
-    // 处理逻辑3
+  // 处理逻辑3
 }
 ```

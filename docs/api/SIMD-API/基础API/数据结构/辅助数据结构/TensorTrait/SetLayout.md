@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
 ```cpp
-__aicore__ inline void SetLayout(const LayoutType& t)
+__aicore__ inline void SetLayout(const LayoutType &t)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section75395119104"></a>

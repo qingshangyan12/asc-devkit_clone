@@ -30,23 +30,25 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 执行L1 Buffer到L0B Buffer的数据搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 构造默认搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 构造指定Trait的搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(
-        const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 ## 参数说明
@@ -139,21 +141,22 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToL0BExample()
-{
-    using BType = half;
-    constexpr uint32_t k = 16;
-    constexpr uint32_t n = 16;
+__aicore__ inline void CopyL1ToL0BExample() {
+  using BType = half;
+  constexpr uint32_t k = 16;
+  constexpr uint32_t n = 16;
 
-    __cbuf__ BType l1Buf[k * n];
-    __cb__ BType l0bBuf[k * n];
+  __cbuf__ BType l1Buf[k * n];
+  __cb__ BType l0bBuf[k * n];
 
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
+  auto l1Tensor =
+      MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
 
-    auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
+  auto l0bTensor =
+      MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, BType>(k, n));
 
-    auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
-    Copy(copyAtom, l0bTensor, l1Tensor);
+  auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+  Copy(copyAtom, l0bTensor, l1Tensor);
 }
 ```
 
@@ -164,21 +167,20 @@ Batch模式示例如下。
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToL0BBatchExample()
-{
-    using BType = half;
-    constexpr uint32_t batch = 2;
-    constexpr uint32_t k = 16;
-    constexpr uint32_t n = 16;
+__aicore__ inline void CopyL1ToL0BBatchExample() {
+  using BType = half;
+  constexpr uint32_t batch = 2;
+  constexpr uint32_t k = 16;
+  constexpr uint32_t n = 16;
 
-    __cbuf__ BType l1Buf[batch * k * n];
-    __cb__ BType l0bBuf[batch * k * n];
+  __cbuf__ BType l1Buf[batch * k * n];
+  __cb__ BType l0bBuf[batch * k * n];
 
-    auto layout = MakeFrameLayout<ZNLayoutPtn, BType>(batch, k, n);
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), layout);
-    auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), layout);
+  auto layout = MakeFrameLayout<ZNLayoutPtn, BType>(batch, k, n);
+  auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), layout);
+  auto l0bTensor = MakeTensor(MakeMemPtr(l0bBuf), layout);
 
-    auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
-    Copy(copyAtom, l0bTensor, l1Tensor);
+  auto copyAtom = MakeCopy(CopyL12L0B{}, CopyL12L0BTraitDefault{});
+  Copy(copyAtom, l0bTensor, l1Tensor);
 }
 ```

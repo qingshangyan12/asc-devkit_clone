@@ -39,18 +39,20 @@ A Matmul example that implements GEMV (General Matrix-Vector multiplication). In
   - Key Kernel Steps
     - Create the Matmul object: the Format parameter of matrix A is CubeFormat::VECTOR.
       ```cpp
-      AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::VECTOR, ATYPE>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>>
+    matmulObj;
       ```
 
   - Key Tiling Steps
     - Create a Tiling object: the Format parameter of matrix A is CubeFormat::VECTOR.
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::VECTOR,
-      matmul_tiling::DataType::DT_FLOAT16, isAtrans);
+cubeTiling.SetAType(matmul_tiling::TPosition::GM,
+                    matmul_tiling::CubeFormat::VECTOR,
+                    matmul_tiling::DataType::DT_FLOAT16, isAtrans);
       ```
 
 - Invocation Implementation  

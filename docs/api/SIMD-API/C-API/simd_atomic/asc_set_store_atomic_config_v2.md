@@ -13,7 +13,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type, uint16_t op)
+__aicore__ inline void asc_set_store_atomic_config_v2(uint16_t type,
+                                                      uint16_t op)
 ```
 
 ## 参数说明

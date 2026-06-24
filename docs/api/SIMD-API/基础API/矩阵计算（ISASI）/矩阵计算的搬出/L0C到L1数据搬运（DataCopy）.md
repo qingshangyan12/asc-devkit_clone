@@ -49,8 +49,10 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
 - 数据搬运接口，通路L0C Buffer(CO1)->L1 Buffer(C1)，配合设置寄存器实现量化和ReLU激活。
 
     ```cpp
-    template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyCO12DstParams& intriParams)
+template <typename T, typename U>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<U> &src,
+                                const DataCopyCO12DstParams &intriParams)
     ```
 
 - [SetFixPipeConfig](./寄存器配置说明/SetFixPipeConfig.md)：寄存器设置接口，通过调用该接口设置随路量化，其中tensor的每个元素都代表一个量化参数，使用tensor量化时需要设置。
@@ -188,8 +190,8 @@ DataCopy矩阵搬出接口支持多种随路能力的组合，需要设置不同
     - 饱和模式：CTRL\[48\]设置成1'b0，INF输出会被饱和为±MAX，NaN输出会被饱和为0。
 
         ```cpp
-        // 设置CTRL[48]为0，开启浮点数饱和模式
-        AscendC::AscendCUtils::SetOverflow(0);
+// 设置CTRL[48]为0，开启浮点数饱和模式
+AscendC::AscendCUtils::SetOverflow(0);
         ```
 
     对于整数类型只有饱和模式。

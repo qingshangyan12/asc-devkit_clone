@@ -15,7 +15,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_datacache_preload(__gm__ uint64_t* address, int64_t offset)
+__aicore__ inline void asc_datacache_preload(__gm__ uint64_t *address,
+                                             int64_t offset)
 ```
 
 ## 参数说明

@@ -28,6 +28,6 @@
     - 宏定义控制方式
         在kernel代码文件的开头位置添加#define ASCENDC_DUMP 0,示例如下：
         ```cpp
-        #define ASCENDC_DUMP 0 // 在包含头文件之前添加
-        #include "..." // 包含所需的头文件
+#define ASCENDC_DUMP 0 // 在包含头文件之前添加
+#include "..."         // 包含所需的头文件
         ```

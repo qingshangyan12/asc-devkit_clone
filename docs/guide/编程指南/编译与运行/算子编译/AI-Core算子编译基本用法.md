@@ -41,17 +41,17 @@ AI Core SIMD的基本编译流程如下：Host代码使用Host编译器编译成
 
   下方示例中，definition.asc定义了变量和函数，example.asc对其进行引用；两个文件将分别编译，最终链接为完整可执行文件。
   ```c++
-  // ------- definition.asc -------
-  __gm__ int dev_var = 5;
-  __aicore__ int device_function();
+// ------- definition.asc -------
+__gm__ int dev_var = 5;
+__aicore__ int device_function();
 
-  // ------- example.asc -------
-  extern __gm__ int dev_var;
-  __aicore__  int device_function();
-  __global__  __vector__ void kernel(int *var) {
-    dev_var = 0;
-    *var = device_function();
-  }
+// ------- example.asc -------
+extern __gm__ int dev_var;
+__aicore__ int device_function();
+__global__ __vector__ void kernel(int *var) {
+  dev_var = 0;
+  *var = device_function();
+}
   ```
 
   ```shell

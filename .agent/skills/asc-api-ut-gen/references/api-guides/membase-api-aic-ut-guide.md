@@ -92,13 +92,13 @@ using SupportType = std::tuple<half, int8_t>;
 ```cpp
 class TEST_Fixpipe : public testing::Test {
 protected:
-    void SetUp() {
-        g_coreType = AscendC::AIC_TYPE;  // 切换到 Cube 核心
-    }
-    void TearDown() {
-        AscendC::CheckSyncState();       // 检查同步状态
-        g_coreType = AscendC::MIX_TYPE;  // 恢复混合模式
-    }
+  void SetUp() {
+    g_coreType = AscendC::AIC_TYPE; // 切换到 Cube 核心
+  }
+  void TearDown() {
+    AscendC::CheckSyncState();      // 检查同步状态
+    g_coreType = AscendC::MIX_TYPE; // 恢复混合模式
+  }
 };
 ```
 
@@ -127,7 +127,8 @@ protected:
 
 ```cpp
 // ❌ 错误：花括号初始化列表不支持
-FixpipeParamsV220 fixpipeParams = {n, m, srcStride, dstStride, quantMode, reluEn};
+FixpipeParamsV220 fixpipeParams = {n,         m,         srcStride,
+                                   dstStride, quantMode, reluEn};
 
 // ✅ 正确：使用成员赋值
 FixpipeParamsV220 fixpipeParams;
@@ -159,18 +160,18 @@ params.field2 = value2;
 
 ```cpp
 struct FixpipeParamsV220 {
-    uint16_t nSize = 0;         // N方向大小
-    uint16_t mSize = 0;         // M方向大小
-    uint16_t srcStride = 0;     // 源stride
-    uint32_t dstStride = 0;     // 目的stride
-    QuantMode_t quantPre = QuantMode_t::NoQuant;  // 量化模式
-    uint64_t deqScalar;         // 反量化标量值
-    uint16_t ndNum = 1;         // ND数量
-    uint16_t srcNdStride = 0;   // 源ND stride
-    uint16_t dstNdStride = 0;   // 目的ND stride
-    bool reluEn = false;        // 是否使能ReLU
-    uint8_t unitFlag = 0;       // 单元标志
-    bool isChannelSplit = false;// 是否通道切分
+  uint16_t nSize = 0;                          // N方向大小
+  uint16_t mSize = 0;                          // M方向大小
+  uint16_t srcStride = 0;                      // 源stride
+  uint32_t dstStride = 0;                      // 目的stride
+  QuantMode_t quantPre = QuantMode_t::NoQuant; // 量化模式
+  uint64_t deqScalar;                          // 反量化标量值
+  uint16_t ndNum = 1;                          // ND数量
+  uint16_t srcNdStride = 0;                    // 源ND stride
+  uint16_t dstNdStride = 0;                    // 目的ND stride
+  bool reluEn = false;                         // 是否使能ReLU
+  uint8_t unitFlag = 0;                        // 单元标志
+  bool isChannelSplit = false;                 // 是否通道切分
 };
 ```
 
@@ -181,7 +182,7 @@ params.nSize = 16;
 params.mSize = 16;
 params.reluEn = true;
 params.quantPre = QuantMode_t::DEQF16;
-params.deqScalar = 0x3C00;  // half 格式的 1.0
+params.deqScalar = 0x3C00; // half 格式的 1.0
 ```
 
 ---
@@ -192,25 +193,25 @@ params.deqScalar = 0x3C00;  // half 格式的 1.0
 
 ```cpp
 enum QuantMode_t {
-    NoQuant,          // 不使能量化功能
-    F322F16,          // float量化成half, scalar量化
-    F322BF16,         // float量化成bfloat16_t, scalar量化
-    DEQF16,           // int32_t量化成half, scalar量化
-    VDEQF16,          // int32_t量化成half, tensor量化
-    QF322B8_PRE,      // float量化成int8_t/uint8_t, scalar量化
-    VQF322B8_PRE,     // float量化成int8_t/uint8_t, tensor量化
-    QF162B8_PRE,      // half量化成int8_t/uint8_t, scalar量化
-    VQF162B8_PRE,     // half量化成int8_t/uint8_t, tensor量化
-    REQ8,             // int32_t量化成int8_t/uint8_t, scalar量化
-    VREQ8,            // int32_t量化成int8_t/uint8_t, tensor量化
-    QF162S4_PRE,      // half量化成int4, scalar量化
-    VQF162S4_PRE,     // half量化成int4, tensor量化
-    REQ4,             // int32_t量化成int4, scalar量化
-    VREQ4,            // int32_t量化成int4, tensor量化
-    DEQS16,           // int32_t量化成int16_t, scalar量化
-    VDEQS16,          // int32_t量化成int16_t, tensor量化
-    QF162S16_PRE,     // half量化成int16_t, scalar量化
-    VQF162S16_PRE,    // half量化成int16_t, tensor量化
+  NoQuant,       // 不使能量化功能
+  F322F16,       // float量化成half, scalar量化
+  F322BF16,      // float量化成bfloat16_t, scalar量化
+  DEQF16,        // int32_t量化成half, scalar量化
+  VDEQF16,       // int32_t量化成half, tensor量化
+  QF322B8_PRE,   // float量化成int8_t/uint8_t, scalar量化
+  VQF322B8_PRE,  // float量化成int8_t/uint8_t, tensor量化
+  QF162B8_PRE,   // half量化成int8_t/uint8_t, scalar量化
+  VQF162B8_PRE,  // half量化成int8_t/uint8_t, tensor量化
+  REQ8,          // int32_t量化成int8_t/uint8_t, scalar量化
+  VREQ8,         // int32_t量化成int8_t/uint8_t, tensor量化
+  QF162S4_PRE,   // half量化成int4, scalar量化
+  VQF162S4_PRE,  // half量化成int4, tensor量化
+  REQ4,          // int32_t量化成int4, scalar量化
+  VREQ4,         // int32_t量化成int4, tensor量化
+  DEQS16,        // int32_t量化成int16_t, scalar量化
+  VDEQS16,       // int32_t量化成int16_t, tensor量化
+  QF162S16_PRE,  // half量化成int16_t, scalar量化
+  VQF162S16_PRE, // half量化成int16_t, tensor量化
 };
 ```
 
@@ -227,18 +228,21 @@ enum QuantMode_t {
 ```cpp
 // 判断是否为 Tensor 量化模式
 __aicore__ inline bool IsVectorQuantMode(QuantMode_t quantPre) {
-    return (quantPre == QuantMode_t::VDEQF16 || quantPre == QuantMode_t::VQF162B8_PRE ||
-            quantPre == QuantMode_t::VREQ8 || quantPre == QuantMode_t::VQF162S4_PRE ||
-            quantPre == QuantMode_t::VREQ4 || quantPre == QuantMode_t::VDEQS16 ||
-            quantPre == QuantMode_t::VQF162S16_PRE);
+  return (quantPre == QuantMode_t::VDEQF16 ||
+          quantPre == QuantMode_t::VQF162B8_PRE ||
+          quantPre == QuantMode_t::VREQ8 ||
+          quantPre == QuantMode_t::VQF162S4_PRE ||
+          quantPre == QuantMode_t::VREQ4 || quantPre == QuantMode_t::VDEQS16 ||
+          quantPre == QuantMode_t::VQF162S16_PRE);
 }
 
 // 判断是否为 Scalar 量化模式
 __aicore__ inline bool IsScalarQuantMode(QuantMode_t quantPre) {
-    return (quantPre == QuantMode_t::DEQF16 || quantPre == QuantMode_t::QF162B8_PRE ||
-            quantPre == QuantMode_t::REQ8 || quantPre == QuantMode_t::QF162S4_PRE ||
-            quantPre == QuantMode_t::REQ4 || quantPre == QuantMode_t::DEQS16 ||
-            quantPre == QuantMode_t::QF162S16_PRE);
+  return (
+      quantPre == QuantMode_t::DEQF16 || quantPre == QuantMode_t::QF162B8_PRE ||
+      quantPre == QuantMode_t::REQ8 || quantPre == QuantMode_t::QF162S4_PRE ||
+      quantPre == QuantMode_t::REQ4 || quantPre == QuantMode_t::DEQS16 ||
+      quantPre == QuantMode_t::QF162S16_PRE);
 }
 ```
 
@@ -254,7 +258,7 @@ __aicore__ inline bool IsScalarQuantMode(QuantMode_t quantPre) {
 LocalTensor<uint64_t> cbufWorkspace;
 
 // workspace 大小通常与输出通道数相关
-uint32_t deqSize = cout;  // 输出通道数
+uint32_t deqSize = cout; // 输出通道数
 ```
 
 ---
@@ -267,9 +271,9 @@ uint32_t deqSize = cout;  // 输出通道数
 
 ```cpp
 enum class CO2Layout : uint8_t {
-    NZ = 0,          // NZ格式
-    ROW_MAJOR,       // ND Row格式
-    COLUMN_MAJOR     // ND Column格式
+  NZ = 0,      // NZ格式
+  ROW_MAJOR,   // ND Row格式
+  COLUMN_MAJOR // ND Column格式
 };
 
 // 预定义配置
@@ -284,8 +288,8 @@ constexpr FixpipeConfig CFG_COLUMN_MAJOR = {CO2Layout::COLUMN_MAJOR};
 
 ```cpp
 enum class FmatrixMode : uint8_t {
-    FMATRIX_LEFT = 0,
-    FMATRIX_RIGHT = 1,
+  FMATRIX_LEFT = 0,
+  FMATRIX_RIGHT = 1,
 };
 ```
 
@@ -298,40 +302,40 @@ enum class FmatrixMode : uint8_t {
 ```cpp
 class KernelMmad {
 public:
-    __aicore__ inline KernelMmad() {}
-    __aicore__ inline void Init(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c,
-        uint16_t mVal, uint16_t kVal, uint16_t nVal)
-    {
-        this->m = mVal;
-        this->k = kVal;
-        this->n = nVal;
+  __aicore__ inline KernelMmad() {}
+  __aicore__ inline void Init(__gm__ uint8_t *a, __gm__ uint8_t *b,
+                              __gm__ uint8_t *c, uint16_t mVal, uint16_t kVal,
+                              uint16_t nVal) {
+    this->m = mVal;
+    this->k = kVal;
+    this->n = nVal;
 
-        // 设置 GlobalTensor
-        aGM.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(a));
-        bGM.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(b));
-        cGM.SetGlobalBuffer(reinterpret_cast<__gm__ half*>(c));
+    // 设置 GlobalTensor
+    aGM.SetGlobalBuffer(reinterpret_cast<__gm__ half *>(a));
+    bGM.SetGlobalBuffer(reinterpret_cast<__gm__ half *>(b));
+    cGM.SetGlobalBuffer(reinterpret_cast<__gm__ half *>(c));
 
-        // 初始化 Buffer
-        pipe.InitBuffer(inQueueA1, 1, m * k * sizeof(half));
-        pipe.InitBuffer(outQueueCO1, 1, m * n * sizeof(float));
-    }
+    // 初始化 Buffer
+    pipe.InitBuffer(inQueueA1, 1, m * k * sizeof(half));
+    pipe.InitBuffer(outQueueCO1, 1, m * n * sizeof(float));
+  }
 
-    __aicore__ inline void Process() {
-        CopyIn();
-        Compute();
-        CopyOut();
-    }
+  __aicore__ inline void Process() {
+    CopyIn();
+    Compute();
+    CopyOut();
+  }
 
 private:
-    __aicore__ inline void CopyIn() { /* ... */ }
-    __aicore__ inline void Compute() { /* Mmad 调用 */ }
-    __aicore__ inline void CopyOut() { /* Fixpipe 调用 */ }
+  __aicore__ inline void CopyIn() { /* ... */ }
+  __aicore__ inline void Compute() { /* Mmad 调用 */ }
+  __aicore__ inline void CopyOut() { /* Fixpipe 调用 */ }
 
-    TPipe pipe;
-    TQue<TPosition::A1, 1> inQueueA1;
-    TQue<TPosition::CO1, 1> outQueueCO1;
-    GlobalTensor<half> aGM, bGM, cGM;
-    uint16_t m, k, n;
+  TPipe pipe;
+  TQue<TPosition::A1, 1> inQueueA1;
+  TQue<TPosition::CO1, 1> outQueueCO1;
+  GlobalTensor<half> aGM, bGM, cGM;
+  uint16_t m, k, n;
 };
 ```
 
@@ -351,14 +355,15 @@ private:
 
 ```cpp
 // 分支1: 无 workspace（普通量化）
-template <typename T, typename U, const FixpipeConfig& config>
-void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const FixpipeParamsV220& intriParams);
+template <typename T, typename U, const FixpipeConfig &config>
+void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+             const FixpipeParamsV220 &intriParams);
 
 // 分支2: 有 workspace（Tensor 量化）
-template <typename T, typename U, const FixpipeConfig& config>
-void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
-    const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsV220& intriParams);
+template <typename T, typename U, const FixpipeConfig &config>
+void Fixpipe(const GlobalTensor<T> &dst, const LocalTensor<U> &src,
+             const LocalTensor<uint64_t> &cbufWorkspace,
+             const FixpipeParamsV220 &intriParams);
 ```
 
 ### 9.3 FixpipeConfig 分支
@@ -405,7 +410,7 @@ void Fixpipe(const GlobalTensor<T>& dst, const LocalTensor<U>& src,
 
 ```cpp
 // ❌ 错误: F322F16 需要 float L0C -> half GM
-Fixpipe<half>(cGM, c1Local, fixpipeParams);  // 类型错误
+Fixpipe<half>(cGM, c1Local, fixpipeParams); // 类型错误
 
 // ✅ 正确
 Fixpipe<float, half>(cGM, c1Local, fixpipeParams);

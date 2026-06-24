@@ -17,7 +17,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride, uint64_t loop2_dst_stride)
+__aicore__ inline void asc_set_ub2gm_loop2_stride(uint64_t loop2_src_stride,
+                                                  uint64_t loop2_dst_stride)
 ```
 
 ## 参数说明

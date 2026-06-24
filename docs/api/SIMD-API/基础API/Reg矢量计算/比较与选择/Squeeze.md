@@ -39,8 +39,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
-__simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
+template <typename T = DefaultType,
+          GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
+__simd_callee__ inline void Squeeze(U &dstReg, U &srcReg, MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -74,10 +75,10 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 - 当模板参数store取值为`GatherMaskMode::STORE_REG`时，由于硬件约束，`StoreUnAlign`指令和`Squeeze`指令必须交替使用，例如：
 
   ```cpp
-  Squeeze(dstVreg, srcVreg, mask);
-  StoreUnAlign(dstAddr, dstVreg, ureg);
-  Squeeze(dstVreg, srcVreg, mask);
-  StoreUnAlign(dstAddr, dstVreg, ureg);
+Squeeze(dstVreg, srcVreg, mask);
+StoreUnAlign(dstAddr, dstVreg, ureg);
+Squeeze(dstVreg, srcVreg, mask);
+StoreUnAlign(dstAddr, dstVreg, ureg);
   ```
 
 - 当store取值为`GatherMaskMode::NO_STORE_REG`时，不涉及AR寄存器，`Squeeze`和`StoreUnAlign`不强制交替。
@@ -87,18 +88,23 @@ __simd_callee__ inline void Squeeze(U& dstReg, U& srcReg, MaskReg& mask)
 以下示例展示了`Squeeze`与`StoreUnAlign`的典型配合方式（`Squeeze`的STORE_REG模式，`StoreUnAlign`使用AR寄存器中的有效元素字节数作为偏移量）：
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void SqueezeVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::UnalignRegForStore ureg;
-    AscendC::Reg::MaskReg sqzMask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::H>();
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(srcReg0, srcAddr, oneRepeatSize);
-        AscendC::Reg::Squeeze<T, AscendC::Reg::GatherMaskMode::STORE_REG>(srcReg1, srcReg0, sqzMask);
-        AscendC::Reg::StoreUnAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(dstAddr, srcReg1, ureg);
-     }
-     AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
+template <typename T>
+__simd_vf__ inline void SqueezeVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                                  uint32_t oneRepeatSize,
+                                  uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::UnalignRegForStore ureg;
+  AscendC::Reg::MaskReg sqzMask =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::H>();
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    AscendC::Reg::LoadAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+        srcReg0, srcAddr, oneRepeatSize);
+    AscendC::Reg::Squeeze<T, AscendC::Reg::GatherMaskMode::STORE_REG>(
+        srcReg1, srcReg0, sqzMask);
+    AscendC::Reg::StoreUnAlign<T, AscendC::Reg::PostLiteral::POST_MODE_UPDATE>(
+        dstAddr, srcReg1, ureg);
+  }
+  AscendC::Reg::StoreUnAlignPost(dstAddr, ureg);
 }
 ```

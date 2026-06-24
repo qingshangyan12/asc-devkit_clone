@@ -17,8 +17,8 @@
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline vector_bool asc_get_mask_spr_b16()
-__simd_callee__ inline vector_bool asc_get_mask_spr_b32()
+__simd_callee__ inline vector_bool asc_get_mask_spr_b16() __simd_callee__
+    inline vector_bool asc_get_mask_spr_b32()
 ```
 
 ## 参数说明

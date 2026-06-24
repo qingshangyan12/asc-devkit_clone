@@ -13,8 +13,15 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_copy_l12l0b_mx(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride)
-__aicore__ inline void asc_copy_l12l0b_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t* src, uint16_t x_start_pos, uint16_t y_start_pos, uint8_t x_step, uint8_t y_step, uint16_t src_stride, uint16_t dst_stride)
+__aicore__ inline void
+asc_copy_l12l0b_mx(uint64_t dst, __cbuf__ fp8_e8m0_t *src, uint16_t x_start_pos,
+                   uint16_t y_start_pos, uint8_t x_step, uint8_t y_step,
+                   uint16_t src_stride, uint16_t dst_stride) __aicore__
+    inline void asc_copy_l12l0b_mx_sync(uint64_t dst, __cbuf__ fp8_e8m0_t *src,
+                                        uint16_t x_start_pos,
+                                        uint16_t y_start_pos, uint8_t x_step,
+                                        uint8_t y_step, uint16_t src_stride,
+                                        uint16_t dst_stride)
 ```
 
 ## 参数说明
@@ -55,6 +62,8 @@ uint8_t x_step = 0;
 uint8_t y_step = 0;
 uint16_t src_stride = 8;
 uint16_t dst_stride = 8;
-uint64_t mx_dst_addr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
-asc_copy_l12l0b_mx(mx_dst_addr, src, x_start_pos, y_start_pos, x_step, y_step, src_stride, dst_stride);
+uint64_t mx_dst_addr =
+    static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst)) / 16;
+asc_copy_l12l0b_mx(mx_dst_addr, src, x_start_pos, y_start_pos, x_step, y_step,
+                   src_stride, dst_stride);
 ```

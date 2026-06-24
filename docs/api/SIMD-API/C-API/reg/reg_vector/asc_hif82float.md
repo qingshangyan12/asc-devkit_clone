@@ -16,13 +16,20 @@
 
 ```cpp
 // 选取索引0的位置
-__simd_callee__ inline void asc_hif82float(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
-// 选取索引1的位置
-__simd_callee__ inline void asc_hif82float_v2(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
-// 选取索引2的位置
-__simd_callee__ inline void asc_hif82float_v3(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
-// 选取索引3的位置
-__simd_callee__ inline void asc_hif82float_v4(vector_float& dst, vector_hifloat8_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_hif82float(vector_float &dst, vector_hifloat8_t src, vector_bool mask)
+    // 选取索引1的位置
+    __simd_callee__
+    inline void asc_hif82float_v2(vector_float &dst, vector_hifloat8_t src,
+                                  vector_bool mask)
+    // 选取索引2的位置
+    __simd_callee__
+    inline void asc_hif82float_v3(vector_float &dst, vector_hifloat8_t src,
+                                  vector_bool mask)
+    // 选取索引3的位置
+    __simd_callee__
+    inline void asc_hif82float_v4(vector_float &dst, vector_hifloat8_t src,
+                                  vector_bool mask)
 ```
 
 ## 参数说明

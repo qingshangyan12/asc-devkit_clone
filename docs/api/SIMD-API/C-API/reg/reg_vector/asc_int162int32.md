@@ -16,9 +16,12 @@
 
 ```cpp
 // 选取索引0的位置
-__simd_callee__ inline void asc_int162int32(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
-// 选取索引1的位置
-__simd_callee__ inline void asc_int162int32_v2(vector_int32_t& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_int162int32(vector_int32_t &dst, vector_int16_t src, vector_bool mask)
+    // 选取索引1的位置
+    __simd_callee__
+    inline void asc_int162int32_v2(vector_int32_t &dst, vector_int16_t src,
+                                   vector_bool mask)
 ```
 
 ## 参数说明

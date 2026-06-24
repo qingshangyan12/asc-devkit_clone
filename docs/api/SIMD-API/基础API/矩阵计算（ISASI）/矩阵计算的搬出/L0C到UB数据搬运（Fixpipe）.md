@@ -31,15 +31,20 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 - 通路L0C Buffer-\>UB，不开启tensor量化功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 - 通路L0C Buffer-\>UB，开启tensor量化功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+        const LocalTensor<uint64_t> &cbufWorkspace,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 </cann-filter>
@@ -51,15 +56,23 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 - 通路L0C Buffer-\>UB，不开启tensor量化功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsM300& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(const LocalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const FixpipeParamsM300 &intriParams)
     ```
 
 - 通路L0C Buffer-\>UB，开启tensor量化功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t, typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace, const FixpipeParamsM300& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR,
+          typename S = uint64_t,
+          typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value,
+                                  bool>::type = true>
+__aicore__ inline void Fixpipe(const LocalTensor<T> &dst,
+                               const LocalTensor<U> &src,
+                               const LocalTensor<S> &cbufWorkspace,
+                               const FixpipeParamsM300 &intriParams)
     ```
 
 </cann-filter>
@@ -297,18 +310,20 @@ M方向切分：
 - 示例：通路L0C Buffer-\>UB。输入A矩阵和B矩阵的数据类型为half，输出C矩阵为float，默认配置开启Nz2Nd的格式转换。完整样例可以参考[样例链接](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2ub)。
 
     ```cpp
-    // L0C Buffer->UB 搬运，目的位置为UB，需将FixpipeConfig的isToUB配置为true。
-    constexpr AscendC::FixpipeConfig CFG_ROW_MAJOR_UB = {AscendC::CO2Layout::ROW_MAJOR, true};
+// L0C Buffer->UB 搬运，目的位置为UB，需将FixpipeConfig的isToUB配置为true。
+constexpr AscendC::FixpipeConfig CFG_ROW_MAJOR_UB = {
+    AscendC::CO2Layout::ROW_MAJOR, true};
 
-    AscendC::LocalTensor<outputType> cUB;
-    cUB = AscendC::LocalTensor<outputType>(AscendC::TPosition::VECOUT, 0, cSingleSize);
-    
-    AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-    fixpipeParams.mSize = baseM;
-    fixpipeParams.nSize = baseN;
-    fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
-    fixpipeParams.dstStride = baseN;
-    AscendC::Fixpipe<outputType, l0cType, CFG_ROW_MAJOR_UB>(cUB, c, fixpipeParams);
+AscendC::LocalTensor<outputType> cUB;
+cUB = AscendC::LocalTensor<outputType>(AscendC::TPosition::VECOUT, 0,
+                                       cSingleSize);
+
+AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
+fixpipeParams.mSize = baseM;
+fixpipeParams.nSize = baseN;
+fixpipeParams.srcStride = CeilAlign(baseM, CUBE_BLOCK);
+fixpipeParams.dstStride = baseN;
+AscendC::Fixpipe<outputType, l0cType, CFG_ROW_MAJOR_UB>(cUB, c, fixpipeParams);
     ```
 
 </cann-filter>

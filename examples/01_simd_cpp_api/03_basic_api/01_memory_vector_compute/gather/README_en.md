@@ -35,7 +35,8 @@ This example switches between different mask generation scenarios through the co
 - Data type: uint32_t
 - Implementation:
     ```cpp
-    AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
+AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask,
+                    gatherMaskParams, rsvdCnt);
     ```
 - Parameters: dstLocal and src0Local use address reuse, with built-in fixed mode src1Pattern=2 for element selection, reduceMode=false (Normal mode), mask=0, gatherMaskParams={1, 4, 8, 0}
 
@@ -46,7 +47,8 @@ This example switches between different mask generation scenarios through the co
 - Data type: uint32_t
 - Implementation:
     ```cpp
-    AscendC::GatherMask (dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
+AscendC::GatherMask(dstLocal, src0Local, src1Local, reduceMode, mask,
+                    gatherMaskParams, rsvdCnt);
     ```
 - Parameters: Use user-provided Tensor for element selection, reduceMode=true (Counter mode), mask=70, gatherMaskParams={1, 2, 4, 0}
 
@@ -57,7 +59,7 @@ This example switches between different mask generation scenarios through the co
 - Data type: input/output uint16_t, srcOffset type uint32_t
 - Implementation:
     ```cpp
-    AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseOffset, count);
+AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseOffset, count);
     ```
 - Parameters: Use user-provided srcOffset for per-element address offset, srcBaseOffset=0 indicates the start address of the source operand, count=128 indicates the number of data elements to process
 
@@ -68,7 +70,7 @@ This example switches between different mask generation scenarios through the co
 - Data type: input/output uint16_t, srcOffset type uint32_t
 - Implementation:
     ```cpp
-    AscendC::Gatherb<T>(dstLocal, src0Local, srcOffset, repeatTime, params);
+AscendC::Gatherb<T>(dstLocal, src0Local, srcOffset, repeatTime, params);
     ```
 - Parameters: User-input srcOffset is the address offset of each datablock in the source operand, repeatTime=1 indicates the repeat iteration count, params={1,8}
 

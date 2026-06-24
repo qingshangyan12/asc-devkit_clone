@@ -35,8 +35,10 @@ $$dstReg_i = srcReg0_i / srcReg1_i$$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void Div(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING,
+          typename U>
+__simd_callee__ inline void Div(U &dstReg, U &srcReg0, U &srcReg1,
+                                MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -103,26 +105,29 @@ FTZ（Flush To Zero）：一种浮点运算模式，当结果为Subnormal时，�
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void DivVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    // 高精度模式
-    // static constexpr AscendC::Reg::DivSpecificMode mode = {AscendC::Reg::MaskMergeMode::ZEROING, true};
-    // Subnormal模式
-    // static constexpr AscendC::Reg::DivSpecificMode mode = {AscendC::Reg::MaskMergeMode::ZEROING, true, DivAlgo::PRECISION_0ULP_FTZ_FALSE};
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
-        AscendC::Reg::Div(dstReg, srcReg0, srcReg1, mask);
-        // 高精度模式/Subnormal模式
-        // AscendC::Reg::Div<T, &mode>(dstReg, srcReg0, srcReg1, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+template <typename T>
+__simd_vf__ inline void DivVF(__ubuf__ T *dstAddr, __ubuf__ T *src0Addr,
+                              __ubuf__ T *src1Addr, uint32_t count,
+                              uint16_t oneRepeatSize, uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  // 高精度模式
+  // static constexpr AscendC::Reg::DivSpecificMode mode =
+  // {AscendC::Reg::MaskMergeMode::ZEROING, true}; Subnormal模式 static
+  // constexpr AscendC::Reg::DivSpecificMode mode =
+  // {AscendC::Reg::MaskMergeMode::ZEROING, true,
+  // DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+    AscendC::Reg::Div(dstReg, srcReg0, srcReg1, mask);
+    // 高精度模式/Subnormal模式
+    // AscendC::Reg::Div<T, &mode>(dstReg, srcReg0, srcReg1, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```
 

@@ -20,18 +20,33 @@ $$
 
 ```cpp
 // 不带进位的矢量加法
-__simd_callee__ inline void asc_add(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
-// 带进位的矢量加法
-__simd_callee__ inline void asc_add(vector_bool& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_add(vector_bool& dst0, vector_uint32_t& dst1, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+__simd_callee__ inline void asc_add(vector_uint8_t &dst, vector_uint8_t src0,
+                                    vector_uint8_t src1,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_add(vector_int8_t &dst, vector_int8_t src0,
+                        vector_int8_t src1, vector_bool mask) __simd_callee__
+    inline void asc_add(vector_uint16_t &dst, vector_uint16_t src0,
+                        vector_uint16_t src1, vector_bool mask) __simd_callee__
+    inline void asc_add(vector_int16_t &dst, vector_int16_t src0,
+                        vector_int16_t src1, vector_bool mask) __simd_callee__
+    inline void asc_add(vector_half &dst, vector_half src0, vector_half src1,
+                        vector_bool mask) __simd_callee__
+    inline void asc_add(vector_float &dst, vector_float src0, vector_float src1,
+                        vector_bool mask) __simd_callee__
+    inline void asc_add(vector_int32_t &dst, vector_int32_t src0,
+                        vector_int32_t src1, vector_bool mask) __simd_callee__
+    inline void asc_add(vector_uint32_t &dst, vector_uint32_t src0,
+                        vector_uint32_t src1, vector_bool mask) __simd_callee__
+    inline void asc_add(vector_bfloat16_t &dst, vector_bfloat16_t src0,
+                        vector_bfloat16_t src1, vector_bool mask)
+    // 带进位的矢量加法
+    __simd_callee__
+    inline void asc_add(vector_bool &dst0, vector_int32_t &dst1,
+                        vector_int32_t src0, vector_int32_t src1,
+                        vector_bool mask) __simd_callee__
+    inline void asc_add(vector_bool &dst0, vector_uint32_t &dst1,
+                        vector_uint32_t src0, vector_uint32_t src1,
+                        vector_bool mask)
 ```
 
 ## 参数说明

@@ -16,19 +16,23 @@
 - 前n个数据搬运
 
 ```c++
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+__aicore__ inline void asc_copy_gm2ub(__ubuf__ void *dst, __gm__ void *src,
+                                      uint32_t size)
 ```
 
 - 高维切分搬运
 
 ```c++
-__aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst, __gm__ void* src, uint16_t n_burst, uint16_t len_burst, uint16_t src_gap, uint16_t dst_gap)
+__aicore__ inline void asc_copy_gm2ub(__ubuf__ void *dst, __gm__ void *src,
+                                      uint16_t n_burst, uint16_t len_burst,
+                                      uint16_t src_gap, uint16_t dst_gap)
 ```
 
 - 同步计算
 
 ```c++
-__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void* dst, __gm__ void* src, uint32_t size)
+__aicore__ inline void asc_copy_gm2ub_sync(__ubuf__ void *dst, __gm__ void *src,
+                                           uint32_t size)
 ```
 
 ## 参数说明
@@ -63,7 +67,7 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
+// total_length指参与搬运的数据总长度。src是外部输入的half类型的GM内存。
 constexpr uint64_t total_length = 128;
 __ubuf__ half dst[total_length];
 asc_copy_gm2ub(dst, src, total_length * sizeof(half));

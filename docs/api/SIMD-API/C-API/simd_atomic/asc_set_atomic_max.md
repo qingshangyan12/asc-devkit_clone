@@ -15,12 +15,12 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_atomic_max_int8()
-__aicore__ inline void asc_set_atomic_max_int16()
-__aicore__ inline void asc_set_atomic_max_int()
-__aicore__ inline void asc_set_atomic_max_bfloat()
-__aicore__ inline void asc_set_atomic_max_float16()
-__aicore__ inline void asc_set_atomic_max_float()
+__aicore__ inline void asc_set_atomic_max_int8() __aicore__
+    inline void asc_set_atomic_max_int16() __aicore__
+    inline void asc_set_atomic_max_int() __aicore__
+    inline void asc_set_atomic_max_bfloat() __aicore__
+    inline void asc_set_atomic_max_float16() __aicore__
+    inline void asc_set_atomic_max_float()
 ```
 
 ## 参数说明

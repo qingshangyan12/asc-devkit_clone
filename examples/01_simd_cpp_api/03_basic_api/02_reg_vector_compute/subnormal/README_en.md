@@ -59,8 +59,9 @@ subnormal
           - Implementation function: SubnormalFTZFalseVF<T>
           - Implementation:
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
+static constexpr AscendC::Reg::DivSpecificMode mode = {
+    ZEROING, false, PRECISION_1ULP_FTZ_FALSE};
+AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
           - Description: Supports Subnormal data computation, uses a single instruction to compute the result, with a maximum precision error of 1 ulp. When the division result is a Subnormal number, the value is preserved.
           - Application scenarios: Scientific computing, numerical simulation, and high-precision computation scenarios that require precise handling of Subnormal floating-point numbers.
@@ -69,8 +70,9 @@ subnormal
           - Implementation function: SubnormalFTZTrueVF<T>
           - Implementation:
             ```cpp
-            static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false, PRECISION_1ULP_FTZ_TRUE};
-            AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
+static constexpr AscendC::Reg::DivSpecificMode mode = {ZEROING, false,
+                                                       PRECISION_1ULP_FTZ_TRUE};
+AscendC::Reg::Div<T, &mode>(zReg, xReg, yReg, mask);
             ```
           - Description: Does not support Subnormal data computation. FTZ mode uses a single instruction to compute the result, with a maximum precision error of 1 ulp. When the division result is a Subnormal number, it is forced to 0.
           - Application scenarios: Deep learning, image processing, and real-time inference scenarios where Subnormal precision requirements are not high, simplifying hardware implementation and improving computation performance.

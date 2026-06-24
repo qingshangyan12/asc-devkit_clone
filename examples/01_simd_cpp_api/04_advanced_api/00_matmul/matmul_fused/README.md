@@ -53,10 +53,10 @@
   - Tiling关键步骤
     - 调用 `MultiCoreMatmulTiling` 设置A/B/C/Bias类型、原始Shape、计算Shape、遍历顺序和固定切分参数。
       ```cpp
-      tilingApi.SetOrgShape(M, N, K);
-      tilingApi.SetShape(M, N, K);
-      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
-      tilingApi.SetFixSplit(baseM, baseN, -1);
+tilingApi.SetOrgShape(M, N, K);
+tilingApi.SetShape(M, N, K);
+tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
 ## 编译运行

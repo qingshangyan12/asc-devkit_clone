@@ -27,31 +27,36 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16
 - 执行L0C Buffer到Unified Buffer的非量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 执行L0C Buffer到Unified Buffer的量化搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor, typename QuantParam,
-        Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src,
-        const QuantParam& quant)
+template <typename AtomType, typename DstTensor, typename SrcTensor,
+          typename QuantParam,
+          Std::enable_if_t<IsCopyQuantParamV<QuantParam>, int> Enable>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src,
+                            const QuantParam &quant)
     ```
 
 - 使用默认trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 使用指定trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 ## 参数说明
@@ -79,10 +84,10 @@ L0C Buffer到Unified Buffer搬运支持不量化输出、float到half或bfloat16
 
 ```cpp
 struct CopyL0C2UBTrait {
-    RoundMode roundMode = RoundMode::DEFAULT;
-    bool enableRelu = false;
-    bool enableChannelSplit = false;
-    DualDstMode dualDstCtl = DUAL_DST_DISABLE;
+  RoundMode roundMode = RoundMode::DEFAULT;
+  bool enableRelu = false;
+  bool enableChannelSplit = false;
+  DualDstMode dualDstCtl = DUAL_DST_DISABLE;
 };
 ```
 
@@ -96,16 +101,12 @@ struct CopyL0C2UBTrait {
 使用自定义trait的示例：
 
 ```cpp
-constexpr CopyL0C2UBTrait l0c2ubTrait = {
-    RoundMode::DEFAULT,
-    false,
-    false,
-    DUAL_DST_DISABLE
-};
+constexpr CopyL0C2UBTrait l0c2ubTrait = {RoundMode::DEFAULT, false, false,
+                                         DUAL_DST_DISABLE};
 
 struct CopyL0C2UBTraitCustom {
-    using TraitType = CopyL0C2UBTrait;
-    static constexpr const TraitType value = l0c2ubTrait;
+  using TraitType = CopyL0C2UBTrait;
+  static constexpr const TraitType value = l0c2ubTrait;
 };
 ```
 
@@ -115,8 +116,8 @@ struct CopyL0C2UBTraitCustom {
 
 ```cpp
 struct FixpipeParams {
-    uint8_t unitFlag = 0;
-    bool subBlockId = false;
+  uint8_t unitFlag = 0;
+  bool subBlockId = false;
 };
 ```
 
@@ -171,14 +172,15 @@ L0C Buffer到Unified Buffer搬运涉及[随路量化](关键特性说明/quant_p
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL0CToUB()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto ub = MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+__aicore__ inline void CopyL0CToUB() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto ub =
+      MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
 
-    FixpipeParams params;
-    auto atom = MakeCopy(CopyL0C2UB{}).with(params);
-    Copy(atom, ub, l0c);
+  FixpipeParams params;
+  auto atom = MakeCopy(CopyL0C2UB{}).with(params);
+  Copy(atom, ub, l0c);
 }
 ```
 
@@ -189,14 +191,15 @@ __aicore__ inline void CopyL0CToUB()
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL0CToUB()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto ub = MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+__aicore__ inline void CopyL0CToUB() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto ub =
+      MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
 
-    uint64_t quant = 1;
-    auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
-    Copy(atom, ub, l0c, quant);
+  uint64_t quant = 1;
+  auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
+  Copy(atom, ub, l0c, quant);
 }
 ```
 
@@ -207,14 +210,16 @@ __aicore__ inline void CopyL0CToUB()
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL0CToUB()
-{
-    auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-    auto ub = MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
-    auto quant = MakeTensor(MakeMemPtr(l1QuantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+__aicore__ inline void CopyL0CToUB() {
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto ub =
+      MakeTensor(MakeMemPtr(ubAddr), MakeFrameLayout<NDExtLayoutPtn>(m, n));
+  auto quant = MakeTensor(MakeMemPtr(l1QuantAddr),
+                          MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
-    auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
-    Copy(atom, ub, l0c, quant);
+  auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
+  Copy(atom, ub, l0c, quant);
 }
 ```
 
@@ -225,19 +230,20 @@ __aicore__ inline void CopyL0CToUB()
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyBatchL0CToUB()
-{
-    constexpr uint32_t batch = 3;
-    constexpr uint32_t m = 32;
-    constexpr uint32_t n = 64;
+__aicore__ inline void CopyBatchL0CToUB() {
+  constexpr uint32_t batch = 3;
+  constexpr uint32_t m = 32;
+  constexpr uint32_t n = 64;
 
-    __cc__ float l0cBuf[batch * m * n];
-    __ubuf__ half ubBuf[batch * m * n];
+  __cc__ float l0cBuf[batch * m * n];
+  __ubuf__ half ubBuf[batch * m * n];
 
-    auto l0c = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn>(batch, m, n));
-    auto ub = MakeTensor(MakeMemPtr(ubBuf), MakeFrameLayout<NDExtLayoutPtn>(batch, m, n));
+  auto l0c =
+      MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn>(batch, m, n));
+  auto ub = MakeTensor(MakeMemPtr(ubBuf),
+                       MakeFrameLayout<NDExtLayoutPtn>(batch, m, n));
 
-    auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
-    Copy(atom, ub, l0c);
+  auto atom = MakeCopy(CopyL0C2UB{}).with(FixpipeParams{});
+  Copy(atom, ub, l0c);
 }
 ```

@@ -8,17 +8,18 @@ NZ2ND转化过程可以参考以下伪代码：
 
 ```cpp
 for (i = 0; i < ndNum; i++) {
-    // fractal_size = 16 * sizeof(L0C_element)
-    src_temp_nd_addr = src + srcNdStride * fractal_size * i;
-    dst_temp_nd_addr = dst + dstNdStride * sizeof(dst_element) * i;
-    for (j = 0; j < mSize; j++) {
-        src_temp_n_addr = src_temp_nd_addr + j * 16 * sizeof(L0C_element);
-        dst_temp_n_addr = dst_temp_nd_addr + j * dstStride * sizeof(dst_element);
-        for (k = 0; k < ceil(nSize / 16); k++) {
-            src_block_addr = src_temp_n_addr + k * srcStride * 16 * sizeof(L0C_element);
-            dst_block_addr = dst_temp_n_addr + k * 16 * sizeof(dst_element);
-        }
+  // fractal_size = 16 * sizeof(L0C_element)
+  src_temp_nd_addr = src + srcNdStride * fractal_size * i;
+  dst_temp_nd_addr = dst + dstNdStride * sizeof(dst_element) * i;
+  for (j = 0; j < mSize; j++) {
+    src_temp_n_addr = src_temp_nd_addr + j * 16 * sizeof(L0C_element);
+    dst_temp_n_addr = dst_temp_nd_addr + j * dstStride * sizeof(dst_element);
+    for (k = 0; k < ceil(nSize / 16); k++) {
+      src_block_addr =
+          src_temp_n_addr + k * srcStride * 16 * sizeof(L0C_element);
+      dst_block_addr = dst_temp_n_addr + k * 16 * sizeof(dst_element);
     }
+  }
 }
 ```
 

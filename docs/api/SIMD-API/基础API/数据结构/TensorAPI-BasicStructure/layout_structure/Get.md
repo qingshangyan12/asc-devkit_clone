@@ -19,10 +19,10 @@ Get提供两类能力：
 
 ```cpp
 template <size_t... Is, typename Tuple>
-__aicore__ inline constexpr auto Get(Tuple&& t)
+__aicore__ inline constexpr auto Get(Tuple &&t)
 
-template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Get(const Layout<Shape, Stride>& layout)
+    template <size_t... Is, typename Shape, typename Stride>
+    __aicore__ inline constexpr auto Get(const Layout<Shape, Stride> &layout)
 ```
 
 ## 参数说明
@@ -64,7 +64,8 @@ auto v0 = Get<0>(t);
 auto v1 = Get<1, 0>(t);
 // v1 = 2
 
-auto layout = MakeLayout(MakeShape(MakeShape(10, 20), MakeShape(20, 30)), MakeStride(MakeStride(10, 200), MakeStride(1, 4000)));
+auto layout = MakeLayout(MakeShape(MakeShape(10, 20), MakeShape(20, 30)),
+                         MakeStride(MakeStride(10, 200), MakeStride(1, 4000)));
 
 // 提取第 1 维度
 auto subLayout = Get<1>(layout);

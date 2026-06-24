@@ -23,40 +23,96 @@ only_index接口：表示只返回最值索引，返回结果存储顺序为[ind
 - 前n个数据计算
 
     ```cpp
-    __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void
+asc_repeat_reduce_max_index_value(__ubuf__ half *dst, __ubuf__ half *src,
+                                  uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_index_value(__ubuf__ float *dst,
+                                                  __ubuf__ float *src,
+                                                  uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_value_index(__ubuf__ half *dst,
+                                                  __ubuf__ half *src,
+                                                  uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_value_index(__ubuf__ float *dst,
+                                                  __ubuf__ float *src,
+                                                  uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_value(__ubuf__ half *dst,
+                                                 __ubuf__ half *src,
+                                                 uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_value(__ubuf__ float *dst,
+                                                 __ubuf__ float *src,
+                                                 uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_index(__ubuf__ half *dst,
+                                                 __ubuf__ half *src,
+                                                 uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_index(__ubuf__ float *dst,
+                                                 __ubuf__ float *src,
+                                                 uint32_t count)
     ```
 
 - 高维切分计算
 
     ```cpp
-    __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_index_value(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_value_index(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_only_value(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
-    __aicore__ inline void asc_repeat_reduce_max_only_index(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t dst_repeat_stride, uint16_t src_block_stride, uint16_t src_repeat_stride)
+__aicore__ inline void
+asc_repeat_reduce_max_index_value(__ubuf__ half *dst, __ubuf__ half *src,
+                                  uint8_t repeat, uint16_t dst_repeat_stride,
+                                  uint16_t src_block_stride,
+                                  uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_index_value(
+        __ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_value_index(
+        __ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_value_index(
+        __ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_only_value(
+        __ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_only_value(
+        __ubuf__ float *dst, __ubuf__ float *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_only_index(
+        __ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+        uint16_t dst_repeat_stride, uint16_t src_block_stride,
+        uint16_t src_repeat_stride) __aicore__
+    inline void asc_repeat_reduce_max_only_index(__ubuf__ float *dst,
+                                                 __ubuf__ float *src,
+                                                 uint8_t repeat,
+                                                 uint16_t dst_repeat_stride,
+                                                 uint16_t src_block_stride,
+                                                 uint16_t src_repeat_stride)
     ```
 
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_repeat_reduce_max_index_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_index_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_value_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_value_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ half* dst, __ubuf__ half* src, uint32_t count)
-    __aicore__ inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ float* dst, __ubuf__ float* src, uint32_t count)
+__aicore__ inline void
+asc_repeat_reduce_max_index_value_sync(__ubuf__ half *dst, __ubuf__ half *src,
+                                       uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_index_value_sync(
+        __ubuf__ float *dst, __ubuf__ float *src, uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_value_index_sync(
+        __ubuf__ half *dst, __ubuf__ half *src, uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_value_index_sync(
+        __ubuf__ float *dst, __ubuf__ float *src, uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ half *dst,
+                                                      __ubuf__ half *src,
+                                                      uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_value_sync(__ubuf__ float *dst,
+                                                      __ubuf__ float *src,
+                                                      uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ half *dst,
+                                                      __ubuf__ half *src,
+                                                      uint32_t count) __aicore__
+    inline void asc_repeat_reduce_max_only_index_sync(__ubuf__ float *dst,
+                                                      __ubuf__ float *src,
+                                                      uint32_t count)
     ```
 
 ## 参数说明
@@ -103,7 +159,8 @@ uint8_t repeat = 2;
 uint16_t dst_repeat_stride = 1;
 uint16_t src_block_stride = 1;
 uint16_t src_repeat_stride = 8;
-asc_repeat_reduce_max_value_index(dst, src, repeat, dst_repeat_stride, src_block_stride, src_repeat_stride);
+asc_repeat_reduce_max_value_index(dst, src, repeat, dst_repeat_stride,
+                                  src_block_stride, src_repeat_stride);
 ```
 
 结果示例：

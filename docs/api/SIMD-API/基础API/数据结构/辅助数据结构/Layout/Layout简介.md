@@ -124,19 +124,21 @@ Layout包含两个核心组成部分：
 ```cpp
 template <typename ShapeType, typename StrideType>
 struct Layout : private Std::tuple<ShapeType, StrideType> {
-    __aicore__ inline constexpr Layout(const ShapeType& shape  = {}, const StrideType& stride = {}) : Std::tuple<ShapeType, StrideType>(shape, stride) {}
+  __aicore__ inline constexpr Layout(const ShapeType &shape = {},
+                                     const StrideType &stride = {})
+      : Std::tuple<ShapeType, StrideType>(shape, stride) {}
 
-    __aicore__ inline constexpr decltype(auto) layout() {}
-    __aicore__ inline constexpr decltype(auto) layout() const {}
-    
-    __aicore__ inline constexpr decltype(auto) GetShape() {}   
-    __aicore__ inline constexpr decltype(auto) GetShape() const {}
-    
-    __aicore__ inline constexpr decltype(auto) GetStride() {}    
-    __aicore__ inline constexpr decltype(auto) GetStride() const {}
-    
-    template <typename CoordType>
-    __aicore__ inline constexpr auto operator()(const CoordType& coord) const {}
+  __aicore__ inline constexpr decltype(auto) layout() {}
+  __aicore__ inline constexpr decltype(auto) layout() const {}
+
+  __aicore__ inline constexpr decltype(auto) GetShape() {}
+  __aicore__ inline constexpr decltype(auto) GetShape() const {}
+
+  __aicore__ inline constexpr decltype(auto) GetStride() {}
+  __aicore__ inline constexpr decltype(auto) GetStride() const {}
+
+  template <typename CoordType>
+  __aicore__ inline constexpr auto operator()(const CoordType &coord) const {}
 }
 ```
 

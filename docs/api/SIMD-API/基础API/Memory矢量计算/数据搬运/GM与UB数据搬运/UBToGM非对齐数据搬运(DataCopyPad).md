@@ -32,8 +32,10 @@
 - 不支持配置设置数据搬运模式mode
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+template <typename T>
+__aicore__ inline void DataCopyPad(const GlobalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams)
     ```
 
 <cann-filter npu-type="950">
@@ -41,9 +43,11 @@
 - 支持配置设置数据搬运模式mode（仅Ascend 950PR/Ascend 950DT支持）
 
     ```cpp
-    // 该函数原型仅支持Ascend 950PR/Ascend 950DT
-    template <typename T, PaddingMode mode = PaddingMode::Normal>
-    __aicore__ inline void DataCopyPad(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams)
+// 该函数原型仅支持Ascend 950PR/Ascend 950DT
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline void DataCopyPad(const GlobalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams)
     ```
 
 </cann-filter>

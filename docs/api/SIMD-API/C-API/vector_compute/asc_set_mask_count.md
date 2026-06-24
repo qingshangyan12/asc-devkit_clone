@@ -38,6 +38,6 @@ PIPE_S
 ```cpp
 asc_set_mask_count();
 asc_set_vector_mask(0, static_cast<uint64_t>(64)); // 设置前64个元素参与计算
-... // 计算操作
-asc_set_mask_norm();    // 恢复为Normal模式。此步骤可根据需求，按需设置。
+...                                                // 计算操作
+    asc_set_mask_norm(); // 恢复为Normal模式。此步骤可根据需求，按需设置。
 ```

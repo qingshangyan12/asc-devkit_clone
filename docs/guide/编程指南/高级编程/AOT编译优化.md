@@ -21,32 +21,35 @@ AOT的核心思想是：**将特定Tiling配置以编译期常量的形式固化
 - 根据算子的典型Shape和输入，编写Tiling常量模板定义
 
   ```cpp
-  struct TilingData;
-  template <typename T>
-  struct ConstTilingHolder { // 持有特定Tiling的常量结构体
-      static constexpr const uint8_t bytes[] = {0, 1, 2, 3, ...};  // 常量特化Tiling值（数组）
-      static constexpr const T value = convert_from_bytes<T>(bytes); // 编译期转为常量结构体
-  };
-  template <typename T>
-  struct RuntimeTilingHolder { // 用于区分常量Tiling的运行时桩结构体
-      static constexpr const uint8_t bytes[sizeof(T)] = {};  // 数据桩实现，该值无意义
-      static constexpr const T value = convert_from_bytes<T>(bytes);
-  };
+struct TilingData;
+template <typename T> struct ConstTilingHolder { // 持有特定Tiling的常量结构体
+  static constexpr const uint8_t bytes[] = {0, 1, 2, 3,
+                                            ...}; // 常量特化Tiling值（数组）
+  static constexpr const T value =
+      convert_from_bytes<T>(bytes); // 编译期转为常量结构体
+};
+template <typename T>
+struct RuntimeTilingHolder { // 用于区分常量Tiling的运行时桩结构体
+  static constexpr const uint8_t bytes[sizeof(T)] =
+      {}; // 数据桩实现，该值无意义
+  static constexpr const T value = convert_from_bytes<T>(bytes);
+};
   ```
 
 - Kernel函数实现，常量Tiling与运行时Tiling变量合一的代码实现
 
   ```cpp
-  // 对外提供模板类型，用于Host调用时不同场景给定常量Tiling值或者运行时桩
-  template <typename TH>
-  __global__ __vector__ void add(__gm__ uint8_t* x1, __gm__ uint8_t* x2, TilingData tiling) {
-      const TilingData *td;
-      if constexpr(!std::is_same_v<TH, RuntimeTilingHolder<TilingData>>) {
-          td = &TH::value; // 如果调用给定的是常量Tiling值，则直接获取常量值向下传递
-      } else {
-          td = &tiling;  // 如果拿到的是运行时桩，则从参数获取
-      }
+// 对外提供模板类型，用于Host调用时不同场景给定常量Tiling值或者运行时桩
+template <typename TH>
+__global__ __vector__ void add(__gm__ uint8_t *x1, __gm__ uint8_t *x2,
+                               TilingData tiling) {
+  const TilingData *td;
+  if constexpr (!std::is_same_v<TH, RuntimeTilingHolder<TilingData>>) {
+    td = &TH::value; // 如果调用给定的是常量Tiling值，则直接获取常量值向下传递
+  } else {
+    td = &tiling; // 如果拿到的是运行时桩，则从参数获取
   }
+}
   ```
 
 ### Host在运行时选择特定Kernel
@@ -55,12 +58,15 @@ AOT的核心思想是：**将特定Tiling配置以编译期常量的形式固化
 
 ```cpp
 // 根据运行时计算的Tiling结果，匹配常量Tiling
-if (memcmp(&tiling_data, ConstTilingHolder<TilingData>::bytes, sizeof(tiling_data)) == 0) {
-    // 匹配上后，调用常量Tiling的Kernel实现
-    add<ConstTilingHolder<TilingData>><<<1, nullptr, stream>>>(x1, x2, tiling_data);
+if (memcmp(&tiling_data, ConstTilingHolder<TilingData>::bytes,
+           sizeof(tiling_data)) == 0) {
+  // 匹配上后，调用常量Tiling的Kernel实现
+  add<ConstTilingHolder<TilingData>>
+      <<<1, nullptr, stream>>>(x1, x2, tiling_data);
 } else {
-    // 最终常量Tiling都无法匹配的，使用运行时Tiling结果进行兜底
-    add<RuntimeTilingHolder<TilingData>><<<1, nullptr, stream>>>(x1, x2, tiling_data);
+  // 最终常量Tiling都无法匹配的，使用运行时Tiling结果进行兜底
+  add<RuntimeTilingHolder<TilingData>>
+      <<<1, nullptr, stream>>>(x1, x2, tiling_data);
 }
 ```
 

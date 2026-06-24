@@ -113,12 +113,11 @@ __aicore__ inline void InitSocState()
 ## 调用示例
 
 ```cpp
-__global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z)
-{
-    // 静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
-    AscendC::InitSocState();
-    KernelAdd op;
-    op.Init(x, y, z);
-    op.Process();
+__global__ __aicore__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z) {
+  // 静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
+  AscendC::InitSocState();
+  KernelAdd op;
+  op.Init(x, y, z);
+  op.Process();
 }
 ```

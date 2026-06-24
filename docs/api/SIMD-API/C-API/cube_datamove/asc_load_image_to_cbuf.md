@@ -16,15 +16,31 @@
 - 常规搬运
 
     ```cpp
-    __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
-    __aicore__ inline void asc_load_image_to_cbuf(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
+__aicore__ inline void asc_load_image_to_cbuf(
+    __cbuf__ int8_t *dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size,
+    uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size,
+    uint16_t right_pad_size) __aicore__
+    inline void asc_load_image_to_cbuf(
+        __cbuf__ half *dst, uint16_t hor_size, uint16_t ver_size,
+        uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size,
+        uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size,
+        uint16_t right_pad_size)
     ```
 
 - 同步搬运
 
     ```cpp
-    __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ int8_t* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
-    __aicore__ inline void asc_load_image_to_cbuf_sync(__cbuf__ half* dst, uint16_t hor_size, uint16_t ver_size, uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size, uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size, uint16_t right_pad_size)
+__aicore__ inline void asc_load_image_to_cbuf_sync(
+    __cbuf__ int8_t *dst, uint16_t hor_size, uint16_t ver_size,
+    uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size,
+    uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size,
+    uint16_t right_pad_size) __aicore__
+    inline void asc_load_image_to_cbuf_sync(
+        __cbuf__ half *dst, uint16_t hor_size, uint16_t ver_size,
+        uint16_t hor_start_pos, uint16_t ver_start_pos, uint16_t src_hor_size,
+        uint8_t top_pad_size, uint8_t bot_pad_size, uint16_t left_pad_size,
+        uint16_t right_pad_size)
     ```
 
 ## 参数说明
@@ -58,7 +74,7 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-constexpr uint64_t total_length = 128;    // total_length指参与搬运的数据总长度
+constexpr uint64_t total_length = 128; // total_length指参与搬运的数据总长度
 __cbuf__ half dst[total_length];
 // 加载图片时的高度与宽度均为1，起始地址为(0,0)，源图片水平宽度为1，不做padding
 asc_load_image_to_cbuf(dst, 1, 1, 0, 0, 1, 0, 0, 0, 0);

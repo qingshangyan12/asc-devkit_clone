@@ -33,7 +33,9 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParamsV2& loadDataParam)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const LoadData2DParamsV2 &loadDataParam)
 ```
 
 ## 参数说明

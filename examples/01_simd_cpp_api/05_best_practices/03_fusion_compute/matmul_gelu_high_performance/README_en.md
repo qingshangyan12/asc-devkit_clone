@@ -121,32 +121,31 @@ The Matmul part of this example uses the same optimization methods as the [Matmu
 **A2/A3 Architecture**: Uses MemBase method (vector basic API + PipeBarrier), no additional intermediate buffers needed, directly reuses output buffer:
 
 ```cpp
-__aicore__ inline void GeluMemBaseCompute(
-    const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    AscendC::Mul(yLocal, xLocal, xLocal, n);        // x²
-    AscendC::PipeBarrier<PIPE_V>();
-    AscendC::Mul(yLocal, yLocal, xLocal, n);        // x³
-    ……
+__aicore__ inline void
+GeluMemBaseCompute(const AscendC::LocalTensor<float> &xLocal,
+                   const AscendC::LocalTensor<float> &yLocal, uint32_t n) {
+  AscendC::Mul(yLocal, xLocal, xLocal, n); // x²
+  AscendC::PipeBarrier<PIPE_V>();
+  AscendC::Mul(yLocal, yLocal, xLocal, n); // x³
+  ……
 }
 ```
 
 **Ascend 950PR Architecture**: Uses RegBase method (VF function), intermediate computation completed within registers, no additional UB buffers needed, reducing data exchange between UB and Reg:
 
 ```cpp
-__simd_vf__ inline void GeluVf(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
+__simd_vf__ inline void GeluVf(__ubuf__ float *xAddr, __ubuf__ float *yAddr,
+                               uint32_t n, uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
 
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);       // x²
-        ……
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask); // x²
+    …… AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 
@@ -157,13 +156,14 @@ The following focuses on the AIC↔AIV CV fusion mechanism.
 This example uses `__global__ __mix__(1, 2)` to declare the kernel function, meaning each logical core consists of 1 AIC and 2 AIVs. The AIC side is responsible for Matmul computation, the AIV side is responsible for GELU vector computation, and both execute in pipeline parallelism within the same AI Core at (baseM × baseN) block granularity.
 
 ```cpp
-__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
-{
-    AscendC::InitSocState();
-    KernelMmadVector<...> op;
-    op.Init(xMatrix, yMatrix, zMatrix);
-    op.Process();
-    AscendC::PipeBarrier<PIPE_ALL>();
+__global__ __mix__(1, 2) void mmad_vector_custom(__gm__ uint8_t *xMatrix,
+                                                 __gm__ uint8_t *yMatrix,
+                                                 __gm__ uint8_t *zMatrix) {
+  AscendC::InitSocState();
+  KernelMmadVector<...> op;
+  op.Init(xMatrix, yMatrix, zMatrix);
+  op.Process();
+  AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
@@ -171,12 +171,12 @@ In `Process()`, `ASCEND_IS_AIC` and `ASCEND_IS_AIV` macros distinguish AIC and A
 
 ```cpp
 if ASCEND_IS_AIC {
-    // AIC side: Buffer allocation + computation loop + Fixpipe transfer out
-    ProcessLoopAic(...);
+  // AIC side: Buffer allocation + computation loop + Fixpipe transfer out
+  ProcessLoopAic(...);
 }
 if ASCEND_IS_AIV {
-    // AIV side: GELU vector computation + transfer out to GM
-    ProcessLoopAiv();
+  // AIV side: GELU vector computation + transfer out to GM
+  ProcessLoopAiv();
 }
 ```
 
@@ -186,10 +186,10 @@ After the AIC side completes Fixpipe output of one (baseM × baseN) sub-block, i
 
 ```cpp
 // AIC side CopyOutAic():
-AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // Notify AIV data ready
+AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8); // Notify AIV data ready
 
 // AIV side GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // Wait for AIC side Fixpipe completion
+AscendC::CrossCoreWaitFlag(0x8); // Wait for AIC side Fixpipe completion
 ```
 
 #### 3. Multi-Core Splitting in `__mix__(1,2)` Mode
@@ -199,9 +199,10 @@ In `__mix__(1,2)` mode, `GetBlockIdx()` is independently numbered on the AIC sid
 ```cpp
 uint32_t logicCoreId;
 if ASCEND_IS_AIC {
-    logicCoreId = AscendC::GetBlockIdx();
+  logicCoreId = AscendC::GetBlockIdx();
 } else {
-    logicCoreId = AscendC::GetBlockIdx() / 2;  // __mix__(1,2): Each logical core corresponds to 2 AIVs
+  logicCoreId = AscendC::GetBlockIdx() /
+                2; // __mix__(1,2): Each logical core corresponds to 2 AIVs
 }
 uint32_t mIterIdx = logicCoreId % mIter;
 uint32_t nIterIdx = logicCoreId / mIter;
@@ -249,7 +250,8 @@ fixpipeParams.nSize = curN;
 fixpipeParams.mSize = curM;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal,
+                                                 fixpipeParams);
 
 // Ascend 950PR architecture
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
@@ -257,7 +259,8 @@ fixpipeParams.mSize = curM;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
-AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal, fixpipeParams);
+AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_GM>(cGM[...], cLocal,
+                                                 fixpipeParams);
 ```
 
 **AIV Side Implementation**
@@ -268,7 +271,8 @@ In `__mix__(1,2)` mode, each logical core has 2 AIVs. The M rows of data output 
 
 ```cpp
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
-uint32_t gmOffset = mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
+uint32_t gmOffset =
+    mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * baseM / 2 * N;
 
 // Step 1: DataCopy GM → xUB
 AscendC::DataCopyPad<float>(xUB, cGM[gmOffset], copyInParams, padParams);
@@ -348,7 +352,7 @@ fixpipeParams.mSize = AscendC::DivCeil(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
-fixpipeParams.dualDstCtl = 0b01;  // Split by M dimension to 2 AIV UBs
+fixpipeParams.dualDstCtl = 0b01; // Split by M dimension to 2 AIV UBs
 AscendC::Fixpipe<float, float, CFG_ROW_MAJOR_UB>(xUB, cLocal, fixpipeParams);
 ```
 
@@ -365,7 +369,9 @@ GeluRegBaseCompute(xUB, geluOutUB, computeLen);
 // DataCopy: geluOutUB → GM
 uint32_t localSubIdx = AscendC::GetSubBlockIdx() % 2;
 uint32_t offset = baseM / 2 * N;
-AscendC::DataCopyPad<float>(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset], geluOutUB, copyParams);
+AscendC::DataCopyPad<float>(
+    cGM[mBlockIdx * baseM * N + nBlockIdx * baseN + localSubIdx * offset],
+    geluOutUB, copyParams);
 ```
 
 **Performance Data**

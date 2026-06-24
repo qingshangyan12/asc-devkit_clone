@@ -45,8 +45,11 @@ $$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, typename U = DefaultType, RegLayout layout = RegLayout::ZERO, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S, typename V>
-__simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& mask)
+template <typename T = DefaultType, typename U = DefaultType,
+          RegLayout layout = RegLayout::ZERO,
+          MaskMergeMode mode = MaskMergeMode::ZEROING, typename S, typename V>
+__simd_callee__ inline void ExpSub(S &dstReg, V &srcReg0, V &srcReg1,
+                                   MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -100,19 +103,23 @@ __simd_callee__ inline void ExpSub(S& dstReg, V& srcReg0, V& srcReg1, MaskReg& m
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T, typename U>
-static __simd_vf__ inline void ExpSubVF(__ubuf__ T* dstAddr, __ubuf__ U* src0Addr, __ubuf__ U* src1Addr, uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<U> srcReg0;
-    AscendC::Reg::RegTensor<U> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<U>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * srcRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * srcRepeatSize);
-        AscendC::Reg::ExpSub<T, U, AscendC::Reg::RegLayout::ZERO, AscendC::Reg::MaskMergeMode::ZEROING>(dstReg, srcReg0, srcReg1, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
-    }
+template <typename T, typename U>
+static __simd_vf__ inline void
+ExpSubVF(__ubuf__ T *dstAddr, __ubuf__ U *src0Addr, __ubuf__ U *src1Addr,
+         uint32_t count, uint32_t srcRepeatSize, uint32_t dstRepeatSize,
+         uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<U> srcReg0;
+  AscendC::Reg::RegTensor<U> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<U>(count);
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * srcRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * srcRepeatSize);
+    AscendC::Reg::ExpSub<T, U, AscendC::Reg::RegLayout::ZERO,
+                         AscendC::Reg::MaskMergeMode::ZEROING>(dstReg, srcReg0,
+                                                               srcReg1, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * dstRepeatSize, dstReg, mask);
+  }
 }
 ```

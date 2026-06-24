@@ -17,15 +17,26 @@ $$
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int8_t src, int8_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint8_t src, uint8_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int16_t src, int16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint16_t src, uint16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_half src, half value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_bfloat16_t src, bfloat16_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_int32_t src, int32_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_uint32_t src, uint32_t value, vector_bool mask)
-__simd_callee__ inline void asc_eq_scalar(vector_bool& dst, vector_float src, float value, vector_bool mask)
+__simd_callee__ inline void asc_eq_scalar(vector_bool &dst, vector_int8_t src,
+                                          int8_t value,
+                                          vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_uint8_t src,
+                              uint8_t value, vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_int16_t src,
+                              int16_t value, vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_uint16_t src,
+                              uint16_t value, vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_half src, half value,
+                              vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_bfloat16_t src,
+                              bfloat16_t value,
+                              vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_int32_t src,
+                              int32_t value, vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_uint32_t src,
+                              uint32_t value, vector_bool mask) __simd_callee__
+    inline void asc_eq_scalar(vector_bool &dst, vector_float src, float value,
+                              vector_bool mask)
 ```
 
 ## 参数说明
@@ -58,6 +69,6 @@ vector_half src;
 vector_bool dst;
 half value = 0.0;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src, src_addr);  // src_addr是外部输入的UB内存空间地址
+asc_loadalign(src, src_addr); // src_addr是外部输入的UB内存空间地址
 asc_eq_scalar(dst, src, value, mask);
 ```

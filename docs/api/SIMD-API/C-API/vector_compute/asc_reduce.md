@@ -16,24 +16,36 @@
 - 前n个数据计算
 
     ```c++
-    __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-    __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
+__aicore__ inline void
+asc_reduce(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0,
+           __ubuf__ uint16_t *src1, uint32_t count) __aicore__
+    inline void asc_reduce(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src0,
+                           __ubuf__ uint32_t *src1, uint32_t count)
     ```
 
 - 高维切分计算
 
   ```c++
-  __aicore__ inline void asc_reduce(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1,
-    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
-  __aicore__ inline void asc_reduce(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1,
-    uint16_t repeat, uint8_t src0_block_stride, uint8_t pattern_mode, uint16_t src0_repeat_stride, uint8_t src1_repeat_stride)
+__aicore__ inline void
+asc_reduce(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0,
+           __ubuf__ uint16_t *src1, uint16_t repeat, uint8_t src0_block_stride,
+           uint8_t pattern_mode, uint16_t src0_repeat_stride,
+           uint8_t src1_repeat_stride) __aicore__
+    inline void asc_reduce(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src0,
+                           __ubuf__ uint32_t *src1, uint16_t repeat,
+                           uint8_t src0_block_stride, uint8_t pattern_mode,
+                           uint16_t src0_repeat_stride,
+                           uint8_t src1_repeat_stride)
   ```
 
 - 同步计算
 
   ```c++
-  __aicore__ inline void asc_reduce_sync(__ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count)
-  __aicore__ inline void asc_reduce_sync(__ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint32_t count)
+__aicore__ inline void
+asc_reduce_sync(__ubuf__ uint16_t *dst, __ubuf__ uint16_t *src0,
+                __ubuf__ uint16_t *src1, uint32_t count) __aicore__
+    inline void asc_reduce_sync(__ubuf__ uint32_t *dst, __ubuf__ uint32_t *src0,
+                                __ubuf__ uint32_t *src1, uint32_t count)
   ```
 
 ## 参数说明
@@ -69,10 +81,10 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-//total_length指参与计算的数据总长度
+// total_length指参与计算的数据总长度
 constexpr uint64_t total_length = 128;
 __ubuf__ uint16_t src0[total_length];
-__ubuf__ uint16_t src1[total_length/16];
+__ubuf__ uint16_t src1[total_length / 16];
 __ubuf__ uint16_t dst[total_length];
 asc_reduce(dst, src0, src1, total_length);
 ```

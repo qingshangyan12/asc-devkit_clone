@@ -49,33 +49,33 @@
       - 创建Matmul对象并初始化。
         在#include "lib/matmul_intf.h"前配置ASCENDC_CUBE_ONLY宏，创建纯Cube模式的Matmul对象
           ```cpp
-          #define ASCENDC_CUBE_ONLY
-          #include "lib/matmul_intf.h"
+#define ASCENDC_CUBE_ONLY
+#include "lib/matmul_intf.h"
           ```
       - 完成Matmul计算。
       - 设置核间同步。
         ```cpp
-        if ASCEND_IS_AIC {
-          AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
-        }
+if ASCEND_IS_AIC {
+  AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(3);
+}
         ```
     - AIV侧具体步骤：
       - 创建LeakyRelu对象并初始化。
       - 等待核间同步。
         ```cpp
-        if ASCEND_IS_AIV {
-          AscendC::CrossCoreWaitFlag(3);
-        }
+if ASCEND_IS_AIV {
+  AscendC::CrossCoreWaitFlag(3);
+}
         ```
       - 完成LeakyRelu计算。
 
   - Tiling关键步骤
     - 设置自定义MatmulConfig参数，将Kernel侧配置的参数如scheduleType等，同步到Tiling侧。
       ```cpp
-      tilingApi.SetOrgShape(M, N, K);
-      tilingApi.SetShape(M, N, K);
-      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
-      tilingApi.SetFixSplit(baseM, baseN, -1);
+tilingApi.SetOrgShape(M, N, K);
+tilingApi.SetShape(M, N, K);
+tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
   - 调用实现

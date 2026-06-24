@@ -120,16 +120,17 @@ right = x + (y + z)   # 先加 y 和 z，再与 x 相加
 #### 1.3.1 核内同步实现
 
 ```cpp
-// 整个原子累加在同一个核内执行，控制5个指令的执行顺序为"①→②→③→④→⑤" 
-①向GM搬运数据data0;    // 数据搬运，覆盖GM原有随机值，期望GM数据为data0 
-核内同步 
-②SetAtomicAdd();         // 开启原子累加，后续从UB/L0C/L1到GM的搬运均执行原子累加 
-// 指令②与③间无需插入同步 
-③向GM搬运data1;    // 开启原子累加后的数据搬运，期望GM数据为data0 + data1 
-核内同步 
-④向GM搬运data2;    // 开启原子累加后的数据搬运，期望GM数据为data0 + data1 + data2 
-核内同步 
-⑤向GM搬运data3;    // 开启原子累加后的数据搬运，期望GM数据为data0 + data1 + data2 + data3
+// 整个原子累加在同一个核内执行，控制5个指令的执行顺序为"①→②→③→④→⑤"
+①向GM搬运数据data0; // 数据搬运，覆盖GM原有随机值，期望GM数据为data0
+核内同步
+②SetAtomicAdd(); // 开启原子累加，后续从UB/L0C/L1到GM的搬运均执行原子累加
+// 指令②与③间无需插入同步
+③向GM搬运data1; // 开启原子累加后的数据搬运，期望GM数据为data0 + data1
+核内同步
+④向GM搬运data2; // 开启原子累加后的数据搬运，期望GM数据为data0 + data1 + data2
+核内同步
+⑤向GM搬运data3; // 开启原子累加后的数据搬运，期望GM数据为data0 + data1 + data2 +
+                // data3
 ```
 搬运指令和开启原子操作的指令流水类型如下表所示，当上述指令在同一个核内执行时，开发者按需插入[单流水同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0271.html)或者[多流水同步](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0270.html)，可参考样例中SCENARIO_NUM=1的分支。
 <table border="1" style="text-align: left;">
@@ -156,24 +157,24 @@ right = x + (y + z)   # 先加 y 和 z，再与 x 相加
 如下伪代码所示，当上述指令都在不同核中执行时，需要将上述的核内同步替换为核间同步。
 
 ```cpp
-// 整个原子累加在4个不同核中执行,控制4个核执行的顺序为"核0→核1→核2→核3" 
-if (GetBlockIdx == 0) { 
-   向GM搬运数据data0; 
-   核间同步 
-} else if (GetBlockIdx == 1) { 
-   核间同步     
-   SetAtomicAdd();          
-   向GM搬运data1; 
-   核间同步    
-} else if (GetBlockIdx == 2) { 
-   核间同步 
-   SetAtomicAdd();          
-   向GM搬运data2;   
-   核间同步  
-} else if (GetBlockIdx == 3) { 
-   核间同步 
-   SetAtomicAdd();          
-   向GM搬运data3;    
+// 整个原子累加在4个不同核中执行,控制4个核执行的顺序为"核0→核1→核2→核3"
+if (GetBlockIdx == 0) {
+  向GM搬运数据data0;
+  核间同步
+} else if (GetBlockIdx == 1) {
+  核间同步
+  SetAtomicAdd();
+  向GM搬运data1;
+  核间同步
+} else if (GetBlockIdx == 2) {
+  核间同步
+  SetAtomicAdd();
+  向GM搬运data2;
+  核间同步
+} else if (GetBlockIdx == 3) {
+  核间同步
+  SetAtomicAdd();
+  向GM搬运data3;
 }
 ```
 由于当前未提供用于控制不同核之间执行顺序的硬件同步接口，因此确定性计算场景下的核间同步需通过软件方式实现。针对纯 Vector 样例、纯 Cube 样例及 Mix（同时包含 Vector 与 Cube 计算）样例三种场景，所采用的软件同步方案存在差异，具体如下表所示。

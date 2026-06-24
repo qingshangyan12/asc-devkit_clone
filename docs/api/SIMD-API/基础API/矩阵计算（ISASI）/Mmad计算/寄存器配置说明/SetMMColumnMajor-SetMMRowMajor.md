@@ -19,8 +19,10 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void SetMMColumnMajor() // 代表CUBE将首先通过M方向，然后通过N方向生成结果
-__aicore__ inline void SetMMRowMajor()   // 代表CUBE将首先通过N方向，然后通过M方向产生结果
+__aicore__ inline void
+SetMMColumnMajor() // 代表CUBE将首先通过M方向，然后通过N方向生成结果
+    __aicore__
+    inline void SetMMRowMajor() // 代表CUBE将首先通过N方向，然后通过M方向产生结果
 ```
 
 ## 参数说明

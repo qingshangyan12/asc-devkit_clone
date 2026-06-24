@@ -23,7 +23,8 @@
 以如下CountBitsCntSameAsSignBit调用为例：
 
 ```cpp
-int64_t valueOut = AscendC::CountBitsCntSameAsSignBit(0x0100000000000020ULL); // 返回6
+int64_t valueOut =
+    AscendC::CountBitsCntSameAsSignBit(0x0100000000000020ULL); // 返回6
 ```
 
 其计算结果如下图所示：
@@ -58,10 +59,10 @@ __aicore__ inline int64_t CountBitsCntSameAsSignBit(int64_t valueIn)
 
 ```cpp
 int64_t valueOut;
-int64_t valueIn = 0;                                    // 二进制表示全为0
+int64_t valueIn = 0; // 二进制表示全为0
 valueOut = AscendC::CountBitsCntSameAsSignBit(valueIn); // 返回-1
 
-valueIn = 0xFFFFFFFFFFFFFFFFLL;                         // -1,二进制表示全为1
+valueIn = 0xFFFFFFFFFFFFFFFFLL; // -1,二进制表示全为1
 valueOut = AscendC::CountBitsCntSameAsSignBit(valueIn); // 返回-1
 
 valueIn = 0x7FFFFFFFFFFFFFFFLL;                         // 正数最大值

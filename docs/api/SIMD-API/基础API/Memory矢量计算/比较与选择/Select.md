@@ -137,15 +137,20 @@ Kirin 9030，支持模式0、1、2。
     - Select模式1
 
         ```cpp
-        template <typename T, typename U>
-        __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint32_t count)
+template <typename T, typename U>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, T src1, SELMODE selMode, uint32_t count)
         ```
 
     - Select模式0和Select模式2
 
         ```cpp
-        template <typename T, typename U>
-        __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint32_t count)
+template <typename T, typename U>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, const LocalTensor<T> &src1, SELMODE selMode,
+       uint32_t count)
         ```
 
 - tensor高维切分计算
@@ -153,44 +158,64 @@ Kirin 9030，支持模式0、1、2。
         - mask逐bit模式
 
             ```cpp
-            template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask[], uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, T src1, SELMODE selMode, uint64_t mask[],
+       uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, T src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, T src1, SELMODE selMode, uint64_t mask,
+       uint8_t repeatTime, const BinaryRepeatParams &repeatParams)
             ```
 
         - 不传入mask参数（需要和[SetVectorMask](../掩码操作/SetVectorMask.md)、[SetCmpMask\(ISASI\)](SetCmpMask(ISASI).md)配合使用）
 
             ```cpp
-            template <typename T, typename U>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U>
+__aicore__ inline void Select(const LocalTensor<T> &dst,
+                              const LocalTensor<U> &selMask,
+                              const LocalTensor<T> &src0, uint8_t repeatTime,
+                              const BinaryRepeatParams &repeatParams)
             ```
 
     - Select模式0和Select模式2
         - mask逐bit模式
 
             ```cpp
-            template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask[],  uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, const LocalTensor<T> &src1, SELMODE selMode,
+       uint64_t mask[], uint8_t repeatTime,
+       const BinaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, typename U, bool isSetMask = true>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<U>& selMask, const LocalTensor<T>& src0, const LocalTensor<T>& src1, SELMODE selMode, uint64_t mask, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, typename U, bool isSetMask = true>
+__aicore__ inline void
+Select(const LocalTensor<T> &dst, const LocalTensor<U> &selMask,
+       const LocalTensor<T> &src0, const LocalTensor<T> &src1, SELMODE selMode,
+       uint64_t mask, uint8_t repeatTime,
+       const BinaryRepeatParams &repeatParams)
             ```
 
         - 不传入mask参数（需要和[SetVectorMask](../掩码操作/SetVectorMask.md)、[SetCmpMask\(ISASI\)](SetCmpMask(ISASI).md)配合使用）
 
             ```cpp
-            template <typename T, SELMODE selMode>
-            __aicore__ inline void Select(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, SELMODE selMode>
+__aicore__ inline void Select(const LocalTensor<T> &dst,
+                              const LocalTensor<T> &src0,
+                              const LocalTensor<T> &src1, uint8_t repeatTime,
+                              const BinaryRepeatParams &repeatParams)
             ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -272,50 +297,56 @@ Kirin 9030，支持模式0、1、2。
 - Select-tensor高维切分计算样例（模式2）
 
     ```cpp
-    uint64_t mask = 256/sizeof(float);
-    int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
-    // repeat = 4, 64 elements one repeat, 256 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE, mask, repeat, repeatParams);
+uint64_t mask = 256 / sizeof(float);
+int repeat = 4;
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
+// repeat = 4, 64 elements one repeat, 256 elements total
+// dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+// repeat dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+AscendC::Select(dstLocal, maskLocal, src0Local, src1Local,
+                AscendC::SELMODE::VSEL_TENSOR_TENSOR_MODE, mask, repeat,
+                repeatParams);
     ```
 
 - Select-tensor前n个数据计算样例（模式1）
 
     ```cpp
-    AscendC::Select(dstLocal, maskLocal, src0Local, static_cast<float>(0), AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
+AscendC::Select(dstLocal, maskLocal, src0Local, static_cast<float>(0),
+                AscendC::SELMODE::VSEL_TENSOR_SCALAR_MODE, dataSize);
     ```
 
 - Select-tensor前n个数据计算样例（模式0，每轮repeat迭代中，maskLocal只有前64bit生效）
 
     ```cpp
-    // float类型
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, dataSize);
+// float类型
+AscendC::Select(dstLocal, maskLocal, src0Local, src1Local,
+                AscendC::SELMODE::VSEL_CMPMASK_SPR, dataSize);
     ```
 
 - Select-tensor高维切分计算样例-mask连续模式（模式0，每轮repeat迭代中，maskLocal只有前64bit生效）
 
     ```cpp
-    uint64_t mask = 256/sizeof(float);
-    int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
-    // repeat = 4, 64 elements one repeat, 256 elements total
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
+uint64_t mask = 256 / sizeof(float);
+int repeat = 4;
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
+// repeat = 4, 64 elements one repeat, 256 elements total
+// dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+// repeat dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats
+AscendC::Select(dstLocal, maskLocal, src0Local, src1Local,
+                AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
     ```
 
 - Select-tensor高维切分计算样例-mask逐bit模式（每轮repeat迭代中，maskLocal只有前64bit生效）
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, 0};
-    int repeat = 4;
-    AscendC::BinaryRepeatParams repeatParams = { 1, 1, 1, 8, 8, 8 };
-    // repeat = 4, 64 elements one repeat, 256 elements total
-    // srcBlkStride, = 1, no gap between blocks in one repeat
-    // dstRepStride, srcRepStride = 8, no gap between repeats
-    AscendC::Select(dstLocal, maskLocal, src0Local, src1Local, AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
+uint64_t mask[2] = {UINT64_MAX, 0};
+int repeat = 4;
+AscendC::BinaryRepeatParams repeatParams = {1, 1, 1, 8, 8, 8};
+// repeat = 4, 64 elements one repeat, 256 elements total
+// srcBlkStride, = 1, no gap between blocks in one repeat
+// dstRepStride, srcRepStride = 8, no gap between repeats
+AscendC::Select(dstLocal, maskLocal, src0Local, src1Local,
+                AscendC::SELMODE::VSEL_CMPMASK_SPR, mask, repeat, repeatParams);
     ```
 
 结果示例如下：

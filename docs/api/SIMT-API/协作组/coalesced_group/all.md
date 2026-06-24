@@ -53,29 +53,25 @@ int all(int predicate) const
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.all(1); // 返回1
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    uint32_t result = active.all(1); // 返回1
+  }
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads();
-            uint32_t result = active.all(1); // 返回1
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active = coalesced_threads();
+    uint32_t result = active.all(1); // 返回1
+  }
+  ...
+}
     ```

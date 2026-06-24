@@ -29,45 +29,84 @@
 
 ```cpp
 // FLOOR舍入模式，非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rd_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rd_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// FLOOR舍入模式，饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rd_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rn(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rn_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rn_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式，饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rn_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rna(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rna_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rna_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式，饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rna_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_ru(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_ru_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_ru_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式，饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_ru_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rz(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2uint8_rz_sat(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rz_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式，饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2uint8_rz_sat_v2(vector_uint8_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2uint8_rd(vector_uint8_t &dst,
+                                              vector_half src, vector_bool mask)
+    // FLOOR舍入模式，饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rd_sat(vector_uint8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // FLOOR舍入模式，非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rd_v2(vector_uint8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // FLOOR舍入模式，饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rd_sat_v2(vector_uint8_t &dst, vector_half src,
+                                         vector_bool mask)
+    // RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rn(vector_uint8_t &dst, vector_half src,
+                                  vector_bool mask)
+    // RINT舍入模式，饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rn_sat(vector_uint8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // RINT舍入模式，非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rn_v2(vector_uint8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // RINT舍入模式，饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rn_sat_v2(vector_uint8_t &dst, vector_half src,
+                                         vector_bool mask)
+    // ROUND舍入模式，非饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rna(vector_uint8_t &dst, vector_half src,
+                                   vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rna_sat(vector_uint8_t &dst, vector_half src,
+                                       vector_bool mask)
+    // ROUND舍入模式，非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rna_v2(vector_uint8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // ROUND舍入模式，饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rna_sat_v2(vector_uint8_t &dst, vector_half src,
+                                          vector_bool mask)
+    // CEIL舍入模式，非饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_ru(vector_uint8_t &dst, vector_half src,
+                                  vector_bool mask)
+    // CEIL舍入模式，饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_ru_sat(vector_uint8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // CEIL舍入模式，非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_ru_v2(vector_uint8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // CEIL舍入模式，饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_ru_sat_v2(vector_uint8_t &dst, vector_half src,
+                                         vector_bool mask)
+    // TRUNC舍入模式，非饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rz(vector_uint8_t &dst, vector_half src,
+                                  vector_bool mask)
+    // TRUNC舍入模式，饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rz_sat(vector_uint8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // TRUNC舍入模式，非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rz_v2(vector_uint8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // TRUNC舍入模式，饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2uint8_rz_sat_v2(vector_uint8_t &dst, vector_half src,
+                                         vector_bool mask)
 ```
 
 ## 参数说明

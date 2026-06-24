@@ -49,27 +49,25 @@ coalesced_group coalesced_threads()
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active =
+        coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
+  }
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        if (threadIdx.x % 2 == 0) {
-            coalesced_group active = coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
-        }
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... if (threadIdx.x % 2 == 0) {
+    coalesced_group active =
+        coalesced_threads(); // 该coalesced_group中包含当前warp内所有线程id为偶数的线程
+  }
+  ...
+}
     ```

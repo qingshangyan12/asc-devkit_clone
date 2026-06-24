@@ -16,7 +16,8 @@ Slice用于从张量指定坐标处切出一个子张量。根据输入的起始
 
 ```cpp
 template <typename Tensor, typename Coord, typename Info>
-__aicore__ inline constexpr decltype(auto) Slice(Tensor&& tensor, const Coord& coord, const Info& info)
+__aicore__ inline constexpr decltype(auto)
+Slice(Tensor &&tensor, const Coord &coord, const Info &info)
 ```
 
 ## 参数说明
@@ -62,7 +63,8 @@ auto sub1 = Slice(tensor1, MakeCoord(2, 4), MakeShape(4, 8));
 // 示例2：按Layout切片
 auto layout2 = MakeLayout(MakeShape(10, 20), MakeStride(20, 1));
 auto tensor2 = MakeTensor(MakeMemPtr<Location::GM, float>(gmAddr), layout2);
-auto sub2 = Slice(tensor2, MakeCoord(1, 2), MakeLayout(MakeShape(3, 5), MakeStride(20, 1)));
+auto sub2 = Slice(tensor2, MakeCoord(1, 2),
+                  MakeLayout(MakeShape(3, 5), MakeStride(20, 1)));
 // 从(1, 2)开始切出一个Shape为(3, 5)的子张量，并保持Stride结构
 
 // 示例3：等价于调用成员函数

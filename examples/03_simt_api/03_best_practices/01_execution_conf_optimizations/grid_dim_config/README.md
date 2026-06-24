@@ -76,15 +76,14 @@
 
 ```cpp
 __global__ __launch_bounds__(MAX_THREAD_NUM) void empty_kernel(
-    float* input, uint32_t* index, float* output,
-    uint32_t input_total_length, uint32_t index_total_length)
-{
-}
+    float *input, uint32_t *index, float *output, uint32_t input_total_length,
+    uint32_t index_total_length) {}
 
-// 线程块数量 由 SCENARIO_NUM 选择：1 / 32 / 64 / 128 / 1024，每线程块线程数固定2048
+// 线程块数量 由 SCENARIO_NUM 选择：1 / 32 / 64 / 128 /
+// 1024，每线程块线程数固定2048
 empty_kernel<<<blocks_per_grid, MAX_THREAD_NUM, 0, stream>>>(
-    input_device, index_device, output_device,
-    input_total_length, index_total_length);
+    input_device, index_device, output_device, input_total_length,
+    index_total_length);
 ```
 
 **性能数据**：
@@ -121,7 +120,9 @@ empty_kernel<<<blocks_per_grid, MAX_THREAD_NUM, 0, stream>>>(
 uint32_t global_idx = blockIdx.x * blockDim.x + threadIdx.x;
 
 uint32_t gather_idx = index[global_idx];
-if (gather_idx >= input_total_length) { gather_idx = 0; }
+if (gather_idx >= input_total_length) {
+  gather_idx = 0;
+}
 output[global_idx] = input[gather_idx];
 ```
 
@@ -149,9 +150,11 @@ uint32_t global_idx = blockIdx.x * blockDim.x + threadIdx.x;
 uint32_t stride = gridDim.x * blockDim.x;
 
 for (uint32_t i = global_idx; i < index_total_length; i += stride) {
-    uint32_t gather_idx = index[i];
-    if (gather_idx >= input_total_length) { gather_idx = 0; }
-    output[i] = input[gather_idx];
+  uint32_t gather_idx = index[i];
+  if (gather_idx >= input_total_length) {
+    gather_idx = 0;
+  }
+  output[i] = input[gather_idx];
 }
 ```
 

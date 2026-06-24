@@ -24,86 +24,191 @@ reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存�
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
   ```cpp
-  // NORM搬出模式
-  __simd_callee__ inline void asc_storealign(__ubuf__  int8_t* dst_align32b, vector_int8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  int16_t* dst_align32b, vector_int16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  int32_t* dst_align32b, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  half* dst_align32b, vector_half src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  float* dst_align32b, vector_float src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  hifloat8_t* dst_align32b, vector_hifloat8_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src, vector_bool mask)
+// NORM搬出模式
+__simd_callee__ inline void asc_storealign(__ubuf__ int8_t *dst_align32b,
+                                           vector_int8_t src,
+                                           vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ uint8_t *dst_align32b,
+                               vector_uint8_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ int16_t *dst_align32b,
+                               vector_int16_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ uint16_t *dst_align32b,
+                               vector_uint16_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ int32_t *dst_align32b,
+                               vector_int32_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ uint32_t *dst_align32b,
+                               vector_uint32_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ half *dst_align32b, vector_half src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ float *dst_align32b, vector_float src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ bfloat16_t *dst_align32b,
+                               vector_bfloat16_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ fp8_e4m3fn_t *dst_align32b,
+                               vector_fp8_e4m3fn_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ hifloat8_t *dst_align32b,
+                               vector_hifloat8_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ fp8_e5m2_t *dst_align32b,
+                               vector_fp8_e5m2_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ fp8_e8m0_t *dst_align32b,
+                               vector_fp8_e8m0_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ fp4x2_e2m1_t *dst_align32b,
+                               vector_fp4x2_e2m1_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ fp4x2_e1m2_t *dst_align32b,
+                               vector_fp4x2_e1m2_t src,
+                               vector_bool mask) __simd_callee__
+    inline void asc_storealign(__ubuf__ int4b_t *dst_align32b,
+                               vector_int4x2_t src, vector_bool mask)
 
-  // FIRST搬出模式
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  int8_t* dst_align32b, vector_int8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  int16_t* dst_align32b, vector_int16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  int32_t* dst_align32b, vector_int32_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  half* dst_align32b, vector_half src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  float* dst_align32b, vector_float src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  hifloat8_t* dst_align32b, vector_hifloat8_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src)
-  __simd_callee__ inline void asc_storealign_1st(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src)
+    // FIRST搬出模式
+    __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ int8_t *dst_align32b,
+                                   vector_int8_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ uint8_t *dst_align32b,
+                                   vector_uint8_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ int16_t *dst_align32b,
+                                   vector_int16_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ uint16_t *dst_align32b,
+                                   vector_uint16_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ int32_t *dst_align32b,
+                                   vector_int32_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ uint32_t *dst_align32b,
+                                   vector_uint32_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ half *dst_align32b,
+                                   vector_half src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ float *dst_align32b,
+                                   vector_float src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ bfloat16_t *dst_align32b,
+                                   vector_bfloat16_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ fp8_e4m3fn_t *dst_align32b,
+                                   vector_fp8_e4m3fn_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ hifloat8_t *dst_align32b,
+                                   vector_hifloat8_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ fp8_e5m2_t *dst_align32b,
+                                   vector_fp8_e5m2_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ fp8_e8m0_t *dst_align32b,
+                                   vector_fp8_e8m0_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ fp4x2_e2m1_t *dst_align32b,
+                                   vector_fp4x2_e2m1_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ fp4x2_e1m2_t *dst_align32b,
+                                   vector_fp4x2_e1m2_t src) __simd_callee__
+    inline void asc_storealign_1st(__ubuf__ int4b_t *dst_align32b,
+                                   vector_int4x2_t src)
 
-  // PACK搬出模式
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  int16_t* dst_align32b, vector_int16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  int32_t* dst_align32b, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  int64_t* dst_align32b, vector_int64_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  uint64_t* dst_align32b, vector_uint64_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  half* dst_align32b, vector_half src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  float* dst_align32b, vector_float src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src, vector_bool mask)
-  
-  // PACKV2搬出模式
-  __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  int32_t* dst_align32b, vector_int32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src, vector_bool mask)
-  __simd_callee__ inline void asc_storealign_pack_v2(__ubuf__  float* dst_align32b, vector_float src, vector_bool mask)
-  
-  // INTLV搬出模式
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int8_t* dst_align32b, vector_int8_t src0, vector_int8_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  uint8_t* dst_align32b, vector_uint8_t src0, vector_uint8_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int16_t* dst_align32b, vector_int16_t src0, vector_int16_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  uint16_t* dst_align32b, vector_uint16_t src0, vector_uint16_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int32_t* dst_align32b, vector_int32_t src0, vector_int32_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  uint32_t* dst_align32b, vector_uint32_t src0, vector_uint32_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  half* dst_align32b, vector_half src0, vector_half src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  bfloat16_t* dst_align32b, vector_bfloat16_t src0, vector_bfloat16_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp8_e4m3fn_t* dst_align32b, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  hifloat8_t* dst_align32b, vector_hifloat8_t src0, vector_hifloat8_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp8_e5m2_t* dst_align32b, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp8_e8m0_t* dst_align32b, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e2m1_t* dst_align32b, vector_fp4x2_e2m1_t src0, vector_fp4x2_e2m1_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  fp4x2_e1m2_t* dst_align32b, vector_fp4x2_e1m2_t src0, vector_fp4x2_e1m2_t src1)
-  __simd_callee__ inline void asc_storealign_intlv(__ubuf__  int4b_t* dst_align32b, vector_int4x2_t src0, vector_int4x2_t src1)
+    // PACK搬出模式
+    __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ int16_t *dst_align32b,
+                                    vector_int16_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint16_t *dst_align32b,
+                                    vector_uint16_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ int32_t *dst_align32b,
+                                    vector_int32_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint32_t *dst_align32b,
+                                    vector_uint32_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ int64_t *dst_align32b,
+                                    vector_int64_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint64_t *dst_align32b,
+                                    vector_uint64_t src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ half *dst_align32b,
+                                    vector_half src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ float *dst_align32b,
+                                    vector_float src,
+                                    vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ bfloat16_t *dst_align32b,
+                                    vector_bfloat16_t src, vector_bool mask)
+
+    // PACKV2搬出模式
+    __simd_callee__
+    inline void asc_storealign_pack_v2(__ubuf__ int32_t *dst_align32b,
+                                       vector_int32_t src,
+                                       vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack_v2(__ubuf__ uint32_t *dst_align32b,
+                                       vector_uint32_t src,
+                                       vector_bool mask) __simd_callee__
+    inline void asc_storealign_pack_v2(__ubuf__ float *dst_align32b,
+                                       vector_float src, vector_bool mask)
+
+    // INTLV搬出模式
+    __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ int8_t *dst_align32b,
+                                     vector_int8_t src0,
+                                     vector_int8_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ uint8_t *dst_align32b,
+                                     vector_uint8_t src0,
+                                     vector_uint8_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ int16_t *dst_align32b,
+                                     vector_int16_t src0,
+                                     vector_int16_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ uint16_t *dst_align32b,
+                                     vector_uint16_t src0,
+                                     vector_uint16_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ int32_t *dst_align32b,
+                                     vector_int32_t src0,
+                                     vector_int32_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ uint32_t *dst_align32b,
+                                     vector_uint32_t src0,
+                                     vector_uint32_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ half *dst_align32b,
+                                     vector_half src0,
+                                     vector_half src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ bfloat16_t *dst_align32b,
+                                     vector_bfloat16_t src0,
+                                     vector_bfloat16_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ fp8_e4m3fn_t *dst_align32b,
+                                     vector_fp8_e4m3fn_t src0,
+                                     vector_fp8_e4m3fn_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ hifloat8_t *dst_align32b,
+                                     vector_hifloat8_t src0,
+                                     vector_hifloat8_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ fp8_e5m2_t *dst_align32b,
+                                     vector_fp8_e5m2_t src0,
+                                     vector_fp8_e5m2_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ fp8_e8m0_t *dst_align32b,
+                                     vector_fp8_e8m0_t src0,
+                                     vector_fp8_e8m0_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ fp4x2_e2m1_t *dst_align32b,
+                                     vector_fp4x2_e2m1_t src0,
+                                     vector_fp4x2_e2m1_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ fp4x2_e1m2_t *dst_align32b,
+                                     vector_fp4x2_e1m2_t src0,
+                                     vector_fp4x2_e1m2_t src1) __simd_callee__
+    inline void asc_storealign_intlv(__ubuf__ int4b_t *dst_align32b,
+                                     vector_int4x2_t src0, vector_int4x2_t src1)
   ```
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
-  // NORM搬出模式
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint32_t* dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint16_t* dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign(__ubuf__ uint8_t* dst, vector_bool src)
-  
-  // PACK搬出模式
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint32_t* dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint16_t* dst, vector_bool src)
-  __simd_callee__ inline void asc_storealign_pack(__ubuf__ uint8_t* dst, vector_bool src)
+// NORM搬出模式
+__simd_callee__ inline void asc_storealign(__ubuf__ uint32_t *dst,
+                                           vector_bool src) __simd_callee__
+    inline void asc_storealign(__ubuf__ uint16_t *dst,
+                               vector_bool src) __simd_callee__
+    inline void asc_storealign(__ubuf__ uint8_t *dst, vector_bool src)
+
+    // PACK搬出模式
+    __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint32_t *dst,
+                                    vector_bool src) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint16_t *dst,
+                                    vector_bool src) __simd_callee__
+    inline void asc_storealign_pack(__ubuf__ uint8_t *dst, vector_bool src)
   ```
 ## 参数说明
 
@@ -142,14 +247,14 @@ PIPE_V
 
 - 从矢量数据寄存器连续对齐搬出到UB的场景
   ```cpp
-  __ubuf__ half* dst_align32b = (__ubuf__ half*)asc_get_phy_buf_addr(0);
-  vector_half src;
-  vector_bool mask = asc_create_mask_b16(PAT_ALL);
-  asc_storealign(dst_align32b, src, mask);
+__ubuf__ half *dst_align32b = (__ubuf__ half *)asc_get_phy_buf_addr(0);
+vector_half src;
+vector_bool mask = asc_create_mask_b16(PAT_ALL);
+asc_storealign(dst_align32b, src, mask);
   ```
 - 从掩码寄存器连续对齐搬出到UB的场景
   ```cpp
-  __ubuf__ uint32_t* dst = (__ubuf__ uint32_t*)asc_get_phy_buf_addr(0);
-  vector_bool src;
-  asc_storealign(dst, src);
+__ubuf__ uint32_t *dst = (__ubuf__ uint32_t *)asc_get_phy_buf_addr(0);
+vector_bool src;
+asc_storealign(dst, src);
   ```

@@ -27,31 +27,35 @@ Global Memory是昇腾NPU的设备内存，位于AI Core外部，容量大、带
 
 ```c
 // Kernel implementation, decorated with __global__ to mark kernel entry point
-__global__ __aicore__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
-{
-    // Kernel internal logic implementation, customized based on operator scenario
+__global__ __aicore__ void add_custom(__gm__ uint8_t *x, __gm__ uint8_t *y,
+                                      __gm__ uint8_t *z) {
+  // Kernel internal logic implementation, customized based on operator scenario
 }
 
-// Host function: allocate Device memory, copy data via aclrtMemcpy, launch kernel via <<<>>>
+// Host function: allocate Device memory, copy data via aclrtMemcpy, launch
+// kernel via <<<>>>
 std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
-    // Get host-side buffer pointers
-    uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
-    uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
-    uint8_t *zHost = nullptr;
-    // Allocate Device memory
-    aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    // Copy data from Host memory to Device memory via aclrtMemcpy
-    aclrtMemcpy((uint8_t*)xDevice, totalByteSize, xHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    aclrtMemcpy((uint8_t*)yDevice, totalByteSize, yHost, totalByteSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    // Launch kernel via <<<>>>, passing Device memory pointers xDevice, yDevice, zDevice
-    add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
-    aclrtSynchronizeStream(stream);
-    // Release Device memory
-    aclrtFree(xDevice);
-    aclrtFree(yDevice);
-    aclrtFree(zDevice);
+  // Get host-side buffer pointers
+  uint8_t *xHost = reinterpret_cast<uint8_t *>(x.data());
+  uint8_t *yHost = reinterpret_cast<uint8_t *>(y.data());
+  uint8_t *zHost = nullptr;
+  // Allocate Device memory
+  aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&yDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&zDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+  // Copy data from Host memory to Device memory via aclrtMemcpy
+  aclrtMemcpy((uint8_t *)xDevice, totalByteSize, xHost, totalByteSize,
+              ACL_MEMCPY_HOST_TO_DEVICE);
+  aclrtMemcpy((uint8_t *)yDevice, totalByteSize, yHost, totalByteSize,
+              ACL_MEMCPY_HOST_TO_DEVICE);
+  // Launch kernel via <<<>>>, passing Device memory pointers xDevice, yDevice,
+  // zDevice
+  add_custom<<<numBlocks, nullptr, stream>>>(xDevice, yDevice, zDevice);
+  aclrtSynchronizeStream(stream);
+  // Release Device memory
+  aclrtFree(xDevice);
+  aclrtFree(yDevice);
+  aclrtFree(zDevice);
 }
 ```
 
@@ -68,10 +72,10 @@ Unified Buffer是AI Core中服务于矢量计算单元的核心内部存储单�
 **静态申请**：分配一段指定大小的内存空间，空间大小在编译时确定，不可动态修改。
 
 ```c
-__global__ __vector__ void add_custom(...)
-{
-    constexpr uint32_t ub_size = 256;
-    __ubuf__ half static_buffer[ub_size];  // Compiler automatically aligns to 32 bytes
+__global__ __vector__ void add_custom(...) {
+  constexpr uint32_t ub_size = 256;
+  __ubuf__ half
+      static_buffer[ub_size]; // Compiler automatically aligns to 32 bytes
 }
 ```
 
@@ -79,19 +83,17 @@ __global__ __vector__ void add_custom(...)
 
 ```c
 // Device-side: declare dynamic shared memory
-__global__ __vector__ void add_custom(...)
-{
-    extern __ubuf__ char dynamic_buf[];
-    // ...
+__global__ __vector__ void add_custom(...) {
+  extern __ubuf__ char dynamic_buf[];
+  // ...
 }
 
 // Host-side: specify dynamic shared memory size via third parameter in <<<>>>
-int32_t main(int argc, char const *argv[])
-{
-    // ...
-    uint32_t dyn_ubuf_size = 1024 * sizeof(char);
-    add_custom<<<block_nums, dyn_ubuf_size, stream>>>(...);
-    // ...
+int32_t main(int argc, char const *argv[]) {
+  // ...
+  uint32_t dyn_ubuf_size = 1024 * sizeof(char);
+  add_custom<<<block_nums, dyn_ubuf_size, stream>>>(...);
+  // ...
 }
 ```
 
@@ -100,15 +102,15 @@ int32_t main(int argc, char const *argv[])
 ```c
 // Define src0 and src1 memory blocks unified via struct
 typedef struct asc_src_buffer_s {
-    half src0_buf[128];
-    half src1_buf[128];
+  half src0_buf[128];
+  half src1_buf[128];
 } asc_src_buffer_t;
 
 __global__ __vector__ void add_custom(...) {
-    __ubuf__ asc_src_buffer_t local_buf{};
-    __ubuf__ asc_src_buffer_t* src_buffer = (__ubuf__ asc_src_buffer_t*)&local_buf;
-    ...
-    asc_add(dst, src_buffer.src0_buf, src_buffer.src1_buf, 128);
+  __ubuf__ asc_src_buffer_t local_buf{};
+  __ubuf__ asc_src_buffer_t *src_buffer =
+      (__ubuf__ asc_src_buffer_t *)&local_buf;
+  ... asc_add(dst, src_buffer.src0_buf, src_buffer.src1_buf, 128);
 }
 ```
 
@@ -143,11 +145,11 @@ constexpr uint32_t m_size = 256;
 constexpr uint32_t n_size = 128;
 constexpr uint32_t k_size = 256;
 
-__cbuf__ half l1a_buffer[m_size * k_size];  // L1 Buffer, 32 bytes aligned
+__cbuf__ half l1a_buffer[m_size * k_size]; // L1 Buffer, 32 bytes aligned
 __cbuf__ half l1b_buffer[n_size * k_size];
-__ca__ half l0a_buffer[m_size * k_size];    // L0A Buffer, 512 bytes aligned
-__cb__ half l0b_buffer[n_size * k_size];    // L0B Buffer, 512 bytes aligned
-__cc__ half l0c_buffer[m_size * n_size];    // L0C Buffer, 64 bytes aligned
+__ca__ half l0a_buffer[m_size * k_size]; // L0A Buffer, 512 bytes aligned
+__cb__ half l0b_buffer[n_size * k_size]; // L0B Buffer, 512 bytes aligned
+__cc__ half l0c_buffer[m_size * n_size]; // L0C Buffer, 64 bytes aligned
 ```
 
 同时为优化矩阵乘法等计算密集型任务、提升Cube计算效率，AI Core的L1、L0 Buffer均采用分形内存排布格式（硬件定制化内存布局，适配矩阵计算访存特征）。不同硬件产品的分形格式存在差异，对比如下表：
@@ -319,19 +321,19 @@ Vector矢量计算主要包含基础算术、归约计算、数据类型转换�
 以Add计算为例，当开发者需要计算4096长度的向量加法，可以通过`asc_add(dst, src0, src1, count)`的接口直接进行计算。更多内容可参考[Memory矢量计算编程](./Memory矢量计算编程.md)中有关Memory矢量计算编程的描述。
 
 ```c
-// Define Vector operator, marked with __vector__ to execute on Device Vector core, suitable for operators with only Vector computation
-__global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    __ubuf__ float x[4096];
-    __ubuf__ float y[4096];
-    __ubuf__ float z[4096];
+// Define Vector operator, marked with __vector__ to execute on Device Vector
+// core, suitable for operators with only Vector computation
+__global__ __vector__ void add_kernel(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  __ubuf__ float x[4096];
+  __ubuf__ float y[4096];
+  __ubuf__ float z[4096];
 
-    // 1. Data transfer in: transfer GM data to UB, this implementation is omitted
-    // ...
-    // 2. Perform calculation for the first 4096 elements via asc_add
-    asc_add(z, x, y, 4096);
+  // 1. Data transfer in: transfer GM data to UB, this implementation is omitted
+  // ...
+  // 2. Perform calculation for the first 4096 elements via asc_add
+  asc_add(z, x, y, 4096);
 }
-
 ```
 
 以上为传统架构的矢量计算编程方式；[NPU架构版本3510](../../../语言扩展层/SIMD-BuiltIn关键字.md)新增寄存器能力，编程模式有所变化：在传统UB缓存体系的基础上，开放寄存器（Register）可编程能力，构建出「Global Memory → UB → Register」的三级内存层级。新一代架构下的矢量计算都需要从Unified Buffer加载到Register寄存器后，再利用Register寄存器进行计算操作。可参考[Reg矢量计算编程](./Reg矢量计算编程.md)中有关Reg矢量计算编程的描述。
@@ -348,20 +350,22 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
 ![矩阵乘示意图](../../../../figures/矩阵乘示意图.png)
 
 ```c
-// Define Cube matrix operator, marked with __cube__ to execute on Device Cube core, suitable for operators with only Cube computation
-__global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    __cbuf__ half a_l1_buf[BLOCK_M * BLOCK_K];   // L1 staging area
-    __cbuf__ half b_l1_buf[BLOCK_K * BLOCK_N];   // L1 staging area
-    __ca__ half l0a_buf[BLOCK_M * BLOCK_K];    // L0A input
-    __cb__ half l0b_buf[BLOCK_K * BLOCK_N];    // L0B input
-    __cc__ float l0c_buf[BLOCK_M * BLOCK_N];   // L0C output
+// Define Cube matrix operator, marked with __cube__ to execute on Device Cube
+// core, suitable for operators with only Cube computation
+__global__ __cube__ void add_kernel(__gm__ float *x, __gm__ float *y,
+                                    __gm__ float *z) {
+  __cbuf__ half a_l1_buf[BLOCK_M * BLOCK_K]; // L1 staging area
+  __cbuf__ half b_l1_buf[BLOCK_K * BLOCK_N]; // L1 staging area
+  __ca__ half l0a_buf[BLOCK_M * BLOCK_K];    // L0A input
+  __cb__ half l0b_buf[BLOCK_K * BLOCK_N];    // L0B input
+  __cc__ float l0c_buf[BLOCK_M * BLOCK_N];   // L0C output
 
-    // GM2L1 and L12L0 data transfer operations
-    // ...
-    // Execute Mmad, computation size is (BLOCK_M, BLOCK_K, BLOCK_N)
-    asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
-    // Matrix data transfer out
+  // GM2L1 and L12L0 data transfer operations
+  // ...
+  // Execute Mmad, computation size is (BLOCK_M, BLOCK_K, BLOCK_N)
+  asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false,
+           false, false);
+  // Matrix data transfer out
 }
 ```
 
@@ -373,22 +377,23 @@ __global__ __cube__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ flo
 ![Flash Attention核心实现](../../../../figures/Flash-Attention核心实现.png)
 
 ```c
-// Define CV fusion operator, marked with __mix__ to execute on Device, suitable for operators combining Cube and Vector computation
-__global__ __mix__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-{
-    if ASCEND_IS_AIV {
-        // ...
-        asc_add(z, x, y, 4096);
-        // ...
-    }
+// Define CV fusion operator, marked with __mix__ to execute on Device, suitable
+// for operators combining Cube and Vector computation
+__global__ __mix__ void add_kernel(__gm__ float *x, __gm__ float *y,
+                                   __gm__ float *z) {
+  if ASCEND_IS_AIV {
+    // ...
+    asc_add(z, x, y, 4096);
+    // ...
+  }
 
-    if ASCEND_IS_AIC {
-        // ...
-        asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false, false, false);
-        // ...
-    }
+  if ASCEND_IS_AIC {
+    // ...
+    asc_mmad(l0c_buf, l0a_buf, l0b_buf, BLOCK_M, BLOCK_K, BLOCK_N, 0, false,
+             false, false);
+    // ...
+  }
 }
-
 ```
 
 融合算子可合并多个独立小算子，减少整体计算量与内存占用、优化数据流传输路径、简化代码实现逻辑，最终实现计算效率、硬件资源利用率与代码可维护性的同步提升。

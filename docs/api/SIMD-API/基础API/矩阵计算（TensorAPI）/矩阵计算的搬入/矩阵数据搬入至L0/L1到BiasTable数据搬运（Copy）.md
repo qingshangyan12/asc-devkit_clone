@@ -19,22 +19,25 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 执行L1 Buffer到BiasTable Buffer的数据搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy, const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 构造默认搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 构造指定Trait的搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation, const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 ## 参数说明
@@ -83,21 +86,22 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyL1ToBTExample()
-{
-    using SrcType = half;
-    using DstType = float;
-    constexpr uint32_t n = 16;
+__aicore__ inline void CopyL1ToBTExample() {
+  using SrcType = half;
+  using DstType = float;
+  constexpr uint32_t n = 16;
 
-    __cbuf__ SrcType l1Buf[n];
-    __biasbuf__ DstType btBuf[n];
+  __cbuf__ SrcType l1Buf[n];
+  __biasbuf__ DstType btBuf[n];
 
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+  auto l1Tensor =
+      MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
-    auto btTensor = MakeTensor(MakeMemPtr(btBuf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+  auto btTensor =
+      MakeTensor(MakeMemPtr(btBuf), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
-    auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
-    Copy(copyAtom, btTensor, l1Tensor);
+  auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
+  Copy(copyAtom, btTensor, l1Tensor);
 }
 ```
 
@@ -108,26 +112,27 @@ batch模式调用示例：
 
 using namespace AscendC::Te;
 
-__aicore__ inline void CopyBatchL1ToBTExample()
-{
-    using SrcType = half;
-    using DstType = float;
-    constexpr uint32_t batch = 2;
-    constexpr uint32_t n = 15;
+__aicore__ inline void CopyBatchL1ToBTExample() {
+  using SrcType = half;
+  using DstType = float;
+  constexpr uint32_t batch = 2;
+  constexpr uint32_t n = 15;
 
-    // batch模式下源/目的张量列方向Shape需按C0_SIZE（32Byte）对齐，
-    // 分别向上对齐到 C0_ELEMENT<srcType> 和 C0_ELEMENT<dstType>。
-    constexpr uint32_t srcN = Std::ceil_align(n, Std::Int<C0_ELEMENT<SrcType>>{});
-    constexpr uint32_t dstN = Std::ceil_align(n, Std::Int<C0_ELEMENT<DstType>>{});
+  // batch模式下源/目的张量列方向Shape需按C0_SIZE（32Byte）对齐，
+  // 分别向上对齐到 C0_ELEMENT<srcType> 和 C0_ELEMENT<dstType>。
+  constexpr uint32_t srcN = Std::ceil_align(n, Std::Int<C0_ELEMENT<SrcType>>{});
+  constexpr uint32_t dstN = Std::ceil_align(n, Std::Int<C0_ELEMENT<DstType>>{});
 
-    __cbuf__ SrcType l1Buf[batch * srcN];
-    __biasbuf__ DstType btBuf[batch * dstN];
+  __cbuf__ SrcType l1Buf[batch * srcN];
+  __biasbuf__ DstType btBuf[batch * dstN];
 
-    auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NDExtLayoutPtn>(batch, 1, srcN));
+  auto l1Tensor = MakeTensor(MakeMemPtr(l1Buf),
+                             MakeFrameLayout<NDExtLayoutPtn>(batch, 1, srcN));
 
-    auto btTensor = MakeTensor(MakeMemPtr(btBuf), MakeFrameLayout<NDExtLayoutPtn>(batch, 1, dstN));
+  auto btTensor = MakeTensor(MakeMemPtr(btBuf),
+                             MakeFrameLayout<NDExtLayoutPtn>(batch, 1, dstN));
 
-    auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
-    Copy(copyAtom, btTensor, l1Tensor);
+  auto copyAtom = MakeCopy(CopyL12BT{}, CopyL12BTTraitDefault{});
+  Copy(copyAtom, btTensor, l1Tensor);
 }
 ```

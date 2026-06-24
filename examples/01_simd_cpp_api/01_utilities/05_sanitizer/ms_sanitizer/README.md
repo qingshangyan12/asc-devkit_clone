@@ -45,10 +45,10 @@ z = x + y
     用户可以注释掉正确的`DataCopy`，使用错误的`DataCopy`复现该场景。`xLocal`分配的大小为`blockLength`，但是搬运长度错误地写成`blockLength * 2`，大于`xLocal`分配的大小，因此触发非法读写。
 
     ```cpp
-    // 1. 正确的DataCopy。
-    AscendC::DataCopy(xLocal, xGm, blockLength);
-    // 2. 错误示例：搬运长度写成blockLength * 2，会触发非法读写。
-    // AscendC::DataCopy(xLocal, xGm, blockLength * 2);
+// 1. 正确的DataCopy。
+AscendC::DataCopy(xLocal, xGm, blockLength);
+// 2. 错误示例：搬运长度写成blockLength * 2，会触发非法读写。
+// AscendC::DataCopy(xLocal, xGm, blockLength * 2);
     ```
 
     重新编译并执行检测：
@@ -63,10 +63,10 @@ z = x + y
     用户可以注释掉正确的`DataCopy`，使用错误的`DataCopy`复现该场景。`DataCopy` GM到UB的搬运中，UB侧地址需要满足32B对齐要求，`xLocal[5]`不满足32B对齐要求，因此触发非对齐访问。
 
     ```cpp
-    // 1. 正确的DataCopy。
-    AscendC::DataCopy(xLocal, xGm, blockLength);
-    // 3. 错误示例：xLocal[5]不满足32B对齐要求，会触发非对齐访问。
-    // AscendC::DataCopy(xLocal[5], xGm, blockLength);
+// 1. 正确的DataCopy。
+AscendC::DataCopy(xLocal, xGm, blockLength);
+// 3. 错误示例：xLocal[5]不满足32B对齐要求，会触发非对齐访问。
+// AscendC::DataCopy(xLocal[5], xGm, blockLength);
     ```
 
     重新编译并执行检测：
@@ -83,8 +83,8 @@ z = x + y
     注意：调用`mssanitizer`时需要传入`--leak-check=yes`来开启分配内存泄漏检查。
 
     ```cpp
-    // 正确释放Device侧输出内存。删除该行后，可触发内存泄漏检测。
-    aclrtFree(zDevice);
+// 正确释放Device侧输出内存。删除该行后，可触发内存泄漏检测。
+aclrtFree(zDevice);
     ```
 
     重新编译并执行检测：
@@ -101,10 +101,10 @@ z = x + y
     注意：调用`mssanitizer`时需要传入`--check-unused-memory=yes`来开启分配内存未使用检查。
 
     ```cpp
-    // 1. 正确的Device侧输入内存申请。
-    aclrtMalloc((void**)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
-    // 2. 错误示例：实际只使用totalByteSize，却申请5倍大小，会触发未使用内存检测。
-    // aclrtMalloc((void**)&xDevice, totalByteSize * 5, ACL_MEM_MALLOC_HUGE_FIRST);
+// 1. 正确的Device侧输入内存申请。
+aclrtMalloc((void **)&xDevice, totalByteSize, ACL_MEM_MALLOC_HUGE_FIRST);
+// 2. 错误示例：实际只使用totalByteSize，却申请5倍大小，会触发未使用内存检测。
+// aclrtMalloc((void**)&xDevice, totalByteSize * 5, ACL_MEM_MALLOC_HUGE_FIRST);
     ```
 
     重新编译并执行检测：
@@ -121,9 +121,9 @@ z = x + y
   注意：调用`mssanitizer`时需要传入`--tool=racecheck`来开启竞争检测。
 
   ```cpp
-  // Add读取xLocal/yLocal前，需要等待MTE2搬运完成；删除后会触发RAW竞争。
-  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+// Add读取xLocal/yLocal前，需要等待MTE2搬运完成；删除后会触发RAW竞争。
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
   ```
 
   重新编译并执行检测：
@@ -140,8 +140,8 @@ z = x + y
   注意：调用`mssanitizer`时需要传入`--tool=initcheck`来开启未初始化检测。
 
   ```cpp
-  // 正确初始化zGm。删除该行后，可触发未初始化检测。
-  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+// 正确初始化zGm。删除该行后，可触发未初始化检测。
+zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
   ```
 
   重新编译并执行检测：

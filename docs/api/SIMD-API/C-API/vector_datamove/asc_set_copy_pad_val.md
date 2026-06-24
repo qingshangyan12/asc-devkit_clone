@@ -23,15 +23,15 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint8_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(int16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(half pad_value)
-__aicore__ inline void asc_set_copy_pad_val(bfloat16_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(int32_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(uint32_t pad_value)
-__aicore__ inline void asc_set_copy_pad_val(float pad_value)
+__aicore__ inline void asc_set_copy_pad_val(int8_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(uint8_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(int16_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(uint16_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(half pad_value) __aicore__
+    inline void asc_set_copy_pad_val(bfloat16_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(int32_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(uint32_t pad_value) __aicore__
+    inline void asc_set_copy_pad_val(float pad_value)
 ```
 
 ## 参数说明

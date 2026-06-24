@@ -14,8 +14,9 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_get_reduce_min_cnt(half& val, uint32_t& index)
-__aicore__ inline void asc_get_reduce_min_cnt(float& val, uint32_t& index)
+__aicore__ inline void asc_get_reduce_min_cnt(half &val,
+                                              uint32_t &index) __aicore__
+    inline void asc_get_reduce_min_cnt(float &val, uint32_t &index)
 ```
 
 ## 参数说明

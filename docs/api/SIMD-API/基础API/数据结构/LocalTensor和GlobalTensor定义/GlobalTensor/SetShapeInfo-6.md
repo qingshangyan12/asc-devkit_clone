@@ -54,7 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetShapeInfo(const ShapeInfo& shapeInfo)
+__aicore__ inline void SetShapeInfo(const ShapeInfo &shapeInfo)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -94,5 +94,6 @@ __aicore__ inline void SetShapeInfo(const ShapeInfo& shapeInfo)
 // 示例设置Tensor的ShapeInfo信息
 AscendC::GlobalTensor<float> tglobal;
 uint32_t shapeArray[] = {16, 1024};
-tglobal.SetShapeInfo(AscendC::ShapeInfo(2, shapeArray, AscendC::DataFormat::ND));
+tglobal.SetShapeInfo(AscendC::ShapeInfo(2, shapeArray,
+                                        AscendC::DataFormat::ND));
 ```

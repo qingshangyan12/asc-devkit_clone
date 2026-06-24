@@ -47,32 +47,34 @@ This example implements an AddN example based on the static Tensor programming m
 
     The dynamic input feature means that the kernel function parameters use the ListTensorDesc structure to store input data information. Construct the ListTensorDesc data structure as shown below.
     ```cpp
-    constexpr uint32_t SHAPE_DIM = 2;
-    struct TensorDesc {
-      uint32_t dim{SHAPE_DIM};
-      uint32_t index;
-      uint64_t shape[SHAPE_DIM] = {8, 2048};
-    };
+constexpr uint32_t SHAPE_DIM = 2;
+struct TensorDesc {
+  uint32_t dim{SHAPE_DIM};
+  uint32_t index;
+  uint64_t shape[SHAPE_DIM] = {8, 2048};
+};
 
-    constexpr uint32_t TENSOR_DESC_NUM = 2;
-    struct ListTensorDesc {
-      uint64_t ptrOffset;
-      TensorDesc tensorDesc[TENSOR_DESC_NUM];
-      uintptr_t dataPtr[TENSOR_DESC_NUM];
-    } inputDesc;
+constexpr uint32_t TENSOR_DESC_NUM = 2;
+struct ListTensorDesc {
+  uint64_t ptrOffset;
+  TensorDesc tensorDesc[TENSOR_DESC_NUM];
+  uintptr_t dataPtr[TENSOR_DESC_NUM];
+} inputDesc;
     ```
     Combine the allocated Tensor parameters into a ListTensorDesc data structure as shown below.
     ```cpp
-    inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
-                {xDesc, yDesc},
-                {(uintptr_t)xDevice, (uintptr_t)yDevice}};
+inputDesc = {(1 + (1 + SHAPE_DIM) * TENSOR_DESC_NUM) * sizeof(uint64_t),
+             {xDesc, yDesc},
+             {(uintptr_t)xDevice, (uintptr_t)yDevice}};
     ``` 
     Parse the corresponding parameters according to the passed data format as shown below.
 
     ```cpp
-    AscendC::ListTensorDesc keyListTensorDescInit((__gm__ void*)srcList);
-    __gm__ uint8_t* x = (__gm__ uint8_t*)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(0);
-    __gm__ uint8_t* y = (__gm__ uint8_t*)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(1);
+AscendC::ListTensorDesc keyListTensorDescInit((__gm__ void *)srcList);
+__gm__ uint8_t *x =
+    (__gm__ uint8_t *)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(0);
+__gm__ uint8_t *y =
+    (__gm__ uint8_t *)keyListTensorDescInit.GetDataPtr<__gm__ uint8_t>(1);
     ```
 
   - Invocation implementation

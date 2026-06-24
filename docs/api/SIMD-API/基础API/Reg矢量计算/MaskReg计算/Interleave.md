@@ -36,7 +36,8 @@
 
 ```cpp
 template <typename T>
-__simd_callee__ inline void Interleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
+__simd_callee__ inline void Interleave(MaskReg &dst0, MaskReg &dst1,
+                                       MaskReg &src0, MaskReg &src1)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -72,21 +73,25 @@ __simd_callee__ inline void Interleave(MaskReg& dst0, MaskReg& dst1, MaskReg& sr
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void InterleaveDeInterleaveVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    AscendC::Reg::MaskReg maskM3 = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::M3>();
-    AscendC::Reg::MaskReg newMask0;
-    AscendC::Reg::MaskReg newMask1;
-    AscendC::Reg::Interleave<T>(newMask0, newMask1, maskFull, maskM3);
-    AscendC::Reg::DeInterleave<T>(newMask0, newMask1, newMask0, newMask1);
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(srcReg, srcReg, 0, newMask0);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
-    }
+__simd_vf__ inline void
+InterleaveDeInterleaveVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                         uint32_t count, uint32_t oneRepeatSize,
+                         uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::MaskReg maskFull =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+  AscendC::Reg::MaskReg maskM3 =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::M3>();
+  AscendC::Reg::MaskReg newMask0;
+  AscendC::Reg::MaskReg newMask1;
+  AscendC::Reg::Interleave<T>(newMask0, newMask1, maskFull, maskM3);
+  AscendC::Reg::DeInterleave<T>(newMask0, newMask1, newMask0, newMask1);
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, newMask0);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask);
+  }
 }
 ```

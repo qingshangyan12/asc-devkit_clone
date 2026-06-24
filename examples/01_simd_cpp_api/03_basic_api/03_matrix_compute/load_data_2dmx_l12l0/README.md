@@ -373,7 +373,7 @@ A / B矩阵和scaleA / scaleB矩阵在不同存储单元的数据排布格式不
 
 ```cpp
 __aicore__ inline uint16_t CeilAlign(uint16_t size, uint16_t alignValue) {
-    return (size + alignValue - 1) / alignValue * alignValue;
+  return (size + alignValue - 1) / alignValue * alignValue;
 }
 ```
 
@@ -507,14 +507,17 @@ A / B / scaleA / scaleB矩阵在L1和L0上各轴的对齐要求不同，后续�
 
 ```cpp
 AscendC::Nd2NzParams nd2nzA1Params;
-nd2nzA1Params.ndNum = 1; // ND矩阵的数目
-nd2nzA1Params.nValue = m; // 源操作ND矩阵的行数
+nd2nzA1Params.ndNum = 1;        // ND矩阵的数目
+nd2nzA1Params.nValue = m;       // 源操作ND矩阵的行数
 nd2nzA1Params.dValue = packedK; // 源操作ND矩阵按B8视图配置的列数
 nd2nzA1Params.srcNdMatrixStride = 0; // 源操作数相邻ND矩阵间的起始地址偏移
-nd2nzA1Params.srcDValue = packedK;  // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
-nd2nzA1Params.dstNzC0Stride = mAlignL1; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
-nd2nzA1Params.dstNzNStride = 1;     // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
-nd2nzA1Params.dstNzMatrixStride = 0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
+nd2nzA1Params.srcDValue =
+    packedK; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
+nd2nzA1Params.dstNzC0Stride =
+    mAlignL1; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzA1Params.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
+nd2nzA1Params.dstNzMatrixStride =
+    0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
 
@@ -525,20 +528,22 @@ AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 - **补零方式**：调用`AscendC::Fill`将k方向尾部1个block的数据刷为0，如图14。
 
 ```cpp
-if constexpr (AscendC::IsSameType<TA, fp8_e4m3fn_t>::value || AscendC::IsSameType<TA, fp8_e5m2_t>::value) {
-    // 将A矩阵L1数据按照uint16类型填0；dst位于A1时，Fill的blockNum单位为32B。
-    const uint32_t heightAlign = CeilAlign(m, fractalShape[0]);
-    auto padTensor = a1Local.template ReinterpretCast<uint16_t>();
-    AscendC::InitConstValueParams<uint16_t> initConstValueParams;
-    // repeatTimes表示迭代次数；以row方向做迭代，覆盖m向16对齐后的每一行。
-    initConstValueParams.repeatTimes = heightAlign;
-    // blockNum表示每次迭代初始化的数据块(32B)个数；这里每次只填充col方向尾部1个32B数据。
-    initConstValueParams.blockNum = 1;
-    // initValue表示初始化值；无效数据填0，防止参与MmadMx计算。
-    initConstValueParams.initValue = 0;
-    // dstOffset定位到col方向当前已搬运数据末尾，后续Fill按row方向逐行填充尾部1个32B数据。
-    uint32_t dstOffset = heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
-    AscendC::Fill(padTensor[dstOffset], initConstValueParams);
+if constexpr (AscendC::IsSameType<TA, fp8_e4m3fn_t>::value ||
+              AscendC::IsSameType<TA, fp8_e5m2_t>::value) {
+  // 将A矩阵L1数据按照uint16类型填0；dst位于A1时，Fill的blockNum单位为32B。
+  const uint32_t heightAlign = CeilAlign(m, fractalShape[0]);
+  auto padTensor = a1Local.template ReinterpretCast<uint16_t>();
+  AscendC::InitConstValueParams<uint16_t> initConstValueParams;
+  // repeatTimes表示迭代次数；以row方向做迭代，覆盖m向16对齐后的每一行。
+  initConstValueParams.repeatTimes = heightAlign;
+  // blockNum表示每次迭代初始化的数据块(32B)个数；这里每次只填充col方向尾部1个32B数据。
+  initConstValueParams.blockNum = 1;
+  // initValue表示初始化值；无效数据填0，防止参与MmadMx计算。
+  initConstValueParams.initValue = 0;
+  // dstOffset定位到col方向当前已搬运数据末尾，后续Fill按row方向逐行填充尾部1个32B数据。
+  uint32_t dstOffset =
+      heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
+  AscendC::Fill(padTensor[dstOffset], initConstValueParams);
 }
 ```
 ##### 5.1.2. A矩阵GM上输入为[k, m]
@@ -563,14 +568,18 @@ if constexpr (AscendC::IsSameType<TA, fp8_e4m3fn_t>::value || AscendC::IsSameTyp
 ```cpp
 AscendC::Nd2NzParams nd2nzA1Params;
 uint16_t aColValue = isFP4 ? CeilDivision(m, 2) : m;
-nd2nzA1Params.ndNum = 1; // ND矩阵的数目
+nd2nzA1Params.ndNum = 1;  // ND矩阵的数目
 nd2nzA1Params.nValue = k; // 源操作ND矩阵的行数
-nd2nzA1Params.dValue = aColValue; // 源操作ND矩阵按B8视图配置的列数，FP4输入时2个元素对应1个B8视图元素
+nd2nzA1Params.dValue =
+    aColValue; // 源操作ND矩阵按B8视图配置的列数，FP4输入时2个元素对应1个B8视图元素
 nd2nzA1Params.srcNdMatrixStride = 0; // 源操作数相邻ND矩阵间的起始地址偏移
-nd2nzA1Params.srcDValue = aColValue; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
-nd2nzA1Params.dstNzC0Stride = alignK; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
-nd2nzA1Params.dstNzNStride = 1;      // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
-nd2nzA1Params.dstNzMatrixStride = 0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
+nd2nzA1Params.srcDValue =
+    aColValue; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
+nd2nzA1Params.dstNzC0Stride =
+    alignK; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzA1Params.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
+nd2nzA1Params.dstNzMatrixStride =
+    0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
 AscendC::DataCopy(a1Local, aGM, nd2nzA1Params);
 ```
 
@@ -620,14 +629,18 @@ AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 ```cpp
 AscendC::Nd2NzParams nd2nzB1Params;
 uint16_t bColValue = isFP4 ? CeilDivision(n, 2) : n;
-nd2nzB1Params.ndNum = 1; // ND矩阵的数目
+nd2nzB1Params.ndNum = 1;  // ND矩阵的数目
 nd2nzB1Params.nValue = k; // 源操作ND矩阵的行数
-nd2nzB1Params.dValue = bColValue; // 源操作ND矩阵按B8视图配置的列数，FP4输入时2个元素对应1个B8视图元素
+nd2nzB1Params.dValue =
+    bColValue; // 源操作ND矩阵按B8视图配置的列数，FP4输入时2个元素对应1个B8视图元素
 nd2nzB1Params.srcNdMatrixStride = 0; // 源操作数相邻ND矩阵间的起始地址偏移
-nd2nzB1Params.srcDValue = bColValue; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
-nd2nzB1Params.dstNzC0Stride = alignK; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzB1Params.srcDValue =
+    bColValue; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
+nd2nzB1Params.dstNzC0Stride =
+    alignK; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 nd2nzB1Params.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
-nd2nzB1Params.dstNzMatrixStride = 0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
+nd2nzB1Params.dstNzMatrixStride =
+    0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
 AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 ```
 
@@ -674,14 +687,17 @@ AscendC::Fill(padTensor[k * fractalShape[0]], initConstValueParams);
 
 ```cpp
 AscendC::Nd2NzParams nd2nzB1Params;
-nd2nzB1Params.ndNum = 1; // ND矩阵的数目
-nd2nzB1Params.nValue = n; // 源操作ND矩阵的行数
+nd2nzB1Params.ndNum = 1;        // ND矩阵的数目
+nd2nzB1Params.nValue = n;       // 源操作ND矩阵的行数
 nd2nzB1Params.dValue = packedK; // 源操作ND矩阵按B8视图配置的列数
 nd2nzB1Params.srcNdMatrixStride = 0; // 源操作数相邻ND矩阵间的起始地址偏移
-nd2nzB1Params.srcDValue = packedK; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
-nd2nzB1Params.dstNzC0Stride = nAlignL1; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzB1Params.srcDValue =
+    packedK; // 源操作数同一ND矩阵内相邻行的起始地址偏移，按B8视图配置
+nd2nzB1Params.dstNzC0Stride =
+    nAlignL1; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 nd2nzB1Params.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
-nd2nzB1Params.dstNzMatrixStride = 0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
+nd2nzB1Params.dstNzMatrixStride =
+    0; // 目的Nz矩阵中，相邻Nz矩阵起始地址的偏移，配置为0时，无意义
 AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 ```
 
@@ -692,20 +708,22 @@ AscendC::DataCopy(b1Local, bGM, nd2nzB1Params);
 - **补零方式**：调用`AscendC::Fill`将k方向尾部1个block的数据刷为0，如图20。
 
 ```cpp
-if constexpr (AscendC::IsSameType<TB, fp8_e4m3fn_t>::value || AscendC::IsSameType<TB, fp8_e5m2_t>::value) {
-    // 将B矩阵L1数据按照uint16类型填0；dst位于B1时，Fill的blockNum单位为32B。
-    const uint32_t heightAlign = CeilAlign(n, fractalShape[0]);
-    auto padTensor = b1Local.template ReinterpretCast<uint16_t>();
-    AscendC::InitConstValueParams<uint16_t> initConstValueParams;
-    // repeatTimes表示迭代次数；以row方向做迭代，覆盖n向16对齐后的每一行。
-    initConstValueParams.repeatTimes = heightAlign;
-    // blockNum表示每次迭代初始化的数据块(32B)个数；这里每次只填充col方向尾部1个32B数据。
-    initConstValueParams.blockNum = 1;
-    // initValue表示初始化值；无效数据填0，防止参与MmadMx计算。
-    initConstValueParams.initValue = 0;
-    // dstOffset定位到col方向当前已搬运数据末尾，后续Fill按row方向逐行填充尾部1个32B数据。
-    uint32_t dstOffset = heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
-    AscendC::Fill(padTensor[dstOffset], initConstValueParams);
+if constexpr (AscendC::IsSameType<TB, fp8_e4m3fn_t>::value ||
+              AscendC::IsSameType<TB, fp8_e5m2_t>::value) {
+  // 将B矩阵L1数据按照uint16类型填0；dst位于B1时，Fill的blockNum单位为32B。
+  const uint32_t heightAlign = CeilAlign(n, fractalShape[0]);
+  auto padTensor = b1Local.template ReinterpretCast<uint16_t>();
+  AscendC::InitConstValueParams<uint16_t> initConstValueParams;
+  // repeatTimes表示迭代次数；以row方向做迭代，覆盖n向16对齐后的每一行。
+  initConstValueParams.repeatTimes = heightAlign;
+  // blockNum表示每次迭代初始化的数据块(32B)个数；这里每次只填充col方向尾部1个32B数据。
+  initConstValueParams.blockNum = 1;
+  // initValue表示初始化值；无效数据填0，防止参与MmadMx计算。
+  initConstValueParams.initValue = 0;
+  // dstOffset定位到col方向当前已搬运数据末尾，后续Fill按row方向逐行填充尾部1个32B数据。
+  uint32_t dstOffset =
+      heightAlign * (CeilAlign(packedK, SCALE_CEIL_NUMBER) / 2);
+  AscendC::Fill(padTensor[dstOffset], initConstValueParams);
 }
 ```
 #### 5.3. scaleA矩阵GM -> L1
@@ -726,16 +744,19 @@ scaleA矩阵为fp8_e8m0_t数据类型，按fp8_e8m0_t真实数据类型排布时
 
 ```cpp
 AscendC::GlobalTensor<half> scaleAGMB16;
-scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()), m * scaleK / 2);
+scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()),
+                            m *scaleK / 2);
 auto scaleA1LocalB16 = scaleA1Local.ReinterpretCast<half>();
 
 AscendC::Dn2NzParams dn2nzParams;
-dn2nzParams.dnNum = 1; // 源操作数中DN矩阵的个数
+dn2nzParams.dnNum = 1;  // 源操作数中DN矩阵的个数
 dn2nzParams.dValue = m; // 源操作DN矩阵的行数
-dn2nzParams.nValue = scaleK / 2; // 源操作DN矩阵的列数，按B16视图后2个fp8_e8m0_t合并为1个half
+dn2nzParams.nValue =
+    scaleK / 2; // 源操作DN矩阵的列数，按B16视图后2个fp8_e8m0_t合并为1个half
 dn2nzParams.srcDnMatrixStride = 0; // 源操作数相邻DN矩阵间的起始地址偏移
 dn2nzParams.srcDValue = scaleK / 2; // 源操作数同一DN矩阵内相邻行的起始地址偏移
-dn2nzParams.dstNzC0Stride = scaleK / 2; // DN转Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+dn2nzParams.dstNzC0Stride =
+    scaleK / 2; // DN转Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 dn2nzParams.dstNzNStride = 1; // DN矩阵第x行与第x+1行转Nz后在dst中的偏移
 dn2nzParams.dstNzMatrixStride = 0; // 相邻Nz矩阵间的起始地址偏移
 AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, dn2nzParams);
@@ -755,15 +776,18 @@ AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, dn2nzParams);
 
 ```cpp
 AscendC::GlobalTensor<half> scaleAGMB16;
-scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()), m * scaleK / 2);
+scaleAGMB16.SetGlobalBuffer((__gm__ half *)(scaleAGM.GetPhyAddr()),
+                            m *scaleK / 2);
 auto scaleA1LocalB16 = scaleA1Local.ReinterpretCast<half>();
 
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.ndNum = 1; // 源操作数中ND矩阵的个数
-nd2nzParams.nValue = scaleK / 2; // 源操作ND矩阵的行数，按B16视图后2个fp8 scale合并为1个half
+nd2nzParams.nValue =
+    scaleK / 2; // 源操作ND矩阵的行数，按B16视图后2个fp8 scale合并为1个half
 nd2nzParams.dValue = m; // 源操作ND矩阵的列数
 nd2nzParams.srcDValue = m; // 源操作数同一ND矩阵内相邻行的起始地址偏移
-nd2nzParams.dstNzC0Stride = scaleK / 2; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzParams.dstNzC0Stride =
+    scaleK / 2; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 nd2nzParams.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
 nd2nzParams.dstNzMatrixStride = 0; // 相邻Nz矩阵间的起始地址偏移
 AscendC::DataCopy(scaleA1LocalB16, scaleAGMB16, nd2nzParams);
@@ -786,15 +810,18 @@ scaleB矩阵的搬运方式与scaleA类似。按fp8_e8m0_t真实数据类型排�
 
 ```cpp
 AscendC::GlobalTensor<half> scaleBGMB16;
-scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()), n * scaleK / 2);
+scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()),
+                            n *scaleK / 2);
 auto scaleB1LocalB16 = scaleB1Local.ReinterpretCast<half>();
 
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.ndNum = 1; // 源操作数中ND矩阵的个数
-nd2nzParams.nValue = scaleK / 2; // 源操作ND矩阵的行数，按B16视图后2个fp8 scale合并为1个half
+nd2nzParams.nValue =
+    scaleK / 2; // 源操作ND矩阵的行数，按B16视图后2个fp8 scale合并为1个half
 nd2nzParams.dValue = n; // 源操作ND矩阵的列数
 nd2nzParams.srcDValue = n; // 源操作数同一ND矩阵内相邻行的起始地址偏移
-nd2nzParams.dstNzC0Stride = scaleK / 2; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+nd2nzParams.dstNzC0Stride =
+    scaleK / 2; // ND -> Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 nd2nzParams.dstNzNStride = 1; // ND矩阵第x行与第x+1行转Nz后在dst中的偏移
 nd2nzParams.dstNzMatrixStride = 0; // 相邻Nz矩阵间的起始地址偏移
 AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, nd2nzParams);
@@ -814,16 +841,19 @@ AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, nd2nzParams);
 
 ```cpp
 AscendC::GlobalTensor<half> scaleBGMB16;
-scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()), n * scaleK / 2);
+scaleBGMB16.SetGlobalBuffer((__gm__ half *)(scaleBGM.GetPhyAddr()),
+                            n *scaleK / 2);
 auto scaleB1LocalB16 = scaleB1Local.ReinterpretCast<half>();
 
 AscendC::Dn2NzParams dn2nzParams;
-dn2nzParams.dnNum = 1; // 源操作数中DN矩阵的个数
+dn2nzParams.dnNum = 1;  // 源操作数中DN矩阵的个数
 dn2nzParams.dValue = n; // 源操作DN矩阵的行数
-dn2nzParams.nValue = scaleK / 2; // 源操作DN矩阵的列数，按B16视图后2个fp8 scale合并为1个half
+dn2nzParams.nValue =
+    scaleK / 2; // 源操作DN矩阵的列数，按B16视图后2个fp8 scale合并为1个half
 dn2nzParams.srcDnMatrixStride = 0; // 源操作数相邻DN矩阵间的起始地址偏移
 dn2nzParams.srcDValue = scaleK / 2; // 源操作数同一DN矩阵内相邻行的起始地址偏移
-dn2nzParams.dstNzC0Stride = scaleK / 2; // DN转Nz后，同一行数据切分后各段的起始地址间隔，单位32B
+dn2nzParams.dstNzC0Stride =
+    scaleK / 2; // DN转Nz后，同一行数据切分后各段的起始地址间隔，单位32B
 dn2nzParams.dstNzNStride = 1; // DN矩阵第x行与第x+1行转Nz后在dst中的偏移
 dn2nzParams.dstNzMatrixStride = 0; // 相邻Nz矩阵间的起始地址偏移
 AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, dn2nzParams);
@@ -863,8 +893,10 @@ AscendC::DataCopy(scaleB1LocalB16, scaleBGMB16, dn2nzParams);
 调用一次`LoadData`指令并传入`LoadData2DParamsV2`、`LoadData2DMxParams`两个结构体参数，可同时完成A矩阵到L0A、对应scale矩阵到L0A_MX的搬运。L0A_MX Buffer和L0A的地址是固定比例关系，`LoadData`指令会自行按照L0A的地址进行推导，用户无需配置。B矩阵和scaleB同理：
 
 ```cpp
-AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams, loadMxDataParams);
-AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams,
+                  loadMxDataParams);
+AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams,
+                  loadMxDataParams);
 ```
 #### 6.3. A矩阵 L1 -> L0A，scaleA矩阵 L1 -> L0A_MX
 
@@ -917,7 +949,8 @@ loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 
-AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams, loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams,
+                  loadMxDataParams);
 ```
 
 ##### 6.3.2. A矩阵 L1 -> L0A 转置，单次调用（场景2 / 4）
@@ -947,7 +980,8 @@ loadDataParams.sid = 0;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // A矩阵转置输入[k, m]，L1 -> L0A需要转置
-// 转置搬运时，L1上A矩阵shape为[kaAlignL1, mAlignL1]，row方向对应逻辑k维度，col方向对应逻辑m维度
+// 转置搬运时，L1上A矩阵shape为[kaAlignL1,
+// mAlignL1]，row方向对应逻辑k维度，col方向对应逻辑m维度
 loadDataParams.mStep = CeilDivision(kaAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(mAlignL1, fractalShape[1]);
 // srcStride/dstStride表示源/目的矩阵col方向相邻分形起始地址间隔，单位512B
@@ -965,7 +999,8 @@ loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 
-AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams, loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local, scaleA1Local, loadDataParams,
+                  loadMxDataParams);
 ```
 
 ##### 6.3.3. A矩阵 L1 -> L0A 转置，for循环调用（场景5 / 6）
@@ -1020,17 +1055,18 @@ loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 uint32_t dstOffset = 0;
 uint16_t L0ALoopNum = CeilDivision(kaAlignL0, fractalShape[0] * fractalNum);
 for (uint16_t loopIdx = 0; loopIdx < L0ALoopNum; ++loopIdx) {
-    // mStartPosition递增，A矩阵每次搬运按m方向更新起始地址，scaleA矩阵第一次for循环全部搬运完成，后续for循环不进行搬运
-    loadDataParams.mStartPosition = mStepAlign * loopIdx;
-    if (loopIdx != 0) {
-        loadMxDataParams.xStep = 0;
-        loadMxDataParams.yStep = 0;
-    } else {
-        loadMxDataParams.xStep = CeilDivision(scaleMAlignL1, fractalShape[0]);
-        loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
-    }
-    AscendC::LoadData(a2Local[dstOffset], a1Local, scaleA1Local, loadDataParams, loadMxDataParams);
-    dstOffset += CeilAlign(mAlignL0, fractalShape[0]) * fractalShape[1];
+  // mStartPosition递增，A矩阵每次搬运按m方向更新起始地址，scaleA矩阵第一次for循环全部搬运完成，后续for循环不进行搬运
+  loadDataParams.mStartPosition = mStepAlign * loopIdx;
+  if (loopIdx != 0) {
+    loadMxDataParams.xStep = 0;
+    loadMxDataParams.yStep = 0;
+  } else {
+    loadMxDataParams.xStep = CeilDivision(scaleMAlignL1, fractalShape[0]);
+    loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
+  }
+  AscendC::LoadData(a2Local[dstOffset], a1Local, scaleA1Local, loadDataParams,
+                    loadMxDataParams);
+  dstOffset += CeilAlign(mAlignL0, fractalShape[0]) * fractalShape[1];
 }
 ```
 
@@ -1089,7 +1125,8 @@ loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 
-AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataParams);
+AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams,
+                  loadMxDataParams);
 ```
 
 ##### 6.4.2. B矩阵 L1 -> L0B 转置（场景2 / 4 / 5 / 6）
@@ -1119,7 +1156,8 @@ loadDataParams.sid = 0;
 loadDataParams.mStartPosition = 0;
 loadDataParams.kStartPosition = 0;
 // B矩阵不转置输入[k, n]，L1 -> L0B需要转置
-// 转置搬运时，L1上B矩阵shape为[kbAlignL1, nAlignL1]，row方向对应逻辑k维度，col方向对应逻辑n维度
+// 转置搬运时，L1上B矩阵shape为[kbAlignL1,
+// nAlignL1]，row方向对应逻辑k维度，col方向对应逻辑n维度
 loadDataParams.mStep = CeilDivision(kbAlignL1, fractalShape[0]);
 loadDataParams.kStep = CeilDivision(nAlignL1, fractalShape[1]);
 // srcStride/dstStride表示源/目的矩阵col方向相邻分形起始地址间隔，单位512B
@@ -1139,7 +1177,8 @@ loadMxDataParams.yStep = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.srcStride = scaleK / SCALE_EVEN_NUMBER;
 loadMxDataParams.dstStride = scaleK / SCALE_EVEN_NUMBER;
 
-AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams, loadMxDataParams);
+AscendC::LoadData(b2Local, b1Local, scaleB1Local, loadDataParams,
+                  loadMxDataParams);
 ```
 
 ### 7. 矩阵乘（`MmadMx`）
@@ -1156,12 +1195,12 @@ MX矩阵乘法公式为`C = (scaleA ⊗ A) * (scaleB ⊗ B)`，`MmadMx`接口会
 ```cpp
 AscendC::MmadParams mmadParams;
 if constexpr (scenarioNum == 2 || scenarioNum == 4) {
-    // mmad默认m轴向16对齐，但由于A转置过程m轴向fractalShape[0]*fractalNum对齐，
-    // 此处按fractalShape[0] * fractalNum对齐，让多搬分形参与计算，
-    // 后续Fixpipe搬出时跳过无效分形对应的结果。
-    mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum);
+  // mmad默认m轴向16对齐，但由于A转置过程m轴向fractalShape[0]*fractalNum对齐，
+  // 此处按fractalShape[0] * fractalNum对齐，让多搬分形参与计算，
+  // 后续Fixpipe搬出时跳过无效分形对应的结果。
+  mmadParams.m = CeilAlign(m, fractalShape[0] * fractalNum);
 } else {
-    mmadParams.m = m;
+  mmadParams.m = m;
 }
 mmadParams.n = n;
 // MX矩阵乘法要求k方向按64对齐。
@@ -1187,11 +1226,11 @@ AscendC::MmadMx(c1Local, a2Local, b2Local, mmadParams);
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
 fixpipeParams.nSize = n;
 fixpipeParams.mSize = m;
-if constexpr (scenarioNum == 2 || scenarioNum == 4){
-    // 场景2/4：A矩阵转置输入[k, m]单次调用，m方向多搬脏数据超过1个分形
-    fixpipeParams.srcStride = CeilAlign(m, fractalShape[0] * fractalNum);
+if constexpr (scenarioNum == 2 || scenarioNum == 4) {
+  // 场景2/4：A矩阵转置输入[k, m]单次调用，m方向多搬脏数据超过1个分形
+  fixpipeParams.srcStride = CeilAlign(m, fractalShape[0] * fractalNum);
 } else {
-    fixpipeParams.srcStride = CeilAlign(m, fractalShape[0]);
+  fixpipeParams.srcStride = CeilAlign(m, fractalShape[0]);
 }
 fixpipeParams.dstStride = n;
 AscendC::Fixpipe<U, U, AscendC::CFG_ROW_MAJOR>(cGM, c1Local, fixpipeParams);

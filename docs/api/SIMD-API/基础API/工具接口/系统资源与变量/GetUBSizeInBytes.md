@@ -46,9 +46,9 @@ this->totalLength = totalLength;
 // GetUBSizeInBytes() / sizeof(half) -> 计算UB能容纳多少个half类型元素
 // 除2 -> 预留50%的UB空间
 if (totalLength > AscendC::GetUBSizeInBytes() / sizeof(half) / 2) {
-    this->tileLength = AscendC::GetUBSizeInBytes() / sizeof(half) / 2;
+  this->tileLength = AscendC::GetUBSizeInBytes() / sizeof(half) / 2;
 } else { // 防止分片大小超过实际数据总量
-    this->tileLength = this->totalLength;
+  this->tileLength = this->totalLength;
 }
 // 需要迭代的分片数量
 this->tileNum = this->totalLength / this->tileLength;

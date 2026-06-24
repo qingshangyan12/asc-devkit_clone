@@ -77,15 +77,14 @@ short_vector_add
 **关键代码**：
 
 ```cpp
-template<typename T>
-__global__ void add(T* x, T* y, T* z, uint64_t size)
-{
-    // gridDim.x * blockDim.x 线程总数 (64 * 1024)
-    int32_t stride = gridDim.x * blockDim.x;
-    // 每个线程从自己的全局idx开始，每次递增总线程数，直到处理完所有元素
-    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < size; idx += stride) {
-        z[idx] = x[idx] + y[idx];
-    }
+template <typename T> __global__ void add(T *x, T *y, T *z, uint64_t size) {
+  // gridDim.x * blockDim.x 线程总数 (64 * 1024)
+  int32_t stride = gridDim.x * blockDim.x;
+  // 每个线程从自己的全局idx开始，每次递增总线程数，直到处理完所有元素
+  for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < size;
+       idx += stride) {
+    z[idx] = x[idx] + y[idx];
+  }
 }
 ```
 
@@ -126,25 +125,25 @@ __global__ void add(T* x, T* y, T* z, uint64_t size)
 **关键代码**：
 
 ```cpp
-template<typename T, typename U>
-__global__ void add2(T* x, T* y, T* z, uint64_t size)
-{
-    // 转为向量类型
-    const U* x2 = reinterpret_cast<const U*>(x);
-    const U* y2 = reinterpret_cast<const U*>(y);
-    U* z2 = reinterpret_cast<U*>(z);
+template <typename T, typename U>
+__global__ void add2(T *x, T *y, T *z, uint64_t size) {
+  // 转为向量类型
+  const U *x2 = reinterpret_cast<const U *>(x);
+  const U *y2 = reinterpret_cast<const U *>(y);
+  U *z2 = reinterpret_cast<U *>(z);
 
-    uint64_t vectorSize = size / 2;
-    int32_t stride = gridDim.x * blockDim.x;
-    // 短向量循环处理偶数对（步长同样是总线程数）
-    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
-        z2[idx] = x2[idx] + y2[idx];
-    }
-    // 最后一个奇数元素处理（如果size是奇数，由全局第0号线程在最后处理）
-    if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
-        uint64_t lastIdx = size - 1;
-        z[lastIdx] = x[lastIdx] + y[lastIdx];
-    }
+  uint64_t vectorSize = size / 2;
+  int32_t stride = gridDim.x * blockDim.x;
+  // 短向量循环处理偶数对（步长同样是总线程数）
+  for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize;
+       idx += stride) {
+    z2[idx] = x2[idx] + y2[idx];
+  }
+  // 最后一个奇数元素处理（如果size是奇数，由全局第0号线程在最后处理）
+  if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
+    uint64_t lastIdx = size - 1;
+    z[lastIdx] = x[lastIdx] + y[lastIdx];
+  }
 }
 ```
 

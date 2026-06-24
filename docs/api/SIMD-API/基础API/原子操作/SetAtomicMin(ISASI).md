@@ -21,8 +21,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline void SetAtomicMin() 
+template <typename T> __aicore__ inline void SetAtomicMin()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -71,30 +70,28 @@ __aicore__ inline void SetAtomicMin()
 #include "kernel_operator.h"
 
 constexpr uint32_t SIZE = 256;
-__aicore__ inline void CopyIn()
-{
-    AscendC::LocalTensor<T> srcLocal = queueSrc.AllocTensor<T>();
-    // 清空原子操作的状态
-    AscendC::DisableDmaAtomic();
-    AscendC::DataCopy(srcLocal, srcGlobal, SIZE);
-    queueSrc.EnQue(srcLocal);
-    // 核间同步
-    AscendC::SyncAll();
+__aicore__ inline void CopyIn() {
+  AscendC::LocalTensor<T> srcLocal = queueSrc.AllocTensor<T>();
+  // 清空原子操作的状态
+  AscendC::DisableDmaAtomic();
+  AscendC::DataCopy(srcLocal, srcGlobal, SIZE);
+  queueSrc.EnQue(srcLocal);
+  // 核间同步
+  AscendC::SyncAll();
 }
 
-__aicore__ inline void CopyOut()
-{
-    AscendC::LocalTensor<T> srcLocal = queueSrc.DeQue<T>();
-    // 开启原子MIN模式，3个核取最小值
-    AscendC::SetAtomicMin<T>();
-    AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
-    // 关闭原子操作
-    AscendC::DisableDmaAtomic();
-    queueSrc.FreeTensor(srcLocal);
+__aicore__ inline void CopyOut() {
+  AscendC::LocalTensor<T> srcLocal = queueSrc.DeQue<T>();
+  // 开启原子MIN模式，3个核取最小值
+  AscendC::SetAtomicMin<T>();
+  AscendC::DataCopy(dstGlobal, srcLocal, SIZE);
+  // 关闭原子操作
+  AscendC::DisableDmaAtomic();
+  queueSrc.FreeTensor(srcLocal);
 }
 
 /*
-每个核的输入数据为: 
+每个核的输入数据为:
 Src0: [1,1,1,1,1,...,1] // 256个1
 Src1: [2,2,2,2,2,...,2] // 256个2
 最终输出数据: [1,1,1,1,1,...,1] // 256个1

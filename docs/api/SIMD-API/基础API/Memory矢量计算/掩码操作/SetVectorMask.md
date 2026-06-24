@@ -79,15 +79,16 @@
 - 适用于Normal模式下mask逐比特模式和Counter模式
 
     ```cpp
-    template <typename T, MaskMode mode = MaskMode::NORMAL>
-    __aicore__ static inline void SetVectorMask(const uint64_t maskHigh, const uint64_t maskLow)
+template <typename T, MaskMode mode = MaskMode::NORMAL>
+__aicore__ static inline void SetVectorMask(const uint64_t maskHigh,
+                                            const uint64_t maskLow)
     ```
 
 - 适用于Normal模式下Mask连续模式和Counter模式
 
     ```cpp
-    template <typename T, MaskMode mode = MaskMode::NORMAL>
-    __aicore__ static inline void SetVectorMask(int32_t len)
+template <typename T, MaskMode mode = MaskMode::NORMAL>
+__aicore__ static inline void SetVectorMask(int32_t len)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -132,50 +133,58 @@
 - Normal模式调用示例
 
     ```cpp
-    AscendC::LocalTensor<half> dstLocal;
-    AscendC::LocalTensor<half> src0Local;
-    AscendC::LocalTensor<half> src1Local;
-    
-    // Normal模式
-    AscendC::SetMaskNorm();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0xffffffffffffffff, 0xffffffffffffffff);  // 逐bit模式
-    
-    // SetVectorMask<half, MaskMode::NORMAL>(128);  // 连续模式
-    // 多次调用矢量计算API,可以统一设置为Normal模式，并设置mask参数，无需在API内部反复设置，省去了在API反复设置的过程，会有一定的性能优势
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
-    // dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
-    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 2, 2, 2, 8, 8, 8 });
-    AscendC::ResetMask();
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+AscendC::LocalTensor<half> src1Local;
+
+// Normal模式
+AscendC::SetMaskNorm();
+AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(
+    0xffffffffffffffff, 0xffffffffffffffff); // 逐bit模式
+
+// SetVectorMask<half, MaskMode::NORMAL>(128);  // 连续模式
+// 多次调用矢量计算API,可以统一设置为Normal模式，并设置mask参数，无需在API内部反复设置，省去了在API反复设置的过程，会有一定的性能优势
+// dstBlkStride, src0BlkStride, src1BlkStride = 1,单次迭代内数据连续读取和写入
+// dstRepStride, src0RepStride, src1RepStride = 8,相邻迭代间数据连续读取和写入
+AscendC::Add<half, false>(dstLocal, src0Local, src1Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
+AscendC::Sub<half, false>(src0Local, dstLocal, src1Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
+AscendC::Mul<half, false>(src1Local, dstLocal, src0Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {2, 2, 2, 8, 8, 8});
+AscendC::ResetMask();
     ```
 
 - Counter模式调用示例
 
     ```cpp
-    // Counter模式和tensor高维切分计算接口配合使用
-    AscendC::LocalTensor<half> dstLocal;
-    AscendC::LocalTensor<half> src0Local;
-    AscendC::LocalTensor<half> src1Local;
-    int32_t len = 128;  // 参与计算的元素个数
-    AscendC::SetMaskCount();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(len);
-    AscendC::Add<half, false>(dstLocal, src0Local, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
-    AscendC::Sub<half, false>(src0Local, dstLocal, src1Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
-    AscendC::Mul<half, false>(src1Local, dstLocal, src0Local, AscendC::MASK_PLACEHOLDER, 1, { 1, 1, 1, 8, 8, 8 });
-    AscendC::SetMaskNorm();
-    AscendC::ResetMask();
-    
-    // Counter模式和tensor前n个数据计算接口配合使用
-    AscendC::LocalTensor<half> dstLocal;
-    AscendC::LocalTensor<half> src0Local;
-    half num = 2; 
-    AscendC::SetMaskCount();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(128); // 参与计算的元素个数为128
-    AscendC::Adds<half, false>(dstLocal, src0Local, num, 1);
-    AscendC::Muls<half, false>(dstLocal, src0Local, num, 1);
-    AscendC::SetMaskNorm();
-    AscendC::ResetMask();
+// Counter模式和tensor高维切分计算接口配合使用
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+AscendC::LocalTensor<half> src1Local;
+int32_t len = 128; // 参与计算的元素个数
+AscendC::SetMaskCount();
+AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(len);
+AscendC::Add<half, false>(dstLocal, src0Local, src1Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
+AscendC::Sub<half, false>(src0Local, dstLocal, src1Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
+AscendC::Mul<half, false>(src1Local, dstLocal, src0Local,
+                          AscendC::MASK_PLACEHOLDER, 1, {1, 1, 1, 8, 8, 8});
+AscendC::SetMaskNorm();
+AscendC::ResetMask();
+
+// Counter模式和tensor前n个数据计算接口配合使用
+AscendC::LocalTensor<half> dstLocal;
+AscendC::LocalTensor<half> src0Local;
+half num = 2;
+AscendC::SetMaskCount();
+AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(
+    128); // 参与计算的元素个数为128
+AscendC::Adds<half, false>(dstLocal, src0Local, num, 1);
+AscendC::Muls<half, false>(dstLocal, src0Local, num, 1);
+AscendC::SetMaskNorm();
+AscendC::ResetMask();
     ```
 
 更多示例请参考[接口外设置Mask](../SIMD计算说明/掩码/接口外设置Mask.md)。

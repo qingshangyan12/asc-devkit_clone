@@ -32,18 +32,19 @@ C API 使用 `asc_` 前缀的函数形式：
 
 ```cpp
 // 向量加法
-__aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint32_t count);
+__aicore__ inline void asc_add(__ubuf__ half *dst, __ubuf__ half *src0,
+                               __ubuf__ half *src1, uint32_t count);
 
 // 带stride的向量加法
-__aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
-    uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void
+asc_add(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1,
+        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
 // 标量加法
-__aicore__ inline void asc_add_scalar(__ubuf__ half* dst, __ubuf__ half* src,
-    half value, uint32_t count);
+__aicore__ inline void asc_add_scalar(__ubuf__ half *dst, __ubuf__ half *src,
+                                      half value, uint32_t count);
 ```
 
 ### 2.2 指针类型标记
@@ -75,13 +76,11 @@ C API 入参多为基本类型：
 C API 测试通常使用 `mockcpp` 框架进行底层指令 Mock：
 
 ```cpp
-#include <mockcpp/mockcpp.hpp>
 #include "c_api/stub/cce_stub.h"
+#include <mockcpp/mockcpp.hpp>
 
 // Mock 底层指令
-MOCKER(cce_instruction, void(...))
-    .times(1)
-    .will(invoke(cce_instruction_Stub));
+MOCKER(cce_instruction, void(...)).times(1).will(invoke(cce_instruction_Stub));
 ```
 
 ---
@@ -149,12 +148,12 @@ C API 常有多个重载版本：
 
 ```cpp
 // 重载1: 基本版本
-void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint32_t count);
+void asc_add(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1,
+             uint32_t count);
 
 // 重载2: 带 stride 版本
-void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint8_t repeat, ...);
+void asc_add(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1,
+             uint8_t repeat, ...);
 ```
 
 **测试策略**：每个重载版本独立测试
@@ -170,9 +169,9 @@ void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
 ```cpp
 // impl 文件中的架构分支
 #if __NPU_ARCH__ == 2201
-    // ascend910b1 实现
+// ascend910b1 实现
 #elif __NPU_ARCH__ == 3510
-    // ascend950pr_9599 实现
+// ascend950pr_9599 实现
 #endif
 ```
 
@@ -207,46 +206,49 @@ C API 的编译、执行、失败修复和验证报告统一按 [自动化验证
 
 ```cpp
 // 向量加法
-__aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint32_t count);
+__aicore__ inline void asc_add(__ubuf__ half *dst, __ubuf__ half *src0,
+                               __ubuf__ half *src1, uint32_t count);
 
 // 带 stride 的向量加法
-__aicore__ inline void asc_add(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint8_t repeat,
-    uint8_t dst_block_stride, uint8_t src0_block_stride, uint8_t src1_block_stride,
-    uint8_t dst_repeat_stride, uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
+__aicore__ inline void
+asc_add(__ubuf__ half *dst, __ubuf__ half *src0, __ubuf__ half *src1,
+        uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
+        uint8_t src1_block_stride, uint8_t dst_repeat_stride,
+        uint8_t src0_repeat_stride, uint8_t src1_repeat_stride);
 
 // 标量加法
-__aicore__ inline void asc_add_scalar(__ubuf__ half* dst, __ubuf__ half* src,
-    half value, uint32_t count);
+__aicore__ inline void asc_add_scalar(__ubuf__ half *dst, __ubuf__ half *src,
+                                      half value, uint32_t count);
 
 // 向量乘法
-__aicore__ inline void asc_mul(__ubuf__ half* dst, __ubuf__ half* src0,
-    __ubuf__ half* src1, uint32_t count);
+__aicore__ inline void asc_mul(__ubuf__ half *dst, __ubuf__ half *src0,
+                               __ubuf__ half *src1, uint32_t count);
 ```
 
 ### 7.2 类型转换类 API
 
 ```cpp
 // float 转 half
-__aicore__ inline void asc_float2half(__ubuf__ half* dst, __ubuf__ float* src,
-    uint32_t count);
+__aicore__ inline void asc_float2half(__ubuf__ half *dst, __ubuf__ float *src,
+                                      uint32_t count);
 
 // half 转 float
-__aicore__ inline void asc_half2float(__ubuf__ float* dst, __ubuf__ half* src,
-    uint32_t count);
+__aicore__ inline void asc_half2float(__ubuf__ float *dst, __ubuf__ half *src,
+                                      uint32_t count);
 ```
 
 ### 7.3 归约操作类 API
 
 ```cpp
 // 数据块归约求和
-__aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half* dst, __ubuf__ half* src,
-    uint32_t count);
+__aicore__ inline void asc_datablock_reduce_sum(__ubuf__ half *dst,
+                                                __ubuf__ half *src,
+                                                uint32_t count);
 
 // 数据块归约求最大值
-__aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ half* src,
-    uint32_t count);
+__aicore__ inline void asc_datablock_reduce_max(__ubuf__ half *dst,
+                                                __ubuf__ half *src,
+                                                uint32_t count);
 ```
 
 ### 7.4 参数说明
@@ -283,20 +285,20 @@ __aicore__ inline void asc_datablock_reduce_max(__ubuf__ half* dst, __ubuf__ hal
 
 ```cpp
 // 向量计算使用 __ubuf__
-__ubuf__ half* dst;
-__ubuf__ half* src0;
-__ubuf__ half* src1;
+__ubuf__ half *dst;
+__ubuf__ half *src0;
+__ubuf__ half *src1;
 asc_add(dst, src0, src1, count);
 
 // L1/CBUF 与 FBUF 数据搬运使用 __cbuf__, __fbuf__
-__cbuf__ void* l1;
-__fbuf__ void* fbuf;
+__cbuf__ void *l1;
+__fbuf__ void *fbuf;
 asc_copy_l12fb(fbuf, l1, size);
 
 // 矩阵计算使用 __ca__, __cb__, __cc__
-__ca__ half* a;
-__cb__ half* b;
-__cc__ float* c;
+__ca__ half *a;
+__cb__ half *b;
+__cc__ float *c;
 asc_mmad(c, a, b, m, n, k);
 ```
 

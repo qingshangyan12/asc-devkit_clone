@@ -69,8 +69,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <pipe_t pipe>
-__aicore__ inline void PipeBarrier()
+template <pipe_t pipe> __aicore__ inline void PipeBarrier()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

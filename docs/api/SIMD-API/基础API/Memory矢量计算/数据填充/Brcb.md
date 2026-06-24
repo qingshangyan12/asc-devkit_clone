@@ -86,7 +86,9 @@ def Brcb(src, dst, repeatTime, repeatParams):
 
 ```cpp
 template <typename T>
-__aicore__ inline void Brcb(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint8_t repeatTime, const BrcbRepeatParams& repeatParams)
+__aicore__ inline void Brcb(const LocalTensor<T> &dst,
+                            const LocalTensor<T> &src, const uint8_t repeatTime,
+                            const BrcbRepeatParams &repeatParams)
 ```
 
 ## 参数说明<a name="section1619484392111"></a>
@@ -195,7 +197,7 @@ dstRepStride为16：说明相邻迭代间目的操作数中首尾DataBlock地址
 // repeatTime = 2, 128 elements one repeat, 256 elements total
 // srcLocal数据类型为half，dstLocal数据类型为half
 // dstBlkStride = 1, no gap between blocks in one repeat
-// dstRepStride = 8, no gap between repeats 
+// dstRepStride = 8, no gap between repeats
 AscendC::Brcb(dstLocal, srcLocal, 2, {1, 8});
 ```
 

@@ -7,17 +7,17 @@ asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../vector_datamove/asc_s
 ```cpp
 constexpr uint64_t ASC_DEFAULT_NDIM_PAD_COUNT_CONFIG_VALUE = 0;
 union asc_ndim_pad_count_config {
-    uint64_t config = ASC_DEFAULT_NDIM_PAD_COUNT_CONFIG_VALUE;
-    struct {
-        uint8_t loop1_lp_count;
-        uint8_t loop1_rp_count;
-        uint8_t loop2_lp_count;
-        uint8_t loop2_rp_count;
-        uint8_t loop3_lp_count;
-        uint8_t loop3_rp_count;
-        uint8_t loop4_lp_count;
-        uint8_t loop4_rp_count;
-    };
+  uint64_t config = ASC_DEFAULT_NDIM_PAD_COUNT_CONFIG_VALUE;
+  struct {
+    uint8_t loop1_lp_count;
+    uint8_t loop1_rp_count;
+    uint8_t loop2_lp_count;
+    uint8_t loop2_rp_count;
+    uint8_t loop3_lp_count;
+    uint8_t loop3_rp_count;
+    uint8_t loop4_lp_count;
+    uint8_t loop4_rp_count;
+  };
 };
 ```
 

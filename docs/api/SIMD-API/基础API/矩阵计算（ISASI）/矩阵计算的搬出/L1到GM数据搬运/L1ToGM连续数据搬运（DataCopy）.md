@@ -24,7 +24,8 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopy(const GlobalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002540198372_section16128134420472"></a>

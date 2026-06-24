@@ -56,8 +56,9 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T1> __aicore__ inline __inout_pipe__(S)
-void SetValue(const uint32_t index, const T1 value) const
+template <typename T1>
+__aicore__ inline __inout_pipe__(S) void SetValue(const uint32_t index,
+                                                  const T1 value) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -104,16 +105,15 @@ void SetValue(const uint32_t index, const T1 value) const
 // srcLen = 256, num = 100, M=50
 // 示例1
 for (int32_t i = 0; i < srcLen; ++i) {
-    inputLocal.SetValue(i, num); // 对inputLocal中第i个位置进行赋值为num
+  inputLocal.SetValue(i, num); // 对inputLocal中第i个位置进行赋值为num
 }
 // 示例1结果如下：
 // 数据(inputLocal): [100 100 100  ... 100]
 
-
 // srcLen = 256, num = 99, M=50
 // 示例2
 for (int32_t i = 0; i < srcLen; ++i) {
-    inputLocal(i) = num; // 对inputLocal中第i个位置进行赋值为num
+  inputLocal(i) = num; // 对inputLocal中第i个位置进行赋值为num
 }
 // 示例2结果如下：
 // 数据(inputLocal): [99 99 99  ... 99]

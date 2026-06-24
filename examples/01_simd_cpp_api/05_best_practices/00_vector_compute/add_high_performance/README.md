@@ -80,10 +80,10 @@ $$
 **关键代码**：
 ```cpp
 for (uint32_t i = 0; i < curLen; i++) {
-      float xVal = (float)xLocal.GetValue(i);
-      float yVal = (float)yLocal.GetValue(i);
-      zLocal.SetValue(i, (half)(xVal + yVal));
-    }
+  float xVal = (float)xLocal.GetValue(i);
+  float yVal = (float)yLocal.GetValue(i);
+  zLocal.SetValue(i, (half)(xVal + yVal));
+}
 ```
 
 **样例配置**：
@@ -183,11 +183,11 @@ AscendC::Add(zLocal, xLocal, yLocal, curLen);
 uint32_t baseCoreM = totalM / splitM;
 uint32_t remainderM = totalM % splitM;
 if (blockIdxM < remainderM) {
-    actualCoreM = baseCoreM + 1;  // 均匀分配余数
-    startM = blockIdxM * actualCoreM;
+  actualCoreM = baseCoreM + 1; // 均匀分配余数
+  startM = blockIdxM * actualCoreM;
 } else {
-    actualCoreM = baseCoreM;
-    startM = remainderM * (baseCoreM + 1) + (blockIdxM - remainderM) * baseCoreM;
+  actualCoreM = baseCoreM;
+  startM = remainderM * (baseCoreM + 1) + (blockIdxM - remainderM) * baseCoreM;
 }
 ```
 
@@ -277,17 +277,21 @@ if (blockIdxM < remainderM) {
 // Ping-Pong双缓冲地址
 static constexpr uint32_t xAddrPing = 0;
 static constexpr uint32_t yAddrPing = MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t zAddrPing = yAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t xAddrPong = zAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t yAddrPong = xAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
-static constexpr uint32_t zAddrPong = yAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPing =
+    yAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t xAddrPong =
+    zAddrPing + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPong =
+    xAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPong =
+    yAddrPong + MAX_DATA_COPY_LEN * sizeof(half);
 
 // 双缓冲流水线：交替使用两个事件ID和两组缓冲区
 for (uint32_t loopIdx = 0; loopIdx < totalBlocks; loopIdx++) {
-    int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
-    AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
-    // ... 数据搬运和计算，使用对应的eventID同步
-    AscendC::Add(zLocal, xLocal, yLocal, curLen);
+  int32_t eventID = (loopIdx % 2 == 0 ? EVENT_ID0 : EVENT_ID1);
+  AscendC::LocalTensor<half> &xLocal = (loopIdx % 2 == 0 ? xPing : xPong);
+  // ... 数据搬运和计算，使用对应的eventID同步
+  AscendC::Add(zLocal, xLocal, yLocal, curLen);
 }
 ```
 
@@ -362,8 +366,8 @@ UB内存分配（双缓冲）：
 
 **关键代码**：
 ```cpp
-  xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
-  yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+xGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
+yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 ```
 
 **样例配置**：
@@ -421,11 +425,16 @@ yGm.SetL2CacheHint(AscendC::CacheMode::CACHE_MODE_DISABLE);
 
 // 优化后的地址布局（避免Bank Conflict）
 static constexpr uint32_t xAddrPingBC = 0;
-static constexpr uint32_t yAddrPingBC = BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);  // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
+static constexpr uint32_t yAddrPingBC =
+    BANK_CONFLICT_DATA_COPY_LEN *
+    sizeof(
+        half); // 错开256B；注意：sizeof(half)=2B，float场景需调整为sizeof(float)
 static constexpr uint32_t xAddrPongBC = MAX_DATA_COPY_LEN * sizeof(half) * 2;
-static constexpr uint32_t yAddrPongBC = xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t yAddrPongBC =
+    xAddrPongBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 static constexpr uint32_t zAddrPingBC = MAX_DATA_COPY_LEN * sizeof(half) * 4;
-static constexpr uint32_t zAddrPongBC = zAddrPingBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
+static constexpr uint32_t zAddrPongBC =
+    zAddrPingBC + BANK_CONFLICT_DATA_COPY_LEN * sizeof(half);
 ```
 
 **样例配置**：

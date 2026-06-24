@@ -23,13 +23,14 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T DeNormMin()
+constexpr __aicore__ static inline T DeNormMin()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋最小正的非正规值：
 
     ```cpp
-    __aicore__ static inline void DeNormMin(const LocalTensor<T>& dstLocal, uint32_t count)
+__aicore__ static inline void DeNormMin(const LocalTensor<T> &dstLocal,
+                                        uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +61,12 @@
 - 标量接口
 
     ```cpp
-    float value = AscendC::NumericLimits<float>::DeNormMin();
+float value = AscendC::NumericLimits<float>::DeNormMin();
     ```
 
 - 矢量接口
 
     ```cpp
-    AscendC::NumericLimits<float>::DeNormMin(dstLocal, 256); // 返回256个float类型的最小正的非正规值
+AscendC::NumericLimits<float>::DeNormMin(
+    dstLocal, 256); // 返回256个float类型的最小正的非正规值
     ```

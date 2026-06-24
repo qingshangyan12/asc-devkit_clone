@@ -7,13 +7,13 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    AscendC::SetMaskCount();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(128);
-    AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, 1);
-    AscendC::SetMaskNorm();
-    // ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
-    AscendC::ResetMask();
+half addsValue = 1.0;
+AscendC::SetMaskCount();
+AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(128);
+AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, 1);
+AscendC::SetMaskNorm();
+// ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
+AscendC::ResetMask();
     ```
 
     **图1**  接口外设置Mask，Counter模式前n个数据计算示例  
@@ -26,15 +26,17 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams {2, 2, 16, 16};
-    AscendC::SetMaskCount();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(130);
-    AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, AscendC::MASK_PLACEHOLDER, repeatTimes, repeatParams);
-    AscendC::SetMaskNorm();
-    // ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
-    AscendC::ResetMask(); 
+half addsValue = 1.0;
+int8_t repeatTimes = 1;
+UnaryRepeatParams repeatParams{2, 2, 16, 16};
+AscendC::SetMaskCount();
+AscendC::SetVectorMask<half, AscendC::MaskMode::COUNTER>(130);
+AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue,
+                           AscendC::MASK_PLACEHOLDER, repeatTimes,
+                           repeatParams);
+AscendC::SetMaskNorm();
+// ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
+AscendC::ResetMask();
     ```
 
     **图2**  接口外设置Mask，Counter模式连续计算示例  
@@ -51,14 +53,17 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    int8_t repeatTimes = 1;
-    UnaryRepeatParams repeatParams{2, 2, 16, 16};
-    AscendC::SetMaskNorm();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0x69A569A569A569A5, 0x69A569A569A569A5);
-    AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, AscendC::MASK_PLACEHOLDER, repeatTimes, repeatParams);
-    // ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
-    AscendC::ResetMask();
+half addsValue = 1.0;
+int8_t repeatTimes = 1;
+UnaryRepeatParams repeatParams{2, 2, 16, 16};
+AscendC::SetMaskNorm();
+AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(0x69A569A569A569A5,
+                                                        0x69A569A569A569A5);
+AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue,
+                           AscendC::MASK_PLACEHOLDER, repeatTimes,
+                           repeatParams);
+// ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
+AscendC::ResetMask();
     ```
 
     **图3**  接口外设置Mask，Normal模式高维切分逐bit计算示例  
@@ -69,14 +74,16 @@
     调用示例：
 
     ```cpp
-    half addsValue = 1.0;
-    uint8_t repeatTimes = 1;
-    AscendC::UnaryRepeatParams repeatParams{2, 2, 16, 16};
-    AscendC::SetMaskNorm();
-    AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(128);
-    AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue, AscendC::MASK_PLACEHOLDER, repeatTimes, repeatParams);
-    // ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
-    AscendC::ResetMask();
+half addsValue = 1.0;
+uint8_t repeatTimes = 1;
+AscendC::UnaryRepeatParams repeatParams{2, 2, 16, 16};
+AscendC::SetMaskNorm();
+AscendC::SetVectorMask<half, AscendC::MaskMode::NORMAL>(128);
+AscendC::Adds<half, false>(dstLocal, srcLocal, addsValue,
+                           AscendC::MASK_PLACEHOLDER, repeatTimes,
+                           repeatParams);
+// ResetMask无需在每次计算接口调用后调用，仅在需显式重置掩码状态时使用
+AscendC::ResetMask();
     ```
 
     **图4**  接口外设置Mask，Normal模式高维切分连续计算示例  

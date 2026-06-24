@@ -13,7 +13,7 @@
 ## 函数原型
 
 ```c++
-__aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config& config)
+__aicore__ inline void asc_set_ndim_pad_count(asc_ndim_pad_count_config &config)
 ```
 
 ## 参数说明
@@ -37,6 +37,6 @@ PIPE_S
 ## 调用示例
 
 ```c++
-asc_ndim_pad_count_config config;  // config默认初始值为0。
-asc_set_ndim_pad_count(config); 
+asc_ndim_pad_count_config config; // config默认初始值为0。
+asc_set_ndim_pad_count(config);
 ```

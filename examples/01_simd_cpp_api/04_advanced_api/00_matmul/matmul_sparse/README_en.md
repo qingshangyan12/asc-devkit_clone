@@ -44,24 +44,32 @@ In this scenario, the input left matrix A and the right matrix are sparse matric
   - Key Kernel Steps
     - When creating the Matmul object, define the parameter type information of matrix B through SparseMatmulType.
       ```cpp
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
-      // Use SparseMatmulType to define the parameter type information of matrix B
-      using B_TYPE = AscendC::SparseMatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, BType, true>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
+// Use SparseMatmulType to define the parameter type information of matrix B
+using B_TYPE =
+    AscendC::SparseMatmulType<AscendC::TPosition::GM, AscendC::TPosition::GM,
+                              CubeFormat::ND, BType, true>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
     - Set the index matrix.
       ```cpp
-      matmulObj.SetSparseIndex(gm_index); // Set the index matrix gm_index generated during the densification of matrix B
+matmulObj.SetSparseIndex(gm_index); // Set the index matrix gm_index generated
+                                    // during the densification of matrix B
       ```
 
   - Key Tiling Steps
     - Enable the Sparse Matmul sparse matrix computation scenario.
       ```cpp
-      auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
-      matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
-      tiling.SetSparse(true); // Enable the Sparse Matmul sparse matrix computation scenario
+auto ascendcPlatform =
+    platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
+matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
+tiling.SetSparse(
+    true); // Enable the Sparse Matmul sparse matrix computation scenario
       ```
 
   - Invocation Implementation  

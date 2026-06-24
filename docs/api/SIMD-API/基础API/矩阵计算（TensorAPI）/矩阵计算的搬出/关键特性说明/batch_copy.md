@@ -14,8 +14,10 @@ batch搬运是L0C Buffer到Global Memory或Unified Buffer搬运在矩阵最外�
 
 
 ```cpp
-auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn>(batch, m, n));
-auto dst = MakeTensor(MakeMemPtr(dstAddr), MakeFrameLayout<NDExtLayoutPtn>(batch, m, n));
+auto l0c =
+    MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn>(batch, m, n));
+auto dst = MakeTensor(MakeMemPtr(dstAddr),
+                      MakeFrameLayout<NDExtLayoutPtn>(batch, m, n));
 
 auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
 Copy(atom, dst, l0c);
@@ -29,7 +31,8 @@ Copy(atom, dst, l0c, quant);
 量化张量不带Batch维度时，接口复用同一份量化参数完成batch搬运：
 
 ```cpp
-auto quant = MakeTensor(MakeMemPtr(quantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
+auto quant =
+    MakeTensor(MakeMemPtr(quantAddr), MakeFrameLayout<NDExtLayoutPtn>(1, n));
 
 auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
 Copy(atom, dst, l0c, quant);
@@ -38,7 +41,8 @@ Copy(atom, dst, l0c, quant);
 量化张量带Batch维度时，不能通过一条Fixpipe指令完成全部Batch搬运。接口会按Batch执行`for`循环，逐Batch使用对应的量化参数完成搬运：
 
 ```cpp
-auto quant = MakeTensor(MakeMemPtr(quantAddr), MakeFrameLayout<NDExtLayoutPtn>(batch, 1, n));
+auto quant = MakeTensor(MakeMemPtr(quantAddr),
+                        MakeFrameLayout<NDExtLayoutPtn>(batch, 1, n));
 
 auto atom = MakeCopy(CopyL0C2GM{}).with(FixpipeParams{});
 Copy(atom, dst, l0c, quant);

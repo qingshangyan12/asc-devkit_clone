@@ -40,23 +40,39 @@ M/N轴方向的流水并行的Matmul样例。该功能的应用场景为输入�
   - Kernel关键步骤
     - 创建Matmul对象时，自定义MatmulConfig参数，将其中的MatmulConfigMode设置成CONFIG_MDL，scheduleType参数设置为ScheduleType::OUTER_PRODUCT，iterateOrder参数设置为IterateOrder::ORDER_M，使能MDL模板的N方向流水并行功能，获得自定义地使用MDL模板的Matmul对象。
       ```cpp
-      constexpr static MatmulConfigMode configModeMDL = MatmulConfigMode::CONFIG_MDL;
-      constexpr static MatmulFuncParams funcParamsOrderM{false, false, false, false, 0, IterateOrder::ORDER_M, ScheduleType::OUTER_PRODUCT, true, true};
-      constexpr static MatmulConfig CFG_MDL_OUTER_PRODUCT_ORDER_M = GetMMConfig<configModeMDL>(funcParamsOrderM);
+constexpr static MatmulConfigMode configModeMDL = MatmulConfigMode::CONFIG_MDL;
+constexpr static MatmulFuncParams funcParamsOrderM{false,
+                                                   false,
+                                                   false,
+                                                   false,
+                                                   0,
+                                                   IterateOrder::ORDER_M,
+                                                   ScheduleType::OUTER_PRODUCT,
+                                                   true,
+                                                   true};
+constexpr static MatmulConfig CFG_MDL_OUTER_PRODUCT_ORDER_M =
+    GetMMConfig<configModeMDL>(funcParamsOrderM);
 
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
-      using BIAS_TYPE =  AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL_OUTER_PRODUCT_ORDER_M> matmulObj;
+using A_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, ATYPE, false>;
+using B_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BType, false>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, CType>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE,
+                CFG_MDL_OUTER_PRODUCT_ORDER_M>
+    matmulObj;
       ```
 
   - Tiling关键步骤
     - 设置自定义MatmulConfig参数，将Kernel侧配置的参数如scheduleType等，同步到Tiling侧。
       ```cpp
-      matmul_tiling::MatmulConfigParams matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
-          matmul_tiling::MatrixTraverse::FIRSTM, false);
-      cubeTiling.SetMatmulConfigParams(matmulConfigParams);
+matmul_tiling::MatmulConfigParams
+    matmulConfigParams(1, false, matmul_tiling::ScheduleType::OUTER_PRODUCT,
+                       matmul_tiling::MatrixTraverse::FIRSTM, false);
+cubeTiling.SetMatmulConfigParams(matmulConfigParams);
       ```
 
 - 调用实现  

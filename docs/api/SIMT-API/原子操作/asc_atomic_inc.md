@@ -86,19 +86,18 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void allocate_ring_slot(uint32_t *ticket,
-                                                             uint32_t *slots,
-                                                             uint32_t capacity,
-                                                             uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void allocate_ring_slot(uint32_t *ticket,
+                                                          uint32_t *slots,
+                                                          uint32_t capacity,
+                                                          uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        uint32_t old_ticket = asc_atomic_inc(ticket, capacity - 1U);
-        slots[idx] = old_ticket;
-    }
+  uint32_t old_ticket = asc_atomic_inc(ticket, capacity - 1U);
+  slots[idx] = old_ticket;
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -106,19 +105,17 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void allocate_ring_slot(__gm__ uint32_t *ticket,
-                                                                      __gm__ uint32_t *slots,
-                                                                      uint32_t capacity,
-                                                                      uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void allocate_ring_slot(
+    __gm__ uint32_t *ticket, __gm__ uint32_t *slots, uint32_t capacity,
+    uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        uint32_t old_ticket = asc_atomic_inc(ticket, capacity - 1U);
-        slots[idx] = old_ticket;
-    }
+  uint32_t old_ticket = asc_atomic_inc(ticket, capacity - 1U);
+  slots[idx] = old_ticket;
+}
     ```
 
 输出结果示例如下：

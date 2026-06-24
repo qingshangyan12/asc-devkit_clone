@@ -17,53 +17,211 @@
 - 填充模式
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
+__aicore__ inline void asc_copy_gm2l1(__cbuf__ void *dst, __gm__ void *src,
+                                      uint32_t n_burst, uint32_t len_burst,
+                                      uint8_t pad_func_mode,
+                                      uint64_t src_stride, uint32_t dst_stride)
     ```
 
 - 填充模式（同步）
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode, uint64_t src_stride, uint32_t dst_stride)
+__aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src,
+                                           uint32_t n_burst, uint32_t len_burst,
+                                           uint8_t pad_func_mode,
+                                           uint64_t src_stride,
+                                           uint32_t dst_stride)
     ```
 
 - 2D搬运模式
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ float *dst, __gm__ float *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ half *dst, __gm__ half *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ hifloat8_t *dst, __gm__ hifloat8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ int16_t *dst, __gm__ int16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ int32_t *dst, __gm__ int32_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ int8_t *dst, __gm__ int8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint16_t *dst, __gm__ uint16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ fp4x2_e1m2_t *dst, __gm__ fp4x2_e1m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ fp4x2_e2m1_t *dst, __gm__ fp4x2_e2m1_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1(__cbuf__ void *dst, __gm__ void *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+__aicore__ inline void
+asc_copy_gm2l1(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src,
+               uint32_t m_start_position, uint32_t k_start_position,
+               uint16_t dst_stride, uint16_t m_step, uint16_t k_step,
+               uint8_t decomp_mode, uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ float *dst, __gm__ float *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ fp8_e4m3fn_t *dst,
+                               __gm__ fp8_e4m3fn_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ half *dst, __gm__ half *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ hifloat8_t *dst, __gm__ hifloat8_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ int16_t *dst, __gm__ int16_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ int32_t *dst, __gm__ int32_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ int8_t *dst, __gm__ int8_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ uint16_t *dst, __gm__ uint16_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ uint32_t *dst, __gm__ uint32_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ uint8_t *dst, __gm__ uint8_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ fp4x2_e1m2_t *dst,
+                               __gm__ fp4x2_e1m2_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ fp4x2_e2m1_t *dst,
+                               __gm__ fp4x2_e2m1_t *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode,
+                               uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1(__cbuf__ void *dst, __gm__ void *src,
+                               uint32_t m_start_position,
+                               uint32_t k_start_position, uint16_t dst_stride,
+                               uint16_t m_step, uint16_t k_step,
+                               uint8_t decomp_mode, uint8_t l2_cache_ctl)
     ```
 
 - 2D搬运模式（同步）
 
     ```cpp
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ float *dst, __gm__ float *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e4m3fn_t *dst, __gm__ fp8_e4m3fn_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e5m2_t *dst, __gm__ fp8_e5m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ half *dst, __gm__ half *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ hifloat8_t *dst, __gm__ hifloat8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ int16_t *dst, __gm__ int16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ int32_t *dst, __gm__ int32_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ int8_t *dst, __gm__ int8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint16_t *dst, __gm__ uint16_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp4x2_e1m2_t *dst, __gm__ fp4x2_e1m2_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ fp4x2_e2m1_t *dst, __gm__ fp4x2_e2m1_t *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
-    __aicore__ inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+__aicore__ inline void
+asc_copy_gm2l1_sync(__cbuf__ bfloat16_t *dst, __gm__ bfloat16_t *src,
+                    uint32_t m_start_position, uint32_t k_start_position,
+                    uint16_t dst_stride, uint16_t m_step, uint16_t k_step,
+                    uint8_t decomp_mode, uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ float *dst, __gm__ float *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e4m3fn_t *dst,
+                                    __gm__ fp8_e4m3fn_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ fp8_e5m2_t *dst,
+                                    __gm__ fp8_e5m2_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ half *dst, __gm__ half *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ hifloat8_t *dst,
+                                    __gm__ hifloat8_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ int16_t *dst, __gm__ int16_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ int32_t *dst, __gm__ int32_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ int8_t *dst, __gm__ int8_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(
+        __cbuf__ uint16_t *dst, __gm__ uint16_t *src, uint32_t m_start_position,
+        uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step,
+        uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(
+        __cbuf__ uint32_t *dst, __gm__ uint32_t *src, uint32_t m_start_position,
+        uint32_t k_start_position, uint16_t dst_stride, uint16_t m_step,
+        uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ uint8_t *dst, __gm__ uint8_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ fp4x2_e1m2_t *dst,
+                                    __gm__ fp4x2_e1m2_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ fp4x2_e2m1_t *dst,
+                                    __gm__ fp4x2_e2m1_t *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl) __aicore__
+    inline void asc_copy_gm2l1_sync(__cbuf__ void *dst, __gm__ void *src,
+                                    uint32_t m_start_position,
+                                    uint32_t k_start_position,
+                                    uint16_t dst_stride, uint16_t m_step,
+                                    uint16_t k_step, uint8_t decomp_mode,
+                                    uint8_t l2_cache_ctl)
     ```
 
 ## 参数说明
@@ -123,16 +281,17 @@ PIPE_MTE2
 ## 调用示例
 
 ```cpp
-//待搬运的连续传输数据块个数为1
+// 待搬运的连续传输数据块个数为1
 constexpr uint32_t n_burst = 1;
-//待搬运的每个连续传输数据块的长度为128个字节
+// 待搬运的每个连续传输数据块的长度为128个字节
 constexpr uint32_t len_burst = 4;
-//不对数据做padding
+// 不对数据做padding
 constexpr uint8_t pad_func_mode = 0;
-//输入输出数据中两个相邻连续数据块之间的距离为0
+// 输入输出数据中两个相邻连续数据块之间的距离为0
 constexpr uint64_t src_stride = 0;
 constexpr uint32_t dst_stride = 0;
 __gm__ half src[256];
 __cbuf__ half dst[256];
-asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride, dst_stride);
+asc_copy_gm2l1(dst, src, n_burst, len_burst, pad_func_mode, src_stride,
+               dst_stride);
 ```

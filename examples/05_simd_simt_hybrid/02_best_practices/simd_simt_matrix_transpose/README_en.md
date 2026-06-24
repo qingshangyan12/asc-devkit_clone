@@ -179,7 +179,8 @@ Unlike Case 0, where threads "directly write input elements to the transposed GM
 uint32_t tile_row = threadIdx.x / TILE_DIM;
 uint32_t tile_col = threadIdx.x % TILE_DIM;
 
-output_tile[tile_col + tile_row * height] = input_tile[tile_col * TILE_DIM + tile_row];
+output_tile[tile_col + tile_row * height] =
+    input_tile[tile_col * TILE_DIM + tile_row];
 ```
 
 **Optimization Methods**:

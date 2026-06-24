@@ -53,10 +53,10 @@ When a hash collision occurs, a thread needs to determine whether the key stored
 
 ```C++
 struct Bucket {
-    int64_t key;            // Key
-    uint32_t state;         // Key value write status flag
-    uint32_t flag;          // Atomic operation flag
-    float value[32];        // Value
+  int64_t key;     // Key
+  uint32_t state;  // Key value write status flag
+  uint32_t flag;   // Atomic operation flag
+  float value[32]; // Value
 };
 ```
 

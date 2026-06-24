@@ -56,7 +56,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline __inout_pipe__(S) __gm__ PrimType& operator()(const uint64_t offset) const
+__aicore__ inline __inout_pipe__(S) __gm__ PrimType &
+operator()(const uint64_t offset) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

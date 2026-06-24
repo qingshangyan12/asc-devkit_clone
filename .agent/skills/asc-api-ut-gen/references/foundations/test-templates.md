@@ -24,29 +24,27 @@
 适用于需要 gtest fixture 的 UT。核心类型设置和 include 列表按目标 API 所属 guide 调整。
 
 ```cpp
-#include <gtest/gtest.h>
 #include "kernel_operator.h"
+#include <gtest/gtest.h>
 
 using namespace AscendC;
 
-class TEST_{API_NAME} : public testing::Test {
-protected:
-    void SetUp() override
-    {
-        // 按目标 API 场景设置核心类型。
-    }
+class TEST_ {
+  API_NAME
+} : public testing::Test{
+  protected : void SetUp() override{
+      // 按目标 API 场景设置核心类型。
+  }
 
-    void TearDown() override
-    {
-        // 按目标 API 场景恢复核心类型并做必要同步检查。
-    }
+  void TearDown() override{
+      // 按目标 API 场景恢复核心类型并做必要同步检查。
+  }
 };
 
-TEST_F(TEST_{API_NAME}, Level1_{ApiName}_{Scenario})
-{
-    // 1. 构造输入、输出、workspace 或 LocalTensor。
-    // 2. 调用目标 API 或测试 kernel。
-    // 3. 用精确断言或 CompareResult 校验结果。
+TEST_F(TEST_{API_NAME}, Level1_{ApiName} _{Scenario}) {
+  // 1. 构造输入、输出、workspace 或 LocalTensor。
+  // 2. 调用目标 API 或测试 kernel。
+  // 3. 用精确断言或 CompareResult 校验结果。
 }
 ```
 
@@ -55,34 +53,34 @@ TEST_F(TEST_{API_NAME}, Level1_{ApiName}_{Scenario})
 参数结构只放目标 API 的真实变量维度。不要把通用 dtype 列表、固定 shape 或固定 count 写进模板。
 
 ```cpp
-struct {ApiName}TestParams {
+struct {
+  ApiName
+} TestParams{
     // 示例字段：shape、count、stride、mode、kernel 函数指针等。
 };
 
-class {ApiName}Testsuite : public testing::Test,
-                           public testing::WithParamInterface<{ApiName}TestParams> {
-protected:
-    void SetUp() override
-    {
-        // 按目标 API 场景设置核心类型。
-    }
+class {
+  ApiName
+} Testsuite : public testing::Test,
+              public testing::WithParamInterface<{ApiName} TestParams>{
+                protected : void SetUp() override{
+                    // 按目标 API 场景设置核心类型。
+                }
 
-    void TearDown() override
-    {
-        // 按目标 API 场景恢复核心类型。
-    }
-};
+                void TearDown() override{
+                    // 按目标 API 场景恢复核心类型。
+                }
+              };
 
-INSTANTIATE_TEST_CASE_P(TEST_{API_NAME}, {ApiName}Testsuite,
+INSTANTIATE_TEST_CASE_P(
+    TEST_{API_NAME}, {ApiName} Testsuite,
     ::testing::Values(
-        {ApiName}TestParams { /* case 1: confirmed supported branch */ },
-        {ApiName}TestParams { /* case 2: confirmed boundary branch */ }
-    ));
+        {ApiName} TestParams{/* case 1: confirmed supported branch */},
+        {ApiName} TestParams{/* case 2: confirmed boundary branch */}));
 
-TEST_P({ApiName}Testsuite, {ApiName}TestCase)
-{
-    const auto param = GetParam();
-    // 使用 param 构造输入并校验目标 API 行为。
+TEST_P({ApiName} Testsuite, {ApiName} TestCase) {
+  const auto param = GetParam();
+  // 使用 param 构造输入并校验目标 API 行为。
 }
 ```
 
@@ -92,17 +90,17 @@ TEST_P({ApiName}Testsuite, {ApiName}TestCase)
 
 ```cpp
 template <typename T>
-bool CompareResult(const T* output, const T* golden, uint32_t size, float rtol, float atol)
-{
-    for (uint32_t i = 0; i < size; i++) {
-        const float actual = static_cast<float>(output[i]);
-        const float expect = static_cast<float>(golden[i]);
-        const float threshold = atol + rtol * std::abs(expect);
-        if (std::abs(actual - expect) > threshold) {
-            return false;
-        }
+bool CompareResult(const T *output, const T *golden, uint32_t size, float rtol,
+                   float atol) {
+  for (uint32_t i = 0; i < size; i++) {
+    const float actual = static_cast<float>(output[i]);
+    const float expect = static_cast<float>(golden[i]);
+    const float threshold = atol + rtol * std::abs(expect);
+    if (std::abs(actual - expect) > threshold) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 ```
 

@@ -19,8 +19,7 @@
 ## 函数原型
 
 ```cpp
-template <int count = 1>
-__aicore__ inline void Nop()
+template <int count = 1> __aicore__ inline void Nop()
 ```
 
 ## 参数说明

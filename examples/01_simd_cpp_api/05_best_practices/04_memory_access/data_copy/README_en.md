@@ -345,13 +345,15 @@ constexpr uint32_t fullMBlockCount = m / singleCoreM;
 constexpr uint32_t mTileCount = singleCoreM / tileM;
 
 for (uint32_t mBlockIdx = 0; mBlockIdx < fullMBlockCount; mBlockIdx++) {
-    uint32_t blockGroupStart = (mBlockIdx / numBlocks) * numBlocks;
-    uint32_t curMBlockIdx = offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % numBlocks : mBlockIdx;
-    uint32_t mStart = curMBlockIdx * singleCoreM;
+  uint32_t blockGroupStart = (mBlockIdx / numBlocks) * numBlocks;
+  uint32_t curMBlockIdx =
+      offsetAddr ? blockGroupStart + (mBlockIdx + blockIdx) % numBlocks
+                 : mBlockIdx;
+  uint32_t mStart = curMBlockIdx * singleCoreM;
 
-    for (uint32_t mTileIdx = 0; mTileIdx < mTileCount; mTileIdx++) {
-        uint32_t mIdx = mStart + mTileIdx * tileM;
-    }
+  for (uint32_t mTileIdx = 0; mTileIdx < mTileCount; mTileIdx++) {
+    uint32_t mIdx = mStart + mTileIdx * tileM;
+  }
 }
 ```
 

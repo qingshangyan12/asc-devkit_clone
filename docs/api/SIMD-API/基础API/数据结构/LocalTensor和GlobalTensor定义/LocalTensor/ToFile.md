@@ -54,7 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-int32_t ToFile(const std::string& fileName) const
+int32_t ToFile(const std::string &fileName) const
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

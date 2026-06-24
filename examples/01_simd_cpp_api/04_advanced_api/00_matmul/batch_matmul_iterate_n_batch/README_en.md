@@ -44,39 +44,42 @@ An example for multiple batch Matmul computations, including both synchronous an
   - Key Kernel Steps
     - When creating the Matmul object, customize the MatmulConfig parameters, set the isNBatch parameter to true to enable multi-batch input and multi-batch output, and set the isBiasBatch parameter to false to enable the Bias reuse feature of BatchMatmul, obtaining a custom Matmul object using the NORM template.
       ```cpp
-      constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
-      constexpr MatmulBatchParams batchParams = {
-        true, BatchMode::BATCH_LESS_THAN_L1, false /* isNBatch, batchMode, isBiasBatch */
-      };
-      constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
+constexpr MatmulConfigMode configMode = MatmulConfigMode::CONFIG_NORM;
+constexpr MatmulBatchParams batchParams = {
+    true, BatchMode::BATCH_LESS_THAN_L1,
+    false /* isNBatch, batchMode, isBiasBatch */
+};
+constexpr MatmulConfig CFG_MM = GetMMConfig<configMode>(batchParams);
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MM> matmulObj;
       ```
     - Calculate the nNum size based on the Layout information and BatchNum of the A and B matrices.
       ```cpp
-      int32_t g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG : tiling.BLayoutInfoG;
-      int32_t nNum = tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
+int32_t g_lay = tiling.ALayoutInfoG > tiling.BLayoutInfoG ? tiling.ALayoutInfoG
+                                                          : tiling.BLayoutInfoG;
+int32_t nNum =
+    tiling.ALayoutInfoB * tiling.ALayoutInfoN * g_lay / tiling.BatchNum;
       ```
     - The current source code defaults to `IS_SYNCH=true`, where computation results are first written to `gm_workspace` and then transferred to the output GM.
       ```cpp
-      matmulObj.SetWorkspace(gm_workspace);
-      matmulObj.IterateNBatch(nNum, batchA, batchB, false);
-      DataCopy(bufferC, gm_workspace, sizeC / sizeof(cType));
+matmulObj.SetWorkspace(gm_workspace);
+matmulObj.IterateNBatch(nNum, batchA, batchB, false);
+DataCopy(bufferC, gm_workspace, sizeC / sizeof(cType));
       ```
     - When `IS_SYNCH=false`, complete the multi-batch matrix multiplication operation and call the GetBatchTensorC interface to obtain results.
       ```cpp
-      matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
-      for(int32_t j = 0; j < nNum; ++j){
-          matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
-      }
+matmulObj.template IterateNBatch<false>(nNum, batchA, batchB, false);
+for (int32_t j = 0; j < nNum; ++j) {
+  matmulObj.template GetBatchTensorC<false>(batchA, batchB, false);
+}
       ```
 
   - Key Tiling Steps
     - Call SetALayout, SetBLayout, SetCLayout, and SetBatchNum to set the Layout axis information and maximum BatchNum for A/B/C.
       ```cpp
-      cubeTiling.SetALayout(1, M, 1, batchNum, K);
-      cubeTiling.SetBLayout(1, N, 1, batchNum, K);
-      cubeTiling.SetCLayout(1, M, 1, batchNum, N);
-      cubeTiling.SetBatchNum(batchNum);
+cubeTiling.SetALayout(1, M, 1, batchNum, K);
+cubeTiling.SetBLayout(1, N, 1, batchNum, K);
+cubeTiling.SetCLayout(1, M, 1, batchNum, N);
+cubeTiling.SetBatchNum(batchNum);
       ```
 
 ## Build and Run

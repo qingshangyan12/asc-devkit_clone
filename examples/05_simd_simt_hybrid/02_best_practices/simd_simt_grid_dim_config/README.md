@@ -77,14 +77,12 @@
 **关键代码**：
 
 ```cpp
-__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...)
-{}
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_empty(...) {}
 
-__global__ __vector__ void empty_kernel(...)
-{
-    for (uint32_t vf_idx = 0; vf_idx < vf_call_times; vf_idx++) {
-        asc_vf_call<simt_empty>(dim3(MAX_THREAD_NUM), ...);
-    }
+__global__ __vector__ void empty_kernel(...) {
+  for (uint32_t vf_idx = 0; vf_idx < vf_call_times; vf_idx++) {
+    asc_vf_call<simt_empty>(dim3(MAX_THREAD_NUM), ...);
+  }
 }
 ```
 
@@ -168,22 +166,24 @@ vf调用也存在调度开销，应尽量调用1次vf处理完所有数据
 **关键代码**：
 
 ```cpp
-// simt_gather: SIMT vf函数 —— grid-stride loop，以总线程数为步长遍历整个index数组
-__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_gather(..., uint32_t index_total_length)
-{
-    uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-    uint32_t stride = gridDim.x * blockDim.x;
-    for (uint32_t i = idx; i < index_total_length; i += stride) {
-        uint32_t gather_idx = index[i];
-        if (gather_idx >= input_total_length) { gather_idx = 0; }
-        output[i] = input[gather_idx];
+// simt_gather: SIMT vf函数 —— grid-stride
+// loop，以总线程数为步长遍历整个index数组
+__simt_vf__ __launch_bounds__(MAX_THREAD_NUM) inline void simt_gather(
+    ..., uint32_t index_total_length) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  uint32_t stride = gridDim.x * blockDim.x;
+  for (uint32_t i = idx; i < index_total_length; i += stride) {
+    uint32_t gather_idx = index[i];
+    if (gather_idx >= input_total_length) {
+      gather_idx = 0;
     }
+    output[i] = input[gather_idx];
+  }
 }
 
 // gather_kernel: 核函数调用simt_gather，线程数量由resolve_thread_num自适应分配
-__global__ __vector__ void gather_kernel(..., uint32_t thread_num)
-{
-    asc_vf_call<simt_gather>(dim3(thread_num), ..., index_total_length);
+__global__ __vector__ void gather_kernel(..., uint32_t thread_num) {
+  asc_vf_call<simt_gather>(dim3(thread_num), ..., index_total_length);
 }
 ```
 
@@ -196,14 +196,14 @@ __global__ __vector__ void gather_kernel(..., uint32_t thread_num)
 - **逻辑核**：启动的线程块数量，是软件侧希望启动的并行任务数
 - **物理核**：硬件实际拥有的Vector Core数量，需要通过[aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/910beta1/API/runtimeapi/aclcppdevg_03_1867.html)在运行期查询获取（本样例环境为64），代码示例如下：
   ```cpp
-  // 运行期查询物理 Vector Core(AIV)数量；查询失败时返回 AIV_CORE_NUM
-  uint32_t query_aiv_core_num(int32_t device_id)
-  {
-      int64_t core_num = 0;
-      aclError ret = aclrtGetDeviceInfo(
-          static_cast<uint32_t>(device_id), ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
-      return (ret == ACL_SUCCESS && core_num > 0) ? static_cast<uint32_t>(core_num) : AIV_CORE_NUM;
-  }
+// 运行期查询物理 Vector Core(AIV)数量；查询失败时返回 AIV_CORE_NUM
+uint32_t query_aiv_core_num(int32_t device_id) {
+  int64_t core_num = 0;
+  aclError ret = aclrtGetDeviceInfo(static_cast<uint32_t>(device_id),
+                                    ACL_DEV_ATTR_VECTOR_CORE_NUM, &core_num);
+  return (ret == ACL_SUCCESS && core_num > 0) ? static_cast<uint32_t>(core_num)
+                                              : AIV_CORE_NUM;
+}
   ```
 
 两者的关系会影响调度开销：当逻辑核数 ≤ 物理核数时，所有逻辑核可以一次占满物理核并行执行；当逻辑核数 > 物理核数时，超出的逻辑核必须等待前面的逻辑核执行完、让出物理核后才能被调度，等待开销会随超出的逻辑核数量增加而上升。

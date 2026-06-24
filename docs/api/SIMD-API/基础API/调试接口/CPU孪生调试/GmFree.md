@@ -89,5 +89,5 @@ void GmFree(void *ptr)
 ## 调用示例<a name="zh-cn_topic_0000002000199397_zh-cn_topic_0000001592243993_section82241477610"></a>
 
 ```cpp
-AscendC::GmFree((void*)x);
+AscendC::GmFree((void *)x);
 ```

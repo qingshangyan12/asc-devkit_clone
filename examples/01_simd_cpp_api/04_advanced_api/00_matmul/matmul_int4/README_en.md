@@ -48,11 +48,15 @@ A Matmul example with A and B matrices as int4b_t data type input.
   - Key Kernel Steps
     - Create the Matmul object with data type int4b_t.
       ```cpp
-      using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AscendC::int4b_t>;
-      using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, AscendC::int4b_t>;
-      using C_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
-      using BIAS_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
-      AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
+using A_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   AscendC::int4b_t>;
+using B_TYPE = AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND,
+                                   AscendC::int4b_t>;
+using C_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
+using BIAS_TYPE =
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, int32_t>;
+AscendC::Matmul<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, CFG_MDL> matmulObj;
       ```
   
   - Invocation Implementation  

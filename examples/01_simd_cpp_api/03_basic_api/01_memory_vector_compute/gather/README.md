@@ -35,7 +35,8 @@
 - 数据类型：uint32_t
 - 实现：
     ```cpp
-    AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask, gatherMaskParams, rsvdCnt);
+AscendC::GatherMask(dstLocal, src0Local, src1Pattern, reduceMode, mask,
+                    gatherMaskParams, rsvdCnt);
     ```
 - 参数：dstLocal和src0Local采用地址复用，并使用内置固定模式src1Pattern=2进行元素选取，reduceMode=false（Normal模式），mask=0，gatherMaskParams={1, 4, 8, 0}
 
@@ -46,7 +47,8 @@
 - 数据类型：uint32_t
 - 实现：
     ```cpp
-    AscendC::GatherMask (dstLocal, src0Local, src1Local, reduceMode, mask, gatherMaskParams, rsvdCnt);
+AscendC::GatherMask(dstLocal, src0Local, src1Local, reduceMode, mask,
+                    gatherMaskParams, rsvdCnt);
     ```
 - 参数：使用用户提供的Tensor进行元素选取，reduceMode=true（Counter模式），mask=70，gatherMaskParams={1, 2, 4, 0}
 
@@ -57,7 +59,7 @@
 - 数据类型：输入输出uint16_t，srcOffset类型为uint32_t
 - 实现：
     ```cpp
-    AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseOffset, count);
+AscendC::Gather(dstLocal, src0Local, srcOffset, srcBaseOffset, count);
     ```
 - 参数：使用用户提供的srcOffset按元素地址偏移，srcBaseOffset=0表示源操作数的起始地址，count=128表示执行处理的数据个数
 
@@ -68,7 +70,7 @@
 - 数据类型：输入输出uint16_t，srcOffset类型为uint32_t
 - 实现：
     ```cpp
-    AscendC::Gatherb<T>(dstLocal, src0Local, srcOffset, repeatTime, params);
+AscendC::Gatherb<T>(dstLocal, src0Local, srcOffset, repeatTime, params);
     ```
 - 参数：用户输入的srcOffset是每个datablock在源操作数中对应的地址偏移，repeatTime=1表示重复迭代次数，params={1,8}
 

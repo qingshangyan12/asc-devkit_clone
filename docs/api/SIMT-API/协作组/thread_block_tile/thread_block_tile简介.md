@@ -13,14 +13,10 @@ unsigned long long num_threads() const;
 unsigned long long thread_rank() const;
 unsigned long long meta_group_size() const;
 unsigned long long meta_group_rank() const;
-template <typename T>
-T shfl(T var, int src_rank) const;
-template <typename T>
-T shfl_up(T var, unsigned int delta) const;
-template <typename T>
-T shfl_down(T var, unsigned int delta) const;
-template <typename T>
-T shfl_xor(T var, unsigned int lane_mask) const;
+template <typename T> T shfl(T var, int src_rank) const;
+template <typename T> T shfl_up(T var, unsigned int delta) const;
+template <typename T> T shfl_down(T var, unsigned int delta) const;
+template <typename T> T shfl_xor(T var, unsigned int lane_mask) const;
 int any(int predicate) const;
 int all(int predicate) const;
 unsigned int ballot(int predicate) const;

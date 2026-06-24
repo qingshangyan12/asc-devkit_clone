@@ -42,7 +42,7 @@
 - 实现：
 
     ```cpp
-    AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, count);
+AscendC::Interleave(dst0Local, dst1Local, src0Local, src1Local, count);
     ```
 
 - 说明：将src0和src1中的元素交织存入dst0和dst1。dst0存放src0前半部分和src1前半部分交织的结果，dst1存放src0后半部分和src1后半部分交织的结果
@@ -60,7 +60,7 @@
 - 实现：
 
     ```cpp
-    AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, count);
+AscendC::DeInterleave(dst0Local, dst1Local, src0Local, src1Local, count);
     ```
 
 - 说明：将src0和src1中的元素解交织存入dst0和dst1。dst0存放src0和src1奇数索引位置的元素，dst1存放src0和src1偶数索引位置的元素

@@ -19,10 +19,15 @@ Vector Length长度为256Byte，dst数据类型为uint16_t，一个dst可以存�
 ## 函数原型
 
   ```cpp
-  // 低位模式
-  __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
-  // 高位模式
-  __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask)
+// 低位模式
+__simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t &dst,
+                                                          vector_uint8_t src,
+                                                          vector_bool mask)
+    // 高位模式
+    __simd_callee__
+    inline void asc_cumulative_histogram_bin1(vector_uint16_t &dst,
+                                              vector_uint8_t src,
+                                              vector_bool mask)
   ```
 
 ## 参数说明

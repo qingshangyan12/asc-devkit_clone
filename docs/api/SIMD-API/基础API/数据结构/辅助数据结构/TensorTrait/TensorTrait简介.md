@@ -11,19 +11,19 @@ TensorTrait数据结构是描述Tensor相关信息的基础模板类，包含Ten
 ## 原型定义<a name="section10580930144614"></a>
 
 ```cpp
-template <typename T, TPosition pos = TPosition::GM, typename LayoutType = Layout<Shape<>, Stride<>>>
+template <typename T, TPosition pos = TPosition::GM,
+          typename LayoutType = Layout<Shape<>, Stride<>>>
 struct TensorTrait {
-    using LiteType = T;
-    using LiteLayoutType = LayoutType;
-    static constexpr const TPosition tPos = pos; // 该常量成员为后续功能扩展做预留
+  using LiteType = T;
+  using LiteLayoutType = LayoutType;
+  static constexpr const TPosition tPos = pos; // 该常量成员为后续功能扩展做预留
 public:
-    __aicore__ inline TensorTrait(const LayoutType& t = {});
+  __aicore__ inline TensorTrait(const LayoutType &t = {});
 
-    __aicore__ inline LayoutType& GetLayout();
-    __aicore__ inline const LayoutType& GetLayout() const;
+  __aicore__ inline LayoutType &GetLayout();
+  __aicore__ inline const LayoutType &GetLayout() const;
 
-    __aicore__ inline void SetLayout(const LayoutType& t);
-
+  __aicore__ inline void SetLayout(const LayoutType &t);
 };
 ```
 
@@ -63,10 +63,10 @@ public:
 ## 成员函数<a name="zh-cn_topic_0000002213064918_section1173524710"></a>
 
 ```cpp
-__aicore__ inline TensorTrait(const LayoutType& t = {})
-__aicore__ inline LayoutType& GetLayout()
-__aicore__ inline const LayoutType& GetLayout() const
-__aicore__ inline void SetLayout(const LayoutType& t)
+__aicore__ inline TensorTrait(const LayoutType &t = {}) __aicore__
+    inline LayoutType &GetLayout() __aicore__
+    inline const LayoutType &GetLayout() const __aicore__
+    inline void SetLayout(const LayoutType &t)
 ```
 
 ## 相关接口<a name="section104554349817"></a>
@@ -74,10 +74,11 @@ __aicore__ inline void SetLayout(const LayoutType& t)
 ```cpp
 // TensorTrait结构构造方法
 template <typename T, TPosition pos, typename LayoutType>
-__aicore__ inline constexpr auto MakeTensorTrait(const LayoutType& t)
+__aicore__ inline constexpr auto MakeTensorTrait(const LayoutType &t)
 
-// is_tensorTrait原型定义
-template <typename T> struct is_tensorTrait
+    // is_tensorTrait原型定义
+    template <typename T>
+    struct is_tensorTrait
 ```
 
 ## 约束说明<a name="section1253618294449"></a>

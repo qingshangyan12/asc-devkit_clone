@@ -17,15 +17,25 @@ $$
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_or(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_half src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask)
-__simd_callee__ inline void asc_or(vector_bool& dst, vector_bool src0, vector_bool src1, vector_bool mask)
+__simd_callee__ inline void asc_or(vector_int8_t &dst, vector_int8_t src0,
+                                   vector_int8_t src1,
+                                   vector_bool mask) __simd_callee__
+    inline void asc_or(vector_uint8_t &dst, vector_uint8_t src0,
+                       vector_uint8_t src1, vector_bool mask) __simd_callee__
+    inline void asc_or(vector_int16_t &dst, vector_int16_t src0,
+                       vector_int16_t src1, vector_bool mask) __simd_callee__
+    inline void asc_or(vector_uint16_t &dst, vector_uint16_t src0,
+                       vector_uint16_t src1, vector_bool mask) __simd_callee__
+    inline void asc_or(vector_half &dst, vector_half src0, vector_half src1,
+                       vector_bool mask) __simd_callee__
+    inline void asc_or(vector_int32_t &dst, vector_int32_t src0,
+                       vector_int32_t src1, vector_bool mask) __simd_callee__
+    inline void asc_or(vector_uint32_t &dst, vector_uint32_t src0,
+                       vector_uint32_t src1, vector_bool mask) __simd_callee__
+    inline void asc_or(vector_float &dst, vector_float src0, vector_float src1,
+                       vector_bool mask) __simd_callee__
+    inline void asc_or(vector_bool &dst, vector_bool src0, vector_bool src1,
+                       vector_bool mask)
 ```
 
 ## 参数说明
@@ -58,7 +68,7 @@ vector_half src0;
 vector_half src1;
 vector_half dst;
 vector_bool mask = asc_create_mask_b16(PAT_ALL);
-asc_loadalign(src0, src0_addr);  // src0_addr是外部输入的UB内存空间地址
-asc_loadalign(src1, src1_addr);  // src0_addr是外部输入的UB内存空间地址
+asc_loadalign(src0, src0_addr); // src0_addr是外部输入的UB内存空间地址
+asc_loadalign(src1, src1_addr); // src0_addr是外部输入的UB内存空间地址
 asc_or(dst, src0, src1, mask);
 ```

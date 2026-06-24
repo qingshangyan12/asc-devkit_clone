@@ -7,12 +7,12 @@ asc_store_atomic_config参数包含原子操作启用位与原子操作类型，
 ```cpp
 constexpr uint64_t ASC_STORE_ATOMIC_DEFAULT_VALUE = 0x0000000000000000;
 union asc_store_atomic_config {
-    uint64_t config = ASC_STORE_ATOMIC_DEFAULT_VALUE;
-    struct {
-        uint64_t atomic_type : 3;
-        uint64_t atomic_op : 2;
-        uint64_t reserved1 : 59;
-    };
+  uint64_t config = ASC_STORE_ATOMIC_DEFAULT_VALUE;
+  struct {
+    uint64_t atomic_type : 3;
+    uint64_t atomic_op : 2;
+    uint64_t reserved1 : 59;
+  };
 };
 ```
 

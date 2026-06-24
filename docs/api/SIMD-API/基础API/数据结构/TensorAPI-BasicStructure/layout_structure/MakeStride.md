@@ -14,7 +14,7 @@
 
 ```cpp
 template <typename... Ts>
-__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts&... t)
+__aicore__ inline constexpr Stride<Ts...> MakeStride(const Ts &...t)
 ```
 
 ## 参数说明
@@ -52,6 +52,6 @@ auto stride = MakeStride(1, 100, 200);
 // 构造层次化Stride
 auto fractalStride = MakeStride(MakeStride(1, 16), MakeStride(32, 512));
 
-auto stride0 = Std::get<0>(stride);                    // stride0 = 1
+auto stride0 = Std::get<0>(stride);                         // stride0 = 1
 auto innerStride = Std::get<1>(Std::get<0>(fractalStride)); // innerStride = 16
 ```

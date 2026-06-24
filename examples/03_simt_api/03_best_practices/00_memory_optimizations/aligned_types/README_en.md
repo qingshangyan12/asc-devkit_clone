@@ -32,8 +32,14 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   A compile-time operator that returns the alignment requirement of an object, that is, the number of bytes that the starting address of the object must be a multiple of. The default `alignof` of a struct equals the maximum `alignof` of all its fields, and can be forcibly increased using the `alignas` keyword. For example, for `struct T` and `struct T2` below, `T` has `alignof` of 4B, and `T2` has `alignof` of 8B.
 
   ```cpp
-  struct T { uint8_t a; uint32_t b; };  // alignof = max(1, 4) = 4
-  struct alignas(8) T2 { uint8_t a; uint32_t b; };  // alignof = 8 (alignas increases alignment)
+struct T {
+  uint8_t a;
+  uint32_t b;
+}; // alignof = max(1, 4) = 4
+struct alignas(8) T2 {
+  uint8_t a;
+  uint32_t b;
+}; // alignof = 8 (alignas increases alignment)
   ```
 
   **2. alignas**
@@ -47,8 +53,12 @@ This example selects 14 structs, grouped by `sizeof` into 4B, 8B, 16B, and 32B g
   - **Also increases sizeof**: `sizeof` must be a multiple of `alignof`, so when increasing `alignof`, `sizeof` rounds up.
 
   ```cpp
-  struct alignas(4) Align3 { unsigned char r, g, b; }; // alignof=4 sizeof=4 (increased with alignas)
-  struct Misalign3 { unsigned char r, g, b; }; // alignof=1 sizeof=3 (default)
+struct alignas(4) Align3 {
+  unsigned char r, g, b;
+}; // alignof=4 sizeof=4 (increased with alignas)
+struct Misalign3 {
+  unsigned char r, g, b;
+}; // alignof=1 sizeof=3 (default)
   ```
 
 - Key Parameters

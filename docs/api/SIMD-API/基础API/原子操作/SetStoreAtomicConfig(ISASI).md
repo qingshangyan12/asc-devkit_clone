@@ -50,5 +50,6 @@ __aicore__ inline void SetStoreAtomicConfig()
 
 ```cpp
 // 设置原子操作为求和操作，支持的数据类型为half
-AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16, AscendC::AtomicOp::ATOMIC_SUM>();
+AscendC::SetStoreAtomicConfig<AscendC::AtomicDtype::ATOMIC_F16,
+                              AscendC::AtomicOp::ATOMIC_SUM>();
 ```

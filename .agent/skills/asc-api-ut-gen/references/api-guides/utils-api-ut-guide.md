@@ -40,8 +40,9 @@ __aicore__ inline bool IsAligned(uint64_t addr, uint32_t alignment);
 __aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment);
 
 // 类型判断
-template<typename T1, typename T2>
-struct is_same { static constexpr bool value = false; };
+template <typename T1, typename T2> struct is_same {
+  static constexpr bool value = false;
+};
 ```
 
 ### 2.2 编译期计算
@@ -54,7 +55,7 @@ constexpr uint32_t BLOCK_SIZE = 32;
 
 // 编译期类型判断
 if constexpr (std::is_same_v<T, half>) {
-    // half 特定处理
+  // half 特定处理
 }
 ```
 
@@ -72,7 +73,7 @@ if constexpr (std::is_same_v<T, half>) {
 
 ```cpp
 __aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment) {
-    return (size + alignment - 1) & ~(alignment - 1);
+  return (size + alignment - 1) & ~(alignment - 1);
 }
 ```
 
@@ -94,21 +95,21 @@ __aicore__ inline uint32_t AlignUp(uint32_t size, uint32_t alignment) {
 ```cpp
 class TEST_AlignUp : public testing::Test {
 protected:
-    void SetUp() {}
-    void TearDown() {}
+  void SetUp() {}
+  void TearDown() {}
 };
 
 TEST_F(TEST_AlignUp, AlignUp_Basic) {
-    // 测试对齐计算
-    EXPECT_EQ(AlignUp(30, 32), 32);
-    EXPECT_EQ(AlignUp(32, 32), 32);
-    EXPECT_EQ(AlignUp(33, 32), 64);
-    EXPECT_EQ(AlignUp(0, 32), 0);
+  // 测试对齐计算
+  EXPECT_EQ(AlignUp(30, 32), 32);
+  EXPECT_EQ(AlignUp(32, 32), 32);
+  EXPECT_EQ(AlignUp(33, 32), 64);
+  EXPECT_EQ(AlignUp(0, 32), 0);
 }
 
 TEST_F(TEST_AlignUp, AlignUp_EdgeCases) {
-    // 边界条件测试
-    EXPECT_EQ(AlignUp(UINT32_MAX - 1, 32), UINT32_MAX - 31);
+  // 边界条件测试
+  EXPECT_EQ(AlignUp(UINT32_MAX - 1, 32), UINT32_MAX - 31);
 }
 ```
 
@@ -131,8 +132,8 @@ static_assert(aligned == 128, "alignment calculation should be correct");
 ```cpp
 // 无需设置特定核心类型
 TEST_F(TEST_Utils, Utils_Basic) {
-    // 直接测试
-    EXPECT_EQ(UtilFunction(...), expected_value);
+  // 直接测试
+  EXPECT_EQ(UtilFunction(...), expected_value);
 }
 ```
 
@@ -156,21 +157,21 @@ utils API 不是单一形状：`Std::remove_pointer` 这类 trait 主要是编�
 
 ```cpp
 TEST_F(TEST_AlignUp, AlignUp_Boundaries) {
-    // 零值
-    EXPECT_EQ(AlignUp(0, 32), 0);
+  // 零值
+  EXPECT_EQ(AlignUp(0, 32), 0);
 
-    // 已对齐值
-    EXPECT_EQ(AlignUp(32, 32), 32);
-    EXPECT_EQ(AlignUp(64, 32), 64);
+  // 已对齐值
+  EXPECT_EQ(AlignUp(32, 32), 32);
+  EXPECT_EQ(AlignUp(64, 32), 64);
 
-    // 未对齐值
-    EXPECT_EQ(AlignUp(1, 32), 32);
-    EXPECT_EQ(AlignUp(31, 32), 32);
-    EXPECT_EQ(AlignUp(33, 32), 64);
+  // 未对齐值
+  EXPECT_EQ(AlignUp(1, 32), 32);
+  EXPECT_EQ(AlignUp(31, 32), 32);
+  EXPECT_EQ(AlignUp(33, 32), 64);
 
-    // 大值
-    EXPECT_EQ(AlignUp(1024, 32), 1024);
-    EXPECT_EQ(AlignUp(1025, 32), 1056);
+  // 大值
+  EXPECT_EQ(AlignUp(1024, 32), 1024);
+  EXPECT_EQ(AlignUp(1025, 32), 1056);
 }
 ```
 
@@ -180,13 +181,11 @@ TEST_F(TEST_AlignUp, AlignUp_Boundaries) {
 
 ```cpp
 INSTANTIATE_TEST_CASE_P(TEST_ALIGN, AlignTestsuite,
-    ::testing::Values(
-        AlignTestParams { 30, 16, 32 },
-        AlignTestParams { 30, 32, 32 },
-        AlignTestParams { 30, 64, 64 },
-        AlignTestParams { 100, 16, 112 },
-        AlignTestParams { 100, 32, 128 }
-    ));
+                        ::testing::Values(AlignTestParams{30, 16, 32},
+                                          AlignTestParams{30, 32, 32},
+                                          AlignTestParams{30, 64, 64},
+                                          AlignTestParams{100, 16, 112},
+                                          AlignTestParams{100, 32, 128}));
 ```
 
 ### 4.3 类型组合
@@ -195,10 +194,10 @@ INSTANTIATE_TEST_CASE_P(TEST_ALIGN, AlignTestsuite,
 
 ```cpp
 TEST_F(TEST_Max, Max_DifferentTypes) {
-    EXPECT_EQ(Max(1, 2), 2);
-    EXPECT_EQ(Max(1.0f, 2.0f), 2.0f);
-    EXPECT_EQ(Max(1.0, 2.0), 2.0);
-    EXPECT_EQ(Max(int8_t(1), int8_t(2)), int8_t(2));
+  EXPECT_EQ(Max(1, 2), 2);
+  EXPECT_EQ(Max(1.0f, 2.0f), 2.0f);
+  EXPECT_EQ(Max(1.0, 2.0), 2.0);
+  EXPECT_EQ(Max(int8_t(1), int8_t(2)), int8_t(2));
 }
 ```
 
@@ -208,15 +207,15 @@ TEST_F(TEST_Max, Max_DifferentTypes) {
 
 ```cpp
 TEST_F(TEST_CheckAlign, CheckAlign_Invalid) {
-    // 非对齐地址
-    EXPECT_FALSE(IsAligned(1, 32));
-    EXPECT_FALSE(IsAligned(31, 32));
-    EXPECT_FALSE(IsAligned(33, 32));
+  // 非对齐地址
+  EXPECT_FALSE(IsAligned(1, 32));
+  EXPECT_FALSE(IsAligned(31, 32));
+  EXPECT_FALSE(IsAligned(33, 32));
 
-    // 对齐地址
-    EXPECT_TRUE(IsAligned(0, 32));
-    EXPECT_TRUE(IsAligned(32, 32));
-    EXPECT_TRUE(IsAligned(64, 32));
+  // 对齐地址
+  EXPECT_TRUE(IsAligned(0, 32));
+  EXPECT_TRUE(IsAligned(32, 32));
+  EXPECT_TRUE(IsAligned(64, 32));
 }
 ```
 
@@ -307,29 +306,24 @@ __aicore__ inline bool IsAligned(uint64_t addr, uint32_t alignment);
 
 ```cpp
 // 最大最小值
-template<typename T>
-__aicore__ inline T Max(T a, T b);
+template <typename T> __aicore__ inline T Max(T a, T b);
 
-template<typename T>
-__aicore__ inline T Min(T a, T b);
+template <typename T> __aicore__ inline T Min(T a, T b);
 
 // 绝对值
-template<typename T>
-__aicore__ inline T Abs(T value);
+template <typename T> __aicore__ inline T Abs(T value);
 ```
 
 ### 9.3 类型判断
 
 ```cpp
 // 类型相同判断
-template<typename T1, typename T2>
-struct is_same {
-    static constexpr bool value = false;
+template <typename T1, typename T2> struct is_same {
+  static constexpr bool value = false;
 };
 
-template<typename T>
-struct is_same<T, T> {
-    static constexpr bool value = true;
+template <typename T> struct is_same<T, T> {
+  static constexpr bool value = true;
 };
 ```
 

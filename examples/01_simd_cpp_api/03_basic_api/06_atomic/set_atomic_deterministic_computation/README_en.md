@@ -120,16 +120,23 @@ Synchronization between the instruction that enables atomic operations and subse
 #### 1.3.1 Intra-core Synchronization Implementation
 
 ```cpp
-// The entire atomic accumulation executes within the same core, controlling the execution order of 5 instructions as "(1)->(2)->(3)->(4)->(5)"
-(1) Transfer data data0 to GM;    // Data transfer, overwrites the original random values in GM, expected GM data is data0
-Intra-core synchronization
-(2) SetAtomicAdd();         // Enable atomic accumulation, subsequent transfers from UB/L0C/L1 to GM all perform atomic accumulation
+// The entire atomic accumulation executes within the same core, controlling the
+// execution order of 5 instructions as "(1)->(2)->(3)->(4)->(5)"
+(1) Transfer data data0 to GM; // Data transfer, overwrites the original random
+                               // values in GM, expected GM data is data0
+Intra -
+    core synchronization(2)
+        SetAtomicAdd(); // Enable atomic accumulation, subsequent transfers from
+                        // UB/L0C/L1 to GM all perform atomic accumulation
 // No synchronization needed between instructions (2) and (3)
-(3) Transfer data1 to GM;    // Data transfer after enabling atomic accumulation, expected GM data is data0 + data1
-Intra-core synchronization
-(4) Transfer data2 to GM;    // Data transfer after enabling atomic accumulation, expected GM data is data0 + data1 + data2
-Intra-core synchronization
-(5) Transfer data3 to GM;    // Data transfer after enabling atomic accumulation, expected GM data is data0 + data1 + data2 + data3
+(3) Transfer data1 to GM; // Data transfer after enabling atomic accumulation,
+                          // expected GM data is data0 + data1
+Intra - core synchronization(4) Transfer data2 to
+    GM; // Data transfer after enabling atomic accumulation, expected GM data is
+        // data0 + data1 + data2
+Intra - core synchronization(5) Transfer data3 to
+    GM; // Data transfer after enabling atomic accumulation, expected GM data is
+        // data0 + data1 + data2 + data3
 ```
 The pipeline types of transfer instructions and atomic operation enabling instructions are shown in the following table. When the above instructions execute within the same core, developers insert [single-pipeline synchronization](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0271.html) or [multi-pipeline synchronization](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0270.html) as needed. Refer to the SCENARIO_NUM=1 branch in the example.
 <table border="1" style="text-align: left;">
@@ -156,24 +163,22 @@ The pipeline types of transfer instructions and atomic operation enabling instru
 As shown in the following pseudocode, when the above instructions execute in different cores, the intra-core synchronization above must be replaced with inter-core synchronization.
 
 ```cpp
-// The entire atomic accumulation executes across 4 different cores, controlling the execution order of the 4 cores as "core 0->core 1->core 2->core 3"
+// The entire atomic accumulation executes across 4 different cores, controlling
+// the execution order of the 4 cores as "core 0->core 1->core 2->core 3"
 if (GetBlockIdx == 0) {
-   Transfer data data0 to GM;
-   Inter-core synchronization
+  Transfer data data0 to GM;
+  Inter - core synchronization
 } else if (GetBlockIdx == 1) {
-   Inter-core synchronization
-   SetAtomicAdd();
-   Transfer data1 to GM;
-   Inter-core synchronization
+  Inter - core synchronization SetAtomicAdd();
+  Transfer data1 to GM;
+  Inter - core synchronization
 } else if (GetBlockIdx == 2) {
-   Inter-core synchronization
-   SetAtomicAdd();
-   Transfer data2 to GM;
-   Inter-core synchronization
+  Inter - core synchronization SetAtomicAdd();
+  Transfer data2 to GM;
+  Inter - core synchronization
 } else if (GetBlockIdx == 3) {
-   Inter-core synchronization
-   SetAtomicAdd();
-   Transfer data3 to GM;
+  Inter - core synchronization SetAtomicAdd();
+  Transfer data3 to GM;
 }
 ```
 Since no hardware synchronization API is currently available for controlling execution order between different cores, inter-core synchronization in deterministic computation scenarios must be implemented through software. The software synchronization schemes differ for three scenarios: pure Vector examples, pure Cube examples, and Mix (containing both Vector and Cube computation) examples, as shown in the following table.

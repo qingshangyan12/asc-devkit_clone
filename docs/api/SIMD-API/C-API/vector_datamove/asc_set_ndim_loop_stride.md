@@ -13,11 +13,16 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride, uint64_t src_stride)
-__aicore__ inline void asc_set_ndim_loop1_stride(uint64_t dst_stride, uint64_t src_stride)
-__aicore__ inline void asc_set_ndim_loop2_stride(uint64_t dst_stride, uint64_t src_stride)
-__aicore__ inline void asc_set_ndim_loop3_stride(uint64_t dst_stride, uint64_t src_stride)
-__aicore__ inline void asc_set_ndim_loop4_stride(uint64_t dst_stride, uint64_t src_stride)
+__aicore__ inline void asc_set_ndim_loop0_stride(uint64_t dst_stride,
+                                                 uint64_t src_stride) __aicore__
+    inline void asc_set_ndim_loop1_stride(uint64_t dst_stride,
+                                          uint64_t src_stride) __aicore__
+    inline void asc_set_ndim_loop2_stride(uint64_t dst_stride,
+                                          uint64_t src_stride) __aicore__
+    inline void asc_set_ndim_loop3_stride(uint64_t dst_stride,
+                                          uint64_t src_stride) __aicore__
+    inline void asc_set_ndim_loop4_stride(uint64_t dst_stride,
+                                          uint64_t src_stride)
 ```
 
 ## 参数说明

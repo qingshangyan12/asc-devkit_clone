@@ -12,26 +12,25 @@ const int32_t DEFAULT_BLK_STRIDE = 1;
 const uint8_t DEFAULT_REPEAT_STRIDE = 8;
 
 struct BinaryRepeatParams {
-    __aicore__ BinaryRepeatParams() {}
-    __aicore__ BinaryRepeatParams(const uint8_t dstBlkStrideIn, const uint8_t src0BlkStrideIn,
-        const uint8_t src1BlkStrideIn, const uint8_t dstRepStrideIn, const uint8_t src0RepStrideIn,
-        const uint8_t src1RepStrideIn)
-        : dstBlkStride(dstBlkStrideIn),
-          src0BlkStride(src0BlkStrideIn),
-          src1BlkStride(src1BlkStrideIn),
-          dstRepStride(dstRepStrideIn),
-          src0RepStride(src0RepStrideIn),
-          src1RepStride(src1RepStrideIn)
-    {}
-    uint32_t blockNumber = DEFAULT_BLK_NUM;
-    uint8_t dstBlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t src0BlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t src1BlkStride = DEFAULT_BLK_STRIDE;
-    uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
-    uint8_t src0RepStride = DEFAULT_REPEAT_STRIDE;
-    uint8_t src1RepStride = DEFAULT_REPEAT_STRIDE;
-    bool repeatStrideMode = false;
-    bool strideSizeMode = false;
+  __aicore__ BinaryRepeatParams() {}
+  __aicore__ BinaryRepeatParams(const uint8_t dstBlkStrideIn,
+                                const uint8_t src0BlkStrideIn,
+                                const uint8_t src1BlkStrideIn,
+                                const uint8_t dstRepStrideIn,
+                                const uint8_t src0RepStrideIn,
+                                const uint8_t src1RepStrideIn)
+      : dstBlkStride(dstBlkStrideIn), src0BlkStride(src0BlkStrideIn),
+        src1BlkStride(src1BlkStrideIn), dstRepStride(dstRepStrideIn),
+        src0RepStride(src0RepStrideIn), src1RepStride(src1RepStrideIn) {}
+  uint32_t blockNumber = DEFAULT_BLK_NUM;
+  uint8_t dstBlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t src0BlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t src1BlkStride = DEFAULT_BLK_STRIDE;
+  uint8_t dstRepStride = DEFAULT_REPEAT_STRIDE;
+  uint8_t src0RepStride = DEFAULT_REPEAT_STRIDE;
+  uint8_t src1RepStride = DEFAULT_REPEAT_STRIDE;
+  bool repeatStrideMode = false;
+  bool strideSizeMode = false;
 };
 ```
 

@@ -54,10 +54,15 @@
 - **数据类型转换：** 转换像素的数据类型，支持uint8\_t转换为int8\_t或half。当uint8\_t转换成int8\_t的时候，输出数据范围限制在\[-128， 127\]。
 
     ```cpp
-    // 例1：实现uint8_t ->int8_t的类型转换，同时实现零均值化：设置每个通道mean值为该通道所有数据的平均值（min和var值无效，不用设置）。
-    output[i][j][k] = input[i][j][k] - mean[k]
-    // 例2：实现uint8_t -> fp16的类型转换，同时实现归一化：设置每个通道mean值为该通道所有数据的平均值，min值为该通道所有数据零均值化后的最小值，var值为该通道所有数据的最大值减最小值的倒数。
-    uint8_t -> fp16:  output[i][j][k] = (input[i][j][k] - mean[k] - min[k]) * var[k]
+// 例1：实现uint8_t
+// ->int8_t的类型转换，同时实现零均值化：设置每个通道mean值为该通道所有数据的平均值（min和var值无效，不用设置）。
+output[i][j][k] =
+    input[i][j][k] -
+    mean[k]
+    // 例2：实现uint8_t ->
+    // fp16的类型转换，同时实现归一化：设置每个通道mean值为该通道所有数据的平均值，min值为该通道所有数据零均值化后的最小值，var值为该通道所有数据的最大值减最小值的倒数。
+    uint8_t->fp16 : output[i][j][k] =
+        (input[i][j][k] - mean[k] - min[k]) * var[k]
     ```
 
     > 转换后的数据类型由模板参数U决定，U为uint8\_t时数据类型转换功能不生效。
@@ -80,15 +85,19 @@
 - 输入图片格式为YUV400、RGB888、XRGB8888
 
     ```cpp
-    template<typename T, typename U>
-    __aicore__ inline void SetAippFunctions(const GlobalTensor<T>& src0, AippInputFormat format, AippParams<U> config)
+template <typename T, typename U>
+__aicore__ inline void SetAippFunctions(const GlobalTensor<T> &src0,
+                                        AippInputFormat format,
+                                        AippParams<U> config)
     ```
 
 - 输入图片格式为YUV420 Semi-Planar
 
     ```cpp
-    template<typename T, typename U>
-    __aicore__ inline void SetAippFunctions(const GlobalTensor<T>& src0, const GlobalTensor<T>& src1, AippInputFormat format, AippParams<U> config)
+template <typename T, typename U>
+__aicore__ inline void
+SetAippFunctions(const GlobalTensor<T> &src0, const GlobalTensor<T> &src1,
+                 AippInputFormat format, AippParams<U> config)
     ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

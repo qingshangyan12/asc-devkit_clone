@@ -17,18 +17,16 @@ F32 Channel Split是矩阵计算结果搬出过程中的通道拆分能力。当
 ```cpp
 using namespace AscendC::Te;
 
-auto l0c = MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
-auto gm = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NZLayoutPtn, float>(m, n));
+auto l0c =
+    MakeTensor(MakeMemPtr(l0cAddr), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+auto gm =
+    MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NZLayoutPtn, float>(m, n));
 
-constexpr CopyL0C2GMTrait l0c2gmTrait = {
-    RoundMode::DEFAULT,
-    false,
-    true
-};
+constexpr CopyL0C2GMTrait l0c2gmTrait = {RoundMode::DEFAULT, false, true};
 
 struct CopyL0C2GMTraitCustom {
-    using TraitType = CopyL0C2GMTrait;
-    static constexpr const TraitType value = l0c2gmTrait;
+  using TraitType = CopyL0C2GMTrait;
+  static constexpr const TraitType value = l0c2gmTrait;
 };
 
 FixpipeParams params;

@@ -16,13 +16,20 @@
 
 ```cpp
 // 数据读取索引0的位置
-__simd_callee__ inline void asc_int82int32(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
-// 数据读取索引1的位置
-__simd_callee__ inline void asc_int82int32_v2(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
-// 数据读取索引2的位置
-__simd_callee__ inline void asc_int82int32_v3(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
-// 数据读取索引3的位置
-__simd_callee__ inline void asc_int82int32_v4(vector_int32_t& dst, vector_int8_t src, vector_bool mask)
+__simd_callee__ inline void asc_int82int32(vector_int32_t &dst,
+                                           vector_int8_t src, vector_bool mask)
+    // 数据读取索引1的位置
+    __simd_callee__
+    inline void asc_int82int32_v2(vector_int32_t &dst, vector_int8_t src,
+                                  vector_bool mask)
+    // 数据读取索引2的位置
+    __simd_callee__
+    inline void asc_int82int32_v3(vector_int32_t &dst, vector_int8_t src,
+                                  vector_bool mask)
+    // 数据读取索引3的位置
+    __simd_callee__
+    inline void asc_int82int32_v4(vector_int32_t &dst, vector_int8_t src,
+                                  vector_bool mask)
 ```
 
 ## 参数说明

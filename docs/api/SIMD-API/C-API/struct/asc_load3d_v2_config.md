@@ -7,13 +7,13 @@ asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。
 ```cpp
 constexpr uint64_t ASC_DEFAULT_LOAD3D_V2_CONFIG_VALUE = 0x0000000000010000;
 union asc_load3d_v2_config {
-    uint64_t config = ASC_DEFAULT_LOAD3D_V2_CONFIG_VALUE;
-    struct {
-        uint64_t rpt_stride : 16;
-        uint64_t rpt_time : 8;
-        uint64_t rpt_mode : 1;
-        uint64_t reserved2 : 39;
-    };
+  uint64_t config = ASC_DEFAULT_LOAD3D_V2_CONFIG_VALUE;
+  struct {
+    uint64_t rpt_stride : 16;
+    uint64_t rpt_time : 8;
+    uint64_t rpt_mode : 1;
+    uint64_t reserved2 : 39;
+  };
 };
 ```
 

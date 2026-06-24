@@ -21,7 +21,7 @@ float类型标量数据转换成bfloat16\_t类型标量数据。
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline bfloat16_t Cast(const float& fVal)
+__aicore__ inline bfloat16_t Cast(const float &fVal)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -42,15 +42,15 @@ __aicore__ inline bfloat16_t Cast(const float& fVal)
 - 输入参数为立即数时，需要使用显式类型转换后输入，例如：
 
     ```cpp
-    // 错误写法，AscendC暂不支持整数类型转bfloat16_t，编译报错
-    bfloat16_t x = AscendC::Cast(1);
-    // 正确写法
-    bfloat16_t x = AscendC::Cast((float)1);
+// 错误写法，AscendC暂不支持整数类型转bfloat16_t，编译报错
+bfloat16_t x = AscendC::Cast(1);
+// 正确写法
+bfloat16_t x = AscendC::Cast((float)1);
     ```
 
 ## 调用示例<a name="section19372434133520"></a>
 
 ```cpp
 float m = 3.14159f;
-bfloat16_t n = AscendC::Cast(m);  // n = 3.140625  float到bfloat16_t进行了舍入
+bfloat16_t n = AscendC::Cast(m); // n = 3.140625  float到bfloat16_t进行了舍入
 ```

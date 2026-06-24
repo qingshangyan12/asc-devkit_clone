@@ -27,7 +27,9 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
 ```
 
 ## 参数说明<a id="section1251613311396"></a>

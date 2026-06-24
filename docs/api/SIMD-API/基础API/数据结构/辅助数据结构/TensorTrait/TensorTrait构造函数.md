@@ -54,7 +54,7 @@
 ## 函数原型<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section13230182415108"></a>
 
 ```cpp
-__aicore__ inline TensorTrait(const LayoutType& t = {})
+__aicore__ inline TensorTrait(const LayoutType &t = {})
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078486173_zh-cn_topic_0000001576727153_zh-cn_topic_0000001389787297_section75395119104"></a>
@@ -91,57 +91,64 @@ __aicore__ inline TensorTrait(const LayoutType& t = {})
 -   TensorTrait使用示例
 
     ```cpp
-    // TensorTrait使用示例为基于googletest的UT示例
-    
-    // MakeTensorTrait方法创建TensorTrait
-    AscendC::Shape<int,int,int> shape = AscendC::MakeShape(10, 20, 30);
-    AscendC::Stride<int,int,int> stride = AscendC::MakeStride(1, 100, 200);
-    auto layoutMake = AscendC::MakeLayout(shape, stride);    
-    auto tensorTraitMake = AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
-    
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitMake.GetLayout().GetShape()), 10);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitMake.GetLayout().GetShape()), 20);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitMake.GetLayout().GetShape()), 30);
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitMake.GetLayout().GetStride()), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitMake.GetLayout().GetStride()), 100);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitMake.GetLayout().GetStride()), 200);
-    
-    // 构造函数方法创建TensorTrait
-    using TensorTraitType = AscendC::TensorTrait<half, AscendC::TPosition::VECCALC, AscendC::Layout<AscendC::Shape<int, int, int>, AscendC::Stride<int, int, int>>>;
-    TensorTraitType tensorTraitInit(layoutMake);
-    
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetLayout().GetShape()), 10);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetLayout().GetShape()), 20);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetLayout().GetShape()), 30);
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetLayout().GetStride()), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetLayout().GetStride()), 100);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetLayout().GetStride()), 200);
-    
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetShape()), 10);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetShape()), 20);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetShape()), 30);
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetStride()), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetStride()), 100);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetStride()), 200);
-    
-    // SetLayout方法设置TensorTrait
-    TensorTraitType tensorTraitSet;
-    tensorTraitSet.SetLayout(layoutMake);
-    
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitSet.GetLayout().GetShape()), 10);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitSet.GetLayout().GetShape()), 20);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitSet.GetLayout().GetShape()), 30);
-    EXPECT_EQ(AscendC::Std::get<0>(tensorTraitSet.GetLayout().GetStride()), 1);
-    EXPECT_EQ(AscendC::Std::get<1>(tensorTraitSet.GetLayout().GetStride()), 100);
-    EXPECT_EQ(AscendC::Std::get<2>(tensorTraitSet.GetLayout().GetStride()), 200);
+// TensorTrait使用示例为基于googletest的UT示例
+
+// MakeTensorTrait方法创建TensorTrait
+AscendC::Shape<int, int, int> shape = AscendC::MakeShape(10, 20, 30);
+AscendC::Stride<int, int, int> stride = AscendC::MakeStride(1, 100, 200);
+auto layoutMake = AscendC::MakeLayout(shape, stride);
+auto tensorTraitMake =
+    AscendC::MakeTensorTrait<float, AscendC::TPosition::VECIN>(layoutMake);
+
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitMake.GetLayout().GetShape()), 10);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitMake.GetLayout().GetShape()), 20);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitMake.GetLayout().GetShape()), 30);
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitMake.GetLayout().GetStride()), 1);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitMake.GetLayout().GetStride()), 100);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitMake.GetLayout().GetStride()), 200);
+
+// 构造函数方法创建TensorTrait
+using TensorTraitType =
+    AscendC::TensorTrait<half, AscendC::TPosition::VECCALC,
+                         AscendC::Layout<AscendC::Shape<int, int, int>,
+                                         AscendC::Stride<int, int, int>>>;
+TensorTraitType tensorTraitInit(layoutMake);
+
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetLayout().GetShape()), 10);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetLayout().GetShape()), 20);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetLayout().GetShape()), 30);
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetLayout().GetStride()), 1);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetLayout().GetStride()), 100);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetLayout().GetStride()), 200);
+
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetShape()), 10);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetShape()), 20);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetShape()), 30);
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitInit.GetStride()), 1);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitInit.GetStride()), 100);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitInit.GetStride()), 200);
+
+// SetLayout方法设置TensorTrait
+TensorTraitType tensorTraitSet;
+tensorTraitSet.SetLayout(layoutMake);
+
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitSet.GetLayout().GetShape()), 10);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitSet.GetLayout().GetShape()), 20);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitSet.GetLayout().GetShape()), 30);
+EXPECT_EQ(AscendC::Std::get<0>(tensorTraitSet.GetLayout().GetStride()), 1);
+EXPECT_EQ(AscendC::Std::get<1>(tensorTraitSet.GetLayout().GetStride()), 100);
+EXPECT_EQ(AscendC::Std::get<2>(tensorTraitSet.GetLayout().GetStride()), 200);
     ```
 
 -   TensorTrait和API配合使用示例
 
     ```cpp
-    AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor1 = que1.DeQue<AscendC::TensorTrait<half>>();
-    AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor2 = que2.DeQue<AscendC::TensorTrait<half>>();
-    AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor3 = que3.AllocTensor<AscendC::TensorTrait<half>>();
-    Add(tensor3, tensor1, tensor2, tensor3.GetSize());
+AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor1 =
+    que1.DeQue<AscendC::TensorTrait<half>>();
+AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor2 =
+    que2.DeQue<AscendC::TensorTrait<half>>();
+AscendC::LocalTensor<AscendC::TensorTrait<half>> tensor3 =
+    que3.AllocTensor<AscendC::TensorTrait<half>>();
+Add(tensor3, tensor1, tensor2, tensor3.GetSize());
     ```
 

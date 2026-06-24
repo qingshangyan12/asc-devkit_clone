@@ -65,12 +65,12 @@ This example controls the two modes through the compilation macro `USE_SILU_MODE
 
     Swish mode invocation:
     ```cpp
-    AscendC::Swish(dstLocal, srcLocal, dataSize, scalarValue);
+AscendC::Swish(dstLocal, srcLocal, dataSize, scalarValue);
     ```
 
     Silu mode invocation:
     ```cpp
-    AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
+AscendC::Silu<T, false>(dstLocal, srcLocal, dataSize);
     ```
 
   - Tiling implementation  

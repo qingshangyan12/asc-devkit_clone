@@ -29,8 +29,7 @@
 ## 函数原型
 
 ```c++
-template <typename T>
-T shfl_xor(T var, unsigned int lane_mask) const
+template <typename T> T shfl_xor(T var, unsigned int lane_mask) const
 ```
 
 ## 参数说明
@@ -60,27 +59,23 @@ T shfl_xor(T var, unsigned int lane_mask) const
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        thread_block block = this_thread_block();
-        auto tile4 = tiled_partition<4>(block);
-        uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... thread_block block = this_thread_block();
+  auto tile4 = tiled_partition<4>(block);
+  uint32_t result = tile4.shfl_xor(threadIdx.x + 100, 1);
+  ...
+}
     ```

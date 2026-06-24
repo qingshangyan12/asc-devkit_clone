@@ -24,7 +24,9 @@
 
 ```cpp
 template <typename T, bool enableSmallC0 = false>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const GlobalTensor<T> &src,
+                                const Dn2NzParams &intriParams);
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -93,21 +95,21 @@ DN2NZ转换示意图如下，样例中参数设置值和解释说明如下（以
 示例代码片段如下，完整示例请参考[data_copy_gm2l1样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中场景3。
 
 ```cpp
-// m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 * fractalShape[1] 
-AscendC::Dn2NzParams dn2nzA1Params; 
-// 传输DN矩阵的数目 
-dn2nzA1Params.dnNum = 1; 
-// DN矩阵的列数 
-dn2nzA1Params.nValue = 40; 
-// DN矩阵的行数 
-dn2nzA1Params.dValue = 56; 
-// 只传输了1个DN矩阵，该参数无效 
-dn2nzA1Params.srcDnMatrixStride = 0; 
-// 源操作数中同一DN矩阵行起始地址间的偏移 
-dn2nzA1Params.srcDValue = 40; 
-dn2nzA1Params.dstNzC0Stride = CeilAlign(m, fractalShape[0]); 
-dn2nzA1Params.dstNzNStride = 1; 
-dn2nzA1Params.dstNzMatrixStride = 0; 
+// m=40,k=56,fractalShape[0] = 16,fractalShape[1] = 16,fractalSize = 16 *
+// fractalShape[1]
+AscendC::Dn2NzParams dn2nzA1Params;
+// 传输DN矩阵的数目
+dn2nzA1Params.dnNum = 1;
+// DN矩阵的列数
+dn2nzA1Params.nValue = 40;
+// DN矩阵的行数
+dn2nzA1Params.dValue = 56;
+// 只传输了1个DN矩阵，该参数无效
+dn2nzA1Params.srcDnMatrixStride = 0;
+// 源操作数中同一DN矩阵行起始地址间的偏移
+dn2nzA1Params.srcDValue = 40;
+dn2nzA1Params.dstNzC0Stride = CeilAlign(m, fractalShape[0]);
+dn2nzA1Params.dstNzNStride = 1;
+dn2nzA1Params.dstNzMatrixStride = 0;
 AscendC::DataCopy(a1Local, aGM, dn2nzA1Params);
-
 ```

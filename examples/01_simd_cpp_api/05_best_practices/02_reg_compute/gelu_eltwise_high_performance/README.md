@@ -91,34 +91,35 @@ $$
 
 **关键代码**：
 ```cpp
-__simd_vf__ inline static void GeluEltwiseBasic(
-    __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum, uint32_t oneRepeatSize)
-{
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
+__simd_vf__ inline static void GeluEltwiseBasic(__ubuf__ float *xAddr,
+                                                __ubuf__ float *yAddr,
+                                                uint32_t n, uint32_t loopNum,
+                                                uint32_t oneRepeatSize) {
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
 
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        // Case 0（scenarioNum == 0）固定使用 VL32 掩码（32 个 float、128 bytes 并行度）；
-        // 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新掩码
-        mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::VL32>();
-        // Gelu计算
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        // Element-wise计算
-        AscendC::Reg::Adds(yReg, yReg, COEFF_C, mask);
-        AscendC::Reg::Mul(yReg, yReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_D, mask);
-        AscendC::Reg::Adds(yReg, yReg, COEFF_E, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    // Case 0（scenarioNum == 0）固定使用 VL32 掩码（32 个 float、128 bytes
+    // 并行度）； 非 Case 0 才使用 UpdateMask<float>(n) 按剩余元素数更新掩码
+    mask = AscendC::Reg::CreateMask<float, AscendC::Reg::MaskPattern::VL32>();
+    // Gelu计算
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    // Element-wise计算
+    AscendC::Reg::Adds(yReg, yReg, COEFF_C, mask);
+    AscendC::Reg::Mul(yReg, yReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_D, mask);
+    AscendC::Reg::Adds(yReg, yReg, COEFF_E, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 
@@ -183,39 +184,39 @@ __simd_vf__ inline static void GeluEltwiseBasic(
 
 **关键代码**：
 ```cpp
-__simd_vf__ inline static void GeluEltwiseLoopSplit(
-    __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum, uint32_t oneRepeatSize)
-{
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-    uint32_t n2 = n;
+__simd_vf__ inline static void
+GeluEltwiseLoopSplit(__ubuf__ float *xAddr, __ubuf__ float *yAddr, uint32_t n,
+                     uint32_t loopNum, uint32_t oneRepeatSize) {
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
+  uint32_t n2 = n;
 
-    // Loop 1: Gelu计算
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+  // Loop 1: Gelu计算
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 
-    // Loop 2: Element-wise计算
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n2);
-        AscendC::Reg::LoadAlign(yReg, yAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(yReg, yReg, COEFF_C, mask);
-        AscendC::Reg::Mul(yReg, yReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_D, mask);
-        AscendC::Reg::Adds(yReg, yReg, COEFF_E, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+  // Loop 2: Element-wise计算
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n2);
+    AscendC::Reg::LoadAlign(yReg, yAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(yReg, yReg, COEFF_C, mask);
+    AscendC::Reg::Mul(yReg, yReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_D, mask);
+    AscendC::Reg::Adds(yReg, yReg, COEFF_E, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 
@@ -258,24 +259,24 @@ __simd_vf__ inline static void GeluEltwiseLoopSplit(
 
 **关键代码**：
 ```cpp
-__simd_vf__ inline static void GeluEltwiseLoopSplit(
-    __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum, uint32_t oneRepeatSize)
-{
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-    uint32_t n2 = n;
+__simd_vf__ inline static void
+GeluEltwiseLoopSplit(__ubuf__ float *xAddr, __ubuf__ float *yAddr, uint32_t n,
+                     uint32_t loopNum, uint32_t oneRepeatSize) {
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
+  uint32_t n2 = n;
 
-    #pragma unroll 6
-    // Loop 1: Gelu计算
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        // ...
-    }
+#pragma unroll 6
+  // Loop 1: Gelu计算
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    // ...
+  }
 
-    #pragma unroll 6
-    // Loop 2: Element-wise计算
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        // ...
-    }
+#pragma unroll 6
+  // Loop 2: Element-wise计算
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    // ...
+  }
 }
 ```
 

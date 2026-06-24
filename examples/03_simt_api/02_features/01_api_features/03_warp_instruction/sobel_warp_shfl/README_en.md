@@ -68,9 +68,13 @@ In the SIMT programming model, a Warp consists of 32 threads. This example needs
 To ensure that the 32 threads in the same Warp always process pixels in the same row, the following coordinate mapping is used:
 
 ```cpp
-int tiles_x = (width + warpSize - 1) / warpSize;    // Number of Warp-sized blocks in the width direction (32 columns per block)
-int x = (warp_id % tiles_x) * warpSize + lane_id;   // Pixel column: current Warp's horizontal start position + intra-Warp offset, ensuring same Warp same row
-int y = warp_id / tiles_x;                          // Pixel row: which Warp row
+int tiles_x =
+    (width + warpSize - 1) / warpSize; // Number of Warp-sized blocks in the
+                                       // width direction (32 columns per block)
+int x = (warp_id % tiles_x) * warpSize +
+        lane_id; // Pixel column: current Warp's horizontal start position +
+                 // intra-Warp offset, ensuring same Warp same row
+int y = warp_id / tiles_x; // Pixel row: which Warp row
 ```
 
 <p align="center">
@@ -83,8 +87,10 @@ As shown in the figure above, computing the Sobel magnitude requires obtaining 9
 
 
 ```cpp
-// Each thread first reads the top, middle, and bottom pixels in the current pixel's column.
-// in_image indicates whether the current thread coordinate is within the valid image range (non-boundary pixel); when false, pixel value is set to 0.
+// Each thread first reads the top, middle, and bottom pixels in the current
+// pixel's column. in_image indicates whether the current thread coordinate is
+// within the valid image range (non-boundary pixel); when false, pixel value is
+// set to 0.
 int top = in_image ? input[(y - 1) * width + x] : 0;
 int mid = in_image ? input[y * width + x] : 0;
 int bot = in_image ? input[(y + 1) * width + x] : 0;
@@ -101,13 +107,18 @@ int shfl_bot_right = asc_shfl_down(bot, 1, warpSize);
 For non-boundary pixels that need to participate in Sobel computation, threads at Warp boundaries require special handling: the left neighbor of thread 0 and the right neighbor of thread 31 are not in the current Warp, so data must be read from Global Memory:
 
 ```cpp
-// At Warp boundaries, adjacent pixels cannot be obtained through shuffle and must be read from Global Memory.
-int top_left = (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
-int top_right = (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
+// At Warp boundaries, adjacent pixels cannot be obtained through shuffle and
+// must be read from Global Memory.
+int top_left =
+    (lane_id == 0) ? input[(y - 1) * width + (x - 1)] : shfl_top_left;
+int top_right =
+    (lane_id == 31) ? input[(y - 1) * width + (x + 1)] : shfl_top_right;
 int mid_left = (lane_id == 0) ? input[y * width + (x - 1)] : shfl_mid_left;
 int mid_right = (lane_id == 31) ? input[y * width + (x + 1)] : shfl_mid_right;
-int bot_left = (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
-int bot_right = (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
+int bot_left =
+    (lane_id == 0) ? input[(y + 1) * width + (x - 1)] : shfl_bot_left;
+int bot_right =
+    (lane_id == 31) ? input[(y + 1) * width + (x + 1)] : shfl_bot_right;
 ```
 
 After obtaining all 9 pixels of the 3x3 neighborhood, compute the horizontal gradient `Gx` and vertical gradient `Gy` according to the Sobel formula to obtain the edge magnitude.
@@ -132,8 +143,10 @@ After thread 0 requests the output position, it broadcasts the base position to 
 ```cpp
 uint32_t warp_base = 0;
 if (lane_id == 0) {
-    // Thread 0 requests output positions for all edge threads in this Warp at once.
-    warp_base = asc_atomic_add(edge_count, static_cast<uint32_t>(__popc(edge_mask)));
+  // Thread 0 requests output positions for all edge threads in this Warp at
+  // once.
+  warp_base =
+      asc_atomic_add(edge_count, static_cast<uint32_t>(__popc(edge_mask)));
 }
 warp_base = asc_shfl(warp_base, 0, warpSize);
 ```
@@ -142,14 +155,12 @@ Each edge thread then computes its local offset within the Warp based on edge_ma
 
 ```cpp
 if (edge_mask & lanemask_eq()) {
-    // Count how many edge threads precede the current thread to obtain the compact write offset within this Warp.
-    uint32_t lower_mask = edge_mask & lanemask_lt();
-    int local_idx = __popc(lower_mask);
-    edge_list[warp_base + local_idx] = {
-        static_cast<uint16_t>(x),
-        static_cast<uint16_t>(y),
-        strength
-    };
+  // Count how many edge threads precede the current thread to obtain the
+  // compact write offset within this Warp.
+  uint32_t lower_mask = edge_mask & lanemask_lt();
+  int local_idx = __popc(lower_mask);
+  edge_list[warp_base + local_idx] = {static_cast<uint16_t>(x),
+                                      static_cast<uint16_t>(y), strength};
 }
 ```
 

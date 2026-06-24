@@ -23,13 +23,14 @@
 - 标量接口，返回值为标量：
 
     ```cpp
-    constexpr __aicore__ static inline T Infinity()
+constexpr __aicore__ static inline T Infinity()
     ```
 
 - 矢量接口，为dstLocal前count个元素赋正无穷大值：
 
     ```cpp
-    __aicore__ static inline void Infinity(const LocalTensor<T>& dstLocal, uint32_t count)
+__aicore__ static inline void Infinity(const LocalTensor<T> &dstLocal,
+                                       uint32_t count)
     ```
 
 ## 参数说明
@@ -60,11 +61,12 @@
 - 标量接口：
 
     ```cpp
-    float value = AscendC::NumericLimits<float>::Infinity();
+float value = AscendC::NumericLimits<float>::Infinity();
     ```
 
 - 矢量接口：
 
     ```cpp
-    AscendC::NumericLimits<float>::Infinity(dstLocal, 256); // 返回256个float类型的正无穷大值
+AscendC::NumericLimits<float>::Infinity(dstLocal,
+                                        256); // 返回256个float类型的正无穷大值
     ```

@@ -31,23 +31,34 @@
 - tensor前n个数据计算：
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t count, bool calIndex = 0)
+template <typename T>
+__aicore__ inline void ReduceMin(const LocalTensor<T> &dst,
+                                 const LocalTensor<T> &src,
+                                 const LocalTensor<T> &sharedTmpBuffer,
+                                 const int32_t count, bool calIndex = 0)
     ```
 
 - tensor高维切分计算：
     - `mask`逐bit模式：
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const uint64_t mask[], const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+template <typename T>
+__aicore__ inline void
+ReduceMin(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+          const LocalTensor<T> &sharedTmpBuffer, const uint64_t mask[],
+          const int32_t repeatTime, const int32_t srcRepStride,
+          bool calIndex = 0)
         ```
 
     - `mask`连续模式：
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void ReduceMin(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<T>& sharedTmpBuffer, const int32_t mask, const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0)
+template <typename T>
+__aicore__ inline void ReduceMin(const LocalTensor<T> &dst,
+                                 const LocalTensor<T> &src,
+                                 const LocalTensor<T> &sharedTmpBuffer,
+                                 const int32_t mask, const int32_t repeatTime,
+                                 const int32_t srcRepStride, bool calIndex = 0)
         ```
 
 ## 参数说明
@@ -138,48 +149,51 @@
 - tensor高维切分计算样例-`mask`连续模式：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
-    int32_t mask = 128;
-    AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65，mask为全部元素参与计算
+int32_t mask = 128;
+AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8,
+                         true);
     ```
 
 - tensor高维切分计算样例-`mask`逐bit模式：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
-    uint64_t mask[2] = { 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF };
-    AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8, true);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor高维切分计算接口，设定repeatTime为65,mask为全部元素参与计算
+uint64_t mask[2] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF};
+AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, 65, 8,
+                         true);
     ```
 
 - tensor前n个数据计算样例：
 
     ```cpp
-    // dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor前n个数据计算接口
-    AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320, true);
+// dstLocal,srcLocal和sharedTmpBuffer均为half类型,srcLocal的计算数据量为8320,并且连续排布，需要索引值，使用tensor前n个数据计算接口
+AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, 8320, true);
     ```
 
 - <a name="li0437172884019"></a>tensor高维切分计算接口完整调用示例：
 
     ```cpp
-    #include "kernel_operator.h"
+#include "kernel_operator.h"
 
-    int srcDataSize = 512;
-    int dstDataSize = 512;
-    int mask = 128;
-    int repStride = 8;
-    int repeat = srcDataSize / mask;
+int srcDataSize = 512;
+int dstDataSize = 512;
+int mask = 128;
+int repStride = 8;
+int repeat = srcDataSize / mask;
 
-    // 初始化srcLocal 、dstLocal 、sharedTmpBuffer
-    AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
-    AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-    AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
+// 初始化srcLocal 、dstLocal 、sharedTmpBuffer
+AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
+AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
+AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
 
-    // mask为128一次计算128个元素,4次repeat计算完512个数,calIndex为true，获取最小值的索引
-    AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, repeat, repStride, true);
-    // 释放Tensor
-    outQueueDst.EnQue<half>(dstLocal);
-    inQueueSrc.FreeTensor(srcLocal);
-    workQueue.FreeTensor(sharedTmpBuffer);
+// mask为128一次计算128个元素,4次repeat计算完512个数,calIndex为true，获取最小值的索引
+AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, mask, repeat,
+                         repStride, true);
+// 释放Tensor
+outQueueDst.EnQue<half>(dstLocal);
+inQueueSrc.FreeTensor(srcLocal);
+workQueue.FreeTensor(sharedTmpBuffer);
     ```
 
     示例结果如下：
@@ -195,20 +209,21 @@
 - tensor前n个数据计算接口完整调用示例：
 
     ```cpp
-    #include "kernel_operator.h"
+#include "kernel_operator.h"
 
-    int srcDataSize = 288;
-    // 初始化srcLocal 、dstLocal 、sharedTmpBuffer
-    AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
-    AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
-    AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
+int srcDataSize = 288;
+// 初始化srcLocal 、dstLocal 、sharedTmpBuffer
+AscendC::LocalTensor<half> srcLocal = inQueueSrc.DeQue<half>();
+AscendC::LocalTensor<half> dstLocal = outQueueDst.AllocTensor<half>();
+AscendC::LocalTensor<half> sharedTmpBuffer = workQueue.AllocTensor<half>();
 
-    // level2接口计算前288个数，calIndex为true，获取最小值的索引
-    AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, srcDataSize, true);
-    // 释放Tensor
-    outQueueDst.EnQue<half>(dstLocal);
-    inQueueSrc.FreeTensor(srcLocal);
-    workQueue.FreeTensor(sharedTmpBuffer);
+// level2接口计算前288个数，calIndex为true，获取最小值的索引
+AscendC::ReduceMin<half>(dstLocal, srcLocal, sharedTmpBuffer, srcDataSize,
+                         true);
+// 释放Tensor
+outQueueDst.EnQue<half>(dstLocal);
+inQueueSrc.FreeTensor(srcLocal);
+workQueue.FreeTensor(sharedTmpBuffer);
     ```
 
     示例结果如下：

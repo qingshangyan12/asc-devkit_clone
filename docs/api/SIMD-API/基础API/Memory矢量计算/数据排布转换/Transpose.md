@@ -91,15 +91,19 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 - 普通转置，支持16\*16的二维矩阵数据块进行转置。
 
   ```cpp
-  template <typename T>
-  __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>& src)
+template <typename T>
+__aicore__ inline void Transpose(const LocalTensor<T> &dst,
+                                 const LocalTensor<T> &src)
   ```
 
 - 增强转置，支持16\*16的二维矩阵数据块转置，支持\[N,C,H,W\]与\[N,H,W,C\]互相转换。
 
   ```cpp
-  template <typename T>
-  __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T> &src, const LocalTensor<uint8_t> &sharedTmpBuffer, const TransposeParamsExt &transposeParams)
+template <typename T>
+__aicore__ inline void Transpose(const LocalTensor<T> &dst,
+                                 const LocalTensor<T> &src,
+                                 const LocalTensor<uint8_t> &sharedTmpBuffer,
+                                 const TransposeParamsExt &transposeParams)
   ```
 
 ## 参数说明
@@ -277,9 +281,9 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 - 普通接口调用示例片段，完整片段请参考[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景一，该示例对\[16,16\]的half类型矩阵进行转置。
 
   ```cpp
-  // dstLocal：目的操作数tensor
-  // srcLocal：源操作数tensor
-  AscendC::Transpose<half>(dstLocal, srcLocal);
+// dstLocal：目的操作数tensor
+// srcLocal：源操作数tensor
+AscendC::Transpose<half>(dstLocal, srcLocal);
   ```
 
   ```plain
@@ -355,11 +359,11 @@ dst_nchw = np.transpose(src_nhwc, axes=(0,3,1,2))
 - 增强接口调用示例片段，完整代码请参考[Transpose类样例](https://gitcode.com/cann/asc-devkit/tree/master/examples/01_simd_cpp_api/03_basic_api/01_memory_vector_compute/transpose)场景二，完成half类型的\[N,C,H,W\]->\[N,H,W,C\]转置。
 
   ```cpp
-  AscendC::TransposeParamsExt transposeParams;
-  transposeParams.nSize = N; // N轴长度
-  transposeParams.cSize = C; // C轴长度
-  transposeParams.hSize = H; // H轴长度
-  transposeParams.wSize = W; // W轴长度
-  transposeParams.transposeType = transposeType; 
-  AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
+AscendC::TransposeParamsExt transposeParams;
+transposeParams.nSize = N; // N轴长度
+transposeParams.cSize = C; // C轴长度
+transposeParams.hSize = H; // H轴长度
+transposeParams.wSize = W; // W轴长度
+transposeParams.transposeType = transposeType;
+AscendC::Transpose(dstLocal, srcLocal, stackBuffer, transposeParams);
   ```

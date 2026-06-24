@@ -62,18 +62,16 @@ For basic concepts of building GE nodes through operator prototypes, refer to [W
 The interface signature enables Python-side invocation via `torch.ops.ascendc_ops.ascendc_add(x, y)`:
 
 ```cpp
-TORCH_LIBRARY_FRAGMENT(ascendc_ops, m)
-{
-    m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
+TORCH_LIBRARY_FRAGMENT(ascendc_ops, m) {
+  m.def("ascendc_add(Tensor x, Tensor y) -> Tensor");
 }
 ```
 
 When `torch.compile` captures the graph, it does not execute actual NPU computation, but it needs to infer output tensor information. Therefore, a Meta implementation must also be registered:
 
 ```cpp
-TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m)
-{
-    m.impl("ascendc_add", TORCH_FN(AscendcAddMeta));
+TORCH_LIBRARY_IMPL(ascendc_ops, Meta, m) {
+  m.impl("ascendc_add", TORCH_FN(AscendcAddMeta));
 }
 ```
 

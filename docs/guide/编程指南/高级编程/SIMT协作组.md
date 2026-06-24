@@ -68,9 +68,9 @@ auto tile4 = tiled_partition<4>(block);
 
 ```c++
 if (threadIdx.x % 2 == 0) {
-    coalesced_group active = coalesced_threads();
-    unsigned int rank = active.thread_rank();
-    ...
+  coalesced_group active = coalesced_threads();
+  unsigned int rank = active.thread_rank();
+  ...
 }
 ```
 
@@ -90,13 +90,12 @@ if (threadIdx.x % 2 == 0) {
 ```c++
 using namespace cooperative_groups;
 
-__global__ void simt_kernel(...)
-{
-    thread_block block = this_thread_block();
-    auto tile8 = tiled_partition<8>(block);
+__global__ void simt_kernel(...) {
+  thread_block block = this_thread_block();
+  auto tile8 = tiled_partition<8>(block);
 
-    unsigned int lane = tile8.thread_rank();
-    ...
+  unsigned int lane = tile8.thread_rank();
+  ...
 }
 ```
 
@@ -111,17 +110,16 @@ __global__ void simt_kernel(...)
 ```c++
 using namespace cooperative_groups;
 
-__global__ void simt_kernel(int *input_arr)
-{
-    thread_block block = this_thread_block();
-    auto tile32 = tiled_partition<32>(block);
+__global__ void simt_kernel(int *input_arr) {
+  thread_block block = this_thread_block();
+  auto tile32 = tiled_partition<32>(block);
 
-    // input_arr中是随机整数
-    int elem = input_arr[block.thread_rank()];
-    coalesced_group subgroup = binary_partition(tile32, (elem & 1));
+  // input_arr中是随机整数
+  int elem = input_arr[block.thread_rank()];
+  coalesced_group subgroup = binary_partition(tile32, (elem & 1));
 
-    unsigned int rank = subgroup.thread_rank();
-    ...
+  unsigned int rank = subgroup.thread_rank();
+  ...
 }
 ```
 

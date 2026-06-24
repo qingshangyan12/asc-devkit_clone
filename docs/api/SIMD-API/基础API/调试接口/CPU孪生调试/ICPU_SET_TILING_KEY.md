@@ -35,5 +35,5 @@
 
 ```cpp
 ICPU_SET_TILING_KEY(10086);
-ICPU_RUN_KF(sort_kernel0, coreNum, (uint8_t*)x, (uint8_t*)y);
+ICPU_RUN_KF(sort_kernel0, coreNum, (uint8_t *)x, (uint8_t *)y);
 ```

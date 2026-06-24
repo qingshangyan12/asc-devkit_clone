@@ -23,8 +23,11 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = int8_t, typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value, bool>::type = true> 
-__aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOfIndexTabEntry)
+template <typename T = int8_t,
+          typename Std::enable_if<Std::is_same<PrimT<T>, int8_t>::value,
+                                  bool>::type = true>
+__aicore__ inline void LoadUnzipIndex(const GlobalTensor<T> &src,
+                                      uint32_t numOfIndexTabEntry)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -57,6 +60,6 @@ __aicore__ inline void LoadUnzipIndex(const GlobalTensor<T>& src, uint32_t numOf
 该调用示例支持的运行平台为Atlas 推理系列产品AI Core。详细用例请参考[LoadDataUnzip](LoadDataUnzip.md)。
 
 ```cpp
-indexGlobal.SetGlobalBuffer((__gm__ int8_t*)indexGm);
+indexGlobal.SetGlobalBuffer((__gm__ int8_t *)indexGm);
 AscendC::LoadUnzipIndex(indexGlobal, numOfIndexTabEntry);
 ```

@@ -42,7 +42,8 @@ $$dstReg1_i = (srcReg0_i \times srcReg1_i) / 2^{bit}$$
 
 ```cpp
 template <typename T = DefaultType, typename U>
-__simd_callee__ inline void Mull(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1, MaskReg& mask)
+__simd_callee__ inline void Mull(U &dstReg0, U &dstReg1, U &srcReg0, U &srcReg1,
+                                 MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -79,21 +80,23 @@ __simd_callee__ inline void Mull(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1,
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void MullVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg0;
-    AscendC::Reg::RegTensor<T> dstReg1;
-    AscendC::Reg::MaskReg mask;
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
-        AscendC::Reg::Mull(dstReg0, dstReg1, srcReg0, srcReg1, mask);
-        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
-        AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
-    }
+template <typename T>
+__simd_vf__ inline void MullVF(__ubuf__ T *dst0Addr, __ubuf__ T *dst1Addr,
+                               __ubuf__ T *src0Addr, __ubuf__ T *src1Addr,
+                               uint32_t count, uint16_t oneRepeatSize,
+                               uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg0;
+  AscendC::Reg::RegTensor<T> dstReg1;
+  AscendC::Reg::MaskReg mask;
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+    AscendC::Reg::Mull(dstReg0, dstReg1, srcReg0, srcReg1, mask);
+    AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+    AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
+  }
 }
 ```

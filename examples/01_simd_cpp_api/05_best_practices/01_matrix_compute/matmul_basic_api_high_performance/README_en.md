@@ -108,11 +108,16 @@ L0A/L0B (64KB):
 
 ```cpp
 // A1: L1 Ping/Pong
-AscendC::LocalTensor<half> a1LocalPing(AscendC::TPosition::A1, 0, a1PingpongSize);
-AscendC::LocalTensor<half> a1LocalPong(AscendC::TPosition::A1, a1PingpongSize * sizeof(half), a1PingpongSize);
+AscendC::LocalTensor<half> a1LocalPing(AscendC::TPosition::A1, 0,
+                                       a1PingpongSize);
+AscendC::LocalTensor<half> a1LocalPong(AscendC::TPosition::A1,
+                                       a1PingpongSize * sizeof(half),
+                                       a1PingpongSize);
 // A2: L0 Ping/Pong
-AscendC::LocalTensor<half> a2LocalPing(AscendC::TPosition::A2, 0, a2PingpongSize);
-AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES, a2PingpongSize);
+AscendC::LocalTensor<half> a2LocalPing(AscendC::TPosition::A2, 0,
+                                       a2PingpongSize);
+AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2,
+                                       L0_PINGPONG_BYTES, a2PingpongSize);
 ```
 
 #### 2. Fine-Grained Pipeline Synchronization
@@ -129,25 +134,28 @@ Four types of hardware event flags are used to implement precise pipeline synchr
 **Reverse synchronization must be preset**: Since reverse synchronization is "consumer SetFlag → producer WaitFlag", SetFlag must be preset before first use, otherwise the first WaitFlag will deadlock:
 
 ```cpp
-// Initialization: Preset reverse synchronization flags to prevent first WaitFlag deadlock
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);  // A1 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);  // A1 Pong writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);  // B1 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);  // B1 Pong writable
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);     // L0 Ping writable
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong writable
+// Initialization: Preset reverse synchronization flags to prevent first
+// WaitFlag deadlock
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0); // A1 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1); // A1 Pong writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2); // B1 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3); // B1 Pong writable
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);    // L0 Ping writable
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);    // L0 Pong writable
 ```
 
 **Large packet granularity forward synchronization**: DataLoad reads data from L1 large packets one base block at a time along K direction, only needing to wait for data readiness when reading the first base block of the large packet. Subsequent base blocks are in the same large packet as the first, no repeated waiting needed:
 
 ```cpp
-// Forward synchronization: Only the first element of the large packet needs to wait for data readiness
+// Forward synchronization: Only the first element of the large packet needs to
+// wait for data readiness
 if (kOffsetInChunkA == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(a1ReadIdx);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(a1ReadIdx);
 }
-// Reverse synchronization: Notify DataCopyIn that buffer can be overwritten only after the last element of the large packet is consumed
+// Reverse synchronization: Notify DataCopyIn that buffer can be overwritten
+// only after the last element of the large packet is consumed
 if ((kOffsetInChunkA + 1) == stepKa) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(a1ReadIdx);
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(a1ReadIdx);
 }
 ```
 
@@ -184,7 +192,8 @@ Through `stepKa`/`stepKb` parameters, multiple basic blocks are packed into one 
 // DataCopyInA: Transfer stepKa baseK blocks at once
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.nValue = curM;
-nd2nzParams.dValue = baseK * stepKa;  // Large packet contains stepKa baseM * baseK blocks
+nd2nzParams.dValue =
+    baseK * stepKa; // Large packet contains stepKa baseM * baseK blocks
 ```
 
 #### 6. LoadData3D Replacing LoadData2D — Reducing Instruction Queue Usage
@@ -200,7 +209,8 @@ Before optimization, with `baseK=64`, loop count is 4:
 ```cpp
 AscendC::LoadData2DParams loadDataParams;
 for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
-    AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
+  AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset],
+                    loadDataParams);
 }
 ```
 
@@ -227,10 +237,12 @@ This reduces MTE1 instruction count per base slice from multiple `LoadData2D` to
 All Tiling parameters (baseM/baseK/baseN, singleCoreM/K/N, stepKa/stepKb) are determined at compile time through template parameters, requiring no Scalar dynamic computation at runtime, reducing Scalar overhead:
 
 ```cpp
-template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
-          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
-          uint32_t stepKa, uint32_t stepKb>
-class KernelMmad { ... };
+template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK,
+          uint32_t baseN, uint32_t singleCoreM, uint32_t singleCoreK,
+          uint32_t singleCoreN, uint32_t stepKa, uint32_t stepKb>
+class KernelMmad {
+  ...
+};
 ```
 
 #### 8. UnitFlag Optimization
@@ -238,7 +250,7 @@ class KernelMmad { ... };
 After enabling UnitFlag, MMAD and FIXPIPE achieve fine-grained (512B) pipeline parallelism instead of instruction-level synchronization. Whenever Cube completes computation of one 512B data result, FIXPIPE immediately transfers that data, with Cube computation and result write-back pipeline overlapping:
 
 ```cpp
-mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // Enable UnitFlag
+mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3; // Enable UnitFlag
 ```
 
 - `unitFlag = 2`: Intermediate K block, MMAD computation result is not immediately written back, but waits for the next 512B completion before pipeline transfer
@@ -251,16 +263,20 @@ L2Cache is the shared external cache for AI Cores, with pure read bandwidth appr
 The specific L2Cache splitting implementation is consistent with Case 6 in the [high-level API Matmul example](../matmul_high_performance/README.md), with the core idea being to split the A matrix along the M axis to make the B matrix reside in L2Cache across rounds. This example implements a dual outer loop through the `ProcessL2Cache()` method, scheduling by `outerMIdx` rounds, with 24 cores computing their respective sub-blocks in parallel within each round:
 
 ```cpp
-// ProcessL2Cache: Split by M direction in rounds, each round 24 cores cover mIterPerRound M sub-blocks
+// ProcessL2Cache: Split by M direction in rounds, each round 24 cores cover
+// mIterPerRound M sub-blocks
 constexpr uint32_t mIterPerRound = AscendC::DivCeil(M, singleCoreM * 2);
-constexpr uint32_t outerMLoopCount = AscendC::DivCeil(mIterTotal, mIterPerRound);
+constexpr uint32_t outerMLoopCount =
+    AscendC::DivCeil(mIterTotal, mIterPerRound);
 
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
-    uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
-    uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
-    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal) continue;
-    InitComputeParamsL2Cache(mIterIdx, nIterIdx);
-    ProcessLoop(...);
+  uint32_t mIterIdx =
+      AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
+  uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
+  if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal)
+    continue;
+  InitComputeParamsL2Cache(mIterIdx, nIterIdx);
+  ProcessLoop(...);
 }
 ```
 
@@ -452,7 +468,7 @@ For operators developed based on operator projects, this interface can be used t
 Call the DumpTensor interface in the operator kernel implementation code where Tensor data needs to be printed. Example:
 
 ```cpp
-AscendC::DumpTensor(cLocal, baseM * baseN);
+AscendC::DumpTensor(cLocal, baseM *baseN);
 ```
 
 > **Notice** The DumpTensor interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC\_DUMP=0 as needed.

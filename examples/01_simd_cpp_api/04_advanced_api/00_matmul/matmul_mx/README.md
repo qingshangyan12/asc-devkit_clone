@@ -47,31 +47,44 @@
   - Kernel关键步骤
     - 创建Matmul对象：使用MatmulTypeWithScale使能scaleA、scaleB。
       ```cpp
-      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false> aType;
-      typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, fp8_e5m2_t, false> bType;
-      typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-      typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-      // 定义matmul对象时， 传入MatmulWithScalePolicy表明使能MxMatmul模板策略
-      AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL, AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>, AscendC::Impl::Detail::MatmulWithScalePolicy> matmulObj;
+typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM,
+                                     AscendC::TPosition::GM, CubeFormat::ND,
+                                     fp8_e5m2_t, false>
+    aType;
+typedef AscendC::MatmulTypeWithScale<AscendC::TPosition::GM,
+                                     AscendC::TPosition::GM, CubeFormat::ND,
+                                     fp8_e5m2_t, false>
+    bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// 定义matmul对象时， 传入MatmulWithScalePolicy表明使能MxMatmul模板策略
+AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL,
+                AscendC::MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::MatmulWithScalePolicy>
+    matmulObj;
       ```
     - 设置左矩阵A与左量化系数矩阵scaleA、右矩阵B与右量化系数矩阵scaleB、Bias。
       ```cpp
-      matmulObj.SetTensorA(aGlobal, isTransA);
-      matmulObj.SetTensorB(bGlobal, isTransB);
-      matmulObj.SetTensorScaleA(asGlobal, isTransScaleA);
-      matmulObj.SetTensorScaleB(bsGlobal, isTransScaleB);
+matmulObj.SetTensorA(aGlobal, isTransA);
+matmulObj.SetTensorB(bGlobal, isTransB);
+matmulObj.SetTensorScaleA(asGlobal, isTransScaleA);
+matmulObj.SetTensorScaleB(bsGlobal, isTransScaleB);
 
-      if (tiling.isBias) {
-          matmulObj.SetBias(biasGlobal);
-      }
+if (tiling.isBias) {
+  matmulObj.SetBias(biasGlobal);
+}
       ```
 
   - Tiling关键步骤
       - 创建一个Tiling对象：使用SetMadType设置Matmul模式，使能MxMatmul场景，使用SetScaleAType设置ScaleA的信息、使用SetScaleBType设置scaleB的信息。
         ```cpp
-        cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);
-        cubeTiling.SetScaleAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, false);
-        cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::ND, false);
+cubeTiling.SetMadType(matmul_tiling::MatrixMadType::MXMODE);
+cubeTiling.SetScaleAType(matmul_tiling::TPosition::GM,
+                         matmul_tiling::CubeFormat::ND, false);
+cubeTiling.SetScaleBType(matmul_tiling::TPosition::GM,
+                         matmul_tiling::CubeFormat::ND, false);
         ```
 
   - 调用实现  

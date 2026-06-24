@@ -141,214 +141,243 @@
 -   上三角模板策略使用示例
 
     ```cpp
-    #include "lib/matmul_intf.h"
+#include "lib/matmul_intf.h"
 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入TrianUpperMatmulPolicy
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::TrianUpperMatmulPolicy>
-        mm;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入TrianUpperMatmulPolicy
+AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::TrianUpperMatmulPolicy>
+    mm;
 
-    // 常规Matmul计算，最后输出上三角形式的结果
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
-    mm.IterateAll(gmC);
-    mm.End();
+// 常规Matmul计算，最后输出上三角形式的结果
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
+mm.IterateAll(gmC);
+mm.End();
     ```
 
 -   下三角模板策略使用示例
 
     ```cpp
-    #include "lib/matmul_intf.h"
+#include "lib/matmul_intf.h"
 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入TrianLowerMatmulPolicy
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::TrianLowerMatmulPolicy>
-        mm;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入TrianLowerMatmulPolicy
+AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::TrianLowerMatmulPolicy>
+    mm;
 
-    // 常规Matmul计算，最后输出下三角形式的结果
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
-    mm.IterateAll(gmC);
-    mm.End();
+// 常规Matmul计算，最后输出下三角形式的结果
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
+mm.IterateAll(gmC);
+mm.End();
     ```
 
 -   NBuffer33模板策略使用示例
 
     ```cpp
-    #define ASCENDC_CUBE_ONLY
-    #include "lib/matmul_intf.h"
+#define ASCENDC_CUBE_ONLY
+#include "lib/matmul_intf.h"
 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入NBuffer33MatmulPolicy
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half> bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入NBuffer33MatmulPolicy
 
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_MDL, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::NBuffer33MatmulPolicy>
-        mm;
+AscendC::Matmul<aType, bType, cType, biasType, CFG_MDL,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::NBuffer33MatmulPolicy>
+    mm;
 
-    // 使用NBuffer33逻辑进行Matmul计算，最后输结果
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
-    mm.IterateAll(gmC);
-    mm.End();
+// 使用NBuffer33逻辑进行Matmul计算，最后输结果
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
+mm.IterateAll(gmC);
+mm.End();
     ```
 
 -   MxMatmul模板策略使用示例
 
     ```cpp
-    #include "lib/matmul_intf.h"
-    typedef MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, AType, isTransposeA> aType;
-    typedef MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM, CubeFormat::ND, BType, isTransposeB> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入MatmulWithScalePolicy
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::MatmulWithScalePolicy>
-        mm;
+#include "lib/matmul_intf.h"
+typedef MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM,
+                            CubeFormat::ND, AType, isTransposeA>
+    aType;
+typedef MatmulTypeWithScale<AscendC::TPosition::GM, AscendC::TPosition::GM,
+                            CubeFormat::ND, BType, isTransposeB>
+    bType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入MatmulWithScalePolicy
+AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::MatmulWithScalePolicy>
+    mm;
 
-    // MxMatmul计算逻辑，最后输出结果
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    mm.SetTensorScaleA(gm_scaleA, isTransposeScaleA);
-    mm.SetTensorScaleB(gm_scaleB, isTransposeScaleB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
-    mm.IterateAll(gmC);
-    mm.End();
+// MxMatmul计算逻辑，最后输出结果
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+mm.SetTensorScaleA(gm_scaleA, isTransposeScaleA);
+mm.SetTensorScaleB(gm_scaleB, isTransposeScaleB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
+mm.IterateAll(gmC);
+mm.End();
     ```
 
 -   SplitM模板策略使用示例
 
     ```cpp
-    #include "lib/matmul_intf.h"
+#include "lib/matmul_intf.h"
 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, LayoutMode::NONE, true> aType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, LayoutMode::NONE, true> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::VECCALC, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入SplitMMatmulPolicy
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::SplitMMatmulPolicy>
-        mm;
-    // Matmul计算
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half,
+                            LayoutMode::NONE, true>
+    aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half,
+                            LayoutMode::NONE, true>
+    bType;
+typedef AscendC::MatmulType<AscendC::TPosition::VECCALC, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入SplitMMatmulPolicy
+AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::SplitMMatmulPolicy>
+    mm;
+// Matmul计算
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
 
-    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified Buffer。
-    pipe.InitBuffer(resultCMatrix, 1, tiling.M* tiling.N * sizeof(C_T));
-    mm.template Iterate<false>();
-    bufferC = resultCMatrix.AllocTensor<C_T>();
-    uint16_t nIter_ = Ceil(tiling.singleCoreN, tiling.baseN);
-    uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
-    uint16_t mnIter_ = nIter_ * mIter_;
-    for (int i = 0; i < mnIter_; i++) {
-        mm.template GetTensorC<false>(bufferC, false, false); // false // kfc vec0 iterate
-        PipeBarrier<PIPE_ALL>();
-    }
-    mm.End();
-    resultCMatrix.EnQue(bufferC);
-    bufferC = resultCMatrix.DeQue<C_T>();
+// 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified
+// Buffer。
+pipe.InitBuffer(resultCMatrix, 1, tiling.M *tiling.N * sizeof(C_T));
+mm.template Iterate<false>();
+bufferC = resultCMatrix.AllocTensor<C_T>();
+uint16_t nIter_ = Ceil(tiling.singleCoreN, tiling.baseN);
+uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
+uint16_t mnIter_ = nIter_ * mIter_;
+for (int i = 0; i < mnIter_; i++) {
+  mm.template GetTensorC<false>(bufferC, false,
+                                false); // false // kfc vec0 iterate
+  PipeBarrier<PIPE_ALL>();
+}
+mm.End();
+resultCMatrix.EnQue(bufferC);
+bufferC = resultCMatrix.DeQue<C_T>();
 
-    uint16_t baseOffset = tiling.M / 2 * tiling.N;
-    uint16_t stride = tiling.M / 2 * tiling.N * sizeof(C_T) / 32; // 32B
-    const uint16_t blockCount = tiling.M / tiling.M;
-    if (GetSubBlockIdxImpl() == 0) {
-        DataCopy(gmC, bufferC, {blockCount, stride, stride, stride});
-    } else {
-        DataCopy(gmC[baseOffset], bufferC, {blockCount, stride, stride, stride});
-    }
+uint16_t baseOffset = tiling.M / 2 * tiling.N;
+uint16_t stride = tiling.M / 2 * tiling.N * sizeof(C_T) / 32; // 32B
+const uint16_t blockCount = tiling.M / tiling.M;
+if (GetSubBlockIdxImpl() == 0) {
+  DataCopy(gmC, bufferC, {blockCount, stride, stride, stride});
+} else {
+  DataCopy(gmC[baseOffset], bufferC, {blockCount, stride, stride, stride});
+}
     ```
 
 -   SplitN模板策略使用示例
 
     ```cpp
-    #include "lib/matmul_intf.h"
+#include "lib/matmul_intf.h"
 
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, LayoutMode::NONE, true> aType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half, LayoutMode::NONE, true> bType;
-    typedef AscendC::MatmulType<AscendC::TPosition::VECCALC, CubeFormat::ND, float> cType;
-    typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float> biasType;
-    // Matmul定义时传入SplitNMatmulPolicy
-    AscendC::Matmul<
-        aType, bType, cType, biasType, CFG_NORM, MatmulCallBackFunc<nullptr, nullptr, nullptr>,
-        AscendC::Impl::Detail::SplitNMatmulPolicy>
-        mm;
-    // Matmul计算
-    TPipe pipe;
-    TCubeTiling tiling;
-    REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
-    mm.SetTensorA(gmA, isTransposeA);
-    mm.SetTensorB(gmB, isTransposeB);
-    if (tiling.isBias) {
-        mm.SetBias(gmBias);
-    }
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half,
+                            LayoutMode::NONE, true>
+    aType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, half,
+                            LayoutMode::NONE, true>
+    bType;
+typedef AscendC::MatmulType<AscendC::TPosition::VECCALC, CubeFormat::ND, float>
+    cType;
+typedef AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, float>
+    biasType;
+// Matmul定义时传入SplitNMatmulPolicy
+AscendC::Matmul<aType, bType, cType, biasType, CFG_NORM,
+                MatmulCallBackFunc<nullptr, nullptr, nullptr>,
+                AscendC::Impl::Detail::SplitNMatmulPolicy>
+    mm;
+// Matmul计算
+TPipe pipe;
+TCubeTiling tiling;
+REGIST_MATMUL_OBJ(&pipe, GetSysWorkSpacePtr(), mm, &tiling);
+mm.SetTensorA(gmA, isTransposeA);
+mm.SetTensorB(gmB, isTransposeB);
+if (tiling.isBias) {
+  mm.SetBias(gmBias);
+}
 
-    // 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified Buffer。
-    pipe.InitBuffer(resultCMatrix, 1, tiling.M* tiling.N * sizeof(C_T));
-    mm.template Iterate<false>();
-    bufferC = resultCMatrix.AllocTensor<C_T>();
-    uint16_t nIter_ = Ceil(tiling.singleCoreN, tiling.baseN);
-    uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
-    uint16_t mnIter_ = nIter_ * mIter_;
-    for (int i = 0; i < mnIter_; i++) {
-        mm.template GetTensorC<false>(bufferC, false, false); // false // kfc vec0 iterate
-        PipeBarrier<PIPE_ALL>();
-    }
-    mm.End();
-    resultCMatrix.EnQue(bufferC);
-    bufferC = resultCMatrix.DeQue<C_T>();
+// 调用GetTensorC接口后，将Matmul一次Iterate的计算结果一分为二，搬运到两个AIV核的Unified
+// Buffer。
+pipe.InitBuffer(resultCMatrix, 1, tiling.M *tiling.N * sizeof(C_T));
+mm.template Iterate<false>();
+bufferC = resultCMatrix.AllocTensor<C_T>();
+uint16_t nIter_ = Ceil(tiling.singleCoreN, tiling.baseN);
+uint16_t mIter_ = Ceil(tiling.singleCoreM, tiling.baseM);
+uint16_t mnIter_ = nIter_ * mIter_;
+for (int i = 0; i < mnIter_; i++) {
+  mm.template GetTensorC<false>(bufferC, false,
+                                false); // false // kfc vec0 iterate
+  PipeBarrier<PIPE_ALL>();
+}
+mm.End();
+resultCMatrix.EnQue(bufferC);
+bufferC = resultCMatrix.DeQue<C_T>();
 
-    uint16_t baseOffset = tiling.N / 2;
-    uint16_t blockCount = tiling.M;
-    uint16_t blockLen = (tiling.N / 2 * sizeof(C_T)) / 32;
-    uint16_t srcStride = 0;
-    uint16_t dstStride = (tiling.N / 2 * sizeof(C_T)) / 32;
-    if (GetSubBlockIdxImpl() == 0) {
-        DataCopy(gmC, bufferC, {blockCount, blockLen, srcStride, dstStride});
-    } else {
-        DataCopy(gmC[baseOffset], bufferC, {blockCount, blockLen, srcStride, dstStride});
-    }
+uint16_t baseOffset = tiling.N / 2;
+uint16_t blockCount = tiling.M;
+uint16_t blockLen = (tiling.N / 2 * sizeof(C_T)) / 32;
+uint16_t srcStride = 0;
+uint16_t dstStride = (tiling.N / 2 * sizeof(C_T)) / 32;
+if (GetSubBlockIdxImpl() == 0) {
+  DataCopy(gmC, bufferC, {blockCount, blockLen, srcStride, dstStride});
+} else {
+  DataCopy(gmC[baseOffset], bufferC,
+           {blockCount, blockLen, srcStride, dstStride});
+}
     ```

@@ -51,17 +51,17 @@
   1. `simt_gather`使用SIMT编程方式，根据`index[i]`从Global Memory中读取离散位置的数据，并写入Unified Buffer。
 
      ```cpp
-     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-     uint32_t gatherIdx = index[idx];
-     gatherOutput[threadIdx.x] = input[gatherIdx];
+uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+uint32_t gatherIdx = index[idx];
+gatherOutput[threadIdx.x] = input[gatherIdx];
      ```
 
   2. `simd_adds`使用SIMD编程方式，从Unified Buffer中读取连续数据，通过`Reg::LoadAlign`加载到寄存器，调用`Reg::Adds`完成加1计算，再通过`Reg::StoreAlign`写回Unified Buffer。
 
      ```cpp
-     AscendC::Reg::LoadAlign(srcReg0, input + i * oneRepeatSize);
-     AscendC::Reg::Adds(dstReg0, srcReg0, addsAddend, maskReg);
-     AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg0, maskReg);
+AscendC::Reg::LoadAlign(srcReg0, input + i * oneRepeatSize);
+AscendC::Reg::Adds(dstReg0, srcReg0, addsAddend, maskReg);
+AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg0, maskReg);
      ```
 
   3. `DataCopy`将结果从Unified Buffer搬运到Global Memory。

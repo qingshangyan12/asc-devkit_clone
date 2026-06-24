@@ -14,7 +14,7 @@
 
 ```cpp
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
+__aicore__ inline constexpr auto Rank(const Layout<Shape, Stride> &layout);
 ```
 
 ### 参数说明
@@ -38,9 +38,9 @@ __aicore__ inline constexpr auto Rank(const Layout<Shape, Stride>& layout);
 ### 示例代码
 
    ```cpp
-  using namespace AscendC::Te;
-  auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
-  auto rank1 = Rank(layout); //rank1 = 2
-  auto rank2 = Rank<0>(layout); //rank2 = 1
+using namespace AscendC::Te;
+auto layout = MakeLayout(MakeShape(10, 20), MakeStride(1, 100));
+auto rank1 = Rank(layout);    // rank1 = 2
+auto rank2 = Rank<0>(layout); // rank2 = 1
   ```
   

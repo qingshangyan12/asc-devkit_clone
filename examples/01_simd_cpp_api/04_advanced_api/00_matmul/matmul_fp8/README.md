@@ -43,24 +43,27 @@ A、B矩阵为hifloat8、fp8_e4m3fn、fp8_e5m2数据类型输入的Matmul样例�
   - Kernel关键步骤
     - 创建Matmul对象，数据类型按照SCENARIO_NUM设置为hifloat8或各种fp8数据类型。
       ```cpp
-      #if SCENARIO_NUM == 1
-      MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 2
-      MatmulFp8Kernel<fp8_e5m2_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 3
-      MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
-      #elif SCENARIO_NUM == 4
-      MatmulFp8Kernel<fp8_e5m2_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
-      #else
-      MatmulFp8Kernel<hifloat8_t, hifloat8_t, float, float> MatmulFp8Kernel;
-      #endif
+#if SCENARIO_NUM == 1
+MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 2
+MatmulFp8Kernel<fp8_e5m2_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 3
+MatmulFp8Kernel<fp8_e4m3fn_t, fp8_e5m2_t, float, float> MatmulFp8Kernel;
+#elif SCENARIO_NUM == 4
+MatmulFp8Kernel<fp8_e5m2_t, fp8_e4m3fn_t, float, float> MatmulFp8Kernel;
+#else
+MatmulFp8Kernel<hifloat8_t, hifloat8_t, float, float> MatmulFp8Kernel;
+#endif
 
-      ...
+...
 
-      AscendC::Matmul<AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
+    AscendC::Matmul<
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, aType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, bType>,
         AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, cType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>, mmCfg> matmulObj;
+        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, biasType>,
+        mmCfg>
+        matmulObj;
       ```
   - 调用实现  
     使用内核调用符<<<>>>调用核函数。

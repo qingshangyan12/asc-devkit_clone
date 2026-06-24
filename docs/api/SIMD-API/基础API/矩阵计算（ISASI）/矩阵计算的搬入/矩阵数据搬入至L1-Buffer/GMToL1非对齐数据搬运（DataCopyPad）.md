@@ -22,7 +22,10 @@
 
 ```cpp
 template <typename T, PaddingMode mode = PaddingMode::Normal>
-__aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const DataCopyPadExtParams<T>& padParams)
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const GlobalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const DataCopyPadExtParams<T> &padParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -139,7 +142,9 @@ padParams.rightPadding = 16;
 // isPad = false 时该值不生效，填0保持字段完整。
 padParams.paddingValue = static_cast<int8_t>(0);
 
-AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Normal>(dstLocal, srcGm, copyParams, padParams);
+AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Normal>(dstLocal, srcGm,
+                                                           copyParams,
+                                                           padParams);
 ```
 
 Compact模式调用示例如下：
@@ -152,7 +157,8 @@ constexpr uint32_t dstElemCount = 160;
 AscendC::GlobalTensor<int8_t> srcGm;
 srcGm.SetGlobalBuffer((__gm__ int8_t *)src, srcElemCount);
 
-// 目的操作数：L1 Buffer的A1位置。Compact模式下3块有效数据共144B，只在最后右侧补16B。
+// 目的操作数：L1
+// Buffer的A1位置。Compact模式下3块有效数据共144B，只在最后右侧补16B。
 AscendC::LocalTensor<int8_t> dstLocal(AscendC::TPosition::A1, 0, dstElemCount);
 
 AscendC::DataCopyExtParams copyParams;
@@ -173,5 +179,7 @@ padParams.isPad = false;
 // isPad = false时该值不生效，填0保持字段完整。
 padParams.paddingValue = static_cast<int8_t>(0);
 
-AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(dstLocal, srcGm, copyParams, padParams);
+AscendC::DataCopyPad<int8_t, AscendC::PaddingMode::Compact>(dstLocal, srcGm,
+                                                            copyParams,
+                                                            padParams);
 ```

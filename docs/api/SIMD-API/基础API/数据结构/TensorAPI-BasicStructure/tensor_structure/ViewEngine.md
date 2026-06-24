@@ -19,18 +19,16 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
   `ViewEngine`定义如下：
 
   ```cpp
-  template <typename Iterator>
-  struct ViewEngine
-  {
-      using iterator    = Iterator;
-      using reference   = typename IterRef<iterator>::type;
-      using elementType = typename IterEle<iterator>::type;
-      using valueType   = typename IterVal<iterator>::type;
+template <typename Iterator> struct ViewEngine {
+  using iterator = Iterator;
+  using reference = typename IterRef<iterator>::type;
+  using elementType = typename IterEle<iterator>::type;
+  using valueType = typename IterVal<iterator>::type;
 
-      __aicore__ inline constexpr iterator const& Begin() const;
-      __aicore__ inline constexpr iterator& Begin();
-      __aicore__ inline constexpr ViewEngine(iterator storage = {});
-  };
+  __aicore__ inline constexpr iterator const &Begin() const;
+  __aicore__ inline constexpr iterator &Begin();
+  __aicore__ inline constexpr ViewEngine(iterator storage = {});
+};
   ```
 
 ## 成员函数说明
@@ -44,8 +42,7 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr ViewEngine(iterator storage = {});
-
+__aicore__ inline constexpr ViewEngine(iterator storage = {});
   ```
 
 - 参数说明
@@ -65,10 +62,9 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr iterator const& Begin() const;
+__aicore__ inline constexpr iterator const &Begin() const;
 
-  __aicore__ inline constexpr iterator& Begin();
-
+__aicore__ inline constexpr iterator &Begin();
   ```
 
 - 返回值说明
@@ -82,19 +78,18 @@ LocalTensor<TensorAttribute<ViewEngine<Iterator>, LayoutType>>
 ## 调用示例
 
 ```cpp
-  using namespace AscendC::Te;
+using namespace AscendC::Te;
 
-  constexpr int32_t size = 256;
-  __ubuf__ float data[size];
-  auto ptr = MakeMemPtr(data);
+constexpr int32_t size = 256;
+__ubuf__ float data[size];
+auto ptr = MakeMemPtr(data);
 
-  auto layout = MakeLayout(MakeShape(2, 2), MakeStride(2, 1));
-  auto tensor = MakeTensor(ptr, layout);
+auto layout = MakeLayout(MakeShape(2, 2), MakeStride(2, 1));
+auto tensor = MakeTensor(ptr, layout);
 
-  auto engine = tensor.Engine();
-  auto begin = engine.Begin();
+auto engine = tensor.Engine();
+auto begin = engine.Begin();
 
-  float a = begin[0];
-  float b = tensor[MakeCoord(1, 1)];
-
+float a = begin[0];
+float b = tensor[MakeCoord(1, 1)];
 ```

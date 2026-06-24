@@ -36,7 +36,8 @@
 
 ```cpp
 template <typename T = DefaultType, typename U>
-__simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
+__simd_callee__ inline void Interleave(U &dstReg0, U &dstReg1, U &srcReg0,
+                                       U &srcReg1)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -74,20 +75,23 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void InterleaveVF(__ubuf__ T* dst0Addr, __ubuf__ T* dst1Addr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg1;
-    AscendC::Reg::RegTensor<T> dstReg0;
-    AscendC::Reg::RegTensor<T> dstReg1;
-    AscendC::Reg::MaskReg mask = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
-        AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
-        AscendC::Reg::Interleave(dstReg0, dstReg1, srcReg0, srcReg1);
-        AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
-        AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
-    }
+template <typename T>
+__simd_vf__ inline void InterleaveVF(__ubuf__ T *dst0Addr, __ubuf__ T *dst1Addr,
+                                     __ubuf__ T *src0Addr, __ubuf__ T *src1Addr,
+                                     uint16_t oneRepeatSize,
+                                     uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg0;
+  AscendC::Reg::RegTensor<T> srcReg1;
+  AscendC::Reg::RegTensor<T> dstReg0;
+  AscendC::Reg::RegTensor<T> dstReg1;
+  AscendC::Reg::MaskReg mask =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    AscendC::Reg::LoadAlign(srcReg0, src0Addr + i * oneRepeatSize);
+    AscendC::Reg::LoadAlign(srcReg1, src1Addr + i * oneRepeatSize);
+    AscendC::Reg::Interleave(dstReg0, dstReg1, srcReg0, srcReg1);
+    AscendC::Reg::StoreAlign(dst0Addr + i * oneRepeatSize, dstReg0, mask);
+    AscendC::Reg::StoreAlign(dst1Addr + i * oneRepeatSize, dstReg1, mask);
+  }
 }
 ```

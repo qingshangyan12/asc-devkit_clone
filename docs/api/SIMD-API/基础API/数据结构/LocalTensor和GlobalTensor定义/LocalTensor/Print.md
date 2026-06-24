@@ -54,8 +54,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-inline void Print()
-inline void Print(uint32_t len)
+inline void Print() inline void Print(uint32_t len)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -93,9 +92,10 @@ inline void Print(uint32_t len)
 
 ```cpp
 // 示例只限于CPU调试，在调试窗口中打印LocalTensor数据用于精度调试，每一行打印一个datablock(32Bytes)的数据
-AscendC::LocalTensor<int32_t> inputLocal = softmaxMaxBuf.template Get<int32_t>();
+AscendC::LocalTensor<int32_t> inputLocal =
+    softmaxMaxBuf.template Get<int32_t>();
 for (int32_t i = 0; i < 16; ++i) {
-    inputLocal.SetValue(i, i); // 对input_local中第i个位置进行赋值为i
+  inputLocal.SetValue(i, i); // 对input_local中第i个位置进行赋值为i
 }
 inputLocal.Print();
 // 0000: 0 1 2 3 4 5 6 7 8

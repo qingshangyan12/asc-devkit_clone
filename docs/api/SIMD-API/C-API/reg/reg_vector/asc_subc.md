@@ -29,8 +29,13 @@ carry输出借位值示例说明：
 ## 函数原型
 
 ```cpp
-__simd_callee__ inline void asc_subc(vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
-__simd_callee__ inline void asc_subc(vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
+__simd_callee__ inline void asc_subc(vector_bool &carry, vector_uint32_t &dst,
+                                     vector_uint32_t src0, vector_uint32_t src1,
+                                     vector_bool carry_src,
+                                     vector_bool mask) __simd_callee__
+    inline void asc_subc(vector_bool &carry, vector_int32_t &dst,
+                         vector_int32_t src0, vector_int32_t src1,
+                         vector_bool carry_src, vector_bool mask)
 ```
 
 ## 参数说明

@@ -73,7 +73,8 @@ REG_OP(AddCustom)
 运行时通过`Session::RunGraph`触发整张GE图执行。
 
 ```cpp
-std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE), BuildInputTensor(Y_SCALE)};
+std::vector<ge::Tensor> inputs{BuildInputTensor(X_SCALE),
+                               BuildInputTensor(Y_SCALE)};
 std::vector<ge::Tensor> outputs;
 const auto runRet = session.RunGraph(GRAPH_ID, inputs, outputs);
 ```

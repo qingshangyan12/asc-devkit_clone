@@ -18,7 +18,7 @@ LayoutPattern决定数据在内存中的分形排列方式，不同存储位置�
 
 ```cpp
 template <typename LayoutPattern, typename TraitType, typename... Args>
-__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args&... args)
+__aicore__ inline constexpr decltype(auto) MakeFrameLayout(const Args &...args)
 ```
 
 常用调用形式如下。
@@ -37,27 +37,27 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 
 1. **LayoutTraitDefault<T>**：指定数据类型T，C0自动计算。
    ```cpp
-   MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
+MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(m, n)
    ```
 
 2. **_C0**：直接指定C0维度的元素个数，数据类型为[Std::Int](../../../../../Utils-API/CPP标准库/类型特性/integral_constant.md)。_C0是`Std::Int<C0>`的简写形式。
    ```cpp
-   MakeFrameLayout<NZLayoutPtn, _16>(m, n)
+MakeFrameLayout<NZLayoutPtn, _16>(m, n)
    ```
 
 3. **不传入Trait**：在分形构造和Trait无关，或Trait值固定的场景下，不传入Trait，内部根据LayoutPattern查找对应的默认Trait。这样的分形有NDLayoutPtn、DNLayoutPtn、DNExtLayoutPtn、NDExtLayoutPtn、ScaleANDLayoutPtn、ScaleADNLayoutPtn、ScaleBNDLayoutPtn、ScaleBDNLayoutPtn。
    ```cpp
-   MakeFrameLayout<NDLayoutPtn>(m, n)
+MakeFrameLayout<NDLayoutPtn>(m, n)
    ```
 
 4. **自定义Trait传入**：传入一个自定义的Trait类型。适用于需要显式描述数据类型、C0大小或其他布局特征，且现有默认Trait、_C0或固定默认Trait都无法满足需求的场景。自定义Trait需要满足底层布局推导所要求的类型约定。
    ```cpp
-   struct MyLayoutTrait {
-       using type = float;
-       static constexpr auto C0_ELEMENT = Std::Int<16>{};
-   };
+struct MyLayoutTrait {
+  using type = float;
+  static constexpr auto C0_ELEMENT = Std::Int<16>{};
+};
 
-   MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
+MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n)
    ```
 
 ## 参数说明
@@ -85,7 +85,8 @@ LayoutTrait用于指定数据类型和C0维度基数。MakeFrameLayout支持以�
 using namespace AscendC::Te;
 
 // 构造GM端ND布局张量
-auto layoutGM = MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n);
+auto layoutGM =
+    MakeFrameLayout<NDExtLayoutPtn, LayoutTraitDefault<float>>(m, n);
 auto gmTensor = MakeTensor(MakeMemPtr<Location::GM>(gmAddr), layoutGM);
 
 // 构造L1端NZ布局张量（L0A/L0B搬运的标准格式）
@@ -102,16 +103,19 @@ auto l1TensorC0 = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutC0);
 
 // 自定义Trait构造
 struct MyLayoutTrait {
-    using type = float;
-    static constexpr auto C0_ELEMENT = Std::Int<16>{};
+  using type = float;
+  static constexpr auto C0_ELEMENT = Std::Int<16>{};
 };
 auto layoutCustom = MakeFrameLayout<NZLayoutPtn, MyLayoutTrait>(m, n);
 
 // 构造Batch矩阵布局
 auto layoutBatchNZ = MakeFrameLayout<NZLayoutPtn, float>(batch, m, n);
-auto l1BatchTensor = MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutBatchNZ);
+auto l1BatchTensor =
+    MakeTensor(MakeMemPtr<Location::L1>(l1Addr), layoutBatchNZ);
 
 // 构造MX场景的scale Batch布局
-auto layoutBatchScaleA = MakeFrameLayout<ScaleANDLayoutPtn>(batch, scaleM, scaleK);
-auto gmScaleTensor = MakeTensor(MakeMemPtr<Location::GM>(scaleAddr), layoutBatchScaleA);
+auto layoutBatchScaleA =
+    MakeFrameLayout<ScaleANDLayoutPtn>(batch, scaleM, scaleK);
+auto gmScaleTensor =
+    MakeTensor(MakeMemPtr<Location::GM>(scaleAddr), layoutBatchScaleA);
 ```

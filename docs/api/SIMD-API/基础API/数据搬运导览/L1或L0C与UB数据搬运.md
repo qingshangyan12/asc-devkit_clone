@@ -32,7 +32,8 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src, const uint32_t count)
 ```
 
 ## UBToL1高维切分数据搬运(DataCopy)
@@ -52,7 +53,9 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const DataCopyParams &repeatParams)
 ```
 
 ## UBToL1随路转换-ND2NZ搬运(DataCopy)
@@ -70,7 +73,9 @@ src和dst分别为源操作数和目的操作数；intriParams为ND2NZ搬运配�
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const Nd2NzParams &intriParams)
 ```
 
 ## UBToL1非对齐数据搬运(DataCopyPad)
@@ -88,7 +93,10 @@ src和dst分别为源操作数和目的操作数；dataCopyParams和nd2nzParams�
 
 ```cpp
 template <typename T>
-__aicore__ inline void DataCopyPad(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams, const Nd2NzParams& nd2nzParams)
+__aicore__ inline void DataCopyPad(const LocalTensor<T> &dst,
+                                   const LocalTensor<T> &src,
+                                   const DataCopyExtParams &dataCopyParams,
+                                   const Nd2NzParams &nd2nzParams)
 ```
 
 <cann-filter npu-type="310p">
@@ -111,15 +119,21 @@ src和dst分别为源操作数和目的操作数；intriParams和enhancedParams�
 - 源操作数和目的操作数类型一致
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+template <typename T>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const DataCopyParams &intriParams,
+                                const DataCopyEnhancedParams &enhancedParams)
     ```
 
 - 源操作数和目的操作数类型不一致
 
     ```cpp
-    template <typename T, typename U>
-    __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
+template <typename T, typename U>
+__aicore__ inline void DataCopy(const LocalTensor<T> &dst,
+                                const LocalTensor<U> &src,
+                                const DataCopyParams &intriParams,
+                                const DataCopyEnhancedParams &enhancedParams)
     ```
 
 </cann-filter>
@@ -142,15 +156,20 @@ src和dst分别为源操作数和目的操作数；intriParams为搬运参数，
 - 不开启随路[tensor量化](../矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 - 开启随路[tensor量化](../矩阵计算（ISASI）/矩阵计算的搬出/关键特性说明/随路量化.md)功能：
 
     ```cpp
-    template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
-    __aicore__ inline void Fixpipe(const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace, const FixpipeParamsArch3510<config.format>& intriParams)
+template <typename T, typename U, const FixpipeConfig &config = CFG_ROW_MAJOR>
+__aicore__ inline void
+Fixpipe(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+        const LocalTensor<uint64_t> &cbufWorkspace,
+        const FixpipeParamsArch3510<config.format> &intriParams)
     ```
 
 <cann-filter npu-type="950">
@@ -172,7 +191,9 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 
 ```cpp
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T> &dst,
+                                      const LocalTensor<T> &src,
+                                      const uint32_t count)
 ```
 
 </cann-filter>
@@ -198,7 +219,9 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 
 ```cpp
 template <typename T, uint8_t subBlockId = 0>
-__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
+__aicore__ inline void DataCopyL1ToUB(const LocalTensor<T> &dst,
+                                      const LocalTensor<T> &src,
+                                      const DataCopyParams &repeatParams)
 ```
 
 </cann-filter>

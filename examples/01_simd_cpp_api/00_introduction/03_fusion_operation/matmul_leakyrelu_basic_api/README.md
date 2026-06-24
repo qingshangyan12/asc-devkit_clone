@@ -141,32 +141,34 @@
           **GlobalTensor定义与分核偏移**：使用[GlobalTensor](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor简介.md)（全局内存张量）访问芯片外部DDR中的输入/输出数据，并通过[GetBlockIdx](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/工具接口/系统资源与变量/GetBlockIdx.md)（获取当前核的逻辑编号）计算分核偏移：
 
           ```cpp
-          class KernelMatmul {
-          public:
-              __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
-              {
-                  // 设置GlobalTensor的起始地址，指向GM中对应的输入/输出矩阵
-                  aGM.SetGlobalBuffer((__gm__ half*)xMatrix);
-                  bGM.SetGlobalBuffer((__gm__ half*)yMatrix);
-                  cGM.SetGlobalBuffer((__gm__ half*)zMatrix);
+class KernelMatmul {
+public:
+  __aicore__ inline void Init(__gm__ uint8_t *xMatrix, __gm__ uint8_t *yMatrix,
+                              __gm__ uint8_t *zMatrix) {
+    // 设置GlobalTensor的起始地址，指向GM中对应的输入/输出矩阵
+    aGM.SetGlobalBuffer((__gm__ half *)xMatrix);
+    bGM.SetGlobalBuffer((__gm__ half *)yMatrix);
+    cGM.SetGlobalBuffer((__gm__ half *)zMatrix);
 
-                  // Cube核按M方向分核，每个Cube核负责singleCoreM * N大小输出块
-                  if ASCEND_IS_AIC {
-                      aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];  // 偏移到当前核负责的A矩阵行
-                      cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];  // 偏移到当前核负责的C矩阵行
-                  }
-                  // Vector核数是Cube核数的2倍，1个Cube核的结果由2个Vector核处理
-                  // GetBlockIdx() / 2 将Vector核编号映射回对应的Cube核输出块起始地址
-                  if ASCEND_IS_AIV {
-                      cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
-                  }
-              }
-          // ...
-          private:
-              AscendC::GlobalTensor<half> aGM;  // 左矩阵A，[M, K]
-              AscendC::GlobalTensor<half> bGM;  // 右矩阵B，[K, N]
-              AscendC::GlobalTensor<half> cGM;  // 输出矩阵C，[M, N]
-          };
+    // Cube核按M方向分核，每个Cube核负责singleCoreM * N大小输出块
+    if ASCEND_IS_AIC {
+      aGM = aGM[AscendC::GetBlockIdx() * singleCoreM *
+                K]; // 偏移到当前核负责的A矩阵行
+      cGM = cGM[AscendC::GetBlockIdx() * singleCoreM *
+                N]; // 偏移到当前核负责的C矩阵行
+    }
+    // Vector核数是Cube核数的2倍，1个Cube核的结果由2个Vector核处理
+    // GetBlockIdx() / 2 将Vector核编号映射回对应的Cube核输出块起始地址
+    if ASCEND_IS_AIV {
+      cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
+    }
+  }
+  // ...
+private:
+  AscendC::GlobalTensor<half> aGM; // 左矩阵A，[M, K]
+  AscendC::GlobalTensor<half> bGM; // 右矩阵B，[K, N]
+  AscendC::GlobalTensor<half> cGM; // 输出矩阵C，[M, N]
+};
           ```
 
           **内存搬运与计算流程**：
@@ -180,76 +182,89 @@
           代码实例如下：
 
           ```cpp
-          __aicore__ inline void Process()
-          {
-              if ASCEND_IS_AIC {
-                  // ==================== Local Tensor 分配 ====================
-                  // 使用LocalMemAllocator按申请顺序自动分配片上内存，避免手动维护地址偏移
-                  AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
-                  AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
-                  AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
-                  AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-                  // L1: A/B矩阵的临时存储; L0A/L0B: Cube计算单元输入; L0C: Cube计算单元输出
-                  // Alloc的TPosition模板参数可缺省，Alloc函数会根据allocator对应的物理位置给出默认值
-                  AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<half>(baseM * baseK);
-                  AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<half>(baseK * baseN);
-                  AscendC::LocalTensor<half> a2Local = l0aAllocator.Alloc<half>(baseM * baseK);
-                  AscendC::LocalTensor<half> b2Local = l0bAllocator.Alloc<half>(baseK * baseN);
-                  AscendC::LocalTensor<float> cLocal = l0cAllocator.Alloc<float>(baseM * baseN);
+__aicore__ inline void Process() {
+  if ASCEND_IS_AIC {
+    // ==================== Local Tensor 分配 ====================
+    // 使用LocalMemAllocator按申请顺序自动分配片上内存，避免手动维护地址偏移
+    AscendC::LocalMemAllocator<AscendC::Hardware::L1> l1Allocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
+    AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
+    // L1: A/B矩阵的临时存储; L0A/L0B: Cube计算单元输入; L0C: Cube计算单元输出
+    // Alloc的TPosition模板参数可缺省，Alloc函数会根据allocator对应的物理位置给出默认值
+    AscendC::LocalTensor<half> a1Local = l1Allocator.Alloc<half>(baseM * baseK);
+    AscendC::LocalTensor<half> b1Local = l1Allocator.Alloc<half>(baseK * baseN);
+    AscendC::LocalTensor<half> a2Local =
+        l0aAllocator.Alloc<half>(baseM * baseK);
+    AscendC::LocalTensor<half> b2Local =
+        l0bAllocator.Alloc<half>(baseK * baseN);
+    AscendC::LocalTensor<float> cLocal =
+        l0cAllocator.Alloc<float>(baseM * baseN);
 
-                  // ==================== GM → L1: DataCopy + ND→Nz格式转换 ====================
-                  // DataCopy搬运时同时完成ND到Nz的格式转换（Cube计算单元要求Nz分形排布）
-                  AscendC::DataCopy(a1Local, aGM, AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
-                  AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
-                  // 核内同步：MTE2搬运完成后通知MTE1可以开始搬运
-                  AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
+    // ==================== GM → L1: DataCopy + ND→Nz格式转换
+    // ====================
+    // DataCopy搬运时同时完成ND到Nz的格式转换（Cube计算单元要求Nz分形排布）
+    AscendC::DataCopy(a1Local, aGM,
+                      AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
+    AscendC::DataCopy(b1Local, bGM,
+                      AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
+    // 核内同步：MTE2搬运完成后通知MTE1可以开始搬运
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(EVENT_ID0);
 
-                  // ==================== L1 → L0A/L0B: LoadData ====================
-                  // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
-                  // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
-                  // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
-          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                  for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
-                      AscendC::LoadData(a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
-                          AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
-                  }
-                  // B矩阵Nz→Zn转置搬运
-                  for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
-                      AscendC::LoadData(b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
-                          AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
-                  }
-                  // Ascend 950PR架构 (dav-3510): L0A排布为Nz格式，一次搬运完成
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                  AscendC::LoadData(a2Local, a1Local,
-                      AscendC::LoadData2DParamsV2{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
+    // ==================== L1 → L0A/L0B: LoadData ====================
+    // ⚠️ 架构约束：不同产品的L0A排布格式不同，LoadData参数需对应调整
+    // A2/A3(2201)为Zz排布需逐块搬运，950PR(3510)为Nz排布可一次完成
+    // A2/A3架构 (dav-2201): L0A排布为Zz格式，需逐块搬运
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+    for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
+      AscendC::LoadData(
+          a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
+          AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK,
+                                    0, 0, false, 0});
+    }
+    // B矩阵Nz→Zn转置搬运
+    for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
+      AscendC::LoadData(
+          b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
+          AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK,
+                                    0, 0, true, 0});
+    }
+    // Ascend 950PR架构 (dav-3510): L0A排布为Nz格式，一次搬运完成
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    AscendC::LoadData(a2Local, a1Local,
+                      AscendC::LoadData2DParamsV2{
+                          0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK,
                           baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
-                  AscendC::LoadData(b2Local, b1Local,
-                      AscendC::LoadData2DParamsV2{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK,
+    AscendC::LoadData(b2Local, b1Local,
+                      AscendC::LoadData2DParamsV2{
+                          0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK,
                           baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
-          #endif
-                  // 核内同步：MTE1搬运完成后通知M流水可以开始Mmad计算
-                  AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+#endif
+    // 核内同步：MTE1搬运完成后通知M流水可以开始Mmad计算
+    AscendC::SetFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE1_M>(EVENT_ID0);
 
-                  // ==================== L0A/L0B → L0C: Mmad矩阵乘累加 ====================
-                  // cmatrixInitVal=true: 首次计算时初始化L0C累加器为0
-                  AscendC::Mmad(cLocal, a2Local, b2Local,
-                      AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+    // ==================== L0A/L0B → L0C: Mmad矩阵乘累加 ====================
+    // cmatrixInitVal=true: 首次计算时初始化L0C累加器为0
+    AscendC::Mmad(cLocal, a2Local, b2Local,
+                  AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
 
-                  // ==================== L0C → GM: Fixpipe搬出 + Nz→ND + fp32→fp16 ====================
-                  // 核内同步：M流水完成后通知FIX流水可以开始Fixpipe
-                  AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
-                  // Fixpipe将L0C结果搬出到GM，同时完成NZ→ND格式转换和float32→half精度转换
-                  AscendC::Fixpipe(cGM, cLocal,
-                      AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
+    // ==================== L0C → GM: Fixpipe搬出 + Nz→ND + fp32→fp16
+    // ==================== 核内同步：M流水完成后通知FIX流水可以开始Fixpipe
+    AscendC::SetFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::M_FIX>(EVENT_ID0);
+    // Fixpipe将L0C结果搬出到GM，同时完成NZ→ND格式转换和float32→half精度转换
+    AscendC::Fixpipe(cGM, cLocal,
+                     AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false,
+                                                QuantMode_t::F322F16, 0, 1, 0,
+                                                0, 0});
 
-                  // ==================== 核间同步：通知Vector核数据就绪 ====================
-                  AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0);
-              }
-              // ... Vector核部分见下方
-          }
+    // ==================== 核间同步：通知Vector核数据就绪 ====================
+    AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0);
+  }
+  // ... Vector核部分见下方
+}
           ```
 
       2. **Vector核计算阶段**：
@@ -262,41 +277,45 @@
           代码实例如下：
 
           ```cpp
-              if ASCEND_IS_AIV {
-                  // ==================== UB Local Tensor 分配 ====================
-                  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-                  // 每个Vector核处理baseM/2 × baseN个元素（1个Cube核的结果由2个Vector核平分）
-                  AscendC::LocalTensor<half> vecLocal = ubAllocator.Alloc<half>(baseM / 2 * baseN);
+if ASCEND_IS_AIV {
+  // ==================== UB Local Tensor 分配 ====================
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  // 每个Vector核处理baseM/2 × baseN个元素（1个Cube核的结果由2个Vector核平分）
+  AscendC::LocalTensor<half> vecLocal =
+      ubAllocator.Alloc<half>(baseM / 2 * baseN);
 
-                  // ==================== 核间同步：等待Cube核Fixpipe完成 ====================
-                  AscendC::CrossCoreWaitFlag(0);
+  // ==================== 核间同步：等待Cube核Fixpipe完成 ====================
+  AscendC::CrossCoreWaitFlag(0);
 
-                  // ==================== GM → UB: DataCopyPad读取Matmul结果 ====================
-                  // 计算当前Vector核在GM中的起始偏移
-                  // GetBlockIdx() % 2 区分同一逻辑核内的2个AIV，处理不同半块数据
-                  uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
-                  uint32_t blockLen = baseN * sizeof(half);
-                  uint32_t srcStride = (N - baseN) * sizeof(half);  // GM中相邻行间的跳转步长
-                  AscendC::DataCopyPad<half>(
-                      vecLocal, cGM[gmOffset],
-                      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
-                      AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
-                  // 核内同步：MTE2搬运完成后通知V流水可以开始计算
-                  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  // ==================== GM → UB: DataCopyPad读取Matmul结果
+  // ==================== 计算当前Vector核在GM中的起始偏移 GetBlockIdx() % 2
+  // 区分同一逻辑核内的2个AIV，处理不同半块数据
+  uint32_t gmOffset = AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
+  uint32_t blockLen = baseN * sizeof(half);
+  uint32_t srcStride = (N - baseN) * sizeof(half); // GM中相邻行间的跳转步长
+  AscendC::DataCopyPad<half>(
+      vecLocal, cGM[gmOffset],
+      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen,
+                                 srcStride, 0, 0},
+      AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
+  // 核内同步：MTE2搬运完成后通知V流水可以开始计算
+  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-                  // ==================== UB计算: LeakyRelu激活 ====================
-                  // LeakyRelu(x) = x >= 0 ? x : x * 0.001
-                  AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, baseM / 2 * baseN);
-                  // 核内同步：V流水完成后通知MTE3可以开始写回
-                  AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-                  AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  // ==================== UB计算: LeakyRelu激活 ====================
+  // LeakyRelu(x) = x >= 0 ? x : x * 0.001
+  AscendC::LeakyRelu(vecLocal, vecLocal, (half)0.001, baseM / 2 * baseN);
+  // 核内同步：V流水完成后通知MTE3可以开始写回
+  AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-                  // ==================== UB → GM: DataCopyPad写回结果 ====================
-                  AscendC::DataCopyPad<half>(cGM[gmOffset], vecLocal,
-                      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0, srcStride, 0});
-              }
-          }
+  // ==================== UB → GM: DataCopyPad写回结果 ====================
+  AscendC::DataCopyPad<half>(
+      cGM[gmOffset], vecLocal,
+      AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, 0,
+                                 srcStride, 0});
+}
+}
           ```
 
   - **约束条件**：
@@ -309,17 +328,19 @@
     核调用符`__mix__(1, 2)`实现Cube和Vector核的协同调用，其中参数`(1, 2)`表示每个逻辑核由1个AIC（Cube核）和2个AIV（Vector核）组成，Cube:Vector核数比例为1:2。
 
     ```cpp
-    // __global__: 核函数声明修饰符
-    // __mix__(1,2): 混合核函数，1个AIC(Cube) + 2个AIV(Vector)组成一个逻辑核
-    __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
-    {
-        AscendC::InitSocState();  // 初始化硬件状态
-        KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN,
-                     baseM, baseK, baseN> op;
-        op.Init(xMatrix, yMatrix, zMatrix);   // GlobalTensor初始化与分核偏移
-        op.Process();        // AIC侧执行Matmul，AIV侧执行LeakyRelu
-        AscendC::PipeBarrier<PIPE_ALL>();  // 等待所有流水阶段完成
-    }
+// __global__: 核函数声明修饰符
+// __mix__(1,2): 混合核函数，1个AIC(Cube) + 2个AIV(Vector)组成一个逻辑核
+__global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t *xMatrix,
+                                              __gm__ uint8_t *yMatrix,
+                                              __gm__ uint8_t *zMatrix) {
+  AscendC::InitSocState(); // 初始化硬件状态
+  KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK,
+               baseN>
+      op;
+  op.Init(xMatrix, yMatrix, zMatrix); // GlobalTensor初始化与分核偏移
+  op.Process(); // AIC侧执行Matmul，AIV侧执行LeakyRelu
+  AscendC::PipeBarrier<PIPE_ALL>(); // 等待所有流水阶段完成
+}
     ```
 
 - **接口参数说明**
@@ -328,101 +349,104 @@
 
   **[AscendC::Nd2NzParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L1-Buffer/GMToL1随路转换-ND2NZ搬运（DataCopy）.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
   ```cpp
-  struct Nd2NzParams {
-      int32_t  ndNum;              // 传输ND矩阵的数目，[0, 4095]
-      uint16_t nValue;             // ND矩阵的行数，[0, 16384]
-      int32_t  dValue;             // ND矩阵的列数，[0, 65535]
-      int32_t  srcNdMatrixStride;  // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
-      int32_t  srcDValue;          // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
-      uint16_t dstNzC0Stride;      // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1, 16384]
-      uint16_t dstNzNStride;       // 目的Nz中Z型矩阵相邻行偏移，单位：C0_SIZE(32B)，[1, 16384]
-      int32_t  dstNzMatrixStride;  // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1, 65535]
-  };
+struct Nd2NzParams {
+  int32_t ndNum;   // 传输ND矩阵的数目，[0, 4095]
+  uint16_t nValue; // ND矩阵的行数，[0, 16384]
+  int32_t dValue;  // ND矩阵的列数，[0, 65535]
+  int32_t srcNdMatrixStride; // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
+  int32_t srcDValue; // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
+  uint16_t
+      dstNzC0Stride; // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1,
+                     // 16384]
+  uint16_t
+      dstNzNStride; // 目的Nz中Z型矩阵相邻行偏移，单位：C0_SIZE(32B)，[1, 16384]
+  int32_t dstNzMatrixStride; // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1,
+                             // 65535]
+};
   ```
   例如搬运A矩阵时`{1, baseM, baseK, 0, K, baseM, 1, 0}`，将baseM×baseK的ND数据转为Nz格式。
 
   **[AscendC::LoadData2DParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md)** — `LoadData`接口使用，描述Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
   ```cpp
-  struct LoadData2DParams {
-      int32_t startIndex;   // 分形矩阵ID（0为第1个），单位：512B，[0, 65535]
-      int32_t repeatTimes;  // 迭代次数，每个迭代处理512B，[1, 255]
-      int32_t srcStride;    // 相邻迭代源分形起始地址间隔，单位：512B，[0, 65535]
-      int32_t sid;          // 预留，配置为0
-      int32_t dstGap;       // 目的端相邻迭代分形间隔，单位：512B，[0, 65535]
-      bool    ifTranspose;  // 是否转置每个分形，默认false
-      bool    addrMode;     // 地址更新方式，false=递增，true=递减，默认false
-  };
+struct LoadData2DParams {
+  int32_t startIndex; // 分形矩阵ID（0为第1个），单位：512B，[0, 65535]
+  int32_t repeatTimes; // 迭代次数，每个迭代处理512B，[1, 255]
+  int32_t srcStride; // 相邻迭代源分形起始地址间隔，单位：512B，[0, 65535]
+  int32_t sid;    // 预留，配置为0
+  int32_t dstGap; // 目的端相邻迭代分形间隔，单位：512B，[0, 65535]
+  bool ifTranspose; // 是否转置每个分形，默认false
+  bool addrMode; // 地址更新方式，false=递增，true=递减，默认false
+};
   ```
   例如：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中，L0A上的排布格式为Zz，搬运A矩阵时`{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`；<br>
   搬运B矩阵时`ifTranspose=true`，完成Nz到Zn的转置搬运。
 
   **[AscendC::LoadData2DParamsV2](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2DV2.md)** — `LoadData`接口使用，描述Ascend 950PR/Ascend 950DT产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
   ```cpp
-  struct LoadData2DParamsV2 {
-      uint32_t mStartPosition;  // M方向起始位置，单位：512B
-      uint32_t kStartPosition;  // K方向起始位置，单位：512B
-      uint16_t mStep;           // M方向搬运分形数
-      uint16_t kStep;           // K方向搬运分形数
-      int32_t  srcStride;       // 源端相邻K方向分形间隔，单位：512B
-      uint16_t dstStride;       // 目的端相邻K方向分形间隔，单位：512B
-      bool     ifTranspose;     // 是否转置每个分形，默认false
-      uint8_t  sid;             // 预留，配置为0
-  };
+struct LoadData2DParamsV2 {
+  uint32_t mStartPosition; // M方向起始位置，单位：512B
+  uint32_t kStartPosition; // K方向起始位置，单位：512B
+  uint16_t mStep;          // M方向搬运分形数
+  uint16_t kStep;          // K方向搬运分形数
+  int32_t srcStride;       // 源端相邻K方向分形间隔，单位：512B
+  uint16_t dstStride;      // 目的端相邻K方向分形间隔，单位：512B
+  bool ifTranspose;        // 是否转置每个分形，默认false
+  uint8_t sid;             // 预留，配置为0
+};
   ```
   Ascend 950PR/Ascend 950DT产品中，L0A上的排布格式为Nz，搬运A矩阵时使用`{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0}`，一次完成A矩阵Nz到Nz搬运；搬运B矩阵时使用`{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0}`，一次完成B矩阵Nz到Zn搬运。
 
   **[AscendC::MmadParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)** — `Mmad`接口使用，描述矩阵乘参数：
   ```cpp
-  struct MmadParams {
-      uint16_t m;               // 左矩阵Height（M维），[0, 4095]
-      uint16_t n;               // 右矩阵Width（N维），[0, 4095]
-      uint16_t k;               // 左矩阵Width/右矩阵Height（K维），[0, 4095]
-      uint16_t unitFlag;        // Mmad与Fixpipe细粒度并行控制，默认0
-      bool     cmatrixSource;   // C矩阵初始值来源，false=CO1，true=C2，默认false
-      bool     cmatrixInitVal;  // C矩阵初始值是否为0，默认true
-  };
+struct MmadParams {
+  uint16_t m;        // 左矩阵Height（M维），[0, 4095]
+  uint16_t n;        // 右矩阵Width（N维），[0, 4095]
+  uint16_t k;        // 左矩阵Width/右矩阵Height（K维），[0, 4095]
+  uint16_t unitFlag; // Mmad与Fixpipe细粒度并行控制，默认0
+  bool cmatrixSource; // C矩阵初始值来源，false=CO1，true=C2，默认false
+  bool cmatrixInitVal; // C矩阵初始值是否为0，默认true
+};
   ```
   例如`{baseM, baseN, baseK, 0, false, true}`，计算baseM×baseN输出块并在K方向累加baseK长度。
 
   **[AscendC::FixpipeParamsV220](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)** — `Fixpipe`接口使用，描述L0C到GM的数据搬运和精度转换参数：
   ```cpp
-  struct FixpipeParamsV220 {
-      int32_t     nSize;        // 源Nz矩阵N方向大小，[1, 4095]
-      uint16_t    mSize;        // 源Nz矩阵M方向大小（Nz2ND时[1, 8192]）
-      uint16_t    srcStride;    // 源Nz相邻Z排布起始偏移，单位：C0_SIZE，[0, 65535]
-      int32_t     dstStride;    // Nz2ND时目的ND矩阵每行元素数，单位：element
-      bool        reluEn;       // 是否使能ReLU
-      QuantMode_t quantPre;     // 量化模式，F322F16表示float→half
-      uint64_t    deqScalar;    // scalar量化参数，单个scale值
-      int32_t     ndNum;        // 源Nz矩阵数目，[1, 65535]
-      int32_t     srcNdStride;  // 不同Nz矩阵起始地址间隔，单位：16×C0_SIZE，[1, 512]
-      int32_t     dstNdStride;  // 目的相邻ND矩阵偏移，单位：element，[1, 65535]
-      int32_t     unitFlag;     // Mmad与Fixpipe并行控制
-  };
+struct FixpipeParamsV220 {
+  int32_t nSize;  // 源Nz矩阵N方向大小，[1, 4095]
+  uint16_t mSize; // 源Nz矩阵M方向大小（Nz2ND时[1, 8192]）
+  uint16_t srcStride; // 源Nz相邻Z排布起始偏移，单位：C0_SIZE，[0, 65535]
+  int32_t dstStride; // Nz2ND时目的ND矩阵每行元素数，单位：element
+  bool reluEn;       // 是否使能ReLU
+  QuantMode_t quantPre; // 量化模式，F322F16表示float→half
+  uint64_t deqScalar;   // scalar量化参数，单个scale值
+  int32_t ndNum;        // 源Nz矩阵数目，[1, 65535]
+  int32_t srcNdStride; // 不同Nz矩阵起始地址间隔，单位：16×C0_SIZE，[1, 512]
+  int32_t dstNdStride; // 目的相邻ND矩阵偏移，单位：element，[1, 65535]
+  int32_t unitFlag; // Mmad与Fixpipe并行控制
+};
   ```
   例如`{baseN, baseM, baseM, N, false, F322F16, 0, 1, 0, 0, 0}`，将L0C中的baseM×baseN float32结果转为half并写回GM。
 
   **[AscendC::DataCopyExtParams](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)** — `DataCopyPad`接口使用，描述GM与UB之间按块搬运的参数：
   ```cpp
-  struct DataCopyExtParams {
-      uint16_t blockCount;  // 连续传输数据块个数
-      uint32_t blockLen;    // 每个数据块长度，单位：Byte
-      uint32_t srcStride;   // 源端相邻数据块间隔，单位：Byte
-      uint32_t dstStride;   // 目的端相邻数据块间隔，单位：Byte
-      uint32_t rsv;         // 预留字段，配置为0
-  };
+struct DataCopyExtParams {
+  uint16_t blockCount; // 连续传输数据块个数
+  uint32_t blockLen;   // 每个数据块长度，单位：Byte
+  uint32_t srcStride;  // 源端相邻数据块间隔，单位：Byte
+  uint32_t dstStride;  // 目的端相邻数据块间隔，单位：Byte
+  uint32_t rsv;        // 预留字段，配置为0
+};
   ```
   例如GM搬运到UB时`{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0}`，每个Vector核读取baseM/2行结果。
 
   **[AscendC::DataCopyPadExtParams\<half\>](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB非对齐数据搬运(DataCopyPad).md)** — `DataCopyPad`接口使用，描述尾块补齐参数：
   ```cpp
-  template <typename T>
-  struct DataCopyPadExtParams {
-      bool isPad;       // 是否开启补齐
-      uint8_t leftPad;  // 左侧补齐长度
-      uint8_t rightPad; // 右侧补齐长度
-      T paddingValue;   // 补齐值
-  };
+template <typename T> struct DataCopyPadExtParams {
+  bool isPad;       // 是否开启补齐
+  uint8_t leftPad;  // 左侧补齐长度
+  uint8_t rightPad; // 右侧补齐长度
+  T paddingValue;   // 补齐值
+};
   ```
   例如`{true, 0, 0, 0}`表示开启补齐能力，但左右两侧均不额外补齐。
 

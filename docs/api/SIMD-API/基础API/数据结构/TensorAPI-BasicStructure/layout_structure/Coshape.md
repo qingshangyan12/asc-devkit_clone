@@ -20,7 +20,7 @@ Coshape = Σ( (shape[i] - 1) × stride[i] ) + 1
 
 ```cpp
 template <size_t... Is, typename Shape, typename Stride>
-__aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride>& layout)
+__aicore__ inline constexpr auto Coshape(const Layout<Shape, Stride> &layout)
 ```
 
 ## 参数说明

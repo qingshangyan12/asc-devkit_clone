@@ -43,17 +43,19 @@ $dst_i = |src_i|$
 - tensor前n个数据连续计算
 
     ```cpp
-    template <typename T>
-    __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count)
+template <typename T>
+__aicore__ inline void Abs(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+                           const int32_t &count)
     ```
 
 <!-- npu="950" id21 -->
 - tensor前n个复数计算
 
     ```cpp
-    // 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
-    template <typename T, typename U>
-    __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t& count)
+// 该函数原型，仅支持Ascend 950PR/Ascend 950DT。
+template <typename T, typename U>
+__aicore__ inline void Abs(const LocalTensor<T> &dst, const LocalTensor<U> &src,
+                           const int32_t &count)
     ```
 <!-- end id21 -->
 
@@ -61,15 +63,19 @@ $dst_i = |src_i|$
     - mask逐bit模式
 
         ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask[], const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Abs(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+                           uint64_t mask[], const uint8_t repeatTime,
+                           const UnaryRepeatParams &repeatParams)
         ```
 
     - mask连续模式
 
         ```cpp
-        template <typename T, bool isSetMask = true>
-        __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, uint64_t mask, const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void Abs(const LocalTensor<T> &dst, const LocalTensor<T> &src,
+                           uint64_t mask, const uint8_t repeatTime,
+                           const UnaryRepeatParams &repeatParams)
         ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -145,11 +151,11 @@ $dst_i = |src_i|$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    uint64_t mask = 256 / sizeof(half);
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Abs(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+uint64_t mask = 256 / sizeof(half);
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+// dstRepStride, srcRepStride = 8, no gap between repeats.
+AscendC::Abs(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
     结果示例如下：
@@ -162,11 +168,11 @@ $dst_i = |src_i|$
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, srcRepStride = 8, no gap between repeats.
-    AscendC::Abs(dstLocal, srcLocal, mask, 4, { 1, 1, 8, 8 });
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, srcBlkStride = 1, no gap between blocks in one repeat.
+// dstRepStride, srcRepStride = 8, no gap between repeats.
+AscendC::Abs(dstLocal, srcLocal, mask, 4, {1, 1, 8, 8});
     ```
 
     结果示例如下：
@@ -179,7 +185,7 @@ $dst_i = |src_i|$
 - tensor前n个数据计算接口样例
 
     ```cpp
-    AscendC::Abs(dstLocal, srcLocal, 512);
+AscendC::Abs(dstLocal, srcLocal, 512);
     ```
 
     结果示例如下：
@@ -195,9 +201,9 @@ $dst_i = |src_i|$
 - tensor前n个复数计算接口样例
 
     ```cpp
-    LocalTensor<complex64> srcLocal = inQueue.DeQue<complex64>();
-    LocalTensor<float> dstLocal = outQueue.AllocTensor<float>();
-    AscendC::Abs(dstLocal, srcLocal, 512);
+LocalTensor<complex64> srcLocal = inQueue.DeQue<complex64>();
+LocalTensor<float> dstLocal = outQueue.AllocTensor<float>();
+AscendC::Abs(dstLocal, srcLocal, 512);
     ```
 
     结果示例如下：

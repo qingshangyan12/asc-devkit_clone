@@ -55,23 +55,23 @@ This example demonstrates how to use the `clock()` interface in SIMT programming
 - Operator Implementation:
 
   ```cpp
-  __global__ void simt_gather(float* input, int32_t* index, float* output, uint64_t index_total_length)
-  {
-      uint64_t start = clock();
-  
-      int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-  
-      // Maps to the index of output tensor
-      if (idx >= index_total_length) {
-          return;
-      }
-      output[idx] = input[index[idx]];
-  
-      uint64_t end = clock();
-      if (blockIdx.x == 0 && threadIdx.x == 0) {
-          printf("%s execute cycle : %lu\n", "simt_gather", end - start);
-      }
+__global__ void simt_gather(float *input, int32_t *index, float *output,
+                            uint64_t index_total_length) {
+  uint64_t start = clock();
+
+  int32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+  // Maps to the index of output tensor
+  if (idx >= index_total_length) {
+    return;
   }
+  output[idx] = input[index[idx]];
+
+  uint64_t end = clock();
+  if (blockIdx.x == 0 && threadIdx.x == 0) {
+    printf("%s execute cycle : %lu\n", "simt_gather", end - start);
+  }
+}
   ```
 
 ## Build and Run

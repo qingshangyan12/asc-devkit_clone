@@ -13,7 +13,9 @@ DataCopy（CO1->GM、CO1->A1）过程中进行随路格式转换（NZ格式转�
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride)
+__aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num,
+                                               uint16_t src_nd_stride,
+                                               uint16_t dst_nd_stride)
 ```
 
 

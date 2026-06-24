@@ -17,8 +17,10 @@ MakePatternLayout用于根据Shape、Stride、LayoutPattern和TraitType构造带
 ## 函数原型
 
 ```cpp
-template <typename LayoutPattern, typename TraitType, typename ShapeType, typename StrideType>
-__aicore__ inline constexpr auto MakePatternLayout(const ShapeType& shape, const StrideType& stride)
+template <typename LayoutPattern, typename TraitType, typename ShapeType,
+          typename StrideType>
+__aicore__ inline constexpr auto MakePatternLayout(const ShapeType &shape,
+                                                   const StrideType &stride)
 ```
 
 ## 参数说明
@@ -57,12 +59,9 @@ using namespace AscendC::Te;
 // 示例1：构造带NZ布局模式的Layout
 auto layout1 = MakePatternLayout<NZLayoutPtn, LayoutTraitDefault<>>(
     MakeShape(MakeShape(16, 2), MakeShape(16, 4)),
-    MakeStride(MakeStride(16, 256), MakeStride(1, 512))
-);
+    MakeStride(MakeStride(16, 256), MakeStride(1, 512)));
 
 // 示例2：构造带ND布局模式的Layout
 auto layout2 = MakePatternLayout<NDLayoutPtn, LayoutTrait<Std::ignore_t, _1>>(
-    MakeShape(32, 64),
-    MakeStride(64, 1)
-);
+    MakeShape(32, 64), MakeStride(64, 1));
 ```

@@ -21,7 +21,7 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline __ssbuf__ void*  GetSsbufBaseAddr()
+__aicore__ inline __ssbuf__ void *GetSsbufBaseAddr()
 ```
 
 ## 参数说明
@@ -42,6 +42,9 @@ __aicore__ inline __ssbuf__ void*  GetSsbufBaseAddr()
 ## 调用示例
 
 ```cpp
- __ssbuf__ void* ssbuf = GetSsbufBaseAddr(); // NPU域中返回(void*) 0 ,CPU域中返回CPU模拟分配的地址
-AscendC::printf("Ssbuf基地址指针：%p\n", ssbuf); // %p为打印指针格式符，NPU环境中，将特殊的0指针值显示为nil
+__ssbuf__ void *ssbuf =
+    GetSsbufBaseAddr(); // NPU域中返回(void*) 0 ,CPU域中返回CPU模拟分配的地址
+AscendC::printf(
+    "Ssbuf基地址指针：%p\n",
+    ssbuf); // %p为打印指针格式符，NPU环境中，将特殊的0指针值显示为nil
 ```

@@ -44,5 +44,5 @@ PIPE_S
 
 ```cpp
 uint64_t value = 1024;
-asc_set_l13d_size(value);    // 设置L1 Buffer的边界值为1024（单位：字节）
+asc_set_l13d_size(value); // 设置L1 Buffer的边界值为1024（单位：字节）
 ```

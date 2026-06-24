@@ -38,35 +38,39 @@
   Device端部分示例如下：
     - **基于C语言API实现Memory矢量计算示例**
       ```cpp
-      __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-      {
-          asc_init();
+__vector__ __global__ void add_custom(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  asc_init();
 
-          constexpr uint32_t block_length = TOTAL_LENGTH / NUM_BLOCKS;
-          
-          // Determine the data that each block needs to process
-          __gm__ float* x_gm = x + block_idx * block_length;
-          __gm__ float* y_gm = y + block_idx * block_length;
-          __gm__ float* z_gm = z + block_idx * block_length;
+  constexpr uint32_t block_length = TOTAL_LENGTH / NUM_BLOCKS;
 
-          // Allocate on-chip UB memory
-          __ubuf__ float x_local[block_length];
-          __ubuf__ float y_local[block_length];
-          __ubuf__ float z_local[block_length];
+  // Determine the data that each block needs to process
+  __gm__ float *x_gm = x + block_idx * block_length;
+  __gm__ float *y_gm = y + block_idx * block_length;
+  __gm__ float *z_gm = z + block_idx * block_length;
 
-          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
-          asc_copy_gm2ub((__ubuf__ void*)x_local, (__gm__ void*)x_gm, block_length * sizeof(float));
-          asc_copy_gm2ub((__ubuf__ void*)y_local, (__gm__ void*)y_gm, block_length * sizeof(float));
-          asc_sync();
+  // Allocate on-chip UB memory
+  __ubuf__ float x_local[block_length];
+  __ubuf__ float y_local[block_length];
+  __ubuf__ float z_local[block_length];
 
-          // Call SIMD API to complete the Add operation
-          asc_add(z_local, x_local, y_local, block_length);
-          asc_sync();
+  // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB
+  // memory
+  asc_copy_gm2ub((__ubuf__ void *)x_local, (__gm__ void *)x_gm,
+                 block_length * sizeof(float));
+  asc_copy_gm2ub((__ubuf__ void *)y_local, (__gm__ void *)y_gm,
+                 block_length * sizeof(float));
+  asc_sync();
 
-          // Write the result from on-chip UB memory back to Global Memory
-          asc_copy_ub2gm((__gm__ void*)z_gm, (__ubuf__ void*)z_local, block_length * sizeof(float));
-          asc_sync();
-      }
+  // Call SIMD API to complete the Add operation
+  asc_add(z_local, x_local, y_local, block_length);
+  asc_sync();
+
+  // Write the result from on-chip UB memory back to Global Memory
+  asc_copy_ub2gm((__gm__ void *)z_gm, (__ubuf__ void *)z_local,
+                 block_length * sizeof(float));
+  asc_sync();
+}
       ```
       > [!NOTE] 说明
       > - 本Memory矢量计算示例支持以下型号：
@@ -77,36 +81,37 @@
     - **基于C++ Tensor实现Memory矢量计算示例**
 
       ```cpp
-      template <uint32_t blockLength>
-      __vector__ __global__ void add_custom(__gm__ float* x, __gm__ float* y, __gm__ float* z)
-      {
-          AscendC::InitSocState();
-          
-          // Determine the data that each block needs to process
-          AscendC::GlobalTensor<float> xGm, yGm, zGm;
-          xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
-          yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
-          zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
-          
-          // Allocate on-chip UB memory
-          AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-          AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
-          AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
-          AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
-          
-          // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB memory
-          AscendC::DataCopy(xLocal, xGm, blockLength);
-          AscendC::DataCopy(yLocal, yGm, blockLength);
-          AscendC::PipeBarrier<PIPE_ALL>();
-          
-          // Call SIMD API to complete the Add operation
-          AscendC::Add(zLocal, xLocal, yLocal, blockLength);
-          AscendC::PipeBarrier<PIPE_ALL>();
-          
-          // Write the result from on-chip UB memory back to Global Memory
-          AscendC::DataCopy(zGm, zLocal, blockLength);
-          AscendC::PipeBarrier<PIPE_ALL>();
-      }
+template <uint32_t blockLength>
+__vector__ __global__ void add_custom(__gm__ float *x, __gm__ float *y,
+                                      __gm__ float *z) {
+  AscendC::InitSocState();
+
+  // Determine the data that each block needs to process
+  AscendC::GlobalTensor<float> xGm, yGm, zGm;
+  xGm.SetGlobalBuffer(x + block_idx * blockLength, blockLength);
+  yGm.SetGlobalBuffer(y + block_idx * blockLength, blockLength);
+  zGm.SetGlobalBuffer(z + block_idx * blockLength, blockLength);
+
+  // Allocate on-chip UB memory
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, blockLength>();
+  AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, blockLength>();
+
+  // Copy input data from Global Memory (i.e., Device Memory) to on-chip UB
+  // memory
+  AscendC::DataCopy(xLocal, xGm, blockLength);
+  AscendC::DataCopy(yLocal, yGm, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>();
+
+  // Call SIMD API to complete the Add operation
+  AscendC::Add(zLocal, xLocal, yLocal, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>();
+
+  // Write the result from on-chip UB memory back to Global Memory
+  AscendC::DataCopy(zGm, zLocal, blockLength);
+  AscendC::PipeBarrier<PIPE_ALL>();
+}
       ```
       > [!NOTE] 说明
       > - 该样例支持以下型号：
@@ -119,38 +124,41 @@
 
     Host端通过`<<<>>>`语法糖调用Device端核函数，示例代码如下：
     ```cpp
-      int32_t main(int argc, char const *argv[])
-      {
-          ...
-          constexpr uint32_t num_blocks = 8;
-          ...
-          
-          // Allocate host and device memory, and copy input data from host to device
-          aclrtMallocHost((void **)(&z_host), total_byte_size);
-          aclrtMalloc((void **)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMalloc((void **)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
-          aclrtMemcpy((uint8_t*)x_device, total_byte_size, x_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
-          aclrtMemcpy((uint8_t*)y_device, total_byte_size, y_host, total_byte_size, ACL_MEMCPY_HOST_TO_DEVICE);
+int32_t main(int argc, char const *argv[]) {
+  ... constexpr uint32_t num_blocks = 8;
+  ...
 
-          // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
-          // numBlocks : Number of blocks. Default to 8 in this example.
-          // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
-          // nullptr : Runtime stream. Uses default stream in this example.
+      // Allocate host and device memory, and copy input data from host to
+      // device
+      aclrtMallocHost((void **)(&z_host), total_byte_size);
+  aclrtMalloc((void **)&x_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&y_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMalloc((void **)&z_device, total_byte_size, ACL_MEM_MALLOC_HUGE_FIRST);
+  aclrtMemcpy((uint8_t *)x_device, total_byte_size, x_host, total_byte_size,
+              ACL_MEMCPY_HOST_TO_DEVICE);
+  aclrtMemcpy((uint8_t *)y_device, total_byte_size, y_host, total_byte_size,
+              ACL_MEMCPY_HOST_TO_DEVICE);
 
-          // Example One：Call add kernel which is implemented by SIMD C API
-          add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
+  // Launch kernel <<<numBlocks, dynUBufSize, stream>>>
+  // numBlocks : Number of blocks. Default to 8 in this example.
+  // dynUBufSize : Dynamic unified buffer size. Default to 0 in this example.
+  // nullptr : Runtime stream. Uses default stream in this example.
 
-          // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
-          // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice, zDevice);
+  // Example One：Call add kernel which is implemented by SIMD C API
+  add_custom<<<num_blocks, 0>>>(xDevice, yDevice, zDevice);
 
-          // Wait for the add_custom kernel to complete
-          aclrtSynchronizeDevice();
+  // Example Two：Call add kernel which is implemented by SIMD C++ Basic API
+  // add_custom<blockLength><<<numBlocks, 0, stream>>>(xDevice, yDevice,
+  // zDevice);
 
-          // Copy the result from device memory to host memory
-          aclrtMemcpy(z_host, total_byte_size, (uint8_t*)z_device, total_byte_size, ACL_MEMCPY_DEVICE_TO_HOST);
-          ...
-      }
+  // Wait for the add_custom kernel to complete
+  aclrtSynchronizeDevice();
+
+  // Copy the result from device memory to host memory
+  aclrtMemcpy(z_host, total_byte_size, (uint8_t *)z_device, total_byte_size,
+              ACL_MEMCPY_DEVICE_TO_HOST);
+  ...
+}
     ```
 
 - **算子编译与运行**：

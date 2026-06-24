@@ -26,16 +26,36 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 - 计算
 
     ```cpp
-    __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+__aicore__ inline void
+asc_mrgsort4(__ubuf__ half *dst,
+             __ubuf__ half *src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat,
+             uint16_t element_length_0, uint16_t element_length_1,
+             uint16_t element_length_2, uint16_t element_length_3,
+             bool if_exhausted_suspension, uint8_t valid_bit) __aicore__
+    inline void asc_mrgsort4(__ubuf__ float *dst,
+                             __ubuf__ float *src[ASC_C_API_MRGSORT_ELEMENT_LEN],
+                             uint8_t repeat, uint16_t element_length_0,
+                             uint16_t element_length_1,
+                             uint16_t element_length_2,
+                             uint16_t element_length_3,
+                             bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
     <cann-filter npu_type="950">
 
     ```cpp
-    // 如下原型仅支持Ascend 950PR/Ascend 950DT
-    __aicore__ inline void asc_mrgsort4(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+// 如下原型仅支持Ascend 950PR/Ascend 950DT
+__aicore__ inline void
+asc_mrgsort4(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+             uint16_t element_length_0, uint16_t element_length_1,
+             uint16_t element_length_2, uint16_t element_length_3,
+             bool if_exhausted_suspension, uint8_t valid_bit) __aicore__
+    inline void asc_mrgsort4(__ubuf__ float *dst, __ubuf__ float *src,
+                             uint8_t repeat, uint16_t element_length_0,
+                             uint16_t element_length_1,
+                             uint16_t element_length_2,
+                             uint16_t element_length_3,
+                             bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
     </cann-filter>
@@ -43,16 +63,34 @@ asc_mrgsort4处理的数据一般是经过asc_bitsort指令处理后的数据，
 - 同步计算
 
     ```cpp
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN], uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+__aicore__ inline void asc_mrgsort4_sync(
+    __ubuf__ half *dst, __ubuf__ half *src[ASC_C_API_MRGSORT_ELEMENT_LEN],
+    uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
+    uint16_t element_length_2, uint16_t element_length_3,
+    bool if_exhausted_suspension, uint8_t valid_bit) __aicore__
+    inline void asc_mrgsort4_sync(
+        __ubuf__ float *dst, __ubuf__ float *src[ASC_C_API_MRGSORT_ELEMENT_LEN],
+        uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1,
+        uint16_t element_length_2, uint16_t element_length_3,
+        bool if_exhausted_suspension, uint8_t valid_bit)
     ```
 
     <cann-filter npu_type="950">
 
     ```cpp
-    // 如下原型仅支持Ascend 950PR/Ascend 950DT
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ half* dst, __ubuf__ half* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
-    __aicore__ inline void asc_mrgsort4_sync(__ubuf__ float* dst, __ubuf__ float* src, uint8_t repeat, uint16_t element_length_0, uint16_t element_length_1, uint16_t element_length_2, uint16_t element_length_3, bool if_exhausted_suspension, uint8_t valid_bit)
+// 如下原型仅支持Ascend 950PR/Ascend 950DT
+__aicore__ inline void
+asc_mrgsort4_sync(__ubuf__ half *dst, __ubuf__ half *src, uint8_t repeat,
+                  uint16_t element_length_0, uint16_t element_length_1,
+                  uint16_t element_length_2, uint16_t element_length_3,
+                  bool if_exhausted_suspension, uint8_t valid_bit) __aicore__
+    inline void asc_mrgsort4_sync(__ubuf__ float *dst, __ubuf__ float *src,
+                                  uint8_t repeat, uint16_t element_length_0,
+                                  uint16_t element_length_1,
+                                  uint16_t element_length_2,
+                                  uint16_t element_length_3,
+                                  bool if_exhausted_suspension,
+                                  uint8_t valid_bit)
     ```
     
     </cann-filter>
@@ -100,8 +138,8 @@ __ubuf__ float src_workspace[array_length * 8];
 __ubuf__ float tmp_workspace[array_length * 8];
 __ubuf__ float dst_workspace[array_length * 8];
 
-__ubuf__ float* src[ASC_C_API_MRGSORT_ELEMENT_LEN];
-__ubuf__ float* dst;
+__ubuf__ float *src[ASC_C_API_MRGSORT_ELEMENT_LEN];
+__ubuf__ float *dst;
 uint8_t valid_bit;
 
 // 每个迭代可以处理4个队列，共2个迭代。
@@ -111,12 +149,14 @@ src[2] = &src_workspace[2 * array_length];
 src[3] = &src_workspace[3 * array_length];
 dst = tmp_workspace;
 valid_bit = 15;
-asc_mrgsort4(dst, src, 2, element_length, element_length, element_length, element_length, false, valid_bit);
+asc_mrgsort4(dst, src, 2, element_length, element_length, element_length,
+             element_length, false, valid_bit);
 
 // 迭代1次，处理2个队列。
 src[0] = &tmp_workspace[0];
 src[1] = &tmp_workspace[1 * 4 * array_length];
 dst = dst_workspace;
 valid_bit = 3;
-asc_mrgsort4(dst, src, 1, 4 * element_length, 4 * element_length, 0, 0, false, valid_bit);
+asc_mrgsort4(dst, src, 1, 4 * element_length, 4 * element_length, 0, 0, false,
+             valid_bit);
 ```

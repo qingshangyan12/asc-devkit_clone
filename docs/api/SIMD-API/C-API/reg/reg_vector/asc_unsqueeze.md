@@ -10,22 +10,27 @@
 
 根据mask进行解压缩，将生成的数据输出到dst。解压缩方式：dst中的第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略不参与统计。算法逻辑表示如下：
   ```cpp
-  dst[0] = 0;
-  // dstLen为dst中包含的元素个数
-  for (int i = 1; i < dstLen; i++) {
-    dst[i] = mask[i - 1] ? (dst[i - 1] + 1) : dst[i - 1];
-  }
+dst[0] = 0;
+// dstLen为dst中包含的元素个数
+for (int i = 1; i < dstLen; i++) {
+  dst[i] = mask[i - 1] ? (dst[i - 1] + 1) : dst[i - 1];
+}
   ```
 
 ## 函数原型
 
   ```cpp
-  __simd_callee__ inline void asc_unsqueeze(vector_int8_t& dst, vector_bool mask)
-  __simd_callee__ inline void asc_unsqueeze(vector_uint8_t& dst, vector_bool mask)
-  __simd_callee__ inline void asc_unsqueeze(vector_int16_t& dst, vector_bool mask)
-  __simd_callee__ inline void asc_unsqueeze(vector_uint16_t& dst, vector_bool mask)
-  __simd_callee__ inline void asc_unsqueeze(vector_int32_t& dst, vector_bool mask)
-  __simd_callee__ inline void asc_unsqueeze(vector_uint32_t& dst, vector_bool mask)
+__simd_callee__ inline void asc_unsqueeze(vector_int8_t &dst,
+                                          vector_bool mask) __simd_callee__
+    inline void asc_unsqueeze(vector_uint8_t &dst,
+                              vector_bool mask) __simd_callee__
+    inline void asc_unsqueeze(vector_int16_t &dst,
+                              vector_bool mask) __simd_callee__
+    inline void asc_unsqueeze(vector_uint16_t &dst,
+                              vector_bool mask) __simd_callee__
+    inline void asc_unsqueeze(vector_int32_t &dst,
+                              vector_bool mask) __simd_callee__
+    inline void asc_unsqueeze(vector_uint32_t &dst, vector_bool mask)
   ```
 
 ## 参数说明

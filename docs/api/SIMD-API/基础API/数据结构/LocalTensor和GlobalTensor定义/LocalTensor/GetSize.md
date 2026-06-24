@@ -75,7 +75,9 @@ __aicore__ inline uint32_t GetSize() const
 
 ```cpp
 // 示例
-auto size = inputLocal.GetSize(); // 获取inputLocal的长度，size大小为inputLocal有多少个元素
+auto size =
+    inputLocal
+        .GetSize(); // 获取inputLocal的长度，size大小为inputLocal有多少个元素
 // 示例5结果如下：
 // size大小为srcLen，256。
 ```

@@ -55,7 +55,7 @@
 
 ```cpp
 template <typename... Ts>
-__aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
+__aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts &...t)
 ```
 
 ## 参数说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section75395119104"></a>
@@ -84,8 +84,7 @@ __aicore__ inline constexpr Shape<Ts...> MakeShape(const Ts&... t)
 Shape结构类型（[Std::tuple](../../../../../Utils-API/CPP标准库/容器函数/容器函数.md)类型的别名），用于定义数据的逻辑形状，例如二维矩阵的行数和列数或多维张量的各维度大小。定义如下:
 
 ```cpp
-template <typename... Shapes>
-using Shape = Std::tuple<Shapes...>;
+template <typename... Shapes> using Shape = Std::tuple<Shapes...>;
 ```
 
 ## 约束说明<a name="zh-cn_topic_0000002078447573_zh-cn_topic_0000001576806829_zh-cn_topic_0000001339187720_section19165124931511"></a>

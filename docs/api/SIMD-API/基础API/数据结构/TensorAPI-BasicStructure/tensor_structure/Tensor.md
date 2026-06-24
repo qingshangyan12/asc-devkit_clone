@@ -15,74 +15,79 @@ Tensor用于将内存访问引擎Engine与布局Layout绑定起来。Engine描�
 ## 原型定义
 
 ```cpp
-template <typename EngineType, typename LayoutType>
-struct TensorAttribute {};
+template <typename EngineType, typename LayoutType> struct TensorAttribute {};
 
-template <typename T>
-struct BaseTensor {};
+template <typename T> struct BaseTensor {};
 
 template <typename EngineType, typename LayoutType>
 struct BaseTensor<TensorAttribute<EngineType, LayoutType>> {
-    using iterator = typename EngineType::iterator;
-    using valueType = typename EngineType::valueType;
-    using elementType = typename EngineType::elementType;
-    using reference = typename EngineType::reference;
+  using iterator = typename EngineType::iterator;
+  using valueType = typename EngineType::valueType;
+  using elementType = typename EngineType::elementType;
+  using reference = typename EngineType::reference;
 
-    using engineType  = EngineType;
-    using layoutType  = LayoutType;
+  using engineType = EngineType;
+  using layoutType = LayoutType;
 
-    static constexpr int rank = LayoutType::rank;
+  static constexpr int rank = LayoutType::rank;
 
-    __aicore__ inline BaseTensor();
-    __aicore__ inline BaseTensor(const EngineType& engine, const LayoutType& layout);
+  __aicore__ inline BaseTensor();
+  __aicore__ inline BaseTensor(const EngineType &engine,
+                               const LayoutType &layout);
 
-    __aicore__ inline constexpr decltype(auto) Tensor() const;
-    __aicore__ inline constexpr decltype(auto) Engine() const;
-    __aicore__ inline constexpr decltype(auto) Engine();
-    __aicore__ inline constexpr decltype(auto) Layout() const;
-    __aicore__ inline constexpr decltype(auto) Data() const;
-    __aicore__ inline constexpr decltype(auto) Data();
-    __aicore__ inline constexpr decltype(auto) Shape() const;
-    __aicore__ inline constexpr decltype(auto) Stride() const;
-    __aicore__ inline constexpr auto Size() const;
-    __aicore__ inline constexpr auto Capacity() const;
+  __aicore__ inline constexpr decltype(auto) Tensor() const;
+  __aicore__ inline constexpr decltype(auto) Engine() const;
+  __aicore__ inline constexpr decltype(auto) Engine();
+  __aicore__ inline constexpr decltype(auto) Layout() const;
+  __aicore__ inline constexpr decltype(auto) Data() const;
+  __aicore__ inline constexpr decltype(auto) Data();
+  __aicore__ inline constexpr decltype(auto) Shape() const;
+  __aicore__ inline constexpr decltype(auto) Stride() const;
+  __aicore__ inline constexpr auto Size() const;
+  __aicore__ inline constexpr auto Capacity() const;
 
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord);
+  template <typename Coord>
+  __aicore__ inline constexpr decltype(auto) operator[](const Coord &coord);
 
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
+  template <typename Coord>
+  __aicore__ inline constexpr decltype(auto)
+  operator[](const Coord &coord) const;
 
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
+  template <typename Coord>
+  __aicore__ inline constexpr decltype(auto) operator()(const Coord &coord);
 
-    template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
+  template <typename Coord>
+  __aicore__ inline constexpr decltype(auto)
+  operator()(const Coord &coord) const;
 
-    template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+  template <typename Coord0, typename Coord1, typename... Coords>
+  __aicore__ inline constexpr decltype(auto)
+  operator()(const Coord0 &c0, const Coord1 &c1, const Coords &...cs);
 
-    template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
+  template <typename Coord0, typename Coord1, typename... Coords>
+  __aicore__ inline constexpr decltype(auto)
+  operator()(const Coord0 &c0, const Coord1 &c1, const Coords &...cs) const;
 
-    template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
+  template <typename Coord, typename Info>
+  __aicore__ inline constexpr decltype(auto) Slice(const Coord &coord,
+                                                   const Info &info);
 
-    template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const;
+  template <typename Coord, typename Info>
+  __aicore__ inline constexpr decltype(auto) Slice(const Coord &coord,
+                                                   const Info &info) const;
 };
 
 template <typename EngineType, typename LayoutType>
 struct GlobalTensor<TensorAttribute<EngineType, LayoutType>>
     : public BaseTensor<TensorAttribute<EngineType, LayoutType>> {
-    __aicore__ inline GlobalTensor() = default;
-    __aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode);
+  __aicore__ inline GlobalTensor() = default;
+  __aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode);
 };
 
 template <typename EngineType, typename LayoutType>
 struct LocalTensor<TensorAttribute<EngineType, LayoutType>>
     : public BaseTensor<TensorAttribute<EngineType, LayoutType>> {
-    __aicore__ inline LocalTensor() = default;
+  __aicore__ inline LocalTensor() = default;
 };
 ```
 
@@ -113,7 +118,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Tensor() const
+__aicore__ inline constexpr decltype(auto) Tensor() const
   ```
 
 - 返回值说明
@@ -131,8 +136,8 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Engine() const
-  __aicore__ inline constexpr decltype(auto) Engine()
+__aicore__ inline constexpr decltype(auto) Engine() const __aicore__
+    inline constexpr decltype(auto) Engine()
   ```
 
 - 返回值说明
@@ -150,7 +155,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Layout() const
+__aicore__ inline constexpr decltype(auto) Layout() const
   ```
 
 - 返回值说明
@@ -168,8 +173,8 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Data() const
-  __aicore__ inline constexpr decltype(auto) Data()
+__aicore__ inline constexpr decltype(auto) Data() const __aicore__
+    inline constexpr decltype(auto) Data()
   ```
 
 - 返回值说明
@@ -187,7 +192,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Shape() const
+__aicore__ inline constexpr decltype(auto) Shape() const
   ```
 
 - 返回值说明
@@ -205,7 +210,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr decltype(auto) Stride() const
+__aicore__ inline constexpr decltype(auto) Stride() const
   ```
 
 - 返回值说明
@@ -223,7 +228,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr auto Size() const
+__aicore__ inline constexpr auto Size() const
   ```
 
 - 返回值说明
@@ -241,7 +246,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr auto Capacity() const
+__aicore__ inline constexpr auto Capacity() const
   ```
 
 - 返回值说明
@@ -259,11 +264,12 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord)
+template <typename Coord>
+__aicore__ inline constexpr decltype(auto) operator[](const Coord &coord)
 
-  template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const
+    template <typename Coord>
+    __aicore__
+    inline constexpr decltype(auto) operator[](const Coord &coord) const
   ```
 
 - 参数说明
@@ -290,17 +296,21 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord)
+template <typename Coord>
+__aicore__ inline constexpr decltype(auto) operator()(const Coord &coord)
 
-  template <typename Coord>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const
+    template <typename Coord>
+    __aicore__
+    inline constexpr decltype(auto) operator()(const Coord &coord) const
 
-  template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs)
+    template <typename Coord0, typename Coord1, typename... Coords>
+    __aicore__ inline constexpr decltype(auto)
+    operator()(const Coord0 &c0, const Coord1 &c1, const Coords &...cs)
 
-  template <typename Coord0, typename Coord1, typename... Coords>
-  __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const
+        template <typename Coord0, typename Coord1, typename... Coords>
+        __aicore__
+    inline constexpr decltype(auto)
+    operator()(const Coord0 &c0, const Coord1 &c1, const Coords &...cs) const
   ```
 
 - 参数说明
@@ -325,11 +335,13 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  template <typename Coord, typename Info>
-  __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info)
+template <typename Coord, typename Info>
+__aicore__ inline constexpr decltype(auto) Slice(const Coord &coord,
+                                                 const Info &info)
 
-  template <typename Coord, typename Info>
-  __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const
+    template <typename Coord, typename Info>
+    __aicore__ inline constexpr decltype(auto)
+        Slice(const Coord &coord, const Info &info) const
   ```
 
 - 参数说明
@@ -354,7 +366,7 @@ Tensor相关类型本身为类型定义，不直接返回值。
 - 函数原型
 
   ```cpp
-  __aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode)
+__aicore__ inline constexpr void SetL2CacheHint(Te::CacheMode mode)
   ```
 
 - 参数说明
@@ -381,10 +393,10 @@ constexpr uint64_t gmAddr = 128;
 auto gmLayout = MakeLayout(MakeShape(128, 128), MakeStride(128, 1));
 auto gmTensor = MakeTensor(MakeMemPtr<Location::GM, float>(gmAddr), gmLayout);
 
-auto gmShape = gmTensor.Shape();        // (128, 128)
-auto gmStride = gmTensor.Stride();      // (128, 1)
-auto gmSize = gmTensor.Size();          // 16384
-auto gmCap = gmTensor.Capacity();       // 16384
+auto gmShape = gmTensor.Shape();   // (128, 128)
+auto gmStride = gmTensor.Stride(); // (128, 1)
+auto gmSize = gmTensor.Size();     // 16384
+auto gmCap = gmTensor.Capacity();  // 16384
 gmTensor.SetL2CacheHint(CacheMode::CACHE_MODE_NORMAL);
 
 // 示例2：按坐标访问元素
@@ -398,7 +410,9 @@ auto subTensor = gmTensor(MakeCoord(16, 16));
 auto sliceTensor = gmTensor.Slice(MakeCoord(0, 0), MakeShape(32, 32));
 
 // 示例5：构造一个LocalTensor
-auto localLayout = MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(32, 32);
-auto localTensor = MakeTensor(MakeMemPtr<Location::L1, float>(l1Addr), localLayout);
+auto localLayout =
+    MakeFrameLayout<NZLayoutPtn, LayoutTraitDefault<float>>(32, 32);
+auto localTensor =
+    MakeTensor(MakeMemPtr<Location::L1, float>(l1Addr), localLayout);
 auto localData = localTensor.Data();
 ```

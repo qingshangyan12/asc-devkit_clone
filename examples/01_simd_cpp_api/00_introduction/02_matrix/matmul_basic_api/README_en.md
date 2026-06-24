@@ -86,79 +86,97 @@ This sample implements multi-core matrix multiplication computation based on the
 
   **[`AscendC::Nd2NzParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB随路转换ND2NZ搬运(DataCopy).md)** — Used by [`DataCopy`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/Memory矢量计算/数据搬运/GM与UB数据搬运/GMToUB随路转换ND2NZ搬运(DataCopy).md) interface, describes ND→Nz format conversion parameters:
   ```cpp
-  struct Nd2NzParams {
-      int32_t  ndNum;              // Number of ND matrices to transfer, [0, 4095]
-      uint16_t nValue;             // Number of rows in ND matrix, [0, 16384]
-      int32_t  dValue;             // Number of columns in ND matrix, [0, 65535]
-      int32_t  srcNdMatrixStride;  // Offset between starting addresses of adjacent ND matrices, unit: element, [0, 65535]
-      int32_t  srcDValue;          // Offset between adjacent rows of the same ND matrix, unit: element, [1, 65535]
-      uint16_t dstNzC0Stride;      // Adjacent row offset after conversion of multiple rows from the same source row in destination Nz, unit: C0_SIZE(32B), [1, 16384]
-      uint16_t dstNzNStride;       // Adjacent row offset of Z-shaped matrices in destination Nz, unit: C0_SIZE(32B), [1, 16384]
-      int32_t  dstNzMatrixStride;  // Starting address offset between adjacent Nz matrices in destination Nz, unit: element, [1, 65535]
-  };
+struct Nd2NzParams {
+  int32_t ndNum;             // Number of ND matrices to transfer, [0, 4095]
+  uint16_t nValue;           // Number of rows in ND matrix, [0, 16384]
+  int32_t dValue;            // Number of columns in ND matrix, [0, 65535]
+  int32_t srcNdMatrixStride; // Offset between starting addresses of adjacent ND
+                             // matrices, unit: element, [0, 65535]
+  int32_t srcDValue;      // Offset between adjacent rows of the same ND matrix,
+                          // unit: element, [1, 65535]
+  uint16_t dstNzC0Stride; // Adjacent row offset after conversion of multiple
+                          // rows from the same source row in destination Nz,
+                          // unit: C0_SIZE(32B), [1, 16384]
+  uint16_t dstNzNStride;  // Adjacent row offset of Z-shaped matrices in
+                          // destination Nz, unit: C0_SIZE(32B), [1, 16384]
+  int32_t
+      dstNzMatrixStride; // Starting address offset between adjacent Nz matrices
+                         // in destination Nz, unit: element, [1, 65535]
+};
   ```
   For example, when transferring matrix A, `{1, baseM, baseK, 0, K, baseM, 1, 0}` converts baseM×baseK ND data to Nz format.
 
   **[`AscendC::LoadData2DParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md)** — Used by [`LoadData`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md) interface, describes data transfer parameters for matrix A L1 to L0A and matrix B L1 to L0B in Atlas A2 Training Series Products/Atlas A2 Inference Series Products, Atlas A3 Training Series Products/Atlas A3 Inference Series Products:
 
   ```cpp
-  struct LoadData2DParams {
-      int32_t startIndex;   // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
-      int32_t repeatTimes;  // Number of iterations, each iteration processes 512B, [1, 255]
-      int32_t srcStride;    // Source fractal starting address interval between adjacent iterations, unit: 512B, [0, 65535]
-      int32_t sid;          // Reserved, set to 0
-      int32_t dstGap;       // Destination fractal interval between adjacent iterations, unit: 512B, [0, 65535]
-      bool    ifTranspose;  // Whether to transpose each fractal, default false
-      bool    addrMode;     // Address update mode, false=increment, true=decrement, default false
-  };
+struct LoadData2DParams {
+  int32_t
+      startIndex; // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
+  int32_t repeatTimes; // Number of iterations, each iteration processes 512B,
+                       // [1, 255]
+  int32_t srcStride;   // Source fractal starting address interval between
+                       // adjacent iterations, unit: 512B, [0, 65535]
+  int32_t sid;         // Reserved, set to 0
+  int32_t dstGap;   // Destination fractal interval between adjacent iterations,
+                    // unit: 512B, [0, 65535]
+  bool ifTranspose; // Whether to transpose each fractal, default false
+  bool addrMode;    // Address update mode, false=increment, true=decrement,
+                    // default false
+};
   ```
   For example: In Atlas A2 Training Series Products/Atlas A2 Inference Series Products, Atlas A3 Training Series Products/Atlas A3 Inference Series Products, the layout format on L0A is Zz. When transferring matrix A, use `{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`; <br>
   When transferring matrix B, set `ifTranspose=true` to complete Nz to Zn transpose transfer.
 
   **[`AscendC::LoadData2DParamsV2`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md)** — Used by [`LoadData`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬入/矩阵数据搬入至L0-Buffer/Load2D.md) interface, describes data transfer parameters for matrix A L1 to L0A and matrix B L1 to L0B in Ascend 950PR/Ascend 950DT products:
   ```cpp
-  struct LoadData2DParamsV2 {
-      uint32_t mStartPosition;  // M direction start position, unit: 512B
-      uint32_t kStartPosition;  // K direction start position, unit: 512B
-      uint16_t mStep;           // Number of fractals transferred in M direction
-      uint16_t kStep;           // Number of fractals transferred in K direction
-      int32_t  srcStride;       // Source fractal interval in K direction, unit: 512B
-      uint16_t dstStride;       // Destination fractal interval in K direction, unit: 512B
-      bool     ifTranspose;     // Whether to transpose each fractal, default false
-      uint8_t  sid;             // Reserved, set to 0
-  };
+struct LoadData2DParamsV2 {
+  uint32_t mStartPosition; // M direction start position, unit: 512B
+  uint32_t kStartPosition; // K direction start position, unit: 512B
+  uint16_t mStep;          // Number of fractals transferred in M direction
+  uint16_t kStep;          // Number of fractals transferred in K direction
+  int32_t srcStride;       // Source fractal interval in K direction, unit: 512B
+  uint16_t dstStride; // Destination fractal interval in K direction, unit: 512B
+  bool ifTranspose;   // Whether to transpose each fractal, default false
+  uint8_t sid;        // Reserved, set to 0
+};
   ```
   In Ascend 950PR/Ascend 950DT products, the layout format on L0A is Nz. When transferring matrix A, use `{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0}` to complete A matrix Nz to Nz transfer in one operation; when transferring matrix B, use `{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0}` to complete B matrix Nz to Zn transfer in one operation.
 
   **[`AscendC::MmadParams`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md)** — Used by [`Mmad`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md) interface, describes matrix multiplication parameters:
 
   ```cpp
-  struct MmadParams {
-      uint16_t m;               // Left matrix Height (M dimension), [0, 4095]
-      uint16_t n;               // Right matrix Width (N dimension), [0, 4095]
-      uint16_t k;               // Left matrix Width/Right matrix Height (K dimension), [0, 4095]
-      uint16_t unitFlag;        // Mmad and Fixpipe fine-grained parallelism control, default 0
-      bool     cmatrixSource;   // C matrix initial value source, false=CO1, true=C2, default false
-      bool     cmatrixInitVal;  // Whether C matrix initial value is 0, default true
-  };
+struct MmadParams {
+  uint16_t m; // Left matrix Height (M dimension), [0, 4095]
+  uint16_t n; // Right matrix Width (N dimension), [0, 4095]
+  uint16_t k; // Left matrix Width/Right matrix Height (K dimension), [0, 4095]
+  uint16_t
+      unitFlag; // Mmad and Fixpipe fine-grained parallelism control, default 0
+  bool cmatrixSource;  // C matrix initial value source, false=CO1, true=C2,
+                       // default false
+  bool cmatrixInitVal; // Whether C matrix initial value is 0, default true
+};
   ```
   For example, `{baseM, baseN, baseK, 0, false, true}` computes a baseM×baseN output block and accumulates baseK length in the K direction.
 
   **[`AscendC::FixpipeParamsV220`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md)** — Used by [`Fixpipe`](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) interface, describes L0C to GM data transfer and precision conversion parameters:
   ```cpp
-  struct FixpipeParamsV220 {
-      int32_t     nSize;        // Source Nz matrix N direction size, [1, 4095]
-      uint16_t    mSize;        // Source Nz matrix M direction size (for Nz2ND, [1, 8192])
-      uint16_t    srcStride;    // Source Nz adjacent Z layout starting offset, unit: C0_SIZE, [0, 65535]
-      int32_t     dstStride;    // Number of elements per row in destination ND matrix for Nz2ND, unit: element
-      bool        reluEn;       // Whether to enable ReLU
-      QuantMode_t quantPre;     // Quantization mode, F322F16 means float→half
-      uint64_t    deqScalar;    // Scalar quantization parameter, single scale value
-      int32_t     ndNum;        // Number of source Nz matrices, [1, 65535]
-      int32_t     srcNdStride;  // Starting address interval between different Nz matrices, unit: 16×C0_SIZE, [1, 512]
-      int32_t     dstNdStride;  // Destination adjacent ND matrix offset, unit: element, [1, 65535]
-      int32_t     unitFlag;     // Mmad and Fixpipe parallelism control
-  };
+struct FixpipeParamsV220 {
+  int32_t nSize;  // Source Nz matrix N direction size, [1, 4095]
+  uint16_t mSize; // Source Nz matrix M direction size (for Nz2ND, [1, 8192])
+  uint16_t srcStride; // Source Nz adjacent Z layout starting offset, unit:
+                      // C0_SIZE, [0, 65535]
+  int32_t dstStride;  // Number of elements per row in destination ND matrix for
+                      // Nz2ND, unit: element
+  bool reluEn;        // Whether to enable ReLU
+  QuantMode_t quantPre; // Quantization mode, F322F16 means float→half
+  uint64_t deqScalar;   // Scalar quantization parameter, single scale value
+  int32_t ndNum;        // Number of source Nz matrices, [1, 65535]
+  int32_t srcNdStride;  // Starting address interval between different Nz
+                        // matrices, unit: 16×C0_SIZE, [1, 512]
+  int32_t dstNdStride;  // Destination adjacent ND matrix offset, unit: element,
+                        // [1, 65535]
+  int32_t unitFlag;     // Mmad and Fixpipe parallelism control
+};
   ```
   For example, `{baseN, baseM, baseM, N, false, F322F16, 0, 1, 0, 0, 0}` converts the baseM×baseN float32 result in L0C to half and writes it back to GM.
 
@@ -230,7 +248,7 @@ For operators developed based on operator projects, you can use the [DumpTensor]
 Call the DumpTensor interface in the operator kernel-side implementation code where Tensor data needs to be printed. Example:
 
 ```cpp
-AscendC::DumpTensor(cLocal, baseM * baseN);
+AscendC::DumpTensor(cLocal, baseM *baseN);
 ```
 
 > [!CAUTION]Note

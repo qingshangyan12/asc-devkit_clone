@@ -24,7 +24,9 @@
 
 ```cpp
 template <TPosition Dst, TPosition Src, typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src,const Load2DBitModeParam& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const Load2DBitModeParam &loadDataParams)
 ```
 
 ## 参数说明<a id="section622mcpsimp"></a>
@@ -77,7 +79,8 @@ loadDataParams.srcStride = xxx;
 loadDataParams.dstStride = xxx;
 loadDataParams.sid = 0;
 loadDataParams.ifTranspose = false;
-Load2DBitModeParam params(loadDataParams);  // 直接使用LoadData2DParamsV2结构体类型对象初始化
+Load2DBitModeParam
+    params(loadDataParams); // 直接使用LoadData2DParamsV2结构体类型对象初始化
 ```
 
 也可以使用各参数的Set函数修改参数值，并且由于使用了联合体，还可以对config0和config1直接进行逐bit位修改来修改参数。
@@ -142,10 +145,12 @@ constexpr uint32_t fractalElemCount = 256;
 constexpr uint32_t tensorElemCount = 4 * fractalElemCount;
 
 // 源操作数：L1 Buffer，存放32x32的half矩阵。
-AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::A1, a1Addr, tensorElemCount);
+AscendC::LocalTensor<half> srcLocal(AscendC::TPosition::A1, a1Addr,
+                                    tensorElemCount);
 
 // 目的操作数：L0A Buffer，预留4个512B分形接收完整32x32 half矩阵。
-AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A2, a2Addr, tensorElemCount);
+AscendC::LocalTensor<half> dstLocal(AscendC::TPosition::A2, a2Addr,
+                                    tensorElemCount);
 
 AscendC::LoadData2DParamsV2 loadDataParams;
 // 从源矩阵M轴第0个16元素开始搬运。
@@ -167,7 +172,8 @@ loadDataParams.sid = 0;
 
 // 使用LoadData2DParamsV2构造bit mode参数，底层以bit位形式传递上述搬运配置。
 AscendC::Load2DBitModeParam bitModeParams(loadDataParams);
-AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(dstLocal, srcLocal, bitModeParams);
+AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(
+    dstLocal, srcLocal, bitModeParams);
 ```
 
 - 示例二：使用Set函数修改Load2DBitModeParam
@@ -189,5 +195,6 @@ bitModeParams.SetDstStride(2);
 // 不对每个分形做转置，保持L1中的分形方向搬入L0A。
 bitModeParams.SetIfTranspose(false);
 
-AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(dstLocal, srcLocal, bitModeParams);
+AscendC::LoadData<AscendC::TPosition::A2, AscendC::TPosition::A1, half>(
+    dstLocal, srcLocal, bitModeParams);
 ```

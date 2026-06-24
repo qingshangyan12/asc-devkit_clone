@@ -20,15 +20,24 @@
 
 ```cpp
 // FLOOR舍入模式
-__simd_callee__ inline void asc_int162half_rd(vector_half& dst, vector_int16_t src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_int162half_rn(vector_half& dst, vector_int16_t src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_int162half_rna(vector_half& dst, vector_int16_t src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_int162half_ru(vector_half& dst, vector_int16_t src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_int162half_rz(vector_half& dst, vector_int16_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_int162half_rd(vector_half &dst, vector_int16_t src, vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__
+    inline void asc_int162half_rn(vector_half &dst, vector_int16_t src,
+                                  vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__
+    inline void asc_int162half_rna(vector_half &dst, vector_int16_t src,
+                                   vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__
+    inline void asc_int162half_ru(vector_half &dst, vector_int16_t src,
+                                  vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__
+    inline void asc_int162half_rz(vector_half &dst, vector_int16_t src,
+                                  vector_bool mask)
 ```
 
 ## 参数说明

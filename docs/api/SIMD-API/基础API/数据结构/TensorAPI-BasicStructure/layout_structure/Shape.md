@@ -11,8 +11,7 @@ Shape用于定义张量的逻辑形状，用于描述各维度的大小。
 ## 原型定义
 
 ```cpp
-template <typename... Shapes>
-using Shape = Std::tuple<Shapes...>;
+template <typename... Shapes> using Shape = Std::tuple<Shapes...>;
 ```
 
 ## 参数说明

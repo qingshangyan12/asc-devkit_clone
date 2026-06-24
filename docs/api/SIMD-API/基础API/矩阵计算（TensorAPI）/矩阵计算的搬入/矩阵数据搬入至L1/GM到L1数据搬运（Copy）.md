@@ -25,24 +25,25 @@ Tensor API通过`Copy`接口统一执行不同通路数据搬运。该接口用�
 - 执行Global Memory到L1 Buffer搬运。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename SrcTensor>
-    __aicore__ inline void Copy(const CopyAtom<AtomType>& atomCopy,
-        const DstTensor& dst, const SrcTensor& src)
+template <typename AtomType, typename DstTensor, typename SrcTensor>
+__aicore__ inline void Copy(const CopyAtom<AtomType> &atomCopy,
+                            const DstTensor &dst, const SrcTensor &src)
     ```
 
 - 使用默认trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation)
+template <typename CopyOperationType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation)
     ```
 
 - 使用指定trait构造搬运原子对象。
 
     ```cpp
-    template <typename CopyOperationType, typename CopyTraitType>
-    __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copyOperation,
-        const CopyTraitType& copyTrait)
+template <typename CopyOperationType, typename CopyTraitType>
+__aicore__ inline constexpr auto
+MakeCopy(const CopyOperationType &copyOperation, const CopyTraitType &copyTrait)
     ```
 
 Global Memory到L1 Buffer通路使用`CopyGM2L1{}`作为`copyOperation`，使用`CopyGM2L1TraitDefault{}`作为默认trait对象。
@@ -169,17 +170,18 @@ using namespace AscendC::Te;
 constexpr uint32_t M = 32;
 constexpr uint32_t K = 64;
 
-__aicore__ inline void CopyGmToL1(__gm__ half* gmAddr)
-{
-    __cbuf__ half l1Buf[M * K];
+__aicore__ inline void CopyGmToL1(__gm__ half *gmAddr) {
+  __cbuf__ half l1Buf[M * K];
 
-    // 源张量：Global Memory上的ND格式矩阵；目的张量：L1 Buffer上的NZ格式矩阵
-    auto gmA = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(M, K));
-    auto l1A = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, half>(M, K));
+  // 源张量：Global Memory上的ND格式矩阵；目的张量：L1 Buffer上的NZ格式矩阵
+  auto gmA =
+      MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(M, K));
+  auto l1A =
+      MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, half>(M, K));
 
-    // 构造GM到L1搬运原子对象，Copy根据源/目的Layout自动完成ND到NZ的随路格式转换
-    auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
-    Copy(copyGm2L1, l1A, gmA);
+  // 构造GM到L1搬运原子对象，Copy根据源/目的Layout自动完成ND到NZ的随路格式转换
+  auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+  Copy(copyGm2L1, l1A, gmA);
 }
 ```
 
@@ -194,16 +196,17 @@ constexpr uint32_t B = 4;
 constexpr uint32_t M = 32;
 constexpr uint32_t K = 64;
 
-__aicore__ inline void CopyBatchGmToL1(__gm__ half* gmAddr)
-{
-    __cbuf__ half l1Buf[B * M * K];
+__aicore__ inline void CopyBatchGmToL1(__gm__ half *gmAddr) {
+  __cbuf__ half l1Buf[B * M * K];
 
-    // 构造带Batch轴的源/目的Layout（B个矩阵），MakeFrameLayout在原Layout外层增加一维Batch
-    auto gmA = MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
-    auto l1A = MakeTensor(MakeMemPtr(l1Buf), MakeFrameLayout<NZLayoutPtn, half>(B, M, K));
+  // 构造带Batch轴的源/目的Layout（B个矩阵），MakeFrameLayout在原Layout外层增加一维Batch
+  auto gmA =
+      MakeTensor(MakeMemPtr(gmAddr), MakeFrameLayout<NDExtLayoutPtn>(B, M, K));
+  auto l1A = MakeTensor(MakeMemPtr(l1Buf),
+                        MakeFrameLayout<NZLayoutPtn, half>(B, M, K));
 
-    // 调用方式与单矩阵一致，Copy一条指令完成B个矩阵的ND到NZ搬运
-    auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
-    Copy(copyGm2L1, l1A, gmA);
+  // 调用方式与单矩阵一致，Copy一条指令完成B个矩阵的ND到NZ搬运
+  auto copyGm2L1 = MakeCopy(CopyGM2L1{}, CopyGM2L1TraitDefault{});
+  Copy(copyGm2L1, l1A, gmA);
 }
 ```

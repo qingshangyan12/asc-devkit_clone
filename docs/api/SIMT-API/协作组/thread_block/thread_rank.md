@@ -49,25 +49,21 @@ static unsigned int thread_rank()
 - SIMT编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
-    {
-        ...
-        thread_block g = this_thread_block();
-        unsigned int rank = g.thread_rank();
-        ...
-    }
+using namespace cooperative_groups;
+__global__ void simt_kernel(...) {
+  ... thread_block g = this_thread_block();
+  unsigned int rank = g.thread_rank();
+  ...
+}
     ```
 
 - SIMD与SIMT混合编程场景：
 
     ```c++
-    using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
-    {
-        ...
-        thread_block g = this_thread_block();
-        unsigned int rank = g.thread_rank();
-        ...
-    }
+using namespace cooperative_groups;
+__simt_vf__ inline void simt_kernel(...) {
+  ... thread_block g = this_thread_block();
+  unsigned int rank = g.thread_rank();
+  ...
+}
     ```

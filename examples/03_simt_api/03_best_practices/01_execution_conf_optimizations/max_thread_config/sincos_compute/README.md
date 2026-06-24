@@ -99,15 +99,14 @@ sincos_compute/
 **关键代码**：
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin, 
-                                    float* output_cos, uint64_t total_length)
-{
-    int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
-    for (int i = 0; i < PER_THREAD_LOOP; i++) {
-        int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
-        sincosf(input[idx], output_sin + idx, output_cos + idx);
-    }
+__global__ void sincos_thread_1024(float *input, float *output_sin,
+                                   float *output_cos, uint64_t total_length) {
+  int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
+
+  for (int i = 0; i < PER_THREAD_LOOP; i++) {
+    int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
+    sincosf(input[idx], output_sin + idx, output_cos + idx);
+  }
 }
 ```
 
@@ -150,16 +149,14 @@ __global__ void sincos_thread_1024(float* input, float* output_sin,
 **关键代码**：
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
-                                    float* output_sin, float* output_cos,
-                                    uint64_t total_length)
-{
-    int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
-    for (int i = 0; i < PER_THREAD_LOOP; i++) {
-        int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
-        sincosf(input[idx], output_sin + idx, output_cos + idx);
-    }
+__global__ __launch_bounds__(512) void sincos_thread_512(
+    float *input, float *output_sin, float *output_cos, uint64_t total_length) {
+  int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
+
+  for (int i = 0; i < PER_THREAD_LOOP; i++) {
+    int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
+    sincosf(input[idx], output_sin + idx, output_cos + idx);
+  }
 }
 ```
 
@@ -214,7 +211,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 3. **使用`__launch_bounds__`提示编译器**：
    ```cpp
-   __global__ __launch_bounds__(线程数) void kernel_name(...)
+__global__ __launch_bounds__(线程数) void kernel_name(...)
    ```
 
 4. **验证优化效果**：

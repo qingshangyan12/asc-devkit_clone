@@ -88,18 +88,25 @@ __aicore__ inline GlobalTensor<CAST_T> ReinterpretCast() const
 ## 调用示例<a name="section17531157161314"></a>
 
 ```cpp
-uint64_t dataSize = 256; //设置input_global的大小为256
+uint64_t dataSize = 256; // 设置input_global的大小为256
 
 AscendC::GlobalTensor<int32_t> inputGlobal; // 类型为int32_t
-inputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ int32_t *>(src_gm), dataSize); // 设置源操作数在Global Memory上的起始地址为src_gm，所占外部存储的大小为256个int32_t
+inputGlobal.SetGlobalBuffer(
+    reinterpret_cast<__gm__ int32_t *>(src_gm),
+    dataSize); // 设置源操作数在Global
+               // Memory上的起始地址为src_gm，所占外部存储的大小为256个int32_t
 
-AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();    
-AscendC::DataCopy(inputLocal, inputGlobal, dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
+AscendC::LocalTensor<int32_t> inputLocal = inQueueX.AllocTensor<int32_t>();
+AscendC::DataCopy(
+    inputLocal, inputGlobal,
+    dataSize); // 将Global Memory上的inputGlobal拷贝到Local Memory的inputLocal上
 ...
-// 假设inputGlobal为int32_t类型，包含16个元素（64字节）
-// 调用ReinterpretCast将inputGlobal重解释为int16_t类型
-AscendC::GlobalTensor<int16_t> interpreTensor = inputGlobal.template ReinterpretCast<int16_t>();
+    // 假设inputGlobal为int32_t类型，包含16个元素（64字节）
+    // 调用ReinterpretCast将inputGlobal重解释为int16_t类型
+    AscendC::GlobalTensor<int16_t>
+        interpreTensor = inputGlobal.template ReinterpretCast<int16_t>();
 // 示例结果如下，二者数据完全一致，在物理内存上也是同一地址，仅根据不同类型进行了重解释
 // inputGlobal:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14 0 15 0
+// interpreTensor:0 0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10 0 11 0 12 0 13 0 14
+// 0 15 0
 ```

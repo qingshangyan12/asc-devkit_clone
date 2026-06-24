@@ -59,7 +59,9 @@
 
 ```cpp
 template <bool isAIVOnly = true>
-__aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, int32_t blockIdx, int32_t eventID)
+__aicore__ inline void IBSet(const GlobalTensor<int32_t> &gmWorkspace,
+                             const LocalTensor<int32_t> &ubWorkspace,
+                             int32_t blockIdx, int32_t eventID)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -100,11 +102,10 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 // sync_gm为外部存储核状态的公共缓存，类型为GlobalTensor；sync_buf为存储当前核状态的公共缓存，类型为LocalTensor。
 int32_t blockIdx = AscendC::GetBlockIdx(); // 获取当前核。
 if (blockIdx == 1) { // 在核1设置IBWait，将阻塞指令执行直到核0操作完成。
-    AscendC::IBWait(sync_gm, sync_buf, 0, 0);
+  AscendC::IBWait(sync_gm, sync_buf, 0, 0);
 }
-...
-if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行核1的指令。
-    AscendC::IBSet(sync_gm, sync_buf, 0, 0);
+... if (blockIdx == 0) { // 在核0设置IBSet，当核0的操作完成后再执行核1的指令。
+  AscendC::IBSet(sync_gm, sync_buf, 0, 0);
 }
 ```
 

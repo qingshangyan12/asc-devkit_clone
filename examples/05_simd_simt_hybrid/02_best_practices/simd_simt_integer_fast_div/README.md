@@ -60,22 +60,25 @@ output[i] = input[i] / divisor
 两个Case共用的数据搬运和SIMT调用流程如下：
 
 ```cpp
-asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, 0, 0, 0);
+asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0,
+                     false, 0, 0, 0);
 
 if ASC_IS_AIV {
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+  asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+  asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 }
 
 if constexpr (scenario == 0) {
-    asc_vf_call<simt_normal_div>(dim3(THREAD_COUNT), input_buf, output_buf, divisor, total_length);
+  asc_vf_call<simt_normal_div>(dim3(THREAD_COUNT), input_buf, output_buf,
+                               divisor, total_length);
 } else {
-    asc_vf_call<simt_fast_div>(dim3(THREAD_COUNT), input_buf, output_buf, magic, shift, total_length);
+  asc_vf_call<simt_fast_div>(dim3(THREAD_COUNT), input_buf, output_buf, magic,
+                             shift, total_length);
 }
 
 if ASC_IS_AIV {
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+  asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+  asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
 }
 
 asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, 0, 0, 0);

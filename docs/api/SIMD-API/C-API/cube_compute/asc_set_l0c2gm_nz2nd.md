@@ -13,7 +13,9 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num, uint64_t src_nd_stride, uint64_t dst_nd_stride)
+__aicore__ inline void asc_set_l0c2gm_nz2nd(uint64_t nd_num,
+                                            uint64_t src_nd_stride,
+                                            uint64_t dst_nd_stride)
 ```
 
 ## 参数说明

@@ -37,7 +37,7 @@ PIPE_S
 
 ```cpp
 // Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步基地址ffts_addr
-uint64_t config = *(__gm__ uint64_t*)ffts_addr;
+uint64_t config = *(__gm__ uint64_t *)ffts_addr;
 asc_set_ffts_base_addr(config);
 int64_t ffts_base = asc_get_ffts_base_addr();
 ```

@@ -57,28 +57,27 @@ SIMT直接访问Global Memory上的x、y和z数据，对应样例中的场景0�
 
 ```cpp
 template <typename T>
-__simt_vf__ inline void floor_mod_simt_gm_contiguous(
-    __gm__ T* x, __gm__ T* y, __gm__ T* z, uint32_t inputTotalLength)
-{
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
-        const auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        if (signsDiffer && (rem != 0)) {
-            z[index] = rem + yValue;
-        } else {
-            z[index] = rem;
-        }
+__simt_vf__ inline void
+floor_mod_simt_gm_contiguous(__gm__ T *x, __gm__ T *y, __gm__ T *z,
+                             uint32_t inputTotalLength) {
+  for (uint32_t index = static_cast<uint32_t>(threadIdx.x);
+       index < inputTotalLength; index += static_cast<uint32_t>(blockDim.x)) {
+    T yValue = y[index];
+    const auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    if (signsDiffer && (rem != 0)) {
+      z[index] = rem + yValue;
+    } else {
+      z[index] = rem;
     }
+  }
 }
 
-__aicore__ inline void ProcessGmSimt()
-{
-    asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
-        dim3(THREAD_COUNT), const_cast<__gm__ T*>(xGm.GetPhyAddr()),
-        const_cast<__gm__ T*>(yGm.GetPhyAddr()), const_cast<__gm__ T*>(zGm.GetPhyAddr()),
-        DataLenPerCore);
+__aicore__ inline void ProcessGmSimt() {
+  asc_vf_call<floor_mod_simt_gm_contiguous<T>>(
+      dim3(THREAD_COUNT), const_cast<__gm__ T *>(xGm.GetPhyAddr()),
+      const_cast<__gm__ T *>(yGm.GetPhyAddr()),
+      const_cast<__gm__ T *>(zGm.GetPhyAddr()), DataLenPerCore);
 }
 ```
 
@@ -87,47 +86,47 @@ __aicore__ inline void ProcessGmSimt()
 使用SIMD接口DataCopy将x和y从Global Memory连续搬运到Unified Buffer，基于SIMT编程方式直接从Unified Buffer读取数据并写入Unified Buffer，再通过DataCopy将结果写回Global Memory，对应样例中的场景3（SCENARIO\_NUM=3）。代码如下。
 
 ```cpp
-__aicore__ inline void CopyIn(
-    uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(xLocal, xGm[tileOffset], count);
-    AscendC::DataCopy(yLocal, yGm[tileOffset], count);
+__aicore__ inline void CopyIn(uint32_t tileIdx, uint32_t count,
+                              AscendC::LocalTensor<T> &xLocal,
+                              AscendC::LocalTensor<T> &yLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(xLocal, xGm[tileOffset], count);
+  AscendC::DataCopy(yLocal, yGm[tileOffset], count);
 }
 
 template <typename T>
-__simt_vf__ inline void floor_mod_simt_contiguous(
-    __ubuf__ T* x, __ubuf__ T* y, __ubuf__ T* z, uint32_t inputTotalLength)
-{
-    for (uint32_t index = static_cast<uint32_t>(threadIdx.x); index < inputTotalLength;
-         index += static_cast<uint32_t>(blockDim.x)) {
-        T yValue = y[index];
-        const auto rem = x[index] % yValue;
-        bool signsDiffer = ((rem < 0) != (yValue < 0));
-        if (signsDiffer && (rem != 0)) {
-            z[index] = rem + yValue;
-        } else {
-            z[index] = rem;
-        }
+__simt_vf__ inline void floor_mod_simt_contiguous(__ubuf__ T *x, __ubuf__ T *y,
+                                                  __ubuf__ T *z,
+                                                  uint32_t inputTotalLength) {
+  for (uint32_t index = static_cast<uint32_t>(threadIdx.x);
+       index < inputTotalLength; index += static_cast<uint32_t>(blockDim.x)) {
+    T yValue = y[index];
+    const auto rem = x[index] % yValue;
+    bool signsDiffer = ((rem < 0) != (yValue < 0));
+    if (signsDiffer && (rem != 0)) {
+      z[index] = rem + yValue;
+    } else {
+      z[index] = rem;
     }
+  }
 }
 
-__aicore__ inline void Compute(
-    uint32_t count, AscendC::LocalTensor<T>& xLocal, AscendC::LocalTensor<T>& yLocal,
-    AscendC::LocalTensor<T>& zLocal)
-{
-    __ubuf__ T* xAddr = (__ubuf__ T*)xLocal.GetPhyAddr();
-    __ubuf__ T* yAddr = (__ubuf__ T*)yLocal.GetPhyAddr();
-    __ubuf__ T* zAddr = (__ubuf__ T*)zLocal.GetPhyAddr();
+__aicore__ inline void Compute(uint32_t count, AscendC::LocalTensor<T> &xLocal,
+                               AscendC::LocalTensor<T> &yLocal,
+                               AscendC::LocalTensor<T> &zLocal) {
+  __ubuf__ T *xAddr = (__ubuf__ T *)xLocal.GetPhyAddr();
+  __ubuf__ T *yAddr = (__ubuf__ T *)yLocal.GetPhyAddr();
+  __ubuf__ T *zAddr = (__ubuf__ T *)zLocal.GetPhyAddr();
 
-    asc_vf_call<floor_mod_simt_contiguous<T>>(dim3(THREAD_COUNT), xAddr, yAddr, zAddr, count);
-    AscendC::DataSyncBarrier<AscendC::MemDsbT::UB>();
+  asc_vf_call<floor_mod_simt_contiguous<T>>(dim3(THREAD_COUNT), xAddr, yAddr,
+                                            zAddr, count);
+  AscendC::DataSyncBarrier<AscendC::MemDsbT::UB>();
 }
 
-__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count, AscendC::LocalTensor<T>& zLocal)
-{
-    uint32_t tileOffset = tileIdx * TileLength;
-    AscendC::DataCopy(zGm[tileOffset], zLocal, count);
+__aicore__ inline void CopyOut(uint32_t tileIdx, uint32_t count,
+                               AscendC::LocalTensor<T> &zLocal) {
+  uint32_t tileOffset = tileIdx * TileLength;
+  AscendC::DataCopy(zGm[tileOffset], zLocal, count);
 }
 ```
 

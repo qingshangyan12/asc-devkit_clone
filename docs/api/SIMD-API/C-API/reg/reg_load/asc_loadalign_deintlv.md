@@ -25,22 +25,51 @@
 ### 基址寻址接口<a name="base-addressing-api"></a>
 
 ```cpp
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_half& dst0, vector_half& dst1, __ubuf__ half* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, __ubuf__ uint32_t* src)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_float& dst1, __ubuf__ float* src)
+__simd_callee__ inline void
+asc_loadalign_deintlv(vector_int4x2_t &dst0, vector_int4x2_t &dst1,
+                      __ubuf__ int4b_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int8_t &dst0, vector_int8_t &dst1,
+                                      __ubuf__ int8_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint8_t &dst0,
+                                      vector_uint8_t &dst1,
+                                      __ubuf__ uint8_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t &dst0,
+                                      vector_fp4x2_e2m1_t &dst1,
+                                      __ubuf__ fp4x2_e2m1_t *src)
+        __simd_callee__ inline void asc_loadalign_deintlv(
+            vector_fp4x2_e1m2_t &dst0, vector_fp4x2_e1m2_t &dst1,
+            __ubuf__ fp4x2_e1m2_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_hifloat8_t &dst0,
+                                      vector_hifloat8_t &dst1,
+                                      __ubuf__ hifloat8_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e8m0_t &dst0,
+                                      vector_fp8_e8m0_t &dst1,
+                                      __ubuf__ fp8_e8m0_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e5m2_t &dst0,
+                                      vector_fp8_e5m2_t &dst1,
+                                      __ubuf__ fp8_e5m2_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(
+        vector_fp8_e4m3fn_t &dst0, vector_fp8_e4m3fn_t &dst1,
+        __ubuf__ fp8_e4m3fn_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int16_t &dst0,
+                                      vector_int16_t &dst1,
+                                      __ubuf__ int16_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint16_t &dst0,
+                                      vector_uint16_t &dst1,
+                                      __ubuf__ uint16_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_half &dst0, vector_half &dst1,
+                                      __ubuf__ half *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_bfloat16_t &dst0,
+                                      vector_bfloat16_t &dst1,
+                                      __ubuf__ bfloat16_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int32_t &dst0,
+                                      vector_int32_t &dst1,
+                                      __ubuf__ int32_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint32_t &dst0,
+                                      vector_uint32_t &dst1,
+                                      __ubuf__ uint32_t *src) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_float &dst0, vector_float &dst1,
+                                      __ubuf__ float *src)
 ```
 
 ### 标量偏移寻址接口<a name="base-scalar-offset-api"></a>
@@ -48,22 +77,66 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
 源地址通过`src + offset`计算得到，且计算结果必须满足32B对齐要求。`offset`的单位为元素个数，实际地址偏移字节数为：`offset * sizeof(data_type)`。
 
 ```cpp
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_half& dst0, vector_half& dst1, __ubuf__ half* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, __ubuf__ uint32_t* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_float& dst1, __ubuf__ float* src, int32_t offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src, int32_t offset)
+__simd_callee__ inline void
+asc_loadalign_deintlv(vector_int8_t &dst0, vector_int8_t &dst1,
+                      __ubuf__ int8_t *src, int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint8_t &dst0,
+                                      vector_uint8_t &dst1,
+                                      __ubuf__ uint8_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t &dst0,
+                                      vector_fp4x2_e2m1_t &dst1,
+                                      __ubuf__ fp4x2_e2m1_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp4x2_e1m2_t &dst0,
+                                      vector_fp4x2_e1m2_t &dst1,
+                                      __ubuf__ fp4x2_e1m2_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e8m0_t &dst0,
+                                      vector_fp8_e8m0_t &dst1,
+                                      __ubuf__ fp8_e8m0_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e5m2_t &dst0,
+                                      vector_fp8_e5m2_t &dst1,
+                                      __ubuf__ fp8_e5m2_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t &dst0,
+                                      vector_fp8_e4m3fn_t &dst1,
+                                      __ubuf__ fp8_e4m3fn_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_hifloat8_t &dst0,
+                                      vector_hifloat8_t &dst1,
+                                      __ubuf__ hifloat8_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int16_t &dst0,
+                                      vector_int16_t &dst1,
+                                      __ubuf__ int16_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint16_t &dst0,
+                                      vector_uint16_t &dst1,
+                                      __ubuf__ uint16_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_half &dst0, vector_half &dst1,
+                                      __ubuf__ half *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_bfloat16_t &dst0,
+                                      vector_bfloat16_t &dst1,
+                                      __ubuf__ bfloat16_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int32_t &dst0,
+                                      vector_int32_t &dst1,
+                                      __ubuf__ int32_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint32_t &dst0,
+                                      vector_uint32_t &dst1,
+                                      __ubuf__ uint32_t *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_float &dst0, vector_float &dst1,
+                                      __ubuf__ float *src,
+                                      int32_t offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int4x2_t &dst0,
+                                      vector_int4x2_t &dst1,
+                                      __ubuf__ int4b_t *src, int32_t offset)
 ```
 
 ### 地址寄存器偏移寻址接口<a name="base-register-indexed-api"></a>
@@ -71,22 +144,66 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 该类接口通过地址寄存器`iter_reg offset`生成实际访问地址。地址寄存器通常在循环场景中使用，需配合[`asc_create_iter_reg`](../reg_vector/asc_create_iter_reg.md)完成初始化。实际访问地址必须满足32B对齐要求。
 
 ```cpp
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t& dst0, vector_fp4x2_e2m1_t& dst1, __ubuf__ fp4x2_e2m1_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint8_t& dst0, vector_uint8_t& dst1, __ubuf__ uint8_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int8_t& dst0, vector_int8_t& dst1, __ubuf__ int8_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t& dst0, vector_fp8_e4m3fn_t& dst1, __ubuf__ fp8_e4m3fn_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e5m2_t& dst0, vector_fp8_e5m2_t& dst1, __ubuf__ fp8_e5m2_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_fp8_e8m0_t& dst0, vector_fp8_e8m0_t& dst1, __ubuf__ fp8_e8m0_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_hifloat8_t& dst0, vector_hifloat8_t& dst1, __ubuf__ hifloat8_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint16_t& dst0, vector_uint16_t& dst1, __ubuf__ uint16_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int16_t& dst0, vector_int16_t& dst1, __ubuf__ int16_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_bfloat16_t& dst0, vector_bfloat16_t& dst1, __ubuf__ bfloat16_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_half& dst0, vector_half& dst1, __ubuf__ half* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_uint32_t& dst0, vector_uint32_t& dst1, __ubuf__ uint32_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int32_t& dst0, vector_int32_t& dst1, __ubuf__ int32_t* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_float& dst1, __ubuf__ float* src, iter_reg offset)
-__simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_int4x2_t& dst1, __ubuf__ int4b_t* src, iter_reg offset)
+__simd_callee__ inline void
+asc_loadalign_deintlv(vector_fp4x2_e1m2_t &dst0, vector_fp4x2_e1m2_t &dst1,
+                      __ubuf__ fp4x2_e1m2_t *src,
+                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp4x2_e2m1_t &dst0,
+                                      vector_fp4x2_e2m1_t &dst1,
+                                      __ubuf__ fp4x2_e2m1_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint8_t &dst0,
+                                      vector_uint8_t &dst1,
+                                      __ubuf__ uint8_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int8_t &dst0, vector_int8_t &dst1,
+                                      __ubuf__ int8_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e4m3fn_t &dst0,
+                                      vector_fp8_e4m3fn_t &dst1,
+                                      __ubuf__ fp8_e4m3fn_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e5m2_t &dst0,
+                                      vector_fp8_e5m2_t &dst1,
+                                      __ubuf__ fp8_e5m2_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_fp8_e8m0_t &dst0,
+                                      vector_fp8_e8m0_t &dst1,
+                                      __ubuf__ fp8_e8m0_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_hifloat8_t &dst0,
+                                      vector_hifloat8_t &dst1,
+                                      __ubuf__ hifloat8_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint16_t &dst0,
+                                      vector_uint16_t &dst1,
+                                      __ubuf__ uint16_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int16_t &dst0,
+                                      vector_int16_t &dst1,
+                                      __ubuf__ int16_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_bfloat16_t &dst0,
+                                      vector_bfloat16_t &dst1,
+                                      __ubuf__ bfloat16_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_half &dst0, vector_half &dst1,
+                                      __ubuf__ half *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_uint32_t &dst0,
+                                      vector_uint32_t &dst1,
+                                      __ubuf__ uint32_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int32_t &dst0,
+                                      vector_int32_t &dst1,
+                                      __ubuf__ int32_t *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_float &dst0, vector_float &dst1,
+                                      __ubuf__ float *src,
+                                      iter_reg offset) __simd_callee__
+    inline void asc_loadalign_deintlv(vector_int4x2_t &dst0,
+                                      vector_int4x2_t &dst1,
+                                      __ubuf__ int4b_t *src, iter_reg offset)
 ```
 
 ## 参数说明
@@ -145,8 +262,8 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_int4x2_t& dst0, vector_
 
 ```cpp
 for (uint16_t i = 0; i < repeat_times; i++) {
-    asc_loadalign_deintlv(reg0, reg1, src + i * one_repeat_size);
-    ...
+  asc_loadalign_deintlv(reg0, reg1, src + i * one_repeat_size);
+  ...
 }
 ```
 
@@ -155,14 +272,14 @@ for (uint16_t i = 0; i < repeat_times; i++) {
 ```cpp
 // 方式1：通过offset控制偏移
 for (uint16_t i = 0; i < repeat_times; i++) {
-    asc_loadalign_deintlv(reg0, reg1, src, i * one_repeat_size);
-    ...
+  asc_loadalign_deintlv(reg0, reg1, src, i * one_repeat_size);
+  ...
 }
 
 // 方式2：通过src控制偏移
 for (uint16_t i = 0; i < repeat_times; i++) {
-    asc_loadalign_deintlv(reg0, reg1, src + i * one_repeat_size, 0);
-    ...
+  asc_loadalign_deintlv(reg0, reg1, src + i * one_repeat_size, 0);
+  ...
 }
 ```
 
@@ -171,7 +288,7 @@ for (uint16_t i = 0; i < repeat_times; i++) {
 ```cpp
 iter_reg addr_reg = asc_create_iter_reg_b32(one_repeat_size);
 for (uint16_t i = 0; i < repeat_times; i++) {
-    asc_loadalign_deintlv(reg0, reg1, src, addr_reg);
-    ...
+  asc_loadalign_deintlv(reg0, reg1, src, addr_reg);
+  ...
 }
 ```

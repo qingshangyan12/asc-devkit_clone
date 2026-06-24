@@ -93,17 +93,15 @@ Unified Buffer或Global Memory上的初始数据。
 -   SIMT编程场景：
 
     ```cpp
-    __global__ __launch_bounds__(256) void merge_observed_flags(uint32_t *flags,
-                                                               uint32_t *observed_flags,
-                                                               uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__global__ __launch_bounds__(256) void merge_observed_flags(
+    uint32_t *flags, uint32_t *observed_flags, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        asc_atomic_or(flags, observed_flags[idx]);
-    }
+  asc_atomic_or(flags, observed_flags[idx]);
+}
     ```
 
 -   SIMD与SIMT混合编程场景：
@@ -111,17 +109,15 @@ Unified Buffer或Global Memory上的初始数据。
     SIMD与SIMT混合编程场景，需要显式使用地址空间限定符表示地址空间：\_\_gm\_\_表示Global Memory内存空间，\_\_ubuf\_\_表示Unified Buffer内存空间。
 
     ```cpp
-    __simt_vf__ __launch_bounds__(1024) inline void merge_observed_flags(__gm__ uint32_t *flags,
-                                                                        __gm__ uint32_t *observed_flags,
-                                                                        uint32_t n)
-    {
-        uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx >= n) {
-            return;
-        }
+__simt_vf__ __launch_bounds__(1024) inline void merge_observed_flags(
+    __gm__ uint32_t *flags, __gm__ uint32_t *observed_flags, uint32_t n) {
+  uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx >= n) {
+    return;
+  }
 
-        asc_atomic_or(flags, observed_flags[idx]);
-    }
+  asc_atomic_or(flags, observed_flags[idx]);
+}
     ```
 
 输出结果示例如下：

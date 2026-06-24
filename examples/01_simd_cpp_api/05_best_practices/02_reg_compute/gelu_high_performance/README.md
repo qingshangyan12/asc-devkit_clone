@@ -175,32 +175,32 @@ $$
 
 **关键代码**：
 ```cpp
-__aicore__ inline void GeluCompute(
-        const AscendC::LocalTensor<float>& xLocal, const AscendC::LocalTensor<float>& yLocal, uint32_t n)
-{
-    // yLocal = x * x = x²
-    AscendC::Mul(yLocal, xLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x² * x = x³
-    AscendC::Mul(yLocal, yLocal, xLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x³ * 0.044715 = 0.044715 * x³
-    AscendC::Muls(yLocal, yLocal, COEFF_A, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x + 0.044715 * x³
-    AscendC::Add(yLocal, xLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = -1.595769 * (x + 0.044715 * x³)
-    AscendC::Muls(yLocal, yLocal, COEFF_B, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Exp(yLocal, yLocal, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = 1 + e^(-1.595769 * (x + 0.044715 * x³))
-    AscendC::Adds(yLocal, yLocal, (float)1.0, n);
-    AscendC::PipeBarrier<PIPE_V>();
-    // yLocal = x / (1 + e^(-1.595769 * (x + 0.044715 * x³)))
-    AscendC::Div(yLocal, xLocal, yLocal, n);
+__aicore__ inline void GeluCompute(const AscendC::LocalTensor<float> &xLocal,
+                                   const AscendC::LocalTensor<float> &yLocal,
+                                   uint32_t n) {
+  // yLocal = x * x = x²
+  AscendC::Mul(yLocal, xLocal, xLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x² * x = x³
+  AscendC::Mul(yLocal, yLocal, xLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x³ * 0.044715 = 0.044715 * x³
+  AscendC::Muls(yLocal, yLocal, COEFF_A, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x + 0.044715 * x³
+  AscendC::Add(yLocal, xLocal, yLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = -1.595769 * (x + 0.044715 * x³)
+  AscendC::Muls(yLocal, yLocal, COEFF_B, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = e^(-1.595769 * (x + 0.044715 * x³))
+  AscendC::Exp(yLocal, yLocal, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = 1 + e^(-1.595769 * (x + 0.044715 * x³))
+  AscendC::Adds(yLocal, yLocal, (float)1.0, n);
+  AscendC::PipeBarrier<PIPE_V>();
+  // yLocal = x / (1 + e^(-1.595769 * (x + 0.044715 * x³)))
+  AscendC::Div(yLocal, xLocal, yLocal, n);
 }
 ```
 
@@ -316,25 +316,27 @@ AscendC::PipeBarrier<PIPE_V>();
 // ... 共8次计算，8次同步
 
 // Case 1: RegBase API + VF融合，寄存器内完成全部计算
-__simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
+__simd_vf__ inline void GeluVfBasic(__ubuf__ float *xAddr,
+                                    __ubuf__ float *yAddr, uint32_t n,
+                                    uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
 
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);  // 仅一次Load
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);  // 仅一次Store
-    }
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // 仅一次Load
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                             mask); // 仅一次Store
+  }
 }
 ```
 
@@ -346,8 +348,8 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 // 核函数中调用 VF 函数的代码片段
 constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
 uint32_t loopNum = AscendC::CeilDivision(n, oneRepeatSize);
-__ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
-__ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
+__ubuf__ float *xAddr = reinterpret_cast<__ubuf__ float *>(xLocal.GetPhyAddr());
+__ubuf__ float *yAddr = reinterpret_cast<__ubuf__ float *>(yLocal.GetPhyAddr());
 // 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数 n 和循环次数
 asc_vf_call<GeluVfBasic>(xAddr, yAddr, n, loopNum);
 ```
@@ -415,25 +417,26 @@ Iter2: Load→Mul→...→Store       ...（无循环控制开销，指令可交
 在 VF 函数的 for 循环前添加 `#pragma unroll 6`，展开因子 6 为经验值，需根据实际场景调优：
 
 ```cpp
-__simd_vf__ inline static void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t n, uint32_t loopNum)
-{
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg, yReg;
-    #pragma unroll 6  // 循环展开优化，提高指令级并行度
-    for (uint16_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(n);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
-        AscendC::Reg::Add(yReg, xReg, yReg, mask);
-        AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
-        AscendC::Reg::Exp(yReg, yReg, mask);
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
-    }
+__simd_vf__ inline static void GeluVfBasic(__ubuf__ float *xAddr,
+                                           __ubuf__ float *yAddr, uint32_t n,
+                                           uint32_t loopNum) {
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg, yReg;
+#pragma unroll 6 // 循环展开优化，提高指令级并行度
+  for (uint16_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(n);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_A, mask);
+    AscendC::Reg::Add(yReg, xReg, yReg, mask);
+    AscendC::Reg::Muls(yReg, yReg, COEFF_B, mask);
+    AscendC::Reg::Exp(yReg, yReg, mask);
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask);
+  }
 }
 ```
 

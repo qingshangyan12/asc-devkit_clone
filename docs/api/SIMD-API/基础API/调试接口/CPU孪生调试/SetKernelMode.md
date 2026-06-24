@@ -81,20 +81,17 @@ void SetKernelMode(KernelMode mode)
 ## 调用示例<a name="zh-cn_topic_0000001963639310_zh-cn_topic_0000001656094169_section82241477610"></a>
 
 ```cpp
-int32_t main(int32_t argc, char* argv[])
-{
-    ...
+int32_t main(int32_t argc, char *argv[]) {
+  ...
 #ifdef ASCENDC_CPU_DEBUG
-    ...
-    AscendC::SetKernelMode(KernelMode::AIV_MODE);
-    ICPU_RUN_KF(add_custom, numBlocks, x, y, z);
-    ...
-    AscendC::GmFree((void *)x);
-    AscendC::GmFree((void *)y);
-    AscendC::GmFree((void *)z);
+      ... AscendC::SetKernelMode(KernelMode::AIV_MODE);
+  ICPU_RUN_KF(add_custom, numBlocks, x, y, z);
+  ... AscendC::GmFree((void *)x);
+  AscendC::GmFree((void *)y);
+  AscendC::GmFree((void *)z);
 #else
-    ...
+      ...
 #endif
-    return 0;
+  return 0;
 }
 ```

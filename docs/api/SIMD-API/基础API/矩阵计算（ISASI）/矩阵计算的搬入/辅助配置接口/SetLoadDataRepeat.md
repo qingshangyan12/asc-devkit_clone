@@ -21,7 +21,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams)
+__aicore__ inline void
+SetLoadDataRepeat(const LoadDataRepeatParam &repeatParams)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -116,19 +117,24 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
 展示代码示例片段：
 
 ```cpp
-// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用load3d接口，实现NZ2ZZ
+// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k,
+// fractalShape[0])；img2col后A矩阵宽度为ci * kh *
+// kw，代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m,
+// fractalShape[1])。最后，配置loadDataParams.enTranspose =
+// true，将整个A矩阵转置并且将其中每一个分形转置 使用load3d接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 
 // 设置loadDataParams相关参数
 ...
 
-// 使用SetLoadDataRepeat接口，设置Load3Dv2接口的repeat参数
-AscendC::LoadDataRepeatParam repeatParams;
-repeatParams.repeatTime = 1;  // height/width方向上的迭代次数
-repeatParams.repeatStride = 1;  // height/width方向上前后迭代起始位置的距离
-repeatParams.repeatMode = 0;  // 迭代方向0: 迭代沿height; 1: 迭代沿width
-repeatParams.dstStride = CeilDivision(m, fractalShape[0]);  // 输出矩阵K轴方向偏移
+    // 使用SetLoadDataRepeat接口，设置Load3Dv2接口的repeat参数
+    AscendC::LoadDataRepeatParam repeatParams;
+repeatParams.repeatTime = 1; // height/width方向上的迭代次数
+repeatParams.repeatStride = 1; // height/width方向上前后迭代起始位置的距离
+repeatParams.repeatMode = 0; // 迭代方向0: 迭代沿height; 1: 迭代沿width
+repeatParams.dstStride =
+    CeilDivision(m, fractalShape[0]); // 输出矩阵K轴方向偏移
 AscendC::SetLoadDataRepeat(repeatParams);
 
 AscendC::LoadData(a2Local, a1Local, loadDataParams);

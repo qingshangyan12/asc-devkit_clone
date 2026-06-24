@@ -35,34 +35,38 @@ Mmad的矩阵乘加关系可参考下图：
 - 执行不传bias的矩阵计算。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor>
-    __aicore__ inline void Mmad(
-        const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter)
+template <typename AtomType, typename DstTensor, typename FmTensor,
+          typename FilterTensor>
+__aicore__ inline void Mmad(const MmadAtom<AtomType> &atomMmad,
+                            const DstTensor &dst, const FmTensor &fm,
+                            const FilterTensor &filter)
     ```
 
 - 执行传入bias的矩阵计算。
 
     ```cpp
-    template <typename AtomType, typename DstTensor, typename FmTensor, typename FilterTensor, typename BiasTensor,
-        Std::enable_if_t<IsAttrTensorV<BiasTensor>, int> Enable>
-    __aicore__ inline void Mmad(
-        const MmadAtom<AtomType>& atomMmad, const DstTensor& dst, const FmTensor& fm, const FilterTensor& filter,
-        const BiasTensor& bias)
+template <typename AtomType, typename DstTensor, typename FmTensor,
+          typename FilterTensor, typename BiasTensor,
+          Std::enable_if_t<IsAttrTensorV<BiasTensor>, int> Enable>
+__aicore__ inline void Mmad(const MmadAtom<AtomType> &atomMmad,
+                            const DstTensor &dst, const FmTensor &fm,
+                            const FilterTensor &filter, const BiasTensor &bias)
     ```
 
 - 构造默认矩阵计算原子对象。
 
     ```cpp
-    template <typename MmadOperationType>
-    __aicore__ inline constexpr auto MakeMmad(const MmadOperationType& mmadOperation)
+template <typename MmadOperationType>
+__aicore__ inline constexpr auto
+MakeMmad(const MmadOperationType &mmadOperation)
     ```
 
 - 构造指定Trait的矩阵计算原子对象。
 
     ```cpp
-    template <typename MmadOperationType, typename MmadTraitType>
-    __aicore__ inline constexpr auto MakeMmad(
-        const MmadOperationType& mmadOperation, const MmadTraitType& mmadTrait)
+template <typename MmadOperationType, typename MmadTraitType>
+__aicore__ inline constexpr auto
+MakeMmad(const MmadOperationType &mmadOperation, const MmadTraitType &mmadTrait)
     ```
 
 ## 参数说明
@@ -161,8 +165,9 @@ MX Mmad模式没有单独的函数接口，而是通过`MmadTrait::mmadType`设�
 
 ```cpp
 struct MmadTraitMX {
-    using TraitType = MmadTrait;
-    static constexpr const TraitType value = MmadTrait(0, false, false, true, MmadType::MX);
+  using TraitType = MmadTrait;
+  static constexpr const TraitType value =
+      MmadTrait(0, false, false, true, MmadType::MX);
 };
 ```
 
@@ -186,58 +191,63 @@ MX Mmad通常需要在调用`Mmad`前完成左矩阵缩放数据ScaleA和右矩�
 - Mmad调用示例
 
     ```cpp
-    #include "tensor_api/tensor.h"
+#include "tensor_api/tensor.h"
 
-    __aicore__ inline void NormalMmadExample()
-    {
-        using namespace AscendC::Te;
+__aicore__ inline void NormalMmadExample() {
+  using namespace AscendC::Te;
 
-        constexpr uint16_t m = 16;
-        constexpr uint16_t n = 16;
-        constexpr uint16_t k = 16;
+  constexpr uint16_t m = 16;
+  constexpr uint16_t n = 16;
+  constexpr uint16_t k = 16;
 
-        __ca__ half l0aBuf[m * k];
-        __cb__ half l0bBuf[k * n];
-        __cc__ float l0cBuf[m * n];
+  __ca__ half l0aBuf[m * k];
+  __cb__ half l0bBuf[k * n];
+  __cc__ float l0cBuf[m * n];
 
-        auto l0A = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, half>(m, k));
-        auto l0B = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, half>(k, n));
-        auto l0C = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto l0A =
+      MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, half>(m, k));
+  auto l0B =
+      MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, half>(k, n));
+  auto l0C =
+      MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
 
-        MmadParams params(m, n, k, 0, true);
-        auto atom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(params);
-        Mmad(atom, l0C, l0A, l0B);
-    }
+  MmadParams params(m, n, k, 0, true);
+  auto atom = MakeMmad(MmadOperation{}, MmadTraitDefault{}).with(params);
+  Mmad(atom, l0C, l0A, l0B);
+}
     ```
 
 - MX场景Mmad调用示例
 
     ```cpp
-    #include "tensor_api/tensor.h"
+#include "tensor_api/tensor.h"
 
-    struct MmadTraitMX {
-        using TraitType = AscendC::Te::MmadTrait;
-        static constexpr const TraitType value = AscendC::Te::MmadTrait(0, false, false, true, AscendC::Te::MmadType::MX);
-    };
+struct MmadTraitMX {
+  using TraitType = AscendC::Te::MmadTrait;
+  static constexpr const TraitType value =
+      AscendC::Te::MmadTrait(0, false, false, true, AscendC::Te::MmadType::MX);
+};
 
-    __aicore__ inline void MxMmadExample()
-    {
-        using namespace AscendC::Te;
+__aicore__ inline void MxMmadExample() {
+  using namespace AscendC::Te;
 
-        constexpr uint16_t m = 16;
-        constexpr uint16_t n = 16;
-        constexpr uint16_t k = 16;
+  constexpr uint16_t m = 16;
+  constexpr uint16_t n = 16;
+  constexpr uint16_t k = 16;
 
-        __ca__ fp8_e5m2_t l0aBuf[m * k];
-        __cb__ fp8_e5m2_t l0bBuf[k * n];
-        __cc__ float l0cBuf[m * n];
+  __ca__ fp8_e5m2_t l0aBuf[m * k];
+  __cb__ fp8_e5m2_t l0bBuf[k * n];
+  __cc__ float l0cBuf[m * n];
 
-        auto l0A = MakeTensor(MakeMemPtr(l0aBuf), MakeFrameLayout<NZLayoutPtn, fp8_e5m2_t>(m, k));
-        auto l0B = MakeTensor(MakeMemPtr(l0bBuf), MakeFrameLayout<ZNLayoutPtn, fp8_e5m2_t>(k, n));
-        auto l0C = MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
+  auto l0A = MakeTensor(MakeMemPtr(l0aBuf),
+                        MakeFrameLayout<NZLayoutPtn, fp8_e5m2_t>(m, k));
+  auto l0B = MakeTensor(MakeMemPtr(l0bBuf),
+                        MakeFrameLayout<ZNLayoutPtn, fp8_e5m2_t>(k, n));
+  auto l0C =
+      MakeTensor(MakeMemPtr(l0cBuf), MakeFrameLayout<NZLayoutPtn, 16>(m, n));
 
-        MmadParams params(m, n, k, 0, true);
-        auto atom = MakeMmad(MmadOperation{}, MmadTraitMX{}).with(params);
-        Mmad(atom, l0C, l0A, l0B);
-    }
+  MmadParams params(m, n, k, 0, true);
+  auto atom = MakeMmad(MmadOperation{}, MmadTraitMX{}).with(params);
+  Mmad(atom, l0C, l0A, l0B);
+}
     ```

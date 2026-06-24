@@ -21,8 +21,7 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T>
-__aicore__ inline void SetAtomicType()
+template <typename T> __aicore__ inline void SetAtomicType()
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>

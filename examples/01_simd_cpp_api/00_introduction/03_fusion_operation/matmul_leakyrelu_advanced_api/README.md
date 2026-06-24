@@ -109,12 +109,13 @@
 
   **`AscendC::DataCopyParams`** — `DataCopy`接口使用，描述Local Memory到Global Memory的数据搬运参数：
   ```cpp
-  struct DataCopyParams {
-      uint16_t blockCount;  // 待搬运的连续传输数据块个数，[1, 4095]
-      uint16_t blockLen;    // 每个连续传输数据块长度，单位为DataBlock（32字节），[1, 65535]
-      uint16_t srcGap;      // 源操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
-      uint16_t dstGap;      // 目的操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
-  };
+struct DataCopyParams {
+  uint16_t blockCount; // 待搬运的连续传输数据块个数，[1, 4095]
+  uint16_t
+      blockLen; // 每个连续传输数据块长度，单位为DataBlock（32字节），[1, 65535]
+  uint16_t srcGap; // 源操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
+  uint16_t dstGap; // 目的操作数相邻连续数据块的间隔，单位为DataBlock（32字节）
+};
   ```
   本样例搬出C矩阵分块时使用`{tiling.baseM, tiling.baseN * sizeof(float) / AscendC::DEFAULT_C0_SIZE, 0, (tiling.N - tiling.baseN) * sizeof(float) / AscendC::DEFAULT_C0_SIZE}`。其中，`blockCount`表示按`baseM`行搬运，`blockLen`表示每行搬运`baseN`个C矩阵元素对应的数据量；`dstGap`表示目的端相邻行之间跨过的元素间隔，用于将`baseM * baseN`分块写回到完整`M * N`矩阵的对应列范围。
 

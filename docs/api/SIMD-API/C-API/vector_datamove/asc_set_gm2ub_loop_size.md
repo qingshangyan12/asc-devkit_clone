@@ -17,7 +17,8 @@
 ## 函数原型
 
 ```cpp
-__aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size, uint64_t loop2_size)
+__aicore__ inline void asc_set_gm2ub_loop_size(uint64_t loop1_size,
+                                               uint64_t loop2_size)
 ```
 
 ## 参数说明

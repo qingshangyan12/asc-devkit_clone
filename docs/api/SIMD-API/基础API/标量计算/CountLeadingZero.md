@@ -23,7 +23,8 @@
 以如下CountLeadingZero调用为例：
 
 ```cpp
-int64_t leadingZeros = AscendC::CountLeadingZero(0x0100000000000020ULL); // 返回7
+int64_t leadingZeros =
+    AscendC::CountLeadingZero(0x0100000000000020ULL); // 返回7
 ```
 
 其计算结果如下图所示：
@@ -58,7 +59,7 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn)
 
 ```cpp
 int64_t leadingZeros;
-uint64_t valueIn = 0x000000000000FFFFULL;          // 二进制表示有48个前导0
+uint64_t valueIn = 0x000000000000FFFFULL; // 二进制表示有48个前导0
 leadingZeros = AscendC::CountLeadingZero(valueIn); // 返回48
 
 valueIn = 0;                                       // 二进制表示全为0

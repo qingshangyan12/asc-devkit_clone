@@ -41,23 +41,24 @@
   - Kernel关键步骤  
     - 创建Matmul对象。其中左矩阵A的MatmulType中，POSITION为VECOUT。
       ```cpp
-      AscendC::MatmulType<AscendC::TPosition::VECOUT, CubeFormat::ND, AType>
+AscendC::MatmulType<AscendC::TPosition::VECOUT, CubeFormat::ND, AType>
       ```
     - 自定义左矩阵A从GM到VECOUT的搬运，设置左矩阵A为VECOUT输入。
       ```cpp
-      AscendC::LocalTensor<AType> vecinTensor = vecin.AllocTensor<AType>();
-      // A矩阵搬入参数
-      DataCopyPad(vecinTensor, aGlobal, {blockCount, blockLen, srcStride, dstStride, 0}, {false, 0, 0, 0});
-      vecin.EnQue(vecinTensor);
-      AscendC::LocalTensor<AType> vecinLocal = vecin.DeQue<AType>();
+AscendC::LocalTensor<AType> vecinTensor = vecin.AllocTensor<AType>();
+// A矩阵搬入参数
+DataCopyPad(vecinTensor, aGlobal,
+            {blockCount, blockLen, srcStride, dstStride, 0}, {false, 0, 0, 0});
+vecin.EnQue(vecinTensor);
+AscendC::LocalTensor<AType> vecinLocal = vecin.DeQue<AType>();
 
-      AscendC::LocalTensor<AType> vecoutTensor = vecout.AllocTensor<AType>();
-      DataCopy(vecoutTensor, vecinLocal, singleSize); // 为方便直接拷贝整个大小
-      vecout.EnQue(vecoutTensor);
-      AscendC::LocalTensor<AType> vecoutLocal = vecout.DeQue<AType>();
-      vecin.FreeTensor(vecinLocal);
+AscendC::LocalTensor<AType> vecoutTensor = vecout.AllocTensor<AType>();
+DataCopy(vecoutTensor, vecinLocal, singleSize); // 为方便直接拷贝整个大小
+vecout.EnQue(vecoutTensor);
+AscendC::LocalTensor<AType> vecoutLocal = vecout.DeQue<AType>();
+vecin.FreeTensor(vecinLocal);
 
-      matmulObj.SetTensorA(vecoutLocal, isTransA);
+matmulObj.SetTensorA(vecoutLocal, isTransA);
       ```
 
   - 调用实现  

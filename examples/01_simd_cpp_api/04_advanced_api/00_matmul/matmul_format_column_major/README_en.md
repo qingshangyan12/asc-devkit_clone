@@ -44,22 +44,29 @@ A Matmul example with input and output matrices in COLUMN_MAJOR (column-major) f
   - Key Kernel Steps
     - Create the Matmul object: set the Format of matrix C to COLUMN_MAJOR.
       ```cpp
-      AscendC::Matmul<
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, ATYPE>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, BType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR, CType>,
-        AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>> matmulObj;
+AscendC::Matmul<
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR,
+                        ATYPE>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR,
+                        BType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::COLUMN_MAJOR,
+                        CType>,
+    AscendC::MatmulType<AscendC::TPosition::GM, CubeFormat::ND, BiasType>>
+    matmulObj;
       ```
 
   - Key Tiling Steps
     - Set the parameter type information for A, B, C, and Bias, where the Format of A, B, and C matrices is set to COLUMN_MAJOR.
       ```cpp
-      cubeTiling.SetAType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT16, isAtrans);
-      cubeTiling.SetBType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT16, isBtrans);
-      cubeTiling.SetCType(matmul_tiling::TPosition::GM, matmul_tiling::CubeFormat::COLUMN_MAJOR,
-          matmul_tiling::DataType::DT_FLOAT);
+cubeTiling.SetAType(matmul_tiling::TPosition::GM,
+                    matmul_tiling::CubeFormat::COLUMN_MAJOR,
+                    matmul_tiling::DataType::DT_FLOAT16, isAtrans);
+cubeTiling.SetBType(matmul_tiling::TPosition::GM,
+                    matmul_tiling::CubeFormat::COLUMN_MAJOR,
+                    matmul_tiling::DataType::DT_FLOAT16, isBtrans);
+cubeTiling.SetCType(matmul_tiling::TPosition::GM,
+                    matmul_tiling::CubeFormat::COLUMN_MAJOR,
+                    matmul_tiling::DataType::DT_FLOAT);
       ```
 
   - Invocation Implementation  

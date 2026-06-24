@@ -53,10 +53,10 @@ A fused programming implementation with separate AIC and AIV cores, mainly intro
   - Key Tiling Steps
     - Call `MultiCoreMatmulTiling` to set A/B/C/Bias types, original Shape, computation Shape, traversal order, and fixed split parameters.
       ```cpp
-      tilingApi.SetOrgShape(M, N, K);
-      tilingApi.SetShape(M, N, K);
-      tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
-      tilingApi.SetFixSplit(baseM, baseN, -1);
+tilingApi.SetOrgShape(M, N, K);
+tilingApi.SetShape(M, N, K);
+tilingApi.SetTraverse(matmul_tiling::MatrixTraverse::FIRSTM);
+tilingApi.SetFixSplit(baseM, baseN, -1);
       ```
 
 ## Build and Run

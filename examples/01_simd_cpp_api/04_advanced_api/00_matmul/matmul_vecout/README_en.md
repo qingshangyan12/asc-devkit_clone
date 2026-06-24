@@ -41,23 +41,25 @@ A Matmul example that uses user-defined VECOUT input, allowing developers to man
   - Key Kernel Steps  
     - Create the Matmul object. In the MatmulType of the left matrix A, POSITION is VECOUT.
       ```cpp
-      AscendC::MatmulType<AscendC::TPosition::VECOUT, CubeFormat::ND, AType>
+AscendC::MatmulType<AscendC::TPosition::VECOUT, CubeFormat::ND, AType>
       ```
     - Customize the transfer of the left matrix A from GM to VECOUT, and set the left matrix A as VECOUT input.
       ```cpp
-      AscendC::LocalTensor<AType> vecinTensor = vecin.AllocTensor<AType>();
-      // Parameters for transferring matrix A
-      DataCopyPad(vecinTensor, aGlobal, {blockCount, blockLen, srcStride, dstStride, 0}, {false, 0, 0, 0});
-      vecin.EnQue(vecinTensor);
-      AscendC::LocalTensor<AType> vecinLocal = vecin.DeQue<AType>();
+AscendC::LocalTensor<AType> vecinTensor = vecin.AllocTensor<AType>();
+// Parameters for transferring matrix A
+DataCopyPad(vecinTensor, aGlobal,
+            {blockCount, blockLen, srcStride, dstStride, 0}, {false, 0, 0, 0});
+vecin.EnQue(vecinTensor);
+AscendC::LocalTensor<AType> vecinLocal = vecin.DeQue<AType>();
 
-      AscendC::LocalTensor<AType> vecoutTensor = vecout.AllocTensor<AType>();
-      DataCopy(vecoutTensor, vecinLocal, singleSize); // Copy the entire size for convenience
-      vecout.EnQue(vecoutTensor);
-      AscendC::LocalTensor<AType> vecoutLocal = vecout.DeQue<AType>();
-      vecin.FreeTensor(vecinLocal);
+AscendC::LocalTensor<AType> vecoutTensor = vecout.AllocTensor<AType>();
+DataCopy(vecoutTensor, vecinLocal,
+         singleSize); // Copy the entire size for convenience
+vecout.EnQue(vecoutTensor);
+AscendC::LocalTensor<AType> vecoutLocal = vecout.DeQue<AType>();
+vecin.FreeTensor(vecinLocal);
 
-      matmulObj.SetTensorA(vecoutLocal, isTransA);
+matmulObj.SetTensorA(vecoutLocal, isTransA);
       ```
 
   - Invocation Implementation  

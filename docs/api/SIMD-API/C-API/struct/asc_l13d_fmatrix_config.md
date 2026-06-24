@@ -7,15 +7,15 @@ asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../cube_datamove/asc_copy_l
 ```cpp
 constexpr uint64_t ASC_DEFAULT_L13D_FMATRIX_CONFIG_VALUE = 0;
 union asc_l13d_fmatrix_config {
-    uint64_t config = ASC_DEFAULT_L13D_FMATRIX_CONFIG_VALUE;
-    struct {
-        uint16_t l1_height;
-        uint16_t l1_width;
-        uint8_t padding_left_size;
-        uint8_t padding_right_size;
-        uint8_t padding_top_size;
-        uint8_t padding_bottom_size;
-    };
+  uint64_t config = ASC_DEFAULT_L13D_FMATRIX_CONFIG_VALUE;
+  struct {
+    uint16_t l1_height;
+    uint16_t l1_width;
+    uint8_t padding_left_size;
+    uint8_t padding_right_size;
+    uint8_t padding_top_size;
+    uint8_t padding_bottom_size;
+  };
 };
 ```
 

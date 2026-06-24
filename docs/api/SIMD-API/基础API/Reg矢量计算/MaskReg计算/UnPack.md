@@ -35,8 +35,8 @@
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <HighLowPart part = HighLowPart::LOWEST> 
-__simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
+template <HighLowPart part = HighLowPart::LOWEST>
+__simd_callee__ inline void UnPack(MaskReg &dst, MaskReg &src)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -66,18 +66,20 @@ __simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
 
 ```cpp
 template <typename T>
-__simd_vf__ inline void UnpackVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint32_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::MaskReg maskFull = AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
-    AscendC::Reg::MaskReg mask0;
-    AscendC::Reg::MaskReg mask1;
-    AscendC::Reg::UnPack<AscendC::Reg::HighLowPart::LOWEST>(mask0, maskFull);
-    for (uint16_t i = 0; i < repeatTimes; ++i) {
-        mask1 = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Adds(srcReg, srcReg, 0, mask0);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask1);
-    }
+__simd_vf__ inline void UnpackVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                                 uint32_t count, uint32_t oneRepeatSize,
+                                 uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::MaskReg maskFull =
+      AscendC::Reg::CreateMask<T, AscendC::Reg::MaskPattern::ALL>();
+  AscendC::Reg::MaskReg mask0;
+  AscendC::Reg::MaskReg mask1;
+  AscendC::Reg::UnPack<AscendC::Reg::HighLowPart::LOWEST>(mask0, maskFull);
+  for (uint16_t i = 0; i < repeatTimes; ++i) {
+    mask1 = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Adds(srcReg, srcReg, 0, mask0);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, srcReg, mask1);
+  }
 }
 ```

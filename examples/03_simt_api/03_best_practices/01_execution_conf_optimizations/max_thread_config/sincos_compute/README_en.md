@@ -99,16 +99,15 @@ This example demonstrates the effect of `__launch_bounds__` through 2 independen
 **Key Code**:
 
 ```cpp
-__global__ void sincos_thread_1024(float* input, float* output_sin, 
-                                    float* output_cos, uint64_t total_length)
-{
-    int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
-    // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
-    for (int i = 0; i < PER_THREAD_LOOP; i++) {
-        int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
-        sincosf(input[idx], output_sin + idx, output_cos + idx);
-    }
+__global__ void sincos_thread_1024(float *input, float *output_sin,
+                                   float *output_cos, uint64_t total_length) {
+  int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
+
+  // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
+  for (int i = 0; i < PER_THREAD_LOOP; i++) {
+    int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
+    sincosf(input[idx], output_sin + idx, output_cos + idx);
+  }
 }
 ```
 
@@ -151,17 +150,15 @@ Optimization direction: Use `__launch_bounds__` to inform the compiler of the ac
 **Key Code**:
 
 ```cpp
-__global__ __launch_bounds__(512) void sincos_thread_512(float* input, 
-                                    float* output_sin, float* output_cos,
-                                    uint64_t total_length)
-{
-    int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
-    
-    // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
-    for (int i = 0; i < PER_THREAD_LOOP; i++) {
-        int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
-        sincosf(input[idx], output_sin + idx, output_cos + idx);
-    }
+__global__ __launch_bounds__(512) void sincos_thread_512(
+    float *input, float *output_sin, float *output_cos, uint64_t total_length) {
+  int32_t blk_start_idx = blockIdx.x * THREADS_PER_BLOCK * PER_THREAD_LOOP;
+
+  // Each core computes PER_THREAD_LOOP * THREADS_PER_BLOCK operations
+  for (int i = 0; i < PER_THREAD_LOOP; i++) {
+    int idx = blk_start_idx + i * THREADS_PER_BLOCK + threadIdx.x;
+    sincosf(input[idx], output_sin + idx, output_cos + idx);
+  }
 }
 ```
 
@@ -216,7 +213,7 @@ __global__ __launch_bounds__(512) void sincos_thread_512(float* input,
 
 3. **Use `__launch_bounds__` to inform the compiler**:
    ```cpp
-   __global__ __launch_bounds__(thread_count) void kernel_name(...)
+__global__ __launch_bounds__(thread_count) void kernel_name(...)
    ```
 
 4. **Verify optimization effect**:

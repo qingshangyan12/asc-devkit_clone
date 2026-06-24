@@ -75,7 +75,7 @@ $dst_i = src0_i / src1_i$
 - 整个tensor参与计算
 
     ```cpp
-    dst = src0 / src1;
+dst = src0 / src1;
     ```
 
 - 传入config的原型
@@ -83,23 +83,33 @@ $dst_i = src0_i / src1_i$
     - tensor前n个数据连续计算
 
         ```cpp
-        template <typename T, const DivConfig& config = DEFAULT_DIV_CONFIG>
-        __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+template <typename T, const DivConfig &config = DEFAULT_DIV_CONFIG>
+__aicore__ inline void Div(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count)
         ```
 
     - tensor高维切分计算
         - mask逐bit模式
 
             ```cpp
-            template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
-            __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true,
+          const DivConfig &config = DEFAULT_DIV_CONFIG>
+__aicore__ inline void
+Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, bool isSetMask = true, const DivConfig& config = DEFAULT_DIV_CONFIG>
-            __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true,
+          const DivConfig &config = DEFAULT_DIV_CONFIG>
+__aicore__ inline void
+Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
             ```
 
 - 不传入config的原型
@@ -107,23 +117,31 @@ $dst_i = src0_i / src1_i$
     - tensor前n个数据连续计算
 
         ```cpp
-        template <typename T>
-        __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
+template <typename T>
+__aicore__ inline void Div(const LocalTensor<T> &dst,
+                           const LocalTensor<T> &src0,
+                           const LocalTensor<T> &src1, const int32_t &count)
         ```
 
     - tensor高维切分计算
         - mask逐bit模式
 
             ```cpp
-            template <typename T, bool isSetMask = true>
-            __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[], const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask[], const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
             ```
 
         - mask连续模式
 
             ```cpp
-            template <typename T, bool isSetMask = true>
-            __aicore__ inline void Div(const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask, const uint8_t repeatTime, const BinaryRepeatParams& repeatParams)
+template <typename T, bool isSetMask = true>
+__aicore__ inline void
+Div(const LocalTensor<T> &dst, const LocalTensor<T> &src0,
+    const LocalTensor<T> &src1, uint64_t mask, const uint8_t repeatTime,
+    const BinaryRepeatParams &repeatParams)
             ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -199,26 +217,28 @@ $dst_i = src0_i / src1_i$
 - tensor高维切分计算样例-mask连续模式
 
     ```cpp
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats.
-    AscendC::Div(dstLocal, src0Local, src1Local, 128, 4, { 1, 1, 1, 8, 8, 8 });
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+// repeat. dstRepStride, src0RepStride, src1RepStride = 8, no gap between
+// repeats.
+AscendC::Div(dstLocal, src0Local, src1Local, 128, 4, {1, 1, 1, 8, 8, 8});
     ```
 
 - tensor高维切分计算样例-mask逐bit模式
 
     ```cpp
-    uint64_t mask[2] = { UINT64_MAX, UINT64_MAX };
-    // repeatTime = 4, 128 elements one repeat, 512 elements total.
-    // dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one repeat.
-    // dstRepStride, src0RepStride, src1RepStride = 8, no gap between repeats.
-    AscendC::Div(dstLocal, src0Local, src1Local, mask, 4, { 1, 1, 1, 8, 8, 8 });
+uint64_t mask[2] = {UINT64_MAX, UINT64_MAX};
+// repeatTime = 4, 128 elements one repeat, 512 elements total.
+// dstBlkStride, src0BlkStride, src1BlkStride = 1, no gap between blocks in one
+// repeat. dstRepStride, src0RepStride, src1RepStride = 8, no gap between
+// repeats.
+AscendC::Div(dstLocal, src0Local, src1Local, mask, 4, {1, 1, 1, 8, 8, 8});
     ```
 
 - tensor前n个数据计算接口样例
 
     ```cpp
-    AscendC::Div(dstLocal, src0Local, src1Local, 512);
+AscendC::Div(dstLocal, src0Local, src1Local, 512);
     ```
 
 
@@ -226,19 +246,19 @@ $dst_i = src0_i / src1_i$
 以下示例仅支持Ascend 950PR/Ascend 950DT
 
     ```cpp
-    // Div 0ulp.
-    static constexpr DivConfig config = { DivAlgo::DIFF_COMPENSATION };
-    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
-    // Div Subnormal.
-    static constexpr DivConfig config = { DivAlgo::PRECISION_0ULP_FTZ_FALSE };
-    Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
+// Div 0ulp.
+static constexpr DivConfig config = {DivAlgo::DIFF_COMPENSATION};
+Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
+// Div Subnormal.
+static constexpr DivConfig config = {DivAlgo::PRECISION_0ULP_FTZ_FALSE};
+Div<T, config>(dstLocalX, srcLocalX, srcLocalY, calCount);
     ```
 <!-- end id31 -->
 
 - 整个tensor参与计算样例
 
     ```cpp
-    dstLocal = src0Local / src1Local;
+dstLocal = src0Local / src1Local;
     ```
 
 结果示例如下：

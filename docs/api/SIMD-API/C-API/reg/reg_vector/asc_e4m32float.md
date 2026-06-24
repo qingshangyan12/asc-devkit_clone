@@ -16,13 +16,20 @@
 
 ```cpp
 // 数据读取索引0的位置
-__simd_callee__ inline void asc_e4m32float(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
-// 数据读取索引1的位置
-__simd_callee__ inline void asc_e4m32float_v2(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
-// 数据读取索引2的位置
-__simd_callee__ inline void asc_e4m32float_v3(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
-// 数据读取索引3的位置
-__simd_callee__ inline void asc_e4m32float_v4(vector_float& dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+__simd_callee__ inline void
+asc_e4m32float(vector_float &dst, vector_fp8_e4m3fn_t src, vector_bool mask)
+    // 数据读取索引1的位置
+    __simd_callee__
+    inline void asc_e4m32float_v2(vector_float &dst, vector_fp8_e4m3fn_t src,
+                                  vector_bool mask)
+    // 数据读取索引2的位置
+    __simd_callee__
+    inline void asc_e4m32float_v3(vector_float &dst, vector_fp8_e4m3fn_t src,
+                                  vector_bool mask)
+    // 数据读取索引3的位置
+    __simd_callee__
+    inline void asc_e4m32float_v4(vector_float &dst, vector_fp8_e4m3fn_t src,
+                                  vector_bool mask)
 ```
 
 ## 参数说明

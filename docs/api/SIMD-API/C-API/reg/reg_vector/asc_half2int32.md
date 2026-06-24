@@ -30,20 +30,35 @@
 
 ```cpp
 // FLOOR舍入模式
-__simd_callee__ inline void asc_half2int32_rd(vector_int32_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int32_rd_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// RINT舍入模式
-__simd_callee__ inline void asc_half2int32_rn(vector_int32_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int32_rn_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式
-__simd_callee__ inline void asc_half2int32_rna(vector_int32_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int32_rna_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// CEIL舍入模式
-__simd_callee__ inline void asc_half2int32_ru(vector_int32_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int32_ru_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
-// TRUNC舍入模式
-__simd_callee__ inline void asc_half2int32_rz(vector_int32_t& dst, vector_half src, vector_bool mask)
-__simd_callee__ inline void asc_half2int32_rz_v2(vector_int32_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2int32_rd(vector_int32_t &dst,
+                                              vector_half src,
+                                              vector_bool mask) __simd_callee__
+    inline void asc_half2int32_rd_v2(vector_int32_t &dst, vector_half src,
+                                     vector_bool mask)
+    // RINT舍入模式
+    __simd_callee__
+    inline void asc_half2int32_rn(vector_int32_t &dst, vector_half src,
+                                  vector_bool mask) __simd_callee__
+    inline void asc_half2int32_rn_v2(vector_int32_t &dst, vector_half src,
+                                     vector_bool mask)
+    // ROUND舍入模式
+    __simd_callee__
+    inline void asc_half2int32_rna(vector_int32_t &dst, vector_half src,
+                                   vector_bool mask) __simd_callee__
+    inline void asc_half2int32_rna_v2(vector_int32_t &dst, vector_half src,
+                                      vector_bool mask)
+    // CEIL舍入模式
+    __simd_callee__
+    inline void asc_half2int32_ru(vector_int32_t &dst, vector_half src,
+                                  vector_bool mask) __simd_callee__
+    inline void asc_half2int32_ru_v2(vector_int32_t &dst, vector_half src,
+                                     vector_bool mask)
+    // TRUNC舍入模式
+    __simd_callee__
+    inline void asc_half2int32_rz(vector_int32_t &dst, vector_half src,
+                                  vector_bool mask) __simd_callee__
+    inline void asc_half2int32_rz_v2(vector_int32_t &dst, vector_half src,
+                                     vector_bool mask)
 ```
 
 ## 参数说明
@@ -74,6 +89,10 @@ PIPE_V
 vector_int32_t dst;
 vector_half src;
 vector_bool mask;
-asc_half2int32_rd(dst, src, mask);    // FLOOR舍入模式，将src的上半部分转换成vector_int32_t类型并写入dst
-asc_half2int32_rd_v2(dst, src, mask);    // FLOOR舍入模式，将src的下半部分转换成vector_int32_t类型并写入dst
+asc_half2int32_rd(
+    dst, src,
+    mask); // FLOOR舍入模式，将src的上半部分转换成vector_int32_t类型并写入dst
+asc_half2int32_rd_v2(
+    dst, src,
+    mask); // FLOOR舍入模式，将src的下半部分转换成vector_int32_t类型并写入dst
 ```

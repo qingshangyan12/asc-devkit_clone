@@ -108,11 +108,16 @@ L0A/L0B (64KB):
 
 ```cpp
 // A1: L1 Ping/Pong
-AscendC::LocalTensor<half> a1LocalPing(AscendC::TPosition::A1, 0, a1PingpongSize);
-AscendC::LocalTensor<half> a1LocalPong(AscendC::TPosition::A1, a1PingpongSize * sizeof(half), a1PingpongSize);
+AscendC::LocalTensor<half> a1LocalPing(AscendC::TPosition::A1, 0,
+                                       a1PingpongSize);
+AscendC::LocalTensor<half> a1LocalPong(AscendC::TPosition::A1,
+                                       a1PingpongSize * sizeof(half),
+                                       a1PingpongSize);
 // A2: L0 Ping/Pong
-AscendC::LocalTensor<half> a2LocalPing(AscendC::TPosition::A2, 0, a2PingpongSize);
-AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES, a2PingpongSize);
+AscendC::LocalTensor<half> a2LocalPing(AscendC::TPosition::A2, 0,
+                                       a2PingpongSize);
+AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2,
+                                       L0_PINGPONG_BYTES, a2PingpongSize);
 ```
 
 #### 2. 细粒度流水同步
@@ -130,12 +135,12 @@ AscendC::LocalTensor<half> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES
 
 ```cpp
 // 初始化：预置反向同步 flag，防止首次 WaitFlag 死锁
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0);  // A1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1);  // A1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2);  // B1 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3);  // B1 Pong 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);     // L0 Ping 可写
-AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID0); // A1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID1); // A1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID2); // B1 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(EVENT_ID3); // B1 Pong 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID0);    // L0 Ping 可写
+AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);    // L0 Pong 可写
 ```
 
 **大包粒度的正向同步**：DataLoad 从 L1 大包中按K方向逐个base块读取数据，只需在读取大包首个base块时等待数据就绪，后续base块与首个在同一个大包内，无需重复等待：
@@ -143,11 +148,11 @@ AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);     // L0 Pong 可写
 ```cpp
 // 正向同步：仅大包首元素需等待数据就绪
 if (kOffsetInChunkA == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(a1ReadIdx);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(a1ReadIdx);
 }
 // 反向同步：仅大包末元素消费完后通知 DataCopyIn 可覆盖
 if ((kOffsetInChunkA + 1) == stepKa) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(a1ReadIdx);
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(a1ReadIdx);
 }
 ```
 
@@ -184,7 +189,7 @@ k=stepKa:       需要 A1 Pong → 已就绪 ✓（A 有 stepKa 轮时间搬运�
 // DataCopyInA: 一次搬入 stepKa 个 baseK 块
 AscendC::Nd2NzParams nd2nzParams;
 nd2nzParams.nValue = curM;
-nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
+nd2nzParams.dValue = baseK * stepKa; // 大包包含 stepKa 个 baseM * baseK
 ```
 
 #### 6. LoadData3D 替代 LoadData2D——减少指令队列占用
@@ -200,7 +205,8 @@ nd2nzParams.dValue = baseK * stepKa;  // 大包包含 stepKa 个 baseM * baseK
 ```cpp
 AscendC::LoadData2DParams loadDataParams;
 for (int i = 0; i < AscendC::DivCeil(baseK, CUBE_BLOCK); ++i) {
-    AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset], loadDataParams);
+  AscendC::LoadData(b2Local[i * dstOffset], b1Local[srcAddr + i * srcOffset],
+                    loadDataParams);
 }
 ```
 
@@ -227,10 +233,12 @@ AscendC::LoadData(a2Local, a1Local[srcAddr], loadDataParams);
 所有 Tiling 参数（baseM/baseK/baseN、singleCoreM/K/N、stepKa/stepKb）通过模板参数在编译期确定，运行时无需 Scalar 动态计算，减少 Scalar 开销：
 
 ```cpp
-template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK, uint32_t baseN,
-          uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
-          uint32_t stepKa, uint32_t stepKb>
-class KernelMmad { ... };
+template <uint32_t M, uint32_t K, uint32_t N, uint32_t baseM, uint32_t baseK,
+          uint32_t baseN, uint32_t singleCoreM, uint32_t singleCoreK,
+          uint32_t singleCoreN, uint32_t stepKa, uint32_t stepKb>
+class KernelMmad {
+  ...
+};
 ```
 
 #### 8. UnitFlag 优化
@@ -238,7 +246,7 @@ class KernelMmad { ... };
 开启 UnitFlag 后，[MMAD](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/Mmad计算/Mmad.md) 和 [FIXPIPE](https://gitcode.com/cann/asc-devkit/blob/master/docs/api/SIMD-API/基础API/矩阵计算（ISASI）/矩阵计算的搬出/L0C到GM数据搬运（Fixpipe）.md) 实现细粒度（512B）流水并行，而非指令级同步。每当 Cube 完成一个 512B 数据结果的计算，FIXPIPE 立即搬出该数据，Cube 计算与结果写回流水重叠：
 
 ```cpp
-mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3;  // 开启 UnitFlag
+mmadParams.unitFlag = (kBlockIdx != kLoopCount - 1) ? 2 : 3; // 开启 UnitFlag
 ```
 
 - `unitFlag = 2`：中间 K 块，MMAD 计算结果不立即写回，而是等待下一个 512B 完成后流水搬出
@@ -253,14 +261,17 @@ L2Cache 切分的具体实现与[高阶 API Matmul 样例](../matmul_high_perfor
 ```cpp
 // ProcessL2Cache: 按 M 方向分轮，每轮 24 核覆盖 mIterPerRound 份 M 子块
 constexpr uint32_t mIterPerRound = AscendC::DivCeil(M, singleCoreM * 2);
-constexpr uint32_t outerMLoopCount = AscendC::DivCeil(mIterTotal, mIterPerRound);
+constexpr uint32_t outerMLoopCount =
+    AscendC::DivCeil(mIterTotal, mIterPerRound);
 
 for (uint32_t outerMIdx = 0; outerMIdx < outerMLoopCount; outerMIdx++) {
-    uint32_t mIterIdx = AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
-    uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
-    if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal) continue;
-    InitComputeParamsL2Cache(mIterIdx, nIterIdx);
-    ProcessLoop(...);
+  uint32_t mIterIdx =
+      AscendC::GetBlockIdx() % mIterPerRound + outerMIdx * mIterPerRound;
+  uint32_t nIterIdx = AscendC::GetBlockIdx() / mIterPerRound;
+  if (mIterIdx >= mIterTotal || nIterIdx >= nIterTotal)
+    continue;
+  InitComputeParamsL2Cache(mIterIdx, nIterIdx);
+  ProcessLoop(...);
 }
 ```
 
@@ -495,7 +506,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
 
 ```cpp
-AscendC::DumpTensor(cLocal, baseM * baseN);
+AscendC::DumpTensor(cLocal, baseM *baseN);
 ```
 
 > [!CAUTION]注意 

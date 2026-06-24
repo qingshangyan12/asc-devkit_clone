@@ -51,17 +51,17 @@ This example demonstrates the usage of the `clock()` API for timestamp marking i
   1. `simt_gather` uses SIMT programming to read data from discrete locations in Global Memory based on `index[i]` and write it to the Unified Buffer.
 
      ```cpp
-     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-     uint32_t gatherIdx = index[idx];
-     gatherOutput[threadIdx.x] = input[gatherIdx];
+uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+uint32_t gatherIdx = index[idx];
+gatherOutput[threadIdx.x] = input[gatherIdx];
      ```
 
   2. `simd_adds` uses SIMD programming to read contiguous data from the Unified Buffer, load it into registers through `Reg::LoadAlign`, perform the add-1 computation through `Reg::Adds`, and write back to the Unified Buffer through `Reg::StoreAlign`.
 
      ```cpp
-     AscendC::Reg::LoadAlign(srcReg0, input + i * oneRepeatSize);
-     AscendC::Reg::Adds(dstReg0, srcReg0, addsAddend, maskReg);
-     AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg0, maskReg);
+AscendC::Reg::LoadAlign(srcReg0, input + i * oneRepeatSize);
+AscendC::Reg::Adds(dstReg0, srcReg0, addsAddend, maskReg);
+AscendC::Reg::StoreAlign(output + i * oneRepeatSize, dstReg0, maskReg);
      ```
 
   3. `DataCopy` transfers the result from the Unified Buffer to Global Memory.

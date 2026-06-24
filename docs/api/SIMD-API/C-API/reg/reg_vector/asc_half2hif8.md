@@ -17,21 +17,36 @@
 
 ```cpp
 // ROUND舍入模式,非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2hif8_rna(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式,饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2hif8_rna_sat(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式,非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2hif8_rna_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// ROUND舍入模式,饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2hif8_rna_sat_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// HYBRID舍入模式,非饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2hif8_rh(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// HYBRID舍入模式,饱和模式，数据写入索引为偶数的位置
-__simd_callee__ inline void asc_half2hif8_rh_sat(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// HYBRID舍入模式,非饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2hif8_rh_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
-// HYBRID舍入模式,饱和模式，数据写入索引为奇数的位置
-__simd_callee__ inline void asc_half2hif8_rh_sat_v2(vector_hifloat8_t& dst, vector_half src, vector_bool mask)
+__simd_callee__ inline void asc_half2hif8_rna(vector_hifloat8_t &dst,
+                                              vector_half src, vector_bool mask)
+    // ROUND舍入模式,饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rna_sat(vector_hifloat8_t &dst, vector_half src,
+                                      vector_bool mask)
+    // ROUND舍入模式,非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rna_v2(vector_hifloat8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // ROUND舍入模式,饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rna_sat_v2(vector_hifloat8_t &dst,
+                                         vector_half src, vector_bool mask)
+    // HYBRID舍入模式,非饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rh(vector_hifloat8_t &dst, vector_half src,
+                                 vector_bool mask)
+    // HYBRID舍入模式,饱和模式，数据写入索引为偶数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rh_sat(vector_hifloat8_t &dst, vector_half src,
+                                     vector_bool mask)
+    // HYBRID舍入模式,非饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rh_v2(vector_hifloat8_t &dst, vector_half src,
+                                    vector_bool mask)
+    // HYBRID舍入模式,饱和模式，数据写入索引为奇数的位置
+    __simd_callee__
+    inline void asc_half2hif8_rh_sat_v2(vector_hifloat8_t &dst, vector_half src,
+                                        vector_bool mask)
 ```
 
 ## 参数说明

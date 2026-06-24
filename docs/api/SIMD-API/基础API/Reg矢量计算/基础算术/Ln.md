@@ -35,8 +35,9 @@ $$dstReg_i = \ln(srcReg_i)$$
 ## 函数原型<a name="section620mcpsimp"></a>
 
 ```cpp
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void Ln(U& dstReg, U& srcReg, MaskReg& mask)
+template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING,
+          typename U>
+__simd_callee__ inline void Ln(U &dstReg, U &srcReg, MaskReg &mask)
 ```
 
 ## 参数说明<a name="section622mcpsimp"></a>
@@ -87,22 +88,24 @@ FTZ（Flush To Zero）：一种浮点运算模式，当结果为Subnormal时，�
 ## 调用示例<a name="section642mcpsimp"></a>
 
 ```cpp
-template<typename T>
-__simd_vf__ inline void LnVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint32_t count, uint16_t oneRepeatSize, uint16_t repeatTimes)
-{
-    AscendC::Reg::RegTensor<T> srcReg;
-    AscendC::Reg::RegTensor<T> dstReg;
-    AscendC::Reg::MaskReg mask;
+template <typename T>
+__simd_vf__ inline void LnVF(__ubuf__ T *dstAddr, __ubuf__ T *srcAddr,
+                             uint32_t count, uint16_t oneRepeatSize,
+                             uint16_t repeatTimes) {
+  AscendC::Reg::RegTensor<T> srcReg;
+  AscendC::Reg::RegTensor<T> dstReg;
+  AscendC::Reg::MaskReg mask;
+  // Subnormal模式
+  // static constexpr AscendC::Reg::LnSpecificMode mode =
+  // {MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE};
+  for (uint16_t i = 0; i < repeatTimes; i++) {
+    mask = AscendC::Reg::UpdateMask<T>(count);
+    AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
+    AscendC::Reg::Ln(dstReg, srcReg, mask);
     // Subnormal模式
-    // static constexpr AscendC::Reg::LnSpecificMode mode = {MaskMergeMode::ZEROING, LnAlgo::PRECISION_1ULP_FTZ_FALSE};
-    for (uint16_t i = 0; i < repeatTimes; i++) {
-        mask = AscendC::Reg::UpdateMask<T>(count);
-        AscendC::Reg::LoadAlign(srcReg, srcAddr + i * oneRepeatSize);
-        AscendC::Reg::Ln(dstReg, srcReg, mask);
-        // Subnormal模式
-        // AscendC::Reg::Ln<T, &mode>(dstReg, srcReg, mask);
-        AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
-    }
+    // AscendC::Reg::Ln<T, &mode>(dstReg, srcReg, mask);
+    AscendC::Reg::StoreAlign(dstAddr + i * oneRepeatSize, dstReg, mask);
+  }
 }
 ```
 

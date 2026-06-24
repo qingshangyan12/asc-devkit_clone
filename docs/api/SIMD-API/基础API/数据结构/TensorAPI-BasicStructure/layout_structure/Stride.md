@@ -11,8 +11,7 @@ Stride用于定义张量各维度在内存中的步长，用于描述同一维�
 ## 原型定义
 
 ```cpp
-template <typename... Strides>
-using Stride = Std::tuple<Strides...>;
+template <typename... Strides> using Stride = Std::tuple<Strides...>;
 ```
 
 ## 参数说明

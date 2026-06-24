@@ -174,13 +174,15 @@ nd2nzA1Params.dValue = packedStepK;
 nd2nzA1Params.srcDValue = PACKED_K;
 nd2nzA1Params.dstNzC0Stride = baseM;
 nd2nzA1Params.dstNzNStride = 1;
-AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM], nd2nzA1Params);
+AscendC::DataCopy(a1Local, aGM[kChunkIdx * baseK + mBlockIdx * K * baseM],
+                  nd2nzA1Params);
 ```
 
 scale 侧按 b16 搬运。由于 `Mmad` 读取数据时的最小分形需要 K 方向连续，对应地 scale 数据在 K 方向必须满足 2Byte 连续，因此使用 b16类型搬运以确保数据布局正确：
 
 ```cpp
-constexpr uint32_t stepScaleK = AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
+constexpr uint32_t stepScaleK =
+    AscendC::DivCeil(baseK * stepKa * scaleFactorKa, SCALE_CEIL_NUMBER);
 AscendC::Dn2NzParams dn2nzParams;
 dn2nzParams.dValue = curM;
 dn2nzParams.nValue = stepScaleK / 2;
@@ -206,13 +208,11 @@ B1 block + scaleB1 block -> L0B MX data
 
 ```cpp
 uint32_t srcAddr = kOffsetInChunkA * baseK * baseM;
-uint32_t scaleSrcAddr = (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
+uint32_t scaleSrcAddr =
+    (kOffsetInScaleChunkA * baseK / SCALE_CEIL_NUMBER) * CUBE_BLOCK;
 
-AscendC::LoadData(a2Local,
-                  a1Local[srcAddr],
-                  as1Local[scaleSrcAddr],
-                  loadDataParams,
-                  loadMxDataParams);
+AscendC::LoadData(a2Local, a1Local[srcAddr], as1Local[scaleSrcAddr],
+                  loadDataParams, loadMxDataParams);
 ```
 
 #### 4. L0 双缓冲：让加载和计算交叠
@@ -236,13 +236,20 @@ AscendC::LoadData(a2Local,
 对应的 LocalTensor 创建如下：
 
 ```cpp
-AscendC::LocalTensor<fp4x2_e1m2_t> a1LocalPing(AscendC::TPosition::A1, 0, a1BufSize);
-AscendC::LocalTensor<fp4x2_e1m2_t> a1LocalPong(AscendC::TPosition::A1, a1BufSize, a1BufSize);
-AscendC::LocalTensor<fp8_e8m0_t> as1LocalPing(AscendC::TPosition::A1, 2 * a1BufSize, as1BufSize);
-AscendC::LocalTensor<fp8_e8m0_t> as1LocalPong(AscendC::TPosition::A1, 2 * a1BufSize + as1BufSize, as1BufSize);
+AscendC::LocalTensor<fp4x2_e1m2_t> a1LocalPing(AscendC::TPosition::A1, 0,
+                                               a1BufSize);
+AscendC::LocalTensor<fp4x2_e1m2_t> a1LocalPong(AscendC::TPosition::A1,
+                                               a1BufSize, a1BufSize);
+AscendC::LocalTensor<fp8_e8m0_t> as1LocalPing(AscendC::TPosition::A1,
+                                              2 * a1BufSize, as1BufSize);
+AscendC::LocalTensor<fp8_e8m0_t> as1LocalPong(AscendC::TPosition::A1,
+                                              2 * a1BufSize + as1BufSize,
+                                              as1BufSize);
 
-AscendC::LocalTensor<fp4x2_e1m2_t> a2LocalPing(AscendC::TPosition::A2, 0, a2PingpongSize);
-AscendC::LocalTensor<fp4x2_e1m2_t> a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES, a2PingpongSize);
+AscendC::LocalTensor<fp4x2_e1m2_t> a2LocalPing(AscendC::TPosition::A2, 0,
+                                               a2PingpongSize);
+AscendC::LocalTensor<fp4x2_e1m2_t>
+    a2LocalPong(AscendC::TPosition::A2, L0_PINGPONG_BYTES, a2PingpongSize);
 ```
 
 一个简化的流水节奏如下：
@@ -309,7 +316,8 @@ fixpipeParams.mSize = curM;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = N;
 fixpipeParams.quantPre = QuantMode_t::F322BF16;
-AscendC::Fixpipe(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN], cLocal, fixpipeParams);
+AscendC::Fixpipe(cGM[mBlockIdx * baseM * N + nBlockIdx * baseN], cLocal,
+                 fixpipeParams);
 ```
 
 ### 事件同步：把流水并行起来
@@ -343,16 +351,20 @@ AscendC::SetFlag<AscendC::HardEvent::M_MTE1>(EVENT_ID1);
 
 ```cpp
 if (kOffsetInDataChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetDataEventId(dataReadIdx));
 }
-if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
+if (((kOffsetInDataChunk + 1) == dataChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetDataEventId(dataReadIdx));
 }
 if (kOffsetInScaleChunk == 0) {
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(GetScaleEventId(scaleReadIdx));
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE1>(
+      GetScaleEventId(scaleReadIdx));
 }
-if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(GetScaleEventId(scaleReadIdx));
+if (((kOffsetInScaleChunk + 1) == scaleChunkStep) ||
+    (kBlockIdx + 1 == kLoopCount)) {
+  AscendC::SetFlag<AscendC::HardEvent::MTE1_MTE2>(
+      GetScaleEventId(scaleReadIdx));
 }
 ```
 

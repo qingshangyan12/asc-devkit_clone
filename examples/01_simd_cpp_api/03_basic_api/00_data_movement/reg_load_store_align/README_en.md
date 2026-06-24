@@ -62,7 +62,7 @@ This example implements contiguous and non-contiguous aligned data transfer oper
     - When outputLength<128, the mask handles outputLength elements
     - After UpdateMask completes, outputLength decrements by the number of elements handled by the mask.
     ```cpp
-    mask = AscendC::Reg::UpdateMask<T>(outputLength);
+mask = AscendC::Reg::UpdateMask<T>(outputLength);
     ```
 - Example specifications:
   <table>
@@ -98,8 +98,8 @@ This example implements contiguous and non-contiguous aligned data transfer oper
 - Example implementation:
   - Initialize the address register, indicating that aReg increments by stride0 when the i-axis loop completes
     ```cpp
-    uint32_t stride0 = AscendC::GetVecLen() / sizeof(T);
-    AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, stride0);
+uint32_t stride0 = AscendC::GetVecLen() / sizeof(T);
+AddrReg aReg = AscendC::Reg::CreateAddrReg<T>(i, stride0);
     ```
   - LoadAlign/StoreAlign parameter offset = aReg. Taking LoadAlign load as an example:
     - The UB start address for each iteration is srcAddr + aReg

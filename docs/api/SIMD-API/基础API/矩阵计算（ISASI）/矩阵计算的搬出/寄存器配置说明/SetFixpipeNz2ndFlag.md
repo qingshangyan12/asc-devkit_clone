@@ -21,14 +21,16 @@ DataCopy数据搬运（[L0C-\>GM](../L0C到GM数据搬运（DataCopy）.md)）�
 ## 函数原型<a id="zh-cn_topic_0000002516209232_section620mcpsimp"></a>
 
 ```cpp
-__aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint16_t dstNdStride)
+__aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
+                                           uint16_t dstNdStride)
 ```
 
 <cann-filter npu-type = "950">
 
 ```cpp
 // 如下原型仅Ascend 950PR/Ascend 950DT支持
-__aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
+__aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
+                                           uint32_t dstNdStride)
 ```
 
 </cann-filter>
@@ -127,5 +129,6 @@ Kirin 9030；
 uint16_t ndNum = 2;
 uint16_t srcNdStride = 2;
 uint16_t dstNdStride = 1;
-AscendC::SetFixpipeNz2ndFlag(ndNum, srcNdStride, dstNdStride); // 设置FIX搬运NZ格式到ND格式转换的参数
+AscendC::SetFixpipeNz2ndFlag(
+    ndNum, srcNdStride, dstNdStride); // 设置FIX搬运NZ格式到ND格式转换的参数
 ```

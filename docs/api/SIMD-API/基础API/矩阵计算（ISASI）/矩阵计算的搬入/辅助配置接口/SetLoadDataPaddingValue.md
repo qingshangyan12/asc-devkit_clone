@@ -60,13 +60,18 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue)
 展示代码示例片段：
 
 ```cpp
-// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho * wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k, fractalShape[0])；img2col后A矩阵宽度为ci * kh * kw,代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m, fractalShape[1])。最后，配置loadDataParams.enTranspose = true，将整个A矩阵转置并且将其中每一个分形转置
-// 使用load3d接口，实现NZ2ZZ
+// Load3Dv2指令完成img2col的过程，可知img2col后A矩阵高度为ho *
+// wo，根据ho和wo的计算公式，代入卷积核宽度、卷积核滑动步长、卷积核膨胀系数等参数可知：A矩阵的高度为CeilAlign(k,
+// fractalShape[0])；img2col后A矩阵宽度为ci * kh *
+// kw,代入kh=1，kw=1，可知A矩阵的宽度为CeilAlign(m,
+// fractalShape[1])。最后，配置loadDataParams.enTranspose =
+// true，将整个A矩阵转置并且将其中每一个分形转置 使用load3d接口，实现NZ2ZZ
 AscendC::LoadData3DParamsV2<T> loadDataParams;
 // 设置loadDataParams相关参数
 ...
-// 设置不在Load3D接口内部设置相关属性，通过外部接口显式调用设置
-static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false, false};
+    // 设置不在Load3D接口内部设置相关属性，通过外部接口显式调用设置
+    static constexpr AscendC::IsResetLoad3dConfig LOAD3D_CONFIG = {false,
+                                                                   false};
 
 // 使用SetLoadDataRepeat接口，设置Load3Dv2接口的repeat参数
 AscendC::SetLoadDataPaddingValue(0);

@@ -57,14 +57,14 @@
   4、MatmulTiling结构体定义
 
   ```cpp
-  struct MatmulTiling {
-      int32_t m;            // 矩阵A的行数
-      int32_t n;            // 矩阵B的列数
-      int32_t k;            // 矩阵A的列数/矩阵B的行数
-      int32_t singleCoreM;  // 单核处理的M维度大小
-      int32_t singleCoreN;  // 单核处理的N维度大小
-      int32_t singleCoreK;  // 单核处理的K维度大小
-  };
+struct MatmulTiling {
+  int32_t m;           // 矩阵A的行数
+  int32_t n;           // 矩阵B的列数
+  int32_t k;           // 矩阵A的列数/矩阵B的行数
+  int32_t singleCoreM; // 单核处理的M维度大小
+  int32_t singleCoreN; // 单核处理的N维度大小
+  int32_t singleCoreK; // 单核处理的K维度大小
+};
   ```
 
 - 样例规格：

@@ -37,10 +37,14 @@
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 
-template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
+    template <typename T>
+    __aicore__
+    inline void LoadData(const LocalTensor<T> &dst, const GlobalTensor<T> &src,
+                         const LoadData2DParams &loadDataParams)
 ```
 
 <cann-filter npu-type = "950">
@@ -48,7 +52,9 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 
 ```cpp
 template <typename T>
-__aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
+__aicore__ inline void LoadData(const LocalTensor<T> &dst,
+                                const LocalTensor<T> &src,
+                                const LoadData2DParams &loadDataParams)
 ```
 
 </cann-filter>
@@ -274,7 +280,8 @@ loadDataParams.srcStride = CeilDivision(m, fractalShape[0]);
 loadDataParams.dstGap = 0;
 loadDataParams.ifTranspose = false;
 for (int i = 0; i < CeilDivision(m, fractalShape[0]); ++i) {
-    AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                    loadDataParams);
 }
 ```
 
@@ -297,6 +304,7 @@ loadDataParams.srcStride = 1;
 loadDataParams.dstGap = 0;
 loadDataParams.ifTranspose = true;
 for (int i = 0; i < CeilDivision(m, fractalShape[1]); ++i) {
-    AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset], loadDataParams);
+  AscendC::LoadData(a2Local[i * dstOffset], a1Local[i * srcOffset],
+                    loadDataParams);
 }
 ```

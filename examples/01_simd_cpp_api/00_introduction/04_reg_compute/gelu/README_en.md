@@ -65,28 +65,30 @@ constexpr float COEFF_LINEAR = -1.595769f;
 constexpr float COEFF_CUBIC = -0.071405f;
 
 // VF function: Complete GELU step-by-step computation in registers
-__simd_vf__ inline static void GeluVfMethod2(
-    __ubuf__ float* xAddr, __ubuf__ float* yAddr, uint32_t count, uint32_t loopNum)
-{
-    // Number of float elements that can be processed in one vector computation repeat (e.g., dav-3510: 256 bytes / 4 bytes = 64 elements)
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    AscendC::Reg::MaskReg mask;
-    AscendC::Reg::RegTensor<float> xReg;
-    AscendC::Reg::RegTensor<float> yReg;
-    AscendC::Reg::RegTensor<float> tmpReg;
-    for (uint32_t i = 0; i < loopNum; ++i) {
-        mask = AscendC::Reg::UpdateMask<float>(count);
-        AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize);   // UB → Register
-        AscendC::Reg::Mul(yReg, xReg, xReg, mask);                  // x²
-        AscendC::Reg::Mul(yReg, yReg, xReg, mask);                  // x³
-        AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);          // -0.071405 * x³
-        AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);       // -1.595769 * x
-        AscendC::Reg::Add(yReg, tmpReg, yReg, mask);                // -1.595769x - 0.071405x³
-        AscendC::Reg::Exp(yReg, yReg, mask);                        // exp(...)
-        AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);                 // 1 + exp(...)
-        AscendC::Reg::Div(yReg, xReg, yReg, mask);                  // x / (1 + exp(...))
-        AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg, mask); // Register → UB
-    }
+__simd_vf__ inline static void GeluVfMethod2(__ubuf__ float *xAddr,
+                                             __ubuf__ float *yAddr,
+                                             uint32_t count, uint32_t loopNum) {
+  // Number of float elements that can be processed in one vector computation
+  // repeat (e.g., dav-3510: 256 bytes / 4 bytes = 64 elements)
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  AscendC::Reg::MaskReg mask;
+  AscendC::Reg::RegTensor<float> xReg;
+  AscendC::Reg::RegTensor<float> yReg;
+  AscendC::Reg::RegTensor<float> tmpReg;
+  for (uint32_t i = 0; i < loopNum; ++i) {
+    mask = AscendC::Reg::UpdateMask<float>(count);
+    AscendC::Reg::LoadAlign(xReg, xAddr + i * oneRepeatSize); // UB → Register
+    AscendC::Reg::Mul(yReg, xReg, xReg, mask);                // x²
+    AscendC::Reg::Mul(yReg, yReg, xReg, mask);                // x³
+    AscendC::Reg::Muls(yReg, yReg, COEFF_CUBIC, mask);        // -0.071405 * x³
+    AscendC::Reg::Muls(tmpReg, xReg, COEFF_LINEAR, mask);     // -1.595769 * x
+    AscendC::Reg::Add(yReg, tmpReg, yReg, mask); // -1.595769x - 0.071405x³
+    AscendC::Reg::Exp(yReg, yReg, mask);         // exp(...)
+    AscendC::Reg::Adds(yReg, yReg, 1.0f, mask);  // 1 + exp(...)
+    AscendC::Reg::Div(yReg, xReg, yReg, mask);   // x / (1 + exp(...))
+    AscendC::Reg::StoreAlign(yAddr + i * oneRepeatSize, yReg,
+                             mask); // Register → UB
+  }
 }
 ```
 
@@ -95,40 +97,48 @@ The VF function above encapsulates the step-by-step computation logic of GELU in
 ```cpp
 // Kernel function: Core partitioning logic + copy in/compute/copy out
 template <uint32_t singleCoreLength>
-__global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
-{
-    AscendC::InitSocState();
-    // Core partitioning: Get current core index through GetBlockIdx, calculate data offset
-    AscendC::GlobalTensor<float> xGm;
-    AscendC::GlobalTensor<float> yGm;
-    xGm.SetGlobalBuffer((__gm__ float*)x + AscendC::GetBlockIdx() * singleCoreLength);
-    yGm.SetGlobalBuffer((__gm__ float*)y + AscendC::GetBlockIdx() * singleCoreLength);
+__global__ __vector__ void gelu_custom(__gm__ uint8_t *x, __gm__ uint8_t *y) {
+  AscendC::InitSocState();
+  // Core partitioning: Get current core index through GetBlockIdx, calculate
+  // data offset
+  AscendC::GlobalTensor<float> xGm;
+  AscendC::GlobalTensor<float> yGm;
+  xGm.SetGlobalBuffer((__gm__ float *)x +
+                      AscendC::GetBlockIdx() * singleCoreLength);
+  yGm.SetGlobalBuffer((__gm__ float *)y +
+                      AscendC::GetBlockIdx() * singleCoreLength);
 
-    // Allocate UB buffer
-    AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
-    AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, singleCoreLength>();
-    AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, singleCoreLength>();
+  // Allocate UB buffer
+  AscendC::LocalMemAllocator<AscendC::Hardware::UB> ubAllocator;
+  AscendC::LocalTensor<float> xLocal =
+      ubAllocator.Alloc<float, singleCoreLength>();
+  AscendC::LocalTensor<float> yLocal =
+      ubAllocator.Alloc<float, singleCoreLength>();
 
-    // Stage 1: GM → UB copy in
-    AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
-    // Synchronization: Wait for GM→UB transfer to complete
-    // EVENT_ID0 is the hardware event channel number (0-7), each event channel counts independently, this example uses only one channel so it is fixed to 0
-    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  // Stage 1: GM → UB copy in
+  AscendC::DataCopy(xLocal, xGm[0], singleCoreLength);
+  // Synchronization: Wait for GM→UB transfer to complete
+  // EVENT_ID0 is the hardware event channel number (0-7), each event channel
+  // counts independently, this example uses only one channel so it is fixed to
+  // 0
+  AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
-    // Stage 2: Register computation
-    constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
-    __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
-    __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
-    asc_vf_call<GeluVfMethod2>(xAddr, yAddr, singleCoreLength, loopNum);
-    // Synchronization: Wait for register computation to complete
-    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
-    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  // Stage 2: Register computation
+  constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
+  uint32_t loopNum = AscendC::CeilDivision(singleCoreLength, oneRepeatSize);
+  __ubuf__ float *xAddr =
+      reinterpret_cast<__ubuf__ float *>(xLocal.GetPhyAddr());
+  __ubuf__ float *yAddr =
+      reinterpret_cast<__ubuf__ float *>(yLocal.GetPhyAddr());
+  asc_vf_call<GeluVfMethod2>(xAddr, yAddr, singleCoreLength, loopNum);
+  // Synchronization: Wait for register computation to complete
+  AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+  AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
 
-    // Stage 3: UB → GM copy out
-    AscendC::DataCopy(yGm[0], yLocal, singleCoreLength);
-    AscendC::PipeBarrier<PIPE_ALL>();
+  // Stage 3: UB → GM copy out
+  AscendC::DataCopy(yGm[0], yLocal, singleCoreLength);
+  AscendC::PipeBarrier<PIPE_ALL>();
 }
 ```
 
@@ -166,7 +176,8 @@ Call the printf interface in the operator kernel implementation code where log i
 Example:
 
 ```cpp
-AscendC::printf("gelu blockIdx=%d, singleCoreLength=%d\n", AscendC::GetBlockIdx(), singleCoreLength);
+AscendC::printf("gelu blockIdx=%d, singleCoreLength=%d\n",
+                AscendC::GetBlockIdx(), singleCoreLength);
 ```
 
 > **Note:** The printf (PRINTF) interface printing functionality has some impact on the actual performance of the operator and is typically used during the debugging phase. Developers can disable the printing functionality by setting `ASCENDC_DUMP=0` as needed.
