@@ -56,8 +56,7 @@ __aicore__ inline void DumpShapeImpl(const ShapeInfo &shapeInfo)
 }
 
 template <typename T>
-__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc,
-                                                                uint32_t dumpSize)
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
     set_atomic_none();
@@ -89,6 +88,39 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
 }
 
 template <typename T>
+__aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                                const uint32_t shapeDim, const uint32_t* shape)
+{
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        const Hardware position = GetPhyType(static_cast<TPosition>(src.GetPosition()));
+#ifdef ASCENDC_DUMP
+        if constexpr (GetTensorDataType<T>() == Internal::DumpTensorDataType::ACL_MAX) {
+            ASCENDC_ASSERT((false), {KERNEL_LOG(KERNEL_ERROR, "dump tensor is not supported this data type\n");});
+            return;
+        }
+#endif
+        if (position == Hardware::UB) {
+            __asc_aicore::asc_dump_ubuf((__ubuf__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
+        } else if (position == Hardware::L1) {
+            __asc_aicore::asc_dump_l1buf((__cbuf__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
+        } else if (position == Hardware::L0C) {
+            if ASCEND_IS_NOT_AIC {
+                return;
+            }
+            __asc_aicore::asc_dump_cbuf((__cc__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
+        } else {
+            ASCENDC_ASSERT((false),
+                    { KERNEL_LOG(KERNEL_ERROR, "dump tensor only support dump tensor from local to gm"); });
+            return;
+        }
+    }
+    set_ctrl(ctrlValue);
+}
+
+template <typename T>
 __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize)
 {
     uint64_t ctrlValue = get_ctrl();
@@ -96,6 +128,19 @@ __aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t 
     dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
     if (g_sysPrintFifoSpace != nullptr) {
         __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize);
+    }
+    set_ctrl(ctrlValue);
+}
+
+template <typename T>
+__aicore__ inline void DumpTensorGM2GMImpl(const GlobalTensor<T>& src, uint32_t desc, uint32_t dumpSize,
+                                            const uint32_t shapeDim, const uint32_t* shape)
+{
+    uint64_t ctrlValue = get_ctrl();
+    set_atomic_none();
+    dcci((__gm__ uint64_t*)g_sysPrintFifoSpace, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    if (g_sysPrintFifoSpace != nullptr) {
+        __asc_aicore::asc_dump_gm((__gm__ T*)src.GetPhyAddr(), desc, dumpSize, shapeDim, shape);
     }
     set_ctrl(ctrlValue);
 }
