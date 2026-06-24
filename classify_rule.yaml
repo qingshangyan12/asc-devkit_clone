@@ -129,6 +129,7 @@ asc-devkit:
       - impl/basic_api/utils/kernel_utils_dump_constants.h
       - impl/adv_api/detail/conv_backprop/conv3d_backprop_filter/conv3d_bp_filter_impl_base.h
       - impl/adv_api/detail/matmul/stage/copy_cube_in/copy_tile_to_cube/data_copy_wrapper.h
+      - impl/basic_api/utils/kernel_utils_cube_group.h
 
   llt:
     ut_check: true
