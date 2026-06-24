@@ -249,11 +249,11 @@ UB中的bank划分如下图所示。UB总大小256KB，划分为16个bank（每�
 
 SIMT场景下，同一个Warp内的多个线程可能在同一条UB访问指令中同时访问UB；当这些访问数据属于同一个bank group的相同编号的subbank资源时，硬件无法在一个周期内处理全部请求，需要排队等待，从而形成subbank冲突并增加访问延迟；如果这些访问数据属于同一个subbank的同一行内的8B地址范围，硬件会将这些请求合并处理，不会形成subbank冲突。
 
-<img src="./figures/Ascend950bank结构示意图.png">
+<img src="./figures/bank结构示意图.png">
 
 **地址采用低位交织：** 如下图所示，UB内连续地址按32B粒度映射到bank0~bank15 —— 第1个32B地址段映射到bank0、第2个映射到bank1、……、第16个映射到bank15，第17个映射回bank0的下一行，依次类推。
 
-<img src="./figures/Ascend950bank内存排布示意图.png">
+<img src="./figures/bank内存排布示意图.png">
 
 SIMT编程方式下bank冲突主要有以下几种：
 
