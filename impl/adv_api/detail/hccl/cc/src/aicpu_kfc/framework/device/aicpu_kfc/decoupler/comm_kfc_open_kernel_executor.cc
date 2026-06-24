@@ -8,8 +8,10 @@
 * See LICENSE in the root of the software repository for the full text of the License.
 */
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "log.h"
@@ -17,10 +19,73 @@
 #include "coll_alg_v2_exec_registry.h"
 #include "cann_dispatch_bridge.h"
 
+namespace Hccl {
+struct TaskParam;
+}
+
+using Mc2TaskDetailCallback = std::function<HcclResult(u32, u32, const Hccl::TaskParam &, u64)>;
+
+int32_t HcommThreadRegisterDfx(ThreadHandle thread, Mc2TaskDetailCallback callback);
+int32_t HcommChannelRegisterDfx(ChannelHandle channel, Mc2TaskDetailCallback callback);
+
 namespace {
 mc2_ops_hccl::OpParam *AsOpenOpParam(std::vector<uint8_t> &opParam)
 {
     return reinterpret_cast<mc2_ops_hccl::OpParam *>(opParam.data());
+}
+
+HcclResult Mc2NoOpTaskDetailCallback(u32, u32, const Hccl::TaskParam &, u64)
+{
+    return HCCL_SUCCESS;
+}
+
+HcclResult OverrideMc2TaskDetailCallback(const mc2_ops_hccl::AlgResourceCtxSerializable &resCtx)
+{
+    std::unordered_set<u64> threadHandles;
+    std::unordered_set<u64> channelHandles;
+    size_t threadCount = 0U;
+    size_t channelCount = 0U;
+
+    auto overrideThread = [&](ThreadHandle thread) -> HcclResult {
+        if (thread == 0U || !threadHandles.insert(static_cast<u64>(thread)).second) {
+            return HCCL_SUCCESS;
+        }
+        int32_t ret = HcommThreadRegisterDfx(thread, Mc2NoOpTaskDetailCallback);
+        CHK_PRT_RET(ret != HCCL_SUCCESS,
+            HCCL_ERROR("[MC2_DFX][OverrideTaskDetailCallback] type[thread], handle[0x%llx], ret[%d].",
+                static_cast<unsigned long long>(thread), ret),
+            static_cast<HcclResult>(ret));
+        ++threadCount;
+        return HCCL_SUCCESS;
+    };
+
+    auto overrideChannel = [&](ChannelHandle channel) -> HcclResult {
+        if (channel == 0U || !channelHandles.insert(static_cast<u64>(channel)).second) {
+            return HCCL_SUCCESS;
+        }
+        int32_t ret = HcommChannelRegisterDfx(channel, Mc2NoOpTaskDetailCallback);
+        CHK_PRT_RET(ret != HCCL_SUCCESS,
+            HCCL_ERROR("[MC2_DFX][OverrideTaskDetailCallback] type[channel], handle[0x%llx], ret[%d].",
+                static_cast<unsigned long long>(channel), ret),
+            static_cast<HcclResult>(ret));
+        ++channelCount;
+        return HCCL_SUCCESS;
+    };
+
+    for (ThreadHandle thread : resCtx.threads) {
+        CHK_RET(overrideThread(thread));
+    }
+    CHK_RET(overrideThread(resCtx.unfoldThread));
+    for (const auto &levelChannels : resCtx.channels) {
+        for (const auto &channel : levelChannels) {
+            CHK_RET(overrideChannel(channel.handle));
+        }
+    }
+
+    HCCL_INFO("[MC2_DFX][OverrideTaskDetailCallback] threads[%zu], channels[%zu], "
+              "resCtxThreadNum[%zu], resCtxLevelNum[%zu].",
+              threadCount, channelCount, resCtx.threads.size(), resCtx.channels.size());
+    return HCCL_SUCCESS;
 }
 
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -132,6 +197,7 @@ HcclResult LaunchOpenOpParamDataImpl(std::vector<uint8_t> &opParam)
     char *ctx = static_cast<char *>(param->resCtx);
     std::vector<char> seq(ctx, ctx + param->ctxSize);
     resCtx.DeSerialize(seq);
+    CHK_RET(OverrideMc2TaskDetailCallback(resCtx));
     HCCL_INFO("[MC2_OPEN_DIAG][Launch] opType %u, algName[%s], inputPtr %p, outputPtr %p, resCtx %p, ctxSize %llu, stream %p."
               "userRank %u, userRankSize %u, threadNum %zu, cclMemAddr %p, cclMemSize %llu.", 
               static_cast<u32>(param->opType), param->algName, param->inputPtr, param->outputPtr,
