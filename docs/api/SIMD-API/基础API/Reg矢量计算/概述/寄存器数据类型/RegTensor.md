@@ -88,7 +88,7 @@ template <typename T, const RegTrait& regTrait = RegTraitNumOne> struct RegTenso
 
     在RegTraitNumOne场景下，从UB（src0Addr）中以DIST_NORM模式搬运VL数据量。
     
-    在RegTraitNumTwo场景下，从UB（src0Addr）中以DIST_DINTLV_B32双搬入模式读取2*VL数据量，将complex64数据交错搬运，偶数索引（低位）的元素存入reg[0]，将奇数索引（高位）的元素存入reg[1]，数据类型为b32。两个RegTensor存储512B的数据量，reg[0]存的是64个complex64的前32位（低位），reg[1]存的是64个complex32的后32位（高位）。
+    在RegTraitNumTwo场景下，从UB（src0Addr）中以DIST_DINTLV_B32双搬入模式读取2*VL数据量，将b64数据交错搬运，偶数索引（低位）的元素存入reg[0]，将奇数索引（高位）的元素存入reg[1]，数据类型为b32。两个RegTensor存储512B的数据量，reg[0]存的是64个b64的前32位（低位），reg[1]存的是64个b64的后32位（高位）。
 
 ## 调用示例<a name="section1398164912391"></a>
 

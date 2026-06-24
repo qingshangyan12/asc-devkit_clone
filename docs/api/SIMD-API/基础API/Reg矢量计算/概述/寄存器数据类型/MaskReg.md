@@ -34,30 +34,6 @@ MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href
 
 ![](../../../../../figures/MaskReg计算过程.png "MaskReg计算过程")
 
-在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
-
-**表1**  Mask设置方式
-
-| 编号 | 设置方式 | 涉及接口 | 说明 |
-| :-- | :------------ | :------------ | :------------ |
-| 1 | 调用接口设置 | CreateMask | 调用CreateMask接口以固定的Pattern设置Mask，每次以循环计算均使用此Mask。详见方式1。 |
-| 2 | 调用接口设置 | UpdateMask | 调用UpdateMask设置Mask。详见方式2。<br>&bull; 在循环外调用UpdateMask设置固定的Mask，Mask表示在一次循环计算中前count个元素参与计算，每次以循环计算均使用此Mask。<br>&bull; 在循环内调用UpdateMask设置Mask，表示计算中前count个元素参与计算，每次循环Mask会自动更新。 |
-| 3 | 从UB搬运 | LoadAlign | 从UB搬运Mask到MaskReg。详见方式3。 |
-| 4 | 从RegTensor搬运 | MaskGenWithRegTensor | 从RegTensor搬运Mask到MaskReg。详见方式4。 |
-| 5 | 从掩码寄存器中读取 | MoveMask | 从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值。详见方式5。 |
-
-- CreateMask：将特定模式设置Mask到MaskReg寄存器。模式见。
-
-  **图2** b8数据类型下CreateMask接口不同MaskReg的模式下元素选取<a id="fig2"></a>
-
-![](../../../../../figures/b8数据类型下CreateMask接口不同MaskReg的模式下元素选取.png "b8数据类型下CreateMask接口不同MaskReg的模式下元素选取")
-
-- UpdateMask：根据当前scalarValue的值生成对应长度的有效位掩码，并自动将scalarValue减去当前向量长度以更新剩余待处理元素数量。
-
-  **图3** b16数据类型下UpdateMask接口基于scalarValue的掩码生成<a id="fig3"></a>
-
-![](../../../../../figures/b16数据类型下UpdateMask接口基于scalarValue的掩码生成.png "b16数据类型下UpdateMask接口基于scalarValue的掩码生成")
-
 ## 函数原型<a name="section620mcpsimp"></a>
 - CreateMask接口
   ```cpp
@@ -72,7 +48,8 @@ MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href
 
 ## 参数说明<a name="section622mcpsimp"></a>
 
-**表2**  CreateMask参数说明
+<a id="create-mask-params"></a>
+**表1**  CreateMask参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :-- | :------------ | :------------ |
@@ -81,7 +58,7 @@ MaskReg用于指示在计算过程中哪些元素参与计算，宽度为<a href
 | regTrait | 输入 | 该参数默认值为RegTraitNumOne。 |
 
 <a id="update-mask-params"></a>
-**表3**  UpdateMask参数说明
+**表2**  UpdateMask参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | :-- | :------------ | :------------ |
@@ -130,7 +107,7 @@ MaskReg
 
 在Mask设置中，Reg矢量计算支持多种灵活配置方式，可根据实际计算场景选择固定Mask模式、从UB搬运或从RegTensor搬运等策略，以满足不同计算场景的需求。具体设置方式如下表所示：
 
-**表1**  Mask设置方式
+**表3**  Mask设置方式
 
 | 编号 | 设置方式 | 涉及接口 | 说明 |
 | :-- | :------------ | :------------ | :------------ |
@@ -142,6 +119,18 @@ MaskReg
 
 Reg矢量计算中，掩码的配置方式由MaskReg寄存器决定，仅支持接口内设置Mask。Mask值可通过MaskReg类型参数，直接作为入参传递给矢量计算API。
 
+- CreateMask：将特定模式设置Mask到MaskReg寄存器。模式见[CreateMask参数说明](#create-mask-params)。
+
+  **图2** b8数据类型下CreateMask接口不同MaskReg的模式下元素选取<a id="fig2"></a>
+
+![](../../../../../figures/b8数据类型下CreateMask接口不同MaskReg的模式下元素选取.png "b8数据类型下CreateMask接口不同MaskReg的模式下元素选取")
+
+- UpdateMask：根据当前scalarValue的值生成对应长度的有效位掩码，并自动将scalarValue减去当前向量长度以更新剩余待处理元素数量。
+
+  **图3** b16数据类型下UpdateMask接口基于scalarValue的掩码生成<a id="fig3"></a>
+
+![](../../../../../figures/b16数据类型下UpdateMask接口基于scalarValue的掩码生成.png "b16数据类型下UpdateMask接口基于scalarValue的掩码生成")
+
 以基础算术API Add为例介绍Mask设置的不同方式。
 
 ```cpp
@@ -150,7 +139,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 ```
 
 - 方式1<a id="method1"></a>
-  采用CreateMask接口以固定的Pattern设置Mask，Pattern详见[UpdateMask参数说明](#update-mask-params)。在循环外调用CreateMask设置固定的Mask，每次以循环计算均使用此Mask。
+  采用CreateMask接口以固定的Pattern设置Mask，Pattern详见[CreateMask参数说明](#create-mask-params)。在循环外调用CreateMask设置固定的Mask，每次以循环计算均使用此Mask。
 
   ```cpp
   template <typename T>
@@ -216,7 +205,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - 方式3<a id="method3"></a>
   
-  采用LoadAlign从UB搬运Mask到MaskReg。在UB中设置Mask。
+  采用[LoadAlign](../../Reg数据搬运/MaskReg搬入.md)从UB搬运Mask到MaskReg。在UB中设置Mask。
 
   ```cpp
   template <typename T>
@@ -236,7 +225,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - 方式4<a id="method4"></a>
   
-  采用MaskGenWithRegTensor从RegTensor搬运Mask到MaskReg。在RegTensor中设置Mask。
+  采用[MaskGenWithRegTensor](../../Reg数据搬运/MaskReg搬入.md)从RegTensor搬运Mask到MaskReg。在RegTensor中设置Mask。
 
   ```cpp
   template <typename T>
@@ -259,7 +248,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
 - 方式5<a id="method5"></a>
   
-  采用MoveMask，从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。b16类型读取完整128bit的{MASK1,MASK0}，将每个bit复制为2bit；b32类型读取64bit的MASK0，并将每个bit复制为4bit。
+  采用[MoveMask](../../MaskReg计算/MoveMask.md)，从SetVectorMask设置的掩码寄存器{MASK1,MASK0}中读取Mask值，并按模板参数T对应的数据格式转换后写入返回值MaskReg。b16类型读取完整128bit的{MASK1,MASK0}，将每个bit复制为2bit；b32类型读取64bit的MASK0，并将每个bit复制为4bit。
 
   ```cpp
   template <typename T>
@@ -292,7 +281,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
 
   - 当操作数类型为b8时，每一个element对应1bit MaskReg；当操作数类型为b16时，每一个element对应2bit MaskReg，且仅2bit中的最低位是有效的；当操作数类型为b32时，每一个element对应4bit MaskReg，且仅4bit中的最低位是有效的。
 
-**图6** NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比<a id="fig6"></a>
+**图6** NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比<a id="fig8"></a>
 
 ![](../../../../../figures/Memory矢量计算与Reg矢量计算Mask机制对比.png "NPU架构版本2201的Memory矢量计算与NPU架构版本3510的Reg矢量计算Mask机制对比")
 

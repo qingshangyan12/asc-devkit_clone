@@ -61,7 +61,7 @@ for (uint16_t index0 = 0; index0 < loopNum0; ++index0){
     for (uint16_t index1 = 0; index1 < loopNum1; ++index1){ 
         for (uint16_t index2 = 0; index2 < loopNum2; ++index2){ 
             for (uint16_t index3 = 0; index3 < loopNum3; ++index3){ 
-                aReg = AscendC::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3 
+                aReg = AscendC::Reg::CreateAddrReg<T>(index0, stride0, index1, stride1, index2, stride2, index3, stride3);  // Offset = index0 * stride0 + index1 * stride1 + index2 * stride2 + index3 * stride3 
             } 
         } 
     } 
