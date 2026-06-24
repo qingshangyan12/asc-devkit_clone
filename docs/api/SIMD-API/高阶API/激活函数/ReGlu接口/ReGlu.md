@@ -80,13 +80,21 @@ ReGlu是一种GLU变体，使用Relu作为激活函数，计算公式如下：
 -   当前仅支持ND格式的输入，不支持其他格式。
 -   支持的数据类型<a id="li356910105419"></a>
 
+    <!-- npu="950" id5 -->
     Ascend 950PR/Ascend 950DT，支持的数据类型为：half、bfloat16\_t、float。
+    <!-- end id5 -->
 
+    <!-- npu="A3" id6 -->
     Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的数据类型为：half、bfloat16\_t、float。
+    <!-- end id6 -->
 
+    <!-- npu="910b" id7 -->
     Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的数据类型为：half、bfloat16\_t、float。
+    <!-- end id7 -->
 
+    <!-- npu="310p" id8 -->
     Atlas 推理系列产品AI Core，支持的数据类型为：half、float。
+    <!-- end id8 -->
 
     <!-- npu="x90" id3 -->
     Kirin X90，支持的数据类型为：half、float。
