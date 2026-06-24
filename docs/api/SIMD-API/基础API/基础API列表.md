@@ -495,8 +495,7 @@
 ## 同步控制
 | 接口名 | 功能描述 |
 | --- | --- |
-| [Lock](同步控制/核内同步/Mutex(ISASI)/Lock.md) | 根据MutexID获取Mutex，并阻塞当前流水指令队列，直到对应的MutexID被Unlock。 |
-| [Unlock](同步控制/核内同步/Mutex(ISASI)/Unlock.md) | 直到前置当前流水指令退出后，根据MutexID释放对应Mutex。 |
+| [TQueSync](同步控制/核内同步/TQueSync/TQueSync.md) | TQueSync类提供同步控制接口，开发者可以使用这类API来自行完成同步控制。 |
 | [IBSet](同步控制/核间同步/IBSet.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
 | [IBWait](同步控制/核间同步/IBWait.md) | 调用IBSet设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。 |
 | [SyncAll](同步控制/核间同步/SyncAll.md) | SyncAll是核间同步控制接口。 |
