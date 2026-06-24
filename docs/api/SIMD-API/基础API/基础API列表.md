@@ -6,8 +6,9 @@
 | --- | --- |
 | [LocalTensor](数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor.md) | LocalTensor用于存放AI Core中Local Memory（内部存储）的数据，支持逻辑位置TPosition为VECIN、VECOUT、VECCALC、A1、A2、B1、B2、CO1、CO2。 |
 | [GlobalTensor](数据结构/LocalTensor和GlobalTensor定义/GlobalTensor/GlobalTensor.md) | GlobalTensor用来存放Global Memory（外部存储）的全局数据。 |
-| [layout_structure](TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Layout相关基础数据结构。 |
-| [tensor_structure](TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Tensor相关数据结构。 |
+| [layout_structure](数据结构/TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Layout相关基础数据结构。 |
+| [tensor_structure](数据结构/TensorAPI-BasicStructure/TensorAPI-BasicStructure.md) | Tensor API基础数据结构中Tensor相关数据结构。 |
+| [GetLayoutPattern](数据结构/TensorAPI-BasicStructure/utils/GetLayoutPattern.md) | GetLayoutPattern用于从Layout类型中提取其LayoutPattern类型信息。 |
 | [Coordinate](数据结构/辅助数据结构/Coordinate/Coordinate.md) | Coordinate本质上是一个元组（tuple），用于表示张量在不同维度的位置信息，即坐标值。 |
 | [Layout](数据结构/辅助数据结构/Layout/Layout.md) | Layout数据结构是描述多维张量内存布局的基础模板类，通过编译时的形状（Shape）和步长（Stride）信息，实现逻辑坐标空间到一维内存地址空间的映射。 |
 | [TensorTrait](数据结构/辅助数据结构/TensorTrait/TensorTrait.md) | TensorTrait数据结构是描述Tensor相关信息的基础模板类，包含Tensor的数据类型、逻辑位置和Layout内存布局。 |
@@ -477,7 +478,18 @@
 ## 资源管理
 | 接口名 | 功能描述 |
 | --- | --- |
+| [TPipe](资源管理/Pipe和Que框架/TPipe/TPipe.md) | TPipe是用来管理全局内存等资源的框架。通过TPipe类提供的接口可以完成内存等资源的分配管理操作。 |
 | [GetTPipePtr](资源管理/Pipe和Que框架/GetTPipePtr.md) | 创建TPipe对象时，对象初始化会设置全局唯一的TPipe指针。本接口用于获取该指针，获取该指针后，可进行TPipe相关的操作。 |
+| [TBufPool](资源管理/Pipe和Que框架/TBufPool/TBufPool.md) | TPipe可以管理全局内存资源，而TBufPool可以手动管理或复用Unified Buffer/L1 Buffer物理内存，主要用于多个stage计算中Unified Buffer/L1 Buffer物理内存不足的场景。 |
+| [TQue](资源管理/Pipe和Que框架/TQue/TQue.md) | 提供入队出队等接口，通过队列（Queue）完成任务间同步。 |
+| [TQueBind](资源管理/Pipe和Que框架/TQueBind/TQueBind.md) | TQueBind绑定源逻辑位置和目的逻辑位置，根据源位置和目的位置，来确定内存分配的位置 、插入对应的同步事件，帮助开发者解决内存分配和管理、同步等问题。 |
+| [TBuf](资源管理/Pipe和Que框架/TBuf/TBuf.md) | 使用Ascend C编程的过程中，可能会用到一些临时变量。这些临时变量占用的内存可以使用TBuf数据结构来管理。 |
+| [InitSpmBuffer](资源管理/Pipe和Que框架/TPipe/InitSpmBuffer.md) | 初始化SPM Buffer。 |
+| [WriteSpmBuffer](资源管理/Pipe和Que框架/TPipe/WriteSpmBuffer.md) | 将需要溢出暂存的数据拷贝到SPM Buffer中。 |
+| [ReadSpmBuffer](资源管理/Pipe和Que框架/TPipe/ReadSpmBuffer.md) | 从SPM Buffer读回到local数据中。 |
+| [GetUserWorkspace](资源管理/临时空间管理/workspace/GetUserWorkspace.md) | 获取用户使用的workspace指针。 |
+| [SetSysWorkSpace](资源管理/临时空间管理/workspace/SetSysWorkSpace.md) | 在进行融合算子编程时，由于框架通信机制需要使用到workspace，也就是系统workspace，所以在该场景下，开发者要调用该接口，设置系统workspace的指针。 |
+| [GetSysWorkSpacePtr](资源管理/临时空间管理/workspace/GetSysWorkSpacePtr.md) | 获取系统workspace指针。 |
 | [PopStackBuffer](资源管理/临时空间管理/PopStackBuffer.md) | 在指定position（逻辑位置）申请临时空间，空间大小为指定position的全部剩余空间。 |
 
 ## 同步控制
